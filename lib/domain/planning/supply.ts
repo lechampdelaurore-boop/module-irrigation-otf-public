@@ -179,11 +179,17 @@ export class ReservoirTimeline {
     return { status: 'short', shortfallCubicMeters: shortfall, retryAtMs: retryAtMs !== null && retryAtMs < this.endMs ? retryAtMs : null };
   }
 
-  /** Ce que la réserve peut fournir d'ici la fin de l'horizon, hors sécurité, apports compris. */
+  /**
+   * Ce que la réserve peut fournir d'ici la fin de l'horizon, apports compris :
+   * le stock moins le minimum de sécurité — négatif quand le stock est sous son
+   * minimum, les apports comblant d'abord le manque, comme la garde les compte
+   * (décision 2 de la 3.9, D-052) —, plus les apports, moins le planifié. Seul
+   * le total est borné par zéro.
+   */
   budgetCubicMeters(): number | null {
     const initial = this.reservoir.currentVolumeCubicMeters;
     if (initial === null) return null;
-    let total = Math.max(0, Math.min(this.reservoir.capacityCubicMeters, initial) - this.reservoir.minimumSafetyCubicMeters);
+    let total = Math.min(this.reservoir.capacityCubicMeters, Math.max(0, initial)) - this.reservoir.minimumSafetyCubicMeters;
     for (const [date, rate] of this.inflowRateByDate) {
       const dayStart = Math.max(this.startMs, localDateStartUtc(date, this.timeZone).getTime());
       const dayEnd = Math.min(this.endMs, localDateStartUtc(addDaysToDateKey(date, 1), this.timeZone).getTime());

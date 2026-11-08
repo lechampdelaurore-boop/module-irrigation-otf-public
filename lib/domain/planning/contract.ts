@@ -322,8 +322,15 @@ export type SupplyBudget = {
    */
   dailyLimitRemainingCubicMeters: number | null;
   demandCubicMeters: number;
-  /** Part servie de chaque niveau de priorité, de 0 à 1. */
+  /** Part visée de chaque niveau de priorité, de 0 à 1 : la fraction de la conduite, celle des parts réservées au départ. */
   fractions: Record<IrrigationNeedPriority, number>;
+  /**
+   * La demande de chaque niveau et l'eau utile placée sur ses planches, en m³, comptées sur la surface que le propre
+   * matériel de chaque planche mouille : la part placée est leur rapport (décision 2 de la 3.9, D-052). Absentes d'un
+   * calcul enregistré avant, dont la ligne garde ses seules fractions.
+   */
+  demandByLevelCubicMeters?: Record<IrrigationNeedPriority, number>;
+  placedByLevelCubicMeters?: Record<IrrigationNeedPriority, number>;
 };
 
 /** Les cinq statuts d'une proposition (docs/planning-contract.md, « Les statuts »). */

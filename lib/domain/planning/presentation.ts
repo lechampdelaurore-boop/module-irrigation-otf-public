@@ -1,4 +1,5 @@
 import type { EquipmentKind } from '../irrigation-domain.ts';
+import { priorityLabel } from '../irrigation-feasibility.ts';
 import { formatWaterVolumeForMessage } from '../irrigation-format.ts';
 import type { IrrigationNeedPriority } from '../irrigation-needs.ts';
 import { MINUTES_PER_HOUR, cubicMetersFromLiters, cubicMetersFromMillimeters, millisecondsFromSeconds } from '../units.ts';
@@ -17,6 +18,7 @@ import {
   type StoredPlanCalculation,
   type StoredProposal,
   type StoredWeeklyPlan,
+  type SupplyBudget,
   type TimingReason,
   type UnplacedReason,
   type WeeklyPlan,
@@ -326,6 +328,27 @@ export function arbitrationNote(summary: { arbitration?: PlanArbitration }): str
     sentences.push(`${formatWaterVolumeForMessage(arbitration.unreceivedCubicMeters)} m³ alloués à ${beds} ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.`);
   }
   return sentences.join(' ');
+}
+
+const PRIORITY_LEVELS: readonly IrrigationNeedPriority[] = ['high', 'normal', 'low'];
+const budgetPercent = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+
+/**
+ * Les niveaux de priorité d'une ligne de budget (décision 2 de la 3.9,
+ * D-052) : pour chacun, la part visée — la fraction de la conduite, celle
+ * des parts réservées au départ — et la part placée — l'eau utile placée sur
+ * ses planches, rapportée à sa demande — ; « — » pour un niveau sans
+ * demande. Un calcul enregistré avant, sans les demandes par niveau, garde sa
+ * ligne d'avant, les seules parts réservées.
+ */
+export function budgetLevelsText(budget: SupplyBudget): string {
+  const percent = (fraction: number) => `${budgetPercent.format(fraction * PERCENT)} %`;
+  const label = (level: IrrigationNeedPriority) => priorityLabel(level).toLocaleLowerCase('fr-FR');
+  const { demandByLevelCubicMeters: demand, placedByLevelCubicMeters: placed } = budget;
+  if (!demand || !placed) return `part réservée : ${PRIORITY_LEVELS.map((level) => `${label(level)} ${percent(budget.fractions[level])}`).join(', ')}`;
+  return PRIORITY_LEVELS.map((level) => (demand[level] > 0
+    ? `${label(level)} ${percent(budget.fractions[level])} visés, ${percent(placed[level] / demand[level])} placés`
+    : `${label(level)} —`)).join(' · ');
 }
 
 // ---------------------------------------------------------------------------
