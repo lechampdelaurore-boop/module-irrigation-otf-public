@@ -185,6 +185,8 @@ export async function savePlanCalculationForUser(
     suggestions: plan.suggestions, overcommittedDays: plan.overcommittedDays, changes: input.changes ?? null,
     // L'arbitrage du plan, seulement sous un arbitrage validé : un calcul sans arbitrage s'enregistre comme avant (D-052).
     ...(plan.arbitration ? { arbitration: plan.arbitration } : {}),
+    // La file du report, seulement quand elle n'est pas vide : un calcul sans file s'enregistre comme avant (décision 4 de la 3.9).
+    ...(plan.deferredQueue ? { deferredQueue: plan.deferredQueue } : {}),
   };
   const previous = await db.prepare(`SELECT id, equipment_id, setting_id, start_at, end_at, dose_mm FROM irrigation_plan_proposals
     WHERE workspace_id = ? AND season = ? AND week_start = ? AND status = 'proposed'`)

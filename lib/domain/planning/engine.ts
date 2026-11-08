@@ -140,6 +140,8 @@ export function buildWeeklyPlan(inputs: PlanningInputs, settings: PlanningSettin
     budgets: placedBudgets(pendingBudgets),
     // Sous un arbitrage validé, ce que les planches allouées n'ont pas reçu reste non attribué : le plan le dit (D-052).
     ...(arbitration ? { arbitration: arbitrationOutcome(arbitration) } : {}),
+    // La file du report suivie, pour qu'un calcul sans événement la reprenne (décision 4 de la 3.9, D-052).
+    ...(inputs.deferredBedIds?.length ? { deferredQueue: [...inputs.deferredBedIds] } : {}),
     suggestions,
     overcommittedDays,
     settings,

@@ -129,7 +129,7 @@ const GROUP_TITLES: Record<UnplacedGroupKey, string> = {
   'no-objective': 'Sans objectif',
   'below-minimum-dose': 'Besoin trop petit pour un arrosage',
   'water-budget': 'Manque d’eau',
-  deferred: 'Reportées au prochain calcul',
+  deferred: 'Reportées jusqu’au prochain événement',
   'pump-time': 'Temps de pompage insuffisant',
   'daily-limit': 'Limite journalière atteinte',
   'reserve-timing': 'Réserve au minimum',
@@ -218,5 +218,7 @@ export function unplacedTileDetail(groups: UnplacedGroups, bedsWithDeficit: numb
 export const UNPLACED_GROUP_MEANING: Partial<Record<UnplacedGroupKey, string>> = {
   'no-equipment': 'Aucun matériel posé ne les arrose : c’est un réglage à faire dans « Matériel », pas un manque d’eau.',
   'water-budget': 'Le stock et les ressources ne suffisent pas d’ici dimanche.',
+  // Sous le report, la file n'avance qu'au calcul qui suit un événement (décision 4 de la 3.9, D-052).
+  deferred: 'Elles passent en tête au calcul qui suit un événement : un arrosage validé ou fait, de l’eau nouvelle, un stock corrigé. Recalculer sans événement ne change pas leur tour.',
   'insufficient-reach': 'Le réglage arrose une surface plus large que la planche : elle reçoit moins que la planche de référence de ce réglage.',
 };

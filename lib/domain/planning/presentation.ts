@@ -138,7 +138,7 @@ const UNPLACED_REASON_LABELS: Record<UnplacedReason, string> = {
   'no-equipment': 'aucun matériel ne l’arrose',
   'below-minimum-dose': 'besoin sous la dose minimale : attend qu’il grandisse',
   'water-budget': 'stock et ressources insuffisants d’ici dimanche',
-  deferred: 'reportée au prochain calcul (conduite « report »)',
+  deferred: 'reportée : passe en tête après le prochain événement (conduite « report »)',
   'pump-time': 'temps de pompage insuffisant dans les plages horaires',
   'daily-limit': 'limite journalière d’irrigation atteinte',
   'reserve-timing': 'réserve au minimum de sécurité au moment voulu',
