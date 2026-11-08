@@ -1,0 +1,407 @@
+.water-management-section {
+  margin-top: 28px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 82%);
+  box-shadow: var(--shadow);
+}
+
+.water-resources-section {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.water-resources-heading,
+.water-asset-title,
+.water-projection-heading,
+.water-asset-card-title,
+.water-card-actions,
+.water-editor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.water-resources-heading h2,
+.water-asset-panel h3,
+.water-links-panel h3,
+.water-projection-panel h3,
+.water-editor h3 {
+  margin: 0;
+}
+
+.water-resources-heading p,
+.water-asset-title p,
+.water-projection-heading p {
+  margin: 5px 0 0;
+}
+
+.water-resources-section button {
+  min-height: 44px;
+}
+
+.water-assets-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.water-asset-panel,
+.water-links-panel,
+.water-projection-panel,
+.water-editor {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 16px;
+}
+
+.water-links-panel,
+.water-projection-panel,
+.water-editor {
+  margin-top: 16px;
+}
+
+.water-asset-title > button,
+.water-link-form button,
+.projection-shortcuts button,
+.water-editor-actions .primary {
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--green);
+  color: white;
+  padding: 8px 14px;
+  font-weight: 500;
+}
+
+.water-asset-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.water-asset-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.water-asset-card-title {
+  align-items: flex-start;
+}
+
+.water-asset-card-title > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.water-asset-card-title span,
+.water-asset-card small,
+.projection-card small,
+.water-link-form small {
+  color: var(--muted);
+}
+
+.water-asset-card-title button,
+.water-card-actions button,
+.water-editor-actions button {
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--green-soft);
+  color: var(--green);
+  padding: 7px 10px;
+  font-weight: 500;
+}
+
+.water-card-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.water-asset-card dl,
+.projection-card dl {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(0, 1.2fr);
+  gap: 7px 12px;
+  margin: 13px 0;
+}
+
+.water-asset-card dt,
+.projection-card dt {
+  color: var(--muted);
+}
+
+.water-asset-card dd,
+.projection-card dd {
+  min-width: 0;
+  margin: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.water-empty {
+  margin: 14px 0 0;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--sheet);
+  color: var(--muted);
+}
+
+.water-editor {
+  border-left: 5px solid var(--green);
+}
+
+.water-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.water-editor label,
+.projection-shortcuts label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.water-editor label > span,
+.projection-shortcuts label > span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: var(--font-ui);
+}
+
+.water-editor input,
+.water-editor select,
+.water-link-form select,
+.projection-shortcuts input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  padding: 8px 10px;
+  color: var(--ink);
+}
+
+.water-editor fieldset {
+  margin: 16px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 12px;
+}
+
+.water-editor legend {
+  padding: 0 6px;
+  font-weight: 750;
+}
+
+.water-editor .water-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.water-editor .water-toggle input {
+  width: 20px;
+  min-height: 20px;
+}
+
+.water-editor-help {
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--tile);
+}
+
+.water-editor-actions {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.water-link-forms {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.water-link-form {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 13px;
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.water-link-form h4 {
+  margin: 0;
+}
+
+.water-network-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.water-connection {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.water-connection strong,
+.water-connection small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.water-connection > span {
+  color: var(--green);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.projection-shortcuts {
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.projection-shortcuts button.is-active {
+  outline: 3px solid #9cd6c0;
+}
+
+.projection-date {
+  margin: 12px 0;
+  color: var(--muted);
+}
+
+.projection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.projection-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, var(--card), var(--tile));
+}
+
+.projection-card > div:first-child > span {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.projection-card h4 {
+  margin: 3px 0 0;
+  font-size: 1.2rem;
+}
+
+.projection-card small {
+  display: block;
+  margin-top: 7px;
+}
+
+.projection-unknown,
+.projection-warning {
+  display: grid;
+  gap: 5px;
+  padding: 11px;
+  border-radius: 9px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+@media (max-width: 980px) {
+  .water-assets-columns,
+  .water-link-forms,
+  .water-editor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .water-projection-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .projection-shortcuts {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .water-resources-section {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: var(--radius);
+  }
+  .water-assets-columns,
+  .water-link-forms,
+  .water-editor-grid,
+  .projection-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .water-resources-heading,
+  .water-asset-title,
+  .water-asset-card-title {
+    align-items: flex-start;
+  }
+  .water-asset-card-title {
+    flex-direction: column;
+  }
+  .water-card-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .water-card-actions button {
+    flex: 1;
+  }
+  .water-asset-card dl,
+  .projection-card dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .water-asset-card dd,
+  .projection-card dd {
+    margin-bottom: 8px;
+  }
+  .projection-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+  .projection-shortcuts label,
+  .projection-shortcuts label + button {
+    grid-column: 1 / -1;
+  }
+  .projection-shortcuts button {
+    padding-inline: 6px;
+  }
+}

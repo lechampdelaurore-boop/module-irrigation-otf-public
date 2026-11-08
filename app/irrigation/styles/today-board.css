@@ -1,0 +1,291 @@
+/*
+ * Les dessins du tableau de bord « Aujourd'hui »
+ * (docs/aujourdhui-tableau-de-bord-contract.md, section 3.2) : les tuiles de
+ * la semaine, les trois jours de météo, les barres de l'eau de la semaine et
+ * du sol, les cuves et les prélèvements, l'anneau de la fiabilité. Une
+ * valeur inconnue se dessine hachurée, jamais pleine (D-003).
+ */
+
+/* La semaine : quatre tuiles à filet. */
+.today-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.today-kpi {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  align-content: start;
+  padding: 10px 12px 11px;
+  border-top: 3px solid var(--green);
+  border-radius: var(--radius);
+  background: var(--tile);
+}
+
+.today-kpi[data-tone="water"] {
+  border-top-color: var(--water);
+  background: var(--water-soft);
+}
+
+.today-kpi[data-tone="warn"] {
+  border-top-color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.today-kpi[data-tone="unknown"] {
+  border-top-color: var(--line-strong);
+  background: var(--sheet);
+}
+
+.today-kpi-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font: 500 12px/1.4 var(--font-ui);
+}
+
+.today-kpi-label .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--green);
+}
+
+.today-kpi[data-tone="water"] .today-kpi-label .icon,
+.today-kpi[data-tone="water"] .today-kpi-value {
+  color: var(--water-ink);
+}
+
+.today-kpi[data-tone="warn"] .today-kpi-label .icon,
+.today-kpi[data-tone="warn"] .today-kpi-value {
+  color: var(--warn-ink);
+}
+
+.today-kpi-value {
+  font: 500 1.6rem/1.15 var(--font-title);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-kpi-detail {
+  color: var(--muted);
+  font-size: .76rem;
+  line-height: 1.4;
+}
+
+/* « Gel ou chaleur » : trois jours en colonne, l'échelle commune. */
+.today-days {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-day {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.today-day[data-tone="alert"] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.today-day[data-tone="unknown"] {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.today-day p {
+  margin: 0;
+}
+
+.today-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.today-day-name {
+  font: 600 13.5px/1.4 var(--font-ui);
+}
+
+.today-day-top .icon {
+  width: 24px;
+  height: 24px;
+  color: var(--amber);
+}
+
+.today-day[data-icon="rain"] .today-day-top .icon {
+  color: var(--water);
+}
+
+.today-day[data-icon="frost"] .today-day-top .icon {
+  color: var(--danger);
+}
+
+.today-day[data-icon="unknown"] .today-day-top .icon {
+  color: var(--warn);
+}
+
+.today-temps {
+  display: grid;
+  grid-template-columns: 3.6em minmax(0, 1fr) 3.6em;
+  gap: 8px;
+  align-items: center;
+  font: 600 13.5px/1.3 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-temp[data-end="min"] {
+  color: var(--water-ink);
+}
+
+.today-day[data-tone="alert"] .today-temp[data-end="min"] {
+  color: var(--danger-ink);
+}
+
+.today-temp[data-end="max"] {
+  color: var(--warn-ink);
+  text-align: right;
+}
+
+.today-range {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 7%);
+}
+
+.today-range i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7fb2df, #f0b46d);
+}
+
+.today-day[data-tone="alert"] .today-range i {
+  background: linear-gradient(90deg, var(--danger), #f0b46d);
+}
+
+.today-range b,
+.today-scale-note b {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--anthracite);
+}
+
+.today-scale-note b {
+  position: static;
+  display: inline-block;
+  height: 10px;
+  margin: 0 3px;
+  vertical-align: -1px;
+}
+
+.today-day-rain {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.today-day-rain .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--water);
+}
+
+.today-day-note {
+  color: var(--danger-ink);
+  font: 500 12.5px/1.4 var(--font-ui);
+}
+
+.today-day-unknown {
+  color: var(--warn-ink);
+  font: 500 12.5px/1.4 var(--font-ui);
+}
+
+.today-weather-line {
+  margin: 0;
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.today-block[data-tone="unknown"] .today-weather-line {
+  color: var(--warn-ink);
+}
+
+.today-scale-note,
+.today-legend {
+  display: flex;
+  margin: 0;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--muted);
+  font: 500 11.5px/1.5 var(--font-ui);
+}
+
+.today-scale-note {
+  display: block;
+}
+
+.today-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.today-legend i {
+  display: inline-block;
+  width: 14px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--green);
+}
+
+.today-legend i[data-tone="late"] {
+  background: var(--warn);
+}
+
+.today-legend i[data-tone="proposed"] {
+  border: 1.5px dashed var(--green);
+  background: var(--card);
+}
+
+.today-legend i[data-tone="past"] {
+  background: repeating-linear-gradient(135deg, rgb(0 0 0 / 12%) 0 3px, transparent 3px 6px);
+}
+
+.today-legend i[data-tone="rain"] {
+  background: #6ea6d8;
+}
+
+.today-legend i[data-tone="goal"] {
+  width: 2px;
+  height: 12px;
+  background: var(--ink);
+}
+
+@container (max-width: 620px) {
+  .today-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-kpi-value {
+    font-size: 1.35rem;
+  }
+}

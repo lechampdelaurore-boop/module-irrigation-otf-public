@@ -1,0 +1,14 @@
+-- Sous-tranche 3.7 : l'alerte « irrigation en retard »
+-- (docs/replanning-contract.md, règles 21 et 24 ; docs/push-worker-contract.md).
+--
+-- Une irrigation planifiée porte, dès sa création, une alarme du Worker de
+-- notification pour son début plus la tolérance R14 : si elle n'a pas démarré
+-- à cette heure, le téléphone dit « Irrigation en retard ». L'alarme vit sous
+-- la révision déjà en place (`timer_alarm_revision`, `timer_alarm_status`,
+-- `timer_alarm_synced_at`) ; le démarrage la remplace par l'alarme de fin du
+-- minuteur, l'annulation la retire. Cette colonne retient son échéance, que
+-- le minuteur n'a pas : nulle dès que le minuteur tourne.
+--
+-- Migration additive (docs/migrations-contract.md) : une colonne, nulle pour
+-- les irrigations planifiées avant elle, qui ne portent pas d'alarme de retard.
+ALTER TABLE `irrigation_event_equipment` ADD COLUMN `late_alarm_due_at` text;

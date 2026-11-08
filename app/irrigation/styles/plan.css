@@ -1,0 +1,462 @@
+.parcel-control {
+  min-width: min(360px, 50vw);
+}
+
+/*
+  Le plan (deuxième passe, D-068, charte du module, points 1 et 2) : la
+  parcelle est un bloc blanc simple, sans bandeau vert foncé ; ses jardins et
+  abris y sont posés sans cadre, leurs planches sur la feuille grise.
+*/
+.farm-plan {
+  position: relative;
+  overflow: visible;
+  padding: 18px 20px 20px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.parcel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin-bottom: 16px;
+  color: var(--muted);
+}
+
+.parcel-heading strong {
+  margin-right: auto;
+  color: var(--ink);
+  font: 300 20px/1.2 var(--font-title);
+}
+
+.parcel-heading span {
+  font-size: 13px;
+}
+
+.parcel-heading span + span::before {
+  margin-right: 8px;
+  content: "·";
+}
+
+.plot-grid {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.plot-plan-card {
+  position: relative;
+  display: flex;
+  flex: 1 1 min(100%, var(--plot-min-width, 290px));
+  max-width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  overflow: visible;
+}
+
+.plot-plan-card:has(.plan-equipment-menu[open]) {
+  z-index: 20;
+}
+
+.plot-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plot-card-heading strong {
+  overflow: hidden;
+  font: 500 14px/1.3 var(--font-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* L'étiquette en pastille douce : jardin vert pâle, abri orangé (point 1). */
+.plot-type-badge {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--tile);
+  color: var(--green);
+  font: 500 12px/1.4 var(--font-ui);
+}
+
+.plot-plan-card[data-mode="greenhouse"] .plot-type-badge {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.plot-area {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.plot-card-body {
+  display: flex;
+  min-height: 126px;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 9.75px;
+  background: var(--sheet);
+}
+
+.plot-bed-count {
+  align-self: center;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.1;
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.plot-plan-content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.plot-placement-labels {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.plot-placement-control {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: stretch;
+}
+
+.plot-placement-label {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border: 1px solid #9ccfe5;
+  border-radius: 5px 0 0 5px;
+  background: #f5fbfe;
+  color: #075d87;
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.plot-placement-label strong {
+  flex: 0 0 auto;
+  font-size: 7px;
+  letter-spacing: .04em;
+}
+
+.plot-placement-label[data-kind="drip"] {
+  border-color: #9ccfe5;
+  background: #f5fbfe;
+  color: #075d87;
+}
+
+.plot-placement-label[data-focused="true"] {
+  box-shadow: 0 0 0 2px white, 0 0 0 4px rgb(7 93 135 / 24%);
+}
+
+.plot-placement-label[data-kind="drip"][data-focused="true"] {
+  box-shadow: 0 0 0 2px white, 0 0 0 4px rgb(7 93 135 / 24%);
+}
+
+.plan-equipment-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.plan-equipment-menu summary {
+  display: grid;
+  width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border: 1px solid #9ccfe5;
+  border-left: 0;
+  border-radius: 0 5px 5px 0;
+  background: #f5fbfe;
+  color: #075d87;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 850;
+  list-style: none;
+}
+
+.plan-equipment-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.plan-equipment-menu summary:hover,
+.plan-equipment-menu[open] summary {
+  background: #dceff7;
+}
+
+.plan-equipment-menu > div {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  display: grid;
+  width: 210px;
+  overflow: hidden;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  box-shadow: var(--shadow-raised);
+}
+
+.plan-equipment-menu button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.plan-equipment-menu button:hover {
+  background: var(--sheet);
+}
+
+.plan-equipment-menu .archive-action {
+  color: #9a3d32;
+}
+
+.plan-equipment-menu .delete-action {
+  border-top: 1px solid #f0d8d4;
+  border-radius: 0 0 7px 7px;
+  color: #a3261a;
+}
+
+.bed-strip {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  grid-template-columns: repeat(var(--bed-columns, 1), minmax(0, 1fr));
+  gap: 3px;
+}
+
+.bed-anchor-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 100px;
+}
+
+.plan-bed {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 100px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: #cfe5d5;
+  color: var(--green);
+  cursor: pointer;
+}
+
+.plot-plan-card[data-mode="greenhouse"] .plan-bed {
+  background: #f7dfaa;
+  color: #865608;
+}
+
+.plan-bed > span:first-child {
+  position: relative;
+  z-index: 5;
+  padding: 3px 1px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 92%);
+  font-size: 8.5px;
+  font-weight: 750;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.plan-bed[data-irrigated="true"] {
+  background:
+    linear-gradient(
+      rgb(15 139 196 / var(--coverage-alpha, .25)),
+      rgb(15 139 196 / var(--coverage-alpha, .25))
+    ),
+    #cfe5d5;
+}
+
+.plot-plan-card[data-mode="greenhouse"] .plan-bed[data-irrigated="true"] {
+  background:
+    linear-gradient(
+      rgb(15 139 196 / var(--coverage-alpha, .25)),
+      rgb(15 139 196 / var(--coverage-alpha, .25))
+    ),
+    #f7dfaa;
+}
+
+.plan-bed[data-overlap="true"] {
+  background:
+    linear-gradient(
+      rgb(119 69 155 / var(--coverage-alpha, .3)),
+      rgb(119 69 155 / var(--coverage-alpha, .3))
+    ),
+    var(--sheet);
+}
+
+.plot-plan-card[data-mode="greenhouse"] .plan-bed[data-overlap="true"] {
+  background:
+    linear-gradient(
+      rgb(119 69 155 / var(--coverage-alpha, .3)),
+      rgb(119 69 155 / var(--coverage-alpha, .3))
+    ),
+    #f7dfaa;
+}
+
+.bed-anchor-cell[data-coverage-dimmed="true"] .plan-bed {
+  filter: saturate(.35);
+  opacity: .42;
+}
+
+.coverage-rate-badge {
+  position: absolute;
+  z-index: 4;
+  top: 4px;
+  left: 50%;
+  max-width: calc(100% - 3px);
+  overflow: hidden;
+  padding: 2px 3px;
+  border-radius: 4px;
+  background: rgb(8 105 149 / 88%);
+  color: white;
+  font-size: 6.5px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+  transform: translateX(-50%);
+}
+
+.coverage-rate-badge[data-overlap="true"] {
+  background: rgb(104 52 141 / 92%);
+}
+
+.farm-plan[data-placement-mode] .plan-bed,
+.farm-plan[data-placement-mode] .between-bed-anchor {
+  cursor: crosshair;
+}
+
+.plan-bed[data-placement-anchor="true"] {
+  border-color: #167eae;
+  background: #dceff7;
+  color: #125f82;
+  box-shadow: inset 0 0 0 1px #167eae, 0 0 0 2px rgb(22 126 174 / 10%);
+}
+
+.plot-plan-card[data-mode="greenhouse"] .plan-bed[data-placement-anchor="true"] {
+  border-color: #167eae;
+  background: #dceff7;
+  color: #125f82;
+  box-shadow: inset 0 0 0 1px #167eae, 0 0 0 2px rgb(22 126 174 / 10%);
+}
+
+.placement-line {
+  position: absolute;
+  z-index: 3;
+  top: 3px;
+  bottom: 3px;
+  left: 50%;
+  width: 3px;
+  border-radius: 999px;
+  background: #0f8bc4;
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 76%);
+  transform: translateX(-50%);
+}
+
+.bed-anchor-cell[data-drip-selected="true"] .plan-bed,
+.plan-bed[data-placement-selected="true"] {
+  border-color: #167eae;
+  box-shadow: inset 0 0 0 1px rgb(22 126 174 / 22%);
+}
+
+.bed-anchor-cell[data-coverage-focused="true"] .plan-bed,
+.plan-bed[data-coverage-focused="true"] {
+  border-color: #0876aa;
+  box-shadow: inset 0 0 0 2px #0876aa, 0 0 0 2px rgb(8 118 170 / 16%);
+}
+
+.between-bed-anchor .placement-line,
+.plan-bed .placement-line.center {
+  top: -7px;
+  bottom: -7px;
+  width: 4px;
+}
+
+.drip-rails {
+  position: absolute;
+  z-index: 3;
+  top: 4px;
+  right: 3px;
+  bottom: 4px;
+  left: 3px;
+  pointer-events: none;
+}
+
+.drip-rails::before,
+.drip-rails::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 2px dashed #167eae;
+  content: "";
+}
+
+.drip-rails::before {
+  left: 0;
+}
+
+.drip-rails::after {
+  right: 0;
+}
+
+.drip-rails[data-focused="true"]::before,
+.drip-rails[data-focused="true"]::after {
+  border-left-color: #075d87;
+  border-left-width: 3px;
+  filter: drop-shadow(0 0 2px rgb(7 93 135 / 35%));
+}
+
+.drip-rails[data-dimmed="true"] {
+  opacity: .32;
+}
+
+.drip-rails[data-preview="true"]::before,
+.drip-rails[data-preview="true"]::after {
+  animation: drip-preview-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes drip-preview-pulse {
+  from { opacity: .55; }
+  to { opacity: 1; }
+}

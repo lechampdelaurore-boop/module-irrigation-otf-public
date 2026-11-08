@@ -1,0 +1,20 @@
+{
+  "name": "Irrigation · Ouvre ta ferme",
+  "short_name": "Irrigation",
+  "description": "Suivi et aide à l'irrigation pour Ouvre ta ferme.",
+  "lang": "fr",
+  "start_url": "/irrigation",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7f1",
+  "theme_color": "#0f6849",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

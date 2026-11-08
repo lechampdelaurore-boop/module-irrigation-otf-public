@@ -1,0 +1,187 @@
+name: Contrôles du module
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  application:
+    name: Application
+    # Sur main, la fusion rejoue le même code déjà vert (la protection de main
+    # exige la PR à jour) : on ne refait pas ces contrôles, seulement le déploiement.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Typage
+        run: pnpm typecheck
+      - name: Tests
+        run: pnpm test
+      - name: Code mort et dépendances
+        run: pnpm knip
+      - name: Compilation
+        run: pnpm build
+
+  workers:
+    name: Workers Cloudflare
+    # Sur main, la fusion rejoue le même code déjà vert (la protection de main
+    # exige la PR à jour) : on ne refait pas ces contrôles, seulement le déploiement.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+      - name: Vérifier le Worker Push
+        run: pnpm push:check
+      - name: Vérifier le planificateur météo
+        run: pnpm weather:check
+
+  parcours:
+    name: Parcours navigateur
+    # Sur main, la fusion rejoue le même code déjà vert (la protection de main
+    # exige la PR à jour) : on ne refait pas ces contrôles, seulement le déploiement.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    # Job séparé du job « Application » : il installe un navigateur, son temps et
+    # ses échecs doivent rester lisibles (docs/browser-journeys-contract.md).
+    # 25 minutes : les parcours en prennent onze, et l'installation du
+    # navigateur, quinze secondes d'habitude, en a pris jusqu'à dix et demie
+    # quand le miroir Ubuntu de GitHub est lent.
+    timeout-minutes: 25
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+      - name: Voir si les parcours sont utiles
+        id: scope
+        # Une PR qui ne touche que des documents (docs/, fichiers .md, modèle de
+        # PR) ne change aucun parcours : on saute le navigateur (15 min).
+        run: |
+          git fetch --depth=1 origin "${{ github.event.pull_request.base.sha }}"
+          other=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD | grep -Ev '^docs/|\.md$|^\.github/pull_request_template' || true)
+          if [ -n "$other" ]; then echo "needed=true" >> "$GITHUB_OUTPUT"; else echo "needed=false" >> "$GITHUB_OUTPUT"; echo "PR de documentation seule : parcours non rejoués."; fi
+      - name: Installer pnpm
+        if: steps.scope.outputs.needed == 'true'
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Installer Node.js
+        if: steps.scope.outputs.needed == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+      - name: Installer les dépendances
+        if: steps.scope.outputs.needed == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Installer le navigateur
+        if: steps.scope.outputs.needed == 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Jouer les parcours
+        if: steps.scope.outputs.needed == 'true'
+        run: pnpm e2e
+      - name: Conserver les traces des parcours en échec
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: parcours-navigateur
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  deploy:
+    name: Déploiement Cloudflare
+    needs: [application, workers, parcours]
+    # Uniquement après une fusion dans main, contrôles verts, et si le porteur a
+    # activé le déploiement (variable de dépôt CLOUDFLARE_DEPLOY = true, une fois
+    # le jeton d'API Cloudflare posé dans les secrets GitHub).
+    # Les jobs de contrôle sont sautés sur main (déjà verts sur la PR) : on ne
+    # bloque que s'ils ont échoué.
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-cloudflare
+      cancel-in-progress: false
+    env:
+      CI: 1
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Récupérer le dépôt avec son historique
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+      - name: Détecter les Workers modifiés depuis la version précédente
+        id: workers
+        run: |
+          before="${{ github.event.before }}"
+          changed=""
+          if [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$before^{commit}" 2>/dev/null; then
+            files=$(git diff --name-only "$before" "$GITHUB_SHA")
+            if echo "$files" | grep -q '^cloudflare/irrigation-push/'; then changed="$changed push"; fi
+            if echo "$files" | grep -q '^cloudflare/irrigation-weather-scheduler/'; then changed="$changed weather"; fi
+          else
+            changed="push weather"
+          fi
+          echo "Workers à redéployer :${changed:- aucun}"
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+      - name: Compiler l'application pour Cloudflare
+        run: pnpm build
+      - name: Appliquer les migrations D1 distantes
+        run: pnpm db:migrate:remote
+      - name: Déployer l'application
+        run: pnpm deploy
+      - name: Déployer le Worker Push
+        if: contains(steps.workers.outputs.changed, 'push')
+        run: pnpm push:deploy
+      - name: Déployer le planificateur météo
+        if: contains(steps.workers.outputs.changed, 'weather')
+        run: pnpm --dir cloudflare/irrigation-weather-scheduler deploy

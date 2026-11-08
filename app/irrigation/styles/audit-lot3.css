@@ -1,0 +1,332 @@
+/*
+ * Audit ergonomique, lot 3 (docs/audit-ergonomie-lot3-contract.md) :
+ * les cartes de tête du planning et les planches non servies rangées par
+ * motif (point 5), la liste des arrosages en lignes par jour, le menu « … »
+ * et « Fait comme prévu » (point 6).
+ */
+
+/* Point 5 : les cartes qui demandent un geste, en tête et marquées d'un trait. */
+.planning-summary-card[data-action="true"] {
+  border-left: 3px solid var(--green);
+}
+
+.planning-summary-card[data-action="true"][data-tone="deficit"] {
+  border-left-color: var(--danger);
+}
+
+/* Les planches sans matériel : une action vers « Matériel », au-dessus du pli, jamais un manque d'eau. */
+.planning-unplaced-wrap {
+  display: grid;
+  gap: .5rem;
+}
+
+.planning-unplaced-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem .5rem;
+  margin: 0;
+  border-radius: 10px;
+  background: var(--warn-soft);
+  padding: .55rem .8rem;
+  color: var(--warn-ink);
+  font-weight: 600;
+}
+
+.planning-unplaced-action .icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.planning-unplaced-action a {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.planning-unplaced-caption,
+.planning-unplaced-meaning {
+  margin: 0 0 .5rem;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.planning-unplaced-group + .planning-unplaced-group {
+  margin-top: 1rem;
+}
+
+.planning-unplaced-group h4 {
+  margin: 0 0 .25rem;
+  font-size: .95rem;
+}
+
+/* Point 6 : une ligne par irrigation, rangée par jour, « À traiter » en tête. */
+.irrigation-to-handle,
+.irrigation-day {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.irrigation-to-handle {
+  border: 1px solid var(--danger-line, var(--line-strong));
+  border-radius: var(--radius);
+  background: var(--danger-soft);
+  padding: 12px;
+}
+
+.irrigation-to-handle > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.irrigation-to-handle > header h4,
+.irrigation-day > h4 {
+  margin: 0;
+  font-size: .95rem;
+}
+
+.irrigation-to-handle > header p {
+  flex: 1 1 220px;
+  margin: 0;
+  color: var(--danger-ink);
+  font-size: .82rem;
+}
+
+.irrigation-to-handle > header button {
+  min-height: var(--touch-target);
+  padding: 0 14px;
+  border: 1px solid var(--anthracite);
+  border-radius: var(--radius-button);
+  background: white;
+  color: var(--anthracite);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.irrigation-row-list {
+  display: grid;
+  gap: 6px;
+}
+
+.irrigation-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 12px;
+}
+
+.irrigation-row[data-lateness="missed"] {
+  border-left: 3px solid var(--danger);
+}
+
+.irrigation-row[data-lateness="late"] {
+  border-left: 3px solid #e99d45;
+}
+
+.irrigation-row-line {
+  display: grid;
+  grid-template-columns: 4.2rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.irrigation-row-time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.irrigation-row-what {
+  display: grid;
+  min-width: 0;
+}
+
+.irrigation-row-what strong,
+.irrigation-row-what small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.irrigation-row-what small {
+  color: var(--muted);
+}
+
+.irrigation-row-volume {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.event-status[data-lateness="missed"] {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+.event-status[data-lateness="late"] {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.irrigation-row > .event-blocked {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.irrigation-row > .record-actions {
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0;
+}
+
+.irrigation-row-details {
+  grid-column: 1 / -1;
+}
+
+.irrigation-row-details > summary {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.irrigation-row-details[open] > summary {
+  margin-bottom: 4px;
+}
+
+/* Le menu « … » : « Annuler » y est rangé, loin de « Démarrer maintenant ». */
+.row-menu {
+  position: relative;
+}
+
+.row-menu > summary {
+  display: grid;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-button);
+  color: var(--ink);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.row-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.row-menu > div {
+  position: absolute;
+  z-index: 8;
+  top: calc(var(--touch-target) + 4px);
+  right: 0;
+  display: grid;
+  min-width: 190px;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 14%);
+  padding: 6px;
+}
+
+.record-actions .row-menu button {
+  width: 100%;
+  min-height: var(--touch-target);
+}
+
+/* « Fait comme prévu » et sa confirmation d'une ligne. */
+button.done-as-planned {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.done-as-planned .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.done-as-planned-dialog {
+  width: min(480px, calc(100vw - 32px));
+  margin: auto;
+  inset: 0;
+  padding: 20px 20px 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: white;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 25%);
+  color: var(--ink);
+}
+
+.done-as-planned-dialog::backdrop {
+  background: rgb(8 30 22 / 55%);
+}
+
+.done-as-planned-dialog h3 {
+  margin: 0 0 8px;
+  font: 300 var(--title-size)/1.2 var(--font-title);
+}
+
+.done-as-planned-dialog p {
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.done-as-planned-dialog .irrigation-dialog-actions button {
+  min-height: var(--touch-target);
+}
+
+/* Sur « Aujourd'hui », trois gestes ne tiennent plus à côté du titre : ils passent dessous. */
+@container (min-width: 621px) {
+  .today-irrigation:has(.done-as-planned) {
+    grid-template-columns: 74px minmax(0, 1fr);
+  }
+
+  .today-irrigation:has(.done-as-planned) .today-irrigation-actions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .irrigation-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .irrigation-row-line {
+    grid-template-columns: 3.6rem minmax(0, 1fr) auto;
+  }
+
+  .irrigation-row-line .event-status {
+    grid-column: 2 / -1;
+  }
+
+  .irrigation-row > .record-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .irrigation-row > .record-actions > button {
+    flex: 1 1 auto;
+  }
+
+  .done-as-planned-dialog .irrigation-dialog-actions {
+    flex-direction: column;
+  }
+}

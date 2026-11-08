@@ -1,0 +1,17 @@
+{
+  "name": "@irrigation-otf/weather-scheduler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cf-typegen": "wrangler types --config wrangler.jsonc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "check": "pnpm typecheck && pnpm test && wrangler deploy --config wrangler.jsonc --dry-run",
+    "deploy": "wrangler deploy --config wrangler.jsonc"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "wrangler": "4.154.0"
+  }
+}

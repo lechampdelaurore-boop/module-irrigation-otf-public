@@ -1,0 +1,372 @@
+/* Le calculateur d'irrigation (3.8 bis, docs/irrigation-calculator-contract.md,
+   section 11) : dans la fenêtre des réglages du matériel, les saisies à
+   gauche, le résultat en direct à droite ; une colonne à 390 px. */
+
+.setting-provenance {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--anthracite);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.setting-provenance[data-level="calculated"] {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+  color: var(--ok-ink);
+}
+
+.setting-provenance[data-level="estimated"] {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.setting-provenance[data-level="measured"] {
+  border-color: var(--water-line);
+  background: var(--water-soft);
+  color: var(--water-ink);
+}
+
+.setting-provenance-block {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.setting-provenance-block > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+.setting-provenance-block > button {
+  justify-self: start;
+  min-height: var(--touch-target);
+}
+
+.calculator-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch-target);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.calculator-check input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green);
+}
+
+.irrigation-calculator {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+  padding: 22px;
+}
+
+.calculator-inputs {
+  display: grid;
+  gap: 14px;
+}
+
+.calculator-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.calculator-methods legend,
+.calculator-group > legend,
+.calculator-group > summary {
+  margin-bottom: 8px;
+  padding: 0;
+  color: var(--green-dark);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calculator-methods label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-target);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  background: white;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.calculator-methods label[data-checked="true"] {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green-dark);
+}
+
+.calculator-methods input {
+  accent-color: var(--green);
+}
+
+.calculator-group {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.calculator-group > summary {
+  min-height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  margin: 0;
+  cursor: pointer;
+}
+
+.calculator-field {
+  display: grid;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+.calculator-field > label small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.calculator-field input,
+.calculator-field select {
+  min-width: 0;
+  min-height: var(--touch-target);
+  padding: 0 10px;
+  color: var(--ink);
+  font: inherit;
+}
+
+/* Dans la case à unité, le champ prend toute la largeur : l'unité reste au bord droit. */
+.calculator-field .unit-input input {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.calculator-field select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+
+.calculator-field > small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.calculator-field > em {
+  color: var(--danger-ink);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.calculator-field[data-invalid="true"] .unit-input {
+  border-color: var(--danger);
+}
+
+.calculator-example-source,
+.calculator-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.calculator-example-source {
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--sheet);
+}
+
+.calculator-output {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.calculator-output > footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.calculator-output > footer button {
+  min-height: var(--touch-target);
+}
+
+.calculator-result {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.calculator-result > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.calculator-result h4 {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+
+.calculator-headline {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 20px;
+}
+
+.calculator-missing,
+.calculator-gap {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.calculator-missing {
+  color: var(--warn-ink);
+}
+
+.calculator-figures {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.calculator-figures > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.calculator-figures dt {
+  color: var(--muted);
+}
+
+.calculator-figures dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.calculator-warnings {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px 10px 28px;
+  border: 1px solid var(--warn-line);
+  border-radius: 9px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.calculator-chart {
+  margin: 0;
+}
+
+.calculator-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.calculator-chart-axis {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.calculator-chart-line {
+  fill: none;
+  stroke: var(--water);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.calculator-chart figcaption {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.calculator-steps summary {
+  min-height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  color: var(--green-dark);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.calculator-steps ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .irrigation-calculator {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .calculator-output {
+    position: static;
+  }
+
+  .calculator-output > footer button {
+    flex: 1 1 100%;
+  }
+}

@@ -1,0 +1,161 @@
+/*
+  Les blocs de la page (docs/charte-module.md, « Fond et blocs ») : blancs,
+  sans bordure, posés sur la feuille #f8f8f8 par l'ombre de la charte, avec
+  son rayon unique de 0,75 rem. Importée en dernier : elle l'emporte sur les
+  feuilles de chaque bloc.
+*/
+.irrigation-events-section,
+.water-management-section,
+.water-resources-section,
+.irrigation-history-dashboard,
+.planning-section,
+.pump-section,
+.irrigation-needs-section,
+.crop-coefficients,
+.soil-reserve,
+.feature-page > .water-panel,
+.bed-crop-water,
+.farm-plan {
+  border-color: transparent;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+/*
+  Tuiles de totaux (« Tableaux et tuiles de totaux ») : vert pâle, sans
+  bordure ; la pluie en bleu eau. Le chiffre est dans la police des titres.
+*/
+.water-summary-card,
+.history-summary-card,
+.planning-summary-card,
+.feasibility-summary > div {
+  border-color: transparent;
+  background: var(--tile);
+}
+
+.water-summary-card.is-water {
+  background: var(--water-soft);
+}
+
+.water-summary-card strong {
+  font-family: var(--font-title);
+  font-weight: 500;
+}
+
+.water-summary-card.is-water strong {
+  color: var(--water);
+}
+
+/*
+  Tableaux : lignes alternées, en-têtes gris de 11,7 px, chiffres tabulaires,
+  survol vert pâle. Au téléphone, ces tableaux deviennent des listes : la
+  règle s'arrête à 761 px.
+*/
+@media (min-width: 761px) {
+  :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) thead th {
+    color: var(--ink2);
+    font-size: .73125rem;
+    font-weight: 600;
+  }
+
+  :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) tbody tr:nth-child(odd) {
+    background: #fcfcfe;
+  }
+
+  :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) tbody tr:nth-child(even) {
+    background: #f2f2f5;
+  }
+
+  :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) tbody tr:hover {
+    background: var(--green-soft);
+  }
+
+  .water-week-table :is(th, td):not(:first-child) {
+    text-align: right;
+  }
+}
+
+/*
+  Couleurs d'état (« Couleurs d'état et bleu eau ») : un message de réussite
+  en vert d'état, une information en bleu pâle, chacun avec son texte
+  assombri ; l'attention et l'erreur suivent les jetons --warn-* et --danger-*.
+*/
+.water-notice,
+.equipment-notice,
+.irrigation-event-notice,
+.planning-notice,
+.planning-proposal-feedback,
+.pump-notice,
+.garden-copy-notice {
+  border-color: transparent;
+  background: var(--ok-soft);
+  color: var(--ok-ink);
+}
+
+.weather-fresh {
+  background: var(--info);
+  color: var(--info-ink);
+}
+
+/*
+  Moins de cadres (deuxième passe, D-068, charte du module, point 2) : un bloc
+  blanc ne contient pas d'autre bloc encadré. Ce qui était un cadre dans un
+  bloc se pose sans bordure, en gris feuille au premier niveau, en blanc au
+  niveau d'en dessous, et ainsi de suite ; un fond de couleur d'état
+  (attention, pluie) reste, seule sa bordure part.
+*/
+.irrigation-event-counts,
+.irrigation-creation-panel,
+.water-management-section .water-panel,
+.water-week-navigation,
+.water-week-table-wrap,
+.irrigation-needs-gardens > details,
+.planning-settings,
+.water-asset-panel,
+.water-links-panel,
+.water-projection-panel,
+.pump-defaults,
+.soil-zone,
+.soil-settings,
+.reference-crop-card,
+.crop-coefficients > .crop-water-settings-block,
+.crop-alert-fold,
+.history-control-block,
+.species-link-card,
+.need-calculation,
+.soil-bed,
+.rooting-line-form,
+.rooting-add-line {
+  border-color: transparent;
+  background: var(--sheet);
+}
+
+.irrigation-need-card,
+.planning-settings fieldset,
+.soil-garden,
+.soil-bed li,
+.soil-settings .crop-water-settings-block,
+.crop-water-mulch,
+.crop-alert-form,
+.history-period-tabs {
+  border-color: transparent;
+  background: var(--card);
+}
+
+.irrigation-notification-readiness,
+.need-diagnostic,
+.pump-empty,
+.water-surplus,
+.soil-observation,
+.soil-threshold,
+.kc-override-form-wrap,
+.farm-durations-wrap,
+.rooting-profile-form-wrap,
+.history-view-tabs,
+.species-exceptions {
+  border-color: transparent;
+}

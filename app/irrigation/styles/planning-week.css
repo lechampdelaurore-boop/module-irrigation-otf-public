@@ -1,0 +1,309 @@
+/*
+ * La semaine en tableau sur un grand écran (retour du porteur, 7 novembre
+ * 2026, précision P46) : les jours en colonnes, une ligne par matériel, un
+ * créneau compact dans la case de son jour ; un clic l'ouvre par-dessus le
+ * tableau, avec son détail et ses gestes. En dessous de 1360 px, la semaine
+ * reste une liste de jours.
+ */
+.planning-row-label,
+.planning-day-band,
+.planning-label-short {
+  display: none;
+}
+
+.planning-cell {
+  display: contents;
+}
+
+/*
+ * Au téléphone (audit ergonomique, point 2, 3.8 quater lot 2, précision
+ * F11), la semaine se replie : les six tuiles en une ligne de résumé, le jour
+ * du jour ouvert, les jours écoulés sous « Jours écoulés (n) », les jours à
+ * venir réduits à leur en-tête. Un jour qui porte une irrigation en retard ou
+ * non faite reste ouvert. Au-dessus de 600 px, rien ne se replie.
+ */
+.planning-summary-line,
+.planning-past-toggle,
+.planning-day-toggle {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .planning-summary-line {
+    display: flex;
+    width: 100%;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: space-between;
+    gap: .6rem;
+    margin: 1rem 0 .4rem;
+    padding: .55rem .9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--tile);
+    color: var(--ink);
+    font: 500 13px/1.4 var(--font-ui);
+    text-align: left;
+  }
+
+  .planning-summary-line small {
+    flex: none;
+    color: var(--green);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  .planning-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: .4rem;
+  }
+
+  .planning-summary:not([data-open="true"]) {
+    display: none;
+  }
+
+  .planning-past-toggle {
+    display: block;
+  }
+
+  .planning-past-toggle button {
+    width: 100%;
+    min-height: var(--touch-target);
+    justify-content: flex-start;
+  }
+
+  .planning-days:not([data-past-open="true"]) .planning-day[data-fold="past"] {
+    display: none;
+  }
+
+  .planning-day-toggle {
+    display: inline-flex;
+    min-height: var(--touch-target);
+    margin-top: .45rem;
+  }
+
+  .planning-day[data-expanded="false"] .planning-proposals {
+    display: none;
+  }
+}
+
+@media (min-width: 1360px) {
+  .planning-days {
+    position: relative;
+    grid-template-columns: 8.5rem repeat(7, minmax(0, 1fr));
+    grid-template-rows: auto repeat(var(--planning-rows), minmax(4rem, auto));
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: white;
+  }
+
+  .planning-day {
+    display: contents;
+  }
+
+  .planning-day-band {
+    display: block;
+    position: relative;
+    z-index: 0;
+    grid-column: var(--col);
+    grid-row: 1 / -1;
+    border-left: 1px solid var(--line);
+  }
+
+  .planning-day[data-before-horizon="true"] .planning-day-band {
+    background: var(--sheet);
+  }
+
+  .planning-row-label {
+    display: block;
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / -1;
+    grid-row: var(--row);
+    border-top: 1px solid var(--line);
+    padding: .6rem .6rem;
+    font-size: .8rem;
+    font-weight: 650;
+  }
+
+  .planning-row-label > span {
+    display: block;
+    width: 7.3rem;
+    overflow-wrap: anywhere;
+  }
+
+  .planning-corner {
+    border-top: 0;
+    align-self: end;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-ui);
+  }
+
+  .planning-day-heading {
+    position: relative;
+    z-index: 2;
+    grid-column: var(--col);
+    grid-row: 1;
+    display: grid;
+    align-content: start;
+    gap: .35rem;
+    min-width: 0;
+    padding: .6rem .5rem;
+  }
+
+  .planning-day-heading h4 {
+    font-size: .85rem;
+  }
+
+  .planning-day-heading small {
+    font-size: .7rem;
+  }
+
+  .planning-day-heading button {
+    min-height: 44px;
+    padding: .3rem .45rem;
+    font-size: .75rem;
+  }
+
+  .planning-label-long {
+    display: none;
+  }
+
+  /* Le titre du jour garde son nom entier pour un lecteur d'écran ; l'écran montre « Lundi 2 ». */
+  .planning-day-heading h4 .planning-label-long {
+    display: inline;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .planning-label-short {
+    display: inline;
+  }
+
+  .planning-proposals {
+    display: contents;
+  }
+
+  .planning-cell {
+    display: grid;
+    z-index: 2;
+    align-content: start;
+    gap: .35rem;
+    grid-column: var(--col);
+    grid-row: var(--row);
+    min-width: 0;
+    padding: .35rem;
+  }
+
+  /* Le créneau fermé : l'heure, puis la dose et le statut. Le reste se lit à l'ouverture. */
+  .planning-cell .planning-proposal:not(:has(> details[open])) {
+    padding: 0 .45rem;
+    border-left-width: 4px;
+    border-radius: 8px;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) > details > summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .15rem .4rem;
+    padding: .35rem 0;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-proposal-time {
+    flex-basis: 100%;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-proposal-time strong,
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-measure strong {
+    font-size: .78rem;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-proposal-measures {
+    display: block;
+    min-width: 0;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-measure strong {
+    white-space: nowrap;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-status {
+    padding: 0;
+    background: none;
+    color: var(--muted);
+    font-size: .68rem;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-status[data-status="validated"] {
+    color: var(--green-dark);
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) :is(.planning-proposal-time small, .planning-proposal-main, .planning-measure small, .planning-measure:not(:first-child)) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .planning-cell .planning-proposal:not(:has(> details[open])) .planning-proposal-after {
+    display: none;
+  }
+
+  .planning-cell:has(> .planning-proposal > details[open]) {
+    z-index: 10;
+  }
+
+  /* Ouvert, le créneau redevient une carte entière, sur la largeur des sept jours, à hauteur de sa ligne. */
+  .planning-cell .planning-proposal:has(> details[open]) {
+    position: absolute;
+    z-index: 10;
+    right: .35rem;
+    left: calc(8.5rem + .35rem);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+  }
+}
+
+/*
+  « Non placé » replié derrière son titre, à toutes les largeurs (demande du
+  porteur du 8 novembre 2026) : tout le titre se touche, la flèche vers le
+  bas se retourne une fois la liste dépliée.
+*/
+.planning-unplaced > summary {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: var(--touch-target);
+  cursor: pointer;
+  list-style: none;
+}
+
+.planning-unplaced > summary::-webkit-details-marker {
+  display: none;
+}
+
+.planning-unplaced > summary h3 {
+  margin: 0;
+}
+
+.planning-unplaced > summary .icon {
+  flex: none;
+  transition: transform .15s ease;
+}
+
+.planning-unplaced[open] > summary {
+  margin-bottom: .5rem;
+}
+
+.planning-unplaced[open] > summary .icon {
+  transform: rotate(180deg);
+}

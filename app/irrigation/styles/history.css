@@ -1,0 +1,577 @@
+.irrigation-history-dashboard {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 82%);
+  box-shadow: var(--shadow);
+}
+
+.irrigation-history-heading,
+.history-list-heading,
+.history-period-navigation,
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.irrigation-history-heading h2 {
+  margin: 4px 0 5px;
+  font-family: var(--font-title);
+  font-size: var(--title-size);
+  font-weight: 300;
+  letter-spacing: -.01em;
+}
+
+.irrigation-history-heading p,
+.history-list-heading p,
+.history-active-scope,
+.history-period-title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.history-export-button,
+.history-custom-dates > button,
+.history-period-navigation button,
+.history-pagination button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--green-soft);
+  color: var(--green);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.history-export-button {
+  flex: 0 0 auto;
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.history-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.history-control-block {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.history-control-block > strong {
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.history-period-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+}
+
+.history-period-tabs button {
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 7px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.history-period-tabs button:last-child {
+  border-right: 0;
+}
+
+.history-period-tabs button[data-active="true"] {
+  background: var(--green);
+  color: white;
+}
+
+.history-period-tabs button:disabled,
+.history-period-navigation button:disabled,
+.history-pagination button:disabled,
+.history-custom-dates > button:disabled {
+  cursor: wait;
+  opacity: .5;
+}
+
+.history-period-navigation span {
+  flex: 1;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.history-custom-dates,
+.history-scope-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.history-custom-dates {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+}
+
+.history-custom-dates label,
+.history-scope-filters label {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.history-custom-dates label > span,
+.history-scope-filters label > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.history-custom-dates input,
+.history-scope-filters select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 10px;
+}
+
+.history-scope-filters select:disabled {
+  background: var(--sheet);
+  color: var(--muted);
+}
+
+.history-error,
+.history-loading,
+.history-warnings p,
+.history-empty {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.history-error {
+  border: 1px solid var(--danger-line);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+.history-loading {
+  background: var(--green-soft);
+  color: var(--green-dark);
+}
+
+.history-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(115px, 1fr));
+  gap: 8px;
+}
+
+.history-summary-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: white;
+}
+
+.history-summary-card > span,
+.history-summary-card small {
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.history-summary-card strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.history-summary-card[data-tone="deficit"] {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.history-summary-card[data-tone="surplus"] {
+  border-color: var(--line-strong);
+  background: var(--tile);
+}
+
+.history-warnings {
+  display: grid;
+  gap: 6px;
+}
+
+.history-warnings p {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.history-list-heading {
+  padding-top: 4px;
+}
+
+.history-list-heading h3 {
+  margin: 0 0 3px;
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.history-event-list {
+  display: grid;
+  gap: 7px;
+}
+
+.history-event-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: white;
+}
+
+.history-event-card > summary {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 90px minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 12px 15px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.history-event-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.history-event-card > summary::after {
+  content: "+";
+  grid-column: 4;
+  color: var(--green);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.history-event-card[open] > summary::after {
+  content: "−";
+}
+
+.history-event-date {
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.history-event-main,
+.history-event-measures {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.history-event-main strong,
+.history-event-main small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-event-main strong,
+.history-event-measures strong {
+  font-size: 11px;
+}
+
+.history-event-main small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+/* 3.8 ter : une irrigation faite pendant un créneau protégé (docs/protected-slots-contract.md, règle 11) */
+.history-event-main .history-event-signal {
+  color: var(--warn-ink);
+  font-weight: 700;
+  white-space: normal;
+}
+
+.history-event-measures {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.history-event-measures em {
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--muted);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.history-event-measures em[data-status="completed"] {
+  background: var(--green-soft);
+  color: var(--green-dark);
+}
+
+.history-event-measures em[data-status="partially_completed"] {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.history-event-measures em[data-status="canceled"] {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+.history-event-detail {
+  display: grid;
+  gap: 15px;
+  padding: 16px;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+}
+
+.history-event-detail dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.history-event-detail dl > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: white;
+}
+
+.history-event-detail dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.history-event-detail dd {
+  overflow-wrap: anywhere;
+  margin: 4px 0 0;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.history-event-note,
+.history-timeline > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.history-timeline h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+}
+
+.history-timeline ol {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-timeline li {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: 9px;
+  color: var(--ink);
+  font-size: 10px;
+}
+
+.history-timeline time {
+  color: var(--green-dark);
+  font-weight: 850;
+}
+
+.history-pagination {
+  justify-content: center;
+}
+
+.history-pagination span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+@media (max-width: 1180px) {
+  .history-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .irrigation-history-dashboard {
+    padding: 18px;
+  }
+
+  .irrigation-history-heading,
+  .history-controls {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .irrigation-history-heading {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .history-export-button {
+    width: 100%;
+  }
+
+  .history-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-event-card > summary {
+    grid-template-columns: 66px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 11px;
+  }
+
+  .history-event-card > summary::after {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .history-event-measures {
+    grid-column: 2 / 4;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .history-event-detail dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .irrigation-history-dashboard {
+    gap: 14px;
+    margin-inline: -4px;
+    padding: 14px;
+    border-radius: var(--radius);
+  }
+
+  .history-period-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-period-tabs button:nth-child(2) {
+    border-right: 0;
+  }
+
+  .history-period-tabs button:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .history-period-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-period-navigation span {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .history-custom-dates,
+  .history-scope-filters {
+    grid-template-columns: 1fr;
+  }
+
+  /* Les tuiles de totaux restent sur deux colonnes au téléphone (charte, point 5 ; audit ergonomique, point 2). */
+  .history-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-summary-card {
+    min-height: 0;
+  }
+
+  .history-event-card > summary {
+    grid-template-columns: 60px minmax(0, 1fr) auto;
+  }
+
+  .history-event-detail dl {
+    grid-template-columns: 1fr;
+  }
+
+  .history-pagination {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-pagination span {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drip-rails[data-preview="true"]::before,
+  .drip-rails[data-preview="true"]::after {
+    animation: none;
+  }
+}

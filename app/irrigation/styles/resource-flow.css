@@ -1,0 +1,384 @@
+.resource-flow-panel {
+  min-width: 0;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--green);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 16px;
+}
+
+.resource-flow-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.resource-flow-heading h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.resource-flow-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.resource-flow-heading button {
+  border: 1px solid var(--anthracite);
+  border-radius: var(--radius-button);
+  background: transparent;
+  padding: 8px 14px;
+  min-height: 44px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.resource-flow-form {
+  margin-top: 14px;
+}
+
+.resource-flow-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.resource-flow-form label,
+.resource-flow-stopped label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.resource-flow-form input:not([type="checkbox"]),
+.resource-flow-stopped input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 44px;
+  font: inherit;
+}
+
+.resource-flow-stopped {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.resource-flow-stopped legend {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.resource-flow-stopped p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resource-flow-stopped[disabled] {
+  opacity: .55;
+}
+
+.resource-flow-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.resource-flow-toggle input {
+  width: 20px;
+  height: 20px;
+}
+
+.resource-flow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.resource-flow-actions button[type="submit"] {
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--green);
+  color: white;
+  padding: 10px 16px;
+  min-height: 44px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.resource-flow-actions button[type="button"] {
+  border: 1px solid var(--anthracite);
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--anthracite);
+  padding: 10px 16px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+/* Le formulaire annonce qu'il corrige un relevé, et lequel. */
+.resource-flow-correcting {
+  margin: 0 0 12px;
+  border-left: 3px solid var(--green);
+  background: var(--sheet);
+  padding: 8px 12px;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.resource-flow-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.resource-flow-latest {
+  margin-top: 18px;
+  border-radius: var(--radius);
+  background: var(--sheet);
+  padding: 14px;
+}
+
+.resource-flow-latest h4,
+.resource-flow-history h4 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.resource-flow-latest dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.resource-flow-latest dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resource-flow-latest dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+}
+
+.resource-flow-apply {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.resource-flow-apply p {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.resource-flow-apply button {
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--green);
+  color: white;
+  padding: 10px 16px;
+  min-height: 44px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.resource-flow-apply-notable {
+  border-top-color: #a7671d;
+}
+
+.resource-flow-apply-notable p strong {
+  color: var(--warn-ink);
+}
+
+.resource-flow-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.resource-flow-chart {
+  margin: 18px 0 0;
+}
+
+.resource-flow-chart svg {
+  width: 100%;
+  height: 200px;
+}
+
+.resource-flow-chart-empty {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.resource-flow-grid {
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+
+.resource-flow-axis {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.resource-flow-line {
+  stroke: var(--green);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.resource-flow-point {
+  fill: var(--green);
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.resource-flow-reference {
+  stroke: #8b9a93;
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.resource-flow-last-label {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.resource-flow-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resource-flow-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resource-flow-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--green);
+}
+
+.resource-flow-swatch-reference {
+  background: repeating-linear-gradient(to right, #8b9a93 0 6px, transparent 6px 10px);
+}
+
+.resource-flow-history {
+  margin-top: 18px;
+}
+
+.resource-flow-history table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.resource-flow-history th,
+.resource-flow-history td {
+  border-bottom: 1px solid var(--line-soft);
+  padding: 8px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.resource-flow-history td small {
+  display: block;
+  color: var(--muted);
+}
+
+.resource-flow-history button {
+  border: 1px solid var(--anthracite);
+  border-radius: var(--radius-button);
+  background: transparent;
+  padding: 6px 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .resource-flow-fields,
+  .resource-flow-stopped,
+  .resource-flow-latest dl {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-flow-heading {
+    flex-direction: column;
+  }
+
+  .resource-flow-heading button,
+  .resource-flow-actions button,
+  .resource-flow-apply button {
+    width: 100%;
+  }
+
+  .resource-flow-chart svg {
+    height: 170px;
+  }
+}
+
+.resource-flow-consumption {
+  margin-top: 18px;
+}
+
+.resource-flow-consumption h4 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.resource-flow-consumption table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.resource-flow-consumption th,
+.resource-flow-consumption td {
+  border-bottom: 1px solid var(--line-soft);
+  padding: 8px 6px;
+  text-align: left;
+}
+
+.resource-flow-consumption thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.resource-flow-consumption tbody th {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.resource-flow-consumption tfoot th,
+.resource-flow-consumption tfoot td {
+  border-bottom: 0;
+  border-top: 2px solid var(--line);
+  font-weight: 700;
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "irrigation-otf-push",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "IRRIGATION_ALARMS",
+        "class_name": "IrrigationAlarm"
+      },
+      {
+        "name": "PUSH_RECIPIENTS",
+        "class_name": "PushRecipient"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["IrrigationAlarm", "PushRecipient"]
+    }
+  ],
+  "vars": {
+    "VAPID_SUBJECT": "https://module-irrigation-otf.lechampdelaurore.workers.dev"
+  },
+  "secrets": {
+    "required": [
+      "IRRIGATION_PUSH_SERVICE_TOKEN",
+      "VAPID_PUBLIC_KEY",
+      "VAPID_PRIVATE_KEY"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

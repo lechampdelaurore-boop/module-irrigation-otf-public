@@ -1,0 +1,166 @@
+/*
+ * « Tout est fait » (docs/aujourdhui-tableau-de-bord-contract.md,
+ * section 3.4) : le bouton en tête de « Votre journée », puis la
+ * confirmation qui liste par jour ce qui sera enregistré.
+ */
+
+.today-page button.today-all-done {
+  gap: 6px;
+  margin-left: auto;
+  flex: none;
+  background: var(--green);
+  color: #fff;
+}
+
+.today-all-done .icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.today-done-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  inset: 0;
+  padding: 22px 22px 0;
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--radius);
+  background: white;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 25%);
+  color: var(--ink);
+}
+
+.today-done-dialog::backdrop {
+  background: rgb(8 30 22 / 55%);
+}
+
+.today-done-dialog h3 {
+  margin: 0 0 8px;
+  font: 300 var(--title-size)/1.2 var(--font-title);
+  letter-spacing: -.01em;
+}
+
+.today-done-dialog > p:not(.eyebrow) {
+  margin: 0 0 8px;
+  font-size: .88rem;
+  line-height: 1.55;
+}
+
+.today-done-final {
+  font-weight: 600;
+}
+
+.today-done-days {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.today-done-day {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.today-done-day ul {
+  display: grid;
+  margin: 0;
+  padding: 0 0 4px;
+  list-style: none;
+}
+
+.today-done-check {
+  display: flex;
+  min-height: var(--touch-target);
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.today-done-check[data-kind="day"] {
+  border-bottom: 1px solid var(--line);
+  background: var(--green-soft);
+}
+
+.today-done-day li .today-done-check {
+  padding-left: 36px;
+}
+
+.today-done-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin: 2px 0 0;
+  accent-color: var(--green);
+}
+
+.today-done-check span {
+  min-width: 0;
+  font-size: .86rem;
+  line-height: 1.4;
+}
+
+.today-done-check small {
+  display: block;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.today-done-note {
+  color: var(--muted);
+}
+
+/* Les boutons restent en vue au pied de la confirmation, même quand la liste défile. */
+.today-done-dialog .irrigation-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  flex-wrap: wrap;
+  margin: 0 -22px;
+  padding: 12px 22px 18px;
+  border-top: 1px solid var(--line);
+  background: white;
+}
+
+/* La liste des refus, sous le message : chaque irrigation non enregistrée avec sa raison. */
+.today-error p,
+.today-error ul {
+  margin: 0;
+}
+
+.today-error ul {
+  padding-left: 1.1rem;
+}
+
+@container (max-width: 620px) {
+  .today-block-heading:has(.today-all-done) {
+    flex-wrap: wrap;
+  }
+
+  .today-page button.today-all-done {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .today-done-dialog {
+    padding: 18px 16px 0;
+  }
+
+  /* Au téléphone, les boutons s'empilent : « Enregistrer » en haut, sous le pouce. */
+  .today-done-dialog .irrigation-dialog-actions {
+    flex-direction: column-reverse;
+    margin: 0 -16px;
+    padding: 10px 16px calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .today-done-day li .today-done-check {
+    padding-left: 22px;
+  }
+}

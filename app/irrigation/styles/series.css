@@ -1,0 +1,211 @@
+/* Vue des cumuls : par périmètre ou par série (docs/series-contract.md). */
+.history-view-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.history-view-tabs button {
+  display: grid;
+  gap: 3px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-view-tabs button:last-child {
+  border-right: 0;
+}
+
+.history-view-tabs button[data-active='true'] {
+  box-shadow: inset 0 -5px var(--green);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.history-view-tabs button strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.history-view-tabs button small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.series-card > summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.series-card-main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.series-card-main strong {
+  font-size: 13px;
+}
+
+.series-card-main small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.series-measures {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(84px, auto));
+  gap: 8px;
+  align-self: start;
+}
+
+.series-measure {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.series-measure small {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--font-ui);
+}
+
+.series-measure strong {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.series-measure[data-tone='deficit'] strong {
+  color: var(--danger-ink);
+}
+
+.series-measure[data-tone='surplus'] strong {
+  color: var(--green-dark);
+}
+
+.series-beds {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.series-beds caption {
+  padding: 6px 0;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: left;
+}
+
+.series-beds th,
+.series-beds td {
+  padding: 6px 8px;
+  border-top: 1px solid var(--line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.series-beds thead th {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--font-ui);
+}
+
+.series-upcoming {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.series-upcoming li {
+  display: grid;
+  gap: 3px;
+  padding: 11px 13px;
+  border: 1px dashed var(--line);
+  border-radius: 11px;
+  background: white;
+  font-size: 11px;
+}
+
+.series-upcoming li span {
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .series-card > summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .series-measures {
+    grid-column: 1 / 3;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .history-view-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .history-view-tabs button {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .history-view-tabs button:last-child {
+    border-bottom: 0;
+  }
+
+  .series-measures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Le tableau des planches devient une liste : une ligne par valeur, l'intitulé en tête. */
+  .series-beds thead {
+    display: none;
+  }
+
+  .series-beds,
+  .series-beds tbody,
+  .series-beds tr,
+  .series-beds th,
+  .series-beds td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .series-beds tr {
+    margin-bottom: 8px;
+    border: 1px solid var(--line-soft);
+    border-radius: 9px;
+  }
+
+  .series-beds th,
+  .series-beds td {
+    border-top: 0;
+  }
+
+  .series-beds tbody th {
+    background: var(--green-soft);
+    color: var(--green-dark);
+  }
+
+  .series-beds td::before {
+    content: attr(data-label) ' : ';
+    color: var(--muted);
+  }
+}

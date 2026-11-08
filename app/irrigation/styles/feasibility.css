@@ -1,0 +1,35 @@
+/* Volumetric feasibility: preserve the farm's working surface, wrap every column. */
+.feasibility-section { margin: 3rem 0; min-width: 0; font-size: 1rem; }
+.feasibility-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.feasibility-heading h2 { margin: 0; }
+.feasibility-heading p, .feasibility-meta { color: var(--muted, var(--muted)); }
+.feasibility-heading button, .feasibility-validation > button { border: 0; border-radius: var(--radius-button); padding: .8rem 1rem; background: var(--green); color: white; cursor: pointer; font-size: .95rem; }
+.feasibility-section button:disabled { opacity: .55; cursor: wait; }
+.feasibility-notice { color: var(--green); }
+.feasibility-warning { background: var(--warn-soft); padding: .8rem 1rem; border-radius: .65rem; color: var(--warn-ink); font-size: .9rem; line-height: 1.55; }
+.feasibility-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: .75rem; margin: 1rem 0; }
+.feasibility-summary > div { border: 1px solid var(--line); border-radius: .75rem; padding: 1rem; background: white; min-width: 0; }
+.feasibility-summary > div > span { font-size: .95rem; }
+.feasibility-summary strong { display: block; font-size: 1.45rem; margin: .5rem 0; font-variant-numeric: tabular-nums; }
+.feasibility-section small { display: block; font-size: .875rem; color: var(--muted); line-height: 1.5; }
+.feasibility-priority, .feasibility-sources { border: 1px solid var(--line); border-radius: .85rem; background: #fff; margin: .8rem 0; min-width: 0; }
+.feasibility-priority > summary, .feasibility-sources > summary { padding: 1rem; cursor: pointer; line-height: 1.5; }
+.feasibility-priority > summary > span { display: block; font-size: .9rem; color: var(--muted); padding-top: .4rem; }
+.feasibility-arbitration { padding: 0 1rem 1rem; border-bottom: 1px solid var(--line); }
+.feasibility-arbitration h3 { font-size: 1.1rem; }
+.feasibility-bed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: .85rem; padding: 1rem; }
+.feasibility-bed-grid > article { min-width: 0; padding: 1rem; border: 1px solid var(--line); border-radius: .65rem; overflow-wrap: anywhere; }
+.feasibility-bed header { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: space-between; }
+.feasibility-bed dl { margin: 1rem 0; }
+.feasibility-bed dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem .75rem; margin: .6rem 0; font-size: .9rem; }
+.feasibility-bed dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; }
+.feasibility-checkbox { display: flex; align-items: center; gap: .5rem; min-height: 44px; cursor: pointer; font-size: .9rem; }
+.feasibility-checkbox input { width: 22px; height: 22px; flex: 0 0 22px; accent-color: #176b4d; }
+.feasibility-status { font-weight: 650; font-size: .95rem; }
+.feasibility-reason { font-size: .9rem; line-height: 1.5; color: var(--warn-ink); }
+.feasibility-validation { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border-top: 1px solid var(--line); }
+.feasibility-help { display: inline; }
+.feasibility-help > button { display: inline-flex; justify-content: center; align-items: center; min-width: 32px; min-height: 32px; border: 0; background: transparent; color: var(--green); padding: 0 .25rem; border-radius: .3rem; cursor: pointer; font-size: 1.15rem; }
+.feasibility-help > [role="tooltip"] { display: block; max-width: 100%; padding: .9rem; margin: .4rem 0; background: var(--sheet); color: var(--ink); border: 1px solid var(--line); border-radius: .6rem; font-size: .9rem; font-weight: 400; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
+.feasibility-help [role="tooltip"] button { display: block; margin-top: .5rem; min-height: 36px; color: var(--green); background: white; border: 1px solid var(--line-strong); border-radius: .4rem; padding: .3rem .8rem; cursor: pointer; }
+@media (max-width: 480px) { .feasibility-bed-grid { padding: .6rem; } .feasibility-heading > button, .feasibility-validation > button { width: 100%; min-height: 44px; } }

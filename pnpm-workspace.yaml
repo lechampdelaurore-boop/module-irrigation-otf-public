@@ -1,0 +1,38 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true
+
+packages:
+  - cloudflare/irrigation-push
+  - cloudflare/irrigation-weather-scheduler
+
+# Un épinglage porte sa raison et sa condition de retrait (point ouvert 20,
+# docs/ETAT_DU_PROJET.md). Celui de `ws`, posé le 1er septembre 2026 sans
+# raison consignée, a été levé le 2 octobre 2026 : miniflare et le greffon Vite
+# demandent eux-mêmes 8.21.0, qui ferme les deux alertes.
+overrides:
+  # miniflare 5.20260918.0-alpha épingle undici 7.29.0, qui laisse neuf des
+  # vingt et une alertes ouvertes ; 7.29.1 (4 septembre 2026) les ferme. Le
+  # 31 octobre 2026, huit alertes nouvelles visent 7.29.1 ; 7.30.1 les ferme.
+  # À retirer quand miniflare épinglera lui-même 7.30.1 ou plus.
+  undici: 7.30.1
+  # Lot du 31 octobre 2026 : vingt-cinq alertes Dependabot, toutes sur les
+  # outils de développement (`pnpm audit --prod` n'en trouve aucune). Chaque
+  # épinglage monte une sous-dépendance à la première version corrigée de sa
+  # ligne, sans changer de version majeure ; à retirer quand le paquet parent
+  # cité demandera lui-même cette version ou plus.
+  # sharp, via miniflare (simulateur Cloudflare local).
+  sharp@0.35: 0.35.5
+  # fast-uri, via webpack et ajv (chaîne de compilation de @vitejs/plugin-rsc).
+  fast-uri@3: 3.1.9
+  # brace-expansion, via minimatch (eslint et eslint-config-next).
+  brace-expansion@1: 1.1.21
+  brace-expansion@5: 5.0.12
+  # js-yaml, via @eslint/eslintrc.
+  js-yaml@4: 4.3.2
+  # zod, via eslint-plugin-react-hooks (eslint-config-next).
+  zod@4: 4.6.7
+  # fflate, via satori et @vercel/og (vinext), absent du site déployé.
+  fflate@0.7: 0.7.5

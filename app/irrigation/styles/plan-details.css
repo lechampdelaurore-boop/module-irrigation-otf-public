@@ -1,0 +1,166 @@
+.between-bed-anchor {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  bottom: 0;
+  left: -7px;
+  width: 14px;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.between-bed-anchor:not([data-placed="true"]):not([data-candidate="true"]):not(:hover) .placement-line:only-child {
+  opacity: .24;
+}
+
+.between-bed-anchor[data-placed="true"] .placement-line,
+.between-bed-anchor[data-candidate="true"] .placement-line,
+.between-bed-anchor:hover .placement-line {
+  width: 5px;
+  opacity: 1;
+}
+
+.plan-bed:hover,
+.plan-bed[data-selected="true"] {
+  border-color: var(--green-dark);
+  box-shadow: inset 0 0 0 1px var(--green-dark);
+}
+
+.plot-plan-card[data-mode="greenhouse"] .plan-bed:hover,
+.plot-plan-card[data-mode="greenhouse"] .plan-bed[data-selected="true"] {
+  border-color: #8a5b08;
+  box-shadow: inset 0 0 0 1px #8a5b08;
+}
+
+.no-beds {
+  margin: auto;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.plot-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plot-card-footer > span[aria-hidden="true"] {
+  display: none;
+}
+
+/*
+  La planche choisie (point 6) : un bloc blanc, son nom en titre de bloc et
+  son jardin en gris à côté, puis ses mesures en tuiles vert pâle.
+*/
+.selected-bed-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 18px 20px 20px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.selected-bed-heading {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 4px 10px;
+}
+
+.selected-bed-heading small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.selected-bed-details dt {
+  color: #3f5f55;
+  font-size: 12px;
+}
+
+.selected-bed-heading strong {
+  font: 300 20px/1.2 var(--font-title);
+}
+
+.selected-bed-details dl {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.selected-bed-details dl > div {
+  padding: 10px 12px;
+  border-radius: 9.75px;
+  background: var(--tile);
+}
+
+.selected-bed-details dd {
+  margin: 2px 0 0;
+  font: 600 16px/1.3 var(--font-ui);
+}
+
+.selected-bed-details dl > div[data-irrigated="true"] {
+  background: var(--water-soft);
+  color: var(--water-ink);
+}
+
+.selected-bed-details dl > div small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plan-empty-state {
+  margin: 0;
+  padding: 72px 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.empty-state {
+  margin: auto;
+  padding: 28px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.read-only-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 28px 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.read-only-note > span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 900;
+}
+
+.read-only-note p {
+  margin: 0;
+}
+
+.read-only-note strong {
+  color: var(--ink);
+}

@@ -1,0 +1,430 @@
+.water-management-heading,
+.water-panel-title,
+.today-water-card,
+.water-week-navigation,
+.water-inline-form,
+.weather-candidates,
+.goal-chip-list {
+  display: flex;
+}
+
+.water-management-heading {
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.water-management-heading h2 {
+  margin: 3px 0 6px;
+  color: var(--ink);
+  font-family: var(--font-title);
+  font-size: var(--title-size);
+  font-weight: 300;
+  letter-spacing: -.01em;
+}
+
+.water-management-heading p:not(.eyebrow),
+.water-panel-title p,
+.water-panel small {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.water-week-navigation {
+  align-items: center;
+  gap: 7px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.water-week-navigation button,
+.water-panel button,
+.water-inline-form button,
+.weather-candidates button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--green-soft);
+  color: var(--green);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.water-week-navigation button:last-child,
+.water-inline-form > button {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.water-week-navigation strong {
+  min-width: 180px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.water-notice,
+.water-error,
+.weather-stale,
+.weather-fresh {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.water-notice,
+.weather-fresh { background: var(--tile); color: var(--green); }
+.water-error { background: var(--danger-soft); color: var(--danger-ink); }
+.weather-stale { background: var(--warn-soft); color: var(--warn-ink); }
+
+.water-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.water-summary-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.water-summary-card span,
+.today-water-metric span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.water-summary-card strong {
+  margin: 7px 0 4px;
+  color: var(--green-dark);
+  font-size: 22px;
+}
+
+.water-summary-card small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+}
+
+/* L'eau du jour en tuile vert pâle : le vert foncé reste aux boutons et au menu (D-068, point 1). */
+.today-water-card {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--tile);
+  color: var(--ink);
+}
+
+.today-water-card > div:first-child {
+  display: flex;
+  min-width: 230px;
+  flex-direction: column;
+}
+
+.today-water-card .eyebrow,
+.today-water-metric span { color: #3f5f55; }
+.today-water-card > div:first-child strong { margin-top: 3px; font-size: 17px; }
+
+.today-water-metric {
+  display: flex;
+  min-width: 110px;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 18px;
+  border-left: 1px solid rgb(11 105 77 / 18%);
+}
+
+.today-water-metric.is-warning strong { color: var(--warn-ink); }
+
+.water-dashboard-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.water-panel {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.water-panel-title {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.water-panel h3 { margin: 0 0 4px; color: var(--ink); font-size: 16px; }
+.water-panel-title .danger-outline { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-ink); }
+
+.water-inline-form {
+  align-items: end;
+  gap: 8px;
+}
+
+.water-inline-form label {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.water-inline-form label > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.water-inline-form input,
+.water-inline-form select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+
+/* Le périmètre d'un objectif : la recherche et la liste rangée par jardin (audit ergonomique, point 4). */
+.goal-scope-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.goal-scope-picker label {
+  display: flex;
+  min-width: 12rem;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.goal-scope-picker label > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.goal-scope-picker input,
+.goal-scope-picker select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+
+.goal-scope-picker .goal-scope-hint {
+  flex: 1 0 100%;
+}
+
+/* La commune se change dans Réglages (audit ergonomique, point 9) : le lien qui y mène. */
+.weather-location-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 38px;
+  margin-bottom: 8px;
+  color: var(--green);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.goal-chip-list,
+.weather-candidates {
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.goal-chip-list > span {
+  display: inline-flex;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--green-dark);
+  font-size: 11px;
+}
+
+.weather-candidates button { height: auto; min-height: 34px; padding: 7px 10px; text-align: left; }
+.secondary-button { margin-top: 10px; }
+.water-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12px; font-weight: 700; }
+.water-limit-form { flex-wrap: wrap; }
+.water-limit-form label { flex-basis: 120px; }
+
+.water-week-table-wrap {
+  overflow-x: auto;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.water-week-table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.water-week-table th,
+.water-week-table td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); text-align: left; }
+.water-week-table thead th { color: var(--muted); font-size: 12px; font-family: var(--font-ui); }
+.water-week-table tbody tr:last-child th,
+.water-week-table tbody tr:last-child td { border-bottom: 0; }
+.limit-exceeded-row { background: var(--danger-soft); color: var(--danger-ink); }
+
+.weather-alerts-panel { margin-top: 12px; }
+.weather-alerts-panel h4 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
+.weather-alert-device { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-radius: 10px; background: var(--sheet); color: var(--green-dark); font-size: 12px; }
+.weather-alert-device[data-status="denied"],
+.weather-alert-device[data-status="unsupported"],
+.weather-alert-device[data-status="unavailable"] { background: var(--warn-soft); color: var(--warn-ink); }
+.weather-alert-device a { color: var(--green-dark); font-weight: 750; }
+.weather-alert-form { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); }
+.weather-alert-fields { flex-wrap: wrap; }
+.weather-alert-fields label { flex-basis: 150px; }
+.weather-alert-form .water-toggle { margin: 12px 0; }
+.weather-alert-form small { display: block; margin-top: 10px; }
+.weather-alert-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.weather-alerts-panel .weather-alert-primary { border-color: var(--green); background: var(--green); color: white; }
+.weather-alerts-panel .danger-outline { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-ink); }
+.weather-alert-list,
+.weather-alert-history { margin: 12px 0 0; padding: 0; list-style: none; }
+.weather-alert-criterion { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line-soft); }
+.weather-alert-criterion[data-active="false"] { opacity: .72; }
+.weather-alert-criterion-text,
+.weather-alert-history li { display: flex; min-width: 0; flex-direction: column; gap: 3px; font-size: 12px; overflow-wrap: anywhere; }
+.weather-alert-state { color: var(--green-dark); font-weight: 750; }
+.weather-alert-unavailable { color: var(--warn-ink); }
+.weather-alert-empty { margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+.weather-alert-history li { padding: 10px 0; border-top: 1px solid var(--line-soft); }
+.weather-alert-history a { align-self: flex-start; color: var(--green-dark); font-weight: 750; }
+.weather-alert-delivery[data-status="failed"],
+.weather-alert-delivery[data-status="retrying"] { color: var(--danger-ink); font-weight: 750; }
+
+@media (max-width: 980px) {
+  .water-management-heading { align-items: stretch; flex-direction: column; }
+  .water-week-navigation { align-self: flex-start; }
+  .water-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .today-water-card { flex-wrap: wrap; }
+  .water-dashboard-columns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .water-management-section { margin-top: 18px; padding: 15px; border-radius: var(--radius); }
+  .water-week-navigation { width: 100%; flex-wrap: wrap; }
+  .water-week-navigation strong { min-width: 0; flex: 1; }
+  .water-week-navigation button:last-child { width: 100%; }
+  .water-summary-grid { grid-template-columns: 1fr 1fr; }
+  .water-summary-card:last-child { grid-column: 1 / -1; }
+  .today-water-card { align-items: stretch; gap: 10px; }
+  .today-water-card > div:first-child { min-width: 100%; }
+  .today-water-metric { min-width: 0; flex: 1; padding: 8px 0 0; border-top: 1px solid rgb(255 255 255 / 22%); border-left: 0; }
+  .water-inline-form { align-items: stretch; flex-direction: column; }
+  /* En colonne, chaque champ garde sa hauteur : étirés, ils s'espaçaient de la hauteur du plus grand. */
+  .water-inline-form label { flex: 0 0 auto; }
+  .water-inline-form > button { width: 100%; }
+  .goal-scope-picker { flex-direction: column; align-items: stretch; }
+  .goal-scope-picker label { min-width: 0; flex: 0 0 auto; }
+  .goal-scope-picker input,
+  .goal-scope-picker select { height: 44px; }
+  .weather-location-link { min-height: 44px; }
+  .water-week-navigation button,
+  .water-panel button,
+  .water-inline-form button { min-height: 44px; }
+  .water-week-table-wrap { overflow: visible; border: 0; background: transparent; }
+  .weather-alert-criterion { flex-direction: column; }
+  .weather-alert-actions > button { flex: 1 1 auto; }
+  .water-week-table { min-width: 0; }
+  .water-week-table thead { display: none; }
+  .water-week-table,
+  .water-week-table tbody,
+  .water-week-table tr,
+  .water-week-table th,
+  .water-week-table td { display: block; width: 100%; }
+  .water-week-table tr { margin-bottom: 8px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
+  .water-week-table tbody th { padding: 10px 12px; background: var(--sheet); }
+  .water-week-table td { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; text-align: right; }
+  .water-week-table td::before { content: attr(data-label); color: var(--muted); font-size: 12px; font-weight: 500; text-align: left; font-family: var(--font-ui); }
+}
+/* L'encart « Alertes cultures » (5 quinquies). */
+.crop-alerts-panel { margin-top: 12px; }
+.crop-alerts-panel h4 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
+.crop-alerts-panel h5 { margin: 12px 0 4px; color: var(--ink); font-size: 12px; }
+.crop-alerts-panel .weather-alert-primary { border-color: var(--green); background: var(--green); color: white; }
+.crop-alert-fold { margin-top: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.crop-alert-fold > summary { display: grid; min-height: 44px; box-sizing: border-box; gap: 2px; padding: 10px 12px; cursor: pointer; }
+.crop-alert-fold > summary small { color: var(--muted); font-size: 12px; }
+.crop-alert-fold > summary { position: relative; padding-right: 40px; list-style: none; }
+.crop-alert-fold > summary::-webkit-details-marker { display: none; }
+/* La flèche vers le bas d'un pli fermé, vers le haut d'un pli ouvert (précision P45). */
+.crop-alert-fold > summary::after { content: ""; position: absolute; top: 50%; right: 16px; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-70%) rotate(45deg); transition: transform .15s ease; }
+.crop-alert-fold[open] > summary::after { transform: translateY(-30%) rotate(-135deg); }
+.crop-alert-fold > :not(summary) { margin-right: 12px; margin-left: 12px; }
+.crop-alert-fold > :last-child { margin-bottom: 12px; }
+.crop-alert-form { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
+.crop-alert-form fieldset { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; border: 0; }
+.crop-alert-form legend { margin-bottom: 4px; font-size: 12px; font-weight: 750; }
+.crop-alert-form fieldset.crop-alert-margins { display: grid; gap: 4px; }
+.crop-alert-margins p { margin: 0; color: var(--muted); font-size: 12px; }
+.crop-alert-form small { color: var(--muted); font-size: 12px; }
+.crop-alert-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.crop-alert-form .water-toggle { flex-direction: row; align-items: center; }
+.crop-alert-form > button { align-self: flex-start; }
+.crop-alert-fields { flex-wrap: wrap; }
+.crop-alert-fields label { flex: 1 1 150px; }
+.crop-alert-offset input[type="range"] { width: 100%; min-height: 44px; }
+.crop-alert-rows { margin: 8px 0 0; padding: 0; list-style: none; }
+.crop-alert-rows > li { display: flex; min-width: 0; flex-direction: column; gap: 3px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 12px; overflow-wrap: anywhere; }
+.crop-alert-row { gap: 8px; }
+.crop-alert-row-text { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.crop-alert-source { color: var(--muted); }
+.crop-alert-note { margin: 0 0 6px; color: var(--muted); font-size: 12px; }
+.crop-alert-upcoming { margin-top: 6px; }
+@media (max-width: 600px) {
+  .crop-alerts-panel .weather-alert-actions > button { flex: 1 1 auto; }
+  .crop-alert-fields label { flex: 0 0 auto; }
+  .crop-alert-form > button { align-self: stretch; }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "irrigation-otf-weather-scheduler",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "services": [
+    {
+      "binding": "IRRIGATION_SITE",
+      "service": "module-irrigation-otf"
+    }
+  ],
+  "triggers": {
+    "crons": ["15 4,5 * * *"]
+  },
+  "vars": {
+    "IRRIGATION_SITE_URL": "https://module-irrigation-otf.lechampdelaurore.workers.dev"
+  },
+  "secrets": {
+    "required": [
+      "WEATHER_SYNC_SERVICE_TOKEN"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

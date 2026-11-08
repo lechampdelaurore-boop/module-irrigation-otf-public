@@ -1,0 +1,445 @@
+/*
+ * La navigation des pages (3.8, docs/feature-selection-contract.md, section 5 ;
+ * charte du module, section 7) : sur ordinateur, un menu à gauche sur le vert
+ * pâle du menu, la page choisie en vert texte blanc ; sur téléphone, une bande
+ * de pages fixée en bas qui défile, la page courante en pilule verte, avec des
+ * cibles de 44 px. Depuis la deuxième passe (D-068), le menu est une colonne
+ * de 247 px collée au bord gauche, du haut en bas de la page, comme sur OTF.
+ * Au téléphone (audit ergonomique, point 2, 3.8 quater lot 2, précision F6),
+ * la bande devient une barre de quatre entrées et « Plus », qui ouvre le menu
+ * entier en feuille au-dessus d'elle.
+ */
+.feature-layout {
+  display: grid;
+  min-height: calc(100vh - 52px);
+  grid-template-columns: 247px minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.feature-page {
+  width: 100%;
+  max-width: 1264px;
+  min-width: 0;
+  padding: 24px 32px 0;
+}
+
+.feature-menu {
+  padding: 16px 12px;
+  background: var(--menu);
+}
+
+.feature-menu ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+}
+
+.feature-menu > ul {
+  position: sticky;
+  top: 16px;
+}
+
+/*
+ * Le tableau de bord (docs/aujourdhui-tableau-de-bord-contract.md,
+ * section 3.1) : « Aujourd'hui » détaché en tête, un encart blanc avec sa
+ * pastille ronde verte, un trait sous lui ; les autres pages en trois
+ * groupes titrés ; Réglages à part, sous un trait.
+ */
+.menu-home-item {
+  margin-bottom: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(11 105 77 / 18%);
+}
+
+.feature-menu a.menu-home {
+  display: grid;
+  min-height: 58px;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 10px;
+  border: 1.5px solid var(--green-soft);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: 0 4px 16px rgb(11 105 77 / 12%);
+  color: var(--ink);
+}
+
+.feature-menu a.menu-home:hover {
+  background: var(--card);
+  border-color: var(--green);
+}
+
+.feature-menu a.menu-home[aria-current="page"] {
+  border-color: var(--green);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.menu-home-badge {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+}
+
+.menu-home-badge .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.menu-home-text {
+  display: grid;
+  min-width: 0;
+}
+
+.menu-home-text strong {
+  font: 500 15.5px/1.15 var(--font-title);
+}
+
+.menu-home-text small {
+  color: var(--ink2);
+  font: 400 11.5px/1.3 var(--font-ui);
+}
+
+.menu-group-title {
+  display: block;
+  padding: 10px 12px 2px;
+  color: #4f6e64;
+  font: 600 10.5px/1.4 var(--font-ui);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.feature-menu .menu-group ul {
+  gap: 2px;
+}
+
+.menu-settings-item {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(11 105 77 / 18%);
+}
+
+.feature-menu a {
+  display: flex;
+  min-height: 33px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 9.75px;
+  color: #1e1e1e;
+  font: 500 13px/1.25 var(--font-ui);
+  text-decoration: none;
+}
+
+.feature-menu a:hover {
+  background: rgb(11 105 77 / 8%);
+}
+
+.feature-menu a[aria-current="page"] {
+  background: var(--green);
+  color: #fff;
+}
+
+.feature-menu a:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.feature-menu .icon {
+  flex: none;
+}
+
+/* La barre du bas n'existe qu'au téléphone. */
+.phone-bar {
+  display: none;
+}
+
+.legacy-redirect {
+  padding: 46px 0;
+  color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .feature-layout {
+    display: block;
+    min-height: 0;
+  }
+
+  .feature-page {
+    padding: 20px 24px 0;
+  }
+
+  .app-shell:has(.feature-menu) {
+    padding-bottom: 96px;
+  }
+
+  /*
+    Le menu d'un matériel s'ouvre vers le haut : vers le bas, celui de la
+    dernière carte passait sous la barre des pages, sans pouvoir défiler.
+  */
+  .equipment-menu > div {
+    top: auto;
+    bottom: 48px;
+  }
+
+  .feature-menu {
+    position: fixed;
+    z-index: 40;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+    overflow-x: auto;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--card);
+    box-shadow: 0 -4px 20px rgb(0 0 0 / 6%);
+    overscroll-behavior-x: contain;
+  }
+
+  .feature-menu ul {
+    position: static;
+    width: max-content;
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  /* Dans la bande de la tablette, les groupes se fondent en une seule rangée de pilules. */
+  .feature-menu > ul {
+    position: static;
+  }
+
+  .menu-home-item,
+  .menu-group,
+  .menu-settings-item,
+  .feature-menu .menu-group ul,
+  .menu-settings-item ul {
+    display: contents;
+  }
+
+  .menu-group-title,
+  .menu-home-text small {
+    display: none;
+  }
+
+  .feature-menu a {
+    min-height: var(--touch-target);
+    padding: 8px 14px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .feature-menu a.menu-home {
+    display: flex;
+    min-height: var(--touch-target);
+    padding: 4px 14px 4px 4px;
+    border-radius: 999px;
+    box-shadow: none;
+  }
+
+  .feature-menu a.menu-home .menu-home-badge {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .feature-page {
+    padding: 14px 14px 0;
+  }
+
+  .app-shell:has(.phone-bar) {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Un champ atteint au clavier ou par un lien s'arrête au-dessus de la barre, jamais dessous. */
+  html:has(.phone-bar) {
+    scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /*
+    La barre du bas : quatre entrées et « Plus », à parts égales, l'icône
+    au-dessus d'un nom court (le nom entier reste le nom accessible) ; la page
+    ouverte prend la pilule verte de la charte.
+  */
+  .phone-bar {
+    display: block;
+    position: fixed;
+    z-index: 41;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 4px max(4px, env(safe-area-inset-right, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(4px, env(safe-area-inset-left, 0px));
+    border-top: 1px solid var(--line);
+    background: var(--card);
+    box-shadow: 0 -4px 20px rgb(0 0 0 / 6%);
+  }
+
+  .phone-bar ul {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    list-style: none;
+  }
+
+  .phone-bar a,
+  .phone-bar button {
+    display: flex;
+    width: 100%;
+    min-height: 56px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px 2px 4px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--ink2);
+    font: 500 11px/1.15 var(--font-ui);
+    text-align: center;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .phone-bar .icon {
+    display: block;
+    box-sizing: content-box;
+    flex: none;
+    padding: 3px 14px;
+    border-radius: 999px;
+  }
+
+  .phone-bar a[aria-current="page"] {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .phone-bar a[aria-current="page"] .icon {
+    background: var(--green);
+    color: #fff;
+  }
+
+  .phone-bar button[aria-expanded="true"] .icon {
+    background: var(--green-soft);
+  }
+
+  /* La page ouverte n'est pas dans la barre : la pastille verte la signale sur « Plus ». */
+  .phone-bar-more {
+    position: relative;
+  }
+
+  .phone-bar-more[data-marked="true"]::after {
+    position: absolute;
+    top: 5px;
+    left: calc(50% + 12px);
+    width: 9px;
+    height: 9px;
+    border: 2px solid var(--card);
+    border-radius: 50%;
+    background: var(--green);
+    content: "";
+  }
+
+  .phone-bar a:focus-visible,
+  .phone-bar button:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -3px;
+  }
+
+  /* Le menu entier, fermé ; « Plus » l'ouvre en feuille au-dessus de la barre. */
+  .feature-menu {
+    display: none;
+  }
+
+  .feature-menu[data-open="true"] {
+    display: block;
+    z-index: 42;
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - 66px - 52px - env(safe-area-inset-bottom, 0px));
+    padding: 10px 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: var(--shadow-raised);
+    overscroll-behavior: contain;
+  }
+
+  .feature-menu[data-open="true"] ul {
+    width: auto;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* La feuille du téléphone retrouve l'encart et les groupes de l'ordinateur. */
+  .feature-menu[data-open="true"] .menu-home-item,
+  .feature-menu[data-open="true"] .menu-group,
+  .feature-menu[data-open="true"] .menu-settings-item {
+    display: block;
+  }
+
+  .feature-menu[data-open="true"] .menu-group ul,
+  .feature-menu[data-open="true"] .menu-settings-item ul {
+    display: flex;
+  }
+
+  .feature-menu[data-open="true"] .menu-group-title,
+  .feature-menu[data-open="true"] .menu-home-text small {
+    display: block;
+  }
+
+  .feature-menu[data-open="true"] a {
+    min-height: var(--touch-target);
+    border-radius: 9.75px;
+    white-space: normal;
+  }
+
+  .feature-menu[data-open="true"] a.menu-home {
+    display: grid;
+    padding: 8px 10px;
+    border-radius: 14px;
+  }
+
+  /*
+    L'entrée « Aujourd'hui » de la barre du bas : un bouton rond vert qui
+    dépasse de la barre, séparé des autres pages par un filet.
+  */
+  .phone-bar li[data-home] {
+    border-right: 1px solid var(--line);
+  }
+
+  .phone-bar li[data-home] a {
+    position: relative;
+    color: var(--green);
+  }
+
+  .phone-bar li[data-home] .menu-home-badge {
+    width: 42px;
+    height: 42px;
+    margin-top: -20px;
+    border: 3px solid var(--card);
+    box-shadow: 0 3px 10px rgb(11 105 77 / 35%);
+  }
+
+  .phone-bar li[data-home] .menu-home-badge .icon,
+  .phone-bar li[data-home] a[aria-current="page"] .menu-home-badge .icon {
+    padding: 0;
+    background: none;
+    color: #fff;
+  }
+
+  .phone-bar li[data-home] .today-badge {
+    top: -14px;
+  }
+}

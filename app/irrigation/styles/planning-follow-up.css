@@ -1,0 +1,134 @@
+/*
+ * Le suivi et la replanification dans la section « Planning de la semaine »
+ * (3.7, docs/replanning-contract.md « L'écran ») : les suggestions sur les
+ * arrosages validés et le pli « Ce qui a changé ». À part de planning.css,
+ * qui tient la limite de 600 lignes.
+ */
+/* 3.7 : les suggestions sur les arrosages validés et le pli « Ce qui a changé » */
+.planning-suggestions {
+  margin-top: 1.4rem;
+}
+
+.planning-suggestions h3 {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.planning-suggestions-note {
+  margin: .4rem 0 .8rem;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.planning-suggestion-list {
+  display: grid;
+  gap: .8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.planning-suggestion {
+  display: grid;
+  gap: .5rem;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-left: 5px solid #b9892b;
+  border-radius: 11px;
+  background: var(--card);
+  padding: .8rem .9rem;
+}
+
+.planning-suggestion[data-suggestion="cancel"] {
+  border-left-color: var(--danger);
+}
+
+.planning-suggestion[data-kept="true"] {
+  border-left-color: var(--line);
+  opacity: .8;
+}
+
+.planning-suggestion-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem .8rem;
+  align-items: baseline;
+}
+
+.planning-suggestion-head strong {
+  font-size: 1.05rem;
+}
+
+.planning-suggestion-head span,
+.planning-suggestion-causes {
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.planning-suggestion-causes {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.planning-suggestion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.planning-kept {
+  margin-top: .8rem;
+}
+
+.planning-changes {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--card);
+  padding: .7rem .9rem;
+}
+
+.planning-changes summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.planning-changes ul {
+  margin: .6rem 0 0;
+  padding-left: 1.1rem;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.planning-changes li[data-kind="unplaced"],
+.planning-changes li[data-kind="deficit"] {
+  color: var(--danger-ink);
+}
+
+/*
+ * Une validée dont l'irrigation est annulée (statuts du contrat) ne compte plus :
+ * la carte se range avec les refusées (trait gauche gris, texte atténué).
+ * Choix du porteur, 7 novembre 2026 : « comme une refusée, pastille visible ».
+ */
+.planning-proposal[data-status="validated"][data-irrigation="canceled"] {
+  border-left-color: var(--line);
+  color: var(--muted);
+}
+
+/*
+ * Les pastilles de ce qui ne compte plus (expirée, refusée, remplacée, annulée)
+ * se lisent sur le blanc de la carte : gris moyen et bordées, plus le gris de la
+ * feuille, presque blanc (choix du porteur, 7 novembre 2026, « toutes pareilles »).
+ */
+.planning-status[data-status="expired"],
+.planning-status[data-status="refused"],
+.planning-status[data-status="replaced"],
+.planning-status[data-status="validated"][data-irrigation="canceled"] {
+  border: 1px solid var(--line-strong);
+  background: var(--line);
+  color: var(--ink2);
+}

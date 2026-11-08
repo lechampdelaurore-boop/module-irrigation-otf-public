@@ -1,0 +1,358 @@
+.irrigation-events-section {
+  margin-top: 28px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 78%);
+  box-shadow: var(--shadow);
+}
+
+.irrigation-events-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.irrigation-events-heading h2,
+.active-irrigations h3,
+.upcoming-irrigations h3,
+.irrigation-history h3 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.irrigation-events-heading h2 {
+  font-family: var(--font-title);
+  font-size: var(--title-size);
+  font-weight: 300;
+  letter-spacing: -.01em;
+}
+
+.irrigation-events-heading p:not(.eyebrow),
+.irrigation-history > div > p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.irrigation-event-counts {
+  display: flex;
+  overflow: hidden;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.irrigation-event-counts span {
+  display: flex;
+  min-width: 94px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 11px 13px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.irrigation-event-counts span + span {
+  border-left: 1px solid var(--line);
+}
+
+.irrigation-event-counts strong {
+  color: var(--green-dark);
+  font-size: 15px;
+}
+
+.irrigation-notification-readiness {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: -5px 0 16px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.irrigation-notification-readiness > div,
+.irrigation-notification-readiness[data-status="granted"],
+.irrigation-notification-readiness[data-status="limited"] {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.irrigation-notification-readiness > div,
+.irrigation-notification-readiness[data-status="granted"],
+.irrigation-notification-readiness[data-status="limited"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.irrigation-notification-readiness strong {
+  color: var(--green-dark);
+}
+
+.irrigation-notification-readiness[data-status="limited"] {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+}
+
+.irrigation-notification-readiness[data-status="limited"] strong {
+  color: var(--warn-ink);
+}
+
+.irrigation-notification-readiness button {
+  min-height: 38px;
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--radius-button);
+  background: var(--green);
+  color: white;
+  font: inherit;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.irrigation-event-notice,
+.irrigation-event-warning,
+.irrigation-event-error {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.irrigation-event-notice {
+  background: var(--tile);
+  color: var(--green);
+}
+
+.irrigation-event-warning,
+.overlap-warning {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.irrigation-event-error {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+.active-irrigations {
+  margin-bottom: 20px;
+  padding: 18px;
+  border: 1px solid var(--water-line);
+  border-radius: var(--radius);
+  background: var(--water-soft);
+}
+
+.active-irrigations-title,
+.irrigation-history {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.active-irrigations-title {
+  margin-bottom: 13px;
+}
+
+.overlap-warning {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.active-irrigation-grid,
+.irrigation-record-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 12px;
+}
+
+.active-irrigation-card,
+.irrigation-record-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: white;
+}
+
+.active-irrigation-card[data-finished="true"] {
+  border-color: #e99d45;
+  box-shadow: 0 0 0 3px rgb(233 157 69 / 13%);
+}
+
+.timer-finished-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: -6px -6px 14px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.timer-finished-alert span {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.active-irrigation-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.active-irrigation-card h4 {
+  margin: 6px 0 1px;
+  font-size: 17px;
+}
+
+.active-irrigation-card header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.timer-countdown {
+  color: var(--water-ink);
+  font-size: clamp(25px, 4vw, 37px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+}
+
+.event-status {
+  display: inline-flex;
+  width: fit-content;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.event-status[data-status="running"] {
+  background: var(--water-soft);
+  color: var(--water-ink);
+}
+
+.event-status[data-status="paused"],
+.event-status[data-status="partially_completed"] {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.event-status[data-status="completed"] {
+  background: var(--tile);
+  color: var(--green);
+}
+
+/* Comme les pastilles du planning de ce qui ne compte plus (planning-follow-up.css) : gris moyen, bordée. */
+.event-status[data-status="canceled"] {
+  border: 1px solid var(--line-strong);
+  background: var(--line);
+  color: var(--ink2);
+}
+
+.active-timer-details,
+.irrigation-record-card dl,
+.irrigation-preview dl {
+  display: grid;
+  gap: 1px;
+  margin: 14px 0;
+  overflow: hidden;
+  border-radius: 9px;
+  background: var(--line);
+}
+
+.active-timer-details {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.active-timer-details div,
+.irrigation-record-card dl div,
+.irrigation-preview dl div {
+  min-width: 0;
+  padding: 10px;
+  background: var(--card);
+}
+
+.active-timer-details dt,
+.irrigation-record-card dt,
+.irrigation-preview dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.active-timer-details dd,
+.irrigation-record-card dd,
+.irrigation-preview dd {
+  margin: 3px 0 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.active-timer-actions,
+.record-actions,
+.irrigation-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.active-timer-actions button,
+.record-actions button,
+.irrigation-dialog-actions button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--anthracite);
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--anthracite);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.active-timer-actions .primary,
+.record-actions .primary,
+.irrigation-dialog-actions .primary {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.active-timer-actions .danger-outline,
+.record-actions .danger-outline {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}

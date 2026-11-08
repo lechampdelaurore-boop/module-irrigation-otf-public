@@ -1,0 +1,53 @@
+{
+  "name": "ouvre-ta-ferme-irrigation",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern work",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types --import ./tests/support/register.mjs \"tests/*.test.ts\" \"tests/db/*.test.ts\"",
+    "knip": "knip",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm knip",
+    "push:check": "pnpm --dir cloudflare/irrigation-push check",
+    "weather:check": "pnpm --dir cloudflare/irrigation-weather-scheduler check",
+    "push:deploy": "pnpm --dir cloudflare/irrigation-push deploy",
+    "deploy": "wrangler deploy --config dist/server/wrangler.json",
+    "db:migrate:remote": "wrangler d1 migrations apply module-irrigation-otf --remote",
+    "db:migrate:local": "wrangler d1 migrations apply module-irrigation-otf --local",
+    "e2e:reset": "node scripts/reset-local-database.mjs",
+    "e2e": "playwright test",
+    "e2e:report": "playwright show-report"
+  },
+  "dependencies": {
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.56.0",
+    "@cloudflare/workers-types": "5.20261027.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "22.20.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitejs/plugin-rsc": "0.5.38",
+    "drizzle-orm": "0.45.3",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.4.3",
+    "knip": "6.43.0",
+    "react-server-dom-webpack": "19.3.1",
+    "typescript": "6.0.3",
+    "vinext": "1.0.1",
+    "vite": "8.3.5",
+    "wrangler": "4.154.0"
+  },
+  "type": "module"
+}

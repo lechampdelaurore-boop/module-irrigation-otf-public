@@ -1,0 +1,155 @@
+/* L'aperçu de l'apport (deuxième passe, D-068) : un bloc blanc, sans cadre. */
+.coverage-overview {
+  display: grid;
+  grid-template-columns: minmax(260px, .75fr) minmax(390px, 1.25fr);
+  gap: 13px 18px;
+  /* Sous le plan de la parcelle depuis le 8 novembre 2026 (retour du porteur). */
+  margin: 16px 0;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-light);
+}
+
+.coverage-overview-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+}
+
+.coverage-overview-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--water-soft);
+  color: var(--water);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.coverage-overview-heading small,
+.coverage-metrics small {
+  color: var(--muted);
+  font: 500 12px/1.3 var(--font-ui);
+}
+
+.coverage-overview-heading h2 {
+  margin: 2px 0;
+  font: 500 15px/1.3 var(--font-ui);
+}
+
+.coverage-overview-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.coverage-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(105px, 1fr));
+  gap: 7px;
+}
+
+.coverage-metrics > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: 9.75px;
+  background: var(--tile);
+}
+
+.coverage-metrics > span[data-warning="true"] {
+  border-color: #d3b8de;
+  background: #fbf5fd;
+}
+
+.coverage-metrics strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coverage-equipment-list {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.coverage-equipment-list button {
+  display: grid;
+  min-width: min(260px, 100%);
+  flex: 1 1 260px;
+  align-items: center;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--anthracite);
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--anthracite);
+  font: inherit;
+  font-family: var(--font-ui);
+  text-align: left;
+  cursor: pointer;
+}
+
+.coverage-equipment-list button:hover,
+.coverage-equipment-list button[data-focused="true"] {
+  border-color: #4b9fc4;
+  background: #edf8fc;
+  box-shadow: inset 0 0 0 1px #4b9fc4;
+}
+
+.coverage-equipment-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #168bc2;
+  box-shadow: 0 0 0 3px #dceff7;
+}
+
+.coverage-equipment-list button > span:nth-child(2) {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.coverage-equipment-list strong,
+.coverage-equipment-list small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coverage-equipment-list strong {
+  font-size: 10px;
+}
+
+.coverage-equipment-list small {
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.coverage-equipment-list b {
+  color: #126f9e;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.coverage-empty {
+  align-self: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}

@@ -1,0 +1,76 @@
+/*
+ * L'historique depuis l'audit ergonomique (3.8 quater, point 11) : le filtre
+ * des irrigations listées et le geste « Saisir la pluie » des cumuls.
+ */
+/* Le filtre de la liste : réalisées par défaut, planifiées, toutes (audit ergonomique, point 11). */
+.history-status-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(3, auto);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+}
+
+.history-status-tabs button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.history-status-tabs button:last-child {
+  border-right: 0;
+}
+
+.history-status-tabs button small {
+  margin-left: 4px;
+  font-weight: 500;
+  opacity: .8;
+}
+
+.history-status-tabs button[data-active="true"] {
+  background: var(--green);
+  color: white;
+}
+
+.history-status-tabs button:disabled {
+  cursor: wait;
+  opacity: .5;
+}
+
+/* « Saisir la pluie » à la place de « Donnée indisponible », ou sous une pluie incomplète. */
+.history-summary-action {
+  color: var(--green);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.history-summary-action.is-main {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+@media (max-width: 760px) {
+  .history-list-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .history-status-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .history-status-tabs button {
+    min-height: 44px;
+  }
+}

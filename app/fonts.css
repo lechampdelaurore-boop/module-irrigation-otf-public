@@ -1,0 +1,29 @@
+/*
+  Les trois polices de la charte du module (docs/charte-module.md, « Polices »),
+  hébergées dans public/fonts sous licence SIL OFL 1.1 : aucun appel du
+  navigateur vers un tiers. Polices variables, sous-ensemble latin ; le texte
+  s'affiche aussitôt dans la police de repli (font-display: swap).
+*/
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque/BricolageGrotesque-latin.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/dm-sans/DMSans-latin.woff2") format("woff2");
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("/fonts/open-sans/OpenSans-latin.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}

@@ -1,0 +1,371 @@
+@media (max-width: 980px) {
+  /*
+    Au téléphone, la barre du haut anthracite de 36 px (deuxième passe,
+    D-068, charte du module, point 5) : le nom de la session à gauche, la
+    cloche des notifications et l'initiale à droite.
+  */
+  .topbar {
+    height: 36px;
+    padding: 0 max(12px, env(safe-area-inset-right, 0px)) 0 max(12px, env(safe-area-inset-left, 0px));
+    border-bottom: 0;
+    background: var(--anthracite);
+    color: #fff;
+  }
+
+  .topbar .brand {
+    display: none;
+  }
+
+  .account {
+    flex: 1;
+    gap: 10px;
+  }
+
+  .account-name {
+    margin-right: auto;
+    font-size: 13px;
+  }
+
+  .topbar-bell {
+    position: relative;
+    display: inline-grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    color: #fff;
+  }
+
+  .avatar {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  /* Des cibles de 44 px autour de la cloche et de l'initiale, sans grandir la barre. */
+  .topbar-bell::after,
+  .avatar::after {
+    position: absolute;
+    inset: -4px;
+    content: "";
+  }
+
+  .avatar::after {
+    inset: -10px;
+  }
+
+  .intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .control-field select {
+    height: var(--touch-target);
+  }
+
+  .sync-card {
+    width: 100%;
+  }
+
+  .selected-bed-details {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .selected-bed-details dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .coverage-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .coverage-equipment-list {
+    grid-column: 1;
+  }
+
+  .garden-groups-heading,
+  .equipment-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .garden-member-editor {
+    grid-template-columns: 30px minmax(0, 1fr) 66px minmax(120px, 1fr) 32px;
+  }
+
+  .garden-member-gap {
+    grid-column: 4;
+  }
+
+  .garden-member-remove {
+    grid-column: 5;
+    grid-row: 1;
+  }
+
+  .placement-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .placement-toolbar-heading {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    padding-bottom: 28px;
+  }
+
+  /*
+    Le bandeau « Alertes système non disponibles » déjà vu sur cet appareil
+    se replie en un point sur la cloche (audit ergonomique, point 2, F10) ;
+    Réglages le garde en entier.
+  */
+  .irrigation-notification-readiness[data-folded="true"] {
+    display: none;
+  }
+
+  .topbar-bell[data-alerts-limited="true"]::before {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 9px;
+    height: 9px;
+    border: 2px solid var(--anthracite);
+    border-radius: 50%;
+    background: var(--warn);
+    content: "";
+  }
+
+  /* La saison passe dans la ligne du titre (help.css, F7) : le bloc qui ne portait qu'elle disparaît. */
+  .plan-controls .season-form,
+  .plan-controls-season-only {
+    display: none;
+  }
+
+  .intro {
+    gap: 6px;
+    padding-bottom: 14px;
+  }
+
+  .cache-warning {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .plan-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .plan-controls form,
+  .control-field,
+  .parcel-control,
+  .control-field select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .farm-plan {
+    padding: 14px;
+  }
+
+  .parcel-heading strong {
+    width: 100%;
+  }
+
+  .plot-grid {
+    display: flex;
+  }
+
+  .plot-plan-card {
+    flex-basis: 100%;
+  }
+
+  .bed-strip {
+    grid-template-columns: repeat(auto-fit, minmax(22px, 1fr));
+  }
+
+  .selected-bed-details dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Les tuiles de totaux restent sur deux colonnes au téléphone (charte, point 5 ; audit ergonomique, point 2). */
+  .coverage-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coverage-equipment-list button {
+    min-width: 0;
+    flex-basis: 100%;
+  }
+
+  .add-equipment-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .garden-chain {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .garden-chain-item {
+    width: 100%;
+    flex-basis: auto;
+  }
+
+  .garden-gap {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .ungrouped-gardens {
+    grid-template-columns: 1fr;
+  }
+
+  .garden-group-card > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .garden-group-actions {
+    width: 100%;
+  }
+
+  .garden-group-actions button {
+    flex: 1;
+  }
+
+  .garden-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .garden-member-editor {
+    align-items: start;
+    grid-template-columns: 30px minmax(0, 1fr) 66px 32px;
+  }
+
+  .garden-member-direction,
+  .garden-member-gap {
+    grid-column: 2 / -1;
+  }
+
+  .garden-member-remove {
+    grid-column: 4;
+    grid-row: 1;
+  }
+
+  .garden-group-dialog form > footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .garden-group-dialog {
+    overflow: hidden;
+  }
+
+  .garden-group-form-scroll {
+    padding: 16px 15px;
+  }
+
+  .garden-member-counter {
+    margin-right: 0;
+  }
+
+  /* Au téléphone, le nombre de réglages laisse sa place ; le « ⋮ » reste à
+     droite et son menu s'ouvre vers la gauche, dans l'écran. Cibles de 44 px. */
+  .equipment-card {
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "mark copy place menu"
+      "pose pose pose  pose";
+  }
+
+  .equipment-place-button,
+  .equipment-remove-button,
+  .equipment-pose-history summary {
+    min-height: 44px;
+  }
+
+  .equipment-setting-count,
+  .archived-badge {
+    display: none;
+  }
+
+  .placement-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .placement-toolbar-heading,
+  .placement-toolbar-error,
+  .placement-toolbar-actions {
+    grid-column: 1;
+  }
+
+  .placement-toolbar-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .placement-remove-button {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .equipment-choice-group {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-dialog-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .equipment-dialog {
+    max-height: 94vh;
+    overflow-y: auto;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .settings-manager-intro {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .setting-card {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+  }
+
+  .setting-card .setting-delete-button {
+    grid-column: 3;
+  }
+
+  .profile-editors {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-preview {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile-preview label {
+    grid-column: 1 / -1;
+  }
+
+  .breadcrumb {
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

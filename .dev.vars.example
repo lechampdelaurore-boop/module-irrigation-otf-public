@@ -1,0 +1,15 @@
+# Valeurs locales pour `wrangler dev` / `vinext dev` en cible Cloudflare.
+# Copier en .dev.vars (ignoré par Git). Ne jamais y mettre de vraie clé partagée.
+# Les trois réglages ci-dessous ferment les sources de hasard des parcours
+# navigateur : données Ouvre ta ferme de démonstration, utilisateur de
+# démonstration, météo déterministe (docs/browser-journeys-contract.md).
+OTF_DATA_SOURCE=mock
+LOCAL_DEMO_USER=true
+WEATHER_DATA_SOURCE=mock
+# ACCESS_TEAM_DOMAIN=https://exemple.cloudflareaccess.com
+# ACCESS_AUD=identifiant-d-audience-de-l-application-access
+# VISUAL_CROSSING_API_KEY=
+# WEATHER_SYNC_SERVICE_TOKEN=
+# IRRIGATION_PUSH_SERVICE_URL=
+# IRRIGATION_PUSH_SERVICE_TOKEN=
+# IRRIGATION_PUSH_VAPID_PUBLIC_KEY=

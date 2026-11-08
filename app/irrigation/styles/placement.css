@@ -1,0 +1,193 @@
+.plan-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+  margin: 0 0 16px;
+}
+
+.plan-controls form {
+  margin: 0;
+}
+
+/* Les étiquettes écrites normalement (deuxième passe, D-068, point 3). */
+.control-field {
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.control-field > span {
+  color: var(--muted);
+  font: 500 13px/1.4 var(--font-ui);
+}
+
+.control-field select {
+  height: 36px;
+  padding: 0 32px 0 10px;
+  border: 1px solid rgb(0 0 0 / 13%);
+  border-radius: 9.75px;
+  background: white;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.control-field select:focus-visible,
+.plan-bed:focus-visible {
+  outline: 3px solid rgb(14 81 55 / 24%);
+  outline-offset: 2px;
+}
+
+.control-field select:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+.placement-notice,
+.placement-global-error {
+  margin: 0 0 14px;
+}
+
+.placement-toolbar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(170px, .5fr) minmax(200px, .6fr) minmax(190px, .55fr);
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid #8eb9cf;
+  border-radius: var(--radius);
+  background: #eef8fc;
+  box-shadow: var(--shadow);
+}
+
+.placement-toolbar-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.placement-toolbar-heading > div {
+  min-width: 0;
+}
+
+.placement-toolbar-heading small,
+.placement-setting-field > span,
+.placement-current-choice small {
+  color: #286c8a;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+}
+
+.placement-toolbar-heading h2 {
+  margin: 2px 0 3px;
+  overflow: hidden;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placement-toolbar-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.placement-symbol {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  background: #167eae;
+  color: white;
+  font-size: 22px;
+  font-weight: 850;
+}
+
+.placement-setting-field,
+.placement-current-choice {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.placement-setting-field select,
+.placement-setting-field input {
+  min-width: 0;
+  height: 42px;
+  padding: 0 36px 0 11px;
+  border: 1px solid #9ebfce;
+  border-radius: 10px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.placement-setting-field small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.placement-current-choice {
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 66%);
+}
+
+.placement-current-choice strong,
+.placement-current-choice > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placement-current-choice strong {
+  font-size: 12px;
+}
+
+.placement-current-choice > span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.placement-current-choice[data-ready="true"] {
+  border-color: #62a4c2;
+  background: white;
+}
+
+.placement-toolbar-error {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.placement-toolbar-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.placement-remove-button {
+  min-height: 44px;
+  margin-right: auto;
+  padding: 0 14px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-button);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}

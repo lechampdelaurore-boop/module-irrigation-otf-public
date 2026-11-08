@@ -1,0 +1,15 @@
+# Fins de ligne : le dépôt et les copies de travail utilisent LF, quel que soit
+# le système (Q1). Les outils écrivent du LF ; sans cette règle, Git sous
+# Windows convertit en CRLF à l'extraction et avertit à chaque commit.
+* text=auto eol=lf
+
+# Fichiers binaires, jamais normalisés.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf binary

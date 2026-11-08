@@ -1,0 +1,95 @@
+/* Pose datée et stockage du matériel (2.11) : l'état sur la carte, le retrait,
+   l'historique des poses, le matériel stocké et les irrigations bloquées. */
+
+.equipment-pose {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  grid-area: pose;
+  gap: 4px 10px;
+}
+
+.equipment-pose-state {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--water-soft);
+  color: var(--water-ink);
+  font-size: 10px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.equipment-pose[data-state="stored"] .equipment-pose-state {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.equipment-pose[data-state="never"] .equipment-pose-state {
+  background: var(--sheet);
+  color: var(--muted);
+}
+
+.equipment-remove-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-button);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.equipment-pose-history {
+  font-size: 10px;
+}
+
+.equipment-pose-history[open] {
+  flex-basis: 100%;
+}
+
+.equipment-pose-history summary {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  color: var(--water-ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.equipment-pose-history ol {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.event-blocked {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* 3.7 : le signal d'une irrigation planifiée en retard ou non faite (règles 18 à 20) */
+.event-late {
+  margin: .5rem 0 0;
+  padding: .5rem .7rem;
+  border-radius: 8px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.event-late[data-lateness="missed"] {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}

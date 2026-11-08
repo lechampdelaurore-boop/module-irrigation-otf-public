@@ -1,0 +1,366 @@
+/*
+ * La page « Aujourd'hui », tableau de bord du module
+ * (docs/aujourdhui-tableau-de-bord-contract.md, section 3.2) : un en-tête qui
+ * résume le jour, puis des blocs blancs de la charte en grille, deux par
+ * rangée à l'ordinateur, une colonne au téléphone. Le gel annoncé porte la
+ * barre rouge, une prévision manquante la barre ambrée. Chaque bouton et
+ * chaque lien-geste fait 44 px. Les jauges sont dans today-board.css.
+ */
+.today-page {
+  display: grid;
+  gap: 16px;
+  margin-top: 1rem;
+  container-type: inline-size;
+}
+
+.today-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.today-row[data-layout="wide"] {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.today-row[data-layout="split"] {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+.today-row[data-layout="half"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* L'en-tête du jour : la date en grand, la ligne du plan, les pastilles, la phrase. */
+.today-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 24px;
+  align-items: end;
+}
+
+.today-head-main {
+  min-width: 0;
+}
+
+.today-eyebrow {
+  margin: 0;
+  color: var(--green);
+  font: 600 11.5px/1.4 var(--font-ui);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.today-date {
+  margin: 2px 0 0;
+  font: 300 2rem/1.1 var(--font-title);
+}
+
+.today-plan-row {
+  display: flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  color: var(--muted);
+}
+
+.today-plan-row .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--green);
+}
+
+.today-plan,
+.today-notice,
+.today-error {
+  margin: 0;
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.today-plan a {
+  color: var(--green);
+  font-weight: 500;
+}
+
+/* « Recalculer le plan » dans la ligne du plan : un lien-geste discret, toujours à 44 px. */
+.today-page .today-plan-row button.today-plan-recalculate {
+  padding: .3rem .4rem;
+  border-color: transparent;
+  background: none;
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.today-chips {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.today-chip {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 8px;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow-light);
+  color: var(--ink);
+  font: 500 13px/1.25 var(--font-ui);
+  text-decoration: none;
+}
+
+.today-chip:hover {
+  box-shadow: var(--shadow);
+}
+
+.today-chip:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.today-chip-dot {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--tile);
+  color: var(--green);
+}
+
+.today-chip-dot .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.today-chip[data-tone="late"] .today-chip-dot,
+.today-chip[data-tone="data"] .today-chip-dot,
+.today-chip[data-tone="unknown"] .today-chip-dot {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.today-chip[data-tone="alert"] .today-chip-dot {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.today-sentence {
+  grid-column: 1 / -1;
+  max-width: 75ch;
+  margin: 0;
+  font: 400 1rem/1.5 var(--font-text);
+}
+
+.today-notice {
+  padding: .5rem .75rem;
+  border-radius: 8px;
+  background: var(--ok-soft);
+  color: var(--ok-ink);
+}
+
+.today-notice a {
+  color: inherit;
+  font-weight: 600;
+}
+
+.today-error {
+  padding: .5rem .75rem;
+  border-radius: 8px;
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+/* Les blocs. */
+.today-block {
+  display: grid;
+  min-width: 0;
+  gap: 14px;
+  padding: 16px 18px 18px;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 16px;
+}
+
+.today-block[data-kind="weather"][data-tone="alert"] {
+  border-left: 5px solid var(--danger);
+}
+
+.today-block[data-kind="weather"][data-tone="unknown"] {
+  border-left: 5px solid var(--warn);
+}
+
+.today-block-heading {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 12px;
+}
+
+.today-block-heading > div {
+  min-width: 0;
+}
+
+.today-block-heading h2 {
+  margin: 0;
+  font: 400 1.2rem/1.2 var(--font-title);
+}
+
+.today-block-sub,
+.today-block-calm {
+  margin: 1px 0 0;
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.today-block-more {
+  margin-left: auto;
+  color: var(--green);
+  font: 500 13px/1.25 var(--font-ui);
+  white-space: nowrap;
+}
+
+.today-block-heading .page-help-toggle,
+.today-block-heading .section-help-toggle {
+  margin-left: auto;
+}
+
+.today-block-badge {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--tile);
+  color: var(--green);
+}
+
+.today-block-badge[data-tone="water"],
+.today-block-badge[data-tone="calm"] {
+  background: var(--water-soft);
+  color: var(--water);
+}
+
+.today-block-badge[data-tone="alert"] {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.today-block-badge[data-tone="unknown"] {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* Les boutons et liens-gestes : 44 px, la pilule de la charte. */
+.today-page button:not(.page-help-toggle, .page-help-close, .section-help-toggle),
+.today-action-link {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  padding: .45rem .9rem;
+  border: 1.5px solid var(--green);
+  border-radius: var(--radius-button);
+  background: var(--tile);
+  color: var(--green);
+  font: 500 13px/1.25 var(--font-ui);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.today-page button.primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.today-page button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.today-page button.today-more {
+  border-color: var(--anthracite);
+  background: var(--card);
+  color: var(--anthracite);
+}
+
+/*
+ * La pastille de « Aujourd'hui » (F12) : la couleur « à regarder » de la
+ * charte, l'ambre de l'attention, jamais le rouge d'une alarme.
+ */
+.today-badge {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  margin-left: auto;
+  place-items: center;
+  padding: 0 6px;
+  border: 1px solid var(--warn-line);
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font: 700 11px/1 var(--font-ui);
+}
+
+/* Une colonne quand la page est étroite (tablette, téléphone). */
+@container (max-width: 860px) {
+  .today-row[data-layout] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .today-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .today-chips {
+    justify-content: flex-start;
+  }
+}
+
+@container (max-width: 620px) {
+  .today-page {
+    gap: 12px;
+  }
+
+  .today-date {
+    font-size: 1.7rem;
+  }
+
+  .today-block {
+    padding: 14px 14px 16px;
+  }
+
+  .today-block-more {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .phone-bar a {
+    position: relative;
+  }
+
+  /* Dans la barre du bas, la pastille se pose en haut à droite de l'icône. */
+  .phone-bar .today-badge {
+    position: absolute;
+    top: 1px;
+    left: calc(50% + 10px);
+    min-width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0 4px;
+    font-size: 10px;
+  }
+}

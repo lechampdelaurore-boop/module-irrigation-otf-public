@@ -1,0 +1,195 @@
+/* Besoin par culture et par stade (5 quater) : la page « Coefficients culturaux ». */
+.crop-coefficients { margin-top: 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: clamp(1rem, 2.5vw, 2rem); color: var(--ink); }
+.crop-coefficients-heading h2 { margin: 0; font-family: var(--font-title); font-size: var(--title-size); font-weight: 300; letter-spacing: -.01em; }
+.crop-coefficients-heading p, .crop-coefficients-part > p { margin: .35rem 0 0; color: var(--muted); }
+.crop-coefficients-part { margin-top: 1.25rem; }
+.crop-coefficients-part h3 { margin: 0; font-size: 1.15rem; }
+.crop-coefficients-empty { border-radius: 10px; background: var(--warn-soft); padding: .75rem .9rem; color: var(--warn-ink); }
+.species-link-list, .reference-crop-list { display: grid; gap: .6rem; margin-top: .75rem; }
+.species-link-card, .reference-crop-card { min-width: 0; border: 1px solid var(--line); border-left: 4px solid #b9a25a; border-radius: var(--radius); background: white; }
+.species-link-card[data-linked="true"] { border-left-color: var(--green); }
+.reference-crop-card { border-left-color: var(--green); }
+.reference-crop-card[data-unusable="true"] { border-left-color: var(--danger); }
+.species-link-card > summary, .reference-crop-card > summary { display: grid; min-height: 44px; box-sizing: border-box; gap: .15rem; padding: .7rem .9rem; cursor: pointer; }
+.species-link-card > summary small, .reference-crop-card > summary small { color: var(--muted); }
+/* Le dessin de l'espèce d'Ouvre ta ferme devant le nom (précision P41). */
+.species-link-card > summary strong, .reference-crop-card > summary strong { display: flex; align-items: center; gap: .5rem; }
+/*
+  « Voir le détail » et sa flèche à droite de chaque ligne (retour du porteur
+  du 8 novembre 2026) : la ligne se lit comme un pli ; « Replier » et la
+  flèche retournée une fois ouverte ; le fond s'éclaire au survol.
+*/
+.species-link-card > summary, .reference-crop-card > summary { grid-template-columns: minmax(0, 1fr) auto; column-gap: .75rem; list-style: none; }
+.species-link-card > summary::-webkit-details-marker, .reference-crop-card > summary::-webkit-details-marker { display: none; }
+.species-link-card > summary > :not(.detail-hint), .reference-crop-card > summary > :not(.detail-hint) { grid-column: 1; }
+.species-link-card > summary:hover, .reference-crop-card > summary:hover { border-radius: var(--radius); background: var(--green-soft); }
+.detail-hint { display: inline-flex; grid-column: 2; grid-row: 1 / span 2; align-self: center; align-items: center; gap: .3rem; color: var(--green); font-size: .82rem; font-weight: 600; white-space: nowrap; }
+.detail-hint .icon { flex: none; transition: transform .15s ease; }
+details[open] > summary .detail-hint .icon { transform: rotate(180deg); }
+details[open] > summary .detail-hint-closed, details:not([open]) > summary .detail-hint-open { display: none; }
+/*
+  Le résumé d'une culture (Kc, racines, séries de la saison) remplit la place
+  vide à droite de son nom, avant « Voir le détail » ; au téléphone, il passe
+  sous le nom (choix du porteur du 8 novembre 2026).
+*/
+.reference-crop-card > summary { grid-template-columns: minmax(0, 1fr) auto auto; }
+.reference-crop-card > summary > .reference-crop-summary { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: .9rem; font-variant-numeric: tabular-nums; text-align: right; }
+.reference-crop-card > summary > .detail-hint { grid-column: 3; }
+.plant-vignette { flex: none; width: 1.75rem; height: 1.75rem; }
+.correspondence-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .55rem; padding: .3rem .9rem .8rem; }
+.correspondence-form label { display: grid; gap: .3rem; font-size: .78rem; font-weight: 750; }
+.correspondence-form select { min-height: 44px; min-width: 0; width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px; background: white; padding: .6rem .7rem; color: inherit; }
+.correspondence-form .correspondence-analogy { display: flex; align-items: center; gap: .4rem; grid-column: 1 / -1; font-weight: 600; }
+.correspondence-buttons { display: flex; flex-wrap: wrap; gap: .4rem; }
+.correspondence-buttons button { min-height: 44px; border: 0; border-radius: var(--radius-button); background: var(--green); padding: .65rem .85rem; color: white; font-weight: 500; }
+.correspondence-buttons button.secondary { border: 1px solid var(--anthracite); background: transparent; color: var(--anthracite); }
+.correspondence-buttons button:disabled { opacity: .55; }
+.species-exceptions { margin: 0 .9rem .8rem; border: 1px solid var(--line); border-radius: 9px; }
+.species-exceptions > summary { min-height: 44px; box-sizing: border-box; padding: .5rem .65rem; cursor: pointer; font-weight: 700; }
+.species-exceptions ul { display: grid; gap: .5rem; margin: 0; padding: 0 .4rem .5rem; list-style: none; }
+.species-exceptions li { display: grid; gap: .15rem; border-top: 1px solid var(--line-soft); padding-top: .5rem; }
+.species-exceptions li > small { color: var(--muted); }
+.species-exceptions .correspondence-form { padding: .3rem 0 0; }
+.without-reference-list { display: grid; gap: .35rem; margin: .6rem 0 0; padding: 0; list-style: none; }
+.without-reference-list li { display: grid; border-radius: 8px; background: var(--sheet); padding: .5rem .7rem; }
+.without-reference-list small { color: var(--muted); }
+.reference-crop-problems { margin: 0 .9rem .5rem; color: var(--danger-ink); font-size: .85rem; }
+.reference-crop-note, .reference-crop-meta { margin: .4rem .9rem; color: var(--muted); font-size: .82rem; overflow-wrap: anywhere; }
+.reference-crop-kc { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .4rem; margin: .4rem .9rem; }
+.reference-crop-kc > div { border-radius: 8px; background: var(--sheet); padding: .45rem .6rem; }
+.reference-crop-kc dt { color: var(--muted); font-size: .75rem; }
+.reference-crop-kc dd { margin: 0; font-weight: 750; }
+.reference-crop-table-wrap { margin: .4rem .9rem; overflow-x: auto; }
+.reference-crop-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.reference-crop-table caption { padding-bottom: .35rem; color: var(--muted); text-align: left; }
+.reference-crop-table th, .reference-crop-table td { border-bottom: 1px solid var(--line-soft); padding: .35rem .45rem; text-align: left; vertical-align: top; }
+@media (max-width: 760px) {
+  .correspondence-form { grid-template-columns: 1fr; }
+  .correspondence-buttons button { flex: 1 1 auto; }
+  .reference-crop-table thead { display: none; }
+  .reference-crop-table, .reference-crop-table tbody, .reference-crop-table tr, .reference-crop-table th, .reference-crop-table td { display: block; }
+  .reference-crop-table tr { border-bottom: 1px solid var(--line); padding: .35rem 0; }
+  .reference-crop-table th, .reference-crop-table td { border: 0; padding: .15rem 0; }
+  .reference-crop-table td::before { content: attr(data-label) " : "; color: var(--muted); }
+  .reference-crop-card > summary { grid-template-columns: minmax(0, 1fr) auto; }
+  .reference-crop-card > summary > .reference-crop-summary { grid-column: 1; grid-row: auto; font-size: .85rem; text-align: left; }
+  .reference-crop-card > summary > .detail-hint { grid-column: 2; grid-row: 1 / span 3; }
+}
+
+/* La fiche de la planche : le besoin de la culture (5 quater, PR 3b). */
+.bed-crop-water { display: grid; gap: .6rem; margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius); background: #fbfcf8; padding: 16px 18px; color: var(--ink); }
+.bed-crop-water h3 { margin: 0; font-size: 1.05rem; }
+.bed-crop-water p { margin: 0; }
+.bed-crop-water-muted { color: var(--muted); font-size: .88rem; }
+.bed-crop-water-alert { border-radius: 8px; background: var(--warn-soft); padding: .5rem .7rem; color: var(--warn-ink); }
+.bed-crop-water-today { display: grid; gap: .45rem; }
+.bed-crop-water-crops { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; }
+.bed-crop-water-crops li { display: grid; gap: .15rem; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 10px; background: white; padding: .55rem .7rem; overflow-wrap: anywhere; }
+.bed-crop-water-crops li[data-status="missing"], .bed-crop-water-crops li[data-status="unknown"] { border-left-color: #b9a25a; }
+.bed-crop-water-crops li[data-status="blocked"] { border-left-color: var(--danger); }
+.bed-crop-water-crops small { color: var(--muted); }
+.bed-crop-water-week-nav { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.bed-crop-water-week-nav strong { flex: 1 1 12rem; text-align: center; }
+.bed-crop-water button { min-height: 44px; border: 0; border-radius: var(--radius-button); background: var(--green); padding: .65rem .85rem; color: white; font-weight: 500; }
+.bed-crop-water button.secondary { border: 1px solid var(--anthracite); background: transparent; color: var(--anthracite); }
+.bed-crop-water button:disabled { opacity: .55; }
+.bed-crop-water-proposal { display: grid; gap: .45rem; }
+.bed-crop-water-proposal dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin: 0; }
+.bed-crop-water-proposal dl > div { border-radius: 8px; background: var(--sheet); padding: .45rem .6rem; }
+.bed-crop-water-proposal dt { color: var(--muted); font-size: .75rem; }
+.bed-crop-water-proposal dd { margin: 0; font-weight: 750; }
+.bed-crop-water-notes { display: grid; gap: .25rem; margin: 0; padding-left: 1.1rem; font-size: .88rem; }
+.bed-crop-water-notes:empty { display: none; }
+.bed-crop-water-notes li[data-status="alert"] { color: var(--danger-ink); }
+.bed-crop-water-actions { display: grid; gap: .3rem; justify-items: start; }
+.bed-crop-water-actions small { color: var(--muted); }
+.bed-crop-water-declare, .bed-crop-water-adoptions { border: 1px solid var(--line); border-radius: 10px; background: white; }
+.bed-crop-water-declare > summary, .bed-crop-water-adoptions > summary { min-height: 44px; box-sizing: border-box; padding: .65rem .8rem; cursor: pointer; font-weight: 700; }
+.bed-crop-water-declare > p { padding: 0 .8rem; }
+.bed-crop-water-adoptions ul { margin: 0; padding: 0 .8rem .7rem 1.8rem; }
+.bed-crop-water-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); align-items: end; gap: .55rem; padding: .6rem .8rem .8rem; }
+.bed-crop-water-form label { display: grid; gap: .3rem; font-size: .78rem; font-weight: 750; }
+.bed-crop-water-form select, .bed-crop-water-form input[type="date"] { min-height: 44px; min-width: 0; width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px; background: white; padding: .6rem .7rem; color: inherit; font: inherit; }
+.bed-crop-water-form fieldset { display: flex; flex-wrap: wrap; gap: .3rem .9rem; margin: 0; border: 0; padding: 0; }
+.bed-crop-water-form legend { padding: 0; font-size: .78rem; font-weight: 750; }
+.bed-crop-water-form .bed-crop-water-choice { display: flex; min-height: 44px; align-items: center; gap: .4rem; font-size: .95rem; font-weight: 600; }
+@media (max-width: 760px) {
+  .bed-crop-water-proposal dl { grid-template-columns: 1fr; }
+  .bed-crop-water-week-nav button { flex: 1 1 auto; }
+  .bed-crop-water-week-nav strong { order: -1; flex-basis: 100%; }
+}
+
+/* Les surcharges de Kc et les réglages du calcul (5 quater, PR 3c). */
+.kc-overrides { margin: .4rem .9rem .8rem; border-top: 1px solid var(--line-soft); padding-top: .5rem; }
+.kc-overrides h4, .crop-water-settings-block h4 { margin: .2rem 0 .35rem; font-size: .92rem; }
+.kc-overrides .reference-crop-meta { margin: .3rem 0; }
+.kc-override-list, .crop-water-settings-list { display: grid; gap: .4rem; margin: .3rem 0; padding: 0; list-style: none; }
+.kc-override-list li, .crop-water-settings-list li { display: grid; gap: .15rem; border-radius: 8px; background: var(--sheet); padding: .5rem .7rem; overflow-wrap: anywhere; }
+.kc-override-list small, .crop-water-settings-list small { color: var(--muted); }
+.kc-override-form-wrap, .farm-durations-wrap { margin-top: .4rem; border: 1px solid var(--line); border-radius: 9px; }
+.kc-override-form-wrap > summary, .farm-durations-wrap > summary { min-height: 44px; box-sizing: border-box; padding: .5rem .65rem; cursor: pointer; font-weight: 700; }
+.kc-override-form, .farm-durations-form, .crop-water-inline-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); align-items: end; gap: .55rem; padding: .3rem .65rem .7rem; }
+.crop-water-inline-form { padding: .4rem 0 0; }
+.kc-override-form label, .farm-durations-form label, .crop-water-inline-form label { display: grid; gap: .3rem; font-size: .78rem; font-weight: 750; }
+.kc-override-form select, .kc-override-form input:not([type=checkbox]), .farm-durations-form input,
+.crop-water-inline-form select, .crop-water-inline-form input { min-height: 44px; min-width: 0; width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px; background: white; padding: .6rem .7rem; color: inherit; font: inherit; }
+.kc-override-form .kc-override-back { display: flex; align-items: center; gap: .4rem; min-height: 44px; font-weight: 600; }
+.kc-override-form .reference-crop-meta, .farm-durations-form .reference-crop-meta { grid-column: 1 / -1; margin: 0; }
+.kc-override-form button, .farm-durations-form button, .crop-water-inline-form button, .crop-water-settings-block > button, .crop-water-settings-list button {
+  min-height: 44px; border: 0; border-radius: var(--radius-button); background: var(--green); padding: .65rem .85rem; color: white; font-weight: 500;
+}
+.crop-water-settings-list button.secondary { justify-self: start; border: 1px solid var(--anthracite); background: transparent; color: var(--anthracite); }
+.kc-override-form button:disabled, .farm-durations-form button:disabled, .crop-water-inline-form button:disabled, .crop-water-settings-block button:disabled { opacity: .55; }
+.crop-water-settings { display: grid; gap: .8rem; }
+.crop-water-settings-block { display: grid; gap: .45rem; border: 1px solid var(--line); border-radius: 10px; background: white; padding: .7rem .8rem; }
+.crop-water-settings-block .reference-crop-meta { margin: 0; }
+details.crop-water-settings-block > summary { display: grid; gap: .1rem; min-height: 44px; box-sizing: border-box; cursor: pointer; }
+details.crop-water-settings-block > summary small { color: var(--muted); }
+.crop-water-option { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: .5rem; min-height: 44px; }
+.crop-water-option input { width: 22px; height: 22px; margin: .1rem 0 0; }
+.crop-water-option small { display: block; color: var(--muted); font-size: .82rem; }
+.crop-water-settings-block > button { justify-self: start; }
+.crop-water-mulch { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .3rem .6rem; margin: 0; border: 1px solid var(--line-soft); border-radius: 9px; padding: .4rem .6rem .6rem; }
+.crop-water-mulch legend { padding: 0 .3rem; font-weight: 750; }
+.crop-water-mulch label { display: flex; align-items: center; gap: .45rem; min-height: 44px; }
+.crop-water-mulch input { width: 22px; height: 22px; }
+@media (max-width: 760px) {
+  .kc-override-form, .farm-durations-form, .crop-water-inline-form { grid-template-columns: 1fr; }
+  .crop-water-settings-block > button, .crop-water-settings-list button.secondary { justify-self: stretch; }
+}
+/* Les durées propres à la ferme (PR 3e). */
+.farm-durations-form label small { color: var(--muted); font-weight: 500; }
+.farm-durations-form button.secondary { border: 1px solid var(--anthracite); background: transparent; color: var(--anthracite); }
+/* La fiche de la série (PR 3e). */
+.series-crop-water { margin-top: .8rem; }
+.series-crop-water-beds { display: grid; gap: .5rem; margin: .4rem 0; padding: 0; list-style: none; }
+.series-crop-water-beds > li { display: grid; gap: .25rem; border: 1px solid var(--line); border-radius: 9px; background: white; padding: .55rem .7rem; overflow-wrap: anywhere; }
+.series-crop-water-beds > li > small { color: var(--muted); }
+.reference-crop-card > .farm-durations-wrap { margin: .4rem .9rem .8rem; }
+
+/* Le profil racinaire d'une culture (5 ter, PR 3c). */
+.rooting-profile { margin: .4rem .9rem .8rem; border-top: 1px solid var(--line-soft); padding-top: .5rem; }
+.rooting-profile h4 { margin: .2rem 0 .35rem; font-size: .92rem; }
+.rooting-profile .reference-crop-meta { margin: .3rem 0; overflow-wrap: anywhere; }
+.rooting-lines { display: grid; gap: .35rem; margin: .3rem 0; padding: 0; list-style: none; }
+.rooting-lines li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .6rem; border-radius: 8px; background: var(--sheet); padding: .45rem .7rem; overflow-wrap: anywhere; }
+.rooting-lines small { grid-column: 1 / -1; color: var(--muted); }
+.rooting-profile-form-wrap { margin-top: .4rem; border: 1px solid var(--line); border-radius: 9px; }
+.rooting-profile-form-wrap > summary { min-height: 44px; box-sizing: border-box; padding: .5rem .65rem; cursor: pointer; font-weight: 700; }
+.rooting-profile-form { display: grid; gap: .55rem; padding: .3rem .65rem .7rem; }
+.rooting-line-form, .rooting-add-line { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); align-items: end; gap: .5rem; border: 1px solid var(--line-soft); border-radius: 9px; padding: .5rem .6rem; }
+.rooting-line-form > strong { grid-column: 1 / -1; font-size: .86rem; }
+.rooting-profile-form label { display: grid; gap: .3rem; font-size: .78rem; font-weight: 750; }
+.rooting-profile-form select, .rooting-profile-form input:not([type=checkbox]) { min-height: 44px; min-width: 0; width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 9px; background: white; padding: .6rem .7rem; color: inherit; font: inherit; }
+.rooting-profile-form .rooting-progressive { display: flex; align-items: center; gap: .4rem; min-height: 44px; font-weight: 600; }
+.rooting-profile-form .rooting-progressive input { width: 22px; height: 22px; }
+.rooting-profile-form .reference-crop-meta { margin: 0; }
+.rooting-problems { margin: 0; padding-left: 1.1rem; color: var(--warn-ink); font-size: .85rem; }
+.rooting-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.rooting-profile-form button { min-height: 44px; border: 0; border-radius: var(--radius-button); background: var(--green); padding: .65rem .85rem; color: white; font-weight: 500; }
+.rooting-profile-form button.secondary { border: 1px solid var(--anthracite); background: transparent; color: var(--anthracite); }
+.rooting-profile-form button:disabled { opacity: .55; }
+@media (max-width: 760px) {
+  .rooting-line-form, .rooting-add-line { grid-template-columns: 1fr; }
+  .rooting-actions button { flex: 1 1 auto; }
+}

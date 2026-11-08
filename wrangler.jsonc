@@ -1,0 +1,43 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "module-irrigation-otf",
+  "main": "vinext/server/fetch-handler",
+  "compatibility_date": "2026-09-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "services": [
+    {
+      "binding": "IRRIGATION_PUSH",
+      "service": "irrigation-otf-push"
+    }
+  ],
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "module-irrigation-otf",
+      "database_id": "b546af2c-82f1-475a-94ed-a3fedeb64e85",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "vars": {
+    "OTF_DATA_SOURCE": "live",
+    "OTF_API_BASE_URL": "https://api.ouvretaferme.org/0.1beta",
+    "IRRIGATION_PUSH_VAPID_PUBLIC_KEY": "BB0SoahNIIaVsW9W84lUymhMzV9xiDaxHhAH0TsrMdIvTcgAQUxJ1JnTRvgjyVWLt8_YhtuGM7rajS9wtBPOGUk",
+    "IRRIGATION_PUSH_SERVICE_URL": "https://irrigation-otf-push.lechampdelaurore.workers.dev",
+    "ACCESS_TEAM_DOMAIN": "https://damp-wind-3566.cloudflareaccess.com",
+    "ACCESS_AUD": "8c56fda353761411cefc519e46c457aa5dd4b5e286f352071a1ef1bcdcc0de1e"
+  },
+  // Plan Workers payant (D-017) : le rendu de /irrigation avec les données
+  // réelles dépassait les 10 ms de calcul du plan gratuit (erreur 1102).
+  "limits": {
+    "cpu_ms": 30000
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

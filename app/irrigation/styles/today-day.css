@@ -1,0 +1,325 @@
+/*
+ * « Votre journée » sur le tableau de bord « Aujourd'hui »
+ * (docs/aujourdhui-tableau-de-bord-contract.md, sections 3.2 et 3.3) : la
+ * frise du jour, les cartes d'irrigation par heure, les jours passés chargés
+ * repliés en une ligne, l'état vide illustré. Au téléphone, la frise
+ * s'efface : les cartes suffisent.
+ */
+/* « Votre journée » : la frise. */
+.today-timeline-wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.today-timeline {
+  position: relative;
+  height: 62px;
+  margin: 0 6px;
+}
+
+.today-timeline-track,
+.today-timeline-past,
+.today-timeline-bar {
+  position: absolute;
+  top: 14px;
+  height: 24px;
+}
+
+.today-timeline-track {
+  right: 0;
+  left: 0;
+  border-radius: 8px;
+  background: var(--sheet);
+}
+
+.today-timeline-past {
+  left: 0;
+  border-radius: 8px 0 0 8px;
+  background: repeating-linear-gradient(135deg, rgb(0 0 0 / 4%) 0 6px, transparent 6px 12px);
+}
+
+.today-timeline-bar {
+  min-width: 4px;
+  border-radius: 6px;
+  background: var(--green);
+}
+
+.today-timeline-bar[data-tone="late"] {
+  background: var(--warn);
+}
+
+.today-timeline-bar[data-tone="missed"] {
+  background: var(--danger);
+}
+
+.today-timeline-bar[data-tone="proposed"] {
+  border: 1.5px dashed var(--green);
+  background: repeating-linear-gradient(135deg, var(--tile) 0 5px, var(--card) 5px 10px);
+}
+
+.today-timeline-now {
+  position: absolute;
+  top: 4px;
+  width: 2px;
+  height: 44px;
+  background: var(--ink);
+}
+
+.today-timeline-now span {
+  position: absolute;
+  top: -8px;
+  left: 6px;
+  padding: 0 3px;
+  background: var(--card);
+  font: 600 11.5px/1.4 var(--font-ui);
+  white-space: nowrap;
+}
+
+.today-timeline-tick {
+  position: absolute;
+  top: 42px;
+  color: var(--muted);
+  font: 500 11px/1.6 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* Les groupes et les cartes d'irrigation. */
+.today-group {
+  display: grid;
+  gap: 8px;
+}
+
+.today-group-title {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font: 600 12.5px/1.4 var(--font-ui);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.today-group[data-group="late"] .today-group-title {
+  color: var(--warn-ink);
+}
+
+.today-irrigations {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-irrigation {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow-light), 0 0 0 1px var(--line-soft);
+}
+
+.today-irrigation[data-tone="late"] {
+  border-left-color: var(--warn);
+}
+
+.today-irrigation[data-tone="missed"] {
+  border-left-color: var(--danger);
+}
+
+.today-irrigation[data-tone="proposed"] {
+  border-left-style: dashed;
+}
+
+.today-irrigation-time {
+  display: grid;
+  margin: 0;
+}
+
+.today-irrigation-time strong {
+  font: 500 1.25rem/1.1 var(--font-title);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-irrigation-time span {
+  color: var(--muted);
+  font-size: .74rem;
+}
+
+.today-irrigation-body {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.today-irrigation-title {
+  margin: 0;
+  font: 600 14px/1.5 var(--font-ui);
+}
+
+.today-irrigation-title .icon {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--green);
+  vertical-align: -3px;
+}
+
+.today-irrigation-title .today-status {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.today-irrigation-meta {
+  display: flex;
+  margin: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.today-irrigation-meta {
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.today-tag,
+.today-status {
+  padding: 1px 9px;
+  border-radius: 999px;
+  font: 600 11.5px/1.6 var(--font-ui);
+  white-space: nowrap;
+}
+
+.today-tag {
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.today-tag[data-kind="dose"] {
+  background: var(--water-soft);
+  color: var(--water-ink);
+}
+
+.today-status {
+  background: var(--tile);
+  color: var(--green);
+}
+
+.today-status[data-tone="late"] {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.today-status[data-tone="missed"] {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+}
+
+.today-status[data-tone="proposed"] {
+  border: 1px dashed var(--green);
+  background: var(--card);
+}
+
+.today-irrigation-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Un jour passé chargé, replié en une ligne (T2). */
+.today-late-day {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+}
+
+.today-late-day-count {
+  color: var(--warn-ink);
+  font: 500 1.5rem/1 var(--font-title);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-late-day p {
+  margin: 0;
+  color: var(--warn-ink);
+  font-size: .82rem;
+}
+
+.today-late-day p b {
+  display: block;
+  color: var(--ink);
+  font: 600 14px/1.4 var(--font-ui);
+}
+
+/* Les états vides illustrés (touches de #294). */
+.today-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.today-empty svg {
+  width: 72px;
+  height: 52px;
+  flex: none;
+  fill: none;
+  stroke: var(--green);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.today-empty b {
+  display: block;
+  font: 600 15px/1.4 var(--font-ui);
+}
+
+.today-empty p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+@container (max-width: 620px) {
+  .today-timeline-wrap {
+    display: none;
+  }
+
+  .today-irrigation {
+    grid-template-columns: 56px minmax(0, 1fr);
+    padding: 10px;
+  }
+
+  .today-irrigation-actions {
+    grid-column: 1 / -1;
+  }
+
+  .today-irrigation-actions > * {
+    flex: 1 1 auto;
+  }
+
+  .today-late-day {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .today-late-day .today-action-link {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  .today-empty {
+    padding: 14px;
+  }
+}

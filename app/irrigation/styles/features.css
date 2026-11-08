@@ -1,0 +1,280 @@
+/*
+ * Le choix des fonctionnalités (3.8, docs/feature-selection-contract.md,
+ * sections 3 à 5) : la liste des cases, à la première ouverture et dans
+ * Réglages, le bandeau, la ligne d'une page non cochée et celle d'une partie
+ * de case sans la case dont elle a besoin. Couleurs de la charte du module ;
+ * cibles tactiles de 44 px.
+ */
+
+.feature-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px 15px;
+  border: 1px solid var(--green-soft);
+  border-radius: var(--radius);
+  background: var(--tile);
+  color: var(--ink);
+}
+
+.feature-banner-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--green);
+}
+
+.feature-banner p {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.feature-banner-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-banner-actions a,
+.feature-banner-actions button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 14px;
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.feature-banner-actions a {
+  background: var(--green);
+  color: white;
+  text-decoration: none;
+}
+
+.feature-banner-actions button {
+  background: transparent;
+  color: var(--green);
+}
+
+.feature-notice,
+.feature-part-unavailable {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--info);
+  color: var(--info-ink);
+  line-height: 1.5;
+}
+
+.feature-part-unavailable {
+  margin: 1.5rem 0 0;
+}
+
+.crop-alert-upcoming .feature-part-unavailable {
+  margin: 0 0 8px;
+}
+
+.feature-part-unavailable a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* La liste des cases. */
+
+.feature-settings .feature-choice,
+.water-management-section > .irrigation-notification-readiness {
+  margin-top: 16px;
+}
+
+.feature-choice {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.feature-choice legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.feature-choice ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Sans cadre (D-068, point 2) : une case cochée se lit à son fond vert pâle. */
+.feature-choice li {
+  min-width: 0;
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.feature-choice li[data-checked="true"] {
+  background: var(--menu);
+}
+
+.feature-choice label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.feature-choice li[data-locked="true"] label {
+  cursor: not-allowed;
+}
+
+.feature-choice input {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  accent-color: var(--green);
+}
+
+.feature-choice label > .icon {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--green);
+}
+
+.feature-choice-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.feature-choice-copy strong {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.feature-choice-copy small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.feature-choice-copy em {
+  color: var(--green-dark);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.feature-choice li[data-locked="true"] .feature-choice-copy em {
+  color: var(--anthracite);
+}
+
+/* La première ouverture. */
+
+.welcome-choice {
+  width: min(980px, calc(100% - 32px));
+  margin: 32px auto 0;
+  padding: clamp(18px, 4vw, 38px);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.welcome-choice h1 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  font-weight: 300;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+
+.welcome-choice > p:not(.eyebrow) {
+  margin: 14px 0 20px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.welcome-actions p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.welcome-actions .primary-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* L'avertissement avant de décocher. */
+
+.feature-dialog {
+  margin: auto;
+  inset: 0;
+  border: 0;
+  max-width: calc(100vw - 36px);
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
+}
+
+.feature-dialog::backdrop {
+  background: rgb(8 30 22 / 55%);
+}
+
+.feature-dialog > p:not(.eyebrow) {
+  line-height: 1.55;
+}
+
+.feature-dialog .irrigation-dialog-actions button {
+  min-height: 44px;
+}
+
+@media (max-width: 600px) {
+  .feature-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .welcome-choice {
+    margin-top: 16px;
+  }
+
+  .welcome-actions .primary-button {
+    width: 100%;
+  }
+}

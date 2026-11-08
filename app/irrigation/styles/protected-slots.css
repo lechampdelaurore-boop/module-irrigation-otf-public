@@ -1,0 +1,73 @@
+/*
+ * Les créneaux protégés (3.8 ter, docs/protected-slots-contract.md, section 7
+ * et règle 12) : leur section dans « Réglages du planning », avec les
+ * composants du pli, et l'avertissement d'un arrosage planifié à la main qui
+ * tombe dans l'un d'eux. Rien d'inventé hors de la charte du module.
+ */
+
+.protected-slots {
+  display: grid;
+  gap: .7rem;
+  padding: .9rem 1rem 1rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.protected-slots h3,
+.protected-slots .planning-settings-note {
+  margin: 0;
+}
+
+.protected-slot-list {
+  display: grid;
+  gap: .5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.protected-slot-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .6rem .8rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 9px;
+  font-size: .85rem;
+}
+
+.protected-slot-list li > span {
+  min-width: 0;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.planning-settings-form.protected-slot-form {
+  padding: 0;
+  border-top: 0;
+}
+
+.planning-settings-form .protected-slot-days {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+}
+
+.protected-slots .planning-settings-history {
+  padding: 0;
+}
+
+.irrigation-preview-warning {
+  margin: 0;
+  padding: .6rem .8rem;
+  border-radius: 9px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: .85rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .protected-slot-list li .planning-settings-actions {
+    width: 100%;
+  }
+}

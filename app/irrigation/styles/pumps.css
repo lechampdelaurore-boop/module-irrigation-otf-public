@@ -1,0 +1,27 @@
+.pump-section { margin-top: 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: clamp(1rem, 2.5vw, 2rem); color: var(--ink); }
+.pump-heading, .pump-card-title, .pump-editor-title, .pump-editor-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.pump-heading span { color: var(--green); font-size: 13px; font-weight: 500; font-family: var(--font-ui); }
+.pump-heading h2 { margin: .2rem 0; font-family: var(--font-title); font-size: var(--title-size); font-weight: 300; letter-spacing: -.01em; }
+.pump-heading p, .pump-defaults > p { margin: 0; color: var(--muted); }
+.pump-heading button, .pump-editor .primary { border: 0; border-radius: var(--radius-button); padding: .75rem 1rem; background: var(--green); color: white; font-weight: 500; }
+.pump-notice, .pump-error { border-radius: 10px; padding: .7rem .9rem; font-weight: 650; }
+.pump-notice { background: var(--tile); color: var(--green); } .pump-error { background: var(--danger-soft); color: var(--danger-ink); }
+.pump-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 275px), 1fr)); gap: .8rem; margin-top: 1rem; }
+.pump-card, .pump-defaults { border: 1px solid var(--line); border-radius: var(--radius); background: white; padding: 1rem; }
+.pump-card.is-archived { opacity: .68; }
+.pump-card-title strong { display: block; font-size: 1.05rem; }.pump-card-title span { color: var(--muted); font-size: .8rem; }
+.pump-card button, .pump-defaults select, .pump-editor button, .pump-editor input, .pump-editor textarea { border: 1px solid var(--line); border-radius: 9px; background: white; padding: .55rem .7rem; color: inherit; }
+.pump-card dl { display: grid; grid-template-columns: minmax(7rem, 1fr) 1.5fr; gap: .35rem .8rem; font-size: .9rem; }.pump-card dt { color: var(--muted); }.pump-card dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.pump-archive { margin-top: .5rem; }.pump-empty { grid-column: 1 / -1; border: 1px dashed var(--line); border-radius: var(--radius); padding: 1rem; }.pump-empty strong { display: block; }
+.pump-conflict { border-radius: 9px; background: var(--danger-soft); padding: .65rem; color: var(--danger-ink); font-size: .84rem; }.pump-conflict strong { display: block; }
+.pump-defaults { margin-top: 1rem; }.pump-defaults > div { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: .7rem; margin-top: .8rem; }.pump-defaults label, .pump-editor > label { display: grid; gap: .35rem; font-size: .85rem; font-weight: 700; }.pump-defaults select { width: 100%; min-width: 0; }
+.pump-dialog-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1rem; background: rgb(0 25 18 / .55); }
+.pump-editor { width: min(640px, 100%); max-height: calc(100vh - 2rem); overflow-y: auto; overflow-x: hidden; display: grid; gap: 1rem; border-radius: var(--radius); background: white; padding: clamp(1rem, 3vw, 1.5rem); box-sizing: border-box; }
+.pump-editor h3 { margin: 0; font-family: var(--font-title); font-size: var(--title-size); font-weight: 300; }.pump-editor textarea { min-height: 5rem; resize: vertical; }.pump-editor fieldset { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); padding: .8rem; }.pump-origin-row { display: flex; justify-content: space-between; gap: .75rem; padding: .45rem 0; border-bottom: 1px solid var(--line-soft); }.pump-origin-row label { overflow-wrap: anywhere; }.pump-editor-help { margin: 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 520px) { .pump-heading { align-items: stretch; flex-direction: column; }.pump-heading button { width: 100%; }.pump-origin-row { align-items: flex-start; flex-direction: column; }.pump-editor-actions button { flex: 1; }.pump-card dl { grid-template-columns: 1fr; }.pump-card dt:not(:first-child) { margin-top: .4rem; } }
+.irrigation-pump-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: .65rem; }
+.irrigation-pump-fields label { display: grid; gap: .35rem; min-width: 0; }.irrigation-pump-fields select { min-width: 0; width: 100%; }
+.hydraulic-indicator { display: grid; gap: .2rem; border: 1px solid var(--line-strong); border-radius: 11px; background: var(--tile); padding: .75rem; font-size: .9rem; }.hydraulic-indicator.is-exceeded { border-color: var(--danger-line); background: var(--danger-soft); color: var(--danger-ink); }.hydraulic-indicator.is-unknown { border-color: var(--line); background: var(--sheet); color: var(--muted); }.hydraulic-indicator small { overflow-wrap: anywhere; }
+.event-pump-summary { margin: .65rem 0; border-radius: 9px; background: var(--tile); padding: .55rem .7rem; color: var(--green); font-size: .82rem; }.event-pump-summary.is-unknown { background: var(--sheet); color: var(--muted); }.event-pump-summary.is-exceeded { background: var(--danger-soft); color: var(--danger-ink); }
+.irrigation-edit-banner { display: flex; align-items: center; justify-content: space-between; gap: .75rem; border-radius: 10px; background: var(--warn-soft); padding: .7rem .9rem; }.irrigation-edit-banner button { border: 1px solid #bda95f; border-radius: var(--radius-button); background: white; padding: .45rem .65rem; }
+@media (max-width: 520px) { .irrigation-edit-banner { align-items: stretch; flex-direction: column; } }
