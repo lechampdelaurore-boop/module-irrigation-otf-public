@@ -357,8 +357,8 @@ l'état au 30 octobre 2026.
     sans attendre la redistribution de fin de tour ; sous arbitrage aussi,
     l'allocation ne reste plus non attribuée.
     Vérification : tests du moteur, avec et sans arbitrage
-    (`tests/planning-shortage.test.ts`). État : ⬜, règle tranchée
-    (décision 5), à coder.
+    (`tests/planning-shortage.test.ts`, D-081). État : ✅ tests écrits et
+    règle codée ; la recette finale le croise en S27, le dimanche soir.
 19. **S19 — La note du manque d'eau.** Trois branches : positive, de l'eau
     placée à côté (une rampe qui arrose des planches sans part) ; silence sur
     le résidu d'arrondi (D-040) ; absente sous arbitrage et quand un volume
@@ -425,8 +425,8 @@ l'état au 30 octobre 2026.
     lundi 06 h 15, la semaine nouvelle repart de l'objectif entier,
     sans report (R10 à non) ; le déficit de la semaine passée se lit dans les
     cumuls « Par périmètre », écart objectif − reçu. Vérification : test
-    « dernier jour » existant ; test de l'historique existant ; recette
-    finale, lecture du lundi. État : 🟡.
+    « dernier jour » existant ; tests S18 pour la part (D-081) ; test de
+    l'historique existant ; recette finale, lecture du lundi. État : 🟡.
 
 ### E. L'isolation en pénurie
 

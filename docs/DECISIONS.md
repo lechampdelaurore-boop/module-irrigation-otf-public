@@ -2308,3 +2308,71 @@ de `tests/db/planning-service.test.ts` (la suite sans événement, avec
 événement, puis sans ; le calcul à la main qui suit un recalcul échoué, qui
 passait déjà sur le service d'avant et garde ce cas) et un de
 `tests/db/planning-repository.test.ts`.
+
+**En ligne** : #13 du dépôt public fusionnée le 9 novembre 2026 à 2 h 51
+(`a15f150`) et déployée à 3 h 23 (run 42547789030, les quatre jobs réussis
+après une relance des parcours navigateur, point ouvert 50 ; aucune
+migration, Workers inchangés).
+
+
+## D-081 — La part du dernier jour (correction 4 de la 3.9) : quatre précisions tranchées par la recommandation
+
+Date : 8 novembre 2026. Quatrième et dernière des corrections du lot 2 de
+la 3.9, la décision 5 du porteur du 30 octobre 2026 (D-052) : le dernier
+jour de la semaine, une part sous la dose minimale est placée tant qu'une
+plage reste, comme hors pénurie. Codée en Opus 5.5 · Max sur le dépôt
+public, le contrat du planning précisé d'abord (`docs/planning-contract.md`,
+« Pénurie » et la note « La part du dernier jour »), des tests rouges avant
+le code.
+
+**Le défaut corrigé** (S18). La borne des parts arrêtait le matériel dès que
+ce que ses parts paient tombait sous la dose minimale, quel que soit le
+jour : un matériel dont le créneau verse à côté attendait une part plus
+grande même le dimanche. Le dimanche, l'attente faisait fondre sa part —
+l'eau libérée en fin de tour allant aussi à des planches qui ne peuvent
+plus rien recevoir — et laissait de l'eau dans la réserve. Sur la ferme du
+point 36 à 26 % de sa demande (5,2 mm de part, les rampes du tunnel 1 et du
+bloc 2 versant aussi sur le bloc 1), le calcul du dimanche à 0 h 30 ne
+plaçait ces deux rampes qu'à 2,3 mm, et 1,1 m³ restait dans la réserve ;
+sous un arbitrage de 5,2 mm par planche, réserve égale aux allocations,
+rien n'était placé pour elles, et 2,12 m³ alloués à dix-huit planches
+restaient non attribués.
+
+**Quatre précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation (mandat « option recommandée par défaut »)
+et consignées au contrat du planning ; elles restent modifiables à la
+relecture du porteur :
+
+- F84 : « le dernier jour », c'est la plage du dernier jour de la semaine,
+  celle qui commence le dimanche — la nuit de dimanche pour l'aspersion, la
+  journée de dimanche pour le goutte-à-goutte —, quand c'est la première que
+  le matériel peut prendre. Avant, le matériel attend comme avant : un
+  calcul de mercredi ou de samedi ne place pas sur dimanche une part sous la
+  dose minimale, comme un reste hors pénurie, qui attend le samedi ; le
+  calcul de dimanche la place.
+- F85 : la part placée est celle que les parts de ses planches paient quand
+  le matériel est examiné, débordement compris, sans attendre la
+  redistribution de fin de tour, comme l'exception du dernier jour place
+  déjà sans attendre une part elle-même sous la dose minimale ; une part
+  qu'une redistribution aurait agrandie est donc placée telle qu'elle est.
+  La garde de la réserve et la ressource directe, qui viennent après la
+  borne, peuvent encore raccourcir ce créneau jusqu'à la seconde.
+- F86 : le motif reste celui de la borne (S15) : « la part de la semaine
+  réservée à ses planches », « part de la semaine atteinte, le reste est
+  réservé aux autres planches ». Un créneau que la borne ne coupe pas, sa
+  planche de référence ayant une cible déjà sous la dose minimale, garde
+  « le reste de la semaine, sous la dose minimale : c'est le dernier jour ».
+- F87 : sous un arbitrage validé, le chemin est le même : une allocation que
+  son débordement fait passer sous la dose minimale est placée le dimanche,
+  au lieu de rester non attribuée.
+
+**Ce qui ne change pas.** La limite journalière, la pompe, la plage
+horaire et les créneaux refusés ou protégés gardent la dose minimale, comme
+pour un reste qui l'atteint hors pénurie ; la somme des volumes d'une
+chaîne ne dépasse jamais son budget ; en milieu de semaine, la borne et la
+redistribution de D-037. Aucune migration. Vérifié par deux tests de
+`tests/planning-shortage.test.ts` (sous la conduite : rien mardi ni samedi,
+dimanche la part entière moins le débordement, la somme des volumes égale
+au budget ; sous arbitrage : rien en semaine, dimanche plus rien de non
+attribué), rouges sur le moteur d'avant ; les 1 301 tests existants
+passent sans changement.
