@@ -327,8 +327,27 @@ leur besoin que leur matériel peut encore servir, qui relèvent leur cible
 d'autant ; un nouveau tour place le supplément, quatre tours au plus. Les
 fractions affichées sont les parts réservées au départ, non le résultat : une
 planche peut recevoir plus, par l'eau libérée, ou moins, par ce que son propre
-créneau verse à côté. Un arbitrage 3.4 validé garde ses allocations telles
-quelles, sans part ni redistribution.
+créneau verse à côté.
+
+**Sous un arbitrage 3.4 validé** (décision 1 de la 3.9, D-052, 30 octobre
+2026), chaque allocation est une part réservée, par le même mécanisme : la
+part d'une planche allouée est ce qui lui a été alloué, borné à son besoin,
+compté sur la surface que son propre matériel mouille ; le reste du budget de
+la chaîne est l'eau non attribuée, où puisent les planches que l'arbitrage ne
+nomme pas — d'un niveau servi en entier ou d'un niveau non arbitré, qui
+gardent leur besoin pour cible — et ce qu'un créneau verse à côté. Le créneau
+est borné et imputé comme sous la conduite, et la coupe porte le motif de
+l'arbitrage, « stock et ressources » : la dernière planche examinée reçoit son
+allocation comme la première. Les parts ne dépassent jamais le budget : quand
+une chaîne ne peut pas fournir toutes ses allocations — une limite
+journalière, que la faisabilité ne compte pas, ou une eau que le moteur lit
+autrement qu'elle —, chacune y est réduite dans la même proportion, et la
+coupe porte le motif de la chaîne. Rien n'est redistribué entre planches, la
+décision du maraîcher est le dernier mot : ce qu'une planche allouée ne peut
+pas recevoir reste non attribué. L'écran le dit sous les cartes du résumé :
+l'eau allouée, sa réduction s'il y en a une, et ce que les planches allouées
+ne peuvent pas recevoir. Aucune ligne de budget ni fraction ne paraît sous un
+arbitrage.
 
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³
@@ -826,11 +845,46 @@ du report — aux planches encore sous leur besoin dont le matériel n'est pas
 arrêté pour une autre raison que la part ; leur cible et leur part montent, le
 motif de la coupe tombe quand la cible rejoint le besoin ; `MAX_SHARE_ROUNDS`
 borne les tours à quatre. Les fractions du budget restent celles du départ.
-Deux limites vues en chemin et laissées telles quelles, à trancher à part :
-l'arbitrage 3.4 validé, dont les allocations ne sont pas encore des parts
-réservées ; le budget d'une chaîne, qui compte les apports jusqu'à dimanche
-minuit, même après la dernière plage, et compte zéro, non le manque, quand le
-stock est sous le minimum de sécurité. ## Notes de mise en œuvre (3.6)
+Deux limites vues en chemin et laissées telles quelles, tranchées par le
+porteur le 30 octobre 2026 (D-052) : l'arbitrage 3.4 validé, dont les
+allocations sont devenues des parts réservées à la 3.9 (note suivante) ; le
+budget d'une chaîne, qui compte les apports jusqu'à dimanche minuit, même
+après la dernière plage, et compte zéro, non le manque, quand le stock est
+sous le minimum de sécurité (décision 2, à coder).
+
+### L'arbitrage en parts réservées (3.9, décision 1, D-052, 8 novembre 2026)
+
+`applyShortage` regroupe les planches par chaîne comme pour la conduite ; sous
+un arbitrage validé, la cible de chaque planche allouée reste son allocation
+bornée à son besoin. Chaque chaîne au budget fini qui porte une planche
+allouée a son registre des parts, construit avec les seules planches
+allouées : leur part est leur cible, l'eau non attribuée le budget moins les
+parts. Quand les parts dépassent le budget, chaque cible de la chaîne est
+multipliée par le rapport du budget aux parts, et le motif de la chaîne
+s'ajoute aux planches ainsi réduites ; le motif de coupe du registre est
+alors celui de la chaîne, `water-budget` sinon. Tout le matériel des planches
+de la chaîne est borné par ce registre : celui d'une planche que l'arbitrage
+ne nomme pas ne prend que l'eau non attribuée et ce que les planches allouées
+qu'il arrose paient de leur part pour l'eau utile reçue. Le registre est sans
+conduite (`strategy: null`) : `redistribute` ne libère rien et rend faux, le
+placement s'arrête après un tour. Aucune ligne de budget n'est rendue.
+
+Le plan porte alors `arbitration` (`PlanArbitration`, absent sans arbitrage :
+un plan sans arbitrage reste celui d'avant) : `allocatedCubicMeters`, les
+allocations bornées aux besoins ; `reservedCubicMeters`, les parts après
+réduction ; `unreceivedCubicMeters` et `unreceivedBedCount`, ce que les
+planches allouées n'ont pas reçu de leur part, hors un reste sous un centième
+de millimètre, que le moteur tient pour reçu (D-040). La note
+(`arbitrationNote`, sous les cartes du résumé) dit « Votre choix entre les
+demandes d’eau s’impose : X m³ alloués, chaque allocation réservée à sa
+planche. » ; puis, quand les parts sont réduites de plus d'un litre, « Le
+moteur ne peut en placer que Y m³ d’ici dimanche : chaque allocation est
+réduite dans la même proportion. » ; puis, quand le non-reçu dépasse un litre,
+« Z m³ alloués à n planches ne peuvent pas être reçus : ils restent non
+attribués, sans redistribution entre planches. » La note du manque d'eau
+(D-038) reste absente sous arbitrage, faute de budget.
+
+## Notes de mise en œuvre (3.6)
 
 Écrites à l'ouverture de la PR de l'interface, le 29 septembre 2026, pour ce
 que le code a dû préciser sans contredire la section « Interface ».
