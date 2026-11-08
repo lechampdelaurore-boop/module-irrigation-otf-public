@@ -2241,3 +2241,70 @@ un stock au-dessus du minimum et un calcul enregistré avant) et un test de
 `tests/db/planning-repository.test.ts` ; l'invariant commun des fixtures
 juge la réserve à partir du premier prélèvement placé, la garde la laissant
 sous son minimum jusque-là.
+
+**En ligne** : #12 du dépôt public fusionnée le 8 novembre 2026 à 21 h 49
+(`87e4ab0`) et déployée à 22 h 03 (run 42522030186, les quatre jobs réussis,
+aucune migration, Workers inchangés).
+
+
+## D-080 — Le report sans bascule d'un calcul à l'autre (correction 3 de la 3.9) : quatre précisions tranchées par la recommandation
+
+Date : 8 novembre 2026. Troisième des quatre corrections du lot 2 de la
+3.9, la décision 4 du porteur du 30 octobre 2026 (D-052) : sous la conduite
+« report », les planches reportées ne passent devant les autres qu'au calcul
+qui suit un événement ; sans événement, le calcul reproduit le précédent.
+Codée en Opus 5.5 · Max sur le dépôt public, le contrat du planning précisé
+d'abord (`docs/planning-contract.md`, « Pénurie » et la note « Le report
+sans bascule »), des tests rouges avant le code.
+
+**Le défaut corrigé** (S12, règle 9 du contrat de la 3.7). Le service
+passait au moteur, à chaque calcul, les planches que le calcul précédent
+avait reportées, qui passaient devant. Un second calcul sans événement
+servait donc les reportées et reportait les premières, et le plan basculait
+d'un calcul à l'autre, contre « même entrée, même plan ». Sur la ferme de
+test (S12 : 12 m³ pour 17,83 m³, trois niveaux), le premier calcul
+reportait une planche du bloc 2 et quinze des tunnels 3 et 4 ; le second,
+sans rien de nouveau, en reportait d'autres. Sur le service, deux planches
+pour une réserve qui n'en sert qu'une : la reportée et la servie
+échangeaient leur place à chaque clic sur « Calculer ».
+
+**Quatre précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation (mandat « option recommandée par défaut »)
+et consignées au contrat du planning ; elles restent modifiables à la
+relecture du porteur :
+
+- F80 : « un événement », c'est un événement de la règle 4 du contrat de la
+  3.7, inscrit au registre des événements après le calcul précédent de la
+  semaine et dont le recalcul n'a pas encore abouti : le recalcul sur
+  événement lui-même, ou un calcul à la main ou du matin qui suit un
+  recalcul échoué. Un événement déjà recalculé ne fait pas avancer la file
+  une seconde fois. Un réglage du planning, la météo du matin, le passage du
+  temps et un changement des fonctionnalités n'en sont pas (règle 5) : le
+  calcul du matin, sans événement, garde la file.
+- F81 : le plan retient la file qu'il a suivie, enregistrée avec le calcul ;
+  sans événement, le calcul suivant reprend cette file, non les planches que
+  le précédent a reportées. C'est ce qui fait reproduire le plan même après
+  un calcul où la file avait avancé.
+- F82 : au premier calcul de la semaine, la file est vide ; après un calcul
+  enregistré avant la correction, qui ne l'a pas retenue, aussi, faute
+  d'événement.
+- F83 : le motif d'une planche reportée dit « reportée : passe en tête après
+  le prochain événement (conduite « report ») », et son groupe, dans la liste
+  « Planches non servies », « Reportées jusqu'au prochain événement », avec
+  la phrase « Elles passent en tête au calcul qui suit un événement : un
+  arrosage validé ou fait, de l'eau nouvelle, un stock corrigé. Recalculer
+  sans événement ne change pas leur tour. » « Au prochain calcul »
+  promettait ce que le calcul sans événement ne fait plus.
+
+**Ce qui ne change pas.** L'ordre de service — la file d'abord, puis
+priorité, déficit relatif, inventaire — et le report jusqu'à épuisement du
+budget ; les deux autres conduites et l'arbitrage, que la file ne touche
+pas ; la semaine suivante, que le report n'atteint pas (Q9, R10). Aucune
+migration : la file s'enregistre dans le résumé du calcul, en JSON,
+seulement quand elle n'est pas vide. Vérifié par trois tests de
+`tests/planning-shortage.test.ts` (deux calculs sans événement ; deux
+calculs autour d'un événement, puis un troisième sans ; la file vide), deux
+de `tests/db/planning-service.test.ts` (la suite sans événement, avec
+événement, puis sans ; le calcul à la main qui suit un recalcul échoué, qui
+passait déjà sur le service d'avant et garde ce cas) et un de
+`tests/db/planning-repository.test.ts`.

@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9, correction 3 : le report sans bascule)
+
+- **Sous la conduite « report », un calcul sans événement reproduit le
+  précédent** (décision 4 de la 3.9, D-052, précisions D-080) : chaque
+  calcul faisait passer devant les planches que le précédent avait
+  reportées, et un second clic sur « Calculer » servait les reportées et
+  reportait les premières. Les reportées ne passent maintenant devant qu'au
+  calcul qui suit un événement — un arrosage validé ou fait, une pluie
+  saisie, un stock corrigé, tout événement qui fait recalculer — ; sans
+  événement, le plan garde sa file et ne bascule plus. Le motif d'une
+  planche reportée dit « passe en tête après le prochain événement », au
+  lieu de « au prochain calcul ». Aucune migration.
+
 ### Corrigé (3.9, correction 2 : le budget net du manque sous le minimum, la part visée et la part placée)
 
 - **Le budget d'une réserve sous son minimum retire d'abord le manque**
@@ -19,7 +32,8 @@ source détaillée commit par commit.
   niveau de priorité, « — » pour un niveau sans demande : l'écart entre les
   deux se lit, par exemple le trop-plein d'une réserve pleine les jours de
   pluie. Sous le report, une planche reportée compte zéro dans la part visée.
-  Un calcul enregistré avant garde sa ligne d'avant. Aucune migration.
+  Un calcul enregistré avant garde sa ligne d'avant. Aucune migration. En
+  ligne le 8 novembre 2026 à 22 h 03 (#12 de ce dépôt).
 
 ### Corrigé (3.9, correction 1 : l'arbitrage validé en parts réservées)
 
