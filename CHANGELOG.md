@@ -5,17 +5,33 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9, correction 1 : l'arbitrage validé en parts réservées)
+
+- **Sous un arbitrage validé, chaque allocation est réservée à sa planche**
+  (décision 1 de la 3.9, D-052, précisions D-077) : le moteur prenait les
+  allocations pour des cibles sans les réserver, et la dernière planche
+  examinée pouvait ne rien recevoir (le tunnel 4 de la ferme de test, à
+  0 mm alors que la réserve tenait les allocations). Chaque allocation
+  devient une part réservée, sans redistribution entre planches ; une
+  planche que l'arbitrage ne nomme pas puise dans l'eau non attribuée ;
+  quand une chaîne ne peut pas fournir toutes ses allocations (une limite
+  journalière), chacune est réduite dans la même proportion. Le planning le
+  dit sous les cartes du résumé : l'eau allouée, sa réduction, et l'eau
+  allouée que les planches ne peuvent pas recevoir, qui reste non
+  attribuée. Sans arbitrage, rien ne change. Aucune migration.
+
 ### Clos (3.8, fonctionnalités à la carte)
 
 - **La 3.8 est close par le porteur** le 8 novembre 2026 à 20 h 21, après sa
   vérification en ligne et un premier lot de retours (#278) ; ses
-  modifications éventuelles passeront chacune par une PR. Reste posée, sans
-  code : l'écran d'arbitrage d'une pénurie présenté comme un plan
-  d'assolement, recommandé dans la 3.9.
+  modifications éventuelles passeront chacune par une PR. L'écran
+  d'arbitrage d'une pénurie présenté comme un plan d'assolement est décidé
+  par le porteur le 8 novembre 2026 à 20 h 40 : dans la 3.9, maquette
+  d'abord.
 
 ### Changé (passage au dépôt public)
 
-- **Le travail passe sur le dépôt public** `module-irrigation-otf-public` (licence PolyForm Shield 1.0.0, historique neuf) ; l'ancien dépôt privé devient une archive. Le déploiement Cloudflare part désormais de ce dépôt. L'économie de minutes D-075 est annulée : contrôles complets sur chaque PR et sur `main`, parcours navigateur jamais sautés. Déploiements de #301, #302 et #303 (PR 2 du lot 3) vérifiés avant la bascule.
+- **Le travail passe sur le dépôt public** `module-irrigation-otf-public` (licence PolyForm Shield 1.0.0, historique neuf) ; l'ancien dépôt privé devient une archive. Le déploiement Cloudflare part désormais de ce dépôt. L'économie de minutes D-075 est annulée : contrôles complets sur chaque PR et sur `main`, parcours navigateur jamais sautés. Déploiements de #301, #302 et #303 (PR 2 du lot 3) vérifiés avant la bascule. Dependabot est retiré du dépôt public (PR #9 de ce dépôt).
 
 ### Changé (audit ergonomique, lot 3, PR 2 : gestes par ligne, mots simples, accessibilité)
 

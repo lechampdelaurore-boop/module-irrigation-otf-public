@@ -659,6 +659,11 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    d'abord — l'arbitrage en parts réservées ; le budget net du manque sous le
    minimum et la part placée à côté de la part visée ; le report sans
    bascule ; la part sous la dose minimale placée le dimanche.
+2 bis. **L'écran d'arbitrage présenté comme un plan d'assolement** (retour
+   du porteur du 7 novembre 2026, décidé par lui le 8 novembre 2026 à
+   20 h 40, D-078) : après les quatre corrections, une maquette d'abord,
+   soumise au porteur avant tout code ; son code passe par un ajout à ce
+   contrat.
 3. **Les scénarios de pénurie** : les tests manquants du moteur (S2, S3, S4,
    S6, S7, S8, S9, S10 étendu, S12 sur deux calculs, S13 dernière planche,
    S18, S20, S23, S24, S26), dans `tests/planning-shortage.test.ts`, sous 600
@@ -798,8 +803,9 @@ contrat :
 - le contrat s'appelle `docs/shortage-contract.md` et la recette
   `docs/recette-tranche-3.md`, le nom que la roadmap donne à sa preuve de fin ;
 - les scénarios sont numérotés S1 à S28, le parcours nouveau P13 (P12 est
-  celui de la 3.7), les tests nouveaux du moteur vont dans
-  `tests/planning-shortage.test.ts` ;
+  celui de la 3.7 ; P13 est devenu depuis celui des alertes météo, et le
+  parcours de la pénurie prend le prochain numéro libre), les tests
+  nouveaux du moteur vont dans `tests/planning-shortage.test.ts` ;
 - le tag est `v0.2.0` et la version du paquet `0.2.0` : un cran mineur par
   tranche close, `1.0.0` étant réservé à la mise en production multi-fermes
   de la tranche 4 ;

@@ -349,9 +349,9 @@ ultérieurement »).
    modifications éventuelles passeront chacune par une PR.
 8. Registres à jour par la PR de clôture.
 
-Reste posée, sans code : l'écran d'arbitrage d'une pénurie présenté comme un
-plan d'assolement (retour du porteur du 7 novembre), recommandé dans la 3.9,
-maquette d'abord ; le choix revient au porteur.
+L'écran d'arbitrage d'une pénurie présenté comme un plan d'assolement (retour
+du porteur du 7 novembre) est décidé par le porteur le 8 novembre 2026 à
+20 h 40 : dans la 3.9, maquette d'abord.
 
 ## 10. Le découpage en PR
 
