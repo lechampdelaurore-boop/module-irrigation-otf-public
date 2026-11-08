@@ -283,6 +283,8 @@ export type WeeklyPlan = {
   deficit: PlanDeficit;
   /** Le budget d'eau retenu pour la pénurie, chaîne par chaîne. */
   budgets: SupplyBudget[];
+  /** Un arbitrage 3.4 validé, tel que le plan l'applique ; absent sans arbitrage, un plan sans arbitrage restant celui d'avant. */
+  arbitration?: PlanArbitration;
   /** Les suggestions sur les arrosages validés, dans l'ordre du temps, et les jours qu'une limite posée après coup met en défaut (3.7). */
   suggestions: PlanSuggestion[];
   overcommittedDays: OvercommittedDay[];
@@ -291,6 +293,22 @@ export type WeeklyPlan = {
     forecastDays: number;
     reservoirsObservedAt: { reservoirId: string; name: string; observedAt: string | null; currentCubicMeters: number | null }[];
   };
+};
+
+/**
+ * Un arbitrage 3.4 validé dans le plan (décision 1 de la 3.9, D-052) :
+ * chaque allocation est une part réservée, sans redistribution entre
+ * planches. Les volumes se comptent sur la surface que le propre matériel de
+ * chaque planche mouille.
+ */
+export type PlanArbitration = {
+  /** Les allocations, chacune bornée au besoin de sa planche, en m³. */
+  allocatedCubicMeters: number;
+  /** Les parts réservées : les allocations, réduites dans la même proportion là où une chaîne ne peut pas toutes les fournir. */
+  reservedCubicMeters: number;
+  /** Ce que les planches allouées ne reçoivent pas de leur part, hors résidu d'arrondi : de l'eau qui reste non attribuée. */
+  unreceivedCubicMeters: number;
+  unreceivedBedCount: number;
 };
 
 export type SupplyBudget = {
@@ -396,7 +414,7 @@ export type StoredPlanCalculation = {
   horizonStartAt: string;
   horizonEndAt: string;
   settings: PlanningSettings;
-  summary: Pick<WeeklyPlan, 'beds' | 'deficit' | 'budgets' | 'assumptions' | 'weekEnd' | 'suggestions' | 'overcommittedDays'> & {
+  summary: Pick<WeeklyPlan, 'beds' | 'deficit' | 'budgets' | 'arbitration' | 'assumptions' | 'weekEnd' | 'suggestions' | 'overcommittedDays'> & {
     /** « Ce qui a changé » depuis le calcul précédent de la semaine (règle 25) ; nul au premier calcul. */
     changes: PlanChanges | null;
   };

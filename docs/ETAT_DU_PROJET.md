@@ -12,25 +12,57 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- 3.9, scénarios, tests de pénurie, recette et publication : **code
+  commencé le 8 novembre 2026 au soir**, en Opus 5.5 · Max, sur le dépôt
+  public. Lot 2, une PR `fix/` par règle tranchée (D-052), contrat du
+  planning précisé avant le code et test rouge d'abord : **correction 1 sur
+  4 codée**, l'arbitrage validé en parts réservées (décision 1, D-077,
+  précisions F72 à F75, aucune migration) ; restent les corrections des
+  décisions 2, 4 et 5. Ensuite l'écran d'arbitrage présenté comme un plan
+  d'assolement, décidé par le porteur le 8 novembre 2026 à 20 h 40
+  (D-078) : une maquette d'abord, soumise au porteur avant tout code. Puis
+  les lots 3 à 7. Ni recette finale ni tag `v0.2.0` sans le porteur. Les
+  tests des scénarios vont dans `tests/planning-shortage.test.ts`.
 - 3.8, fonctionnalités à la carte : **close par le porteur le 8 novembre
   2026 à 20 h 21**, des modifications restant possibles plus tard, chacune
   par une PR (détail plus bas).
-- Économie des minutes GitHub Actions (D-075, en ligne, #300) : 2 706 min sur 3 000 utilisées le 8 novembre ; la CI saute les contrôles sur `main` et les parcours pour les PR de documents seuls.
+- Économie des minutes GitHub Actions (D-075, #300) : **annulée le
+  8 novembre 2026** au passage sur le dépôt public (`866ae13`), dont les
+  minutes sont gratuites : contrôles complets sur chaque PR et sur `main`,
+  parcours navigateur jamais sautés.
 - « Aujourd'hui » en tableau de bord (D-074) : la légende de la frise oubliait
   « Non faite » (retour du porteur du 8 novembre 2026) ; corrigée, elle dit
   seulement les couleurs présentes sur la frise du jour (précision T19).
 - Audit ergonomique, lot 3 (3.8 quater, D-076) : contrat validé par le porteur
   le 8 novembre 2026 (`docs/audit-ergonomie-lot3-contract.md`) ; PR 1, le
   planning et les arrosages (points 5 et 6), en ligne (#301, P31a, F52 à
-  F61) ; **PR 2, les PR 2 et 3 réunies (points 12, 13, 10, 8 et 14), codée
-  le 8 novembre 2026** en Opus 5.5 · Très élevé (parcours P31b et P31c,
-  précisions F62 à F71, aucune migration) : espèces à rattacher en tête et
-  « Rattacher comme… », « Observer » sur la réserve du sol, modèles
-  d'alerte et état de l'appareil, mots simples, « Aller au contenu », cibles
-  de 44 px et contraste mesurés. Le lot 3 est complet à sa fusion ; relecture
-  en ligne du porteur ; ensuite les corrections de la 3.9. Le mode sombre et
-  un lecteur d'écran ne sont pas vérifiés (F50).
-- Fusionné et déployé sur `main` au 8 novembre 2026 : toutes les PR jusqu'à
+  F61) ; **PR 2, les PR 2 et 3 réunies (points 12, 13, 10, 8 et 14), en
+  ligne le 8 novembre 2026 à 18 h 57** (#303 de l'archive, codée en
+  Opus 5.5 · Très élevé, parcours P31b et P31c, précisions F62 à F71,
+  aucune migration) : espèces à rattacher en tête et « Rattacher comme… »,
+  « Observer » sur la réserve du sol, modèles d'alerte et état de
+  l'appareil, mots simples, « Aller au contenu », cibles de 44 px et
+  contraste mesurés. Le lot 3 est complet ; ses écrans, relus en ligne par
+  le porteur, sont validés le 8 novembre 2026 à 19 h 20 (« ça me semble
+  bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
+  d'écran ne sont pas vérifiés (F50).
+- Fusionné et déployé sur `main` du dépôt public au 8 novembre 2026 : la
+  PR #10 (`775c7cd`, la clôture de la 3.8 dans les registres, fusionnée à
+  20 h 37 et déployée à 20 h 50, run 42515943412, les quatre jobs réussis,
+  aucune migration, Workers inchangés). Avant elle : la PR #9 (`fa45281`,
+  le retrait de Dependabot, fusionnée à 20 h 18 et déployée à 20 h 32, run
+  42514364088, les quatre jobs réussis, aucune migration, Workers
+  inchangés) ; avant
+  elle, `866ae13` (la synchronisation avec l'archive au `d350c06` et
+  l'annulation de D-075, déployé à 19 h 45, run 42508561331, les quatre
+  jobs réussis, premier déploiement depuis le dépôt public). Les numéros de
+  PR du dépôt public repartent de #1 ; ceux qui suivent sont de l'archive.
+- Fusionné et déployé sur `main` de l'archive, jusqu'à la bascule : toutes
+  les PR jusqu'à #303 (`d350c06`, l'audit ergonomique, lot 3, PR 2 : les
+  gestes par ligne, les mots simples et l'accessibilité, D-076, fusionnée le
+  8 novembre à 18 h 56 et déployée à 18 h 57, run 42507465264, le job de
+  déploiement réussi, les contrôles sautés comme le voulait D-075, aucune
+  migration, Workers inchangés). Avant elle :
   #302 (`e542313`, la légende de la frise d'« Aujourd'hui », T19, fusionnée
   le 8 novembre à 17 h 50 et déployée à 17 h 51, run 42501901101, le job de
   déploiement réussi, les contrôles sautés comme le veut D-075, aucune
@@ -195,9 +227,9 @@ registres, elle y renvoie.
   **3.8 ✅ close par le porteur le 8 novembre 2026 à 20 h 21** (« On va
   clôturer la 3.8 pour l'instant, quitte à ce que je fasse des modifications
   ultérieurement ») : ses modifications éventuelles passeront chacune par
-  une PR. Reste posée, sans code : l'écran d'arbitrage d'une pénurie
-  présenté comme un plan d'assolement (retour du 7 novembre), recommandé
-  dans la 3.9, maquette d'abord.
+  une PR. L'écran d'arbitrage d'une pénurie présenté comme un plan
+  d'assolement (retour du 7 novembre) est décidé par le porteur le
+  8 novembre 2026 à 20 h 40 : dans la 3.9, maquette d'abord.
 - 3.8 bis, calculateur d'irrigation : contrat validé par le porteur le
   6 novembre 2026 (`docs/irrigation-calculator-contract.md`, D-061). **Codé
   la nuit du 7 au 8 novembre 2026 sur le mandat du porteur** (« enchaîner les
@@ -331,8 +363,8 @@ registres, elle y renvoie.
   complété ; une irrigation enregistrée ne se modifie plus (D-006, T16).
   Dix-huit précisions T1 à T18. Relecture en ligne du porteur ensuite.
   **Lot 3 : contrat court validé par le porteur le 8 novembre 2026**
-  (`docs/audit-ergonomie-lot3-contract.md`, D-076), trois PR. **PR 1 (cette
-  PR), le planning et les arrosages** : les cartes de tête « À valider »,
+  (`docs/audit-ergonomie-lot3-contract.md`, D-076), trois PR. **PR 1, le
+  planning et les arrosages** (#301, en ligne) : les cartes de tête « À valider »,
   « Faites », « En retard », le retard lu sur l'irrigation validée ; les
   planches non servies rangées par motif, celles sans matériel dites en
   action vers « Matériel » ; les codes des règles dans l'infobulle « Pour
@@ -340,7 +372,10 @@ registres, elle y renvoie.
   d'action sans bouton ; « À traiter » en tête puis une ligne par
   irrigation et par jour, « Annuler » dans le menu « … », « Fait comme
   prévu » avec une confirmation d'une ligne, sur « Arrosages » et sur
-  « Aujourd'hui ». Avant les PR 2 et 3 du lot et les correctifs de la 3.9.
+  « Aujourd'hui ». **PR 2, les PR 2 et 3 réunies** (#303 de l'archive, en
+  ligne le 8 novembre 2026 à 18 h 57) : les gestes par ligne, les mots
+  simples et l'accessibilité. Lot 3 complet, validé par le porteur le
+  8 novembre 2026 à 19 h 20.
 - Connexions matériel (C1 station météo locale, C2 tensiomètres, C3
   électrovannes) : **demandées par le porteur le 7 novembre 2026**
   (roadmap section 6 bis, D-063), après la 3.9, avant la tranche 4 ; trois
@@ -474,9 +509,10 @@ registres, elle y renvoie.
 - Code suivant, d'après l'ordre de `docs/ROADMAP.md` (section 2) : le
   mandat du 6 novembre 2026 (D-060) est entièrement codé ; reste, avec le
   porteur, son jugement sur les recettes de la 5 ter et de la 5 quinquies.
-  Après la 3.8 : la deuxième passe de la refonte (D-068, codée, à relire
-  par le porteur), la 3.8 bis (codée, #281), la 3.8 ter (en cours, cinq PR),
-  puis la 3.8 quater et la 3.9. La 3.8 se clôt seulement avec lui.
+  Après la 3.8, close par le porteur : la deuxième passe de la refonte
+  (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
+  3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
+  cours : lot 2, quatre PR `fix/`, une à la fois.
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).
@@ -498,6 +534,13 @@ registres, elle y renvoie.
 - Source de vérité unique depuis le 18 septembre 2026 : le dépôt GitHub privé
   `lechampdelaurore-boop/module-irrigation-otf` (décision D-011). Le dépôt
   interne de l'environnement Codex n'est plus un lieu d'écriture.
+- **Depuis le 8 novembre 2026**, le travail et le déploiement passent par le
+  dépôt public `lechampdelaurore-boop/module-irrigation-otf-public` (licence
+  PolyForm Shield 1.0.0, historique neuf) ; le dépôt privé devient une
+  archive en lecture seule, jamais rendue publique. `main` y est protégée :
+  PR obligatoire, jobs « Application », « Workers Cloudflare » et
+  « Parcours navigateur » requis, branche à jour exigée, ni forçage ni
+  suppression.
 - `main` est protégée depuis le 18 septembre 2026 (décision D-013) : PR
   obligatoire, jobs « Application », « Workers Cloudflare » et, depuis le
   2 octobre 2026 (D-026), « Parcours navigateur » requis, branche à jour

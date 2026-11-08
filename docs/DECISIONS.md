@@ -2103,4 +2103,74 @@ celle d'une alerte. Vérifié par `tests/audit-ergonomie-lot3-gestes.test.ts`
 (cas 8 à 11 et 13), l'isolation entre exploitations par les tests de
 `tests/db` déjà en place (cas 14 : aucune lecture ni écriture nouvelle),
 P31b et P31c aux deux largeurs et les parcours P14, P16, P17 et P31a mis à
-jour.
+jour. **En ligne** : #303 de l'archive fusionnée le 8 novembre 2026 à 18 h 56
+(`d350c06`) et déployée à 18 h 57 (run 42507465264, le job de déploiement
+réussi, les contrôles sautés comme le voulait D-075, aucune migration). Le
+lot 3 est complet ; ses écrans, relus en ligne par le porteur, sont validés
+le 8 novembre 2026 à 19 h 20 (« ça me semble bon »).
+
+
+## D-077 — L'arbitrage validé en parts réservées (correction 1 de la 3.9) : quatre précisions tranchées par la recommandation
+
+Date : 8 novembre 2026. Première des quatre corrections du lot 2 de la 3.9,
+la décision 1 du porteur du 30 octobre 2026 (D-052) : sous un arbitrage 3.4
+validé, chaque allocation est une part réservée, sans redistribution entre
+planches ; l'eau qu'une planche allouée ne peut pas recevoir reste non
+attribuée, et l'écran le dit. Codée en Opus 5.5 · Max sur le dépôt public,
+le contrat du planning précisé d'abord (`docs/planning-contract.md`,
+« Pénurie » et la note « L'arbitrage en parts réservées »), un test rouge
+avant le code (`tests/planning-shortage.test.ts`).
+
+**Le défaut corrigé** (point ouvert 36, sous arbitrage). Le moteur prenait
+les allocations pour des cibles sans les réserver : le débordement d'un
+matériel pouvait prendre l'eau d'une autre planche allouée, et la dernière
+planche examinée ne rien recevoir. Sur la ferme de test (S13), avec 6 mm
+alloués partout et une réserve qui tient exactement les allocations, le
+tunnel 4 recevait 0 mm.
+
+**Quatre précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation (mandat « option recommandée par défaut »)
+et consignées au contrat du planning ; elles restent modifiables à la
+relecture du porteur :
+
+- F72 : seules les allocations sont des parts. Une planche que l'arbitrage
+  ne nomme pas (un niveau servi en entier, ou un niveau non arbitré) garde
+  son besoin pour cible et puise dans l'eau non attribuée de sa chaîne.
+- F73 : quand une chaîne ne peut pas fournir toutes ses allocations, chacune
+  est réduite dans la même proportion, et la coupe porte le motif de la
+  chaîne. Le cas réel est une limite journalière, que la faisabilité ne
+  compte pas. C'est la condition pour qu'aucune planche choisie ne reste
+  sans eau.
+- F74 : le plan porte `arbitration` (l'eau allouée, l'eau que la semaine
+  peut fournir après réduction, l'eau allouée non reçue et ses planches),
+  absent sans arbitrage. Le planning le dit dans une note sous les cartes
+  du résumé, en trois phrases au plus : l'eau allouée, sa réduction s'il y
+  en a une, ce que les planches allouées ne peuvent pas recevoir ; chaque
+  phrase ajoutée passe le litre. Aucune ligne de budget ni fraction sous
+  arbitrage (S13).
+- F75 : « ne peut pas être reçu », c'est la part restée non dépensée à la
+  fin du placement. L'eau qu'un créneau verse à côté a été placée : elle
+  n'en fait pas partie.
+
+**Ce qui ne change pas.** Sans arbitrage, le plan est celui d'avant, sans
+le champ `arbitration` ; la conduite en pénurie R9 et la part réservée de
+D-037 gardent leurs règles. Aucune migration : le champ s'enregistre dans
+le résumé du calcul, en JSON. Vérifié par cinq tests de
+`tests/planning-shortage.test.ts` et un test de
+`tests/db/planning-repository.test.ts`.
+
+
+## D-078 — L'écran d'arbitrage présenté comme un plan d'assolement : dans la 3.9, maquette d'abord
+
+Date : 8 novembre 2026, 20 h 40. Le porteur avait demandé le 7 novembre 2026
+un écran d'arbitrage d'une pénurie présenté comme un plan d'assolement. La
+question était restée ouverte à la clôture de la 3.8 ; la recommandation
+était de le faire dans la 3.9, en commençant par une maquette. Le porteur
+répond « oui ».
+
+- **Décision.** L'écran se fait dans la 3.9, après les quatre corrections du
+  lot 2. Une maquette d'abord, soumise au porteur avant tout code ; son code
+  passe par un ajout au contrat de la 3.9 (`docs/shortage-contract.md`).
+- **Ce qui ne change pas.** Le moteur reçoit une allocation par planche,
+  quel que soit l'écran qui la produit : la correction 1 (D-077) n'en
+  dépend pas.

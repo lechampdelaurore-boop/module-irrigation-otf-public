@@ -7,6 +7,7 @@ import type { PlanBedOutcome, PlanEventNotice, StoredPlanSuggestion, StoredWeekl
 import {
   PROPOSAL_STATUSES,
   PROPOSAL_STATUS_LABELS,
+  arbitrationNote,
   bedReasonLabels,
   calculationTriggerLabel,
   pendingEventNotice,
@@ -391,6 +392,8 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
 }) {
   const { deficit } = plan.calculation.summary;
   const explanation = waterDeficitExplanation(plan);
+  // Sous un arbitrage validé, aucune ligne de budget : la note dit l'eau allouée et ce qui ne peut pas être reçu (D-052).
+  const arbitration = arbitrationNote(plan.calculation.summary);
   // Au téléphone, les tuiles tiennent en une ligne de résumé, dépliable (F11).
   const [open, setOpen] = useState(false);
   const tilesId = useId();
@@ -409,6 +412,7 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
         <SummaryCard label="Planches non servies" value={String(unplacedCount)} detail={unplacedDetail} tone={unplacedCount > 0 ? 'deficit' : undefined} />
       </div>
       {explanation ? <p className="planning-summary-note">{explanation}</p> : null}
+      {arbitration ? <p className="planning-summary-note">{arbitration}</p> : null}
     </>
   );
 }

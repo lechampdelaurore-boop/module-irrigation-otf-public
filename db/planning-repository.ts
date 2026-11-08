@@ -183,6 +183,8 @@ export async function savePlanCalculationForUser(
   const summary: StoredPlanCalculation['summary'] = {
     weekEnd: plan.weekEnd, beds: plan.beds, deficit: plan.deficit, budgets: plan.budgets, assumptions: plan.assumptions,
     suggestions: plan.suggestions, overcommittedDays: plan.overcommittedDays, changes: input.changes ?? null,
+    // L'arbitrage du plan, seulement sous un arbitrage validé : un calcul sans arbitrage s'enregistre comme avant (D-052).
+    ...(plan.arbitration ? { arbitration: plan.arbitration } : {}),
   };
   const previous = await db.prepare(`SELECT id, equipment_id, setting_id, start_at, end_at, dose_mm FROM irrigation_plan_proposals
     WHERE workspace_id = ? AND season = ? AND week_start = ? AND status = 'proposed'`)

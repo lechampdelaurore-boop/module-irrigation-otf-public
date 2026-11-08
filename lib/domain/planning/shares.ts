@@ -13,7 +13,9 @@ import type { BedState } from './shortage.ts';
  * parts. Un créneau est borné à ce que ses parts paient, imputé aux parts des
  * planches qu'il arrose utilement, son débordement à l'eau non attribuée puis
  * aux parts de ses propres planches. Ce qu'une planche ne peut pas recevoir
- * est libéré en fin de tour et redistribué par la conduite.
+ * est libéré en fin de tour et redistribué par la conduite — sauf sous un
+ * arbitrage 3.4 validé, dont les allocations sont les parts et que rien ne
+ * redistribue (décision 1 de la 3.9, D-052).
  */
 
 const EPSILON = 1e-9;
@@ -28,6 +30,9 @@ type ShareEntry = {
   remainingCubicMeters: number;
 };
 
+/** Un reste sous un centième de millimètre de sa surface est un résidu d'arrondi des secondes, pas une part. */
+const isResidue = (entry: ShareEntry) => entry.remainingCubicMeters <= cubicMetersFromMillimeters(NEGLIGIBLE_MM, entry.wettedAreaSquareMeters);
+
 /** Un créneau tel que le registre le juge : ce que chaque planche arrosée reçoit, et son volume au prix du matériel. */
 export type SharePlacement = {
   applications: readonly { otfBedId: string; appliedMm: number }[];
@@ -39,7 +44,7 @@ export class ShareLedger {
   readonly shortfallReason: UnplacedReason;
   private readonly entries = new Map<string, ShareEntry>();
   private unreservedCubicMeters: number;
-  private readonly strategy: PlanningSettings['shortageStrategy'];
+  private readonly strategy: PlanningSettings['shortageStrategy'] | null;
   private readonly deferredFirst: ReadonlySet<string>;
 
   constructor(input: {
@@ -47,7 +52,8 @@ export class ShareLedger {
     wettedAreaOf: (bed: BedState) => number | null;
     budgetCubicMeters: number;
     shortfallReason: UnplacedReason;
-    strategy: PlanningSettings['shortageStrategy'];
+    /** La conduite qui redistribue l'eau libérée en fin de tour ; `null` sous un arbitrage validé, qui ne redistribue rien. */
+    strategy: PlanningSettings['shortageStrategy'] | null;
     deferredFirst: ReadonlySet<string>;
   }) {
     this.shortfallReason = input.shortfallReason;
@@ -140,12 +146,12 @@ export class ShareLedger {
    * redistribué par la conduite aux planches encore sous leur besoin que leur
    * matériel peut encore servir ; leur cible et leur part montent, le motif
    * de la coupe tombe quand la cible rejoint le besoin. Vrai quand une cible
-   * a monté au-delà de ce qu'elle était.
+   * a monté au-delà de ce qu'elle était. Sous un arbitrage, rien n'est libéré.
    */
   redistribute(canStillServe: (bed: BedState) => boolean): boolean {
+    if (this.strategy === null) return false;
     const entries = [...this.entries.values()];
-    // Un reste sous un centième de millimètre de sa surface est un résidu d'arrondi des secondes, pas une part à libérer.
-    const releasing = entries.filter((entry) => entry.remainingCubicMeters > cubicMetersFromMillimeters(NEGLIGIBLE_MM, entry.wettedAreaSquareMeters));
+    const releasing = entries.filter((entry) => !isResidue(entry));
     const pool = releasing.reduce((sum, entry) => sum + entry.remainingCubicMeters, 0);
     const eligible = entries.filter(({ bed }) => bed.unplannable === null && bed.needMm - bed.targetMm > EPSILON && canStillServe(bed));
     const gifts = this.allocate(pool, eligible);
@@ -172,6 +178,16 @@ export class ShareLedger {
       if (entry.bed.targetMm > (targetsBefore.get(entry) ?? entry.bed.targetMm) + NEGLIGIBLE_MM) raised = true;
     }
     return raised;
+  }
+
+  /**
+   * Ce qui reste des parts à la fin du placement, hors résidu d'arrondi : sous
+   * un arbitrage, l'eau allouée que les planches n'ont pas reçue, qui reste
+   * non attribuée (décision 1 de la 3.9).
+   */
+  unspentShares(): { cubicMeters: number; bedCount: number } {
+    const unspent = [...this.entries.values()].filter((entry) => !isResidue(entry));
+    return { cubicMeters: unspent.reduce((sum, entry) => sum + entry.remainingCubicMeters, 0), bedCount: unspent.length };
   }
 
   /** La conduite en pénurie (R9) appliquée à l'eau libérée : niveau par niveau, part égale, ou dans l'ordre du report. */
