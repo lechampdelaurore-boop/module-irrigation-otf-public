@@ -3,7 +3,7 @@ import test, { afterEach, beforeEach } from 'node:test';
 import { cancelPlannedIrrigationForUser } from '../../db/irrigation-event/completion';
 import { createIrrigationEventForUser, updatePlannedIrrigationForUser } from '../../db/irrigation-event/create';
 import { saveFeatureSelectionForUser } from '../../db/feature-selection-repository';
-import { decidePlanProposalForUser } from '../../db/planning-repository';
+import { decidePlanProposalForUser, savePlanningSettingsForUser } from '../../db/planning-repository';
 import { createProtectedSlotForUser, deleteProtectedSlotForUser } from '../../db/protected-slots-repository';
 import { listPumpConfigurationForUser, saveEquipmentDefaultPumpForUser, savePumpForUser } from '../../db/pump-repository';
 import { saveHydricGoalForUser } from '../../db/water-management-repository';
@@ -13,7 +13,7 @@ import { FEATURE_IDS } from '../../lib/domain/features/catalogue';
 import { planActionCounts } from '../../lib/domain/planning/action-summary';
 import type { PlanCalculationEvent, StoredWeeklyPlan } from '../../lib/domain/planning/contract';
 import { calculationTriggerLabel, summarizePlan } from '../../lib/domain/planning/presentation';
-import { minutesOfDay } from '../../lib/domain/planning/settings';
+import { DEFAULT_PLANNING_SETTINGS, minutesOfDay } from '../../lib/domain/planning/settings';
 import { recalculatePlanAfterEvent, recalculatePlanAfterFeatureChange } from '../../lib/services/planning-recalculation';
 import { computeWeeklyPlanForUser, readWeeklyPlanForUser } from '../../lib/services/planning-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
@@ -387,4 +387,59 @@ test('3.8 : un changement des fonctionnalités qui touche le plan le recalcule, 
   const lines: Record<string, unknown>[] = [];
   await recalculatePlanAfterFeatureChange(ALICE, 2026, { now: NOW, compute: async () => { throw new Error('panne'); }, log: (_level, entry) => { lines.push(entry); } });
   assert.deepEqual(lines.map((line) => [line.event, line.error]), [['planning_features_recalculation_failed', 'panne']], 'l’échec se journalise sans lever');
+});
+
+/**
+ * Deux planches, chacune son goutte-à-goutte, 0,6 m³ demandés chacune, une réserve de 0,7 m³ sans apport, la conduite
+ * « report » : la première planche de l'inventaire tient, l'autre est reportée (S12, décision 4 de la 3.9).
+ */
+async function farmUnderDefer(owner = ALICE) {
+  const first = await createDripFixture(owner, { beds: ['bed-1'], rateMmPerHour: 14, bedAreaSquareMeters: 30, name: 'Goutte-à-goutte P1' });
+  const second = await createDripFixture(owner, { beds: ['bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30, name: 'Goutte-à-goutte P2' });
+  const reservoirId = await saveWaterReservoirForUser(owner, owner, null, {
+    name: 'Réserve tampon', type: 'tank', capacityCubicMeters: 60, currentVolumeCubicMeters: 0.7, minimumSafetyCubicMeters: 0,
+    exposedSurfaceSquareMeters: 0, receivesRain: false, evaporationEnabled: false, evaporationCoefficient: 0, status: 'active', notes: null,
+  }, '2026-09-29T10:00:00.000Z');
+  const pumpId = await savePumpForUser(owner, owner, null, { name: 'La pompe', maximumFlowCubicMetersPerHour: 8, status: 'active', notes: null, origins: [{ sourceKind: 'reservoir', resourceId: null, reservoirId, isDefault: true }] });
+  for (const fixture of [first, second]) await saveEquipmentDefaultPumpForUser(owner, owner, fixture.equipment.id, pumpId);
+  await saveHydricGoalForUser(owner, { season: 2026, weekStart: '2026-09-21', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
+  await savePlanningSettingsForUser(owner, owner, { ...DEFAULT_PLANNING_SETTINGS, shortageStrategy: 'defer' });
+}
+
+const deferredOf = (plan: StoredWeeklyPlan | null) => plan?.calculation.summary.beds.filter((bed) => bed.reasons.includes('deferred')).map((bed) => bed.bedId);
+const slotsOf = (plan: StoredWeeklyPlan | null) => plan?.proposals.filter((proposal) => proposal.status === 'proposed').map((proposal) => [proposal.storedId, proposal.equipmentId, proposal.startAt, proposal.doseMm]);
+
+test('sous le report, un calcul sans événement reproduit le précédent ; après un événement, la reportée passe devant, et la file se garde (3.9, décision 4)', async () => {
+  await farmUnderDefer();
+  const first = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
+  assert.deepEqual(deferredOf(first), ['bed-2'], 'une planche tient dans 0,7 m³, l’autre est reportée');
+  // Aujourd'hui, ce second calcul servait la reportée et reportait la première : le plan basculait d'un calcul à l'autre.
+  const second = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
+  assert.deepEqual(deferredOf(second), ['bed-2'], 'sans événement, la file n’avance pas');
+  assert.deepEqual(slotsOf(second), slotsOf(first), 'les mêmes propositions, rien de remplacé (règle 9)');
+
+  // Un événement de la règle 4, inscrit au registre : son recalcul fait passer la reportée devant.
+  const later = new Date('2026-09-29T11:10:00.000Z');
+  await recalculatePlanAfterEvent(ALICE, { kind: 'reservoir-level-observed', season: 2026, at: later, lasting: true }, { now: later, compute: computeWithSnapshot });
+  const afterEvent = await readWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, now: later });
+  assert.equal(afterEvent?.calculation.triggerEvent, 'reservoir-level-observed');
+  assert.deepEqual(deferredOf(afterEvent), ['bed-1'], 'la reportée passe devant, la première attend son tour');
+  assert.deepEqual(afterEvent?.calculation.summary.deferredQueue, ['bed-2'], 'la file suivie s’enregistre avec le calcul');
+
+  // Sans nouvel événement, le calcul suivant — à la main comme celui du matin — garde la file.
+  const third = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: later });
+  assert.deepEqual(deferredOf(third), ['bed-1'], 'la file reste celle du calcul après l’événement');
+  assert.deepEqual(slotsOf(third), slotsOf(afterEvent));
+});
+
+test('sous le report, un calcul qui suit un recalcul échoué fait avancer la file : l’événement a eu lieu (3.9, décision 4)', async () => {
+  await farmUnderDefer();
+  const first = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
+  assert.deepEqual(deferredOf(first), ['bed-2']);
+  const later = new Date('2026-09-29T11:10:00.000Z');
+  await recalculatePlanAfterEvent(ALICE, { kind: 'rain-recorded', season: 2026, at: '2026-09-29' }, { now: later, compute: async () => { throw new Error('panne'); }, log: () => undefined });
+  assert.equal((await readWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, now: later }))?.pendingEvent?.status, 'failed');
+  const recalculated = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: later });
+  assert.deepEqual(deferredOf(recalculated), ['bed-1'], 'le calcul à la main qui suit l’échec fait passer la reportée devant');
+  assert.equal(recalculated.pendingEvent, null);
 });

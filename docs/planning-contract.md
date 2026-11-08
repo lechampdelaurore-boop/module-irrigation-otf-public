@@ -277,8 +277,15 @@ celles du cahier des charges (section 27) :
    sans son arbitrage humain quand il n'existe pas.
 2. **Part égale pour toutes**, sans distinction de priorité.
 3. **Report** : les planches non servies sont proposées en premier au
-   prochain calcul, ou à la semaine suivante si Q9 le permet ; leur déficit
-   reste affiché tel quel.
+   calcul qui suit un événement (décision 4 de la 3.9, D-052, 30 octobre
+   2026) — de l'eau nouvelle, un arrosage validé ou fait, un stock corrigé,
+   tout événement de la règle 4 du contrat de la 3.7 — ; sans événement
+   depuis le calcul précédent, le calcul garde la file du précédent et
+   reproduit son plan (« même entrée, même plan », règle 9), au lieu de
+   servir les reportées et de reporter les premières, d'un calcul à l'autre.
+   Le report reste une file d'attente, qui n'avance que quand quelque chose
+   s'est passé. Il ne passe à la semaine suivante que si Q9 le permet
+   (R10) ; le déficit des planches reportées reste affiché tel quel.
 
 Dans tous les cas : un arbitrage 3.4 déjà validé pour la semaine s'impose au
 moteur ; le déficit annoncé est **exactement** le besoin non couvert, planche
@@ -936,6 +943,46 @@ zéro ; elle restait à 1. `budgetLevelsText` (`presentation.ts`) écrit la lign
 « haute — · normale 73 % visés, 73 % placés · basse — ». Un calcul enregistré
 avant la correction, sans ces deux champs, garde sa ligne d'avant, les seules
 fractions.
+
+### Le report sans bascule (3.9, décision 4, D-052, 8 novembre 2026)
+
+Sous le report, `applyShortage` sert d'abord les planches de **la file**
+(`PlanningInputs.deferredBedIds`), puis les autres dans l'ordre de service
+— priorité, déficit relatif, inventaire —, jusqu'à épuisement du budget. Le
+plan retient la file qu'il a suivie (`WeeklyPlan.deferredQueue`, enregistrée
+avec le calcul, absente quand elle est vide).
+
+`nextDeferredQueue` (`shortage.ts`) choisit la file d'un calcul à partir du
+calcul précédent de la semaine :
+
+- **après un événement**, la file devient les planches que le calcul
+  précédent a reportées : elles passent devant ;
+- **sans événement**, la file reste celle du calcul précédent, et le calcul
+  reproduit son plan, y compris après un calcul où la file avait avancé ;
+- au premier calcul de la semaine, la file est vide ; après un calcul
+  enregistré avant la correction, qui ne l'a pas retenue, aussi.
+
+« Un événement », c'est un événement de la règle 4 du contrat de la 3.7,
+inscrit au registre des événements (`irrigation_plan_events`) après le
+calcul précédent et dont le recalcul n'a pas encore abouti : le service le
+lit dans `pendingEvent` du plan précédent. C'est le cas du recalcul sur
+événement lui-même, dont l'événement reste « en cours » pendant le calcul,
+et d'un calcul à la main ou du matin qui suit un recalcul échoué. Un
+événement déjà recalculé l'a été par le calcul précédent : il ne fait pas
+avancer la file une seconde fois. Ne sont pas des événements, comme pour le
+recalcul (règle 5) : un réglage du planning, la météo du matin, le passage
+du temps, ni un changement des fonctionnalités, qui ne passe pas par le
+registre. Le calcul du matin, sans événement depuis le précédent, garde
+donc la file ; ses chiffres peuvent changer avec la prévision et les
+besoins du jour, pas l'ordre de la file.
+
+Le motif d'une planche reportée dit quand elle passe : « reportée : passe
+en tête après le prochain événement (conduite « report ») ». Dans la liste
+« Planches non servies », leur groupe s'appelle « Reportées jusqu'au
+prochain événement », avec la phrase « Elles passent en tête au calcul qui
+suit un événement : un arrosage validé ou fait, de l'eau nouvelle, un stock
+corrigé. Recalculer sans événement ne change pas leur tour. » « Au prochain
+calcul » promettait ce que le calcul sans événement ne fait plus.
 
 ## Notes de mise en œuvre (3.6)
 

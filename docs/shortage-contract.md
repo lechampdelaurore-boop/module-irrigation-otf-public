@@ -293,10 +293,12 @@ l'état au 30 octobre 2026.
     (décision 6). État : 🟡.
 12. **S12 — Report.** Mêmes données, R9 « report ». Attendu : les planches
     servies en entier dans l'ordre de service — priorité, déficit relatif,
-    inventaire — jusqu'à épuisement du budget ; les suivantes « reportée au
-    prochain calcul (conduite « report ») », cible 0, manque entier ; au
-    calcul suivant, les reportées ne passent devant qu'après un événement,
-    et sans événement le calcul reproduit le précédent (décision 4).
+    inventaire — jusqu'à épuisement du budget ; les suivantes « reportée :
+    passe en tête après le prochain événement (conduite « report ») »,
+    cible 0, manque entier ; au calcul suivant, les reportées ne passent
+    devant qu'après un événement, et sans événement le calcul reproduit le
+    précédent (décision 4 ; le motif disait « reportée au prochain calcul »,
+    ce que le calcul sans événement ne fait plus, D-080).
     Vérification : test existant (sommaire) ; test sur deux calculs à
     écrire, avec et sans événement ; recette finale, jamais joué
     (décision 6). État : 🟡, règle tranchée (décision 4), à coder.

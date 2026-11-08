@@ -4,6 +4,7 @@ import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts'
 import type { IrrigationNeedPriority } from '../lib/domain/irrigation-needs.ts';
 import type { PlanningInputs, SupplyBudget, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
+import { nextDeferredQueue } from '../lib/domain/planning/shortage.ts';
 import { arbitrationNote, budgetLevelsText } from '../lib/domain/planning/presentation.ts';
 import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters } from '../lib/domain/units.ts';
 import { assertInvariants, byEquipment, close, farm, NOW, plannedIrrigation, settings } from './support/planning-fixtures.ts';
@@ -17,6 +18,9 @@ import { assertInvariants, byEquipment, close, farm, NOW, plannedIrrigation, set
  * Décision 2 : le budget d'une réserve retire d'abord le manque sous son
  * minimum de sécurité, et la ligne de budget montre la part visée et la part
  * placée de chaque niveau (docs/planning-contract.md, « Pénurie »).
+ * Décision 4 : sous le report, les planches reportées ne passent devant
+ * qu'au calcul qui suit un événement ; sans événement, le calcul reproduit
+ * le précédent (« Le report sans bascule »).
  */
 
 /** La demande de la ferme à quatre tunnels : 1,98 m³ du bloc 1, 5,608 m³ du bloc 2, 10,24 m³ des tunnels. */
@@ -237,4 +241,53 @@ test('un stock au-dessus de son minimum garde le budget d’avant ; un calcul en
   close(withMinimum.availableCubicMeters, 25 - 20 + 0.511 * HORIZON_HOURS, 1e-6, 'stock au-dessus du minimum');
   const stored: SupplyBudget = { originKey: 'reservoir:reserve', originName: 'Réserve tampon', availableCubicMeters: 75.27, dailyLimitRemainingCubicMeters: null, demandCubicMeters: 82.7, fractions: { high: 1, normal: 0.91, low: 1 } };
   assert.equal(budgetLevelsText(stored), 'part réservée : haute 100 %, normale 91 %, basse 100 %');
+});
+
+// Décision 4 : le report sans bascule d'un calcul à l'autre.
+
+/** S12 : les données de S10 — tunnels 1 et 2 en haute, blocs en normale, tunnels 3 et 4 en basse, 12 m³ pour 17,83 m³ —, sous le report. */
+const deferSettings = { ...settings, shortageStrategy: 'defer' as const };
+const s12 = () => farm({ extraTunnels: true, forageFlow: 0, reservoirCubicMeters: 12, priorities: { 'tunnel-1': 'high', 'tunnel-2': 'high', 'tunnel-3': 'low', 'tunnel-4': 'low' } }).inputs;
+/** Les planches qu'un calcul a reportées, dans l'ordre de l'inventaire. */
+const deferredBeds = (plan: WeeklyPlan) => plan.beds.filter((bed) => bed.reasons.includes('deferred')).map((bed) => bed.bedId);
+/** Le plan tel que le maraîcher le lit : chaque créneau, son matériel, ses heures et sa dose. */
+const slots = (plan: WeeklyPlan) => plan.proposals.map((proposal) => [proposal.equipmentId, proposal.startAt, proposal.endAt, proposal.doseMm]);
+
+test('S12 sur deux calculs, sans événement : le second reproduit le premier, les reportées le restent (décision 4)', () => {
+  // Aujourd'hui, le second calcul servait d'abord les reportées et reportait les premières : le plan basculait.
+  const inputs = s12();
+  const first = buildWeeklyPlan(inputs, deferSettings);
+  assert.ok(deferredBeds(first).length > 0, 'des planches sont reportées');
+  const second = buildWeeklyPlan({ ...inputs, deferredBedIds: nextDeferredQueue(first, false) }, deferSettings);
+  assertInvariants(second, inputs, deferSettings);
+  assert.deepEqual(deferredBeds(second), deferredBeds(first), 'les mêmes planches reportées');
+  assert.deepEqual(slots(second), slots(first), 'les mêmes créneaux');
+});
+
+test('S12 sur deux calculs, après un événement : les reportées passent devant, et la file se garde jusqu’au suivant (décision 4)', () => {
+  const inputs = s12();
+  const first = buildWeeklyPlan(inputs, deferSettings);
+  const queue = nextDeferredQueue(first, true);
+  assert.deepEqual(queue, deferredBeds(first), 'après un événement, la file : les reportées du calcul précédent');
+  const afterEvent = buildWeeklyPlan({ ...inputs, deferredBedIds: queue }, deferSettings);
+  assertInvariants(afterEvent, inputs, deferSettings);
+  assert.deepEqual(afterEvent.deferredQueue, queue, 'le plan retient la file qu’il a suivie');
+  for (const bedId of queue) assert.ok(!deferredBeds(afterEvent).includes(bedId), `${bedId} passe devant`);
+  assert.ok(deferredBeds(afterEvent).length > 0, 'le budget ne suffit toujours pas : d’autres attendent');
+  // Sans nouvel événement, le calcul suivant garde la file : il reproduit le plan d'après l'événement, sans revenir au premier.
+  const next = buildWeeklyPlan({ ...inputs, deferredBedIds: nextDeferredQueue(afterEvent, false) }, deferSettings);
+  assert.deepEqual(next.deferredQueue, queue);
+  assert.deepEqual(deferredBeds(next), deferredBeds(afterEvent));
+  assert.deepEqual(slots(next), slots(afterEvent));
+});
+
+test('la file est vide au premier calcul de la semaine, et après un calcul enregistré avant la correction faute d’événement (décision 4)', () => {
+  assert.deepEqual(nextDeferredQueue(null, true), []);
+  assert.deepEqual(nextDeferredQueue(null, false), []);
+  const first = buildWeeklyPlan(s12(), deferSettings);
+  assert.equal(first.deferredQueue, undefined, 'une file vide ne s’enregistre pas');
+  // Un calcul enregistré avant la correction n'a pas de file : sans événement, le calcul suivant part d'une file vide.
+  const stored = { beds: first.beds };
+  assert.deepEqual(nextDeferredQueue(stored, false), []);
+  assert.deepEqual(nextDeferredQueue(stored, true), deferredBeds(first));
 });
