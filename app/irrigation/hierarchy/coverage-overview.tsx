@@ -44,13 +44,16 @@ export function CoverageOverview({
               <small>Débit total{unknownAreaBedCount > 0 ? ' · incomplet' : ''}</small>
               <strong>{numberFormatter.format(totalFlow.value)} {totalFlow.unit}</strong>
             </span>
+            {/* Une ligne de sens sous chaque chiffre (audit ergonomique, lot 3, point 8). */}
             <span data-warning={coverage.overlapBedCount > 0}>
               <small>Chevauchements</small>
               <strong>{coverage.overlapBedCount} planche{coverage.overlapBedCount > 1 ? 's' : ''}</strong>
+              <em className="coverage-metric-meaning">Planches arrosées par deux matériels : sans souci si c’est voulu.</em>
             </span>
             <span>
               <small>Cumul maximal</small>
               <strong>{formatIrrigationRate(coverage.maxRateMmPerHour)}</strong>
+              <em className="coverage-metric-meaning">L’apport horaire le plus fort sur une planche, matériels additionnés : à comparer à ce que votre sol absorbe.</em>
             </span>
           </div>
           <div className="coverage-equipment-list" aria-label="Matériels calculés">
@@ -70,7 +73,14 @@ export function CoverageOverview({
                   <span className="coverage-equipment-dot" aria-hidden="true" />
                   <span>
                     <strong>{item.equipmentName}</strong>
-                    <small>{item.settingName} · {item.bedCount} planche{item.bedCount > 1 ? 's' : ''}{item.unknownAreaBedCount > 0 ? ` · ${item.unknownAreaBedCount} sans passe-pied connu, hors débit` : ''}</small>
+                    {/* Le nom du réglage (« 5 planches ») et les planches couvertes, séparés (point 8). */}
+                    <small>
+                      <span className="coverage-setting-name">Réglage {item.settingName}</span>
+                      <span>
+                        couvre {item.bedCount} planche{item.bedCount > 1 ? 's' : ''}
+                        {item.unknownAreaBedCount > 0 ? ` · ${item.unknownAreaBedCount} sans passe-pied connu, hors débit` : ''}
+                      </span>
+                    </small>
                   </span>
                   <b>{formatFlowRate(item.totalLitersPerHour)}</b>
                 </button>

@@ -249,6 +249,13 @@ même consigne :
 | T17 | Ce que retient l'historique | le journal de l'irrigation porte « faite comme prévu » ; le mode de création se lit « Planifiée, faite comme prévu » et la chronologie « Faite comme prévu », à l'heure de fin prévue |
 | T18 | Au téléphone | la confirmation garde ses boutons en vue au pied, « Enregistrer n irrigations » au-dessus d'« Annuler » ; le bouton « Tout est fait » prend toute la largeur sous le titre de « Votre journée » |
 
+**Retour du porteur après la mise en ligne** (8 novembre 2026, « ça veut
+dire quoi les carrés rouges ? ») :
+
+| N° | Précision | Choix |
+| --- | --- | --- |
+| T19 | Légende de la frise | elle oubliait « Non faite », la barre rouge d'une irrigation dont tout le créneau est passé sans démarrage. Elle dit désormais chaque couleur présente sur la frise du jour, et seulement celles-là, avec le statut des cartes (« Non faite », « En retard », « Planifiée », « À valider ») ; « Déjà passé » s'y ajoute quand l'heure actuelle est sur la frise |
+
 ## 8. Risques
 
 - La page lit davantage de données : le temps d'affichage est regardé sur la

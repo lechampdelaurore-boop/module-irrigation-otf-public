@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { soilGardenAnchor } from '@/lib/domain/today/reliability';
+import { soilGardenLines } from '@/lib/domain/soil-reserve/garden-lines';
 import { gaugeShortDayLabel, type SoilGaugePlot, type SoilGaugeView, type SoilGaugeZone } from '@/lib/domain/soil-reserve/gauge-view';
 import type { SoilObservation } from '@/lib/domain/soil-reserve/gauge';
 import { saveSoilObservationAction, type SoilReserveActionResult } from '../soil-reserve-actions';
@@ -45,6 +46,28 @@ export function SoilGaugePart({ season, gauge, pending, run }: { season: number;
 }
 
 function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone: SoilGaugeZone; today: string; pending: boolean; run: Run }) {
+  // Un pli de jardins se déplie au clic, et reste déplié tant qu'un de ses jardins est ouvert
+  // (une observation qui forme un pli ne referme pas le jardin qu'on lit ; point 13, précision F65).
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
+  const [openPlots, setOpenPlots] = useState<ReadonlySet<string>>(() => new Set());
+  const lines = soilGardenLines(zone, today);
+  const shown = (key: string, plotIds: readonly string[]) => expanded.has(key) || plotIds.some((plotId) => openPlots.has(plotId));
+  const groupOf = (key: string) => lines.find((line) => line.kind === 'group' && line.key === key);
+  const onOpenChange = useCallback((plotId: string, open: boolean) => setOpenPlots((current) => {
+    if (current.has(plotId) === open) return current;
+    const next = new Set(current);
+    if (open) next.add(plotId);
+    else next.delete(plotId);
+    return next;
+  }), []);
+  const toggleGroup = (key: string, plotIds: readonly string[], open: boolean) => {
+    const next = new Set(expanded);
+    if (open) next.delete(key);
+    else next.add(key);
+    setExpanded(next);
+    // Replier le pli referme aussi la lecture de ses jardins : il se replie vraiment.
+    if (open) setOpenPlots(new Set([...openPlots].filter((plotId) => !plotIds.includes(plotId))));
+  };
   return (
     <section className="soil-zone" aria-label={`Réserve · ${zone.name}`}>
       <h4>Parcelle {zone.name}</h4>
@@ -60,7 +83,43 @@ function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone
           run={run}
         />
       ) : null}
-      {zone.plots.map((plot) => <PlotGauge key={plot.plotId} season={season} zoneId={zone.zoneId} plot={plot} today={today} pending={pending} run={run} />)}
+      {lines.map((line) => {
+        if (line.kind === 'group') {
+          const open = shown(line.key, line.plotIds);
+          return (
+            <div key={`group:${line.key}`} className="soil-garden-group" data-open={open}>
+              <p>
+                <strong>{line.title}</strong>
+                <small>{line.detail}</small>
+              </p>
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls={line.plotIds.map((plotId) => soilGardenAnchor(plotId)).join(' ')}
+                onClick={() => toggleGroup(line.key, line.plotIds, open)}
+              >
+                {open ? 'Replier' : `Voir les ${line.plotIds.length} jardins`}
+              </button>
+            </div>
+          );
+        }
+        const group = line.groupKey === null ? undefined : groupOf(line.groupKey);
+        const hidden = group?.kind === 'group' ? !shown(group.key, group.plotIds) : false;
+        return (
+          <PlotGauge
+            key={line.plot.plotId}
+            season={season}
+            zoneId={zone.zoneId}
+            plot={line.plot}
+            today={today}
+            pending={pending}
+            run={run}
+            hidden={hidden}
+            observe={line.observe}
+            onOpenChange={onOpenChange}
+          />
+        );
+      })}
     </section>
   );
 }
@@ -73,59 +132,97 @@ function plotHeadline(plot: SoilGaugePlot): string {
   return parts.join(' · ');
 }
 
-function PlotGauge({ season, zoneId, plot, today, pending, run }: { season: number; zoneId: string; plot: SoilGaugePlot; today: string; pending: boolean; run: Run }) {
+function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, observe, onOpenChange }: {
+  season: number;
+  zoneId: string;
+  plot: SoilGaugePlot;
+  today: string;
+  pending: boolean;
+  run: Run;
+  /** Rangé dans un pli replié. */
+  hidden: boolean;
+  /** La ligne est « inconnue » : « Observer » y paraît (point 13). */
+  observe: boolean;
+  onOpenChange: (plotId: string, open: boolean) => void;
+}) {
   const garden = plot.garden;
   const anchor = soilGardenAnchor(plot.plotId);
   const details = useRef<HTMLDetailsElement>(null);
+  const place = plot.sheltered ? 'l’abri' : 'le jardin';
   useEffect(() => {
-    // « Observer le sol de … » sur « Aujourd'hui » (audit ergonomique, lot 2) ouvre le jardin désigné.
+    // « Observer le sol de … » sur « Aujourd'hui » (audit ergonomique, lot 2) ouvre le jardin désigné, même rangé dans un pli.
     if (window.location.hash === `#${anchor}` && details.current) {
       details.current.open = true;
-      details.current.scrollIntoView({ block: 'start' });
+      onOpenChange(plot.plotId, true);
+      requestAnimationFrame(() => details.current?.scrollIntoView({ block: 'start' }));
     }
-  }, [anchor]);
+  }, [anchor, onOpenChange, plot.plotId]);
+  const observeNow = () => {
+    const element = details.current;
+    if (!element) return;
+    element.open = true;
+    onOpenChange(plot.plotId, true);
+    requestAnimationFrame(() => {
+      const form = element.querySelector<HTMLElement>('.soil-observation');
+      form?.scrollIntoView({ block: 'center' });
+      form?.querySelector<HTMLInputElement>('input[type="range"]')?.focus({ preventScroll: true });
+    });
+  };
   return (
-    <details ref={details} id={anchor} className="soil-garden" suppressHydrationWarning>
-      <summary>
-        <strong>{plot.name}{plot.sheltered ? ' · abri' : ''}</strong>
-        <small>{plotHeadline(plot)}</small>
-      </summary>
-      <div className="soil-garden-body">
-        <p className="soil-garden-counts">
-          {garden.countedBeds} planche{garden.countedBeds > 1 ? 's' : ''} comptée{garden.countedBeds > 1 ? 's' : ''}
-          {garden.unknownBeds > 0 ? ` · ${garden.unknownBeds} inconnue${garden.unknownBeds > 1 ? 's' : ''}` : ''}
-          {garden.withoutCrop.length > 0 ? ` · ${garden.withoutCrop.length} sans culture, à part` : ''}
-        </p>
-        {garden.countedBeds > 0 ? (
-          <ul className="soil-week" aria-label={`Prévu jusqu’à dimanche, fin de chaque jour · ${plot.name}`}>
-            {plot.week.map((item) => (
-              <li key={item.date}>
-                <span>{gaugeShortDayLabel(item.date)}</span>
-                <strong>{item.percent === null ? 'inconnue' : `${whole.format(item.percent)} %`}</strong>
-                <small>prévu</small>
-              </li>
+    <div className="soil-garden-line" data-observe={observe} hidden={hidden}>
+      <details
+        ref={details}
+        id={anchor}
+        className="soil-garden"
+        suppressHydrationWarning
+        onToggle={(event) => onOpenChange(plot.plotId, event.currentTarget.open)}
+      >
+        <summary>
+          <strong>{plot.name}{plot.sheltered ? ' · abri' : ''}</strong>
+          <small>{plotHeadline(plot)}</small>
+        </summary>
+        <div className="soil-garden-body">
+          <p className="soil-garden-counts">
+            {garden.countedBeds} planche{garden.countedBeds > 1 ? 's' : ''} comptée{garden.countedBeds > 1 ? 's' : ''}
+            {garden.unknownBeds > 0 ? ` · ${garden.unknownBeds} inconnue${garden.unknownBeds > 1 ? 's' : ''}` : ''}
+            {garden.withoutCrop.length > 0 ? ` · ${garden.withoutCrop.length} sans culture, à part` : ''}
+          </p>
+          {garden.countedBeds > 0 ? (
+            <ul className="soil-week" aria-label={`Prévu jusqu’à dimanche, fin de chaque jour · ${plot.name}`}>
+              {plot.week.map((item) => (
+                <li key={item.date}>
+                  <span>{gaugeShortDayLabel(item.date)}</span>
+                  <strong>{item.percent === null ? 'inconnue' : `${whole.format(item.percent)} %`}</strong>
+                  <small>prévu</small>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <ObservationForm
+            key={plot.observation?.recordedAt ?? 'aucune'}
+            title={`Observer ${place}`}
+            note={null}
+            observation={plot.observation}
+            place={{ zoneId, plotId: plot.plotId }}
+            season={season}
+            pending={pending}
+            run={run}
+          />
+          <div className="soil-beds" role="list" aria-label={`Planches · ${plot.name}`}>
+            {plot.beds.map((bed) => (
+              <div role="listitem" key={bed.bedId}>
+                <SoilBed bed={bed} season={season} today={today} pending={pending} run={run} />
+              </div>
             ))}
-          </ul>
-        ) : null}
-        <ObservationForm
-          key={plot.observation?.recordedAt ?? 'aucune'}
-          title={`Observer ${plot.sheltered ? 'l’abri' : 'le jardin'}`}
-          note={null}
-          observation={plot.observation}
-          place={{ zoneId, plotId: plot.plotId }}
-          season={season}
-          pending={pending}
-          run={run}
-        />
-        <div className="soil-beds" role="list" aria-label={`Planches · ${plot.name}`}>
-          {plot.beds.map((bed) => (
-            <div role="listitem" key={bed.bedId}>
-              <SoilBed bed={bed} season={season} today={today} pending={pending} run={run} />
-            </div>
-          ))}
+          </div>
         </div>
-      </div>
-    </details>
+      </details>
+      {observe ? (
+        <button type="button" className="soil-garden-observe" aria-label={`Observer ${place} ${plot.name}`} onClick={observeNow}>
+          Observer
+        </button>
+      ) : null}
+    </div>
   );
 }
 

@@ -1,10 +1,19 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useId, useState, useTransition } from 'react';
 import type { StoredReferenceCrop } from '@/db/crop-water/references';
 import { correspondenceTargetLabel, kcSourceLabel } from '@/lib/domain/crop-water/presentation';
 import type { KcSource } from '@/lib/domain/crop-water/reference';
 import type { CorrespondenceEntry, SeasonSpecies } from '@/lib/domain/crop-water/species';
+import {
+  speciesInLinkOrder,
+  speciesLinkCounter,
+  speciesNeedsLink,
+  suggestReferenceCrop,
+  WITHOUT_REFERENCE_CONSEQUENCE,
+  type LinkCandidate,
+} from '@/lib/domain/crop-water/species-linking';
+import { matchesSearch } from '@/lib/domain/name-search';
 import type { CropCoefficientsView } from '@/lib/services/crop-water-coefficients';
 import { pageHref } from '@/lib/domain/features/pages';
 import { kcOverrideRows } from '@/lib/domain/crop-water/settings-view';
@@ -23,7 +32,9 @@ import { CropWaterSettingsSection } from './crop-water-settings';
 import { ReferenceCropCard } from './reference-crop-card';
 import { referenceCropSummary } from '@/lib/domain/crop-water/crop-summary';
 import { DetailHint } from './detail-hint';
+import { ExpertsFold } from './experts-fold';
 import { PlantVignette } from './plant-vignette';
+import { SpeciesLinkSuggestion } from './species-link-suggestion';
 
 /**
  * La page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -83,10 +94,12 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
           </>
         ) : (
           <>
-            <h2 id="crop-coefficients-title">Coefficients culturaux</h2>
+            {/* Le titre et la tête en clair ; le détail technique dans « Pour les experts » (audit ergonomique, lot 3, point 8). */}
+            <h2 id="crop-coefficients-title">Besoin en eau par culture</h2>
             <p>
-              Le besoin en eau d’une culture suit son stade : c’est son coefficient cultural, le Kc. Chaque espèce de vos séries se
-              rattache à une culture de référence <a href={pageHref('reglages', { season })}>dans Réglages</a>.
+              Une culture ne boit pas autant à la levée qu’en pleine saison. Le module suit le stade de chaque culture, jour après
+              jour, pour proposer un objectif d’arrosage. Chaque espèce de vos séries suit une culture de référence, choisie{' '}
+              <a href={pageHref('reglages', { season })}>dans Réglages</a>.
             </p>
           </>
         )}
@@ -107,9 +120,17 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
           <section className="crop-coefficients-part" aria-labelledby="reference-crops-title">
             <h3 id="reference-crops-title">Cultures de référence</h3>
             <p>
-              Les valeurs du CRIIAM Sud s’imposent pour ses légumes ; la FAO-56 sert de repli. Une culture inutilisable dit pourquoi.
-              Touchez une culture pour voir ses Kc, ses durées et son profil racinaire, et les régler.
+              Touchez une culture pour voir ce qu’elle boit à chaque stade, la durée de ses stades et la profondeur de ses racines,
+              et les régler pour votre ferme. Une culture inutilisable dit pourquoi.
             </p>
+            <ExpertsFold>
+              <p>
+                Le besoin d’un jour est l’ETM : l’évapotranspiration de référence (ET0) multipliée par le coefficient cultural (Kc) du
+                stade. Les valeurs du CRIIAM Sud s’imposent pour ses légumes ; la FAO-56 sert de repli. Le CRIIAM donne un Kc par
+                stade, en escalier ; la FAO-56, un trapèze (début, développement, pleine saison, fin). Le jeu commun est la table partagée
+                par toutes les fermes ; les durées de la ferme le remplacent pour elle seule.
+              </p>
+            </ExpertsFold>
             <div className="reference-crop-list">
               {view.crops.map((stored) => {
                 const overrideRows = kcOverrideRows(stored.crop, view.overrides, view.settings.today);
@@ -141,6 +162,9 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
   );
 }
 
+/** La recherche par nom paraît dès deux espèces (précision F64). */
+const SEARCH_FROM = 2;
+
 function SpeciesSection({ season, view, spriteHref, pending, run }: {
   season: number;
   view: Extract<CropCoefficientsView, { available: true }>;
@@ -148,20 +172,68 @@ function SpeciesSection({ season, view, spriteHref, pending, run }: {
   pending: boolean;
   run: Pending;
 }) {
-  const linked = view.species.filter((species) => species.link !== null).length;
+  const [query, setQuery] = useState('');
+  const hintId = useId();
+  const toLink = view.species.filter(speciesNeedsLink).length;
+  const shown = speciesInLinkOrder(view.species.filter((species) => matchesSearch(species.plantName, query)));
+  // La proposition ne lit que le jeu commun : une culture saisie par la ferme n'est jamais proposée (cas 9).
+  const candidates: LinkCandidate[] = view.crops.map((stored) => ({
+    id: stored.crop.id,
+    name: stored.crop.name,
+    source: stored.crop.source,
+    fromCommonSet: stored.origin === 'common' || stored.crop.id in view.commonVersions,
+    usable: stored.problems.length === 0,
+  }));
   return (
     <section className="crop-coefficients-part" aria-labelledby="species-links-title">
       <h3 id="species-links-title">Espèces de la saison</h3>
+      <p className="species-link-counter">
+        <strong>{speciesLinkCounter(view.species)}</strong>
+        {toLink > 0 ? <span>{WITHOUT_REFERENCE_CONSEQUENCE}</span> : null}
+      </p>
       <p>
-        {linked} espèce{linked > 1 ? 's' : ''} rattachée{linked > 1 ? 's' : ''} sur {view.species.length}, pour les séries de la
-        saison {season} posées sur des planches. Une série peut suivre une autre culture que son espèce : c’est une exception.
-        Touchez une espèce pour la rattacher ou voir ses séries.
+        Les espèces des séries de la saison {season} posées sur des planches, celles à rattacher d’abord. Une série peut suivre
+        une autre culture que son espèce : c’est une exception. Touchez une espèce pour la rattacher ou voir ses séries.
       </p>
       {view.species.length === 0 ? <p className="crop-coefficients-empty">Aucune série de la saison n’est posée sur une planche.</p> : null}
+      {view.species.length >= SEARCH_FROM ? (
+        <div className="species-search">
+          <label>
+            <span>Chercher une espèce</span>
+            <input type="search" value={query} placeholder="Tomate, carotte…" aria-describedby={hintId} onChange={(event) => setQuery(event.target.value)} />
+          </label>
+          {/* Une zone vivante sans le rôle « status » : celui-ci reste aux messages d'enregistrement de la section. */}
+          <small id={hintId} aria-live="polite">
+            {query.trim() === ''
+              ? 'Tapez un nom pour réduire la liste.'
+              : shown.length === 0
+                ? 'Aucune espèce ne correspond à cette recherche.'
+                : `${shown.length} espèce${shown.length > 1 ? 's' : ''} trouvée${shown.length > 1 ? 's' : ''}.`}
+          </small>
+        </div>
+      ) : null}
       <div className="species-link-list">
-        {view.species.map((species) => (
-          <SpeciesLinkCard key={species.plantId} season={season} species={species} crops={view.crops} spriteHref={spriteHref} pending={pending} run={run} />
-        ))}
+        {shown.map((species) => {
+          const suggestion = speciesNeedsLink(species) ? suggestReferenceCrop(species.plantName, candidates) : null;
+          return (
+            <div key={species.plantId} className="species-link-row" data-to-link={speciesNeedsLink(species)}>
+              <SpeciesLinkCard season={season} species={species} crops={view.crops} spriteHref={spriteHref} pending={pending} run={run} />
+              {suggestion ? (
+                <SpeciesLinkSuggestion
+                  plantName={species.plantName}
+                  crop={suggestion}
+                  pending={pending}
+                  onConfirm={() => run(() => saveSpeciesCorrespondenceAction({
+                    season,
+                    plantId: species.plantId,
+                    seriesId: null,
+                    target: { kind: 'reference', referenceCropId: suggestion.id, analogy: false },
+                  }))}
+                />
+              ) : null}
+            </div>
+          );
+        })}
       </div>
     </section>
   );
@@ -178,7 +250,7 @@ function SpeciesLinkCard({ season, species, crops, spriteHref, pending, run }: {
   const cropName = (id: string) => crops.find((stored) => stored.crop.id === id)?.crop.name ?? null;
   // Une carte ouverte avant que React ne reprenne la main est un geste de l'utilisateur, pas un écart à signaler.
   return (
-    <details className="species-link-card" data-linked={species.link !== null} suppressHydrationWarning>
+    <details className="species-link-card" data-linked={!speciesNeedsLink(species)} suppressHydrationWarning>
       <summary>
         <strong><PlantVignette spriteHref={spriteHref} symbol={speciesSymbol(species.plantName)} />{species.plantName}</strong>
         <small>
@@ -284,7 +356,7 @@ function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView,
         <p>Toutes les espèces de la saison ont une culture de référence ou sont de l’engrais vert.</p>
       ) : (
         <>
-          <p>Pas d’objectif proposé pour ces espèces : leur objectif saisi reste seul.</p>
+          <p>{WITHOUT_REFERENCE_CONSEQUENCE} La liste compte aussi les séries dont l’exception est « sans référence ».</p>
           <ul className="without-reference-list" aria-label="Espèces sans référence Kc">
             {view.withoutReference.map((item) => (
               <li key={`${item.plantId}:${item.reason}`}>

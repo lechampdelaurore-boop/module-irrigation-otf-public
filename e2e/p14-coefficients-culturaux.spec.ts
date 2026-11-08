@@ -98,7 +98,8 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   // La table de la culture de référence se lit, sur la page « Besoin par culture ».
   await attendreLaPageIrrigation(page, 'cultures');
   const coefficients = page.locator('section.crop-coefficients');
-  await expect(coefficients.getByRole('heading', { name: 'Coefficients culturaux' })).toBeVisible();
+  // Le titre en clair depuis l'audit ergonomique (lot 3, point 8).
+  await expect(coefficients.getByRole('heading', { name: 'Besoin en eau par culture' })).toBeVisible();
   const table = coefficients.locator('details.reference-crop-card').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.culture}$`) }) });
   await table.locator('summary').first().click();
   await expect(table).toContainText('CRIIAM Sud');

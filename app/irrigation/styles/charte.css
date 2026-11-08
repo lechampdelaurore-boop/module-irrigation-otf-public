@@ -42,8 +42,9 @@
   font-weight: 500;
 }
 
+/* L'encre de l'eau sur l'eau pâle : 7:1 ; le bleu de l'eau n'y tenait que 4,34:1 (audit ergonomique, lot 3, point 14). */
 .water-summary-card.is-water strong {
-  color: var(--water);
+  color: var(--water-ink);
 }
 
 /*

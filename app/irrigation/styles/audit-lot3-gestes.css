@@ -1,0 +1,336 @@
+/*
+ * Audit ergonomique, lot 3, PR 2 (docs/audit-ergonomie-lot3-contract.md,
+ * sections 4 et 5) : les espèces à rattacher en tête et « Rattacher
+ * comme… » (point 12), « Observer » et les jardins rangés en une phrase
+ * (point 13), les modèles d'alerte et l'état de cet appareil (point 10), les
+ * mots simples (point 8) et l'accessibilité (point 14).
+ */
+
+/* Point 12 : le compteur, la recherche et la proposition d'après le nom. */
+.species-link-counter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2rem .6rem;
+  margin: .4rem 0 0;
+}
+
+.species-link-counter span {
+  color: var(--warn-ink);
+}
+
+.species-search {
+  display: grid;
+  gap: .3rem;
+  max-width: 28rem;
+  margin-top: .75rem;
+}
+
+.species-search label {
+  display: grid;
+  gap: .3rem;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.species-search input {
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+  padding: .6rem .7rem;
+  color: inherit;
+  font: inherit;
+}
+
+.species-search small {
+  color: var(--muted);
+}
+
+.species-link-row {
+  display: grid;
+  min-width: 0;
+  gap: .35rem;
+}
+
+.species-link-suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .4rem .75rem;
+  margin-left: 4px;
+  border-radius: 10px;
+  background: var(--warn-soft);
+  padding: .4rem .5rem .4rem .8rem;
+  color: var(--warn-ink);
+  font-size: .82rem;
+}
+
+.species-link-suggestion > button {
+  min-height: var(--touch-target);
+  border: 1px solid var(--green);
+  border-radius: var(--radius-button);
+  background: white;
+  padding: .55rem .85rem;
+  color: var(--green);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.species-link-suggestion > button:disabled {
+  opacity: .55;
+}
+
+/* Point 13 : « Observer » sur la ligne d'un jardin inconnu, et le pli des jardins pareils. */
+.soil-garden-line {
+  position: relative;
+  min-width: 0;
+}
+
+.soil-garden-line[data-observe="true"] > .soil-garden > summary {
+  padding-right: 7.5rem;
+}
+
+.soil-reserve .soil-garden-line > .soil-garden-observe {
+  position: absolute;
+  top: 4px;
+  right: .4rem;
+  min-height: var(--touch-target);
+}
+
+.soil-garden-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .4rem .75rem;
+  border-radius: 10px;
+  background: var(--card);
+  padding: .4rem .5rem .4rem .75rem;
+}
+
+.soil-garden-group p {
+  display: grid;
+  gap: .1rem;
+  margin: 0;
+}
+
+.soil-garden-group small {
+  color: var(--muted);
+}
+
+.soil-garden-group[data-open="true"] {
+  border-left: 3px solid var(--green);
+}
+
+/* Point 10 : les modèles, l'état de cet appareil et le repli du gel à 2 m. */
+.weather-alert-templates {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.weather-alert-templates p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.weather-alert-device > div {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 16rem;
+  gap: 2px;
+}
+
+.weather-alert-device .water-error {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.weather-alerts-margin {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.weather-alerts-margin > summary {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green-dark);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.weather-alerts-margin > p {
+  margin: 0 0 6px;
+}
+
+/* Point 8 : « Pour les experts », le réglage séparé des planches couvertes, une ligne de sens sous les chiffres. */
+.experts-fold {
+  margin: .4rem .9rem;
+}
+
+.crop-water-settings-block .experts-fold,
+.crop-coefficients-part > .experts-fold {
+  margin: .4rem 0;
+}
+
+.experts-fold > summary {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green-dark);
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.experts-fold-body > p {
+  margin: 0 0 .4rem;
+}
+
+.experts-fold-body > .reference-crop-meta,
+.experts-fold-body > .reference-crop-note {
+  margin-inline: 0;
+}
+
+.coverage-equipment-list small {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+}
+
+.coverage-setting-name {
+  flex: none;
+  border-radius: 4px;
+  background: var(--tile);
+  padding: 0 4px;
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+.coverage-equipment-list small > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coverage-metric-meaning {
+  color: var(--muted);
+  font: 400 11px/1.35 var(--font-ui);
+  font-style: normal;
+  white-space: normal;
+}
+
+/* Point 14 : le lien « Aller au contenu », visible dès qu'il reçoit le clavier. */
+.skip-link {
+  position: absolute;
+  z-index: 100;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  border-radius: var(--radius-button);
+  background: var(--green);
+  padding: 0 16px;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.feature-page:focus {
+  outline: none;
+}
+
+/* Point 14 : le compte d'un onglet de l'historique, lisible (4,5:1) sans voile. */
+.history-status-tabs button small {
+  opacity: 1;
+}
+
+/*
+ * Point 14 : au téléphone, toute cible tient 44 px de haut (cas 13, F69) : les
+ * champs de 38 à 40 px, les segments et flèches de l'historique, « Saisir la
+ * pluie », « Exporter », les plis du besoin, les cases à cocher et leur libellé.
+ */
+@media (max-width: 640px) {
+  .feature-page :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]), select, textarea),
+  .history-period-tabs button,
+  .history-period-navigation button,
+  .history-status-tabs button,
+  .irrigation-needs-controls button,
+  .need-decision-form button,
+  .history-export-button,
+  .need-calculation > summary,
+  .need-diagnostic > summary {
+    min-height: var(--touch-target);
+  }
+
+  .history-summary-action,
+  .history-export-button,
+  .need-calculation > summary,
+  .need-diagnostic > summary {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+  }
+
+  .need-calculation > summary,
+  .need-diagnostic > summary {
+    display: flex;
+  }
+
+  .history-summary-action {
+    min-height: var(--touch-target);
+  }
+
+  .feature-page .water-toggle,
+  .feature-page .need-toggle {
+    min-height: var(--touch-target);
+  }
+
+  /* Les menus des matériels (liste et plan), les modes de calcul d'un apport,
+     les plis des apports et du planning, les liens de l'historique des alertes. */
+  .feature-page .equipment-menu button,
+  .feature-page .plan-equipment-menu button,
+  .feature-page .calculation-mode button {
+    min-height: var(--touch-target);
+  }
+
+  .feature-page .application-details > summary,
+  .feature-page .planning-changes > summary,
+  .feature-page .weather-alert-history a {
+    display: flex;
+    box-sizing: border-box;
+    min-height: var(--touch-target);
+    align-items: center;
+  }
+
+  .feature-page .application-details > summary {
+    padding-top: 0;
+  }
+
+  .feature-page .weather-alert-history a {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .species-link-suggestion > button,
+  .soil-garden-group > button,
+  .weather-alert-templates button {
+    flex: 1 1 auto;
+  }
+
+  .soil-garden-line[data-observe="true"] > .soil-garden > summary {
+    padding-right: 6.5rem;
+  }
+}

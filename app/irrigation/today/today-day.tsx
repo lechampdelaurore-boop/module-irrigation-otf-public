@@ -13,13 +13,6 @@ import { TodayAllDone } from './today-all-done';
 type LateBlock = Extract<TodayBlock, { kind: 'late' }>;
 type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
 
-const TIMELINE_LEGEND: { tone: TodayIrrigationLine['tone'] | 'past'; label: string }[] = [
-  { tone: 'late', label: 'En retard' },
-  { tone: 'planned', label: 'Planifiée' },
-  { tone: 'proposed', label: 'À valider' },
-  { tone: 'past', label: 'Déjà passé' },
-];
-
 /**
  * « Votre journée » (docs/aujourdhui-tableau-de-bord-contract.md,
  * sections 3.2 et 3.3) : les anciens blocs « En retard » et « À faire
@@ -127,7 +120,7 @@ function Timeline({ timeline }: { timeline: DayTimeline }) {
         ))}
       </div>
       <p className="today-legend" aria-hidden="true">
-        {TIMELINE_LEGEND.map((item) => <span key={item.tone}><i data-tone={item.tone} />{item.label}</span>)}
+        {timeline.legend.map((item) => <span key={item.tone}><i data-tone={item.tone} />{item.label}</span>)}
       </p>
     </div>
   );

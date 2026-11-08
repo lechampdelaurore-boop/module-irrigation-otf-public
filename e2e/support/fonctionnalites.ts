@@ -1,5 +1,5 @@
 import { expect, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
-import { nomsDesPagesDuMenu } from './parcours.ts';
+import { attendreLaPagePrete, nomsDesPagesDuMenu } from './parcours.ts';
 
 /**
  * Les parcours du choix des fonctionnalités (3.8, docs/feature-selection-contract.md)
@@ -12,6 +12,18 @@ export async function ouvrirUneFermeNeuve(context: BrowserContext, testInfo: Tes
   const adresse = testInfo.project.use.baseURL;
   if (!adresse) throw new Error('Adresse de base absente de la configuration Playwright.');
   await context.addCookies([{ name: 'demo-farm', value: `${nom}-${testInfo.project.name}`, url: adresse }]);
+}
+
+/** Une ferme neuve, propre au parcours et à la largeur, toutes les cases cochées, arrivée sur « Aujourd'hui » (P31). */
+export async function ouvrirUneFermeToutCochee(page: Page, context: BrowserContext, testInfo: TestInfo, nom: string): Promise<void> {
+  await ouvrirUneFermeNeuve(context, testInfo, nom);
+  await page.goto('/irrigation/bienvenue');
+  await attendreLeChoixDesFonctionnalites(page);
+  for (const caseACocher of await page.getByRole('checkbox').all()) {
+    if (!(await caseACocher.isChecked())) await caseACocher.check();
+  }
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await attendreLaPagePrete(page, 'aujourdhui');
 }
 
 /** L'écran de la première ouverture, prêt à répondre. */

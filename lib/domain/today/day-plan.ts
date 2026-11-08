@@ -37,7 +37,18 @@ export type DayTimeline = {
   /** L'heure actuelle sur la frise ; `null` quand elle en sort (la nuit). */
   now: { label: string; percent: number } | null;
   bars: TimelineBar[];
+  /**
+   * La légende : une entrée par couleur présente sur la frise, avec le statut
+   * que disent les cartes, puis « Déjà passé » quand l'heure actuelle y est.
+   */
+  legend: { tone: TimelineLegendTone; label: string }[];
 };
+
+type TimelineLegendTone = TodayIrrigationLine['tone'] | 'past';
+
+/** L'ordre de la légende : le plus pressant d'abord. */
+const LEGEND_ORDER: readonly TodayIrrigationLine['tone'][] = ['missed', 'late', 'planned', 'proposed'];
+const PAST_LEGEND_LABEL = 'Déjà passé';
 
 function roundedPercent(fraction: number): number {
   return Math.round(percentFromFraction(fraction) * PERCENT_DECIMALS) / PERCENT_DECIMALS;
@@ -76,11 +87,17 @@ export function dayTimeline(lines: readonly TodayIrrigationLine[], now: Date): D
     ticks.push({ label: `${hour} h`, percent: at(hour * MINUTES_PER_HOUR) });
   }
   const nowMinutes = farmMinutesOfDay(now);
+  const nowMark = nowMinutes >= from && nowMinutes <= from + length ? { label: hourLabel(nowMinutes), percent: at(nowMinutes) } : null;
+  const legend: DayTimeline['legend'] = LEGEND_ORDER.flatMap((tone) => {
+    const line = todays.find((item) => item.tone === tone);
+    return line ? [{ tone, label: line.status }] : [];
+  });
+  if (nowMark) legend.push({ tone: 'past', label: PAST_LEGEND_LABEL });
   return {
     startHour,
     endHour,
     ticks,
-    now: nowMinutes >= from && nowMinutes <= from + length ? { label: hourLabel(nowMinutes), percent: at(nowMinutes) } : null,
+    now: nowMark,
     bars: spans.map(({ line, start, end }) => ({
       key: line.key,
       tone: line.tone,
@@ -88,6 +105,7 @@ export function dayTimeline(lines: readonly TodayIrrigationLine[], now: Date): D
       widthPercent: Math.max(0, roundedPercent((end - start) / length)),
       label: `${line.hour}, ${line.status}, ${line.title}`,
     })),
+    legend,
   };
 }
 

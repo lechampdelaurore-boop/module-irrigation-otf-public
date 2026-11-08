@@ -5,6 +5,44 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Changé (audit ergonomique, lot 3, PR 2 : gestes par ligne, mots simples, accessibilité)
+
+- **Espèces** (Réglages) : les espèces à rattacher passent en tête, avec
+  « 3 espèces à rattacher sur 78 » au lieu d'un compte qui prenait « sans
+  référence » pour un rattachement, et la phrase « Sans référence : le
+  besoin n’est pas calculé, seul votre objectif compte. » ; une recherche
+  par nom ; « Rattacher comme Tomate… » propose, d'après le nom, une seule
+  culture du jeu commun et attend toujours une confirmation.
+- **Réserve du sol** : « Observer » sur chaque jardin ou abri dont la jauge
+  est inconnue, qui ouvre son curseur ; les jardins de plein champ au même
+  pourcentage, observés le même jour, tiennent en une phrase dépliable
+  (« Tous les jardins de plein champ : 50 % du plein, observé hier »).
+- **Alertes météo** : sans alerte, trois modèles en un clic, modifiables
+  avant l'enregistrement (gel sous 3 °C, forte chaleur au-dessus de 33 °C,
+  pluie au-delà de 15 mm, sur 3 jours) ; l'état des notifications de cet
+  appareil et « Activer sur cet appareil » sur la page ; la note du gel à
+  2 m repliée.
+- **Mots simples** : « Besoin en eau par culture » en titre, le détail
+  technique (sources, courbes, formule de l'ETM, lissage des stades) dans
+  des replis « Pour les experts » ; un seul tableau et un seul formulaire
+  pour les K_abri ; dans « Matériel », le nom du réglage séparé des planches
+  couvertes et une ligne de sens sous « Chevauchements » et « Cumul
+  maximal ».
+- **Accessibilité** : « Aller au contenu » en premier arrêt du clavier ;
+  toute cible à 44 px au téléphone (champs, listes, segments de
+  l'historique, « Saisir la pluie », plis, cases, menus des matériels) ; le contraste de chaque
+  texte mesuré sur toutes les pages, deux textes corrigés. Mode sombre et
+  lecteur d'écran non vérifiés. Aucun calcul changé, aucune migration.
+
+### Corrigé (« Aujourd'hui » : la légende de la frise)
+
+- La frise de « Votre journée » dessinait en rouge les irrigations « Non
+  faites » sans que la légende le dise. La légende nomme désormais chaque
+  couleur présente sur la frise du jour, et seulement celles-là, avec le
+  statut des cartes ; « Déjà passé » s'y ajoute quand l'heure actuelle est
+  sur la frise (contrat, précision T19). Aucun calcul changé, aucune
+  migration.
+
 ### Changé (audit ergonomique, lot 3, PR 1 : le planning et les arrosages)
 
 - **Planning** : les cartes de tête disent d'abord ce qui demande un geste,

@@ -257,6 +257,10 @@
   background: var(--green);
 }
 
+.today-legend i[data-tone="missed"] {
+  background: var(--danger);
+}
+
 .today-legend i[data-tone="late"] {
   background: var(--warn);
 }

@@ -17,7 +17,6 @@ import {
   wasCompletionAlreadySignaled,
 } from './completion-signal';
 import { remainingForEvent } from './presentation';
-import { publishNotificationStatus } from './notification-status-signal';
 
 export type NotificationStatus =
   | 'checking'
@@ -50,10 +49,6 @@ export function useIrrigationNotifications({
     useState<NotificationStatus>('checking');
   const notifiedEventIds = useRef(new Set<string>());
   const notificationRegistration = useRef<ServiceWorkerRegistration | null>(null);
-
-  useEffect(() => {
-    publishNotificationStatus(notificationStatus);
-  }, [notificationStatus]);
 
   useEffect(() => {
     let mounted = true;

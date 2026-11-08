@@ -1990,7 +1990,7 @@ Ne changent pas : D-003, D-004, D-006, D-028, D-041, D-047, D-067, D-073.
   `main` ; il repose sur la règle « PR à jour avant fusion ».
 
 
-## D-076 — Le lot 3 de l'audit ergonomique : un contrat court validé, la PR 1 (planning et arrosages) et dix précisions tranchées en codant
+## D-076 — Le lot 3 de l'audit ergonomique : un contrat court validé, la PR 1 (planning et arrosages), la PR 2 (gestes par ligne, mots simples, accessibilité) et vingt précisions tranchées en codant
 
 Date : 8 novembre 2026. Contrat court du lot 3 de la 3.8 quater (points 5,
 6, 8, 10, 12, 13 et 14 de l'audit, D-069), écrit avant tout code en
@@ -2055,3 +2055,50 @@ d'une validée relue, heures modifiées comprises, et l'isolation entre
 exploitations, cas 14), P31a aux deux largeurs et les parcours P2, P7, P10,
 P11, P12, P26 et P28 mis à jour (« Annuler » dans le menu « … », les
 nouveaux mots, la ligne de résumé du planning au téléphone).
+**En ligne** : #301 fusionnée le 8 novembre 2026 à 17 h 23 (`db8d342`) et
+déployée à 17 h 24 (run 42499644714, le job de déploiement réussi, les
+contrôles sautés comme le veut D-075).
+
+**PR 2, codée le 8 novembre 2026 en Opus 5.5 · Très élevé : les PR 2 et 3
+réunies** (minutes Actions comptées, comme le contrat le permet) : les
+gestes par ligne (points 12, 13, 10), les mots simples (point 8) et
+l'accessibilité (point 14). Dix précisions de plus, tranchées en codant par
+la recommandation et consignées au contrat (section 8, « Précisions de la
+PR 2 ») ; elles restent modifiables à la relecture du porteur :
+
+- F62 : une espèce « à rattacher » n'a aucun rattachement ou est rattachée
+  à « sans référence » ; elles passent en tête, avec « n espèces à
+  rattacher sur T » et la phrase de conséquence.
+- F63 : « Rattacher comme… » ne propose qu'une culture du jeu commun dont
+  tout le nom commence le nom de l'espèce, la plus précise, le CRIIAM avant
+  la FAO-56 ; une égalité restante ou aucun nom commun : rien. Une
+  confirmation, jamais d'écriture sans elle.
+- F64 : la recherche par nom dès deux espèces.
+- F65 : « Observer » sur chaque ligne « inconnue » de la réserve du sol ;
+  les jardins de plein champ au même pourcentage, observés le même jour,
+  rangés en une phrase dépliable, ouverte tant qu'un de ses jardins l'est.
+- F66 : les trois modèles d'alerte, les mêmes pour toutes les fermes, avec
+  un libellé déjà rempli, tant qu'il n'y a aucune alerte.
+- F67 : l'état des notifications de cet appareil et « Activer sur cet
+  appareil » sur la page « Alertes météo » ; la note du gel à 2 m repliée.
+- F68 : « Besoin en eau par culture », trois replis « Pour les experts »,
+  un seul tableau et un seul formulaire pour les K_abri ; dans « Matériel »,
+  le réglage en pastille à côté des planches couvertes et une ligne de sens
+  sous « Chevauchements » et « Cumul maximal ».
+- F69 : toute cible à 44 px au téléphone, mesurée sur les douze pages,
+  plis fermés puis ouverts.
+- F70 : le contraste mesuré sur chaque texte visible, aux deux largeurs ;
+  deux textes corrigés (le compte d'un onglet de l'historique, le chiffre
+  de l'eau sur l'eau pâle) ; un test sur les jetons de la charte.
+- F71 : « Aller au contenu », premier arrêt du clavier de chaque page.
+
+Le mode sombre et un lecteur d'écran ne sont pas vérifiés par ce lot (F50).
+
+**Ce qui ne change pas (PR 2).** Le moteur, la jauge, le calcul du besoin,
+les règles des alertes, les actions d'enregistrement : la proposition
+d'après le nom passe par l'action de rattachement existante, un modèle par
+celle d'une alerte. Vérifié par `tests/audit-ergonomie-lot3-gestes.test.ts`
+(cas 8 à 11 et 13), l'isolation entre exploitations par les tests de
+`tests/db` déjà en place (cas 14 : aucune lecture ni écriture nouvelle),
+P31b et P31c aux deux largeurs et les parcours P14, P16, P17 et P31a mis à
+jour.

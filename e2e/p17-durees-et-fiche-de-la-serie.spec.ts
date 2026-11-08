@@ -64,7 +64,9 @@ test('les durées d’une culture se règlent puis reviennent au jeu commun, et 
   await verifierCibleTactile(revenir, 'Le bouton « Revenir aux durées communes »');
   await revenir.click();
   await expect(statut).toHaveText('La culture reprend les durées du jeu commun.');
-  await expect(carte.locator('summary').first()).toContainText('jeu commun');
+  // La source et le jeu commun sont dans « Pour les experts » (audit ergonomique, lot 3, point 8) ; le résumé ne dit plus « durées de la ferme ».
+  await expect(carte.locator('summary').first()).not.toContainText('durées de la ferme');
+  await expect(carte.locator('details.experts-fold')).toContainText('jeu commun');
   await verifierLEtape(page, journal, 'retour aux durées communes');
 
   // Rattacher la carotte à la carotte du CRIIAM, dans Réglages.

@@ -29,7 +29,8 @@ import {
  * « Tout est fait » (section 3.4), sur une autre ferme neuve : une irrigation
  * planifiée il y a six heures, finie, fait paraître le bouton ; la
  * confirmation la liste cochée, se décoche, « Annuler » n'écrit rien,
- * « Enregistrer 1 irrigation » l'enregistre et le bouton disparaît.
+ * « Enregistrer 1 irrigation » l'enregistre et le bouton disparaît. À
+ * l'ordinateur, la légende de la frise nomme les couleurs de ses barres (T19).
  *
  * Ce qu'il ne prouve pas : les valeurs dessinées (les tests du domaine,
  * `tests/aujourdhui-tableau-de-bord.test.ts`, les chiffrent), la ferme
@@ -37,6 +38,26 @@ import {
  */
 
 const GROUPES = ['Arroser', 'Équiper', 'Surveiller'];
+
+/**
+ * T19 : la légende de la frise nomme chaque couleur de barre présente, et
+ * seulement celles-là, dans la couleur même de la barre. La frise n'existe
+ * que si une irrigation est du jour : à une heure de parcours où celle d'il y
+ * a six heures tombe la veille, il n'y a rien à vérifier.
+ */
+async function verifierLaLegendeDeLaFrise(page: Page): Promise<void> {
+  const frise = page.locator('.today-timeline-wrap');
+  if ((await frise.count()) === 0) return;
+  const tons = (selecteur: string) => frise.locator(selecteur).evaluateAll((elements) =>
+    elements.map((element): [string, string] => [element.getAttribute('data-tone') ?? '', getComputedStyle(element).backgroundColor]));
+  const barres = new Map(await tons('.today-timeline-bar'));
+  const legende = new Map(await tons('.today-legend i'));
+  legende.delete('past');
+  expect([...legende.keys()].sort()).toEqual([...barres.keys()].sort());
+  for (const [ton, fond] of barres) {
+    if (ton !== 'proposed') expect(legende.get(ton), `la pastille « ${ton} » de la légende`).toBe(fond);
+  }
+}
 
 /** La ferme neuve du parcours, toutes les cases cochées, arrivée sur « Aujourd'hui ». */
 async function ouvrirLaFermeToutCoche(page: Page, context: BrowserContext, testInfo: TestInfo, nom: string): Promise<void> {
@@ -128,6 +149,7 @@ test('« Tout est fait » : la confirmation liste l’irrigation passée, « Ann
   await expect(toutEstFait).toHaveAccessibleName('Tout est fait (1)');
   if (telephone) await verifierCibleTactile(toutEstFait, 'Le bouton « Tout est fait »');
   await verifierLEtape(page, journal, 'bouton « Tout est fait »');
+  if (!telephone) await verifierLaLegendeDeLaFrise(page);
 
   // Rien n'est écrit au premier clic : la confirmation liste, cochée ; décocher retire du compte.
   await toutEstFait.click();

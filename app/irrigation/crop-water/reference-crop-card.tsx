@@ -8,6 +8,7 @@ import type { KcOverrideRow } from '@/lib/domain/crop-water/settings-view';
 import { referenceCropSymbol } from '@/lib/domain/crop-water/plant-vignettes';
 import { referenceCropSummaryText, type ReferenceCropSummary } from '@/lib/domain/crop-water/crop-summary';
 import { DetailHint } from './detail-hint';
+import { ExpertsFold } from './experts-fold';
 import { FarmDurationsForm } from './farm-durations';
 import { KcOverrides, type KcOverrideSubmit } from './kc-overrides';
 import { PlantVignette } from './plant-vignette';
@@ -49,16 +50,18 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
   const { crop } = stored;
   const unusable = stored.problems.length > 0;
   const overridden = overrideRows.filter((row) => row.inForce !== null && row.inForce.kc !== null).length;
+  const farmMarks = [
+    ...(stored.origin === 'farm' ? ['durées de la ferme'] : []),
+    ...(unusable ? ['inutilisable'] : []),
+    ...(overridden > 0 ? [`${overridden} Kc surchargé${overridden > 1 ? 's' : ''}`] : []),
+    ...(rooting.inForce?.origin === 'farm' ? ['profil racinaire de la ferme'] : []),
+  ];
   return (
     <details className="reference-crop-card" data-unusable={unusable} suppressHydrationWarning>
       <summary>
         <strong><PlantVignette spriteHref={spriteHref} symbol={referenceCropSymbol(crop)} />{crop.name}</strong>
-        <small>
-          {kcSourceLabel(crop.source)} · {curveLabel(crop.curve)} · {stored.origin === 'farm' ? 'durées de la ferme' : 'jeu commun'}
-          {unusable ? ' · inutilisable' : ''}
-          {overridden > 0 ? ` · ${overridden} Kc surchargé${overridden > 1 ? 's' : ''}` : ''}
-          {rooting.inForce?.origin === 'farm' ? ' · profil racinaire de la ferme' : ''}
-        </small>
+        {/* La source et la forme de la courbe passent dans « Pour les experts » ; restent les réglages de la ferme (point 8). */}
+        {farmMarks.length > 0 ? <small>{farmMarks.join(' · ')}</small> : null}
         {unusable ? null : <span className="reference-crop-summary">{referenceCropSummaryText(summary)}</span>}
         <DetailHint />
       </summary>
@@ -67,19 +70,24 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
           {stored.problems.map((problem) => <li key={problem}>{problem}</li>)}
         </ul>
       ) : null}
-      {crop.source === 'fao56' ? (
-        <p className="reference-crop-note">
-          Valeurs de la FAO-56, en général plus hautes que les références régionales du CRIIAM.
+      <ExpertsFold>
+        <p className="reference-crop-meta">
+          {kcSourceLabel(crop.source)} · {curveLabel(crop.curve)} · {stored.origin === 'farm' ? 'durées de la ferme' : 'jeu commun'}
         </p>
-      ) : null}
+        {crop.source === 'fao56' ? (
+          <p className="reference-crop-note">
+            Valeurs de la FAO-56, en général plus hautes que les références régionales du CRIIAM.
+          </p>
+        ) : null}
+        <p className="reference-crop-meta">
+          {stored.sourceUrl ? <>Source : <a href={stored.sourceUrl} target="_blank" rel="noreferrer">{stored.sourceUrl}</a></> : 'Source : non renseignée'}
+          {stored.surveyedOn ? ` · relevée le ${surveyDay.format(new Date(`${stored.surveyedOn}T12:00:00Z`))}` : ''}
+          {stored.datesSource ? ` · dates par défaut : ${stored.datesSource}` : ''}
+        </p>
+      </ExpertsFold>
       <CurveDetails curve={crop.curve} />
       <p className="reference-crop-meta">
         Délai de levée : {crop.emergenceDelayDays['direct-sowing']} j en semis direct, {crop.emergenceDelayDays.planting} j en plantation.
-      </p>
-      <p className="reference-crop-meta">
-        {stored.sourceUrl ? <>Source : <a href={stored.sourceUrl} target="_blank" rel="noreferrer">{stored.sourceUrl}</a></> : 'Source : non renseignée'}
-        {stored.surveyedOn ? ` · relevée le ${surveyDay.format(new Date(`${stored.surveyedOn}T12:00:00Z`))}` : ''}
-        {stored.datesSource ? ` · dates par défaut : ${stored.datesSource}` : ''}
       </p>
       {unusable ? null : (
         <KcOverrides cropName={crop.name} rows={overrideRows} today={today} pending={pending} onSubmit={onOverride} />

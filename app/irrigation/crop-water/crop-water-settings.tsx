@@ -14,6 +14,7 @@ import {
 } from '../crop-water-actions';
 import { SHELTER_FACTOR_HELP } from '@/lib/domain/features/help';
 import { useSectionHelp } from '../shell/section-help';
+import { ExpertsFold } from './experts-fold';
 
 /**
  * Les réglages du besoin par culture (docs/crop-water-need-contract.md,
@@ -39,7 +40,7 @@ export function CropWaterSettingsSection({ season, settings, pending, run }: {
   return (
     <section className="crop-coefficients-part crop-water-settings" aria-labelledby="crop-water-settings-title">
       <h3 id="crop-water-settings-title">Réglages du calcul</h3>
-      <p>Ils corrigent l’ETM de chaque planche : ETM = ET0 × K_abri × Kc × K_paillage × K_ombrage.</p>
+      <p>Sous un abri, un paillage ou un filet, une culture ne boit pas comme en plein champ : ces réglages le disent au calcul.</p>
       <OptionsForm key={`${settings.options.smoothing}|${settings.options.shading}`} season={season} settings={settings} pending={pending} run={run} />
       <SheltersPart season={season} settings={settings} pending={pending} run={run} />
       <MulchPart season={season} beds={settings.beds} pending={pending} run={run} />
@@ -55,16 +56,20 @@ function OptionsForm({ season, settings, pending, run }: { season: number; setti
   return (
     <div className="crop-water-settings-block" role="group" aria-label="Options du calcul">
       <h4>Options</h4>
-      <label className="crop-water-option">
-        <input type="checkbox" checked={smoothing} onChange={(event) => setSmoothing(event.target.checked)} />
-        <span>
-          <strong>Lissage des passages de stade</strong> · {settings.options.smoothing ? 'activé' : 'désactivé'}
-          <small>
-            Le Kc passe d’un stade au suivant en ligne droite sur {KC_SMOOTHING_DAYS} jours, au lieu de changer d’un coup le jour du
-            passage.
-          </small>
-        </span>
-      </label>
+      {/* La formule de l'ETM et le lissage des stades, le même contenu, dans « Pour les experts » (audit ergonomique, lot 3, point 8). */}
+      <ExpertsFold>
+        <p className="reference-crop-meta">Le besoin de chaque planche : ETM = ET0 × K_abri × Kc × K_paillage × K_ombrage.</p>
+        <label className="crop-water-option">
+          <input type="checkbox" checked={smoothing} onChange={(event) => setSmoothing(event.target.checked)} />
+          <span>
+            <strong>Lissage des passages de stade</strong> · {settings.options.smoothing ? 'activé' : 'désactivé'}
+            <small>
+              Le Kc passe d’un stade au suivant en ligne droite sur {KC_SMOOTHING_DAYS} jours, au lieu de changer d’un coup le jour
+              du passage.
+            </small>
+          </span>
+        </label>
+      </ExpertsFold>
       <label className="crop-water-option">
         <input type="checkbox" checked={shading} onChange={(event) => setShading(event.target.checked)} />
         <span>
@@ -94,49 +99,78 @@ function SheltersPart({ season, settings, pending, run }: { season: number; sett
       {settings.shelters.length === 0 ? (
         <p className="crop-coefficients-empty">Aucun jardin n’est sous abri cette saison.</p>
       ) : (
-        <ul className="crop-water-settings-list" aria-label="K_abri des abris">
-          {settings.shelters.map((shelter) => (
-            <ShelterItem key={`${shelter.plotId}|${shelter.history.length}`} season={season} shelter={shelter} today={settings.today} pending={pending} run={run} />
-          ))}
-        </ul>
+        <>
+          {/* Un seul tableau et un seul formulaire, au lieu d'un formulaire par abri (audit ergonomique, lot 3, point 8). */}
+          <div className="reference-crop-table-wrap">
+            <table className="reference-crop-table shelter-factor-table" aria-label="K_abri des abris">
+              <thead>
+                <tr><th scope="col">Abri</th><th scope="col">K_abri aujourd’hui</th><th scope="col">Révisions datées</th></tr>
+              </thead>
+              <tbody>
+                {settings.shelters.map((shelter) => (
+                  <tr key={shelter.plotId}>
+                    <th scope="row">{shelter.name}</th>
+                    <td data-label="K_abri aujourd’hui">{decimal.format(shelter.factor)}{shelter.isDefault ? ', valeur par défaut' : ', valeur de la ferme'}</td>
+                    <td data-label="Révisions datées">
+                      {shelter.history.length > 0
+                        ? shelter.history.map((revision) => `${decimal.format(revision.value)} à partir du ${day(revision.effectiveFrom)}`).join(' ; ')
+                        : 'aucune'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <ShelterFactorForm
+            key={settings.shelters.map((shelter) => `${shelter.plotId}:${shelter.history.length}`).join('|')}
+            season={season}
+            shelters={settings.shelters}
+            today={settings.today}
+            pending={pending}
+            run={run}
+          />
+        </>
       )}
     </div>
   );
 }
 
-function ShelterItem({ season, shelter, today, pending, run }: { season: number; shelter: ShelterSetting; today: string; pending: boolean; run: Run }) {
+function ShelterFactorForm({ season, shelters, today, pending, run }: {
+  season: number;
+  shelters: readonly ShelterSetting[];
+  today: string;
+  pending: boolean;
+  run: Run;
+}) {
+  const [plotId, setPlotId] = useState(shelters.length === 1 ? shelters[0].plotId : '');
   const [value, setValue] = useState('');
   const [effectiveFrom, setEffectiveFrom] = useState(today);
   const factor = parseDecimal(value);
   return (
-    <li>
-      <strong>{shelter.name}</strong>
-      <span>
-        K_abri aujourd’hui : {decimal.format(shelter.factor)}{shelter.isDefault ? ', valeur par défaut' : ', valeur de la ferme'}
-      </span>
-      {shelter.history.length > 0 ? (
-        <small>
-          {shelter.history.map((revision) => `${decimal.format(revision.value)} à partir du ${day(revision.effectiveFrom)}`).join(' ; ')}
-        </small>
-      ) : null}
-      <div className="crop-water-inline-form" role="group" aria-label={`Régler le K_abri · ${shelter.name}`}>
-        <label>
-          <span>Nouveau K_abri</span>
-          <input type="text" inputMode="decimal" placeholder="par exemple 0,70" value={value} onChange={(event) => setValue(event.target.value)} />
-        </label>
-        <label>
-          <span>À partir du</span>
-          <input type="date" value={effectiveFrom} onChange={(event) => setEffectiveFrom(event.target.value)} />
-        </label>
-        <button
-          type="button"
-          disabled={pending || factor === null || effectiveFrom === ''}
-          onClick={() => factor !== null && run(() => addShelterFactorAction({ season, plotId: shelter.plotId, value: factor, effectiveFrom }))}
-        >
-          Enregistrer le K_abri
-        </button>
-      </div>
-    </li>
+    <div className="crop-water-inline-form" role="group" aria-label="Régler un K_abri">
+      <label>
+        <span>Abri</span>
+        <select value={plotId} onChange={(event) => setPlotId(event.target.value)}>
+          {shelters.length > 1 ? <option value="">— Choisir —</option> : null}
+          {shelters.map((shelter) => <option key={shelter.plotId} value={shelter.plotId}>{shelter.name}</option>)}
+        </select>
+      </label>
+      <label>
+        <span>Nouveau K_abri</span>
+        <input type="text" inputMode="decimal" placeholder="par exemple 0,70" value={value} onChange={(event) => setValue(event.target.value)} />
+      </label>
+      <label>
+        <span>À partir du</span>
+        <input type="date" value={effectiveFrom} onChange={(event) => setEffectiveFrom(event.target.value)} />
+      </label>
+      <button
+        type="button"
+        disabled={pending || plotId === '' || factor === null || effectiveFrom === ''}
+        onClick={() => factor !== null && run(() => addShelterFactorAction({ season, plotId, value: factor, effectiveFrom }))}
+      >
+        Enregistrer le K_abri
+      </button>
+    </div>
   );
 }
 

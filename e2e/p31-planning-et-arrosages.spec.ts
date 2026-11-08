@@ -1,5 +1,5 @@
-import { expect, test, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
+import { expect, test } from '@playwright/test';
+import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
 import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme } from './support/planning.ts';
@@ -31,22 +31,10 @@ import { poserUnObjectifDeFerme } from './support/planning.ts';
  * phrase est testée dans le domaine), la ferme réelle, un vrai téléphone.
  */
 
-/** La ferme neuve du parcours, toutes les cases cochées, arrivée sur « Aujourd'hui ». */
-async function ouvrirLaFermeToutCoche(page: Page, context: BrowserContext, testInfo: TestInfo, nom: string): Promise<void> {
-  await ouvrirUneFermeNeuve(context, testInfo, nom);
-  await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'aujourdhui');
-}
-
 test('planning : les gestes en tête, les planches sans matériel en action vers « Matériel », le reste rangé par motif', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
-  await ouvrirLaFermeToutCoche(page, context, testInfo, 'lot3-planning');
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot3-planning');
 
   // Un objectif de ferme, aucun matériel : toutes les planches attendent un matériel, aucune ne manque d'eau.
   await attendreLaPageIrrigation(page, 'besoins');
@@ -103,7 +91,7 @@ test('arrosages : rien de présélectionné, « À traiter » en tête, lignes p
   const telephone = testInfo.project.name === 'telephone';
   // Un seul « maintenant » par parcours : toutes les dates en découlent.
   const reference = Date.now();
-  await ouvrirLaFermeToutCoche(page, context, testInfo, 'lot3-arrosages');
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot3-arrosages');
   await attendreLaPageIrrigation(page, 'materiel');
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo);
 

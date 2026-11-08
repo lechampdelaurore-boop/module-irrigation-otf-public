@@ -13,13 +13,30 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - Économie des minutes GitHub Actions (D-075, en ligne, #300) : 2 706 min sur 3 000 utilisées le 8 novembre ; la CI saute les contrôles sur `main` et les parcours pour les PR de documents seuls.
+- « Aujourd'hui » en tableau de bord (D-074) : la légende de la frise oubliait
+  « Non faite » (retour du porteur du 8 novembre 2026) ; corrigée, elle dit
+  seulement les couleurs présentes sur la frise du jour (précision T19).
 - Audit ergonomique, lot 3 (3.8 quater, D-076) : contrat validé par le porteur
-  le 8 novembre 2026 (`docs/audit-ergonomie-lot3-contract.md`) ; **PR 1, le
-  planning et les arrosages (points 5 et 6), codée le 8 novembre 2026** en
-  Opus 5.5 · Très élevé (parcours P31a, précisions F52 à F61, aucune
-  migration). Ensuite la PR 2 (points 12, 13, 10) et la PR 3 (points 8, 14),
-  peut-être en une seule ; puis les corrections de la 3.9.
+  le 8 novembre 2026 (`docs/audit-ergonomie-lot3-contract.md`) ; PR 1, le
+  planning et les arrosages (points 5 et 6), en ligne (#301, P31a, F52 à
+  F61) ; **PR 2, les PR 2 et 3 réunies (points 12, 13, 10, 8 et 14), codée
+  le 8 novembre 2026** en Opus 5.5 · Très élevé (parcours P31b et P31c,
+  précisions F62 à F71, aucune migration) : espèces à rattacher en tête et
+  « Rattacher comme… », « Observer » sur la réserve du sol, modèles
+  d'alerte et état de l'appareil, mots simples, « Aller au contenu », cibles
+  de 44 px et contraste mesurés. Le lot 3 est complet à sa fusion ; relecture
+  en ligne du porteur ; ensuite les corrections de la 3.9. Le mode sombre et
+  un lecteur d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` au 8 novembre 2026 : toutes les PR jusqu'à
+  #302 (`e542313`, la légende de la frise d'« Aujourd'hui », T19, fusionnée
+  le 8 novembre à 17 h 50 et déployée à 17 h 51, run 42501901101, le job de
+  déploiement réussi, les contrôles sautés comme le veut D-075, aucune
+  migration, Workers inchangés). Avant elle :
+  #301 (`db8d342`, l'audit ergonomique, lot 3, PR 1 : le planning et les
+  arrosages, D-076, fusionnée le 8 novembre à 17 h 23 et déployée à
+  17 h 24, run 42499644714, le job de déploiement réussi, les contrôles
+  sautés comme le veut D-075, aucune migration, Workers inchangés). Avant
+  elle :
   #300 (`dda513c`, l'économie des minutes GitHub Actions, D-075, fusionnée
   le 8 novembre à 16 h 12 et déployée à 16 h 13, run 42493646188, le job de
   déploiement réussi, les trois jobs de contrôle sautés comme le veut

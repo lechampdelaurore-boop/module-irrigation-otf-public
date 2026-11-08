@@ -82,6 +82,8 @@ export function IrrigationShell({
 
   return (
     <main ref={shell} className="app-shell" data-page={page}>
+      {/* Le premier arrêt du clavier saute la barre et le menu (audit ergonomique, lot 3, point 14). */}
+      <a className="skip-link" href="#contenu">Aller au contenu</a>
       <Topbar
         userName={userName}
         signOutPath={signOutPath}
@@ -91,7 +93,7 @@ export function IrrigationShell({
       <div className="feature-layout">
         <FeatureMenu menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} />
 
-        <div className="feature-page">
+        <div className="feature-page" id="contenu" tabIndex={-1}>
           <section className="intro" aria-labelledby="page-title">
             <PageTitle
               title={title}

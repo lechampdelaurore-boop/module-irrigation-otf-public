@@ -68,15 +68,17 @@ test('un Kc se surcharge et revient à la source, et le K_abri, le paillage, l�
   const reglages = section.locator('section.crop-water-settings');
   await reglages.scrollIntoViewIfNeeded();
   await expect(reglages.getByRole('heading', { name: 'Réglages du calcul' })).toBeVisible();
-  const abri = reglages.getByRole('group', { name: 'Régler le K_abri · Tunnel 1' });
-  const abris = reglages.getByRole('list', { name: 'K_abri des abris' });
+  // Un seul tableau et un seul formulaire pour les abris (audit ergonomique, lot 3, point 8).
+  const abri = reglages.getByRole('group', { name: 'Régler un K_abri' });
+  const abris = reglages.getByRole('table', { name: 'K_abri des abris' });
   for (const [saisie, attendu] of [['0,7', '0,70'], ['0,8', '0,80']] as const) {
+    await abri.getByRole('combobox').selectOption({ label: 'Tunnel 1' });
     await abri.getByLabel('Nouveau K_abri').fill(saisie);
     const bouton = abri.getByRole('button', { name: 'Enregistrer le K_abri' });
     await verifierCibleTactile(bouton, 'Le bouton « Enregistrer le K_abri »');
     await bouton.click();
     await expect(statut).toHaveText('Le K_abri de Tunnel 1 est enregistré.');
-    await expect(abris).toContainText(`K_abri aujourd’hui : ${attendu}, valeur de la ferme`);
+    await expect(abris.getByRole('row').filter({ hasText: 'Tunnel 1' })).toContainText(`${attendu}, valeur de la ferme`);
   }
   await verifierLEtape(page, journal, 'K_abri réglé');
 

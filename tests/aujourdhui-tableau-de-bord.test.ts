@@ -137,6 +137,23 @@ test('la frise : 5 h à 22 h, l’heure actuelle, une barre par irrigation du jo
   assert.deepEqual(timeline.now, { label: '6 h', percent: 5.9 });
   assert.deepEqual(timeline.ticks.map((tick) => tick.label), ['6 h', '8 h', '10 h', '12 h', '14 h', '16 h', '18 h', '20 h', '22 h']);
   assert.equal(timeline.ticks.at(-1)?.percent, 100);
+  assert.deepEqual(timeline.legend, [{ tone: 'planned', label: 'Planifiée' }, { tone: 'proposed', label: 'À valider' }, { tone: 'past', label: 'Déjà passé' }]);
+});
+
+test('la légende de la frise dit chaque couleur présente, « Non faite » en tête, et seulement celles-là', () => {
+  // 16 h à la ferme : minuit est passé sans démarrage, 15 h a dépassé sa tolérance, 18 h attend.
+  const at = new Date('2026-11-12T15:00:00.000Z');
+  const events = [event('e1', '2026-11-11T23:00:00.000Z', 60), event('e2', '2026-11-12T14:00:00.000Z', 120), event('e3', '2026-11-12T17:00:00.000Z', 60)];
+  const { late, todo } = lines(events, [], at);
+  const timeline = dayTimeline([...late, ...todo], at);
+  assert.deepEqual(timeline?.bars.map((bar) => bar.tone), ['missed', 'late', 'planned']);
+  assert.deepEqual(timeline?.legend.map((item) => [item.tone, item.label]), [
+    ['missed', 'Non faite'], ['late', 'En retard'], ['planned', 'Planifiée'], ['past', 'Déjà passé'],
+  ]);
+  // La nuit, l'heure actuelle sort de la frise : rien de hachuré, pas de « Déjà passé ».
+  const night = new Date('2026-11-12T02:00:00.000Z');
+  const early = dayTimeline(lines([event('e1', '2026-11-12T03:00:00.000Z', 30)], [], night).todo, night);
+  assert.deepEqual(early?.legend, [{ tone: 'planned', label: 'Planifiée' }]);
 });
 
 test('la frise s’élargit pour une irrigation de 4 h ou qui finit après 22 h, et disparaît sans irrigation du jour', () => {

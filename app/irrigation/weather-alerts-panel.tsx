@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useSyncExternalStore, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import type { WeatherAlertHistoryEntry, WeatherAlertsView } from '@/lib/services/weather-alerts-view';
 import {
@@ -10,12 +10,8 @@ import {
   type WeatherAlertCriterion,
   type WeatherAlertCriterionInput,
 } from '@/lib/domain/weather/weather-alerts';
-import {
-  readNotificationStatus,
-  readServerNotificationStatus,
-  subscribeNotificationStatus,
-} from './irrigation-manager/notification-status-signal';
-import type { NotificationStatus } from './irrigation-manager/use-irrigation-notifications';
+import { weatherAlertTemplates, type WeatherAlertTemplate } from '@/lib/domain/weather/weather-alert-templates';
+import { WeatherAlertsDevice } from './weather-alerts-device';
 import {
   deleteWeatherAlertCriterionAction,
   saveWeatherAlertCriterionAction,
@@ -43,6 +39,20 @@ const NEW_DRAFT: Draft = {
   label: '',
   active: true,
 };
+
+/** Un modèle remplit le formulaire ; il reste modifiable avant « Enregistrer l'alerte » (point 10). */
+function templateDraft(template: WeatherAlertTemplate): Draft {
+  const { settings } = template;
+  return {
+    criterionId: null,
+    field: settings.field,
+    direction: settings.direction,
+    threshold: String(settings.threshold).replace('.', ','),
+    horizonDays: String(settings.horizonDays),
+    label: settings.label ?? '',
+    active: settings.active,
+  };
+}
 
 const HORIZONS = Array.from(
   { length: WEATHER_ALERT_HORIZON_DAYS.maximum - WEATHER_ALERT_HORIZON_DAYS.minimum + 1 },
@@ -151,6 +161,7 @@ export function WeatherAlertsPanel({
   );
 
   const unit = WEATHER_ALERT_FIELD_CHOICES.find((choice) => choice.field === draft?.field)?.unit ?? '°C';
+  const templates = weatherAlertTemplates(view.criteria.length);
 
   return (
     <article className="water-panel weather-alerts-panel" id="weather-alerts" aria-labelledby="weather-alerts-title">
@@ -158,12 +169,14 @@ export function WeatherAlertsPanel({
         <div>
           <h3 id="weather-alerts-title">Alertes météo</h3>
           <p>Une notification quand la prévision de la commune franchit le seuil que vous choisissez, sans marge ajoutée.</p>
-          <p className="weather-alerts-margin">
-            La prévision est celle de l’air à 2 m du sol : au ras du sol, il fait souvent 2 à 3 °C de moins, et sous abri la
-            température diffère. Pour une gelée, choisissez donc un seuil au-dessus de 0 °C. Le gel selon chaque culture, avec
-            cette marge réglable, est dans{' '}
-            {cropAlertsHref === null ? '« Alertes cultures », à cocher dans Réglages.' : <><a href={cropAlertsHref}>Alertes cultures</a>.</>}
-          </p>
+          <details className="weather-alerts-margin">
+            <summary>Pour le gel : la prévision est celle de l’air à 2 m</summary>
+            <p>
+              Au ras du sol, il fait souvent 2 à 3 °C de moins, et sous abri la température diffère. Pour une gelée, choisissez
+              donc un seuil au-dessus de 0 °C. Le gel selon chaque culture, avec cette marge réglable, est dans{' '}
+              {cropAlertsHref === null ? '« Alertes cultures », à cocher dans Réglages.' : <><a href={cropAlertsHref}>Alertes cultures</a>.</>}
+            </p>
+          </details>
         </div>
         {draft === null ? (
           <button type="button" disabled={pending} onClick={() => { setDraft(NEW_DRAFT); setRefusals({}); setNotice(null); }}>
@@ -172,7 +185,7 @@ export function WeatherAlertsPanel({
         ) : null}
       </div>
 
-      <DeviceReminder />
+      <WeatherAlertsDevice season={season} />
 
       {notice ? <p className="water-notice" role="status">{notice}</p> : null}
       {error ? <p className="water-error" role="alert">{error}</p> : null}
@@ -242,6 +255,18 @@ export function WeatherAlertsPanel({
       ) : null}
 
       {view.criteria.length === 0 && draft === null ? <p className="weather-alert-empty">Aucune alerte météo pour l’exploitation.</p> : null}
+      {draft === null && templates.length > 0 ? (
+        <div className="weather-alert-templates" role="group" aria-labelledby="weather-alert-templates-title">
+          <p id="weather-alert-templates-title">Partir d’un modèle, sur {templates[0].settings.horizonDays} jours, modifiable avant l’enregistrement :</p>
+          <div className="weather-alert-actions">
+            {templates.map((template) => (
+              <button key={template.key} type="button" disabled={pending} onClick={() => { setDraft(templateDraft(template)); setRefusals({}); setNotice(null); }}>
+                {template.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <ul className="weather-alert-list" aria-label="Alertes météo de l’exploitation">
         {view.criteria.map(({ criterion, summary, unavailableMessage, lastAlert }) => (
           <li key={criterion.id} className="weather-alert-criterion" data-active={criterion.active}>
@@ -286,29 +311,6 @@ export function WeatherAlertsPanel({
       )}
     </article>
   );
-}
-
-/** Le rappel du contrat : les alertes ne partent que vers les appareils où elles sont activées. */
-function DeviceReminder() {
-  const status = useSyncExternalStore(subscribeNotificationStatus, readNotificationStatus, readServerNotificationStatus);
-  return (
-    <div className="weather-alert-device" data-status={status}>
-      <span>{deviceText(status)}</span>
-      {status === 'default' ? <a href="#irrigation-notifications">Activer les alertes sur cet appareil</a> : null}
-    </div>
-  );
-}
-
-function deviceText(status: NotificationStatus): string {
-  const rule = 'Les alertes partent vers tous les appareils de l’exploitation où les alertes sont activées.';
-  switch (status) {
-    case 'enabled': return `${rule} Cet appareil les reçoit.`;
-    case 'default': return `${rule} Cet appareil ne les reçoit pas encore.`;
-    case 'checking': return rule;
-    case 'denied': return `${rule} Elles sont bloquées dans les réglages du navigateur de cet appareil.`;
-    case 'unsupported': return `${rule} Ce navigateur ne peut pas les recevoir.`;
-    case 'unavailable': return `${rule} Le service de notification n’a pas pu démarrer sur cet appareil.`;
-  }
 }
 
 /** « Valeur prévue 2,6 °C le lundi 2 novembre » : toujours une prévision, jamais une observation. */

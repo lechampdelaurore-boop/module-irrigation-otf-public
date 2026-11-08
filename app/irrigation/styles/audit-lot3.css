@@ -261,7 +261,8 @@ button.done-as-planned {
   height: 16px;
 }
 
-.done-as-planned-dialog {
+.done-as-planned-dialog,
+.line-confirm-dialog {
   width: min(480px, calc(100vw - 32px));
   margin: auto;
   inset: 0;
@@ -273,22 +274,26 @@ button.done-as-planned {
   color: var(--ink);
 }
 
-.done-as-planned-dialog::backdrop {
+.done-as-planned-dialog::backdrop,
+.line-confirm-dialog::backdrop {
   background: rgb(8 30 22 / 55%);
 }
 
-.done-as-planned-dialog h3 {
+.done-as-planned-dialog h3,
+.line-confirm-dialog h3 {
   margin: 0 0 8px;
   font: 300 var(--title-size)/1.2 var(--font-title);
 }
 
-.done-as-planned-dialog p {
+.done-as-planned-dialog p,
+.line-confirm-dialog p {
   margin: 0;
   font-size: .9rem;
   line-height: 1.55;
 }
 
-.done-as-planned-dialog .irrigation-dialog-actions button {
+.done-as-planned-dialog .irrigation-dialog-actions button,
+.line-confirm-dialog .irrigation-dialog-actions button {
   min-height: var(--touch-target);
 }
 
@@ -326,7 +331,8 @@ button.done-as-planned {
     flex: 1 1 auto;
   }
 
-  .done-as-planned-dialog .irrigation-dialog-actions {
+  .done-as-planned-dialog .irrigation-dialog-actions,
+  .line-confirm-dialog .irrigation-dialog-actions {
     flex-direction: column;
   }
 }
