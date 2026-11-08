@@ -297,6 +297,32 @@ budget ne se lit que sur l'eau — ; la limite reste vérifiée créneau par
 créneau sur les jours limités, et ce qu'elle y laisse sans place porte le même
 nom (point ouvert 35, corrigé le 9 octobre 2026).
 
+**Le budget d'une réserve** est l'eau que la garde laisse passer d'ici
+dimanche minuit : le stock observé moins le minimum de sécurité, plus les
+apports, moins ce qui est déjà planifié. Quand le stock est sous son minimum
+(décision 2 de la 3.9, D-052, 30 octobre 2026), le manque se retire
+d'abord : les apports remontent la réserve au minimum avant de compter dans
+le budget, comme la garde les compte. Les parts, prises sur ce budget, se
+répartissent alors entre toutes les planches, au lieu de servir les unes et
+de laisser les autres sans rien quand la garde arrête le placement. Les
+règles du placement ne changent pas — la garde, les plages, la dose, la part
+réservée — : changent le budget annoncé, les fractions et les parts qui en
+découlent. Sur la ferme, le 5 octobre 2026 (calcul T3) : 25 m³ en réserve
+pour un minimum de 40 m³, 75,27 m³ d'apports d'ici dimanche ; le budget est
+60,27 m³ et non 75,27 m³, la priorité normale vise 73 % de son besoin et
+non 91 %, et le plan plaçait déjà 60,2 m³ en tout.
+
+La ligne de budget de chaque chaîne montre, niveau de priorité par niveau,
+**la part visée et la part placée** (décision 2) : la part visée est la
+fraction de la conduite, celle des parts réservées au départ — sous le
+report, la part de la demande du niveau que la conduite sert au départ, une
+planche reportée comptant zéro — ; la part placée est l'eau utile placée,
+rapportée au besoin du niveau, comptées toutes deux sur la surface que le
+propre matériel de chaque planche mouille, comme le budget. Un niveau sans aucune demande s'affiche « — ». L'écart entre les deux
+se lit sans se calculer d'avance : le trop-plein d'une réserve pleine les
+jours de pluie (T2 : 97 % visés, 84 % placés), une part qu'une planche ne
+peut pas recevoir, ou l'eau libérée qu'une autre reçoit en plus.
+
 **La part réservée** (D-037, point ouvert 36, 9 octobre 2026). Chaque planche
 d'une chaîne d'eau a une part du budget : sa cible — la fraction de la
 conduite en pénurie, ou le besoin entier quand le budget suffit —, comptée sur
@@ -327,7 +353,8 @@ leur besoin que leur matériel peut encore servir, qui relèvent leur cible
 d'autant ; un nouveau tour place le supplément, quatre tours au plus. Les
 fractions affichées sont les parts réservées au départ, non le résultat : une
 planche peut recevoir plus, par l'eau libérée, ou moins, par ce que son propre
-créneau verse à côté.
+créneau verse à côté ; la part placée, à côté de chacune, dit le résultat
+(décision 2 de la 3.9).
 
 **Sous un arbitrage 3.4 validé** (décision 1 de la 3.9, D-052, 30 octobre
 2026), chaque allocation est une part réservée, par le même mécanisme : la
@@ -849,8 +876,11 @@ Deux limites vues en chemin et laissées telles quelles, tranchées par le
 porteur le 30 octobre 2026 (D-052) : l'arbitrage 3.4 validé, dont les
 allocations sont devenues des parts réservées à la 3.9 (note suivante) ; le
 budget d'une chaîne, qui compte les apports jusqu'à dimanche minuit, même
-après la dernière plage, et compte zéro, non le manque, quand le stock est
-sous le minimum de sécurité (décision 2, à coder).
+après la dernière plage, et comptait zéro, non le manque, quand le stock est
+sous le minimum de sécurité : il retire le manque depuis la décision 2 de la
+3.9 (« Le budget net du manque sous le minimum », plus bas) ; les apports
+d'après la dernière plage restent comptés, et la part placée montre ce
+qu'ils n'ont pas servi.
 
 ### L'arbitrage en parts réservées (3.9, décision 1, D-052, 8 novembre 2026)
 
@@ -883,6 +913,29 @@ réduite dans la même proportion. » ; puis, quand le non-reçu dépasse un lit
 « Z m³ alloués à n planches ne peuvent pas être reçus : ils restent non
 attribués, sans redistribution entre planches. » La note du manque d'eau
 (D-038) reste absente sous arbitrage, faute de budget.
+
+### Le budget net du manque sous le minimum (3.9, décision 2, D-052, 8 novembre 2026)
+
+`ReservoirTimeline.budgetCubicMeters()` part du stock observé, borné à la
+capacité, moins le minimum de sécurité, sans le borner par zéro : négatif
+quand le stock est sous son minimum. Il ajoute les apports de chaque jour
+jusqu'à la fin de l'horizon, retire les prélèvements déjà planifiés, et ne
+borne par zéro que le total. Un stock au-dessus de son minimum donne le
+budget d'avant, au millilitre.
+
+Chaque `SupplyBudget` porte, à côté de `fractions` (les parts visées),
+`demandByLevelCubicMeters`, la demande de chaque niveau, et
+`placedByLevelCubicMeters`, l'eau utile placée sur les planches du niveau,
+comptées sur la surface du propre matériel de chaque planche ; `placedBudgets`
+(`shortage.ts`) les remplit sur le plan fini, avec les planches de chaque
+chaîne qu'`applyShortage` a regroupées, pour que le regroupement reste à un
+seul endroit. La part placée d'un niveau est le rapport des deux ; un niveau sans demande n'a ni part visée
+ni part placée. Sous le report, `applyShortage` pose la fraction de chaque
+niveau à la part de sa demande servie au départ, les planches reportées à
+zéro ; elle restait à 1. `budgetLevelsText` (`presentation.ts`) écrit la ligne :
+« haute — · normale 73 % visés, 73 % placés · basse — ». Un calcul enregistré
+avant la correction, sans ces deux champs, garde sa ligne d'avant, les seules
+fractions.
 
 ## Notes de mise en œuvre (3.6)
 

@@ -249,13 +249,15 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
   // Réserve : jamais sous le minimum, avec tous les prélèvements placés, sur la
   // projection qui juge — bornée par la capacité, jamais par zéro — et non sur
   // le niveau affiché (point ouvert 19 : la borne à zéro rendait « 0 ≥ 0 » vrai).
+  // Jugée dès le premier prélèvement placé : avant lui, rien du plan ne la fait
+  // descendre, et une réserve qui part sous son minimum (S3) n'en est pas fautive.
   const reservoir = inputs.infrastructure.reservoirs[0];
-  if (reservoir.currentVolumeCubicMeters !== null) {
+  const withdrawals = plan.proposals.filter((proposal) => proposal.volumeCubicMeters !== null && proposal.pumpId);
+  if (reservoir.currentVolumeCubicMeters !== null && withdrawals.length > 0) {
     const timeline = new ReservoirTimeline({ reservoir, infrastructure: inputs.infrastructure, days: inputs.days, now: inputs.now, horizonEnd: new Date(plan.horizonEndAt), timeZone: TZ });
-    for (const proposal of plan.proposals) {
-      if (proposal.volumeCubicMeters !== null && proposal.pumpId) timeline.addWithdrawal({ startMs: Date.parse(proposal.startAt), endMs: Date.parse(proposal.endAt), cubicMeters: proposal.volumeCubicMeters });
-    }
-    const minimum = timeline.minimumLevel(inputs.now.getTime(), Date.parse(plan.horizonEndAt));
+    for (const proposal of withdrawals) timeline.addWithdrawal({ startMs: Date.parse(proposal.startAt), endMs: Date.parse(proposal.endAt), cubicMeters: proposal.volumeCubicMeters ?? 0 });
+    const firstStart = Math.min(...withdrawals.map((proposal) => Date.parse(proposal.startAt)));
+    const minimum = timeline.minimumLevel(firstStart, Date.parse(plan.horizonEndAt));
     assert.ok(minimum !== null && minimum.minimum >= reservoir.minimumSafetyCubicMeters - 1e-6, `réserve au plus bas à ${minimum?.minimum} m³`);
   }
   // Budget : la somme des volumes d'une chaîne ne dépasse jamais son budget, l'eau ni la limite journalière (D-037).
