@@ -9,6 +9,7 @@ import {
   PROPOSAL_STATUS_LABELS,
   arbitrationNote,
   bedReasonLabels,
+  budgetLevelsText,
   calculationTriggerLabel,
   pendingEventNotice,
   planDays,
@@ -61,8 +62,6 @@ type Props = {
   onAddManualSlot: () => void;
 };
 
-const percent = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
-const PERCENT = 100;
 /** Les délais entre deux relectures après un événement, en secondes : un recalcul prend de quelques secondes à trois quarts de minute sur le site (point ouvert 34). */
 const REFRESH_DELAYS_SECONDS = [1, 2, 3, 5, 8, 10, 10, 10];
 /** Les signaux que les autres sections envoient après un événement de la règle 4 (3.7) ; le canal porte ceux des autres onglets. */
@@ -432,8 +431,8 @@ function BudgetList({ budgets }: { budgets: readonly SupplyBudget[] }) {
             <span>
               {budget.availableCubicMeters === null ? 'eau mobilisable inconnue' : `${formatVolume(budget.availableCubicMeters)} mobilisables`} pour {formatVolume(budget.demandCubicMeters)} demandés
               {budget.dailyLimitRemainingCubicMeters !== null ? ` · limite journalière : ${formatVolume(budget.dailyLimitRemainingCubicMeters)} restants` : ''}
-              {' · part réservée : '}
-              {(['high', 'normal', 'low'] as const).map((priority) => `${priorityLabel(priority).toLocaleLowerCase('fr-FR')} ${percent.format(budget.fractions[priority] * PERCENT)} %`).join(', ')}
+              {/* La part visée et la part placée de chaque niveau, « — » sans demande (décision 2 de la 3.9, D-052). */}
+              {` · ${budgetLevelsText(budget)}`}
             </span>
           </li>
         ))}

@@ -1,19 +1,22 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
-import type { PlanningInputs, WeeklyPlan } from '../lib/domain/planning/contract.ts';
+import type { IrrigationNeedPriority } from '../lib/domain/irrigation-needs.ts';
+import type { PlanningInputs, SupplyBudget, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
-import { arbitrationNote } from '../lib/domain/planning/presentation.ts';
-import { cubicMetersFromMillimeters } from '../lib/domain/units.ts';
-import { assertInvariants, byEquipment, close, farm, plannedIrrigation, settings } from './support/planning-fixtures.ts';
+import { arbitrationNote, budgetLevelsText } from '../lib/domain/planning/presentation.ts';
+import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters } from '../lib/domain/units.ts';
+import { assertInvariants, byEquipment, close, farm, NOW, plannedIrrigation, settings } from './support/planning-fixtures.ts';
 
 /**
  * Les scénarios de pénurie de la 3.9 (docs/shortage-contract.md), en
  * commençant par les règles que le porteur a tranchées le 30 octobre 2026
  * (D-052). Décision 1 : sous un arbitrage 3.4 validé, chaque allocation est
  * une part réservée, sans redistribution entre planches ; ce qu'une planche
- * allouée ne peut pas recevoir reste non attribué, et l'écran le dit
- * (docs/planning-contract.md, « Pénurie »).
+ * allouée ne peut pas recevoir reste non attribué, et l'écran le dit.
+ * Décision 2 : le budget d'une réserve retire d'abord le manque sous son
+ * minimum de sécurité, et la ligne de budget montre la part visée et la part
+ * placée de chaque niveau (docs/planning-contract.md, « Pénurie »).
  */
 
 /** La demande de la ferme à quatre tunnels : 1,98 m³ du bloc 1, 5,608 m³ du bloc 2, 10,24 m³ des tunnels. */
@@ -163,4 +166,75 @@ test('la note de l’arbitrage se tait sous le litre et compte les planches au s
       + '0,16 m³ alloués à 1 planche ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
   );
   assert.equal(arbitrationNote({}), null);
+});
+
+// Décision 2 : le budget net du manque sous le minimum ; la part visée et la part placée.
+
+/** Les heures d'apport du forage d'ici la fin de l'horizon, du mardi 12 h 52 au dimanche minuit à la ferme. */
+const HORIZON_HOURS = (Date.parse('2026-10-04T22:00:00.000Z') - NOW.getTime()) / MILLISECONDS_PER_HOUR;
+/** La réserve de la ferme de test, 25 m³ pour un minimum de sécurité de 40 m³, le forage à 0,2 m³/h (S3). */
+const S3 = { stock: 25, minimum: 40, flow: 0.2 };
+const withSafetyMinimum = (inputs: PlanningInputs, minimumSafetyCubicMeters: number): PlanningInputs => ({
+  ...inputs,
+  infrastructure: { ...inputs.infrastructure, reservoirs: inputs.infrastructure.reservoirs.map((reservoir) => ({ ...reservoir, minimumSafetyCubicMeters })) },
+});
+const belowMinimum = () => withSafetyMinimum(farm({ extraTunnels: true, forageFlow: S3.flow, reservoirCubicMeters: S3.stock }).inputs, S3.minimum);
+/** L'eau utile placée sur les planches d'un niveau, comptée sur la surface que leur propre matériel mouille. */
+const placedOnLevel = (plan: WeeklyPlan, priority: IrrigationNeedPriority) =>
+  plan.beds.filter((bed) => bed.priority === priority).reduce((sum, bed) => sum + cubicMetersFromMillimeters(bed.placedMm, wettedAreaOf(bed.bedId)), 0);
+
+test('S3, réserve sous son minimum : le budget retire d’abord le manque, et les parts se répartissent entre toutes les planches (décision 2)', () => {
+  // Les 15 m³ manquants se comblent d'abord : il reste 0,2 × 131,1 h − 15 = 11,23 m³ pour 17,83 m³ demandés. Compter
+  // zéro au lieu du manque annonçait 26,23 m³ et aucune pénurie : la garde arrêtait le placement, les tunnels 3 et 4
+  // ne recevaient rien.
+  const inputs = belowMinimum();
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  const [budget] = plan.budgets;
+  const net = S3.stock - S3.minimum + S3.flow * HORIZON_HOURS;
+  close(budget.availableCubicMeters, net, 1e-6, 'le budget net du manque sous le minimum');
+  close(budget.fractions.normal, net / DEMAND_CUBIC_METERS, 1e-6, 'la part visée, prise sur ce budget');
+  for (const bed of plan.beds) assert.ok(bed.placedMm > 1, `${bed.bedName} : ${bed.placedMm} mm, servie avec les autres`);
+  assert.ok(placedVolume(plan) <= net + 1e-6, 'pas plus que le budget');
+  // Aucun créneau avant l'heure où l'apport a comblé le manque (S3, « La garde de la réserve »).
+  const filledAt = NOW.getTime() + (S3.minimum - S3.stock) / S3.flow * MILLISECONDS_PER_HOUR;
+  for (const proposal of plan.proposals) assert.ok(Date.parse(proposal.startAt) >= filledAt - 1000, `${proposal.id} ${proposal.startAt} avant que la réserve soit à son minimum`);
+});
+
+test('la ligne de budget montre la part visée et la part placée de chaque niveau, « — » pour un niveau sans demande (décision 2)', () => {
+  const plan = buildWeeklyPlan(belowMinimum(), settings);
+  const [budget] = plan.budgets;
+  assert.deepEqual(budget.demandByLevelCubicMeters && { ...budget.demandByLevelCubicMeters, normal: Math.round(budget.demandByLevelCubicMeters.normal * 1e4) / 1e4 }, { high: 0, normal: DEMAND_CUBIC_METERS, low: 0 });
+  assert.ok(budget.placedByLevelCubicMeters);
+  close(budget.placedByLevelCubicMeters.normal, placedOnLevel(plan, 'normal'), 1e-9, 'l’eau utile placée, comptée comme la demande');
+  assert.equal(budgetLevelsText(budget), 'haute — · normale 63 % visés, 62 % placés · basse —');
+});
+
+test('S10, trois niveaux : la part visée de la conduite, la part placée à côté ; sous le report, une planche reportée compte zéro (décision 2)', () => {
+  // Tunnels 1 et 2 en haute, blocs en normale, tunnels 3 et 4 en basse ; 12 m³ pour 17,83 m³ demandés.
+  const { inputs } = farm({ extraTunnels: true, forageFlow: 0, reservoirCubicMeters: 12, priorities: { 'tunnel-1': 'high', 'tunnel-2': 'high', 'tunnel-3': 'low', 'tunnel-4': 'low' } });
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  const [budget] = plan.budgets;
+  assert.deepEqual({ high: budget.fractions.high, low: budget.fractions.low }, { high: 1, low: 0 });
+  close(budget.fractions.normal, (12 - 5.12) / 7.5878, 1e-9, 'la normale prend ce que la haute laisse');
+  for (const level of ['high', 'normal', 'low'] as const) close(budget.placedByLevelCubicMeters?.[level] ?? null, placedOnLevel(plan, level), 1e-9, level);
+  assert.match(budgetLevelsText(budget), /^haute 100 % visés, 100 % placés · normale 91 % visés, \d+ % placés · basse 0 % visés, 0 % placés$/);
+  // Sous le report, la part visée d'un niveau est ce que la conduite sert au départ : une planche basse sur seize
+  // tient dans ce qui reste, les quinze autres sont reportées. Les fractions restaient à 100 %.
+  const deferSettings = { ...settings, shortageStrategy: 'defer' as const };
+  const deferred = buildWeeklyPlan(inputs, deferSettings);
+  assertInvariants(deferred, inputs, deferSettings);
+  close(deferred.budgets[0].fractions.high, 1, 1e-9, 'la haute servie en entier');
+  close(deferred.budgets[0].fractions.low, 1 / 16, 1e-9, 'une planche basse sur seize');
+  assert.match(budgetLevelsText(deferred.budgets[0]), / · basse 6 % visés, \d+ % placés$/);
+});
+
+test('un stock au-dessus de son minimum garde le budget d’avant ; un calcul enregistré avant garde sa ligne d’avant (décision 2)', () => {
+  const [above] = buildWeeklyPlan(farm().inputs, settings).budgets;
+  close(above.availableCubicMeters, 30 + 0.511 * HORIZON_HOURS, 1e-6, 'minimum à zéro');
+  const [withMinimum] = buildWeeklyPlan(withSafetyMinimum(farm({ reservoirCubicMeters: 25 }).inputs, 20), settings).budgets;
+  close(withMinimum.availableCubicMeters, 25 - 20 + 0.511 * HORIZON_HOURS, 1e-6, 'stock au-dessus du minimum');
+  const stored: SupplyBudget = { originKey: 'reservoir:reserve', originName: 'Réserve tampon', availableCubicMeters: 75.27, dailyLimitRemainingCubicMeters: null, demandCubicMeters: 82.7, fractions: { high: 1, normal: 0.91, low: 1 } };
+  assert.equal(budgetLevelsText(stored), 'part réservée : haute 100 %, normale 91 %, basse 100 %');
 });

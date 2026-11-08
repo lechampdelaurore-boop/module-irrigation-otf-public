@@ -286,3 +286,14 @@ test('l’arbitrage du plan s’enregistre avec le calcul et se relit ; un calcu
   assert.deepEqual(stored?.calculation.summary.arbitration, arbitration, 'relu tel quel');
   assert.deepEqual(stored?.calculation.summary.budgets, [], 'aucune ligne de budget sous un arbitrage');
 });
+
+test('la part visée et la part placée de chaque niveau s’enregistrent avec le calcul et se relisent (décision 2 de la 3.9, D-052)', async () => {
+  const budgets = [{
+    originKey: 'reservoir:reserve', originName: 'Réserve tampon', availableCubicMeters: 60.27, dailyLimitRemainingCubicMeters: null, demandCubicMeters: 82.7,
+    fractions: { high: 1, normal: 0.73, low: 1 }, demandByLevelCubicMeters: { high: 0, normal: 82.7, low: 0 }, placedByLevelCubicMeters: { high: 0, normal: 60.2, low: 0 },
+  }];
+  const placed = { ...plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], '2026-09-29T04:15:00.000Z'), budgets };
+  await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'manual', actorUserId: ALICE, plan: placed });
+  const stored = await readLatestPlanForUser(ALICE, 2026, WEEK);
+  assert.deepEqual(stored?.calculation.summary.budgets, budgets, 'relu tel quel, sans migration');
+});

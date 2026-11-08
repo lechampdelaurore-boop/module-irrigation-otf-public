@@ -16,9 +16,11 @@ registres, elle y renvoie.
   commencé le 8 novembre 2026 au soir**, en Opus 5.5 · Max, sur le dépôt
   public. Lot 2, une PR `fix/` par règle tranchée (D-052), contrat du
   planning précisé avant le code et test rouge d'abord : **correction 1 sur
-  4 codée**, l'arbitrage validé en parts réservées (décision 1, D-077,
-  précisions F72 à F75, aucune migration) ; restent les corrections des
-  décisions 2, 4 et 5. Ensuite l'écran d'arbitrage présenté comme un plan
+  4 en ligne** (#11 de ce dépôt), l'arbitrage validé en parts réservées
+  (décision 1, D-077, précisions F72 à F75) ; **correction 2 codée**, le
+  budget net du manque sous le minimum, la part visée et la part placée
+  (décision 2, D-079, précisions F76 à F79, aucune migration) ; restent les
+  corrections des décisions 4 et 5. Ensuite l'écran d'arbitrage présenté comme un plan
   d'assolement, décidé par le porteur le 8 novembre 2026 à 20 h 40
   (D-078) : une maquette d'abord, soumise au porteur avant tout code. Puis
   les lots 3 à 7. Ni recette finale ni tag `v0.2.0` sans le porteur. Les
@@ -47,9 +49,12 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 8 novembre 2026 : la
+  PR #11 (`187ff6e`, la correction 1 de la 3.9, l'arbitrage validé en parts
+  réservées, fusionnée à 21 h 07 et déployée à 21 h 21, run 42518503747, les
+  quatre jobs réussis, aucune migration, Workers inchangés). Avant elle : la
   PR #10 (`775c7cd`, la clôture de la 3.8 dans les registres, fusionnée à
   20 h 37 et déployée à 20 h 50, run 42515943412, les quatre jobs réussis,
-  aucune migration, Workers inchangés). Avant elle : la PR #9 (`fa45281`,
+  aucune migration, Workers inchangés) ; la PR #9 (`fa45281`,
   le retrait de Dependabot, fusionnée à 20 h 18 et déployée à 20 h 32, run
   42514364088, les quatre jobs réussis, aucune migration, Workers
   inchangés) ; avant
@@ -512,7 +517,8 @@ registres, elle y renvoie.
   Après la 3.8, close par le porteur : la deuxième passe de la refonte
   (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
   3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
-  cours : lot 2, quatre PR `fix/`, une à la fois.
+  cours : lot 2, quatre PR `fix/`, une à la fois, la première en ligne
+  (#11), la deuxième en PR.
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).

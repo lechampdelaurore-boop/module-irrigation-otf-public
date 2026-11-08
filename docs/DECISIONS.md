@@ -2159,6 +2159,10 @@ le résumé du calcul, en JSON. Vérifié par cinq tests de
 `tests/planning-shortage.test.ts` et un test de
 `tests/db/planning-repository.test.ts`.
 
+**En ligne** : #11 du dépôt public fusionnée le 8 novembre 2026 à 21 h 07
+(`187ff6e`) et déployée à 21 h 21 (run 42518503747, les quatre jobs réussis,
+aucune migration, Workers inchangés).
+
 
 ## D-078 — L'écran d'arbitrage présenté comme un plan d'assolement : dans la 3.9, maquette d'abord
 
@@ -2174,3 +2178,66 @@ répond « oui ».
 - **Ce qui ne change pas.** Le moteur reçoit une allocation par planche,
   quel que soit l'écran qui la produit : la correction 1 (D-077) n'en
   dépend pas.
+
+
+## D-079 — Le budget net du manque sous le minimum, la part visée et la part placée (correction 2 de la 3.9) : quatre précisions tranchées par la recommandation
+
+Date : 8 novembre 2026. Deuxième des quatre corrections du lot 2 de la 3.9,
+la décision 2 du porteur du 30 octobre 2026 (D-052) : le budget d'une chaîne
+d'eau retire d'abord le manque sous le minimum de sécurité, et la ligne de
+budget montre la part visée et la part placée, par niveau de priorité.
+Codée en Opus 5.5 · Max sur le dépôt public, le contrat du planning précisé
+d'abord (`docs/planning-contract.md`, « Pénurie » et la note « Le budget net
+du manque sous le minimum »), un test rouge avant le code
+(`tests/planning-shortage.test.ts`).
+
+**Le défaut corrigé** (S3). Sous son minimum, le stock comptait zéro dans le
+budget, non le manque : le budget annonçait tous les apports d'ici dimanche,
+quand la garde en retient d'abord ce qu'il faut pour remonter la réserve au
+minimum. Les parts, prises sur ce budget trop grand, servaient les premières
+planches examinées, et la garde arrêtait le placement avant les dernières.
+Sur la ferme de test (25 m³ en réserve, minimum 40 m³, forage à 0,2 m³/h),
+le budget annonçait 26,23 m³ pour 11,23 m³ que la garde laisse passer, et
+les seize planches des tunnels 3 et 4 ne recevaient rien. Sur la ferme, le
+5 octobre 2026 (calcul T3) : 75,27 m³ et « normale 91 % » annoncés, 60,2 m³
+placés.
+
+**Quatre précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation (mandat « option recommandée par défaut »)
+et consignées au contrat du planning ; elles restent modifiables à la
+relecture du porteur :
+
+- F76 : les règles du placement ne changent pas — la garde, les plages, la
+  dose, la part réservée de D-037 — ; changent le budget, les fractions et
+  les parts qui en découlent. La décision dit « aucun changement dans ce que
+  le moteur place » et veut des parts qui « se répartissent entre toutes les
+  planches plutôt que 91 % aux unes, rien aux autres » : la garde plaçait
+  déjà, en tout, l'eau du budget net ; c'est son partage qui change, et il
+  passe par les parts.
+- F77 : la part placée d'un niveau est l'eau utile placée sur ses planches,
+  le surplus exclu, rapportée à la demande du niveau, comptées toutes deux
+  sur la surface que le propre matériel de chaque planche mouille, comme le
+  budget. Elle se calcule sur le plan fini (`placedBudgets`, `shortage.ts`)
+  et s'enregistre avec le budget.
+- F78 : sous le report, la part visée d'un niveau est la part de sa demande
+  que la conduite sert au départ, une planche reportée comptant zéro ; elle
+  restait à 100 %. Sur la ferme de test (S10), une planche basse sur seize
+  tient dans ce qui reste : « basse 6 % visés ».
+- F79 : la ligne s'écrit « haute — · normale 73 % visés, 73 % placés ·
+  basse — », « — » pour un niveau sans demande ; un calcul enregistré avant
+  la correction, sans les deux champs nouveaux, garde sa ligne d'avant,
+  « part réservée : » suivi des seules fractions.
+
+**Ce qui ne change pas.** Un stock au-dessus de son minimum donne le budget
+d'avant, au millilitre, et le plan d'avant. Les apports d'après la dernière
+plage restent comptés dans le budget (limite laissée telle quelle par le
+porteur le 30 octobre 2026, D-052) : la part placée montre ce qu'ils n'ont
+pas servi. Sous arbitrage, toujours aucune ligne de budget (D-077). Aucune
+migration : les deux champs s'enregistrent avec le budget, dans le résumé du
+calcul, en JSON. Vérifié par quatre tests de
+`tests/planning-shortage.test.ts` (S3 ; la ligne par niveau ; S10 à trois
+niveaux, sous « prioritaires d'abord, puis part égale » et sous le report ;
+un stock au-dessus du minimum et un calcul enregistré avant) et un test de
+`tests/db/planning-repository.test.ts` ; l'invariant commun des fixtures
+juge la réserve à partir du premier prélèvement placé, la garde la laissant
+sous son minimum jusque-là.

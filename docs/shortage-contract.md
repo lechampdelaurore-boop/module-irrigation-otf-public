@@ -215,7 +215,9 @@ l'état au 30 octobre 2026.
    ligne de budget retire d'abord le manque sous le minimum (décision 2) :
    60,27 m³ et « normale 73 % », ce que le plan a placé, au lieu de 75,27 m³
    et 91 % aujourd'hui. Vérification : recette T3 (garde prouvée) ; test du
-   moteur à écrire. État : ⬜ test, règle tranchée (décision 2), à coder.
+   moteur sur la ferme de test, forage à 0,2 m³/h
+   (`tests/planning-shortage.test.ts`, D-079). État : 🟡 test écrit et
+   règle codée, recette finale à jouer.
 4. **S4 — Réserve engagée sous son minimum par des irrigations planifiées à
    la main.** Réserve 25 m³, minimum 20, deux irrigations planifiées à la main
    de 4 m³ chacune lundi soir. Attendu : tant que la projection est sous 20,
@@ -280,8 +282,10 @@ l'état au 30 octobre 2026.
     haute ne porte de motif d'eau ; somme ≤ 12 m³ ; les fractions affichées
     sont les parts de départ, non le résultat (D-037). Vérification : test
     « manque d'eau » étendu à trois niveaux — il n'a pas de planche basse
-    aujourd'hui — ; recette finale avec des priorités posées par le porteur
-    (décision 3). État : 🟡 test, ⬜ recette.
+    aujourd'hui — ; les fractions et la part placée de chaque niveau le sont
+    depuis la correction 2 (`tests/planning-shortage.test.ts`, D-079), les
+    motifs restent à vérifier ; recette finale avec des priorités posées par
+    le porteur (décision 3). État : 🟡 test, ⬜ recette.
 11. **S11 — Part égale pour toutes.** Mêmes données, R9 « part égale ».
     Attendu : 12 / 17,83 = 67 % pour chaque planche, quel que soit son
     niveau ; motif sur toutes ; somme ≤ 12 m³. Vérification : test existant
@@ -308,8 +312,9 @@ l'état au 30 octobre 2026.
     arbitrage vide ») ; test « dernière planche examinée sous arbitrage » à
     écrire, rouge tant que la décision 1 n'est pas codée ; recette finale :
     arbitrage validé à l'écran de la faisabilité puis plan calculé (la
-    recette 3.4 l'a joué pour la faisabilité, jamais pour le plan). État : ⬜,
-    règle tranchée (décision 1), à coder.
+    recette 3.4 l'a joué pour la faisabilité, jamais pour le plan). État : 🟡
+    test écrit et règle codée (`tests/planning-shortage.test.ts`, D-077, #11),
+    recette finale à jouer.
 
 ### C. La part réservée (D-037)
 

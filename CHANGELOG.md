@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9, correction 2 : le budget net du manque sous le minimum, la part visée et la part placée)
+
+- **Le budget d'une réserve sous son minimum retire d'abord le manque**
+  (décision 2 de la 3.9, D-052, précisions D-079) : il comptait tous les
+  apports d'ici dimanche, quand la garde en retient d'abord ce qu'il faut
+  pour remonter la réserve au minimum. Les parts, prises sur ce budget trop
+  grand, servaient les premières planches et laissaient les dernières sans
+  rien (les tunnels 3 et 4 de la ferme de test, à 0 mm). Elles se répartissent
+  maintenant entre toutes les planches ; les règles du placement ne changent
+  pas. Un stock au-dessus de son minimum garde le budget d'avant.
+- **La ligne de budget montre la part visée et la part placée** de chaque
+  niveau de priorité, « — » pour un niveau sans demande : l'écart entre les
+  deux se lit, par exemple le trop-plein d'une réserve pleine les jours de
+  pluie. Sous le report, une planche reportée compte zéro dans la part visée.
+  Un calcul enregistré avant garde sa ligne d'avant. Aucune migration.
+
 ### Corrigé (3.9, correction 1 : l'arbitrage validé en parts réservées)
 
 - **Sous un arbitrage validé, chaque allocation est réservée à sa planche**
@@ -18,7 +34,8 @@ source détaillée commit par commit.
   journalière), chacune est réduite dans la même proportion. Le planning le
   dit sous les cartes du résumé : l'eau allouée, sa réduction, et l'eau
   allouée que les planches ne peuvent pas recevoir, qui reste non
-  attribuée. Sans arbitrage, rien ne change. Aucune migration.
+  attribuée. Sans arbitrage, rien ne change. Aucune migration. En ligne le
+  8 novembre 2026 à 21 h 21 (#11 de ce dépôt).
 
 ### Clos (3.8, fonctionnalités à la carte)
 

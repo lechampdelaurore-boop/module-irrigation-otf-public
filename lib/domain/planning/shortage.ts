@@ -32,6 +32,17 @@ export type ArbitrationShares = {
   ledgers: readonly ShareLedger[];
 };
 
+/**
+ * Une ligne de budget telle que la conduite la pose, avec les planches de sa
+ * chaîne, pour y lire après le placement l'eau placée par niveau (décision 2
+ * de la 3.9, D-052).
+ */
+export type PendingBudget = {
+  budget: SupplyBudget;
+  beds: readonly BedState[];
+  volumeOf: (bed: BedState, mm: number) => number;
+};
+
 /** Les planches d'une chaîne d'eau, avec son budget d'ici dimanche et le terme qui le borne. */
 type ChainGroup = {
   key: string;
@@ -52,7 +63,7 @@ export function applyShortage(
   weekEndAt: Date,
   inputs: PlanningInputs,
   settings: PlanningSettings,
-): { budgets: SupplyBudget[]; shares: Map<string, ShareLedger>; arbitration: ArbitrationShares | null } {
+): { budgets: PendingBudget[]; shares: Map<string, ShareLedger>; arbitration: ArbitrationShares | null } {
   const equipmentById = new Map(equipment.map((item) => [item.id, item]));
   const wettedFor = (bed: BedState) => bed.equipmentId
     ? equipmentById.get(bed.equipmentId)?.coveredBeds.find((covered) => covered.bedId === bed.bedId)?.wettedAreaSquareMeters ?? null
@@ -69,7 +80,7 @@ export function applyShortage(
     return { budgets: [], ...applyArbitration(beds, inputs.arbitration, groups, wettedFor, volumeOf) };
   }
 
-  const budgets: SupplyBudget[] = [];
+  const budgets: PendingBudget[] = [];
   const shares = new Map<string, ShareLedger>();
   const deferredFirst = new Set(inputs.deferredBedIds ?? []);
   for (const group of groups) {
@@ -105,6 +116,12 @@ export function applyShortage(
             bed.reasons.add('deferred');
           }
         }
+        // La part visée d'un niveau sous le report : ce que la conduite sert au départ, une reportée comptant zéro
+        // (décision 2 de la 3.9, D-052).
+        for (const level of ['high', 'normal', 'low'] as const) {
+          if (demandByLevel[level] <= EPSILON) continue;
+          fractions[level] = group.beds.filter((bed) => bed.priority === level).reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0) / demandByLevel[level];
+        }
         deferMode = true;
       }
     }
@@ -124,15 +141,34 @@ export function applyShortage(
       }
     }
     budgets.push({
-      originKey: key,
-      originName: chain.originName,
-      availableCubicMeters: available,
-      dailyLimitRemainingCubicMeters: dailyRemaining,
-      demandCubicMeters: demand,
-      fractions,
+      budget: {
+        originKey: key,
+        originName: chain.originName,
+        availableCubicMeters: available,
+        dailyLimitRemainingCubicMeters: dailyRemaining,
+        demandCubicMeters: demand,
+        fractions,
+        demandByLevelCubicMeters: demandByLevel,
+      },
+      beds: group.beds,
+      volumeOf,
     });
   }
   return { budgets, shares, arbitration: null };
+}
+
+/**
+ * Après le placement, la part placée de chaque niveau à côté de sa part
+ * visée (décision 2 de la 3.9, D-052) : l'eau utile que ses planches ont
+ * reçue, comptée comme sa demande, sur la surface que le propre matériel de
+ * chaque planche mouille.
+ */
+export function placedBudgets(pending: readonly PendingBudget[]): SupplyBudget[] {
+  return pending.map(({ budget, beds, volumeOf }) => {
+    const placed: Record<IrrigationNeedPriority, number> = { high: 0, normal: 0, low: 0 };
+    for (const bed of beds) placed[bed.priority] += volumeOf(bed, bed.placedMm);
+    return { ...budget, placedByLevelCubicMeters: placed };
+  });
 }
 
 /** Les planches à servir, regroupées par chaîne d'eau, chaque chaîne avec son budget et le terme qui le borne. */
