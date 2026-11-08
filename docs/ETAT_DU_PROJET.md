@@ -12,6 +12,9 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- 3.8, fonctionnalités à la carte : **close par le porteur le 8 novembre
+  2026 à 20 h 21**, des modifications restant possibles plus tard, chacune
+  par une PR (détail plus bas).
 - Économie des minutes GitHub Actions (D-075, en ligne, #300) : 2 706 min sur 3 000 utilisées le 8 novembre ; la CI saute les contrôles sur `main` et les parcours pour les PR de documents seuls.
 - « Aujourd'hui » en tableau de bord (D-074) : la légende de la frise oubliait
   « Non faite » (retour du porteur du 8 novembre 2026) ; corrigée, elle dit
@@ -186,9 +189,15 @@ registres, elle y renvoie.
   quatre crans, les dessins des espèces d'Ouvre ta ferme, la marge expliquée
   dans Alertes météo, les marges de gel réglables (migration additive 0028)
   et l'historique replié dans Alertes cultures, la semaine du planning en
-  tableau sur grand écran. Le porteur refera un passage en ligne ; la 3.8
-  se clôt après son retour. La deuxième passe de la refonte (D-068) suit,
-  codée et déployée le 7 novembre au soir (#279).
+  tableau sur grand écran ; le porteur a confirmé le 8 novembre que les
+  dessins d'Ouvre ta ferme s'affichent en ligne. La deuxième passe de la
+  refonte (D-068) a suivi, codée et déployée le 7 novembre au soir (#279).
+  **3.8 ✅ close par le porteur le 8 novembre 2026 à 20 h 21** (« On va
+  clôturer la 3.8 pour l'instant, quitte à ce que je fasse des modifications
+  ultérieurement ») : ses modifications éventuelles passeront chacune par
+  une PR. Reste posée, sans code : l'écran d'arbitrage d'une pénurie
+  présenté comme un plan d'assolement (retour du 7 novembre), recommandé
+  dans la 3.9, maquette d'abord.
 - 3.8 bis, calculateur d'irrigation : contrat validé par le porteur le
   6 novembre 2026 (`docs/irrigation-calculator-contract.md`, D-061). **Codé
   la nuit du 7 au 8 novembre 2026 sur le mandat du porteur** (« enchaîner les
