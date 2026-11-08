@@ -348,9 +348,13 @@ planches », la contrainte limitante « part de la semaine atteinte, le reste
 est réservé aux autres planches », et les planches servies sous leur cible
 portent le motif de la coupe de la chaîne, « stock et ressources » ou « limite
 journalière ». Sous la dose minimale, le matériel ne part pas : il attend une
-part plus grande. Chaque planche reçoit ainsi sa part, la dernière examinée
-comme la première, et la somme des volumes d'une chaîne ne dépasse jamais son
-budget.
+part plus grande. Le dernier jour de la semaine, il n'y a plus rien à
+attendre : quand la première plage que le matériel peut prendre est celle du
+dimanche, sa part est placée quand même, si petite soit-elle, comme un reste
+hors pénurie (« exception du dernier jour », décision 5 de la 3.9, D-052),
+pour ne pas laisser dans la réserve une eau que personne n'aura. Chaque
+planche reçoit ainsi sa part, la dernière examinée comme la première, et la
+somme des volumes d'une chaîne ne dépasse jamais son budget.
 
 Ce qu'une planche ne peut pas recevoir — plage horaire, espacement, dose
 minimale, réserve au minimum au moment voulu, matériel arrêté — est libéré à
@@ -867,7 +871,8 @@ garde de la réserve, qui restent vérifiées ; la coupe porte le motif de dose
 `reserved-share`, sauf quand elle ne retire qu'une seconde d'arrondi, moins
 d'un centième de millimètre à la planche de référence. Sous la dose minimale,
 le matériel est arrêté avec le motif de la coupe de la chaîne et marqué pour
-repartir si sa part grandit.
+repartir si sa part grandit, sauf sur la plage du dernier jour, où sa part
+est placée telle qu'elle est (« La part du dernier jour », plus bas).
 
 À l'imputation, chaque planche arrosée paie l'eau utile reçue au prix de son
 matériel, jusqu'à sa part ; le reste du volume est pris sur l'eau non
@@ -983,6 +988,61 @@ prochain événement », avec la phrase « Elles passent en tête au calcul qui
 suit un événement : un arrosage validé ou fait, de l'eau nouvelle, un stock
 corrigé. Recalculer sans événement ne change pas leur tour. » « Au prochain
 calcul » promettait ce que le calcul sans événement ne fait plus.
+
+### La part du dernier jour (3.9, décision 5, D-052, 8 novembre 2026)
+
+La borne des parts (`engine.ts`, « La part réservée » plus haut) arrêtait le
+matériel dès que ce que ses parts paient tombait sous la dose minimale, quel
+que soit le jour. Elle tient maintenant compte de **la plage du dernier
+jour** de la semaine, celle qui commence le dimanche (`interval.dateKey`,
+comme toute plage : la nuit de dimanche pour l'aspersion, la journée de
+dimanche pour le goutte-à-goutte) : sur cette plage, le créneau accepte
+toute durée jusqu'à la seconde, comme l'exception du dernier jour le fait
+pour un reste sous la dose minimale (`last-day-below-minimum`, une seconde
+au moins). La garde de la réserve et la ressource directe, qui viennent
+après la borne, peuvent encore raccourcir ce créneau, jusqu'à la seconde
+elles aussi : quelques secondes retirées par la réserve ne refusent pas un
+créneau que la part accepte.
+
+- **Avant le dernier jour**, rien ne change : le matériel s'arrête à sa
+  première plage, la coupe ne dépendant pas du jour, et attend une part plus
+  grande. Un calcul de mercredi ou de samedi ne place donc pas sur dimanche
+  une part sous la dose minimale ; le calcul de dimanche la place, comme un
+  reste hors pénurie sous la dose minimale, qui attend le samedi (test
+  « dernier jour » du moteur).
+- **La part placée** est celle que les parts de ses planches paient quand le
+  matériel est examiné, débordement compris : sur la plage du dimanche, le
+  matériel n'attend plus la redistribution de fin de tour, comme l'exception
+  du dernier jour place déjà sans attendre une part elle-même sous la dose
+  minimale. Attendre la faisait fondre, l'eau libérée allant aussi à des
+  planches qui ne peuvent plus rien recevoir le dimanche, et laissait de
+  l'eau dans la réserve. Une part qu'une redistribution aurait agrandie est
+  donc placée telle qu'elle est : la décision fait passer l'exception avant
+  l'attente.
+- **Le motif** reste celui de la borne (S15) : la dose dit « la part de la
+  semaine réservée à ses planches », la contrainte limitante « part de la
+  semaine atteinte, le reste est réservé aux autres planches ». Un créneau
+  que la borne ne coupe pas, sa planche de référence ayant une cible déjà
+  sous la dose minimale, garde « le reste de la semaine, sous la dose
+  minimale : c'est le dernier jour ».
+- **Sous un arbitrage validé**, le chemin est le même : une allocation que
+  son débordement fait passer sous la dose minimale est placée le dimanche,
+  au lieu de rester non attribuée.
+- **Ne changent pas** : la limite journalière, la pompe, la plage horaire et
+  les créneaux refusés ou protégés gardent la dose minimale, comme pour un
+  reste qui l'atteint hors pénurie ; la somme des volumes d'une chaîne ne
+  dépasse jamais son budget.
+
+Exemple, la ferme du point 36 à 26 % de sa demande (S18,
+`tests/planning-shortage.test.ts`) : 5,2 mm de part partout ; les rampes du
+tunnel 1 et du bloc 2 versent aussi sur le bloc 1, et leurs parts ne paient
+plus que 4,80 et 4,92 mm, sous les 5 mm de l'aspersion. Mardi et samedi,
+elles attendent, comme avant. Le dimanche à 0 h 30, elles ne partaient
+qu'après les tours, à 2,3 mm, et 1,1 m³ restait dans la réserve ; elles
+partent dimanche soir à 4,80 et 4,92 mm, et la somme des volumes est le
+budget. Sous un arbitrage de 5,2 mm par planche, réserve égale aux
+allocations, 2,12 m³ alloués à dix-huit planches restaient non attribués le
+dimanche ; il n'en reste rien.
 
 ## Notes de mise en œuvre (3.6)
 
