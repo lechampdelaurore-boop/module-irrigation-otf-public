@@ -1973,6 +1973,8 @@ Ne changent pas : D-003, D-004, D-006, D-028, D-041, D-047, D-067, D-073.
 
 ## D-075 — Économiser les minutes GitHub Actions sans affaiblir la protection de main
 
+> **Annulée le 8 novembre 2026** (passage du travail sur le dépôt public `module-irrigation-otf-public`, dont les minutes Actions sont gratuites, sur demande du porteur). Retour au protocole complet : contrôles sur chaque PR **et** sur `main`, job Parcours jamais sauté. Le texte ci-dessous reste pour mémoire.
+
 - **Contexte.** Le 8 novembre 2026, GitHub a signalé 2 706 minutes utilisées
   sur 3 000 incluses ; le budget Actions du compte est à 0 $, donc au-delà les
   Actions sont bloquées (et les fusions avec elles) jusqu'au 1er décembre. Un

@@ -22,8 +22,10 @@ marquée comme terminée sans élément nouveau qui le justifie.
 
 ## Git, PR et publication
 
-- GitHub, dépôt `lechampdelaurore-boop/module-irrigation-otf`, est l'unique
-  source de vérité (D-011). `main` y est protégée (D-013) : toute modification
+- GitHub, dépôt public `lechampdelaurore-boop/module-irrigation-otf-public`, est
+  l'unique source de vérité (D-011, depuis le 8 novembre 2026 ; l'ancien dépôt
+  privé `module-irrigation-otf` est une archive en lecture seule : ne jamais le
+  rendre public, son historique contient des données personnelles). `main` y est protégée (D-013) : toute modification
   passe par une PR à jour dont les jobs « Application », « Workers
   Cloudflare » et « Parcours navigateur » sont verts (D-026).
 - Une fusion dans `main` déploie le site (D-016, `docs/publication.md`) :

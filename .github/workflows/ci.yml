@@ -16,9 +16,6 @@ concurrency:
 jobs:
   application:
     name: Application
-    # Sur main, la fusion rejoue le même code déjà vert (la protection de main
-    # exige la PR à jour) : on ne refait pas ces contrôles, seulement le déploiement.
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -48,9 +45,6 @@ jobs:
 
   workers:
     name: Workers Cloudflare
-    # Sur main, la fusion rejoue le même code déjà vert (la protection de main
-    # exige la PR à jour) : on ne refait pas ces contrôles, seulement le déploiement.
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -74,9 +68,6 @@ jobs:
 
   parcours:
     name: Parcours navigateur
-    # Sur main, la fusion rejoue le même code déjà vert (la protection de main
-    # exige la PR à jour) : on ne refait pas ces contrôles, seulement le déploiement.
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     # Job séparé du job « Application » : il installe un navigateur, son temps et
     # ses échecs doivent rester lisibles (docs/browser-journeys-contract.md).
@@ -87,33 +78,20 @@ jobs:
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7
-      - name: Voir si les parcours sont utiles
-        id: scope
-        # Une PR qui ne touche que des documents (docs/, fichiers .md, modèle de
-        # PR) ne change aucun parcours : on saute le navigateur (15 min).
-        run: |
-          git fetch --depth=1 origin "${{ github.event.pull_request.base.sha }}"
-          other=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD | grep -Ev '^docs/|\.md$|^\.github/pull_request_template' || true)
-          if [ -n "$other" ]; then echo "needed=true" >> "$GITHUB_OUTPUT"; else echo "needed=false" >> "$GITHUB_OUTPUT"; echo "PR de documentation seule : parcours non rejoués."; fi
       - name: Installer pnpm
-        if: steps.scope.outputs.needed == 'true'
         uses: pnpm/action-setup@v6
         with:
           version: 11.19.0
       - name: Installer Node.js
-        if: steps.scope.outputs.needed == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: 22.13.0
           cache: pnpm
       - name: Installer les dépendances
-        if: steps.scope.outputs.needed == 'true'
         run: pnpm install --frozen-lockfile
       - name: Installer le navigateur
-        if: steps.scope.outputs.needed == 'true'
         run: pnpm exec playwright install --with-deps chromium
       - name: Jouer les parcours
-        if: steps.scope.outputs.needed == 'true'
         run: pnpm e2e
       - name: Conserver les traces des parcours en échec
         if: failure()
@@ -131,9 +109,7 @@ jobs:
     # Uniquement après une fusion dans main, contrôles verts, et si le porteur a
     # activé le déploiement (variable de dépôt CLOUDFLARE_DEPLOY = true, une fois
     # le jeton d'API Cloudflare posé dans les secrets GitHub).
-    # Les jobs de contrôle sont sautés sur main (déjà verts sur la PR) : on ne
-    # bloque que s'ils ont échoué.
-    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY == 'true' }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
