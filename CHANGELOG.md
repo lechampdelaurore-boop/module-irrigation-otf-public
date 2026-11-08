@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Clos (3.8, fonctionnalités à la carte)
+
+- **La 3.8 est close par le porteur** le 8 novembre 2026 à 20 h 21, après sa
+  vérification en ligne et un premier lot de retours (#278) ; ses
+  modifications éventuelles passeront chacune par une PR. Reste posée, sans
+  code : l'écran d'arbitrage d'une pénurie présenté comme un plan
+  d'assolement, recommandé dans la 3.9.
+
 ### Changé (passage au dépôt public)
 
 - **Le travail passe sur le dépôt public** `module-irrigation-otf-public` (licence PolyForm Shield 1.0.0, historique neuf) ; l'ancien dépôt privé devient une archive. Le déploiement Cloudflare part désormais de ce dépôt. L'économie de minutes D-075 est annulée : contrôles complets sur chaque PR et sur `main`, parcours navigateur jamais sautés. Déploiements de #301, #302 et #303 (PR 2 du lot 3) vérifiés avant la bascule.

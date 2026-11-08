@@ -14,8 +14,9 @@ jamais. Et je revérifierai ensuite en direct sur la version en ligne
 l'ergonomie, comment elle est. » La 3.8 se construit donc jusqu'au déploiement
 sans maquette préalable ni relecture avant fusion ; toute question nouvelle est
 tranchée par la recommandation et consignée en section 11 ; le porteur juge
-l'ergonomie sur le site en ligne et fait son retour. Décision : D-067. Rien
-n'est codé.
+l'ergonomie sur le site en ligne et fait son retour. Décision : D-067.
+**Codée en sept PR (#271 à #276, #278) et close par le porteur le
+8 novembre 2026** (section 9, « État de la preuve à la clôture »).
 
 Le logiciel est **multi-fermes** : aucune case n'est pensée pour une ferme
 particulière, et une ferme nouvelle ne voit rien coché d'avance. Les exemples
@@ -325,6 +326,32 @@ Remplace celle du bloc 3.8 de la roadmap (« aucune modification dans `lib/` ni
    l'ergonomie. Le porteur juge (D-014) et fait son retour ; ses retours
    passent par des PR.
 8. **Registres** à jour.
+
+### État de la preuve à la clôture (8 novembre 2026)
+
+La 3.8 est **close par le porteur le 8 novembre 2026 à 20 h 21** (« On va
+clôturer la 3.8 pour l'instant, quitte à ce que je fasse des modifications
+ultérieurement »).
+
+1. à 4. Les tests du domaine, de la persistance, des traitements et des
+   bulles existent et passent (PR 1 à 6, #271 à #276).
+5. Les parcours existants adaptés et les trois nouveaux (P22, P23, P24) sont
+   verts aux deux largeurs ; P10, P11, P14, P19 et P21 adaptés aux retours du
+   porteur (#278).
+6. Le temps serveur de la première page est mesuré en local dans la PR 2
+   (#272, journal `irrigation_page_loaded`) : 178,5 ms médians pour
+   l'ancienne page unique, 20,5 ms pour Matériel et placement et de 17 à
+   82 ms pour les autres pages ; il n'a pas été relevé sur le site en ligne.
+7. Le porteur a vérifié le site en ligne le 7 novembre 2026 au soir ; le
+   premier lot de ses retours (P36 à P46) est en ligne depuis le 7 novembre
+   à 22 h 28 (#278), et il a confirmé le 8 novembre que les dessins des
+   espèces d'Ouvre ta ferme s'affichent. Il clôt sans second lot ; ses
+   modifications éventuelles passeront chacune par une PR.
+8. Registres à jour par la PR de clôture.
+
+Reste posée, sans code : l'écran d'arbitrage d'une pénurie présenté comme un
+plan d'assolement (retour du porteur du 7 novembre), recommandé dans la 3.9,
+maquette d'abord ; le choix revient au porteur.
 
 ## 10. Le découpage en PR
 
