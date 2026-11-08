@@ -273,3 +273,16 @@ test('« Ce qui a changé » s’enregistre avec le calcul et se relit ; un calc
   assert.equal(reread?.calculation.summary.changes, null);
   assert.deepEqual(reread?.calculation.summary.beds, stored!.calculation.summary.beds);
 });
+
+test('l’arbitrage du plan s’enregistre avec le calcul et se relit ; un calcul sans arbitrage n’en a pas la clé (décision 1 de la 3.9, D-052)', async () => {
+  await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'manual', actorUserId: ALICE, plan: plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], '2026-09-29T04:15:00.000Z') });
+  let stored = await readLatestPlanForUser(ALICE, 2026, WEEK);
+  assert.equal(stored && 'arbitration' in stored.calculation.summary, false, 'sans arbitrage, le résumé reste celui d’avant');
+
+  const arbitration = { allocatedCubicMeters: 5.12, reservedCubicMeters: 5.12, unreceivedCubicMeters: 2.56, unreceivedBedCount: 16 };
+  const arbitrated = { ...plan([proposal('p-1', '2026-09-29T20:00:00.000Z', 8100)], '2026-09-29T08:00:00.000Z'), budgets: [], arbitration };
+  await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'event', triggerEvent: 'arbitration-validated', actorUserId: ALICE, plan: arbitrated });
+  stored = await readLatestPlanForUser(ALICE, 2026, WEEK);
+  assert.deepEqual(stored?.calculation.summary.arbitration, arbitration, 'relu tel quel');
+  assert.deepEqual(stored?.calculation.summary.budgets, [], 'aucune ligne de budget sous un arbitrage');
+});

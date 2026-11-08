@@ -10,7 +10,7 @@ import { describeLimitingConstraint, type PumpConstraint } from './justification
 import { boundingProtectedNames, endsBeforeProtected, protectedIntervalsBetween, protectedNamesWithin, startsAfterProtected, withoutProtectedIntervals, type ProtectedInterval } from './protected-slots.ts';
 import { refusedIntervalsByEquipment, withoutRefusedIntervals, type RefusedInterval } from './refusals.ts';
 import { buildPlanSuggestions } from './suggestions.ts';
-import { applyShortage, type BedState } from './shortage.ts';
+import { applyShortage, arbitrationOutcome, type BedState } from './shortage.ts';
 import { redistributeShares, type ShareLedger, type SharePlacement } from './shares.ts';
 import type { PlanningSettings } from './settings.ts';
 import { DailyLimitLedger, datesBetween, type ReservoirTimeline, type SupplyChain } from './supply.ts';
@@ -55,7 +55,7 @@ export function buildWeeklyPlan(inputs: PlanningInputs, settings: PlanningSettin
 
   const chains = buildSupplyChains(inputs, equipment, horizonStart, weekEndAt);
   const ledger = new DailyLimitLedger({ events: inputs.events, limits: inputs.dailyLimits, now, timeZone });
-  const { budgets, shares } = applyShortage(beds, equipment, chains, ledger, horizonStart, weekEndAt, inputs, settings);
+  const { budgets, shares, arbitration } = applyShortage(beds, equipment, chains, ledger, horizonStart, weekEndAt, inputs, settings);
 
   const proposals: PlanProposal[] = [];
   const days = horizonStart < weekEndAt ? datesBetween(horizonStart, weekEndAt, timeZone) : [];
@@ -137,6 +137,8 @@ export function buildWeeklyPlan(inputs: PlanningInputs, settings: PlanningSettin
     beds: outcomes,
     deficit: summarizeDeficit(outcomes, beds, equipmentById),
     budgets,
+    // Sous un arbitrage validé, ce que les planches allouées n'ont pas reçu reste non attribué : le plan le dit (D-052).
+    ...(arbitration ? { arbitration: arbitrationOutcome(arbitration) } : {}),
     suggestions,
     overcommittedDays,
     settings,

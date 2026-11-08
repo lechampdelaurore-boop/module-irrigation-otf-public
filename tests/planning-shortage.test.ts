@@ -153,3 +153,14 @@ test('les planches qu’un arbitrage ne nomme pas puisent dans l’eau non attri
   assert.equal('arbitration' in without, false, 'sans arbitrage, aucun champ nouveau');
   assert.equal(arbitrationNote(without), null);
 });
+
+test('la note de l’arbitrage se tait sous le litre et compte les planches au singulier comme au pluriel (décision 1)', () => {
+  const arbitration = { allocatedCubicMeters: 2, reservedCubicMeters: 1.9995, unreceivedCubicMeters: 0.0009, unreceivedBedCount: 1 };
+  assert.equal(arbitrationNote({ arbitration }), 'Votre choix entre les demandes d’eau s’impose : 2 m³ alloués, chaque allocation réservée à sa planche.');
+  assert.equal(
+    arbitrationNote({ arbitration: { ...arbitration, unreceivedCubicMeters: 0.16 } }),
+    'Votre choix entre les demandes d’eau s’impose : 2 m³ alloués, chaque allocation réservée à sa planche. '
+      + '0,16 m³ alloués à 1 planche ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
+  );
+  assert.equal(arbitrationNote({}), null);
+});

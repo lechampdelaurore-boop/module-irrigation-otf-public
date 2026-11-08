@@ -7,6 +7,7 @@ import { isBedUnplaced } from './changes.ts';
 import {
   effectiveProposalStatus,
   type DoseReason,
+  type PlanArbitration,
   type PlanBedOutcome,
   type PlanCalculationTrigger,
   type PlanCalculationEvent,
@@ -304,6 +305,27 @@ export function waterDeficitExplanation(plan: StoredWeeklyPlan): string | null {
   if (otherwise > ONE_LITER_CUBIC_METERS) parts.push(`${formatWaterVolumeForMessage(otherwise)} m³ qui manquent pour une autre raison que l’eau (temps de pompage, espacement, dose minimale)`);
   if (parts.length === 0) return null;
   return `Demandés ${formatWaterVolumeForMessage(demanded)} m³, placés ${formatWaterVolumeForMessage(placed)} m³, manque d’eau ${formatWaterVolumeForMessage(deficit.waterCubicMeters)} m³ : l’écart tient à ${parts.join(', et à ')}. Le manque se compte planche par planche, sur la surface que son propre matériel mouille.`;
+}
+
+/**
+ * La note sous les cartes quand un arbitrage 3.4 validé s'impose au plan
+ * (décision 1 de la 3.9, D-052) : l'eau allouée, réservée à chaque planche ;
+ * sa réduction quand une chaîne ne peut pas tout fournir ; l'eau allouée que
+ * les planches ne peuvent pas recevoir, qui reste non attribuée. Chaque
+ * ajout passe le litre. Nulle sans arbitrage.
+ */
+export function arbitrationNote(summary: { arbitration?: PlanArbitration }): string | null {
+  const { arbitration } = summary;
+  if (!arbitration) return null;
+  const sentences = [`Votre choix entre les demandes d’eau s’impose : ${formatWaterVolumeForMessage(arbitration.allocatedCubicMeters)} m³ alloués, chaque allocation réservée à sa planche.`];
+  if (arbitration.allocatedCubicMeters - arbitration.reservedCubicMeters > ONE_LITER_CUBIC_METERS) {
+    sentences.push(`Le moteur ne peut en placer que ${formatWaterVolumeForMessage(arbitration.reservedCubicMeters)} m³ d’ici dimanche : chaque allocation est réduite dans la même proportion.`);
+  }
+  if (arbitration.unreceivedCubicMeters > ONE_LITER_CUBIC_METERS) {
+    const beds = `${arbitration.unreceivedBedCount} planche${arbitration.unreceivedBedCount > 1 ? 's' : ''}`;
+    sentences.push(`${formatWaterVolumeForMessage(arbitration.unreceivedCubicMeters)} m³ alloués à ${beds} ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.`);
+  }
+  return sentences.join(' ');
 }
 
 // ---------------------------------------------------------------------------
