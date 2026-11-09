@@ -528,8 +528,9 @@ l'état au 30 octobre 2026.
     report, avec un refus, un arbitrage enregistré et une suggestion
     notifiée ; B, la même semaine, n'en voit rien, ne décide pas d'une
     proposition de A, et reçoit son calcul du matin quand celui de A échoue ;
-    les manquants écrits dans la revue de sécurité. État : ✅ test, revue de
-    sécurité à faire.
+    les manquants écrits dans la revue de sécurité. État : ✅ test ; revue
+    de sécurité faite le 9 novembre 2026 (D-095), trois tests d'isolation
+    écrits.
 
 ### Ce que la liste couvre, et ce qu'elle ne couvre pas
 
@@ -935,7 +936,11 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    troisième en jouant tous les parcours, le point 62, une pompe et un
    matériel archivés au téléphone et au contraste, corrigé dans une PR qui
    précède celle du lot (D-094).
-5. **La revue de sécurité** : ses corrections, une PR par défaut.
+5. **La revue de sécurité** : ses corrections, une PR par défaut. Faite le
+   9 novembre 2026 (D-095), sans défaut : trois tests d'isolation à deux
+   fermes et une garde du compte de démonstration écrits, chaque point
+   consigné dans la section D du protocole ; la configuration Access se lit
+   avec le porteur, à la recette.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte
    rendu dans `docs/recette-tranche-3.md`.
 7. **La PR de clôture** : registres, journal des changements, version ; puis

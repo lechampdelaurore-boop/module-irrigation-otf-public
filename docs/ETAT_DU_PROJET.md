@@ -95,6 +95,16 @@ registres, elle y renvoie.
   la semaine réservée à ses planches ». **60 corrigé le 9 novembre 2026**
   (D-093, F134 et F135), dans une PR qui suit celle de 61 : la fiche d'une
   pompe voit une réserve créée sans recharger la page.
+- 3.9, lot 5, la revue de sécurité : **faite le 9 novembre 2026** (D-095,
+  précisions F139 à F142), sans changer aucun comportement, dans une PR qui
+  suit celle de 60. Les sept points de la section D de
+  `docs/recette-tranche-3.md` portent leur constat et leur verdict :
+  **aucun défaut**. Trois tests d'isolation à deux fermes écrits, là où il
+  en manquait (les poses d'un matériel, l'événement en attente du plan, les
+  saisies du sol), et une garde du compte de démonstration, retiré du
+  paquet de production. `pnpm audit` : une alerte modérée, minimatch, par
+  l'outil de lint, le lot à part déjà décidé. Reste la configuration
+  Access, lue avec le porteur à la recette (lot 6).
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

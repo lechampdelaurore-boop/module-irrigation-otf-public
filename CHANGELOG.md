@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Vérifié (3.9, lot 5 : la revue de sécurité)
+
+- **La revue de sécurité de la 3.9 est faite, sans défaut** (lot 5,
+  D-095) : frontières, isolation des données, authentification, connecteur
+  Ouvre ta ferme, secrets et journaux, notifications ; chaque point porte
+  son constat et son verdict dans `docs/recette-tranche-3.md`.
+- **Trois tests d'isolation à deux fermes** comblent les dépôts qui n'en
+  avaient pas : les poses d'un matériel et leur registre, l'événement en
+  attente du plan, les saisies du sol ne se lisent pas depuis une autre
+  ferme.
+- **Le compte de démonstration reste hors production** : un test garde la
+  condition qui le retire du paquet construit pour le déploiement.
+- `pnpm audit` lu une fois : une alerte modérée, minimatch, par l'outil de
+  lint, déjà prévue en lot à part. La configuration de Cloudflare Access se
+  lira avec le porteur, à la recette.
+
 ### Corrigé (3.9 : la fiche d'une pompe et la réserve créée)
 
 - **La fiche d'une pompe voit une réserve créée sans recharger la page**
