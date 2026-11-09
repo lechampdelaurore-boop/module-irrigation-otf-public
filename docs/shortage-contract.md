@@ -216,8 +216,8 @@ l'état au 30 octobre 2026.
    60,27 m³ et « normale 73 % », ce que le plan a placé, au lieu de 75,27 m³
    et 91 % aujourd'hui. Vérification : recette T3 (garde prouvée) ; test du
    moteur sur la ferme de test, forage à 0,2 m³/h
-   (`tests/planning-shortage.test.ts`, D-079). État : 🟡 test écrit et
-   règle codée, recette finale à jouer.
+   (`tests/planning-shortage.test.ts`, D-079, #12). État : 🟡 test écrit
+   et règle codée, recette finale à jouer.
 4. **S4 — Réserve engagée sous son minimum par des irrigations planifiées à
    la main.** Réserve 25 m³, minimum 20, deux irrigations planifiées à la main
    de 4 m³ chacune lundi soir. Attendu : tant que la projection est sous 20,
@@ -293,13 +293,17 @@ l'état au 30 octobre 2026.
     (décision 6). État : 🟡.
 12. **S12 — Report.** Mêmes données, R9 « report ». Attendu : les planches
     servies en entier dans l'ordre de service — priorité, déficit relatif,
-    inventaire — jusqu'à épuisement du budget ; les suivantes « reportée au
-    prochain calcul (conduite « report ») », cible 0, manque entier ; au
-    calcul suivant, les reportées ne passent devant qu'après un événement,
-    et sans événement le calcul reproduit le précédent (décision 4).
-    Vérification : test existant (sommaire) ; test sur deux calculs à
-    écrire, avec et sans événement ; recette finale, jamais joué
-    (décision 6). État : 🟡, règle tranchée (décision 4), à coder.
+    inventaire — jusqu'à épuisement du budget ; les suivantes « reportée :
+    passe en tête après le prochain événement (conduite « report ») »,
+    cible 0, manque entier ; au calcul suivant, les reportées ne passent
+    devant qu'après un événement, et sans événement le calcul reproduit le
+    précédent (décision 4 ; le motif disait « reportée au prochain calcul »,
+    ce que le calcul sans événement ne fait plus, D-080).
+    Vérification : test existant (sommaire) ; tests sur deux calculs, avec
+    et sans événement, sur le moteur et sur le service
+    (`tests/planning-shortage.test.ts`, `tests/db/planning-service.test.ts`,
+    D-080) ; recette finale, jamais joué (décision 6). État : 🟡 tests
+    écrits et règle codée, recette finale à jouer.
 13. **S13 — Arbitrage 3.4 validé.** Décision validée pour la semaine : tunnel
     1 servi en entier, tunnel 2 exclu, blocs à 50 %. Attendu : les allocations
     s'imposent, la cible de chaque planche est son allocation ; aucune ligne

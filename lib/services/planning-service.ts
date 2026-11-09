@@ -14,6 +14,7 @@ import { calculateIrrigationCoverage } from '../domain/irrigation-coverage';
 import type { PlanCalculationEvent, PlanCalculationTrigger, PlanningInputs, StoredWeeklyPlan } from '../domain/planning/contract';
 import { describePlanChanges } from '../domain/planning/changes';
 import { buildWeeklyPlan } from '../domain/planning/engine';
+import { nextDeferredQueue } from '../domain/planning/shortage';
 import { FARM_TIME_ZONE, addDaysToDateKey, dateKeyInTimeZone, localDateStartUtc, weekStartDateKey } from '../domain/water-management';
 import { partitionIrrigationEventsForUser } from './counted-irrigation-events';
 import { getEnabledFeaturesForUser, listFarmsWithFeature } from './feature-selection-service';
@@ -131,7 +132,9 @@ export async function computeWeeklyPlanForUser({
     events,
     blockedIrrigations,
     arbitration,
-    deferredBedIds: previous?.calculation.summary.beds.filter((bed) => bed.reasons.includes('deferred')).map((bed) => bed.bedId) ?? [],
+    // La file du report n'avance qu'au calcul qui suit un événement (décision 4 de la 3.9, D-052) : un événement inscrit au
+    // registre après le calcul précédent, dont le recalcul est en cours — ce calcul même — ou a échoué.
+    deferredBedIds: nextDeferredQueue(previous?.calculation.summary ?? null, (previous?.pendingEvent ?? null) !== null),
     // Les créneaux refusés de la semaine (D-030, point ouvert 31) : chaque proposition refusée, de n'importe quel calcul
     // de la semaine, exclut son matériel sur ses heures ; le registre étant lu par semaine, le lundi repart sans eux.
     refusedSlots: previous?.proposals

@@ -50,7 +50,12 @@ export type PlanningInputs = {
    * Absent ou vide, la conduite en pénurie du réglage R9 s'applique.
    */
   arbitration?: readonly { bedId: string; allocatedCubicMeters: number }[] | null;
-  /** Planches reportées par le calcul précédent (R9 « report ») : servies en premier. */
+  /**
+   * La file du report (R9 « report ») : les planches servies en premier, avant
+   * les autres dans l'ordre de service. `nextDeferredQueue` la choisit : les
+   * reportées du calcul précédent après un événement, sa file sans événement
+   * (décision 4 de la 3.9, D-052).
+   */
   deferredBedIds?: readonly string[];
   /**
    * Les créneaux refusés de la semaine du plan (D-030) : aucun créneau de ce
@@ -285,6 +290,12 @@ export type WeeklyPlan = {
   budgets: SupplyBudget[];
   /** Un arbitrage 3.4 validé, tel que le plan l'applique ; absent sans arbitrage, un plan sans arbitrage restant celui d'avant. */
   arbitration?: PlanArbitration;
+  /**
+   * La file du report que ce calcul a suivie, enregistrée avec lui pour qu'un
+   * calcul sans événement la reprenne et reproduise son plan (décision 4 de la
+   * 3.9, D-052) ; absente quand elle est vide.
+   */
+  deferredQueue?: string[];
   /** Les suggestions sur les arrosages validés, dans l'ordre du temps, et les jours qu'une limite posée après coup met en défaut (3.7). */
   suggestions: PlanSuggestion[];
   overcommittedDays: OvercommittedDay[];
@@ -421,7 +432,7 @@ export type StoredPlanCalculation = {
   horizonStartAt: string;
   horizonEndAt: string;
   settings: PlanningSettings;
-  summary: Pick<WeeklyPlan, 'beds' | 'deficit' | 'budgets' | 'arbitration' | 'assumptions' | 'weekEnd' | 'suggestions' | 'overcommittedDays'> & {
+  summary: Pick<WeeklyPlan, 'beds' | 'deficit' | 'budgets' | 'arbitration' | 'deferredQueue' | 'assumptions' | 'weekEnd' | 'suggestions' | 'overcommittedDays'> & {
     /** « Ce qui a changé » depuis le calcul précédent de la semaine (règle 25) ; nul au premier calcul. */
     changes: PlanChanges | null;
   };

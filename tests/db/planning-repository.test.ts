@@ -297,3 +297,12 @@ test('la part visée et la part placée de chaque niveau s’enregistrent avec l
   const stored = await readLatestPlanForUser(ALICE, 2026, WEEK);
   assert.deepEqual(stored?.calculation.summary.budgets, budgets, 'relu tel quel, sans migration');
 });
+
+test('la file du report s’enregistre avec le calcul et se relit ; une file vide ne s’écrit pas (décision 4 de la 3.9, D-052)', async () => {
+  const queued = { ...plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], '2026-09-29T04:15:00.000Z'), deferredQueue: ['bed-2', 'bed-3'] };
+  await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'manual', actorUserId: ALICE, plan: queued });
+  assert.deepEqual((await readLatestPlanForUser(ALICE, 2026, WEEK))?.calculation.summary.deferredQueue, ['bed-2', 'bed-3'], 'relue telle quelle, sans migration');
+  await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'manual', actorUserId: ALICE, plan: plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], '2026-09-29T05:15:00.000Z') });
+  const summary = (await readLatestPlanForUser(ALICE, 2026, WEEK))?.calculation.summary;
+  assert.ok(summary && !('deferredQueue' in summary), 'un calcul sans file s’enregistre comme avant');
+});

@@ -17,10 +17,12 @@ registres, elle y renvoie.
   public. Lot 2, une PR `fix/` par règle tranchée (D-052), contrat du
   planning précisé avant le code et test rouge d'abord : **correction 1 sur
   4 en ligne** (#11 de ce dépôt), l'arbitrage validé en parts réservées
-  (décision 1, D-077, précisions F72 à F75) ; **correction 2 codée**, le
+  (décision 1, D-077, précisions F72 à F75) ; **correction 2 en ligne** (#12), le
   budget net du manque sous le minimum, la part visée et la part placée
-  (décision 2, D-079, précisions F76 à F79, aucune migration) ; restent les
-  corrections des décisions 4 et 5. Ensuite l'écran d'arbitrage présenté comme un plan
+  (décision 2, D-079, précisions F76 à F79, aucune migration) ;
+  **correction 3 codée**, le report sans bascule d'un calcul à l'autre
+  (décision 4, D-080, précisions F80 à F83, aucune migration) ; reste la
+  correction de la décision 5. Ensuite l'écran d'arbitrage présenté comme un plan
   d'assolement, décidé par le porteur le 8 novembre 2026 à 20 h 40
   (D-078) : une maquette d'abord, soumise au porteur avant tout code. Puis
   les lots 3 à 7. Ni recette finale ni tag `v0.2.0` sans le porteur. Les
@@ -49,19 +51,22 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 8 novembre 2026 : la
-  PR #11 (`187ff6e`, la correction 1 de la 3.9, l'arbitrage validé en parts
-  réservées, fusionnée à 21 h 07 et déployée à 21 h 21, run 42518503747, les
-  quatre jobs réussis, aucune migration, Workers inchangés). Avant elle : la
-  PR #10 (`775c7cd`, la clôture de la 3.8 dans les registres, fusionnée à
-  20 h 37 et déployée à 20 h 50, run 42515943412, les quatre jobs réussis,
-  aucune migration, Workers inchangés) ; la PR #9 (`fa45281`,
-  le retrait de Dependabot, fusionnée à 20 h 18 et déployée à 20 h 32, run
-  42514364088, les quatre jobs réussis, aucune migration, Workers
-  inchangés) ; avant
-  elle, `866ae13` (la synchronisation avec l'archive au `d350c06` et
-  l'annulation de D-075, déployé à 19 h 45, run 42508561331, les quatre
-  jobs réussis, premier déploiement depuis le dépôt public). Les numéros de
-  PR du dépôt public repartent de #1 ; ceux qui suivent sont de l'archive.
+  PR #12 (`87e4ab0`, la correction 2 de la 3.9, le budget net du manque sous
+  le minimum, la part visée et la part placée, fusionnée à 21 h 49 et
+  déployée à 22 h 03, run 42522030186, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la PR #11 (`187ff6e`, la
+  correction 1 de la 3.9, l'arbitrage validé en parts réservées, fusionnée à
+  21 h 07 et déployée à 21 h 21, run 42518503747, les quatre jobs réussis,
+  aucune migration, Workers inchangés) ; la PR #10 (`775c7cd`, la clôture de
+  la 3.8 dans les registres, fusionnée à 20 h 37 et déployée à 20 h 50, run
+  42515943412, les quatre jobs réussis, aucune migration, Workers
+  inchangés) ; la PR #9 (`fa45281`, le retrait de Dependabot, fusionnée à
+  20 h 18 et déployée à 20 h 32, run 42514364088, les quatre jobs réussis,
+  aucune migration, Workers inchangés) ; avant elle, `866ae13` (la
+  synchronisation avec l'archive au `d350c06` et l'annulation de D-075,
+  déployé à 19 h 45, run 42508561331, les quatre jobs réussis, premier
+  déploiement depuis le dépôt public). Les numéros de PR du dépôt public
+  repartent de #1 ; ceux qui suivent sont de l'archive.
 - Fusionné et déployé sur `main` de l'archive, jusqu'à la bascule : toutes
   les PR jusqu'à #303 (`d350c06`, l'audit ergonomique, lot 3, PR 2 : les
   gestes par ligne, les mots simples et l'accessibilité, D-076, fusionnée le
@@ -517,8 +522,8 @@ registres, elle y renvoie.
   Après la 3.8, close par le porteur : la deuxième passe de la refonte
   (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
   3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
-  cours : lot 2, quatre PR `fix/`, une à la fois, la première en ligne
-  (#11), la deuxième en PR.
+  cours : lot 2, quatre PR `fix/`, une à la fois, les deux premières en
+  ligne (#11, #12), la troisième en PR.
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).
@@ -7293,6 +7298,22 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    n'est pas confirmée, la correction vaut quelle qu'en soit la cause.
    Fermeture au jugement du porteur. Fermé par le porteur le 30 octobre 2026
    (« Ok, tu peux fermer ces trois points »).
+48. **Ouvert le 8 novembre 2026, en vérifiant la correction 3 de la 3.9 ;
+   non bloquant.** Le parcours P28 (`e2e/p28-telephone.spec.ts`, « au
+   téléphone, la barre du bas… ») attend une proposition du planning après
+   « Recalculer le plan », la plage du goutte-à-goutte réglée de 00:00 à
+   23:59. Ce dimanche soir, entre 22 h et 22 h 07 à la ferme, le plan n'en
+   avait aucune (« Demandés 1,365 m³, placés 0 m³, manque d'eau 0 m³ »,
+   l'écart tenant à « une autre raison que l'eau ») : le parcours a échoué
+   sur la branche de la correction 3, à l'ordinateur dans la suite entière
+   puis aux deux largeurs seul, et sur `main` (`87e4ab0`), à l'ordinateur
+   seul. Il est passé à 22 h 30 sur `main`, aux deux largeurs, comme sur
+   les contrôles de `main` à 21 h 49. L'échec dépend donc de l'heure, sans
+   tenir à la seule fin de semaine ; la cause reste à établir (les heures
+   restantes, l'espacement, la dose minimale, la prévision). Recommandation :
+   une PR à part, pour que le parcours ne dépende plus de l'heure ; en
+   attendant, une PR ouverte le dimanche soir attend le lundi pour ses
+   contrôles.
 
 ## Procédure de reprise rapide
 

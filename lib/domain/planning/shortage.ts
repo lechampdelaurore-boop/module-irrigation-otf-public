@@ -1,6 +1,6 @@
 import type { IrrigationNeedPriority } from '../irrigation-needs.ts';
 import { cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../units.ts';
-import type { PlanArbitration, PlanningInputs, SupplyBudget, UnplacedReason } from './contract.ts';
+import type { PlanArbitration, PlanningInputs, SupplyBudget, UnplacedReason, WeeklyPlan } from './contract.ts';
 import { compareBedsForService, type PlanningBed, type PlanningEquipment } from './demand.ts';
 import type { PlanningSettings } from './settings.ts';
 import { ShareLedger } from './shares.ts';
@@ -102,7 +102,7 @@ export function applyShortage(
           remaining -= levelDemand;
         }
       } else {
-        // Report : servir dans l'ordre jusqu'à épuisement, les autres attendent le prochain calcul.
+        // Report : servir la file d'abord, puis dans l'ordre jusqu'à épuisement ; les autres attendent le prochain événement.
         let remaining = budget;
         const ordered = [...group.beds].sort((left, right) =>
           Number(deferredFirst.has(right.bedId)) - Number(deferredFirst.has(left.bedId)) || compareBedsForService(left, right));
@@ -169,6 +169,19 @@ export function placedBudgets(pending: readonly PendingBudget[]): SupplyBudget[]
     for (const bed of beds) placed[bed.priority] += volumeOf(bed, bed.placedMm);
     return { ...budget, placedByLevelCubicMeters: placed };
   });
+}
+
+/**
+ * La file du report d'un calcul (décision 4 de la 3.9, D-052) : après un
+ * événement enregistré depuis le calcul précédent de la semaine, les planches
+ * qu'il a reportées passent devant ; sans événement, la file reste la sienne,
+ * et le calcul reproduit son plan. Vide au premier calcul de la semaine, comme
+ * après un calcul enregistré avant la correction, qui ne l'a pas retenue.
+ */
+export function nextDeferredQueue(previous: Pick<WeeklyPlan, 'beds' | 'deferredQueue'> | null, eventSincePrevious: boolean): string[] {
+  if (!previous) return [];
+  if (!eventSincePrevious) return [...(previous.deferredQueue ?? [])];
+  return previous.beds.filter((bed) => bed.reasons.includes('deferred')).map((bed) => bed.bedId);
 }
 
 /** Les planches à servir, regroupées par chaîne d'eau, chaque chaîne avec son budget et le terme qui le borne. */
