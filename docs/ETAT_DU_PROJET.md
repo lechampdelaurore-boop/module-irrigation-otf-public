@@ -7534,13 +7534,17 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    (`lib/domain/planning/engine.ts`, « La limite journalière ») : quand le
    premier jour est celui qui borne, la coupe retire l'eau du lendemain, et
    le premier jour reste au-dessus. Le même défaut que le point 54, par un
-   autre chemin. Les tests existants ne le voyaient pas : leurs créneaux
-   passent rarement minuit, alors que le test d'invariants vérifie déjà la
-   limite jour par jour. Recommandation : une seule correction pour 54 et
-   58, dans la même PR `fix/` que 55 : couper le créneau jour par jour
-   depuis son début, à l'heure où le reste du jour s'épuise ; un créneau
-   qui ne peut plus rien prendre le premier jour part à minuit si sa plage
-   continue ; le test rouge d'abord, la ferme en taille à 15 m³.
+   autre chemin. La garde de la validation, elle, compte jour par jour :
+   elle refuse ces créneaux (« Limite journalière dépassée le … ») ; rien
+   ne part donc au-delà de la limite par le module, mais le plan propose
+   ce qui ne peut pas être validé. Les tests existants ne le voyaient pas :
+   leurs créneaux passent rarement minuit, alors que le test d'invariants
+   vérifie déjà la limite jour par jour. Recommandation : une seule
+   correction pour 54 et 58, dans la même PR `fix/` que 55 : couper le
+   créneau jour par jour depuis son début, à l'heure où le reste du jour
+   s'épuise ; un créneau qui ne peut plus rien prendre le premier jour
+   part à minuit si sa plage continue ; le test rouge d'abord, la ferme en
+   taille à 15 m³.
 
 ## Procédure de reprise rapide
 
