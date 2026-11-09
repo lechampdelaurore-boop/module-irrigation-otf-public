@@ -28,12 +28,15 @@ registres, elle y renvoie.
   le porteur le 9 novembre 2026 à 11 h 40, **codé** (D-083, précisions F92
   à F97, aucune migration). Puis les lots 3 à 7. Ni
   recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
-  vont dans `tests/planning-shortage.test.ts`.
-- Parcours navigateur : certains dépendent de l'heure ou du jour, sur `main`
-  comme sur les branches (points ouverts 48 à 50). Ni PR ouverte ni contrôle
-  relancé le dimanche après 21 h ni entre minuit et 2 h 30 à la ferme ; le
-  lundi, un échec de P12 sur la pluie mesurée se relance une fois. Jusqu'à
-  la PR à part qui les en libérera.
+  vont dans `tests/planning-shortage.test.ts` et
+  `tests/planning-shortage-scenarios.test.ts` (F98).
+- 3.9, lot 3, les scénarios de pénurie en tests du moteur : **écrits le
+  9 novembre 2026** (D-084, précisions F98 à F102), sans changer aucun
+  comportement. S2, S4, S10 étendu, S23, S24, S26 et l'isolation S28
+  tiennent ; S7, S8 et S9 en partie ; S6 et S20 non. **Sept défauts
+  relevés, points ouverts 51 à 57**, à corriger avant la recette finale,
+  chacun dans sa PR `fix/`, le contrat précisé et le test rouge d'abord,
+  après la PR de ce lot, qui suit celle de l'écran d'arbitrage.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7406,6 +7409,113 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    retient la réponse d'un jour de la semaine passée jusqu'après le
    retour à aujourd'hui ; rouge avant la correction, aux deux largeurs
    (« Expected: "0" », « Received: "" »).
+51. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
+   finale.** S7, stock inconnu : la réserve sans jauge, le moteur fait ce
+   que le contrat attend — créneaux « eau non vérifiée », aucun budget
+   chiffré, aucune coupe, la note du manque d'eau se tait —, mais la tuile
+   « Manque d'eau » du résumé (`app/irrigation/planning/weekly-plan-view.tsx`)
+   écrit « 0,00 m³ », un zéro que rien ne prouve (D-003), au lieu de dire
+   que le manque d'eau ne peut pas être chiffré. Recommandation : la tuile
+   le dit dès qu'une chaîne servie n'a pas de stock connu ; une correction
+   d'affichage seule, dans sa PR `fix/`, le contrat précisé et le test
+   rouge d'abord.
+52. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
+   finale.** S8, pompe archivée : sur la ferme de test, sa seule pompe
+   archivée, les cinq matériels qu'elle sert restent proposés « sans
+   pompe », eau non vérifiée, 12,71 m³ placés comme si elle servait
+   encore ; une seconde chaîne dont la pompe est archivée fait de même (la
+   rampe du bloc 2, 4,21 m³). Le contrat (S8) attend aucun créneau sur
+   cette chaîne et le motif « origine d'eau ou pompe indisponible ».
+   Cause : `buildPlanningEquipment` (`lib/domain/planning/demand.ts`)
+   écarte une pompe archivée comme si le matériel n'en avait pas, et le
+   matériel prend le chemin « sans pompe habituelle ». Recommandation : un
+   matériel dont la pompe habituelle est archivée n'a aucun créneau, avec
+   ce motif ; « non vérifié » reste pour le matériel sans pompe habituelle.
+   Dans la même PR `fix/` que le point 53, le contrat précisé et le test
+   rouge d'abord.
+53. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
+   finale.** S8, ressource inactive : la rampe du bloc 2 servie par une
+   source prélevée directement, la source inactive, ou hors de sa période
+   de disponibilité toute la semaine, ne reçoit aucun créneau, comme
+   attendu ; mais ses dix planches portent « stock et ressources
+   insuffisants d'ici dimanche », 5,61 m³ comptés en manque d'eau, au lieu
+   de « origine d'eau ou pompe indisponible » : le budget de la source vaut
+   zéro, et sa part, prise avant le placement, nomme la coupe. À l'inverse,
+   une réserve inactive donne le bon motif à ses planches, mais sa ligne de
+   budget annonce « 97,01 m³ mobilisables » qu'aucun créneau ne peut
+   prendre. Recommandation : une chaîne dont l'origine est indisponible
+   pour la semaine le dit sur sa ligne de budget, sans eau mobilisable, et
+   ses planches portent ce motif avant tout partage ; une ressource
+   disponible une partie de la semaine garde son budget (8 m³ du jeudi au
+   dimanche, déjà juste). Avec le point 52.
+54. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette finale :
+   le plan propose de prélever plus que l'autorisation.** S9, deux
+   chaînes : sur la ferme en taille, les rampes des blocs 3 et 4 sur une
+   source à sa pompe de 3 m³/h, la limite de prélèvement à 2 m³ par jour,
+   la source donne 2 m³ le mardi, 4 m³ le mercredi — le bloc 3 de 21 h à
+   22 h 05, le bloc 4 de 22 h 05 à 23 h 10 —, 2 m³ le jeudi. Cause : le
+   moteur vérifie ce qui reste à la ressource sur les jours du créneau
+   entier (le mercredi, rien ; le jeudi, 2 m³), le raccourcit à 2 m³, puis
+   place ce créneau raccourci, fini avant minuit, sur le seul mercredi
+   (`lib/domain/planning/engine.ts`, la vérification de la ressource
+   directe). Les invariants des tests vérifient les limites journalières
+   d'irrigation, pas les limites de prélèvement. Recommandation : vérifier
+   le créneau raccourci jour par jour, comme la limite journalière, et
+   ajouter aux invariants la limite de prélèvement de chaque ressource,
+   jour par jour ; une PR `fix/` avec le point 55, le test rouge d'abord.
+55. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
+   finale.** S9 encore : la coupe d'une ressource directe se nomme comme
+   celle d'une réserve. Un créneau raccourci par la limite de prélèvement
+   de la source dit « réserve « Source du bas » au minimum de sécurité »,
+   sa dose « ce que la réserve fournit sans passer sous son minimum », et
+   un créneau qu'elle empêche, « réserve au minimum de sécurité au moment
+   voulu ». Une source n'a ni réserve ni minimum : ce qui la borne, c'est
+   sa limite de prélèvement du jour. Recommandation : nommer cette limite
+   (« limite de prélèvement de « Source du bas » atteinte ce jour-là ») ;
+   c'est un motif nouveau, donc le contrat du planning précisé d'abord.
+   Avec le point 54.
+56. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
+   finale.** S6, l'eau et le temps de pompage ensemble : le résumé compte
+   tout le manque d'une planche sous le premier de ses motifs dans l'ordre
+   alphabétique (`summarizeDeficit`, `lib/domain/planning/engine.ts`).
+   Une planche coupée à la fois par sa part et par le temps de pompage, ou
+   par l'espacement, voit son manque entier compté en temps de pompage, ou
+   hors des deux tuiles. Sur la ferme de test, dimanche 21 h, la plage des
+   asperseurs réduite à 21 h – 21 h 30, les tunnels prioritaires, les blocs
+   bas, la réserve à 4,48 m³ et le forage arrêté : 12,07 m³ demandés,
+   4,01 m³ placés ; le résumé dit « Manque d'eau 0 m³ » et « Temps de
+   pompage manquant 6,25 m³ », dont les 5,61 m³ du bloc 2, que sa part à
+   0 % prive de tout. Le contrat (S6) veut deux manques distincts, ni l'un
+   dans l'autre, et une note du manque d'eau (D-038) qui n'impute au temps
+   de pompage que ce qui lui revient. Recommandation : la part coupée
+   (besoin moins part) compte en manque d'eau, le reste (part moins placé)
+   sous le motif du placement ; sa PR `fix/` porte le test entier de S6.
+57. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette finale ;
+   un cas limite pourra demander l'avis du porteur.** S20, validation en
+   pénurie : les quatre tunnels pour 5 m³ (la pénurie de la cinquième
+   recette), chacun reçoit 9,76 mm ; les propositions des tunnels 1 et 2
+   validées, le recalcul refait les parts sur le reste du budget (2,50 m³)
+   et le reste des besoins : les tunnels 3 et 4 tombent à 6,46 mm, 0,85 m³
+   restent dans la réserve, et chaque tunnel validé garde une part de
+   1,42 mm qu'aucun créneau ne lui donne. Le contrat (S20) attend que les
+   irrigations validées comptent comme prélèvements placés et que les
+   tunnels 3 et 4 gardent leur part, mêmes doses qu'avant. Cause : les
+   parts se calculent sur les besoins nets de l'eau planifiée
+   (`lib/domain/planning/shortage.ts`) et sur un budget net des
+   prélèvements planifiés (`lib/domain/planning/chains.ts`).
+   Recommandation : les parts sur le besoin entier et le budget entier,
+   l'eau planifiée comptée comme déjà placée pour ses planches. Cas
+   limite : une irrigation validée au-delà de la part de sa planche ;
+   prendre l'excédent sur les parts des autres est un choix agronomique,
+   à poser au porteur quand ce point se code. Sa PR `fix/` porte le test
+   entier de S20.
 
 ## Procédure de reprise rapide
 

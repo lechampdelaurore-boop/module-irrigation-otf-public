@@ -2495,6 +2495,71 @@ chaque planche servie sans la redistribuer (D-077). Aucune migration.
 introuvable), et P7, rouge avant le code aux deux largeurs (le titre de
 l'écran introuvable) ; les 1 315 tests et les 84 parcours passent.
 
+## D-084 — Les scénarios de pénurie en tests du moteur (lot 3 de la 3.9) : sept défauts relevés, cinq précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur.
+
+**Constat.** Le lot 3 de la 3.9 écrit en tests du moteur les scénarios de
+pénurie du contrat (`docs/shortage-contract.md`) qui n'en avaient pas, sans
+changer aucun comportement : un test rouge y est un défaut, corrigé à part.
+S3, S12, S13 et S18 l'étaient déjà par les quatre corrections. S2, S4, S10
+étendu, S23, S24, S26 et l'isolation S28 tiennent ; S7, S8 et S9 tiennent
+en partie ; S6 et S20 non. Sept défauts relevés, inscrits comme points
+ouverts 51 à 57 de l'état du projet : la tuile « Manque d'eau » à zéro sur
+un stock inconnu (51) ; une pompe archivée qui laisse son matériel proposé
+« non vérifié » (52) ; une ressource inactive, ou hors de sa période,
+nommée « stock et ressources insuffisants », et une réserve inactive
+annoncée mobilisable (53) ; la limite de prélèvement d'une source dépassée
+par un créneau vérifié sur deux jours et placé sur un seul (54) ; la coupe
+d'une source nommée comme celle d'une réserve (55) ; le manque d'une
+planche compté en entier sous le premier de ses motifs (56) ; les parts
+refaites sur le reste après une validation en pénurie (57).
+
+**Précisions** (techniques, sans règle agronomique ; consignées au contrat
+de la 3.9, `docs/shortage-contract.md`, scénario par scénario et au point 3
+du découpage) :
+
+- F98 : les tests des scénarios vont dans un second fichier,
+  `tests/planning-shortage-scenarios.test.ts`, le premier
+  (`tests/planning-shortage.test.ts`) approchant la limite de 600 lignes ;
+  S10 étendu reste dans le premier, avec S10 et S11.
+- F99 : un scénario qui révèle un défaut n'entre pas rouge dans ce lot, et
+  aucun test n'est sauté ni marqué « à faire » : ce qui tient est vérifié,
+  l'écart est inscrit comme point ouvert avec ses chiffres, et son test
+  entre rouge dans la PR `fix/` qui le corrige. S6 et S20, en défaut
+  entier, y entrent en entier.
+- F100 : les fixtures s'étendent sans changer les tests existants : une
+  irrigation planifiée ou validée peut puiser dans la réserve
+  (`fromReserve`) ; `withDirectChain` ajoute une seconde chaîne, une source
+  à sa pompe de 3 m³/h et sa limite de prélèvement par jour ; les
+  invariants vérifient chaque pompe à son propre débit, et la réserve avec
+  ses irrigations planifiées, sans les créneaux d'une autre chaîne.
+- F101 : S26 est un relevé, comme le contrat le dit : le test vérifie les
+  invariants des deux plans et écrit dans son compte rendu les créneaux
+  déplacés et l'écart de volume ; il n'échoue pas sur l'écart.
+- F102 : l'isolation S28 se vérifie au service, deux exploitations dans la
+  même base de test, la même semaine ; l'arbitrage enregistré par A se
+  vérifie au dépôt, la faisabilité lisant, dans les tests, des planches
+  d'exemple ; l'échec du calcul du matin de A se provoque par un calcul
+  enregistré illisible, et la ligne du journal ne nomme personne.
+
+**Ce qui ne change pas.** Aucun calcul, aucun écran, aucune migration : les
+tests et les fixtures seulement. Les sept défauts se corrigent chacun dans
+sa PR `fix/`, le contrat précisé avant le code et un test rouge d'abord,
+après la PR de ce lot ; réunis quand ils touchent le même code, et dans cet
+ordre, du plus sérieux au plus léger : 54 et 55, la ressource directe, le
+plan proposant de prélever plus que l'autorisation ; 57 ; 56 ; 52 et 53,
+les chaînes indisponibles ; 51, l'affichage seul. Le point 57
+pourra demander l'avis du porteur sur un cas limite : une irrigation
+validée au-delà de la part de sa planche.
+
+**Vérifié par** `tests/planning-shortage-scenarios.test.ts` (huit tests :
+S2, S4, S7, S8, S9, S23, S24 et S26), le test S10 étendu de
+`tests/planning-shortage.test.ts` et le test S28 de
+`tests/db/planning-service.test.ts`, verts sur le moteur tel qu'il est ;
+les 1 324 tests et les 84 parcours passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.
