@@ -29,6 +29,7 @@ import {
   windowLabel,
 } from '../lib/domain/planning/presentation.ts';
 import { DEFAULT_PLANNING_SETTINGS } from '../lib/domain/planning/settings.ts';
+import { unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '../lib/domain/planning/water-deficit-summary.ts';
 import { cubicMetersFromMillimeters, millimetersForRate } from '../lib/domain/units.ts';
 
 /**
@@ -282,6 +283,28 @@ test('le sous-titre du manque d’eau nomme la limite journalière quand c’est
   assert.equal(waterDeficitDetail({ waterCubicMeters: 7.2, byReason: { 'water-budget': 7.2 } }), 'Ce que le stock et les ressources ne couvrent pas');
   assert.equal(waterDeficitDetail({ waterCubicMeters: 19.2, byReason: { 'daily-limit': 19.2 } }), 'Ce que la limite journalière ne laisse pas placer');
   assert.equal(waterDeficitDetail({ waterCubicMeters: 10, byReason: { 'water-budget': 7.5, 'daily-limit': 2.5 } }), 'Ce que le stock et les ressources ne couvrent pas, dont 2,5 m³ par la limite journalière');
+});
+
+test('le manque d’eau sur une chaîne à l’eau inconnue : « non chiffré », ou « au moins » ce que les autres chiffrent, jamais un zéro (point ouvert 51, D-089)', () => {
+  const line = (originKey: string, availableCubicMeters: number | null, demandCubicMeters: number) => ({
+    originKey, originName: originKey, availableCubicMeters, dailyLimitRemainingCubicMeters: null, demandCubicMeters, fractions: { high: 1, normal: 1, low: 1 },
+  });
+  // Une réserve sans stock observé, un matériel sans pompe : leur eau est inconnue ; sans demande, une chaîne ne compte pas.
+  assert.equal(unknownWaterChainCount([line('reservoir:reserve', null, 7.1), line('unverified:gag1', null, 1.32), line('resource:source', 8, 5.6), line('unverified:gag2', null, 0)]), 2);
+  assert.equal(unknownWaterChainCount([line('reservoir:reserve', 97, 7.1)]), 0);
+  assert.equal(unknownWaterChainCount([]), 0, 'sous un arbitrage, aucune ligne : la carte reste celle d’avant');
+  const volume = (value: number) => `${String(value).replace('.', ',')} m³`;
+  assert.equal(waterDeficitValue(0, 0, volume), '0 m³', 'toute l’eau connue : le zéro est prouvé');
+  assert.equal(waterDeficitValue(2.5, 0, volume), '2,5 m³');
+  assert.equal(waterDeficitValue(0, 1, volume), 'non chiffré');
+  assert.equal(waterDeficitValue(2.5, 2, volume), 'au moins 2,5 m³');
+  assert.equal(waterDeficitTileDetail({ waterCubicMeters: 7.2, byReason: { 'water-budget': 7.2 } }, 0), 'Ce que le stock et les ressources ne couvrent pas');
+  assert.equal(waterDeficitTileDetail({ waterCubicMeters: 0, byReason: {} }, 1), 'Eau mobilisable inconnue sur une chaîne : le manque ne peut pas y être chiffré');
+  assert.equal(waterDeficitTileDetail({ waterCubicMeters: 0, byReason: {} }, 3), 'Eau mobilisable inconnue sur 3 chaînes : le manque ne peut pas y être chiffré');
+  assert.equal(
+    waterDeficitTileDetail({ waterCubicMeters: 10, byReason: { 'water-budget': 7.5, 'daily-limit': 2.5 } }, 1),
+    'Ce que le stock et les ressources ne couvrent pas, dont 2,5 m³ par la limite journalière ; eau mobilisable inconnue sur une chaîne, où le manque ne peut pas être chiffré',
+  );
 });
 
 /** Le plan enregistré avec son manque et, s'il y a lieu, le budget de sa seule chaîne (D-038). */

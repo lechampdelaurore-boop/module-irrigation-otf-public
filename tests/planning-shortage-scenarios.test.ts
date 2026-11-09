@@ -3,7 +3,9 @@ import test from 'node:test';
 import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
+import { planSummaryLine } from '../lib/domain/planning/phone-week.ts';
 import { arbitrationNote, waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
+import { unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '../lib/domain/planning/water-deficit-summary.ts';
 import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { splitVolumeAcrossLocalDays } from '../lib/domain/water-management.ts';
 import {
@@ -142,8 +144,7 @@ test('S6, temps de pompage et eau à la fois : chaque planche compte sa part cou
   assert.ok(note?.includes(`${formatWaterVolumeForMessage(counted - plan.deficit.waterCubicMeters)} m³ qui manquent pour une autre raison que l’eau`), note ?? 'aucune note');
 });
 
-test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiffré, aucune coupe, et la note du manque d’eau se tait', () => {
-  // Le résumé, lui, écrit encore « Manque d’eau 0,00 m³ » au lieu de dire que le manque ne peut pas être chiffré (point ouvert 51).
+test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiffré, aucune coupe, la note du manque d’eau se tait, et le résumé dit que le manque ne peut pas être chiffré (point ouvert 51, D-089)', () => {
   const { inputs } = farm({ extraTunnels: true, reservoirCubicMeters: null });
   const plan = buildWeeklyPlan(inputs, settings);
   assertInvariants(plan, inputs);
@@ -157,6 +158,22 @@ test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiff
   }
   assert.equal(plan.deficit.waterCubicMeters, 0, 'aucun manque d’eau compté sur un stock inconnu');
   assert.equal(waterDeficitExplanation(stored(plan)), null);
+  // Le résumé le dit, au lieu d'un zéro que rien ne prouve (D-003) : la carte écrivait « 0,00 m³ ».
+  const volume = (value: number) => `${formatWaterVolumeForMessage(value)} m³`;
+  const unknown = unknownWaterChainCount(plan.budgets);
+  assert.equal(unknown, 1, 'la réserve sans jauge');
+  assert.equal(waterDeficitValue(plan.deficit.waterCubicMeters, unknown, volume), 'non chiffré');
+  assert.equal(waterDeficitTileDetail(plan.deficit, unknown), 'Eau mobilisable inconnue sur une chaîne : le manque ne peut pas y être chiffré');
+  const line = (deficit: WeeklyPlan['deficit'], unknownChains: number) => planSummaryLine({ volumeCubicMeters: 1, unverifiedCount: 0 }, [], { ...deficit, pumpTimeCubicMeters: 0 }, 0, volume, unknownChains);
+  assert.equal(line(plan.deficit, unknown), '1 m³ · manque d’eau non chiffré');
+  // La rampe du bloc 2 sur une source à 0,5 m³ par jour : le manque de sa chaîne est chiffré, celui de la réserve ne l'est pas.
+  const twoChains = withDirectChain(inputs, { equipmentIds: ['rampe-bloc-2'], dailyLimitCubicMeters: 0.5 });
+  const short = buildWeeklyPlan(twoChains, settings);
+  assertInvariants(short, twoChains);
+  assert.ok(short.deficit.waterCubicMeters > 1, 'la source en pénurie');
+  assert.equal(unknownWaterChainCount(short.budgets), 1);
+  assert.equal(waterDeficitValue(short.deficit.waterCubicMeters, 1, volume), `au moins ${volume(short.deficit.waterCubicMeters)}`);
+  assert.equal(line(short.deficit, 1), `1 m³ · manque d’eau au moins ${volume(short.deficit.waterCubicMeters)}`);
 });
 
 test('S8, réserve inactive : aucun créneau sur sa chaîne, motif « origine d’eau ou pompe indisponible », sa ligne de budget le dit ; la chaîne de la source reste la même', () => {

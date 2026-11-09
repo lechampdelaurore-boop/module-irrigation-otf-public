@@ -525,6 +525,15 @@ du moteur et n'écrit aucune règle métier : ce qu'elle calcule pour s'afficher
   proposées et validées en m³ avec le nombre de créneaux au volume inconnu, le
   manque d'eau, le temps de pompage manquant et les planches non servies. Un
   manque vaut exactement ce que le moteur a chiffré, jamais arrondi à zéro.
+  Quand l'eau mobilisable d'une chaîne servie est inconnue — une réserve sans
+  stock observé, ou un matériel sans pompe ou sans origine renseignée, dont la
+  ligne de budget dit « eau mobilisable inconnue » —, le manque d'eau ne peut
+  pas être chiffré sur cette chaîne, et le résumé le dit au lieu d'un zéro que
+  rien ne prouve (D-003, point ouvert 51, D-089) : la carte « Manque d'eau »
+  écrit « non chiffré » quand aucune autre chaîne n'en chiffre, « au moins X
+  m³ » sinon, et son sous-titre compte les chaînes à l'eau inconnue ; la ligne
+  de résumé du téléphone de même. Sous un arbitrage, qui ne rend aucune ligne
+  de budget, la carte reste celle d'avant.
   Quand le manque d'eau diffère de « demandé moins placé », une note sous les
   cartes l'explique avec ses chiffres : le manque se compte planche par
   planche, sur la surface que son propre matériel mouille ; l'eau versée à
@@ -612,7 +621,7 @@ Rien ne s'écrit dans Ouvre ta ferme. L'écran n'arrose rien.
 | Planche arrosée par une rampe sous la part R13 | l'eau reçue est comptée dans les besoins et l'historique ; la planche ne commande ni la dose, ni « un arrosage par jour », ni l'espacement ; son reste est affiché « portée du matériel insuffisante » (D-025) |
 | Matériel sans pompe habituelle | créneau proposé « faisabilité non vérifiée », sans garantie de débit ni de stock, comme la 3.2 le permet |
 | Pompe habituelle archivée | aucun créneau, « origine d'eau ou pompe indisponible » : le matériel n'est pas « sans pompe » (point ouvert 52, D-088) |
-| Stock de la réserve inconnu | créneaux proposés « eau non vérifiée » ; le manque d'eau ne peut pas être chiffré et le dit |
+| Stock de la réserve inconnu | créneaux proposés « eau non vérifiée » ; le manque d'eau ne peut pas être chiffré et le dit : « non chiffré », ou « au moins X m³ » quand une autre chaîne en chiffre un (point ouvert 51, D-089) |
 | Pluie réelle absente sur des jours écoulés | règle D-019 : prévision du jour, sinon zéro, jours listés « partiel » |
 | Prévision météo absente ou ancienne | pluie prévue comptée zéro, calcul marqué « sans prévision » avec la date de la dernière |
 | Irrigation en cours au moment du calcul | comptée pour sa dose prévue jusqu'à sa fin, puis lue au réel |
