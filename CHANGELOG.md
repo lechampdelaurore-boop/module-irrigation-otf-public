@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (parcours navigateur à l'heure de la ferme ; pluie mesurée : le dernier jour choisi)
+
+- **Le champ « Millimètres » de la pluie mesurée suit le dernier jour
+  choisi** (point ouvert 50, D-082) : choisir un jour d'une autre
+  semaine, puis un autre jour avant la réponse, laissait cette réponse
+  en retard vider le champ et remplacer la semaine affichée. Rare à la
+  main ; le lundi, les parcours le voyaient. La réponse d'un choix
+  dépassé est maintenant ignorée.
+- **Les parcours navigateur ne dépendent plus de l'heure** (point ouvert
+  49, D-082) : ils écrivaient leurs dates à l'heure de la machine, UTC
+  en intégration continue, une à deux heures de moins qu'à la ferme, et
+  P4, P9 et P31 échouaient la nuit après minuit. Ils écrivent
+  maintenant à l'heure de la ferme, et une irrigation cherchée dans la
+  semaine en cours finit à la minute précédente. Le dimanche soir
+  (point ouvert 48) reste à traiter. Aucune migration.
+
 ### Corrigé (3.9, correction 4 : la part du dernier jour)
 
 - **Le dimanche, une part sous la dose minimale est placée, comme un reste
@@ -16,7 +32,8 @@ source détaillée commit par commit.
   plage du dimanche, la part est maintenant placée telle qu'elle est, si
   petite soit-elle ; en semaine et le samedi, le matériel attend comme
   avant. Sous un arbitrage validé aussi : l'allocation ne reste plus non
-  attribuée. Aucune migration.
+  attribuée. Aucune migration. En ligne le 12 novembre 2026 à 13 h 14 (#14
+  de ce dépôt).
 
 ### Corrigé (3.9, correction 3 : le report sans bascule)
 
