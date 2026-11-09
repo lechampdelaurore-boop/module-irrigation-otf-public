@@ -59,9 +59,11 @@ registres, elle y renvoie.
   **51 corrigé le 9 novembre 2026** (D-089, F120 à F122), dans une PR qui
   suit celle de 52 et 53 : quand l'eau d'une chaîne servie est inconnue,
   la carte « Manque d'eau » dit « non chiffré », ou « au moins X m³ », au
-  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés ; un neuvième,
-  relevé en chemin (point 59, le pli des changements d'un recalcul), reste
-  à corriger à part.
+  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés. **59 corrigé
+  le 9 novembre 2026** (D-090, F123 et F124), relevé en corrigeant 51, dans
+  une PR qui suit la sienne : le pli des changements d'un recalcul écrit le
+  manque d'eau comme la carte quand l'eau d'une chaîne est inconnue d'un
+  côté, sans écart chiffré.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7659,8 +7661,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    petite ferme à 3 m³ ne passe plus 3,00 m³ le mardi (rouge avant :
    3,054 m³). Un balayage de limites ne trouve plus aucun jour au-delà de
    la sienne, quand cinq plans sur dix dépassaient avant.
-59. **Ouvert le 9 novembre 2026, en corrigeant le point 51 (D-089) ; à
-   corriger avant la recette finale.** Le pli des changements d'un
+59. **Ouvert le 9 novembre 2026, en corrigeant le point 51 (D-089) ;
+   corrigé le jour même (D-090) ; fermeture au jugement du porteur.** Le
+   pli des changements d'un
    recalcul (3.7, `lib/domain/planning/changes.ts` et
    `lib/domain/planning/follow-up.ts`) compare le manque d'eau chiffré des
    deux calculs : « Manque d'eau : de 3 à 0 m³ (−3 m³) ». Quand l'eau d'une
@@ -7672,7 +7675,11 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    calcul retient, pour chacun des deux, s'il avait une chaîne servie à
    l'eau inconnue, et le pli écrit alors « non chiffré » de ce côté-là,
    comme la carte ; une PR `fix/` à part, le contrat précisé et le test
-   rouge d'abord.
+   rouge d'abord. Corrigé le 9 novembre 2026 (D-090, F123 et F124), comme
+   recommandé : « Manque d'eau : de 3,00 m³ à non chiffré » au lieu de
+   « de 3,00 à 0,00 m³ (−3,00 m³) », la ligne ne paraissant que si les deux
+   côtés s'écrivent autrement (`tests/planning-follow-up.test.ts`, rouge
+   avant).
 
 ## Procédure de reprise rapide
 

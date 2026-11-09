@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : le pli des changements sur une eau inconnue)
+
+- **Le pli « Ce qui a changé » ne lit plus de baisse du manque d'eau que
+  rien ne prouve** (point ouvert 59, D-090). Quand l'eau d'une chaîne
+  servie est inconnue dans l'un des deux calculs, il écrit « Manque
+  d'eau : de 3,00 m³ à non chiffré » au lieu de « de 3,00 à 0,00 m³
+  (−3,00 m³) ». Aucune migration.
+
 ### Corrigé (3.9 : le manque d'eau non chiffré)
 
 - **Le manque d'eau n'affiche plus un zéro qu'aucun stock ne prouve**

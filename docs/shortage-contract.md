@@ -880,7 +880,9 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
    S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
    dans sa PR `fix/`, son test rouge d'abord (58, 54 et 55 le 9 novembre
-   2026, D-085 ; 57, 56, 52, 53 et 51 le même jour, D-086 à D-089) — S6 et S20 y portent leur
+   2026, D-085 ; 57, 56, 52, 53 et 51 le même jour, D-086 à D-089 ; un
+   neuvième, le point 59, relevé en corrigeant 51 et corrigé le même jour,
+   D-090) — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée
    ou validée peut puiser dans la réserve (`fromReserve`), une seconde
