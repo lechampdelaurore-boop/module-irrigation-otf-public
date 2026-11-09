@@ -47,6 +47,13 @@ export type PlanChanges = {
   /** Le manque d'eau de la semaine (m³) avant et après : l'écart se lit de l'un à l'autre. */
   waterDeficitBeforeCubicMeters: number;
   waterDeficitAfterCubicMeters: number;
+  /**
+   * Les chaînes servies à l'eau inconnue du calcul précédent et du nouveau : leur manque n'est pas chiffré, et le pli
+   * l'écrit comme la carte, sans écart (point ouvert 59, D-090). Absentes quand toute l'eau est connue, et d'une
+   * comparaison enregistrée avant.
+   */
+  unknownWaterChainsBefore?: number;
+  unknownWaterChainsAfter?: number;
 };
 
 const NEGLIGIBLE_MM = 0.01;

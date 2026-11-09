@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { describePlanChanges, isBedUnplaced } from '../lib/domain/planning/changes.ts';
-import type { PlanBedOutcome, PlanProposal, PlanSuggestion, StoredProposal, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain/planning/contract.ts';
+import type { PlanBedOutcome, PlanProposal, PlanSuggestion, StoredProposal, StoredWeeklyPlan, SupplyBudget, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { DEFAULT_PLANNING_SETTINGS } from '../lib/domain/planning/settings.ts';
 
 /**
@@ -74,12 +74,12 @@ function suggestion(eventEquipmentId: string, kind: 'cancel' | 'reduce', doseMm:
   };
 }
 
-type Content = { proposals?: PlanProposal[]; beds?: PlanBedOutcome[]; suggestions?: PlanSuggestion[]; waterCubicMeters?: number };
+type Content = { proposals?: PlanProposal[]; beds?: PlanBedOutcome[]; suggestions?: PlanSuggestion[]; waterCubicMeters?: number; budgets?: SupplyBudget[] };
 
-function nextPlan({ proposals = [], beds = [], suggestions = [], waterCubicMeters = 0 }: Content, computedAt = SECOND_CALCULATION_AT): WeeklyPlan {
+function nextPlan({ proposals = [], beds = [], suggestions = [], waterCubicMeters = 0, budgets = [] }: Content, computedAt = SECOND_CALCULATION_AT): WeeklyPlan {
   return {
     weekStart: '2026-09-28', weekEnd: '2026-10-04', computedAt, horizonStartAt: computedAt, horizonEndAt: '2026-10-04T22:00:00.000Z',
-    proposals, beds, deficit: { waterCubicMeters, pumpTimeCubicMeters: 0, byReason: {}, bedCount: 0 }, budgets: [], suggestions, overcommittedDays: [],
+    proposals, beds, deficit: { waterCubicMeters, pumpTimeCubicMeters: 0, byReason: {}, bedCount: 0 }, budgets, suggestions, overcommittedDays: [],
     settings: DEFAULT_PLANNING_SETTINGS, assumptions: { forecastDays: 6, reservoirsObservedAt: [] },
   };
 }
@@ -90,7 +90,7 @@ function previousPlan(content: Content, storedProposals?: StoredProposal[]): Sto
     calculation: {
       id: 'calc-1', season: 2026, weekStart: plan.weekStart, trigger: 'daily', triggerEvent: null, computedAt: plan.computedAt,
       horizonStartAt: plan.horizonStartAt, horizonEndAt: plan.horizonEndAt, settings: plan.settings,
-      summary: { weekEnd: plan.weekEnd, beds: plan.beds, deficit: plan.deficit, budgets: [], assumptions: plan.assumptions, suggestions: plan.suggestions, overcommittedDays: [], changes: null },
+      summary: { weekEnd: plan.weekEnd, beds: plan.beds, deficit: plan.deficit, budgets: plan.budgets, assumptions: plan.assumptions, suggestions: plan.suggestions, overcommittedDays: [], changes: null },
     },
     proposals: storedProposals ?? plan.proposals.map((item) => stored(item)),
     suggestions: [],
@@ -228,6 +228,17 @@ test('l’écart du manque d’eau se lit d’un calcul à l’autre, dans les d
     [describePlanChanges(previousPlan({ waterCubicMeters: 0 }), nextPlan({ waterCubicMeters: 3 }))].map((item) => [item?.waterDeficitBeforeCubicMeters, item?.waterDeficitAfterCubicMeters]),
     [[0, 3]],
   );
+});
+
+test('une chaîne servie à l’eau inconnue se retient de chaque côté, absente quand toute l’eau est connue : le pli ne lit pas un écart que rien ne prouve (point ouvert 59, D-090)', () => {
+  const unknown: SupplyBudget = { originKey: 'reservoir:reserve', originName: 'Réserve', availableCubicMeters: null, dailyLimitRemainingCubicMeters: null, demandCubicMeters: 7.1, fractions: { high: 1, normal: 1, low: 1 } };
+  const known: SupplyBudget = { ...unknown, originKey: 'resource:source', availableCubicMeters: 8 };
+  // Un matériel qui perd sa pompe habituelle : sa chaîne devient « sans pompe », et son manque n'est plus chiffré.
+  const changes = describePlanChanges(previousPlan({ waterCubicMeters: 3, budgets: [known] }), nextPlan({ waterCubicMeters: 0, budgets: [known, { ...unknown, originKey: 'unverified:gag1' }] }));
+  assert.equal(changes && 'unknownWaterChainsBefore' in changes, false, 'avant, toute l’eau connue : rien de retenu');
+  assert.equal(changes?.unknownWaterChainsAfter, 1);
+  const both = describePlanChanges(previousPlan({ budgets: [unknown] }), nextPlan({ budgets: [unknown, { ...unknown, originKey: 'unverified:gag1' }, { ...unknown, originKey: 'unverified:gag2', demandCubicMeters: 0 }] }));
+  assert.deepEqual([both?.unknownWaterChainsBefore, both?.unknownWaterChainsAfter], [1, 2], 'une chaîne sans demande ne compte pas');
 });
 
 test('la liste est dans l’ordre du temps puis du matériel, et la même deux fois de suite', () => {

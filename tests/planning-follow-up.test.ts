@@ -73,6 +73,22 @@ test('le signal du retard : rien avant la tolérance, « En retard » ensuite av
   assert.equal(latenessLabel({ ...event, equipment: { ...event.equipment, timerState: 'running' } }, 30, at(35)), null, 'démarrée : plus de retard');
 });
 
+test('le pli écrit le manque d’eau comme la carte quand l’eau d’une chaîne servie est inconnue d’un côté, sans écart chiffré, et seulement s’ils s’écrivent autrement (point ouvert 59, D-090)', () => {
+  const base: PlanChanges = {
+    previousCalculationId: 'calc-0', previousComputedAt: '2026-09-30T04:15:00.000Z', proposals: [], newSuggestions: [], bedsNowUnplaced: [], bedsNowPlaced: [],
+    waterDeficitBeforeCubicMeters: 3, waterDeficitAfterCubicMeters: 0,
+  };
+  const lines = (overrides: Partial<PlanChanges>) => planChangesLines({ ...base, ...overrides }, format).map((line) => [line.kind, line.text]);
+  // Avant : « Manque d’eau : de 3,00 à 0,00 m³ (−3,00 m³) », une baisse que rien ne prouve.
+  assert.deepEqual(lines({ unknownWaterChainsAfter: 1 }), [['deficit', 'Manque d’eau : de 3,00 m³ à non chiffré']]);
+  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 0, waterDeficitAfterCubicMeters: 3, unknownWaterChainsBefore: 2 }), [['deficit', 'Manque d’eau : de non chiffré à 3,00 m³']]);
+  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 2, waterDeficitAfterCubicMeters: 3, unknownWaterChainsBefore: 1 }), [['deficit', 'Manque d’eau : d’au moins 2,00 m³ à 3,00 m³']]);
+  assert.deepEqual(lines({ waterDeficitAfterCubicMeters: 0, waterDeficitBeforeCubicMeters: 0, unknownWaterChainsAfter: 1 }), [['deficit', 'Manque d’eau : de 0,00 m³ à non chiffré']]);
+  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 2, waterDeficitAfterCubicMeters: 2.001, unknownWaterChainsBefore: 1, unknownWaterChainsAfter: 1 }), [], 'les deux s’écrivent de même');
+  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 0, waterDeficitAfterCubicMeters: 0, unknownWaterChainsBefore: 1, unknownWaterChainsAfter: 3 }), [], 'non chiffré des deux côtés');
+  assert.deepEqual(lines({}), [['deficit', 'Manque d’eau : de 3,00 à 0,00 m³ (−3,00 m³)']], 'toute l’eau connue : comme avant');
+});
+
 test('le pli « Ce qui a changé » : une ligne par proposition, suggestion, planche entrée ou sortie, et l’écart du manque d’eau ; rien quand rien n’a changé', () => {
   const slot = (startAt: string, endAt: string, doseMm: number) => ({ startAt, endAt, doseMm, bedNames: ['B2-1'] });
   const changes: PlanChanges = {
