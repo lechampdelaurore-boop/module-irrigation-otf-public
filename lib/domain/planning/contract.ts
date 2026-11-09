@@ -110,7 +110,12 @@ export type DoseReason = 'remaining-need' | 'maximum-dose' | 'window-fit' | 'pum
   /** Raccourci pour finir avant un créneau protégé (D-062, règle 6). */
   | 'protected-slot-fit'
   /** Raccourci à ce que la limite de prélèvement de la ressource laisse ce jour-là (D-085). */
-  | 'withdrawal-limit';
+  | 'withdrawal-limit'
+  /**
+   * La part de la planche de référence, sa cible sous son besoin — en pénurie, ou son allocation sous un
+   * arbitrage —, sans coupe : le reste à placer est cette part, non le besoin (point ouvert 61, D-092).
+   */
+  | 'shortage-share';
 export type TimingReason = 'earliest' | 'after-forecast-rain' | 'spacing' | 'window' | 'pump-capacity' | 'reserve-inflow' | 'daily-limit'
   /** Commencé à la fin d'un créneau refusé (D-030). */
   | 'after-refused-slot'
