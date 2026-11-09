@@ -56,7 +56,12 @@ registres, elle y renvoie.
   venir d'ici dimanche — pompe habituelle archivée, origine inactive ou
   hors de sa période — n'entre dans aucun partage ; ses planches portent
   « origine d'eau ou pompe indisponible », et sa ligne de budget le dit.
-  Reste 51.
+  **51 corrigé le 9 novembre 2026** (D-089, F120 à F122), dans une PR qui
+  suit celle de 52 et 53 : quand l'eau d'une chaîne servie est inconnue,
+  la carte « Manque d'eau » dit « non chiffré », ou « au moins X m³ », au
+  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés ; un neuvième,
+  relevé en chemin (point 59, le pli des changements d'un recalcul), reste
+  à corriger à part.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7454,8 +7459,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    retour à aujourd'hui ; rouge avant la correction, aux deux largeurs
    (« Expected: "0" », « Received: "" »).
 51. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
-   finale.** S7, stock inconnu : la réserve sans jauge, le moteur fait ce
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-089) ;
+   fermeture au jugement du porteur.** S7, stock inconnu : la réserve sans jauge, le moteur fait ce
    que le contrat attend — créneaux « eau non vérifiée », aucun budget
    chiffré, aucune coupe, la note du manque d'eau se tait —, mais la tuile
    « Manque d'eau » du résumé (`app/irrigation/planning/weekly-plan-view.tsx`)
@@ -7463,7 +7468,12 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    que le manque d'eau ne peut pas être chiffré. Recommandation : la tuile
    le dit dès qu'une chaîne servie n'a pas de stock connu ; une correction
    d'affichage seule, dans sa PR `fix/`, le contrat précisé et le test
-   rouge d'abord.
+   rouge d'abord. Corrigé le 9 novembre 2026 (D-089, F120 à F122), comme
+   recommandé : la carte écrit « non chiffré » quand aucune autre chaîne
+   ne chiffre de manque d'eau, « au moins X m³ » sinon, et son sous-titre
+   compte les chaînes à l'eau inconnue — un matériel sans pompe ou sans
+   origine compte aussi —, la ligne de résumé du téléphone de même
+   (`tests/planning-shortage-scenarios.test.ts`, rouge avant).
 52. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-088) ;
    fermeture au jugement du porteur.** S8, pompe archivée : sur la ferme de test, sa seule pompe
@@ -7645,6 +7655,20 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    petite ferme à 3 m³ ne passe plus 3,00 m³ le mardi (rouge avant :
    3,054 m³). Un balayage de limites ne trouve plus aucun jour au-delà de
    la sienne, quand cinq plans sur dix dépassaient avant.
+59. **Ouvert le 9 novembre 2026, en corrigeant le point 51 (D-089) ; à
+   corriger avant la recette finale.** Le pli des changements d'un
+   recalcul (3.7, `lib/domain/planning/changes.ts` et
+   `lib/domain/planning/follow-up.ts`) compare le manque d'eau chiffré des
+   deux calculs : « Manque d'eau : de 3 à 0 m³ (−3 m³) ». Quand l'eau d'une
+   chaîne servie devient inconnue entre les deux — un matériel qui perd sa
+   pompe habituelle, une réserve sans stock observé —, son manque n'est
+   plus chiffré, et le pli lit une baisse que rien ne prouve (D-003), alors
+   que la carte dit désormais « non chiffré » ; l'inverse se lit comme une
+   hausse. Rare, mais trompeur le jour où il arrive. Recommandation : le
+   calcul retient, pour chacun des deux, s'il avait une chaîne servie à
+   l'eau inconnue, et le pli écrit alors « non chiffré » de ce côté-là,
+   comme la carte ; une PR `fix/` à part, le contrat précisé et le test
+   rouge d'abord.
 
 ## Procédure de reprise rapide
 

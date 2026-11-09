@@ -279,9 +279,12 @@ l'état au 30 octobre 2026.
    manque d'eau ne peut pas être chiffré ; jamais un zéro (D-003) ; la note se
    tait. Vérification : test du moteur (lot 3, D-084) : créneaux non
    vérifiés, aucun budget chiffré, aucune coupe, la note se tait ; mais le
-   résumé écrit « Manque d'eau 0,00 m³ » (point ouvert 51). Test seulement :
-   la jauge de la vraie réserve ne se vide pas pour un essai. État : 🟡
-   moteur ✅, résumé ❌ défaut corrigé à part.
+   résumé écrit « Manque d'eau 0,00 m³ » (point ouvert 51). Corrigé le
+   9 novembre 2026 (D-089) : la carte dit « non chiffré », ou « au moins
+   X m³ » quand une autre chaîne chiffre un manque, et la ligne de résumé
+   du téléphone de même (`tests/planning-shortage-scenarios.test.ts`).
+   Test seulement : la jauge de la vraie réserve ne se vide pas pour un
+   essai. État : 🟡 test ✅, recette finale ⬜.
 8. **S8 — Origine indisponible, pompe archivée, ressource inactive sur la
    période.** Attendu : aucun créneau sur cette chaîne, motif « origine d'eau
    ou pompe indisponible » ; les autres chaînes inchangées ; un matériel sans
@@ -877,7 +880,7 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
    S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
    dans sa PR `fix/`, son test rouge d'abord (58, 54 et 55 le 9 novembre
-   2026, D-085 ; 57, 56, 52 et 53 le même jour, D-086 à D-088) — S6 et S20 y portent leur
+   2026, D-085 ; 57, 56, 52, 53 et 51 le même jour, D-086 à D-089) — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée
    ou validée peut puiser dans la réserve (`fromReserve`), une seconde

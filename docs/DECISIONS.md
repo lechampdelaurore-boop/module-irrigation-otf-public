@@ -2871,6 +2871,54 @@ donne pas au bloc 2), « 3,55 m³ alloués à 22 planches ne peuvent pas être
 reçus » comme avant, et la pompe archivée ne place plus rien : « 6,354 m³
 alloués à 32 planches ne peuvent pas être reçus ». Les 1 339 tests passent.
 
+## D-089 — Le manque d'eau non chiffré sur une chaîne à l'eau inconnue (point ouvert 51) : trois précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Cinquième et dernière
+correction des défauts relevés au lot 3 (D-084). Codée en Opus 5.5 · Max
+sur le dépôt public, le contrat du planning précisé d'abord
+(`docs/planning-contract.md`, « Interface (3.6) », le résumé, et le cas
+limite du stock inconnu), les tests rouges avant le code. Une correction
+d'affichage seule : le moteur ne change pas.
+
+**Le défaut corrigé.** S7, la réserve sans jauge : le moteur propose ses
+créneaux « eau non vérifiée », sans budget chiffré ni coupe, et la note
+du manque d'eau se tait, comme le contrat l'attend ; mais la carte
+« Manque d'eau » du résumé écrivait « 0,00 m³ », un zéro que rien ne
+prouve (D-003), au lieu de dire que le manque ne peut pas être chiffré.
+
+**Trois précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation et consignées au contrat du planning :
+
+- F120 : le manque d'eau ne peut pas être chiffré sur une chaîne servie
+  dont l'eau mobilisable est inconnue, c'est-à-dire dont la ligne de budget
+  dit « eau mobilisable inconnue » pour une demande : une réserve sans
+  stock observé, mais aussi un matériel sans pompe ou sans origine
+  renseignée, dont le moteur ne connaît pas l'eau non plus.
+- F121 : la carte écrit « non chiffré » quand aucune autre chaîne ne
+  chiffre de manque d'eau, « au moins X m³ » sinon, X étant le manque
+  chiffré ailleurs ; son sous-titre compte les chaînes à l'eau inconnue
+  (« Eau mobilisable inconnue sur une chaîne : le manque ne peut pas y être
+  chiffré ») ; la carte ne se colore en manque que pour un manque chiffré.
+  La ligne de résumé du téléphone de même : « manque d'eau non chiffré »,
+  ou « manque d'eau au moins X ».
+- F122 : sous un arbitrage, qui ne rend aucune ligne de budget, la carte
+  reste celle d'avant ; un calcul enregistré avant porte ses lignes de
+  budget, et la règle s'y lit aussi. Les règles d'écriture vivent dans
+  `lib/domain/planning/water-deficit-summary.ts`, testées, le module de
+  présentation approchant les 600 lignes.
+
+**Relevé en chemin, corrigé à part** (point ouvert 59) : le pli des
+changements d'un recalcul (3.7) compare deux manques d'eau chiffrés ; une
+chaîne dont l'eau devient inconnue entre deux calculs — un matériel qui
+perd sa pompe habituelle — s'y lirait comme une baisse (« de 3 à 0 m³ »).
+
+**Vérifié par** le test S7 entier (`tests/planning-shortage-scenarios.test.ts`)
+et les règles d'écriture de la carte (`tests/planning-presentation.test.ts`),
+rouges avant le code : sur la réserve sans jauge, « non chiffré » et la
+ligne « manque d'eau non chiffré » ; la rampe du bloc 2 sur une source à
+0,5 m³ par jour, « au moins 5,608 m³ ». Les 1 340 tests passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.
