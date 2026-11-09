@@ -159,8 +159,8 @@ test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiff
   assert.equal(waterDeficitExplanation(stored(plan)), null);
 });
 
-test('S8, réserve inactive : aucun créneau sur sa chaîne, motif « origine d’eau ou pompe indisponible » ; la chaîne de la source reste la même', () => {
-  // La pompe archivée et la ressource inactive sur la période ne se lisent pas encore ainsi (points ouverts 52 et 53).
+test('S8, réserve inactive : aucun créneau sur sa chaîne, motif « origine d’eau ou pompe indisponible », sa ligne de budget le dit ; la chaîne de la source reste la même', () => {
+  // La pompe archivée et la ressource inactive sur la période : les deux tests suivants (points ouverts 52 et 53).
   const twoChains = withDirectChain(farm().inputs, { equipmentIds: ['rampe-bloc-2'], dailyLimitCubicMeters: 10 });
   const reference = buildWeeklyPlan(twoChains, settings);
   const inputs = withReservoir(twoChains, { status: 'inactive' });
@@ -175,6 +175,68 @@ test('S8, réserve inactive : aucun créneau sur sa chaîne, motif « origine d�
   // 1,32 m³ de gag1, 0,66 de gag2, 2,56 par tunnel : toute la demande de la chaîne, comptée en manque d'eau.
   close(plan.deficit.byReason['supply-unavailable'] ?? null, 1.32 + 0.66 + 2 * 2.56, 1e-6);
   close(plan.deficit.waterCubicMeters, 7.1, 1e-6);
+  // Sa ligne de budget le dit, sans eau mobilisable : elle annonçait 97,01 m³ « mobilisables » (point ouvert 53, D-088).
+  const reserveLine = plan.budgets.find((budget) => budget.originKey === 'reservoir:reserve');
+  assert.ok(reserveLine?.unavailable === true && reserveLine.availableCubicMeters === 0, 'la ligne de la réserve indisponible');
+  assert.ok(!plan.budgets.find((budget) => budget.originKey === 'resource:source')?.unavailable, 'la ligne de la source inchangée');
+});
+
+const withArchivedPump = (inputs: PlanningInputs, pumpId: string): PlanningInputs => ({
+  ...inputs,
+  pumps: inputs.pumps.map((pump) => (pump.id === pumpId ? { ...pump, status: 'archived' as const, archivedAt: '2026-09-01T00:00:00.000Z' } : pump)),
+});
+
+test('S8, pompe habituelle archivée : aucun créneau sur ses matériels, motif « origine d’eau ou pompe indisponible », une chaîne à part ; sans pompe habituelle, un matériel reste proposé (point ouvert 52, D-088)', () => {
+  // La seule pompe de la ferme archivée : ses cinq matériels restaient proposés « sans pompe », 12,71 m³ placés.
+  const base = farm().inputs;
+  const inputs = withArchivedPump(base, 'pompe');
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assert.deepEqual(slots(plan), [], 'aucun créneau');
+  for (const bed of plan.beds.filter((item) => item.needMm > 0)) assert.deepEqual(bed.reasons, ['supply-unavailable'], bed.bedName);
+  close(plan.deficit.byReason['supply-unavailable'] ?? null, 12.7078, 1e-3, 'toute la demande, en manque d’eau sous ce motif');
+  assert.deepEqual(plan.budgets.map((budget) => [budget.originKey, budget.originName, budget.unavailable, budget.availableCubicMeters]), [['pump:pompe', 'La pompe (pompe archivée)', true, 0]]);
+  // La pompe d'une seconde chaîne archivée (la rampe du bloc 2, 4,21 m³ placés avant) : la chaîne de la réserve inchangée.
+  const twoChains = withDirectChain(base, { equipmentIds: ['rampe-bloc-2'], dailyLimitCubicMeters: 10 });
+  const onSource = (equipmentId: string) => equipmentId === 'rampe-bloc-2';
+  const reference = buildWeeklyPlan(twoChains, settings);
+  const second = withArchivedPump(twoChains, 'pompe-source');
+  const secondPlan = buildWeeklyPlan(second, settings);
+  assertInvariants(secondPlan, second);
+  assert.deepEqual(slots(secondPlan), slots(reference, (equipmentId) => !onSource(equipmentId)), 'rien sur la rampe du bloc 2, la réserve inchangée');
+  for (const bed of secondPlan.beds.filter((item) => onSource(item.equipmentId ?? '') && item.needMm > 0)) assert.deepEqual(bed.reasons, ['supply-unavailable'], bed.bedName);
+  // Sans pompe habituelle, rien n'est indisponible : le matériel reste proposé « faisabilité non vérifiée ».
+  const without = buildWeeklyPlan(farm({ withoutPumpFor: ['gag1'] }).inputs, settings);
+  assert.ok(byEquipment(without, 'gag1').length > 0 && byEquipment(without, 'gag1').every((proposal) => !proposal.justification.hydraulicallyVerified), 'gag1 proposé, non vérifié');
+});
+
+test('S8, ressource directe inactive ou hors de sa période toute la semaine : motif « origine d’eau ou pompe indisponible » avant tout partage, sa ligne de budget le dit ; disponible une partie de la semaine, son budget reste (point ouvert 53, D-088)', () => {
+  const twoChains = withDirectChain(farm().inputs, { equipmentIds: ['rampe-bloc-2'], dailyLimitCubicMeters: 2 });
+  const withSource = (changes: Partial<PlanningInputs['infrastructure']['resources'][number]>): PlanningInputs => ({
+    ...twoChains,
+    infrastructure: { ...twoChains.infrastructure, resources: twoChains.infrastructure.resources.map((resource) => (resource.id === 'source' ? { ...resource, ...changes } : resource)) },
+  });
+  const cases: [string, Partial<PlanningInputs['infrastructure']['resources'][number]>][] = [['inactive', { status: 'inactive' }], ['disponible jusqu’au 20 septembre', { availableUntil: '2026-09-20' }]];
+  for (const [label, changes] of cases) {
+    const inputs = withSource(changes);
+    const plan = buildWeeklyPlan(inputs, settings);
+    assertInvariants(plan, inputs);
+    assert.equal(byEquipment(plan, 'rampe-bloc-2').length, 0, `${label} : aucun créneau`);
+    const beds = plan.beds.filter((bed) => bed.equipmentId === 'rampe-bloc-2' && bed.needMm > 0);
+    assert.equal(beds.length, 10, label);
+    // Avant : « stock et ressources insuffisants d'ici dimanche », 5,61 m³ comptés sous ce motif.
+    for (const bed of beds) assert.deepEqual(bed.reasons, ['supply-unavailable'], `${label} : ${bed.bedName}`);
+    close(plan.deficit.byReason['supply-unavailable'] ?? null, 5.6078, 1e-3, label);
+    assert.equal(plan.deficit.byReason['water-budget'], undefined, label);
+    const line = plan.budgets.find((budget) => budget.originKey === 'resource:source');
+    assert.ok(line?.unavailable === true && line.availableCubicMeters === 0, `${label} : la ligne de budget le dit`);
+  }
+  // Disponible à partir du jeudi 1er octobre : ses 8 m³ du jeudi au dimanche, sans coupe.
+  const partial = buildWeeklyPlan(withSource({ availableFrom: '2026-10-01' }), settings);
+  const line = partial.budgets.find((budget) => budget.originKey === 'resource:source');
+  assert.ok(line && !line.unavailable, 'disponible une partie de la semaine');
+  close(line?.availableCubicMeters ?? null, 8, 1e-6, 'le budget de ses jours disponibles');
+  assert.ok(byEquipment(partial, 'rampe-bloc-2').length > 0, 'la rampe du bloc 2 servie');
 });
 
 test('S9, deux chaînes d’eau : une ligne de budget par chaîne, la pénurie de l’une ne touche pas l’autre, chaque planche comptée sur la chaîne de son matériel', () => {

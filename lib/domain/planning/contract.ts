@@ -334,6 +334,12 @@ export type SupplyBudget = {
   /** Eau mobilisable d'ici dimanche : stock hors sécurité, apports, pluie, moins l'évaporation et le planifié. */
   availableCubicMeters: number | null;
   /**
+   * Rien ne peut venir de la chaîne d'ici dimanche : réserve ou ressource inactive ou introuvable, ressource hors de sa
+   * période, pompe habituelle archivée ; l'eau mobilisable vaut alors zéro (points ouverts 52 et 53, D-088). Absent
+   * d'un calcul enregistré avant.
+   */
+  unavailable?: boolean;
+  /**
    * Ce que la limite journalière d'irrigation laisse encore d'ici dimanche, tous jours confondus ; `null` quand
    * elle ne borne pas la semaine : aucune limite, ou un jour de l'horizon sans limite (point ouvert 35).
    */

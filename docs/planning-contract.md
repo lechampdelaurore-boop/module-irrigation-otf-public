@@ -258,7 +258,7 @@ besoin, le déficit qui en résulte est chiffré et nommé.
 | Limite de prélèvement d'une ressource, m³/jour | 3.1 | plafonne ce que la ressource peut fournir ce jour-là ; la coupe se nomme « limite de prélèvement » |
 | Minimum de sécurité d'une réserve | 3.1 | la projection ne descend jamais dessous |
 | Débit maximal d'une pompe, simultanéité | 3.2 | découpe et enchaîne les créneaux |
-| Origine d'eau indisponible, pompe archivée, ressource inactive sur la période | 3.1, 3.2 | aucun créneau sur cette chaîne |
+| Origine d'eau indisponible, pompe archivée, ressource inactive sur la période | 3.1, 3.2 | aucun créneau sur cette chaîne ; ses planches portent « origine d'eau ou pompe indisponible » avant tout partage, et sa ligne de budget le dit, sans eau mobilisable (points ouverts 52 et 53, D-088) |
 | Plage horaire d'une nature de matériel | R8 | place le créneau dedans ou le reporte |
 | Créneau protégé nommé, pour tout le matériel de l'exploitation | 3.8 ter, `docs/protected-slots-contract.md` (D-062) | découpe la plage autour de lui, sans exception, prioritaires et pénurie compris |
 | Restriction réglementaire, arrêté préfectoral | 2.8 | c'est la limite journalière en m³/jour, qui existe déjà : un arrêté fonctionne toujours ainsi (tranché le 29 septembre 2026) ; aucune plage horaire à modéliser |
@@ -438,6 +438,21 @@ disponible et la demande sans l'eau validée : la part visée d'un niveau
 qui a de l'eau validée y est la part de sa demande restante que les parts
 réservent, comme sous le report.
 
+**L'origine indisponible** (points ouverts 52 et 53, D-088, 9 novembre
+2026). Une chaîne dont rien ne peut venir d'ici dimanche — sa réserve ou sa
+ressource inactive ou introuvable, sa ressource hors de sa période de
+disponibilité jusqu'à dimanche, ou la pompe habituelle de son matériel
+archivée — n'entre dans aucun partage : ses planches portent « origine
+d'eau ou pompe indisponible » avant la conduite, leur besoin compté en
+manque d'eau sous ce motif, et sa ligne de budget dit « indisponible cette
+semaine, aucune eau mobilisable » pour sa demande. Une ressource disponible
+une partie de la semaine garde le budget de ses jours disponibles. Les
+matériels dont la pompe habituelle est archivée forment, pompe par pompe,
+une chaîne à part, nommée « <nom de la pompe> (pompe archivée) » : ils ne
+puisent pas dans l'origine de cette pompe, que d'autres pompes peuvent
+servir. Un matériel sans pompe habituelle reste proposé « faisabilité non
+vérifiée ».
+
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³
 avec le stock, pour 79,2 m³ demandés — un manque d'eau de 7,2 m³. Si les
@@ -593,6 +608,7 @@ Rien ne s'écrit dans Ouvre ta ferme. L'écran n'arrose rien.
 | Planche arrosée par deux matériels positionnés | le goutte-à-goutte d'abord, l'aspersion pour le reste (question Q5) |
 | Planche arrosée par une rampe sous la part R13 | l'eau reçue est comptée dans les besoins et l'historique ; la planche ne commande ni la dose, ni « un arrosage par jour », ni l'espacement ; son reste est affiché « portée du matériel insuffisante » (D-025) |
 | Matériel sans pompe habituelle | créneau proposé « faisabilité non vérifiée », sans garantie de débit ni de stock, comme la 3.2 le permet |
+| Pompe habituelle archivée | aucun créneau, « origine d'eau ou pompe indisponible » : le matériel n'est pas « sans pompe » (point ouvert 52, D-088) |
 | Stock de la réserve inconnu | créneaux proposés « eau non vérifiée » ; le manque d'eau ne peut pas être chiffré et le dit |
 | Pluie réelle absente sur des jours écoulés | règle D-019 : prévision du jour, sinon zéro, jours listés « partiel » |
 | Prévision météo absente ou ancienne | pluie prévue comptée zéro, calcul marqué « sans prévision » avec la date de la dernière |
