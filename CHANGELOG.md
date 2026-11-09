@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : l'eau et le temps de pompage à la fois)
+
+- **Le manque d'eau et le temps de pompage manquant ne se mélangent
+  plus** (point ouvert 56, D-087). Le manque d'une planche se partage
+  entre ses motifs : ce que sa part lui retire compte en manque d'eau, le
+  reste sous le motif du placement (temps de pompage, espacement, dose
+  minimale). Avant, une planche coupée par les deux comptait en entier
+  sous le premier motif dans l'ordre alphabétique : un dimanche soir en
+  pénurie, « Manque d'eau 0 m³ » et « Temps de pompage manquant
+  6,25 m³ », pour 6,95 m³ et 0,64 m³. Aucune migration.
+
 ### Corrigé (3.9 : l'eau déjà validée en pénurie)
 
 - **Valider des propositions en pénurie ne refait plus le partage**

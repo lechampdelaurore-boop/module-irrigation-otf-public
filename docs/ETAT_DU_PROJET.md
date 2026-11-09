@@ -48,7 +48,10 @@ registres, elle y renvoie.
   valider en pénurie ne refait plus le partage ; le cas limite, un
   arrosage validé au-delà de la part de sa planche, est tranché par le
   porteur le jour même : selon la conduite choisie, l'option codée.
-  Restent 56, 52 et 53, puis 51.
+  **56 corrigé le 9 novembre
+  2026** (D-087, F113 à F115), dans une PR qui suit celle de 57 : le manque
+  d'une planche se partage entre la coupe de sa part, en manque d'eau, et
+  son placement. Restent 52 et 53, puis 51.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7526,8 +7529,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    jour pour 1,4 m³) le dit (rouge avant : « réserve au minimum de
    sécurité au moment voulu »).
 56. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
-   finale.** S6, l'eau et le temps de pompage ensemble : le résumé compte
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-087) ;
+   fermeture au jugement du porteur.** S6, l'eau et le temps de pompage ensemble : le résumé compte
    tout le manque d'une planche sous le premier de ses motifs dans l'ordre
    alphabétique (`summarizeDeficit`, `lib/domain/planning/engine.ts`).
    Une planche coupée à la fois par sa part et par le temps de pompage, ou
@@ -7542,6 +7545,12 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    de pompage que ce qui lui revient. Recommandation : la part coupée
    (besoin moins part) compte en manque d'eau, le reste (part moins placé)
    sous le motif du placement ; sa PR `fix/` porte le test entier de S6.
+   Corrigé le 9 novembre 2026 (D-087, F113 à F115), comme recommandé, la
+   part étant celle de la fin du calcul : sur le même cas, 6,95 m³ de
+   manque d'eau, 0,64 m³ de temps de pompage (le tunnel 1, dont le bloc 1 a
+   reçu la part) et 0,47 m³ d'espacement (le bloc 1)
+   (`tests/planning-shortage-scenarios.test.ts`, rouge avant : 0 m³ et
+   6,25 m³).
 57. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-086) ;
    fermeture au jugement du porteur ; le cas limite tranché par lui le
