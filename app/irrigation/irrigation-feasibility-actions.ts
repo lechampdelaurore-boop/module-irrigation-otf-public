@@ -2,15 +2,18 @@
 
 import { getAuthenticatedUser } from '@/app/access-auth';
 import { saveIrrigationArbitrationForUser, wasIrrigationArbitrationSavedForUser } from '@/db/irrigation-arbitration-repository';
-import { getIrrigationFeasibilityForUser } from '@/lib/services/irrigation-feasibility-service';
+import { getIrrigationFeasibilityForUser, getIrrigationFeasibilityScreenForUser } from '@/lib/services/irrigation-feasibility-service';
 import { recalculatePlanAfterEvent } from '@/lib/services/planning-recalculation';
 import { FEASIBILITY_PRIORITIES, type IrrigationFeasibility } from '@/lib/domain/irrigation-feasibility';
+import { isArbitrationEditable } from '@/lib/domain/arbitration-preview';
+import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
 import type { IrrigationNeedPriority } from '@/lib/domain/irrigation-needs';
 
-export type FeasibilityActionResult = { ok: true; dashboard: IrrigationFeasibility; message: string } | { ok: false; message: string };
+/** `crops` : les cultures des planches pour l'écran d'arbitrage, quand un niveau demande un choix (2 bis, D-083). */
+export type FeasibilityActionResult = { ok: true; dashboard: IrrigationFeasibility; crops: ArbitrationCrops | null; message: string } | { ok: false; message: string };
 
 export async function loadIrrigationFeasibilityAction(input: { season: number }): Promise<FeasibilityActionResult> {
-  return withContext(input.season, async (context) => ({ ok: true, message: 'Faisabilité recalculée.', dashboard: await getIrrigationFeasibilityForUser(context) }));
+  return withContext(input.season, async (context) => ({ ok: true, message: 'Faisabilité recalculée.', ...await getIrrigationFeasibilityScreenForUser(context) }));
 }
 
 export async function saveIrrigationArbitrationAction(input: {
@@ -22,12 +25,12 @@ export async function saveIrrigationArbitrationAction(input: {
       || typeof input.requestId !== 'string' || !/^[a-f0-9-]{36}$/i.test(input.requestId)
       || !Array.isArray(input.selectedBedIds) || input.selectedBedIds.length > 10000 || input.selectedBedIds.some((id) => typeof id !== 'string')
       || new Set(input.selectedBedIds).size !== input.selectedBedIds.length) throw new Error('Sélection invalide.');
-    if (await wasIrrigationArbitrationSavedForUser(context.ownerUserId, input)) return { ok: true, message: 'Cette décision avait déjà été enregistrée. Voici la situation actuelle.', dashboard: await getIrrigationFeasibilityForUser(context) };
+    if (await wasIrrigationArbitrationSavedForUser(context.ownerUserId, input)) return { ok: true, message: 'Cette décision avait déjà été enregistrée. Voici la situation actuelle.', ...await getIrrigationFeasibilityScreenForUser(context) };
     const fresh = await getIrrigationFeasibilityForUser(context);
     if (fresh.weekStart !== input.weekStart) throw new Error('La semaine a changé. Rechargez la faisabilité.');
     if (fresh.revision !== input.expectedRevision || fresh.snapshotSignature !== input.snapshotSignature) throw new Error('Les données ont changé dans un autre onglet ou lors du recalcul. Recalculez puis vérifiez votre sélection.');
     const level = fresh.priorities.find((item) => item.priority === input.priority)!;
-    if (!['required', 'revalidation_required', 'validated'].includes(level.arbitration)) throw new Error('Ce niveau ne nécessite pas de sélection manuelle actuellement.');
+    if (!isArbitrationEditable(level)) throw new Error('Ce niveau ne nécessite pas de sélection manuelle actuellement.');
     if (input.selectedBedIds.some((id) => !level.candidates.includes(id))) throw new Error('Une planche sélectionnée ne fait plus partie des besoins de ce niveau.');
     await saveIrrigationArbitrationForUser(context.ownerUserId, {
       season: input.season, weekStart: fresh.weekStart, priority: input.priority, selectedBedIds: input.selectedBedIds,
@@ -35,7 +38,7 @@ export async function saveIrrigationArbitrationAction(input: {
     });
     // Un arbitrage validé s'impose au moteur : le plan se recalcule (3.7, règle 4).
     await recalculatePlanAfterEvent(context.ownerUserId, { kind: 'arbitration-validated', season: input.season, at: fresh.weekStart, lasting: true });
-    return { ok: true, message: 'Choix enregistré pour cette semaine. Les quantités ont été recalculées.', dashboard: await getIrrigationFeasibilityForUser(context) };
+    return { ok: true, message: 'Répartition enregistrée pour cette semaine. Les quantités ont été recalculées.', ...await getIrrigationFeasibilityScreenForUser(context) };
   });
 }
 
