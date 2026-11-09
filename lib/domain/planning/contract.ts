@@ -108,12 +108,16 @@ export type DoseReason = 'remaining-need' | 'maximum-dose' | 'window-fit' | 'pum
   /** Raccourci pour finir avant un créneau refusé (D-030). */
   | 'refused-slot-fit'
   /** Raccourci pour finir avant un créneau protégé (D-062, règle 6). */
-  | 'protected-slot-fit';
+  | 'protected-slot-fit'
+  /** Raccourci à ce que la limite de prélèvement de la ressource laisse ce jour-là (D-085). */
+  | 'withdrawal-limit';
 export type TimingReason = 'earliest' | 'after-forecast-rain' | 'spacing' | 'window' | 'pump-capacity' | 'reserve-inflow' | 'daily-limit'
   /** Commencé à la fin d'un créneau refusé (D-030). */
   | 'after-refused-slot'
   /** Commencé à la fin d'un créneau protégé (D-062, règle 6). */
-  | 'after-protected-slot';
+  | 'after-protected-slot'
+  /** Commencé à minuit, la limite de prélèvement de la ressource étant atteinte la veille (D-085). */
+  | 'withdrawal-limit';
 
 type ProposalJustification = {
   priority: IrrigationNeedPriority;
@@ -159,6 +163,8 @@ export type UnplacedReason =
   | 'deferred'
   | 'pump-time'
   | 'daily-limit'
+  /** La limite de prélèvement de la ressource prélevée directement ne laisse la dose minimale aucun jour (D-085). */
+  | 'withdrawal-limit'
   | 'reserve-timing'
   | 'volume-unknown-under-limit'
   | 'supply-unavailable'

@@ -1,6 +1,6 @@
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
 import { pumpUsagesFromEvents, type IrrigationPump, type PumpOrigin } from '../pumps.ts';
-import { MILLISECONDS_PER_HOUR } from '../units.ts';
+import { MILLISECONDS_PER_HOUR, millisecondsFromSeconds, secondsFromMilliseconds } from '../units.ts';
 import {
   addDaysToDateKey,
   buildDailyWaterLedger,
@@ -206,9 +206,11 @@ export class DirectResourceTimeline {
   private readonly potentialByDate: Map<string, number>;
   private readonly usedByDate = new Map<string, number>();
   private readonly flows: { startMs: number; endMs: number; flow: number }[] = [];
+  private readonly timeZone: string;
 
   constructor(input: { resource: WaterResource; infrastructure: WaterInfrastructure; now: Date; horizonEnd: Date; timeZone: string }) {
     this.resource = input.resource;
+    this.timeZone = input.timeZone;
     const withdrawn = actualWithdrawalsByResourceAndDate(input.infrastructure.movements, input.timeZone);
     this.potentialByDate = new Map();
     for (const date of datesBetween(input.now, input.horizonEnd, input.timeZone)) {
@@ -236,8 +238,16 @@ export class DirectResourceTimeline {
     return Math.max(0, (this.potentialByDate.get(date) ?? 0) - (this.usedByDate.get(date) ?? 0));
   }
 
-  addUse(date: string, cubicMeters: number): void {
-    this.usedByDate.set(date, (this.usedByDate.get(date) ?? 0) + cubicMeters);
+  /**
+   * Ce qu'un prélèvement prend à chacun de ses jours civils, à la part de sa
+   * durée tombée ce jour-là, comme la limite le compte : un créneau de 21 h à
+   * 0 h 30 prend six septièmes de son volume à son premier jour, jamais la
+   * moitié (point ouvert 54, D-085).
+   */
+  addWithdrawal(startMs: number, endMs: number, cubicMeters: number): void {
+    for (const [date, volume] of splitVolumeAcrossLocalDays({ startAt: new Date(startMs), endAt: new Date(endMs), cubicMeters, timeZone: this.timeZone })) {
+      this.usedByDate.set(date, (this.usedByDate.get(date) ?? 0) + volume);
+    }
   }
 
   /** Le débit instantané ne dépasse pas le débit nominal. */
@@ -370,6 +380,52 @@ export class DailyLimitLedger {
       this.committed.set(date, (this.committed.get(date) ?? 0) + volume);
     }
   }
+}
+
+/** Ce qu'une limite par jour laisse à un créneau : tout, une coupe, un départ au minuit suivant, ou rien dans cette plage. */
+type DailyFit = { kind: 'fits' } | { kind: 'cut'; seconds: number } | { kind: 'midnight'; startMs: number } | { kind: 'blocked' };
+
+/**
+ * Un créneau face à une limite par jour — la limite journalière d'irrigation
+ * ou la limite de prélèvement d'une ressource —, jour civil par jour civil
+ * depuis son début (docs/planning-contract.md, « Où placer les créneaux »,
+ * point 6 ; points ouverts 54 et 58, D-085). Le débit est constant : chaque
+ * jour reçoit la part du volume que sa part de la durée porte. Le créneau
+ * s'arrête à la seconde où le reste d'un de ses jours s'épuise, jamais en
+ * retirant à sa fin ce qu'un jour plus tôt a de trop ; un jour sans limite
+ * (`null`) ne borne rien. Sous la durée minimale, il part au minuit suivant
+ * quand c'est son premier jour qui s'épuise et que la plage continue assez
+ * pour la durée minimale ; sinon rien ne tient dans cette plage.
+ */
+export function fitWithinDailyRemaining(input: {
+  startMs: number;
+  durationSeconds: number;
+  cubicMeters: number;
+  minimumSeconds: number;
+  endLimitMs: number;
+  timeZone: string;
+  remainingFor: (date: string) => number | null;
+}): DailyFit {
+  const { startMs, cubicMeters, timeZone } = input;
+  const totalMs = millisecondsFromSeconds(input.durationSeconds);
+  const endMs = startMs + totalMs;
+  let date = dateKeyInTimeZone(new Date(startMs), timeZone);
+  const firstMidnightMs = localDateStartUtc(addDaysToDateKey(date, 1), timeZone).getTime();
+  let cutMs: number | null = null;
+  for (let dayStartMs = startMs; dayStartMs < endMs && cutMs === null;) {
+    const nextDate = addDaysToDateKey(date, 1);
+    const dayEndMs = localDateStartUtc(nextDate, timeZone).getTime();
+    const remaining = input.remainingFor(date);
+    // La part du jour, comptée comme `splitVolumeAcrossLocalDays` la compte pour la limite et pour les invariants.
+    if (remaining !== null && cubicMeters * (Math.min(endMs, dayEndMs) - dayStartMs) / totalMs > remaining + EPSILON) cutMs = dayStartMs + remaining * totalMs / cubicMeters;
+    dayStartMs = dayEndMs;
+    date = nextDate;
+  }
+  if (cutMs === null) return { kind: 'fits' };
+  const seconds = Math.floor(secondsFromMilliseconds(cutMs - startMs));
+  if (seconds >= input.minimumSeconds) return { kind: 'cut', seconds };
+  if (cutMs < firstMidnightMs && firstMidnightMs + millisecondsFromSeconds(input.minimumSeconds) <= input.endLimitMs) return { kind: 'midnight', startMs: firstMidnightMs };
+  return { kind: 'blocked' };
 }
 
 /** La chaîne d'eau d'un matériel : sa pompe et, derrière elle, sa réserve ou sa ressource. */

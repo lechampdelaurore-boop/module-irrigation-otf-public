@@ -13,7 +13,7 @@ import { buildPlanSuggestions } from './suggestions.ts';
 import { applyShortage, arbitrationOutcome, placedBudgets, type BedState } from './shortage.ts';
 import { redistributeShares, type ShareLedger, type SharePlacement } from './shares.ts';
 import type { PlanningSettings } from './settings.ts';
-import { DailyLimitLedger, datesBetween, type ReservoirTimeline, type SupplyChain } from './supply.ts';
+import { DailyLimitLedger, datesBetween, fitWithinDailyRemaining, type ReservoirTimeline, type SupplyChain } from './supply.ts';
 import { windowIntervals } from './windows.ts';
 
 /**
@@ -368,26 +368,37 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
       let endMs = startMs + millisecondsFromSeconds(durationSeconds);
       let applications = applicationsFor(equipment, durationSeconds);
       let volume = volumeOf(applications);
+      // Une coupe raccourcit le créneau depuis son début : sa fin, ses apports et son volume suivent sa durée.
+      const shortenTo = (seconds: number) => {
+        durationSeconds = seconds;
+        endMs = startMs + millisecondsFromSeconds(seconds);
+        applications = applicationsFor(equipment, seconds);
+        volume = volumeOf(applications);
+      };
 
-      // La limite journalière (2.8), jour civil par jour civil.
+      // La limite journalière (2.8), jour civil par jour civil depuis le début du créneau ; le premier jour plein, il part
+      // à minuit si sa plage continue (point ouvert 58, D-085).
       const limit = context.ledger.evaluate(startMs, endMs, volume);
       if (limit.status === 'unknown-under-limit') {
         blockingReason = 'volume-unknown-under-limit';
         break;
       }
       if (limit.status === 'exceeded' && volume !== null && volume > 0) {
-        const allowed = Math.max(0, volume - limit.exceededByCubicMeters);
-        const shortened = Math.floor(durationSeconds * allowed / volume);
-        if (shortened < candidate.minimumDurationSeconds) {
+        const fit = fitWithinDailyRemaining({ startMs, durationSeconds, cubicMeters: volume, minimumSeconds: candidate.minimumDurationSeconds, endLimitMs, timeZone: context.timeZone, remainingFor: (date) => context.ledger.remainingFor(date) });
+        if (fit.kind === 'midnight') {
+          startMs = fit.startMs;
+          attemptTiming = 'daily-limit';
+          continue;
+        }
+        if (fit.kind === 'blocked') {
           blockingReason = 'daily-limit';
           break;
         }
-        durationSeconds = shortened;
-        doseReason = 'daily-limit';
-        endMs = startMs + millisecondsFromSeconds(durationSeconds);
-        applications = applicationsFor(equipment, durationSeconds);
-        volume = volumeOf(applications);
-        attemptTiming = attemptTiming === 'earliest' ? 'daily-limit' : attemptTiming;
+        if (fit.kind === 'cut') {
+          shortenTo(fit.seconds);
+          doseReason = 'daily-limit';
+          attemptTiming = attemptTiming === 'earliest' ? 'daily-limit' : attemptTiming;
+        }
       }
 
       // La part réservée (D-037) : le créneau ne prend que ce que ses parts paient ; la coupe ne dépend pas du jour.
@@ -401,10 +412,7 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
           if (shortened < minimumSeconds) return { ok: false, reason: shares.shortfallReason, shareBound: true };
           // La seconde d'arrondi de la durée n'est pas une coupe : le motif ne se nomme que si la planche de référence y perd un reste visible.
           const material = millimetersForDurationSeconds(candidate.referenceRate, durationSeconds - shortened) >= NEGLIGIBLE_MM;
-          durationSeconds = shortened;
-          endMs = startMs + millisecondsFromSeconds(durationSeconds);
-          applications = applicationsFor(equipment, durationSeconds);
-          volume = volumeOf(applications);
+          shortenTo(shortened);
           if (material) {
             doseReason = 'reserved-share';
             for (const bed of candidate.assignedBeds) bed.shareCut = shares.shortfallReason;
@@ -429,29 +437,28 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
             blockingReason = 'reserve-timing';
             break;
           }
-          durationSeconds = shortened;
+          shortenTo(shortened);
           doseReason = 'reserve-level';
-          endMs = startMs + millisecondsFromSeconds(durationSeconds);
-          applications = applicationsFor(equipment, durationSeconds);
-          volume = volumeOf(applications);
         }
         projectedLevel = evaluation.status === 'unknown' ? null : chain.reservoir.minimumLevel(endMs, endMs, { startMs, endMs, cubicMeters: volume ?? 0 })?.minimum ?? null;
       }
+      // Une ressource prélevée directement n'a ni stock ni minimum : sa limite de prélèvement se juge comme la limite
+      // journalière, et sa coupe porte son nom (points ouverts 54 et 55, D-085).
       const directResource = chain.resource;
-      if (directResource && volume !== null) {
-        const dates = datesBetween(new Date(startMs), new Date(endMs), context.timeZone);
-        const remaining = dates.reduce((sum, date) => sum + directResource.remainingForDate(date), 0);
-        if (remaining + EPSILON < volume) {
-          const shortened = Math.floor(durationSeconds * remaining / volume);
-          if (shortened < minimumSeconds) {
-            blockingReason = 'reserve-timing';
-            break;
-          }
-          durationSeconds = shortened;
-          doseReason = 'reserve-level';
-          endMs = startMs + millisecondsFromSeconds(durationSeconds);
-          applications = applicationsFor(equipment, durationSeconds);
-          volume = volumeOf(applications);
+      if (directResource && volume !== null && volume > 0) {
+        const fit = fitWithinDailyRemaining({ startMs, durationSeconds, cubicMeters: volume, minimumSeconds, endLimitMs, timeZone: context.timeZone, remainingFor: (date) => directResource.remainingForDate(date) });
+        if (fit.kind === 'midnight') {
+          startMs = fit.startMs;
+          attemptTiming = 'withdrawal-limit';
+          continue;
+        }
+        if (fit.kind === 'blocked') {
+          blockingReason = 'withdrawal-limit';
+          break;
+        }
+        if (fit.kind === 'cut') {
+          shortenTo(fit.seconds);
+          doseReason = 'withdrawal-limit';
         }
       }
 
@@ -459,7 +466,7 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
       commitProposal(candidate, context, chain, { startMs, endMs, durationSeconds, applications, volume, doseReason, timingReason: attemptTiming, projectedLevel, wateredBeds, pump: { before: pumpBefore, after: pumpAfter }, protectedSlotNames });
       return { ok: true };
     }
-    if (blockingReason === 'volume-unknown-under-limit' || blockingReason === 'daily-limit' || blockingReason === 'reserve-timing') {
+    if (blockingReason === 'volume-unknown-under-limit' || blockingReason === 'daily-limit' || blockingReason === 'reserve-timing' || blockingReason === 'withdrawal-limit') {
       // Un autre jour peut passer : on ne bloque le matériel qu'après tous les jours.
       continue;
     }
@@ -607,10 +614,7 @@ function commitProposal(
   }
   if (chain.pumpTimeline && flow !== null) chain.pumpTimeline.add(placement.startMs, placement.endMs, flow, equipment.name);
   if (chain.reservoir && placement.volume !== null) chain.reservoir.addWithdrawal({ startMs: placement.startMs, endMs: placement.endMs, cubicMeters: placement.volume });
-  if (chain.resource && placement.volume !== null) {
-    const dates = datesBetween(new Date(placement.startMs), new Date(placement.endMs), context.timeZone);
-    for (const date of dates) chain.resource.addUse(date, placement.volume / dates.length);
-  }
+  if (chain.resource && placement.volume !== null) chain.resource.addWithdrawal(placement.startMs, placement.endMs, placement.volume);
   if (placement.volume !== null) context.ledger.add(placement.startMs, placement.endMs, placement.volume);
 
   const referenceApplied = placement.applications.find((application) => application.otfBedId === candidate.referenceBed.bedId)?.appliedMm ?? candidate.doseMm;
@@ -657,7 +661,7 @@ function summarizeDeficit(outcomes: readonly PlanBedOutcome[], beds: readonly Be
   let water = 0;
   let pumpTime = 0;
   let bedCount = 0;
-  const waterReasons = new Set<UnplacedReason>(['water-budget', 'deferred', 'reserve-timing', 'supply-unavailable', 'daily-limit']);
+  const waterReasons = new Set<UnplacedReason>(['water-budget', 'deferred', 'reserve-timing', 'supply-unavailable', 'daily-limit', 'withdrawal-limit']);
   for (const outcome of outcomes) {
     if (outcome.deficitMm <= EPSILON) continue;
     bedCount += 1;

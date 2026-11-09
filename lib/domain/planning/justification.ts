@@ -42,6 +42,8 @@ export function describeLimitingConstraint(
     return `pompe « ${chain.pumpTimeline?.pump.name ?? '?'} » ${parts.join(' ; ')}`;
   }
   if (doseReason === 'daily-limit' || timingReason === 'daily-limit') return 'limite journalière d’irrigation atteinte';
+  // Une ressource prélevée directement n'a ni stock ni minimum : sa coupe porte le nom de sa limite (point ouvert 55, D-085).
+  if (doseReason === 'withdrawal-limit' || timingReason === 'withdrawal-limit') return `limite de prélèvement de « ${chain.originName} » atteinte`;
   if (doseReason === 'reserved-share') return 'part de la semaine atteinte, le reste est réservé aux autres planches';
   if (doseReason === 'reserve-level' || timingReason === 'reserve-inflow') return `réserve « ${chain.originName} » au minimum de sécurité`;
   if (doseReason === 'refused-slot-fit' || timingReason === 'after-refused-slot') return 'créneau refusé évité (D-030)';

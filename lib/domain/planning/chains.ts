@@ -2,7 +2,7 @@ import { remainingPlannedApplications } from '../planned-irrigation.ts';
 import { cubicMetersFromMillimeters } from '../units.ts';
 import type { PlanningInputs } from './contract.ts';
 import type { PlanningEquipment } from './demand.ts';
-import { DirectResourceTimeline, PumpTimeline, ReservoirTimeline, datesBetween, type SupplyChain } from './supply.ts';
+import { DirectResourceTimeline, PumpTimeline, ReservoirTimeline, type SupplyChain } from './supply.ts';
 
 /**
  * Les chaînes d'eau des matériels du calcul : pompe, puis réserve ou
@@ -44,11 +44,7 @@ export function buildSupplyChains(inputs: PlanningInputs, equipment: readonly Pl
       if (kind === 'reservoir') {
         reservoirTimeline(id)?.addWithdrawal({ startMs: row.startsAt.getTime(), endMs: row.endsAt.getTime(), cubicMeters });
       } else if (kind === 'resource') {
-        const timeline = resourceTimeline(id);
-        if (timeline) {
-          const dates = datesBetween(row.startsAt, row.endsAt, timeZone);
-          for (const date of dates) timeline.addUse(date, cubicMeters / dates.length);
-        }
+        resourceTimeline(id)?.addWithdrawal(row.startsAt.getTime(), row.endsAt.getTime(), cubicMeters);
       }
     }
   }

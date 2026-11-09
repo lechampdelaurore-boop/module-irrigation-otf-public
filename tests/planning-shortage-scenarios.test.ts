@@ -23,7 +23,7 @@ const HORIZON_END = '2026-10-04T22:00:00.000Z';
 /** Les heures d'apport d'ici la fin de l'horizon, du mardi 12 h 52 au dimanche minuit à la ferme. */
 const HORIZON_HOURS = (Date.parse(HORIZON_END) - NOW.getTime()) / MILLISECONDS_PER_HOUR;
 /** Les motifs d'eau du résumé (« Manque d'eau ») : une planche servie hors pénurie n'en porte aucun. */
-const WATER_REASONS: readonly UnplacedReason[] = ['water-budget', 'deferred', 'reserve-timing', 'supply-unavailable', 'daily-limit'];
+const WATER_REASONS: readonly UnplacedReason[] = ['water-budget', 'deferred', 'reserve-timing', 'supply-unavailable', 'daily-limit', 'withdrawal-limit'];
 const placedVolume = (plan: WeeklyPlan) => plan.proposals.reduce((sum, proposal) => sum + (proposal.volumeCubicMeters ?? 0), 0);
 /** Le plan tel que le maraîcher le lit : chaque créneau, son matériel, ses heures et sa dose. */
 const slots = (plan: WeeklyPlan, keep: (equipmentId: string) => boolean = () => true) => plan.proposals
@@ -261,9 +261,12 @@ test('S24, semaine entamée : jeudi midi, le budget part du stock observé, les 
   for (const proposal of plan.proposals) assert.ok(Date.parse(proposal.startAt) >= THURSDAY_NOON.getTime(), `${proposal.id} : rien sur les jours écoulés`);
   const thursday = plan.proposals.reduce((sum, proposal) => sum + (splitVolumeAcrossLocalDays({ startAt: proposal.startAt, endAt: proposal.endAt, cubicMeters: proposal.volumeCubicMeters ?? 0, timeZone: TZ }).get('2026-10-01') ?? 0), 0);
   assert.ok(thursday + 0.924 <= 2 + 1e-6, `jeudi : ${thursday} m³ proposés en plus des 0,924 réalisés`);
-  // Sans l'arrosage du matin, la rampe du bloc 2 part jeudi soir ; avec lui, la limite du jeudi ne la laisse partir que vendredi.
+  // Sans l'arrosage du matin, la rampe du bloc 2 part jeudi soir ; avec lui, le reste du jeudi ne tient pas sa dose
+  // minimale : elle part à minuit, sur le vendredi, sa plage continuant jusqu'à 8 h (D-085).
   assert.equal(byEquipment(week(false), 'rampe-bloc-2')[0].startAt, '2026-10-01T19:00:00.000Z');
-  assert.equal(byEquipment(plan, 'rampe-bloc-2')[0].startAt, '2026-10-02T19:00:00.000Z');
+  const [friday] = byEquipment(plan, 'rampe-bloc-2');
+  assert.equal(friday.startAt, '2026-10-01T22:00:00.000Z');
+  assert.equal(friday.justification.timingReason, 'daily-limit');
 });
 
 test('S26, sensibilité à l’heure du calcul : deux minutes plus tard, les deux plans tiennent les invariants ; créneaux déplacés et écart de volume relevés', (t) => {
