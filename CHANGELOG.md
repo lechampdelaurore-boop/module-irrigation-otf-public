@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : la fiche d'une pompe et la réserve créée)
+
+- **La fiche d'une pompe voit une réserve créée sans recharger la page**
+  (point ouvert 60, D-093). Sur « Ressources et pompes », la fiche
+  « Nouvelle pompe » disait « Créez d’abord une ressource ou une réserve »
+  juste après « La réserve a été créée. » ; la gestion des pompes relit
+  maintenant son tableau quand une ressource ou une réserve change, et
+  les noms et les états se lisent à jour sur les cartes des pompes. Aucune
+  migration.
+
 ### Corrigé (3.9 : le motif de la dose en pénurie)
 
 - **En pénurie, la carte dit que la dose est la part de la planche**

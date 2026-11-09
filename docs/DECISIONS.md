@@ -3106,6 +3106,48 @@ de même ; hors pénurie, à 30 m³, la dose maximale puis le besoin restant.
 Le libellé (`tests/planning-presentation.test.ts`) ; P32 lit le motif sur
 la ferme de démonstration. Les 1 346 tests passent.
 
+## D-093 — La fiche d'une pompe et les ressources changées (point ouvert 60) : deux précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le second des deux
+défauts relevés en écrivant le parcours P32 (D-091), corrigé à part, après
+le premier (D-092). Codée en Opus 5.5 · Max sur le dépôt public, le contrat
+des pompes précisé d'abord (`docs/pumps-hydraulic-contract.md`, « La fiche
+d'une pompe »), les tests rouges avant le code.
+
+**Le défaut corrigé.** Sur la page « Ressources et pompes », la gestion des
+pompes gardait le tableau des ressources et des réserves lu au chargement
+de la page : une réserve créée dans le panneau voisin n'apparaissait pas
+dans les origines possibles d'une nouvelle pompe, dont la fiche disait
+« Créez d’abord une ressource ou une réserve » juste après « La réserve a
+été créée. » ; un nom changé ou une réserve rendue inactive se lisaient de
+même en retard sur les cartes des pompes, jusqu'au rechargement. Rien
+n'était faux en base, mais le maraîcher qui crée sa cuve puis sa pompe
+était arrêté sans raison.
+
+**Deux précisions**, techniques, tranchées par la recommandation et
+consignées au contrat des pompes :
+
+- F134 : après chaque enregistrement réussi, le panneau des ressources
+  signale qu'une ressource ou une réserve a changé
+  (`notifyWaterSourcesChanged`, `lib/domain/feasibility-notifications.ts`),
+  un signal de la page, sans données ; la gestion des pompes relit alors
+  son tableau au serveur par une action en lecture seule
+  (`loadPumpDashboardAction`), hors de la transition de ses
+  enregistrements, et une relecture cède la place à toute action ou
+  relecture plus récente. Une pompe enregistrée ne donne pas ce signal ; le
+  serveur vérifie toujours chaque origine à l'enregistrement
+  (`assertOriginsOwned`). Une relecture qui échoue le dit sous les pompes.
+- F135 : P32 crée sa réserve puis sa pompe sans recharger la page, comme
+  un maraîcher ; un test du domaine vérifie le signal, sans données, et
+  qu'une pompe enregistrée ne le donne pas
+  (`tests/water-sources-signal.test.ts`).
+
+**Vérifié par** P32, rouge avant le code (la ligne de la réserve attendue
+dans la fiche, jamais parue), vert après, et le test du signal, rouge
+avant : le module n'avait pas ce signal. Les 1 348 tests et les 88
+parcours passent.
+
 ## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de

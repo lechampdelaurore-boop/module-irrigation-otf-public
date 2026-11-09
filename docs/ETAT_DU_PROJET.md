@@ -92,7 +92,9 @@ registres, elle y renvoie.
   PR qui précède celle de ce lot (D-094). 88 parcours. **61 corrigé le
   9 novembre 2026** (D-092, F132 et F133), dans une PR qui suit celle du
   lot 4 : la carte d'une ligne en pénurie dit que sa dose est « la part de
-  la semaine réservée à ses planches ».
+  la semaine réservée à ses planches ». **60 corrigé le 9 novembre 2026**
+  (D-093, F134 et F135), dans une PR qui suit celle de 61 : la fiche d'une
+  pompe voit une réserve créée sans recharger la page.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7727,7 +7729,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    côtés s'écrivent autrement (`tests/planning-follow-up.test.ts`, rouge
    avant).
 60. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
-   3.9, D-091) ; non bloquant.** Sur la page « Ressources et pompes », une
+   3.9, D-091) ; corrigé le jour même (D-093) ; fermeture au jugement du
+   porteur.** Sur la page « Ressources et pompes », une
    réserve ou une ressource créée n'apparaît pas dans les origines possibles
    d'une nouvelle pompe avant le rechargement de la page : la fiche « Nouvelle
    pompe » dit « Créez d’abord une ressource ou une réserve, ou enregistrez la
@@ -7742,7 +7745,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    recharge la page entre les deux. Recommandation : la gestion des pompes
    relit les ressources quand le panneau voisin en change une, comme la
    faisabilité le fait déjà (`notifyFeasibilityChanged`) ; une PR `fix/` à
-   part, le test rouge d'abord, P32 sans rechargement.
+   part, le test rouge d'abord, P32 sans rechargement. Corrigé le
+   9 novembre 2026 (D-093, F134 et F135), comme recommandé : après chaque
+   enregistrement réussi, le panneau des ressources le signale, et la
+   gestion des pompes relit son tableau au serveur ; P32 crée sa réserve
+   puis sa pompe sans recharger (rouge avant : la réserve n'est jamais
+   parue dans la fiche), et `tests/water-sources-signal.test.ts` vérifie le
+   signal.
 61. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
    3.9, D-091) ; corrigé le jour même (D-092) ; fermeture au jugement du
    porteur.** En pénurie, la carte d'une ligne qui

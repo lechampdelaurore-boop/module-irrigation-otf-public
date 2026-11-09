@@ -930,7 +930,8 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    `docs/recette-tranche-3.md`. Écrits le 9 novembre 2026 (D-091), avec les
    deux tests du moteur de S21, absents de la liste du point 3 ; deux défauts
    relevés en écrivant P32, points ouverts 60 et 61, chacun corrigé dans sa
-   PR `fix/`, son test rouge d'abord (61 le 9 novembre 2026, D-092) ; un
+   PR `fix/`, son test rouge d'abord (61 et 60 le 9 novembre 2026, D-092
+   et D-093) ; un
    troisième en jouant tous les parcours, le point 62, une pompe et un
    matériel archivés au téléphone et au contraste, corrigé dans une PR qui
    précède celle du lot (D-094).
