@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : l'origine indisponible)
+
+- **Une pompe archivée ou une origine indisponible ne reçoit plus rien,
+  et le dit** (points ouverts 52 et 53, D-088). Un matériel dont la pompe
+  habituelle est archivée n'est plus proposé « faisabilité non vérifiée »
+  comme s'il n'en avait pas : il ne reçoit aucun créneau. Une chaîne dont
+  rien ne peut venir d'ici dimanche — pompe archivée, réserve ou ressource
+  inactive, ressource hors de sa période — n'entre dans aucun partage :
+  ses planches portent « origine d'eau ou pompe indisponible », et sa
+  ligne de budget dit « indisponible cette semaine, aucune eau
+  mobilisable » au lieu d'un stock qu'aucun créneau ne peut prendre.
+  Aucune migration.
+
 ### Corrigé (3.9 : l'eau et le temps de pompage à la fois)
 
 - **Le manque d'eau et le temps de pompage manquant ne se mélangent
