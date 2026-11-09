@@ -190,6 +190,31 @@ test('une ferme révise le profil d\'une culture à partir d\'un jour ; le profi
   assert.equal(cropRooting(rootingProfileOn(bob, 'criiam-tomate', '2026-07-01'), staged(3, '2026-06-20'), '2026-07-01').depthM, 0.65);
 });
 
+test('revue de sécurité (D2) : rien de ce qu’une ferme saisit pour son sol ne se lit chez une autre', async () => {
+  const bobWorkspace = await ensureWorkspaceForUser(BOB);
+  const before = await readSoilReserveInputsForWorkspace(bobWorkspace, '2026-06-01');
+  assert.equal((await addSoilRecordForUser(ALICE, FARM_SOIL_ENTRY, NOW)).ok, true);
+  assert.equal((await addSoilSettingsForUser(ALICE, { ...DEFAULT_SOIL_SETTINGS, threshold: { mode: 'farm', percent: 50 }, effectiveFrom: '2026-06-01' }, NOW)).ok, true);
+  assert.equal((await addSoilObservationForUser(ALICE, { zoneId: BED.zoneId, plotId: null, percent: 50, observedAt: '2026-06-10T07:00:00.000Z' }, NOW)).ok, true);
+  assert.equal((await addSurfaceDeclarationForUser(ALICE, { bedId: BED.id, date: '2026-06-01', state: 'impermeable-tarp' }, NOW)).ok, true);
+  assert.equal((await addRootingProfileForUser(ALICE, {
+    referenceCropId: 'criiam-tomate',
+    p: 0.4,
+    stages: [{ rank: 1, depthM: 0.2, endDepthM: null, progressionDays: null }, { rank: null, depthM: 0.3, endDepthM: null, progressionDays: null }],
+    source: 'Contrôle à la tarière sous abri',
+    note: 'Racines dans les 30 premiers cm',
+    effectiveFrom: '2026-06-15',
+  }, NOW)).ok, true);
+
+  const alice = await readSoilReserveInputsForWorkspace(await ensureWorkspaceForUser(ALICE), '2026-06-01');
+  assert.deepEqual(
+    [alice.soilRecords.length, alice.settings.length, alice.observations.length, alice.surfaceDeclarations.length, alice.rootingProfiles.filter((profile) => profile.origin === 'farm').length],
+    [1, 1, 1, 1, 1],
+    'chez Alice, ses cinq saisies se relisent',
+  );
+  assert.deepEqual(await readSoilReserveInputsForWorkspace(bobWorkspace, '2026-06-01'), before, 'chez Bob, rien n’a changé : ni sol, ni seuil, ni observation, ni état de surface, ni profil');
+});
+
 test('un profil sur une culture inconnue ou hors règles est refusé', async () => {
   const base = { p: 0.4, stages: [], source: 'test', note: null, effectiveFrom: '2026-06-15' };
   assert.deepEqual(await addRootingProfileForUser(ALICE, { ...base, referenceCropId: 'inconnue' }, NOW), { ok: false, problems: ['Culture de référence inconnue : inconnue.'] });
