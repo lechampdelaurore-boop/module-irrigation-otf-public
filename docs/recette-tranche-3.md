@@ -67,7 +67,7 @@ porteur pose le jour même (décision 3).
 
 | N° | Geste | Attendu (règle) | Attendu chiffré, écrit avant le clic | Constaté | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| B1 | Stock seul (S1) : forage indisponible, la réserve à son stock observé, minimum 0 | Budget égal au stock ; une fraction par niveau ; chaque planche coupée à sa part, motif « stock et ressources insuffisants d’ici dimanche » ; somme des volumes ≤ budget ; la dernière planche examinée servie comme la première (D-037) | | | |
+| B1 | Stock seul (S1) : forage indisponible, la réserve à son stock observé, minimum 0 | Budget égal au stock ; une fraction par niveau ; chaque planche coupée à sa part, motif « stock et ressources insuffisants d’ici dimanche », la dose de sa carte dite « la part de la semaine réservée à ses planches » (D-092) ; somme des volumes ≤ budget ; la dernière planche examinée servie comme la première (D-037) | | | |
 | B2 | Minimum relevé au-dessus du stock (S3) | Aucun créneau avant que l'apport ait comblé le manque sous le minimum, « dès que la réserve a l'eau nécessaire » ; la réserve jamais sous son minimum ; la ligne de budget retire d'abord ce manque (décision 2) | | | |
 | B3 | Limite de prélèvement de la ressource (S2) | Budget égal au stock plus l'apport plafonné jour par jour ; aucun jour au-delà de la limite ; sa coupe nommée « limite de prélèvement … atteinte » (D-085) | | | |
 | B4 | Restriction : limite journalière d'irrigation (S5) | Chaque jour limité rempli au plus à la limite, réalisé et validé compris ; la coupe nommée « limite journalière » ; un créneau à cheval sur minuit vérifié sur ses deux jours (D-085) | | | |

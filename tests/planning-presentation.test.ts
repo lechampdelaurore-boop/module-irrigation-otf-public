@@ -334,6 +334,8 @@ test('la note du manque d’eau chiffre l’écart entre demandé, placé et man
   assert.equal(waterDeficitExplanation(planWithDeficit([placed(3)], deficit(6, { 'water-budget': 6 }), null)), null);
   assert.equal(waterDeficitExplanation(planWithDeficit([placed(4), placed(3, 'calc-0')], deficit(6, { 'water-budget': 6 }), 10)), null);
   assert.equal(doseReasonLabel('reserved-share'), 'la part de la semaine réservée à ses planches');
+  // Une dose qui est la part, sans coupe, se dit de même (point ouvert 61, D-092).
+  assert.equal(doseReasonLabel('shortage-share'), 'la part de la semaine réservée à ses planches');
 });
 
 test('la note se tait sous le résidu d’arrondi des secondes, un centième de millimètre par planche et par créneau (D-040, point 41)', () => {

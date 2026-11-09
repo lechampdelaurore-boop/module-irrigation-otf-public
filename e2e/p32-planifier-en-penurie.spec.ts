@@ -115,15 +115,17 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   await verifierLEtape(page, journal, 'liste non placé et son motif');
 
   // La carte de chaque ligne porte la part de sa planche, la même dose pour
-  // les deux, au même besoin ; sa justification nomme la réserve et la
-  // faisabilité vérifiée. Le motif de la dose, qui dit encore « le besoin
-  // restant » pour cette part, n'est pas lu ici (point ouvert 61).
+  // les deux, au même besoin ; sa justification dit que cette dose est la
+  // part, non « le besoin restant » (point ouvert 61, D-092), nomme la réserve
+  // et la faisabilité vérifiée.
   const carteN02 = await carteNommee(planning, proposeesDe(planning, n02.materiel).first());
   await expect(doseDe(carteN02)).toHaveText(PART_MM);
   await expect(doseDe(proposeesDe(planning, n03.materiel).first())).toHaveText(PART_MM);
   await montrerLaCarte(planning, carteN02);
   await carteN02.locator('summary').click();
   const justification = carteN02.locator('.planning-justification');
+  await expect(justification).toContainText('la part de la semaine réservée à ses planches');
+  await expect(justification).not.toContainText('le besoin restant');
   await expect(justification).toContainText(reserve);
   await expect(justification).toContainText('vérifiée : pompe, origine et stock connus');
   await carteN02.locator('summary').click();
