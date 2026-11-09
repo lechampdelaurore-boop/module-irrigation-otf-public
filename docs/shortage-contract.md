@@ -581,9 +581,9 @@ Trois fermes, chacune pour ce qu'elle prouve.
    de la carte, son motif — « la part de la semaine réservée à ses
    planches », qui disait « le besoin restant de la planche la plus
    demandeuse » avant la correction du point ouvert 61 (D-092) —, la réserve
-   et la faisabilité de sa justification. La fiche d'une pompe ne
-   voit une réserve créée qu'après le rechargement de la page (point ouvert
-   60) : P32 recharge entre les deux.
+   et la faisabilité de sa justification. La fiche d'une pompe ne voyait
+   une réserve créée qu'après le rechargement de la page (point ouvert 60) :
+   P32 crée l'une puis l'autre sans recharger depuis sa correction (D-093).
 3. **La ferme réelle**, pour la recette finale seulement, sur le « vas-y » du
    porteur, données expérimentales relevées et remises en état par l'écran.
    Aucun export de la ferme n'est versionné (`AGENTS.md`, sécurité) : ses
