@@ -3,6 +3,7 @@ import test, { afterEach, beforeEach } from 'node:test';
 import { cancelPlannedIrrigationForUser } from '../../db/irrigation-event/completion';
 import { createIrrigationEventForUser, updatePlannedIrrigationForUser } from '../../db/irrigation-event/create';
 import { saveFeatureSelectionForUser } from '../../db/feature-selection-repository';
+import { listIrrigationArbitrationsForUser, readFeasibilityRevisionForUser, saveIrrigationArbitrationForUser } from '../../db/irrigation-arbitration-repository';
 import { decidePlanProposalForUser, savePlanningSettingsForUser } from '../../db/planning-repository';
 import { createProtectedSlotForUser, deleteProtectedSlotForUser } from '../../db/protected-slots-repository';
 import { listPumpConfigurationForUser, saveEquipmentDefaultPumpForUser, savePumpForUser } from '../../db/pump-repository';
@@ -15,7 +16,8 @@ import type { PlanCalculationEvent, StoredWeeklyPlan } from '../../lib/domain/pl
 import { calculationTriggerLabel, summarizePlan } from '../../lib/domain/planning/presentation';
 import { DEFAULT_PLANNING_SETTINGS, minutesOfDay } from '../../lib/domain/planning/settings';
 import { recalculatePlanAfterEvent, recalculatePlanAfterFeatureChange } from '../../lib/services/planning-recalculation';
-import { computeWeeklyPlanForUser, readWeeklyPlanForUser } from '../../lib/services/planning-service';
+import { computeWeeklyPlanForUser, readWeeklyPlanForUser, recalculateWeeklyPlansForAllWorkspaces } from '../../lib/services/planning-service';
+import { refusePlanProposalForUser } from '../../lib/services/planning-validation-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
 
@@ -404,6 +406,7 @@ async function farmUnderDefer(owner = ALICE) {
   for (const fixture of [first, second]) await saveEquipmentDefaultPumpForUser(owner, owner, fixture.equipment.id, pumpId);
   await saveHydricGoalForUser(owner, { season: 2026, weekStart: '2026-09-21', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
   await savePlanningSettingsForUser(owner, owner, { ...DEFAULT_PLANNING_SETTINGS, shortageStrategy: 'defer' });
+  return { first, second };
 }
 
 const deferredOf = (plan: StoredWeeklyPlan | null) => plan?.calculation.summary.beds.filter((bed) => bed.reasons.includes('deferred')).map((bed) => bed.bedId);
@@ -442,4 +445,56 @@ test('sous le report, un calcul qui suit un recalcul échoué fait avancer la fi
   const recalculated = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: later });
   assert.deepEqual(deferredOf(recalculated), ['bed-1'], 'le calcul à la main qui suit l’échec fait passer la reportée devant');
   assert.equal(recalculated.pendingEvent, null);
+});
+
+test('S28, deux exploitations la même semaine : rien de A, en pénurie, ne paraît chez B — réglages, arbitrage, refus, suggestions, notification — et l’échec du calcul du matin de A ne gêne pas B (3.9)', async () => {
+  // A : la ferme du report, en pénurie (0,7 m³ pour 1,2 m³), un arrosage posé à la main demain au-delà de la dose
+  // maximale, un refus et un arbitrage ; B : la ferme ordinaire, la même saison, la même semaine, les mêmes planches.
+  const { first: dripOfA } = await farmUnderDefer(ALICE);
+  const { fixture } = await farmWithWater(BOB);
+  const tomorrow = { startAt: '2026-09-30T06:00:00.000Z', endAt: '2026-09-30T07:00:00.000Z', durationSeconds: 3600 };
+  await createIrrigationEventForUser(ALICE, {
+    ...completedDraft(dripOfA, tomorrow), kind: 'planned', actualStartAt: null, actualEndAt: null, actualDurationSeconds: 0,
+    plannedStartAt: tomorrow.startAt, plannedEndAt: tomorrow.endAt, plannedDurationSeconds: tomorrow.durationSeconds,
+  });
+  const before = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
+  const refused = before.proposals.find((proposal) => proposal.status === 'proposed');
+  assert.ok(refused);
+  assert.equal(await refusePlanProposalForUser({ ownerUserId: BOB, proposalId: refused.storedId, actorUserId: BOB }), false, 'B ne décide pas d’une proposition de A');
+  assert.equal(await refusePlanProposalForUser({ ownerUserId: ALICE, proposalId: refused.storedId, actorUserId: ALICE }), true);
+  await saveIrrigationArbitrationForUser(ALICE, {
+    season: 2026, weekStart: '2026-09-28', priority: 'normal', selectedBedIds: ['bed-2'], candidateBedIds: ['bed-1', 'bed-2'],
+    expectedRevision: await readFeasibilityRevisionForUser(ALICE), requestId: 'arbitrage-de-a',
+  });
+
+  const alarms: string[] = [];
+  const scheduleAlarm = async (request: { recipientKey: string }) => { alarms.push(request.recipientKey); return { status: 'ok' as const }; };
+  const alice = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW, trigger: 'daily', scheduleAlarm });
+  assert.equal(alice.calculation.settings.shortageStrategy, 'defer');
+  assert.ok(alice.calculation.summary.deficit.waterCubicMeters > 0, 'A est en pénurie');
+  assert.ok(alice.suggestions.length > 0, 'l’arrosage de A au-delà de la dose maximale lui vaut une suggestion');
+  // L'arbitrage se lit par exploitation : celui de A n'entre pas dans les entrées de B.
+  assert.equal((await listIrrigationArbitrationsForUser(ALICE, 2026, '2026-09-28')).length, 1);
+  assert.deepEqual(await listIrrigationArbitrationsForUser(BOB, 2026, '2026-09-28'), []);
+  assert.equal(alarms.length, 1, 'A est prévenu le matin');
+  const bob = await computeWeeklyPlanForUser({ ownerUserId: BOB, season: 2026, snapshot, now: NOW, trigger: 'daily', scheduleAlarm });
+  assert.equal(alarms.length, 1, 'rien n’est notifié à B');
+  assert.deepEqual(bob.calculation.settings, DEFAULT_PLANNING_SETTINGS, 'les réglages de B, pas le report de A');
+  assert.equal(bob.calculation.summary.arbitration, undefined);
+  assert.equal(bob.calculation.summary.deferredQueue, undefined);
+  assert.deepEqual(bob.suggestions, []);
+  assert.deepEqual(bob.calculation.summary.deficit, { waterCubicMeters: 0, pumpTimeCubicMeters: 0, byReason: {}, bedCount: 0 });
+  assert.deepEqual(bob.calculation.summary.budgets.map((budget) => budget.fractions), [{ high: 1, normal: 1, low: 1 }], 'la réserve de B seule, sans pénurie');
+  assert.ok(bob.proposals.every((proposal) => proposal.equipmentId === fixture.equipment.id && proposal.status === 'proposed'), 'les propositions de B seules, aucune décision de A');
+  assert.equal(bob.proposals[0].startAt, refused.startAt, 'le créneau refusé chez A reste libre chez B');
+
+  // Le calcul du matin : un calcul enregistré abîmé chez A le fait échouer ; B reçoit le sien, et le journal ne nomme personne.
+  database.sqlite.prepare("UPDATE irrigation_plan_calculations SET summary = '{\"beds\":[]}' WHERE workspace_id = (SELECT id FROM irrigation_workspaces WHERE owner_user_id = ?)").run(ALICE);
+  const lines: string[] = [];
+  const morning = new Date('2026-09-29T11:30:00.000Z');
+  assert.deepEqual(await recalculateWeeklyPlansForAllWorkspaces({ now: morning, log: (line) => { lines.push(line); } }), { recalculated: 1, failed: 1 });
+  const bobMorning = await readWeeklyPlanForUser({ ownerUserId: BOB, season: 2026, now: morning });
+  assert.deepEqual([bobMorning?.calculation.trigger, bobMorning?.calculation.computedAt], ['daily', morning.toISOString()]);
+  assert.equal(lines.length, 1);
+  assert.ok(!lines[0].includes(ALICE) && !lines[0].includes(BOB), lines[0]);
 });
