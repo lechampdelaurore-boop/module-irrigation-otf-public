@@ -573,6 +573,13 @@ export function splitIntervalByLocalDay(start: Date, end: Date, timeZone: string
   return result;
 }
 
+/** Une ressource donne de l'eau un jour donné : active, et ce jour dans sa période de disponibilité. */
+export function isResourceAvailableOn(resource: WaterResource, date: string): boolean {
+  return resource.status === 'active'
+    && (resource.availableFrom === null || date >= resource.availableFrom)
+    && (resource.availableUntil === null || date <= resource.availableUntil);
+}
+
 export function resourcePotentialForSegment({
   resource,
   limits,
@@ -584,9 +591,7 @@ export function resourcePotentialForSegment({
   segment: LocalDaySegment;
   alreadyWithdrawnCubicMeters: number;
 }) {
-  if (resource.status !== 'active'
-    || (resource.availableFrom !== null && segment.date < resource.availableFrom)
-    || (resource.availableUntil !== null && segment.date > resource.availableUntil)) return 0;
+  if (!isResourceAvailableOn(resource, segment.date)) return 0;
   const byFlow = resource.nominalFlowCubicMetersPerHour * segment.hours;
   const limit = latestResourceLimit(limits, segment.date);
   if (!limit?.enabled || limit.maxCubicMetersPerDay === null) return byFlow;

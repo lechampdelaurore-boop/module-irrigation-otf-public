@@ -58,7 +58,12 @@ export function buildSupplyChains(inputs: PlanningInputs, equipment: readonly Pl
     }
     const origin = item.origin;
     let chain: SupplyChain;
-    if (!origin) {
+    if (item.unavailablePump) {
+      // La pompe habituelle archivée : rien ne sert le matériel, qui ne puise pas dans l'origine de cette pompe, que
+      // d'autres pompes peuvent servir ; une chaîne à part, pompe par pompe (point ouvert 52, D-088).
+      const { id, name } = item.unavailablePump;
+      chain = { originKey: `pump:${id}`, originName: name === null ? 'pompe habituelle introuvable' : `${name} (pompe archivée)`, pumpTimeline: null, reservoir: null, resource: null, origin: null, unavailable: true };
+    } else if (!origin) {
       chain = { originKey: null, originName: pump ? 'origine non renseignée' : 'sans pompe', pumpTimeline, reservoir: null, resource: null, origin: null, unavailable: false };
     } else if (origin.sourceKind === 'reservoir' && origin.reservoirId) {
       const timeline = reservoirTimeline(origin.reservoirId);
@@ -80,7 +85,8 @@ export function buildSupplyChains(inputs: PlanningInputs, equipment: readonly Pl
         reservoir: null,
         resource: timeline,
         origin,
-        unavailable: !timeline || timeline.resource.status !== 'active',
+        // Inactive, ou hors de sa période toute la semaine : rien ne peut en venir (point ouvert 53, D-088).
+        unavailable: !timeline || !timeline.availableDuringHorizon,
       };
     }
     chains.set(item.id, chain);

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
-import { waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
+import { arbitrationNote, waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
 import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { splitVolumeAcrossLocalDays } from '../lib/domain/water-management.ts';
 import {
@@ -237,6 +237,39 @@ test('S8, ressource directe inactive ou hors de sa période toute la semaine : m
   assert.ok(line && !line.unavailable, 'disponible une partie de la semaine');
   close(line?.availableCubicMeters ?? null, 8, 1e-6, 'le budget de ses jours disponibles');
   assert.ok(byEquipment(partial, 'rampe-bloc-2').length > 0, 'la rampe du bloc 2 servie');
+});
+
+test('S8 sous un arbitrage validé : les planches d’une chaîne indisponible ne portent que ce motif, et leur allocation ne peut pas être reçue ; l’autre chaîne garde la sienne (points ouverts 52 et 53, D-088)', () => {
+  // Chaque planche allouée à 10 mm, la moitié de son besoin, sur la surface que son propre matériel mouille.
+  const wettedAreaOf = (bedId: string) => (bedId.startsWith('B1-') ? 16.5 : bedId.startsWith('B2-') ? 28.039 : 16);
+  const arbitrated = (inputs: PlanningInputs): PlanningInputs => ({
+    ...inputs,
+    arbitration: inputs.needs.map(({ bedId }) => ({ bedId, allocatedCubicMeters: cubicMetersFromMillimeters(10, wettedAreaOf(bedId)) })),
+  });
+  const twoChains = withDirectChain(farm().inputs, { equipmentIds: ['rampe-bloc-2'], dailyLimitCubicMeters: 10 });
+  const inputs = arbitrated(withReservoir(twoChains, { status: 'inactive' }));
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  // Avant, « stock et ressources » s'ajoutait au motif, et 6,35 m³ du manque se comptaient sous lui.
+  for (const bed of plan.beds.filter((item) => item.equipmentId !== 'rampe-bloc-2')) assert.deepEqual(bed.reasons, ['supply-unavailable'], bed.bedName);
+  for (const bed of plan.beds.filter((item) => item.equipmentId === 'rampe-bloc-2')) close(bed.placedMm, 10, 0.01, `${bed.bedName} : son allocation`);
+  close(plan.deficit.byReason['supply-unavailable'] ?? null, 7.1, 1e-6, 'toute la demande de la chaîne de la réserve');
+  close(plan.deficit.byReason['water-budget'] ?? null, 2.8039, 1e-6, 'ce que l’arbitrage ne donne pas au bloc 2');
+  assert.ok(plan.arbitration);
+  close(plan.arbitration.allocatedCubicMeters, 6.3539, 1e-6, 'alloué');
+  close(plan.arbitration.reservedCubicMeters, 6.3539, 1e-6, 'aucune réduction');
+  close(plan.arbitration.unreceivedCubicMeters, 3.55, 1e-6, 'les allocations de la chaîne de la réserve');
+  assert.equal(plan.arbitration.unreceivedBedCount, 22);
+  // La seule pompe de la ferme archivée : rien n'est placé, et toutes les allocations restent non attribuées.
+  const archived = arbitrated(withArchivedPump(farm().inputs, 'pompe'));
+  const archivedPlan = buildWeeklyPlan(archived, settings);
+  assertInvariants(archivedPlan, archived);
+  assert.deepEqual(slots(archivedPlan), [], 'aucun créneau');
+  assert.equal(
+    arbitrationNote(archivedPlan),
+    'Votre choix entre les demandes d’eau s’impose : 6,354 m³ alloués, chaque allocation réservée à sa planche. '
+      + '6,354 m³ alloués à 32 planches ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
+  );
 });
 
 test('S9, deux chaînes d’eau : une ligne de budget par chaîne, la pénurie de l’une ne touche pas l’autre, chaque planche comptée sur la chaîne de son matériel', () => {

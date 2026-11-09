@@ -8,6 +8,8 @@ import { commonFraction, ShareLedger, shareAt } from './shares.ts';
 import type { DailyLimitLedger, SupplyChain } from './supply.ts';
 
 const EPSILON = 1e-9;
+/** Un reste sous un centième de millimètre est un résidu d'arrondi, comme dans le registre des parts. */
+const NEGLIGIBLE_MM = 0.01;
 
 /** L'état d'une planche pendant le calcul : sa cible, ce qui est placé, ce qui manque et pourquoi. */
 export type BedState = PlanningBed & {
@@ -31,6 +33,8 @@ export type ArbitrationShares = {
   allocatedCubicMeters: number;
   reservedCubicMeters: number;
   ledgers: readonly ShareLedger[];
+  /** Les allocations des chaînes indisponibles, que rien ne peut apporter : non reçues d'avance (D-088). */
+  unreceivable: { cubicMeters: number; bedCount: number };
 };
 
 /**
@@ -76,6 +80,16 @@ export function applyShortage(
   const dailyRemaining = ledger.remainingBetween(horizonStart.getTime(), weekEndAt.getTime());
   const groups = chainGroups(beds, chains, dailyRemaining);
   const validatedMm = validatedWaterOf(inputs, chains, horizonStart, weekEndAt);
+  // Une chaîne dont rien ne peut venir d'ici dimanche n'entre dans aucun partage : ses planches portent leur motif avant
+  // la conduite comme avant un arbitrage, tout leur besoin compté en manque d'eau (points ouverts 52 et 53, D-088).
+  for (const group of groups) {
+    if (!group.chain.unavailable) continue;
+    for (const bed of group.beds) {
+      bed.targetMm = 0;
+      bed.remainingMm = 0;
+      bed.reasons.add('supply-unavailable');
+    }
+  }
 
   // Un arbitrage absent ou vide ne s'impose pas : la conduite en pénurie s'applique (point 26).
   if (inputs.arbitration && inputs.arbitration.length > 0) {
@@ -86,11 +100,17 @@ export function applyShortage(
   const shares = new Map<string, ShareLedger>();
   const deferredFirst = new Set(inputs.deferredBedIds ?? []);
   for (const group of groups) {
-    const { key, chain, available, budget, shortfallReason } = group;
+    const { chain, budget, shortfallReason } = group;
     const demandByLevel: Record<IrrigationNeedPriority, number> = { high: 0, normal: 0, low: 0 };
     for (const bed of group.beds) demandByLevel[bed.priority] += volumeOf(bed, bed.needMm);
     const demand = demandByLevel.high + demandByLevel.normal + demandByLevel.low;
     const fractions: Record<IrrigationNeedPriority, number> = { high: 1, normal: 1, low: 1 };
+    if (chain.unavailable) {
+      // Ni conduite ni part : rien n'est visé, et la ligne le dit, sans eau mobilisable (D-088).
+      for (const level of ['high', 'normal', 'low'] as const) if (demandByLevel[level] > EPSILON) fractions[level] = 0;
+      budgets.push({ budget: budgetLine(group, demandByLevel, fractions, dailyRemaining), beds: group.beds, volumeOf });
+      continue;
+    }
     let deferMode = false;
     if (Number.isFinite(budget) && demand > budget + EPSILON) {
       if (settings.shortageStrategy !== 'defer') {
@@ -151,21 +171,28 @@ export function applyShortage(
         if (bed.equipmentId) shares.set(bed.equipmentId, ledger);
       }
     }
-    budgets.push({
-      budget: {
-        originKey: key,
-        originName: chain.originName,
-        availableCubicMeters: available,
-        dailyLimitRemainingCubicMeters: dailyRemaining,
-        demandCubicMeters: demand,
-        fractions,
-        demandByLevelCubicMeters: demandByLevel,
-      },
-      beds: group.beds,
-      volumeOf,
-    });
+    budgets.push({ budget: budgetLine(group, demandByLevel, fractions, dailyRemaining), beds: group.beds, volumeOf });
   }
   return { budgets, shares, arbitration: null };
+}
+
+/**
+ * La ligne de budget d'une chaîne : son eau mobilisable, ce que la limite
+ * journalière laisse, sa demande et la part visée de chaque niveau ; le
+ * drapeau `unavailable` seulement quand rien ne peut venir de la chaîne
+ * (D-088), absent sinon, comme dans un calcul enregistré avant.
+ */
+function budgetLine(group: ChainGroup, demandByLevel: Record<IrrigationNeedPriority, number>, fractions: Record<IrrigationNeedPriority, number>, dailyRemaining: number | null): SupplyBudget {
+  return {
+    originKey: group.key,
+    originName: group.chain.originName,
+    availableCubicMeters: group.available,
+    ...(group.chain.unavailable ? { unavailable: true } : {}),
+    dailyLimitRemainingCubicMeters: dailyRemaining,
+    demandCubicMeters: demandByLevel.high + demandByLevel.normal + demandByLevel.low,
+    fractions,
+    demandByLevelCubicMeters: demandByLevel,
+  };
 }
 
 /**
@@ -246,7 +273,8 @@ function chainGroups(beds: readonly BedState[], chains: ReadonlyMap<string, Supp
     groups.set(key, group);
   }
   return [...groups.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([key, { chain, beds: grouped }]) => {
-    const available = chain.reservoir ? chain.reservoir.budgetCubicMeters() : chain.resource ? chain.resource.budgetCubicMeters() : null;
+    // Une chaîne indisponible n'a aucune eau mobilisable, quoi que sa réserve contienne (point ouvert 53, D-088).
+    const available = chain.unavailable ? 0 : chain.reservoir ? chain.reservoir.budgetCubicMeters() : chain.resource ? chain.resource.budgetCubicMeters() : null;
     const budget = [available, dailyRemaining].filter((value): value is number => value !== null).reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
     // Le terme qui borne nomme la coupe : la limite journalière quand elle laisse moins que l'eau, l'eau sinon
     // (point ouvert 35, corrigé le 9 octobre 2026).
@@ -263,7 +291,9 @@ function chainGroups(beds: readonly BedState[], chains: ReadonlyMap<string, Supp
  * allocations, réduites dans la même proportion quand elles dépassent le
  * budget —, sans conduite : rien n'est redistribué. Les planches que
  * l'arbitrage ne nomme pas gardent leur besoin et puisent dans l'eau non
- * attribuée.
+ * attribuée. Les planches d'une chaîne indisponible gardent leur cible
+ * nulle et leur seul motif : leur allocation ne peut pas être reçue, et
+ * reste non attribuée (points ouverts 52 et 53, D-088).
  */
 function applyArbitration(
   beds: readonly BedState[],
@@ -272,6 +302,7 @@ function applyArbitration(
   water: { wettedFor: (bed: BedState) => number | null; volumeOf: (bed: BedState, mm: number) => number; validatedMm: (bed: BedState) => number },
 ): { shares: Map<string, ShareLedger>; arbitration: ArbitrationShares } {
   const { wettedFor, volumeOf, validatedMm } = water;
+  const unavailable = new Set(groups.filter((group) => group.chain.unavailable).flatMap((group) => group.beds));
   const allocated = new Map<BedState, number>();
   for (const allocation of allocations) {
     const bed = beds.find((item) => item.bedId === allocation.bedId);
@@ -282,18 +313,30 @@ function applyArbitration(
     // D-086), et il ne reste à placer que l'allocation moins cette eau.
     const validated = validatedMm(bed);
     const allotted = Math.min(bed.needMm + validated, allowedMm);
+    allocated.set(bed, allotted);
+    if (unavailable.has(bed)) continue;
     const target = Math.max(0, allotted - validated);
     if (target < bed.needMm - EPSILON) bed.reasons.add('water-budget');
     bed.targetMm = target;
     bed.remainingMm = target;
-    allocated.set(bed, allotted);
   }
   const allocatedCubicMeters = [...allocated].reduce((sum, [bed, allotted]) => sum + volumeOf(bed, allotted), 0);
   const shares = new Map<string, ShareLedger>();
   const ledgers: ShareLedger[] = [];
+  const unreceivable = { cubicMeters: 0, bedCount: 0 };
   let reduction = 0;
   for (const group of groups) {
     const own = group.beds.filter((bed) => allocated.has(bed));
+    if (group.chain.unavailable) {
+      // Rien ne peut venir de la chaîne : ce qu'elle aurait placé ne peut pas être reçu, sans registre ni réduction (D-088).
+      for (const bed of own) {
+        const mm = Math.max(0, (allocated.get(bed) ?? 0) - validatedMm(bed));
+        if (mm <= NEGLIGIBLE_MM) continue;
+        unreceivable.cubicMeters += volumeOf(bed, mm);
+        unreceivable.bedCount += 1;
+      }
+      continue;
+    }
     if (own.length === 0 || !Number.isFinite(group.budget)) continue;
     const reserved = own.reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0);
     let shortfallReason: UnplacedReason = 'water-budget';
@@ -316,13 +359,13 @@ function applyArbitration(
       if (bed.equipmentId) shares.set(bed.equipmentId, ledger);
     }
   }
-  return { shares, arbitration: { allocatedCubicMeters, reservedCubicMeters: allocatedCubicMeters - reduction, ledgers } };
+  return { shares, arbitration: { allocatedCubicMeters, reservedCubicMeters: allocatedCubicMeters - reduction, ledgers, unreceivable } };
 }
 
 /** Après le placement : ce que les planches allouées n'ont pas reçu de leur part reste non attribué, et le plan le dit. */
 export function arbitrationOutcome(arbitration: ArbitrationShares): PlanArbitration {
-  let unreceivedCubicMeters = 0;
-  let unreceivedBedCount = 0;
+  let unreceivedCubicMeters = arbitration.unreceivable.cubicMeters;
+  let unreceivedBedCount = arbitration.unreceivable.bedCount;
   for (const ledger of arbitration.ledgers) {
     const unspent = ledger.unspentShares();
     unreceivedCubicMeters += unspent.cubicMeters;

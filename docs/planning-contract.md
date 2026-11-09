@@ -451,7 +451,10 @@ matériels dont la pompe habituelle est archivée forment, pompe par pompe,
 une chaîne à part, nommée « <nom de la pompe> (pompe archivée) » : ils ne
 puisent pas dans l'origine de cette pompe, que d'autres pompes peuvent
 servir. Un matériel sans pompe habituelle reste proposé « faisabilité non
-vérifiée ».
+vérifiée ». Sous un arbitrage validé, ses planches gardent ce seul motif et
+rien à recevoir : leur allocation, que rien ne peut leur apporter, compte
+parmi ce que les planches allouées ne peuvent pas recevoir, et reste non
+attribuée.
 
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³
@@ -983,7 +986,10 @@ un plan sans arbitrage reste celui d'avant) : `allocatedCubicMeters`, les
 allocations bornées aux besoins ; `reservedCubicMeters`, les parts après
 réduction ; `unreceivedCubicMeters` et `unreceivedBedCount`, ce que les
 planches allouées n'ont pas reçu de leur part, hors un reste sous un centième
-de millimètre, que le moteur tient pour reçu (D-040). La note
+de millimètre, que le moteur tient pour reçu (D-040). Une chaîne indisponible
+(« L'origine indisponible », D-088) n'a pas de registre : ses planches gardent
+leur cible nulle, et leurs allocations, moins l'eau validée de la chaîne,
+s'ajoutent d'avance au non-reçu, sans réduction. La note
 (`arbitrationNote`, sous les cartes du résumé) dit « Votre choix entre les
 demandes d’eau s’impose : X m³ alloués, chaque allocation réservée à sa
 planche. » ; puis, quand les parts sont réduites de plus d'un litre, « Le
