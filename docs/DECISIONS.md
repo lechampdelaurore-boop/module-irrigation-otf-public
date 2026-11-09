@@ -2970,6 +2970,94 @@ retenu, et « de 3,00 à 0,00 m³ (−3,00 m³) ». Les 1 342 tests passent.
 (`854ae13`) et déployée à 18 h 18 (run 43265302502, les quatre jobs
 réussis ; aucune migration, Workers inchangés).
 
+## D-091 — Le parcours « Planifier en pénurie » et le protocole vide de la recette finale (lot 4 de la 3.9) : sept précisions tranchées par la recommandation, deux défauts relevés
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Écrit en Opus 5.5 · Max
+sur le dépôt public, le contrat de la 3.9 (`docs/shortage-contract.md`) et
+celui des parcours (`docs/browser-journeys-contract.md`) précisés d'abord.
+Le lot 4 ne change aucun comportement : un parcours, deux tests du moteur,
+un protocole et les registres.
+
+**Constat.** Le parcours nouveau du contrat de la 3.9 joue la pénurie sur la
+ferme de démonstration, aux deux largeurs : il crée sa réserve, sa pompe,
+deux lignes et un objectif ; calcule le plan ; lit la ligne de budget et ses
+fractions, « Non placé » et son motif, la carte de chaque ligne et sa
+justification ; valide une proposition et constate qu'elle compte au
+recalcul (S20) ; en refuse une autre, replacée hors du créneau refusé
+(S21) ; puis remet tout en état. En l'écrivant, deux défauts relevés,
+inscrits comme points ouverts 60 et 61 : sur la page « Ressources et
+pompes », la fiche d'une pompe ne voit une réserve créée qu'après le
+rechargement de la page (60) ; en pénurie, la carte d'une ligne qui
+n'arrose que sa planche justifie sa dose par « le besoin restant de la
+planche la plus demandeuse », quand cette dose est la part de la planche
+(61). En jouant tous les parcours, un troisième, inscrit comme point
+ouvert 62 et corrigé dans une PR qui précède celle de ce lot (D-094) : la
+pompe et les deux lignes que P32 laisse archivées ont fait voir à P31c, au
+téléphone, des cibles sous 44 px et, sur une ferme neuve, une carte sous
+4,5:1. S21 n'avait aucun test du moteur, absent de la liste du lot 3 : ses
+deux tests sont écrits ici, et tiennent.
+
+**Précisions** (techniques, sans règle agronomique ; consignées aux deux
+contrats) :
+
+- F125 : le parcours s'appelle P32, le prochain numéro libre, le P13 de
+  l'écriture du contrat étant devenu celui des alertes météo ; son fichier
+  est `e2e/p32-planifier-en-penurie.spec.ts`.
+- F126 : sa situation rend la dose indépendante du jour et de l'heure : une
+  réserve de 10 m³ observée à 0,3 m³ et non à 2 m³, pour que la part de
+  chaque planche, 5,9 mm, tienne en un seul arrosage sous la dose maximale
+  du goutte-à-goutte — 2 m³ donnaient 40 mm, quatre arrosages que la
+  semaine n'offre plus à partir du vendredi ; deux goutte-à-goutte à
+  20 mm/h, l'un sur N02, l'autre sur N03, où aucun parcours ne laisse de
+  matériel ni d'irrigation, plutôt qu'un matériel sur N01 à N03 — P6 laisse
+  sur N01 une ligne à 25 mm/h qui la servirait (R12), et P3, P4 et P9 y
+  saisissent des irrigations ; deux lignes pour que la validation de l'une
+  laisse à l'autre sa proposition, à comparer puis à refuser ; une plage du
+  goutte-à-goutte qui finit à douze heures au moins du calcul, de 00:00 à
+  23:59 le matin, de 12:00 à 11:59 l'après-midi. Reste connu et non
+  couvert : le dimanche de 23 h 42 à 23 h 59, la part ne tient plus avant
+  minuit.
+- F127 : une ligne qui n'arrose que sa planche n'est pas raccourcie par
+  les parts — sa dose est la part de sa planche — : P32 lit la dose de la
+  carte, la réserve et la faisabilité vérifiée de sa justification, pas le
+  motif de la dose (point ouvert 61) ; la coupe par les parts (S15), qui
+  demande un créneau versant aussi sur d'autres planches, reste prouvée par
+  le test du moteur.
+- F128 : S9 sur la ferme de démonstration : P32 lit la ligne de budget de sa
+  chaîne parmi celles des matériels sans pompe que les autres parcours
+  laissent ; il ne fabrique pas de seconde chaîne chiffrée, que le test du
+  moteur prouve dans les deux sens.
+- F129 : S21 en deux tests du moteur
+  (`tests/planning-shortage-scenarios.test.ts`), sur la pénurie de la
+  cinquième recette : le créneau refusé du tunnel 1 est évité, le tunnel 1
+  replacé ailleurs avec la même part, les autres gardent la leur ; la
+  semaine entière refusée au tunnel 1, ses planches portent « créneau
+  refusé », et sa part, libérée en fin de tour, relève la cible des trois
+  autres de 9,77 à 13,02 mm — le supplément, 3,26 mm, sous la dose minimale
+  de l'aspersion, attend comme un reste hors pénurie (D-081, F84).
+- F130 : la non-régression (point 4 du contrat de la 3.9) relève la durée
+  des parcours au lieu de la borner : « sous cinq minutes » valait pour
+  treize parcours ; les 88 d'aujourd'hui en prennent onze environ.
+- F131 : le protocole vide de la recette finale,
+  `docs/recette-tranche-3.md`, sur le modèle de `docs/recette-3.4.md` : les
+  préalables, la lecture sans rien modifier (A1 à A14), la pénurie fabriquée
+  sur le « vas-y » du porteur (B1 à B13, l'attendu chiffré écrit avant le
+  clic, les données relevées en 0.3 et rendues en B13), le téléphone (C1 à
+  C4), la revue de sécurité (D1 à D7), la non-régression (E1 à E6), les
+  scénarios S1 à S28 avec leur preuve attendue, les réévaluations promises
+  et la clôture ; chaque ligne porte un constat et un verdict, OK ou KO.
+
+**Ce qui ne change pas.** Aucun calcul, aucun écran, aucune migration ; le
+parcours n'écrit que dans la ferme de démonstration et rend tout ce qu'il
+crée. Les défauts 60 et 61 se corrigent chacun dans sa PR `fix/`, le contrat
+précisé avant le code et un test rouge d'abord, après la PR de ce lot et
+avant la revue de sécurité (lot 5) : 61 d'abord, ce que le maraîcher lit en
+pénurie, puis 60.
+
+**Vérifié par** P32 aux deux largeurs, les deux tests de S21, et les
+contrôles complets ; les 1 344 tests et les 88 parcours passent.
+
 ## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de

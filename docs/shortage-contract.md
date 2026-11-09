@@ -607,7 +607,7 @@ dans `docs/ETAT_DU_PROJET.md` et dans la PR :
    dernière, sur une base neuve (test de dérive de schéma).
 4. Les parcours navigateur, P0 à P32 (P1 à P13 quand ce contrat s'est
    écrit), à 1 280 et 390 px, leur durée relevée — « sous cinq minutes »
-   valait pour treize parcours, les 86 d'aujourd'hui en prennent onze
+   valait pour treize parcours, les 88 d'aujourd'hui en prennent onze
    environ (précisé au lot 4, D-091) —,
    sans débordement ni erreur de console.
 5. **La relecture des registres** contre le dépôt et Git : chaque ligne 🟡 ou
@@ -929,7 +929,9 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    `docs/recette-tranche-3.md`. Écrits le 9 novembre 2026 (D-091), avec les
    deux tests du moteur de S21, absents de la liste du point 3 ; deux défauts
    relevés en écrivant P32, points ouverts 60 et 61, chacun corrigé dans sa
-   PR `fix/`, son test rouge d'abord.
+   PR `fix/`, son test rouge d'abord ; un troisième en jouant tous les
+   parcours, le point 62, une pompe et un matériel archivés au téléphone et
+   au contraste, corrigé dans une PR qui précède celle du lot (D-094).
 5. **La revue de sécurité** : ses corrections, une PR par défaut.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte
    rendu dans `docs/recette-tranche-3.md`.
