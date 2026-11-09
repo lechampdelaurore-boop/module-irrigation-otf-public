@@ -3,10 +3,10 @@ import test from 'node:test';
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
-import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters } from '../lib/domain/units.ts';
+import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { splitVolumeAcrossLocalDays } from '../lib/domain/water-management.ts';
 import {
-  assertInvariants, byEquipment, close, farm, largeFarm, NOW, PARIS_21H_TUESDAY, realIrrigation, settings, TZ, validatedIrrigation, withDirectChain,
+  assertInvariants, byEquipment, close, farm, largeFarm, NOW, PARIS_21H_TUESDAY, realIrrigation, settings, TZ, validatedIrrigation, withDirectChain, withValidatedProposals,
 } from './support/planning-fixtures.ts';
 
 /**
@@ -284,4 +284,88 @@ test('S26, sensibilité à l’heure du calcul : deux minutes plus tard, les deu
   t.diagnostic(`S26 : ${moved.length} créneaux sur ${before.size} déplacés ou de dose changée ; volume placé ${placedVolume(first).toFixed(4)} puis ${placedVolume(second).toFixed(4)} m³, écart ${gap.toFixed(4)} m³ pour ${(0.05 * 2 / 60).toFixed(4)} m³ d’apport perdu`);
   for (const slot of moved) t.diagnostic(`  12 h 52 : ${slot}`);
   for (const slot of [...after].filter((item) => !before.has(item))) t.diagnostic(`  12 h 54 : ${slot}`);
+});
+
+// ---------------------------------------------------------------------------
+// S20, la validation en pénurie (point ouvert 57, D-086)
+// ---------------------------------------------------------------------------
+
+/** Les quatre tunnels seuls pour une réserve de 5 m³, le forage à l'arrêt : la pénurie de la cinquième recette. */
+const ZERO_NEED = { rawPlanningNeedMm: 0, effectiveNeedMm: 0 };
+const TUNNELS_ONLY = { extraTunnels: true, forageFlow: 0, reservoirCubicMeters: 5, plotNeeds: { 'bloc-1': ZERO_NEED, 'bloc-2': ZERO_NEED } };
+/** Les huit planches d'un tunnel, 16 m² mouillés chacune. */
+const TUNNEL_SQUARE_METERS = 8 * 16;
+const VALIDATED = ['rampe-tunnel-1', 'rampe-tunnel-2'];
+const doseOf = (plan: WeeklyPlan, equipmentId: string) => byEquipment(plan, equipmentId).reduce((sum, proposal) => sum + proposal.doseMm, 0);
+const volumeOf = (plan: WeeklyPlan, equipmentIds: readonly string[]) => plan.proposals
+  .filter((proposal) => equipmentIds.includes(proposal.equipmentId)).reduce((sum, proposal) => sum + (proposal.volumeCubicMeters ?? 0), 0);
+/** L'eau que les arrosages validés prélèveront, au prix de leur surface mouillée. */
+const validatedVolume = (inputs: PlanningInputs) => inputs.events.flatMap((event) => event.equipment.applications)
+  .reduce((sum, application) => sum + cubicMetersFromMillimeters(application.plannedAmountMm, application.wettedAreaSquareMeters ?? 0), 0);
+
+test('S20, validation en pénurie : les arrosages validés comptent comme déjà placés ; les tunnels 3 et 4 gardent leur part, les tunnels validés ne reçoivent rien de plus (point ouvert 57)', () => {
+  // 9,76 mm par tunnel. Le recalcul refaisait les parts sur le reste : les tunnels 3 et 4 tombaient à 6,46 mm, chaque
+  // tunnel validé gardait 1,42 mm qu'aucun créneau ne lui donnait, et 0,85 m³ restaient dans la réserve.
+  const { inputs } = farm(TUNNELS_ONLY);
+  const first = buildWeeklyPlan(inputs, settings);
+  assertInvariants(first, inputs);
+  const second = withValidatedProposals(inputs, first, VALIDATED);
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  for (const tunnel of [3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), doseOf(first, `rampe-tunnel-${tunnel}`), 0.01, `tunnel ${tunnel} : la même dose qu’avant`);
+  assert.deepEqual(slots(plan, (equipmentId) => VALIDATED.includes(equipmentId)), [], 'aucune seconde proposition sur un tunnel validé');
+  const validated = volumeOf(first, VALIDATED);
+  close(validated + placedVolume(plan), placedVolume(first), 0.005, 'validé plus proposé : l’eau de la semaine, rien ne reste dans la réserve');
+  assert.ok(validated + placedVolume(plan) <= 5 + 1e-6, 'validé plus proposé sous le budget');
+  // La ligne de budget reste celle de ce qui reste à placer : la part visée et la part placée s'y rejoignent.
+  const [budget] = plan.budgets;
+  close(budget.availableCubicMeters, 5 - validatedVolume(second), 1e-6, 'l’eau disponible, sans l’eau validée');
+  close((budget.placedByLevelCubicMeters?.normal ?? 0) / (budget.demandByLevelCubicMeters?.normal ?? 1), budget.fractions.normal, 0.005, 'visée et placée');
+});
+
+test('S20 sous un arbitrage validé : l’allocation compte l’eau validée ; après la validation des tunnels 1 et 2, les tunnels 3 et 4 reçoivent la leur (point ouvert 57)', () => {
+  // 9,76 mm alloués à chaque tunnel. Après la validation des tunnels 1 et 2, chaque allocation était réduite de moitié,
+  // sous la dose minimale, et plus rien n'était placé.
+  const { inputs: base } = farm(TUNNELS_ONLY);
+  const inputs: PlanningInputs = { ...base, arbitration: base.needs.map(({ bedId }) => ({ bedId, allocatedCubicMeters: bedId.startsWith('T') ? cubicMetersFromMillimeters(9.76, 16) : 0 })) };
+  const first = buildWeeklyPlan(inputs, settings);
+  assertInvariants(first, inputs);
+  const second = withValidatedProposals(inputs, first, VALIDATED);
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  for (const tunnel of [3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), 9.76, 0.01, `tunnel ${tunnel} : son allocation`);
+  assert.deepEqual(slots(plan, (equipmentId) => VALIDATED.includes(equipmentId)), [], 'aucune seconde proposition sur un tunnel validé');
+  assert.ok(first.arbitration && plan.arbitration, 'le plan porte l’arbitrage');
+  close(plan.arbitration.allocatedCubicMeters, first.arbitration.allocatedCubicMeters, 1e-6, 'le choix du maraîcher, eau validée comprise');
+  close(plan.arbitration.reservedCubicMeters, plan.arbitration.allocatedCubicMeters, 1e-3, 'aucune allocation réduite');
+});
+
+test('S20, un arrosage validé au-delà de la part de sa planche : la conduite se rejoue, cette planche servie de ce qu’elle a reçu, et les autres se partagent le reste (point ouvert 57, D-086)', () => {
+  // Le tunnel 1 validé à une fois et demie sa proposition, 14,6 mm pour une part de 9,76 ; le tunnel 2 tel quel. Le
+  // recalcul laissait aux tunnels 3 et 4 5,27 mm chacun et 0,53 m³ dans la réserve.
+  const { inputs } = farm(TUNNELS_ONLY);
+  const first = buildWeeklyPlan(inputs, settings);
+  const second = withValidatedProposals(inputs, first, VALIDATED, (equipmentId) => (equipmentId === 'rampe-tunnel-1' ? 1.5 : 1));
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  assert.deepEqual(slots(plan, (equipmentId) => VALIDATED.includes(equipmentId)), [], 'les tunnels validés ont déjà au moins leur part');
+  const rest = millimetersFromCubicMeters(5 - validatedVolume(second), 2 * TUNNEL_SQUARE_METERS);
+  for (const tunnel of [3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), rest, 0.02, `tunnel ${tunnel} : la moitié du reste`);
+  close(validatedVolume(second) + placedVolume(plan), 5, 0.005, 'rien ne reste dans la réserve');
+});
+
+test('S20 et les priorités : l’eau validée en trop sur une planche normale se reprend sur les autres normales ; la prioritaire garde son besoin entier (point ouvert 57, D-086)', () => {
+  // 6 m³ ; le tunnel 3 prioritaire, servi en entier (20 mm), les trois autres à 8,96 mm. Le tunnel 1 validé à une fois
+  // et demie sa proposition : la conduite se rejoue, le tunnel 3 garde ses 20 mm, les tunnels 2 et 4 prennent le reste.
+  const { inputs } = farm({ ...TUNNELS_ONLY, reservoirCubicMeters: 6, priorities: { 'tunnel-3': 'high' } });
+  const first = buildWeeklyPlan(inputs, settings);
+  assertInvariants(first, inputs);
+  close(doseOf(first, 'rampe-tunnel-3'), 20, 0.01, 'la prioritaire servie en entier');
+  const second = withValidatedProposals(inputs, first, ['rampe-tunnel-1'], () => 1.5);
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  close(doseOf(plan, 'rampe-tunnel-3'), 20, 0.01, 'la prioritaire garde son besoin entier');
+  const rest = millimetersFromCubicMeters(6 - validatedVolume(second) - cubicMetersFromMillimeters(20, TUNNEL_SQUARE_METERS), 2 * TUNNEL_SQUARE_METERS);
+  for (const tunnel of [2, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), rest, 0.02, `tunnel ${tunnel} : la moitié du reste des normales`);
+  assert.equal(byEquipment(plan, 'rampe-tunnel-1').length, 0, 'le tunnel 1 a déjà plus que sa part');
 });

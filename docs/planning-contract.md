@@ -395,6 +395,26 @@ l'eau allouée, sa réduction s'il y en a une, et ce que les planches allouées
 ne peuvent pas recevoir. Aucune ligne de budget ni fraction ne paraît sous un
 arbitrage.
 
+**L'eau déjà validée** (point ouvert 57, D-086, 9 novembre 2026). Les
+parts se calculent sur la semaine entière : le besoin d'une planche compte
+l'eau que les arrosages validés de sa chaîne doivent encore lui donner d'ici
+dimanche, et le budget de la chaîne aussi. Cette eau compte comme déjà
+placée dans la part de la planche : il ne reste à placer que sa part moins
+cette eau. Valider des propositions en pénurie ne refait donc pas le
+partage : un recalcul après validation garde les parts des autres planches,
+et une planche validée à sa part ne reçoit pas une seconde proposition.
+Quand un arrosage validé a donné à une planche plus que sa part, la conduite
+se rejoue, cette planche servie de ce qu'elle a reçu : les autres planches de
+la même eau se partagent le reste comme la conduite le veut — les
+prioritaires d'abord, ou part égale, ou la fin de la file du report. Sous un
+arbitrage validé, l'allocation d'une planche compte de même l'eau validée de
+sa chaîne : un arrosage validé à l'allocation la remplit, et un arrosage
+validé au-delà réduit les autres allocations dans la même proportion, comme
+toute eau que la chaîne ne peut pas fournir. La ligne de budget reste celle
+de ce qui reste à placer, l'eau disponible et la demande sans l'eau
+validée : la part visée d'un niveau y est la part de sa demande restante que
+les parts réservent, comme sous le report.
+
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³
 avec le stock, pour 79,2 m³ demandés — un manque d'eau de 7,2 m³. Si les

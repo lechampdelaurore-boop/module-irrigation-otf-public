@@ -424,3 +424,33 @@ export function withDirectChain(inputs: PlanningInputs, options: { equipmentIds:
     },
   };
 }
+
+/**
+ * Des propositions d'un calcul validées, comme le service les enregistre
+ * (S20 de la 3.9) : chacune devient un arrosage validé à venir sur la pompe
+ * de la réserve, aux heures, au taux et à la surface mouillée de la
+ * proposition, et le besoin de ses planches perd ce qu'elles y recevront,
+ * comme la 3.3 le compte. `scale` allonge un arrosage validé : un maraîcher
+ * qui valide plus que la proposition.
+ */
+export function withValidatedProposals(inputs: PlanningInputs, plan: WeeklyPlan, equipmentIds: readonly string[], scale: (equipmentId: string) => number = () => 1): PlanningInputs {
+  const events = plan.proposals.filter((proposal) => equipmentIds.includes(proposal.equipmentId)).map((proposal) => validatedIrrigation(
+    `valide-${proposal.id}`, proposal.equipmentId, proposal.startAt, Math.round(proposal.durationSeconds * scale(proposal.equipmentId)),
+    proposal.bedApplications.map((application) => application.bedId),
+    { rate: proposal.applications[0].rateMmPerHour, wettedAreaSquareMeters: proposal.bedApplications[0].wettedAreaSquareMeters, fromReserve: true },
+  ));
+  const plannedMm = new Map<string, number>();
+  for (const event of events) {
+    for (const application of event.equipment.applications) plannedMm.set(application.otfBedId, (plannedMm.get(application.otfBedId) ?? 0) + application.plannedAmountMm);
+  }
+  return {
+    ...inputs,
+    events: [...inputs.events, ...events],
+    needs: inputs.needs.map((need) => {
+      const planned = plannedMm.get(need.bedId);
+      if (planned === undefined) return need;
+      const less = (value: number | null) => (value === null ? null : Math.max(0, value - planned));
+      return { ...need, plannedIrrigationMm: need.plannedIrrigationMm + planned, rawPlanningNeedMm: less(need.rawPlanningNeedMm), effectiveNeedMm: less(need.effectiveNeedMm) };
+    }),
+  };
+}
