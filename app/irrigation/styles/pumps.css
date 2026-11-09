@@ -8,7 +8,8 @@
 .pump-notice { background: var(--tile); color: var(--green); } .pump-error { background: var(--danger-soft); color: var(--danger-ink); }
 .pump-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 275px), 1fr)); gap: .8rem; margin-top: 1rem; }
 .pump-card, .pump-defaults { border: 1px solid var(--line); border-radius: var(--radius); background: white; padding: 1rem; }
-.pump-card.is-archived { opacity: .68; }
+/* Une pompe archivée se distingue par son fond et son état, sans voile qui pâlirait ses textes sous 4,5:1 (point ouvert 62, D-094). */
+.pump-card.is-archived { background: var(--sheet); }
 .pump-card-title strong { display: block; font-size: 1.05rem; }.pump-card-title span { color: var(--muted); font-size: .8rem; }
 .pump-card button, .pump-defaults select, .pump-editor button, .pump-editor input, .pump-editor textarea { border: 1px solid var(--line); border-radius: 9px; background: white; padding: .55rem .7rem; color: inherit; }
 .pump-card dl { display: grid; grid-template-columns: minmax(7rem, 1fr) 1.5fr; gap: .35rem .8rem; font-size: .9rem; }.pump-card dt { color: var(--muted); }.pump-card dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
