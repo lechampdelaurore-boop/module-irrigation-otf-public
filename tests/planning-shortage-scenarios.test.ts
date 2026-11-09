@@ -17,7 +17,8 @@ import {
  * Les scénarios de pénurie de la 3.9 que le moteur tient déjà, écrits en
  * tests sans changer son comportement (docs/shortage-contract.md,
  * « Découpage et preuve de fin », point 3) : la source du manque (S2, S4,
- * S7, S8, S9) et la semaine qui avance (S23, S24, S26). Ce que ces scénarios
+ * S7, S8, S9), la semaine qui avance (S23, S24, S26), la validation et le
+ * refus en pénurie (S20 ; S21, écrit au lot 4, D-091). Ce que ces scénarios
  * attendent et que le moteur ne fait pas est un défaut, relevé en les
  * écrivant et corrigé à part, chacun avec son test rouge (points ouverts 51
  * à 57) : ces tests-ci ne vérifient que ce qui tient.
@@ -540,4 +541,42 @@ test('S20, l’eau libérée en fin de tour : une planche validée au-delà des 
   for (const tunnel of [2, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), level, 0.02, `tunnel ${tunnel} : au niveau commun`);
   // Le complément du tunnel 1, 0,46 mm, est sous la dose minimale : il attend.
   assert.equal(byEquipment(plan, 'rampe-tunnel-1').length, 0, 'le tunnel 1, servi au-delà, ne prend que son complément au niveau commun');
+});
+
+// ---------------------------------------------------------------------------
+// S21, le refus en pénurie (D-030, D-037, D-091)
+// ---------------------------------------------------------------------------
+
+const avoids = (proposal: { startAt: string; endAt: string }, slot: { startAt: string; endAt: string }) => Date.parse(proposal.endAt) <= Date.parse(slot.startAt) || Date.parse(proposal.startAt) >= Date.parse(slot.endAt);
+
+test('S21, refus en pénurie : le créneau refusé est évité, le tunnel 1 replacé ailleurs avec la même part, les autres tunnels gardent la leur', () => {
+  const { inputs } = farm(TUNNELS_ONLY);
+  const first = buildWeeklyPlan(inputs, settings);
+  assertInvariants(first, inputs);
+  const [proposal] = byEquipment(first, 'rampe-tunnel-1');
+  const refused = { equipmentId: 'rampe-tunnel-1', startAt: proposal.startAt, endAt: proposal.endAt };
+  const second: PlanningInputs = { ...inputs, refusedSlots: [refused] };
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  const tunnel1 = byEquipment(plan, 'rampe-tunnel-1');
+  assert.ok(tunnel1.length > 0, 'le tunnel 1 replacé');
+  assert.ok(tunnel1.every((item) => avoids(item, refused)), `${slots(plan, (equipmentId) => equipmentId === 'rampe-tunnel-1').join(' ; ')} évite ${refused.startAt} → ${refused.endAt}`);
+  for (const tunnel of [1, 2, 3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), doseOf(first, `rampe-tunnel-${tunnel}`), 0.01, `tunnel ${tunnel} : la même part`);
+  assert.ok(placedVolume(plan) <= 5 + 1e-6, 'sous le budget');
+});
+
+test('S21, la semaine entière refusée au tunnel 1 : « créneau refusé » dans « Non placé », et sa part libérée en fin de tour relève la cible des trois autres (D-037)', () => {
+  const { inputs } = farm(TUNNELS_ONLY);
+  const second: PlanningInputs = { ...inputs, refusedSlots: [{ equipmentId: 'rampe-tunnel-1', startAt: NOW.toISOString(), endAt: HORIZON_END }] };
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  assert.equal(byEquipment(plan, 'rampe-tunnel-1').length, 0);
+  for (const bed of plan.beds.filter((item) => item.plotName === 'Tunnel 1')) assert.ok(bed.reasons.includes('refused-slot'), `${bed.bedName} : ${bed.reasons.join(', ')}`);
+  // La part du tunnel 1 libérée relève la cible des trois autres d'un tiers chacun, de 9,77 à 13,02 mm. Le supplément,
+  // 3,26 mm, sous la dose minimale de l'aspersion, attend comme un reste hors pénurie (D-081, F84).
+  const released = millimetersFromCubicMeters(5, 3 * TUNNEL_SQUARE_METERS);
+  const share = millimetersFromCubicMeters(5, 4 * TUNNEL_SQUARE_METERS);
+  for (const bed of plan.beds.filter((item) => ['Tunnel 2', 'Tunnel 3', 'Tunnel 4'].includes(item.plotName))) close(bed.targetMm, released, 0.02, `${bed.bedName} : sa cible relevée`);
+  for (const tunnel of [2, 3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), share, 0.01, `tunnel ${tunnel} : sa part placée, le supplément attend`);
+  assert.ok(placedVolume(plan) <= 5 + 1e-6, 'sous le budget');
 });
