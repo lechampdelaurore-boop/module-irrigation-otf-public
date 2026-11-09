@@ -38,7 +38,12 @@ registres, elle y renvoie.
   chacun dans sa PR `fix/`, le contrat précisé et le test rouge d'abord,
   après la PR de ce lot, qui suit celle de l'écran d'arbitrage. Le plus
   sérieux d'abord : la limite journalière d'un arrêté (58) et celle d'une
-  ressource (54) dépassées par un créneau à cheval sur minuit.
+  ressource (54) dépassées par un créneau à cheval sur minuit. **58, 54 et
+  55 corrigés le 9 novembre 2026** (D-085, F103 à F107), dans une PR qui
+  suit celle du lot 3 : les limites par jour se jugent depuis le début du
+  créneau, qui part à minuit quand son premier jour est plein, et la coupe
+  d'une source se nomme « limite de prélèvement ». Restent 57, 56, 52 et
+  53, puis 51.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7462,9 +7467,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    disponible une partie de la semaine garde son budget (8 m³ du jeudi au
    dimanche, déjà juste). Avec le point 52.
 54. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette finale :
-   le plan propose de prélever plus que l'autorisation.** S9, deux
-   chaînes : sur la ferme en taille, les rampes des blocs 3 et 4 sur une
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-085) ;
+   fermeture au jugement du porteur : le plan proposait de prélever plus
+   que l'autorisation.** S9, deux chaînes : sur la ferme en taille, les rampes des blocs 3 et 4 sur une
    source à sa pompe de 3 m³/h, la limite de prélèvement à 2 m³ par jour,
    la source donne 2 m³ le mardi, 4 m³ le mercredi — le bloc 3 de 21 h à
    22 h 05, le bloc 4 de 22 h 05 à 23 h 10 —, 2 m³ le jeudi. Cause : le
@@ -7477,11 +7482,19 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    le créneau raccourci jour par jour, comme la limite journalière, et
    ajouter aux invariants la limite de prélèvement de chaque ressource,
    jour par jour ; une PR `fix/` avec les points 55 et 58, le test rouge
-   d'abord.
+   d'abord. Corrigé le 9 novembre 2026 dans la PR des limites par jour
+   (D-085, F103, F106 et F107) : le créneau se juge jour par jour depuis son
+   début et s'arrête là où le reste de la source pour un de ses jours
+   s'épuise ; ce qu'il prend à la source se compte à la part de sa durée
+   tombée chaque jour, non plus à parts égales entre ses jours ; les
+   invariants des tests vérifient la limite de prélèvement jour par jour.
+   Sur le même cas, la source donne au plus 2,00 m³ chaque jour, pour le
+   même volume placé, 28,00 m³ (`tests/planning-daily-limits.test.ts`,
+   rouge avant : 4,000 m³ le mercredi).
 55. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
-   finale.** S9 encore : la coupe d'une ressource directe se nomme comme
-   celle d'une réserve. Un créneau raccourci par la limite de prélèvement
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-085) ;
+   fermeture au jugement du porteur.** S9 encore : la coupe d'une
+   ressource directe se nomme comme celle d'une réserve. Un créneau raccourci par la limite de prélèvement
    de la source dit « réserve « Source du bas » au minimum de sécurité »,
    sa dose « ce que la réserve fournit sans passer sous son minimum », et
    un créneau qu'elle empêche, « réserve au minimum de sécurité au moment
@@ -7489,7 +7502,16 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    sa limite de prélèvement du jour. Recommandation : nommer cette limite
    (« limite de prélèvement de « Source du bas » atteinte ce jour-là ») ;
    c'est un motif nouveau, donc le contrat du planning précisé d'abord.
-   Avec les points 54 et 58.
+   Avec les points 54 et 58. Corrigé le 9 novembre 2026 dans la même PR
+   (D-085, F105) : le motif nouveau « limite de prélèvement ». La carte dit
+   « limite de prélèvement de « Source du bas » atteinte », la dose « ce
+   que la limite de prélèvement laisse », le moment « un jour où la limite
+   de prélèvement le permet », et une planche qu'elle empêche « limite de
+   prélèvement de la ressource atteinte », comptée en manque d'eau ;
+   « ce jour-là » est tombé, comme pour la limite journalière. Une source
+   trop petite pour la dose minimale de la rampe du bloc 2 (0,3 m³ par
+   jour pour 1,4 m³) le dit (rouge avant : « réserve au minimum de
+   sécurité au moment voulu »).
 56. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
    finale.** S6, l'eau et le temps de pompage ensemble : le résumé compte
@@ -7528,9 +7550,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    à poser au porteur quand ce point se code. Sa PR `fix/` porte le test
    entier de S20.
 58. **Ouvert le 9 novembre 2026, en reproduisant le point 54 (lot 3 de la
-   3.9, D-084) ; à corriger avant la recette finale : le plan propose
-   d'arroser plus que la limite journalière, celle d'un arrêté.** S5, la
-   limite journalière d'irrigation : un créneau à cheval sur minuit dont le
+   3.9, D-084) ; corrigé le jour même (D-085) ; fermeture au jugement du
+   porteur : le plan proposait d'arroser plus que la limite journalière,
+   celle d'un arrêté.** S5, la limite journalière d'irrigation : un créneau à cheval sur minuit dont le
    premier jour est déjà plein y garde sa part. Sur la ferme des tests à la
    taille de la ferme réelle, aux réglages par défaut, une limite de 15 m³
    par jour : le jeudi, quatre rampes de bloc remplissent la journée à
@@ -7552,7 +7574,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    créneau jour par jour depuis son début, à l'heure où le reste du jour
    s'épuise ; un créneau qui ne peut plus rien prendre le premier jour
    part à minuit si sa plage continue ; le test rouge d'abord, la ferme en
-   taille à 15 m³.
+   taille à 15 m³. Corrigé le 9 novembre 2026 dans la même PR (D-085, F103
+   et F104), comme recommandé. Sur la ferme en taille à 15 m³, aucun jour
+   ne passe 15,00 m³ ; deux créneaux partent à minuit le vendredi, trois
+   le samedi, et tout le besoin est placé, 71,29 m³ au lieu de 70,60. La
+   petite ferme à 3 m³ ne passe plus 3,00 m³ le mardi (rouge avant :
+   3,054 m³). Un balayage de limites ne trouve plus aucun jour au-delà de
+   la sienne, quand cinq plans sur dix dépassaient avant.
 
 ## Procédure de reprise rapide
 

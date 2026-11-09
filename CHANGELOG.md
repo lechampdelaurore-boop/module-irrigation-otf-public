@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : les limites par jour)
+
+- **Le plan ne propose plus d'arroser plus que la limite journalière d'un
+  arrêté, ni de prélever plus que l'autorisation d'une source** (points
+  ouverts 58 et 54, D-085). Un créneau à cheval sur minuit se juge jour
+  par jour depuis son début : il s'arrête à l'heure où le reste d'un de
+  ses jours s'épuise, et part à minuit quand son premier jour est déjà
+  plein, si sa plage continue. Avant, 22,10 m³ un jeudi pour une limite
+  de 15, ou 4 m³ tirés d'une source un mercredi pour 2 autorisés ; la
+  validation refusait déjà ces créneaux.
+- **La coupe d'une source porte le nom de sa limite** (point ouvert 55,
+  D-085) : « limite de prélèvement de « Source du bas » atteinte », et
+  non plus « réserve au minimum de sécurité » ; un motif nouveau, compté
+  en manque d'eau. Aucune migration.
+
 ### Vérifié (3.9, lot 3 : les scénarios de pénurie en tests du moteur)
 
 - **Les scénarios de pénurie du contrat de la 3.9 deviennent des tests du

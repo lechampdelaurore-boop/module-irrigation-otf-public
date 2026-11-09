@@ -2567,6 +2567,88 @@ S2, S4, S7, S8, S9, S23, S24 et S26), le test S10 étendu de
 `tests/db/planning-service.test.ts`, verts sur le moteur tel qu'il est ;
 les 1 324 tests et les 84 parcours passent.
 
+## D-085 — Les limites par jour vérifiées depuis le début du créneau (points ouverts 54, 55 et 58) : cinq précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Première correction
+des défauts relevés au lot 3 (D-084), la plus sérieuse : le plan proposait
+d'arroser plus que la limite journalière d'un arrêté, ou de prélever plus
+que l'autorisation d'une source. Codée en Opus 5.5 · Max sur le dépôt
+public, le contrat du planning précisé d'abord (`docs/planning-contract.md`,
+« Où placer les créneaux », point 6), des tests rouges avant le code.
+
+**Les défauts corrigés.** Le moteur jugeait un créneau sur tous ses jours à
+la fois, puis le raccourcissait par sa fin : sous la limite journalière
+d'irrigation, du dépassement du premier jour qui dépasse ; sous la limite
+de prélèvement d'une source, du reste de tous ses jours additionnés. Quand
+le premier jour était celui qui bornait, la coupe retirait l'eau du
+lendemain et le premier jour restait au-dessus (54, 58) : sur la ferme des
+tests en taille, 22,10 m³ un jeudi pour 15 ; sur la petite ferme à 40 mm,
+3,05 m³ un mardi pour 3, 5,94 pour 4 ; une source à 2 m³ par jour donnait
+4 m³ un mercredi. Et la coupe d'une source se nommait comme celle d'une
+réserve, « réserve « Source du bas » au minimum de sécurité » (55). La
+garde de la validation, qui comptait déjà jour par jour, refusait ces
+créneaux : rien n'est parti au-delà d'une limite par le module.
+
+**Cinq précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation (mandat « option recommandée par défaut »)
+et consignées au contrat du planning ; elles restent modifiables à la
+relecture du porteur :
+
+- F103 : un créneau se juge jour civil par jour civil depuis son début,
+  chaque jour recevant la part du volume que sa part de la durée porte,
+  comme la garde de la validation et les invariants des tests le
+  comptent ; il s'arrête à la seconde où le reste d'un de ses jours
+  s'épuise. La règle vaut pour la limite journalière d'irrigation et pour
+  la limite de prélèvement d'une ressource prélevée directement
+  (`fitWithinDailyRemaining`, `lib/domain/planning/supply.ts`).
+- F104 : quand c'est son premier jour qui s'épuise avant la durée
+  minimale, le créneau part au minuit suivant si sa plage continue au
+  moins cette durée, sur le reste du jour suivant, et son moment se dit
+  « un jour où la limite … le permet » ; sinon, ou quand c'est un jour
+  suivant qui s'épuise, un autre jour est essayé, comme avant. Partir à
+  minuit ne rapproche jamais deux arrosages d'une planche : un créneau ne
+  part jamais avant le dernier départ de ses planches plus l'espacement.
+- F105 : la coupe d'une limite de prélèvement porte son nom, par un motif
+  nouveau (`withdrawal-limit`) : sur la carte, « limite de prélèvement de
+  « Source du bas » atteinte » ; à la dose, « ce que la limite de
+  prélèvement laisse » ; au moment, « un jour où la limite de prélèvement
+  le permet » ; pour une planche qu'elle empêche, « limite de prélèvement
+  de la ressource atteinte », comptée en manque d'eau comme la limite
+  journalière, et rangée sous « Limite de prélèvement atteinte » ; pour
+  les experts, D-085. « Ce jour-là », proposé au point 55, est tombé,
+  comme pour la limite journalière. Le reste du jour d'une ressource est
+  celui que le module calculait déjà, sa limite moins ce qui est pris,
+  borné par son débit sur les heures du jour : ce débit ne borne que si
+  plusieurs pompes y puisent ensemble plus longtemps que la journée, et
+  la coupe se nomme alors aussi « limite de prélèvement ». Une réserve
+  garde « réserve au minimum de sécurité ».
+- F106 : ce qu'un créneau prend à une ressource directe se compte à la
+  part de sa durée tombée chaque jour, non plus à parts égales entre ses
+  jours : un créneau de 21 h à 0 h 30 prend six septièmes de son volume à
+  son premier jour, jamais la moitié. De même pour les irrigations déjà
+  planifiées sur cette ressource.
+- F107 : les invariants des tests vérifient aussi la limite de prélèvement
+  de chaque ressource, jour civil par jour civil
+  (`tests/support/planning-fixtures.ts`).
+
+**Ce qui ne change pas.** La garde de la réserve et ses mots, la part
+réservée, la pompe, la plage horaire, les créneaux refusés ou protégés, la
+garde de la validation. Aucune migration : les motifs vivent dans le
+calcul enregistré, un calcul ancien garde les siens. S24 suit la règle :
+la rampe du bloc 2, que le reste du jeudi (1,076 m³) ne tient plus, part
+vendredi à minuit au lieu de vendredi à 21 h.
+
+**Vérifié par** `tests/planning-daily-limits.test.ts` (cinq tests : la
+ferme en taille à 15 m³, la petite ferme à 3 m³, la source à 2 m³, la
+source trop petite pour la dose minimale, les libellés), rouges sur le
+moteur d'avant, et par le test S24 ajusté ; les 1 329 tests passent. Sur
+un balayage de limites (ferme en taille de 9 à 30 m³, petite ferme de 2 à
+6 m³, source de 1 à 6 m³), aucun jour ne dépasse plus sa limite, quand
+cinq plans sur dix, et trois sources sur cinq, dépassaient avant ; la
+ferme en taille à 15 m³ place tout son besoin, 71,29 m³ au lieu de 70,60,
+cinq créneaux partant à minuit le vendredi et le samedi.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.
