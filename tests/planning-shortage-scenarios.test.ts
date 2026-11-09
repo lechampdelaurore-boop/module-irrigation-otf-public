@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
@@ -105,6 +106,40 @@ test('S4, réserve engagée sous son minimum par deux irrigations planifiées à
   assert.equal(first.justification.limitingConstraint, 'réserve « Réserve tampon » au minimum de sécurité');
   assert.equal(byEquipment(plan, 'rampe-tunnel-3').length + byEquipment(plan, 'rampe-tunnel-4').length, 0);
   assert.equal(plan.deficit.waterCubicMeters, 0, 'la garde retarde, elle ne coupe pas : l’apport de la semaine suffit');
+});
+
+test('S6, temps de pompage et eau à la fois : chaque planche compte sa part coupée en manque d’eau et le reste sous le motif du placement, ni l’un dans l’autre (point ouvert 56, D-087)', () => {
+  // Dimanche 21 h, la plage des asperseurs réduite à 21 h – 21 h 30, les tunnels prioritaires (5 mm au tunnel 1, 10 aux
+  // autres), les blocs bas, la réserve à 4,48 m³ — le besoin des tunnels — et le forage arrêté : 12,07 m³ demandés. Les
+  // tunnels 2 à 4 saturent la pompe ; la part du tunnel 1, qu'elle ne peut plus servir, va au bloc 1. Le résumé disait
+  // « Manque d'eau 0 m³ » et « Temps de pompage manquant 6,25 m³ », dont les 5,61 m³ du bloc 2, que sa part à 0 % prive
+  // de tout.
+  const tunnel = (mm: number) => ({ rawPlanningNeedMm: mm, effectiveNeedMm: mm });
+  const { inputs } = farm({
+    extraTunnels: true, forageFlow: 0, reservoirCubicMeters: 4.48, now: new Date('2026-10-04T19:00:00.000Z'),
+    plotNeeds: { 'tunnel-1': tunnel(5), 'tunnel-2': tunnel(10), 'tunnel-3': tunnel(10), 'tunnel-4': tunnel(10) },
+    priorities: { 'tunnel-1': 'high', 'tunnel-2': 'high', 'tunnel-3': 'high', 'tunnel-4': 'high', 'bloc-1': 'low', 'bloc-2': 'low' },
+  });
+  const halfHour = { ...settings, windows: { ...settings.windows, sprinkler: { startMinute: 21 * 60, endMinute: 21 * 60 + 30 } } };
+  const plan = buildWeeklyPlan(inputs, halfHour);
+  assertInvariants(plan, inputs, halfHour);
+  const [budget] = plan.budgets;
+  assert.ok(budget.availableCubicMeters !== null);
+  const bloc2 = plan.beds.filter((bed) => bed.plotName === 'bloc 2');
+  for (const bed of bloc2) assert.ok(bed.placedMm === 0 && bed.reasons.includes('water-budget') && bed.reasons.includes('pump-time'), `${bed.bedName} : sa part à 0 %, et la pompe`);
+  // Le temps de pompage : le seul tunnel 1, 5 mm sur ses 128 m², jamais l'eau que la conduite retire au bloc 2.
+  close(plan.deficit.pumpTimeCubicMeters, cubicMetersFromMillimeters(5, 128), 0.005, 'temps de pompage manquant');
+  // Le bloc 2 demande 5,608 m³ (20 mm sur ses dix planches) : tout en manque d'eau, sa part étant nulle.
+  assert.ok((plan.deficit.byReason['water-budget'] ?? 0) > 5.608, 'le bloc 2 entier en manque d’eau');
+  // Le manque d'eau : la demande moins l'eau de la semaine, moins la part du tunnel 1 que le bloc 1 a reçue à sa place.
+  close(plan.deficit.waterCubicMeters, budget.demandCubicMeters - budget.availableCubicMeters - plan.deficit.pumpTimeCubicMeters, 0.005, 'manque d’eau');
+  // Les deux manques et l'espacement du bloc 1 font tout ce qui manque, ni l'un dans l'autre.
+  const counted = Object.values(plan.deficit.byReason).reduce((sum, value) => sum + (value ?? 0), 0);
+  close(counted, plan.deficit.waterCubicMeters + plan.deficit.pumpTimeCubicMeters + (plan.deficit.byReason.spacing ?? 0), 1e-9, 'chaque mètre cube sous un seul motif');
+  close(counted, budget.demandCubicMeters - placedVolume(plan), 0.01, 'demandé moins placé');
+  // La note du manque d'eau n'impute au temps de pompage et à l'espacement que ce qui leur revient (D-038).
+  const note = waterDeficitExplanation(stored(plan));
+  assert.ok(note?.includes(`${formatWaterVolumeForMessage(counted - plan.deficit.waterCubicMeters)} m³ qui manquent pour une autre raison que l’eau`), note ?? 'aucune note');
 });
 
 test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiffré, aucune coupe, et la note du manque d’eau se tait', () => {

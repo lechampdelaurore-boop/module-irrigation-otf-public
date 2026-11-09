@@ -275,6 +275,20 @@ Le moteur distingue deux manques, chacun chiffré et nommé :
 - **le manque de temps de pompage** : les créneaux qui ne tiennent pas dans
   les plages horaires avec la simultanéité permise.
 
+Le manque d'une planche se partage entre ses motifs (point ouvert 56, D-087,
+9 novembre 2026) : ce que la conduite en pénurie ou l'arbitrage lui retire
+— son besoin moins sa part — compte sous le motif de cette coupe, en manque
+d'eau ; le reste — sa part moins l'eau placée — compte sous le motif qui a
+empêché de la placer : temps de pompage, espacement, dose minimale, plage
+horaire, ou la coupe elle-même quand aucun autre motif ne l'explique. Une
+planche coupée à la fois par sa part et par le temps de pompage compte
+dans les deux manques, chacun pour ce qui lui revient, jamais l'un dans
+l'autre ; une planche à 0 % de part compte tout son besoin en manque d'eau,
+quels que soient ses autres motifs. La part est celle de la fin du calcul,
+après la redistribution de l'eau libérée (D-037) : l'eau qu'une planche ne
+peut pas recevoir et qu'une autre reçoit à sa place n'est pas un manque de
+plus.
+
 Devant un manque, la **conduite en pénurie** est un réglage (R9) parmi trois,
 celles du cahier des charges (section 27) :
 
