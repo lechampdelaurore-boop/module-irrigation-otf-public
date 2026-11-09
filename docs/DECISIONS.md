@@ -2653,11 +2653,11 @@ cinq plans sur dix, et trois sources sur cinq, dépassaient avant ; la
 ferme en taille à 15 m³ place tout son besoin, 71,29 m³ au lieu de 70,60,
 cinq créneaux partant à minuit le vendredi et le samedi.
 
-## D-086 — L'eau déjà validée comptée dans les parts en pénurie (point ouvert 57) : quatre précisions tranchées par la recommandation, le cas limite posé au porteur
+## D-086 — L'eau déjà validée comptée dans les parts en pénurie (point ouvert 57) : quatre précisions tranchées par la recommandation, le cas limite tranché par le porteur
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
 l'assistant ; modifiable à la relecture du porteur ; le cas limite (F109)
-attend sa réponse, l'option recommandée codée en attendant. Deuxième
+tranché par le porteur le jour même, sur l'option recommandée. Deuxième
 correction des défauts relevés au lot 3 (D-084). Codée en Opus 5.5 · Max
 sur le dépôt public, le contrat du planning précisé d'abord
 (`docs/planning-contract.md`, « Pénurie », « L'eau déjà validée »), des
@@ -2690,17 +2690,15 @@ relecture du porteur :
   (`validatedWaterOf`, `lib/domain/planning/shortage.ts`).
 - F109, le cas limite, agronomique : posé au porteur le 9 novembre 2026,
   « un arrosage validé dépasse la part d'une planche ; reprendre sur
-  qui ? », l'option recommandée « selon la conduite choisie » codée en
-  attendant sa réponse. Un arrosage validé au-delà de la part de sa
-  planche rejoue la conduite, cette planche servie de ce qu'elle a reçu :
-  la conduite cherche la plus grande fraction commune du besoin de la
-  semaine que le budget paie, niveau par niveau sous les priorités, toutes
-  ensemble sous la part égale ; une planche qui a déjà plus ne prend rien
-  de plus (`conductFraction`, `shareAt`, `commonFraction`). Le report sert
-  sa file dans l'ordre sur le budget net de l'eau validée : la fin de la
-  file porte l'excédent. S'il choisit une autre option — toutes les autres
-  dans la même proportion, ou personne et le plan le signale —, F109 et
-  F110 changent, avec leurs tests.
+  qui ? », et tranché par lui le même jour à 16 h 22 : « selon la conduite
+  choisie », l'option recommandée, déjà codée. Un arrosage validé au-delà
+  de la part de sa planche rejoue la conduite, cette planche servie de ce
+  qu'elle a reçu : la conduite cherche la plus grande fraction commune du
+  besoin de la semaine que le budget paie, niveau par niveau sous les
+  priorités, toutes ensemble sous la part égale ; une planche qui a déjà
+  plus ne prend rien de plus (`conductFraction`, `shareAt`,
+  `commonFraction`). Le report sert sa file dans l'ordre sur le budget net
+  de l'eau validée : la fin de la file porte l'excédent.
 - F110 : l'eau libérée en fin de tour (D-037) suit la même règle quand une
   planche du niveau a de l'eau validée : elle relève d'abord les planches
   les plus loin de leur besoin de la semaine, et une planche servie

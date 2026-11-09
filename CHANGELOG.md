@@ -16,7 +16,7 @@ source détaillée commit par commit.
   tunnels 3 et 4 de 9,76 à 6,46 mm et laissait 0,85 m³ dans la réserve ;
   sous un arbitrage, plus rien n'était placé. Un arrosage validé au-delà
   de la part de sa planche rejoue la conduite, cette planche servie de ce
-  qu'elle a reçu (option recommandée, posée au porteur). Aucune
+  qu'elle a reçu : le choix du porteur, le 9 novembre 2026. Aucune
   migration.
 
 ### Corrigé (3.9 : les limites par jour)

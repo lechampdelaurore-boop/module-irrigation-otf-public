@@ -427,9 +427,10 @@ l'état au 30 octobre 2026.
     planche ; les tunnels 3 et 4 gardent leurs 9,76 mm, aucun tunnel validé
     ne reçoit de seconde proposition, rien ne reste dans la réserve ; sous
     un arbitrage, de même ; un arrosage validé au-delà de sa part rejoue la
-    conduite (cas limite posé au porteur). Tests du moteur
-    (`tests/planning-shortage-scenarios.test.ts`, cinq tests) et du service,
-    de la validation au recalcul (`tests/db/planning-validation.test.ts`).
+    conduite (cas limite tranché par le porteur le 9 novembre 2026). Tests
+    du moteur (`tests/planning-shortage-scenarios.test.ts`, cinq tests) et
+    du service, de la validation au recalcul
+    (`tests/db/planning-validation.test.ts`).
     État : 🟡 tests ✅, recette finale ⬜.
 21. **S21 — Refus en pénurie** (D-030, moteur de la 3.7). La proposition du
     tunnel 1 refusée. Attendu : le créneau refusé exclu pour la semaine ; le
