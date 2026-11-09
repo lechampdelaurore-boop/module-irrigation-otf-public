@@ -246,7 +246,12 @@ l'état au 30 octobre 2026.
    sur une planche sans passe-pied — n'est jamais proposé un jour limité,
    motif « volume inconnu sous une limite journalière ». Vérification : tests
    « restriction » et « point 35 » (existants, a à c) ; T4b (prouvé) ; (d) et
-   (e) à vérifier dans les tests, à écrire s'ils manquent. État : 🟡.
+   (e) à vérifier dans les tests, à écrire s'ils manquent. Relevé au lot 3
+   (D-084), en reproduisant le point 54 : (a) ne tient pas pour un créneau
+   à cheval sur minuit dont le premier jour est déjà plein ; sur la ferme
+   des tests à la taille de la ferme réelle, une limite de 15 m³ par jour
+   laisse 22,10 m³ le jeudi (point ouvert 58). État : 🟡, (a) ❌ défaut
+   corrigé à part, son test rouge d'abord.
 6. **S6 — Temps de pompage et eau à la fois.** Les quatre rampes de serre
    (10,24 m³/h pour une pompe à 8) sur une plage d'aspersion réduite à
    21 h – 0 h, et une réserve à 5 m³. Attendu : deux manques distincts, chacun
@@ -846,7 +851,8 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    comportement — un test rouge y est un défaut, corrigé à part. Écrits le
    9 novembre 2026 (D-084) : S3, S12, S13 et S18 l'étaient avec les
    corrections ; S2, S4, S10, S23, S24, S26 et S28 tiennent ; S7, S8 et S9 en
-   partie ; sept défauts relevés, points ouverts 51 à 57, chacun corrigé
+   partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
+   S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
    dans sa PR `fix/`, son test rouge d'abord — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée

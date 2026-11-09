@@ -2495,7 +2495,7 @@ chaque planche servie sans la redistribuer (D-077). Aucune migration.
 introuvable), et P7, rouge avant le code aux deux largeurs (le titre de
 l'écran introuvable) ; les 1 315 tests et les 84 parcours passent.
 
-## D-084 — Les scénarios de pénurie en tests du moteur (lot 3 de la 3.9) : sept défauts relevés, cinq précisions tranchées par la recommandation
+## D-084 — Les scénarios de pénurie en tests du moteur (lot 3 de la 3.9) : huit défauts relevés, cinq précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
 l'assistant ; modifiable à la relecture du porteur.
@@ -2505,8 +2505,8 @@ pénurie du contrat (`docs/shortage-contract.md`) qui n'en avaient pas, sans
 changer aucun comportement : un test rouge y est un défaut, corrigé à part.
 S3, S12, S13 et S18 l'étaient déjà par les quatre corrections. S2, S4, S10
 étendu, S23, S24, S26 et l'isolation S28 tiennent ; S7, S8 et S9 tiennent
-en partie ; S6 et S20 non. Sept défauts relevés, inscrits comme points
-ouverts 51 à 57 de l'état du projet : la tuile « Manque d'eau » à zéro sur
+en partie ; S6 et S20 non. Huit défauts relevés, inscrits comme points
+ouverts 51 à 58 de l'état du projet : la tuile « Manque d'eau » à zéro sur
 un stock inconnu (51) ; une pompe archivée qui laisse son matériel proposé
 « non vérifié » (52) ; une ressource inactive, ou hors de sa période,
 nommée « stock et ressources insuffisants », et une réserve inactive
@@ -2514,7 +2514,10 @@ annoncée mobilisable (53) ; la limite de prélèvement d'une source dépassée
 par un créneau vérifié sur deux jours et placé sur un seul (54) ; la coupe
 d'une source nommée comme celle d'une réserve (55) ; le manque d'une
 planche compté en entier sous le premier de ses motifs (56) ; les parts
-refaites sur le reste après une validation en pénurie (57).
+refaites sur le reste après une validation en pénurie (57) ; et, trouvé en
+reproduisant le point 54, la limite journalière d'irrigation d'un arrêté
+dépassée de la même façon, sur la ferme des tests à la taille de la ferme
+réelle, 22,10 m³ un jeudi pour 15 (S5, 58).
 
 **Précisions** (techniques, sans règle agronomique ; consignées au contrat
 de la 3.9, `docs/shortage-contract.md`, scénario par scénario et au point 3
@@ -2545,14 +2548,14 @@ du découpage) :
   enregistré illisible, et la ligne du journal ne nomme personne.
 
 **Ce qui ne change pas.** Aucun calcul, aucun écran, aucune migration : les
-tests et les fixtures seulement. Les sept défauts se corrigent chacun dans
+tests et les fixtures seulement. Les huit défauts se corrigent chacun dans
 sa PR `fix/`, le contrat précisé avant le code et un test rouge d'abord,
 après la PR de ce lot ; réunis quand ils touchent le même code, et dans cet
-ordre, du plus sérieux au plus léger : 54 et 55, la ressource directe, le
-plan proposant de prélever plus que l'autorisation ; 57 ; 56 ; 52 et 53,
-les chaînes indisponibles ; 51, l'affichage seul. Le point 57
-pourra demander l'avis du porteur sur un cas limite : une irrigation
-validée au-delà de la part de sa planche.
+ordre, du plus sérieux au plus léger : 58, 54 et 55, les limites par jour,
+le plan proposant d'arroser plus que l'arrêté ou de prélever plus que
+l'autorisation ; 57 ; 56 ; 52 et 53, les chaînes indisponibles ; 51,
+l'affichage seul. Le point 57 pourra demander l'avis du porteur sur un cas
+limite : une irrigation validée au-delà de la part de sa planche.
 
 **Vérifié par** `tests/planning-shortage-scenarios.test.ts` (huit tests :
 S2, S4, S7, S8, S9, S23, S24 et S26), le test S10 étendu de

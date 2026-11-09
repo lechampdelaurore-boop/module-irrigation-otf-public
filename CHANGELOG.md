@@ -15,8 +15,10 @@ source détaillée commit par commit.
   trois niveaux (S10), la pluie prévue sur deux calculs (S23), la semaine
   entamée (S24), deux calculs à deux minutes (S26, un relevé) et
   l'isolation de deux exploitations la même semaine (S28).
-- **Sept défauts relevés, aucun corrigé ici** (points ouverts 51 à 57) :
-  « Manque d'eau 0,00 m³ » sur un stock inconnu ; une pompe archivée qui
+- **Huit défauts relevés, aucun corrigé ici** (points ouverts 51 à 58) :
+  la limite journalière d'un arrêté dépassée par un créneau à cheval sur
+  minuit (22,10 m³ un jeudi pour 15) ; « Manque d'eau 0,00 m³ » sur un
+  stock inconnu ; une pompe archivée qui
   laisse son matériel proposé ; une source inactive nommée « stock et
   ressources insuffisants » ; la limite de prélèvement d'une source
   dépassée un mercredi (4 m³ pour 2) ; la coupe d'une source nommée comme

@@ -33,10 +33,12 @@ registres, elle y renvoie.
 - 3.9, lot 3, les scénarios de pénurie en tests du moteur : **écrits le
   9 novembre 2026** (D-084, précisions F98 à F102), sans changer aucun
   comportement. S2, S4, S10 étendu, S23, S24, S26 et l'isolation S28
-  tiennent ; S7, S8 et S9 en partie ; S6 et S20 non. **Sept défauts
-  relevés, points ouverts 51 à 57**, à corriger avant la recette finale,
+  tiennent ; S7, S8 et S9 en partie ; S6 et S20 non. **Huit défauts
+  relevés, points ouverts 51 à 58**, à corriger avant la recette finale,
   chacun dans sa PR `fix/`, le contrat précisé et le test rouge d'abord,
-  après la PR de ce lot, qui suit celle de l'écran d'arbitrage.
+  après la PR de ce lot, qui suit celle de l'écran d'arbitrage. Le plus
+  sérieux d'abord : la limite journalière d'un arrêté (58) et celle d'une
+  ressource (54) dépassées par un créneau à cheval sur minuit.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7466,7 +7468,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    d'irrigation, pas les limites de prélèvement. Recommandation : vérifier
    le créneau raccourci jour par jour, comme la limite journalière, et
    ajouter aux invariants la limite de prélèvement de chaque ressource,
-   jour par jour ; une PR `fix/` avec le point 55, le test rouge d'abord.
+   jour par jour ; une PR `fix/` avec les points 55 et 58, le test rouge
+   d'abord.
 55. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
    finale.** S9 encore : la coupe d'une ressource directe se nomme comme
@@ -7478,7 +7481,7 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    sa limite de prélèvement du jour. Recommandation : nommer cette limite
    (« limite de prélèvement de « Source du bas » atteinte ce jour-là ») ;
    c'est un motif nouveau, donc le contrat du planning précisé d'abord.
-   Avec le point 54.
+   Avec les points 54 et 58.
 56. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
    finale.** S6, l'eau et le temps de pompage ensemble : le résumé compte
@@ -7516,6 +7519,28 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    prendre l'excédent sur les parts des autres est un choix agronomique,
    à poser au porteur quand ce point se code. Sa PR `fix/` porte le test
    entier de S20.
+58. **Ouvert le 9 novembre 2026, en reproduisant le point 54 (lot 3 de la
+   3.9, D-084) ; à corriger avant la recette finale : le plan propose
+   d'arroser plus que la limite journalière, celle d'un arrêté.** S5, la
+   limite journalière d'irrigation : un créneau à cheval sur minuit dont le
+   premier jour est déjà plein y garde sa part. Sur la ferme des tests à la
+   taille de la ferme réelle, aux réglages par défaut, une limite de 15 m³
+   par jour : le jeudi, quatre rampes de bloc remplissent la journée à
+   15,00 m³, puis cinq créneaux partent de 22 h 42 à 23 h 33 et y ajoutent
+   7,10 m³, soit 22,10 m³ le jeudi et 17,99 m³ le vendredi ; à 18 m³ par
+   jour, 22,12 m³ le jeudi. Cause : `DailyLimitLedger.evaluate`
+   (`lib/domain/planning/supply.ts`) rend le dépassement du premier jour
+   qui dépasse, et le moteur raccourcit le créneau de ce volume par sa fin
+   (`lib/domain/planning/engine.ts`, « La limite journalière ») : quand le
+   premier jour est celui qui borne, la coupe retire l'eau du lendemain, et
+   le premier jour reste au-dessus. Le même défaut que le point 54, par un
+   autre chemin. Les tests existants ne le voyaient pas : leurs créneaux
+   passent rarement minuit, alors que le test d'invariants vérifie déjà la
+   limite jour par jour. Recommandation : une seule correction pour 54 et
+   58, dans la même PR `fix/` que 55 : couper le créneau jour par jour
+   depuis son début, à l'heure où le reste du jour s'épuise ; un créneau
+   qui ne peut plus rien prendre le premier jour part à minuit si sa plage
+   continue ; le test rouge d'abord, la ferme en taille à 15 m³.
 
 ## Procédure de reprise rapide
 
