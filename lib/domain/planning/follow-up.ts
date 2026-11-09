@@ -3,6 +3,7 @@ import { plannedIrrigationLateness } from '../planned-irrigation.ts';
 import { millisecondsFromMinutes } from '../units.ts';
 import type { PlanChanges } from './changes.ts';
 import type { PlanSuggestionCause, StoredPlanSuggestion } from './contract.ts';
+import { waterDeficitValue } from './water-deficit-summary.ts';
 
 /**
  * La présentation du suivi et de la replanification (3.7,
@@ -133,6 +134,16 @@ export function planChangesLines(changes: PlanChanges, format: DateFormats): Pla
   }
   for (const bed of changes.bedsNowPlaced) {
     lines.push({ kind: 'placed', text: `De nouveau servie : ${bed.bedName} (${bed.plotName})` });
+  }
+  const unknownBefore = changes.unknownWaterChainsBefore ?? 0;
+  const unknownAfter = changes.unknownWaterChainsAfter ?? 0;
+  if (unknownBefore > 0 || unknownAfter > 0) {
+    // Une eau inconnue d'un côté : le manque s'y écrit comme la carte, sans écart chiffré (point ouvert 59, D-090).
+    const volume = (value: number) => `${cubicMeters.format(value)} m³`;
+    const before = waterDeficitValue(changes.waterDeficitBeforeCubicMeters, unknownBefore, volume);
+    const after = waterDeficitValue(changes.waterDeficitAfterCubicMeters, unknownAfter, volume);
+    if (before !== after) lines.push({ kind: 'deficit', text: `Manque d’eau : ${before.startsWith('au ') ? 'd’' : 'de '}${before} à ${after}` });
+    return lines;
   }
   const delta = changes.waterDeficitAfterCubicMeters - changes.waterDeficitBeforeCubicMeters;
   if (Math.abs(delta) >= NEGLIGIBLE_CUBIC_METERS) {

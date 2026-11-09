@@ -1,5 +1,6 @@
 import { millisecondsFromMinutes } from '../units.ts';
 import { effectiveProposalStatus, type PlanBedOutcome, type PlanProposal, type PlanSuggestion, type StoredProposal, type StoredWeeklyPlan, type WeeklyPlan } from './contract.ts';
+import { unknownWaterChainCount } from './water-deficit-summary.ts';
 
 /**
  * « Ce qui a changé » (docs/replanning-contract.md, règle 25 ;
@@ -74,6 +75,8 @@ export function describePlanChanges(previous: StoredWeeklyPlan | null, plan: Wee
   if (!previous) return null;
   const computedAt = new Date(plan.computedAt);
   const before = previous.proposals.filter((proposal) => proposal.calculationId === previous.calculation.id && effectiveProposalStatus(proposal, computedAt) === 'proposed');
+  const unknownBefore = unknownWaterChainCount(previous.calculation.summary.budgets);
+  const unknownAfter = unknownWaterChainCount(plan.budgets);
   return {
     previousCalculationId: previous.calculation.id,
     previousComputedAt: previous.calculation.computedAt,
@@ -82,6 +85,9 @@ export function describePlanChanges(previous: StoredWeeklyPlan | null, plan: Wee
     ...bedPlacementChanges(previous.calculation.summary.beds, plan.beds),
     waterDeficitBeforeCubicMeters: previous.calculation.summary.deficit.waterCubicMeters,
     waterDeficitAfterCubicMeters: plan.deficit.waterCubicMeters,
+    // Une chaîne servie à l'eau inconnue d'un côté : son manque n'y est pas chiffré (point ouvert 59, D-090).
+    ...(unknownBefore > 0 ? { unknownWaterChainsBefore: unknownBefore } : {}),
+    ...(unknownAfter > 0 ? { unknownWaterChainsAfter: unknownAfter } : {}),
   };
 }
 

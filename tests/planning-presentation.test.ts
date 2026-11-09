@@ -24,12 +24,11 @@ import {
   unplacedBeds,
   unplacedReasonLabel,
   validatedProposalNote,
-  waterDeficitDetail,
   waterDeficitExplanation,
   windowLabel,
 } from '../lib/domain/planning/presentation.ts';
 import { DEFAULT_PLANNING_SETTINGS } from '../lib/domain/planning/settings.ts';
-import { unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '../lib/domain/planning/water-deficit-summary.ts';
+import { unknownWaterChainCount, waterDeficitDetail, waterDeficitTileDetail, waterDeficitValue } from '../lib/domain/planning/water-deficit-summary.ts';
 import { cubicMetersFromMillimeters, millimetersForRate } from '../lib/domain/units.ts';
 
 /**
