@@ -232,7 +232,15 @@ Dans cet ordre, pour chaque jour restant, d'aujourd'hui à dimanche :
    borné par zéro et par la capacité : une cuve n'est jamais négative.
 6. **Les limites.** La limite journalière d'irrigation (2.8) et la limite de
    prélèvement d'une ressource (3.1) sont vérifiées jour civil par jour civil,
-   en comptant ce qui est déjà réalisé et validé ce jour-là.
+   en comptant ce qui est déjà réalisé et validé ce jour-là. Un créneau qui
+   passe minuit se vérifie jour par jour depuis son début : il s'arrête à
+   l'heure où le reste d'un de ses jours s'épuise, jamais en retirant à sa
+   fin ce qu'un jour plus tôt a de trop (points ouverts 54 et 58, D-085).
+   Quand son premier jour ne tient plus la durée minimale, il part à minuit
+   si sa plage continue, sur le reste du jour suivant ; sinon un autre jour
+   est essayé. La coupe d'une limite de prélèvement porte son nom, « limite
+   de prélèvement », jamais celui d'une réserve : une ressource prélevée
+   directement n'a ni stock ni minimum de sécurité (point ouvert 55).
 
 Le résultat est un plan qui, en septembre sur la ferme, tient sans peine :
 79,2 m³ à 8 m³/h font dix heures de pompage au minimum ; matériel par
@@ -247,7 +255,7 @@ besoin, le déficit qui en résulte est chiffré et nommé.
 | Contrainte | Source | Ce que le moteur fait devant elle |
 | --- | --- | --- |
 | Limite journalière d'irrigation, m³/jour, sur ses dates | 2.8 | plafonne le volume proposé du jour, réalisé et validé compris |
-| Limite de prélèvement d'une ressource, m³/jour | 3.1 | plafonne ce que la ressource peut fournir ce jour-là |
+| Limite de prélèvement d'une ressource, m³/jour | 3.1 | plafonne ce que la ressource peut fournir ce jour-là ; la coupe se nomme « limite de prélèvement » |
 | Minimum de sécurité d'une réserve | 3.1 | la projection ne descend jamais dessous |
 | Débit maximal d'une pompe, simultanéité | 3.2 | découpe et enchaîne les créneaux |
 | Origine d'eau indisponible, pompe archivée, ressource inactive sur la période | 3.1, 3.2 | aucun créneau sur cette chaîne |
