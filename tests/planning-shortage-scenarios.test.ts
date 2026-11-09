@@ -6,7 +6,8 @@ import { waterDeficitExplanation } from '../lib/domain/planning/presentation.ts'
 import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { splitVolumeAcrossLocalDays } from '../lib/domain/water-management.ts';
 import {
-  assertInvariants, byEquipment, close, farm, largeFarm, NOW, PARIS_21H_TUESDAY, realIrrigation, settings, TZ, validatedIrrigation, withDirectChain, withValidatedProposals,
+  assertInvariants, byEquipment, close, farm, largeFarm, NOW, PARIS_21H_TUESDAY, plannedIrrigation, realIrrigation, settings, TZ, validatedIrrigation, withDirectChain,
+  withValidatedProposals,
 } from './support/planning-fixtures.ts';
 
 /**
@@ -368,4 +369,28 @@ test('S20 et les priorités : l’eau validée en trop sur une planche normale s
   const rest = millimetersFromCubicMeters(6 - validatedVolume(second) - cubicMetersFromMillimeters(20, TUNNEL_SQUARE_METERS), 2 * TUNNEL_SQUARE_METERS);
   for (const tunnel of [2, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), rest, 0.02, `tunnel ${tunnel} : la moitié du reste des normales`);
   assert.equal(byEquipment(plan, 'rampe-tunnel-1').length, 0, 'le tunnel 1 a déjà plus que sa part');
+});
+
+test('S20, l’eau libérée en fin de tour : une planche validée au-delà des autres n’en prend qu’une fois rejointe (point ouvert 57, D-086)', () => {
+  // 7 m³, 13,67 mm par tunnel ; le tunnel 1 validé à 1,3 fois sa proposition, 17,77 mm, et le tunnel 3 empêché toute la
+  // semaine par l'espacement d'une irrigation planifiée dimanche à 0 h 30. Sa part libérée relève d'abord les tunnels 2
+  // et 4 jusqu'au tunnel 1, puis les trois ensemble : 18,23 mm. Au prorata des manques, le tunnel 1 en prenait 1,56 mm
+  // avant d'avoir été rejoint, et les tunnels 2 et 4 restaient à 17,68 mm.
+  const { inputs } = farm({ ...TUNNELS_ONLY, reservoirCubicMeters: 7 });
+  const first = buildWeeklyPlan(inputs, settings);
+  const validated = withValidatedProposals(inputs, first, ['rampe-tunnel-1'], () => 1.3);
+  const t1Mm = validated.events.flatMap((event) => event.equipment.applications)[0].plannedAmountMm;
+  const second: PlanningInputs = {
+    ...validated,
+    events: [...validated.events, plannedIrrigation('planifiee-t3', 'rampe-tunnel-3', '2026-10-03T22:30:00.000Z', '2026-10-03T23:30:00.000Z', tunnelBeds(3))],
+  };
+  const plan = buildWeeklyPlan(second, settings);
+  assertInvariants(plan, second);
+  for (const bed of plan.beds.filter((item) => item.plotName === 'Tunnel 3')) assert.ok(bed.placedMm === 0 && bed.reasons.includes('spacing'), `${bed.bedName} : espacement`);
+  // Le niveau commun : l'eau de la semaine moins l'eau validée, plus l'eau validée du tunnel 1, sur trois tunnels.
+  const level = (millimetersFromCubicMeters(7 - validatedVolume(validated), TUNNEL_SQUARE_METERS) + t1Mm) / 3;
+  assert.ok(level > t1Mm, `le tunnel 1 rejoint, à ${level.toFixed(2)} mm pour ses ${t1Mm.toFixed(2)} mm validés`);
+  for (const tunnel of [2, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), level, 0.02, `tunnel ${tunnel} : au niveau commun`);
+  // Le complément du tunnel 1, 0,46 mm, est sous la dose minimale : il attend.
+  assert.equal(byEquipment(plan, 'rampe-tunnel-1').length, 0, 'le tunnel 1, servi au-delà, ne prend que son complément au niveau commun');
 });

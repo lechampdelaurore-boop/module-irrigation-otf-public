@@ -46,6 +46,7 @@ export class ShareLedger {
   private unreservedCubicMeters: number;
   private readonly strategy: PlanningSettings['shortageStrategy'] | null;
   private readonly deferredFirst: ReadonlySet<string>;
+  private readonly validatedMmOf: (bed: BedState) => number;
 
   constructor(input: {
     beds: readonly BedState[];
@@ -55,10 +56,13 @@ export class ShareLedger {
     /** La conduite qui redistribue l'eau libérée en fin de tour ; `null` sous un arbitrage validé, qui ne redistribue rien. */
     strategy: PlanningSettings['shortageStrategy'] | null;
     deferredFirst: ReadonlySet<string>;
+    /** L'eau validée de la chaîne que chaque planche recevra encore, déjà placée dans sa part (point ouvert 57, D-086). */
+    validatedMmOf?: (bed: BedState) => number;
   }) {
     this.shortfallReason = input.shortfallReason;
     this.strategy = input.strategy;
     this.deferredFirst = input.deferredFirst;
+    this.validatedMmOf = input.validatedMmOf ?? (() => 0);
     let reserved = 0;
     for (const bed of input.beds) {
       const wetted = input.wettedAreaOf(bed);
@@ -212,12 +216,48 @@ export class ShareLedger {
       const atLevel = eligible.filter((entry) => level.includes(entry.bed.priority));
       const demand = atLevel.reduce((sum, entry) => sum + deficitOf(entry), 0);
       if (demand <= EPSILON) continue;
-      const fraction = Math.min(1, Math.max(0, remaining) / demand);
-      for (const entry of atLevel) gifts.set(entry, deficitOf(entry) * fraction);
+      if (demand > remaining && atLevel.some((entry) => this.validatedMmOf(entry.bed) > EPSILON)) {
+        // L'eau validée compte comme reçue : l'eau libérée relève d'abord les planches les plus loin de leur besoin de la
+        // semaine, et une planche déjà servie au-delà des autres n'en prend qu'une fois rejointe (point ouvert 57, D-086).
+        const giftAt = (entry: ShareEntry, fraction: number) => cubicMetersFromMillimeters(
+          Math.max(0, shareAt(entry.bed, fraction, this.validatedMmOf(entry.bed)) - entry.bed.targetMm), entry.wettedAreaSquareMeters);
+        const fraction = commonFraction(remaining, (candidate) => atLevel.reduce((sum, entry) => sum + giftAt(entry, candidate), 0));
+        for (const entry of atLevel) gifts.set(entry, giftAt(entry, fraction));
+      } else {
+        const fraction = Math.min(1, Math.max(0, remaining) / demand);
+        for (const entry of atLevel) gifts.set(entry, deficitOf(entry) * fraction);
+      }
       remaining -= demand;
     }
     return gifts;
   }
+}
+
+/**
+ * La cible d'une planche à une fraction de la conduite (point ouvert 57,
+ * D-086) : la fraction de son besoin de la semaine — besoin restant plus eau
+ * validée de sa chaîne —, moins cette eau validée, déjà placée ; zéro pour
+ * une planche qui en a déjà autant.
+ */
+export function shareAt(bed: BedState, fraction: number, validatedMm: number): number {
+  return Math.max(0, fraction * (bed.needMm + validatedMm) - validatedMm);
+}
+
+/**
+ * La plus grande fraction commune que de l'eau peut donner, quand l'eau prise
+ * grandit avec la fraction : une bissection suffit (point ouvert 57, D-086).
+ */
+export function commonFraction(pool: number, takenAt: (fraction: number) => number): number {
+  if (pool <= 0) return 0;
+  if (takenAt(1) <= pool) return 1;
+  let low = 0;
+  let high = 1;
+  for (let step = 0; step < 50; step += 1) {
+    const middle = (low + high) / 2;
+    if (takenAt(middle) <= pool) low = middle;
+    else high = middle;
+  }
+  return low;
 }
 
 /** La fin d'un tour de placement pour toutes les chaînes : vrai si une cible a monté quelque part. */
