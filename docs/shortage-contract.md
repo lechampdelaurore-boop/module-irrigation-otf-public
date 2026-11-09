@@ -422,8 +422,15 @@ l'état au 30 octobre 2026.
     la validation des tunnels 1 et 2, les parts se recalculent sur le reste
     du budget et des besoins ; les tunnels 3 et 4 tombent de 9,76 à 6,46 mm,
     0,85 m³ restent dans la réserve, et chaque tunnel validé garde une part
-    de 1,42 mm à placer (point ouvert 57). État : ❌ défaut, corrigé à part,
-    son test rouge d'abord.
+    de 1,42 mm à placer (point ouvert 57). Corrigé le 9 novembre 2026
+    (D-086) : l'eau validée compte comme déjà placée dans la part de sa
+    planche ; les tunnels 3 et 4 gardent leurs 9,76 mm, aucun tunnel validé
+    ne reçoit de seconde proposition, rien ne reste dans la réserve ; sous
+    un arbitrage, de même ; un arrosage validé au-delà de sa part rejoue la
+    conduite (cas limite posé au porteur). Tests du moteur
+    (`tests/planning-shortage-scenarios.test.ts`, cinq tests) et du service,
+    de la validation au recalcul (`tests/db/planning-validation.test.ts`).
+    État : 🟡 tests ✅, recette finale ⬜.
 21. **S21 — Refus en pénurie** (D-030, moteur de la 3.7). La proposition du
     tunnel 1 refusée. Attendu : le créneau refusé exclu pour la semaine ; le
     besoin du tunnel 1 placé ailleurs avec la même part ; si aucun autre
@@ -861,7 +868,7 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
    S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
    dans sa PR `fix/`, son test rouge d'abord (58, 54 et 55 le 9 novembre
-   2026, D-085) — S6 et S20 y portent leur
+   2026, D-085 ; 57 le même jour, D-086) — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée
    ou validée peut puiser dans la réserve (`fromReserve`), une seconde

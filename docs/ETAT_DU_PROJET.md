@@ -42,8 +42,12 @@ registres, elle y renvoie.
   55 corrigés le 9 novembre 2026** (D-085, F103 à F107), dans une PR qui
   suit celle du lot 3 : les limites par jour se jugent depuis le début du
   créneau, qui part à minuit quand son premier jour est plein, et la coupe
-  d'une source se nomme « limite de prélèvement ». Restent 57, 56, 52 et
-  53, puis 51.
+  d'une source se nomme « limite de prélèvement ». **57 corrigé le
+  9 novembre 2026** (D-086, F108 à F112), dans une PR qui suit celle des
+  limites : l'eau déjà validée compte comme placée dans les parts, et
+  valider en pénurie ne refait plus le partage ; le cas limite, un
+  arrosage validé au-delà de la part de sa planche, est posé au porteur,
+  l'option recommandée codée en attendant. Restent 56, 52 et 53, puis 51.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7534,8 +7538,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    (besoin moins part) compte en manque d'eau, le reste (part moins placé)
    sous le motif du placement ; sa PR `fix/` porte le test entier de S6.
 57. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette finale ;
-   un cas limite pourra demander l'avis du porteur.** S20, validation en
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-086) ;
+   fermeture au jugement du porteur ; le cas limite posé au porteur, sa
+   réponse attendue.** S20, validation en
    pénurie : les quatre tunnels pour 5 m³ (la pénurie de la cinquième
    recette), chacun reçoit 9,76 mm ; les propositions des tunnels 1 et 2
    validées, le recalcul refait les parts sur le reste du budget (2,50 m³)
@@ -7552,7 +7557,19 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    limite : une irrigation validée au-delà de la part de sa planche ;
    prendre l'excédent sur les parts des autres est un choix agronomique,
    à poser au porteur quand ce point se code. Sa PR `fix/` porte le test
-   entier de S20.
+   entier de S20. Corrigé le 9 novembre 2026 (D-086, F108 à F112), comme
+   recommandé : l'eau que les irrigations planifiées de la chaîne d'une
+   planche lui donneront encore compte comme déjà placée dans sa part ;
+   après la validation des tunnels 1 et 2, les tunnels 3 et 4 gardent
+   leurs 9,76 mm et rien ne reste dans la réserve
+   (`tests/planning-shortage-scenarios.test.ts`, rouge avant : 6,46 mm),
+   et le service le vérifie de la validation au recalcul
+   (`tests/db/planning-validation.test.ts`). Sous un arbitrage,
+   l'allocation compte l'eau validée. Le cas limite est posé au porteur le
+   9 novembre 2026 ; l'option recommandée, « selon la conduite choisie »,
+   est codée en attendant : la conduite se rejoue, la planche servie
+   au-delà gardant ce qu'elle a reçu, et l'eau libérée en fin de tour suit
+   la même règle.
 58. **Ouvert le 9 novembre 2026, en reproduisant le point 54 (lot 3 de la
    3.9, D-084) ; corrigé le jour même (D-085) ; fermeture au jugement du
    porteur : le plan proposait d'arroser plus que la limite journalière,
