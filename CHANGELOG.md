@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : une pompe et un matériel archivés, au téléphone et au contraste)
+
+- **Au téléphone, les boutons d'une carte de pompe et « Matériels
+  archivés » font 44 px, et une pompe archivée se lit** (point ouvert 62,
+  D-094). « Modifier », « Archiver » et « Réactiver » passent de 39 à
+  44 px, « Matériels archivés (n) » de 36 à 44 px ; une pompe archivée se
+  distingue par son fond et son état, sans le voile qui mettait ses
+  intitulés à 3,1:1. Correction d'affichage seule.
+
 ### Corrigé (3.9 : le pli des changements sur une eau inconnue)
 
 - **Le pli « Ce qui a changé » ne lit plus de baisse du manque d'eau que
