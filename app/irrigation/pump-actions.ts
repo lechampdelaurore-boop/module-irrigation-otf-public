@@ -14,6 +14,21 @@ export type PumpActionResult =
   | { ok: true; message: string; dashboard: Awaited<ReturnType<typeof getPumpDashboardForUser>> }
   | { ok: false; message: string };
 
+/**
+ * Le tableau des pompes relu au serveur, sans rien écrire : la gestion des
+ * pompes le redemande quand le panneau des ressources change une ressource ou
+ * une réserve (point ouvert 60, D-093).
+ */
+export async function loadPumpDashboardAction(): Promise<PumpActionResult> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { ok: false, message: 'Votre session a expiré.' };
+  try {
+    return { ok: true, message: '', dashboard: await getPumpDashboardForUser(user.userId) };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : 'Une erreur est survenue.' };
+  }
+}
+
 export async function savePumpAction(input: { pumpId: string | null; pump: PumpDraft }): Promise<PumpActionResult> {
   return mutate(async (userId) => {
     await savePumpForUser(userId, userId, input.pumpId, input.pump);

@@ -8,6 +8,18 @@ export function notifyFeasibilityChanged() {
 }
 
 /**
+ * La page « Ressources et pompes » : une ressource ou une réserve créée,
+ * modifiée ou rendue inactive dans le panneau des ressources, la gestion des
+ * pompes relit son tableau au serveur, pour que la fiche d'une pompe la voie
+ * sans recharger la page (point ouvert 60, D-093). Le signal ne porte rien.
+ */
+export const WATER_SOURCES_CHANGED = 'irrigation-water-sources-changed';
+
+export function notifyWaterSourcesChanged() {
+  window.dispatchEvent(new CustomEvent(WATER_SOURCES_CHANGED));
+}
+
+/**
  * Le volume d'un besoin se calcule sur la surface mouillée du matériel
  * positionné (D-022) : un placement qui change recalcule les besoins, qui
  * préviennent à leur tour la faisabilité.

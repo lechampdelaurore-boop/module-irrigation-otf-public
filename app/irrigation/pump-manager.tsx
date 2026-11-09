@@ -2,11 +2,12 @@
 
 import type { EquipmentListItem } from '@/lib/domain/equipment-record';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
-import { useState, useTransition } from 'react';
-import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { notifyFeasibilityChanged, WATER_SOURCES_CHANGED } from '@/lib/domain/feasibility-notifications';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import { findPumpCapacityConflicts, type IrrigationPump, type PumpDraft, type PumpOriginKind, type PumpUsage } from '@/lib/domain/pumps';
 import {
+  loadPumpDashboardAction,
   saveEquipmentDefaultPumpAction,
   savePumpAction,
   setPumpArchivedAction,
@@ -29,13 +30,30 @@ export function PumpManager({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Une relecture en cours cède la place à toute action ou relecture plus récente.
+  const latest = useRef(0);
   const run = (work: () => Promise<PumpActionResult>, close = false) => startTransition(async () => {
+    latest.current += 1;
     const result = await work();
     if (!result.ok) { setError(result.message); setNotice(null); return; }
     setDashboard(result.dashboard); setNotice(result.message); setError(null);
     notifyFeasibilityChanged();
     if (close) setEditor(null);
   });
+  useEffect(() => {
+    // Une ressource ou une réserve changée dans le panneau des ressources : le tableau se relit au serveur, et
+    // la fiche d'une pompe propose les origines telles qu'elles sont, sans recharger la page (point ouvert 60, D-093).
+    const reload = () => {
+      const request = ++latest.current;
+      void loadPumpDashboardAction().then((result) => {
+        if (request !== latest.current) return;
+        if (result.ok) setDashboard(result.dashboard);
+        else setError(result.message);
+      }, () => { if (request === latest.current) setError('Les origines des pompes n’ont pas pu être relues. Rechargez la page.'); });
+    };
+    window.addEventListener(WATER_SOURCES_CHANGED, reload);
+    return () => { window.removeEventListener(WATER_SOURCES_CHANGED, reload); latest.current += 1; };
+  }, []);
   const sourceName = (pump: IrrigationPump, defaultOnly = false) => {
     const origins = defaultOnly ? pump.origins.filter((item) => item.isDefault) : pump.origins;
     const names = origins.map((origin) => origin.sourceKind === 'resource'
