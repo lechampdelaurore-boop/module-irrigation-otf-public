@@ -3058,6 +3058,50 @@ pénurie, puis 60.
 **Vérifié par** P32 aux deux largeurs, les deux tests de S21, et les
 contrôles complets ; les 1 344 tests et les 88 parcours passent.
 
+## D-092 — Le motif de la dose en pénurie (point ouvert 61) : deux précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le premier des deux
+défauts relevés en écrivant le parcours P32 (D-091), corrigé à part. Codée
+en Opus 5.5 · Max sur le dépôt public, le contrat du planning précisé
+d'abord (`docs/planning-contract.md`, « La part réservée »), les tests rouges
+avant le code.
+
+**Le défaut corrigé.** En pénurie, la cible d'une planche est sa part de la
+conduite, et le reste qu'elle a à recevoir est cette part. Une rampe qui
+n'arrose que ses planches n'est jamais raccourcie par les parts : sa carte
+disait « Pourquoi cette dose : le besoin restant de la planche la plus
+demandeuse », que le maraîcher lit comme tout ce qui reste à recevoir, quand
+la planche n'en reçoit qu'une part — sur P32, 5,9 mm, le reste compté sous
+« stock et ressources insuffisants » dans « Non placé ». Sous un arbitrage,
+une allocation sous le besoin se lisait de même. La recette du 10 octobre
+2026 (T1) l'avait lu ainsi sans le relever.
+
+**Deux précisions**, techniques, sans règle agronomique nouvelle, tranchées
+par la recommandation et consignées au contrat du planning :
+
+- F132 : un créneau que ses parts ne raccourcissent pas, quand la cible de
+  sa planche de référence est sous son besoin d'un centième de millimètre
+  au moins — sa part de la conduite, ou son allocation sous un arbitrage —,
+  porte le motif de dose `shortage-share`, au libellé de la coupe : « la
+  part de la semaine réservée à ses planches ». La dose maximale, la dose du
+  dernier jour sous la dose minimale et les coupes de la plage, de la pompe,
+  des limites, de la réserve et des créneaux refusés ou protégés gardent leur
+  motif ; hors pénurie, « le besoin restant » ne change pas.
+- F133 : sa contrainte limitante ne passe qu'après celles du moment —
+  pompe, limite journalière ou de prélèvement, réserve, créneau refusé ou
+  protégé, plage, pluie prévue, espacement — et dit sinon « part de la
+  semaine atteinte, le reste est réservé aux autres planches » ; une coupe
+  par les parts (`reserved-share`) garde son rang d'avant. Un calcul
+  enregistré avant garde son motif ; aucune migration.
+
+**Vérifié par** deux tests du moteur (`tests/planning-shortage.test.ts`),
+rouges avant le code : 5 m³ pour quatre tunnels à 20 mm, les quatre rampes
+à 9,77 mm disaient `remaining-need` ; sous un arbitrage de 9 mm par planche,
+de même ; hors pénurie, à 30 m³, la dose maximale puis le besoin restant.
+Le libellé (`tests/planning-presentation.test.ts`) ; P32 lit le motif sur
+la ferme de démonstration. Les 1 346 tests passent.
+
 ## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de

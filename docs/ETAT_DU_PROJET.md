@@ -88,7 +88,10 @@ registres, elle y renvoie.
   besoin restant » quand c'est la part de sa planche (61) ; la fiche d'une
   pompe ne voit une réserve créée qu'après le rechargement de la page (60).
   En jouant tous les parcours, un troisième, le point 62, corrigé dans la
-  PR qui précède celle de ce lot (D-094). 88 parcours.
+  PR qui précède celle de ce lot (D-094). 88 parcours. **61 corrigé le
+  9 novembre 2026** (D-092, F132 et F133), dans une PR qui suit celle du
+  lot 4 : la carte d'une ligne en pénurie dit que sa dose est « la part de
+  la semaine réservée à ses planches ».
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7735,7 +7738,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    faisabilité le fait déjà (`notifyFeasibilityChanged`) ; une PR `fix/` à
    part, le test rouge d'abord, P32 sans rechargement.
 61. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
-   3.9, D-091) ; non bloquant.** En pénurie, la carte d'une ligne qui
+   3.9, D-091) ; corrigé le jour même (D-092) ; fermeture au jugement du
+   porteur.** En pénurie, la carte d'une ligne qui
    n'arrose que sa planche justifie sa dose par « Pourquoi cette dose : le
    besoin restant de la planche la plus demandeuse », alors que cette dose
    est la part de la planche, une fraction de son besoin : sur P32, 5,9 mm,
@@ -7752,7 +7756,11 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    Recommandation : quand la cible de la planche de référence est sous son
    besoin, la dose dit « la part de la semaine réservée à ses planches »,
    comme une coupe ; une PR `fix/` à part, le contrat du planning précisé et
-   le test rouge d'abord, et P32 qui lit le motif.
+   le test rouge d'abord, et P32 qui lit le motif. Corrigé le 9 novembre
+   2026 (D-092, F132 et F133), comme recommandé : la dose d'une planche dont
+   la cible est sous son besoin dit « la part de la semaine réservée à ses
+   planches », sa contrainte limitante ne passant qu'après celles du moment
+   (`tests/planning-shortage.test.ts`, rouge avant ; P32 lit le motif).
 62. **Ouvert le 9 novembre 2026, en jouant les parcours du lot 4 de la
    3.9 ; corrigé le jour même (D-094) ; fermeture au jugement du
    porteur.** Au téléphone, sur une ferme qui a une pompe, « Modifier » et
