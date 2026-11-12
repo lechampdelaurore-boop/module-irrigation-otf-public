@@ -12,7 +12,7 @@ Pas de calendrier, de choix horaire, de concurrence minute par minute, de comman
 - Besoin total = somme des besoins effectifs connus. Une donnée manquante rend le total global non calculable, avec sous-total connu affiché.
 - Priorités strictes Haute, Normale, Basse. Le déficit relatif n’influe pas sur la priorité.
 - Si tout un niveau peut être servi, allocation complète automatique.
-- En pénurie entre plusieurs planches, aucune sélection automatique : cases « Servir », puis validation humaine. Une seule planche peut recevoir le maximum sans arbitrage.
+- En pénurie entre plusieurs planches, aucune décision automatique : cases « Servir », toutes cochées au départ — la proposition, depuis l'écran façon plan d'assolement (`docs/shortage-contract.md`, 2 bis, D-083) —, puis validation humaine ; rien n'est enregistré avant elle. Une seule planche peut recevoir le maximum sans arbitrage.
 - Si les sélectionnées tiennent dans le budget, allocation complète ; sinon même fraction de besoin pour chacune. Les arêtes incompatibles ne sont jamais utilisées ; le taux commun peut être limité par une source exclusive. Un reliquat non distribuable est explicite, pas réattribué silencieusement.
 - Les exclues reçoivent zéro avec explication. Après validation, le reliquat passe au niveau inférieur.
 - Une dose positive sous le seuil 3.3 est affichée à titre explicatif, mais affectée à zéro. Elle n’est pas transférée au futur planning, ni redistribuée aux priorités suivantes sans nouvel arbitrage.
@@ -39,5 +39,7 @@ Les actions déterminent le propriétaire depuis la session, jamais depuis le fo
 Chargement différé à l’approche de la section, calcul unique par période, aucune requête D1 par planche, aucun nouvel appel météo/OTF ad hoc. Les événements sont bornés à la semaine (réel OU planifié, et minuteurs ouverts), les mouvements à la période utile. Le contrat GET OTF n’est pas changé.
 
 Recalcul ciblé après modification, message inter-onglets, retour de visibilité et bouton explicite. Pas de polling ni de `router.refresh()` ajouté par 3.4. Les données en cache ne deviennent pas une source indépendante.
+
+L'écran d'arbitrage (`docs/shortage-contract.md`, 2 bis, D-083) recalcule la part à chaque case dans le navigateur, par `allocateIrrigationWater` sur la faisabilité reçue, sans requête. Les cultures de chaque planche et leur stade du jour ne se lisent que pour cet écran, quand un niveau demande un choix ; le planning, qui relit la faisabilité, ne les lit pas.
 
 Résultat destiné à 3.5 : `IrrigationFeasibility`, détail par priorité et `BedWaterAllocation` avec besoin source, échéance, dose/volume proposé et alloué, part confirmée, volume utilisable, déficit, satisfaction, arbitrage, qualité hydraulique et raisons. Le champ `usableForPlanningCubicMeters` est nul sous seuil ou si la chaîne reste non vérifiée ; il ne déclenche aucune irrigation.

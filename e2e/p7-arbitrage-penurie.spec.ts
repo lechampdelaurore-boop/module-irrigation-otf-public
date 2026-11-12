@@ -12,6 +12,11 @@ import { attendreLaPageIrrigation, epinglerLaBulle, surveillerLaConsole, verifie
  * s'enregistre, rien ne déborde et les cibles sont assez grandes pour un pouce.
  * Ce que le porteur garde : le confort réel sur son propre téléphone.
  *
+ * Depuis le 9 novembre 2026, l'écran se présente comme un plan d'assolement
+ * (docs/shortage-contract.md, 2 bis, D-083) : les planches rangées par jardin
+ * avec leurs cultures, toutes cochées au départ, le bilan recalculé à chaque
+ * case, rien d'enregistré avant « Valider la répartition ».
+ *
  * La pénurie est provoquée par des besoins manuels au plafond plutôt qu'en
  * vidant les réserves : les parcours partagent une base, et le besoin d'une
  * planche ne dépend que d'elle, alors que l'eau disponible dépend de tout ce que
@@ -58,38 +63,55 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   // format brut à côté d'une date de calcul déjà mise en forme.
   await expect(faisabilite.locator('.feasibility-meta'))
     .toHaveText(/^Semaine du \d{2}\/\d{2}\/\d{4} au \d{2}\/\d{2}\/\d{4} · Calculé le /);
-  const groupe = faisabilite.locator('details').filter({ hasText: 'Priorité Normale' });
-  // « Choix à faire entre les demandes d’eau » la première fois, « Choix à valider de nouveau »
-  // quand une décision antérieure est devenue caduque : les deux largeurs
-  // partagent une base, et la seconde hérite de la décision de la première,
-  // caduque depuis sa remise en état.
-  await expect(groupe).toContainText(/Choix (à faire entre les demandes d’eau|à valider de nouveau)/, { timeout: 30_000 });
-  await expect(groupe).toContainText('disponibles au maximum pour');
-  // Le pli peut déjà être ouvert : cliquer sans regarder le refermerait.
-  const premiereCase = groupe.getByLabel(`Servir ${'N01'}`);
-  await expect(async () => {
-    if (!(await premiereCase.isVisible())) await groupe.locator('summary').first().click();
-    await expect(premiereCase).toBeVisible({ timeout: 1_000 });
-  }).toPass({ timeout: 30_000 });
-  await verifierLEtape(page, journal, 'arbitrage affiché');
+  // L'écran d'arbitrage façon plan d'assolement (docs/shortage-contract.md,
+  // 2 bis, D-083). Le même titre que le choix soit à faire ou à valider de
+  // nouveau : les deux largeurs partagent une base, et la seconde hérite de la
+  // décision de la première, caduque depuis sa remise en état.
+  const arbitrage = faisabilite.locator('section.arbitration-plan').filter({ hasText: 'priorité normale' });
+  await expect(arbitrage.getByRole('heading', { name: 'L’eau ne suffit pas pour toutes les planches de priorité normale' }))
+    .toBeVisible({ timeout: 30_000 });
+  // `has` cherche à l'intérieur de chaque élément filtré : la case s'y désigne
+  // depuis la page, et non depuis la section, dont le chemin ne s'y trouve pas.
+  const laCase = (planche: string) => page.getByRole('checkbox', { name: new RegExp(`^Servir ${planche} : `) });
+  const caseDe = (planche: string) => arbitrage.locator(laCase(planche));
+  // Au départ, toutes les planches à choisir sont cochées : c'est la proposition.
+  const cases = arbitrage.getByRole('checkbox', { name: /^Servir / });
+  const total = await cases.count();
+  expect(total, 'au moins les trois planches du parcours').toBeGreaterThanOrEqual(planches.length);
+  for (const planche of planches) await expect(caseDe(planche)).toBeChecked();
+  const servies = arbitrage.locator('.arbitration-tile').filter({ hasText: 'Planches servies' }).locator('strong');
+  await expect(servies).toHaveText(`${total} sur ${total}`);
+  // N01, en succession sur la ferme de démonstration : les carottes finies, la
+  // mâche à venir. La ligne le dit, la frise le montre.
+  const ligneN01 = arbitrage.locator('.arbitration-bed').filter({ has: laCase('N01') });
+  await expect(ligneN01).toContainText('Planche nue depuis le');
+  await expect(ligneN01).toContainText('Mâche à partir du');
+  await expect(ligneN01.locator('.arbitration-crop.is-planned')).toHaveCount(1);
+  await verifierLEtape(page, journal, 'arbitrage affiché, toutes les planches cochées');
 
-  // Aucune quantité à saisir : l'écran ne demande qu'un choix de planches.
-  for (const planche of planches) {
-    await expect(groupe.getByLabel(`Servir ${planche}`)).toBeVisible();
-  }
-  const valider = groupe.getByRole('button', { name: 'Valider la sélection' });
+  // « Ne rien servir » décoche les planches du jardin de N01, puis N01 est
+  // recochée : le bilan se recalcule sans rien enregistrer.
+  const jardin = arbitrage.locator('.arbitration-garden').filter({ has: laCase('N01') });
+  const rienServir = jardin.getByRole('button', { name: /^Ne rien servir/ });
+  await rienServir.click();
+  for (const planche of planches) await expect(caseDe(planche)).not.toBeChecked();
+  await caseDe('N01').check();
+  await expect(servies).toHaveText(`${total - 2} sur ${total}`);
+  await expect(caseDe('N02')).not.toBeChecked();
+  await expect(arbitrage).toContainText('Rien n’est enregistré tant que vous n’avez pas validé.');
+  const valider = arbitrage.getByRole('button', { name: 'Valider la répartition' });
   await expect(valider).toBeVisible();
-  await verifierCibleTactile(valider, 'le bouton « Valider la sélection »');
-  await verifierCibleTactile(
-    groupe.locator('label').filter({ hasText: `Servir ${planches[0]}` }).first(),
-    `l’étiquette « Servir ${planches[0]} »`,
-  );
+  await verifierCibleTactile(valider, 'le bouton « Valider la répartition »');
+  await verifierCibleTactile(rienServir, 'le bouton « Ne rien servir »');
+  await verifierCibleTactile(arbitrage.locator('label').filter({ has: laCase('N01') }).first(), 'la case « Servir N01 »');
+  await verifierLEtape(page, journal, 'choix fait, rien d’enregistré');
 
-  await groupe.getByLabel(`Servir ${planches[0]}`).check();
   await valider.click();
-  await expect(groupe).toContainText('Choix enregistré', { timeout: 30_000 });
-  await expect(groupe).toContainText('Dernière décision');
-  await verifierLEtape(page, journal, 'arbitrage enregistré');
+  await expect(arbitrage).toContainText('Répartition validée', { timeout: 30_000 });
+  await expect(caseDe('N01')).toBeChecked();
+  await expect(caseDe('N02')).not.toBeChecked();
+  await expect(servies).toHaveText(`${total - 2} sur ${total}`);
+  await verifierLEtape(page, journal, 'répartition validée');
 
   // Remise en état : les parcours partagent une base, des besoins de 500 mm
   // laissés derrière fausseraient tous les suivants.
@@ -108,7 +130,7 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   await faisabilite.getByRole('button', { name: 'Recalculer la faisabilité' }).click();
   await expect(faisabilite.locator('.feasibility-warning').filter({ hasText: 'L’ancien choix entre les demandes d’eau de priorité Normale n’est plus applicable' }))
     .toBeVisible({ timeout: 30_000 });
-  await expect(groupe).not.toContainText('Choix enregistré');
+  await expect(faisabilite).not.toContainText('Répartition validée');
   await verifierLEtape(page, journal, 'état initial rétabli, arbitrage caduc');
 });
 

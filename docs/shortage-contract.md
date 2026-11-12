@@ -648,7 +648,8 @@ planifiée qui ne peut pas démarrer ne compte pas (D-044) ; la réserve du sol
 et le besoin par culture, informations (D-041, D-045) ; Ouvre ta ferme lu,
 jamais écrit (D-001, D-002) ; l'isolation par exploitation ; les priorités,
 celles du maraîcher. Aucun écran nouveau : la 3.8 a rangé les écrans, la 3.9
-les lit. Les décisions 1, 2, 4 et 5 du porteur, prises le 30 octobre 2026,
+les lit, à une exception décidée par le porteur : l'écran d'arbitrage (2 bis,
+D-078). Les décisions 1, 2, 4 et 5 du porteur, prises le 30 octobre 2026,
 précisent quatre règles sans en contredire aucune ; elles sont consignées en
 fin de document et dans `docs/DECISIONS.md` (D-052).
 
@@ -661,6 +662,116 @@ planning) ; les pompes de transfert ; toute règle agronomique nouvelle
 (sensibilité des cultures, besoin par stade dans la dose) ; une alerte sur la
 réserve d'eau ; le plan au-delà de la semaine courante ; toute automatisation
 d'arrosage.
+
+## L'écran d'arbitrage façon plan d'assolement (2 bis)
+
+**La demande.** Le 7 novembre 2026, le porteur trouve la partie arbitrage
+« illisible » : « il faudrait qu'on sache quelles sont les cultures déjà
+présentes sur ces planches pour savoir si on les arrose ou pas », en reprenant
+« le principe du plan d'assolement d'Ouvre ta ferme », pour « que les besoins
+en eau soient faciles à répartir ». Décidé par lui le 8 novembre 2026 (D-078) ;
+maquette sur des données d'exemple soumise le même jour à 22 h 55, validée par
+lui le 9 novembre 2026 à 11 h 40 (D-083). Ce qui suit l'écrit pour le code.
+
+**Ce qui ne change pas.** Le calcul : la part d'une planche cochée reste celle
+de la faisabilité (3.4, `docs/irrigation-feasibility-contract.md`), la même
+fraction du besoin pour toutes les cochées, bornée par l'eau du niveau et par
+l'hydraulique. La décision enregistrée, sa garde (révision et signature) et
+son journal. Le planning, qui réserve sa part à chaque planche servie sans la
+redistribuer (décision 1, D-077). Les niveaux sans choix à faire — allocation
+automatique, en attente, choix plus applicable —, présentés comme avant.
+Aucune règle agronomique : les cultures, leur stade et leur Kc s'affichent
+pour aider le choix et n'entrent dans aucun calcul.
+
+**L'écran**, pour chaque niveau de priorité qui demande un choix (à faire, à
+valider de nouveau, ou enregistré) :
+
+1. **Le bilan du choix**, en quatre chiffres : l'eau disponible pour ce
+   niveau d'ici dimanche soir, après les niveaux précédents ; le besoin des
+   planches cochées, sur celui de toutes les planches à choisir ; ce que
+   reçoit chaque planche cochée, en pour cent de son besoin, la même part pour
+   toutes ; les planches servies, sur les planches à choisir. Puis la
+   répartition de l'eau disponible en une barre : un segment par planche
+   servie, l'eau sous le seuil, et le reste.
+2. **Les planches rangées comme un plan d'assolement** : par parcelle, puis
+   par jardin ou abri, marqué « Abri » ou « Plein champ », avec son résumé
+   (planches, servies, besoin, part). Une ligne par planche : la case
+   « Servir », le nom et la surface, la frise de ses cultures, « Cette
+   semaine », le besoin en mm et en m³, et la part d'eau en mm et en m³ avec
+   son pourcentage, « Non servie » pour une planche décochée.
+3. **La frise** couvre dix-huit semaines à l'ordinateur — les huit
+   précédentes, la semaine en cours, marquée, et les neuf suivantes —, huit au
+   téléphone (trois avant, quatre après). Chaque culture de la planche y est
+   une barre, de son premier jour sur la planche à la fin de sa dernière
+   semaine de récolte, la récolte hachurée ; une culture qui n'est pas encore
+   sur la planche est en pointillé, dite « prévu » ; une fin inconnue mène la
+   barre au bord de la frise. Les cultures et leurs dates sont celles du suivi
+   par série (`docs/series-contract.md`, `lib/domain/crop-water/crop-calendar.ts`),
+   lues dans le plan de culture d'Ouvre ta ferme : une série en bloc ou sans
+   implantation n'y figure pas. Plan de culture non lu : pas de frise, et
+   l'écran le dit.
+4. **« Cette semaine »** : une phrase sur la culture en place la plus
+   ancienne de la planche, celle de la première règle qui s'applique :
+   - la dernière semaine de récolte est la semaine en cours : « Dernière
+     semaine de récolte » ;
+   - la première semaine de récolte est la semaine en cours : « Première
+     récolte cette semaine » ; la précédente : « Première récolte la semaine
+     dernière » ;
+   - la récolte a commencé : « En récolte jusqu'au 16 août », le dimanche de
+     la dernière semaine de récolte, ou « En récolte » quand elle est
+     inconnue ;
+   - la première semaine de récolte est la suivante : « Première récolte la
+     semaine prochaine » ;
+   - la culture a été semée ou plantée dans la semaine en cours ou dans l'une
+     des deux précédentes : « Semis » ou « Plantation » « cette semaine », « la
+     semaine dernière » ou « il y a deux semaines » ;
+   - la première récolte est connue : « Récolte à partir du 28 septembre » ;
+     sinon : « En place depuis le 4 mai » ;
+   - aucune culture en place : « Planche nue depuis le 13 juillet », le
+     lendemain de la fin de la dernière culture, ou « Planche nue ».
+
+   En dessous, à titre d'information : le stade et le Kc du jour de chaque
+   culture en place, tels que le besoin par culture les calcule
+   (`docs/crop-water-need-contract.md`), chacun précédé du nom de la culture
+   quand il y en a plusieurs, « engrais vert » pour un engrais vert ; puis la
+   prochaine culture prévue sur la planche : « Épinard à partir du 24 août ».
+5. **Au départ, toutes les planches à choisir sont cochées** : c'est la
+   proposition. Rien n'est enregistré avant « Valider la répartition ».
+   Décocher une planche la retire du partage et monte la part des autres. À
+   chaque case, la part et le bilan se recalculent dans le navigateur, sans
+   requête, par le calcul même du serveur (`allocateIrrigationWater`) : la
+   validation retrouve ces chiffres tant que rien n'a changé. « Tout servir »
+   et « Ne rien servir » cochent ou décochent les planches à choisir d'un
+   jardin ; « Revenir à la proposition » les recoche toutes.
+6. Un choix enregistré et toujours valable s'affiche tel quel, « Répartition
+   validée », avec sa date. Un choix devenu caduc (« à valider de nouveau »)
+   repart de la proposition : ses exclusions ne ressuscitent pas (3.4).
+7. **Le seuil** : une part sous le seuil de planification de sa planche n'est
+   pas transmise au planning (3.4). La ligne le dit (« Sous le seuil de 3 mm :
+   pas transmise au planning »), le bilan aussi, avec le conseil de servir
+   moins de planches pour que chacune reçoive davantage. Une planche qu'aucune
+   alimentation compatible ne peut servir le dit sur sa ligne.
+8. **Deux vues** : « Planches à choisir », celles du niveau qui ont un besoin,
+   et « Toute la ferme », où chaque autre planche porte son état — servie
+   avant ce choix, en attente, sans besoin, données insuffisantes. Deux
+   lignes rappellent ce que reçoivent les niveaux d'avant et d'après.
+9. **Au téléphone** : une carte par planche, la frise sur huit semaines, la
+   validation au pied de l'écran ; aucun défilement de côté ; les cases, les
+   boutons et leurs étiquettes à 44 px au moins.
+
+**Le coût.** Les cultures et leur stade ne se lisent que pour cet écran, quand
+un niveau demande un choix, dans le chargement de la faisabilité, sans requête
+par planche ni appel à Ouvre ta ferme ou au service météo. Le planning, qui
+relit la faisabilité, ne les lit pas.
+
+**Vérifié par** `tests/arbitration-preview.test.ts` (la part recalculée dans
+le navigateur égale celle que le serveur calcule une fois le choix
+enregistré ; décocher monte la part des autres ; le seuil ; aucune planche
+cochée), `tests/arbitration-crops.test.ts` (la frise et chaque phrase de
+« Cette semaine ») et P7 (les planches à choisir toutes cochées au départ,
+« Ne rien servir » sur le jardin de N01 puis N01 recochée, le bilan recalculé
+sans rien enregistrer, la répartition validée, aucun débordement à 390 px,
+les cibles de 44 px).
 
 ## Découpage et preuve de fin
 
@@ -676,7 +787,9 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    du porteur du 7 novembre 2026, décidé par lui le 8 novembre 2026 à
    20 h 40, D-078) : après les quatre corrections, une maquette d'abord,
    soumise au porteur avant tout code ; son code passe par un ajout à ce
-   contrat.
+   contrat. Maquette validée par le porteur le 9 novembre 2026 à 11 h 40 ;
+   l'ajout est la section « L'écran d'arbitrage façon plan d'assolement »
+   (D-083), codée dans une PR.
 3. **Les scénarios de pénurie** : les tests manquants du moteur (S2, S3, S4,
    S6, S7, S8, S9, S10 étendu, S12 sur deux calculs, S13 dernière planche,
    S18, S20, S23, S24, S26), dans `tests/planning-shortage.test.ts`, sous 600

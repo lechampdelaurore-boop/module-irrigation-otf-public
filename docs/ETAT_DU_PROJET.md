@@ -24,9 +24,9 @@ registres, elle y renvoie.
   l'autre (décision 4, D-080, précisions F80 à F83, aucune migration) ;
   **correction 4 en ligne** (#14), la part du dernier jour (décision 5, D-081,
   précisions F84 à F87, aucune migration). Ensuite l'écran d'arbitrage
-  présenté comme un plan d'assolement, décidé par le porteur le 8 novembre
-  2026 à 20 h 40 (D-078) : sa maquette, soumise au porteur le 8 novembre
-  2026 à 22 h 55, attend son avis avant tout code. Puis les lots 3 à 7. Ni
+  présenté comme un plan d'assolement (2 bis, D-078) : maquette validée par
+  le porteur le 9 novembre 2026 à 11 h 40, **codé** (D-083, précisions F92
+  à F97, aucune migration). Puis les lots 3 à 7. Ni
   recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts`.
 - Parcours navigateur : certains dépendent de l'heure ou du jour, sur `main`
@@ -39,8 +39,8 @@ registres, elle y renvoie.
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
   chantier de code à la fois ; D4 (Cloudflare) sur accord exprès du porteur.
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
-  le champ de la pluie mesurée suit le dernier jour choisi (D-082) : les
-  points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
+  le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
+  le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
   ouvert 48) : ni PR ouverte ni contrôle relancé le dimanche après 21 h à
   la ferme, jusqu'à la PR à part qui l'en libérera.
 - 3.8, fonctionnalités à la carte : **close par le porteur le 8 novembre
@@ -67,6 +67,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #15 (`268adc9`, les parcours à l'heure de la ferme et la pluie du
+  dernier jour choisi, points ouverts 49 et 50, fusionnée le 12 novembre
+  à 13 h 31 et déployée à 13 h 44, run 43218749629, les quatre jobs réussis,
+  aucune migration, Workers inchangés). Avant elle : la
   PR #14 (`5522a04`, la correction 4 de la 3.9, la part du dernier jour,
   fusionnée le 12 novembre à 13 h 02 et déployée à 13 h 14, run 43214382568,
   les quatre jobs réussis, aucune migration, Workers inchangés). Avant elle : la
