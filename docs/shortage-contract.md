@@ -351,10 +351,14 @@ l'état au 30 octobre 2026.
     État : 🟡.
 18. **S18 — Sous la dose minimale en pénurie, et le dernier jour.** Une part
     sous la dose minimale R4 en milieu de semaine : le matériel attend
-    (existant). La même part le dimanche, dernière plage de la semaine :
-    placée, comme l'exception du dernier jour hors pénurie (décision 5).
-    Vérification : test du moteur à écrire. État : ⬜, règle tranchée
-    (décision 5), à coder.
+    (existant), le samedi compris. La même part le dimanche, dernière plage
+    de la semaine : placée, comme l'exception du dernier jour hors pénurie
+    (décision 5), à ce que ses parts paient quand le matériel est examiné,
+    sans attendre la redistribution de fin de tour ; sous arbitrage aussi,
+    l'allocation ne reste plus non attribuée.
+    Vérification : tests du moteur, avec et sans arbitrage
+    (`tests/planning-shortage.test.ts`, D-081). État : ✅ tests écrits et
+    règle codée ; la recette finale le croise en S27, le dimanche soir.
 19. **S19 — La note du manque d'eau.** Trois branches : positive, de l'eau
     placée à côté (une rampe qui arrose des planches sans part) ; silence sur
     le résidu d'arrondi (D-040) ; absente sous arbitrage et quand un volume
@@ -421,8 +425,8 @@ l'état au 30 octobre 2026.
     lundi 06 h 15, la semaine nouvelle repart de l'objectif entier,
     sans report (R10 à non) ; le déficit de la semaine passée se lit dans les
     cumuls « Par périmètre », écart objectif − reçu. Vérification : test
-    « dernier jour » existant ; test de l'historique existant ; recette
-    finale, lecture du lundi. État : 🟡.
+    « dernier jour » existant ; tests S18 pour la part (D-081) ; test de
+    l'historique existant ; recette finale, lecture du lundi. État : 🟡.
 
 ### E. L'isolation en pénurie
 

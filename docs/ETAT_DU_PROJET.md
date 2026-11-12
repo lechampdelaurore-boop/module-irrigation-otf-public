@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 8 novembre 2026.
+Dernière mise à jour : 9 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -20,13 +20,20 @@ registres, elle y renvoie.
   (décision 1, D-077, précisions F72 à F75) ; **correction 2 en ligne** (#12), le
   budget net du manque sous le minimum, la part visée et la part placée
   (décision 2, D-079, précisions F76 à F79, aucune migration) ;
-  **correction 3 codée**, le report sans bascule d'un calcul à l'autre
-  (décision 4, D-080, précisions F80 à F83, aucune migration) ; reste la
-  correction de la décision 5. Ensuite l'écran d'arbitrage présenté comme un plan
-  d'assolement, décidé par le porteur le 8 novembre 2026 à 20 h 40
-  (D-078) : une maquette d'abord, soumise au porteur avant tout code. Puis
-  les lots 3 à 7. Ni recette finale ni tag `v0.2.0` sans le porteur. Les
-  tests des scénarios vont dans `tests/planning-shortage.test.ts`.
+  **correction 3 en ligne** (#13), le report sans bascule d'un calcul à
+  l'autre (décision 4, D-080, précisions F80 à F83, aucune migration) ;
+  **correction 4 codée**, la part du dernier jour (décision 5, D-081,
+  précisions F84 à F87, aucune migration). Ensuite l'écran d'arbitrage
+  présenté comme un plan d'assolement, décidé par le porteur le 8 novembre
+  2026 à 20 h 40 (D-078) : sa maquette, soumise au porteur le 8 novembre
+  2026 à 22 h 55, attend son avis avant tout code. Puis les lots 3 à 7. Ni
+  recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
+  vont dans `tests/planning-shortage.test.ts`.
+- Parcours navigateur : certains dépendent de l'heure ou du jour, sur `main`
+  comme sur les branches (points ouverts 48 à 50). Ni PR ouverte ni contrôle
+  relancé le dimanche après 21 h ni entre minuit et 2 h 30 à la ferme ; le
+  lundi, un échec de P12 sur la pluie mesurée se relance une fois. Jusqu'à
+  la PR à part qui les en libérera.
 - 3.8, fonctionnalités à la carte : **close par le porteur le 8 novembre
   2026 à 20 h 21**, des modifications restant possibles plus tard, chacune
   par une PR (détail plus bas).
@@ -50,11 +57,16 @@ registres, elle y renvoie.
   le porteur, sont validés le 8 novembre 2026 à 19 h 20 (« ça me semble
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
-- Fusionné et déployé sur `main` du dépôt public au 8 novembre 2026 : la
-  PR #12 (`87e4ab0`, la correction 2 de la 3.9, le budget net du manque sous
-  le minimum, la part visée et la part placée, fusionnée à 21 h 49 et
-  déployée à 22 h 03, run 42522030186, les quatre jobs réussis, aucune
-  migration, Workers inchangés). Avant elle : la PR #11 (`187ff6e`, la
+- Fusionné et déployé sur `main` du dépôt public au 9 novembre 2026 : la
+  PR #13 (`a15f150`, la correction 3 de la 3.9, le report sans bascule d'un
+  calcul à l'autre, fusionnée le 9 novembre à 2 h 51 et déployée à
+  3 h 23, run 42547789030, les quatre jobs réussis après une relance des
+  parcours navigateur (point ouvert 50), aucune migration, Workers
+  inchangés). Avant elle : la PR #12 (`87e4ab0`, la correction 2
+  de la 3.9, le budget net du manque sous le minimum, la part visée et la
+  part placée, fusionnée le 8 novembre à 21 h 49 et déployée à 22 h 03,
+  run 42522030186, les quatre jobs réussis, aucune migration, Workers
+  inchangés) ; la PR #11 (`187ff6e`, la
   correction 1 de la 3.9, l'arbitrage validé en parts réservées, fusionnée à
   21 h 07 et déployée à 21 h 21, run 42518503747, les quatre jobs réussis,
   aucune migration, Workers inchangés) ; la PR #10 (`775c7cd`, la clôture de
@@ -522,8 +534,8 @@ registres, elle y renvoie.
   Après la 3.8, close par le porteur : la deuxième passe de la refonte
   (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
   3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
-  cours : lot 2, quatre PR `fix/`, une à la fois, les deux premières en
-  ligne (#11, #12), la troisième en PR.
+  cours : lot 2, quatre PR `fix/`, une à la fois, les trois premières en
+  ligne (#11 à #13), la quatrième en PR.
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).
@@ -7310,10 +7322,58 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    seul. Il est passé à 22 h 30 sur `main`, aux deux largeurs, comme sur
    les contrôles de `main` à 21 h 49. L'échec dépend donc de l'heure, sans
    tenir à la seule fin de semaine ; la cause reste à établir (les heures
-   restantes, l'espacement, la dose minimale, la prévision). Recommandation :
-   une PR à part, pour que le parcours ne dépende plus de l'heure ; en
-   attendant, une PR ouverte le dimanche soir attend le lundi pour ses
-   contrôles.
+   restantes, l'espacement, la dose minimale, la prévision). Le même soir à
+   23 h, sur la branche de la correction 4, la suite entière a vu échouer
+   P12 à l'ordinateur (« temps de pompage insuffisant dans les plages
+   horaires » au lieu de « créneau refusé »), puis huit autres parcours, la
+   plupart par contagion : un parcours interrompu laisse son objectif ou
+   son choix, que le suivant trouve. Seuls, P7 et P12 sont passés à
+   23 h 12 sur `main` et à 23 h 15 sur la branche ; P28 a échoué à 23 h 13
+   sur `main`, à l'ordinateur, et il est passé à 23 h 16 sur la branche.
+   Plus la fin de la semaine approche, plus de parcours du planning
+   dépendent de l'heure. Recommandation : une PR à part, pour que les
+   parcours ne dépendent plus de l'heure ; en attendant, une PR ouverte le
+   dimanche soir attend le lundi pour ses contrôles.
+49. **Ouvert le 9 novembre 2026, en vérifiant la PR de la correction 3 de
+   la 3.9 ; non bloquant.** Ce lundi peu après minuit à la ferme, trois
+   parcours ont échoué aux deux largeurs : P4
+   (`e2e/p4-cumuls-export.spec.ts`), P9 (`e2e/p9-suivi-par-serie.spec.ts`)
+   et P31 (`e2e/p31-planning-et-arrosages.spec.ts`, les arrosages), sur les
+   contrôles de la PR #13 de ce dépôt de 0 h 10 à 0 h 12, puis seuls sur
+   `main` (`87e4ab0`) de 0 h 19 à 0 h 23. Cause : `horodatageLocal`
+   (`e2e/support/materiel.ts`) écrit l'heure du processus des parcours, en
+   temps universel sur la CI comme en local, dans des champs que la page
+   lit à l'heure de Paris ; l'heure saisie recule d'une heure en hiver, de
+   deux en été. P4 et P9 enregistrent une irrigation finie il y a une
+   demi-heure et la cherchent dans la semaine en cours : le lundi, jusqu'à
+   1 h 30 (2 h 30 en été), elle finit dans la semaine précédente ; avant
+   0 h 30, elle y finirait même à la bonne heure. P31 planifie une
+   irrigation « demain, même heure » : chaque nuit, de minuit à 1 h (2 h en
+   été), elle tombe aujourd'hui. Après 2 h 30, tout est passé : la suite
+   entière sur la branche de la correction 4 en local, 84 parcours sur 84,
+   de 2 h 36 à 2 h 47, et les contrôles de la PR #13, relancés une fois à
+   2 h 36, 84 sur 84. Recommandation : la même PR à part que pour le point
+   48, qui écrira ces horodatages à l'heure de Paris et éloignera ces
+   irrigations des bornes du jour et de la semaine ; en attendant, ni PR
+   ouverte ni parcours relancé entre minuit et 2 h 30.
+50. **Ouvert le 9 novembre 2026, en vérifiant le déploiement de la
+   correction 3 de la 3.9 ; non bloquant.** Sur les contrôles de `main`
+   après la fusion de #13 (`a15f150`, run 42547789030), P12 a échoué à
+   l'ordinateur à 2 h 54 à la ferme, sur sa dernière étape : la pluie du
+   jour remise à 0 mm, le champ « Millimètres » de « Pluie mesurée », ramené
+   de la veille à aujourd'hui, est resté vide au lieu de montrer « 0 ». Le
+   déploiement a attendu ; les parcours, relancés une fois à 3 h 09, sont
+   passés, 84 sur 84, et le déploiement a suivi à 3 h 23. Cause probable,
+   une course dans `chooseRainDate`
+   (`app/irrigation/water-management-dashboard.tsx`) : un jour hors de la
+   semaine affichée fait charger sa semaine ; si un autre jour est choisi
+   avant la réponse, celle-ci arrive quand même, remplace la semaine
+   affichée et vide le champ. Le lundi, la veille est dans la semaine
+   précédente : le parcours, plus rapide que la réponse, la déclenche selon
+   les délais du serveur. Rare à la main, mais réelle : la semaine affichée
+   et le champ ne suivent plus le jour choisi. Recommandation : ne garder
+   que la réponse du dernier jour choisi, test d'abord, dans la PR à part
+   des points 48 et 49.
 
 ## Procédure de reprise rapide
 

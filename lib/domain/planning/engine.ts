@@ -324,6 +324,8 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
     const endLimitMs = interval.endAt.getTime();
     for (let guard = 0; guard < 200 && startMs < endLimitMs; guard += 1) {
       const minimumMs = millisecondsFromSeconds(candidate.minimumDurationSeconds);
+      // La durée la plus courte acceptée : la dose minimale, sauf pour une part du dernier jour (plus bas).
+      let minimumSeconds = candidate.minimumDurationSeconds;
       if (endLimitMs - startMs < minimumMs) {
         // Trop court avant le créneau refusé alors que la plage entière aurait suffi : c'est le refus qui empêche.
         if (guard === 0 && interval.endsBeforeRefusal && interval.windowEndAt.getTime() - startMs >= minimumMs) blockingReason = 'refused-slot';
@@ -393,7 +395,10 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
       if (shares && volume !== null) {
         const shortened = shares.longestDurationWithinShares((seconds) => placementAt(equipment, seconds), durationSeconds, servedBedIds);
         if (shortened < durationSeconds) {
-          if (shortened < candidate.minimumDurationSeconds) return { ok: false, reason: shares.shortfallReason, shareBound: true };
+          // Sous la dose minimale, le matériel attend une part plus grande ; la plage du dernier jour la place quand même,
+          // comme un reste hors pénurie (décision 5 de la 3.9, D-052).
+          if (shortened < minimumSeconds && interval.dateKey === context.days.at(-1)) minimumSeconds = 1;
+          if (shortened < minimumSeconds) return { ok: false, reason: shares.shortfallReason, shareBound: true };
           // La seconde d'arrondi de la durée n'est pas une coupe : le motif ne se nomme que si la planche de référence y perd un reste visible.
           const material = millimetersForDurationSeconds(candidate.referenceRate, durationSeconds - shortened) >= NEGLIGIBLE_MM;
           durationSeconds = shortened;
@@ -420,7 +425,7 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
           }
           // Attendre ne comble rien : la plus longue durée que la réserve accepte, sinon un autre jour.
           const shortened = longestDurationUnderReserve(chain.reservoir, equipment, startMs, durationSeconds);
-          if (shortened < candidate.minimumDurationSeconds) {
+          if (shortened < minimumSeconds) {
             blockingReason = 'reserve-timing';
             break;
           }
@@ -438,7 +443,7 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
         const remaining = dates.reduce((sum, date) => sum + directResource.remainingForDate(date), 0);
         if (remaining + EPSILON < volume) {
           const shortened = Math.floor(durationSeconds * remaining / volume);
-          if (shortened < candidate.minimumDurationSeconds) {
+          if (shortened < minimumSeconds) {
             blockingReason = 'reserve-timing';
             break;
           }

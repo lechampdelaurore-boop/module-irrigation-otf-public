@@ -20,7 +20,9 @@ import { assertInvariants, byEquipment, close, farm, NOW, plannedIrrigation, set
  * placée de chaque niveau (docs/planning-contract.md, « Pénurie »).
  * Décision 4 : sous le report, les planches reportées ne passent devant
  * qu'au calcul qui suit un événement ; sans événement, le calcul reproduit
- * le précédent (« Le report sans bascule »).
+ * le précédent (« Le report sans bascule »). Décision 5 : le dernier jour,
+ * une part sous la dose minimale est placée tant qu'une plage reste, comme
+ * un reste hors pénurie (« La part du dernier jour »).
  */
 
 /** La demande de la ferme à quatre tunnels : 1,98 m³ du bloc 1, 5,608 m³ du bloc 2, 10,24 m³ des tunnels. */
@@ -290,4 +292,80 @@ test('la file est vide au premier calcul de la semaine, et après un calcul enre
   const stored = { beds: first.beds };
   assert.deepEqual(nextDeferredQueue(stored, false), []);
   assert.deepEqual(nextDeferredQueue(stored, true), deferredBeds(first));
+});
+
+/** Samedi 22 h 30 à la ferme : la nuit de samedi reste, celle de dimanche vient après. */
+const SATURDAY_22H30 = new Date('2026-10-03T20:30:00.000Z');
+/** La part de chaque planche quand la réserve n'a que 26 % de la demande, au-dessus des 5 mm de l'aspersion. */
+const SUNDAY_SHARE_MM = NEED_MM * 0.26;
+/**
+ * La ferme du point 36 à 26 % de sa demande : les rampes du tunnel 1 et du bloc 2 versent aussi sur le bloc 1 à
+ * 2 mm/h, et ce débordement fait passer ce que leurs parts paient sous la dose minimale de l'aspersion. Sous
+ * arbitrage, chaque planche reçoit la même part en allocation, la réserve égale aux allocations.
+ */
+function sundayFarm(now: Date, arbitrated = false): PlanningInputs {
+  const { inputs } = farm({
+    extraTunnels: true,
+    forageFlow: 0,
+    reservoirCubicMeters: DEMAND_CUBIC_METERS * 0.26,
+    now,
+    edges: [
+      { equipmentId: 'rampe-tunnel-1', bedIds: ['B1-0', 'B1-1'], rateMmPerHour: 2 },
+      { equipmentId: 'rampe-bloc-2', bedIds: ['B1-2', 'B1-3'], rateMmPerHour: 2 },
+    ],
+  });
+  return arbitrated ? { ...inputs, arbitration: arbitrationOf(inputs, () => SUNDAY_SHARE_MM) } : inputs;
+}
+/** Les deux rampes qui débordent, et la parcelle de chacune. */
+const SPILLING = [['rampe-tunnel-1', 'Tunnel 1'], ['rampe-bloc-2', 'bloc 2']] as const;
+
+/** Une part sous la dose minimale : rien en semaine ; dimanche soir, un seul créneau, à ce que les parts paient. */
+function assertPlacedOnSunday(plan: WeeklyPlan) {
+  const minimum = settings.doses.sprinkler.minimumMm;
+  for (const [equipmentId, plotName] of SPILLING) {
+    for (const bed of plot(plan, plotName)) {
+      // Sa part entière, que l'attente de la redistribution faisait fondre, moins ce que son créneau verse à côté.
+      close(bed.targetMm, SUNDAY_SHARE_MM, 0.01, `${bed.bedName} : sa part`);
+      assert.ok(bed.placedMm > 4.7 && bed.placedMm < minimum, `${bed.bedName} : ${bed.placedMm} mm, sous la dose minimale`);
+    }
+    const proposals = byEquipment(plan, equipmentId);
+    assert.equal(proposals.length, 1, `${equipmentId} : un créneau`);
+    const [proposal] = proposals;
+    assert.ok(proposal.startAt >= '2026-10-04T19:00:00.000Z', `${equipmentId} : la nuit de dimanche, ${proposal.startAt}`);
+    assert.equal(proposal.justification.doseReason, 'reserved-share');
+    assert.equal(proposal.justification.limitingConstraint, 'part de la semaine atteinte, le reste est réservé aux autres planches');
+  }
+}
+
+test('S18, une part sous la dose minimale : le matériel attend en semaine et le samedi ; dimanche, sa part est placée, comme un reste hors pénurie (décision 5)', () => {
+  for (const now of [NOW, SATURDAY_22H30]) {
+    const inputs = sundayFarm(now);
+    const plan = buildWeeklyPlan(inputs, settings);
+    assertInvariants(plan, inputs);
+    for (const [equipmentId] of SPILLING) assert.equal(byEquipment(plan, equipmentId).length, 0, `${now.toISOString()} : ${equipmentId} attend une part plus grande`);
+  }
+  // Aujourd'hui, le dimanche, les deux rampes ne partaient qu'après les tours, leur part fondue à 2,3 mm, et 1,1 m³
+  // restait dans la réserve.
+  const inputs = sundayFarm(new Date(SUNDAY_00H30));
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assertPlacedOnSunday(plan);
+  const [budget] = plan.budgets;
+  assert.ok(budget.availableCubicMeters !== null);
+  close(placedVolume(plan), budget.availableCubicMeters, 0.01, 'rien ne reste dans la réserve : la somme des volumes est le budget');
+});
+
+test('S18 sous arbitrage : une allocation que son débordement fait passer sous la dose minimale attend en semaine ; dimanche, elle est placée au lieu de rester non attribuée (décision 5)', () => {
+  const midweek = buildWeeklyPlan(sundayFarm(NOW, true), settings);
+  for (const [equipmentId] of SPILLING) assert.equal(byEquipment(midweek, equipmentId).length, 0, `${equipmentId} attend`);
+  assert.equal(midweek.arbitration?.unreceivedBedCount, 18, 'en semaine, le tunnel 1 et le bloc 2 attendent');
+  // Aujourd'hui, le dimanche, 2,12 m³ alloués à dix-huit planches restaient non attribués.
+  const inputs = sundayFarm(new Date(SUNDAY_00H30), true);
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assertPlacedOnSunday(plan);
+  assert.ok(plan.arbitration);
+  assert.equal(plan.arbitration.unreceivedBedCount, 0);
+  close(plan.arbitration.unreceivedCubicMeters, 0, 0.001, 'rien ne reste non attribué');
+  assert.equal(arbitrationNote(plan), `Votre choix entre les demandes d’eau s’impose : ${formatWaterVolumeForMessage(plan.arbitration.allocatedCubicMeters)} m³ alloués, chaque allocation réservée à sa planche.`);
 });

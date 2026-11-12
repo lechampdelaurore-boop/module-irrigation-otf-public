@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9, correction 4 : la part du dernier jour)
+
+- **Le dimanche, une part sous la dose minimale est placée, comme un reste
+  hors pénurie** (décision 5 de la 3.9, D-052, précisions D-081) : en
+  pénurie, un matériel dont le créneau verse à côté — une rampe qui arrose
+  aussi la planche voisine — attendait une part plus grande dès que ce que
+  ses parts paient tombait sous la dose minimale, même le dernier jour ; sa
+  part fondait en attendant, et de l'eau restait dans la réserve. Sur la
+  plage du dimanche, la part est maintenant placée telle qu'elle est, si
+  petite soit-elle ; en semaine et le samedi, le matériel attend comme
+  avant. Sous un arbitrage validé aussi : l'allocation ne reste plus non
+  attribuée. Aucune migration.
+
 ### Corrigé (3.9, correction 3 : le report sans bascule)
 
 - **Sous la conduite « report », un calcul sans événement reproduit le
@@ -16,7 +29,8 @@ source détaillée commit par commit.
   saisie, un stock corrigé, tout événement qui fait recalculer — ; sans
   événement, le plan garde sa file et ne bascule plus. Le motif d'une
   planche reportée dit « passe en tête après le prochain événement », au
-  lieu de « au prochain calcul ». Aucune migration.
+  lieu de « au prochain calcul ». Aucune migration. En ligne le 9 novembre
+  2026 à 3 h 23 (#13 de ce dépôt).
 
 ### Corrigé (3.9, correction 2 : le budget net du manque sous le minimum, la part visée et la part placée)
 
