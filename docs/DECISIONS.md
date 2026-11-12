@@ -2437,3 +2437,60 @@ une PR à part.
 lundi 9 novembre), et par l'étape nouvelle de P12, rouge avant la
 correction aux deux largeurs (« Expected: "0" », « Received: "" ») ; les
 1 303 tests existants et les 84 parcours passent.
+
+**En ligne** : #15 du dépôt public fusionnée le 12 novembre 2026 à 13 h 31
+(`268adc9`) et déployée à 13 h 44 (run 43218749629, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-083 — L'écran d'arbitrage façon plan d'assolement (2 bis de la 3.9) : la maquette validée, et six précisions tranchées par la recommandation
+
+Date : 9 novembre 2026, 11 h 40. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur.
+
+**Décision du porteur.** La maquette de l'écran d'arbitrage présenté comme
+un plan d'assolement (D-078), soumise le 8 novembre 2026 à 22 h 55 sur des
+données d'exemple, est validée par lui le 9 novembre 2026 à 11 h 40 : « Je
+valide la plaquette. » Son code passe par la section « L'écran d'arbitrage
+façon plan d'assolement » du contrat de la 3.9 (`docs/shortage-contract.md`,
+2 bis).
+
+**Précisions** (de présentation ou techniques, sans règle agronomique ;
+consignées à cette section du contrat) :
+
+- F92 : au départ, toutes les planches à choisir sont cochées : c'est la
+  proposition. Un choix devenu caduc repart d'elle ; ses exclusions ne
+  ressuscitent pas (3.4). Rien n'est enregistré avant « Valider la
+  répartition ».
+- F93 : la part et le bilan se recalculent dans le navigateur, à chaque
+  case, sans requête, par la fonction même du serveur
+  (`allocateIrrigationWater`), avec ce choix à la place de celui du niveau
+  et les autres décisions telles quelles : la validation retrouve ces
+  chiffres tant que rien n'a changé ; sinon la garde du serveur (révision et
+  signature) refuse et demande de recalculer.
+- F94 : la frise couvre dix-huit semaines à l'ordinateur (huit avant, neuf
+  après), huit au téléphone (trois avant, quatre après) : une barre par
+  culture de la planche, la récolte hachurée, une culture à venir en
+  pointillé ; une même espèce garde sa teinte d'une planche à l'autre.
+- F95 : « Cette semaine » : la phrase de la culture en place la plus
+  ancienne, par la première règle qui s'applique (point 4 du contrat) ;
+  dessous, le stade et le Kc du jour, à titre d'information, et la prochaine
+  culture prévue.
+- F96 : deux vues, « Planches à choisir » et « Toute la ferme », où les
+  autres planches portent leur état ; deux lignes rappellent ce que
+  reçoivent les niveaux d'avant et d'après. Une planche se présente en ligne
+  quand l'écran est large, en carte quand il est étroit, selon la place
+  réellement disponible et non la seule largeur de l'appareil.
+- F97 : les cultures et leur stade ne se lisent que pour cet écran, dans le
+  chargement de la faisabilité, quand un niveau demande un choix ; le
+  planning, qui relit la faisabilité, ne les lit pas. Une erreur de lecture
+  du stade n'empêche pas l'écran : la frise s'affiche sans stade, et le
+  journal le note.
+
+**Ce qui ne change pas.** Le calcul de la faisabilité (3.4), la décision
+enregistrée, sa garde et son journal ; le planning, qui réserve sa part à
+chaque planche servie sans la redistribuer (D-077). Aucune migration.
+
+**Vérifié par** `tests/arbitration-preview.test.ts` et
+`tests/arbitration-crops.test.ts`, rouges avant le code (module
+introuvable), et P7, rouge avant le code aux deux largeurs (le titre de
+l'écran introuvable) ; les 1 315 tests et les 84 parcours passent.

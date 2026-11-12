@@ -57,6 +57,8 @@ export type IrrigationFeasibility = {
   unallocatedCubicMeters: number;
   withheldBelowThresholdCubicMeters: number;
   reservedPlannedCubicMeters: number;
+  /** L'eau réservée une seule fois aux irrigations d'origine inconnue ou insuffisante : l'aperçu d'un choix la reprend (2 bis). */
+  reservedUnassignedCubicMeters: number;
   requiresManualArbitration: boolean;
   priorities: PriorityFeasibility[];
   pools: FeasibilityPool[];
@@ -68,9 +70,14 @@ const sum = (values: readonly number[]) => values.reduce((a, b) => a + b, 0);
 const ratio = (part: number, total: number) => total <= EPS ? 100 : Math.min(100, Math.max(0, part / total * 100));
 export const sameBedIds = (a: readonly string[], b: readonly string[]) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
 
+/** Ce que le calcul lit des besoins de 3.3 : la semaine et les planches, quel que soit leur rangement. */
+type FeasibilityNeeds = Pick<IrrigationNeedsDashboard, 'season' | 'weekStart' | 'weekEnd' | 'timeZone' | 'calculatedAt'> & {
+  gardens: readonly { beds: readonly BedIrrigationNeed[] }[];
+};
+
 /** No agronomy and no timetable: only the effective needs produced by 3.3. */
 export function allocateIrrigationWater(input: {
-  needs: IrrigationNeedsDashboard; pools: FeasibilityPool[]; decisions: IrrigationArbitration[];
+  needs: FeasibilityNeeds; pools: FeasibilityPool[]; decisions: IrrigationArbitration[];
   reservedUnassignedCubicMeters?: number; reservedPlannedCubicMeters?: number;
 }): IrrigationFeasibility {
   const { needs, pools, decisions } = input;
@@ -175,6 +182,7 @@ export function allocateIrrigationWater(input: {
     coveragePercent: unknownCount ? null : ratio(affectable, knownNeed), confirmedCoveragePercent: unknownCount ? null : ratio(confirmedTotal, knownNeed),
     unallocatedCubicMeters: Math.max(0, capacity - allocated), withheldBelowThresholdCubicMeters: withheld,
     reservedPlannedCubicMeters: input.reservedPlannedCubicMeters ?? 0,
+    reservedUnassignedCubicMeters: input.reservedUnassignedCubicMeters ?? 0,
     requiresManualArbitration,
     priorities, pools, warnings,
   };

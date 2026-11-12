@@ -5,8 +5,13 @@ import { listPumpConfigurationForUser } from '@/db/pump-repository';
 import { listWaterInfrastructureForUser } from '@/db/water-resource-repository';
 import { invalidateIrrigationArbitrationsForUser, listIrrigationArbitrationsForUser, readFeasibilityRevisionForUser } from '@/db/irrigation-arbitration-repository';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
+import { getCropWaterDaysForUser } from './crop-water-week';
+import { logJsonLine } from '@/lib/adapters/log';
 import { getIrrigationSnapshot } from './irrigation-service';
 import { allocateIrrigationWater, sameBedIds, type IrrigationFeasibility } from '../domain/irrigation-feasibility';
+import { isArbitrationEditable } from '../domain/arbitration-preview';
+import { arbitrationCrops, stagesToday, type ArbitrationCrops } from '../domain/arbitration-crops';
+import type { IrrigationSnapshot } from '../domain/domain';
 import { describeFeasibilityPaths } from '../domain/feasibility-hydraulics';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
 import { calculateIrrigationCoverage } from '../domain/irrigation-coverage';
@@ -16,6 +21,37 @@ import { plannedWaterForPeriod } from '../domain/planned-irrigation';
 import { projectWaterAvailability } from '../domain/water-resources';
 
 export async function getIrrigationFeasibilityForUser(input: { ownerUserId: string; season: number; now?: Date }): Promise<IrrigationFeasibility> {
+  return (await computeIrrigationFeasibility(input)).result;
+}
+
+/**
+ * La faisabilité pour son écran : quand un niveau demande un choix, les
+ * cultures de chaque planche et leur stade du jour, pour l'écran d'arbitrage
+ * façon plan d'assolement (docs/shortage-contract.md, 2 bis, D-083). Le
+ * planning, qui relit la faisabilité, ne les lit pas.
+ */
+export async function getIrrigationFeasibilityScreenForUser(input: { ownerUserId: string; season: number; now?: Date }): Promise<{ dashboard: IrrigationFeasibility; crops: ArbitrationCrops | null }> {
+  const now = input.now ?? new Date();
+  const { result, snapshot } = await computeIrrigationFeasibility({ ...input, now });
+  const cropPlan = snapshot.cropPlan;
+  if (!cropPlan || !result.priorities.some(isArbitrationEditable)) return { dashboard: result, crops: null };
+  const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
+  const bedIds = result.priorities.flatMap((level) => level.beds.map((row) => row.need.bedId));
+  return { dashboard: result, crops: arbitrationCrops({ cropPlan, bedIds, today, stagesToday: await stagesTodayByBed(input.ownerUserId, input.season, snapshot, today, now) }) };
+}
+
+/** Le stade et le Kc du jour, une information : un échec du calcul laisse l'écran sans eux. */
+async function stagesTodayByBed(ownerUserId: string, season: number, snapshot: IrrigationSnapshot, today: string, now: Date) {
+  try {
+    const days = await getCropWaterDaysForUser({ ownerUserId, season, snapshot, dates: [today], now });
+    return new Map((days?.beds ?? []).map((bed) => [bed.bedId, stagesToday(bed.days[0]?.crops ?? [])]));
+  } catch (error) {
+    logJsonLine('warn', { event: 'arbitration_crop_stages_failed', season, error: error instanceof Error ? error.message : 'inconnue', failedAt: new Date().toISOString() });
+    return new Map();
+  }
+}
+
+async function computeIrrigationFeasibility(input: { ownerUserId: string; season: number; now?: Date }): Promise<{ result: IrrigationFeasibility; snapshot: IrrigationSnapshot }> {
   const { ownerUserId, season } = input;
   const now = input.now ?? new Date();
   const weekStart = weekStartDateKey(now, FARM_TIME_ZONE);
@@ -50,7 +86,7 @@ export async function getIrrigationFeasibilityForUser(input: { ownerUserId: stri
     const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(snapshot.beds.filter((bed) => bed.seasons.includes(season)).sort((a, b) => a.id.localeCompare(b.id)))));
     result.snapshotSignature = [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
     result.warnings.push('Analyse volumétrique préliminaire : les horaires, l’alternance des pompes et les remplissages pendant de nouvelles irrigations restent à vérifier dans le futur planning.');
-    return result;
+    return { result, snapshot };
   }
   throw new Error('Les données viennent de changer. Recalculez la faisabilité avant de valider votre sélection.');
 }

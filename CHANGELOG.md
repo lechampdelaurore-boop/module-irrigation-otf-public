@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (3.9, 2 bis : l'écran d'arbitrage façon plan d'assolement)
+
+- **L'écran d'arbitrage se lit comme un plan d'assolement** (D-078,
+  précisions D-083) : quand un niveau de priorité demande un choix, ses
+  planches sont rangées par parcelle, puis par jardin ou abri, chacune avec
+  la frise de ses cultures sur plusieurs semaines, ce qui y pousse cette
+  semaine, son besoin et la part d'eau qu'elle recevrait. Toutes les
+  planches sont cochées au départ ; chaque case recalcule aussitôt le bilan
+  du niveau (l'eau disponible, le besoin des planches cochées, la part de
+  chacune, les planches servies), sans rien enregistrer avant « Valider la
+  répartition ». Deux vues : « Planches à choisir » et « Toute la ferme ».
+  Le calcul, la décision enregistrée et sa garde ne changent pas. Aucune
+  migration.
+
 ### Corrigé (parcours navigateur à l'heure de la ferme ; pluie mesurée : le dernier jour choisi)
 
 - **Le champ « Millimètres » de la pluie mesurée suit le dernier jour
@@ -20,6 +34,7 @@ source détaillée commit par commit.
   maintenant à l'heure de la ferme, et une irrigation cherchée dans la
   semaine en cours finit à la minute précédente. Le dimanche soir
   (point ouvert 48) reste à traiter. Aucune migration.
+  En ligne le 12 novembre 2026 à 13 h 44 (#15 de ce dépôt).
 
 ### Corrigé (3.9, correction 4 : la part du dernier jour)
 
