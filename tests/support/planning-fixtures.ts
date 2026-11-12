@@ -188,6 +188,8 @@ export const close = (actual: number | null, expected: number, tolerance = 0.01,
 export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used: PlanningSettings = settings) {
   const pumpUsages: { pumpId: string; start: number; end: number; flow: number }[] = [];
   const volumeByDate = new Map<string, number>();
+  /** Ce que chaque créneau prend jour par jour à la chaîne qui le sert, par clé d'origine puis par jour civil. */
+  const drawnByOriginAndDate = new Map<string, Map<string, number>>();
   const startsByBed = new Map<string, number[]>();
   for (const proposal of plan.proposals) {
     const start = Date.parse(proposal.startAt);
@@ -216,8 +218,12 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
     }
     if (proposal.pumpId && proposal.flowCubicMetersPerHour !== null) pumpUsages.push({ pumpId: proposal.pumpId, start, end, flow: proposal.flowCubicMetersPerHour });
     if (proposal.volumeCubicMeters !== null) {
+      const originKey = proposal.justification.supply?.originKey ?? null;
+      const drawn = originKey === null ? null : drawnByOriginAndDate.get(originKey) ?? new Map<string, number>();
+      if (originKey !== null && drawn) drawnByOriginAndDate.set(originKey, drawn);
       for (const [date, volume] of splitVolumeAcrossLocalDays({ startAt: proposal.startAt, endAt: proposal.endAt, cubicMeters: proposal.volumeCubicMeters, timeZone: TZ })) {
         volumeByDate.set(date, (volumeByDate.get(date) ?? 0) + volume);
+        drawn?.set(date, (drawn.get(date) ?? 0) + volume);
       }
     }
   }
@@ -233,6 +239,14 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
       if (limit.enabled && limit.maxCubicMetersPerDay !== null && date >= limit.validFrom) {
         assert.ok(volume <= limit.maxCubicMetersPerDay + 1e-6, `${date} : ${volume} m³ sous la limite ${limit.maxCubicMetersPerDay}`);
       }
+    }
+  }
+  // Limite de prélèvement d'une ressource prélevée directement, jour civil par jour civil (points ouverts 54 et 58).
+  for (const limit of inputs.infrastructure.resourceLimits) {
+    if (!limit.enabled || limit.maxCubicMetersPerDay === null) continue;
+    for (const [date, volume] of drawnByOriginAndDate.get(`resource:${limit.resourceId}`) ?? []) {
+      if (date < limit.validFrom || (limit.validUntil !== null && date > limit.validUntil)) continue;
+      assert.ok(volume <= limit.maxCubicMetersPerDay + 1e-6, `${limit.resourceId}, ${date} : ${volume} m³ prélevés sous la limite ${limit.maxCubicMetersPerDay}`);
     }
   }
   // Espacement : 24 h au moins entre deux débuts sur une même planche.

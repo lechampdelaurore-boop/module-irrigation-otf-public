@@ -132,6 +132,7 @@ const GROUP_TITLES: Record<UnplacedGroupKey, string> = {
   deferred: 'Reportées jusqu’au prochain événement',
   'pump-time': 'Temps de pompage insuffisant',
   'daily-limit': 'Limite journalière atteinte',
+  'withdrawal-limit': 'Limite de prélèvement atteinte',
   'reserve-timing': 'Réserve au minimum',
   'volume-unknown-under-limit': 'Volume inconnu sous une limite journalière',
   'supply-unavailable': 'Eau ou pompe indisponible',

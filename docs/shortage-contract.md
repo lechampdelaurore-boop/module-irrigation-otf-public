@@ -250,8 +250,11 @@ l'état au 30 octobre 2026.
    (D-084), en reproduisant le point 54 : (a) ne tient pas pour un créneau
    à cheval sur minuit dont le premier jour est déjà plein ; sur la ferme
    des tests à la taille de la ferme réelle, une limite de 15 m³ par jour
-   laisse 22,10 m³ le jeudi (point ouvert 58). État : 🟡, (a) ❌ défaut
-   corrigé à part, son test rouge d'abord.
+   laisse 22,10 m³ le jeudi (point ouvert 58). Corrigé le 9 novembre 2026
+   (D-085) : le créneau se juge jour par jour depuis son début et part à
+   minuit quand son premier jour est plein ; aucun jour ne passe plus sa
+   limite (`tests/planning-daily-limits.test.ts`). État : 🟡, (a) ✅
+   test, (d) et (e) à vérifier.
 6. **S6 — Temps de pompage et eau à la fois.** Les quatre rampes de serre
    (10,24 m³/h pour une pompe à 8) sur une plage d'aspersion réduite à
    21 h – 0 h, et une réserve à 5 m³. Attendu : deux manques distincts, chacun
@@ -301,8 +304,11 @@ l'état au 30 octobre 2026.
    pour une limite de 2 m³ par jour — un créneau raccourci à cheval sur
    minuit se vérifie sur les deux jours, puis se place sur le premier (point
    ouvert 54) — et sa coupe se nomme « réserve « Source du bas » au minimum
-   de sécurité » (point ouvert 55) ; parcours P13 sur la ferme de
-   démonstration. État : 🟡 test ✅, deux défauts corrigés à part, P13 ⬜.
+   de sécurité » (point ouvert 55). Corrigés le 9 novembre 2026 (D-085) : la
+   source donne au plus 2,00 m³ chaque jour, et sa coupe se nomme « limite
+   de prélèvement de « Source du bas » atteinte »
+   (`tests/planning-daily-limits.test.ts`). Parcours P13 sur la ferme de
+   démonstration. État : 🟡 test ✅, P13 ⬜.
 
 ### B. La conduite en pénurie (R9)
 
@@ -450,8 +456,9 @@ l'état au 30 octobre 2026.
     écoulés ne reçoivent rien ; la limite journalière du jeudi compte le
     réalisé du jeudi. Vérification : test du moteur (lot 3, D-084) : budget
     de 4 m³ observés, parts sur 9,22 m³ restants ; sans l'arrosage du jeudi
-    matin, la rampe du bloc 2 part jeudi soir, avec lui vendredi, la limite
-    de 2 m³ du jeudi comptant ses 0,924 m³. État : ✅ test.
+    matin, la rampe du bloc 2 part jeudi soir, avec lui vendredi à minuit
+    (D-085), la limite de 2 m³ du jeudi comptant ses 0,924 m³. État : ✅
+    test.
 25. **S25 — Même calcul deux fois en pénurie.** Attendu : identique, aucune
     proposition « remplacée » (règle 11 du planning, règle 9 de la 3.7).
     Vérification : test existant (limite journalière, quatre tunnels), à
@@ -853,7 +860,8 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    corrections ; S2, S4, S10, S23, S24, S26 et S28 tiennent ; S7, S8 et S9 en
    partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
    S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
-   dans sa PR `fix/`, son test rouge d'abord — S6 et S20 y portent leur
+   dans sa PR `fix/`, son test rouge d'abord (58, 54 et 55 le 9 novembre
+   2026, D-085) — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée
    ou validée peut puiser dans la réserve (`fromReserve`), une seconde

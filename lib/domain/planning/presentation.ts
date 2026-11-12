@@ -141,6 +141,7 @@ const UNPLACED_REASON_LABELS: Record<UnplacedReason, string> = {
   deferred: 'reportée : passe en tête après le prochain événement (conduite « report »)',
   'pump-time': 'temps de pompage insuffisant dans les plages horaires',
   'daily-limit': 'limite journalière d’irrigation atteinte',
+  'withdrawal-limit': 'limite de prélèvement de la ressource atteinte',
   'reserve-timing': 'réserve au minimum de sécurité au moment voulu',
   'volume-unknown-under-limit': 'volume inconnu sous une limite journalière',
   'supply-unavailable': 'origine d’eau ou pompe indisponible',
@@ -162,6 +163,7 @@ const DOSE_REASON_LABELS: Record<DoseReason, string> = {
   'last-day-below-minimum': 'le reste de la semaine, sous la dose minimale : c’est le dernier jour',
   'refused-slot-fit': 'ce qui tient avant un créneau refusé',
   'protected-slot-fit': 'ce qui tient avant un créneau protégé',
+  'withdrawal-limit': 'ce que la limite de prélèvement laisse',
 };
 
 const TIMING_REASON_LABELS: Record<TimingReason, string> = {
@@ -174,6 +176,7 @@ const TIMING_REASON_LABELS: Record<TimingReason, string> = {
   'daily-limit': 'un jour où la limite journalière le permet',
   'after-refused-slot': 'après un créneau refusé',
   'after-protected-slot': 'après un créneau protégé',
+  'withdrawal-limit': 'un jour où la limite de prélèvement le permet',
 };
 
 /**
@@ -190,6 +193,7 @@ const UNPLACED_REASON_REFERENCES: Partial<Record<UnplacedReason, string>> = {
   spacing: 'R6, R7',
   'refused-slot': 'D-030',
   'protected-slot': 'D-062',
+  'withdrawal-limit': 'D-085',
 };
 
 /** « Pour les experts : R13, D-025 » ; nul quand le motif ne renvoie à aucune règle numérotée. */
