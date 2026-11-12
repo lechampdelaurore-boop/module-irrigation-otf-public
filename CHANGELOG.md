@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : le manque d'eau non chiffré)
+
+- **Le manque d'eau n'affiche plus un zéro qu'aucun stock ne prouve**
+  (point ouvert 51, D-089). Quand l'eau d'une chaîne servie est inconnue
+  — une réserve sans stock observé, un matériel sans pompe ou sans
+  origine —, la carte « Manque d'eau » dit « non chiffré », ou « au moins
+  X m³ » quand une autre chaîne en chiffre un, et compte les chaînes à
+  l'eau inconnue ; la ligne de résumé du téléphone de même. Avant, elle
+  écrivait « 0,00 m³ ». Aucune migration.
+
 ### Corrigé (3.9 : l'origine indisponible)
 
 - **Une pompe archivée ou une origine indisponible ne reçoit plus rien,
@@ -17,6 +27,7 @@ source détaillée commit par commit.
   ligne de budget dit « indisponible cette semaine, aucune eau
   mobilisable » au lieu d'un stock qu'aucun créneau ne peut prendre.
   Aucune migration.
+  En ligne le 12 novembre 2026 à 17 h 13 (#22 de ce dépôt).
 
 ### Corrigé (3.9 : l'eau et le temps de pompage à la fois)
 

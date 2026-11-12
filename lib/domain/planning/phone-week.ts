@@ -1,6 +1,7 @@
 import type { StoredProposal, WeeklyPlan } from './contract.ts';
 import type { PlanDay, PlanSummary } from './presentation.ts';
 import { FARM_TIME_ZONE, dateKeyInTimeZone } from '../water-management.ts';
+import { waterDeficitValue } from './water-deficit-summary.ts';
 
 /**
  * Le planning de la semaine au téléphone (audit ergonomique, point 2, 3.8
@@ -89,10 +90,12 @@ export function planSummaryLine(
   deficit: Pick<WeeklyPlan['deficit'], 'waterCubicMeters' | 'pumpTimeCubicMeters'>,
   unplacedCount: number,
   formatVolume: (cubicMeters: number) => string,
+  /** Les chaînes servies à l'eau inconnue : le manque d'eau n'y est pas chiffré, et la ligne le dit (point ouvert 51, D-089). */
+  unknownWaterChains = 0,
 ): string {
   // Les gestes d'abord, comme les cartes de tête (audit ergonomique, lot 3, point 5) : à valider, faites, en retard.
   const parts = [...actions, formatVolume(summary.volumeCubicMeters)];
-  if (deficit.waterCubicMeters > 0) parts.push(`manque d’eau ${formatVolume(deficit.waterCubicMeters)}`);
+  if (deficit.waterCubicMeters > 0 || unknownWaterChains > 0) parts.push(`manque d’eau ${waterDeficitValue(deficit.waterCubicMeters, unknownWaterChains, formatVolume)}`);
   if (deficit.pumpTimeCubicMeters > 0) parts.push(`pompage manquant ${formatVolume(deficit.pumpTimeCubicMeters)}`);
   if (unplacedCount > 0) parts.push(plural(unplacedCount, 'planche non servie', 'planches non servies'));
   if (summary.unverifiedCount > 0) parts.push(`${summary.unverifiedCount} non vérifié${summary.unverifiedCount > 1 ? 's' : ''}`);
