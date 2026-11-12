@@ -108,8 +108,9 @@ registres, elle y renvoie.
   paquet de production. `pnpm audit` : une alerte modérée, minimatch, par
   l'outil de lint, le lot à part déjà décidé. Reste la configuration
   Access, lue avec le porteur à la recette (lot 6).
-- 3.9, la surface mouillée inconnue en pénurie : **corrigée le
-  12 novembre 2026** (point ouvert 63, D-097, précisions F143 à F146),
+- 3.9, la surface mouillée inconnue en pénurie : **corrigée, en ligne**
+  (#30 ; le 12 novembre 2026, point ouvert 63, D-097, précisions F143 à
+  F146),
   relevée le jour même en comparant les deux moteurs, avant la recette
   finale. Une planche dont le passe-pied n'est pas renseigné, sous une
   aspersion, comptait 0 m³ dans le partage de l'eau, et sa rampe partait
@@ -154,6 +155,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #30 (`78e46c7`, la correction de la surface mouillée inconnue en
+  pénurie, point ouvert 63, D-097, fusionnée le 12 novembre à 21 h 58 et
+  déployée à 22 h 13, run 43305603699, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
   PR #29 (`d6b797d`, le lot 5, la revue de sécurité de la 3.9, D-095,
   fusionnée le 12 novembre à 20 h 45 et déployée à 20 h 58, run 43293482362,
   les quatre jobs réussis, aucune migration, Workers inchangés). Avant
@@ -7836,7 +7841,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    avant (39 px, 36 px et 3,1:1), passe.
 63. **Ouvert le 12 novembre 2026, en comparant le moteur du module à
    celui de Tlaloc ; corrigé le jour même, avant la recette finale, comme
-   le porteur l'a voulu (D-097) ; fermeture au jugement du porteur.** Dans
+   le porteur l'a voulu (D-097), en ligne (#30) ; fermeture au jugement du
+   porteur.** Dans
    `lib/domain/planning/shortage.ts`, le volume d'une planche dont la
    surface mouillée par son propre matériel est inconnue — une aspersion
    sur une planche sans passe-pied renseigné (D-022) — valait 0 m³ dans le

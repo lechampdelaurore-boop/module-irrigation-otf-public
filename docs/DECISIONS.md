@@ -3374,6 +3374,9 @@ contrat précisé et le test rouge d'abord.
 rouges avant le code : les trois conduites, hors pénurie, et sous un
 arbitrage. Les 1 358 tests passent.
 
+**En ligne** : #30 du dépôt public fusionnée le 12 novembre 2026 à 21 h 58
+(`78e46c7`) et déployée à 22 h 13 (run 43305603699, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
 
 ## D-098 — Le manque au volume inconnu dans les totaux du plan (point ouvert 64) : quatre précisions tranchées par la recommandation
 

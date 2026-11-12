@@ -29,6 +29,7 @@ source détaillée commit par commit.
   proposée, ses planches portent « volume inconnu en pénurie », et leur
   eau va aux autres ; la ligne de budget dit « au moins X m³ demandés ».
   Hors pénurie, rien ne change. Aucune migration.
+  En ligne le 12 novembre 2026 à 22 h 13 (#30 de ce dépôt).
 
 ### Vérifié (3.9, lot 5 : la revue de sécurité)
 
