@@ -331,7 +331,8 @@ La ligne de budget de chaque chaîne montre, niveau de priorité par niveau,
 **la part visée et la part placée** (décision 2) : la part visée est la
 fraction de la conduite, celle des parts réservées au départ — sous le
 report, la part de la demande du niveau que la conduite sert au départ, une
-planche reportée comptant zéro — ; la part placée est l'eau utile placée,
+planche reportée comptant zéro ; pour un niveau qui a de l'eau validée, la
+part de sa demande restante que ses parts réservent (D-086) — ; la part placée est l'eau utile placée,
 rapportée au besoin du niveau, comptées toutes deux sur la surface que le
 propre matériel de chaque planche mouille, comme le budget. Un niveau sans aucune demande s'affiche « — ». L'écart entre les deux
 se lit sans se calculer d'avance : le trop-plein d'une réserve pleine les
@@ -394,6 +395,34 @@ pas recevoir reste non attribué. L'écran le dit sous les cartes du résumé :
 l'eau allouée, sa réduction s'il y en a une, et ce que les planches allouées
 ne peuvent pas recevoir. Aucune ligne de budget ni fraction ne paraît sous un
 arbitrage.
+
+**L'eau déjà validée** (point ouvert 57, D-086, 9 novembre 2026). Les
+parts se calculent sur tout le reste de la semaine, eau validée comprise :
+le besoin d'une planche compte l'eau que les irrigations déjà planifiées
+de sa chaîne — propositions validées comprises — doivent encore lui donner
+d'ici dimanche, et le budget de la chaîne aussi. Cette eau compte comme
+déjà placée dans la part de la planche : il ne reste à placer que sa part
+moins cette eau. Valider des propositions en pénurie ne refait donc pas le
+partage : un recalcul après validation garde les parts des autres
+planches, et une planche validée à sa part ne reçoit pas une seconde
+proposition. Quand un arrosage validé a donné à une planche plus que sa
+part — une dose ajustée à la validation, par exemple —, la conduite se
+rejoue, cette planche servie de ce qu'elle a reçu : les autres planches de
+la même eau se partagent le reste comme la conduite le veut — les
+prioritaires d'abord, ou part égale, ou la fin de la file du report.
+L'eau libérée en fin de tour suit la même règle : elle relève d'abord les
+planches les plus loin de leur besoin de la semaine, et une planche servie
+au-delà des autres n'en prend qu'une fois rejointe. L'eau qu'une planche
+reçoit d'une autre chaîne reste retirée de son besoin, hors des parts.
+Sous un arbitrage validé, l'allocation d'une planche compte de même l'eau
+validée de sa chaîne : un arrosage validé à l'allocation la remplit ; un
+arrosage validé au-delà prend sur l'eau de la chaîne, et quand elle ne peut
+plus fournir les autres allocations, ce qui en reste à placer est réduit
+dans la même proportion, comme pour toute eau que la chaîne ne peut pas
+fournir. La ligne de budget reste celle de ce qui reste à placer, l'eau
+disponible et la demande sans l'eau validée : la part visée d'un niveau
+qui a de l'eau validée y est la part de sa demande restante que les parts
+réservent, comme sous le report.
 
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³

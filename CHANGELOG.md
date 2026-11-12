@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : l'eau déjà validée en pénurie)
+
+- **Valider des propositions en pénurie ne refait plus le partage**
+  (point ouvert 57, D-086). L'eau que les irrigations planifiées d'une
+  chaîne donneront encore à une planche compte comme déjà placée dans sa
+  part : au recalcul, les autres planches gardent leur part, et une
+  planche validée ne reçoit pas une seconde proposition. Avant, sur les
+  quatre tunnels pour 5 m³, valider les tunnels 1 et 2 faisait tomber les
+  tunnels 3 et 4 de 9,76 à 6,46 mm et laissait 0,85 m³ dans la réserve ;
+  sous un arbitrage, plus rien n'était placé. Un arrosage validé au-delà
+  de la part de sa planche rejoue la conduite, cette planche servie de ce
+  qu'elle a reçu : le choix du porteur, le 9 novembre 2026. Aucune
+  migration.
+
 ### Corrigé (3.9 : les limites par jour)
 
 - **Le plan ne propose plus d'arroser plus que la limite journalière d'un
@@ -19,6 +33,7 @@ source détaillée commit par commit.
   D-085) : « limite de prélèvement de « Source du bas » atteinte », et
   non plus « réserve au minimum de sécurité » ; un motif nouveau, compté
   en manque d'eau. Aucune migration.
+  En ligne le 12 novembre 2026 à 15 h 42 (#19 de ce dépôt).
 
 ### Vérifié (3.9, lot 3 : les scénarios de pénurie en tests du moteur)
 

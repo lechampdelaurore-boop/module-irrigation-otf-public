@@ -2653,6 +2653,91 @@ cinq plans sur dix, et trois sources sur cinq, dépassaient avant ; la
 ferme en taille à 15 m³ place tout son besoin, 71,29 m³ au lieu de 70,60,
 cinq créneaux partant à minuit le vendredi et le samedi.
 
+**En ligne** : #19 du dépôt public fusionnée le 12 novembre 2026 à 15 h 27
+(`833d092`) et déployée à 15 h 42 (run 43237426130, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-086 — L'eau déjà validée comptée dans les parts en pénurie (point ouvert 57) : quatre précisions tranchées par la recommandation, le cas limite tranché par le porteur
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur ; le cas limite (F109)
+tranché par le porteur le jour même, sur l'option recommandée. Deuxième
+correction des défauts relevés au lot 3 (D-084). Codée en Opus 5.5 · Max
+sur le dépôt public, le contrat du planning précisé d'abord
+(`docs/planning-contract.md`, « Pénurie », « L'eau déjà validée »), des
+tests rouges avant le code.
+
+**Le défaut corrigé.** Les parts se calculaient sur les besoins nets de
+l'eau planifiée et sur un budget net des prélèvements planifiés : valider
+des propositions en pénurie refaisait le partage sur le reste. Sur la
+pénurie de la cinquième recette, les quatre tunnels pour 5 m³, les
+propositions des tunnels 1 et 2 validées, le recalcul faisait tomber les
+tunnels 3 et 4 de 9,76 à 6,46 mm, laissait 0,85 m³ dans la réserve, et
+gardait à chaque tunnel validé une part de 1,42 mm qu'aucun créneau ne lui
+donnait. Sous un arbitrage, la même validation réduisait chaque allocation
+de moitié, sous la dose minimale : plus rien n'était placé.
+
+**La règle**, celle que le point 57 recommandait : les parts sur le besoin
+entier et le budget entier de la semaine, l'eau planifiée comptée comme
+déjà placée pour ses planches.
+
+**Précisions**, consignées au contrat du planning et modifiables à la
+relecture du porteur :
+
+- F108 : l'eau comptée comme déjà placée dans la part d'une planche est
+  celle que les irrigations déjà planifiées de la chaîne de son matériel
+  lui donneront encore d'ici dimanche — propositions validées ou
+  irrigations planifiées à la main, que le moteur ne distingue pas —,
+  comptée comme la 3.3 la retire du besoin et comme la chaîne la retire de
+  son budget (`remainingPlannedApplications`). L'eau qu'une planche reçoit
+  d'une autre chaîne reste retirée de son besoin, hors des parts
+  (`validatedWaterOf`, `lib/domain/planning/shortage.ts`).
+- F109, le cas limite, agronomique : posé au porteur le 9 novembre 2026,
+  « un arrosage validé dépasse la part d'une planche ; reprendre sur
+  qui ? », et tranché par lui le même jour à 16 h 22 : « selon la conduite
+  choisie », l'option recommandée, déjà codée. Un arrosage validé au-delà
+  de la part de sa planche rejoue la conduite, cette planche servie de ce
+  qu'elle a reçu : la conduite cherche la plus grande fraction commune du
+  besoin de la semaine que le budget paie, niveau par niveau sous les
+  priorités, toutes ensemble sous la part égale ; une planche qui a déjà
+  plus ne prend rien de plus (`conductFraction`, `shareAt`,
+  `commonFraction`). Le report sert sa file dans l'ordre sur le budget net
+  de l'eau validée : la fin de la file porte l'excédent.
+- F110 : l'eau libérée en fin de tour (D-037) suit la même règle quand une
+  planche du niveau a de l'eau validée : elle relève d'abord les planches
+  les plus loin de leur besoin de la semaine, et une planche servie
+  au-delà des autres n'en prend qu'une fois rejointe. Sans eau validée, la
+  redistribution au prorata des manques ne change pas : c'est la même
+  règle quand toutes les planches partent de la même fraction
+  (`ShareLedger`, `lib/domain/planning/shares.ts`).
+- F111 : sous un arbitrage validé, l'allocation d'une planche compte l'eau
+  validée de sa chaîne : il ne reste à placer que l'allocation moins cette
+  eau. Un arrosage validé au-delà prend sur l'eau de la chaîne ; quand elle
+  ne peut plus fournir les autres allocations, ce qui en reste à placer est
+  réduit dans la même proportion, par la règle de la décision 1 de la 3.9
+  (D-077). L'eau allouée qu'affiche l'écran compte l'eau validée : c'est
+  le choix du maraîcher, que la validation ne change pas.
+- F112 : la ligne de budget reste celle de ce qui reste à placer, l'eau
+  disponible et la demande sans l'eau validée ; la part visée d'un niveau
+  qui a de l'eau validée y est la part de sa demande restante que les
+  parts réservent, comme sous le report ; sans eau validée, la fraction de
+  la conduite, comme avant.
+
+**Ce qui ne change pas.** Le besoin de la 3.3, le budget des chaînes, le
+report, la garde de la validation, le calcul enregistré : aucune
+migration. Sans eau planifiée sur une chaîne en pénurie, les parts restent
+les mêmes : la fraction est, comme avant, l'eau rapportée à la demande.
+
+**Vérifié par** cinq tests du moteur
+(`tests/planning-shortage-scenarios.test.ts` : S20 sous la conduite, sous
+un arbitrage, un arrosage validé au-delà de sa part, les priorités, l'eau
+libérée en fin de tour), rouges sur le moteur d'avant (6,46 mm au lieu de
+9,76 ; rien de placé sous l'arbitrage ; 5,27 au lieu de 7,33 ; 5,77 au
+lieu de 6,72 ; 17,68 au lieu de 18,23), et un test du service
+(`tests/db/planning-validation.test.ts`) : une proposition validée par le
+service porte l'origine de sa chaîne, et au recalcul l'autre planche de
+la même réserve garde ses 10 mm (6,67 avant). Les 1 335 tests passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

@@ -9,6 +9,7 @@ import { saveDailyWaterLimitForUser, saveHydricGoalForUser } from '../../db/wate
 import { saveResourceReservoirLinkForUser, saveWaterReservoirForUser, saveWaterResourceForUser } from '../../db/water-resource-repository';
 import { listWorkspaceOwnerIds } from '../../db/workspace-repository';
 import type { IrrigationSnapshot } from '../../lib/domain/domain';
+import type { StoredWeeklyPlan } from '../../lib/domain/planning/contract';
 import { computeWeeklyPlanForUser } from '../../lib/services/planning-service';
 import { refusePlanProposalForUser, validatePlanProposalForUser } from '../../lib/services/planning-validation-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
@@ -164,4 +165,33 @@ test('un ajustement déplace le début et fait suivre la durée à la dose, par 
   assert.match(event.note ?? '', /proposition p-1 ajustée \(6 mm, début le 29\/09\/2026 18:00\)/);
   const stored = await readLatestPlanForUser(ALICE, 2026, '2026-09-28');
   assert.equal(stored?.proposals.find((proposal) => proposal.storedId === first.storedId)?.validatedEventId, event.id);
+});
+
+test('S20, valider en pénurie ne refait pas le partage : au recalcul, l’autre planche de la même réserve garde sa part, la validée ne reçoit rien de plus (point ouvert 57, D-086)', async () => {
+  // Deux goutte-à-goutte sur la même pompe et la même réserve, 0,6 m³ sans apport pour 1,2 m³ demandés : 10 mm chacun.
+  const one = await createDripFixture(ALICE, { name: 'Goutte 1', beds: ['bed-1'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
+  const two = await createDripFixture(ALICE, { name: 'Goutte 2', beds: ['bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
+  const reservoirId = await saveWaterReservoirForUser(ALICE, ALICE, null, {
+    name: 'Réserve tampon', type: 'tank', capacityCubicMeters: 60, currentVolumeCubicMeters: 0.6, minimumSafetyCubicMeters: 0,
+    exposedSurfaceSquareMeters: 0, receivesRain: false, evaporationEnabled: false, evaporationCoefficient: 0, status: 'active', notes: null,
+  }, '2026-09-29T10:00:00.000Z');
+  const pumpId = await savePumpForUser(ALICE, ALICE, null, { name: 'La pompe', maximumFlowCubicMetersPerHour: 8, status: 'active', notes: null, origins: [{ sourceKind: 'reservoir', resourceId: null, reservoirId, isDefault: true }] });
+  for (const fixture of [one, two]) await saveEquipmentDefaultPumpForUser(ALICE, ALICE, fixture.equipment.id, pumpId);
+  await saveHydricGoalForUser(ALICE, { season: 2026, weekStart: '2026-09-21', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
+  const dose = (plan: StoredWeeklyPlan, equipmentId: string) => plan.proposals
+    .filter((proposal) => proposal.equipmentId === equipmentId && proposal.status === 'proposed').reduce((sum, proposal) => sum + proposal.doseMm, 0);
+  const first = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW, actorUserId: ALICE });
+  for (const fixture of [one, two]) assert.ok(Math.abs(dose(first, fixture.equipment.id) - 10) < 0.05, `${dose(first, fixture.equipment.id)} mm : la moitié du besoin`);
+
+  const proposal = first.proposals.find((item) => item.equipmentId === one.equipment.id);
+  assert.ok(proposal);
+  const result = await validatePlanProposalForUser({ ownerUserId: ALICE, season: 2026, snapshot, proposalId: proposal.storedId, actorUserId: ALICE, now: NOW });
+  assert.ok(result.ok, result.ok ? '' : result.message);
+  const [event] = await listIrrigationEventsForUser(ALICE, 2026, true);
+  assert.deepEqual([event.equipment.pumpOriginSnapshot?.sourceKind, event.equipment.pumpOriginSnapshot?.sourceId], ['reservoir', reservoirId], 'l’irrigation validée puise dans la réserve de sa chaîne');
+
+  // Le recalcul refaisait les parts sur le reste : 6,67 mm pour l'autre, et 3,33 mm de plus pour la validée.
+  const second = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW, trigger: 'event' });
+  assert.ok(Math.abs(dose(second, two.equipment.id) - 10) < 0.05, `${dose(second, two.equipment.id)} mm : l’autre garde sa part`);
+  assert.equal(dose(second, one.equipment.id), 0, 'la validée ne reçoit rien de plus');
 });

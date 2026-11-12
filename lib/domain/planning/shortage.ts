@@ -1,9 +1,10 @@
 import type { IrrigationNeedPriority } from '../irrigation-needs.ts';
+import { remainingPlannedApplications } from '../planned-irrigation.ts';
 import { cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../units.ts';
 import type { PlanArbitration, PlanningInputs, SupplyBudget, UnplacedReason, WeeklyPlan } from './contract.ts';
 import { compareBedsForService, type PlanningBed, type PlanningEquipment } from './demand.ts';
 import type { PlanningSettings } from './settings.ts';
-import { ShareLedger } from './shares.ts';
+import { commonFraction, ShareLedger, shareAt } from './shares.ts';
 import type { DailyLimitLedger, SupplyChain } from './supply.ts';
 
 const EPSILON = 1e-9;
@@ -74,10 +75,11 @@ export function applyShortage(
   };
   const dailyRemaining = ledger.remainingBetween(horizonStart.getTime(), weekEndAt.getTime());
   const groups = chainGroups(beds, chains, dailyRemaining);
+  const validatedMm = validatedWaterOf(inputs, chains, horizonStart, weekEndAt);
 
   // Un arbitrage absent ou vide ne s'impose pas : la conduite en pénurie s'applique (point 26).
   if (inputs.arbitration && inputs.arbitration.length > 0) {
-    return { budgets: [], ...applyArbitration(beds, inputs.arbitration, groups, wettedFor, volumeOf) };
+    return { budgets: [], ...applyArbitration(beds, inputs.arbitration, groups, { wettedFor, volumeOf, validatedMm }) };
   }
 
   const budgets: PendingBudget[] = [];
@@ -91,15 +93,17 @@ export function applyShortage(
     const fractions: Record<IrrigationNeedPriority, number> = { high: 1, normal: 1, low: 1 };
     let deferMode = false;
     if (Number.isFinite(budget) && demand > budget + EPSILON) {
-      if (settings.shortageStrategy === 'equal-share') {
-        const share = demand > 0 ? Math.min(1, budget / demand) : 1;
-        fractions.high = share; fractions.normal = share; fractions.low = share;
-      } else if (settings.shortageStrategy === 'priority-then-equal-share') {
-        let remaining = budget;
-        for (const level of ['high', 'normal', 'low'] as const) {
-          const levelDemand = demandByLevel[level];
-          fractions[level] = levelDemand <= EPSILON ? 1 : Math.min(1, Math.max(0, remaining) / levelDemand);
-          remaining -= levelDemand;
+      if (settings.shortageStrategy !== 'defer') {
+        // La conduite sur la semaine entière, toutes ensemble pour la part égale, niveau par niveau sinon : l'eau validée
+        // de la chaîne compte comme déjà placée dans la part de sa planche (point ouvert 57, D-086).
+        const levels: IrrigationNeedPriority[][] = settings.shortageStrategy === 'equal-share' ? [['high', 'normal', 'low']] : [['high'], ['normal'], ['low']];
+        let pool = budget;
+        for (const level of levels) {
+          const atLevel = group.beds.filter((bed) => level.includes(bed.priority));
+          const fraction = conductFraction(atLevel, pool, validatedMm, volumeOf);
+          for (const priority of level) fractions[priority] = fraction;
+          // Un niveau servi en partie prend toute l'eau qui restait : les suivants n'ont rien.
+          pool = fraction < 1 ? 0 : pool - atLevel.reduce((sum, bed) => sum + volumeOf(bed, bed.needMm), 0);
         }
       } else {
         // Report : servir la file d'abord, puis dans l'ordre jusqu'à épuisement ; les autres attendent le prochain événement.
@@ -127,15 +131,22 @@ export function applyShortage(
     }
     if (!deferMode) {
       for (const bed of group.beds) {
-        const target = bed.needMm * fractions[bed.priority];
+        const target = shareAt(bed, fractions[bed.priority], validatedMm(bed));
         if (target < bed.needMm - EPSILON) bed.reasons.add(shortfallReason);
         bed.targetMm = target;
         bed.remainingMm = target;
       }
+      // La part visée d'un niveau qui a de l'eau validée : la part de sa demande restante que les parts réservent, comme sous
+      // le report ; sans eau validée, la fraction de la conduite, comme avant (D-086).
+      for (const level of ['high', 'normal', 'low'] as const) {
+        const own = group.beds.filter((bed) => bed.priority === level);
+        if (demandByLevel[level] <= EPSILON || !own.some((bed) => validatedMm(bed) > EPSILON)) continue;
+        fractions[level] = own.reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0) / demandByLevel[level];
+      }
     }
     // Les cibles deviennent des parts réservées, au prix de la surface que le matériel de chaque planche mouille (D-037).
     if (Number.isFinite(budget)) {
-      const ledger = new ShareLedger({ beds: group.beds, wettedAreaOf: wettedFor, budgetCubicMeters: budget, shortfallReason, strategy: settings.shortageStrategy, deferredFirst });
+      const ledger = new ShareLedger({ beds: group.beds, wettedAreaOf: wettedFor, budgetCubicMeters: budget, shortfallReason, strategy: settings.shortageStrategy, deferredFirst, validatedMmOf: validatedMm });
       for (const bed of group.beds) {
         if (bed.equipmentId) shares.set(bed.equipmentId, ledger);
       }
@@ -184,6 +195,44 @@ export function nextDeferredQueue(previous: Pick<WeeklyPlan, 'beds' | 'deferredQ
   return previous.beds.filter((bed) => bed.reasons.includes('deferred')).map((bed) => bed.bedId);
 }
 
+/**
+ * L'eau que les irrigations déjà planifiées — propositions validées
+ * comprises — doivent encore donner d'ici dimanche à une planche, depuis la
+ * chaîne de son matériel (point ouvert 57, D-086) : elle est déjà retirée de
+ * son besoin et du budget de la chaîne, et compte comme déjà placée dans sa
+ * part. L'eau d'une autre chaîne reste ce qu'elle était : retirée du besoin,
+ * hors des parts.
+ */
+function validatedWaterOf(inputs: PlanningInputs, chains: ReadonlyMap<string, SupplyChain>, horizonStart: Date, weekEndAt: Date): (bed: BedState) => number {
+  const byChainAndBed = new Map<string, number>();
+  for (const row of remainingPlannedApplications(inputs.events, horizonStart, weekEndAt)) {
+    if (!row.sourceKey) continue;
+    const key = `${row.sourceKey}|${row.bedId}`;
+    byChainAndBed.set(key, (byChainAndBed.get(key) ?? 0) + row.amountMm);
+  }
+  return (bed) => {
+    const originKey = bed.equipmentId ? chains.get(bed.equipmentId)?.originKey ?? null : null;
+    return originKey === null ? 0 : byChainAndBed.get(`${originKey}|${bed.bedId}`) ?? 0;
+  };
+}
+
+/**
+ * La fraction de la conduite pour des planches et l'eau qu'elles peuvent
+ * encore prendre (point ouvert 57, D-086) : la plus grande fraction de leur
+ * besoin de la semaine — besoin restant plus eau validée de leur chaîne —
+ * dont les cibles tiennent dans cette eau, l'eau validée comptant comme déjà
+ * placée ; une planche qui en a déjà plus ne prend rien de plus, et les
+ * autres se partagent le reste. Sans eau validée, l'eau rapportée à la
+ * demande, comme avant.
+ */
+function conductFraction(beds: readonly BedState[], pool: number, validatedMm: (bed: BedState) => number, volumeOf: (bed: BedState, mm: number) => number): number {
+  const demand = beds.reduce((sum, bed) => sum + volumeOf(bed, bed.needMm), 0);
+  if (demand <= EPSILON || demand <= pool) return 1;
+  if (pool <= 0) return 0;
+  if (beds.every((bed) => validatedMm(bed) <= EPSILON)) return pool / demand;
+  return commonFraction(pool, (fraction) => beds.reduce((sum, bed) => sum + volumeOf(bed, shareAt(bed, fraction, validatedMm(bed))), 0));
+}
+
 /** Les planches à servir, regroupées par chaîne d'eau, chaque chaîne avec son budget et le terme qui le borne. */
 function chainGroups(beds: readonly BedState[], chains: ReadonlyMap<string, SupplyChain>, dailyRemaining: number | null): ChainGroup[] {
   const groups = new Map<string, { chain: SupplyChain; beds: BedState[] }>();
@@ -208,8 +257,9 @@ function chainGroups(beds: readonly BedState[], chains: ReadonlyMap<string, Supp
 
 /**
  * Sous un arbitrage validé (décision 1 de la 3.9, D-052) : la cible de chaque
- * planche allouée est son allocation bornée à son besoin, et chaque chaîne au
- * budget fini qui en porte une a ses parts réservées — les seules
+ * planche allouée est son allocation bornée à son besoin, moins l'eau validée
+ * de sa chaîne qu'elle recevra encore (point ouvert 57, D-086), et chaque
+ * chaîne au budget fini qui en porte une a ses parts réservées — les seules
  * allocations, réduites dans la même proportion quand elles dépassent le
  * budget —, sans conduite : rien n'est redistribué. Les planches que
  * l'arbitrage ne nomme pas gardent leur besoin et puisent dans l'eau non
@@ -219,22 +269,26 @@ function applyArbitration(
   beds: readonly BedState[],
   allocations: NonNullable<PlanningInputs['arbitration']>,
   groups: readonly ChainGroup[],
-  wettedFor: (bed: BedState) => number | null,
-  volumeOf: (bed: BedState, mm: number) => number,
+  water: { wettedFor: (bed: BedState) => number | null; volumeOf: (bed: BedState, mm: number) => number; validatedMm: (bed: BedState) => number },
 ): { shares: Map<string, ShareLedger>; arbitration: ArbitrationShares } {
-  const allocated = new Set<BedState>();
+  const { wettedFor, volumeOf, validatedMm } = water;
+  const allocated = new Map<BedState, number>();
   for (const allocation of allocations) {
     const bed = beds.find((item) => item.bedId === allocation.bedId);
     const wetted = bed ? wettedFor(bed) : null;
     if (!bed || wetted === null || wetted <= 0) continue;
     const allowedMm = millimetersFromCubicMeters(Math.max(0, allocation.allocatedCubicMeters), wetted);
-    const target = Math.min(bed.needMm, allowedMm);
+    // L'allocation est celle de la semaine : l'eau validée de la chaîne de la planche y compte déjà (point ouvert 57,
+    // D-086), et il ne reste à placer que l'allocation moins cette eau.
+    const validated = validatedMm(bed);
+    const allotted = Math.min(bed.needMm + validated, allowedMm);
+    const target = Math.max(0, allotted - validated);
     if (target < bed.needMm - EPSILON) bed.reasons.add('water-budget');
     bed.targetMm = target;
     bed.remainingMm = target;
-    allocated.add(bed);
+    allocated.set(bed, allotted);
   }
-  const allocatedCubicMeters = [...allocated].reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0);
+  const allocatedCubicMeters = [...allocated].reduce((sum, [bed, allotted]) => sum + volumeOf(bed, allotted), 0);
   const shares = new Map<string, ShareLedger>();
   const ledgers: ShareLedger[] = [];
   let reduction = 0;
