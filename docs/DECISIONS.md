@@ -2377,6 +2377,67 @@ au budget ; sous arbitrage : rien en semaine, dimanche plus rien de non
 attribué), rouges sur le moteur d'avant ; les 1 301 tests existants
 passent sans changement.
 
+**En ligne** : #14 du dépôt public fusionnée le 12 novembre 2026 à 13 h 02
+(`5522a04`) et déployée à 13 h 14 (run 43214382568, les quatre jobs réussis ; aucune
+migration, Workers inchangés).
+
+
+## D-082 — Les parcours navigateur ne dépendent plus de l'heure, et le champ de la pluie suit le dernier jour choisi (points ouverts 49 et 50) : quatre précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur.
+
+**Constat.** Les 8 et 9 novembre 2026, pendant les PR des corrections 3 et
+4 de la 3.9, des parcours ont échoué selon l'heure, sur `main` comme sur les
+branches. La nuit après minuit à la ferme (point ouvert 49), P4, P9 et P31
+échouaient : `horodatageLocal` écrivait les dates à l'heure de la machine
+qui joue les parcours, UTC en intégration continue comme dans les
+conteneurs, alors que la page les lit à l'heure de la ferme ; l'heure
+saisie reculait d'une heure en hiver, de deux en été. Le lundi (point
+ouvert 50), P12 voyait le champ « Millimètres » de la pluie mesurée rester
+vide : choisir la veille, dans la semaine passée, faisait charger cette
+semaine, et la réponse, arrivée après le retour à aujourd'hui, remplaçait
+la semaine affichée et vidait le champ. Une course réelle de la page, que
+le parcours, plus rapide qu'une main, déclenchait selon les délais du
+serveur : deux échecs sur cinq passages dans la nuit du 9 novembre. Le
+contrat des parcours promettait déjà qu'un parcours ne dépend pas de
+l'heure (« Reproductibilité ») ; rien ne le garantissait.
+
+**Précisions** (techniques, sans règle agronomique ; consignées au contrat
+des parcours, `docs/browser-journeys-contract.md`, et au contrat des
+besoins, `docs/irrigation-needs-contract.md`) :
+
+- F88 : les dates et heures qu'un parcours saisit s'écrivent à l'heure de
+  la ferme, par le formateur de l'application
+  (`formatIrrigationDateTimeInput`), quel que soit le fuseau de la machine.
+- F89 : une irrigation déjà réalisée qu'un parcours cherche ensuite dans la
+  semaine, le mois ou la saison en cours finit à la minute précédente (P4,
+  d'une demi-heure ; P9, d'une heure) : une période la compte dès qu'elle la
+  chevauche. Seul reste le passage d'une période à la suivante, à une ou
+  deux minutes près, où aucune irrigation passée ne peut encore appartenir
+  à la nouvelle.
+- F90 : sur la page des besoins, le champ « Millimètres » et la semaine
+  affichée suivent le dernier jour choisi : chaque choix de jour est
+  numéroté, et la réponse d'un choix dépassé est ignorée. Les autres
+  chargements de semaine ne changent pas : les flèches et « Cette semaine »
+  sont grisés pendant un chargement.
+- F91 : P12 joue la course à chaque passage, quel que soit le jour : il
+  retient la réponse d'un jour de la semaine passée jusqu'après le retour à
+  aujourd'hui, puis vérifie que le champ montre toujours « 0 » et que la
+  semaine affichée reste celle d'aujourd'hui.
+
+**Ce qui ne change pas.** Aucun calcul, aucune migration. Le point ouvert
+48, le dimanche soir, reste ouvert : à quelques heures de la fin de la
+semaine, le planning n'a presque plus de place pour proposer un arrosage,
+et P28 ou P12 échouent par moments ; sa cause exacte reste à établir, dans
+une PR à part.
+
+**Vérifié par** `tests/parcours-heure.test.ts`, rouge avant la correction
+(une machine en UTC écrivait « 2026-11-08T23:30 » pour 0 h 30 à la ferme le
+lundi 9 novembre), et par l'étape nouvelle de P12, rouge avant la
+correction aux deux largeurs (« Expected: "0" », « Received: "" ») ; les
+1 303 tests existants et les 84 parcours passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

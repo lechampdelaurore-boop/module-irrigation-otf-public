@@ -78,6 +78,8 @@ export function WaterManagementDashboard({
   const [rainDate, setRainDate] = useState(() => dateKeyInTimeZone(new Date()));
   // La mesure déjà saisie pour le jour choisi (détail de la recette 3.7) : le champ la montre, on la corrige sur place.
   const [rainAmount, setRainAmount] = useState(() => manualRainInput(initialDashboard.days, dateKeyInTimeZone(new Date())) ?? '');
+  // Le numéro du dernier choix de jour : seule sa réponse compte (point ouvert 50).
+  const rainDateChoice = useRef(0);
   const today = dateKeyInTimeZone(new Date());
   const activeLimit = useMemo(
     () => dashboard.limits.find(
@@ -120,8 +122,14 @@ export function WaterManagementDashboard({
     setError(null);
   };
 
-  /** Le jour de la pluie mesurée change : le champ montre sa mesure ; hors de la semaine affichée, la semaine suit. */
+  /**
+   * Le jour de la pluie mesurée change : le champ montre sa mesure ; hors de la semaine affichée, la semaine suit.
+   * Le dernier jour choisi l'emporte : la semaine d'un jour choisi plus tôt, arrivée après un autre choix, ne
+   * remplace ni la semaine affichée ni le champ (docs/irrigation-needs-contract.md, point ouvert 50).
+   */
   const chooseRainDate = (date: string) => {
+    const choice = rainDateChoice.current + 1;
+    rainDateChoice.current = choice;
     setRainDate(date);
     if (!isValidDateKey(date)) return;
     const shown = manualRainInput(dashboard.days, date);
@@ -132,6 +140,7 @@ export function WaterManagementDashboard({
     setRainAmount('');
     startTransition(async () => {
       const result = await loadWaterDashboardAction({ season, weekStart: weekStartDateKey(date) });
+      if (choice !== rainDateChoice.current) return;
       receive(result);
       if (result.ok) setRainAmount(manualRainInput(result.dashboard.days, date) ?? '');
     });

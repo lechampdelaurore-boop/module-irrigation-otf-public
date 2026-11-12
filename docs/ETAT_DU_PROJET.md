@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 9 novembre 2026.
+Dernière mise à jour : 12 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -22,7 +22,7 @@ registres, elle y renvoie.
   (décision 2, D-079, précisions F76 à F79, aucune migration) ;
   **correction 3 en ligne** (#13), le report sans bascule d'un calcul à
   l'autre (décision 4, D-080, précisions F80 à F83, aucune migration) ;
-  **correction 4 codée**, la part du dernier jour (décision 5, D-081,
+  **correction 4 en ligne** (#14), la part du dernier jour (décision 5, D-081,
   précisions F84 à F87, aucune migration). Ensuite l'écran d'arbitrage
   présenté comme un plan d'assolement, décidé par le porteur le 8 novembre
   2026 à 20 h 40 (D-078) : sa maquette, soumise au porteur le 8 novembre
@@ -38,6 +38,11 @@ registres, elle y renvoie.
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
   chantier de code à la fois ; D4 (Cloudflare) sur accord exprès du porteur.
+- Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
+  le champ de la pluie mesurée suit le dernier jour choisi (D-082) : les
+  points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
+  ouvert 48) : ni PR ouverte ni contrôle relancé le dimanche après 21 h à
+  la ferme, jusqu'à la PR à part qui l'en libérera.
 - 3.8, fonctionnalités à la carte : **close par le porteur le 8 novembre
   2026 à 20 h 21**, des modifications restant possibles plus tard, chacune
   par une PR (détail plus bas).
@@ -61,7 +66,10 @@ registres, elle y renvoie.
   le porteur, sont validés le 8 novembre 2026 à 19 h 20 (« ça me semble
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
-- Fusionné et déployé sur `main` du dépôt public au 9 novembre 2026 : la
+- Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #14 (`5522a04`, la correction 4 de la 3.9, la part du dernier jour,
+  fusionnée le 12 novembre à 13 h 02 et déployée à 13 h 14, run 43214382568,
+  les quatre jobs réussis, aucune migration, Workers inchangés). Avant elle : la
   PR #13 (`a15f150`, la correction 3 de la 3.9, le report sans bascule d'un
   calcul à l'autre, fusionnée le 9 novembre à 2 h 51 et déployée à
   3 h 23, run 42547789030, les quatre jobs réussis après une relance des
@@ -538,8 +546,8 @@ registres, elle y renvoie.
   Après la 3.8, close par le porteur : la deuxième passe de la refonte
   (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
   3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
-  cours : lot 2, quatre PR `fix/`, une à la fois, les trois premières en
-  ligne (#11 à #13), la quatrième en PR.
+  cours : lot 2, quatre PR `fix/`, une à la fois, toutes les quatre en
+  ligne (#11 à #14).
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).
@@ -7339,7 +7347,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    parcours ne dépendent plus de l'heure ; en attendant, une PR ouverte le
    dimanche soir attend le lundi pour ses contrôles.
 49. **Ouvert le 9 novembre 2026, en vérifiant la PR de la correction 3 de
-   la 3.9 ; non bloquant.** Ce lundi peu après minuit à la ferme, trois
+   la 3.9 ; non bloquant ; corrigé le jour même (D-082) ; fermeture au
+   jugement du porteur.** Ce lundi peu après minuit à la ferme, trois
    parcours ont échoué aux deux largeurs : P4
    (`e2e/p4-cumuls-export.spec.ts`), P9 (`e2e/p9-suivi-par-serie.spec.ts`)
    et P31 (`e2e/p31-planning-et-arrosages.spec.ts`, les arrosages), sur les
@@ -7359,9 +7368,18 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    2 h 36, 84 sur 84. Recommandation : la même PR à part que pour le point
    48, qui écrira ces horodatages à l'heure de Paris et éloignera ces
    irrigations des bornes du jour et de la semaine ; en attendant, ni PR
-   ouverte ni parcours relancé entre minuit et 2 h 30.
+   ouverte ni parcours relancé entre minuit et 2 h 30. Corrigé le
+   9 novembre 2026 dans la PR qui suit la correction 4 (D-082, F88 et
+   F89) : `horodatageLocal` écrit à l'heure de la ferme, par le formateur
+   de l'application, quel que soit le fuseau de la machine
+   (`tests/parcours-heure.test.ts`, rouge avant : une machine en UTC
+   écrivait 23:30 pour 0 h 30 à la ferme) ; P4 et P9 finissent leur
+   irrigation à la minute précédente, qu'une période compte dès qu'elle
+   la chevauche. Seul reste le passage d'une période à la suivante, à une
+   ou deux minutes près.
 50. **Ouvert le 9 novembre 2026, en vérifiant le déploiement de la
-   correction 3 de la 3.9 ; non bloquant.** Sur les contrôles de `main`
+   correction 3 de la 3.9 ; non bloquant ; corrigé le jour même (D-082) ;
+   fermeture au jugement du porteur.** Sur les contrôles de `main`
    après la fusion de #13 (`a15f150`, run 42547789030), P12 a échoué à
    l'ordinateur à 2 h 54 à la ferme, sur sa dernière étape : la pluie du
    jour remise à 0 mm, le champ « Millimètres » de « Pluie mesurée », ramené
@@ -7377,7 +7395,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    les délais du serveur. Rare à la main, mais réelle : la semaine affichée
    et le champ ne suivent plus le jour choisi. Recommandation : ne garder
    que la réponse du dernier jour choisi, test d'abord, dans la PR à part
-   des points 48 et 49.
+   des points 48 et 49. Corrigé le 9 novembre 2026 dans cette PR (D-082,
+   F90 et F91) : chaque choix de jour est numéroté, et la réponse d'un
+   choix dépassé est ignorée (`docs/irrigation-needs-contract.md`). P12
+   joue maintenant la course à chaque passage, quel que soit le jour : il
+   retient la réponse d'un jour de la semaine passée jusqu'après le
+   retour à aujourd'hui ; rouge avant la correction, aux deux largeurs
+   (« Expected: "0" », « Received: "" »).
 
 ## Procédure de reprise rapide
 
