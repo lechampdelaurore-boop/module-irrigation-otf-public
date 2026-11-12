@@ -1,6 +1,8 @@
 import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { dateKeyInTimeZone } from '../../lib/domain/irrigation-history/dates.ts';
+import { formatIrrigationDateTimeInput } from '../../lib/domain/irrigation-format.ts';
 import { millisecondsFromMinutes } from '../../lib/domain/units.ts';
+import { FARM_TIME_ZONE } from '../../lib/domain/water-management.ts';
 import { ouvrirParClic } from './parcours.ts';
 
 /**
@@ -116,7 +118,11 @@ export async function annulerDepuisLeMenu(page: Page, ligne: Locator, action: 'A
 }
 
 /**
- * Horodatage au format attendu par un champ « date et heure », en heure locale.
+ * Horodatage au format attendu par un champ « date et heure », à l'heure de la
+ * ferme : la page lit ce champ à l'heure de la ferme, et la machine qui joue
+ * les parcours peut être ailleurs, en UTC en intégration continue. Écrit à
+ * l'heure de la machine, il reculait d'une heure en hiver et de deux en été
+ * (docs/browser-journeys-contract.md, « Reproductibilité », point ouvert 49).
  *
  * `reference` est le « maintenant » du parcours, relevé une seule fois à son
  * début : deux lectures de l'horloge peuvent tomber de part et d'autre d'une
@@ -124,9 +130,7 @@ export async function annulerDepuisLeMenu(page: Page, ligne: Locator, action: 'A
  * avec elles (docs/browser-journeys-contract.md).
  */
 export function horodatageLocal(decalageMinutes: number, reference: number): string {
-  const instant = new Date(reference + millisecondsFromMinutes(decalageMinutes));
-  const deuxChiffres = (valeur: number) => String(valeur).padStart(2, '0');
-  return `${instant.getFullYear()}-${deuxChiffres(instant.getMonth() + 1)}-${deuxChiffres(instant.getDate())}T${deuxChiffres(instant.getHours())}:${deuxChiffres(instant.getMinutes())}`;
+  return formatIrrigationDateTimeInput(new Date(reference + millisecondsFromMinutes(decalageMinutes)), FARM_TIME_ZONE);
 }
 
 /**

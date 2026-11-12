@@ -1,7 +1,7 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page, type Request } from '@playwright/test';
 import { dateKeyInTimeZone } from '../lib/domain/irrigation-history/dates.ts';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
-import { addDaysToDateKey } from '../lib/domain/water-management.ts';
+import { addDaysToDateKey, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
@@ -191,6 +191,46 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   await attendreLaPageIrrigation(page, 'besoins');
   await expect(page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' }).getByLabel('Millimètres')).toHaveValue('0');
   await verifierLEtape(page, journal, 'mesure du jour montrée dans le champ');
+
+  // Le dernier jour choisi l'emporte (point ouvert 50) : un jour de la semaine
+  // passée fait charger sa semaine, et si l'on revient à aujourd'hui avant la
+  // réponse, celle-ci, arrivée en retard, ne remplace ni le champ ni la semaine
+  // affichée. La réponse est retenue jusqu'après le retour à aujourd'hui, pour
+  // que la course se joue à chaque passage, quel que soit le jour : sans cela,
+  // elle ne se jouait que le lundi, quand la veille est dans la semaine passée.
+  const pluieRouverte = page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' });
+  const semaineAffichee = page.locator('.water-week-navigation strong');
+  const semaineDAujourdhui = (await semaineAffichee.textContent()) ?? '';
+  const unJourDeLaSemainePassee = addDaysToDateKey(aujourdhui, -7);
+  const lundiDeLaSemainePassee = weekStartDateKey(unJourDeLaSemainePassee);
+  const chargeLaSemainePassee = (requete: Request) => requete.method() === 'POST' && (requete.postData() ?? '').includes(lundiDeLaSemainePassee);
+  const pageDesBesoins = (adresse: URL) => adresse.pathname === '/irrigation/besoins';
+  let retenue = false;
+  let relacher: () => void = () => {};
+  const relachee = new Promise<void>((resolve) => { relacher = resolve; });
+  await page.route(pageDesBesoins, async (route) => {
+    if (retenue || !chargeLaSemainePassee(route.request())) {
+      await route.continue();
+      return;
+    }
+    retenue = true;
+    const reponse = await route.fetch();
+    await relachee;
+    await route.fulfill({ response: reponse });
+  });
+  await pluieRouverte.getByLabel('Date', { exact: true }).fill(unJourDeLaSemainePassee);
+  await expect.poll(() => retenue).toBe(true);
+  await pluieRouverte.getByLabel('Date', { exact: true }).fill(aujourdhui);
+  await expect(pluieRouverte.getByLabel('Millimètres')).toHaveValue('0');
+  const reponseArrivee = page.waitForResponse((reponse) => chargeLaSemainePassee(reponse.request()));
+  relacher();
+  await reponseArrivee;
+  // La réponse lue, la page rend la main : « Enregistrer » se réactive.
+  await expect(pluieRouverte.getByRole('button', { name: 'Enregistrer' })).toBeEnabled();
+  await expect(pluieRouverte.getByLabel('Millimètres')).toHaveValue('0');
+  await expect(semaineAffichee).toHaveText(semaineDAujourdhui);
+  await page.unroute(pageDesBesoins);
+  await verifierLEtape(page, journal, 'réponse en retard sans effet sur le champ ni la semaine');
 });
 
 /** La pluie mesurée d'aujourd'hui, la date que le formulaire propose de lui-même. */
