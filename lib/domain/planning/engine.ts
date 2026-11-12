@@ -379,6 +379,13 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
         volume = volumeOf(applications);
       };
 
+      // Une chaîne dont l'eau est partagée — en pénurie, ou sous un arbitrage validé — ne place jamais un volume inconnu :
+      // aucune part ne pourrait le compter, et l'eau des autres planches s'en irait sans être comptée. Le matériel arrose
+      // une planche dont la surface mouillée est inconnue ; aucun jour de la semaine n'y change rien (point ouvert 63,
+      // D-097).
+      const shares = context.shares.get(equipment.id);
+      if (volume === null && shares?.shortage) return { ok: false, reason: 'volume-unknown-under-budget' };
+
       // La limite journalière (2.8), jour civil par jour civil depuis le début du créneau ; le premier jour plein, il part
       // à minuit si sa plage continue (point ouvert 58, D-085).
       const limit = context.ledger.evaluate(startMs, endMs, volume);
@@ -405,7 +412,6 @@ function placeCandidate(candidate: Candidate, context: PlacementContext): { ok: 
       }
 
       // La part réservée (D-037) : le créneau ne prend que ce que ses parts paient ; la coupe ne dépend pas du jour.
-      const shares = context.shares.get(equipment.id);
       if (shares && volume !== null) {
         const shortened = shares.longestDurationWithinShares((seconds) => placementAt(equipment, seconds), durationSeconds, servedBedIds);
         if (shortened < durationSeconds) {

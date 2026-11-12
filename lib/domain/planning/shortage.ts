@@ -73,9 +73,13 @@ export function applyShortage(
   const wettedFor = (bed: BedState) => bed.equipmentId
     ? equipmentById.get(bed.equipmentId)?.coveredBeds.find((covered) => covered.bedId === bed.bedId)?.wettedAreaSquareMeters ?? null
     : null;
+  // Le volume d'une planche du partage, au prix de la surface que son propre matériel mouille. Une planche dont cette
+  // surface est inconnue n'a pas de volume : elle reste hors de tout partage, jamais comptée zéro (D-003, point ouvert 63,
+  // D-097) ; la compter ici serait une erreur de programmation, et le calcul s'arrête plutôt que d'écrire un chiffre faux.
   const volumeOf = (bed: BedState, mm: number) => {
     const wetted = wettedFor(bed);
-    return wetted === null ? 0 : cubicMetersFromMillimeters(mm, wetted);
+    if (wetted === null) throw new Error(`Planche ${bed.bedId} sans surface mouillée connue dans un partage d'eau (point ouvert 63).`);
+    return cubicMetersFromMillimeters(mm, wetted);
   };
   const dailyRemaining = ledger.remainingBetween(horizonStart.getTime(), weekEndAt.getTime());
   const groups = chainGroups(beds, chains, dailyRemaining);
@@ -101,25 +105,38 @@ export function applyShortage(
   const deferredFirst = new Set(inputs.deferredBedIds ?? []);
   for (const group of groups) {
     const { chain, budget, shortfallReason } = group;
+    // Le partage ne compte que les planches dont la surface mouillée par leur propre matériel est connue ; les autres
+    // n'ont pas de volume, et la ligne de budget les compte à part (point ouvert 63, D-097).
+    const shared = group.beds.filter((bed) => wettedFor(bed) !== null);
+    const unpriced = group.beds.length - shared.length;
     const demandByLevel: Record<IrrigationNeedPriority, number> = { high: 0, normal: 0, low: 0 };
-    for (const bed of group.beds) demandByLevel[bed.priority] += volumeOf(bed, bed.needMm);
+    for (const bed of shared) demandByLevel[bed.priority] += volumeOf(bed, bed.needMm);
     const demand = demandByLevel.high + demandByLevel.normal + demandByLevel.low;
     const fractions: Record<IrrigationNeedPriority, number> = { high: 1, normal: 1, low: 1 };
     if (chain.unavailable) {
       // Ni conduite ni part : rien n'est visé, et la ligne le dit, sans eau mobilisable (D-088).
       for (const level of ['high', 'normal', 'low'] as const) if (demandByLevel[level] > EPSILON) fractions[level] = 0;
-      budgets.push({ budget: budgetLine(group, demandByLevel, fractions, dailyRemaining), beds: group.beds, volumeOf });
+      budgets.push({ budget: budgetLine(group, demandByLevel, fractions, dailyRemaining, unpriced), beds: shared, volumeOf });
       continue;
     }
     let deferMode = false;
-    if (Number.isFinite(budget) && demand > budget + EPSILON) {
+    const inShortage = Number.isFinite(budget) && demand > budget + EPSILON;
+    if (inShortage) {
+      // En pénurie, une planche sans volume ne peut rien recevoir : aucune part ne compterait son créneau. Elle n'a pas de
+      // cible et le dit sous son motif, avant la conduite (point ouvert 63, D-097).
+      for (const bed of group.beds) {
+        if (wettedFor(bed) !== null) continue;
+        bed.targetMm = 0;
+        bed.remainingMm = 0;
+        bed.reasons.add('volume-unknown-under-budget');
+      }
       if (settings.shortageStrategy !== 'defer') {
         // La conduite sur la semaine entière, toutes ensemble pour la part égale, niveau par niveau sinon : l'eau validée
         // de la chaîne compte comme déjà placée dans la part de sa planche (point ouvert 57, D-086).
         const levels: IrrigationNeedPriority[][] = settings.shortageStrategy === 'equal-share' ? [['high', 'normal', 'low']] : [['high'], ['normal'], ['low']];
         let pool = budget;
         for (const level of levels) {
-          const atLevel = group.beds.filter((bed) => level.includes(bed.priority));
+          const atLevel = shared.filter((bed) => level.includes(bed.priority));
           const fraction = conductFraction(atLevel, pool, validatedMm, volumeOf);
           for (const priority of level) fractions[priority] = fraction;
           // Un niveau servi en partie prend toute l'eau qui restait : les suivants n'ont rien.
@@ -128,7 +145,7 @@ export function applyShortage(
       } else {
         // Report : servir la file d'abord, puis dans l'ordre jusqu'à épuisement ; les autres attendent le prochain événement.
         let remaining = budget;
-        const ordered = [...group.beds].sort((left, right) =>
+        const ordered = [...shared].sort((left, right) =>
           Number(deferredFirst.has(right.bedId)) - Number(deferredFirst.has(left.bedId)) || compareBedsForService(left, right));
         for (const bed of ordered) {
           const volume = volumeOf(bed, bed.needMm);
@@ -144,13 +161,13 @@ export function applyShortage(
         // (décision 2 de la 3.9, D-052).
         for (const level of ['high', 'normal', 'low'] as const) {
           if (demandByLevel[level] <= EPSILON) continue;
-          fractions[level] = group.beds.filter((bed) => bed.priority === level).reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0) / demandByLevel[level];
+          fractions[level] = shared.filter((bed) => bed.priority === level).reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0) / demandByLevel[level];
         }
         deferMode = true;
       }
     }
     if (!deferMode) {
-      for (const bed of group.beds) {
+      for (const bed of shared) {
         const target = shareAt(bed, fractions[bed.priority], validatedMm(bed));
         if (target < bed.needMm - EPSILON) bed.reasons.add(shortfallReason);
         bed.targetMm = target;
@@ -159,19 +176,19 @@ export function applyShortage(
       // La part visée d'un niveau qui a de l'eau validée : la part de sa demande restante que les parts réservent, comme sous
       // le report ; sans eau validée, la fraction de la conduite, comme avant (D-086).
       for (const level of ['high', 'normal', 'low'] as const) {
-        const own = group.beds.filter((bed) => bed.priority === level);
+        const own = shared.filter((bed) => bed.priority === level);
         if (demandByLevel[level] <= EPSILON || !own.some((bed) => validatedMm(bed) > EPSILON)) continue;
         fractions[level] = own.reduce((sum, bed) => sum + volumeOf(bed, bed.targetMm), 0) / demandByLevel[level];
       }
     }
     // Les cibles deviennent des parts réservées, au prix de la surface que le matériel de chaque planche mouille (D-037).
     if (Number.isFinite(budget)) {
-      const ledger = new ShareLedger({ beds: group.beds, wettedAreaOf: wettedFor, budgetCubicMeters: budget, shortfallReason, strategy: settings.shortageStrategy, deferredFirst, validatedMmOf: validatedMm });
+      const ledger = new ShareLedger({ beds: shared, wettedAreaOf: wettedFor, budgetCubicMeters: budget, shortfallReason, strategy: settings.shortageStrategy, deferredFirst, validatedMmOf: validatedMm, shortage: inShortage });
       for (const bed of group.beds) {
         if (bed.equipmentId) shares.set(bed.equipmentId, ledger);
       }
     }
-    budgets.push({ budget: budgetLine(group, demandByLevel, fractions, dailyRemaining), beds: group.beds, volumeOf });
+    budgets.push({ budget: budgetLine(group, demandByLevel, fractions, dailyRemaining, unpriced), beds: shared, volumeOf });
   }
   return { budgets, shares, arbitration: null };
 }
@@ -180,9 +197,11 @@ export function applyShortage(
  * La ligne de budget d'une chaîne : son eau mobilisable, ce que la limite
  * journalière laisse, sa demande et la part visée de chaque niveau ; le
  * drapeau `unavailable` seulement quand rien ne peut venir de la chaîne
- * (D-088), absent sinon, comme dans un calcul enregistré avant.
+ * (D-088), absent sinon, comme dans un calcul enregistré avant ; le nombre
+ * de planches au volume inconnu, que la demande ne compte pas, seulement
+ * quand il y en a (point ouvert 63, D-097).
  */
-function budgetLine(group: ChainGroup, demandByLevel: Record<IrrigationNeedPriority, number>, fractions: Record<IrrigationNeedPriority, number>, dailyRemaining: number | null): SupplyBudget {
+function budgetLine(group: ChainGroup, demandByLevel: Record<IrrigationNeedPriority, number>, fractions: Record<IrrigationNeedPriority, number>, dailyRemaining: number | null, unknownVolumeBedCount: number): SupplyBudget {
   return {
     originKey: group.key,
     originName: group.chain.originName,
@@ -190,6 +209,7 @@ function budgetLine(group: ChainGroup, demandByLevel: Record<IrrigationNeedPrior
     ...(group.chain.unavailable ? { unavailable: true } : {}),
     dailyLimitRemainingCubicMeters: dailyRemaining,
     demandCubicMeters: demandByLevel.high + demandByLevel.normal + demandByLevel.low,
+    ...(unknownVolumeBedCount > 0 ? { unknownVolumeBedCount } : {}),
     fractions,
     demandByLevelCubicMeters: demandByLevel,
   };
@@ -353,7 +373,7 @@ function applyArbitration(
       reduction += reserved - Math.max(0, group.budget);
       shortfallReason = group.shortfallReason;
     }
-    const ledger = new ShareLedger({ beds: own, wettedAreaOf: wettedFor, budgetCubicMeters: group.budget, shortfallReason, strategy: null, deferredFirst: new Set() });
+    const ledger = new ShareLedger({ beds: own, wettedAreaOf: wettedFor, budgetCubicMeters: group.budget, shortfallReason, strategy: null, deferredFirst: new Set(), shortage: true });
     ledgers.push(ledger);
     for (const bed of group.beds) {
       if (bed.equipmentId) shares.set(bed.equipmentId, ledger);
