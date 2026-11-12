@@ -3102,6 +3102,10 @@ consignées au contrat de l'audit et à celui des parcours :
 **Vérifié par** P31c, rouge avant le code (39 px, 36 px et 3,1:1), vert
 après. Les 1 342 tests et les 86 parcours passent.
 
+**En ligne** : #25 du dépôt public fusionnée le 12 novembre 2026 à 18 h 32
+(`f5e2fd2`) et déployée à 18 h 47 (run 43270561040, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

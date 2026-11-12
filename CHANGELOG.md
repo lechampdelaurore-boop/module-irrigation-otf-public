@@ -36,6 +36,7 @@ source détaillée commit par commit.
   44 px, « Matériels archivés (n) » de 36 à 44 px ; une pompe archivée se
   distingue par son fond et son état, sans le voile qui mettait ses
   intitulés à 3,1:1. Correction d'affichage seule.
+  En ligne le 12 novembre 2026 à 18 h 47 (#25 de ce dépôt).
 
 ### Corrigé (3.9 : le pli des changements sur une eau inconnue)
 

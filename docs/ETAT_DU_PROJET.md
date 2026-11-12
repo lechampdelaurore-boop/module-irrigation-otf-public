@@ -64,11 +64,11 @@ registres, elle y renvoie.
   corrigeant 51 : le pli des changements d'un recalcul écrit le
   manque d'eau comme la carte quand l'eau d'une chaîne est inconnue d'un
   côté, sans écart chiffré.
-- 3.9, une pompe et un matériel archivés : **corrigés le 9 novembre 2026**
-  (point ouvert 62, D-094, précisions F136 à F138), relevés en jouant les
-  parcours du lot 4, dans une PR qui suit celle de 59 et précède celle du
-  lot 4 : au téléphone, les boutons d'une carte de pompe et « Matériels
-  archivés » font 44 px ; une pompe archivée se distingue par son fond,
+- 3.9, une pompe et un matériel archivés : **corrigés, en ligne** (#25 ;
+  le 9 novembre 2026, point ouvert 62, D-094, précisions F136 à F138),
+  relevés en jouant les parcours du lot 4 et corrigés avant lui : au
+  téléphone, les boutons d'une carte de pompe et « Matériels archivés »
+  font 44 px ; une pompe archivée se distingue par son fond,
   sans le voile qui mettait ses textes à 3,1:1. P31c le mesure sur une
   ferme neuve.
 - 3.9, lot 4, le parcours « Planifier en pénurie » et le protocole vide de
@@ -122,6 +122,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #25 (`f5e2fd2`, la correction d'une pompe et d'un matériel archivés au
+  téléphone et au contraste, point ouvert 62, D-094, fusionnée
+  le 12 novembre à 18 h 32 et déployée à 18 h 47, run 43270561040, les
+  quatre jobs réussis, aucune migration, Workers inchangés). Avant elle : la
   PR #24 (`854ae13`, la correction du pli des changements sur une eau
   inconnue, point ouvert 59, D-090, fusionnée le 12 novembre à 18 h 03 et
   déployée à 18 h 18, run 43265302502, les quatre jobs réussis, aucune
