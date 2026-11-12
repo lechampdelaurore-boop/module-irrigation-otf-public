@@ -36,6 +36,7 @@ source détaillée commit par commit.
   (61) ; la pompe et les lignes que P32 laisse archivées ont fait voir à
   P31c, au téléphone, des cibles sous 44 px et une carte sous 4,5:1 (62,
   corrigé dans la PR qui précède celle-ci, D-094).
+  En ligne le 12 novembre 2026 à 19 h 22 (#26 de ce dépôt).
 
 ### Corrigé (3.9 : une pompe et un matériel archivés, au téléphone et au contraste)
 

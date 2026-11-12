@@ -72,8 +72,9 @@ registres, elle y renvoie.
   sans le voile qui mettait ses textes à 3,1:1. P31c le mesure sur une
   ferme neuve.
 - 3.9, lot 4, le parcours « Planifier en pénurie » et le protocole vide de
-  la recette finale : **écrits le 9 novembre 2026** (D-091, précisions F125
-  à F131), sans changer aucun comportement. P32 (le P13 du contrat, numéro
+  la recette finale : **écrits, en ligne** (#26 ; le 9 novembre 2026,
+  D-091, précisions F125 à F131), sans changer aucun comportement.
+  P32 (le P13 du contrat, numéro
   pris depuis par les alertes météo) joue la pénurie sur la ferme de
   démonstration, aux deux largeurs : sa réserve à 0,3 m³, sa pompe, deux
   goutte-à-goutte sur N02 et N03 ; la ligne de budget et ses fractions,
@@ -125,6 +126,11 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #26 (`bc99d0b`, le lot 4, le parcours P32 « Planifier en pénurie », les
+  tests du moteur de S21 et le protocole vide de la recette finale, D-091,
+  fusionnée le 12 novembre à 19 h 06 et déployée à 19 h 22, run 43276463105,
+  les quatre jobs réussis, aucune migration, Workers inchangés). Avant
+  elle : la
   PR #25 (`f5e2fd2`, la correction d'une pompe et d'un matériel archivés au
   téléphone et au contraste, point ouvert 62, D-094, fusionnée
   le 12 novembre à 18 h 32 et déployée à 18 h 47, run 43270561040, les

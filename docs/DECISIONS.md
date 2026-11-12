@@ -3058,6 +3058,10 @@ pénurie, puis 60.
 **Vérifié par** P32 aux deux largeurs, les deux tests de S21, et les
 contrôles complets ; les 1 344 tests et les 88 parcours passent.
 
+**En ligne** : #26 du dépôt public fusionnée le 12 novembre 2026 à 19 h 06
+(`bc99d0b`) et déployée à 19 h 22 (run 43276463105, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-092 — Le motif de la dose en pénurie (point ouvert 61) : deux précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
