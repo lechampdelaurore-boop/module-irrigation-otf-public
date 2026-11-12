@@ -2653,6 +2653,10 @@ cinq plans sur dix, et trois sources sur cinq, dépassaient avant ; la
 ferme en taille à 15 m³ place tout son besoin, 71,29 m³ au lieu de 70,60,
 cinq créneaux partant à minuit le vendredi et le samedi.
 
+**En ligne** : #19 du dépôt public fusionnée le 12 novembre 2026 à 15 h 27
+(`833d092`) et déployée à 15 h 42 (run 43237426130, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-086 — L'eau déjà validée comptée dans les parts en pénurie (point ouvert 57) : quatre précisions tranchées par la recommandation, le cas limite tranché par le porteur
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de

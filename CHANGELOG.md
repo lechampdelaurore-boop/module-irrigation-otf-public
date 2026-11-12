@@ -33,6 +33,7 @@ source détaillée commit par commit.
   D-085) : « limite de prélèvement de « Source du bas » atteinte », et
   non plus « réserve au minimum de sécurité » ; un motif nouveau, compté
   en manque d'eau. Aucune migration.
+  En ligne le 12 novembre 2026 à 15 h 42 (#19 de ce dépôt).
 
 ### Vérifié (3.9, lot 3 : les scénarios de pénurie en tests du moteur)
 

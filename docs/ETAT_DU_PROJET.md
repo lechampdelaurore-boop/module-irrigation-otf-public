@@ -39,8 +39,8 @@ registres, elle y renvoie.
   après la PR de ce lot, qui suit celle de l'écran d'arbitrage. Le plus
   sérieux d'abord : la limite journalière d'un arrêté (58) et celle d'une
   ressource (54) dépassées par un créneau à cheval sur minuit. **58, 54 et
-  55 corrigés le 9 novembre 2026** (D-085, F103 à F107), dans une PR qui
-  suit celle du lot 3 : les limites par jour se jugent depuis le début du
+  55 corrigés, en ligne** (#19 ; le 9 novembre 2026, D-085, F103 à F107) :
+  les limites par jour se jugent depuis le début du
   créneau, qui part à minuit quand son premier jour est plein, et la coupe
   d'une source se nomme « limite de prélèvement ». **57 corrigé le
   9 novembre 2026** (D-086, F108 à F112), dans une PR qui suit celle des
@@ -82,6 +82,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #19 (`833d092`, la correction des limites par jour, points ouverts 54,
+  55 et 58, D-085, fusionnée le 12 novembre à 15 h 27 et déployée à 15 h 42,
+  run 43237426130, les quatre jobs réussis, aucune migration, Workers
+  inchangés). Avant elle : la
   PR #18 (`395b99e`, le lot 3 de la 3.9, les scénarios de pénurie en tests
   du moteur, D-084, fusionnée le 12 novembre à 14 h 58 et déployée
   à 15 h 09, run 43232464948, les quatre jobs réussis, aucune migration,
