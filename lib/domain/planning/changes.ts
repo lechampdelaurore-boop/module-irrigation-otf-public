@@ -84,6 +84,8 @@ export function describePlanChanges(previous: StoredWeeklyPlan | null, plan: Wee
   const before = previous.proposals.filter((proposal) => proposal.calculationId === previous.calculation.id && effectiveProposalStatus(proposal, computedAt) === 'proposed');
   const unknownBefore = unknownWaterChainCount(previous.calculation.summary.budgets);
   const unknownAfter = unknownWaterChainCount(plan.budgets);
+  const unknownBedsBefore = previous.calculation.summary.deficit.unknownVolumeBeds?.water ?? 0;
+  const unknownBedsAfter = plan.deficit.unknownVolumeBeds?.water ?? 0;
   return {
     previousCalculationId: previous.calculation.id,
     previousComputedAt: previous.calculation.computedAt,
@@ -95,6 +97,9 @@ export function describePlanChanges(previous: StoredWeeklyPlan | null, plan: Wee
     // Une chaîne servie à l'eau inconnue d'un côté : son manque n'y est pas chiffré (point ouvert 59, D-090).
     ...(unknownBefore > 0 ? { unknownWaterChainsBefore: unknownBefore } : {}),
     ...(unknownAfter > 0 ? { unknownWaterChainsAfter: unknownAfter } : {}),
+    // Une planche en manque d'eau au volume inconnu d'un côté : le total s'y lit « au moins » (point ouvert 64, D-098).
+    ...(unknownBedsBefore > 0 ? { unknownWaterBedsBefore: unknownBedsBefore } : {}),
+    ...(unknownBedsAfter > 0 ? { unknownWaterBedsAfter: unknownBedsAfter } : {}),
   };
 }
 

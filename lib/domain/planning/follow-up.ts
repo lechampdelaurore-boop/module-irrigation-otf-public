@@ -135,10 +135,11 @@ export function planChangesLines(changes: PlanChanges, format: DateFormats): Pla
   for (const bed of changes.bedsNowPlaced) {
     lines.push({ kind: 'placed', text: `De nouveau servie : ${bed.bedName} (${bed.plotName})` });
   }
-  const unknownBefore = changes.unknownWaterChainsBefore ?? 0;
-  const unknownAfter = changes.unknownWaterChainsAfter ?? 0;
+  const unknownBefore = (changes.unknownWaterChainsBefore ?? 0) + (changes.unknownWaterBedsBefore ?? 0);
+  const unknownAfter = (changes.unknownWaterChainsAfter ?? 0) + (changes.unknownWaterBedsAfter ?? 0);
   if (unknownBefore > 0 || unknownAfter > 0) {
-    // Une eau inconnue d'un côté : le manque s'y écrit comme la carte, sans écart chiffré (point ouvert 59, D-090).
+    // Une eau inconnue d'un côté : le manque s'y écrit comme la carte, sans écart chiffré (point ouvert 59, D-090) ; de
+    // même pour une planche en manque d'eau au volume inconnu (point ouvert 64, D-098).
     const volume = (value: number) => `${cubicMeters.format(value)} m³`;
     const before = waterDeficitValue(changes.waterDeficitBeforeCubicMeters, unknownBefore, volume);
     const after = waterDeficitValue(changes.waterDeficitAfterCubicMeters, unknownAfter, volume);
