@@ -318,8 +318,11 @@ l'état au 30 octobre 2026.
    de sécurité » (point ouvert 55). Corrigés le 9 novembre 2026 (D-085) : la
    source donne au plus 2,00 m³ chaque jour, et sa coupe se nomme « limite
    de prélèvement de « Source du bas » atteinte »
-   (`tests/planning-daily-limits.test.ts`). Parcours P13 sur la ferme de
-   démonstration. État : 🟡 test ✅, P13 ⬜.
+   (`tests/planning-daily-limits.test.ts`). Sur la ferme de démonstration,
+   le parcours P32 (lot 4, D-091) lit la ligne de budget de sa chaîne parmi
+   celles des matériels sans pompe que les autres parcours laissent ; il ne
+   fabrique pas de seconde chaîne chiffrée, que le test prouve dans les deux
+   sens. État : 🟡 test ✅, P32 pour une chaîne.
 
 ### B. La conduite en pénurie (R9)
 
@@ -442,15 +445,24 @@ l'état au 30 octobre 2026.
     du moteur (`tests/planning-shortage-scenarios.test.ts`, cinq tests) et
     du service, de la validation au recalcul
     (`tests/db/planning-validation.test.ts`).
-    État : 🟡 tests ✅, recette finale ⬜.
+    Sur la ferme de démonstration, P32 valide une proposition en pénurie :
+    au recalcul, l'eau mobilisable baisse de son volume, la planche validée
+    ne reçoit rien de plus, l'autre ligne garde sa dose (D-091).
+    État : 🟡 tests ✅, P32 ✅, recette finale ⬜.
 21. **S21 — Refus en pénurie** (D-030, moteur de la 3.7). La proposition du
     tunnel 1 refusée. Attendu : le créneau refusé exclu pour la semaine ; le
     besoin du tunnel 1 placé ailleurs avec la même part ; si aucun autre
     créneau n'est possible, « créneau refusé » dans « Non placé » (3.7,
     règle 2) et sa part libérée en fin de tour aux autres tunnels, comme toute
     part qu'une planche ne peut pas recevoir (D-037) ; somme ≤ budget.
-    Vérification : test à écrire une fois le moteur de la 3.7 en place ;
-    recette finale. État : ⬜, attend la 3.7.
+    Vérification : deux tests du moteur, écrits au lot 4
+    (`tests/planning-shortage-scenarios.test.ts`, D-091) — le créneau refusé
+    évité, le tunnel 1 replacé ailleurs avec la même part, les autres tunnels
+    gardant la leur ; la semaine entière refusée, « créneau refusé » et la
+    cible des trois autres relevée de sa part, le supplément sous la dose
+    minimale attendant comme un reste hors pénurie (D-081) — ; P32 refuse une
+    proposition en pénurie sur la ferme de démonstration ; recette finale.
+    État : 🟡 tests ✅, P32 ✅, recette finale ⬜.
 22. **S22 — Restriction posée après coup** (3.7, règle 16 ; décision 3 du
     porteur). Des arrosages validés d'un jour dépassent une limite posée
     ensuite. Attendu : le jour signalé, suggestions « Réduire à … mm » en
@@ -542,14 +554,35 @@ Trois fermes, chacune pour ce qu'elle prouve.
    persistance à deux exploitations.
 2. **La ferme de démonstration** (`lib/adapters/mock-data.ts`,
    `mock-crop-plan.ts`, météo de démonstration), celle des parcours navigateur,
-   quinze planches sur quatre saisons. Un parcours nouveau, **P13 « Planifier
-   en pénurie »**, aux deux largeurs : il crée sa réserve (10 m³ observés à
-   2 m³, minimum 0), sa pompe, un matériel sur N01 à N03 et un objectif ;
-   calcule le plan ; lit la ligne de budget, les fractions, la liste « Non
-   placé » et son motif, la justification d'une carte coupée ; valide une
-   proposition en pénurie et constate qu'elle compte au recalcul ; refuse une
-   proposition ; puis remet tout en état. Il crée sa propre situation et la
-   rend, ne dépend ni du jour ni de la minute (`docs/browser-journeys-contract.md`).
+   quinze planches sur quatre saisons. Un parcours nouveau, **P32 « Planifier
+   en pénurie »** (le P13 de l'écriture, numéro pris depuis par les alertes
+   météo), aux deux largeurs : il crée sa réserve (10 m³ observés à 0,3 m³,
+   minimum 0), sa pompe, deux goutte-à-goutte, l'un sur N02, l'autre sur N03,
+   et un objectif ; calcule le plan ; lit la ligne de budget, les fractions,
+   la liste « Non placé » et son motif, la justification d'une carte en
+   pénurie ; valide une proposition en pénurie et constate qu'elle compte au
+   recalcul —
+   l'eau mobilisable baisse de son volume, l'autre ligne garde sa dose
+   (S20) — ; refuse une proposition, replacée hors du créneau refusé (S21) ;
+   puis remet tout en état. Il crée sa propre situation et la rend, ne dépend
+   ni du jour ni de la minute (`docs/browser-journeys-contract.md`).
+   Précisé à son écriture, le 9 novembre 2026 (D-091) : 0,3 m³ et non 2 m³,
+   pour que la part de chaque planche, 5,9 mm, tienne dans un seul arrosage
+   sous la dose maximale du goutte-à-goutte (10 mm), quel que soit le jour,
+   quand 2 m³ donnaient 40 mm à placer en quatre arrosages, que la semaine
+   n'offre plus à partir du vendredi ; N02 et N03 et non N01 à N03, parce que
+   les parcours précédents laissent sur N01 leurs lignes, dont une à 25 mm/h
+   qui la servirait (R12), et leurs irrigations, qui changent son besoin ;
+   deux lignes et non une, pour que la validation de l'une laisse à l'autre
+   sa proposition, à comparer puis à refuser. Une ligne qui n'arrose que sa
+   planche n'est pas raccourcie par les parts : sa dose est la part de sa
+   planche, et la coupe (S15), qui demande un créneau versant aussi sur
+   d'autres planches, reste prouvée par le test du moteur ; P32 lit la dose
+   de la carte, la réserve et la faisabilité de sa justification, pas le
+   motif de la dose, qui dit encore « le besoin restant de la planche la plus
+   demandeuse » pour cette part (point ouvert 61). La fiche d'une pompe ne
+   voit une réserve créée qu'après le rechargement de la page (point ouvert
+   60) : P32 recharge entre les deux.
 3. **La ferme réelle**, pour la recette finale seulement, sur le « vas-y » du
    porteur, données expérimentales relevées et remises en état par l'écran.
    Aucun export de la ferme n'est versionné (`AGENTS.md`, sécurité) : ses
@@ -572,7 +605,10 @@ dans `docs/ETAT_DU_PROJET.md` et dans la PR :
    budget de temps du calcul de la grande ferme (500 ms, D-031).
 3. Les tests de persistance sur toutes les migrations, de `0000` à la
    dernière, sur une base neuve (test de dérive de schéma).
-4. Les parcours navigateur, P1 à P13, à 1 280 et 390 px, sous cinq minutes,
+4. Les parcours navigateur, P0 à P32 (P1 à P13 quand ce contrat s'est
+   écrit), à 1 280 et 390 px, leur durée relevée — « sous cinq minutes »
+   valait pour treize parcours, les 88 d'aujourd'hui en prennent onze
+   environ (précisé au lot 4, D-091) —,
    sans débordement ni erreur de console.
 5. **La relecture des registres** contre le dépôt et Git : chaque ligne 🟡 ou
    ⬜ de la section 1 et de l'ordre de la section 2 de la roadmap, chaque point
@@ -889,7 +925,13 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    chaîne s'ajoute (`withDirectChain` : une source, sa pompe de 3 m³/h, sa
    limite de prélèvement par jour), et les invariants vérifient chaque
    pompe à son propre débit et la réserve avec ses irrigations planifiées.
-4. **Le parcours P13** et le protocole vide de `docs/recette-tranche-3.md`.
+4. **Le parcours P32** (le P13 de l'écriture) et le protocole vide de
+   `docs/recette-tranche-3.md`. Écrits le 9 novembre 2026 (D-091), avec les
+   deux tests du moteur de S21, absents de la liste du point 3 ; deux défauts
+   relevés en écrivant P32, points ouverts 60 et 61, chacun corrigé dans sa
+   PR `fix/`, son test rouge d'abord ; un troisième en jouant tous les
+   parcours, le point 62, une pompe et un matériel archivés au téléphone et
+   au contraste, corrigé dans une PR qui précède celle du lot (D-094).
 5. **La revue de sécurité** : ses corrections, une PR par défaut.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte
    rendu dans `docs/recette-tranche-3.md`.
@@ -1054,6 +1096,6 @@ par relire, sans changer les règles d'ici :
 - **5 bis** : une alerte ne change rien au plan (contrat des alertes) ;
 - **5 quater** : un objectif proposé non adopté n'entre pas dans le besoin ;
   adopté, c'est une révision d'objectif, donc un événement de la 3.7 (D-045) ;
-- **3.8** : les chemins de l'écran dans le protocole de recette et dans P13
+- **3.8** : les chemins de l'écran dans le protocole de recette et dans P32
   sont ceux de la disposition réorganisée ; la mesure du temps de chargement
   avant et après est reprise.

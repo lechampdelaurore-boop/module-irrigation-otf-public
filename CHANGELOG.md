@@ -5,6 +5,29 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Vérifié (3.9, lot 4 : la pénurie dans le navigateur, et le protocole de la recette finale)
+
+- **Un parcours navigateur joue la pénurie** (P32 « Planifier en pénurie »,
+  lot 4, D-091), aux deux largeurs, sur la ferme de démonstration : une
+  réserve observée à 0,3 m³, sa pompe, deux goutte-à-goutte ; la ligne de
+  budget et ses fractions, « Non placé » et son motif, la dose de chaque
+  carte à la part de sa planche ; une proposition validée qui compte au
+  recalcul, une refusée replacée hors du créneau refusé ; puis tout est
+  rendu. 88 parcours.
+- **Le refus en pénurie devient un test du moteur** (S21) : le créneau
+  refusé est évité et la part replacée ailleurs ; la semaine entière
+  refusée, « créneau refusé », et la part libérée relève la cible des
+  autres planches.
+- **Le protocole de la recette finale est écrit, vide**
+  (`docs/recette-tranche-3.md`), à remplir avec le porteur.
+- **Trois défauts relevés, aucun corrigé ici** (points ouverts 60 à 62) :
+  la fiche d'une nouvelle pompe ne voit une réserve créée qu'après le
+  rechargement de la page (60) ; en pénurie, la carte d'une ligne justifie
+  sa dose par « le besoin restant » quand c'est la part de sa planche
+  (61) ; la pompe et les lignes que P32 laisse archivées ont fait voir à
+  P31c, au téléphone, des cibles sous 44 px et une carte sous 4,5:1 (62,
+  corrigé dans la PR qui précède celle-ci, D-094).
+
 ### Corrigé (3.9 : une pompe et un matériel archivés, au téléphone et au contraste)
 
 - **Au téléphone, les boutons d'une carte de pompe et « Matériels
@@ -13,6 +36,7 @@ source détaillée commit par commit.
   44 px, « Matériels archivés (n) » de 36 à 44 px ; une pompe archivée se
   distingue par son fond et son état, sans le voile qui mettait ses
   intitulés à 3,1:1. Correction d'affichage seule.
+  En ligne le 12 novembre 2026 à 18 h 47 (#25 de ce dépôt).
 
 ### Corrigé (3.9 : le pli des changements sur une eau inconnue)
 

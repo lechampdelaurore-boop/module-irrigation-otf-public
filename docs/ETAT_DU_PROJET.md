@@ -64,13 +64,31 @@ registres, elle y renvoie.
   corrigeant 51 : le pli des changements d'un recalcul écrit le
   manque d'eau comme la carte quand l'eau d'une chaîne est inconnue d'un
   côté, sans écart chiffré.
-- 3.9, une pompe et un matériel archivés : **corrigés le 9 novembre 2026**
-  (point ouvert 62, D-094, précisions F136 à F138), relevés en jouant les
-  parcours du lot 4, dans une PR qui suit celle de 59 et précède celle du
-  lot 4 : au téléphone, les boutons d'une carte de pompe et « Matériels
-  archivés » font 44 px ; une pompe archivée se distingue par son fond,
+- 3.9, une pompe et un matériel archivés : **corrigés, en ligne** (#25 ;
+  le 9 novembre 2026, point ouvert 62, D-094, précisions F136 à F138),
+  relevés en jouant les parcours du lot 4 et corrigés avant lui : au
+  téléphone, les boutons d'une carte de pompe et « Matériels archivés »
+  font 44 px ; une pompe archivée se distingue par son fond,
   sans le voile qui mettait ses textes à 3,1:1. P31c le mesure sur une
   ferme neuve.
+- 3.9, lot 4, le parcours « Planifier en pénurie » et le protocole vide de
+  la recette finale : **écrits le 9 novembre 2026** (D-091, précisions F125
+  à F131), sans changer aucun comportement. P32 (le P13 du contrat, numéro
+  pris depuis par les alertes météo) joue la pénurie sur la ferme de
+  démonstration, aux deux largeurs : sa réserve à 0,3 m³, sa pompe, deux
+  goutte-à-goutte sur N02 et N03 ; la ligne de budget et ses fractions,
+  « Non placé » et son motif, la dose de chaque carte à la part de sa
+  planche ; une proposition validée qui compte au recalcul (S20), une
+  refusée replacée hors du créneau refusé (S21) ; puis la remise en état.
+  Les deux tests du moteur de S21, qui manquaient, tiennent.
+  `docs/recette-tranche-3.md` porte le protocole vide de la recette finale,
+  rempli avec le porteur au lot 6. **Deux défauts relevés, points ouverts
+  60 et 61**, à corriger chacun dans sa PR `fix/` avant la revue de
+  sécurité : la carte d'une ligne en pénurie justifie sa dose par « le
+  besoin restant » quand c'est la part de sa planche (61) ; la fiche d'une
+  pompe ne voit une réserve créée qu'après le rechargement de la page (60).
+  En jouant tous les parcours, un troisième, le point 62, corrigé dans la
+  PR qui précède celle de ce lot (D-094). 88 parcours.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -104,6 +122,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #25 (`f5e2fd2`, la correction d'une pompe et d'un matériel archivés au
+  téléphone et au contraste, point ouvert 62, D-094, fusionnée
+  le 12 novembre à 18 h 32 et déployée à 18 h 47, run 43270561040, les
+  quatre jobs réussis, aucune migration, Workers inchangés). Avant elle : la
   PR #24 (`854ae13`, la correction du pli des changements sur une eau
   inconnue, point ouvert 59, D-090, fusionnée le 12 novembre à 18 h 03 et
   déployée à 18 h 18, run 43265302502, les quatre jobs réussis, aucune
@@ -7695,6 +7717,42 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    « de 3,00 à 0,00 m³ (−3,00 m³) », la ligne ne paraissant que si les deux
    côtés s'écrivent autrement (`tests/planning-follow-up.test.ts`, rouge
    avant).
+60. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
+   3.9, D-091) ; non bloquant.** Sur la page « Ressources et pompes », une
+   réserve ou une ressource créée n'apparaît pas dans les origines possibles
+   d'une nouvelle pompe avant le rechargement de la page : la fiche « Nouvelle
+   pompe » dit « Créez d’abord une ressource ou une réserve, ou enregistrez la
+   pompe sans origine. », juste après « La réserve a été créée. ». Cause : la
+   gestion des pompes (`app/irrigation/pump-manager.tsx`) garde sa propre
+   copie du tableau des ressources, lue une fois au chargement
+   (`useState(initialDashboard)`), que la création d'une réserve dans le
+   panneau voisin (`app/irrigation/water-resource-manager.tsx`) ne met pas à
+   jour ; un nom changé ou une réserve rendue inactive se lisent de même en
+   retard sur les cartes des pompes. Rien n'est faux en base, mais le
+   maraîcher qui crée sa cuve puis sa pompe est arrêté sans raison. P32
+   recharge la page entre les deux. Recommandation : la gestion des pompes
+   relit les ressources quand le panneau voisin en change une, comme la
+   faisabilité le fait déjà (`notifyFeasibilityChanged`) ; une PR `fix/` à
+   part, le test rouge d'abord, P32 sans rechargement.
+61. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
+   3.9, D-091) ; non bloquant.** En pénurie, la carte d'une ligne qui
+   n'arrose que sa planche justifie sa dose par « Pourquoi cette dose : le
+   besoin restant de la planche la plus demandeuse », alors que cette dose
+   est la part de la planche, une fraction de son besoin : sur P32, 5,9 mm,
+   quand la ligne de budget ne vise qu'une part du besoin de la chaîne et
+   que « Non placé » compte le reste sous « stock et ressources
+   insuffisants ». Le contrat ne nomme la
+   part que pour un créneau raccourci par les parts (S15) ; le moteur fixe
+   la cible de la planche à sa part avant le placement, et la dose suit son
+   « besoin restant », qui est alors cette cible
+   (`lib/domain/planning/engine.ts`, `lib/domain/planning/shortage.ts`). La
+   recette du 10 octobre 2026 (T1) l'avait lu ainsi sans le relever. Rien
+   n'est mal calculé, mais la carte dit au maraîcher que sa planche reçoit
+   ce qui lui reste à recevoir quand elle n'en reçoit qu'une part.
+   Recommandation : quand la cible de la planche de référence est sous son
+   besoin, la dose dit « la part de la semaine réservée à ses planches »,
+   comme une coupe ; une PR `fix/` à part, le contrat du planning précisé et
+   le test rouge d'abord, et P32 qui lit le motif.
 62. **Ouvert le 9 novembre 2026, en jouant les parcours du lot 4 de la
    3.9 ; corrigé le jour même (D-094) ; fermeture au jugement du
    porteur.** Au téléphone, sur une ferme qui a une pompe, « Modifier » et

@@ -15,7 +15,7 @@ import { ouvrirParClic } from './parcours.ts';
  * parcours nomme donc ce qu'il crée d'après son projet, pour ne jamais retomber
  * sur ce que l'autre a laissé (docs/browser-journeys-contract.md).
  */
-function nomUnique(testInfo: TestInfo, prefixe: string): string {
+export function nomUnique(testInfo: TestInfo, prefixe: string): string {
   // Une exécution joue chaque parcours à deux largeurs sur une même base : le
   // nom porte donc le fichier du parcours et la largeur, faute de quoi deux
   // parcours retomberaient sur le matériel l'un de l'autre.
@@ -33,10 +33,12 @@ export type MaterielPrepare = {
 export async function preparerMaterielArrosant(
   page: Page,
   testInfo: TestInfo,
-  options: { planche?: string; apportMmParHeure?: number } = {},
+  /** `repere` distingue les matériels d'un parcours qui en pose plusieurs : « Ligne N02 p32-… ordinateur ». */
+  options: { planche?: string; apportMmParHeure?: number; repere?: string } = {},
 ): Promise<MaterielPrepare> {
-  const materiel = nomUnique(testInfo, 'Ligne');
-  const reglage = nomUnique(testInfo, 'Réglage');
+  const repere = options.repere ? ` ${options.repere}` : '';
+  const materiel = nomUnique(testInfo, `Ligne${repere}`);
+  const reglage = nomUnique(testInfo, `Réglage${repere}`);
   const planche = options.planche ?? 'N01';
   const apportMmParHeure = options.apportMmParHeure ?? 10;
 
