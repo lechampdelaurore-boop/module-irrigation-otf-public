@@ -2567,6 +2567,10 @@ S2, S4, S7, S8, S9, S23, S24 et S26), le test S10 étendu de
 `tests/db/planning-service.test.ts`, verts sur le moteur tel qu'il est ;
 les 1 324 tests et les 84 parcours passent.
 
+**En ligne** : #18 du dépôt public fusionnée le 12 novembre 2026 à 14 h 58
+(`395b99e`) et déployée à 15 h 09 (run 43232464948, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-085 — Les limites par jour vérifiées depuis le début du créneau (points ouverts 54, 55 et 58) : cinq précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de

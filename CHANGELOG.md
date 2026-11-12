@@ -40,6 +40,7 @@ source détaillée commit par commit.
   celle d'une réserve ; un manque compté en entier sous un seul motif ;
   les parts refaites sur le reste après une validation en pénurie. Chacun
   sera corrigé dans sa PR, test rouge d'abord. Aucune migration.
+  En ligne le 12 novembre 2026 à 15 h 09 (#18 de ce dépôt).
 
 ### Documents (Tranche 4 : la démo guidée inscrite aux registres)
 

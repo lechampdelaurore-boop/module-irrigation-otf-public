@@ -30,8 +30,8 @@ registres, elle y renvoie.
   recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts` et
   `tests/planning-shortage-scenarios.test.ts` (F98).
-- 3.9, lot 3, les scénarios de pénurie en tests du moteur : **écrits le
-  9 novembre 2026** (D-084, précisions F98 à F102), sans changer aucun
+- 3.9, lot 3, les scénarios de pénurie en tests du moteur : **en ligne**
+  (#18), écrits le 9 novembre 2026 (D-084, F98 à F102), sans changer aucun
   comportement. S2, S4, S10 étendu, S23, S24, S26 et l'isolation S28
   tiennent ; S7, S8 et S9 en partie ; S6 et S20 non. **Huit défauts
   relevés, points ouverts 51 à 58**, à corriger avant la recette finale,
@@ -77,6 +77,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #18 (`395b99e`, le lot 3 de la 3.9, les scénarios de pénurie en tests
+  du moteur, D-084, fusionnée le 12 novembre à 14 h 58 et déployée
+  à 15 h 09, run 43232464948, les quatre jobs réussis, aucune migration,
+  Workers inchangés). Avant elle : la
   PR #16 (`77a2c0e`, le contrat de la démo guidée inscrit aux registres,
   Tranche 4, D-096, documents seuls, fusionnée le 12 novembre à 14 h 29 et
   déployée à 14 h 42, run 43227755893, les quatre jobs réussis, aucune
