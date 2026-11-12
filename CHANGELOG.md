@@ -30,6 +30,7 @@ source détaillée commit par commit.
   maintenant son tableau quand une ressource ou une réserve change, et
   les noms et les états se lisent à jour sur les cartes des pompes. Aucune
   migration.
+  En ligne le 12 novembre 2026 à 20 h 26 (#28 de ce dépôt).
 
 ### Corrigé (3.9 : le motif de la dose en pénurie)
 

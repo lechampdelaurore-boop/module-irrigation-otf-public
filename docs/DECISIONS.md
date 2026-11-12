@@ -3152,6 +3152,10 @@ dans la fiche, jamais parue), vert après, et le test du signal, rouge
 avant : le module n'avait pas ce signal. Les 1 348 tests et les 88
 parcours passent.
 
+**En ligne** : #28 du dépôt public fusionnée le 12 novembre 2026 à 20 h 09
+(`53044ba`) et déployée à 20 h 26 (run 43287314051, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
