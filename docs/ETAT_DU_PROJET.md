@@ -97,8 +97,9 @@ registres, elle y renvoie.
   la semaine réservée à ses planches ». **60 corrigé, en ligne**
   (#28 ; le 9 novembre 2026, D-093, F134 et F135), après 61 : la fiche d'une
   pompe voit une réserve créée sans recharger la page.
-- 3.9, lot 5, la revue de sécurité : **faite le 9 novembre 2026** (D-095,
-  précisions F139 à F142), sans changer aucun comportement, dans une PR qui
+- 3.9, lot 5, la revue de sécurité : **faite, en ligne** (#29 ; le
+  9 novembre 2026, D-095, précisions F139 à F142), sans changer aucun
+  comportement, dans une PR qui
   suit celle de 60. Les sept points de la section D de
   `docs/recette-tranche-3.md` portent leur constat et leur verdict :
   **aucun défaut**. Trois tests d'isolation à deux fermes écrits, là où il
@@ -150,6 +151,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #29 (`d6b797d`, le lot 5, la revue de sécurité de la 3.9, D-095,
+  fusionnée le 12 novembre à 20 h 45 et déployée à 20 h 58, run 43293482362,
+  les quatre jobs réussis, aucune migration, Workers inchangés). Avant
+  elle : la
   PR #28 (`53044ba`, la correction de la fiche d'une pompe qui voit une
   réserve créée sans recharger, point ouvert 60, D-093, fusionnée
   le 12 novembre à 20 h 09 et déployée à 20 h 26, run 43287314051, les

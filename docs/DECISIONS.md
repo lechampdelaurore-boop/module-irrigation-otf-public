@@ -3257,6 +3257,10 @@ aucun écran, aucun outil de la CI.
 **Vérifié par** les cinq tests nouveaux, rouges filtre ou garde relâché,
 et les contrôles complets ; les 1 353 tests et les 88 parcours passent.
 
+**En ligne** : #29 du dépôt public fusionnée le 12 novembre 2026 à 20 h 45
+(`d6b797d`) et déployée à 20 h 58 (run 43293482362, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

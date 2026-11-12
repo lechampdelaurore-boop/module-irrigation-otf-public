@@ -32,6 +32,7 @@ source détaillée commit par commit.
 - `pnpm audit` lu une fois : une alerte modérée, minimatch, par l'outil de
   lint, déjà prévue en lot à part. La configuration de Cloudflare Access se
   lira avec le porteur, à la recette.
+  En ligne le 12 novembre 2026 à 20 h 58 (#29 de ce dépôt).
 
 ### Corrigé (3.9 : la fiche d'une pompe et la réserve créée)
 
