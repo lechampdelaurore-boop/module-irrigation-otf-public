@@ -69,9 +69,8 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   const reserve = nomUnique(testInfo, 'Réserve');
   const pompe = nomUnique(testInfo, 'Pompe');
   await creerLaReserve(page, reserve);
-  // La fiche d'une pompe ne voit une réserve créée qu'après le rechargement de
-  // la page (point ouvert 60) : le parcours recharge, comme l'utilisateur.
-  await attendreLaPageIrrigation(page, 'ressources');
+  // Sans recharger la page : la fiche d'une pompe voit la réserve créée
+  // (point ouvert 60, D-093).
   await creerLaPompe(page, pompe, reserve);
   for (const { materiel } of [n02, n03]) await choisirLaPompeHabituelle(page, materiel, pompe);
   await verifierLEtape(page, journal, 'réserve, pompe et pompes habituelles');
@@ -252,8 +251,8 @@ async function creerLaReserve(page: Page, reserve: string): Promise<void> {
 
 async function creerLaPompe(page: Page, pompe: string, reserve: string): Promise<void> {
   const formulaire = page.locator('form.pump-editor').filter({ has: page.getByRole('heading', { name: 'Nouvelle pompe' }) });
-  // Premier clic après le rechargement : la fenêtre n'existe que sous React.
-  await ouvrirParClic(page.getByRole('button', { name: '+ Ajouter une pompe' }), formulaire);
+  await page.getByRole('button', { name: '+ Ajouter une pompe' }).click();
+  await expect(formulaire).toBeVisible();
   await formulaire.getByLabel('Nom', { exact: true }).fill(pompe);
   await formulaire.getByLabel('Débit maximal (m³/h)').fill(DEBIT_DE_LA_POMPE_M3_H);
   const origine = formulaire.locator('.pump-origin-row').filter({ hasText: `${reserve} · réserve` });

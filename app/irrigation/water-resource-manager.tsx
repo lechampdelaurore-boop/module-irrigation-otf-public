@@ -2,7 +2,7 @@
 import { millisecondsFromMinutes } from '@/lib/domain/units';
 
 import { useState, useTransition } from 'react';
-import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
+import { notifyFeasibilityChanged, notifyWaterSourcesChanged } from '@/lib/domain/feasibility-notifications';
 import {
   formatIrrigationDateTime,
   formatIrrigationDateTimeInput,
@@ -82,6 +82,8 @@ export function WaterResourceManager({
       }
       setDashboard(result.dashboard);
       notifyFeasibilityChanged();
+      // La fiche d'une pompe propose les ressources et les réserves telles qu'elles sont (point ouvert 60, D-093).
+      notifyWaterSourcesChanged();
       setNotice(result.message);
       setError(null);
       onSuccess?.();

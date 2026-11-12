@@ -16,6 +16,10 @@ La configuration est progressive et facultative. Sans pompe, une irrigation rest
 
 Changer l’origine ponctuellement ne modifie pas l’origine par défaut. Renommer une pompe, réduire sa capacité ou modifier son origine par défaut ne réécrit jamais les irrigations historiques.
 
+## La fiche d’une pompe
+
+Sur la page « Ressources et pompes » (3.8), la fiche d’une pompe propose pour origines possibles les ressources et les réserves de l’exploitation telles qu’elles sont, pas telles qu’elles étaient au chargement de la page : une ressource ou une réserve créée, modifiée ou rendue inactive dans le panneau des ressources paraît aussitôt dans la fiche, sous son nom et son état, et dans les origines des cartes des pompes. La gestion des pompes relit pour cela son tableau au serveur quand le panneau des ressources lui signale un changement, sans rien recevoir d’autre que ce signal ; le serveur vérifie toujours, à l’enregistrement, que chaque origine appartient à l’exploitation (`assertOriginsOwned`). Précisé le 9 novembre 2026 (point ouvert 60, D-093) : la fiche disait « Créez d’abord une ressource ou une réserve » juste après « La réserve a été créée. », jusqu’au rechargement de la page.
+
 ## Calcul et simultanéité
 
 Le débit demandé réutilise les applications par planche issues du moteur de couverture existant : `débit (m³/h) = somme(mm/h × m²) / 1000`. Aucun second moteur de débit n’est introduit.
