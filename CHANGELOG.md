@@ -22,6 +22,7 @@ source détaillée commit par commit.
   X m³ » quand une autre chaîne en chiffre un, et compte les chaînes à
   l'eau inconnue ; la ligne de résumé du téléphone de même. Avant, elle
   écrivait « 0,00 m³ ». Aucune migration.
+  En ligne le 12 novembre 2026 à 17 h 45 (#23 de ce dépôt).
 
 ### Corrigé (3.9 : l'origine indisponible)
 

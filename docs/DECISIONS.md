@@ -2923,6 +2923,10 @@ rouges avant le code : sur la réserve sans jauge, « non chiffré » et la
 ligne « manque d'eau non chiffré » ; la rampe du bloc 2 sur une source à
 0,5 m³ par jour, « au moins 5,608 m³ ». Les 1 340 tests passent.
 
+**En ligne** : #23 du dépôt public fusionnée le 12 novembre 2026 à 17 h 30
+(`ef20c5f`) et déployée à 17 h 45 (run 43259462933, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-090 — Le pli des changements d'un recalcul sur une eau inconnue (point ouvert 59) : deux précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
