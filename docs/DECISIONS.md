@@ -3106,6 +3106,10 @@ de même ; hors pénurie, à 30 m³, la dose maximale puis le besoin restant.
 Le libellé (`tests/planning-presentation.test.ts`) ; P32 lit le motif sur
 la ferme de démonstration. Les 1 346 tests passent.
 
+**En ligne** : #27 du dépôt public fusionnée le 12 novembre 2026 à 19 h 39
+(`cd49512`) et déployée à 19 h 54 (run 43282133338, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-093 — La fiche d'une pompe et les ressources changées (point ouvert 60) : deux précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de

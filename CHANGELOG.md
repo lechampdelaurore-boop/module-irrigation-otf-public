@@ -23,6 +23,7 @@ source détaillée commit par commit.
   demandeuse » pour une dose qui n'est qu'une part de ce besoin ; elle dit
   maintenant « la part de la semaine réservée à ses planches », sous un
   arbitrage aussi. Hors pénurie, rien ne change. Aucune migration.
+  En ligne le 12 novembre 2026 à 19 h 54 (#27 de ce dépôt).
 
 ### Vérifié (3.9, lot 4 : la pénurie dans le navigateur, et le protocole de la recette finale)
 

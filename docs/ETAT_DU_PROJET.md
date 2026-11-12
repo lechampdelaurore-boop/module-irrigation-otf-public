@@ -89,8 +89,8 @@ registres, elle y renvoie.
   besoin restant » quand c'est la part de sa planche (61) ; la fiche d'une
   pompe ne voit une réserve créée qu'après le rechargement de la page (60).
   En jouant tous les parcours, un troisième, le point 62, corrigé dans la
-  PR qui précède celle de ce lot (D-094). 88 parcours. **61 corrigé le
-  9 novembre 2026** (D-092, F132 et F133), dans une PR qui suit celle du
+  PR qui précède celle de ce lot (D-094). 88 parcours. **61 corrigé,
+  en ligne** (#27 ; le 9 novembre 2026, D-092, F132 et F133), après le
   lot 4 : la carte d'une ligne en pénurie dit que sa dose est « la part de
   la semaine réservée à ses planches ». **60 corrigé le 9 novembre 2026**
   (D-093, F134 et F135), dans une PR qui suit celle de 61 : la fiche d'une
@@ -128,6 +128,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #27 (`cd49512`, la correction du motif de la dose en pénurie, point
+  ouvert 61, D-092, fusionnée le 12 novembre à 19 h 39 et déployée
+  à 19 h 54, run 43282133338, les quatre jobs réussis, aucune migration,
+  Workers inchangés). Avant elle : la
   PR #26 (`bc99d0b`, le lot 4, le parcours P32 « Planifier en pénurie », les
   tests du moteur de S21 et le protocole vide de la recette finale, D-091,
   fusionnée le 12 novembre à 19 h 06 et déployée à 19 h 22, run 43276463105,
