@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documents (Tranche 4 : la démo guidée inscrite aux registres)
+
+- **Le contrat de la démo guidée est inscrit** (`docs/demo-guided-contract.md`,
+  validé par le porteur le 8 novembre 2026, D-096) : sous-tranche 4.0,
+  ligne 25 de la roadmap, découpage D1 à D4 après la 3.9. Documents seuls,
+  aucun code ; D4 (Cloudflare) attend un accord exprès du porteur.
+
 ### Corrigé (3.9, correction 4 : la part du dernier jour)
 
 - **Le dimanche, une part sous la dose minimale est placée, comme un reste

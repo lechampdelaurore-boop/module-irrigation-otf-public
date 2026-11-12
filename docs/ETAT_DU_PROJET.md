@@ -34,6 +34,10 @@ registres, elle y renvoie.
   relancé le dimanche après 21 h ni entre minuit et 2 h 30 à la ferme ; le
   lundi, un échec de P12 sur la pluie mesurée se relance une fois. Jusqu'à
   la PR à part qui les en libérera.
+- Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
+  **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
+  12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
+  chantier de code à la fois ; D4 (Cloudflare) sur accord exprès du porteur.
 - 3.8, fonctionnalités à la carte : **close par le porteur le 8 novembre
   2026 à 20 h 21**, des modifications restant possibles plus tard, chacune
   par une PR (détail plus bas).
