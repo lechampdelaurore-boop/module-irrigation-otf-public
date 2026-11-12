@@ -2494,3 +2494,48 @@ chaque planche servie sans la redistribuer (D-077). Aucune migration.
 `tests/arbitration-crops.test.ts`, rouges avant le code (module
 introuvable), et P7, rouge avant le code aux deux largeurs (le titre de
 l'écran introuvable) ; les 1 315 tests et les 84 parcours passent.
+
+## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
+
+Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.
+Documents seuls, aucun code. Le porteur a validé le 8 novembre 2026 le
+contrat de la démo guidée (`docs/demo-guided-contract.md`, écrit le 7), qui
+ouvre la Tranche 4 (sous-tranche 4.0, ligne 25 de la roadmap).
+
+**Décisions.**
+
+- **Une ferme de démonstration séparée** du même code : Worker propre, base
+  D1 propre, aucun secret OTF ; accès sur invitation par courriel ; données
+  figées avec une date simulée par scénario ; espace propre par invité,
+  remise à zéro par bouton et chaque nuit (choix C1 à C12 du contrat,
+  tranchés par la recommandation).
+- **Trois fermes fictives et une ferme vierge** (profils A, B, C), uniquement
+  des espèces du catalogue Kc validé, **aucune nouvelle valeur agronomique** ;
+  quatre moments de saison par profil (gel de printemps, semaine normale
+  d'été, pénurie de pic d'été, fin de saison). Réponses du porteur du
+  8 novembre 2026 : 1 oui, 2 oui.
+- **Cinq couches de garde-fous** pour que la démo ne touche jamais une vraie
+  ferme : séparation physique, mode démo qui échoue fermé dans les deux sens,
+  pas de réseau sortant, données fictives comparées aux jeux de la ferme réelle,
+  isolation par espace.
+- **Hébergement** : un second Worker et une seconde base D1 sur le compte
+  Cloudflare du porteur, relevé du coût après un mois (réponse 3 du
+  8 novembre 2026). Le coût du contrôle d'accès par courriel reste non
+  confirmé, très probablement gratuit pour deux ou trois invités.
+- **Invités** : Nicolas (Tlaloc) et Vincent, le développeur d'Ouvre ta ferme,
+  pour l'instant ; aucune autre ferme avant leurs retours (réponse 4).
+- **Découpage** : D1 garde-fous, D2 fermes et saisons, D3 visite guidée, D4
+  remise à zéro et déploiement séparé ; une PR chacune, un seul chantier de
+  code à la fois.
+
+**Ordre et accords.** Le code vient **après la 3.9** (ordre de la
+roadmap, ligne 25, inchangé). Le « vas-y » de D1 à D3 est celui du code ; **D4
+touche Cloudflare et demande un accord exprès à part**, après vérification
+du coût d'Access dans le tableau de bord et alerte de facturation. Réglage du
+code : Opus 5.5 · Élevé (ligne 25), à relire dans le dépôt à jour au
+lancement ; Fable est interdit. Aucune connexion de ferme réelle, aucun
+jeton OTF, aucun appel OTF en démo.
+
+**Non établi** (section 13 du contrat) : le coût réel du second déploiement,
+un avis juridique sur les courriels d'invités et sur l'usage du nom d'OTF,
+la liste exacte des espèces des profils B et C.

@@ -29,6 +29,15 @@ registres, elle y renvoie.
   à F97, aucune migration). Puis les lots 3 à 7. Ni
   recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts`.
+- Parcours navigateur : certains dépendent de l'heure ou du jour, sur `main`
+  comme sur les branches (points ouverts 48 à 50). Ni PR ouverte ni contrôle
+  relancé le dimanche après 21 h ni entre minuit et 2 h 30 à la ferme ; le
+  lundi, un échec de P12 sur la pluie mesurée se relance une fois. Jusqu'à
+  la PR à part qui les en libérera.
+- Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
+  **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
+  12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
+  chantier de code à la fois ; D4 (Cloudflare) sur accord exprès du porteur.
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point

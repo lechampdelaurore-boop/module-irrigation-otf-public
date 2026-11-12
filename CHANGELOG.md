@@ -5,6 +5,12 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documents (Tranche 4 : la démo guidée inscrite aux registres)
+
+- **Le contrat de la démo guidée est inscrit** (`docs/demo-guided-contract.md`,
+  validé par le porteur le 8 novembre 2026, D-096) : sous-tranche 4.0,
+  ligne 25 de la roadmap, découpage D1 à D4 après la 3.9. Documents seuls,
+  aucun code ; D4 (Cloudflare) attend un accord exprès du porteur.
 ### Ajouté (3.9, 2 bis : l'écran d'arbitrage façon plan d'assolement)
 
 - **L'écran d'arbitrage se lit comme un plan d'assolement** (D-078,
