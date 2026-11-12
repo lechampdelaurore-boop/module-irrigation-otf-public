@@ -287,7 +287,11 @@ l'autre ; une planche à 0 % de part compte tout son besoin en manque d'eau,
 quels que soient ses autres motifs. La part est celle de la fin du calcul,
 après la redistribution de l'eau libérée (D-037) : l'eau qu'une planche ne
 peut pas recevoir et qu'une autre reçoit à sa place n'est pas un manque de
-plus.
+plus. Chaque part se chiffre sur la surface que le propre matériel de la
+planche mouille ; quand cette surface est inconnue, son manque n'a pas de
+volume : il n'entre dans aucun total, ni à zéro (D-003), et la planche
+compte à part sous chaque manque que ses motifs auraient grossi (point
+ouvert 64, D-098, 12 novembre 2026).
 
 Devant un manque, la **conduite en pénurie** est un réglage (R9) parmi trois,
 celles du cahier des charges (section 27) :
@@ -484,7 +488,12 @@ parts, libérées en fin de tour, vont aux planches que leur matériel peut
 encore servir (D-037), et sous un arbitrage, leurs allocations comptent
 parmi ce que les planches allouées ne peuvent pas recevoir. Renseigner le
 passe-pied dans Ouvre ta ferme rend la planche à son partage au calcul
-suivant.
+suivant. Son manque n'a pas de volume (point ouvert 64, D-098) : hors
+pénurie, le total que son motif aurait grossi — le temps de pompage
+manquant faute de plage, le manque d'eau sur une chaîne indisponible — se
+lit « au moins », ou « non chiffré » quand rien d'autre n'en chiffre ; en
+pénurie, il reste sous « volume inconnu en pénurie », une donnée qui
+manque, hors du manque d'eau et du temps de pompage.
 
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³
@@ -563,14 +572,24 @@ du moteur et n'écrit aucune règle métier : ce qu'elle calcule pour s'afficher
   écrit « non chiffré » quand aucune autre chaîne n'en chiffre, « au moins X
   m³ » sinon, et son sous-titre compte les chaînes à l'eau inconnue ; la ligne
   de résumé du téléphone de même. Sous un arbitrage, qui ne rend aucune ligne
-  de budget, la carte reste celle d'avant.
+  de budget, la carte reste celle d'avant. De même quand une planche en manque
+  a un volume inconnu, faute de surface mouillée connue (point ouvert 64,
+  D-098) : la carte du manque que son motif aurait grossi, « Manque d'eau »
+  ou « Temps de pompage manquant », écrit « au moins X m³ », ou « non
+  chiffré » quand rien d'autre n'en chiffre, son sous-titre compte ces
+  planches, et la carte reste signalée en rouge doux, le manque étant sûr et
+  son volume seul inconnu ; la ligne de résumé du téléphone et le pli des
+  changements d'un recalcul de même.
   Quand le manque d'eau diffère de « demandé moins placé », une note sous les
   cartes l'explique avec ses chiffres : le manque se compte planche par
   planche, sur la surface que son propre matériel mouille ; l'eau versée à
   côté des planches comptées, au-delà de leur besoin ou sur une surface plus
   large que celle de leur matériel est placée sans couvrir de besoin ; ce qui
   manque pour une autre raison que l'eau — temps de pompage, espacement, dose
-  minimale — n'entre pas dans le manque d'eau (D-038, point ouvert 36). Le
+  minimale — n'entre pas dans le manque d'eau (D-038, point ouvert 36). Elle
+  se tait quand un volume est inconnu — celui d'un créneau, de la demande
+  d'une planche ou de son manque (points ouverts 63 et 64) — : ses chiffres
+  se liraient exacts. Le
   budget par chaîne affiche la part réservée à chaque niveau de priorité, non
   le résultat (D-037).
 - **La semaine en jours** : les sept jours, chacun avec ses propositions dans
@@ -651,7 +670,7 @@ Rien ne s'écrit dans Ouvre ta ferme. L'écran n'arrose rien.
 | Planche arrosée par une rampe sous la part R13 | l'eau reçue est comptée dans les besoins et l'historique ; la planche ne commande ni la dose, ni « un arrosage par jour », ni l'espacement ; son reste est affiché « portée du matériel insuffisante » (D-025) |
 | Matériel sans pompe habituelle | créneau proposé « faisabilité non vérifiée », sans garantie de débit ni de stock, comme la 3.2 le permet |
 | Pompe habituelle archivée | aucun créneau, « origine d'eau ou pompe indisponible » : le matériel n'est pas « sans pompe » (point ouvert 52, D-088) |
-| Surface mouillée inconnue : aspersion sur une planche sans passe-pied renseigné | hors pénurie, créneau proposé « volume inconnu », compté à part ; la demande de sa chaîne se lit « au moins » ; en pénurie ou sous un arbitrage validé, ni part ni créneau : « volume inconnu en pénurie », pour elle et les autres planches de son matériel, jamais comptée zéro (point ouvert 63, D-097) |
+| Surface mouillée inconnue : aspersion sur une planche sans passe-pied renseigné | hors pénurie, créneau proposé « volume inconnu », compté à part ; la demande de sa chaîne se lit « au moins » ; en pénurie ou sous un arbitrage validé, ni part ni créneau : « volume inconnu en pénurie », pour elle et les autres planches de son matériel, jamais comptée zéro (point ouvert 63, D-097) ; hors pénurie, son manque, hors de tout total, fait lire « au moins » le total que son motif aurait grossi (point ouvert 64, D-098) |
 | Stock de la réserve inconnu | créneaux proposés « eau non vérifiée » ; le manque d'eau ne peut pas être chiffré et le dit : « non chiffré », ou « au moins X m³ » quand une autre chaîne en chiffre un (point ouvert 51, D-089) |
 | Pluie réelle absente sur des jours écoulés | règle D-019 : prévision du jour, sinon zéro, jours listés « partiel » |
 | Prévision météo absente ou ancienne | pluie prévue comptée zéro, calcul marqué « sans prévision » avec la date de la dernière |

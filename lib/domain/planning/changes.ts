@@ -55,6 +55,13 @@ export type PlanChanges = {
    */
   unknownWaterChainsBefore?: number;
   unknownWaterChainsAfter?: number;
+  /**
+   * Les planches en manque d'eau au volume inconnu du calcul précédent et du nouveau : leur manque n'est pas dans le
+   * total, et le pli l'écrit comme la carte, sans écart (point ouvert 64, D-098). Absentes quand il n'y en a pas, et
+   * d'une comparaison enregistrée avant.
+   */
+  unknownWaterBedsBefore?: number;
+  unknownWaterBedsAfter?: number;
 };
 
 const NEGLIGIBLE_MM = 0.01;

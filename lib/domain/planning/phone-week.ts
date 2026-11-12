@@ -1,7 +1,7 @@
 import type { StoredProposal, WeeklyPlan } from './contract.ts';
 import type { PlanDay, PlanSummary } from './presentation.ts';
 import { FARM_TIME_ZONE, dateKeyInTimeZone } from '../water-management.ts';
-import { waterDeficitValue } from './water-deficit-summary.ts';
+import { hasPumpTimeDeficit, pumpTimeDeficitValue, uncountedWaterCount, waterDeficitValue } from './water-deficit-summary.ts';
 
 /**
  * Le planning de la semaine au téléphone (audit ergonomique, point 2, 3.8
@@ -87,7 +87,7 @@ export function unplacedFoldLabel(unplacedCount: number): string {
 export function planSummaryLine(
   summary: Pick<PlanSummary, 'volumeCubicMeters' | 'unverifiedCount'>,
   actions: readonly string[],
-  deficit: Pick<WeeklyPlan['deficit'], 'waterCubicMeters' | 'pumpTimeCubicMeters'>,
+  deficit: Pick<WeeklyPlan['deficit'], 'waterCubicMeters' | 'pumpTimeCubicMeters' | 'unknownVolumeBeds'>,
   unplacedCount: number,
   formatVolume: (cubicMeters: number) => string,
   /** Les chaînes servies à l'eau inconnue : le manque d'eau n'y est pas chiffré, et la ligne le dit (point ouvert 51, D-089). */
@@ -95,8 +95,10 @@ export function planSummaryLine(
 ): string {
   // Les gestes d'abord, comme les cartes de tête (audit ergonomique, lot 3, point 5) : à valider, faites, en retard.
   const parts = [...actions, formatVolume(summary.volumeCubicMeters)];
-  if (deficit.waterCubicMeters > 0 || unknownWaterChains > 0) parts.push(`manque d’eau ${waterDeficitValue(deficit.waterCubicMeters, unknownWaterChains, formatVolume)}`);
-  if (deficit.pumpTimeCubicMeters > 0) parts.push(`pompage manquant ${formatVolume(deficit.pumpTimeCubicMeters)}`);
+  // Une planche en manque au volume inconnu : le total se lit « au moins », comme les cartes (point ouvert 64, D-098).
+  const uncountedWater = uncountedWaterCount(deficit, unknownWaterChains);
+  if (deficit.waterCubicMeters > 0 || uncountedWater > 0) parts.push(`manque d’eau ${waterDeficitValue(deficit.waterCubicMeters, uncountedWater, formatVolume)}`);
+  if (hasPumpTimeDeficit(deficit)) parts.push(`pompage manquant ${pumpTimeDeficitValue(deficit, formatVolume)}`);
   if (unplacedCount > 0) parts.push(plural(unplacedCount, 'planche non servie', 'planches non servies'));
   if (summary.unverifiedCount > 0) parts.push(`${summary.unverifiedCount} non vérifié${summary.unverifiedCount > 1 ? 's' : ''}`);
   return parts.join(' · ');

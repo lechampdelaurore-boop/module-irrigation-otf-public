@@ -218,6 +218,13 @@ type PlanDeficit = {
   pumpTimeCubicMeters: number;
   byReason: Partial<Record<UnplacedReason, number>>;
   bedCount: number;
+  /**
+   * Les planches en manque dont la surface mouillée par leur propre matériel est inconnue : leur manque n'a pas de
+   * volume et n'entre dans aucun total. Chacune compte sous le total que son manque aurait grossi, le manque d'eau ou
+   * le temps de pompage, qui se lit alors « au moins », ou « non chiffré » à zéro (point ouvert 64, D-098). Absent quand
+   * il n'y en a pas, comme dans un calcul enregistré avant.
+   */
+  unknownVolumeBeds?: { water: number; pumpTime: number };
 };
 
 /**
