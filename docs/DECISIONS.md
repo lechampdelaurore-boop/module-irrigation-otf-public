@@ -2738,6 +2738,64 @@ lieu de 6,72 ; 17,68 au lieu de 18,23), et un test du service
 service porte l'origine de sa chaîne, et au recalcul l'autre planche de
 la même réserve garde ses 10 mm (6,67 avant). Les 1 335 tests passent.
 
+**En ligne** : #20 du dépôt public fusionnée le 12 novembre 2026 à 15 h 59
+(`8e3cca4`) et déployée à 16 h 14 (run 43242971980, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-087 — Le manque d'une planche partagé entre la coupe de sa part et son placement (point ouvert 56) : trois précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Troisième correction
+des défauts relevés au lot 3 (D-084). Codée en Opus 5.5 · Max sur le dépôt
+public, le contrat du planning précisé d'abord (`docs/planning-contract.md`,
+« Pénurie », le partage du manque), le test rouge avant le code.
+
+**Le défaut corrigé.** Le résumé comptait tout le manque d'une planche sous
+le premier de ses motifs dans l'ordre alphabétique (`summarizeDeficit`) :
+une planche coupée à la fois par sa part et par le temps de pompage, ou
+par l'espacement, voyait son manque entier compté en temps de pompage, ou
+hors des deux tuiles. Sur la ferme de test, dimanche 21 h, la plage des
+asperseurs réduite à 21 h – 21 h 30, les tunnels prioritaires, les blocs
+bas, la réserve à 4,48 m³ et le forage arrêté : 12,07 m³ demandés,
+4,01 m³ placés, et le résumé disait « Manque d'eau 0 m³ » et « Temps de
+pompage manquant 6,25 m³ », dont les 5,61 m³ du bloc 2, que sa part à 0 %
+prive de tout. Le contrat (S6) veut deux manques distincts, ni l'un dans
+l'autre.
+
+**Trois précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation et consignées au contrat du planning :
+
+- F113 : le manque d'une planche se partage entre ses motifs. Ce que la
+  conduite en pénurie ou l'arbitrage lui retire — son besoin moins sa part
+  — compte sous le motif de la coupe (« stock et ressources », « limite
+  journalière », « report »), en manque d'eau ; le reste — sa part moins
+  l'eau placée — sous le premier de ses autres motifs dans l'ordre où le
+  résumé les lisait déjà, ou sous la coupe quand aucun autre ne l'explique.
+  Une planche sans coupe garde son manque entier sous son premier motif,
+  comme avant.
+- F114 : la part est celle de la fin du calcul, après la redistribution de
+  l'eau libérée (D-037) : l'eau qu'une planche ne peut pas recevoir et
+  qu'une autre reçoit à sa place n'est pas un manque de plus. Une planche
+  servie en entier par la conduite mais que la pompe n'a pas pu servir, et
+  dont la part est allée à une autre, compte son manque en temps de
+  pompage : sur S6, le tunnel 1 (0,64 m³), dont le bloc 1 a reçu la part.
+- F115 : la note du manque d'eau (D-038) garde sa formule ; ce qu'elle
+  impute à « une autre raison que l'eau » n'est plus que ce que le
+  placement n'a pas pu servir. Le résumé se calcule hors du moteur, dans
+  `lib/domain/planning/deficit.ts`, pour que le moteur reste sous les 600
+  lignes.
+
+**Ce qui ne change pas.** Le placement, les parts, les motifs de chaque
+planche et leur liste à l'écran, le calcul enregistré : aucune migration ;
+un calcul ancien garde le résumé qu'il avait.
+
+**Vérifié par** le test S6 entier (`tests/planning-shortage-scenarios.test.ts`),
+rouge sur le moteur d'avant (6,25 m³ de temps de pompage pour 0,64) : sur
+le même cas, 6,95 m³ de manque d'eau, 0,64 m³ de temps de pompage,
+0,47 m³ d'espacement (le bloc 1), chaque mètre cube sous un seul motif,
+leur somme valant demandé moins placé ; la note dit « 1,113 m³ qui
+manquent pour une autre raison que l'eau ». Les 1 336 tests passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

@@ -6,6 +6,7 @@ import { addDaysToDateKey, dateKeyInTimeZone, localDateStartUtc } from '../water
 import type { DoseReason, PlanBedApplication, PlanBedOutcome, PlanProposal, PlanningInputs, TimingReason, UnplacedReason, WeeklyPlan } from './contract.ts';
 import { buildPlanningBeds, buildPlanningEquipment, compareBedsForService, PRIORITY_RANK, type PlanningEquipment } from './demand.ts';
 import { buildSupplyChains } from './chains.ts';
+import { summarizeDeficit } from './deficit.ts';
 import { describeLimitingConstraint, type PumpConstraint } from './justification.ts';
 import { boundingProtectedNames, endsBeforeProtected, protectedIntervalsBetween, protectedNamesWithin, startsAfterProtected, withoutProtectedIntervals, type ProtectedInterval } from './protected-slots.ts';
 import { refusedIntervalsByEquipment, withoutRefusedIntervals, type RefusedInterval } from './refusals.ts';
@@ -654,24 +655,4 @@ function commitProposal(
       hydraulicallyVerified: chain.pumpTimeline !== null && flow !== null && chain.origin !== null && (chain.reservoir ? chain.reservoir.known : chain.resource !== null),
     },
   });
-}
-
-function summarizeDeficit(outcomes: readonly PlanBedOutcome[], beds: readonly BedState[], equipmentById: ReadonlyMap<string, PlanningEquipment>): WeeklyPlan['deficit'] {
-  const byReason: Partial<Record<UnplacedReason, number>> = {};
-  let water = 0;
-  let pumpTime = 0;
-  let bedCount = 0;
-  const waterReasons = new Set<UnplacedReason>(['water-budget', 'deferred', 'reserve-timing', 'supply-unavailable', 'daily-limit', 'withdrawal-limit']);
-  for (const outcome of outcomes) {
-    if (outcome.deficitMm <= EPSILON) continue;
-    bedCount += 1;
-    const state = beds.find((bed) => bed.bedId === outcome.bedId);
-    const wetted = state?.equipmentId ? equipmentById.get(state.equipmentId)?.coveredBeds.find((covered) => covered.bedId === outcome.bedId)?.wettedAreaSquareMeters ?? null : null;
-    const cubicMeters = wetted === null ? 0 : cubicMetersFromMillimeters(outcome.deficitMm, wetted);
-    const reason = outcome.reasons[0] ?? 'pump-time';
-    byReason[reason] = (byReason[reason] ?? 0) + cubicMeters;
-    if (waterReasons.has(reason)) water += cubicMeters;
-    else if (reason === 'pump-time' || reason === 'no-time-left') pumpTime += cubicMeters;
-  }
-  return { waterCubicMeters: water, pumpTimeCubicMeters: pumpTime, byReason, bedCount };
 }

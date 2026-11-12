@@ -268,8 +268,12 @@ l'état au 30 octobre 2026.
    motifs dans l'ordre alphabétique ; sur la ferme de test, dimanche soir,
    4,48 m³ pour 12,07 m³ demandés se lisent « Manque d'eau 0 m³ » et
    « Temps de pompage manquant 6,25 m³ » (point ouvert 56) ; « pompe
-   saturée » existant pour la pompe seule. État : ❌ défaut, corrigé à
-   part, son test rouge d'abord.
+   saturée » existant pour la pompe seule. Corrigé le 9 novembre 2026
+   (D-087) : le manque d'une planche se partage entre la coupe de sa part,
+   en manque d'eau, et son placement ; sur le même cas, 6,95 m³ de manque
+   d'eau, 0,64 m³ de temps de pompage, 0,47 m³ d'espacement
+   (`tests/planning-shortage-scenarios.test.ts`). État : 🟡 test ✅,
+   recette finale ⬜.
 7. **S7 — Stock inconnu.** Réserve sans jauge. Attendu : créneaux proposés
    « eau non vérifiée », aucun budget sur cette chaîne, le résumé dit que le
    manque d'eau ne peut pas être chiffré ; jamais un zéro (D-003) ; la note se
@@ -869,7 +873,7 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
    S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
    dans sa PR `fix/`, son test rouge d'abord (58, 54 et 55 le 9 novembre
-   2026, D-085 ; 57 le même jour, D-086) — S6 et S20 y portent leur
+   2026, D-085 ; 57 et 56 le même jour, D-086 et D-087) — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée
    ou validée peut puiser dans la réserve (`fromReserve`), une seconde
