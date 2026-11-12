@@ -135,6 +135,7 @@ const GROUP_TITLES: Record<UnplacedGroupKey, string> = {
   'withdrawal-limit': 'Limite de prélèvement atteinte',
   'reserve-timing': 'Réserve au minimum',
   'volume-unknown-under-limit': 'Volume inconnu sous une limite journalière',
+  'volume-unknown-under-budget': 'Volume inconnu en pénurie',
   'supply-unavailable': 'Eau ou pompe indisponible',
   'no-time-left': 'Plus de plage horaire',
   'insufficient-reach': 'Réglage plus large que la planche',

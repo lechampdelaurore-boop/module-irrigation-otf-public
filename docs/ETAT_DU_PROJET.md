@@ -26,7 +26,9 @@ registres, elle y renvoie.
   précisions F84 à F87, aucune migration). Ensuite l'écran d'arbitrage
   présenté comme un plan d'assolement (2 bis, D-078) : maquette validée par
   le porteur le 9 novembre 2026 à 11 h 40, **en ligne** (#17, D-083,
-  précisions F92 à F97, aucune migration). Puis les lots 3 à 7. Ni
+  précisions F92 à F97, aucune migration), relu en ligne et jugé correct
+  par le porteur le 12 novembre 2026 à 21 h 25 (« L'écran d'arbitrage dans
+  faisabilité me paraît correct. »). Puis les lots 3 à 7. Ni
   recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts` et
   `tests/planning-shortage-scenarios.test.ts` (F98).
@@ -95,8 +97,9 @@ registres, elle y renvoie.
   la semaine réservée à ses planches ». **60 corrigé, en ligne**
   (#28 ; le 9 novembre 2026, D-093, F134 et F135), après 61 : la fiche d'une
   pompe voit une réserve créée sans recharger la page.
-- 3.9, lot 5, la revue de sécurité : **faite le 9 novembre 2026** (D-095,
-  précisions F139 à F142), sans changer aucun comportement, dans une PR qui
+- 3.9, lot 5, la revue de sécurité : **faite, en ligne** (#29 ; le
+  9 novembre 2026, D-095, précisions F139 à F142), sans changer aucun
+  comportement, dans une PR qui
   suit celle de 60. Les sept points de la section D de
   `docs/recette-tranche-3.md` portent leur constat et leur verdict :
   **aucun défaut**. Trois tests d'isolation à deux fermes écrits, là où il
@@ -105,6 +108,16 @@ registres, elle y renvoie.
   paquet de production. `pnpm audit` : une alerte modérée, minimatch, par
   l'outil de lint, le lot à part déjà décidé. Reste la configuration
   Access, lue avec le porteur à la recette (lot 6).
+- 3.9, la surface mouillée inconnue en pénurie : **corrigée le
+  12 novembre 2026** (point ouvert 63, D-097, précisions F143 à F146),
+  relevée le jour même en comparant les deux moteurs, avant la recette
+  finale. Une planche dont le passe-pied n'est pas renseigné, sous une
+  aspersion, comptait 0 m³ dans le partage de l'eau, et sa rampe partait
+  au volume inconnu, hors du budget ; elle reste maintenant hors du
+  partage, et en pénurie ou sous un arbitrage, aucun créneau au volume
+  inconnu n'est proposé. Un défaut voisin relevé en chemin, le **point
+  ouvert 64** : le manque d'une telle planche compte 0 m³ dans les totaux
+  du plan ; à corriger dans sa PR `fix/`.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -138,6 +151,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #29 (`d6b797d`, le lot 5, la revue de sécurité de la 3.9, D-095,
+  fusionnée le 12 novembre à 20 h 45 et déployée à 20 h 58, run 43293482362,
+  les quatre jobs réussis, aucune migration, Workers inchangés). Avant
+  elle : la
   PR #28 (`53044ba`, la correction de la fiche d'une pompe qui voit une
   réserve créée sans recharger, point ouvert 60, D-093, fusionnée
   le 12 novembre à 20 h 09 et déployée à 20 h 26, run 43287314051, les
@@ -7814,6 +7831,40 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    lot 4, qui ne peut pas entrer vert sans elle (F99). Corrigé le
    9 novembre 2026 (D-094, F136 à F138), comme recommandé : P31c, rouge
    avant (39 px, 36 px et 3,1:1), passe.
+63. **Ouvert le 12 novembre 2026, en comparant le moteur du module à
+   celui de Tlaloc ; corrigé le jour même, avant la recette finale, comme
+   le porteur l'a voulu (D-097) ; fermeture au jugement du porteur.** Dans
+   `lib/domain/planning/shortage.ts`, le volume d'une planche dont la
+   surface mouillée par son propre matériel est inconnue — une aspersion
+   sur une planche sans passe-pied renseigné (D-022) — valait 0 m³ dans le
+   partage de l'eau : la demande de sa chaîne l'omettait, la conduite lui
+   donnait une part que rien ne comptait, le report ne la reportait
+   jamais, et son matériel partait au volume inconnu, hors des parts. Sur
+   la ferme des tests, la réserve de 5 m³ pour les quatre tunnels, le
+   passe-pied de T1-1 inconnu : sous le report, 7,04 m³ placés pour un
+   budget de 5 ; sous un arbitrage, les allocations du tunnel 1 dites
+   « non reçues » alors qu'elles l'étaient. Recommandation : la planche
+   hors de tout partage, jamais comptée zéro (D-003) ; en pénurie ou sous
+   un arbitrage, aucun créneau au volume inconnu, comme sous une limite
+   journalière (S5, cas e). Corrigé le 12 novembre 2026 (D-097, F143 à
+   F146), comme recommandé : cinq tests de
+   `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
+64. **Ouvert le 12 novembre 2026, en corrigeant le point 63 ; à corriger
+   dans sa PR `fix/` ; fermeture au jugement du porteur.** Le manque d'une
+   planche dont la surface mouillée par son propre matériel est inconnue
+   compte 0 m³ dans les totaux du plan (`lib/domain/planning/deficit.ts`).
+   Sur la ferme des tests, le dimanche à 21 h, la plage des asperseurs
+   réduite à vingt minutes, les huit planches du tunnel 1 restent à 20 mm
+   faute de plage : quand le passe-pied de T1-1 n'est pas renseigné, la
+   carte « Temps de pompage manquant » dit 2,24 m³, comme un total exact,
+   au lieu de « au moins 2,24 m³ » (2,56 m³ quand il l'est). Le même calcul
+   compte 0 m³ le manque d'eau d'une telle planche sur une chaîne
+   indisponible. Rien n'est mal placé : seul le total se lit comme exact.
+   Recommandation : le manque du plan compte à part les planches en manque
+   au volume inconnu, et les cartes « Manque d'eau » et « Temps de pompage
+   manquant » disent « au moins X m³ », ou « non chiffré », comme pour une
+   eau inconnue (D-089) ; une PR `fix/` à part, le contrat du planning
+   précisé et le test rouge d'abord.
 
 ## Procédure de reprise rapide
 

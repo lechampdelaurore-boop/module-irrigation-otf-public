@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : la surface mouillée inconnue en pénurie)
+
+- **Une planche dont le passe-pied n'est pas renseigné ne pèse plus zéro
+  en pénurie** (point ouvert 63, D-097). Sous une aspersion, sa surface
+  mouillée est inconnue : elle comptait 0 m³ dans le partage de l'eau, et
+  sa rampe partait au volume inconnu, hors du budget — sur la ferme des
+  tests, sous le report, 7,04 m³ placés pour 5. Elle reste maintenant hors
+  du partage : en pénurie ou sous un arbitrage validé, sa rampe n'est pas
+  proposée, ses planches portent « volume inconnu en pénurie », et leur
+  eau va aux autres ; la ligne de budget dit « au moins X m³ demandés ».
+  Hors pénurie, rien ne change. Aucune migration.
+
 ### Vérifié (3.9, lot 5 : la revue de sécurité)
 
 - **La revue de sécurité de la 3.9 est faite, sans défaut** (lot 5,
@@ -20,6 +32,7 @@ source détaillée commit par commit.
 - `pnpm audit` lu une fois : une alerte modérée, minimatch, par l'outil de
   lint, déjà prévue en lot à part. La configuration de Cloudflare Access se
   lira avec le porteur, à la recette.
+  En ligne le 12 novembre 2026 à 20 h 58 (#29 de ce dépôt).
 
 ### Corrigé (3.9 : la fiche d'une pompe et la réserve créée)
 

@@ -172,6 +172,11 @@ export type UnplacedReason =
   | 'withdrawal-limit'
   | 'reserve-timing'
   | 'volume-unknown-under-limit'
+  /**
+   * En pénurie ou sous un arbitrage validé, la planche — ou une autre planche de son matériel — n'a pas de surface
+   * mouillée connue : le volume du créneau est inconnu, et aucune part ne peut le compter (point ouvert 63, D-097).
+   */
+  | 'volume-unknown-under-budget'
   | 'supply-unavailable'
   | 'no-time-left'
   /** Arrosée sous la part R13 de son matériel, ou moins vite que sa planche de référence (D-025). */
@@ -349,7 +354,14 @@ export type SupplyBudget = {
    * elle ne borne pas la semaine : aucune limite, ou un jour de l'horizon sans limite (point ouvert 35).
    */
   dailyLimitRemainingCubicMeters: number | null;
+  /** La demande des planches dont la surface mouillée est connue ; celles au volume inconnu n'y sont jamais comptées zéro. */
   demandCubicMeters: number;
+  /**
+   * Les planches de la chaîne dont la surface mouillée par leur propre matériel est inconnue : leur volume n'est pas
+   * dans la demande, qui se lit alors « au moins » (point ouvert 63, D-097). Absent quand il n'y en a pas, comme dans
+   * un calcul enregistré avant.
+   */
+  unknownVolumeBedCount?: number;
   /** Part visée de chaque niveau de priorité, de 0 à 1 : la fraction de la conduite, celle des parts réservées au départ. */
   fractions: Record<IrrigationNeedPriority, number>;
   /**

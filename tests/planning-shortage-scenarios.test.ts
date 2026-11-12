@@ -4,7 +4,7 @@ import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts'
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { planSummaryLine } from '../lib/domain/planning/phone-week.ts';
-import { arbitrationNote, waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
+import { arbitrationNote, budgetDemandText, waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
 import { unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '../lib/domain/planning/water-deficit-summary.ts';
 import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { splitVolumeAcrossLocalDays } from '../lib/domain/water-management.ts';
@@ -579,4 +579,79 @@ test('S21, la semaine entière refusée au tunnel 1 : « créneau refusé » dan
   for (const bed of plan.beds.filter((item) => ['Tunnel 2', 'Tunnel 3', 'Tunnel 4'].includes(item.plotName))) close(bed.targetMm, released, 0.02, `${bed.bedName} : sa cible relevée`);
   for (const tunnel of [2, 3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), share, 0.01, `tunnel ${tunnel} : sa part placée, le supplément attend`);
   assert.ok(placedVolume(plan) <= 5 + 1e-6, 'sous le budget');
+});
+
+// ---------------------------------------------------------------------------
+// La surface mouillée inconnue en pénurie (point ouvert 63, D-097)
+// ---------------------------------------------------------------------------
+
+/** Le passe-pied de T1-1 non renseigné : sous la rampe du tunnel 1, sa surface mouillée est inconnue (D-022, D-003). */
+const UNKNOWN_ALLEY = 'T1-1';
+const withUnknownAlley = (inputs: PlanningInputs): PlanningInputs => ({
+  ...inputs,
+  beds: inputs.beds.map((bed) => (bed.id === UNKNOWN_ALLEY ? { ...bed, alleyWidth: null } : bed)),
+  needs: inputs.needs.map((need) => (need.bedId === UNKNOWN_ALLEY ? { ...need, wettedAreaSquareMeters: null, wettedAreaSource: 'unknown-alley', effectiveVolumeCubicMeters: null } : need)),
+});
+const cubicMetersText = (cubicMeters: number) => `${formatWaterVolumeForMessage(cubicMeters)} m³`;
+
+for (const strategy of ['priority-then-equal-share', 'equal-share', 'defer'] as const) {
+  test(`point ouvert 63, conduite « ${strategy} » : une planche au passe-pied inconnu reste hors du partage, jamais comptée zéro ; la rampe qui l’arrose n’est pas proposée, et les autres tunnels se partagent l’eau`, () => {
+    // La réserve de 5 m³ pour les quatre tunnels. T1-1 pesait 0 m³ : sa rampe partait au volume inconnu, hors des parts,
+    // et sous le report, jamais reportée, elle était reproposée à chaque tour, 60 mm pour 20 mm de besoin.
+    const inputs = withUnknownAlley(farm(TUNNELS_ONLY).inputs);
+    const used = { ...settings, shortageStrategy: strategy };
+    const plan = buildWeeklyPlan(inputs, used);
+    assertInvariants(plan, inputs, used);
+    const [budget] = plan.budgets;
+    close(budget.demandCubicMeters, 31 * cubicMetersFromMillimeters(20, 16), 1e-6, 'la demande des 31 planches à la surface connue');
+    assert.equal(budget.unknownVolumeBedCount, 1, 'T1-1 comptée à part');
+    assert.equal(budgetDemandText(budget, cubicMetersText), 'au moins 9,92 m³ demandés (1 planche au volume inconnu)');
+    const unknown = plan.beds.find((bed) => bed.bedId === UNKNOWN_ALLEY);
+    assert.ok(unknown, UNKNOWN_ALLEY);
+    assert.equal(unknown.targetMm, 0, `${UNKNOWN_ALLEY} : aucune part`);
+    assert.equal(unknown.placedMm, 0, `${UNKNOWN_ALLEY} : rien de placé`);
+    assert.deepEqual(slots(plan, (equipmentId) => equipmentId === 'rampe-tunnel-1'), [], 'aucun créneau sur la rampe du tunnel 1 : son volume serait inconnu');
+    for (const bed of plan.beds.filter((item) => item.plotName === 'Tunnel 1')) {
+      assert.ok(bed.reasons.includes('volume-unknown-under-budget'), `${bed.bedName} : ${bed.reasons.join(', ')}`);
+      assert.equal(bed.placedMm, 0, `${bed.bedName} : rien de placé`);
+    }
+    assert.ok(plan.proposals.every((proposal) => proposal.volumeCubicMeters !== null), 'aucun volume inconnu proposé en pénurie');
+    assert.ok(placedVolume(plan) <= 5 + 1e-6, `${placedVolume(plan)} m³ placés sous le budget de 5 m³`);
+    if (strategy === 'defer') return;
+    // Les parts des sept autres planches du tunnel 1, libérées en fin de tour, relèvent la cible des trois autres tunnels
+    // jusqu'à tout le budget, 13,02 mm ; le supplément sous la dose minimale attend, comme en S21 (D-037, D-081).
+    for (const bed of plan.beds.filter((item) => ['Tunnel 2', 'Tunnel 3', 'Tunnel 4'].includes(item.plotName))) {
+      close(bed.targetMm, millimetersFromCubicMeters(5, 3 * TUNNEL_SQUARE_METERS), 0.02, `${bed.bedName} : sa cible relevée`);
+    }
+  });
+}
+
+test('point ouvert 63, hors pénurie : la planche au passe-pied inconnu reste servie comme avant, son créneau « volume inconnu », et la ligne de budget dit « au moins »', () => {
+  const inputs = withUnknownAlley(farm({ ...TUNNELS_ONLY, reservoirCubicMeters: 30 }).inputs);
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  const [budget] = plan.budgets;
+  assert.deepEqual(budget.fractions, { high: 1, normal: 1, low: 1 }, 'pas de pénurie');
+  assert.equal(budget.unknownVolumeBedCount, 1, 'T1-1 comptée à part');
+  assert.equal(budgetDemandText(budget, cubicMetersText), 'au moins 9,92 m³ demandés (1 planche au volume inconnu)');
+  const tunnel1 = byEquipment(plan, 'rampe-tunnel-1');
+  assert.ok(tunnel1.length > 0 && tunnel1.every((proposal) => proposal.volumeCubicMeters === null), 'la rampe du tunnel 1 proposée, au volume inconnu');
+  for (const bed of plan.beds.filter((item) => item.plotName === 'Tunnel 1')) close(bed.placedMm, 20, 0.01, `${bed.bedName} : servie en entier`);
+  assert.equal(budgetDemandText({ demandCubicMeters: 9.92 }, cubicMetersText), '9,92 m³ demandés', 'sans planche au volume inconnu, la ligne d’avant');
+});
+
+test('point ouvert 63, sous un arbitrage validé : la rampe qui arrose une planche au passe-pied inconnu n’est pas proposée, et les allocations de ses autres planches restent non reçues', () => {
+  // 9,76 mm alloués à chaque planche des tunnels à la surface connue, 4,84 m³ en tout : rien n'est réduit.
+  const { inputs: base } = farm(TUNNELS_ONLY);
+  const allocated = base.needs.filter(({ bedId }) => bedId.startsWith('T') && bedId !== UNKNOWN_ALLEY);
+  const inputs = withUnknownAlley({ ...base, arbitration: allocated.map(({ bedId }) => ({ bedId, allocatedCubicMeters: cubicMetersFromMillimeters(9.76, 16) })) });
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assert.deepEqual(slots(plan, (equipmentId) => equipmentId === 'rampe-tunnel-1'), [], 'aucun créneau sur la rampe du tunnel 1');
+  assert.ok(plan.proposals.every((proposal) => proposal.volumeCubicMeters !== null), 'aucun volume inconnu proposé sous l’arbitrage');
+  for (const bed of plan.beds.filter((item) => item.plotName === 'Tunnel 1')) assert.ok(bed.reasons.includes('volume-unknown-under-budget'), `${bed.bedName} : ${bed.reasons.join(', ')}`);
+  for (const tunnel of [2, 3, 4]) close(doseOf(plan, `rampe-tunnel-${tunnel}`), 9.76, 0.01, `tunnel ${tunnel} : son allocation`);
+  assert.ok(plan.arbitration, 'le plan porte l’arbitrage');
+  assert.equal(plan.arbitration.unreceivedBedCount, 7, 'les sept autres planches du tunnel 1 ne reçoivent pas leur allocation');
+  close(plan.arbitration.unreceivedCubicMeters, 7 * cubicMetersFromMillimeters(9.76, 16), 1e-3, 'leur allocation reste non attribuée');
 });

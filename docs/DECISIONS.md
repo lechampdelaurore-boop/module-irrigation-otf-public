@@ -3257,6 +3257,10 @@ aucun écran, aucun outil de la CI.
 **Vérifié par** les cinq tests nouveaux, rouges filtre ou garde relâché,
 et les contrôles complets ; les 1 353 tests et les 88 parcours passent.
 
+**En ligne** : #29 du dépôt public fusionnée le 12 novembre 2026 à 20 h 45
+(`d6b797d`) et déployée à 20 h 58 (run 43293482362, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.
@@ -3305,3 +3309,68 @@ la liste exacte des espèces des profils B et C.
 **En ligne** : #16 du dépôt public fusionnée le 12 novembre 2026 à 14 h 29
 (`77a2c0e`) et déployée à 14 h 42 (run 43227755893, les quatre jobs
 réussis ; aucune migration, Workers inchangés).
+
+## D-097 — La surface mouillée inconnue en pénurie (point ouvert 63) : quatre précisions tranchées par la recommandation
+
+Date : 12 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le défaut relevé le
+jour même en comparant le moteur du module à celui de Tlaloc (le chantier
+de la fusion des deux moteurs), inscrit et corrigé avant la recette
+finale, comme le porteur l'a voulu. Codée en Opus 5.5 · Max sur le dépôt
+public, le contrat du planning précisé d'abord (`docs/planning-contract.md`,
+« Pénurie », « La surface mouillée inconnue », et les cas limites), les
+tests rouges avant le code.
+
+**Le défaut corrigé.** Dans `lib/domain/planning/shortage.ts`, le volume
+d'une planche dont la surface mouillée par son propre matériel est
+inconnue — une aspersion sur une planche sans passe-pied renseigné dans
+Ouvre ta ferme (D-022) — valait 0 m³ dans le partage de l'eau : la demande
+de sa chaîne l'omettait, la conduite en pénurie lui donnait une part que
+rien ne comptait, le report ne la reportait jamais, et son matériel partait
+au volume inconnu, hors des parts, ce que seule la limite journalière
+arrêtait (S5, cas e). Sur la ferme des tests, la réserve de 5 m³ pour les
+quatre tunnels, le passe-pied de T1-1 inconnu : sous le report, la rampe du
+tunnel 1 recevait 20 mm, 2,56 m³ que rien ne comptait, soit 7,04 m³ placés
+pour un budget de 5 ; sous un arbitrage, T1-1, non allouée, recevait 20 mm,
+et les allocations des sept autres planches du tunnel se disaient « non
+reçues » alors qu'elles l'étaient. Une inconnue n'est jamais zéro (D-003).
+
+**Quatre précisions**, techniques, tranchées par la recommandation et
+consignées au contrat du planning :
+
+- F143 : le partage — la demande, la conduite, l'ordre du report, les parts
+  réservées et la part placée — ne compte que les planches dont la surface
+  mouillée par leur propre matériel est connue ; une autre n'y entre ni à
+  zéro ni autrement, et `volumeOf` arrête le calcul plutôt que de la
+  compter. La ligne de budget compte ces planches à part
+  (`unknownVolumeBedCount`, champ facultatif, absent quand il n'y en a pas
+  et d'un calcul enregistré avant), et l'écran écrit « au moins X m³
+  demandés (N planches au volume inconnu) ». Aucune migration.
+- F144 : la pénurie se juge sur la demande connue. Quand elle dépasse le
+  budget de la chaîne, la conduite s'applique, et une planche au volume
+  inconnu n'a pas de cible, sous le motif `volume-unknown-under-budget`,
+  posé avant la conduite. Hors pénurie, rien ne change : son matériel est
+  proposé « volume inconnu », compté à part dans le résumé ; sous une
+  limite journalière, la règle d'avant reste (S5, cas e).
+- F145 : sur une chaîne dont l'eau est partagée — en pénurie, ou sous un
+  arbitrage validé —, le moteur ne propose aucun créneau au volume inconnu ;
+  le registre des parts sait que l'eau de sa chaîne est partagée
+  (`shortage`). Le motif se juge avant la limite journalière, aucun jour
+  n'y changeant rien ; les autres planches du matériel le portent, et leurs
+  parts, libérées en fin de tour, vont aux planches que leur matériel peut
+  encore servir (D-037) ; sous un arbitrage, leurs allocations comptent
+  parmi ce que les planches allouées ne peuvent pas recevoir.
+- F146 : les mots. « Volume inconnu en pénurie » pour le groupe de « Non
+  placé » ; « volume inconnu en pénurie : le passe-pied d'une planche
+  arrosée n'est pas renseigné dans Ouvre ta ferme » pour la planche, qui
+  dit le geste qui la rend à son partage au calcul suivant.
+
+**Relevé en chemin, le point ouvert 64** : hors du partage, le manque
+d'une planche au volume inconnu compte 0 m³ dans les totaux du plan
+(`lib/domain/planning/deficit.ts`) ; à corriger dans sa PR `fix/`, le
+contrat précisé et le test rouge d'abord.
+
+**Vérifié par** cinq tests de `tests/planning-shortage-scenarios.test.ts`,
+rouges avant le code : les trois conduites, hors pénurie, et sous un
+arbitrage. Les 1 358 tests passent.
+

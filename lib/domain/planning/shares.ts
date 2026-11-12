@@ -42,6 +42,11 @@ export type SharePlacement = {
 export class ShareLedger {
   /** Le motif de la coupe de la chaîne : « stock et ressources » ou « limite journalière » (point ouvert 35). */
   readonly shortfallReason: UnplacedReason;
+  /**
+   * L'eau de la chaîne est partagée : la demande connue dépasse son budget et la conduite en pénurie s'applique, ou un
+   * arbitrage validé fixe les parts. Aucun créneau au volume inconnu n'y est alors proposé (point ouvert 63, D-097).
+   */
+  readonly shortage: boolean;
   private readonly entries = new Map<string, ShareEntry>();
   private unreservedCubicMeters: number;
   private readonly strategy: PlanningSettings['shortageStrategy'] | null;
@@ -58,8 +63,11 @@ export class ShareLedger {
     deferredFirst: ReadonlySet<string>;
     /** L'eau validée de la chaîne que chaque planche recevra encore, déjà placée dans sa part (point ouvert 57, D-086). */
     validatedMmOf?: (bed: BedState) => number;
+    /** Vrai en pénurie ou sous un arbitrage validé : l'eau est partagée (point ouvert 63, D-097). */
+    shortage: boolean;
   }) {
     this.shortfallReason = input.shortfallReason;
+    this.shortage = input.shortage;
     this.strategy = input.strategy;
     this.deferredFirst = input.deferredFirst;
     this.validatedMmOf = input.validatedMmOf ?? (() => 0);

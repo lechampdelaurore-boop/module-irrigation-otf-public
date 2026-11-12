@@ -143,6 +143,7 @@ const UNPLACED_REASON_LABELS: Record<UnplacedReason, string> = {
   'withdrawal-limit': 'limite de prélèvement de la ressource atteinte',
   'reserve-timing': 'réserve au minimum de sécurité au moment voulu',
   'volume-unknown-under-limit': 'volume inconnu sous une limite journalière',
+  'volume-unknown-under-budget': 'volume inconnu en pénurie : le passe-pied d’une planche arrosée n’est pas renseigné dans Ouvre ta ferme',
   'supply-unavailable': 'origine d’eau ou pompe indisponible',
   'no-time-left': 'plus de plage horaire d’ici dimanche',
   'insufficient-reach': 'réglage plus large que la planche : elle reçoit moins que la planche de référence du réglage',
@@ -337,6 +338,18 @@ export function budgetLevelsText(budget: SupplyBudget): string {
   return PRIORITY_LEVELS.map((level) => (demand[level] > 0
     ? `${label(level)} ${percent(budget.fractions[level])} visés, ${percent(placed[level] / demand[level])} placés`
     : `${label(level)} —`)).join(' · ');
+}
+
+/**
+ * La demande d'une ligne de budget : « 12,39 m³ demandés », ou « au moins
+ * 12,39 m³ demandés (1 planche au volume inconnu) » quand des planches de la
+ * chaîne n'ont pas de surface mouillée connue : leur volume n'est pas dans la
+ * demande, jamais compté zéro (point ouvert 63, D-097).
+ */
+export function budgetDemandText(budget: Pick<SupplyBudget, 'demandCubicMeters' | 'unknownVolumeBedCount'>, formatVolume: (cubicMeters: number) => string): string {
+  const unknown = budget.unknownVolumeBedCount ?? 0;
+  if (unknown <= 0) return `${formatVolume(budget.demandCubicMeters)} demandés`;
+  return `au moins ${formatVolume(budget.demandCubicMeters)} demandés (${unknown} planche${unknown > 1 ? 's' : ''} au volume inconnu)`;
 }
 
 // ---------------------------------------------------------------------------

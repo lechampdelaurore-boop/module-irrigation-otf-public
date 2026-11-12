@@ -253,8 +253,13 @@ l'état au 30 octobre 2026.
    laisse 22,10 m³ le jeudi (point ouvert 58). Corrigé le 9 novembre 2026
    (D-085) : le créneau se juge jour par jour depuis son début et part à
    minuit quand son premier jour est plein ; aucun jour ne passe plus sa
-   limite (`tests/planning-daily-limits.test.ts`). État : 🟡, (a) ✅
-   test, (d) et (e) à vérifier.
+   limite (`tests/planning-daily-limits.test.ts`). La même règle vaut,
+   depuis le 12 novembre 2026, pour le budget de la semaine : en pénurie
+   ou sous un arbitrage validé, aucun créneau au volume inconnu n'est
+   proposé, motif « volume inconnu en pénurie » ; la planche au passe-pied
+   inconnu n'entre dans aucun partage, jamais comptée zéro (point ouvert
+   63, D-097, `tests/planning-shortage-scenarios.test.ts`). État : 🟡, (a)
+   ✅ test, (d) et (e) à vérifier.
 6. **S6 — Temps de pompage et eau à la fois.** Les quatre rampes de serre
    (10,24 m³/h pour une pompe à 8) sur une plage d'aspersion réduite à
    21 h – 0 h, et une réserve à 5 m³. Attendu : deux manques distincts, chacun
@@ -940,7 +945,10 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    9 novembre 2026 (D-095), sans défaut : trois tests d'isolation à deux
    fermes et une garde du compte de démonstration écrits, chaque point
    consigné dans la section D du protocole ; la configuration Access se lit
-   avec le porteur, à la recette.
+   avec le porteur, à la recette. Le 12 novembre 2026, un défaut relevé en
+   comparant les deux moteurs, le point ouvert 63, la surface mouillée
+   inconnue en pénurie, corrigé avant la recette dans sa PR `fix/`, son
+   test rouge d'abord (D-097) ; un voisin relevé en chemin, le point 64.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte
    rendu dans `docs/recette-tranche-3.md`.
 7. **La PR de clôture** : registres, journal des changements, version ; puis
