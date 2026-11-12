@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : le pli des changements sur une eau inconnue)
+
+- **Le pli « Ce qui a changé » ne lit plus de baisse du manque d'eau que
+  rien ne prouve** (point ouvert 59, D-090). Quand l'eau d'une chaîne
+  servie est inconnue dans l'un des deux calculs, il écrit « Manque
+  d'eau : de 3,00 m³ à non chiffré » au lieu de « de 3,00 à 0,00 m³
+  (−3,00 m³) ». Aucune migration.
+
 ### Corrigé (3.9 : le manque d'eau non chiffré)
 
 - **Le manque d'eau n'affiche plus un zéro qu'aucun stock ne prouve**
@@ -14,6 +22,7 @@ source détaillée commit par commit.
   X m³ » quand une autre chaîne en chiffre un, et compte les chaînes à
   l'eau inconnue ; la ligne de résumé du téléphone de même. Avant, elle
   écrivait « 0,00 m³ ». Aucune migration.
+  En ligne le 12 novembre 2026 à 17 h 45 (#23 de ce dépôt).
 
 ### Corrigé (3.9 : l'origine indisponible)
 

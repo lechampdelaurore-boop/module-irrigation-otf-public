@@ -21,7 +21,6 @@ import {
   type SupplyBudget,
   type TimingReason,
   type UnplacedReason,
-  type WeeklyPlan,
 } from './contract.ts';
 import { validatePlanningSettings, type PlanningSettings, type PlanningSettingsIssue, type TimeWindow } from './settings.ts';
 
@@ -238,22 +237,6 @@ export function doseReasonLabel(reason: DoseReason): string {
 
 export function timingReasonLabel(reason: TimingReason): string {
   return TIMING_REASON_LABELS[reason];
-}
-
-const WATER_DEFICIT_DETAIL = 'Ce que le stock et les ressources ne couvrent pas';
-/** Un manque sous un millième de litre est un résidu d'arrondi, pas une part à nommer. */
-const NEGLIGIBLE_CUBIC_METERS = 1e-6;
-
-/**
- * Le sous-titre du manque d'eau du résumé : nomme la limite journalière
- * quand c'est elle qui coupe, en tout ou en partie (docs/planning-contract.md,
- * « Pénurie », point ouvert 35, corrigé le 9 octobre 2026).
- */
-export function waterDeficitDetail(deficit: Pick<WeeklyPlan['deficit'], 'waterCubicMeters' | 'byReason'>): string {
-  const byLimit = deficit.byReason['daily-limit'] ?? 0;
-  if (byLimit <= NEGLIGIBLE_CUBIC_METERS) return WATER_DEFICIT_DETAIL;
-  if (byLimit >= deficit.waterCubicMeters - NEGLIGIBLE_CUBIC_METERS) return 'Ce que la limite journalière ne laisse pas placer';
-  return `${WATER_DEFICIT_DETAIL}, dont ${formatWaterVolumeForMessage(byLimit)} m³ par la limite journalière`;
 }
 
 /** Un écart sous un litre est un arrondi, pas une note à écrire. */

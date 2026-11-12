@@ -1478,7 +1478,14 @@ Dans la section « Planning de la semaine », sans réorganisation
   « Proposition apparue / retirée / déplacée », « Dose changée », « Suggestion
   nouvelle : annuler … » ou « réduire à X mm … », « Entrée dans « Non
   placé » : planche (jardin), manque X mm », « Sortie de « Non placé » »,
-  « Manque d'eau : de A à B m³ » quand l'écart atteint cinq litres. Une
+  « Manque d'eau : de A à B m³ » quand l'écart atteint cinq litres. Quand
+  l'eau d'une chaîne servie est inconnue dans l'un des deux calculs, le
+  manque de ce calcul s'écrit comme sa carte, « non chiffré » ou « au moins
+  X m³ », sans écart chiffré — « Manque d'eau : de 3,00 m³ à non chiffré »,
+  « d'au moins 2,00 m³ à 3,00 m³ » —, et la ligne ne paraît que si les deux
+  s'écrivent autrement : une baisse ou une hausse que rien ne prouve ne se
+  lit plus (D-003, point ouvert 59, D-090). Un calcul enregistré avant ne
+  retient pas ses chaînes à l'eau inconnue : il se lit comme avant. Une
   lecture : rien n'y est modifiable.
 - **Les suggestions sur les arrosages validés** (`.planning-suggestions`),
   après les budgets : chacune avec « Annuler » ou « Réduire à X mm », le

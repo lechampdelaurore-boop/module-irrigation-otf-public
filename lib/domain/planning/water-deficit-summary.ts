@@ -1,5 +1,5 @@
+import { formatWaterVolumeForMessage } from '../irrigation-format.ts';
 import type { SupplyBudget, WeeklyPlan } from './contract.ts';
-import { waterDeficitDetail } from './presentation.ts';
 
 /**
  * Le manque d'eau du résumé quand l'eau d'une chaîne servie est inconnue
@@ -7,10 +7,26 @@ import { waterDeficitDetail } from './presentation.ts';
  * 51, D-089) : sur une chaîne sans eau mobilisable connue — une réserve sans
  * stock observé, un matériel sans pompe ou sans origine —, le manque ne peut
  * pas être chiffré, et le résumé le dit au lieu d'un zéro que rien ne prouve
- * (D-003). Sous un arbitrage, aucune ligne de budget : rien ne change.
+ * (D-003). Sous un arbitrage, aucune ligne de budget : rien ne change. Le
+ * pli des changements d'un recalcul l'écrit de même (point ouvert 59, D-090).
  */
 
 const EPSILON = 1e-9;
+const WATER_DEFICIT_DETAIL = 'Ce que le stock et les ressources ne couvrent pas';
+/** Un manque sous un millième de litre est un résidu d'arrondi, pas une part à nommer. */
+const NEGLIGIBLE_CUBIC_METERS = 1e-6;
+
+/**
+ * Le sous-titre du manque d'eau du résumé : nomme la limite journalière
+ * quand c'est elle qui coupe, en tout ou en partie (docs/planning-contract.md,
+ * « Pénurie », point ouvert 35, corrigé le 9 octobre 2026).
+ */
+export function waterDeficitDetail(deficit: Pick<WeeklyPlan['deficit'], 'waterCubicMeters' | 'byReason'>): string {
+  const byLimit = deficit.byReason['daily-limit'] ?? 0;
+  if (byLimit <= NEGLIGIBLE_CUBIC_METERS) return WATER_DEFICIT_DETAIL;
+  if (byLimit >= deficit.waterCubicMeters - NEGLIGIBLE_CUBIC_METERS) return 'Ce que la limite journalière ne laisse pas placer';
+  return `${WATER_DEFICIT_DETAIL}, dont ${formatWaterVolumeForMessage(byLimit)} m³ par la limite journalière`;
+}
 
 /** Les chaînes servies dont l'eau mobilisable est inconnue : une ligne de budget sans eau chiffrée, pour une demande. */
 export function unknownWaterChainCount(budgets: readonly SupplyBudget[]): number {

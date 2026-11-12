@@ -2923,6 +2923,49 @@ rouges avant le code : sur la réserve sans jauge, « non chiffré » et la
 ligne « manque d'eau non chiffré » ; la rampe du bloc 2 sur une source à
 0,5 m³ par jour, « au moins 5,608 m³ ». Les 1 340 tests passent.
 
+**En ligne** : #23 du dépôt public fusionnée le 12 novembre 2026 à 17 h 30
+(`ef20c5f`) et déployée à 17 h 45 (run 43259462933, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-090 — Le pli des changements d'un recalcul sur une eau inconnue (point ouvert 59) : deux précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le défaut relevé en
+corrigeant le point 51 (D-089), corrigé à part. Codée en Opus 5.5 · Max
+sur le dépôt public, le contrat du planning précisé d'abord
+(`docs/planning-contract.md`, « L'écran du suivi », le pli « Ce qui a
+changé »), les tests rouges avant le code.
+
+**Le défaut corrigé.** Le pli des changements d'un recalcul (3.7)
+comparait le manque d'eau chiffré des deux calculs : quand l'eau d'une
+chaîne servie devenait inconnue entre les deux — un matériel qui perd sa
+pompe habituelle, une réserve sans stock observé —, son manque n'était
+plus chiffré, et le pli lisait « Manque d'eau : de 3,00 à 0,00 m³
+(−3,00 m³) », une baisse que rien ne prouve (D-003), alors que la carte
+dit « non chiffré » depuis D-089 ; l'inverse se lisait comme une hausse.
+
+**Deux précisions**, techniques, tranchées par la recommandation et
+consignées au contrat du planning :
+
+- F123 : la comparaison retient, pour le calcul précédent et le nouveau,
+  le nombre de leurs chaînes servies à l'eau inconnue, lu sur leurs lignes
+  de budget comme la carte (`unknownWaterChainsBefore`,
+  `unknownWaterChainsAfter`, deux champs facultatifs de `PlanChanges`,
+  absents quand toute l'eau est connue et d'une comparaison enregistrée
+  avant, qui se lit comme avant). Aucune migration.
+- F124 : quand l'un des deux en a, le pli écrit le manque de chaque côté
+  comme sa carte — « non chiffré » ou « au moins X m³ » —, sans écart
+  chiffré, et seulement si les deux s'écrivent autrement : « Manque
+  d'eau : de 3,00 m³ à non chiffré », « d'au moins 2,00 m³ à 3,00 m³ ».
+  Toute l'eau connue des deux côtés, la ligne reste celle d'avant, à cinq
+  litres près. Les règles d'écriture de la carte, son sous-titre compris,
+  vivent ensemble dans `lib/domain/planning/water-deficit-summary.ts`.
+
+**Vérifié par** les tests de la comparaison
+(`tests/planning-changes.test.ts`) et du pli
+(`tests/planning-follow-up.test.ts`), rouges avant le code : rien de
+retenu, et « de 3,00 à 0,00 m³ (−3,00 m³) ». Les 1 342 tests passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.
