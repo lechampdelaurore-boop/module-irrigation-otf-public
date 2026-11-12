@@ -2495,6 +2495,10 @@ chaque planche servie sans la redistribuer (D-077). Aucune migration.
 introuvable), et P7, rouge avant le code aux deux largeurs (le titre de
 l'écran introuvable) ; les 1 315 tests et les 84 parcours passent.
 
+**En ligne** : #17 du dépôt public fusionnée le 12 novembre 2026 à 14 h 02
+(`8d72b49`) et déployée à 14 h 13 (run 43223463035, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-084 — Les scénarios de pénurie en tests du moteur (lot 3 de la 3.9) : huit défauts relevés, cinq précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
@@ -2607,3 +2611,7 @@ jeton OTF, aucun appel OTF en démo.
 **Non établi** (section 13 du contrat) : le coût réel du second déploiement,
 un avis juridique sur les courriels d'invités et sur l'usage du nom d'OTF,
 la liste exacte des espèces des profils B et C.
+
+**En ligne** : #16 du dépôt public fusionnée le 12 novembre 2026 à 14 h 29
+(`77a2c0e`) et déployée à 14 h 42 (run 43227755893, les quatre jobs
+réussis ; aucune migration, Workers inchangés).

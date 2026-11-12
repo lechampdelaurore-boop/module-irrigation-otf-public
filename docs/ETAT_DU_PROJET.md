@@ -25,8 +25,8 @@ registres, elle y renvoie.
   **correction 4 en ligne** (#14), la part du dernier jour (décision 5, D-081,
   précisions F84 à F87, aucune migration). Ensuite l'écran d'arbitrage
   présenté comme un plan d'assolement (2 bis, D-078) : maquette validée par
-  le porteur le 9 novembre 2026 à 11 h 40, **codé** (D-083, précisions F92
-  à F97, aucune migration). Puis les lots 3 à 7. Ni
+  le porteur le 9 novembre 2026 à 11 h 40, **en ligne** (#17, D-083,
+  précisions F92 à F97, aucune migration). Puis les lots 3 à 7. Ni
   recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts` et
   `tests/planning-shortage-scenarios.test.ts` (F98).
@@ -72,6 +72,14 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #16 (`77a2c0e`, le contrat de la démo guidée inscrit aux registres,
+  Tranche 4, D-096, documents seuls, fusionnée le 12 novembre à 14 h 29 et
+  déployée à 14 h 42, run 43227755893, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
+  PR #17 (`8d72b49`, l'écran d'arbitrage façon plan d'assolement, 2 bis de
+  la 3.9, fusionnée le 12 novembre à 14 h 02 et déployée à 14 h 13,
+  run 43223463035, les quatre jobs réussis, aucune migration, Workers
+  inchangés). Avant elle : la
   PR #15 (`268adc9`, les parcours à l'heure de la ferme et la pluie du
   dernier jour choisi, points ouverts 49 et 50, fusionnée le 12 novembre
   à 13 h 31 et déployée à 13 h 44, run 43218749629, les quatre jobs réussis,

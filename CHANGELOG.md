@@ -32,6 +32,8 @@ source détaillée commit par commit.
   validé par le porteur le 8 novembre 2026, D-096) : sous-tranche 4.0,
   ligne 25 de la roadmap, découpage D1 à D4 après la 3.9. Documents seuls,
   aucun code ; D4 (Cloudflare) attend un accord exprès du porteur.
+  En ligne le 12 novembre 2026 à 14 h 42 (#16 de ce dépôt).
+
 ### Ajouté (3.9, 2 bis : l'écran d'arbitrage façon plan d'assolement)
 
 - **L'écran d'arbitrage se lit comme un plan d'assolement** (D-078,
@@ -45,6 +47,7 @@ source détaillée commit par commit.
   répartition ». Deux vues : « Planches à choisir » et « Toute la ferme ».
   Le calcul, la décision enregistrée et sa garde ne changent pas. Aucune
   migration.
+  En ligne le 12 novembre 2026 à 14 h 13 (#17 de ce dépôt).
 
 ### Corrigé (parcours navigateur à l'heure de la ferme ; pluie mesurée : le dernier jour choisi)
 
