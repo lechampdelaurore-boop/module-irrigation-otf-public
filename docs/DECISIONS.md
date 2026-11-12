@@ -2796,6 +2796,81 @@ le même cas, 6,95 m³ de manque d'eau, 0,64 m³ de temps de pompage,
 leur somme valant demandé moins placé ; la note dit « 1,113 m³ qui
 manquent pour une autre raison que l'eau ». Les 1 336 tests passent.
 
+**En ligne** : #21 du dépôt public fusionnée le 12 novembre 2026 à 16 h 31
+(`6ff25e1`) et déployée à 16 h 45 (run 43248783998, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-088 — L'origine indisponible n'entre dans aucun partage (points ouverts 52 et 53) : quatre précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Quatrième correction
+des défauts relevés au lot 3 (D-084). Codée en Opus 5.5 · Max sur le dépôt
+public, le contrat du planning précisé d'abord (`docs/planning-contract.md`,
+« Pénurie », « L'origine indisponible », la contrainte opposable et les cas
+limites), les tests rouges avant le code.
+
+**Les défauts corrigés.** Point 52 : un matériel dont la pompe habituelle
+est archivée prenait le chemin « sans pompe habituelle » ; sur la ferme de
+test, sa seule pompe archivée, les cinq matériels qu'elle sert restaient
+proposés « faisabilité non vérifiée », 12,71 m³ placés comme si elle
+servait encore, et une seconde chaîne dont la pompe est archivée faisait
+de même (la rampe du bloc 2, 4,21 m³). Point 53 : une ressource directe
+inactive, ou hors de sa période toute la semaine, valait zéro au budget,
+et la part prise avant le placement nommait la coupe : ses dix planches
+portaient « stock et ressources insuffisants d'ici dimanche », 5,61 m³
+comptés sous ce motif ; à l'inverse, la ligne de budget d'une réserve
+inactive annonçait « 97,01 m³ mobilisables » qu'aucun créneau ne pouvait
+prendre.
+
+**Quatre précisions**, techniques, sans règle agronomique nouvelle,
+tranchées par la recommandation et consignées au contrat du planning :
+
+- F116 : une chaîne est indisponible quand rien ne peut en venir d'ici
+  dimanche : sa réserve ou sa ressource inactive ou introuvable, sa
+  ressource hors de sa période de disponibilité chaque jour du calcul à
+  dimanche minuit, ou la pompe habituelle du matériel archivée. Une
+  ressource disponible un jour au moins garde le budget de ses jours
+  disponibles, comme avant (8 m³ du jeudi au dimanche sur la ferme de
+  test). La règle du jour est écrite une fois (`isResourceAvailableOn`,
+  `lib/domain/water-resources.ts`), pour le potentiel du jour comme pour la
+  semaine.
+- F117 : les matériels dont la pompe habituelle est archivée forment, pompe
+  par pompe, une chaîne à part, nommée « <nom de la pompe> (pompe
+  archivée) » (« pompe habituelle introuvable » si elle manque) : ils ne
+  puisent pas dans l'origine de cette pompe, que d'autres pompes peuvent
+  servir. Un matériel sans pompe habituelle reste proposé « faisabilité non
+  vérifiée ».
+- F118 : les planches d'une chaîne indisponible portent « origine d'eau ou
+  pompe indisponible » avant la conduite, leur cible à zéro, tout leur
+  besoin compté en manque d'eau sous ce motif ; la chaîne n'entre ni dans
+  la conduite, ni dans un registre des parts, ni dans la redistribution.
+  Sa ligne de budget a zéro d'eau mobilisable, le drapeau `unavailable`
+  (absent sur les autres lignes et d'un calcul enregistré avant) et une
+  part visée nulle pour chaque niveau qui a une demande ; l'écran y dit
+  « indisponible cette semaine, aucune eau mobilisable » pour sa demande.
+- F119 : sous un arbitrage validé, ces planches gardent ce seul motif et
+  rien à recevoir : leurs allocations, moins l'eau validée de la chaîne,
+  s'ajoutent d'avance à ce que les planches allouées ne peuvent pas
+  recevoir, sans réduction, et restent non attribuées. La note de
+  l'arbitrage reste celle d'avant pour une réserve inactive ; « stock et
+  ressources » ne s'ajoute plus à leur motif.
+
+**Ce qui ne change pas.** Le placement sur les autres chaînes, le matériel
+sans pompe habituelle, la faisabilité de la 3.4, le calcul enregistré :
+aucune migration ; un calcul ancien garde ses lignes de budget.
+
+**Vérifié par** les quatre tests de S8 (`tests/planning-shortage-scenarios.test.ts`),
+rouges sur le moteur d'avant : la réserve inactive, sa ligne à zéro et
+indisponible (97,01 m³ avant) ; la pompe seule archivée, aucun créneau,
+12,71 m³ de manque d'eau sous ce motif, une seule ligne « La pompe (pompe
+archivée) », et celle d'une seconde chaîne, la réserve inchangée ; la
+source inactive ou hors de sa période, ses dix planches sous ce motif ; et
+sous un arbitrage, la réserve inactive ne compte plus 6,35 m³ du manque en
+« stock et ressources » (7,10 m³ sous ce motif, 2,80 m³ que l'arbitrage ne
+donne pas au bloc 2), « 3,55 m³ alloués à 22 planches ne peuvent pas être
+reçus » comme avant, et la pompe archivée ne place plus rien : « 6,354 m³
+alloués à 32 planches ne peuvent pas être reçus ». Les 1 339 tests passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

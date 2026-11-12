@@ -60,6 +60,11 @@ export type PlanningEquipment = {
   placementId: string;
   pump: IrrigationPump | null;
   origin: PumpOrigin | null;
+  /**
+   * La pompe habituelle du matériel quand elle est archivée, ou introuvable : le matériel n'est pas « sans pompe »,
+   * rien ne peut le servir (point ouvert 52, D-088). Nulle quand sa pompe habituelle est active, ou qu'il n'en a pas.
+   */
+  unavailablePump: { id: string; name: string | null } | null;
   coveredBeds: CoveredBed[];
   /** Débit demandé à la pompe quand tout le matériel arrose ; nul si une surface mouillée est inconnue. */
   flowCubicMetersPerHour: number | null;
@@ -145,6 +150,7 @@ export function buildPlanningEquipment(inputs: PlanningInputs, settings: Plannin
     const pumpDefault = inputs.pumpDefaults.find((candidate) => candidate.equipmentId === item.id);
     const pump = pumpDefault ? pumpsById.get(pumpDefault.pumpId) ?? null : null;
     const origin = pump?.origins.find((candidate) => candidate.isDefault) ?? pump?.origins[0] ?? null;
+    const usable = pump !== null && pump.status === 'active';
     result.push({
       id: item.id,
       name: item.name,
@@ -152,8 +158,9 @@ export function buildPlanningEquipment(inputs: PlanningInputs, settings: Plannin
       settingId: setting.id,
       settingName: setting.name,
       placementId: placement.id,
-      pump: pump && pump.status === 'active' ? pump : null,
-      origin: pump && pump.status === 'active' ? origin : null,
+      pump: usable ? pump : null,
+      origin: usable ? origin : null,
+      unavailablePump: pumpDefault && !usable ? { id: pumpDefault.pumpId, name: pump?.name ?? null } : null,
       coveredBeds,
       flowCubicMetersPerHour: requestedFlowCubicMetersPerHour(coveredBeds),
     });

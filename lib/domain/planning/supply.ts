@@ -13,6 +13,7 @@ import {
 import {
   actualWithdrawalsByResourceAndDate,
   estimatedEvaporationCubicMeters,
+  isResourceAvailableOn,
   rainInputCubicMeters,
   resourcePotentialForSegment,
   type WaterInfrastructure,
@@ -203,6 +204,11 @@ export class ReservoirTimeline {
 /** Une ressource prélevée directement : son débit borne le simultané, sa limite borne le jour. */
 export class DirectResourceTimeline {
   readonly resource: WaterResource;
+  /**
+   * La ressource donne de l'eau au moins un jour d'ici dimanche : active, et un jour de l'horizon dans sa période de
+   * disponibilité. Sinon rien ne peut en venir, et sa chaîne est indisponible (point ouvert 53, D-088).
+   */
+  readonly availableDuringHorizon: boolean;
   private readonly potentialByDate: Map<string, number>;
   private readonly usedByDate = new Map<string, number>();
   private readonly flows: { startMs: number; endMs: number; flow: number }[] = [];
@@ -213,7 +219,9 @@ export class DirectResourceTimeline {
     this.timeZone = input.timeZone;
     const withdrawn = actualWithdrawalsByResourceAndDate(input.infrastructure.movements, input.timeZone);
     this.potentialByDate = new Map();
-    for (const date of datesBetween(input.now, input.horizonEnd, input.timeZone)) {
+    const dates = datesBetween(input.now, input.horizonEnd, input.timeZone);
+    this.availableDuringHorizon = dates.some((date) => isResourceAvailableOn(input.resource, date));
+    for (const date of dates) {
       const dayStart = Math.max(input.now.getTime(), localDateStartUtc(date, input.timeZone).getTime());
       const dayEnd = Math.min(input.horizonEnd.getTime(), localDateStartUtc(addDaysToDateKey(date, 1), input.timeZone).getTime());
       const hours = (dayEnd - dayStart) / MILLISECONDS_PER_HOUR;
@@ -436,7 +444,10 @@ export type SupplyChain = {
   reservoir: ReservoirTimeline | null;
   resource: DirectResourceTimeline | null;
   origin: PumpOrigin | null;
-  /** La ressource ou la réserve est inactive ou introuvable : rien ne peut en venir. */
+  /**
+   * Rien ne peut venir de la chaîne d'ici dimanche : sa réserve ou sa ressource inactive ou introuvable, sa ressource hors
+   * de sa période toute la semaine, ou la pompe habituelle du matériel archivée (points ouverts 52 et 53, D-088).
+   */
   unavailable: boolean;
 };
 

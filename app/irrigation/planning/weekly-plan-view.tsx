@@ -429,7 +429,10 @@ function BudgetList({ budgets }: { budgets: readonly SupplyBudget[] }) {
           <li key={budget.originKey}>
             <strong>{budget.originName}</strong>
             <span>
-              {budget.availableCubicMeters === null ? 'eau mobilisable inconnue' : `${formatVolume(budget.availableCubicMeters)} mobilisables`} pour {formatVolume(budget.demandCubicMeters)} demandés
+              {/* Une chaîne dont rien ne peut venir d'ici dimanche le dit, sans eau mobilisable (points ouverts 52 et 53, D-088). */}
+              {budget.unavailable
+                ? 'indisponible cette semaine, aucune eau mobilisable'
+                : budget.availableCubicMeters === null ? 'eau mobilisable inconnue' : `${formatVolume(budget.availableCubicMeters)} mobilisables`} pour {formatVolume(budget.demandCubicMeters)} demandés
               {budget.dailyLimitRemainingCubicMeters !== null ? ` · limite journalière : ${formatVolume(budget.dailyLimitRemainingCubicMeters)} restants` : ''}
               {/* La part visée et la part placée de chaque niveau, « — » sans demande (décision 2 de la 3.9, D-052). */}
               {` · ${budgetLevelsText(budget)}`}

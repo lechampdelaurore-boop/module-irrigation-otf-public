@@ -48,10 +48,15 @@ registres, elle y renvoie.
   valider en pénurie ne refait plus le partage ; le cas limite, un
   arrosage validé au-delà de la part de sa planche, est tranché par le
   porteur le jour même : selon la conduite choisie, l'option codée.
-  **56 corrigé le 9 novembre
-  2026** (D-087, F113 à F115), dans une PR qui suit celle de 57 : le manque
+  **56 corrigé, en ligne** (#21 ; le 9 novembre 2026, D-087, F113 à
+  F115) : le manque
   d'une planche se partage entre la coupe de sa part, en manque d'eau, et
-  son placement. Restent 52 et 53, puis 51.
+  son placement. **52 et 53 corrigés le 9 novembre 2026** (D-088, F116 à
+  F119), dans une PR qui suit celle de 56 : une chaîne dont rien ne peut
+  venir d'ici dimanche — pompe habituelle archivée, origine inactive ou
+  hors de sa période — n'entre dans aucun partage ; ses planches portent
+  « origine d'eau ou pompe indisponible », et sa ligne de budget le dit.
+  Reste 51.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -85,6 +90,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #21 (`6ff25e1`, la correction du manque partagé entre l'eau et
+  le placement, point ouvert 56, D-087, fusionnée le 12 novembre à 16 h 31
+  et déployée à 16 h 45, run 43248783998, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
   PR #20 (`8e3cca4`, la correction de l'eau déjà validée en pénurie, point
   ouvert 57, D-086, fusionnée le 12 novembre à 15 h 59 et déployée
   à 16 h 14, run 43242971980, les quatre jobs réussis, aucune migration,
@@ -7456,8 +7465,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    d'affichage seule, dans sa PR `fix/`, le contrat précisé et le test
    rouge d'abord.
 52. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
-   finale.** S8, pompe archivée : sur la ferme de test, sa seule pompe
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-088) ;
+   fermeture au jugement du porteur.** S8, pompe archivée : sur la ferme de test, sa seule pompe
    archivée, les cinq matériels qu'elle sert restent proposés « sans
    pompe », eau non vérifiée, 12,71 m³ placés comme si elle servait
    encore ; une seconde chaîne dont la pompe est archivée fait de même (la
@@ -7469,10 +7478,16 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    matériel dont la pompe habituelle est archivée n'a aucun créneau, avec
    ce motif ; « non vérifié » reste pour le matériel sans pompe habituelle.
    Dans la même PR `fix/` que le point 53, le contrat précisé et le test
-   rouge d'abord.
+   rouge d'abord. Corrigé le 9 novembre 2026 (D-088, F117 et F118), comme
+   recommandé : les matériels dont la pompe habituelle est archivée forment,
+   pompe par pompe, une chaîne à part, « La pompe (pompe archivée) », sans
+   créneau, leurs planches sous ce motif ; sur le même cas, aucun créneau,
+   12,71 m³ de manque d'eau sous ce motif, la réserve inchangée quand c'est
+   la pompe d'une seconde chaîne (`tests/planning-shortage-scenarios.test.ts`,
+   rouge avant).
 53. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
-   pénurie (lot 3 de la 3.9, D-084) ; à corriger avant la recette
-   finale.** S8, ressource inactive : la rampe du bloc 2 servie par une
+   pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-088) ;
+   fermeture au jugement du porteur.** S8, ressource inactive : la rampe du bloc 2 servie par une
    source prélevée directement, la source inactive, ou hors de sa période
    de disponibilité toute la semaine, ne reçoit aucun créneau, comme
    attendu ; mais ses dix planches portent « stock et ressources
@@ -7485,7 +7500,16 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    pour la semaine le dit sur sa ligne de budget, sans eau mobilisable, et
    ses planches portent ce motif avant tout partage ; une ressource
    disponible une partie de la semaine garde son budget (8 m³ du jeudi au
-   dimanche, déjà juste). Avec le point 52.
+   dimanche, déjà juste). Avec le point 52. Corrigé le 9 novembre 2026
+   (D-088, F116, F118 et F119), comme recommandé : la source inactive ou
+   hors de sa période porte ce motif sur ses dix planches avant tout
+   partage, et la ligne de budget d'une chaîne indisponible dit
+   « indisponible cette semaine, aucune eau mobilisable » (zéro, au lieu
+   des 97,01 m³ de la réserve inactive) ; disponible une partie de la
+   semaine, la source garde ses 8 m³. Sous un arbitrage, ces planches ne
+   portent plus « stock et ressources » en plus, et leurs allocations
+   restent non attribuées (`tests/planning-shortage-scenarios.test.ts`,
+   rouges avant).
 54. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-085) ;
    fermeture au jugement du porteur : le plan proposait de prélever plus

@@ -293,8 +293,12 @@ l'état au 30 octobre 2026.
    et une ressource directe inactive, ou hors de sa période, se nomme « stock
    et ressources insuffisants d'ici dimanche », la ligne de budget d'une
    réserve inactive montrant son stock comme mobilisable (point ouvert 53).
-   État : 🟡 réserve inactive ✅, pompe archivée et ressource ❌ défauts
-   corrigés à part.
+   Corrigé le 9 novembre 2026 (D-088) : une chaîne dont rien ne peut venir
+   d'ici dimanche n'entre dans aucun partage, ses planches portent ce motif
+   avant la conduite, sa ligne de budget dit « indisponible cette semaine,
+   aucune eau mobilisable », et les matériels d'une pompe archivée forment
+   une chaîne à part ; quatre tests (`tests/planning-shortage-scenarios.test.ts`),
+   arbitrage compris. État : 🟡 test ✅, recette finale ⬜.
 9. **S9 — Deux chaînes d'eau.** La ferme de test avec une seconde chaîne :
    une ressource directe à limite de prélèvement 2 m³/jour, sa pompe à
    3 m³/h, pour deux rampes de bloc ; la réserve en pénurie et la ressource
@@ -873,7 +877,7 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
    S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
    dans sa PR `fix/`, son test rouge d'abord (58, 54 et 55 le 9 novembre
-   2026, D-085 ; 57 et 56 le même jour, D-086 et D-087) — S6 et S20 y portent leur
+   2026, D-085 ; 57, 56, 52 et 53 le même jour, D-086 à D-088) — S6 et S20 y portent leur
    test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
    s'étendent sans changer les tests existants : une irrigation planifiée
    ou validée peut puiser dans la réserve (`fromReserve`), une seconde
