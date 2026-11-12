@@ -465,6 +465,27 @@ rien à recevoir : leur allocation, que rien ne peut leur apporter, compte
 parmi ce que les planches allouées ne peuvent pas recevoir, et reste non
 attribuée.
 
+**La surface mouillée inconnue** (point ouvert 63, D-097, 12 novembre
+2026). Une planche dont la surface que son propre matériel mouille est
+inconnue — une aspersion sur une planche dont le passe-pied n'est pas
+renseigné dans Ouvre ta ferme (D-022) — n'a pas de volume : elle n'entre
+dans aucun partage, ni à zéro ni autrement (D-003). La demande de sa chaîne
+ne compte que les planches dont la surface est connue, et sa ligne de
+budget le dit : « au moins X m³ demandés (N planches au volume inconnu) ».
+Hors pénurie, rien d'autre ne change : son matériel est proposé « volume
+inconnu », compté à part dans le résumé. Quand la demande connue dépasse
+déjà le budget de la chaîne — la conduite en pénurie s'applique —, ou sous
+un arbitrage validé, aucune part ne pourrait compter son eau : la planche
+n'a pas de cible et porte « volume inconnu en pénurie » avant la conduite,
+et aucun créneau au volume inconnu n'est proposé sur la chaîne — c'est la
+règle de la limite journalière (S5, cas e) étendue au budget de la
+semaine. Les autres planches de son matériel portent le même motif ; leurs
+parts, libérées en fin de tour, vont aux planches que leur matériel peut
+encore servir (D-037), et sous un arbitrage, leurs allocations comptent
+parmi ce que les planches allouées ne peuvent pas recevoir. Renseigner le
+passe-pied dans Ouvre ta ferme rend la planche à son partage au calcul
+suivant.
+
 Exemple sur la ferme, réserve observée à 5 m³ un mardi midi au lieu de 30 :
 le forage donne 12,3 m³ par jour, soit 67 m³ d'ici dimanche minuit, 72 m³
 avec le stock, pour 79,2 m³ demandés — un manque d'eau de 7,2 m³. Si les
@@ -630,6 +651,7 @@ Rien ne s'écrit dans Ouvre ta ferme. L'écran n'arrose rien.
 | Planche arrosée par une rampe sous la part R13 | l'eau reçue est comptée dans les besoins et l'historique ; la planche ne commande ni la dose, ni « un arrosage par jour », ni l'espacement ; son reste est affiché « portée du matériel insuffisante » (D-025) |
 | Matériel sans pompe habituelle | créneau proposé « faisabilité non vérifiée », sans garantie de débit ni de stock, comme la 3.2 le permet |
 | Pompe habituelle archivée | aucun créneau, « origine d'eau ou pompe indisponible » : le matériel n'est pas « sans pompe » (point ouvert 52, D-088) |
+| Surface mouillée inconnue : aspersion sur une planche sans passe-pied renseigné | hors pénurie, créneau proposé « volume inconnu », compté à part ; la demande de sa chaîne se lit « au moins » ; en pénurie ou sous un arbitrage validé, ni part ni créneau : « volume inconnu en pénurie », pour elle et les autres planches de son matériel, jamais comptée zéro (point ouvert 63, D-097) |
 | Stock de la réserve inconnu | créneaux proposés « eau non vérifiée » ; le manque d'eau ne peut pas être chiffré et le dit : « non chiffré », ou « au moins X m³ » quand une autre chaîne en chiffre un (point ouvert 51, D-089) |
 | Pluie réelle absente sur des jours écoulés | règle D-019 : prévision du jour, sinon zéro, jours listés « partiel » |
 | Prévision météo absente ou ancienne | pluie prévue comptée zéro, calcul marqué « sans prévision » avec la date de la dernière |

@@ -126,7 +126,7 @@ test('cas 2 : le plus gros groupe d’abord ; à taille égale, l’ordre des mo
 });
 
 test('point 5.3 : les libellés visibles parlent en phrases ; les identifiants des règles restent pour les experts (F48)', () => {
-  const unplaced: UnplacedReason[] = ['no-objective', 'no-equipment', 'below-minimum-dose', 'water-budget', 'deferred', 'pump-time', 'daily-limit', 'withdrawal-limit', 'reserve-timing', 'volume-unknown-under-limit', 'supply-unavailable', 'no-time-left', 'insufficient-reach', 'spacing', 'refused-slot', 'protected-slot'];
+  const unplaced: UnplacedReason[] = ['no-objective', 'no-equipment', 'below-minimum-dose', 'water-budget', 'deferred', 'pump-time', 'daily-limit', 'withdrawal-limit', 'reserve-timing', 'volume-unknown-under-limit', 'volume-unknown-under-budget', 'supply-unavailable', 'no-time-left', 'insufficient-reach', 'spacing', 'refused-slot', 'protected-slot'];
   const doses: DoseReason[] = ['remaining-need', 'maximum-dose', 'window-fit', 'pump-gap', 'daily-limit', 'reserved-share', 'reserve-level', 'last-day-below-minimum', 'refused-slot-fit', 'protected-slot-fit', 'withdrawal-limit', 'shortage-share'];
   const timings: TimingReason[] = ['earliest', 'after-forecast-rain', 'spacing', 'window', 'pump-capacity', 'reserve-inflow', 'daily-limit', 'after-refused-slot', 'after-protected-slot', 'withdrawal-limit'];
   const visible = [

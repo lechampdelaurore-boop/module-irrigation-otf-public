@@ -253,8 +253,13 @@ l'état au 30 octobre 2026.
    laisse 22,10 m³ le jeudi (point ouvert 58). Corrigé le 9 novembre 2026
    (D-085) : le créneau se juge jour par jour depuis son début et part à
    minuit quand son premier jour est plein ; aucun jour ne passe plus sa
-   limite (`tests/planning-daily-limits.test.ts`). État : 🟡, (a) ✅
-   test, (d) et (e) à vérifier.
+   limite (`tests/planning-daily-limits.test.ts`). La même règle vaut,
+   depuis le 12 novembre 2026, pour le budget de la semaine : en pénurie
+   ou sous un arbitrage validé, aucun créneau au volume inconnu n'est
+   proposé, motif « volume inconnu en pénurie » ; la planche au passe-pied
+   inconnu n'entre dans aucun partage, jamais comptée zéro (point ouvert
+   63, D-097, `tests/planning-shortage-scenarios.test.ts`). État : 🟡, (a)
+   ✅ test, (d) et (e) à vérifier.
 6. **S6 — Temps de pompage et eau à la fois.** Les quatre rampes de serre
    (10,24 m³/h pour une pompe à 8) sur une plage d'aspersion réduite à
    21 h – 0 h, et une réserve à 5 m³. Attendu : deux manques distincts, chacun
