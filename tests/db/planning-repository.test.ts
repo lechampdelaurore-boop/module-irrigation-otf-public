@@ -223,6 +223,17 @@ test('un événement postérieur au calcul se lit avec le plan tant que son reca
   assert.throws(() => database.sqlite.prepare("UPDATE irrigation_plan_events SET status = 'recalculated' WHERE id = ?").run(earlier), /CHECK constraint failed/, 'recalculé sans calcul ni heure : refusé');
 });
 
+test('revue de sécurité (D2) : l’événement en attente d’une ferme ne paraît jamais dans le plan d’une autre', async () => {
+  const computed = '2026-09-29T10:52:00.000Z';
+  await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'manual', actorUserId: ALICE, plan: plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], computed) });
+  const bobCalculation = await savePlanCalculationForUser(BOB, { season: 2026, weekStart: WEEK, trigger: 'manual', actorUserId: BOB, plan: plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], computed) });
+  await recordPlanEventForUser(ALICE, { season: 2026, weekStart: WEEK, kind: 'rain-recorded', occurredAt: '2026-09-29T11:10:00.000Z' });
+  const bobRefusal = await recordPlanEventForUser(BOB, { season: 2026, weekStart: WEEK, kind: 'proposal-refused', occurredAt: '2026-09-29T11:20:00.000Z' });
+  assert.deepEqual((await readLatestPlanForUser(ALICE, 2026, WEEK))?.pendingEvent, { kind: 'rain-recorded', occurredAt: '2026-09-29T11:10:00.000Z', status: 'pending' }, 'Alice lit sa pluie, pas le refus de Bob, plus récent');
+  await settlePlanEvent(bobRefusal, { calculationId: bobCalculation }, '2026-09-29T11:20:05.000Z');
+  assert.equal((await readLatestPlanForUser(BOB, 2026, WEEK))?.pendingEvent, null, 'son refus recalculé, Bob n’a rien à signaler : la pluie d’Alice ne paraît pas chez lui');
+});
+
 test('une proposition jamais décidée dont le créneau est passé se lit « expirée » ; la base refuse un créneau vide ou un statut inconnu', async () => {
   await savePlanCalculationForUser(ALICE, { season: 2026, weekStart: WEEK, trigger: 'event', actorUserId: ALICE, plan: plan([proposal('p-1', '2026-09-29T19:00:00.000Z', 8100)], '2026-09-29T10:52:00.000Z') });
   const stored = await readLatestPlanForUser(ALICE, 2026, WEEK);

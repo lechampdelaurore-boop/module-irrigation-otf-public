@@ -3152,6 +3152,10 @@ dans la fiche, jamais parue), vert après, et le test du signal, rouge
 avant : le module n'avait pas ce signal. Les 1 348 tests et les 88
 parcours passent.
 
+**En ligne** : #28 du dépôt public fusionnée le 12 novembre 2026 à 20 h 09
+(`53044ba`) et déployée à 20 h 26 (run 43287314051, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
@@ -3199,6 +3203,59 @@ après. Les 1 342 tests et les 86 parcours passent.
 **En ligne** : #25 du dépôt public fusionnée le 12 novembre 2026 à 18 h 32
 (`f5e2fd2`) et déployée à 18 h 47 (run 43270561040, les quatre jobs
 réussis ; aucune migration, Workers inchangés).
+
+## D-095 — La revue de sécurité de la 3.9 (lot 5) : aucun défaut, trois tests d'isolation et une garde écrits, quatre précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Écrit en Opus 5.5 · Max
+sur le dépôt public, à la tête de la file des PR de la 3.9 (la branche du
+point 60), d'après la section « La revue de sécurité des frontières et de
+l'isolation » du contrat de la 3.9 (`docs/shortage-contract.md`). Le lot 5
+ne change aucun comportement : cinq tests, la section D de
+`docs/recette-tranche-3.md` et les registres.
+
+**Constat.** Les sept points de la revue ne relèvent aucun défaut ; chacun
+porte son constat et son verdict dans la section D du protocole. Trois
+dépôts n'avaient aucun test où une autre ferme ne lit rien : les poses d'un
+matériel et leur registre, l'événement en attente du plan, les saisies du
+sol autres que les observations. L'utilisateur de démonstration n'avait que
+sa condition « hors production », sans test ; le paquet construit par
+`pnpm build`, la commande du déploiement, ne contient plus sa branche. Les
+cinq tests sont écrits ici, trois d'isolation et deux pour la garde ;
+chacun échoue quand on relâche le filtre ou la garde qu'il protège, puis
+repasse. `pnpm audit`, lu une fois : une
+vulnérabilité modérée, minimatch, par l'outil de lint, qui relève du lot à
+part déjà décidé (eslint 10). Reste la lecture de la configuration Access
+dans le Chrome du porteur, sur son mot.
+
+**Précisions** (techniques, sans règle agronomique ; consignées au
+protocole) :
+
+- F139 : « les fichiers de `tests/db/` relus un par un » se fait par un
+  relevé outillé, puis une lecture : pour chaque fichier, les dépôts qu'il
+  importe et ses appels au nom d'un second propriétaire ; puis la lecture de
+  chaque dépôt sans tel appel. Les outils du relevé ne sont pas versionnés
+  (D7 : aucun scanner nouveau).
+- F140 : un dépôt qui ne fait que rassembler des lectures éprouvées
+  ailleurs (`db/crop-water/inputs.ts`), ou que le travail de nuit fait lire
+  à toutes les fermes par construction, derrière la route interne et son
+  jeton (`db/automatic-weather-repository.ts`), est nommé avec sa raison,
+  sans test propre.
+- F141 : la garde de `LOCAL_DEMO_USER` se teste sur le code : toute lecture
+  de la variable dans `app/`, `lib/` et `db/` porte la condition « hors
+  production » sur la même ligne, et le seul retour de l'utilisateur de
+  démonstration la suit (`tests/access-demo-user.test.ts`). Le paquet
+  construit se constate une fois, dans le compte rendu ; aucune étape n'est
+  ajoutée à la CI.
+- F142 : la section D se remplit au lot 5, sur la tête de la file des PR ;
+  la recette finale la relit sur la version déployée (D-014) et y ajoute la
+  lecture de la configuration Access, la seule qui attend le porteur.
+
+**Ce qui ne change pas.** Aucun code de l'application, aucune migration,
+aucun écran, aucun outil de la CI.
+
+**Vérifié par** les cinq tests nouveaux, rouges filtre ou garde relâché,
+et les contrôles complets ; les 1 353 tests et les 88 parcours passent.
 
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 

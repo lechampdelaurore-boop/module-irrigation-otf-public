@@ -4,6 +4,7 @@ import {
   EquipmentPlacementChangedError,
   EquipmentPlacementDateError,
   listEquipmentPlacementsForUser,
+  listPosesOfEquipmentForUser,
   removeEquipmentPlacementForUser,
   saveEquipmentPlacementForUser,
   updateEquipmentPlacementSettingForUser,
@@ -37,6 +38,7 @@ import {
  */
 
 const ALICE = 'alice';
+const BOB = 'bob';
 const SEASON = 2026;
 const IRRIGATION = { startAt: '2026-06-10T06:00:00.000Z', endAt: '2026-06-10T07:00:00.000Z', durationSeconds: 3600 };
 const PENDANT_L_IRRIGATION = '2026-06-10T06:30:00.000Z';
@@ -304,4 +306,16 @@ test('scénario 10 : une position antérieure à la migration reste posée, sans
   assert.equal(await removeEquipmentPlacementForUser(ALICE, sprinklerId, SEASON, APRES_L_IRRIGATION), 'removed');
   const [closed] = await listEquipmentPoseHistoryForUser(ALICE, SEASON);
   assert.deepEqual([closed.placedAt, closed.removedAt], [null, APRES_L_IRRIGATION], 'la date inconnue reste inconnue dans le registre');
+});
+
+test('revue de sécurité (D2) : les poses d’une ferme et leur registre ne se lisent pas depuis une autre, même en nommant le matériel', async () => {
+  const alice = await createDripFixture(ALICE);
+  const bob = await createDripFixture(BOB, { name: 'Rampe de Bob' });
+  assert.equal(await removeEquipmentPlacementForUser(ALICE, alice.equipment.id, SEASON, APRES_L_IRRIGATION), 'removed');
+  assert.equal((await listEquipmentPoseHistoryForUser(ALICE, SEASON)).length, 1, 'chez Alice, la pose fermée est au registre');
+  assert.equal((await listPosesOfEquipmentForUser(ALICE, alice.equipment.id, SEASON)).length, 1);
+
+  assert.deepEqual((await listEquipmentPosesForUser(BOB, SEASON)).map((pose) => pose.id), [bob.placement.id], 'Bob ne lit que sa propre pose');
+  assert.deepEqual(await listEquipmentPoseHistoryForUser(BOB, SEASON), [], 'ni le registre d’Alice');
+  assert.deepEqual(await listPosesOfEquipmentForUser(BOB, alice.equipment.id, SEASON), [], 'ni les poses du matériel d’Alice, même nommé');
 });

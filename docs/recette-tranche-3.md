@@ -98,13 +98,96 @@ un constat qui demande une décision devient une question au porteur.
 
 | N° | Point | Ce qui se vérifie | Constat | Verdict |
 | --- | --- | --- | --- | --- |
-| D1 | Les frontières (Q3, `docs/boundaries-contract.md`) | Le lint refuse un import interdit (`tests/lint-boundaries.test.ts`) ; `lib/domain/` n'importe que le domaine ; `db/` importé par aucun composant client autrement qu'en type ; aucun littéral d'unité hors `lib/domain/units.ts` ; aucun fichier au-dessus de 600 lignes ; `pnpm knip` sans signalement ; les deux Workers vérifiés par leurs propres contrôles | | |
-| D2 | L'isolation des données | Les tables de `db/schema.ts` portent l'exploitation, et celles qui ne la portent pas sont nommées avec leur raison ; chaque dépôt de `db/` prend le propriétaire de la session ; pour chaque dépôt, un test de persistance éprouve qu'un autre propriétaire ne lit ni n'écrit — les fichiers de `tests/db/` relus un par un, les dépôts sans un tel test nommés et leur test écrit ; le planning isolé par exploitation, saison et semaine (S28) | | |
-| D3 | L'authentification | Cloudflare Access sur chaque requête, le jeton vérifié — émetteur, audience, signature, validité — (`app/access-auth.ts`, `tests/access-jwt.test.ts`) ; `LOCAL_DEMO_USER` refusé hors développement ; la route interne météo n'accepte que son jeton partagé, comparé en temps constant ; les Workers se parlent par liaisons de service ; la configuration Access lue dans le Chrome du porteur, sur son mot, en lecture seule, sans rien consigner d'identifiant | | |
-| D4 | Le connecteur Ouvre ta ferme | Liste blanche, `GET` seulement, quatre appels par seconde, 500 par page, cinquante pages au plus, refus explicite au-delà (D-002, D-022) ; `tests/read-client.test.ts` | | |
-| D5 | Les secrets et les journaux | Aucune clé, jeton, cookie ni courriel dans le dépôt, les journaux ou la documentation ; `.dev.vars` et les exports `*.d1-export.json` ignorés par Git ; les lignes JSON du Worker sans identifiant de personne ni nom de planche ; une lecture unique de `pnpm audit`, sa sortie collée | | |
-| D6 | Les notifications | Le Worker Push ne connaît que l'exploitation comme destinataire ; liste blanche d'adresses, déduplication, aucun texte personnel (`docs/push-worker-contract.md`) | | |
-| D7 | Ce que la revue ne fait pas | Aucun test d'intrusion, aucun scanner nouveau, aucun changement de l'identité (tranche 4) : dit dans le compte rendu | | |
+| D1 | Les frontières (Q3, `docs/boundaries-contract.md`) | Le lint refuse un import interdit (`tests/lint-boundaries.test.ts`) ; `lib/domain/` n'importe que le domaine ; `db/` importé par aucun composant client autrement qu'en type ; aucun littéral d'unité hors `lib/domain/units.ts` ; aucun fichier au-dessus de 600 lignes ; `pnpm knip` sans signalement ; les deux Workers vérifiés par leurs propres contrôles | Le 9 novembre 2026, lecture de `f5a8e0b`, tête de la file des PR de la 3.9 (lot 5, D-095). Les dix tests de `tests/lint-boundaries.test.ts` éprouvent les refus du lint : `lib/domain/` sans React, Next, exécution Cloudflare, services, adaptateurs, `app/` ni `db/`, même en type (D-020) ; `lib/adapters/`, `lib/services/` et `db/` dans leurs bornes ; un composant client n'importe `db/` qu'en type ; un facteur 1000, 3600 ou 60000 hors de `lib/domain/units.ts` est refusé ; un module de plus de 600 lignes, vides et commentaires exclus, est refusé, et aucun fichier du dépôt ne dépasse. Contrôles complets du même jour : `pnpm lint`, `typecheck`, `knip` sans signalement, `push:check` et `weather:check` verts | OK |
+| D2 | L'isolation des données | Les tables de `db/schema.ts` portent l'exploitation, et celles qui ne la portent pas sont nommées avec leur raison ; chaque dépôt de `db/` prend le propriétaire de la session ; pour chaque dépôt, un test de persistance éprouve qu'un autre propriétaire ne lit ni n'écrit — les fichiers de `tests/db/` relus un par un, les dépôts sans un tel test nommés et leur test écrit ; le planning isolé par exploitation, saison et semaine (S28) | Sur 79 tables, 61 portent `workspace_id` ; les 18 autres sont nommées avec leur raison sous ce tableau. Les 95 actions serveur des 18 fichiers `'use server'` lisent l'utilisateur de la session, directement ou par leur enveloppe, et aucune ne reçoit de propriétaire dans ses entrées ; les dépôts prennent ce propriétaire, ou l'exploitation qui en découle. Les fonctions de `db/` qui reçoivent l'identifiant d'un objet filtrent par exploitation dans leur requête ou vérifient d'abord l'appartenance ; quatre aides internes ne le font pas et ne reçoivent que des identifiants que le serveur vient de créer ou de vérifier (`settlePlanEvent`, `logStatement`, `conditionalFinalizationLogStatement`, `listApplicationBedIds`). Les 52 fichiers de `tests/db/` relus pour leur second propriétaire (relevé outillé des appels au nom de Bob, puis lecture des dépôts sans tel appel, F139) : trois dépôts n'avaient aucun test où une autre ferme ne lit rien, écrits par ce lot, sous ce tableau ; chacun échoue quand on relâche le filtre de sa requête, puis repasse. Sans test propre, avec leur raison (F140) : `db/crop-water/inputs.ts`, qui rassemble des lectures éprouvées ailleurs ; `db/automatic-weather-repository.ts`, que le travail de nuit fait lire à toutes les fermes par construction, derrière la route interne et son jeton. Le planning est isolé par exploitation, saison et semaine : S28 (`tests/db/planning-service.test.ts`) et l'isolation par semaine de `tests/db/planning-repository.test.ts` | OK ; trois tests d'isolation écrits (lot 5) |
+| D3 | L'authentification | Cloudflare Access sur chaque requête, le jeton vérifié — émetteur, audience, signature, validité — (`app/access-auth.ts`, `tests/access-jwt.test.ts`) ; `LOCAL_DEMO_USER` refusé hors développement ; la route interne météo n'accepte que son jeton partagé, comparé en temps constant ; les Workers se parlent par liaisons de service ; la configuration Access lue dans le Chrome du porteur, sur son mot, en lecture seule, sans rien consigner d'identifiant | Les 14 pages de `/irrigation` passent par `requireAuthenticatedUser`, douze par `loadPageContext`, l'entrée du module et « Bienvenue » directement ; `/` ne fait que rediriger. Les deux exports (`especes.svg`, `historique.csv`) répondent 401 sans utilisateur ; les 95 actions serveur lisent l'utilisateur de la session (D2). Le jeton : émetteur, audience, signature par les clés du domaine Access, validité, RS256 seul (`lib/services/access-jwt.ts`, 14 tests). `LOCAL_DEMO_USER` est gardé par `process.env.NODE_ENV !== 'production'` : dans le paquet construit par `pnpm build`, la commande du déploiement, le 9 novembre 2026 à `da3759f`, le morceau `access-auth` lit l'en-tête d'Access mais ne contient ni la variable, ni l'utilisateur de démonstration, ni son témoin : la branche est retirée à la compilation. `tests/access-demo-user.test.ts`, nouveau, garde la condition et échoue sans elle (F141). La route interne météo n'accepte que son jeton partagé, comparé après SHA-256 en temps constant (`lib/services/weather/internal-auth.ts`, testé) ; le Worker Push compare son jeton porteur de la même façon (401 testé). L'application joint le Worker Push par la liaison `IRRIGATION_PUSH`, l'appel réseau ne restant qu'en local, sans liaison ; le planificateur météo joint le site par `IRRIGATION_SITE`. La configuration Access, dans le Chrome du porteur : pas encore lue | OK pour le code. Reste la lecture de la configuration Access, sur le mot du porteur, à la recette (F142) |
+| D4 | Le connecteur Ouvre ta ferme | Liste blanche, `GET` seulement, quatre appels par seconde, 500 par page, cinquante pages au plus, refus explicite au-delà (D-002, D-022) ; `tests/read-client.test.ts` | `lib/adapters/otf/read-client.ts` : `GET` seul, jeton dans l'en-tête côté serveur ; 250 ms au moins entre deux départs, quota partagé entre les clients d'un même serveur, une seconde sans appel après un 429 ; une route hors liste blanche rejetée avant le réseau, routes voisines du plan de culture comprises ; 500 lignes par page, 50 pages par défaut, une lecture au-delà refusée et non tronquée ; l'adresse limitée au serveur officiel ; 401, 403 et 429 jamais retentés. 16 tests dans `tests/read-client.test.ts`. Remarque : l'option du nombre de pages est bornée à 100 dans le code, mais aucun appelant ne la passe ; le plafond servi reste 50 | OK |
+| D5 | Les secrets et les journaux | Aucune clé, jeton, cookie ni courriel dans le dépôt, les journaux ou la documentation ; `.dev.vars` et les exports `*.d1-export.json` ignorés par Git ; les lignes JSON du Worker sans identifiant de personne ni nom de planche ; une lecture unique de `pnpm audit`, sa sortie collée | Les fichiers suivis relus pour les adresses et les formes de clés, valeurs masquées pendant la lecture : aucune clé, aucun jeton, aucun témoin, aucune adresse de personne. Reconnus publics : l'audience Access (`ACCESS_AUD`, portée par chaque jeton) et la clé publique VAPID de `wrangler.jsonc`, des SHA de commits, des empreintes d'exemple dans les types Workers générés, les adresses `exemple.test` des tests du jeton. `.gitignore` écarte `.dev.vars` et ses variantes, `.env*` et `*.d1-export.json` ; seuls les deux fichiers d'exemple sont suivis. Remarque : un `pnpm build` local recopie `.dev.vars` dans `dist/server/` ; sans effet en production, le job de déploiement partant d'une extraction neuve où ce fichier n'existe pas, et `wrangler deploy` ne l'envoyant pas. Les journaux : une ligne JSON par événement (`logJsonLine`, les journaliseurs passés aux services, la route interne et le planificateur météo), faite de noms d'événements, de dates, d'états, de sources, de comptes, de noms et de messages d'erreur, et, pour la météo de nuit, de la clé du lieu ; aucun identifiant de personne, aucune adresse, aucun nom de planche. Une ligne reste hors JSON, l'échec de lecture d'OTF (`[irrigation-sync]` : nom, message, statut HTTP), sans identité. `pnpm audit`, lu une fois le 9 novembre 2026 à 16 h 49 sur `da3759f`, sortie sous ce tableau : une vulnérabilité modérée, minimatch, par `eslint-config-next`, outil de lint absent du paquet servi | OK. Minimatch : le lot à part déjà décidé (eslint 10), sur le « vas-y » du porteur |
+| D6 | Les notifications | Le Worker Push ne connaît que l'exploitation comme destinataire ; liste blanche d'adresses, déduplication, aucun texte personnel (`docs/push-worker-contract.md`) | Les quatre émetteurs de l'application (minuteur et retard, notification du matin du planning, alertes météo, alertes cultures) adressent le Worker Push à l'exploitation seule : `recipientKey` est l'identifiant de l'espace. Le Worker n'accepte que les fournisseurs Push connus (Google, Apple, Mozilla, Microsoft), garde vingt abonnements au plus par destinataire, ne délivre une révision qu'une fois par abonnement, ne laisse jamais une révision ancienne remplacer une récente, borne le titre à 80 caractères et le texte à 160, et n'ouvre au toucher que `/irrigation` ou l'une de ses pages. Les textes parlent du matériel, des planches et des heures ; aucun nom ni aucune adresse de personne. Tests : `cloudflare/irrigation-push/test/worker.test.ts` (10) et `push-payload.test.ts` | OK |
+| D7 | Ce que la revue ne fait pas | Aucun test d'intrusion, aucun scanner nouveau, aucun changement de l'identité (tranche 4) : dit dans le compte rendu | Aucun test d'intrusion ; aucun outil ajouté, la lecture des adresses et des formes de clés et le relevé des tests d'isolation étant faits une fois, sans être versionnés ; aucun changement de l'identité ni de l'accès : l'identité par ferme et l'accès à plusieurs fermes sont la tranche 4 | Dit |
+
+### Compte rendu de la revue (lot 5, 9 novembre 2026)
+
+**Les 18 tables sans `workspace_id` (D2)**, chacune avec sa raison :
+
+- `irrigation_workspaces` : la racine ; elle porte `owner_user_id`.
+- `otf_snapshots` : le cache des lectures d'Ouvre ta ferme, dont la clé
+  porte l'utilisateur et la saison (`lib/services/irrigation-service.ts`) ;
+  « le cache est isolé par utilisateur et par saison »
+  (`tests/db/snapshot-cache.test.ts`).
+- `irrigation_background_jobs` : le verrou et le dernier état du travail de
+  nuit (clé du travail, jeton du verrou, dates, dernière erreur) ; aucune
+  donnée de ferme.
+- `irrigation_crop_alert_common` : le jeu commun des seuils de gel et des
+  délais de séchage, le même pour toutes les fermes.
+- Quatorze tables filles, lues seulement par leur parent, qui porte
+  l'exploitation : les réglages d'un matériel
+  (`irrigation_equipment_settings`) et leurs valeurs
+  (`sprinkler_profile_points`, `drip_setting_rates`) ; les membres d'un
+  groupe de jardins (`irrigation_garden_group_members`) ; les planches d'une
+  position (`irrigation_placement_selected_beds`) ; le matériel d'une
+  irrigation, ses apports par planche et son journal
+  (`irrigation_event_equipment`, `irrigation_bed_applications`,
+  `irrigation_event_log`) ; les versions d'un critère d'alerte
+  (`irrigation_weather_alert_criterion_versions`) ; les stades, les saisons,
+  les mois et les débuts de stade d'une culture de référence
+  (`irrigation_crop_reference_stages`, `irrigation_crop_reference_seasons`,
+  `irrigation_crop_reference_season_months`,
+  `irrigation_crop_reference_stage_starts`), commune ou propre à une ferme ;
+  les stades d'un profil racinaire (`irrigation_soil_rooting_stages`).
+
+**Les tests d'isolation écrits par le lot 5 (D2).** Chacun échoue quand le
+filtre de sa requête est relâché (« `OR 1` »), puis repasse le filtre
+rendu :
+
+- les poses d'une ferme et leur registre, y compris les poses d'un matériel
+  nommé par son identifiant, ne se lisent pas depuis une autre
+  (`tests/db/equipment-placement-periods-repository.test.ts`) ;
+- l'événement en attente du plan d'une ferme ne paraît jamais dans le plan
+  d'une autre, la même semaine (`tests/db/planning-repository.test.ts`) ;
+- rien de ce qu'une ferme saisit pour son sol (sol, seuil, observation, état
+  de surface, profil racinaire) ne se lit chez une autre
+  (`tests/db/soil-reserve-persistence.test.ts`).
+
+Et la garde de l'utilisateur de démonstration (D3) :
+`tests/access-demo-user.test.ts`, qui échoue quand la condition « hors
+production » est retirée.
+
+**La sortie de `pnpm audit` (D5)**, lue une fois, le 9 novembre 2026 à
+16 h 49 (Paris), dans le dépôt principal à `da3759f` ; code de sortie 1 :
+
+```text
+┌─────────────────────┬────────────────────────────────────────────────────────┐
+│ moderate            │ minimatch has potential denial of service via          │
+│                     │ globparts amplification                                │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Package             │ minimatch                                              │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Vulnerable versions │ >=7.0.0 <11.0.1                                        │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Patched versions    │ >=11.0.1                                               │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ Paths               │ .>eslint-config-next>eslint-import-resolver-           │
+│                     │ typescript>eslint-plugin-import>eslint-module-         │
+│                     │ utils>@typescript-eslint/parser>@typescript-eslint/    │
+│                     │ typescript-estree>minimatch                            │
+│                     │                                                        │
+│                     │ .>eslint-config-next>eslint-import-resolver-           │
+│                     │ typescript>eslint-plugin-import>@typescript-eslint/    │
+│                     │ parser>@typescript-eslint/typescript-estree>minimatch  │
+│                     │                                                        │
+│                     │ .>eslint-config-next>eslint-plugin-import>eslint-      │
+│                     │ module-utils>@typescript-eslint/parser>@typescript-    │
+│                     │ eslint/typescript-estree>minimatch                     │
+│                     │                                                        │
+│                     │ ... Found 11 paths, run `pnpm why minimatch` for more  │
+│                     │ information                                            │
+├─────────────────────┼────────────────────────────────────────────────────────┤
+│ More info           │ https://github.com/advisories/GHSA-g3hv-75wg-m249      │
+└─────────────────────┴────────────────────────────────────────────────────────┘
+1 vulnerabilities found
+Severity: 1 moderate
+```
 
 ## E. La non-régression complète
 
