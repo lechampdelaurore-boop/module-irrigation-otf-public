@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : une pompe et un matériel archivés, au téléphone et au contraste)
+
+- **Au téléphone, les boutons d'une carte de pompe et « Matériels
+  archivés » font 44 px, et une pompe archivée se lit** (point ouvert 62,
+  D-094). « Modifier », « Archiver » et « Réactiver » passent de 39 à
+  44 px, « Matériels archivés (n) » de 36 à 44 px ; une pompe archivée se
+  distingue par son fond et son état, sans le voile qui mettait ses
+  intitulés à 3,1:1. Correction d'affichage seule.
+
 ### Corrigé (3.9 : le pli des changements sur une eau inconnue)
 
 - **Le pli « Ce qui a changé » ne lit plus de baisse du manque d'eau que
@@ -12,6 +21,7 @@ source détaillée commit par commit.
   servie est inconnue dans l'un des deux calculs, il écrit « Manque
   d'eau : de 3,00 m³ à non chiffré » au lieu de « de 3,00 à 0,00 m³
   (−3,00 m³) ». Aucune migration.
+  En ligne le 12 novembre 2026 à 18 h 18 (#24 de ce dépôt).
 
 ### Corrigé (3.9 : le manque d'eau non chiffré)
 

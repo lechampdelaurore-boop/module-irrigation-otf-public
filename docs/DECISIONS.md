@@ -2966,6 +2966,54 @@ consignées au contrat du planning :
 (`tests/planning-follow-up.test.ts`), rouges avant le code : rien de
 retenu, et « de 3,00 à 0,00 m³ (−3,00 m³) ». Les 1 342 tests passent.
 
+**En ligne** : #24 du dépôt public fusionnée le 12 novembre 2026 à 18 h 03
+(`854ae13`) et déployée à 18 h 18 (run 43265302502, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
+
+Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le défaut relevé en
+jouant les parcours du lot 4 de la 3.9, corrigé à part et avant lui : sans
+cette correction, le lot 4 n'entre pas vert (F99). Codée en Opus 5.5 · Max
+sur le dépôt public, le contrat de l'audit ergonomique précisé d'abord
+(`docs/audit-ergonomie-lot3-contract.md`, F69 et F70) et celui des
+parcours (P31c), le test rouge avant le code.
+
+**Le défaut corrigé.** La ferme de démonstration n'a ni pompe ni matériel
+archivé : P31c, qui mesure les cibles et le contraste de ses douze pages,
+ne voyait ni la carte d'une pompe ni le pli des matériels archivés. Le
+parcours de pénurie du lot 4 (P32) en laisse, sa remise en état archivant
+sa pompe et ses deux lignes, qui ne se suppriment pas ; joué après lui,
+P31c au téléphone a trouvé « Modifier » et « Réactiver » d'une carte de
+pompe à 39 px et « Matériels archivés (2) » à 36 px, sous les 44 px du
+point 14 de l'audit. Sur une ferme neuve, la carte d'une pompe archivée,
+voilée à 0,68, mettait aussi « Archivée », « Débit maximal », « Origine
+par défaut » et « Origines possibles » à 3,1:1, sous 4,5:1, aux deux
+largeurs. Toute ferme qui a une pompe, ou un matériel archivé, avait ces
+cibles ; toute ferme qui a une pompe archivée, ce contraste.
+
+**Trois précisions**, techniques, tranchées par la recommandation et
+consignées au contrat de l'audit et à celui des parcours :
+
+- F136 : au téléphone (640 px et moins, comme les autres cibles corrigées
+  par l'audit), les boutons d'une carte de pompe et « Matériels archivés
+  (n) » prennent la hauteur d'une cible, 44 px
+  (`app/irrigation/styles/audit-lot3-gestes.css`) ; à l'ordinateur, la
+  souris garde les tailles actuelles.
+- F137 : un objet archivé se distingue par son fond et son état, jamais
+  par un voile qui pâlit ses textes : une pompe archivée prend le fond
+  gris clair des matériels archivés et garde « Archivée »
+  (`app/irrigation/styles/pumps.css`).
+- F138 : P31c mesure, sur une ferme neuve propre au parcours et à la
+  largeur, une pompe et un goutte-à-goutte créés puis archivés : « Ressources
+  et pompes », plis fermés puis ouverts, et « Matériel », « Matériels
+  archivés (1) » replié puis déplié. La PR passe avant celle du lot 4 dans
+  la file.
+
+**Vérifié par** P31c, rouge avant le code (39 px, 36 px et 3,1:1), vert
+après. Les 1 342 tests et les 86 parcours passent.
+
 ## D-096 — La démo guidée inscrite aux registres : contrat validé, code après la 3.9, Cloudflare sur accord exprès
 
 Date : 8 novembre 2026 (contrat validé), inscrite le 12 novembre 2026.

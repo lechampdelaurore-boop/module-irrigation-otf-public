@@ -305,6 +305,13 @@
     min-height: var(--touch-target);
   }
 
+  /* Là où la ferme a une pompe ou un matériel archivé : les boutons d'une
+     carte de pompe et le pli des matériels archivés (point ouvert 62, D-094). */
+  .feature-page .pump-card button,
+  .feature-page .archived-toggle {
+    min-height: var(--touch-target);
+  }
+
   .feature-page .application-details > summary,
   .feature-page .planning-changes > summary,
   .feature-page .weather-alert-history a {

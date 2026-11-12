@@ -59,11 +59,18 @@ registres, elle y renvoie.
   **51 corrigé, en ligne** (#23 ; le 9 novembre 2026, D-089, F120 à
   F122) : quand l'eau d'une chaîne servie est inconnue,
   la carte « Manque d'eau » dit « non chiffré », ou « au moins X m³ », au
-  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés. **59 corrigé
-  le 9 novembre 2026** (D-090, F123 et F124), relevé en corrigeant 51, dans
-  une PR qui suit la sienne : le pli des changements d'un recalcul écrit le
+  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés. **59 corrigé,
+  en ligne** (#24 ; le 9 novembre 2026, D-090, F123 et F124), relevé en
+  corrigeant 51 : le pli des changements d'un recalcul écrit le
   manque d'eau comme la carte quand l'eau d'une chaîne est inconnue d'un
   côté, sans écart chiffré.
+- 3.9, une pompe et un matériel archivés : **corrigés le 9 novembre 2026**
+  (point ouvert 62, D-094, précisions F136 à F138), relevés en jouant les
+  parcours du lot 4, dans une PR qui suit celle de 59 et précède celle du
+  lot 4 : au téléphone, les boutons d'une carte de pompe et « Matériels
+  archivés » font 44 px ; une pompe archivée se distingue par son fond,
+  sans le voile qui mettait ses textes à 3,1:1. P31c le mesure sur une
+  ferme neuve.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -97,6 +104,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #24 (`854ae13`, la correction du pli des changements sur une eau
+  inconnue, point ouvert 59, D-090, fusionnée le 12 novembre à 18 h 03 et
+  déployée à 18 h 18, run 43265302502, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
   PR #23 (`ef20c5f`, la correction du manque d'eau non chiffré, point ouvert
   51, D-089, fusionnée le 12 novembre à 17 h 30 et déployée à 17 h 45,
   run 43259462933, les quatre jobs réussis, aucune migration, Workers
@@ -7684,6 +7695,26 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    « de 3,00 à 0,00 m³ (−3,00 m³) », la ligne ne paraissant que si les deux
    côtés s'écrivent autrement (`tests/planning-follow-up.test.ts`, rouge
    avant).
+62. **Ouvert le 9 novembre 2026, en jouant les parcours du lot 4 de la
+   3.9 ; corrigé le jour même (D-094) ; fermeture au jugement du
+   porteur.** Au téléphone, sur une ferme qui a une pompe, « Modifier » et
+   « Archiver » ou « Réactiver » d'une carte de pompe font 39 px ; sur une
+   ferme qui a un matériel archivé, « Matériels archivés (n) » fait
+   36 px : sous les 44 px du point 14 de l'audit ergonomique (D-076, F69).
+   La carte d'une pompe archivée, voilée à 0,68
+   (`app/irrigation/styles/pumps.css`), met « Archivée », « Débit
+   maximal », « Origine par défaut » et « Origines possibles » à 3,1:1,
+   sous 4,5:1 (F70), aux deux largeurs. La ferme de démonstration n'a ni
+   pompe ni matériel archivé : P31c, qui mesure ses douze pages, ne les
+   voyait pas. Le parcours de pénurie du lot 4 (P32) en laisse — sa remise
+   en état archive sa pompe et ses deux lignes, qui ne se suppriment
+   pas —, et P31c au téléphone, joué après lui, a échoué. Recommandation :
+   les deux cibles à 44 px au téléphone comme les autres, la pompe
+   archivée distinguée par son fond plutôt que par un voile, et P31c qui
+   le mesure sur une ferme neuve ; une PR `fix/` à part, avant celle du
+   lot 4, qui ne peut pas entrer vert sans elle (F99). Corrigé le
+   9 novembre 2026 (D-094, F136 à F138), comme recommandé : P31c, rouge
+   avant (39 px, 36 px et 3,1:1), passe.
 
 ## Procédure de reprise rapide
 
