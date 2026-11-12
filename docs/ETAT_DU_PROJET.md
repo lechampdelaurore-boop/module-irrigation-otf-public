@@ -59,9 +59,9 @@ registres, elle y renvoie.
   **51 corrigé, en ligne** (#23 ; le 9 novembre 2026, D-089, F120 à
   F122) : quand l'eau d'une chaîne servie est inconnue,
   la carte « Manque d'eau » dit « non chiffré », ou « au moins X m³ », au
-  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés. **59 corrigé
-  le 9 novembre 2026** (D-090, F123 et F124), relevé en corrigeant 51, dans
-  une PR qui suit la sienne : le pli des changements d'un recalcul écrit le
+  lieu d'un zéro. Les huit défauts du lot 3 sont corrigés. **59 corrigé,
+  en ligne** (#24 ; le 9 novembre 2026, D-090, F123 et F124), relevé en
+  corrigeant 51 : le pli des changements d'un recalcul écrit le
   manque d'eau comme la carte quand l'eau d'une chaîne est inconnue d'un
   côté, sans écart chiffré.
 - 3.9, une pompe et un matériel archivés : **corrigés le 9 novembre 2026**
@@ -104,6 +104,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #24 (`854ae13`, la correction du pli des changements sur une eau
+  inconnue, point ouvert 59, D-090, fusionnée le 12 novembre à 18 h 03 et
+  déployée à 18 h 18, run 43265302502, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
   PR #23 (`ef20c5f`, la correction du manque d'eau non chiffré, point ouvert
   51, D-089, fusionnée le 12 novembre à 17 h 30 et déployée à 17 h 45,
   run 43259462933, les quatre jobs réussis, aucune migration, Workers

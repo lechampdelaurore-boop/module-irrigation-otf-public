@@ -21,6 +21,7 @@ source détaillée commit par commit.
   servie est inconnue dans l'un des deux calculs, il écrit « Manque
   d'eau : de 3,00 m³ à non chiffré » au lieu de « de 3,00 à 0,00 m³
   (−3,00 m³) ». Aucune migration.
+  En ligne le 12 novembre 2026 à 18 h 18 (#24 de ce dépôt).
 
 ### Corrigé (3.9 : le manque d'eau non chiffré)
 

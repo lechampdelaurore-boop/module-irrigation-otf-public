@@ -2966,6 +2966,10 @@ consignées au contrat du planning :
 (`tests/planning-follow-up.test.ts`), rouges avant le code : rien de
 retenu, et « de 3,00 à 0,00 m³ (−3,00 m³) ». Les 1 342 tests passent.
 
+**En ligne** : #24 du dépôt public fusionnée le 12 novembre 2026 à 18 h 03
+(`854ae13`) et déployée à 18 h 18 (run 43265302502, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-094 — Une pompe et un matériel archivés, au téléphone et au contraste (point ouvert 62) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
