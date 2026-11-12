@@ -216,7 +216,7 @@ test('la ligne de budget montre la part visée et la part placée de chaque nive
   assert.equal(budgetLevelsText(budget), 'haute — · normale 63 % visés, 62 % placés · basse —');
 });
 
-test('S10, trois niveaux : la part visée de la conduite, la part placée à côté ; sous le report, une planche reportée compte zéro (décision 2)', () => {
+test('S10, trois niveaux : la part visée de la conduite, la part placée à côté, le motif de la basse et aucun sur la haute ; sous le report, une planche reportée compte zéro (décision 2)', () => {
   // Tunnels 1 et 2 en haute, blocs en normale, tunnels 3 et 4 en basse ; 12 m³ pour 17,83 m³ demandés.
   const { inputs } = farm({ extraTunnels: true, forageFlow: 0, reservoirCubicMeters: 12, priorities: { 'tunnel-1': 'high', 'tunnel-2': 'high', 'tunnel-3': 'low', 'tunnel-4': 'low' } });
   const plan = buildWeeklyPlan(inputs, settings);
@@ -226,6 +226,10 @@ test('S10, trois niveaux : la part visée de la conduite, la part placée à cô
   close(budget.fractions.normal, (12 - 5.12) / 7.5878, 1e-9, 'la normale prend ce que la haute laisse');
   for (const level of ['high', 'normal', 'low'] as const) close(budget.placedByLevelCubicMeters?.[level] ?? null, placedOnLevel(plan, level), 1e-9, level);
   assert.match(budgetLevelsText(budget), /^haute 100 % visés, 100 % placés · normale 91 % visés, \d+ % placés · basse 0 % visés, 0 % placés$/);
+  // La basse porte « stock et ressources insuffisants d'ici dimanche », et rien d'autre ; la haute, servie en entier, aucun motif.
+  for (const bed of plan.beds.filter((item) => item.priority === 'low')) assert.deepEqual(bed.reasons, ['water-budget'], bed.bedName);
+  for (const bed of plan.beds.filter((item) => item.priority === 'high')) assert.deepEqual([bed.reasons, bed.deficitMm], [[], 0], bed.bedName);
+  assert.ok(placedVolume(plan) <= 12 + 1e-6, `${placedVolume(plan)} m³ placés pour 12 m³`);
   // Sous le report, la part visée d'un niveau est ce que la conduite sert au départ : une planche basse sur seize
   // tient dans ce qui reste, les quinze autres sont reportées. Les fractions restaient à 100 %.
   const deferSettings = { ...settings, shortageStrategy: 'defer' as const };

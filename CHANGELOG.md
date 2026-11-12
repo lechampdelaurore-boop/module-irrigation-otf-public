@@ -5,12 +5,35 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Vérifié (3.9, lot 3 : les scénarios de pénurie en tests du moteur)
+
+- **Les scénarios de pénurie du contrat de la 3.9 deviennent des tests du
+  moteur** (lot 3, D-084), sans changer aucun comportement : la limite de
+  prélèvement qui plafonne l'apport (S2), la réserve engagée sous son
+  minimum par des irrigations planifiées à la main (S4), le stock inconnu
+  (S7), la réserve inactive (S8), deux chaînes d'eau (S9), les motifs de
+  trois niveaux (S10), la pluie prévue sur deux calculs (S23), la semaine
+  entamée (S24), deux calculs à deux minutes (S26, un relevé) et
+  l'isolation de deux exploitations la même semaine (S28).
+- **Huit défauts relevés, aucun corrigé ici** (points ouverts 51 à 58) :
+  la limite journalière d'un arrêté dépassée par un créneau à cheval sur
+  minuit (22,10 m³ un jeudi pour 15) ; « Manque d'eau 0,00 m³ » sur un
+  stock inconnu ; une pompe archivée qui
+  laisse son matériel proposé ; une source inactive nommée « stock et
+  ressources insuffisants » ; la limite de prélèvement d'une source
+  dépassée un mercredi (4 m³ pour 2) ; la coupe d'une source nommée comme
+  celle d'une réserve ; un manque compté en entier sous un seul motif ;
+  les parts refaites sur le reste après une validation en pénurie. Chacun
+  sera corrigé dans sa PR, test rouge d'abord. Aucune migration.
+
 ### Documents (Tranche 4 : la démo guidée inscrite aux registres)
 
 - **Le contrat de la démo guidée est inscrit** (`docs/demo-guided-contract.md`,
   validé par le porteur le 8 novembre 2026, D-096) : sous-tranche 4.0,
   ligne 25 de la roadmap, découpage D1 à D4 après la 3.9. Documents seuls,
   aucun code ; D4 (Cloudflare) attend un accord exprès du porteur.
+  En ligne le 12 novembre 2026 à 14 h 42 (#16 de ce dépôt).
+
 ### Ajouté (3.9, 2 bis : l'écran d'arbitrage façon plan d'assolement)
 
 - **L'écran d'arbitrage se lit comme un plan d'assolement** (D-078,
@@ -24,6 +47,7 @@ source détaillée commit par commit.
   répartition ». Deux vues : « Planches à choisir » et « Toute la ferme ».
   Le calcul, la décision enregistrée et sa garde ne changent pas. Aucune
   migration.
+  En ligne le 12 novembre 2026 à 14 h 13 (#17 de ce dépôt).
 
 ### Corrigé (parcours navigateur à l'heure de la ferme ; pluie mesurée : le dernier jour choisi)
 

@@ -205,8 +205,10 @@ l'état au 30 octobre 2026.
    Paris, apports à la réserve compris (86,68 m³ le 5 octobre) ; pas de manque
    d'eau ; les planches non servies le sont pour R6, R7, la portée ou la dose
    minimale, jamais pour un motif d'eau ; « Manque d'eau 0,00 m³ ».
-   Vérification : recette T4a (prouvé) ; test du moteur à écrire, les
-   fixtures ne connaissant pas de limite de prélèvement. État : ⬜ test.
+   Vérification : recette T4a (prouvé) ; test du moteur
+   (`tests/planning-shortage-scenarios.test.ts`, lot 3, D-084) : 80,69 m³
+   sur la ferme de test au lieu de 92,01 m³ sans limite, aucun motif d'eau.
+   État : ✅ test, à rejouer en recette finale.
 3. **S3 — Minimum de sécurité au-dessus du stock.** Réserve 25 m³, minimum
    40 m³, forage 0,511 m³/h. Attendu : aucun créneau avant l'heure exacte où
    l'apport a comblé les 15 m³ manquants (mercredi 4 h 17 sur la ferme),
@@ -225,8 +227,12 @@ l'état au 30 octobre 2026.
    voulu » ; les irrigations planifiées restent, le moteur n'ajoute pas d'eau à
    un manque, il l'annonce ; dès l'heure où l'apport remonte la projection
    au-dessus de 20, les créneaux reprennent (« La garde de la réserve »).
-   Vérification : test du moteur à écrire ; ligne de recette finale (jamais
-   joué). État : ⬜.
+   Vérification : test du moteur (lot 3, D-084) : sur la ferme de test, les
+   deux irrigations posées mardi après-midi font tomber la projection à
+   18,09 m³ à 15 h ; aucun créneau avant 18 h 44, le premier dit « dès que
+   la réserve a l'eau nécessaire », rien n'est ajouté aux deux tunnels ;
+   ligne de recette finale (jamais joué). État : 🟡 test écrit, recette
+   finale à jouer.
 5. **S5 — Restriction : limite journalière d'irrigation (arrêté).** Cinq
    variantes. (a) Tous les jours de l'horizon limités à 10 m³ : le budget de
    chaque chaîne est borné par ce que la limite laisse, la coupe se nomme
@@ -240,7 +246,12 @@ l'état au 30 octobre 2026.
    sur une planche sans passe-pied — n'est jamais proposé un jour limité,
    motif « volume inconnu sous une limite journalière ». Vérification : tests
    « restriction » et « point 35 » (existants, a à c) ; T4b (prouvé) ; (d) et
-   (e) à vérifier dans les tests, à écrire s'ils manquent. État : 🟡.
+   (e) à vérifier dans les tests, à écrire s'ils manquent. Relevé au lot 3
+   (D-084), en reproduisant le point 54 : (a) ne tient pas pour un créneau
+   à cheval sur minuit dont le premier jour est déjà plein ; sur la ferme
+   des tests à la taille de la ferme réelle, une limite de 15 m³ par jour
+   laisse 22,10 m³ le jeudi (point ouvert 58). État : 🟡, (a) ❌ défaut
+   corrigé à part, son test rouge d'abord.
 6. **S6 — Temps de pompage et eau à la fois.** Les quatre rampes de serre
    (10,24 m³/h pour une pompe à 8) sur une plage d'aspersion réduite à
    21 h – 0 h, et une réserve à 5 m³. Attendu : deux manques distincts, chacun
@@ -248,28 +259,50 @@ l'état au 30 octobre 2026.
    dimanche » ; le temps, « temps de pompage insuffisant dans les plages
    horaires » — ; ni l'un n'entre dans l'autre ; la note du manque d'eau
    (D-038) n'impute au temps de pompage que ce qui lui revient. Vérification :
-   test du moteur à écrire ; « pompe saturée » existant pour la pompe seule.
-   État : ⬜.
+   test du moteur essayé au lot 3, rouge, versé avec sa correction : le
+   manque d'une planche coupée à la fois par l'eau et par le temps de
+   pompage — ou l'espacement — se compte en entier sous le premier de ses
+   motifs dans l'ordre alphabétique ; sur la ferme de test, dimanche soir,
+   4,48 m³ pour 12,07 m³ demandés se lisent « Manque d'eau 0 m³ » et
+   « Temps de pompage manquant 6,25 m³ » (point ouvert 56) ; « pompe
+   saturée » existant pour la pompe seule. État : ❌ défaut, corrigé à
+   part, son test rouge d'abord.
 7. **S7 — Stock inconnu.** Réserve sans jauge. Attendu : créneaux proposés
    « eau non vérifiée », aucun budget sur cette chaîne, le résumé dit que le
    manque d'eau ne peut pas être chiffré ; jamais un zéro (D-003) ; la note se
-   tait. Vérification : test du moteur à écrire — le test d'invariants tire une
-   réserve inconnue une fois sur dix mais ne lit pas le résumé. Test
-   seulement : la jauge de la vraie réserve ne se vide pas pour un essai.
-   État : ⬜.
+   tait. Vérification : test du moteur (lot 3, D-084) : créneaux non
+   vérifiés, aucun budget chiffré, aucune coupe, la note se tait ; mais le
+   résumé écrit « Manque d'eau 0,00 m³ » (point ouvert 51). Test seulement :
+   la jauge de la vraie réserve ne se vide pas pour un essai. État : 🟡
+   moteur ✅, résumé ❌ défaut corrigé à part.
 8. **S8 — Origine indisponible, pompe archivée, ressource inactive sur la
    période.** Attendu : aucun créneau sur cette chaîne, motif « origine d'eau
    ou pompe indisponible » ; les autres chaînes inchangées ; un matériel sans
    pompe habituelle reste proposé « non vérifié ». Vérification : test du
-   moteur à écrire, la ferme de test n'ayant pas de pompe archivée. État : ⬜.
+   moteur (lot 3, D-084) pour la réserve inactive — aucun créneau sur sa
+   chaîne, ce motif sur ses vingt-deux planches, la chaîne d'une source
+   inchangée — et test existant « matériel sans pompe » ; mais la pompe
+   archivée laisse son matériel proposé « non vérifié » (point ouvert 52),
+   et une ressource directe inactive, ou hors de sa période, se nomme « stock
+   et ressources insuffisants d'ici dimanche », la ligne de budget d'une
+   réserve inactive montrant son stock comme mobilisable (point ouvert 53).
+   État : 🟡 réserve inactive ✅, pompe archivée et ressource ❌ défauts
+   corrigés à part.
 9. **S9 — Deux chaînes d'eau.** La ferme de test avec une seconde chaîne :
    une ressource directe à limite de prélèvement 2 m³/jour, sa pompe à
    3 m³/h, pour deux rampes de bloc ; la réserve en pénurie et la ressource
    non, puis l'inverse. Attendu : une ligne de budget par chaîne, chacune avec
    ses fractions ; la pénurie d'une chaîne ne touche pas l'autre ; une planche
    n'est comptée que sur la chaîne du matériel qui la sert (R12) ; la somme
-   des volumes de chaque chaîne ≤ son budget. Vérification : fixtures étendues
-   et test à écrire ; parcours P13 sur la ferme de démonstration. État : ⬜.
+   des volumes de chaque chaîne ≤ son budget. Vérification : fixtures
+   étendues (`withDirectChain`) et test du moteur (lot 3, D-084), sur la
+   ferme en taille, les rampes des blocs 3 et 4 sur la source : tout ce qui
+   précède tient, dans les deux sens ; mais la source tire 4 m³ le mercredi
+   pour une limite de 2 m³ par jour — un créneau raccourci à cheval sur
+   minuit se vérifie sur les deux jours, puis se place sur le premier (point
+   ouvert 54) — et sa coupe se nomme « réserve « Source du bas » au minimum
+   de sécurité » (point ouvert 55) ; parcours P13 sur la ferme de
+   démonstration. État : 🟡 test ✅, deux défauts corrigés à part, P13 ⬜.
 
 ### B. La conduite en pénurie (R9)
 
@@ -284,8 +317,10 @@ l'état au 30 octobre 2026.
     « manque d'eau » étendu à trois niveaux — il n'a pas de planche basse
     aujourd'hui — ; les fractions et la part placée de chaque niveau le sont
     depuis la correction 2 (`tests/planning-shortage.test.ts`, D-079), les
-    motifs restent à vérifier ; recette finale avec des priorités posées par
-    le porteur (décision 3). État : 🟡 test, ⬜ recette.
+    motifs depuis le lot 3 (D-084) : la basse ne porte que « stock et
+    ressources insuffisants d'ici dimanche », la haute aucun motif ; recette
+    finale avec des priorités posées par le porteur (décision 3). État : ✅
+    test, ⬜ recette.
 11. **S11 — Part égale pour toutes.** Mêmes données, R9 « part égale ».
     Attendu : 12 / 17,83 = 67 % pour chaque planche, quel que soit son
     niveau ; motif sur toutes ; somme ≤ 12 m³. Vérification : test existant
@@ -377,7 +412,12 @@ l'état au 30 octobre 2026.
     irrigations validées (fixture `plannedIrrigation`) et test de persistance
     du service (`tests/db/planning-service.test.ts`, `planning-validation`) à
     vérifier, à écrire s'ils manquent ; recette finale (jamais joué).
-    État : ⬜.
+    Test du moteur essayé au lot 3, rouge, versé avec sa correction : après
+    la validation des tunnels 1 et 2, les parts se recalculent sur le reste
+    du budget et des besoins ; les tunnels 3 et 4 tombent de 9,76 à 6,46 mm,
+    0,85 m³ restent dans la réserve, et chaque tunnel validé garde une part
+    de 1,42 mm à placer (point ouvert 57). État : ❌ défaut, corrigé à part,
+    son test rouge d'abord.
 21. **S21 — Refus en pénurie** (D-030, moteur de la 3.7). La proposition du
     tunnel 1 refusée. Attendu : le créneau refusé exclu pour la semaine ; le
     besoin du tunnel 1 placé ailleurs avec la même part ; si aucun autre
@@ -400,13 +440,18 @@ l'état au 30 octobre 2026.
     2 mm : recalcul, le besoin du plein champ remonte de 10 mm, l'eau déjà
     placée ou validée n'est pas reprise, le manque grandit et le dit.
     Information R2 : décision 7, aucune règle. Vérification : test « pluie prévue »
-    existant ; test en pénurie sur deux calculs à écrire. État : ⬜.
+    existant ; test en pénurie sur deux calculs (lot 3, D-084) : mardi, le
+    plein champ attend vendredi, sa part prise sur 8 mm ; vendredi, à 18 mm,
+    le budget part des 2,32 m³ observés et le manque passe de 3,31 à
+    8,59 m³. État : ✅ test, à rejouer en recette finale.
 24. **S24 — Semaine entamée.** Jeudi midi, irrigations réalisées du lundi au
     mercredi, réserve basse. Attendu : le budget part du stock observé
     maintenant ; les parts se calculent sur les besoins restants ; les jours
     écoulés ne reçoivent rien ; la limite journalière du jeudi compte le
-    réalisé du jeudi. Vérification : test du moteur à écrire (fixture `now`
-    et `events`). État : ⬜.
+    réalisé du jeudi. Vérification : test du moteur (lot 3, D-084) : budget
+    de 4 m³ observés, parts sur 9,22 m³ restants ; sans l'arrosage du jeudi
+    matin, la rampe du bloc 2 part jeudi soir, avec lui vendredi, la limite
+    de 2 m³ du jeudi comptant ses 0,924 m³. État : ✅ test.
 25. **S25 — Même calcul deux fois en pénurie.** Attendu : identique, aucune
     proposition « remplacée » (règle 11 du planning, règle 9 de la 3.7).
     Vérification : test existant (limite journalière, quatre tunnels), à
@@ -417,8 +462,11 @@ l'état au 30 octobre 2026.
     et écrits dans le compte rendu. C'est un relevé, pas une garde : un écart
     de volume placé plus grand que l'apport perdu est un constat au jugement
     du porteur, pas un défaut, tant qu'aucune règle ne dit autre chose.
-    Vérification : test de relevé à écrire ; recette finale, deux recalculs à
-    deux minutes d'écart sur le même état. État : ⬜.
+    Vérification : test de relevé (lot 3, D-084), en pénurie, le forage à
+    0,05 m³/h : huit créneaux sur huit déplacés de quelques secondes ou de
+    deux minutes, 10,6866 puis 10,6850 m³ placés, un écart de 0,0016 m³ pour
+    0,0017 m³ d'apport perdu ; recette finale, deux recalculs à deux minutes
+    d'écart sur le même état. État : ✅ relevé, ⬜ recette.
 27. **S27 — Dimanche soir et lundi.** Dimanche 23 h en pénurie, puis lundi.
     Attendu : dimanche, le manque reste affiché, un reste sous la dose
     minimale placé tant qu'une plage reste, une part aussi (décision 5) ;
@@ -437,8 +485,13 @@ l'état au 30 octobre 2026.
     A ne se valide pas depuis B ; l'échec du recalcul du matin de A ne gêne pas
     B. Vérification : tests de persistance existants relus un par un
     (`planning-repository`, `planning-validation`, `planning-service`,
-    `irrigation-arbitration-repository`) ; les manquants écrits dans la revue
-    de sécurité. État : 🟡.
+    `irrigation-arbitration-repository`) ; le test d'isolation du lot 3
+    (`tests/db/planning-service.test.ts`, D-084) : A en pénurie, sous le
+    report, avec un refus, un arbitrage enregistré et une suggestion
+    notifiée ; B, la même semaine, n'en voit rien, ne décide pas d'une
+    proposition de A, et reçoit son calcul du matin quand celui de A échoue ;
+    les manquants écrits dans la revue de sécurité. État : ✅ test, revue de
+    sécurité à faire.
 
 ### Ce que la liste couvre, et ce qu'elle ne couvre pas
 
@@ -792,9 +845,21 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    (D-083), codée dans une PR.
 3. **Les scénarios de pénurie** : les tests manquants du moteur (S2, S3, S4,
    S6, S7, S8, S9, S10 étendu, S12 sur deux calculs, S13 dernière planche,
-   S18, S20, S23, S24, S26), dans `tests/planning-shortage.test.ts`, sous 600
-   lignes, avec les fixtures étendues ; le test d'isolation S28 ; aucun
-   changement de comportement — un test rouge y est un défaut, corrigé à part.
+   S18, S20, S23, S24, S26), dans `tests/planning-shortage.test.ts` et
+   `tests/planning-shortage-scenarios.test.ts`, chacun sous 600 lignes, avec
+   les fixtures étendues ; le test d'isolation S28 ; aucun changement de
+   comportement — un test rouge y est un défaut, corrigé à part. Écrits le
+   9 novembre 2026 (D-084) : S3, S12, S13 et S18 l'étaient avec les
+   corrections ; S2, S4, S10, S23, S24, S26 et S28 tiennent ; S7, S8 et S9 en
+   partie ; huit défauts relevés, points ouverts 51 à 58 — le dernier sur
+   S5, hors de la liste, en reproduisant le point 54 —, chacun corrigé
+   dans sa PR `fix/`, son test rouge d'abord — S6 et S20 y portent leur
+   test entier ; aucun test n'est sauté ni marqué « à faire ». Les fixtures
+   s'étendent sans changer les tests existants : une irrigation planifiée
+   ou validée peut puiser dans la réserve (`fromReserve`), une seconde
+   chaîne s'ajoute (`withDirectChain` : une source, sa pompe de 3 m³/h, sa
+   limite de prélèvement par jour), et les invariants vérifient chaque
+   pompe à son propre débit et la réserve avec ses irrigations planifiées.
 4. **Le parcours P13** et le protocole vide de `docs/recette-tranche-3.md`.
 5. **La revue de sécurité** : ses corrections, une PR par défaut.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte

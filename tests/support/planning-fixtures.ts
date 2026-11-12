@@ -6,6 +6,7 @@ import type { BedIrrigationCoverage } from '../../lib/domain/irrigation-coverage
 import type { IrrigationEventRecord } from '../../lib/domain/irrigation-event-record.ts';
 import type { BedIrrigationNeed, IrrigationNeedPriority } from '../../lib/domain/irrigation-needs.ts';
 import type { PlanningInputs, WeeklyPlan } from '../../lib/domain/planning/contract.ts';
+import { remainingPlannedApplications } from '../../lib/domain/planned-irrigation.ts';
 import { protectedIntervalsBetween } from '../../lib/domain/planning/protected-slots.ts';
 import { DEFAULT_PLANNING_SETTINGS, type PlanningSettings } from '../../lib/domain/planning/settings.ts';
 import { ReservoirTimeline } from '../../lib/domain/planning/supply.ts';
@@ -185,7 +186,7 @@ export const close = (actual: number | null, expected: number, tolerance = 0.01,
 
 /** Les invariants du contrat, vérifiés sur tout plan (roadmap 3.5, preuve de fin). */
 export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used: PlanningSettings = settings) {
-  const pumpUsages: { start: number; end: number; flow: number }[] = [];
+  const pumpUsages: { pumpId: string; start: number; end: number; flow: number }[] = [];
   const volumeByDate = new Map<string, number>();
   const startsByBed = new Map<string, number[]>();
   for (const proposal of plan.proposals) {
@@ -213,17 +214,18 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
         startsByBed.set(application.bedId, starts);
       }
     }
-    if (proposal.pumpId && proposal.flowCubicMetersPerHour !== null) pumpUsages.push({ start, end, flow: proposal.flowCubicMetersPerHour });
+    if (proposal.pumpId && proposal.flowCubicMetersPerHour !== null) pumpUsages.push({ pumpId: proposal.pumpId, start, end, flow: proposal.flowCubicMetersPerHour });
     if (proposal.volumeCubicMeters !== null) {
       for (const [date, volume] of splitVolumeAcrossLocalDays({ startAt: proposal.startAt, endAt: proposal.endAt, cubicMeters: proposal.volumeCubicMeters, timeZone: TZ })) {
         volumeByDate.set(date, (volumeByDate.get(date) ?? 0) + volume);
       }
     }
   }
-  // Pompe : à aucun instant la somme des débits ne dépasse 8 m³/h.
+  // Pompe : à aucun instant la somme des débits d'une pompe ne dépasse son débit, 8 m³/h pour celle de la réserve.
   for (const usage of pumpUsages) {
-    const engaged = pumpUsages.filter((other) => other.start <= usage.start && other.end > usage.start).reduce((sum, other) => sum + other.flow, 0);
-    assert.ok(engaged <= inputs.pumps[0].maximumFlowCubicMetersPerHour + 1e-9, `pompe à ${engaged} m³/h à ${new Date(usage.start).toISOString()}`);
+    const engaged = pumpUsages.filter((other) => other.pumpId === usage.pumpId && other.start <= usage.start && other.end > usage.start).reduce((sum, other) => sum + other.flow, 0);
+    const maximum = inputs.pumps.find((pump) => pump.id === usage.pumpId)?.maximumFlowCubicMetersPerHour ?? 0;
+    assert.ok(engaged <= maximum + 1e-9, `${usage.pumpId} à ${engaged} m³/h à ${new Date(usage.start).toISOString()}`);
   }
   // Limite journalière.
   for (const limit of inputs.dailyLimits) {
@@ -250,11 +252,17 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
   // projection qui juge — bornée par la capacité, jamais par zéro — et non sur
   // le niveau affiché (point ouvert 19 : la borne à zéro rendait « 0 ≥ 0 » vrai).
   // Jugée dès le premier prélèvement placé : avant lui, rien du plan ne la fait
-  // descendre, et une réserve qui part sous son minimum (S3) n'en est pas fautive.
+  // descendre, et une réserve qui part sous son minimum (S3) ou qu'une irrigation
+  // planifiée à la main y engage (S4) n'en est pas fautive. Les irrigations
+  // planifiées qui puisent dans la réserve y prélèvent leur eau, comme le moteur
+  // les compte ; les créneaux d'une autre chaîne n'y prélèvent rien (S9).
   const reservoir = inputs.infrastructure.reservoirs[0];
-  const withdrawals = plan.proposals.filter((proposal) => proposal.volumeCubicMeters !== null && proposal.pumpId);
+  const withdrawals = plan.proposals.filter((proposal) => proposal.volumeCubicMeters !== null && proposal.pumpId && proposal.justification.supply?.originKey === `reservoir:${reservoir.id}`);
   if (reservoir.currentVolumeCubicMeters !== null && withdrawals.length > 0) {
     const timeline = new ReservoirTimeline({ reservoir, infrastructure: inputs.infrastructure, days: inputs.days, now: inputs.now, horizonEnd: new Date(plan.horizonEndAt), timeZone: TZ });
+    for (const row of remainingPlannedApplications(inputs.events, inputs.now, new Date(plan.horizonEndAt))) {
+      if (row.sourceKey === `reservoir:${reservoir.id}`) timeline.addWithdrawal({ startMs: row.startsAt.getTime(), endMs: row.endsAt.getTime(), cubicMeters: cubicMetersFromMillimeters(row.amountMm, row.areaSquareMeters) });
+    }
     for (const proposal of withdrawals) timeline.addWithdrawal({ startMs: Date.parse(proposal.startAt), endMs: Date.parse(proposal.endAt), cubicMeters: proposal.volumeCubicMeters ?? 0 });
     const firstStart = Math.min(...withdrawals.map((proposal) => Date.parse(proposal.startAt)));
     const minimum = timeline.minimumLevel(firstStart, Date.parse(plan.horizonEndAt));
@@ -327,7 +335,7 @@ export function largeFarm(options: FixtureOptions & { blocDrips?: boolean } = {}
  * telle que le moteur la lit : elle tient la pompe sur son créneau prévu quand
  * elle a un débit demandé, et fixe un début d'arrosage sur ses planches (R6, R7).
  */
-export function plannedIrrigation(id: string, equipmentId: string, startAt: string, endAt: string, bedIds: string[], options: { kind?: 'drip' | 'sprinkler'; flow?: number } = {}): IrrigationEventRecord {
+export function plannedIrrigation(id: string, equipmentId: string, startAt: string, endAt: string, bedIds: string[], options: { kind?: 'drip' | 'sprinkler'; flow?: number; fromReserve?: boolean } = {}): IrrigationEventRecord {
   const base = realIrrigation(id, equipmentId, startAt, bedIds, 1, 6.667, options.kind ?? 'sprinkler', 'planned');
   const plannedDurationSeconds = Math.round(secondsFromMilliseconds(Date.parse(endAt) - Date.parse(startAt)));
   return {
@@ -336,7 +344,9 @@ export function plannedIrrigation(id: string, equipmentId: string, startAt: stri
       ...base.equipment,
       actualStartAt: null, actualEndAt: null, actualDurationSeconds: 0,
       plannedStartAt: startAt, plannedEndAt: endAt, plannedDurationSeconds,
-      pumpId: options.flow === undefined ? null : 'pompe', requestedFlowCubicMetersPerHour: options.flow ?? null,
+      pumpId: options.flow === undefined && !options.fromReserve ? null : 'pompe', requestedFlowCubicMetersPerHour: options.flow ?? null,
+      // Une irrigation planifiée sur la pompe de la réserve y prélève son eau (S4, S20).
+      ...(options.fromReserve ? { pumpOriginId: 'origine-reserve', pumpOriginSnapshot: { id: 'origine-reserve', sourceKind: 'reservoir' as const, sourceId: 'reserve', name: 'Réserve tampon' } } : {}),
     },
   };
 }
@@ -356,12 +366,12 @@ export function validatedIrrigation(
   startAt: string,
   durationSeconds: number,
   bedIds: string[],
-  options: { kind?: 'drip' | 'sprinkler'; rate?: number; wettedAreaSquareMeters?: number | null; flow?: number } = {},
+  options: { kind?: 'drip' | 'sprinkler'; rate?: number; wettedAreaSquareMeters?: number | null; flow?: number; fromReserve?: boolean } = {},
 ): IrrigationEventRecord {
   const kind = options.kind ?? 'sprinkler';
   const rate = options.rate ?? (kind === 'drip' ? 14 : 6.667);
   const endAt = new Date(Date.parse(startAt) + millisecondsFromSeconds(durationSeconds)).toISOString();
-  const base = plannedIrrigation(id, equipmentId, startAt, endAt, bedIds, { kind, flow: options.flow });
+  const base = plannedIrrigation(id, equipmentId, startAt, endAt, bedIds, { kind, flow: options.flow, fromReserve: options.fromReserve });
   const plannedAmountMm = millimetersForDurationSeconds(rate, durationSeconds);
   return {
     ...base,
@@ -374,6 +384,29 @@ export function validatedIrrigation(
         actualAmountMm: 0,
         wettedAreaSquareMeters: options.wettedAreaSquareMeters === undefined ? application.wettedAreaSquareMeters : options.wettedAreaSquareMeters,
       })),
+    },
+  };
+}
+
+/**
+ * Une seconde chaîne d'eau (S9 de la 3.9, docs/shortage-contract.md) : une
+ * ressource prélevée directement, sa limite de prélèvement par jour et sa
+ * propre pompe, pour les matériels nommés ; les autres restent sur la pompe
+ * de la réserve.
+ */
+export function withDirectChain(inputs: PlanningInputs, options: { equipmentIds: readonly string[]; dailyLimitCubicMeters: number; resourceFlow?: number; pumpFlow?: number }): PlanningInputs {
+  const pump: IrrigationPump = {
+    id: 'pompe-source', name: 'La pompe de la source', maximumFlowCubicMetersPerHour: options.pumpFlow ?? 3, status: 'active', archivedAt: null, notes: null,
+    origins: [{ id: 'origine-source', pumpId: 'pompe-source', sourceKind: 'resource', resourceId: 'source', reservoirId: null, isDefault: true }],
+  };
+  return {
+    ...inputs,
+    pumps: [...inputs.pumps, pump],
+    pumpDefaults: inputs.pumpDefaults.map((item) => (options.equipmentIds.includes(item.equipmentId) ? { ...item, pumpId: pump.id } : item)),
+    infrastructure: {
+      ...inputs.infrastructure,
+      resources: [...inputs.infrastructure.resources, { id: 'source', name: 'Source du bas', type: 'spring', nominalFlowCubicMetersPerHour: options.resourceFlow ?? 3, status: 'active', availableFrom: null, availableUntil: null, notes: null }],
+      resourceLimits: [...inputs.infrastructure.resourceLimits, { id: 'limite-source', resourceId: 'source', enabled: true, maxCubicMetersPerDay: options.dailyLimitCubicMeters, validFrom: '2026-09-01', validUntil: null, referenceNote: 'autorisation de prélèvement', createdAt: '2026-09-01T00:00:00.000Z' }],
     },
   };
 }
