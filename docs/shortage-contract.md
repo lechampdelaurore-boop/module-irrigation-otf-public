@@ -945,7 +945,10 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    9 novembre 2026 (D-095), sans défaut : trois tests d'isolation à deux
    fermes et une garde du compte de démonstration écrits, chaque point
    consigné dans la section D du protocole ; la configuration Access se lit
-   avec le porteur, à la recette.
+   avec le porteur, à la recette. Le 12 novembre 2026, un défaut relevé en
+   comparant les deux moteurs, le point ouvert 63, la surface mouillée
+   inconnue en pénurie, corrigé avant la recette dans sa PR `fix/`, son
+   test rouge d'abord (D-097) ; un voisin relevé en chemin, le point 64.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte
    rendu dans `docs/recette-tranche-3.md`.
 7. **La PR de clôture** : registres, journal des changements, version ; puis
