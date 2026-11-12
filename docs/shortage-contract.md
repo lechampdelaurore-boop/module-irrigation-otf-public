@@ -578,9 +578,10 @@ Trois fermes, chacune pour ce qu'elle prouve.
    planche n'est pas raccourcie par les parts : sa dose est la part de sa
    planche, et la coupe (S15), qui demande un créneau versant aussi sur
    d'autres planches, reste prouvée par le test du moteur ; P32 lit la dose
-   de la carte, la réserve et la faisabilité de sa justification, pas le
-   motif de la dose, qui dit encore « le besoin restant de la planche la plus
-   demandeuse » pour cette part (point ouvert 61). La fiche d'une pompe ne
+   de la carte, son motif — « la part de la semaine réservée à ses
+   planches », qui disait « le besoin restant de la planche la plus
+   demandeuse » avant la correction du point ouvert 61 (D-092) —, la réserve
+   et la faisabilité de sa justification. La fiche d'une pompe ne
    voit une réserve créée qu'après le rechargement de la page (point ouvert
    60) : P32 recharge entre les deux.
 3. **La ferme réelle**, pour la recette finale seulement, sur le « vas-y » du
@@ -929,9 +930,10 @@ En PR courtes, tests d'abord, chacune verte en CI, fusionnées une à la fois :
    `docs/recette-tranche-3.md`. Écrits le 9 novembre 2026 (D-091), avec les
    deux tests du moteur de S21, absents de la liste du point 3 ; deux défauts
    relevés en écrivant P32, points ouverts 60 et 61, chacun corrigé dans sa
-   PR `fix/`, son test rouge d'abord ; un troisième en jouant tous les
-   parcours, le point 62, une pompe et un matériel archivés au téléphone et
-   au contraste, corrigé dans une PR qui précède celle du lot (D-094).
+   PR `fix/`, son test rouge d'abord (61 le 9 novembre 2026, D-092) ; un
+   troisième en jouant tous les parcours, le point 62, une pompe et un
+   matériel archivés au téléphone et au contraste, corrigé dans une PR qui
+   précède celle du lot (D-094).
 5. **La revue de sécurité** : ses corrections, une PR par défaut.
 6. **La recette finale**, sans PR, sur le « vas-y » du porteur ; son compte
    rendu dans `docs/recette-tranche-3.md`.

@@ -5,8 +5,8 @@ import type { IrrigationNeedPriority } from '../lib/domain/irrigation-needs.ts';
 import type { PlanningInputs, SupplyBudget, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { nextDeferredQueue } from '../lib/domain/planning/shortage.ts';
-import { arbitrationNote, budgetLevelsText } from '../lib/domain/planning/presentation.ts';
-import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters } from '../lib/domain/units.ts';
+import { arbitrationNote, budgetLevelsText, doseReasonLabel } from '../lib/domain/planning/presentation.ts';
+import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { assertInvariants, byEquipment, close, farm, NOW, plannedIrrigation, settings } from './support/planning-fixtures.ts';
 
 /**
@@ -372,4 +372,50 @@ test('S18 sous arbitrage : une allocation que son débordement fait passer sous 
   assert.equal(plan.arbitration.unreceivedBedCount, 0);
   close(plan.arbitration.unreceivedCubicMeters, 0, 0.001, 'rien ne reste non attribué');
   assert.equal(arbitrationNote(plan), `Votre choix entre les demandes d’eau s’impose : ${formatWaterVolumeForMessage(plan.arbitration.allocatedCubicMeters)} m³ alloués, chaque allocation réservée à sa planche.`);
+});
+
+// ---------------------------------------------------------------------------
+// Le motif de la dose en pénurie (point ouvert 61, D-092)
+// ---------------------------------------------------------------------------
+
+/** Les quatre tunnels seuls, le forage à l'arrêt : chaque rampe n'arrose que ses huit planches, rien ne déborde. */
+const tunnelsFarm = (reservoirCubicMeters: number) => farm({
+  extraTunnels: true, forageFlow: 0, reservoirCubicMeters,
+  plotNeeds: { 'bloc-1': { rawPlanningNeedMm: 0, effectiveNeedMm: 0 }, 'bloc-2': { rawPlanningNeedMm: 0, effectiveNeedMm: 0 } },
+}).inputs;
+const SHARE_REASON = 'la part de la semaine réservée à ses planches';
+const SHARE_CONSTRAINT = 'part de la semaine atteinte, le reste est réservé aux autres planches';
+
+/** Chaque rampe de tunnel dit que sa dose est la part ; la contrainte du moment passe d'abord, la pompe pour celle qui l'attend. */
+function assertSharedDoses(plan: WeeklyPlan, expectedMm: number) {
+  const tunnels = plan.proposals.filter((proposal) => proposal.equipmentId.startsWith('rampe-tunnel-'));
+  assert.equal(tunnels.length, 4);
+  for (const { equipmentId, doseMm, justification } of tunnels) {
+    close(doseMm, expectedMm, 0.01, `${equipmentId} : sa part`);
+    assert.equal(justification.doseReason, 'shortage-share', equipmentId);
+    assert.equal(doseReasonLabel(justification.doseReason), SHARE_REASON);
+    if (['earliest', 'window'].includes(justification.timingReason)) assert.equal(justification.limitingConstraint, SHARE_CONSTRAINT, equipmentId);
+  }
+}
+
+test('point ouvert 61 : en pénurie, une rampe que ses parts ne coupent pas dit que sa dose est la part de la semaine, non le besoin restant ; hors pénurie, le besoin restant (D-092)', () => {
+  // 5 m³ pour quatre tunnels à 20 mm : 9,77 mm chacun, qui se disaient « le besoin restant de la planche la plus demandeuse ».
+  const inputs = tunnelsFarm(5);
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assertSharedDoses(plan, millimetersFromCubicMeters(5, 4 * 8 * 16));
+  // Hors pénurie, la cible est le besoin : la dose maximale, puis le besoin restant.
+  const ample = tunnelsFarm(30);
+  const full = buildWeeklyPlan(ample, settings);
+  assertInvariants(full, ample);
+  const reasons = [...new Set(full.proposals.map((proposal) => proposal.justification.doseReason))].sort();
+  assert.deepEqual(reasons, ['maximum-dose', 'remaining-need'], 'hors pénurie, aucune part');
+});
+
+test('point ouvert 61 sous un arbitrage : une allocation sous le besoin se dit part de la semaine (D-092)', () => {
+  const base = tunnelsFarm(5);
+  const inputs: PlanningInputs = { ...base, arbitration: arbitrationOf(base, tunnelsOnly(9)) };
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assertSharedDoses(plan, 9);
 });

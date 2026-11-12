@@ -200,7 +200,9 @@ function nextCandidate(
       return bed.remainingMm < best.remainingMm - EPSILON ? bed : best;
     });
     let doseMm = reference.remainingMm;
-    let doseReason: DoseReason = 'remaining-need';
+    // Sous son besoin, la cible de la planche est sa part : le reste à placer est cette part, et la carte le dit
+    // plutôt que « le besoin restant » (point ouvert 61, D-092).
+    let doseReason: DoseReason = reference.needMm - reference.targetMm >= NEGLIGIBLE_MM ? 'shortage-share' : 'remaining-need';
     if (doseMm > dose.maximumMm) {
       doseMm = dose.maximumMm;
       doseReason = 'maximum-dose';

@@ -51,6 +51,8 @@ export function describeLimitingConstraint(
   if (doseReason === 'window-fit') return 'fin de la plage horaire';
   if (timingReason === 'after-forecast-rain') return 'pluie prévue laissée passer';
   if (timingReason === 'spacing') return 'espacement entre deux arrosages';
+  // Une dose qui est la part, sans coupe, ne passe qu'après les contraintes du moment (point ouvert 61, D-092).
+  if (doseReason === 'shortage-share') return 'part de la semaine atteinte, le reste est réservé aux autres planches';
   return null;
 }
 

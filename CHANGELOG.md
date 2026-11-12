@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : le motif de la dose en pénurie)
+
+- **En pénurie, la carte dit que la dose est la part de la planche**
+  (point ouvert 61, D-092). Une rampe qui n'arrose que ses planches disait
+  « Pourquoi cette dose : le besoin restant de la planche la plus
+  demandeuse » pour une dose qui n'est qu'une part de ce besoin ; elle dit
+  maintenant « la part de la semaine réservée à ses planches », sous un
+  arbitrage aussi. Hors pénurie, rien ne change. Aucune migration.
+
 ### Vérifié (3.9, lot 4 : la pénurie dans le navigateur, et le protocole de la recette finale)
 
 - **Un parcours navigateur joue la pénurie** (P32 « Planifier en pénurie »,
@@ -27,6 +36,7 @@ source détaillée commit par commit.
   (61) ; la pompe et les lignes que P32 laisse archivées ont fait voir à
   P31c, au téléphone, des cibles sous 44 px et une carte sous 4,5:1 (62,
   corrigé dans la PR qui précède celle-ci, D-094).
+  En ligne le 12 novembre 2026 à 19 h 22 (#26 de ce dépôt).
 
 ### Corrigé (3.9 : une pompe et un matériel archivés, au téléphone et au contraste)
 

@@ -163,6 +163,7 @@ const DOSE_REASON_LABELS: Record<DoseReason, string> = {
   'refused-slot-fit': 'ce qui tient avant un créneau refusé',
   'protected-slot-fit': 'ce qui tient avant un créneau protégé',
   'withdrawal-limit': 'ce que la limite de prélèvement laisse',
+  'shortage-share': 'la part de la semaine réservée à ses planches',
 };
 
 const TIMING_REASON_LABELS: Record<TimingReason, string> = {

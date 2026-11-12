@@ -370,7 +370,16 @@ parts paient : la dose dit alors « la part de la semaine réservée à ses
 planches », la contrainte limitante « part de la semaine atteinte, le reste
 est réservé aux autres planches », et les planches servies sous leur cible
 portent le motif de la coupe de la chaîne, « stock et ressources » ou « limite
-journalière ». Sous la dose minimale, le matériel ne part pas : il attend une
+journalière ». Un créneau que ses parts ne raccourcissent pas dit aussi la
+part quand la cible de sa planche de référence est sous son besoin — sa part
+de la conduite, ou son allocation sous un arbitrage — : sa dose est alors
+cette part, et la carte dit « la part de la semaine réservée à ses
+planches », non « le besoin restant de la planche la plus demandeuse », que
+le maraîcher lirait comme tout ce qui lui reste à recevoir (point ouvert 61,
+D-092) ; sa contrainte limitante reste celle du moment quand il y en a une —
+pompe, limite, réserve, créneau refusé ou protégé, plage, pluie prévue,
+espacement — et dit sinon « part de la semaine atteinte, le reste est
+réservé aux autres planches ». Sous la dose minimale, le matériel ne part pas : il attend une
 part plus grande. Le dernier jour de la semaine, il n'y a plus rien à
 attendre : quand la première plage que le matériel peut prendre est celle du
 dimanche, sa part est placée quand même, si petite soit-elle, comme un reste
@@ -948,7 +957,10 @@ ce que les autres planches arrosées paient de leur part pour l'eau qu'elles
 reçoivent utilement. La borne vient après la limite journalière et avant la
 garde de la réserve, qui restent vérifiées ; la coupe porte le motif de dose
 `reserved-share`, sauf quand elle ne retire qu'une seconde d'arrondi, moins
-d'un centième de millimètre à la planche de référence. Sous la dose minimale,
+d'un centième de millimètre à la planche de référence. Un créneau non coupé
+dont la planche de référence a une cible sous son besoin, d'un centième de
+millimètre au moins, porte `shortage-share`, au même libellé ; sa contrainte
+limitante ne passe qu'après celles du moment (point ouvert 61, D-092). Sous la dose minimale,
 le matériel est arrêté avec le motif de la coupe de la chaîne et marqué pour
 repartir si sa part grandit, sauf sur la plage du dernier jour, où sa part
 est placée telle qu'elle est (« La part du dernier jour », plus bas).
