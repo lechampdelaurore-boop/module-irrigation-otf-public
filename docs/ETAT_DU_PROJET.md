@@ -42,9 +42,9 @@ registres, elle y renvoie.
   55 corrigés, en ligne** (#19 ; le 9 novembre 2026, D-085, F103 à F107) :
   les limites par jour se jugent depuis le début du
   créneau, qui part à minuit quand son premier jour est plein, et la coupe
-  d'une source se nomme « limite de prélèvement ». **57 corrigé le
-  9 novembre 2026** (D-086, F108 à F112), dans une PR qui suit celle des
-  limites : l'eau déjà validée compte comme placée dans les parts, et
+  d'une source se nomme « limite de prélèvement ». **57 corrigé, en ligne**
+  (#20 ; le 9 novembre 2026, D-086, F108 à F112) : l'eau déjà validée
+  compte comme placée dans les parts, et
   valider en pénurie ne refait plus le partage ; le cas limite, un
   arrosage validé au-delà de la part de sa planche, est tranché par le
   porteur le jour même : selon la conduite choisie, l'option codée.
@@ -85,6 +85,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #20 (`8e3cca4`, la correction de l'eau déjà validée en pénurie, point
+  ouvert 57, D-086, fusionnée le 12 novembre à 15 h 59 et déployée
+  à 16 h 14, run 43242971980, les quatre jobs réussis, aucune migration,
+  Workers inchangés). Avant elle : la
   PR #19 (`833d092`, la correction des limites par jour, points ouverts 54,
   55 et 58, D-085, fusionnée le 12 novembre à 15 h 27 et déployée à 15 h 42,
   run 43237426130, les quatre jobs réussis, aucune migration, Workers

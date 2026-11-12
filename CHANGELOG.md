@@ -29,6 +29,7 @@ source détaillée commit par commit.
   de la part de sa planche rejoue la conduite, cette planche servie de ce
   qu'elle a reçu : le choix du porteur, le 9 novembre 2026. Aucune
   migration.
+  En ligne le 12 novembre 2026 à 16 h 14 (#20 de ce dépôt).
 
 ### Corrigé (3.9 : les limites par jour)
 

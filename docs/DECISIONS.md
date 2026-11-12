@@ -2738,6 +2738,10 @@ lieu de 6,72 ; 17,68 au lieu de 18,23), et un test du service
 service porte l'origine de sa chaîne, et au recalcul l'autre planche de
 la même réserve garde ses 10 mm (6,67 avant). Les 1 335 tests passent.
 
+**En ligne** : #20 du dépôt public fusionnée le 12 novembre 2026 à 15 h 59
+(`8e3cca4`) et déployée à 16 h 14 (run 43242971980, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-087 — Le manque d'une planche partagé entre la coupe de sa part et son placement (point ouvert 56) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
