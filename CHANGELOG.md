@@ -27,6 +27,7 @@ source détaillée commit par commit.
   ligne de budget dit « indisponible cette semaine, aucune eau
   mobilisable » au lieu d'un stock qu'aucun créneau ne peut prendre.
   Aucune migration.
+  En ligne le 12 novembre 2026 à 17 h 13 (#22 de ce dépôt).
 
 ### Corrigé (3.9 : l'eau et le temps de pompage à la fois)
 

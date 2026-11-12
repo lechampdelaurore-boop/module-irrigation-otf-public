@@ -2871,6 +2871,10 @@ donne pas au bloc 2), « 3,55 m³ alloués à 22 planches ne peuvent pas être
 reçus » comme avant, et la pompe archivée ne place plus rien : « 6,354 m³
 alloués à 32 planches ne peuvent pas être reçus ». Les 1 339 tests passent.
 
+**En ligne** : #22 du dépôt public fusionnée le 12 novembre 2026 à 17 h 02
+(`e8e2db2`) et déployée à 17 h 13 (run 43254267435, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-089 — Le manque d'eau non chiffré sur une chaîne à l'eau inconnue (point ouvert 51) : trois précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
