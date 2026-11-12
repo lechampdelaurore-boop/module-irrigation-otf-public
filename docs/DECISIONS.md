@@ -3374,3 +3374,69 @@ contrat précisé et le test rouge d'abord.
 rouges avant le code : les trois conduites, hors pénurie, et sous un
 arbitrage. Les 1 358 tests passent.
 
+
+## D-098 — Le manque au volume inconnu dans les totaux du plan (point ouvert 64) : quatre précisions tranchées par la recommandation
+
+Date : 12 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le voisin du point
+63, relevé en le corrigeant (D-097), corrigé la nuit même, avant la
+recette finale : le porteur a voulu que les chantiers s'enchaînent
+(« Non, on enchaîne. S'il reste des chantiers, on peut les commencer dès
+ce soir. », puis « Je veux que tu enchaînes les chantiers en toute
+autonomie toute la nuit. », 12 novembre 2026, 21 h 44), et la carte du
+moment de la correction est close sur ces mots (« Cette nuit, après
+2 h 30 », la PR ouverte hors des heures fragiles des parcours). Codée en
+Opus 5.5 · Max sur le dépôt public, le contrat du planning précisé d'abord
+(`docs/planning-contract.md`, « Pénurie », « La surface mouillée
+inconnue », le résumé de « Interface (3.6) » et les cas limites), les
+tests rouges avant le code.
+
+**Le défaut corrigé.** Dans `lib/domain/planning/deficit.ts`, le manque
+d'une planche dont la surface mouillée par son propre matériel est
+inconnue — une aspersion sur une planche sans passe-pied renseigné dans
+Ouvre ta ferme (D-022) — valait 0 m³ dans les totaux du plan. Sur la
+ferme des tests, le dimanche à 21 h, la plage des asperseurs réduite à
+vingt minutes, les huit planches du tunnel 1 restent à 20 mm faute de
+plage : le passe-pied de T1-1 inconnu, la carte « Temps de pompage
+manquant » disait 2,24 m³, comme un total exact (2,56 m³ quand il est
+connu) ; la réserve inactive, la carte « Manque d'eau » des quatre
+tunnels disait 9,92 m³ (10,24 m³). Sous le report, la note du manque
+d'eau écrivait « Demandés 9,92 m³ » quand la ligne de budget dit « au
+moins 9,92 m³ demandés ». Rien n'était mal placé : seuls les totaux se
+lisaient exacts. Une inconnue n'est jamais zéro (D-003).
+
+**Quatre précisions**, techniques, tranchées par la recommandation et
+consignées au contrat du planning :
+
+- F147 : le compte. Le manque d'une planche au volume inconnu n'entre dans
+  aucun total ni sous aucun motif, pas même à zéro ; la planche compte à
+  part sous chaque total que ses motifs auraient grossi, le manque d'eau
+  (les motifs de l'eau) ou le temps de pompage manquant (le temps de
+  pompage et la fin de la semaine) : `unknownVolumeBeds`, `{ water,
+  pumpTime }`, champ facultatif, absent quand il n'y en a pas et d'un
+  calcul enregistré avant. Aucune migration. Le nombre de planches non
+  servies ne change pas.
+- F148 : les mots, ceux d'une eau inconnue (D-089). La carte du manque que
+  le motif aurait grossi écrit « au moins X m³ », ou « non chiffré » quand
+  rien d'autre n'en chiffre ; son sous-titre ajoute « une planche au
+  volume inconnu, où le manque ne peut pas être chiffré » (« N
+  planches »), ou, seule, « Une planche au volume inconnu : le manque ne
+  peut pas y être chiffré » ; avec une chaîne à l'eau inconnue, les deux
+  se nomment. La carte reste signalée en rouge doux : le manque est sûr,
+  son volume seul est inconnu, à la différence d'une eau inconnue, dont le
+  manque peut être nul. La ligne de résumé du téléphone et le pli des
+  changements d'un recalcul disent de même (`unknownWaterBedsBefore`,
+  `unknownWaterBedsAfter`, facultatifs).
+- F149 : la note du manque d'eau se tait quand un volume est inconnu —
+  celui d'un créneau, comme avant, de la demande d'une planche (point 63)
+  ou de son manque — : ses chiffres se liraient exacts.
+- F150 : en pénurie ou sous un arbitrage, le manque d'une planche au
+  volume inconnu reste sous « volume inconnu en pénurie », une donnée qui
+  manque, hors du manque d'eau et du temps de pompage, comme sous une
+  limite journalière (S5, cas e) : aucune carte ne s'y lit « au moins »,
+  la ligne de budget le dit déjà, et « Non placé » nomme le geste.
+
+**Vérifié par** trois tests de `tests/planning-shortage-scenarios.test.ts`,
+rouges avant le code : le temps de pompage, une chaîne indisponible (la
+carte, la ligne du téléphone et le pli), et la pénurie sous les trois
+conduites. Les 1 361 tests passent.

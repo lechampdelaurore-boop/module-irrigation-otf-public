@@ -116,8 +116,11 @@ registres, elle y renvoie.
   au volume inconnu, hors du budget ; elle reste maintenant hors du
   partage, et en pénurie ou sous un arbitrage, aucun créneau au volume
   inconnu n'est proposé. Un défaut voisin relevé en chemin, le **point
-  ouvert 64** : le manque d'une telle planche compte 0 m³ dans les totaux
-  du plan ; à corriger dans sa PR `fix/`.
+  ouvert 64**, **corrigé le soir même** (D-098, précisions F147 à F150),
+  dans la nuit voulue par le porteur : le manque d'une telle planche ne
+  compte plus 0 m³ dans les totaux du plan ; elle compte à part, et le
+  total que son motif aurait grossi, le temps de pompage manquant ou le
+  manque d'eau, se lit « au moins X m³ », ou « non chiffré ».
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -7849,8 +7852,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    journalière (S5, cas e). Corrigé le 12 novembre 2026 (D-097, F143 à
    F146), comme recommandé : cinq tests de
    `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
-64. **Ouvert le 12 novembre 2026, en corrigeant le point 63 ; à corriger
-   dans sa PR `fix/` ; fermeture au jugement du porteur.** Le manque d'une
+64. **Ouvert le 12 novembre 2026, en corrigeant le point 63 ; corrigé le
+   soir même dans sa PR `fix/` (D-098) ; fermeture au jugement du
+   porteur.** Le manque d'une
    planche dont la surface mouillée par son propre matériel est inconnue
    compte 0 m³ dans les totaux du plan (`lib/domain/planning/deficit.ts`).
    Sur la ferme des tests, le dimanche à 21 h, la plage des asperseurs
@@ -7864,7 +7868,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    au volume inconnu, et les cartes « Manque d'eau » et « Temps de pompage
    manquant » disent « au moins X m³ », ou « non chiffré », comme pour une
    eau inconnue (D-089) ; une PR `fix/` à part, le contrat du planning
-   précisé et le test rouge d'abord.
+   précisé et le test rouge d'abord. Corrigé le 12 novembre 2026 (D-098,
+   F147 à F150), comme recommandé : la planche compte à part sous chaque
+   total que ses motifs auraient grossi, la carte et son sous-titre le
+   disent, ainsi que la ligne du téléphone et le pli des changements, et
+   la note du manque d'eau se tait ; en pénurie, son manque reste sous
+   « volume inconnu en pénurie ». Trois tests de
+   `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
 
 ## Procédure de reprise rapide
 

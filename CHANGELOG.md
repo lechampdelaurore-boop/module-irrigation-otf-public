@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (3.9 : le manque au volume inconnu dans les totaux)
+
+- **Le manque d'une planche au volume inconnu ne compte plus zéro dans les
+  totaux du plan** (point ouvert 64, D-098). Sous une aspersion, quand le
+  passe-pied d'une planche n'est pas renseigné, son manque n'a pas de
+  volume : la carte « Temps de pompage manquant » ou « Manque d'eau » le
+  comptait 0 m³ et se lisait exacte — sur la ferme des tests, 2,24 m³ au
+  lieu de « au moins 2,24 m³ ». Elle écrit maintenant « au moins X m³ »,
+  ou « non chiffré », et son sous-titre nomme la planche au volume
+  inconnu ; la ligne de résumé du téléphone et le pli des changements
+  disent de même, et la note du manque d'eau se tait. En pénurie, ce
+  manque reste sous « volume inconnu en pénurie ». Aucune migration.
+
 ### Corrigé (3.9 : la surface mouillée inconnue en pénurie)
 
 - **Une planche dont le passe-pied n'est pas renseigné ne pèse plus zéro
