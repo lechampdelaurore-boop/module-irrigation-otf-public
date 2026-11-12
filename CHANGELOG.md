@@ -28,6 +28,7 @@ source détaillée commit par commit.
   sous le premier motif dans l'ordre alphabétique : un dimanche soir en
   pénurie, « Manque d'eau 0 m³ » et « Temps de pompage manquant
   6,25 m³ », pour 6,95 m³ et 0,64 m³. Aucune migration.
+  En ligne le 12 novembre 2026 à 16 h 45 (#21 de ce dépôt).
 
 ### Corrigé (3.9 : l'eau déjà validée en pénurie)
 

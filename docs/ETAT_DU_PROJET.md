@@ -48,8 +48,8 @@ registres, elle y renvoie.
   valider en pénurie ne refait plus le partage ; le cas limite, un
   arrosage validé au-delà de la part de sa planche, est tranché par le
   porteur le jour même : selon la conduite choisie, l'option codée.
-  **56 corrigé le 9 novembre
-  2026** (D-087, F113 à F115), dans une PR qui suit celle de 57 : le manque
+  **56 corrigé, en ligne** (#21 ; le 9 novembre 2026, D-087, F113 à
+  F115) : le manque
   d'une planche se partage entre la coupe de sa part, en manque d'eau, et
   son placement. **52 et 53 corrigés le 9 novembre 2026** (D-088, F116 à
   F119), dans une PR qui suit celle de 56 : une chaîne dont rien ne peut
@@ -90,6 +90,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+  PR #21 (`6ff25e1`, la correction du manque partagé entre l'eau et
+  le placement, point ouvert 56, D-087, fusionnée le 12 novembre à 16 h 31
+  et déployée à 16 h 45, run 43248783998, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
   PR #20 (`8e3cca4`, la correction de l'eau déjà validée en pénurie, point
   ouvert 57, D-086, fusionnée le 12 novembre à 15 h 59 et déployée
   à 16 h 14, run 43242971980, les quatre jobs réussis, aucune migration,

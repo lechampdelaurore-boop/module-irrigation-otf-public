@@ -2796,6 +2796,10 @@ le même cas, 6,95 m³ de manque d'eau, 0,64 m³ de temps de pompage,
 leur somme valant demandé moins placé ; la note dit « 1,113 m³ qui
 manquent pour une autre raison que l'eau ». Les 1 336 tests passent.
 
+**En ligne** : #21 du dépôt public fusionnée le 12 novembre 2026 à 16 h 31
+(`6ff25e1`) et déployée à 16 h 45 (run 43248783998, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-088 — L'origine indisponible n'entre dans aucun partage (points ouverts 52 et 53) : quatre précisions tranchées par la recommandation
 
 Date : 9 novembre 2026. Statut : appliquée, sous la conduite de
