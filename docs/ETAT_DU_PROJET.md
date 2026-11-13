@@ -140,8 +140,9 @@ registres, elle y renvoie.
   `feat/demo-fermes-fictives` posée sur celle de D1 : les fermes, les
   moments, l'espace par ferme et par moment, la date simulée au serveur et
   au navigateur, et ce que chaque ferme a déjà réglé (matériel, eau,
-  objectifs, plan du matin, saison passée). Deux questions agronomiques au
-  porteur (les espèces, le sol), la recommandation suivie en attendant.
+  objectifs, plan du matin, saison passée). Les deux questions
+  agronomiques (les espèces, le sol) tranchées par le porteur le
+  13 novembre 2026 sur la recommandation : rien ne change dans le code.
   Contrôles du 13 novembre 2026 : lint sans avertissement, typage sans
   erreur, 1 419 tests sur 1 419 (33 nouveaux), compilation réussie, knip,
   `push:check` et `weather:check` sans erreur, 88 parcours sur 88 (9,8 min) ; chaque moment constaté en

@@ -3502,8 +3502,9 @@ moment choisis dans la bannière, la date simulée posée requête par requête
 par le point d'entrée de la démonstration (`demo-worker.ts`), la production
 gardant le sien ; à sa première ouverture, chaque ferme a déjà son
 matériel, son eau, ses objectifs adoptés, son plan du matin et sa saison
-passée, et chaque moment montre ce qu'il annonce (un test par moment). Deux
-questions agronomiques au porteur (les espèces, le sol). Sa PR s'ouvre
+passée, et chaque moment montre ce qu'il annonce (un test par moment). Les deux
+questions agronomiques (les espèces, le sol) tranchées par le porteur le
+13 novembre 2026 sur la recommandation. Sa PR s'ouvre
 après celle de D1. Ensuite D3, la visite guidée.
 
 ### 4.7 — Hébergement et identité

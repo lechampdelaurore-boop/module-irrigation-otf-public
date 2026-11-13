@@ -233,7 +233,12 @@ attendant sa réponse, et changera si elle diffère.
   validé (migration 0023). A : carottes, épinards, tomates, courgettes,
   salades, radis, poireaux, oignons ; B : salades, courgettes, haricots,
   tomates ; C : pommes de terre, poireaux, fraisiers. *Question agronomique
-  posée au porteur (1 sur 2), recommandation suivie en attendant.*
+  posée au porteur (1 sur 2) : liste gardée telle quelle par lui le
+  13 novembre 2026 (« Garder la liste »).* **Le sol des fermes fictives
+  reste « non renseigné »** (question 2 sur 2, tranchée par le porteur le
+  même jour : « Laisser non renseigné ») : les seules valeurs de sol du
+  module sont celles de sa ferme, interdites ici, et aucune valeur n'est
+  inventée ; la jauge de la réserve du sol dit qu'il manque la donnée.
 - **F162 — la météo des moments**, sans appel réseau : le fournisseur de
   démonstration, avec deux épisodes : des nuits de gel du 15 et 16 avril
   (minimales de −2,4 et −1,1 °C) et une sécheresse chaude du 13 juillet au

@@ -3509,8 +3509,11 @@ météo selon le mois ; F169 une seule préparation.
 **Deux questions agronomiques au porteur** (une par message) : les espèces
 de chaque ferme (F161) et le sol (aucune valeur de sol du module n'est
 fictive : les seules sont celles de sa ferme, interdites ici ;
-recommandation : laisser le sol « non renseigné »). Le code suit la
-recommandation en attendant ses réponses.
+recommandation : laisser le sol « non renseigné »). **Tranchées par le
+porteur le 13 novembre 2026, une carte chacune** : les espèces gardées
+telles quelles (« Garder la liste »), le sol laissé « non renseigné »
+(« Laisser non renseigné ») ; le code, qui suivait déjà la recommandation,
+ne change pas.
 
 **Vérifié par** `tests/demo-farms.test.ts` (le catalogue, les témoins,
 l'espace par moment et l'identité forgée refusée, l'horloge simulée au
