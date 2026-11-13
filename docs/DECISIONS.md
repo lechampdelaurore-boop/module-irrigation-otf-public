@@ -3443,3 +3443,7 @@ consignées au contrat du planning :
 rouges avant le code : le temps de pompage, une chaîne indisponible (la
 carte, la ligne du téléphone et le pli), et la pénurie sous les trois
 conduites. Les 1 361 tests passent.
+
+**En ligne** : #31 du dépôt public fusionnée le 13 novembre 2026 à 2 h 49
+(`ac14f6b`) et déployée à 3 h 04 (run 43347699699, les quatre jobs
+réussis ; aucune migration, Workers inchangés).

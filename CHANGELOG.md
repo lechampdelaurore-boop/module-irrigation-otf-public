@@ -17,6 +17,7 @@ source détaillée commit par commit.
   inconnu ; la ligne de résumé du téléphone et le pli des changements
   disent de même, et la note du manque d'eau se tait. En pénurie, ce
   manque reste sous « volume inconnu en pénurie ». Aucune migration.
+  En ligne le 13 novembre 2026 à 3 h 04 (#31 de ce dépôt).
 
 ### Corrigé (3.9 : la surface mouillée inconnue en pénurie)
 
