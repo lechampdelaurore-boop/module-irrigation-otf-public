@@ -3764,3 +3764,56 @@ démonstration sur 16 (1,7 min) et `demo:check` sans erreur (la
 démonstration compilée sur sa configuration et vérifiée à blanc par
 Wrangler : sa base, ses cinq réglages, sa tâche de nuit, ni liaison ni
 secret).
+
+## D-107 — Style, graphique des réserves et vue satellite inscrits à la roadmap : après le tag v0.2.0, dans cet ordre, un chantier de code à la fois
+
+Date : 13 novembre 2026. Documents seuls, aucun code. Numéro : le premier
+libre après D-106 (la démo guidée et la clôture de la 3.9 sont en ligne).
+
+Trois chantiers demandés par le porteur n'étaient inscrits nulle part
+dans la roadmap : ils le sont maintenant (section 5 sexies, ligne 24 quater,
+tableau de la section 1).
+
+**Décisions.**
+
+- **Style « un peu plus joli » (S1)** : les cinq touches de la maquette du
+  porteur, habillage seulement, dans la charte d'Ouvre ta ferme. Le patch
+  R5 déjà écrit sur l'archive est **refait sur le dépôt public**
+  (`/mnt/project-files/style-plus-joli/`).
+- **Graphique des réserves du sol (S2)** : variante B choisie par le
+  porteur le 8 novembre 2026, une barre par jardin, les planches en
+  points, le prévu de dimanche en pointillé ; aucun calcul nouveau
+  (D-047 inchangée) ; une seule PR avec sa section de contrat.
+- **Vue satellite (S3)** : « le gratuit » (porteur, 8 novembre 2026,
+  11 h 13) : MapLibre GL JS et orthophotos IGN, fond interchangeable pour
+  les fermes hors de France, pas de Mapbox ; contour absent traité comme
+  un cas normal ; aucune position de planche.
+- **Ordre** : après le tag v0.2.0 de la 3.9 (posé) et la démo guidée
+  (D1 à D4, en ligne) : S1, S2, S3 ; **l'audit
+  ergonomique final** de toutes les pages vient après (captures en
+  Sonnet 5.5, analyse en Opus 5.5). Un seul chantier de code à la fois,
+  un seul chantier de code à la fois.
+
+**Réglage de chaque chantier** (grille de la roadmap, critères du juge, du
+coût d'une erreur non vue, de la liberté de conception et du contexte ;
+Fable est interdit, D-055) :
+
+- S1 et S2 : **Opus 5.5 · Élevé**. Ce sont des fonctionnalités délimitées
+  sous maquette validée et contrat écrit ; les tests, les parcours et la
+  CI jugent, et une erreur d'affichage se voit. C'est la ligne des passes
+  R3 et R4.
+- S3 : **Opus 5.5 · Très élevé**. Elle ajoute une migration, lit des
+  données d'OTF, charge une bibliothèque et un service externes, et rien
+  d'équivalent n'existe dans le module : plus de liberté de conception et
+  un contexte plus large. Pas Max, car aucune règle agronomique n'est en
+  jeu et l'isolation des fermes n'est pas touchée ; à relever à Max si le
+  contrat découvre que le rangement des contours croise l'isolation.
+
+**Tranché par la recommandation** (aucune question agronomique) : le
+réglage ci-dessus ; l'ordre S1, S2, S3, qui fait précéder le graphique de ses classes de style ; une
+seule PR de registres à la fois, celle-ci après la clôture de la 3.9.
+
+**Non établi.** La forme réelle de `coordinates` dans OTF, la
+disponibilité d'une tuile IGN depuis le site et les conditions d'usage de
+cartes.gouv.fr (à constater par le fil de S3) ; le contenu exact du patch
+de style une fois rejoué sur le dépôt public.

@@ -155,6 +155,13 @@ registres, elle y renvoie.
   fusion de la PR de clôture (#33), après son déploiement vérifié (run
   43485850915) : un tag simple, posé par la page de version « v0.2.0 — Tranche 3 clôturée » que le porteur a publiée sur GitHub, sur un lien préparé par l'assistant : la session de l'assistant ne peut écrire aucun tag (envoi refusé par GitHub, 403), écart au contrat qui le voulait annoté et poussé par l'assistant. Le premier passage du planificateur après D-100,
   le 14 novembre 2026 à 6 h 15, reste à constater.
+- Finitions, graphique des réserves du sol et vue satellite (section 5
+  sexies de la roadmap, D-107) : **inscrits le 13 novembre 2026, aucun
+  code encore**. Après le tag v0.2.0, dans l'ordre : style « un peu plus joli »
+  (patch de l'archive à refaire sur le dépôt public), graphique des
+  réserves du sol (variante B), vue satellite (MapLibre et orthophotos
+  IGN, le gratuit). L'audit ergonomique final vient après. Réglages :
+  Opus 5.5 · Élevé, Élevé, Très élevé.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

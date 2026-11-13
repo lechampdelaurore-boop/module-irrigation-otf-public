@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documents (registres : style, graphique des réserves, vue satellite)
+
+- Trois chantiers de code inscrits à la roadmap, sans code (D-107) : le
+  style « un peu plus joli », le graphique des réserves du sol (variante B)
+  et la vue satellite (MapLibre et orthophotos IGN), après le tag v0.2.0,
+  dans cet ordre, avec leur réglage de modèle et d'effort.
+
 ### Ajouté (4.0, D4 : la remise à zéro et le déploiement séparé)
 
 - **« Remettre à zéro » dans la bannière de la démonstration** (D-106) :
