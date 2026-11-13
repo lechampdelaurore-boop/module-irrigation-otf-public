@@ -149,6 +149,45 @@ Contrôles avant chaque PR (point 9 des instructions) : `pnpm lint`, `typecheck`
 - les noms exacts des variables (`OTF_DATA_SOURCE`, `WEATHER_DATA_SOURCE`, `LOCAL_DEMO_USER`), l'existence d'une horloge injectable pour la date simulée, et la structure de `mock-data.ts` ;
 - l'état de la deuxième passe « à la manière d'OTF » (#279) et de l'audit ergonomique : la visite doit se coder **après** leur mise en ligne pour ne pas être refaite.
 
+## 11 bis. Précisions faites en codant D1 (13 novembre 2026, D-099)
+
+Tranchées par la recommandation, sans valeur agronomique ; chacune reste
+modifiable par le porteur.
+
+- **F151 — le réglage.** Il s'appelle bien `DEMO_MODE`. Vide ou `false` : le
+  module se comporte exactement comme avant (production, développement,
+  parcours navigateur). `true` : démonstration. Toute autre valeur
+  (`1`, `yes`, `TRUE`…) refuse de démarrer, en production comme en
+  démonstration.
+- **F152 — le refus de démarrer**, contrôlé une fois par `instrumentation.ts`
+  avant toute page (vinext l'attend et mémorise son échec : toutes les pages
+  répondent par une erreur tant que la configuration ne change pas). Il
+  couvre, au-delà du jeton OTF et de la source `live` du contrat, la météo
+  `live`, la clé de météo, le jeton du service de notification, la liaison
+  au Worker de notification et le jeton de synchronisation météo : tout ce
+  que la couche 1 interdit à la démonstration. Le message nomme les
+  réglages en cause, jamais une valeur. Conséquence constatée : la
+  configuration de production (`wrangler.jsonc`, liaison au Worker de
+  notification) ne peut pas servir à la démonstration ; D4 aura la sienne.
+- **F153 — le réseau sortant.** Une seule exception à la couche 3 : le
+  domaine Access de l'équipe (`ACCESS_TEAM_DOMAIN`, en `https`, origine
+  exacte), dont les clés publiques vérifient la connexion des invités (C2).
+  La base D1 et le Worker lui-même ne passent pas par le réseau. Sans
+  domaine Access lisible, rien n'est joignable. La garde se pose sur l'appel
+  réseau du Worker au démarrage, avant le chargement des pages ; un refus
+  nomme l'hôte seul, jamais le chemin.
+- **F154 — les sources et les notifications.** En démonstration, Ouvre ta
+  ferme et la météo sont celles de démonstration même quand rien n'est posé
+  (la météo vaut `live` par défaut hors démonstration). Aucune notification :
+  pas de clé publique, service désactivé, pas de cloche ; dans Réglages et
+  dans Alertes météo, la ligne « Démonstration : les notifications du
+  téléphone sont désactivées, rien n'est envoyé. » remplace l'abonnement de
+  l'appareil.
+- **F155 — la bannière**, au-dessus de la barre du haut, sur toutes les
+  pages (première ouverture, données indisponibles et page introuvable
+  comprises), sans bouton pour la fermer ; le bouton « Remettre la
+  démonstration à zéro » s'y ajoute en D4, avec la remise à zéro.
+
 ## 12. Questions au porteur (répondues) (une par message, numérotées)
 
 Le total est **4**. Elles ne touchent que l'agronomie, le budget et les contacts extérieurs.

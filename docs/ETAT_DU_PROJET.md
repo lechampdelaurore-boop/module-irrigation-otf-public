@@ -126,6 +126,15 @@ registres, elle y renvoie.
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
   chantier de code à la fois ; D4 (Cloudflare) sur accord exprès du porteur.
+  **D1, les garde-fous du mode démo, codée la nuit du 12 au 13 novembre
+  2026** sur le mandat du porteur (D-099, précisions F151 à F155), sur sa
+  branche `feat/demo-garde-fous` ; sa PR s'ouvre après le tag `v0.2.0`,
+  pour que la recette finale de la 3.9 porte sur la version sans D1.
+  Contrôles du 13 novembre 2026, branche à jour avec `main` (`ac14f6b`) :
+  lint sans avertissement, typage sans erreur, 1 386 tests sur 1 386
+  (28 nouveaux), compilation réussie, knip, `push:check` et `weather:check`
+  sans erreur, 88 parcours sur 88 (9,7 min) ; refus de démarrer et bannière
+  constatés dans le serveur de développement (D-099).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
