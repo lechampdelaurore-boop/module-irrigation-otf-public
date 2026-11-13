@@ -14,7 +14,7 @@ import { windowIntervalForDay } from '../../lib/domain/planning/windows.ts';
 import type { IrrigationPump } from '../../lib/domain/pumps.ts';
 import { millimetersForDurationSeconds } from '../../lib/domain/irrigation-timer.ts';
 import { cubicMetersFromMillimeters, MILLISECONDS_PER_DAY, millisecondsFromSeconds, secondsFromMilliseconds } from '../../lib/domain/units.ts';
-import { dateKeyInTimeZone, splitVolumeAcrossLocalDays } from '../../lib/domain/water-management.ts';
+import { buildDailyWaterLedger, dateKeyInTimeZone, splitVolumeAcrossLocalDays } from '../../lib/domain/water-management.ts';
 import type { WaterInfrastructure } from '../../lib/domain/water-resources.ts';
 
 /**
@@ -233,11 +233,15 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
     const maximum = inputs.pumps.find((pump) => pump.id === usage.pumpId)?.maximumFlowCubicMetersPerHour ?? 0;
     assert.ok(engaged <= maximum + 1e-9, `${usage.pumpId} à ${engaged} m³/h à ${new Date(usage.start).toISOString()}`);
   }
-  // Limite journalière.
+  // Limite journalière, réalisé et validé compris : chaque jour, le plan n'ajoute que ce que la limite laisse après l'eau
+  // déjà arrosée ou engagée ce jour-là (contrat de la pénurie, invariant 4 ; D-085).
+  const committed = new Map(buildDailyWaterLedger(inputs.events, inputs.now, TZ)
+    .map((row) => [row.date, row.realizedCubicMeters + row.plannedCubicMeters + (row.estimatedOngoingCubicMeters ?? 0)]));
   for (const limit of inputs.dailyLimits) {
     for (const [date, volume] of volumeByDate) {
       if (limit.enabled && limit.maxCubicMetersPerDay !== null && date >= limit.validFrom) {
-        assert.ok(volume <= limit.maxCubicMetersPerDay + 1e-6, `${date} : ${volume} m³ sous la limite ${limit.maxCubicMetersPerDay}`);
+        const room = Math.max(0, limit.maxCubicMetersPerDay - (committed.get(date) ?? 0));
+        assert.ok(volume <= room + 1e-6, `${date} : ${volume} m³ placés pour ${room} m³ que la limite ${limit.maxCubicMetersPerDay} laisse`);
       }
     }
   }
@@ -254,6 +258,12 @@ export function assertInvariants(plan: WeeklyPlan, inputs: PlanningInputs, used:
     const sorted = [...starts].sort((left, right) => left - right);
     for (let index = 1; index < sorted.length; index += 1) {
       assert.ok(sorted[index] - sorted[index - 1] >= used.doses.drip.spacingDays * MILLISECONDS_PER_DAY - 1, `${bedId} : espacement respecté`);
+    }
+  }
+  // Créneaux refusés : aucun créneau du matériel ne recouvre ces heures, même en partie, quelle que soit la dose (D-030, S21).
+  for (const slot of inputs.refusedSlots ?? []) {
+    for (const proposal of plan.proposals.filter((item) => item.equipmentId === slot.equipmentId)) {
+      assert.ok(Date.parse(proposal.endAt) <= Date.parse(slot.startAt) || Date.parse(proposal.startAt) >= Date.parse(slot.endAt), `${proposal.id} ${proposal.startAt} → ${proposal.endAt} hors du créneau refusé ${slot.startAt} → ${slot.endAt}`);
     }
   }
   // Créneaux protégés : aucun créneau planifié n'en recouvre un, même en partie, quel que soit le matériel (D-062, règle 5).
