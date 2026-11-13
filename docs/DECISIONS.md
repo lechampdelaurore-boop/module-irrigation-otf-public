@@ -3710,6 +3710,11 @@ bulle dans la fenêtre et au-dessus de la barre des pages, aucun
 débordement, aucune erreur de console, aucune écriture. Contrôles du
 13 novembre 2026 au soir, branche refaite sur `main` après le tag et posée sur celle de D2 : lint sans avertissement, typage sans erreur, 1 431 tests sur 1 431 (11 nouveaux depuis D2), compilation réussie, knip, `push:check` et `weather:check` sans erreur, 88 parcours sur 88 (12,2 min) et 14 parcours de démonstration sur 14 (1,6 min). Constaté aussi en vrai, aux deux largeurs, sur le serveur de démonstration : les sept visites jouées de bout en bout dans chaque ferme concernée, sans erreur de console ni débordement.
 
+**En ligne** : #36 du dépôt public fusionnée le 13 novembre 2026 à 22 h 35
+(`442a9fd`) et déployée à 22 h 51 (run 43512069129, les quatre jobs
+réussis ; aucune migration, Workers inchangés). Rien de visible en
+production : D3 ne sert que la démonstration.
+
 ## D-106 — La remise à zéro et le déploiement séparé de la démonstration (4.0, D4) : neuf précisions tranchées par la recommandation
 
 Date : 13 novembre 2026. Quatrième et dernière PR de code de la démo guidée
