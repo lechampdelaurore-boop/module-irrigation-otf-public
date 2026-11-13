@@ -26,7 +26,7 @@ export function FeatureChoiceList({
 }) {
   const rows = featureChoiceRows(selection);
   return (
-    <fieldset className="feature-choice">
+    <fieldset className="feature-choice" data-tour="fonctionnalites">
       <legend>Fonctionnalités</legend>
       <ul>
         {rows.map((row) => {

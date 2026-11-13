@@ -249,7 +249,7 @@ export function WaterManagementDashboard({
 
   if (part === 'arrosages') {
     return (
-      <section className="water-management-section" aria-labelledby="water-today-title">
+      <section className="water-management-section" aria-labelledby="water-today-title" data-tour="eau-du-jour">
         <header className="water-management-heading">
           <div>
             <h2 id="water-today-title">L’eau du jour</h2>

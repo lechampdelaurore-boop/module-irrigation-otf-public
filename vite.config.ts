@@ -18,6 +18,9 @@ export default defineConfig(async () => {
   const viteEnvironment = { name: 'rsc', childEnvironments: ['ssr'] };
 
   return {
-    plugins: [vinext(), cloudflare({ viteEnvironment, configPath: 'wrangler.jsonc' })],
+    // Les parcours de la démonstration démarrent la même application sur une
+    // configuration locale écrite à part (scripts/demo-e2e-server.mjs), sans
+    // toucher celle de la production.
+    plugins: [vinext(), cloudflare({ viteEnvironment, configPath: process.env.IRRIGATION_WRANGLER_CONFIG ?? 'wrangler.jsonc' })],
   };
 });

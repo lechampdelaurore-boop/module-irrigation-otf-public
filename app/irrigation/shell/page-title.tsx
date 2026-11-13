@@ -34,6 +34,7 @@ export function PageTitle({ title, help, aside = null }: { title: string; help: 
           ref={toggle}
           type="button"
           className="page-help-toggle"
+          data-tour="aide-page"
           aria-expanded={open}
           aria-controls={panelId}
           aria-label={`Aide : ${title}`}

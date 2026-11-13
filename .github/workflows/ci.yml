@@ -93,6 +93,11 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Jouer les parcours
         run: pnpm e2e
+      # Les visites guidées de la démonstration, sur la même application
+      # démarrée en mode démonstration (docs/demo-guided-contract.md, D3) :
+      # après les parcours ordinaires, jamais en même temps (base locale commune).
+      - name: Jouer les parcours de la démonstration
+        run: pnpm e2e:demo
       - name: Conserver les traces des parcours en échec
         if: failure()
         uses: actions/upload-artifact@v7
@@ -101,6 +106,8 @@ jobs:
           path: |
             test-results/
             playwright-report/
+            test-results-demo/
+            playwright-report-demo/
           retention-days: 7
 
   deploy:

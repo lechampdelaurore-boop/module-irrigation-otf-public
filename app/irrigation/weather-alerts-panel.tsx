@@ -168,7 +168,7 @@ export function WeatherAlertsPanel({
   const templates = weatherAlertTemplates(view.criteria.length);
 
   return (
-    <article className="water-panel weather-alerts-panel" id="weather-alerts" aria-labelledby="weather-alerts-title">
+    <article className="water-panel weather-alerts-panel" id="weather-alerts" data-tour="alertes-meteo" aria-labelledby="weather-alerts-title">
       <div className="water-panel-title">
         <div>
           <h3 id="weather-alerts-title">Alertes météo</h3>

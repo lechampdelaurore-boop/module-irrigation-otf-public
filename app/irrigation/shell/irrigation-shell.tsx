@@ -94,6 +94,7 @@ export function IrrigationShell({
         signOutPath={signOutPath}
         demo={demo}
         demoSelection={demoSelection}
+        tour={demo ? { current: page, reachable: menu, query: { season, zone } } : null}
         notificationsHref={usesPushNotifications(menu.filter(isPageFeatureId)) ? pageHref('reglages', { season, zone }, 'notifications-title') : null}
       />
 
