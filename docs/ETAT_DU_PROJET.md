@@ -140,14 +140,15 @@ registres, elle y renvoie.
   à A14) : tout conforme, « Tous OK » du porteur ; la configuration Access
   lue sur son mot, et le contournement de la route interne retiré sur son
   ordre (D-100). Séance 2, la pénurie fabriquée sur la ferme réelle (B1 à
-  B13) : douze lignes conformes à l'avis de l'assistant, B10 non jouée (un
-  refus ne se défait pas, D-030), la ferme remise en état et le plan du
-  départ retrouvé ; un constat hors ligne, le point ouvert 66. Les
+  B13) : douze lignes conformes, OK du porteur, B10 non jouée (un refus ne
+  se défait pas, D-030), la ferme remise en état et le plan du départ
+  retrouvé ; un constat hors ligne, le point ouvert 66. Séance 3, le
+  téléphone (C1 à C4), jouée par l'assistant à sa demande, à 390 px : OK,
+  une gêne pour l'audit ergonomique final. Les
   invariants étendus (D-099, en ligne, #32) ; les contrôles complets et les 88 parcours
   verts ; le temps de rendu relu en ligne ; Vinext, risque levé (D-101) ;
-  le planificateur météo près de son délai, le point ouvert 65. Restent au
-  porteur : ses verdicts de B1 à B13, la séance 3 au téléphone (C1 à C4),
-  son mot de clôture, puis le tag `v0.2.0`.
+  le planificateur météo près de son délai, le point ouvert 65. Reste au
+  porteur son mot de clôture, puis le tag `v0.2.0`.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

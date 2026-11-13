@@ -2339,13 +2339,14 @@ rouge d'abord ; les tests des scénarios vont dans
   `docs/recette-tranche-3.md`) : la lecture sur données réelles conforme
   (« Tous OK » du porteur) ; la configuration Access lue, et le
   contournement de la route interne retiré sur son ordre (D-100) ; la
-  pénurie fabriquée sur la ferme réelle, B1 à B13, conforme à l'avis de
-  l'assistant, B10 non jouée parce qu'un refus ne se défait pas, la ferme
-  remise en état ; les scénarios S1 à S28 chacun avec sa preuve ; Vinext,
+  pénurie fabriquée sur la ferme réelle, B1 à B13, conforme, OK du
+  porteur, B10 non jouée parce qu'un refus ne se défait pas, la ferme
+  remise en état ; le téléphone, C1 à C4, joué par l'assistant à sa
+  demande, OK ; les scénarios S1 à S28 chacun avec sa preuve ; Vinext,
   risque levé (D-101) ; deux points ouverts non bloquants, 65 (le
   planificateur météo près de son délai) et 66 (la basse servie autant que
-  la normale sous un minimum de sécurité). Restent au porteur ses
-  verdicts, la séance au téléphone et son mot de clôture.
+  la normale sous un minimum de sécurité). Reste au porteur son mot de
+  clôture.
 
 ## 4. Chantier transversal Q — Socle qualité
 

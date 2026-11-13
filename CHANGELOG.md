@@ -23,9 +23,9 @@ source détaillée commit par commit.
 
 - **La recette finale de la tranche 3 est faite**, le 13 novembre 2026, sur
   la version en ligne : la lecture sur données réelles, la pénurie
-  fabriquée sur la ferme réelle puis défaite, les scénarios S1 à S28,
-  chacun avec sa preuve, les contrôles complets et les 88 parcours.
-  Restent au porteur ses verdicts, la séance au téléphone et son mot de
+  fabriquée sur la ferme réelle puis défaite, le téléphone, les scénarios
+  S1 à S28, chacun avec sa preuve, les contrôles complets et les 88
+  parcours ; les verdicts du porteur recueillis. Reste son mot de
   clôture.
 - Deux points ouverts relevés, non bloquants : le planificateur météo
   près de son délai de 25 s (65), la priorité basse servie autant que la
