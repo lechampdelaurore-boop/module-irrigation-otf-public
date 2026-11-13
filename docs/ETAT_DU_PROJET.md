@@ -548,7 +548,10 @@ registres, elle y renvoie.
   est terminé. **À vérifier par le porteur à son retour** : comme pour le
   calculateur, ni sa relecture en ligne ni une recette avec sa session sur
   la ferme réelle n'ont pu se faire cette nuit ; aucun créneau n'existe sur
-  sa ferme tant qu'il n'en pose pas.
+  sa ferme tant qu'il n'en pose pas. **Relu en ligne par le porteur le
+  8 novembre 2026 à 11 h 28** (« Ça a l'air de marcher. ») ; **close par lui
+  le 13 novembre 2026 à 21 h 48** (« Clôturer les deux », avec la 3.8 quater), des
+  retouches restant possibles après l'audit final.
 - 3.8 quater, audit ergonomique : **audit du 7 novembre 2026 retenu en entier
   par le porteur le jour même** (D-069), quatorze améliorations voulues, en
   trois lots (petits points 7, 4, 9, 11 ; téléphone, « Aujourd'hui » et
@@ -644,7 +647,9 @@ registres, elle y renvoie.
   « Aujourd'hui ». **PR 2, les PR 2 et 3 réunies** (#303 de l'archive, en
   ligne le 8 novembre 2026 à 18 h 57) : les gestes par ligne, les mots
   simples et l'accessibilité. Lot 3 complet, validé par le porteur le
-  8 novembre 2026 à 19 h 20.
+  8 novembre 2026 à 19 h 20. **3.8 quater close par lui le 13 novembre 2026 à 21 h 48**
+  (« Clôturer les deux », avec la 3.8 ter), des retouches restant possibles
+  après l'audit final.
 - Connexions matériel (C1 station météo locale, C2 tensiomètres, C3
   électrovannes) : **demandées par le porteur le 7 novembre 2026**
   (roadmap section 6 bis, D-063), après la 3.9, avant la tranche 4 ; trois

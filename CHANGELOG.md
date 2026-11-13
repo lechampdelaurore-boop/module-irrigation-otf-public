@@ -72,7 +72,9 @@ source détaillée commit par commit.
   clôture le 13 novembre 2026**, la Tranche 3 avec elle ; les points
   ouverts 49 à 64 fermés. Le tag `v0.2.0` posé le jour même sur le commit
   de fusion de la PR de clôture (#33), après son déploiement vérifié, par
-  la page de version « v0.2.0 — Tranche 3 clôturée ».
+  la page de version « v0.2.0 — Tranche 3 clôturée ». La 3.8 ter (créneaux
+  protégés nommés) et la 3.8 quater (audit ergonomique) closes par lui le
+  même soir, à 21 h 48.
 - Deux points ouverts relevés, non bloquants : le planificateur météo
   près de son délai de 25 s (65), la priorité basse servie autant que la
   normale sous un minimum de sécurité (66).
