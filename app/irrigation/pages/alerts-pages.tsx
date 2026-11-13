@@ -11,15 +11,17 @@ import { WeatherAlertsPanel } from '../weather-alerts-panel';
  * tels qu'ils étaient sous le tableau de l'eau de la semaine. Leurs actions
  * rendent ce tableau ; la page en garde l'encart.
  */
-export function WeatherAlertsPage({ season, initialDashboard, cropAlertsHref }: {
+export function WeatherAlertsPage({ season, initialDashboard, cropAlertsHref, demo }: {
   season: number;
   initialDashboard: WaterDashboard;
   /** La page « Alertes cultures » quand elle est cochée, `null` sinon (précision P43). */
   cropAlertsHref: string | null;
+  /** Un déploiement de démonstration : aucun appareil à abonner (docs/demo-guided-contract.md, C7). */
+  demo: boolean;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
   if (!dashboard.weatherAlerts) return null;
-  return <WeatherAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.weatherAlerts} cropAlertsHref={cropAlertsHref} onDashboard={setDashboard} />;
+  return <WeatherAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.weatherAlerts} cropAlertsHref={cropAlertsHref} demo={demo} onDashboard={setDashboard} />;
 }
 
 export function CropAlertsPage({ season, initialDashboard, sprinklerUnavailable }: {

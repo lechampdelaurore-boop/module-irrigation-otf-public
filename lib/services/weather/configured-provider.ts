@@ -3,6 +3,7 @@ import { demonstrationWeatherProvider } from '../../adapters/weather/demonstrati
 import { openMeteoWeatherProvider } from '../../adapters/weather/open-meteo-provider.ts';
 import { VisualCrossingWeatherProvider } from '../../adapters/weather/visual-crossing-provider.ts';
 import type { WeatherProvider } from '../../domain/weather/weather-provider.ts';
+import { isDemoDeployment } from '../deployment-mode.ts';
 
 let cachedKey: string | null = null;
 let cachedProvider: WeatherProvider | null = null;
@@ -42,6 +43,8 @@ class FreeWeatherProvider implements WeatherProvider {
  * valeur par défaut est `live`, et la production ne pose jamais ce réglage.
  */
 function readWeatherDataSource(): 'mock' | 'live' {
+  // La démonstration ne lit jamais la vraie météo (docs/demo-guided-contract.md, couche 2).
+  if (isDemoDeployment()) return 'mock';
   const configured = process.env.WEATHER_DATA_SOURCE ?? env.WEATHER_DATA_SOURCE;
   return configured === 'mock' ? 'mock' : 'live';
 }

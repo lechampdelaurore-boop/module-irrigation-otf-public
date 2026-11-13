@@ -42,6 +42,8 @@ export type ShellProps = {
   banner: string | null;
   /** La page demandée n'était pas cochée : la ligne qui le dit (P14). */
   notice: string | null;
+  /** Un déploiement de démonstration (docs/demo-guided-contract.md) : bannière permanente, aucune notification. */
+  demo: boolean;
 };
 
 export function IrrigationShell({
@@ -56,7 +58,7 @@ export function IrrigationShell({
   /** La pastille de « Aujourd'hui » quand la page la connaît (F12) ; absente, le menu la lit après l'affichage. */
   todayBadge?: number | null;
 }) {
-  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice } = props;
+  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice, demo } = props;
 
   const shell = useRef<HTMLElement>(null);
 
@@ -87,6 +89,7 @@ export function IrrigationShell({
       <Topbar
         userName={userName}
         signOutPath={signOutPath}
+        demo={demo}
         notificationsHref={usesPushNotifications(menu.filter(isPageFeatureId)) ? pageHref('reglages', { season, zone }, 'notifications-title') : null}
       />
 

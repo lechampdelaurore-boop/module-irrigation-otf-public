@@ -11,6 +11,7 @@ import {
   type WeatherAlertCriterionInput,
 } from '@/lib/domain/weather/weather-alerts';
 import { weatherAlertTemplates, type WeatherAlertTemplate } from '@/lib/domain/weather/weather-alert-templates';
+import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { WeatherAlertsDevice } from './weather-alerts-device';
 import {
   deleteWeatherAlertCriterionAction,
@@ -74,9 +75,12 @@ export function WeatherAlertsPanel({
   weekStart,
   view,
   cropAlertsHref,
+  demo,
   onDashboard,
 }: {
   season: number;
+  /** Un déploiement de démonstration : la ligne qui le dit au lieu de l'abonnement de l'appareil (C7). */
+  demo: boolean;
   /** La page « Alertes cultures » quand elle est cochée, `null` sinon (précision P43). */
   cropAlertsHref: string | null;
   weekStart: string;
@@ -185,7 +189,7 @@ export function WeatherAlertsPanel({
         ) : null}
       </div>
 
-      <WeatherAlertsDevice season={season} />
+      {demo ? <p className="demo-push-notice" role="note">{DEMO_PUSH_NOTICE}</p> : <WeatherAlertsDevice season={season} />}
 
       {notice ? <p className="water-notice" role="status">{notice}</p> : null}
       {error ? <p className="water-error" role="alert">{error}</p> : null}

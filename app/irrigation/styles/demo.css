@@ -1,0 +1,47 @@
+/*
+ * La démonstration (docs/demo-guided-contract.md, sections 4 et 9) : la
+ * bannière permanente au-dessus de la barre du haut, et la ligne qui remplace
+ * les notifications du téléphone. Charte du module : bloc blanc, liseré vert
+ * pâle, texte Open Sans, icône au trait, hauteur de 44 px au moins.
+ */
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--green-soft);
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 14px;
+}
+
+.demo-banner-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--tile);
+  color: var(--green);
+}
+
+.demo-banner p {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.demo-push-notice {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink2);
+}

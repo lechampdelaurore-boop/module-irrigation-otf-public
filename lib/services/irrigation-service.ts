@@ -14,6 +14,7 @@ import {
   readOtfSeasonSnapshot,
 } from '@/lib/adapters/otf/snapshot-reader';
 import { readLiveOrLastSuccessfulSnapshot } from '@/lib/domain/snapshot-policy';
+import { isDemoDeployment } from '@/lib/services/deployment-mode';
 
 // Le plan de culture s'ajoute à l'instantané le 29 septembre 2026 : un cache
 // de la version précédente n'en a pas, une nouvelle clé force sa lecture.
@@ -149,6 +150,8 @@ function snapshotForSeason(
 }
 
 function readDataSource(): 'mock' | 'live' {
+  // La démonstration ne lit jamais Ouvre ta ferme (docs/demo-guided-contract.md, couche 2).
+  if (isDemoDeployment()) return 'mock';
   // En développement local, le lanceur sécurisé fournit les réglages via
   // process.env. Ils doivent donc primer sur les bindings du site publié.
   const configured = process.env.OTF_DATA_SOURCE ?? env.OTF_DATA_SOURCE;

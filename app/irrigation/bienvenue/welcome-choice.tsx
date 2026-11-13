@@ -8,7 +8,7 @@ import { FeatureChoiceList } from '../shell/feature-choice-list';
 import { Topbar } from '../shell/topbar';
 
 /** Le choix de la première ouverture (R5) : il faut au moins une case pour continuer (P7). */
-export function WelcomeChoice({ userName, signOutPath }: { userName: string; signOutPath: string }) {
+export function WelcomeChoice({ userName, signOutPath, demo }: { userName: string; signOutPath: string; demo: boolean }) {
   const shell = useRef<HTMLElement>(null);
   const [selection, setSelection] = useState<FeatureSelection>([]);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export function WelcomeChoice({ userName, signOutPath }: { userName: string; sig
 
   return (
     <main ref={shell} className="app-shell welcome-shell">
-      <Topbar userName={userName} signOutPath={signOutPath} />
+      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} />
       <section className="welcome-choice" aria-labelledby="welcome-title">
         <p className="eyebrow">Première ouverture</p>
         <h1 id="welcome-title">Choisissez vos fonctionnalités</h1>

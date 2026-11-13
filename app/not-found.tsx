@@ -3,6 +3,8 @@ import { getAuthenticatedUser, signOutPath } from '@/app/access-auth';
 import { menuPages, NOT_FOUND_LABEL, notFoundReturnLink, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { logJsonLine } from '@/lib/adapters/log';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
+import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { DemoBanner } from './irrigation/shell/demo-banner';
 import { FeatureMenu } from './irrigation/shell/feature-menu';
 import { Topbar } from './irrigation/shell/topbar';
 import './irrigation/irrigation.css';
@@ -29,10 +31,11 @@ export default async function NotFound() {
     </section>
   );
 
-  if (!farm) return <main className="app-shell">{content}</main>;
+  const demo = isDemoDeployment();
+  if (!farm) return <main className="app-shell">{demo ? <DemoBanner /> : null}{content}</main>;
   return (
     <main className="app-shell">
-      <Topbar userName={farm.userName} signOutPath={signOutPath()} />
+      <Topbar userName={farm.userName} signOutPath={signOutPath()} demo={demo} />
       <div className="feature-layout">
         {farm.menu.length > 0 ? <FeatureMenu menu={farm.menu} current={null} query={{}} /> : null}
         <div className="feature-page">{content}</div>
