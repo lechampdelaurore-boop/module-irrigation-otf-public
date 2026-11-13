@@ -20,6 +20,7 @@ import { logJsonLine } from '@/lib/adapters/log';
 import { startStopwatch } from '@/lib/adapters/stopwatch';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
 import { getIrrigationSnapshot, IrrigationDataUnavailableError } from '@/lib/services/irrigation-service';
+import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
@@ -101,6 +102,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
         reason: loaded.reason,
         seasonFirst: loaded.seasonFirst,
         seasonLast: loaded.seasonLast,
+        demo: isDemoDeployment(),
       },
     };
   }
@@ -131,6 +133,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       warning: snapshot.warning ?? null,
       banner: selection.banner ? featureBannerText(selection.banner) : null,
       notice: params.absente === '1' ? ABSENT_FEATURE_NOTICE : null,
+      demo: isDemoDeployment(),
     },
     lap: (step) => stopwatch.lap(step),
     logLoaded: () => {

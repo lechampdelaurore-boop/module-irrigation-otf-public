@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (4.0, D1 : les garde-fous du mode démo)
+
+- **Le mode démo** (`DEMO_MODE=true`, D-103), première pièce de la démo
+  guidée : un déploiement de démonstration refuse de démarrer s'il reçoit
+  quoi que ce soit de réel (jeton ou source Ouvre ta ferme, météo réelle,
+  service de notification), et la production refuse de démarrer si elle
+  voit `DEMO_MODE`. En démonstration, aucun appel ne part vers Ouvre ta
+  ferme ni la météo, aucune notification n'est envoyée, et une bannière
+  dit sur chaque page : « Démonstration : données fictives. Rien ici ne
+  touche une vraie ferme. » Sans `DEMO_MODE`, rien ne change. Aucune
+  migration ; le déploiement de la démonstration viendra en D4.
+
 ## 2026-11 — Tranche 3 clôturée (v0.2.0)
 
 - Planning hebdomadaire de l'irrigation : propositions justifiées,

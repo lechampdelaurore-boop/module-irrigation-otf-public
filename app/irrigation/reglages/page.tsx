@@ -1,3 +1,4 @@
+import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
 import { CropCoefficientsPanel } from '../crop-water/crop-coefficients-panel';
 import { loadPageContext, type IrrigationSearchParams } from '../page-context';
@@ -28,7 +29,9 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
     <IrrigationShell {...context.shell}>
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
       {waterDashboard ? <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} part="reglages" /> : null}
-      {usesPushNotifications(context.enabled) ? <NotificationSettings season={context.season} /> : null}
+      {usesPushNotifications(context.enabled)
+        ? context.shell.demo ? <p className="demo-push-notice" role="note">{DEMO_PUSH_NOTICE}</p> : <NotificationSettings season={context.season} />
+        : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
     </IrrigationShell>
   );

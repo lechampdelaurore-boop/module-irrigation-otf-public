@@ -3554,3 +3554,42 @@ de l'archive) ; aucun incident attribué à Vinext depuis, ni dans les
 registres ni pendant la recette finale. D-015 est close « risque levé » ;
 l'épinglage exact de la version et ses mises à jour en lot dédié, testées
 par la CI, restent la règle (Q4). Aucun code.
+
+## D-103 — Les garde-fous du mode démo (4.0, D1) : cinq précisions tranchées par la recommandation
+
+Date : 13 novembre 2026. Première PR de code de la démo guidée
+(`docs/demo-guided-contract.md`, D-096), codée la nuit du 12 au
+13 novembre 2026 sur le mandat du porteur (« Je veux que tu enchaînes les
+chantiers en toute autonomie toute la nuit », 12 novembre 2026, 21 h 44),
+en Opus 5.5 · Élevé (ligne 4.0 de la roadmap), sur sa branche ; sa PR
+s'ouvre après le tag `v0.2.0` de la 3.9, pour que la recette finale porte
+sur la version sans D1 (D-014).
+
+**Décision.** Un déploiement est la production ou la démonstration, jamais
+un mélange : `DEMO_MODE=true` démarre une démonstration seulement si rien
+de réel n'est branché, et le module refuse de démarrer dans les deux sens
+(couche 2) ; en démonstration, tout appel réseau sort seulement vers le
+domaine Access de l'équipe (couche 3). Les sources sont celles de
+démonstration, aucune notification ne part, et une bannière permanente dit
+que les données sont fictives.
+
+**Cinq précisions**, consignées au contrat (section 11 bis) : F153 le nom et
+les valeurs de `DEMO_MODE` ; F154 le refus de démarrer étendu à tous les
+secrets réels et à la liaison au Worker de notification, contrôlé par
+`instrumentation.ts` ; F155 l'exception du domaine Access ; F156 les sources
+de démonstration forcées et les notifications absentes ; F157 la bannière
+sans bouton jusqu'à D4.
+
+**Vérifié par** `tests/demo-mode.test.ts` (le mode dans les deux sens, une
+valeur illisible, le réseau refusé vers Ouvre ta ferme, Open-Meteo, Visual
+Crossing et le service de notification, l'origine exacte d'Access, la
+bannière, aucun écran qui lise le jeton) et `tests/demo-mode-startup.test.ts`
+(le démarrage réel par `instrumentation.ts` : refus dans les deux sens, même
+par les réglages du Worker ; production inchangée ; en démonstration, les
+vrais adaptateurs d'Ouvre ta ferme et de la météo n'émettent aucun appel ;
+météo de démonstration sans réglage ; notifications désactivées). Constaté
+aussi dans le serveur de développement : avec `DEMO_MODE=true` sur la
+configuration de production, chaque page répond « Démarrage refusé : la
+démonstration est liée au Worker de notification » ; sans cette liaison, la
+bannière s'affiche aux deux largeurs, sans cloche ni défilement de côté, et
+le navigateur ne joint aucun hôte extérieur.
