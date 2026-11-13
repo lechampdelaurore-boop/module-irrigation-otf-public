@@ -30,7 +30,7 @@ la publication pilotable.
 | Application | Worker Cloudflare `module-irrigation-otf` dans le compte du porteur, adresse `https://module-irrigation-otf.<sous-domaine>.workers.dev` |
 | Base | D1 `module-irrigation-otf`, liaison `DB`, migrations du dossier `drizzle/` appliquées par Wrangler |
 | Connexion | Cloudflare Access devant le Worker : code à usage unique envoyé au courriel du porteur ; identité transmise à l'application par le jeton `Cf-Access-Jwt-Assertion`, vérifié côté serveur |
-| Route interne météo | `/api/internal/*` exclue d'Access par une règle de contournement ; elle reste protégée par son jeton partagé comparé en temps constant |
+| Route interne météo | `/api/internal/*` derrière Access comme le reste du Worker depuis le 13 novembre 2026 (D-100), la règle de contournement de la phase 1 retirée : le planificateur la joint par la liaison de service `IRRIGATION_SITE`, qui ne traverse pas Access ; elle reste protégée par son jeton partagé comparé en temps constant |
 | Publication | GitHub Actions : à chaque fusion dans `main`, après les contrôles, application des migrations puis déploiement ; les Workers ne sont redéployés que si leur dossier a changé |
 | Secrets | Dans Cloudflare, saisis par le porteur ; dans GitHub, un jeton d'API Cloudflare et l'identifiant de compte pour le déploiement |
 | Développement local | Base D1 locale migrée par `wrangler d1 migrations apply --local`, utilisateur de démonstration hors production ; débloque la sous-tranche Q5 |

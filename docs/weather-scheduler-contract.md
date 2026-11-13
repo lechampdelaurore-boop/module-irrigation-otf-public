@@ -19,9 +19,11 @@ de synchronisation que le bouton manuel.
 ## Sécurité
 
 - la route interne refuse tout appel sans `WEATHER_SYNC_SERVICE_TOKEN` valide ;
-- la route `/api/internal/*` du site est exclue de Cloudflare Access par une
-  règle de contournement ; aucun jeton d’hébergement n’est nécessaire, seul le
-  secret partagé ci-dessus protège la route ;
+- la route `/api/internal/*` du site est derrière Cloudflare Access comme le
+  reste du site depuis le 13 novembre 2026 (D-100) : la liaison de service ne
+  traverse pas Access, aucun jeton d’hébergement n’est nécessaire, et le secret
+  partagé ci-dessus protège la route ; la règle de contournement qui l’en
+  excluait depuis la phase 1 est retirée ;
 - aucun de ces secrets n’est présent dans Git, une URL ou les journaux ;
 - l’endpoint manuel du Worker est un `POST /run` protégé par le même secret et
   sert uniquement à la recette et au diagnostic ;

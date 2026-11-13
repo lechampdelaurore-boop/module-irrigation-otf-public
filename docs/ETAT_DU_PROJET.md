@@ -28,8 +28,9 @@ registres, elle y renvoie.
   le porteur le 9 novembre 2026 à 11 h 40, **en ligne** (#17, D-083,
   précisions F92 à F97, aucune migration), relu en ligne et jugé correct
   par le porteur le 12 novembre 2026 à 21 h 25 (« L'écran d'arbitrage dans
-  faisabilité me paraît correct. »). Puis les lots 3 à 7. Ni
-  recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
+  faisabilité me paraît correct. »). Puis les lots 3 à 7 : la recette
+  finale (lot 6) faite le 13 novembre 2026, la clôture (lot 7) et le tag
+  `v0.2.0` sur le mot du porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts` et
   `tests/planning-shortage-scenarios.test.ts` (F98).
 - 3.9, lot 3, les scénarios de pénurie en tests du moteur : **en ligne**
@@ -132,6 +133,21 @@ registres, elle y renvoie.
   créneaux refusés et des arrosages validés ; les invariants vérifient en
   plus les créneaux refusés, et la limite journalière compte l'eau déjà
   arrosée ou validée du jour. Aucun défaut.
+- 3.9, recette finale (lot 6) : **faite le 13 novembre 2026** sur
+  `ac14f6b`, la version en ligne (`docs/recette-tranche-3.md`). Le porteur
+  à la première séance, puis absent sur son mandat (« avancer en
+  autonomie », réponses par la recommandation). Séance 1, la lecture (0, A1
+  à A14) : tout conforme, « Tous OK » du porteur ; la configuration Access
+  lue sur son mot, et le contournement de la route interne retiré sur son
+  ordre (D-100). Séance 2, la pénurie fabriquée sur la ferme réelle (B1 à
+  B13) : douze lignes conformes à l'avis de l'assistant, B10 non jouée (un
+  refus ne se défait pas, D-030), la ferme remise en état et le plan du
+  départ retrouvé ; un constat hors ligne, le point ouvert 66. Les
+  invariants étendus (D-099) ; les contrôles complets et les 88 parcours
+  verts ; le temps de rendu relu en ligne ; Vinext, risque levé (D-101) ;
+  le planificateur météo près de son délai, le point ouvert 65. Restent au
+  porteur : ses verdicts de B1 à B13, la séance 3 au téléphone (C1 à C4),
+  son mot de clôture, puis le tag `v0.2.0`.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -710,11 +726,8 @@ registres, elle y renvoie.
 - Code suivant, d'après l'ordre de `docs/ROADMAP.md` (section 2) : le
   mandat du 6 novembre 2026 (D-060) est entièrement codé ; reste, avec le
   porteur, son jugement sur les recettes de la 5 ter et de la 5 quinquies.
-  Après la 3.8, close par le porteur : la deuxième passe de la refonte
-  (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
-  3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
-  cours : lot 2, quatre PR `fix/`, une à la fois, toutes les quatre en
-  ligne (#11 à #14).
+  La 3.9 se clôt sur le mot du porteur (lot 7) ; ensuite la tranche 4,
+  ouverte par la démo guidée (ordre 25, D-096).
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).
@@ -726,7 +739,9 @@ registres, elle y renvoie.
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot
   d'harmonisation n'est pas planifié, il attend le « vas-y » du porteur.
-- PR de Dependabot ouvertes (#230 à #234) : jamais fusionnées seules.
+- Dependabot retiré du dépôt public par la PR #9 (8 novembre 2026) ; sa
+  remise éventuelle sera une PR à part. Ses PR #230 à #234 restent sur
+  l'archive, jamais fusionnées.
 
 ## Référence Git
 
@@ -870,7 +885,8 @@ Le 19 septembre 2026, Cloudflare Access configuré : équipe Zero Trust
 `damp-wind-3566` sur l'offre gratuite, application « Module irrigation »
 protégeant le Worker (session d'un mois, politique Allow sur le seul courriel
 du porteur, code à usage unique), application « Module irrigation - route
-interne » en Bypass sur le chemin `/api/internal`. Variables
+interne » en Bypass sur le chemin `/api/internal` (retirée le 13 novembre
+2026, D-100). Variables
 `ACCESS_TEAM_DOMAIN` et `ACCESS_AUD` inscrites dans `wrangler.jsonc`, Worker
 redéployé et sondé : `/irrigation` redirige vers la connexion Access, la route
 interne reçoit bien les requêtes et répond 401 sans jeton applicatif. Les
@@ -7082,7 +7098,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    sixième recette du 10 octobre, 1,5 s chacun, n'en ont pas produit.
    Depuis le 31 octobre 2026 (3.7, PR 2), chaque recalcul sur événement
    écrit `planning_calculation_completed` avec `triggerEvent` : une occasion
-   de plus d'observer le 3 s à 45 s.
+   de plus d'observer le 3 s à 45 s. Le 13 novembre 2026, à la recette
+   finale de la 3.9 : aucun recalcul de 3 s à 45 s (de 1,0 à 1,9 s, G3) ;
+   dans les journaux des sept jours d'avant, les quatre affichages de page
+   dont l'instantané s'est relu en direct depuis Ouvre ta ferme ont pris
+   6,7 s médians, 7,7 s au plus, dont 6,1 s médians de lecture (G2) : la
+   piste du point, vue sur un affichage, pas sur un recalcul. Laissé en
+   veille.
 35. ✅ **Ouvert le 5 octobre 2026 au soir par la quatrième recette réelle du
    planning, scénario 4 du contrat ; corrigé le 9 octobre 2026 sur le mot du
    porteur, PR #156 fusionnée et déployée le jour même.** Sous une limite
@@ -7895,6 +7917,35 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    la note du manque d'eau se tait ; en pénurie, son manque reste sous
    « volume inconnu en pénurie ». Trois tests de
    `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
+65. 🟡 **Ouvert le 13 novembre 2026 par la recette finale de la 3.9, en
+   lisant les journaux du planificateur météo ; non bloquant, à regarder
+   après le tag `v0.2.0`.** La synchronisation météo du matin frôle le
+   délai de 25 s que le planificateur donne à son appel : les 11 et
+   12 novembre 2026, la première tentative de 6 h 15 a expiré au bout de
+   25 s (`weather_scheduler_network_retry`, « TimeoutError ») et la
+   deuxième a réussi (statut 200, à 6 h 15 min 49 s et à 6 h 15 min 54 s) ;
+   le 13, la première a suffi (6 h 15 min 16 s). Rien n'est perdu, les
+   nouvelles tentatives sont prévues pour cela, mais la marge est mince.
+   Recommandation : lire d'abord, dans les journaux de la synchronisation,
+   la durée de chacune de ses étapes, avant d'allonger le délai ou
+   d'alléger l'appel ; aucun code avant le tag.
+66. 🟡 **Ouvert le 13 novembre 2026 par la recette finale de la 3.9 (B2) ;
+   non bloquant, au jugement du porteur, à étudier après le tag
+   `v0.2.0`.** En pénurie sous un minimum de sécurité, la priorité basse
+   peut recevoir autant que la normale. Sur la ferme réelle, la réserve à
+   25 m³ pour un minimum relevé à 40 m³, le forage sans limite : la ligne
+   de budget vise 100 % pour la haute, 89 % pour la normale et 0 % pour la
+   basse, et en place 100 %, 52 % et 52 %. Le moteur préfère attendre l'eau
+   d'une dose pleine plutôt que partir plus tôt avec une dose réduite
+   (`lib/domain/planning/engine.ts`) : le tunnel 2 attend dimanche 00:43
+   pour ses 15 mm, et l'espacement de 24 h lui ferme le créneau de
+   dimanche 21:00 ; le tunnel 3, faute d'eau samedi soir, n'a que celui de
+   dimanche ; l'eau que la normale ne peut plus prendre va à la basse en
+   fin de tour (S17). Refait à la main, un départ du tunnel 2 samedi à
+   21:00, vers 7,4 mm, puis 15 mm dimanche lui donneraient environ 22 mm,
+   et moins au tunnel 4. Aucun invariant n'est violé et aucun chiffre n'est
+   faux : c'est une limite de la règle de placement. Recommandation :
+   l'étudier après le tag ; aucun code avant.
 
 ## Procédure de reprise rapide
 
