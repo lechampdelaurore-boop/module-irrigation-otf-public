@@ -2,6 +2,7 @@
 
 import { useSystemAlertsDot } from '../irrigation-manager/system-alerts-memory';
 import { Icon } from '../line-icon';
+import { DemoBanner } from './demo-banner';
 
 /**
  * La barre du haut, commune à toutes les pages du module (deuxième passe de
@@ -10,44 +11,52 @@ import { Icon } from '../line-icon';
  * son initiale ; au téléphone, la barre anthracite de 36 px avec le nom, la
  * cloche des notifications et l'initiale. La cloche prend un point quand le
  * bandeau « Alertes système non disponibles » s'est replié (audit
- * ergonomique, point 2, précision F10).
+ * ergonomique, point 2, précision F10). En démonstration, la bannière
+ * permanente la précède (docs/demo-guided-contract.md, section 4).
  */
 export function Topbar({
   userName,
   signOutPath,
   notificationsHref = null,
+  demo = false,
 }: {
   userName: string;
   signOutPath: string;
   /** Les réglages des notifications, quand une case cochée en envoie. */
   notificationsHref?: string | null;
+  /** Un déploiement de démonstration : la bannière, et jamais la cloche. */
+  demo?: boolean;
 }) {
   const alertsLimited = useSystemAlertsDot();
+  const bellHref = demo ? null : notificationsHref;
   return (
-    <header className="topbar">
-      <a className="brand" href="/irrigation" aria-label="Accueil Irrigation">
-        <span className="brand-mark" aria-hidden="true">
-          <Icon name="goutte" />
-        </span>
-        <strong>Irrigation</strong>
-      </a>
-      <div className="account">
-        <strong className="account-name">{userName}</strong>
-        {notificationsHref ? (
-          <a
-            className="topbar-bell"
-            href={notificationsHref}
-            data-alerts-limited={alertsLimited}
-            aria-label={alertsLimited ? 'Notifications du téléphone : alertes système non disponibles sur cet appareil' : 'Notifications du téléphone'}
-            title="Notifications du téléphone"
-          >
-            <Icon name="cloche" />
-          </a>
-        ) : null}
-        <a className="avatar" href={signOutPath} aria-label={`Déconnecter ${userName}`} title="Se déconnecter">
-          {userName.slice(0, 1).toLocaleUpperCase('fr-FR')}
+    <>
+      {demo ? <DemoBanner /> : null}
+      <header className="topbar">
+        <a className="brand" href="/irrigation" aria-label="Accueil Irrigation">
+          <span className="brand-mark" aria-hidden="true">
+            <Icon name="goutte" />
+          </span>
+          <strong>Irrigation</strong>
         </a>
-      </div>
-    </header>
+        <div className="account">
+          <strong className="account-name">{userName}</strong>
+          {bellHref ? (
+            <a
+              className="topbar-bell"
+              href={bellHref}
+              data-alerts-limited={alertsLimited}
+              aria-label={alertsLimited ? 'Notifications du téléphone : alertes système non disponibles sur cet appareil' : 'Notifications du téléphone'}
+              title="Notifications du téléphone"
+            >
+              <Icon name="cloche" />
+            </a>
+          ) : null}
+          <a className="avatar" href={signOutPath} aria-label={`Déconnecter ${userName}`} title="Se déconnecter">
+            {userName.slice(0, 1).toLocaleUpperCase('fr-FR')}
+          </a>
+        </div>
+      </header>
+    </>
   );
 }

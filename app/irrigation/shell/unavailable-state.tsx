@@ -13,17 +13,19 @@ export type UnavailableStateProps = {
   reason: IrrigationUnavailableReason | 'season-unavailable';
   seasonFirst?: number;
   seasonLast?: number;
+  /** Un déploiement de démonstration : la bannière permanente (docs/demo-guided-contract.md). */
+  demo: boolean;
 };
 
 /** Ouvre ta ferme n'a pas répondu et rien n'est encore enregistré : aucune page ne peut s'afficher. */
-export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast }: UnavailableStateProps) {
+export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast, demo }: UnavailableStateProps) {
   const rateLimited = reason === 'rate-limit';
   const seasonUnavailable = reason === 'season-unavailable' && seasonFirst !== undefined && seasonLast !== undefined;
   const fallbackSeason = seasonUnavailable ? closestAvailableSeason(season, seasonFirst, seasonLast) : season;
 
   return (
     <main className="app-shell">
-      <Topbar userName={userName} signOutPath={signOutPath} />
+      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} />
       <section className="fatal-state" role="alert">
         <p className="eyebrow">
           {seasonUnavailable

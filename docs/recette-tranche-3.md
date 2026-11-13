@@ -315,4 +315,6 @@ ou dit « non vérifié ».
   suivante.
 - Le tag `v0.2.0`, annoté, posé sur le commit de fusion de la PR de clôture
   après son déploiement vérifié, sur le mot du porteur, poussé par
-  l'assistant ; annoncé avec son lien, consigné par la PR suivante.
+  l'assistant ; annoncé avec son lien, consigné par la PR suivante. Posé
+  le 13 novembre 2026 à 20 h 58 sur `70477a4`, le commit de fusion de #33,
+  déployé à 19 h 58 (run 43485850915, les quatre jobs réussis) : un tag simple, posé par la page de version « v0.2.0 — Tranche 3 clôturée » que le porteur a publiée sur GitHub, sur un lien préparé par l'assistant : la session de l'assistant ne peut écrire aucun tag (envoi refusé par GitHub, 403), écart au contrat qui le voulait annoté et poussé par l'assistant.

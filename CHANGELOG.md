@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (4.0, D1 : les garde-fous du mode démo)
+
+- **Le mode démo** (`DEMO_MODE=true`, D-103), première pièce de la démo
+  guidée : un déploiement de démonstration refuse de démarrer s'il reçoit
+  quoi que ce soit de réel (jeton ou source Ouvre ta ferme, météo réelle,
+  service de notification), et la production refuse de démarrer si elle
+  voit `DEMO_MODE`. En démonstration, aucun appel ne part vers Ouvre ta
+  ferme ni la météo, aucune notification n'est envoyée, et une bannière
+  dit sur chaque page : « Démonstration : données fictives. Rien ici ne
+  touche une vraie ferme. » Sans `DEMO_MODE`, rien ne change. Aucune
+  migration ; le déploiement de la démonstration viendra en D4.
+
 ## 2026-11 — Tranche 3 clôturée (v0.2.0)
 
 - Planning hebdomadaire de l'irrigation : propositions justifiées,
@@ -27,7 +39,9 @@ source détaillée commit par commit.
   S1 à S28, chacun avec sa preuve, les contrôles complets et les 88
   parcours ; les verdicts du porteur recueillis. **Close sur son mot de
   clôture le 13 novembre 2026**, la Tranche 3 avec elle ; les points
-  ouverts 49 à 64 fermés.
+  ouverts 49 à 64 fermés. Le tag `v0.2.0` posé le jour même sur le commit
+  de fusion de la PR de clôture (#33), après son déploiement vérifié, par
+  la page de version « v0.2.0 — Tranche 3 clôturée ».
 - Deux points ouverts relevés, non bloquants : le planificateur météo
   près de son délai de 25 s (65), la priorité basse servie autant que la
   normale sous un minimum de sécurité (66).

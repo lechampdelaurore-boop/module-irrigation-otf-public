@@ -4,6 +4,7 @@ import type {
   IrrigationPushSendRequest,
   IrrigationPushSubscription,
 } from '../domain/irrigation-push-contract';
+import { isDemoDeployment } from './deployment-mode';
 
 const REQUEST_TIMEOUT_MS = 8_000;
 
@@ -13,6 +14,8 @@ export type IrrigationPushServiceResult =
   | { status: 'failed'; message: string };
 
 export function getIrrigationPushPublicKey(): string | null {
+  // La démonstration n'envoie aucune notification (docs/demo-guided-contract.md, C7).
+  if (isDemoDeployment()) return null;
   const value = readServerSetting('IRRIGATION_PUSH_VAPID_PUBLIC_KEY');
   return value?.trim() || null;
 }
@@ -79,6 +82,7 @@ async function callPushService(
   payload: unknown,
   readResponse?: (response: Response) => Promise<void>,
 ): Promise<IrrigationPushServiceResult> {
+  if (isDemoDeployment()) return { status: 'disabled' };
   const baseUrl = readPushServiceBaseUrl();
   const token = readServerSetting('IRRIGATION_PUSH_SERVICE_TOKEN')?.trim();
   if (!baseUrl || !token) return { status: 'disabled' };

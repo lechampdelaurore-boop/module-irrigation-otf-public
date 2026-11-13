@@ -21,6 +21,7 @@ export default async function AlertesMeteoPage({ searchParams }: { searchParams:
       <WeatherAlertsPage
         season={context.season}
         initialDashboard={waterDashboard}
+        demo={context.shell.demo}
         cropAlertsHref={context.enabled.includes('alertes-cultures') ? pageHref('alertes-cultures', { season: context.season }) : null}
       />
     </IrrigationShell>
