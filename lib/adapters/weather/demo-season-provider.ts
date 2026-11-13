@@ -4,7 +4,9 @@ import { demonstrationWeatherProvider } from './demonstration-provider.ts';
 /**
  * La météo de la démonstration guidée (docs/demo-guided-contract.md,
  * section 6, moments de saison) : celle des parcours navigateur, sans
- * réseau ni hasard, sauf deux semaines de 2026 écrites pour leur moment :
+ * réseau ni hasard, réchauffée selon le mois (le motif des parcours est une
+ * arrière-saison : sans cela, l'été aurait des nuits à 2,6 °C et du gel
+ * annoncé en juin), et deux semaines de 2026 écrites pour leur moment :
  * deux nuits de gel à la mi-avril (le moment « gel de printemps », le
  * 14 avril), et deux semaines sèches et chaudes à la mi-juillet (le moment
  * « pénurie », le 21 juillet). Ce sont des valeurs de démonstration, sans
@@ -45,8 +47,28 @@ function summerDrought(date: string): DayOverride | null {
   };
 }
 
+/** De combien le mois réchauffe le motif des parcours, en °C ; avril et l'hiver le gardent tel quel. */
+const SEASON_WARMING_CELSIUS: Readonly<Record<string, number>> = { '05': 4, '06': 7, '07': 9, '08': 9, '09': 5, '10': 1 };
+/** De combien le mois multiplie l'ETP du motif, une arrière-saison. */
+const SEASON_ET0_FACTOR: Readonly<Record<string, number>> = { '05': 1.3, '06': 1.5, '07': 1.6, '08': 1.5, '10': 0.7 };
+
+const roundToTenth = (value: number) => Math.round(value * 10) / 10;
+
+function inSeason(value: WeatherDailyValue): WeatherDailyValue {
+  const month = value.date.slice(5, 7);
+  const warming = SEASON_WARMING_CELSIUS[month] ?? 0;
+  const factor = SEASON_ET0_FACTOR[month] ?? 1;
+  const warm = (celsius: number | null | undefined) => (celsius === null || celsius === undefined ? celsius : roundToTenth(celsius + warming));
+  return {
+    ...value,
+    minimumTemperatureCelsius: warm(value.minimumTemperatureCelsius),
+    maximumTemperatureCelsius: warm(value.maximumTemperatureCelsius),
+    et0Mm: value.et0Mm === null || value.et0Mm === undefined ? value.et0Mm : roundToTenth(value.et0Mm * factor),
+  };
+}
+
 function withMoments(values: readonly WeatherDailyValue[]): WeatherDailyValue[] {
-  return values.map((value) => ({ ...value, ...(SPRING_FROST[value.date] ?? summerDrought(value.date) ?? {}) }));
+  return values.map((value) => ({ ...inSeason(value), ...(SPRING_FROST[value.date] ?? summerDrought(value.date) ?? {}) }));
 }
 
 export const demoSeasonWeatherProvider: WeatherProvider = {

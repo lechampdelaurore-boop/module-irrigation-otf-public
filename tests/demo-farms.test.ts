@@ -241,7 +241,10 @@ for (const moment of DEMO_PROFILES[0].moments) {
         assert.ok(forecast.every((day) => day.precipitationMm === 0 && (day.et0Mm ?? 0) >= 5.5), 'une semaine sèche et chaude');
       } else {
         const plain = await demonstrationWeatherProvider.readForecast({ latitude: 0, longitude: 0, startDate: moment.dateKey, endDate: addDaysToDateKey(moment.dateKey, 6), timezone: 'Europe/Paris' } as Parameters<typeof demonstrationWeatherProvider.readForecast>[0]);
-        assert.deepEqual(forecast, plain, 'la météo ordinaire de la démonstration');
+        // La météo des parcours, réchauffée selon le mois : la même pluie, des nuits sans gel.
+        assert.deepEqual(forecast.map((day) => day.precipitationMm), plain.map((day) => day.precipitationMm), 'la pluie ordinaire de la démonstration');
+        assert.ok(forecast.every((day) => (day.minimumTemperatureCelsius ?? 0) >= 3.5), 'aucune nuit froide');
+        if (moment.id === 'ete') assert.ok(forecast.every((day) => (day.minimumTemperatureCelsius ?? 0) >= 9), 'des nuits d’été');
         if (moment.id === 'ete') assert.ok(inPlace.length >= 6, 'la saison bat son plein');
         if (moment.id === 'automne') {
           const harvested = plan.series.filter((series) => series.cultivations[0].harvestWeeks.length > 0);
