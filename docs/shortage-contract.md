@@ -610,7 +610,7 @@ dans `docs/ETAT_DU_PROJET.md` et dans la PR :
 2. Les tests du moteur, dont les invariants sur deux cents semaines tirées au
    hasard, étendus aux parts, aux refus, à l'arbitrage et à deux chaînes ; le
    budget de temps du calcul de la grande ferme (500 ms, D-031). Étendus le
-   13 novembre 2026, pendant la recette finale (D-099) :
+   13 novembre 2026, pendant la recette finale (D-099, #32) :
    `tests/planning-invariants.test.ts`.
 3. Les tests de persistance sur toutes les migrations, de `0000` à la
    dernière, sur une base neuve (test de dérive de schéma).

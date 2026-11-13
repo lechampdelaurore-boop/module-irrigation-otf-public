@@ -12,8 +12,9 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
-- 3.9, scénarios, tests de pénurie, recette et publication : **code
-  commencé le 8 novembre 2026 au soir**, en Opus 5.5 · Max, sur le dépôt
+- 3.9, scénarios, tests de pénurie, recette et publication : **close
+  le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
+  elle (tag `v0.2.0`). **Code commencé le 8 novembre 2026 au soir**, en Opus 5.5 · Max, sur le dépôt
   public. Lot 2, une PR `fix/` par règle tranchée (D-052), contrat du
   planning précisé avant le code et test rouge d'abord : **correction 1 sur
   4 en ligne** (#11 de ce dépôt), l'arbitrage validé en parts réservées
@@ -28,8 +29,9 @@ registres, elle y renvoie.
   le porteur le 9 novembre 2026 à 11 h 40, **en ligne** (#17, D-083,
   précisions F92 à F97, aucune migration), relu en ligne et jugé correct
   par le porteur le 12 novembre 2026 à 21 h 25 (« L'écran d'arbitrage dans
-  faisabilité me paraît correct. »). Puis les lots 3 à 7. Ni
-  recette finale ni tag `v0.2.0` sans le porteur. Les tests des scénarios
+  faisabilité me paraît correct. »). Puis les lots 3 à 7 : la recette
+  finale (lot 6) faite le 13 novembre 2026, la clôture (lot 7) et le tag
+  `v0.2.0` sur le mot du porteur. Les tests des scénarios
   vont dans `tests/planning-shortage.test.ts` et
   `tests/planning-shortage-scenarios.test.ts` (F98).
 - 3.9, lot 3, les scénarios de pénurie en tests du moteur : **en ligne**
@@ -124,14 +126,34 @@ registres, elle y renvoie.
   total que son motif aurait grossi, le temps de pompage manquant ou le
   manque d'eau, se lit « au moins X m³ », ou « non chiffré ».
 - 3.9, recette finale (lot 6), E2 : **les invariants sur deux cents
-  semaines étendus** (le 13 novembre 2026, D-099, précisions F151 et
-  F152), comme le contrat le demande pour la clôture, dans une PR `test/`
+  semaines étendus, en ligne** (#32 ; le 13 novembre 2026, D-099,
+  précisions F151 et F152), comme le contrat le demande pour la clôture, dans une PR `test/`
   avant celle de la clôture, sans changer aucun comportement. Un second
   test tire une seconde chaîne d'eau, un arbitrage validé, une planche à la
   surface mouillée inconnue, puis, au second calcul de la semaine, des
   créneaux refusés et des arrosages validés ; les invariants vérifient en
   plus les créneaux refusés, et la limite journalière compte l'eau déjà
   arrosée ou validée du jour. Aucun défaut.
+- 3.9, recette finale (lot 6) : **faite le 13 novembre 2026** sur
+  `ac14f6b`, la version en ligne (`docs/recette-tranche-3.md`). Le porteur
+  à la première séance, puis absent sur son mandat (« avancer en
+  autonomie », réponses par la recommandation). Séance 1, la lecture (0, A1
+  à A14) : tout conforme, « Tous OK » du porteur ; la configuration Access
+  lue sur son mot, et le contournement de la route interne retiré sur son
+  ordre (D-100). Séance 2, la pénurie fabriquée sur la ferme réelle (B1 à
+  B13) : douze lignes conformes, OK du porteur, B10 non jouée (un refus ne
+  se défait pas, D-030), la ferme remise en état et le plan du départ
+  retrouvé ; un constat hors ligne, le point ouvert 66. Séance 3, le
+  téléphone (C1 à C4), jouée par l'assistant à sa demande, à 390 px : OK,
+  une gêne pour l'audit ergonomique final. Les
+  invariants étendus (D-099, en ligne, #32) ; les contrôles complets et les 88 parcours
+  verts ; le temps de rendu relu en ligne ; Vinext, risque levé (D-101) ;
+  le planificateur météo près de son délai, le point ouvert 65. **Mot de
+  clôture du porteur le 13 novembre 2026 à 19 h 28** (« Clôturer la 3.9 et poser le tag v0.2.0 ? » : « Clôturer, fermer 49 à 64 ») : la 3.9
+  et la Tranche 3 closes, les points ouverts 49 à 64 fermés ; le tag
+  `v0.2.0` sur le commit de fusion de la PR de clôture, après son
+  déploiement vérifié. Le premier passage du planificateur après D-100,
+  le 14 novembre 2026 à 6 h 15, reste à constater.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -165,6 +187,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #32 (`bd539f8`, les invariants étendus, E2 de la recette finale,
+  D-099, fusionnée le 13 novembre à 10 h 34 et déployée à 10 h 49, run
+  43402427168, les quatre jobs réussis, aucune migration, Workers
+  inchangés). Avant elle : la
   PR #31 (`ac14f6b`, la correction du manque au volume inconnu dans les
   totaux, point ouvert 64, D-098, fusionnée le 13 novembre à 2 h 49 et
   déployée à 3 h 04, run 43347699699, les quatre jobs réussis, aucune
@@ -710,11 +736,8 @@ registres, elle y renvoie.
 - Code suivant, d'après l'ordre de `docs/ROADMAP.md` (section 2) : le
   mandat du 6 novembre 2026 (D-060) est entièrement codé ; reste, avec le
   porteur, son jugement sur les recettes de la 5 ter et de la 5 quinquies.
-  Après la 3.8, close par le porteur : la deuxième passe de la refonte
-  (D-068, codée, à relire par le porteur), la 3.8 bis (codée, #281), la
-  3.8 ter (cinq PR), la 3.8 quater (trois lots, en ligne), puis la 3.9, en
-  cours : lot 2, quatre PR `fix/`, une à la fois, toutes les quatre en
-  ligne (#11 à #14).
+  La 3.9 se clôt sur le mot du porteur (lot 7) ; ensuite la tranche 4,
+  ouverte par la démo guidée (ordre 25, D-096).
 - Modèle Fable interdit depuis le 1er novembre 2026 (D-055) : tout ce qui était
   prévu en Fable passe en Opus 5.5 · Max, quel que soit l'effort d'avant
   (3.9, domaine de la 5 quater, tranche 4).
@@ -726,7 +749,9 @@ registres, elle y renvoie.
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot
   d'harmonisation n'est pas planifié, il attend le « vas-y » du porteur.
-- PR de Dependabot ouvertes (#230 à #234) : jamais fusionnées seules.
+- Dependabot retiré du dépôt public par la PR #9 (8 novembre 2026) ; sa
+  remise éventuelle sera une PR à part. Ses PR #230 à #234 restent sur
+  l'archive, jamais fusionnées.
 
 ## Référence Git
 
@@ -870,7 +895,8 @@ Le 19 septembre 2026, Cloudflare Access configuré : équipe Zero Trust
 `damp-wind-3566` sur l'offre gratuite, application « Module irrigation »
 protégeant le Worker (session d'un mois, politique Allow sur le seul courriel
 du porteur, code à usage unique), application « Module irrigation - route
-interne » en Bypass sur le chemin `/api/internal`. Variables
+interne » en Bypass sur le chemin `/api/internal` (retirée le 13 novembre
+2026, D-100). Variables
 `ACCESS_TEAM_DOMAIN` et `ACCESS_AUD` inscrites dans `wrangler.jsonc`, Worker
 redéployé et sondé : `/irrigation` redirige vers la connexion Access, la route
 interne reçoit bien les requêtes et répond 401 sans jeton applicatif. Les
@@ -7082,7 +7108,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    sixième recette du 10 octobre, 1,5 s chacun, n'en ont pas produit.
    Depuis le 31 octobre 2026 (3.7, PR 2), chaque recalcul sur événement
    écrit `planning_calculation_completed` avec `triggerEvent` : une occasion
-   de plus d'observer le 3 s à 45 s.
+   de plus d'observer le 3 s à 45 s. Le 13 novembre 2026, à la recette
+   finale de la 3.9 : aucun recalcul de 3 s à 45 s (de 1,0 à 1,9 s, G3) ;
+   dans les journaux des sept jours d'avant, les quatre affichages de page
+   dont l'instantané s'est relu en direct depuis Ouvre ta ferme ont pris
+   6,7 s médians, 7,7 s au plus, dont 6,1 s médians de lecture (G2) : la
+   piste du point, vue sur un affichage, pas sur un recalcul. Laissé en
+   veille.
 35. ✅ **Ouvert le 5 octobre 2026 au soir par la quatrième recette réelle du
    planning, scénario 4 du contrat ; corrigé le 9 octobre 2026 sur le mot du
    porteur, PR #156 fusionnée et déployée le jour même.** Sous une limite
@@ -7513,9 +7545,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    dépendent de l'heure. Recommandation : une PR à part, pour que les
    parcours ne dépendent plus de l'heure ; en attendant, une PR ouverte le
    dimanche soir attend le lundi pour ses contrôles.
-49. **Ouvert le 9 novembre 2026, en vérifiant la PR de la correction 3 de
-   la 3.9 ; non bloquant ; corrigé le jour même (D-082) ; fermeture au
-   jugement du porteur.** Ce lundi peu après minuit à la ferme, trois
+49. ✅ **Ouvert le 9 novembre 2026, en vérifiant la PR de la correction 3 de
+   la 3.9 ; non bloquant ; corrigé le jour même (D-082) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Ce lundi peu après minuit à la ferme, trois
    parcours ont échoué aux deux largeurs : P4
    (`e2e/p4-cumuls-export.spec.ts`), P9 (`e2e/p9-suivi-par-serie.spec.ts`)
    et P31 (`e2e/p31-planning-et-arrosages.spec.ts`, les arrosages), sur les
@@ -7544,9 +7575,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    irrigation à la minute précédente, qu'une période compte dès qu'elle
    la chevauche. Seul reste le passage d'une période à la suivante, à une
    ou deux minutes près.
-50. **Ouvert le 9 novembre 2026, en vérifiant le déploiement de la
+50. ✅ **Ouvert le 9 novembre 2026, en vérifiant le déploiement de la
    correction 3 de la 3.9 ; non bloquant ; corrigé le jour même (D-082) ;
-   fermeture au jugement du porteur.** Sur les contrôles de `main`
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Sur les contrôles de `main`
    après la fusion de #13 (`a15f150`, run 42547789030), P12 a échoué à
    l'ordinateur à 2 h 54 à la ferme, sur sa dernière étape : la pluie du
    jour remise à 0 mm, le champ « Millimètres » de « Pluie mesurée », ramené
@@ -7569,9 +7600,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    retient la réponse d'un jour de la semaine passée jusqu'après le
    retour à aujourd'hui ; rouge avant la correction, aux deux largeurs
    (« Expected: "0" », « Received: "" »).
-51. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+51. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-089) ;
-   fermeture au jugement du porteur.** S7, stock inconnu : la réserve sans jauge, le moteur fait ce
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** S7, stock inconnu : la réserve sans jauge, le moteur fait ce
    que le contrat attend — créneaux « eau non vérifiée », aucun budget
    chiffré, aucune coupe, la note du manque d'eau se tait —, mais la tuile
    « Manque d'eau » du résumé (`app/irrigation/planning/weekly-plan-view.tsx`)
@@ -7585,9 +7616,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    compte les chaînes à l'eau inconnue — un matériel sans pompe ou sans
    origine compte aussi —, la ligne de résumé du téléphone de même
    (`tests/planning-shortage-scenarios.test.ts`, rouge avant).
-52. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+52. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-088) ;
-   fermeture au jugement du porteur.** S8, pompe archivée : sur la ferme de test, sa seule pompe
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** S8, pompe archivée : sur la ferme de test, sa seule pompe
    archivée, les cinq matériels qu'elle sert restent proposés « sans
    pompe », eau non vérifiée, 12,71 m³ placés comme si elle servait
    encore ; une seconde chaîne dont la pompe est archivée fait de même (la
@@ -7606,9 +7637,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    12,71 m³ de manque d'eau sous ce motif, la réserve inchangée quand c'est
    la pompe d'une seconde chaîne (`tests/planning-shortage-scenarios.test.ts`,
    rouge avant).
-53. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+53. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-088) ;
-   fermeture au jugement du porteur.** S8, ressource inactive : la rampe du bloc 2 servie par une
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** S8, ressource inactive : la rampe du bloc 2 servie par une
    source prélevée directement, la source inactive, ou hors de sa période
    de disponibilité toute la semaine, ne reçoit aucun créneau, comme
    attendu ; mais ses dix planches portent « stock et ressources
@@ -7631,9 +7662,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    portent plus « stock et ressources » en plus, et leurs allocations
    restent non attribuées (`tests/planning-shortage-scenarios.test.ts`,
    rouges avant).
-54. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+54. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-085) ;
-   fermeture au jugement du porteur : le plan proposait de prélever plus
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9 : le plan proposait de prélever plus
    que l'autorisation.** S9, deux chaînes : sur la ferme en taille, les rampes des blocs 3 et 4 sur une
    source à sa pompe de 3 m³/h, la limite de prélèvement à 2 m³ par jour,
    la source donne 2 m³ le mardi, 4 m³ le mercredi — le bloc 3 de 21 h à
@@ -7656,9 +7687,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    Sur le même cas, la source donne au plus 2,00 m³ chaque jour, pour le
    même volume placé, 28,00 m³ (`tests/planning-daily-limits.test.ts`,
    rouge avant : 4,000 m³ le mercredi).
-55. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+55. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-085) ;
-   fermeture au jugement du porteur.** S9 encore : la coupe d'une
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** S9 encore : la coupe d'une
    ressource directe se nomme comme celle d'une réserve. Un créneau raccourci par la limite de prélèvement
    de la source dit « réserve « Source du bas » au minimum de sécurité »,
    sa dose « ce que la réserve fournit sans passer sous son minimum », et
@@ -7677,9 +7708,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    trop petite pour la dose minimale de la rampe du bloc 2 (0,3 m³ par
    jour pour 1,4 m³) le dit (rouge avant : « réserve au minimum de
    sécurité au moment voulu »).
-56. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+56. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-087) ;
-   fermeture au jugement du porteur.** S6, l'eau et le temps de pompage ensemble : le résumé compte
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** S6, l'eau et le temps de pompage ensemble : le résumé compte
    tout le manque d'une planche sous le premier de ses motifs dans l'ordre
    alphabétique (`summarizeDeficit`, `lib/domain/planning/engine.ts`).
    Une planche coupée à la fois par sa part et par le temps de pompage, ou
@@ -7700,9 +7731,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    reçu la part) et 0,47 m³ d'espacement (le bloc 1)
    (`tests/planning-shortage-scenarios.test.ts`, rouge avant : 0 m³ et
    6,25 m³).
-57. **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
+57. ✅ **Ouvert le 9 novembre 2026, en écrivant les tests des scénarios de
    pénurie (lot 3 de la 3.9, D-084) ; corrigé le jour même (D-086) ;
-   fermeture au jugement du porteur ; le cas limite tranché par lui le
+   fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9 ; le cas limite tranché par lui le
    jour même.** S20, validation en
    pénurie : les quatre tunnels pour 5 m³ (la pénurie de la cinquième
    recette), chacun reçoit 9,76 mm ; les propositions des tunnels 1 et 2
@@ -7734,9 +7765,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    rejoue, la planche servie
    au-delà gardant ce qu'elle a reçu, et l'eau libérée en fin de tour suit
    la même règle.
-58. **Ouvert le 9 novembre 2026, en reproduisant le point 54 (lot 3 de la
-   3.9, D-084) ; corrigé le jour même (D-085) ; fermeture au jugement du
-   porteur : le plan proposait d'arroser plus que la limite journalière,
+58. ✅ **Ouvert le 9 novembre 2026, en reproduisant le point 54 (lot 3 de la
+   3.9, D-084) ; corrigé le jour même (D-085) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9 : le plan proposait d'arroser plus que la limite journalière,
    celle d'un arrêté.** S5, la limite journalière d'irrigation : un créneau à cheval sur minuit dont le
    premier jour est déjà plein y garde sa part. Sur la ferme des tests à la
    taille de la ferme réelle, aux réglages par défaut, une limite de 15 m³
@@ -7766,8 +7796,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    petite ferme à 3 m³ ne passe plus 3,00 m³ le mardi (rouge avant :
    3,054 m³). Un balayage de limites ne trouve plus aucun jour au-delà de
    la sienne, quand cinq plans sur dix dépassaient avant.
-59. **Ouvert le 9 novembre 2026, en corrigeant le point 51 (D-089) ;
-   corrigé le jour même (D-090) ; fermeture au jugement du porteur.** Le
+59. ✅ **Ouvert le 9 novembre 2026, en corrigeant le point 51 (D-089) ;
+   corrigé le jour même (D-090) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Le
    pli des changements d'un
    recalcul (3.7, `lib/domain/planning/changes.ts` et
    `lib/domain/planning/follow-up.ts`) compare le manque d'eau chiffré des
@@ -7785,9 +7815,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    « de 3,00 à 0,00 m³ (−3,00 m³) », la ligne ne paraissant que si les deux
    côtés s'écrivent autrement (`tests/planning-follow-up.test.ts`, rouge
    avant).
-60. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
-   3.9, D-091) ; corrigé le jour même (D-093) ; fermeture au jugement du
-   porteur.** Sur la page « Ressources et pompes », une
+60. ✅ **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
+   3.9, D-091) ; corrigé le jour même (D-093) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Sur la page « Ressources et pompes », une
    réserve ou une ressource créée n'apparaît pas dans les origines possibles
    d'une nouvelle pompe avant le rechargement de la page : la fiche « Nouvelle
    pompe » dit « Créez d’abord une ressource ou une réserve, ou enregistrez la
@@ -7809,9 +7838,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    puis sa pompe sans recharger (rouge avant : la réserve n'est jamais
    parue dans la fiche), et `tests/water-sources-signal.test.ts` vérifie le
    signal.
-61. **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
-   3.9, D-091) ; corrigé le jour même (D-092) ; fermeture au jugement du
-   porteur.** En pénurie, la carte d'une ligne qui
+61. ✅ **Ouvert le 9 novembre 2026, en écrivant le parcours P32 (lot 4 de la
+   3.9, D-091) ; corrigé le jour même (D-092) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** En pénurie, la carte d'une ligne qui
    n'arrose que sa planche justifie sa dose par « Pourquoi cette dose : le
    besoin restant de la planche la plus demandeuse », alors que cette dose
    est la part de la planche, une fraction de son besoin : sur P32, 5,9 mm,
@@ -7833,9 +7861,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    la cible est sous son besoin dit « la part de la semaine réservée à ses
    planches », sa contrainte limitante ne passant qu'après celles du moment
    (`tests/planning-shortage.test.ts`, rouge avant ; P32 lit le motif).
-62. **Ouvert le 9 novembre 2026, en jouant les parcours du lot 4 de la
-   3.9 ; corrigé le jour même (D-094) ; fermeture au jugement du
-   porteur.** Au téléphone, sur une ferme qui a une pompe, « Modifier » et
+62. ✅ **Ouvert le 9 novembre 2026, en jouant les parcours du lot 4 de la
+   3.9 ; corrigé le jour même (D-094) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Au téléphone, sur une ferme qui a une pompe, « Modifier » et
    « Archiver » ou « Réactiver » d'une carte de pompe font 39 px ; sur une
    ferme qui a un matériel archivé, « Matériels archivés (n) » fait
    36 px : sous les 44 px du point 14 de l'audit ergonomique (D-076, F69).
@@ -7853,10 +7880,9 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    lot 4, qui ne peut pas entrer vert sans elle (F99). Corrigé le
    9 novembre 2026 (D-094, F136 à F138), comme recommandé : P31c, rouge
    avant (39 px, 36 px et 3,1:1), passe.
-63. **Ouvert le 12 novembre 2026, en comparant le moteur du module à
+63. ✅ **Ouvert le 12 novembre 2026, en comparant le moteur du module à
    celui de Tlaloc ; corrigé le jour même, avant la recette finale, comme
-   le porteur l'a voulu (D-097), en ligne (#30) ; fermeture au jugement du
-   porteur.** Dans
+   le porteur l'a voulu (D-097), en ligne (#30) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Dans
    `lib/domain/planning/shortage.ts`, le volume d'une planche dont la
    surface mouillée par son propre matériel est inconnue — une aspersion
    sur une planche sans passe-pied renseigné (D-022) — valait 0 m³ dans le
@@ -7872,9 +7898,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    journalière (S5, cas e). Corrigé le 12 novembre 2026 (D-097, F143 à
    F146), comme recommandé : cinq tests de
    `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
-64. **Ouvert le 12 novembre 2026, en corrigeant le point 63 ; corrigé le
-   soir même dans sa PR `fix/` (D-098), en ligne (#31) ; fermeture au
-   jugement du porteur.** Le manque d'une
+64. ✅ **Ouvert le 12 novembre 2026, en corrigeant le point 63 ; corrigé le
+   soir même dans sa PR `fix/` (D-098), en ligne (#31) ; fermé par le porteur le 13 novembre 2026, à la clôture de la 3.9.** Le manque d'une
    planche dont la surface mouillée par son propre matériel est inconnue
    compte 0 m³ dans les totaux du plan (`lib/domain/planning/deficit.ts`).
    Sur la ferme des tests, le dimanche à 21 h, la plage des asperseurs
@@ -7895,6 +7920,35 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    la note du manque d'eau se tait ; en pénurie, son manque reste sous
    « volume inconnu en pénurie ». Trois tests de
    `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
+65. 🟡 **Ouvert le 13 novembre 2026 par la recette finale de la 3.9, en
+   lisant les journaux du planificateur météo ; non bloquant, à regarder
+   après le tag `v0.2.0`.** La synchronisation météo du matin frôle le
+   délai de 25 s que le planificateur donne à son appel : les 11 et
+   12 novembre 2026, la première tentative de 6 h 15 a expiré au bout de
+   25 s (`weather_scheduler_network_retry`, « TimeoutError ») et la
+   deuxième a réussi (statut 200, à 6 h 15 min 49 s et à 6 h 15 min 54 s) ;
+   le 13, la première a suffi (6 h 15 min 16 s). Rien n'est perdu, les
+   nouvelles tentatives sont prévues pour cela, mais la marge est mince.
+   Recommandation : lire d'abord, dans les journaux de la synchronisation,
+   la durée de chacune de ses étapes, avant d'allonger le délai ou
+   d'alléger l'appel ; aucun code avant le tag.
+66. 🟡 **Ouvert le 13 novembre 2026 par la recette finale de la 3.9 (B2) ;
+   non bloquant, au jugement du porteur, à étudier après le tag
+   `v0.2.0`.** En pénurie sous un minimum de sécurité, la priorité basse
+   peut recevoir autant que la normale. Sur la ferme réelle, la réserve à
+   25 m³ pour un minimum relevé à 40 m³, le forage sans limite : la ligne
+   de budget vise 100 % pour la haute, 89 % pour la normale et 0 % pour la
+   basse, et en place 100 %, 52 % et 52 %. Le moteur préfère attendre l'eau
+   d'une dose pleine plutôt que partir plus tôt avec une dose réduite
+   (`lib/domain/planning/engine.ts`) : le tunnel 2 attend dimanche 00:43
+   pour ses 15 mm, et l'espacement de 24 h lui ferme le créneau de
+   dimanche 21:00 ; le tunnel 3, faute d'eau samedi soir, n'a que celui de
+   dimanche ; l'eau que la normale ne peut plus prendre va à la basse en
+   fin de tour (S17). Refait à la main, un départ du tunnel 2 samedi à
+   21:00, vers 7,4 mm, puis 15 mm dimanche lui donneraient environ 22 mm,
+   et moins au tunnel 4. Aucun invariant n'est violé et aucun chiffre n'est
+   faux : c'est une limite de la règle de placement. Recommandation :
+   l'étudier après le tag ; aucun code avant.
 
 ## Procédure de reprise rapide
 

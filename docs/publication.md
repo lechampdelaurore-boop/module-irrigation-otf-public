@@ -60,9 +60,12 @@ déclencheurs SQL des migrations.
 - Connexion : Cloudflare Access, équipe `damp-wind-3566`, application
   « Module irrigation » sur le Worker, session d'un mois, courriel du porteur
   autorisé par code à usage unique ; variables `ACCESS_TEAM_DOMAIN` et
-  `ACCESS_AUD` dans `wrangler.jsonc`. Une application Access « Module
-  irrigation - route interne » en Bypass sur `/api/internal` date de la
-  phase 1 ; la route y reste protégée par son jeton applicatif.
+  `ACCESS_AUD` dans `wrangler.jsonc`. La route interne météo,
+  `/api/internal`, est derrière Access comme le reste du Worker depuis le
+  13 novembre 2026 (D-100) : le planificateur la joint par la liaison de
+  service `IRRIGATION_SITE`, qui ne traverse pas Access, et elle garde son
+  jeton applicatif. L'application « Module irrigation - route interne », en
+  Bypass de la phase 1 à cette date, est retirée.
 - Liaisons de service entre Workers, obligatoires : un Worker ne peut pas
   joindre un autre Worker du même compte par son adresse publique
   `workers.dev`. L'application appelle le Worker Push par la liaison

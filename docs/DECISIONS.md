@@ -129,6 +129,9 @@ dépendance à l'interface et à la configuration. Un changement d'hébergement
 n'est pas retenu pour ce motif ; la question de l'hébergement et de l'identité
 est traitée en tranche 4 (4.7). Réévaluation à la 3.9.
 
+Réévaluée le 13 novembre 2026, à la recette finale de la 3.9 : close
+« risque levé » (D-101).
+
 ## D-016 — Hébergement sur Cloudflare, publication automatique
 
 Décision du 18 septembre 2026. La publication sur OpenAI Sites est manuelle
@@ -3499,3 +3502,55 @@ ne fait échouer aucun invariant : la réserve et le forage bornent le
 placement d'eux-mêmes, et l'égalité des allocations réduites reste
 prouvée par les tests de S13 (D-077). Aucun défaut relevé. Les 1 362
 tests passent.
+
+**En ligne** : #32 du dépôt public fusionnée le 13 novembre 2026 à 10 h 34
+(`bd539f8`) et déployée à 10 h 49 (run 43402427168, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-100 — La route interne météo derrière Cloudflare Access : le contournement retiré (recette finale de la 3.9)
+
+Date : 13 novembre 2026. Statut : appliquée, sur l'ordre exprès du porteur
+(« Tu peux faire le ménage toi-même », 13 novembre 2026, 8 h 41). La
+configuration Access, lue le même matin à la recette finale (D3 de
+`docs/recette-tranche-3.md`) dans le navigateur intégré de l'app Claude,
+sur le mot du porteur, en lecture seule, montrait deux applications :
+« Module irrigation », qui couvre le Worker, et « Module irrigation - route
+interne », en Bypass « Everyone » sur `/api/internal`, posée le
+19 septembre 2026 à la phase 1 de Q0 pour que le planificateur météo
+joigne le site par son adresse publique. Depuis la phase 3, le
+planificateur passe par la liaison de service `IRRIGATION_SITE`, qui ne
+traverse pas Access : le contournement ne servait plus, et laissait la
+route ouverte à tout appel, gardée par son seul jeton. Aucun autre appelant
+de `/api/internal` dans le dépôt ; la route d'export qui y vivait a été
+retirée à la phase 4.
+
+**Fait** : l'application « Module irrigation - route interne » puis sa
+règle réutilisable, devenue orpheline, supprimées vers 9 h 15 par
+l'assistant, dans le même navigateur, le porteur absent, sur son ordre ;
+leur contenu noté pour pouvoir les recréer, sans aucun identifiant
+consigné. Rien d'autre n'a changé dans Cloudflare : ni l'application
+« Module irrigation », ni sa règle, ni les Workers. Constaté juste après :
+`/api/internal/weather-sync` sans session renvoie à la connexion Access, et
+avec la session du porteur répond 405, comme le reste du site couvert par
+sa règle. Le premier passage du planificateur après le retrait, le
+14 novembre 2026 à 6 h 15, reste à constater ; s'il échouait, l'application
+se recrée telle qu'elle était, le temps de comprendre.
+
+**Conséquences** : la route garde son jeton partagé, comparé en temps
+constant, derrière Access cette fois ; `docs/publication.md`,
+`docs/weather-scheduler-contract.md` et `docs/hosting-migration-contract.md`
+disent l'état nouveau ; les récits de la phase 1 dans l'état du projet et
+la roadmap restent tels quels, annotés. Aucun code, aucune migration.
+
+## D-101 — Vinext : le risque accepté en septembre est levé (réévaluation de D-015 à la 3.9)
+
+Date : 13 novembre 2026. Statut : appliquée par la recommandation du
+contrat de la 3.9 (« Les réévaluations promises à la 3.9 »), sur le mandat
+du porteur du jour (« Tu réponds à tes propres questions avec la réponse
+recommandée. », 8 h 37) ; modifiable à sa relecture. Constat (G1 de
+`docs/recette-tranche-3.md`) : la version en service est `1.0.1`, une
+version stable, `1.0.0` étant en place depuis le 1er octobre 2026 (PR #121
+de l'archive) ; aucun incident attribué à Vinext depuis, ni dans les
+registres ni pendant la recette finale. D-015 est close « risque levé » ;
+l'épinglage exact de la version et ses mises à jour en lot dédié, testées
+par la CI, restent la règle (Q4). Aucun code.

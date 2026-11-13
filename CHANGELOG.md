@@ -5,6 +5,41 @@ source détaillée commit par commit.
 
 ## Non publié
 
+## 2026-11 — Tranche 3 clôturée (v0.2.0)
+
+- Planning hebdomadaire de l'irrigation : propositions justifiées,
+  validation et refus, replanification sur événement, recalcul du matin,
+  conduite en pénurie prouvée par vingt-huit scénarios.
+- Fonctionnalités à la carte et une page par fonctionnalité, page
+  « Aujourd'hui », calculateur d'irrigation, créneaux protégés nommés.
+- Alertes météo et alertes par culture, réserve du sol, besoin en eau par
+  culture et par stade.
+- Hébergement sur Cloudflare et publication automatique, socle qualité,
+  dépôt public sous licence PolyForm Shield.
+- Recette finale du 13 novembre 2026 sur la ferme réelle
+  (`docs/recette-tranche-3.md`).
+
+### Vérifié (3.9, la recette finale)
+
+- **La recette finale de la tranche 3 est faite**, le 13 novembre 2026, sur
+  la version en ligne : la lecture sur données réelles, la pénurie
+  fabriquée sur la ferme réelle puis défaite, le téléphone, les scénarios
+  S1 à S28, chacun avec sa preuve, les contrôles complets et les 88
+  parcours ; les verdicts du porteur recueillis. **Close sur son mot de
+  clôture le 13 novembre 2026**, la Tranche 3 avec elle ; les points
+  ouverts 49 à 64 fermés.
+- Deux points ouverts relevés, non bloquants : le planificateur météo
+  près de son délai de 25 s (65), la priorité basse servie autant que la
+  normale sous un minimum de sécurité (66).
+- Vinext : le risque accepté en septembre est levé (D-101).
+
+### Sécurité (3.9, la recette finale)
+
+- **La route interne météo est derrière Cloudflare Access**, comme le
+  reste du site (D-100) : le contournement posé en septembre, devenu
+  inutile depuis que le planificateur passe par une liaison de service, est
+  retiré. Elle garde son jeton.
+
 ### Vérifié (3.9, recette finale : les invariants étendus)
 
 - **Les invariants du moteur, sur deux cents semaines tirées au hasard,
@@ -14,6 +49,7 @@ source détaillée commit par commit.
   en plus qu'aucun créneau ne tombe sur un créneau refusé, et que la
   limite journalière compte l'eau déjà arrosée ou validée du jour. Aucun
   défaut ; aucun comportement changé.
+  En ligne le 13 novembre 2026 à 10 h 49 (#32 de ce dépôt).
 
 ### Corrigé (3.9 : le manque au volume inconnu dans les totaux)
 
