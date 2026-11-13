@@ -48,6 +48,7 @@ source détaillée commit par commit.
   en plus qu'aucun créneau ne tombe sur un créneau refusé, et que la
   limite journalière compte l'eau déjà arrosée ou validée du jour. Aucun
   défaut ; aucun comportement changé.
+  En ligne le 13 novembre 2026 à 10 h 49 (#32 de ce dépôt).
 
 ### Corrigé (3.9 : le manque au volume inconnu dans les totaux)
 

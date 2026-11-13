@@ -3503,6 +3503,10 @@ placement d'eux-mêmes, et l'égalité des allocations réduites reste
 prouvée par les tests de S13 (D-077). Aucun défaut relevé. Les 1 362
 tests passent.
 
+**En ligne** : #32 du dépôt public fusionnée le 13 novembre 2026 à 10 h 34
+(`bd539f8`) et déployée à 10 h 49 (run 43402427168, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
 ## D-100 — La route interne météo derrière Cloudflare Access : le contournement retiré (recette finale de la 3.9)
 
 Date : 13 novembre 2026. Statut : appliquée, sur l'ordre exprès du porteur

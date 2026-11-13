@@ -125,8 +125,8 @@ registres, elle y renvoie.
   total que son motif aurait grossi, le temps de pompage manquant ou le
   manque d'eau, se lit « au moins X m³ », ou « non chiffré ».
 - 3.9, recette finale (lot 6), E2 : **les invariants sur deux cents
-  semaines étendus** (le 13 novembre 2026, D-099, précisions F151 et
-  F152), comme le contrat le demande pour la clôture, dans une PR `test/`
+  semaines étendus, en ligne** (#32 ; le 13 novembre 2026, D-099,
+  précisions F151 et F152), comme le contrat le demande pour la clôture, dans une PR `test/`
   avant celle de la clôture, sans changer aucun comportement. Un second
   test tire une seconde chaîne d'eau, un arbitrage validé, une planche à la
   surface mouillée inconnue, puis, au second calcul de la semaine, des
@@ -143,7 +143,7 @@ registres, elle y renvoie.
   B13) : douze lignes conformes à l'avis de l'assistant, B10 non jouée (un
   refus ne se défait pas, D-030), la ferme remise en état et le plan du
   départ retrouvé ; un constat hors ligne, le point ouvert 66. Les
-  invariants étendus (D-099) ; les contrôles complets et les 88 parcours
+  invariants étendus (D-099, en ligne, #32) ; les contrôles complets et les 88 parcours
   verts ; le temps de rendu relu en ligne ; Vinext, risque levé (D-101) ;
   le planificateur météo près de son délai, le point ouvert 65. Restent au
   porteur : ses verdicts de B1 à B13, la séance 3 au téléphone (C1 à C4),
@@ -181,6 +181,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #32 (`bd539f8`, les invariants étendus, E2 de la recette finale,
+  D-099, fusionnée le 13 novembre à 10 h 34 et déployée à 10 h 49, run
+  43402427168, les quatre jobs réussis, aucune migration, Workers
+  inchangés). Avant elle : la
   PR #31 (`ac14f6b`, la correction du manque au volume inconnu dans les
   totaux, point ouvert 64, D-098, fusionnée le 13 novembre à 2 h 49 et
   déployée à 3 h 04, run 43347699699, les quatre jobs réussis, aucune
