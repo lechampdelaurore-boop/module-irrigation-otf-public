@@ -25,8 +25,9 @@ source détaillée commit par commit.
   la version en ligne : la lecture sur données réelles, la pénurie
   fabriquée sur la ferme réelle puis défaite, le téléphone, les scénarios
   S1 à S28, chacun avec sa preuve, les contrôles complets et les 88
-  parcours ; les verdicts du porteur recueillis. Reste son mot de
-  clôture.
+  parcours ; les verdicts du porteur recueillis. **Close sur son mot de
+  clôture le 13 novembre 2026**, la Tranche 3 avec elle ; les points
+  ouverts 49 à 64 fermés.
 - Deux points ouverts relevés, non bloquants : le planificateur météo
   près de son délai de 25 s (65), la priorité basse servie autant que la
   normale sous un minimum de sécurité (66).

@@ -224,7 +224,7 @@ collées dans `docs/ETAT_DU_PROJET.md` et dans la PR de clôture.
 | E2 | Les tests du moteur | Les invariants sur deux cents semaines tirées au hasard, étendus aux parts, aux refus, à l'arbitrage et à deux chaînes ; la grande ferme calculée sous 500 ms (D-031) | `tests/planning-engine.test.ts` : les invariants sur deux cents semaines (la ferme seule, les trois conduites) et le calcul de la grande ferme sous 500 ms (D-031), verts. Étendus le 13 novembre 2026, pendant la recette, par `tests/planning-invariants.test.ts` (#32, D-099) : deux cents semaines, deux calculs chacune ; une seconde chaîne dans 80 semaines, un arbitrage validé dans 69, une planche à la surface mouillée inconnue dans 29, des créneaux refusés dans 121, des arrosages validés dans 70, une pénurie sous la conduite dans 44 ; `assertInvariants` vérifie en plus les créneaux refusés et la limite journalière, réalisé et validé compris. Aucun défaut ; deux mutations du moteur font échouer le test | OK |
 | E3 | Les tests de persistance | Toutes les migrations, de `0000` à la dernière, sur une base neuve (dérive de schéma) | Les 31 migrations de `drizzle/`, de `0000` à `0030`, rejouées sur une base neuve par chaque test de persistance (`tests/support/d1-sqlite.ts`) ; le test de dérive (`tests/db/schema-drift.test.ts`) : les tables et colonnes de `db/schema.ts` correspondent exactement à la base migrée. Les 52 fichiers de `tests/db/` passent dans `pnpm test` (E1) | OK |
 | E4 | Les parcours navigateur, P0 à P32, à 1 280 et 390 px | Tous passés, sans débordement ni erreur de console, leur durée relevée | Le 13 novembre 2026, sur le même code : les 88 parcours, 44 par largeur (`ordinateur` à 1 280 × 900, `telephone` à 390 × 844), tous réussis du premier coup (aucun nouvel essai n'est permis), en 12,5 min ; 5,7 s médians par parcours, le plus long P13 (ordinateur), 47,6 s. Les deux gardes de `e2e/support/parcours.ts`, aucune erreur de console et aucun débordement horizontal, appliquées après chaque étape visible, tenues partout ; les cibles de 44 px mesurées là où le parcours les vise. Joués avec le navigateur sans tête de la machine (une configuration locale qui ne change que le chemin du navigateur) ; la CI les rejoue | OK |
-| E5 | La relecture des registres contre le dépôt et Git | Chaque ligne 🟡 ou ⬜ de la roadmap, chaque point ouvert, chaque décision citée par un contrat vérifiés à la source ; les écarts corrigés par la PR de clôture et listés dans son compte rendu | Relecture faite le 13 novembre 2026 : chaque ligne 🟡 ou ⬜ de la section 1 et de l'ordre de la roadmap, les points ouverts 34 et 48 à 64, les décisions citées par les contrats, vérifiés à la source ; toutes les décisions citées existent. Écarts corrigés par la PR de clôture : la section 8 de la roadmap, cinq lignes en retard (les paramètres culturaux et la réserve du sol, codés et en ligne depuis le 6 novembre ; les priorités, la conduite en pénurie et les indicateurs, tranchés au cadrage et prouvés) ; la ligne de la 3.8 ter, relue par le porteur le 8 novembre 2026 ; deux lignes du résumé de l'état (le code suivant, Dependabot) ; la route interne dite hors d'Access dans trois documents (D-100). Les points 49 à 64, corrigés et en ligne, attendent le jugement du porteur | OK ; écarts corrigés |
+| E5 | La relecture des registres contre le dépôt et Git | Chaque ligne 🟡 ou ⬜ de la roadmap, chaque point ouvert, chaque décision citée par un contrat vérifiés à la source ; les écarts corrigés par la PR de clôture et listés dans son compte rendu | Relecture faite le 13 novembre 2026 : chaque ligne 🟡 ou ⬜ de la section 1 et de l'ordre de la roadmap, les points ouverts 34 et 48 à 64, les décisions citées par les contrats, vérifiés à la source ; toutes les décisions citées existent. Écarts corrigés par la PR de clôture : la section 8 de la roadmap, cinq lignes en retard (les paramètres culturaux et la réserve du sol, codés et en ligne depuis le 6 novembre ; les priorités, la conduite en pénurie et les indicateurs, tranchés au cadrage et prouvés) ; la ligne de la 3.8 ter, relue par le porteur le 8 novembre 2026 ; deux lignes du résumé de l'état (le code suivant, Dependabot) ; la route interne dite hors d'Access dans trois documents (D-100). Les points 49 à 64, corrigés et en ligne, attendaient le jugement du porteur : fermés sur son mot de clôture (H) | OK ; écarts corrigés |
 | E6 | Les scénarios S1 à S28 | Chacun avec sa preuve ou « non vérifié » : section F | Section F : les vingt-huit scénarios, chacun avec sa preuve ; S21 et S27 non vérifiés sur la ferme, prouvés par leurs tests (et P32 pour S21) | OK |
 
 ## F. Les scénarios S1 à S28
@@ -285,7 +285,7 @@ ou dit « non vérifié ».
   priorité basse servie autant que la normale sous un minimum de sécurité
   (B2), non bloquant, traité après la clôture (la recommandation, annoncée
   au porteur le 13 novembre 2026 à 13 h 30). Les points 49 à 64, corrigés et en
-  ligne, attendent son jugement, avec son mot de clôture.
+  ligne, fermés sur son mot de clôture.
 - Les questions tranchées pendant la recette, par la recommandation, sur
   le mandat du porteur du 13 novembre 2026 à 8 h 37 (« Tu réponds à tes
   propres questions avec la réponse recommandée. ») : l'objectif de B1
@@ -305,9 +305,14 @@ ou dit « non vérifié ».
   « Annuler » est le seul geste qui la sort de « À traiter » sans compter
   d'eau. Ensuite : 57 arrosages archivés au lieu de 29, la pastille
   d'Aujourd'hui de 31 à 3, le plan de la semaine inchangé.
-- Le mot de clôture du porteur : à recueillir ; la PR de clôture ne se
-  fusionne qu'après lui.
+- Le mot de clôture du porteur : donné le 13 novembre 2026 à 19 h 28,
+  sur la carte « Clôturer la 3.9 et poser le tag v0.2.0 ? » : « Clôturer,
+  fermer 49 à 64 ». La 3.9 close, la Tranche 3 avec elle ; les points
+  ouverts 49 à 64 fermés. La PR de clôture se fusionne ensuite, son
+  déploiement vérifié job par job.
+- Le premier passage du planificateur après le retrait du contournement
+  (D-100), le 14 novembre 2026 à 6 h 15 : à constater, consigné par la PR
+  suivante.
 - Le tag `v0.2.0`, annoté, posé sur le commit de fusion de la PR de clôture
   après son déploiement vérifié, sur le mot du porteur, poussé par
-  l'assistant ; annoncé avec son lien, consigné par la PR suivante : à
-  poser.
+  l'assistant ; annoncé avec son lien, consigné par la PR suivante.
