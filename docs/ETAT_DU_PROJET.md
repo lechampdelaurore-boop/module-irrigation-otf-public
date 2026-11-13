@@ -220,6 +220,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #35 (`5d9ef50`, D2 de la démo guidée, les fermes fictives et la date
+  simulée, D-104, fusionnée à 21 h 59 et déployée à 22 h 16, run
+  43506611911, les quatre jobs réussis, aucune migration). Avant elle : la
   PR #34 (`eb9ee53`, D1 de la démo guidée, les garde-fous du mode démo,
   D-103, fusionnée à 21 h 30 et déployée à 21 h 45, run 43502203781, les
   quatre jobs réussis, aucune migration ; la production vérifiée dans le

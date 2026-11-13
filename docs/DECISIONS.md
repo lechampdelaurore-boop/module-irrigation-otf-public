@@ -3663,6 +3663,12 @@ bannière recharge le module dans le bon espace ; aucune page ne déborde à
 390 px ; une première ouverture prend de 1 à 3 s dans le serveur de
 développement.
 
+**En ligne** : #35 du dépôt public fusionnée le 13 novembre 2026 à 21 h 59
+(`5d9ef50`) et déployée à 22 h 16 (run 43506611911, les quatre jobs
+réussis ; aucune migration, Workers inchangés). Rien de visible en
+production : D2 ne sert que la démonstration ; le déploiement de la
+démonstration vient avec D4.
+
 ## D-105 — La visite guidée (4.0, D3) : treize précisions tranchées par la recommandation
 
 Date : 13 novembre 2026. Troisième PR de code de la démo guidée
