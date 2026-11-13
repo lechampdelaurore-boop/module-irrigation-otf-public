@@ -123,6 +123,15 @@ registres, elle y renvoie.
   compte plus 0 m³ dans les totaux du plan ; elle compte à part, et le
   total que son motif aurait grossi, le temps de pompage manquant ou le
   manque d'eau, se lit « au moins X m³ », ou « non chiffré ».
+- 3.9, recette finale (lot 6), E2 : **les invariants sur deux cents
+  semaines étendus** (le 13 novembre 2026, D-099, précisions F151 et
+  F152), comme le contrat le demande pour la clôture, dans une PR `test/`
+  avant celle de la clôture, sans changer aucun comportement. Un second
+  test tire une seconde chaîne d'eau, un arbitrage validé, une planche à la
+  surface mouillée inconnue, puis, au second calcul de la semaine, des
+  créneaux refusés et des arrosages validés ; les invariants vérifient en
+  plus les créneaux refusés, et la limite journalière compte l'eau déjà
+  arrosée ou validée du jour. Aucun défaut.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
