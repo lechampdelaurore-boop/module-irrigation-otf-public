@@ -3,6 +3,7 @@
 import { DEMO_BANNER_TEXT } from '@/lib/domain/demo/deployment-mode';
 import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, DEMO_PROFILES, resolveDemoChoice, type DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Icon } from '../line-icon';
+import { GuidedTour, type TourSurroundings } from './guided-tour';
 
 /** Un an : le choix tient d'une visite à l'autre ; il ne porte rien de sensible. */
 const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
@@ -28,16 +29,21 @@ function choose(profile: string, moment: string | undefined) {
  * bouton pour la fermer. Quand l'invité est connu, elle porte le choix de la
  * ferme fictive et du moment de la saison ; changer l'un ou l'autre ouvre
  * l'espace correspondant, sans rien effacer. Le bouton « Remettre la
- * démonstration à zéro » s'y ajoutera avec la remise à zéro (D4).
+ * démonstration à zéro » s'y ajoutera avec la remise à zéro (D4). Dans les
+ * pages du module, elle porte aussi les visites guidées (D3).
  */
-export function DemoBanner({ selection = null }: { selection?: DemoSelection | null }) {
+export function DemoBanner({ selection = null, tour = null }: {
+  selection?: DemoSelection | null;
+  /** La page ouverte et le menu de la ferme, pour les visites guidées ; absents, pas de visite (page introuvable). */
+  tour?: TourSurroundings | null;
+}) {
   const current = selection ? resolveDemoChoice(selection.profile, selection.moment) : null;
   return (
-    <aside className="demo-banner" aria-label="Démonstration" data-demo-banner="true">
+    <aside className="demo-banner" aria-label="Démonstration" data-demo-banner="true" data-tour="banniere">
       <span className="demo-banner-icon"><Icon name="bouclier" /></span>
       <p>{DEMO_BANNER_TEXT}</p>
       {current ? (
-        <div className="demo-banner-choices">
+        <div className="demo-banner-choices" data-tour="banniere-choix">
           <label>
             <span>Ferme</span>
             <select value={current.profile.id} onChange={(event) => choose(event.currentTarget.value, undefined)}>
@@ -54,6 +60,7 @@ export function DemoBanner({ selection = null }: { selection?: DemoSelection | n
           ) : null}
         </div>
       ) : null}
+      {current && tour ? <GuidedTour current={tour.current} reachable={tour.reachable} query={tour.query} /> : null}
     </aside>
   );
 }

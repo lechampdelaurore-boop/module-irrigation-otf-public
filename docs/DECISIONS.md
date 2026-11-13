@@ -3662,3 +3662,50 @@ s'ouvre sur la liste à cocher ; changer de ferme ou de moment dans la
 bannière recharge le module dans le bon espace ; aucune page ne déborde à
 390 px ; une première ouverture prend de 1 à 3 s dans le serveur de
 développement.
+
+**En ligne** : #35 du dépôt public fusionnée le 13 novembre 2026 à 21 h 59
+(`5d9ef50`) et déployée à 22 h 16 (run 43506611911, les quatre jobs
+réussis ; aucune migration, Workers inchangés). Rien de visible en
+production : D2 ne sert que la démonstration ; le déploiement de la
+démonstration vient avec D4.
+
+## D-105 — La visite guidée (4.0, D3) : treize précisions tranchées par la recommandation
+
+Date : 13 novembre 2026. Troisième PR de code de la démo guidée
+(`docs/demo-guided-contract.md`, D-096), codée la nuit du 12 au
+13 novembre 2026 sur le même mandat que D1 et D2 (D-103, D-104), en
+Opus 5.5 · Élevé, sur sa branche `feat/demo-d3-visite-guidee`, posée sur celle
+de D2 ; sa PR s'ouvre après celle de D2, donc après le tag `v0.2.0` de la
+3.9.
+
+**Décision.** Sept visites guidées, une par thème, dans l'ordre du contrat ;
+des bulles accrochées aux écrans par `data-tour`, jamais par le texte ni le
+menu ; une visite qui montre et ne fait rien à la place du visiteur ; une
+étape dont l'élément manque, sautée sans message ; l'étape en cours rangée
+dans le navigateur, reprise après un rechargement.
+
+**Treize précisions**, consignées au contrat (section 11 quater) : F172
+l'entrée par la bannière ; F173 l'invitation ; F174 les boutons et
+« Passer » ; F175 d'une page à l'autre et la pause ; F176 reprenable, et
+sans stockage ; F177 l'étape sautée ; F178 les visites offertes à chaque
+ferme ; F179 la place de la bulle ; F180 l'accessibilité ; F181 « Et pour
+ma ferme ? » en bulles ; F182 la remise à zéro dite en D4 ; F183 les
+repères ; F184 les parcours de la démonstration.
+
+**Vérifié par** `tests/demo-tours.test.ts` (les sept visites et leur ordre,
+chaque repère posé et utile, des textes courts sans emoji ni sigle laissé
+sans son sens, la couche 4 sur les textes, l'étape jouée sur la bonne
+page et sautée sinon dans les deux sens, les visites offertes à chaque
+ferme, « Passer », le compte des étapes, l'étape rangée relue ou refusée)
+et par les parcours `e2e-demo/` V1 à V7, aux deux largeurs : V1 l'invitation,
+avancer, reculer, reprendre après un rechargement, Échap et le focus
+rendu, « déjà vue », et l'accessibilité mesurée de la bulle et de la
+liste ; V2 la visite d'une page à l'autre dans un navigateur qui refuse le
+stockage, sans rien démarrer ; V3 le planning ; V4 la pénurie sur trois
+pages, la pause ailleurs et la reprise sur un clic ; V5 le gel annoncé ;
+V6 Réglages chez la ferme C, puis la première ouverture de la ferme vierge,
+l'étape du menu sautée et « Passer » ; V7 les bulles de texte. À chaque
+étape : le titre, « étape n sur N », l'élément souligné, le focus, la
+bulle dans la fenêtre et au-dessus de la barre des pages, aucun
+débordement, aucune erreur de console, aucune écriture. Contrôles du
+13 novembre 2026 au soir, branche refaite sur `main` après le tag et posée sur celle de D2 : lint sans avertissement, typage sans erreur, 1 431 tests sur 1 431 (11 nouveaux depuis D2), compilation réussie, knip, `push:check` et `weather:check` sans erreur, 88 parcours sur 88 (12,2 min) et 14 parcours de démonstration sur 14 (1,6 min). Constaté aussi en vrai, aux deux largeurs, sur le serveur de démonstration : les sept visites jouées de bout en bout dans chaque ferme concernée, sans erreur de console ni débordement.

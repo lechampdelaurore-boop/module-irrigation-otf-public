@@ -54,7 +54,7 @@ export function TodayDay({ today, late, todo, timeline, allDone, query, pending,
     );
   };
   return (
-    <section className="today-block" id="today-day" data-kind="day" aria-labelledby="today-day-title">
+    <section className="today-block" id="today-day" data-tour="aujourdhui-journee" data-kind="day" aria-labelledby="today-day-title">
       <div className="today-block-heading">
         <span className="today-block-badge"><Icon name="goutte" /></span>
         <div>

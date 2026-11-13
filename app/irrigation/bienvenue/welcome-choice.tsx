@@ -8,6 +8,9 @@ import { FeatureChoiceList } from '../shell/feature-choice-list';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Topbar } from '../shell/topbar';
 
+/** La ferme vierge de la démonstration n'a pas encore de menu : ses visites se jouent sur cette page (D3). */
+const WELCOME_TOUR = { current: 'bienvenue', reachable: [], query: {} } as const;
+
 /** Le choix de la première ouverture (R5) : il faut au moins une case pour continuer (P7). */
 export function WelcomeChoice({ userName, signOutPath, demo, demoSelection }: {
   userName: string;
@@ -50,7 +53,7 @@ export function WelcomeChoice({ userName, signOutPath, demo, demoSelection }: {
 
   return (
     <main ref={shell} className="app-shell welcome-shell">
-      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} />
+      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} tour={demo ? WELCOME_TOUR : null} />
       <section className="welcome-choice" aria-labelledby="welcome-title">
         <p className="eyebrow">Première ouverture</p>
         <h1 id="welcome-title">Choisissez vos fonctionnalités</h1>

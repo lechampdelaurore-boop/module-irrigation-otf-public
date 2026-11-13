@@ -283,6 +283,81 @@ attendant sa réponse, et changera si elle diffère.
   autres attendent qu'il soit prêt (cinq secondes au plus) ; les cases
   cochées s'écrivent en dernier et disent qu'il l'est.
 
+## 11 quater. Précisions faites en codant D3 (13 novembre 2026, D-105)
+
+Tranchées par la recommandation, sans valeur agronomique ; chacune reste
+modifiable par le porteur. Les textes des bulles sont écrits pour
+quelqu'un qui n'a jamais vu le module ; ils pourront suivre l'audit
+ergonomique final, sans toucher au moteur.
+
+- **F172 — l'entrée des visites** : un bouton « Visites guidées » dans la
+  bannière ouvre la liste des visites offertes à la ferme choisie, chacune
+  avec sa durée, ce qu'elle montre, la ferme et le moment où elle parle le
+  mieux, et « déjà vue » ou « en cours ». Pas de bouton sur la page
+  introuvable.
+- **F173 — l'invitation** : à la première ouverture, une bulle discrète, au
+  coin bas, propose la visite « Bienvenue » ; elle ne prend pas le focus,
+  « Plus tard » la range pour de bon. Un navigateur qui refuse le stockage
+  ne la voit pas : elle reviendrait à chaque page.
+- **F174 — les boutons** : « Suivant » (« Terminer » à la dernière étape),
+  « Précédent » (absent à la première), « Passer » et « Quitter la
+  visite ». « Passer » saute le reste de la visite et commence la
+  suivante (son nom pour le lecteur d'écran le dit) ; une étape se passe
+  déjà par « Suivant ». Absent après la dernière visite offerte.
+- **F175 — d'une page à l'autre** : une étape d'une autre page s'ouvre sur
+  le clic du visiteur, par un lien qui porte l'étape dans l'adresse
+  (`?visite=`), effacée à l'arrivée. Si le visiteur part ailleurs en cours
+  de visite, la bulle se met en pause et propose « Reprendre la visite » :
+  elle ne le ramène pas d'elle-même et ne prend pas le focus.
+- **F176 — reprenable** : l'étape en cours, les visites finies et
+  l'invitation vue sont rangées dans le navigateur (`demo-visite`,
+  `demo-visites-vues`, `demo-visite-invitation`), rien de sensible. Sans
+  stockage, la visite marche quand même d'une page à l'autre par
+  l'adresse, mais ne reprend pas après la fermeture de l'onglet.
+- **F177 — l'étape sautée** : une étape dont l'élément manque ou n'est pas
+  visible est sautée sans message, comme celle d'une page que la ferme n'a
+  pas cochée. À l'arrivée sur une page, l'élément a deux secondes pour
+  paraître ; sur un clic dans une page déjà là, il y est ou non. « Étape n
+  sur N » ne compte que ce que la ferme peut voir.
+- **F178 — les visites offertes** : une visite n'est offerte qu'à une ferme
+  qui a l'une de ses pages. Ferme A : les sept ; ferme B : Bienvenue, Un
+  arrosage de A à Z, Le module à la carte, Et pour ma ferme ? ; ferme C :
+  Bienvenue, Les alertes, Le module à la carte, Et pour ma ferme ? ; ferme
+  vierge : Bienvenue, Le module à la carte, Et pour ma ferme ?.
+- **F179 — la place de la bulle** : à partir de 981 px de large, près de
+  l'élément (dessous, sinon dessus, sinon à côté, sinon au coin bas), elle
+  le suit quand la page défile et ne sort jamais de la fenêtre ; en deçà,
+  en feuille basse au-dessus de la barre des pages, sans la cacher (au bas
+  de l'écran sur la première ouverture, qui n'en a pas). Une bulle sans
+  élément se pose au milieu. L'élément présenté est entouré de vert.
+- **F180 — l'accessibilité** (section 9) : une fenêtre non modale ; le focus
+  va au titre de la bulle à chaque étape et revient au bouton « Visites
+  guidées » à la fin ; Échap quitte quand le focus est dans la bulle (il ne
+  vole pas l'Échap des autres fenêtres de la page) ; une région `aria-live`
+  annonce la visite et l'étape ; le défilement est instantané sous
+  `prefers-reduced-motion` ; anneau de focus de 3 px vert à 70 %, cibles de
+  44 px. Contrastes mesurés dans la bulle et la liste : tous au moins
+  4,5:1 (parcours V1 et V7).
+- **F181 — « Et pour ma ferme ? »** : trois bulles de texte au milieu de
+  l'écran plutôt qu'une page nouvelle : aucun écran de saisie ni de lien
+  vers OTF en démonstration (C8).
+- **F182 — la remise à zéro** n'est pas encore dite par la visite
+  « Bienvenue » : son étape s'ajoutera avec le bouton, en D4.
+- **F183 — les repères** : vingt et une valeurs de `data-tour`, listées dans
+  `lib/domain/demo/tours.ts` ; un test vérifie que chacune est posée dans
+  le code des écrans et sert à une étape, et qu'aucune autre n'y traîne.
+- **F184 — les parcours de la démonstration** (`pnpm e2e:demo`,
+  `playwright.demo.config.ts`) : la même application démarrée comme le
+  Worker de démonstration, sur une configuration locale écrite sous
+  `.wrangler/demo-e2e/` par `scripts/demo-e2e-server.mjs` (le chemin passe
+  par `IRRIGATION_WRANGLER_CONFIG`, lu par `vite.config.ts`) :
+  `wrangler.jsonc` n'est plus touché, ni pour les parcours ni pour un
+  essai. Sept parcours, V1 à V7, un par visite, aux deux largeurs, joués
+  en intégration continue après les parcours ordinaires. « La visite ne
+  fait rien à la place du visiteur » s'y vérifie par l'absence de toute
+  requête d'écriture : seules passent les actions de lecture que la page
+  fait d'elle-même (`read…`, `load…`).
+
 ## 12. Questions au porteur (répondues) (une par message, numérotées)
 
 Le total est **4**. Elles ne touchent que l'agronomie, le budget et les contacts extérieurs.

@@ -367,7 +367,7 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
         ) : null}
       </header>
       {day.proposals.length > 0 ? (
-        <div className="planning-proposals" id={proposalsId}>
+        <div className="planning-proposals" id={proposalsId} data-tour="planning-propositions">
           {planDayCells(day, rows).map((cell) => (
             <div key={cell.row} className="planning-cell" style={{ '--row': cell.row + 2 } as CSSProperties}>
               {cell.proposals.map((proposal) => (
@@ -402,11 +402,11 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   const tilesId = useId();
   return (
     <>
-      <button type="button" className="planning-summary-line" aria-expanded={open} aria-controls={tilesId} onClick={() => setOpen((value) => !value)}>
+      <button type="button" className="planning-summary-line" data-tour="planning-semaine" aria-expanded={open} aria-controls={tilesId} onClick={() => setOpen((value) => !value)}>
         <span>{planSummaryLine(summary, actionLine, deficit, unplacedCount, formatVolume, unknownWater)}</span>
         <small>{open ? 'Replier' : 'Détail'}</small>
       </button>
-      <div className="planning-summary" id={tilesId} data-open={open}>
+      <div className="planning-summary" id={tilesId} data-open={open} data-tour="planning-semaine">
         {actions.map((tile) => <SummaryCard key={tile.label} label={tile.label} value={tile.value} detail={tile.detail} tone={tile.tone} action />)}
         <SummaryCard label="Volume proposé et validé" value={formatVolume(summary.volumeCubicMeters)} detail={summary.unknownVolumeCount > 0 ? `${summary.unknownVolumeCount} créneau${summary.unknownVolumeCount > 1 ? 'x' : ''} au volume inconnu en plus` : 'Volumes connus'} />
         <SummaryCard label="Non vérifié" value={String(summary.unverifiedCount)} detail="Créneaux sans pompe, origine ou stock connu" />
@@ -459,14 +459,14 @@ function BudgetList({ budgets }: { budgets: readonly SupplyBudget[] }) {
 function UnplacedList({ beds, groups, season }: { beds: readonly PlanBedOutcome[]; groups: UnplacedGroups; season: number }) {
   if (beds.length === 0) {
     return (
-      <div className="planning-unplaced">
+      <div className="planning-unplaced" data-tour="planning-non-servies">
         <h3>Planches non servies</h3>
         <p className="planning-empty">Toutes les planches qui ont un besoin sont servies en entier.</p>
       </div>
     );
   }
   return (
-    <div className="planning-unplaced-wrap">
+    <div className="planning-unplaced-wrap" data-tour="planning-non-servies">
       {groups.noEquipment ? (
         <p className="planning-unplaced-action">
           <Icon name="rampe" />

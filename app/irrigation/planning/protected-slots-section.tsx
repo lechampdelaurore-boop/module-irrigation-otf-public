@@ -96,7 +96,7 @@ export function ProtectedSlotsSection({ initialSlots }: { initialSlots: Protecte
   });
 
   return (
-    <section className="protected-slots" aria-labelledby="protected-slots-title">
+    <section className="protected-slots" aria-labelledby="protected-slots-title" data-tour="planning-creneaux">
       <h3 id="protected-slots-title">Créneaux protégés</h3>
       <p className="planning-settings-note">
         Des heures où le planning ne propose jamais d’arrosage, pour tout le matériel : le lavage des légumes, un passage, une livraison. Un créneau vaut au prochain calcul ; « Recalculer le plan » le prend tout de suite. Un arrosage déjà validé qui y tombe reçoit une suggestion ; rien n’est annulé sans vous.

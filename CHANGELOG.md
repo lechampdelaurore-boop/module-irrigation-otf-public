@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (4.0, D3 : la visite guidée)
+
+- **Les visites guidées de la démonstration** (D-105) : un bouton
+  « Visites guidées » dans la bannière ouvre sept visites courtes
+  (Bienvenue, Un arrosage de A à Z, Le planning, Quand l'eau manque, Les
+  alertes, Le module à la carte, Et pour ma ferme ?), offertes selon ce que
+  la ferme choisie a coché. Des bulles présentent chaque partie de l'écran
+  en mots simples, à côté de l'élément à l'ordinateur et en feuille basse
+  au téléphone ; la visite ne clique jamais à la place du visiteur, passe
+  d'une page à l'autre sur son clic, saute ce qui n'est pas à l'écran et
+  reprend où on l'avait laissée. Clavier, lecteur d'écran et mouvements
+  réduits pris en compte. Seulement en démonstration ; aucune migration.
+  Les parcours de la démonstration se jouent par `pnpm e2e:demo`, sans
+  toucher la configuration de production.
+
 ### Ajouté (4.0, D2 : les fermes fictives et la date simulée)
 
 - **Les fermes fictives de la démonstration** (D-104) : trois fermes
@@ -57,7 +72,9 @@ source détaillée commit par commit.
   clôture le 13 novembre 2026**, la Tranche 3 avec elle ; les points
   ouverts 49 à 64 fermés. Le tag `v0.2.0` posé le jour même sur le commit
   de fusion de la PR de clôture (#33), après son déploiement vérifié, par
-  la page de version « v0.2.0 — Tranche 3 clôturée ».
+  la page de version « v0.2.0 — Tranche 3 clôturée ». La 3.8 ter (créneaux
+  protégés nommés) et la 3.8 quater (audit ergonomique) closes par lui le
+  même soir, à 21 h 48.
 - Deux points ouverts relevés, non bloquants : le planificateur météo
   près de son délai de 25 s (65), la priorité basse servie autant que la
   normale sous un minimum de sécurité (66).

@@ -64,7 +64,7 @@ export function CropAlertsPanel({
   };
 
   return (
-    <article className="water-panel crop-alerts-panel" id="crop-alerts" aria-labelledby="crop-alerts-title">
+    <article className="water-panel crop-alerts-panel" id="crop-alerts" data-tour="alertes-cultures" aria-labelledby="crop-alerts-title">
       <div className="water-panel-title">
         <div>
           <h3 id="crop-alerts-title">Alertes cultures</h3>

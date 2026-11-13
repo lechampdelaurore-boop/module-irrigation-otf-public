@@ -181,6 +181,16 @@ registres, elle y renvoie.
   1 420 (33 nouveaux), compilation réussie, knip, `push:check` et
   `weather:check` sans erreur, 88 parcours sur 88 (12,1 min) ; chaque
   moment constaté en vrai avec le point d'entrée de la démonstration (D-104).
+  **D3, la visite guidée, codée la même nuit** (D-105, précisions F172 à
+  F184), sur la branche `feat/demo-d3-visite-guidee` posée sur celle de D2 :
+  sept visites, des bulles accrochées par `data-tour`, l'étape sautée quand
+  son élément manque, reprenable, accessible ; sept parcours de
+  démonstration aux deux largeurs (`pnpm e2e:demo`). Contrôles du
+  13 novembre 2026 au soir, branche refaite sur `main` après le tag : lint
+  sans avertissement, typage sans erreur, 1 431 tests sur 1 431
+  (11 nouveaux), compilation réussie, knip, `push:check` et
+  `weather:check` sans erreur, 88 parcours sur 88 (12,2 min) et 14 parcours
+  de démonstration sur 14 (1,6 min) (D-105).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
@@ -210,6 +220,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #35 (`5d9ef50`, D2 de la démo guidée, les fermes fictives et la date
+  simulée, D-104, fusionnée à 21 h 59 et déployée à 22 h 16, run
+  43506611911, les quatre jobs réussis, aucune migration). Avant elle : la
   PR #34 (`eb9ee53`, D1 de la démo guidée, les garde-fous du mode démo,
   D-103, fusionnée à 21 h 30 et déployée à 21 h 45, run 43502203781, les
   quatre jobs réussis, aucune migration ; la production vérifiée dans le
@@ -538,7 +551,10 @@ registres, elle y renvoie.
   est terminé. **À vérifier par le porteur à son retour** : comme pour le
   calculateur, ni sa relecture en ligne ni une recette avec sa session sur
   la ferme réelle n'ont pu se faire cette nuit ; aucun créneau n'existe sur
-  sa ferme tant qu'il n'en pose pas.
+  sa ferme tant qu'il n'en pose pas. **Relu en ligne par le porteur le
+  8 novembre 2026 à 11 h 28** (« Ça a l'air de marcher. ») ; **close par lui
+  le 13 novembre 2026 à 21 h 48** (« Clôturer les deux », avec la 3.8 quater), des
+  retouches restant possibles après l'audit final.
 - 3.8 quater, audit ergonomique : **audit du 7 novembre 2026 retenu en entier
   par le porteur le jour même** (D-069), quatorze améliorations voulues, en
   trois lots (petits points 7, 4, 9, 11 ; téléphone, « Aujourd'hui » et
@@ -634,7 +650,9 @@ registres, elle y renvoie.
   « Aujourd'hui ». **PR 2, les PR 2 et 3 réunies** (#303 de l'archive, en
   ligne le 8 novembre 2026 à 18 h 57) : les gestes par ligne, les mots
   simples et l'accessibilité. Lot 3 complet, validé par le porteur le
-  8 novembre 2026 à 19 h 20.
+  8 novembre 2026 à 19 h 20. **3.8 quater close par lui le 13 novembre 2026 à 21 h 48**
+  (« Clôturer les deux », avec la 3.8 ter), des retouches restant possibles
+  après l'audit final.
 - Connexions matériel (C1 station météo locale, C2 tensiomètres, C3
   électrovannes) : **demandées par le porteur le 7 novembre 2026**
   (roadmap section 6 bis, D-063), après la 3.9, avant la tranche 4 ; trois

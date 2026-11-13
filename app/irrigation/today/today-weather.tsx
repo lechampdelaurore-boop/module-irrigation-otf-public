@@ -34,7 +34,7 @@ const BLOCK_ICONS: Record<WeatherBlock['tone'], IconName> = {
 export function TodayWeather({ block, query }: { block: WeatherBlock; query: PageQuery }) {
   const { scale } = block;
   return (
-    <section className="today-block" id="today-weather" data-kind="weather" data-tone={block.tone} aria-labelledby="today-weather-title">
+    <section className="today-block" id="today-weather" data-tour="aujourdhui-gel" data-kind="weather" data-tone={block.tone} aria-labelledby="today-weather-title">
       <div className="today-block-heading">
         <span className="today-block-badge" data-tone={block.tone}><Icon name={BLOCK_ICONS[block.tone]} /></span>
         <div>

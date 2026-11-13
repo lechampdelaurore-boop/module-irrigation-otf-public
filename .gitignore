@@ -57,3 +57,5 @@ next-env.d.ts
 # Sorties des parcours navigateur (Q5), jamais versionnées
 test-results/
 playwright-report/
+test-results-demo/
+playwright-report-demo/

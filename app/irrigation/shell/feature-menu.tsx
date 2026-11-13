@@ -65,7 +65,7 @@ export function FeatureMenu({
 
   return (
     <>
-      <nav className="phone-bar" aria-label="Pages principales" data-entries={bar.entries.length + (bar.more ? 1 : 0)}>
+      <nav className="phone-bar" data-tour="menu" aria-label="Pages principales" data-entries={bar.entries.length + (bar.more ? 1 : 0)}>
         <ul>
           {bar.entries.map((item) => (
             <li key={item} data-home={item === 'aujourdhui' || undefined}>
@@ -99,7 +99,7 @@ export function FeatureMenu({
           ) : null}
         </ul>
       </nav>
-      <nav ref={sheet} id={menuId} className="feature-menu" aria-label="Pages du module" data-open={open} data-phone-bar-only={!bar.more}>
+      <nav ref={sheet} id={menuId} className="feature-menu" data-tour="menu" aria-label="Pages du module" data-open={open} data-phone-bar-only={!bar.more}>
         <ul>
           {layout.today ? (
             <li className="menu-home-item">
