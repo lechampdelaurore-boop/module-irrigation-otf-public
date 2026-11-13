@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 13 novembre 2026.
+Dernière mise à jour : 14 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -156,12 +156,21 @@ registres, elle y renvoie.
   43485850915) : un tag simple, posé par la page de version « v0.2.0 — Tranche 3 clôturée » que le porteur a publiée sur GitHub, sur un lien préparé par l'assistant : la session de l'assistant ne peut écrire aucun tag (envoi refusé par GitHub, 403), écart au contrat qui le voulait annoté et poussé par l'assistant. Le premier passage du planificateur après D-100,
   le 14 novembre 2026 à 6 h 15, reste à constater.
 - Finitions, graphique des réserves du sol et vue satellite (section 5
-  sexies de la roadmap, D-107) : **inscrits le 13 novembre 2026, aucun
-  code encore**. Après le tag v0.2.0, dans l'ordre : style « un peu plus joli »
-  (patch de l'archive à refaire sur le dépôt public), graphique des
-  réserves du sol (variante B), vue satellite (MapLibre et orthophotos
-  IGN, le gratuit). L'audit ergonomique final vient après. Réglages :
-  Opus 5.5 · Élevé, Élevé, Très élevé.
+  sexies de la roadmap, D-107) : **inscrits le 13 novembre 2026** (#38,
+  fusionnée le 13 novembre 2026 à 23 h 49). Après le tag v0.2.0, dans
+  l'ordre : style « un peu plus joli », graphique des réserves du sol
+  (variante B), vue satellite (MapLibre et orthophotos IGN, le gratuit).
+  L'audit ergonomique final vient après. Réglages : Opus 5.5 · Élevé,
+  Élevé, Très élevé. **S1, le style, refait sur le dépôt public la nuit du
+  13 au 14 novembre 2026** sur le mandat d'autonomie du porteur, en
+  Opus 5.5 · Élevé (cette PR, D-108) : les cinq touches de la maquette
+  validée, habillage seulement, aucune migration ; reste la relecture
+  visuelle du porteur après déploiement. **Le déploiement de #38 n'a pas
+  eu lieu** : sur `main`, le parcours P7 au téléphone a échoué en passant
+  minuit à la ferme (run 43522400430), les deux déploiements sautés ;
+  #38 ne porte que des registres, qui partent en ligne avec cette PR.
+  Relevé en chemin, le point ouvert 67 (un test de la démonstration qui
+  échoue entre minuit et 2 h à la ferme).
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -8024,6 +8033,23 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    et moins au tunnel 4. Aucun invariant n'est violé et aucun chiffre n'est
    faux : c'est une limite de la règle de placement. Recommandation :
    l'étudier après le tag ; aucun code avant.
+67. 🟡 **Ouvert le 14 novembre 2026 par le chantier S1 (style), en
+   rejouant les contrôles sur `main` à 0 h 03 à la ferme ; non bloquant
+   hors de cette plage, à corriger dans sa PR `fix/`.** Le test « l'horloge
+   simulée ne vaut que dans la requête de l'invité »
+   (`tests/demo-farms.test.ts`) lit le texte de `Date()` dans le fuseau du
+   processus (UTC sur la CI et dans le bac à sable) et y cherche
+   « Apr 14 2026 » ; or le moment du 14 avril garde l'heure réelle de la
+   ferme : entre minuit et 2 h à la ferme, il tombe encore le 13 avril en
+   UTC, et le test échoue, sur `main` comme sur toute branche (1 440 sur
+   1 441 à 0 h 03). Le même soir, à minuit pile à la ferme, le parcours P7
+   au téléphone a échoué sur `main` après la fusion de #38 (attente
+   dépassée), le jour changeant en cours de parcours, de la famille du
+   point ouvert 48. Recommandation : lire le jour du texte dans le fuseau
+   de la ferme (`dateKeyInTimeZone(new Date(Date()))`) plutôt que dans
+   celui du processus ; une PR `fix/` à part, sans toucher au code de la
+   démonstration. D'ici là, ne pas lancer de contrôle entre minuit et 2 h
+   à la ferme.
 
 ## Procédure de reprise rapide
 

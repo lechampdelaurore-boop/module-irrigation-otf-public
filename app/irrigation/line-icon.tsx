@@ -25,6 +25,8 @@ const PATHS = {
   // Le calculateur d'irrigation (3.8 bis) : une calculette au trait.
   calcul: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8 7h8v3H8zM8.5 14h.5M12 14h.5M15.5 14h.5M8.5 17.5h.5M12 17.5h.5M15.5 17.5h.5',
   aide: 'M12 21a9 9 0 1 0 0-18a9 9 0 1 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17v.5',
+  // Les tuiles de totaux (troisième passe, docs/charte-module.md) : l'objectif de la ferme.
+  cible: 'M12 20a8 8 0 1 0 0-16a8 8 0 1 0 0 16zM12 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6z',
   // La page « Aujourd'hui » (audit ergonomique, lot 2) : un soleil au trait.
   soleil: 'M12 16a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4',
   // La flèche d'un pli : vers le bas replié, retournée une fois déplié.

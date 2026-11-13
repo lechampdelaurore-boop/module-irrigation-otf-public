@@ -7,6 +7,7 @@ import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, 
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
 import { FigureOrigin } from './shell/figure-origin';
+import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
 import {
@@ -351,11 +352,11 @@ export function WaterManagementDashboard({
       {error ? <p className="water-error" role="alert">{error}</p> : null}
 
       <div className="water-summary-grid">
-        <SummaryCard label="Objectif ferme" value={farmGoal ? `${mm.format(farmGoal.amountMm)} mm` : 'Non défini'} detail={`${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} ciblé${dashboard.goals.length > 1 ? 's' : ''}`} />
-        <SummaryCard label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${cubicMeters.format(dashboard.totals.realizedIrrigationCubicMeters)} m³ répartis sur la surface totale des planches`} />
-        <SummaryCard water label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
-        <SummaryCard water label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
-        <SummaryCard label="ET0" value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
+        <SummaryCard icon="cible" label="Objectif ferme" value={farmGoal ? `${mm.format(farmGoal.amountMm)} mm` : 'Non défini'} detail={`${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} ciblé${dashboard.goals.length > 1 ? 's' : ''}`} />
+        <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${cubicMeters.format(dashboard.totals.realizedIrrigationCubicMeters)} m³ répartis sur la surface totale des planches`} />
+        <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
+        <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
+        <SummaryCard icon="soleil" label="ET0" value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
       </div>
 
       {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
@@ -431,9 +432,9 @@ export function WaterManagementDashboard({
   );
 }
 
-/** Une tuile de total ; la pluie est en bleu eau (charte du module). */
-function SummaryCard({ label, value, detail, water = false }: { label: string; value: string; detail: string; water?: boolean }) {
-  return <div className={water ? 'water-summary-card is-water' : 'water-summary-card'}><span>{label}</span><strong>{value}</strong><small>{detail}</small></div>;
+/** Une tuile de total, son icône au trait devant le libellé ; la pluie est en bleu eau (charte du module). */
+function SummaryCard({ icon, label, value, detail, water = false }: { icon: IconName; label: string; value: string; detail: string; water?: boolean }) {
+  return <div className={water ? 'water-summary-card is-water' : 'water-summary-card'}><span><Icon name={icon} />{label}</span><strong>{value}</strong><small>{detail}</small></div>;
 }
 
 function TodayMetric({ label, value, warning = false }: { label: string; value: number | null; warning?: boolean }) {

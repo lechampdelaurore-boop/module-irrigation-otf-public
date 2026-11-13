@@ -47,7 +47,7 @@ import { planDayCells, planWeekRows, type PlanWeekRow } from '@/lib/domain/plann
 import { pastDaysLabel, phoneWeekFolds, planSummaryLine, unplacedFoldLabel, type PhoneDayFold } from '@/lib/domain/planning/phone-week';
 import { UNPLACED_GROUP_MEANING, planActionCounts, planActionLine, planActionTiles, unplacedGroups, unplacedTileDetail, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
 import { pageHref } from '@/lib/domain/features/pages';
-import { Icon } from '../line-icon';
+import { Icon, type IconName } from '../line-icon';
 import { FigureOrigin } from '../shell/figure-origin';
 
 type Props = {
@@ -407,12 +407,12 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
         <small>{open ? 'Replier' : 'Détail'}</small>
       </button>
       <div className="planning-summary" id={tilesId} data-open={open} data-tour="planning-semaine">
-        {actions.map((tile) => <SummaryCard key={tile.label} label={tile.label} value={tile.value} detail={tile.detail} tone={tile.tone} action />)}
-        <SummaryCard label="Volume proposé et validé" value={formatVolume(summary.volumeCubicMeters)} detail={summary.unknownVolumeCount > 0 ? `${summary.unknownVolumeCount} créneau${summary.unknownVolumeCount > 1 ? 'x' : ''} au volume inconnu en plus` : 'Volumes connus'} />
-        <SummaryCard label="Non vérifié" value={String(summary.unverifiedCount)} detail="Créneaux sans pompe, origine ou stock connu" />
-        <SummaryCard label="Manque d’eau" value={waterDeficitValue(deficit.waterCubicMeters, uncountedWaterCount(deficit, unknownWater), formatVolume)} detail={waterDeficitTileDetail(deficit, unknownWater)} tone={hasWaterDeficit(deficit) ? 'deficit' : undefined} />
-        <SummaryCard label="Temps de pompage manquant" value={pumpTimeDeficitValue(deficit, formatVolume)} detail={pumpTimeDeficitDetail(deficit)} tone={hasPumpTimeDeficit(deficit) ? 'deficit' : undefined} />
-        <SummaryCard label="Planches non servies" value={String(unplacedCount)} detail={unplacedDetail} tone={unplacedCount > 0 ? 'deficit' : undefined} />
+        {actions.map((tile) => <SummaryCard key={tile.label} icon={ACTION_TILE_ICONS[tile.label]} label={tile.label} value={tile.value} detail={tile.detail} tone={tile.tone} action />)}
+        <SummaryCard icon="goutte" label="Volume proposé et validé" value={formatVolume(summary.volumeCubicMeters)} detail={summary.unknownVolumeCount > 0 ? `${summary.unknownVolumeCount} créneau${summary.unknownVolumeCount > 1 ? 'x' : ''} au volume inconnu en plus` : 'Volumes connus'} />
+        <SummaryCard icon="aide" label="Non vérifié" value={String(summary.unverifiedCount)} detail="Créneaux sans pompe, origine ou stock connu" />
+        <SummaryCard icon="goutte" label="Manque d’eau" value={waterDeficitValue(deficit.waterCubicMeters, uncountedWaterCount(deficit, unknownWater), formatVolume)} detail={waterDeficitTileDetail(deficit, unknownWater)} tone={hasWaterDeficit(deficit) ? 'deficit' : undefined} />
+        <SummaryCard icon="horloge" label="Temps de pompage manquant" value={pumpTimeDeficitValue(deficit, formatVolume)} detail={pumpTimeDeficitDetail(deficit)} tone={hasPumpTimeDeficit(deficit) ? 'deficit' : undefined} />
+        <SummaryCard icon="pousse" label="Planches non servies" value={String(unplacedCount)} detail={unplacedDetail} tone={unplacedCount > 0 ? 'deficit' : undefined} />
       </div>
       {explanation ? <p className="planning-summary-note">{explanation}</p> : null}
       {arbitration ? <p className="planning-summary-note">{arbitration}</p> : null}
@@ -420,8 +420,12 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   );
 }
 
-function SummaryCard({ label, value, detail, tone, action = false }: { label: string; value: string; detail: string; tone?: string; action?: boolean }) {
-  return <div className="planning-summary-card" data-tone={tone} data-action={action || undefined}><span>{label}</span><strong>{value}</strong><small>{detail}</small></div>;
+/** L'icône au trait des tuiles de gestes, d'après leur libellé (troisième passe, docs/charte-module.md). */
+const ACTION_TILE_ICONS: Partial<Record<string, IconName>> = { 'À valider': 'calendrier', Faites: 'coche', 'En retard': 'alerte' };
+
+/** Une tuile de total, son icône au trait devant le libellé (troisième passe, docs/charte-module.md). */
+function SummaryCard({ icon, label, value, detail, tone, action = false }: { icon?: IconName; label: string; value: string; detail: string; tone?: string; action?: boolean }) {
+  return <div className="planning-summary-card" data-tone={tone} data-action={action || undefined}><span>{icon ? <Icon name={icon} /> : null}{label}</span><strong>{value}</strong><small>{detail}</small></div>;
 }
 
 function BudgetList({ budgets }: { budgets: readonly SupplyBudget[] }) {

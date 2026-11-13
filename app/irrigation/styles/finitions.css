@@ -1,0 +1,287 @@
+/*
+  Troisième passe de l'habillage (docs/charte-module.md, « Troisième passe »),
+  validée par le porteur le 8 novembre 2026 sur la maquette
+  https://claude.ai/artifact/L1Sm7H6dCsZXMEk8kqrzyx : cinq touches qui
+  réchauffent les écrans sans quitter la charte d'Ouvre ta ferme. Mêmes
+  couleurs, mêmes polices, même disposition ; aucun effet sur les calculs.
+  Importée après charte.css : elle l'emporte sur elle.
+*/
+
+/*
+  1. Une pastille ronde devant le titre de chaque bloc : la pastille
+  d'univers d'OTF en plus petit, fond vert pâle et icône verte au trait, ou
+  bleu eau pour l'eau et la pluie. Les icônes sont celles de line-icon.tsx,
+  recopiées en image : un test vérifie qu'elles n'en divergent pas. La
+  pastille est une image de fond : les lecteurs d'écran ne la lisent pas.
+*/
+#irrigation-events-title,
+#water-today-title,
+#water-management-title,
+#water-weather-title,
+#irrigation-needs-title,
+#feasibility-title,
+#planning-title,
+#soil-reserve-title,
+#crop-coefficients-title,
+#species-correspondence-title,
+#garden-groups-title,
+#equipment-title,
+#water-resources-title,
+#pump-title,
+#weather-alerts-title,
+#crop-alerts-title,
+#irrigation-history-title,
+#series-water-title,
+#feature-settings-title,
+#notifications-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#irrigation-events-title::before,
+#water-today-title::before,
+#water-management-title::before,
+#water-weather-title::before,
+#irrigation-needs-title::before,
+#feasibility-title::before,
+#planning-title::before,
+#soil-reserve-title::before,
+#crop-coefficients-title::before,
+#species-correspondence-title::before,
+#garden-groups-title::before,
+#equipment-title::before,
+#water-resources-title::before,
+#pump-title::before,
+#weather-alerts-title::before,
+#crop-alerts-title::before,
+#irrigation-history-title::before,
+#series-water-title::before,
+#feature-settings-title::before,
+#notifications-title::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--tile) var(--badge-icon) center / 20px no-repeat;
+}
+
+#water-today-title::before,
+#water-management-title::before,
+#water-weather-title::before,
+#water-resources-title::before,
+#pump-title::before {
+  background-color: var(--water-soft);
+}
+
+/* Arrosages */
+#irrigation-events-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3c3.5 4.2 6 7.2 6 10.2A6 6 0 0 1 6 13.2C6 10.2 8.5 7.2 12 3z'/%3E%3C/svg%3E"); }
+/* L’eau du jour */
+#water-today-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3c3.5 4.2 6 7.2 6 10.2A6 6 0 0 1 6 13.2C6 10.2 8.5 7.2 12 3z'/%3E%3C/svg%3E"); }
+/* Objectifs hydriques et météo */
+#water-management-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 8a3.5 3.5 0 0 1 0 7M8 18l-1 3M12 18l-1 3M16 18l-1 3'/%3E%3C/svg%3E"); }
+/* Lieu de la météo */
+#water-weather-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 8a3.5 3.5 0 0 1 0 7M8 18l-1 3M12 18l-1 3M16 18l-1 3'/%3E%3C/svg%3E"); }
+/* Besoins d’irrigation */
+#irrigation-needs-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21v-9M12 12C12 8 9 6 5 6c0 4 2 6 7 6zM12 14c0-3 2-5 6-5 0 3-2 5-6 5z'/%3E%3C/svg%3E"); }
+/* Faisabilité */
+#feasibility-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17a8 8 0 1 1 16 0M12 17l4-5'/%3E%3C/svg%3E"); }
+/* Planning de la semaine */
+#planning-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM4 10h16M9 3v4M15 3v4'/%3E%3C/svg%3E"); }
+/* Réserve du sol */
+#soil-reserve-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17a8 8 0 1 1 16 0M12 17l4-5'/%3E%3C/svg%3E"); }
+/* Coefficients culturaux */
+#crop-coefficients-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21v-9M12 12C12 8 9 6 5 6c0 4 2 6 7 6zM12 14c0-3 2-5 6-5 0 3-2 5-6 5z'/%3E%3C/svg%3E"); }
+/* Correspondance des espèces */
+#species-correspondence-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21v-9M12 12C12 8 9 6 5 6c0 4 2 6 7 6zM12 14c0-3 2-5 6-5 0 3-2 5-6 5z'/%3E%3C/svg%3E"); }
+/* Groupes de jardins */
+#garden-groups-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5l5-2 6 2 5-2v13l-5 2-6-2-5 2zM9 4.5v13M15 6.5v13'/%3E%3C/svg%3E"); }
+/* Matériel d’irrigation */
+#equipment-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5l5-2 6 2 5-2v13l-5 2-6-2-5 2zM9 4.5v13M15 6.5v13'/%3E%3C/svg%3E"); }
+/* Ressources en eau */
+#water-resources-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6c0-1.7 3.1-3 7-3s7 1.3 7 3v12c0 1.7-3.1 3-7 3s-7-1.3-7-3zM5 6c0 1.7 3.1 3 7 3s7-1.3 7-3'/%3E%3C/svg%3E"); }
+/* Pompes */
+#pump-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6c0-1.7 3.1-3 7-3s7 1.3 7 3v12c0 1.7-3.1 3-7 3s-7-1.3-7-3zM5 6c0 1.7 3.1 3 7 3s7-1.3 7-3'/%3E%3C/svg%3E"); }
+/* Alertes météo */
+#weather-alerts-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.5 2h-14zM10 20.5a2 2 0 0 0 4 0'/%3E%3C/svg%3E"); }
+/* Alertes cultures */
+#crop-alerts-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4l9 16H3zM12 10v4M12 17v.5'/%3E%3C/svg%3E"); }
+/* Historique et cumuls */
+#irrigation-history-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h16M7 16v-4M12 16V8M17 16v-6'/%3E%3C/svg%3E"); }
+/* Cumuls par série */
+#series-water-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h16M7 16v-4M12 16V8M17 16v-6'/%3E%3C/svg%3E"); }
+/* Fonctionnalités */
+#feature-settings-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1'/%3E%3C/svg%3E"); }
+/* Notifications */
+#notifications-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.5 2h-14zM10 20.5a2 2 0 0 0 4 0'/%3E%3C/svg%3E"); }
+
+/*
+  2. Des tuiles de totaux plus vivantes : un filet de couleur en haut (le vert
+  d'univers, le bleu eau pour la pluie, l'orange d'attention pour un manque),
+  une petite icône devant le libellé quand la tuile en porte une, le chiffre
+  un peu plus grand, dans la police des titres.
+*/
+.water-summary-card,
+.history-summary-card,
+.planning-summary-card,
+.feasibility-summary > div {
+  border-top: 3px solid var(--green-universe);
+}
+
+.water-summary-card.is-water {
+  border-top-color: var(--water);
+}
+
+.history-summary-card[data-tone="deficit"],
+.planning-summary-card[data-tone="deficit"] {
+  border-top-color: var(--warn);
+}
+
+/* Une tuile de geste en retard garde la couleur de son filet gauche (audit-lot3.css). */
+.planning-summary-card[data-action="true"][data-tone="deficit"] {
+  border-top-color: var(--danger);
+}
+
+.water-summary-card > span,
+.planning-summary-card > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.water-summary-card > span .icon,
+.planning-summary-card > span .icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: var(--green);
+}
+
+.water-summary-card.is-water > span .icon {
+  color: var(--water);
+}
+
+.water-summary-card strong {
+  font-size: 24px;
+}
+
+.history-summary-card strong,
+.planning-summary-card strong,
+.feasibility-summary strong {
+  font-family: var(--font-title);
+  font-weight: 500;
+}
+
+.history-summary-card strong {
+  font-size: 18px;
+}
+
+.planning-summary-card strong {
+  font-size: 1.5rem;
+}
+
+/*
+  3. Le bandeau d'annonce comme les encarts « Nouveau » de la Boîte à outils
+  d'OTF : un cadre vert en pointillé et l'étiquette « Nouveau ». L'étiquette
+  est décorative (texte de remplacement vide) : le bandeau dit déjà ce qui
+  est nouveau.
+*/
+.feature-banner {
+  border: 1.5px dashed var(--green-universe);
+  background: #f3f9f6;
+}
+
+.feature-banner p::before {
+  content: "Nouveau" / "";
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--green);
+  color: white;
+  font: 600 11px/1.4 var(--font-ui);
+  vertical-align: 1px;
+}
+
+/*
+  4. Les cartes qu'on ouvre d'un clic répondent au survol, à la souris
+  seulement : fond vert pâle et ombre légère de la charte, sur la carte
+  fermée. Pas de déplacement : une transformation dérangerait les bulles
+  d'aide placées dans la carte.
+  Les cartes des cultures et des espèces répondent déjà au survol par leur
+  résumé (crop-water.css) : elles gardent le leur.
+*/
+@media (hover: hover) {
+  .irrigation-needs-gardens > details,
+  .history-event-card,
+  .soil-garden {
+    transition: background-color .15s ease, box-shadow .15s ease;
+  }
+
+  .irrigation-needs-gardens > details:not([open]):hover,
+  .history-event-card:not([open]):hover,
+  .soil-garden:not([open]):hover {
+    background-color: var(--tile);
+    box-shadow: var(--shadow-light);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .irrigation-needs-gardens > details,
+  .history-event-card,
+  .soil-garden {
+    transition: none;
+  }
+}
+
+/*
+  5. Les grands états vides illustrés : un petit dessin au trait (deux
+  buttes, une goutte) au-dessus du message, au lieu d'un texte gris seul.
+  Les messages d'une ligne restent sans dessin. Le signe « ⌁ » de
+  l'inventaire vide laisse la place au même dessin.
+*/
+.equipment-empty-icon {
+  display: none;
+}
+
+.equipment-empty-state::before,
+.irrigation-empty-action::before,
+.garden-groups-empty::before,
+.settings-empty-state::before,
+.plan-empty-state::before {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 44px;
+  margin: 0 auto 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='%230f8c66' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 38h52M10 38c2-6 6-9 10-9s8 3 10 9M34 38c2-5 5-7 8-7s6 2 8 7M40 6c3 3.5 5 6 5 9a5 5 0 0 1-10 0c0-3 2-5.5 5-9z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Au téléphone, la pastille rétrécit un peu, comme le titre. */
+@media (max-width: 760px) {
+  #irrigation-events-title::before,
+  #water-today-title::before,
+  #water-management-title::before,
+  #water-weather-title::before,
+  #irrigation-needs-title::before,
+  #feasibility-title::before,
+  #planning-title::before,
+  #soil-reserve-title::before,
+  #crop-coefficients-title::before,
+  #species-correspondence-title::before,
+  #garden-groups-title::before,
+  #equipment-title::before,
+  #water-resources-title::before,
+  #pump-title::before,
+  #weather-alerts-title::before,
+  #crop-alerts-title::before,
+  #irrigation-history-title::before,
+  #series-water-title::before,
+  #feature-settings-title::before,
+  #notifications-title::before {
+    width: 32px;
+    height: 32px;
+    background-size: 18px;
+  }
+}
