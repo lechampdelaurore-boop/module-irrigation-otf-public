@@ -42,6 +42,11 @@ jobs:
         run: pnpm knip
       - name: Compilation
         run: pnpm build
+      # La démonstration, compilée sur sa propre configuration et vérifiée à
+      # blanc par Wrangler (docs/demo-guided-contract.md, D4) : en dernier,
+      # car elle remplace la compilation de la production dans dist/.
+      - name: Compiler et vérifier la démonstration
+        run: pnpm demo:check
 
   workers:
     name: Workers Cloudflare
@@ -168,3 +173,41 @@ jobs:
       - name: Déployer le planificateur météo
         if: contains(steps.workers.outputs.changed, 'weather')
         run: pnpm --dir cloudflare/irrigation-weather-scheduler deploy
+
+  deploy-demo:
+    name: Déploiement de la démonstration
+    # Après la production, jamais à sa place (docs/demo-guided-contract.md,
+    # D4) : un échec ici laisse la production en ligne. Le Worker et la base
+    # D1 de la démonstration sont les siens (wrangler.demo.jsonc) ; ses
+    # migrations ne visent que sa base.
+    needs: [deploy]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-cloudflare-demo
+      cancel-in-progress: false
+    env:
+      CI: 1
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: pnpm
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+      - name: Compiler la démonstration
+        run: pnpm demo:build
+      - name: Appliquer les migrations D1 de la démonstration
+        run: pnpm demo:migrate:remote
+      - name: Déployer la démonstration
+        run: pnpm demo:deploy

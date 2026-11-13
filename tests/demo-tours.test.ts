@@ -60,7 +60,7 @@ test('les sept visites du contrat, dans son ordre, de deux à quatre minutes', (
   assert.equal(new Set(TOURS.map((tour) => tour.id)).size, TOURS.length);
   for (const tour of TOURS) {
     assert.ok(tour.minutes >= 2 && tour.minutes <= 4, tour.id);
-    assert.ok(tour.steps.length >= 2 && tour.steps.length <= 6, `${tour.id} : ${tour.steps.length} étapes`);
+    assert.ok(tour.steps.length >= 2 && tour.steps.length <= 7, `${tour.id} : ${tour.steps.length} étapes`);
   }
 });
 

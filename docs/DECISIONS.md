@@ -3709,3 +3709,53 @@ l'étape du menu sautée et « Passer » ; V7 les bulles de texte. À chaque
 bulle dans la fenêtre et au-dessus de la barre des pages, aucun
 débordement, aucune erreur de console, aucune écriture. Contrôles du
 13 novembre 2026 au soir, branche refaite sur `main` après le tag et posée sur celle de D2 : lint sans avertissement, typage sans erreur, 1 431 tests sur 1 431 (11 nouveaux depuis D2), compilation réussie, knip, `push:check` et `weather:check` sans erreur, 88 parcours sur 88 (12,2 min) et 14 parcours de démonstration sur 14 (1,6 min). Constaté aussi en vrai, aux deux largeurs, sur le serveur de démonstration : les sept visites jouées de bout en bout dans chaque ferme concernée, sans erreur de console ni débordement.
+
+## D-106 — La remise à zéro et le déploiement séparé de la démonstration (4.0, D4) : neuf précisions tranchées par la recommandation
+
+Date : 13 novembre 2026. Quatrième et dernière PR de code de la démo guidée
+(`docs/demo-guided-contract.md`, D-096), codée le soir du 13 novembre
+2026 sur le « vas-y » exprès du porteur pour D4, donné le matin même
+(8 h 41) pour le moment où le tag `v0.2.0` serait posé, en Opus 5.5 · Élevé, sur
+sa branche `feat/demo-d4-remise-a-zero`, posée sur celle de D3. La partie
+Cloudflare a été faite le soir même dans le navigateur du porteur, après
+qu'il s'est reconnecté lui-même : la base D1 de démonstration créée, le
+coût d'Access relu (offre gratuite, un siège sur cinquante, 0 $ par mois),
+l'alerte de budget trouvée déjà posée.
+
+**Décision.** La démonstration est un second déploiement du même code,
+décrit par `wrangler.demo.jsonc` : son Worker, sa base, son adresse, sans
+secret ni liaison au Worker de notification, déployé par la CI après la
+production et jamais à sa place. La remise à zéro, au bouton de la
+bannière après confirmation ou chaque nuit pour les espaces inactifs depuis
+plus de 24 heures, met l'espace de côté au lieu de l'effacer : une seule
+écriture, aucune table immuable touchée, et l'invité retrouve à sa requête
+suivante un espace neuf. L'accès passe par une application Access propre à
+la démonstration, créée après son premier déploiement : d'ici là, rien
+n'est joignable.
+
+**Neuf précisions**, consignées au contrat (section 11 quinquies) : F185
+remettre à zéro sans rien effacer ; F186 le bouton et sa confirmation ;
+F187 le dernier passage ; F188 la tâche de nuit ; F189 le déploiement
+séparé ; F190 l'accès et son coût ; F191 le courriel de l'invité ; F192
+l'intégration continue ; F193 la visite « Bienvenue » à sept étapes.
+
+**Vérifié par** `tests/db/demo-reset.test.ts` (l'espace remis à zéro rendu
+à son premier jour, les autres invités et les autres moments intacts,
+l'ancien espace mis de côté et non effacé, deux remises de suite
+distinctes, la ferme vierge revenue à sa liste à cocher, le refus hors
+démonstration et pour une identité qui n'est pas de démonstration, la
+tâche de nuit qui ne vise que les espaces de démonstration inactifs depuis
+plus de 24 heures, une seule fois, et le passage noté au plus une fois par
+heure), `tests/demo-deployment-config.test.ts` (un autre Worker et une
+autre base au même runtime, ni liaison ni source réelle ni réglage de
+notification, le mode démo qui accepte la configuration telle qu'écrite,
+la tâche de nuit planifiée, le déploiement après la production sur sa
+propre base), la compilation de la démonstration vérifiée à blanc par
+Wrangler, et le parcours `e2e-demo/` V8 aux deux largeurs. Contrôles du 13 novembre 2026 au soir, branche posée sur celle de D3 :
+lint sans avertissement, typage sans erreur, 1 441 tests sur 1 441
+(10 nouveaux depuis D3), compilation réussie, knip, `push:check` et
+`weather:check` sans erreur, 88 parcours sur 88 (12,1 min), 16 parcours de
+démonstration sur 16 (1,7 min) et `demo:check` sans erreur (la
+démonstration compilée sur sa configuration et vérifiée à blanc par
+Wrangler : sa base, ses cinq réglages, sa tâche de nuit, ni liaison ni
+secret).

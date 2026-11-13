@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (4.0, D4 : la remise à zéro et le déploiement séparé)
+
+- **« Remettre à zéro » dans la bannière de la démonstration** (D-106) :
+  après confirmation, la ferme et le moment ouverts reviennent à leur
+  premier jour ; les autres ne changent pas. Chaque nuit, les espaces où
+  personne n'est passé depuis plus de 24 heures y reviennent seuls. Rien
+  n'est effacé : l'espace remis à zéro est mis de côté dans la base de
+  démonstration. La visite « Bienvenue » le présente.
+- **Le déploiement séparé de la démonstration** : son propre Worker et sa
+  propre base D1 (`wrangler.demo.jsonc`), compilés et vérifiés à chaque PR,
+  déployés après la production, jamais à sa place. L'accès passe par
+  Cloudflare Access ; tant que son application n'est pas créée, rien n'est
+  joignable. Aucune migration.
+
 ### Ajouté (4.0, D3 : la visite guidée)
 
 - **Les visites guidées de la démonstration** (D-105) : un bouton

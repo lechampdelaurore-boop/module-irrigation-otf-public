@@ -11,12 +11,13 @@ import { commencerLaVisite, etapeSuivante, jouerLaVisite, ouvrirLaDemo, verifier
  */
 const PAGE = '/irrigation/aujourdhui';
 const ETAPES: EtapeAttendue[] = [
-  { titre: 'Bienvenue dans la démonstration', rang: 'étape 1 sur 6', chemin: PAGE },
-  { titre: 'Rien n’est réel ici', rang: 'étape 2 sur 6', ancre: 'banniere', chemin: PAGE },
-  { titre: 'Une ferme, un moment de la saison', rang: 'étape 3 sur 6', ancre: 'banniere-choix', chemin: PAGE },
-  { titre: 'Une page par fonctionnalité', rang: 'étape 4 sur 6', ancre: 'menu', chemin: PAGE },
-  { titre: 'L’aide de chaque page', rang: 'étape 5 sur 6', ancre: 'aide-page', chemin: PAGE },
-  { titre: 'Essayez sans crainte', rang: 'étape 6 sur 6', ancre: 'visites', chemin: PAGE },
+  { titre: 'Bienvenue dans la démonstration', rang: 'étape 1 sur 7', chemin: PAGE },
+  { titre: 'Rien n’est réel ici', rang: 'étape 2 sur 7', ancre: 'banniere', chemin: PAGE },
+  { titre: 'Une ferme, un moment de la saison', rang: 'étape 3 sur 7', ancre: 'banniere-choix', chemin: PAGE },
+  { titre: 'Une page par fonctionnalité', rang: 'étape 4 sur 7', ancre: 'menu', chemin: PAGE },
+  { titre: 'L’aide de chaque page', rang: 'étape 5 sur 7', ancre: 'aide-page', chemin: PAGE },
+  { titre: 'Les visites, quand vous voulez', rang: 'étape 6 sur 7', ancre: 'visites', chemin: PAGE },
+  { titre: 'Essayez sans crainte', rang: 'étape 7 sur 7', ancre: 'remise-a-zero', chemin: PAGE },
 ];
 
 test('V1 Bienvenue : l’invitation, avancer, reculer, reprendre, quitter par Échap, finir', async ({ page }) => {

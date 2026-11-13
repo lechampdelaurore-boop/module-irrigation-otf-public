@@ -53,6 +53,7 @@ export type Tour = {
 export const TOUR_ANCHORS = [
   'banniere',
   'banniere-choix',
+  'remise-a-zero',
   'visites',
   'menu',
   'aide-page',
@@ -109,8 +110,13 @@ export const TOURS: readonly Tour[] = [
       },
       {
         anchor: 'visites',
+        title: 'Les visites, quand vous voulez',
+        text: 'Les visites se relancent d’ici, une par thème. Une visite interrompue reprend où vous l’aviez laissée.',
+      },
+      {
+        anchor: 'remise-a-zero',
         title: 'Essayez sans crainte',
-        text: 'Vos essais restent dans votre propre espace, un pour chaque ferme et chaque moment ; les autres visiteurs ne les voient pas. Les visites se relancent d’ici, et une visite interrompue reprend où vous l’aviez laissée.',
+        text: 'Vos essais restent dans votre propre espace, un pour chaque ferme et chaque moment ; les autres visiteurs ne les voient pas. « Remettre à zéro » rend à la ferme et au moment ouverts leur premier jour. Sans visite pendant un jour, votre espace y revient seul, la nuit.',
       },
     ],
   },

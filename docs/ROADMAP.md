@@ -567,7 +567,11 @@ selon la règle de la section 10.
     le mandat du porteur (D-103), sur sa branche : sa PR s'ouvre après le
     tag `v0.2.0` de la 3.9, puis D2 et D3 dans l'ordre. **D2 codée la
     même nuit** (D-104), sur sa branche posée sur celle de D1 ; **D3 aussi**
-    (D-105), sur la sienne posée sur celle de D2.
+    (D-105), sur la sienne posée sur celle de D2. **D4 codée le soir du
+    13 novembre 2026** sur le « vas-y » exprès du porteur, donné pour le
+    tag (D-106), la base de démonstration créée et le coût d'Access relu
+    le soir même dans son navigateur ; reste l'application Access de la
+    démonstration, après son premier déploiement.
 
 24 bis. **Connexions matériel** — trois fonctions demandées le 7 novembre 2026 :
     la connexion à une **station météo locale**, la connexion à des
@@ -3477,7 +3481,7 @@ largeurs ; la relecture visuelle du porteur ; pour R4, chaque page comparée
 
 | N° | Sous-tranche | État | Modèle · effort |
 | --- | --- | --- | --- |
-| 4.0 | Démo guidée avec saisons : ferme de démonstration séparée, trois fermes fictives, visite guidée (D1 à D4, `docs/demo-guided-contract.md`) | 🔶 contrat validé le 8 novembre 2026, code après la 3.9 ; D1 codée le 13 novembre 2026 sur sa branche, PR après le tag `v0.2.0` ; D2 et D3 codées la même nuit sur les leurs | Opus 5.5 · Élevé (ligne 25, à relire au lancement) — D4 (Cloudflare) sur accord exprès du porteur |
+| 4.0 | Démo guidée avec saisons : ferme de démonstration séparée, trois fermes fictives, visite guidée (D1 à D4, `docs/demo-guided-contract.md`) | 🔶 contrat validé le 8 novembre 2026, code après la 3.9 ; D1 codée le 13 novembre 2026 sur sa branche, PR après le tag `v0.2.0` ; D2 et D3 codées la même nuit sur les leurs ; D4 codée le 13 novembre 2026 au soir, sur le « vas-y » exprès du porteur | Opus 5.5 · Élevé (ligne 25, à relire au lancement) — D4 (Cloudflare) sur accord exprès du porteur |
 | 4.1 | Identité stable des exploitations (`otf_farm_id` alimenté automatiquement) | 🟡 à confirmer | Opus 5.5 · Élevé — champ déjà présent, alimentation à automatiser |
 | 4.2 | Droits et isolation multi-structure | 🟡 à confirmer | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — une fuite entre fermes est discrète et grave |
 | 4.3 | Contrat d'intégration OTF, SSO, lien dans le menu Production | 🟡 à confirmer | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — identité et contrat avec un tiers, erreur difficile à rattraper |
@@ -3558,6 +3562,18 @@ une configuration locale qui ne touche plus `wrangler.jsonc`. Les textes
 pourront suivre l'audit ergonomique final. Sa PR s'ouvre après celle de
 D2. Ensuite D4 (remise à zéro et déploiement séparé), sur accord exprès du
 porteur.
+
+**D4 codée le 13 novembre 2026 au soir** (D-106, précisions F185 à F193),
+sur la branche `feat/demo-d4-remise-a-zero`, posée sur celle de D3, sur le
+« vas-y » exprès du porteur : « Remettre à zéro » dans la bannière après
+confirmation, la remise à zéro de nuit des espaces inactifs depuis plus de
+24 heures (l'espace mis de côté, jamais effacé), le Worker et la base D1
+de démonstration (`wrangler.demo.jsonc`), compilés et vérifiés à chaque PR
+et déployés après la production. La base est créée sur le compte du
+porteur, le coût d'Access relu (0 $). Reste l'application Access de la
+démonstration et les invitations de Nicolas et de Vincent, dans le
+navigateur du porteur, après le premier déploiement ; puis la recette
+réelle de la remise à zéro.
 
 ### 4.7 — Hébergement et identité
 

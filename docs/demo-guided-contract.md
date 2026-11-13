@@ -358,6 +358,72 @@ ergonomique final, sans toucher au moteur.
   requête d'écriture : seules passent les actions de lecture que la page
   fait d'elle-même (`read…`, `load…`).
 
+## 11 quinquies. Précisions faites en codant D4 (13 novembre 2026, D-106)
+
+Tranchées par la recommandation, sans valeur agronomique ; chacune reste
+modifiable par le porteur. La partie Cloudflare a été faite le 13 novembre
+2026 au soir sur son « vas-y » exprès du matin, dans son navigateur après
+qu'il s'est reconnecté lui-même : la base de démonstration créée, le coût
+d'Access relu.
+
+- **F185 — remettre à zéro sans rien effacer** : un espace remis à zéro est
+  mis de côté, pas effacé. Son identité devient `…·archive·<heure>` ; toutes
+  ses lignes pendent à l'espace, jamais à l'invité, si bien qu'une seule
+  écriture les détache toutes, et l'invité retrouve à sa requête suivante un
+  espace neuf préparé comme à sa première ouverture (section 6). Effacer les
+  lignes une à une heurterait les tables que le module garde immuables par
+  construction (les déclarations du sol, les coefficients corrigés, leurs
+  journaux) : la remise à zéro ne les touche pas. Les espaces mis de côté
+  restent dans la seule base de démonstration, lus par personne.
+- **F186 — le bouton** « Remettre à zéro », dans la bannière, à côté du
+  choix de la ferme et du moment, partout où ce choix s'affiche. Rien sans
+  confirmation : une fenêtre non modale dit ce qui revient au premier jour
+  (la ferme et le moment ouverts) et ce qui ne change pas (les autres) ;
+  « Annuler » ou Échap la ferment et rendent le focus au bouton.
+  Confirmée, la page d'arrivée de la ferme se rouvre en entier ; la ferme
+  vierge revient à sa liste à cocher.
+- **F187 — le dernier passage** de l'invité est l'heure de mise à jour de
+  son espace, réécrite au plus une fois par heure à sa visite, à l'horloge
+  réelle de la base, jamais au jour simulé.
+- **F188 — la tâche de nuit** du Worker de démonstration, à 2 h 17 UTC,
+  met de côté, en une écriture, chaque espace de démonstration où personne
+  n'est passé depuis plus de 24 heures, jamais une identité hors
+  démonstration ni un espace déjà mis de côté. Hors d'une démonstration
+  acceptée, elle ne fait rien et le journalise ; son journal ne porte
+  qu'un nombre d'espaces.
+- **F189 — le déploiement séparé** : `wrangler.demo.jsonc` décrit le Worker
+  `module-irrigation-otf-demo`, sur le point d'entrée `demo-worker.ts`, et
+  la base D1 `module-irrigation-otf-demo`, créée le 13 novembre 2026 dans
+  le tableau de bord du porteur ; une seule adresse, celle de
+  `workers.dev` (adresses de préversion fermées), les sources de
+  démonstration, ni secret ni liaison au Worker de notification (un test
+  le vérifie, et que le mode démo l'accepte tel quel). La compilation de
+  la démonstration lit cette configuration par `IRRIGATION_WRANGLER_CONFIG`
+  (`pnpm demo:build`) ; `wrangler.jsonc` ne change pas.
+- **F190 — l'accès** passe par Cloudflare Access, comme la production, avec
+  sa propre application et son audience (`ACCESS_AUD`). Tant que cette
+  application n'existe pas, l'audience est vide et aucun invité n'est
+  reconnu : rien n'est joignable (échoue fermé). Elle se crée, avec les
+  invitations de Nicolas et de Vincent, après le premier déploiement, dans
+  le navigateur du porteur ; son audience s'écrit ensuite dans la
+  configuration. Coût relu le 13 novembre 2026 : offre Zero Trust gratuite,
+  un siège sur cinquante utilisé, 0 $ par mois ; l'alerte de budget du
+  compte (5 $) était déjà posée, aucun plafond de dépense n'est posé (il
+  couperait aussi la production).
+- **F191 — le courriel de l'invité** n'est gardé que par Access, le temps
+  de son invitation : le module n'en écrit aucun, l'espace porte le sujet
+  du jeton. Retirer l'invité de la règle d'Access suffit.
+- **F192 — l'intégration continue** compile et vérifie à blanc la
+  démonstration à chaque PR (`pnpm demo:check`, job « Application »), et
+  la déploie après la production, jamais à sa place (job « Déploiement de
+  la démonstration », qui suit celui de la production) : ses migrations
+  ne visent que sa base, et un échec y laisse la production en ligne.
+- **F193 — la visite « Bienvenue »** passe à sept étapes : « Les visites,
+  quand vous voulez » sur le bouton des visites, puis « Essayez sans
+  crainte » sur le bouton « Remettre à zéro » (vingt-deux repères
+  `data-tour`). Parcours V8 aux deux largeurs : rien sans confirmation,
+  puis la ferme vierge revenue à sa liste à cocher.
+
 ## 12. Questions au porteur (répondues) (une par message, numérotées)
 
 Le total est **4**. Elles ne touchent que l'agronomie, le budget et les contacts extérieurs.
