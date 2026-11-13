@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (4.0, D2 : les fermes fictives et la date simulée)
+
+- **Les fermes fictives de la démonstration** (D-100) : trois fermes
+  (maraîchage diversifié, petite exploitation, matériel et alertes
+  seulement) et une ferme vierge, aux noms inventés, chacune dans sa
+  commune, avec quatre moments de la saison 2026 (gel de printemps, début
+  d'été, pic d'été sans eau, automne). La démonstration se joue le jour du
+  moment, à l'heure réelle de la ferme ; la ferme et le moment se
+  choisissent dans la bannière ; chaque invité a son espace par ferme et
+  par moment. Seulement en démonstration : la production garde son point
+  d'entrée et son horloge. Aucune migration.
+
 ### Ajouté (4.0, D1 : les garde-fous du mode démo)
 
 - **Le mode démo** (`DEMO_MODE=true`, D-099), première pièce de la démo

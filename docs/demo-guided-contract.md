@@ -188,6 +188,64 @@ modifiable par le porteur.
   comprises), sans bouton pour la fermer ; le bouton « Remettre la
   démonstration à zéro » s'y ajoute en D4, avec la remise à zéro.
 
+## 11 ter. Précisions faites en codant D2 (13 novembre 2026, D-100)
+
+Tranchées par la recommandation, sans valeur agronomique nouvelle ; chacune
+reste modifiable par le porteur. Deux choix agronomiques lui sont posés
+(les espèces de chaque ferme, le sol) : le code suit la recommandation en
+attendant sa réponse, et changera si elle diffère.
+
+- **F156 — un espace par invité, par ferme et par moment** (couche 5).
+  L'identité d'un espace de démonstration est celle de l'invité suivie de
+  la ferme et du moment ; les essais faits dans un moment ne débordent ni
+  sur un autre moment ni sur un autre invité, et changer de ferme ou de
+  moment n'efface rien. Hors démonstration, l'identité reste celle
+  d'Access, inchangée.
+- **F157 — le choix de la ferme et du moment** se fait dans la bannière,
+  par deux listes (la ferme vierge n'a qu'un moment, la liste du moment ne
+  s'affiche pas) ; il tient dans deux témoins du navigateur, sans rien de
+  sensible ; une valeur absente ou hors de la liste ouvre la ferme A à son
+  premier moment. Un changement recharge le module en entier, car il change
+  l'espace et le jour de toute la requête.
+- **F158 — la date simulée** (C3) : le jour est celui du moment, l'heure est
+  l'heure réelle de la ferme. Elle se pose requête par requête, par un point
+  d'entrée propre à la démonstration (`demo-worker.ts`) qui remplace
+  l'horloge du Worker et lit l'écart de chaque requête dans son contexte :
+  deux invités dans deux moments ne se gênent pas. Le navigateur reçoit le
+  même écart en tête de page, avant que les écrans ne s'animent. Le point
+  d'entrée de la production reste `vinext/server/fetch-handler`, inchangé ;
+  hors d'une démonstration acceptée, celui de la démonstration ne sert rien.
+- **F159 — les quatre moments sont des mardis de la saison 2026** (une
+  semaine entamée) : printemps le 14 avril, début d'été le 16 juin, pic
+  d'été le 21 juillet, automne le 20 octobre. Le plan de culture d'une ferme
+  se lit au jour du moment : ce qui est prévu avant est fait, ce qui vient
+  après est à faire.
+- **F160 — les fermes et leurs noms.** Quatre fermes aux noms de lieux
+  inventés, chacune dans sa commune (Nantes pour la ferme A et la ferme
+  vierge, Tours pour B, Valence pour C) : la ferme A reprend la forme de la
+  ferme de démonstration actuelle (trois îlots, une serre, des planches de
+  tailles réalistes), sous d'autres noms, car celle-ci porte « Tunnel 1 »,
+  un nom de la ferme réelle ; le jeu des parcours navigateur reste intact.
+  La couche 4 est un test : aucun nom des jeux de la ferme réelle
+  (Clémentière, Tunnel 1, B1-0…, Forage principal…) n'apparaît dans une
+  ferme fictive.
+- **F161 — les espèces** : seulement des espèces rattachées au catalogue Kc
+  validé (migration 0023). A : carottes, épinards, tomates, courgettes,
+  salades, radis, poireaux, oignons ; B : salades, courgettes, haricots,
+  tomates ; C : pommes de terre, poireaux, fraisiers. *Question agronomique
+  posée au porteur (1 sur 2), recommandation suivie en attendant.*
+- **F162 — la météo des moments**, sans appel réseau : le fournisseur de
+  démonstration, avec deux épisodes : des nuits de gel du 15 et 16 avril
+  (minimales de −2,4 et −1,1 °C) et une sécheresse chaude du 13 juillet au
+  2 août (sans pluie, ET0 de 5,6 à 6,4 mm), pour que les sept jours de
+  prévision de chaque moment montrent ce qu'il annonce. Valeurs dans les
+  fourchettes déjà utilisées par la démonstration et les tests.
+- **F163 — la ferme vierge** n'a pas d'espace tant que l'invité n'a rien
+  coché : elle s'ouvre, comme une ferme qui n'a jamais ouvert le module, sur
+  la liste à cocher. Les fermes A, B et C s'ouvrent avec leurs cases cochées
+  d'avance (B ajoute le calculateur, qu'elle montre) ; un espace déjà ouvert
+  n'est jamais réécrit.
+
 ## 12. Questions au porteur (répondues) (une par message, numérotées)
 
 Le total est **4**. Elles ne touchent que l'agronomie, le budget et les contacts extérieurs.
