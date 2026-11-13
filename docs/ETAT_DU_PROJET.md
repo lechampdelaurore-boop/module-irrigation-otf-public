@@ -151,8 +151,9 @@ registres, elle y renvoie.
   le planificateur météo près de son délai, le point ouvert 65. **Mot de
   clôture du porteur le 13 novembre 2026 à 19 h 28** (« Clôturer la 3.9 et poser le tag v0.2.0 ? » : « Clôturer, fermer 49 à 64 ») : la 3.9
   et la Tranche 3 closes, les points ouverts 49 à 64 fermés ; le tag
-  `v0.2.0` sur le commit de fusion de la PR de clôture, après son
-  déploiement vérifié. Le premier passage du planificateur après D-100,
+  `v0.2.0` posé le 13 novembre 2026 à 20 h 58 sur `70477a4`, le commit de
+  fusion de la PR de clôture (#33), après son déploiement vérifié (run
+  43485850915) : un tag simple, posé par la page de version « v0.2.0 — Tranche 3 clôturée » que le porteur a publiée sur GitHub, sur un lien préparé par l'assistant : la session de l'assistant ne peut écrire aucun tag (envoi refusé par GitHub, 403), écart au contrat qui le voulait annoté et poussé par l'assistant. Le premier passage du planificateur après D-100,
   le 14 novembre 2026 à 6 h 15, reste à constater.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
@@ -162,10 +163,10 @@ registres, elle y renvoie.
   2026** sur le mandat du porteur (D-103, précisions F153 à F157), sur sa
   branche `feat/demo-d1-garde-fous` ; sa PR s'ouvre après le tag `v0.2.0`,
   pour que la recette finale de la 3.9 porte sur la version sans D1.
-  Contrôles du 13 novembre 2026, branche à jour avec `main` (`ac14f6b`) :
-  lint sans avertissement, typage sans erreur, 1 386 tests sur 1 386
-  (28 nouveaux), compilation réussie, knip, `push:check` et `weather:check`
-  sans erreur, 88 parcours sur 88 (9,7 min) ; refus de démarrer et bannière
+  Contrôles du 13 novembre 2026 au soir, branche refaite sur `main` après
+  le tag (`70477a4`) : lint sans avertissement, typage sans erreur, 1 387
+  tests sur 1 387 (28 nouveaux), compilation réussie, knip, `push:check`
+  et `weather:check` sans erreur, 88 parcours sur 88 (11,9 min) ; refus de démarrer et bannière
   constatés dans le serveur de développement (D-103).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
@@ -196,6 +197,11 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #33 (`70477a4`, la clôture de la 3.9 et de la Tranche 3, la version
+  0.2.0, D-100 et D-101, fusionnée le 13 novembre à 19 h 46 sur le mot de
+  clôture du porteur et déployée à 19 h 58, run 43485850915, les quatre jobs
+  réussis, aucune migration, les Workers Push et météo redéployés à leur version 0.2.0 ; le tag `v0.2.0` posé sur ce
+  commit à 20 h 58, par la page de version publiée par le porteur). Avant elle : la
   PR #32 (`bd539f8`, les invariants étendus, E2 de la recette finale,
   D-099, fusionnée le 13 novembre à 10 h 34 et déployée à 10 h 49, run
   43402427168, les quatre jobs réussis, aucune migration, Workers
