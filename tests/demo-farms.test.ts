@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import test, { afterEach } from 'node:test';
-import { DEMO_FARMS, DEMO_SPECIES_REFERENCES, demoFarmSnapshot } from '../lib/adapters/demo/farms.ts';
+import { DEMO_FARMS, demoFarmSnapshot } from '../lib/adapters/demo/farms.ts';
+import { DEMO_FROST_COMMON_KEYS, DEMO_SPECIES_REFERENCES } from '../lib/adapters/demo/module-data.ts';
 import { demoSeasonWeatherProvider } from '../lib/adapters/weather/demo-season-provider.ts';
 import { demonstrationWeatherProvider } from '../lib/adapters/weather/demonstration-provider.ts';
 import {
@@ -163,6 +164,14 @@ test('uniquement des espèces du catalogue Kc validé (migration 0023)', () => {
       assert.ok(reference, `${series.plantId} sans culture de référence`);
       assert.ok(catalogue.includes(`'${reference}'`), `${reference} absent du catalogue`);
     }
+  }
+});
+
+test('les seuils de gel viennent du jeu commun (migration 0026), sans valeur propre', () => {
+  const common = readFileSync('drizzle/0026_crop_alerts.sql', 'utf8');
+  for (const [plantId, key] of Object.entries(DEMO_FROST_COMMON_KEYS)) {
+    assert.ok(DEMO_SPECIES_REFERENCES[plantId], `${plantId} n’est pas une espèce des fermes fictives`);
+    assert.ok(common.includes(`('${key}', `), `${key} absent du jeu commun`);
   }
 });
 

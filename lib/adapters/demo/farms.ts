@@ -131,21 +131,3 @@ export const DEMO_FARMS: Readonly<Record<DemoProfileId, DemoFarmDefinition>> = {
 export function demoFarmSnapshot(profile: DemoProfileId, momentDateKey: string): IrrigationSnapshot {
   return buildDemoSnapshot(DEMO_FARMS[profile], momentDateKey);
 }
-
-/**
- * Chaque espèce des fermes fictives et sa culture de référence du catalogue
- * Kc validé (migration 0023) : rien d'autre n'entre dans la démonstration.
- */
-export const DEMO_SPECIES_REFERENCES: Readonly<Record<string, string>> = {
-  'plante-carotte': 'criiam-carotte',
-  'plante-epinard': 'fao-epinard',
-  'plante-tomate': 'criiam-tomate',
-  'plante-courgette': 'criiam-courgette',
-  'plante-salade': 'criiam-salade-ete',
-  'plante-radis': 'fao-radis',
-  'plante-poireau': 'criiam-poireau',
-  'plante-oignon': 'criiam-oignon',
-  'plante-haricot': 'criiam-haricot',
-  'plante-pomme-de-terre': 'criiam-pomme-de-terre',
-  'plante-fraisier': 'criiam-fraisier',
-};
