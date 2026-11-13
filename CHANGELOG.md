@@ -14,7 +14,11 @@ source détaillée commit par commit.
   d'été, pic d'été sans eau, automne). La démonstration se joue le jour du
   moment, à l'heure réelle de la ferme ; la ferme et le moment se
   choisissent dans la bannière ; chaque invité a son espace par ferme et
-  par moment. Seulement en démonstration : la production garde son point
+  par moment. À sa première ouverture, chaque ferme a déjà son matériel,
+  son eau, ses objectifs, son plan de la semaine et sa saison passée : au
+  printemps, le gel est annoncé ; en été, tout se place ; au pic d'été,
+  l'eau manque et le planning le chiffre ; à l'automne, l'historique a la
+  saison. Seulement en démonstration : la production garde son point
   d'entrée et son horloge. Aucune migration.
 
 ### Ajouté (4.0, D1 : les garde-fous du mode démo)

@@ -3483,7 +3483,7 @@ démonstration est liée au Worker de notification » ; sans cette liaison, la
 bannière s'affiche aux deux largeurs, sans cloche ni défilement de côté, et
 le navigateur ne joint aucun hôte extérieur.
 
-## D-100 — Les fermes fictives et la date simulée (4.0, D2) : huit précisions tranchées par la recommandation
+## D-100 — Les fermes fictives et la date simulée (4.0, D2) : quatorze précisions tranchées par la recommandation
 
 Date : 13 novembre 2026. Deuxième PR de code de la démo guidée
 (`docs/demo-guided-contract.md`, D-096), codée la nuit du 12 au
@@ -3497,23 +3497,20 @@ par invité, par ferme et par moment ; la ferme et le moment choisis dans la
 bannière ; la date simulée posée requête par requête par un point d'entrée
 propre à la démonstration, la production gardant le sien.
 
-**Huit précisions**, consignées au contrat (section 11 ter) : F156 l'espace
-par ferme et par moment ; F157 le choix dans la bannière et ses témoins ;
-F158 la date simulée, au serveur et au navigateur ; F159 les quatre mardis ;
-F160 les fermes, leurs noms et la couche 4 ; F161 les espèces ; F162 la
-météo des moments ; F163 la ferme vierge et les cases cochées d'avance.
+**Quatorze précisions**, consignées au contrat (section 11 ter) : F156
+l'espace par ferme et par moment ; F157 le choix dans la bannière et ses
+témoins ; F158 la date simulée, au serveur et au navigateur ; F159 les
+quatre mardis ; F160 les fermes, leurs noms et la couche 4 ; F161 les
+espèces ; F162 la météo des moments ; F163 la ferme vierge et les cases
+cochées d'avance ; F164 le matériel et l'eau ; F165 les objectifs adoptés ;
+F166 la météo passée et le calcul du matin ; F167 l'historique ; F168 la
+météo selon le mois ; F169 une seule préparation.
 
 **Deux questions agronomiques au porteur** (une par message) : les espèces
 de chaque ferme (F161) et le sol (aucune valeur de sol du module n'est
 fictive : les seules sont celles de sa ferme, interdites ici ;
 recommandation : laisser le sol « non renseigné »). Le code suit la
 recommandation en attendant ses réponses.
-
-**Ce que D2 ne fait pas encore** (à venir sur la même branche) : le
-matériel, la ressource, la pompe, les objectifs et les correspondances des
-espèces de chaque ferme, écrits à la première ouverture de l'espace, qui
-font voir l'alerte de gel, le planning, le budget de pénurie et
-l'historique ; et un test par moment sur ces écrans.
 
 **Vérifié par** `tests/demo-farms.test.ts` (le catalogue, les témoins,
 l'espace par moment et l'identité forgée refusée, l'horloge simulée au
@@ -3522,15 +3519,26 @@ navigateur, des plans cohérents lus au jour du moment, des espèces du
 catalogue validé, la couche 4, un test par moment sur la date et la météo)
 et `tests/db/demo-space.test.ts` (les cases cochées d'avance, un espace
 jamais réécrit, la ferme vierge sur la liste à cocher, rien hors
-démonstration). Contrôles du 13 novembre 2026, branche posée sur celle de
-D1 (elle-même à jour avec `main`, `ac14f6b`) : lint sans avertissement,
-typage sans erreur, 1 408 tests sur 1 408 (22 nouveaux), compilation
-réussie, knip, `push:check` et `weather:check` sans erreur, 88 parcours sur
-88 (10,0 min). Constaté aussi en vrai, le point d'entrée de la
+démonstration ; les espèces et les seuils de gel rattachés ; deux premières
+ouvertures simultanées ; la météo passée sans trou ; les objectifs adoptés ;
+le matériel et l'eau ; un test par moment : le gel des 15 et 16 avril
+nommé par l'encart, l'été placé sans manque ni gel, la pénurie chiffrée au
+pic d'été, la saison passée dans l'historique d'automne ; chaque ferme et
+chaque moment préparés sans erreur). Contrôles du 13 novembre 2026, branche
+posée sur celle de D1 (elle-même à jour avec `main`, `ac14f6b`) :
+lint sans avertissement, typage sans
+erreur, 1 419 tests sur 1 419 (33 nouveaux depuis D1), compilation réussie,
+knip, `push:check` et `weather:check` sans erreur, 88 parcours sur 88
+(9,8 min). Constaté aussi en vrai, le point d'entrée de la
 démonstration branché le temps de l'essai sur une configuration locale
 sans liaison au Worker de notification (puis remise en état) : chaque page
 se joue au jour du moment choisi (14 avril, 16 juin, 21 juillet, 20 octobre)
 à l'heure de Paris, au serveur comme dans le navigateur, sans erreur de
-console ; la ferme vierge s'ouvre sur la liste à cocher ; changer de ferme
-ou de moment dans la bannière recharge le module dans le bon espace ; la
-bannière tient aux deux largeurs.
+console ; au printemps, « Aujourd'hui » annonce le gel des 15 et 16 avril
+sur les radis et les tomates ; en été, le plan du matin propose sans manque ;
+au pic d'été, il chiffre le manque d'eau (1,8 m³ sur 2,7 m³ demandés,
+bassin à 6 m³) ; à l'automne, l'historique a la saison ; la ferme vierge
+s'ouvre sur la liste à cocher ; changer de ferme ou de moment dans la
+bannière recharge le module dans le bon espace ; aucune page ne déborde à
+390 px ; une première ouverture prend de 1 à 3 s dans le serveur de
+développement.

@@ -246,6 +246,38 @@ attendant sa réponse, et changera si elle diffère.
   d'avance (B ajoute le calculateur, qu'elle montre) ; un espace déjà ouvert
   n'est jamais réécrit.
 
+- **F164 — le matériel et l'eau**, écrits à la première ouverture par les
+  dépôts ordinaires, valeurs de matériel fictives : un goutte-à-goutte par
+  parcelle à 6 mm/h, posé le 2 mars sur toutes ses planches. Ferme A : un
+  puits de 1,5 m³/h qui remplit un bassin de 40 m³ (minimum de sécurité
+  4 m³), une pompe de 3 m³/h qui en tire l'eau ; le bassin relevé le matin
+  du moment à 36, 30, 6 puis 22 m³ ; au pic d'été, le puits est à sec (il
+  est arrêté, sa fiche le dit), d'où la pénurie. Ferme B : le réseau
+  communal, 2 m³/h, sans réserve. Ferme C : le matériel seul.
+- **F165 — les objectifs** de la ferme A sont les propositions du module
+  pour chaque planche cultivée (Kc du catalogue × ETP de la météo de la
+  démonstration), adoptées comme d'un clic dans « Besoin par culture » :
+  aucun chiffre saisi. Les fermes B et C, sans « Besoin par culture », n'ont
+  pas d'objectif : l'invité le fixe.
+- **F166 — ce que la nuit aurait fait** : la météo des quatre semaines
+  passées en base (en réanalyse jusqu'à cinq jours avant le moment, en
+  prévision ensuite), et le plan de la semaine calculé « au matin ».
+- **F167 — l'historique** des fermes qui ont « Arrosages » : un arrosage
+  par semaine et par goutte-à-goutte, le lundi à 7 h, de 45 min en avril,
+  1 h en mai, 2 h en juin, 2 h 30 en juillet et en août, 1 h 30 en
+  septembre et 45 min en octobre : les gestes d'une ferme inventée, que le
+  module compte, pas une recommandation.
+- **F168 — la météo selon le mois.** Le motif des parcours navigateur est
+  une arrière-saison (des nuits à 2,6 °C) : la démonstration le réchauffe
+  de 4 °C en mai, 7 °C en juin, 9 °C en juillet et en août, 5 °C en
+  septembre et 1 °C en octobre, et son ETP de × 1,3 à × 1,6 de mai à août
+  (× 0,7 en octobre) ; sans cela, du gel serait annoncé en juin. La pluie
+  reste celle des parcours.
+- **F169 — une seule préparation.** La page et ses données partent ensemble
+  à la première ouverture : la requête qui crée l'espace l'écrit, les
+  autres attendent qu'il soit prêt (cinq secondes au plus) ; les cases
+  cochées s'écrivent en dernier et disent qu'il l'est.
+
 ## 12. Questions au porteur (répondues) (une par message, numérotées)
 
 Le total est **4**. Elles ne touchent que l'agronomie, le budget et les contacts extérieurs.

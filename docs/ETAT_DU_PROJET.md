@@ -135,16 +135,17 @@ registres, elle y renvoie.
   (28 nouveaux), compilation réussie, knip, `push:check` et `weather:check`
   sans erreur, 88 parcours sur 88 (9,7 min) ; refus de démarrer et bannière
   constatés dans le serveur de développement (D-099).
-  **D2, les fermes fictives et la date simulée, commencée la même nuit**
-  (D-100, précisions F156 à F163), sur la branche
+  **D2, les fermes fictives et la date simulée, codée la même nuit**
+  (D-100, précisions F156 à F169), sur la branche
   `feat/demo-fermes-fictives` posée sur celle de D1 : les fermes, les
   moments, l'espace par ferme et par moment, la date simulée au serveur et
-  au navigateur ; reste le peuplement du matériel, de la ressource et des
-  objectifs de chaque ferme. Contrôles du 13 novembre 2026 : lint sans
-  avertissement, typage sans erreur, 1 408 tests sur 1 408 (22 nouveaux),
-  compilation réussie, knip, `push:check` et `weather:check` sans erreur,
-  88 parcours sur 88 (10,0 min) ; date simulée, ferme vierge et bannière
-  constatées en vrai avec le point d'entrée de la démonstration (D-100).
+  au navigateur, et ce que chaque ferme a déjà réglé (matériel, eau,
+  objectifs, plan du matin, saison passée). Deux questions agronomiques au
+  porteur (les espèces, le sol), la recommandation suivie en attendant.
+  Contrôles du 13 novembre 2026 : lint sans avertissement, typage sans
+  erreur, 1 419 tests sur 1 419 (33 nouveaux), compilation réussie, knip,
+  `push:check` et `weather:check` sans erreur, 88 parcours sur 88 (9,8 min) ; chaque moment constaté en
+  vrai avec le point d'entrée de la démonstration (D-100).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
