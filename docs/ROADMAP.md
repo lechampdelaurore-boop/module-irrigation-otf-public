@@ -71,6 +71,7 @@ venir ; les lignes terminées gardent le nom du modèle employé.
 | Extension · Alertes météo par culture (5 quinquies) | 🟡 | **demandée le 6 novembre 2026** (idées A1 et A2 de la comparaison avec Tlaloc, aspersions à reconsidérer ajoutées le jour même) ; **contrat écrit et relu par le porteur le 6 novembre 2026** (`docs/weather-crop-alerts-contract.md`, D-058) : gel selon la culture (un seul seuil par espèce, marge de 3 ou 2 °C, curseur de microclimat), arrêt d'arrosage avant récolte, aspersions de jour sous abri à reconsidérer ; **code commencé le 6 novembre 2026 sur le mandat du porteur** (D-060), en Opus 5.5 : PR 1, le domaine (`lib/domain/crop-alerts/`, dix-neuf des vingt scénarios du contrat en tests, huit précisions consignées dans le contrat), codée le jour même ; PR 2, la persistance et l'envoi (migration additive 0026, `db/crop-alerts/`, `lib/services/crop-alerts-service.ts`, le scénario 13 en test, huit précisions consignées dans le contrat), codée le jour même ; PR 3, l'écran (l'encart « Alertes cultures » sous les alertes météo, parcours P21, huit précisions consignées dans le contrat), codée le jour même ; ces trois PR fusionnées et déployées le 6 novembre 2026 (#252 à #254) ; **recette réelle faite les 6 et 7 novembre 2026 sur son « vas-y »** (`docs/recette-5-quinquies.md`) : ses 24 légumes rattachés au jeu commun, la vraie alerte de gel du dimanche 8 novembre produite mais refusée par le service d'envoi, défaut corrigé le soir même (#258) ; l'alerte reçue ensuite sur son téléphone, mais seulement à son réveil, et le toucher n'ouvrant rien, deux défauts corrigés le soir même (#260, priorité haute, premier plan d'abord) ; à l'essai final du 7 novembre 2026, l'alerte arrive à l'heure sur son téléphone verrouillé et sonne, et le toucher ouvre le module ; jugement au porteur (D-014). Place : après la 5 ter, avant la refonte ergonomique et la 3.8 |
 | Extension · Refonte ergonomique (charte du module) | 🟡 | charte du module **validée par le porteur le 6 novembre 2026** (`docs/charte-module.md`, maquettes dans `/mnt/project-files/charte-module/`), polices sous licence SIL OFL 1.1, hébergées avec leur `OFL.txt` ; **code commencé le 6 novembre 2026 sur le mandat du porteur** (D-060), en Opus 5.5, CSS seul, en trois temps : R1, les jetons, les polices hébergées, le fond, les blocs et les rayons (neuf précisions consignées dans la charte), codé le jour même, fusionné et déployé le 7 novembre 2026 (#257) ; R2, les boutons, les onglets, les tableaux et les tuiles de totaux (cinq précisions consignées dans la charte), codé le jour même, fusionné et déployé le 7 novembre 2026 (#263) ; R3, les couleurs d'état, le bleu eau et les icônes au trait (cinq précisions consignées dans la charte ; la navigation de la charte revient à la 3.8), codé le jour même, fusionné et déployé le 7 novembre 2026 (#264) ; un défaut de R3 trouvé le 7 novembre 2026 au contrôle de départ de la 3.8 et corrigé (le composant des icônes, nommé `icon.tsx`, pris par le cadre pour l'image de l'onglet de la page, que chaque page demandait en vain, erreur 404 ; renommé `line-icon.tsx`) ; **relecture visuelle du porteur le 7 novembre 2026** : lisible, mais trop proche d'avant et pas assez « OTF » (captures avant, après et aujourd'hui dans `/mnt/project-files/refonte-avant-apres/`) ; **deuxième passe, R4, décidée le jour même sur une maquette validée par lui** (D-068) : plan sans bandeau vert foncé, moins de cadres, étiquettes écrites normalement, titre de page à la taille de la charte, barre anthracite au téléphone ; CSS et habillage seulement, en Opus 5.5 · Élevé ; **R4 codée le 7 novembre 2026 au soir, juste après le déploiement de la PR 7 de la 3.8** : barre du haut commune (blanche à l'ordinateur, anthracite avec la cloche au téléphone), menu en colonne collée au bord gauche, titre à la taille de la charte avec son « ? » au trait, état des données d'OTF en une ligne, plan et planche choisie en blocs blancs, étiquettes écrites normalement, cadres dans les blocs remplacés par des fonds alternés ; chaque page comparée à la maquette aux deux largeurs ; relecture du porteur à venir. Place : après la 5 quinquies, avant la 3.8 ; R4 juste après la 3.8, avant la 3.8 bis |
 | Extension · Audit ergonomique (3.8 quater) | ✅ | **audit du 7 novembre 2026** (`/mnt/project-files/audit-ergonomie/audit-ergonomie-module-2026-11-07.md`, quatorze propositions classées) **retenu en entier par le porteur le jour même** (D-069) : les quatorze points sont décidés, pas facultatifs ; consigné en section 3.8 quater ; après la 3.8 bis et la 3.8 ter, avant la 3.9, en trois lots, le premier étant les petits points 7, 4, 9 et 11 ; **lot 1 codé la nuit du 7 au 8 novembre 2026** sur le mandat du porteur (D-072, parcours P27, #288 en ligne le 8 novembre à 04 h 29) : titre d'onglet par page et page introuvable en français, ordre naturel des listes et périmètre d'un objectif cherché et rangé par jardin, saison et commune là où elles servent, historique ouvert sur les irrigations réalisées ; **relu et validé par le porteur le 8 novembre 2026** (E4 compris : au téléphone aussi, le périmètre d'un objectif garde ses groupes par jardin et sa recherche) ; **lot 2 : contrat écrit le 8 novembre 2026** (`docs/audit-ergonomie-lot2-contract.md`, D-073, #289 en ligne) ; **PR 1 du lot 2, le téléphone, codée le 8 novembre 2026** (parcours P28, précisions F15 à F22, #290 en ligne) : barre du bas à quatre entrées et « Plus », saison dans la ligne du titre, bandeau des alertes système replié sur la cloche, planning replié, tuiles sur deux colonnes, pastilles d'aide à 44 px ; **PR 2 du lot 2, le domaine « Aujourd'hui » et « Fiabilité du calcul », codée le 8 novembre 2026** (`lib/domain/today/`, `lib/services/today-service.ts`, précisions F23 à F30, #291 en ligne), sans écran ; **PR 3 du lot 2, les écrans, codée le 8 novembre 2026** (parcours P29, précisions F31 à F42) : la page « Aujourd'hui », première du menu et page d'arrivée, ses cinq blocs et la zone « Fiabilité du calcul » avec le geste de chaque ligne, la pastille du menu en ambre ; relecture en ligne du porteur à son retour ; **retours du porteur du 8 novembre 2026** : « Non placé » replié et l'ordre de « Matériel et placement » (#295), « Besoin par culture » (#296) ; **« Aujourd'hui » en tableau de bord** (D-074, `docs/aujourdhui-tableau-de-bord-contract.md`) : maquette validée par le porteur le 8 novembre 2026, entrée de menu détachée, « Tout est fait » tel que prévu (son choix), trois PR (contrat et domaine, écrans, « Tout est fait »), la PR 1 en ligne (#297), la PR 2 (les écrans, P30) en ligne (#298), la PR 3 (« Tout est fait ») en ligne (#299) ; légende de la frise corrigée après le retour du porteur (T19 : « Non faite » en rouge, seulement les couleurs présentes) ; **lot 3 : contrat validé par le porteur le 8 novembre 2026** (`docs/audit-ergonomie-lot3-contract.md`, D-076), trois PR ; **PR 1 du lot 3, le planning et les arrosages (points 5 et 6), codée le 8 novembre 2026** (parcours P31a, précisions F52 à F61) : cartes de tête « À valider », « Faites », « En retard », planches non servies rangées par motif avec l'action vers « Matériel », formulaire sans présélection, faisabilité en phrase d'action, « À traiter » en tête puis une ligne par irrigation et par jour, « Annuler » dans le menu « … », « Fait comme prévu » (#301 en ligne) ; **PR 2 du lot 3, les PR 2 et 3 réunies (points 12, 13, 10, 8 et 14), en ligne le 8 novembre 2026** (#303 de l'archive, parcours P31b et P31c, précisions F62 à F71) : espèces à rattacher en tête avec « Rattacher comme… » confirmé, « Observer » sur une jauge inconnue et les jardins pareils en une phrase, trois modèles d'alerte et l'état de cet appareil, « Besoin en eau par culture » et les replis « Pour les experts », un seul tableau des K_abri, « Aller au contenu », cibles de 44 px au téléphone et contraste mesuré ; **lot 3 complet, validé par le porteur le 8 novembre 2026 à 19 h 20** ; **3.8 quater close par le porteur le 13 novembre 2026 à 21 h 48** | Opus 5.5 · Élevé pour le lot 1, Très élevé pour les lots 2 et 3 et le tableau de bord (voir le bloc 3.8 quater) |
+| Extension · Finitions, graphique des réserves et vue satellite | 🔶 | **trois chantiers de code inscrits le 13 novembre 2026** (D-107, section 5 sexies), **après le tag v0.2.0 de la 3.9 et avant l'audit ergonomique final**, dans cet ordre, un seul chantier de code à la fois : **style « un peu plus joli »** (cinq touches de la maquette validée, patch R5 à refaire sur le dépôt public, habillage seulement), **graphique des réserves du sol** (variante B choisie par le porteur : une barre par jardin, planches en points, aucun calcul nouveau), **vue satellite** (le gratuit choisi par le porteur le 8 novembre 2026 : MapLibre et orthophotos IGN, contour des parcelles et des jardins lu dans OTF) ; le style démarre à la fusion de cette PR (mandat de nuit du porteur) | Opus 5.5 · Élevé (style), Opus 5.5 · Élevé (graphique), Opus 5.5 · Très élevé (vue satellite) |
 | Extension · Connexions matériel (capteurs météo, tensiomètres, électrovannes) | 🔶 | **demandée par le porteur le 7 novembre 2026**, consignée en section 6 bis (D-063) : brancher au module une station météo locale, des tensiomètres, puis piloter des électrovannes ; **trois recherches documentaires sans code** (une par fonction) ; **C3 (électrovannes) : contrat écrit le 7 novembre 2026** (`docs/valve-control-contract.md`, D-064), le module doit piloter, confirmation du porteur à chaque ouverture, rien de codé ni acheté ; C1 et C2 : aucun réglage ni aucune méthode décidés ; l'électrovanne touche la ferme réelle : rien n'est exécuté, documents seulement. Place : après la 3.9, avant la tranche 4 |
 | Extension · Banc commun de saisons rejouées avec Tlaloc, et idées sans engagement | 🔶 | **décidé par le porteur le 7 novembre 2026** (D-065, section 6 ter) : le rejeu de saisons avec Tlaloc se place **après la 3.9, en recherche** : un contrat écrit d'abord, **aucun code sans son accord** ; quatre idées rangées sans engagement (archivage des prévisions J+1, formule du tensiomètre pour C2, heures de silence des notifications, ET0 horaire). Rien n'est codé ni promis à Tlaloc | contrat : Sonnet 5.5 · Moyen ; code : à fixer au contrat, sur accord du porteur |
 | Chantier · Partage des rôles avec Tlaloc et fusion des deux moteurs | 🔶 | **accord du porteur avec le développeur de Tlaloc le 7 novembre 2026** (D-066, section 6 quater) : le porteur termine la Tranche 3 (mode solo) ; Tlaloc prend l'automatisation (capteurs, électrovannes : C1 à C3 **confiés à Tlaloc**, recherches conservées) ; **avant la Tranche 4**, un chantier « fusion des deux moteurs » (comparaison fine puis synthèse en un logiciel commun, à partir du code de Tlaloc), qui absorbe le banc commun ; ergonomie : Tlaloc garde la sienne, chez nous les fonctionnalités se cochent à la connexion (intention rattachée à la 3.8). Rien n'est codé ni cadré | contrat : Sonnet 5.5 · Moyen ; code : à fixer au contrat |
@@ -552,6 +553,22 @@ selon la règle de la section 10.
     porteur**, la Tranche 3 avec elle, les points ouverts 49 à 64 fermés ;
     le tag `v0.2.0` posé sur son commit de fusion (`70477a4`), le
     13 novembre 2026 à 20 h 58.
+24 quater. **Finitions, graphique des réserves du sol et vue satellite** —
+    trois chantiers de code inscrits le 13 novembre 2026 (D-107, section
+    5 sexies), **après le tag v0.2.0 de la 3.9**, un seul chantier de code
+    à la fois, une PR chacun, dans l'ordre : (a) **style « un peu plus
+    joli »**, cinq touches validées sur maquette, habillage seulement, le
+    patch R5 de l'archive refait sur le dépôt public (Opus 5.5 · Élevé) ;
+    (b) **graphique des réserves du sol**, variante B, un affichage sans
+    calcul nouveau (Opus 5.5 · Élevé) ; (c) **vue satellite**, MapLibre et
+    orthophotos IGN, avec une migration et la lecture des contours d'OTF
+    (Opus 5.5 · Très élevé). La démo guidée (D1 à D4) est déjà en
+    ligne ; l'**audit ergonomique final**
+    de toutes les pages (captures en Sonnet 5.5 · Moyen, analyse en Opus
+    5.5) vient après ces trois chantiers. Le style démarre dès la fusion de ce
+    registre (mandat d'autonomie du porteur le 13 novembre 2026) ; les
+    deux autres suivent un à un.
+
 25. **Tranche 4** — à cadrer avec le développeur d'Ouvre ta ferme après
     la 3.9. Elle s'ouvre par la **démo guidée avec saisons** (sous-tranche
     4.0, contrat `docs/demo-guided-contract.md` **validé par le porteur le
@@ -3473,6 +3490,109 @@ et comparées à la maquette ; relecture du porteur à venir.
 Preuve de fin : les tests et les parcours navigateur verts aux deux
 largeurs ; la relecture visuelle du porteur ; pour R4, chaque page comparée
 à la maquette aux deux largeurs, puis sa relecture.
+
+## 5 sexies. Extension — Finitions, graphique des réserves du sol et vue satellite (🔶 inscrite le 13 novembre 2026, style à lancer)
+
+Trois chantiers demandés par le porteur entre le 8 et le 13 novembre
+2026, tous trois **sans règle agronomique nouvelle**, inscrits ensemble
+pour que la roadmap fasse foi sur leur ordre et leur réglage (D-107).
+Chacun est une PR de code précédée, quand il en faut un, de la section de
+contrat à verser dans la même PR ; le style démarre dès la fusion de ce registre sur le mandat
+d'autonomie du porteur (13 novembre 2026), et un seul chantier de code à
+la fois.
+
+| N° | Chantier | État | Modèle · effort |
+| --- | --- | --- | --- |
+| S1 | Style « un peu plus joli » (R5) | 🔶 patch prêt, à refaire sur le dépôt public | Opus 5.5 · Élevé — habillage seulement, sous maquette validée, les tests de style et la CI jugent ; c'est la ligne des passes R3 et R4 |
+| S2 | Graphique des réserves du sol (variante B) | 🔶 maquette validée, section de contrat rédigée | Opus 5.5 · Élevé — un affichage sous contrat écrit, aucun calcul nouveau, des tests et des parcours le jugent |
+| S3 | Vue satellite de la parcelle (MapLibre et IGN) | 🔶 recherche finie, contrat à écrire | Opus 5.5 · Très élevé — migration, lecture de données d'OTF, bibliothèque et service externes, pas d'équivalent dans le module : contexte étendu et plus de liberté de conception |
+
+### S1 — Style « un peu plus joli » (troisième passe, R5)
+
+Le porteur trouve le style austère et a choisi cinq touches sur une
+maquette, **sans quitter la charte d'Ouvre ta ferme** : une pastille
+ronde à icône au trait devant le titre de vingt blocs (verte, bleu eau
+pour l'eau et la pluie) ; les tuiles de totaux à filet de couleur, avec
+une icône devant le libellé et un chiffre un peu plus grand ; le bandeau
+d'annonce en pointillé vert avec l'étiquette « Nouveau », comme la
+Boîte à outils d'OTF ; les cartes qu'on ouvre d'un clic teintées de vert
+pâle au survol, sans déplacement ; de petits dessins au trait dans les
+grands états vides.
+
+Le travail est **déjà fait une fois**, sur l'archive : patch
+`r5-style-plus-joli.patch`, corps de PR et captures dans
+`/mnt/project-files/style-plus-joli/` (feuille `finitions.css`,
+`line-icon.tsx`, deux composants de tuiles, jeton `--green-universe`,
+`tests/style-finitions.test.ts`, six précisions pour la charte). **À
+refaire sur le dépôt public**, par un fil de code qui rejoue le patch sur
+`main` à jour, renumérote ses décisions et refait les captures avant et
+après aux deux largeurs sur les onze pages. Habillage seulement : aucun
+calcul, aucun texte, aucune migration. Il passe **avant** le graphique,
+qui se branche sur ses classes (tuiles, pastilles, jeton de bleu eau).
+
+Preuve de fin : les tests et les parcours navigateur verts aux deux
+largeurs ; les captures avant et après ; la relecture visuelle du porteur
+après déploiement.
+
+### S2 — Graphique des réserves du sol, variante B
+
+Demandé par le porteur le 8 novembre 2026 (« une représentation
+graphique des réserves du sol par bloc, un peu jolie »). **Variante B
+choisie par lui le jour même** sur maquette
+(`/mnt/project-files/reserve-du-sol-graphique/maquette-reserve-du-sol.html`) :
+une barre par jardin ou abri, de 0 à 100 % du plein, remplie en bleu
+eau ; les planches de ce jardin en points sur la barre, orange sous leur
+seuil ; un trait pointillé pour le prévu de dimanche ; « inconnue » sans
+chiffre quand le pourcentage est inconnu, jamais zéro (D-003) ; toucher
+une barre ouvre le pli du jardin. **Aucun calcul nouveau, aucun chiffre
+qui ne soit déjà sur la page** (D-047 inchangée). La section de contrat à
+verser dans `docs/soil-reserve-contract.md` est rédigée
+(`brouillon-contrat-vue-ensemble.md`, même dossier) : dix points, dont
+l'accessibilité et le téléphone à 390 px.
+
+Une seule PR : contrat, code, parcours, registres. Elle vient après le
+style, dont elle reprend les classes communes ; décision et précisions à
+numéroter au moment de la PR. Point à relire au lancement : la valeur du
+pourcentage et le prévu de dimanche viennent des calculs déjà en place
+(`garden.percent`), à vérifier dans le dépôt à jour.
+
+Preuve de fin : un test par règle d'affichage (inconnue, abri, sous le
+seuil, arrêt avant récolte, sans planche cultivée), le parcours
+navigateur aux deux largeurs, la relecture du porteur.
+
+### S3 — Vue satellite de la parcelle
+
+Recherche faite le 8 novembre 2026, sans code
+(`/mnt/project-files/vue-satellite/recherche-vue-satellite-otf.md`) :
+Ouvre ta ferme affiche un fond satellite dans son plan de la ferme ;
+le module en offrirait un dans le bloc de la parcelle (matériel et
+placement). **Le porteur a choisi le gratuit le 8 novembre 2026 à
+11 h 13** : **MapLibre GL JS** (licence BSD) avec les **orthophotos de
+l'IGN** (France, sans clé), un fond interchangeable pour les fermes
+hors de France, pas de Mapbox. Le module lit déjà `/zoneList` et
+`/plotList` mais jette `coordinates` : le code les garde (migration),
+cadre la carte sur la parcelle, dessine les contours des jardins avec
+leur nom et leur mode, une bascule satellite et dessin, l'échelle et
+l'attribution du fournisseur ; **pas de position des planches** (OTF n'en
+donne pas) ; « contour absent » est un cas normal, jamais un onglet vide
+ou cassé.
+
+Avant tout code, un fil de contrat écrit la section (`docs/`) et fixe
+trois faits à constater, non vérifiés à ce jour : la forme réelle de
+`coordinates` sur la ferme de test (au plus quatre requêtes par seconde,
+OTF en lecture seule), une tuile IGN réelle, et les conditions d'usage de
+cartes.gouv.fr. Le module étant multi-fermes, rien n'y suppose la ferme
+du porteur. Le coût est nul pour la France ; le fond d'une ferme hors
+de France reste à décider ferme par ferme, avec la clé de cette ferme et
+jamais un achat à la place du porteur.
+
+Preuve de fin : le contrat validé, des tests sur la lecture et le
+rangement des contours (absents, nuls, trous), le parcours navigateur
+aux deux largeurs, une relecture du porteur sur sa ferme.
+
+**Ce qui attend le porteur.** La relecture de chaque chantier à
+sa mise en ligne ; pour S3, celle du contrat avant le code.
+Ensuite l'audit ergonomique final de toutes les pages.
 
 ## 6. Tranche 4 — Généralisation et intégration OTF (⬜)
 
