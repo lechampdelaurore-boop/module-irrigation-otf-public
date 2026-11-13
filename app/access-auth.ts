@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createJwksFetcher, verifyAccessJwt } from '@/lib/services/access-jwt';
 import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, demoOwnerUserId, resolveDemoChoice } from '@/lib/domain/demo/catalogue';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { recordDemoVisit } from '@/lib/services/demo-reset';
 import { prepareDemoSpace } from '@/lib/services/demo-space';
 
 /**
@@ -69,6 +70,8 @@ async function demoSpaceUser(user: AuthenticatedUser): Promise<AuthenticatedUser
   const choice = resolveDemoChoice(jar.get(DEMO_PROFILE_COOKIE)?.value, jar.get(DEMO_MOMENT_COOKIE)?.value);
   const userId = demoOwnerUserId(user.userId, choice);
   await prepareDemoSpace(userId, choice);
+  // Le passage de l'invité, pour la remise à zéro de nuit des espaces inactifs (D4).
+  await recordDemoVisit(userId);
   return { ...user, userId };
 }
 

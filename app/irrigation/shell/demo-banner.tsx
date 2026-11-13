@@ -3,6 +3,7 @@
 import { DEMO_BANNER_TEXT } from '@/lib/domain/demo/deployment-mode';
 import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, DEMO_PROFILES, resolveDemoChoice, type DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Icon } from '../line-icon';
+import { DemoReset } from './demo-reset';
 import { GuidedTour, type TourSurroundings } from './guided-tour';
 
 /** Un an : le choix tient d'une visite à l'autre ; il ne porte rien de sensible. */
@@ -28,9 +29,9 @@ function choose(profile: string, moment: string | undefined) {
  * sections 4 et 9) : au-dessus de la barre du haut, sur toutes les pages, sans
  * bouton pour la fermer. Quand l'invité est connu, elle porte le choix de la
  * ferme fictive et du moment de la saison ; changer l'un ou l'autre ouvre
- * l'espace correspondant, sans rien effacer. Le bouton « Remettre la
- * démonstration à zéro » s'y ajoutera avec la remise à zéro (D4). Dans les
- * pages du module, elle porte aussi les visites guidées (D3).
+ * l'espace correspondant, sans rien effacer ; « Remettre à zéro » rend à
+ * la ferme et au moment ouverts leur premier jour, après confirmation (D4).
+ * Dans les pages du module, elle porte aussi les visites guidées (D3).
  */
 export function DemoBanner({ selection = null, tour = null }: {
   selection?: DemoSelection | null;
@@ -60,6 +61,7 @@ export function DemoBanner({ selection = null, tour = null }: {
           ) : null}
         </div>
       ) : null}
+      {current ? <DemoReset farm={current.profile.label} moment={current.profile.moments.length > 1 ? current.moment.label : null} /> : null}
       {current && tour ? <GuidedTour current={tour.current} reachable={tour.reachable} query={tour.query} /> : null}
     </aside>
   );

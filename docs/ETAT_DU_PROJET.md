@@ -191,6 +191,20 @@ registres, elle y renvoie.
   (11 nouveaux), compilation réussie, knip, `push:check` et
   `weather:check` sans erreur, 88 parcours sur 88 (12,2 min) et 14 parcours
   de démonstration sur 14 (1,6 min) (D-105).
+  **D4, la remise à zéro et le déploiement séparé, codée le soir du
+  13 novembre 2026** sur le « vas-y » exprès du porteur (D-106, précisions
+  F185 à F193), sur la branche `feat/demo-d4-remise-a-zero` posée sur celle
+  de D3 : « Remettre à zéro » dans la bannière, après confirmation ; la
+  remise à zéro de nuit des espaces inactifs ; `wrangler.demo.jsonc` et le
+  job « Déploiement de la démonstration » après la production. La base D1
+  de démonstration est créée sur le compte Cloudflare ; reste l'application
+  Access de la démonstration et ses invitations, dans le navigateur du
+  porteur, après le premier déploiement. Contrôles
+  du 13 novembre 2026 au soir : lint sans avertissement, typage sans
+  erreur, 1 441 tests sur 1 441 (10 nouveaux), compilation réussie, knip,
+  `push:check` et `weather:check` sans erreur, 88 parcours sur 88
+  (12,1 min), 16 parcours de démonstration sur 16 (1,7 min), `demo:check`
+  sans erreur (D-106).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
@@ -220,6 +234,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #36 (`442a9fd`, D3 de la démo guidée, la visite guidée, D-105, avec la
+  clôture de la 3.8 ter et de la 3.8 quater consignée, fusionnée à 22 h 35
+  et déployée à 22 h 51, run 43512069129, les quatre jobs réussis, aucune
+  migration). Avant elle : la
   PR #35 (`5d9ef50`, D2 de la démo guidée, les fermes fictives et la date
   simulée, D-104, fusionnée à 21 h 59 et déployée à 22 h 16, run
   43506611911, les quatre jobs réussis, aucune migration). Avant elle : la

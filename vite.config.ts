@@ -2,8 +2,9 @@ import vinext from 'vinext';
 import { defineConfig } from 'vite';
 
 /**
- * Cible unique de déploiement : Worker et base D1 du compte du porteur,
- * décrits par `wrangler.jsonc` ; connexion par Cloudflare Access (D-016).
+ * Cibles de déploiement : Worker et base D1 du compte du porteur,
+ * décrits par `wrangler.jsonc` ; la démonstration, sur les siens, par
+ * `wrangler.demo.jsonc` (D-106) ; connexion par Cloudflare Access (D-016).
  * En développement local, les valeurs viennent de `.dev.vars`.
  */
 export default defineConfig(async () => {

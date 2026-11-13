@@ -94,3 +94,106 @@
     min-width: 56px;
   }
 }
+
+/*
+ * La remise à zéro (section 8 ; D4) : un bouton secondaire de la bannière et
+ * sa fenêtre de confirmation, posée sous lui comme la liste des visites.
+ */
+.demo-reset {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.demo-reset-button,
+.demo-reset-confirm,
+.demo-reset-cancel {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-button);
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.demo-reset-confirm {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.demo-reset-cancel {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.demo-reset-button:focus-visible,
+.demo-reset-confirm:focus-visible,
+.demo-reset-cancel:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.demo-reset-confirm:disabled,
+.demo-reset-cancel:disabled {
+  cursor: progress;
+  opacity: 0.8;
+}
+
+.demo-reset-dialog {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-family: var(--font-text);
+}
+
+.demo-reset-dialog h2 {
+  margin: 0 0 4px;
+  font-family: var(--font-title);
+  font-size: 18px;
+}
+
+.demo-reset-dialog p {
+  margin: 0 0 12px;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.demo-reset-dialog .demo-reset-error {
+  color: var(--danger);
+}
+
+.demo-reset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .demo-reset,
+  .demo-reset-button {
+    width: 100%;
+  }
+
+  .demo-reset-dialog {
+    right: 0;
+    left: 0;
+    width: auto;
+  }
+}

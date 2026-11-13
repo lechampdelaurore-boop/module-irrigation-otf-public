@@ -30,7 +30,7 @@ test('V6 Le module à la carte : Réglages, puis la première ouverture de la fe
   await expect(page).toHaveURL(/\/irrigation\/bienvenue/);
   expect(await visitesOffertes(page)).toEqual(['Bienvenue', 'Le module à la carte', 'Et pour ma ferme ?']);
   await commencerLaVisite(page, 'Bienvenue');
-  await verifierLEtapeDeVisite(page, vierge, { titre: 'Bienvenue dans la démonstration', rang: 'étape 1 sur 4', chemin: '/irrigation/bienvenue' });
+  await verifierLEtapeDeVisite(page, vierge, { titre: 'Bienvenue dans la démonstration', rang: 'étape 1 sur 5', chemin: '/irrigation/bienvenue' });
   await page.locator('.tour-bubble').getByRole('button', { name: /^Passer/ }).click();
   await verifierLEtapeDeVisite(page, vierge, { titre: 'Cochez ce qui vous sert', rang: 'étape 1 sur 2', ancre: 'fonctionnalites', chemin: '/irrigation/bienvenue' });
   await etapeSuivante(page);
