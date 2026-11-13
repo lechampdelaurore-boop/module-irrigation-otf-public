@@ -22,7 +22,7 @@ import {
   type PlanDay,
   type PlanSummary,
 } from '@/lib/domain/planning/presentation';
-import { unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
+import { hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import type { PlanningSettings } from '@/lib/domain/planning/settings';
 import { millisecondsFromSeconds } from '@/lib/domain/units';
@@ -391,7 +391,8 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   unplacedDetail: string;
 }) {
   const { deficit } = plan.calculation.summary;
-  // Une chaîne servie à l'eau inconnue : son manque ne peut pas être chiffré, et le résumé le dit (point ouvert 51, D-089).
+  // Une chaîne servie à l'eau inconnue : son manque ne peut pas être chiffré, et le résumé le dit (point ouvert 51, D-089) ;
+  // de même pour une planche en manque au volume inconnu, que le résumé compte à part (point ouvert 64, D-098).
   const unknownWater = unknownWaterChainCount(plan.calculation.summary.budgets);
   const explanation = waterDeficitExplanation(plan);
   // Sous un arbitrage validé, aucune ligne de budget : la note dit l'eau allouée et ce qui ne peut pas être reçu (D-052).
@@ -409,8 +410,8 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
         {actions.map((tile) => <SummaryCard key={tile.label} label={tile.label} value={tile.value} detail={tile.detail} tone={tile.tone} action />)}
         <SummaryCard label="Volume proposé et validé" value={formatVolume(summary.volumeCubicMeters)} detail={summary.unknownVolumeCount > 0 ? `${summary.unknownVolumeCount} créneau${summary.unknownVolumeCount > 1 ? 'x' : ''} au volume inconnu en plus` : 'Volumes connus'} />
         <SummaryCard label="Non vérifié" value={String(summary.unverifiedCount)} detail="Créneaux sans pompe, origine ou stock connu" />
-        <SummaryCard label="Manque d’eau" value={waterDeficitValue(deficit.waterCubicMeters, unknownWater, formatVolume)} detail={waterDeficitTileDetail(deficit, unknownWater)} tone={deficit.waterCubicMeters > 0 ? 'deficit' : undefined} />
-        <SummaryCard label="Temps de pompage manquant" value={formatVolume(deficit.pumpTimeCubicMeters)} detail="Ce qui ne tient pas dans les plages horaires" tone={deficit.pumpTimeCubicMeters > 0 ? 'deficit' : undefined} />
+        <SummaryCard label="Manque d’eau" value={waterDeficitValue(deficit.waterCubicMeters, uncountedWaterCount(deficit, unknownWater), formatVolume)} detail={waterDeficitTileDetail(deficit, unknownWater)} tone={hasWaterDeficit(deficit) ? 'deficit' : undefined} />
+        <SummaryCard label="Temps de pompage manquant" value={pumpTimeDeficitValue(deficit, formatVolume)} detail={pumpTimeDeficitDetail(deficit)} tone={hasPumpTimeDeficit(deficit) ? 'deficit' : undefined} />
         <SummaryCard label="Planches non servies" value={String(unplacedCount)} detail={unplacedDetail} tone={unplacedCount > 0 ? 'deficit' : undefined} />
       </div>
       {explanation ? <p className="planning-summary-note">{explanation}</p> : null}

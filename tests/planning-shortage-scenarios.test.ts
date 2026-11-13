@@ -2,10 +2,14 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
+import { describePlanChanges } from '../lib/domain/planning/changes.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
+import { planChangesLines } from '../lib/domain/planning/follow-up.ts';
 import { planSummaryLine } from '../lib/domain/planning/phone-week.ts';
 import { arbitrationNote, budgetDemandText, waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
-import { unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '../lib/domain/planning/water-deficit-summary.ts';
+import {
+  hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue,
+} from '../lib/domain/planning/water-deficit-summary.ts';
 import { MILLISECONDS_PER_HOUR, cubicMetersFromMillimeters, millimetersFromCubicMeters } from '../lib/domain/units.ts';
 import { splitVolumeAcrossLocalDays } from '../lib/domain/water-management.ts';
 import {
@@ -654,4 +658,80 @@ test('point ouvert 63, sous un arbitrage validé : la rampe qui arrose une planc
   assert.ok(plan.arbitration, 'le plan porte l’arbitrage');
   assert.equal(plan.arbitration.unreceivedBedCount, 7, 'les sept autres planches du tunnel 1 ne reçoivent pas leur allocation');
   close(plan.arbitration.unreceivedCubicMeters, 7 * cubicMetersFromMillimeters(9.76, 16), 1e-3, 'leur allocation reste non attribuée');
+});
+
+// ---------------------------------------------------------------------------
+// Le manque au volume inconnu dans les totaux (point ouvert 64, D-098)
+// ---------------------------------------------------------------------------
+
+/** Dimanche 21 h, la plage des asperseurs réduite à vingt minutes : la rampe du tunnel 1 n'y trouve plus de place. */
+const TWENTY_MINUTES = { ...settings, windows: { ...settings.windows, sprinkler: { startMinute: 21 * 60, endMinute: 21 * 60 + 20 } } };
+const SUNDAY_EVENING = { ...TUNNELS_ONLY, reservoirCubicMeters: 30, now: new Date('2026-10-04T19:00:00.000Z') };
+const FORMATS = { dateTime: (iso: string) => iso, time: (iso: string) => iso, day: (dateKey: string) => dateKey };
+
+test('point ouvert 64, temps de pompage : le manque d’une planche au passe-pied inconnu n’est jamais compté zéro ; la carte et la ligne du téléphone disent « au moins », et la note du manque d’eau se tait', () => {
+  // Les huit planches du tunnel 1 restent à 20 mm faute de plage : 2,56 m³ manquent quand T1-1 est connue ; inconnue, la
+  // carte disait 2,24 m³, comme un total exact.
+  const known = buildWeeklyPlan(farm(SUNDAY_EVENING).inputs, TWENTY_MINUTES);
+  close(known.deficit.pumpTimeCubicMeters, 8 * cubicMetersFromMillimeters(20, 16), 1e-6, 'T1-1 connue : les huit planches');
+  assert.equal(known.deficit.unknownVolumeBeds, undefined, 'rien d’inconnu : le plan d’avant');
+  assert.equal(pumpTimeDeficitValue(known.deficit, cubicMetersText), '2,56 m³');
+  assert.equal(pumpTimeDeficitDetail(known.deficit), 'Ce qui ne tient pas dans les plages horaires');
+  assert.ok(waterDeficitExplanation(stored(known)), 'T1-1 connue : la note d’avant');
+  const inputs = withUnknownAlley(farm(SUNDAY_EVENING).inputs);
+  const plan = buildWeeklyPlan(inputs, TWENTY_MINUTES);
+  assertInvariants(plan, inputs, TWENTY_MINUTES);
+  const unknown = plan.beds.find((bed) => bed.bedId === UNKNOWN_ALLEY);
+  assert.ok(unknown && unknown.deficitMm === 20 && unknown.reasons.includes('pump-time'), `${UNKNOWN_ALLEY} : 20 mm faute de plage`);
+  close(plan.deficit.pumpTimeCubicMeters, 7 * cubicMetersFromMillimeters(20, 16), 1e-6, 'les sept planches au volume connu');
+  assert.deepEqual(plan.deficit.unknownVolumeBeds, { water: 0, pumpTime: 1 }, 'T1-1 comptée à part');
+  assert.equal(pumpTimeDeficitValue(plan.deficit, cubicMetersText), 'au moins 2,24 m³');
+  assert.equal(pumpTimeDeficitDetail(plan.deficit), 'Ce qui ne tient pas dans les plages horaires ; une planche au volume inconnu, où le manque ne peut pas être chiffré');
+  assert.equal(hasPumpTimeDeficit(plan.deficit), true);
+  assert.equal(planSummaryLine({ volumeCubicMeters: 2.56, unverifiedCount: 0 }, [], plan.deficit, 32, cubicMetersText), '2,56 m³ · pompage manquant au moins 2,24 m³ · 32 planches non servies');
+  // La note comparait « demandés 9,92 m³ » à un manque compté sans T1-1 : un volume est inconnu, elle se tait (D-038).
+  assert.equal(waterDeficitExplanation(stored(plan)), null);
+  // Le seul manque de T1-1 : rien ne se chiffre, « non chiffré », et la carte reste signalée.
+  const alone = { ...plan.deficit, pumpTimeCubicMeters: 0 };
+  assert.equal(pumpTimeDeficitValue(alone, cubicMetersText), 'non chiffré');
+  assert.equal(pumpTimeDeficitDetail(alone), 'Une planche au volume inconnu : le manque ne peut pas y être chiffré');
+  assert.equal(hasPumpTimeDeficit(alone), true);
+});
+
+test('point ouvert 64, chaîne indisponible : le manque d’eau d’une planche au passe-pied inconnu n’est jamais compté zéro ; « au moins » sur la carte, la ligne du téléphone et le pli des changements', () => {
+  const inactive = (inputs: PlanningInputs) => withReservoir(inputs, { status: 'inactive' });
+  const known = buildWeeklyPlan(inactive(farm(TUNNELS_ONLY).inputs), settings);
+  close(known.deficit.waterCubicMeters, 32 * cubicMetersFromMillimeters(20, 16), 1e-6, 'T1-1 connue : les 32 planches des tunnels');
+  const inputs = inactive(withUnknownAlley(farm(TUNNELS_ONLY).inputs));
+  const plan = buildWeeklyPlan(inputs, settings);
+  assertInvariants(plan, inputs);
+  assert.deepEqual(plan.beds.find((bed) => bed.bedId === UNKNOWN_ALLEY)?.reasons, ['supply-unavailable']);
+  close(plan.deficit.waterCubicMeters, 31 * cubicMetersFromMillimeters(20, 16), 1e-6, 'les 31 planches au volume connu');
+  assert.deepEqual(plan.deficit.unknownVolumeBeds, { water: 1, pumpTime: 0 });
+  const chains = unknownWaterChainCount(plan.budgets);
+  assert.equal(chains, 0, 'l’eau de la chaîne est connue : indisponible');
+  assert.equal(waterDeficitValue(plan.deficit.waterCubicMeters, uncountedWaterCount(plan.deficit, chains), cubicMetersText), 'au moins 9,92 m³');
+  assert.equal(waterDeficitTileDetail(plan.deficit, chains), 'Ce que le stock et les ressources ne couvrent pas ; une planche au volume inconnu, où le manque ne peut pas être chiffré');
+  assert.equal(planSummaryLine({ volumeCubicMeters: 0, unverifiedCount: 0 }, [], plan.deficit, 32, cubicMetersText, chains), `${cubicMetersText(0)} · manque d’eau au moins 9,92 m³ · 32 planches non servies`);
+  // Avec une chaîne à l'eau inconnue en plus, les deux se nomment.
+  assert.equal(waterDeficitTileDetail({ ...plan.deficit, waterCubicMeters: 0 }, 1), 'Eau mobilisable inconnue sur une chaîne et une planche au volume inconnu : le manque ne peut pas y être chiffré');
+  assert.equal(hasWaterDeficit({ ...plan.deficit, waterCubicMeters: 0 }), true, 'le manque de T1-1 est sûr, son volume seul est inconnu');
+  // Le pli d'un recalcul où le passe-pied de T1-1 s'efface : « de 10,24 m³ à au moins 9,92 m³ », sans écart chiffré.
+  const changes = describePlanChanges(stored(known), plan);
+  assert.ok(changes);
+  assert.deepEqual([changes.unknownWaterBedsBefore, changes.unknownWaterBedsAfter], [undefined, 1]);
+  assert.deepEqual(planChangesLines(changes, FORMATS).filter((line) => line.kind === 'deficit').map((line) => line.text), ['Manque d’eau : de 10,24 m³ à au moins 9,92 m³']);
+});
+
+test('point ouvert 64, en pénurie : le manque d’une planche au volume inconnu reste sous son motif, hors du manque d’eau et du temps de pompage ; la demande se lit « au moins », et la note du manque d’eau se tait', () => {
+  const inputs = withUnknownAlley(farm(TUNNELS_ONLY).inputs);
+  for (const shortageStrategy of ['priority-then-equal-share', 'equal-share', 'defer'] as const) {
+    const used = { ...settings, shortageStrategy };
+    const plan = buildWeeklyPlan(inputs, used);
+    assertInvariants(plan, inputs, used);
+    assert.deepEqual(plan.beds.find((bed) => bed.bedId === UNKNOWN_ALLEY)?.reasons, ['volume-unknown-under-budget'], shortageStrategy);
+    assert.equal(plan.deficit.unknownVolumeBeds, undefined, `${shortageStrategy} : une donnée manque, « Volume inconnu en pénurie », ni l’eau ni la pompe`);
+    // Sous le report, la note disait « Demandés 9,92 m³ » quand la ligne de budget dit « au moins » : elle se tait.
+    assert.equal(waterDeficitExplanation(stored(plan)), null, shortageStrategy);
+  }
 });

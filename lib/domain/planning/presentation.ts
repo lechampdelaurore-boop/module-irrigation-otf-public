@@ -270,12 +270,14 @@ function roundingResidueCubicMeters(proposals: StoredWeeklyPlan['proposals']): n
  * ouvert 36) : l'eau placée sans couvrir de besoin compté, et ce qui manque
  * pour une autre raison que l'eau, chiffrés sur le plan enregistré. Nulle
  * quand l'identité tient — au résidu d'arrondi des secondes près, et au
- * moins au litre près (D-040) —, qu'un volume est inconnu ou que le budget
- * est absent (arbitrage).
+ * moins au litre près (D-040) —, qu'un volume est inconnu — celui d'un
+ * créneau, de la demande d'une planche ou de son manque (points ouverts 63
+ * et 64, D-097, D-098) — ou que le budget est absent (arbitrage).
  */
 export function waterDeficitExplanation(plan: StoredWeeklyPlan): string | null {
   const { budgets, deficit } = plan.calculation.summary;
   if (budgets.length === 0) return null;
+  if (deficit.unknownVolumeBeds || budgets.some((budget) => (budget.unknownVolumeBedCount ?? 0) > 0)) return null;
   const demanded = budgets.reduce((sum, budget) => sum + budget.demandCubicMeters, 0);
   const own = plan.proposals.filter((proposal) => proposal.calculationId === plan.calculation.id);
   let placed = 0;
