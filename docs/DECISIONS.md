@@ -3443,3 +3443,59 @@ consignées au contrat du planning :
 rouges avant le code : le temps de pompage, une chaîne indisponible (la
 carte, la ligne du téléphone et le pli), et la pénurie sous les trois
 conduites. Les 1 361 tests passent.
+
+**En ligne** : #31 du dépôt public fusionnée le 13 novembre 2026 à 2 h 49
+(`ac14f6b`) et déployée à 3 h 04 (run 43347699699, les quatre jobs
+réussis ; aucune migration, Workers inchangés).
+
+## D-099 — Les invariants sur deux cents semaines étendus aux refus, à l'arbitrage et à deux chaînes (E2 de la recette finale) : deux précisions tranchées par la recommandation
+
+Date : 13 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Le contrat de la 3.9
+demande pour la clôture « les invariants sur deux cents semaines tirées au
+hasard, étendus aux parts, aux refus, à l'arbitrage et à deux chaînes »
+(`docs/shortage-contract.md`, « La non-régression complète », point 2) ;
+relu pendant la recette finale du 13 novembre 2026, le test de
+`tests/planning-engine.test.ts` ne tirait ni refus, ni arbitrage, ni
+seconde chaîne. La question — étendre avant la clôture, ou consigner
+l'écart — est tranchée par la recommandation, sur le mandat du porteur
+(« Tu réponds à tes propres questions avec la réponse recommandée. »,
+13 novembre 2026, 8 h 37) : étendre, dans une PR `test/` à part, avant
+la PR de clôture, sans changer aucun comportement. Écrit en
+Opus 5.5 · Max sur le dépôt public.
+
+**Deux précisions**, techniques, tranchées par la recommandation :
+
+- F151 : le test. Un second test, `tests/planning-invariants.test.ts`,
+  plutôt qu'un test réécrit : celui de `tests/planning-engine.test.ts`
+  reste tel quel, comme le lot 3 l'a voulu des tests existants (D-084).
+  Deux cents semaines à graine fixe sur la ferme des tests et ses quatre
+  tunnels, deux calculs chacune, les trois conduites. Au premier calcul,
+  tirés au hasard : une seconde chaîne d'eau (`withDirectChain` : une
+  source, sa pompe et sa limite par jour) pour un à trois matériels, une
+  planche à la surface mouillée inconnue (point ouvert 63), un arbitrage
+  validé allouant à une planche sur deux de zéro à 1,2 fois son besoin ;
+  la réserve et le forage tirés vers le bas, pour que le manque d'eau et
+  ses parts se jouent souvent. Au second calcul : de zéro à deux créneaux
+  du premier refusés (D-030), et les créneaux d'un autre matériel de la
+  réserve validés, leur eau comptée (`withValidatedProposals`, S20).
+  Chaque extension est jouée au moins vingt fois, ce que le test vérifie
+  lui-même. Sous un arbitrage, le plan n'a aucune ligne de budget, et ses
+  parts réservées ne dépassent jamais les allocations.
+- F152 : les invariants. `assertInvariants`
+  (`tests/support/planning-fixtures.ts`) vérifie en plus qu'aucun créneau
+  ne recouvre, même en partie, un créneau refusé de son matériel (D-030),
+  et compte sous la limite journalière l'eau déjà arrosée ou validée du
+  jour, comme le contrat l'écrit (« réalisé et validé compris ») : le plan
+  n'ajoute que ce que la limite laisse. Les 1 361 tests existants passent
+  sous ces invariants plus stricts.
+
+**Vérifié par** deux mutations du moteur, défaites ensuite : sans les
+créneaux refusés, le nouveau test échoue sur un créneau posé sur son
+refus ; sans l'eau engagée dans le compte de la limite journalière, il
+échoue sur un jour où le plan place 3,00 m³ quand la limite de 3 m³ n'en
+laisse que 1,08. Une troisième, l'arbitrage sans le budget de sa chaîne,
+ne fait échouer aucun invariant : la réserve et le forage bornent le
+placement d'eux-mêmes, et l'égalité des allocations réduites reste
+prouvée par les tests de S13 (D-077). Aucun défaut relevé. Les 1 362
+tests passent.

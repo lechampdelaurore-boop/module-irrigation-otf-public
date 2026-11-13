@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 12 novembre 2026.
+Dernière mise à jour : 13 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -117,11 +117,21 @@ registres, elle y renvoie.
   au volume inconnu, hors du budget ; elle reste maintenant hors du
   partage, et en pénurie ou sous un arbitrage, aucun créneau au volume
   inconnu n'est proposé. Un défaut voisin relevé en chemin, le **point
-  ouvert 64**, **corrigé le soir même** (D-098, précisions F147 à F150),
+  ouvert 64**, **corrigé le soir même, en ligne** (#31 ; D-098,
+  précisions F147 à F150),
   dans la nuit voulue par le porteur : le manque d'une telle planche ne
   compte plus 0 m³ dans les totaux du plan ; elle compte à part, et le
   total que son motif aurait grossi, le temps de pompage manquant ou le
   manque d'eau, se lit « au moins X m³ », ou « non chiffré ».
+- 3.9, recette finale (lot 6), E2 : **les invariants sur deux cents
+  semaines étendus** (le 13 novembre 2026, D-099, précisions F151 et
+  F152), comme le contrat le demande pour la clôture, dans une PR `test/`
+  avant celle de la clôture, sans changer aucun comportement. Un second
+  test tire une seconde chaîne d'eau, un arbitrage validé, une planche à la
+  surface mouillée inconnue, puis, au second calcul de la semaine, des
+  créneaux refusés et des arrosages validés ; les invariants vérifient en
+  plus les créneaux refusés, et la limite journalière compte l'eau déjà
+  arrosée ou validée du jour. Aucun défaut.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -154,7 +164,11 @@ registres, elle y renvoie.
   le porteur, sont validés le 8 novembre 2026 à 19 h 20 (« ça me semble
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
-- Fusionné et déployé sur `main` du dépôt public au 12 novembre 2026 : la
+- Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #31 (`ac14f6b`, la correction du manque au volume inconnu dans les
+  totaux, point ouvert 64, D-098, fusionnée le 13 novembre à 2 h 49 et
+  déployée à 3 h 04, run 43347699699, les quatre jobs réussis, aucune
+  migration, Workers inchangés). Avant elle : la
   PR #30 (`78e46c7`, la correction de la surface mouillée inconnue en
   pénurie, point ouvert 63, D-097, fusionnée le 12 novembre à 21 h 58 et
   déployée à 22 h 13, run 43305603699, les quatre jobs réussis, aucune
@@ -7859,8 +7873,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    F146), comme recommandé : cinq tests de
    `tests/planning-shortage-scenarios.test.ts`, rouges avant, passent.
 64. **Ouvert le 12 novembre 2026, en corrigeant le point 63 ; corrigé le
-   soir même dans sa PR `fix/` (D-098) ; fermeture au jugement du
-   porteur.** Le manque d'une
+   soir même dans sa PR `fix/` (D-098), en ligne (#31) ; fermeture au
+   jugement du porteur.** Le manque d'une
    planche dont la surface mouillée par son propre matériel est inconnue
    compte 0 m³ dans les totaux du plan (`lib/domain/planning/deficit.ts`).
    Sur la ferme des tests, le dimanche à 21 h, la plage des asperseurs

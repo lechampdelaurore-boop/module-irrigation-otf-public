@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Vérifié (3.9, recette finale : les invariants étendus)
+
+- **Les invariants du moteur, sur deux cents semaines tirées au hasard,
+  couvrent maintenant ce que la 3.9 a ajouté** (D-099) : une seconde
+  chaîne d'eau, un arbitrage validé, une planche à la surface mouillée
+  inconnue, des créneaux refusés et des arrosages validés. Ils vérifient
+  en plus qu'aucun créneau ne tombe sur un créneau refusé, et que la
+  limite journalière compte l'eau déjà arrosée ou validée du jour. Aucun
+  défaut ; aucun comportement changé.
+
 ### Corrigé (3.9 : le manque au volume inconnu dans les totaux)
 
 - **Le manque d'une planche au volume inconnu ne compte plus zéro dans les
@@ -17,6 +27,7 @@ source détaillée commit par commit.
   inconnu ; la ligne de résumé du téléphone et le pli des changements
   disent de même, et la note du manque d'eau se tait. En pénurie, ce
   manque reste sous « volume inconnu en pénurie ». Aucune migration.
+  En ligne le 13 novembre 2026 à 3 h 04 (#31 de ce dépôt).
 
 ### Corrigé (3.9 : la surface mouillée inconnue en pénurie)
 
