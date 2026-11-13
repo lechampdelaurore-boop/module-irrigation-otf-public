@@ -322,6 +322,12 @@ répondait 404 sans qu'aucun parcours ne le voie).
   temps et ses échecs restent lisibles, et parce qu'il installe un navigateur.
 - Les captures d'écran et les traces des parcours en échec sont conservées comme
   artefacts du job, afin qu'un échec puisse être compris sans le reproduire.
+- `pnpm e2e:demo` joue les parcours de la démonstration (`e2e-demo/`, V1 à
+  V7, les visites guidées, D-101) sur la même application démarrée en mode
+  démonstration, par une configuration locale écrite sous
+  `.wrangler/demo-e2e/` (`scripts/demo-e2e-server.mjs`) : `wrangler.jsonc`
+  n'est pas touché. Le même job les joue après les parcours ordinaires,
+  jamais en même temps : les deux suites partagent la base locale.
 
 ## Interdits
 

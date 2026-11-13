@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (4.0, D3 : la visite guidée)
+
+- **Les visites guidées de la démonstration** (D-101) : un bouton
+  « Visites guidées » dans la bannière ouvre sept visites courtes
+  (Bienvenue, Un arrosage de A à Z, Le planning, Quand l'eau manque, Les
+  alertes, Le module à la carte, Et pour ma ferme ?), offertes selon ce que
+  la ferme choisie a coché. Des bulles présentent chaque partie de l'écran
+  en mots simples, à côté de l'élément à l'ordinateur et en feuille basse
+  au téléphone ; la visite ne clique jamais à la place du visiteur, passe
+  d'une page à l'autre sur son clic, saute ce qui n'est pas à l'écran et
+  reprend où on l'avait laissée. Clavier, lecteur d'écran et mouvements
+  réduits pris en compte. Seulement en démonstration ; aucune migration.
+  Les parcours de la démonstration se jouent par `pnpm e2e:demo`, sans
+  toucher la configuration de production.
+
 ### Ajouté (4.0, D2 : les fermes fictives et la date simulée)
 
 - **Les fermes fictives de la démonstration** (D-100) : trois fermes

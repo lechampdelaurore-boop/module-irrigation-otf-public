@@ -146,6 +146,15 @@ registres, elle y renvoie.
   erreur, 1 419 tests sur 1 419 (33 nouveaux), compilation réussie, knip,
   `push:check` et `weather:check` sans erreur, 88 parcours sur 88 (9,8 min) ; chaque moment constaté en
   vrai avec le point d'entrée de la démonstration (D-100).
+  **D3, la visite guidée, codée la même nuit** (D-101, précisions F170 à
+  F182), sur la branche `feat/demo-visite-guidee` posée sur celle de D2 :
+  sept visites, des bulles accrochées par `data-tour`, l'étape sautée quand
+  son élément manque, reprenable, accessible ; sept parcours de
+  démonstration aux deux largeurs (`pnpm e2e:demo`). Contrôles du
+  13 novembre 2026 : lint sans avertissement, typage sans erreur, 1 430 tests sur
+  1 430 (11 nouveaux), compilation réussie, knip, `push:check` et
+  `weather:check` sans erreur, 88 parcours sur 88 (11,9 min) et 14 parcours
+  de démonstration sur 14 (1,6 min) (D-101).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
