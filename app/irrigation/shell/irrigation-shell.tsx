@@ -6,6 +6,7 @@ import { isPageFeatureId } from '@/lib/domain/features/catalogue';
 import { pageHelp } from '@/lib/domain/features/help';
 import { pageHref, pageLabel, pagePath, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
+import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { createSeasons, sourceLabel } from '../hierarchy/presentation';
 import { Icon } from '../line-icon';
 import { FeatureBanner } from './feature-banner';
@@ -44,6 +45,8 @@ export type ShellProps = {
   notice: string | null;
   /** Un déploiement de démonstration (docs/demo-guided-contract.md) : bannière permanente, aucune notification. */
   demo: boolean;
+  /** En démonstration, la ferme fictive et le moment de l'invité. */
+  demoSelection: DemoSelection | null;
 };
 
 export function IrrigationShell({
@@ -58,7 +61,7 @@ export function IrrigationShell({
   /** La pastille de « Aujourd'hui » quand la page la connaît (F12) ; absente, le menu la lit après l'affichage. */
   todayBadge?: number | null;
 }) {
-  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice, demo } = props;
+  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice, demo, demoSelection } = props;
 
   const shell = useRef<HTMLElement>(null);
 
@@ -90,6 +93,7 @@ export function IrrigationShell({
         userName={userName}
         signOutPath={signOutPath}
         demo={demo}
+        demoSelection={demoSelection}
         notificationsHref={usesPushNotifications(menu.filter(isPageFeatureId)) ? pageHref('reglages', { season, zone }, 'notifications-title') : null}
       />
 

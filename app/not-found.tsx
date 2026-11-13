@@ -4,6 +4,7 @@ import { menuPages, NOT_FOUND_LABEL, notFoundReturnLink, type IrrigationPageId }
 import { logJsonLine } from '@/lib/adapters/log';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { DemoBanner } from './irrigation/shell/demo-banner';
 import { FeatureMenu } from './irrigation/shell/feature-menu';
 import { Topbar } from './irrigation/shell/topbar';
@@ -35,7 +36,7 @@ export default async function NotFound() {
   if (!farm) return <main className="app-shell">{demo ? <DemoBanner /> : null}{content}</main>;
   return (
     <main className="app-shell">
-      <Topbar userName={farm.userName} signOutPath={signOutPath()} demo={demo} />
+      <Topbar userName={farm.userName} signOutPath={signOutPath()} demo={demo} demoSelection={demo ? demoSelectionOfOwner(farm.userId) : null} />
       <div className="feature-layout">
         {farm.menu.length > 0 ? <FeatureMenu menu={farm.menu} current={null} query={{}} /> : null}
         <div className="feature-page">{content}</div>
@@ -45,6 +46,7 @@ export default async function NotFound() {
 }
 
 type FarmForNotFound = {
+  userId: string;
   userName: string;
   firstVisit: boolean;
   enabled: Awaited<ReturnType<typeof getFeatureSelectionForUser>>['enabled'];
@@ -57,6 +59,7 @@ async function readFarm(): Promise<FarmForNotFound | null> {
     if (!user) return null;
     const selection = await getFeatureSelectionForUser(user.userId);
     return {
+      userId: user.userId,
       userName: user.displayName,
       firstVisit: selection.firstVisit,
       enabled: selection.enabled,

@@ -12,7 +12,8 @@
         "tests/support/cloudflare-workers.mjs",
         "scripts/*.ts",
         "vite.config.ts",
-        "eslint.config.mjs"
+        "eslint.config.mjs",
+        "demo-worker.ts"
       ],
       "project": ["app/**/*.{ts,tsx}", "lib/**/*.ts", "db/**/*.ts", "tests/**/*.{ts,mjs}", "scripts/*.ts", "e2e/**/*.ts"],
       "ignore": ["public/**", "dist/**", ".next/**", ".vinext/**"]

@@ -86,3 +86,8 @@ export function startDeployment(host: FetchHost = globalThis): DeploymentMode {
   }
   return mode;
 }
+
+/** Vrai seulement pour une démonstration dont le démarrage est accepté. */
+export function isAcceptedDemonstration(): boolean {
+  return currentDeploymentMode().kind === 'demonstration';
+}
