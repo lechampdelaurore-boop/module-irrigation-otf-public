@@ -3594,6 +3594,12 @@ démonstration est liée au Worker de notification » ; sans cette liaison, la
 bannière s'affiche aux deux largeurs, sans cloche ni défilement de côté, et
 le navigateur ne joint aucun hôte extérieur.
 
+**En ligne** : #34 du dépôt public fusionnée le 13 novembre 2026 à 21 h 30
+(`eb9ee53`) et déployée à 21 h 45 (run 43502203781, les quatre jobs
+réussis ; aucune migration, Workers inchangés) ; la production vérifiée le
+soir même dans le navigateur du porteur : « Aujourd'hui » s'ouvre sur les
+données réelles, sans bannière de démonstration.
+
 ## D-104 — Les fermes fictives et la date simulée (4.0, D2) : quatorze précisions tranchées par la recommandation
 
 Date : 13 novembre 2026. Deuxième PR de code de la démo guidée

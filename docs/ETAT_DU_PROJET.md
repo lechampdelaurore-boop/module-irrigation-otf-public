@@ -210,6 +210,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #34 (`eb9ee53`, D1 de la démo guidée, les garde-fous du mode démo,
+  D-103, fusionnée à 21 h 30 et déployée à 21 h 45, run 43502203781, les
+  quatre jobs réussis, aucune migration ; la production vérifiée dans le
+  navigateur du porteur, sans bannière de démonstration). Avant elle : la
   PR #33 (`70477a4`, la clôture de la 3.9 et de la Tranche 3, la version
   0.2.0, D-100 et D-101, fusionnée le 13 novembre à 19 h 46 sur le mot de
   clôture du porteur et déployée à 19 h 58, run 43485850915, les quatre jobs
