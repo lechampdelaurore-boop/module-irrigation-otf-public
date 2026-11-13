@@ -12,9 +12,12 @@ import type { Page } from '@playwright/test';
 export type CibleMesuree = { cible: string; hauteur: number };
 export type TexteMesure = { texte: string; ratio: number; couleur: string; fond: string; taille: number };
 
-/** Les cibles visibles de moins de 44 px de haut, hors liens pris dans une phrase (exception du WCAG 2.5.5). */
-export async function ciblesTropPetites(page: Page, minimum = 44): Promise<CibleMesuree[]> {
-  return page.evaluate((min) => {
+/**
+ * Les cibles visibles de moins de 44 px de haut, hors liens pris dans une phrase (exception du WCAG 2.5.5).
+ * `racine` : où chercher ; `main` par défaut, la bulle d'une visite guidée (posée hors de `main`) sinon.
+ */
+export async function ciblesTropPetites(page: Page, minimum = 44, racine = 'main'): Promise<CibleMesuree[]> {
+  return page.evaluate(({ min, racine }) => {
     const selecteur = [
       'a[href]', 'button', 'select', 'textarea', 'summary', '[role="tab"]', '[role="menuitem"]',
       'input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"])',
@@ -38,7 +41,7 @@ export async function ciblesTropPetites(page: Page, minimum = 44): Promise<Cible
       && element.parentElement !== null
       && ['P', 'LI', 'SMALL', 'SPAN', 'TD', 'DD', 'LABEL', 'EM', 'STRONG'].includes(element.parentElement.tagName);
     const mesures: { cible: string; hauteur: number }[] = [];
-    for (const element of document.querySelectorAll(`main ${selecteur.split(', ').join(', main ')}`)) {
+    for (const element of document.querySelectorAll(`${racine} ${selecteur.split(', ').join(`, ${racine} `)}`)) {
       if (!(element as HTMLElement).checkVisibility?.({ checkOpacity: true, checkVisibilityCSS: true })) continue;
       if (element.closest('[aria-hidden="true"], .skip-link')) continue;
       if (dansUnePhrase(element)) continue;
@@ -48,12 +51,12 @@ export async function ciblesTropPetites(page: Page, minimum = 44): Promise<Cible
       if (hauteur < min) mesures.push({ cible: nom(element), hauteur });
     }
     return mesures;
-  }, minimum);
+  }, { min: minimum, racine });
 }
 
 /** Les textes visibles dont le contraste est sous 4,5:1 (3:1 pour un grand texte), fond calculé par superposition. */
-export async function textesPeuContrastes(page: Page): Promise<TexteMesure[]> {
-  return page.evaluate(() => {
+export async function textesPeuContrastes(page: Page, racine = 'main'): Promise<TexteMesure[]> {
+  return page.evaluate((racine) => {
     type Rgba = [number, number, number, number];
     const lire = (valeur: string): Rgba | null => {
       const trouve = valeur.match(/rgba?\(([^)]+)\)/);
@@ -90,7 +93,7 @@ export async function textesPeuContrastes(page: Page): Promise<TexteMesure[]> {
     const hex = (c: Rgba) => `#${c.slice(0, 3).map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
     const mesures: { texte: string; ratio: number; couleur: string; fond: string; taille: number }[] = [];
     const vus = new Set<Element>();
-    const marcheur = document.createTreeWalker(document.querySelector('main') ?? document.body, NodeFilter.SHOW_TEXT);
+    const marcheur = document.createTreeWalker(document.querySelector(racine) ?? document.body, NodeFilter.SHOW_TEXT);
     for (let noeud = marcheur.nextNode(); noeud; noeud = marcheur.nextNode()) {
       const texte = noeud.textContent?.replace(/\s+/g, ' ').trim() ?? '';
       const element = noeud.parentElement;
@@ -113,5 +116,5 @@ export async function textesPeuContrastes(page: Page): Promise<TexteMesure[]> {
       }
     }
     return mesures;
-  });
+  }, racine);
 }

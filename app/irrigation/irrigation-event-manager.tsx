@@ -350,7 +350,7 @@ export function IrrigationEventManager({
 
       <div className="irrigation-creation-panel">
         {editingEventEquipmentId ? <div className="irrigation-edit-banner"><strong>Modification d’une irrigation planifiée</strong><button type="button" onClick={() => setEditingEventEquipmentId(null)}>Annuler la modification</button></div> : null}
-        <div className="irrigation-action-tabs" role="tablist" aria-label="Action d’irrigation">
+        <div className="irrigation-action-tabs" data-tour="arrosage-actions" role="tablist" aria-label="Action d’irrigation">
           <ActionTab
             active={creationKind === 'running'}
             onClick={() => setCreationKind('running')}
@@ -382,7 +382,7 @@ export function IrrigationEventManager({
           </div>
         ) : (
           <div className="irrigation-form-layout">
-            <div className="irrigation-form-fields">
+            <div className="irrigation-form-fields" data-tour="arrosage-champs">
               <label>
                 <span>Matériel</span>
                 <select

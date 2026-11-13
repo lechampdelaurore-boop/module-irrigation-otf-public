@@ -130,7 +130,7 @@ export function WaterResourceManager({
           )}
         </article>
 
-        <article className="water-asset-panel">
+        <article className="water-asset-panel" data-tour="ressources-reserves">
           <div className="water-asset-title"><div><h3>Réserves</h3><p>Où l’eau est stockée.</p></div><button type="button" onClick={() => setReservoirEditor('new')}>+ Ajouter</button></div>
           {infrastructure.reservoirs.length === 0 ? <Empty text="Aucune réserve enregistrée." /> : (
             <div className="water-asset-list">{infrastructure.reservoirs.map((reservoir) => {

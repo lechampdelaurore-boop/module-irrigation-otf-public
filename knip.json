@@ -9,13 +9,14 @@
         "tests/support/resolve-hooks.mjs",
         "e2e/**/*.spec.ts",
         "playwright.config.ts",
+        "e2e-demo/**/*.spec.ts",
         "tests/support/cloudflare-workers.mjs",
         "scripts/*.ts",
         "vite.config.ts",
         "eslint.config.mjs",
         "demo-worker.ts"
       ],
-      "project": ["app/**/*.{ts,tsx}", "lib/**/*.ts", "db/**/*.ts", "tests/**/*.{ts,mjs}", "scripts/*.ts", "e2e/**/*.ts"],
+      "project": ["app/**/*.{ts,tsx}", "lib/**/*.ts", "db/**/*.ts", "tests/**/*.{ts,mjs}", "scripts/*.ts", "e2e/**/*.ts", "e2e-demo/**/*.ts"],
       "ignore": ["public/**", "dist/**", ".next/**", ".vinext/**"]
     },
     "cloudflare/irrigation-push": {

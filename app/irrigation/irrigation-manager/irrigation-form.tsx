@@ -89,7 +89,7 @@ export function IrrigationPreview({
 }) {
   const referenceRate = applications[0]?.rateMmPerHour ?? 0;
   return (
-    <aside className="irrigation-preview" aria-live="polite">
+    <aside className="irrigation-preview" data-tour="arrosage-resultat" aria-live="polite">
       <p className="eyebrow">Résultat calculé</p>
       <strong className="calculated-duration">{formatDuration(durationSeconds)}<FigureOrigin text={origin} /></strong>
       <dl>

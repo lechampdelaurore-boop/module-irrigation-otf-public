@@ -4,6 +4,7 @@ import { useSystemAlertsDot } from '../irrigation-manager/system-alerts-memory';
 import { Icon } from '../line-icon';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { DemoBanner } from './demo-banner';
+import type { TourSurroundings } from './guided-tour';
 
 /**
  * La barre du haut, commune à toutes les pages du module (deuxième passe de
@@ -21,6 +22,7 @@ export function Topbar({
   notificationsHref = null,
   demo = false,
   demoSelection = null,
+  tour = null,
 }: {
   userName: string;
   signOutPath: string;
@@ -30,12 +32,14 @@ export function Topbar({
   demo?: boolean;
   /** La ferme fictive et le moment de l'invité, que la bannière permet de changer (D2). */
   demoSelection?: DemoSelection | null;
+  /** En démonstration, ce que les visites guidées savent de la page (D3). */
+  tour?: TourSurroundings | null;
 }) {
   const alertsLimited = useSystemAlertsDot();
   const bellHref = demo ? null : notificationsHref;
   return (
     <>
-      {demo ? <DemoBanner selection={demoSelection} /> : null}
+      {demo ? <DemoBanner selection={demoSelection} tour={tour} /> : null}
       <header className="topbar">
         <a className="brand" href="/irrigation" aria-label="Accueil Irrigation">
           <span className="brand-mark" aria-hidden="true">

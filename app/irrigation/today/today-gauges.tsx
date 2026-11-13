@@ -117,7 +117,7 @@ function SoilBar({ garden }: { garden: SoilGarden }) {
  */
 export function TodayWaterBlockView({ block }: { block: WaterBlock }) {
   return (
-    <section className="today-block" id="today-water" data-kind="water" data-empty={block.empty !== null} aria-labelledby="today-water-title">
+    <section className="today-block" id="today-water" data-tour="aujourdhui-eau" data-kind="water" data-empty={block.empty !== null} aria-labelledby="today-water-title">
       <div className="today-block-heading">
         <span className="today-block-badge" data-tone="water"><Icon name="cuve" /></span>
         <div>
