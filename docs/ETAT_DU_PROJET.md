@@ -168,6 +168,19 @@ registres, elle y renvoie.
   tests sur 1 387 (28 nouveaux), compilation réussie, knip, `push:check`
   et `weather:check` sans erreur, 88 parcours sur 88 (11,9 min) ; refus de démarrer et bannière
   constatés dans le serveur de développement (D-103).
+  **D2, les fermes fictives et la date simulée, codée la même nuit**
+  (D-104, précisions F158 à F171), sur la branche
+  `feat/demo-d2-fermes-fictives` posée sur celle de D1 : les fermes, les
+  moments, l'espace par ferme et par moment, la date simulée au serveur et
+  au navigateur, et ce que chaque ferme a déjà réglé (matériel, eau,
+  objectifs, plan du matin, saison passée). Les deux questions
+  agronomiques (les espèces, le sol) tranchées par le porteur le
+  13 novembre 2026 sur la recommandation : rien ne change dans le code.
+  Contrôles du 13 novembre 2026 au soir, branche refaite sur `main` après
+  le tag : lint sans avertissement, typage sans erreur, 1 420 tests sur
+  1 420 (33 nouveaux), compilation réussie, knip, `push:check` et
+  `weather:check` sans erreur, 88 parcours sur 88 (12,1 min) ; chaque
+  moment constaté en vrai avec le point d'entrée de la démonstration (D-104).
 - Parcours navigateur : ils écrivent leurs dates à l'heure de la ferme et
   le champ de la pluie mesurée suit le dernier jour choisi (D-082, en ligne
   le 12 novembre 2026, #15) : les points ouverts 49 et 50 sont corrigés. Reste le dimanche soir (point
@@ -197,6 +210,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #34 (`eb9ee53`, D1 de la démo guidée, les garde-fous du mode démo,
+  D-103, fusionnée à 21 h 30 et déployée à 21 h 45, run 43502203781, les
+  quatre jobs réussis, aucune migration ; la production vérifiée dans le
+  navigateur du porteur, sans bannière de démonstration). Avant elle : la
   PR #33 (`70477a4`, la clôture de la 3.9 et de la Tranche 3, la version
   0.2.0, D-100 et D-101, fusionnée le 13 novembre à 19 h 46 sur le mot de
   clôture du porteur et déployée à 19 h 58, run 43485850915, les quatre jobs

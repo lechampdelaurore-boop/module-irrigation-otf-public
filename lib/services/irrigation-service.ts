@@ -15,6 +15,8 @@ import {
 } from '@/lib/adapters/otf/snapshot-reader';
 import { readLiveOrLastSuccessfulSnapshot } from '@/lib/domain/snapshot-policy';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { demoChoiceOfOwner } from '@/lib/domain/demo/catalogue';
+import { demoFarmSnapshot } from '@/lib/adapters/demo/farms';
 
 // Le plan de culture s'ajoute à l'instantané le 29 septembre 2026 : un cache
 // de la version précédente n'en a pas, une nouvelle clé force sa lecture.
@@ -33,12 +35,13 @@ export async function getIrrigationSnapshot(
   { season, forceRefresh = false }: IrrigationSnapshotOptions,
 ): Promise<IrrigationSnapshot> {
   if (readDataSource() !== 'live') {
-    const snapshot = snapshotForSeason(mockSnapshot, season);
+    const source = mockSource(cacheKey);
+    const snapshot = snapshotForSeason(source, season);
     if (snapshot) return snapshot;
     throw new OtfSeasonUnavailableError(
       season,
-      mockSnapshot.configuration.seasonFirst,
-      mockSnapshot.configuration.seasonLast,
+      source.configuration.seasonFirst,
+      source.configuration.seasonLast,
     );
   }
 
@@ -90,7 +93,7 @@ export async function getIrrigationSnapshot(
  * ta ferme »).
  */
 export async function readCachedIrrigationSnapshot(cacheKey: string, season: number): Promise<IrrigationSnapshot | null> {
-  if (readDataSource() !== 'live') return snapshotForSeason(mockSnapshot, season);
+  if (readDataSource() !== 'live') return snapshotForSeason(mockSource(cacheKey), season);
   const scoped = await readCachedSnapshot(JSON.stringify([SNAPSHOT_CACHE_VERSION, cacheKey, season]));
   if (scoped) return scoped;
   const legacy = await readCachedSnapshot(`${LEGACY_SNAPSHOT_CACHE_VERSION}:${cacheKey}`);
@@ -147,6 +150,16 @@ function snapshotForSeason(
       : undefined,
     warning: undefined,
   };
+}
+
+/**
+ * Le plan de démonstration : en démonstration, celui de la ferme fictive et
+ * du moment de l'espace (docs/demo-guided-contract.md, section 6) ; ailleurs,
+ * la ferme de démonstration des parcours navigateur, inchangée.
+ */
+function mockSource(cacheKey: string): IrrigationSnapshot {
+  const choice = isDemoDeployment() ? demoChoiceOfOwner(cacheKey) : null;
+  return choice ? demoFarmSnapshot(choice.profile.id, choice.moment.dateKey) : mockSnapshot;
 }
 
 function readDataSource(): 'mock' | 'live' {

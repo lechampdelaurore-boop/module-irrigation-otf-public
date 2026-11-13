@@ -1,5 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { demonstrationWeatherProvider } from '../../adapters/weather/demonstration-provider.ts';
+import { demoSeasonWeatherProvider } from '../../adapters/weather/demo-season-provider.ts';
 import { openMeteoWeatherProvider } from '../../adapters/weather/open-meteo-provider.ts';
 import { VisualCrossingWeatherProvider } from '../../adapters/weather/visual-crossing-provider.ts';
 import type { WeatherProvider } from '../../domain/weather/weather-provider.ts';
@@ -43,13 +44,14 @@ class FreeWeatherProvider implements WeatherProvider {
  * valeur par défaut est `live`, et la production ne pose jamais ce réglage.
  */
 function readWeatherDataSource(): 'mock' | 'live' {
-  // La démonstration ne lit jamais la vraie météo (docs/demo-guided-contract.md, couche 2).
-  if (isDemoDeployment()) return 'mock';
   const configured = process.env.WEATHER_DATA_SOURCE ?? env.WEATHER_DATA_SOURCE;
   return configured === 'mock' ? 'mock' : 'live';
 }
 
 export function getConfiguredWeatherProvider(): WeatherProvider {
+  // La démonstration ne lit jamais la vraie météo (docs/demo-guided-contract.md,
+  // couche 2) ; la sienne porte les moments de saison des fermes fictives.
+  if (isDemoDeployment()) return demoSeasonWeatherProvider;
   if (readWeatherDataSource() === 'mock') return demonstrationWeatherProvider;
   const key = (process.env.VISUAL_CROSSING_API_KEY ?? env.VISUAL_CROSSING_API_KEY)?.trim() || null;
   if (!key) return openMeteoWeatherProvider;

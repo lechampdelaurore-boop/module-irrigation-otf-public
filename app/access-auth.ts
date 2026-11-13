@@ -2,6 +2,9 @@ import { env } from 'cloudflare:workers';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createJwksFetcher, verifyAccessJwt } from '@/lib/services/access-jwt';
+import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, demoOwnerUserId, resolveDemoChoice } from '@/lib/domain/demo/catalogue';
+import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { prepareDemoSpace } from '@/lib/services/demo-space';
 
 /**
  * Identité de l'utilisateur connecté.
@@ -43,10 +46,30 @@ function demoUser(farm: string | undefined): AuthenticatedUser {
 }
 
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+  const user = await readUser();
+  if (!user || !isDemoDeployment()) return user;
+  return demoSpaceUser(user);
+}
+
+async function readUser(): Promise<AuthenticatedUser | null> {
   if (process.env.NODE_ENV !== 'production' && process.env.LOCAL_DEMO_USER === 'true') {
     return demoUser((await cookies()).get(DEMO_FARM_COOKIE)?.value);
   }
   return readAccessUser(await headers());
+}
+
+/**
+ * En démonstration, l'invité travaille dans l'espace de la ferme fictive et
+ * du moment qu'il a choisis (docs/demo-guided-contract.md, sections 4 à 6) :
+ * un espace par invité, par ferme et par moment, préparé à sa première
+ * ouverture. Son nom reste le sien.
+ */
+async function demoSpaceUser(user: AuthenticatedUser): Promise<AuthenticatedUser> {
+  const jar = await cookies();
+  const choice = resolveDemoChoice(jar.get(DEMO_PROFILE_COOKIE)?.value, jar.get(DEMO_MOMENT_COOKIE)?.value);
+  const userId = demoOwnerUserId(user.userId, choice);
+  await prepareDemoSpace(userId, choice);
+  return { ...user, userId };
 }
 
 export async function requireAuthenticatedUser(): Promise<AuthenticatedUser> {

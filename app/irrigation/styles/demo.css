@@ -45,3 +45,52 @@
   background: var(--card);
   color: var(--ink2);
 }
+
+.demo-banner-choices {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.demo-banner-choices label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--ink2);
+}
+
+.demo-banner-choices select {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-button);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .demo-banner {
+    flex-wrap: wrap;
+  }
+
+  /* Le texte reste à côté de l'icône ; les choix passent dessous. */
+  .demo-banner p {
+    flex-basis: 0;
+  }
+
+  .demo-banner-choices,
+  .demo-banner-choices label,
+  .demo-banner-choices select {
+    width: 100%;
+  }
+
+  .demo-banner-choices span {
+    min-width: 56px;
+  }
+}
