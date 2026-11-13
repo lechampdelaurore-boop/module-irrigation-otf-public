@@ -6,6 +6,7 @@ import { readPlantSymbols } from '../lib/adapters/otf/plant-sprite.ts';
 import { OtfReadClient } from '../lib/adapters/otf/read-client.ts';
 import { OpenMeteoWeatherProvider } from '../lib/adapters/weather/open-meteo-provider.ts';
 import { demonstrationWeatherProvider } from '../lib/adapters/weather/demonstration-provider.ts';
+import { demoSeasonWeatherProvider } from '../lib/adapters/weather/demo-season-provider.ts';
 import { DemoOutboundRefusedError } from '../lib/domain/demo/outbound-guard.ts';
 import { DeploymentRefusedError, isDemoDeployment, startDeployment } from '../lib/services/deployment-mode.ts';
 import { getIrrigationPushPublicKey, registerIrrigationPushSubscription } from '../lib/services/irrigation-push-service.ts';
@@ -130,7 +131,9 @@ test('en démonstration, la météo est celle de démonstration même sans WEATH
   clearSettings();
   assert.notEqual(getConfiguredWeatherProvider(), demonstrationWeatherProvider, 'hors démonstration, la valeur par défaut reste live');
   process.env.DEMO_MODE = 'true';
-  assert.equal(getConfiguredWeatherProvider(), demonstrationWeatherProvider);
+  // La météo des moments de saison (D2), sans réseau, créditée comme la démonstration.
+  assert.equal(getConfiguredWeatherProvider(), demoSeasonWeatherProvider);
+  assert.equal(getConfiguredWeatherProvider().id, demonstrationWeatherProvider.id);
 });
 
 test('en démonstration, aucune notification : pas de clé publique, service désactivé', async () => {

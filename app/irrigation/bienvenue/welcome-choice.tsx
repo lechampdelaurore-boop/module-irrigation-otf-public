@@ -5,10 +5,16 @@ import type { FeatureId } from '@/lib/domain/features/catalogue';
 import { checkFeature, uncheckFeature, type FeatureSelection } from '@/lib/domain/features/selection';
 import { saveFeatureSelectionAction } from '../feature-selection-actions';
 import { FeatureChoiceList } from '../shell/feature-choice-list';
+import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Topbar } from '../shell/topbar';
 
 /** Le choix de la première ouverture (R5) : il faut au moins une case pour continuer (P7). */
-export function WelcomeChoice({ userName, signOutPath, demo }: { userName: string; signOutPath: string; demo: boolean }) {
+export function WelcomeChoice({ userName, signOutPath, demo, demoSelection }: {
+  userName: string;
+  signOutPath: string;
+  demo: boolean;
+  demoSelection: DemoSelection | null;
+}) {
   const shell = useRef<HTMLElement>(null);
   const [selection, setSelection] = useState<FeatureSelection>([]);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +50,7 @@ export function WelcomeChoice({ userName, signOutPath, demo }: { userName: strin
 
   return (
     <main ref={shell} className="app-shell welcome-shell">
-      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} />
+      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} />
       <section className="welcome-choice" aria-labelledby="welcome-title">
         <p className="eyebrow">Première ouverture</p>
         <h1 id="welcome-title">Choisissez vos fonctionnalités</h1>

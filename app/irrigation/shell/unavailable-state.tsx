@@ -3,6 +3,7 @@
 import { pageHref, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { closestAvailableSeason } from '@/lib/domain/irrigation-navigation';
 import type { IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
+import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Topbar } from './topbar';
 
 export type UnavailableStateProps = {
@@ -15,17 +16,18 @@ export type UnavailableStateProps = {
   seasonLast?: number;
   /** Un déploiement de démonstration : la bannière permanente (docs/demo-guided-contract.md). */
   demo: boolean;
+  demoSelection: DemoSelection | null;
 };
 
 /** Ouvre ta ferme n'a pas répondu et rien n'est encore enregistré : aucune page ne peut s'afficher. */
-export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast, demo }: UnavailableStateProps) {
+export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast, demo, demoSelection }: UnavailableStateProps) {
   const rateLimited = reason === 'rate-limit';
   const seasonUnavailable = reason === 'season-unavailable' && seasonFirst !== undefined && seasonLast !== undefined;
   const fallbackSeason = seasonUnavailable ? closestAvailableSeason(season, seasonFirst, seasonLast) : season;
 
   return (
     <main className="app-shell">
-      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} />
+      <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} />
       <section className="fatal-state" role="alert">
         <p className="eyebrow">
           {seasonUnavailable

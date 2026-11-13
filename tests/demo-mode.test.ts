@@ -179,7 +179,7 @@ test('aucun écran ne saisit ni ne lit le jeton Ouvre ta ferme : il reste un sec
 
 test('la barre du haut porte la bannière en démonstration et n’y montre jamais la cloche', () => {
   const topbar = readFileSync('app/irrigation/shell/topbar.tsx', 'utf8');
-  assert.match(topbar, /\{demo \? <DemoBanner \/> : null\}/);
+  assert.match(topbar, /\{demo \? <DemoBanner selection=\{demoSelection\} \/> : null\}/);
   assert.match(topbar, /const bellHref = demo \? null : notificationsHref;/);
   // Chaque page passe par la barre du haut : le gabarit, l'état indisponible, la première ouverture et la page introuvable.
   for (const file of ['app/irrigation/shell/irrigation-shell.tsx', 'app/irrigation/shell/unavailable-state.tsx', 'app/irrigation/bienvenue/welcome-choice.tsx', 'app/not-found.tsx']) {

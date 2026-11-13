@@ -2,6 +2,7 @@
 
 import { useSystemAlertsDot } from '../irrigation-manager/system-alerts-memory';
 import { Icon } from '../line-icon';
+import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { DemoBanner } from './demo-banner';
 
 /**
@@ -19,6 +20,7 @@ export function Topbar({
   signOutPath,
   notificationsHref = null,
   demo = false,
+  demoSelection = null,
 }: {
   userName: string;
   signOutPath: string;
@@ -26,12 +28,14 @@ export function Topbar({
   notificationsHref?: string | null;
   /** Un déploiement de démonstration : la bannière, et jamais la cloche. */
   demo?: boolean;
+  /** La ferme fictive et le moment de l'invité, que la bannière permet de changer (D2). */
+  demoSelection?: DemoSelection | null;
 }) {
   const alertsLimited = useSystemAlertsDot();
   const bellHref = demo ? null : notificationsHref;
   return (
     <>
-      {demo ? <DemoBanner /> : null}
+      {demo ? <DemoBanner selection={demoSelection} /> : null}
       <header className="topbar">
         <a className="brand" href="/irrigation" aria-label="Accueil Irrigation">
           <span className="brand-mark" aria-hidden="true">

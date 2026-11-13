@@ -26,6 +26,18 @@ export async function ensureWorkspaceForUser(ownerUserId: string): Promise<strin
   }
 }
 
+/**
+ * Crée l'espace s'il n'existe pas encore, et dit si c'est cet appel qui l'a
+ * créé : deux requêtes simultanées ne le créent qu'une fois, et une seule
+ * apprend qu'elle l'a fait (l'index unique des espaces sans ferme OTF).
+ */
+export async function createWorkspaceIfAbsent(ownerUserId: string): Promise<boolean> {
+  const result = await db.prepare(
+    `INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES (?, ?) ON CONFLICT DO NOTHING`,
+  ).bind(crypto.randomUUID(), ownerUserId).run();
+  return Number(result.meta.changes ?? 0) === 1;
+}
+
 export async function readWaterBudgetRevisionForUser(ownerUserId: string): Promise<number> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const row = await db.prepare(

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { browserClockScript } from '@/lib/domain/demo/browser-clock';
 import { PAGE_TITLE_TEMPLATE } from '@/lib/domain/features/pages';
+import { currentSimulatedOffsetMs } from '@/lib/services/demo-clock';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -32,8 +34,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // En démonstration seulement, le navigateur lit le jour du moment, comme le
+  // serveur (docs/demo-guided-contract.md, F160) ; ailleurs, aucun script.
+  const offset = currentSimulatedOffsetMs();
   return (
     <html lang="fr">
+      {offset === null ? null : (
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: browserClockScript(offset) }} />
+        </head>
+      )}
       <body>{children}</body>
     </html>
   );
