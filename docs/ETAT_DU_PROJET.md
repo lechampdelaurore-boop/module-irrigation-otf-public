@@ -221,7 +221,9 @@ registres, elle y renvoie.
   navigateur et les 16 parcours de la démonstration (local), verts. **PR 2
   en ligne** (#47, `a29605a`, fusionnée le 14 novembre 2026 à 19 h 16,
   déployée à 19 h 34, run 43625642370, les cinq jobs réussis). **Premières
-  remarques du porteur le soir même, corrigées** (cette PR, D-115, contrat
+  remarques du porteur le soir même, corrigées, en ligne** (#49, `360a73e`,
+  fusionnée le 14 novembre 2026 à 20 h 36, déployée à 20 h 54, run
+  43633039546, les cinq jobs réussis ; D-115, contrat
   section 13, F232 à F235) : les trois fermes garnies de la démonstration
   dessinées sur des lieux inventés, la ferme vierge non ; à l'ordinateur, la
   liste des jardins à la hauteur de la carte, avec son ascenseur. Aucune
@@ -231,14 +233,23 @@ registres, elle y renvoie.
   Reste la relecture du porteur sur sa ferme et, dans la démonstration,
   l'emplacement des dessins (F234).
 - Fusion des moteurs, étape 1 (ligne 24 sexies de la roadmap, D-114) :
-  **inscrite le 14 novembre 2026** sur le mot du porteur, registres
-  seulement (cette PR). Un script qui fait tourner le code OTF actuel de la
-  jauge sur les dix cas O01 à O10 du dépôt commun et sur les cas limites du
-  contrat de fusion, et compare aux valeurs calculées à la main ; il ne
-  modifie ni le module ni un test. Place : après la vue satellite, avant
-  l'audit ergonomique final, en Opus 5.5 · Élevé. Rien n'est codé, rien
-  n'est envoyé à Nicolas ; tout travail sur le dépôt commun attend un
-  nouvel accord du porteur.
+  **inscrite le 14 novembre 2026** sur le mot du porteur (#48), **script
+  écrit et lancé le soir même** (cette PR, D-116), en Opus 5.5 · Élevé :
+  contrat `docs/shared-engine-cases-contract.md`, script
+  `scripts/shared-engine-cases.ts`, copie figée des cas du dépôt commun
+  (`scripts/shared-engine/cas-otf.json`, commit `43c9de7`), test
+  `tests/shared-engine-cases.test.ts` rouge avant le script. Rien du module
+  ni de ses tests ne change. Mesure sur `360a73e` : **17 cas conformes**
+  (O01 à O06, O08 à O10, et les huit cas limites L1 à L7, L3 bis), **un
+  écart**, O07 (le drainage du jour qui fait repartir une jauge inconnue :
+  0,7 mm dans le code, « inconnu » dans le cas, qui se trompe sur le jeu
+  OTF), **deux valeurs non jouées** (O06, la variante « manque » de
+  Tlaloc). Reste au porteur : autoriser ou non la correction du contrat
+  commun (O07 ; O08, statut périmé et entrées incomplètes) et le message à
+  Nicolas ; rien n'est envoyé. Contrôles avant la PR : lint, typage,
+  1 508 tests, compilation, knip, `push:check`, `weather:check`, verts ;
+  parcours navigateur non rejoués en local, sans rapport (ni interface ni
+  service touchés), joués par la CI.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -322,6 +333,12 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+  PR #49 (`360a73e`, la démonstration dessinée et la liste des jardins à la
+  hauteur de la carte, D-115, fusionnée à 20 h 36 et déployée à 20 h 54,
+  run 43633039546, les cinq jobs réussis, aucune migration). Avant elle :
+  la PR #48 (`b363021`, l'inscription du script des cas de test du moteur
+  commun, D-114, registres seulement, fusionnée à 19 h 54 et déployée à
+  20 h 13, run 43629207518, les cinq jobs réussis). Avant elle : la
   PR #47 (`a29605a`, la vue satellite, PR 2, l'onglet, D-113, fusionnée à
   19 h 16 et déployée à 19 h 34, run 43625642370, les cinq jobs réussis,
   aucune migration). Avant elle : la PR #46 (`c77331c`, le jeton Access de la démonstration vérifié à l'heure

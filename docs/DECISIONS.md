@@ -4093,3 +4093,42 @@ est remplacée par F232. Contrat, section 13. Aucune migration, rien ne
 change au téléphone ni en production hors de la mise en page de la liste.
 
 Ne changent pas : D-110, D-111, D-113.
+
+## D-116 — Fusion des moteurs, étape 1 : le script des cas de test, première mesure
+
+Date : 14 novembre 2026 au soir. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur du 14 novembre 2026 (aucune question agronomique).
+Après D-114. Contrat : `docs/shared-engine-cases-contract.md`.
+
+**Établi.** Le script `scripts/shared-engine-cases.ts` fait calculer par le
+code actuel du module les dix cas O01 à O10 du dépôt commun (copie figée au
+commit `43c9de7`, `scripts/shared-engine/cas-otf.json`), lus dans le
+fichier, et huit cas limites du contrat de fusion (§ 5), écrits au contrat
+du script avant le calcul. Sur `360a73e` : 17 cas conformes, un écart (O07,
+le drainage du jour de remplissage), deux valeurs non jouées (O06, la
+variante « manque » du jeu Tlaloc).
+
+**Décisions.**
+
+- Les verdicts : conforme à 0,01 près, `null` seulement pour `null` ;
+  « conforme, déduit » pour une grandeur que le code ne nomme pas (RU, RAW,
+  manque Dr, Kr), déduite de ses sorties ; « non joué » avec sa raison. Un
+  écart est un résultat : le script ne s'arrête en erreur que sur un
+  fichier de cas illisible ou incomplet.
+- O08 ne donne ni besoins ni surfaces : il se joue sur la ferme des tests de
+  D-097, au budget écrit (10 m³, où il n'y a pas de pénurie, rapporté), puis
+  à 5 m³, où A et B se vérifient.
+- **O07 : c'est le cas qui se trompe sur le jeu OTF**, pas le code. Au jour
+  qui fait repartir une jauge inconnue par un apport, le code compte un
+  drainage de `apports − capacité` (0,7 mm), un minimum, que la pastille de
+  l'eau arrosée en trop lit quand l'apport est un arrosage. Correction
+  proposée au contrat commun, avec celles d'O08 (statut « exécuté »,
+  entrées complétées) : **non appliquée** ; toute PR sur le dépôt commun et
+  tout message à Nicolas attendent l'accord du porteur (D-114).
+
+Aucune migration ; aucun fichier de `app/`, `lib/`, `db/` ni aucun test
+existant modifié ; un test nouveau, `tests/shared-engine-cases.test.ts`,
+écrit rouge avant le script, tient la règle des verdicts sans figer la
+mesure.
+
+Ne changent pas : D-003, D-047, D-060, D-097, D-114.
