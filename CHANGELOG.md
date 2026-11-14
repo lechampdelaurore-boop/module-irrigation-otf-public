@@ -33,6 +33,7 @@ source détaillée commit par commit.
   ouvert 69) : le jeton Cloudflare Access se vérifie à l'heure réelle, et
   non au jour simulé du moment choisi, où un jeton émis aujourd'hui
   paraissait « pas encore valide ». Rien ne change en production.
+- Ce correctif en ligne : #46, déployée le 14 novembre 2026 à 18 h 56.
 - L'application Access de la démonstration et son AUD en ligne : #45,
   déployée le 14 novembre 2026 à 17 h 58.
 
