@@ -163,7 +163,7 @@ registres, elle y renvoie.
   L'audit ergonomique final vient après. Réglages : Opus 5.5 · Élevé,
   Élevé, Très élevé. **S1, le style, refait sur le dépôt public la nuit du
   13 au 14 novembre 2026** sur le mandat d'autonomie du porteur, en
-  Opus 5.5 · Élevé (cette PR, D-108) : les cinq touches de la maquette
+  Opus 5.5 · Élevé (#39, D-108) : les cinq touches de la maquette
   validée, habillage seulement, aucune migration ; reste la relecture
   visuelle du porteur. **S1 en ligne** (#39, fusionnée le 14 novembre
   2026 à 2 h 50, déployée à 3 h 27, run 43542965425, après une relance du
@@ -176,7 +176,7 @@ registres, elle y renvoie.
   et le point 68 (le parcours V8 qui cliquait avant que la page réponde),
   corrigé et en ligne (#41, le 14 novembre 2026 à 4 h 39, run 43551212504).
   **S2, le graphique des réserves du sol, codé la même nuit** sur le même
-  mandat, en Opus 5.5 · Élevé (cette PR, D-109, précisions F194 à F200) :
+  mandat, en Opus 5.5 · Élevé (#42, D-109, précisions F194 à F200) :
   en tête de chaque parcelle de « Réserve du sol », une barre par jardin
   ou abri au % du plein de maintenant (`garden.percent`, le titre même du
   pli, vérifié au lancement), les planches en points, orange sous leur
@@ -198,7 +198,7 @@ registres, elle y renvoie.
   condition C, la licence des photos, est **levée** le jour même (Licence
   Ouverte 2.0 : réutilisation commerciale permise, donc multi-fermes ;
   crédit « IGN » avec lien vers la source). **PR 1, le domaine, codée le
-  14 novembre 2026** (cette PR, D-111, précisions F214 à F223), en
+  14 novembre 2026** (#44, D-111, précisions F214 à F223), en
   Opus 5.5 · Très élevé, sans interface : les contours d'OTF lus de façon
   tolérante et gardés dans l'instantané (champ `outline` optionnel, aucune
   requête de plus), cadrage, « en France », fonds IGN et « Dessin », style
@@ -230,11 +230,13 @@ registres, elle y renvoie.
   migration. Contrôles avant la PR : lint, typage, 1 503 tests,
   compilation, knip, `push:check`, `weather:check`, `demo:check`, les
   94 parcours navigateur et les 16 de la démonstration (local), verts.
-  Reste la relecture du porteur sur sa ferme et, dans la démonstration,
-  l'emplacement des dessins (F234).
+  **Relue et validée par le porteur le 14 novembre 2026 à 21 h 11**
+  (« impeccable »), sur sa ferme et dans la démonstration : **S3 est
+  close**. Limite connue laissée telle quelle : sur une parcelle aux jardins
+  serrés, leurs noms peuvent se chevaucher sur la carte.
 - Fusion des moteurs, étape 1 (ligne 24 sexies de la roadmap, D-114) :
   **inscrite le 14 novembre 2026** sur le mot du porteur (#48), **script
-  écrit et lancé le soir même** (cette PR, D-116), en Opus 5.5 · Élevé :
+  écrit et lancé le soir même** (#50, D-116), en Opus 5.5 · Élevé :
   contrat `docs/shared-engine-cases-contract.md`, script
   `scripts/shared-engine-cases.ts`, copie figée des cas du dépôt commun
   (`scripts/shared-engine/cas-otf.json`, commit `43c9de7`), test
@@ -250,6 +252,11 @@ registres, elle y renvoie.
   1 508 tests, compilation, knip, `push:check`, `weather:check`, verts ;
   parcours navigateur non rejoués en local, sans rapport (ni interface ni
   service touchés), joués par la CI.
+- Audit ergonomique final (ligne 24 septies de la roadmap, D-107) :
+  **inscrit le 14 novembre 2026** sur le mot du porteur (21 h 52), après
+  les finitions et le script des cas de test ; toutes les pages, sur
+  plusieurs fermes, aux deux largeurs ; captures en Sonnet 5.5 · Moyen,
+  analyse en Opus 5.5 · Élevé ; **captures lancées le soir même**.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -297,8 +304,20 @@ registres, elle y renvoie.
   est créée le 14 novembre 2026 dans le navigateur du porteur et son AUD
   posé dans `wrangler.demo.jsonc` (#45, en ligne à 17 h 58) ; la première
   ouverture a montré que le jeton Access était vérifié au jour simulé
-  (point ouvert 69, corrigé par D-112, #46 en ligne à 18 h 56) ; restent les invitations de
-  Nicolas et de Vincent et la recette réelle. Contrôles
+  (point ouvert 69, corrigé par D-112, #46 en ligne à 18 h 56). **Recette
+  réelle conforme le 14 novembre 2026** (fin à 19 h 53, dans le navigateur
+  du porteur) : la visite « Bienvenue » de bout en bout, chaque ferme
+  garnie à ses quatre moments et la ferme vierge aux bonnes dates, les sept
+  visites jouées jusqu'au bout, bulles dans l'écran, 164 requêtes sans
+  erreur dans les journaux du Worker ; le téléphone, que la fenêtre du
+  porteur ne permettait pas, est couvert par les parcours automatiques ;
+  quatre remarques versées à l'audit ergonomique final
+  (`remarques-recette-demo.md`, hors dépôt). **Nicolas connecté le
+  14 novembre 2026 à 20 h 53**, après l'ajout de la connexion par code reçu
+  par courriel, pour la démonstration seule (choix du porteur à 20 h 24 ;
+  la production garde la seule connexion Cloudflare). Restent la remise à
+  zéro de nuit à lire dans les journaux le 15 novembre 2026 et la première
+  connexion de Vincent. Contrôles
   du 13 novembre 2026 au soir : lint sans avertissement, typage sans
   erreur, 1 441 tests sur 1 441 (10 nouveaux), compilation réussie, knip,
   `push:check` et `weather:check` sans erreur, 88 parcours sur 88
@@ -333,6 +352,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+  PR #50 (`21e9cc3`, le script des cas de test du moteur commun, première
+  mesure, D-116, fusionnée à 21 h 22 et déployée à 21 h 37, run
+  43637137167, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #49 (`360a73e`, la démonstration dessinée et la liste des jardins à la
   hauteur de la carte, D-115, fusionnée à 20 h 36 et déployée à 20 h 54,
   run 43633039546, les cinq jobs réussis, aucune migration). Avant elle :
@@ -8180,13 +8202,15 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    seule relance du job, comme le veut la règle, verte : #39 déployée à
    3 h 27. Recommandation : attendre
    la page prête après le rechargement, comme V1.
-69. 🟡 **Ouvert le 14 novembre 2026 par la première ouverture de la
+69. ✅ **Ouvert le 14 novembre 2026 par la première ouverture de la
    démonstration en ligne** (après #45, en ligne à 17 h 58, run
    43617026648) : la démonstration renvoyait vers `/cdn-cgi/access/login`,
    page introuvable sur workers.dev. Le jeton Access arrivait bien mais
    était vérifié au jour simulé (14 avril), où il paraît « pas encore
    valide ». Correctif dans sa PR `fix/` (D-112, #46, en ligne le 14 novembre 2026
-   à 18 h 56) : le jeton se vérifie à l'heure réelle. À fermer après la recette réelle de la démonstration.
+   à 18 h 56) : le jeton se vérifie à l'heure réelle. **Fermé le
+   14 novembre 2026** : la recette réelle de la démonstration est conforme
+   (19 h 53) et un invité s'y est connecté (20 h 53).
 
 ## Procédure de reprise rapide
 
