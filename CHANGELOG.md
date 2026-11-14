@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (un test de la démonstration qui échouait la nuit, point ouvert 67)
+
+- Le test de l'horloge simulée lit le jour du texte de `Date()` à l'heure
+  de la ferme, et non plus au fuseau du processus : il échouait entre
+  minuit et 2 h à la ferme, sur la CI comme en local. Un cas à 0 h 03 le
+  tient. Aucun code de la démonstration ne change.
+
 ### Modifié (S1, style « un peu plus joli » : la troisième passe de l'habillage)
 
 - **Cinq touches dans la charte d'Ouvre ta ferme** (D-108,
