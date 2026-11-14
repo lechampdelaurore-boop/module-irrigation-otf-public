@@ -5,6 +5,24 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Clos (S3, la vue satellite)
+
+- **La vue satellite est relue et validée par le porteur** le 14 novembre
+  2026 à 21 h 11 (« impeccable »), sur sa ferme et dans la démonstration :
+  S3 est close (contrat, sections 11 à 13 ; D-110, D-111, D-113, D-115).
+- Le script des cas de test du moteur commun en ligne : #50, déployée le
+  14 novembre 2026 à 21 h 37.
+
+### Vérifié (4.0, la démonstration en ligne)
+
+- **Recette réelle de la démonstration conforme** le 14 novembre 2026 :
+  visite « Bienvenue », chaque ferme à chacun de ses moments, les sept
+  visites jusqu'au bout, journaux du Worker sans erreur. Le point ouvert 69
+  est fermé.
+- **Un invité connecté** le soir même, par un code reçu par courriel,
+  ouvert pour la démonstration seule ; la production garde la seule
+  connexion Cloudflare.
+
 ### Ajouté (fusion des moteurs, étape 1 : le script des cas de test)
 
 - **Le script des cas de test du moteur commun** (D-116,

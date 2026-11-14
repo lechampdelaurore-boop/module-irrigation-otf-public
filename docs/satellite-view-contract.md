@@ -7,7 +7,8 @@ porteur est obligatoire avant tout code de S3.** **Validé par le porteur le
 14 novembre 2026 à 15 h 41** (« 3 je valide ») ; le code commence le jour
 même par la PR 1, le domaine (section 11, D-111), puis par la PR 2, l'onglet,
 après les constats A et B (section 12, D-113). Les premières remarques du
-porteur, le soir même, donnent la section 13 (D-115).
+porteur, le soir même, donnent la section 13 (D-115). **Relue et validée
+par le porteur le 14 novembre 2026 à 21 h 11 : S3 est close.**
 
 ## 1. Ce que le porteur a choisi
 
