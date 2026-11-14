@@ -257,6 +257,16 @@ registres, elle y renvoie.
   les finitions et le script des cas de test ; toutes les pages, sur
   plusieurs fermes, aux deux largeurs ; captures en Sonnet 5.5 · Moyen,
   analyse en Opus 5.5 · Élevé ; **captures lancées le soir même**.
+  **Analyse rendue la nuit du 14 novembre 2026** (`audit-ergonomie-final-2026-11-14.md`) :
+  **six lots de correction inscrits** (D-117), 24 octies (C, gestes sûrs),
+  24 nonies (A, le matin), 24 decies (B, pénurie lisible), 24 undecies (F,
+  démonstration), 24 duodecies (E, mots et chiffres), 24 terdecies (D,
+  pages allégées), chacun en Opus 5.5 · Élevé, un contrat avant le code,
+  une PR par point. Les six choix du rapport sont consignés sur l'option
+  recommandée, **à confirmer par le porteur au réveil** ; le code des lots
+  A et D attend sa confirmation, la séance sur la ferme réelle son
+  « vas-y ». Le lot C, premier lot, peut partir. PR de registres seule,
+  aucun contrôle rejoué.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

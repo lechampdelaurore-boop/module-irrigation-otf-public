@@ -13,6 +13,16 @@ source détaillée commit par commit.
 - Le script des cas de test du moteur commun en ligne : #50, déployée le
   14 novembre 2026 à 21 h 37.
 
+### Inscrit (les six lots de correction de l'audit ergonomique final)
+
+- **L'analyse de l'audit ergonomique final est rendue** (nuit du 14 novembre
+  2026) et ses **six lots de correction sont inscrits** (D-117) : C gestes
+  sûrs (24 octies), A le matin (24 nonies), B pénurie lisible (24 decies),
+  F démonstration (24 undecies), E mots et chiffres (24 duodecies), D pages
+  allégées (24 terdecies), chacun en Opus 5.5 · Élevé. Les choix du rapport
+  sont consignés sur l'option recommandée, à confirmer par le porteur ; la
+  séance sur la ferme réelle attend son « vas-y ». Registres seulement.
+
 ### Inscrit (l'audit ergonomique final)
 
 - **L'audit ergonomique final a sa ligne** (24 septies) : après les
