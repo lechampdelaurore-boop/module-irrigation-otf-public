@@ -144,7 +144,11 @@ réseau et serveur restent simulées afin de ne pas perturber le service.
 - les lignes `plotList` marquées `zoneFill: true` représentent la surface de la
   parcelle et sont masquées comme jardins techniques ;
 - une planche dont le jardin n’est pas présent pour la saison consultée est
-  ignorée au lieu d’invalider les autres planches saines.
+  ignorée au lieu d’invalider les autres planches saines ;
+- `coordinates` (parcelles et jardins) sert à la vue satellite de S3 : cache
+  technique de l'instantané comme les noms, lecture tolérante, un contour
+  invalide ou absent n'invalide jamais l'instantané (`docs/satellite-view-contract.md`,
+  F201, F202).
 
 ## Extension 2.8 : commune météo
 

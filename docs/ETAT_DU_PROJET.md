@@ -186,7 +186,17 @@ registres, elle y renvoie.
   neuf tests (`tests/soil-reserve-garden-bars.test.ts`), parcours P33.
   Contrôles avant la PR : lint, typage, 1 456 tests, compilation, knip,
   `push:check`, `weather:check` et les 90 parcours navigateur (local),
-  verts. Reste la relecture visuelle du porteur sur la version déployée.
+  verts. **S2 en ligne** (#42, `72e6df6`, déployée le 14 novembre 2026 à
+  5 h 12, run 43554060404). Reste la relecture visuelle du porteur sur la
+  version déployée.
+  **S3, la vue satellite : contrat écrit** le 14 novembre 2026 (cette PR,
+  D-110, `docs/satellite-view-contract.md`, précisions F201 à F213, parcours
+  prévu P34), sans code, en Sonnet 5.5 · Moyen. Constaté : les conditions de
+  cartes.gouv.fr. **Non vérifié** : la forme de `coordinates` (aucun jeton
+  de ferme dans le fil) et une tuile IGN (le relais du bac à sable refuse
+  `data.geopf.fr`), devenus conditions d'entrée du code. Aucune migration
+  SQL : les contours vont dans le JSON de l'instantané. La relecture du
+  porteur est obligatoire avant le code.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

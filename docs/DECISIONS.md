@@ -3903,8 +3903,37 @@ de jardins pareils ouvre aussi ce pli ; F198 au téléphone, les repères
 perdent leur mot ; F199 un % hors de 0 à 100 se place au bord ; F200 la
 légende à chaque parcelle.
 
+**En ligne** le 14 novembre 2026 à 5 h 12 (#42, `72e6df6`, run 43554060404),
+consigné par la PR du contrat de S3 (D-110).
+
 **Non établi.** La lecture du graphique sur la ferme réelle du porteur et
-son jugement visuel, après déploiement.
+son jugement visuel, sur la version déployée.
 
 Ne changent pas : D-003, D-006, D-047, D-053, D-107, D-108.
 
+## D-110 — Vue satellite de la parcelle (S3) : contrat MapLibre et orthophotos IGN, sans migration SQL
+
+Date : 8 novembre 2026 pour le choix du porteur ; 14 novembre 2026 pour le
+contrat, sur son mandat d'autonomie de la nuit. Décideur : le porteur
+(« le gratuit », 8 novembre 2026 à 11 h 13) ; les précisions, par la
+recommandation. Sans code, en Sonnet 5.5 · Moyen.
+
+**Décision.** `docs/satellite-view-contract.md` fixe l'onglet « Vue
+satellite » du bloc de chaque parcelle de « Matériel et placement » :
+MapLibre GL JS (BSD) et orthophotos de l'IGN sans clé, fond « Dessin » en
+repli et hors de France, un fond interchangeable sans autre fournisseur livré,
+contours des jardins nommés, liste texte à côté, jamais de position de
+planche, « contour absent » cas normal, rendu SVG sans WebGL. Précisions F201
+à F213. Les contours sont rangés dans le JSON de l'instantané OTF
+(`otf_snapshots.payload`, champ `outline` optionnel) : **aucune migration SQL**,
+contrairement à ce que la recherche supposait.
+
+**Établi.** Les conditions de cartes.gouv.fr (lues le 14 novembre 2026).
+**Non établi, conditions d'entrée du code** : la forme réelle de
+`coordinates` sur « Ferme v2 » n° 4394 (aucun jeton dans le fil de contrat) ;
+une tuile IGN réelle et son adresse (le relais réseau du bac à sable refuse
+`data.geopf.fr`) ; l'attribution exacte et l'usage commercial de la couche
+d'orthophotos. Si l'usage multi-fermes n'est pas permis, S3 s'arrête et le
+porteur décide.
+
+Ne changent pas : D-001, D-002, D-003, D-047.

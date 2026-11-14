@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (S3, le contrat de la vue satellite, sans code)
+
+- `docs/satellite-view-contract.md` (D-110, précisions F201 à F213) : l'onglet
+  « Vue satellite » de la parcelle, MapLibre et orthophotos IGN, contours des
+  jardins lus dans OTF et rangés dans le cache de l'instantané (aucune
+  migration SQL), « contour absent » cas normal, fond « Dessin » en repli.
+  Trois conditions d'entrée du code : forme de `coordinates`, tuile IGN et
+  licence de la couche, non vérifiées à l'écriture. Aucun changement de
+  comportement.
+- S2 en ligne : #42, déployée le 14 novembre 2026 à 5 h 12.
+
 ### Ajouté (S2, le graphique des réserves du sol, variante B)
 
 - **La vue d'ensemble par jardin** en tête de chaque parcelle de la page
