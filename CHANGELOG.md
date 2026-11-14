@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (le parcours de démonstration V8, point ouvert 68)
+
+- Le parcours « Remettre à zéro » attend que la page réponde après son
+  rechargement avant de cliquer, comme la visite « Bienvenue » : un clic
+  tombé avant que la page soit prête n'ouvrait pas la confirmation, et le
+  parcours a échoué une fois sur `main`. Aucun code de la démonstration ne
+  change.
+
 ### Corrigé (un test de la démonstration qui échouait la nuit, point ouvert 67)
 
 - Le test de l'horloge simulée lit le jour du texte de `Date()` à l'heure

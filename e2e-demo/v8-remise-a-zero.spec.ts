@@ -34,6 +34,8 @@ test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revien
   await expect(bouton).toBeFocused();
   await page.reload();
   await expect(page).not.toHaveURL(/\/irrigation\/bienvenue/);
+  // Après le rechargement, la page doit répondre avant le clic, comme V1 : un clic avant l'hydratation se perd (point ouvert 68).
+  await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
 
   await bouton.click();
   await fenetre.getByRole('button', { name: 'Remettre à zéro' }).click();
