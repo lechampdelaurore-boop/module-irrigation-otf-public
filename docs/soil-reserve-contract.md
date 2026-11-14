@@ -634,6 +634,9 @@ Aucun conseil d'arrosage avant une plantation ou un semis : le porteur l'a
   5 quater.
 - Ordinateur et 390 px de large ; la 3.8 rangera ensuite ce bloc avec le
   reste de l'interface.
+- En tête de chaque parcelle, depuis le 14 novembre 2026, la vue
+  d'ensemble par jardin : une barre par jardin ou abri, ses planches en
+  points (section « La vue d'ensemble par jardin », à la fin, D-109).
 
 ## Ce qui dépend de la 5 quater
 
@@ -1429,3 +1432,91 @@ chaque point tranché par l'assistant sur son option recommandée :
    de ce que le sol retient (3d) restent sur les propositions.
 
 Ne changent pas : D-003, D-006, D-028, D-047.
+
+## La vue d'ensemble par jardin (14 novembre 2026, S2, D-109)
+
+Demandée par le porteur le 8 novembre 2026 (« une représentation graphique
+des réserves du sol par bloc, un peu jolie »), lue « par jardin ».
+**Variante B choisie par lui le jour même** sur maquette
+(https://claude.ai/artifact/U6EPngGTvs7qpKfyJ8YfNj) : une barre par jardin,
+les planches en points. C'est un affichage : **aucun calcul nouveau, aucun
+chiffre qui ne soit déjà sur la page** (D-047 inchangée). Le module
+`lib/domain/soil-reserve/garden-bars.ts` range ce que la jauge a déjà
+calculé (`garden.percent`, `week`, le résumé de chaque planche) ; il ne lit
+rien d'autre. Chantier S2 de la roadmap (section 5 sexies), écrit et codé la
+nuit du 13 au 14 novembre 2026 sur le mandat d'autonomie du porteur.
+
+1. **Place.** En tête de chaque parcelle du bloc « Réserve du sol », sous
+   son nom, au-dessus de son curseur et de ses jardins repliés ; la pastille
+   de l'eau arrosée en trop reste en tête du bloc. Un graphique par
+   parcelle.
+2. **Une barre par jardin ou abri**, dans l'ordre de la page. La barre va
+   de 0 à 100 % du plein ; son remplissage, en bleu eau, vaut le % du plein
+   du jardin maintenant (`garden.percent`, la même valeur que le titre du
+   pli). Le chiffre est écrit à droite, arrondi à l'unité comme le pli, en
+   chiffres tabulaires. Sous le nom : « plein champ » ou « abri », et
+   « n sous le seuil » s'il y en a.
+3. **Les planches en points.** Chaque planche comptée dans le % du jardin
+   (cultivée ou engrais vert, état connu) est un point placé à son % du
+   plein maintenant, celui de son pli. Un point est orange quand la planche
+   est sous son seuil, sa dose conseillée affichée ; une planche en arrêt
+   avant récolte garde un point bleu, pour ne pas inviter à l'arroser. Les
+   planches sans culture et les planches inconnues ne sont pas des points ;
+   elles restent comptées dans la ligne du pli comme avant.
+4. **Le prévu de dimanche** : un trait vertical en pointillés au % prévu de
+   la fin de dimanche (dernier jour de `week` du jardin), quand il est
+   connu. Prévu et estimé ne se confondent jamais (D-006) : le trait est la
+   seule marque du prévu, nommée dans la légende (« jardin maintenant »,
+   « planche sous son seuil », « prévu dimanche »).
+5. **Inconnue.** Un jardin dont le % est inconnu montre une barre vide en
+   pointillés marquée « inconnue » et un tiret à la place du chiffre,
+   jamais zéro (D-003). Un jardin sans planche cultivée dit « aucune
+   planche cultivée », sans barre.
+6. **Repères** sous les barres : 0 %, sec 25, frais 50, humide 75, 100 %
+   (les crans du curseur, P40).
+7. **Toucher une barre** ouvre le pli du jardin en dessous et y fait
+   défiler la page.
+8. **Accessibilité.** Chaque barre est un bouton dont le nom, lu par un
+   lecteur d'écran, dit tout ce qu'elle dessine : « Jardin 2 : 47 % du plein
+   maintenant, 27 % prévu dimanche, 2 planches sous le seuil ». Le graphique
+   n'est jamais la seule source d'un chiffre : tout reste écrit dans les
+   plis.
+9. **Téléphone (390 px).** Le nom passe au-dessus de la barre, le chiffre
+   reste à droite ; rien ne déborde ; chaque barre fait au moins 44 px de
+   haut.
+10. **Charte.** Couleurs par les jetons de la charte (bleu eau `--water`,
+    son fond `--water-soft`, son encre `--water-ink`, attention `--warn`) ;
+    le chiffre dans la police des titres, au poids des tuiles de la
+    troisième passe (`finitions.css`, S1).
+
+**Précisions faites en codant** (14 novembre 2026, D-109), tranchées par la
+recommandation sur le mandat du porteur, aucune agronomique :
+
+- **F194 — une seule règle pour les points et le %.** La règle qui dit
+  quelles planches entrent dans le % du jardin vit en un seul endroit
+  (`countsInGardenPercent`, `signals.ts`) ; le graphique l'appelle, pour
+  qu'un point ne paraisse jamais pour une planche que le % ne compte pas.
+- **F195 — rien de dessiné sur une barre inconnue.** Ni point ni trait du
+  prévu, même si un jour prévu était connu : une barre vide ne porte pas de
+  chiffre. Son nom pour un lecteur d'écran : « Tunnel 1, abri : réserve
+  inconnue ».
+- **F196 — une barre inconnue se touche aussi.** Elle ouvre le pli du
+  jardin, où « Observer » attend (point 13 de l'audit, lot 3). La ligne
+  « aucune planche cultivée » n'est pas une barre et ne se touche pas.
+- **F197 — un jardin rangé dans un pli de jardins pareils** (point 13) :
+  toucher sa barre ouvre aussi le pli qui le range.
+- **F198 — au téléphone, les repères perdent leur mot** (« 25 », « 50 »,
+  « 75 » entre « 0 % » et « 100 % ») : à 390 px, « humide 75 » et
+  « 100 % » se chevauchaient.
+- **F199 — un % hors de 0 à 100 se place au bord** de la barre, son chiffre
+  écrit tel quel.
+- **F200 — la légende à chaque parcelle**, au-dessus de ses barres : chaque
+  graphique se lit seul, la page pouvant compter plusieurs parcelles.
+
+Preuves : `tests/soil-reserve-garden-bars.test.ts`, un test par règle
+d'affichage (barre connue, inconnue, abri, sous le seuil, arrêt avant
+récolte, sans planche cultivée, planches qui sont des points, prévu absent,
+place et repères) ; le parcours navigateur P33 sur ordinateur et à
+390 px ; la relecture du porteur sur la version déployée.
+
+Ne changent pas : D-003, D-006, D-047, D-053.

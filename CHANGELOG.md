@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (S2, le graphique des réserves du sol, variante B)
+
+- **La vue d'ensemble par jardin** en tête de chaque parcelle de la page
+  « Réserve du sol » (D-109, `docs/soil-reserve-contract.md`, « La vue
+  d'ensemble par jardin ») : une barre par jardin ou abri, remplie en bleu
+  eau au % du plein de maintenant, le chiffre à droite ; ses planches en
+  points, orange sous leur seuil, bleues en arrêt avant récolte ; le prévu
+  de dimanche en pointillé ; « inconnue » et un tiret, jamais zéro ;
+  « aucune planche cultivée » sans barre. Toucher une barre ouvre le pli du
+  jardin. Au téléphone, le nom au-dessus de la barre.
+- Aucun calcul nouveau, aucun chiffre qui ne soit déjà dans les plis.
+  Nouveaux : `lib/domain/soil-reserve/garden-bars.ts`, la feuille
+  `soil-bars.css`, le parcours P33.
+
 ### Corrigé (le parcours de démonstration V8, point ouvert 68)
 
 - Le parcours « Remettre à zéro » attend que la page réponde après son

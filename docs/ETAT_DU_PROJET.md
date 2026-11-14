@@ -174,7 +174,19 @@ registres, elle y renvoie.
   ouvert 67 (un test de la démonstration qui échouait entre minuit et 2 h
   à la ferme), corrigé et en ligne (#40, le 14 novembre 2026 à 3 h 59),
   et le point 68 (le parcours V8 qui cliquait avant que la page réponde),
-  corrigé par cette PR.
+  corrigé et en ligne (#41, le 14 novembre 2026 à 4 h 39, run 43551212504).
+  **S2, le graphique des réserves du sol, codé la même nuit** sur le même
+  mandat, en Opus 5.5 · Élevé (cette PR, D-109, précisions F194 à F200) :
+  en tête de chaque parcelle de « Réserve du sol », une barre par jardin
+  ou abri au % du plein de maintenant (`garden.percent`, le titre même du
+  pli, vérifié au lancement), les planches en points, orange sous leur
+  seuil, le prévu de dimanche en pointillé, « inconnue » et un tiret,
+  jamais zéro ; toucher une barre ouvre le pli. Aucun calcul nouveau,
+  aucune migration ; contrat versé dans `docs/soil-reserve-contract.md`,
+  neuf tests (`tests/soil-reserve-garden-bars.test.ts`), parcours P33.
+  Contrôles avant la PR : lint, typage, 1 456 tests, compilation, knip,
+  `push:check`, `weather:check` et les 90 parcours navigateur (local),
+  verts. Reste la relecture visuelle du porteur sur la version déployée.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -8064,7 +8076,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    celui du processus ; une PR `fix/` à part, sans toucher au code de la
    démonstration.
 68. ✅ **Ouvert le 14 novembre 2026 par le déploiement de #39 (style) ;
-   corrigé le jour même** dans sa PR `fix/` (cette PR), après celle de 67
+   corrigé le jour même** dans sa PR `fix/` (#41, en ligne le 14 novembre
+   2026 à 4 h 39, run 43551212504), après celle de 67
    (#40, en ligne le 14 novembre 2026 à 3 h 59, run 43548157719) : V8
    attend la page prête après son rechargement, comme V1, avant de
    cliquer. V8 joué six fois de suite en local (trois à chaque largeur),

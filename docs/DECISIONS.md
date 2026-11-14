@@ -3866,3 +3866,45 @@ numérotée « 24 quater » à son inscription (D-107) alors que ce numéro
 était déjà celui de la fusion des deux moteurs, devient « 24 quinquies ».
 
 Ne changent pas : D-060, D-067, D-068, D-107.
+
+## D-109 — Graphique des réserves du sol (S2, variante B) : une barre par jardin, les planches en points, aucun calcul nouveau
+
+Date : 8 novembre 2026 pour le choix du porteur ; 14 novembre 2026 pour le
+contrat et le code, sur son mandat d'autonomie de la nuit. Décideur : le
+porteur, sur une maquette ; les précisions, par la recommandation.
+
+Le porteur demande le 8 novembre 2026 « une représentation graphique des
+réserves du sol par bloc, un peu jolie », lue « par jardin ». Sur la
+maquette https://claude.ai/artifact/U6EPngGTvs7qpKfyJ8YfNj, il choisit le
+jour même la **variante B** : une barre par jardin ou abri, de 0 à 100 %
+du plein, remplie en bleu eau au % du plein de maintenant ; ses planches
+en points, orange sous leur seuil ; un trait pointillé pour le prévu de
+dimanche ; « inconnue » sans chiffre, jamais zéro. Chantier S2 de la
+section 5 sexies de la roadmap (D-107), en Opus 5.5 · Élevé, après le
+style (S1, D-108), dont il reprend les jetons et la police des chiffres.
+
+**Décision.** La section « La vue d'ensemble par jardin » de
+`docs/soil-reserve-contract.md` en fixe les dix points (place,
+barre, points, prévu, inconnue, repères, toucher, accessibilité,
+téléphone, charte). C'est un **affichage** : le module
+`lib/domain/soil-reserve/garden-bars.ts` range ce que la jauge a déjà
+calculé (`garden.percent`, `week`, le résumé de chaque planche), aucun
+chiffre n'est nouveau ni absent des plis, D-047 ne change pas. Vérifié au
+lancement : le % de la barre est `garden.percent`, la valeur même du titre
+du pli, et le prévu de dimanche le dernier jour de `week` du jardin, tous
+deux calculés par `soilGaugeView`.
+
+**Sept précisions**, consignées au contrat : F194 une seule règle pour
+les points et le % (`countsInGardenPercent`, sortie de
+`gardenSoilSummary` sans en changer le résultat) ; F195 rien de dessiné
+sur une barre inconnue ; F196 une barre inconnue se touche aussi, la
+ligne « aucune planche cultivée » non ; F197 un jardin rangé dans un pli
+de jardins pareils ouvre aussi ce pli ; F198 au téléphone, les repères
+perdent leur mot ; F199 un % hors de 0 à 100 se place au bord ; F200 la
+légende à chaque parcelle.
+
+**Non établi.** La lecture du graphique sur la ferme réelle du porteur et
+son jugement visuel, après déploiement.
+
+Ne changent pas : D-003, D-006, D-047, D-053, D-107, D-108.
+

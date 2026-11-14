@@ -6,6 +6,7 @@ import { soilGardenLines } from '@/lib/domain/soil-reserve/garden-lines';
 import { gaugeShortDayLabel, type SoilGaugePlot, type SoilGaugeView, type SoilGaugeZone } from '@/lib/domain/soil-reserve/gauge-view';
 import type { SoilObservation } from '@/lib/domain/soil-reserve/gauge';
 import { saveSoilObservationAction, type SoilReserveActionResult } from '../soil-reserve-actions';
+import { SoilBars } from './soil-bars';
 import { SoilBed } from './soil-bed';
 
 /**
@@ -68,9 +69,18 @@ function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone
     // Replier le pli referme aussi la lecture de ses jardins : il se replie vraiment.
     if (open) setOpenPlots(new Set([...openPlots].filter((plotId) => !plotIds.includes(plotId))));
   };
+  // Toucher une barre du graphique ouvre le pli du jardin, même rangé dans un pli de jardins, et y mène (S2, D-109).
+  const openGarden = (plotId: string) => {
+    const element = document.getElementById(soilGardenAnchor(plotId));
+    if (!(element instanceof HTMLDetailsElement)) return;
+    element.open = true;
+    onOpenChange(plotId, true);
+    requestAnimationFrame(() => element.scrollIntoView({ block: 'start' }));
+  };
   return (
     <section className="soil-zone" aria-label={`Réserve · ${zone.name}`}>
       <h4>Parcelle {zone.name}</h4>
+      <SoilBars zone={zone} onOpen={openGarden} />
       {zone.fieldPlotCount > 0 ? (
         <ObservationForm
           key={zone.observation?.recordedAt ?? 'aucune'}
