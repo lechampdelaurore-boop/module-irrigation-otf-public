@@ -274,6 +274,18 @@ registres, elle y renvoie.
   A et D attend sa confirmation, la séance sur la ferme réelle son
   « vas-y ». Le lot C, premier lot, peut partir. PR de registres seule,
   aucun contrôle rejoué.
+- Audit ergonomique final, **lot C · gestes sûrs** (24 octies) : **commencé
+  le 14 novembre 2026 au soir** en Opus 5.5 · Élevé, sur le mandat
+  d'autonomie de nuit du porteur. Contrat court
+  `docs/audit-ergonomie-final-lot-c-contract.md` (D-119, précisions F236 à
+  F242, parcours P35), causes établies dans le code avant toute
+  correction : des règles de bloc plus fortes repeignaient « Retirer la
+  mesure » et le « i » ; une transparence rendait pâles les boutons
+  indisponibles. **PR 1 sur 3, R6** : « Retirer la mesure » en contour
+  rouge, écarté de 24 px ; « Replier le jour » neutre, la validation du jour
+  24 px plus bas ; « Valider » seul en grand, « Ajuster » et « Refuser » côte
+  à côte (F236 à F238 ; P35, P10 étendu ; aucune migration, aucun calcul
+  changé). Ensuite A3 puis J10, chacun sa PR.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -369,7 +381,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
-  PR #51 (`8e0ba09`, la clôture de S3, la recette de la démonstration et
+  PR #52 (`716708b`, les six lots de l'audit final et les quatre
+  extensions closes, D-117 et D-118, registres seulement, fusionnée à
+  22 h 47 et déployée à 23 h 02, run 43644683613, les cinq jobs réussis,
+  aucune migration). Avant elle : la PR #51 (`8e0ba09`, la clôture de S3, la recette de la démonstration et
   l'inscription de l'audit final, registres seulement, fusionnée à 21 h 11,
   run 43641460873, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #50 (`21e9cc3`, le script des cas de test du moteur commun, première

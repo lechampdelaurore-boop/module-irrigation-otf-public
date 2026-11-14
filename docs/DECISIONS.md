@@ -4198,3 +4198,37 @@ laissaient ouverts, s'il y en a, restent consignés à leur place dans
 Aucune migration ; aucun code touché.
 
 Ne changent pas : D-041, D-045, D-047, D-058, D-117.
+
+## D-119 — Audit ergonomique final, lot C : les gestes sûrs, contrat et première PR (R6)
+
+Date : 14 novembre 2026, soir. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur (« pousse du code en autonomie toute la nuit
+si nécessaire »), aucune question agronomique ; chaque précision reste
+modifiable par lui. Après D-117 et D-118.
+
+**Établi dans le code avant toute correction.** « Retirer la mesure »
+portait la classe du bouton secondaire, mais la règle du formulaire en
+ligne, plus forte, le repeignait en vert plein comme « Enregistrer ». Au
+planning, « Replier le jour » et la validation du jour recevaient la même
+règle générale, à 12 px l'un de l'autre ; chaque proposition empilait trois
+boutons pleine largeur. Les boutons indisponibles sont rendus transparents
+(A3), et le « i » repeint par les règles de bloc (J10) : traités par les
+PR 2 et 3 du lot.
+
+**Décisions.**
+
+- Le lot C suit le contrat court
+  `docs/audit-ergonomie-final-lot-c-contract.md` : trois PR, une par point
+  (R6, A3, J10), une à la fois ; précisions F236 à F242 ; parcours P35.
+- R6 : « Retirer la mesure » en contour rouge sur fond blanc, écarté de
+  24 px d'« Enregistrer » (F236) ; « Replier le jour » neutre, la validation
+  du jour 24 px plus bas au téléphone (F237) ; « Valider » seul sur la
+  ligne, « Ajuster » et « Refuser » côte à côte en dessous, 44 px chacun
+  (F238). Une feuille de style dernière importée, `gestes-surs.css`, porte
+  les règles du lot.
+- Aucune fenêtre de confirmation ajoutée ni retirée ; aucun texte de bouton
+  changé ; « Tout vider » reste à sa place.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-006, D-076, D-117.

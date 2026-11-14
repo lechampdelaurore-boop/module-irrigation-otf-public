@@ -1,0 +1,75 @@
+/*
+  Audit ergonomique final, lot C : gestes sûrs
+  (docs/audit-ergonomie-final-lot-c-contract.md). Dernière feuille importée :
+  ses règles passent après celles des blocs qu'elles corrigent.
+*/
+
+/*
+  R6, F236 : « Retirer la mesure » efface une pluie saisie. La règle du
+  formulaire en ligne (.water-inline-form > button) le peignait en vert plein,
+  comme « Enregistrer » : contour rouge, et écarté du geste courant.
+*/
+.water-inline-form > button.rain-remove {
+  border-color: var(--danger);
+  background: var(--card);
+  color: var(--danger-ink);
+}
+
+@media (min-width: 601px) {
+  .water-inline-form > button.rain-remove {
+    margin-top: 0;
+    margin-left: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .water-inline-form > button.rain-remove {
+    margin-top: 24px;
+  }
+}
+
+/*
+  R6, F237 : « Replier le jour » est un geste de lecture, neutre ;
+  « Valider les n propositions du jour » se pose 24 px plus bas. Le pli
+  n'existe qu'au téléphone (planning-week.css).
+*/
+.planning-section .planning-day-toggle {
+  border-color: var(--line-strong);
+  background: var(--card);
+  color: var(--ink);
+}
+
+@media (max-width: 600px) {
+  .planning-section .planning-day-heading > .planning-day-validate {
+    margin-top: 12px;
+  }
+}
+
+/*
+  R6, F238 : « Valider » seul en grand ; « Ajuster » et « Refuser » côte à
+  côte en dessous, plus petits, chacun gardant sa cible de 44 px.
+*/
+.planning-proposal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.planning-section .planning-proposal-actions > button {
+  width: 100%;
+  min-width: 0;
+  font-size: .85rem;
+}
+
+.planning-section .planning-proposal-actions > button.primary {
+  grid-column: 1 / -1;
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* À l'ordinateur, les trois gestes gardent une largeur de main, pas celle de la carte. */
+@media (min-width: 601px) {
+  .planning-proposal-actions {
+    max-width: 32rem;
+  }
+}

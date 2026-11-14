@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit ergonomique final, lot C, gestes sûrs)
+
+- **R6, trois gestes où l'on pouvait se tromper** (D-119, F236 à F238) :
+  « Retirer la mesure » de la pluie mesurée est en contour rouge, écarté
+  d'« Enregistrer » ; au téléphone, « Replier le jour » est neutre et
+  « Valider les n propositions du jour » se pose plus bas ; chaque
+  proposition montre « Valider » seul en grand, « Ajuster » et « Refuser »
+  côte à côte en dessous. Contrat court
+  `docs/audit-ergonomie-final-lot-c-contract.md` ; parcours P35, P10 étendu.
+- Les six lots de l'audit final et les quatre extensions closes en ligne :
+  #52, déployée le 14 novembre 2026 à 23 h 02.
+
 ### Clos (S3, la vue satellite)
 
 - **La vue satellite est relue et validée par le porteur** le 14 novembre
