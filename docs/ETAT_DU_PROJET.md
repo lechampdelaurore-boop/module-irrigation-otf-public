@@ -172,7 +172,9 @@ registres, elle y renvoie.
   échoué en passant minuit à la ferme (run 43522400430). Reste la relecture
   visuelle du porteur dans son navigateur. Relevés en chemin : le point
   ouvert 67 (un test de la démonstration qui échouait entre minuit et 2 h
-  à la ferme), corrigé par la PR qui suit (cette PR), et le point 68.
+  à la ferme), corrigé et en ligne (#40, le 14 novembre 2026 à 3 h 59),
+  et le point 68 (le parcours V8 qui cliquait avant que la page réponde),
+  corrigé par cette PR.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -8061,8 +8063,15 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    de la ferme (`dateKeyInTimeZone(new Date(Date()))`) plutôt que dans
    celui du processus ; une PR `fix/` à part, sans toucher au code de la
    démonstration.
-68. 🟡 **Ouvert le 14 novembre 2026 par le déploiement de #39 (style) ;
-   non bloquant, à corriger dans sa PR `fix/` après celle de 67.** Sur
+68. ✅ **Ouvert le 14 novembre 2026 par le déploiement de #39 (style) ;
+   corrigé le jour même** dans sa PR `fix/` (cette PR), après celle de 67
+   (#40, en ligne le 14 novembre 2026 à 3 h 59, run 43548157719) : V8
+   attend la page prête après son rechargement, comme V1, avant de
+   cliquer. V8 joué six fois de suite en local (trois à chaque largeur),
+   sans échec ; la course elle-même ne se reproduit pas à la demande.
+   Contrôles : lint, typage, tests, compilation, knip, `push:check` et
+   `weather:check` ; les parcours de démonstration en local, les parcours
+   complets par la CI. Constat de départ : Sur
    `main` (run 43542965425), le parcours de démonstration V8 au téléphone
    a échoué : après `page.reload()`, il clique « Remettre à zéro » sans
    attendre que la page réponde (`main.app-shell[data-interactive="true"]`,
