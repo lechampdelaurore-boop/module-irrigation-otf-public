@@ -252,11 +252,28 @@ registres, elle y renvoie.
   1 508 tests, compilation, knip, `push:check`, `weather:check`, verts ;
   parcours navigateur non rejoués en local, sans rapport (ni interface ni
   service touchés), joués par la CI.
+- **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
+  22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
+  culture et par stade (5 quater), les alertes météo par culture (5
+  quinquies) et la refonte ergonomique (charte du module) ; **l'audit
+  ergonomique final et ses six lots sont maintenus**. Les points ouverts
+  qu'elles portaient restent consignés à leur place, la clôture ne les
+  ferme pas. Registres seulement.
 - Audit ergonomique final (ligne 24 septies de la roadmap, D-107) :
   **inscrit le 14 novembre 2026** sur le mot du porteur (21 h 52), après
   les finitions et le script des cas de test ; toutes les pages, sur
   plusieurs fermes, aux deux largeurs ; captures en Sonnet 5.5 · Moyen,
   analyse en Opus 5.5 · Élevé ; **captures lancées le soir même**.
+  **Analyse rendue la nuit du 14 novembre 2026** (`audit-ergonomie-final-2026-11-14.md`) :
+  **six lots de correction inscrits** (D-117), 24 octies (C, gestes sûrs),
+  24 nonies (A, le matin), 24 decies (B, pénurie lisible), 24 undecies (F,
+  démonstration), 24 duodecies (E, mots et chiffres), 24 terdecies (D,
+  pages allégées), chacun en Opus 5.5 · Élevé, un contrat avant le code,
+  une PR par point. Les six choix du rapport sont consignés sur l'option
+  recommandée, **à confirmer par le porteur au réveil** ; le code des lots
+  A et D attend sa confirmation, la séance sur la ferme réelle son
+  « vas-y ». Le lot C, premier lot, peut partir. PR de registres seule,
+  aucun contrôle rejoué.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -352,6 +369,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+  PR #51 (`8e0ba09`, la clôture de S3, la recette de la démonstration et
+  l'inscription de l'audit final, registres seulement, fusionnée à 21 h 11,
+  run 43641460873, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #50 (`21e9cc3`, le script des cas de test du moteur commun, première
   mesure, D-116, fusionnée à 21 h 22 et déployée à 21 h 37, run
   43637137167, les cinq jobs réussis, aucune migration). Avant elle : la

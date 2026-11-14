@@ -4132,3 +4132,69 @@ existant modifié ; un test nouveau, `tests/shared-engine-cases.test.ts`,
 mesure.
 
 Ne changent pas : D-003, D-047, D-060, D-097, D-114.
+
+## D-117 — Audit ergonomique final : six lots de correction inscrits, choix consignés sur l'option recommandée
+
+Date : 14 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur du 14 novembre 2026 (« pousse du code en autonomie
+toute la nuit si nécessaire »), aucune question agronomique. Après D-107 et
+D-116. Rapport : `audit-ergonomie-final-2026-11-14.md` (analyse en Opus
+5.5 · Élevé, sans code ni PR, sur `main` à `21e9cc3`).
+
+**Établi.** L'analyse est rendue : 232 prises, douze des quatorze points du
+premier audit tiennent, six constats gênants (R1 à R6) et seize à
+améliorer. Elle propose six lots de correction ; les six choix de sa
+section 7 sont réservés au porteur.
+
+**Décisions** (toutes à titre provisoire, **à confirmer par le porteur au
+réveil ; il peut y revenir**) :
+
+- Les six lots sont inscrits dans l'ordre du rapport, sous les lignes 24
+  octies (C, gestes sûrs), 24 nonies (A, le matin), 24 decies (B, pénurie
+  lisible), 24 undecies (F, démonstration), 24 duodecies (E, mots et
+  chiffres), 24 terdecies (D, pages allégées), chacun en **Opus 5.5 ·
+  Élevé** (affichage sans calcul nouveau). Un contrat avant le code, une PR
+  par point, un seul chantier de code à la fois.
+- Choix n° 1 à 4 : l'option recommandée (les six lots dans cet ordre ;
+  « Aujourd'hui » annonce demain et le manque d'eau ; réglages repliés en
+  bas de chaque page ; démonstration complétée). Choix n° 5 : mode sombre
+  **non prévu pour l'instant**.
+- **Choix n° 6 non retenu par défaut** : la séance de lecture dans le
+  Chrome du porteur sur sa ferme réelle attend son « vas-y » exprès
+  (consigne du projet : tout ce qui touche la ferme réelle).
+- Le choix n° 2 change le contrat de la page « Aujourd'hui » validé le
+  8 novembre 2026 (`docs/aujourdhui-tableau-de-bord-contract.md`, § 3.5) et
+  le n° 3 l'organisation de pages validées : **le code des lots A et D
+  attend la confirmation du porteur** ; leurs contrats peuvent s'écrire.
+- Les autres points du rapport suivent l'option recommandée : volumes en m³
+  à deux décimales, en litres sous 1 m³, millimètres à une décimale ; codes
+  R retirés des libellés visibles ; nom de la culture sur la frise ; mots
+  harmonisés.
+- Si la cause de R2 (l'objectif qui diffère d'une page à l'autre) ou de J4
+  (le bon premier geste sur la réserve du sol, D-041, D-047) est dans un
+  calcul ou un contrat d'agronomie, le lot s'arrête et le porteur en est
+  prévenu avant de coder.
+
+Aucune migration ; aucun fichier de `app/`, `lib/`, `db/` ni aucun test
+modifié.
+
+Ne changent pas : D-003, D-041, D-047, D-107, D-116.
+
+## D-118 — Quatre extensions closes sur le mot du porteur, le second audit ergonomique maintenu
+
+Date : 14 novembre 2026, 22 h 30. Décideur : le porteur, en toutes lettres :
+« la réserve du sol, le besoin en eau par culture, les alertes météo par
+culture et la refonte ergonomique. on peut marquer clos, mais on maintient
+le second audit ergonomique ». Après D-117.
+
+**Décision.** Sont marquées **closes** (✅) dans la roadmap : la réserve du
+sol (5 ter), le besoin en eau par culture et par stade (5 quater), les
+alertes météo par culture (5 quinquies) et la refonte ergonomique (charte du
+module). **Maintenus** : l'audit ergonomique final (24 septies) et ses six
+lots de correction (24 octies à 24 terdecies, D-117). Les points qu'elles
+laissaient ouverts, s'il y en a, restent consignés à leur place dans
+`docs/ETAT_DU_PROJET.md` ; la clôture ne les ferme pas.
+
+Aucune migration ; aucun code touché.
+
+Ne changent pas : D-041, D-045, D-047, D-058, D-117.

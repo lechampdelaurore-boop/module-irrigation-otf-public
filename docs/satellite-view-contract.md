@@ -407,6 +407,20 @@ tolérante la range telle quelle, ce que l'assistant a vérifié en passant une
 copie **décalée** des contours (même forme, autre lieu) à
 `readOtfOutline` ; rien de la position n'est consigné. F201 ne change pas.
 
+**Confirmé par OTF** (réponse sur Discord, salon « API », transmise par le
+porteur le 14 novembre 2026) : `coordinates` est la liste des points
+`[longitude, latitude]` du contour tracé sur la vue satellite d'OTF, `null`
+si rien n'est tracé ; les parcelles (`/zoneList`, `/zone/{id}`) le donnent
+de la même façon que les jardins (`/plotList?season=…`, filtre facultatif
+`zone=`, et `/plot/{id}`). C'est ce que lit le module, par `/zoneList` et
+`/plotList` de la saison, sans route de plus. La portée
+`production.parcel:read` suffit pour ces routes, plus fine que
+`production:read` ; le module garde `production:read`, qu'il lui faut aussi
+pour les planches et le plan de culture. À revoir en Tranche 4 (formulaire
+OAuth d'OTF) : demander la portée la plus fine qui couvre tout ce que le
+module lit, après avoir vérifié si `production.parcel:read` couvre
+`/bedList`.
+
 ### Condition B, une vraie tuile IGN : **levée**
 
 Lue dans le même Chrome, sans clé ni compte :
