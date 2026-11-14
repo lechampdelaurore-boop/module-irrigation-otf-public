@@ -203,9 +203,9 @@ registres, elle y renvoie.
   tolérante et gardés dans l'instantané (champ `outline` optionnel, aucune
   requête de plus), cadrage, « en France », fonds IGN et « Dessin », style
   de la carte, liste des jardins, dessin de secours en SVG. Contrôles avant
-  la PR : voir sa description (lint, typage, tests, compilation, knip,
-  `push:check`, `weather:check` ; parcours navigateur sans rapport, aucune
-  interface ni service touché, rejoués par la CI). **Non vérifié, conditions
+  la PR : lint, typage, 1 499 tests (43 nouveaux), compilation, knip,
+  `push:check`, `weather:check` et les 90 parcours navigateur (local),
+  verts. **Non vérifié, conditions
   de la PR 2** : la forme réelle de `coordinates` (A, jeton de « Ferme v2 »
   posé par le porteur) et une vraie tuile IGN (B, dans son Chrome).
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
