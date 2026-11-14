@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (fusion des moteurs, étape 1 : le script des cas de test)
+
+- **Le script des cas de test du moteur commun** (D-116,
+  `docs/shared-engine-cases-contract.md`, `scripts/shared-engine-cases.ts`) :
+  il fait calculer par le code du module les dix cas O01 à O10 du dépôt
+  commun et huit cas limites du contrat de fusion, et compare aux valeurs
+  écrites à la main. Première mesure : 17 cas conformes, un écart (O07 : le
+  drainage du jour de remplissage vaut 0,7 mm dans le code, « inconnu » dans
+  le cas, qui se trompe), deux valeurs non jouées (la variante de Tlaloc).
+  Rien du module ni de ses tests ne change ; la correction du contrat commun
+  attend l'accord du porteur.
+- Le correctif de la vue satellite en ligne : #49, déployée le 14 novembre
+  2026 à 20 h 54 ; l'inscription du script en ligne : #48, déployée à
+  20 h 13.
+
 ### Corrigé (S3, la vue satellite, après la relecture du porteur)
 
 - **La démonstration montre la vue satellite** (D-115, F232 à F234) : les
