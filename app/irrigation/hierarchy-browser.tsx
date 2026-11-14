@@ -22,6 +22,8 @@ import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import { GardenGroupManager } from './garden-group-manager';
 import { BedCropWaterPanel } from './crop-water/bed-crop-water-panel';
 import { IrrigationShell, type ShellProps } from './shell/irrigation-shell';
+import { PlanViewTabs, type PlanView } from './hierarchy/plan-view-tabs';
+import { SatelliteViewTab } from './hierarchy/satellite/satellite-view-tab';
 
 type Props = {
   shell: ShellProps;
@@ -58,6 +60,8 @@ export function HierarchyBrowser({
   const season = selectedSeason;
   const [zoneId, setZoneId] = useState<string | null>(shell.zone);
   const [bedId, setBedId] = useState<string | null>(null);
+  // Un seul onglet du bloc de la parcelle à la fois ; la vue satellite ne se charge qu'à son ouverture (F204).
+  const [planView, setPlanView] = useState<PlanView>('plan');
   const equipmentInventoryRef = useRef<EquipmentInventoryHandle>(null);
 
   const zones = snapshot.zones.filter((zone) => zone.seasons.includes(season));
@@ -163,6 +167,9 @@ export function HierarchyBrowser({
       )
     : currentEquipmentPlacements;
 
+  // Poser un matériel se fait sur le plan : la vue satellite lui cède la place le temps de la pose.
+  const shownPlanView: PlanView = placementEditor ? 'plan' : planView;
+
   const chooseZone = (value: string) => {
     setZoneId(value);
     setBedId(null);
@@ -250,8 +257,13 @@ export function HierarchyBrowser({
               <span>{plots.length} jardin{plots.length > 1 ? 's' : ''} ou abri{plots.length > 1 ? 's' : ''}</span>
               <span>{beds.length} planche{beds.length > 1 ? 's' : ''}</span>
             </header>
-            {plots.length > 0 ? (
-              <div className="plot-grid">
+            <PlanViewTabs view={shownPlanView} onChange={setPlanView} />
+            {shownPlanView === 'satellite' ? (
+              <div id="plan-view-panel" role="tabpanel" aria-labelledby="plan-view-tab-satellite">
+                <SatelliteViewTab zone={selectedZone} plots={snapshot.plots} season={season} />
+              </div>
+            ) : plots.length > 0 ? (
+              <div id="plan-view-panel" role="tabpanel" aria-labelledby="plan-view-tab-plan" className="plot-grid">
                 {plots.map((plot) => {
                   const plotBeds = sortBedsByName(
                     beds.filter((bed) => bed.plotId === plot.id),
@@ -285,7 +297,7 @@ export function HierarchyBrowser({
                 })}
               </div>
             ) : (
-              <p className="plan-empty-state">
+              <p id="plan-view-panel" role="tabpanel" aria-labelledby="plan-view-tab-plan" className="plan-empty-state">
                 Aucun jardin ou abri n’est rattaché à cette parcelle.
               </p>
             )}
