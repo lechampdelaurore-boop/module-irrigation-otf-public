@@ -13,6 +13,12 @@ source détaillée commit par commit.
 - Le script des cas de test du moteur commun en ligne : #50, déployée le
   14 novembre 2026 à 21 h 37.
 
+### Inscrit (l'audit ergonomique final)
+
+- **L'audit ergonomique final a sa ligne** (24 septies) : après les
+  finitions et le script des cas de test, toutes les pages du module ;
+  captures en Sonnet 5.5 · Moyen, analyse en Opus 5.5 · Élevé.
+
 ### Vérifié (4.0, la démonstration en ligne)
 
 - **Recette réelle de la démonstration conforme** le 14 novembre 2026 :

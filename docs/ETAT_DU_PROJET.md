@@ -252,6 +252,11 @@ registres, elle y renvoie.
   1 508 tests, compilation, knip, `push:check`, `weather:check`, verts ;
   parcours navigateur non rejoués en local, sans rapport (ni interface ni
   service touchés), joués par la CI.
+- Audit ergonomique final (ligne 24 septies de la roadmap, D-107) :
+  **inscrit le 14 novembre 2026** sur le mot du porteur (21 h 52), après
+  les finitions et le script des cas de test ; toutes les pages, sur
+  plusieurs fermes, aux deux largeurs ; captures en Sonnet 5.5 · Moyen,
+  analyse en Opus 5.5 · Élevé ; **captures lancées le soir même**.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
