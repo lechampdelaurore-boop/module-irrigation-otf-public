@@ -73,3 +73,33 @@
     max-width: 32rem;
   }
 }
+
+/*
+  A3, F239 : un bouton indisponible se lit. Les blocs le rendaient
+  transparent (opacité de 0,25 à 0,8, une vingtaine de règles) : blanc sur
+  vert pâle, 2,4 pour 1. Une seule règle pour tout le module, sans
+  transparence : gris foncé sur gris clair (5,5 pour 1). Elle passe au-dessus
+  des règles de bloc, qui peignent chacune leurs boutons : c'est la seule
+  façon de la tenir en un endroit. Le curseur de chaque bloc est gardé.
+*/
+button:disabled {
+  border-color: var(--line-strong) !important;
+  background: var(--line-soft) !important;
+  color: var(--ink2) !important;
+  opacity: 1 !important;
+}
+
+/* A3, F240 : « Répartition validée » est un état, dit par une pastille à la place du bouton. */
+.arbitration-validated {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target);
+  padding: 0 1.1rem;
+  border: 1px solid var(--ok);
+  border-radius: var(--radius-button);
+  background: var(--ok-soft);
+  color: var(--ok-ink);
+  font-size: .95rem;
+  font-weight: 600;
+}

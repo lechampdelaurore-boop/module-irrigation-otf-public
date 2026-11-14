@@ -113,7 +113,10 @@ export function ArbitrationPlan({ feasibility, level, crops, pending, onSave }: 
       </div>
       <div className="arbitration-actions">
         <button type="button" className="arbitration-secondary" disabled={pending || sameBedIds(selection, level.candidates)} onClick={() => setSelection([...level.candidates])}>Revenir à la proposition</button>
-        <button type="button" disabled={pending || unchanged} onClick={() => void onSave(selection)}>{pending ? 'Enregistrement…' : unchanged ? 'Répartition validée' : 'Valider la répartition'}</button>
+        {/* Une répartition validée est un état, pas un bouton grisé (audit final, lot C, A3, F240). */}
+        {unchanged && !pending
+          ? <span className="arbitration-validated">✓ Répartition validée</span>
+          : <button type="button" disabled={pending} onClick={() => void onSave(selection)}>{pending ? 'Enregistrement…' : 'Valider la répartition'}</button>}
       </div>
     </footer>
   </section>;

@@ -54,7 +54,10 @@ export async function ciblesTropPetites(page: Page, minimum = 44, racine = 'main
   }, { min: minimum, racine });
 }
 
-/** Les textes visibles dont le contraste est sous 4,5:1 (3:1 pour un grand texte), fond calculé par superposition. */
+/**
+ * Les textes visibles dont le contraste est sous 4,5:1 (3:1 pour un grand texte), fond calculé par superposition,
+ * boutons indisponibles compris et transparence de chaque élément appliquée à son fond comme à son texte.
+ */
 export async function textesPeuContrastes(page: Page, racine = 'main'): Promise<TexteMesure[]> {
   return page.evaluate((racine) => {
     type Rgba = [number, number, number, number];
@@ -74,21 +77,24 @@ export async function textesPeuContrastes(page: Page, racine = 'main'): Promise<
       return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
     };
     const luminance = (c: Rgba) => 0.2126 * lineaire(c[0]) + 0.7152 * lineaire(c[1]) + 0.0722 * lineaire(c[2]);
+    const opacite = (element: Element) => {
+      let produit = 1;
+      for (let courant: Element | null = element; courant; courant = courant.parentElement) produit *= Number(getComputedStyle(courant).opacity);
+      return produit;
+    };
+    // Chaque fond compte avec la transparence de tout son élément (audit final, lot C, A3, F241) :
+    // un bouton transparent laisse voir ce qui est dessous, son fond comme son texte.
     const fondDe = (element: Element): Rgba => {
       const couches: Rgba[] = [];
       for (let courant: Element | null = element; courant; courant = courant.parentElement) {
         const fond = lire(getComputedStyle(courant).backgroundColor);
         if (fond && fond[3] > 0) {
-          couches.push(fond);
-          if (fond[3] >= 1) break;
+          const alpha = fond[3] * opacite(courant);
+          couches.push([fond[0], fond[1], fond[2], alpha]);
+          if (alpha >= 1) break;
         }
       }
       return couches.reduceRight<Rgba>((dessous, dessus) => sur(dessus, dessous), [255, 255, 255, 1]);
-    };
-    const opacite = (element: Element) => {
-      let produit = 1;
-      for (let courant: Element | null = element; courant; courant = courant.parentElement) produit *= Number(getComputedStyle(courant).opacity);
-      return produit;
     };
     const hex = (c: Rgba) => `#${c.slice(0, 3).map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
     const mesures: { texte: string; ratio: number; couleur: string; fond: string; taille: number }[] = [];
@@ -100,7 +106,8 @@ export async function textesPeuContrastes(page: Page, racine = 'main'): Promise<
       if (!texte || !element || vus.has(element)) continue;
       vus.add(element);
       if (!element.checkVisibility?.({ checkOpacity: true, checkVisibilityCSS: true })) continue;
-      if (element.closest('svg, [aria-hidden="true"], :disabled, [aria-disabled="true"], .skip-link')) continue;
+      // Un bouton indisponible se mesure aussi : il doit se lire, même grisé (audit final, lot C, A3, F241).
+      if (element.closest('svg, [aria-hidden="true"], .skip-link')) continue;
       const style = getComputedStyle(element);
       const couleur = lire(style.color);
       if (!couleur) continue;

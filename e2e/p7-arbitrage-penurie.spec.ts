@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { textesPeuContrastes } from './support/accessibilite.ts';
 import { attendreLaPageIrrigation, epinglerLaBulle, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 
 /**
@@ -111,6 +112,16 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   await expect(caseDe('N01')).toBeChecked();
   await expect(caseDe('N02')).not.toBeChecked();
   await expect(servies).toHaveText(`${total - 2} sur ${total}`);
+  // Audit final, lot C, A3 (F240) : la répartition validée est un état, dite par une pastille, jamais un bouton grisé ;
+  // le pied de l'écran se lit (F239, F241), et une case changée fait revenir « Valider la répartition ».
+  await expect(arbitrage.locator('.arbitration-validated')).toHaveText('✓ Répartition validée');
+  await expect(arbitrage.getByRole('button', { name: /Répartition validée/ })).toHaveCount(0);
+  expect(await textesPeuContrastes(page, '.arbitration-footer'), 'le pied de l’écran d’arbitrage se lit').toEqual([]);
+  await caseDe('N02').check();
+  await expect(arbitrage.getByRole('button', { name: 'Valider la répartition' })).toBeVisible();
+  await expect(arbitrage.locator('.arbitration-validated')).toHaveCount(0);
+  await caseDe('N02').uncheck();
+  await expect(arbitrage.locator('.arbitration-validated')).toBeVisible();
   await verifierLEtape(page, journal, 'répartition validée');
 
   // Remise en état : les parcours partagent une base, des besoins de 500 mm
