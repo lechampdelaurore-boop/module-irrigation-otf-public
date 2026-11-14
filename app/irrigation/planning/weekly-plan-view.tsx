@@ -360,7 +360,7 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
           ) : null}
         </div>
         {proposed.length > 0 ? (
-          <button type="button" disabled={pending} aria-label={`Valider les ${proposed.length} proposition${proposed.length > 1 ? 's' : ''} du jour`} onClick={() => onValidateDay(proposed)}>
+          <button type="button" className="planning-day-validate" disabled={pending} aria-label={`Valider les ${proposed.length} proposition${proposed.length > 1 ? 's' : ''} du jour`} onClick={() => onValidateDay(proposed)}>
             <span className="planning-label-long">Valider les {proposed.length} proposition{proposed.length > 1 ? 's' : ''} du jour</span>
             <span className="planning-label-short">Tout valider ({proposed.length})</span>
           </button>

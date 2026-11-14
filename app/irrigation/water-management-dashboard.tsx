@@ -396,7 +396,7 @@ export function WaterManagementDashboard({
             <label><span>Date</span><input type="date" max={today} value={rainDate} onChange={(event) => chooseRainDate(event.target.value)} /></label>
             <label><span>Millimètres</span><input inputMode="decimal" value={rainAmount} onChange={(event) => setRainAmount(event.target.value)} /></label>
             <button type="button" disabled={pending} onClick={() => startTransition(async () => receiveRain(await saveManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate, precipitationMm: numeric(rainAmount) }), rainDate))}>Enregistrer</button>
-            <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receiveRain(await removeManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate }), rainDate))}>Retirer la mesure</button>
+            <button type="button" className="secondary-button rain-remove" disabled={pending} onClick={() => startTransition(async () => receiveRain(await removeManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate }), rainDate))}>Retirer la mesure</button>
           </div>
         </article>
 

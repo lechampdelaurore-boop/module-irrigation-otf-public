@@ -33,6 +33,43 @@ import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrer
  * les siennes.
  */
 
+/** Écart minimal entre deux gestes voisins qui ne font pas la même chose (audit final, lot C, R6, F236 et F237). */
+const ECART_DES_GESTES_PX = 24;
+
+/**
+ * Audit final, lot C, R6 (F238) : « Valider » seul sur toute la ligne,
+ * « Ajuster » et « Refuser » côte à côte en dessous, chacun à 44 px.
+ */
+async function verifierLesGestesDeLaCarte(carte: Locator): Promise<void> {
+  const [valider, ajuster, refuser] = await Promise.all([
+    carte.getByRole('button', { name: 'Valider', exact: true }).boundingBox(),
+    carte.getByRole('button', { name: 'Ajuster' }).boundingBox(),
+    carte.getByRole('button', { name: 'Refuser' }).boundingBox(),
+  ]);
+  expect(valider && ajuster && refuser, 'les trois gestes de la carte ont une boîte').toBeTruthy();
+  expect(Math.round(ajuster!.y), '« Ajuster » et « Refuser » sur une même ligne').toBe(Math.round(refuser!.y));
+  expect(ajuster!.x, '« Ajuster » à gauche de « Refuser »').toBeLessThan(refuser!.x);
+  expect(Math.round(ajuster!.y), '« Ajuster » et « Refuser » sous « Valider »').toBeGreaterThanOrEqual(Math.round(valider!.y + valider!.height));
+  expect(Math.round(valider!.width), '« Valider » prend la largeur des deux autres').toBeGreaterThanOrEqual(Math.round(refuser!.x + refuser!.width - ajuster!.x));
+  expect(Math.round(ajuster!.height)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(refuser!.height)).toBeGreaterThanOrEqual(44);
+}
+
+/**
+ * Audit final, lot C, R6 (F237), au téléphone : « Replier le jour » (ou
+ * « Voir les créneaux ») est neutre, sur fond blanc ; la validation du jour,
+ * en vert, se tient à 24 px au moins en dessous.
+ */
+async function verifierLeJourEcarte(jour: Locator): Promise<void> {
+  const pli = jour.locator('.planning-day-toggle');
+  const toutValider = jour.getByRole('button', { name: /^Valider les \d+ propositions? du jour$/ });
+  await expect(pli).toBeVisible();
+  await expect(pli).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(toutValider).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  const [haut, bas] = await Promise.all([pli.boundingBox(), toutValider.boundingBox()]);
+  expect(Math.round(bas!.y - (haut!.y + haut!.height)), 'la validation du jour écartée du pli').toBeGreaterThanOrEqual(ECART_DES_GESTES_PX);
+}
+
 /** Objectif de ferme assez grand pour qu'une dose entière tienne même le dernier jour de la semaine. */
 const OBJECTIF_MM = '70';
 const PLAGE_OUVERTE = { debut: '00:00', fin: '23:59' };
@@ -119,6 +156,8 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
 
   // Ajuster puis valider : 6 mm à 10 mm/h font 36 minutes, la fin suit.
   await verifierCibleTactile(premiere.getByRole('button', { name: 'Valider', exact: true }), 'le bouton « Valider »');
+  await verifierLesGestesDeLaCarte(premiere);
+  await verifierLEtape(page, journal, '« Valider » seul en grand, « Ajuster » et « Refuser » côte à côte');
   await premiere.getByRole('button', { name: 'Ajuster' }).click();
   const ajustement = premiere.getByRole('form', { name: /^Ajuster la proposition/ });
   await ajustement.getByLabel('Dose de référence (mm)').fill('6');
@@ -140,6 +179,7 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
     // un sélecteur par statut glisserait vers la proposition suivante.
     const deuxieme = await carteNommee(planning, proposees().first());
     const jour = planning.locator('li.planning-day').filter({ has: proposeesDe(page) }).first();
+    if (testInfo.project.name === 'telephone') await verifierLeJourEcarte(jour);
     await jour.getByRole('button', { name: /^Valider les \d+ propositions? du jour$/ }).click();
     await expect(deuxieme.locator('.planning-status')).toHaveText('Validée', { timeout: 30_000 });
     validees += 1;
