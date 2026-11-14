@@ -362,6 +362,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+  PR #51 (`8e0ba09`, la clôture de S3, la recette de la démonstration et
+  l'inscription de l'audit final, registres seulement, fusionnée à 21 h 11,
+  run 43641460873, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #50 (`21e9cc3`, le script des cas de test du moteur commun, première
   mesure, D-116, fusionnée à 21 h 22 et déployée à 21 h 37, run
   43637137167, les cinq jobs réussis, aucune migration). Avant elle : la
