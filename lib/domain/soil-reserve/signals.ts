@@ -178,6 +178,15 @@ export type GardenSoilSummary = {
   withoutCrop: { bedId: string; bedName: string; surfaceState: SurfaceState; declared: boolean }[];
 };
 
+/**
+ * Une planche entre-t-elle dans le % du plein de son jardin ? Cultivée, ou
+ * en engrais vert ; une planche nue, bâchée, paillée ou enherbée reste à
+ * part. Le graphique des réserves place ses points sur la même règle.
+ */
+export function countsInGardenPercent(mode: SoilReserveDay['mode'], surfaceState: SurfaceState | null): boolean {
+  return mode === 'crop' || (mode === 'cover' && surfaceState !== 'grass');
+}
+
 /** Le jardin : les mm ne s'additionnent pas entre surfaces, ils se pondèrent par la surface des planches. */
 export function gardenSoilSummary(beds: readonly GardenBed[]): GardenSoilSummary {
   let water = 0;
@@ -187,8 +196,7 @@ export function gardenSoilSummary(beds: readonly GardenBed[]): GardenSoilSummary
   let lowest: GardenSoilSummary['lowest'] = null;
   const withoutCrop: GardenSoilSummary['withoutCrop'] = [];
   for (const bed of beds) {
-    const greenManure = bed.mode === 'cover' && bed.surfaceState !== 'grass';
-    if (bed.mode !== 'crop' && !greenManure) {
+    if (!countsInGardenPercent(bed.mode, bed.surfaceState)) {
       if (bed.surfaceState !== null) withoutCrop.push({ bedId: bed.bedId, bedName: bed.bedName, surfaceState: bed.surfaceState, declared: bed.surfaceStateDeclared });
       else unknownBeds += 1;
       continue;
