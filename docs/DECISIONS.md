@@ -3765,6 +3765,19 @@ démonstration compilée sur sa configuration et vérifiée à blanc par
 Wrangler : sa base, ses cinq réglages, sa tâche de nuit, ni liaison ni
 secret).
 
+**En ligne** : #37 du dépôt public fusionnée le 13 novembre 2026 à 23 h 12
+(`4942d8f`) et déployée à 23 h 28 (run 43517326592, les cinq jobs
+réussis ; aucune migration en production, Workers inchangés). Le job
+« Déploiement de la démonstration » a créé le Worker
+`module-irrigation-otf-demo`, appliqué les 31 migrations à sa base vide et
+enregistré la tâche de nuit (2 h 17 UTC) : le jeton de la CI avait les
+droits. Le 14 novembre 2026 à 17 h 30, dans le navigateur du porteur,
+l'application Access de la démonstration a été créée depuis l'onglet
+« Access » du Worker (tout le trafic, la politique « Porteur du projet »
+réutilisée sans la modifier) ; son AUD est posé dans `wrangler.demo.jsonc`
+par la PR suivante. Restent les invitations de Nicolas et de Vincent et la
+recette réelle.
+
 ## D-107 — Style, graphique des réserves et vue satellite inscrits à la roadmap : après le tag v0.2.0, dans cet ordre, un chantier de code à la fois
 
 Date : 13 novembre 2026. Documents seuls, aucun code. Numéro : le premier

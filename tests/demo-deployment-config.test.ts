@@ -47,13 +47,15 @@ test('la démonstration est un autre Worker, sur une autre base, au même code e
   assert.match(base.database_id, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 });
 
-test('ni liaison au Worker de notification, ni source réelle, ni réglage de notification ; une seule adresse', () => {
+test('ni liaison au Worker de notification, ni source réelle, ni réglage de notification ; une seule adresse et sa propre application Access', () => {
   assert.equal(demo.services, undefined);
   assert.equal(demo.vars.DEMO_MODE, 'true');
   assert.equal(demo.vars.OTF_DATA_SOURCE, 'mock');
   assert.equal(demo.vars.WEATHER_DATA_SOURCE, 'mock');
   assert.deepEqual(Object.keys(demo.vars).filter((name) => /PUSH|OTF_API|TOKEN|KEY|SECRET|LOCAL_DEMO/.test(name)), []);
   assert.equal(demo.vars.ACCESS_TEAM_DOMAIN, production.vars.ACCESS_TEAM_DOMAIN);
+  assert.match(demo.vars.ACCESS_AUD, /^[0-9a-f]{64}$/);
+  assert.notEqual(demo.vars.ACCESS_AUD, production.vars.ACCESS_AUD);
   assert.equal(demo.workers_dev, true);
   assert.equal(demo.preview_urls, false);
 });

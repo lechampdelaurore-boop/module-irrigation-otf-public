@@ -97,6 +97,10 @@ source détaillée commit par commit.
   déployés après la production, jamais à sa place. L'accès passe par
   Cloudflare Access ; tant que son application n'est pas créée, rien n'est
   joignable. Aucune migration.
+- **L'application Access de la démonstration** (D-106, 14 novembre 2026) :
+  créée dans le navigateur du porteur, son AUD posé dans
+  `wrangler.demo.jsonc` ; un test vérifie qu'il n'est ni vide ni celui de
+  la production.
 
 ### Ajouté (4.0, D3 : la visite guidée)
 
