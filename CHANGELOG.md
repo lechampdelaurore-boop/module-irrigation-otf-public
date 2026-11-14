@@ -5,6 +5,24 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (S3, la vue satellite, PR 1 : le domaine, sans interface)
+
+- **Les contours d'Ouvre ta ferme gardés dans l'instantané** (D-111,
+  `docs/satellite-view-contract.md`, section 11) : `coordinates` des
+  parcelles et des jardins, déjà reçu et jusqu'ici jeté, est lu de façon
+  tolérante (`lib/domain/otf/outline.ts`) et rangé dans un champ `outline`
+  optionnel ; un contour illisible ou absent ne fait jamais rejeter
+  l'instantané, un ancien cache sans contour reste valide. Aucune migration,
+  aucune requête de plus à OTF.
+- Le domaine de la vue satellite, sans interface
+  (`lib/domain/satellite-view/`) : cadrage, décision « en France », fonds
+  IGN et « Dessin », style de la carte, liste des jardins, dessin de secours
+  en SVG. Rien ne s'affiche encore : l'onglet vient en PR 2, après les
+  conditions A et B.
+- Condition C levée : les orthophotos de l'IGN sont réutilisables par un
+  service multi-fermes (Licence Ouverte 2.0), crédit « © IGN ».
+- Le contrat de S3 en ligne : #43, déployée le 14 novembre 2026 à 5 h 53.
+
 ### Ajouté (S3, le contrat de la vue satellite, sans code)
 
 - `docs/satellite-view-contract.md` (D-110, précisions F201 à F213) : l'onglet

@@ -1,4 +1,5 @@
 import type { IrrigationSnapshot } from './domain.ts';
+import { isOutlineShape } from './otf/outline.ts';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -10,13 +11,26 @@ function hasStringId(
   return isRecord(value) && typeof value.id === 'string' && value.id.length > 0;
 }
 
+/**
+ * Le contour d'une parcelle ou d'un jardin (S3, F202) : absent d'un cache
+ * antérieur à la vue satellite, ou d'un élément qu'OTF ne dessine pas, ce qui
+ * reste un instantané valide ; présent, il a la forme que la lecture range.
+ */
+function hasValidOutline(value: Record<string, unknown>): boolean {
+  return value.outline === undefined || isOutlineShape(value.outline);
+}
+
 function hasValidZone(value: unknown): boolean {
   if (!hasStringId(value) || !isRecord(value)) return false;
-  return value.area === null || (
+  return hasValidOutline(value) && (value.area === null || (
     typeof value.area === 'number' &&
     Number.isFinite(value.area) &&
     value.area >= 0
-  );
+  ));
+}
+
+function hasValidPlot(value: unknown): boolean {
+  return hasStringId(value) && hasValidOutline(value);
 }
 
 /**
@@ -57,7 +71,7 @@ export function isIrrigationSnapshot(value: unknown): value is IrrigationSnapsho
     Array.isArray(value.zones) &&
     value.zones.every(hasValidZone) &&
     Array.isArray(value.plots) &&
-    value.plots.every(hasStringId) &&
+    value.plots.every(hasValidPlot) &&
     Array.isArray(value.beds) &&
     value.beds.every(hasStringId) &&
     (source === 'mock' || source === 'live' || source === 'cache') &&

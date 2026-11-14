@@ -189,14 +189,25 @@ registres, elle y renvoie.
   verts. **S2 en ligne** (#42, `72e6df6`, déployée le 14 novembre 2026 à
   5 h 12, run 43554060404). Reste la relecture visuelle du porteur sur la
   version déployée.
-  **S3, la vue satellite : contrat écrit** le 14 novembre 2026 (cette PR,
+  **S3, la vue satellite : contrat écrit** le 14 novembre 2026 (#43,
   D-110, `docs/satellite-view-contract.md`, précisions F201 à F213, parcours
-  prévu P34), sans code, en Sonnet 5.5 · Moyen. Constaté : les conditions de
-  cartes.gouv.fr. **Non vérifié** : la forme de `coordinates` (aucun jeton
-  de ferme dans le fil) et une tuile IGN (le relais du bac à sable refuse
-  `data.geopf.fr`), devenus conditions d'entrée du code. Aucune migration
-  SQL : les contours vont dans le JSON de l'instantané. La relecture du
-  porteur est obligatoire avant le code.
+  prévu P34), sans code, en Sonnet 5.5 · Moyen ; **en ligne** (#43,
+  fusionnée à 5 h 35, déployée à 5 h 53, run 43557444868) ; **validé par
+  le porteur le 14 novembre 2026 à 15 h 41** (« 3 je valide »). Aucune
+  migration SQL : les contours vont dans le JSON de l'instantané. La
+  condition C, la licence des photos, est **levée** le jour même (Licence
+  Ouverte 2.0 : réutilisation commerciale permise, donc multi-fermes ;
+  crédit « IGN » avec lien vers la source). **PR 1, le domaine, codée le
+  14 novembre 2026** (cette PR, D-111, précisions F214 à F223), en
+  Opus 5.5 · Très élevé, sans interface : les contours d'OTF lus de façon
+  tolérante et gardés dans l'instantané (champ `outline` optionnel, aucune
+  requête de plus), cadrage, « en France », fonds IGN et « Dessin », style
+  de la carte, liste des jardins, dessin de secours en SVG. Contrôles avant
+  la PR : lint, typage, 1 499 tests (43 nouveaux), compilation, knip,
+  `push:check`, `weather:check` et les 90 parcours navigateur (local),
+  verts. **Non vérifié, conditions
+  de la PR 2** : la forme réelle de `coordinates` (A, jeton de « Ferme v2 »
+  posé par le porteur) et une vraie tuile IGN (B, dans son Chrome).
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
