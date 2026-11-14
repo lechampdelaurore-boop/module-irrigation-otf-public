@@ -249,10 +249,12 @@ registres, elle y renvoie.
   F185 à F193), sur la branche `feat/demo-d4-remise-a-zero` posée sur celle
   de D3 : « Remettre à zéro » dans la bannière, après confirmation ; la
   remise à zéro de nuit des espaces inactifs ; `wrangler.demo.jsonc` et le
-  job « Déploiement de la démonstration » après la production. La base D1
-  de démonstration est créée sur le compte Cloudflare ; reste l'application
-  Access de la démonstration et ses invitations, dans le navigateur du
-  porteur, après le premier déploiement. Contrôles
+  job « Déploiement de la démonstration » après la production. **En ligne
+  le 13 novembre 2026 à 23 h 28** (#37) : le Worker et la base de
+  démonstration créés par la CI. L'application Access de la démonstration
+  est créée le 14 novembre 2026 dans le navigateur du porteur et son AUD
+  posé dans `wrangler.demo.jsonc` ; restent les invitations de Nicolas et
+  de Vincent et la recette réelle. Contrôles
   du 13 novembre 2026 au soir : lint sans avertissement, typage sans
   erreur, 1 441 tests sur 1 441 (10 nouveaux), compilation réussie, knip,
   `push:check` et `weather:check` sans erreur, 88 parcours sur 88
@@ -287,6 +289,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+  PR #37 (`4942d8f`, D4 de la démo guidée, la remise à zéro et le
+  déploiement séparé, D-106, fusionnée à 23 h 12 et déployée à 23 h 28,
+  run 43517326592, les cinq jobs réussis, aucune migration en production,
+  31 migrations sur la base de démonstration toute neuve). Avant elle : la
   PR #36 (`442a9fd`, D3 de la démo guidée, la visite guidée, D-105, avec la
   clôture de la 3.8 ter et de la 3.8 quater consignée, fusionnée à 22 h 35
   et déployée à 22 h 51, run 43512069129, les quatre jobs réussis, aucune

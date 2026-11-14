@@ -600,8 +600,9 @@ selon la règle de la section 10.
     (D-105), sur la sienne posée sur celle de D2. **D4 codée le soir du
     13 novembre 2026** sur le « vas-y » exprès du porteur, donné pour le
     tag (D-106), la base de démonstration créée et le coût d'Access relu
-    le soir même dans son navigateur ; reste l'application Access de la
-    démonstration, après son premier déploiement.
+    le soir même dans son navigateur ; **D4 en ligne le 13 novembre 2026 à
+    23 h 28** (#37), son application Access créée le 14 novembre ; restent
+    les invitations et la recette réelle.
 
 24 bis. **Connexions matériel** — trois fonctions demandées le 7 novembre 2026 :
     la connexion à une **station météo locale**, la connexion à des
@@ -3761,10 +3762,12 @@ confirmation, la remise à zéro de nuit des espaces inactifs depuis plus de
 24 heures (l'espace mis de côté, jamais effacé), le Worker et la base D1
 de démonstration (`wrangler.demo.jsonc`), compilés et vérifiés à chaque PR
 et déployés après la production. La base est créée sur le compte du
-porteur, le coût d'Access relu (0 $). Reste l'application Access de la
-démonstration et les invitations de Nicolas et de Vincent, dans le
-navigateur du porteur, après le premier déploiement ; puis la recette
-réelle de la remise à zéro.
+porteur, le coût d'Access relu (0 $). **En ligne le 13 novembre 2026 à
+23 h 28** (#37, `4942d8f`) : le Worker et la base de démonstration créés
+par la CI. L'application Access de la démonstration est créée le
+14 novembre 2026 dans le navigateur du porteur, son AUD posé dans
+`wrangler.demo.jsonc` ; restent les invitations de Nicolas et de Vincent,
+puis la recette réelle de la remise à zéro.
 
 ### 4.7 — Hébergement et identité
 

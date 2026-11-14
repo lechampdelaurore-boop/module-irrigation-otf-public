@@ -33,7 +33,7 @@
     "ACCESS_TEAM_DOMAIN": "https://damp-wind-3566.cloudflareaccess.com",
     // L'audience de l'application Access de la démonstration, posée quand
     // elle sera créée ; vide, aucun invité n'est reconnu : rien n'est joignable.
-    "ACCESS_AUD": ""
+    "ACCESS_AUD": "bc86a6ecb6dc3db1b5823da10d5badb755a3b0ee20536dab14e95c6b249f18cb"
   },
   // La remise à zéro des espaces inactifs depuis plus de 24 heures, chaque
   // nuit à 2 h 17 UTC (section 8).
