@@ -91,6 +91,11 @@ test('le jour du moment, à l’heure réelle de la ferme, même d’une heure d
   assert.equal(new Date(simulatedInstantMs(realNow, '2026-04-14')).toISOString(), '2026-04-14T08:52:07.250Z');
   const lateEvening = Date.parse('2026-11-13T22:30:00.000Z'); // samedi 23 h 30 à la ferme : le jour du moment, pas le lendemain
   assert.equal(new Date(simulatedInstantMs(lateEvening, '2026-10-20')).toISOString(), '2026-10-20T21:30:00.000Z');
+  // Samedi 0 h 03 à la ferme : le 14 avril à 0 h 03 tombe encore le 13 avril en UTC ; son texte, relu à l'heure de la
+  // ferme, dit bien le 14 (point ouvert 67 : le test suivant le lisait au fuseau du processus et échouait de 0 h à 2 h).
+  const afterMidnight = simulatedInstantMs(Date.parse('2026-11-13T23:03:00.000Z'), '2026-04-14');
+  assert.equal(new Date(afterMidnight).toISOString(), '2026-04-13T22:03:00.000Z');
+  assert.equal(dateKeyInTimeZone(new Date(new Date(afterMidnight).toString())), '2026-04-14');
 });
 
 test('l’horloge simulée ne vaut que dans la requête de l’invité : deux moments à la fois ne se gênent pas', async () => {
@@ -108,7 +113,8 @@ test('l’horloge simulée ne vaut que dans la requête de l’invité : deux mo
     assert.equal(new Date('2026-01-01T00:00:00.000Z').toISOString(), '2026-01-01T00:00:00.000Z', 'une date donnée reste la même');
     assert.equal(new Date(0).getTime(), 0);
     assert.ok(new Date() instanceof Date);
-    assert.match(Date(), /Apr 14 2026/);
+    // Le texte de `Date()` est écrit au fuseau du processus (UTC sur la CI) : son jour se lit à l'heure de la ferme (point ouvert 67).
+    assert.equal(dateKeyInTimeZone(new Date(Date())), '2026-04-14', 'Date() sans new : le texte du jour du moment');
     assert.equal(Date.UTC(2026, 0, 1), Date.parse('2026-01-01T00:00:00.000Z'));
   });
 });

@@ -165,12 +165,14 @@ registres, elle y renvoie.
   13 au 14 novembre 2026** sur le mandat d'autonomie du porteur, en
   Opus 5.5 · Élevé (cette PR, D-108) : les cinq touches de la maquette
   validée, habillage seulement, aucune migration ; reste la relecture
-  visuelle du porteur après déploiement. **Le déploiement de #38 n'a pas
-  eu lieu** : sur `main`, le parcours P7 au téléphone a échoué en passant
-  minuit à la ferme (run 43522400430), les deux déploiements sautés ;
-  #38 ne porte que des registres, qui partent en ligne avec cette PR.
-  Relevé en chemin, le point ouvert 67 (un test de la démonstration qui
-  échoue entre minuit et 2 h à la ferme).
+  visuelle du porteur. **S1 en ligne** (#39, fusionnée le 14 novembre
+  2026 à 2 h 50, déployée à 3 h 27, run 43542965425, après une relance du
+  parcours de démonstration V8, point ouvert 68), #38 avec elle : son
+  propre déploiement avait été sauté, le parcours P7 au téléphone ayant
+  échoué en passant minuit à la ferme (run 43522400430). Reste la relecture
+  visuelle du porteur dans son navigateur. Relevés en chemin : le point
+  ouvert 67 (un test de la démonstration qui échouait entre minuit et 2 h
+  à la ferme), corrigé par la PR qui suit (cette PR), et le point 68.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -8033,9 +8035,19 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    et moins au tunnel 4. Aucun invariant n'est violé et aucun chiffre n'est
    faux : c'est une limite de la règle de placement. Recommandation :
    l'étudier après le tag ; aucun code avant.
-67. 🟡 **Ouvert le 14 novembre 2026 par le chantier S1 (style), en
-   rejouant les contrôles sur `main` à 0 h 03 à la ferme ; non bloquant
-   hors de cette plage, à corriger dans sa PR `fix/`.** Le test « l'horloge
+67. ✅ **Ouvert le 14 novembre 2026 par le chantier S1 (style), en
+   rejouant les contrôles sur `main` à 0 h 03 à la ferme ; corrigé le jour
+   même** dans sa PR `fix/` (cette PR), sur la demande du coordinateur,
+   avant le graphique (S2) : le test lit le jour du texte de `Date()` à
+   l'heure de la ferme, et le premier test de l'horloge simulée prouve, à
+   0 h 03 un samedi, que cette lecture dit le 14 avril quand le texte UTC
+   dit encore le 13 (l'ancienne vérification, rejouée sur cet instant au
+   fuseau UTC, rend faux). Aucun code de la démonstration ne change.
+   Contrôles : lint, typage, tests (1 447 sur 1 447), compilation, knip,
+   `push:check` et `weather:check` sans erreur ; parcours navigateur non
+   joués en local, sans rapport (ni interface ni service touchés), la CI
+   les joue.
+   Constat de départ : le test « l'horloge
    simulée ne vaut que dans la requête de l'invité »
    (`tests/demo-farms.test.ts`) lit le texte de `Date()` dans le fuseau du
    processus (UTC sur la CI et dans le bac à sable) et y cherche
@@ -8048,8 +8060,19 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    point ouvert 48. Recommandation : lire le jour du texte dans le fuseau
    de la ferme (`dateKeyInTimeZone(new Date(Date()))`) plutôt que dans
    celui du processus ; une PR `fix/` à part, sans toucher au code de la
-   démonstration. D'ici là, ne pas lancer de contrôle entre minuit et 2 h
-   à la ferme.
+   démonstration.
+68. 🟡 **Ouvert le 14 novembre 2026 par le déploiement de #39 (style) ;
+   non bloquant, à corriger dans sa PR `fix/` après celle de 67.** Sur
+   `main` (run 43542965425), le parcours de démonstration V8 au téléphone
+   a échoué : après `page.reload()`, il clique « Remettre à zéro » sans
+   attendre que la page réponde (`main.app-shell[data-interactive="true"]`,
+   ce que V1 attend après son propre rechargement) ; le clic tombe avant
+   l'hydratation, la fenêtre de confirmation ne s'ouvre pas, et le
+   parcours attend son bouton jusqu'au délai. Le même parcours avait réussi
+   sur la PR vingt minutes plus tôt. Les deux déploiements sautés ; une
+   seule relance du job, comme le veut la règle, verte : #39 déployée à
+   3 h 27. Recommandation : attendre
+   la page prête après le rechargement, comme V1.
 
 ## Procédure de reprise rapide
 
