@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (S1, style « un peu plus joli » : la troisième passe de l'habillage)
+
+- **Cinq touches dans la charte d'Ouvre ta ferme** (D-108,
+  `docs/charte-module.md`, « Troisième passe ») : une pastille ronde à icône
+  devant le titre de vingt blocs, verte ou bleu eau ; les tuiles de totaux à
+  filet de couleur, avec une icône au trait sur celles des objectifs et du
+  planning, le chiffre un peu plus grand ; le bandeau d'annonce en pointillé
+  vert avec l'étiquette « Nouveau » ; les cartes qu'on ouvre d'un clic
+  teintées de vert pâle au survol de la souris ; les grands états vides
+  illustrés d'un petit dessin au trait.
+- Nouvelle feuille `app/irrigation/styles/finitions.css`, une icône de plus
+  (la cible), un jeton `--green-universe`. Aucun calcul, aucun texte, aucune
+  migration ne change.
+
 ### Documents (registres : style, graphique des réserves, vue satellite)
 
 - Trois chantiers de code inscrits à la roadmap, sans code (D-107) : le

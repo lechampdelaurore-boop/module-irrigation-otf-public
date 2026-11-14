@@ -218,3 +218,70 @@ Précisions du code (7 novembre 2026), sur la recommandation :
   lisent à leur fond : gris non cochée, vert pâle cochée.
 - **L'eau du jour** (Arrosages) passe du bandeau vert foncé à une tuile vert
   pâle : le vert foncé reste aux boutons et au menu.
+
+### Troisième passe (R5), choisie le 8 novembre 2026 (D-108)
+
+Le 8 novembre 2026, le porteur trouve le style « plutôt austère » et
+demande qu'il soit « un tout petit peu plus joli, sans trop dénoter avec la
+charte graphique d'Ouvre ta ferme ». Il choisit les cinq touches d'une
+maquette (https://claude.ai/artifact/L1Sm7H6dCsZXMEk8kqrzyx, source dans
+`/mnt/project-files/style-plus-joli/`). Mêmes couleurs, mêmes polices, même
+disposition ; aucun calcul ni aucun texte ne change. Le code est dans
+`app/irrigation/styles/finitions.css`, importée après `charte.css`, et
+`tests/style-finitions.test.ts` le tient.
+
+1. **Une pastille ronde devant le titre de chaque bloc** : 38 px (32 px au
+   téléphone), fond `#e3f2ee` et icône verte au trait, ou fond `#dcebf7` et
+   icône `#1f6fb2` pour l'eau et la pluie. C'est la pastille d'univers d'OTF
+   en plus petit.
+2. **Des tuiles de totaux plus vivantes** : un filet de 3 px en haut (vert
+   d'univers `#0f8c66`, bleu eau pour la pluie, orange d'attention pour un
+   manque), une icône au trait devant le libellé, le chiffre un peu plus
+   grand en Bricolage Grotesque 500.
+3. **Le bandeau d'annonce comme les encarts « Nouveau » de la Boîte à outils
+   d'OTF** : cadre vert en pointillé et étiquette « Nouveau ».
+4. **Les cartes qu'on ouvre d'un clic répondent au survol** de la souris.
+5. **Les grands états vides illustrés** d'un petit dessin au trait.
+
+Précisions du code (8 novembre 2026 sur l'archive, refaites le
+14 novembre 2026 sur le dépôt public), sur la recommandation :
+
+- **Les pastilles sont en CSS**, en image de fond posée devant le titre :
+  aucun composant ne change, les lecteurs d'écran ne les lisent pas. Les
+  icônes sont celles de `line-icon.tsx`, recopiées en image ; un test
+  vérifie qu'elles n'en divergent pas et que chaque titre visé existe.
+  Vingt titres en ont une : les h2 des blocs et les titres des pages
+  Réserve du sol, Alertes météo et Alertes cultures. Les sous-blocs
+  (« Les Prés », « Planche N01 », « Besoin de la culture ») et la barre de
+  placement n'en ont pas ; l'aperçu « Apport calculé par heure » garde son
+  symbole « ≈ ». Les blocs de « Aujourd'hui » ont déjà la leur, dans leur
+  composant.
+- **Les icônes des tuiles** sont sur les tuiles de « Objectifs et besoins »
+  (objectif, irrigation, pluie, pluie prévue, ET0) et du planning (à
+  valider, faites, en retard, volume, non vérifié, manque d'eau, temps de
+  pompage, planches non servies). La cible s'ajoute au jeu ; le soleil
+  (ET0) et l'horloge y étaient déjà. Les tuiles de l'historique et de la
+  faisabilité reçoivent le filet et le chiffre, sans icône : leurs
+  libellés changent selon le cas. Une tuile de geste en retard garde au
+  filet du haut le rouge de son filet gauche.
+- **Le survol sans soulèvement** : la maquette montrait des lignes blanches
+  qui se soulèvent. Une carte blanche dans un bloc blanc contredirait la
+  deuxième passe (« un bloc blanc ne contient pas d'autre bloc encadré »),
+  et un déplacement dérangerait les bulles d'aide placées dans la carte. La
+  carte fermée prend donc au survol le fond vert pâle `#e3f2ee` et l'ombre
+  légère de la charte ; à la souris seulement, sans effet au téléphone.
+  Cartes concernées : les jardins des besoins, les irrigations de
+  l'historique, les jardins de la réserve du sol. Les cultures de référence
+  et les espèces de la saison gardent le survol qu'elles ont depuis le
+  retour du porteur du 8 novembre 2026 (le fond vert de leur résumé) : deux
+  fonds l'un sur l'autre feraient double emploi.
+- **Le dessin des états vides** (deux buttes et une goutte, au trait
+  `#0f8c66`) va sur les grands états vides centrés : « Aucun matériel prêt
+  à irriguer », « Aucun groupe configuré », « Aucun matériel enregistré »
+  (il remplace le signe « ⌁ »), le réglage du matériel et le plan vides.
+  Les messages d'une ligne (planning, historique, ressources) restent sans
+  dessin.
+- **L'étiquette « Nouveau »** est décorative (texte de remplacement vide) :
+  le bandeau dit déjà ce qui est nouveau.
+- **Un jeton de plus**, `--green-universe: #0f8c66`, le vert de la pastille
+  d'univers d'OTF, pour les filets et le pointillé.

@@ -3817,3 +3817,52 @@ seule PR de registres à la fois, celle-ci après la clôture de la 3.9.
 disponibilité d'une tuile IGN depuis le site et les conditions d'usage de
 cartes.gouv.fr (à constater par le fil de S3) ; le contenu exact du patch
 de style une fois rejoué sur le dépôt public.
+
+## D-108 — Style « un peu plus joli » (S1, troisième passe R5) : cinq touches dans la charte d'OTF, refaites sur le dépôt public
+
+Date : 8 novembre 2026 pour le choix du porteur ; 13 et 14 novembre 2026
+pour le code, sur son mandat d'autonomie de la nuit. Décideur : le
+porteur, sur une maquette ; les précisions, par la recommandation.
+
+Le porteur trouve le style « plutôt austère » et le veut « un tout petit peu
+plus joli, sans trop dénoter avec la charte graphique d'Ouvre ta ferme ».
+Sur la maquette https://claude.ai/artifact/L1Sm7H6dCsZXMEk8kqrzyx, il choisit
+le 8 novembre 2026 les cinq touches proposées (option recommandée) : une
+pastille ronde à icône devant le titre de chaque bloc ; des tuiles de
+totaux à filet de couleur, icône et chiffre un peu plus grand ; le bandeau
+d'annonce en pointillé vert avec l'étiquette « Nouveau », comme la Boîte à
+outils d'OTF ; les cartes qui répondent au survol de la souris ; les
+grands états vides illustrés. Codée le jour même sur l'archive (PR 294,
+jamais fusionnée, numéro de décision D-074 pris depuis par « Aujourd'hui »),
+elle est refaite sur le dépôt public après le tag `v0.2.0`, chantier S1 de
+la section 5 sexies de la roadmap (D-107), en Opus 5.5 · Élevé.
+
+Mêmes couleurs, mêmes polices, même disposition ; aucun calcul ni aucun
+texte ne change, aucune migration. Les précisions sont consignées dans
+`docs/charte-module.md` (« Troisième passe ») ; la principale : le survol
+ne soulève pas la carte, il la teinte de vert pâle, pour ne pas poser une
+carte blanche dans un bloc blanc (D-068) ni déranger les bulles d'aide.
+
+**Ce que le rejeu change au patch de l'archive**, tranché par la
+recommandation (habillage seulement) :
+
+- Le soleil et l'horloge existent déjà dans `line-icon.tsx` (venus avec
+  « Aujourd'hui ») : seule la cible s'ajoute ; l'horloge garde le tracé
+  qu'elle a, aucune pastille ne l'emploie.
+- Les tuiles du planning commencent maintenant par les trois tuiles de
+  gestes de l'audit (lot 3) : « À valider » prend le calendrier, « Faites »
+  la coche, « En retard » l'alerte ; « Planches non servies » passe de
+  l'alerte à la pousse, pour que deux tuiles voisines n'aient pas la même
+  icône. Une tuile de geste en retard garde au filet du haut le rouge de
+  son filet gauche.
+- Les blocs de la page « Aujourd'hui » ont déjà leur pastille, dans le
+  composant (`today-block-badge`) : la feuille n'en ajoute pas.
+- Les cartes des cultures de référence et des espèces de la saison
+  répondent au survol depuis le retour du porteur du 8 novembre 2026 (le
+  fond vert de leur résumé) : elles le gardent, sans second fond.
+
+La ligne de ces trois chantiers dans l'ordre de la roadmap (section 2),
+numérotée « 24 quater » à son inscription (D-107) alors que ce numéro
+était déjà celui de la fusion des deux moteurs, devient « 24 quinquies ».
+
+Ne changent pas : D-060, D-067, D-068, D-107.
