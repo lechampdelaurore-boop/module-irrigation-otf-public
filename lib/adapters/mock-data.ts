@@ -1,5 +1,6 @@
 import type { IrrigationSnapshot } from '../domain/domain';
 import { buildMockCropPlan } from './mock-crop-plan';
+import { MOCK_OUTLINES } from './mock-outlines';
 
 export const mockSnapshot: IrrigationSnapshot = {
   configuration: {
@@ -14,9 +15,9 @@ export const mockSnapshot: IrrigationSnapshot = {
     legalCountry: 'FR',
   },
   zones: [
-    { id: 'zone-pres', name: 'Les Prés', area: 996, seasons: [2025, 2026, 2027] },
+    { id: 'zone-pres', name: 'Les Prés', area: 996, seasons: [2025, 2026, 2027], outline: MOCK_OUTLINES.pres },
     { id: 'zone-coteau', name: 'Le Coteau', area: 792, seasons: [2024, 2025, 2026] },
-    { id: 'zone-verger', name: 'Sous le verger', area: 336, seasons: [2026, 2027] },
+    { id: 'zone-verger', name: 'Sous le verger', area: 336, seasons: [2026, 2027], outline: MOCK_OUTLINES.verger },
   ],
   plots: [
     {
@@ -28,6 +29,7 @@ export const mockSnapshot: IrrigationSnapshot = {
       width: 18,
       area: 756,
       seasons: [2025, 2026, 2027],
+      outline: MOCK_OUTLINES.jardinNord,
     },
     {
       id: 'plot-tunnel-1',
@@ -38,6 +40,7 @@ export const mockSnapshot: IrrigationSnapshot = {
       width: 8,
       area: 240,
       seasons: [2025, 2026, 2027],
+      outline: MOCK_OUTLINES.tunnel1,
     },
     {
       id: 'plot-sud',
