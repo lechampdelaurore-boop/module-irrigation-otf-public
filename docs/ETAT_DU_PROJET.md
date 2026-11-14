@@ -205,9 +205,21 @@ registres, elle y renvoie.
   de la carte, liste des jardins, dessin de secours en SVG. Contrôles avant
   la PR : lint, typage, 1 499 tests (43 nouveaux), compilation, knip,
   `push:check`, `weather:check` et les 90 parcours navigateur (local),
-  verts. **Non vérifié, conditions
-  de la PR 2** : la forme réelle de `coordinates` (A, jeton de « Ferme v2 »
-  posé par le porteur) et une vraie tuile IGN (B, dans son Chrome).
+  verts. **PR 1 en ligne** (#44, `9847d03`, fusionnée à 16 h 35, déployée
+  à 16 h 51, run 43611019947). **Conditions A et B levées le jour même
+  dans le Chrome du porteur** (section 12 du contrat) : OTF envoie un anneau
+  fermé de points par parcelle et par jardin, `null` sans dessin, que la
+  lecture range telle quelle ; la tuile IGN vient sans clé, jeu `PM_0_19`,
+  zoom 19, rien en Polynésie française. **PR 2, l'onglet, codée le
+  14 novembre 2026** (cette PR, D-113, précisions F224 à F231) : dans
+  « Matériel et placement », les onglets « Plan » et « Vue satellite » ; la
+  carte MapLibre 6.16.0 chargée à l'ouverture, la liste des jardins, la
+  bascule mémorisée, le repli « Dessin », le dessin SVG sans WebGL ; la
+  ferme des parcours porte des contours fictifs ; parcours P34. Aucune
+  migration. Contrôles avant la PR : lint, typage, 1 502 tests,
+  compilation, knip, `push:check`, `weather:check`, les 94 parcours
+  navigateur et les 16 parcours de la démonstration (local), verts. Reste
+  la relecture du porteur sur sa ferme, après le déploiement.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -255,7 +267,7 @@ registres, elle y renvoie.
   est créée le 14 novembre 2026 dans le navigateur du porteur et son AUD
   posé dans `wrangler.demo.jsonc` (#45, en ligne à 17 h 58) ; la première
   ouverture a montré que le jeton Access était vérifié au jour simulé
-  (point ouvert 69, corrigé par D-112) ; restent les invitations de
+  (point ouvert 69, corrigé par D-112, #46 en ligne à 18 h 56) ; restent les invitations de
   Nicolas et de Vincent et la recette réelle. Contrôles
   du 13 novembre 2026 au soir : lint sans avertissement, typage sans
   erreur, 1 441 tests sur 1 441 (10 nouveaux), compilation réussie, knip,
@@ -291,7 +303,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
-  PR #45 (`36e56b1`, l'AUD de l'application Access de la démonstration et
+  PR #46 (`c77331c`, le jeton Access de la démonstration vérifié à l'heure
+  réelle, point ouvert 69, D-112, fusionnée à 18 h 38 et déployée à
+  18 h 56, run 43622235660, les cinq jobs réussis, aucune migration).
+  Avant elle : la PR #45 (`36e56b1`, l'AUD de l'application Access de la démonstration et
   #37 consignée, D-106, fusionnée à 17 h 42 et déployée à 17 h 58, run
   43617026648, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #37 (`4942d8f`, D4 de la démo guidée, la remise à zéro et le
@@ -8132,8 +8147,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    43617026648) : la démonstration renvoyait vers `/cdn-cgi/access/login`,
    page introuvable sur workers.dev. Le jeton Access arrivait bien mais
    était vérifié au jour simulé (14 avril), où il paraît « pas encore
-   valide ». Correctif dans sa PR `fix/` (D-112) : le jeton se vérifie à
-   l'heure réelle. À fermer après la recette réelle de la démonstration.
+   valide ». Correctif dans sa PR `fix/` (D-112, #46, en ligne le 14 novembre 2026
+   à 18 h 56) : le jeton se vérifie à l'heure réelle. À fermer après la recette réelle de la démonstration.
 
 ## Procédure de reprise rapide
 

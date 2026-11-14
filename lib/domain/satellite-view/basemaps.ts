@@ -70,10 +70,11 @@ const METROPOLITAN_FRANCE: BasemapArea = {
 
 /**
  * Les emprises de la France où le fond IGN s'essaie (F206 d) : la métropole
- * et l'outre-mer habité, chacun dans un rectangle autour de ses terres. Que
- * la couche d'orthophotos ait des images partout se constate à la condition B
- * (emprise de la couche) ; une zone sans image passe d'elle-même au
- * « Dessin » (F206 c).
+ * et l'outre-mer où la couche a des images à l'échelle d'une ferme, chacun
+ * dans un rectangle autour de ses terres. Constaté à la condition B (contrat,
+ * section 12) : la Polynésie française n'a rien au-delà du zoom 11, elle
+ * n'est donc pas ici et reçoit l'avis « non configuré ». Une zone sans image
+ * passe d'elle-même au « Dessin » (F206 c).
  */
 export const FRANCE_AREAS: BasemapArea[] = [
   METROPOLITAN_FRANCE,
@@ -86,7 +87,6 @@ export const FRANCE_AREAS: BasemapArea[] = [
   box('Saint-Pierre-et-Miquelon', -56.45, 46.74, -56.1, 47.15),
   box('Saint-Martin et Saint-Barthélemy', -63.2, 17.85, -62.75, 18.15),
   box('Wallis-et-Futuna', -178.25, -14.4, -176.1, -13.15),
-  box('Polynésie française', -154.8, -27.7, -134.4, -7.8),
   box('Nouvelle-Calédonie', 163.5, -22.8, 168.2, -19.5),
 ];
 
@@ -111,12 +111,14 @@ export function isInFrance(position: OutlinePosition): boolean {
 
 /**
  * Les orthophotos de l'IGN par la Géoplateforme, service WMTS public, jeu de
- * tuiles `PM` (Mercator sphérique, 256 px). Gratuit, sans clé, tuiles non
- * soumises à limite d'usage (conditions de cartes.gouv.fr, lues le
- * 14 novembre 2026). Couche, format et zoom maximal à confirmer sur une
- * vraie tuile (condition B du contrat) ; crédit lu dans la licence (condition C).
- * Les tuiles sont demandées par le navigateur directement à l'IGN, à la
- * demande de l'écran seulement : ni relais, ni cache, ni précharge.
+ * tuiles `PM_0_19` que la couche déclare (Mercator sphérique, 256 px, zooms 0
+ * à 19). Gratuit, sans clé, tuiles non soumises à limite d'usage (conditions
+ * de cartes.gouv.fr, lues le 14 novembre 2026). Couche, format, jeu et zoom
+ * maximal constatés sur de vraies tuiles (condition B, contrat section 12) ;
+ * crédit lu dans la licence (condition C), lien vers la page de la donnée,
+ * qui porte sa date de mise à jour. Les tuiles sont demandées par le
+ * navigateur directement à l'IGN, à la demande de l'écran seulement : ni
+ * relais, ni cache, ni précharge.
  */
 export const IGN_ORTHOPHOTOS: Basemap = {
   id: 'ign-orthophotos',
@@ -125,9 +127,12 @@ export const IGN_ORTHOPHOTOS: Basemap = {
   tiles:
     'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0' +
     '&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg' +
-    '&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+    '&TILEMATRIXSET=PM_0_19&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
   tileSizePx: 256,
-  attribution: { text: '© IGN – Géoplateforme', href: 'https://cartes.gouv.fr' },
+  attribution: {
+    text: '© IGN – Géoplateforme',
+    href: 'https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-ORTHO',
+  },
   maxZoom: 19,
   coverage: FRANCE_AREAS,
 };

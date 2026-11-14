@@ -1,0 +1,333 @@
+/*
+  Le bloc de la parcelle : onglets « Plan » et « Vue satellite » (S3,
+  docs/satellite-view-contract.md, F204 à F213). Les couleurs de la carte
+  viennent de la charte : la carte les lit ici, dans ses variables (F220).
+*/
+.plan-view-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, auto);
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.plan-view-tabs button {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.plan-view-tabs button:last-child {
+  border-right: 0;
+}
+
+.plan-view-tabs button[data-active='true'] {
+  box-shadow: inset 0 -4px var(--green);
+  background: var(--card);
+}
+
+.satellite-view {
+  --satellite-field: var(--green);
+  --satellite-shelter: var(--water);
+  --satellite-zone-on-photo: var(--card);
+  --satellite-zone-on-drawing: var(--ink);
+  --satellite-drawing-background: var(--sheet);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  grid-template-areas:
+    "toggle toggle"
+    "notice notice"
+    "map list"
+    "legend list"
+    "privacy list";
+  align-items: start;
+  gap: 10px 20px;
+}
+
+.satellite-view[data-drawing='none'] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "notice"
+    "list";
+}
+
+.satellite-basemap-toggle {
+  display: inline-flex;
+  grid-area: toggle;
+  justify-self: start;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.satellite-basemap-toggle button {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.satellite-basemap-toggle button + button {
+  border-left: 1px solid var(--line);
+}
+
+.satellite-basemap-toggle button[aria-pressed='true'] {
+  background: var(--green);
+  color: var(--card);
+}
+
+.satellite-notice,
+.satellite-undrawn {
+  grid-area: notice;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: 14px;
+}
+
+.satellite-undrawn {
+  border-color: var(--line);
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.satellite-map-frame {
+  position: relative;
+  grid-area: map;
+  min-width: 0;
+}
+
+.satellite-map {
+  width: 100%;
+  height: min(60vh, 520px);
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--satellite-drawing-background);
+}
+
+.satellite-loading {
+  display: grid;
+  height: min(60vh, 520px);
+  min-height: 280px;
+  margin: 0;
+  place-items: center;
+  border-radius: var(--radius);
+  background: var(--sheet);
+  color: var(--muted);
+}
+
+/* Les boutons de MapLibre à la taille des cibles tactiles du module. */
+.satellite-map .maplibregl-ctrl-group button {
+  width: 44px;
+  height: 44px;
+}
+
+.satellite-map .maplibregl-ctrl-attrib {
+  font-size: 12px;
+}
+
+.satellite-map .maplibregl-ctrl-attrib a {
+  color: var(--ink);
+}
+
+/* Les noms posés sur la carte et sur le dessin : un halo clair derrière le texte (F213, 4,5:1). */
+.satellite-label {
+  max-width: 160px;
+  padding: 2px 6px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 88%);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.satellite-label-zone {
+  font-size: 15px;
+  font-weight: 600;
+  cursor: default;
+}
+
+.satellite-label[data-highlighted='true'] {
+  outline: 3px solid var(--ink);
+}
+
+.satellite-svg {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  background: var(--satellite-drawing-background);
+}
+
+.satellite-svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.satellite-svg .satellite-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.satellite-svg-garden {
+  fill: var(--satellite-field);
+  fill-opacity: 0.2;
+  stroke: var(--satellite-field);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+.satellite-svg-garden[data-mode='greenhouse'] {
+  fill: var(--satellite-shelter);
+  stroke: var(--satellite-shelter);
+}
+
+.satellite-svg-garden[data-highlighted='true'] {
+  fill-opacity: 0.4;
+  stroke-width: 5;
+}
+
+.satellite-svg-zone {
+  fill: none;
+  stroke: var(--satellite-zone-on-drawing);
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.satellite-legend {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: legend;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.satellite-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--satellite-field);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--satellite-field) 20%, transparent);
+}
+
+.satellite-legend-swatch[data-mode='greenhouse'] {
+  margin-left: 10px;
+  border-color: var(--satellite-shelter);
+  background: color-mix(in srgb, var(--satellite-shelter) 20%, transparent);
+}
+
+.satellite-privacy {
+  grid-area: privacy;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.satellite-garden-list {
+  display: grid;
+  grid-area: list;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.satellite-garden-row {
+  display: grid;
+  width: 100%;
+  min-height: 44px;
+  gap: 2px 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--satellite-field);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 13px;
+  text-align: left;
+}
+
+.satellite-garden-row[data-mode='greenhouse'] {
+  border-left-color: var(--satellite-shelter);
+}
+
+button.satellite-garden-row {
+  cursor: pointer;
+}
+
+button.satellite-garden-row[aria-pressed='true'] {
+  border-color: var(--ink);
+  border-left-width: 5px;
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.satellite-garden-row strong {
+  grid-column: 1 / -1;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.satellite-garden-outline {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+
+.satellite-garden-row[data-outlined='false'] .satellite-garden-outline {
+  color: var(--warn-ink);
+}
+
+.satellite-garden-empty {
+  grid-area: list;
+  margin: 0;
+  color: var(--muted);
+}
+
+/* Au téléphone : la carte prend la largeur, environ 60 % de l'écran en hauteur, la liste dessous (F213). */
+@media (max-width: 760px) {
+  .satellite-view {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "toggle"
+      "notice"
+      "map"
+      "legend"
+      "privacy"
+      "list";
+  }
+
+  .satellite-map,
+  .satellite-loading {
+    height: 60vh;
+  }
+
+  .plan-view-tabs {
+    display: grid;
+    width: 100%;
+  }
+}

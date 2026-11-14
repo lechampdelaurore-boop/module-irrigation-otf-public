@@ -5,12 +5,35 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (S3, la vue satellite, PR 2 : l'onglet)
+
+- **L'onglet « Vue satellite » de la parcelle** (D-113,
+  `docs/satellite-view-contract.md`, section 12) : dans « Matériel et
+  placement », à côté du « Plan », la parcelle et ses jardins dessinés dans
+  Ouvre ta ferme, sur les photos aériennes de l'IGN ou sur le « Dessin »,
+  avec leur nom, vert pour le plein champ, bleu pour l'abri ; la liste des
+  jardins à côté (mode, surface d'OTF, contour dessiné ou non), qui met un
+  jardin en évidence sur la carte et inversement ; la bascule « Satellite /
+  Dessin » mémorisée par l'appareil ; l'échelle, le zoom, le plein écran et
+  le crédit de l'IGN. Une parcelle non dessinée le dit ; un fond
+  indisponible passe au « Dessin » ; sans WebGL, les contours sont dessinés
+  en SVG. MapLibre 6.16.0 n'est chargé qu'à l'ouverture de l'onglet.
+- Conditions A et B levées dans le Chrome du porteur : la forme des contours
+  d'OTF (un anneau fermé de points) et une vraie tuile de l'IGN (jeu
+  `PM_0_19`, zoom 19, lien du crédit vers la fiche de la donnée) ; la
+  Polynésie française, sans photos à l'échelle d'une ferme, reçoit l'avis
+  « non configuré ».
+- Parcours navigateur P34 aux deux largeurs ; la ferme des parcours porte
+  des contours inventés sur un lieu fictif.
+- La PR 1 en ligne : #44, déployée le 14 novembre 2026 à 16 h 51.
+
 ### Corrigé (4.0, la démonstration en ligne)
 
 - **La démonstration accepte enfin la connexion Access** (D-112, point
   ouvert 69) : le jeton Cloudflare Access se vérifie à l'heure réelle, et
   non au jour simulé du moment choisi, où un jeton émis aujourd'hui
   paraissait « pas encore valide ». Rien ne change en production.
+- Ce correctif en ligne : #46, déployée le 14 novembre 2026 à 18 h 56.
 - L'application Access de la démonstration et son AUD en ligne : #45,
   déployée le 14 novembre 2026 à 17 h 58.
 

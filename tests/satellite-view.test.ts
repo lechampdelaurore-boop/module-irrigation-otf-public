@@ -3,6 +3,7 @@ import test from 'node:test';
 import { DEMO_FARMS, demoFarmSnapshot } from '../lib/adapters/demo/farms.ts';
 import { mockSnapshot } from '../lib/adapters/mock-data.ts';
 import type { Outline, OutlinePosition, Plot, Zone } from '../lib/domain/domain.ts';
+import { isOutlineShape } from '../lib/domain/otf/outline.ts';
 import {
   DRAWING_BASEMAP,
   FRANCE_AREAS,
@@ -48,6 +49,9 @@ function rectangle(west: number, south: number, east: number, north: number): Ou
     holes: [],
   }];
 }
+
+/** La page de la donnée BD ORTHO, qui porte sa date de mise à jour (condition B). */
+const IGN_DATASET_PAGE = 'https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-ORTHO';
 
 const ZONE_OUTLINE = rectangle(2.4, 47, 2.41, 47.01);
 const zone: Zone = { id: '7', name: 'Parcelle d’essai', area: 76000, seasons: [2026], outline: ZONE_OUTLINE };
@@ -166,12 +170,12 @@ test('F206 d : le fond IGN s’essaie en métropole, en Corse et outre-mer', () 
     Ajaccio: [8.74, 41.92], Bastia: [9.45, 42.7], Bonifacio: [9.16, 41.39],
     'Pointe-à-Pitre': [-61.53, 16.24], 'Fort-de-France': [-61.07, 14.6], Cayenne: [-52.33, 4.94],
     'Saint-Denis de La Réunion': [55.45, -20.88], Mamoudzou: [45.23, -12.78], 'Saint-Pierre': [-56.18, 46.78],
-    Marigot: [-63.08, 18.07], 'Mata-Utu': [-176.17, -13.28], Papeete: [-149.57, -17.54], Nouméa: [166.45, -22.27],
+    Marigot: [-63.08, 18.07], 'Mata-Utu': [-176.17, -13.28], Nouméa: [166.45, -22.27],
   };
   for (const [place, position] of Object.entries(inFrance)) {
     assert.equal(isInFrance(position), true, place);
   }
-  assert.equal(FRANCE_AREAS.length, 12, 'la métropole, la Corse et dix territoires d’outre-mer');
+  assert.equal(FRANCE_AREAS.length, 11, 'la métropole, la Corse et neuf territoires d’outre-mer');
 });
 
 test('F206 d : hors de France, le fond IGN ne s’essaie pas, même près de la frontière', () => {
@@ -183,6 +187,8 @@ test('F206 d : hors de France, le fond IGN ne s’essaie pas, même près de la 
     Barcelone: [2.17, 41.39], Figueres: [2.96, 42.27], Pampelune: [-1.64, 42.81], 'Saint-Sébastien': [-2.02, 43.32],
     Madrid: [-3.7, 40.42], Dakar: [-17.44, 14.69], Roseau: [-61.39, 15.3], Paramaribo: [-55.2, 5.85],
     'Port-Louis': [57.5, -20.16], Montréal: [-73.57, 45.5],
+    // Condition B : la couche IGN n'a rien en Polynésie au-delà du zoom 11.
+    Papeete: [-149.57, -17.54], 'Bora-Bora': [-151.74, -16.5], 'Nuku Hiva': [-140.1, -8.86],
   };
   for (const [place, position] of Object.entries(abroad)) {
     assert.equal(isInFrance(position), false, place);
@@ -197,11 +203,12 @@ test('F212 : le fond IGN est public, sans clé ni compte, et crédite l’IGN (F
   assert.ok(tiles.startsWith('https://data.geopf.fr/wmts?'));
   for (const placeholder of ['{z}', '{x}', '{y}']) assert.ok(tiles.includes(placeholder), placeholder);
   assert.ok(tiles.includes('LAYER=ORTHOIMAGERY.ORTHOPHOTOS'));
-  assert.ok(tiles.includes('TILEMATRIXSET=PM'));
+  assert.ok(tiles.includes('&TILEMATRIXSET=PM_0_19&'), 'le jeu que la couche déclare');
   assert.doesNotMatch(tiles, /key|token|apikey|password/i);
   assert.equal(IGN_ORTHOPHOTOS.tileSizePx, 256);
   assert.match(IGN_ORTHOPHOTOS.attribution?.text ?? '', /^© IGN/);
-  assert.equal(IGN_ORTHOPHOTOS.attribution?.href, 'https://cartes.gouv.fr');
+  assert.equal(IGN_ORTHOPHOTOS.attribution?.href, IGN_DATASET_PAGE);
+  assert.equal(IGN_ORTHOPHOTOS.maxZoom, 19, 'constaté : le zoom 20 répond « No data found »');
   assert.equal(IGN_ORTHOPHOTOS.coverage, FRANCE_AREAS);
   assert.equal(DRAWING_BASEMAP.kind, 'plain');
   assert.equal(DRAWING_BASEMAP.tiles, null, 'le Dessin ne fait aucune requête');
@@ -275,7 +282,7 @@ test('F208 : sur les photos, un style à fond uni dessous, les images, les jardi
   assert.equal(basemap.maxzoom, 19);
   assert.equal(
     basemap.attribution,
-    '<a href="https://cartes.gouv.fr" target="_blank" rel="noopener noreferrer">© IGN – Géoplateforme</a>',
+    `<a href="${IGN_DATASET_PAGE}" target="_blank" rel="noopener noreferrer">© IGN – Géoplateforme</a>`,
   );
   const outlines = style.sources[OUTLINES_SOURCE_ID];
   assert.ok(outlines?.type === 'geojson');
@@ -298,7 +305,7 @@ test('F208 : sur le Dessin, aucune requête, la parcelle à l’encre ; jamais d
     assert.equal('sprite' in built, false);
     assert.equal(built.layers.some(({ type }) => type === ('symbol' as string)), false);
     const urls = JSON.stringify(built).match(/https?:\/\/[^"\\ ]+/g) ?? [];
-    assert.ok(urls.every((url) => url.startsWith('https://data.geopf.fr/') || url === 'https://cartes.gouv.fr'), urls.join(' '));
+    assert.ok(urls.every((url) => url.startsWith('https://data.geopf.fr/') || url === IGN_DATASET_PAGE), urls.join(' '));
   }
 });
 
@@ -340,15 +347,32 @@ test('F206 : tout dessiné, en partie, ou rien du tout', () => {
   assert.equal(none.gardens.length, 1, 'la liste reste');
 });
 
-test('F211 : la ferme de démonstration et les fermes fictives n’ont aucun contour : elles montrent « non dessinée »', () => {
-  const snapshots = [mockSnapshot, ...Object.keys(DEMO_FARMS).map((profile) => demoFarmSnapshot(profile as keyof typeof DEMO_FARMS, '2026-06-16'))];
-  for (const snapshot of snapshots) {
+test('F211 : les fermes de la démonstration guidée n’ont aucun contour : elles montrent « non dessinée »', () => {
+  for (const profile of Object.keys(DEMO_FARMS) as (keyof typeof DEMO_FARMS)[]) {
+    const snapshot = demoFarmSnapshot(profile, '2026-06-16');
     assert.ok(snapshot.zones.length > 0);
     for (const demoZone of snapshot.zones) {
       const view = satelliteView(demoZone, snapshot.plots);
       assert.equal(view.drawing, 'none', `${snapshot.structure.name}, ${demoZone.name}`);
       assert.equal(view.framing, null);
     }
+  }
+});
+
+test('F224 : la ferme des parcours porte des contours fictifs qui jouent les trois cas, en France', () => {
+  const drawingOf = (zoneId: string) => {
+    const parcel = mockSnapshot.zones.find(({ id }) => id === zoneId);
+    assert.ok(parcel, zoneId);
+    return satelliteView(parcel, mockSnapshot.plots);
+  };
+  const pres = drawingOf('zone-pres');
+  assert.equal(pres.drawing, 'complete');
+  assert.deepEqual(pres.gardens.map(({ name, outlined }) => [name, outlined]), [['Jardin Nord', true], ['Tunnel 1', true]]);
+  assert.equal(chooseBasemap('satellite', pres.framing).basemap, IGN_ORTHOPHOTOS, 'près de la commune de la ferme, en France');
+  assert.equal(drawingOf('zone-verger').drawing, 'partial');
+  assert.equal(drawingOf('zone-coteau').drawing, 'none');
+  for (const zoneOrPlot of [...mockSnapshot.zones, ...mockSnapshot.plots]) {
+    if (zoneOrPlot.outline) assert.ok(isOutlineShape(zoneOrPlot.outline), zoneOrPlot.id);
   }
 });
 

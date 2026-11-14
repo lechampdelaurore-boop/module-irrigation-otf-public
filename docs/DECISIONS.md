@@ -4012,3 +4012,35 @@ avant le correctif, à l'heure simulée ; hors démonstration, l'heure réelle
 est celle de l'horloge.
 
 Ne changent pas : D-104, D-106.
+
+## D-113 — Vue satellite (S3), PR 2 : l'onglet, après les constats A et B
+
+Date : 14 novembre 2026. Décideur : le porteur pour le contrat (« 3 je
+valide », 14 novembre 2026 à 15 h 41) et pour les constats dans son Chrome
+(« tu peux y aller », 17 h 22) ; les précisions, par la recommandation. En
+Opus 5.5 · Très élevé, la ligne S3 de la roadmap.
+
+**Établi.** A : OTF envoie pour une parcelle et ses jardins un seul anneau
+fermé de paires `[longitude, latitude]`, `null` pour un jardin non dessiné,
+sans trou ; la lecture de la PR 1 le range tel quel, F201 ne change pas.
+B : la couche `ORTHOIMAGERY.ORTHOPHOTOS` répond sans clé, jeu déclaré
+`PM_0_19`, zoom maximal 19, « No data found » hors de ses images, aucune
+image à l'échelle d'une ferme en Polynésie française ; CORS autorisé depuis
+l'adresse du module. Constats au contrat, section 12, sans aucune valeur de
+contour ni clé consignée.
+
+**Décision.** Le bloc de la parcelle de « Matériel et placement » reçoit les
+onglets « Plan » et « Vue satellite » ; la vue satellite charge
+`maplibre-gl` 6.16.0 (version exacte, BSD-3-Clause) à son ouverture
+seulement, dessine la parcelle et ses jardins sur les orthophotos de l'IGN
+ou le « Dessin », avec la liste des jardins à côté, la bascule mémorisée par
+l'appareil et le dessin SVG sans WebGL. L'adresse des tuiles prend le jeu
+`PM_0_19`, le crédit mène à la fiche de la donnée BD ORTHO, la Polynésie
+française reçoit l'avis « non configuré ». La ferme de démonstration des
+parcours navigateur porte des contours inventés sur un lieu fictif pour
+jouer les trois cas ; celles de la démonstration guidée n'en ont aucun
+(F211 précisé). Précisions F224 à F231 au contrat ; parcours P34. Aucune
+migration, aucune requête de plus à OTF, aucune écriture hors le choix de
+fond de l'appareil.
+
+Ne changent pas : D-001, D-002, D-003, D-047, D-110, D-111.

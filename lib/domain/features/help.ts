@@ -21,7 +21,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   materiel: {
     purpose: 'Décrire votre matériel d’arrosage et dire où il est posé, planche par planche.',
-    reading: 'Le plan montre vos jardins et leurs planches. Une planche arrosée porte le matériel posé et l’apport qu’il donne en millimètres par heure. Touchez une planche pour ouvrir sa fiche.',
+    reading: 'Le plan montre vos jardins et leurs planches. Une planche arrosée porte le matériel posé et l’apport qu’il donne en millimètres par heure. Touchez une planche pour ouvrir sa fiche. L’onglet « Vue satellite » montre la parcelle et ses jardins dessinés dans Ouvre ta ferme.',
     firstStep: 'Ajoutez un matériel, goutte-à-goutte ou aspersion, avec ses réglages, puis posez-le sur les planches qu’il arrose.',
   },
   arrosages: {
