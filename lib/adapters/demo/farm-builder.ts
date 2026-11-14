@@ -1,4 +1,4 @@
-import type { Bed, CropPlan, CropSeries, ImplantationTask, IrrigationSnapshot, Plot, PlotMode, Zone } from '../../domain/domain.ts';
+import type { Bed, CropPlan, CropSeries, ImplantationTask, IrrigationSnapshot, Outline, OutlinePosition, Plot, PlotMode, Zone } from '../../domain/domain.ts';
 import { compareWeekKeys, weekKeyFromDateKey } from '../../domain/week-keys.ts';
 
 /**
@@ -14,7 +14,12 @@ const SEASONS = [DEMO_SEASON];
 
 export type DemoBedDefinition = { id: string; name: string; length: number; width: number; alleyWidth: number };
 type DemoPlotDefinition = { id: string; name: string; mode: PlotMode; length: number; width: number; beds: readonly DemoBedDefinition[] };
-type DemoZoneDefinition = { id: string; name: string; plots: readonly DemoPlotDefinition[] };
+/**
+ * `drawnAt` : le coin sud-ouest de la parcelle, sur un lieu inventé, quand la
+ * ferme fictive l'a dessinée dans Ouvre ta ferme (S3, F232) ; sans lui, la
+ * parcelle n'est pas dessinée et la vue satellite le dit.
+ */
+type DemoZoneDefinition = { id: string; name: string; plots: readonly DemoPlotDefinition[]; drawnAt?: OutlinePosition };
 
 /** Une série : une culture, ses planches, son implantation et ses semaines de récolte prévues. */
 export type DemoSeriesDefinition = {
@@ -38,6 +43,40 @@ export type DemoFarmDefinition = {
 };
 
 const round = (value: number) => Math.round(value * 100) / 100;
+
+/** Le bord laissé autour des jardins, et l'écart entre deux jardins, en mètres (F233). */
+const DRAWN_MARGIN_METERS = 4;
+const DRAWN_GAP_METERS = 3;
+const METERS_PER_DEGREE_OF_LATITUDE = 111_320;
+
+/** Un rectangle nord en haut, en mètres depuis le coin sud-ouest de la parcelle. */
+function drawnRectangle(origin: OutlinePosition, west: number, south: number, east: number, north: number): Outline {
+  const [longitude, latitude] = origin;
+  const metersPerDegreeOfLongitude = METERS_PER_DEGREE_OF_LATITUDE * Math.cos((latitude * Math.PI) / 180);
+  const at = (x: number, y: number): OutlinePosition => [
+    Math.round((longitude + x / metersPerDegreeOfLongitude) * 1e7) / 1e7,
+    Math.round((latitude + y / METERS_PER_DEGREE_OF_LATITUDE) * 1e7) / 1e7,
+  ];
+  return [{ exterior: [at(west, south), at(east, south), at(east, north), at(west, north), at(west, south)], holes: [] }];
+}
+
+/**
+ * Les contours d'une parcelle dessinée (F233) : ses jardins côte à côte d'ouest
+ * en est, chacun à ses dimensions d'Ouvre ta ferme (longueur d'ouest en est,
+ * largeur du sud au nord), et la parcelle autour, avec un bord.
+ */
+function drawnOutlines(zone: DemoZoneDefinition, origin: OutlinePosition): { zone: Outline; plots: Map<string, Outline> } {
+  const plots = new Map<string, Outline>();
+  let east = DRAWN_MARGIN_METERS;
+  let widest = 0;
+  for (const plot of zone.plots) {
+    plots.set(plot.id, drawnRectangle(origin, east, DRAWN_MARGIN_METERS, east + plot.length, DRAWN_MARGIN_METERS + plot.width));
+    east += plot.length + DRAWN_GAP_METERS;
+    widest = Math.max(widest, plot.width);
+  }
+  const zoneEast = east - DRAWN_GAP_METERS + DRAWN_MARGIN_METERS;
+  return { zone: drawnRectangle(origin, 0, 0, zoneEast, widest + 2 * DRAWN_MARGIN_METERS), plots };
+}
 
 function cropPlanAt(series: readonly DemoSeriesDefinition[], momentDateKey: string): CropPlan {
   const momentWeek = weekKeyFromDateKey(momentDateKey);
@@ -94,15 +133,20 @@ export function buildDemoSnapshot(definition: DemoFarmDefinition, momentDateKey:
   const beds: Bed[] = [];
   for (const zone of definition.zones) {
     let zoneArea = 0;
+    const drawn = zone.drawnAt ? drawnOutlines(zone, zone.drawnAt) : null;
     for (const plot of zone.plots) {
       const plotArea = round(plot.length * plot.width);
       zoneArea += plotArea;
-      plots.push({ id: plot.id, zoneId: zone.id, name: plot.name, mode: plot.mode, length: plot.length, width: plot.width, area: plotArea, seasons: SEASONS });
+      const outline = drawn?.plots.get(plot.id);
+      plots.push({
+        id: plot.id, zoneId: zone.id, name: plot.name, mode: plot.mode, length: plot.length, width: plot.width, area: plotArea, seasons: SEASONS,
+        ...(outline ? { outline } : {}),
+      });
       for (const bed of plot.beds) {
         beds.push({ id: bed.id, zoneId: zone.id, plotId: plot.id, name: bed.name, length: bed.length, width: bed.width, alleyWidth: bed.alleyWidth, area: round(bed.length * bed.width), seasons: SEASONS });
       }
     }
-    zones.push({ id: zone.id, name: zone.name, area: round(zoneArea), seasons: SEASONS });
+    zones.push({ id: zone.id, name: zone.name, area: round(zoneArea), seasons: SEASONS, ...(drawn ? { outline: drawn.zone } : {}) });
   }
   return {
     configuration: { seasonFirst: DEMO_SEASON, seasonLast: DEMO_SEASON },

@@ -211,7 +211,7 @@ registres, elle y renvoie.
   fermé de points par parcelle et par jardin, `null` sans dessin, que la
   lecture range telle quelle ; la tuile IGN vient sans clé, jeu `PM_0_19`,
   zoom 19, rien en Polynésie française. **PR 2, l'onglet, codée le
-  14 novembre 2026** (cette PR, D-113, précisions F224 à F231) : dans
+  14 novembre 2026** (D-113, précisions F224 à F231) : dans
   « Matériel et placement », les onglets « Plan » et « Vue satellite » ; la
   carte MapLibre 6.16.0 chargée à l'ouverture, la liste des jardins, la
   bascule mémorisée, le repli « Dessin », le dessin SVG sans WebGL ; la
@@ -220,8 +220,16 @@ registres, elle y renvoie.
   compilation, knip, `push:check`, `weather:check`, les 94 parcours
   navigateur et les 16 parcours de la démonstration (local), verts. **PR 2
   en ligne** (#47, `a29605a`, fusionnée le 14 novembre 2026 à 19 h 16,
-  déployée à 19 h 34, run 43625642370, les cinq jobs réussis). Reste la
-  relecture du porteur sur sa ferme.
+  déployée à 19 h 34, run 43625642370, les cinq jobs réussis). **Premières
+  remarques du porteur le soir même, corrigées** (cette PR, D-115, contrat
+  section 13, F232 à F235) : les trois fermes garnies de la démonstration
+  dessinées sur des lieux inventés, la ferme vierge non ; à l'ordinateur, la
+  liste des jardins à la hauteur de la carte, avec son ascenseur. Aucune
+  migration. Contrôles avant la PR : lint, typage, 1 503 tests,
+  compilation, knip, `push:check`, `weather:check`, `demo:check`, les
+  94 parcours navigateur et les 16 de la démonstration (local), verts.
+  Reste la relecture du porteur sur sa ferme et, dans la démonstration,
+  l'emplacement des dessins (F234).
 - Fusion des moteurs, étape 1 (ligne 24 sexies de la roadmap, D-114) :
   **inscrite le 14 novembre 2026** sur le mot du porteur, registres
   seulement (cette PR). Un script qui fait tourner le code OTF actuel de la

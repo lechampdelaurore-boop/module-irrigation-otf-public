@@ -347,14 +347,64 @@ test('F206 : tout dessiné, en partie, ou rien du tout', () => {
   assert.equal(none.gardens.length, 1, 'la liste reste');
 });
 
-test('F211 : les fermes de la démonstration guidée n’ont aucun contour : elles montrent « non dessinée »', () => {
+/** La surface d'un anneau en m², à plat autour de sa latitude : assez juste pour un jardin. */
+function ringAreaSquareMeters(ring: OutlinePosition[]): number {
+  const metersPerDegree = 111_320;
+  const cosine = Math.cos((ring[0][1] * Math.PI) / 180);
+  let twice = 0;
+  for (let index = 0; index < ring.length - 1; index += 1) {
+    const [x1, y1] = ring[index];
+    const [x2, y2] = ring[index + 1];
+    twice += x1 * cosine * metersPerDegree * y2 * metersPerDegree - x2 * cosine * metersPerDegree * y1 * metersPerDegree;
+  }
+  return Math.abs(twice) / 2;
+}
+
+test('F232 : les fermes garnies de la démonstration sont dessinées, sauf une parcelle ; la ferme vierge ne l’est pas', () => {
+  const drawingOf = (profile: keyof typeof DEMO_FARMS) => {
+    const snapshot = demoFarmSnapshot(profile, '2026-06-16');
+    return Object.fromEntries(snapshot.zones.map((parcel) => [parcel.name, satelliteView(parcel, snapshot.plots)]));
+  };
+  const maraichage = drawingOf('maraichage');
+  assert.deepEqual(
+    Object.entries(maraichage).map(([name, view]) => [name, view.drawing]),
+    [['Le Grand Champ', 'complete'], ['La Butte', 'complete'], ['Le Clos des Saules', 'none']],
+  );
+  assert.deepEqual(Object.values(drawingOf('petite-ferme')).map((view) => view.drawing), ['complete']);
+  assert.deepEqual(Object.values(drawingOf('vannes-alertes')).map((view) => view.drawing), ['complete', 'complete']);
+  for (const view of Object.values(drawingOf('vierge'))) {
+    assert.equal(view.drawing, 'none');
+    assert.equal(view.framing, null);
+  }
+  for (const profile of ['maraichage', 'petite-ferme', 'vannes-alertes'] as const) {
+    for (const [name, view] of Object.entries(drawingOf(profile))) {
+      if (view.drawing === 'none') continue;
+      assert.equal(chooseBasemap('satellite', view.framing).basemap, IGN_ORTHOPHOTOS, `${profile}, ${name} : en France`);
+    }
+  }
+});
+
+test('F233 : les contours de la démonstration suivent les dimensions d’OTF, jardins côte à côte dans leur parcelle', () => {
   for (const profile of Object.keys(DEMO_FARMS) as (keyof typeof DEMO_FARMS)[]) {
     const snapshot = demoFarmSnapshot(profile, '2026-06-16');
-    assert.ok(snapshot.zones.length > 0);
-    for (const demoZone of snapshot.zones) {
-      const view = satelliteView(demoZone, snapshot.plots);
-      assert.equal(view.drawing, 'none', `${snapshot.structure.name}, ${demoZone.name}`);
-      assert.equal(view.framing, null);
+    for (const parcel of snapshot.zones) {
+      if (!parcel.outline) continue;
+      assert.ok(isOutlineShape(parcel.outline), parcel.id);
+      const [west, south] = parcel.outline[0].exterior[0];
+      const [east, north] = parcel.outline[0].exterior[2];
+      const gardens = snapshot.plots.filter((garden) => garden.zoneId === parcel.id);
+      let previousEast = west;
+      for (const garden of gardens) {
+        assert.ok(garden.outline && isOutlineShape(garden.outline), garden.id);
+        const ring = garden.outline[0].exterior;
+        const drawnArea = ringAreaSquareMeters(ring);
+        assert.ok(Math.abs(drawnArea - garden.area) / garden.area < 0.01, `${garden.name} : ${drawnArea} m² dessinés pour ${garden.area}`);
+        for (const [longitude, latitude] of ring) {
+          assert.ok(longitude > west && longitude < east && latitude > south && latitude < north, `${garden.name} dans ${parcel.name}`);
+        }
+        assert.ok(ring[0][0] > previousEast, `${garden.name} à l’est du jardin précédent`);
+        previousEast = ring[1][0];
+      }
     }
   }
 });

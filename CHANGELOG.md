@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (S3, la vue satellite, après la relecture du porteur)
+
+- **La démonstration montre la vue satellite** (D-115, F232 à F234) : les
+  trois fermes garnies sont dessinées, sur des lieux inventés près de leur
+  commune, avec les dimensions de leurs jardins ; « Le Clos des Saules » et
+  la ferme vierge ne le sont pas, pour montrer ce cas.
+- **La liste des jardins à la hauteur de la carte** (F235) : à
+  l'ordinateur, elle défile seule à côté de la carte, et la légende suit
+  juste sous la carte, sans zone vide ; un jardin touché sur la carte amène
+  sa ligne en vue.
+
 ### Inscrit (fusion des moteurs, étape 1 : le script des cas de test)
 
 - **Le script des cas de test du moteur commun entre dans la roadmap**

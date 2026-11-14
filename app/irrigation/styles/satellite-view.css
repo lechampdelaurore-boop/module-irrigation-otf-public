@@ -40,14 +40,16 @@
   --satellite-zone-on-photo: var(--card);
   --satellite-zone-on-drawing: var(--ink);
   --satellite-drawing-background: var(--sheet);
+  /* La hauteur de la carte, que la liste des jardins ne dépasse pas à côté d'elle (F235). */
+  --satellite-map-height: max(280px, min(60vh, 520px));
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
   grid-template-areas:
     "toggle toggle"
     "notice notice"
     "map list"
-    "legend list"
-    "privacy list";
+    "legend ."
+    "privacy .";
   align-items: start;
   gap: 10px 20px;
 }
@@ -112,8 +114,7 @@
 
 .satellite-map {
   width: 100%;
-  height: min(60vh, 520px);
-  min-height: 280px;
+  height: var(--satellite-map-height);
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--satellite-drawing-background);
@@ -121,8 +122,7 @@
 
 .satellite-loading {
   display: grid;
-  height: min(60vh, 520px);
-  min-height: 280px;
+  height: var(--satellite-map-height);
   margin: 0;
   place-items: center;
   border-radius: var(--radius);
@@ -249,12 +249,30 @@
 }
 
 .satellite-garden-list {
+  position: relative;
   display: grid;
   grid-area: list;
+  align-content: start;
   gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/*
+  À côté de la carte, la liste a son propre ascenseur : elle ne dépasse pas la
+  hauteur de la carte, et la page enchaîne juste sous la carte (F235).
+*/
+.satellite-view:not([data-drawing='none']) .satellite-garden-list {
+  max-height: var(--satellite-map-height);
+  padding-right: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.satellite-garden-list:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .satellite-garden-row {
@@ -319,6 +337,13 @@ button.satellite-garden-row[aria-pressed='true'] {
       "legend"
       "privacy"
       "list";
+  }
+
+  /* Au téléphone, la liste vient sous la carte, entière : la page défile seule. */
+  .satellite-view:not([data-drawing='none']) .satellite-garden-list {
+    max-height: none;
+    padding-right: 0;
+    overflow-y: visible;
   }
 
   .satellite-map,

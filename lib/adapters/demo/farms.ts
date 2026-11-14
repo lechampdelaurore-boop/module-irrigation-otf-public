@@ -9,6 +9,11 @@ import { bedRow, buildDemoSnapshot, type DemoFarmDefinition, type DemoSeriesDefi
  * validé, aucune valeur agronomique nouvelle. La ferme A reprend la forme de
  * la ferme de démonstration des parcours (plein champ, un abri, un verger),
  * étendue ; les parcours gardent la leur, intacte.
+ *
+ * Les parcelles dessinées (S3, F232 à F234) portent un coin sud-ouest pris à
+ * la campagne près de la commune de la ferme : un lieu inventé, qui ne désigne
+ * aucune ferme réelle. La ferme vierge n'a rien dessiné, comme une ferme qui
+ * démarre ; « Le Clos des Saules » non plus, pour montrer ce cas.
  */
 
 const series = (
@@ -34,6 +39,7 @@ const MARAICHAGE: DemoFarmDefinition = {
     {
       id: 'zone-grand-champ',
       name: 'Le Grand Champ',
+      drawnAt: [-1.44, 47.33],
       plots: [
         { id: 'plot-champ-haut', name: 'Champ du haut', mode: 'garden', length: 42, width: 18, beds: bedRow('H', 3, { length: 30, width: 0.75, alleyWidth: 0.45 }) },
         { id: 'plot-abri-noues', name: 'Abri des noues', mode: 'greenhouse', length: 30, width: 8, beds: bedRow('A', 3, { length: 26, width: 0.75, alleyWidth: 0.35 }) },
@@ -42,6 +48,7 @@ const MARAICHAGE: DemoFarmDefinition = {
     {
       id: 'zone-butte',
       name: 'La Butte',
+      drawnAt: [-1.437, 47.3315],
       plots: [{ id: 'plot-champ-bas', name: 'Champ du bas', mode: 'garden', length: 36, width: 22, beds: bedRow('C', 2, { length: 32, width: 0.8, alleyWidth: 0.4 }) }],
     },
     {
@@ -70,6 +77,7 @@ const PETITE_FERME: DemoFarmDefinition = {
   zones: [{
     id: 'zone-potager',
     name: 'Le Potager',
+    drawnAt: [0.855, 47.295],
     plots: [
       { id: 'plot-jardin-mare', name: 'Jardin de la mare', mode: 'garden', length: 20, width: 12, beds: bedRow('M', 4, { length: 15, width: 0.8, alleyWidth: 0.4 }) },
       { id: 'plot-petit-abri', name: 'Petit abri', mode: 'greenhouse', length: 12, width: 6, beds: bedRow('P', 2, { length: 10, width: 0.8, alleyWidth: 0.4 }) },
@@ -92,11 +100,13 @@ const VANNES_ALERTES: DemoFarmDefinition = {
     {
       id: 'zone-terres-blanches',
       name: 'Les Terres Blanches',
+      drawnAt: [5.06, 44.945],
       plots: [{ id: 'plot-parcelle-vignes', name: 'Parcelle des vignes', mode: 'garden', length: 40, width: 20, beds: bedRow('V', 3, { length: 35, width: 1.2, alleyWidth: 0.6 }) }],
     },
     {
       id: 'zone-verger',
       name: 'Le Verger',
+      drawnAt: [5.0605, 44.9435],
       plots: [{ id: 'plot-rangs-verger', name: 'Rangs du verger', mode: 'garden', length: 30, width: 10, beds: bedRow('R', 2, { length: 25, width: 1, alleyWidth: 0.5 }) }],
     },
   ],
