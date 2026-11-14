@@ -4044,3 +4044,29 @@ migration, aucune requête de plus à OTF, aucune écriture hors le choix de
 fond de l'appareil.
 
 Ne changent pas : D-001, D-002, D-003, D-047, D-110, D-111.
+
+## D-114 — Fusion des moteurs, étape 1 : le script des cas de test s'inscrit dans l'ordre d'exécution
+
+Date : 14 novembre 2026. Décideur : le porteur (« Inscris le script dans la
+roadmap », 14 novembre 2026), sur la recommandation du coordinateur ; le
+réglage, par la recommandation.
+
+**Établi.** Le contrat de fusion des deux moteurs (brouillon v0.1.1) porte
+les onze décisions du porteur du 14 novembre 2026 (MC-16 à MC-26), dont
+MC-26 : étapes 0 et 1 d'abord, moteur et adaptateur en Opus 5.5 · Max quand
+la place de code est libre, ligne de roadmap par une PR de registres à ce
+moment. Les dix cas OTF O01 à O10 du dépôt commun sont calculés à la main
+et n'ont jamais été exécutés.
+
+**Décision.** L'étape 1 (un script qui fait tourner le code OTF actuel de la
+jauge sur les cas O01 à O10 et sur les cas limites du contrat de fusion, et
+compare aux valeurs écrites) entre dans l'ordre d'exécution, ligne 24
+sexies, **après la vue satellite (S3) et avant l'audit ergonomique final**,
+en Opus 5.5 · Élevé, un seul chantier de code à la fois. Le script mesure :
+il ne modifie ni le module ni un test existant ; une valeur fausse se
+corrige dans le contrat, jamais dans le code du module. Les étapes 2 et 3
+restent hors ordre. Toute PR sur le dépôt commun et tout message à Nicolas
+restent interdits sans nouvel accord du porteur. Aucune migration, aucune
+ligne de code du module.
+
+Ne changent pas : D-065, D-066, D-001, D-003, D-047.
