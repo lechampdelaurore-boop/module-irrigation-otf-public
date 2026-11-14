@@ -3980,3 +3980,35 @@ le zoom maximal et la page de crédit (B, dans le Chrome du porteur). Si A
 montre une forme que F201 ne lit pas, la lecture s'ajuste avant la PR 2.
 
 Ne changent pas : D-001, D-002, D-003, D-047, D-110.
+
+## D-112 — Démonstration : le jeton Cloudflare Access se vérifie à l'heure réelle, jamais au jour simulé
+
+Date : 14 novembre 2026. Correctif de D4 (D-106), tranché par la
+recommandation, en Opus 5.5 · Élevé, sur sa branche
+`fix/demo-jeton-access-heure-reelle`.
+
+**Constat.** #45 a posé l'AUD de l'application Access de la démonstration
+(en ligne le 14 novembre 2026 à 17 h 58, run 43617026648). À la première
+ouverture dans le navigateur du porteur, la démonstration renvoyait vers
+`/cdn-cgi/access/login`, page introuvable (404) sur l'adresse workers.dev.
+Les journaux du Worker montrent que la requête arrivait bien avec son jeton
+Access (`cf-access-jwt-assertion`). Le jeton était refusé : le Worker de
+démonstration joue chaque requête au jour simulé du moment choisi (D-104,
+C3), le 14 avril par défaut, et un jeton émis le 14 novembre y paraît « pas
+encore valide ». Les parcours de démonstration ne l'avaient pas vu : ils
+passent par l'utilisateur de démonstration local, sans jeton.
+
+**Décision.** Ce qui se vérifie contre le monde réel se lit à l'heure
+réelle. `realNow()` (`lib/services/demo-clock.ts`) rend l'heure réelle même
+pendant une requête de démonstration ; elle est lue sur l'horloge installée
+plutôt que sur une variable du module, pour rester juste si le module est
+chargé deux fois. `app/access-auth.ts` vérifie le jeton (validité, cache des
+clés publiques) avec elle. En production, rien ne change : sans horloge
+simulée, `realNow()` est `Date.now()`.
+
+**Vérifié par** `tests/access-jwt-demo-clock.test.ts` : au 14 avril simulé,
+un jeton émis maintenant est accepté à l'heure réelle et refusé, comme
+avant le correctif, à l'heure simulée ; hors démonstration, l'heure réelle
+est celle de l'horloge.
+
+Ne changent pas : D-104, D-106.
