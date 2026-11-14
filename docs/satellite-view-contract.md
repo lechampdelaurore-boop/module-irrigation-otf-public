@@ -5,7 +5,8 @@ sans code, en Sonnet 5.5 · Moyen (travail sans code de la grille). Chantier S3
 de la section 5 sexies de `ROADMAP.md`, décision D-110. **La relecture du
 porteur est obligatoire avant tout code de S3.** **Validé par le porteur le
 14 novembre 2026 à 15 h 41** (« 3 je valide ») ; le code commence le jour
-même par la PR 1, le domaine (section 11, D-111).
+même par la PR 1, le domaine (section 11, D-111), puis par la PR 2, l'onglet,
+après les constats A et B (section 12, D-113).
 
 ## 1. Ce que le porteur a choisi
 
@@ -29,7 +30,7 @@ n° 4394, en lecture seule. **Aucun des trois n'a pu être vérifié de bout en
 bout cette nuit ; ils sont donc dits « non vérifiés » et deviennent des
 conditions d'entrée du code (section 9).**
 
-### Fait 1 — la forme réelle de `coordinates` : **non vérifié**
+### Fait 1 — la forme réelle de `coordinates` : **constaté le 14 novembre 2026 (section 12)**
 
 Aucun appel réel n'a été fait : l'accès à `/zoneList` et `/plotList` demande un
 jeton OAuth2 de la ferme, que ce fil n'a pas et ne doit ni voir ni saisir
@@ -43,7 +44,7 @@ Faute de constat, le contrat **ne parie pas sur une forme** : la lecture est
 tolérante (F201) et le premier travail du code est de constater la forme
 réelle (section 9, condition A) et de la consigner ici par une section datée.
 
-### Fait 2 — une tuile IGN réelle : **non vérifié**
+### Fait 2 — une tuile IGN réelle : **constaté le 14 novembre 2026 (section 12)**
 
 L'essai a échoué dans le bac à sable de ce fil : le relais réseau refuse
 `data.geopf.fr` (« CONNECT tunnel failed, response 403 », sur la tuile comme
@@ -305,7 +306,7 @@ Licence Ouverte 2.0 (`https://www.data.gouv.fr/pages/legal/licences/etalab-2.0`)
 son zoom maximal, et la page de la couche (avec sa date) vers laquelle pointer
 le lien du crédit, s'il en existe une plus précise que `cartes.gouv.fr`.
 
-### Conditions A et B : **toujours ouvertes**
+### Conditions A et B : **toujours ouvertes** (levées le jour même, section 12)
 
 Elles ne bloquent pas la PR 1 (la lecture est tolérante, F201) mais la PR 2,
 l'interface : A demande le jeton de « Ferme v2 » n° 4394 posé par le porteur
@@ -358,11 +359,11 @@ zoom maximal de 19, **provisoires** jusqu'à B.
   Saint-Martin et Saint-Barthélemy, Wallis-et-Futuna, Polynésie française,
   Nouvelle-Calédonie). Une ferme frontalière peut voir le fond IGN essayé ;
   sans image, la carte passe au « Dessin » (F206 c). Que la couche ait des
-  images partout se vérifie avec B.
+  images partout se vérifie avec B (fait : la Polynésie en sort, section 12).
 - **F222 — la bascule mémorisée.** Le satellite par défaut ; toute valeur
   mémorisée autre que « dessin » y revient.
 - **F223 — le crédit.** « © IGN – Géoplateforme », lien vers
-  `https://cartes.gouv.fr`, ouvert dans un nouvel onglet ; le « Dessin » ne
+  `https://cartes.gouv.fr` (la fiche de la donnée depuis la section 12), ouvert dans un nouvel onglet ; le « Dessin » ne
   crédite personne.
 
 **Preuve de la PR 1** : `tests/otf-outline.test.ts` (toutes les formes de
@@ -374,3 +375,121 @@ parcelle, aucune emprise, « en France », choix du fond, style, ce que
 l'onglet montre, ferme de démonstration sans contour, dessin SVG) ;
 `tests/snapshot-validation.test.ts` (ancien cache sans contour, contour
 abîmé).
+
+## 12. Conditions A et B, et la PR 2 : l'onglet (14 novembre 2026)
+
+Constatées le 14 novembre 2026 en fin d'après-midi dans le Chrome du
+porteur, avec son accord, dans un onglet ouvert par l'assistant et refermé à
+la fin ; lecture seule, rien n'est écrit dans Ouvre ta ferme ni ailleurs.
+
+### Condition A, la forme de `coordinates` : **levée**
+
+Le porteur a collé lui-même la clé API de « Ferme v2 » n° 4394 dans un
+champ masqué de l'onglet ; la clé n'a été ni affichée, ni enregistrée, ni
+vue par l'assistant, le champ s'est vidé aussitôt. Deux lectures,
+`/zoneList` et `/plotList` de la saison 2026, à une demi-seconde d'écart ;
+seule la **forme** des contours a été relevée, jamais leurs valeurs :
+
+- les deux routes répondent `{ count, list }` ;
+- la parcelle porte **un seul anneau fermé** de paires `[longitude,
+  latitude]` (13 points), des nombres à 13 décimales ; cinq jardins sur six
+  portent chacun un anneau fermé de 5 points (des rectangles), le sixième
+  `null` ; aucun trou, aucun polygone multiple, aucun texte JSON ;
+- un jardin est dessiné **hors** du contour de sa parcelle : le cadrage le
+  prend (F203, l'emprise s'étend aux jardins) ;
+- la même forme se lit dans la page « Plan de la ferme » d'OTF.
+
+C'est la première forme de F201 (une liste de points) : la lecture
+tolérante la range telle quelle, ce que l'assistant a vérifié en passant une
+copie **décalée** des contours (même forme, autre lieu) à
+`readOtfOutline` ; rien de la position n'est consigné. F201 ne change pas.
+
+### Condition B, une vraie tuile IGN : **levée**
+
+Lue dans le même Chrome, sans clé ni compte :
+
+- `GetCapabilities` : la couche `ORTHOIMAGERY.ORTHOPHOTOS`
+  (« Photographies aériennes »), format `image/jpeg`, style `normal`, jeu de
+  tuiles **déclaré `PM_0_19`** (Mercator sphérique, 256 px, zooms 0 à 19) ;
+  le jeu `PM` répond la même tuile. Son emprise déclarée est le monde entier :
+  elle ne dit pas où sont les images, les emprises du code restent utiles ;
+- une tuile du centre de la France aux zooms 17 et 19 : 200, JPEG 256 × 256,
+  sans clé ; au zoom 20 : 404 « No data found ». **Zoom maximal 19
+  confirmé** ;
+- hors des images (Madrid) : 404 « No data found » ; en haute mer à petite
+  échelle, une tuile unie ;
+- outre-mer : des images à La Réunion, en Nouvelle-Calédonie, à
+  Wallis-et-Futuna, en Guyane (côte et intérieur), à Mayotte, à
+  Saint-Pierre-et-Miquelon et à Saint-Martin ; **en Polynésie française,
+  rien au-delà du zoom 11** (Papeete, Bora-Bora, Nuku Hiva), comme le dit la
+  fiche de la donnée ;
+- depuis l'adresse du module, la tuile s'obtient par une requête CORS
+  (l'IGN l'autorise) ; le site n'a aucune politique de contenu qui la
+  bloquerait. L'IGN demande au navigateur de garder la tuile 21 jours.
+- la fiche de la donnée, `https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-ORTHO`,
+  porte sa date de mise à jour : le lien du crédit y mène (Licence Ouverte,
+  condition C).
+
+**Ce qui change dans le code** : l'adresse des tuiles prend le jeu déclaré
+`PM_0_19` ; le lien du crédit mène à la fiche de la donnée (F223) ; la
+Polynésie française sort des emprises où le fond IGN s'essaie et reçoit
+l'avis « non configuré » (F221 : la Corse et neuf territoires d'outre-mer).
+
+### Précisions faites en codant la PR 2 (F224 à F231, par la recommandation)
+
+- **F224 — la ferme des parcours.** La ferme de démonstration des parcours
+  navigateur (`lib/adapters/mock-data.ts`) porte des contours **inventés**
+  sur un lieu fictif près de sa commune (`lib/adapters/mock-outlines.ts`) :
+  « Les Prés » en entier, « Sous le verger » en partie, « Le Coteau » pas du
+  tout, pour jouer les trois cas. Les fermes de la démonstration guidée
+  n'en ont toujours aucun (F211 précisé) : elles montrent « non dessinée ».
+- **F225 — les onglets.** Le bloc de la parcelle porte deux onglets,
+  « Plan » et « Vue satellite » ; « Plan » à chaque ouverture de la page
+  (l'onglet n'est pas mémorisé, seul le fond l'est) ; flèches, Début et Fin
+  passent de l'un à l'autre. Poser un matériel se fait sur le plan : la
+  vue satellite lui cède la place le temps de la pose.
+- **F226 — la bibliothèque.** `maplibre-gl` **6.16.0** (BSD-3-Clause,
+  publiée le 25 octobre 2026, la plus récente d'au moins deux semaines),
+  chargée à l'ouverture de l'onglet avec sa feuille de style ; son
+  travailleur est servi par le module avec le reste de l'application. Les
+  boutons de la carte parlent français et mesurent 44 px ; les noms sont
+  posés en HTML, sans glyphe chargé à distance.
+- **F227 — aucun mouvement.** La carte s'ouvre déjà cadrée, sans animation,
+  et rien ne la déplace ensuite que la main de l'utilisateur ; sous
+  `prefers-reduced-motion`, le fondu des tuiles est supprimé aussi.
+- **F228 — le fond indisponible.** Une tuile en échec ne suffit pas (une
+  ferme frontalière en a au bord) : quand la carte s'est posée avec au moins
+  une tuile du fond en échec et **aucune** réussie, elle passe au « Dessin »
+  et dit « Fond satellite indisponible » ; redemander « Satellite » réessaie.
+- **F229 — la mise en évidence.** La ligne d'un jardin dans la liste est une
+  bascule (`aria-pressed`) ; toucher un jardin ou son nom sur la carte le
+  désigne. La ligne d'un jardin sans contour est un texte, pas un bouton :
+  elle n'a rien à montrer sur la carte.
+- **F230 — sans carte.** Sans WebGL, ou si la bibliothèque ne se charge pas,
+  le dessin SVG prend la place de la carte, avec la phrase « Ce navigateur
+  ne peut pas afficher la carte » ; ni bascule ni photo, aucune requête à
+  l'IGN.
+- **F231 — ce que la carte dit autour d'elle.** Sous la carte, la légende
+  des couleurs (plein champ, abri) et, quand les photos s'affichent, la
+  phrase de confidentialité (« L'IGN voit quelle zone est regardée, pas qui
+  la regarde ») ; l'aide de la page « Matériel et placement » nomme
+  l'onglet.
+
+**Limites connues** : le nom de la parcelle se pose à un point intérieur
+qui peut voisiner le nom d'un jardin ; le plein écran, sa sortie par Échap
+et les gestes à deux doigts ne sont pas joués par le parcours ; au-delà du
+zoom 19, la carte agrandit la dernière tuile.
+
+**Preuve de la PR 2** : le parcours **P34** aux deux largeurs
+(`e2e/p34-vue-satellite.spec.ts`) — les tuiles servies par le parcours,
+jamais demandées à l'IGN : l'onglet chargé à son ouverture seulement, la
+carte des Prés, le crédit et son lien, l'échelle, les noms, la liste
+(surface d'OTF, mode, contour), l'adresse des tuiles sans clé, la mise en
+évidence dans les deux sens, la bascule mémorisée au rechargement, la
+parcelle en partie dessinée, la parcelle sans dessin, le fond indisponible
+(réponse « No data found »), le retour au plan, les cibles de 44 px au
+téléphone, sans débordement ni erreur de console ; puis, sans WebGL, le
+dessin SVG et sa liste. Les tests du domaine
+(`tests/satellite-view.test.ts`) suivent les constats : jeu `PM_0_19`, lien
+du crédit, zoom 19, Polynésie hors des emprises, ferme des parcours (F224).
+Reste la relecture du porteur sur sa ferme, après le déploiement.

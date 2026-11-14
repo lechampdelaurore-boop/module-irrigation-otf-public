@@ -205,9 +205,20 @@ registres, elle y renvoie.
   de la carte, liste des jardins, dessin de secours en SVG. Contrôles avant
   la PR : lint, typage, 1 499 tests (43 nouveaux), compilation, knip,
   `push:check`, `weather:check` et les 90 parcours navigateur (local),
-  verts. **Non vérifié, conditions
-  de la PR 2** : la forme réelle de `coordinates` (A, jeton de « Ferme v2 »
-  posé par le porteur) et une vraie tuile IGN (B, dans son Chrome).
+  verts. **PR 1 en ligne** (#44, `9847d03`, fusionnée à 16 h 35, déployée
+  à 16 h 51, run 43611019947). **Conditions A et B levées le jour même
+  dans le Chrome du porteur** (section 12 du contrat) : OTF envoie un anneau
+  fermé de points par parcelle et par jardin, `null` sans dessin, que la
+  lecture range telle quelle ; la tuile IGN vient sans clé, jeu `PM_0_19`,
+  zoom 19, rien en Polynésie française. **PR 2, l'onglet, codée le
+  14 novembre 2026** (cette PR, D-113, précisions F224 à F231) : dans
+  « Matériel et placement », les onglets « Plan » et « Vue satellite » ; la
+  carte MapLibre 6.16.0 chargée à l'ouverture, la liste des jardins, la
+  bascule mémorisée, le repli « Dessin », le dessin SVG sans WebGL ; la
+  ferme des parcours porte des contours fictifs ; parcours P34. Aucune
+  migration. Contrôles avant la PR : voir « Derniers changements
+  fonctionnels ». Reste la relecture du porteur sur sa ferme, après le
+  déploiement.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
