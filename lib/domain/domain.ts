@@ -13,11 +13,33 @@ export type OtfStructure = {
   legalCountry: string | null;
 };
 
+/** Un point d'un contour : longitude puis latitude, en degrés WGS 84, six décimales. */
+export type OutlinePosition = [longitude: number, latitude: number];
+
+/** Un anneau fermé : son premier point répété à la fin, au moins trois points distincts. */
+export type OutlineRing = OutlinePosition[];
+
+/** Un polygone : un anneau extérieur et, dedans, des trous. */
+export type OutlinePolygon = {
+  exterior: OutlineRing;
+  holes: OutlineRing[];
+};
+
+/**
+ * Le contour d'une parcelle ou d'un jardin tel qu'Ouvre ta ferme le dessine
+ * (`coordinates`), rangé par `lib/domain/otf/outline.ts` : un ou plusieurs
+ * polygones. Cache technique de l'instantané, comme les noms
+ * (docs/satellite-view-contract.md, F201, F202).
+ */
+export type Outline = OutlinePolygon[];
+
 export type Zone = {
   id: string;
   name: string;
   area: number | null;
   seasons: Season[];
+  /** Absent : parcelle non dessinée dans OTF, ou cache antérieur à S3 (« contour absent »). */
+  outline?: Outline;
 };
 
 export type PlotMode = 'garden' | 'greenhouse';
@@ -31,6 +53,8 @@ export type Plot = {
   width: number;
   area: number;
   seasons: Season[];
+  /** Absent : jardin non dessiné dans OTF, ou cache antérieur à S3 (« contour absent »). */
+  outline?: Outline;
 };
 
 export type Bed = {

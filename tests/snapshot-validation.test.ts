@@ -48,3 +48,37 @@ test('un cache sans plan de culture reste valide, un plan de culture présent do
   assert.equal(isIrrigationSnapshot({ ...validSnapshot, cropPlan: { ...cropPlan, series: [{ id: 'serie-1' }] } }), false, 'une série sans mises en culture');
   assert.equal(isIrrigationSnapshot({ ...validSnapshot, cropPlan: null }), false);
 });
+
+const outline = [{
+  exterior: [[2.4, 47], [2.401, 47], [2.401, 47.001], [2.4, 47.001], [2.4, 47]],
+  holes: [],
+}];
+const plot = { id: '21', zoneId: '14', name: 'Jardin', mode: 'garden', length: 30, width: 10, area: 300, seasons: [2026] };
+
+test('F202 : un ancien cache sans contour reste valide ; un contour rangé est accepté sur la parcelle et le jardin', () => {
+  assert.equal(isIrrigationSnapshot({ ...validSnapshot, plots: [plot] }), true, 'cache antérieur à S3 : contour absent');
+  const withOutlines = {
+    ...validSnapshot,
+    zones: [{ ...validSnapshot.zones[0], outline }],
+    plots: [{ ...plot, outline }],
+  };
+  assert.equal(isIrrigationSnapshot(withOutlines), true);
+  assert.equal(isIrrigationSnapshot(JSON.parse(JSON.stringify(withOutlines))), true, 'relu du cache');
+});
+
+test('F202 : un contour présent mais abîmé fait écarter le cache, comme un plan de culture abîmé', () => {
+  const broken = [
+    null,
+    [],
+    'carré',
+    [{ exterior: [[2.4, 47], [2.401, 47], [2.4, 47]], holes: [] }],
+    [{ exterior: outline[0].exterior }],
+    [{ exterior: outline[0].exterior, holes: [[[2.4, 47]]] }],
+    [{ exterior: [[2.4, 47], [2.401, 47], [2.401, null], [2.4, 47.001], [2.4, 47]], holes: [] }],
+    outline[0].exterior,
+  ];
+  for (const value of broken) {
+    assert.equal(isIrrigationSnapshot({ ...validSnapshot, zones: [{ ...validSnapshot.zones[0], outline: value }] }), false, `parcelle ${JSON.stringify(value)}`);
+    assert.equal(isIrrigationSnapshot({ ...validSnapshot, plots: [{ ...plot, outline: value }] }), false, `jardin ${JSON.stringify(value)}`);
+  }
+});

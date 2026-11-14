@@ -3,7 +3,9 @@
 Écrit le 14 novembre 2026 sur le mandat d'autonomie de la nuit du porteur,
 sans code, en Sonnet 5.5 · Moyen (travail sans code de la grille). Chantier S3
 de la section 5 sexies de `ROADMAP.md`, décision D-110. **La relecture du
-porteur est obligatoire avant tout code de S3.**
+porteur est obligatoire avant tout code de S3.** **Validé par le porteur le
+14 novembre 2026 à 15 h 41** (« 3 je valide ») ; le code commence le jour
+même par la PR 1, le domaine (section 11, D-111).
 
 ## 1. Ce que le porteur a choisi
 
@@ -270,3 +272,105 @@ fond hors de France.
 Une PR de code, après la relecture du porteur : (1) domaine et tests, sans
 interface ; (2) composant, onglet et parcours P34. Un seul chantier de code à
 la fois ; réglage de la roadmap : Opus 5.5 · Très élevé (ligne S3).
+
+## 11. Le code, PR 1 : le domaine (14 novembre 2026)
+
+Codé le 14 novembre 2026 en Opus 5.5 · Très élevé, après la validation du
+porteur, sans interface (D-111). Aucune migration, aucun changement de
+comportement visible : l'instantané garde désormais les contours qu'OTF
+envoie déjà, et rien ne les affiche encore.
+
+### Condition C, la licence des orthophotos : **levée**
+
+Constaté le 14 novembre 2026 par le fil « Vérifier la licence des images
+IGN », et relu par ce fil sur `https://cartes.gouv.fr/cgu` et sur la
+Licence Ouverte 2.0 (`https://www.data.gouv.fr/pages/legal/licences/etalab-2.0`) :
+
+- l'usage des géoservices de la Géoplateforme est gratuit, sans clé sur les
+  points d'accès publics ; les tuiles WMTS ne sont soumises à aucune limite
+  d'usage ; les offres « Essentiel » et « Premium » des conditions visent les
+  fournisseurs qui hébergent leurs données, pas ceux qui les affichent ;
+- les données sont sous Licence Ouverte (Etalab 2.0) : réutilisation
+  permise « à des fins commerciales ou non », donc par un service
+  multi-fermes ;
+- obligations : mentionner la source (au moins « IGN ») et la date de
+  dernière mise à jour, ce qu'un lien vers la source suffit à faire ; ne pas
+  donner à la réutilisation un caractère officiel ; ne pas tromper sur les
+  données (la date des photos n'est pas affichée par le module, donc jamais
+  faussée) ;
+- l'IGN peut limiter ou bloquer un usage abusif : le repli « Dessin »
+  (F206 c) le couvre.
+
+**Reste à faire en PR 2, avec la condition B** : le nom exact de la couche,
+son zoom maximal, et la page de la couche (avec sa date) vers laquelle pointer
+le lien du crédit, s'il en existe une plus précise que `cartes.gouv.fr`.
+
+### Conditions A et B : **toujours ouvertes**
+
+Elles ne bloquent pas la PR 1 (la lecture est tolérante, F201) mais la PR 2,
+l'interface : A demande le jeton de « Ferme v2 » n° 4394 posé par le porteur
+lui-même, B une tuile chargée dans son Chrome. Le fond IGN du code
+(`lib/domain/satellite-view/basemaps.ts`) porte l'adresse du contrat et un
+zoom maximal de 19, **provisoires** jusqu'à B.
+
+### Précisions faites en codant (F214 à F223, par la recommandation)
+
+- **F214 — où vit le code.** La lecture et le rangement dans
+  `lib/domain/otf/outline.ts` ; le reste dans `lib/domain/satellite-view/` :
+  `framing.ts` (cadrage), `basemaps.ts` (fonds et « en France »),
+  `map-style.ts` (style), `view.ts` (ce que l'onglet montre),
+  `svg-drawing.ts` (dessin de secours). Un contour rangé est une liste de
+  polygones `{ exterior, holes }`, chaque anneau fermé ; un contour absent
+  est un champ qui manque, jamais `null` ni une liste vide.
+- **F215 — un point.** Deux nombres, ou trois (une altitude, permise par
+  GeoJSON, ignorée) ; un seul point invalide rend son anneau invalide plutôt
+  que d'être ôté, pour ne jamais déformer un dessin. La forme (anneau,
+  polygone, liste de polygones) se lit à la profondeur du premier nombre
+  rencontré, pas du premier élément, pour qu'un premier point abîmé ne
+  trompe pas la lecture. Un texte JSON n'est lu qu'une fois.
+- **F216 — la simplification.** Le seuil de 2 000 points compte tous les
+  points rangés du contour, trous et points de fermeture compris ; chaque
+  anneau est alors simplifié à 0,5 m sur un plan local ; un anneau réduit à
+  moins de trois points distincts est écarté. Un contour qui reste au-delà
+  de 2 000 points après simplification est gardé tel quel (limite consignée,
+  aucune ferme connue n'en approche).
+- **F217 — l'ancien cache.** Absent, le contour laisse l'instantané valide ;
+  présent mais abîmé, il fait écarter le cache, comme un plan de culture
+  abîmé : le module relit alors OTF.
+- **F218 — la marge.** 10 % de la largeur à l'est et à l'ouest, 10 % de la
+  hauteur au nord et au sud ; un contour sans largeur ou sans hauteur prend
+  la marge de l'autre sens ; le cadrage s'arrête aux latitudes de Mercator
+  (85,05°).
+- **F219 — les noms.** Posés en HTML sur la carte (F208, son repli), sans
+  couche de texte ni glyphe chargé à distance ; à un point toujours
+  intérieur du plus grand morceau du contour (au milieu du plus large
+  segment de sa ligne de mi-hauteur), même en L ou troué.
+- **F220 — les couleurs.** Aucune couleur dans le domaine : l'interface passe
+  celles de la charte. Le contour de la parcelle est blanc sur les photos, à
+  l'encre de la charte sur le « Dessin », où le blanc ne se verrait pas. Un
+  jardin touché se met en évidence par un état de la carte, sans refaire le
+  style ; parcelle et jardin ont des clés distinctes (`zone:…`,
+  `garden:…`), OTF pouvant leur donner le même numéro.
+- **F221 — « en France ».** La métropole par un polygone à grands traits qui
+  passe quelques kilomètres au-delà des côtes et des frontières, la Corse et
+  dix territoires d'outre-mer par un rectangle chacun (Guadeloupe,
+  Martinique, Guyane, La Réunion, Mayotte, Saint-Pierre-et-Miquelon,
+  Saint-Martin et Saint-Barthélemy, Wallis-et-Futuna, Polynésie française,
+  Nouvelle-Calédonie). Une ferme frontalière peut voir le fond IGN essayé ;
+  sans image, la carte passe au « Dessin » (F206 c). Que la couche ait des
+  images partout se vérifie avec B.
+- **F222 — la bascule mémorisée.** Le satellite par défaut ; toute valeur
+  mémorisée autre que « dessin » y revient.
+- **F223 — le crédit.** « © IGN – Géoplateforme », lien vers
+  `https://cartes.gouv.fr`, ouvert dans un nouvel onglet ; le « Dessin » ne
+  crédite personne.
+
+**Preuve de la PR 1** : `tests/otf-outline.test.ts` (toutes les formes de
+F201, nul, vide, anneau ouvert, doublons, hors bornes, trou, polygone
+multiple, plus de 2 000 points, jamais d'exception, jamais de rejet de
+l'instantané, aucune requête de plus à OTF) ;
+`tests/satellite-view.test.ts` (cadrage, jardin sans contour qui reprend sa
+parcelle, aucune emprise, « en France », choix du fond, style, ce que
+l'onglet montre, ferme de démonstration sans contour, dessin SVG) ;
+`tests/snapshot-validation.test.ts` (ancien cache sans contour, contour
+abîmé).

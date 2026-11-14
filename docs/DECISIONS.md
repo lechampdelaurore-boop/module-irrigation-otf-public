@@ -3937,3 +3937,33 @@ d'orthophotos. Si l'usage multi-fermes n'est pas permis, S3 s'arrête et le
 porteur décide.
 
 Ne changent pas : D-001, D-002, D-003, D-047.
+
+## D-111 — Vue satellite (S3), PR 1 : la lecture des contours et le domaine, sans interface
+
+Date : 14 novembre 2026. Décideur : le porteur pour le contrat (« 3 je
+valide », 14 novembre 2026 à 15 h 41) ; les précisions, par la
+recommandation. En Opus 5.5 · Très élevé, la ligne S3 de la roadmap.
+
+**Décision.** La PR 1 de S3 range les contours qu'OTF envoie déjà
+(`coordinates` de `/zoneList` et `/plotList`) dans l'instantané, champ
+`outline` optionnel des parcelles et des jardins, par une lecture tolérante
+qui ne lève jamais d'erreur et ne fait jamais rejeter l'instantané
+(`lib/domain/otf/outline.ts`, F201, F202) ; elle écrit, sans interface, le
+cadrage, la décision « en France », le choix du fond, le style de la carte,
+ce que l'onglet montre et le dessin de secours en SVG
+(`lib/domain/satellite-view/`). Aucune migration, aucune requête de plus à
+OTF, aucune dépendance nouvelle : MapLibre arrive avec l'interface, en PR 2.
+Précisions F214 à F223 au contrat (section 11).
+
+**Établi.** La condition C : les orthophotos de l'IGN sont sous Licence
+Ouverte 2.0, réutilisables à des fins commerciales, donc par un service
+multi-fermes ; crédit « IGN » avec lien vers la source, sans caractère
+officiel ; blocage possible d'un abus, couvert par le repli « Dessin ».
+La ferme de démonstration et les fermes fictives n'ont aucun contour (F211).
+
+**Non établi, conditions de la PR 2.** La forme réelle de `coordinates`
+(A, jeton de « Ferme v2 » posé par le porteur) ; une vraie tuile, la couche,
+le zoom maximal et la page de crédit (B, dans le Chrome du porteur). Si A
+montre une forme que F201 ne lit pas, la lecture s'ajuste avant la PR 2.
+
+Ne changent pas : D-001, D-002, D-003, D-047, D-110.

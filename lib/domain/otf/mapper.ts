@@ -9,6 +9,7 @@ import type {
   Zone,
 } from '../domain.ts';
 import { OtfApiError, extractCollection } from './api-contract.ts';
+import { readOtfOutline } from './outline.ts';
 
 type RawRecord = Record<string, unknown>;
 
@@ -105,6 +106,7 @@ function mapZone(value: unknown, fallbackSeasons: Season[]): Zone {
     name: toName(raw.name ?? raw.label ?? raw.title, `Parcelle ${id}`),
     area: toOptionalNonNegativeNumber(raw.area),
     seasons: mapEntitySeasons(raw, fallbackSeasons),
+    ...outlineField(raw.coordinates),
   };
 }
 
@@ -127,7 +129,19 @@ function mapPlot(value: unknown, fallbackSeasons: Season[]): Plot {
     width,
     area: toOptionalNonNegativeNumber(raw.area) ?? length * width,
     seasons: mapEntitySeasons(raw, fallbackSeasons),
+    ...outlineField(raw.coordinates),
   };
+}
+
+/**
+ * Le contour d'une parcelle ou d'un jardin (S3, F201, F202) : présent
+ * seulement quand OTF en dessine un lisible ; sinon le champ manque, comme
+ * dans un cache antérieur à S3, et le contour est « absent ». Jamais une
+ * erreur : un contour illisible ne fait pas rejeter l'instantané.
+ */
+function outlineField(coordinates: unknown): Pick<Zone, 'outline'> {
+  const outline = readOtfOutline(coordinates);
+  return outline === null ? {} : { outline };
 }
 
 function mapBed(
