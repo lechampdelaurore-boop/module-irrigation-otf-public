@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Inscrit (fusion des moteurs, étape 1 : le script des cas de test)
+
+- **Le script des cas de test du moteur commun entre dans la roadmap**
+  (D-114, ligne 24 sexies, section 6 quater) : un programme qui fait tourner
+  le code OTF actuel de la jauge sur les dix cas O01 à O10 du dépôt commun
+  et sur les cas limites du contrat de fusion, et compare aux valeurs écrites
+  à la main. Après la vue satellite, avant l'audit ergonomique final, en
+  Opus 5.5 · Élevé. Registres seulement : aucun code, aucun envoi à Nicolas.
+- La PR 2 de la vue satellite en ligne : #47, déployée le 14 novembre 2026 à
+  19 h 34.
+
 ### Ajouté (S3, la vue satellite, PR 2 : l'onglet)
 
 - **L'onglet « Vue satellite » de la parcelle** (D-113,
