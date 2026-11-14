@@ -4232,3 +4232,35 @@ PR 2 et 3 du lot.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-006, D-076, D-117.
+
+## D-120 — Audit ergonomique final, lot C, PR 2 (A3) : les boutons indisponibles se lisent
+
+Date : 14 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-119 (contrat court du lot C, section 4).
+
+**Établi dans le code.** Une vingtaine de règles de bloc rendaient un
+bouton indisponible transparent (opacité de 0,25 à 0,8) : blanc sur vert
+devenu blanc sur `#78AC9C`, 2,4 pour 1. La mesure de contraste du parcours
+P31c écartait les boutons indisponibles et n'appliquait la transparence
+qu'au texte, jamais au fond : elle ne pouvait pas le voir.
+
+**Décisions.**
+
+- Une seule règle pour tous les boutons indisponibles du module, dans
+  `gestes-surs.css` : plus de transparence ; texte `--ink2` sur fond
+  `--line-soft`, contour `--line-strong`, 5,5 pour 1 ; le curseur de chaque
+  bloc est gardé. Elle passe au-dessus des règles de bloc (`!important`),
+  seule façon de la tenir en un endroit (F239).
+- « Répartition validée » n'est plus un bouton grisé : une pastille verte
+  « ✓ Répartition validée » prend sa place tant que la sélection est celle
+  qui a été validée ; une case changée fait revenir « Valider la
+  répartition » (F240).
+- La mesure de contraste des parcours compte les boutons indisponibles et
+  la transparence de chaque élément, fond compris (F241) : P31c la fait sur
+  toutes les pages aux deux largeurs ; P7 sur le pied de l'écran
+  d'arbitrage.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-083, D-119.

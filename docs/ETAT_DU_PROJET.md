@@ -285,7 +285,13 @@ registres, elle y renvoie.
   rouge, écarté de 24 px ; « Replier le jour » neutre, la validation du jour
   24 px plus bas ; « Valider » seul en grand, « Ajuster » et « Refuser » côte
   à côte (F236 à F238 ; P35, P10 étendu ; aucune migration, aucun calcul
-  changé). Ensuite A3 puis J10, chacun sa PR.
+  changé), **en ligne** (#53, fusionnée à 23 h 48, déployée le 15 novembre 2026 à 0 h 02). **PR 2 sur 3,
+  A3** : les boutons indisponibles se lisent, une seule règle sans
+  transparence, gris foncé sur gris clair, 5,5 pour 1 ; « Répartition
+  validée » dite par une pastille à la place du bouton grisé ; la mesure de
+  contraste des parcours compte les boutons indisponibles et la
+  transparence entière (F239 à F241, D-120 ; P31c et P7 étendus ; aucune
+  migration, aucun calcul changé). Ensuite J10, sa PR.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -381,6 +387,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+  PR #53 (`b37b1ac`, lot C de l'audit final, R6, les gestes risqués, et le
+  contrat court du lot, D-119, fusionnée à 23 h 48 et déployée le 15 novembre 2026 à 0 h 02,
+  run 43649972474, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #52 (`716708b`, les six lots de l'audit final et les quatre
   extensions closes, D-117 et D-118, registres seulement, fusionnée à
   22 h 47 et déployée à 23 h 02, run 43644683613, les cinq jobs réussis,

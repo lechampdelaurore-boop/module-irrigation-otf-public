@@ -16,6 +16,12 @@ source détaillée commit par commit.
   `docs/audit-ergonomie-final-lot-c-contract.md` ; parcours P35, P10 étendu.
 - Les six lots de l'audit final et les quatre extensions closes en ligne :
   #52, déployée le 14 novembre 2026 à 23 h 02.
+- **A3, les boutons indisponibles se lisent** (D-120, F239 à F241) : plus
+  de bouton pâle, blanc sur vert transparent (2,4 pour 1), mais gris foncé
+  sur gris clair (5,5 pour 1), partout ; « Répartition validée » est une
+  pastille, plus un bouton grisé. Les parcours mesurent désormais aussi les
+  boutons indisponibles (P31c, P7). R6 en ligne : #53, déployée le
+  15 novembre 2026 à 0 h 02.
 
 ### Clos (S3, la vue satellite)
 
