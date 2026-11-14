@@ -253,8 +253,10 @@ registres, elle y renvoie.
   le 13 novembre 2026 à 23 h 28** (#37) : le Worker et la base de
   démonstration créés par la CI. L'application Access de la démonstration
   est créée le 14 novembre 2026 dans le navigateur du porteur et son AUD
-  posé dans `wrangler.demo.jsonc` ; restent les invitations de Nicolas et
-  de Vincent et la recette réelle. Contrôles
+  posé dans `wrangler.demo.jsonc` (#45, en ligne à 17 h 58) ; la première
+  ouverture a montré que le jeton Access était vérifié au jour simulé
+  (point ouvert 69, corrigé par D-112) ; restent les invitations de
+  Nicolas et de Vincent et la recette réelle. Contrôles
   du 13 novembre 2026 au soir : lint sans avertissement, typage sans
   erreur, 1 441 tests sur 1 441 (10 nouveaux), compilation réussie, knip,
   `push:check` et `weather:check` sans erreur, 88 parcours sur 88
@@ -288,7 +290,10 @@ registres, elle y renvoie.
   le porteur, sont validés le 8 novembre 2026 à 19 h 20 (« ça me semble
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
-- Fusionné et déployé sur `main` du dépôt public au 13 novembre 2026 : la
+- Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+  PR #45 (`36e56b1`, l'AUD de l'application Access de la démonstration et
+  #37 consignée, D-106, fusionnée à 17 h 42 et déployée à 17 h 58, run
+  43617026648, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #37 (`4942d8f`, D4 de la démo guidée, la remise à zéro et le
   déploiement séparé, D-106, fusionnée à 23 h 12 et déployée à 23 h 28,
   run 43517326592, les cinq jobs réussis, aucune migration en production,
@@ -8122,6 +8127,13 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    seule relance du job, comme le veut la règle, verte : #39 déployée à
    3 h 27. Recommandation : attendre
    la page prête après le rechargement, comme V1.
+69. 🟡 **Ouvert le 14 novembre 2026 par la première ouverture de la
+   démonstration en ligne** (après #45, en ligne à 17 h 58, run
+   43617026648) : la démonstration renvoyait vers `/cdn-cgi/access/login`,
+   page introuvable sur workers.dev. Le jeton Access arrivait bien mais
+   était vérifié au jour simulé (14 avril), où il paraît « pas encore
+   valide ». Correctif dans sa PR `fix/` (D-112) : le jeton se vérifie à
+   l'heure réelle. À fermer après la recette réelle de la démonstration.
 
 ## Procédure de reprise rapide
 

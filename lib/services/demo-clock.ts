@@ -34,6 +34,7 @@ function buildSimulatedDate(): DateConstructor {
   SimulatedDate.now = simulatedNow;
   SimulatedDate.parse = RealDate.parse;
   SimulatedDate.UTC = RealDate.UTC;
+  SimulatedDate.realNow = () => RealDate.now();
   return SimulatedDate as unknown as DateConstructor;
 }
 
@@ -48,6 +49,18 @@ export function installSimulatedDate(host: { Date: DateConstructor } = globalThi
 export function uninstallSimulatedDate(host: { Date: DateConstructor } = globalThis): void {
   host.Date = RealDate;
   if (installedOn === host) installedOn = null;
+}
+
+/**
+ * L'heure réelle, même au milieu d'une requête de démonstration : pour ce
+ * qui se vérifie contre le monde réel, comme la validité d'un jeton Cloudflare
+ * Access (émis aujourd'hui, il paraîtrait « pas encore valide » au jour simulé
+ * d'avril). Lue sur l'horloge installée plutôt que sur une variable de ce
+ * module, pour rester juste même si le module est chargé deux fois.
+ */
+export function realNow(): number {
+  const clock = globalThis.Date as DateConstructor & { realNow?: () => number };
+  return typeof clock.realNow === 'function' ? clock.realNow() : clock.now();
 }
 
 /** L'écart de la requête en cours, ou `null` hors d'une requête de démonstration. */

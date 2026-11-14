@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (4.0, la démonstration en ligne)
+
+- **La démonstration accepte enfin la connexion Access** (D-112, point
+  ouvert 69) : le jeton Cloudflare Access se vérifie à l'heure réelle, et
+  non au jour simulé du moment choisi, où un jeton émis aujourd'hui
+  paraissait « pas encore valide ». Rien ne change en production.
+- L'application Access de la démonstration et son AUD en ligne : #45,
+  déployée le 14 novembre 2026 à 17 h 58.
+
 ### Ajouté (S3, la vue satellite, PR 1 : le domaine, sans interface)
 
 - **Les contours d'Ouvre ta ferme gardés dans l'instantané** (D-111,

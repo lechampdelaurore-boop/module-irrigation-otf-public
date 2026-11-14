@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createJwksFetcher, verifyAccessJwt } from '@/lib/services/access-jwt';
 import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, demoOwnerUserId, resolveDemoChoice } from '@/lib/domain/demo/catalogue';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { realNow } from '@/lib/services/demo-clock';
 import { recordDemoVisit } from '@/lib/services/demo-reset';
 import { prepareDemoSpace } from '@/lib/services/demo-space';
 
@@ -104,13 +105,15 @@ async function readAccessUser(requestHeaders: Headers): Promise<AuthenticatedUse
   const settings = accessSettings();
   if (!token || !settings) return null;
   if (!jwksFetcher || jwksTeamDomain !== settings.teamDomain) {
-    jwksFetcher = createJwksFetcher({ teamDomain: settings.teamDomain, fetchImpl: (url) => fetch(url) });
+    // L'heure réelle, jamais celle du jour simulé de la démonstration (D-112).
+    jwksFetcher = createJwksFetcher({ teamDomain: settings.teamDomain, fetchImpl: (url) => fetch(url), now: realNow });
     jwksTeamDomain = settings.teamDomain;
   }
   const result = await verifyAccessJwt(token, {
     teamDomain: settings.teamDomain,
     audience: settings.audience,
     fetchJwks: jwksFetcher,
+    now: new Date(realNow()),
   });
   if (!result.ok) return null;
   const email = result.payload.email?.trim() ?? '';
