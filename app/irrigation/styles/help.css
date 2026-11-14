@@ -109,7 +109,13 @@
   margin-top: 12px;
 }
 
-/* La bulle « d'où vient ce chiffre », à côté d'un chiffre principal. */
+/*
+  La bulle « d'où vient ce chiffre », à côté d'un chiffre principal. Ses
+  boutons sont nommés par leur parent (« .figure-origin > button… ») : un
+  bloc qui peint tous ses boutons (« .bed-crop-water button »…) ne repeint
+  plus le « i » en carré vert sur le texte voisin (audit final, lot C, J10,
+  F242).
+*/
 .figure-origin {
   position: relative;
   display: inline-flex;
@@ -117,12 +123,16 @@
   margin-left: 4px;
 }
 
-.figure-origin-toggle {
+.figure-origin > button.figure-origin-toggle {
   display: inline-grid;
   place-items: center;
   width: 24px;
+  min-width: 0;
   height: 24px;
+  min-height: 0;
+  margin: 0;
   padding: 0;
+  box-shadow: none;
   border: 1px solid var(--green-soft);
   border-radius: 50%;
   background: var(--card);
@@ -136,18 +146,18 @@
 }
 
 /* Le « i » est dessiné ici : fermée, la bulle n'ajoute aucun texte au chiffre. */
-.figure-origin-toggle::before {
+.figure-origin > button.figure-origin-toggle::before {
   content: "i";
 }
 
 /* La cible tactile reste de 44 px sans agrandir le rond. */
-.figure-origin-toggle::after {
+.figure-origin > button.figure-origin-toggle::after {
   position: absolute;
   inset: -10px;
   content: "";
 }
 
-.figure-origin-toggle[aria-expanded="true"] {
+.figure-origin > button.figure-origin-toggle[aria-expanded="true"] {
   border-color: var(--green);
   background: var(--green);
   color: #fff;
@@ -183,12 +193,16 @@
   white-space: normal;
 }
 
-.figure-origin-close {
+.figure-origin-bubble > button.figure-origin-close {
   position: absolute;
   top: 4px;
   right: 4px;
   width: 32px;
+  min-width: 0;
   height: 32px;
+  min-height: 0;
+  padding: 0;
+  box-shadow: none;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -317,7 +331,7 @@
     négatives lui gardent la place du rond, dessiné en dessous ; le rond ne
     change pas de taille.
   */
-  .figure-origin-toggle,
+  .figure-origin > button.figure-origin-toggle,
   .need-help > button,
   .feasibility-help > button {
     position: relative;
@@ -331,7 +345,7 @@
     background: transparent;
   }
 
-  .figure-origin-toggle::after,
+  .figure-origin > button.figure-origin-toggle::after,
   .need-help > button::after {
     position: absolute;
     z-index: -1;
@@ -347,11 +361,11 @@
     border-color: var(--line-strong);
   }
 
-  .figure-origin-toggle[aria-expanded="true"] {
+  .figure-origin > button.figure-origin-toggle[aria-expanded="true"] {
     background: transparent;
   }
 
-  .figure-origin-toggle[aria-expanded="true"]::after {
+  .figure-origin > button.figure-origin-toggle[aria-expanded="true"]::after {
     border-color: var(--green);
     background: var(--green);
   }

@@ -22,6 +22,10 @@ source détaillée commit par commit.
   pastille, plus un bouton grisé. Les parcours mesurent désormais aussi les
   boutons indisponibles (P31c, P7). R6 en ligne : #53, déployée le
   15 novembre 2026 à 0 h 02.
+- **J10, le bouton « i » ne recouvre plus le texte** (D-121, F242) : dans la
+  fiche du besoin de la culture d'une planche, il était repeint en carré
+  vert sur « ET0 » ; il garde maintenant son petit rond partout. Parcours
+  P35 étendu. A3 en ligne : #54, déployée le 15 novembre 2026 à 0 h 53.
 
 ### Clos (S3, la vue satellite)
 
