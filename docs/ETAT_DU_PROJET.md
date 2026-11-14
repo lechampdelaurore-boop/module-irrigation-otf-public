@@ -218,8 +218,19 @@ registres, elle y renvoie.
   ferme des parcours porte des contours fictifs ; parcours P34. Aucune
   migration. Contrôles avant la PR : lint, typage, 1 502 tests,
   compilation, knip, `push:check`, `weather:check`, les 94 parcours
-  navigateur et les 16 parcours de la démonstration (local), verts. Reste
-  la relecture du porteur sur sa ferme, après le déploiement.
+  navigateur et les 16 parcours de la démonstration (local), verts. **PR 2
+  en ligne** (#47, `a29605a`, fusionnée le 14 novembre 2026 à 19 h 16,
+  déployée à 19 h 34, run 43625642370, les cinq jobs réussis). Reste la
+  relecture du porteur sur sa ferme.
+- Fusion des moteurs, étape 1 (ligne 24 sexies de la roadmap, D-114) :
+  **inscrite le 14 novembre 2026** sur le mot du porteur, registres
+  seulement (cette PR). Un script qui fait tourner le code OTF actuel de la
+  jauge sur les dix cas O01 à O10 du dépôt commun et sur les cas limites du
+  contrat de fusion, et compare aux valeurs calculées à la main ; il ne
+  modifie ni le module ni un test. Place : après la vue satellite, avant
+  l'audit ergonomique final, en Opus 5.5 · Élevé. Rien n'est codé, rien
+  n'est envoyé à Nicolas ; tout travail sur le dépôt commun attend un
+  nouvel accord du porteur.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -303,7 +314,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
-  PR #46 (`c77331c`, le jeton Access de la démonstration vérifié à l'heure
+  PR #47 (`a29605a`, la vue satellite, PR 2, l'onglet, D-113, fusionnée à
+  19 h 16 et déployée à 19 h 34, run 43625642370, les cinq jobs réussis,
+  aucune migration). Avant elle : la PR #46 (`c77331c`, le jeton Access de la démonstration vérifié à l'heure
   réelle, point ouvert 69, D-112, fusionnée à 18 h 38 et déployée à
   18 h 56, run 43622235660, les cinq jobs réussis, aucune migration).
   Avant elle : la PR #45 (`36e56b1`, l'AUD de l'application Access de la démonstration et
