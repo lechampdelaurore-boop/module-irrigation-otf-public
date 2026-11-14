@@ -4179,3 +4179,22 @@ Aucune migration ; aucun fichier de `app/`, `lib/`, `db/` ni aucun test
 modifié.
 
 Ne changent pas : D-003, D-041, D-047, D-107, D-116.
+
+## D-118 — Quatre extensions closes sur le mot du porteur, le second audit ergonomique maintenu
+
+Date : 14 novembre 2026, 22 h 30. Décideur : le porteur, en toutes lettres :
+« la réserve du sol, le besoin en eau par culture, les alertes météo par
+culture et la refonte ergonomique. on peut marquer clos, mais on maintient
+le second audit ergonomique ». Après D-117.
+
+**Décision.** Sont marquées **closes** (✅) dans la roadmap : la réserve du
+sol (5 ter), le besoin en eau par culture et par stade (5 quater), les
+alertes météo par culture (5 quinquies) et la refonte ergonomique (charte du
+module). **Maintenus** : l'audit ergonomique final (24 septies) et ses six
+lots de correction (24 octies à 24 terdecies, D-117). Les points qu'elles
+laissaient ouverts, s'il y en a, restent consignés à leur place dans
+`docs/ETAT_DU_PROJET.md` ; la clôture ne les ferme pas.
+
+Aucune migration ; aucun code touché.
+
+Ne changent pas : D-041, D-045, D-047, D-058, D-117.

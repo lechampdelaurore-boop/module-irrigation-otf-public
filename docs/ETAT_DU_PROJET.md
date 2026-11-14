@@ -252,6 +252,13 @@ registres, elle y renvoie.
   1 508 tests, compilation, knip, `push:check`, `weather:check`, verts ;
   parcours navigateur non rejoués en local, sans rapport (ni interface ni
   service touchés), joués par la CI.
+- **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
+  22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
+  culture et par stade (5 quater), les alertes météo par culture (5
+  quinquies) et la refonte ergonomique (charte du module) ; **l'audit
+  ergonomique final et ses six lots sont maintenus**. Les points ouverts
+  qu'elles portaient restent consignés à leur place, la clôture ne les
+  ferme pas. Registres seulement.
 - Audit ergonomique final (ligne 24 septies de la roadmap, D-107) :
   **inscrit le 14 novembre 2026** sur le mot du porteur (21 h 52), après
   les finitions et le script des cas de test ; toutes les pages, sur

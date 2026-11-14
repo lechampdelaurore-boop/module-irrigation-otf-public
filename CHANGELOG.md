@@ -13,6 +13,13 @@ source détaillée commit par commit.
 - Le script des cas de test du moteur commun en ligne : #50, déployée le
   14 novembre 2026 à 21 h 37.
 
+### Clos (quatre extensions, sur le mot du porteur)
+
+- **Closes le 14 novembre 2026 à 22 h 30** (D-118) : la réserve du sol, le
+  besoin en eau par culture et par stade, les alertes météo par culture et
+  la refonte ergonomique. L'audit ergonomique final et ses six lots sont
+  maintenus. Registres seulement.
+
 ### Confirmé (la vue satellite, réponse d'OTF)
 
 - **Confirmé par OTF : la forme de `coordinates`** (liste de points
