@@ -13,6 +13,14 @@ source détaillée commit par commit.
 - Le script des cas de test du moteur commun en ligne : #50, déployée le
   14 novembre 2026 à 21 h 37.
 
+### Confirmé (la vue satellite, réponse d'OTF)
+
+- **Confirmé par OTF : la forme de `coordinates`** (liste de points
+  `[longitude, latitude]`, `null` si rien n'est tracé), pour les parcelles
+  comme pour les jardins ; la portée `production.parcel:read` suffit pour
+  `/zoneList` et `/plotList`, à revoir en Tranche 4. Rien à changer au
+  module (contrat de la vue satellite, section 12 ; contrat OTF).
+
 ### Inscrit (les six lots de correction de l'audit ergonomique final)
 
 - **L'analyse de l'audit ergonomique final est rendue** (nuit du 14 novembre

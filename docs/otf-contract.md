@@ -13,8 +13,8 @@ technique de continuité de service.
 | --- | --- | --- |
 | `GET /me` | `general:read` | Lire l’identifiant, le nom et la commune administrative de la structure autorisée |
 | `GET /configuration` | `general:read` | Lire `seasonFirst` et `seasonLast` |
-| `GET /zoneList` | `production:read` | Lister les parcelles |
-| `GET /plotList` | `production:read` | Lister les jardins et abris |
+| `GET /zoneList` | `production:read` (`production.parcel:read` suffit, confirmé par OTF le 14 novembre 2026) | Lister les parcelles |
+| `GET /plotList` | `production:read` (`production.parcel:read` suffit, confirmé par OTF le 14 novembre 2026) | Lister les jardins et abris |
 | `GET /bedList` | `production:read` | Lister les planches et `alleyWidth` |
 | `GET /actionList` | `production:read` | Lire le `fqn` des interventions, pour reconnaître semis direct et plantation (`docs/series-contract.md`) |
 | `GET /plantList` | `production:read` | Lire le nom des espèces des mises en culture |
