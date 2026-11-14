@@ -117,7 +117,12 @@ export function SatelliteViewTab({ zone, plots, season }: Props) {
           parcelle et ses jardins dans le plan de la ferme d’Ouvre ta ferme pour les voir ici.
         </p>
       )}
-      <SatelliteGardenList gardens={view.gardens} highlightedPlotId={highlightedPlotId} onSelectGarden={toggleGarden} />
+      <SatelliteGardenList
+        gardens={view.gardens}
+        highlightedPlotId={highlightedPlotId}
+        onSelectGarden={toggleGarden}
+        scrollable={hasMap}
+      />
     </div>
   );
 }

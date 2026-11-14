@@ -6,7 +6,8 @@ de la section 5 sexies de `ROADMAP.md`, décision D-110. **La relecture du
 porteur est obligatoire avant tout code de S3.** **Validé par le porteur le
 14 novembre 2026 à 15 h 41** (« 3 je valide ») ; le code commence le jour
 même par la PR 1, le domaine (section 11, D-111), puis par la PR 2, l'onglet,
-après les constats A et B (section 12, D-113).
+après les constats A et B (section 12, D-113). Les premières remarques du
+porteur, le soir même, donnent la section 13 (D-115).
 
 ## 1. Ce que le porteur a choisi
 
@@ -227,7 +228,8 @@ F201 à F208 et F213 sont ci-dessus. S'y ajoutent :
   ceux de l'utilisateur ;
 - **F211** — la ferme de démonstration n'a pas de contour : elle montre le cas
   « aucun contour » (F206 a) ; les jeux d'essai du code en portent, sur un
-  lieu fictif ;
+  lieu fictif ; **remplacée par F232** (section 13) : les fermes garnies de la
+  démonstration guidée sont dessinées ;
 - **F212** — aucun secret : l'adresse des tuiles ne porte aucune clé ; aucune
   clé de ferme n'est créée par S3.
 
@@ -493,3 +495,49 @@ dessin SVG et sa liste. Les tests du domaine
 (`tests/satellite-view.test.ts`) suivent les constats : jeu `PM_0_19`, lien
 du crédit, zoom 19, Polynésie hors des emprises, ferme des parcours (F224).
 Reste la relecture du porteur sur sa ferme, après le déploiement.
+
+## 13. Les remarques du porteur sur la PR 2 (14 novembre 2026 au soir)
+
+Le porteur a relu l'onglet en ligne, sur sa ferme et dans la démonstration,
+le soir de la mise en ligne de la PR 2 (#47). Deux remarques, tranchées par
+la recommandation sur son mandat (D-115) :
+
+- dans la démonstration, l'onglet ne montrait aucune carte : les fermes
+  fictives n'avaient aucun contour (F211), ce qui laissait l'onglet vide
+  pour qui découvre le module ;
+- sur sa ferme, la liste des jardins s'allongeait bien plus bas que la carte
+  et laissait sous la carte une grande zone vide : il veut un ascenseur dans
+  la liste, et que la page enchaîne sous la carte.
+
+Ce qui en découle :
+
+- **F232 — la démonstration dessinée.** Les trois fermes garnies de la
+  démonstration guidée sont dessinées dans « leur » Ouvre ta ferme : « Le
+  Grand Champ » et « La Butte » de la Ferme des Trois Noues, « Le Potager »
+  du Jardin de la Mare, « Les Terres Blanches » et « Le Verger » du Domaine
+  des Terres Blanches. « Le Clos des Saules » ne l'est pas, pour montrer ce
+  cas ; la Ferme du Pré Neuf, vierge, n'a rien dessiné, comme une ferme qui
+  démarre.
+- **F233 — des contours tirés des dimensions.** Chaque jardin dessiné a la
+  longueur (d'ouest en est) et la largeur (du sud au nord) qu'Ouvre ta
+  ferme lui donne, nord en haut ; les jardins d'une parcelle sont côte à côte
+  d'ouest en est, à 3 m l'un de l'autre, et la parcelle les entoure avec un
+  bord de 4 m. La surface dessinée est donc celle d'OTF, à 1 % près.
+- **F234 — des lieux inventés.** Chaque parcelle dessinée part d'un coin
+  sud-ouest pris à la campagne près de la commune de la ferme (Nantes, Tours,
+  Valence), en France, donc sur les photos de l'IGN. Ces lieux ne désignent
+  aucune ferme réelle ; les photos dessous sont celles de l'IGN, que chacun
+  peut voir. Ils n'ont pas pu être choisis en regardant les photos (l'IGN
+  n'est pas joignable depuis l'environnement de code) : le porteur dit, en
+  relisant la démonstration, si un dessin tombe mal, et le coin se déplace.
+- **F235 — la liste à côté de la carte.** À l'ordinateur, la liste des
+  jardins ne dépasse pas la hauteur de la carte et défile seule (son propre
+  ascenseur, joignable au clavier) ; la légende et la phrase de
+  confidentialité suivent juste sous la carte. Un jardin touché sur la carte
+  amène sa ligne en vue dans la liste, sans faire défiler la page. Au
+  téléphone, rien ne change : la liste vient sous la carte, entière.
+
+**Preuve** : `tests/satellite-view.test.ts` (F232 : qui est dessiné, fond
+IGN ; F233 : surfaces à 1 % près, jardins dans leur parcelle, côte à côte) ;
+P34 à l'ordinateur (F235 : la liste à droite de la carte, pas plus haute
+qu'elle, son ascenseur, la légende juste sous la carte).

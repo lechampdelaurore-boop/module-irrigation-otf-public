@@ -4070,3 +4070,26 @@ restent interdits sans nouvel accord du porteur. Aucune migration, aucune
 ligne de code du module.
 
 Ne changent pas : D-065, D-066, D-001, D-003, D-047.
+
+## D-115 — Vue satellite (S3) : la démonstration dessinée, la liste des jardins à la hauteur de la carte
+
+Date : 14 novembre 2026 au soir. Décideur : le porteur pour le constat
+(« il n'y a aucune carte qui s'affiche dans la vue satellite de la démo » ;
+« je veux que tu mettes un ascenseur […] avec la liste des jardins ») ; la
+forme, par la recommandation, sur son mandat. Après #47.
+
+**Constat.** Les fermes de la démonstration guidée n'avaient aucun contour
+(F211) : l'onglet n'y montrait que « parcelle non dessinée ». Sur une ferme
+qui a beaucoup de jardins, la liste à côté de la carte descendait bien plus
+bas qu'elle et repoussait la légende et la suite de la page.
+
+**Décision.** Les trois fermes garnies de la démonstration sont dessinées
+(F232), sauf « Le Clos des Saules », et la ferme vierge ne l'est pas : les
+contours sont tirés des dimensions d'OTF (F233), sur des lieux inventés à la
+campagne près de leur commune (F234), à corriger sur l'avis du porteur s'ils
+tombent mal. À l'ordinateur, la liste des jardins ne dépasse pas la hauteur
+de la carte et défile seule ; la page enchaîne sous la carte (F235). F211
+est remplacée par F232. Contrat, section 13. Aucune migration, rien ne
+change au téléphone ni en production hors de la mise en page de la liste.
+
+Ne changent pas : D-110, D-111, D-113.

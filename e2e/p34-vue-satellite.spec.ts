@@ -100,6 +100,19 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
     ] as const) {
       await verifierCibleTactile(cible, intitule);
     }
+  } else {
+    // À côté de la carte, la liste a son propre ascenseur, à la hauteur de la carte, et la page enchaîne sous la carte (F235).
+    const boiteCarte = await carte.boundingBox();
+    const boiteListe = await liste.boundingBox();
+    const boiteLegende = await panneau.locator('.satellite-legend').boundingBox();
+    if (!boiteCarte || !boiteListe || !boiteLegende) throw new Error('La carte, la liste et la légende doivent se voir.');
+    const basDeLaCarte = boiteCarte.y + boiteCarte.height;
+    expect(boiteListe.x).toBeGreaterThanOrEqual(boiteCarte.x + boiteCarte.width);
+    expect(boiteListe.y + boiteListe.height).toBeLessThanOrEqual(basDeLaCarte + 1);
+    expect(boiteLegende.y - basDeLaCarte).toBeLessThan(30);
+    await expect(liste).toHaveCSS('overflow-y', 'auto');
+    const hauteurMaximale = await liste.evaluate((element) => Number.parseFloat(getComputedStyle(element).maxHeight));
+    expect(Math.abs(hauteurMaximale - boiteCarte.height)).toBeLessThanOrEqual(1);
   }
   await verifierLEtape(page, journal, 'vue satellite des Prés');
 
