@@ -141,10 +141,14 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   await expect(page.locator('section').filter({ has: page.getByRole('heading', { name: 'Notifications du téléphone' }) }).locator('.irrigation-notification-readiness[data-status="limited"]')).toBeVisible();
   await verifierLEtape(page, journal, 'rappel dans Réglages');
 
-  // « Plus » porte la pastille verte quand la page ouverte n'est pas dans la barre.
+  // « Plus » prend la marque de la page ouverte quand elle n'est pas dans la barre, sans point vert muet (lot A, J13, F287).
   if (telephone) {
     const plus = barre.getByRole('button', { name: /^Plus de pages/ });
     await expect(plus).toHaveAttribute('data-marked', 'true');
+    expect(await plus.evaluate((element) => getComputedStyle(element, '::after').content)).toBe('none');
+    const marque = await plus.locator('.icon').evaluate((element) => getComputedStyle(element).backgroundColor);
+    const ouverte = await barre.getByRole('link').first().locator('.icon').evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(marque, 'la marque de « Plus »').not.toBe(ouverte);
     await expect(plus).toHaveAccessibleName('Plus de pages, dont la page ouverte : Réglages');
     const menu = await ouvrirLeMenuDesPages(page);
     await expect(menu.getByRole('link')).toHaveCount(12);

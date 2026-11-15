@@ -42,13 +42,17 @@ export function useTodayBadge(menu: readonly IrrigationPageId[], initial: number
   return wanted && badge !== null && badge > 0 ? badge : null;
 }
 
-/** Le nom du lien qui porte la pastille, pour un lecteur d'écran : « Aujourd'hui, 3 à regarder ». */
+/**
+ * Le nom du lien qui porte la pastille, pour un lecteur d'écran : il dit ce
+ * qu'elle compte, « Aujourd'hui, 3 choses à regarder » (audit final, lot A,
+ * J13, F287).
+ */
 export function todayBadgeLabel(label: string, count: number | null): string {
-  return count === null ? label : `${label}, ${count} à regarder`;
+  return count === null ? label : `${label}, ${count} ${count === 1 ? 'chose' : 'choses'} à regarder`;
 }
 
-/** Le nombre affiché ; le nom du lien le dit déjà en mots. Rien sans nombre. */
+/** Le nombre affiché ; le nom du lien le dit déjà en mots, l'infobulle aussi (F287). Rien sans nombre. */
 export function TodayBadge({ count }: { count: number | null }) {
   if (count === null) return null;
-  return <span className="today-badge" aria-hidden="true" data-today-badge={count}>{count}</span>;
+  return <span className="today-badge" aria-hidden="true" title={`${count} ${count === 1 ? 'chose' : 'choses'} à regarder`} data-today-badge={count}>{count}</span>;
 }

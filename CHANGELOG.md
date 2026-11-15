@@ -7,6 +7,13 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot A, le matin)
 
+- **J13, un en-tête moins répétitif** (D-141, F285 à F287) : « Aujourd'hui »
+  n'a plus qu'un titre, la date en sous-titre ; la pastille du jour dit
+  « 2 à faire » ; la pastille du menu dit « 2 choses à regarder » ; « Plus »
+  prend la marque de la page ouverte au lieu d'un point vert muet ; une
+  journée sans rien à faire laisse « Gel ou chaleur » passer dessous à
+  l'ordinateur. Parcours P28, P29 et P30 étendus. Le lot A est codé en
+  entier. J14 en ligne : #73, déployée le 15 novembre 2026 à 17 h 52.
 - **J14, un gel annoncé sans alerte posée se dit** (D-140, F283, F284) :
   quand une minimale prévue est à 0 °C ou moins et qu'aucune alerte de gel
   n'est posée, « Gel ou chaleur » dit « −2,4 °C annoncé le mer. 18 nov. et

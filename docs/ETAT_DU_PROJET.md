@@ -457,14 +457,21 @@ registres, elle y renvoie.
   « Non calculable » dit pourquoi, et « Besoin de la semaine » sur
   « Ressources » se lit « au moins 3,4 m³ », avec les planches qui
   manquent (F280 à F282 ; P15 changé ; aucun calcul changé). **PR 3 sur
-  4, J14** (D-140) : la phrase calme de « Gel ou chaleur » ne regardait que
+  4, J14** (D-140), **en ligne** (#73, fusionnée à 17 h 38, déployée à
+  17 h 52, run 43736630947, cinq jobs verts) : la phrase calme de « Gel ou chaleur » ne regardait que
   les alertes posées, à côté du flocon de la carte ; une minimale prévue à
   0 °C ou moins sans alerte de gel active ni gel des cultures annoncé se
   dit désormais (« −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel
   posée. »), avec « Poser « Gel : moins de 3 °C » », qui ouvre le
   formulaire rempli du modèle sur « Alertes météo », rien d'enregistré ; la
   pastille dit « Gel sans alerte posée » (F283, F284 ; P29 étendu ; ton du
-  bloc, seuils et envois inchangés). Ensuite J13.
+  bloc, seuils et envois inchangés). **PR 4 sur 4, J13** (D-141) : un seul
+  titre, la date en sous-titre ; la pastille du jour dit « 2 à faire » ;
+  celle du menu dit « 2 choses à regarder » ; « Plus » prend la marque de
+  la page ouverte au lieu d'un point vert muet ; une journée sans rien à
+  faire laisse « Gel ou chaleur » passer dessous à l'ordinateur (F285 à
+  F287 ; P28, P29, P30 étendus). **Le lot est codé en entier** ; reste sa
+  recette.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

@@ -4880,3 +4880,27 @@ le gel des cultures ne changent pas. L'écriture directe de l'alerte depuis
 
 Ne changent pas : D-003, D-028 ; le seuil de 3 °C du modèle (choix du
 porteur du 8 novembre 2026).
+
+## D-141 — Audit ergonomique final, lot A : un en-tête moins répétitif (J13)
+
+Date : 15 novembre 2026, fin d'après-midi. Décideur : le porteur pour le
+contenu (D-137, toutes les recommandations du contrat retenues) ; les
+précisions tranchées en codant suivent l'option recommandée, aucune
+question agronomique, modifiables par lui. Après D-140.
+
+**Décision** (F285 à F287, contrat `docs/audit-ergonomie-final-lot-a-contract.md`,
+section 8 quinquies) : « Aujourd'hui » a un seul titre, la date en
+sous-titre, sans « Tableau de bord » dans l'en-tête ; la pastille du jour
+dit « 2 à faire » ; la pastille du menu dit ce qu'elle compte (« 2 choses à
+regarder ») ; le point vert de « Plus », qui marquait la page ouverte sans
+le dire, laisse place à la même marque que l'entrée de la page ouverte ; à
+l'ordinateur, une journée sans rien à rattraper ni à faire laisse « Gel ou
+chaleur » passer dessous. Le contrat de la page
+(`docs/aujourdhui-tableau-de-bord-contract.md`, sections 3.1 et 3.2) est
+changé en conséquence ; le cas 3 du contrat du lot 2 (« Plus » porte la
+pastille verte) devient : « Plus » porte la marque de la page ouverte.
+
+Aucune migration ; aucun calcul ni compte ne change (la pastille du menu
+compte comme avant, F12).
+
+Ne changent pas : D-003, D-073, D-074.
