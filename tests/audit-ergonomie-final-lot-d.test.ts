@@ -45,3 +45,16 @@ test('« Matériel » renvoie à « Objectifs et besoins » au lieu de répéter
   assert.match(materiel, /pageHref\('besoins', \{ season \}\)/);
   assert.match(materiel, /href=\{`#\$\{PAGE_SETTINGS_ANCHOR\}`\}/);
 });
+
+test('M1 : au téléphone, une case de planche de « Matériel » ne descend pas sous 44 px de large ; trop nombreuses, elles passent à la ligne (F313, F314)', () => {
+  const sheet = source('app/irrigation/styles/pages-allegees.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  const phone = sheet.match(/@media \(max-width: 600px\) \{\s*\.bed-strip \{([\s\S]*?)\}\s*\}/)?.[1] ?? '';
+  assert.match(phone, /grid-template-columns:\s*repeat\(auto-fit, minmax\(var\(--touch-target\), 1fr\)\);/);
+  assert.match(phone, /gap:\s*4px;/, 'un écart entre deux cases, pour ne pas en toucher deux');
+  assert.match(source('app/globals.css'), /--touch-target:\s*44px;/);
+  // La feuille du lot passe après celle du téléphone : sa règle l'emporte.
+  const entry = source('app/irrigation/irrigation.css');
+  assert.ok(entry.indexOf("styles/pages-allegees.css") > entry.indexOf("styles/responsive.css"));
+  // Le nom accessible et le geste de la case ne changent pas (F313, point 3).
+  assert.match(source('app/irrigation/hierarchy/plot-plan-card.tsx'), /className="plan-bed"[\s\S]*?aria-label=\{bedCoverage/);
+});

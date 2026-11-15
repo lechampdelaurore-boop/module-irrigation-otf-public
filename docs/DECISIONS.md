@@ -5135,3 +5135,22 @@ Affichage et gestes seuls : la jauge, le besoin, le plan et les doses ne
 changent pas (D-047) ; aucune migration.
 
 Ne changent pas : D-041, D-046, D-047, D-053, D-149.
+
+## D-151 — Audit ergonomique final, lot D : les cases de planche de « Matériel » à 44 px (M1)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur, qui a ajouté ce point
+au lot le 15 novembre 2026 (15 h 50, « 1 oui »), d'après la recette du
+lot E. Après D-150.
+
+**Décision** (F313, F314, contrat `docs/audit-ergonomie-final-lot-d-contract.md`,
+section 5 bis) : au téléphone (600 px et moins), chaque case de planche du
+plan de « Matériel » fait 44 px de large au moins, la cible habituelle du
+module (A2, D-136) ; 4 px séparent deux cases, pour ne pas en toucher deux.
+Trop nombreuses pour une ligne, les cases passent à la ligne, dans l'ordre
+du jardin : la ferme réelle en a jusqu'à 33 par jardin, qui faisaient 23 px
+à 390 px. Le dessin, le nom accessible et le geste de la case ne changent
+pas ; à l'ordinateur, rien ne change.
+
+Affichage seul : aucun calcul, aucune migration.
+
+Ne changent pas : D-136, D-150.

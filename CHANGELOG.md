@@ -7,6 +7,10 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
+- **M1, les cases de planche de « Matériel » assez grandes à toucher**
+  (D-151, F313, F314) : au téléphone, 44 px de large au moins, 4 px entre
+  deux ; un jardin de 33 planches passe sur plusieurs lignes au lieu de
+  cases de 23 px. Parcours P31c étendu, à 390 et 360 px.
 - **J4, « Réserve du sol » : la RFU d'abord** (D-150, F308 à F312) : sans
   réserve utile (RFU) pour sa parcelle, un jardin inconnu porte
   « Renseigner la réserve de la parcelle », qui ouvre « Réglages du sol »
