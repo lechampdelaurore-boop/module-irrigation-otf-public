@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { KcOverride } from '../lib/domain/crop-water/kc.ts';
-import { referenceCropSummary, referenceCropSummaryText } from '../lib/domain/crop-water/crop-summary.ts';
+import { referenceCropExpertText, referenceCropSeriesCount, referenceCropSeriesText, referenceCropSummary, referenceCropSummaryText, splitBySeasonUse } from '../lib/domain/crop-water/crop-summary.ts';
 import { kcOverrideRows } from '../lib/domain/crop-water/settings-view.ts';
 import type { CorrespondenceEntry, SeasonSpecies } from '../lib/domain/crop-water/species.ts';
 import { rootingProfileView } from '../lib/domain/soil-reserve/rooting-view.ts';
@@ -71,4 +71,23 @@ test('un seul Kc s’écrit seul ; une série au singulier ; un stade sans ligne
   const shallow = rootingProfileView(CARROT, [{ ...profile(CARROT.id, null, [fixed(1, 0.2)]), origin: 'farm' as const }], TODAY);
   assert.deepEqual(referenceCropSummary(CARROT.id, [], shallow, []).rootDepth, { meters: 0.3, proposed: true });
   assert.equal(referenceCropSummary(CARROT.id, [], shallow, []).kc, null);
+});
+
+test('la carte fermée ne dit que ses séries ; le Kc et les racines vont dans « Pour les experts » (audit final, lot D, J5, F303)', () => {
+  const rows = kcOverrideRows(CARROT, [], TODAY);
+  const rooting = rootingProfileView(CARROT, [], TODAY);
+  const seasonSpecies = [species('carotte', ['s1', 's2'], reference(CARROT.id))];
+  const summary = referenceCropSummary(CARROT.id, rows, rooting, seasonSpecies);
+  assert.equal(referenceCropSeriesText(summary), '2 séries de la saison');
+  assert.equal(referenceCropExpertText(summary), referenceCropSummaryText(summary).replace(' · 2 séries de la saison', ''));
+  assert.match(referenceCropExpertText(summary), /^Kc .* · racines .* m( proposés)?$/);
+  assert.equal(referenceCropSeriesText({ ...summary, seriesCount: 0 }), 'aucune série de la saison');
+});
+
+test('les cultures de la saison d’abord, les autres à part, chacune dans son ordre (F302)', () => {
+  const seasonSpecies = [species('carotte', ['s1'], reference(CARROT.id))];
+  assert.equal(referenceCropSeriesCount(CARROT.id, seasonSpecies), 1);
+  assert.equal(referenceCropSeriesCount(BROCCOLI.id, seasonSpecies), 0);
+  const split = splitBySeasonUse(['a', 'b', 'c', 'd'], (item) => (item === 'b' || item === 'd' ? 1 : 0));
+  assert.deepEqual(split, { cultivated: ['b', 'd'], others: ['a', 'c'] });
 });

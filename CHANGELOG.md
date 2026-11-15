@@ -7,6 +7,13 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
+- **J5, « Besoin par culture » : vos cultures d'abord** (D-148, F302 à
+  F304) : « Vos cultures cette saison (8) » en tête, « Les autres cultures
+  de référence (32) » dans un pli fermé ; la carte fermée dit « 2 séries de
+  la saison », le Kc et les racines sont dans son « Pour les experts » ;
+  l'ombrage dit « 13 % de moins pour un filet de 25 % », sa formule passe
+  dans « Pour les experts ». Parcours P14, P16, P17, P20 adaptés, P31c
+  étendu.
 - **J3, « Objectifs et besoins » plus court au téléphone** (D-147, F299 à
   F301) : chaque jour de la semaine tient en une ligne, « lun. 15 juin ·
   2,31 m³ arrosés · pluie 4,3 mm », et s'ouvre dessous ; le jour courant

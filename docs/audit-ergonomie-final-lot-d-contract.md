@@ -149,6 +149,26 @@ de 44 px au téléphone, 124 803 px tout déplié, selon le rapport).
    relèvent du point A2 du lot E, qui ne les traite pas toutes : à confirmer
    au contrat de A2 pour éviter un doublon) (F304).
 
+**Ce que le code a établi pour J5 (PR 3, D-148).**
+
+- Une culture « de la saison » est une culture de référence à laquelle au
+  moins une série posée de la saison se rattache, par son espèce ou par une
+  exception : le même compte que « 3 séries de la saison » du résumé. Les
+  deux groupes gardent l'ordre de la liste. Sans aucune culture de la
+  saison, le pli des autres s'ouvre et une phrase renvoie au rattachement
+  dans Réglages : la page n'est jamais vide (F302).
+- La carte fermée ne dit plus que ses séries (« 2 séries de la saison ») ;
+  « Kc de 0,40 à 1,05 · racines jusqu'à 0,40 m » passe en tête de son
+  « Pour les experts ». Ce résumé avait été choisi par le porteur le
+  8 novembre 2026 ; J5, qu'il a retenu le 15 novembre 2026, le remplace
+  (F303). L'ombrage dit « 13 % de moins pour un filet de 25 % » ; sa formule,
+  K_ombrage = √(1 − taux du filet), est dans « Pour les experts » des
+  options (F303).
+- Les cibles : mesurées par P31c à 390 px sur toute la page, plis ouverts,
+  depuis le lot E (A2, F273), aucune sous 44 px ; les « 143 » du rapport
+  comptaient la case et non son étiquette (contrat du lot E, section 9).
+  Le nouveau pli fait 44 px (F304).
+
 **J2 — un pli « Réglages de cette page », fermé, en bas** (choix n° 3 :
 oui). Pages concernées, d'après le rapport et la lecture du code :
 

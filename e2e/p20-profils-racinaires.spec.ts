@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { carteDeCulture } from './support/cultures.ts';
 
 /**
  * Parcours P20 : le profil racinaire d'une culture sur la page « Coefficients
@@ -33,15 +34,16 @@ test('le profil racinaire d’une culture se lit, se règle pour la ferme et rep
   const section = page.locator('section.crop-coefficients');
   const statut = section.getByRole('status');
 
-  const carte = section.locator('details.reference-crop-card').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.culture}$`) }) });
-  await expect(carte).toHaveCount(1);
+  const carte = await carteDeCulture(section, cas.culture);
   await carte.scrollIntoViewIfNeeded();
-  // Fermée, la carte dit qu'elle s'ouvre et résume la culture (Kc, racines, séries de la saison) :
-  // à droite du nom, sous le nom au téléphone (retours du porteur du 8 novembre 2026).
+  // Fermée, la carte dit qu'elle s'ouvre et ses séries de la saison : à droite du nom, sous le nom
+  // au téléphone (retours du porteur du 8 novembre 2026) ; le Kc et les racines sont dans
+  // « Pour les experts » de la carte (audit final, lot D, J5, F303).
   const entete = carte.locator('summary').first();
   await expect(entete.getByText('Voir le détail')).toBeVisible();
   const resume = entete.locator('.reference-crop-summary');
-  await expect(resume).toHaveText(/^Kc (de )?\d,\d{2,3}( à \d,\d{2,3})? · racines (jusqu’à|:) \d,\d{2} m( proposés)? · (aucune série|\d+ séries?) de la saison$/);
+  await expect(resume).toHaveText(/^(aucune série|\d+ séries?) de la saison$/);
+  await expect(carte.locator('.reference-crop-expert-summary')).toHaveText(/^Kc (de )?\d,\d{2,3}( à \d,\d{2,3})? · racines (jusqu’à|:) \d,\d{2} m( proposés)?$/);
   const [boiteNom, boiteResume] = await Promise.all([entete.locator('strong').boundingBox(), resume.boundingBox()]);
   if (testInfo.project.name === 'ordinateur') expect(boiteNom && boiteResume && boiteResume.x > boiteNom.x + boiteNom.width).toBe(true);
   else expect(boiteNom && boiteResume && boiteResume.y >= boiteNom.y + boiteNom.height - 1).toBe(true);

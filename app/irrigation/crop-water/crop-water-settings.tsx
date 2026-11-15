@@ -59,6 +59,8 @@ function OptionsForm({ season, settings, pending, run }: { season: number; setti
       {/* La formule de l'ETM et le lissage des stades, le même contenu, dans « Pour les experts » (audit ergonomique, lot 3, point 8). */}
       <ExpertsFold>
         <p className="reference-crop-meta">Le besoin de chaque planche : ETM = ET0 × K_abri × Kc × K_paillage × K_ombrage.</p>
+        {/* La formule de l'ombrage quitte l'option visible (audit final, lot D, J5, F303). */}
+        <p className="reference-crop-meta">Ombrage : K_ombrage = √(1 − taux du filet).</p>
         <label className="crop-water-option">
           <input type="checkbox" checked={smoothing} onChange={(event) => setSmoothing(event.target.checked)} />
           <span>
@@ -75,8 +77,8 @@ function OptionsForm({ season, settings, pending, run }: { season: number; setti
         <span>
           <strong>Ombrage</strong> · {settings.options.shading ? 'activé' : 'désactivé'}
           <small>
-            Un filet d’ombrage posé sur une planche réduit son besoin : ETM × √(1 − taux), soit 0,87 pour un filet de 25 %. C’est une
-            hypothèse tirée des formules de serre, pas une norme.
+            Un filet d’ombrage posé sur une planche réduit son besoin : 13 % de moins pour un filet de 25 %. C’est une hypothèse
+            tirée des formules de serre, pas une norme.
           </small>
         </span>
       </label>

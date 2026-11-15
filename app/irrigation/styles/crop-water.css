@@ -6,6 +6,14 @@
 .crop-coefficients-part h3 { margin: 0; font-size: 1.15rem; }
 .crop-coefficients-empty { border-radius: 10px; background: var(--warn-soft); padding: .75rem .9rem; color: var(--warn-ink); }
 .species-link-list, .reference-crop-list { display: grid; gap: .6rem; margin-top: .75rem; }
+/* Vos cultures de la saison d'abord, les autres dans un pli fermé (audit final, lot D, J5, F302). */
+.reference-crop-group-title { margin: 1rem 0 0; font-size: 1rem; }
+.reference-crop-others { margin-top: 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.reference-crop-others > summary { position: relative; display: flex; min-height: var(--touch-target); box-sizing: border-box; align-items: center; padding: .6rem 2.5rem .6rem .9rem; font-weight: 650; cursor: pointer; list-style: none; }
+.reference-crop-others > summary::-webkit-details-marker { display: none; }
+.reference-crop-others > summary::after { position: absolute; top: 50%; right: 16px; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; content: ""; transform: translateY(-70%) rotate(45deg); }
+.reference-crop-others[open] > summary::after { transform: translateY(-30%) rotate(-135deg); }
+.reference-crop-others > .reference-crop-list { margin: 0; padding: 0 .6rem .6rem; }
 .species-link-card, .reference-crop-card { min-width: 0; border: 1px solid var(--line); border-left: 4px solid #b9a25a; border-radius: var(--radius); background: white; }
 .species-link-card[data-linked="true"] { border-left-color: var(--green); }
 .reference-crop-card { border-left-color: var(--green); }

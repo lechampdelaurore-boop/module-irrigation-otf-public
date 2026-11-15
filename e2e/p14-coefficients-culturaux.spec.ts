@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { carteDeCulture } from './support/cultures.ts';
 
 /**
  * Parcours P14 : la page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -100,7 +101,7 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   const coefficients = page.locator('section.crop-coefficients');
   // Le titre en clair depuis l'audit ergonomique (lot 3, point 8).
   await expect(coefficients.getByRole('heading', { name: 'Besoin en eau par culture' })).toBeVisible();
-  const table = coefficients.locator('details.reference-crop-card').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.culture}$`) }) });
+  const table = await carteDeCulture(coefficients, cas.culture);
   await table.locator('summary').first().click();
   await expect(table).toContainText('CRIIAM Sud');
   await expect(table.getByRole('table')).toBeVisible();

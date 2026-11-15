@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { carteDeCulture } from './support/cultures.ts';
 
 /**
  * Parcours P16 : les surcharges de Kc et les réglages du calcul sur la page
@@ -37,8 +38,7 @@ test('un Kc se surcharge et revient à la source, et le K_abri, le paillage, l�
   const statut = section.getByRole('status');
 
   // Surcharger le premier Kc de la culture, puis revenir à la valeur de la source.
-  const carte = section.locator('details.reference-crop-card').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.culture}$`) }) });
-  await expect(carte).toHaveCount(1);
+  const carte = await carteDeCulture(section, cas.culture);
   await carte.scrollIntoViewIfNeeded();
   const ouvrirFormulaire = carte.locator('details.kc-override-form-wrap > summary');
   await ouvrirParClic(carte.locator('summary').first(), ouvrirFormulaire);

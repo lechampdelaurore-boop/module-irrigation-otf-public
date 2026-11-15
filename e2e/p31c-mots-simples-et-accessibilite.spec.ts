@@ -66,6 +66,16 @@ test('besoin par culture en mots simples : titre en clair, plis « Pour les expe
   const options = reglages.getByRole('group', { name: 'Options du calcul' });
   await expect(options.locator('details.experts-fold')).toContainText('ETM = ET0 × K_abri × Kc × K_paillage × K_ombrage');
   await expect(options.locator('details.experts-fold')).toContainText('Lissage des passages de stade');
+  // Audit final, lot D, J5 : les cultures de la saison d'abord, les autres dans un pli fermé (F302) ;
+  // la formule de l'ombrage quitte l'option visible (F303).
+  const vosCultures = section.getByRole('heading', { level: 4, name: /^Vos cultures cette saison \(\d+\)$/ });
+  await expect(vosCultures).toBeVisible();
+  const autres = section.locator('details.reference-crop-others');
+  await expect(autres.locator(':scope > summary')).toHaveText(/^Les autres cultures de référence \(\d+\)$/);
+  const cultivees = Number((await vosCultures.innerText()).match(/\((\d+)\)/)![1]);
+  expect(await autres.evaluate((element) => (element as HTMLDetailsElement).open), 'le pli des autres cultures fermé, sauf sans culture de la saison').toBe(cultivees === 0);
+  await expect(options.locator('label.crop-water-option').filter({ hasText: 'Ombrage' })).not.toContainText('√');
+  await expect(options.locator('details.experts-fold')).toContainText('K_ombrage = √(1 − taux du filet)');
   await verifierLEtape(page, journal, 'besoin par culture en clair');
 });
 
