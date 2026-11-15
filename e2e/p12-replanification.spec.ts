@@ -3,7 +3,7 @@ import { dateKeyInTimeZone } from '../lib/domain/irrigation-history/dates.ts';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { addDaysToDateKey, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
@@ -263,6 +263,8 @@ async function saisirLaPluieDuJour(page: Page, millimetres: string): Promise<voi
  * le moteur la lisent comme une absence de limite.
  */
 async function reglerLaLimiteJournaliere(page: Page, limite: { active: true; metresCubes: string } | { active: false }): Promise<void> {
+  // La limite est dans le pli « Réglages de cette page » (audit final, lot D, J2, F305).
+  await ouvrirLesReglagesDeLaPage(page);
   const panneau = page.locator('.water-management-section .water-panel').filter({ hasText: 'Limite journalière d’irrigation' });
   await panneau.scrollIntoViewIfNeeded();
   await panneau.getByLabel('Activer la limite').setChecked(limite.active);

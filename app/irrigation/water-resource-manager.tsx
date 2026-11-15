@@ -2,7 +2,8 @@
 import { volumeText } from '@/lib/domain/display-numbers';
 import { millisecondsFromMinutes } from '@/lib/domain/units';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, type ReactNode } from 'react';
+import { PageSettingsFold } from './shell/page-settings-fold';
 import { notifyFeasibilityChanged, notifyWaterSourcesChanged } from '@/lib/domain/feasibility-notifications';
 import {
   formatIrrigationDateTime,
@@ -49,10 +50,16 @@ export function WaterResourceManager({
   season,
   initialNowIso,
   initialDashboard,
+  after = null,
+  settings = null,
 }: {
   season: number;
   initialNowIso: string;
   initialDashboard: WaterResourceDashboard;
+  /** Ce qui suit les projections, avant le pli des réglages : la faisabilité, quand aucune répartition n'attend. */
+  after?: ReactNode;
+  /** Ce que la page ajoute au pli « Réglages de cette page » : les pompes et la pompe habituelle du matériel. */
+  settings?: ReactNode;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
   const [notice, setNotice] = useState<string | null>(null);
@@ -156,20 +163,6 @@ export function WaterResourceManager({
       {correctionReservoir ? <VolumeCorrection reservoir={correctionReservoir} disabled={pending} onCancel={() => setCorrectionReservoir(null)} onSave={(volumeCubicMeters, observedAt, reason) => run(() => correctWaterReservoirVolumeAction({ ...projectionInput(), reservoirId: correctionReservoir.id, volumeCubicMeters, observedAt, reason }), () => setCorrectionReservoir(null))} /> : null}
       {flowResource ? <ResourceFlowPanel resource={flowResource} entry={dashboard.flowHistory[flowResource.id] ?? { readings: [], measurements: [], revisions: [] }} timeZone={dashboard.timeZone} nowIso={initialNowIso} authorisedCubicMetersPerDay={dashboard.latestLimitByResource[flowResource.id]?.enabled ? dashboard.latestLimitByResource[flowResource.id]?.maxCubicMetersPerDay ?? null : null} pending={pending} notice={notice} error={error} onClose={() => setFlowResourceId(null)} onSubmit={(input, onSuccess) => run(() => saveResourceMeterReadingAction({ ...projectionInput(), resourceId: flowResource.id, ...input }), onSuccess)} onDelete={(readingId) => run(() => deleteResourceMeterReadingAction({ ...projectionInput(), readingId }))} onApply={(measurement) => run(() => applyResourceFlowAction({ ...projectionInput(), resourceId: flowResource.id, fromReadingId: measurement.fromReadingId, toReadingId: measurement.toReadingId }))} /> : null}
 
-      <article className="water-links-panel">
-        <div className="water-asset-title"><div><h3>Liaisons</h3><p>Les connexions décrivent la topologie, sans pompe ni pression.</p></div></div>
-        <div className="water-link-forms">
-          <ResourceLinkForm dashboard={dashboard} disabled={pending} onSave={(link) => run(() => saveResourceReservoirLinkAction({ ...projectionInput(), link }))} />
-          <ReservoirLinkForm dashboard={dashboard} disabled={pending} onSave={(link) => run(() => saveReservoirLinkAction({ ...projectionInput(), link }))} />
-          <DefaultSupplyForm dashboard={dashboard} disabled={pending} onSave={(supply) => run(() => saveDefaultWaterSupplyAction({ ...projectionInput(), supply }))} />
-        </div>
-        <div className="water-network-view">
-          {infrastructure.resourceReservoirLinks.map((link) => <Connection key={link.id} source={infrastructure.resources.find((item) => item.id === link.resourceId)?.name ?? 'Ressource'} target={infrastructure.reservoirs.find((item) => item.id === link.reservoirId)?.name ?? 'Réserve'} detail={`${link.fillMode === 'automatic' ? 'Automatique / continu' : 'Manuel'}${link.active ? '' : ' · inactive'}`} active={link.active} disabled={pending} onToggle={() => run(() => saveResourceReservoirLinkAction({ ...projectionInput(), link: { ...link, active: !link.active } }))} />)}
-          {infrastructure.reservoirLinks.map((link) => <Connection key={link.id} source={infrastructure.reservoirs.find((item) => item.id === link.upstreamReservoirId)?.name ?? 'Réserve'} target={infrastructure.reservoirs.find((item) => item.id === link.downstreamReservoirId)?.name ?? 'Réserve'} detail={`Connexion existante · transfert à caractériser en 3.2${link.active ? '' : ' · inactive'}`} active={link.active} disabled={pending} onToggle={() => run(() => saveReservoirLinkAction({ ...projectionInput(), link: { ...link, active: !link.active } }))} />)}
-          {infrastructure.resourceReservoirLinks.length + infrastructure.reservoirLinks.length === 0 ? <Empty text="Aucune liaison enregistrée." /> : null}
-        </div>
-      </article>
-
       <article className="water-projection-panel">
         <div className="water-projection-heading"><div><h3>Disponibilité / projections</h3><p>Estimation à partir du stock observé, des apports potentiels, de la météo et des irrigations déjà planifiées.</p></div><div className="projection-shortcuts" aria-label="Horizon de projection">{(['24h', '48h', '7d'] as const).map((horizon) => <button type="button" className={dashboard.horizon === horizon ? 'is-active' : ''} disabled={pending} key={horizon} onClick={() => run(() => loadWaterResourceDashboardAction(projectionInput(horizon)))}>{horizon === '7d' ? '7 jours' : horizon.replace('h', ' h')}</button>)}<label><span>Date personnalisée</span><input type="datetime-local" value={customEndsAt} min={initialProjectionMinimum} onChange={(event) => setCustomEndsAt(event.target.value)} /></label><button type="button" disabled={pending} onClick={() => run(() => loadWaterResourceDashboardAction(projectionInput('custom')))}>Calculer</button></div></div>
         <p className="projection-date">Projection jusqu’au {formatIrrigationDateTime(dashboard.projectionEndsAt, dashboard.timeZone)}. Les valeurs futures restent des estimations.</p>
@@ -191,6 +184,24 @@ export function WaterResourceManager({
           {infrastructure.reservoirs.length === 0 && !dashboard.projection.directSupply ? <Empty text="Créez une ressource ou une réserve pour obtenir une projection." /> : null}
         </div>
       </article>
+      {after}
+      {/* Les liaisons, l'alimentation par défaut et les pompes, dans le pli du bas (audit final, lot D, J2, F305). */}
+      <PageSettingsFold>
+        <article className="water-links-panel">
+          <div className="water-asset-title"><div><h3>Liaisons</h3><p>Les connexions décrivent la topologie, sans pompe ni pression.</p></div></div>
+          <div className="water-link-forms">
+            <ResourceLinkForm dashboard={dashboard} disabled={pending} onSave={(link) => run(() => saveResourceReservoirLinkAction({ ...projectionInput(), link }))} />
+            <ReservoirLinkForm dashboard={dashboard} disabled={pending} onSave={(link) => run(() => saveReservoirLinkAction({ ...projectionInput(), link }))} />
+            <DefaultSupplyForm dashboard={dashboard} disabled={pending} onSave={(supply) => run(() => saveDefaultWaterSupplyAction({ ...projectionInput(), supply }))} />
+          </div>
+          <div className="water-network-view">
+            {infrastructure.resourceReservoirLinks.map((link) => <Connection key={link.id} source={infrastructure.resources.find((item) => item.id === link.resourceId)?.name ?? 'Ressource'} target={infrastructure.reservoirs.find((item) => item.id === link.reservoirId)?.name ?? 'Réserve'} detail={`${link.fillMode === 'automatic' ? 'Automatique / continu' : 'Manuel'}${link.active ? '' : ' · inactive'}`} active={link.active} disabled={pending} onToggle={() => run(() => saveResourceReservoirLinkAction({ ...projectionInput(), link: { ...link, active: !link.active } }))} />)}
+            {infrastructure.reservoirLinks.map((link) => <Connection key={link.id} source={infrastructure.reservoirs.find((item) => item.id === link.upstreamReservoirId)?.name ?? 'Réserve'} target={infrastructure.reservoirs.find((item) => item.id === link.downstreamReservoirId)?.name ?? 'Réserve'} detail={`Connexion existante · transfert à caractériser en 3.2${link.active ? '' : ' · inactive'}`} active={link.active} disabled={pending} onToggle={() => run(() => saveReservoirLinkAction({ ...projectionInput(), link: { ...link, active: !link.active } }))} />)}
+            {infrastructure.resourceReservoirLinks.length + infrastructure.reservoirLinks.length === 0 ? <Empty text="Aucune liaison enregistrée." /> : null}
+          </div>
+        </article>
+        {settings}
+      </PageSettingsFold>
     </section>
   );
 }

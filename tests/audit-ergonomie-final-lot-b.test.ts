@@ -151,7 +151,8 @@ test('R4, F247 et F248 : le lien mène à l’ancre de la faisabilité, qui pass
   assert.match(view, /action\.arbitrated \? 'Revoir la répartition' : 'Répartir l’eau'/);
   assert.match(readFileSync('app/irrigation/irrigation-feasibility-dashboard.tsx', 'utf8'), /<section ref=\{root\} id="repartition"/);
   const ressources = readFileSync('app/irrigation/ressources/page.tsx', 'utf8');
-  const order = ['{first ? feasibility : null}', '<WaterResourceManager', '<PumpManager', '{first ? null : feasibility}'].map((marker) => ressources.indexOf(marker));
+  // Lot D, J2 (D-149) : sinon, la faisabilité vient après les ressources, juste avant le pli « Réglages de cette page » où passent les pompes.
+  const order = ['{first ? feasibility : null}', '<WaterResourceManager', 'after={first ? null : feasibility}', 'settings={<PumpManager'].map((marker) => ressources.indexOf(marker));
   assert.ok(order.every((index, position) => index >= 0 && (position === 0 || index > order[position - 1])), 'la faisabilité avant les ressources quand elle passe en tête, après sinon');
   assert.match(readFileSync('app/irrigation/page-loaders.ts', 'utf8'), /decisionPending: shortageDecisionPending\(weeklyPlan\)/);
 });

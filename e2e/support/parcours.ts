@@ -177,3 +177,18 @@ export async function verifierLEtape(page: Page, journal: JournalDeConsole, etap
   await verifierAucunDebordementHorizontal(page, etape);
   verifierAucuneErreurDeConsole(journal, etape);
 }
+
+/**
+ * Le pli « Réglages de cette page », ouvert s'il ne l'est pas déjà : la limite journalière,
+ * le seuil de planification, les liaisons et les pompes, le besoin de la culture d'une planche
+ * y sont rangés, fermés, en bas de leur page (audit ergonomique final, lot D, J2, F305).
+ */
+export async function ouvrirLesReglagesDeLaPage(page: Page): Promise<Locator> {
+  const pli = page.locator('details#reglages-de-la-page');
+  await expect(pli).toHaveCount(1);
+  if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) {
+    await pli.locator(':scope > summary').click();
+  }
+  await expect(pli).toHaveAttribute('open', '');
+  return pli;
+}

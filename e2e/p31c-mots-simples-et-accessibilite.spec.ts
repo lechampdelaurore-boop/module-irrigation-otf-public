@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { ciblesTropPetites, textesPeuContrastes, type CibleMesuree, type TexteMesure } from './support/accessibilite.ts';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierLEtape, type PageDuModule } from './support/parcours.ts';
+import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P31c : l'audit ergonomique, lot 3, PR 2 — les mots simples
@@ -173,6 +173,8 @@ async function creerPuisArchiverUnMateriel(page: Page, materiel: string): Promis
 
 /** Une pompe de 2 m³/h, sans origine, créée puis archivée : sa carte dit « Archivée ». */
 async function creerPuisArchiverUnePompe(page: Page, pompe: string): Promise<void> {
+  // Les pompes sont dans le pli « Réglages de cette page » (audit final, lot D, J2, F305).
+  await ouvrirLesReglagesDeLaPage(page);
   const formulaire = page.locator('form.pump-editor').filter({ has: page.getByRole('heading', { name: 'Nouvelle pompe' }) });
   await ouvrirParClic(page.getByRole('button', { name: '+ Ajouter une pompe' }), formulaire);
   await formulaire.getByLabel('Nom', { exact: true }).fill(pompe);

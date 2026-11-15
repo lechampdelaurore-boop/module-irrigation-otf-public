@@ -28,9 +28,14 @@ export default async function RessourcesPage({ searchParams }: { searchParams: I
   return (
     <IrrigationShell {...context.shell}>
       {first ? feasibility : null}
-      <WaterResourceManager season={context.season} initialNowIso={context.nowIso} initialDashboard={waterResourceDashboard} />
-      <PumpManager equipment={equipment} events={irrigationEvents} initialDashboard={pumpDashboard} />
-      {first ? null : feasibility}
+      {/* Les liaisons et les pompes dans le pli « Réglages de cette page », en bas, après la faisabilité (audit final, lot D, J2, F305). */}
+      <WaterResourceManager
+        season={context.season}
+        initialNowIso={context.nowIso}
+        initialDashboard={waterResourceDashboard}
+        after={first ? null : feasibility}
+        settings={<PumpManager equipment={equipment} events={irrigationEvents} initialDashboard={pumpDashboard} />}
+      />
     </IrrigationShell>
   );
 }

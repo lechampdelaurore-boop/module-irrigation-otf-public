@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import test from 'node:test';
+
+/**
+ * Audit ergonomique final, lot D, J2 : le pli « Réglages de cette page »
+ * (docs/audit-ergonomie-final-lot-d-contract.md, section 5, F305 à F307).
+ * Affichage seul : ces tests lisent où chaque réglage est rangé ; les
+ * parcours P12, P15, P31c, P32 et P35 l'ouvrent et s'en servent.
+ */
+
+const source = (path: string) => readFileSync(path, 'utf8');
+const fold = source('app/irrigation/shell/page-settings-fold.tsx');
+
+test('le pli s’appelle « Réglages de cette page », fermé, avec une ancre stable qui l’ouvre (F305, F307)', () => {
+  assert.match(fold, /export const PAGE_SETTINGS_ANCHOR = 'reglages-de-la-page';/);
+  assert.match(fold, /<strong>Réglages de cette page<\/strong>/);
+  assert.match(fold, /useState\(openReason !== null\)/, 'fermé, sauf raison dite');
+  assert.match(fold, /addEventListener\('hashchange'/, 'un lien suivi dans la page l’ouvre aussi');
+  assert.match(fold, /fold\.current\?\.contains\(target\)/, 'l’ancre d’un élément qu’il contient l’ouvre');
+});
+
+test('chaque page range ses réglages dans le pli, en bas (F305)', () => {
+  const arrosages = source('app/irrigation/water-management-dashboard.tsx');
+  const limit = arrosages.indexOf('Limite journalière d’irrigation');
+  assert.ok(arrosages.lastIndexOf('<PageSettingsFold>', limit) > arrosages.lastIndexOf("if (part === 'arrosages')", limit), 'Arrosages : la limite journalière');
+
+  const besoins = source('app/irrigation/irrigation-needs-dashboard.tsx');
+  assert.ok(besoins.indexOf('<PageSettingsFold>') < besoins.indexOf('Seuil minimal de planification'), 'Objectifs et besoins : le seuil');
+  assert.ok(besoins.indexOf('irrigation-needs-gardens') < besoins.indexOf('<PageSettingsFold>'), 'après les besoins par planche');
+
+  const ressources = source('app/irrigation/water-resource-manager.tsx');
+  const settingsAt = ressources.indexOf('<PageSettingsFold>');
+  assert.ok(settingsAt > ressources.indexOf('water-projection-panel') && settingsAt < ressources.indexOf('<h3>Liaisons</h3>'), 'Ressources : les liaisons, après les projections');
+  assert.ok(ressources.indexOf('{after}') < settingsAt, 'la faisabilité avant le pli');
+  assert.match(source('app/irrigation/ressources/page.tsx'), /settings=\{<PumpManager /, 'Ressources : les pompes et la pompe habituelle');
+
+  const materiel = source('app/irrigation/hierarchy-browser.tsx');
+  assert.match(materiel, /<PageSettingsFold>\s*<BedCropWaterPanel /, 'Matériel : le besoin de la culture de la planche');
+});
+
+test('« Matériel » renvoie à « Objectifs et besoins » au lieu de répéter ETM, ET0 et Kc (F306)', () => {
+  const materiel = source('app/irrigation/hierarchy-browser.tsx');
+  assert.match(materiel, /className="bed-crop-water-pointer"/);
+  assert.match(materiel, /pageHref\('besoins', \{ season \}\)/);
+  assert.match(materiel, /href=\{`#\$\{PAGE_SETTINGS_ANCHOR\}`\}/);
+});
