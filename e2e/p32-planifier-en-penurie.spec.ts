@@ -111,6 +111,25 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   await expect(planning.locator('.planning-summary-note:visible')).toHaveCount(0);
   await verifierLEtape(page, journal, 'phrase d’action, détail du calcul replié');
 
+  // « Aujourd'hui » redit la phrase du planning, avec le même lien vers la
+  // répartition, et la pastille orange tant qu'elle attend (audit final,
+  // lot A, R1, F276 et F277). Une répartition validée laissée par un autre
+  // parcours la ferait « Revoir », sans pastille.
+  const phraseDuPlanning = await planning.locator('.planning-shortage-action > span').innerText();
+  const lienDuPlanning = await planning.locator('.planning-shortage-action > a').innerText();
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const encadre = page.locator('.today-head .today-shortage');
+  await expect(page.locator('.today-shortage > span')).toHaveText(phraseDuPlanning);
+  const lienDuMatin = encadre.getByRole('link', { name: lienDuPlanning, exact: true });
+  await expect(lienDuMatin).toHaveAttribute('href', /^\/irrigation\/ressources\?season=\d{4}#repartition$/);
+  await verifierCibleTactile(lienDuMatin, `le lien « ${lienDuPlanning} » d’« Aujourd’hui »`);
+  await expect(page.locator('.today-chip[data-tone="shortage"]')).toHaveCount(lienDuPlanning === 'Répartir l’eau' ? 1 : 0);
+  await expect(page.locator('.today-chip').filter({ hasText: 'Rien à arroser' })).toHaveCount(0);
+  await expect(page.locator('.today-head')).not.toContainText('Rien d’urgent');
+  await verifierLEtape(page, journal, '« Aujourd’hui » dit le manque d’eau comme le planning');
+  await attendreLaPageIrrigation(page, 'planning');
+  await expect(planning.locator('.planning-shortage-action > span')).toHaveText(phraseDuPlanning);
+
   // La ligne de budget de la réserve : l'eau mobilisable, la demande, et pour
   // chaque niveau la part visée et la part placée, « — » sans demande.
   const budget = await ligneDeBudget(planning, reserve);

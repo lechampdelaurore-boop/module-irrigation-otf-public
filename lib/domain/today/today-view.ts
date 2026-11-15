@@ -4,7 +4,7 @@ import type { FeatureId } from '../features/catalogue.ts';
 import type { IrrigationPageId } from '../features/pages.ts';
 import type { FeatureSelection } from '../features/selection.ts';
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
-import type { StoredProposal } from '../planning/contract.ts';
+import type { StoredProposal, StoredWeeklyPlan } from '../planning/contract.ts';
 import { addDaysToDateKey } from '../water-management.ts';
 import type { WaterInfrastructure } from '../water-resources.ts';
 import {
@@ -14,6 +14,7 @@ import {
   type WeatherAlertForecastDay,
 } from '../weather/weather-alerts.ts';
 import type { SoilGaugeZone } from '../soil-reserve/gauge-view.ts';
+import { todayShortage, todayTomorrow, type TodayShortage, type TodayTomorrow } from './ahead.ts';
 import { allDone, type AllDone } from './all-done.ts';
 import { dayTimeline, lateItems, type DayTimeline, type LateItem } from './day-plan.ts';
 import { todayHeadline, type TodayHeadline } from './headline.ts';
@@ -195,6 +196,12 @@ export type TodayInputs = {
   lateToleranceMinutes: number;
   /** Le dernier plan de la semaine ; `null` quand le planning n'est pas coché ou qu'aucun calcul n'existe. */
   plan: { computedAt: string; proposals: readonly StoredProposal[] } | null;
+  /**
+   * Le même plan, tel que le planning le lit pour sa phrase de pénurie (lot A,
+   * R1, F276) ; `null` quand le planning n'est pas coché ou qu'aucun calcul
+   * n'existe.
+   */
+  shortagePlan: Pick<StoredWeeklyPlan, 'calculation'> | null;
   bedNames: ReadonlyMap<string, string>;
   /** `null` quand « Ressources et pompes » n'est pas coché. */
   infrastructure: WaterInfrastructure | null;
@@ -222,6 +229,10 @@ export type TodayView = {
   week: TodayWeek | null;
   /** « Réserve du sol » ; `null` sans la case. */
   soil: TodaySoil | null;
+  /** Les arrosages de demain à valider (lot A, R1, F274) ; `null` sans « Planning » ou sans proposition demain. */
+  tomorrow: TodayTomorrow | null;
+  /** L'eau qui manque à la semaine, la phrase du planning (F276) ; `null` sans « Planning » ou sans manque. */
+  shortage: TodayShortage | null;
 };
 
 export function todayView(input: TodayInputs): TodayView {
@@ -252,6 +263,9 @@ export function todayView(input: TodayInputs): TodayView {
   if (reliabilityOn) blocks.push({ kind: 'reliability', zone: reliabilityZone(reliability), checks: reliabilityChecks(reliabilityInputs, reliability) });
   const count = reliability.length + late.length;
   const today = farmDateKey(now);
+  // Ce qui attend après le jour ne se dit que « Planning » coché (lot A, R1) : le plan de la semaine en décide.
+  const tomorrow = on('planning') && input.plan ? todayTomorrow(input.plan.proposals, now) : null;
+  const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled) : null;
   return {
     today,
     plan: on('planning') ? planLine(input.plan?.computedAt ?? null, now) : null,
@@ -262,10 +276,14 @@ export function todayView(input: TodayInputs): TodayView {
       irrigations: irrigationsOn ? { late, todo } : null,
       weather: weather ? { tone: weather.tone, days: weather.days, calmText: weather.tone === 'calm' ? weather.lines[weather.lines.length - 1] ?? null : null } : null,
       reliabilityCount: reliabilityOn ? reliability.length : null,
+      tomorrow,
+      shortage,
     }),
     timeline: irrigationsOn ? dayTimeline([...late, ...todo], now) : null,
     allDone: irrigationsOn ? allDone({ lines: [...late, ...todo], events: input.events, now }) : null,
     week: on('besoins') && input.week ? todayWeek(input.week) : null,
     soil: on('sol') && input.soil ? todaySoil(input.soil) : null,
+    tomorrow,
+    shortage,
   };
 }

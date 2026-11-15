@@ -270,10 +270,12 @@ registres, elle y renvoie.
   démonstration), 24 duodecies (E, mots et chiffres), 24 terdecies (D,
   pages allégées), chacun en Opus 5.5 · Élevé, un contrat avant le code,
   une PR par point. Les six choix du rapport sont consignés sur l'option
-  recommandée, **à confirmer par le porteur au réveil** ; le code des lots
-  A et D attend sa confirmation, la séance sur la ferme réelle son
-  « vas-y ». Le lot C, premier lot, peut partir. PR de registres seule,
-  aucun contrôle rejoué.
+  recommandée, puis **confirmés par le porteur le 15 novembre 2026 à
+  15 h 51** (D-137 : « Je suis d'accord avec toutes tes propositions.
+  Toutes les recommandations. ») : le code des lots A et D n'attend plus
+  sa confirmation, et la séance de lecture sur la ferme réelle a son
+  accord, chaque séance ouverte avec lui. PR de registres seule, aucun
+  contrôle rejoué.
 - Audit ergonomique final, **lot C · gestes sûrs** (24 octies) : **commencé
   le 14 novembre 2026 au soir** en Opus 5.5 · Élevé, sur le mandat
   d'autonomie de nuit du porteur. Contrat court
@@ -305,8 +307,8 @@ registres, elle y renvoie.
   `docs/audit-ergonomie-final-lot-b-contract.md` (D-122, précisions F243 à
   F256 ; P32, P7, P12, P10 et P31 étendus), causes établies dans le code ;
   sept PR, une à la fois ; affichage seul, aucun calcul de pénurie changé.
-  Le bouton « Répartir l'eau » sur « Aujourd'hui » (R4) attend le lot A et
-  le porteur. **PR 1 sur 7, R3** : au planning, une phrase d'action en tête
+  Le bouton « Répartir l'eau » sur « Aujourd'hui » (R4) va avec le lot A
+  (codé par sa PR 1, D-138). **PR 1 sur 7, R3** : au planning, une phrase d'action en tête
   du résumé quand l'eau manque (« Il manque 0,37 m³ d'eau d'ici dimanche :
   5 planches ne recevront pas tout leur besoin. »), les deux notes du
   calcul dans un repli fermé « Le détail du calcul » ; sur « Ressources »,
@@ -362,8 +364,8 @@ registres, elle y renvoie.
   dit sous son en-tête, en rouge foncé, « Limite journalière de 1,50 m³
   dépassée : 5,06 m³ engagés » (F256 ; P12 étendu ; aucune migration). Le
   lot B est alors codé en entier ; reste sa recette sur la version
-  déployée, et le bouton « Répartir l'eau » sur « Aujourd'hui », avec le
-  lot A. **PR 7 en ligne** (#63, fusionnée à 6 h 55, déployée à 7 h 10).
+  déployée ; le bouton « Répartir l'eau » sur « Aujourd'hui » est codé
+  avec le lot A (PR 1, D-138). **PR 7 en ligne** (#63, fusionnée à 6 h 55, déployée à 7 h 10).
 - Audit ergonomique final, lot E, mots et chiffres (24 duodecies, D-130) :
   **commencé le 15 novembre 2026 au matin**, en Opus 5.5 · Élevé, sur le
   mandat d'autonomie du porteur. Contrat court
@@ -420,7 +422,31 @@ registres, elle y renvoie.
   44 px dans les deux sens ; P31c mesure la largeur, au dixième de pixel,
   et toute étiquette qui contient une case (F272 et F273 ; aucune
   migration). Le lot E est alors codé en entier ; reste sa recette sur la
-  version déployée.
+  version déployée. **PR 7 en ligne** (#70, fusionnée à 11 h 50, déployée
+  à 12 h 09, cinq jobs verts). « Par analogie » (44 px) n'est mesuré par
+  aucun parcours : à voir à la recette.
+- Audit ergonomique final, **lot A · le matin, l'essentiel** (24 nonies,
+  D-138) : **commencé le 15 novembre 2026 l'après-midi**, en Opus 5.5 ·
+  Élevé, sur le « vas-y » exprès du porteur (« Point numéro 2, vas-y. »,
+  D-137). Contrat court `docs/audit-ergonomie-final-lot-a-contract.md`
+  (précisions F274 et suivantes), quatre PR, une à la fois, affichage
+  seul : R1, R2, J14, J13. Cause de R1 établie dans le code : l'en-tête ne
+  regardait que les irrigations du jour. **PR 1 sur 4, R1** : quand
+  « Planning » est coché, un encadré de l'en-tête redit la phrase d'action
+  du planning quand l'eau manque, mot pour mot, avec le même lien
+  « Répartir l'eau » ou « Revoir la répartition » (faisabilité active), et
+  la pastille orange « L'eau manque » en tête tant qu'une répartition
+  attend ; les arrosages de demain à valider, de 0 h à minuit, se lisent au
+  pied de « Votre journée » (« Demain à 6 h : 3 arrosages à valider »,
+  « Voir au planning »), dans une pastille et dans la phrase ; « Rien
+  d'urgent aujourd'hui. » et « Rien à arroser » ne se disent plus quand
+  demain ou la semaine parlent ; une réserve dont le volume connu est sous
+  son minimum de sécurité le dit en orange et en mots (F274 à F279 ;
+  section 3.5 du contrat de la page changée ; P32 étendu ; aucune
+  migration, aucun calcul changé). Limite connue : le dimanche, rien n'est
+  annoncé pour lundi, dont le plan n'existe pas encore. Ensuite R2, cause à
+  établir d'abord (point d'arrêt : si elle est dans le calcul de
+  l'objectif, le coordinateur est prévenu avant de coder), J14 et J13.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

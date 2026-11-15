@@ -2,6 +2,7 @@
 
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all-done';
+import type { TodayTomorrow } from '@/lib/domain/today/ahead';
 import type { DayTimeline, LateItem } from '@/lib/domain/today/day-plan';
 import type { TodayIrrigationLine } from '@/lib/domain/today/today-irrigations';
 import { shortDayText } from '@/lib/domain/today/today-text';
@@ -23,12 +24,15 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * « Ouvrir » vers sa carte. Rien n'est démarré de soi (D-028). En tête,
  * « Tout est fait (n) » quand des irrigations passées attendent encore
  * (section 3.4) ; sur chacune d'elles, « Fait comme prévu » pour elle seule
- * (audit ergonomique, lot 3, point 6.5, F43), avec la même règle.
+ * (audit ergonomique, lot 3, point 6.5, F43), avec la même règle. Au pied,
+ * les arrosages de demain encore à valider, avec un lien vers le premier sur
+ * le planning (audit ergonomique final, lot A, R1, F274).
  */
-export function TodayDay({ today, late, todo, timeline, allDone, query, pending, onStart, onAllDone }: {
+export function TodayDay({ today, late, todo, tomorrow, timeline, allDone, query, pending, onStart, onAllDone }: {
   today: string;
   late: LateBlock;
   todo: TodoBlock;
+  tomorrow: TodayTomorrow | null;
   timeline: DayTimeline | null;
   allDone: AllDone | null;
   query: PageQuery;
@@ -92,6 +96,13 @@ export function TodayDay({ today, late, todo, timeline, allDone, query, pending,
             {todo.lines.map(card)}
           </ul>
         </div>
+      ) : null}
+      {tomorrow ? (
+        <p className="today-tomorrow">
+          <Icon name="calendrier" />
+          <span>{tomorrow.text}</span>
+          <a href={pageHref(tomorrow.link.page, query, tomorrow.link.anchor)}>Voir au planning</a>
+        </p>
       ) : null}
     </section>
   );

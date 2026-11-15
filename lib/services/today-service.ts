@@ -97,6 +97,7 @@ async function readTodayInputs(
     events,
     lateToleranceMinutes: settings.lateToleranceMinutes,
     plan: plan ? { computedAt: plan.calculation.computedAt, proposals: plan.proposals } : null,
+    shortagePlan: plan,
     bedNames: new Map(snapshot.beds.map((bed) => [bed.id, bed.name])),
     infrastructure,
     reliability: {

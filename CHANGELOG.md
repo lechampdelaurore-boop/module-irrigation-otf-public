@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit ergonomique final, lot A, le matin)
+
+- **R1, « Aujourd'hui » annonce demain et l'eau qui manque** (D-137,
+  D-138, F274 à F279) : quand « Planning » est coché, l'en-tête redit la
+  phrase d'action du planning quand l'eau manque, avec le même bouton
+  « Répartir l'eau » (ou « Revoir la répartition »), et la pastille orange
+  « L'eau manque » tant qu'une répartition attend ; les arrosages de
+  demain à valider se lisent au pied de « Votre journée » (« Demain à
+  6 h : 3 arrosages à valider », « Voir au planning »), dans une pastille et
+  dans la phrase ; « Rien d'urgent aujourd'hui. » et « Rien à arroser » ne
+  se disent plus dans ces cas ; une réserve sous son minimum de sécurité le
+  dit en orange et en mots. Les six choix de l'audit confirmés par le
+  porteur (D-137). Contrat court `docs/audit-ergonomie-final-lot-a-contract.md` ;
+  parcours P32 étendu. A2 du lot E en ligne : #70, déployée le 15 novembre
+  2026 à 12 h 09.
+
 ### Corrigé (audit ergonomique final, lot E, mots et chiffres)
 
 - **A1, « Aller au contenu » partout** (D-130, F257) : la première

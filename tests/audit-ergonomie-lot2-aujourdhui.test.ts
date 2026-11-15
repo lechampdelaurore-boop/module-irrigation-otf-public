@@ -118,6 +118,7 @@ function inputs(overrides: Partial<TodayInputs> = {}): TodayInputs {
     events: [],
     lateToleranceMinutes: 30,
     plan: { computedAt: '2026-11-12T05:02:00.000Z', proposals: [] },
+    shortagePlan: null,
     bedNames: BEDS,
     infrastructure: infrastructure([]),
     reliability: { actualRainMissingDates: [], soilGardensNeverObserved: [], speciesWithoutReference: [] },
@@ -356,6 +357,7 @@ test('cas 15 : six manques, cinq lignes et « Voir l’autre » ; la pastille co
   const view = todayView(inputs({
     infrastructure: infrastructure([reservoir('r1', 'Cuve', '2026-10-05T07:00:00.000Z'), reservoir('r2', 'Bassin', null, null)]),
     plan: { computedAt: '2026-11-09T05:00:00.000Z', proposals: [] },
+    shortagePlan: null,
     events: [event('late', '2026-11-12T04:00:00.000Z', '2026-11-12T06:00:00.000Z')],
     reliability: {
       actualRainMissingDates: ['2026-11-11'],

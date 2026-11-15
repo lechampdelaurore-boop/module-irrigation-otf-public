@@ -1,6 +1,7 @@
 'use client';
 
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
+import type { TodayShortage } from '@/lib/domain/today/ahead';
 import type { TodayHeadline } from '@/lib/domain/today/headline';
 import type { TodayPlanLine } from '@/lib/domain/today/today-view';
 import { Icon, type IconName } from '../line-icon';
@@ -16,6 +17,7 @@ const CHIP_ICONS: Record<Chip['icon'], IconName> = {
   cloud: 'nuage',
   check: 'coche',
   shield: 'bouclier',
+  calendar: 'calendrier',
 };
 
 /** Le bloc où mène une pastille : son ancre sur la page. */
@@ -23,6 +25,7 @@ const CHIP_TARGETS: Record<Chip['target'], string> = {
   day: '#today-day',
   weather: '#today-weather',
   reliability: '#today-reliability',
+  shortage: '#today-shortage',
 };
 
 /**
@@ -30,11 +33,14 @@ const CHIP_TARGETS: Record<Chip['target'], string> = {
  * sections 3.2 et 3.5) : « Tableau de bord », la date en toutes lettres, la
  * ligne du dernier calcul du plan, la phrase qui résume le jour et les
  * pastilles qui mènent chacune à son bloc. Elles ne disent que ce que disent
- * les blocs présents.
+ * les blocs présents. Quand l'eau manque à la semaine, un encadré redit la
+ * phrase du planning et son lien « Répartir l'eau » (audit ergonomique final,
+ * lot A, R1, F276).
  */
-export function TodayHeader({ headline, plan, query, pending, onRecalculatePlan }: {
+export function TodayHeader({ headline, plan, shortage, query, pending, onRecalculatePlan }: {
   headline: TodayHeadline;
   plan: TodayPlanLine | null;
+  shortage: TodayShortage | null;
   query: PageQuery;
   pending: boolean;
   onRecalculatePlan: () => void;
@@ -68,7 +74,13 @@ export function TodayHeader({ headline, plan, query, pending, onRecalculatePlan 
           ))}
         </nav>
       ) : null}
-      <p className="today-sentence">{headline.sentence}</p>
+      {shortage ? (
+        <p className="today-shortage" id="today-shortage" role="note">
+          <span>{shortage.sentence}</span>
+          {shortage.link ? <a href={pageHref(shortage.link.page, query, shortage.link.anchor)}>{shortage.link.label}</a> : null}
+        </p>
+      ) : null}
+      {headline.sentence ? <p className="today-sentence">{headline.sentence}</p> : null}
     </header>
   );
 }

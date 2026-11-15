@@ -30,6 +30,12 @@ type ReservoirGauge = {
   observedText: string;
   /** Le relevé date de plus de sept jours, ou n'existe pas : la cuve se dessine grisée. */
   stale: boolean;
+  /**
+   * « sous son minimum de 2 m³ » quand le volume connu est sous le minimum de
+   * sécurité déjà saisi de la réserve (lot A, R1, F279) : la cuve se dessine
+   * en orange, et le mot le dit ; `null` sinon.
+   */
+  belowMinimumText: string | null;
 };
 
 type LimitGauge = {
@@ -67,7 +73,7 @@ function byName<T extends { name: string }>(items: readonly T[]): T[] {
 
 function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], today: string): { gauge: ReservoirGauge; line: string } {
   const capacityText = `sur ${waterText(reservoir.capacityCubicMeters, 'm³')}`;
-  const base = { id: reservoir.id, name: reservoir.name, capacityCubicMeters: reservoir.capacityCubicMeters, capacityText };
+  const base = { id: reservoir.id, name: reservoir.name, capacityCubicMeters: reservoir.capacityCubicMeters, capacityText, belowMinimumText: null };
   if (reservoir.currentVolumeCubicMeters === null) {
     return {
       gauge: { ...base, volumeCubicMeters: null, volumeText: null, fillPercent: null, observedText: 'volume jamais saisi', stale: true },
@@ -76,8 +82,10 @@ function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], to
   }
   const volume = reservoir.currentVolumeCubicMeters;
   const volumeText = waterText(volume, 'm³');
-  const filled = { ...base, volumeCubicMeters: volume, volumeText, fillPercent: fillPercent(volume, reservoir.capacityCubicMeters) };
-  const both = `${volumeText} ${capacityText}`;
+  // Un volume inconnu n'est jamais dit sous le minimum (D-003) ; un minimum nul ne l'est jamais non plus.
+  const belowMinimumText = volume < reservoir.minimumSafetyCubicMeters ? `sous son minimum de ${waterText(reservoir.minimumSafetyCubicMeters, 'm³')}` : null;
+  const filled = { ...base, volumeCubicMeters: volume, volumeText, fillPercent: fillPercent(volume, reservoir.capacityCubicMeters), belowMinimumText };
+  const both = `${volumeText} ${capacityText}${belowMinimumText ? `, ${belowMinimumText}` : ''}`;
   if (reservoir.currentVolumeObservedAt === null) {
     return {
       gauge: { ...filled, observedText: 'date d’observation inconnue', stale: true },

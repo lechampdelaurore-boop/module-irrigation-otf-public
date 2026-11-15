@@ -128,11 +128,12 @@ export function TodayWaterBlockView({ block }: { block: WaterBlock }) {
       {block.reservoirs.length > 0 ? (
         <ul className="today-tanks" aria-hidden="true">
           {block.reservoirs.map((reservoir) => (
-            <li key={reservoir.id} className="today-tank-row" data-stale={reservoir.stale}>
+            <li key={reservoir.id} className="today-tank-row" data-stale={reservoir.stale} data-below-minimum={reservoir.belowMinimumText !== null}>
               <span className="today-tank">{reservoir.fillPercent === null ? null : <i style={{ height: `${reservoir.fillPercent}%` }} />}</span>
               <span className="today-tank-text">
                 <b>{reservoir.name}</b>
                 <span className="today-tank-volume">{reservoir.volumeText ?? 'volume inconnu'} <small>{reservoir.capacityText}</small></span>
+                {reservoir.belowMinimumText ? <span className="today-tank-minimum">{reservoir.belowMinimumText}</span> : null}
                 <span className="today-tank-age">{reservoir.observedText}</span>
               </span>
             </li>

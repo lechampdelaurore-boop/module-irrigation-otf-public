@@ -81,7 +81,7 @@ function dayLines(events: IrrigationEventRecord[], proposals: StoredProposal[] =
 function inputs(events: IrrigationEventRecord[], overrides: Partial<TodayInputs> = {}): TodayInputs {
   return {
     enabled: ALL, now: NOW, weather: { forecasts: [], frost: [], criteria: [] }, events, lateToleranceMinutes: 30,
-    plan: { computedAt: '2026-11-12T05:02:00.000Z', proposals: [] }, bedNames: BEDS, infrastructure: null,
+    plan: { computedAt: '2026-11-12T05:02:00.000Z', proposals: [] }, shortagePlan: null, bedNames: BEDS, infrastructure: null,
     reliability: { actualRainMissingDates: [], soilGardensNeverObserved: [], speciesWithoutReference: [] }, week: null, soil: null,
     ...overrides,
   };
