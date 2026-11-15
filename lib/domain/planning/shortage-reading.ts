@@ -1,5 +1,5 @@
 import { cubicMetersFromLiters } from '../units.ts';
-import { effectiveProposalStatus, type PlanBedOutcome, type StoredWeeklyPlan } from './contract.ts';
+import { effectiveProposalStatus, type OvercommittedDay, type PlanBedOutcome, type StoredWeeklyPlan } from './contract.ts';
 import { isCanceledValidation } from './presentation.ts';
 import { uncountedWaterCount, unknownWaterChainCount, waterDeficitValue } from './water-deficit-summary.ts';
 
@@ -115,4 +115,16 @@ export function budgetValidatedNote(plan: Pick<StoredWeeklyPlan, 'proposals'>, f
   if (count === 0) return null;
   const after = cubicMeters === null ? 'après les arrosages déjà validés cette semaine' : `après les ${formatVolume(cubicMeters)} déjà validés cette semaine`;
   return `Les parts se comptent sur ce qui reste à placer, ${after} : une part qui baisse après une validation ne retire pas d’eau aux planches.`;
+}
+
+/**
+ * Le jour qu'une limite journalière posée après coup met en défaut (remarque 5
+ * de la recette 3.9, F256) : sa colonne le dit sous son en-tête, « Limite
+ * journalière de 1,50 m³ dépassée : 5,06 m³ engagés », comme la cause des
+ * suggestions de la règle 16. Nulle pour un jour dans la limite.
+ */
+export function overcommittedDayNotice(days: readonly OvercommittedDay[], dateKey: string, formatVolume: (cubicMeters: number) => string): string | null {
+  const day = days.find((item) => item.date === dateKey);
+  if (!day) return null;
+  return `Limite journalière de ${formatVolume(day.limitCubicMeters)} dépassée : ${formatVolume(day.committedCubicMeters)} engagés`;
 }

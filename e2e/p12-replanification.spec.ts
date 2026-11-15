@@ -140,6 +140,12 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     await expect(suggestion.getByRole('button', { name: 'Garder' })).toBeVisible();
     await pli.locator('summary').click();
     await expect(pli.locator('li[data-kind="suggestion"]').filter({ hasText: materiel })).toContainText('Suggestion nouvelle : annuler');
+    // La colonne du jour dépassé le dit aussi, sous son en-tête (audit final, lot B, remarque 5, F256).
+    const jourDepasse = planning.locator('.planning-day-overcommitted');
+    await expect(jourDepasse).toHaveCount(1);
+    await expect(jourDepasse).toBeVisible();
+    await expect(jourDepasse).toHaveText(/^Limite journalière de 0,01 m³ dépassée : \d+,\d{2,3} m³ engagés$/);
+    const engagesAvant = metresCubesEngages(await jourDepasse.innerText());
     await verifierLEtape(page, journal, 'suggestion « Annuler » sous la limite');
 
     // « Appliquer » passe par l'annulation ordinaire de l'irrigation : elle
@@ -155,6 +161,14 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     // La carte validée lit le réel : « Annulée », hors du compte des validées (statuts du contrat ; recette réelle du 31 octobre 2026).
     await expect(validee.locator('.planning-status')).toHaveText('Annulée');
     await expect(planning.locator('.planning-summary-card').filter({ hasText: 'Faites' })).toContainText('sur 0 validée');
+    // L'arrosage annulé ne compte plus dans ce que le jour engage : la colonne
+    // ne dit plus rien, ou, si d'autres parcours ont arrosé ce jour-là
+    // au-delà de 0,01 m³, un volume engagé plus petit (F256).
+    const jourApres = planning.locator('.planning-day-overcommitted');
+    if (await jourApres.count() > 0) {
+      await expect(jourApres).toHaveCount(1);
+      expect(metresCubesEngages(await jourApres.innerText()), 'le volume engagé du jour, sans l’arrosage annulé').toBeLessThan(engagesAvant);
+    }
     await verifierLEtape(page, journal, 'suggestion appliquée');
     await attendreLaPageIrrigation(page, 'arrosages');
     await expect(aVenir).toHaveCount(0);
@@ -261,4 +275,11 @@ async function reglerLaLimiteJournaliere(page: Page, limite: { active: true; met
     limite.active ? 'La limite journalière a été enregistrée.' : 'La limite journalière est désactivée pour cette période.',
     { timeout: 15_000 },
   );
+}
+
+/** Le volume engagé que dit la colonne d'un jour au-delà de sa limite (F256). */
+function metresCubesEngages(texte: string): number {
+  const trouve = texte.match(/: (\d+(?:,\d+)?) m³ engagés$/);
+  expect(trouve, `un volume engagé dans « ${texte} »`).not.toBeNull();
+  return Number(trouve![1].replace(',', '.'));
 }

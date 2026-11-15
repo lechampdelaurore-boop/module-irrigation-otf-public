@@ -164,3 +164,11 @@
   color: var(--ink2);
   font-size: .85rem;
 }
+
+/* Remarque 5 de la recette 3.9 (F256) : le jour au-delà de sa limite journalière le dit sous son en-tête, en rouge foncé. */
+.planning-day-overcommitted {
+  margin: .3rem 0 0;
+  color: var(--danger-ink);
+  font-size: .8rem;
+  font-weight: 650;
+}

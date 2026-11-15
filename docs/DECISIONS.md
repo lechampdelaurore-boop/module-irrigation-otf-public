@@ -4500,3 +4500,33 @@ Aucune part, aucun budget ne change. Parcours P32 étendu.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-052, D-086, D-117, D-126.
+
+## D-128 — Audit ergonomique final, lot B : le jour au-delà de sa limite journalière (remarque 5)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-127 (remarque 4). Remarque 5 de la recette 3.9 ; dernière
+PR du lot B.
+
+**Établi dans le code.** Le plan range les jours qu'une limite journalière
+posée après coup met en défaut (`overcommittedDays`, règle 16) ; seule la
+cause des suggestions les nommait, la colonne du jour ne disait rien (B11).
+
+**Décision.** La colonne du jour le dit sous son en-tête, en rouge foncé :
+« Limite journalière de 1,50 m³ dépassée : 5,06 m³ engagés », les deux
+volumes écrits comme ailleurs au planning (`overcommittedDayNotice`) ; rien
+pour un jour dans sa limite. Un calcul enregistré avant la 3.7 n'a aucun
+jour dépassé et ne dit rien (F256). Aucune limite, aucun volume engagé ni
+aucune suggestion ne change. Parcours P12 étendu : après la suggestion
+appliquée, le jour ne dit plus rien, ou un volume engagé plus petit quand
+d'autres parcours ont déjà arrosé ce jour-là (une première version, qui
+exigeait qu'il ne dise plus rien, a échoué en local au téléphone pour
+cette raison).
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+**Le lot B est codé en entier** (D-122 à D-128, et le correctif D-129) ;
+reste sa recette sur la version déployée, et le bouton « Répartir l'eau »
+sur « Aujourd'hui », qui va avec le lot A.
+
+Ne changent pas : D-117, D-127.
