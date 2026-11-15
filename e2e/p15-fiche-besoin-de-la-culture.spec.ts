@@ -10,7 +10,7 @@ import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierC
  * sur V01, sous le verger, une planche qu'aucun autre parcours ne touche. Le
  * parcours rattache la carotte à la carotte du CRIIAM, ouvre la fiche de V01,
  * lit le stade du jour, le Kc et l'ETM, l'objectif proposé de la semaine face
- * à l'objectif applicable, déclare le stade suivant pour la planche, lit
+ * à l'objectif adopté, déclare le stade suivant pour la planche, lit
  * l'objectif proposé à côté de l'objectif dans « Besoins d'irrigation », puis
  * retire le rattachement.
  *
@@ -59,7 +59,7 @@ test('la fiche de la planche montre le stade, le Kc, l’ETM et l’objectif pro
   await expect(carottes).toContainText(/Kc (0,50|1,00)/);
   await expect(carottes).toContainText(/ETM \d+(,\d+)? mm/);
   await expect(carottes).toContainText('Carotte (CRIIAM Sud)');
-  await expect(fiche.getByText('Objectif applicable', { exact: true })).toBeVisible();
+  await expect(fiche.getByText('Objectif adopté', { exact: true })).toBeVisible();
   await expect(fiche.getByText('Objectif proposé', { exact: true })).toBeVisible();
   const lundi = dateKeyInTimeZone(new Date(), FARM_TIME_ZONE) === weekStartDateKey(dateKeyInTimeZone(new Date(), FARM_TIME_ZONE));
   const adopter = fiche.getByRole('button', { name: 'Adopter la proposition' });

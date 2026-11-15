@@ -1,23 +1,30 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { volumeText } from '../lib/domain/display-numbers.ts';
+import { feasibilityHeadTiles } from '../lib/domain/feasibility-reading.ts';
 import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue.ts';
+import type { PriorityFeasibility } from '../lib/domain/irrigation-feasibility.ts';
+import { ADOPTED_OBJECTIVE_HELP, feasibilityUnknownReason, gardenUnknownReason } from '../lib/domain/objective-reading.ts';
 import type { StoredProposal, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { shortageAction } from '../lib/domain/planning/shortage-reading.ts';
 import { todayTomorrow } from '../lib/domain/today/ahead.ts';
 import { todayView, type TodayBlock, type TodayInputs } from '../lib/domain/today/today-view.ts';
 import { waterBlock } from '../lib/domain/today/water.ts';
+import { todayWeek, type TodayWeekBed } from '../lib/domain/today/week.ts';
 import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-resources.ts';
 import type { WeatherAlertForecastDay } from '../lib/domain/weather/weather-alerts.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
 
 /**
  * Audit ergonomique final, lot A : le matin, l'essentiel
- * (docs/audit-ergonomie-final-lot-a-contract.md), PR 1, R1 : « Aujourd'hui »
+ * (docs/audit-ergonomie-final-lot-a-contract.md). PR 1, R1 : « Aujourd'hui »
  * annonce les arrosages de demain à valider et l'eau qui manque à la
- * semaine, avec la phrase du planning (F274 à F279). Affichage seul : rien
- * n'est recalculé, tout se lit sur le plan enregistré.
+ * semaine, avec la phrase du planning (F274 à F279). PR 2, R2 : un objectif
+ * posé sur une partie des planches se chiffre sur elles, et chaque page dit
+ * pourquoi un total manque (F280 à F282). Affichage seul : rien n'est
+ * recalculé.
  * Aujourd'hui = jeudi 12 novembre 2026, 6 h 00 à la ferme.
  */
 
@@ -215,4 +222,78 @@ test('F279 : un bassin sous son minimum de sécurité le dit en mots ; au minimu
   assert.equal(waterBlock(water([reservoir(12, 2)]), NOW).reservoirs[0].belowMinimumText, null);
   assert.equal(waterBlock(water([reservoir(0, 0)]), NOW).reservoirs[0].belowMinimumText, null, 'un minimum nul n’est jamais franchi');
   assert.equal(waterBlock(water([reservoir(null, 2)]), NOW).reservoirs[0].belowMinimumText, null, 'un volume inconnu n’est jamais dit sous le minimum (D-003)');
+});
+
+// R2, un seul objectif d'une page à l'autre (F280 à F282).
+
+const weekBed = (plotId: string, plotName: string, objectiveMm: number | null, values: Partial<TodayWeekBed> = {}): TodayWeekBed => ({
+  plotId, plotName, sheltered: false, areaSquareMeters: 10, objectiveMm, actualRainMm: 2, actualIrrigationMm: 4,
+  realRemainingMm: objectiveMm === null ? null : Math.max(0, objectiveMm - 6), ...values,
+});
+
+test('cas 6, F280 : 10 planches, 7 avec un objectif : « objectifs posés sur 7 planches sur 10 », les chiffres sur ces 7 seulement', () => {
+  const beds = [
+    ...Array.from({ length: 7 }, () => weekBed('g1', 'Champ du haut', 20)),
+    ...Array.from({ length: 3 }, () => weekBed('g2', 'Abri des noues', null, { actualIrrigationMm: 30 })),
+  ];
+  const week = todayWeek({ weekStart: '2026-11-09', weekEnd: '2026-11-15', beds, water: null });
+  assert.ok(week);
+  assert.deepEqual(week.farm.objectiveBeds, { withObjective: 7, total: 10 });
+  // L'irrigation des trois planches sans objectif (30 mm) n'entre pas dans les chiffres de la ferme.
+  assert.equal(week.farm.text, '6 / 20 mm sur 7 planches sur 10');
+  assert.equal(week.tiles.objective, '20 mm');
+  assert.equal(week.tiles.objectiveDetail, 'objectifs posés sur 7 planches sur 10, du lun. 9 nov. au dim. 15 nov.');
+  assert.equal(week.tiles.received, '6 mm');
+  assert.equal(week.tiles.receivedDetail, '4 mm d’irrigation, 2 mm de pluie mesurée, sur ces 7 planches');
+  assert.equal(week.tiles.remaining, '14 mm');
+  assert.equal(week.tiles.remainingDetail, 'objectif moins l’eau reçue, jamais négatif, sur ces 7 planches');
+  // Chaque jardin se lit pour lui-même : entier, ou sans objectif.
+  assert.deepEqual(week.shown.map((row) => row.text), ['6 / 20 mm', '32 mm reçus, aucun objectif posé']);
+});
+
+test('cas 7, F280 : aucune planche avec un objectif : « aucun objectif posé », aucun chiffre d’objectif', () => {
+  const week = todayWeek({ weekStart: '2026-11-09', weekEnd: '2026-11-15', beds: [weekBed('g1', 'Champ', null), weekBed('g1', 'Champ', null)], water: null });
+  assert.ok(week);
+  assert.deepEqual(week.farm.objectiveBeds, { withObjective: 0, total: 2 });
+  assert.equal(week.tiles.objective, null);
+  assert.equal(week.tiles.remaining, null);
+  assert.equal(week.tiles.objectiveDetail, 'ferme entière, du lun. 9 nov. au dim. 15 nov.');
+  assert.equal(week.farm.text, '6 mm reçus, aucun objectif posé');
+  const view = readFileSync('app/irrigation/today/today-week.tsx', 'utf8');
+  assert.match(view, /tiles\.objective \?\? 'aucun objectif posé'/);
+  assert.doesNotMatch(view, /non fixé/);
+});
+
+test('F281 : « Objectif adopté » sur la fiche de la planche et de la série, avec la phrase qui le distingue du proposé', () => {
+  assert.match(ADOPTED_OBJECTIVE_HELP, /^L’objectif adopté est celui que le besoin et le planning appliquent ; l’objectif proposé.+ne s’applique que si vous l’adoptez\.$/);
+  const bedPanel = readFileSync('app/irrigation/crop-water/bed-crop-water-panel.tsx', 'utf8');
+  assert.match(bedPanel, /<dt>Objectif adopté<\/dt>.+<FigureOrigin text=\{ADOPTED_OBJECTIVE_HELP\} \/>/);
+  for (const file of ['app/irrigation/crop-water/bed-crop-water-panel.tsx', 'app/irrigation/crop-water/series-crop-water-panel.tsx', 'app/irrigation/irrigation-needs-dashboard.tsx', 'lib/domain/planning/presentation.ts']) {
+    assert.doesNotMatch(readFileSync(file, 'utf8'), /[Oo]bjectif applicable/, `${file} ne dit plus « applicable » à l’écran`);
+  }
+});
+
+test('F282 : le « Non calculable » d’un jardin dit pourquoi ; le besoin de « Ressources » se lit « au moins », avec sa raison', () => {
+  const beds = [{ objectiveMm: 20, effectiveNeedMm: 8 }, { objectiveMm: null, effectiveNeedMm: null }, { objectiveMm: null, effectiveNeedMm: null }];
+  assert.equal(gardenUnknownReason(beds, (bed) => bed.effectiveNeedMm), '2 planches sur 3 sans objectif adopté');
+  assert.equal(gardenUnknownReason(beds.slice(0, 2), (bed) => bed.effectiveNeedMm), '1 planche sur 2 sans objectif adopté');
+  assert.equal(gardenUnknownReason(beds.slice(0, 1), (bed) => bed.effectiveNeedMm), null);
+  assert.equal(gardenUnknownReason([{ objectiveMm: 20, value: null }], (bed) => bed.value), '1 planche sur 1 au besoin inconnu');
+  assert.equal(feasibilityUnknownReason({ noObjective: 5, noWettedArea: 0 }), '5 planches sans objectif adopté');
+  assert.equal(feasibilityUnknownReason({ noObjective: 1, noWettedArea: 2 }), '1 planche sans objectif adopté, 2 planches sans surface mouillée connue');
+  assert.equal(feasibilityUnknownReason({ noObjective: 0, noWettedArea: 0 }), null);
+  type Row = PriorityFeasibility['beds'][number];
+  const row = (status: Row['status'], objectiveMm: number | null) => ({ status, need: { objectiveMm } }) as Row;
+  const tiles = feasibilityHeadTiles({
+    priorities: [{ priority: 'normal', arbitration: 'automatic', beds: [row('partial', 20), row('unknown', null), row('unknown', 20)] } as PriorityFeasibility],
+    forecastAvailableCubicMeters: 0.3, totalNeedCubicMeters: null, knownNeedCubicMeters: 0.67, coveragePercent: null,
+  });
+  assert.deepEqual(tiles?.unknownNeed, { noObjective: 1, noWettedArea: 1 });
+  assert.equal(tiles?.knownNeedCubicMeters, 0.67);
+  const view = readFileSync('app/irrigation/irrigation-feasibility-dashboard.tsx', 'utf8');
+  assert.match(view, /`au moins \$\{volumeText\(head\.knownNeedCubicMeters\)\}`/);
+  assert.match(view, /`non chiffré pour \$\{feasibilityUnknownReason\(head\.unknownNeed\)/);
+  const needs = readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8');
+  assert.match(needs, /À planifier : \{gardenMm\(garden\.effectiveNeedMm, gardenUnknownReason\(garden\.beds/);
+  assert.match(needs, /bed\.calculatedNeedMm === null && missingLabels\(bed, 'planning'\) \? <p className="need-unknown-reason">Non calculable : \{missingLabels\(bed, 'planning'\)\}\.<\/p>/);
 });

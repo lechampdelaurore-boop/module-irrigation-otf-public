@@ -220,8 +220,35 @@ Même consigne : l'option recommandée, aucune question agronomique (D-138).
 dimanche, D-004). Le dimanche, le plan de la semaine suivante n'existe pas
 encore (il se calcule le lundi matin) : rien n'est annoncé pour lundi.
 
+## 8 ter. Ce que la PR 2 (R2) a tranché en codant
+
+**Cause établie dans le code, au point d'arrêt** : chaque page lit le même
+objectif, celui que `objectiveForBed` (`lib/domain/irrigation-needs.ts`)
+calcule pour le besoin, le planning, la faisabilité et la fiche de la
+culture. Le calcul de l'objectif n'est pas en cause ; le point d'arrêt ne
+s'applique pas, et rien d'agronomique ne change. Les écarts viennent de
+l'affichage : un total de jardin, de ferme ou de semaine devient inconnu dès
+qu'**une seule** planche n'a pas d'objectif adopté (règle D-003, juste, mais
+muette sur sa raison), et la fiche de la planche nommait « applicable » ce
+que le reste du module appelle adopter. L'objectif **proposé**, calculé
+d'après la culture, n'entre dans le besoin que si on l'adopte (D-045) : la
+fiche montrait donc bien deux objets différents, sans le dire.
+
+Même consigne : l'option recommandée, aucune question agronomique (D-139).
+
+| N° | Précision | Choix codé |
+| --- | --- | --- |
+| F280 | Objectif partiel sur « Aujourd'hui » | quand une partie seulement des planches a un objectif, l'objectif, l'eau reçue et le reste à apporter se chiffrent **sur ces planches seulement**, et le disent : la ligne « 12 / 25 mm sur 7 planches sur 10 », la tuile « objectifs posés sur 7 planches sur 10 », le détail « sur ces 7 planches » ; sans aucun objectif, « aucun objectif posé » (et plus « non fixé ») ; avec tous, rien ne change. Jamais un total qui mêle du connu et de l'inconnu (D-003) |
+| F281 | Objectif adopté / proposé | « Objectif adopté » partout où l'objectif qui s'applique apparaît (fiche de la planche, fiche de la série, « Objectifs et besoins », planning) ; « Objectif proposé » pour celui que calcule la culture ; sur la fiche, un ⓘ dit la différence en une phrase : « L'objectif adopté est celui que le besoin et le planning appliquent ; l'objectif proposé, calculé d'après la culture, ne s'applique que si vous l'adoptez. » |
+| F282 | « Non calculable » | dit pourquoi avec ce que le domaine sait déjà : le total d'un jardin, « Non calculable (2 planches sur 3 sans objectif adopté) » ; une planche, « Non calculable : aucun objectif adopté. » sous ses chiffres ; sur « Ressources », « Besoin de la semaine » se lit « au moins 3,4 m³ », avec « non chiffré pour 2 planches sans objectif adopté » (ou « sans surface mouillée connue ») au lieu de « Non calculable » muet, et « Part servie » dit que le besoin n'est pas chiffré en entier |
+
+C'est aussi la cause du « Non calculable » de « Besoin de la semaine » sur
+« Ressources » quand le planning annonce un manque : le manque se calcule sur
+les planches chiffrées, le total de la semaine attendait toutes les planches.
+
 ## 9. Ce que le lot ne prouve pas
 
 Un vrai téléphone en main à 6 h du matin ; la lecture par un lecteur d'écran ;
 la ferme réelle (aucune séance Chrome sans le « vas-y » de François) ; la
-cause exacte des « Non calculable » (à établir au point d'arrêt de R2).
+lecture des trois pages sur la ferme vitrine elle-même (la cause des « Non
+calculable » est établie dans le code, section 8 ter).

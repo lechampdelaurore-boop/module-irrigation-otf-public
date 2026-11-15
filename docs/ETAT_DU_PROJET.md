@@ -444,9 +444,19 @@ registres, elle y renvoie.
   son minimum de sécurité le dit en orange et en mots (F274 à F279 ;
   section 3.5 du contrat de la page changée ; P32 étendu ; aucune
   migration, aucun calcul changé). Limite connue : le dimanche, rien n'est
-  annoncé pour lundi, dont le plan n'existe pas encore. Ensuite R2, cause à
-  établir d'abord (point d'arrêt : si elle est dans le calcul de
-  l'objectif, le coordinateur est prévenu avant de coder), J14 et J13.
+  annoncé pour lundi, dont le plan n'existe pas encore. **PR 1 en ligne**
+  (#71, fusionnée à 16 h 30, déployée à 16 h 47, run 43730259221, cinq
+  jobs verts). **PR 2 sur 4, R2** (D-139) : cause établie
+  au point d'arrêt, dans l'affichage et non dans le calcul de l'objectif
+  (chaque page lit `objectiveForBed`) ; un total devenait inconnu dès
+  qu'une seule planche n'avait pas d'objectif adopté, sans dire pourquoi.
+  « Aujourd'hui » chiffre désormais un objectif partiel sur ses planches
+  (« 12 / 25 mm sur 7 planches sur 10 ») ; « Objectif adopté » remplace
+  « Objectif applicable », avec une phrase qui le distingue du proposé ;
+  « Non calculable » dit pourquoi, et « Besoin de la semaine » sur
+  « Ressources » se lit « au moins 3,4 m³ », avec les planches qui
+  manquent (F280 à F282 ; P15 changé ; aucun calcul changé). Ensuite J14
+  et J13.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

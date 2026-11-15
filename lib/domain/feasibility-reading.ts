@@ -12,6 +12,10 @@ import type { IrrigationFeasibility, PriorityFeasibility } from './irrigation-fe
 export type FeasibilityHeadTiles = {
   availableCubicMeters: number | null;
   needCubicMeters: number | null;
+  /** Le besoin des planches chiffrées seulement, quand d'autres ne le sont pas : « au moins » (audit final, lot A, R2, F282). */
+  knownNeedCubicMeters: number;
+  /** Les planches au besoin non chiffré, et pourquoi : sans objectif adopté, ou sans surface mouillée connue (F282). */
+  unknownNeed: { noObjective: number; noWettedArea: number };
   coveragePercent: number | null;
   /** Les planches servies en entier, parmi celles qui ont un besoin. */
   fullyServedBeds: number;
@@ -23,12 +27,17 @@ export type FeasibilityHeadTiles = {
  * l'écran de répartition porte alors les siennes (eau disponible, besoin,
  * part servie, planches servies), et la faisabilité n'en ajoute aucune.
  */
-export function feasibilityHeadTiles(dashboard: Pick<IrrigationFeasibility, 'priorities' | 'forecastAvailableCubicMeters' | 'totalNeedCubicMeters' | 'coveragePercent'>): FeasibilityHeadTiles | null {
+export function feasibilityHeadTiles(dashboard: Pick<IrrigationFeasibility, 'priorities' | 'forecastAvailableCubicMeters' | 'totalNeedCubicMeters' | 'knownNeedCubicMeters' | 'coveragePercent'>): FeasibilityHeadTiles | null {
   if (dashboard.priorities.some(isArbitrationEditable)) return null;
-  const rows = dashboard.priorities.flatMap((level) => level.beds).filter((row) => row.status !== 'no_need');
+  const all = dashboard.priorities.flatMap((level) => level.beds);
+  const rows = all.filter((row) => row.status !== 'no_need');
+  const unknown = all.filter((row) => row.status === 'unknown');
+  const noObjective = unknown.filter((row) => row.need.objectiveMm === null).length;
   return {
     availableCubicMeters: dashboard.forecastAvailableCubicMeters,
     needCubicMeters: dashboard.totalNeedCubicMeters,
+    knownNeedCubicMeters: dashboard.knownNeedCubicMeters,
+    unknownNeed: { noObjective, noWettedArea: unknown.length - noObjective },
     coveragePercent: dashboard.coveragePercent,
     fullyServedBeds: rows.filter((row) => row.status === 'full').length,
     bedsWithNeed: rows.length,

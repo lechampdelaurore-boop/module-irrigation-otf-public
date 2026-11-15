@@ -6,13 +6,14 @@ import type { CropWaterDay } from '@/lib/domain/crop-water/etm';
 import type { BedCropWaterSheet } from '@/lib/services/crop-water-bed';
 import type { StageChoice } from '@/lib/services/crop-water-week';
 import { addDaysToDateKey } from '@/lib/domain/water-management';
+import { ADOPTED_OBJECTIVE_HELP } from '@/lib/domain/objective-reading';
 import { FigureOrigin } from '../shell/figure-origin';
 import { adoptCropWaterProposalAction, declareCropStageAction, loadBedCropWaterAction, type BedCropWaterActionResult } from '../crop-water-actions';
 
 /**
  * Le besoin de la culture dans la fiche de la planche (docs/crop-water-need-contract.md,
  * « L'écran », 5 quater, PR 3b) : le stade, le Kc et l'ETM du jour de chaque
- * culture, l'objectif proposé de la semaine face à l'objectif applicable,
+ * culture, l'objectif proposé de la semaine face à l'objectif adopté,
  * « Déclarer un stade » et « Adopter la proposition ». La proposition reste
  * une information tant qu'elle n'est pas adoptée.
  */
@@ -167,7 +168,7 @@ function WeekView({ sheet, pending, run, season }: { sheet: AvailableSheet; pend
   return (
     <div className="bed-crop-water-proposal">
       <dl>
-        <div><dt>Objectif applicable</dt><dd>{week.objectiveMm === null ? 'Aucun' : `${mm.format(week.objectiveMm)} mm`}</dd></div>
+        <div><dt>Objectif adopté</dt><dd>{week.objectiveMm === null ? 'Aucun' : `${mm.format(week.objectiveMm)} mm`}<FigureOrigin text={ADOPTED_OBJECTIVE_HELP} /></dd></div>
         <div><dt>Objectif proposé</dt><dd>{week.proposedMm === null ? 'Non calculable' : `${mm.format(week.proposedMm)} mm`}<FigureOrigin text={proposedObjectiveOrigin(week)} /></dd></div>
         <div>
           <dt>Écart</dt>
@@ -188,7 +189,7 @@ function WeekView({ sheet, pending, run, season }: { sheet: AvailableSheet; pend
           <li key={alert.kind === 'high-etm' ? `high-${alert.date}` : 'deviation'} data-status="alert">
             {alert.kind === 'high-etm'
               ? `ETM élevée le ${formatDay(alert.date)} : ${mm.format(alert.etmMm)} mm. Vérifiez la culture de référence et les réglages.`
-              : `La proposition (${mm.format(alert.proposedMm)} mm) s’écarte de plus de moitié de l’objectif applicable (${mm.format(alert.objectiveMm)} mm).`}
+              : `La proposition (${mm.format(alert.proposedMm)} mm) s’écarte de plus de moitié de l’objectif adopté (${mm.format(alert.objectiveMm)} mm).`}
           </li>
         ))}
       </ul>
