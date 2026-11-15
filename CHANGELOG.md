@@ -7,6 +7,15 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
+- **J4, « Réserve du sol » : la RFU d'abord** (D-150, F308 à F312) : sans
+  réserve utile (RFU) pour sa parcelle, un jardin inconnu porte
+  « Renseigner la réserve de la parcelle », qui ouvre « Réglages du sol »
+  sur la RFU à saisir, au lieu d'« Observer », qui n'y aurait rien rempli ;
+  « Aujourd'hui » propose le même geste dans « Fiabilité du calcul ». Les
+  planches pareilles d'un jardin se disent en une phrase, « 12 planches :
+  inconnue, aucune RFU saisie », leurs lignes dans un pli ; un jardin
+  ouvert montre son formulaire d'observation sans répéter « Observer ».
+  Parcours P29, P31b et P33 adaptés.
 - **J2, un pli « Réglages de cette page »** (D-149, F305 à F307, choix
   n° 3) : fermé, en bas d'« Arrosages » (la limite journalière),
   d'« Objectifs et besoins » (le seuil minimal de planification), de

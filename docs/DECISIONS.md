@@ -5097,3 +5097,41 @@ qu'il fait, aucun calcul ne change ; aucune migration. Les pages validées
 avant (3.8, D-067 ; lots A et B) changent d'organisation sur ce choix.
 
 Ne changent pas : D-067, D-137, D-148.
+
+## D-150 — Audit ergonomique final, lot D : « Réserve du sol », la RFU d'abord (J4)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur, pour la question
+agronomique (« RFU d'abord », accord du 15 novembre 2026, 14 h 51). Après
+D-149.
+
+**Décision** (F308 à F312, contrat `docs/audit-ergonomie-final-lot-d-contract.md`,
+section 6) : quand la réserve utile (RFU) d'une parcelle n'est pas saisie,
+une observation du sol ne fait pas vivre la jauge : la capacité d'une
+planche vaut la RFU par la profondeur des racines (D-041, D-046, D-053).
+Le premier geste est donc de renseigner la RFU :
+
+- une ligne de jardin inconnue pour cette raison porte « Renseigner la
+  réserve de la parcelle », qui ouvre « Réglages du sol » sur le formulaire
+  de sa parcelle, curseur dans la RFU du laboratoire ; « Observer » n'y est
+  plus proposé, et « Observer la parcelle » laisse place à la même phrase
+  quand aucun de ses jardins de plein champ n'a de RFU (F308) ;
+- « Fiabilité du calcul », sur « Aujourd'hui », ne propose « Observer le
+  sol de … » que pour un jardin dont la parcelle a sa RFU ; sinon une
+  ligne nomme les parcelles sans RFU et mène, par l'ancre
+  `#soil-parcel-<parcelle>`, à « Renseigner la réserve de la parcelle … »
+  (F309) ;
+- les planches d'un jardin inconnues pour la même raison, à deux au moins,
+  se disent en une phrase (« 12 planches : inconnue, aucune RFU saisie »),
+  leurs lignes dans un pli fermé ; une planche dont toute la semaine est
+  inconnue le dit en une ligne au lieu de six cases (F310) ;
+- la ligne d'un jardin montre « Observer » tant qu'il est replié, son
+  formulaire une fois ouvert : jamais les deux à la fois (F311) ;
+- « RFU » s'écrit « réserve utile (RFU) » à sa première occurrence de la
+  page (F312).
+
+Un test du domaine prouve qu'une observation ne remplit pas une jauge sans
+RFU : chaque jour reste inconnu, faute de sol, jamais à zéro (D-003).
+Affichage et gestes seuls : la jauge, le besoin, le plan et les doses ne
+changent pas (D-047) ; aucune migration.
+
+Ne changent pas : D-041, D-046, D-047, D-053, D-149.

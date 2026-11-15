@@ -551,7 +551,20 @@ registres, elle y renvoie.
   la planche, que la planche renvoie à « Objectifs et besoins ») ; l'ancre
   `#reglages-de-la-page` l'ouvre ; aucun réglage de ces pages ne bloque
   seul un calcul, l'ouverture d'office n'est donc employée nulle part
-  (F305 à F307 ; P12, P15, P31c, P32, P35 adaptés). Ensuite J4.
+  (F305 à F307 ; P12, P15, P31c, P32, P35 adaptés), **en ligne** (#82,
+  fusionnée le 16 novembre 2026 à 5 h 36, déployée à 5 h 56, run
+  43805094005, cinq jobs verts). **PR 5 sur 7, J4**
+  (D-150, « RFU d'abord », réponse du porteur) : sans réserve utile (RFU)
+  pour la parcelle, une ligne de jardin inconnue porte « Renseigner la
+  réserve de la parcelle », qui ouvre « Réglages du sol » sur sa parcelle,
+  au lieu d'« Observer » ; sur « Aujourd'hui », « Fiabilité du calcul » ne
+  propose « Observer le sol de … » qu'avec la RFU et nomme sinon les
+  parcelles à renseigner ; les planches inconnues pour la même raison se
+  disent en une phrase (« 12 planches : inconnue, aucune RFU saisie »),
+  leurs lignes dans un pli ; « Observer » ou le formulaire, jamais les deux ;
+  « réserve utile (RFU) » en entier à sa première occurrence ; un test du
+  domaine prouve qu'une observation ne remplit pas une jauge sans RFU
+  (F308 à F312 ; P29, P31b, P33 adaptés). Ensuite M1.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

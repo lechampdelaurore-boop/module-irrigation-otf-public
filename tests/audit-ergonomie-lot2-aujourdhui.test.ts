@@ -328,7 +328,7 @@ test('cas 12 : cinq jours de pluie réelle manquants sur sept', () => {
 
 test('cas 13 : trois jardins jamais observés sur cinq, nommés ; les jardins observés ne comptent pas', () => {
   const garden = (plotId: string, name: string, observed: boolean, percent: number | null, unknownBeds: number) => ({
-    plotId, name, observation: observed ? { observedAt: '2026-11-01T08:00:00.000Z' } : null, garden: { percent, unknownBeds },
+    plotId, name, observation: observed ? { observedAt: '2026-11-01T08:00:00.000Z' } : null, garden: { percent, unknownBeds }, beds: [],
   });
   const zones = [
     { plots: [garden('a', 'Abri 1', false, null, 4), garden('b', 'Jardin nord', true, null, 3), garden('c', 'Jardin 10', false, null, 2)] },

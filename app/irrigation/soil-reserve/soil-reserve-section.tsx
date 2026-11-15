@@ -26,8 +26,8 @@ export function SoilReserveSection({ initialView }: { initialView: SoilReserveVi
     <section className="soil-reserve" aria-labelledby="soil-reserve-title" aria-busy={pending}>
       <h3 id="soil-reserve-title">Réserve du sol</h3>
       <p>
-        L’eau que le sol de chaque planche tient à la disposition des racines, estimée jour par jour. C’est une information : elle ne
-        change ni le besoin, ni le plan, ni les priorités.
+        L’eau que le sol de chaque planche tient à la disposition des racines, estimée jour par jour à partir de la réserve utile (RFU)
+        de sa parcelle. C’est une information : elle ne change ni le besoin, ni le plan, ni les priorités.
       </p>
       {message ? <p className={message.ok ? 'planning-notice' : 'planning-error'} role={message.ok ? 'status' : 'alert'}>{message.text}</p> : null}
       {view.waterSurplus ? <WaterSurplusBadge surplus={view.waterSurplus} /> : null}

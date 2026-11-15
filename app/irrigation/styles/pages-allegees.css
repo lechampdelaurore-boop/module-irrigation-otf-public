@@ -3,6 +3,8 @@
   (docs/audit-ergonomie-final-lot-d-contract.md).
   J2 : le pli « Réglages de cette page », en bas, fermé (F305) ; le renvoi
   du besoin de la culture sur « Matériel » (F306).
+  J4 : « Renseigner la réserve de la parcelle » sous un jardin sans RFU, et
+  les planches pareilles en une phrase, leurs lignes dans un pli (F308, F310).
 */
 .page-settings {
   margin-top: 1.5rem;
@@ -64,5 +66,48 @@
 
 .bed-crop-water-pointer {
   margin: .75rem 0 0;
+  color: var(--muted);
+}
+
+/* J4 : le premier geste sans RFU, sous la ligne du jardin ou en tête de la parcelle (F308). */
+.soil-reserve .soil-garden-soil-first {
+  min-height: var(--touch-target);
+  margin: .35rem 0 .6rem;
+}
+
+.soil-zone-without-soil {
+  display: grid;
+  justify-items: start;
+  gap: .35rem;
+  margin: .5rem 0 .75rem;
+}
+
+.soil-zone-without-soil > p,
+.soil-garden-without-soil {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* J4 : les planches inconnues pour la même raison, une phrase et un pli (F310). */
+.soil-beds-same {
+  display: grid;
+  gap: .35rem;
+  margin: .5rem 0;
+}
+
+.soil-beds-same > p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.soil-beds-fold > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  cursor: pointer;
+}
+
+.soil-week-unknown {
+  margin: .25rem 0;
   color: var(--muted);
 }

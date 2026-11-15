@@ -16,7 +16,11 @@ import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierC
  *   compteur baisse d'une espèce ; le rattachement est retiré à la fin
  *   (cas 8 et 9) ;
  * - « Réserve du sol » : sans sol saisi, chaque jardin est « inconnue » et
- *   porte « Observer », qui ouvre la jauge sur son curseur (cas 10) ;
+ *   porte « Renseigner la réserve de la parcelle », pas « Observer » ; ses
+ *   planches pareilles se disent en une phrase, leurs lignes dans un pli ; le
+ *   bouton ouvre « Réglages du sol » sur la RFU de la parcelle, qu'on saisit
+ *   (lot D, J4, cas 7 et 8, F308, F310, F312) ; la RFU saisie, l'abri
+ *   sans culture ne porte plus aucun geste (cas 10) ;
  * - « Alertes météo » : sans alerte, trois modèles et l'état des
  *   notifications de cet appareil ; un modèle remplit le formulaire, qui
  *   reste modifiable ; « Annuler » n'enregistre rien ; enregistré, il fait
@@ -91,20 +95,60 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
   await expect(section.getByRole('status')).toHaveText('Le rattachement de l’espèce est retiré : elle est de nouveau non rattachée.');
   await expect(compteur.locator('strong')).toContainText(`${avant} espèce`);
 
-  // Cas 10 : sans sol saisi, chaque jardin est inconnu et porte « Observer », qui ouvre son curseur.
+  // J4 : sans sol saisi, chaque jardin est inconnu faute de RFU ; le geste est « Renseigner la réserve de la parcelle » (F308).
   await attendreLaPageIrrigation(page, 'sol');
   const reserve = page.locator('section.soil-reserve');
-  const ligne = reserve.locator('.soil-garden-line').filter({ has: page.locator('details.soil-garden > summary strong', { hasText: /^Tunnel 1 · abri$/ }) });
+  const ligneDe = (nom: RegExp) => reserve.locator('.soil-garden-line').filter({ has: page.locator('details.soil-garden > summary strong', { hasText: nom }) });
+  const ligne = ligneDe(/^Tunnel 1 · abri$/);
   await expect(ligne.locator('details.soil-garden > summary small')).toHaveText('inconnue');
-  const observer = ligne.getByRole('button', { name: 'Observer l’abri Tunnel 1' });
-  if (telephone) await verifierCibleTactile(observer, 'Le bouton « Observer »');
-  await expect(reserve.locator('.soil-garden-line[data-observe="true"]')).not.toHaveCount(0);
+  await expect(reserve.locator('.soil-garden-line[data-observe="true"]')).toHaveCount(0);
+  await expect(ligne.getByRole('button', { name: /^Observer/ })).toHaveCount(0);
+  const pres = reserve.getByRole('region', { name: 'Réserve · Les Prés' });
+  await expect(pres.getByRole('group', { name: 'Observer la parcelle' })).toHaveCount(0);
+  await expect(pres.locator('.soil-zone-without-soil')).toContainText('La réserve utile (RFU) de la parcelle n’est pas saisie');
+  // « RFU » s'écrit en entier à sa première occurrence de la page (F312).
+  const texte = await reserve.innerText();
+  expect(texte.indexOf('RFU'), 'la première « RFU » suit « réserve utile ( »').toBe(texte.indexOf('réserve utile (RFU)') + 'réserve utile ('.length);
+  await verifierLEtape(page, journal, 'sans RFU, « Renseigner la réserve de la parcelle »');
+
+  // Cas 8 : les planches pareilles d'un jardin se disent en une phrase, leurs lignes dans un pli (F310).
+  const nord = ligneDe(/^Jardin Nord$/);
+  await nord.locator('details.soil-garden > summary').click();
+  const pareilles = nord.locator('.soil-beds-same');
+  await expect(pareilles.locator(':scope > p')).toHaveText(/^\d+ planches : inconnue, aucune RFU saisie$/);
+  await expect(pareilles.locator('details.soil-beds-fold')).not.toHaveAttribute('open', '');
+  await expect(nord.locator('.soil-garden-without-soil')).toBeVisible();
+  await expect(nord.getByRole('group', { name: 'Observer le jardin' })).toHaveCount(0);
+  await nord.locator('details.soil-garden > summary').click();
+  await expect(nord.locator('details.soil-garden')).not.toHaveAttribute('open', '');
+  await verifierLEtape(page, journal, 'planches pareilles en une phrase');
+
+  // Le bouton ouvre « Réglages du sol » sur la RFU de la parcelle ; la RFU saisie, la ligne change de geste.
+  const renseigner = ligne.getByRole('button', { name: 'Renseigner la réserve de la parcelle, pour l’abri Tunnel 1' });
+  if (telephone) await verifierCibleTactile(renseigner, 'Le bouton « Renseigner la réserve de la parcelle »');
+  const sol = reserve.getByRole('region', { name: 'Sol · Les Prés' });
+  const rfu = sol.getByRole('group', { name: 'Enregistrer le sol de la parcelle' }).getByLabel('RFU du laboratoire (mm/m)');
   await expect(async () => {
-    await observer.click();
-    await expect(ligne.getByRole('group', { name: 'Observer l’abri' }).getByRole('slider')).toBeFocused({ timeout: 1_000 });
+    await renseigner.click();
+    await expect(rfu).toBeFocused({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
-  await expect(ligne.locator('details.soil-garden')).toHaveAttribute('open', '');
-  await verifierLEtape(page, journal, '« Observer » ouvre le curseur du jardin inconnu');
+  await expect(reserve.locator('details.soil-settings')).toHaveAttribute('open', '');
+  const enregistrerLeSol = sol.getByRole('button', { name: 'Enregistrer le sol de la parcelle' });
+  await expect(async () => {
+    await rfu.fill('');
+    await rfu.fill('62');
+    await expect(enregistrerLeSol).toBeEnabled({ timeout: 1_000 });
+  }).toPass({ timeout: 30_000 });
+  await enregistrerLeSol.click();
+  await expect(reserve.getByRole('status')).toHaveText('Le sol de la parcelle est enregistré.');
+  await expect(ligne.getByRole('button', { name: /^Renseigner la réserve/ })).toHaveCount(0);
+  await verifierLEtape(page, journal, 'RFU saisie par son bouton');
+
+  // Cas 10 : la RFU saisie, l'abri dont les planches sont sans culture dit « aucune planche cultivée », sans geste ;
+  // « Observer » sur un jardin cultivé, et un seul des deux avec son formulaire (F311), se lisent au parcours P33.
+  await expect(ligne.locator('details.soil-garden > summary small')).toHaveText('aucune planche cultivée');
+  await expect(ligne.getByRole('button')).toHaveCount(0);
+  await verifierLEtape(page, journal, 'RFU saisie, plus de geste inutile');
 
   // Cas 11 : trois modèles, l'état de cet appareil, la note du gel repliée.
   await attendreLaPageIrrigation(page, 'alertes-meteo');
