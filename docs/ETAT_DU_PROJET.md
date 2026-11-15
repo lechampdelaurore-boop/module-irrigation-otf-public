@@ -363,7 +363,23 @@ registres, elle y renvoie.
   dépassée : 5,06 m³ engagés » (F256 ; P12 étendu ; aucune migration). Le
   lot B est alors codé en entier ; reste sa recette sur la version
   déployée, et le bouton « Répartir l'eau » sur « Aujourd'hui », avec le
-  lot A.
+  lot A. **PR 7 en ligne** (#63, fusionnée à 6 h 55, déployée à 7 h 10).
+- Audit ergonomique final, lot E, mots et chiffres (24 duodecies, D-130) :
+  **commencé le 15 novembre 2026 au matin**, en Opus 5.5 · Élevé, sur le
+  mandat d'autonomie du porteur. Contrat court
+  `docs/audit-ergonomie-final-lot-e-contract.md` (précisions F257 à F273),
+  causes établies dans le code, sept PR, une à la fois, affichage seul :
+  A1, J8, J9, J11, J12, J15, A2. Sur « Aujourd'hui », seulement l'arrondi,
+  les mots et le bandeau de J11 (lot A en attente) ; les noms de la ferme
+  de démonstration vont avec le lot F. A2 mesuré à 390 px sur la
+  démonstration et sur la ferme des parcours : trois vrais défauts (les
+  flèches de la semaine d'« Objectifs et besoins », « + Ajouter une
+  pompe », la case « Par analogie » de Réglages) ; les grands nombres du
+  rapport comptaient la case à cocher plutôt que son étiquette. **PR 1 sur
+  7, A1** : « Aller au contenu » en premier arrêt du clavier sur la
+  première ouverture et sur la page introuvable, vers leur bloc principal,
+  qui reçoit le focus (F257 ; P22 et P27 étendus ; aucune migration).
+  Ensuite J8, les arrondis.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -459,6 +475,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #63 (`7780775`, lot B de l'audit final, remarque 5 de la recette 3.9,
+  le jour au-delà de sa limite journalière, D-128, fusionnée à 6 h 55 et
+  déployée à 7 h 10, run 43683110839, les cinq jobs réussis, aucune
+  migration). Avant elle : la
   PR #62 (`f93699c`, lot B de l'audit final, remarque 4 de la recette 3.9,
   les parts comptées après l'eau validée, D-127, fusionnée à 6 h 21 et
   déployée à 6 h 40, run 43680743916, les cinq jobs réussis, aucune

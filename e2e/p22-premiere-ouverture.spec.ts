@@ -25,6 +25,14 @@ test('une ferme neuve choisit ses fonctionnalités avant toute page, et ne voit 
   const continuer = page.getByRole('button', { name: 'Continuer' });
   await expect(continuer).toBeDisabled();
   await expect(page.getByText('Cochez au moins une fonctionnalité pour continuer.')).toBeVisible();
+  // Le premier arrêt du clavier saute la barre et mène à la liste, comme sur les autres pages (audit final, lot E, A1, F257).
+  await page.locator('body').press('Tab');
+  const saut = page.getByRole('link', { name: 'Aller au contenu' });
+  await expect(saut).toBeFocused();
+  await expect(saut).toBeInViewport();
+  await saut.press('Enter');
+  await expect(page.locator('#contenu')).toBeFocused();
+  await expect(page.locator('#contenu')).toContainText('Choisissez vos fonctionnalités');
   await expect(page.locator('li').filter({ has: caseDeLaFonctionnalite(page, 'Planning de la semaine') }))
     .toContainText('Cochera aussi Arrosages, Objectifs et besoins et Matériel et placement, dont elle a besoin.');
   await verifierLEtape(page, journal, 'liste de la première ouverture');

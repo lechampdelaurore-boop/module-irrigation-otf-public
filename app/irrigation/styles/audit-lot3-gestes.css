@@ -247,7 +247,9 @@
   transform: none;
 }
 
-.feature-page:focus {
+.feature-page:focus,
+.welcome-choice:focus,
+.not-found-state:focus {
   outline: none;
 }
 

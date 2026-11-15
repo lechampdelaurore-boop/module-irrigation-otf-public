@@ -49,6 +49,14 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
   await expect(page.getByRole('heading', { level: 1, name: NOT_FOUND_LABEL })).toBeVisible();
   await expect(page).toHaveTitle(pageDocumentTitle(NOT_FOUND_LABEL));
   await expect(page.getByText('404 This page could not be found')).toHaveCount(0);
+  // « Aller au contenu » en premier arrêt du clavier, comme sur les autres pages (audit final, lot E, A1, F257).
+  await page.locator('body').press('Tab');
+  const saut = page.getByRole('link', { name: 'Aller au contenu' });
+  await expect(saut).toBeFocused();
+  await expect(saut).toBeInViewport();
+  await saut.press('Enter');
+  await expect(page.locator('#contenu')).toBeFocused();
+  await expect(page.locator('#contenu')).toContainText(NOT_FOUND_LABEL);
   // Le même menu que les autres pages ; au téléphone, « Plus » l'ouvre au-dessus de la barre du bas (lot 2).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
   const retour = page.getByRole('link', { name: 'Revenir à « Aujourd’hui »' });

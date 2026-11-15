@@ -24,7 +24,7 @@ export default async function NotFound() {
   const farm = await readFarm();
   const back = notFoundReturnLink(farm ? { firstVisit: farm.firstVisit, enabled: farm.enabled } : null);
   const content = (
-    <section className="not-found-state" aria-labelledby="not-found-title">
+    <section className="not-found-state" id="contenu" tabIndex={-1} aria-labelledby="not-found-title">
       <p className="eyebrow">Erreur 404</p>
       <h1 id="not-found-title">{NOT_FOUND_LABEL}</h1>
       <p>Cette adresse ne correspond à aucune page du module. Elle a peut-être été mal tapée, ou la page a changé de nom. Aucune donnée n’a été modifiée.</p>
@@ -33,9 +33,12 @@ export default async function NotFound() {
   );
 
   const demo = isDemoDeployment();
-  if (!farm) return <main className="app-shell">{demo ? <DemoBanner /> : null}{content}</main>;
+  // Le premier arrêt du clavier saute la barre et le menu, comme sur les autres pages (audit final, lot E, A1, F257).
+  const skipLink = <a className="skip-link" href="#contenu">Aller au contenu</a>;
+  if (!farm) return <main className="app-shell">{skipLink}{demo ? <DemoBanner /> : null}{content}</main>;
   return (
     <main className="app-shell">
+      {skipLink}
       <Topbar userName={farm.userName} signOutPath={signOutPath()} demo={demo} demoSelection={demo ? demoSelectionOfOwner(farm.userId) : null} />
       <div className="feature-layout">
         {farm.menu.length > 0 ? <FeatureMenu menu={farm.menu} current={null} query={{}} /> : null}

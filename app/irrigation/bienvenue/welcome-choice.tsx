@@ -53,8 +53,10 @@ export function WelcomeChoice({ userName, signOutPath, demo, demoSelection }: {
 
   return (
     <main ref={shell} className="app-shell welcome-shell">
+      {/* Le premier arrêt du clavier saute la barre, comme sur les autres pages (audit final, lot E, A1, F257). */}
+      <a className="skip-link" href="#contenu">Aller au contenu</a>
       <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} tour={demo ? WELCOME_TOUR : null} />
-      <section className="welcome-choice" aria-labelledby="welcome-title">
+      <section className="welcome-choice" id="contenu" tabIndex={-1} aria-labelledby="welcome-title">
         <p className="eyebrow">Première ouverture</p>
         <h1 id="welcome-title">Choisissez vos fonctionnalités</h1>
         <p>

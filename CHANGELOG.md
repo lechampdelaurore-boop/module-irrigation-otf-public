@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit ergonomique final, lot E, mots et chiffres)
+
+- **A1, « Aller au contenu » partout** (D-130, F257) : la première
+  ouverture (« Choisissez vos fonctionnalités ») et la page introuvable ont
+  à leur tour le lien d'évitement en premier arrêt du clavier, vers leur
+  bloc principal. Contrat court `docs/audit-ergonomie-final-lot-e-contract.md` ;
+  parcours P22 et P27 étendus. Remarque 5 du lot B en ligne : #63, déployée
+  le 15 novembre 2026 à 7 h 10.
+
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 
 - **R3, la pénurie dite en une phrase** (D-122, F243 à F246) : au planning,
