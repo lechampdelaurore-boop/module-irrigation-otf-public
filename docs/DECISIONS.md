@@ -4625,3 +4625,31 @@ Aucune migration ; aucun calcul, aucune donnée touchés : des mots
 seulement. Les noms de la ferme de démonstration ne changent pas (lot F).
 
 Ne changent pas : D-117, D-130, D-131.
+
+## D-133 — Audit ergonomique final, lot E : la page non cochée nommée, et où la cocher (J11)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur, aucune question agronomique ; modifiable par lui.
+Après D-132 (J9).
+
+**Établi dans le code.** Une page non cochée renvoyait à la page d'arrivée
+avec `?absente=1` : l'adresse ne disait pas quelle page était demandée, et
+la ligne ne pouvait dire que « Cette fonctionnalité n'est pas cochée pour
+votre ferme. », sans mener nulle part.
+
+**Décision.** L'adresse nomme la page demandée (`?absente=arrosages`) ; la
+ligne dit « La page « Arrosages » n'est pas cochée pour votre ferme. » et
+porte le lien « La cocher dans Réglages », vers le bloc « Fonctionnalités
+de la ferme » (ancre `#fonctionnalites`). Pour « Aujourd'hui », qui n'a pas
+de case : « La page « Aujourd'hui » n'a aucune de ses fonctionnalités
+cochées pour votre ferme. », lien « Les cocher dans Réglages ». Une ancienne
+adresse (`?absente=1`, celle des anciennes ancres de notification), ou une
+page inconnue, garde la phrase d'avant, avec le même lien (F265). La page
+d'arrivée, et le retrait de `absente` de l'adresse une fois lue, ne
+changent pas. Parcours P22 et P23 étendus.
+
+Aucune migration ; aucun calcul, aucune donnée touchés. Sur
+« Aujourd'hui », seule cette ligne change (son contrat, lot A, est
+intact).
+
+Ne changent pas : D-117, D-130, D-132.

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { featureLabel, type FeatureId } from '@/lib/domain/features/catalogue';
 import { checkConfirmation, joinLabels } from '@/lib/domain/features/choice';
-import { pageHref } from '@/lib/domain/features/pages';
+import { FEATURE_SETTINGS_ANCHOR, pageHref } from '@/lib/domain/features/pages';
 import { checkFeature, uncheckFeature, type FeatureSelection } from '@/lib/domain/features/selection';
 import { uncheckWarning, type FeatureDataCounts } from '@/lib/domain/features/warnings';
 import { saveFeatureSelectionAction } from '../feature-selection-actions';
@@ -79,7 +79,7 @@ export function FeatureSettings({
   };
 
   return (
-    <section className="water-management-section feature-settings" aria-labelledby="feature-settings-title">
+    <section id={FEATURE_SETTINGS_ANCHOR} className="water-management-section feature-settings" aria-labelledby="feature-settings-title">
       <header className="water-management-heading">
         <div>
           <h2 id="feature-settings-title">Fonctionnalités de la ferme</h2>

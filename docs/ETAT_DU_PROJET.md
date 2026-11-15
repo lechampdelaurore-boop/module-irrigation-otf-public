@@ -393,8 +393,15 @@ registres, elle y renvoie.
   des noues »), jamais devant un h ; « Réglage habituel » une fois ; « Eau
   non pompée faute de temps » sur la tuile du planning et « non pompé faute
   de temps » au téléphone (F261 à F264, `lib/domain/display-words.ts` ;
-  P10, P29 et P31c adaptés ; aucune migration). Ensuite J11, le bandeau
-  « non cochée ».
+  P10, P29 et P31c adaptés ; aucune migration). **PR 3 en ligne** (#66,
+  fusionnée à 9 h 18, déployée à 9 h 36). **PR 4 sur 7, J11** (D-133) :
+  une page non cochée renvoie à la page d'arrivée avec son nom dans
+  l'adresse (`?absente=arrosages`) ; la ligne dit « La page « Arrosages »
+  n'est pas cochée pour votre ferme. » et porte « La cocher dans
+  Réglages », vers « Fonctionnalités de la ferme » ; « Aujourd'hui » dit
+  n'avoir aucune de ses fonctionnalités cochées ; une ancienne adresse garde
+  la phrase d'avant, avec le lien (F265 ; P22 et P23 étendus ; aucune
+  migration). Ensuite J12, le bandeau des alertes limitées.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -490,6 +497,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #66 (`c6e4694`, lot E de l'audit final, J9, les mêmes mots d'une page
+  à l'autre, D-132, fusionnée à 9 h 18 et déployée à 9 h 36, run
+  43693895736, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #65 (`bbbc5c8`, lot E de l'audit final, J8, des nombres lisibles
   partout, D-131, fusionnée à 8 h 41 et déployée à 9 h 01, run 43691068707,
   les cinq jobs réussis, aucune migration). Avant elle : la
