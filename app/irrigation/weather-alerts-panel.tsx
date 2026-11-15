@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import type { WeatherAlertHistoryEntry, WeatherAlertsView } from '@/lib/services/weather-alerts-view';
 import {
@@ -10,7 +10,7 @@ import {
   type WeatherAlertCriterion,
   type WeatherAlertCriterionInput,
 } from '@/lib/domain/weather/weather-alerts';
-import { weatherAlertTemplates, type WeatherAlertTemplate } from '@/lib/domain/weather/weather-alert-templates';
+import { FROST_TEMPLATE, FROST_TEMPLATE_ANCHOR, weatherAlertTemplates, type WeatherAlertTemplate } from '@/lib/domain/weather/weather-alert-templates';
 import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { WeatherAlertsDevice } from './weather-alerts-device';
 import {
@@ -92,6 +92,20 @@ export function WeatherAlertsPanel({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  useEffect(() => {
+    // Le lien « Poser « Gel : moins de 3 °C » » de « Aujourd'hui » met le modèle de gel en vue :
+    // le formulaire rempli, modifiable, rien d'enregistré sans « Enregistrer l'alerte » (lot A, J14, F284).
+    const openFromHash = () => {
+      if (window.location.hash !== `#${FROST_TEMPLATE_ANCHOR}`) return;
+      setDraft(templateDraft(FROST_TEMPLATE));
+      setRefusals({});
+      setNotice(null);
+      window.requestAnimationFrame(() => document.getElementById(FROST_TEMPLATE_ANCHOR)?.scrollIntoView({ block: 'start' }));
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+    return () => window.removeEventListener('hashchange', openFromHash);
+  }, []);
   const [pending, startTransition] = useTransition();
 
   const run = (action: () => Promise<WaterActionResult>, after?: () => void) => {
@@ -197,6 +211,7 @@ export function WeatherAlertsPanel({
       {draft ? (
         <form
           className="weather-alert-form"
+          id={draft.criterionId ? undefined : FROST_TEMPLATE_ANCHOR}
           aria-label={draft.criterionId ? 'Modifier l’alerte météo' : 'Nouvelle alerte météo'}
           onSubmit={(event) => { event.preventDefault(); save(); }}
         >

@@ -37,6 +37,16 @@ const TEMPLATES: readonly WeatherAlertTemplate[] = [
   },
 ];
 
+/**
+ * L'ancre de « Alertes météo » qui met le modèle de gel en vue, formulaire
+ * rempli et modifiable, rien d'enregistré (audit final, lot A, J14, F284) :
+ * le lien de « Aujourd'hui » quand un gel est annoncé sans alerte posée.
+ */
+export const FROST_TEMPLATE_ANCHOR = 'modele-gel';
+
+/** Le modèle de gel, celui que met en vue le lien de « Aujourd'hui » (F284). */
+export const FROST_TEMPLATE: WeatherAlertTemplate = TEMPLATES[0];
+
 /** Les modèles ne paraissent que tant que l'exploitation n'a aucune alerte, active ou non. */
 export function weatherAlertTemplates(criteriaCount: number): readonly WeatherAlertTemplate[] {
   return criteriaCount === 0 ? TEMPLATES : [];

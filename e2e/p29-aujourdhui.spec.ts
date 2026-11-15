@@ -25,7 +25,8 @@ import {
  * lignes de « Fiabilité du calcul ». Une alerte météo de l'exploitation,
  * fabriquée par le parcours et franchie par la prévision de démonstration
  * (minimale sous 12 °C), fait passer le bloc « Gel ou chaleur » en barre
- * rouge. Deux manques se corrigent par leur bouton : le plan jamais calculé
+ * rouge ; avant elle, le lien du gel sans alerte posée (`#modele-gel`, lot A,
+ * J14) met le modèle de gel en vue sans rien enregistrer. Deux manques se corrigent par leur bouton : le plan jamais calculé
  * (« Recalculer le plan ») et le volume d'une cuve jamais saisi (« Saisir le
  * volume de… », qui ouvre sa carte sur « Ressources et pompes ») ; chaque
  * ligne disparaît ensuite et la pastille baisse d'autant. « Observer le sol
@@ -173,6 +174,19 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(bloc(page, 'Eau disponible')).toContainText(`${cuve} : 12 m³ sur 20 m³, observé aujourd’hui.`);
   await expect(lignesDeFiabilite(page).filter({ hasText: cuve })).toHaveCount(0);
   await verifierLEtape(page, journal, 'volume saisi, ligne disparue');
+
+  // J14 (lot A, F284) : le lien « Poser « Gel : moins de 3 °C » » de « Aujourd'hui » met le modèle de gel en vue,
+  // le formulaire rempli et modifiable ; rien ne s'enregistre sans « Enregistrer l'alerte ».
+  await page.goto('/irrigation/alertes-meteo#modele-gel');
+  await attendreLaPagePrete(page, 'alertes-meteo');
+  const modele = page.locator('#weather-alerts').getByRole('form', { name: 'Nouvelle alerte météo' });
+  await expect(modele).toHaveAttribute('id', 'modele-gel');
+  await expect(modele.getByLabel('Seuil, en °C')).toHaveValue('3');
+  await expect(modele.getByLabel('Libellé facultatif')).toHaveValue('Gel');
+  await expect(modele).toBeInViewport();
+  await modele.getByRole('button', { name: 'Annuler' }).click();
+  await expect(modele).toHaveCount(0);
+  await verifierLEtape(page, journal, 'modèle de gel mis en vue, rien enregistré');
 
   // Une alerte météo de l'exploitation que la prévision de démonstration franchit : le bloc passe en barre rouge.
   const libelle = `Gel P29 ${testInfo.project.name}`;

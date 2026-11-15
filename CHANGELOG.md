@@ -7,6 +7,14 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot A, le matin)
 
+- **J14, un gel annoncé sans alerte posée se dit** (D-140, F283, F284) :
+  quand une minimale prévue est à 0 °C ou moins et qu'aucune alerte de gel
+  n'est posée, « Gel ou chaleur » dit « −2,4 °C annoncé le mer. 18 nov. et
+  aucune alerte de gel posée. », avec « Poser « Gel : moins de 3 °C » » qui
+  ouvre le modèle rempli sur « Alertes météo », rien d'enregistré ; la
+  pastille dit « Gel sans alerte posée » au lieu de « Rien d'annoncé sur
+  trois jours ». Parcours P29 étendu. R2 en ligne : #72, déployée le
+  15 novembre 2026 à 17 h 17.
 - **R2, un seul objectif d'une page à l'autre** (D-139, F280 à F282) :
   chaque page lisait déjà le même objectif ; « Aujourd'hui » chiffre
   l'objectif, l'eau reçue et le reste sur les planches qui ont un objectif

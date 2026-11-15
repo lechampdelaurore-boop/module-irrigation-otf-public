@@ -446,7 +446,8 @@ registres, elle y renvoie.
   migration, aucun calcul changé). Limite connue : le dimanche, rien n'est
   annoncé pour lundi, dont le plan n'existe pas encore. **PR 1 en ligne**
   (#71, fusionnée à 16 h 30, déployée à 16 h 47, run 43730259221, cinq
-  jobs verts). **PR 2 sur 4, R2** (D-139) : cause établie
+  jobs verts). **PR 2 sur 4, R2** (D-139), **en ligne** (#72, fusionnée à
+  17 h 02, déployée à 17 h 17, run 43733212212, cinq jobs verts) : cause établie
   au point d'arrêt, dans l'affichage et non dans le calcul de l'objectif
   (chaque page lit `objectiveForBed`) ; un total devenait inconnu dès
   qu'une seule planche n'avait pas d'objectif adopté, sans dire pourquoi.
@@ -455,8 +456,15 @@ registres, elle y renvoie.
   « Objectif applicable », avec une phrase qui le distingue du proposé ;
   « Non calculable » dit pourquoi, et « Besoin de la semaine » sur
   « Ressources » se lit « au moins 3,4 m³ », avec les planches qui
-  manquent (F280 à F282 ; P15 changé ; aucun calcul changé). Ensuite J14
-  et J13.
+  manquent (F280 à F282 ; P15 changé ; aucun calcul changé). **PR 3 sur
+  4, J14** (D-140) : la phrase calme de « Gel ou chaleur » ne regardait que
+  les alertes posées, à côté du flocon de la carte ; une minimale prévue à
+  0 °C ou moins sans alerte de gel active ni gel des cultures annoncé se
+  dit désormais (« −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel
+  posée. »), avec « Poser « Gel : moins de 3 °C » », qui ouvre le
+  formulaire rempli du modèle sur « Alertes météo », rien d'enregistré ; la
+  pastille dit « Gel sans alerte posée » (F283, F284 ; P29 étendu ; ton du
+  bloc, seuils et envois inchangés). Ensuite J13.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

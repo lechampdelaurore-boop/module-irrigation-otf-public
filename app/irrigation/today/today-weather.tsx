@@ -36,7 +36,7 @@ export function TodayWeather({ block, query }: { block: WeatherBlock; query: Pag
   return (
     <section className="today-block" id="today-weather" data-tour="aujourdhui-gel" data-kind="weather" data-tone={block.tone} aria-labelledby="today-weather-title">
       <div className="today-block-heading">
-        <span className="today-block-badge" data-tone={block.tone}><Icon name={BLOCK_ICONS[block.tone]} /></span>
+        <span className="today-block-badge" data-tone={block.tone}><Icon name={block.unposedFrost && block.tone === 'calm' ? 'flocon' : BLOCK_ICONS[block.tone]} /></span>
         <div>
           <h2 id="today-weather-title">Gel ou chaleur</h2>
           <p className="today-block-sub">Trois jours, vos seuils d’alerte</p>
@@ -48,6 +48,13 @@ export function TodayWeather({ block, query }: { block: WeatherBlock; query: Pag
       <div className={block.tone === 'alert' ? 'today-weather-lines sr-only' : 'today-weather-lines'}>
         {block.lines.map((line) => <p key={line} className="today-weather-line">{line}</p>)}
       </div>
+      {/* Un gel annoncé sans alerte posée : la phrase et le modèle à poser sur « Alertes météo », rien d'enregistré ici (lot A, J14, F283, F284). */}
+      {block.unposedFrost ? (
+        <p className="today-unposed-frost" role="note">
+          <span>{block.unposedFrost.text}</span>
+          <a href={pageHref(block.unposedFrost.link.page, query, block.unposedFrost.link.anchor)}>{block.unposedFrost.link.label}</a>
+        </p>
+      ) : null}
       <p className="today-scale-note">
         De la minimale à la maximale, de {celsiusText(scale.minimumCelsius)} à {celsiusText(scale.maximumCelsius)} ; le trait <b aria-hidden="true" /> marque 0 °C.
       </p>
