@@ -1,3 +1,4 @@
+import { volumeText } from '../display-numbers.ts';
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
 import { plannedIrrigationLateness } from '../planned-irrigation.ts';
 import { millisecondsFromMinutes } from '../units.ts';
@@ -16,7 +17,6 @@ import { waterDeficitValue } from './water-deficit-summary.ts';
  */
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const cubicMeters = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const MINUTES_PER_HOUR = 60;
 /** Sous cinq litres, l'écart du manque d'eau est un arrondi, pas un changement. */
 const NEGLIGIBLE_CUBIC_METERS = 0.005;
@@ -51,7 +51,7 @@ export function suggestionCauseLabel(cause: PlanSuggestionCause, format: DateFor
     case 'equipment-moved':
       return `${cause.equipmentName} reposé ailleurs : l’irrigation ne peut pas démarrer`;
     case 'daily-limit':
-      return `limite journalière du ${format.day(cause.date)} : ${cubicMeters.format(cause.limitCubicMeters)} m³ pour ${cubicMeters.format(cause.committedCubicMeters)} m³ engagés`;
+      return `limite journalière du ${format.day(cause.date)} : ${volumeText(cause.limitCubicMeters)} pour ${volumeText(cause.committedCubicMeters)} engagés`;
     case 'volume-unknown':
       return `volume invérifiable le ${format.day(cause.date)} sous une limite journalière`;
     case 'protected-slot': {
@@ -140,7 +140,7 @@ export function planChangesLines(changes: PlanChanges, format: DateFormats): Pla
   if (unknownBefore > 0 || unknownAfter > 0) {
     // Une eau inconnue d'un côté : le manque s'y écrit comme la carte, sans écart chiffré (point ouvert 59, D-090) ; de
     // même pour une planche en manque d'eau au volume inconnu (point ouvert 64, D-098).
-    const volume = (value: number) => `${cubicMeters.format(value)} m³`;
+    const volume = volumeText;
     const before = waterDeficitValue(changes.waterDeficitBeforeCubicMeters, unknownBefore, volume);
     const after = waterDeficitValue(changes.waterDeficitAfterCubicMeters, unknownAfter, volume);
     if (before !== after) lines.push({ kind: 'deficit', text: `Manque d’eau : ${before.startsWith('au ') ? 'd’' : 'de '}${before} à ${after}` });
@@ -148,7 +148,7 @@ export function planChangesLines(changes: PlanChanges, format: DateFormats): Pla
   }
   const delta = changes.waterDeficitAfterCubicMeters - changes.waterDeficitBeforeCubicMeters;
   if (Math.abs(delta) >= NEGLIGIBLE_CUBIC_METERS) {
-    lines.push({ kind: 'deficit', text: `Manque d’eau : de ${cubicMeters.format(changes.waterDeficitBeforeCubicMeters)} à ${cubicMeters.format(changes.waterDeficitAfterCubicMeters)} m³ (${delta > 0 ? '+' : '−'}${cubicMeters.format(Math.abs(delta))} m³)` });
+    lines.push({ kind: 'deficit', text: `Manque d’eau : de ${volumeText(changes.waterDeficitBeforeCubicMeters)} à ${volumeText(changes.waterDeficitAfterCubicMeters)} (${delta > 0 ? '+' : '−'}${volumeText(Math.abs(delta))})` });
   }
   return lines;
 }

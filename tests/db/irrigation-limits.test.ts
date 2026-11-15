@@ -154,10 +154,10 @@ test('au volume connu, le démarrage reste bloqué au-dessus de la limite, comme
  * planifié retiré du déjà engagé de ses jours. L’aspersion connue de 0,75 m³
  * est planifiée le 5 octobre de 6 h à 7 h, avant toute limite.
  */
-function exceededWithPlanned(plannedCubicMeters: string) {
+function exceededWithPlanned(plannedVolume: string) {
   return (error: unknown) => error instanceof IrrigationDailyLimitExceededError
     && error.message.startsWith('Limite journalière dépassée le 5 oct. 2026 : ')
-    && error.message.includes(`, ${plannedCubicMeters} m³ planifiés, `);
+    && error.message.includes(`, ${plannedVolume} planifiés, `);
 }
 
 test('modifiée sans changer de volume sous une limite de 1 m³, elle est acceptée : ses 0,75 m³ ne comptent pas deux fois', async () => {
@@ -169,12 +169,12 @@ test('modifiée sans changer de volume sous une limite de 1 m³, elle est accept
 test('la même aspersion créée en plus, sans exclusion, reste refusée : la planifiée compte', async () => {
   await plannedBeforeAnyLimit([45, 30]);
   await dailyLimit(1);
-  await assert.rejects(enforceDailyLimitForCreation(ALICE, 'planned', PLANNED, KNOWN), exceededWithPlanned('0,75'));
+  await assert.rejects(enforceDailyLimitForCreation(ALICE, 'planned', PLANNED, KNOWN), exceededWithPlanned('750 L'));
 });
 
 test('modifiée vers deux heures, 1,5 m³, elle est refusée sur son seul volume nouveau, l’ancien retiré', async () => {
   const eventEquipmentId = await plannedBeforeAnyLimit([45, 30]);
   await dailyLimit(1);
   const twoHours: IrrigationTiming = { ...PLANNED, plannedEndAt: '2026-10-05T06:00:00.000Z', plannedDurationSeconds: 7200 };
-  await assert.rejects(enforceDailyLimitForCreation(ALICE, 'planned', twoHours, KNOWN, eventEquipmentId), exceededWithPlanned('0'));
+  await assert.rejects(enforceDailyLimitForCreation(ALICE, 'planned', twoHours, KNOWN, eventEquipmentId), exceededWithPlanned('0 m³'));
 });

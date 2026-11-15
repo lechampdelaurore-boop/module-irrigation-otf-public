@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
+import { volumeText } from '../lib/domain/display-numbers.ts';
 import type { PlanningInputs, StoredWeeklyPlan, UnplacedReason, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { describePlanChanges } from '../lib/domain/planning/changes.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
@@ -146,7 +146,7 @@ test('S6, temps de pompage et eau à la fois : chaque planche compte sa part cou
   close(counted, budget.demandCubicMeters - placedVolume(plan), 0.01, 'demandé moins placé');
   // La note du manque d'eau n'impute au temps de pompage et à l'espacement que ce qui leur revient (D-038).
   const note = waterDeficitExplanation(stored(plan));
-  assert.ok(note?.includes(`${formatWaterVolumeForMessage(counted - plan.deficit.waterCubicMeters)} m³ qui manquent pour une autre raison que l’eau`), note ?? 'aucune note');
+  assert.ok(note?.includes(`${volumeText(counted - plan.deficit.waterCubicMeters)} qui manquent pour une autre raison que l’eau`), note ?? 'aucune note');
 });
 
 test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiffré, aucune coupe, la note du manque d’eau se tait, et le résumé dit que le manque ne peut pas être chiffré (point ouvert 51, D-089)', () => {
@@ -164,7 +164,7 @@ test('S7, stock inconnu : créneaux « eau non vérifiée », aucun budget chiff
   assert.equal(plan.deficit.waterCubicMeters, 0, 'aucun manque d’eau compté sur un stock inconnu');
   assert.equal(waterDeficitExplanation(stored(plan)), null);
   // Le résumé le dit, au lieu d'un zéro que rien ne prouve (D-003) : la carte écrivait « 0,00 m³ ».
-  const volume = (value: number) => `${formatWaterVolumeForMessage(value)} m³`;
+  const volume = (value: number) => `${volumeText(value)}`;
   const unknown = unknownWaterChainCount(plan.budgets);
   assert.equal(unknown, 1, 'la réserve sans jauge');
   assert.equal(waterDeficitValue(plan.deficit.waterCubicMeters, unknown, volume), 'non chiffré');
@@ -289,8 +289,8 @@ test('S8 sous un arbitrage validé : les planches d’une chaîne indisponible n
   assert.deepEqual(slots(archivedPlan), [], 'aucun créneau');
   assert.equal(
     arbitrationNote(archivedPlan),
-    'Votre choix entre les demandes d’eau s’impose : 6,354 m³ alloués, chaque allocation réservée à sa planche. '
-      + '6,354 m³ alloués à 32 planches ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
+    'Votre choix entre les demandes d’eau s’impose : 6,35 m³ alloués, chaque allocation réservée à sa planche. '
+      + '6,35 m³ alloués à 32 planches ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
   );
 });
 
@@ -596,7 +596,7 @@ const withUnknownAlley = (inputs: PlanningInputs): PlanningInputs => ({
   beds: inputs.beds.map((bed) => (bed.id === UNKNOWN_ALLEY ? { ...bed, alleyWidth: null } : bed)),
   needs: inputs.needs.map((need) => (need.bedId === UNKNOWN_ALLEY ? { ...need, wettedAreaSquareMeters: null, wettedAreaSource: 'unknown-alley', effectiveVolumeCubicMeters: null } : need)),
 });
-const cubicMetersText = (cubicMeters: number) => `${formatWaterVolumeForMessage(cubicMeters)} m³`;
+const cubicMetersText = (cubicMeters: number) => `${volumeText(cubicMeters)}`;
 
 for (const strategy of ['priority-then-equal-share', 'equal-share', 'defer'] as const) {
   test(`point ouvert 63, conduite « ${strategy} » : une planche au passe-pied inconnu reste hors du partage, jamais comptée zéro ; la rampe qui l’arrose n’est pas proposée, et les autres tunnels se partagent l’eau`, () => {

@@ -1,5 +1,5 @@
 import { listDailyWaterLimitsForUser } from '@/db/water-management-repository';
-import { formatWaterVolumeForMessage } from '@/lib/domain/irrigation-format';
+import { volumeText } from '@/lib/domain/display-numbers';
 import type { IrrigationBedApplicationDraft, IrrigationEventCreationKind } from '@/lib/domain/irrigation-event-record';
 import type { HydraulicFeasibility } from '@/lib/domain/pumps';
 import { cubicMetersFromMillimeters, millimetersForRate } from '@/lib/domain/units';
@@ -126,10 +126,10 @@ export async function enforceDailyLimitForCreation(
   if (violations.length === 0) return undefined;
   const first = violations[0];
   const message = `Limite journalière dépassée le ${formatCivilDate(first.date)} : ` +
-    `${formatWaterVolumeForMessage(first.alreadyRealizedCubicMeters)} m³ déjà réalisés, ${formatWaterVolumeForMessage(first.alreadyPlannedCubicMeters)} m³ planifiés, ` +
-    `${formatWaterVolumeForMessage(first.candidateCubicMeters)} m³ pour cette irrigation, ` +
-    `${formatWaterVolumeForMessage(first.alreadyEstimatedCubicMeters)} m³ en cours estimés, ` +
-    `limite ${formatWaterVolumeForMessage(first.limitCubicMeters)} m³, dépassement ${formatWaterVolumeForMessage(first.exceededByCubicMeters)} m³.`;
+    `${volumeText(first.alreadyRealizedCubicMeters)} déjà réalisés, ${volumeText(first.alreadyPlannedCubicMeters)} planifiés, ` +
+    `${volumeText(first.candidateCubicMeters)} pour cette irrigation, ` +
+    `${volumeText(first.alreadyEstimatedCubicMeters)} en cours estimés, ` +
+    `limite ${volumeText(first.limitCubicMeters)}, dépassement ${volumeText(first.exceededByCubicMeters)}.`;
   if (dailyLimitViolationPolicy(kind) === 'warn') {
     return `${message} L’enregistrement réel a été conservé.`;
   }

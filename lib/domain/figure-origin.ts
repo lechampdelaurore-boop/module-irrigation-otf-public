@@ -1,3 +1,5 @@
+import { millimetersText, volumeText } from './display-numbers.ts';
+
 /**
  * La bulle « d'où vient ce chiffre » (3.8, docs/feature-selection-contract.md,
  * section 6) : elle met en mots les valeurs que le calcul a déjà produites,
@@ -6,21 +8,19 @@
  * s'appuient sur ces formats.
  */
 
-const millimeters = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const cubicMeters = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 const decimal = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 const percent = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 const threeDecimals = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 });
 const twoDecimals = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-/** « 12 mm », « 2,5 mm » : comme les besoins et la météo à l'écran. */
+/** « 12 mm », « 2,5 mm » : comme partout à l'écran (lot E, J8, F259). */
 export function mmText(value: number): string {
-  return `${millimeters.format(value)} mm`;
+  return millimetersText(value);
 }
 
-/** « 0,60 m³ » : comme les volumes à l'écran. */
+/** « 0,6 m³ », « 425 L » : comme partout à l'écran (lot E, J8, F258). */
 export function cubicMetersText(value: number): string {
-  return `${cubicMeters.format(value)} m³`;
+  return volumeText(value);
 }
 
 /** Un nombre à deux décimales au plus, sans unité : un coefficient, un débit. */
@@ -43,7 +43,11 @@ export function rateText(value: number): string {
   return `${decimal.format(value)} mm/h`;
 }
 
-/** « 12,345 m³ », « 4,2 m³/h » : un volume ou un débit d'eau, trois décimales au plus, comme les ressources à l'écran. */
+/**
+ * « 12,35 m³ », « 425 L » : un volume, comme partout à l'écran (lot E, J8,
+ * F258) ; « 4,2 m³/h » : un débit, trois décimales au plus, hors de la règle
+ * des volumes (F260).
+ */
 export function waterText(value: number, unit: 'm³' | 'm³/h'): string {
-  return `${threeDecimals.format(value)} ${unit}`;
+  return unit === 'm³' ? volumeText(value) : `${threeDecimals.format(value)} ${unit}`;
 }

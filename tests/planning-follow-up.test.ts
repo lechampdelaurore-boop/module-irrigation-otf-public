@@ -51,7 +51,7 @@ test('chaque raison dit sur quoi elle repose : les termes du besoin, le matérie
   );
   assert.equal(suggestionCauseLabel({ kind: 'equipment-stored', equipmentName: 'Rampe bloc 2', removedAt: '2026-09-29T15:00:00.000Z' }, format), 'Rampe bloc 2 stocké depuis le [2026-09-29T15:00:00.000Z] : l’irrigation ne peut pas démarrer');
   assert.equal(suggestionCauseLabel({ kind: 'equipment-moved', equipmentName: 'Rampe bloc 2' }, format), 'Rampe bloc 2 reposé ailleurs : l’irrigation ne peut pas démarrer');
-  assert.equal(suggestionCauseLabel({ kind: 'daily-limit', date: '2026-09-30', limitCubicMeters: 3, committedCubicMeters: 5.775 }, format), 'limite journalière du <2026-09-30> : 3,00 m³ pour 5,78 m³ engagés');
+  assert.equal(suggestionCauseLabel({ kind: 'daily-limit', date: '2026-09-30', limitCubicMeters: 3, committedCubicMeters: 5.775 }, format), 'limite journalière du <2026-09-30> : 3 m³ pour 5,78 m³ engagés');
   assert.equal(suggestionCauseLabel({ kind: 'volume-unknown', date: '2026-09-30' }, format), 'volume invérifiable le <2026-09-30> sous une limite journalière');
 });
 
@@ -80,13 +80,13 @@ test('le pli écrit le manque d’eau comme la carte quand l’eau d’une chaî
   };
   const lines = (overrides: Partial<PlanChanges>) => planChangesLines({ ...base, ...overrides }, format).map((line) => [line.kind, line.text]);
   // Avant : « Manque d’eau : de 3,00 à 0,00 m³ (−3,00 m³) », une baisse que rien ne prouve.
-  assert.deepEqual(lines({ unknownWaterChainsAfter: 1 }), [['deficit', 'Manque d’eau : de 3,00 m³ à non chiffré']]);
-  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 0, waterDeficitAfterCubicMeters: 3, unknownWaterChainsBefore: 2 }), [['deficit', 'Manque d’eau : de non chiffré à 3,00 m³']]);
-  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 2, waterDeficitAfterCubicMeters: 3, unknownWaterChainsBefore: 1 }), [['deficit', 'Manque d’eau : d’au moins 2,00 m³ à 3,00 m³']]);
-  assert.deepEqual(lines({ waterDeficitAfterCubicMeters: 0, waterDeficitBeforeCubicMeters: 0, unknownWaterChainsAfter: 1 }), [['deficit', 'Manque d’eau : de 0,00 m³ à non chiffré']]);
+  assert.deepEqual(lines({ unknownWaterChainsAfter: 1 }), [['deficit', 'Manque d’eau : de 3 m³ à non chiffré']]);
+  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 0, waterDeficitAfterCubicMeters: 3, unknownWaterChainsBefore: 2 }), [['deficit', 'Manque d’eau : de non chiffré à 3 m³']]);
+  assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 2, waterDeficitAfterCubicMeters: 3, unknownWaterChainsBefore: 1 }), [['deficit', 'Manque d’eau : d’au moins 2 m³ à 3 m³']]);
+  assert.deepEqual(lines({ waterDeficitAfterCubicMeters: 0, waterDeficitBeforeCubicMeters: 0, unknownWaterChainsAfter: 1 }), [['deficit', 'Manque d’eau : de 0 m³ à non chiffré']]);
   assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 2, waterDeficitAfterCubicMeters: 2.001, unknownWaterChainsBefore: 1, unknownWaterChainsAfter: 1 }), [], 'les deux s’écrivent de même');
   assert.deepEqual(lines({ waterDeficitBeforeCubicMeters: 0, waterDeficitAfterCubicMeters: 0, unknownWaterChainsBefore: 1, unknownWaterChainsAfter: 3 }), [], 'non chiffré des deux côtés');
-  assert.deepEqual(lines({}), [['deficit', 'Manque d’eau : de 3,00 à 0,00 m³ (−3,00 m³)']], 'toute l’eau connue : comme avant');
+  assert.deepEqual(lines({}), [['deficit', 'Manque d’eau : de 3 m³ à 0 m³ (−3 m³)']], 'toute l’eau connue : comme avant');
 });
 
 test('le pli « Ce qui a changé » : une ligne par proposition, suggestion, planche entrée ou sortie, et l’écart du manque d’eau ; rien quand rien n’a changé', () => {
@@ -117,7 +117,7 @@ test('le pli « Ce qui a changé » : une ligne par proposition, suggestion, pla
     ['suggestion', 'Suggestion nouvelle : réduire à 8 mm Rampe bloc 2, [2026-09-30T06:00:00.000Z]'],
     ['unplaced', 'Désormais non servie : B2-1 (Bloc 2), manque 5,3 mm'],
     ['placed', 'De nouveau servie : B2-2 (Bloc 2)'],
-    ['deficit', 'Manque d’eau : de 3,20 à 1,05 m³ (−2,15 m³)'],
+    ['deficit', 'Manque d’eau : de 3,2 m³ à 1,05 m³ (−2,15 m³)'],
   ]);
   assert.deepEqual(planChangesLines({ ...changes, proposals: [], newSuggestions: [], bedsNowUnplaced: [], bedsNowPlaced: [], waterDeficitAfterCubicMeters: 3.201 }, format), []);
 });

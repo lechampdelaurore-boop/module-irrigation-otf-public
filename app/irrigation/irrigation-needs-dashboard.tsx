@@ -1,5 +1,6 @@
 'use client';
 
+import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriority, type IrrigationNeedsDashboard } from '@/lib/domain/irrigation-needs';
@@ -10,7 +11,6 @@ import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrr
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
-const volume = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
 type SortMode = 'priority' | 'deficit' | 'covered' | 'remaining';
 
@@ -59,7 +59,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
       <label><span>Trier les planches</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="priority">Priorités hautes</option><option value="deficit">Déficit le plus fort</option><option value="remaining">Besoin restant</option><option value="covered">Déjà couvert</option></select></label>
     </div>
     <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId}>
-      <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {formatMm(garden.effectiveNeedMm)}</strong><small>Besoin réel : {formatMm(garden.realRemainingMm)} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volume.format(garden.effectiveVolumeCubicMeters)} m³`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
+      <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {formatMm(garden.effectiveNeedMm)}</strong><small>Besoin réel : {formatMm(garden.realRemainingMm)} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
       <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm })))} />)}</div>
     </details>)}</div>
   </section>;
@@ -73,7 +73,7 @@ function BedNeedCard({ bed, proposal, pending, onSave }: { bed: BedIrrigationNee
   const exceeds = overrideEnabled && numeric(override) > (bed.objectiveMm ?? Number.POSITIVE_INFINITY);
   return <article className="irrigation-need-card" data-priority={bed.priority}>
     <header><div><strong>{bed.bedName}</strong><small>{area.format(bed.areaSquareMeters)} m²</small></div><span className="need-priority-label">Priorité {priorityLabel(bed.priority)}</span></header>
-    <div className="need-primary"><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{formatMm(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{formatMm(bed.calculatedNeedMm)}</strong></span><span><small>Besoin effectif <HelpButton text={help.effective} /></small><strong>{formatMm(bed.effectiveNeedMm)}</strong></span><span><small>Volume</small><strong>{bed.effectiveVolumeCubicMeters === null ? '—' : `${volume.format(bed.effectiveVolumeCubicMeters)} m³`}</strong></span><span><small>Déficit relatif <HelpButton text={help.deficit} /></small><strong>{bed.relativeDeficitPercent === null ? '—' : `${mm.format(bed.relativeDeficitPercent)} %`}</strong></span></div>
+    <div className="need-primary"><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{formatMm(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{formatMm(bed.calculatedNeedMm)}</strong></span><span><small>Besoin effectif <HelpButton text={help.effective} /></small><strong>{formatMm(bed.effectiveNeedMm)}</strong></span><span><small>Volume</small><strong>{bed.effectiveVolumeCubicMeters === null ? '—' : `${volumeText(bed.effectiveVolumeCubicMeters)}`}</strong></span><span><small>Déficit relatif <HelpButton text={help.deficit} /></small><strong>{bed.relativeDeficitPercent === null ? '—' : `${mm.format(bed.relativeDeficitPercent)} %`}</strong></span></div>
     {!bed.completeness.complete ? <NeedDiagnostic bed={bed} /> : null}
     <details className="need-calculation"><summary>Voir le calcul</summary><dl>
       <Et0Metric bed={bed} />

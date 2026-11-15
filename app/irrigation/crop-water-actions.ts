@@ -1,5 +1,6 @@
 'use server';
 
+import { millimetersText } from '@/lib/domain/display-numbers';
 import { getAuthenticatedUser } from '@/app/access-auth';
 import { saveAdoptedGoalForUser } from '@/db/crop-water/adoptions';
 import { addKcOverrideForUser, addStageDeclarationForUser, deleteSpeciesCorrespondenceForUser, saveSpeciesCorrespondenceForUser } from '@/db/crop-water/entries';
@@ -300,7 +301,7 @@ export async function adoptCropWaterProposalAction(input: { season: number; bedI
     await recalculatePlanAfterEvent(ownerUserId, { kind: 'objective-changed', season: input.season, at: revision.weekStart, lasting: true });
     return {
       ok: true,
-      message: `La proposition est adoptée : ${revision.amountMm.toLocaleString('fr-FR')} mm par semaine deviennent l’objectif de la planche à partir d’aujourd’hui.`,
+      message: `La proposition est adoptée : ${millimetersText(revision.amountMm)} par semaine deviennent l’objectif de la planche à partir d’aujourd’hui.`,
       sheet: await getBedCropWaterSheetForUser({ ownerUserId, season: input.season, snapshot, bedId: input.bedId, weekStart: input.weekStart }),
     };
   });

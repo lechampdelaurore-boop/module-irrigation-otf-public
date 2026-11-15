@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
+import { volumeText } from '../lib/domain/display-numbers.ts';
 import type { IrrigationNeedPriority } from '../lib/domain/irrigation-needs.ts';
 import type { PlanningInputs, SupplyBudget, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
@@ -78,7 +78,7 @@ test('S13, dernière planche examinée sous arbitrage : chaque allocation est un
   close(plan.arbitration.allocatedCubicMeters, DEMAND_CUBIC_METERS * 0.3, 0.001, 'alloué');
   close(plan.arbitration.reservedCubicMeters, DEMAND_CUBIC_METERS * 0.3, 0.001, 'réservé');
   assert.equal(plan.arbitration.unreceivedBedCount, 0);
-  assert.equal(arbitrationNote(plan), `Votre choix entre les demandes d’eau s’impose : ${formatWaterVolumeForMessage(plan.arbitration.allocatedCubicMeters)} m³ alloués, chaque allocation réservée à sa planche.`);
+  assert.equal(arbitrationNote(plan), `Votre choix entre les demandes d’eau s’impose : ${volumeText(plan.arbitration.allocatedCubicMeters)} alloués, chaque allocation réservée à sa planche.`);
 });
 
 test('sous arbitrage, rien n’est redistribué : ce qu’une planche allouée ne peut pas recevoir reste non attribué, et la note le dit (décision 1)', () => {
@@ -169,7 +169,7 @@ test('la note de l’arbitrage se tait sous le litre et compte les planches au s
   assert.equal(
     arbitrationNote({ arbitration: { ...arbitration, unreceivedCubicMeters: 0.16 } }),
     'Votre choix entre les demandes d’eau s’impose : 2 m³ alloués, chaque allocation réservée à sa planche. '
-      + '0,16 m³ alloués à 1 planche ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
+      + '160 L alloués à 1 planche ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.',
   );
   assert.equal(arbitrationNote({}), null);
 });
@@ -371,7 +371,7 @@ test('S18 sous arbitrage : une allocation que son débordement fait passer sous 
   assert.ok(plan.arbitration);
   assert.equal(plan.arbitration.unreceivedBedCount, 0);
   close(plan.arbitration.unreceivedCubicMeters, 0, 0.001, 'rien ne reste non attribué');
-  assert.equal(arbitrationNote(plan), `Votre choix entre les demandes d’eau s’impose : ${formatWaterVolumeForMessage(plan.arbitration.allocatedCubicMeters)} m³ alloués, chaque allocation réservée à sa planche.`);
+  assert.equal(arbitrationNote(plan), `Votre choix entre les demandes d’eau s’impose : ${volumeText(plan.arbitration.allocatedCubicMeters)} alloués, chaque allocation réservée à sa planche.`);
 });
 
 // ---------------------------------------------------------------------------

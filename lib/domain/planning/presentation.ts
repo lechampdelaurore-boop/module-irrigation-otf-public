@@ -1,6 +1,6 @@
 import type { EquipmentKind } from '../irrigation-domain.ts';
 import { priorityLabel } from '../irrigation-feasibility.ts';
-import { formatWaterVolumeForMessage } from '../irrigation-format.ts';
+import { volumeText } from '../display-numbers.ts';
 import type { IrrigationNeedPriority } from '../irrigation-needs.ts';
 import { MINUTES_PER_HOUR, cubicMetersFromLiters, cubicMetersFromMillimeters, millisecondsFromSeconds } from '../units.ts';
 import { FARM_TIME_ZONE, dateKeyInTimeZone, weekDateKeys } from '../water-management.ts';
@@ -291,13 +291,13 @@ export function waterDeficitExplanation(plan: StoredWeeklyPlan): string | null {
   const tolerance = Math.max(ONE_LITER_CUBIC_METERS, roundingResidueCubicMeters(own));
   const parts: string[] = [];
   if (beside > tolerance) {
-    parts.push(`${formatWaterVolumeForMessage(beside)} m³ placés sans couvrir de besoin compté — à côté des planches, au-delà de leur besoin, ou sur une surface plus large que celle de leur propre matériel${otherwise > ONE_LITER_CUBIC_METERS ? ' —' : ''}`);
+    parts.push(`${volumeText(beside)} placés sans couvrir de besoin compté — à côté des planches, au-delà de leur besoin, ou sur une surface plus large que celle de leur propre matériel${otherwise > ONE_LITER_CUBIC_METERS ? ' —' : ''}`);
   } else if (beside < -tolerance) {
-    parts.push(`${formatWaterVolumeForMessage(-beside)} m³ de besoin couverts par une eau comptée sur une surface plus petite que celle de leur propre matériel`);
+    parts.push(`${volumeText(-beside)} de besoin couverts par une eau comptée sur une surface plus petite que celle de leur propre matériel`);
   }
-  if (otherwise > ONE_LITER_CUBIC_METERS) parts.push(`${formatWaterVolumeForMessage(otherwise)} m³ qui manquent pour une autre raison que l’eau (temps de pompage, espacement, dose minimale)`);
+  if (otherwise > ONE_LITER_CUBIC_METERS) parts.push(`${volumeText(otherwise)} qui manquent pour une autre raison que l’eau (temps de pompage, espacement, dose minimale)`);
   if (parts.length === 0) return null;
-  return `Demandés ${formatWaterVolumeForMessage(demanded)} m³, placés ${formatWaterVolumeForMessage(placed)} m³, manque d’eau ${formatWaterVolumeForMessage(deficit.waterCubicMeters)} m³ : l’écart tient à ${parts.join(', et à ')}. Le manque se compte planche par planche, sur la surface que son propre matériel mouille.`;
+  return `Demandés ${volumeText(demanded)}, placés ${volumeText(placed)}, manque d’eau ${volumeText(deficit.waterCubicMeters)} : l’écart tient à ${parts.join(', et à ')}. Le manque se compte planche par planche, sur la surface que son propre matériel mouille.`;
 }
 
 /**
@@ -310,13 +310,13 @@ export function waterDeficitExplanation(plan: StoredWeeklyPlan): string | null {
 export function arbitrationNote(summary: { arbitration?: PlanArbitration }): string | null {
   const { arbitration } = summary;
   if (!arbitration) return null;
-  const sentences = [`Votre choix entre les demandes d’eau s’impose : ${formatWaterVolumeForMessage(arbitration.allocatedCubicMeters)} m³ alloués, chaque allocation réservée à sa planche.`];
+  const sentences = [`Votre choix entre les demandes d’eau s’impose : ${volumeText(arbitration.allocatedCubicMeters)} alloués, chaque allocation réservée à sa planche.`];
   if (arbitration.allocatedCubicMeters - arbitration.reservedCubicMeters > ONE_LITER_CUBIC_METERS) {
-    sentences.push(`Le moteur ne peut en placer que ${formatWaterVolumeForMessage(arbitration.reservedCubicMeters)} m³ d’ici dimanche : chaque allocation est réduite dans la même proportion.`);
+    sentences.push(`Le moteur ne peut en placer que ${volumeText(arbitration.reservedCubicMeters)} d’ici dimanche : chaque allocation est réduite dans la même proportion.`);
   }
   if (arbitration.unreceivedCubicMeters > ONE_LITER_CUBIC_METERS) {
     const beds = `${arbitration.unreceivedBedCount} planche${arbitration.unreceivedBedCount > 1 ? 's' : ''}`;
-    sentences.push(`${formatWaterVolumeForMessage(arbitration.unreceivedCubicMeters)} m³ alloués à ${beds} ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.`);
+    sentences.push(`${volumeText(arbitration.unreceivedCubicMeters)} alloués à ${beds} ne peuvent pas être reçus : ils restent non attribués, sans redistribution entre planches.`);
   }
   return sentences.join(' ');
 }

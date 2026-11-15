@@ -13,6 +13,13 @@ source détaillée commit par commit.
   bloc principal. Contrat court `docs/audit-ergonomie-final-lot-e-contract.md` ;
   parcours P22 et P27 étendus. Remarque 5 du lot B en ligne : #63, déployée
   le 15 novembre 2026 à 7 h 10.
+- **J8, des nombres lisibles** (D-131, F258 à F260) : partout, un volume
+  s'écrit en m³ à deux décimales au plus, sans zéro inutile (« 3,14 m³ »,
+  « 12 m³ »), en litres entiers sous 1 m³ (« 425 L »), « moins de 1 L »
+  plutôt que « 0 L », et les millimètres à une décimale au plus
+  (« 16,5 mm », « 12 mm »). Une seule règle d'affichage pour toutes les
+  pages ; le calcul, les champs de saisie et l'export gardent toute leur
+  précision. Parcours P12 et P32 adaptés. A1 en ligne : #64.
 
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 

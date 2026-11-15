@@ -1,5 +1,6 @@
 'use client';
 
+import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { priorityLabel, type AllocationStatus, type IrrigationFeasibility, type PriorityFeasibility } from '@/lib/domain/irrigation-feasibility';
 import { feasibilityNoticeSource, notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
@@ -10,13 +11,12 @@ import { feasibilityHeadTiles, isPriorityLevelShown } from '@/lib/domain/feasibi
 import { ArbitrationPlan } from './arbitration-plan';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
-const decimalVolume = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 const dates = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
 const jours = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Paris' });
 /** Midi UTC : la date métier ne doit pas glisser d'un jour selon le fuseau. */
 const jour = (cle: string) => jours.format(new Date(`${cle}T12:00:00Z`));
-const volume = (value: number | null) => value === null ? 'Non calculable' : `${decimalVolume.format(value)} m³`;
-const mm = (value: number | null) => value === null ? 'Non calculable' : `${number.format(value)} mm`;
+const volume = (value: number | null) => value === null ? 'Non calculable' : volumeText(value);
+const mm = (value: number | null) => value === null ? 'Non calculable' : millimetersText(value);
 const percent = (value: number | null) => value === null ? 'Non calculable' : `${number.format(value)} %`;
 const statusLabels: Record<AllocationStatus, string> = {
   no_need: 'Aucun besoin', full: 'Besoin entièrement satisfait en volume', partial: 'Besoin partiellement satisfait', unsatisfied: 'Besoin non satisfait',

@@ -29,6 +29,10 @@ export function cubicMetersFromLiters(liters: number): number {
   return liters / LITERS_PER_CUBIC_METER;
 }
 
+export function litersFromCubicMeters(cubicMeters: number): number {
+  return cubicMeters * LITERS_PER_CUBIC_METER;
+}
+
 /** Volume apporté par une hauteur d'eau sur une surface : mm × m² / 1 000. */
 export function cubicMetersFromMillimeters(millimeters: number, areaSquareMeters: number): number {
   return millimeters * areaSquareMeters / MILLIMETER_SQUARE_METERS_PER_CUBIC_METER;

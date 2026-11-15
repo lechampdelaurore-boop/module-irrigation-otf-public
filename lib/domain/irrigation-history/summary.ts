@@ -1,6 +1,6 @@
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
 import { cubicMetersFromMillimeterSquareMeters } from '../units.ts';
-import { decimalText } from '../figure-origin.ts';
+import { decimalText, mmText } from '../figure-origin.ts';
 import type { Bed, Plot } from '../domain.ts';
 import { irrigationActiveIntervals } from '../water-management.ts';
 import { goalRevisionFirstDate } from '../hydric-goal-revisions.ts';
@@ -293,5 +293,5 @@ function availability(availableDays: number, totalDays: number): HistoryAvailabi
  */
 export function irrigationCumulOrigin(summary: Pick<IrrigationHistorySummary, 'irrigationMm' | 'irrigatedAreaSquareMeters' | 'scopeAreaSquareMeters'>): string | null {
   if (summary.irrigationMm === null) return null;
-  return `Apport irrigation ${decimalText(summary.irrigationMm)} mm : l’eau apportée à chaque planche (ses millimètres × sa surface), additionnée puis répartie sur toute la surface du périmètre, ${decimalText(summary.scopeAreaSquareMeters)} m². ${decimalText(summary.irrigatedAreaSquareMeters)} m² ont été arrosés ; une planche non arrosée compte 0 mm, une grande planche pèse plus qu’une petite.`;
+  return `Apport irrigation ${mmText(summary.irrigationMm)} : l’eau apportée à chaque planche (ses millimètres × sa surface), additionnée puis répartie sur toute la surface du périmètre, ${decimalText(summary.scopeAreaSquareMeters)} m². ${decimalText(summary.irrigatedAreaSquareMeters)} m² ont été arrosés ; une planche non arrosée compte 0 mm, une grande planche pèse plus qu’une petite.`;
 }

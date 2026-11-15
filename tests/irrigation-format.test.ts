@@ -4,14 +4,14 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import {
   formatIrrigationDateTimeInput,
-  formatWaterVolumeForMessage,
   instantFromIrrigationDateTimeInput,
 } from '../lib/domain/irrigation-format.ts';
+import { volumeText } from '../lib/domain/display-numbers.ts';
 
-test('les petits volumes restent lisibles dans les alertes de limite', () => {
-  assert.equal(formatWaterVolumeForMessage(0.01125), '0,011');
-  assert.equal(formatWaterVolumeForMessage(0.00125), '0,001');
-  assert.equal(formatWaterVolumeForMessage(1), '1');
+test('les petits volumes restent lisibles dans les alertes de limite, en litres sous 1 m³ (F258)', () => {
+  assert.equal(volumeText(0.01125), '11 L');
+  assert.equal(volumeText(0.00125), '1 L');
+  assert.equal(volumeText(1), '1 m³');
 });
 
 test('les dates de réserve sont identiques pour un serveur UTC et un navigateur dans un autre fuseau', () => {

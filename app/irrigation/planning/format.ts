@@ -1,12 +1,12 @@
 'use client';
 import { FARM_TIME_ZONE } from '@/lib/domain/water-management';
+import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
 
 /**
  * Les formats de l'écran du planning : heures et dates à la ferme (D-004),
- * millimètres, mètres cubes et débits en français. Aucune règle ici.
+ * millimètres et volumes comme partout (lot E, J8), débits en français.
+ * Aucune règle ici.
  */
-const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const volume = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 const flow = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 const time = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: FARM_TIME_ZONE });
 const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: FARM_TIME_ZONE });
@@ -15,11 +15,11 @@ const shortDay = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-di
 const weekdayAndDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', timeZone: 'UTC' });
 
 export function formatMm(value: number | null) {
-  return value === null ? 'inconnu' : `${mm.format(value)} mm`;
+  return value === null ? 'inconnu' : millimetersText(value);
 }
 
 export function formatVolume(value: number | null) {
-  return value === null ? 'volume inconnu' : `${volume.format(value)} m³`;
+  return value === null ? 'volume inconnu' : volumeText(value);
 }
 
 export function formatFlow(value: number | null) {

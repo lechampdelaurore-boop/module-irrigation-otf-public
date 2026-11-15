@@ -1,11 +1,5 @@
 import { FARM_TIME_ZONE, isValidDateKey, localDateTimeUtc } from './water-management.ts';
 
-export function formatWaterVolumeForMessage(value: number) {
-  return new Intl.NumberFormat('fr-FR', {
-    maximumFractionDigits: 3,
-  }).format(value);
-}
-
 // The server and the browser must render the same farm-local timestamp.
 export function formatIrrigationDateTime(value: string, timeZone: string) {
   return new Intl.DateTimeFormat('fr-FR', {

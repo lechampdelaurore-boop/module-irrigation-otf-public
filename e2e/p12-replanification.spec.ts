@@ -4,6 +4,7 @@ import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { addDaysToDateKey, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -136,7 +137,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     await expect(suggestion).toHaveCount(1);
     await expect(suggestion).toHaveAttribute('data-suggestion', 'cancel');
     await expect(suggestion.locator('.planning-suggestion-head strong')).toHaveText('Annuler');
-    await expect(suggestion.locator('.planning-suggestion-causes')).toContainText(/limite journalière du .* : 0,01 m³ pour \d+,\d{2} m³ engagés/);
+    await expect(suggestion.locator('.planning-suggestion-causes')).toContainText(new RegExp(`limite journalière du .* : 10 L pour ${VOLUME_ECRIT} engagés`));
     await expect(suggestion.getByRole('button', { name: 'Garder' })).toBeVisible();
     await pli.locator('summary').click();
     await expect(pli.locator('li[data-kind="suggestion"]').filter({ hasText: materiel })).toContainText('Suggestion nouvelle : annuler');
@@ -144,7 +145,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     const jourDepasse = planning.locator('.planning-day-overcommitted');
     await expect(jourDepasse).toHaveCount(1);
     await expect(jourDepasse).toBeVisible();
-    await expect(jourDepasse).toHaveText(/^Limite journalière de 0,01 m³ dépassée : \d+,\d{2,3} m³ engagés$/);
+    await expect(jourDepasse).toHaveText(new RegExp(`^Limite journalière de 10 L dépassée : ${VOLUME_ECRIT} engagés$`));
     const engagesAvant = metresCubesEngages(await jourDepasse.innerText());
     await verifierLEtape(page, journal, 'suggestion « Annuler » sous la limite');
 
@@ -279,7 +280,5 @@ async function reglerLaLimiteJournaliere(page: Page, limite: { active: true; met
 
 /** Le volume engagé que dit la colonne d'un jour au-delà de sa limite (F256). */
 function metresCubesEngages(texte: string): number {
-  const trouve = texte.match(/: (\d+(?:,\d+)?) m³ engagés$/);
-  expect(trouve, `un volume engagé dans « ${texte} »`).not.toBeNull();
-  return Number(trouve![1].replace(',', '.'));
+  return metresCubesLus(texte, 'engagés');
 }

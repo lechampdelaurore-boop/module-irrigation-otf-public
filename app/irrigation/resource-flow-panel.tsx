@@ -1,4 +1,5 @@
 'use client';
+import { volumeText } from '@/lib/domain/display-numbers';
 import { useState } from 'react';
 import {
   authorisedEnvelope,
@@ -28,7 +29,9 @@ import { FigureOrigin } from './shell/figure-origin';
  */
 
 const flowFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 });
-const volumeFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+const hoursFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+/** L'index du compteur se lit comme sur le compteur : une lecture, pas un volume arrondi (lot E, J8, F260). */
+const meterIndexFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const percentFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0, signDisplay: 'exceptZero' });
 // La part de l'autorisé n'est pas une variation : elle ne porte pas de signe.
 const ratioFormat = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
@@ -248,8 +251,8 @@ function LatestMeasurement({
     <section className="resource-flow-latest" aria-label="Dernière mesure">
       <h4>Dernière mesure, au {formatDate(measurement.toTakenAt)}</h4>
       <dl>
-        <div><dt>Volume produit</dt><dd>{volumeFormat.format(measurement.producedCubicMeters)} m³</dd></div>
-        <div><dt>Temps de marche</dt><dd>{volumeFormat.format(hoursFromSeconds(measurement.runningSeconds))} h</dd></div>
+        <div><dt>Volume produit</dt><dd>{volumeText(measurement.producedCubicMeters)}</dd></div>
+        <div><dt>Temps de marche</dt><dd>{hoursFormat.format(hoursFromSeconds(measurement.runningSeconds))} h</dd></div>
         <div><dt>Débit en fonctionnement</dt><dd>{measurement.runningFlowCubicMetersPerHour === null ? 'La pompe n’a pas tourné' : `${flowFormat.format(measurement.runningFlowCubicMetersPerHour)} m³/h`}<FigureOrigin text={flowMeasurementOrigin(measurement)} /></dd></div>
         <div><dt>Débit moyen sur la période</dt><dd>{flowFormat.format(measurement.averageFlowCubicMetersPerHour)} m³/h</dd></div>
       </dl>
@@ -307,7 +310,7 @@ function ReadingHistory({
               return (
                 <tr key={reading.id}>
                   <td>{formatDate(reading.takenAt)}{reading.note ? <small>{reading.note}</small> : null}</td>
-                  <td>{volumeFormat.format(reading.meterIndexCubicMeters)} m³</td>
+                  <td>{meterIndexFormat.format(reading.meterIndexCubicMeters)} m³</td>
                   <td>
                     {reading.meterReplaced
                       ? 'Compteur remplacé'
@@ -371,7 +374,7 @@ function ConsumptionHistory({
           {periods.map((period) => (
             <tr key={period.month}>
               <th scope="row">{monthLabel(period, timeZone)}</th>
-              <td>{volumeFormat.format(period.producedCubicMeters)} m³</td>
+              <td>{volumeText(period.producedCubicMeters)}</td>
               <td>{period.measurementCount}</td>
               {authorisedCubicMetersPerDay === null ? null : <td>{envelopeLabel(period, authorisedCubicMetersPerDay)}</td>}
             </tr>
@@ -380,7 +383,7 @@ function ConsumptionHistory({
         <tfoot>
           <tr>
             <th scope="row">Total affiché</th>
-            <td>{volumeFormat.format(total)} m³</td>
+            <td>{volumeText(total)}</td>
             <td />
             {authorisedCubicMetersPerDay === null ? null : <td />}
           </tr>
@@ -412,5 +415,5 @@ function monthLabel(period: ResourceConsumptionPeriod, timeZone: string): string
 function envelopeLabel(period: ResourceConsumptionPeriod, authorisedCubicMetersPerDay: number): string {
   const envelope = authorisedEnvelope(period, authorisedCubicMetersPerDay);
   if (!envelope) return '—';
-  return `${ratioFormat.format(envelope.usedRatio * 100)} % de ${volumeFormat.format(envelope.allowedCubicMeters)} m³`;
+  return `${ratioFormat.format(envelope.usedRatio * 100)} % de ${volumeText(envelope.allowedCubicMeters)}`;
 }

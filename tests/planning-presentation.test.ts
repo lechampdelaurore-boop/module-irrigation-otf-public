@@ -320,10 +320,10 @@ test('la note du manque d’eau chiffre l’écart entre demandé, placé et man
   const deficit = (water: number, byReason: Partial<Record<UnplacedReason, number>>) => ({ waterCubicMeters: water, pumpTimeCubicMeters: 0, byReason, bedCount: 1 });
   // La recette du 9 octobre 2026 : 82,70 m³ demandés, 24,999 m³ placés, 62,187 m³ de manque d'eau — 4,486 m³ placés à côté.
   const beside = waterDeficitExplanation(planWithDeficit([placed(24.999)], deficit(62.187, { 'water-budget': 62.187 }), 82.7));
-  assert.equal(beside, 'Demandés 82,7 m³, placés 24,999 m³, manque d’eau 62,187 m³ : l’écart tient à 4,486 m³ placés sans couvrir de besoin compté — à côté des planches, au-delà de leur besoin, ou sur une surface plus large que celle de leur propre matériel. Le manque se compte planche par planche, sur la surface que son propre matériel mouille.');
+  assert.equal(beside, 'Demandés 82,7 m³, placés 25 m³, manque d’eau 62,19 m³ : l’écart tient à 4,49 m³ placés sans couvrir de besoin compté — à côté des planches, au-delà de leur besoin, ou sur une surface plus large que celle de leur propre matériel. Le manque se compte planche par planche, sur la surface que son propre matériel mouille.');
   // Un manque pour une autre raison que l'eau s'ajoute.
   const other = waterDeficitExplanation(planWithDeficit([placed(24.999)], deficit(60, { 'water-budget': 60, 'pump-time': 2.187 }), 82.7));
-  assert.match(other ?? '', /manque d’eau 60 m³ : l’écart tient à 4,486 m³ placés sans couvrir de besoin compté — [^.]+ —, et à 2,187 m³ qui manquent pour une autre raison que l’eau \(temps de pompage, espacement, dose minimale\)\. Le manque/);
+  assert.match(other ?? '', /manque d’eau 60 m³ : l’écart tient à 4,49 m³ placés sans couvrir de besoin compté — [^.]+ —, et à 2,19 m³ qui manquent pour une autre raison que l’eau \(temps de pompage, espacement, dose minimale\)\. Le manque/);
   // Du besoin couvert par moins d'eau qu'il n'en compte : le matériel qui l'a arrosé mouille une surface plus petite.
   const narrower = waterDeficitExplanation(planWithDeficit([placed(3)], deficit(6, { 'water-budget': 6 }), 10));
   assert.match(narrower ?? '', /^Demandés 10 m³, placés 3 m³, manque d’eau 6 m³ : l’écart tient à 1 m³ de besoin couverts par une eau comptée sur une surface plus petite que celle de leur propre matériel\. Le manque/);
@@ -353,5 +353,5 @@ test('la note se tait sous le résidu d’arrondi des secondes, un centième de 
   const counted = cubicMetersFromMillimeters(20 - 5.5804, 896);
   assert.equal(waterDeficitExplanation(planWithDeficit(proposals, deficit(counted), 17.92)), null);
   // Au-delà du résidu — ici 9 L, un centième de millimètre sur 896 m² —, la note reparaît.
-  assert.match(waterDeficitExplanation(planWithDeficit(proposals, deficit(counted - 0.02), 17.92)) ?? '', /0,022 m³ de besoin couverts par une eau comptée sur une surface plus petite/);
+  assert.match(waterDeficitExplanation(planWithDeficit(proposals, deficit(counted - 0.02), 17.92)) ?? '', /22 L de besoin couverts par une eau comptée sur une surface plus petite/);
 });
