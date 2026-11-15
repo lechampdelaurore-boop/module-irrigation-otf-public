@@ -338,9 +338,9 @@ export function WaterManagementDashboard({
           <p>Suivi hebdomadaire du lundi au dimanche. Ces données alimentent le calcul des besoins affiché ensuite.</p>
         </div>
         <div className="water-week-navigation" aria-label="Changer de semaine">
-          <button type="button" disabled={pending} onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, -7))}>←</button>
+          <button type="button" disabled={pending} aria-label="Semaine précédente" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, -7))}>←</button>
           <strong>{formatDateRange(dashboard.weekStart, dashboard.weekEnd)}</strong>
-          <button type="button" disabled={pending} onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, 7))}>→</button>
+          <button type="button" disabled={pending} aria-label="Semaine suivante" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, 7))}>→</button>
           <button type="button" disabled={pending} onClick={() => loadWeek(dateKeyInTimeZone(new Date()))}>Cette semaine</button>
         </div>
       </header>

@@ -9,11 +9,12 @@ import type { Page } from '@playwright/test';
  * correction se trouve sans rejouer le parcours.
  */
 
-export type CibleMesuree = { cible: string; hauteur: number };
+export type CibleMesuree = { cible: string; hauteur: number; largeur: number };
 export type TexteMesure = { texte: string; ratio: number; couleur: string; fond: string; taille: number };
 
 /**
- * Les cibles visibles de moins de 44 px de haut, hors liens pris dans une phrase (exception du WCAG 2.5.5).
+ * Les cibles visibles de moins de 44 px de haut ou de large, hors liens pris dans une phrase (exception du WCAG 2.5.5) ;
+ * une case se mesure par l'étiquette qui la contient, même enveloppée (audit final, lot E, A2, F273).
  * `racine` : où chercher ; `main` par défaut, la bulle d'une visite guidée (posée hors de `main`) sinon.
  */
 export async function ciblesTropPetites(page: Page, minimum = 44, racine = 'main'): Promise<CibleMesuree[]> {
@@ -21,7 +22,7 @@ export async function ciblesTropPetites(page: Page, minimum = 44, racine = 'main
     const selecteur = [
       'a[href]', 'button', 'select', 'textarea', 'summary', '[role="tab"]', '[role="menuitem"]',
       'input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"])',
-      'label:has(> input[type="checkbox"]), label:has(> input[type="radio"])',
+      'label:has(input[type="checkbox"]), label:has(input[type="radio"])',
     ].join(', ');
     const nom = (element: Element) => {
       const etiquette = element.closest('label')?.innerText ?? element.getAttribute('placeholder') ?? '';
@@ -30,25 +31,27 @@ export async function ciblesTropPetites(page: Page, minimum = 44, racine = 'main
       return `${element.tagName.toLowerCase()}${classe ? `.${classe}` : ''} « ${texte.slice(0, 60)} »`;
     };
     // Une zone invisible posée par un pseudo-élément agrandit la cible sans grandir le dessin (cloche et initiale, F22).
-    const hauteurTouchee = (element: Element, hauteur: number) => {
+    const tailleTouchee = (element: Element, taille: number, sens: 'height' | 'width') => {
       const zone = getComputedStyle(element, '::after');
-      if (zone.content === 'none' || zone.position !== 'absolute') return hauteur;
-      const etendue = Number.parseFloat(zone.height);
-      return Number.isFinite(etendue) ? Math.max(hauteur, etendue) : hauteur;
+      if (zone.content === 'none' || zone.position !== 'absolute') return taille;
+      const etendue = Number.parseFloat(zone[sens]);
+      return Number.isFinite(etendue) ? Math.max(taille, etendue) : taille;
     };
     const dansUnePhrase = (element: Element) => element.tagName === 'A'
       && getComputedStyle(element).display === 'inline'
       && element.parentElement !== null
       && ['P', 'LI', 'SMALL', 'SPAN', 'TD', 'DD', 'LABEL', 'EM', 'STRONG'].includes(element.parentElement.tagName);
-    const mesures: { cible: string; hauteur: number }[] = [];
+    const mesures: { cible: string; hauteur: number; largeur: number }[] = [];
     for (const element of document.querySelectorAll(`${racine} ${selecteur.split(', ').join(`, ${racine} `)}`)) {
       if (!(element as HTMLElement).checkVisibility?.({ checkOpacity: true, checkVisibilityCSS: true })) continue;
       if (element.closest('[aria-hidden="true"], .skip-link')) continue;
       if (dansUnePhrase(element)) continue;
       const boite = element.getBoundingClientRect();
       if (boite.width === 0 || boite.height === 0) continue;
-      const hauteur = Math.round(hauteurTouchee(element, boite.height));
-      if (hauteur < min) mesures.push({ cible: nom(element), hauteur });
+      // Au dixième : 43,8 px ne s'arrondit pas à 44 (F273).
+      const hauteur = Math.round(tailleTouchee(element, boite.height, 'height') * 10) / 10;
+      const largeur = Math.round(tailleTouchee(element, boite.width, 'width') * 10) / 10;
+      if (hauteur < min || largeur < min) mesures.push({ cible: nom(element), hauteur, largeur });
     }
     return mesures;
   }, { min: minimum, racine });

@@ -327,8 +327,10 @@
     padding-top: 0;
   }
 
+  /* « Voir » faisait 25 px de large : 44 px dans les deux sens (audit final, lot E, A2, F272). */
   .feature-page .weather-alert-history a {
     display: inline-flex;
+    min-width: var(--touch-target);
   }
 }
 

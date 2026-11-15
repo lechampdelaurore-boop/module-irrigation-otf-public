@@ -4705,3 +4705,36 @@ P34 étendu (au téléphone, 142 px de la carte à l'écran sans le code).
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-117, D-134.
+
+## D-136 — Audit ergonomique final, lot E : les dernières cibles de moins de 44 px (A2)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur, aucune question agronomique ; modifiable par lui.
+Après D-135 (J15). Clôt le code du lot E.
+
+**Établi par la mesure** (D-130, section 9 du contrat). À 390 px, avec les
+règles de P31c, il ne restait que trois défauts : les flèches « ← » et
+« → » de la semaine d'« Objectifs et besoins » (38 px de large, sans nom
+lisible), « + Ajouter une pompe » (43,5 px de haut à la mesure du parcours,
+43,8 px à celle de l'audit) et la case « Par analogie (culture proche, pas
+la même) » de la correspondance des espèces (19 px de haut). P31c ne
+mesurait que la hauteur, arrondie au pixel, et seulement les cases posées
+directement dans leur étiquette : il ne voyait aucun des trois.
+
+**Décision.** Les trois cibles font 44 px dans les deux sens ; les flèches
+portent « Semaine précédente » et « Semaine suivante » (F272). La nouvelle
+mesure en a trouvé une quatrième, que l'audit n'avait pas vue faute
+d'alerte envoyée sur sa ferme : « Voir » dans l'historique des alertes
+(cultures et météo), 25 px de large au téléphone, porté lui aussi à 44 px. La mesure de
+P31c, partagée avec les visites guidées, prend la largeur comme la
+hauteur, au dixième de pixel, la zone élargie d'un pseudo-élément dans les
+deux sens, et toute étiquette qui contient une case, même enveloppée
+(F273). Rouge sans le code : P31c liste les quatre flèches (38,1 px de
+large) et « + Ajouter une pompe » (43,5 px). La case « Par analogie » ne
+s'affiche qu'une fois une culture choisie dans la correspondance, ce
+qu'aucun parcours ne fait : sa hauteur suit la règle CSS, sans mesure de
+parcours.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-117, D-130, D-135.
