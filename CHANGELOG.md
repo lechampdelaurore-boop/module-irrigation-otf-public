@@ -13,7 +13,8 @@ source détaillée commit par commit.
   visites, l'historique et les exports ; la liste « Ferme » donne le
   profil comme description. La petite exploitation ne propose plus que le
   début d'été et l'automne, la ferme « matériel et alertes » la nuit de gel
-  et le début d'été. Parcours V8 et V9 adaptés.
+  et le début d'été. Parcours V8 et V9 adaptés. J1 en ligne : #76,
+  déployée le 15 novembre 2026 à 19 h 54.
 - **J1, la barre de la démonstration en une ligne au téléphone** (D-143,
   F288 à F291) : à 600 px et moins, la bannière dit « Démonstration ·
   Maraîchage diversifié · Pic d'été » sur 44 px, et « Changer » ouvre

@@ -494,7 +494,9 @@ registres, elle y renvoie.
   listes, la remise à zéro et les visites, fermé à chaque page ; une visite
   qui présente un élément du détail l'ouvre ; à l'ordinateur, capture
   comparée pixel à pixel, rien ne change (F288 à F291 ; V1, V2, V6, V8
-  adaptés, V9 ajouté ; 18 parcours de la démonstration sur 18). **PR 2
+  adaptés, V9 ajouté ; 18 parcours de la démonstration sur 18), **en
+  ligne** (#76, fusionnée à 19 h 36, déployée à 19 h 54, run 43747727811,
+  cinq jobs verts). **PR 2
   sur 3, J9 et J16** (D-144) : la ferme fictive porte un seul nom, celui
   de son exploitation, tenu par le catalogue (bannière, remise à zéro,
   visites, historique et exports ; la liste donne le profil comme
