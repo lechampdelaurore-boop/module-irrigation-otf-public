@@ -7,7 +7,7 @@ import type { PlanBedOutcome, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain
 import { informationalBedCount, unplacedDeficitCount, unplacedGroups, unplacedTileDetail } from '../lib/domain/planning/action-summary.ts';
 import { planSummaryLine, unplacedFoldLabel } from '../lib/domain/planning/phone-week.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
-import { budgetValidatedNote, keepsDeficit, shortageAction, shortageDecisionPending, waterReceivedWithoutShareMm } from '../lib/domain/planning/shortage-reading.ts';
+import { budgetValidatedNote, keepsDeficit, overcommittedDayNotice, shortageAction, shortageDecisionPending, waterReceivedWithoutShareMm } from '../lib/domain/planning/shortage-reading.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
 
 /**
@@ -233,4 +233,17 @@ test('remarque 4, F255 : avec des arrosages validés, le pli du budget dit le vo
   const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
   assert.match(view, /validatedNote=\{budgetValidatedNote\(plan, formatVolume\)\}/);
   assert.match(view, /<summary>Budget d’eau d’ici dimanche, chaîne par chaîne<\/summary>\s*\{\/\*[^*]*\*\/\}\s*\{validatedNote \? <p className="planning-budgets-validated">/);
+});
+
+// Remarque 5 — le jour au-delà de sa limite journalière (F256).
+
+test('remarque 5, F256 : le jour qu’une limite posée après coup met en défaut le dit dans sa colonne ; les autres rien', () => {
+  const days = [{ date: '2026-07-07', limitCubicMeters: 1.5, committedCubicMeters: 5.06 }];
+  assert.equal(overcommittedDayNotice(days, '2026-07-07', volume), 'Limite journalière de 1,50 m³ dépassée : 5,06 m³ engagés');
+  assert.equal(overcommittedDayNotice(days, '2026-07-08', volume), null);
+  assert.equal(overcommittedDayNotice([], '2026-07-07', volume), null);
+  assert.equal(overcommittedDayNotice([{ date: '2026-07-07', limitCubicMeters: 0.01, committedCubicMeters: 0.12 }], '2026-07-07', volume), 'Limite journalière de 0,01 m³ dépassée : 0,12 m³ engagés');
+  const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
+  assert.match(view, /overcommitted=\{overcommittedDayNotice\(plan\.calculation\.summary\.overcommittedDays, day\.dateKey, formatVolume\)\}/);
+  assert.match(view, /\{overcommitted \? <p className="planning-day-overcommitted" role="note">\{overcommitted\}<\/p> : null\}/);
 });

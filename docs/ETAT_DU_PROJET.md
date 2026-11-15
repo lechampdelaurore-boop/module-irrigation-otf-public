@@ -356,7 +356,14 @@ registres, elle y renvoie.
   les 5,06 m³ déjà validés cette semaine : une part qui baisse après une
   validation ne retire pas d'eau aux planches » (« après les arrosages déjà
   validés » quand un volume validé est inconnu) (F255 ; P32 étendu ; aucune
-  migration). Ensuite la remarque 5.
+  migration), **en ligne** (#62, fusionnée à 6 h 21, déployée à
+  6 h 40). **PR 7 sur 7, remarque 5 de la recette 3.9** : la colonne
+  d'un jour qu'une limite journalière posée après coup met en défaut le
+  dit sous son en-tête, en rouge foncé, « Limite journalière de 1,50 m³
+  dépassée : 5,06 m³ engagés » (F256 ; P12 étendu ; aucune migration). Le
+  lot B est alors codé en entier ; reste sa recette sur la version
+  déployée, et le bouton « Répartir l'eau » sur « Aujourd'hui », avec le
+  lot A.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -452,6 +459,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #62 (`f93699c`, lot B de l'audit final, remarque 4 de la recette 3.9,
+  les parts comptées après l'eau validée, D-127, fusionnée à 6 h 21 et
+  déployée à 6 h 40, run 43680743916, les cinq jobs réussis, aucune
+  migration). Avant elle : la
   PR #61 (`5236e70`, lot B de l'audit final, remarque 2 de la recette 3.9,
   l'eau reçue sans part, D-126, fusionnée à 5 h 52 et déployée à
   6 h 07, run 43678652717, les cinq jobs réussis, aucune migration). Avant

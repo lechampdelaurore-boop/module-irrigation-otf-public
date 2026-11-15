@@ -50,6 +50,12 @@ source détaillée commit par commit.
   baisse après une validation ne retire pas d'eau aux planches. Affichage
   seul ; parcours P32 étendu. Remarque 2 en ligne : #61, déployée le
   15 novembre 2026 à 6 h 07.
+- **Remarque 5 de la recette 3.9, le jour au-delà de sa limite** (D-128,
+  F256) : au planning, la colonne d'un jour qu'une limite journalière posée
+  après coup met en défaut le dit sous son en-tête, en rouge foncé
+  (« Limite journalière de 1,50 m³ dépassée : 5,06 m³ engagés »).
+  Affichage seul ; parcours P12 étendu. Remarque 4 en ligne : #62, déployée
+  le 15 novembre 2026 à 6 h 40. Le lot B est codé en entier.
 
 ### Corrigé (écran de répartition)
 

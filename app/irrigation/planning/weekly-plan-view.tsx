@@ -22,7 +22,7 @@ import {
   type PlanDay,
   type PlanSummary,
 } from '@/lib/domain/planning/presentation';
-import { budgetValidatedNote, shortageAction, waterReceivedWithoutShareMm } from '@/lib/domain/planning/shortage-reading';
+import { budgetValidatedNote, overcommittedDayNotice, shortageAction, waterReceivedWithoutShareMm } from '@/lib/domain/planning/shortage-reading';
 import { hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import type { PlanningSettings } from '@/lib/domain/planning/settings';
@@ -259,7 +259,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
               const fold = folds.folds[day.dateKey];
               const expanded = dayToggles[day.dateKey] ?? fold === 'open';
               return (
-                <DayBlock key={day.dateKey} day={day} column={index} rows={rows} fold={fold} expanded={expanded} onToggle={() => setDayToggles((current) => ({ ...current, [day.dateKey]: !expanded }))} calculationId={plan.calculation.id} now={now} pending={pending} feedback={feedback} soilNotes={soilNotes} onValidateDay={validate} onValidate={(id) => validate([id])} onAdjust={adjust} onRefuse={refuse} />
+                <DayBlock key={day.dateKey} day={day} column={index} rows={rows} fold={fold} expanded={expanded} onToggle={() => setDayToggles((current) => ({ ...current, [day.dateKey]: !expanded }))} calculationId={plan.calculation.id} overcommitted={overcommittedDayNotice(plan.calculation.summary.overcommittedDays, day.dateKey, formatVolume)} now={now} pending={pending} feedback={feedback} soilNotes={soilNotes} onValidateDay={validate} onValidate={(id) => validate([id])} onAdjust={adjust} onRefuse={refuse} />
               );
             })}
           </ol>
@@ -321,7 +321,7 @@ function sameNotice(left: PlanEventNotice | null, right: PlanEventNotice | null)
   return left?.kind === right?.kind && left?.status === right?.status && left?.occurredAt === right?.occurredAt;
 }
 
-function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, now, pending, feedback, soilNotes, onValidateDay, onValidate, onAdjust, onRefuse }: {
+function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, overcommitted, now, pending, feedback, soilNotes, onValidateDay, onValidate, onAdjust, onRefuse }: {
   day: PlanDay;
   /** Le rang du jour dans la semaine, à partir de 0 : sa colonne dans le tableau. */
   column: number;
@@ -332,6 +332,8 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
   expanded: boolean;
   onToggle: () => void;
   calculationId: string;
+  /** « Limite journalière de 1,50 m³ dépassée : 5,06 m³ engagés », nul pour un jour dans sa limite (F256). */
+  overcommitted: string | null;
   now: Date;
   pending: boolean;
   feedback: Record<string, ProposalFeedback>;
@@ -358,6 +360,8 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
               ? (day.beforeHorizon ? 'Jour écoulé avant le calcul.' : 'Aucune proposition.')
               : `${counts.join(' · ')} · ${formatVolume(day.volumeCubicMeters)}${day.unknownVolumeCount > 0 ? ` + ${day.unknownVolumeCount} au volume inconnu` : ''}`}
           </small>
+          {/* Le jour qu'une limite posée après coup met en défaut le dit dans sa colonne (remarque 5 de la recette 3.9, F256). */}
+          {overcommitted ? <p className="planning-day-overcommitted" role="note">{overcommitted}</p> : null}
           {day.proposals.length > 0 ? (
             <button type="button" className="planning-day-toggle" aria-expanded={expanded} aria-controls={proposalsId} onClick={onToggle}>
               {expanded ? 'Replier le jour' : `Voir les créneaux (${day.proposals.length})`}
