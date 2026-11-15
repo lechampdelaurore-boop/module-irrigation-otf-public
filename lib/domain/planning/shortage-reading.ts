@@ -1,5 +1,6 @@
 import { cubicMetersFromLiters } from '../units.ts';
-import type { PlanBedOutcome, StoredWeeklyPlan } from './contract.ts';
+import { effectiveProposalStatus, type PlanBedOutcome, type StoredWeeklyPlan } from './contract.ts';
+import { isCanceledValidation } from './presentation.ts';
 import { uncountedWaterCount, unknownWaterChainCount, waterDeficitValue } from './water-deficit-summary.ts';
 
 /**
@@ -70,4 +71,26 @@ export function shortageAction(plan: Pick<StoredWeeklyPlan, 'calculation'>, form
  */
 export function shortageDecisionPending(plan: Pick<StoredWeeklyPlan, 'calculation'> | null): boolean {
   return plan !== null && !plan.calculation.summary.arbitration && lacksWater(plan.calculation.summary.deficit);
+}
+
+/** Sous cinq centièmes de millimètre, l'écart entre l'eau reçue et le placé est un arrondi : il ne s'écrit pas (F254). */
+const RECEIVED_TOLERANCE_MM = 0.05;
+
+/**
+ * L'eau qu'une planche reçoit au-delà de ce qui lui est placé (remarque 2 de
+ * la recette 3.9, F254) : celle que le matériel d'une voisine servie verse
+ * aussi sur elle (S16), lue dans les créneaux proposés ou validés de la
+ * semaine, hors des validées dont l'irrigation est annulée. `null` sous
+ * l'arrondi. Ni le manque, ni le placé, ni aucun total n'en changent.
+ */
+export function waterReceivedWithoutShareMm(plan: Pick<StoredWeeklyPlan, 'proposals'>, bed: Pick<PlanBedOutcome, 'bedId' | 'placedMm'>, now: Date): number | null {
+  let receivedMm = 0;
+  for (const proposal of plan.proposals) {
+    if (isCanceledValidation(proposal)) continue;
+    const status = effectiveProposalStatus(proposal, now);
+    if (status !== 'proposed' && status !== 'validated') continue;
+    for (const application of proposal.bedApplications) if (application.bedId === bed.bedId) receivedMm += application.appliedMm;
+  }
+  const beyond = receivedMm - bed.placedMm;
+  return beyond >= RECEIVED_TOLERANCE_MM ? beyond : null;
 }

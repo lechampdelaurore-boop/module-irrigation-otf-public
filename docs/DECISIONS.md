@@ -4451,3 +4451,28 @@ PR. Parcours P10 et P31 étendus.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-040, D-117, D-122, D-124.
+
+## D-126 — Audit ergonomique final, lot B : l'eau qu'une planche reçoit sans part (remarque 2)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-125 (J7). Remarque 2 de la recette 3.9.
+
+**Établi dans le code.** Le pli des planches non servies compte « Placé »
+au sens des parts (`placedMm`) ; l'eau que le matériel d'une planche servie
+verse aussi sur sa voisine (S16) est dans le créneau
+(`bedApplications[].appliedMm`), pas dans la ligne de la voisine. En
+« report », une planche reportée sous la rampe d'un bloc servi se lisait
+« 0 mm placés » alors que la rampe la mouille comme ses voisines.
+
+**Décision.** La ligne de la planche le dit dans son motif : « ; reçoit
+quand même 15 mm du matériel qui arrose ses voisines », quand l'eau des
+créneaux proposés ou validés de la semaine, hors des validées dont
+l'irrigation est annulée et des refusées, passe ce qui lui est placé d'au
+moins 0,05 mm (`waterReceivedWithoutShareMm`). Ni le manque, ni le placé,
+ni aucun total, ni aucune part ne changent (F254). Preuve : le jeu S12 du
+moteur en report (B2-9 reçoit 15 mm, à l'arrondi des secondes près).
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-052, D-117, D-125.
