@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { priorityLabel, type AllocationStatus, type IrrigationFeasibility, type PriorityFeasibility } from '@/lib/domain/irrigation-feasibility';
-import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
+import { feasibilityNoticeSource, notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { isArbitrationEditable } from '@/lib/domain/arbitration-preview';
 import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
 import { loadIrrigationFeasibilityAction, saveIrrigationArbitrationAction, type FeasibilityActionResult } from './irrigation-feasibility-actions';
@@ -41,6 +41,8 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
   const sequence = useRef(0);
   const root = useRef<HTMLElement>(null);
   const activated = useRef(false);
+  // Le nom de ce tableau dans ses propres notifications : il ne relit pas la répartition qu'il vient de valider (D-129).
+  const self = useId();
   const receive = useCallback((result: FeasibilityActionResult) => {
     if (result.ok) { setDashboard(result.dashboard); setCrops(result.crops); setError(null); setNotice(result.message); }
     else setError(result.message);
@@ -57,7 +59,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
     const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting) && !activated.current) { activated.current = true; void refresh(); } }, { rootMargin: '300px' });
     if (root.current) observer.observe(root.current);
     let timer: ReturnType<typeof setTimeout>;
-    const changed = () => { if (!activated.current) return; clearTimeout(timer); timer = setTimeout(() => void refresh(), 180); };
+    const changed = (event?: Event) => { if (!activated.current || (event && feasibilityNoticeSource(event) === self)) return; clearTimeout(timer); timer = setTimeout(() => void refresh(), 180); };
     const events = ['irrigation-feasibility-source-changed', 'irrigation-events-changed', 'irrigation-needs-source-changed'];
     events.forEach((name) => window.addEventListener(name, changed));
     const focused = () => { if (document.visibilityState === 'visible') changed(); };
@@ -65,7 +67,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
     const channel = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('irrigation-feasibility');
     if (channel) channel.onmessage = changed;
     return () => { observer.disconnect(); clearTimeout(timer); events.forEach((name) => window.removeEventListener(name, changed)); document.removeEventListener('visibilitychange', focused); channel?.close(); sequence.current += 1; };
-  }, [refresh]);
+  }, [refresh, self]);
   const head = dashboard ? feasibilityHeadTiles(dashboard) : null;
   // L'ancre de « Répartir l'eau », depuis le planning (audit final, lot B, R4, F247).
   return <section ref={root} id="repartition" className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
@@ -89,7 +91,8 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
           try {
             const result = await saveIrrigationArbitrationAction({ season, weekStart: dashboard.weekStart, priority: level.priority, selectedBedIds, expectedRevision: dashboard.revision, snapshotSignature: dashboard.snapshotSignature, requestId: crypto.randomUUID() });
             if (request === sequence.current) receive(result);
-            if (result.ok) notifyFeasibilityChanged();
+            // Le résultat porte déjà le tableau à jour : les autres blocs et onglets relisent, celui-ci non (D-129).
+            if (result.ok) notifyFeasibilityChanged(self);
           } catch { setError('La répartition n’a pas pu être enregistrée. Recalculez avant de réessayer.'); }
           finally { if (request === sequence.current) setPending(false); }
         }} />
