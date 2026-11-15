@@ -4904,3 +4904,35 @@ Aucune migration ; aucun calcul ni compte ne change (la pastille du menu
 compte comme avant, F12).
 
 Ne changent pas : D-003, D-073, D-074.
+
+## D-142 — Tranche 4 : le contrat est validé, ordre fixé, sous-tranche 4.8 ajoutée
+
+Date : 15 novembre 2026. Décideur : le porteur, qui a validé le contrat le
+15 novembre 2026 à 15 h 30 ; les points non réservés suivent l'option
+recommandée, modifiables par lui. Aucun code.
+
+**Décision.** Contrat `docs/tranche-4-contract.md` (T4-01 à T4-20). Ordre :
+préparation sans code (inventaire du propre à la ferme, mesure des appels à
+OTF par jour, conditions d'OTF) ; **4.8 site définitif et politique de
+confidentialité** (nouvelle sous-tranche, elle débloque le formulaire
+d'OTF) ; envoi du formulaire par le porteur ; 4.1 et 4.2 (identité de ferme
+et isolation prouvée) ; 4.3 (OAuth en lecture seule, clé personnelle en
+secours) ; 4.4 ; 4.5 ; 4.6 (pilote). 4.7 est absorbée par 4.1 à 4.3.
+Réglages : ceux de la roadmap ; 4.8 : contrat Sonnet 5.5 · Moyen, code
+Opus 5.5 · Élevé.
+
+**Tranché par le porteur (budget, jamais par une recommandation générale).**
+Adresse gratuite `workers.dev`, pas de domaine payant ; hébergement gratuit
+des fermes amies pendant le pilote ; pilote avec des fermes amies qu'il
+contacte lui-même ; relecture juridique gratuite par son réseau, plus tard,
+et **aucune ferme tierce reliée avant elle**.
+
+**Établi à corriger.** Le droit « Interventions » est nécessaire (`/actionList`,
+`/taskList`). **Non établi** : consommation quotidienne réelle d'appels à OTF
+(estimée à 20 à 25 par lecture complète, plafond de 100 par jour sur l'offre
+« Gestion »), correspondance route et droit, conditions écrites d'OTF.
+
+La fusion des moteurs n'est pas touchée ; aucun code de Tranche 4 avant
+elle, sauf ce que la roadmap autorise.
+
+Ne changent pas : D-001, D-003, D-066, D-096.
