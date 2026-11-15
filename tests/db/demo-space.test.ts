@@ -20,6 +20,12 @@ import { listWaterInfrastructureForUser } from '../../db/water-resource-reposito
 import { installSimulatedDate, runOnSimulatedDay, uninstallSimulatedDate } from '../../lib/services/demo-clock';
 import { listHydricGoalsForUser, listWeatherDailyValuesForUser } from '../../db/water-management-repository';
 import { getFeatureSelectionForUser } from '../../lib/services/feature-selection-service';
+import { listWeatherAlertCriteriaForWorkspace, listWeatherAlertForecastDays } from '../../db/weather-alert-repository';
+import { resetDemoSpace } from '../../lib/services/demo-reset';
+import { FROST_TEMPLATE } from '../../lib/domain/weather/weather-alert-templates';
+import { evaluateWeatherAlertCriterion } from '../../lib/domain/weather/weather-alerts';
+import { weekStartDateKey } from '../../lib/domain/water-management';
+import { getBedCropWaterSheetForUser } from '../../lib/services/crop-water-bed';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 
 /**
@@ -231,6 +237,51 @@ test('chaque ferme et chaque moment se préparent sans erreur', async () => {
       const started = Date.now();
       await prepareOnMoment('invite-c', profile.id, moment.id);
       assert.ok(Date.now() - started < 10_000, `${profile.id} · ${moment.id}`);
+    }
+  }
+});
+
+// --- Le jeu de données complété (audit ergonomique final, lot F, section 5) ---
+
+test('F295 : la ferme « matériel et alertes » a posé le modèle de gel, et sa nuit de gel le déclenche ; la remise à zéro le rend', async () => {
+  const { choice, owner } = await prepareOnMoment('invite-a', 'vannes-alertes', 'gel-printemps');
+  const criteria = await listWeatherAlertCriteriaForWorkspace(await workspaceOf(owner));
+  assert.equal(criteria.length, 1);
+  const { id, version, ...settings } = criteria[0];
+  assert.ok(id && version === 1);
+  assert.deepEqual(settings, FROST_TEMPLATE.settings, 'le modèle de la page « Alertes météo », tel quel');
+  const today = choice.moment.dateKey;
+  const forecasts = await listWeatherAlertForecastDays(await workspaceOf(owner), 'otf:valence:26000', today, addDaysToDateKey(today, 6));
+  const { crossings } = evaluateWeatherAlertCriterion({ criterion: criteria[0], forecasts, today, alertedDates: new Set() });
+  assert.ok(crossings.length > 0, 'la nuit de gel déclenche l’alerte');
+  assert.ok(crossings.every((crossing) => crossing.value < FROST_TEMPLATE.settings.threshold));
+
+  // Cas 9 : « Remettre à zéro » rend le jeu complété.
+  await runOnSimulatedDay(today, () => resetDemoSpace(owner));
+  assert.equal((await listWeatherAlertCriteriaForWorkspace(await workspaceOf(owner))).length, 1);
+});
+
+test('F295 : seule la ferme qui le coche sans le gel des cultures a une alerte météo posée d’avance', async () => {
+  for (const { profile, moment } of [{ profile: 'maraichage', moment: 'gel-printemps' }, { profile: 'petite-ferme', moment: 'ete' }, { profile: 'vannes-alertes', moment: 'ete' }]) {
+    const { owner } = await prepareOnMoment('invite-b', profile, moment);
+    const expected = profile === 'vannes-alertes' ? 1 : 0;
+    assert.equal((await listWeatherAlertCriteriaForWorkspace(await workspaceOf(owner))).length, expected, `${profile} · ${moment}`);
+  }
+});
+
+test('F296 : à chaque moment du maraîchage, toute planche cultivée a son objectif proposé et adopté ; aucun objectif pour la ferme entière', async () => {
+  for (const moment of DEMO_PROFILES[0].moments) {
+    const { choice, owner } = await prepareOnMoment('invite-c', 'maraichage', moment.id);
+    const weekStart = weekStartDateKey(choice.moment.dateKey);
+    const goals = await listHydricGoalsForUser(owner, 2026, weekStart);
+    assert.ok(goals.every((goal) => goal.scopeType === 'bed'), `${moment.id} : aucun objectif hors planche`);
+    const withGoal = new Set(goals.map((goal) => goal.otfBedId));
+    assert.ok(withGoal.size > 0, moment.id);
+    // Une planche sans objectif est une planche où rien ne pousse cette semaine-là.
+    const snapshot = demoFarmSnapshot('maraichage', choice.moment.dateKey);
+    for (const bed of snapshot.beds.filter((item) => !withGoal.has(item.id))) {
+      const sheet = await runOnSimulatedDay(choice.moment.dateKey, () => getBedCropWaterSheetForUser({ ownerUserId: owner, season: 2026, snapshot, bedId: bed.id, now: new Date(`${choice.moment.dateKey}T08:00:00.000Z`) }));
+      assert.ok(sheet.available && sheet.bed.week.status === 'no-crop', `${moment.id} : ${bed.id} sans objectif alors qu’une culture y pousse`);
     }
   }
 });

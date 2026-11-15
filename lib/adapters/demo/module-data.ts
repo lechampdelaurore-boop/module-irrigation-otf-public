@@ -1,3 +1,5 @@
+import type { WeatherAlertTemplate } from '../../domain/weather/weather-alert-templates.ts';
+
 /**
  * Ce que chaque ferme fictive a déjà réglé dans le module à sa première
  * ouverture (docs/demo-guided-contract.md, section 6 ; D2) : le rattachement
@@ -123,4 +125,16 @@ export const DEMO_HISTORY_MINUTES_BY_MONTH: Readonly<Record<string, number>> = {
   '08': 150,
   '09': 90,
   '10': 45,
+};
+
+/**
+ * Les alertes météo que la ferme a déjà posées (audit ergonomique final,
+ * lot F, docs/audit-ergonomie-final-lot-f-contract.md, section 5 ; F295) :
+ * des modèles de la page « Alertes météo », posés par le même geste qu'un
+ * clic sur le modèle puis « Enregistrer l'alerte », jamais une règle écrite
+ * ici. La ferme « matériel et alertes », qui coche les alertes météo sans le
+ * gel des cultures, a posé le gel : sa nuit de gel déclenche l'alerte.
+ */
+export const DEMO_WEATHER_ALERT_TEMPLATES: Readonly<Record<string, readonly WeatherAlertTemplate['key'][]>> = {
+  'vannes-alertes': ['frost'],
 };

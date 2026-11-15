@@ -7,6 +7,12 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot F, la démonstration)
 
+- **Le jeu de données complété** (D-145, F295, F296) : la ferme « matériel
+  et alertes » a posé d'avance l'alerte « Gel : moins de 3 °C », que sa
+  nuit de gel déclenche ; aucun objectif « ferme entière » n'est inventé
+  (choix du porteur), toute planche cultivée ayant déjà le sien. Parcours
+  V10 ajouté. Le lot F est codé en entier. J9 et J16 en ligne : #77,
+  déployée le 15 novembre 2026 à 20 h 32.
 - **J9 et J16, un seul nom pour la ferme, des moments qui ont un sens**
   (D-144, F292 à F294) : la ferme fictive porte le nom de son exploitation
   (« Ferme des Trois Noues ») dans la bannière, la remise à zéro, les

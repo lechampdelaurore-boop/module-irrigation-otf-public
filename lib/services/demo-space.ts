@@ -1,12 +1,14 @@
 import { DEMO_FARMS, demoFarmSnapshot } from '../adapters/demo/farms.ts';
-import { DEMO_FROST_COMMON_KEYS, DEMO_SPECIES_REFERENCES } from '../adapters/demo/module-data.ts';
+import { DEMO_FROST_COMMON_KEYS, DEMO_SPECIES_REFERENCES, DEMO_WEATHER_ALERT_TEMPLATES } from '../adapters/demo/module-data.ts';
 import { adoptionRevision } from '../domain/crop-water/proposal.ts';
 import type { DemoChoice } from '../domain/demo/catalogue.ts';
 import type { IrrigationSnapshot } from '../domain/domain.ts';
+import { weatherAlertTemplates } from '../domain/weather/weather-alert-templates.ts';
 import { saveFrostLinkForUser } from '@/db/crop-alerts/inputs';
 import { saveAdoptedGoalForUser } from '@/db/crop-water/adoptions';
 import { saveSpeciesCorrespondenceForUser } from '@/db/crop-water/entries';
 import { readFeatureSelectionForUser, saveFeatureSelectionForUser } from '@/db/feature-selection-repository';
+import { createWeatherAlertCriterionForUser } from '@/db/weather-alert-repository';
 import { createWorkspaceIfAbsent } from '@/db/workspace-repository';
 import { getBedCropWaterSheetForUser } from './crop-water-bed.ts';
 import { isDemoDeployment } from './deployment-mode.ts';
@@ -20,7 +22,8 @@ import { computeWeeklyPlanForUser } from './planning-service.ts';
  * ouverture avec ce que la ferme a déjà réglé (ses cases cochées, ses
  * espèces rattachées aux cultures de référence et aux seuils de gel du jeu
  * commun, son matériel et son eau, ses arrosages passés, la météo des
- * semaines passées, les objectifs proposés par le module et adoptés, le plan
+ * semaines passées, les alertes météo qu'elle a posées, les objectifs
+ * proposés par le module et adoptés, le plan
  * de la semaine calculé), par les dépôts ordinaires, comme si la ferme l'avait
  * saisi. La ferme vierge n'a pas d'espace tant que l'invité n'a rien coché :
  * c'est ainsi qu'une ferme qui n'a jamais ouvert le module arrive sur la
@@ -50,6 +53,7 @@ async function seedDemoSpace(ownerUserId: string, choice: DemoChoice): Promise<v
   await saveSpecies(ownerUserId, choice, now);
   await seedDemoEquipment(ownerUserId, choice, snapshot);
   await seedDemoWeather(ownerUserId, snapshot, choice.moment.dateKey, now);
+  await saveWeatherAlerts(ownerUserId, choice, now);
   if (choice.profile.features.includes('cultures')) await adoptProposals(ownerUserId, snapshot, now);
   // Le calcul du matin, que la tâche de nuit aurait fait pour une vraie ferme.
   if (choice.profile.features.includes('planning')) {
@@ -80,6 +84,13 @@ async function waitUntilPrepared(ownerUserId: string): Promise<void> {
  * cultivée (Kc du catalogue × ETP de la météo de la démonstration), adoptée
  * comme la ferme le ferait d'un clic dans « Besoin par culture ». Aucun
  * chiffre saisi : une planche sans proposition complète reste sans objectif.
+ *
+ * Recensé au code (lot F, F296) : à chacun des quatre moments du maraîchage,
+ * toute planche cultivée reçoit sa proposition ; seules restent sans
+ * objectif les planches où rien ne pousse cette semaine-là. Le module ne
+ * propose aucun objectif pour la ferme entière : en poser un demanderait un
+ * chiffre saisi, une valeur agronomique, et il s'appliquerait aussi aux
+ * planches vides. Aucun n'est inventé.
  */
 async function adoptProposals(ownerUserId: string, snapshot: IrrigationSnapshot, now: Date): Promise<void> {
   const season = snapshot.configuration.seasonFirst;
@@ -88,6 +99,19 @@ async function adoptProposals(ownerUserId: string, snapshot: IrrigationSnapshot,
     if (!sheet.available || !sheet.weekOpen) continue;
     const revision = adoptionRevision(sheet.bed.week, bed, now.toISOString());
     if (revision) await saveAdoptedGoalForUser(ownerUserId, season, revision);
+  }
+}
+
+/**
+ * Les alertes météo que la ferme a posées d'avance (F295) : le modèle de la
+ * page « Alertes météo », enregistré tel quel, comme la ferme le ferait d'un
+ * clic sur le modèle puis « Enregistrer l'alerte ».
+ */
+async function saveWeatherAlerts(ownerUserId: string, choice: DemoChoice, now: Date): Promise<void> {
+  if (!choice.profile.features.includes('alertes-meteo')) return;
+  const keys = DEMO_WEATHER_ALERT_TEMPLATES[choice.profile.id] ?? [];
+  for (const template of weatherAlertTemplates(0).filter((item) => keys.includes(item.key))) {
+    await createWeatherAlertCriterionForUser(ownerUserId, template.settings, now);
   }
 }
 

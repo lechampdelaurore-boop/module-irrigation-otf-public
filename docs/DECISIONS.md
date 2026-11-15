@@ -4991,3 +4991,26 @@ Aucune migration ; aucun garde-fou de la démonstration ne change (D-103 à
 D-106) ; les dates des moments et l'heure simulée ne changent pas.
 
 Ne changent pas : D-096, D-104, D-143.
+
+## D-145 — Audit ergonomique final, lot F : le jeu de la démonstration complété (choix n° 4)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur (D-137, toutes les
+recommandations du contrat du lot F retenues ; la question agronomique de
+l'objectif « ferme entière », posée le jour même, tranchée par lui à
+19 h 42 : « Non, rien d'inventé »). Après D-144.
+
+**Décision** (F295 et F296, contrat `docs/audit-ergonomie-final-lot-f-contract.md`,
+sections 5 et 5 bis) : la ferme « matériel et alertes » a posé d'avance le
+modèle « Gel : moins de 3 °C » de la page « Alertes météo », enregistré tel
+quel par le même dépôt que le geste de la page, jamais une règle écrite en
+dur ; sa nuit de gel le déclenche, et la remise à zéro le rend (F295).
+Aucun objectif n'est posé sur le périmètre « ferme entière » : le module
+n'en propose pas, et un chiffre saisi serait une valeur agronomique
+inventée, appliquée aussi aux planches vides ; toute planche cultivée a
+déjà son objectif proposé et adopté, à chaque moment (F296). Aucune
+fonctionnalité n'est ajoutée à un profil.
+
+Aucune migration ; aucun garde-fou de la démonstration ne change ; rien
+ne touche la ferme réelle.
+
+Ne changent pas : D-096, D-104, D-106, D-140.
