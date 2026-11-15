@@ -342,7 +342,14 @@ registres, elle y renvoie.
   5 sans objectif », et leur groupe passe en dernier, sans couleur d'alerte
   ; au téléphone, une ligne compacte par planche, « A01 · Abri des noues ·
   manque 3,6 mm sur 10,9 mm », le motif dessous (F251 à F253 ; P10 et P31
-  étendus ; aucune migration). Ensuite la remarque 2.
+  étendus ; aucune migration), **en ligne** (#60, fusionnée à 5 h 20,
+  déployée à 5 h 36). **PR 5 sur 7, remarque 2 de la recette 3.9** : la
+  ligne d'une planche non servie dit l'eau qu'elle reçoit quand même du
+  matériel qui arrose ses voisines servies (« ; reçoit quand même 15 mm du
+  matériel qui arrose ses voisines »), lue dans les créneaux proposés ou
+  validés de la semaine, au-delà de ce qui lui est placé d'au moins
+  0,05 mm ; ni le manque, ni le placé, ni aucun total ne changent (F254 ;
+  aucune migration). Ensuite la remarque 4.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -438,6 +445,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #60 (`0470ff0`, lot B de l'audit final, J7, seules les planches en
+  manque se comptent en rouge, D-125, fusionnée à 5 h 20 et déployée à
+  5 h 36, run 43676320767, les cinq jobs réussis, aucune migration). Avant
+  elle : la
   PR #59 (`73b6ba3`, lot B de l'audit final, R5, la culture sur la ligne
   de la planche, D-124, fusionnée à 4 h 44 et déployée à 5 h 03, run
   43673674817, les cinq jobs réussis, aucune migration). Avant elle : la

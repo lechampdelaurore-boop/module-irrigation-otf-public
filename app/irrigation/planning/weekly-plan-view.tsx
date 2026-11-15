@@ -22,7 +22,7 @@ import {
   type PlanDay,
   type PlanSummary,
 } from '@/lib/domain/planning/presentation';
-import { shortageAction } from '@/lib/domain/planning/shortage-reading';
+import { shortageAction, waterReceivedWithoutShareMm } from '@/lib/domain/planning/shortage-reading';
 import { hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import type { PlanningSettings } from '@/lib/domain/planning/settings';
@@ -192,6 +192,8 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
   const summary = useMemo(() => (plan ? summarizePlan(plan, now) : null), [plan, now]);
   const unplaced = useMemo(() => (plan ? unplacedBeds(plan) : []), [plan]);
   const groups = useMemo(() => unplacedGroups(unplaced), [unplaced]);
+  // L'eau qu'une planche non servie reçoit quand même du matériel de ses voisines (remarque 2 de la recette 3.9, F254).
+  const received = useMemo(() => new Map(plan ? unplaced.map((bed) => [bed.bedId, waterReceivedWithoutShareMm(plan, bed, now)] as const) : []), [plan, unplaced, now]);
   const actions = useMemo(() => (plan && summary ? planActionCounts(plan, summary, initialSettings.lateToleranceMinutes, now) : null), [plan, summary, initialSettings.lateToleranceMinutes, now]);
   const weekProposed = plan ? proposedIds(plan.proposals, now) : [];
 
@@ -262,7 +264,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
             })}
           </ol>
 
-          <UnplacedList beds={unplaced} groups={groups} season={season} />
+          <UnplacedList beds={unplaced} groups={groups} season={season} received={received} />
         </>
       )}
 
@@ -479,7 +481,7 @@ function BudgetList({ budgets }: { budgets: readonly SupplyBudget[] }) {
  * au-dessus du pli, jamais comme un manque d'eau. Une liste vide dit en une
  * phrase que tout est servi.
  */
-function UnplacedList({ beds, groups, season }: { beds: readonly PlanBedOutcome[]; groups: UnplacedGroups; season: number }) {
+function UnplacedList({ beds, groups, season, received }: { beds: readonly PlanBedOutcome[]; groups: UnplacedGroups; season: number; received: ReadonlyMap<string, number | null> }) {
   if (beds.length === 0) {
     return (
       <div className="planning-unplaced" data-tour="planning-non-servies">
@@ -521,7 +523,7 @@ function UnplacedList({ beds, groups, season }: { beds: readonly PlanBedOutcome[
                     <td data-label="Besoin" data-cell="need">{mmLabel(bed.needMm)}</td>
                     <td data-label="Placé" data-cell="placed">{mmLabel(bed.placedMm)}</td>
                     <td data-label="Manque" data-cell="deficit">{mmLabel(bed.deficitMm)}<span className="planning-unplaced-of"> sur {mmLabel(bed.needMm)}</span><FigureOrigin text={unplacedOrigin(bed)} /></td>
-                    <td data-label="Motif" data-cell="reason" title={unplacedReasonsExpertNote(bed.reasons) ?? undefined}>{bed.reasons.length === 0 ? 'manque partiel, faute de place' : bedReasonLabels(bed).join(' ; ')}</td>
+                    <td data-label="Motif" data-cell="reason" title={unplacedReasonsExpertNote(bed.reasons) ?? undefined}>{bed.reasons.length === 0 ? 'manque partiel, faute de place' : bedReasonLabels(bed).join(' ; ')}{receivedNote(received.get(bed.bedId) ?? null)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -531,6 +533,11 @@ function UnplacedList({ beds, groups, season }: { beds: readonly PlanBedOutcome[
       </details>
     </div>
   );
+}
+
+/** « ; reçoit quand même 24,6 mm du matériel qui arrose ses voisines » : l'eau versée sans part, dite sur la ligne (F254). */
+function receivedNote(receivedMm: number | null): string {
+  return receivedMm === null ? '' : ` ; reçoit quand même ${mmLabel(receivedMm)} du matériel qui arrose ses voisines`;
 }
 
 const mmFormatter = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });

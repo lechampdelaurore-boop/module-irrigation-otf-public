@@ -48,7 +48,7 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
  * replacé ou le dit non placé (statuts du contrat : « l'irrigation validée a
  * vécu ; le plan lit le réel » ; recette réelle du 31 octobre 2026).
  */
-function isCanceledValidation(proposal: Pick<StoredProposal, 'status' | 'irrigationStatus'>): boolean {
+export function isCanceledValidation(proposal: Pick<StoredProposal, 'status' | 'irrigationStatus'>): boolean {
   return proposal.status === 'validated' && proposal.irrigationStatus === 'canceled';
 }
 

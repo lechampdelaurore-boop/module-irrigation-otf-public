@@ -7,7 +7,7 @@ import type { PlanBedOutcome, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain
 import { informationalBedCount, unplacedDeficitCount, unplacedGroups, unplacedTileDetail } from '../lib/domain/planning/action-summary.ts';
 import { planSummaryLine, unplacedFoldLabel } from '../lib/domain/planning/phone-week.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
-import { keepsDeficit, shortageAction, shortageDecisionPending } from '../lib/domain/planning/shortage-reading.ts';
+import { keepsDeficit, shortageAction, shortageDecisionPending, waterReceivedWithoutShareMm } from '../lib/domain/planning/shortage-reading.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
 
 /**
@@ -189,4 +189,27 @@ test('J7, F253 : au téléphone, une ligne compacte par planche, la priorité no
   assert.match(phone, /td\[data-cell="deficit"\]::before \{\s*content: "· manque ";/);
   assert.match(phone, /td\[data-cell="reason"\] \{\s*flex-basis: 100%;/);
   assert.match(sheet, /^\.planning-unplaced-of \{\s*display: none;/m, 'à l’ordinateur, la colonne « Besoin » le dit');
+});
+
+// Remarque 2 de la recette 3.9 — l'eau qu'une planche reçoit sans part (F254).
+
+test('remarque 2, F254 : en report (S12), une planche reportée sous la rampe d’un bloc servi dit les 15 mm qu’elle reçoit quand même ; les autres rien', () => {
+  const inputs = farm({ extraTunnels: true, forageFlow: 0, reservoirCubicMeters: 12, priorities: { 'tunnel-1': 'high', 'tunnel-2': 'high', 'tunnel-3': 'low', 'tunnel-4': 'low' } }).inputs;
+  const plan = stored(buildWeeklyPlan(inputs, { ...settings, shortageStrategy: 'defer' }));
+  const now = new Date(plan.calculation.computedAt);
+  const bed = (id: string) => plan.calculation.summary.beds.find((item) => item.bedId === id)!;
+  // B2-9, reportée : rien de placé à sa part, et la rampe du bloc 2 la mouille comme ses voisines servies.
+  assert.deepEqual([bed('B2-9').reasons, bed('B2-9').placedMm, bed('B2-9').deficitMm], [['deferred'], 0, 20]);
+  assert.ok(Math.abs((waterReceivedWithoutShareMm(plan, bed('B2-9'), now) ?? 0) - 15) < 0.01, 'les 15 mm de la rampe, à l’arrondi des secondes près');
+  assert.equal(bed('B2-9').deficitMm, 20, 'le manque ne change pas');
+  // Une planche servie à sa part, et une reportée sous un matériel qui ne part pas : rien à dire.
+  assert.equal(waterReceivedWithoutShareMm(plan, bed('B2-1'), now), null);
+  assert.equal(waterReceivedWithoutShareMm(plan, bed('T3-2'), now), null);
+  // Une validée dont l'irrigation est annulée ne compte plus ; une refusée non plus.
+  const off = (status: 'refused' | 'validated', irrigationStatus: 'canceled' | null) => ({ ...plan, proposals: plan.proposals.map((proposal) => ({ ...proposal, status, irrigationStatus })) });
+  assert.equal(waterReceivedWithoutShareMm(off('validated', 'canceled'), bed('B2-9'), now), null);
+  assert.equal(waterReceivedWithoutShareMm(off('refused', null), bed('B2-9'), now), null);
+  assert.ok((waterReceivedWithoutShareMm(off('validated', null), bed('B2-9'), now) ?? 0) > 14.9, 'une validée compte');
+  const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
+  assert.match(view, /` ; reçoit quand même \$\{mmLabel\(receivedMm\)\} du matériel qui arrose ses voisines`/);
 });

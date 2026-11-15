@@ -37,6 +37,12 @@ source détaillée commit par commit.
   « A01 · Abri des noues · manque 3,6 mm sur 10,9 mm », le motif dessous.
   Affichage seul ; parcours P10 et P31 étendus. R5 en ligne : #59, déployée
   le 15 novembre 2026 à 5 h 03.
+- **Remarque 2 de la recette 3.9, l'eau reçue sans part** (D-126, F254) :
+  au planning, la ligne d'une planche non servie dit l'eau que le matériel
+  qui arrose ses voisines lui verse quand même (« reçoit quand même 15 mm
+  du matériel qui arrose ses voisines »). Ni le manque, ni le placé, ni
+  aucun total ne changent. Affichage seul. J7 en ligne : #60, déployée le
+  15 novembre 2026 à 5 h 36.
 
 ### Corrigé (écran de répartition)
 
