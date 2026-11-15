@@ -17,6 +17,8 @@ registres, elle y renvoie.
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
   4.5, 4.6. Adresse gratuite `workers.dev` ; aucune ferme tierce avant la
   relecture de la confidentialité. La fusion des moteurs passe d'abord.
+  Consigné par #75 (fusionnée à 18 h 56, déployée à 19 h 16, run
+  43743907175, cinq jobs verts).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
