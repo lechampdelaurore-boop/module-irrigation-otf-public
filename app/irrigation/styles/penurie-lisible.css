@@ -83,3 +83,77 @@
   font-weight: 600;
   overflow-wrap: anywhere;
 }
+
+/* J7 : un groupe sans manque (« Sans objectif ») se dit en simple information, sans alerte (F252). */
+.planning-unplaced-group[data-informational] h4 {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* J7 : « sur 10,9 mm » ne s'écrit qu'au téléphone, où la colonne « Besoin » se replie dans la ligne compacte (F253). */
+.planning-unplaced-of {
+  display: none;
+}
+
+/*
+  J7 : au téléphone, une ligne compacte par planche (F253) : « A01 · Abri des
+  noues · manque 3,6 mm sur 10,9 mm », son « i », puis le motif dessous ; la
+  priorité seulement quand elle n'est pas normale ; « Placé » à l'ordinateur
+  seulement. Le même tableau, redessiné : un lecteur d'écran lit toujours ses
+  colonnes.
+*/
+@media (max-width: 760px) {
+  .planning-unplaced-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .1rem .35rem;
+    padding: .45rem .7rem;
+  }
+
+  .planning-unplaced-table tbody th,
+  .planning-unplaced-table td {
+    width: auto;
+    padding: 0;
+    background: none;
+  }
+
+  .planning-unplaced-table tbody th {
+    color: var(--ink, inherit);
+    font-weight: 750;
+  }
+
+  .planning-unplaced-table td::before {
+    content: none;
+  }
+
+  .planning-unplaced-table td[data-cell="plot"]::before {
+    content: "· ";
+  }
+
+  .planning-unplaced-table td[data-cell="priority"]::before {
+    content: "· priorité ";
+  }
+
+  .planning-unplaced-table td[data-cell="priority"][data-priority="normal"],
+  .planning-unplaced-table td[data-cell="need"],
+  .planning-unplaced-table td[data-cell="placed"],
+  .planning-unplaced-table tr[data-informational] td[data-cell="deficit"] {
+    display: none;
+  }
+
+  .planning-unplaced-table td[data-cell="deficit"]::before {
+    content: "· manque ";
+  }
+
+  .planning-unplaced-table td[data-cell="deficit"] .planning-unplaced-of {
+    display: inline;
+  }
+
+  .planning-unplaced-table td[data-cell="reason"] {
+    flex-basis: 100%;
+    color: var(--muted);
+    font-size: .8rem;
+    line-height: 1.4;
+  }
+}

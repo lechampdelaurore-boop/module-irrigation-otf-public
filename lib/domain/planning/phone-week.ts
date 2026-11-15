@@ -74,8 +74,10 @@ const plural = (count: number, singular: string, pluralForm = `${singular}s`) =>
  * ergonomique, lot 3, point 5, précision F48) ; le titre reprend celui de la
  * tuile du résumé.
  */
-export function unplacedFoldLabel(unplacedCount: number): string {
-  return `Planches non servies (${unplacedCount})`;
+export function unplacedFoldLabel(unplacedCount: number, informationalCount = 0): string {
+  // Les planches sans manque, dites à part, sans entrer dans le compte (audit final, lot B, J7, F251).
+  if (informationalCount === 0) return `Planches non servies (${unplacedCount})`;
+  return unplacedCount === 0 ? `Planches sans objectif (${informationalCount})` : `Planches non servies (${unplacedCount}) · ${informationalCount} sans objectif`;
 }
 
 /**

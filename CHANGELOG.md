@@ -29,6 +29,14 @@ source détaillée commit par commit.
   l'infobulle. Affichage seul ; parcours P7 étendu. Le correctif de
   l'écran de répartition en ligne : #58, déployée le 15 novembre 2026 à
   4 h 26.
+- **J7, seules les planches en manque se comptent en rouge** (D-125, F251
+  à F253) : la tuile, la ligne du téléphone et le titre du pli des planches
+  non servies ne comptent plus celles qui n'ont rien à recevoir (« Sans
+  objectif ») ; elles sont dites à part, pour information, et leur groupe
+  passe en dernier. Au téléphone, chaque planche tient sur une ligne,
+  « A01 · Abri des noues · manque 3,6 mm sur 10,9 mm », le motif dessous.
+  Affichage seul ; parcours P10 et P31 étendus. R5 en ligne : #59, déployée
+  le 15 novembre 2026 à 5 h 03.
 
 ### Corrigé (écran de répartition)
 

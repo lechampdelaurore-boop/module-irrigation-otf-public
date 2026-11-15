@@ -120,6 +120,9 @@ export function planActionLine(counts: PlanActionCounts): string[] {
 // Les planches non servies, rangées par motif
 // ---------------------------------------------------------------------------
 
+/** Sous un centième de millimètre, le manque est un arrondi, pas un manque. */
+const NEGLIGIBLE_DEFICIT_MM = 0.01;
+
 /** Le motif d'un groupe : celui de la planche, ou un manque partiel faute de place. */
 export type UnplacedGroupKey = UnplacedReason | 'partial';
 
@@ -150,6 +153,12 @@ type UnplacedGroup = {
   /** « Sans matériel (38) ». */
   title: string;
   beds: PlanBedOutcome[];
+  /**
+   * Aucune de ses planches ne garde de manque (« Sans objectif ») : un groupe
+   * dit en simple information, en dernier, jamais compté en rouge (audit
+   * final, lot B, J7, F251 et F252).
+   */
+  informational: boolean;
 };
 
 export type UnplacedGroups = {
@@ -192,15 +201,15 @@ export function unplacedGroups(beds: readonly PlanBedOutcome[]): UnplacedGroups 
     byKey.set(key, [...(byKey.get(key) ?? []), bed]);
   }
   const order = Object.keys(GROUP_TITLES) as UnplacedGroupKey[];
+  // Un groupe sans manque se dit pour information ; les planches sans matériel, un réglage à faire, jamais (cas 2).
+  const informational = (key: UnplacedGroupKey, grouped: readonly PlanBedOutcome[]) => key !== 'no-equipment' && grouped.every((bed) => bed.deficitMm < NEGLIGIBLE_DEFICIT_MM);
+  // Les groupes sans manque passent en dernier (F252) ; sinon, le plus gros d'abord, puis l'ordre des motifs.
   const groups = [...byKey.entries()]
-    .sort(([leftKey, left], [rightKey, right]) => right.length - left.length || order.indexOf(leftKey) - order.indexOf(rightKey))
-    .map(([key, grouped]) => ({ key, title: `${GROUP_TITLES[key]} (${grouped.length})`, beds: grouped }));
+    .sort(([leftKey, left], [rightKey, right]) => Number(informational(leftKey, left)) - Number(informational(rightKey, right)) || right.length - left.length || order.indexOf(leftKey) - order.indexOf(rightKey))
+    .map(([key, grouped]) => ({ key, title: `${GROUP_TITLES[key]} (${grouped.length})`, beds: grouped, informational: informational(key, grouped) }));
   const noEquipment = byKey.get('no-equipment')?.length ?? 0;
   return { noEquipment: noEquipment > 0 ? noEquipmentAction(noEquipment) : null, groups };
 }
-
-/** Sous un centième de millimètre, le manque est un arrondi, pas un manque. */
-const NEGLIGIBLE_DEFICIT_MM = 0.01;
 
 /**
  * Le détail de la tuile « Planches non servies » : les planches sans matériel
@@ -208,6 +217,10 @@ const NEGLIGIBLE_DEFICIT_MM = 0.01;
  * nombre de planches au manque chiffré, comme avant.
  */
 export function unplacedTileDetail(groups: UnplacedGroups, bedsWithDeficit: number): string {
+  return `${deficitTileDetail(groups, bedsWithDeficit)}${informationalText(groups)}`;
+}
+
+function deficitTileDetail(groups: UnplacedGroups, bedsWithDeficit: number): string {
   if (!groups.noEquipment) return `${bedsWithDeficit} avec un manque chiffré`;
   const others = groups.groups
     .filter((group) => group.key !== 'no-equipment')
@@ -216,9 +229,32 @@ export function unplacedTileDetail(groups: UnplacedGroups, bedsWithDeficit: numb
   return others === 0 ? withoutEquipment : `${withoutEquipment} · ${plural(others, 'autre', 'autres')} avec un manque chiffré`;
 }
 
+/** « · 5 sans objectif, pour information » : les planches sans manque, dites à part, jamais en rouge (F251). */
+function informationalText(groups: UnplacedGroups): string {
+  const count = informationalBedCount(groups);
+  return count === 0 ? '' : ` · ${count} sans objectif, pour information`;
+}
+
+/**
+ * Les planches non servies des groupes qui gardent un manque, planches sans
+ * matériel comprises : le compte rouge de la tuile, de la ligne du téléphone
+ * et du titre du pli (audit final, lot B, J7, F251). Celles des groupes qui
+ * n'ont rien à recevoir n'y entrent pas.
+ */
+export function unplacedDeficitCount(groups: UnplacedGroups): number {
+  return groups.groups.reduce((count, group) => count + (group.informational ? 0 : group.beds.length), 0);
+}
+
+/** Les planches des groupes sans manque (« Sans objectif ») : dites en simple information (F251). */
+export function informationalBedCount(groups: UnplacedGroups): number {
+  return groups.groups.reduce((count, group) => count + (group.informational ? group.beds.length : 0), 0);
+}
+
 /** Ce qu'une planche non servie de ce groupe signifie, en une phrase, sous son titre. */
 export const UNPLACED_GROUP_MEANING: Partial<Record<UnplacedGroupKey, string>> = {
   'no-equipment': 'Aucun matériel posé ne les arrose : c’est un réglage à faire dans « Matériel », pas un manque d’eau.',
+  // Pour information : ces planches n'ont rien à recevoir cette semaine (audit final, lot B, J7, F252).
+  'no-objective': 'Aucun objectif ne s’applique à elles cette semaine : rien à leur donner, pour information.',
   'water-budget': 'Le stock et les ressources ne suffisent pas d’ici dimanche.',
   // Sous le report, la file n'avance qu'au calcul qui suit un événement (décision 4 de la 3.9, D-052).
   deferred: 'Elles passent en tête au calcul qui suit un événement : un arrosage validé ou fait, de l’eau nouvelle, un stock corrigé. Recalculer sans événement ne change pas leur tour.',

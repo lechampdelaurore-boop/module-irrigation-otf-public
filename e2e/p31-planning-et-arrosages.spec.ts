@@ -71,13 +71,29 @@ test('planning : les gestes en tête, les planches sans matériel en action vers
 
   // Le pli se déplie : « Sans matériel (n) » en tête, avec ce qu'il veut dire.
   const pli = planning.locator('details.planning-unplaced');
-  await expect(pli.locator('summary h3')).toHaveText(/^Planches non servies \(\d+\)$/);
+  // Le titre ne compte en rouge que les planches en manque ; celles sans objectif sont dites à part (audit final, lot B, J7, F251).
+  await expect(pli.locator('summary h3')).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?|Planches sans objectif \(\d+\))$/);
   await pli.locator('summary').click();
   const premier = pli.locator('section.planning-unplaced-group').first();
   await expect(premier).toHaveAttribute('data-group', 'no-equipment');
   await expect(premier.locator('h4')).toHaveText(`Sans matériel (${sansMateriel})`);
   await expect(premier).toContainText('pas un manque d’eau');
   await expect(premier.locator('tbody tr')).toHaveCount(sansMateriel);
+  // Au téléphone, une ligne compacte par planche : son nom, son jardin, son
+  // manque « sur » son besoin, le motif dessous ; ni « Placé » ni la priorité
+  // normale (audit final, lot B, J7, F253).
+  const ligne = premier.locator('tbody tr').first();
+  if (telephone) {
+    await expect(ligne.locator('td[data-cell="placed"]')).toBeHidden();
+    await expect(ligne.locator('td[data-cell="need"]')).toBeHidden();
+    await expect(ligne.locator('.planning-unplaced-of')).toBeVisible();
+    const [nom, motif] = await Promise.all([ligne.locator('th').boundingBox(), ligne.locator('td[data-cell="reason"]').boundingBox()]);
+    expect(motif!.y, 'le motif sous la ligne compacte').toBeGreaterThan(nom!.y);
+    expect(motif!.y - nom!.y, 'une ligne compacte, pas six').toBeLessThan(120);
+  } else {
+    await expect(ligne.locator('td[data-cell="placed"]')).toBeVisible();
+    await expect(ligne.locator('.planning-unplaced-of')).toBeHidden();
+  }
   await expect(pli).not.toContainText(/\bR13\b|arbitrage|Non placé/);
   await verifierLEtape(page, journal, 'planches non servies rangées par motif');
 

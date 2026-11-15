@@ -4420,3 +4420,34 @@ dit (F250). Aucune valeur de Kc ne change. Parcours P7 étendu.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-083, D-117, D-122, D-123, D-129.
+
+## D-125 — Audit ergonomique final, lot B : seules les planches en manque se comptent en rouge (J7)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-124 (R5).
+
+**Établi dans le code.** La tuile « Planches non servies », la ligne du
+téléphone et le titre du pli comptaient toutes les planches non servies
+(`isBedUnplaced`), y compris celles qui n'ont rien à recevoir (« Sans
+objectif », manque nul) ; au téléphone, chaque planche du pli prenait six
+lignes, une par colonne.
+
+**Décision.** Le compte rouge se fait par groupe de motif : il laisse de
+côté les groupes informatifs, ceux dont aucune planche ne garde un manque
+d'au moins un centième de millimètre ; les planches qu'aucun matériel
+n'arrose y restent toujours, en tête, comme un réglage à faire (audit
+ergonomique, lot 3, cas 2). Les planches des groupes informatifs sont dites
+à part : « Planches non servies (5) · 5 sans objectif », ou « Planches sans
+objectif (2) » quand rien d'autre n'est à compter ; la tuile ajoute « · 5
+sans objectif, pour information » (F251). Leur groupe passe en dernier,
+titre en gris, sans couleur d'alerte (F252). Au téléphone, une ligne
+compacte par planche, en CSS seulement, sans doubler le contenu : « A01 ·
+Abri des noues · manque 3,6 mm sur 10,9 mm » et son « i », le motif
+dessous ; la priorité seulement quand elle n'est pas normale ; « Placé » à
+l'ordinateur seulement (F253). Le contrat du lot B précise F251 dans cette
+PR. Parcours P10 et P31 étendus.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-040, D-117, D-122, D-124.
