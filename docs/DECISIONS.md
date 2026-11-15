@@ -4264,3 +4264,32 @@ qu'au texte, jamais au fond : elle ne pouvait pas le voir.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-083, D-119.
+
+## D-121 — Audit ergonomique final, lot C, PR 3 (J10) : le « i » garde son dessin dans tout bloc
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-120 (contrat court du lot C, section 5).
+
+**Établi dans le code.** Le « i » (`shell/figure-origin.tsx`) est un rond
+de 24 px dont la boîte grandit à 44 px au téléphone sans grandir le dessin
+(premier audit, point 2). Ses règles (`styles/help.css`) ne visaient que sa
+classe ; un bloc qui peint tous ses boutons (`.bed-crop-water button`, et
+d'autres pareils) passait au-dessus : fond vert, marge intérieure, 44 px de
+haut. Dans la fiche du besoin de la culture d'une planche, un carré vert de
+44 px au téléphone recouvrait « ET0 » et le chiffre voisin ; une pilule
+verte de 27 px sur 44 à l'ordinateur. Le planning s'en gardait par une
+exception, les autres blocs non.
+
+**Décision.** Les règles du « i » et de la croix de sa bulle sont nommées
+par leur parent (`.figure-origin > button.figure-origin-toggle`,
+`.figure-origin-bubble > button.figure-origin-close`), ce qui les fait
+passer au-dessus de toute règle de bloc, et remettent à zéro ce qu'un bloc
+pourrait leur donner (hauteur et largeur minimales, marges, ombre) (F242).
+Le parcours P35 mesure chaque « i » fermé de toutes les pages, aux deux
+largeurs, et dans la fiche de la planche V01, la carotte rattachée le temps
+de la lire puis détachée comme dans P15.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-076, D-119, D-120.

@@ -291,7 +291,13 @@ registres, elle y renvoie.
   validée » dite par une pastille à la place du bouton grisé ; la mesure de
   contraste des parcours compte les boutons indisponibles et la
   transparence entière (F239 à F241, D-120 ; P31c et P7 étendus ; aucune
-  migration, aucun calcul changé). Ensuite J10, sa PR.
+  migration, aucun calcul changé), **en ligne** (#54, fusionnée à 0 h 34,
+  déployée à 0 h 53). **PR 3 sur 3, J10** : le « i » garde son dessin
+  dans tout bloc ; ses règles sont nommées par leur parent et passent
+  au-dessus des règles de bloc qui le repeignaient en carré vert sur
+  « ET0 » (F242, D-121 ; P35 étendu à toutes les pages et à la fiche de la
+  planche ; aucune migration, aucun calcul changé). Le lot C est alors
+  codé en entier ; reste sa recette sur la version déployée.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -386,7 +392,10 @@ registres, elle y renvoie.
   le porteur, sont validés le 8 novembre 2026 à 19 h 20 (« ça me semble
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
-- Fusionné et déployé sur `main` du dépôt public au 14 novembre 2026 : la
+- Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #54 (`55e344f`, lot C de l'audit final, A3, les boutons indisponibles
+  lisibles, D-120, fusionnée à 0 h 34 et déployée à 0 h 53, run 43653945457,
+  les cinq jobs réussis, aucune migration). Avant elle : la
   PR #53 (`b37b1ac`, lot C de l'audit final, R6, les gestes risqués, et le
   contrat court du lot, D-119, fusionnée à 23 h 48 et déployée le 15 novembre 2026 à 0 h 02,
   run 43649972474, les cinq jobs réussis, aucune migration). Avant elle : la
