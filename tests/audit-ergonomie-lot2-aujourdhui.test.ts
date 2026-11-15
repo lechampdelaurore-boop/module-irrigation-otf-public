@@ -144,7 +144,7 @@ test('cas 4 : sans aucune des huit cases utiles, pas de page « Aujourd’hui »
   assert.equal(landingPage(sansAujourdhui), 'materiel');
   // `/irrigation` va à Matériel ; `/irrigation/aujourdhui`, à la première page cochée avec sa ligne.
   assert.deepEqual(legacyRedirect('', sansAujourdhui), { page: 'materiel', notEnabled: false });
-  assert.deepEqual(pageAccess('aujourdhui', false, sansAujourdhui), { kind: 'not-enabled', page: 'materiel' });
+  assert.deepEqual(pageAccess('aujourdhui', false, sansAujourdhui), { kind: 'not-enabled', page: 'materiel', requested: 'aujourdhui' });
   assert.deepEqual(notFoundReturnLink({ firstVisit: false, enabled: sansAujourdhui }), { href: '/irrigation/materiel', label: 'Revenir à « Matériel et placement »' });
 });
 
@@ -158,7 +158,7 @@ test('F1 et F2 : « Aujourd’hui » est la première du menu, la page d’arriv
   assert.deepEqual(legacyRedirect('#inconnue', ALL), { page: 'aujourdhui', notEnabled: false });
   assert.deepEqual(pageAccess('aujourdhui', false, ALL), { kind: 'open' });
   assert.deepEqual(pageAccess('aujourdhui', true, ALL), { kind: 'welcome' });
-  assert.deepEqual(pageAccess('sol', false, ['arrosages', 'materiel']), { kind: 'not-enabled', page: 'aujourdhui' });
+  assert.deepEqual(pageAccess('sol', false, ['arrosages', 'materiel']), { kind: 'not-enabled', page: 'aujourdhui', requested: 'sol' });
   assert.deepEqual(notFoundReturnLink({ firstVisit: false, enabled: ALL }), { href: '/irrigation/aujourdhui', label: 'Revenir à « Aujourd’hui »' });
   assert.equal(pageUsesSeason('aujourdhui', ALL), false);
 });

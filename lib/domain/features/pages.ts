@@ -59,12 +59,40 @@ export type PageQuery = {
   /** Un jour de la semaine à ouvrir, `AAAA-MM-JJ`. */
   week?: string | null;
   refresh?: boolean;
-  /** La page demandée n'est pas cochée : la page d'arrivée le dit une fois (P14). */
-  absent?: boolean;
+  /**
+   * La page demandée n'est pas cochée : la page d'arrivée le dit une fois
+   * (P14), en la nommant quand on la connaît (audit final, lot E, J11, F265).
+   */
+  absent?: boolean | IrrigationPageId;
 };
 
-/** La ligne de la page d'arrivée quand la page demandée n'est pas cochée (section 5, P14). */
+/** La ligne de la page d'arrivée quand la page demandée n'est pas cochée et qu'on ne sait pas laquelle (section 5, P14). */
 export const ABSENT_FEATURE_NOTICE = 'Cette fonctionnalité n’est pas cochée pour votre ferme.';
+
+/** Le bloc de Réglages où se cochent les fonctionnalités, que la ligne d'une page non cochée désigne (F265). */
+export const FEATURE_SETTINGS_ANCHOR = 'fonctionnalites';
+
+export type AbsentPageNotice = {
+  text: string;
+  /** Le lien vers le bloc « Fonctionnalités de la ferme » de Réglages. */
+  settingsLabel: string;
+};
+
+/**
+ * La ligne d'une page non cochée (audit final, lot E, J11, F265) : elle
+ * nomme la page demandée, que l'adresse porte (`?absente=arrosages`), et
+ * mène à Réglages. « Aujourd'hui » n'a pas de case : elle n'a aucune de ses
+ * fonctionnalités cochées. Une ancienne adresse (`?absente=1`) ou une page
+ * inconnue garde la phrase d'avant, avec le même lien.
+ */
+export function absentPageNotice(value: string | string[] | undefined): AbsentPageNotice | null {
+  if (typeof value !== 'string' || value.length === 0) return null;
+  if (value === 'aujourdhui') {
+    return { text: `La page « ${pageLabel('aujourdhui')} » n’a aucune de ses fonctionnalités cochées pour votre ferme.`, settingsLabel: 'Les cocher dans Réglages' };
+  }
+  if (isPageFeatureId(value)) return { text: `La page « ${pageLabel(value)} » n’est pas cochée pour votre ferme.`, settingsLabel: 'La cocher dans Réglages' };
+  return { text: ABSENT_FEATURE_NOTICE, settingsLabel: 'La cocher dans Réglages' };
+}
 
 /** Le nom d'une page, au menu, en titre et dans l'onglet du navigateur. */
 export function pageLabel(page: IrrigationPageId): string {
@@ -125,7 +153,7 @@ export function pageHref(page: IrrigationPageId, query: PageQuery = {}, hash?: s
   if (query.zone) params.set('zone', query.zone);
   if (query.week) params.set('week', query.week);
   if (query.refresh) params.set('refresh', '1');
-  if (query.absent) params.set('absente', '1');
+  if (query.absent) params.set('absente', query.absent === true ? '1' : query.absent);
   const search = params.toString();
   return `${pagePath(page)}${search ? `?${search}` : ''}${hash ? `#${hash.replace(/^#/, '')}` : ''}`;
 }
@@ -140,8 +168,8 @@ export type PageAccess =
   | { kind: 'open' }
   /** La ferme n'a jamais ouvert le module : elle choisit d'abord ses cases (R5). */
   | { kind: 'welcome' }
-  /** La page n'est pas cochée : la page d'arrivée, avec la ligne qui le dit. */
-  | { kind: 'not-enabled'; page: IrrigationPageId };
+  /** La page n'est pas cochée : la page d'arrivée, avec la ligne qui nomme la page demandée (F265). */
+  | { kind: 'not-enabled'; page: IrrigationPageId; requested: IrrigationPageId };
 
 /**
  * Ce qu'une page fait de la ferme qui la demande : s'ouvrir, ou conduire
@@ -152,7 +180,7 @@ export function pageAccess(page: IrrigationPageId, firstVisit: boolean, selectio
   if (firstVisit) return { kind: 'welcome' };
   if (page === 'reglages') return { kind: 'open' };
   if (page === 'aujourdhui' ? hasTodayPage(selection) : selection.includes(page)) return { kind: 'open' };
-  return { kind: 'not-enabled', page: landingPage(selection) };
+  return { kind: 'not-enabled', page: landingPage(selection), requested: page };
 }
 
 /** Les pages du menu, dans l'ordre de la liste : « Aujourd'hui » en tête quand elle existe, les cases cochées, puis Réglages. */

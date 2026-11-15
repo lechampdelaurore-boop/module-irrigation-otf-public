@@ -5,7 +5,7 @@ import type { FeatureId } from '@/lib/domain/features/catalogue';
 import { featureBannerText } from '@/lib/domain/features/choice';
 import { firstEnabledFeature } from '@/lib/domain/features/selection';
 import {
-  ABSENT_FEATURE_NOTICE,
+  absentPageNotice,
   menuPages,
   pageAccess,
   pageHref,
@@ -84,7 +84,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const access = pageAccess(page, selection.firstVisit, selection.enabled);
   if (access.kind === 'welcome') redirect(WELCOME_PATH);
   if (access.kind === 'not-enabled') {
-    redirect(pageHref(access.page, { season: typeof params.season === 'string' ? linkSeason : null, zone, absent: true }));
+    redirect(pageHref(access.page, { season: typeof params.season === 'string' ? linkSeason : null, zone, absent: access.requested }));
   }
   const enabled: FeatureId[] = selection.enabled;
   stopwatch.lap('selection');
@@ -134,7 +134,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       lastSuccessfulReadAt: snapshot.lastSuccessfulReadAt,
       warning: snapshot.warning ?? null,
       banner: selection.banner ? featureBannerText(selection.banner) : null,
-      notice: params.absente === '1' ? ABSENT_FEATURE_NOTICE : null,
+      notice: absentPageNotice(params.absente),
       demo: isDemoDeployment(),
       demoSelection: isDemoDeployment() ? demoSelectionOfOwner(user.userId) : null,
     },

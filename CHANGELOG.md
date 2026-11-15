@@ -27,6 +27,13 @@ source détaillée commit par commit.
   h) ; « Réglage habituel » une seule fois ; « Eau non pompée faute de
   temps » au lieu de « Temps de pompage manquant », le nombre inchangé.
   Parcours P10, P29 et P31c adaptés. J8 en ligne : #65.
+- **J11, la page non cochée nommée** (D-133, F265) : la ligne de la page
+  d'arrivée dit laquelle (« La page « Arrosages » n’est pas cochée pour
+  votre ferme. ») et porte le lien « La cocher dans Réglages », vers le
+  bloc « Fonctionnalités de la ferme » ; pour « Aujourd’hui », « n’a aucune
+  de ses fonctionnalités cochées » et « Les cocher dans Réglages ». Une
+  ancienne adresse garde la phrase d’avant, avec le lien. Parcours P22 et
+  P23 étendus. J9 en ligne : #66.
 
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 

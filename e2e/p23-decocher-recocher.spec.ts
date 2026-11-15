@@ -65,7 +65,8 @@ test('décocher une fonctionnalité avertit, retire sa page et ses blocs sans ri
   await expect(page.getByRole('heading', { name: 'Correspondance des espèces' })).toHaveCount(0);
   await page.goto('/irrigation/cultures');
   await attendreLaPagePrete(page, 'aujourdhui');
-  await expect(page.getByRole('status').filter({ hasText: 'Cette fonctionnalité n’est pas cochée pour votre ferme.' })).toBeVisible();
+  // La ligne nomme la page décochée (audit final, lot E, J11, F265).
+  await expect(page.getByRole('status').filter({ hasText: 'La page « Besoin par culture » n’est pas cochée pour votre ferme.' })).toBeVisible();
   await verifierLEtape(page, journal, 'besoin par culture décoché');
 
   // Recocher : rien d'autre à cocher, pas de fenêtre ; la page et le rattachement reviennent (R1).

@@ -69,17 +69,26 @@ test('une ferme neuve choisit ses fonctionnalités avant toute page, et ne voit 
   await expect(page.getByRole('complementary', { name: 'Choix des fonctionnalités' })).toHaveCount(0);
   await verifierLEtape(page, journal, 'première page après le choix');
 
-  // Une page non cochée conduit à la page d'arrivée, qui le dit une fois.
+  // Une page non cochée conduit à la page d'arrivée, qui le dit une fois, en la
+  // nommant, avec le lien qui mène où la cocher (audit final, lot E, J11, F265).
   await page.goto('/irrigation/historique');
   await attendreLaPagePrete(page, 'aujourdhui');
-  await expect(page.getByRole('status').filter({ hasText: 'Cette fonctionnalité n’est pas cochée pour votre ferme.' })).toBeVisible();
+  const ligne = page.getByRole('status').filter({ hasText: 'La page « Historique et cumuls » n’est pas cochée pour votre ferme.' });
+  await expect(ligne).toBeVisible();
   await expect(page).not.toHaveURL(/absente/);
   await verifierLEtape(page, journal, 'page non cochée');
+  await ligne.getByRole('link', { name: 'La cocher dans Réglages' }).click();
+  await attendreLaPagePrete(page, 'reglages');
+  await expect(page).toHaveURL(/\/irrigation\/reglages(\?[^#]*)?#fonctionnalites$/);
+  await expect(page.getByRole('heading', { name: 'Fonctionnalités de la ferme' })).toBeInViewport();
+  await verifierLEtape(page, journal, 'le lien mène aux fonctionnalités de la ferme');
 
-  // Une ancienne adresse de notification qui désignait l'historique fait de même (P14).
+  // Une ancienne adresse de notification qui désignait l'historique ne nomme pas la page : la phrase d'avant, avec le même lien (P14, F265).
   await page.goto('/irrigation#series-water-title');
   await attendreLaPagePrete(page, 'aujourdhui');
-  await expect(page.getByRole('status').filter({ hasText: 'Cette fonctionnalité n’est pas cochée pour votre ferme.' })).toBeVisible();
+  const ancienne = page.getByRole('status').filter({ hasText: 'Cette fonctionnalité n’est pas cochée pour votre ferme.' });
+  await expect(ancienne).toBeVisible();
+  await expect(ancienne.getByRole('link', { name: 'La cocher dans Réglages' })).toBeVisible();
 
   // Le choix fait, la liste de la première ouverture ne revient plus : on change dans Réglages.
   await page.goto('/irrigation/bienvenue');

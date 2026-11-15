@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import { isPageFeatureId } from '@/lib/domain/features/catalogue';
 import { pageHelp } from '@/lib/domain/features/help';
-import { pageHref, pageLabel, pagePath, type IrrigationPageId } from '@/lib/domain/features/pages';
+import { FEATURE_SETTINGS_ANCHOR, pageHref, pageLabel, pagePath, type AbsentPageNotice, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { createSeasons, sourceLabel } from '../hierarchy/presentation';
@@ -41,8 +41,8 @@ export type ShellProps = {
   warning: string | null;
   /** Le bandeau du choix des fonctionnalités, jusqu'à ce qu'on le ferme (R6, R7). */
   banner: string | null;
-  /** La page demandée n'était pas cochée : la ligne qui le dit (P14). */
-  notice: string | null;
+  /** La page demandée n'était pas cochée : la ligne qui la nomme et mène à Réglages (P14, F265). */
+  notice: AbsentPageNotice | null;
   /** Un déploiement de démonstration (docs/demo-guided-contract.md) : bannière permanente, aucune notification. */
   demo: boolean;
   /** En démonstration, la ferme fictive et le moment de l'invité. */
@@ -120,7 +120,12 @@ export function IrrigationShell({
             </div>
           </section>
 
-          {notice ? <p className="feature-notice" role="status">{notice}</p> : null}
+          {notice ? (
+            <p className="feature-notice" role="status">
+              {notice.text}{' '}
+              <a href={pageHref('reglages', { season, zone }, FEATURE_SETTINGS_ANCHOR)}>{notice.settingsLabel}</a>
+            </p>
+          ) : null}
 
           {banner ? <FeatureBanner text={banner} settingsHref={page === 'reglages' ? null : pageHref('reglages', { season, zone })} /> : null}
 

@@ -281,9 +281,9 @@ test('une page non cochée conduit à la page d’arrivée, avec la ligne qui le
   assert.deepEqual(pageAccess('planning', false, [...FEATURE_IDS]), { kind: 'open' });
   assert.deepEqual(pageAccess('reglages', false, ['alertes-meteo']), { kind: 'open' }, 'Réglages s’ouvre toujours');
   // La page d'arrivée : « Aujourd'hui » quand elle existe (lot 2, F1), sinon la première page cochée.
-  assert.deepEqual(pageAccess('historique', false, ['materiel', 'arrosages']), { kind: 'not-enabled', page: 'aujourdhui' });
-  assert.deepEqual(pageAccess('materiel', false, ['alertes-cultures']), { kind: 'not-enabled', page: 'aujourdhui' });
-  assert.deepEqual(pageAccess('arrosages', false, ['materiel', 'calculateur']), { kind: 'not-enabled', page: 'materiel' });
+  assert.deepEqual(pageAccess('historique', false, ['materiel', 'arrosages']), { kind: 'not-enabled', page: 'aujourdhui', requested: 'historique' });
+  assert.deepEqual(pageAccess('materiel', false, ['alertes-cultures']), { kind: 'not-enabled', page: 'aujourdhui', requested: 'materiel' });
+  assert.deepEqual(pageAccess('arrosages', false, ['materiel', 'calculateur']), { kind: 'not-enabled', page: 'materiel', requested: 'arrosages' });
   assert.equal(pageHref('materiel', { season: 2026, absent: true }), '/irrigation/materiel?season=2026&absente=1');
   assert.equal(ABSENT_FEATURE_NOTICE, 'Cette fonctionnalité n’est pas cochée pour votre ferme.');
 });

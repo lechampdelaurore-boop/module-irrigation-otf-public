@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { millimetersNumber, millimetersText, volumeText } from '../lib/domain/display-numbers.ts';
 import { ofName, proposalsText, settingText } from '../lib/domain/display-words.ts';
+import { ABSENT_FEATURE_NOTICE, absentPageNotice, pageAccess, pageHref } from '../lib/domain/features/pages.ts';
 
 /**
  * Audit ergonomique final, lot E, mots et chiffres
@@ -56,4 +57,22 @@ test('J9 : le réglage nommé une fois (F263, cas 11)', () => {
   assert.equal(settingText('réglage du matin'), 'réglage du matin');
   assert.equal(settingText('5 planches'), 'Réglage 5 planches');
   assert.equal(settingText('Réglages'), 'Réglage Réglages', 'un autre mot que « Réglage »');
+});
+
+test('J11 : l’adresse nomme la page non cochée et la ligne la nomme, avec le lien vers Réglages (F265, cas 12)', () => {
+  const access = pageAccess('arrosages', false, ['materiel']);
+  assert.deepEqual(access, { kind: 'not-enabled', page: 'materiel', requested: 'arrosages' });
+  assert.equal(pageHref('aujourdhui', { season: 2026, absent: 'arrosages' }), '/irrigation/aujourdhui?season=2026&absente=arrosages');
+  assert.deepEqual(absentPageNotice('arrosages'), { text: 'La page « Arrosages » n’est pas cochée pour votre ferme.', settingsLabel: 'La cocher dans Réglages' });
+  assert.deepEqual(absentPageNotice('historique'), { text: 'La page « Historique et cumuls » n’est pas cochée pour votre ferme.', settingsLabel: 'La cocher dans Réglages' });
+});
+
+test('J11 : « Aujourd’hui » n’a pas de case, une ancienne adresse ou une page inconnue garde la phrase d’avant (F265)', () => {
+  assert.deepEqual(pageAccess('aujourdhui', false, ['calculateur']), { kind: 'not-enabled', page: 'reglages', requested: 'aujourdhui' });
+  assert.deepEqual(absentPageNotice('aujourdhui'), { text: 'La page « Aujourd’hui » n’a aucune de ses fonctionnalités cochées pour votre ferme.', settingsLabel: 'Les cocher dans Réglages' });
+  assert.equal(pageHref('materiel', { absent: true }), '/irrigation/materiel?absente=1');
+  for (const old of ['1', 'inconnue', 'reglages']) assert.deepEqual(absentPageNotice(old), { text: ABSENT_FEATURE_NOTICE, settingsLabel: 'La cocher dans Réglages' }, old);
+  assert.equal(absentPageNotice(undefined), null);
+  assert.equal(absentPageNotice(''), null);
+  assert.equal(absentPageNotice(['arrosages', 'planning']), null);
 });
