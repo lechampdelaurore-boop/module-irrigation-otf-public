@@ -334,7 +334,15 @@ registres, elle y renvoie.
   nom de la planche, « A01 · Tomate », à toutes les largeurs, « planche
   nue » quand le plan de culture n'en a aucune ; la phrase de la semaine
   garde le stade et laisse le Kc à l'infobulle de la cellule (F249, F250 ;
-  P7 étendu ; aucune migration). Ensuite J7.
+  P7 étendu ; aucune migration), **en ligne** (#59, fusionnée à
+  4 h 44, déployée à 5 h 03). **PR 4 sur 7, J7** : le compte rouge
+  des planches non servies (tuile, ligne du téléphone, titre du pli) ne
+  prend plus les groupes de motif où aucune planche ne garde de manque ;
+  elles sont dites à part, pour information, « Planches non servies (5) ·
+  5 sans objectif », et leur groupe passe en dernier, sans couleur d'alerte
+  ; au téléphone, une ligne compacte par planche, « A01 · Abri des noues ·
+  manque 3,6 mm sur 10,9 mm », le motif dessous (F251 à F253 ; P10 et P31
+  étendus ; aucune migration). Ensuite la remarque 2.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -430,6 +438,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #59 (`73b6ba3`, lot B de l'audit final, R5, la culture sur la ligne
+  de la planche, D-124, fusionnée à 4 h 44 et déployée à 5 h 03, run
+  43673674817, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #58 (`550c0f6`, l'écran de répartition qui ne relit plus sa propre
   répartition validée, D-129, fusionnée à 4 h 10 et déployée à
   4 h 26, run 43671158376, les cinq jobs réussis, aucune migration). Avant

@@ -148,7 +148,7 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
   const nonPlace = planning.locator('details.planning-unplaced');
   await expect(nonPlace).toHaveJSProperty('open', false);
   const titreNonPlace = nonPlace.locator('summary');
-  await expect(titreNonPlace).toHaveText(/^Planches non servies \(\d+\)$/);
+  await expect(titreNonPlace).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?|Planches sans objectif \(\d+\))$/);
   await expect(nonPlace.locator('tbody tr').first()).toBeHidden();
   await verifierCibleTactile(titreNonPlace, 'le titre « Planches non servies »');
   await expect((await lignesNonPlacees(planning)).filter({ hasText: 'S01' })).toContainText('aucun matériel ne l’arrose');

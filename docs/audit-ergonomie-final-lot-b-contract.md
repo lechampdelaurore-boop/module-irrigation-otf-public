@@ -129,11 +129,15 @@ objectif », manque nul) ; au téléphone, chaque planche du pli prend six
 lignes (une par colonne).
 
 1. **Le compte rouge** (tuile « Planches non servies », ligne du
-   téléphone, titre du pli) ne compte que les planches qui gardent un
-   manque d'au moins un centième de millimètre. Les autres sont dites à
-   part, en simple information : « Planches non servies (5) · 5 sans
-   objectif » ; la tuile ajoute « · 5 sans objectif, pour information »
-   (F251).
+   téléphone, titre du pli) se fait par groupe de motif : il laisse de côté
+   les groupes informatifs, ceux dont aucune planche ne garde un manque
+   d'au moins un centième de millimètre ; les planches qu'aucun matériel
+   n'arrose y restent toujours, en tête, comme un réglage à faire (audit
+   ergonomique, lot 3, cas 2). Les planches des groupes informatifs sont
+   dites à part, en simple information : « Planches non servies (5) · 5
+   sans objectif », ou « Planches sans objectif (2) » quand rien d'autre
+   n'est à compter ; la tuile ajoute « · 5 sans objectif, pour
+   information » (F251).
 2. **Leur groupe** (« Sans objectif », ou tout groupe sans manque) passe
    en dernier, sans couleur d'alerte (F252).
 3. **Au téléphone, une ligne compacte par planche** : « A01 · Abri des

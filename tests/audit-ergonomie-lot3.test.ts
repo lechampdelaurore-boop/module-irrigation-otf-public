@@ -83,7 +83,8 @@ test('le retard d’une validée suit la tolérance R14 de la page des arrosages
   assert.equal(planActionTiles(actions)[2]?.detail, 'à démarrer sur « Arrosages »');
 });
 
-function bed(id: string, reasons: UnplacedReason[], deficitMm = 0): PlanBedOutcome {
+/** Une planche non servie garde, par défaut, tout son besoin en manque, comme le moteur la rend (audit final, lot B, J7 : une planche sans manque se dit à part). */
+function bed(id: string, reasons: UnplacedReason[], deficitMm = 10): PlanBedOutcome {
   return {
     bedId: id, bedName: id, plotName: 'Jardin', priority: 'normal', needMm: 10, targetMm: 10, placedMm: 0, surplusMm: 0,
     deficitMm, reasons, proposalIds: [], equipmentId: reasons.includes('no-equipment') ? null : 'rampe',

@@ -46,7 +46,7 @@ import { capitalize, formatDateTime, formatLongDay, formatShortDay, formatVolume
 import { unplacedOrigin } from '@/lib/domain/planning/origins';
 import { planDayCells, planWeekRows, type PlanWeekRow } from '@/lib/domain/planning/week-grid';
 import { pastDaysLabel, phoneWeekFolds, planSummaryLine, unplacedFoldLabel, type PhoneDayFold } from '@/lib/domain/planning/phone-week';
-import { UNPLACED_GROUP_MEANING, planActionCounts, planActionLine, planActionTiles, unplacedGroups, unplacedTileDetail, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
+import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionCounts, planActionLine, planActionTiles, unplacedDeficitCount, unplacedGroups, unplacedTileDetail, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
 import { pageHref } from '@/lib/domain/features/pages';
 import { Icon, type IconName } from '../line-icon';
 import { FigureOrigin } from '../shell/figure-origin';
@@ -229,7 +229,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
               {pendingEventNotice(plan.pendingEvent, formatDateTime(plan.pendingEvent.occurredAt))}
             </p>
           ) : null}
-          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplaced.length} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} /> : null}
+          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplacedDeficitCount(groups)} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} /> : null}
           {plan.calculation.summary.changes ? <ChangesFold changes={plan.calculation.summary.changes} /> : null}
           {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} /> : null}
           <SuggestionList suggestions={plan.suggestions} pending={pending} feedback={suggestionFeedback} onApply={applySuggestion} onKeep={keepSuggestion} />
@@ -499,12 +499,12 @@ function UnplacedList({ beds, groups, season }: { beds: readonly PlanBedOutcome[
       ) : null}
       <details className="planning-unplaced">
         <summary>
-          <h3>{unplacedFoldLabel(beds.length)}</h3>
+          <h3>{unplacedFoldLabel(unplacedDeficitCount(groups), informationalBedCount(groups))}</h3>
           <Icon name="fleche-bas" />
         </summary>
         <p className="planning-unplaced-caption">Chaque planche que le plan ne sert pas en entier, rangée par motif : aussi important que ce qui est placé.</p>
         {groups.groups.map((group) => (
-          <section key={group.key} className="planning-unplaced-group" data-group={group.key} aria-label={group.title}>
+          <section key={group.key} className="planning-unplaced-group" data-group={group.key} data-informational={group.informational || undefined} aria-label={group.title}>
             <h4>{group.title}</h4>
             {UNPLACED_GROUP_MEANING[group.key] ? <p className="planning-unplaced-meaning">{UNPLACED_GROUP_MEANING[group.key]}</p> : null}
             <table className="planning-table planning-unplaced-table">
@@ -513,14 +513,15 @@ function UnplacedList({ beds, groups, season }: { beds: readonly PlanBedOutcome[
               </thead>
               <tbody>
                 {group.beds.map((bed) => (
-                  <tr key={bed.bedId}>
+                  // Au téléphone, une ligne compacte : « A01 · Abri des noues · manque 3,6 mm sur 10,9 mm », le motif dessous (audit final, lot B, J7, F253).
+                  <tr key={bed.bedId} data-informational={group.informational || undefined}>
                     <th scope="row">{bed.bedName}</th>
-                    <td data-label="Jardin ou abri">{bed.plotName}</td>
-                    <td data-label="Priorité">{priorityLabel(bed.priority)}</td>
-                    <td data-label="Besoin">{mmLabel(bed.needMm)}</td>
-                    <td data-label="Placé">{mmLabel(bed.placedMm)}</td>
-                    <td data-label="Manque">{mmLabel(bed.deficitMm)}<FigureOrigin text={unplacedOrigin(bed)} /></td>
-                    <td data-label="Motif" title={unplacedReasonsExpertNote(bed.reasons) ?? undefined}>{bed.reasons.length === 0 ? 'manque partiel, faute de place' : bedReasonLabels(bed).join(' ; ')}</td>
+                    <td data-label="Jardin ou abri" data-cell="plot">{bed.plotName}</td>
+                    <td data-label="Priorité" data-cell="priority" data-priority={bed.priority}>{priorityLabel(bed.priority)}</td>
+                    <td data-label="Besoin" data-cell="need">{mmLabel(bed.needMm)}</td>
+                    <td data-label="Placé" data-cell="placed">{mmLabel(bed.placedMm)}</td>
+                    <td data-label="Manque" data-cell="deficit">{mmLabel(bed.deficitMm)}<span className="planning-unplaced-of"> sur {mmLabel(bed.needMm)}</span><FigureOrigin text={unplacedOrigin(bed)} /></td>
+                    <td data-label="Motif" data-cell="reason" title={unplacedReasonsExpertNote(bed.reasons) ?? undefined}>{bed.reasons.length === 0 ? 'manque partiel, faute de place' : bedReasonLabels(bed).join(' ; ')}</td>
                   </tr>
                 ))}
               </tbody>

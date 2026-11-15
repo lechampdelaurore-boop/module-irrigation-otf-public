@@ -11,4 +11,7 @@ test('le titre de la liste repliée dit le nombre de planches, en mots simples (
   assert.equal(unplacedFoldLabel(1), 'Planches non servies (1)');
   assert.equal(unplacedFoldLabel(2), 'Planches non servies (2)');
   assert.equal(unplacedFoldLabel(37), 'Planches non servies (37)');
+  // Audit final, lot B, J7 (F251) : les planches sans manque, dites à part, hors du compte.
+  assert.equal(unplacedFoldLabel(5, 5), 'Planches non servies (5) · 5 sans objectif');
+  assert.equal(unplacedFoldLabel(0, 2), 'Planches sans objectif (2)');
 });

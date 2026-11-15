@@ -3,7 +3,9 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { feasibilityHeadTiles, isPriorityLevelShown } from '../lib/domain/feasibility-reading.ts';
 import type { IrrigationFeasibility, PriorityFeasibility } from '../lib/domain/irrigation-feasibility.ts';
-import type { StoredWeeklyPlan, WeeklyPlan } from '../lib/domain/planning/contract.ts';
+import type { PlanBedOutcome, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain/planning/contract.ts';
+import { informationalBedCount, unplacedDeficitCount, unplacedGroups, unplacedTileDetail } from '../lib/domain/planning/action-summary.ts';
+import { planSummaryLine, unplacedFoldLabel } from '../lib/domain/planning/phone-week.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { keepsDeficit, shortageAction, shortageDecisionPending } from '../lib/domain/planning/shortage-reading.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
@@ -152,4 +154,39 @@ test('R4, F247 et F248 : le lien mène à l’ancre de la faisabilité, qui pass
   const order = ['{first ? feasibility : null}', '<WaterResourceManager', '<PumpManager', '{first ? null : feasibility}'].map((marker) => ressources.indexOf(marker));
   assert.ok(order.every((index, position) => index >= 0 && (position === 0 || index > order[position - 1])), 'la faisabilité avant les ressources quand elle passe en tête, après sinon');
   assert.match(readFileSync('app/irrigation/page-loaders.ts', 'utf8'), /decisionPending: shortageDecisionPending\(weeklyPlan\)/);
+});
+
+// J7 — seules les planches en manque se comptent en rouge (F251 à F253).
+
+const outcome = (id: string, reasons: PlanBedOutcome['reasons'], deficitMm: number): PlanBedOutcome => ({
+  bedId: id, bedName: id, plotName: 'Abri des noues', priority: 'normal', needMm: deficitMm > 0 ? 10.9 : 0, targetMm: 0, placedMm: 0, surplusMm: 0,
+  deficitMm, reasons, proposalIds: [], equipmentId: 'rampe',
+});
+
+test('J7, F251 et F252 : cinq planches en manque, cinq sans objectif ; le compte rouge ne prend que les premières, « Sans objectif » en dernier, pour information', () => {
+  const beds = [
+    ...Array.from({ length: 5 }, (_, index) => outcome(`O${index + 1}`, ['no-objective'], 0)),
+    ...Array.from({ length: 5 }, (_, index) => outcome(`A${index + 1}`, ['water-budget'], 3.6)),
+  ];
+  const groups = unplacedGroups(beds);
+  assert.equal(unplacedDeficitCount(groups), 5);
+  assert.equal(informationalBedCount(groups), 5);
+  assert.deepEqual(groups.groups.map((group) => [group.title, group.informational]), [['Manque d’eau (5)', false], ['Sans objectif (5)', true]], 'à taille égale, le groupe sans manque passe après');
+  assert.equal(unplacedFoldLabel(unplacedDeficitCount(groups), informationalBedCount(groups)), 'Planches non servies (5) · 5 sans objectif');
+  assert.equal(unplacedTileDetail(groups, 5), '5 avec un manque chiffré · 5 sans objectif, pour information');
+  // Le plus gros groupe d'abord, sauf un groupe sans manque, toujours en dernier.
+  const many = unplacedGroups([...Array.from({ length: 8 }, (_, index) => outcome(`O${index + 1}`, ['no-objective'], 0)), outcome('A1', ['water-budget'], 3.6)]);
+  assert.deepEqual(many.groups.map((group) => group.title), ['Manque d’eau (1)', 'Sans objectif (8)']);
+  assert.match(planSummaryLine({ volumeCubicMeters: 1, unverifiedCount: 0 }, [], { waterCubicMeters: 0.37, pumpTimeCubicMeters: 0 }, unplacedDeficitCount(many), volume), /· 1 planche non servie$/);
+});
+
+test('J7, F253 : au téléphone, une ligne compacte par planche, la priorité normale et « Placé » repliés, le besoin dit « sur »', () => {
+  const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
+  assert.match(view, /<span className="planning-unplaced-of"> sur \{mmLabel\(bed\.needMm\)\}<\/span><FigureOrigin/);
+  const sheet = readFileSync('app/irrigation/styles/penurie-lisible.css', 'utf8');
+  const phone = sheet.slice(sheet.indexOf('@media (max-width: 760px)'));
+  for (const hidden of ['td[data-cell="priority"][data-priority="normal"]', 'td[data-cell="need"]', 'td[data-cell="placed"]']) assert.ok(phone.includes(hidden), `${hidden} replié au téléphone`);
+  assert.match(phone, /td\[data-cell="deficit"\]::before \{\s*content: "· manque ";/);
+  assert.match(phone, /td\[data-cell="reason"\] \{\s*flex-basis: 100%;/);
+  assert.match(sheet, /^\.planning-unplaced-of \{\s*display: none;/m, 'à l’ordinateur, la colonne « Besoin » le dit');
 });
