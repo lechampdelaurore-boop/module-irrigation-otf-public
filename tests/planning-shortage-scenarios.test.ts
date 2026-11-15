@@ -688,7 +688,7 @@ test('point ouvert 64, temps de pompage : le manque d’une planche au passe-pie
   assert.equal(pumpTimeDeficitValue(plan.deficit, cubicMetersText), 'au moins 2,24 m³');
   assert.equal(pumpTimeDeficitDetail(plan.deficit), 'Ce qui ne tient pas dans les plages horaires ; une planche au volume inconnu, où le manque ne peut pas être chiffré');
   assert.equal(hasPumpTimeDeficit(plan.deficit), true);
-  assert.equal(planSummaryLine({ volumeCubicMeters: 2.56, unverifiedCount: 0 }, [], plan.deficit, 32, cubicMetersText), '2,56 m³ · pompage manquant au moins 2,24 m³ · 32 planches non servies');
+  assert.equal(planSummaryLine({ volumeCubicMeters: 2.56, unverifiedCount: 0 }, [], plan.deficit, 32, cubicMetersText), '2,56 m³ · non pompé faute de temps au moins 2,24 m³ · 32 planches non servies');
   // La note comparait « demandés 9,92 m³ » à un manque compté sans T1-1 : un volume est inconnu, elle se tait (D-038).
   assert.equal(waterDeficitExplanation(stored(plan)), null);
   // Le seul manque de T1-1 : rien ne se chiffre, « non chiffré », et la carte reste signalée.

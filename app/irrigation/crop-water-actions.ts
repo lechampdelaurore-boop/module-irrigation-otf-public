@@ -19,6 +19,7 @@ import { getCropCoefficientsViewForUser, type CropCoefficientsView } from '@/lib
 import { resetFarmDurationsForUser, saveFarmDurationsForUser } from '@/lib/services/crop-water-durations';
 import type { FarmDurations } from '@/lib/domain/crop-water/farm-durations';
 import { getIrrigationSnapshot } from '@/lib/services/irrigation-service';
+import { ofName } from '@/lib/domain/display-words';
 
 /**
  * Les actions de la page « Coefficients culturaux » (5 quater, PR 3) : la
@@ -195,7 +196,7 @@ export async function addShelterFactorAction(input: {
     if (!result.ok) return { ok: false, message: result.problems.join(' ') };
     return {
       ok: true,
-      message: `Le K_abri de ${plot.name} est enregistré.`,
+      message: `Le K_abri ${ofName(plot.name)} est enregistré.`,
       view: await getCropCoefficientsViewForUser({ ownerUserId, season: input.season, snapshot }),
     };
   });

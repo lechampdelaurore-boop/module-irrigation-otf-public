@@ -20,6 +20,13 @@ source détaillée commit par commit.
   (« 16,5 mm », « 12 mm »). Une seule règle d'affichage pour toutes les
   pages ; le calcul, les champs de saisie et l'export gardent toute leur
   précision. Parcours P12 et P32 adaptés. A1 en ligne : #64.
+- **J9, les mêmes mots d'une page à l'autre** (D-132, F261 à F264) :
+  « Noter la pluie » sur l'historique comme sur « Aujourd'hui » ; « Valider
+  la proposition du jour » quand il n'y en a qu'une ; « Observer le sol
+  d'Abri des noues » (« de » s'élide devant une voyelle, jamais devant un
+  h) ; « Réglage habituel » une seule fois ; « Eau non pompée faute de
+  temps » au lieu de « Temps de pompage manquant », le nombre inchangé.
+  Parcours P10, P29 et P31c adaptés. J8 en ligne : #65.
 
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 

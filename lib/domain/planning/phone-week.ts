@@ -100,7 +100,7 @@ export function planSummaryLine(
   // Une planche en manque au volume inconnu : le total se lit « au moins », comme les cartes (point ouvert 64, D-098).
   const uncountedWater = uncountedWaterCount(deficit, unknownWaterChains);
   if (deficit.waterCubicMeters > 0 || uncountedWater > 0) parts.push(`manque d’eau ${waterDeficitValue(deficit.waterCubicMeters, uncountedWater, formatVolume)}`);
-  if (hasPumpTimeDeficit(deficit)) parts.push(`pompage manquant ${pumpTimeDeficitValue(deficit, formatVolume)}`);
+  if (hasPumpTimeDeficit(deficit)) parts.push(`non pompé faute de temps ${pumpTimeDeficitValue(deficit, formatVolume)}`);
   if (unplacedCount > 0) parts.push(plural(unplacedCount, 'planche non servie', 'planches non servies'));
   if (summary.unverifiedCount > 0) parts.push(`${summary.unverifiedCount} non vérifié${summary.unverifiedCount > 1 ? 's' : ''}`);
   return parts.join(' · ');

@@ -4593,3 +4593,35 @@ Aucune migration ; aucun calcul, aucune donnée touchés : l'arrondi n'est
 qu'un affichage.
 
 Ne changent pas : D-003, D-117, D-130.
+
+## D-132 — Audit ergonomique final, lot E : les mêmes mots d'une page à l'autre (J9)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur, aucune question agronomique ; modifiable par lui.
+Après D-131 (J8).
+
+**Établi dans le code.** L'historique disait « Saisir la pluie » là où
+« Aujourd'hui » dit « Noter la pluie de la semaine » ; le planning écrivait
+« Valider les 1 proposition du jour » ; « Aujourd'hui » écrivait « Observer
+le sol de Abri des noues » ; l'aperçu du matériel préfixait toujours le nom
+du réglage par « Réglage », d'où « Réglage Réglage habituel » ; la tuile du
+planning appelait « Temps de pompage manquant » un volume en m³.
+
+**Décision.** Un geste, un mot : « Noter la pluie » sur l'historique (F261).
+Les accords, par `lib/domain/display-words.ts` (F262) : « Valider la
+proposition du jour » quand il n'y en a qu'une ; « de » s'élide devant un
+nom donné par la ferme qui commence par une voyelle, accentuée ou non, ou
+par œ ou æ (« d'Abri des noues », « d'Étang »), jamais devant un h, qui
+peut être aspiré (« de Haut Champ »), ni devant un y. La règle sert aussi au
+message « Le K_abri d'… est enregistré » et à la ligne « la surface mouillée
+d'… n'est pas connue ». Le réglage nommé une fois (F263) : un nom qui
+commence déjà par le mot « Réglage » se lit seul. « Eau non pompée faute de
+temps » sur la tuile, « non pompé faute de temps » dans la ligne du
+téléphone (F264), le nombre et sa règle inchangés ; le contrat du planning
+suit. Parcours P10, P29 et P31c adaptés ; P31c prouve le cas 11, son
+réglage s'appelant « Réglage p31c-… ».
+
+Aucune migration ; aucun calcul, aucune donnée touchés : des mots
+seulement. Les noms de la ferme de démonstration ne changent pas (lot F).
+
+Ne changent pas : D-117, D-130, D-131.

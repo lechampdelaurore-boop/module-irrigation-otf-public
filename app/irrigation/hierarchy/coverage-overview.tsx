@@ -4,6 +4,7 @@ import { formatIrrigationRate, numberFormatter } from './presentation';
 import { sortByNameNaturally } from '@/lib/domain/bed-order';
 import { displayFlowRate } from '@/lib/domain/irrigation-calculations';
 import { type IrrigationCoverageResult } from '@/lib/domain/irrigation-coverage';
+import { settingText } from '@/lib/domain/display-words';
 
 export function CoverageOverview({
   coverage,
@@ -75,7 +76,7 @@ export function CoverageOverview({
                     <strong>{item.equipmentName}</strong>
                     {/* Le nom du réglage (« 5 planches ») et les planches couvertes, séparés (point 8). */}
                     <small>
-                      <span className="coverage-setting-name">Réglage {item.settingName}</span>
+                      <span className="coverage-setting-name">{settingText(item.settingName)}</span>
                       <span>
                         couvre {item.bedCount} planche{item.bedCount > 1 ? 's' : ''}
                         {item.unknownAreaBedCount > 0 ? ` · ${item.unknownAreaBedCount} sans passe-pied connu, hors débit` : ''}

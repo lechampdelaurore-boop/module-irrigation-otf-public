@@ -337,7 +337,7 @@ test('cas 13 : trois jardins jamais observés sur cinq, nommés ; les jardins ob
   assert.deepEqual(gardens.map((item) => item.name), ['Abri 1', 'Jardin 10', 'Jardin 9']);
   const lines = reliabilityLines({ ...FRESH, enabled: ALL, now: NOW, soilGardensNeverObserved: gardens });
   assert.equal(lines[0].text, 'Le sol de 3 jardins n’a jamais été observé : Abri 1, Jardin 9, Jardin 10.');
-  assert.deepEqual(lines[0].action, { kind: 'link', label: 'Observer le sol de Abri 1', page: 'sol', anchor: 'soil-garden-a' });
+  assert.deepEqual(lines[0].action, { kind: 'link', label: "Observer le sol d'Abri 1", page: 'sol', anchor: 'soil-garden-a' });
   assert.equal(reliabilityLines({ ...FRESH, enabled: ALL, now: NOW, soilGardensNeverObserved: gardens.slice(0, 1) })[0].text, 'Le sol du jardin Abri 1 n’a jamais été observé.');
   assert.equal(namesText(['A', 'B', 'C', 'D', 'E']), 'A, B, C et 2 autres');
 });

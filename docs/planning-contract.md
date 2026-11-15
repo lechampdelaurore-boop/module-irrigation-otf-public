@@ -575,7 +575,8 @@ du moteur et n'écrit aucune règle métier : ce qu'elle calcule pour s'afficher
   de budget, la carte reste celle d'avant. De même quand une planche en manque
   a un volume inconnu, faute de surface mouillée connue (point ouvert 64,
   D-098) : la carte du manque que son motif aurait grossi, « Manque d'eau »
-  ou « Temps de pompage manquant », écrit « au moins X m³ », ou « non
+  ou « Eau non pompée faute de temps » (anciennement « Temps de pompage
+  manquant », audit final, lot E, J9, F264), écrit « au moins X m³ », ou « non
   chiffré » quand rien d'autre n'en chiffre, son sous-titre compte ces
   planches, et la carte reste signalée en rouge doux, le manque étant sûr et
   son volume seul inconnu ; la ligne de résumé du téléphone et le pli des
@@ -596,7 +597,8 @@ du moteur et n'écrit aucune règle métier : ce qu'elle calcule pour s'afficher
   l'ordre des débuts — une plage qui passe minuit appartient au jour où elle
   commence —, son compte et son volume ; un jour écoulé avant le calcul le
   dit, un jour sans proposition aussi. Par jour, « Valider les N
-  propositions du jour » ; en tête, « Valider toute la semaine » (D-024,
+  propositions du jour », « Valider la proposition du jour » quand il n'y en
+  a qu'une (F262) ; en tête, « Valider toute la semaine » (D-024,
   point 10). Chacune est validée à son tour, avec sa propre réponse ; un
   refus n'arrête pas les suivantes.
 - **Une proposition** est une carte : d'un coup d'œil le créneau (début, fin,

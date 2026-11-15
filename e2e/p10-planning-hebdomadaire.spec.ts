@@ -62,7 +62,7 @@ async function verifierLesGestesDeLaCarte(carte: Locator): Promise<void> {
  */
 async function verifierLeJourEcarte(jour: Locator): Promise<void> {
   const pli = jour.locator('.planning-day-toggle');
-  const toutValider = jour.getByRole('button', { name: /^Valider les \d+ propositions? du jour$/ });
+  const toutValider = jour.getByRole('button', { name: /^Valider (?:la proposition|les \d+ propositions) du jour$/ });
   await expect(pli).toBeVisible();
   await expect(pli).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(toutValider).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
@@ -180,7 +180,7 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
     const deuxieme = await carteNommee(planning, proposees().first());
     const jour = planning.locator('li.planning-day').filter({ has: proposeesDe(page) }).first();
     if (testInfo.project.name === 'telephone') await verifierLeJourEcarte(jour);
-    await jour.getByRole('button', { name: /^Valider les \d+ propositions? du jour$/ }).click();
+    await jour.getByRole('button', { name: /^Valider (?:la proposition|les \d+ propositions) du jour$/ }).click();
     await expect(deuxieme.locator('.planning-status')).toHaveText('Validée', { timeout: 30_000 });
     validees += 1;
     await verifierLEtape(page, journal, 'jour validé');

@@ -156,7 +156,7 @@ test('les tuiles en une ligne : les gestes et le volume toujours, le reste quand
   );
   assert.equal(
     planSummaryLine({ volumeCubicMeters: 0.195, unverifiedCount: 1 }, ['1 à valider', '2 faites', '1 en retard'], { waterCubicMeters: 1.5, pumpTimeCubicMeters: 0.5 }, 7, volume),
-    '1 à valider · 2 faites · 1 en retard · 0,195 m³ · manque d’eau 1,5 m³ · pompage manquant 0,5 m³ · 7 planches non servies · 1 non vérifié',
+    '1 à valider · 2 faites · 1 en retard · 0,195 m³ · manque d’eau 1,5 m³ · non pompé faute de temps 0,5 m³ · 7 planches non servies · 1 non vérifié',
   );
   assert.equal(
     planSummaryLine({ volumeCubicMeters: 0, unverifiedCount: 0 }, ['0 à valider', '0 faite'], { waterCubicMeters: 0, pumpTimeCubicMeters: 0 }, 1, volume),
