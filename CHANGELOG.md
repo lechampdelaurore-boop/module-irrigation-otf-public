@@ -7,6 +7,13 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot F, la démonstration)
 
+- **J9 et J16, un seul nom pour la ferme, des moments qui ont un sens**
+  (D-144, F292 à F294) : la ferme fictive porte le nom de son exploitation
+  (« Ferme des Trois Noues ») dans la bannière, la remise à zéro, les
+  visites, l'historique et les exports ; la liste « Ferme » donne le
+  profil comme description. La petite exploitation ne propose plus que le
+  début d'été et l'automne, la ferme « matériel et alertes » la nuit de gel
+  et le début d'été. Parcours V8 et V9 adaptés.
 - **J1, la barre de la démonstration en une ligne au téléphone** (D-143,
   F288 à F291) : à 600 px et moins, la bannière dit « Démonstration ·
   Maraîchage diversifié · Pic d'été » sur 44 px, et « Changer » ouvre

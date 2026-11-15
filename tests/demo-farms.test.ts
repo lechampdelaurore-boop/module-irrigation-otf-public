@@ -11,6 +11,7 @@ import {
   DEMO_PROFILES,
   demoChoiceOfOwner,
   demoOwnerUserId,
+  demoProfileOption,
   demoSummary,
   resolveDemoChoice,
 } from '../lib/domain/demo/catalogue.ts';
@@ -35,12 +36,41 @@ afterEach(() => uninstallSimulatedDate());
 
 // --- Le catalogue ------------------------------------------------------------
 
-test('trois profils et une ferme vierge ; quatre moments par profil, un seul pour la ferme vierge', () => {
+test('trois profils et une ferme vierge ; J16 : chaque profil ne propose que les moments qui ont un sens pour lui (F293)', () => {
   assert.deepEqual(DEMO_PROFILES.map((profile) => profile.id), ['maraichage', 'petite-ferme', 'vannes-alertes', 'vierge']);
-  for (const profile of DEMO_PROFILES.slice(0, 3)) {
-    assert.deepEqual(profile.moments.map((moment) => moment.id), ['gel-printemps', 'ete', 'penurie', 'automne'], profile.id);
+  const moments = Object.fromEntries(DEMO_PROFILES.map((profile) => [profile.id, profile.moments.map((moment) => moment.id)]));
+  assert.deepEqual(moments, {
+    maraichage: ['gel-printemps', 'ete', 'penurie', 'automne'],
+    'petite-ferme': ['ete', 'automne'],
+    'vannes-alertes': ['gel-printemps', 'ete'],
+    vierge: ['ete'],
+  });
+  // Un moment garde sa date d'un profil à l'autre ; seul ce qu'il fait voir peut changer (F294).
+  const dates = new Map(DEMO_PROFILES[0].moments.map((moment) => [moment.id, moment.dateKey]));
+  for (const { profile, moment } of ALL_CHOICES) assert.equal(moment.dateKey, dates.get(moment.id), `${profile.id} · ${moment.id}`);
+});
+
+test('J16 : ce qu’un moment fait voir ne promet rien que sa ferme n’a pas coché (F294)', () => {
+  const promises: Array<[RegExp, string]> = [[/planning/i, 'planning'], [/réserve|budget/i, 'ressources'], [/historique|cumuls/i, 'historique'], [/alerte/i, 'alertes-meteo'], [/calculateur/i, 'calculateur']];
+  for (const { profile, moment } of ALL_CHOICES) {
+    for (const [word, feature] of promises) {
+      if (word.test(moment.shows)) assert.ok((profile.features as readonly string[]).includes(feature), `${profile.id} · ${moment.id} : « ${moment.shows} »`);
+    }
   }
-  assert.deepEqual(DEMO_PROFILES[3].moments.map((moment) => moment.id), ['ete']);
+});
+
+test('J9 : la ferme fictive porte un seul nom, celui de son exploitation, dans la bannière et dans le module (F292)', () => {
+  for (const profile of DEMO_PROFILES) {
+    assert.equal(DEMO_FARMS[profile.id].name, profile.farmName, profile.id);
+    assert.equal(demoFarmSnapshot(profile.id, profile.moments[0].dateKey).structure.name, profile.farmName, profile.id);
+    assert.equal(demoProfileOption(profile), `${profile.farmName} · ${profile.shortLabel}`);
+  }
+  assert.deepEqual(DEMO_PROFILES.map(demoProfileOption), [
+    'Ferme des Trois Noues · Maraîchage diversifié',
+    'Le Jardin de la Mare · Petite exploitation',
+    'Domaine des Terres Blanches · Matériel et alertes',
+    'Ferme du Pré Neuf · Ferme vierge',
+  ]);
 });
 
 test('les cases cochées d’avance forment un choix complet, et la ferme vierge n’en coche aucune', () => {
@@ -54,16 +84,19 @@ test('un choix illisible revient au premier profil et à son premier moment ; un
   assert.deepEqual(ids(resolveDemoChoice(undefined, undefined)), ['maraichage', 'gel-printemps']);
   assert.deepEqual(ids(resolveDemoChoice('inconnu', 'penurie')), ['maraichage', 'penurie']);
   assert.deepEqual(ids(resolveDemoChoice('vierge', 'penurie')), ['vierge', 'ete']);
+  // Un témoin resté sur un moment retiré du profil (J16, cas 5) : le premier moment du profil, sans erreur.
+  assert.deepEqual(ids(resolveDemoChoice('petite-ferme', 'penurie')), ['petite-ferme', 'ete']);
+  assert.deepEqual(ids(resolveDemoChoice('vannes-alertes', 'automne')), ['vannes-alertes', 'gel-printemps']);
   assert.deepEqual(ids(resolveDemoChoice('petite-ferme', 'automne')), ['petite-ferme', 'automne']);
 });
 
-test('J1 : la ligne de la bannière au téléphone dit la ferme et le moment en noms courts, sans moment pour la ferme vierge', () => {
-  assert.equal(demoSummary(resolveDemoChoice('maraichage', 'penurie')), 'Démonstration · Maraîchage diversifié · Pic d’été');
-  assert.equal(demoSummary(resolveDemoChoice('petite-ferme', 'automne')), 'Démonstration · Petite exploitation · Automne');
-  assert.equal(demoSummary(resolveDemoChoice('vannes-alertes', 'gel-printemps')), 'Démonstration · Matériel et alertes · Gel de printemps');
-  assert.equal(demoSummary(resolveDemoChoice('vierge', 'ete')), 'Démonstration · Ferme vierge');
-  // Deux lignes de texte au plus dans 44 px, à 390 px de large : la plus longue tient en moins de 60 signes.
-  for (const choice of ALL_CHOICES) assert.ok(demoSummary(choice).length <= 60, demoSummary(choice));
+test('J1 et J9 : la ligne de la bannière au téléphone dit le nom de la ferme et le moment en nom court, sans moment pour la ferme vierge', () => {
+  assert.equal(demoSummary(resolveDemoChoice('maraichage', 'penurie')), 'Démonstration · Ferme des Trois Noues · Pic d’été');
+  assert.equal(demoSummary(resolveDemoChoice('petite-ferme', 'automne')), 'Démonstration · Le Jardin de la Mare · Automne');
+  assert.equal(demoSummary(resolveDemoChoice('vannes-alertes', 'gel-printemps')), 'Démonstration · Domaine des Terres Blanches · Gel de printemps');
+  assert.equal(demoSummary(resolveDemoChoice('vierge', 'ete')), 'Démonstration · Ferme du Pré Neuf');
+  // Deux lignes de texte au plus dans 44 px, à 390 px de large (mesuré par V9) : 62 signes au plus.
+  for (const choice of ALL_CHOICES) assert.ok(demoSummary(choice).length <= 62, demoSummary(choice));
 });
 
 test('les témoins se lisent dans l’en-tête, sans confondre deux noms voisins', () => {
@@ -86,7 +119,7 @@ test('couche 5 : chaque invité, chaque ferme et chaque moment a son espace, et 
       assert.deepEqual(ids(demoChoiceOfOwner(owner)!), [choice.profile.id, choice.moment.id]);
     }
   }
-  assert.equal(owners.size, 2 * 13);
+  assert.equal(owners.size, 2 * (4 + 2 + 2 + 1));
   // Une identité hors démonstration, ou forgée, ne se lit pas comme un espace de démonstration.
   for (const forged of ['invite-a', 'invite-a·demo·maraichage', 'invite-a·demo·maraichage·penurie·x', 'invite-a·demo·vierge·penurie', 'x·demo·inconnu·ete']) {
     assert.equal(demoChoiceOfOwner(forged), null, forged);

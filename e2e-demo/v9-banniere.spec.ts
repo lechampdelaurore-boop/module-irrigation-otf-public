@@ -36,7 +36,7 @@ test('V9 La bannière : une ligne au téléphone, « Changer » ouvre le reste ;
   expect(boite!.height, 'la bannière tient en une ligne de 44 px').toBeLessThanOrEqual(45);
   // L'invitation écartée n'ouvre pas le détail : le focus va à « Changer ».
   await expect(changer).toBeFocused();
-  await expect(banniere.locator('.demo-banner-line')).toHaveText('Démonstration · Maraîchage diversifié · Pic d’été');
+  await expect(banniere.locator('.demo-banner-line')).toHaveText('Démonstration · Ferme des Trois Noues · Pic d’été');
   await expect(changer).toHaveText('Changer');
   await expect(changer).toHaveAttribute('aria-expanded', 'false');
   await expect(texte).toHaveCount(1);

@@ -22,7 +22,7 @@ test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revien
   const fenetre = page.getByRole('dialog', { name: 'Remettre à zéro ?' });
   await ouvrirLeDetailDeLaBanniere(page);
   await bouton.click();
-  await expect(fenetre).toContainText('Ferme vierge');
+  await expect(fenetre).toContainText('Ferme du Pré Neuf');
   await expect(fenetre).toContainText('Les autres fermes et les autres moments ne changent pas.');
   await verifierLAccessibiliteDe(page, '.demo-reset-dialog');
   await fenetre.getByRole('button', { name: 'Annuler' }).click();

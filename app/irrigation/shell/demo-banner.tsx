@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { DEMO_BANNER_TEXT } from '@/lib/domain/demo/deployment-mode';
-import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, DEMO_PROFILES, demoSummary, resolveDemoChoice, type DemoSelection } from '@/lib/domain/demo/catalogue';
+import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, DEMO_PROFILES, demoProfileOption, demoSummary, resolveDemoChoice, type DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Icon } from '../line-icon';
 import { DEMO_DETAIL_ATTRIBUTE, listenToDemoDetailRequests } from './demo-banner-detail';
 import { DemoReset } from './demo-reset';
@@ -40,6 +40,8 @@ function choose(profile: string, moment: string | undefined) {
  * J1), une ligne de 44 px dit la ferme et le moment, et « Changer » ouvre le
  * reste dessous. Le détail est fermé à chaque page : toute navigation du
  * module est un chargement complet. Au-dessus de 600 px, rien ne change.
+ * La ferme porte le nom de l'exploitation, partout ; son profil n'est que la
+ * description de la liste (J9, F292).
  */
 export function DemoBanner({ selection = null, tour = null }: {
   selection?: DemoSelection | null;
@@ -80,7 +82,7 @@ export function DemoBanner({ selection = null, tour = null }: {
           <label>
             <span>Ferme</span>
             <select value={current.profile.id} onChange={(event) => choose(event.currentTarget.value, undefined)}>
-              {DEMO_PROFILES.map((profile) => <option key={profile.id} value={profile.id}>{profile.label}</option>)}
+              {DEMO_PROFILES.map((profile) => <option key={profile.id} value={profile.id}>{demoProfileOption(profile)}</option>)}
             </select>
           </label>
           {severalMoments ? (
@@ -92,7 +94,7 @@ export function DemoBanner({ selection = null, tour = null }: {
             </label>
           ) : null}
         </div>
-        <DemoReset farm={current.profile.label} moment={severalMoments ? current.moment.label : null} />
+        <DemoReset farm={current.profile.farmName} moment={severalMoments ? current.moment.label : null} />
         {tour ? <GuidedTour current={tour.current} reachable={tour.reachable} query={tour.query} /> : null}
       </div>
     </aside>
