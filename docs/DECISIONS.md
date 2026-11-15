@@ -4964,3 +4964,30 @@ Aucune migration ; aucun garde-fou de la démonstration ne change (D-103 à
 D-106) ; les listes gardent les noms longs.
 
 Ne changent pas : D-096, D-105.
+
+## D-144 — Audit ergonomique final, lot F : un seul nom pour la ferme, des moments qui ont un sens (J9, J16)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur pour le contenu
+(D-137, toutes les recommandations du contrat du lot F retenues) ; les
+précisions tranchées en codant suivent l'option recommandée, aucune
+question agronomique, modifiables par lui. Après D-143.
+
+**Décision** (F292 à F294, contrat `docs/audit-ergonomie-final-lot-f-contract.md`,
+sections 4 et 4 bis) : une ferme fictive porte un seul nom, celui de son
+exploitation (« Ferme des Trois Noues »), tenu par le catalogue et repris
+par le plan de la ferme : l'historique et ses exports, la ligne de la
+bannière au téléphone, la fenêtre « Remettre à zéro » et les visites
+guidées le disent ; la liste « Ferme » le donne suivi du profil en nom
+court, comme description (F292). L'en-tête, qui dit le nom de la personne
+connectée, ne change pas. Chaque profil ne propose que les moments qui
+montrent ce que son nom promet : la petite exploitation, le début d'été et
+l'automne ; la ferme « matériel et alertes », la nuit de gel et le début
+d'été ; le maraîchage, les quatre ; la ferme vierge, le début d'été (F293).
+Ce qu'un moment fait voir est réécrit par profil quand le texte général
+était faux (F294). Un témoin resté sur un moment retiré retombe sur le
+premier moment du profil, sans erreur.
+
+Aucune migration ; aucun garde-fou de la démonstration ne change (D-103 à
+D-106) ; les dates des moments et l'heure simulée ne changent pas.
+
+Ne changent pas : D-096, D-104, D-143.

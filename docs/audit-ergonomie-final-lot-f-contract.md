@@ -124,6 +124,40 @@ conservé (à confirmer à la lecture de `lib/domain/demo/tours.ts`).
 « petite-ferme · pénurie »). La PR 2 relit **chaque** parcours qui désigne un
 couple retiré avant de l'enlever, et le dit en clair dans la PR.
 
+## 4 bis. Ce que le code a établi pour J9 et J16 (PR 2, D-144)
+
+- **L'en-tête** dit le nom de la personne connectée, jamais celui d'une
+  ferme : sur la démonstration déployée, le nom de l'invité (Cloudflare
+  Access) ; « Ferme de démonstration » (`access-auth.ts`) n'est que le nom
+  de l'utilisateur local des essais et des parcours, que la démonstration
+  déployée ne montre jamais. Il ne change pas : l'accès normal reste tel
+  quel.
+- **Le nom de l'exploitation** est tenu une seule fois, par le catalogue
+  (`farmName`), et `farms.ts` le reprend : l'historique, son périmètre
+  « ferme entière » et ses exports (`structure.name`), la ligne de la
+  bannière au téléphone, la fenêtre « Remettre à zéro » et les visites
+  guidées disent tous « Ferme des Trois Noues » (F292). La ligne de la
+  section 3 devient donc « Démonstration · Ferme des Trois Noues · Pic
+  d'été ».
+- **La liste « Ferme »** dit « Ferme des Trois Noues · Maraîchage
+  diversifié » : le nom de l'exploitation, puis le profil en nom court,
+  comme description (F292).
+- **Les visites guidées** : aucun `bestWith` ne désignait un couple retiré ;
+  ils nomment désormais la ferme par le nom de son exploitation (« Avec
+  « Ferme des Trois Noues », au pic de l'été. »), et un test le tient.
+- **Les parcours** : aucun parcours `e2e:demo` ne choisissait un couple
+  retiré (V7 joue « petite exploitation · automne », V6 « matériel et
+  alertes · début d'été », tous deux conservés) ; V8 attend « Ferme du
+  Pré Neuf », V9 la nouvelle ligne. Deux tests de la base choisissaient
+  un couple retiré par commodité : ils prennent le début d'été, que le
+  repli de `resolveDemoChoice` leur donnait déjà.
+- **`shows`** est réécrit pour la petite exploitation, la ferme « matériel
+  et alertes » et la ferme vierge ; un test vérifie que ce qu'un moment
+  fait voir ne promet rien que sa ferme n'a pas coché (F294).
+- Un espace déjà ouvert sur un couple retiré n'est plus atteignable (le
+  témoin retombe sur le premier moment du profil) ; la tâche de nuit le
+  met de côté comme tout espace inactif depuis plus d'un jour.
+
 ## 5. Le jeu de données (choix n° 4 du rapport)
 
 **Causes établies dans le code.** `adoptProposals` (`demo-space.ts`) adopte,

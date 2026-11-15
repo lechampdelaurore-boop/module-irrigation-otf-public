@@ -7,6 +7,11 @@ import type { FeatureId } from '../features/catalogue.ts';
  * 2026 (question 1 sur 4) ; quatre moments par profil (question 2 sur 4),
  * chacun daté : la démonstration se joue ce jour-là, à l'heure réelle de la
  * ferme, quel que soit le jour de la visite (C3).
+ *
+ * Audit ergonomique final, lot F (docs/audit-ergonomie-final-lot-f-contract.md,
+ * section 4) : chaque profil ne propose que les moments qui montrent ce que
+ * son nom promet (J16, F293), avec ce qu'ils y font voir (F294) ; la ferme
+ * fictive porte un seul nom, celui de l'exploitation (J9, F292).
  */
 
 export type DemoProfileId = 'maraichage' | 'petite-ferme' | 'vannes-alertes' | 'vierge';
@@ -27,9 +32,12 @@ type DemoMoment = {
 
 export type DemoProfile = {
   id: DemoProfileId;
+  /** Le nom du profil, que la liste de la bannière donne comme description de la ferme (F292). */
   label: string;
-  /** Le nom court de la ligne de la bannière au téléphone (lot F, F290). */
+  /** Le nom court du profil, dans la liste de la bannière (lot F, F290). */
   shortLabel: string;
+  /** Le nom de l'exploitation fictive, le seul que le module donne à la ferme (J9, F292). */
+  farmName: string;
   description: string;
   /** Les cases cochées d'avance ; vide pour la ferme vierge, qui s'ouvre sur la liste à cocher. */
   features: readonly FeatureId[];
@@ -70,11 +78,15 @@ const MOMENTS: Readonly<Record<DemoMomentId, DemoMoment>> = {
 
 const ALL_MOMENTS = DEMO_MOMENT_IDS.map((id) => MOMENTS[id]);
 
+/** Un moment dont le texte général ne dit pas la vérité de la ferme : ce qu'il y fait voir (F294). */
+const shown = (id: DemoMomentId, shows: string): DemoMoment => ({ ...MOMENTS[id], shows });
+
 export const DEMO_PROFILES: readonly DemoProfile[] = [
   {
     id: 'maraichage',
     label: 'Maraîchage diversifié',
     shortLabel: 'Maraîchage diversifié',
+    farmName: 'Ferme des Trois Noues',
     description: 'Plein champ et abri, une réserve et une pompe : le besoin, le planning, la pénurie et la réserve.',
     features: ['arrosages', 'planning', 'besoins', 'sol', 'cultures', 'materiel', 'calculateur', 'ressources', 'alertes-meteo', 'alertes-cultures', 'historique'],
     moments: ALL_MOMENTS,
@@ -83,25 +95,36 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     id: 'petite-ferme',
     label: 'Petite exploitation, une seule ressource',
     shortLabel: 'Petite exploitation',
+    farmName: 'Le Jardin de la Mare',
     description: 'L’arrosage sans réserve, et le calculateur des millimètres au temps.',
     features: ['arrosages', 'besoins', 'materiel', 'calculateur'],
-    moments: ALL_MOMENTS,
+    // Ni alertes, ni planning, ni réserve : ni nuit de gel, ni pénurie.
+    moments: [
+      shown('ete', 'Une semaine ordinaire : l’arrosage du jour, le besoin de chaque planche et le calculateur.'),
+      shown('automne', 'La saison s’achève : les arrosages de la saison et le besoin des dernières planches.'),
+    ],
   },
   {
     id: 'vannes-alertes',
     label: 'Le matériel et les alertes seulement',
     shortLabel: 'Matériel et alertes',
+    farmName: 'Domaine des Terres Blanches',
     description: 'Le module à la carte : une ferme qui ne coche presque rien.',
     features: ['materiel', 'alertes-meteo'],
-    moments: ALL_MOMENTS,
+    // Les alertes météo, mais ni pénurie ni historique : ni pic d'été, ni fin de saison.
+    moments: [
+      shown('gel-printemps', 'Une nuit de gel est annoncée : les alertes météo de la ferme.'),
+      shown('ete', 'Une semaine ordinaire : le matériel de la ferme et ses alertes météo.'),
+    ],
   },
   {
     id: 'vierge',
     label: 'Ferme vierge',
     shortLabel: 'Ferme vierge',
+    farmName: 'Ferme du Pré Neuf',
     description: 'La première ouverture : rien de coché, rien de réglé.',
     features: [],
-    moments: [MOMENTS.ete],
+    moments: [shown('ete', 'La première ouverture : la liste des fonctionnalités à cocher, et rien de réglé.')],
   },
 ];
 
@@ -124,13 +147,18 @@ export function resolveDemoChoice(profileId: string | undefined, momentId: strin
 
 /**
  * La ligne de la bannière au téléphone (docs/audit-ergonomie-final-lot-f-contract.md,
- * section 3 ; J1) : « Démonstration », la ferme, puis le moment quand le
- * profil en propose plusieurs, en noms courts.
+ * section 3 ; J1) : « Démonstration », le nom de la ferme (J9, F292), puis
+ * le moment en nom court quand le profil en propose plusieurs.
  */
 export function demoSummary(choice: DemoChoice): string {
-  const parts = ['Démonstration', choice.profile.shortLabel];
+  const parts = ['Démonstration', choice.profile.farmName];
   if (choice.profile.moments.length > 1) parts.push(choice.moment.shortLabel);
   return parts.join(' · ');
+}
+
+/** Une ferme dans la liste de la bannière : son nom, puis son profil comme description (J9, F292). */
+export function demoProfileOption(profile: DemoProfile): string {
+  return `${profile.farmName} · ${profile.shortLabel}`;
 }
 
 const SEPARATOR = '·demo·';

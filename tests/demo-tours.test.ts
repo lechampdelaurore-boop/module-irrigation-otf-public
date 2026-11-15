@@ -177,3 +177,10 @@ test('l’étape rangée se relit telle quelle ; une valeur abîmée ne reprend 
   assert.deepEqual(withSeenTour(['bienvenue'], 'bienvenue'), ['bienvenue']);
   assert.deepEqual(withSeenTour(['bienvenue'], 'planning'), ['bienvenue', 'planning']);
 });
+
+test('J9 : une visite désigne la ferme par le nom de son exploitation, celui de la liste de la bannière (F292)', () => {
+  const farmNames = DEMO_PROFILES.map((profile) => profile.farmName);
+  for (const tour of TOURS) {
+    for (const [, name] of (tour.bestWith ?? '').matchAll(/« ([^»]+) »/g)) assert.ok(farmNames.includes(name), `${tour.id} : ${name}`);
+  }
+});

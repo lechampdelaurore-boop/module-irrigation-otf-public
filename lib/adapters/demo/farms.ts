@@ -1,5 +1,5 @@
 import type { IrrigationSnapshot } from '../../domain/domain.ts';
-import type { DemoProfileId } from '../../domain/demo/catalogue.ts';
+import { DEMO_PROFILES, type DemoProfileId } from '../../domain/demo/catalogue.ts';
 import { bedRow, buildDemoSnapshot, type DemoFarmDefinition, type DemoSeriesDefinition } from './farm-builder.ts';
 
 /**
@@ -15,6 +15,9 @@ import { bedRow, buildDemoSnapshot, type DemoFarmDefinition, type DemoSeriesDefi
  * aucune ferme réelle. La ferme vierge n'a rien dessiné, comme une ferme qui
  * démarre ; « Le Clos des Saules » non plus, pour montrer ce cas.
  */
+
+/** Le nom de l'exploitation, tenu par le catalogue : le même dans la bannière et dans le module (J9, F292). */
+const farmName = (profile: DemoProfileId): string => DEMO_PROFILES.find((item) => item.id === profile)!.farmName;
 
 const series = (
   id: string, name: string, plant: string, plantName: string, kind: DemoSeriesDefinition['kind'],
@@ -32,7 +35,7 @@ const series = (
 
 const MARAICHAGE: DemoFarmDefinition = {
   id: 'demo-maraichage',
-  name: 'Ferme des Trois Noues',
+  name: farmName('maraichage'),
   city: 'Nantes',
   postcode: '44000',
   zones: [
@@ -71,7 +74,7 @@ const MARAICHAGE: DemoFarmDefinition = {
 
 const PETITE_FERME: DemoFarmDefinition = {
   id: 'demo-petite-ferme',
-  name: 'Le Jardin de la Mare',
+  name: farmName('petite-ferme'),
   city: 'Tours',
   postcode: '37000',
   zones: [{
@@ -93,7 +96,7 @@ const PETITE_FERME: DemoFarmDefinition = {
 
 const VANNES_ALERTES: DemoFarmDefinition = {
   id: 'demo-vannes-alertes',
-  name: 'Domaine des Terres Blanches',
+  name: farmName('vannes-alertes'),
   city: 'Valence',
   postcode: '26000',
   zones: [
@@ -119,7 +122,7 @@ const VANNES_ALERTES: DemoFarmDefinition = {
 
 const VIERGE: DemoFarmDefinition = {
   id: 'demo-vierge',
-  name: 'Ferme du Pré Neuf',
+  name: farmName('vierge'),
   city: 'Nantes',
   postcode: '44000',
   zones: [{

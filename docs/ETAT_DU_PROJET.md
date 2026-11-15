@@ -494,8 +494,17 @@ registres, elle y renvoie.
   listes, la remise à zéro et les visites, fermé à chaque page ; une visite
   qui présente un élément du détail l'ouvre ; à l'ordinateur, capture
   comparée pixel à pixel, rien ne change (F288 à F291 ; V1, V2, V6, V8
-  adaptés, V9 ajouté ; 18 parcours de la démonstration sur 18). Ensuite J9
-  et J16.
+  adaptés, V9 ajouté ; 18 parcours de la démonstration sur 18), **en
+  ligne** (#76, fusionnée à 19 h 36, déployée à 19 h 54, run 43747727811,
+  cinq jobs verts). **PR 2
+  sur 3, J9 et J16** (D-144) : la ferme fictive porte un seul nom, celui
+  de son exploitation, tenu par le catalogue (bannière, remise à zéro,
+  visites, historique et exports ; la liste donne le profil comme
+  description ; l'en-tête, qui dit le nom de la personne connectée, ne
+  change pas) ; la petite exploitation ne propose plus que le début d'été
+  et l'automne, la ferme « matériel et alertes » la nuit de gel et le début
+  d'été ; aucun parcours ne choisissait un couple retiré (F292 à F294 ;
+  V8, V9 adaptés). Ensuite le jeu de données.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

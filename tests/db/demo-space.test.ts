@@ -43,7 +43,7 @@ afterEach(() => {
 });
 
 test('un espace de démonstration s’ouvre avec les cases que sa ferme coche d’avance', async () => {
-  const choice = resolveDemoChoice('petite-ferme', 'penurie');
+  const choice = resolveDemoChoice('petite-ferme', 'ete');
   const owner = demoOwnerUserId('invite-a', choice);
   await prepareDemoSpace(owner, choice);
   const selection = await getFeatureSelectionForUser(owner);
@@ -221,7 +221,7 @@ test('moment « automne » : la saison passée est dans l’historique, arrosage
   assert.ok(events.every((event) => event.status === 'completed'));
   assert.ok(events.every((event) => (event.equipment.actualStartAt ?? '') < `${choice.moment.dateKey}T00:00:00.000Z`));
   // La ferme qui ne coche pas « Arrosages » n'a pas d'historique.
-  const valves = await prepareOnMoment('invite-a', 'vannes-alertes', 'automne');
+  const valves = await prepareOnMoment('invite-a', 'vannes-alertes', 'ete');
   assert.deepEqual(await listIrrigationEventsForUser(valves.owner, 2026), []);
 });
 

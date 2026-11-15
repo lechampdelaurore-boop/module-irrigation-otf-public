@@ -125,7 +125,7 @@ export const TOURS: readonly Tour[] = [
     title: 'Un arrosage de A à Z',
     summary: 'Choisir un matériel et une quantité d’eau, comprendre le chiffre calculé, puis valider vous-même.',
     minutes: 4,
-    bestWith: 'Avec « Maraîchage diversifié » ou « Petite exploitation ».',
+    bestWith: 'Avec « Ferme des Trois Noues » ou « Le Jardin de la Mare ».',
     requires: ['arrosages'],
     steps: [
       {
@@ -171,7 +171,7 @@ export const TOURS: readonly Tour[] = [
     title: 'Le planning',
     summary: 'Les propositions de la semaine, les créneaux, valider ou refuser, et les planches non servies.',
     minutes: 3,
-    bestWith: 'Avec « Maraîchage diversifié », en début d’été.',
+    bestWith: 'Avec « Ferme des Trois Noues », en début d’été.',
     requires: ['planning'],
     steps: [
       {
@@ -205,7 +205,7 @@ export const TOURS: readonly Tour[] = [
     title: 'Quand l’eau manque',
     summary: 'La réserve basse, le manque d’eau chiffré et les planches qui passent après les autres.',
     minutes: 3,
-    bestWith: 'Avec « Maraîchage diversifié », au pic de l’été.',
+    bestWith: 'Avec « Ferme des Trois Noues », au pic de l’été.',
     requires: ['planning', 'ressources'],
     steps: [
       {
@@ -245,7 +245,7 @@ export const TOURS: readonly Tour[] = [
     title: 'Les alertes',
     summary: 'Le gel prévu culture par culture, la marge de sécurité, et l’alerte qui vous parvient.',
     minutes: 3,
-    bestWith: 'Avec « Maraîchage diversifié », au printemps, la nuit de gel.',
+    bestWith: 'Avec « Ferme des Trois Noues », au printemps, la nuit de gel.',
     requires: ['alertes-meteo', 'alertes-cultures'],
     steps: [
       {
@@ -278,7 +278,7 @@ export const TOURS: readonly Tour[] = [
     title: 'Le module à la carte',
     summary: 'Cocher et décocher des fonctionnalités : le module ne montre que ce qui sert à la ferme.',
     minutes: 2,
-    bestWith: 'Avec « Le matériel et les alertes seulement » ou la « Ferme vierge ».',
+    bestWith: 'Avec « Domaine des Terres Blanches » ou « Ferme du Pré Neuf ».',
     steps: [
       {
         pages: ['reglages', 'bienvenue'],
