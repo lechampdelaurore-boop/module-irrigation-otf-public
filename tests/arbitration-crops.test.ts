@@ -74,9 +74,12 @@ test('« Cette semaine » : l’implantation récente, la culture en place, la p
   assert.equal(semaineDe('B9').main, 'Planche nue');
 });
 
-test('le stade et le Kc du jour, à titre d’information, puis la prochaine culture prévue', () => {
-  assert.equal(semaineDe('T1-1').detail, 'Récolte · Kc 1,15');
-  assert.equal(semaineDe('A3').detail, 'Fin de récolte · Kc 0,95 · Épinard à partir du 24 août');
+test('le stade du jour, à titre d’information, puis la prochaine culture prévue ; le Kc à part, pour l’infobulle (audit final, lot B, R5, F250)', () => {
+  assert.equal(semaineDe('T1-1').detail, 'Récolte');
+  assert.equal(semaineDe('T1-1').expert, 'Kc 1,15');
+  assert.equal(semaineDe('A3').detail, 'Fin de récolte · Épinard à partir du 24 août');
+  assert.equal(semaineDe('A3').expert, 'Kc 0,95');
+  assert.equal(semaineDe('B4').expert, null);
   assert.equal(semaineDe('B4').detail, 'Engrais vert à partir du 3 août');
   assert.equal(semaineDe('B9').detail, null);
   const deux = arbitrationCrops({
@@ -89,7 +92,8 @@ test('le stade et le Kc du jour, à titre d’information, puis la prochaine cul
   });
   // Deux cultures en place : chacune nommée ; la phrase porte sur la plus ancienne.
   assert.equal(deux.beds.C1.week.main, 'En récolte jusqu’au 11 octobre');
-  assert.equal(deux.beds.C1.week.detail, 'Tomate : Récolte · Kc 1,15');
+  assert.equal(deux.beds.C1.week.detail, 'Tomate : Récolte');
+  assert.equal(deux.beds.C1.week.expert, 'Tomate : Kc 1,15');
   assert.deepEqual(deux.beds.C1.present, ['Tomate', 'Basilic']);
   const engrais = arbitrationCrops({ cropPlan: plan({ D1: [{ id: 'phacelie', plant: 'Phacélie', kind: 'direct-sowing', week: 26 }] }), bedIds: ['D1'], today: TODAY,
     stagesToday: new Map([['D1', [{ cultivationId: 'culture-phacelie', plantName: 'Phacélie', stage: null, kc: null, surfaceState: true }]]]) });
@@ -117,5 +121,5 @@ test('la frise : chaque culture en semaines depuis la semaine en cours, la réco
 test('les cultures en place, pour la case « Servir » ; une planche inconnue n’a ni frise ni culture', () => {
   assert.deepEqual(vue.beds['T1-1'].present, ['Tomate']);
   assert.deepEqual(vue.beds.B4.present, []);
-  assert.deepEqual(vue.beds.B9, { crops: [], present: [], week: { main: 'Planche nue', detail: null } });
+  assert.deepEqual(vue.beds.B9, { crops: [], present: [], week: { main: 'Planche nue', detail: null, expert: null } });
 });

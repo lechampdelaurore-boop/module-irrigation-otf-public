@@ -44,7 +44,12 @@ export type ArbitrationBedCrops = {
   crops: ArbitrationTimelineCrop[];
   /** Les cultures en place aujourd'hui, de la plus ancienne à la plus récente. */
   present: string[];
-  week: { main: string; detail: string | null };
+  /**
+   * `detail` : le stade de chaque culture en place, puis la prochaine culture
+   * prévue ; `expert` : le Kc du jour, pour l'infobulle de la cellule, hors
+   * de la phrase (audit final, lot B, R5, F250).
+   */
+  week: { main: string; detail: string | null; expert: string | null };
 };
 
 export type ArbitrationCrops = { weekStart: string; beds: Record<string, ArbitrationBedCrops> };
@@ -104,7 +109,7 @@ function bedCrops(crops: CultivationDates[], today: string, weekStart: string, s
     crops: crops.map((crop) => timelineCrop(crop, today, weekStart))
       .filter((crop) => (crop.endWeek === null || crop.endWeek >= -ARBITRATION_WEEKS_BEFORE) && crop.startWeek <= ARBITRATION_WEEKS_AFTER),
     present: inPlace.map((crop) => crop.plantName),
-    week: { main: mainPhrase(inPlace[0], crops, today, weekStart), detail: detailPhrase(inPlace, crops, today, stages) },
+    week: { main: mainPhrase(inPlace[0], crops, today, weekStart), detail: detailPhrase(inPlace, crops, today, stages), expert: expertPhrase(inPlace, stages) },
   };
 }
 
@@ -145,14 +150,14 @@ function mainPhrase(crop: CultivationDates | undefined, crops: readonly Cultivat
   return `En place depuis le ${day(crop.presenceStart)}`;
 }
 
-/** Le stade et le Kc du jour de chaque culture en place, puis la prochaine culture prévue. */
+/** Le stade du jour de chaque culture en place, puis la prochaine culture prévue ; le Kc va dans l'infobulle (F250). */
 function detailPhrase(inPlace: readonly CultivationDates[], crops: readonly CultivationDates[], today: string, stages: readonly BedStageToday[]): string | null {
   const named = inPlace.length > 1;
   const stageTexts = inPlace.flatMap((crop) => {
     const stage = stages.find((item) => item.cultivationId === crop.cultivationId);
     const text = !stage ? null
       : stage.surfaceState ? 'engrais vert'
-        : stage.stage !== null && stage.kc !== null ? `${stage.stage} · Kc ${kcNumber.format(stage.kc)}` : null;
+        : stage.stage !== null && stage.kc !== null ? stage.stage : null;
     return text === null ? [] : [named ? `${crop.plantName} : ${text}` : text];
   });
   const next = crops.find((crop) => crop.presenceStart > today);
@@ -161,6 +166,18 @@ function detailPhrase(inPlace: readonly CultivationDates[], crops: readonly Cult
     ...(next ? [`${next.plantName} à partir du ${day(next.presenceStart)}`] : []),
   ];
   return parts.length ? parts.join(' · ') : null;
+}
+
+/** « Kc 1,15 », ou « Tomate : Kc 1,15 ; Basilic : Kc 1 » : le Kc du jour de chaque culture en place, pour les experts (F250). */
+function expertPhrase(inPlace: readonly CultivationDates[], stages: readonly BedStageToday[]): string | null {
+  const named = inPlace.length > 1;
+  const texts = inPlace.flatMap((crop) => {
+    const stage = stages.find((item) => item.cultivationId === crop.cultivationId);
+    if (!stage || stage.surfaceState || stage.stage === null || stage.kc === null) return [];
+    const text = `Kc ${kcNumber.format(stage.kc)}`;
+    return [named ? `${crop.plantName} : ${text}` : text];
+  });
+  return texts.length ? texts.join(' ; ') : null;
 }
 
 function toneOf(name: string): number {

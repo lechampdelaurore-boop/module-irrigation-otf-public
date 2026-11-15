@@ -328,7 +328,13 @@ registres, elle y renvoie.
   de N02 restée cochée au clic ; l'écran de répartition relisait sa propre
   répartition validée 180 ms après l'avoir reçue, ses cases indisponibles
   le temps de ce calcul inutile. Il ne relit plus que les changements des
-  autres blocs et onglets (aucun calcul ni donnée touchés). Ensuite R5.
+  autres blocs et onglets (aucun calcul ni donnée touchés), **en ligne**
+  (#58, fusionnée à 4 h 10, déployée à 4 h 26). **PR 3 sur 7, R5** :
+  sur l'écran de répartition, les cultures en place s'écrivent à côté du
+  nom de la planche, « A01 · Tomate », à toutes les largeurs, « planche
+  nue » quand le plan de culture n'en a aucune ; la phrase de la semaine
+  garde le stade et laisse le Kc à l'infobulle de la cellule (F249, F250 ;
+  P7 étendu ; aucune migration). Ensuite J7.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -424,6 +430,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #58 (`550c0f6`, l'écran de répartition qui ne relit plus sa propre
+  répartition validée, D-129, fusionnée à 4 h 10 et déployée à
+  4 h 26, run 43671158376, les cinq jobs réussis, aucune migration). Avant
+  elle : la
   PR #57 (`9006fb3`, lot B de l'audit final, R4, le chemin vers la
   répartition, D-123, fusionnée à 3 h 19 et déployée à 3 h 51, run
   43667252295, les cinq jobs réussis après une relance du job des
