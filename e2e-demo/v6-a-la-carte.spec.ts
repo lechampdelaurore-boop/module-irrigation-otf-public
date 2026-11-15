@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { commencerLaVisite, ecarterLInvitation, etapeSuivante, jouerLaVisite, ouvrirLaDemo, verifierLEtapeDeVisite } from './support/visite.ts';
+import { commencerLaVisite, ecarterLInvitation, etapeSuivante, jouerLaVisite, ouvrirLaDemo, ouvrirLeDetailDeLaBanniere, verifierLEtapeDeVisite } from './support/visite.ts';
 
 /**
  * Parcours V6 : la visite « Le module à la carte » (contrat, section 7,
@@ -8,6 +8,7 @@ import { commencerLaVisite, ecarterLInvitation, etapeSuivante, jouerLaVisite, ou
  * sans message. « Passer » mène à la visite suivante.
  */
 async function visitesOffertes(page: import('@playwright/test').Page): Promise<string[]> {
+  await ouvrirLeDetailDeLaBanniere(page);
   await page.getByRole('button', { name: 'Visites guidées' }).click();
   const titres = await page.locator('.tour-list li button strong').allInnerTexts();
   await page.keyboard.press('Escape');

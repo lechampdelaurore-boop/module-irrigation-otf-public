@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit ergonomique final, lot F, la démonstration)
+
+- **J1, la barre de la démonstration en une ligne au téléphone** (D-143,
+  F288 à F291) : à 600 px et moins, la bannière dit « Démonstration ·
+  Maraîchage diversifié · Pic d'été » sur 44 px, et « Changer » ouvre
+  dessous le texte, les deux listes, la remise à zéro et les visites ; le
+  détail est fermé à chaque page. Une visite qui présente un élément du
+  détail l'ouvre. À l'ordinateur, rien ne change. Contrat du lot versé
+  (`docs/audit-ergonomie-final-lot-f-contract.md`). Parcours V1, V2, V6 et
+  V8 adaptés, V9 ajouté. Lot A : J13 en ligne, #74, déployée le
+  15 novembre 2026 à 18 h 30.
+
 ### Ajouté (Tranche 4, contrat)
 
 - **Contrat de la Tranche 4 validé** (D-142) : `docs/tranche-4-contract.md`,

@@ -43,6 +43,7 @@ Réglage de la roadmap pour le code : la recherche du 7/11 cite la ligne 25 (« 
 
 - Le module **tel qu'il est** (même code, mêmes onze pages, mêmes calculs). Aucun écran de démo qui ne serait pas un vrai écran : on montre le vrai produit.
 - Une **bannière permanente** : « Démonstration : données fictives. Rien ici ne touche une vraie ferme. » avec le bouton de remise à zéro. Elle suit la charte du module (section 9).
+  Au téléphone (600 px et moins), elle tient en une ligne de 44 px, la ferme et le moment, et « Changer » ouvre le reste dessous (audit ergonomique final, lot F, D-143, `docs/audit-ergonomie-final-lot-f-contract.md`, section 3).
 - Un **sélecteur de ferme de démonstration** (trois profils + « ferme vierge »), et pour chaque profil un **sélecteur de scénario de saison**.
 - La **visite guidée** (section 7).
 

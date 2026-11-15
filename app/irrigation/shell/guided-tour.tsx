@@ -21,6 +21,7 @@ import {
 import { tourById, type Tour, type TourId, type TourPage, type TourStep } from '@/lib/domain/demo/tours';
 import { WELCOME_PATH, pageHref, pageLabel, type PageQuery } from '@/lib/domain/features/pages';
 import { Icon } from '../line-icon';
+import { DEMO_DETAIL_TOGGLE_SELECTOR, isInFoldedDemoDetail, openDemoDetail } from './demo-banner-detail';
 
 /** Ce que la bannière sait de la page pour y jouer une visite : la page ouverte, le menu de la ferme, la saison et la parcelle. */
 export type TourSurroundings = { current: TourPage; reachable: readonly TourPage[]; query: PageQuery };
@@ -75,21 +76,39 @@ function visibleAnchor(name: string): HTMLElement | null {
 }
 
 /**
+ * Au téléphone, le choix de la ferme, le bouton des visites et la remise à
+ * zéro sont rangés dans le détail replié de la bannière : une visite qui doit
+ * les présenter l'ouvre (docs/audit-ergonomie-final-lot-f-contract.md, F291),
+ * plutôt que de sauter l'étape.
+ */
+function foldedAnchor(name: string): boolean {
+  return [...document.querySelectorAll(`[data-tour="${name}"]`)].some(isInFoldedDemoDetail);
+}
+
+/** L'élément visible, ou rendu visible en ouvrant le détail de la bannière. */
+function revealedAnchor(name: string): HTMLElement | null {
+  const element = visibleAnchor(name);
+  if (element || !foldedAnchor(name)) return element;
+  openDemoDetail();
+  return visibleAnchor(name);
+}
+
+/**
  * L'élément d'une étape. À l'arrivée sur une page (`patient`), on lui laisse
  * le temps de paraître ; sur un clic dans une page déjà là, il y est ou non.
  */
 async function waitForAnchor(name: string, patient: boolean): Promise<HTMLElement | null> {
   for (let attempt = 0; attempt < (patient ? ANCHOR_WAIT_STEPS : 1); attempt += 1) {
-    const element = visibleAnchor(name);
+    const element = revealedAnchor(name);
     if (element) return element;
     await new Promise((resolve) => setTimeout(resolve, ANCHOR_WAIT_MS));
   }
   return null;
 }
 
-/** Une étape sans élément se montre toujours ; avec, seulement si l'élément est à l'écran. */
+/** Une étape sans élément se montre toujours ; avec, seulement si l'élément est à l'écran, ou dans le détail replié de la bannière. */
 function anchorShown(step: TourStep): boolean {
-  return !step.anchor || visibleAnchor(step.anchor) !== null;
+  return !step.anchor || visibleAnchor(step.anchor) !== null || foldedAnchor(step.anchor);
 }
 
 /**
@@ -102,7 +121,7 @@ function hasStepTowards(tour: Tour, from: number, direction: 1 | -1, context: To
     const playable = playableStep(tour, index, direction, context);
     if (!playable) return false;
     const anchor = tour.steps[playable.index].anchor;
-    if (playable.page !== context.current || !anchor || visibleAnchor(anchor)) return true;
+    if (playable.page !== context.current || !anchor || visibleAnchor(anchor) || foldedAnchor(anchor)) return true;
     index = playable.index + direction;
   }
 }
@@ -160,13 +179,25 @@ export function GuidedTour({ current, reachable, query }: TourSurroundings) {
     queryRef.current = query;
   });
 
-  const restoreFocus = useCallback(() => {
+  /**
+   * Au téléphone, le bouton des visites est dans le détail replié de la
+   * bannière : à la fin d'une visite, le détail s'ouvre pour le recevoir ;
+   * l'invitation écartée, elle, ne l'ouvre pas, et le focus va à « Changer ».
+   */
+  const restoreFocus = useCallback((reveal: boolean) => {
     const target = returnFocus.current?.isConnected ? returnFocus.current : listButton.current;
     returnFocus.current = null;
+    if (target && isInFoldedDemoDetail(target)) {
+      if (!reveal) {
+        document.querySelector<HTMLElement>(DEMO_DETAIL_TOGGLE_SELECTOR)?.focus();
+        return;
+      }
+      openDemoDetail();
+    }
     target?.focus();
   }, []);
 
-  const finish = useCallback((tour: TourId | null, completed: boolean) => {
+  const finish = useCallback((tour: TourId | null, completed: boolean, reveal = true) => {
     request.current += 1;
     writeStored(TOUR_STORAGE_KEY, null);
     if (tour && completed) {
@@ -177,7 +208,7 @@ export function GuidedTour({ current, reachable, query }: TourSurroundings) {
       });
     }
     setShown(null);
-    restoreFocus();
+    restoreFocus(reveal);
   }, [restoreFocus]);
 
   /**
@@ -321,8 +352,9 @@ export function GuidedTour({ current, reachable, query }: TourSurroundings) {
   }, [anchor, shown]);
 
   const quit = useCallback(() => {
-    if (shown?.kind === 'invitation') writeStored(TOUR_INVITATION_STORAGE_KEY, 'vue');
-    finish(null, false);
+    const invitation = shown?.kind === 'invitation';
+    if (invitation) writeStored(TOUR_INVITATION_STORAGE_KEY, 'vue');
+    finish(null, false, !invitation);
   }, [shown, finish]);
 
   // Échap ferme la liste, ou quitte la visite quand le focus est dans la bulle.

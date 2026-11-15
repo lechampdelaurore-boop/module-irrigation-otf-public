@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { commencerLaVisite, jouerLaVisite, ouvrirLaDemo } from './support/visite.ts';
+import { commencerLaVisite, jouerLaVisite, ouvrirLaDemo, ouvrirLeDetailDeLaBanniere } from './support/visite.ts';
 
 /**
  * Parcours V2 : la visite « Un arrosage de A à Z » (contrat, section 7,
@@ -17,6 +17,7 @@ test('V2 Un arrosage de A à Z : d’une page à l’autre, stockage refusé, sa
     });
   });
   const visite = await ouvrirLaDemo(page, 'maraichage', 'ete');
+  await ouvrirLeDetailDeLaBanniere(page);
   await expect(page.getByRole('button', { name: 'Visites guidées' })).toBeVisible();
   await expect(page.locator('.tour-bubble')).toHaveCount(0);
 

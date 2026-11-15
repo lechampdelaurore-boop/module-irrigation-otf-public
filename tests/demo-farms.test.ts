@@ -11,6 +11,7 @@ import {
   DEMO_PROFILES,
   demoChoiceOfOwner,
   demoOwnerUserId,
+  demoSummary,
   resolveDemoChoice,
 } from '../lib/domain/demo/catalogue.ts';
 import { browserClockScript } from '../lib/domain/demo/browser-clock.ts';
@@ -54,6 +55,15 @@ test('un choix illisible revient au premier profil et à son premier moment ; un
   assert.deepEqual(ids(resolveDemoChoice('inconnu', 'penurie')), ['maraichage', 'penurie']);
   assert.deepEqual(ids(resolveDemoChoice('vierge', 'penurie')), ['vierge', 'ete']);
   assert.deepEqual(ids(resolveDemoChoice('petite-ferme', 'automne')), ['petite-ferme', 'automne']);
+});
+
+test('J1 : la ligne de la bannière au téléphone dit la ferme et le moment en noms courts, sans moment pour la ferme vierge', () => {
+  assert.equal(demoSummary(resolveDemoChoice('maraichage', 'penurie')), 'Démonstration · Maraîchage diversifié · Pic d’été');
+  assert.equal(demoSummary(resolveDemoChoice('petite-ferme', 'automne')), 'Démonstration · Petite exploitation · Automne');
+  assert.equal(demoSummary(resolveDemoChoice('vannes-alertes', 'gel-printemps')), 'Démonstration · Matériel et alertes · Gel de printemps');
+  assert.equal(demoSummary(resolveDemoChoice('vierge', 'ete')), 'Démonstration · Ferme vierge');
+  // Deux lignes de texte au plus dans 44 px, à 390 px de large : la plus longue tient en moins de 60 signes.
+  for (const choice of ALL_CHOICES) assert.ok(demoSummary(choice).length <= 60, demoSummary(choice));
 });
 
 test('les témoins se lisent dans l’en-tête, sans confondre deux noms voisins', () => {

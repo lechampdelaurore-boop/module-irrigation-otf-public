@@ -471,13 +471,29 @@ registres, elle y renvoie.
   posée. »), avec « Poser « Gel : moins de 3 °C » », qui ouvre le
   formulaire rempli du modèle sur « Alertes météo », rien d'enregistré ; la
   pastille dit « Gel sans alerte posée » (F283, F284 ; P29 étendu ; ton du
-  bloc, seuils et envois inchangés). **PR 4 sur 4, J13** (D-141) : un seul
+  bloc, seuils et envois inchangés). **PR 4 sur 4, J13** (D-141), **en
+  ligne** (#74, fusionnée à 18 h 11, déployée à 18 h 30, run 43739686565,
+  cinq jobs verts) : un seul
   titre, la date en sous-titre ; la pastille du jour dit « 2 à faire » ;
   celle du menu dit « 2 choses à regarder » ; « Plus » prend la marque de
   la page ouverte au lieu d'un point vert muet ; une journée sans rien à
   faire laisse « Gel ou chaleur » passer dessous à l'ordinateur (F285 à
-  F287 ; P28, P29, P30 étendus). **Le lot est codé en entier** ; reste sa
-  recette.
+  F287 ; P28, P29, P30 étendus). **Le lot est codé et en ligne en
+  entier** ; reste sa recette.
+- Audit ergonomique final, **lot F · la démonstration** (24 undecies,
+  D-143) : **commencé le 15 novembre 2026 au soir**, en Opus 5.5 · Élevé,
+  sur le « vas-y » exprès du porteur (D-137). Contrat court
+  `docs/audit-ergonomie-final-lot-f-contract.md` (précisions F288 et
+  suivantes), versé par la PR 1 ; trois PR, une à la fois : J1 ; J9 et
+  J16 ; le jeu de données (choix n° 4). Démonstration seule, jamais la
+  ferme réelle. **PR 1 sur 3, J1** (D-143) : au téléphone, la bannière
+  tenait 265 px sur 844 ; elle tient en une ligne de 44 px, la ferme et le
+  moment en noms courts, et « Changer » ouvre dessous le texte, les deux
+  listes, la remise à zéro et les visites, fermé à chaque page ; une visite
+  qui présente un élément du détail l'ouvre ; à l'ordinateur, capture
+  comparée pixel à pixel, rien ne change (F288 à F291 ; V1, V2, V6, V8
+  adaptés, V9 ajouté ; 18 parcours de la démonstration sur 18). Ensuite J9
+  et J16.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

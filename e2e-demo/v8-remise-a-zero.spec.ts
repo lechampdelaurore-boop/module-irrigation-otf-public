@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ecarterLInvitation, ouvrirLaDemo, verifierLAccessibiliteDe } from './support/visite.ts';
+import { ecarterLInvitation, ouvrirLaDemo, ouvrirLeDetailDeLaBanniere, verifierLAccessibiliteDe } from './support/visite.ts';
 
 /**
  * Parcours V8 : « Remettre à zéro » (docs/demo-guided-contract.md, section 8 ;
@@ -20,6 +20,7 @@ test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revien
 
   const bouton = page.locator('.demo-reset-button');
   const fenetre = page.getByRole('dialog', { name: 'Remettre à zéro ?' });
+  await ouvrirLeDetailDeLaBanniere(page);
   await bouton.click();
   await expect(fenetre).toContainText('Ferme vierge');
   await expect(fenetre).toContainText('Les autres fermes et les autres moments ne changent pas.');
@@ -37,6 +38,7 @@ test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revien
   // Après le rechargement, la page doit répondre avant le clic, comme V1 : un clic avant l'hydratation se perd (point ouvert 68).
   await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
 
+  await ouvrirLeDetailDeLaBanniere(page);
   await bouton.click();
   await fenetre.getByRole('button', { name: 'Remettre à zéro' }).click();
   await expect(page).toHaveURL(/\/irrigation\/bienvenue/);
