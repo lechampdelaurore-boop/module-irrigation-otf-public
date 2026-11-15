@@ -100,6 +100,14 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   // mâche à venir. La ligne le dit, la frise le montre.
   const ligneN01 = arbitrage.locator('.arbitration-bed').filter({ has: laCase('N01') });
   await expect(ligneN01).toContainText('Planche nue depuis le');
+  // Le nom de la culture sur la ligne de la planche, à toutes les largeurs :
+  // N01 n'a rien en place cette semaine ; une planche cultivée nomme sa
+  // culture à côté de son nom ; le Kc reste dans l'infobulle (audit final,
+  // lot B, R5, F249 et F250).
+  await expect(ligneN01.locator('.arbitration-name strong')).toHaveText('N01 · planche nue');
+  await expect(arbitrage.locator('.arbitration-bed-crops').first()).toBeVisible();
+  for (const nom of await arbitrage.locator('.arbitration-name strong').allInnerTexts()) expect(nom, 'le nom de la planche suivi de ses cultures').toMatch(/^.+ · .+$/);
+  await expect(arbitrage.locator('.arbitration-week').filter({ hasText: /Kc/ })).toHaveCount(0);
   await expect(ligneN01).toContainText('Mâche à partir du');
   await expect(ligneN01.locator('.arbitration-crop.is-planned')).toHaveCount(1);
   await verifierLEtape(page, journal, 'arbitrage affiché, toutes les planches cochées');

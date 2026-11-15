@@ -77,3 +77,9 @@
 #repartition {
   scroll-margin-top: 16px;
 }
+
+/* R5 : les cultures en place à côté du nom de la planche, à toutes les largeurs (F249). */
+.arbitration-name .arbitration-bed-crops {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}

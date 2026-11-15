@@ -103,7 +103,7 @@ export function ArbitrationPlan({ feasibility, level, crops, pending, onSave }: 
         </article>;
       })}
     </section>)}
-    <p className="arbitration-footnote">Les cultures et leurs dates viennent du plan de culture d’Ouvre ta ferme ; le stade et le Kc, du besoin par culture du module, à titre d’information. Le besoin de la semaine reste l’objectif de la planche, moins la pluie et les arrosages.</p>
+    <p className="arbitration-footnote">Les cultures et leurs dates viennent du plan de culture d’Ouvre ta ferme ; le stade, et le Kc dans l’infobulle de la colonne « Cette semaine », du besoin par culture du module, à titre d’information. Le besoin de la semaine reste l’objectif de la planche, moins la pluie et les arrosages.</p>
     <footer className="arbitration-footer">
       <div>
         <strong aria-live="polite">{count(served, 'planche servie', 'planches servies')} · {preview.share === null ? 'aucune eau répartie' : preview.share + EPS >= 1 ? 'chacune reçoit tout son besoin' : `chacune reçoit ${pct(preview.share)} de son besoin`} · {m3(preview.allocatedCubicMeters)} répartis</strong>
@@ -182,9 +182,11 @@ function BedRow({ need, row, crops, cropsRead, choosable, checked, farmView, lev
     <div className="arbitration-serve">{choosable
       ? <label className="arbitration-check"><input type="checkbox" checked={checked} disabled={pending} aria-label={serveLabel} onChange={(event) => onToggle(event.target.checked)} /></label>
       : <span className="arbitration-fixed" aria-hidden="true">{(row.allocatedCubicMeters ?? 0) > EPS ? '✓' : row.status === 'unknown' || row.status === 'no_need' ? '—' : '…'}</span>}</div>
-    <div className="arbitration-name"><strong>{need.bedName}</strong><small>{area.format(need.areaSquareMeters)} m²{farmView ? ` · priorité ${lower(need.priority)}` : ''}</small></div>
+    {/* Les cultures en place à côté du nom, à toutes les largeurs : la frise du téléphone ne montre que huit semaines (audit final, lot B, R5, F249). */}
+    <div className="arbitration-name"><strong>{need.bedName}{cropsRead ? <span className="arbitration-bed-crops"> · {present.length ? present.join(', ') : 'planche nue'}</span> : null}</strong><small>{area.format(need.areaSquareMeters)} m²{farmView ? ` · priorité ${lower(need.priority)}` : ''}</small></div>
     <ArbitrationTimeline crops={crops?.crops ?? null} />
-    <div className="arbitration-week"><span>{crops?.week.main ?? '—'}</span>{crops?.week.detail ? <small>{crops.week.detail}</small> : null}</div>
+    {/* Le Kc du jour dans l'infobulle de la cellule, pour les experts (F250). */}
+    <div className="arbitration-week" title={crops?.week.expert ?? undefined}><span>{crops?.week.main ?? '—'}</span>{crops?.week.detail ? <small>{crops.week.detail}</small> : null}</div>
     <div className="arbitration-need"><span>{need.effectiveNeedMm === null ? 'Non calculable' : mm(need.effectiveNeedMm)}</span><small>{need.effectiveVolumeCubicMeters === null ? '' : m3(need.effectiveVolumeCubicMeters)}</small></div>
     <div className="arbitration-share">{choosable ? <Share need={need} row={row} checked={checked} share={preview.share} /> : <Status row={row} need={need} level={level} />}</div>
   </div>;

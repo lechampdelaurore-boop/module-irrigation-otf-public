@@ -4394,3 +4394,29 @@ Aucun calcul, aucune donnée ni migration ; aucun test ni parcours n'est
 assoupli.
 
 Ne changent pas : D-083, D-120, D-123.
+
+## D-124 — Audit ergonomique final, lot B : la culture sur la ligne de la planche (R5)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-123 (R4) et le correctif D-129. Le numéro suit l'ordre des
+points du contrat du lot B, réservé avant le correctif.
+
+**Établi dans le code.** La frise de l'écran de répartition écrit le nom de
+la culture au début de chaque bande (`ArbitrationTimeline`) ; au téléphone,
+la bande est décalée pour ne montrer que huit semaines, et une culture
+commencée avant elles perd son nom. La ligne de la planche ne portait que
+son nom et sa surface ; la phrase de la semaine ajoutait le stade et le Kc.
+
+**Décision.** Les cultures en place s'écrivent à côté du nom de la planche,
+« A01 · Tomate » (plusieurs séparées par une virgule), à toutes les
+largeurs ; « planche nue » quand le plan de culture n'en a aucune ; rien
+quand le plan de culture n'est pas lu (F249). La phrase de la semaine garde
+le stade ; le Kc, « Kc 1,15 » ou « Tomate : Kc 1,15 » quand plusieurs
+cultures sont en place, passe dans l'infobulle de la cellule, pour les
+experts, comme les numéros des règles (F48) ; la note de bas de l'écran le
+dit (F250). Aucune valeur de Kc ne change. Parcours P7 étendu.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-083, D-117, D-122, D-123, D-129.

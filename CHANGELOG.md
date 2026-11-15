@@ -22,6 +22,13 @@ source détaillée commit par commit.
   passe en tête de « Ressources ». Le bouton sur « Aujourd'hui » attend le
   lot A. Affichage seul ; parcours P32 étendu. R3 en ligne : #56, déployée
   le 15 novembre 2026 à 2 h 47.
+- **R5, la culture lisible sur l'écran de répartition** (D-124, F249,
+  F250) : les cultures en place s'écrivent à côté du nom de chaque planche,
+  « A01 · Tomate », à l'ordinateur comme au téléphone, « planche nue » sans
+  culture ; la phrase de la semaine garde le stade et le Kc passe dans
+  l'infobulle. Affichage seul ; parcours P7 étendu. Le correctif de
+  l'écran de répartition en ligne : #58, déployée le 15 novembre 2026 à
+  4 h 26.
 
 ### Corrigé (écran de répartition)
 
