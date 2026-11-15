@@ -1,0 +1,55 @@
+/*
+  Audit ergonomique final, lot B : la pénurie lisible
+  (docs/audit-ergonomie-final-lot-b-contract.md). Affichage seul.
+*/
+
+/* R3 : la phrase d'action du planning, en tête du résumé, quand l'eau manque (F243). */
+.planning-shortage-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem 1rem;
+  margin: 1rem 0 0;
+  padding: .8rem 1rem;
+  border: 1px solid var(--danger-line);
+  border-radius: 10px;
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  font-size: .95rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+/* R3 : « Le détail du calcul », fermé par défaut, au planning et sur « Ressources » (F244, F245). */
+.planning-calculation,
+.feasibility-calculation {
+  margin: .8rem 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, .85rem);
+  background: white;
+  min-width: 0;
+}
+
+.planning-calculation > summary,
+.feasibility-calculation > summary {
+  min-height: var(--touch-target, 44px);
+  padding: .75rem 1rem;
+  cursor: pointer;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.planning-calculation[open] > summary,
+.feasibility-calculation[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.planning-calculation > .planning-summary-note {
+  margin: .5rem;
+}
+
+.feasibility-calculation > .feasibility-summary,
+.feasibility-calculation > .feasibility-warning,
+.feasibility-calculation > .feasibility-sources {
+  margin: 1rem;
+}

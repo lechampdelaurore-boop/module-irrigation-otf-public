@@ -6,6 +6,7 @@ import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications
 import { isArbitrationEditable } from '@/lib/domain/arbitration-preview';
 import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
 import { loadIrrigationFeasibilityAction, saveIrrigationArbitrationAction, type FeasibilityActionResult } from './irrigation-feasibility-actions';
+import { feasibilityHeadTiles, isPriorityLevelShown } from '@/lib/domain/feasibility-reading';
 import { ArbitrationPlan } from './arbitration-plan';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -65,6 +66,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
     if (channel) channel.onmessage = changed;
     return () => { observer.disconnect(); clearTimeout(timer); events.forEach((name) => window.removeEventListener(name, changed)); document.removeEventListener('visibilitychange', focused); channel?.close(); sequence.current += 1; };
   }, [refresh]);
+  const head = dashboard ? feasibilityHeadTiles(dashboard) : null;
   return <section ref={root} className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
     <header className="feasibility-heading"><div><h2 id="feasibility-title">Faisabilité et répartition de l’eau</h2><p>De maintenant à dimanche soir · Analyse préliminaire <FeasibilityHelp label="Faisabilité préliminaire" text={help.preliminary} /></p></div><button type="button" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
     {error ? <p className="water-error" role="alert">{error}</p> : null}
@@ -72,19 +74,14 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
     {!dashboard ? <p>Les besoins et ressources seront chargés pour la semaine en cours.</p> : <>
       <p className="feasibility-meta">Semaine du {jour(dashboard.weekStart)} au {jour(dashboard.weekEnd)} · Calculé le {dates.format(new Date(dashboard.calculatedAt))}</p>
       {dashboard.warnings.map((warning) => <p className="feasibility-warning" key={warning}>{warning}</p>)}
-      <div className="feasibility-summary">
-        <Summary label="Besoins totaux" value={volume(dashboard.totalNeedCubicMeters)} detail={dashboard.unknownNeedCount ? `Partie connue : ${volume(dashboard.knownNeedCubicMeters)}` : 'Besoins effectifs restant à planifier'} />
-        <Summary label="Eau mobilisable actuellement" value={volume(dashboard.currentAvailableCubicMeters)} detail={`Stocks renseignés, hors sécurité${dashboard.currentAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownCurrentCubicMeters)}` : ''}`} />
-        <Summary label="Disponibilité prévisionnelle" value={volume(dashboard.forecastAvailableCubicMeters)} helpText={help.forecast} detail={`Après ${volume(dashboard.reservedPlannedCubicMeters)} déjà planifiés${dashboard.forecastAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownForecastCubicMeters)}` : ''}`} />
-        <Summary label="Volume affectable" value={volume(dashboard.allocatableCubicMeters)} helpText={help.allocatable} detail={dashboard.requiresManualArbitration ? 'Maximum théorique avant votre choix' : 'Après sélection et seuil minimal'} />
-        <Summary label="Volume satisfait" value={volume(dashboard.allocatedCubicMeters)} detail={`Dont chaîne connue : ${volume(dashboard.confirmedAllocatedCubicMeters)}`} />
-        <Summary label="Déficit global" value={volume(dashboard.residualDeficitCubicMeters)} helpText={help.residual} detail={dashboard.requiresManualArbitration ? 'Déficit minimal avant votre décision' : 'Besoins non couverts'} />
-        <Summary label="Taux de couverture" value={percent(dashboard.coveragePercent)} helpText={help.coverage} detail={`Couverture confirmée : ${percent(dashboard.confirmedCoveragePercent)}`} />
-        <Summary label="Volume non affecté" value={volume(dashboard.unallocatedCubicMeters)} detail={dashboard.withheldBelowThresholdCubicMeters > 0 ? `Dont sous seuil : ${volume(dashboard.withheldBelowThresholdCubicMeters)}` : 'Non consommé ni réservé par cette analyse'} />
-      </div>
-      {dashboard.potentialAdditionalCubicMeters > 0 ? <p className="feasibility-warning">Volume supplémentaire potentiellement utilisable : {volume(dashboard.potentialAdditionalCubicMeters)}. Son acheminement hydraulique reste à vérifier ; une couverture totale en volume ne prouve pas la faisabilité du planning.</p> : null}
-      <details className="feasibility-sources"><summary>Voir les ressources prises en compte</summary><div className="feasibility-bed-grid">{dashboard.pools.map((pool) => <article key={pool.key}><strong>{pool.name}</strong><p>Actuel : {volume(pool.currentCubicMeters)}<br />Prévisionnel restant : {volume(pool.forecastCubicMeters)}</p>{pool.reasons.map((reason) => <p key={reason}>{reason}</p>)}</article>)}</div></details>
-      <div>{dashboard.priorities.map((level) => isArbitrationEditable(level)
+      {/* Quatre tuiles au plus en tête ; l'écran de répartition, quand un niveau attend un choix, porte les siennes (audit final, lot B, R3, F245). */}
+      {head ? <div className="feasibility-summary is-head">
+        <Summary label="Eau disponible" value={volume(head.availableCubicMeters)} detail="d’ici dimanche soir, après les arrosages déjà planifiés" />
+        <Summary label="Besoin de la semaine" value={volume(head.needCubicMeters)} detail="besoins effectifs restant à planifier" />
+        <Summary label="Part servie" value={percent(head.coveragePercent)} detail="du besoin, en volume" />
+        <Summary label="Planches servies en entier" value={`${head.fullyServedBeds} sur ${head.bedsWithNeed}`} detail="parmi les planches qui ont un besoin" />
+      </div> : null}
+      <div>{dashboard.priorities.filter(isPriorityLevelShown).map((level) => isArbitrationEditable(level)
         // L'écran d'arbitrage façon plan d'assolement (docs/shortage-contract.md, 2 bis, D-083).
         ? <ArbitrationPlan key={`${dashboard.revision}:${level.priority}`} feasibility={dashboard} level={level} crops={crops} pending={pending} onSave={async (selectedBedIds) => {
           const request = ++sequence.current; setPending(true);
@@ -96,6 +93,22 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
           finally { if (request === sequence.current) setPending(false); }
         }} />
         : <PriorityPanel key={`${dashboard.revision}:${level.priority}`} level={level} />)}</div>
+      {/* Les chiffres du calcul, fermés par défaut, sous l'écran de répartition (audit final, lot B, R3, F245). */}
+      <details className="feasibility-calculation">
+        <summary>Le détail du calcul</summary>
+        <div className="feasibility-summary">
+          <Summary label="Besoins totaux" value={volume(dashboard.totalNeedCubicMeters)} detail={dashboard.unknownNeedCount ? `Partie connue : ${volume(dashboard.knownNeedCubicMeters)}` : 'Besoins effectifs restant à planifier'} />
+          <Summary label="Eau mobilisable actuellement" value={volume(dashboard.currentAvailableCubicMeters)} detail={`Stocks renseignés, hors sécurité${dashboard.currentAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownCurrentCubicMeters)}` : ''}`} />
+          <Summary label="Disponibilité prévisionnelle" value={volume(dashboard.forecastAvailableCubicMeters)} helpText={help.forecast} detail={`Après ${volume(dashboard.reservedPlannedCubicMeters)} déjà planifiés${dashboard.forecastAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownForecastCubicMeters)}` : ''}`} />
+          <Summary label="Volume affectable" value={volume(dashboard.allocatableCubicMeters)} helpText={help.allocatable} detail={dashboard.requiresManualArbitration ? 'Maximum théorique avant votre choix' : 'Après sélection et seuil minimal'} />
+          <Summary label="Volume satisfait" value={volume(dashboard.allocatedCubicMeters)} detail={`Dont chaîne connue : ${volume(dashboard.confirmedAllocatedCubicMeters)}`} />
+          <Summary label="Déficit global" value={volume(dashboard.residualDeficitCubicMeters)} helpText={help.residual} detail={dashboard.requiresManualArbitration ? 'Déficit minimal avant votre décision' : 'Besoins non couverts'} />
+          <Summary label="Taux de couverture" value={percent(dashboard.coveragePercent)} helpText={help.coverage} detail={`Couverture confirmée : ${percent(dashboard.confirmedCoveragePercent)}`} />
+          <Summary label="Volume non affecté" value={volume(dashboard.unallocatedCubicMeters)} detail={dashboard.withheldBelowThresholdCubicMeters > 0 ? `Dont sous seuil : ${volume(dashboard.withheldBelowThresholdCubicMeters)}` : 'Non consommé ni réservé par cette analyse'} />
+        </div>
+        {dashboard.potentialAdditionalCubicMeters > 0 ? <p className="feasibility-warning">Volume supplémentaire potentiellement utilisable : {volume(dashboard.potentialAdditionalCubicMeters)}. Son acheminement hydraulique reste à vérifier ; une couverture totale en volume ne prouve pas la faisabilité du planning.</p> : null}
+        <details className="feasibility-sources"><summary>Voir les ressources prises en compte</summary><div className="feasibility-bed-grid">{dashboard.pools.map((pool) => <article key={pool.key}><strong>{pool.name}</strong><p>Actuel : {volume(pool.currentCubicMeters)}<br />Prévisionnel restant : {volume(pool.forecastCubicMeters)}</p>{pool.reasons.map((reason) => <p key={reason}>{reason}</p>)}</article>)}</div></details>
+      </details>
     </>}
   </section>;
 }

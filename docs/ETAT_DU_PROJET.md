@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 14 novembre 2026.
+Dernière mise à jour : 15 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -296,8 +296,24 @@ registres, elle y renvoie.
   dans tout bloc ; ses règles sont nommées par leur parent et passent
   au-dessus des règles de bloc qui le repeignaient en carré vert sur
   « ET0 » (F242, D-121 ; P35 étendu à toutes les pages et à la fiche de la
-  planche ; aucune migration, aucun calcul changé). Le lot C est alors
-  codé en entier ; reste sa recette sur la version déployée.
+  planche ; aucune migration, aucun calcul changé), **en ligne** (#55,
+  fusionnée à 1 h 25, déployée à 1 h 41). Le lot C est codé et en ligne en
+  entier ; reste sa recette sur la version déployée.
+- Audit ergonomique final, **lot B · pénurie lisible** (24 decies) :
+  **commencé le 15 novembre 2026, la nuit**, en Opus 5.5 · Élevé, sur le
+  mandat d'autonomie de nuit du porteur. Contrat court
+  `docs/audit-ergonomie-final-lot-b-contract.md` (D-122, précisions F243 à
+  F256 ; P32, P7, P12, P10 et P31 étendus), causes établies dans le code ;
+  sept PR, une à la fois ; affichage seul, aucun calcul de pénurie changé.
+  Le bouton « Répartir l'eau » sur « Aujourd'hui » (R4) attend le lot A et
+  le porteur. **PR 1 sur 7, R3** : au planning, une phrase d'action en tête
+  du résumé quand l'eau manque (« Il manque 0,37 m³ d'eau d'ici dimanche :
+  5 planches ne recevront pas tout leur besoin. »), les deux notes du
+  calcul dans un repli fermé « Le détail du calcul » ; sur « Ressources »,
+  quatre tuiles au plus (aucune de plus que celles de l'écran de
+  répartition quand un niveau attend un choix), les huit d'avant dans le
+  même repli, aucun bloc de priorité sans besoin (F243 à F246 ; P32 et P7
+  étendus ; aucune migration). Ensuite R4.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -393,6 +409,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #55 (`e71f6a0`, lot C de l'audit final, J10, le « i » qui garde son
+  dessin, D-121, fusionnée à 1 h 25 et déployée à 1 h 41, run 43658103145,
+  les cinq jobs réussis, aucune migration). Avant elle : la
   PR #54 (`55e344f`, lot C de l'audit final, A3, les boutons indisponibles
   lisibles, D-120, fusionnée à 0 h 34 et déployée à 0 h 53, run 43653945457,
   les cinq jobs réussis, aucune migration). Avant elle : la

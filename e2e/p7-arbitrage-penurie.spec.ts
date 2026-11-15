@@ -82,6 +82,20 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   for (const planche of planches) await expect(caseDe(planche)).toBeChecked();
   const servies = arbitrage.locator('.arbitration-tile').filter({ hasText: 'Planches servies' }).locator('strong');
   await expect(servies).toHaveText(`${total} sur ${total}`);
+  // Quatre tuiles au plus : celles de l'écran de répartition ; les huit du
+  // calcul attendent, fermées, dans « Le détail du calcul » (audit final,
+  // lot B, R3, F245).
+  await expect(faisabilite.locator('.feasibility-summary.is-head')).toHaveCount(0);
+  await expect(arbitrage.locator('.arbitration-tile')).toHaveCount(4);
+  const detailDuCalcul = faisabilite.locator('details.feasibility-calculation');
+  await expect(detailDuCalcul).toHaveJSProperty('open', false);
+  await expect(detailDuCalcul.locator('summary').first()).toHaveText('Le détail du calcul');
+  await verifierCibleTactile(detailDuCalcul.locator('summary').first(), 'le titre « Le détail du calcul »');
+  await detailDuCalcul.locator('summary').first().click();
+  await expect(detailDuCalcul.locator('.feasibility-summary > div')).toHaveCount(8);
+  await expect(detailDuCalcul).toContainText('Taux de couverture');
+  await detailDuCalcul.locator('summary').first().click();
+  await verifierLEtape(page, journal, 'quatre tuiles, le détail du calcul replié');
   // N01, en succession sur la ferme de démonstration : les carottes finies, la
   // mâche à venir. La ligne le dit, la frise le montre.
   const ligneN01 = arbitrage.locator('.arbitration-bed').filter({ has: laCase('N01') });
