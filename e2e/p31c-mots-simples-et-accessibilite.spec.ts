@@ -79,7 +79,8 @@ test('matériel : le réglage séparé des planches couvertes, une ligne de sens
   await expect(apercu.locator('.coverage-metric-meaning').first()).toHaveText('Planches arrosées par deux matériels : sans souci si c’est voulu.');
   await expect(apercu.locator('.coverage-metric-meaning').nth(1)).toContainText('à comparer à ce que votre sol absorbe');
   const materiel = apercu.locator('.coverage-equipment-list button').first();
-  await expect(materiel.locator('.coverage-setting-name')).toHaveText(`Réglage ${reglage}`);
+  // Le nom du réglage commence déjà par « Réglage » : il se lit une fois (audit final, lot E, J9, F263).
+  await expect(materiel.locator('.coverage-setting-name')).toHaveText(reglage);
   await expect(materiel.locator('small')).toContainText(/couvre \d+ planches?/);
   await verifierLEtape(page, journal, 'matériel en clair');
 });

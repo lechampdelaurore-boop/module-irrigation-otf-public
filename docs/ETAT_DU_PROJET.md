@@ -386,7 +386,15 @@ registres, elle y renvoie.
   1 m³, « moins de 1 L » plutôt que « 0 L », des millimètres à une
   décimale au plus (F258 à F260 ; P12 et P32 adaptés ; aucune migration).
   Le calcul, les champs de saisie, l'export, l'index d'un compteur et les
-  débits ne changent pas. Ensuite J9, les mêmes mots d'une page à l'autre.
+  débits ne changent pas. **PR 2 en ligne** (#65, fusionnée à 8 h 41,
+  déployée à 9 h 01). **PR 3 sur 7, J9** (D-132) : « Noter la pluie » sur
+  l'historique ; « Valider la proposition du jour » quand il n'y en a
+  qu'une ; « de » élidé devant un nom qui commence par une voyelle (« d'Abri
+  des noues »), jamais devant un h ; « Réglage habituel » une fois ; « Eau
+  non pompée faute de temps » sur la tuile du planning et « non pompé faute
+  de temps » au téléphone (F261 à F264, `lib/domain/display-words.ts` ;
+  P10, P29 et P31c adaptés ; aucune migration). Ensuite J11, le bandeau
+  « non cochée ».
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -482,6 +490,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #65 (`bbbc5c8`, lot E de l'audit final, J8, des nombres lisibles
+  partout, D-131, fusionnée à 8 h 41 et déployée à 9 h 01, run 43691068707,
+  les cinq jobs réussis, aucune migration). Avant elle : la
   PR #64 (`66a9374`, lot E de l'audit final, A1, « Aller au contenu » sur
   la première ouverture et la page introuvable, D-130, fusionnée à 8 h 05 et
   déployée à 8 h 25, run 43688374458, les cinq jobs réussis, aucune

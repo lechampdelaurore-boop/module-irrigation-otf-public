@@ -1,6 +1,7 @@
 import { cubicMetersText, mmText, rateText } from '../figure-origin.ts';
 import type { PlanBedOutcome, PlanProposal } from './contract.ts';
 import { bedReasonLabels } from './presentation.ts';
+import { ofName } from '../display-words.ts';
 
 /**
  * Les bulles « d'où vient ce chiffre » du planning (3.8,
@@ -30,7 +31,7 @@ function volumeSentence(proposal: ProposalFigures): string {
   const watered = proposal.bedApplications.filter((application) => application.appliedMm > 0);
   const unknown = watered.find((application) => application.wettedAreaSquareMeters === null);
   if (proposal.volumeCubicMeters === null || unknown) {
-    return `Volume inconnu : la surface mouillée de ${unknown?.bedName ?? 'une planche'} n’est pas connue (son passe-pied manque).`;
+    return `Volume inconnu : la surface mouillée ${unknown ? ofName(unknown.bedName) : 'd’une planche'} n’est pas connue (son passe-pied manque).`;
   }
   const terms = watered.map((application) => `${mmText(application.appliedMm)} sur ${squareMeters.format(application.wettedAreaSquareMeters ?? 0)} m²`);
   return `Volume : ${terms.join(' + ')} = ${cubicMetersText(proposal.volumeCubicMeters)} (1 mm sur 1 m², c’est 1 litre).`;

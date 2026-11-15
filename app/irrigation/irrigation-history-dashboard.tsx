@@ -172,7 +172,7 @@ export function IrrigationHistoryDashboardView({
   const statusFilter = dashboard.statusFilter;
   const exportLabel = historyExportLabel(statusFilter, dashboard.period.mode === 'season' ? `saison ${season}` : periodTitle(dashboard));
   const rainMissing = !dashboard.summary.actualRainAvailability.complete;
-  const rainAction = rainMissing && rainHref ? { href: rainHref, label: 'Saisir la pluie' } : null;
+  const rainAction = rainMissing && rainHref ? { href: rainHref, label: 'Noter la pluie' } : null;
   // L'écart manque à cause de la pluie seulement si un objectif existe : sans objectif, la pluie n'y suffirait pas.
   const gapWaitsForRain = dashboard.summary.gapToObjectiveMm === null && rainMissing && dashboard.summary.objectiveAvailability.availableBedDays > 0;
   const canNavigateBack = dashboard.period.startDate > `${season}-01-01`;

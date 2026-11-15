@@ -5,6 +5,7 @@ import type { SoilGaugeZone } from '../soil-reserve/gauge-view.ts';
 import { millisecondsFromHours } from '../units.ts';
 import { addDaysToDateKey } from '../water-management.ts';
 import { countText, dateWithYearText, daysBetween, farmDateKey, farmHourText, namesText, shortDayText, sortedNames } from './today-text.ts';
+import { ofName } from '../display-words.ts';
 
 /**
  * La zone « Fiabilité du calcul » (audit ergonomique, point 3, 3.8 quater
@@ -146,7 +147,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
       kind: 'soil',
       key: 'soil',
       text,
-      action: { kind: 'link', label: `Observer le sol de ${first.name}`, page: 'sol', anchor: soilGardenAnchor(first.plotId) },
+      action: { kind: 'link', label: `Observer le sol ${ofName(first.name)}`, page: 'sol', anchor: soilGardenAnchor(first.plotId) },
     });
   }
   if (on('species') && input.speciesWithoutReference.length > 0) {

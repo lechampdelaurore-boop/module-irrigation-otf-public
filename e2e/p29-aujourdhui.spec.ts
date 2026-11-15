@@ -133,8 +133,8 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect.poll(() => pastille(page)).toBe(manquesAuDepart - 1 === 0 ? null : manquesAuDepart - 1);
   await verifierLEtape(page, journal, 'plan recalculé, ligne disparue');
 
-  // « Observer le sol de … » ouvre le jardin désigné, déplié, sur « Réserve du sol ».
-  const observer = lignesDeFiabilite(page).getByRole('link', { name: /^Observer le sol de / });
+  // « Observer le sol de … » (ou « d'… » devant une voyelle, F262) ouvre le jardin désigné, déplié, sur « Réserve du sol ».
+  const observer = lignesDeFiabilite(page).getByRole('link', { name: /^Observer le sol (?:de |d')/ });
   await expect(observer).toHaveCount(1);
   await observer.click();
   await attendreLaPagePrete(page, 'sol');

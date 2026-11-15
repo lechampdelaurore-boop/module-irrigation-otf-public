@@ -50,6 +50,7 @@ import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionCounts, planAc
 import { pageHref } from '@/lib/domain/features/pages';
 import { Icon, type IconName } from '../line-icon';
 import { FigureOrigin } from '../shell/figure-origin';
+import { proposalsText } from '@/lib/domain/display-words';
 
 type Props = {
   season: number;
@@ -369,8 +370,8 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
           ) : null}
         </div>
         {proposed.length > 0 ? (
-          <button type="button" className="planning-day-validate" disabled={pending} aria-label={`Valider les ${proposed.length} proposition${proposed.length > 1 ? 's' : ''} du jour`} onClick={() => onValidateDay(proposed)}>
-            <span className="planning-label-long">Valider les {proposed.length} proposition{proposed.length > 1 ? 's' : ''} du jour</span>
+          <button type="button" className="planning-day-validate" disabled={pending} aria-label={`Valider ${proposalsText(proposed.length)} du jour`} onClick={() => onValidateDay(proposed)}>
+            <span className="planning-label-long">Valider {proposalsText(proposed.length)} du jour</span>
             <span className="planning-label-short">Tout valider ({proposed.length})</span>
           </button>
         ) : null}
@@ -430,7 +431,7 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
         <SummaryCard icon="goutte" label="Volume proposé et validé" value={formatVolume(summary.volumeCubicMeters)} detail={summary.unknownVolumeCount > 0 ? `${summary.unknownVolumeCount} créneau${summary.unknownVolumeCount > 1 ? 'x' : ''} au volume inconnu en plus` : 'Volumes connus'} />
         <SummaryCard icon="aide" label="Non vérifié" value={String(summary.unverifiedCount)} detail="Créneaux sans pompe, origine ou stock connu" />
         <SummaryCard icon="goutte" label="Manque d’eau" value={waterDeficitValue(deficit.waterCubicMeters, uncountedWaterCount(deficit, unknownWater), formatVolume)} detail={waterDeficitTileDetail(deficit, unknownWater)} tone={hasWaterDeficit(deficit) ? 'deficit' : undefined} />
-        <SummaryCard icon="horloge" label="Temps de pompage manquant" value={pumpTimeDeficitValue(deficit, formatVolume)} detail={pumpTimeDeficitDetail(deficit)} tone={hasPumpTimeDeficit(deficit) ? 'deficit' : undefined} />
+        <SummaryCard icon="horloge" label="Eau non pompée faute de temps" value={pumpTimeDeficitValue(deficit, formatVolume)} detail={pumpTimeDeficitDetail(deficit)} tone={hasPumpTimeDeficit(deficit) ? 'deficit' : undefined} />
         <SummaryCard icon="pousse" label="Planches non servies" value={String(unplacedCount)} detail={unplacedDetail} tone={unplacedCount > 0 ? 'deficit' : undefined} />
       </div>
       {/* Les chiffres du calcul, fermés par défaut ; leur texte ne change pas (audit final, lot B, R3, F244). */}
