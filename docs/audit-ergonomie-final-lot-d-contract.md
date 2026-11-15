@@ -112,6 +112,26 @@ surtout des « 0,00 m³ » et des « — ».
    D-003 : une donnée inconnue ne devient pas « rien ») ; elles se rangent en
    une phrase « 3 jours sans irrigation ni pluie mesurée » (F301).
 
+## 4 bis. Ce que le code a établi pour J3 (PR 2, D-147)
+
+- Les « sept cartes » sont le tableau des jours de la semaine
+  (`water-management-dashboard.tsx`, `#weather`), qu'au téléphone la feuille
+  de style mettait en cartes de huit lignes. À l'ordinateur, c'est déjà un
+  tableau d'une ligne par jour : il ne change pas (F299).
+- Au téléphone, chaque jour tient en une ligne : un bouton de 44 px qui dit
+  la date et ce qui s'y est passé (« 2,31 m³ arrosés · pluie 4,3 mm »,
+  « sans irrigation ni pluie mesurée · 6 mm de pluie prévus », « limite
+  dépassée ») ; il ouvre le détail dessous. Le jour courant est ouvert (F299).
+  Les cellules repliées restent dans la page (recherche, lecteur d'écran).
+- Au-dessus du tableau, une phrase compte les jours sans irrigation ni pluie
+  (« 3 jours sans irrigation ni pluie mesurée ») ; une pluie inconnue n'est
+  pas comptée comme une pluie, et aucun jour n'est masqué (F301, D-003). La
+  règle vit dans `lib/domain/water-week-days.ts`.
+- La tuile « ET0 » est le total de la semaine, pas du jour : elle s'appelle
+  « Évaporation de la semaine (ET0) ». Une tuile sans chiffre
+  (« non disponible · partielle », « Non défini ») s'écrit à la taille du
+  texte courant (F300).
+
 ## 5. J5 et J2
 
 **J5 — « Besoin par culture » liste 40 cultures.** Cause : chaque culture de
@@ -247,7 +267,7 @@ valeurs et à 190 planches reste **non vérifié** (rapport, section 8).
 | --- | --- | --- |
 | 1 | Planning, réglages R2 à R14 | aucun libellé visible ne commence par « Rn · » ; la bulle d'aide dit « Réglage Rn » |
 | 2 | Objectifs et besoins à 390 px | les jours repliés, la page sous 3 500 px (à mesurer, était 5 950) |
-| 3 | La tuile d'évaporation | « Évaporation du jour (ET0) », jamais « ETO » |
+| 3 | La tuile d'évaporation | « Évaporation de la semaine (ET0) », jamais « ETO » |
 | 4 | Besoin par culture, ferme à 8 cultures | « Vos cultures cette saison (8) » ouvert ; le pli « Les autres cultures de référence (32) » fermé |
 | 5 | Les quatre pages de J2 | un pli « Réglages de cette page », fermé ; ouvert par ancre ; un réglage incomplet l'ouvre |
 | 6 | Matériel, « Besoin de la culture » | renvoie à « Objectifs et besoins » ; plus d'ETM, ET0, Kc répétés |
@@ -263,7 +283,7 @@ valeurs et à 190 planches reste **non vérifié** (rapport, section 8).
 | F297 | Codes R | retirés des libellés, gardés dans la bulle d'aide et le nom accessible |
 | F298 | Refus d'un réglage | nommé en mots simples, sans son numéro |
 | F299 | Jours d'« Objectifs et besoins » | une ligne par jour, repliés au téléphone |
-| F300 | Tuile ETO | « Évaporation du jour (ET0) » |
+| F300 | Tuile ETO | « Évaporation de la semaine (ET0) » (c'est le total de la semaine) ; une tuile sans chiffre au texte courant |
 | F301 | Jours sans donnée | rangés en une phrase, jamais masqués |
 | F302 | Cultures | « Vos cultures cette saison » d'abord, les autres repliées |
 | F303 | Kc, racines | « Pour les experts » |

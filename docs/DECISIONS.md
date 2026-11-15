@@ -5037,3 +5037,20 @@ Affichage seul : aucun réglage, aucune valeur par défaut, aucun calcul ne
 change ; aucune migration.
 
 Ne changent pas : D-029, D-117, D-137.
+
+## D-147 — Audit ergonomique final, lot D : « Objectifs et besoins » plus court au téléphone (J3)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur (D-137). Après D-146.
+
+**Décision** (F299 à F301, contrat `docs/audit-ergonomie-final-lot-d-contract.md`,
+sections 4 et 4 bis) : au téléphone, chaque jour du tableau de la semaine
+tient en une ligne, la date et ce qui s'y est passé, et s'ouvre dessous ;
+le jour courant est ouvert ; à l'ordinateur, le tableau d'une ligne par
+jour ne change pas (F299). La tuile « ET0 » s'appelle « Évaporation de la
+semaine (ET0) », et une tuile sans chiffre s'écrit à la taille du texte
+courant (F300). Une phrase compte les jours sans irrigation ni pluie, sans
+en masquer aucun ; une pluie inconnue n'y devient pas zéro (F301, D-003).
+
+Affichage seul : aucune valeur, aucun calcul ne change ; aucune migration.
+
+Ne changent pas : D-003, D-010, D-146.

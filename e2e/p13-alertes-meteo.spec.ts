@@ -128,6 +128,34 @@ test('une alerte météo se règle, refuse un seuil non numérique, s’enregist
   await expect(page.locator('#weather thead')).toContainText('Températures prévues');
   await verifierLEtape(page, journal, 'ancienne adresse de la semaine conduite');
 
+  // Audit final, lot D, J3 : l'évaporation dit son nom (F300) ; au téléphone, un jour replié tient
+  // en une ligne, la date et ce qui s'y est passé, et s'ouvre dessous (F299) ; à l'ordinateur, une
+  // ligne par jour, sans bouton.
+  await expect(page.locator('.water-summary-card').filter({ hasText: 'Évaporation de la semaine (ET0)' })).toHaveCount(1);
+  const jours = page.locator('#weather tbody tr');
+  await expect(jours).toHaveCount(7);
+  if (testInfo.project.name === 'telephone') {
+    const ouverts = await jours.evaluateAll((lignes) => lignes.map((ligne) => ligne.hasAttribute('data-open')));
+    expect(ouverts.filter(Boolean).length, 'au plus le jour courant ouvert').toBeLessThanOrEqual(1);
+    const replie = jours.nth(ouverts.indexOf(false));
+    const bouton = replie.locator('.water-day-toggle');
+    await expect(bouton).toBeVisible();
+    await expect(bouton.locator('small')).not.toBeEmpty();
+    await expect(replie.locator('td[data-label="Prévision"]')).toBeHidden();
+    const hauteur = (await replie.boundingBox())!.height;
+    expect(hauteur, 'un jour replié tient en une ligne de détail').toBeLessThan(90);
+    await verifierCibleTactile(bouton, 'le jour replié');
+    await bouton.click();
+    await expect(bouton).toHaveAttribute('aria-expanded', 'true');
+    await expect(replie.locator('td[data-label="Prévision"]')).toBeVisible();
+    await bouton.click();
+    await expect(bouton).toHaveAttribute('aria-expanded', 'false');
+  } else {
+    await expect(jours.first().locator('.water-day-toggle')).toBeHidden();
+    await expect(jours.first().locator('td[data-label="Prévision"]')).toBeVisible();
+  }
+  await verifierLEtape(page, journal, 'jours de la semaine repliés au téléphone');
+
   // Supprimée, l'alerte quitte la liste ; ses alertes restent dans l'historique.
   await attendreLaPageIrrigation(page, 'alertes-meteo');
   const encartRouvert = page.locator('#weather-alerts');
