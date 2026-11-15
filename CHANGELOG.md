@@ -45,6 +45,13 @@ source détaillée commit par commit.
   de la parcelle n'est plus posé sur la carte ; au téléphone, choisir
   « Vue satellite » amène les onglets en haut quand la carte commencerait
   sous l'écran. Parcours P34 étendu. J12 en ligne : #68.
+- **A2, les dernières cibles de moins de 44 px** (D-136, F272 et F273) :
+  les flèches de la semaine d'« Objectifs et besoins » (nommées « Semaine
+  précédente » et « Semaine suivante »), « + Ajouter une pompe », la case
+  « Par analogie » de Réglages et « Voir » dans l'historique des alertes
+  font 44 px dans les deux sens. La mesure du parcours P31c prend la largeur
+  comme la hauteur, au dixième de pixel, et toute étiquette qui contient une
+  case. J15 en ligne : #69. Le lot E est codé en entier ; reste sa recette.
 
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 

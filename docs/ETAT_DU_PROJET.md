@@ -412,7 +412,15 @@ registres, elle y renvoie.
   seuls » ; le nom de la parcelle n'est plus posé sur la carte ; au
   téléphone, « Vue satellite » amène les onglets en haut quand il resterait
   moins de 200 px de la carte à l'écran (F268 à F271 ; P34 étendu ; aucune
-  migration). Ensuite A2, les dernières cibles de moins de 44 px.
+  migration). **PR 6 en ligne** (#69, fusionnée à 11 h 11, déployée à
+  11 h 31). **PR 7 sur 7, A2** (D-136) : les flèches de la semaine
+  d'« Objectifs et besoins » (« Semaine précédente », « Semaine
+  suivante »), « + Ajouter une pompe », la case « Par analogie » et « Voir »
+  dans l'historique des alertes, que la nouvelle mesure a trouvé, font
+  44 px dans les deux sens ; P31c mesure la largeur, au dixième de pixel,
+  et toute étiquette qui contient une case (F272 et F273 ; aucune
+  migration). Le lot E est alors codé en entier ; reste sa recette sur la
+  version déployée.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -508,6 +516,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #69 (`237c7c4`, lot E de l'audit final, J15, la vue satellite dans son
+  repli, D-135, fusionnée à 11 h 11 et déployée à 11 h 31, run
+  43702861966, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #68 (`5b6de6a`, lot E de l'audit final, J12, les alertes limitées sous
   le formulaire, D-134, fusionnée à 10 h 37 et déployée à 10 h 54, run
   43700109230, les cinq jobs réussis, aucune migration). Avant elle : la

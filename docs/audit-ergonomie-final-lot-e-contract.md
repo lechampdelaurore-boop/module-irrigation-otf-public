@@ -170,6 +170,13 @@ plutôt que son étiquette, et les liens pris dans une phrase.
 2. **P31c mesure aussi la largeur**, et toute étiquette qui contient une
    case, même enveloppée (F273).
 
+**Trouvé au code (D-136).** La mesure élargie, jouée sur toute la suite, a
+trouvé une quatrième cible que l'audit n'avait pas vue faute d'alerte
+envoyée sur sa ferme : « Voir » dans l'historique des alertes (cultures et
+météo), 25 px de large au téléphone ; elle passe à 44 px avec les trois
+autres. La mesure se fait au dixième de pixel, pour que 43,5 px ne
+s'arrondisse pas à 44.
+
 ## 10. Cas chiffrés (la preuve de fin les met en tests et en parcours)
 
 | Cas | Entrée | Attendu |

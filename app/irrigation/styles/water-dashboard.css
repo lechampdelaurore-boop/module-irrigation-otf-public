@@ -428,3 +428,10 @@
   .crop-alert-fields label { flex: 0 0 auto; }
   .crop-alert-form > button { align-self: stretch; }
 }
+
+/* Les flèches et « Cette semaine » : 44 px dans les deux sens (audit final, lot E, A2, F272). */
+.water-week-navigation button {
+  min-width: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
+}

@@ -58,7 +58,7 @@ async function allerALaSemainePrecedente(page: Page): Promise<string> {
   await navigation.scrollIntoViewIfNeeded();
   const semaine = navigation.locator('strong');
   const courante = await semaine.innerText();
-  await navigation.getByRole('button', { name: '←' }).click();
+  await navigation.getByRole('button', { name: 'Semaine précédente' }).click();
   await expect(semaine).not.toHaveText(courante, { timeout: 15_000 });
   return courante;
 }
