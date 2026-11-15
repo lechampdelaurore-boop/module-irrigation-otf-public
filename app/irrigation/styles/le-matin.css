@@ -97,3 +97,6 @@
   color: var(--warn-ink);
   font-weight: 600;
 }
+
+/* « Non calculable » d'une planche dit pourquoi (lot A, R2, F282). */
+.need-unknown-reason { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }

@@ -4814,3 +4814,38 @@ Aucune migration ; aucun calcul de besoin, de pénurie, de plan ni de gel ne
 change ; la pastille du menu et son compte (F12) non plus.
 
 Ne changent pas : D-003, D-004, D-028, D-122, D-123, D-131.
+
+## D-139 — Audit ergonomique final, lot A : un seul objectif d'une page à l'autre (R2)
+
+Date : 15 novembre 2026, après-midi. Décideur : le porteur pour le
+contenu (D-137, toutes les recommandations du contrat retenues) ; les
+précisions tranchées en codant suivent l'option recommandée, aucune
+question agronomique, modifiables par lui. Après D-138.
+
+**Établi dans le code, au point d'arrêt** (contrat
+`docs/audit-ergonomie-final-lot-a-contract.md`, section 8 ter). Chaque page
+lit le même objectif, celui de `objectiveForBed` : le calcul de l'objectif
+n'est pas en cause, le point d'arrêt ne s'applique pas. Les écarts viennent
+de l'affichage : un total de jardin, de ferme ou de semaine devient inconnu
+dès qu'une seule planche n'a pas d'objectif adopté (D-003), sans dire
+pourquoi, et la fiche de la planche disait « applicable » pour ce que le
+reste du module appelle adopter (D-045).
+
+**Décision** (F280 à F282) :
+
+- sur « Aujourd'hui », quand une partie seulement des planches a un
+  objectif, l'objectif, l'eau reçue et le reste à apporter se chiffrent sur
+  ces planches seulement et le disent (« sur 7 planches sur 10 ») ; sans
+  aucun objectif, « aucun objectif posé » ;
+- « Objectif adopté » partout où l'objectif qui s'applique apparaît,
+  « Objectif proposé » pour celui que calcule la culture, et une phrase
+  d'aide sur la fiche dit la différence ;
+- « Non calculable » dit pourquoi : « 2 planches sur 3 sans objectif
+  adopté » pour un jardin, la raison du domaine pour une planche ; sur
+  « Ressources », le besoin de la semaine se lit « au moins » le volume
+  chiffré, avec les planches qui manquent et pourquoi.
+
+Aucune migration ; aucun calcul d'objectif, de besoin, de pénurie ni de plan
+ne change : un total inconnu reste inconnu, seule sa raison se lit.
+
+Ne changent pas : D-003, D-010, D-022, D-045.

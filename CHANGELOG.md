@@ -7,6 +7,15 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot A, le matin)
 
+- **R2, un seul objectif d'une page à l'autre** (D-139, F280 à F282) :
+  chaque page lisait déjà le même objectif ; « Aujourd'hui » chiffre
+  l'objectif, l'eau reçue et le reste sur les planches qui ont un objectif
+  et le dit (« sur 7 planches sur 10 ») au lieu de « non fixé » ; « Objectif
+  adopté » remplace « Objectif applicable », avec une phrase qui le
+  distingue de l'objectif proposé ; « Non calculable » dit pourquoi, et le
+  besoin de la semaine de « Ressources » se lit « au moins » le volume
+  chiffré, avec les planches qui manquent. Parcours P15 changé. R1 en
+  ligne : #71, déployée le 15 novembre 2026 à 16 h 47.
 - **R1, « Aujourd'hui » annonce demain et l'eau qui manque** (D-137,
   D-138, F274 à F279) : quand « Planning » est coché, l'en-tête redit la
   phrase d'action du planning quand l'eau manque, avec le même bouton

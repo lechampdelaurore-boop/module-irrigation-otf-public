@@ -14,6 +14,12 @@ import { shortDayText } from './today-text.ts';
  * s'additionnent pas entre surfaces : ils se pondèrent par la surface,
  * Σ(mm × m²) / Σ(m²) ; une valeur inconnue d'une planche laisse le total
  * inconnu (D-003).
+ *
+ * Un objectif posé sur une partie des planches seulement (audit ergonomique
+ * final, lot A, R2, F280) : l'objectif, l'eau reçue et le reste à apporter
+ * se chiffrent sur les planches qui ont un objectif, et le disent (« sur
+ * 7 planches sur 10 ») ; jamais un total qui mêle du connu et de l'inconnu,
+ * jamais « non fixé » quand des planches en ont un.
  */
 
 /** Ce que la page lit d'une planche dans le tableau des besoins de la semaine. */
@@ -48,7 +54,9 @@ type WeekRow = {
   /** Irrigation + pluie ; `null` quand la pluie est inconnue. */
   receivedMm: number | null;
   remainingMm: number | null;
-  /** « 8 / 20 mm », « 8 mm reçus, objectif non fixé », « pluie inconnue ». */
+  /** Les planches qui ont un objectif cette semaine, sur toutes celles du jardin ou de la ferme (F280). */
+  objectiveBeds: { withObjective: number; total: number };
+  /** « 8 / 20 mm », « 8 / 20 mm sur 7 planches sur 10 », « 8 mm reçus, aucun objectif posé », « pluie inconnue ». */
   text: string;
   /** Les barres empilées et le trait de l'objectif, en % de l'échelle. */
   bars: { irrigationPercent: number; rainPercent: number; objectivePercent: number | null };
@@ -65,9 +73,12 @@ export type TodayWeek = {
   /** Les tuiles de la semaine. */
   tiles: {
     objective: string | null;
+    /** « ferme entière, du … », ou « sur les 7 planches sur 10 qui ont un objectif, du … » (F280). */
+    objectiveDetail: string;
     received: string | null;
     receivedDetail: string | null;
     remaining: string | null;
+    remainingDetail: string;
     /** « 18 m³ », « au moins 18 m³ » quand une surface mouillée manque ; `null` sans « Ressources » ni tableau de l'eau. */
     water: string | null;
     waterToday: string | null;
@@ -90,19 +101,37 @@ function rounded(value: number): number {
   return Math.round(value * PERCENT_DECIMALS) / PERCENT_DECIMALS;
 }
 
+/** « 1 planche sur 2 », « 7 planches sur 10 ». */
+function bedsOn(count: number, total: number): string {
+  return `${count} planche${count > 1 ? 's' : ''} sur ${total}`;
+}
+
+/**
+ * Les planches sur lesquelles se chiffre la ligne (F280) : celles qui ont un
+ * objectif quand une partie seulement en a un ; sinon toutes.
+ */
+function counted(beds: readonly TodayWeekBed[]): { scope: readonly TodayWeekBed[]; objectiveBeds: WeekRow['objectiveBeds'] } {
+  const withObjective = beds.filter((bed) => bed.objectiveMm !== null);
+  const partial = withObjective.length > 0 && withObjective.length < beds.length;
+  return { scope: partial ? withObjective : beds, objectiveBeds: { withObjective: withObjective.length, total: beds.length } };
+}
+
 function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxMm: number): WeekRow {
-  const objectiveMm = weighted(beds, (bed) => bed.objectiveMm);
-  const irrigationMm = weighted(beds, (bed) => Math.max(0, bed.actualIrrigationMm)) ?? 0;
-  const rainMm = weighted(beds, (bed) => bed.actualRainMm);
+  const { scope, objectiveBeds } = counted(beds);
+  const partial = objectiveBeds.withObjective > 0 && objectiveBeds.withObjective < objectiveBeds.total;
+  const objectiveMm = weighted(scope, (bed) => bed.objectiveMm);
+  const irrigationMm = weighted(scope, (bed) => Math.max(0, bed.actualIrrigationMm)) ?? 0;
+  const rainMm = weighted(scope, (bed) => bed.actualRainMm);
   const receivedMm = rainMm === null ? null : irrigationMm + rainMm;
-  const remainingMm = weighted(beds, (bed) => bed.realRemainingMm);
+  const remainingMm = weighted(scope, (bed) => bed.realRemainingMm);
   const percent = (mm: number) => rounded(percentFromFraction(Math.min(1, Math.max(0, mm / scaleMaxMm))));
   const irrigationPercent = percent(irrigationMm);
+  const on = partial ? ` sur ${bedsOn(objectiveBeds.withObjective, objectiveBeds.total)}` : '';
   const text = objectiveMm === null
-    ? `${mmText(rounded(receivedMm ?? irrigationMm))} reçus, objectif non fixé`
+    ? `${mmText(rounded(receivedMm ?? irrigationMm))} reçus, aucun objectif posé`
     : receivedMm === null
-      ? `${mmText(rounded(irrigationMm))} irrigués / ${mmText(rounded(objectiveMm))}, pluie inconnue`
-      : `${millimeters.format(receivedMm)} / ${mmText(rounded(objectiveMm))}`;
+      ? `${mmText(rounded(irrigationMm))} irrigués / ${mmText(rounded(objectiveMm))}${on}, pluie inconnue`
+      : `${millimeters.format(receivedMm)} / ${mmText(rounded(objectiveMm))}${on}`;
   return {
     key,
     name,
@@ -112,6 +141,7 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
     rainMm,
     receivedMm,
     remainingMm,
+    objectiveBeds,
     text,
     bars: {
       irrigationPercent,
@@ -145,8 +175,13 @@ export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
   const mm = (value: number | null) => (value === null ? null : mmText(rounded(value)));
   const water = input.water;
   const volume = (value: number) => `${water?.incomplete ? 'au moins ' : ''}${waterText(value, 'm³')}`;
+  const label = `du ${shortDayText(input.weekStart)} au ${shortDayText(input.weekEnd)}`;
+  const { withObjective, total } = farm.objectiveBeds;
+  const partial = withObjective > 0 && withObjective < total;
+  // Sur une partie des planches, chaque tuile le dit : jamais un chiffre lu pour la ferme entière (F280).
+  const scoped = (detail: string) => (partial ? `${detail}, ${withObjective === 1 ? 'sur cette planche' : `sur ces ${withObjective} planches`}` : detail);
   return {
-    label: `du ${shortDayText(input.weekStart)} au ${shortDayText(input.weekEnd)}`,
+    label,
     scaleMaxMm: max,
     farm,
     shown: rows.slice(0, WEEK_GARDENS_SHOWN),
@@ -154,11 +189,15 @@ export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
     moreLabel: hidden.length === 0 ? null : hidden.length === 1 ? 'Voir l’autre jardin' : `Voir les ${hidden.length} autres jardins`,
     tiles: {
       objective: mm(farm.objectiveMm),
+      objectiveDetail: partial ? `objectifs posés sur ${bedsOn(withObjective, total)}, ${label}` : `ferme entière, ${label}`,
       received: mm(farm.receivedMm),
-      receivedDetail: farm.rainMm === null
+      receivedDetail: scoped(farm.rainMm === null
         ? `${mmText(rounded(farm.irrigationMm))} d’irrigation, pluie inconnue`
-        : `${mmText(rounded(farm.irrigationMm))} d’irrigation, ${mmText(rounded(farm.rainMm))} de pluie mesurée`,
+        : `${mmText(rounded(farm.irrigationMm))} d’irrigation, ${mmText(rounded(farm.rainMm))} de pluie mesurée`),
       remaining: mm(farm.remainingMm),
+      remainingDetail: farm.remainingMm === null
+        ? 'une valeur manque : voir « Objectifs et besoins »'
+        : scoped('objectif moins l’eau reçue, jamais négatif'),
       water: water ? volume(water.weekCubicMeters) : null,
       waterToday: water ? `dont ${volume(water.todayCubicMeters)} aujourd’hui` : null,
     },

@@ -96,9 +96,9 @@ test('R3, F244 : les deux notes du calcul sont dans « Le détail du calcul », 
 // R3 — quatre tuiles au plus sur « Ressources », aucun bloc de priorité vide (F245, F246).
 
 type Row = PriorityFeasibility['beds'][number];
-const row = (status: Row['status']) => ({ status }) as Row;
+const row = (status: Row['status'], objectiveMm: number | null = 10) => ({ status, need: { objectiveMm } }) as Row;
 const level = (priority: PriorityFeasibility['priority'], arbitration: PriorityFeasibility['arbitration'], beds: Row[]) => ({ priority, arbitration, beds }) as PriorityFeasibility;
-const dashboard = (priorities: PriorityFeasibility[]) => ({ priorities, forecastAvailableCubicMeters: 2, totalNeedCubicMeters: 5, coveragePercent: 40 }) as Pick<IrrigationFeasibility, 'priorities' | 'forecastAvailableCubicMeters' | 'totalNeedCubicMeters' | 'coveragePercent'>;
+const dashboard = (priorities: PriorityFeasibility[]) => ({ priorities, forecastAvailableCubicMeters: 2, totalNeedCubicMeters: 5, knownNeedCubicMeters: 5, coveragePercent: 40 }) as Pick<IrrigationFeasibility, 'priorities' | 'forecastAvailableCubicMeters' | 'totalNeedCubicMeters' | 'knownNeedCubicMeters' | 'coveragePercent'>;
 
 test('R3, F245 : rien à choisir, quatre tuiles ; les planches servies en entier comptées parmi celles qui ont un besoin', () => {
   const tiles = feasibilityHeadTiles(dashboard([
@@ -106,7 +106,7 @@ test('R3, F245 : rien à choisir, quatre tuiles ; les planches servies en entier
     level('normal', 'automatic', [row('partial'), row('full'), row('unknown')]),
     level('low', 'automatic', []),
   ]));
-  assert.deepEqual(tiles, { availableCubicMeters: 2, needCubicMeters: 5, coveragePercent: 40, fullyServedBeds: 2, bedsWithNeed: 4 });
+  assert.deepEqual(tiles, { availableCubicMeters: 2, needCubicMeters: 5, knownNeedCubicMeters: 5, unknownNeed: { noObjective: 0, noWettedArea: 1 }, coveragePercent: 40, fullyServedBeds: 2, bedsWithNeed: 4 });
 });
 
 test('R3, F245 : un niveau qui attend un choix, ou dont le choix est validé, laisse les tuiles à l’écran de répartition', () => {

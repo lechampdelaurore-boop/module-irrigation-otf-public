@@ -103,7 +103,7 @@ function BedItem({ bed }: { bed: SeriesBedCropWater }) {
       </small>
       <small>
         Semaine : objectif proposé {week.proposedMm === null ? 'non calculable' : `${mm.format(week.proposedMm)} mm`}
-        {', '}objectif applicable {week.objectiveMm === null ? 'aucun' : `${mm.format(week.objectiveMm)} mm`}
+        {', '}objectif adopté {week.objectiveMm === null ? 'aucun' : `${mm.format(week.objectiveMm)} mm`}
         {week.differenceMm === null ? '' : `, écart ${signed(week.differenceMm)} mm`}
         {'. '}{proposalStatusLabel(week.status)}
       </small>

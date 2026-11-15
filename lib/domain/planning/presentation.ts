@@ -133,7 +133,7 @@ export function pendingEventNotice(event: Pick<PlanEventNotice, 'kind' | 'status
 }
 
 const UNPLACED_REASON_LABELS: Record<UnplacedReason, string> = {
-  'no-objective': 'aucun objectif applicable',
+  'no-objective': 'aucun objectif adopté',
   'no-equipment': 'aucun matériel ne l’arrose',
   'below-minimum-dose': 'besoin sous la dose minimale : attend qu’il grandisse',
   'water-budget': 'stock et ressources insuffisants d’ici dimanche',

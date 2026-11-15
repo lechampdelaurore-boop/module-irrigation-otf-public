@@ -4,6 +4,7 @@ import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriority, type IrrigationNeedsDashboard } from '@/lib/domain/irrigation-needs';
+import { gardenUnknownReason } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
 import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { FigureOrigin } from './shell/figure-origin';
@@ -17,7 +18,7 @@ type SortMode = 'priority' | 'deficit' | 'covered' | 'remaining';
 const help = {
   et0: 'ET0 cumulée sur la semaine, réanalyse pour les jours passés et prévision pour les jours à venir. Affichée pour information : elle n’entre pas dans le calcul du besoin.',
   proposed: 'Somme des ETM des sept jours, culture par culture et stade par stade. Une information : elle n’entre dans le besoin que si vous l’adoptez depuis la fiche de la planche.',
-  objective: 'Objectif hydrique applicable à cette planche selon l’historique des objectifs de la semaine. C’est la demande de la semaine, avant déduction des pluies et des irrigations.',
+  objective: 'Objectif hydrique adopté pour cette planche selon l’historique des objectifs de la semaine. C’est la demande de la semaine, avant déduction des pluies et des irrigations.',
   actual: 'Reste réel après la pluie mesurée ou réanalysée et les irrigations réellement confirmées.',
   forecast: 'Pluie extérieure encore prévue jusqu’à dimanche. Elle vaut 0 sous abri.',
   planning: 'Reste à planifier après pluie réelle, pluie prévue, irrigation réelle et irrigation déjà planifiée.',
@@ -59,7 +60,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
       <label><span>Trier les planches</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="priority">Priorités hautes</option><option value="deficit">Déficit le plus fort</option><option value="remaining">Besoin restant</option><option value="covered">Déjà couvert</option></select></label>
     </div>
     <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId}>
-      <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {formatMm(garden.effectiveNeedMm)}</strong><small>Besoin réel : {formatMm(garden.realRemainingMm)} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
+      <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
       <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm })))} />)}</div>
     </details>)}</div>
   </section>;
@@ -74,6 +75,8 @@ function BedNeedCard({ bed, proposal, pending, onSave }: { bed: BedIrrigationNee
   return <article className="irrigation-need-card" data-priority={bed.priority}>
     <header><div><strong>{bed.bedName}</strong><small>{area.format(bed.areaSquareMeters)} m²</small></div><span className="need-priority-label">Priorité {priorityLabel(bed.priority)}</span></header>
     <div className="need-primary"><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{formatMm(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{formatMm(bed.calculatedNeedMm)}</strong></span><span><small>Besoin effectif <HelpButton text={help.effective} /></small><strong>{formatMm(bed.effectiveNeedMm)}</strong></span><span><small>Volume</small><strong>{bed.effectiveVolumeCubicMeters === null ? '—' : `${volumeText(bed.effectiveVolumeCubicMeters)}`}</strong></span><span><small>Déficit relatif <HelpButton text={help.deficit} /></small><strong>{bed.relativeDeficitPercent === null ? '—' : `${mm.format(bed.relativeDeficitPercent)} %`}</strong></span></div>
+    {/* « Non calculable » dit pourquoi, avec la raison que le domaine connaît (audit final, lot A, R2, F282). */}
+    {bed.calculatedNeedMm === null && missingLabels(bed, 'planning') ? <p className="need-unknown-reason">Non calculable : {missingLabels(bed, 'planning')}.</p> : null}
     {!bed.completeness.complete ? <NeedDiagnostic bed={bed} /> : null}
     <details className="need-calculation"><summary>Voir le calcul</summary><dl>
       <Et0Metric bed={bed} />
@@ -98,7 +101,7 @@ function BedNeedCard({ bed, proposal, pending, onSave }: { bed: BedIrrigationNee
 }
 
 function NeedDiagnostic({ bed }: { bed: BedIrrigationNeed }) {
-  const objectiveOrigin = bed.objectiveSource === 'farm' ? 'hérité de la ferme' : bed.objectiveSource === 'zone' ? 'hérité de la parcelle' : bed.objectiveSource === 'plot' ? 'hérité du jardin ou de l’abri' : bed.objectiveSource === 'bed' ? 'défini pour la planche' : bed.objectiveSource === 'mixed' ? 'objectifs historiques de plusieurs niveaux' : 'aucun objectif applicable';
+  const objectiveOrigin = bed.objectiveSource === 'farm' ? 'hérité de la ferme' : bed.objectiveSource === 'zone' ? 'hérité de la parcelle' : bed.objectiveSource === 'plot' ? 'hérité du jardin ou de l’abri' : bed.objectiveSource === 'bed' ? 'défini pour la planche' : bed.objectiveSource === 'mixed' ? 'objectifs historiques de plusieurs niveaux' : 'aucun objectif adopté';
   return <details className="need-diagnostic">
     <summary>ⓘ Pourquoi&nbsp;?</summary>
     <ul>
@@ -109,7 +112,7 @@ function NeedDiagnostic({ bed }: { bed: BedIrrigationNeed }) {
       <DiagnosticLine label="Pluie prévue" value={bed.forecastRainMm} ok={bed.completeness.missingDates.forecastRain.length === 0} detail={bed.sheltered ? 'abri : pluie extérieure non applicable, zéro valide' : bed.completeness.missingDates.forecastRain.length === 0 ? 'prévision disponible' : `${missingDatesText(bed.completeness.missingDates.forecastRain)}, comptée zéro`} />
       <DiagnosticLine label="Irrigation planifiée" value={bed.plannedIrrigationMm} ok detail="planifications actives" />
     </ul>
-    <p><strong>Objectif de la semaine :</strong> {bed.completeness.demandComplete ? `${formatMm(bed.objectiveMm)} — calculable` : 'non calculable — aucun objectif applicable'}</p>
+    <p><strong>Objectif de la semaine :</strong> {bed.completeness.demandComplete ? `${formatMm(bed.objectiveMm)} — calculable` : 'non calculable — aucun objectif adopté'}</p>
     <p><strong>Besoin réel :</strong> {!bed.completeness.demandComplete ? `non calculable — ${missingLabels(bed, 'real')}` : bed.completeness.realComplete ? `${formatMm(bed.realRemainingMm)} — calculable` : `${formatMm(bed.realRemainingMm)} — partiel, ${missingLabels(bed, 'real')}`}</p>
     <p><strong>Besoin à planifier :</strong> {!bed.completeness.demandComplete ? `non calculable — ${missingLabels(bed, 'planning')}` : bed.completeness.planningComplete ? `${formatMm(bed.rawPlanningNeedMm)} — calculable` : `${formatMm(bed.rawPlanningNeedMm)} — partiel, ${missingLabels(bed, 'planning')}`}</p>
     <small>Période : {formatDate(bed.weekStart)} au {formatDate(bed.weekEnd)} · Surface de la planche : {area.format(bed.areaSquareMeters)} m² · Surface mouillée : {wettedArea(bed).value} ({wettedArea(bed).kind}) · {bed.sheltered ? 'Abri' : 'Plein champ'} · Seuil : {formatMm(bed.thresholdMm)} · Override : {bed.manualOverrideMm === null ? 'aucun' : formatMm(bed.manualOverrideMm)}</small>
@@ -155,6 +158,8 @@ function HelpButton({ text }: { text: string }) {
   return <span className="need-help" onMouseLeave={() => setHovered(false)}><button type="button" aria-label="Afficher l’explication" aria-expanded={open} onClick={() => { setDismissed(false); setPinned(!pinned); }} onMouseEnter={() => { setDismissed(false); setHovered(true); }} onFocus={() => { setDismissed(false); setFocused(true); }} onBlur={() => setFocused(false)}>i</button>{open ? <span role="tooltip">{text}<button type="button" aria-label="Fermer l’explication" onClick={(event) => { event.stopPropagation(); setPinned(false); setHovered(false); setFocused(false); setDismissed(true); }}>×</button></span> : null}</span>;
 }
 function formatMm(value: number | null) { return value === null ? 'Non calculable' : `${mm.format(value)} mm`; }
+/** Le total d'un jardin, ou « Non calculable » avec sa raison (audit final, lot A, R2, F282). */
+function gardenMm(value: number | null, reason: string | null) { return value === null && reason ? `Non calculable (${reason})` : formatMm(value); }
 function formatOptionalMm(value: number | null) { return value === null ? 'non disponible' : formatMm(value); }
 function formatDate(value: string, withYear = true) { return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', ...(withYear ? { year: 'numeric' as const } : {}), timeZone: 'UTC' }).format(new Date(`${value}T12:00:00Z`)); }
 /** Origine de la pluie retenue pour les jours écoulés sans mesure ni réanalyse (D-019). */
@@ -171,12 +176,12 @@ function rainFallbackText(bed: BedIrrigationNeed) {
 function missingDatesText(dates: readonly string[]) { return dates.length === 0 ? 'donnée indisponible' : `manquante ${dates.length === 1 ? 'le' : 'les'} ${dates.map((date) => formatDate(date, false)).join(', ')}`; }
 function missingLabels(bed: BedIrrigationNeed, level: 'real' | 'planning') {
   const missing = bed.completeness.missing.filter((item) => level === 'planning' || item !== 'forecast-rain');
-  return missing.map((item) => item === 'objective' ? 'aucun objectif applicable' : item === 'actual-rain' ? `pluie réelle ${missingDatesText(bed.completeness.missingDates.actualRain)}` : `pluie prévue ${missingDatesText(bed.completeness.missingDates.forecastRain)}`).join(' ; ');
+  return missing.map((item) => item === 'objective' ? 'aucun objectif adopté' : item === 'actual-rain' ? `pluie réelle ${missingDatesText(bed.completeness.missingDates.actualRain)}` : `pluie prévue ${missingDatesText(bed.completeness.missingDates.forecastRain)}`).join(' ; ');
 }
 function dashboardWarning(dashboard: IrrigationNeedsDashboard) {
   const beds = dashboard.gardens.flatMap((garden) => garden.beds);
   const causes = [
-    ['objective', 'aucun objectif hydrique applicable', []] as const,
+    ['objective', 'aucun objectif hydrique adopté', []] as const,
     ['actual-rain', 'pluie réelle incomplète', dashboard.completeness.missingDates.actualRain] as const,
     ['forecast-rain', 'pluie prévue incomplète', dashboard.completeness.missingDates.forecastRain] as const,
   ].flatMap(([key, label, dates]) => {

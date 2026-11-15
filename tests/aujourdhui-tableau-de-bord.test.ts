@@ -275,15 +275,17 @@ test('T4 : la semaine pondère les millimètres par la surface, pour la ferme et
   assert.equal(week.farm.text, '9,3 / 21,7 mm');
   assert.deepEqual(week.tiles, {
     objective: '21,7 mm',
+    objectiveDetail: 'ferme entière, du lun. 9 nov. au dim. 15 nov.',
     received: '9,3 mm',
     receivedDetail: '8 mm d’irrigation, 1,3 mm de pluie mesurée',
     remaining: '12,3 mm',
+    remainingDetail: 'objectif moins l’eau reçue, jamais négatif',
     water: '18,04 m³',
     waterToday: 'dont 4 m³ aujourd’hui',
   });
 });
 
-test('D-003 : une pluie ou un objectif inconnus laissent le total inconnu, jamais zéro', () => {
+test('D-003 : une pluie inconnue laisse le total inconnu, jamais zéro ; sans objectif, aucun chiffre d’objectif', () => {
   const week = todayWeek({
     weekStart: '2026-11-09',
     weekEnd: '2026-11-15',
@@ -291,9 +293,11 @@ test('D-003 : une pluie ou un objectif inconnus laissent le total inconnu, jamai
     water: { weekCubicMeters: 3, todayCubicMeters: 0, incomplete: true },
   });
   assert.ok(week);
-  assert.deepEqual(week.shown.map((row) => row.text), ['6 mm irrigués / 20 mm, pluie inconnue', '2 mm reçus, objectif non fixé']);
-  assert.deepEqual([week.tiles.objective, week.tiles.received, week.tiles.remaining], [null, null, null]);
-  assert.equal(week.tiles.receivedDetail, '3 mm d’irrigation, pluie inconnue');
+  assert.deepEqual(week.shown.map((row) => row.text), ['6 mm irrigués / 20 mm, pluie inconnue', '2 mm reçus, aucun objectif posé']);
+  // Depuis le lot A (R2, F280) : la ferme se chiffre sur la planche qui a un objectif, et le dit ; sa pluie reste inconnue.
+  assert.deepEqual([week.tiles.objective, week.tiles.received, week.tiles.remaining], ['20 mm', null, null]);
+  assert.equal(week.tiles.objectiveDetail, 'objectifs posés sur 1 planche sur 2, du lun. 9 nov. au dim. 15 nov.');
+  assert.equal(week.tiles.receivedDetail, '6 mm d’irrigation, pluie inconnue, sur cette planche');
   assert.equal(week.tiles.water, 'au moins 3 m³');
   assert.equal(week.shown[0].bars.objectivePercent, 100 * 20 / 20);
   assert.equal(todayWeek({ weekStart: '2026-11-09', weekEnd: '2026-11-15', beds: [], water: null }), null);

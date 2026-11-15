@@ -8,6 +8,7 @@ import { isArbitrationEditable } from '@/lib/domain/arbitration-preview';
 import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
 import { loadIrrigationFeasibilityAction, saveIrrigationArbitrationAction, type FeasibilityActionResult } from './irrigation-feasibility-actions';
 import { feasibilityHeadTiles, isPriorityLevelShown } from '@/lib/domain/feasibility-reading';
+import { feasibilityUnknownReason } from '@/lib/domain/objective-reading';
 import { ArbitrationPlan } from './arbitration-plan';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -80,8 +81,9 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
       {/* Quatre tuiles au plus en tête ; l'écran de répartition, quand un niveau attend un choix, porte les siennes (audit final, lot B, R3, F245). */}
       {head ? <div className="feasibility-summary is-head">
         <Summary label="Eau disponible" value={volume(head.availableCubicMeters)} detail="d’ici dimanche soir, après les arrosages déjà planifiés" />
-        <Summary label="Besoin de la semaine" value={volume(head.needCubicMeters)} detail="besoins effectifs restant à planifier" />
-        <Summary label="Part servie" value={percent(head.coveragePercent)} detail="du besoin, en volume" />
+        {/* Un besoin chiffré en partie se lit « au moins », et la tuile dit pourquoi (audit final, lot A, R2, F282). */}
+        <Summary label="Besoin de la semaine" value={head.needCubicMeters === null && head.knownNeedCubicMeters > 0 ? `au moins ${volumeText(head.knownNeedCubicMeters)}` : volume(head.needCubicMeters)} detail={head.needCubicMeters === null ? `non chiffré pour ${feasibilityUnknownReason(head.unknownNeed) ?? 'des planches'}` : 'besoins effectifs restant à planifier'} />
+        <Summary label="Part servie" value={percent(head.coveragePercent)} detail={head.coveragePercent === null && head.needCubicMeters === null ? 'le besoin de la semaine n’est pas chiffré en entier' : 'du besoin, en volume'} />
         <Summary label="Planches servies en entier" value={`${head.fullyServedBeds} sur ${head.bedsWithNeed}`} detail="parmi les planches qui ont un besoin" />
       </div> : null}
       <div>{dashboard.priorities.filter(isPriorityLevelShown).map((level) => isArbitrationEditable(level)
