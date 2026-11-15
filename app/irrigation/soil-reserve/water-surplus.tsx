@@ -1,5 +1,6 @@
 'use client';
 
+import { volumeText } from '@/lib/domain/display-numbers';
 import type { WaterSurplus } from '@/lib/domain/soil-reserve/water-surplus';
 import { gaugeDayLabel, gaugeShortDayLabel } from '@/lib/domain/soil-reserve/gauge-view';
 
@@ -11,7 +12,6 @@ import { gaugeDayLabel, gaugeShortDayLabel } from '@/lib/domain/soil-reserve/gau
  */
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const volume = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 
 export function WaterSurplusBadge({ surplus }: { surplus: WaterSurplus }) {
   const period = `du ${gaugeDayLabel(surplus.from)} au ${gaugeDayLabel(surplus.to)}`;
@@ -19,7 +19,7 @@ export function WaterSurplusBadge({ surplus }: { surplus: WaterSurplus }) {
     ? 'aucune'
     : surplus.cubicMeters === null
       ? `${surplus.beds.length} planche${surplus.beds.length > 1 ? 's' : ''}, volume inconnu`
-      : `${surplus.volumeIncomplete ? 'au moins ' : ''}${volume.format(surplus.cubicMeters)} m³`;
+      : `${surplus.volumeIncomplete ? 'au moins ' : ''}${volumeText(surplus.cubicMeters)}`;
   return (
     <details className="water-surplus" data-empty={surplus.beds.length === 0} suppressHydrationWarning>
       <summary>
@@ -32,7 +32,7 @@ export function WaterSurplusBadge({ surplus }: { surplus: WaterSurplus }) {
             {surplus.beds.map((bed) => (
               <li key={bed.bedId}>
                 <strong>Planche {bed.bedName}</strong>
-                <span>{mm.format(bed.drainedMm)} mm{bed.cubicMeters === null ? ', volume inconnu' : `, ${volume.format(bed.cubicMeters)} m³`}</span>
+                <span>{mm.format(bed.drainedMm)} mm{bed.cubicMeters === null ? ', volume inconnu' : `, ${volumeText(bed.cubicMeters)}`}</span>
                 <small>{bed.days.map(gaugeShortDayLabel).join(', ')}</small>
               </li>
             ))}

@@ -2,6 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { horodatageLocal, nomUnique, preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -38,7 +39,7 @@ import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrer
 const OBJECTIF_MM = '70';
 /** La part de N02 et de N03 : 0,3 m³ sur 50,5 m², soit 5,9 mm, un seul arrosage entre 3 et 10 mm. */
 const STOCK_M3 = '0,3';
-const STOCK_AFFICHE = '0,30 m³';
+const STOCK_AFFICHE = '300 L';
 const PART_MM = '5,9 mm';
 const CAPACITE_M3 = '10';
 const DEBIT_DE_LA_POMPE_M3_H = '2';
@@ -49,7 +50,8 @@ const PLAGE_DE_DEPART = { debut: '06:00', fin: '22:00' };
 const RECALCUL = { timeout: millisecondsFromMinutes(1) };
 const MOTIF_EAU = 'stock et ressources insuffisants d’ici dimanche';
 /** L'écart d'arrondi entre l'eau mobilisable et le volume validé, chacun au litre. */
-const ARRONDI_M3 = 0.002;
+// Trois volumes écrits à 1 L près sous 1 m³, à 0,01 m³ près au-delà (lot E, J8, F258) : l'écart d'arrondi au pire.
+const ARRONDI_M3 = 0.015;
 /** Six pages, deux lignes, une réserve, une pompe, deux recalculs et la remise en état. */
 const DUREE_DU_PARCOURS = millisecondsFromMinutes(4);
 
@@ -112,7 +114,7 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   // La ligne de budget de la réserve : l'eau mobilisable, la demande, et pour
   // chaque niveau la part visée et la part placée, « — » sans demande.
   const budget = await ligneDeBudget(planning, reserve);
-  await expect(budget).toHaveText(/^0,30 m³ mobilisables pour \d+,\d{2,3} m³ demandés · haute — · normale \d+ % visés, \d+ % placés · basse —$/);
+  await expect(budget).toHaveText(new RegExp(`^300 L mobilisables pour ${VOLUME_ECRIT} demandés · haute — · normale \\d+ % visés, \\d+ % placés · basse —$`));
   const parts = (await budget.innerText()).match(/normale (\d+) % visés, (\d+) % placés/);
   expect(parts, 'la part normale de la ligne de budget').not.toBeNull();
   const [visee, placee] = [Number(parts![1]), Number(parts![2])];
@@ -167,7 +169,7 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   // après les m³ déjà validés, au moins ceux de N02 (audit final, lot B, remarque 4, F255).
   const apresValidation = planning.locator('.planning-budgets-validated');
   await expect(apresValidation).toBeVisible();
-  await expect(apresValidation).toHaveText(/^Les parts se comptent sur ce qui reste à placer, après les \d+(,\d+)? m³ déjà validés cette semaine : une part qui baisse après une validation ne retire pas d’eau aux planches\.$/);
+  await expect(apresValidation).toHaveText(new RegExp(`^Les parts se comptent sur ce qui reste à placer, après les ${VOLUME_ECRIT} déjà validés cette semaine : une part qui baisse après une validation ne retire pas d’eau aux planches\\.$`));
   expect(metresCubes(await apresValidation.innerText(), 'déjà validés'), 'le volume validé de N02 au moins').toBeGreaterThanOrEqual(volumeValide - ARRONDI_M3);
   await verifierLEtape(page, journal, 'proposition validée, comptée au recalcul');
 
@@ -243,11 +245,9 @@ function estDimanche(reference: number): boolean {
   return new Date(`${horodatageLocal(0, reference).slice(0, 10)}T12:00:00Z`).getUTCDay() === DIMANCHE;
 }
 
-/** « 0,166 m³ mobilisables pour … » : le nombre de mètres cubes qui précède le mot donné. */
+/** « 166 L mobilisables pour … » : le volume, en m³, qui précède le mot donné (lot E, J8). */
 function metresCubes(texte: string, suivant: string): number {
-  const trouve = texte.match(new RegExp(`(\\d+(?:,\\d+)?) m³${suivant ? ` ${suivant}` : ''}`));
-  expect(trouve, `un volume en m³ dans « ${texte} »`).not.toBeNull();
-  return Number(trouve![1].replace(',', '.'));
+  return metresCubesLus(texte, suivant);
 }
 
 function mesureDe(carte: Locator, intitule: string): Locator {
@@ -285,7 +285,7 @@ async function creerLaReserve(page: Page, reserve: string): Promise<void> {
   await formulaire.getByLabel('Volume observé (m³)').fill(STOCK_M3);
   await formulaire.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(formulaire).toBeHidden({ timeout: 15_000 });
-  await expect(panneau.locator('.water-asset-card').filter({ hasText: reserve })).toContainText('Actuel0,3 m³');
+  await expect(panneau.locator('.water-asset-card').filter({ hasText: reserve })).toContainText('Actuel300 L');
 }
 
 async function creerLaPompe(page: Page, pompe: string, reserve: string): Promise<void> {

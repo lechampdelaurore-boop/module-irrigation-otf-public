@@ -1,3 +1,4 @@
+import { volumeText } from './display-numbers.ts';
 import { cubicMetersFromLiters } from './units.ts';
 import { litersPerHourForBed } from './irrigation-calculations.ts';
 import type { WaterInfrastructure } from './water-resources.ts';
@@ -220,7 +221,7 @@ export function resolvePumpOriginAvailability({
         .get(`${resource.id}:${civilDate}`) ?? 0;
       const remaining = Math.max(0, limit.maxCubicMetersPerDay - alreadyWithdrawn);
       if (requiredVolumeCubicMeters > remaining + 1e-9) {
-        return { status: 'unavailable', message: `Limite de prélèvement insuffisante (${remaining.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} m³ encore disponibles ce jour).` };
+        return { status: 'unavailable', message: `Limite de prélèvement insuffisante (${volumeText(remaining)} encore disponibles ce jour).` };
       }
     }
     return { status: 'available', message: 'Ressource directe disponible selon les informations renseignées.' };
@@ -239,7 +240,7 @@ export function resolvePumpOriginAvailability({
   if (mobilizable + 1e-9 < requiredVolumeCubicMeters) {
     return {
       status: 'unavailable',
-      message: `Volume mobilisable insuffisant (${mobilizable.toLocaleString('fr-FR', { maximumFractionDigits: 3 })} m³).`,
+      message: `Volume mobilisable insuffisant (${volumeText(mobilizable)}).`,
     };
   }
   return { status: 'available', message: 'Volume mobilisable suffisant selon le dernier stock observé.' };

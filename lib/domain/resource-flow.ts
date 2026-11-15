@@ -269,5 +269,5 @@ export function flowMeasurementOrigin(measurement: Pick<ResourceFlowMeasurement,
   const running = measurement.stoppedSeconds > 0
     ? `Le temps de marche est le temps entre les deux relevés, ${hoursText(measurement.elapsedSeconds)}, moins les arrêts déclarés, ${hoursText(measurement.stoppedSeconds)}.`
     : 'Le temps de marche est le temps entre les deux relevés : aucun arrêt déclaré.';
-  return `Volume produit ${oneDecimal.format(measurement.producedCubicMeters)} m³ ÷ temps de marche ${hoursText(measurement.runningSeconds)} = ${waterText(measurement.runningFlowCubicMetersPerHour, 'm³/h')}. ${running}`;
+  return `Volume produit ${waterText(measurement.producedCubicMeters, 'm³')} ÷ temps de marche ${hoursText(measurement.runningSeconds)} = ${waterText(measurement.runningFlowCubicMetersPerHour, 'm³/h')}. ${running}`;
 }

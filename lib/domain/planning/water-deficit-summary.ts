@@ -1,4 +1,4 @@
-import { formatWaterVolumeForMessage } from '../irrigation-format.ts';
+import { volumeText } from '../display-numbers.ts';
 import type { SupplyBudget, WeeklyPlan } from './contract.ts';
 
 /**
@@ -30,7 +30,7 @@ export function waterDeficitDetail(deficit: Pick<WeeklyPlan['deficit'], 'waterCu
   const byLimit = deficit.byReason['daily-limit'] ?? 0;
   if (byLimit <= NEGLIGIBLE_CUBIC_METERS) return WATER_DEFICIT_DETAIL;
   if (byLimit >= deficit.waterCubicMeters - NEGLIGIBLE_CUBIC_METERS) return 'Ce que la limite journalière ne laisse pas placer';
-  return `${WATER_DEFICIT_DETAIL}, dont ${formatWaterVolumeForMessage(byLimit)} m³ par la limite journalière`;
+  return `${WATER_DEFICIT_DETAIL}, dont ${volumeText(byLimit)} par la limite journalière`;
 }
 
 /** Les chaînes servies dont l'eau mobilisable est inconnue : une ligne de budget sans eau chiffrée, pour une demande. */

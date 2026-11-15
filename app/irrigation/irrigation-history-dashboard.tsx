@@ -1,5 +1,6 @@
 'use client';
 
+import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
 import { useMemo, useState, useTransition, type ReactNode } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type {
@@ -45,7 +46,7 @@ const periodLabels: Record<HistoryPeriodMode, string> = {
 const numberFormatter = new Intl.NumberFormat('fr-FR', {
   maximumFractionDigits: 2,
 });
-const volumeFormatter = new Intl.NumberFormat('fr-FR', {
+const flowFormatter = new Intl.NumberFormat('fr-FR', {
   maximumFractionDigits: 3,
 });
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -335,35 +336,34 @@ export function IrrigationHistoryDashboardView({
         <SummaryCard
           label="Irrigation"
           value={dashboard.summary.irrigationCubicMeters}
-          unit="m³"
-          formatter={volumeFormatter}
+          format={volumeText}
           availability={dashboard.summary.irrigationVolumeIncomplete ? 'incomplet : une irrigation sans surface mouillée connue' : null}
         />
-        <SummaryCard label="Apport irrigation" value={dashboard.summary.irrigationMm} unit="mm" origin={irrigationCumulOrigin(dashboard.summary)} />
+        <SummaryCard label="Apport irrigation" value={dashboard.summary.irrigationMm} format={millimetersText} origin={irrigationCumulOrigin(dashboard.summary)} />
         <SummaryCard label="Surface irriguée" value={dashboard.summary.irrigatedAreaSquareMeters} unit="m²" />
         <SummaryCard
           label="Pluie réelle"
           value={dashboard.summary.actualRainMm}
-          unit="mm"
+          format={millimetersText}
           availability={availabilityText(dashboard.summary.actualRainAvailability)}
           action={rainAction}
         />
         <SummaryCard
           label="ET0"
           value={dashboard.summary.et0Mm}
-          unit="mm"
+          format={millimetersText}
           availability={availabilityText(dashboard.summary.et0Availability)}
         />
         <SummaryCard
           label="Objectif"
           value={dashboard.summary.objectiveMm}
-          unit="mm"
+          format={millimetersText}
           availability={objectiveAvailabilityText(dashboard.summary.objectiveAvailability)}
         />
         <SummaryCard
           label="Écart à l’objectif"
           value={dashboard.summary.gapToObjectiveMm}
-          unit="mm"
+          format={millimetersText}
           signed
           tone={gapTone(dashboard.summary.gapToObjectiveMm)}
           availability={gapWaitsForRain ? 'pluie réelle incomplète' : null}
@@ -437,18 +437,20 @@ function SummaryCard({
   signed = false,
   availability = null,
   tone,
-  formatter = numberFormatter,
+  format,
   origin = null,
   action = null,
   missingAction = null,
 }: {
   label: string;
   value: number | null;
-  unit: string;
+  /** L'unité écrite après le nombre, quand aucun format ne la porte (m²). */
+  unit?: string;
   signed?: boolean;
   availability?: string | null;
   tone?: string;
-  formatter?: Intl.NumberFormat;
+  /** Le nombre et son unité : un volume ou des millimètres s'écrivent comme partout (lot E, J8, F258, F259). */
+  format?: (value: number) => string;
   origin?: string | null;
   /** Un geste qui complète la donnée, sous la valeur (audit ergonomique, point 11). */
   action?: { href: string; label: string } | null;
@@ -463,7 +465,7 @@ function SummaryCard({
         ? <a className="history-summary-action is-main" href={missingAction.href}>{missingAction.label}</a>
         : <strong>{value === null
           ? 'Donnée indisponible'
-          : `${signed && value > 0 ? '+' : ''}${formatter.format(value)} ${unit}`}<FigureOrigin text={origin} /></strong>}
+          : `${signed && value > 0 ? '+' : ''}${format ? format(value) : `${numberFormatter.format(value)} ${unit ?? ''}`.trim()}`}<FigureOrigin text={origin} /></strong>}
       {availability ? <small>{availability}</small> : null}
       {action && !replaced ? <a className="history-summary-action" href={action.href}>{action.label}</a> : null}
     </article>
@@ -484,7 +486,7 @@ function HistoryItem({ item }: { item: IrrigationHistoryItem }) {
           {protectedSignal ? <small className="history-event-signal">{protectedSignal}</small> : null}
         </span>
         <span className="history-event-measures">
-          {showsActual ? <strong>{numberFormatter.format(item.actualAmountMm)} mm · {item.actualCubicMeters === null ? 'volume inconnu' : `${volumeFormatter.format(item.actualCubicMeters)} m³`}</strong> : null}
+          {showsActual ? <strong>{millimetersText(item.actualAmountMm)} · {item.actualCubicMeters === null ? 'volume inconnu' : `${volumeText(item.actualCubicMeters)}`}</strong> : null}
           <em data-status={item.status}>{item.statusLabel}</em>
         </span>
       </summary>
@@ -499,18 +501,18 @@ function HistoryItem({ item }: { item: IrrigationHistoryItem }) {
           <Detail label="Matériel historique" value={item.equipmentName} />
           <Detail label="Réglage historique" value={item.settingName} />
           <Detail label="Pompe historique" value={item.pumpName ?? 'Non renseignée · faisabilité non vérifiée'} />
-          <Detail label="Débit demandé" value={item.requestedFlowCubicMetersPerHour === null || item.requestedFlowCubicMetersPerHour === undefined ? 'Non vérifié' : `${volumeFormatter.format(item.requestedFlowCubicMetersPerHour)} m³/h`} />
-          <Detail label="Débit maximal historique" value={item.pumpMaximumFlowCubicMetersPerHour === null || item.pumpMaximumFlowCubicMetersPerHour === undefined ? '—' : `${volumeFormatter.format(item.pumpMaximumFlowCubicMetersPerHour)} m³/h`} />
+          <Detail label="Débit demandé" value={item.requestedFlowCubicMetersPerHour === null || item.requestedFlowCubicMetersPerHour === undefined ? 'Non vérifié' : `${flowFormatter.format(item.requestedFlowCubicMetersPerHour)} m³/h`} />
+          <Detail label="Débit maximal historique" value={item.pumpMaximumFlowCubicMetersPerHour === null || item.pumpMaximumFlowCubicMetersPerHour === undefined ? '—' : `${flowFormatter.format(item.pumpMaximumFlowCubicMetersPerHour)} m³/h`} />
           <Detail label="Origine historique" value={item.pumpOriginName ?? 'Non renseignée'} />
           <Detail label="Placement" value={item.placementLabel} />
           <Detail label="Parcelle" value={item.zoneName ?? '—'} />
           <Detail label="Jardin(s) ou abri(s)" value={item.plotNames.join(', ') || '—'} />
           <Detail label="Planche(s)" value={item.bedNames.join(', ') || '—'} />
-          <Detail label="Apport réel" value={showsActual ? `${numberFormatter.format(item.actualAmountMm)} mm` : '0 mm'} />
-          <Detail label="Volume réel" value={!showsActual ? '0 m³' : item.actualCubicMeters === null ? '— (surface mouillée inconnue)' : `${volumeFormatter.format(item.actualCubicMeters)} m³`} />
+          <Detail label="Apport réel" value={showsActual ? `${millimetersText(item.actualAmountMm)}` : '0 mm'} />
+          <Detail label="Volume réel" value={!showsActual ? '0 m³' : item.actualCubicMeters === null ? '— (surface mouillée inconnue)' : `${volumeText(item.actualCubicMeters)}`} />
           <Detail label="Surface concernée" value={showsActual ? `${numberFormatter.format(item.irrigatedAreaSquareMeters)} m²` : '0 m²'} />
           <Detail label="Surface mouillée" value={item.wettedAreaSquareMeters === null ? item.wettedAreaLabel : `${numberFormatter.format(item.wettedAreaSquareMeters)} m² — ${item.wettedAreaLabel}`} />
-          <Detail label="Objectif initial" value={item.initialObjectiveMm === null ? 'Non historisé' : `${numberFormatter.format(item.initialObjectiveMm)} mm`} />
+          <Detail label="Objectif initial" value={item.initialObjectiveMm === null ? 'Non historisé' : `${millimetersText(item.initialObjectiveMm)}`} />
           <Detail label="Statut" value={item.statusLabel} />
           <Detail label="Mode de création" value={item.modeLabel} />
         </dl>

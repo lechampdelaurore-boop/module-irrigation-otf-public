@@ -4561,3 +4561,35 @@ leur bloc principal, qui reçoit le focus (F257). Parcours P22 et P27
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-117, D-128.
+
+
+## D-131 — Audit ergonomique final, lot E : des nombres lisibles (J8)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur, aucune question agronomique ; modifiable par lui.
+Après D-130 (contrat et A1).
+
+**Établi dans le code.** Chaque page avait son format : trois décimales au
+plus (`formatWaterVolumeForMessage`, `waterText`, l'historique, la vue par
+série, les ressources), deux décimales fixes (« 0,00 m³ »), des
+millimètres à deux décimales (l'historique, la faisabilité) ou à une
+décimale imposée (« 12,0 mm » dans les arrosages).
+
+**Décision.** Une seule règle d'affichage, `lib/domain/display-numbers.ts`,
+que toutes les pages appellent (F260) : un volume en m³ à deux décimales au
+plus, sans zéro inutile (« 3,14 m³ », « 12 m³ ») ; sous 1 m³, en litres
+entiers (« 425 L ») ; « moins de 1 L » pour un volume non nul plus petit
+qu'un demi-litre, jamais « 0 L » ; « 0 m³ » pour zéro (F258) ; des
+millimètres à une décimale au plus (F259). Les litres se calculent par
+`litersFromCubicMeters` (`lib/domain/units.ts`). `formatWaterVolumeForMessage`
+disparaît, remplacée par la règle. Hors de la règle : les champs de
+saisie, l'export CSV, la note qu'une validation écrit sur l'arrosage,
+l'index d'un compteur, les débits, les vitesses, les réglages rappelés tels
+que saisis, les Kc, les surfaces et les distances. Parcours P12 et P32
+adaptés (un volume écrit se lit par `e2e/support/volumes.ts`) ; la limite de
+0,01 m³ de P12 se lit « 10 L ».
+
+Aucune migration ; aucun calcul, aucune donnée touchés : l'arrondi n'est
+qu'un affichage.
+
+Ne changent pas : D-003, D-117, D-130.

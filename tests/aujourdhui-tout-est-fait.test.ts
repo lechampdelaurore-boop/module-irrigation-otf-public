@@ -139,12 +139,12 @@ test('tout est fait : les retards et les irrigations finies du jour, par jour ; 
     ['Aujourd’hui', ['d']],
   ]);
   const yesterday = list.days[1];
-  assert.equal(yesterday.summary, '2 irrigations, de 7 h à 17 h, sur 2 planches · 2 h · 0,48 m³');
+  assert.equal(yesterday.summary, '2 irrigations, de 7 h à 17 h, sur 2 planches · 2 h · 480 L');
   assert.deepEqual(yesterday.items.map((item) => [item.hours, item.title, item.detail]), [
-    ['7 h à 8 h 30', 'Goutte-à-goutte c · Réglage 1', 'planche P1 · 1 h 30 · 10 mm · 0,30 m³'],
-    ['17 h à 17 h 30', 'Goutte-à-goutte b · Réglage 1', 'planche P3 · 30 min · 6 mm · 0,18 m³'],
+    ['7 h à 8 h 30', 'Goutte-à-goutte c · Réglage 1', 'planche P1 · 1 h 30 · 10 mm · 300 L'],
+    ['17 h à 17 h 30', 'Goutte-à-goutte b · Réglage 1', 'planche P3 · 30 min · 6 mm · 180 L'],
   ]);
-  assert.equal(list.days[0].summary, '1 irrigation, à 7 h, sur 2 planches · 1 h · 0,60 m³');
+  assert.equal(list.days[0].summary, '1 irrigation, à 7 h, sur 2 planches · 1 h · 600 L');
   // Commencée sans être finie : dite, pas enregistrable (T15).
   assert.deepEqual(list.notOver, [{ title: 'Goutte-à-goutte in-slot · Réglage 1', endHour: '18 h 30' }]);
 });

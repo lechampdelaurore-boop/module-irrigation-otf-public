@@ -1,5 +1,6 @@
 'use client';
 
+import { volumeText } from '@/lib/domain/display-numbers';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
@@ -28,10 +29,6 @@ import {
 } from './water-actions';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const cubicMeters = new Intl.NumberFormat('fr-FR', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
   weekday: 'short',
   day: 'numeric',
@@ -265,7 +262,7 @@ export function WaterManagementDashboard({
             <span className="eyebrow">Eau aujourd’hui</span>
             <strong>{currentDay?.limitCubicMeters === null || !currentDay
               ? 'Aucune limite active'
-              : `${cubicMeters.format(currentDay.limitCubicMeters)} m³ maximum`}</strong>
+              : `${volumeText(currentDay.limitCubicMeters)} maximum`}</strong>
           </div>
           <TodayMetric label="Réalisé" value={currentDay?.realizedIrrigationCubicMeters ?? 0} />
           {currentDay.estimatedOngoingCubicMeters > 0 ? <TodayMetric label="En cours estimé" value={currentDay.estimatedOngoingCubicMeters} /> : null}
@@ -353,7 +350,7 @@ export function WaterManagementDashboard({
 
       <div className="water-summary-grid">
         <SummaryCard icon="cible" label="Objectif ferme" value={farmGoal ? `${mm.format(farmGoal.amountMm)} mm` : 'Non défini'} detail={`${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} ciblé${dashboard.goals.length > 1 ? 's' : ''}`} />
-        <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${cubicMeters.format(dashboard.totals.realizedIrrigationCubicMeters)} m³ répartis sur la surface totale des planches`} />
+        <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
         <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
         <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
         <SummaryCard icon="soleil" label="ET0" value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
@@ -417,13 +414,13 @@ export function WaterManagementDashboard({
           <thead><tr><th>Jour</th><th>Irrigation réalisée</th><th>Planifiée</th><th>Pluie mesurée / réanalyse</th><th>Prévision</th><th>Températures prévues</th><th>ET0</th><th>Limite</th></tr></thead>
           <tbody>{dashboard.days.map((day) => <tr key={day.date} className={day.limitExceededByCubicMeters > 0 ? 'limit-exceeded-row' : undefined}>
             <th>{formatDate(day.date)}</th>
-            <td data-label="Irrigation réalisée">{cubicMeters.format(day.realizedIrrigationCubicMeters)} m³{day.volumeIncomplete ? <small> · incomplet, surface mouillée inconnue</small> : null}{day.estimatedOngoingCubicMeters > 0 ? <small> + {cubicMeters.format(day.estimatedOngoingCubicMeters)} m³ en cours estimés</small> : null}</td>
-            <td data-label="Planifiée">{cubicMeters.format(day.plannedIrrigationCubicMeters)} m³</td>
+            <td data-label="Irrigation réalisée">{volumeText(day.realizedIrrigationCubicMeters)}{day.volumeIncomplete ? <small> · incomplet, surface mouillée inconnue</small> : null}{day.estimatedOngoingCubicMeters > 0 ? <small> + {volumeText(day.estimatedOngoingCubicMeters)} en cours estimés</small> : null}</td>
+            <td data-label="Planifiée">{volumeText(day.plannedIrrigationCubicMeters)}</td>
             <td data-label="Pluie réelle / estimée">{day.effectiveActualRainMm === null ? '—' : `${mm.format(day.effectiveActualRainMm)} mm`}{day.manualRainMm !== null ? ' · mesurée' : day.reanalysisRainMm !== null ? ' · réanalyse' : ''}<FigureOrigin text={actualRainOrigin(day)} /></td>
             <td data-label="Prévision">{day.forecastRainMm === null ? '—' : `${mm.format(day.forecastRainMm)} mm`}</td>
             <td data-label="Températures prévues">{formatTemperatures(day.forecastMinimumTemperatureCelsius, day.forecastMaximumTemperatureCelsius)}</td>
             <td data-label="ET0">{day.et0Mm === null ? '—' : `${mm.format(day.et0Mm)} mm · ${day.et0Kind === 'reanalysis' ? 'réanalyse' : 'prévue'}`}</td>
-            <td data-label="Limite">{day.limitCubicMeters === null ? '—' : `${cubicMeters.format(day.limitCubicMeters)} m³`}{day.limitExceededByCubicMeters > 0 ? ` · +${cubicMeters.format(day.actualLimitExceededByCubicMeters || day.limitExceededByCubicMeters)} ${day.actualLimitExceededByCubicMeters > 0 ? 'réels' : 'prévus'}` : ''}</td>
+            <td data-label="Limite">{day.limitCubicMeters === null ? '—' : `${volumeText(day.limitCubicMeters)}`}{day.limitExceededByCubicMeters > 0 ? ` · +${volumeText(day.actualLimitExceededByCubicMeters || day.limitExceededByCubicMeters)} ${day.actualLimitExceededByCubicMeters > 0 ? 'réels' : 'prévus'}` : ''}</td>
           </tr>)}</tbody>
         </table>
       </div>
@@ -438,7 +435,7 @@ function SummaryCard({ icon, label, value, detail, water = false }: { icon: Icon
 }
 
 function TodayMetric({ label, value, warning = false }: { label: string; value: number | null; warning?: boolean }) {
-  return <div className={warning ? 'today-water-metric is-warning' : 'today-water-metric'}><span>{label}</span><strong>{value === null ? '—' : `${cubicMeters.format(value)} m³`}</strong></div>;
+  return <div className={warning ? 'today-water-metric is-warning' : 'today-water-metric'}><span>{label}</span><strong>{value === null ? '—' : `${volumeText(value)}`}</strong></div>;
 }
 
 function parseGoalScope(value: string) {

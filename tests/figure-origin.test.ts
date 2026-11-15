@@ -8,6 +8,7 @@ import type { PlanBedOutcome, PlanProposal } from '../lib/domain/planning/contra
 import { proposalOrigin, unplacedOrigin } from '../lib/domain/planning/origins';
 import { gaugePercentOrigin, thresholdOrigin } from '../lib/domain/soil-reserve/gauge-view';
 import { actualRainOrigin } from '../lib/domain/water-management';
+import { volumeText } from '../lib/domain/display-numbers';
 import { coverageOrigin } from '../lib/domain/irrigation-coverage';
 import { frostThresholdOrigin } from '../lib/domain/crop-alerts/view';
 import { frostAlertThresholdCelsius, frostMarginCelsius } from '../lib/domain/crop-alerts/thresholds';
@@ -25,7 +26,8 @@ import { irrigationCumulOrigin } from '../lib/domain/irrigation-history/summary'
 
 const screenMm = (value: number) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(value)} mm`;
 const screenWhole = (value: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value);
-const screenVolume = (value: number) => `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format(value)} m³`;
+// Les volumes à l'écran (lot E, J8, F258) : la même règle que la bulle.
+const screenVolume = volumeText;
 
 test('objectifs et besoins : la bulle du besoin de la semaine dit le calcul et finit sur le chiffre affiché', () => {
   const bed = { objectiveMm: 20, actualRainMm: 3, actualIrrigationMm: 5, sheltered: false, realRemainingMm: realRemainingMm(20, 3, 5) };
@@ -130,7 +132,7 @@ test('besoin par culture : la bulle de l’objectif proposé additionne les ETM 
 });
 
 const screenRate = (value: number) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(value)} mm/h`;
-const screenWater = (value: number, unit: string) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 }).format(value)} ${unit}`;
+const screenWater = (value: number, unit: string) => unit === 'm³' ? volumeText(value) : `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 }).format(value)} ${unit}`;
 const screenCelsius = (value: number) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(Math.round(value * 10) / 10)} °C`;
 
 test('matériel et placement : la bulle de l’apport horaire additionne les matériels posés jusqu’au chiffre affiché', () => {
@@ -193,7 +195,7 @@ test('ressources et pompes : la bulle du stock disponible dit le volume projeté
 
 test('historique et cumuls : la bulle du cumul dit la pondération par la surface et redit le chiffre affiché', () => {
   const text = irrigationCumulOrigin({ irrigationMm: 12.345, irrigatedAreaSquareMeters: 30, scopeAreaSquareMeters: 45.5 }) ?? '';
-  assert.ok(text.startsWith('Apport irrigation 12,35 mm : '), text);
+  assert.ok(text.startsWith('Apport irrigation 12,3 mm : '), text);
   assert.match(text, /toute la surface du périmètre, 45,5 m²\. 30 m² ont été arrosés/);
   assert.equal(irrigationCumulOrigin({ irrigationMm: null, irrigatedAreaSquareMeters: 0, scopeAreaSquareMeters: 0 }), null);
 });

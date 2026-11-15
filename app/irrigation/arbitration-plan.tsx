@@ -1,5 +1,6 @@
 'use client';
 
+import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
 import { useMemo, useState } from 'react';
 import type { ArbitrationBedCrops, ArbitrationCrops } from '@/lib/domain/arbitration-crops';
 import { initialArbitrationSelection, previewArbitration, type ArbitrationPreview } from '@/lib/domain/arbitration-preview';
@@ -17,12 +18,10 @@ import { ArbitrationTimeline, ArbitrationTimelineHeader } from './arbitration-ti
  * « Valider la répartition ».
  */
 
-const cubic = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const millimeters = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const decided = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
-const m3 = (value: number) => `${cubic.format(value)} m³`;
-const mm = (value: number) => `${millimeters.format(value)} mm`;
+const m3 = volumeText;
+const mm = millimetersText;
 const pct = (value: number) => `${Math.round(value * 100)} %`;
 const count = (value: number, one: string, many = `${one}s`) => `${value} ${value > 1 ? many : one}`;
 const lower = (priority: PriorityFeasibility['priority']) => priorityLabel(priority).toLocaleLowerCase('fr');

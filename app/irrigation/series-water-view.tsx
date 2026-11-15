@@ -1,5 +1,6 @@
 'use client';
 
+import { volumeText } from '@/lib/domain/display-numbers';
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
 import type { SeriesWaterDashboard } from '@/lib/services/series-water-service';
 import { loadSeriesWaterAction } from './irrigation-history-actions';
@@ -9,7 +10,6 @@ type Report = Extract<SeriesWaterDashboard, { available: true }>['report'];
 type SeriesSummary = Report['series'][number];
 
 const numberFormatter = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const volumeFormatter = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 });
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
 
 /**
@@ -136,7 +136,7 @@ function SeriesCard({ item, season, cropWater }: { item: SeriesSummary; season: 
           <Detail label="Dernière récolte" value={harvestLabel(item)} />
           <Detail label="Statut" value={item.occupation.status === 'ongoing' ? 'En cours' : 'Terminée'} />
           <Detail label="Surface occupée" value={item.areaSquareMeters === null ? 'Inconnue — largeur de planche manquante, pas de moyenne' : `${numberFormatter.format(item.areaSquareMeters)} m²`} />
-          <Detail label="Volume d’irrigation" value={`${volumeFormatter.format(item.irrigationCubicMeters)} m³${item.irrigationVolumeIncomplete ? ' — incomplet, surface mouillée inconnue' : ''}`} />
+          <Detail label="Volume d’irrigation" value={`${volumeText(item.irrigationCubicMeters)}${item.irrigationVolumeIncomplete ? ' — incomplet, surface mouillée inconnue' : ''}`} />
           <Detail label="Pluie réelle" value={item.rainAvailability.complete ? `${numberFormatter.format(item.rainMm ?? 0)} mm` : `Indisponible — ${item.rainAvailability.availableDays}/${item.rainAvailability.totalDays} jour(s)`} />
           <Detail label="Objectif restant" value={item.objectiveRemainingMm === null ? '—' : `${numberFormatter.format(item.objectiveRemainingMm)} mm jusqu’à la dernière récolte attendue`} />
         </dl>
@@ -152,7 +152,7 @@ function SeriesCard({ item, season, cropWater }: { item: SeriesSummary; season: 
                 <td data-label="Jardin ou abri">{bed.plotName}{bed.sheltered ? ' (abri)' : ''}</td>
                 <td data-label="Linéaire">{bed.lengthMeters === null ? '—' : `${numberFormatter.format(bed.lengthMeters)} m`}</td>
                 <td data-label="Irrigation">{numberFormatter.format(bed.irrigationMm)} mm</td>
-                <td data-label="Volume">{bed.irrigationCubicMeters === null ? 'inconnu' : `${volumeFormatter.format(bed.irrigationCubicMeters)} m³`}</td>
+                <td data-label="Volume">{bed.irrigationCubicMeters === null ? 'inconnu' : `${volumeText(bed.irrigationCubicMeters)}`}</td>
                 <td data-label="Pluie">{bed.rainMm === null ? '—' : `${numberFormatter.format(bed.rainMm)} mm`}</td>
                 <td data-label="Objectif">{bed.objectiveMm === null ? '—' : `${numberFormatter.format(bed.objectiveMm)} mm`}</td>
               </tr>
@@ -174,8 +174,8 @@ function Detail({ label, value }: { label: string; value: string }) {
 }
 
 function mmAndVolume(item: SeriesSummary) {
-  if (item.irrigationMm === null) return `par planche seulement · ${volumeFormatter.format(item.irrigationCubicMeters)} m³`;
-  return `${numberFormatter.format(item.irrigationMm)} mm · ${volumeFormatter.format(item.irrigationCubicMeters)} m³${item.irrigationVolumeIncomplete ? ' (incomplet)' : ''}`;
+  if (item.irrigationMm === null) return `par planche seulement · ${volumeText(item.irrigationCubicMeters)}`;
+  return `${numberFormatter.format(item.irrigationMm)} mm · ${volumeText(item.irrigationCubicMeters)}${item.irrigationVolumeIncomplete ? ' (incomplet)' : ''}`;
 }
 
 function implantationLabel(item: SeriesSummary) {

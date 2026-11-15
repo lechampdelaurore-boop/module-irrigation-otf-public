@@ -379,7 +379,14 @@ registres, elle y renvoie.
   7, A1** : « Aller au contenu » en premier arrêt du clavier sur la
   première ouverture et sur la page introuvable, vers leur bloc principal,
   qui reçoit le focus (F257 ; P22 et P27 étendus ; aucune migration).
-  Ensuite J8, les arrondis.
+  **PR 1 en ligne** (#64, fusionnée à 8 h 05, déployée à 8 h 25). **PR 2
+  sur 7, J8** (D-131) : une seule règle d'affichage des nombres,
+  `lib/domain/display-numbers.ts`, pour toutes les pages : un volume en m³
+  à deux décimales au plus, sans zéro inutile, en litres entiers sous
+  1 m³, « moins de 1 L » plutôt que « 0 L », des millimètres à une
+  décimale au plus (F258 à F260 ; P12 et P32 adaptés ; aucune migration).
+  Le calcul, les champs de saisie, l'export, l'index d'un compteur et les
+  débits ne changent pas. Ensuite J9, les mêmes mots d'une page à l'autre.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -475,6 +482,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #64 (`66a9374`, lot E de l'audit final, A1, « Aller au contenu » sur
+  la première ouverture et la page introuvable, D-130, fusionnée à 8 h 05 et
+  déployée à 8 h 25, run 43688374458, les cinq jobs réussis, aucune
+  migration). Avant elle : la
   PR #63 (`7780775`, lot B de l'audit final, remarque 5 de la recette 3.9,
   le jour au-delà de sa limite journalière, D-128, fusionnée à 6 h 55 et
   déployée à 7 h 10, run 43683110839, les cinq jobs réussis, aucune

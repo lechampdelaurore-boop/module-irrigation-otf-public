@@ -2,7 +2,7 @@ import { millisecondsFromSeconds } from '@/lib/domain/units';
 
 import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
 import { listDailyWaterLimitsForUser } from '@/db/water-management-repository';
-import { formatWaterVolumeForMessage } from '@/lib/domain/irrigation-format';
+import { volumeText } from '@/lib/domain/display-numbers';
 import {
   buildDailyWaterLedger,
   evaluateDailyWaterLimit,
@@ -79,9 +79,9 @@ export async function enforceDailyLimitForStart(
   const first = violations[0];
   throw new IrrigationDailyLimitExceededError(
     `Démarrage bloqué : limite journalière dépassée le ${formatCivilDate(first.date)}. ` +
-    `${formatWaterVolumeForMessage(first.alreadyRealizedCubicMeters)} m³ déjà réalisés, ${formatWaterVolumeForMessage(first.alreadyPlannedCubicMeters)} m³ planifiés, ` +
-    `${formatWaterVolumeForMessage(first.candidateCubicMeters)} m³ à démarrer, ` +
-    `limite ${formatWaterVolumeForMessage(first.limitCubicMeters)} m³, dépassement prévu ${formatWaterVolumeForMessage(first.exceededByCubicMeters)} m³.`,
+    `${volumeText(first.alreadyRealizedCubicMeters)} déjà réalisés, ${volumeText(first.alreadyPlannedCubicMeters)} planifiés, ` +
+    `${volumeText(first.candidateCubicMeters)} à démarrer, ` +
+    `limite ${volumeText(first.limitCubicMeters)}, dépassement prévu ${volumeText(first.exceededByCubicMeters)}.`,
   );
 }
 

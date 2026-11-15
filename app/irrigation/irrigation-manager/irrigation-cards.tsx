@@ -1,4 +1,5 @@
 'use client';
+import { millimetersText } from '@/lib/domain/display-numbers';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 import {
   decimalFormatter,
@@ -8,7 +9,6 @@ import {
   formatDuration,
   formatWettedVolume,
   wettedVolumeLiters,
-  oneDecimalFormatter,
   remainingForEvent,
 } from './presentation';
 
@@ -294,8 +294,8 @@ function ApplicationDetails({
                 <tr key={application.otfBedId}>
                   <td>{bedNames.get(application.otfBedId) ?? application.otfBedId}</td>
                   <td>{decimalFormatter.format(application.rateMmPerHour)}</td>
-                  <td>{oneDecimalFormatter.format(application.plannedAmountMm)} mm</td>
-                  <td>{oneDecimalFormatter.format(actual)} mm</td>
+                  <td>{millimetersText(application.plannedAmountMm)}</td>
+                  <td>{millimetersText(actual)}</td>
                 </tr>
               );
             })}

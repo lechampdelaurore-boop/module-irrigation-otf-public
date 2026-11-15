@@ -1,7 +1,7 @@
 'use client';
+import { volumeText } from '@/lib/domain/display-numbers';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 import {
-  LITERS_PER_CUBIC_METER,
   SECONDS_PER_HOUR,
   cubicMetersFromLiters,
   hoursFromSeconds,
@@ -15,11 +15,6 @@ export type CreationKind = 'running' | 'planned' | 'completed';
 
 export const decimalFormatter = new Intl.NumberFormat('fr-FR', {
   maximumFractionDigits: 2,
-});
-
-export const oneDecimalFormatter = new Intl.NumberFormat('fr-FR', {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
 });
 
 const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -126,10 +121,10 @@ export function formatWettedVolume(liters: number | null) {
   return liters === null ? 'Inconnu — passe-pied non renseigné' : formatVolume(liters);
 }
 
+/** Un volume en litres, écrit comme partout : « 425 L », « 3,14 m³ » (lot E, J8, F258). */
 export function formatVolume(liters: number) {
   if (!Number.isFinite(liters) || liters < 0) return '—';
-  if (liters > LITERS_PER_CUBIC_METER) return `${decimalFormatter.format(cubicMetersFromLiters(liters))} m³`;
-  return `${decimalFormatter.format(liters)} L`;
+  return volumeText(cubicMetersFromLiters(liters));
 }
 
 export function formatDateTime(value: string) {

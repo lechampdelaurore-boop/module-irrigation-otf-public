@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { formatWaterVolumeForMessage } from '../lib/domain/irrigation-format.ts';
+import { volumeText } from '../lib/domain/display-numbers.ts';
 import type { StoredWeeklyPlan, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { waterDeficitExplanation } from '../lib/domain/planning/presentation.ts';
@@ -139,7 +139,7 @@ test('la note du manque d’eau explique l’écart entre demandé, placé et ma
   assert.ok(beside > 0.1 && beside < 0.2, `${beside} m³ placés à côté`);
   const note = waterDeficitExplanation(stored(plan));
   assert.ok(note !== null, 'une note explique l’écart');
-  const expected = `Demandés ${formatWaterVolumeForMessage(demanded)} m³, placés ${formatWaterVolumeForMessage(placed)} m³, manque d’eau ${formatWaterVolumeForMessage(plan.deficit.waterCubicMeters)} m³ : l’écart tient à ${formatWaterVolumeForMessage(beside)} m³ placés sans couvrir de besoin compté`;
+  const expected = `Demandés ${volumeText(demanded)}, placés ${volumeText(placed)}, manque d’eau ${volumeText(plan.deficit.waterCubicMeters)} : l’écart tient à ${volumeText(beside)} placés sans couvrir de besoin compté`;
   assert.ok(note.startsWith(expected), `${note}\n  devrait commencer par\n${expected}`);
   assert.doesNotMatch(note, /autre raison que l’eau/, 'rien ne manque pour une autre raison');
 });

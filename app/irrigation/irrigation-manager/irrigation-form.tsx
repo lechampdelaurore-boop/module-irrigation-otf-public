@@ -1,4 +1,5 @@
 'use client';
+import { millimetersText } from '@/lib/domain/display-numbers';
 import type { EquipmentListItem, EquipmentSettingRecord } from '@/lib/domain/equipment-record';
 import {
   type CreationKind,
@@ -7,7 +8,6 @@ import {
   formatDuration,
   formatRate,
   formatVolume,
-  oneDecimalFormatter,
 } from './presentation';
 
 import { hydraulicMessage } from '@/lib/domain/hydraulic-message';
@@ -113,7 +113,7 @@ export function IrrigationPreview({
                   <tr key={application.bed.id}>
                     <td>{application.bed.name}</td>
                     <td>{decimalFormatter.format(application.rateMmPerHour)}</td>
-                    <td>{application.amountMm === null ? 'inconnu' : `${oneDecimalFormatter.format(application.amountMm)} mm`}</td>
+                    <td>{application.amountMm === null ? 'inconnu' : `${millimetersText(application.amountMm)}`}</td>
                   </tr>
                 ))}
               </tbody>

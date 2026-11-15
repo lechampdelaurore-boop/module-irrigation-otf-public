@@ -238,7 +238,7 @@ test('cas 7 : « Fait comme prévu » sur une ligne passée, une confirmation d�
   const missed = irrigation('m1', '2026-11-11T06:00:00.000Z', 90, 'Rampe nord');
   const sentences = confirmations([missed]);
   assert.deepEqual([...sentences.keys()], ['m1-eq']);
-  assert.equal(sentences.get('m1-eq'), 'Enregistrer comme faite Rampe nord · Standard, hier de 7 h à 8 h 30, 0,017 m³ ? Elle ne se corrigera plus dans le module.');
+  assert.equal(sentences.get('m1-eq'), 'Enregistrer comme faite Rampe nord · Standard, hier de 7 h à 8 h 30, 17 L ? Elle ne se corrigera plus dans le module.');
 });
 
 test('cas 7 : absent sur une ligne future, en retard mais pas finie, ou déjà démarrée ; le même jugement que « Tout est fait »', () => {
@@ -259,6 +259,6 @@ test('cas 7 : un volume inconnu se dit inconnu, jamais zéro (D-003) ; le jour s
   );
   assert.equal(
     doneAsPlannedConfirmation({ title: 'Rampe', hours: '5 h à 6 h', cubicMeters: 1.2 }, 'Aujourd’hui'),
-    'Enregistrer comme faite Rampe, aujourd’hui de 5 h à 6 h, 1,20 m³ ? Elle ne se corrigera plus dans le module.',
+    'Enregistrer comme faite Rampe, aujourd’hui de 5 h à 6 h, 1,2 m³ ? Elle ne se corrigera plus dans le module.',
   );
 });
