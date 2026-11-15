@@ -246,9 +246,20 @@ C'est aussi la cause du « Non calculable » de « Besoin de la semaine » sur
 « Ressources » quand le planning annonce un manque : le manque se calcule sur
 les planches chiffrées, le total de la semaine attendait toutes les planches.
 
+## 8 quater. Ce que la PR 3 (J14) a tranché en codant
+
+Même consigne : l'option recommandée, aucune question agronomique (D-140).
+
+| N° | Précision | Choix codé |
+| --- | --- | --- |
+| F283 | Gel sans alerte | quand « Alertes météo » est coché, qu'une minimale prévue des trois jours est à 0 °C ou moins (le flocon de la carte), qu'aucune alerte active ne porte sur la minimale vers le bas et que le gel des cultures n'a rien annoncé : « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. », la plus froide des trois, en ambre sous les lignes du bloc, toujours visible ; la phrase calme se tait à côté ; la pastille de l'en-tête dit « Gel sans alerte posée » (au lieu de « Rien d'annoncé sur trois jours ») et la phrase de résumé la reprend. Une alerte de gel posée mais désactivée : « … et votre alerte de gel est désactivée. », lien « Voir les alertes météo ». Une minimale inconnue ne dit rien (D-003). Le seuil de gel de chaque culture reste dit par « Alertes cultures », comme avant |
+| F284 | Geste | le lien « Poser « Gel : moins de 3 °C » » ouvre « Alertes météo » à l'ancre `#modele-gel` : le formulaire « Nouvelle alerte météo » s'ouvre, rempli du modèle de gel, modifiable, et rien ne s'enregistre sans « Enregistrer l'alerte » (D-028) ; même quand la ferme a déjà d'autres alertes (les modèles de l'écran vide ne paraissent qu'à zéro alerte). Le ton du bloc, les seuils, les alertes et leurs envois ne changent pas |
+
 ## 9. Ce que le lot ne prouve pas
 
 Un vrai téléphone en main à 6 h du matin ; la lecture par un lecteur d'écran ;
 la ferme réelle (aucune séance Chrome sans le « vas-y » de François) ; la
 lecture des trois pages sur la ferme vitrine elle-même (la cause des « Non
-calculable » est établie dans le code, section 8 ter).
+calculable » est établie dans le code, section 8 ter) ; la phrase du gel sans
+alerte posée sur une vraie prévision sous 0 °C (la prévision des parcours
+n'y descend pas : le domaine la prouve, P29 prouve le lien vers le modèle).

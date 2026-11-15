@@ -10,11 +10,13 @@ import type { StoredProposal, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { shortageAction } from '../lib/domain/planning/shortage-reading.ts';
 import { todayTomorrow } from '../lib/domain/today/ahead.ts';
-import { todayView, type TodayBlock, type TodayInputs } from '../lib/domain/today/today-view.ts';
+import { celsiusText } from '../lib/domain/crop-alerts/text.ts';
+import { todayView, weatherBlock, type TodayBlock, type TodayInputs } from '../lib/domain/today/today-view.ts';
 import { waterBlock } from '../lib/domain/today/water.ts';
 import { todayWeek, type TodayWeekBed } from '../lib/domain/today/week.ts';
 import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-resources.ts';
-import type { WeatherAlertForecastDay } from '../lib/domain/weather/weather-alerts.ts';
+import { FROST_TEMPLATE_ANCHOR } from '../lib/domain/weather/weather-alert-templates.ts';
+import type { WeatherAlertCriterion, WeatherAlertForecastDay } from '../lib/domain/weather/weather-alerts.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
 
 /**
@@ -23,8 +25,9 @@ import { farm, settings } from './support/planning-fixtures.ts';
  * annonce les arrosages de demain à valider et l'eau qui manque à la
  * semaine, avec la phrase du planning (F274 à F279). PR 2, R2 : un objectif
  * posé sur une partie des planches se chiffre sur elles, et chaque page dit
- * pourquoi un total manque (F280 à F282). Affichage seul : rien n'est
- * recalculé.
+ * pourquoi un total manque (F280 à F282). PR 3, J14 : un gel annoncé sans
+ * alerte de gel posée se dit, avec le modèle à poser (F283, F284). Affichage
+ * seul : rien n'est recalculé.
  * Aujourd'hui = jeudi 12 novembre 2026, 6 h 00 à la ferme.
  */
 
@@ -296,4 +299,61 @@ test('F282 : le « Non calculable » d’un jardin dit pourquoi ; le besoin de �
   const needs = readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8');
   assert.match(needs, /À planifier : \{gardenMm\(garden\.effectiveNeedMm, gardenUnknownReason\(garden\.beds/);
   assert.match(needs, /bed\.calculatedNeedMm === null && missingLabels\(bed, 'planning'\) \? <p className="need-unknown-reason">Non calculable : \{missingLabels\(bed, 'planning'\)\}\.<\/p>/);
+});
+
+// J14, un gel annoncé sans alerte posée (F283, F284).
+
+const coldThreeDays = (minimum: number | null): WeatherAlertForecastDay[] => [
+  forecast('2026-11-12'),
+  { ...forecast('2026-11-13'), minimumTemperatureCelsius: minimum },
+  forecast('2026-11-14'),
+];
+const frostCriterion = (active: boolean): WeatherAlertCriterion => ({
+  id: 'gel', version: 1, field: 'minimum-temperature', direction: 'below', threshold: 3, horizonDays: 7, active, label: 'Gel',
+});
+
+test('cas 8, F283 : −2,4 °C annoncé sans alerte de gel posée : la phrase, le lien vers le modèle, jamais « Rien d’annoncé »', () => {
+  const view = todayView(inputs({ weather: { forecasts: coldThreeDays(-2.4), frost: [], criteria: [] } }));
+  const weather = block(view.blocks, 'weather');
+  const text = `${celsiusText(-2.4)} annoncé le ven. 13 nov. et aucune alerte de gel posée.`;
+  assert.deepEqual(weather.unposedFrost, { text, link: { label: 'Poser « Gel : moins de 3 °C »', page: 'alertes-meteo', anchor: FROST_TEMPLATE_ANCHOR } });
+  // Seule la phrase change : aucune alerte ne se déclenche, le ton reste, la phrase calme se tait.
+  assert.equal(weather.tone, 'calm');
+  assert.deepEqual(weather.lines, []);
+  assert.ok(view.headline.sentence.includes(text));
+  assert.doesNotMatch(view.headline.sentence, /Pas de gel annoncé/);
+  assert.ok(view.headline.chips.some((chip) => chip.text === 'Gel sans alerte posée' && chip.icon === 'frost'));
+  assert.ok(!view.headline.chips.some((chip) => chip.text === 'Rien d’annoncé sur trois jours'));
+});
+
+test('cas 9 : −2,4 °C avec une alerte de gel posée : l’alerte se déclenche, la phrase habituelle', () => {
+  const weather = weatherBlock({ forecasts: coldThreeDays(-2.4), frost: [], criteria: [frostCriterion(true)] }, ALL, NOW);
+  assert.equal(weather.unposedFrost, null);
+  assert.equal(weather.tone, 'alert');
+  assert.equal(weather.lines.length, 1);
+});
+
+test('F283 : une alerte de gel désactivée se dit ; rien sans « Alertes météo », au-dessus de 0 °C, à minimale inconnue ou quand le gel des cultures parle', () => {
+  const off = weatherBlock({ forecasts: coldThreeDays(-2.4), frost: [], criteria: [frostCriterion(false)] }, ALL, NOW);
+  assert.deepEqual(off.unposedFrost, {
+    text: `${celsiusText(-2.4)} annoncé le ven. 13 nov. et votre alerte de gel est désactivée.`,
+    link: { label: 'Voir les alertes météo', page: 'alertes-meteo', anchor: 'weather-alerts' },
+  });
+  assert.equal(weatherBlock({ forecasts: coldThreeDays(0), frost: [], criteria: [] }, ALL, NOW).unposedFrost?.text, `${celsiusText(0)} annoncé le ven. 13 nov. et aucune alerte de gel posée.`);
+  assert.equal(weatherBlock({ forecasts: coldThreeDays(-2.4), frost: [], criteria: null }, ALL.filter((id) => id !== 'alertes-meteo'), NOW).unposedFrost, null);
+  assert.equal(weatherBlock({ forecasts: coldThreeDays(0.5), frost: [], criteria: [] }, ALL, NOW).unposedFrost, null);
+  assert.equal(weatherBlock({ forecasts: coldThreeDays(null), frost: [], criteria: [] }, ALL, NOW).unposedFrost, null);
+  const crops = [{ date: '2026-11-13', minimumCelsius: -2.4, crops: [{ name: 'Laitue' }] }] as unknown as NonNullable<TodayInputs['weather']['frost']>;
+  assert.equal(weatherBlock({ forecasts: coldThreeDays(-2.4), frost: crops, criteria: [] }, ALL, NOW).unposedFrost, null);
+});
+
+test('F284 : le lien met le modèle de gel en vue sur « Alertes météo », rien ne s’enregistre depuis « Aujourd’hui »', () => {
+  const view = readFileSync('app/irrigation/today/today-weather.tsx', 'utf8');
+  assert.match(view, /className="today-unposed-frost" role="note"/);
+  assert.match(view, /pageHref\(block\.unposedFrost\.link\.page, query, block\.unposedFrost\.link\.anchor\)/);
+  assert.doesNotMatch(view, /Action\(/);
+  const panel = readFileSync('app/irrigation/weather-alerts-panel.tsx', 'utf8');
+  assert.match(panel, /window\.location\.hash !== `#\$\{FROST_TEMPLATE_ANCHOR\}`/);
+  assert.match(panel, /setDraft\(templateDraft\(FROST_TEMPLATE\)\)/);
+  assert.match(panel, /id=\{draft\.criterionId \? undefined : FROST_TEMPLATE_ANCHOR\}/);
 });

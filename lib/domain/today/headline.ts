@@ -38,7 +38,7 @@ export type HeadlineInputs = {
   /** `null` quand ni le planning ni les arrosages ne sont cochés. */
   irrigations: { late: readonly TodayIrrigationLine[]; todo: readonly TodayIrrigationLine[] } | null;
   /** `null` quand aucune alerte n'est cochée. */
-  weather: { tone: 'alert' | 'unknown' | 'calm'; days: readonly TodayWeatherDay[]; calmText: string | null } | null;
+  weather: { tone: 'alert' | 'unknown' | 'calm'; days: readonly TodayWeatherDay[]; calmText: string | null; unposedFrost?: { text: string } | null } | null;
   /** `null` quand la zone « Fiabilité du calcul » n'existe pas. */
   reliabilityCount: number | null;
   /** Les arrosages de demain à valider ; `null` sans « Planning » ou sans proposition demain. */
@@ -101,6 +101,13 @@ function weatherParts(weather: NonNullable<HeadlineInputs['weather']>, today: st
     return {
       sentences: [`${alerted.notes[0]} ${when(alerted, today)}.`],
       chips: [{ key: 'weather', tone: 'alert', icon: 'bell', text: `Alerte météo ${when(alerted, today)}`, target: 'weather' }],
+    };
+  }
+  // Un gel annoncé sans alerte posée ne se lit jamais « Rien d'annoncé » (lot A, J14, F283).
+  if (weather.unposedFrost) {
+    return {
+      sentences: [weather.unposedFrost.text],
+      chips: [{ key: 'weather', tone: 'unknown', icon: 'frost', text: 'Gel sans alerte posée', target: 'weather' }],
     };
   }
   if (weather.tone === 'unknown') {

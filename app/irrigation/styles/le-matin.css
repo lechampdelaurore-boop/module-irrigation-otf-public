@@ -100,3 +100,32 @@
 
 /* « Non calculable » d'une planche dit pourquoi (lot A, R2, F282). */
 .need-unknown-reason { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }
+
+/* J14 : un gel annoncé sans alerte de gel posée, la phrase et le modèle à poser (F283, F284). */
+.today-unposed-frost {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 10px 0 0;
+  padding: .6rem .8rem;
+  border-radius: 8px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: .9rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.today-unposed-frost > span {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.today-unposed-frost > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target, 44px);
+  color: var(--green-dark);
+  font-weight: 700;
+}

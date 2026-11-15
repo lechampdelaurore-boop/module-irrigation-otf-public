@@ -13,6 +13,7 @@ import {
   type WeatherAlertCriterion,
   type WeatherAlertForecastDay,
 } from '../weather/weather-alerts.ts';
+import { FROST_TEMPLATE, FROST_TEMPLATE_ANCHOR } from '../weather/weather-alert-templates.ts';
 import type { SoilGaugeZone } from '../soil-reserve/gauge-view.ts';
 import { todayShortage, todayTomorrow, type TodayShortage, type TodayTomorrow } from './ahead.ts';
 import { allDone, type AllDone } from './all-done.ts';
@@ -71,6 +72,20 @@ export type TodayWeatherBlock = {
   /** Les trois jours dessinés : températures sur l'échelle commune, pluie prévue, ce qui est annoncé. */
   days: TodayWeatherDay[];
   scale: TodayWeatherScale;
+  /**
+   * Un gel annoncé que ni les cultures ni une alerte de gel active ne disent
+   * (J14, F283) ; `null` sinon. À part des lignes : il se lit toujours à
+   * l'écran, même quand une autre alerte rend les lignes au seul lecteur
+   * d'écran, et le ton du bloc ne change pas (aucune alerte ne se déclenche).
+   */
+  unposedFrost: TodayUnposedFrost | null;
+};
+
+type TodayUnposedFrost = {
+  /** « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. » */
+  text: string;
+  /** Le modèle de gel mis en vue sur « Alertes météo », rien d'enregistré (F284) ; ou l'alerte désactivée. */
+  link: { label: string; page: 'alertes-meteo'; anchor: string };
 };
 
 export const FORECAST_UNAVAILABLE = 'Prévision indisponible : à vérifier.';
@@ -123,13 +138,15 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
   }
 
   const criteriaAnnounced = lines.length > (frostAnnounced ? 1 : 0);
+  const unposedFrost = criteriaOn && !frostAnnounced ? unposedFrostText(input, days) : null;
 
   // Un jour sans prévision n'est jamais lu comme un jour calme (D-003, cas 6).
   const missing = days.filter((date) => !hasForecast(input.forecasts, date));
   const tone = lines.length > 0 ? 'alert' : missing.length > 0 ? 'unknown' : 'calm';
   if (missing.length === days.length) lines.push(FORECAST_UNAVAILABLE);
   else if (missing.length > 0) lines.push(`Prévision indisponible ${daysText(missing)} : à vérifier.`);
-  if (tone === 'calm') lines.push(calmWeatherText(frostOn, criteriaOn, days[days.length - 1]));
+  // La phrase calme ne se dit pas à côté d'un gel annoncé sans alerte posée (J14) : elle serait vraie et trompeuse.
+  if (tone === 'calm' && !unposedFrost) lines.push(calmWeatherText(frostOn, criteriaOn, days[days.length - 1]));
   const forecasts = input.forecasts.filter((day) => days.includes(day.date));
   const scale = weatherScale(forecasts);
   return {
@@ -139,7 +156,30 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
     link: { label: 'Voir les alertes', page: weatherLinkPage(enabled, frostAnnounced, criteriaAnnounced) },
     days: weatherDays({ dates: days, today, forecasts, announcements, scale }),
     scale,
+    unposedFrost,
   };
+}
+
+/**
+ * J14 (audit ergonomique final, lot A, F283, F284) : une minimale prévue à
+ * 0 °C ou moins, comme le flocon de la carte du jour, sans alerte de gel
+ * active (une alerte sur la minimale, vers le bas) ni gel des cultures
+ * annoncé. La phrase le dit et mène au modèle de gel, à poser sur « Alertes
+ * météo » ; rien ne s'enregistre depuis « Aujourd'hui » (D-028). Une minimale
+ * inconnue ne dit rien (D-003). Seule la phrase change : les seuils, les
+ * alertes et leurs envois non.
+ */
+function unposedFrostText(input: TodayWeatherInputs, days: readonly string[]): TodayUnposedFrost | null {
+  const frostCriteria = (input.criteria ?? []).filter((criterion) => criterion.field === 'minimum-temperature' && criterion.direction === 'below');
+  if (frostCriteria.some((criterion) => criterion.active)) return null;
+  const coldest = input.forecasts
+    .filter((day) => days.includes(day.date) && day.minimumTemperatureCelsius !== null && day.minimumTemperatureCelsius <= 0)
+    .sort((a, b) => (a.minimumTemperatureCelsius ?? 0) - (b.minimumTemperatureCelsius ?? 0) || a.date.localeCompare(b.date))[0];
+  if (!coldest || coldest.minimumTemperatureCelsius === null) return null;
+  const announced = `${celsiusText(coldest.minimumTemperatureCelsius)} annoncé le ${shortDayText(coldest.date)}`;
+  return frostCriteria.length > 0
+    ? { text: `${announced} et votre alerte de gel est désactivée.`, link: { label: 'Voir les alertes météo', page: 'alertes-meteo', anchor: 'weather-alerts' } }
+    : { text: `${announced} et aucune alerte de gel posée.`, link: { label: `Poser « ${FROST_TEMPLATE.title} »`, page: 'alertes-meteo', anchor: FROST_TEMPLATE_ANCHOR } };
 }
 
 /**
@@ -274,7 +314,7 @@ export function todayView(input: TodayInputs): TodayView {
     headline: todayHeadline({
       today,
       irrigations: irrigationsOn ? { late, todo } : null,
-      weather: weather ? { tone: weather.tone, days: weather.days, calmText: weather.tone === 'calm' ? weather.lines[weather.lines.length - 1] ?? null : null } : null,
+      weather: weather ? { tone: weather.tone, days: weather.days, calmText: weather.tone === 'calm' && !weather.unposedFrost ? weather.lines[weather.lines.length - 1] ?? null : null, unposedFrost: weather.unposedFrost } : null,
       reliabilityCount: reliabilityOn ? reliability.length : null,
       tomorrow,
       shortage,

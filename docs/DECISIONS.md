@@ -4849,3 +4849,34 @@ Aucune migration ; aucun calcul d'objectif, de besoin, de pénurie ni de plan
 ne change : un total inconnu reste inconnu, seule sa raison se lit.
 
 Ne changent pas : D-003, D-010, D-022, D-045.
+
+## D-140 — Audit ergonomique final, lot A : un gel annoncé sans alerte posée se dit (J14)
+
+Date : 15 novembre 2026, après-midi. Décideur : le porteur pour le
+contenu (D-137, toutes les recommandations du contrat retenues) ; les
+précisions tranchées en codant suivent l'option recommandée, aucune
+question agronomique, modifiables par lui. Après D-139.
+
+**Établi dans le code** (contrat `docs/audit-ergonomie-final-lot-a-contract.md`,
+section 5). La phrase calme du bloc « Gel ou chaleur » ne regarde que les
+alertes posées ; la carte du jour, elle, met le flocon dès que la minimale
+prévue est à 0 °C ou moins. Une ferme sans alerte de gel voyait le flocon,
+la phrase « Aucune de vos alertes météo ne se déclenche » et la pastille
+verte « Rien d'annoncé sur trois jours ».
+
+**Décision** (F283, F284, section 8 quater) : « Alertes météo » coché, une
+minimale prévue des trois jours à 0 °C ou moins, aucune alerte active sur
+la minimale vers le bas et rien d'annoncé par le gel des cultures : le bloc
+dit « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. »,
+avec le lien « Poser « Gel : moins de 3 °C » » vers « Alertes météo », qui
+ouvre le formulaire rempli du modèle de gel, modifiable ; rien ne
+s'enregistre depuis « Aujourd'hui » (D-028). La pastille dit « Gel sans
+alerte posée ». Une alerte de gel désactivée se dit comme telle. Une
+minimale inconnue ne dit rien (D-003).
+
+Aucune migration ; le ton du bloc, les seuils, les alertes, leurs envois et
+le gel des cultures ne changent pas. L'écriture directe de l'alerte depuis
+« Aujourd'hui » reste à une PR ultérieure, si le porteur la demande.
+
+Ne changent pas : D-003, D-028 ; le seuil de 3 °C du modèle (choix du
+porteur du 8 novembre 2026).
