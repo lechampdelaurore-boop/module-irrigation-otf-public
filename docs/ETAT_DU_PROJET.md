@@ -12,6 +12,12 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
+  `docs/tranche-4-contract.md`), rien de codé : préparation, puis 4.8 (site et
+  confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
+  4.5, 4.6. Adresse gratuite `workers.dev` ; aucune ferme tierce avant la
+  relecture de la confidentialité. La fusion des moteurs passe d'abord.
+
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
   elle (tag `v0.2.0`). **Code commencé le 8 novembre 2026 au soir**, en Opus 5.5 · Max, sur le dépôt

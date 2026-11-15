@@ -737,6 +737,9 @@ selon la règle de la section 10.
     D1 à D4, **après la 3.9**, un seul chantier de code à la fois : les
     garde-fous du mode démo, les trois fermes fictives et leurs saisons,
     la visite guidée, puis la remise à zéro et le déploiement séparé.
+    **Contrat de la Tranche 4 validé le 15 novembre 2026** (D-142,
+    `docs/tranche-4-contract.md`) : préparation, 4.8, formulaire d'OTF,
+    4.1 et 4.2, 4.3, 4.4, 4.5, 4.6 ; rien de codé.
     **D4 touche Cloudflare : elle attend un accord exprès du porteur**,
     distinct du « vas-y » de D1 à D3, après vérification du coût d'Access.
     Elle ne dépend ni de l'identité (4.1 à 4.3) ni de la connexion d'une
@@ -3854,6 +3857,7 @@ pages.
 | 4.4 | Configuration et accueil d'une nouvelle ferme | ⬜ | Opus 5.5 · Élevé — parcours délimité, vérifiable par un essai réel |
 | 4.5 | Exploitation : observabilité, sauvegardes D1, conservation, support | 🟡 à confirmer | Opus 5.5 · Très élevé — une sauvegarde qui ne restaure pas est un défaut silencieux |
 | 4.6 | Pilote multi-fermes et mise en production | ⬜ | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — vraies fermes, vraies données, isolation à prouver en conditions réelles |
+| 4.8 | Site définitif et politique de confidentialité (adresse gratuite, page publique, confidentialité, route de retour OAuth ; débloque le formulaire d'OTF) | ⬜ contrat validé le 15 novembre 2026 (D-142, `docs/tranche-4-contract.md`) | contrat : Sonnet 5.5 · Moyen ; code : Opus 5.5 · Élevé (proposé) |
 | 4.7 | Identité OTF ou multi-structure (la partie hébergement est réalisée par Q0) | ⬜ | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — identité, même exigence que 4.2 et 4.3 |
 
 ### 4.0 — Démo guidée avec saisons (🔶 contrat validé le 8 novembre 2026, code après la 3.9)

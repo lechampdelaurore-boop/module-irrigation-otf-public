@@ -5,6 +5,11 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, contrat)
+
+- **Contrat de la Tranche 4 validé** (D-142) : `docs/tranche-4-contract.md`,
+  ordre des sous-tranches, sous-tranche 4.8 ajoutée ; aucun code.
+
 ### Corrigé (audit ergonomique final, lot A, le matin)
 
 - **J13, un en-tête moins répétitif** (D-141, F285 à F287) : « Aujourd'hui »
