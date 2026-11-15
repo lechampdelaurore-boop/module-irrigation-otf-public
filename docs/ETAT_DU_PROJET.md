@@ -504,7 +504,14 @@ registres, elle y renvoie.
   change pas) ; la petite exploitation ne propose plus que le début d'été
   et l'automne, la ferme « matériel et alertes » la nuit de gel et le début
   d'été ; aucun parcours ne choisissait un couple retiré (F292 à F294 ;
-  V8, V9 adaptés). Ensuite le jeu de données.
+  V8, V9 adaptés), **en ligne** (#77, fusionnée à 20 h 12, déployée à
+  20 h 32, run 43751181907, cinq jobs verts). **PR 3 sur 3, le jeu de données** (D-145) : la ferme
+  « matériel et alertes » a posé d'avance le modèle « Gel : moins de
+  3 °C », que sa nuit de gel déclenche ; aucun objectif « ferme entière »
+  n'est inventé, sur le choix du porteur le 15 novembre 2026 à 19 h 42
+  (« Non, rien d'inventé ») : toute planche cultivée a déjà le sien, à
+  chaque moment (F295, F296 ; V10 ajouté). **Le lot est codé en entier** ;
+  reste sa recette.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

@@ -194,6 +194,26 @@ ferme entière exige une valeur saisie (non une proposition), c'est un chiffre
 agronomique, **réservé au porteur** ; la règle 1 s'applique alors (aucun
 objectif inventé), et la PR 3 le lui dit avant tout code.
 
+## 5 bis. Ce que le code a établi pour le jeu de données (PR 3, D-145)
+
+- **L'objectif « ferme entière »** : le module ne propose d'objectif que
+  planche par planche ; en poser un pour toute la ferme demanderait un
+  chiffre saisi, une valeur agronomique, qui s'appliquerait aussi aux
+  planches vides. **Question posée au porteur le 15 novembre 2026 ; réponse
+  à 19 h 42 : « Non, rien d'inventé »** (F296). Recensé au code : à chacun
+  des quatre moments du maraîchage, toute planche cultivée reçoit sa
+  proposition et l'adopte ; seules restent sans objectif les planches où
+  rien ne pousse cette semaine-là (un test le tient). « Aujourd'hui » dit
+  déjà l'objectif posé sur une partie des planches (lot A, R2).
+- **Le gel posé d'avance** (F295) : la table `DEMO_WEATHER_ALERT_TEMPLATES`
+  de `lib/adapters/demo/module-data.ts` donne, par profil, des clés de
+  modèle ; la préparation de l'espace enregistre le modèle de la page
+  « Alertes météo » tel quel, par le même dépôt que « Enregistrer
+  l'alerte ». Seule la ferme « matériel et alertes » en a un (elle coche
+  les alertes météo sans le gel des cultures) ; la remise à zéro le rend.
+  Sa nuit de gel le déclenche : « Aujourd'hui » dit « Gel : température
+  minimale prévue … » au lieu de « aucune alerte de gel posée » (V10).
+
 ## 6. Cas chiffrés
 
 | Cas | Entrée | Attendu |
