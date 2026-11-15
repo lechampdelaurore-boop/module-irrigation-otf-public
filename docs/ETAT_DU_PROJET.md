@@ -406,7 +406,13 @@ registres, elle y renvoie.
   « Alertes système non disponibles » vient sous le formulaire, texte
   inchangé, et se replie une fois vu à toutes les largeurs, avec le point
   sur la cloche au téléphone ; Réglages le garde en entier (F266 et F267 ;
-  P28 étendu ; aucune migration). Ensuite J15, la vue satellite.
+  P28 étendu ; aucune migration). **PR 5 en ligne** (#68, fusionnée à
+  10 h 37, déployée à 10 h 54). **PR 6 sur 7, J15** (D-135) : le bouton du
+  fond suit le fond affiché ; « Photo » et « Contours », « les contours
+  seuls » ; le nom de la parcelle n'est plus posé sur la carte ; au
+  téléphone, « Vue satellite » amène les onglets en haut quand il resterait
+  moins de 200 px de la carte à l'écran (F268 à F271 ; P34 étendu ; aucune
+  migration). Ensuite A2, les dernières cibles de moins de 44 px.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -502,6 +508,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #68 (`5b6de6a`, lot E de l'audit final, J12, les alertes limitées sous
+  le formulaire, D-134, fusionnée à 10 h 37 et déployée à 10 h 54, run
+  43700109230, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #67 (`91c2e9f`, lot E de l'audit final, J11, la page non cochée nommée,
   et où la cocher, D-133, fusionnée à 9 h 57 et déployée à 10 h 18, run
   43696894369, les cinq jobs réussis, aucune migration). Avant elle : la

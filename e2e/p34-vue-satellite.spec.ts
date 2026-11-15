@@ -62,8 +62,9 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   const liste = panneau.getByRole('list', { name: 'Jardins de la parcelle' });
   const ligneNord = liste.getByRole('button', { name: /^Jardin Nord/ });
   const ligneTunnel = liste.getByRole('button', { name: /^Tunnel 1/ });
-  const satellite = panneau.getByRole('button', { name: 'Satellite', exact: true });
-  const dessin = panneau.getByRole('button', { name: 'Dessin', exact: true });
+  // La bascule dit « Photo » et « Contours » (audit final, lot E, J15, F269).
+  const satellite = panneau.getByRole('button', { name: 'Photo', exact: true });
+  const dessin = panneau.getByRole('button', { name: 'Contours', exact: true });
 
   // Le plan d'abord ; la vue satellite ne se charge qu'à son ouverture, et rien n'est demandé à l'IGN avant.
   await expect(ongletPlan).toHaveAttribute('aria-selected', 'true');
@@ -71,13 +72,19 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   await ouvrirParClic(ongletSatellite, satellite);
   await expect(ongletSatellite).toHaveAttribute('aria-selected', 'true');
   await expect(satellite).toHaveAttribute('aria-pressed', 'true');
+  await expect(dessin).toHaveAttribute('aria-pressed', 'false');
+  if (telephone) {
+    // Au téléphone, la carte se voit sans chercher : au moins 200 px d'elle à l'écran (F271).
+    await expect.poll(() => carte.evaluate((element) => window.innerHeight - element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(200);
+  }
   await expect(carte).toHaveAttribute('data-ready', 'true');
   await expect(carte).toHaveAttribute('data-basemap', 'ign-orthophotos');
   await expect(carte.getByRole('link', { name: '© IGN – Géoplateforme' })).toHaveAttribute(
     'href',
     'https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-ORTHO',
   );
-  await expect(carte.locator('.satellite-label', { hasText: 'Les Prés' })).toBeVisible();
+  // Le nom de la parcelle est le titre du bloc : il n'est plus posé sur la carte (F270).
+  await expect(carte.locator('.satellite-label', { hasText: 'Les Prés' })).toHaveCount(0);
   await expect(carte.locator('.satellite-label', { hasText: 'Jardin Nord' })).toBeVisible();
   await expect(carte.locator('.satellite-label', { hasText: 'Tunnel 1' })).toBeVisible();
   await expect(carte.locator('.maplibregl-ctrl-scale')).toHaveText(/^\d+\s?m$/);
@@ -93,8 +100,8 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   if (telephone) {
     for (const [cible, intitule] of [
       [ongletSatellite, 'L’onglet « Vue satellite »'],
-      [satellite, 'Le bouton « Satellite »'],
-      [dessin, 'Le bouton « Dessin »'],
+      [satellite, 'Le bouton « Photo »'],
+      [dessin, 'Le bouton « Contours »'],
       [ligneNord, 'La ligne de Jardin Nord'],
       [carte.getByRole('button', { name: 'Rapprocher' }), 'Le bouton « Rapprocher »'],
     ] as const) {
@@ -125,7 +132,7 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   await expect(ligneTunnel).toHaveAttribute('aria-pressed', 'false');
   await verifierLEtape(page, journal, 'mise en évidence d’un jardin');
 
-  // Le « Dessin » : aucune photo ni crédit, et le choix tient au rechargement.
+  // Les « Contours » : aucune photo ni crédit, et le choix tient au rechargement.
   await dessin.click();
   await expect(dessin).toHaveAttribute('aria-pressed', 'true');
   await expect(carte).toHaveAttribute('data-basemap', 'drawing');
@@ -143,7 +150,7 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   // En partie dessinée : la parcelle sur la carte, son jardin « contour non dessiné » dans la liste.
   await choisirLaParcelle(page, 'Sous le verger');
   await expect(carte).toHaveAttribute('data-ready', 'true');
-  await expect(carte.locator('.satellite-label', { hasText: 'Sous le verger' })).toBeVisible();
+  await expect(carte.locator('.satellite-label')).toHaveCount(0);
   await expect(liste.getByRole('listitem')).toHaveText([/Jardin du verger\s*plein champ\s*336 m²\s*contour non dessiné/]);
   await expect(liste.getByRole('button')).toHaveCount(0);
   await verifierLEtape(page, journal, 'parcelle dessinée en partie');
@@ -156,13 +163,14 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   await expect(liste.getByRole('listitem')).toHaveText([/Jardin Sud\s*plein champ\s*792 m²\s*contour non dessiné/]);
   await verifierLEtape(page, journal, 'parcelle sans dessin');
 
-  // Fond indisponible : la Géoplateforme n'a pas d'image ici ; la carte passe au « Dessin », les contours restent.
+  // Fond indisponible : la Géoplateforme n'a pas d'image ici ; la carte passe aux contours seuls, et c'est « Contours » qui est enfoncé (F268).
   await repondreAuxTuiles(page, 'aucune-donnee');
   await choisirLaParcelle(page, 'Les Prés');
-  await expect(panneau.getByRole('status')).toHaveText('Fond satellite indisponible : la carte montre le dessin des contours.');
+  await expect(panneau.getByRole('status')).toHaveText('Fond satellite indisponible : la carte montre les contours seuls.');
   await expect(carte).toHaveAttribute('data-basemap', 'drawing');
   await expect(carte.locator('.satellite-label', { hasText: 'Jardin Nord' })).toBeVisible();
-  await expect(satellite).toHaveAttribute('aria-pressed', 'true');
+  await expect(dessin).toHaveAttribute('aria-pressed', 'true');
+  await expect(satellite).toHaveAttribute('aria-pressed', 'false');
   await verifierLEtape(page, journal, 'fond indisponible');
 
   // Le retour au plan : un seul onglet ouvert à la fois.
@@ -189,7 +197,7 @@ test('sans WebGL, la vue satellite dessine les contours en SVG, avec la même li
   const dessin = panneau.getByRole('img', { name: /^Dessin de Les Prés/ });
   await ouvrirParClic(bloc.getByRole('tab', { name: 'Vue satellite' }), dessin);
   await expect(panneau.getByRole('status')).toHaveText(/Ce navigateur ne peut pas afficher la carte/);
-  await expect(panneau.getByRole('button', { name: 'Satellite', exact: true })).toHaveCount(0);
+  await expect(panneau.getByRole('button', { name: 'Photo', exact: true })).toHaveCount(0);
   await expect(dessin.locator('path.satellite-svg-garden')).toHaveCount(2);
   await expect(dessin.locator('path.satellite-svg-zone')).toHaveCount(1);
   await expect(panneau.locator('.satellite-svg .satellite-label', { hasText: 'Tunnel 1' })).toBeVisible();

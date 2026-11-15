@@ -16,17 +16,18 @@ type Props = {
 };
 
 function noticeFor(input: { svg: boolean; failed: boolean; notConfigured: boolean }): string | null {
-  if (input.svg) return 'Ce navigateur ne peut pas afficher la carte : voici le dessin des contours, sans photos.';
-  if (input.failed) return 'Fond satellite indisponible : la carte montre le dessin des contours.';
-  if (input.notConfigured) return 'Fond satellite non configuré pour cette ferme : la carte montre le dessin des contours.';
+  if (input.svg) return 'Ce navigateur ne peut pas afficher la carte : voici les contours seuls, sans photos.';
+  if (input.failed) return 'Fond satellite indisponible : la carte montre les contours seuls.';
+  if (input.notConfigured) return 'Fond satellite non configuré pour cette ferme : la carte montre les contours seuls.';
   return null;
 }
 
 /**
  * L'onglet « Vue satellite » d'une parcelle (S3, docs/satellite-view-contract.md,
  * F204 à F213) : la carte de la parcelle et de ses jardins, leur liste à côté,
- * la bascule « Satellite / Dessin ». Un affichage seulement : rien n'est
- * calculé ni écrit, hors le choix de fond de l'appareil.
+ * la bascule « Photo / Contours » (audit final, lot E, J15, F269), qui suit
+ * le fond affiché (F268). Un affichage seulement : rien n'est calculé ni
+ * écrit, hors le choix de fond de l'appareil.
  */
 export function SatelliteViewTab({ zone, plots, season }: Props) {
   // L'instantané ne change pas d'un rendu à l'autre : la carte ne se refait que si la parcelle ou la saison change.
@@ -46,6 +47,8 @@ export function SatelliteViewTab({ zone, plots, season }: Props) {
   const basemap = failed ? DRAWING_BASEMAP : choice.basemap;
   const hasMap = view.drawing !== 'none' && view.framing !== null;
   const renderer = webGl === null ? 'pending' : webGl && !mapUnavailable ? 'map' : 'svg';
+  // Le bouton enfoncé est celui du fond affiché : « Contours » quand la photo manque ou n'est pas configurée (F268).
+  const showsPhoto = basemap.kind === 'raster';
   const notice = hasMap
     ? noticeFor({ svg: renderer === 'svg', failed, notConfigured: choice.notice === 'satellite-not-configured' })
     : null;
@@ -65,11 +68,11 @@ export function SatelliteViewTab({ zone, plots, season }: Props) {
         <>
           {renderer === 'map' ? (
             <div className="satellite-basemap-toggle" role="group" aria-label="Fond de la carte">
-              <button type="button" aria-pressed={preference === 'satellite'} onClick={() => choosePreference('satellite')}>
-                Satellite
+              <button type="button" aria-pressed={showsPhoto} onClick={() => choosePreference('satellite')}>
+                Photo
               </button>
-              <button type="button" aria-pressed={preference === 'drawing'} onClick={() => choosePreference('drawing')}>
-                Dessin
+              <button type="button" aria-pressed={!showsPhoto} onClick={() => choosePreference('drawing')}>
+                Contours
               </button>
             </div>
           ) : null}

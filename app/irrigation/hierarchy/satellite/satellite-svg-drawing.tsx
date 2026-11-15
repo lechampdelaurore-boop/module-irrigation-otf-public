@@ -60,11 +60,7 @@ export function SatelliteSvgDrawing({ zone, plots, view, highlightedPlotId, onSe
           <path className="satellite-svg-zone" d={svgOutlinePath(zone.outline, projection)} fillRule="evenodd" />
         ) : null}
       </svg>
-      {view.zoneLabelAt ? (
-        <span className="satellite-label satellite-label-zone" style={labelStyle(view.zoneLabelAt, projection)} aria-hidden="true">
-          {view.zoneName}
-        </span>
-      ) : null}
+      {/* Le nom de la parcelle est le titre du bloc : seuls les jardins portent le leur (F270). */}
       {view.gardens.map((garden) =>
         garden.labelAt ? (
           <span

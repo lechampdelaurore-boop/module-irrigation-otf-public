@@ -3,7 +3,10 @@
   docs/satellite-view-contract.md, F204 à F213). Les couleurs de la carte
   viennent de la charte : la carte les lit ici, dans ses variables (F220).
 */
+
+/* Amenés en haut de l'écran au téléphone quand on choisit « Vue satellite » (F271). */
 .plan-view-tabs {
+  scroll-margin-top: 8px;
   display: inline-grid;
   grid-template-columns: repeat(2, auto);
   margin-bottom: 16px;
@@ -158,12 +161,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
-}
-
-.satellite-label-zone {
-  font-size: 15px;
-  font-weight: 600;
-  cursor: default;
 }
 
 .satellite-label[data-highlighted='true'] {
