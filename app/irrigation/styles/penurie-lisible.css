@@ -53,3 +53,27 @@
 .feasibility-calculation > .feasibility-sources {
   margin: 1rem;
 }
+
+/* R4 : « Répartir l'eau », le geste qui suit la phrase, une cible de 44 px (F247). */
+.planning-shortage-action > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target, 44px);
+  padding: 0 1rem;
+  border-radius: var(--radius-button, .6rem);
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.planning-shortage-action > a:focus-visible {
+  outline: 3px solid var(--green-dark);
+  outline-offset: 2px;
+}
+
+/* R4 : l'écran de répartition, où « Répartir l'eau » mène, ne se cache pas sous le haut de l'écran. */
+#repartition {
+  scroll-margin-top: 16px;
+}

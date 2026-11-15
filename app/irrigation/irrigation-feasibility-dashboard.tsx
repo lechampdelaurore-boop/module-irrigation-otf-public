@@ -67,7 +67,8 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
     return () => { observer.disconnect(); clearTimeout(timer); events.forEach((name) => window.removeEventListener(name, changed)); document.removeEventListener('visibilitychange', focused); channel?.close(); sequence.current += 1; };
   }, [refresh]);
   const head = dashboard ? feasibilityHeadTiles(dashboard) : null;
-  return <section ref={root} className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
+  // L'ancre de « Répartir l'eau », depuis le planning (audit final, lot B, R4, F247).
+  return <section ref={root} id="repartition" className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
     <header className="feasibility-heading"><div><h2 id="feasibility-title">Faisabilité et répartition de l’eau</h2><p>De maintenant à dimanche soir · Analyse préliminaire <FeasibilityHelp label="Faisabilité préliminaire" text={help.preliminary} /></p></div><button type="button" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
     {error ? <p className="water-error" role="alert">{error}</p> : null}
     {notice ? <p className="feasibility-notice" role="status">{notice}</p> : null}

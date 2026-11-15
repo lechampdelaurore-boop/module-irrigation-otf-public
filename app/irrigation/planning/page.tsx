@@ -4,6 +4,8 @@ import { IrrigationShell } from '../shell/irrigation-shell';
 import { UnavailableState } from '../shell/unavailable-state';
 import { PlanningPage } from '../pages/planning-page';
 import { pageMetadata } from '../page-metadata';
+import { pageHref } from '@/lib/domain/features/pages';
+import { isPartActive } from '@/lib/domain/features/socle';
 import '../irrigation.css';
 
 export const dynamic = 'force-dynamic';
@@ -15,9 +17,11 @@ export default async function PlanningRoutePage({ searchParams }: { searchParams
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { weeklyPlan, planningSettings, protectedSlots, soilNotes } = await loadPlanningPage(context);
   context.logLoaded();
+  // « Répartir l'eau » mène à la faisabilité de « Ressources », quand la ferme a coché sa partie (audit final, lot B, R4, F247).
+  const repartitionHref = isPartActive(context.enabled, 'feasibility') ? pageHref('ressources', { season: context.season }, 'repartition') : null;
   return (
     <IrrigationShell {...context.shell}>
-      <PlanningPage season={context.season} initialNowIso={context.nowIso} weeklyPlan={weeklyPlan} planningSettings={planningSettings} protectedSlots={protectedSlots} soilNotes={soilNotes} />
+      <PlanningPage season={context.season} initialNowIso={context.nowIso} weeklyPlan={weeklyPlan} planningSettings={planningSettings} protectedSlots={protectedSlots} soilNotes={soilNotes} repartitionHref={repartitionHref} />
     </IrrigationShell>
   );
 }

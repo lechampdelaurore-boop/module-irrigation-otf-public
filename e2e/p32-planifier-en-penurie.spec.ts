@@ -100,7 +100,8 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   // lot B, R3, F243) ; les notes du calcul, quand il y en a, attendent dans
   // un repli fermé (F244).
   await expect(planning.locator('.planning-shortage-action')).toBeVisible();
-  await expect(planning.locator('.planning-shortage-action')).toHaveText(/^Il manque .+ d’eau d’ici dimanche.* : \d+ planches? ne recevr(a|ont) pas tout (son|leur) besoin\.$/);
+  // La phrase seule, sans le lien « Répartir l'eau » qui la suit (R4, F247).
+  await expect(planning.locator('.planning-shortage-action > span')).toHaveText(/^Il manque .+ d’eau d’ici dimanche.* : \d+ planches? ne recevr(a|ont) pas tout (son|leur) besoin\.$/);
   for (const repli of await planning.locator('details.planning-calculation').all()) {
     await expect(repli).toHaveJSProperty('open', false);
     await expect(repli.locator('summary')).toHaveText('Le détail du calcul');
@@ -180,6 +181,24 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   if (replacee && !estDimanche(reference)) await expect(doseDe(proposeesDe(planning, n03.materiel).first())).toHaveText(PART_MM);
   if (!replacee) await expect((await lignesNonPlacees(planning)).filter({ hasText: 'N03' })).toContainText('créneau refusé');
   await verifierLEtape(page, journal, replacee ? 'part replacée après le refus' : 'part non placée pour créneau refusé');
+
+  // « Répartir l'eau » mène à l'écran de répartition, que « Ressources » met
+  // en tête de page tant que la répartition attend (audit final, lot B, R4,
+  // F247 et F248).
+  // Une répartition validée laissée par un autre parcours la ferait « Revoir » :
+  // la page garde alors l'ordre d'avant, la répartition n'attendant plus.
+  const repartir = planning.locator('.planning-shortage-action').getByRole('link', { name: /^(Répartir l’eau|Revoir la répartition)$/ });
+  await verifierCibleTactile(repartir, 'le lien « Répartir l’eau »');
+  const enAttente = (await repartir.innerText()) === 'Répartir l’eau';
+  await repartir.click();
+  await expect(page).toHaveURL(/\/irrigation\/ressources\?season=\d+#repartition$/);
+  const repartition = page.locator('section#repartition');
+  await expect(repartition).toBeVisible();
+  if (enAttente) {
+    const [haut, ressources] = await Promise.all([repartition.boundingBox(), page.locator('section.water-resources-section').boundingBox()]);
+    expect(haut!.y, 'la faisabilité avant les ressources en eau').toBeLessThan(ressources!.y);
+  }
+  await verifierLEtape(page, journal, 'répartir l’eau, la faisabilité en tête');
 
   // Remise en état : les parcours partagent une base. L'irrigation validée
   // annulée, les lignes et la pompe archivées, la réserve rendue inactive,

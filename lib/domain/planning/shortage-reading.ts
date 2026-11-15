@@ -14,6 +14,15 @@ const ONE_LITER_CUBIC_METERS = cubicMetersFromLiters(1);
 /** Sous un centième de millimètre, le manque d'une planche est un arrondi (`isBedUnplaced`). */
 const NEGLIGIBLE_DEFICIT_MM = 0.01;
 
+/**
+ * L'eau manque au plan : chiffrée au litre au moins, ou sûre sans volume pour
+ * une planche au volume inconnu (D-098). Une eau seulement inconnue n'est pas
+ * un manque (D-089).
+ */
+function lacksWater(deficit: StoredWeeklyPlan['calculation']['summary']['deficit']): boolean {
+  return deficit.waterCubicMeters >= ONE_LITER_CUBIC_METERS || (deficit.unknownVolumeBeds?.water ?? 0) > 0;
+}
+
 /** Une planche qui garde un manque : elle ne recevra pas tout son besoin. */
 export function keepsDeficit(bed: Pick<PlanBedOutcome, 'deficitMm'>): boolean {
   return bed.deficitMm >= NEGLIGIBLE_DEFICIT_MM;
@@ -37,8 +46,7 @@ const bedsText = (count: number) => (count > 1 ? `${count} planches ne recevront
  */
 export function shortageAction(plan: Pick<StoredWeeklyPlan, 'calculation'>, formatVolume: (cubicMeters: number) => string): ShortageAction | null {
   const { deficit, budgets, beds, arbitration } = plan.calculation.summary;
-  // Une eau inconnue n'est pas un manque : seule une planche en manque au volume inconnu en est un, sûr même sans volume (D-098).
-  if (deficit.waterCubicMeters < ONE_LITER_CUBIC_METERS && (deficit.unknownVolumeBeds?.water ?? 0) === 0) return null;
+  if (!lacksWater(deficit)) return null;
   const uncounted = uncountedWaterCount(deficit, unknownWaterChainCount(budgets));
   const value = waterDeficitValue(deficit.waterCubicMeters, uncounted, formatVolume);
   // « non chiffré » ne se lit pas « il manque non chiffré » : la phrase dit qu'un manque existe sans le chiffrer.
@@ -51,4 +59,15 @@ export function shortageAction(plan: Pick<StoredWeeklyPlan, 'calculation'>, form
   }
   const lead = `${missing.charAt(0).toLocaleUpperCase('fr-FR')}${missing.slice(1)}`;
   return { arbitrated: false, sentence: `${lead}${consequence ? ` : ${consequence}` : ''}.` };
+}
+
+/**
+ * Une décision de répartition attend (R4, F248) : le dernier plan de la
+ * semaine manque d'eau et aucune répartition validée ne s'y applique. Sur
+ * « Ressources », la faisabilité passe alors en tête de page. Le plan
+ * enregistré en décide, lu sans calcul ; la faisabilité, elle, ne se
+ * calcule qu'à l'approche de sa section.
+ */
+export function shortageDecisionPending(plan: Pick<StoredWeeklyPlan, 'calculation'> | null): boolean {
+  return plan !== null && !plan.calculation.summary.arbitration && lacksWater(plan.calculation.summary.deficit);
 }

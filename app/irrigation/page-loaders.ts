@@ -13,6 +13,7 @@ import { getCropCoefficientsViewForUser } from '@/lib/services/crop-water-coeffi
 import { getIrrigationHistoryDashboardForUser } from '@/lib/services/irrigation-history-service';
 import { getIrrigationNeedsDashboardForUser } from '@/lib/services/irrigation-needs-service';
 import { readWeeklyPlanForUser } from '@/lib/services/planning-service';
+import { shortageDecisionPending } from '@/lib/domain/planning/shortage-reading';
 import { emptyPumpDashboard, getPumpDashboardForUser } from '@/lib/services/pump-dashboard';
 import { getSoilReserveViewForUser } from '@/lib/services/soil-reserve-view';
 import { getWaterDashboardForUser } from '@/lib/services/water-dashboard';
@@ -155,14 +156,16 @@ export async function loadPlanningPage(context: ReadyPageContext) {
 }
 
 export async function loadRessourcesPage(context: ReadyPageContext) {
-  const [equipment, irrigationEvents, waterResourceDashboard, pumpDashboard] = await Promise.all([
+  const [equipment, irrigationEvents, waterResourceDashboard, pumpDashboard, weeklyPlan] = await Promise.all([
     listEquipmentForUser(context.userId),
     listIrrigationEventsForUser(context.userId, context.season, true),
     getWaterResourceDashboardForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot, now: new Date(context.nowIso) }),
     getPumpDashboardForUser(context.userId),
+    // Le plan enregistré, lu sans calcul : il dit si une répartition attend (audit final, lot B, R4, F248).
+    readWeeklyPlanForUser({ ownerUserId: context.userId, season: context.season, now: new Date(context.nowIso) }),
   ]);
   context.lap('dashboards');
-  return { equipment, irrigationEvents, waterResourceDashboard, pumpDashboard };
+  return { equipment, irrigationEvents, waterResourceDashboard, pumpDashboard, decisionPending: shortageDecisionPending(weeklyPlan) };
 }
 
 export async function loadSolPage(context: ReadyPageContext) {
