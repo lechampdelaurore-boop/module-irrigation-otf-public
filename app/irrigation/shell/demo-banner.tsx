@@ -1,8 +1,11 @@
 'use client';
 
+import { useEffect, useId, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { DEMO_BANNER_TEXT } from '@/lib/domain/demo/deployment-mode';
-import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, DEMO_PROFILES, resolveDemoChoice, type DemoSelection } from '@/lib/domain/demo/catalogue';
+import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, DEMO_PROFILES, demoSummary, resolveDemoChoice, type DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Icon } from '../line-icon';
+import { DEMO_DETAIL_ATTRIBUTE, listenToDemoDetailRequests } from './demo-banner-detail';
 import { DemoReset } from './demo-reset';
 import { GuidedTour, type TourSurroundings } from './guided-tour';
 
@@ -32,6 +35,11 @@ function choose(profile: string, moment: string | undefined) {
  * l'espace correspondant, sans rien effacer ; « Remettre à zéro » rend à
  * la ferme et au moment ouverts leur premier jour, après confirmation (D4).
  * Dans les pages du module, elle porte aussi les visites guidées (D3).
+ *
+ * Au téléphone (docs/audit-ergonomie-final-lot-f-contract.md, section 3 ;
+ * J1), une ligne de 44 px dit la ferme et le moment, et « Changer » ouvre le
+ * reste dessous. Le détail est fermé à chaque page : toute navigation du
+ * module est un chargement complet. Au-dessus de 600 px, rien ne change.
  */
 export function DemoBanner({ selection = null, tour = null }: {
   selection?: DemoSelection | null;
@@ -39,11 +47,35 @@ export function DemoBanner({ selection = null, tour = null }: {
   tour?: TourSurroundings | null;
 }) {
   const current = selection ? resolveDemoChoice(selection.profile, selection.moment) : null;
+  const [open, setOpen] = useState(false);
+  const detailId = useId();
+  // Une visite qui présente un élément du détail l'ouvre, rendu avant qu'elle ne le cherche.
+  useEffect(() => listenToDemoDetailRequests(() => flushSync(() => setOpen(true))), []);
+
+  if (!current) {
+    return (
+      <aside className="demo-banner" aria-label="Démonstration" data-demo-banner="true" data-tour="banniere">
+        <span className="demo-banner-icon"><Icon name="bouclier" /></span>
+        <p>{DEMO_BANNER_TEXT}</p>
+      </aside>
+    );
+  }
+  const severalMoments = current.profile.moments.length > 1;
   return (
-    <aside className="demo-banner" aria-label="Démonstration" data-demo-banner="true" data-tour="banniere">
+    <aside className="demo-banner" aria-label="Démonstration" data-demo-banner="true" data-tour="banniere" data-open={open}>
       <span className="demo-banner-icon"><Icon name="bouclier" /></span>
-      <p>{DEMO_BANNER_TEXT}</p>
-      {current ? (
+      <p className="demo-banner-text">{DEMO_BANNER_TEXT}</p>
+      <p className="demo-banner-line">{demoSummary(current)}</p>
+      <button
+        type="button"
+        className="demo-banner-toggle"
+        aria-expanded={open}
+        aria-controls={detailId}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {open ? 'Fermer' : 'Changer'}
+      </button>
+      <div id={detailId} className="demo-banner-detail" {...{ [DEMO_DETAIL_ATTRIBUTE]: open ? 'ouvert' : 'ferme' }}>
         <div className="demo-banner-choices" data-tour="banniere-choix">
           <label>
             <span>Ferme</span>
@@ -51,7 +83,7 @@ export function DemoBanner({ selection = null, tour = null }: {
               {DEMO_PROFILES.map((profile) => <option key={profile.id} value={profile.id}>{profile.label}</option>)}
             </select>
           </label>
-          {current.profile.moments.length > 1 ? (
+          {severalMoments ? (
             <label>
               <span>Moment</span>
               <select value={current.moment.id} onChange={(event) => choose(current.profile.id, event.currentTarget.value)}>
@@ -60,9 +92,9 @@ export function DemoBanner({ selection = null, tour = null }: {
             </label>
           ) : null}
         </div>
-      ) : null}
-      {current ? <DemoReset farm={current.profile.label} moment={current.profile.moments.length > 1 ? current.moment.label : null} /> : null}
-      {current && tour ? <GuidedTour current={tour.current} reachable={tour.reachable} query={tour.query} /> : null}
+        <DemoReset farm={current.profile.label} moment={severalMoments ? current.moment.label : null} />
+        {tour ? <GuidedTour current={tour.current} reachable={tour.reachable} query={tour.query} /> : null}
+      </div>
     </aside>
   );
 }

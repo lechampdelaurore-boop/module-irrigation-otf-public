@@ -17,6 +17,8 @@ type DemoMomentId = (typeof DEMO_MOMENT_IDS)[number];
 type DemoMoment = {
   id: DemoMomentId;
   label: string;
+  /** Le nom court de la ligne de la bannière au téléphone (lot F, F290). */
+  shortLabel: string;
   /** Le jour simulé, `AAAA-MM-JJ`, à la ferme. */
   dateKey: string;
   /** Ce que le moment fait voir, en une phrase. */
@@ -26,6 +28,8 @@ type DemoMoment = {
 export type DemoProfile = {
   id: DemoProfileId;
   label: string;
+  /** Le nom court de la ligne de la bannière au téléphone (lot F, F290). */
+  shortLabel: string;
   description: string;
   /** Les cases cochées d'avance ; vide pour la ferme vierge, qui s'ouvre sur la liste à cocher. */
   features: readonly FeatureId[];
@@ -37,24 +41,28 @@ const MOMENTS: Readonly<Record<DemoMomentId, DemoMoment>> = {
   'gel-printemps': {
     id: 'gel-printemps',
     label: 'Printemps, nuit de gel annoncée',
+    shortLabel: 'Gel de printemps',
     dateKey: '2026-04-14',
     shows: 'Une nuit de gel est annoncée : l’alerte de la culture qui risque de geler.',
   },
   ete: {
     id: 'ete',
     label: 'Début d’été, semaine normale',
+    shortLabel: 'Début d’été',
     dateKey: '2026-06-16',
     shows: 'Une semaine ordinaire : le planning propose et place tous les arrosages.',
   },
   penurie: {
     id: 'penurie',
     label: 'Pic d’été, l’eau manque',
+    shortLabel: 'Pic d’été',
     dateKey: '2026-07-21',
     shows: 'La réserve est basse : le budget de la semaine, les parts de chaque planche et ce qui n’est pas placé.',
   },
   automne: {
     id: 'automne',
     label: 'Automne, fin de saison',
+    shortLabel: 'Automne',
     dateKey: '2026-10-20',
     shows: 'La saison s’achève : l’historique des arrosages et les cumuls.',
   },
@@ -66,6 +74,7 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
   {
     id: 'maraichage',
     label: 'Maraîchage diversifié',
+    shortLabel: 'Maraîchage diversifié',
     description: 'Plein champ et abri, une réserve et une pompe : le besoin, le planning, la pénurie et la réserve.',
     features: ['arrosages', 'planning', 'besoins', 'sol', 'cultures', 'materiel', 'calculateur', 'ressources', 'alertes-meteo', 'alertes-cultures', 'historique'],
     moments: ALL_MOMENTS,
@@ -73,6 +82,7 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
   {
     id: 'petite-ferme',
     label: 'Petite exploitation, une seule ressource',
+    shortLabel: 'Petite exploitation',
     description: 'L’arrosage sans réserve, et le calculateur des millimètres au temps.',
     features: ['arrosages', 'besoins', 'materiel', 'calculateur'],
     moments: ALL_MOMENTS,
@@ -80,6 +90,7 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
   {
     id: 'vannes-alertes',
     label: 'Le matériel et les alertes seulement',
+    shortLabel: 'Matériel et alertes',
     description: 'Le module à la carte : une ferme qui ne coche presque rien.',
     features: ['materiel', 'alertes-meteo'],
     moments: ALL_MOMENTS,
@@ -87,6 +98,7 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
   {
     id: 'vierge',
     label: 'Ferme vierge',
+    shortLabel: 'Ferme vierge',
     description: 'La première ouverture : rien de coché, rien de réglé.',
     features: [],
     moments: [MOMENTS.ete],
@@ -108,6 +120,17 @@ export function resolveDemoChoice(profileId: string | undefined, momentId: strin
   const profile = profileById(profileId) ?? DEMO_PROFILES[0];
   const moment = profile.moments.find((item) => item.id === momentId) ?? profile.moments[0];
   return { profile, moment };
+}
+
+/**
+ * La ligne de la bannière au téléphone (docs/audit-ergonomie-final-lot-f-contract.md,
+ * section 3 ; J1) : « Démonstration », la ferme, puis le moment quand le
+ * profil en propose plusieurs, en noms courts.
+ */
+export function demoSummary(choice: DemoChoice): string {
+  const parts = ['Démonstration', choice.profile.shortLabel];
+  if (choice.profile.moments.length > 1) parts.push(choice.moment.shortLabel);
+  return parts.join(' · ');
 }
 
 const SEPARATOR = '·demo·';

@@ -74,14 +74,102 @@
   font-size: 14px;
 }
 
+/*
+ * La ligne de la bannière et son bouton « Changer » ne servent qu'au
+ * téléphone (docs/audit-ergonomie-final-lot-f-contract.md, section 3 ; J1).
+ * Au-dessus de 600 px, le détail se fond dans la bannière : rien ne change.
+ */
+.demo-banner-line,
+.demo-banner-toggle {
+  display: none;
+}
+
+.demo-banner-detail {
+  display: contents;
+}
+
 @media (max-width: 600px) {
   .demo-banner {
     flex-wrap: wrap;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
-  /* Le texte reste à côté de l'icône ; les choix passent dessous. */
-  .demo-banner p {
-    flex-basis: 0;
+  /* Une ligne de 44 px : la ferme et le moment, puis « Changer ». */
+  .demo-banner .demo-banner-line {
+    display: -webkit-box;
+    flex: 1 1 0;
+    overflow: hidden;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.25;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .demo-banner-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    border: 1px solid var(--green);
+    border-radius: var(--radius-button);
+    background: var(--green-soft);
+    color: var(--green);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .demo-banner-toggle:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Replié : le texte n'est lu que par un lecteur d'écran, le détail est caché. */
+  .demo-banner[data-open="false"] .demo-banner-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .demo-banner-detail[data-demo-detail="ferme"] .demo-banner-choices,
+  .demo-banner-detail[data-demo-detail="ferme"] .demo-reset,
+  .demo-banner-detail[data-demo-detail="ferme"] .tour-launcher-button {
+    display: none;
+  }
+
+  /* Le lanceur ne garde que l'annonce des étapes, lue par un lecteur d'écran. */
+  .demo-banner-detail[data-demo-detail="ferme"] .tour-launcher {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* Ouvert : le texte, puis les listes, la remise à zéro et les visites, sous la ligne. */
+  .demo-banner[data-open="true"] .demo-banner-text {
+    flex: 1 0 100%;
+    order: 1;
+    padding: 4px 0;
+  }
+
+  .demo-banner-detail[data-demo-detail="ouvert"] {
+    display: flex;
+    flex: 1 0 100%;
+    flex-direction: column;
+    gap: 8px;
+    order: 2;
+    padding-bottom: 10px;
   }
 
   .demo-banner-choices,

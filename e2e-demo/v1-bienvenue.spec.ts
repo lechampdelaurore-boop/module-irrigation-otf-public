@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { commencerLaVisite, etapeSuivante, jouerLaVisite, ouvrirLaDemo, verifierLAccessibiliteDe, verifierLEtapeDeVisite, type EtapeAttendue } from './support/visite.ts';
+import { commencerLaVisite, etapeSuivante, jouerLaVisite, ouvrirLaDemo, ouvrirLeDetailDeLaBanniere, verifierLAccessibiliteDe, verifierLEtapeDeVisite, type EtapeAttendue } from './support/visite.ts';
 
 /**
  * Parcours V1 : la visite « Bienvenue » (docs/demo-guided-contract.md,
@@ -55,6 +55,7 @@ test('V1 Bienvenue : l’invitation, avancer, reculer, reprendre, quitter par É
   await expect(bulle).toHaveCount(0);
 
   // La liste : accessible, puis la visite entière.
+  await ouvrirLeDetailDeLaBanniere(page);
   await page.getByRole('button', { name: 'Visites guidées' }).click();
   const liste = page.getByRole('dialog', { name: 'Visites guidées' });
   await expect(liste.getByRole('button')).toHaveCount(8);

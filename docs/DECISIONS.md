@@ -4936,3 +4936,31 @@ La fusion des moteurs n'est pas touchée ; aucun code de Tranche 4 avant
 elle, sauf ce que la roadmap autorise.
 
 Ne changent pas : D-001, D-003, D-066, D-096.
+
+## D-143 — Audit ergonomique final, lot F : la barre de la démonstration en une ligne au téléphone (J1)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur pour le contenu
+(D-137, « Je suis d'accord avec toutes tes propositions. Toutes les
+recommandations. » : le contrat du lot F et son choix n° 4 retenus, avec
+son « vas-y » au code) ; les précisions tranchées en codant suivent
+l'option recommandée, aucune question agronomique, modifiables par lui.
+Après D-142.
+
+**Décision** (F288 à F291, contrat `docs/audit-ergonomie-final-lot-f-contract.md`,
+section 3, versé au dépôt par cette PR) : à 600 px et moins, la bannière
+de la démonstration tient en une ligne de 44 px, « Démonstration ·
+Maraîchage diversifié · Pic d'été », en noms courts tenus dans le
+catalogue à côté des noms longs (F290), suivie du bouton « Changer ». Il
+ouvre dessous le texte « données fictives », les deux listes, la remise à
+zéro et les visites guidées, et se lit alors « Fermer » ; le détail est
+fermé à chaque page (F289 ; toute navigation du module est un chargement
+complet). Replié, le texte reste lu par un lecteur d'écran, et l'annonce
+des étapes des visites aussi. Une visite qui présente un élément du
+détail l'ouvre, et la fin d'une visite y rend le focus ; l'invitation
+écartée ne l'ouvre pas et rend le focus à « Changer » (F291). Au-dessus
+de 600 px, rien ne change (F288).
+
+Aucune migration ; aucun garde-fou de la démonstration ne change (D-103 à
+D-106) ; les listes gardent les noms longs.
+
+Ne changent pas : D-096, D-105.

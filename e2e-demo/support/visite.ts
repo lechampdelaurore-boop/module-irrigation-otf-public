@@ -49,8 +49,21 @@ export async function ecarterLInvitation(page: Page): Promise<void> {
   await expect(bulle(page)).toHaveCount(0);
 }
 
+/**
+ * Au téléphone, les listes, la remise à zéro et les visites sont rangées
+ * derrière « Changer » (docs/audit-ergonomie-final-lot-f-contract.md, J1) :
+ * on ouvre le détail de la bannière s'il est replié. À l'ordinateur, rien.
+ */
+export async function ouvrirLeDetailDeLaBanniere(page: Page): Promise<void> {
+  const changer = page.locator('.demo-banner-toggle');
+  if (!(await changer.isVisible())) return;
+  if ((await changer.getAttribute('aria-expanded')) === 'false') await changer.click();
+  await expect(changer).toHaveAttribute('aria-expanded', 'true');
+}
+
 /** Ouvre la liste par le bouton de la bannière et lance une visite. */
 export async function commencerLaVisite(page: Page, titre: string): Promise<void> {
+  await ouvrirLeDetailDeLaBanniere(page);
   const bouton = page.getByRole('button', { name: 'Visites guidées' });
   await bouton.click();
   const liste = page.getByRole('dialog', { name: 'Visites guidées' });
