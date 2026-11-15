@@ -4530,3 +4530,34 @@ reste sa recette sur la version déployée, et le bouton « Répartir l'eau »
 sur « Aujourd'hui », qui va avec le lot A.
 
 Ne changent pas : D-117, D-127.
+
+## D-130 — Audit ergonomique final, lot E : le contrat, et « Aller au contenu » partout (A1)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur (« pousse du code en autonomie toute la nuit si
+nécessaire »), aucune question agronomique ; modifiable par lui. Après
+D-117 (les six lots) et D-128 (fin du lot B).
+
+**Contrat.** `docs/audit-ergonomie-final-lot-e-contract.md` couvre J8, J9,
+J11, J12, J15, A1 et A2 (précisions F257 à F273), en sept PR, une à la
+fois, dans l'ordre A1, J8, J9, J11, J12, J15, A2. Affichage seul :
+l'arrondi n'est qu'un affichage, jamais le calcul ; ni les champs de
+saisie, ni l'export CSV, ni les débits ne changent. Sur « Aujourd'hui »,
+seulement l'arrondi, les mots et le bandeau de J11 : le contrat de la page
+attend le lot A. Les noms de la ferme de démonstration vont avec le lot F.
+A2 est mesuré avant d'être corrigé : à 390 px, sur la démonstration et sur
+la ferme des parcours, avec les règles de P31c, trois vrais défauts ; les
+grands nombres du rapport comptaient la case à cocher (16 px) plutôt que
+son étiquette, et les liens pris dans une phrase.
+
+**Établi dans le code (A1).** Le lien « Aller au contenu » vit dans le
+gabarit des pages du module ; la première ouverture et la page introuvable
+ont leur propre gabarit, sans lui.
+
+**Décision.** Ces deux pages ont le lien en premier arrêt du clavier, vers
+leur bloc principal, qui reçoit le focus (F257). Parcours P22 et P27
+étendus.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-117, D-128.
