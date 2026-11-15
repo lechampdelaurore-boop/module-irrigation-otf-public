@@ -349,7 +349,14 @@ registres, elle y renvoie.
   matériel qui arrose ses voisines »), lue dans les créneaux proposés ou
   validés de la semaine, au-delà de ce qui lui est placé d'au moins
   0,05 mm ; ni le manque, ni le placé, ni aucun total ne changent (F254 ;
-  aucune migration). Ensuite la remarque 4.
+  aucune migration), **en ligne** (#61, fusionnée à 5 h 52, déployée à
+  6 h 07). **PR 6 sur 7, remarque 4 de la recette 3.9** : quand la
+  semaine a des arrosages validés, le pli « Budget d'eau d'ici dimanche »
+  dit en tête que « les parts se comptent sur ce qui reste à placer, après
+  les 5,06 m³ déjà validés cette semaine : une part qui baisse après une
+  validation ne retire pas d'eau aux planches » (« après les arrosages déjà
+  validés » quand un volume validé est inconnu) (F255 ; P32 étendu ; aucune
+  migration). Ensuite la remarque 5.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -445,6 +452,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #61 (`5236e70`, lot B de l'audit final, remarque 2 de la recette 3.9,
+  l'eau reçue sans part, D-126, fusionnée à 5 h 52 et déployée à
+  6 h 07, run 43678652717, les cinq jobs réussis, aucune migration). Avant
+  elle : la
   PR #60 (`0470ff0`, lot B de l'audit final, J7, seules les planches en
   manque se comptent en rouge, D-125, fusionnée à 5 h 20 et déployée à
   5 h 36, run 43676320767, les cinq jobs réussis, aucune migration). Avant

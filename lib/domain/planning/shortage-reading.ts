@@ -94,3 +94,25 @@ export function waterReceivedWithoutShareMm(plan: Pick<StoredWeeklyPlan, 'propos
   const beyond = receivedMm - bed.placedMm;
   return beyond >= RECEIVED_TOLERANCE_MM ? beyond : null;
 }
+
+/**
+ * La phrase en tête du pli du budget quand la semaine a des arrosages validés
+ * (remarque 4 de la recette 3.9, F255) : les parts se comptent sur ce qui
+ * reste à placer, après l'eau validée (D-086), si bien qu'une part peut
+ * baisser après une validation sans qu'aucune planche reçoive moins. Le
+ * volume est la somme des propositions validées dont l'irrigation n'est pas
+ * annulée ; un seul volume inconnu, et la phrase dit « les arrosages déjà
+ * validés » sans chiffre. Nulle sans arrosage validé.
+ */
+export function budgetValidatedNote(plan: Pick<StoredWeeklyPlan, 'proposals'>, formatVolume: (cubicMeters: number) => string): string | null {
+  let count = 0;
+  let cubicMeters: number | null = 0;
+  for (const proposal of plan.proposals) {
+    if (proposal.status !== 'validated' || isCanceledValidation(proposal)) continue;
+    count += 1;
+    cubicMeters = cubicMeters === null || proposal.volumeCubicMeters === null ? null : cubicMeters + proposal.volumeCubicMeters;
+  }
+  if (count === 0) return null;
+  const after = cubicMeters === null ? 'après les arrosages déjà validés cette semaine' : `après les ${formatVolume(cubicMeters)} déjà validés cette semaine`;
+  return `Les parts se comptent sur ce qui reste à placer, ${after} : une part qui baisse après une validation ne retire pas d’eau aux planches.`;
+}

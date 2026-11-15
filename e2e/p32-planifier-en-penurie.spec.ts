@@ -120,6 +120,8 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   expect(visee).toBeLessThan(100);
   expect(placee, 'la part placée, celle que les créneaux paient').toBeLessThanOrEqual(visee);
   const mobilisableAvant = metresCubes(await budget.innerText(), 'mobilisables');
+  // Rien de validé encore : le pli ne dit pas les parts comptées après l'eau validée (remarque 4, F255).
+  await expect(planning.locator('.planning-budgets-validated')).toHaveCount(0);
   await verifierLEtape(page, journal, 'ligne de budget et fractions');
 
   // Ce qui n'a pas été placé, avec son motif : N02 n'a reçu que sa part.
@@ -161,6 +163,12 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   const mobilisableApres = metresCubes(await budgetApres.innerText(), 'mobilisables');
   expect(Math.abs(mobilisableApres - (mobilisableAvant - volumeValide)), `${mobilisableApres} m³ mobilisables après la validation de ${volumeValide} m³ sur ${mobilisableAvant} m³`)
     .toBeLessThanOrEqual(ARRONDI_M3);
+  // La part de la normale peut baisser : le pli dit, en tête, qu'elle se compte
+  // après les m³ déjà validés, au moins ceux de N02 (audit final, lot B, remarque 4, F255).
+  const apresValidation = planning.locator('.planning-budgets-validated');
+  await expect(apresValidation).toBeVisible();
+  await expect(apresValidation).toHaveText(/^Les parts se comptent sur ce qui reste à placer, après les \d+(,\d+)? m³ déjà validés cette semaine : une part qui baisse après une validation ne retire pas d’eau aux planches\.$/);
+  expect(metresCubes(await apresValidation.innerText(), 'déjà validés'), 'le volume validé de N02 au moins').toBeGreaterThanOrEqual(volumeValide - ARRONDI_M3);
   await verifierLEtape(page, journal, 'proposition validée, comptée au recalcul');
 
   // Refuser en pénurie : le créneau refusé est évité au recalcul et la part de
