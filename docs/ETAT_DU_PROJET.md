@@ -322,7 +322,13 @@ registres, elle y renvoie.
   tête de page tant que le dernier plan de la semaine manque d'eau sans
   répartition validée, lu sur le plan enregistré, sans calcul (F247,
   F248 ; P32 étendu ; aucune migration). Le bouton sur « Aujourd'hui »
-  reste au lot A. Ensuite R5.
+  reste au lot A, **en ligne** (#57, fusionnée à 3 h 19, déployée à
+  3 h 51 après une relance du job des parcours). **Correctif à part**
+  (D-129) : P7 a échoué une fois sur `main` après la fusion de #57, la case
+  de N02 restée cochée au clic ; l'écran de répartition relisait sa propre
+  répartition validée 180 ms après l'avoir reçue, ses cases indisponibles
+  le temps de ce calcul inutile. Il ne relit plus que les changements des
+  autres blocs et onglets (aucun calcul ni donnée touchés). Ensuite R5.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -418,6 +424,11 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #57 (`9006fb3`, lot B de l'audit final, R4, le chemin vers la
+  répartition, D-123, fusionnée à 3 h 19 et déployée à 3 h 51, run
+  43667252295, les cinq jobs réussis après une relance du job des
+  parcours, P7 au téléphone ayant échoué une fois, voir D-129 ; aucune
+  migration). Avant elle : la
   PR #56 (`2c42008`, lot B de l'audit final, R3, la pénurie dite en une
   phrase, et le contrat court du lot, D-122, fusionnée à 2 h 32 et déployée
   à 2 h 47, run 43663534667, les cinq jobs réussis, aucune migration).

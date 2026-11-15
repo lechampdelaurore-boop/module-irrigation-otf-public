@@ -23,6 +23,16 @@ source détaillée commit par commit.
   lot A. Affichage seul ; parcours P32 étendu. R3 en ligne : #56, déployée
   le 15 novembre 2026 à 2 h 47.
 
+### Corrigé (écran de répartition)
+
+- **Les cases restent disponibles après « Valider la répartition »**
+  (D-129) : l'écran relisait la répartition qu'il venait d'enregistrer,
+  180 ms après l'avoir reçue, et ses cases devenaient indisponibles le
+  temps de ce calcul inutile ; changer d'avis juste après une validation
+  pouvait rester sans effet. Il ne relit plus que les changements venus
+  des autres blocs et onglets. R4 en ligne : #57, déployée le 15 novembre
+  2026 à 3 h 51.
+
 ### Corrigé (audit ergonomique final, lot C, gestes sûrs)
 
 - **R6, trois gestes où l'on pouvait se tromper** (D-119, F236 à F238) :

@@ -4365,3 +4365,32 @@ l'approche de sa section (F248). Le bouton « Répartir l'eau » sur
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-052, D-083, D-117, D-122.
+
+## D-129 — L'écran de répartition ne relit pas sa propre répartition validée
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur (aucune question agronomique) ; modifiable
+par lui. Correctif hors des points du lot B, après D-123.
+
+**Constat.** Après la fusion de #57, le parcours P7 a échoué une fois sur
+`main` (run 43667252295, projet « telephone ») : « Clicking the checkbox did
+not change its state » sur la case de N02, juste après « Valider la
+répartition ». Rejoué, le job a réussi ; P7 a réussi sur la PR et en local.
+
+**Établi dans le code.** Après une répartition enregistrée, le tableau de la
+faisabilité reçoit le tableau à jour, puis prévient les autres blocs
+(`notifyFeasibilityChanged`) ; il écoute lui-même ce signal, si bien que
+180 ms plus tard il relance un calcul de la faisabilité, dont il n'a pas
+besoin, et ses cases sont indisponibles le temps de ce calcul. Un clic qui
+tombe dans cette fenêtre reste sans effet : c'est la cause la plus probable
+de l'échec, déduite du code ; l'échec n'a pas été reproduit en local.
+
+**Décision.** Le signal porte le nom du bloc qui l'envoie (`source`), sur
+l'événement de la fenêtre comme sur le message du canal ; le tableau de la
+faisabilité nomme le sien et l'ignore. Les autres blocs (planning, pompes,
+besoins, placements) et les autres onglets relisent comme avant ; un
+message sans source, d'un onglet resté sur l'ancienne version, fait relire.
+Aucun calcul, aucune donnée ni migration ; aucun test ni parcours n'est
+assoupli.
+
+Ne changent pas : D-083, D-120, D-123.

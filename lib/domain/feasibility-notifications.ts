@@ -1,10 +1,22 @@
-/** Notifications only; decisions and water quantities remain on the server. */
-export function notifyFeasibilityChanged() {
-  window.dispatchEvent(new CustomEvent('irrigation-feasibility-source-changed'));
+/**
+ * Notifications only; decisions and water quantities remain on the server.
+ * `source` names the block that sends it, so that it does not reread what it
+ * has just saved and received (D-129).
+ */
+export function notifyFeasibilityChanged(source?: string) {
+  window.dispatchEvent(new CustomEvent('irrigation-feasibility-source-changed', { detail: { source } }));
   if (typeof BroadcastChannel !== 'undefined') {
     const channel = new BroadcastChannel('irrigation-feasibility');
-    channel.postMessage('changed'); channel.close();
+    channel.postMessage({ source }); channel.close();
   }
+}
+
+/** La source d'une notification de faisabilité, sur l'événement de la fenêtre comme sur le message du canal ; aucune pour les autres signaux. */
+export function feasibilityNoticeSource(event: Event): string | undefined {
+  const payload: unknown = 'data' in event ? (event as MessageEvent).data : (event as CustomEvent<unknown>).detail;
+  if (typeof payload !== 'object' || payload === null || !('source' in payload)) return undefined;
+  const { source } = payload as { source?: unknown };
+  return typeof source === 'string' ? source : undefined;
 }
 
 /**
