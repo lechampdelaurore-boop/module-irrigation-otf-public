@@ -401,7 +401,12 @@ registres, elle y renvoie.
   Réglages », vers « Fonctionnalités de la ferme » ; « Aujourd'hui » dit
   n'avoir aucune de ses fonctionnalités cochées ; une ancienne adresse garde
   la phrase d'avant, avec le lien (F265 ; P22 et P23 étendus ; aucune
-  migration). Ensuite J12, le bandeau des alertes limitées.
+  migration). **PR 4 en ligne** (#67, fusionnée à 9 h 57, déployée à
+  10 h 18). **PR 5 sur 7, J12** (D-134) : sur « Arrosages », le bandeau
+  « Alertes système non disponibles » vient sous le formulaire, texte
+  inchangé, et se replie une fois vu à toutes les largeurs, avec le point
+  sur la cloche au téléphone ; Réglages le garde en entier (F266 et F267 ;
+  P28 étendu ; aucune migration). Ensuite J15, la vue satellite.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -497,6 +502,9 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #67 (`91c2e9f`, lot E de l'audit final, J11, la page non cochée nommée,
+  et où la cocher, D-133, fusionnée à 9 h 57 et déployée à 10 h 18, run
+  43696894369, les cinq jobs réussis, aucune migration). Avant elle : la
   PR #66 (`c6e4694`, lot E de l'audit final, J9, les mêmes mots d'une page
   à l'autre, D-132, fusionnée à 9 h 18 et déployée à 9 h 36, run
   43693895736, les cinq jobs réussis, aucune migration). Avant elle : la
