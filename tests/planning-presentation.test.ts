@@ -246,7 +246,7 @@ test('les réglages font l’aller-retour par le formulaire, et une saisie absur
   assert.deepEqual(settingsFromForm(form), { settings: DEFAULT_PLANNING_SETTINGS, issues: [] });
   assert.equal(settingsFromForm({ ...form, lateToleranceMinutes: '45' }).settings?.lateToleranceMinutes, 45);
   const lateRefused = settingsFromForm({ ...form, lateToleranceMinutes: '30,5' });
-  assert.deepEqual(lateRefused.issues.map((issue) => [issue.path, settingsIssueLabel(issue.path)]), [['lateToleranceMinutes', 'R14, tolérance du retard']]);
+  assert.deepEqual(lateRefused.issues.map((issue) => [issue.path, settingsIssueLabel(issue.path)]), [['lateToleranceMinutes', 'Tolérance du retard']]);
 
   const edited = settingsFromForm({
     ...form,

@@ -19,8 +19,11 @@ const GAP_PX = 8;
  * Sur un écran large, la bulle est fixée sous son bouton, dans la fenêtre :
  * un tableau qui défile ne la coupe pas et elle ne fait jamais déborder la
  * page ; elle suit son bouton quand la page défile.
+ *
+ * Le nom du bouton se change quand la bulle ne dit pas l'origine d'un
+ * chiffre : les numéros des réglages du planning, par exemple (lot D, J6).
  */
-export function FigureOrigin({ text }: { text: string | null }) {
+export function FigureOrigin({ text, label = 'D’où vient ce chiffre ?' }: { text: string | null; label?: string }) {
   const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<CSSProperties | undefined>(undefined);
   const bubbleId = useId();
@@ -77,8 +80,8 @@ export function FigureOrigin({ text }: { text: string | null }) {
         className="figure-origin-toggle"
         aria-expanded={open}
         aria-controls={open ? bubbleId : undefined}
-        aria-label="D’où vient ce chiffre ?"
-        title="D’où vient ce chiffre ?"
+        aria-label={label}
+        title={label}
         onClick={() => setOpen((value) => !value)}
       />
       {open ? (

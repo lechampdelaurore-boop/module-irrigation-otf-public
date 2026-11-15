@@ -616,21 +616,21 @@ export function settingsFromForm(form: PlanningSettingsForm): { settings: Planni
 
 const SETTINGS_ISSUE_LABELS: Record<string, string> = {
   '': 'Réglages',
-  forecastRainShare: 'R2, part de la pluie prévue',
-  waitForForecastRainAboveMm: 'R3, seuil de pluie prévue',
-  'doses.sprinkler': 'R4 à R7, aspersion',
-  'doses.drip': 'R4 à R7, goutte-à-goutte',
-  'windows.sprinkler': 'R8, plage de l’aspersion',
-  'windows.drip': 'R8, plage du goutte-à-goutte',
-  shortageStrategy: 'R9, conduite en pénurie',
-  carryOverDeficit: 'R10, report du déficit',
-  collectiveDoseRule: 'R11, dose collective',
-  preferredKindWhenBoth: 'R12, matériel préféré',
-  commandingRateShare: 'R13, part du débit qui commande',
-  lateToleranceMinutes: 'R14, tolérance du retard',
+  forecastRainShare: 'Part de la pluie prévue déduite',
+  waitForForecastRainAboveMm: 'Pluie prévue qui fait attendre',
+  'doses.sprinkler': 'Doses et fréquence de l’aspersion',
+  'doses.drip': 'Doses et fréquence du goutte-à-goutte',
+  'windows.sprinkler': 'Plage horaire de l’aspersion',
+  'windows.drip': 'Plage horaire du goutte-à-goutte',
+  shortageStrategy: 'Conduite en pénurie',
+  carryOverDeficit: 'Report du déficit',
+  collectiveDoseRule: 'Dose d’un matériel qui arrose plusieurs planches',
+  preferredKindWhenBoth: 'Matériel qui sert d’abord',
+  commandingRateShare: 'Part du débit qui commande l’arrosage',
+  lateToleranceMinutes: 'Tolérance du retard',
 };
 
-/** Le réglage qu'un chemin de validation désigne, pour dire au maraîcher où est la valeur refusée. */
+/** Le réglage qu'un chemin de validation désigne, en mots simples comme son libellé (lot D, J6, F298), pour dire au maraîcher où est la valeur refusée. */
 export function settingsIssueLabel(path: string): string {
   return SETTINGS_ISSUE_LABELS[path] ?? path;
 }

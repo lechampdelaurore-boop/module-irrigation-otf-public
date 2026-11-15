@@ -5014,3 +5014,26 @@ Aucune migration ; aucun garde-fou de la démonstration ne change ; rien
 ne touche la ferme réelle.
 
 Ne changent pas : D-096, D-104, D-106, D-140.
+
+## D-146 — Audit ergonomique final, lot D : contrat versé, les réglages du planning en mots simples (J6)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur (D-137, toutes les
+recommandations des contrats retenues le 15 novembre 2026 à 14 h 51, dont
+le choix n° 3 et « RFU d'abord » pour J4 ; M1 et N1 ajoutés au lot sur
+son accord du même jour). Après D-145.
+
+**Décision** : le contrat court du lot D, `docs/audit-ergonomie-final-lot-d-contract.md`,
+est versé au dépôt, ses numéros recalés (D-146 à D-152, F297 à F316) ;
+sept PR, une à la fois : J6, J3, J5, J2, J4, M1, N1. Première PR, J6
+(F297, F298, contrat sections 3 et 3 bis) : les réglages du planning
+perdent leur numéro « R2 · » à « R14 · » dans leurs libellés visibles. Le
+numéro reste pour les experts dans une bulle « Numéros des réglages »,
+posée dans la légende de chaque groupe (« Pour les experts : Réglage R2,
+part de la pluie prévue déduite du besoin ; … »), et dans le nom des champs
+par nature de matériel, que des parcours désignent (F297). Un réglage
+refusé se nomme en mots simples, comme son libellé (F298).
+
+Affichage seul : aucun réglage, aucune valeur par défaut, aucun calcul ne
+change ; aucune migration.
+
+Ne changent pas : D-029, D-117, D-137.
