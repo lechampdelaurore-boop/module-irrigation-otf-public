@@ -96,6 +96,18 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   await expect(meta).toContainText(`${reserve} : ${STOCK_AFFICHE} observés`);
   await verifierLEtape(page, journal, 'plan calculé');
 
+  // Une phrase d'action en tête du résumé, aux deux largeurs (audit final,
+  // lot B, R3, F243) ; les notes du calcul, quand il y en a, attendent dans
+  // un repli fermé (F244).
+  await expect(planning.locator('.planning-shortage-action')).toBeVisible();
+  await expect(planning.locator('.planning-shortage-action')).toHaveText(/^Il manque .+ d’eau d’ici dimanche.* : \d+ planches? ne recevr(a|ont) pas tout (son|leur) besoin\.$/);
+  for (const repli of await planning.locator('details.planning-calculation').all()) {
+    await expect(repli).toHaveJSProperty('open', false);
+    await expect(repli.locator('summary')).toHaveText('Le détail du calcul');
+  }
+  await expect(planning.locator('.planning-summary-note:visible')).toHaveCount(0);
+  await verifierLEtape(page, journal, 'phrase d’action, détail du calcul replié');
+
   // La ligne de budget de la réserve : l'eau mobilisable, la demande, et pour
   // chaque niveau la part visée et la part placée, « — » sans demande.
   const budget = await ligneDeBudget(planning, reserve);

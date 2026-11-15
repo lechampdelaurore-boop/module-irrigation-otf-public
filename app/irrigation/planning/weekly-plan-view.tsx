@@ -22,6 +22,7 @@ import {
   type PlanDay,
   type PlanSummary,
 } from '@/lib/domain/planning/presentation';
+import { shortageAction } from '@/lib/domain/planning/shortage-reading';
 import { hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import type { PlanningSettings } from '@/lib/domain/planning/settings';
@@ -397,11 +398,14 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   const explanation = waterDeficitExplanation(plan);
   // Sous un arbitrage validé, aucune ligne de budget : la note dit l'eau allouée et ce qui ne peut pas être reçu (D-052).
   const arbitration = arbitrationNote(plan.calculation.summary);
+  const action = shortageAction(plan, formatVolume);
   // Au téléphone, les tuiles tiennent en une ligne de résumé, dépliable (F11).
   const [open, setOpen] = useState(false);
   const tilesId = useId();
   return (
     <>
+      {/* Une phrase d'action en tête quand l'eau manque (audit final, lot B, R3, F243). */}
+      {action ? <p className="planning-shortage-action" role="note">{action.sentence}</p> : null}
       <button type="button" className="planning-summary-line" data-tour="planning-semaine" aria-expanded={open} aria-controls={tilesId} onClick={() => setOpen((value) => !value)}>
         <span>{planSummaryLine(summary, actionLine, deficit, unplacedCount, formatVolume, unknownWater)}</span>
         <small>{open ? 'Replier' : 'Détail'}</small>
@@ -414,8 +418,14 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
         <SummaryCard icon="horloge" label="Temps de pompage manquant" value={pumpTimeDeficitValue(deficit, formatVolume)} detail={pumpTimeDeficitDetail(deficit)} tone={hasPumpTimeDeficit(deficit) ? 'deficit' : undefined} />
         <SummaryCard icon="pousse" label="Planches non servies" value={String(unplacedCount)} detail={unplacedDetail} tone={unplacedCount > 0 ? 'deficit' : undefined} />
       </div>
-      {explanation ? <p className="planning-summary-note">{explanation}</p> : null}
-      {arbitration ? <p className="planning-summary-note">{arbitration}</p> : null}
+      {/* Les chiffres du calcul, fermés par défaut ; leur texte ne change pas (audit final, lot B, R3, F244). */}
+      {explanation || arbitration ? (
+        <details className="planning-calculation">
+          <summary>Le détail du calcul</summary>
+          {explanation ? <p className="planning-summary-note">{explanation}</p> : null}
+          {arbitration ? <p className="planning-summary-note">{arbitration}</p> : null}
+        </details>
+      ) : null}
     </>
   );
 }

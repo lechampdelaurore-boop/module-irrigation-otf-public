@@ -4293,3 +4293,46 @@ de la lire puis détachée comme dans P15.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-076, D-119, D-120.
+
+## D-122 — Audit ergonomique final, lot B : la pénurie lisible, contrat et première PR (R3)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur (« pousse du code en autonomie toute la nuit
+si nécessaire », 14 novembre 2026), aucune question agronomique ;
+modifiable par lui. Après D-117 (les six lots) et D-121 (fin du lot C).
+
+**Contrat.** `docs/audit-ergonomie-final-lot-b-contract.md` : R3, R4, R5,
+J7 et les remarques 2, 4 et 5 de la recette 3.9, en sept PR, une à la
+fois ; affichage seul, aucun calcul de pénurie, de part, de manque ni de
+dose ne change. Le bouton « Répartir l'eau » sur « Aujourd'hui » (R4)
+touche le contrat de la page validé le 8 novembre 2026 : il va avec le
+lot A et attend le porteur.
+
+**Établi dans le code (R3).** Au planning, sous les tuiles, deux notes
+s'affichaient d'office (`waterDeficitExplanation`, `arbitrationNote`) :
+l'écart entre « demandés », « placés » et « manque d'eau », puis la note de
+l'arbitrage ; rien ne disait en une phrase ce qui manque. Sur
+« Ressources », la faisabilité alignait huit tuiles avant l'écran de
+répartition, qui a déjà les siennes, et un bloc par niveau de priorité,
+même sans planche ni besoin.
+
+**Décision (R3).** Au planning, une phrase d'action en tête du résumé quand
+l'eau manque, chiffrée au litre au moins, ou sûre sans volume pour une
+planche au volume inconnu (D-098) ; une chaîne à l'eau inconnue n'est pas
+un manque (D-089) : « Il manque 0,37 m³ d'eau d'ici dimanche : 5 planches ne
+recevront pas tout leur besoin. », « Votre répartition s'applique : … »
+sous une répartition validée ; les planches comptées sont celles qui
+gardent un manque, hors celles qu'aucun matériel n'arrose (F243). Les deux
+notes passent dans un repli fermé « Le détail du calcul », sans changer de
+texte (F244). Sur « Ressources », quatre tuiles au plus : aucune de plus
+que celles de l'écran de répartition quand un niveau attend un choix ;
+sinon « Eau disponible », « Besoin de la semaine », « Part servie »,
+« Planches servies en entier » ; les huit d'avant, les ressources prises
+en compte et le volume supplémentaire potentiel dans « Le détail du
+calcul » (F245). Un niveau dont aucune planche n'a de besoin ne s'affiche
+pas ; une planche aux données insuffisantes le garde (D-003) (F246).
+Parcours P32 et P7 étendus.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-003, D-038, D-052, D-083, D-117.

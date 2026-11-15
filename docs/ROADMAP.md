@@ -77,9 +77,9 @@ venir ; les lignes terminées gardent le nom du modèle employé.
 | Chantier · Partage des rôles avec Tlaloc et fusion des deux moteurs | 🔶 | **accord du porteur avec le développeur de Tlaloc le 7 novembre 2026** (D-066, section 6 quater) : le porteur termine la Tranche 3 (mode solo) ; Tlaloc prend l'automatisation (capteurs, électrovannes : C1 à C3 **confiés à Tlaloc**, recherches conservées) ; **avant la Tranche 4**, un chantier « fusion des deux moteurs » (comparaison fine puis synthèse en un logiciel commun, à partir du code de Tlaloc), qui absorbe le banc commun ; ergonomie : Tlaloc garde la sienne, chez nous les fonctionnalités se cochent à la connexion (intention rattachée à la 3.8). Rien n'est codé ni cadré | contrat : Sonnet 5.5 · Moyen ; code : à fixer au contrat |
 | Chantier · Fusion des moteurs, étape 1 : script des cas de test (24 sexies) | 🔶 | **inscrit le 14 novembre 2026 sur le mot du porteur** (D-114, section 6 quater) : un programme qui fait tourner le code OTF actuel de la jauge sur les dix cas O01 à O10 du dépôt commun (calculés à la main, jamais exécutés) et sur les cas limites du contrat de fusion, et compare aux valeurs écrites ; il mesure, il ne modifie ni le module ni ses tests ; **après la vue satellite (S3, en ligne), avant l'audit ergonomique final** ; contrat de fusion : brouillon v0.1.1 avec les onze décisions du porteur du 14 novembre 2026 (MC-16 à MC-26), pas encore versé au dépôt commun ; **script écrit et lancé le soir même** (D-116, `docs/shared-engine-cases-contract.md`, `scripts/shared-engine-cases.ts`), sans rien changer au module ni à ses tests : **17 cas conformes, un écart** (O07 : le drainage du jour de remplissage, 0,7 mm dans le code, « inconnu » dans le cas, qui se trompe), deux valeurs non jouées (variante de Tlaloc) ; la correction du contrat commun (O07, et O08 : statut périmé, entrées incomplètes) attend l'accord du porteur ; rien n'est envoyé à Nicolas | Opus 5.5 · Élevé |
 | Chantier · Audit ergonomique final (24 septies) | 🔶 | **inscrit le 14 novembre 2026 sur le mot du porteur** (« oui », 21 h 52), à la place que lui donnait D-107 : **après les finitions** (S1 à S3, la vue satellite close) **et le script des cas de test** (24 sexies, en ligne), avant tout nouveau chantier ; toutes les pages du module, sur plusieurs fermes, à l'ordinateur et au téléphone ; il reprend les remarques de la recette 3.9 et de la recette de la démonstration ; un rapport classé, que le porteur retient avant toute correction, chacune par sa PR ; **captures lancées le soir même, analyse rendue la nuit du 14 novembre 2026** (232 prises, 12 des 14 points du premier audit tiennent) ; **six lots de correction inscrits** (24 octies à 24 terdecies, D-117), le porteur les confirme au réveil | Captures en Sonnet 5.5 · Moyen, analyse en Opus 5.5 · Élevé |
-| Chantier · Audit ergonomique final, lot C · Gestes sûrs (24 octies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : R6 (« Retirer la mesure » en style secondaire, « Valider les 3 propositions du jour » écarté de « Replier le jour », « Valider » seul en grand sur chaque proposition), A3 (boutons pâles, contraste mesuré 2,4 pour 1) et J10 (le bouton « i » qui recouvre le texte, cause à établir) ; **pourquoi ici** : petit, sans risque, et la demande la plus constante du porteur : l'empêcher de faire une erreur ; **premier lot**, premier à coder ; un contrat avant le code, une PR par point ; **commencé le 14 novembre 2026 au soir** : contrat court `docs/audit-ergonomie-final-lot-c-contract.md` (D-119, F236 à F242, P35), causes établies dans le code ; **R6 en ligne** (PR 1 sur 3, #53) ; **A3 en ligne** (PR 2 sur 3, #54) ; **J10 codé** (PR 3 sur 3, D-121) : le lot est codé en entier, reste sa recette | Opus 5.5 · Élevé |
+| Chantier · Audit ergonomique final, lot C · Gestes sûrs (24 octies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : R6 (« Retirer la mesure » en style secondaire, « Valider les 3 propositions du jour » écarté de « Replier le jour », « Valider » seul en grand sur chaque proposition), A3 (boutons pâles, contraste mesuré 2,4 pour 1) et J10 (le bouton « i » qui recouvre le texte, cause à établir) ; **pourquoi ici** : petit, sans risque, et la demande la plus constante du porteur : l'empêcher de faire une erreur ; **premier lot**, premier à coder ; un contrat avant le code, une PR par point ; **commencé le 14 novembre 2026 au soir** : contrat court `docs/audit-ergonomie-final-lot-c-contract.md` (D-119, F236 à F242, P35), causes établies dans le code ; **R6 en ligne** (PR 1 sur 3, #53) ; **A3 en ligne** (PR 2 sur 3, #54) ; **J10 en ligne** (PR 3 sur 3, #55, D-121) : le lot est codé et en ligne en entier, reste sa recette | Opus 5.5 · Élevé |
 | Chantier · Audit ergonomique final, lot A · Le matin, l'essentiel (24 nonies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : R1 (« Aujourd'hui » annonce les arrosages de demain à valider et le manque d'eau de la semaine, **change le contrat de la page validé le 8 novembre 2026**, choix n° 2), R2 (un seul objectif d'une page à l'autre, **cause à établir dans le code d'abord**), J14 (gel annoncé sans alerte posée) et J13 ; **pourquoi ici** : la question n° 1 de l'audit ; **le contrat se rédige, le code attend la confirmation du porteur sur le choix n° 2** ; si la cause de R2 est dans le calcul de l'objectif, le coordinateur est prévenu avant de coder ; un contrat avant le code, une PR par point | Opus 5.5 · Élevé |
-| Chantier · Audit ergonomique final, lot B · Pénurie lisible (24 decies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : R3 (une phrase d'action, le détail du calcul dans un repli, quatre tuiles), R4 (un bouton « Répartir l'eau » depuis « Aujourd'hui » et le planning, l'écran de répartition en tête de « Ressources »), R5 (le nom de la culture sur la frise à toutes les largeurs), J7 (« Manque d'eau » compté seul en rouge) puis les remarques 2, 4 et 5 de la recette 3.9, rejouées sur un jeu de parcours qui les reproduit ; **pourquoi ici** : le cas où le module sert le plus est celui qui se lit le moins bien ; affichage seul, aucun calcul de pénurie ne change ; un contrat avant le code, une PR par point | Opus 5.5 · Élevé |
+| Chantier · Audit ergonomique final, lot B · Pénurie lisible (24 decies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : R3 (une phrase d'action, le détail du calcul dans un repli, quatre tuiles), R4 (un bouton « Répartir l'eau » depuis « Aujourd'hui » et le planning, l'écran de répartition en tête de « Ressources »), R5 (le nom de la culture sur la frise à toutes les largeurs), J7 (« Manque d'eau » compté seul en rouge) puis les remarques 2, 4 et 5 de la recette 3.9, rejouées sur un jeu de parcours qui les reproduit ; **pourquoi ici** : le cas où le module sert le plus est celui qui se lit le moins bien ; affichage seul, aucun calcul de pénurie ne change ; un contrat avant le code, une PR par point ; **commencé le 15 novembre 2026, la nuit** : contrat court `docs/audit-ergonomie-final-lot-b-contract.md` (D-122, F243 à F256), causes établies dans le code, sept PR ; le bouton « Répartir l'eau » sur « Aujourd'hui » attend le lot A ; **R3 codé** (PR 1 sur 7, D-122), puis R4 | Opus 5.5 · Élevé |
 | Chantier · Audit ergonomique final, lot F · Démonstration (24 undecies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : J1 (la barre de la démonstration en une ligne au téléphone), J16 (seulement les moments qui ont un sens pour chaque ferme), le jeu de données (un objectif « ferme entière », une alerte de gel déjà posée sur la ferme « matériel et alertes », choix n° 4) et J9 côté démonstration (un seul nom pour la ferme) ; **pourquoi ici** : avant de montrer la démonstration à d'autres fermes (Tranche 4) ; un contrat avant le code, une PR par point | Opus 5.5 · Élevé |
 | Chantier · Audit ergonomique final, lot E · Mots et chiffres (24 duodecies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : J8 (m³ à deux décimales, litres sous 1 m³, mm à une décimale), J9 (mêmes mots d'une page à l'autre), J11 (le bandeau « non cochée » dit laquelle et où la cocher), J12, J15 (vue satellite, repli), A1 (lien « Aller au contenu » sur les deux pages qui l'ont perdu) et A2 (cibles de moins de 44 px) ; **pourquoi ici** : beaucoup de petites PR rapides ; l'arrondi n'est qu'un affichage, jamais le calcul ; un contrat avant le code, une PR par point | Opus 5.5 · Élevé |
 | Chantier · Audit ergonomique final, lot D · Pages allégées (24 terdecies) | 🔶 | **inscrit le 14 novembre 2026** (D-117) d'après le rapport `audit-ergonomie-final-2026-11-14.md` : J2 (un pli « Réglages de cette page », fermé, en bas, **touche des pages déjà validées**, choix n° 3), J3, J4 (« Réserve du sol » : **la cause et le bon premier geste, « Observer » ou « Renseigner la réserve de la parcelle », sont à établir dans le code d'abord**), J5 et J6 (codes R2 à R14 retirés des libellés visibles) ; **pourquoi ici** : le plus gros lot ; **le code attend la confirmation du porteur sur le choix n° 3**, et J4 touche la réserve du sol (D-041, D-047) : le coordinateur est prévenu avant tout contrat ; un contrat avant le code, une PR par point | Opus 5.5 · Élevé |
@@ -635,7 +635,7 @@ selon la règle de la section 10.
     graphique). **Commencé le 14 novembre 2026 au soir** (D-119) : contrat
     court `docs/audit-ergonomie-final-lot-c-contract.md`, causes établies
     dans le code ; R6 en ligne (PR 1 sur 3, #53), A3 en ligne (PR 2 sur 3,
-    #54), J10 codé (PR 3 sur 3, D-121) ; reste la recette.
+    #54), J10 en ligne (PR 3 sur 3, #55, D-121) ; reste la recette.
 
 24 nonies. **Audit ergonomique final, lot A · Le matin, l'essentiel** —
     inscrit le 14 novembre 2026 (D-117). Contenu : R1 (« Aujourd'hui »
@@ -661,7 +661,12 @@ selon la règle de la section 10.
     plus est celui qui se lit le moins bien ; affichage seul, aucun calcul
     de pénurie ne change. Un contrat avant le code, une PR par point, un
     seul chantier de code à la fois, **Opus 5.5 · Élevé** (affichage sans
-    calcul nouveau, comme le style et le graphique).
+    calcul nouveau, comme le style et le graphique). **Commencé le
+    15 novembre 2026, la nuit** (D-122) : contrat court
+    `docs/audit-ergonomie-final-lot-b-contract.md`, causes établies dans le
+    code, sept PR (R3, R4, R5, J7, remarques 2, 4 et 5) ; le bouton
+    « Répartir l'eau » sur « Aujourd'hui » attend le lot A ; R3 codé (PR 1
+    sur 7), puis R4.
 
 24 undecies. **Audit ergonomique final, lot F · Démonstration** — inscrit
     le 14 novembre 2026 (D-117). Contenu : J1 (la barre de la
@@ -4181,8 +4186,28 @@ mesure de contraste des parcours compte les boutons indisponibles et la
 transparence entière (F239 à F241 ; P31c et P7 étendus), **en ligne**
 (#54). **PR 3, J10** (D-121) : le « i » garde son dessin dans tout bloc,
 ses règles nommées par leur parent passant au-dessus des règles de bloc
-(F242 ; P35 étendu). Le lot est codé en entier ; reste sa recette sur la
-version déployée.
+(F242 ; P35 étendu), **en ligne** (#55). Le lot est codé et en ligne en
+entier ; reste sa recette sur la version déployée.
+
+**Lot B, pénurie lisible (24 decies) : commencé le 15 novembre 2026, la
+nuit** (D-122), en Opus 5.5 · Élevé, sur le mandat d'autonomie de nuit du
+porteur. Contrat court `docs/audit-ergonomie-final-lot-b-contract.md`
+(précisions F243 à F256 ; P32, P7, P12, P10 et P31 étendus), sept PR, une
+à la fois, affichage seul. Hors du lot : le bouton « Répartir l'eau » sur
+« Aujourd'hui » (R4), qui change le contrat de la page et va avec le lot A.
+Causes établies dans le code : au planning, les notes du calcul affichées
+d'office et aucune phrase de ce qu'il faut faire ; sur « Ressources », huit
+tuiles avant l'écran de répartition, un bloc par niveau même vide, la
+faisabilité en dernière section ; la frise qui écrit le nom de la culture
+au début de sa bande, décalée au téléphone ; le compte rouge des planches
+non servies qui prend celles sans objectif ; l'eau versée par le matériel
+d'une voisine, absente de la ligne de la planche ; les parts du budget
+comptées après l'eau validée sans le dire ; le jour au-delà de sa limite,
+nommé dans les seules suggestions. **PR 1, R3** : une phrase d'action en
+tête du résumé du planning, les notes du calcul dans « Le détail du
+calcul », fermé ; sur « Ressources », quatre tuiles au plus, le reste dans
+le même repli, aucun bloc de priorité sans besoin (F243 à F246 ; P32 et P7
+étendus). Ensuite R4.
 
 ## 7. Décisions prises par le porteur de projet le 18 septembre 2026
 

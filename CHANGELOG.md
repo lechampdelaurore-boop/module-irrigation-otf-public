@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit ergonomique final, lot B, pénurie lisible)
+
+- **R3, la pénurie dite en une phrase** (D-122, F243 à F246) : au planning,
+  quand l'eau manque, une phrase en tête du résumé dit combien il manque et
+  combien de planches ne recevront pas tout ; les explications du calcul
+  sont rangées dans un repli fermé « Le détail du calcul ». Sur
+  « Ressources », quatre tuiles au plus, le reste dans le même repli, et
+  plus de bloc de priorité vide. Affichage seul. Contrat court
+  `docs/audit-ergonomie-final-lot-b-contract.md` ; parcours P32 et P7
+  étendus. J10 en ligne : #55, déployée le 15 novembre 2026 à 1 h 41.
+
 ### Corrigé (audit ergonomique final, lot C, gestes sûrs)
 
 - **R6, trois gestes où l'on pouvait se tromper** (D-119, F236 à F238) :
