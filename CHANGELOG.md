@@ -15,6 +15,13 @@ source détaillée commit par commit.
   plus de bloc de priorité vide. Affichage seul. Contrat court
   `docs/audit-ergonomie-final-lot-b-contract.md` ; parcours P32 et P7
   étendus. J10 en ligne : #55, déployée le 15 novembre 2026 à 1 h 41.
+- **R4, le chemin vers la répartition** (D-123, F247, F248) : la phrase
+  d'action du planning se termine par un lien « Répartir l'eau » (« Revoir
+  la répartition » quand une répartition est validée) vers l'écran de
+  répartition de « Ressources » ; tant qu'une décision attend, cet écran
+  passe en tête de « Ressources ». Le bouton sur « Aujourd'hui » attend le
+  lot A. Affichage seul ; parcours P32 étendu. R3 en ligne : #56, déployée
+  le 15 novembre 2026 à 2 h 47.
 
 ### Corrigé (audit ergonomique final, lot C, gestes sûrs)
 

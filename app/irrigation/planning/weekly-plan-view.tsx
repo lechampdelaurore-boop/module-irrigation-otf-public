@@ -60,6 +60,8 @@ type Props = {
   initialProtectedSlots: ProtectedSlot[];
   /** La dose au-delà de ce que le sol retient, par proposition, calculée au chargement de la page (5 ter, PR 3d). */
   soilNotes?: Record<string, ProposalSoilNote[]>;
+  /** L'écran de répartition de « Ressources », ou rien sans la faisabilité (audit final, lot B, R4, F247). */
+  repartitionHref?: string | null;
   /** « Ajouter un créneau à la main » : le formulaire « Planifier » est sur la page des arrosages depuis la 3.8. */
   onAddManualSlot: () => void;
 };
@@ -76,7 +78,7 @@ const REFRESH_SIGNALS = ['irrigation-events-changed', 'irrigation-needs-source-c
  * appelle les actions du moteur ; les regroupements et les comptes viennent
  * de `lib/domain/planning/presentation.ts`.
  */
-export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSettings, initialProtectedSlots, soilNotes = {}, onAddManualSlot }: Props) {
+export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSettings, initialProtectedSlots, soilNotes = {}, repartitionHref = null, onAddManualSlot }: Props) {
   const [plan, setPlan] = useState(initialPlan);
   const [now, setNow] = useState(() => new Date(initialNowIso));
   const [notice, setNotice] = useState<string | null>(null);
@@ -227,7 +229,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
               {pendingEventNotice(plan.pendingEvent, formatDateTime(plan.pendingEvent.occurredAt))}
             </p>
           ) : null}
-          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplaced.length} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} /> : null}
+          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplaced.length} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} /> : null}
           {plan.calculation.summary.changes ? <ChangesFold changes={plan.calculation.summary.changes} /> : null}
           {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} /> : null}
           <SuggestionList suggestions={plan.suggestions} pending={pending} feedback={suggestionFeedback} onApply={applySuggestion} onKeep={keepSuggestion} />
@@ -382,7 +384,7 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
   );
 }
 
-function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, unplacedDetail }: {
+function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, unplacedDetail, repartitionHref }: {
   summary: PlanSummary;
   plan: StoredWeeklyPlan;
   /** « À valider », « Faites », « En retard » : les cartes de tête (audit ergonomique, lot 3, point 5, cas 1). */
@@ -390,6 +392,7 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   actionLine: string[];
   unplacedCount: number;
   unplacedDetail: string;
+  repartitionHref: string | null;
 }) {
   const { deficit } = plan.calculation.summary;
   // Une chaîne servie à l'eau inconnue : son manque ne peut pas être chiffré, et le résumé le dit (point ouvert 51, D-089) ;
@@ -405,7 +408,13 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   return (
     <>
       {/* Une phrase d'action en tête quand l'eau manque (audit final, lot B, R3, F243). */}
-      {action ? <p className="planning-shortage-action" role="note">{action.sentence}</p> : null}
+      {action ? (
+        <p className="planning-shortage-action" role="note">
+          <span>{action.sentence}</span>
+          {/* « Répartir l'eau » mène à l'écran de répartition (audit final, lot B, R4, F247). */}
+          {repartitionHref ? <a href={repartitionHref}>{action.arbitrated ? 'Revoir la répartition' : 'Répartir l’eau'}</a> : null}
+        </p>
+      ) : null}
       <button type="button" className="planning-summary-line" data-tour="planning-semaine" aria-expanded={open} aria-controls={tilesId} onClick={() => setOpen((value) => !value)}>
         <span>{planSummaryLine(summary, actionLine, deficit, unplacedCount, formatVolume, unknownWater)}</span>
         <small>{open ? 'Replier' : 'Détail'}</small>

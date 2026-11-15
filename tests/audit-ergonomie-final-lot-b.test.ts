@@ -5,7 +5,7 @@ import { feasibilityHeadTiles, isPriorityLevelShown } from '../lib/domain/feasib
 import type { IrrigationFeasibility, PriorityFeasibility } from '../lib/domain/irrigation-feasibility.ts';
 import type { StoredWeeklyPlan, WeeklyPlan } from '../lib/domain/planning/contract.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
-import { keepsDeficit, shortageAction } from '../lib/domain/planning/shortage-reading.ts';
+import { keepsDeficit, shortageAction, shortageDecisionPending } from '../lib/domain/planning/shortage-reading.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
 
 /**
@@ -126,4 +126,30 @@ test('R3, F246 : un niveau sans planche, ou dont toutes les planches n’ont auc
   assert.equal(isPriorityLevelShown(level('low', 'automatic', [row('no_need'), row('no_need')])), false);
   assert.equal(isPriorityLevelShown(level('low', 'automatic', [row('no_need'), row('unknown')])), true, 'une donnée inconnue ne se tait pas (D-003)');
   assert.equal(isPriorityLevelShown(level('normal', 'required', [row('arbitration_required')])), true);
+});
+
+// R4 — « Répartir l'eau », la faisabilité en tête de « Ressources » (F247, F248).
+
+test('R4, F248 : une répartition attend quand le plan de la semaine manque d’eau sans répartition validée', () => {
+  const plan = stored(shortagePlan());
+  const { summary } = plan.calculation;
+  const variant = (changes: Partial<typeof summary>) => ({ ...plan, calculation: { ...plan.calculation, summary: { ...summary, ...changes } } });
+  assert.equal(shortageDecisionPending(null), false, 'aucun plan : l’ordre d’avant');
+  assert.equal(shortageDecisionPending(plan), true);
+  assert.equal(shortageDecisionPending(variant({ arbitration: { allocatedCubicMeters: 2, reservedCubicMeters: 2, unreceivedCubicMeters: 0, unreceivedBedCount: 0 } })), false, 'une répartition validée s’applique');
+  assert.equal(shortageDecisionPending(variant({ deficit: { ...summary.deficit, waterCubicMeters: 0 } })), false, 'rien ne manque');
+  const unknown = summary.budgets.map((budget) => ({ ...budget, availableCubicMeters: null }));
+  assert.equal(shortageDecisionPending(variant({ budgets: unknown, deficit: { ...summary.deficit, waterCubicMeters: 0 } })), false, 'une eau inconnue n’est pas un manque');
+});
+
+test('R4, F247 et F248 : le lien mène à l’ancre de la faisabilité, qui passe en tête de « Ressources » quand une répartition attend', () => {
+  const route = readFileSync('app/irrigation/planning/page.tsx', 'utf8');
+  assert.match(route, /isPartActive\(context\.enabled, 'feasibility'\) \? pageHref\('ressources', \{ season: context\.season \}, 'repartition'\) : null/);
+  const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
+  assert.match(view, /action\.arbitrated \? 'Revoir la répartition' : 'Répartir l’eau'/);
+  assert.match(readFileSync('app/irrigation/irrigation-feasibility-dashboard.tsx', 'utf8'), /<section ref=\{root\} id="repartition"/);
+  const ressources = readFileSync('app/irrigation/ressources/page.tsx', 'utf8');
+  const order = ['{first ? feasibility : null}', '<WaterResourceManager', '<PumpManager', '{first ? null : feasibility}'].map((marker) => ressources.indexOf(marker));
+  assert.ok(order.every((index, position) => index >= 0 && (position === 0 || index > order[position - 1])), 'la faisabilité avant les ressources quand elle passe en tête, après sinon');
+  assert.match(readFileSync('app/irrigation/page-loaders.ts', 'utf8'), /decisionPending: shortageDecisionPending\(weeklyPlan\)/);
 });

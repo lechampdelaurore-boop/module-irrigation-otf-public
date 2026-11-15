@@ -4336,3 +4336,32 @@ Parcours P32 et P7 étendus.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-003, D-038, D-052, D-083, D-117.
+
+## D-123 — Audit ergonomique final, lot B : le chemin vers la répartition (R4)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-122 (contrat du lot B et R3).
+
+**Établi dans le code.** Le planning ne renvoyait nulle part vers l'écran
+de répartition ; sur « Ressources », la faisabilité était la dernière
+section (`app/irrigation/ressources/page.tsx`), après les ressources, les
+liaisons et les pompes : 11 000 px au téléphone.
+
+**Décision.** La phrase d'action du planning (D-122) se termine par un lien
+de 44 px de haut, « Répartir l'eau », ou « Revoir la répartition » sous une
+répartition validée, vers `/irrigation/ressources?season=…#repartition`,
+seulement quand la partie « faisabilité » est cochée (P1) (F247). Sur
+« Ressources », la faisabilité passe en tête de page tant qu'une décision
+attend : le dernier plan de la semaine manque d'eau (la même règle que la
+phrase) et aucune répartition validée ne s'y applique ; sinon l'ordre
+d'avant. Le plan enregistré en décide, lu sans calcul
+(`shortageDecisionPending`) ; la faisabilité ne se calcule toujours qu'à
+l'approche de sa section (F248). Le bouton « Répartir l'eau » sur
+« Aujourd'hui » n'est pas fait : il change le contrat de la page validé le
+8 novembre 2026 et va avec le lot A, qui attend le porteur. Parcours P32
+étendu.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-052, D-083, D-117, D-122.

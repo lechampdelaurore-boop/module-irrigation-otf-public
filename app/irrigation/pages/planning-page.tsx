@@ -20,6 +20,7 @@ export function PlanningPage({
   planningSettings,
   protectedSlots,
   soilNotes,
+  repartitionHref,
 }: {
   season: number;
   initialNowIso: string;
@@ -27,6 +28,8 @@ export function PlanningPage({
   planningSettings: PlanningSettings;
   protectedSlots: ProtectedSlot[];
   soilNotes: Record<string, ProposalSoilNote[]>;
+  /** L'écran de répartition de « Ressources », ou rien quand la ferme n'a pas coché la faisabilité (lot B, R4). */
+  repartitionHref: string | null;
 }) {
   useUrlIntent('recalculer', () => window.dispatchEvent(new CustomEvent('planning-recalculate-requested')));
   return (
@@ -37,6 +40,7 @@ export function PlanningPage({
       initialSettings={planningSettings}
       initialProtectedSlots={protectedSlots}
       soilNotes={soilNotes}
+      repartitionHref={repartitionHref}
       onAddManualSlot={() => window.location.assign(hrefWithIntent(pagePath('arrosages'), season, 'planifier', '1'))}
     />
   );

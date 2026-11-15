@@ -313,7 +313,16 @@ registres, elle y renvoie.
   quatre tuiles au plus (aucune de plus que celles de l'écran de
   répartition quand un niveau attend un choix), les huit d'avant dans le
   même repli, aucun bloc de priorité sans besoin (F243 à F246 ; P32 et P7
-  étendus ; aucune migration). Ensuite R4.
+  étendus ; aucune migration), **en ligne** (#56, fusionnée à 2 h 32,
+  déployée à 2 h 47). **PR 2 sur 7, R4** : la phrase d'action du planning
+  se termine par un lien de 44 px, « Répartir l'eau » (« Revoir la
+  répartition » sous une répartition validée), vers la faisabilité de
+  « Ressources » (`#repartition`), seulement quand la partie
+  « faisabilité » est cochée ; sur « Ressources », la faisabilité passe en
+  tête de page tant que le dernier plan de la semaine manque d'eau sans
+  répartition validée, lu sur le plan enregistré, sans calcul (F247,
+  F248 ; P32 étendu ; aucune migration). Le bouton sur « Aujourd'hui »
+  reste au lot A. Ensuite R5.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
@@ -409,6 +418,10 @@ registres, elle y renvoie.
   bon ») ; ensuite les corrections de la 3.9. Le mode sombre et un lecteur
   d'écran ne sont pas vérifiés (F50).
 - Fusionné et déployé sur `main` du dépôt public au 15 novembre 2026 : la
+  PR #56 (`2c42008`, lot B de l'audit final, R3, la pénurie dite en une
+  phrase, et le contrat court du lot, D-122, fusionnée à 2 h 32 et déployée
+  à 2 h 47, run 43663534667, les cinq jobs réussis, aucune migration).
+  Avant elle : la
   PR #55 (`e71f6a0`, lot C de l'audit final, J10, le « i » qui garde son
   dessin, D-121, fusionnée à 1 h 25 et déployée à 1 h 41, run 43658103145,
   les cinq jobs réussis, aucune migration). Avant elle : la
