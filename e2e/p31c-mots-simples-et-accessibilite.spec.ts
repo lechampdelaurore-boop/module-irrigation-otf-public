@@ -19,6 +19,9 @@ import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage,
  *   fait 44 px de large au moins, sans chevaucher sa voisine ; un jardin de
  *   33 cases, posé pour l'essai à côté du vrai, passe à la ligne (lot D, M1,
  *   F313, F314) ;
+ * - « Ressources », sur une ferme neuve sans objectif adopté : « Part
+ *   servie », « Couverture confirmée » et chaque tuile « Non calculable » de
+ *   la faisabilité disent pourquoi (lot D, N1, F315, F316) ;
  * - toutes les pages : « Aller au contenu » est le premier arrêt du clavier
  *   et mène au contenu ; au téléphone, aucune cible visible sous 44 px de
  *   haut, plis fermés puis tous ouverts ; aux deux largeurs, aucun texte
@@ -144,6 +147,28 @@ test('« Matériel » à 390 et 360 px : chaque case de planche fait 44 px de la
     await page.locator('.bed-strip[data-essai="m1"]').evaluate((element) => element.remove());
   }
   await verifierLEtape(page, journal, 'cases de planche de 44 px');
+});
+
+test('« Ressources » : chaque « Non calculable » de la faisabilité dit pourquoi, « Part servie » et « Couverture confirmée » comprises', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  // Une ferme neuve, propre au parcours : aucun objectif n'y est adopté, le besoin de la semaine n'est pas chiffré (lot D, N1, cas 10).
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot-d-n1');
+  await attendreLaPageIrrigation(page, 'ressources');
+  const section = page.locator('section.feasibility-section');
+  await section.scrollIntoViewIfNeeded();
+  await expect(section.locator('.feasibility-meta')).toBeVisible({ timeout: 30_000 });
+  const partServie = section.locator('.feasibility-summary.is-head > div').filter({ hasText: 'Part servie' });
+  await expect(partServie.locator('strong')).toHaveText('Non calculable');
+  await expect(partServie.locator('small')).toHaveText(/^besoin non chiffré pour \d+ planches? sans objectif adopté/);
+  // Le détail du calcul : « Couverture confirmée » et chaque tuile sans chiffre portent leur raison (F315, F316).
+  await ouvrirParClic(section.locator('details.feasibility-calculation > summary'), section.locator('details.feasibility-calculation .feasibility-summary'));
+  await expect(section.locator('details.feasibility-calculation')).toContainText('Couverture confirmée : Non calculable (besoin non chiffré pour');
+  const nues = await section.locator('.feasibility-summary > div').evaluateAll((tuiles) => tuiles
+    .filter((tuile) => tuile.querySelector('strong')?.textContent === 'Non calculable')
+    .filter((tuile) => !/non chiffré|non renseigné|inconnue|aucune ressource|une donnée manque/.test(tuile.querySelector('small')?.textContent ?? ''))
+    .map((tuile) => tuile.querySelector('span')?.textContent ?? ''));
+  expect(nues, 'les tuiles « Non calculable » sans raison').toEqual([]);
+  await verifierLEtape(page, journal, 'les « Non calculable » disent pourquoi');
 });
 
 test('« Aller au contenu », cibles de 44 px au téléphone et contraste de 4,5:1 sur toutes les pages', async ({ page }, testInfo) => {

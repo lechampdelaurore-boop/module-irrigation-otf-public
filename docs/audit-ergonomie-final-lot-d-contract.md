@@ -270,6 +270,17 @@ depuis #72. **Le porteur a accepté de les ajouter à ce lot** (15 novembre 2026
 3. Même mot et même forme sur tous les « Non calculable » de la page, y
    compris « Part servie » et « Couverture confirmée » (F316).
 
+**Ce que le code a établi (PR 7, D-152).** Le calcul expose déjà ses
+raisons : le statut « unknown » et l'objectif de chaque planche (F282),
+la surface mouillée, et le volume ou la prévision `null` de chaque
+ressource. `lib/domain/feasibility-unknown.ts` les met en mots, sans rien
+recalculer. Deux formes seulement : la ligne « Non calculable : raison. »,
+celle d'« Objectifs et besoins », sous une planche ; entre parenthèses dans
+une phrase (« Couverture confirmée : Non calculable (…) »). Une tuile garde
+sa valeur « Non calculable » et met la raison dans sa ligne du dessous,
+comme « Besoin de la semaine ». La phrase « le besoin de la semaine n'est pas
+chiffré en entier » de « Part servie » laisse place à la raison chiffrée.
+
 ## 6. J4 — « Réserve du sol » : la cause, et le bon premier geste (question agronomique, tranchée par le porteur)
 
 **Ce que le code dit déjà** (lu, pas supposé) :
