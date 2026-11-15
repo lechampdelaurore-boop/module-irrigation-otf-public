@@ -1,0 +1,289 @@
+# Contrat court — audit ergonomique final, lot D : pages allégées (24 terdecies)
+
+Écrit le 15 novembre 2026 en Sonnet 5.5 · Moyen, sans code, sans PR,
+d'après `docs/ROADMAP.md` (ligne 24 terdecies) et le rapport
+`audit-ergonomie-final-2026-11-14.md` (points **J2, J3, J4, J5, J6**, D-117).
+Les causes ont été **lues dans le dépôt** (`main` à #67) ; ce qui reste à
+confirmer est dit « à confirmer ».
+
+**Choix n° 3 : oui (D-137). J4 : « renseigner la RFU d'abord » retenu
+(recommandation, question 1 sur 3 des contrats posée au porteur le
+15 novembre 2026).** Rappel de ce qui était en attente :
+
+- **J2** (un pli « Réglages de cette page ») change l'organisation de pages
+  déjà validées : **choix n° 3** du rapport, qui lui revient.
+- **J4** (« Réserve du sol ») touche la réserve du sol (D-041, D-047, D-053).
+  La ligne 24 terdecies veut que le coordinateur soit prévenu **avant tout
+  contrat** : c'est fait par ce brouillon, qui range J4 à part (section 6) et
+  pose une **question agronomique réservée au porteur**, sans la trancher (tranchée depuis, section 6).
+- **J3, J5, J6** n'ont besoin de personne : ils suivent l'option recommandée.
+
+**Accord du porteur (15 novembre 2026, 14 h 51, heure de Paris)** : « Je
+suis d'accord avec toutes tes propositions. Toutes les recommandations. »
+(D-137), en réponse aux questions des contrats, dont celle de J4. Toutes les
+recommandations de ce contrat sont retenues, y compris « RFU d'abord » pour
+J4, et le code a son « vas-y ». Ajouts du jour acceptés par lui : M1
+(15 h 50, « 1 oui ») et N1 (17 h 35, « oui »). Versé au dépôt par la PR 1
+du lot, en Opus 5.5 · Élevé (la ligne 24 terdecies), les numéros recalés sur
+le dépôt.
+
+Affichage seul : aucun calcul de besoin, d'ETM, de Kc, de réserve ni de
+planning ne change ; aucune donnée, aucune migration. Logiciel multi-fermes :
+les règles visent une page, jamais une ferme.
+
+Registres (recalés sur le dépôt : le lot F en occupe jusqu'à D-145 et F296) :
+décisions **D-146 à D-152** (une par PR), précisions **F297 à F316** ;
+parcours P10, P18, P19, P20, P31 et P32 étendus selon la page.
+
+## 1. Livraison en sept PR, une à la fois, dans cet ordre
+
+| PR | Point | Fichiers principaux | Attend |
+| --- | --- | --- | --- |
+| 1 · Mots simples au planning | J6 | `app/irrigation/planning/planning-settings-form.tsx`, `lib/domain/planning/setting-codes.ts` | personne |
+| 2 · Objectifs et besoins plus courts | J3 | `app/irrigation/irrigation-needs-dashboard.tsx` | personne |
+| 3 · Vos cultures d'abord | J5 | `app/irrigation/cultures/page.tsx`, `crop-water/crop-coefficients-panel.tsx`, `reference-crop-card.tsx` | personne |
+| 4 · Un pli « Réglages de cette page » | J2 | `weekly-plan-view.tsx`, `irrigation-needs-dashboard.tsx`, `water-resource-manager.tsx`, `crop-water/bed-crop-water-panel.tsx` | choix n° 3 (oui) |
+| 5 · Réserve du sol | J4 | `soil-reserve/soil-gauge.tsx`, `lib/domain/soil-reserve/gauge-view.ts`, `lib/domain/today/reliability.ts` | question agronomique (RFU d'abord) |
+| 6 · Cases de planche de « Matériel » | M1 (ajout du 15/11) | `app/irrigation/equipment-placement*.tsx`, `equipment-pose.tsx`, feuille de « Matériel » | accepté le 15/11 |
+| 7 · « Non calculable » dit pourquoi, sur « Ressources » | N1 (ajout du 15/11) | `app/irrigation/irrigation-feasibility-dashboard.tsx` (`volume`, `mm`, `percent`), `lib/domain/irrigation-feasibility.ts` | accepté le 15/11 |
+
+Chaque PR :
+`lint`, `typecheck`, `test`, `build`, `knip`, `push:check`, `weather:check`
+et `e2e` collés ; registres dans la même PR ; la première verse ce contrat.
+
+## 2. Ce qui ne change pas
+
+Tous les calculs et leurs nombres ; les gestes et ce qu'ils font ; les
+fenêtres de confirmation ; la page « Aujourd'hui » (lot A) ; les arrondis, mots
+et volumes du lot E (m³ à deux décimales, litres sous 1 m³, mm à une décimale) ;
+la démonstration (lot F). Ce qui est déplacé dans un pli n'est ni retiré ni
+désactivé : un lecteur d'écran et la recherche du navigateur le retrouvent
+(un `details` ouvert par l'ancre ou le clavier).
+
+## 3. J6 — Les codes R2 à R14 quittent les libellés visibles
+
+**Cause établie dans le code.** `planning-settings-form.tsx` (lignes 86 à 141)
+écrit « R2 · … » à « R14 · … » dans chaque libellé. Le pli `<details
+className="planning-settings">` existe déjà : seul le mot change.
+
+1. **Le code n'est plus dans le libellé visible** ; il reste dans une bulle
+   d'aide pour les experts, sous la forme « Réglage R13 » (F297).
+2. Les `aria-label` gardent leur code **dans le nom de l'élément**, car des
+   parcours en dépendent (« R4 dose minimale … »). À confirmer : si l'on veut
+   les retirer du nom accessible, les parcours qui les nomment (P10, P31) sont
+   relus dans la même PR.
+3. Les libellés restent ceux du rapport : une phrase simple (« Part de la
+   pluie prévue déduite du besoin (%) ») ; la ligne grise de résumé du planning
+   (« pluie prévue déduite à 100 %, attendue au-dessus de 5 mm … ») reste, le
+   rapport la juge dense mais utile.
+
+## 3 bis. Ce que le code a établi pour J6 (PR 1, D-146)
+
+- Le formulaire n'avait pas de bulle d'aide, et un bouton placé dans un
+  `label` deviendrait le champ que ce libellé désigne. La bulle se pose donc
+  dans la **légende de chaque groupe** (« Pluie prévue », « Aspersion »,
+  « Goutte-à-goutte », « Pénurie… », « Portée du matériel », « Suivi des
+  arrosages ») : c'est la bulle « d'où vient ce chiffre » du module, nommée
+  ici « Numéros des réglages », qui dit « Pour les experts : Réglage R2,
+  part de la pluie prévue déduite du besoin ; Réglage R3, … » (F297). Les
+  numéros vivent dans `lib/domain/planning/setting-codes.ts`.
+- Les noms des champs par nature de matériel gardent leur numéro
+  (« R8 début de plage Goutte-à-goutte ») : des parcours les nomment, et un
+  lecteur d'écran l'annonce sans l'afficher (point 2).
+- Un réglage refusé se nomme en mots simples, comme son libellé
+  (« Tolérance du retard : … » au lieu de « R14, tolérance du retard : … »)
+  (F298).
+
+## 4. J3 — « Objectifs et besoins » : sept cartes de jour presque vides
+
+**Cause établie dans le rapport (mesure) ; à confirmer en lisant le
+composant.** Sept cartes de sept lignes (irrigation réalisée, planifiée,
+pluie, prévision, températures, ET0, limite), environ 2 000 px au téléphone,
+surtout des « 0,00 m³ » et des « — ».
+
+1. **Une ligne par jour**, sous la forme d'un tableau compact (une cellule par
+   grandeur) à l'ordinateur ; **au téléphone, les jours repliés** comme au
+   planning (un jour = une ligne, le détail dessous), le jour courant ouvert
+   (F299).
+2. La tuile **« ETO »** (écrite avec un O) devient **« Évaporation du jour
+   (ET0) »** ; « Non disponible · partielle » cesse de s'afficher en très gros
+   sur trois lignes (taille du texte courant, une seule ligne) (F300).
+3. Les lignes dont toutes les grandeurs sont vides ne sont pas masquées (règle
+   D-003 : une donnée inconnue ne devient pas « rien ») ; elles se rangent en
+   une phrase « 3 jours sans irrigation ni pluie mesurée » (F301).
+
+## 5. J5 et J2
+
+**J5 — « Besoin par culture » liste 40 cultures.** Cause : chaque culture de
+référence est une carte complète (« Kc de 0,50 à 0,90 · racines jusqu'à
+0,60 m · … »), cultivée ou non (1 078 éléments cliquables, 143 cibles de moins
+de 44 px au téléphone, 124 803 px tout déplié, selon le rapport).
+
+1. **« Vos cultures cette saison (8) »** en tête, ouvertes comme aujourd'hui ;
+   **« Les autres cultures de référence (32) »** dans un pli fermé (F302).
+2. **Kc et profondeur de racines** passent dans « Pour les experts » (le pli
+   `experts-fold.tsx` existe déjà ; le point 8 du premier audit n'était fait
+   qu'à moitié). La formule « ETM × √(1 − taux) » quitte les options visibles
+   (reste dans l'aide) (F303).
+3. Les cibles de moins de 44 px de cette page sont corrigées ici (elles
+   relèvent du point A2 du lot E, qui ne les traite pas toutes : à confirmer
+   au contrat de A2 pour éviter un doublon) (F304).
+
+**J2 — un pli « Réglages de cette page », fermé, en bas** (choix n° 3 :
+oui). Pages concernées, d'après le rapport et la lecture du code :
+
+| Page | Ce qui part dans le pli | Reste dans la page |
+| --- | --- | --- |
+| Arrosages | limite journalière et ses dates | la liste, le formulaire |
+| Objectifs et besoins | seuil minimal de planification | les objectifs, les besoins |
+| Ressources et pompes | liaisons, alimentation par défaut, pompes, pompe habituelle de chaque matériel | l'écran de répartition (en tête depuis le lot B), la projection |
+| Matériel | le bloc « Besoin de la culture » (ETM, ET0, Kc, « Adopter la proposition ») | l'inventaire, le placement |
+
+1. Le pli s'appelle **« Réglages de cette page »**, fermé, en bas, **sauf** si
+   l'on arrive par une ancre ou un lien qui le désigne, ou si un réglage est
+   incomplet et bloque le calcul (alors il s'ouvre et le dit) (F305).
+2. Le bloc « Besoin de la culture » de « Matériel » **renvoie à « Objectifs et
+   besoins »** au lieu de répéter ETM, ET0 et Kc (le rapport, J2) ; l'objectif
+   adopté reste modifiable là où il l'est aujourd'hui (F306).
+3. **Rien ne disparaît** : chaque réglage reste à une adresse et une ancre
+   stables (les liens des lots A et B ne se brisent pas) (F307).
+
+## 5 bis. M1 — Les cases de planche de « Matériel » assez grandes à toucher (ajout du 15 novembre 2026)
+
+**Origine.** Constat de la recette du lot E (`recettes/constats-lot-e.md`) :
+sur « Matériel » à 390 px, les cases de planche (« B1-0 »…) font **23 px de
+large**, hors de la cible habituelle. Le contrat A2 du lot E ne les couvre
+pas. **Le porteur a accepté de les ajouter à ce lot** (15 novembre 2026, 15 h 50,
+« 1 oui »).
+
+1. **La cible habituelle du module** : toute zone à toucher fait **44 px au
+   moins, en hauteur et en largeur**, au téléphone (la même règle que A2 et que
+   les boutons du module). Les cases de planche de « Matériel » la respectent
+   à 390 et 360 px (F313).
+2. **Sans changer la disposition** : le dessin de la case peut rester petit si
+   sa **zone tactile** grandit (marge intérieure ou zone invisible), en
+   gardant un écart entre deux cases pour ne pas en toucher deux ; si 44 px
+   ne tiennent pas sur une ligne, les cases passent à la ligne (F314).
+3. Le **nom accessible** (« B1-0 ») et ce que fait la case ne changent pas.
+4. À confirmer en lisant le composant : si les cases sont des `<input
+   type="checkbox">`, la zone se fait par le `<label>`.
+
+## 5 ter. N1 — « Part servie » et « Couverture confirmée » disent pourquoi (ajout du 15 novembre 2026)
+
+**Origine.** Recette du lot A (`recettes/constats-lot-a.md`, ligne R2) :
+sur « Ressources », « Part servie » et « Couverture confirmée » restent des
+« Non calculable » nus, alors que « Besoin de la semaine » dit sa raison
+depuis #72. **Le porteur a accepté de les ajouter à ce lot** (15 novembre 2026,
+17 h 35, « oui »).
+
+**Cause lue dans le code.** `irrigation-feasibility-dashboard.tsx` écrit
+`value === null ? 'Non calculable'` dans ses trois aides (`volume`, `mm`,
+`percent`, lignes 18 à 20) : le texte ne porte jamais la raison.
+
+1. Chaque « Non calculable » de la faisabilité est suivi **d'une ligne de
+   raison**, la même façon que « Besoin de la semaine » (#72) : « aucun
+   objectif adopté », « pluie réelle manquante », « réserve non renseignée »,
+   etc., **seulement si le domaine connaît déjà la raison** ; sinon la
+   raison générale « une donnée manque : voir Fiabilité du calcul » (F315).
+2. **Aucun calcul ne change** ; la raison est celle que le domaine expose déjà
+   (à confirmer dans `lib/domain/irrigation-feasibility.ts` ; s'il faut
+   l'exposer, on la lit, on n'en crée pas de règle).
+3. Même mot et même forme sur tous les « Non calculable » de la page, y
+   compris « Part servie » et « Couverture confirmée » (F316).
+
+## 6. J4 — « Réserve du sol » : la cause, et le bon premier geste (question agronomique, tranchée par le porteur)
+
+**Ce que le code dit déjà** (lu, pas supposé) :
+
+- `lib/domain/soil-reserve/gauge-view.ts`, ligne 175 : la raison « no-soil »
+  s'écrit **« Inconnue : aucune RFU saisie pour sa parcelle. »** Elle est
+  distincte de « not-started » (« pas encore de départ. Réglez le curseur sur
+  ce que vous observez… »).
+- `lib/domain/today/reliability.ts`, ligne 150 : la fiabilité propose
+  **« Observer le sol de … »** pour un jardin jamais observé, **sans regarder
+  si la parcelle a une RFU**.
+- `soil-gauge.tsx` : le bouton « Observer » apparaît sur toute ligne
+  « inconnue ».
+
+**Ce que cela laisse penser** (à confirmer par un test sur le domaine) :
+quand la raison est « no-soil », la capacité du plein ne se calcule pas
+(la RFU est une donnée de la parcelle, D-041/D-046), donc **une observation ne
+peut pas remplir une jauge sans RFU** ; le geste juste est « Renseigner la
+réserve de la parcelle ». Sur la démo (0 parcelle sur 3 renseignée, rapport),
+les trois boutons « Observer » ne mènent à rien de visible.
+
+**Question réservée au porteur** (agronomie, donc pas l'option recommandée
+par défaut) : *« Quand la réserve utile (RFU) d'une parcelle n'est pas
+renseignée, une observation du sol suffit-elle à faire vivre la jauge, ou
+faut-il d'abord renseigner la RFU ? »* Recommandation : **renseigner la RFU
+d'abord**, car la capacité d'une planche vaut la RFU par la profondeur
+racinaire (D-041, D-046, D-053) ; une observation sans capacité n'a pas de
+sens. **Réponse du porteur le 15 novembre 2026 : la recommandation, « RFU
+d'abord »** (accord de 14 h 51).
+
+Donc (F308 à F312, D-150) :
+
+1. Sur une ligne « inconnue » pour cause « no-soil », le bouton est
+   **« Renseigner la réserve de la parcelle »** (il ouvre « Réglages du sol ») ;
+   « Observer » n'y est plus proposé (F308).
+2. La fiabilité d'« Aujourd'hui » n'offre « Observer le sol de … » que pour un
+   jardin dont la parcelle a une RFU ; sinon : « Renseigner la réserve de la
+   parcelle … » (F309).
+3. **Les lignes identiques** (six cases « inconnue · prévu » par planche, 18 383
+   px tout déplié) se rangent en une phrase par jardin (« 12 planches :
+   inconnue, aucune RFU saisie »), deuxième moitié du point 13 du premier
+   audit, qui n'est pas faite (F310).
+4. Le formulaire d'observation n'est plus ouvert d'office **et** suivi de
+   « Observer » pour le même jardin : un seul des deux (F311).
+5. « RFU » s'écrit « réserve utile (RFU) » à sa première occurrence de la page
+   (F312).
+
+Le graphique des réserves (S2) n'est pas touché ; son essai avec de vraies
+valeurs et à 190 planches reste **non vérifié** (rapport, section 8).
+
+## 7. Cas chiffrés
+
+| Cas | Entrée | Attendu |
+| --- | --- | --- |
+| 1 | Planning, réglages R2 à R14 | aucun libellé visible ne commence par « Rn · » ; la bulle d'aide dit « Réglage Rn » |
+| 2 | Objectifs et besoins à 390 px | les jours repliés, la page sous 3 500 px (à mesurer, était 5 950) |
+| 3 | La tuile d'évaporation | « Évaporation du jour (ET0) », jamais « ETO » |
+| 4 | Besoin par culture, ferme à 8 cultures | « Vos cultures cette saison (8) » ouvert ; le pli « Les autres cultures de référence (32) » fermé |
+| 5 | Les quatre pages de J2 | un pli « Réglages de cette page », fermé ; ouvert par ancre ; un réglage incomplet l'ouvre |
+| 6 | Matériel, « Besoin de la culture » | renvoie à « Objectifs et besoins » ; plus d'ETM, ET0, Kc répétés |
+| 7 | Sol, parcelle sans RFU | « Renseigner la réserve de la parcelle », pas « Observer » |
+| 8 | Sol, 12 planches de même état | une phrase par jardin, les lignes dans un pli |
+| 10 | Ressources, « Part servie » sans besoin chiffré | « Non calculable » suivi de sa raison, comme « Besoin de la semaine » |
+| 9 | Matériel à 390 et 360 px | chaque case de planche : zone à toucher de 44 × 44 px au moins, deux cases ne se chevauchent pas |
+
+## 8. Précisions proposées (non agronomiques, option recommandée)
+
+| N° | Précision | Choix recommandé |
+| --- | --- | --- |
+| F297 | Codes R | retirés des libellés, gardés dans la bulle d'aide et le nom accessible |
+| F298 | Refus d'un réglage | nommé en mots simples, sans son numéro |
+| F299 | Jours d'« Objectifs et besoins » | une ligne par jour, repliés au téléphone |
+| F300 | Tuile ETO | « Évaporation du jour (ET0) » |
+| F301 | Jours sans donnée | rangés en une phrase, jamais masqués |
+| F302 | Cultures | « Vos cultures cette saison » d'abord, les autres repliées |
+| F303 | Kc, racines | « Pour les experts » |
+| F304 | Cibles de « Besoin par culture » | 44 px au moins |
+| F305 | Pli de réglages | fermé, en bas, ouvert par ancre ou réglage incomplet |
+| F306 | « Besoin de la culture » de « Matériel » | renvoie à « Objectifs et besoins » |
+| F307 | Ancres | inchangées, les liens des autres lots tiennent |
+| F308 à F312 | Réserve du sol sans RFU | « Renseigner la réserve de la parcelle » d'abord (agronomie, tranché par le porteur) |
+| F313 | Cases de planche de « Matériel » | zone à toucher de 44 px, dessin libre |
+| F314 | Disposition des cases | dessin libre, passage à la ligne s'il le faut |
+| F315 | « Non calculable » sur « Ressources » | toujours suivi de sa raison |
+| F316 | Forme de la raison | la même sur toute la page |
+
+**Questions au porteur** : le choix n° 3 du rapport (oui) et la question
+agronomique de J4 (« RFU d'abord ») sont tranchés par son accord du
+15 novembre 2026 (D-137).
+
+## 9. Ce que le lot ne prouve pas
+
+La jauge à 190 planches et avec de vraies valeurs ; un lecteur d'écran sur les
+plis ; la ferme réelle ; la cause exacte de « no-soil » sur la ferme du porteur
+(sa RFU de 62 mm/m est déjà saisie, rapport 5 ter : le cas se voit seulement sur
+une ferme neuve ou sur la démonstration).

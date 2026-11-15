@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit ergonomique final, lot D, les pages allégées)
+
+- **J6, les réglages du planning en mots simples** (D-146, F297, F298) :
+  « R2 · Part de la pluie prévue déduite du besoin (%) » devient « Part de
+  la pluie prévue déduite du besoin (%) », et ainsi de R2 à R14 ; les
+  numéros restent pour les experts dans la bulle « Numéros des réglages »
+  de chaque groupe ; un réglage refusé se nomme en mots simples. Contrat
+  du lot versé : `docs/audit-ergonomie-final-lot-d-contract.md`.
+
 ### Corrigé (audit ergonomique final, lot F, la démonstration)
 
 - **Le jeu de données complété** (D-145, F295, F296) : la ferme « matériel

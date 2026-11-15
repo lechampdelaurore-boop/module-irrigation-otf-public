@@ -121,6 +121,15 @@ export async function reglerLaPlageDuGoutteAGoutte(planning: Locator, plage: { d
   if (!(await reglages.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await reglages.locator('summary').click();
   }
+  // Les libellés en mots simples ; les numéros dans la bulle du groupe, pour les experts (audit final, lot D, J6, F297).
+  const libelles = await reglages.locator('.planning-settings-form label > span').allTextContents();
+  expect(libelles.length, 'les libellés des réglages').toBeGreaterThan(10);
+  expect(libelles.filter((libelle) => /^R\d+\b/.test(libelle)), 'aucun libellé ne commence par son numéro').toEqual([]);
+  const goutte = reglages.locator('fieldset', { has: planning.page().locator('legend', { hasText: 'Goutte-à-goutte' }) });
+  await goutte.getByRole('button', { name: 'Numéros des réglages' }).click();
+  await expect(goutte.getByRole('note')).toContainText('Réglage R8, plage horaire');
+  await goutte.getByRole('note').getByRole('button', { name: 'Fermer' }).click();
+  await expect(goutte.getByRole('note')).toHaveCount(0);
   await reglages.getByLabel('R8 début de plage Goutte-à-goutte').fill(plage.debut);
   await reglages.getByLabel('R8 fin de plage Goutte-à-goutte').fill(plage.fin);
   await reglages.getByRole('button', { name: 'Enregistrer les réglages' }).click();

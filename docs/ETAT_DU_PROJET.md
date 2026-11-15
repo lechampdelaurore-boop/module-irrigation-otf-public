@@ -510,8 +510,22 @@ registres, elle y renvoie.
   3 °C », que sa nuit de gel déclenche ; aucun objectif « ferme entière »
   n'est inventé, sur le choix du porteur le 15 novembre 2026 à 19 h 42
   (« Non, rien d'inventé ») : toute planche cultivée a déjà le sien, à
-  chaque moment (F295, F296 ; V10 ajouté). **Le lot est codé en entier** ;
-  reste sa recette.
+  chaque moment (F295, F296 ; V10 ajouté), **en ligne** (#78, fusionnée à
+  20 h 47, déployée à 21 h 05, run 43754416701, cinq jobs verts). **Le lot
+  est codé et en ligne en entier** ; reste sa recette.
+- Audit ergonomique final, **lot D · les pages allégées** (24 terdecies,
+  D-146) : **commencé le 15 novembre 2026 au soir**, en Opus 5.5 · Élevé,
+  sur l'accord du porteur (D-137 : toutes les recommandations, dont le
+  choix n° 3 et « RFU d'abord » pour la question agronomique de J4).
+  Contrat court `docs/audit-ergonomie-final-lot-d-contract.md` (précisions
+  F297 à F316), versé par la PR 1 ; sept PR, une à la fois : J6, J3, J5,
+  J2, J4, puis M1 et N1, ajoutés par le porteur le 15 novembre 2026.
+  Affichage seul, aucun calcul ne change. **PR 1 sur 7, J6** (D-146) : les
+  réglages du planning perdent leur numéro « R2 · » à « R14 · » dans leurs
+  libellés visibles ; les numéros restent pour les experts dans une bulle
+  « Numéros des réglages » posée dans la légende de chaque groupe, et dans
+  le nom des champs par nature de matériel ; un réglage refusé se nomme en
+  mots simples (F297, F298). Ensuite J3.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
