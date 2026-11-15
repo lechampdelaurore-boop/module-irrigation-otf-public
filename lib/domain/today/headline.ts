@@ -80,7 +80,7 @@ function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>
   if (todo > 0) {
     const planned = plural(todo, 'Une irrigation est prévue aujourd’hui', '{n} irrigations sont prévues aujourd’hui');
     sentences.push(`${planned}${proposed > 0 ? `, dont ${proposed} à valider` : ''}.`);
-    chips.push({ key: 'todo', tone: 'todo', icon: 'drop', text: `${todo} à faire aujourd’hui`, target: 'day' });
+    chips.push({ key: 'todo', tone: 'todo', icon: 'drop', text: `${todo} à faire`, target: 'day' });
   }
   // « Rien à arroser » ne se dit plus quand demain ou la semaine ont quelque chose à dire (F277).
   if (late === 0 && todo === 0 && !aheadSaid) chips.push({ key: 'nothing', tone: 'ok', icon: 'check', text: 'Rien à arroser', target: 'day' });

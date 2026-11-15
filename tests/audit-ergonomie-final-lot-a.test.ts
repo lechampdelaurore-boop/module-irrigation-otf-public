@@ -11,7 +11,7 @@ import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { shortageAction } from '../lib/domain/planning/shortage-reading.ts';
 import { todayTomorrow } from '../lib/domain/today/ahead.ts';
 import { celsiusText } from '../lib/domain/crop-alerts/text.ts';
-import { todayView, weatherBlock, type TodayBlock, type TodayInputs } from '../lib/domain/today/today-view.ts';
+import { dayRowLayout, todayView, weatherBlock, type TodayBlock, type TodayInputs } from '../lib/domain/today/today-view.ts';
 import { waterBlock } from '../lib/domain/today/water.ts';
 import { todayWeek, type TodayWeekBed } from '../lib/domain/today/week.ts';
 import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-resources.ts';
@@ -26,8 +26,9 @@ import { farm, settings } from './support/planning-fixtures.ts';
  * semaine, avec la phrase du planning (F274 à F279). PR 2, R2 : un objectif
  * posé sur une partie des planches se chiffre sur elles, et chaque page dit
  * pourquoi un total manque (F280 à F282). PR 3, J14 : un gel annoncé sans
- * alerte de gel posée se dit, avec le modèle à poser (F283, F284). Affichage
- * seul : rien n'est recalculé.
+ * alerte de gel posée se dit, avec le modèle à poser (F283, F284). PR 4,
+ * J13 : un en-tête moins répétitif (F285 à F287). Affichage seul : rien
+ * n'est recalculé.
  * Aujourd'hui = jeudi 12 novembre 2026, 6 h 00 à la ferme.
  */
 
@@ -356,4 +357,33 @@ test('F284 : le lien met le modèle de gel en vue sur « Alertes météo », rie
   assert.match(panel, /window\.location\.hash !== `#\$\{FROST_TEMPLATE_ANCHOR\}`/);
   assert.match(panel, /setDraft\(templateDraft\(FROST_TEMPLATE\)\)/);
   assert.match(panel, /id=\{draft\.criterionId \? undefined : FROST_TEMPLATE_ANCHOR\}/);
+});
+
+// J13, un en-tête moins répétitif (F285 à F287).
+
+test('F285 : un seul titre, celui de la page ; la date en sous-titre, sans « Tableau de bord »', () => {
+  const header = readFileSync('app/irrigation/today/today-header.tsx', 'utf8');
+  assert.match(header, /<p className="today-date">\{headline\.title\}<\/p>/);
+  assert.doesNotMatch(header, /<h2/);
+  assert.doesNotMatch(header, />Tableau de bord</);
+  assert.doesNotMatch(readFileSync('app/irrigation/styles/today.css', 'utf8'), /today-eyebrow/);
+});
+
+test('F286 : les pastilles mènent au bloc avec le seul chiffre, sans redire la phrase', () => {
+  const view = todayView(inputs({ ...withProposals([proposal('jour', '2026-11-12T17:00:00.000Z')]) }));
+  const todo = view.headline.chips.find((chip) => chip.key === 'todo');
+  assert.deepEqual(todo && [todo.text, todo.target], ['1 à faire', 'day']);
+  assert.match(view.headline.sentence, /prévue aujourd’hui/);
+});
+
+test('F287 : la pastille du menu dit ce qu’elle compte, « Plus » prend la marque de la page ouverte, la journée courte passe au-dessus du gel', () => {
+  const badge = readFileSync('app/irrigation/shell/today-badge.tsx', 'utf8');
+  assert.match(badge, /`\$\{label\}, \$\{count\} \$\{count === 1 \? 'chose' : 'choses'\} à regarder`/);
+  const navigation = readFileSync('app/irrigation/styles/navigation.css', 'utf8');
+  assert.doesNotMatch(navigation, /\.phone-bar-more\[data-marked="true"\]::after/);
+  assert.match(navigation, /\.phone-bar-more\[data-marked="true"\] \.icon \{\s+background: var\(--green\);/);
+  assert.equal(dayRowLayout(0, 0), 'stack');
+  assert.equal(dayRowLayout(1, 0), 'wide');
+  assert.equal(dayRowLayout(0, 2), 'wide');
+  assert.match(readFileSync('app/irrigation/today/today-page.tsx', 'utf8'), /layout=\{late && todo \? dayRowLayout\(late\.lines\.length, todo\.lines\.length\) : 'wide'\}/);
 });

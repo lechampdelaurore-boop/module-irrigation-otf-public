@@ -2,7 +2,7 @@
 
 import { useState, useTransition, type ReactNode } from 'react';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
-import type { TodayBlock, TodayView } from '@/lib/domain/today/today-view';
+import { dayRowLayout, type TodayBlock, type TodayView } from '@/lib/domain/today/today-view';
 import { recordDoneAsPlannedAction } from '../done-as-planned-actions';
 import { startIrrigationEventAction } from '../irrigation-event-actions';
 import { computeWeeklyPlanAction } from '../planning-actions';
@@ -121,7 +121,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       <Pair
         wide={late && todo ? <TodayDay today={view.today} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} query={dayQuery} pending={pending} onStart={start} onAllDone={recordAllDone} /> : null}
         narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
-        layout="wide"
+        layout={late && todo ? dayRowLayout(late.lines.length, todo.lines.length) : 'wide'}
       />
       <Pair
         wide={view.week ? <TodayWeekWater week={view.week} query={dayQuery} /> : null}
@@ -139,10 +139,11 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
 
 /**
  * Deux blocs côte à côte à l'ordinateur : deux tiers et un tiers (`wide`),
- * sept et cinq douzièmes (`split`), moitié-moitié (`half`). Un seul présent
+ * sept et cinq douzièmes (`split`), moitié-moitié (`half`), l'un sous l'autre
+ * (`stack`, une journée courte, J13). Un seul présent
  * prend toute la largeur ; aucun, rien.
  */
-function Pair({ wide, narrow, layout }: { wide: ReactNode; narrow: ReactNode; layout: 'wide' | 'split' | 'half' }) {
+function Pair({ wide, narrow, layout }: { wide: ReactNode; narrow: ReactNode; layout: 'wide' | 'split' | 'half' | 'stack' }) {
   if (!wide && !narrow) return null;
   return (
     <div className="today-row" data-layout={wide && narrow ? layout : 'single'}>

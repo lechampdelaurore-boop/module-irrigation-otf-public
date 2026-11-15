@@ -381,7 +381,7 @@ test('l’en-tête : la date en toutes lettres, la phrase et les pastilles d’u
   assert.equal(view.headline.sentence, '2 irrigations sont à rattraper. 2 irrigations sont prévues aujourd’hui, dont 1 à valider. Gel annoncé le sam. 14 nov. : -1 °C. Une donnée est à rafraîchir pour que le calcul soit fiable.');
   assert.deepEqual(view.headline.chips.map((chip) => [chip.tone, chip.text, chip.target]), [
     ['late', '2 à rattraper', 'day'],
-    ['todo', '2 à faire aujourd’hui', 'day'],
+    ['todo', '2 à faire', 'day'],
     ['alert', 'Gel le sam. 14 nov.', 'weather'],
     ['data', '1 donnée à rafraîchir', 'reliability'],
   ]);

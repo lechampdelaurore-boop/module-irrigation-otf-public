@@ -64,7 +64,7 @@ async function pastille(page: Page): Promise<number | null> {
     await page.keyboard.press('Escape');
     await expect(menu).toBeHidden();
   }
-  const nombre = nom?.match(/, (\d+) à regarder$/)?.[1];
+  const nombre = nom?.match(/, (\d+) choses? à regarder$/)?.[1];
   return nombre ? Number(nombre) : null;
 }
 
@@ -100,8 +100,16 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(blocs(page).locator('h2')).toHaveText(TITRES_DES_BLOCS);
   await expect(bloc(page, 'Votre journée')).toContainText('Aucune irrigation en retard.');
   await expect(bloc(page, 'Votre journée')).toContainText('Rien à faire aujourd’hui.');
-  // L'en-tête : la date en toutes lettres et la phrase du jour.
-  await expect(page.locator('.today-head h2')).toHaveText(/^[A-Z][a-zé]+ \d{1,2} [a-zéû]+$/);
+  // L'en-tête : un seul titre, celui de la page ; la date en toutes lettres en sous-titre, et la phrase du jour (lot A, J13, F285).
+  await expect(page.locator('.today-head .today-date')).toHaveText(/^[A-Z][a-zé]+ \d{1,2} [a-zéû]+$/);
+  await expect(page.locator('.today-head').getByRole('heading')).toHaveCount(0);
+  await expect(page.locator('.today-head')).not.toContainText('Tableau de bord');
+  // Rien à rattraper ni à faire : la journée est courte, « Gel ou chaleur » passe dessous, sans grand vide à côté (J13, F287).
+  const rangee = page.locator('.today-row').filter({ has: page.getByRole('heading', { level: 2, name: 'Votre journée' }) });
+  await expect(rangee).toHaveAttribute('data-layout', 'stack');
+  const basDeLaJournee = await bloc(page, 'Votre journée').evaluate((element) => element.getBoundingClientRect().bottom);
+  const hautDuGel = await bloc(page, 'Gel ou chaleur').evaluate((element) => element.getBoundingClientRect().top);
+  expect(hautDuGel, '« Gel ou chaleur » sous « Votre journée »').toBeGreaterThanOrEqual(basDeLaJournee);
   await expect(page.locator('.today-sentence')).not.toBeEmpty();
   await expect(bloc(page, 'Eau disponible')).toContainText('Aucune réserve ni ressource limitée suivie.');
   // La saison n'y est pas proposée (F2) ; le plan jamais calculé se dit en une ligne qui mène au planning.

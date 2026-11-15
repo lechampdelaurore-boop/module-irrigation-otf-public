@@ -255,6 +255,20 @@ Même consigne : l'option recommandée, aucune question agronomique (D-140).
 | F283 | Gel sans alerte | quand « Alertes météo » est coché, qu'une minimale prévue des trois jours est à 0 °C ou moins (le flocon de la carte), qu'aucune alerte active ne porte sur la minimale vers le bas et que le gel des cultures n'a rien annoncé : « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. », la plus froide des trois, en ambre sous les lignes du bloc, toujours visible ; la phrase calme se tait à côté ; la pastille de l'en-tête dit « Gel sans alerte posée » (au lieu de « Rien d'annoncé sur trois jours ») et la phrase de résumé la reprend. Une alerte de gel posée mais désactivée : « … et votre alerte de gel est désactivée. », lien « Voir les alertes météo ». Une minimale inconnue ne dit rien (D-003). Le seuil de gel de chaque culture reste dit par « Alertes cultures », comme avant |
 | F284 | Geste | le lien « Poser « Gel : moins de 3 °C » » ouvre « Alertes météo » à l'ancre `#modele-gel` : le formulaire « Nouvelle alerte météo » s'ouvre, rempli du modèle de gel, modifiable, et rien ne s'enregistre sans « Enregistrer l'alerte » (D-028) ; même quand la ferme a déjà d'autres alertes (les modèles de l'écran vide ne paraissent qu'à zéro alerte). Le ton du bloc, les seuils, les alertes et leurs envois ne changent pas |
 
+## 8 quinquies. Ce que la PR 4 (J13) a tranché en codant
+
+Même consigne : l'option recommandée, aucune question agronomique (D-141).
+
+| N° | Précision | Choix codé |
+| --- | --- | --- |
+| F285 | Un seul titre | « Aujourd'hui », titre de la page, reste seul ; « Tableau de bord » ne se redit plus dans l'en-tête (le menu le garde sous « Aujourd'hui ») ; la date en toutes lettres devient un sous-titre, plus un titre de niveau 2 |
+| F286 | Pastilles | elles menaient déjà chacune à son bloc ; celle du jour garde le seul chiffre, « 2 à faire » au lieu de « 2 à faire aujourd'hui », que la phrase dit déjà ; les autres étaient déjà courtes (« 2 à rattraper », « 3 à valider demain », « Gel le sam. 14 nov. ») |
+| F287 | Pastille du menu, « Plus », grille | la pastille du menu dit ce qu'elle compte dans son nom accessible, « Aujourd'hui, 2 choses à regarder » (« 1 chose »), et dans son infobulle. Le point vert de « Plus » ne comptait rien : il marquait la page ouverte rangée dans « Plus » ; il est retiré, et « Plus » prend la même marque que l'entrée de la page ouverte (icône sur fond vert, texte vert), son nom disant laquelle. À l'ordinateur, sans rien à rattraper ni à faire, « Gel ou chaleur » passe sous « Votre journée » au lieu de laisser un grand vide à côté |
+
+La ligne « De la minimale à la maximale… ; le trait marque 0 °C » reste :
+le contrat de la page la demande (lecteur d'écran, échelle des cartes), et
+l'audit la dit utile.
+
 ## 9. Ce que le lot ne prouve pas
 
 Un vrai téléphone en main à 6 h du matin ; la lecture par un lecteur d'écran ;

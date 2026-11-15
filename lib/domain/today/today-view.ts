@@ -217,6 +217,16 @@ type TodayReliabilityBlock = {
 };
 export type TodayBlock = TodayWeatherBlock | TodayLateBlock | TodayIrrigationBlock<'todo'> | TodayWaterBlock | TodayReliabilityBlock;
 
+/**
+ * « Votre journée » et « Gel ou chaleur » à l'ordinateur (audit final, lot A,
+ * J13, F287) : côte à côte quand la journée a des irrigations ; sans rien à
+ * rattraper ni à faire, la journée est courte, et « Gel ou chaleur » passe
+ * dessous, sans grand vide à côté de lui.
+ */
+export function dayRowLayout(lateCount: number, todoCount: number): 'wide' | 'stack' {
+  return lateCount + todoCount === 0 ? 'stack' : 'wide';
+}
+
 /** La ligne du dernier calcul du plan ; le lien mène au planning quand il n'y en a pas. */
 export type TodayPlanLine = { text: string; linkToPlanning: boolean };
 

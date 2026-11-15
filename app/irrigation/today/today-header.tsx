@@ -30,7 +30,8 @@ const CHIP_TARGETS: Record<Chip['target'], string> = {
 
 /**
  * L'en-tête du tableau de bord (docs/aujourdhui-tableau-de-bord-contract.md,
- * sections 3.2 et 3.5) : « Tableau de bord », la date en toutes lettres, la
+ * sections 3.2 et 3.5) : la date en toutes lettres sous le titre de la page
+ * (audit final, lot A, J13, F285), la
  * ligne du dernier calcul du plan, la phrase qui résume le jour et les
  * pastilles qui mènent chacune à son bloc. Elles ne disent que ce que disent
  * les blocs présents. Quand l'eau manque à la semaine, un encadré redit la
@@ -48,8 +49,8 @@ export function TodayHeader({ headline, plan, shortage, query, pending, onRecalc
   return (
     <header className="today-head">
       <div className="today-head-main">
-        <p className="today-eyebrow">Tableau de bord</p>
-        <h2 className="today-date">{headline.title}</h2>
+        {/* Un seul titre, celui de la page ; la date en sous-titre (audit final, lot A, J13, F285). */}
+        <p className="today-date">{headline.title}</p>
         {plan ? (
           <div className="today-plan-row">
             <Icon name={plan.linkToPlanning ? 'calendrier' : 'coche'} />

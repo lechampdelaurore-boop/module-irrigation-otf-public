@@ -333,21 +333,20 @@
     background: var(--green-soft);
   }
 
-  /* La page ouverte n'est pas dans la barre : la pastille verte la signale sur « Plus ». */
-  .phone-bar-more {
-    position: relative;
+  /*
+    La page ouverte n'est pas dans la barre : « Plus » prend la marque de la
+    page ouverte, comme les autres entrées, au lieu d'un point vert qui ne
+    disait pas ce qu'il comptait (audit final, lot A, J13, F287). Son nom dit
+    laquelle.
+  */
+  .phone-bar-more[data-marked="true"] {
+    color: var(--green);
+    font-weight: 700;
   }
 
-  .phone-bar-more[data-marked="true"]::after {
-    position: absolute;
-    top: 5px;
-    left: calc(50% + 12px);
-    width: 9px;
-    height: 9px;
-    border: 2px solid var(--card);
-    border-radius: 50%;
+  .phone-bar-more[data-marked="true"] .icon {
     background: var(--green);
-    content: "";
+    color: #fff;
   }
 
   .phone-bar a:focus-visible,

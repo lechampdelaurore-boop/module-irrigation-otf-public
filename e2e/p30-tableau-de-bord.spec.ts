@@ -113,7 +113,7 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   await verifierLEtape(page, journal, 'menu détaché et groupes');
 
   // L'en-tête : la date, les chiffres de la semaine, les pastilles.
-  await expect(page.locator('.today-head h2')).toBeVisible();
+  await expect(page.locator('.today-head .today-date')).toBeVisible();
   await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi')).toHaveCount(4);
   const pastilles = page.getByRole('navigation', { name: 'Résumé du jour' }).getByRole('link');
   await expect(pastilles.first()).toBeVisible();

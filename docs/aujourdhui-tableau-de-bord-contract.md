@@ -62,7 +62,8 @@ le lot 3 de l'audit et les correctifs de la 3.9.
 
 - « Aujourd'hui » est **détaché** : un encart blanc à part, en tête du menu
   latéral, avec une pastille ronde verte et l'icône du soleil, le mot
-  « Aujourd'hui » et, dessous, « Tableau de bord » ; la pastille du nombre à
+  « Aujourd'hui » et, dessous, « Tableau de bord » (dans le menu seulement :
+  la page ne le redit plus, J13) ; la pastille du nombre à
   regarder à droite. Un trait le sépare des autres pages.
 - Les autres pages se rangent en trois groupes titrés (T1) : **Arroser**
   (Arrosages, Planning de la semaine, Objectifs et besoins, Réserve du sol,
@@ -77,7 +78,7 @@ le lot 3 de l'audit et les correctifs de la 3.9.
 
 | Bloc | Cases requises | Contenu dessiné |
 | --- | --- | --- |
-| En-tête | toujours | « Tableau de bord », la date du jour en toutes lettres (« Jeudi 12 novembre »), la ligne du plan (« Plan calculé aujourd'hui à 6 h 02 · Recalculer »), une phrase de résumé (3.5) et des pastilles cliquables qui mènent au bloc : n à rattraper, n à faire aujourd'hui, le gel ou l'alerte annoncés, la prévision à vérifier, n données à rafraîchir ; rien de tout cela : des pastilles vertes (« Rien à arroser », « Rien d'annoncé sur trois jours », « Données à jour ») |
+| En-tête | toujours | sous le seul titre de la page, la date du jour en toutes lettres en sous-titre (« Jeudi 12 novembre » ; « Tableau de bord » n'y est plus redit, audit final, lot A, J13, D-141), la ligne du plan (« Plan calculé aujourd'hui à 6 h 02 · Recalculer »), une phrase de résumé (3.5) et des pastilles cliquables qui mènent au bloc : n à rattraper, n à faire (le chiffre seul, la phrase dit le reste, J13), le gel ou l'alerte annoncés, la prévision à vérifier, n données à rafraîchir ; rien de tout cela : des pastilles vertes (« Rien à arroser », « Rien d'annoncé sur trois jours », « Données à jour ») |
 | La semaine | Objectifs et besoins | quatre tuiles : objectif de la semaine (ferme entière, pondéré par la surface), eau reçue (irrigation réelle + pluie mesurée, avec le détail), reste à apporter (l'écart existant, jamais négatif), eau utilisée en m³ (et celle du jour) quand le tableau de l'eau existe, « au moins » quand une surface mouillée manque |
 | Votre journée | Planning ou Arrosages | les anciens blocs « En retard » et « À faire aujourd'hui » réunis : à l'ordinateur, une frise de 5 h à 22 h avec l'heure actuelle et une barre par irrigation du jour (couleur du statut, longueur = durée) ; puis « À rattraper (n) » et « À faire aujourd'hui (n) », en cartes par heure (heure en grand, matériel et réglage, planches, durée et millimètres en étiquettes, statut, boutons) |
 | Gel ou chaleur | Alertes cultures et/ou Alertes météo | les trois jours en cartes : icône, minimale et maximale sur une échelle commune avec le trait de 0 °C, pluie prévue ; le jour d'une alerte encadré en rouge avec ses cultures ou son alerte ; prévision absente : la carte du jour dit « inconnue » et le bloc « Prévision indisponible : à vérifier » en ambre ; une minimale prévue à 0 °C ou moins sans alerte de gel active ni gel des cultures annoncé, « Alertes météo » coché : « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. » en ambre, avec le lien « Poser « Gel : moins de 3 °C » » vers le modèle, et la pastille « Gel sans alerte posée » au lieu de « Rien d'annoncé sur trois jours » (audit final, lot A, J14, D-140) |
@@ -87,7 +88,9 @@ le lot 3 de l'audit et les correctifs de la 3.9.
 | Fiabilité du calcul | au moins une donnée suivie | un anneau en n parts (une par donnée suivie : à jour en vert, à rafraîchir en ambre) avec « 3/5 à jour » ; la liste montre aussi les données à jour, cochées (T6), et chaque manque garde sa phrase, sa conséquence et son bouton ; plus de cinq manques : « Voir les n autres » (F38) |
 
 À l'ordinateur, la page est une grille : la semaine sur toute la largeur ;
-« Votre journée » (deux tiers) à côté de « Gel ou chaleur » (un tiers) ;
+« Votre journée » (deux tiers) à côté de « Gel ou chaleur » (un tiers), sauf
+sans rien à rattraper ni à faire : la journée est courte et « Gel ou chaleur »
+passe dessous, pour ne pas laisser de grand vide (J13, D-141) ;
 « Eau de la semaine » à côté de « Réserve du sol » ; « Eau disponible » à
 côté de « Fiabilité du calcul ». Au téléphone : une colonne, dans le même
 ordre, la frise remplacée par les cartes seules, chaque bouton à 44 px ;

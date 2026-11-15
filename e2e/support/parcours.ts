@@ -100,8 +100,8 @@ export async function ouvrirLeMenuDesPages(page: Page): Promise<Locator> {
   return menu;
 }
 
-/** La pastille de « Aujourd'hui » s'ajoute à son nom accessible (F12) : « Aujourd’hui, 3 à regarder ». */
-const PASTILLE_DANS_LE_NOM = /, \d+ à regarder$/;
+/** La pastille de « Aujourd'hui » s'ajoute à son nom accessible (F12, F287) : « Aujourd’hui, 3 choses à regarder ». */
+const PASTILLE_DANS_LE_NOM = /, \d+ choses? à regarder$/;
 
 /** Le nom accessible d'un lien du menu, sans la pastille de « Aujourd'hui ». */
 export function sansLaPastille(nom: string | null): string | null {
