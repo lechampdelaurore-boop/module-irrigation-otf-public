@@ -99,6 +99,20 @@
   color: var(--green-dark);
 }
 
+/* Sous le formulaire, l'état limité (audit final, lot E, J12, F266). */
+.irrigation-creation-panel + .irrigation-notification-readiness {
+  margin: 0 0 16px;
+}
+
+/*
+  Le bandeau « Alertes système non disponibles » déjà vu sur cet appareil se
+  replie, à toutes les largeurs (F267), en un point sur la cloche au
+  téléphone (F10) ; Réglages le garde en entier.
+*/
+.irrigation-notification-readiness[data-folded="true"] {
+  display: none;
+}
+
 .irrigation-notification-readiness[data-status="limited"] {
   border-color: var(--warn-line);
   background: var(--warn-soft);

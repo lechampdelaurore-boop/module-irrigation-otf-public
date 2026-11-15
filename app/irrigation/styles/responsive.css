@@ -118,15 +118,7 @@
     padding-bottom: 28px;
   }
 
-  /*
-    Le bandeau « Alertes système non disponibles » déjà vu sur cet appareil
-    se replie en un point sur la cloche (audit ergonomique, point 2, F10) ;
-    Réglages le garde en entier.
-  */
-  .irrigation-notification-readiness[data-folded="true"] {
-    display: none;
-  }
-
+  /* Le point sur la cloche d'un état limité déjà vu (F10) ; le bandeau replié vit dans irrigation-events.css (F267). */
   .topbar-bell[data-alerts-limited="true"]::before {
     position: absolute;
     top: 7px;

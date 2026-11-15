@@ -70,9 +70,13 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   // Le bandeau des alertes système vit sur la page des arrosages (F21).
   await attendreLaPageIrrigation(page, 'arrosages');
 
-  // Le bandeau des alertes système, montré une fois en entier.
+  // Le bandeau des alertes système, montré une fois en entier, sous le formulaire (audit final, lot E, J12, F266).
   await expect(bandeauDesAlertes(page)).toBeVisible();
   await expect(bandeauDesAlertes(page)).toContainText('Alertes système non disponibles');
+  const formulaire = await page.locator('.irrigation-creation-panel').boundingBox();
+  const bandeau = await bandeauDesAlertes(page).boundingBox();
+  expect(formulaire && bandeau, 'le formulaire et le bandeau doivent exister').toBeTruthy();
+  expect(bandeau!.y, 'le bandeau des alertes vient sous le formulaire').toBeGreaterThanOrEqual(formulaire!.y + formulaire!.height);
   const cloche = page.locator('header.topbar a.topbar-bell');
   await expect(cloche).toHaveAttribute('data-alerts-limited', 'true');
 
@@ -120,17 +124,15 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   const planche = telephone ? 'T02' : 'T01';
   await preparerMaterielArrosant(page, testInfo, { planche });
   await attendreLaPageIrrigation(page, 'arrosages');
+  // Replié une fois vu, à toutes les largeurs (F267).
+  await expect(bandeauDesAlertes(page)).toBeHidden();
   if (telephone) {
-    await expect(bandeauDesAlertes(page)).toBeHidden();
     await expect(cloche).toHaveAccessibleName('Notifications du téléphone : alertes système non disponibles sur cet appareil');
     const premierChamp = page.locator('.irrigation-events-section').locator('select:visible, input:visible').first();
     const boite = await premierChamp.boundingBox();
     const barreHaut = (await barre.boundingBox())?.y ?? ECRAN_DU_TELEPHONE_PX;
     expect(boite, 'le premier champ d’« Arrosages » doit exister').not.toBeNull();
     expect(boite!.y + boite!.height, `le premier champ d’« Arrosages » finit à ${Math.round(boite!.y + boite!.height)} px, sous la barre du bas (${Math.round(barreHaut)} px)`).toBeLessThanOrEqual(barreHaut);
-  } else {
-    // À l'ordinateur, le bandeau reste affiché : la mise en page ne change pas.
-    await expect(bandeauDesAlertes(page)).toBeVisible();
   }
   await verifierLEtape(page, journal, 'bandeau replié et premier champ');
 

@@ -4653,3 +4653,27 @@ Aucune migration ; aucun calcul, aucune donnée touchés. Sur
 intact).
 
 Ne changent pas : D-117, D-130, D-132.
+
+## D-134 — Audit ergonomique final, lot E : les alertes limitées sous le formulaire (J12)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur, aucune question agronomique ; modifiable par lui.
+Après D-133 (J11).
+
+**Établi dans le code.** Sur « Arrosages », le bandeau « Alertes système non
+disponibles » venait entre le titre et le formulaire « Enregistrer ou
+planifier » ; il ne se repliait, une fois vu, qu'au téléphone (F10). Sur un
+appareil où les notifications sont permises, il n'apparaît pas.
+
+**Décision.** Sur « Arrosages », le bandeau d'un état limité (refusé, non
+pris en charge, indisponible) vient sous le formulaire, texte inchangé ;
+« Recevoir les alertes » et « Alertes activées » gardent leur place
+(F266). Il se replie une fois vu à toutes les largeurs, avec le point sur la
+cloche du téléphone ; l'ordinateur, qui n'a pas de cloche, retrouve le
+rappel complet dans Réglages, qui le garde en entier (F267). Le souvenir
+reste sur l'appareil, jamais en base, comme avant. Parcours P28 étendu
+(rouge sans le code : le bandeau au-dessus du formulaire).
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-117, D-133.

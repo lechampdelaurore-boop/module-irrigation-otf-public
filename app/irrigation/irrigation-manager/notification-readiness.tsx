@@ -4,9 +4,10 @@ import type { NotificationStatus } from './use-irrigation-notifications';
 
 /**
  * L'état des alertes de cet appareil. Sur la page des arrosages, le bandeau
- * « Alertes système non disponibles » se replie au téléphone après un premier
- * affichage, en un point sur la cloche (audit ergonomique, point 2, F10) ;
- * Réglages le garde toujours en entier.
+ * « Alertes système non disponibles » vient sous le formulaire (audit final,
+ * lot E, J12, F266) et se replie après un premier affichage, à toutes les
+ * largeurs (F267), en un point sur la cloche au téléphone (audit ergonomique,
+ * point 2, F10) ; Réglages le garde toujours en entier.
  */
 export function NotificationReadiness({
   status,
@@ -19,7 +20,7 @@ export function NotificationReadiness({
   pending: boolean;
   onEnable: () => void;
   onDisable: () => void;
-  /** Vrai sur la page des arrosages : le bandeau d'un état limité déjà vu s'y replie au téléphone. */
+  /** Vrai sur la page des arrosages : le bandeau d'un état limité déjà vu s'y replie, à toutes les largeurs (F267). */
   foldable?: boolean;
 }) {
   const folded = useFoldedSystemAlerts(status, foldable);

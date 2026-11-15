@@ -44,6 +44,7 @@ import {
 } from './irrigation-event-actions';
 import type { IrrigationEventActionResult, IrrigationPreparationMode } from './irrigation-event/contract';
 import { recordDoneAsPlannedAction } from './done-as-planned-actions';
+import { isLimitedAlertStatus } from '@/lib/domain/system-alerts-banner';
 
 type Props = {
   season: number;
@@ -289,6 +290,17 @@ export function IrrigationEventManager({
     document.querySelector('.irrigation-creation-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const limitedAlerts = isLimitedAlertStatus(notificationStatus);
+  const notificationReadiness = (
+    <NotificationReadiness
+      foldable
+      status={notificationStatus}
+      pending={pending}
+      onEnable={() => void enableNotifications()}
+      onDisable={() => void disableNotifications()}
+    />
+  );
+
   return (
     <section className="irrigation-events-section" aria-labelledby="irrigation-events-title">
       <header className="irrigation-events-heading">
@@ -305,13 +317,8 @@ export function IrrigationEventManager({
         </div>
       </header>
 
-      <NotificationReadiness
-        foldable
-        status={notificationStatus}
-        pending={pending}
-        onEnable={() => void enableNotifications()}
-        onDisable={() => void disableNotifications()}
-      />
+      {/* Un état limité vient sous le formulaire (audit final, lot E, J12, F266) ; « Recevoir les alertes » et « Alertes activées » gardent leur place. */}
+      {limitedAlerts ? null : notificationReadiness}
 
       {notice ? <p className="irrigation-event-notice" role="status">{notice}</p> : null}
       {warning ? <p className="irrigation-event-warning" role="alert">{warning}</p> : null}
@@ -571,6 +578,8 @@ export function IrrigationEventManager({
           </div>
         )}
       </div>
+
+      {limitedAlerts ? notificationReadiness : null}
 
       <UpcomingIrrigations
         events={[...openPartialEvents, ...plannedEvents]}

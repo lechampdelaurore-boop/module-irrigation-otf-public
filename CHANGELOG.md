@@ -34,6 +34,11 @@ source détaillée commit par commit.
   de ses fonctionnalités cochées » et « Les cocher dans Réglages ». Une
   ancienne adresse garde la phrase d’avant, avec le lien. Parcours P22 et
   P23 étendus. J9 en ligne : #66.
+- **J12, les alertes limitées sous le formulaire** (D-134, F266 et F267) :
+  sur « Arrosages », « Alertes système non disponibles » vient sous le
+  formulaire « Enregistrer ou planifier », texte inchangé, et se replie une
+  fois vu à toutes les largeurs (le point sur la cloche au téléphone,
+  Réglages le garde en entier). Parcours P28 étendu. J11 en ligne : #67.
 
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 
