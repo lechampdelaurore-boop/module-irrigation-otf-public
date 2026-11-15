@@ -103,11 +103,16 @@ case. Un seul onglet de ce bloc est ouvert à la fois ; l'onglet n'est chargé
 **F205 — contenu.**
 
 - carte cadrée sur la parcelle choisie (F203) ;
-- trait blanc épais autour de la parcelle, son nom ;
+- trait blanc épais autour de la parcelle ; son nom, posé d'abord au milieu
+  de la parcelle, n'est plus que le titre du bloc (audit final, lot E, J15,
+  F270) ;
 - les jardins en contour, **vert** pour le plein champ, **autre couleur**
   (bleu eau de la charte) pour l'abri ; chacun avec son nom et son mode ;
 - une bascule « Satellite / Dessin » (fond uni clair), choix mémorisé par
   appareil (`localStorage`, entouré de `try/catch`, la page s'affiche sans) ;
+  elle dit depuis « Photo / Contours », les messages de repli « les contours
+  seuls », et le bouton enfoncé suit le fond affiché (audit final, lot E,
+  J15, F268 et F269) ;
 - échelle en mètres, zoom, plein écran, attribution du fournisseur ;
 - **à côté, une liste texte des jardins** (nom, mode, surface d'OTF, état du
   contour) : alternative à la carte, au clavier comme au lecteur d'écran ;

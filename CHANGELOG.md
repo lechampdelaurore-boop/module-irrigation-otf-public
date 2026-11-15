@@ -39,6 +39,12 @@ source détaillée commit par commit.
   formulaire « Enregistrer ou planifier », texte inchangé, et se replie une
   fois vu à toutes les largeurs (le point sur la cloche au téléphone,
   Réglages le garde en entier). Parcours P28 étendu. J11 en ligne : #67.
+- **J15, la vue satellite** (D-135, F268 à F271) : le bouton enfoncé suit
+  le fond affiché (« Contours » quand la photo manque) ; la bascule dit
+  « Photo » et « Contours », les messages « les contours seuls » ; le nom
+  de la parcelle n'est plus posé sur la carte ; au téléphone, choisir
+  « Vue satellite » amène les onglets en haut quand la carte commencerait
+  sous l'écran. Parcours P34 étendu. J12 en ligne : #68.
 
 ### Corrigé (audit ergonomique final, lot B, pénurie lisible)
 

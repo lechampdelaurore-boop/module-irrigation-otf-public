@@ -32,7 +32,6 @@ export type SatelliteView = {
   zoneId: string;
   zoneName: string;
   zoneOutlined: boolean;
-  zoneLabelAt: OutlinePosition | null;
   drawing: SatelliteDrawing;
   /** Le cadrage de la carte, marge comprise ; `null` quand rien n'est dessiné. */
   framing: GeoBounds | null;
@@ -58,7 +57,6 @@ export function satelliteView(zone: Zone, plots: Plot[]): SatelliteView {
     zoneId: zone.id,
     zoneName: zone.name,
     zoneOutlined,
-    zoneLabelAt: outlineLabelPoint(zone.outline),
     drawing,
     framing: zoneFraming(zone, ownPlots),
     gardens,

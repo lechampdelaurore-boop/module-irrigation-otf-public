@@ -140,8 +140,8 @@ export function SatelliteMap({
         map.addControl(new maplibre.FullscreenControl(), 'top-right');
         map.addControl(new maplibre.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
+        // Le nom de la parcelle est le titre du bloc : seuls les jardins portent le leur sur la carte (audit final, lot E, J15, F270).
         const labels: [OutlinePosition | null, HTMLSpanElement][] = [
-          [view.zoneLabelAt, labelElement(view.zoneName, 'satellite-label satellite-label-zone', null)],
           ...view.gardens.map((garden): [OutlinePosition | null, HTMLSpanElement] => {
             const element = labelElement(garden.name, 'satellite-label', garden.mode);
             element.dataset.plotId = garden.plotId;

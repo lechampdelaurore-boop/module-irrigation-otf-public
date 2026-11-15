@@ -4677,3 +4677,31 @@ reste sur l'appareil, jamais en base, comme avant. Parcours P28 étendu
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-117, D-133.
+
+## D-135 — Audit ergonomique final, lot E : la vue satellite, dans son repli (J15)
+
+Date : 15 novembre 2026, matin. Décideur : la recommandation, sur le mandat
+d'autonomie du porteur, aucune question agronomique ; modifiable par lui.
+Après D-134 (J12).
+
+**Établi dans le code.** Le bouton du fond suivait la préférence de
+l'appareil, non le fond affiché : sous un fond satellite indisponible ou
+non configuré, « Satellite » restait enfoncé sur une carte en contours. La
+bascule disait « Satellite » et « Dessin », à côté des onglets « Plan » et
+« Vue satellite ». Le nom de la parcelle, déjà titre du bloc, était posé au
+milieu de la carte et chevauchait celui d'un jardin. Au téléphone, la carte
+pouvait commencer sous l'écran.
+
+**Décision.** Le bouton enfoncé est celui du fond affiché : « Contours »
+quand la photo manque ou n'est pas configurée ; toucher « Photo » la
+redemande (F268). La bascule dit « Photo » et « Contours », les messages de
+repli « les contours seuls » ; les onglets ne changent pas (F269). Le nom
+de la parcelle n'est plus posé sur la carte ni sur le dessin SVG ; les
+jardins gardent le leur (F270). Au téléphone, choisir « Vue satellite »
+amène les onglets en haut de l'écran quand il resterait moins de 200 px de
+la carte à l'écran (F271). Le contrat de la vue satellite suit. Parcours
+P34 étendu (au téléphone, 142 px de la carte à l'écran sans le code).
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-117, D-134.
