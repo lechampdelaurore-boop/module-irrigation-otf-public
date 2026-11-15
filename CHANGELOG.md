@@ -43,6 +43,13 @@ source détaillée commit par commit.
   du matériel qui arrose ses voisines »). Ni le manque, ni le placé, ni
   aucun total ne changent. Affichage seul. J7 en ligne : #60, déployée le
   15 novembre 2026 à 5 h 36.
+- **Remarque 4 de la recette 3.9, les parts après l'eau validée** (D-127,
+  F255) : au planning, le pli « Budget d'eau d'ici dimanche » dit, dès
+  qu'un arrosage de la semaine est validé, que les parts se comptent sur ce
+  qui reste à placer, après les mètres cubes déjà validés : une part qui
+  baisse après une validation ne retire pas d'eau aux planches. Affichage
+  seul ; parcours P32 étendu. Remarque 2 en ligne : #61, déployée le
+  15 novembre 2026 à 6 h 07.
 
 ### Corrigé (écran de répartition)
 

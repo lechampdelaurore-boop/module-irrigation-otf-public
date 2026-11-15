@@ -7,7 +7,7 @@ import type { PlanBedOutcome, StoredWeeklyPlan, WeeklyPlan } from '../lib/domain
 import { informationalBedCount, unplacedDeficitCount, unplacedGroups, unplacedTileDetail } from '../lib/domain/planning/action-summary.ts';
 import { planSummaryLine, unplacedFoldLabel } from '../lib/domain/planning/phone-week.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
-import { keepsDeficit, shortageAction, shortageDecisionPending, waterReceivedWithoutShareMm } from '../lib/domain/planning/shortage-reading.ts';
+import { budgetValidatedNote, keepsDeficit, shortageAction, shortageDecisionPending, waterReceivedWithoutShareMm } from '../lib/domain/planning/shortage-reading.ts';
 import { farm, settings } from './support/planning-fixtures.ts';
 
 /**
@@ -212,4 +212,25 @@ test('remarque 2, F254 : en report (S12), une planche reportée sous la rampe d�
   assert.ok((waterReceivedWithoutShareMm(off('validated', null), bed('B2-9'), now) ?? 0) > 14.9, 'une validée compte');
   const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
   assert.match(view, /` ; reçoit quand même \$\{mmLabel\(receivedMm\)\} du matériel qui arrose ses voisines`/);
+});
+
+// Remarque 4 — les parts comptées après l'eau validée (F255).
+
+test('remarque 4, F255 : avec des arrosages validés, le pli du budget dit le volume déjà validé ; sans chiffre quand un volume manque ; rien sans validation', () => {
+  const plan = stored(shortagePlan());
+  assert.ok(plan.proposals.length >= 2, 'le jeu propose au moins deux créneaux');
+  assert.equal(budgetValidatedNote(plan, volume), null, 'rien de validé : aucune phrase');
+  const [first, second] = plan.proposals;
+  const validated = (proposal: StoredWeeklyPlan['proposals'][number], extra: Partial<StoredWeeklyPlan['proposals'][number]> = {}) => ({ ...proposal, status: 'validated' as const, ...extra });
+  const two = { ...plan, proposals: [validated(first, { volumeCubicMeters: 3 }), validated(second, { volumeCubicMeters: 2.06 }), ...plan.proposals.slice(2)] };
+  assert.equal(budgetValidatedNote(two, volume), 'Les parts se comptent sur ce qui reste à placer, après les 5,06 m³ déjà validés cette semaine : une part qui baisse après une validation ne retire pas d’eau aux planches.');
+  // Une validée dont l'irrigation est annulée ne compte plus : son eau est revenue au plan.
+  const canceled = { ...plan, proposals: [validated(first, { volumeCubicMeters: 3 }), validated(second, { volumeCubicMeters: 2.06, irrigationStatus: 'canceled' }), ...plan.proposals.slice(2)] };
+  assert.match(budgetValidatedNote(canceled, volume) ?? '', /après les 3,00 m³ déjà validés/);
+  // Un volume validé inconnu : la phrase ne chiffre pas.
+  const unknown = { ...plan, proposals: [validated(first, { volumeCubicMeters: null }), validated(second, { volumeCubicMeters: 2.06 }), ...plan.proposals.slice(2)] };
+  assert.match(budgetValidatedNote(unknown, volume) ?? '', /^Les parts se comptent sur ce qui reste à placer, après les arrosages déjà validés cette semaine : /);
+  const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
+  assert.match(view, /validatedNote=\{budgetValidatedNote\(plan, formatVolume\)\}/);
+  assert.match(view, /<summary>Budget d’eau d’ici dimanche, chaîne par chaîne<\/summary>\s*\{\/\*[^*]*\*\/\}\s*\{validatedNote \? <p className="planning-budgets-validated">/);
 });

@@ -4476,3 +4476,27 @@ moteur en report (B2-9 reçoit 15 mm, à l'arrondi des secondes près).
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-052, D-117, D-125.
+
+## D-127 — Audit ergonomique final, lot B : les parts comptées après l'eau validée (remarque 4)
+
+Date : 15 novembre 2026, nuit. Décideur : la recommandation, sur le mandat
+d'autonomie de nuit du porteur, aucune question agronomique ; modifiable
+par lui. Après D-126 (remarque 2). Remarque 4 de la recette 3.9.
+
+**Établi dans le code.** Après une validation, la ligne de budget compte
+l'eau mobilisable et la demande après l'eau validée (S20, D-086) : la part
+de la normale passe de 42 à 27 % (B9) alors que ses planches reçoivent la
+même eau. Rien ne le disait.
+
+**Décision.** Le pli « Budget d'eau d'ici dimanche » le dit en tête, quand
+la semaine a des arrosages validés : « Les parts se comptent sur ce qui
+reste à placer, après les 5,06 m³ déjà validés cette semaine : une part qui
+baisse après une validation ne retire pas d'eau aux planches. » Le volume
+est la somme des propositions validées dont l'irrigation n'est pas
+annulée ; un seul volume inconnu, et la phrase dit « après les arrosages
+déjà validés cette semaine », sans chiffre (`budgetValidatedNote`) (F255).
+Aucune part, aucun budget ne change. Parcours P32 étendu.
+
+Aucune migration ; aucun calcul, aucune donnée touchés.
+
+Ne changent pas : D-052, D-086, D-117, D-126.

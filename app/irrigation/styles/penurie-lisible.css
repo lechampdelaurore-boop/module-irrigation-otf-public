@@ -157,3 +157,10 @@
     line-height: 1.4;
   }
 }
+
+/* Remarque 4 de la recette 3.9 (F255) : la phrase des parts comptées après l'eau validée, en tête du pli du budget. */
+.planning-budgets-validated {
+  margin: 0 1rem .6rem;
+  color: var(--ink2);
+  font-size: .85rem;
+}

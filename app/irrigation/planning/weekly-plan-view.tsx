@@ -22,7 +22,7 @@ import {
   type PlanDay,
   type PlanSummary,
 } from '@/lib/domain/planning/presentation';
-import { shortageAction, waterReceivedWithoutShareMm } from '@/lib/domain/planning/shortage-reading';
+import { budgetValidatedNote, shortageAction, waterReceivedWithoutShareMm } from '@/lib/domain/planning/shortage-reading';
 import { hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import type { PlanningSettings } from '@/lib/domain/planning/settings';
@@ -233,7 +233,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
           ) : null}
           {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplacedDeficitCount(groups)} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} /> : null}
           {plan.calculation.summary.changes ? <ChangesFold changes={plan.calculation.summary.changes} /> : null}
-          {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} /> : null}
+          {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} validatedNote={budgetValidatedNote(plan, formatVolume)} /> : null}
           <SuggestionList suggestions={plan.suggestions} pending={pending} feedback={suggestionFeedback} onApply={applySuggestion} onKeep={keepSuggestion} />
 
           <div className="planning-week-heading">
@@ -449,10 +449,12 @@ function SummaryCard({ icon, label, value, detail, tone, action = false }: { ico
   return <div className="planning-summary-card" data-tone={tone} data-action={action || undefined}><span>{icon ? <Icon name={icon} /> : null}{label}</span><strong>{value}</strong><small>{detail}</small></div>;
 }
 
-function BudgetList({ budgets }: { budgets: readonly SupplyBudget[] }) {
+function BudgetList({ budgets, validatedNote }: { budgets: readonly SupplyBudget[]; validatedNote: string | null }) {
   return (
     <details className="planning-budgets">
       <summary>Budget d’eau d’ici dimanche, chaîne par chaîne</summary>
+      {/* Une part qui baisse après une validation se comprend (remarque 4 de la recette 3.9, F255). */}
+      {validatedNote ? <p className="planning-budgets-validated">{validatedNote}</p> : null}
       <ul>
         {budgets.map((budget) => (
           <li key={budget.originKey}>
