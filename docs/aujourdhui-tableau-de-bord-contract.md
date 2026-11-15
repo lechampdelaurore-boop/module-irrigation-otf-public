@@ -150,10 +150,37 @@ la PR 3 de ce contrat et reprise par le lot 3.
 
 Elle est composée par le domaine, à partir des blocs présents seulement,
 dans cet ordre : les retards, ce qui reste à faire aujourd'hui (« dont k à
-valider »), le gel ou l'alerte annoncés (ou la prévision indisponible), puis
-les données à rafraîchir. Sans retard, sans irrigation du jour et sans
-annonce : « Rien d'urgent aujourd'hui. », suivi de la phrase calme de la
-météo quand le bloc existe. Une case décochée n'y parle pas.
+valider »), les arrosages de demain à valider, le gel ou l'alerte annoncés
+(ou la prévision indisponible), puis les données à rafraîchir. Sans retard,
+sans irrigation du jour, sans annonce, **sans rien à valider demain ni eau
+qui manque à la semaine** : « Rien d'urgent aujourd'hui. », suivi de la
+phrase calme de la météo quand le bloc existe. Une case décochée n'y parle
+pas.
+
+**Changé le 15 novembre 2026** (audit ergonomique final, lot A, R1, choix
+n° 2 du rapport confirmé par le porteur, D-137 et D-138 ;
+`docs/audit-ergonomie-final-lot-a-contract.md`, précisions F274 à F279).
+Quand « Planning » est coché, et seulement alors, la page dit aussi ce qui
+attend après le jour, lu sur le plan enregistré de la semaine, sans rien
+recalculer :
+
+- **l'eau qui manque à la semaine** : un encadré de l'en-tête redit la
+  phrase d'action du planning mot pour mot (`shortageAction`), suivie du
+  même lien « Répartir l'eau » ou « Revoir la répartition » vers l'écran de
+  répartition quand la faisabilité est active ; la pastille orange
+  « L'eau manque » se met en tête tant qu'une répartition attend. La phrase
+  de résumé ne redit pas le manque ;
+- **les arrosages de demain à valider**, de 0 h à minuit le lendemain : la
+  pastille « n à valider demain », la phrase « 3 arrosages sont à valider
+  demain à 6 h. » après celles du jour, et au pied de « Votre journée » la
+  ligne « Demain à 6 h : 3 arrosages à valider », avec « Voir au planning »
+  vers la première ;
+- la pastille verte « Rien à arroser » ne s'affiche plus tant que l'un des
+  deux est dit.
+
+Le bloc « Eau disponible » dit aussi, en orange et en mots, une réserve
+dont le volume connu est sous son minimum de sécurité (« sous son minimum
+de 2 m³ »).
 
 ## 4. Architecture
 

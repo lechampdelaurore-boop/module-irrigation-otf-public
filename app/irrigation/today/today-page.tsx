@@ -99,6 +99,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       <TodayHeader
         headline={view.headline}
         plan={view.plan}
+        shortage={view.shortage}
         query={dayQuery}
         pending={pending}
         onRecalculatePlan={recalculatePlan}
@@ -118,7 +119,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       ) : null}
       {view.week ? <TodayWeekTiles week={view.week} /> : null}
       <Pair
-        wide={late && todo ? <TodayDay today={view.today} late={late} todo={todo} timeline={view.timeline} allDone={view.allDone} query={dayQuery} pending={pending} onStart={start} onAllDone={recordAllDone} /> : null}
+        wide={late && todo ? <TodayDay today={view.today} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} query={dayQuery} pending={pending} onStart={start} onAllDone={recordAllDone} /> : null}
         narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
         layout="wide"
       />

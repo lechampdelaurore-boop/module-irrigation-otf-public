@@ -95,6 +95,7 @@ function inputs(overrides: Partial<TodayInputs> = {}): TodayInputs {
     events: [],
     lateToleranceMinutes: 30,
     plan: { computedAt: '2026-11-12T05:02:00.000Z', proposals: [] },
+    shortagePlan: null,
     bedNames: BEDS,
     infrastructure: infrastructure([]),
     reliability: { actualRainMissingDates: [], soilGardensNeverObserved: [], speciesWithoutReference: [] },
@@ -403,6 +404,8 @@ test('l’en-tête d’une journée calme, et celui d’une prévision indisponi
     irrigations: null,
     weather: { tone: 'alert', days: weatherBlock({ forecasts: [forecast('2026-11-12', 10, 31)], frost: null, criteria: [criterion] }, ['alertes-meteo'], NOW).days, calmText: null },
     reliabilityCount: null,
+    tomorrow: null,
+    shortage: null,
   });
   assert.equal(hot.sentence, 'Chaleur : température maximale prévue 31 °C aujourd’hui.');
   assert.deepEqual(hot.chips.map((chip) => chip.text), ['Alerte météo aujourd’hui']);

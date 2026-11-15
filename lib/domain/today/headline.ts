@@ -1,4 +1,5 @@
 import { celsiusText } from '../crop-alerts/text.ts';
+import type { TodayShortage, TodayTomorrow } from './ahead.ts';
 import type { TodayIrrigationLine } from './today-irrigations.ts';
 import type { TodayWeatherDay } from './weather-days.ts';
 
@@ -8,16 +9,18 @@ import type { TodayWeatherDay } from './weather-days.ts';
  * date en toutes lettres, une phrase de résumé et des pastilles qui mènent
  * au bloc. Elles ne disent que ce que disent les blocs présents : une case
  * décochée n'y parle pas, et une donnée inconnue n'y devient jamais « tout
- * va bien » (D-003).
+ * va bien » (D-003). Quand « Planning » est coché, l'en-tête dit aussi ce
+ * qui attend après le jour : l'eau qui manque à la semaine et les arrosages
+ * de demain à valider (audit ergonomique final, lot A, R1, F277 et F278).
  */
 
-type ChipTarget = 'day' | 'weather' | 'reliability';
+type ChipTarget = 'day' | 'weather' | 'reliability' | 'shortage';
 
 type TodayChip = {
   key: string;
-  /** `late`, `alert`, `data` et `unknown` demandent un regard ; `todo` est à faire ; `ok` est calme. */
-  tone: 'late' | 'todo' | 'alert' | 'data' | 'unknown' | 'ok';
-  icon: 'clock' | 'drop' | 'frost' | 'bell' | 'cloud' | 'check' | 'shield';
+  /** `late`, `alert`, `data`, `unknown` et `shortage` demandent un regard ; `todo` est à faire ; `ok` est calme. */
+  tone: 'late' | 'todo' | 'alert' | 'data' | 'unknown' | 'shortage' | 'ok';
+  icon: 'clock' | 'drop' | 'frost' | 'bell' | 'cloud' | 'check' | 'shield' | 'calendar';
   text: string;
   /** Le bloc où mène la pastille. */
   target: ChipTarget;
@@ -38,6 +41,10 @@ export type HeadlineInputs = {
   weather: { tone: 'alert' | 'unknown' | 'calm'; days: readonly TodayWeatherDay[]; calmText: string | null } | null;
   /** `null` quand la zone « Fiabilité du calcul » n'existe pas. */
   reliabilityCount: number | null;
+  /** Les arrosages de demain à valider ; `null` sans « Planning » ou sans proposition demain. */
+  tomorrow: TodayTomorrow | null;
+  /** L'eau qui manque à la semaine ; `null` sans « Planning » ou sans manque. */
+  shortage: TodayShortage | null;
 };
 
 const longDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
@@ -60,7 +67,7 @@ function plural(count: number, one: string, many: string): string {
   return count === 1 ? one : many.replace('{n}', String(count));
 }
 
-function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>): { sentences: string[]; chips: TodayChip[] } {
+function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>, aheadSaid: boolean): { sentences: string[]; chips: TodayChip[] } {
   const late = irrigations.late.length;
   const todo = irrigations.todo.length;
   const proposed = irrigations.todo.filter((line) => line.tone === 'proposed').length;
@@ -75,7 +82,8 @@ function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>
     sentences.push(`${planned}${proposed > 0 ? `, dont ${proposed} à valider` : ''}.`);
     chips.push({ key: 'todo', tone: 'todo', icon: 'drop', text: `${todo} à faire aujourd’hui`, target: 'day' });
   }
-  if (late === 0 && todo === 0) chips.push({ key: 'nothing', tone: 'ok', icon: 'check', text: 'Rien à arroser', target: 'day' });
+  // « Rien à arroser » ne se dit plus quand demain ou la semaine ont quelque chose à dire (F277).
+  if (late === 0 && todo === 0 && !aheadSaid) chips.push({ key: 'nothing', tone: 'ok', icon: 'check', text: 'Rien à arroser', target: 'day' });
   return { sentences, chips };
 }
 
@@ -104,15 +112,36 @@ function weatherParts(weather: NonNullable<HeadlineInputs['weather']>, today: st
   return { sentences: [], chips: [{ key: 'weather', tone: 'ok', icon: 'check', text: 'Rien d’annoncé sur trois jours', target: 'weather' }] };
 }
 
+/**
+ * Ce qui attend après le jour (F277) : la pastille orange « L'eau manque » en
+ * tête, tant qu'une répartition attend, puis celle de demain ; la phrase de
+ * demain suit celles du jour. Le manque d'eau, lui, se lit dans l'encadré de
+ * l'en-tête, avec la phrase du planning : la phrase de résumé ne le redit pas.
+ */
+function aheadParts(input: HeadlineInputs): { lead: TodayChip[]; chips: TodayChip[]; sentences: string[] } {
+  const lead: TodayChip[] = input.shortage?.decisionPending
+    ? [{ key: 'shortage', tone: 'shortage', icon: 'drop', text: 'L’eau manque', target: 'shortage' }]
+    : [];
+  if (!input.tomorrow) return { lead, chips: [], sentences: [] };
+  return {
+    lead,
+    chips: [{ key: 'tomorrow', tone: 'todo', icon: 'calendar', text: `${input.tomorrow.count} à valider demain`, target: 'day' }],
+    sentences: [input.tomorrow.sentence],
+  };
+}
+
 export function todayHeadline(input: HeadlineInputs): TodayHeadline {
-  const irrigation = input.irrigations ? irrigationParts(input.irrigations) : { sentences: [], chips: [] };
+  const aheadSaid = input.tomorrow !== null || input.shortage !== null;
+  const irrigation = input.irrigations ? irrigationParts(input.irrigations, aheadSaid) : { sentences: [], chips: [] };
   const weather = input.weather ? weatherParts(input.weather, input.today) : { sentences: [], chips: [] };
-  const sentences = [...irrigation.sentences, ...weather.sentences];
+  const ahead = aheadParts(input);
+  const sentences = [...irrigation.sentences, ...ahead.sentences, ...weather.sentences];
   if (sentences.length === 0) {
-    sentences.push('Rien d’urgent aujourd’hui.');
+    // « Rien d'urgent » seulement si ni le jour, ni demain, ni la semaine n'ont rien à dire (F278).
+    if (!aheadSaid) sentences.push('Rien d’urgent aujourd’hui.');
     if (input.weather?.calmText) sentences.push(input.weather.calmText);
   }
-  const chips = [...irrigation.chips, ...weather.chips];
+  const chips = [...ahead.lead, ...irrigation.chips, ...ahead.chips, ...weather.chips];
   if (input.reliabilityCount !== null) {
     const count = input.reliabilityCount;
     if (count > 0) sentences.push(plural(count, 'Une donnée est à rafraîchir pour que le calcul soit fiable.', '{n} données sont à rafraîchir pour que le calcul soit fiable.'));

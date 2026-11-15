@@ -1,0 +1,99 @@
+/*
+  Audit ergonomique final, lot A : le matin, l'essentiel
+  (docs/audit-ergonomie-final-lot-a-contract.md). Affichage seul.
+*/
+
+/* R1 : l'eau qui manque à la semaine, la phrase du planning et son lien, dans l'en-tête (F276). */
+.today-shortage {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem 1rem;
+  margin: 0;
+  padding: .8rem 1rem;
+  border: 1px solid var(--danger-line);
+  border-radius: 10px;
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  font-size: .95rem;
+  font-weight: 650;
+  line-height: 1.5;
+  scroll-margin-top: 16px;
+}
+
+.today-shortage > span {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.today-shortage > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target, 44px);
+  padding: 0 1rem;
+  border-radius: var(--radius-button, .6rem);
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.today-shortage > a:focus-visible {
+  outline: 3px solid var(--green-dark);
+  outline-offset: 2px;
+}
+
+/* R1 : la pastille « L'eau manque », orange, en tête des pastilles (F277). */
+.today-chip[data-tone="shortage"] .today-chip-dot {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* R1 : les arrosages de demain à valider, au pied de « Votre journée » (F274). */
+.today-tomorrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.today-tomorrow .icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--green);
+}
+
+.today-tomorrow > span {
+  font-weight: 600;
+}
+
+.today-tomorrow > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target, 44px);
+  color: var(--green);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+/* R1 : une réserve sous son minimum de sécurité, en orange et en mots (F279). */
+.today-tank-row[data-below-minimum="true"] .today-tank {
+  border-color: var(--warn);
+}
+
+.today-tank-row[data-below-minimum="true"] .today-tank i {
+  background: var(--warn);
+}
+
+.today-tank-minimum {
+  color: var(--warn-ink);
+  font-weight: 600;
+}

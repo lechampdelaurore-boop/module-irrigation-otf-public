@@ -4738,3 +4738,79 @@ parcours.
 Aucune migration ; aucun calcul, aucune donnée touchés.
 
 Ne changent pas : D-117, D-130, D-135.
+
+## D-137 — Audit ergonomique final : les six choix confirmés par le porteur, lots A et D débloqués
+
+Date : 15 novembre 2026, 15 h 51 et 15 h 52. Décideur : le porteur, en
+toutes lettres : « Je suis d'accord avec toutes tes propositions. Toutes
+les recommandations. », « Point numéro 2, vas-y. », puis « Numéro 5, je
+suis d'accord avec les corrections, vas-y. ». Après D-117 et D-136.
+
+**Décision.** Les six choix de la section 7 du rapport
+`audit-ergonomie-final-2026-11-14.md`, consignés à titre provisoire par
+D-117, sont **confirmés sur l'option recommandée** : les six lots dans
+l'ordre C, A, B, F, E, D ; « Aujourd'hui » annonce les arrosages de demain
+à valider et le manque d'eau de la semaine (choix n° 2) ; les réglages de
+chaque page rangés dans un pli « Réglages de cette page », fermé, en bas
+(choix n° 3) ; la démonstration complétée (choix n° 4) ; le mode sombre
+non prévu pour l'instant (choix n° 5) ; la séance de lecture dans le
+Chrome du porteur, sur la ferme réelle, en lecture seule (choix n° 6).
+
+- **Le code des lots A et D n'attend plus sa confirmation** ; le lot A
+  a son « vas-y » exprès (« Point numéro 2, vas-y. ») et commence le jour
+  même (D-138).
+- **La séance du choix n° 6 a son accord** ; chaque séance reste ouverte
+  avec lui, dans son Chrome, lecture seule, onglets refermés à la fin.
+- Ce qui reste réservé ne change pas : si la cause de R2 (l'objectif qui
+  diffère d'une page à l'autre) ou de J4 (le premier geste sur la réserve
+  du sol) est dans un calcul ou un contrat d'agronomie, le lot s'arrête et
+  le porteur en est prévenu avant de coder (D-117).
+
+Aucune migration ; aucun code touché par cette décision.
+
+Ne changent pas : D-028, D-041, D-047, D-117.
+
+## D-138 — Audit ergonomique final, lot A : contrat et première PR, « Aujourd'hui » annonce demain et l'eau qui manque (R1)
+
+Date : 15 novembre 2026, après-midi. Décideur : le porteur pour le
+contenu (D-137, toutes les recommandations du contrat retenues) ; les
+précisions tranchées en codant suivent l'option recommandée, aucune
+question agronomique, modifiables par lui. Après D-137.
+
+**Établi dans le code** (contrat `docs/audit-ergonomie-final-lot-a-contract.md`,
+section 3). `irrigationParts` (`lib/domain/today/headline.ts`) ne regardait
+que les irrigations du jour : sans rien à dire, la page écrivait « Rien
+d'urgent aujourd'hui. » et la pastille verte « Rien à arroser », même en
+pleine pénurie et la veille d'arrosages à valider. Le service lisait déjà
+le plan de la semaine quand « Planning » est coché : rien n'est lu de plus.
+
+**Décision.** Quand « Planning » est coché, et seulement alors
+(F274 à F278, section 8 bis du contrat) :
+
+- les arrosages de demain encore à valider, de 0 h à minuit le lendemain
+  à la ferme, se lisent au pied de « Votre journée » (« Demain à 6 h :
+  3 arrosages à valider », « Voir au planning » vers la première
+  proposition), dans une pastille « 3 à valider demain » et dans la phrase
+  de résumé, après le jour ;
+- l'eau qui manque à la semaine se lit dans un encadré de l'en-tête, avec
+  la phrase d'action du planning (`shortageAction`, appelée telle quelle,
+  sans copie de règle) et le même lien « Répartir l'eau » ou « Revoir la
+  répartition », présent seulement quand la faisabilité est active ; la
+  pastille orange « L'eau manque » se met en tête tant qu'une répartition
+  attend (`shortageDecisionPending`) ;
+- « Rien à arroser » ne s'affiche plus, et « Rien d'urgent aujourd'hui. »
+  ne s'écrit plus, tant que demain ou la semaine ont quelque chose à dire.
+
+Le bloc « Eau disponible » dit une réserve dont le volume connu est
+strictement sous son minimum de sécurité, en orange et en mots (« sous son
+minimum de 2 m³ ») ; un volume inconnu ou un minimum nul, jamais (F279,
+D-003). Le contrat de la page (`docs/aujourdhui-tableau-de-bord-contract.md`,
+section 3.5) est changé en conséquence.
+
+**Limite connue** : le dimanche, le plan de la semaine suivante n'existe
+pas encore ; rien n'est annoncé pour lundi.
+
+Aucune migration ; aucun calcul de besoin, de pénurie, de plan ni de gel ne
+change ; la pastille du menu et son compte (F12) non plus.
+
+Ne changent pas : D-003, D-004, D-028, D-122, D-123, D-131.
