@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, manualRainInput, weekStartDateKey } from '@/lib/domain/water-management';
+import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-days';
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
 import { FigureOrigin } from './shell/figure-origin';
@@ -79,6 +80,8 @@ export function WaterManagementDashboard({
   // Le numéro du dernier choix de jour : seule sa réponse compte (point ouvert 50).
   const rainDateChoice = useRef(0);
   const today = dateKeyInTimeZone(new Date());
+  // Le jour courant ouvert au téléphone, les autres repliés (lot D, J3, F299).
+  const [openDay, setOpenDay] = useState<string | null>(today);
   const activeLimit = useMemo(
     () => dashboard.limits.find(
       (limit) => limit.validFrom <= today && (limit.validUntil === null || limit.validUntil >= today),
@@ -99,6 +102,7 @@ export function WaterManagementDashboard({
 
   const currentDay = dashboard.todayWater;
   const farmGoal = dashboard.goals.find((goal) => goal.scopeType === 'farm');
+  const quietDays = quietWaterDaysText(dashboard.days);
   const missingEt0Dates = dashboard.days.filter((day) => day.et0Mm === null).map((day) => day.date);
   const missingActualRainDates = dashboard.days.filter((day) => day.date <= today && day.effectiveActualRainMm === null).map((day) => day.date);
   const missingForecastRainDates = dashboard.days.filter((day) => day.date >= today && day.forecastRainMm === null).map((day) => day.date);
@@ -353,7 +357,7 @@ export function WaterManagementDashboard({
         <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
         <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
         <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
-        <SummaryCard icon="soleil" label="ET0" value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
+        <SummaryCard icon="soleil" label="Évaporation de la semaine (ET0)" value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
       </div>
 
       {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
@@ -410,10 +414,17 @@ export function WaterManagementDashboard({
       </dialog>
 
       <div className="water-week-table-wrap" id="weather">
+        {quietDays ? <p className="water-week-quiet">{quietDays}.</p> : null}
         <table className="water-week-table">
           <thead><tr><th>Jour</th><th>Irrigation réalisée</th><th>Planifiée</th><th>Pluie mesurée / réanalyse</th><th>Prévision</th><th>Températures prévues</th><th>ET0</th><th>Limite</th></tr></thead>
-          <tbody>{dashboard.days.map((day) => <tr key={day.date} className={day.limitExceededByCubicMeters > 0 ? 'limit-exceeded-row' : undefined}>
-            <th>{formatDate(day.date)}</th>
+          <tbody>{dashboard.days.map((day) => <tr key={day.date} className={day.limitExceededByCubicMeters > 0 ? 'limit-exceeded-row' : undefined} data-open={openDay === day.date ? 'true' : undefined}>
+            <th>
+              <span className="water-day-date">{formatDate(day.date)}</span>
+              {/* Au téléphone, le jour replié en une ligne ; le bouton ouvre le détail dessous (lot D, J3, F299). */}
+              <button type="button" className="water-day-toggle" aria-expanded={openDay === day.date} onClick={() => setOpenDay((current) => (current === day.date ? null : day.date))}>
+                <span>{formatDate(day.date)}</span><small>{waterDaySummary(day)}</small>
+              </button>
+            </th>
             <td data-label="Irrigation réalisée">{volumeText(day.realizedIrrigationCubicMeters)}{day.volumeIncomplete ? <small> · incomplet, surface mouillée inconnue</small> : null}{day.estimatedOngoingCubicMeters > 0 ? <small> + {volumeText(day.estimatedOngoingCubicMeters)} en cours estimés</small> : null}</td>
             <td data-label="Planifiée">{volumeText(day.plannedIrrigationCubicMeters)}</td>
             <td data-label="Pluie réelle / estimée">{day.effectiveActualRainMm === null ? '—' : `${mm.format(day.effectiveActualRainMm)} mm`}{day.manualRainMm !== null ? ' · mesurée' : day.reanalysisRainMm !== null ? ' · réanalyse' : ''}<FigureOrigin text={actualRainOrigin(day)} /></td>
@@ -431,7 +442,9 @@ export function WaterManagementDashboard({
 
 /** Une tuile de total, son icône au trait devant le libellé ; la pluie est en bleu eau (charte du module). */
 function SummaryCard({ icon, label, value, detail, water = false }: { icon: IconName; label: string; value: string; detail: string; water?: boolean }) {
-  return <div className={water ? 'water-summary-card is-water' : 'water-summary-card'}><span><Icon name={icon} />{label}</span><strong>{value}</strong><small>{detail}</small></div>;
+  // Un chiffre absent (« Non défini », « non disponible · partielle ») s'écrit à la taille du texte courant, sur une ligne, pas en très gros (lot D, J3, F300).
+  const unknown = !/^\d/.test(value);
+  return <div className={water ? 'water-summary-card is-water' : 'water-summary-card'}><span><Icon name={icon} />{label}</span><strong className={unknown ? 'is-unknown' : undefined}>{value}</strong><small>{detail}</small></div>;
 }
 
 function TodayMetric({ label, value, warning = false }: { label: string; value: number | null; warning?: boolean }) {

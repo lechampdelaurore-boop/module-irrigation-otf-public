@@ -7,6 +7,13 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
+- **J3, « Objectifs et besoins » plus court au téléphone** (D-147, F299 à
+  F301) : chaque jour de la semaine tient en une ligne, « lun. 15 juin ·
+  2,31 m³ arrosés · pluie 4,3 mm », et s'ouvre dessous ; le jour courant
+  est ouvert. Une phrase compte les jours sans irrigation ni pluie. La
+  tuile « ET0 » devient « Évaporation de la semaine (ET0) » ; « non
+  disponible · partielle » ne s'écrit plus en très gros. Parcours P13
+  étendu.
 - **J6, les réglages du planning en mots simples** (D-146, F297, F298) :
   « R2 · Part de la pluie prévue déduite du besoin (%) » devient « Part de
   la pluie prévue déduite du besoin (%) », et ainsi de R2 à R14 ; les

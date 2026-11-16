@@ -525,7 +525,17 @@ registres, elle y renvoie.
   libellés visibles ; les numéros restent pour les experts dans une bulle
   « Numéros des réglages » posée dans la légende de chaque groupe, et dans
   le nom des champs par nature de matériel ; un réglage refusé se nomme en
-  mots simples (F297, F298). Ensuite J3.
+  mots simples (F297, F298), **en ligne** (#79, fusionnée le 15 novembre
+  2026 à 21 h 50 ; le déploiement a sauté sur le parcours P28, rouge aussi
+  sur `main` le dimanche soir, et une seule relance hors de cette fenêtre
+  l'a passé : déployée le 16 novembre 2026 à 3 h 00, run 43760337407,
+  cinq jobs verts). **PR 2 sur 7, J3** (D-147) : au téléphone,
+  chaque jour du tableau de la semaine d'« Objectifs et besoins » tient en
+  une ligne (la date et ce qui s'y est passé) et s'ouvre dessous, le jour
+  courant ouvert ; une phrase compte les jours sans irrigation ni pluie,
+  sans en masquer aucun ; la tuile « ET0 » devient « Évaporation de la
+  semaine (ET0) » ; une tuile sans chiffre s'écrit au texte courant (F299 à
+  F301 ; P13 étendu). Ensuite J5.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

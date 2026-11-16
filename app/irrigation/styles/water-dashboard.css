@@ -116,6 +116,13 @@
   font-size: 22px;
 }
 
+/* Un chiffre absent à la taille du texte courant, sur une ligne (audit final, lot D, J3, F300). */
+.water-summary-card strong.is-unknown {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 650;
+}
+
 .water-summary-card small {
   overflow: hidden;
   color: var(--muted);
@@ -388,7 +395,22 @@
   .water-week-table tbody th { padding: 10px 12px; background: var(--sheet); }
   .water-week-table td { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; text-align: right; }
   .water-week-table td::before { content: attr(data-label); color: var(--muted); font-size: 12px; font-weight: 500; text-align: left; font-family: var(--font-ui); }
+  /* Les jours repliés en une ligne, le jour courant ouvert (audit final, lot D, J3, F299). */
+  .water-week-table tbody th { padding: 0; }
+  .water-week-table .water-day-date { display: none; }
+  .water-week-table .water-day-toggle { display: grid; width: 100%; min-height: 44px; box-sizing: border-box; gap: 2px; margin: 0; padding: 10px 40px 10px 12px; position: relative; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .water-week-table .water-day-toggle small { color: var(--muted); font-size: 12px; font-weight: 500; font-family: var(--font-ui); }
+  .water-week-table .water-day-toggle::after { position: absolute; top: 50%; right: 16px; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; content: ""; transform: translateY(-70%) rotate(45deg); }
+  .water-week-table tr[data-open] .water-day-toggle::after { transform: translateY(-30%) rotate(-135deg); }
+  .water-week-table tr:not([data-open]) td { display: none; }
 }
+
+/* À l'ordinateur, une ligne par jour : la date seule, sans bouton (F299). */
+@media (min-width: 601px) {
+  .water-day-toggle { display: none; }
+}
+
+.water-week-quiet { margin: 0; padding: 10px 12px; color: var(--muted); font-size: 12px; }
 /* L'encart « Alertes cultures » (5 quinquies). */
 .crop-alerts-panel { margin-top: 12px; }
 .crop-alerts-panel h4 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
