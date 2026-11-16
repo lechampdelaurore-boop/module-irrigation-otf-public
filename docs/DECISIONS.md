@@ -5154,3 +5154,32 @@ pas ; à l'ordinateur, rien ne change.
 Affichage seul : aucun calcul, aucune migration.
 
 Ne changent pas : D-136, D-150.
+
+## D-152 — Audit ergonomique final, lot D : chaque « Non calculable » de « Ressources » dit pourquoi (N1)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur, qui a ajouté ce point
+au lot le 15 novembre 2026 (17 h 35, « oui »), d'après la recette du lot A.
+Après D-151.
+
+**Décision** (F315, F316, contrat `docs/audit-ergonomie-final-lot-d-contract.md`,
+section 5 ter) : dans la faisabilité de « Ressources », chaque « Non
+calculable » est suivi de sa raison, celle que le calcul expose déjà :
+
+- le besoin, et ce qui en dépend (part servie, déficit global, couverture
+  confirmée) : « besoin non chiffré pour 2 planches sans objectif adopté »,
+  les mêmes mots que « Besoin de la semaine » (F282) ;
+- l'eau mobilisable : « volume non renseigné pour Cuve nord » ; l'eau
+  prévue : « prévision inconnue pour Forage » ; sans ressource : « aucune
+  ressource en service » ;
+- une planche : « Non calculable : aucun objectif adopté. » ou « surface
+  mouillée inconnue », la forme d'« Objectifs et besoins » ;
+- sinon, la raison générale : « une donnée manque : voir Fiabilité du
+  calcul ».
+
+Dans une phrase, la raison suit entre parenthèses : « Couverture confirmée :
+Non calculable (besoin non chiffré pour …) ». Le module
+`lib/domain/feasibility-unknown.ts` lit la faisabilité déjà calculée : aucun
+calcul ne change, aucune inconnue ne devient zéro (D-003) ; aucune
+migration.
+
+Ne changent pas : D-003, D-022, D-139, D-151.

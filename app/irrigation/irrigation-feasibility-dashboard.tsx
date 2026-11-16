@@ -9,6 +9,7 @@ import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
 import { loadIrrigationFeasibilityAction, saveIrrigationArbitrationAction, type FeasibilityActionResult } from './irrigation-feasibility-actions';
 import { feasibilityHeadTiles, isPriorityLevelShown } from '@/lib/domain/feasibility-reading';
 import { feasibilityUnknownReason } from '@/lib/domain/objective-reading';
+import { bedUnknownReason, feasibilityUnknownReasons, notComputableInline, notComputableLine } from '@/lib/domain/feasibility-unknown';
 import { ArbitrationPlan } from './arbitration-plan';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -16,6 +17,7 @@ const dates = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 
 const jours = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Paris' });
 /** Midi UTC : la date métier ne doit pas glisser d'un jour selon le fuseau. */
 const jour = (cle: string) => jours.format(new Date(`${cle}T12:00:00Z`));
+/** « Non calculable » se lit toujours avec sa raison, dans la ligne qui suit (lot D, N1, F315, F316). */
 const volume = (value: number | null) => value === null ? 'Non calculable' : volumeText(value);
 const mm = (value: number | null) => value === null ? 'Non calculable' : millimetersText(value);
 const percent = (value: number | null) => value === null ? 'Non calculable' : `${number.format(value)} %`;
@@ -70,6 +72,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
     return () => { observer.disconnect(); clearTimeout(timer); events.forEach((name) => window.removeEventListener(name, changed)); document.removeEventListener('visibilitychange', focused); channel?.close(); sequence.current += 1; };
   }, [refresh, self]);
   const head = dashboard ? feasibilityHeadTiles(dashboard) : null;
+  const reasons = dashboard ? feasibilityUnknownReasons(dashboard) : null;
   // L'ancre de « Répartir l'eau », depuis le planning (audit final, lot B, R4, F247).
   return <section ref={root} id="repartition" className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
     <header className="feasibility-heading"><div><h2 id="feasibility-title">Faisabilité et répartition de l’eau</h2><p>De maintenant à dimanche soir · Analyse préliminaire <FeasibilityHelp label="Faisabilité préliminaire" text={help.preliminary} /></p></div><button type="button" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
@@ -80,10 +83,10 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
       {dashboard.warnings.map((warning) => <p className="feasibility-warning" key={warning}>{warning}</p>)}
       {/* Quatre tuiles au plus en tête ; l'écran de répartition, quand un niveau attend un choix, porte les siennes (audit final, lot B, R3, F245). */}
       {head ? <div className="feasibility-summary is-head">
-        <Summary label="Eau disponible" value={volume(head.availableCubicMeters)} detail="d’ici dimanche soir, après les arrosages déjà planifiés" />
+        <Summary label="Eau disponible" value={volume(head.availableCubicMeters)} detail={head.availableCubicMeters === null && reasons ? reasons.forecast : 'd’ici dimanche soir, après les arrosages déjà planifiés'} />
         {/* Un besoin chiffré en partie se lit « au moins », et la tuile dit pourquoi (audit final, lot A, R2, F282). */}
         <Summary label="Besoin de la semaine" value={head.needCubicMeters === null && head.knownNeedCubicMeters > 0 ? `au moins ${volumeText(head.knownNeedCubicMeters)}` : volume(head.needCubicMeters)} detail={head.needCubicMeters === null ? `non chiffré pour ${feasibilityUnknownReason(head.unknownNeed) ?? 'des planches'}` : 'besoins effectifs restant à planifier'} />
-        <Summary label="Part servie" value={percent(head.coveragePercent)} detail={head.coveragePercent === null && head.needCubicMeters === null ? 'le besoin de la semaine n’est pas chiffré en entier' : 'du besoin, en volume'} />
+        <Summary label="Part servie" value={percent(head.coveragePercent)} detail={head.coveragePercent === null && reasons ? reasons.need : 'du besoin, en volume'} />
         <Summary label="Planches servies en entier" value={`${head.fullyServedBeds} sur ${head.bedsWithNeed}`} detail="parmi les planches qui ont un besoin" />
       </div> : null}
       <div>{dashboard.priorities.filter(isPriorityLevelShown).map((level) => isArbitrationEditable(level)
@@ -103,17 +106,17 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
       <details className="feasibility-calculation">
         <summary>Le détail du calcul</summary>
         <div className="feasibility-summary">
-          <Summary label="Besoins totaux" value={volume(dashboard.totalNeedCubicMeters)} detail={dashboard.unknownNeedCount ? `Partie connue : ${volume(dashboard.knownNeedCubicMeters)}` : 'Besoins effectifs restant à planifier'} />
-          <Summary label="Eau mobilisable actuellement" value={volume(dashboard.currentAvailableCubicMeters)} detail={`Stocks renseignés, hors sécurité${dashboard.currentAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownCurrentCubicMeters)}` : ''}`} />
-          <Summary label="Disponibilité prévisionnelle" value={volume(dashboard.forecastAvailableCubicMeters)} helpText={help.forecast} detail={`Après ${volume(dashboard.reservedPlannedCubicMeters)} déjà planifiés${dashboard.forecastAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownForecastCubicMeters)}` : ''}`} />
+          <Summary label="Besoins totaux" value={volume(dashboard.totalNeedCubicMeters)} detail={dashboard.unknownNeedCount ? `Partie connue : ${volume(dashboard.knownNeedCubicMeters)}${dashboard.totalNeedCubicMeters === null && reasons ? ` · ${reasons.need}` : ''}` : 'Besoins effectifs restant à planifier'} />
+          <Summary label="Eau mobilisable actuellement" value={volume(dashboard.currentAvailableCubicMeters)} detail={`Stocks renseignés, hors sécurité${dashboard.currentAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownCurrentCubicMeters)} · ${reasons?.current ?? ''}` : ''}`} />
+          <Summary label="Disponibilité prévisionnelle" value={volume(dashboard.forecastAvailableCubicMeters)} helpText={help.forecast} detail={`Après ${volume(dashboard.reservedPlannedCubicMeters)} déjà planifiés${dashboard.forecastAvailableCubicMeters === null ? ` · Partie connue : ${volume(dashboard.knownForecastCubicMeters)} · ${reasons?.forecast ?? ''}` : ''}`} />
           <Summary label="Volume affectable" value={volume(dashboard.allocatableCubicMeters)} helpText={help.allocatable} detail={dashboard.requiresManualArbitration ? 'Maximum théorique avant votre choix' : 'Après sélection et seuil minimal'} />
           <Summary label="Volume satisfait" value={volume(dashboard.allocatedCubicMeters)} detail={`Dont chaîne connue : ${volume(dashboard.confirmedAllocatedCubicMeters)}`} />
-          <Summary label="Déficit global" value={volume(dashboard.residualDeficitCubicMeters)} helpText={help.residual} detail={dashboard.requiresManualArbitration ? 'Déficit minimal avant votre décision' : 'Besoins non couverts'} />
-          <Summary label="Taux de couverture" value={percent(dashboard.coveragePercent)} helpText={help.coverage} detail={`Couverture confirmée : ${percent(dashboard.confirmedCoveragePercent)}`} />
+          <Summary label="Déficit global" value={volume(dashboard.residualDeficitCubicMeters)} helpText={help.residual} detail={dashboard.residualDeficitCubicMeters === null && reasons ? reasons.need : dashboard.requiresManualArbitration ? 'Déficit minimal avant votre décision' : 'Besoins non couverts'} />
+          <Summary label="Taux de couverture" value={percent(dashboard.coveragePercent)} helpText={help.coverage} detail={dashboard.confirmedCoveragePercent === null && reasons ? `Couverture confirmée : ${notComputableInline(reasons.need)}` : `Couverture confirmée : ${percent(dashboard.confirmedCoveragePercent)}`} />
           <Summary label="Volume non affecté" value={volume(dashboard.unallocatedCubicMeters)} detail={dashboard.withheldBelowThresholdCubicMeters > 0 ? `Dont sous seuil : ${volume(dashboard.withheldBelowThresholdCubicMeters)}` : 'Non consommé ni réservé par cette analyse'} />
         </div>
         {dashboard.potentialAdditionalCubicMeters > 0 ? <p className="feasibility-warning">Volume supplémentaire potentiellement utilisable : {volume(dashboard.potentialAdditionalCubicMeters)}. Son acheminement hydraulique reste à vérifier ; une couverture totale en volume ne prouve pas la faisabilité du planning.</p> : null}
-        <details className="feasibility-sources"><summary>Voir les ressources prises en compte</summary><div className="feasibility-bed-grid">{dashboard.pools.map((pool) => <article key={pool.key}><strong>{pool.name}</strong><p>Actuel : {volume(pool.currentCubicMeters)}<br />Prévisionnel restant : {volume(pool.forecastCubicMeters)}</p>{pool.reasons.map((reason) => <p key={reason}>{reason}</p>)}</article>)}</div></details>
+        <details className="feasibility-sources"><summary>Voir les ressources prises en compte</summary><div className="feasibility-bed-grid">{dashboard.pools.map((pool) => <article key={pool.key}><strong>{pool.name}</strong><p>Actuel : {pool.currentCubicMeters === null ? notComputableInline('volume non renseigné') : volume(pool.currentCubicMeters)}<br />Prévisionnel restant : {pool.forecastCubicMeters === null ? notComputableInline('prévision inconnue') : volume(pool.forecastCubicMeters)}</p>{pool.reasons.map((reason) => <p key={reason}>{reason}</p>)}</article>)}</div></details>
       </details>
     </>}
   </section>;
@@ -126,6 +129,8 @@ function PriorityPanel({ level }: { level: PriorityFeasibility }) {
     <div className="feasibility-bed-grid">{level.beds.map((row) => <article key={row.need.bedId} className="feasibility-bed" data-status={row.status}>
       <header><div><strong>{row.need.bedName}</strong><small>{row.need.zoneName} · {row.need.plotName}</small></div></header>
       <dl><div><dt>Besoin effectif</dt><dd>{mm(row.need.effectiveNeedMm)} · {volume(row.need.effectiveVolumeCubicMeters)}</dd></div><div><dt>Déficit actuel</dt><dd>{mm(row.need.realRemainingMm)} · {percent(row.need.relativeDeficitPercent)}</dd></div><div><dt>Allocation faisable <FeasibilityHelp label="Allocation faisable" text={help.allocation} /></dt><dd>{mm(row.allocatedMm)} · {volume(row.allocatedCubicMeters)}</dd></div><div><dt>Déficit résiduel <FeasibilityHelp label="Déficit résiduel" text={help.residual} /></dt><dd>{mm(row.residualMm)} · {volume(row.residualCubicMeters)}</dd></div><div><dt>Satisfaction</dt><dd>{percent(row.satisfactionPercent)}</dd></div></dl>
+      {[row.need.effectiveNeedMm, row.need.effectiveVolumeCubicMeters, row.need.realRemainingMm, row.need.relativeDeficitPercent, row.allocatedMm, row.allocatedCubicMeters, row.residualMm, row.residualCubicMeters, row.satisfactionPercent].includes(null)
+        ? <p className="need-unknown-reason">{notComputableLine(bedUnknownReason(row.need))}</p> : null}
       {row.need.manualOverrideMm !== null ? <p>Besoin manuel actif{row.need.overrideReason ? ` : ${row.need.overrideReason}` : ''}.</p> : null}
       <p className="feasibility-status">{statusLabels[row.status]}</p>
       {row.status === 'below_threshold' ? <p>Proposition brute : {volume(row.proposedCubicMeters)} · seuil {mm(row.need.thresholdMm)}. Volume non affecté.</p> : null}

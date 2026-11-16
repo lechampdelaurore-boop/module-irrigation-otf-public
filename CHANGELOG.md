@@ -7,6 +7,12 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
+- **N1, chaque « Non calculable » de « Ressources » dit pourquoi** (D-152,
+  F315, F316) : « Part servie », « Déficit global », « Couverture
+  confirmée », l'eau disponible et chaque planche de la faisabilité portent
+  leur raison, « besoin non chiffré pour 2 planches sans objectif adopté »,
+  « volume non renseigné pour Cuve nord », ou à défaut « une donnée manque :
+  voir Fiabilité du calcul ». Parcours P31c étendu.
 - **M1, les cases de planche de « Matériel » assez grandes à toucher**
   (D-151, F313, F314) : au téléphone, 44 px de large au moins, 4 px entre
   deux ; un jardin de 33 planches passe sur plusieurs lignes au lieu de

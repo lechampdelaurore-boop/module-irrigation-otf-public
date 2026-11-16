@@ -571,7 +571,13 @@ registres, elle y renvoie.
   moins, 4 px entre deux, et passe à la ligne quand le jardin en a trop pour
   une ligne (la ferme réelle en a jusqu'à 33, qui faisaient 23 px) ; le
   dessin et le geste ne changent pas (F313, F314 ; P31c étendu à 390 et
-  360 px). Ensuite N1.
+  360 px), **en ligne** (#84, fusionnée le 16 novembre 2026 à 7 h 26,
+  déployée à 7 h 47, run 43816723699, cinq jobs verts). **PR 7 sur 7, N1** (D-152) : sur « Ressources », chaque « Non
+  calculable » de la faisabilité dit pourquoi, avec la raison que le calcul
+  expose déjà (« besoin non chiffré pour 2 planches sans objectif adopté »,
+  « volume non renseigné pour Cuve nord »…), sinon « une donnée manque :
+  voir Fiabilité du calcul » ; « Part servie » et « Couverture confirmée »
+  comprises (F315, F316 ; P31c étendu). Reste la recette du porteur.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul
