@@ -564,7 +564,14 @@ registres, elle y renvoie.
   leurs lignes dans un pli ; « Observer » ou le formulaire, jamais les deux ;
   « réserve utile (RFU) » en entier à sa première occurrence ; un test du
   domaine prouve qu'une observation ne remplit pas une jauge sans RFU
-  (F308 à F312 ; P29, P31b, P33 adaptés). Ensuite M1.
+  (F308 à F312 ; P29, P31b, P33 adaptés), **en ligne** (#83, fusionnée
+  le 16 novembre 2026 à 6 h 30, déployée à 6 h 50, run 43810666483, cinq
+  jobs verts). **PR 6 sur 7, M1** (D-151) : au
+  téléphone, chaque case de planche de « Matériel » fait 44 px de large au
+  moins, 4 px entre deux, et passe à la ligne quand le jardin en a trop pour
+  une ligne (la ferme réelle en a jusqu'à 33, qui faisaient 23 px) ; le
+  dessin et le geste ne changent pas (F313, F314 ; P31c étendu à 390 et
+  360 px). Ensuite N1.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

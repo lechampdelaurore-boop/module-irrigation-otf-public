@@ -5,6 +5,9 @@
   du besoin de la culture sur « Matériel » (F306).
   J4 : « Renseigner la réserve de la parcelle » sous un jardin sans RFU, et
   les planches pareilles en une phrase, leurs lignes dans un pli (F308, F310).
+  M1 : au téléphone, les cases de planche de « Matériel » font 44 px de large
+  au moins ; trop nombreuses pour une ligne, elles passent à la ligne (F313,
+  F314).
 */
 .page-settings {
   margin-top: 1.5rem;
@@ -110,4 +113,12 @@
 .soil-week-unknown {
   margin: .25rem 0;
   color: var(--muted);
+}
+
+/* M1 : la case de planche garde son dessin, mais jamais moins de 44 px de large au téléphone ; 4 px entre deux (F313, F314). */
+@media (max-width: 600px) {
+  .bed-strip {
+    grid-template-columns: repeat(auto-fit, minmax(var(--touch-target), 1fr));
+    gap: 4px;
+  }
 }

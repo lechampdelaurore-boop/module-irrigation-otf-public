@@ -15,6 +15,10 @@ import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage,
  *   dans « Pour les experts », un seul tableau des K_abri (cas 12) ;
  * - « Matériel » : le nom du réglage séparé des planches couvertes, une
  *   ligne de sens sous « Chevauchements » et « Cumul maximal » ;
+ * - « Matériel » au téléphone, à 390 et 360 px : chaque case de planche
+ *   fait 44 px de large au moins, sans chevaucher sa voisine ; un jardin de
+ *   33 cases, posé pour l'essai à côté du vrai, passe à la ligne (lot D, M1,
+ *   F313, F314) ;
  * - toutes les pages : « Aller au contenu » est le premier arrêt du clavier
  *   et mène au contenu ; au téléphone, aucune cible visible sous 44 px de
  *   haut, plis fermés puis tous ouverts ; aux deux largeurs, aucun texte
@@ -93,6 +97,53 @@ test('matériel : le réglage séparé des planches couvertes, une ligne de sens
   await expect(materiel.locator('.coverage-setting-name')).toHaveText(reglage);
   await expect(materiel.locator('small')).toContainText(/couvre \d+ planches?/);
   await verifierLEtape(page, journal, 'matériel en clair');
+});
+
+/** Les cases de planche de « Matériel » : leur boîte, et celles qui en chevauchent une autre. */
+async function casesDePlanche(page: Page) {
+  return page.locator('.bed-strip .plan-bed').evaluateAll((cases) => {
+    const boites = cases.map((element) => element.getBoundingClientRect()).filter((boite) => boite.width > 0);
+    const chevauchements = boites.filter((boite, index) => boites.some((autre, position) => position !== index
+      && boite.left < autre.right && autre.left < boite.right && boite.top < autre.bottom && autre.top < boite.bottom)).length;
+    return { nombre: boites.length, plusEtroite: Math.min(...boites.map((boite) => Math.round(boite.width * 10) / 10)), chevauchements };
+  });
+}
+
+test('« Matériel » à 390 et 360 px : chaque case de planche fait 44 px de large, sans chevaucher sa voisine, même à 33 planches', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'telephone', 'la règle vaut au téléphone (lot D, M1, F313)');
+  const journal = surveillerLaConsole(page);
+  await attendreLaPageIrrigation(page, 'materiel');
+  for (const largeur of [390, 360]) {
+    await page.setViewportSize({ width: largeur, height: 844 });
+    const cases = await casesDePlanche(page);
+    expect(cases.nombre, 'des cases de planche sur la démonstration').toBeGreaterThan(0);
+    expect(cases.plusEtroite, `la case la plus étroite à ${largeur} px`).toBeGreaterThanOrEqual(44);
+    expect(cases.chevauchements, `aucune case n'en chevauche une autre à ${largeur} px`).toBe(0);
+    // La ferme réelle a jusqu'à 33 planches par jardin (175 en tout) : un jardin de 33 cases, posé à côté du vrai, passe à la ligne (F314).
+    await page.locator('.plot-plan-card').first().evaluate((carte) => {
+      const bande = carte.querySelector('.bed-strip');
+      if (!bande) return;
+      const essai = document.createElement('div');
+      essai.className = 'bed-strip';
+      essai.dataset.essai = 'm1';
+      for (let numero = 1; numero <= 33; numero += 1) {
+        const cellule = document.createElement('div');
+        cellule.className = 'bed-anchor-cell';
+        const bouton = document.createElement('button');
+        bouton.type = 'button';
+        bouton.className = 'plan-bed';
+        bouton.innerHTML = `<span>B1-${numero}</span>`;
+        cellule.appendChild(bouton);
+        essai.appendChild(cellule);
+      }
+      bande.parentNode?.insertBefore(essai, bande.nextSibling);
+    });
+    const essai = await page.locator('.bed-strip[data-essai="m1"] .plan-bed').evaluateAll((cases) => cases.map((element) => element.getBoundingClientRect()));
+    expect(Math.min(...essai.map((boite) => boite.width)), `33 cases à ${largeur} px`).toBeGreaterThanOrEqual(44);
+    expect(new Set(essai.map((boite) => Math.round(boite.top))).size, 'les 33 cases passent à la ligne').toBeGreaterThan(1);
+    await page.locator('.bed-strip[data-essai="m1"]').evaluate((element) => element.remove());
+  }
+  await verifierLEtape(page, journal, 'cases de planche de 44 px');
 });
 
 test('« Aller au contenu », cibles de 44 px au téléphone et contraste de 4,5:1 sur toutes les pages', async ({ page }, testInfo) => {

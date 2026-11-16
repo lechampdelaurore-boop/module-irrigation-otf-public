@@ -238,6 +238,15 @@ pas. **Le porteur a accepté de les ajouter à ce lot** (15 novembre 2026, 15 h 
 4. À confirmer en lisant le composant : si les cases sont des `<input
    type="checkbox">`, la zone se fait par le `<label>`.
 
+**Ce que le code a établi (PR 6, D-151).** Les cases sont des `<button
+class="plan-bed">` dans une grille, `.bed-strip`, qui au téléphone prenait
+`repeat(auto-fit, minmax(22px, 1fr))` (`styles/responsive.css`) : 33 planches
+y tenaient sur une ligne, à 23 px. La règle passe à `minmax(var(--touch-target),
+1fr)` avec 4 px d'écart, dans `styles/pages-allegees.css` : la case grandit
+elle-même, aucune zone invisible n'est nécessaire. P31c le mesure à 390 et
+360 px, sur la démonstration et sur un jardin d'essai de 33 cases posé pour
+la mesure puis retiré.
+
 ## 5 ter. N1 — « Part servie » et « Couverture confirmée » disent pourquoi (ajout du 15 novembre 2026)
 
 **Origine.** Recette du lot A (`recettes/constats-lot-a.md`, ligne R2) :
