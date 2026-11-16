@@ -43,6 +43,11 @@ function deepestRoot(rooting: RootingProfileView): ReferenceCropSummary['rootDep
   return { meters: deepest, proposed: false };
 }
 
+/** Le nombre de séries de la saison rattachées à la culture (lot D, J5, F302). */
+export function referenceCropSeriesCount(referenceCropId: string, species: readonly SeasonSpecies[]): number {
+  return seriesOf(referenceCropId, species).size;
+}
+
 /** Les séries de la saison rattachées à la culture : l'exception d'une série l'emporte sur le rattachement de son espèce. */
 function seriesOf(referenceCropId: string, species: readonly SeasonSpecies[]): Set<string> {
   const ids = new Set<string>();
@@ -58,6 +63,30 @@ function seriesOf(referenceCropId: string, species: readonly SeasonSpecies[]): S
 const kcFormat = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 const meters = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+/**
+ * Le résumé lu sans ouvrir la carte : « 3 séries de la saison », « aucune
+ * série de la saison ». Le Kc et les racines passent dans « Pour les
+ * experts » de la carte (audit ergonomique final, lot D, J5, F303).
+ */
+export function referenceCropSeriesText(summary: ReferenceCropSummary): string {
+  return summary.seriesCount === 0
+    ? 'aucune série de la saison'
+    : `${summary.seriesCount} série${summary.seriesCount > 1 ? 's' : ''} de la saison`;
+}
+
+/** Les cultures cultivées cette saison d'abord, les autres à part (lot D, J5, F302) ; l'ordre de chaque groupe est gardé. */
+export function splitBySeasonUse<T>(items: readonly T[], seriesCount: (item: T) => number): { cultivated: T[]; others: T[] } {
+  return {
+    cultivated: items.filter((item) => seriesCount(item) > 0),
+    others: items.filter((item) => seriesCount(item) === 0),
+  };
+}
+
+/** « Kc de 0,40 à 1,05 · racines jusqu'à 0,40 m », pour « Pour les experts » de la carte (F303). */
+export function referenceCropExpertText(summary: ReferenceCropSummary): string {
+  return referenceCropSummaryText(summary).split(' · ').slice(0, -1).join(' · ');
+}
+
 /** « Kc de 0,40 à 1,05 · racines jusqu'à 0,40 m · 3 séries de la saison ». */
 export function referenceCropSummaryText(summary: ReferenceCropSummary): string {
   const parts: string[] = [];
@@ -69,8 +98,6 @@ export function referenceCropSummaryText(summary: ReferenceCropSummary): string 
   parts.push(summary.rootDepth.proposed
     ? `racines : ${meters.format(summary.rootDepth.meters)} m proposés`
     : `racines jusqu’à ${meters.format(summary.rootDepth.meters)} m`);
-  parts.push(summary.seriesCount === 0
-    ? 'aucune série de la saison'
-    : `${summary.seriesCount} série${summary.seriesCount > 1 ? 's' : ''} de la saison`);
+  parts.push(referenceCropSeriesText(summary));
   return parts.join(' · ');
 }

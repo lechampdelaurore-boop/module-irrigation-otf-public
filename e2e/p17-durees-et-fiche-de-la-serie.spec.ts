@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { carteDeCulture } from './support/cultures.ts';
 
 /**
  * Parcours P17 : les durées propres à la ferme et la fiche de la série
@@ -37,8 +38,7 @@ test('les durées d’une culture se règlent puis reviennent au jeu commun, et 
   const statut = coefficients.getByRole('status');
 
   // Régler le délai de levée en plantation, puis revenir aux durées communes.
-  const carte = coefficients.locator('details.reference-crop-card').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${culture}$`) }) });
-  await expect(carte).toHaveCount(1);
+  const carte = await carteDeCulture(coefficients, culture);
   await carte.scrollIntoViewIfNeeded();
   const ouvrirDurees = carte.locator('details.farm-durations-wrap > summary');
   await ouvrirParClic(carte.locator('summary').first(), ouvrirDurees);

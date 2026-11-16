@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState, useTransition } from 'react';
+import { useId, useState, useTransition, type ReactNode } from 'react';
 import type { StoredReferenceCrop } from '@/db/crop-water/references';
 import { correspondenceTargetLabel, kcSourceLabel } from '@/lib/domain/crop-water/presentation';
 import type { KcSource } from '@/lib/domain/crop-water/reference';
@@ -30,7 +30,7 @@ import {
 } from '../crop-water-actions';
 import { CropWaterSettingsSection } from './crop-water-settings';
 import { ReferenceCropCard } from './reference-crop-card';
-import { referenceCropSummary } from '@/lib/domain/crop-water/crop-summary';
+import { referenceCropSeriesCount, referenceCropSummary, splitBySeasonUse } from '@/lib/domain/crop-water/crop-summary';
 import { DetailHint } from './detail-hint';
 import { ExpertsFold } from './experts-fold';
 import { PlantVignette } from './plant-vignette';
@@ -131,8 +131,8 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
                 par toutes les fermes ; les durées de la ferme le remplacent pour elle seule.
               </p>
             </ExpertsFold>
-            <div className="reference-crop-list">
-              {view.crops.map((stored) => {
+            <ReferenceCropGroups crops={view.crops} seriesCount={(stored) => referenceCropSeriesCount(stored.crop.id, view.species)}>
+              {(stored) => {
                 const overrideRows = kcOverrideRows(stored.crop, view.overrides, view.settings.today);
                 const rooting = rootingProfileView(stored.crop, view.rootingProfiles, view.settings.today);
                 return (
@@ -152,13 +152,41 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
                     onSaveRooting={(input) => run(() => saveRootingProfileAction({ season, referenceCropId: stored.crop.id, ...input }))}
                   />
                 );
-              })}
-            </div>
+              }}
+            </ReferenceCropGroups>
           </section>
           <CropWaterSettingsSection season={season} settings={view.settings} pending={pending} run={run} />
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * Les cultures de la saison d'abord, ouvertes comme avant ; les autres
+ * cultures de référence dans un pli fermé (audit ergonomique final, lot D,
+ * J5, F302). Sans aucune culture de la saison, le pli s'ouvre : la page
+ * n'est jamais vide.
+ */
+function ReferenceCropGroups({ crops, seriesCount, children }: {
+  crops: readonly StoredReferenceCrop[];
+  seriesCount: (stored: StoredReferenceCrop) => number;
+  children: (stored: StoredReferenceCrop) => ReactNode;
+}) {
+  const { cultivated, others } = splitBySeasonUse(crops, seriesCount);
+  return (
+    <>
+      <h4 className="reference-crop-group-title">Vos cultures cette saison ({cultivated.length})</h4>
+      {cultivated.length === 0 ? (
+        <p className="crop-coefficients-empty">Aucune culture de référence ne sert à vos séries cette saison : rattachez leurs espèces dans Réglages.</p>
+      ) : <div className="reference-crop-list">{cultivated.map(children)}</div>}
+      {others.length > 0 ? (
+        <details className="reference-crop-others" open={cultivated.length === 0} suppressHydrationWarning>
+          <summary>Les autres cultures de référence ({others.length})</summary>
+          <div className="reference-crop-list">{others.map(children)}</div>
+        </details>
+      ) : null}
+    </>
   );
 }
 

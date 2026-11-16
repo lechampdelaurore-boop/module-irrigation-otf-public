@@ -6,7 +6,7 @@ import { FAO_PHASES, type KcCurve, type ReferenceCrop } from '@/lib/domain/crop-
 import { kcSourceLabel, monthsLabel, stageAnchorLabel } from '@/lib/domain/crop-water/presentation';
 import type { KcOverrideRow } from '@/lib/domain/crop-water/settings-view';
 import { referenceCropSymbol } from '@/lib/domain/crop-water/plant-vignettes';
-import { referenceCropSummaryText, type ReferenceCropSummary } from '@/lib/domain/crop-water/crop-summary';
+import { referenceCropExpertText, referenceCropSeriesText, type ReferenceCropSummary } from '@/lib/domain/crop-water/crop-summary';
 import { DetailHint } from './detail-hint';
 import { ExpertsFold } from './experts-fold';
 import { FarmDurationsForm } from './farm-durations';
@@ -62,7 +62,8 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
         <strong><PlantVignette spriteHref={spriteHref} symbol={referenceCropSymbol(crop)} />{crop.name}</strong>
         {/* La source et la forme de la courbe passent dans « Pour les experts » ; restent les réglages de la ferme (point 8). */}
         {farmMarks.length > 0 ? <small>{farmMarks.join(' · ')}</small> : null}
-        {unusable ? null : <span className="reference-crop-summary">{referenceCropSummaryText(summary)}</span>}
+        {/* Les séries de la saison seules ; le Kc et les racines dans « Pour les experts » (audit final, lot D, J5, F303). */}
+        {unusable ? null : <span className="reference-crop-summary">{referenceCropSeriesText(summary)}</span>}
         <DetailHint />
       </summary>
       {unusable ? (
@@ -71,6 +72,7 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
         </ul>
       ) : null}
       <ExpertsFold>
+        {unusable ? null : <p className="reference-crop-meta reference-crop-expert-summary">{referenceCropExpertText(summary)}</p>}
         <p className="reference-crop-meta">
           {kcSourceLabel(crop.source)} · {curveLabel(crop.curve)} · {stored.origin === 'farm' ? 'durées de la ferme' : 'jeu commun'}
         </p>

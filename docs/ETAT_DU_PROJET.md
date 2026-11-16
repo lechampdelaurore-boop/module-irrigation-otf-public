@@ -535,7 +535,14 @@ registres, elle y renvoie.
   courant ouvert ; une phrase compte les jours sans irrigation ni pluie,
   sans en masquer aucun ; la tuile « ET0 » devient « Évaporation de la
   semaine (ET0) » ; une tuile sans chiffre s'écrit au texte courant (F299 à
-  F301 ; P13 étendu). Ensuite J5.
+  F301 ; P13 étendu), **en ligne** (#80, fusionnée le 16 novembre 2026 à
+  3 h 42, déployée à 4 h 01, run 43793774502, cinq jobs verts). **PR 3 sur
+  7, J5** (D-148) : « Besoin par culture »
+  montre d'abord « Vos cultures cette saison (N) », les autres cultures de
+  référence dans un pli fermé ; la carte fermée ne dit plus que ses séries
+  de la saison, le Kc et les racines passent dans son « Pour les experts »,
+  comme la formule de l'ombrage (F302 à F304 ; P14, P16, P17, P20 adaptés,
+  P31c étendu). Ensuite J2.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

@@ -5054,3 +5054,22 @@ en masquer aucun ; une pluie inconnue n'y devient pas zéro (F301, D-003).
 Affichage seul : aucune valeur, aucun calcul ne change ; aucune migration.
 
 Ne changent pas : D-003, D-010, D-146.
+
+## D-148 — Audit ergonomique final, lot D : « Besoin par culture », vos cultures d'abord (J5)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur (D-137). Après D-147.
+
+**Décision** (F302 à F304, contrat `docs/audit-ergonomie-final-lot-d-contract.md`,
+section 5) : la page « Besoin par culture » montre d'abord « Vos cultures
+cette saison (N) », celles auxquelles une série de la saison se rattache ;
+les autres cultures de référence sont dans un pli fermé, ouvert seulement
+quand la saison n'en cultive aucune (F302). La carte fermée d'une culture
+ne dit plus que ses séries de la saison ; le Kc et la profondeur des racines
+passent dans son « Pour les experts », ce qui remplace le résumé choisi le
+8 novembre 2026 ; la formule de l'ombrage quitte l'option visible (F303).
+Aucune cible de la page sous 44 px (F304).
+
+Affichage seul : aucun Kc, aucune durée, aucun profil, aucun calcul ne
+change ; aucune migration.
+
+Ne changent pas : D-045, D-053, D-147.
