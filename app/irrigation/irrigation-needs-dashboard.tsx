@@ -8,6 +8,7 @@ import { gardenUnknownReason } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
 import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { FigureOrigin } from './shell/figure-origin';
+import { PageSettingsFold } from './shell/page-settings-fold';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
@@ -55,14 +56,19 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     {notice ? <p className="water-notice" role="status">{notice}</p> : null}{error ? <p className="water-error" role="alert">{error}</p> : null}
     {!dashboard.completeness.complete ? <p className="irrigation-needs-warning" role="status">{dashboardWarning(dashboard)}</p> : null}
     <div className="irrigation-needs-controls">
-      <label><span>Seuil minimal de planification (mm)</span><input inputMode="decimal" value={threshold} onChange={(event) => setThreshold(event.target.value)} /></label>
-      <button type="button" disabled={pending} onClick={() => startTransition(async () => receive(await saveIrrigationNeedThresholdAction({ season, weekStart: dashboard.weekStart, thresholdMm: numeric(threshold) })))}>Enregistrer le seuil</button>
       <label><span>Trier les planches</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="priority">Priorités hautes</option><option value="deficit">Déficit le plus fort</option><option value="remaining">Besoin restant</option><option value="covered">Déjà couvert</option></select></label>
     </div>
     <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId}>
       <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
       <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm })))} />)}</div>
     </details>)}</div>
+    {/* Le seuil minimal de planification dans le pli du bas (audit final, lot D, J2, F305). */}
+    <PageSettingsFold>
+      <div className="irrigation-needs-controls">
+        <label><span>Seuil minimal de planification (mm)</span><input inputMode="decimal" value={threshold} onChange={(event) => setThreshold(event.target.value)} /></label>
+        <button type="button" disabled={pending} onClick={() => startTransition(async () => receive(await saveIrrigationNeedThresholdAction({ season, weekStart: dashboard.weekStart, thresholdMm: numeric(threshold) })))}>Enregistrer le seuil</button>
+      </div>
+    </PageSettingsFold>
   </section>;
 }
 

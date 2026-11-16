@@ -542,7 +542,16 @@ registres, elle y renvoie.
   référence dans un pli fermé ; la carte fermée ne dit plus que ses séries
   de la saison, le Kc et les racines passent dans son « Pour les experts »,
   comme la formule de l'ombrage (F302 à F304 ; P14, P16, P17, P20 adaptés,
-  P31c étendu). Ensuite J2.
+  P31c étendu), **en ligne** (#81, fusionnée le 16 novembre 2026 à
+  4 h 37, déployée à 4 h 58, run 43799270497, cinq jobs verts). **PR 4 sur 7, J2** (D-149) : un pli « Réglages de cette
+  page », fermé, en bas, sur « Arrosages » (la limite journalière),
+  « Objectifs et besoins » (le seuil minimal de planification),
+  « Ressources et pompes » (liaisons, alimentation par défaut, pompes,
+  pompe habituelle) et « Matériel » (la fiche « Besoin de la culture » de
+  la planche, que la planche renvoie à « Objectifs et besoins ») ; l'ancre
+  `#reglages-de-la-page` l'ouvre ; aucun réglage de ces pages ne bloque
+  seul un calcul, l'ouverture d'office n'est donc employée nulle part
+  (F305 à F307 ; P12, P15, P31c, P32, P35 adaptés). Ensuite J4.
 - Tranche 4, démo guidée (4.0, D-096) : contrat `docs/demo-guided-contract.md`
   **validé par le porteur le 8 novembre 2026**, inscrit aux registres le
   12 novembre 2026 (documents seuls). Code D1 à D4 **après la 3.9**, un seul

@@ -1,0 +1,68 @@
+/*
+  Audit ergonomique final, lot D, les pages allégées
+  (docs/audit-ergonomie-final-lot-d-contract.md).
+  J2 : le pli « Réglages de cette page », en bas, fermé (F305) ; le renvoi
+  du besoin de la culture sur « Matériel » (F306).
+*/
+.page-settings {
+  margin-top: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.page-settings > summary {
+  position: relative;
+  display: grid;
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  gap: 2px;
+  padding: .7rem 2.75rem .7rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.page-settings > summary::-webkit-details-marker {
+  display: none;
+}
+
+.page-settings > summary small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.page-settings > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.page-settings[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.page-settings-body {
+  display: grid;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+
+/*
+  Un matériel archivé est un contexte d'empilement (son filtre) : menu ouvert,
+  il passe au-dessus du pli qui le suit, que « Restaurer » reste à toucher.
+*/
+.equipment-card:has(.equipment-menu[open]) {
+  position: relative;
+  z-index: 20;
+}
+
+.bed-crop-water-pointer {
+  margin: .75rem 0 0;
+  color: var(--muted);
+}

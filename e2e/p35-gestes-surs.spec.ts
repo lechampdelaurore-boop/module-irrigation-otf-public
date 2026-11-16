@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, type PageDuModule } from './support/parcours.ts';
+import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P35 : l'audit ergonomique final, lot C, gestes sûrs
@@ -67,6 +67,7 @@ test('le « i » garde son dessin dans tout bloc, sur toutes les pages', async (
       await verifierLEtape(page, journal, 'carotte rattachée, pour que la fiche ait son « i »');
       await attendreLaPageIrrigation(page, 'materiel');
       await page.getByRole('region', { name: 'Choix du plan affiché' }).getByLabel('Parcelle').selectOption({ label: 'Sous le verger' });
+      await ouvrirLesReglagesDeLaPage(page); // la fiche est dans le pli du bas (audit final, lot D, J2, F305)
       const fiche = page.getByRole('region', { name: 'Besoin de la culture · planche V01' });
       await expect(fiche.locator('.figure-origin-toggle').first()).toBeVisible({ timeout: 30_000 });
       await fiche.scrollIntoViewIfNeeded();

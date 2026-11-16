@@ -21,6 +21,8 @@ import type { ClosedPlacementPose } from '@/db/equipment-placement-poses';
 import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import { GardenGroupManager } from './garden-group-manager';
 import { BedCropWaterPanel } from './crop-water/bed-crop-water-panel';
+import { pageHref } from '@/lib/domain/features/pages';
+import { PAGE_SETTINGS_ANCHOR, PageSettingsFold } from './shell/page-settings-fold';
 import { IrrigationShell, type ShellProps } from './shell/irrigation-shell';
 import { PlanViewTabs, type PlanView } from './hierarchy/plan-view-tabs';
 import { SatelliteViewTab } from './hierarchy/satellite/satellite-view-tab';
@@ -316,8 +318,13 @@ export function HierarchyBrowser({
           coverage={coverageByBedId.get(selectedBed.id) ?? null}
         />
       ) : null}
+      {/* Le besoin de la culture renvoie à « Objectifs et besoins » ; son stade et l'adoption sont dans le pli du bas (audit final, lot D, J2, F306). */}
       {selectedBed && showBedCropWater ? (
-        <BedCropWaterPanel key={`${season}:${selectedBed.id}`} season={season} bedId={selectedBed.id} bedName={selectedBed.name} />
+        <p className="bed-crop-water-pointer">
+          Le besoin de la culture de cette planche se lit dans{' '}
+          <a href={pageHref('besoins', { season })}>Objectifs et besoins</a> ; son stade et l’adoption de l’objectif proposé
+          sont dans <a href={`#${PAGE_SETTINGS_ANCHOR}`}>Réglages de cette page</a>, en bas.
+        </p>
       ) : null}
 
       {/* Le plan de la parcelle d'abord, la planche choisie juste dessous, puis l'aperçu (retour du porteur du 8 novembre 2026). */}
@@ -345,6 +352,11 @@ export function HierarchyBrowser({
         onPlacementChanged={applyPlacementUpdate}
         calculator={calculator}
       />
+      {selectedBed && showBedCropWater ? (
+        <PageSettingsFold>
+          <BedCropWaterPanel key={`${season}:${selectedBed.id}`} season={season} bedId={selectedBed.id} bedName={selectedBed.name} />
+        </PageSettingsFold>
+      ) : null}
       {removal ? (
         <EquipmentRemovalDialog
           equipmentName={equipmentById.get(removal.equipmentId)?.name ?? 'ce matériel'}

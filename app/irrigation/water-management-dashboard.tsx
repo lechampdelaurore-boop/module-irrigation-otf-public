@@ -9,6 +9,7 @@ import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-day
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
 import { FigureOrigin } from './shell/figure-origin';
+import { PageSettingsFold } from './shell/page-settings-fold';
 import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
@@ -285,6 +286,8 @@ export function WaterManagementDashboard({
         {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
           ? <p className="weather-stale">Un minuteur attend encore la confirmation de ses horaires réels. Son volume en cours est une estimation, réservée dans le budget mais non ajoutée au réalisé confirmé.</p> : null}
 
+        {/* La limite journalière et ses dates dans le pli du bas (audit final, lot D, J2, F305). */}
+        <PageSettingsFold>
         <div className="water-dashboard-columns">
           <article className="water-panel">
             <div className="water-panel-title"><div><h3>Limite journalière d’irrigation</h3><p>Règle forte appliquée aux nouvelles irrigations en cours ou planifiées.</p></div></div>
@@ -298,6 +301,7 @@ export function WaterManagementDashboard({
             </div>
           </article>
         </div>
+        </PageSettingsFold>
       </section>
     );
   }

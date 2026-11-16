@@ -51,6 +51,13 @@ test('la fiche de la planche montre le stade, le Kc, l’ETM et l’objectif pro
   // La fiche de V01 : parcelle « Sous le verger », sa première planche.
   await attendreLaPageIrrigation(page, 'materiel');
   await page.getByRole('region', { name: 'Choix du plan affiché' }).getByLabel('Parcelle').selectOption({ label: 'Sous le verger' });
+  // Sous la planche, un renvoi : le besoin se lit dans « Objectifs et besoins » ; le stade et l'adoption sont
+  // dans le pli « Réglages de cette page », que son lien ouvre (audit final, lot D, J2, F305, F306).
+  const renvoi = page.locator('.bed-crop-water-pointer');
+  await expect(renvoi.getByRole('link', { name: 'Objectifs et besoins' })).toHaveAttribute('href', /\/irrigation\/besoins\?/);
+  await expect(page.locator('details#reglages-de-la-page')).not.toHaveAttribute('open', '');
+  await renvoi.getByRole('link', { name: 'Réglages de cette page' }).click();
+  await expect(page.locator('details#reglages-de-la-page')).toHaveAttribute('open', '');
   const fiche = page.getByRole('region', { name: 'Besoin de la culture · planche V01' });
   await fiche.scrollIntoViewIfNeeded();
   const cultures = fiche.getByRole('list', { name: 'Cultures du jour' });

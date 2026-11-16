@@ -5073,3 +5073,27 @@ Affichage seul : aucun Kc, aucune durée, aucun profil, aucun calcul ne
 change ; aucune migration.
 
 Ne changent pas : D-045, D-053, D-147.
+
+## D-149 — Audit ergonomique final, lot D : un pli « Réglages de cette page » (J2, choix n° 3)
+
+Date : 15 novembre 2026, soir. Décideur : le porteur (choix n° 3 du rapport,
+confirmé le 15 novembre 2026, D-137). Après D-148.
+
+**Décision** (F305 à F307, contrat `docs/audit-ergonomie-final-lot-d-contract.md`,
+section 5) : sur « Arrosages », « Objectifs et besoins », « Ressources et
+pompes » et « Matériel », ce qui se règle une fois pour toutes quitte le
+travail du jour pour un pli « Réglages de cette page », fermé, en bas : la
+limite journalière ; le seuil minimal de planification ; les liaisons,
+l'alimentation par défaut, les pompes et la pompe habituelle du matériel ;
+la fiche « Besoin de la culture » d'une planche. Le pli s'ouvre par son
+ancre `#reglages-de-la-page` ou celle d'un élément qu'il contient (F305,
+F307). Sur « Matériel », une phrase renvoie à « Objectifs et besoins »
+pour le besoin, et au pli pour le stade et l'adoption, qui restent où ils
+étaient (F306). Aucun réglage de ces pages ne bloque seul un calcul :
+l'ouverture d'office n'est employée nulle part.
+
+Affichage seul : aucun réglage ne disparaît, aucun geste ne change ce
+qu'il fait, aucun calcul ne change ; aucune migration. Les pages validées
+avant (3.8, D-067 ; lots A et B) changent d'organisation sur ce choix.
+
+Ne changent pas : D-067, D-137, D-148.

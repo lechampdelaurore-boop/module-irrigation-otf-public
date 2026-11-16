@@ -188,6 +188,36 @@ oui). Pages concernées, d'après le rapport et la lecture du code :
 3. **Rien ne disparaît** : chaque réglage reste à une adresse et une ancre
    stables (les liens des lots A et B ne se brisent pas) (F307).
 
+**Ce que le code a établi pour J2 (PR 4, D-149).**
+
+- Un composant, `app/irrigation/shell/page-settings-fold.tsx` : le pli
+  s'appelle « Réglages de cette page », fermé, sous-titré « Ce qui se règle
+  une fois pour toutes ». Son ancre est la même partout,
+  `#reglages-de-la-page` ; elle l'ouvre, comme l'ancre de tout élément qu'il
+  contient, au chargement comme à un lien suivi dans la page (F305, F307).
+  Rien n'y est retiré ni désactivé, et la recherche du navigateur ouvre un
+  pli fermé.
+- Arrosages : la limite journalière et ses dates. Objectifs et besoins : le
+  seuil minimal de planification (le tri des planches reste en haut).
+  Ressources et pompes : les liaisons, l'alimentation par défaut, les
+  pompes et la pompe habituelle de chaque matériel ; la faisabilité passe
+  avant le pli, et reste en tête quand une répartition attend (lot B). Le
+  pli est en bas de chaque page.
+- Matériel : la fiche « Besoin de la culture » de la planche choisie (stade,
+  semaine, « Déclarer un stade », « Adopter la proposition ») va dans le pli,
+  sans rien changer de ce qu'elle fait : l'objectif adopté reste modifiable
+  là où il l'était. Sous la planche, une phrase renvoie à « Objectifs et
+  besoins » pour le besoin, et au pli pour le stade et l'adoption ; l'ETM,
+  l'ET0 et le Kc ne s'affichent plus d'office sur « Matériel » (F306).
+- Un réglage incomplet qui bloquerait un calcul ouvrirait le pli en le
+  disant (`openReason`) : **aucun cas n'a été trouvé** dans ces quatre pages.
+  La limite, le seuil, les pompes et la pompe habituelle sont facultatifs ou
+  ont leur valeur de départ, et la faisabilité nomme elle-même une chaîne
+  sans origine d'eau ni pompe (D-088). L'ouverture d'office n'est donc
+  employée nulle part.
+- Les ancres des lots A et B (`#repartition`, `#manual-rain`, les
+  réserves) sont hors du pli : elles ne changent pas (F307).
+
 ## 5 bis. M1 — Les cases de planche de « Matériel » assez grandes à toucher (ajout du 15 novembre 2026)
 
 **Origine.** Constat de la recette du lot E (`recettes/constats-lot-e.md`) :

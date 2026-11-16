@@ -7,6 +7,14 @@ source détaillée commit par commit.
 
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
+- **J2, un pli « Réglages de cette page »** (D-149, F305 à F307, choix
+  n° 3) : fermé, en bas d'« Arrosages » (la limite journalière),
+  d'« Objectifs et besoins » (le seuil minimal de planification), de
+  « Ressources et pompes » (liaisons, alimentation par défaut, pompes,
+  pompe habituelle) et de « Matériel » (la fiche « Besoin de la culture »
+  de la planche, renvoyée à « Objectifs et besoins ») ; rien n'est retiré,
+  l'adresse `#reglages-de-la-page` l'ouvre. Parcours P12, P15, P31c, P32
+  et P35 adaptés.
 - **J5, « Besoin par culture » : vos cultures d'abord** (D-148, F302 à
   F304) : « Vos cultures cette saison (8) » en tête, « Les autres cultures
   de référence (32) » dans un pli fermé ; la carte fermée dit « 2 séries de

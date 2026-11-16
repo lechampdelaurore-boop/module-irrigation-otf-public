@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { horodatageLocal, nomUnique, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
@@ -308,6 +308,7 @@ async function creerLaReserve(page: Page, reserve: string): Promise<void> {
 }
 
 async function creerLaPompe(page: Page, pompe: string, reserve: string): Promise<void> {
+  await ouvrirLesReglagesDeLaPage(page); // les pompes, en bas (audit final, lot D, J2, F305)
   const formulaire = page.locator('form.pump-editor').filter({ has: page.getByRole('heading', { name: 'Nouvelle pompe' }) });
   await page.getByRole('button', { name: '+ Ajouter une pompe' }).click();
   await expect(formulaire).toBeVisible();
@@ -325,6 +326,7 @@ async function creerLaPompe(page: Page, pompe: string, reserve: string): Promise
 
 /** La pompe habituelle d'un matériel : sa liste porte son nom, et l'écran la relit du serveur une fois enregistrée. */
 async function choisirLaPompeHabituelle(page: Page, materiel: string, pompe: string): Promise<void> {
+  await ouvrirLesReglagesDeLaPage(page); // les pompes, en bas (audit final, lot D, J2, F305)
   const liste = page.locator('article.pump-defaults label').filter({ hasText: materiel }).locator('select');
   await liste.selectOption({ label: pompe });
   await expect(liste.locator('option:checked')).toHaveText(pompe, { timeout: 15_000 });
@@ -341,6 +343,7 @@ async function archiverLeMateriel(page: Page, materiel: string): Promise<void> {
 }
 
 async function archiverLaPompe(page: Page, pompe: string): Promise<void> {
+  await ouvrirLesReglagesDeLaPage(page); // les pompes, en bas (audit final, lot D, J2, F305)
   const carte = page.locator('article.pump-card').filter({ hasText: pompe });
   await carte.getByRole('button', { name: 'Archiver' }).click();
   await expect(carte).toContainText('Archivée', { timeout: 15_000 });
