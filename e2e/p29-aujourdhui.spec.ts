@@ -29,8 +29,10 @@ import {
  * J14) met le modèle de gel en vue sans rien enregistrer. Deux manques se corrigent par leur bouton : le plan jamais calculé
  * (« Recalculer le plan ») et le volume d'une cuve jamais saisi (« Saisir le
  * volume de… », qui ouvre sa carte sur « Ressources et pompes ») ; chaque
- * ligne disparaît ensuite et la pastille baisse d'autant. « Observer le sol
- * de… » ouvre, déplié, le jardin qu'il nomme. Tout se passe sur
+ * ligne disparaît ensuite et la pastille baisse d'autant. Sans réserve utile
+ * (RFU) saisie, la fiabilité ne propose pas « Observer le sol de… » mais
+ * « Renseigner la réserve de la parcelle… », qui ouvre « Réglages du sol » sur
+ * sa parcelle (lot D, J4, F309). Tout se passe sur
  * une ferme propre au parcours et à la largeur : rien n'est laissé sur la
  * ferme de démonstration habituelle.
  *
@@ -142,16 +144,19 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect.poll(() => pastille(page)).toBe(manquesAuDepart - 1 === 0 ? null : manquesAuDepart - 1);
   await verifierLEtape(page, journal, 'plan recalculé, ligne disparue');
 
-  // « Observer le sol de … » (ou « d'… » devant une voyelle, F262) ouvre le jardin désigné, déplié, sur « Réserve du sol ».
-  const observer = lignesDeFiabilite(page).getByRole('link', { name: /^Observer le sol (?:de |d')/ });
-  await expect(observer).toHaveCount(1);
-  await observer.click();
+  // Sans RFU, une observation ne remplirait rien : « Renseigner la réserve de la parcelle … » à la place d'« Observer le sol de … »,
+  // et le lien ouvre « Réglages du sol » sur le formulaire de sa parcelle (J4, F309).
+  await expect(lignesDeFiabilite(page).getByRole('link', { name: /^Observer le sol / })).toHaveCount(0);
+  const renseigner = lignesDeFiabilite(page).getByRole('link', { name: /^Renseigner la réserve de la parcelle / });
+  await expect(renseigner).toHaveCount(1);
+  await expect(lignesDeFiabilite(page).filter({ has: page.getByRole('link', { name: /^Renseigner la réserve de la parcelle / }) })).toContainText('La réserve utile (RFU) de');
+  await renseigner.click();
   await attendreLaPagePrete(page, 'sol');
-  await expect(page).toHaveURL(/\/irrigation\/sol\?season=\d{4}#soil-garden-/);
-  const jardin = page.locator(`details.soil-garden${new URL(page.url()).hash}`);
-  await expect(jardin).toHaveJSProperty('open', true);
-  await expect(jardin.locator('.soil-garden-body')).toBeVisible();
-  await verifierLEtape(page, journal, 'jardin à observer ouvert par son lien');
+  await expect(page).toHaveURL(/\/irrigation\/sol\?season=\d{4}#soil-parcel-/);
+  const parcelle = page.locator(`section.soil-place${new URL(page.url()).hash}`);
+  await expect(page.locator('details.soil-settings')).toHaveJSProperty('open', true);
+  await expect(parcelle.getByLabel('RFU du laboratoire (mm/m)').first()).toBeVisible();
+  await verifierLEtape(page, journal, 'parcelle sans RFU ouverte par son lien');
 
   // Une cuve dont le volume n'a jamais été saisi : la ligne, puis son bouton qui ouvre sa carte.
   const cuve = `Cuve P29 ${testInfo.project.name}`;

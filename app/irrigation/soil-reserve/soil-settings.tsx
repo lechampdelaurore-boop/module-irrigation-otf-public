@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { soilParcelAnchor } from '@/lib/domain/today/reliability';
 import {
   parseDecimal,
   parseShare,
@@ -32,6 +33,24 @@ import { saveSoilRecordAction, saveSoilSettingsAction, type SoilReserveActionRes
 
 type Run = (operation: () => Promise<SoilReserveActionResult>) => void;
 
+/**
+ * Ouvre « Réglages du sol » sur le formulaire de la parcelle et y mène, le
+ * curseur dans la RFU du laboratoire (J4, F308) : le geste de « Renseigner la
+ * réserve de la parcelle », sur la jauge comme depuis « Aujourd'hui ».
+ */
+export function revealParcelSoil(zoneId: string) {
+  const section = document.getElementById(soilParcelAnchor(zoneId));
+  const settings = section?.closest('details.soil-settings');
+  if (!section || !(settings instanceof HTMLDetailsElement)) return;
+  settings.open = true;
+  const fold = section.querySelector('details.soil-record-fold');
+  if (fold instanceof HTMLDetailsElement) fold.open = true;
+  requestAnimationFrame(() => {
+    section.scrollIntoView({ block: 'start' });
+    section.querySelector<HTMLInputElement>('.soil-record-form input')?.focus({ preventScroll: true });
+  });
+}
+
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 const dayFormat = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 const PERCENT = 100;
@@ -42,6 +61,18 @@ const PROVENANCES: { value: SoilRecord['provenance']; label: string }[] = [
 ];
 
 export function SoilSettingsPart({ season, view, pending, run }: { season: number; view: SoilSettingsView; pending: boolean; run: Run }) {
+  // Les parcelles, en une clé stable : un enregistrement ne ramène pas la page à l'ancre.
+  const zoneIds = view.zones.map((zone) => zone.zoneId).join('|');
+  useEffect(() => {
+    // « Renseigner la réserve de la parcelle … » sur « Aujourd'hui » mène ici par l'ancre de la parcelle (J4, F309).
+    const reveal = () => {
+      const zoneId = zoneIds.split('|').find((id) => window.location.hash === `#${soilParcelAnchor(id)}`);
+      if (zoneId) revealParcelSoil(zoneId);
+    };
+    reveal();
+    window.addEventListener('hashchange', reveal);
+    return () => window.removeEventListener('hashchange', reveal);
+  }, [zoneIds]);
   return (
     <details className="soil-settings" suppressHydrationWarning>
       <summary>
@@ -69,9 +100,9 @@ function summaryLabel(view: SoilSettingsView): string {
 function ZoneSoil({ season, zone, today, pending, run }: { season: number; zone: ZoneSoilSetting; today: string; pending: boolean; run: Run }) {
   const zoneRecord = zone.soil.current?.record ?? null;
   return (
-    <section className="crop-water-settings-block soil-place" aria-label={`Sol · ${zone.name}`}>
+    <section id={soilParcelAnchor(zone.zoneId)} className="crop-water-settings-block soil-place" aria-label={`Sol · ${zone.name}`}>
       <h4>Parcelle {zone.name}</h4>
-      <CurrentSoil soil={zone.soil} empty="Aucune RFU saisie : la jauge de ses planches reste inconnue." />
+      <CurrentSoil soil={zone.soil} empty="Aucune réserve utile (RFU) saisie : la jauge de ses planches reste inconnue." />
       <SoilRecordForm
         key={`${zone.zoneId}|${zone.soil.history.length}`}
         title="Enregistrer le sol de la parcelle"

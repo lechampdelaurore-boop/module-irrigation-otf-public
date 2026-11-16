@@ -44,7 +44,9 @@ export function SoilBed({ bed, season, today, pending, run }: { bed: SoilGaugeBe
       </summary>
       <div className="soil-bed-detail">
         <BedState bed={bed} />
-        {bed.week.length > 0 ? (
+        {bed.week.length > 0 && bed.week.every((item) => item.percent === null) ? (
+          <p className="soil-week-unknown">Prévu jusqu’à dimanche : inconnue.</p>
+        ) : bed.week.length > 0 ? (
           <ul className="soil-week" aria-label={`Prévu jusqu’à dimanche, fin de chaque jour · planche ${bed.name}`}>
             {bed.week.map((item) => (
               <li key={item.date}>

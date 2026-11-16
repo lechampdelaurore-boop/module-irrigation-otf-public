@@ -311,6 +311,39 @@ Donc (F308 à F312, D-150) :
 Le graphique des réserves (S2) n'est pas touché ; son essai avec de vraies
 valeurs et à 190 planches reste **non vérifié** (rapport, section 8).
 
+## 6 bis. Ce que le code a établi pour J4 (PR 5, D-150)
+
+- **Le test du domaine est écrit** (`tests/soil-reserve-without-rfu.test.ts`) :
+  sans RFU, `bedSoilReserve` rend chaque jour inconnu pour la raison
+  « no-soil », état et capacité à `null`, même avec deux observations ; la
+  même observation, la RFU saisie, fait partir la jauge. L'intuition de la
+  section 6 est donc confirmée par le code.
+- **« Sans RFU »** se lit sur la jauge déjà calculée : toutes les planches du
+  jardin sont inconnues pour « no-soil » (`plotWithoutSoil`). La RFU vaut
+  pour une parcelle ou un jardin, jamais pour une planche seule.
+- **Le bouton** « Renseigner la réserve de la parcelle » se place sous la
+  ligne du jardin, pas à droite de son titre comme « Observer » : il est
+  trop long pour tenir à côté au téléphone. Il ouvre « Réglages du sol » et
+  le pli « Enregistrer le sol de la parcelle », et met le curseur dans la RFU
+  du laboratoire. La même adresse, `#soil-parcel-<parcelle>`, sert au lien
+  d'« Aujourd'hui ».
+- **« Observer la parcelle »** cède aussi la place à la phrase et au bouton
+  quand aucun jardin de plein champ de la parcelle n'a de RFU : il ne
+  réglerait que ces jardins.
+- **« Fiabilité du calcul »** compte un jardin sans RFU même s'il a été
+  observé, puisque l'observation n'y a rien rempli ; sa pastille dit par
+  exemple « 1 jardin jamais observé · 2 parcelles sans RFU ».
+- **F311** : la ligne d'un jardin montre « Observer » tant qu'il est replié ;
+  ouvert, son formulaire seul. Un jardin sans RFU n'a plus de formulaire
+  d'observation, mais une phrase qui dit pourquoi.
+- **Les parcours** : P31b porte le cas 7 et le cas 8 sur sa ferme neuve, puis
+  saisit la RFU par le bouton ; l'abri, dont les planches sont sans culture,
+  ne porte alors plus aucun geste. P29 suit le lien de la fiabilité jusqu'au
+  formulaire de la parcelle. P33 lit la phrase dans le pli de Tunnel 1, puis,
+  la RFU de « Sous le verger » saisie, voit « Observer » sur le jardin
+  cultivé replié et son seul formulaire une fois ouvert (F311). P18 et P19
+  n'avaient rien à changer : ils saisissent la RFU avant d'observer.
+
 ## 7. Cas chiffrés
 
 | Cas | Entrée | Attendu |

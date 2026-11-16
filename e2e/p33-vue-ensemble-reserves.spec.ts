@@ -10,7 +10,9 @@ import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierC
  *
  * Sans sol saisi, les barres des Prés sont « inconnue », un tiret à la place
  * du chiffre, jamais zéro. Le sol de « Sous le verger » saisi et la parcelle
- * observée « sec », 25 % du plein : la barre du Jardin du verger, dont les
+ * observée « sec », 25 % du plein (avant l'observation, le jardin cultivé
+ * porte « Observer » replié et son seul formulaire ouvert, lot D, J4, F311) :
+ * la barre du Jardin du verger, dont les
  * carottes sont en place quel que soit le jour du parcours, se remplit à
  * 25 %, au chiffre du titre de son pli ; V01 y est un point, et le compte des
  * points orange est celui écrit sous le nom et dans le texte de la barre.
@@ -49,13 +51,14 @@ test('la vue d’ensemble montre une barre par jardin, inconnue sans sol, rempli
   await expect(vuePres.locator('.soil-bars-axis')).toHaveText(/0 %.*25.*50.*75.*100 %/);
   await verifierLEtape(page, journal, 'barres inconnues sans sol');
 
-  // Toucher la barre d'un jardin inconnu ouvre son pli, où « Observer l’abri » attend.
+  // Toucher la barre d'un jardin inconnu ouvre son pli ; sans RFU, il dit qu'une observation ne le remplirait pas (J4, F308).
   if (telephone) await verifierCibleTactile(barreTunnel, 'La barre de Tunnel 1');
   const tunnel = pres.locator('details.soil-garden').filter({ has: page.locator('summary strong', { hasText: /^Tunnel 1 · abri$/ }) });
   await expect(tunnel).not.toHaveAttribute('open', '');
   await barreTunnel.click();
   await expect(tunnel).toHaveAttribute('open', '');
-  await expect(tunnel.getByRole('group', { name: 'Observer l’abri' })).toBeVisible();
+  await expect(tunnel.locator('.soil-garden-without-soil')).toBeVisible();
+  await expect(tunnel.getByRole('group', { name: 'Observer l’abri' })).toHaveCount(0);
   await expect(tunnel.locator(':scope > summary')).toBeInViewport();
   await verifierLEtape(page, journal, 'toucher une barre ouvre le pli');
 
@@ -87,6 +90,15 @@ test('la vue d’ensemble montre une barre par jardin, inconnue sans sol, rempli
   await enregistrerLeSol.click();
   await expect(statut).toHaveText('Le sol de la parcelle est enregistré.');
   const verger = section.getByRole('region', { name: 'Réserve · Sous le verger' });
+  // Lot D, J4, F311 : la RFU saisie, le jardin cultivé pas encore parti porte « Observer » tant qu'il est replié ; ouvert, son formulaire seul.
+  const ligneVerger = verger.locator('.soil-garden-line').filter({ has: page.locator('details.soil-garden > summary strong', { hasText: /^Jardin du verger$/ }) });
+  const observerVerger = ligneVerger.getByRole('button', { name: 'Observer le jardin Jardin du verger' });
+  await expect(observerVerger).toBeVisible();
+  await ligneVerger.locator('details.soil-garden > summary').click();
+  await expect(ligneVerger.getByRole('group', { name: 'Observer le jardin' })).toBeVisible();
+  await expect(observerVerger).toHaveCount(0);
+  await ligneVerger.locator('details.soil-garden > summary').click();
+  await expect(observerVerger).toBeVisible();
   const curseur = verger.getByRole('group', { name: 'Observer la parcelle' });
   await curseur.getByRole('slider').fill('25');
   await curseur.getByRole('button', { name: 'Enregistrer l’observation' }).click();

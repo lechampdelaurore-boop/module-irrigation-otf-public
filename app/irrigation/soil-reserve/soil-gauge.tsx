@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { soilGardenAnchor } from '@/lib/domain/today/reliability';
-import { soilGardenLines } from '@/lib/domain/soil-reserve/garden-lines';
+import { soilBedRows, soilGardenLines, zoneFieldWithoutSoil, type SoilGardenAction } from '@/lib/domain/soil-reserve/garden-lines';
 import { gaugeShortDayLabel, type SoilGaugePlot, type SoilGaugeView, type SoilGaugeZone } from '@/lib/domain/soil-reserve/gauge-view';
 import type { SoilObservation } from '@/lib/domain/soil-reserve/gauge';
 import { saveSoilObservationAction, type SoilReserveActionResult } from '../soil-reserve-actions';
 import { SoilBars } from './soil-bars';
 import { SoilBed } from './soil-bed';
+import { revealParcelSoil } from './soil-settings';
 
 /**
  * La jauge de la réserve du sol par parcelle et par jardin
@@ -17,6 +18,12 @@ import { SoilBed } from './soil-bed';
  * maintenant, le prévu jusqu'à dimanche, la plus basse de ses planches, les
  * planches sans culture à part, son curseur, et le détail par planche à la
  * demande.
+ *
+ * Lot D, J4 (D-150) : sans réserve utile (RFU) pour la parcelle, le geste est
+ * « Renseigner la réserve de la parcelle », qui ouvre « Réglages du sol » ;
+ * l'observation n'y est plus proposée. Les planches inconnues pour la même
+ * raison se disent en une phrase, leurs lignes dans un pli ; la ligne d'un
+ * jardin montre « Observer » ou son formulaire, jamais les deux à la fois.
  */
 
 type Run = (operation: () => Promise<SoilReserveActionResult>) => void;
@@ -81,7 +88,14 @@ function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone
     <section className="soil-zone" aria-label={`Réserve · ${zone.name}`}>
       <h4>Parcelle {zone.name}</h4>
       <SoilBars zone={zone} onOpen={openGarden} />
-      {zone.fieldPlotCount > 0 ? (
+      {zone.fieldPlotCount > 0 && zoneFieldWithoutSoil(zone) ? (
+        <div className="soil-zone-without-soil">
+          <p>
+            La réserve utile (RFU) de la parcelle n’est pas saisie : sans elle, une observation ne remplit pas la jauge de ses jardins.
+          </p>
+          <SoilFirstButton zoneId={zone.zoneId} label={`Renseigner la réserve de la parcelle ${zone.name}`} />
+        </div>
+      ) : zone.fieldPlotCount > 0 ? (
         <ObservationForm
           key={zone.observation?.recordedAt ?? 'aucune'}
           title="Observer la parcelle"
@@ -125,7 +139,7 @@ function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone
             pending={pending}
             run={run}
             hidden={hidden}
-            observe={line.observe}
+            action={line.action}
             onOpenChange={onOpenChange}
           />
         );
@@ -142,7 +156,16 @@ function plotHeadline(plot: SoilGaugePlot): string {
   return parts.join(' · ');
 }
 
-function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, observe, onOpenChange }: {
+/** « Renseigner la réserve de la parcelle » : ouvre « Réglages du sol » sur le formulaire de sa parcelle (J4, F308). */
+function SoilFirstButton({ zoneId, label }: { zoneId: string; label: string }) {
+  return (
+    <button type="button" className="soil-garden-soil-first" aria-label={label} onClick={() => revealParcelSoil(zoneId)}>
+      Renseigner la réserve de la parcelle
+    </button>
+  );
+}
+
+function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, action, onOpenChange }: {
   season: number;
   zoneId: string;
   plot: SoilGaugePlot;
@@ -151,14 +174,17 @@ function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, observe,
   run: Run;
   /** Rangé dans un pli replié. */
   hidden: boolean;
-  /** La ligne est « inconnue » : « Observer » y paraît (point 13). */
-  observe: boolean;
+  /** Le geste d'une ligne « inconnue » : « Observer » (point 13) ou « Renseigner la réserve de la parcelle » (J4). */
+  action: SoilGardenAction;
   onOpenChange: (plotId: string, open: boolean) => void;
 }) {
   const garden = plot.garden;
   const anchor = soilGardenAnchor(plot.plotId);
   const details = useRef<HTMLDetailsElement>(null);
   const place = plot.sheltered ? 'l’abri' : 'le jardin';
+  // Ouvert, le jardin montre son formulaire d'observation ; fermé, « Observer » : un seul des deux (J4, F311).
+  const [open, setOpen] = useState(false);
+  const rows = soilBedRows(plot.beds);
   useEffect(() => {
     // « Observer le sol de … » sur « Aujourd'hui » (audit ergonomique, lot 2) ouvre le jardin désigné, même rangé dans un pli.
     if (window.location.hash === `#${anchor}` && details.current) {
@@ -179,13 +205,16 @@ function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, observe,
     });
   };
   return (
-    <div className="soil-garden-line" data-observe={observe} hidden={hidden}>
+    <div className="soil-garden-line" data-observe={action === 'observe'} data-soil-first={action === 'soil'} hidden={hidden}>
       <details
         ref={details}
         id={anchor}
         className="soil-garden"
         suppressHydrationWarning
-        onToggle={(event) => onOpenChange(plot.plotId, event.currentTarget.open)}
+        onToggle={(event) => {
+          setOpen(event.currentTarget.open);
+          onOpenChange(plot.plotId, event.currentTarget.open);
+        }}
       >
         <summary>
           <strong>{plot.name}{plot.sheltered ? ' · abri' : ''}</strong>
@@ -208,30 +237,63 @@ function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, observe,
               ))}
             </ul>
           ) : null}
-          <ObservationForm
-            key={plot.observation?.recordedAt ?? 'aucune'}
-            title={`Observer ${place}`}
-            note={null}
-            observation={plot.observation}
-            place={{ zoneId, plotId: plot.plotId }}
-            season={season}
-            pending={pending}
-            run={run}
-          />
-          <div className="soil-beds" role="list" aria-label={`Planches · ${plot.name}`}>
-            {plot.beds.map((bed) => (
-              <div role="listitem" key={bed.bedId}>
-                <SoilBed bed={bed} season={season} today={today} pending={pending} run={run} />
-              </div>
-            ))}
-          </div>
+          {action === 'soil' ? (
+            <p className="soil-garden-without-soil">
+              Sans réserve utile (RFU) saisie pour sa parcelle, la jauge reste inconnue : une observation ne la remplirait pas.
+            </p>
+          ) : (
+            <ObservationForm
+              key={plot.observation?.recordedAt ?? 'aucune'}
+              title={`Observer ${place}`}
+              note={null}
+              observation={plot.observation}
+              place={{ zoneId, plotId: plot.plotId }}
+              season={season}
+              pending={pending}
+              run={run}
+            />
+          )}
+          {rows.groups.map((group) => (
+            <div key={group.key} className="soil-beds-same">
+              <p>{group.text}</p>
+              <details className="soil-beds-fold" suppressHydrationWarning>
+                <summary>Voir les {group.beds.length} planches</summary>
+                <BedList beds={group.beds} label={`Planches · ${plot.name} · ${group.text}`} season={season} today={today} pending={pending} run={run} />
+              </details>
+            </div>
+          ))}
+          {rows.single.length > 0 ? (
+            <BedList beds={rows.single} label={`Planches · ${plot.name}`} season={season} today={today} pending={pending} run={run} />
+          ) : null}
         </div>
       </details>
-      {observe ? (
+      {action === 'soil' ? (
+        <SoilFirstButton zoneId={zoneId} label={`Renseigner la réserve de la parcelle, pour ${place} ${plot.name}`} />
+      ) : null}
+      {action === 'observe' && !open ? (
         <button type="button" className="soil-garden-observe" aria-label={`Observer ${place} ${plot.name}`} onClick={observeNow}>
           Observer
         </button>
       ) : null}
+    </div>
+  );
+}
+
+function BedList({ beds, label, season, today, pending, run }: {
+  beds: readonly SoilGaugePlot['beds'][number][];
+  label: string;
+  season: number;
+  today: string;
+  pending: boolean;
+  run: Run;
+}) {
+  return (
+    <div className="soil-beds" role="list" aria-label={label}>
+      {beds.map((bed) => (
+        <div role="listitem" key={bed.bedId}>
+          <SoilBed bed={bed} season={season} today={today} pending={pending} run={run} />
+        </div>
+      ))}
     </div>
   );
 }

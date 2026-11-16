@@ -154,7 +154,7 @@ test('cas 10 : six abris « inconnue » portent chacun « Observer » ; onze jar
   assert.equal(group.plotIds.length, 11);
   const plots = lines.filter((line) => line.kind === 'plot');
   assert.equal(plots.filter((line) => line.groupKey === group.key).length, 11);
-  const observe = plots.filter((line) => line.observe);
+  const observe = plots.filter((line) => line.action === 'observe');
   assert.deepEqual(observe.map((line) => line.plot.name), ['Tunnel 1', 'Tunnel 2', 'Tunnel 3', 'Tunnel 4', 'Tunnel 5', 'Tunnel 6']);
   assert.ok(observe.every((line) => line.groupKey === null));
 });
@@ -180,7 +180,7 @@ test('cas 10 : un pli ne range que des jardins de plein champ au même pourcenta
   assert.deepEqual(lines.map((line) => (line.kind === 'group' ? 'pli' : line.plot.plotId)), ['pli', 'a', 'b', 'c', 'd', 'e', 'f']);
   // Une ligne « aucune planche cultivée » n'est pas inconnue : pas d'« Observer ».
   const last = lines.at(-1);
-  assert.equal(last?.kind === 'plot' && last.observe, false);
+  assert.equal(last?.kind === 'plot' && last.action, null);
   assert.equal(observationDayText(null, TODAY), 'sans observation');
   assert.equal(observationDayText('2026-11-03', TODAY), 'observé le mardi 3 novembre');
 });

@@ -2,6 +2,7 @@ import type { FeatureId } from '../features/catalogue.ts';
 import type { IrrigationPageId } from '../features/pages.ts';
 import type { FeatureSelection } from '../features/selection.ts';
 import type { SoilGaugeZone } from '../soil-reserve/gauge-view.ts';
+import { plotWithoutSoil } from '../soil-reserve/garden-lines.ts';
 import { millisecondsFromHours } from '../units.ts';
 import { addDaysToDateKey } from '../water-management.ts';
 import { countText, dateWithYearText, daysBetween, farmDateKey, farmHourText, namesText, shortDayText, sortedNames } from './today-text.ts';
@@ -56,19 +57,26 @@ export type ReliabilityLine = {
 /** Une réserve ou une cuve active de la ferme, avec la date de sa dernière observation du volume. */
 type ReliabilityReservoir = { id: string; name: string; observedAt: string | null };
 
-/** Un jardin ou un abri dont la jauge du sol est inconnue faute d'avoir jamais été observée. */
-export type ReliabilitySoilGarden = { plotId: string; name: string };
+/**
+ * Un jardin ou un abri dont la jauge du sol est inconnue faute d'avoir jamais
+ * été observée ; `withoutRfu` nomme sa parcelle quand c'est la réserve utile
+ * (RFU) qui manque (lot D, J4, D-150) : l'observer ne remplirait rien.
+ */
+export type ReliabilitySoilGarden = { plotId: string; name: string; withoutRfu?: { zoneId: string; zoneName: string } };
 
 /**
  * F25 : les jardins et abris de la jauge du sol qui n'ont jamais été
  * observés — ni eux, ni leur parcelle pour un jardin de plein champ — et dont
  * aucune planche n'est connue. Un jardin observé ne compte pas, même inconnu
  * depuis un jour de pluie manquante : la ligne de la pluie le dit déjà.
+ * J4 : un jardin sans RFU compte toujours, observé ou non, avec sa parcelle.
  */
-export function neverObservedSoilGardens(zones: readonly Pick<SoilGaugeZone, 'plots'>[]): ReliabilitySoilGarden[] {
-  return zones.flatMap((zone) => zone.plots
-    .filter((plot) => plot.observation === null && plot.garden.percent === null && plot.garden.unknownBeds > 0)
-    .map((plot) => ({ plotId: plot.plotId, name: plot.name })));
+export function neverObservedSoilGardens(zones: readonly Pick<SoilGaugeZone, 'zoneId' | 'name' | 'plots'>[]): ReliabilitySoilGarden[] {
+  return zones.flatMap((zone) => zone.plots.flatMap((plot): ReliabilitySoilGarden[] => {
+    if (plot.garden.percent !== null || plot.garden.unknownBeds === 0) return [];
+    if (plotWithoutSoil(plot)) return [{ plotId: plot.plotId, name: plot.name, withoutRfu: { zoneId: zone.zoneId, zoneName: zone.name } }];
+    return plot.observation === null ? [{ plotId: plot.plotId, name: plot.name }] : [];
+  }));
 }
 
 export type ReliabilityInputs = {
@@ -105,6 +113,11 @@ export function soilGardenAnchor(plotId: string): string {
   return `soil-garden-${plotId}`;
 }
 
+/** L'ancre du sol d'une parcelle dans « Réglages du sol », sur la page « Réserve du sol » : sa RFU s'y saisit (J4). */
+export function soilParcelAnchor(zoneId: string): string {
+  return `soil-parcel-${zoneId}`;
+}
+
 /**
  * La conséquence d'une pluie réelle manquante, dans les mêmes mots partout
  * (F9) : la zone et l'avertissement du tableau des besoins la disent.
@@ -137,19 +150,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
       action: { kind: 'link', label: 'Noter la pluie de la semaine', page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
     });
   }
-  if (on('soil') && input.soilGardensNeverObserved.length > 0) {
-    const gardens = [...input.soilGardensNeverObserved].sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
-    const first = gardens[0];
-    const text = gardens.length === 1
-      ? `Le sol du jardin ${first.name} n’a jamais été observé.`
-      : `Le sol de ${gardens.length} jardins n’a jamais été observé : ${namesText(gardens.map((garden) => garden.name))}.`;
-    lines.push({
-      kind: 'soil',
-      key: 'soil',
-      text,
-      action: { kind: 'link', label: `Observer le sol ${ofName(first.name)}`, page: 'sol', anchor: soilGardenAnchor(first.plotId) },
-    });
-  }
+  if (on('soil')) lines.push(...soilLines(input.soilGardensNeverObserved));
   if (on('species') && input.speciesWithoutReference.length > 0) {
     const count = sortedNames(input.speciesWithoutReference).length;
     lines.push({
@@ -166,6 +167,52 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
     if (line) lines.push(line);
   }
   return lines;
+}
+
+/**
+ * Les lignes du sol : une pour les jardins jamais observés dont la parcelle
+ * a sa RFU (« Observer le sol de … ») ; une pour les parcelles sans RFU
+ * (« Renseigner la réserve de la parcelle … », J4, F309), car une observation
+ * ne remplit pas une jauge sans RFU.
+ */
+function soilLines(all: readonly ReliabilitySoilGarden[]): ReliabilityLine[] {
+  const lines: ReliabilityLine[] = [];
+  const gardens = all.filter((garden) => !garden.withoutRfu).sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+  if (gardens.length > 0) {
+    const first = gardens[0];
+    lines.push({
+      kind: 'soil',
+      key: 'soil',
+      text: gardens.length === 1
+        ? `Le sol du jardin ${first.name} n’a jamais été observé.`
+        : `Le sol de ${gardens.length} jardins n’a jamais été observé : ${namesText(gardens.map((garden) => garden.name))}.`,
+      action: { kind: 'link', label: `Observer le sol ${ofName(first.name)}`, page: 'sol', anchor: soilGardenAnchor(first.plotId) },
+    });
+  }
+  const parcels = soilParcelsWithoutRfu(all);
+  if (parcels.length > 0) {
+    const first = parcels[0];
+    lines.push({
+      kind: 'soil',
+      key: 'soil-rfu',
+      text: parcels.length === 1
+        ? `La réserve utile (RFU) de la parcelle ${first.zoneName} n’est pas saisie : la réserve du sol de ${first.gardens === 1 ? 'son jardin' : `ses ${first.gardens} jardins`} reste inconnue.`
+        : `La réserve utile (RFU) de ${parcels.length} parcelles n’est pas saisie : ${namesText(parcels.map((parcel) => parcel.zoneName))}. La réserve du sol de leurs jardins reste inconnue.`,
+      action: { kind: 'link', label: `Renseigner la réserve de la parcelle ${first.zoneName}`, page: 'sol', anchor: soilParcelAnchor(first.zoneId) },
+    });
+  }
+  return lines;
+}
+
+/** Les parcelles sans RFU, chacune avec le nombre de ses jardins concernés, dans l'ordre des noms. */
+function soilParcelsWithoutRfu(gardens: readonly ReliabilitySoilGarden[]): { zoneId: string; zoneName: string; gardens: number }[] {
+  const parcels = new Map<string, { zoneId: string; zoneName: string; gardens: number }>();
+  for (const garden of gardens) {
+    if (!garden.withoutRfu) continue;
+    const parcel = parcels.get(garden.withoutRfu.zoneId) ?? { ...garden.withoutRfu, gardens: 0 };
+    parcels.set(parcel.zoneId, { ...parcel, gardens: parcel.gardens + 1 });
+  }
+  return [...parcels.values()].sort((a, b) => a.zoneName.localeCompare(b.zoneName, 'fr', { numeric: true }));
 }
 
 function reservoirLine(reservoir: ReliabilityReservoir, today: string): ReliabilityLine | null {
@@ -239,7 +286,14 @@ function todoSummary(kind: ReliabilityKind, input: ReliabilityInputs, lines: rea
       const missing = new Set(input.actualRainMissingDates ?? []).size;
       return `${countText(missing, 'jour manquant', 'jours manquants')} : le besoin est surévalué`;
     }
-    case 'soil': return countText(input.soilGardensNeverObserved.length, 'jardin jamais observé', 'jardins jamais observés');
+    case 'soil': {
+      const observable = input.soilGardensNeverObserved.filter((garden) => !garden.withoutRfu).length;
+      const parcels = soilParcelsWithoutRfu(input.soilGardensNeverObserved).length;
+      return [
+        observable > 0 ? countText(observable, 'jardin jamais observé', 'jardins jamais observés') : null,
+        parcels > 0 ? countText(parcels, 'parcelle sans RFU', 'parcelles sans RFU') : null,
+      ].filter((part): part is string => part !== null).join(' · ');
+    }
     case 'species': return countText(sortedNames(input.speciesWithoutReference).length, 'espèce sans référence', 'espèces sans référence');
     case 'plan': return input.planComputedAt === null
       ? 'Jamais calculé'

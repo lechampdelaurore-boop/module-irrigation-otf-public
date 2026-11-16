@@ -1,5 +1,5 @@
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE } from '../water-management.ts';
-import { gaugeDayLabel, type SoilGaugePlot, type SoilGaugeZone } from './gauge-view.ts';
+import { gaugeDayLabel, unknownReasonText, type SoilGaugeBed, type SoilGaugePlot, type SoilGaugeZone } from './gauge-view.ts';
 
 /**
  * Les lignes des jardins d'une parcelle sur la page « Réserve du sol »
@@ -8,6 +8,11 @@ import { gaugeDayLabel, type SoilGaugePlot, type SoilGaugeZone } from './gauge-v
  * jardins de plein champ au même pourcentage, observés le même jour, se
  * rangent en une phrase dépliable. Rien ne change dans la jauge : ce module
  * ne lit que ce qu'elle a déjà calculé.
+ *
+ * Lot D, J4 (docs/audit-ergonomie-final-lot-d-contract.md, section 6, D-150) :
+ * une ligne inconnue faute de réserve utile (RFU) pour la parcelle porte
+ * « Renseigner la réserve de la parcelle », pas « Observer » : sans RFU, la
+ * capacité d'une planche ne se calcule pas, et une observation ne remplit rien.
  */
 
 export type SoilGardenLine =
@@ -25,9 +30,29 @@ export type SoilGardenLine =
       plot: SoilGaugePlot;
       /** Le pli qui range ce jardin, ou `null`. */
       groupKey: string | null;
-      /** Vrai pour une ligne « inconnue » : le bouton « Observer » y paraît. */
-      observe: boolean;
+      /**
+       * Le geste de la ligne : « observe » pour une ligne « inconnue » dont la
+       * parcelle a sa RFU, « soil » quand elle n'en a pas (J4), `null` sinon.
+       */
+      action: SoilGardenAction;
     };
+
+export type SoilGardenAction = 'observe' | 'soil' | null;
+
+/**
+ * Le jardin n'a pas de réserve utile (RFU) : chacune de ses planches est
+ * inconnue pour la raison « no-soil ». La RFU vaut pour une parcelle ou un
+ * jardin (D-041, D-046) ; elle manque donc à toutes ses planches à la fois.
+ */
+export function plotWithoutSoil(plot: Pick<SoilGaugePlot, 'beds'>): boolean {
+  return plot.beds.length > 0 && plot.beds.every((bed) => bed.summary.unknown?.kind === 'no-soil');
+}
+
+/** La parcelle n'a de RFU pour aucun de ses jardins de plein champ : l'observer ne réglerait rien. */
+export function zoneFieldWithoutSoil(zone: Pick<SoilGaugeZone, 'plots'>): boolean {
+  const field = zone.plots.filter((plot) => !plot.sheltered && plot.beds.length > 0);
+  return field.length > 0 && field.every(plotWithoutSoil);
+}
 
 /** Une ligne « inconnue » : des planches cultivées, aucune connue (la ligne qui dit « aucune planche cultivée » n'en est pas une). */
 function soilGardenUnknown(plot: SoilGaugePlot): boolean {
@@ -81,7 +106,52 @@ export function soilGardenLines(zone: Pick<SoilGaugeZone, 'plots' | 'fieldPlotCo
         plotIds: group.map((member) => member.plotId),
       });
     }
-    lines.push({ kind: 'plot', plot, groupKey: grouped ? key : null, observe: soilGardenUnknown(plot) });
+    lines.push({ kind: 'plot', plot, groupKey: grouped ? key : null, action: gardenAction(plot) });
   }
   return lines;
+}
+
+function gardenAction(plot: SoilGaugePlot): SoilGardenAction {
+  if (!soilGardenUnknown(plot)) return null;
+  return plotWithoutSoil(plot) ? 'soil' : 'observe';
+}
+
+/**
+ * Les planches d'un jardin (J4, F310) : celles qui sont inconnues pour la
+ * même raison, à au moins deux, se disent en une phrase (« 12 planches :
+ * inconnue, aucune RFU saisie ») et se rangent dans un pli ; les autres
+ * restent chacune sur sa ligne, dans l'ordre du jardin.
+ */
+export type SoilBedRows = {
+  single: SoilGaugeBed[];
+  groups: { key: string; text: string; beds: SoilGaugeBed[] }[];
+};
+
+export function soilBedRows(beds: readonly SoilGaugeBed[]): SoilBedRows {
+  const byReason = new Map<string, SoilGaugeBed[]>();
+  for (const bed of beds) {
+    const reason = sameUnknownKey(bed);
+    if (reason !== null) byReason.set(reason, [...(byReason.get(reason) ?? []), bed]);
+  }
+  const grouped = new Set([...byReason.values()].filter((members) => members.length > 1).flat().map((bed) => bed.bedId));
+  return {
+    single: beds.filter((bed) => !grouped.has(bed.bedId)),
+    groups: [...byReason.entries()]
+      .filter(([, members]) => members.length > 1)
+      .map(([key, members]) => ({ key, text: `${members.length} planches : ${unknownGroupText(members[0])}`, beds: members })),
+  };
+}
+
+/** La raison d'une planche inconnue, telle que l'écran la dit ; `null` pour une planche connue. */
+function sameUnknownKey(bed: SoilGaugeBed): string | null {
+  if (bed.summary.current !== null || bed.summary.unknown === null) return null;
+  return unknownReasonText(bed.summary.unknown);
+}
+
+/** « inconnue, aucune RFU saisie » ; « inconnue depuis le mardi 3 novembre, la pluie de ce jour manque ». */
+function unknownGroupText(bed: SoilGaugeBed): string {
+  const reason = bed.summary.unknown;
+  if (reason?.kind === 'no-soil') return 'inconnue, aucune RFU saisie';
+  const text = reason === null ? 'Inconnue.' : unknownReasonText(reason);
+  return text.replace(/^Inconnue/, 'inconnue').replace(' : ', ', ').replace(/\.$/, '');
 }
