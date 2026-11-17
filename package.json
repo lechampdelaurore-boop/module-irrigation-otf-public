@@ -17,6 +17,8 @@
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm knip",
     "push:check": "pnpm --dir cloudflare/irrigation-push check",
     "weather:check": "pnpm --dir cloudflare/irrigation-weather-scheduler check",
+    "site:check": "pnpm --dir cloudflare/irrigation-site check",
+    "site:deploy": "pnpm --dir cloudflare/irrigation-site deploy",
     "push:deploy": "pnpm --dir cloudflare/irrigation-push deploy",
     "deploy": "wrangler deploy --config dist/server/wrangler.json",
     "db:migrate:remote": "wrangler d1 migrations apply module-irrigation-otf --remote",

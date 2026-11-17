@@ -7,6 +7,7 @@ allowBuilds:
 packages:
   - cloudflare/irrigation-push
   - cloudflare/irrigation-weather-scheduler
+  - cloudflare/irrigation-site
 
 # Un épinglage porte sa raison et sa condition de retrait (point ouvert 20,
 # docs/ETAT_DU_PROJET.md). Celui de `ws`, posé le 1er septembre 2026 sans

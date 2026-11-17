@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Le site public du module (sous-tranche 4.8, docs/tranche-4-contract.md,
+  // section 9 ; D-153) : la page d'accueil, la politique de confidentialité et
+  // les conditions d'utilisation, lisibles sans connexion. Un Worker à part,
+  // choisi par le porteur le 17 novembre 2026, pour ne jamais toucher à
+  // l'application Access du module : aucune base, aucune liaison, aucun
+  // secret obligatoire. Son adresse est fixe, elle est donnée au formulaire
+  // d'Ouvre ta ferme : ne pas renommer ce Worker.
+  "name": "irrigation-otf-site",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-18",
+  "workers_dev": true,
+  // Une seule adresse publique.
+  "preview_urls": false,
+  // Aucun journal des visites : le site public ne garde rien des visiteurs.
+  "observability": {
+    "enabled": false
+  }
+}

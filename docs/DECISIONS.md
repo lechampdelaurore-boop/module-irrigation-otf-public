@@ -5183,3 +5183,69 @@ calcul ne change, aucune inconnue ne devient zéro (D-003) ; aucune
 migration.
 
 Ne changent pas : D-003, D-022, D-139, D-151.
+
+## D-153 — Tranche 4, sous-tranche 4.8 : le site public, la confidentialité et l'adresse de retour d'Ouvre ta ferme, avant la fin de la fusion des moteurs
+
+Date : 17 novembre 2026, soir. Décideur : le porteur. Après D-152.
+
+**Ordre.** Le porteur a donné son « vas-y » exprès le 17 novembre 2026 à
+21 h 01 (heure de Paris) pour coder la 4.8 **pendant que la fusion des
+moteurs attend la relecture de Nicolas**, alors que la section 4 du contrat
+de la Tranche 4 (D-142) plaçait la fusion d'abord. Raison : la place de code
+était libre, et la 4.8 débloque le formulaire d'Ouvre ta ferme, dont le délai
+de validation est inconnu. La fusion reste prioritaire sur la place de code
+dès qu'elle a du code à faire ; rien du moteur n'est touché.
+
+**Décision** (précisions F317 à F324, `docs/tranche-4-contract.md`,
+section 9 bis), trois réponses du porteur, une par une :
+
+1. les pages publiques sont servies par un Worker à part,
+   `irrigation-otf-site`, sans base ni liaison, déployé par la CI, plutôt que
+   par des exceptions dans l'application Access du module (« Petit site
+   séparé ») ; adresse fixe
+   `https://irrigation-otf-site.lechampdelaurore.workers.dev` ;
+2. le responsable affiché est « François PREZEAU, GAEC Le Champ de
+   l'Aurore » ;
+3. l'adresse de contact est saisie par le porteur lui-même dans un réglage
+   du Worker du site (`SITE_CONTACT_EMAIL`), jamais dans le dépôt ; sans
+   elle, les pages renvoient à la page publique du projet.
+
+Trois pages : accueil, politique de confidentialité, conditions
+d'utilisation, écrites d'après ce que fait le code. L'adresse de retour
+OAuth est fixée sur le module, `/api/otf/oauth/retour` : jusqu'à la 4.3,
+elle ne lit rien de l'adresse et dit que la connexion n'est pas encore
+ouverte. Le texte n'est pas un avis juridique (T4-20) : aucune ferme tierce
+n'est reliée avant sa relecture (question 4 du contrat).
+
+Ne changent pas : D-142 (sauf l'ordre ci-dessus), D-016, D-100.
+
+## D-154 — La Tranche 4 se code sans attendre la fin de la fusion des moteurs ; banc allégé ; deux chantiers de code s'ils touchent deux dépôts
+
+Date : 17 novembre 2026, soir (21 h 16, heure de Paris). Décideur : le
+porteur (« Je suis d'accord avec toutes tes propositions. Mets-les en œuvre
+de manière autonome »), sur cinq propositions du coordinateur pour superposer
+les attentes. Après D-153, qu'elle étend à toute la Tranche 4.
+
+**Décision.**
+
+1. **La Tranche 4 se code sans attendre la fin de la fusion des moteurs.**
+   Elle touche la connexion et l'accès des fermes, pas le calcul ; le moteur
+   commun se branchera dessous plus tard (contrat de la Tranche 4,
+   section 11 : l'accueil lit les valeurs par défaut par l'interface du
+   moteur, jamais en dur). Remplace « avant la Tranche 4 » de D-066 et
+   l'ordre « la fusion des moteurs passe d'abord » de D-142.
+2. **Le formulaire d'Ouvre ta ferme part dès que la 4.8 est en ligne**,
+   envoyé par le porteur lui-même.
+3. **Le pilote se prépare dès maintenant** : le porteur contacte lui-même les
+   fermes amies et relance la relecture juridique (contacts extérieurs, à
+   lui) ; aucune ferme tierce n'est reliée avant cette relecture (inchangé).
+4. **Le banc d'essai commun est allégé** à deux ou trois saisons rejouées au
+   lieu de toutes, **sous réserve de l'accord de Nicolas** (le banc est
+   commun), et passe après la Tranche 4 s'il traîne.
+5. **Exception à « un seul chantier de code à la fois »** : deux chantiers de
+   code peuvent avancer en même temps quand ils touchent des dépôts
+   différents, le moteur commun d'un côté, le module de l'autre. Dans un
+   même dépôt, la règle reste entière.
+
+Ne changent pas : D-142 (contenu des sous-tranches, sauf l'ordre), D-066
+(partage des rôles), D-055 (Fable interdit), la règle des registres.
