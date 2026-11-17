@@ -1,20 +1,19 @@
 import { millisecondsFromHours } from '@/lib/domain/units';
-import { env } from 'cloudflare:workers';
-import { readCachedSnapshot, saveCachedSnapshot } from '@/db/snapshot-cache';
+import { readCachedSnapshot, readLatestCachedSnapshot, saveCachedSnapshot } from '@/db/snapshot-cache';
+import { readDeploymentFarm, saveDeploymentFarm } from '@/db/otf-deployment-farm-repository';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import { mockSnapshot } from '@/lib/adapters/mock-data';
 import { cropPlanForSeason } from '@/lib/domain/crop-plan';
-import {
-  OTF_MINIMUM_REQUEST_INTERVAL_MS,
-  OtfReadClient,
-} from '@/lib/adapters/otf/read-client';
+import { farmSpaceOf } from '@/lib/domain/farm-space';
 import { OtfApiError } from '@/lib/domain/otf/api-contract';
+import { OtfFarmMismatchError, snapshotFarmIdentity } from '@/lib/domain/otf/farm-identity';
 import {
   OtfSeasonUnavailableError,
   readOtfSeasonSnapshot,
 } from '@/lib/adapters/otf/snapshot-reader';
 import { readLiveOrLastSuccessfulSnapshot } from '@/lib/domain/snapshot-policy';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { createOtfReadClient, readOtfDataSource } from '@/lib/services/otf-connection';
 import { demoChoiceOfOwner } from '@/lib/domain/demo/catalogue';
 import { demoFarmSnapshot } from '@/lib/adapters/demo/farms';
 
@@ -30,11 +29,16 @@ type IrrigationSnapshotOptions = {
   forceRefresh?: boolean;
 };
 
+/**
+ * L'instantané d'un espace, rangé sous sa clé (docs/tranche-4-contract.md,
+ * F328). Avec Ouvre ta ferme, seul l'espace de la ferme du déploiement le lit,
+ * et la lecture commence par vérifier cette ferme (F332, F337, F342).
+ */
 export async function getIrrigationSnapshot(
   cacheKey: string,
   { season, forceRefresh = false }: IrrigationSnapshotOptions,
 ): Promise<IrrigationSnapshot> {
-  if (readDataSource() !== 'live') {
+  if (readOtfDataSource() !== 'live') {
     const source = mockSource(cacheKey);
     const snapshot = snapshotForSeason(source, season);
     if (snapshot) return snapshot;
@@ -45,34 +49,32 @@ export async function getIrrigationSnapshot(
     );
   }
 
+  const spaceFarm = farmSpaceOf(cacheKey).otfFarmId;
   const versionedCacheKey = JSON.stringify([
     SNAPSHOT_CACHE_VERSION,
     cacheKey,
     season,
   ]);
-  const legacyCacheKey = `${LEGACY_SNAPSHOT_CACHE_VERSION}:${cacheKey}`;
 
   return readLiveOrLastSuccessfulSnapshot({
     readLive: async () => {
+      // Avant tout appel : la ferme que cet espace peut lire (F342).
+      const expectedFarm = await farmToRead(spaceFarm);
       try {
-        const client = new OtfReadClient({
-          baseUrl: readRequiredServerSetting('OTF_API_BASE_URL'),
-          token: readRequiredServerSetting('OTF_API_TOKEN'),
-          minimumRequestIntervalMs: OTF_MINIMUM_REQUEST_INTERVAL_MS,
-        });
-        return await readOtfSeasonSnapshot(client, season);
+        const snapshot = await readOtfSeasonSnapshot(createOtfReadClient(), season, new Date(), expectedFarm);
+        await keepDeploymentFarm(expectedFarm, snapshot.lastSuccessfulReadAt);
+        return snapshot;
       } catch (error) {
+        // La clé mène à une autre ferme : elle devient la ferme gardée, et
+        // la page suivante ouvre l'espace de celle-ci (F332).
+        if (error instanceof OtfFarmMismatchError && error.observedFarmId !== null) {
+          await keepDeploymentFarm(error.observedFarmId, new Date().toISOString());
+        }
         logSyncFailure('lecture-live', error);
         throw error;
       }
     },
-    readCache: async () => {
-      const scoped = await readCachedSnapshot(versionedCacheKey);
-      if (scoped) return scoped;
-
-      const legacy = await readCachedSnapshot(legacyCacheKey);
-      return legacy ? snapshotForSeason(legacy, season) : null;
-    },
+    readCache: () => readSpaceCachedSnapshot(cacheKey, season),
     writeCache: async (snapshot) => {
       try {
         await saveCachedSnapshot(versionedCacheKey, snapshot);
@@ -86,6 +88,30 @@ export async function getIrrigationSnapshot(
 }
 
 /**
+ * La ferme que l'espace peut lire chez Ouvre ta ferme : la sienne, si c'est
+ * celle de la clé du déploiement. Un espace sans ferme (d'avant la 4.1, sa
+ * personne pas encore revenue) ou d'une autre ferme ne lit pas OTF : son
+ * dernier instantané en cache sert (F342).
+ */
+async function farmToRead(spaceFarm: string | null): Promise<string> {
+  if (spaceFarm === null) {
+    throw new OtfApiError('Espace sans ferme : Ouvre ta ferme n’est pas lu avant son rattachement.');
+  }
+  const deploymentFarm = (await readDeploymentFarm())?.otfFarmId ?? null;
+  if (deploymentFarm !== spaceFarm) throw new OtfFarmMismatchError(deploymentFarm);
+  return spaceFarm;
+}
+
+/** La ferme observée devient la ferme gardée ; une panne de la base n'empêche pas la lecture. */
+async function keepDeploymentFarm(otfFarmId: string, observedAt: string) {
+  try {
+    await saveDeploymentFarm(otfFarmId, observedAt);
+  } catch (error) {
+    logSyncFailure('écriture-ferme', error);
+  }
+}
+
+/**
  * L'instantané déjà lu, sans aucun appel à Ouvre ta ferme : la démonstration,
  * ou le dernier mis en cache pour la saison, quel que soit son âge ; `null`
  * quand rien n'est en cache. Les alertes par culture le lisent
@@ -93,14 +119,46 @@ export async function getIrrigationSnapshot(
  * ta ferme »).
  */
 export async function readCachedIrrigationSnapshot(cacheKey: string, season: number): Promise<IrrigationSnapshot | null> {
-  if (readDataSource() !== 'live') return snapshotForSeason(mockSource(cacheKey), season);
+  if (readOtfDataSource() !== 'live') return snapshotForSeason(mockSource(cacheKey), season);
+  return readSpaceCachedSnapshot(cacheKey, season);
+}
+
+/**
+ * Le dernier instantané d'un espace, toutes saisons : la preuve de la ferme
+ * d'où viennent ses données, pour le rattachement (F331, F340).
+ */
+export async function readLatestCachedSnapshotOfSpace(cacheKey: string): Promise<IrrigationSnapshot | null> {
+  const scopedPrefix = JSON.stringify([SNAPSHOT_CACHE_VERSION, cacheKey]).slice(0, -1) + ',';
+  return readLatestCachedSnapshot({ prefix: scopedPrefix, exactKey: legacyCacheKeyOf(cacheKey) });
+}
+
+/**
+ * L'instantané en cache d'un espace pour la saison. Un espace qui vient
+ * d'être rattaché n'a encore rien sous sa clé : il lit celui de sa personne
+ * d'avant la 4.1, seulement s'il est de la même ferme ; rien n'est copié
+ * (F343).
+ */
+async function readSpaceCachedSnapshot(cacheKey: string, season: number): Promise<IrrigationSnapshot | null> {
+  const own = await readCachedSnapshotOfKey(cacheKey, season);
+  if (own) return own;
+  const { ownerUserId, otfFarmId } = farmSpaceOf(cacheKey);
+  if (otfFarmId === null) return null;
+  const beforeAttachment = await readCachedSnapshotOfKey(ownerUserId, season);
+  return beforeAttachment && snapshotFarmIdentity(beforeAttachment) === otfFarmId ? beforeAttachment : null;
+}
+
+async function readCachedSnapshotOfKey(cacheKey: string, season: number): Promise<IrrigationSnapshot | null> {
   const scoped = await readCachedSnapshot(JSON.stringify([SNAPSHOT_CACHE_VERSION, cacheKey, season]));
   if (scoped) return scoped;
-  const legacy = await readCachedSnapshot(`${LEGACY_SNAPSHOT_CACHE_VERSION}:${cacheKey}`);
+  const legacy = await readCachedSnapshot(legacyCacheKeyOf(cacheKey));
   return legacy ? snapshotForSeason(legacy, season) : null;
 }
 
-function logSyncFailure(stage: 'lecture-live' | 'écriture-cache', error: unknown) {
+function legacyCacheKeyOf(cacheKey: string): string {
+  return `${LEGACY_SNAPSHOT_CACHE_VERSION}:${cacheKey}`;
+}
+
+function logSyncFailure(stage: 'lecture-live' | 'écriture-cache' | 'écriture-ferme', error: unknown) {
   const diagnostic = error instanceof Error
     ? {
         name: error.name,
@@ -160,23 +218,4 @@ function snapshotForSeason(
 function mockSource(cacheKey: string): IrrigationSnapshot {
   const choice = isDemoDeployment() ? demoChoiceOfOwner(cacheKey) : null;
   return choice ? demoFarmSnapshot(choice.profile.id, choice.moment.dateKey) : mockSnapshot;
-}
-
-function readDataSource(): 'mock' | 'live' {
-  // La démonstration ne lit jamais Ouvre ta ferme (docs/demo-guided-contract.md, couche 2).
-  if (isDemoDeployment()) return 'mock';
-  // En développement local, le lanceur sécurisé fournit les réglages via
-  // process.env. Ils doivent donc primer sur les bindings du site publié.
-  const configured = process.env.OTF_DATA_SOURCE ?? env.OTF_DATA_SOURCE;
-  return configured === 'live' ? 'live' : 'mock';
-}
-
-function readRequiredServerSetting(
-  key: 'OTF_API_BASE_URL' | 'OTF_API_TOKEN',
-): string {
-  const workerValue =
-    key === 'OTF_API_BASE_URL' ? env.OTF_API_BASE_URL : env.OTF_API_TOKEN;
-  const value = process.env[key] ?? workerValue;
-  if (!value?.trim()) throw new Error(`Configuration serveur absente : ${key}`);
-  return value.trim();
 }

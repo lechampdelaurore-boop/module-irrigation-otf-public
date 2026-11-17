@@ -5291,3 +5291,54 @@ un second fil reste due avant toute ferme tierce (4.6).
 
 Ne changent pas : D-142 (sauf la ligne 4.1 alignée), D-154, D-003 (rien
 n'est deviné), D-096 (la démonstration reste sans ferme), D-048.
+
+## D-156 — Tranche 4, 4.1 et 4.2, PR 2 : l'identité de la ferme lue chez OTF, la ferme du déploiement et le rattachement automatique
+
+Date : 17 novembre 2026, nuit. Décideur : Claude, à l'option recommandée,
+sur le mandat du porteur (D-154, D-155) ; **la fusion attend son « vas-y »
+exprès** (D-155). Après D-155.
+
+**Pourquoi la question.** La section 5 bis du contrat disait quoi faire
+(F329 à F332) sans dire comment : l'ordre des lectures, ce qui fait une
+identité, où garder la ferme de la clé, ce qui s'affiche quand OTF ne la
+dit pas, ce que deviennent les espaces d'une autre ferme ou sans ferme, et
+le cache d'un espace qui vient de changer de clé. Aucune de ces questions
+n'est agronomique, ne touche au budget ni à Cloudflare.
+
+**Décision.** Huit précisions écrites avant le code
+(`docs/tranche-4-contract.md`, section 5 ter, F337 à F344), toutes à
+l'option recommandée :
+
+1. `GET /me` est lu d'abord, à chaque lecture d'OTF : la ferme est
+   vérifiée avant toute autre route (F337).
+2. Une identité, c'est une seule structure et un identifiant lisible ; le
+   remplaçant `unknown` des instantanés n'en est pas une (F338).
+3. La ferme du déploiement est gardée dans une table d'une ligne,
+   `otf_deployment_farm` (migration additive 0031) ; une observation plus
+   ancienne ne remplace jamais une plus récente. Sans ligne : le dernier
+   instantané en cache lisible, sinon un seul `GET /me`. Avec les données
+   fictives, la ferme fictive `farm-demo`, sans rien écrire (F339).
+4. Le rattachement se fait à chaque connexion, avant de rendre la clé, par
+   une seule écriture conditionnelle ; jamais de fusion de deux espaces
+   (F340).
+5. Sans identité, aucune page ne s'affiche ; l'export et les dessins des
+   espèces sont refusés avec le même message ; la forme de la réponse est
+   journalisée, jamais ses valeurs (F341).
+6. Les espaces d'une autre ferme, et ceux sans ferme hors démonstration, ne
+   lisent pas OTF (F342).
+7. Un espace qui vient d'être rattaché lit le dernier instantané de sa
+   personne d'avant la 4.1 seulement s'il est de la même ferme, sans le
+   copier (F343).
+8. Ce que la mise en ligne change pour une ferme réelle est écrit (F344).
+
+**Ce que la fusion fera sur la ferme réelle.** À la première ouverture du
+porteur après la mise en ligne : une ligne dans `otf_deployment_farm` (la
+ferme de son dernier instantané) et la ferme écrite dans la colonne de son
+espace ; rien d'autre ne change à l'écran. **Risque connu** : la
+documentation d'OTF ne donne pas les champs de `GET /me` ; la règle lit
+`id` ou `@id`, comme la lecture de l'instantané depuis la 2.8. Si la
+réponse réelle n'en avait pas, la page dirait « La ferme n'est pas
+identifiée » et rien ne serait écrit : un retour du code suffirait.
+
+Ne changent pas : D-155, D-154, D-003 (rien n'est deviné), D-096 (la
+démonstration reste sans ferme), D-048.

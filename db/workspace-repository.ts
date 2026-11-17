@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { farmSpaceKey, farmSpaceOf, InvalidFarmSpaceError } from '@/lib/domain/farm-space';
 import { SPACE_FILTER, spaceKeyOfRow, spaceParams } from './workspace-scope';
 
 export async function findWorkspaceIdForUser(ownerUserId: string): Promise<string | null> {
@@ -36,6 +37,26 @@ export async function createWorkspaceIfAbsent(ownerUserId: string): Promise<bool
   const result = await db.prepare(
     `INSERT INTO irrigation_workspaces (id, owner_user_id, otf_farm_id) VALUES (?, ?, ?) ON CONFLICT DO NOTHING`,
   ).bind(crypto.randomUUID(), ...spaceParams(ownerUserId)).run();
+  return Number(result.meta.changes ?? 0) === 1;
+}
+
+/**
+ * Le rattachement de l'espace d'avant la 4.1 (docs/tranche-4-contract.md,
+ * F331, F340) : l'espace sans ferme de cette personne reçoit cette ferme, par
+ * une seule écriture, sans copie ni suppression. Si la personne a déjà un
+ * espace pour cette ferme, rien n'est écrit : l'index unique de la personne
+ * et de la ferme l'interdit, et l'espace sans ferme reste gardé à part. Dit
+ * si c'est cet appel qui a rattaché l'espace.
+ */
+export async function attachPendingWorkspace(personKey: string, otfFarmId: string): Promise<boolean> {
+  if (farmSpaceOf(personKey).otfFarmId !== null) {
+    throw new InvalidFarmSpaceError('Le rattachement part de l’espace sans ferme d’une personne.');
+  }
+  // Une ferme mal formée est refusée avant toute écriture (F327).
+  farmSpaceKey(personKey, otfFarmId);
+  const result = await db.prepare(
+    `UPDATE OR IGNORE irrigation_workspaces SET otf_farm_id = ?, updated_at = ? WHERE ${SPACE_FILTER}`,
+  ).bind(otfFarmId, new Date().toISOString(), ...spaceParams(personKey)).run();
   return Number(result.meta.changes ?? 0) === 1;
 }
 

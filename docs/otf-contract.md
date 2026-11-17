@@ -50,6 +50,10 @@ de proxy générique.
    régulateur et ne peuvent pas cumuler leurs quotas. Constaté le 20 septembre
    2026 : le régulateur vivait dans chaque client alors que le client est
    reconstruit à chaque lecture, ce qui a produit un `429` sur `/bedList`.
+1 ter. Depuis la 4.1 (`docs/tranche-4-contract.md`, F337), `/me` est la
+   première route de chaque lecture, avant `/configuration` : la ferme qu'il
+   désigne est comparée à celle de l'espace avant toute autre route, et une
+   lecture qui mène à une autre ferme, ou à aucune, s'arrête sans rien ranger.
 2. Les listes suivent la pagination, au maximum 500 éléments par page et 50
    pages par route.
 3. Les réponses sont adaptées au modèle du module.

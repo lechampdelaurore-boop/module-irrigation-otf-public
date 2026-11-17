@@ -9,6 +9,7 @@ import type {
   Zone,
 } from '../domain.ts';
 import { OtfApiError, extractCollection } from './api-contract.ts';
+import { UNKNOWN_STRUCTURE_ID } from './farm-identity.ts';
 import { readOtfOutline } from './outline.ts';
 
 type RawRecord = Record<string, unknown>;
@@ -58,7 +59,7 @@ function mapOtfStructure(payload: unknown): OtfStructure {
   const candidate = candidates[0] ?? payload;
   if (!isRecord(candidate)) {
     return {
-      id: 'unknown',
+      id: UNKNOWN_STRUCTURE_ID,
       name: 'Exploitation OTF',
       legalCity: null,
       legalPostcode: null,
@@ -66,7 +67,7 @@ function mapOtfStructure(payload: unknown): OtfStructure {
     };
   }
   const raw = candidate;
-  const id = relationId(raw.id ?? raw['@id'] ?? 'unknown', 'structure');
+  const id = relationId(raw.id ?? raw['@id'] ?? UNKNOWN_STRUCTURE_ID, 'structure');
   return {
     id,
     name: toName(raw.name ?? raw.label ?? raw.title, `Exploitation ${id}`),

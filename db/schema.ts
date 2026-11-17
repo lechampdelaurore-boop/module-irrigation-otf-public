@@ -29,11 +29,28 @@ export const otfSnapshots = sqliteTable('otf_snapshots', {
 });
 
 /**
+ * La ferme de la clé du déploiement (4.1, docs/tranche-4-contract.md, F330 et
+ * F339) : une seule ligne, la dernière ferme que `GET /me` a désignée et
+ * l'heure de cette observation.
+ */
+export const otfDeploymentFarm = sqliteTable(
+  'otf_deployment_farm',
+  {
+    id: integer('id').primaryKey(),
+    otfFarmId: text('otf_farm_id').notNull(),
+    observedAt: text('observed_at').notNull(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [check('chk_otf_deployment_farm_single_row', sql`${table.id} = 1`)],
+);
+
+/**
  * Isolation boundary for irrigation-owned data.
  *
- * OTF remains the source of truth for farms and permissions. `otfFarmId` is
- * deliberately only a nullable external reference until OTF exposes a stable
- * farm identifier through the read contract.
+ * OTF remains the source of truth for farms and permissions. Since 4.1
+ * (docs/tranche-4-contract.md, F327 to F331), `otfFarmId` is the farm read by
+ * `GET /me`, written when a person's space is attached to it; it stays `NULL`
+ * for the demo and for a space from before 4.1 whose person has not come back.
  */
 export const irrigationWorkspaces = sqliteTable(
   'irrigation_workspaces',
