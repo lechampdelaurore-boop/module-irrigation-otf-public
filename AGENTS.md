@@ -79,6 +79,7 @@ pnpm build
 pnpm knip
 pnpm push:check
 pnpm weather:check
+pnpm site:check
 pnpm e2e
 ```
 

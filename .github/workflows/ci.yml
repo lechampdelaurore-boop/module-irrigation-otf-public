@@ -70,6 +70,8 @@ jobs:
         run: pnpm push:check
       - name: Vérifier le planificateur météo
         run: pnpm weather:check
+      - name: Vérifier le site public
+        run: pnpm site:check
 
   parcours:
     name: Parcours navigateur
@@ -156,8 +158,9 @@ jobs:
             files=$(git diff --name-only "$before" "$GITHUB_SHA")
             if echo "$files" | grep -q '^cloudflare/irrigation-push/'; then changed="$changed push"; fi
             if echo "$files" | grep -q '^cloudflare/irrigation-weather-scheduler/'; then changed="$changed weather"; fi
+            if echo "$files" | grep -q '^cloudflare/irrigation-site/'; then changed="$changed site"; fi
           else
-            changed="push weather"
+            changed="push weather site"
           fi
           echo "Workers à redéployer :${changed:- aucun}"
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
@@ -173,6 +176,11 @@ jobs:
       - name: Déployer le planificateur météo
         if: contains(steps.workers.outputs.changed, 'weather')
         run: pnpm --dir cloudflare/irrigation-weather-scheduler deploy
+      # Le site public (4.8, D-153) : un Worker sans base ni liaison, à son
+      # adresse fixe ; redéployé seulement quand son dossier change.
+      - name: Déployer le site public
+        if: contains(steps.workers.outputs.changed, 'site')
+        run: pnpm site:deploy
 
   deploy-demo:
     name: Déploiement de la démonstration

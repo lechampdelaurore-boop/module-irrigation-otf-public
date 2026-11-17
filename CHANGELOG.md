@@ -5,6 +5,26 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.8, le site public)
+
+- **Le site public du module** (D-153, F317 à F324) : un Worker à part,
+  `irrigation-otf-site`, sans connexion, à l'adresse fixe
+  `https://irrigation-otf-site.lechampdelaurore.workers.dev` : l'accueil,
+  la politique de confidentialité et les conditions d'utilisation, sans
+  script, sans témoin, sans mesure d'audience ; le contact est une adresse
+  que le porteur pose lui-même dans Cloudflare. Contrôle `pnpm site:check`,
+  déploiement par la CI quand son dossier change.
+- **L'adresse de retour d'Ouvre ta ferme** (D-153, F322) :
+  `/api/otf/oauth/retour` sur le module, qui dit que la connexion n'est pas
+  encore ouverte, sans rien lire de l'adresse. Parcours P36 aux deux
+  largeurs.
+
+### Changé (ordre de la roadmap)
+
+- **La Tranche 4 n'attend plus la fin de la fusion des moteurs** (D-154) :
+  banc commun allégé à deux ou trois saisons sous réserve de l'accord de
+  Nicolas ; deux chantiers de code ensemble s'ils touchent deux dépôts.
+
 ### Corrigé (audit ergonomique final, lot D, les pages allégées)
 
 - **N1, chaque « Non calculable » de « Ressources » dit pourquoi** (D-152,

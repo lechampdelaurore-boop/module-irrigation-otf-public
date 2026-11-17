@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 15 novembre 2026.
+Dernière mise à jour : 17 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -13,12 +13,32 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
-  `docs/tranche-4-contract.md`), rien de codé : préparation, puis 4.8 (site et
+  `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
   4.5, 4.6. Adresse gratuite `workers.dev` ; aucune ferme tierce avant la
-  relecture de la confidentialité. La fusion des moteurs passe d'abord.
+  relecture de la confidentialité. **Depuis le 17 novembre 2026 (D-154), la Tranche 4 se code sans attendre
+  la fin de la fusion des moteurs** ; banc commun allégé (deux ou trois
+  saisons, sous réserve de l'accord de Nicolas) ; deux chantiers de code
+  ensemble s'ils touchent deux dépôts différents.
   Consigné par #75 (fusionnée à 18 h 56, déployée à 19 h 16, run
   43743907175, cinq jobs verts).
+- Tranche 4, **4.8 codée le 17 novembre 2026** (D-153, F317 à F324) sur
+  le « vas-y » exprès du porteur, **avant la fin de la fusion des moteurs**
+  (dérogation d'ordre ; la fusion attend la relecture de Nicolas) : un
+  Worker à part, `irrigation-otf-site`, sert l'accueil, la politique de
+  confidentialité et les conditions d'utilisation à l'adresse fixe
+  `https://irrigation-otf-site.lechampdelaurore.workers.dev` ; l'adresse de
+  retour d'OTF, `/api/otf/oauth/retour`, est fixée sur le module et ne fait
+  rien avant la 4.3. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` (nouveau) réussis en local, P36
+  joué en local aux deux largeurs ; la suite complète des parcours jouée par
+  la CI de la PR (longs essais sur GitHub, choix du 17 novembre 2026).
+  Restent : le déploiement vérifié, l'adresse de contact que le porteur pose
+  lui-même (`SITE_CONTACT_EMAIL`), sa relecture du texte en ligne, l'envoi
+  du formulaire d'OTF par lui, la relecture juridique avant toute ferme
+  tierce. Non consigné jusqu'ici : le lot D (#79 à #85) est en ligne, #85
+  déployée le 16 novembre 2026 à 8 h 43 (run 43824015609, cinq jobs verts).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

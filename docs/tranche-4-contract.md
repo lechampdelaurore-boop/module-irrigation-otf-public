@@ -57,6 +57,8 @@ La roadmap a déjà 4.1 à 4.7. Ce contrat **les garde**, ajoute **4.8** (site d
 | 7 | **4.6 Pilote** | 1 à 2 fermes amies, lecture seule, accord écrit | non (recette) | Opus 5.5 · Max |
 | — | **4.7** | la partie hébergement est faite (Q0) ; la partie identité est **absorbée par 4.1 à 4.3** : à fermer à ce moment-là | — | — |
 
+**Mise à jour du 17 novembre 2026 (D-153, D-154).** La 4.8 est codée avant la fin de la fusion des moteurs, et toute la Tranche 4 se code désormais sans l'attendre : elle ne touche pas le calcul (section 11), le moteur commun se branchera dessous. Deux chantiers de code peuvent avancer ensemble s'ils touchent deux dépôts différents.
+
 **Pourquoi cet ordre [T4-02].** Le formulaire d'OTF exige trois choses que nous n'avons pas : adresse définitive du site, page de confidentialité, adresse de retour OAuth (décision de François du 12/11, formulaire non envoyé). **4.8 d'abord débloque le formulaire**, dont le délai est hors de notre contrôle ; on code l'isolation (3) **pendant** l'attente. L'isolation vient avant la connexion : on ne branche pas des fermes réelles sur un logiciel dont l'isolation n'est pas prouvée.
 
 **Condition de départ commune :** « vas-y » de François pour chaque sous-tranche de code ; 4.8 et la préparation (étape 0) n'exigent que ce contrat validé (le formulaire, lui, est un acte de François).
@@ -134,6 +136,58 @@ La **visite guidée** et la démonstration (4.0) servent de formation : aucune n
 
 **[T4-20] Avis juridique : hors de ma compétence et de ce brouillon.** Les textes rédigés ici sont **un projet honnête, pas un avis**. Question 4 (section 12).
 
+### 9 bis. Précisions du code de la 4.8 (17 novembre 2026, D-153, F317 à F324)
+
+Codée le 17 novembre 2026 sur le « vas-y » exprès du porteur, **avant la fin
+de la fusion des moteurs** (dérogation à l'ordre de la section 4, voir D-153),
+en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
+
+- **F317 · Où.** Les pages publiques sont servies par **un Worker à part**,
+  `irrigation-otf-site` (`cloudflare/irrigation-site/`), choisi par le
+  porteur (« Petit site séparé », question 1 sur 3) plutôt que des exceptions
+  dans l'application Access du module : aucun réglage Access, le module reste
+  fermé comme avant. Adresse fixe :
+  `https://irrigation-otf-site.lechampdelaurore.workers.dev` (le « Site web »
+  du formulaire d'OTF). Le Worker n'a ni base, ni liaison, ni secret
+  obligatoire ; il est déployé par la CI après la production, seulement quand
+  son dossier change.
+- **F318 · Trois pages**, en français, sans jargon : l'accueil (`/` : ce que
+  fait le module, pour qui, ce qu'il ne fait pas, la démonstration sur
+  invitation, le contact), la politique de confidentialité
+  (`/confidentialite`, le champ du formulaire) et les conditions
+  d'utilisation (`/conditions`). Le texte décrit ce que fait le code à sa
+  date ; toute PR qui change ce qui est lu, gardé ou envoyé dehors le met à
+  jour.
+- **F319 · Responsable** : « François PREZEAU, GAEC Le Champ de l'Aurore »,
+  écrit par le porteur (question 2 sur 3).
+- **F320 · Contact** : une adresse que le porteur **saisit lui-même** dans un
+  réglage du Worker du site, `SITE_CONTACT_EMAIL` (question 3 sur 3) ; elle
+  n'est jamais écrite dans le dépôt ni vue par l'assistant. Tant qu'elle
+  manque, ou si sa valeur n'a pas la forme d'une adresse, les pages renvoient
+  à la page publique du projet sur GitHub.
+- **F321 · Rien des visiteurs** : ni script, ni police, ni image venus
+  d'ailleurs, ni témoin, ni mesure d'audience ; les journaux du Worker sont
+  désactivés ; seules `GET` et `HEAD` sont acceptées ; en-têtes de sécurité
+  (`Content-Security-Policy` fermée, `Referrer-Policy: no-referrer`).
+- **F322 · L'adresse de retour OAuth** est fixée sur le module :
+  `https://module-irrigation-otf.lechampdelaurore.workers.dev/api/otf/oauth/retour`,
+  derrière la connexion comme tout le module. Jusqu'à la 4.3, elle ne lit, ne
+  garde, ne journalise et ne renvoie rien de l'adresse (`code`, `state`) :
+  elle dit « La connexion à Ouvre ta ferme n'est pas encore ouverte » et
+  ramène au module ; jamais en cache, `Referrer-Policy: no-referrer`. Un test
+  vérifie que le site public annonce la même adresse que celle que sert le
+  module.
+- **F323 · Point pour la 4.3** : les journaux d'invocation du Worker du
+  module (observabilité, `head_sampling_rate` 1) gardent sept jours l'adresse
+  de chaque requête, donc le `code` d'autorisation à usage unique quand la
+  4.3 l'échangera. Le contrat 4.3 tranche (journaux de cette route coupés,
+  ou code court et à usage unique jugé suffisant) ; rien n'est changé ici.
+- **F324 · Preuves** : `pnpm site:check` (12 tests, vérification du Worker),
+  tests de la route de retour, parcours P36 aux deux largeurs. Restent :
+  le déploiement vérifié job par job, l'adresse de contact posée par le
+  porteur, sa relecture du texte en ligne, puis l'envoi du formulaire d'OTF
+  (son acte) ; la relecture juridique avant toute ferme tierce (question 4).
+
 ## 10. Exploitation (4.5) et pilote (4.6)
 
 **4.5.** Sauvegarde et **restauration D1 essayées pour de vrai** (une sauvegarde qui ne restaure pas est un défaut silencieux ; les possibilités d'historique du service sont [NON VÉRIFIÉ]) ; observabilité par ferme sans données sensibles (taux d'erreurs OTF, quota consommé, dernière synchronisation) ; **suppression complète d'une ferme** (jeton, instantanés, réglages, évènements) vérifiée par test ; page d'état simple pour l'exploitant ; procédure de support (une personne) ; **budget de coûts** relu au tableau de bord un mois après la première ferme (les deux alertes de budget existent). Coût estimé : **≈ 5 $/mois jusqu'à 30 fermes sans Access payant**, le calcul étant le seul poste proche du plafond (mesure réelle du 9/11 : ≈ 307 ms de calcul par requête, 1 000 requêtes par mois et par ferme).
@@ -146,7 +200,7 @@ La Tranche 4 **ne modifie pas le moteur hydrique** : bilan, pluie utile, observa
 
 - Si la phase 1 du moteur commun change l'interface du moteur avant 4.4, l'accueil lit les valeurs par défaut **par l'interface**, pas en dur.
 - Les valeurs par défaut propres à une ferme (section 7) peuvent recouper les « jeux de réglages » ; l'inventaire **signale** le recoupement, la décision appartient au chantier de fusion.
-- 4.1 à 4.3 (identité, isolation, jeton) **ne dépendent pas** du moteur : elles peuvent commencer avant la fin de la fusion ; le code de la fusion (Opus 5.5 · Max) reste prioritaire sur la place de code libre.
+- 4.1 à 4.3 (identité, isolation, jeton) **ne dépendent pas** du moteur : elles peuvent commencer avant la fin de la fusion ; le code de la fusion (Opus 5.5 · Max) reste prioritaire sur la place de code libre. **Depuis le 17 novembre 2026 (D-154)**, la Tranche 4 entière n'attend plus la fusion, et les deux chantiers avancent ensemble, chacun dans son dépôt.
 
 À relire à chaque lancement : l'état de la fusion dans le dépôt (`docs/shared-engine-cases-contract.md` et le dépôt commun), pas ce brouillon.
 
