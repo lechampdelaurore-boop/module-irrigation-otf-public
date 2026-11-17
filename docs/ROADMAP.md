@@ -4020,8 +4020,10 @@ base ; les recherches d'espace dédoublées en une seule ; les traitements du
 matin parcourent tous les espaces, avec ou sans ferme, chacun sous sa clé.
 Aucune migration ; les espaces actuels restent sans ferme jusqu'à la PR 2.
 `pnpm test` rejoue les tests de la base deux fois de plus (`pnpm
-test:isolation`), et une mutation des filtres les fait échouer. Ouverte ;
-ensuite la PR 2.
+test:isolation`), et une mutation des filtres les fait échouer. Sa première
+CI a fait tomber P12 dans la dernière heure du jour, sans rapport avec le
+code : P12 lit désormais la seule colonne du jour de l'arrosage validé.
+Ouverte ; ensuite la PR 2.
 
 ### 4.7 — Hébergement et identité
 

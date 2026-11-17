@@ -59,11 +59,17 @@ registres, elle y renvoie.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; la suite complète des parcours jouée
-  par la CI de la PR (longs essais sur GitHub). Restent : la PR 2
-  (l'identité lue chez OTF et le rattachement automatique, fusionnée
-  seulement sur le « vas-y » exprès du porteur), la PR 3 (le régulateur des
-  appels par ferme), la revue de l'isolation par un second fil avant toute
-  ferme tierce.
+  par la CI de la PR (longs essais sur GitHub). Sa première CI, à 23 h 08
+  (heure de Paris), a fait tomber P12 au téléphone dans la dernière heure du
+  jour (deux colonnes en dépassement au lieu d'une : la limite vaut dès
+  aujourd'hui, où d'autres parcours ont arrosé, et à cette heure l'arrosage
+  validé peut tomber le lendemain), puis P2, P26 et P32 derrière lui ; P12
+  lit désormais la seule colonne du jour de l'arrosage validé
+  (`docs/browser-journeys-contract.md`, « l'heure où il tourne »). Restent :
+  la PR 2 (l'identité lue chez OTF et le rattachement automatique,
+  fusionnée seulement sur le « vas-y » exprès du porteur), la PR 3 (le
+  régulateur des appels par ferme), la revue de l'isolation par un second
+  fil avant toute ferme tierce.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

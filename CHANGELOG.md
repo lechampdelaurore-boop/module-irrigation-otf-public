@@ -18,6 +18,16 @@ source détaillée commit par commit.
   ferme (`pnpm test:isolation`) ; un garde-fou refuse toute requête par la
   seule personne.
 
+### Corrigé (parcours navigateur)
+
+- **P12 ne dépend plus de l'heure où il tourne** (#87) : il lit le
+  dépassement de la limite journalière dans la colonne du jour de
+  l'arrosage validé, et non dans toute la semaine. La limite vaut dès
+  aujourd'hui, où d'autres parcours ont arrosé, et dans la dernière heure
+  du jour l'arrosage validé peut tomber le lendemain : deux colonnes sont
+  alors en défaut. P12 en a compté deux au lieu d'une (CI du 17 novembre
+  2026 à 23 h 16), et P2, P26 et P32 sont tombés derrière lui.
+
 ### Ajouté (Tranche 4, sous-tranche 4.8, le site public)
 
 - **Le site public du module** (D-153, F317 à F324) : un Worker à part,

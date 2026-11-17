@@ -202,7 +202,15 @@ CI le 3 octobre (point ouvert 22). Reste connu et non couvert : le dimanche de
 23 h 42 à 23 h 59, plus aucun créneau de la semaine ne tient et P10 n'a rien à
 lire. P12, dans la dernière heure d'un dimanche, trouve après son refus son
 besoin « Non placé » pour créneau refusé et n'a plus rien à valider : il le
-dit et ne joue pas la suite.
+dit et ne joue pas la suite. La limite journalière de P12, posée dès
+aujourd'hui et sans fin, met en défaut tout jour où d'autres parcours ont
+arrosé au-delà de 10 L ; dans la dernière heure d'un jour, l'arrosage qu'il
+valide peut tomber le lendemain, et le jour même, déjà chargé, est alors
+en défaut lui aussi. P12 lit donc le dépassement dans la colonne du jour de
+l'arrosage validé, et non dans toute la semaine. Il a échoué en CI le
+17 novembre 2026 à 23 h 16 (#87) en comptant deux colonnes au lieu d'une,
+et trois parcours derrière lui, que sa limite et son objectif laissés en
+place ont fait tomber.
 
 **Deux parcours sur une même planche.** P10 laisse sa ligne posée sur son
 tunnel ; P12, qui y pose la sienne, la fait débiter plus fort — 12 mm/h
