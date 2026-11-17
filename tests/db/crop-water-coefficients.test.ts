@@ -6,6 +6,7 @@ import { addRootingProfileForUser } from '../../db/soil-reserve/entries';
 import type { IrrigationSnapshot } from '../../lib/domain/domain';
 import { getCropCoefficientsViewForUser } from '../../lib/services/crop-water-coefficients';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La page « Coefficients culturaux » lue depuis la base (5 quater, PR 3) :
@@ -14,8 +15,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * référence Kc ».
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

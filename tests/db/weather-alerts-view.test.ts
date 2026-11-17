@@ -12,6 +12,7 @@ import type { WeatherDailyValue } from '../../lib/domain/weather/weather-provide
 import { evaluateWeatherAlertsAfterForecastWrite } from '../../lib/services/weather-alerts-service';
 import { readWeatherAlertsView } from '../../lib/services/weather-alerts-view';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * L'encart « Alertes météo » (docs/weather-alerts-contract.md, « L'écran »,
@@ -21,8 +22,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * l'autre.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const LOCATION = 'custom:tronget:03240';
 const MORNING = new Date('2026-11-02T05:15:00.000Z');
 const AFTERNOON = new Date('2026-11-02T13:00:00.000Z');

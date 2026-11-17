@@ -141,8 +141,15 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     await expect(suggestion.getByRole('button', { name: 'Garder' })).toBeVisible();
     await pli.locator('summary').click();
     await expect(pli.locator('li[data-kind="suggestion"]').filter({ hasText: materiel })).toContainText('Suggestion nouvelle : annuler');
-    // La colonne du jour dépassé le dit aussi, sous son en-tête (audit final, lot B, remarque 5, F256).
-    const jourDepasse = planning.locator('.planning-day-overcommitted');
+    // La colonne du jour de l'arrosage validé le dit aussi, sous son en-tête
+    // (audit final, lot B, remarque 5, F256). Elle seule : la limite vaut dès
+    // aujourd'hui, où d'autres parcours ont pu arroser au-delà de 10 L, et
+    // dans la dernière heure du jour l'arrosage validé tombe le lendemain ;
+    // deux colonnes le disent alors, à juste titre (« l'heure où il tourne »,
+    // CI du 17 novembre 2026 à 23 h 16).
+    const identifiantValide = await validee.getAttribute('data-proposal-id');
+    const jourDuValide = planning.locator('li.planning-day').filter({ has: page.locator(`article.planning-proposal[data-proposal-id="${identifiantValide}"]`) });
+    const jourDepasse = jourDuValide.locator('.planning-day-overcommitted');
     await expect(jourDepasse).toHaveCount(1);
     await expect(jourDepasse).toBeVisible();
     await expect(jourDepasse).toHaveText(new RegExp(`^Limite journalière de 10 L dépassée : ${VOLUME_ECRIT} engagés$`));
@@ -162,10 +169,10 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     // La carte validée lit le réel : « Annulée », hors du compte des validées (statuts du contrat ; recette réelle du 31 octobre 2026).
     await expect(validee.locator('.planning-status')).toHaveText('Annulée');
     await expect(planning.locator('.planning-summary-card').filter({ hasText: 'Faites' })).toContainText('sur 0 validée');
-    // L'arrosage annulé ne compte plus dans ce que le jour engage : la colonne
-    // ne dit plus rien, ou, si d'autres parcours ont arrosé ce jour-là
-    // au-delà de 0,01 m³, un volume engagé plus petit (F256).
-    const jourApres = planning.locator('.planning-day-overcommitted');
+    // L'arrosage annulé ne compte plus dans ce que son jour engage : la
+    // colonne ne dit plus rien, ou, si d'autres parcours ont arrosé ce
+    // jour-là au-delà de 0,01 m³, un volume engagé plus petit (F256).
+    const jourApres = jourDuValide.locator('.planning-day-overcommitted');
     if (await jourApres.count() > 0) {
       await expect(jourApres).toHaveCount(1);
       expect(metresCubesEngages(await jourApres.innerText()), 'le volume engagé du jour, sans l’arrosage annulé').toBeLessThan(engagesAvant);

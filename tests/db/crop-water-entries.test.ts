@@ -22,6 +22,7 @@ import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { resolveCorrespondence } from '../../lib/domain/crop-water/species';
 import { ARTICHOKE } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Les saisies de la ferme en base (docs/crop-water-need-contract.md, « Les
@@ -31,8 +32,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * filets et options. Chaque écriture reste dans son exploitation.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const MORNING = new Date('2026-11-06T07:00:00.000Z');
 const LATER = new Date('2026-11-06T08:00:00.000Z');
 

@@ -8,6 +8,7 @@ import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { getSeriesCropWaterSheetForUser } from '../../lib/services/crop-water-series';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE } from '../support/spaces';
 
 /**
  * La fiche de la série (5 quater, PR 3e, « L'écran ») : sur chacune de ses
@@ -16,7 +17,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * présentes (l'ETM d'une planche est celle de sa culture la plus exigeante) ; un stade déclaré pour toute la série vaut sur chaque planche.
  */
 
-const ALICE = 'alice';
 const TODAY = '2026-05-13';
 const NOW = new Date('2026-05-13T08:00:00.000Z');
 

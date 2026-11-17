@@ -7,6 +7,7 @@ import { farmDurationsOf } from '../../lib/domain/crop-water/farm-durations';
 import { getCropCoefficientsViewForUser } from '../../lib/services/crop-water-coefficients';
 import { resetFarmDurationsForUser, saveFarmDurationsForUser } from '../../lib/services/crop-water-durations';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Les durées propres à la ferme, enregistrées (5 quater, PR 3e) : la version
@@ -15,8 +16,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * communes », rétablissent le jeu commun.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

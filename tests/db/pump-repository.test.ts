@@ -14,9 +14,8 @@ import { ensureWorkspaceForUser, readHydraulicRevisionForUser } from '../../db/w
 import type { PumpDraft } from '../../lib/domain/pumps';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { createDripFixture, plannedDraft, runningDraft } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

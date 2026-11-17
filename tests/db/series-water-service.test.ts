@@ -6,8 +6,8 @@ import type { IrrigationSnapshot } from '../../lib/domain/domain';
 import { getSeriesWaterDashboardForUser } from '../../lib/services/series-water-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
-const ALICE = 'alice';
 const NOW = new Date('2026-09-29T10:00:00.000Z');
 
 let database: TestDatabase;

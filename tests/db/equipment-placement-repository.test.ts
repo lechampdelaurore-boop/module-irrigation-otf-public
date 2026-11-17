@@ -15,9 +15,8 @@ import { createIrrigationEventForUser } from '../../db/irrigation-event/create';
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const SEASON = 2026;
 /** Lundi 2 mars 2026, 8 h à la ferme : la date de pose des tests, dans la saison et dans le passé. */
 const POSE = '2026-03-02T07:00:00.000Z';

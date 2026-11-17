@@ -9,6 +9,7 @@ import { minutesOfDay } from '../../lib/domain/planning/settings';
 import { getIrrigationHistoryDashboardForUser } from '../../lib/services/irrigation-history-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
 /**
  * Le signal d'une irrigation faite pendant un créneau protégé, sur sa carte de
@@ -18,7 +19,6 @@ import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } f
  * la 3.8 a tout coché (R6).
  */
 
-const ALICE = 'alice';
 const NOW = new Date('2026-09-30T10:00:00.000Z');
 
 let database: TestDatabase;

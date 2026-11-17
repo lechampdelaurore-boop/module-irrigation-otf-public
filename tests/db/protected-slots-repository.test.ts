@@ -12,6 +12,7 @@ import {
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { minutesOfDay } from '../../lib/domain/planning/settings';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Le registre des créneaux protégés (docs/protected-slots-contract.md,
@@ -21,8 +22,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * ligne écrite ni créneau par défaut tant que personne n'en saisit.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

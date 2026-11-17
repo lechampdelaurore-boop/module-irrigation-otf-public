@@ -13,9 +13,8 @@ import {
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../../db/workspace-repository';
 import type { WaterReservoirDraft, WaterResourceDraft } from '../../lib/domain/water-resources';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

@@ -12,9 +12,8 @@ import {
 import { listWaterInfrastructureForUser, saveWaterResourceForUser } from '../../db/water-resource-repository';
 import type { WaterResourceDraft } from '../../lib/domain/water-resources';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const HEURE = 60 * 60;
 
 let database: TestDatabase;

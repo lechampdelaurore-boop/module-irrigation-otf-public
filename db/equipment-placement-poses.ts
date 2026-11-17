@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import type { PlacementBedInput } from '@/lib/domain/equipment-placement-domain';
 import type {
   PlacementIrrigationUse,
@@ -88,10 +89,10 @@ export async function listEquipmentPosesForUser(
        FROM irrigation_equipment_placements AS placement
        INNER JOIN irrigation_workspaces AS workspace
          ON workspace.id = placement.workspace_id
-       WHERE workspace.owner_user_id = ? AND placement.season = ?
+       WHERE ${WORKSPACE_SPACE_FILTER} AND placement.season = ?
        ORDER BY placement.created_at, placement.id`,
     )
-      .bind(ownerUserId, season)
+      .bind(...spaceParams(ownerUserId), season)
       .all<PlacementRow>(),
     db.prepare(
       `SELECT
@@ -104,10 +105,10 @@ export async function listEquipmentPosesForUser(
          ON placement.id = selected.placement_id
        INNER JOIN irrigation_workspaces AS workspace
          ON workspace.id = placement.workspace_id
-       WHERE workspace.owner_user_id = ? AND placement.season = ?
+       WHERE ${WORKSPACE_SPACE_FILTER} AND placement.season = ?
        ORDER BY selected.placement_id, selected.position`,
     )
-      .bind(ownerUserId, season)
+      .bind(...spaceParams(ownerUserId), season)
       .all<SelectedBedRow>(),
   ]);
 
@@ -128,10 +129,10 @@ export async function listEquipmentPoseHistoryForUser(
      FROM irrigation_equipment_placement_history AS history
      INNER JOIN irrigation_workspaces AS workspace
        ON workspace.id = history.workspace_id
-     WHERE workspace.owner_user_id = ? AND history.season = ?
+     WHERE ${WORKSPACE_SPACE_FILTER} AND history.season = ?
      ORDER BY history.removed_at DESC, history.created_at DESC, history.id`,
   )
-    .bind(ownerUserId, season)
+    .bind(...spaceParams(ownerUserId), season)
     .all<{ id: string; placed_at: string | null; removed_at: string; pose_snapshot: string }>();
 
   return rows.results.map((row) => {

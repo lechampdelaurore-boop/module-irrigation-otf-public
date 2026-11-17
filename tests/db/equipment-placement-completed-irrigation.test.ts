@@ -7,6 +7,7 @@ import { listIrrigationEventsForUser } from '../../db/irrigation-event/read';
 import { irrigationPlacementForUser } from '../../lib/services/irrigation-placement-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
 /**
  * Pose datée et stockage du matériel, la saisie après coup (sous-tranche
@@ -14,7 +15,6 @@ import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } f
  * 12). En juin 2026, la ferme est à UTC+2 : 06:00Z se lit 8 h 00.
  */
 
-const ALICE = 'alice';
 const SEASON = 2026;
 
 let database: TestDatabase;

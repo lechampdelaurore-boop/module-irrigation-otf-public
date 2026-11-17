@@ -7,6 +7,7 @@ import { deleteEquipmentSettingForUser, saveEquipmentSettingForUser } from '../.
 import { emptyCalculatorInputs, type CalculatorInputs } from '../../lib/domain/irrigation-calculator/inputs';
 import { calculatorSettingValues, settingLabelOf } from '../../lib/domain/irrigation-calculator/provenance';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La provenance des réglages (docs/irrigation-calculator-contract.md,
@@ -15,8 +16,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * réglage, isolée par espace de travail, sans toucher aux valeurs.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

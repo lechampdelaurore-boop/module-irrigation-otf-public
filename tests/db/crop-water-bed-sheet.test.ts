@@ -15,6 +15,7 @@ import { EARLY_SPRINKLER_WARNING } from '../../lib/domain/crop-water/proposal';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { completedDraft, createDripFixture } from '../support/irrigation-fixtures';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La fiche de la planche lue depuis la base (5 quater, PR 3b) : le stade, le
@@ -23,8 +24,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * la planche qui garde son origine (D-039, migration 0024).
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const BED = 'planche-a';
 const SHELTER = 'jardin-serre';
 const WEEK = '2026-05-11';

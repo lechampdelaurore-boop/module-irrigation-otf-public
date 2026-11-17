@@ -1,5 +1,6 @@
 import { db } from '../binding';
 import { ensureWorkspaceForUser } from '../workspace-repository';
+import { spaceKeyOfRow } from '../workspace-scope';
 import {
   DEFAULT_CROP_ALERT_SETTINGS,
   validateCropAlertSettings,
@@ -212,10 +213,14 @@ export async function readLatestForecastLocation(workspaceId: string): Promise<s
   return row?.location_key ?? null;
 }
 
-/** Le propriétaire d'une exploitation, qui donne la clé de son instantané d'Ouvre ta ferme. */
+/**
+ * La clé d'espace d'une exploitation, personne et ferme (4.2, F328), qui
+ * donne la clé de son instantané d'Ouvre ta ferme.
+ */
 export async function readWorkspaceOwner(workspaceId: string): Promise<string | null> {
-  const row = await db.prepare(`SELECT owner_user_id FROM irrigation_workspaces WHERE id = ?`).bind(workspaceId).first<{ owner_user_id: string }>();
-  return row?.owner_user_id ?? null;
+  const row = await db.prepare(`SELECT owner_user_id, otf_farm_id FROM irrigation_workspaces WHERE id = ?`)
+    .bind(workspaceId).first<{ owner_user_id: string; otf_farm_id: string | null }>();
+  return row ? spaceKeyOfRow(row) : null;
 }
 
 function nullable(value: number | null): number | null {

@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-record';
 import type {
   EquipmentListItem,
@@ -106,7 +107,7 @@ export async function listIrrigationHistoryForUser(
   const period = periodPredicate('event_equipment', 'event');
   const scope = scopePredicate(query.scope);
   const commonArguments = [
-    ownerUserId,
+    ...spaceParams(ownerUserId),
     query.season,
     query.season,
     ...periodArguments(query),
@@ -116,7 +117,7 @@ export async function listIrrigationHistoryForUser(
   const [eventsResult, applicationsResult, historyResult] = await Promise.all([
     db.prepare(
       `${eventSelectSql()}
-       WHERE workspace.owner_user_id = ?
+       WHERE ${WORKSPACE_SPACE_FILTER}
          AND (? IS NULL OR event.season = ?)
          AND ${period.sql}
          AND EXISTS (
@@ -145,7 +146,7 @@ export async function listIrrigationHistoryForUser(
          ON event_equipment.id = application.event_equipment_id
        INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
        INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-       WHERE workspace.owner_user_id = ?
+       WHERE ${WORKSPACE_SPACE_FILTER}
          AND (? IS NULL OR event.season = ?)
          AND ${period.sql}
          ${scope.sql('application')}
@@ -160,7 +161,7 @@ export async function listIrrigationHistoryForUser(
        INNER JOIN irrigation_event_equipment AS event_equipment
          ON event_equipment.event_id = event.id
        INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-       WHERE workspace.owner_user_id = ?
+       WHERE ${WORKSPACE_SPACE_FILTER}
          AND (? IS NULL OR event.season = ?)
          AND ${period.sql}
          AND EXISTS (

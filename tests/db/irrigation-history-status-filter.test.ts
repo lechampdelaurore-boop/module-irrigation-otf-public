@@ -9,6 +9,7 @@ import {
 } from '../../lib/services/irrigation-history-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture, plannedDraft } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
 /**
  * L'historique s'ouvre sur les irrigations réalisées (audit ergonomique,
@@ -17,7 +18,6 @@ import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture, pl
  * et l'export suit le filtre — un lien sans filtre exporte tout, comme avant.
  */
 
-const ALICE = 'alice';
 const NOW = new Date('2026-09-30T10:00:00.000Z');
 
 let database: TestDatabase;

@@ -33,9 +33,8 @@ import {
 import { ensureWorkspaceForUser, readHydraulicRevisionForUser, readWaterBudgetRevisionForUser } from '../../db/workspace-repository';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { completedDraft, createDripFixture, plannedDraft, runningDraft, type IrrigationFixture } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const T0 = '2026-06-15T08:00:00.000Z';
 const MINUTE_MS = 60_000;
 

@@ -10,6 +10,7 @@ import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { etmRecordDates, recordEtmDaysForUser } from '../../lib/services/crop-water-etm-record';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * L'ETM enregistrée chaque matin (5 quater, PR 3d, « La traçabilité ») :
@@ -18,7 +19,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * réanalyse arrivée entre-temps prend la place de la prévision.
  */
 
-const ALICE = 'alice';
 const BED = 'planche-a';
 const EMPTY_BED = 'planche-b';
 const SHELTER = 'jardin-serre';
@@ -92,6 +92,6 @@ test('chaque matin, l’ETM de chaque planche s’enregistre pour huit jours ave
 });
 
 test('une ferme sans espace ni plan lu n’enregistre rien', async () => {
-  assert.equal(await recordEtmDaysForUser({ ownerUserId: 'bob', season: 2026, snapshot, now: MONDAY_MORNING }), 0);
+  assert.equal(await recordEtmDaysForUser({ ownerUserId: BOB, season: 2026, snapshot, now: MONDAY_MORNING }), 0);
   assert.equal(await recordEtmDaysForUser({ ownerUserId: ALICE, season: 2026, snapshot: { ...snapshot, cropPlan: undefined }, now: MONDAY_MORNING }), 0);
 });

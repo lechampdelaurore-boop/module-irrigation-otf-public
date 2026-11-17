@@ -8,6 +8,7 @@ import type { TodayBlock, TodayView } from '../../lib/domain/today/today-view';
 import { getTodayBadgeForUser, getTodayViewForUser } from '../../lib/services/today-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, plannedDraft } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La page « Aujourd'hui » lue en base (audit ergonomique, points 1 et 3,
@@ -16,8 +17,6 @@ import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, plannedDraft } fro
  * aucun volume de la première — comme l'isolation des autres lectures.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const NOW = new Date('2026-11-12T05:00:00.000Z');
 const ALL = [...FEATURE_IDS];
 

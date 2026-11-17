@@ -5,6 +5,29 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Sécurité (Tranche 4, 4.1 et 4.2, l'isolation des fermes)
+
+- **Chaque espace se retrouve par la personne et la ferme ensemble**
+  (D-155, F327, F328, PR 1 sur 3) : la clé d'espace,
+  `<personne>·ferme·<ferme>` ou la personne seule pour un espace sans
+  ferme, passe dans toutes les requêtes de la base par un filtre unique
+  (`db/workspace-scope.ts`), jointures de vérification comprises ; une clé
+  mal formée est refusée. Rien ne change à l'écran : les espaces actuels
+  restent sans ferme jusqu'à la PR suivante. `pnpm test` rejoue les tests
+  de la base à deux fermes pour une personne et à deux personnes pour une
+  ferme (`pnpm test:isolation`) ; un garde-fou refuse toute requête par la
+  seule personne.
+
+### Corrigé (parcours navigateur)
+
+- **P12 ne dépend plus de l'heure où il tourne** (#87) : il lit le
+  dépassement de la limite journalière dans la colonne du jour de
+  l'arrosage validé, et non dans toute la semaine. La limite vaut dès
+  aujourd'hui, où d'autres parcours ont arrosé, et dans la dernière heure
+  du jour l'arrosage validé peut tomber le lendemain : deux colonnes sont
+  alors en défaut. P12 en a compté deux au lieu d'une (CI du 17 novembre
+  2026 à 23 h 16), et P2, P26 et P32 sont tombés derrière lui.
+
 ### Ajouté (Tranche 4, sous-tranche 4.8, le site public)
 
 - **Le site public du module** (D-153, F317 à F324) : un Worker à part,

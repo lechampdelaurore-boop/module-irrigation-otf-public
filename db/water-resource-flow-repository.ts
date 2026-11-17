@@ -1,5 +1,5 @@
 import { db } from './binding';
-import { ensureWorkspaceForUser } from './workspace-repository';
+import { ensureWorkspaceForUser, findWorkspaceIdForUser as findWorkspaceId } from './workspace-repository';
 import {
   validateMeterReading,
   type MeterReadingDraft,
@@ -286,9 +286,3 @@ async function assertReadingOwned(readingId: string, workspaceId: string): Promi
   if (!row) throw new Error('Relevé introuvable.');
 }
 
-async function findWorkspaceId(ownerUserId: string): Promise<string | null> {
-  const row = await db.prepare(
-    'SELECT id FROM irrigation_workspaces WHERE owner_user_id = ? LIMIT 1',
-  ).bind(ownerUserId).first<{ id: string }>();
-  return row?.id ?? null;
-}

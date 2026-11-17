@@ -5,6 +5,7 @@ import type { IrrigationPushAlarmRequest } from '../../lib/domain/irrigation-pus
 import type { StoredPlanSuggestion } from '../../lib/domain/planning/contract';
 import { notifyMorningSuggestions } from '../../lib/services/planning-notifications';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE } from '../support/spaces';
 
 /**
  * La notification du matin passe par l'alarme existante du Worker de
@@ -14,7 +15,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * personne (règle 23).
  */
 
-const ALICE = 'alice';
 const NOW = new Date('2026-09-30T04:15:00.000Z'); // mercredi 6 h 15 à la ferme
 const HOUR_MS = 3_600_000;
 

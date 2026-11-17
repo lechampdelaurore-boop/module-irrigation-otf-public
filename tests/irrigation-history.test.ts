@@ -404,9 +404,10 @@ test('le CSV sans irrigation conserve un résumé météo et hydrique non vide',
   assert.equal(csv.trimEnd().split('\r\n').length, 2);
 });
 
-test('les requêtes d’historique imposent la saison et le propriétaire sur chaque lecture D1', () => {
+test('les requêtes d’historique imposent la saison et l’espace, personne et ferme, sur chaque lecture D1 (4.2, F328)', () => {
   const source = readFileSync('db/irrigation-history-repository.ts', 'utf8');
-  assert.equal((source.match(/workspace\.owner_user_id = \?/g) ?? []).length, 3);
+  assert.equal((source.match(/WHERE \$\{WORKSPACE_SPACE_FILTER\}/g) ?? []).length, 3);
+  assert.doesNotMatch(source, /workspace\.owner_user_id = \?/, 'jamais la personne sans la ferme');
   assert.equal((source.match(/event\.season = \?/g) ?? []).length, 3);
   assert.doesNotMatch(source, /\b(?:INSERT|UPDATE|DELETE)\b/i);
 });

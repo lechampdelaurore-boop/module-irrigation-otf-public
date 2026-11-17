@@ -13,6 +13,7 @@ import { recordDoneAsPlannedForOwner } from '../../lib/services/done-as-planned-
 import { IrrigationPushCancellationError } from '../../lib/services/irrigation-push-orchestration';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { createDripFixture, plannedDraft, type IrrigationFixture } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * « Tout est fait » dans la base (docs/aujourdhui-tableau-de-bord-contract.md,
@@ -22,8 +23,6 @@ import { createDripFixture, plannedDraft, type IrrigationFixture } from '../supp
  * son nom. Maintenant = lundi 15 juin 2026, 8 h UTC.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const T0 = '2026-06-15T08:00:00.000Z';
 
 let database: TestDatabase;

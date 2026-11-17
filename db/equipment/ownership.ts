@@ -1,35 +1,9 @@
 import { db } from '../binding';
 import { EquipmentNameAlreadyExistsError } from './errors';
 
-export async function ensureWorkspace(ownerUserId: string): Promise<string> {
-  const existingId = await findWorkspaceId(ownerUserId);
-  if (existingId) return existingId;
-
-  const workspaceId = crypto.randomUUID();
-  try {
-    await db.prepare(
-      'INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES (?, ?)',
-    )
-      .bind(workspaceId, ownerUserId)
-      .run();
-    return workspaceId;
-  } catch (error) {
-    const concurrentId = await findWorkspaceId(ownerUserId);
-    if (concurrentId) return concurrentId;
-    throw error;
-  }
-}
-
-export async function findWorkspaceId(ownerUserId: string): Promise<string | null> {
-  const row = await db.prepare(
-    `SELECT id FROM irrigation_workspaces
-     WHERE owner_user_id = ? AND otf_farm_id IS NULL LIMIT 1`,
-  )
-    .bind(ownerUserId)
-    .first<{ id: string }>();
-
-  return row?.id ?? null;
-}
+// L'espace se retrouve en un seul endroit, par la personne et la ferme
+// ensemble (docs/tranche-4-contract.md, section 5 bis, F328).
+export { ensureWorkspaceForUser as ensureWorkspace, findWorkspaceIdForUser as findWorkspaceId } from '../workspace-repository';
 
 export async function assertEquipmentNameAvailable(
   workspaceId: string,
