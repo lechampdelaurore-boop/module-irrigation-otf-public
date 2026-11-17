@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 17 novembre 2026.
+Dernière mise à jour : 18 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -46,30 +46,38 @@ registres, elle y renvoie.
 - Tranche 4, **4.1 et 4.2 commencées ensemble le 17 novembre 2026 au
   soir, en Opus 5.5 · Max**, sur le choix du porteur (carte « 1 sur 1 »,
   22 h 35 ; D-155) : règles écrites avant le code
-  (`docs/tranche-4-contract.md`, section 5 bis, F325 à F336), trois PR
-  dans l'ordre. **PR 1 sur 3 ouverte** (`chore/cle-espace-ferme`) : la clé
-  d'espace, la personne et la ferme ensemble (`lib/domain/farm-space.ts`),
-  filtre chaque requête qui retrouve un espace ou vérifie qu'un objet
-  désigné par le navigateur lui appartient (`db/workspace-scope.ts`) ; rien
-  ne change à l'écran, aucune migration, les espaces actuels restent sans
-  ferme jusqu'à la PR 2. `pnpm test` rejoue les tests de la base deux fois
-  de plus, à deux fermes pour une même personne puis à deux personnes pour
-  une même ferme (`pnpm test:isolation`) ; un garde-fou refuse toute
-  requête de la base qui retrouverait un espace par la seule personne.
-  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
-  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
-  `pnpm site:check` réussis en local ; la suite complète des parcours jouée
-  par la CI de la PR (longs essais sur GitHub). Sa première CI, à 23 h 08
-  (heure de Paris), a fait tomber P12 au téléphone dans la dernière heure du
-  jour (deux colonnes en dépassement au lieu d'une : la limite vaut dès
-  aujourd'hui, où d'autres parcours ont arrosé, et à cette heure l'arrosage
-  validé peut tomber le lendemain), puis P2, P26 et P32 derrière lui ; P12
-  lit désormais la seule colonne du jour de l'arrosage validé
-  (`docs/browser-journeys-contract.md`, « l'heure où il tourne »). Restent :
-  la PR 2 (l'identité lue chez OTF et le rattachement automatique,
-  fusionnée seulement sur le « vas-y » exprès du porteur), la PR 3 (le
-  régulateur des appels par ferme), la revue de l'isolation par un second
-  fil avant toute ferme tierce.
+  (`docs/tranche-4-contract.md`, sections 5 bis et 5 ter, F325 à F344),
+  trois PR dans l'ordre. **PR 1 sur 3 en ligne le 18 novembre 2026 à
+  0 h 35** : #87 fusionnée à 0 h 19, run 44198385411 vérifié job par job
+  (« Application », « Workers Cloudflare », « Parcours navigateur »,
+  « Déploiement Cloudflare », « Déploiement de la démonstration », verts).
+  La clé d'espace, la personne et la ferme ensemble
+  (`lib/domain/farm-space.ts`), filtre chaque requête qui retrouve un
+  espace ou vérifie qu'un objet désigné par le navigateur lui appartient
+  (`db/workspace-scope.ts`) ; rien n'a changé à l'écran ; `pnpm test`
+  rejoue les tests de la base à deux fermes pour une même personne puis à
+  deux personnes pour une même ferme (`pnpm test:isolation`) ; un
+  garde-fou refuse toute requête de la base qui retrouverait un espace par
+  la seule personne. Sa première CI, à 23 h 08, avait fait tomber P12 au
+  téléphone dans la dernière heure du jour (deux colonnes en dépassement au
+  lieu d'une), puis P2, P26 et P32 derrière lui ; P12 lit désormais la
+  seule colonne du jour de l'arrosage validé
+  (`docs/browser-journeys-contract.md`, « l'heure où il tourne »).
+  **PR 2 sur 3 ouverte** (`feat/identite-ferme-otf`, D-156) : `GET /me` lu
+  d'abord à chaque lecture, qui s'arrête si la clé mène à une autre ferme
+  ou à aucune ; la ferme du déploiement gardée (`otf_deployment_farm`,
+  migration additive 0031) ; à chaque connexion, l'espace d'avant la 4.1
+  reçoit la ferme d'où viennent ses données, par une seule écriture
+  conditionnelle, et la clé rendue est celle de la ferme ; un espace d'une
+  autre ferme, ou sans ferme hors démonstration, ne lit plus OTF ; sans
+  ferme connue, aucune page ne s'affiche (F341). Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; la suite complète des parcours jouée par la CI de la PR. **Sa
+  fusion attend le « vas-y » exprès du porteur** : à sa première ouverture
+  après la mise en ligne, la ferme s'écrit dans la colonne de son espace
+  réel (F344). Restent : la PR 3 (le régulateur des appels par ferme), la
+  revue de l'isolation par un second fil avant toute ferme tierce.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

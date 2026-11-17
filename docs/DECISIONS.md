@@ -5294,8 +5294,8 @@ n'est deviné), D-096 (la démonstration reste sans ferme), D-048.
 
 ## D-156 — Tranche 4, 4.1 et 4.2, PR 2 : l'identité de la ferme lue chez OTF, la ferme du déploiement et le rattachement automatique
 
-Date : 17 novembre 2026, nuit. Décideur : Claude, à l'option recommandée,
-sur le mandat du porteur (D-154, D-155) ; **la fusion attend son « vas-y »
+Date : nuit du 17 au 18 novembre 2026. Décideur : Claude, à l'option
+recommandée, sur le mandat du porteur (D-154, D-155) ; **la fusion attend son « vas-y »
 exprès** (D-155). Après D-155.
 
 **Pourquoi la question.** La section 5 bis du contrat disait quoi faire
