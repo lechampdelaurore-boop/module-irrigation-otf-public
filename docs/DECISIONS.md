@@ -5249,3 +5249,45 @@ les attentes. Après D-153, qu'elle étend à toute la Tranche 4.
 
 Ne changent pas : D-142 (contenu des sous-tranches, sauf l'ordre), D-066
 (partage des rôles), D-055 (Fable interdit), la règle des registres.
+
+## D-155 — Tranche 4, sous-tranches 4.1 et 4.2 ensemble : l'identité de la ferme et l'isolation, en trois PR
+
+Date : 17 novembre 2026, soir. Décideur : le porteur, sur la carte « 1 sur
+1 » (22 h 35, heure de Paris : « 4.1 et 4.2 ensemble, en Max »). Après
+D-154.
+
+**Pourquoi la question.** Les registres se contredisaient : la ligne 4.1 de
+la roadmap (section 6) la donnait seule, en Opus 5.5 · Élevé ; le contrat
+validé (section 4, D-142) faisait de 4.1 et 4.2 un seul chantier, en
+Opus 5.5 · Max. Le code tranchait aussi : treize requêtes retrouvent
+l'espace d'une personne en cherchant « son espace sans ferme », une
+trentaine d'autres ne vérifient que la personne ; remplir l'identifiant de
+ferme sans les changer rendrait les données de la ferme introuvables.
+
+**Décision.**
+
+1. 4.1 et 4.2 forment **un seul chantier, en Opus 5.5 · Max**, comme le
+   prévoit le contrat ; la ligne 4.1 de la roadmap est alignée.
+2. Les règles sont écrites avant le code (`docs/tranche-4-contract.md`,
+   section 5 bis, F325 à F336), toutes à l'option recommandée : aucune
+   n'est agronomique, ne touche au budget ni à Cloudflare. Un espace, c'est
+   une personne et une ferme ; chaque requête les filtre ensemble ;
+   l'identité de la ferme vient de `GET /me` d'OTF ; l'espace d'avant la
+   4.1 est rattaché automatiquement à la ferme d'où viennent ses données,
+   sans copie ni suppression ; une clé qui change de ferme n'écrit rien
+   dans l'espace de l'ancienne ; le régulateur tient 4 appels par seconde
+   et 30 par minute par ferme.
+3. **Trois PR, dans l'ordre**, chacune après le déploiement vérifié de la
+   précédente : (1) la clé d'espace dans chaque requête, sans rien changer
+   de visible, avec les tests d'isolation et la liste des requêtes relue ;
+   (2) l'identité lue chez OTF et le rattachement automatique ; (3) le
+   régulateur par ferme. **La PR 2 attend un « vas-y » exprès du porteur
+   avant sa fusion** : elle écrit dans l'espace de sa ferme réelle, et un
+   retour en arrière du code ne suffirait plus à la défaire.
+
+Restent à la 4.3 : le coffre des jetons, le budget quotidien d'appels et
+l'échelonnement des synchronisations (F335). La revue de l'isolation par
+un second fil reste due avant toute ferme tierce (4.6).
+
+Ne changent pas : D-142 (sauf la ligne 4.1 alignée), D-154, D-003 (rien
+n'est deviné), D-096 (la démonstration reste sans ferme), D-048.

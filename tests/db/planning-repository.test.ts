@@ -15,9 +15,8 @@ import type { PlanProposal, WeeklyPlan } from '../../lib/domain/planning/contrac
 import { effectiveProposalStatus } from '../../lib/domain/planning/contract';
 import { DEFAULT_PLANNING_SETTINGS } from '../../lib/domain/planning/settings';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const WEEK = '2026-09-28';
 
 let database: TestDatabase;

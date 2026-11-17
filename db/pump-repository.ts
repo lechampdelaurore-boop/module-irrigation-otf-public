@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import { ensureWorkspaceForUser } from './workspace-repository';
 import { hydraulicRevisionStatement } from './workspace-repository';
 import {
@@ -41,20 +42,20 @@ export async function listPumpConfigurationForUser(
       pump.status, pump.archived_at, pump.notes
       FROM irrigation_pumps AS pump
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = pump.workspace_id
-      WHERE workspace.owner_user_id = ?
+      WHERE ${WORKSPACE_SPACE_FILTER}
       ORDER BY CASE pump.status WHEN 'active' THEN 0 ELSE 1 END, pump.name COLLATE NOCASE`)
-      .bind(ownerUserId).all<PumpRow>(),
+      .bind(...spaceParams(ownerUserId)).all<PumpRow>(),
     db.prepare(`SELECT origin.id, origin.pump_id, origin.source_kind,
       origin.resource_id, origin.reservoir_id, origin.is_default
       FROM irrigation_pump_origins AS origin
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = origin.workspace_id
-      WHERE workspace.owner_user_id = ? ORDER BY origin.is_default DESC, origin.created_at`)
-      .bind(ownerUserId).all<OriginRow>(),
+      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY origin.is_default DESC, origin.created_at`)
+      .bind(...spaceParams(ownerUserId)).all<OriginRow>(),
     db.prepare(`SELECT defaults.equipment_id, defaults.pump_id
       FROM irrigation_equipment_pump_defaults AS defaults
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = defaults.workspace_id
-      WHERE workspace.owner_user_id = ?`)
-      .bind(ownerUserId).all<{ equipment_id: string; pump_id: string }>(),
+      WHERE ${WORKSPACE_SPACE_FILTER}`)
+      .bind(...spaceParams(ownerUserId)).all<{ equipment_id: string; pump_id: string }>(),
   ]);
   const originsByPump = new Map<string, PumpOrigin[]>();
   for (const row of origins.results) {
@@ -105,7 +106,7 @@ export async function listPumpUsagesForUser(
     FROM irrigation_event_equipment AS event_equipment
     INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
     INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-    WHERE workspace.owner_user_id = ? AND event_equipment.pump_id = ?
+    WHERE ${WORKSPACE_SPACE_FILTER} AND event_equipment.pump_id = ?
       AND event_equipment.id != COALESCE(?, '')
       AND event_equipment.requested_flow_cubic_meters_per_hour IS NOT NULL
       AND (
@@ -120,7 +121,7 @@ export async function listPumpUsagesForUser(
           AND event_equipment.planned_end_at > ?
           AND event_equipment.planned_start_at < ?)
       )`)
-    .bind(ownerUserId, pumpId, excludedEventEquipmentId, startsAt, endsAt, startsAt, endsAt)
+    .bind(...spaceParams(ownerUserId), pumpId, excludedEventEquipmentId, startsAt, endsAt, startsAt, endsAt)
     .all<{ id: string; pump_id: string; requested_flow_cubic_meters_per_hour: number; equipment_snapshot: string; usage_start: string; usage_end: string }>();
   return rows.results.map((row) => {
     const snapshot = JSON.parse(row.equipment_snapshot) as { name?: string };

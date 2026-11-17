@@ -1,4 +1,5 @@
 import { db } from '../binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from '../workspace-scope';
 import type {
   IrrigationBedApplicationRecord,
   IrrigationEventRecord,
@@ -23,7 +24,7 @@ export async function listIrrigationEventsForUser(
   period?: { startAt: string; endAt: string },
 ): Promise<IrrigationEventRecord[]> {
   let seasonFilter = season === undefined ? '' : ' AND event.season = ?';
-  const queryArguments = season === undefined ? [ownerUserId] : [ownerUserId, season];
+  const queryArguments: (string | number | null)[] = season === undefined ? [...spaceParams(ownerUserId)] : [...spaceParams(ownerUserId), season];
   if (period) {
     seasonFilter += ` AND EXISTS (SELECT 1 FROM irrigation_event_equipment scoped
       WHERE scoped.event_id = event.id AND (scoped.timer_state IS NOT NULL OR
@@ -34,7 +35,7 @@ export async function listIrrigationEventsForUser(
   const [eventsResult, applicationsResult, historyResult] = await Promise.all([
     db.prepare(
       `${eventSelectSql()}
-       WHERE workspace.owner_user_id = ?${seasonFilter}
+       WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
        ORDER BY
          CASE WHEN event_equipment.timer_state IS NOT NULL THEN 0 ELSE 1 END,
          COALESCE(event_equipment.actual_end_at, event_equipment.planned_start_at, event.created_at) DESC,
@@ -58,7 +59,7 @@ export async function listIrrigationEventsForUser(
          ON event_equipment.id = application.event_equipment_id
        INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
        INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-       WHERE workspace.owner_user_id = ?${seasonFilter}
+       WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
        ORDER BY application.event_equipment_id, application.otf_plot_id, application.otf_bed_id`,
     )
       .bind(...queryArguments)
@@ -68,7 +69,7 @@ export async function listIrrigationEventsForUser(
        FROM irrigation_event_log AS log
        INNER JOIN irrigation_events AS event ON event.id = log.event_id
        INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-       WHERE workspace.owner_user_id = ?${seasonFilter}
+       WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
        ORDER BY log.created_at, log.rowid`,
     ).bind(...queryArguments).all<{ event_id: string; action: string; payload: string; created_at: string }>()
       : Promise.resolve({ results: [] }),
@@ -163,8 +164,8 @@ export async function readIrrigationEventAnchorForUser(
      FROM irrigation_event_equipment AS event_equipment
      INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-     WHERE event_equipment.id = ? AND workspace.owner_user_id = ? LIMIT 1`,
-  ).bind(eventEquipmentId, ownerUserId).first<{ season: number; start_at: string }>();
+     WHERE event_equipment.id = ? AND ${WORKSPACE_SPACE_FILTER} LIMIT 1`,
+  ).bind(eventEquipmentId, ...spaceParams(ownerUserId)).first<{ season: number; start_at: string }>();
   return row ? { season: Number(row.season), startAt: row.start_at } : null;
 }
 
@@ -183,10 +184,10 @@ export async function readIrrigationStartLimitCandidateForUser(
      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
      INNER JOIN irrigation_bed_applications AS application
        ON application.event_equipment_id = event_equipment.id
-     WHERE event_equipment.id = ? AND workspace.owner_user_id = ?
+     WHERE event_equipment.id = ? AND ${WORKSPACE_SPACE_FILTER}
      GROUP BY event.season, event_equipment.planned_duration_seconds,
               event_equipment.actual_duration_seconds`,
-  ).bind(eventEquipmentId, ownerUserId).first<{
+  ).bind(eventEquipmentId, ...spaceParams(ownerUserId)).first<{
     season: number;
     planned_duration_seconds: number;
     actual_duration_seconds: number;

@@ -18,6 +18,7 @@ import { cropRooting, rootingProfileOn, rootingProfileProblems } from '../../lib
 import { DEFAULT_SOIL_SETTINGS, resolveBedSoil, soilSettingsOn, type SoilRecord } from '../../lib/domain/soil-reserve/soil';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { BED, bareDay, crop, cropDay, dates, FARM_SOIL, observation, staged } from '../support/soil-reserve-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La réserve du sol en base (docs/soil-reserve-contract.md, « Découpage et
@@ -28,8 +29,6 @@ import { BED, bareDay, crop, cropDay, dates, FARM_SOIL, observation, staged } fr
  * recalculé.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const NOW = new Date('2026-06-10T08:00:00.000Z');
 /** Le sol de la ferme du porteur tel qu'il se saisit : l'heure d'enregistrement vient de la base. */
 const FARM_SOIL_ENTRY = Object.fromEntries(Object.entries(FARM_SOIL).filter(([key]) => key !== 'recordedAt')) as Omit<SoilRecord, 'recordedAt'>;

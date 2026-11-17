@@ -9,6 +9,7 @@ import type { IrrigationBedApplicationDraft, IrrigationEventCreationKind } from 
 import { IrrigationDailyLimitExceededError, enforceDailyLimitForCreation, type IrrigationTiming } from '../../lib/services/irrigation-limits';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, plannedDraft } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
 /**
  * La garde de la limite journalière à la création (2.8,
@@ -18,7 +19,6 @@ import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, plannedDraft } fro
  * en avertissement (point ouvert 12, corrigé le 4 octobre 2026).
  */
 
-const ALICE = 'alice';
 /** Lundi 5 octobre 2026, de 6 h à 7 h, heure de Paris. */
 const START = '2026-10-05T04:00:00.000Z';
 const END = '2026-10-05T05:00:00.000Z';

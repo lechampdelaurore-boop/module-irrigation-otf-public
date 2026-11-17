@@ -8,9 +8,8 @@ import {
 } from '../../db/irrigation-need-repository';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../../db/workspace-repository';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const SEASON = 2026;
 const WEEK = '2026-06-15';
 

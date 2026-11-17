@@ -1,4 +1,5 @@
 import { db } from '../binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from '../workspace-scope';
 import type { EquipmentListItem, EquipmentSettingRecord } from '@/lib/domain/equipment-record';
 import type {
   IrrigationPushAlarmStatus,
@@ -32,10 +33,10 @@ export async function markIrrigationPushScheduleStatusForUser(
          INNER JOIN irrigation_workspaces AS workspace
            ON workspace.id = event.workspace_id
          WHERE event.id = irrigation_event_equipment.event_id
-           AND workspace.owner_user_id = ?
+           AND ${WORKSPACE_SPACE_FILTER}
        )`,
   )
-    .bind(status, nowIso, nowIso, eventEquipmentId, revision, ownerUserId)
+    .bind(status, nowIso, nowIso, eventEquipmentId, revision, ...spaceParams(ownerUserId))
     .run();
 }
 
@@ -53,13 +54,13 @@ export async function listUpcomingPushAlarmsForUser(
      FROM irrigation_event_equipment AS event_equipment
      INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-     WHERE workspace.owner_user_id = ?
+     WHERE ${WORKSPACE_SPACE_FILTER}
        AND event_equipment.timer_alarm_status IN ('pending', 'scheduled')
        AND event_equipment.timer_alarm_revision IS NOT NULL
        AND COALESCE(event_equipment.timer_theoretical_end_at, event_equipment.late_alarm_due_at) > ?
      ORDER BY event_equipment.id`,
   )
-    .bind(ownerUserId, now.toISOString())
+    .bind(...spaceParams(ownerUserId), now.toISOString())
     .all<{ id: string; timer_alarm_revision: string }>();
   return result.results.map((row) => ({ eventEquipmentId: row.id, revision: row.timer_alarm_revision }));
 }

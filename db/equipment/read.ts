@@ -1,4 +1,5 @@
 import { db } from '../binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from '../workspace-scope';
 import { type SprinklerProfilePoint } from '@/lib/domain/irrigation-domain';
 import type { EquipmentListItem, EquipmentSettingRecord } from '@/lib/domain/equipment-record';
 import type { DripRateRow, EquipmentRow, ProfilePointRow, SettingRow } from './rows';
@@ -21,12 +22,12 @@ export async function listEquipmentForUser(
            FROM irrigation_equipment AS equipment
            INNER JOIN irrigation_workspaces AS workspace
              ON workspace.id = equipment.workspace_id
-           WHERE workspace.owner_user_id = ?
+           WHERE ${WORKSPACE_SPACE_FILTER}
            ORDER BY
              CASE equipment.status WHEN 'active' THEN 0 ELSE 1 END,
              equipment.name COLLATE NOCASE`,
         )
-        .bind(ownerUserId)
+        .bind(...spaceParams(ownerUserId))
         .all<EquipmentRow>(),
       database
         .prepare(
@@ -41,10 +42,10 @@ export async function listEquipmentForUser(
              ON equipment.id = settings.equipment_id
            INNER JOIN irrigation_workspaces AS workspace
              ON workspace.id = equipment.workspace_id
-           WHERE workspace.owner_user_id = ?
+           WHERE ${WORKSPACE_SPACE_FILTER}
            ORDER BY settings.equipment_id, settings.position`,
         )
-        .bind(ownerUserId)
+        .bind(...spaceParams(ownerUserId))
         .all<SettingRow>(),
       database
         .prepare(
@@ -60,10 +61,10 @@ export async function listEquipmentForUser(
              ON equipment.id = settings.equipment_id
            INNER JOIN irrigation_workspaces AS workspace
              ON workspace.id = equipment.workspace_id
-           WHERE workspace.owner_user_id = ?
+           WHERE ${WORKSPACE_SPACE_FILTER}
            ORDER BY points.setting_id, points.side, points.distance_meters`,
         )
-        .bind(ownerUserId)
+        .bind(...spaceParams(ownerUserId))
         .all<ProfilePointRow>(),
       database
         .prepare(
@@ -75,9 +76,9 @@ export async function listEquipmentForUser(
              ON equipment.id = settings.equipment_id
            INNER JOIN irrigation_workspaces AS workspace
              ON workspace.id = equipment.workspace_id
-           WHERE workspace.owner_user_id = ?`,
+           WHERE ${WORKSPACE_SPACE_FILTER}`,
         )
-        .bind(ownerUserId)
+        .bind(...spaceParams(ownerUserId))
         .all<DripRateRow>(),
     ]);
 

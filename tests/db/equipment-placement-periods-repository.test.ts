@@ -27,6 +27,7 @@ import {
   plannedDraft,
   runningDraft,
 } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Pose datée et stockage du matériel, côté base (sous-tranche 2.11, PR 2 ;
@@ -37,8 +38,6 @@ import {
  * En juin 2026, la ferme est à UTC+2 : 06:00Z se lit 8 h 00.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const SEASON = 2026;
 const IRRIGATION = { startAt: '2026-06-10T06:00:00.000Z', endAt: '2026-06-10T07:00:00.000Z', durationSeconds: 3600 };
 const PENDANT_L_IRRIGATION = '2026-06-10T06:30:00.000Z';

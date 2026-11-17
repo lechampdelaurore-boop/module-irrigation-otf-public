@@ -7,9 +7,8 @@ import { listIrrigationHistoryForUser, type IrrigationHistoryScopeFilter } from 
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { completedDraft, createDripFixture, plannedDraft, runningDraft } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const FARM: IrrigationHistoryScopeFilter = { level: 'farm', zoneId: null, plotId: null, bedId: null };
 const JUNE = { season: 2026, startAt: '2026-06-01T00:00:00.000Z', endAtExclusive: '2026-07-01T00:00:00.000Z', scope: FARM };
 

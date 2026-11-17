@@ -14,9 +14,8 @@ import { computeWeeklyPlanForUser } from '../../lib/services/planning-service';
 import { refusePlanProposalForUser, validatePlanProposalForUser } from '../../lib/services/planning-validation-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const NOW = new Date('2026-09-29T10:52:00.000Z');
 
 let database: TestDatabase;

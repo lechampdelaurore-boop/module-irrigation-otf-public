@@ -24,6 +24,7 @@ import {
   TOMATO,
 } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Le jeu de référence en base (docs/crop-water-need-contract.md, « Le jeu de
@@ -33,8 +34,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * changer les Kc, ou une culture saisie par elle, pour elle seule.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const ALL_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const FAO_URL = 'https://www.fao.org/4/X0490E/x0490e0b.htm';
 const CRIIAM_URL = 'https://www.criiamsud.fr/coefficients_culturaux';

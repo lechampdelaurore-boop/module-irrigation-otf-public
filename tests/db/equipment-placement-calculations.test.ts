@@ -13,6 +13,7 @@ import { validatePlanProposalForUser } from '../../lib/services/planning-validat
 import { validatePumpAssignmentForUser } from '../../lib/services/pump-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, type IrrigationFixture } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
 /**
  * Pose datée et stockage du matériel, ce que voient les calculs (sous-tranche
@@ -21,7 +22,6 @@ import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, type IrrigationFix
  * lit 8 h 00.
  */
 
-const ALICE = 'alice';
 const SEASON = 2026;
 
 let database: TestDatabase;

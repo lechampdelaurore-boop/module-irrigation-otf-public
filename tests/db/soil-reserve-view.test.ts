@@ -14,6 +14,7 @@ import { getSoilReserveViewForUser } from '../../lib/services/soil-reserve-view'
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FARM_SOIL } from '../support/soil-reserve-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La jauge du bloc « Réserve du sol » à partir de la base (5 ter, PR 3b) : le
@@ -23,7 +24,6 @@ import { FARM_SOIL } from '../support/soil-reserve-fixtures';
  * surface ; sans sol saisi, la jauge est inconnue et le dit.
  */
 
-const ALICE = 'alice';
 const BED = 'planche-a';
 const EMPTY_BED = 'planche-b';
 const SHELTER = 'jardin-serre';
@@ -125,7 +125,7 @@ test('la jauge suit la saison en cours ; une ferme sans espace lit les valeurs d
   assert.match(other.gaugeUnavailable ?? '', /saison en cours/);
   const unread = await getSoilReserveViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: { ...snapshot, cropPlan: undefined }, now: NOW });
   assert.match(unread.gaugeUnavailable ?? '', /plan de culture/);
-  const bob = await getSoilReserveViewForUser({ ownerUserId: 'bob', season: 2026, snapshot, now: NOW });
+  const bob = await getSoilReserveViewForUser({ ownerUserId: BOB, season: 2026, snapshot, now: NOW });
   assert.equal(bob.gauge, null);
   assert.equal(bob.waterSurplus, null, 'sans jauge, pas de pastille');
   assert.equal(bob.settings.farm.isDefault, true);

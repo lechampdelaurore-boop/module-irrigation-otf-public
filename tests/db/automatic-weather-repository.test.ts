@@ -14,12 +14,11 @@ import {
   saveWeatherPreferenceForUser,
 } from '../../db/water-management-repository';
 import { saveFeatureSelectionForUser } from '../../db/feature-selection-repository';
-import { ensureWorkspaceForUser } from '../../db/workspace-repository';
+import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../../db/workspace-repository';
 import { customWeatherLocationKey } from '../../lib/domain/weather/location';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const CAROL = 'carol';
 const candidate = { displayName: 'Vannes', city: 'Vannes', postcode: '56000', latitude: 47.66, longitude: -2.76, timezone: 'Europe/Paris', countryCode: 'FR' };
 
@@ -47,7 +46,7 @@ test('cibles de la synchronisation nocturne : un lieu actif par espace, selon le
   await ensureWorkspaceForUser('dave');
 
   const targets = await listAutomaticWeatherTargets();
-  const aliceWorkspace = database.sqlite.prepare("SELECT id FROM irrigation_workspaces WHERE owner_user_id = 'alice'").get()?.id;
+  const aliceWorkspace = await findWorkspaceIdForUser(ALICE);
   assert.deepEqual(
     targets.map((target) => [target.workspaceId === aliceWorkspace ? 'alice' : 'bob', target.locationKey, target.latitude, target.refreshNotBeforeAt]).sort(),
     [

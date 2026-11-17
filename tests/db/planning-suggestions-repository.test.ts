@@ -8,6 +8,7 @@ import type { PlanSuggestion, WeeklyPlan } from '../../lib/domain/planning/contr
 import { DEFAULT_PLANNING_SETTINGS } from '../../lib/domain/planning/settings';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { createDripFixture, plannedDraft } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * « Garder » une suggestion (3.7, docs/replanning-contract.md, règle 17) :
@@ -16,8 +17,6 @@ import { createDripFixture, plannedDraft } from '../support/irrigation-fixtures'
  * antérieur à la 3.7 se relit sans suggestion.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const WEEK = '2026-09-28';
 const START = '2026-09-30T06:00:00.000Z';
 const END = '2026-09-30T06:34:17.000Z';

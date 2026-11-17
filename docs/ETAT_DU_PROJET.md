@@ -34,11 +34,36 @@ registres, elle y renvoie.
   `pnpm weather:check`, `pnpm site:check` (nouveau) réussis en local, P36
   joué en local aux deux largeurs ; la suite complète des parcours jouée par
   la CI de la PR (longs essais sur GitHub, choix du 17 novembre 2026).
-  Restent : le déploiement vérifié, l'adresse de contact que le porteur pose
-  lui-même (`SITE_CONTACT_EMAIL`), sa relecture du texte en ligne, l'envoi
-  du formulaire d'OTF par lui, la relecture juridique avant toute ferme
-  tierce. Non consigné jusqu'ici : le lot D (#79 à #85) est en ligne, #85
-  déployée le 16 novembre 2026 à 8 h 43 (run 43824015609, cinq jobs verts).
+  **En ligne le 17 novembre 2026 à 21 h 59** : #86 fusionnée à 21 h 39,
+  run 44171528159 vérifié job par job (« Application », « Workers
+  Cloudflare », « Parcours navigateur », « Déploiement Cloudflare », site
+  public compris, et « Déploiement de la démonstration », verts). Restent :
+  l'adresse de contact que le porteur pose lui-même
+  (`SITE_CONTACT_EMAIL`), sa relecture du texte en ligne, l'envoi du
+  formulaire d'OTF par lui, la relecture juridique avant toute ferme
+  tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
+  2026 à 8 h 43 (run 43824015609, cinq jobs verts).
+- Tranche 4, **4.1 et 4.2 commencées ensemble le 17 novembre 2026 au
+  soir, en Opus 5.5 · Max**, sur le choix du porteur (carte « 1 sur 1 »,
+  22 h 35 ; D-155) : règles écrites avant le code
+  (`docs/tranche-4-contract.md`, section 5 bis, F325 à F336), trois PR
+  dans l'ordre. **PR 1 sur 3 ouverte** (`chore/cle-espace-ferme`) : la clé
+  d'espace, la personne et la ferme ensemble (`lib/domain/farm-space.ts`),
+  filtre chaque requête qui retrouve un espace ou vérifie qu'un objet
+  désigné par le navigateur lui appartient (`db/workspace-scope.ts`) ; rien
+  ne change à l'écran, aucune migration, les espaces actuels restent sans
+  ferme jusqu'à la PR 2. `pnpm test` rejoue les tests de la base deux fois
+  de plus, à deux fermes pour une même personne puis à deux personnes pour
+  une même ferme (`pnpm test:isolation`) ; un garde-fou refuse toute
+  requête de la base qui retrouverait un espace par la seule personne.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; la suite complète des parcours jouée
+  par la CI de la PR (longs essais sur GitHub). Restent : la PR 2
+  (l'identité lue chez OTF et le rattachement automatique, fusionnée
+  seulement sur le « vas-y » exprès du porteur), la PR 3 (le régulateur des
+  appels par ferme), la revue de l'isolation par un second fil avant toute
+  ferme tierce.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

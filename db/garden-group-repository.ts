@@ -1,5 +1,6 @@
 import { db } from './binding';
 import { aEcritUneLigne } from './write-result';
+import { ensureWorkspaceForUser as ensureWorkspace, findWorkspaceIdForUser as findWorkspaceId } from './workspace-repository';
 import type {
   GardenBedOrder,
   ValidGardenGroupInput,
@@ -369,35 +370,6 @@ async function insertSeasonMarker(
   )
     .bind(workspaceId, season, copiedFromSeason, new Date().toISOString())
     .run();
-}
-
-async function ensureWorkspace(ownerUserId: string): Promise<string> {
-  const existingId = await findWorkspaceId(ownerUserId);
-  if (existingId) return existingId;
-
-  const workspaceId = crypto.randomUUID();
-  try {
-    await db.prepare(
-      'INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES (?, ?)',
-    )
-      .bind(workspaceId, ownerUserId)
-      .run();
-    return workspaceId;
-  } catch (error) {
-    const concurrentId = await findWorkspaceId(ownerUserId);
-    if (concurrentId) return concurrentId;
-    throw error;
-  }
-}
-
-async function findWorkspaceId(ownerUserId: string): Promise<string | null> {
-  const row = await db.prepare(
-    `SELECT id FROM irrigation_workspaces
-     WHERE owner_user_id = ? AND otf_farm_id IS NULL LIMIT 1`,
-  )
-    .bind(ownerUserId)
-    .first<{ id: string }>();
-  return row?.id ?? null;
 }
 
 export class GardenGroupNameAlreadyExistsError extends Error {

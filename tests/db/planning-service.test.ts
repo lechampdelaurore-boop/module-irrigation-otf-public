@@ -20,9 +20,9 @@ import { computeWeeklyPlanForUser, readWeeklyPlanForUser, recalculateWeeklyPlans
 import { refusePlanProposalForUser } from '../../lib/services/planning-validation-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
+import { SPACE_FILTER, spaceParams } from '../../db/workspace-scope';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const NOW = new Date('2026-09-29T10:52:00.000Z'); // mardi 12 h 52 à la ferme
 
 let database: TestDatabase;
@@ -355,10 +355,10 @@ function planShape(plan: StoredWeeklyPlan, equipmentId: string) {
 test('3.8 : Ressources et pompes décochée, le plan est celui d’une ferme sans pompe ni ressource ; ses pompes restent enregistrées', async () => {
   const { fixture } = await farmWithWater();
   await saveFeatureSelectionForUser(ALICE, FEATURE_IDS.filter((id) => id !== 'ressources'), NOW);
-  const bob = await createDripFixture('bob', { beds: ['bed-1', 'bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
-  await saveHydricGoalForUser('bob', { season: 2026, weekStart: '2026-09-21', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
+  const bob = await createDripFixture(BOB, { beds: ['bed-1', 'bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
+  await saveHydricGoalForUser(BOB, { season: 2026, weekStart: '2026-09-21', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
   const alices = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
-  const bobs = await computeWeeklyPlanForUser({ ownerUserId: 'bob', season: 2026, snapshot, now: NOW });
+  const bobs = await computeWeeklyPlanForUser({ ownerUserId: BOB, season: 2026, snapshot, now: NOW });
   assert.deepEqual(planShape(alices, fixture.equipment.id), planShape(bobs, bob.equipment.id));
   assert.equal(alices.proposals.length, 2);
   assert.deepEqual(alices.proposals.map((proposal) => [proposal.pumpId, proposal.justification.hydraulicallyVerified]), [[null, false], [null, false]]);
@@ -489,7 +489,7 @@ test('S28, deux exploitations la même semaine : rien de A, en pénurie, ne para
   assert.equal(bob.proposals[0].startAt, refused.startAt, 'le créneau refusé chez A reste libre chez B');
 
   // Le calcul du matin : un calcul enregistré abîmé chez A le fait échouer ; B reçoit le sien, et le journal ne nomme personne.
-  database.sqlite.prepare("UPDATE irrigation_plan_calculations SET summary = '{\"beds\":[]}' WHERE workspace_id = (SELECT id FROM irrigation_workspaces WHERE owner_user_id = ?)").run(ALICE);
+  database.sqlite.prepare(`UPDATE irrigation_plan_calculations SET summary = '{"beds":[]}' WHERE workspace_id = (SELECT id FROM irrigation_workspaces WHERE ${SPACE_FILTER})`).run(...spaceParams(ALICE));
   const lines: string[] = [];
   const morning = new Date('2026-09-29T11:30:00.000Z');
   assert.deepEqual(await recalculateWeeklyPlansForAllWorkspaces({ now: morning, log: (line) => { lines.push(line); } }), { recalculated: 1, failed: 1 });

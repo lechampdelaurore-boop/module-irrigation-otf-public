@@ -6,6 +6,7 @@ import type { IrrigationPushScheduleRecord } from '../../lib/domain/irrigation-e
 import { pushAlarmRequest, synchronizeIrrigationPushSchedule } from '../../lib/services/irrigation-push-orchestration';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { createDripFixture, plannedDraft, runningDraft } from '../support/irrigation-fixtures';
+import { ALICE } from '../support/spaces';
 
 /**
  * Les deux alarmes qu'une irrigation confie au Worker de notification
@@ -13,7 +14,6 @@ import { createDripFixture, plannedDraft, runningDraft } from '../support/irriga
  * 24) : la fin du minuteur, et le retard d'une irrigation planifiée.
  */
 
-const ALICE = 'alice';
 
 let database: TestDatabase;
 beforeEach(() => {

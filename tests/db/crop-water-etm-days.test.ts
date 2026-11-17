@@ -12,6 +12,7 @@ import { etmDayRecord, type EtmDayRecord } from '../../lib/domain/crop-water/rec
 import { weekDateKeys } from '../../lib/domain/water-management';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * L'ETM du jour en base (docs/crop-water-need-contract.md, « La
@@ -21,8 +22,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * jour bloqué n'écrase jamais la dernière valeur valide.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const BED = 'planche-a';
 const SHELTER = 'jardin-serre';
 const WEEK = '2026-05-11';

@@ -1,4 +1,5 @@
 import { db } from '../binding';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from '../workspace-scope';
 import { readCurrentPose } from '../equipment-placement-poses';
 import { IrrigationEquipmentAlreadyRunningError, IrrigationEventStateError } from './errors';
 import { type MutableEventEquipmentRow, parseJson } from './rows';
@@ -39,21 +40,15 @@ export async function findMutableEventEquipment(
      FROM irrigation_event_equipment AS event_equipment
      INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-     WHERE event_equipment.id = ? AND workspace.owner_user_id = ? LIMIT 1`,
+     WHERE event_equipment.id = ? AND ${WORKSPACE_SPACE_FILTER} LIMIT 1`,
   )
-    .bind(eventEquipmentId, ownerUserId)
+    .bind(eventEquipmentId, ...spaceParams(ownerUserId))
     .first<MutableEventEquipmentRow>();
 }
 
-export async function findWorkspaceId(ownerUserId: string): Promise<string | null> {
-  const row = await db.prepare(
-    `SELECT id FROM irrigation_workspaces
-     WHERE owner_user_id = ? AND otf_farm_id IS NULL LIMIT 1`,
-  )
-    .bind(ownerUserId)
-    .first<{ id: string }>();
-  return row?.id ?? null;
-}
+// L'espace se retrouve en un seul endroit, par la personne et la ferme
+// ensemble (docs/tranche-4-contract.md, section 5 bis, F328).
+export { findWorkspaceIdForUser as findWorkspaceId } from '../workspace-repository';
 
 export async function assertEquipmentNotRunning(
   workspaceId: string,

@@ -13,6 +13,7 @@ import { recordSoilDaysForUser } from '../../lib/services/soil-reserve-record';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FARM_SOIL } from '../support/soil-reserve-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * L'état du jour de la jauge enregistré chaque matin (5 ter, PR 3d) : les
@@ -20,7 +21,6 @@ import { FARM_SOIL } from '../support/soil-reserve-fixtures';
  * aujourd'hui ni les jours prévus ; un recalcul remplace l'état du même jour.
  */
 
-const ALICE = 'alice';
 const BED = 'planche-a';
 const EMPTY_BED = 'planche-b';
 const SHELTER = 'jardin-serre';
@@ -97,5 +97,5 @@ test('rien n’est enregistré pour une autre saison, sans plan de culture lu, n
   await prepare();
   assert.equal(await recordSoilDaysForUser({ ownerUserId: ALICE, season: 2025, snapshot, now: NOW }), 0);
   assert.equal(await recordSoilDaysForUser({ ownerUserId: ALICE, season: 2026, snapshot: { ...snapshot, cropPlan: undefined }, now: NOW }), 0);
-  assert.equal(await recordSoilDaysForUser({ ownerUserId: 'bob', season: 2026, snapshot, now: NOW }), 0);
+  assert.equal(await recordSoilDaysForUser({ ownerUserId: BOB, season: 2026, snapshot, now: NOW }), 0);
 });

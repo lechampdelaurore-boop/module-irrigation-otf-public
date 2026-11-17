@@ -17,6 +17,7 @@ import type { WeatherDailyValue } from '../../lib/domain/weather/weather-provide
 import type { IrrigationPushSendResult } from '../../lib/services/irrigation-push-service';
 import { evaluateWeatherAlertsAfterForecastWrite } from '../../lib/services/weather-alerts-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Alertes météo, persistance et envoi (docs/weather-alerts-contract.md,
@@ -26,8 +27,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * et l'enregistrement sans appareil abonné (scénario 9).
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const LOCATION = 'custom:tronget:03240';
 // Lundi 2 novembre 2026 : lecture de 06 h 15 et actualisation de 14 h à la ferme.
 const MORNING = new Date('2026-11-02T05:15:00.000Z');

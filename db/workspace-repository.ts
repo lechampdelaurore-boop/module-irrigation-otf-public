@@ -1,11 +1,12 @@
 import { db } from './binding';
+import { SPACE_FILTER, spaceKeyOfRow, spaceParams } from './workspace-scope';
 
 export async function findWorkspaceIdForUser(ownerUserId: string): Promise<string | null> {
   const row = await db.prepare(
     `SELECT id FROM irrigation_workspaces
-     WHERE owner_user_id = ? AND otf_farm_id IS NULL LIMIT 1`,
+     WHERE ${SPACE_FILTER} LIMIT 1`,
   )
-    .bind(ownerUserId)
+    .bind(...spaceParams(ownerUserId))
     .first<{ id: string }>();
   return row?.id ?? null;
 }
@@ -16,8 +17,8 @@ export async function ensureWorkspaceForUser(ownerUserId: string): Promise<strin
   const workspaceId = crypto.randomUUID();
   try {
     await db.prepare(
-      `INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES (?, ?)`,
-    ).bind(workspaceId, ownerUserId).run();
+      `INSERT INTO irrigation_workspaces (id, owner_user_id, otf_farm_id) VALUES (?, ?, ?)`,
+    ).bind(workspaceId, ...spaceParams(ownerUserId)).run();
     return workspaceId;
   } catch {
     const concurrent = await findWorkspaceIdForUser(ownerUserId);
@@ -29,12 +30,12 @@ export async function ensureWorkspaceForUser(ownerUserId: string): Promise<strin
 /**
  * Crée l'espace s'il n'existe pas encore, et dit si c'est cet appel qui l'a
  * créé : deux requêtes simultanées ne le créent qu'une fois, et une seule
- * apprend qu'elle l'a fait (l'index unique des espaces sans ferme OTF).
+ * apprend qu'elle l'a fait (les index uniques des espaces, avec ou sans ferme).
  */
 export async function createWorkspaceIfAbsent(ownerUserId: string): Promise<boolean> {
   const result = await db.prepare(
-    `INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES (?, ?) ON CONFLICT DO NOTHING`,
-  ).bind(crypto.randomUUID(), ownerUserId).run();
+    `INSERT INTO irrigation_workspaces (id, owner_user_id, otf_farm_id) VALUES (?, ?, ?) ON CONFLICT DO NOTHING`,
+  ).bind(crypto.randomUUID(), ...spaceParams(ownerUserId)).run();
   return Number(result.meta.changes ?? 0) === 1;
 }
 
@@ -51,11 +52,11 @@ export async function readWaterBudgetRevisionForUser(ownerUserId: string): Promi
 export function waterBudgetRevisionStatement(ownerUserId: string, expectedRevision?: number) {
   return expectedRevision === undefined
     ? db.prepare(
-        'UPDATE irrigation_workspaces SET water_budget_revision = water_budget_revision + 1 WHERE owner_user_id = ? AND otf_farm_id IS NULL',
-      ).bind(ownerUserId)
+        `UPDATE irrigation_workspaces SET water_budget_revision = water_budget_revision + 1 WHERE ${SPACE_FILTER}`,
+      ).bind(...spaceParams(ownerUserId))
     : db.prepare(
-        'UPDATE irrigation_workspaces SET water_budget_revision = ? WHERE owner_user_id = ? AND otf_farm_id IS NULL',
-      ).bind(expectedRevision + 1, ownerUserId);
+        `UPDATE irrigation_workspaces SET water_budget_revision = ? WHERE ${SPACE_FILTER}`,
+      ).bind(expectedRevision + 1, ...spaceParams(ownerUserId));
 }
 
 export async function readHydraulicRevisionForUser(ownerUserId: string): Promise<number> {
@@ -71,15 +72,16 @@ export async function readHydraulicRevisionForUser(ownerUserId: string): Promise
 export function hydraulicRevisionStatement(ownerUserId: string, expectedRevision?: number) {
   return expectedRevision === undefined
     ? db.prepare(
-        'UPDATE irrigation_workspaces SET hydraulic_revision = hydraulic_revision + 1 WHERE owner_user_id = ? AND otf_farm_id IS NULL',
-      ).bind(ownerUserId)
+        `UPDATE irrigation_workspaces SET hydraulic_revision = hydraulic_revision + 1 WHERE ${SPACE_FILTER}`,
+      ).bind(...spaceParams(ownerUserId))
     : db.prepare(
-        'UPDATE irrigation_workspaces SET hydraulic_revision = ? WHERE owner_user_id = ? AND otf_farm_id IS NULL',
-      ).bind(expectedRevision + 1, ownerUserId);
+        `UPDATE irrigation_workspaces SET hydraulic_revision = ? WHERE ${SPACE_FILTER}`,
+      ).bind(expectedRevision + 1, ...spaceParams(ownerUserId));
 }
 
-/** Les propriétaires de tous les espaces, pour le recalcul quotidien du planning (3.5, R1). */
+/** Les clés de tous les espaces, avec ou sans ferme, pour le recalcul quotidien du planning (3.5, R1 ; 4.2, F328). */
 export async function listWorkspaceOwnerIds(): Promise<string[]> {
-  const result = await db.prepare('SELECT owner_user_id FROM irrigation_workspaces ORDER BY owner_user_id').all<{ owner_user_id: string }>();
-  return result.results.map((row) => row.owner_user_id);
+  const result = await db.prepare('SELECT owner_user_id, otf_farm_id FROM irrigation_workspaces ORDER BY owner_user_id, otf_farm_id')
+    .all<{ owner_user_id: string; otf_farm_id: string | null }>();
+  return result.results.map(spaceKeyOfRow);
 }

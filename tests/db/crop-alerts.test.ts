@@ -29,6 +29,7 @@ import { readCropAlertsView } from '../../lib/services/crop-alerts-view';
 import { readCachedIrrigationSnapshot } from '../../lib/services/irrigation-service';
 import type { IrrigationPushSendResult } from '../../lib/services/irrigation-push-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Les alertes par culture, persistance et envoi
@@ -40,8 +41,6 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * les dates suivent le jour où le test tourne.
  */
 
-const ALICE = 'alice';
-const BOB = 'bob';
 const LOCATION = 'custom:lyon:69001';
 
 let database: TestDatabase;

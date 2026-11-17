@@ -9,6 +9,7 @@ import {
   readIrrigationUses,
 } from './equipment-placement-poses';
 import { aEcritUneLigne } from './write-result';
+import { findWorkspaceIdForUser as findWorkspaceId } from './workspace-repository';
 import type { ValidEquipmentPlacementInput } from '@/lib/domain/equipment-placement-domain';
 import {
   checkPlacementDate,
@@ -384,16 +385,6 @@ function assertPlacementMatchesEquipmentKind(
       'La planche d’ancrage doit faire partie des planches sélectionnées.',
     );
   }
-}
-
-async function findWorkspaceId(ownerUserId: string): Promise<string | null> {
-  const row = await db.prepare(
-    `SELECT id FROM irrigation_workspaces
-     WHERE owner_user_id = ? AND otf_farm_id IS NULL LIMIT 1`,
-  )
-    .bind(ownerUserId)
-    .first<{ id: string }>();
-  return row?.id ?? null;
 }
 
 export class EquipmentPlacementKindError extends Error {

@@ -22,9 +22,8 @@ import { createIrrigationEventForUser } from '../../db/irrigation-event/create';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../../db/workspace-repository';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { completedDraft, createDripFixture } from '../support/irrigation-fixtures';
+import { ALICE, BOB } from '../support/spaces';
 
-const ALICE = 'alice';
-const BOB = 'bob';
 
 let database: TestDatabase;
 beforeEach(() => {

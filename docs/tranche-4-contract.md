@@ -77,6 +77,108 @@ La roadmap a déjà 4.1 à 4.7. Ce contrat **les garde**, ajoute **4.8** (site d
 
 **[T4-08] Synchronisations échelonnées.** Pas de ferme qui synchronise toutes à la même minute (le planificateur météo actuel tourne à 04 h 15 et 05 h 15 ; contrat `weather-scheduler-contract.md`) ; décalage par ferme.
 
+### 5 bis. Précisions de 4.1 et 4.2 (17 novembre 2026, D-155, F325 à F336)
+
+Écrites avant le code, en Opus 5.5 · Max, sur le choix du porteur du
+17 novembre 2026 à 22 h 35 (carte « 1 sur 1 ») : **4.1 et 4.2 forment un
+seul chantier**, comme le prévoit la section 4 ; la ligne 4.1 de la roadmap
+(4.1 seule, en Opus 5.5 · Élevé) est alignée. Les points ci-dessous suivent
+l'option recommandée : aucun n'est agronomique, ne touche au budget ni à
+Cloudflare, et le porteur peut les changer.
+
+- **F325 · Pourquoi ensemble.** Avant ce chantier, treize requêtes
+  retrouvent l'espace d'une personne en cherchant « son espace sans ferme »
+  (`otf_farm_id IS NULL`), et une trentaine d'autres ne vérifient que la
+  personne. Remplir l'identifiant de ferme sans les changer rendrait les
+  données de la ferme introuvables ; les changer, c'est l'isolation.
+- **F326 · Trois PR, dans l'ordre**, AGENTS.md interdisant de mêler une
+  restructuration et un ajout : (1) la clé d'espace dans chaque requête, sans
+  rien changer de visible, avec les tests d'isolation et la liste des
+  requêtes relue ; (2) l'identité lue chez OTF et le rattachement
+  automatique de l'espace existant (le cœur de 4.1) ; (3) le régulateur des
+  appels par ferme. Chacune après le déploiement vérifié de la précédente.
+  **La PR 2 attend un « vas-y » exprès du porteur avant sa fusion** : elle
+  écrit dans l'espace de sa ferme réelle (la colonne de la ferme), et un
+  simple retour en arrière du code ne suffirait plus à la défaire.
+- **F327 · La clé d'espace.** Un espace, c'est une personne (le sujet de sa
+  connexion Access) et une ferme (l'identifiant de structure d'OTF,
+  `otf_farm_id`) ; la démonstration et les espaces d'avant la 4.1 n'ont pas
+  de ferme. La clé est calculée par le serveur seul, à la connexion
+  (`app/access-auth.ts`), jamais lue du navigateur ; le reste du module la
+  reçoit à la place de l'identifiant de la personne, comme la démonstration
+  le fait déjà (`…·demo·…`). Forme : `<personne>·ferme·<ferme>`,
+  l'identifiant de ferme limité à des lettres, des chiffres, le tiret et le
+  souligné (64 signes au plus) ; une clé mal formée est refusée, jamais
+  devinée (`lib/domain/farm-space.ts`). Les colonnes qui notent l'auteur
+  d'une action (`actor_user_id`) reçoivent la clé, qui contient la
+  personne, comme en démonstration.
+- **F328 · Chaque requête filtre la personne et la ferme ensemble**
+  (`owner_user_id = ? AND otf_farm_id IS ?`, `db/workspace-scope.ts`), y
+  compris les jointures qui vérifient qu'un objet désigné par le navigateur
+  (un arrosage, un matériel, une proposition) appartient bien à l'espace.
+  Les traitements d'arrière-plan (calcul du matin, alertes, météo)
+  parcourent tous les espaces, avec ou sans ferme, chacun sous sa clé. Le
+  cache d'OTF est rangé par clé d'espace : jamais partagé entre deux fermes
+  ni entre deux personnes (plus strict que « par ferme », T4-03).
+- **F329 · L'identité vient de `GET /me`.** La documentation de l'API
+  d'OTF, relue le 17 novembre 2026, dit qu'une clé ou un jeton « est
+  rattaché à une seule structure » et que `structure.id` ne change pas. Une
+  réponse sans identifiant, ou qui en donne plusieurs, n'est pas une
+  identité : rien n'est rattaché, aucune donnée n'est montrée sous une
+  identité devinée (D-003), et la page le dit.
+- **F330 · Avant la 4.3, la ferme est celle de la clé du déploiement**
+  (`OTF_API_TOKEN`, une seule ferme). Le serveur garde la dernière ferme
+  observée par `GET /me` (table `otf_deployment_farm`, une seule ligne),
+  remise à jour à chaque lecture. Sans ferme gardée (premier passage après
+  la mise en ligne), il reprend celle du dernier instantané en cache, lu lui
+  aussi par `GET /me`, sinon il appelle `GET /me` une fois. La
+  démonstration reste sans ferme (section 5) ; les données fictives des
+  parcours navigateur portent l'identifiant de leur ferme fictive.
+- **F331 · Rattachement automatique (4.1).** Au premier passage d'une
+  personne après la mise en ligne, son espace d'avant la 4.1 reçoit
+  l'identifiant de la ferme d'où viennent ses données : celle de son dernier
+  instantané en cache, ou, sans cache, la ferme de la clé. Une seule
+  écriture, conditionnelle, sans copie ni suppression : réglages, matériel,
+  historique restent où ils sont. Si ses données viennent d'une autre ferme
+  que celle de la clé, l'espace ancien est rattaché à sa vraie ferme et un
+  espace neuf s'ouvre pour la ferme de la clé : rien n'est mélangé.
+- **F332 · Garde à chaque lecture d'OTF.** `GET /me` est relu à chaque
+  lecture (déjà le cas) et comparé à la ferme de l'espace **avant** les
+  autres routes. Si la clé mène à une autre ferme, rien n'est lu de plus ni
+  rangé dans l'espace, la ferme gardée devient la nouvelle, et la page dit :
+  « La clé d'Ouvre ta ferme de ce module mène maintenant à une autre ferme.
+  Rechargez la page pour l'ouvrir ; les réglages de la ferme précédente
+  restent gardés à part. » Un espace dont la ferme n'est plus celle de la
+  clé ne lit plus OTF : son dernier instantané en cache reste lisible.
+- **F333 · Un propriétaire par ferme (T4-04)** s'appliquera au rattachement
+  par autorisation (4.3). D'ici là, la clé du déploiement est partagée comme
+  aujourd'hui : chaque personne admise par Access garde son espace à elle
+  pour cette ferme. Une personne peut avoir un espace par ferme (index
+  unique personne et ferme, déjà en base).
+- **F334 · Régulateur par ferme (T4-07).** Le rythme de 4 appels par seconde
+  est tenu ferme par ferme, et s'y ajoute la limite d'OTF de 30 appels par
+  minute : quand elle est pleine, un appel attend au plus 5 secondes qu'une
+  place se libère, sinon la lecture s'arrête comme sur une limite atteinte
+  (dernier instantané affiché, message existant), sans rien envoyer à OTF.
+  Limite connue : le régulateur vit dans chaque instance du Worker, comme
+  aujourd'hui ; un régulateur partagé entre instances se tranche à la 4.3,
+  avec le budget quotidien.
+- **F335 · Restent à la 4.3** : le coffre des jetons (T4-12 : avant OAuth, la
+  seule clé est le secret du déploiement, il n'y a rien à y ranger), le
+  budget quotidien (T4-14 : la consommation réelle n'est pas mesurée) et
+  l'échelonnement des synchronisations (T4-08 : une seule ferme par
+  déploiement d'ici là).
+- **F336 · Migration et preuves.** Une migration additive : la table
+  `otf_deployment_farm` ; aucune colonne ni ligne supprimée. Preuves : des
+  tests à deux fermes pour une même personne et à deux personnes pour une
+  même ferme, avec les mêmes identifiants OTF (chaque lecture, chaque
+  écriture, chaque action désignée par le navigateur, chaque traitement
+  d'arrière-plan et chaque notification de l'une sont invisibles de
+  l'autre) ; la liste écrite des requêtes qui lisent sans filtre d'espace,
+  jointe à la PR 1 ; des tests du rattachement, sur une base où un espace
+  d'avant la 4.1 a ses données, de la garde et du régulateur. La revue par
+  un second fil reste due avant toute ferme tierce (T4-06, 4.6).
+
 ## 6. Connexion à l'API d'OTF (4.3)
 
 ### 6.1 Ce que la documentation d'OTF établit (lue le 7/11 ; à relire avant le code)
