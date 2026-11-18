@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (Tranche 4, 4.8, le site public)
+
+- **L'accueil du site public, plus clair** (F345, F346, remarques du
+  porteur du 18 novembre 2026) : vannes et capteurs « en cours de
+  développement » ; « L'essayer » dit qu'une ferme reliée travaille sur ses
+  vraies données, que le raccordement s'ouvre d'abord à quelques fermes
+  amies, puis propose la démonstration sur invitation ; « Contact » dit
+  « de préférence par Discord » et demande, en cas de problème, une
+  description écrite avec des captures d'écran (F347).
+
 ### Sécurité (Tranche 4, 4.1 et 4.2, l'isolation des fermes)
 
 - **Chaque espace se retrouve par la personne et la ferme ensemble**

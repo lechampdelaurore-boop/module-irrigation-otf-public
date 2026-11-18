@@ -82,6 +82,14 @@ test("la page d'accueil dit ce que fait le module, pour qui, ce qu'il ne fait pa
     assert.match(body, new RegExp(`<h2>${heading}</h2>`), heading);
   }
   assert.match(body, /démonstration/);
+  // Précisions du porteur du 18 novembre 2026 (F345, F346).
+  assert.match(body, /pas encore de vanne ni de capteur : c'est en cours de développement/);
+  assert.match(body, /travaillera sur ses vraies données/);
+  assert.match(body, /pas encore ouvert à tous/);
+  // Le contact, de préférence par Discord (F347).
+  assert.match(body, /de préférence par Discord/);
+  assert.match(body, /décrivez-le bien par écrit/);
+  assert.match(body, /captures d'écran si possible/);
   assert.ok(body.includes(RESPONSIBLE));
 });
 

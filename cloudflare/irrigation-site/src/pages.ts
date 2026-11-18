@@ -48,14 +48,16 @@ export function homePage(contactEmail: string | undefined): string {
 <p>Pour les fermes maraîchères qui tiennent leur plan dans Ouvre ta ferme et ont l'abonnement qui ouvre son interface de programmation (API). Les AMAP n'y ont pas accès : le module ne peut pas les servir.</p>
 <h2>Ce qu'il ne fait pas</h2>
 <ul>
-<li>Il ne pilote aucune vanne ni aucun capteur.</li>
+<li>Il ne pilote pas encore de vanne ni de capteur : c'est en cours de développement.</li>
 <li>Il ne remplace pas le jugement de l'exploitant : ses calculs sont une aide à la décision, pas une garantie.</li>
 <li>Il n'est pas encore ouvert à toutes les fermes : il est en essai sur une ferme, puis sur quelques fermes amies.</li>
 </ul>
 <h2>L'essayer</h2>
-<p>Le module lui-même est réservé aux fermes reliées, après connexion. Une démonstration avec des fermes fictives existe, sur invitation : demandez-la ${contactHtml(contactEmail)}.</p>
+<p>Une ferme qui utilise Ouvre ta ferme pourra relier le module à son propre compte. Après connexion, elle y travaillera sur ses vraies données : son plan, ses cultures, son matériel et ses arrosages. Ce raccordement n'est pas encore ouvert à tous : il le sera d'abord pour quelques fermes amies.</p>
+<p>En attendant, une démonstration avec des fermes fictives permet de tout essayer sans rien risquer, sur invitation : demandez-la ${contactHtml(contactEmail)}.</p>
 <h2>Contact</h2>
-<p>Responsable : ${RESPONSIBLE}. Pour toute question, ${contactHtml(contactEmail)}.</p>
+<p>Responsable : ${RESPONSIBLE}. Pour toute question, de préférence par Discord ; sinon ${contactHtml(contactEmail)}.</p>
+<p>En cas de problème, décrivez-le bien par écrit : sur quelle page, ce que vous faisiez, ce qui s'est passé. Joignez des captures d'écran si possible.</p>
 <p>Lire aussi la <a href="${PAGE_PATHS.privacy}">politique de confidentialité</a> et les <a href="${PAGE_PATHS.terms}">conditions d'utilisation</a>. Le code du module est public : <a href="${SOURCE_URL}">page du projet</a>.</p>`,
   });
 }

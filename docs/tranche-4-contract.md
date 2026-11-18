@@ -357,6 +357,23 @@ en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
   le déploiement vérifié job par job, l'adresse de contact posée par le
   porteur, sa relecture du texte en ligne, puis l'envoi du formulaire d'OTF
   (son acte) ; la relecture juridique avant toute ferme tierce (question 4).
+- **Le 18 novembre 2026, l'adresse de contact est posée par le porteur
+  lui-même** (secret `SITE_CONTACT_EMAIL`, à 19 h 39) ; la page de
+  confidentialité ne renvoie plus à la page du projet. **Ses premières
+  remarques à la relecture**, le même soir :
+- **F345 · Vannes et capteurs** : l'accueil dit « Il ne pilote pas encore de
+  vanne ni de capteur : c'est en cours de développement » (D-066 : le
+  pilotage est développé avec Tlaloc).
+- **F346 · « L'essayer »** : l'accueil dit qu'une ferme pourra relier le
+  module à son propre compte Ouvre ta ferme et y travailler, après
+  connexion, sur ses vraies données ; que ce raccordement n'est pas encore
+  ouvert à tous, d'abord à quelques fermes amies ; puis la démonstration
+  sur invitation, pour tout essayer sans rien risquer.
+- **F347 · Contact** : dans « Contact » de l'accueil, « de préférence par
+  Discord » (sans nommer le serveur : les fermes savent où trouver le
+  porteur), sinon par courriel ; en cas de problème, le décrire par écrit
+  (page, geste, ce qui s'est passé), avec des captures d'écran si possible.
+  Les demandes sur les données restent par courriel (confidentialité).
 
 ## 10. Exploitation (4.5) et pilote (4.6)
 
