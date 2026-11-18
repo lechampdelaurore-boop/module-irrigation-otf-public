@@ -5,6 +5,25 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (Tranche 4, 4.8, le site public)
+
+- **L'accueil du site public, plus clair** (F345, F346, remarques du
+  porteur du 18 novembre 2026) : vannes et capteurs « en cours de
+  développement » ; « L'essayer » dit qu'une ferme reliée travaille sur ses
+  vraies données, que le raccordement s'ouvre d'abord à quelques fermes
+  amies, puis propose la démonstration sur invitation ; « Contact » dit
+  « de préférence par Discord » et demande, en cas de problème, une
+  description écrite avec des captures d'écran (F347).
+- **Une rubrique « Prix » dans les conditions d'utilisation** (F348, choix
+  du porteur du 18 novembre 2026) : gratuit pendant tout le pilote, les
+  frais payés par une ferme bénévole ; ensuite, selon le nombre de fermes,
+  une participation possible d'environ 1 € par mois et par ferme, pour
+  couvrir les frais seulement, annoncée à l'avance ; textes datés du
+  18 novembre 2026.
+- **4.8 close** : textes validés par le porteur le 18 novembre 2026 à
+  20 h 04, formulaire d'Ouvre ta ferme envoyé par lui le même soir à
+  20 h 13 ; la demande attend la validation d'OTF.
+
 ### Sécurité (Tranche 4, 4.1 et 4.2, l'isolation des fermes)
 
 - **Chaque espace se retrouve par la personne et la ferme ensemble**

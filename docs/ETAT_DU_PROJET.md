@@ -37,11 +37,23 @@ registres, elle y renvoie.
   **En ligne le 17 novembre 2026 à 21 h 59** : #86 fusionnée à 21 h 39,
   run 44171528159 vérifié job par job (« Application », « Workers
   Cloudflare », « Parcours navigateur », « Déploiement Cloudflare », site
-  public compris, et « Déploiement de la démonstration », verts). Restent :
-  l'adresse de contact que le porteur pose lui-même
-  (`SITE_CONTACT_EMAIL`), sa relecture du texte en ligne, l'envoi du
-  formulaire d'OTF par lui, la relecture juridique avant toute ferme
-  tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
+  public compris, et « Déploiement de la démonstration », verts).
+  **Adresse de contact posée par le porteur le 18 novembre 2026** (secret
+  `SITE_CONTACT_EMAIL`, la page de confidentialité vérifiée) ; sa relecture
+  est en cours, ses premières remarques (F345 à F347 : vannes et capteurs
+  « en cours de développement », « L'essayer » plus clair, contact de
+  préférence par Discord) corrigées le jour même ; **relecture finie et
+  textes validés par le porteur le 18 novembre 2026 à 20 h 04** (« J'ai
+  fini de relire les 3 pages, je valide en l'état »). **Formulaire d'OTF envoyé par le
+  porteur lui-même le 18 novembre 2026 à 20 h 13** : la demande « Module
+  d'irrigation pour Ouvre ta ferme » est « En attente » chez OTF, cinq
+  droits en lecture, chacun avec sa raison ; **4.8 close**. Le même
+  soir, sur son mot, les conditions d'utilisation ont une rubrique
+  « Prix » : gratuit pendant le pilote, puis une participation possible
+  d'environ 1 € par mois et par ferme pour couvrir les frais (F348).
+  Restent :
+  la validation d'OTF (délai hors de notre main), la relecture juridique
+  avant toute ferme tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
   2026 à 8 h 43 (run 43824015609, cinq jobs verts).
 - Tranche 4, **4.1 et 4.2 commencées ensemble le 17 novembre 2026 au
   soir, en Opus 5.5 · Max**, sur le choix du porteur (carte « 1 sur 1 »,
@@ -85,6 +97,10 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; la suite complète des parcours jouée
   par la CI de la PR. Reste ensuite : la revue de l'isolation par un second
   fil, due avant toute ferme tierce (4.6).
+  **PR 3 sur 3 en ligne** (consigné par la PR suivante, celle du site
+  public, F345 à F347) : #89 fusionnée le 18 novembre 2026 à 11 h 05,
+  déployée à 11 h 25, run 44282058341 vérifié job par job (cinq jobs
+  verts).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

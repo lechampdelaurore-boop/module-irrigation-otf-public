@@ -357,6 +357,44 @@ en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
   le déploiement vérifié job par job, l'adresse de contact posée par le
   porteur, sa relecture du texte en ligne, puis l'envoi du formulaire d'OTF
   (son acte) ; la relecture juridique avant toute ferme tierce (question 4).
+- **Le 18 novembre 2026, l'adresse de contact est posée par le porteur
+  lui-même** (secret `SITE_CONTACT_EMAIL`, à 19 h 39) ; la page de
+  confidentialité ne renvoie plus à la page du projet. **Ses premières
+  remarques à la relecture**, le même soir :
+- **F345 · Vannes et capteurs** : l'accueil dit « Il ne pilote pas encore de
+  vanne ni de capteur : c'est en cours de développement » (D-066 : le
+  pilotage est développé avec Tlaloc).
+- **F346 · « L'essayer »** : l'accueil dit qu'une ferme pourra relier le
+  module à son propre compte Ouvre ta ferme et y travailler, après
+  connexion, sur ses vraies données ; que ce raccordement n'est pas encore
+  ouvert à tous, d'abord à quelques fermes amies ; puis la démonstration
+  sur invitation, pour tout essayer sans rien risquer.
+- **F347 · Contact** : dans « Contact » de l'accueil, « de préférence par
+  Discord » (sans nommer le serveur : les fermes savent où trouver le
+  porteur), sinon par courriel ; en cas de problème, le décrire par écrit
+  (page, geste, ce qui s'est passé), avec des captures d'écran si possible.
+  Les demandes sur les données restent par courriel (confidentialité).
+- **F348 · Prix** (choix du porteur du 18 novembre 2026 à 21 h, après
+  l'envoi du formulaire) : les conditions d'utilisation ont une rubrique
+  « Prix » : gratuit pendant tout le pilote ; développé et maintenu
+  bénévolement par une ferme qui en paie seule les frais (hébergement
+  d'environ 5 € par mois, davantage avec plus de fermes ; outils de
+  développement et de maintenance, environ 100 € par mois) ; après le
+  pilote, selon le nombre de fermes, une participation possible de l'ordre
+  de 1 € par mois et par ferme, pour couvrir ces frais seulement, sans but
+  lucratif, annoncée à l'avance, chaque ferme restant libre d'arrêter. La
+  mention « en essai, sans garantie » reste à part. La date des textes
+  passe au 18 novembre 2026. La question 2 (qui paie l'hébergement) reste
+  tranchée « gratuit pendant le pilote » ; la participation après le
+  pilote sera à décider par le porteur.
+- **Relecture finie** : le porteur valide les trois pages le 18 novembre
+  2026 à 20 h 04 (« je valide en l'état »).
+- **Formulaire envoyé** par le porteur lui-même le 18 novembre 2026 à
+  20 h 13 : la demande « Module d'irrigation pour Ouvre ta ferme » est
+  « En attente » chez OTF, avec les adresses de la section 9 bis et cinq
+  droits en lecture (structure, parcellaire, cultures, interventions,
+  espèces et variétés), chacun avec sa raison. **La 4.8 est close** ;
+  reste l'étape 2 de l'ordre, la validation d'OTF, hors de notre main.
 
 ## 10. Exploitation (4.5) et pilote (4.6)
 
