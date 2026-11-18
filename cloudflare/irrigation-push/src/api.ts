@@ -5,8 +5,8 @@ import {
   validateIrrigationPushSubscriptionRequest,
   validateIrrigationPushUnsubscriptionRequest,
   type IrrigationPushAlarmRequest,
+  type IrrigationPushRegistration,
   type IrrigationPushSendRequest,
-  type IrrigationPushSubscription,
 } from './contract.ts';
 
 const MAX_REQUEST_BYTES = 32_768;
@@ -16,16 +16,21 @@ type AlarmApiStub = {
   cancel: (revision: string) => Promise<unknown>;
 };
 
-type RecipientApiStub = {
-  upsert: (subscription: IrrigationPushSubscription) => Promise<void>;
-  remove: (endpoint: string) => Promise<void>;
+/**
+ * Un appareil, désigné par son adresse d'abonnement : toute inscription et
+ * tout retrait passent par lui, jamais directement par la liste d'un espace
+ * (docs/tranche-4-contract.md, F371 à F377).
+ */
+type DeviceApiStub = {
+  register: (registration: IrrigationPushRegistration) => Promise<unknown>;
+  unregister: (recipientKey: string, endpoint: string) => Promise<void>;
 };
 
 export type PushApiDependencies = {
   serviceToken: string;
   sendNow: (request: IrrigationPushSendRequest) => Promise<unknown>;
   getAlarm: (eventEquipmentId: string) => AlarmApiStub;
-  getRecipient: (recipientKey: string) => RecipientApiStub;
+  getDevice: (endpoint: string) => DeviceApiStub;
 };
 
 export async function handlePushApiRequest(
@@ -67,15 +72,16 @@ export async function handlePushApiRequest(
   if (pathname === '/v1/subscriptions/upsert') {
     const registration = validateIrrigationPushSubscriptionRequest(input);
     if (!registration) return json({ error: 'invalid_subscription' }, 400);
-    await dependencies.getRecipient(registration.recipientKey)
-      .upsert(registration.subscription);
-    return new Response(null, { status: 204 });
+    return json(
+      await dependencies.getDevice(registration.subscription.endpoint).register(registration),
+      200,
+    );
   }
   if (pathname === '/v1/subscriptions/remove') {
     const registration = validateIrrigationPushUnsubscriptionRequest(input);
     if (!registration) return json({ error: 'invalid_subscription' }, 400);
-    await dependencies.getRecipient(registration.recipientKey)
-      .remove(registration.endpoint);
+    await dependencies.getDevice(registration.endpoint)
+      .unregister(registration.recipientKey, registration.endpoint);
     return new Response(null, { status: 204 });
   }
   return json({ error: 'not_found' }, 404);

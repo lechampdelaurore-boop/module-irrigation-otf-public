@@ -3,29 +3,40 @@ import type { PushSubscription, VapidKeys } from '@block65/webcrypto-web-push';
 import {
   type IrrigationPushAlarmRequest,
   type IrrigationPushNotification,
+  type IrrigationPushRegistration,
   type IrrigationPushSendRequest,
   type IrrigationPushSubscription,
-} from './contract';
-import { handlePushApiRequest } from './api';
-import { deliverWebPush } from './delivery';
+} from './contract.ts';
+import { handlePushApiRequest } from './api.ts';
+import { deliverWebPush } from './delivery.ts';
+import {
+  decideDelivery,
+  decideRegistration,
+  holderAfterUnregistration,
+  type DeviceHolder,
+} from './devices.ts';
 import {
   compareAlarmRevisions,
   deliveryRetryDelay,
   immediateDeliveryStatus,
+  retryAlarmName,
   shouldRetryDelivery,
   type ImmediateDeliveryCounts,
-} from './domain';
+} from './domain.ts';
 
 const MAX_SUBSCRIPTIONS_PER_RECIPIENT = 20;
 const MAX_DELIVERY_ATTEMPTS = 12;
 const INITIAL_RETRY_DELAY_MS = 15_000;
 const MAX_RETRY_DELAY_MS = 15 * 60_000;
+const DEVICE_HOLDER_KEY = 'holder';
 
 type StoredAlarm = IrrigationPushAlarmRequest & {
   attempt: number;
 };
 
 type DeliveryRequest = {
+  /** L'espace qui envoie : chaque appareil de sa liste doit encore y être inscrit (F371). */
+  recipientKey: string;
   revision: string;
   notification: IrrigationPushNotification;
 };
@@ -34,6 +45,7 @@ type DeliveryResult = {
   delivered: number;
   alreadyDelivered: number;
   expired: number;
+  reassigned: number;
   transient: number;
   permanent: number;
 };
@@ -46,13 +58,15 @@ type SubscriptionRow = {
   last_sent_revision: string | null;
 };
 
+export type DeviceRegistrationResult = { status: 'registered' | 'other-person' };
+
 export default {
   async fetch(request, env): Promise<Response> {
     return handlePushApiRequest(request, {
       serviceToken: env.IRRIGATION_PUSH_SERVICE_TOKEN,
       sendNow: (request) => sendNow(env, request),
       getAlarm: (eventEquipmentId) => alarmStub(env, eventEquipmentId),
-      getRecipient: (recipientKey) => recipientStub(env, recipientKey),
+      getDevice: (endpoint) => deviceStub(env, endpoint),
     });
   },
 } satisfies ExportedHandler<Env>;
@@ -87,6 +101,7 @@ export class IrrigationAlarm extends DurableObject<Env> {
     if (!current) return;
 
     const result = await recipientStub(this.env, current.recipientKey).deliver({
+      recipientKey: current.recipientKey,
       revision: current.revision,
       notification: current.notification,
     });
@@ -174,6 +189,7 @@ export class PushRecipient extends DurableObject<Env> {
       delivered: 0,
       alreadyDelivered: 0,
       expired: 0,
+      reassigned: 0,
       transient: 0,
       permanent: 0,
     };
@@ -188,8 +204,24 @@ export class PushRecipient extends DurableObject<Env> {
         continue;
       }
       if (row.expiration_time !== null && row.expiration_time <= Date.now()) {
-        await this.remove(row.endpoint);
+        await this.forgetExpired(row.endpoint);
         result.expired += 1;
+        continue;
+      }
+      // Un appareil, une personne (F371) : vérifié au moment d'envoyer,
+      // appareil par appareil ; s'il est passé ailleurs, il quitte la liste
+      // sans rien recevoir. Une vérification impossible n'envoie rien et se
+      // retente comme un échec transitoire.
+      const admitted = await deviceStub(this.env, row.endpoint)
+        .admit(request.recipientKey)
+        .catch(() => null);
+      if (admitted === null) {
+        result.transient += 1;
+        continue;
+      }
+      if (!admitted) {
+        await this.remove(row.endpoint);
+        result.reassigned += 1;
         continue;
       }
 
@@ -214,10 +246,68 @@ export class PushRecipient extends DurableObject<Env> {
           row.endpoint,
         );
       } else if (disposition === 'expired') {
-        await this.remove(row.endpoint);
+        await this.forgetExpired(row.endpoint);
       }
     }
     return result;
+  }
+
+  /** Un abonnement expiré quitte la liste, et le service oublie l'appareil : son adresse ne sert plus à rien. */
+  private async forgetExpired(endpoint: string) {
+    await this.remove(endpoint);
+    await deviceStub(this.env, endpoint).forget().catch(() => undefined);
+  }
+}
+
+/**
+ * Un appareil, désigné par son adresse d'abonnement (F371 à F377) : à qui il
+ * est, et dans quels espaces de cette personne il est inscrit. Chaque
+ * inscription, chaque retrait et chaque vérification d'envoi passent par
+ * lui, l'un après l'autre : deux inscriptions simultanées du même appareil ne
+ * peuvent pas le laisser dans les espaces de deux personnes, et un envoi ne
+ * lit jamais un appareil à moitié inscrit.
+ */
+export class PushDevice extends DurableObject<Env> {
+  async register(registration: IrrigationPushRegistration): Promise<DeviceRegistrationResult> {
+    return this.ctx.blockConcurrencyWhile(async () => {
+      const decision = decideRegistration(await this.holder(), registration);
+      if (decision.status === 'other-person') return { status: 'other-person' };
+      // La décision est rangée d'abord : si un retrait échoue ensuite,
+      // l'appareil est déjà refusé aux espaces qu'il quitte (F371).
+      await this.ctx.storage.put(DEVICE_HOLDER_KEY, decision.holder);
+      for (const recipientKey of decision.detachFrom) {
+        await recipientStub(this.env, recipientKey).remove(registration.subscription.endpoint);
+      }
+      await recipientStub(this.env, registration.recipientKey).upsert(registration.subscription);
+      return { status: 'registered' };
+    });
+  }
+
+  async unregister(recipientKey: string, endpoint: string): Promise<void> {
+    await this.ctx.blockConcurrencyWhile(async () => {
+      await this.ctx.storage.put(
+        DEVICE_HOLDER_KEY,
+        holderAfterUnregistration(await this.holder(), recipientKey),
+      );
+      await recipientStub(this.env, recipientKey).remove(endpoint);
+    });
+  }
+
+  /** L'espace qui envoie peut-il servir cet appareil ? Un appareil jamais vu lui est réservé (F375). */
+  async admit(recipientKey: string): Promise<boolean> {
+    return this.ctx.blockConcurrencyWhile(async () => {
+      const decision = decideDelivery(await this.holder(), recipientKey);
+      if (decision.admitted && decision.claim) await this.ctx.storage.put(DEVICE_HOLDER_KEY, decision.claim);
+      return decision.admitted;
+    });
+  }
+
+  async forget(): Promise<void> {
+    await this.ctx.blockConcurrencyWhile(async () => this.ctx.storage.deleteAll());
+  }
+
+  private async holder(): Promise<DeviceHolder | null> {
+    return (await this.ctx.storage.get<DeviceHolder>(DEVICE_HOLDER_KEY)) ?? null;
   }
 }
 
@@ -225,16 +315,21 @@ export class PushRecipient extends DurableObject<Env> {
  * L'envoi immédiat : une première livraison tout de suite, dont le résultat
  * revient à l'application ; les échecs transitoires sont retentés par une
  * alarme sous la même révision, avec les mêmes tentatives bornées, sans
- * doublon pour les appareils déjà servis.
+ * doublon pour les appareils déjà servis. L'alarme est nommée par l'espace
+ * et l'identifiant de la notification ensemble (F377).
  */
 async function sendNow(env: Env, request: IrrigationPushSendRequest) {
   const recipient = recipientStub(env, request.recipientKey);
   const subscriptions = await recipient.count();
-  const result = await recipient.deliver({ revision: request.revision, notification: request.notification });
+  const result = await recipient.deliver({
+    recipientKey: request.recipientKey,
+    revision: request.revision,
+    notification: request.notification,
+  });
   const counts: ImmediateDeliveryCounts = { subscriptions, ...result };
   const status = immediateDeliveryStatus(counts);
   if (counts.transient > 0) {
-    await alarmStub(env, request.notificationId).schedule({
+    await alarmStub(env, retryAlarmName(request.recipientKey, request.notificationId)).schedule({
       eventEquipmentId: request.notificationId,
       recipientKey: request.recipientKey,
       revision: request.revision,
@@ -255,6 +350,12 @@ function recipientStub(env: Env, recipientKey: string) {
   return env.PUSH_RECIPIENTS.get(
     env.PUSH_RECIPIENTS.idFromName(recipientKey),
   ) as unknown as DurableObjectStub & Pick<PushRecipient, 'upsert' | 'remove' | 'count' | 'deliver'>;
+}
+
+function deviceStub(env: Env, endpoint: string) {
+  return env.PUSH_DEVICES.get(
+    env.PUSH_DEVICES.idFromName(endpoint),
+  ) as unknown as DurableObjectStub & Pick<PushDevice, 'register' | 'unregister' | 'admit' | 'forget'>;
 }
 
 function vapidKeys(env: Env): VapidKeys {

@@ -1,8 +1,8 @@
 import { env } from 'cloudflare:workers';
 import type {
   IrrigationPushAlarmRequest,
+  IrrigationPushRegistration,
   IrrigationPushSendRequest,
-  IrrigationPushSubscription,
 } from '../domain/irrigation-push-contract';
 import { isDemoDeployment } from './deployment-mode';
 
@@ -33,14 +33,29 @@ export async function cancelIrrigationPushAlarm(request: {
   return callPushService('/v1/alarms/cancel', request);
 }
 
+/**
+ * L'inscription d'un appareil (docs/tranche-4-contract.md, F371 à F375) :
+ * `other-person` quand une ouverture de page trouve l'appareil d'une autre
+ * personne, qu'elle ne prend pas. Un service d'avant le correctif répond sans
+ * corps (204) : l'appareil est alors inscrit comme avant.
+ */
+export type IrrigationPushRegistrationResult =
+  | IrrigationPushServiceResult
+  | { status: 'other-person' };
+
 export async function registerIrrigationPushSubscription(
-  recipientKey: string,
-  subscription: IrrigationPushSubscription,
-): Promise<IrrigationPushServiceResult> {
-  return callPushService('/v1/subscriptions/upsert', {
-    recipientKey,
-    subscription,
+  registration: IrrigationPushRegistration,
+): Promise<IrrigationPushRegistrationResult> {
+  let status: unknown = 'registered';
+  const result = await callPushService('/v1/subscriptions/upsert', registration, async (response) => {
+    if (response.status === 204) return;
+    const body = await response.json().catch(() => null) as { status?: unknown } | null;
+    status = body?.status ?? null;
   });
+  if (result.status !== 'ok') return result;
+  if (status === 'registered') return { status: 'ok' };
+  if (status === 'other-person') return { status: 'other-person' };
+  return { status: 'failed', message: 'Réponse du service d’alerte illisible.' };
 }
 
 export async function unregisterIrrigationPushSubscription(

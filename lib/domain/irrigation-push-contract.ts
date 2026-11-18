@@ -1,5 +1,8 @@
+import { farmSpaceOf } from './farm-space';
+
 const IRRIGATION_PUSH_SUBSCRIPTION_ENDPOINT_MAX_LENGTH = 2_048;
 const IRRIGATION_PUSH_KEY_MAX_LENGTH = 256;
+const IRRIGATION_PUSH_PERSON_KEY_PREFIX = 'irrigation-push-person:';
 
 export type IrrigationPushSubscription = {
   endpoint: string;
@@ -26,6 +29,47 @@ export type IrrigationPushAlarmRequest = {
   dueAt: string;
   notification: IrrigationPushNotification;
 };
+
+/**
+ * Le geste qui inscrit un appareil (docs/tranche-4-contract.md, F372) :
+ * `activate`, le bouton « Activer » de la personne, qui peut prendre
+ * l'appareil d'une autre personne ; `refresh`, l'ouverture d'une page, qui ne
+ * fait que renouveler l'inscription de la personne à qui l'appareil est déjà.
+ */
+export type IrrigationPushRegistrationIntent = 'activate' | 'refresh';
+
+/** L'inscription d'un appareil telle que le service de notification la reçoit (F371 à F375). */
+export type IrrigationPushRegistration = {
+  recipientKey: string;
+  personKey: string;
+  intent: IrrigationPushRegistrationIntent;
+  subscription: IrrigationPushSubscription;
+};
+
+/**
+ * Le geste venu du navigateur : seul `activate` exact prend un appareil ;
+ * tout le reste, absent ou inconnu, n'est qu'un renouvellement (F372).
+ */
+export function irrigationPushRegistrationIntent(value: unknown): IrrigationPushRegistrationIntent {
+  return value === 'activate' ? 'activate' : 'refresh';
+}
+
+/**
+ * L'empreinte de la personne d'un espace pour le service de notification
+ * (F371) : SHA-256 de son identifiant de connexion, préfixé, en hexadécimal.
+ * Le service sait si deux inscriptions viennent de la même personne sans
+ * jamais recevoir son identifiant, son nom ni son courriel. Elle se calcule
+ * sur la clé d'espace que le serveur a établie (F327), jamais sur une valeur
+ * du navigateur ; les espaces d'une même personne ont la même empreinte.
+ */
+export async function irrigationPushPersonKey(spaceKey: string): Promise<string> {
+  const { ownerUserId } = farmSpaceOf(spaceKey);
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(`${IRRIGATION_PUSH_PERSON_KEY_PREFIX}${ownerUserId}`),
+  );
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
 
 /** L'envoi immédiat d'une notification (docs/push-worker-contract.md, « Envoi immédiat »). */
 export type IrrigationPushSendRequest = {

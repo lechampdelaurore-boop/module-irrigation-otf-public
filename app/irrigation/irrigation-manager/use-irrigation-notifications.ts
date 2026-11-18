@@ -4,6 +4,7 @@ import { pageHref } from '@/lib/domain/features/pages';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 import {
   applicationServerKeyBytes,
+  deviceStatusAfterRefresh,
   showIrrigationCompletionNotification,
 } from '@/lib/domain/irrigation-notifications';
 import {
@@ -80,10 +81,13 @@ export function useIrrigationNotifications({
           setNotificationStatus('default');
           return;
         }
+        // L'ouverture d'une page ne fait que renouveler : l'appareil d'une
+        // autre personne reste à elle (docs/tranche-4-contract.md, F372).
         const result = await registerIrrigationPushSubscriptionAction(
           subscription.toJSON(),
+          'refresh',
         );
-        if (mounted) setNotificationStatus(result.ok ? 'enabled' : 'unavailable');
+        if (mounted) setNotificationStatus(deviceStatusAfterRefresh(result));
       })
       .catch(() => {
         if (mounted) setNotificationStatus('unavailable');
@@ -168,8 +172,10 @@ export function useIrrigationNotifications({
         });
         createdSubscription = true;
       }
+      // Le geste « Activer » : l'appareil passe à cette personne (F372).
       const result = await registerIrrigationPushSubscriptionAction(
         subscription.toJSON(),
+        'activate',
       );
       if (!result.ok) {
         if (createdSubscription) await subscription.unsubscribe().catch(() => false);

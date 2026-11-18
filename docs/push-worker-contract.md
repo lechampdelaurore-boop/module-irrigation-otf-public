@@ -19,6 +19,11 @@ ordinaire vers `IRRIGATION_PUSH_SERVICE_URL` est conservé. En l’absence de
 configuration, le minuteur reste utilisable et l’interface annonce que les
 alertes sont indisponibles.
 
+L’inscription d’un appareil porte, depuis le 18 novembre 2026, l’empreinte de
+la personne qui l’inscrit et son geste, « Activer » ou l’ouverture d’une page
+(voir « Un appareil, une personne ») ; le Worker répond `registered` ou
+`other-person`.
+
 Le Worker refuse les requêtes non authentifiées et valide intégralement leur
 JSON. Le contrat navigateur accepte uniquement les fournisseurs Push connus et
 les clics de notification ne peuvent ouvrir qu’une URL interne à
@@ -41,10 +46,42 @@ traits d’union, rien d’autre.
 - pause, reprise, arrêt et annulation resynchronisent ou retirent l’alarme
   correspondante ;
 - un destinataire conserve au maximum vingt abonnements ;
+- une instance `PushDevice` par appareil, identifiée par son adresse
+  d’abonnement, garde la personne à qui il est et ses espaces (voir « Un
+  appareil, une personne ») ;
 - une même révision délivrée est mémorisée par abonnement afin d’éviter un
   doublon ;
 - les abonnements expirés sont retirés ; les échecs transitoires sont retentés
   avec temporisation bornée, au maximum douze tentatives.
+
+## Un appareil, une personne (18 novembre 2026)
+
+Correctif du constat A de la revue de l’isolation du 18 novembre 2026
+(`docs/tranche-4-contract.md`, section 5 quater, F371 à F378, D-159). Avant
+lui, un appareil où deux personnes avaient ouvert le module restait inscrit
+dans les deux espaces et recevait les notifications des deux.
+
+- **La fiche de l’appareil.** L’instance `PushDevice` de l’appareil garde
+  l’empreinte de sa personne (SHA-256 de son identifiant de connexion,
+  calculée par le module ; jamais l’identifiant, le nom ni le courriel) et
+  les espaces de cette personne où il est inscrit, vingt au plus ; au-delà,
+  le plus ancien est détaché. Toute inscription, tout retrait et toute
+  vérification d’un même appareil passent l’un après l’autre.
+- **L’inscription.** Le geste `activate` (le bouton « Activer ») inscrit
+  l’appareil pour sa personne ; s’il était à une autre, il quitte aussitôt
+  la liste de chacun des espaces de celle-ci. Le geste `refresh`
+  (l’ouverture d’une page, et toute requête sans geste) n’inscrit un appareil
+  que s’il est à la même personne ou à personne ; sinon le Worker ne change
+  rien et répond `other-person`. Un geste inconnu est refusé (`400`).
+- **L’envoi.** Avant de délivrer à un appareil de la liste d’un espace, le
+  Worker demande à sa fiche s’il est bien inscrit dans cet espace. Non :
+  l’appareil est retiré de la liste sans rien recevoir (`reassigned` au
+  décompte). Pas de réponse : rien n’est envoyé à cet appareil, l’échec compte
+  comme transitoire et l’envoi se retente. Un appareil sans fiche, inscrit
+  avant le correctif, est gardé par le premier espace qui lui envoie.
+- **Le retrait.** « Désactiver » retire l’appareil de l’espace courant ; la
+  fiche garde sa personne, même sans espace. Un abonnement que le fournisseur
+  déclare expiré est retiré de la liste et sa fiche est oubliée.
 
 Le service worker `public/irrigation-notifications-sw.js` affiche une
 notification persistante et sécurise l’URL ouverte au clic. Une panne Push
@@ -83,11 +120,14 @@ un identifiant de notification.
   avec la même déduplication par révision et par abonnement que les alarmes.
 - La réponse rend le résultat à l’application, qui l’enregistre : `sent` dès
   qu’un appareil l’a reçue (ou l’avait déjà reçue sous la même révision),
-  `no-subscriber` quand le destinataire n’a aucun abonnement valable,
+  `no-subscriber` quand le destinataire n’a aucun abonnement valable (les
+  appareils passés à une autre personne ne comptent pas),
   `retrying` après un échec seulement transitoire, `failed` sinon ; avec le
   décompte par appareil.
-- Un échec transitoire est retenté par une alarme `IrrigationAlarm` nommée par
-  l’identifiant de notification, sous la même révision, à quinze secondes puis
+- Un échec transitoire est retenté par une alarme `IrrigationAlarm` nommée
+  `send:<destinataire>:<identifiant de notification>` (depuis le
+  18 novembre 2026 : avant, le seul identifiant, que deux espaces pouvaient
+  partager le même jour ; F377), sous la même révision, à quinze secondes puis
   selon la temporisation bornée des alarmes, douze tentatives au plus ; les
   appareils déjà servis ne reçoivent rien de plus.
 
@@ -109,6 +149,15 @@ une longueur annoncée exacte (RFC 8291), jeton VAPID signé, visant le serveur 
 navigateur et valable au plus vingt-quatre heures (RFC 8292). Une rupture de
 l’API ou du format de la bibliothèque devient ainsi visible en intégration
 continue, au lieu de se découvrir par une notification muette.
+
+Depuis le 18 novembre 2026 (F378), une autre suite fait tourner le vrai code
+du Worker, ses trois classes de Durable Objects comprises, sur une mémoire de
+test qui imite Cloudflare (`cloudflare/irrigation-push/test/support/`) : un
+même appareil inscrit par deux personnes, deux fermes d’une même personne,
+« Désactiver », les appareils d’avant le correctif, deux inscriptions
+simultanées, une alarme programmée avant le changement de personne, les
+nouvelles tentatives de deux espaces, la vérification qui échoue et
+l’appareil expiré.
 
 Ces tests ne remplacent pas une recette physique avec téléphone verrouillé ou
 navigateur réellement arrêté. Cette vérification reste manuelle et ne doit
