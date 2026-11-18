@@ -63,21 +63,28 @@ registres, elle y renvoie.
   lieu d'une), puis P2, P26 et P32 derrière lui ; P12 lit désormais la
   seule colonne du jour de l'arrosage validé
   (`docs/browser-journeys-contract.md`, « l'heure où il tourne »).
-  **PR 2 sur 3 ouverte** (`feat/identite-ferme-otf`, D-156) : `GET /me` lu
-  d'abord à chaque lecture, qui s'arrête si la clé mène à une autre ferme
-  ou à aucune ; la ferme du déploiement gardée (`otf_deployment_farm`,
-  migration additive 0031) ; à chaque connexion, l'espace d'avant la 4.1
-  reçoit la ferme d'où viennent ses données, par une seule écriture
-  conditionnelle, et la clé rendue est celle de la ferme ; un espace d'une
-  autre ferme, ou sans ferme hors démonstration, ne lit plus OTF ; sans
-  ferme connue, aucune page ne s'affiche (F341). Contrôles de la PR :
-  `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
-  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
-  local ; la suite complète des parcours jouée par la CI de la PR. **Sa
-  fusion attend le « vas-y » exprès du porteur** : à sa première ouverture
-  après la mise en ligne, la ferme s'écrit dans la colonne de son espace
-  réel (F344). Restent : la PR 3 (le régulateur des appels par ferme), la
-  revue de l'isolation par un second fil avant toute ferme tierce.
+  **PR 2 sur 3 en ligne le 18 novembre 2026 à 10 h 41** (#88, D-156),
+  fusionnée à 10 h 23 sur le « vas-y » exprès du porteur (10 h 22), run
+  44275442691 vérifié job par job : `GET /me` lu d'abord à chaque lecture,
+  qui s'arrête si la clé mène à une autre ferme ou à aucune ; la ferme du
+  déploiement gardée (`otf_deployment_farm`, migration additive 0031) ; à
+  chaque connexion, l'espace d'avant la 4.1 reçoit la ferme d'où viennent
+  ses données, par une seule écriture conditionnelle, et la clé rendue est
+  celle de la ferme ; un espace d'une autre ferme, ou sans ferme hors
+  démonstration, ne lit plus OTF ; sans ferme connue, aucune page ne
+  s'affiche (F341). À la première ouverture du porteur, la ferme s'écrit
+  dans la colonne de son espace réel (F344) : **recette du porteur à
+  faire**, rien ne doit changer à l'écran ; si la page disait « La ferme
+  n'est pas identifiée », rien ne serait écrit et un retour du code
+  suffirait. **PR 3 sur 3 ouverte** (`feat/regulateur-par-ferme`, D-157) :
+  un régulateur par ferme, 4 appels par seconde et 30 par minute ; quand la
+  minute est pleine, une attente de 5 secondes au plus, sinon l'appel n'est
+  pas envoyé et la page garde le dernier instantané avec le message de
+  limite atteinte. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm
+  test`, `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; la suite complète des parcours jouée
+  par la CI de la PR. Reste ensuite : la revue de l'isolation par un second
+  fil, due avant toute ferme tierce (4.6).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
