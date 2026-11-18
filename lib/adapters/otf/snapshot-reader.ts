@@ -3,6 +3,8 @@ import { mapOtfConfiguration, mapOtfSnapshot } from '../../domain/otf/mapper.ts'
 import { mapCropPlan } from '../../domain/otf/crop-plan-mapper.ts';
 import type { OtfReadClient } from './read-client.ts';
 import { OtfApiError } from '../../domain/otf/api-contract.ts';
+import { farmIdentityShape, OtfFarmMismatchError, otfFarmIdentity } from '../../domain/otf/farm-identity.ts';
+import { logJsonLine } from '../log.ts';
 
 export class OtfSeasonUnavailableError extends OtfApiError {
   readonly requestedSeason: number;
@@ -22,11 +24,26 @@ export class OtfSeasonUnavailableError extends OtfApiError {
   }
 }
 
+/**
+ * L'instantané d'une saison. `GET /me` est lu d'abord (docs/tranche-4-contract.md,
+ * F337) : avec `expectedFarmId`, la lecture s'arrête avant toute autre route
+ * si la clé mène à une autre ferme, ou à aucune (F332, F341).
+ */
 export async function readOtfSeasonSnapshot(
   client: OtfReadClient,
   season: number,
   readAt = new Date(),
+  expectedFarmId?: string,
 ): Promise<IrrigationSnapshot> {
+  const rawStructures = await client.getCurrentStructures();
+  if (expectedFarmId !== undefined) {
+    const observedFarmId = otfFarmIdentity(rawStructures);
+    if (observedFarmId !== expectedFarmId) {
+      // La forme seule, jamais l'identifiant : de quoi comprendre un refus (F341).
+      if (observedFarmId === null) logJsonLine('warn', { event: 'otf_farm_identity_missing', ...farmIdentityShape(rawStructures) });
+      throw new OtfFarmMismatchError(observedFarmId);
+    }
+  }
   const rawConfiguration = await client.getConfiguration();
   const configuration = mapOtfConfiguration(rawConfiguration);
 
@@ -41,7 +58,6 @@ export async function readOtfSeasonSnapshot(
       configuration.seasonLast,
     );
   }
-  const rawStructures = await client.getCurrentStructures();
 
   const zones = await readSeason('/zoneList', season, () =>
     client.listZones(season),

@@ -17,6 +17,15 @@ source détaillée commit par commit.
   de la base à deux fermes pour une personne et à deux personnes pour une
   ferme (`pnpm test:isolation`) ; un garde-fou refuse toute requête par la
   seule personne.
+- **La ferme de chaque espace vient d'Ouvre ta ferme** (D-156, F337 à
+  F344, PR 2 sur 3) : `GET /me` est lu en premier à chaque lecture, qui
+  s'arrête si la clé mène à une autre ferme, ou à aucune ; la ferme de la
+  clé est gardée (table `otf_deployment_farm`, migration additive 0031) ;
+  à chaque connexion, l'espace d'avant la 4.1 reçoit la ferme d'où
+  viennent ses données, par une seule écriture, sans copie ni fusion, et
+  la clé rendue est celle de la ferme. Un espace d'une autre ferme ne lit
+  plus OTF : son dernier instantané s'affiche avec le message de F332.
+  Sans ferme connue, aucune page ne s'affiche (F341).
 
 ### Corrigé (parcours navigateur)
 

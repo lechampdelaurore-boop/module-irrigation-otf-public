@@ -1,10 +1,13 @@
 import { redirect } from 'next/navigation';
-import { requireAuthenticatedUser } from '@/app/access-auth';
+import { requireAuthenticatedUser, type AuthenticatedUser } from '@/app/access-auth';
 import { WELCOME_PATH } from '@/lib/domain/features/pages';
 import { parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
+import { todaySeason } from '@/lib/domain/today/today-view';
+import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
-import type { IrrigationSearchParams } from './page-context';
+import { farmUnidentifiedState, type IrrigationSearchParams } from './page-context';
 import { LegacyRedirect } from './shell/legacy-redirect';
+import { UnavailableState } from './shell/unavailable-state';
 import './irrigation.css';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +21,14 @@ export const dynamic = 'force-dynamic';
  */
 export default async function IrrigationIndexPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const params = await searchParams;
-  const user = await requireAuthenticatedUser();
+  let user: AuthenticatedUser;
+  try {
+    user = await requireAuthenticatedUser();
+  } catch (error) {
+    // La ferme de la clé n'est pas établie : rien n'est montré (F341).
+    if (error instanceof FarmIdentityUnavailableError) return <UnavailableState {...farmUnidentifiedState('aujourdhui', todaySeason(new Date()), error)} />;
+    throw error;
+  }
   const selection = await getFeatureSelectionForUser(user.userId);
   // Une ferme qui n'a jamais ouvert le module choisit d'abord ses cases (R5).
   if (selection.firstVisit) redirect(WELCOME_PATH);

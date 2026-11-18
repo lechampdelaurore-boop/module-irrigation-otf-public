@@ -1,4 +1,4 @@
-import { getAuthenticatedUser } from '@/app/access-auth';
+import { authenticatedUserOrRefusal } from '@/app/access-auth';
 import { requestedPlantSymbols } from '@/lib/domain/crop-water/plant-vignettes';
 import { readPlantSprite } from '@/lib/services/plant-sprite-service';
 
@@ -8,8 +8,8 @@ import { readPlantSprite } from '@/lib/services/plant-sprite-service';
  * seul, sa politique de contenu n'y laisserait courir aucun script.
  */
 export async function GET(request: Request) {
-  const user = await getAuthenticatedUser();
-  if (!user) return new Response('Session expirée.', { status: 401 });
+  const user = await authenticatedUserOrRefusal();
+  if (user instanceof Response) return user;
   const ids = requestedPlantSymbols(new URL(request.url).searchParams.get('ids'));
   if (ids.length === 0) return new Response('Aucun dessin demandé.', { status: 400 });
   const sprite = await readPlantSprite(ids);

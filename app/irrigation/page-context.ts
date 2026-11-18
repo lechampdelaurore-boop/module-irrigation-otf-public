@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { requireAuthenticatedUser, signOutPath } from '@/app/access-auth';
+import { requireAuthenticatedUser, signOutPath, type AuthenticatedUser } from '@/app/access-auth';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { FeatureId } from '@/lib/domain/features/catalogue';
 import { featureBannerText } from '@/lib/domain/features/choice';
@@ -21,6 +21,7 @@ import { startStopwatch } from '@/lib/adapters/stopwatch';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
 import { getIrrigationSnapshot, IrrigationDataUnavailableError } from '@/lib/services/irrigation-service';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
+import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import type { ShellProps } from './shell/irrigation-shell';
@@ -73,7 +74,13 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const season = page === 'aujourdhui' ? todaySeason(new Date()) : linkSeason;
   const week = parseIrrigationWeek(params.week);
   const zone = typeof params.zone === 'string' && params.zone.length > 0 ? params.zone : null;
-  const user = await requireAuthenticatedUser();
+  let user: AuthenticatedUser;
+  try {
+    user = await requireAuthenticatedUser();
+  } catch (error) {
+    if (error instanceof FarmIdentityUnavailableError) return { kind: 'unavailable', props: farmUnidentifiedState(page, season, error) };
+    throw error;
+  }
   const signOutHref = signOutPath();
   const stopwatch = startStopwatch();
 
@@ -144,6 +151,22 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       const { durationsMs, totalMs } = stopwatch.report();
       logJsonLine('info', { event: 'irrigation_page_loaded', page, season, snapshotSource: snapshot.source, forceRefresh, durationsMs, totalMs, loadedAt: new Date().toISOString() });
     },
+  };
+}
+
+/**
+ * La ferme de la clé n'est pas établie (docs/tranche-4-contract.md, F341) :
+ * aucune page ne s'affiche, et celle-ci le dit à la personne.
+ */
+export function farmUnidentifiedState(page: IrrigationPageId, season: number, error: FarmIdentityUnavailableError): UnavailableStateProps {
+  return {
+    page,
+    signOutPath: signOutPath(),
+    userName: error.displayName ?? '',
+    season,
+    reason: 'farm-unidentified',
+    demo: false,
+    demoSelection: null,
   };
 }
 

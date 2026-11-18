@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { IrrigationSnapshot } from '../lib/domain/domain.ts';
 import {
+  FARM_CHANGED_MESSAGE,
   IrrigationDataUnavailableError,
   readLiveOrLastSuccessfulSnapshot,
 } from '../lib/domain/snapshot-policy.ts';
 import { OtfApiError } from '../lib/domain/otf/api-contract.ts';
+import { OtfFarmMismatchError } from '../lib/domain/otf/farm-identity.ts';
 
 const completeSnapshot: IrrigationSnapshot = {
   configuration: { seasonFirst: 2026, seasonLast: 2026 },
@@ -160,4 +162,47 @@ test('une actualisation manuelle ignore un cache récent', async () => {
   assert.equal(liveCalls, 1);
   assert.deepEqual(result, refreshedSnapshot);
   assert.deepEqual(written, refreshedSnapshot);
+});
+
+test('une clé qui mène à une autre ferme : rien n’est rangé, le dernier instantané s’affiche avec le message de F332', async () => {
+  let writeCalled = false;
+  const result = await readLiveOrLastSuccessfulSnapshot({
+    readLive: async () => {
+      throw new OtfFarmMismatchError('18');
+    },
+    readCache: async () => completeSnapshot,
+    writeCache: async () => {
+      writeCalled = true;
+    },
+  });
+  assert.equal(writeCalled, false);
+  assert.equal(result.source, 'cache');
+  assert.equal(result.warning, FARM_CHANGED_MESSAGE);
+});
+
+test('une clé qui ne mène à aucune ferme lisible : le dernier instantané s’affiche, avec un message à part (F341)', async () => {
+  const result = await readLiveOrLastSuccessfulSnapshot({
+    readLive: async () => {
+      throw new OtfFarmMismatchError(null);
+    },
+    readCache: async () => completeSnapshot,
+    writeCache: async () => undefined,
+  });
+  assert.equal(result.source, 'cache');
+  assert.match(result.warning ?? '', /n'a pas dit à quelle ferme mène la clé/);
+});
+
+test('sans cache, la ferme changée ou inconnue garde son motif, jamais « indisponible »', async () => {
+  for (const [observed, reason] of [['18', 'farm-changed'], [null, 'farm-unidentified']] as const) {
+    await assert.rejects(
+      () => readLiveOrLastSuccessfulSnapshot({
+        readLive: async () => {
+          throw new OtfFarmMismatchError(observed);
+        },
+        readCache: async () => null,
+        writeCache: async () => undefined,
+      }),
+      (error) => error instanceof IrrigationDataUnavailableError && error.reason === reason,
+    );
+  }
 });

@@ -3,10 +3,12 @@ import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createJwksFetcher, verifyAccessJwt } from '@/lib/services/access-jwt';
 import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, demoOwnerUserId, resolveDemoChoice } from '@/lib/domain/demo/catalogue';
+import { FARM_UNIDENTIFIED_MESSAGE } from '@/lib/domain/snapshot-policy';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { realNow } from '@/lib/services/demo-clock';
 import { recordDemoVisit } from '@/lib/services/demo-reset';
 import { prepareDemoSpace } from '@/lib/services/demo-space';
+import { FarmIdentityUnavailableError, resolveSpaceKey } from '@/lib/services/farm-identity-service';
 
 /**
  * Identité de l'utilisateur connecté.
@@ -21,6 +23,11 @@ import { prepareDemoSpace } from '@/lib/services/demo-space';
  * vérifie sur une ferme neuve, docs/browser-journeys-contract.md).
  */
 export type AuthenticatedUser = {
+  /**
+   * La clé de l'espace où la personne travaille (docs/tranche-4-contract.md,
+   * F327) : sa personne et sa ferme, ou en démonstration la ferme fictive et
+   * le moment choisis. Jamais l'identifiant de la personne seul.
+   */
   userId: string;
   displayName: string;
   email: string;
@@ -49,8 +56,24 @@ function demoUser(farm: string | undefined): AuthenticatedUser {
 
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   const user = await readUser();
-  if (!user || !isDemoDeployment()) return user;
-  return demoSpaceUser(user);
+  if (!user) return null;
+  return isDemoDeployment() ? demoSpaceUser(user) : farmSpaceUser(user);
+}
+
+/**
+ * Hors démonstration, la personne travaille dans l'espace de sa ferme
+ * (docs/tranche-4-contract.md, F327, F331, F340) : la clé vient du serveur,
+ * jamais du navigateur, et son espace d'avant la 4.1 est rattaché à sa ferme
+ * au passage. Sans ferme établie, rien n'est montré :
+ * `FarmIdentityUnavailableError` (F341).
+ */
+async function farmSpaceUser(user: AuthenticatedUser): Promise<AuthenticatedUser> {
+  try {
+    return { ...user, userId: await resolveSpaceKey(user.userId) };
+  } catch (error) {
+    if (error instanceof FarmIdentityUnavailableError) throw new FarmIdentityUnavailableError(user.displayName);
+    throw error;
+  }
 }
 
 async function readUser(): Promise<AuthenticatedUser | null> {
@@ -80,6 +103,20 @@ export async function requireAuthenticatedUser(): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser();
   if (user) return user;
   redirect(signInPath());
+}
+
+/**
+ * Pour une route qui rend un fichier plutôt qu'une page : la personne
+ * connectée, ou la réponse qui refuse la demande, session expirée ou ferme de
+ * la clé pas encore établie (docs/tranche-4-contract.md, F341).
+ */
+export async function authenticatedUserOrRefusal(): Promise<AuthenticatedUser | Response> {
+  try {
+    return (await getAuthenticatedUser()) ?? new Response('Session expirée.', { status: 401 });
+  } catch (error) {
+    if (!(error instanceof FarmIdentityUnavailableError)) throw error;
+    return new Response(FARM_UNIDENTIFIED_MESSAGE, { status: 503, headers: { 'Cache-Control': 'no-store' } });
+  }
 }
 
 /** Access ramène l'utilisateur sur la page demandée après connexion. */

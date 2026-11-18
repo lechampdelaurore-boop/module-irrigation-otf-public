@@ -179,6 +179,68 @@ Cloudflare, et le porteur peut les changer.
   d'avant la 4.1 a ses données, de la garde et du régulateur. La revue par
   un second fil reste due avant toute ferme tierce (T4-06, 4.6).
 
+### 5 ter. Précisions de la PR 2 : l'identité et le rattachement (17 novembre 2026, D-156, F337 à F344)
+
+Écrites avant le code de la PR 2, toutes à l'option recommandée ; elles
+précisent F329 à F332 sans les changer.
+
+- **F337 · `GET /me` d'abord.** Chaque lecture d'OTF commence par `GET /me`,
+  avant `/configuration` : la ferme est vérifiée avant toute autre route
+  (F332), et une saison absente se juge sur la configuration de la bonne
+  ferme. Le contrat de lecture (`docs/otf-contract.md`, « Lecture
+  atomique ») le dit aussi.
+- **F338 · Ce qui fait une identité** (`lib/domain/otf/farm-identity.ts`).
+  Une réponse de `GET /me` qui porte exactement une structure (la réponse
+  elle-même, ou une liste d'un seul élément) dont l'identifiant (`id`, ou à
+  défaut le dernier segment de `@id`) est un entier positif ou un texte de la
+  forme de F327. Rien d'autre n'est une identité. La ferme d'un instantané en
+  cache est celle que sa lecture a vue ; le remplaçant d'avant cette règle,
+  `unknown`, n'en est pas une.
+- **F339 · La ferme du déploiement** (F330). La table `otf_deployment_farm`
+  garde la ferme et l'heure de son observation ; une observation plus
+  ancienne ne remplace jamais une plus récente. Sans ligne : le dernier
+  instantané en cache, toutes clés confondues, si sa ferme est lisible ;
+  sinon un seul appel à `GET /me`, au rythme du client existant. Avec les
+  données fictives (parcours navigateur, développement), la ferme est celle
+  de la ferme fictive, `farm-demo`, sans rien écrire. La démonstration n'a
+  pas de ferme (section 5).
+- **F340 · Le rattachement (F331), à chaque connexion, avant de rendre la
+  clé.** Si la personne a un espace sans ferme, il reçoit la ferme de son
+  dernier instantané en cache dont la ferme est lisible, sinon celle du
+  déploiement, par une seule écriture conditionnelle. Si la personne a déjà
+  un espace pour cette ferme, rien n'est écrit : l'espace sans ferme reste
+  gardé à part, jamais fusionné. La clé rendue est toujours celle de la
+  ferme du déploiement.
+- **F341 · Sans identité, rien n'est montré** (F329). Si la ferme du
+  déploiement ne peut pas être établie, aucune page ne s'affiche ; elle
+  dit : « Ouvre ta ferme n'a pas dit à quelle ferme mène la clé de ce
+  module. Rien n'est affiché tant que la ferme n'est pas connue ; aucune
+  donnée n'a été modifiée. Réessayez dans quelques minutes. » Les actions
+  sont refusées ; l'export et les dessins des espèces aussi, avec le même
+  message. Une lecture dont `GET /me` ne donne pas d'identité s'arrête
+  de même : rien n'est lu de plus ni rangé ; la dernière lecture réussie
+  s'affiche, avec : « Ouvre ta ferme n'a pas dit à quelle ferme mène la clé
+  de ce module. La dernière lecture réussie est affichée. » Le journal note
+  alors la forme de la réponse (le nombre de structures, le type de
+  l'identifiant), jamais ses valeurs.
+- **F342 · Les espaces qui ne lisent pas OTF.** Un espace dont la ferme
+  n'est pas celle du déploiement ne lit pas OTF (F332) : son dernier
+  instantané en cache s'affiche avec le message de F332 ; sans cache, la
+  page dit ce message. Un espace sans ferme, hors démonstration, ne lit pas
+  OTF non plus : c'est un espace d'avant la 4.1 dont la personne n'est pas
+  revenue ; les traitements du matin le calculent sur son cache, sans
+  changer la preuve de sa ferme.
+- **F343 · Continuité du cache.** Un espace qui vient d'être rattaché n'a
+  pas encore d'instantané sous sa nouvelle clé : faute de mieux, il lit le
+  dernier instantané de sa personne d'avant la 4.1, **seulement si cet
+  instantané est de la même ferme**. Rien n'est copié ; la première lecture
+  réussie range l'instantané sous la nouvelle clé.
+- **F344 · Ce que la mise en ligne change pour une ferme réelle.** Au
+  premier passage de la personne, une écriture : la ferme dans la colonne
+  de son espace (et la ligne de `otf_deployment_farm`). Rien ne change à
+  l'écran ; la première lecture d'OTF sous la nouvelle clé est une lecture
+  complète, comme une actualisation.
+
 ## 6. Connexion à l'API d'OTF (4.3)
 
 ### 6.1 Ce que la documentation d'OTF établit (lue le 7/11 ; à relire avant le code)

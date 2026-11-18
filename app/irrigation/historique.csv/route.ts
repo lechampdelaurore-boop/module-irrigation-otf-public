@@ -1,4 +1,4 @@
-import { getAuthenticatedUser } from '@/app/access-auth';
+import { authenticatedUserOrRefusal } from '@/app/access-auth';
 import {
   HISTORY_PERIOD_MODES,
   HISTORY_SCOPE_LEVELS,
@@ -15,8 +15,8 @@ import { getIrrigationHistoryExportForUser } from '@/lib/services/irrigation-his
 import { getIrrigationSnapshot } from '@/lib/services/irrigation-service';
 
 export async function GET(request: Request) {
-  const user = await getAuthenticatedUser();
-  if (!user) return new Response('Session expirée.', { status: 401 });
+  const user = await authenticatedUserOrRefusal();
+  if (user instanceof Response) return user;
   const url = new URL(request.url);
   const season = Number(url.searchParams.get('season'));
   const mode = url.searchParams.get('mode');

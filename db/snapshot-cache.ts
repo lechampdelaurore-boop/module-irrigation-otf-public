@@ -32,8 +32,10 @@ export async function readCachedSnapshot(
     .bind(cacheKey)
     .first<{ payload: string; last_successful_read_at: string }>();
 
-  if (!row) return null;
+  return row ? parseCachedRow(row) : null;
+}
 
+function parseCachedRow(row: { payload: string; last_successful_read_at: string }): IrrigationSnapshot | null {
   try {
     const parsed: unknown = JSON.parse(row.payload);
     if (!isIrrigationSnapshot(parsed)) return null;
@@ -45,6 +47,30 @@ export async function readCachedSnapshot(
   } catch {
     return null;
   }
+}
+
+/**
+ * Le plus récent des instantanés gardés (4.1, docs/tranche-4-contract.md,
+ * F331, F339) : parmi tous, ou parmi ceux dont la clé commence par `prefix`
+ * ou vaut `exactKey`, comparées signe à signe. `null` si le plus récent est
+ * illisible : rien n'est deviné.
+ */
+export async function readLatestCachedSnapshot(
+  keys?: { prefix: string; exactKey: string },
+): Promise<IrrigationSnapshot | null> {
+  await ensureSnapshotTable();
+  const statement = keys
+    ? db.prepare(
+        `SELECT payload, last_successful_read_at FROM otf_snapshots
+         WHERE instr(cache_key, ?) = 1 OR cache_key = ?
+         ORDER BY last_successful_read_at DESC LIMIT 1`,
+      ).bind(keys.prefix, keys.exactKey)
+    : db.prepare(
+        `SELECT payload, last_successful_read_at FROM otf_snapshots
+         ORDER BY last_successful_read_at DESC LIMIT 1`,
+      );
+  const row = await statement.first<{ payload: string; last_successful_read_at: string }>();
+  return row ? parseCachedRow(row) : null;
 }
 
 export async function saveCachedSnapshot(
