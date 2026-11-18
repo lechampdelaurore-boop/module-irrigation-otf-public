@@ -11,7 +11,7 @@ import { escapeHtml, renderPage } from './layout.ts';
  */
 
 export const RESPONSIBLE = "François PREZEAU, GAEC Le Champ de l'Aurore";
-const TEXT_DATE = '17 novembre 2026';
+const TEXT_DATE = '18 novembre 2026';
 
 /** Une adresse électronique plausible : une valeur mal saisie ne s'affiche pas. */
 const EMAIL_PATTERN = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
@@ -141,7 +141,7 @@ export function termsPage(contactEmail: string | undefined): string {
     body: `<h1>Conditions d'utilisation</h1>
 <p class="updated">Texte du ${TEXT_DATE}.</p>
 <ul>
-<li><strong>Un service fourni tel quel.</strong> Le module est en essai, gratuit pendant le pilote, sans garantie de disponibilité ni d'absence d'erreur.</li>
+<li><strong>Un service fourni tel quel.</strong> Le module est gratuit et n'a pas vocation à devenir payant. Il est en essai, sans garantie de disponibilité ni d'absence d'erreur.</li>
 <li><strong>Une aide à la décision.</strong> Les besoins, plannings et alertes sont des calculs à partir de vos réglages et de la météo. Ils ne garantissent aucun résultat : les décisions d'arrosage restent celles de l'exploitant.</li>
 <li><strong>Votre ferme sous votre responsabilité.</strong> L'exploitant reste responsable de sa ferme, de son eau et du respect des arrêtés de restriction.</li>
 <li><strong>Lecture seule.</strong> Le module ne modifie rien dans Ouvre ta ferme. L'accès se retire à tout moment depuis Ouvre ta ferme.</li>
