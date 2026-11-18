@@ -4056,8 +4056,9 @@ ferme est `farm-demo`. 21 tests du rattachement et de la garde sur une base
 migrée ; quatre fautes volontaires, chacune détectée. Fusionnée sur le
 « vas-y » exprès du porteur (10 h 22) : **en ligne le 18 novembre 2026 à
 10 h 41**, #88 fusionnée à 10 h 23, run 44275442691 vérifié job par job.
-Reste la recette du porteur : une ouverture du module, où rien ne doit
-changer à l'écran.
+Recette du porteur faite le 18 novembre 2026 à 20 h 06 : une ouverture du
+module, où rien ne devait changer à l'écran (« Le module s'affiche
+normalement. »).
 
 **PR 3 codée le 18 novembre 2026** (D-157, F334), branche
 `feat/regulateur-par-ferme` : un régulateur par ferme, partagé par tous les

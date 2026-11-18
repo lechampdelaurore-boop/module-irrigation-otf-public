@@ -89,10 +89,10 @@ registres, elle y renvoie.
   celle de la ferme ; un espace d'une autre ferme, ou sans ferme hors
   démonstration, ne lit plus OTF ; sans ferme connue, aucune page ne
   s'affiche (F341). À la première ouverture du porteur, la ferme s'écrit
-  dans la colonne de son espace réel (F344) : **recette du porteur à
-  faire**, rien ne doit changer à l'écran ; si la page disait « La ferme
-  n'est pas identifiée », rien ne serait écrit et un retour du code
-  suffirait. **PR 3 sur 3 ouverte** (`feat/regulateur-par-ferme`, D-157) :
+  dans la colonne de son espace réel (F344) : **recette du porteur faite
+  le 18 novembre 2026 à 20 h 06**, une ouverture du module, où rien ne
+  devait changer à l'écran (« Le module s'affiche normalement. »).
+  **PR 3 sur 3 ouverte** (`feat/regulateur-par-ferme`, D-157) :
   un régulateur par ferme, 4 appels par seconde et 30 par minute ; quand la
   minute est pleine, une attente de 5 secondes au plus, sinon l'appel n'est
   pas envoyé et la page garde le dernier instantané avec le message de

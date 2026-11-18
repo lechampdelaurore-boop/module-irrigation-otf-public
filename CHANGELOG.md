@@ -21,6 +21,9 @@ source détaillée commit par commit.
 - En ligne le 18 novembre 2026 : #89, la PR 3 de la 4.1 et de la 4.2,
   déployée à 11 h 25 ; #90, le site public et la 4.8 close, fusionnée à
   21 h 20 et déployée à 21 h 38 (run 44389956513, cinq jobs verts).
+- Recette de #88 (PR 2 de la 4.1 et de la 4.2) faite par le porteur le
+  18 novembre 2026 à 20 h 06 : une ouverture du module, rien n'a changé à
+  l'écran (« Le module s'affiche normalement. »).
 
 ### Corrigé (Tranche 4, 4.8, le site public)
 
