@@ -18,8 +18,10 @@ source détaillée commit par commit.
   la revue de l'isolation du 18 novembre 2026 confie à la 4.3, dont la
   règle d'Access : jusqu'au pilote, seules des personnes de la ferme du
   porteur y sont admises. Aucun changement de comportement.
-- La PR 3 de la 4.1 et de la 4.2 en ligne : #89, déployée le
-  18 novembre 2026 à 11 h 25.
+- En ligne le 18 novembre 2026 : #89, la PR 3 de la 4.1 et de la 4.2,
+  déployée à 11 h 25 ; #90, le site public et la 4.8 close, fusionnée à
+  21 h 20 et déployée à 21 h 38 (run 44389956513, cinq jobs verts).
+
 ### Corrigé (Tranche 4, 4.8, le site public)
 
 - **L'accueil du site public, plus clair** (F345, F346, remarques du

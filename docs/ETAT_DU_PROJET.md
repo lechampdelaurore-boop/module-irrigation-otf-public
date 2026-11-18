@@ -51,7 +51,11 @@ registres, elle y renvoie.
   soir, sur son mot, les conditions d'utilisation ont une rubrique
   « Prix » : gratuit pendant le pilote, puis une participation possible
   d'environ 1 € par mois et par ferme pour couvrir les frais (F348).
-  Restent :
+  **En ligne le 18 novembre 2026 à 21 h 38** (consigné par la PR suivante,
+  celle du contrat de la 4.3) : #90 fusionnée à 21 h 20, run 44389956513
+  vérifié job par job (« Application », « Workers Cloudflare », « Parcours
+  navigateur », « Déploiement Cloudflare », site public compris, et
+  « Déploiement de la démonstration », verts). Restent :
   la validation d'OTF (délai hors de notre main), la relecture juridique
   avant toute ferme tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
   2026 à 8 h 43 (run 43824015609, cinq jobs verts).
