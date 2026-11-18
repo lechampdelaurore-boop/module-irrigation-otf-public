@@ -5342,3 +5342,49 @@ identifiée » et rien ne serait écrit : un retour du code suffirait.
 
 Ne changent pas : D-155, D-154, D-003 (rien n'est deviné), D-096 (la
 démonstration reste sans ferme), D-048.
+
+## D-157 — Tranche 4, 4.1 et 4.2, PR 3 : le régulateur des appels par ferme
+
+Date : 18 novembre 2026, nuit. Décideur : Claude, à l'option recommandée,
+sur le mandat du porteur (D-154, D-155). Après D-156.
+
+**Pourquoi la question.** F334 disait la règle (4 appels par seconde et 30
+par minute, ferme par ferme ; une attente de 5 secondes au plus quand la
+minute est pleine ; sinon la lecture s'arrête comme sur une limite
+atteinte) sans dire comment la compter, ni quel régulateur sert la clé du
+déploiement avant que sa ferme soit connue. Aucune de ces questions n'est
+agronomique, ne touche au budget ni à Cloudflare.
+
+**Décision.** Toutes à l'option recommandée :
+
+1. Un régulateur par ferme, partagé par tous les clients de cette ferme ;
+   une ferme n'attend jamais le quota d'une autre, ni l'espacement, ni la
+   minute, ni la pause qui suit un `429` (`lib/adapters/otf/read-client.ts`).
+2. Avant la 4.3, la clé du déploiement a un seul régulateur, y compris
+   pour le premier `GET /me` qui fait connaître sa ferme : ranger ce
+   premier appel à part aurait permis, dans une course entre deux
+   connexions, cinq appels dans la même seconde. La règle des 4 appels par
+   seconde passe avant la finesse du découpage.
+3. La minute est glissante et comptée avec une seconde de marge : trente
+   départs tiennent dans 61 secondes au moins. OTF compte les appels à leur
+   arrivée, le module à leur départ.
+4. Le refus se décide quand l'appel arrive en tête de file : si la place
+   se libère dans plus de 5 secondes, l'appel n'est pas envoyé, rien n'est
+   compté, et l'erreur porte le statut 429, qui fait afficher le dernier
+   instantané avec le message existant (`lib/domain/snapshot-policy.ts`).
+   Un refus ne se retente pas.
+5. L'attente d'une place ne compte plus dans le délai de l'appel (8
+   secondes) : le délai part de l'envoi.
+6. Le calcul est une fonction pure (`lib/domain/otf/call-pace.ts`),
+   éprouvée par un appelant qui insiste : jamais cinq départs en une
+   seconde, jamais trente et un en une minute.
+
+**Ce que cela change pour une ferme réelle.** Une lecture de saison compte
+une vingtaine d'appels sur la ferme du porteur : une seconde lecture
+complète dans la même minute (deux actualisations de suite, par exemple)
+s'arrête après quelques appels, avec le dernier instantané et le message
+« Limite de requêtes OTF atteinte », au lieu de recevoir un `429` d'OTF.
+
+Ne changent pas : D-155, D-156, la règle du projet de 4 requêtes par
+seconde au plus. Restent à la 4.3 (F335) : le régulateur partagé entre
+instances du Worker, le budget quotidien, l'échelonnement.

@@ -1,5 +1,5 @@
 import { env } from 'cloudflare:workers';
-import { OTF_MINIMUM_REQUEST_INTERVAL_MS, OtfReadClient } from '@/lib/adapters/otf/read-client';
+import { DEPLOYMENT_KEY_FARM, OTF_MINIMUM_REQUEST_INTERVAL_MS, OtfReadClient } from '@/lib/adapters/otf/read-client';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 
 /**
@@ -17,12 +17,17 @@ export function readOtfDataSource(): 'mock' | 'live' {
   return configured === 'live' ? 'live' : 'mock';
 }
 
-/** Le client de lecture, avec la clé du déploiement, qui reste côté serveur. */
+/**
+ * Le client de lecture, avec la clé du déploiement, qui reste côté serveur.
+ * Avant la 4.3, cette clé mène à une seule ferme : ses appels passent par le
+ * régulateur de cette ferme (docs/tranche-4-contract.md, F334).
+ */
 export function createOtfReadClient(): OtfReadClient {
   return new OtfReadClient({
     baseUrl: readRequiredServerSetting('OTF_API_BASE_URL'),
     token: readRequiredServerSetting('OTF_API_TOKEN'),
     minimumRequestIntervalMs: OTF_MINIMUM_REQUEST_INTERVAL_MS,
+    farmKey: DEPLOYMENT_KEY_FARM,
   });
 }
 

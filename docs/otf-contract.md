@@ -44,12 +44,21 @@ de proxy générique.
    entier toutes saisons confondues, treize pages sur la ferme du porteur. Le
    tout forme un seul instantané : si une de ces lectures échoue, rien ne
    remplace le cache.
-1 bis. Ce rythme vaut pour le module entier, pas pour chaque client. Le quota
-   est celui du jeton : deux lectures lancées en même temps par des composants
-   différents, par exemple la page et une action serveur, passent par le même
-   régulateur et ne peuvent pas cumuler leurs quotas. Constaté le 20 septembre
-   2026 : le régulateur vivait dans chaque client alors que le client est
-   reconstruit à chaque lecture, ce qui a produit un `429` sur `/bedList`.
+1 bis. Ce rythme vaut pour la ferme, pas pour chaque client : le quota d'OTF
+   est celui de la ferme, toutes applications confondues
+   (`docs/tranche-4-contract.md`, T4-07, F334). Deux lectures lancées en même
+   temps par des composants différents, par exemple la page et une action
+   serveur, passent par le même régulateur et ne peuvent pas cumuler leurs
+   quotas ; une ferme n'attend jamais le quota d'une autre. Constaté le
+   20 septembre 2026 : le régulateur vivait dans chaque client alors que le
+   client est reconstruit à chaque lecture, ce qui a produit un `429` sur
+   `/bedList`. Depuis la 4.2, s'y ajoute la limite d'OTF de trente appels par
+   minute : quand la minute est pleine, un appel attend au plus cinq secondes
+   qu'une place se libère, sinon il n'est pas envoyé et la lecture s'arrête
+   comme sur une limite atteinte (dernier instantané affiché, message
+   existant). Une lecture de saison compte une vingtaine d'appels sur la ferme
+   du porteur (treize pages de tâches) : une seconde lecture complète dans la
+   même minute s'arrête ainsi, au lieu de recevoir un `429`.
 1 ter. Depuis la 4.1 (`docs/tranche-4-contract.md`, F337), `/me` est la
    première route de chaque lecture, avant `/configuration` : la ferme qu'il
    désigne est comparée à celle de l'espace avant toute autre route, et une

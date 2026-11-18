@@ -1,5 +1,14 @@
 import { OtfApiError, extractCollection } from '../../domain/otf/api-contract.ts';
-import { millisecondsFromSeconds } from '../../domain/units.ts';
+import {
+  EMPTY_CALL_PACE,
+  holdCallsUntil,
+  nextCallSlot,
+  OTF_CALLS_PER_MINUTE,
+  OTF_MINUTE_LIMIT_MAX_WAIT_MS,
+  recordCallStart,
+  type CallPaceState,
+} from '../../domain/otf/call-pace.ts';
+import { millisecondsFromSeconds, secondsFromMilliseconds } from '../../domain/units.ts';
 
 const OTF_READ_ROUTES = [
   '/me',
@@ -36,24 +45,47 @@ const RATE_SLOT_SAFETY_MARGIN_MS = 5;
 const OTF_RATE_LIMIT_COOLDOWN_MS = 1_000;
 
 /**
- * Le quota de quatre appels par seconde vaut pour le jeton du module, pas pour
- * l'objet qui appelle. Le rythme est donc tenu par un régulateur unique du
- * module, partagé par tous les clients : deux lectures lancées en même temps
- * par des composants différents ne peuvent plus cumuler leurs quotas. Constaté
- * le 20 septembre 2026 par un 429 sur `/bedList` (docs/otf-contract.md).
+ * Le quota d'OTF est celui de la ferme, toutes applications confondues
+ * (docs/tranche-4-contract.md, T4-07, F334), pas celui de l'objet qui
+ * appelle. Le rythme est donc tenu par un régulateur par ferme, partagé par
+ * tous les clients de cette ferme : deux lectures lancées en même temps par
+ * des composants différents ne peuvent pas cumuler leurs quotas (constaté le
+ * 20 septembre 2026 par un 429 sur `/bedList`, docs/otf-contract.md), et une
+ * ferme n'attend jamais le quota d'une autre. Chaque régulateur vit dans
+ * l'instance du Worker qui appelle ; un régulateur partagé entre instances
+ * se tranche à la 4.3, avec le budget quotidien.
  */
-const otfRatePacer = {
-  lastRequestStartedAt: 0,
-  notBefore: 0,
-  queue: Promise.resolve() as Promise<void>,
+type FarmPacer = { state: CallPaceState; queue: Promise<void> };
+
+const farmPacers = new Map<string, FarmPacer>();
+
+/**
+ * Avant la 4.3, la seule clé est celle du déploiement, rattachée à une seule
+ * ferme (F330) : tous ses appels, y compris le premier `GET /me` qui fait
+ * connaître sa ferme, passent par un même régulateur.
+ */
+export const DEPLOYMENT_KEY_FARM = 'ferme-de-la-cle-du-deploiement';
+
+function farmPacer(farmKey: string): FarmPacer {
+  const known = farmPacers.get(farmKey);
+  if (known) return known;
+  const created: FarmPacer = { state: EMPTY_CALL_PACE, queue: Promise.resolve() };
+  farmPacers.set(farmKey, created);
+  return created;
+}
+
+/** Remet les régulateurs à zéro entre deux tests, qui se suivent sans attendre. */
+export function resetOtfRatePacer(): void {
+  farmPacers.clear();
+}
+
+/** L'horloge du régulateur ; les tests la remplacent pour parcourir une minute sans l'attendre. */
+type OtfClock = {
+  now: () => number;
+  sleep: (durationMs: number) => Promise<void>;
 };
 
-/** Remet le régulateur à zéro entre deux tests, qui se suivent sans attendre. */
-export function resetOtfRatePacer(): void {
-  otfRatePacer.lastRequestStartedAt = 0;
-  otfRatePacer.notBefore = 0;
-  otfRatePacer.queue = Promise.resolve();
-}
+const realClock: OtfClock = { now: () => Date.now(), sleep: delay };
 
 export type OtfReadRoute = (typeof OTF_READ_ROUTES)[number];
 
@@ -70,6 +102,9 @@ type OtfReadClientOptions = {
   maxPages?: number;
   timeoutMs?: number;
   minimumRequestIntervalMs?: number;
+  /** La ferme dont ce client dépense le quota ; par défaut, celle de la clé du déploiement. */
+  farmKey?: string;
+  clock?: OtfClock;
 };
 
 export function assertAllowedReadRoute(value: string): asserts value is OtfReadRoute {
@@ -86,6 +121,8 @@ export class OtfReadClient {
   private readonly maxPages: number;
   private readonly timeoutMs: number;
   private readonly minimumRequestIntervalMs: number;
+  private readonly farmKey: string;
+  private readonly clock: OtfClock;
 
   constructor(options: OtfReadClientOptions) {
     if (!options.token.trim()) {
@@ -119,6 +156,8 @@ export class OtfReadClient {
       ),
       millisecondsFromSeconds(1),
     );
+    this.farmKey = options.farmKey ?? DEPLOYMENT_KEY_FARM;
+    this.clock = options.clock ?? realClock;
   }
 
   async getConfiguration(): Promise<unknown> {
@@ -220,11 +259,13 @@ export class OtfReadClient {
     }
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
+      // L'attente d'une place ne compte pas dans le délai de l'appel ; un
+      // refus du régulateur n'envoie rien et ne se retente pas.
+      await this.waitForRateSlot();
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
 
       try {
-        await this.waitForRateSlot();
         const response = await this.fetchImpl(url, {
           method: 'GET',
           headers: {
@@ -260,43 +301,55 @@ export class OtfReadClient {
         clearTimeout(timeout);
       }
 
-      await delay(120 * (attempt + 1));
+      await this.clock.sleep(120 * (attempt + 1));
     }
 
     throw new OtfApiError('Lecture OTF impossible.');
   }
 
+  /**
+   * La place de cet appel dans le rythme de sa ferme (F334) : un départ
+   * toutes les 250 ms au plus, trente par minute ; quand la minute est
+   * pleine, une attente de cinq secondes au plus, sinon l'appel est refusé
+   * comme sur une limite atteinte, sans rien envoyer à OTF.
+   */
   private waitForRateSlot(): Promise<void> {
-    const pacer = otfRatePacer;
-    const dueAt = () => Math.max(
-      pacer.lastRequestStartedAt + this.minimumRequestIntervalMs + RATE_SLOT_SAFETY_MARGIN_MS,
-      pacer.notBefore,
-    );
+    const pacer = farmPacer(this.farmKey);
+    const { now, sleep } = this.clock;
+    const spacingMs = this.minimumRequestIntervalMs + RATE_SLOT_SAFETY_MARGIN_MS;
     const slot = pacer.queue.then(async () => {
-      let waitMs = Math.max(0, dueAt() - Date.now());
-
       // Un minuteur peut se réveiller légèrement avant son échéance. Recalculer
       // évite alors de démarrer une requête trop tôt et sérialise aussi les
       // lectures lancées simultanément par le lecteur d'instantané.
-      while (waitMs > 0) {
-        await delay(waitMs);
-        waitMs = Math.max(0, dueAt() - Date.now());
+      for (;;) {
+        const next = nextCallSlot(pacer.state, now(), spacingMs);
+        if (next.kind === 'refused') {
+          throw new OtfApiError(
+            `Limite de ${OTF_CALLS_PER_MINUTE} appels par minute atteinte pour cette ferme : `
+              + `une place se libère dans plus de ${secondsFromMilliseconds(OTF_MINUTE_LIMIT_MAX_WAIT_MS)} secondes, l'appel n'est pas envoyé.`,
+            429,
+          );
+        }
+        const waitMs = next.at - now();
+        if (waitMs <= 0) break;
+        await sleep(waitMs);
       }
 
-      pacer.lastRequestStartedAt = Date.now();
+      pacer.state = recordCallStart(pacer.state, now());
     });
 
     pacer.queue = slot.catch(() => undefined);
     return slot;
   }
 
-  /** Une limite atteinte fait patienter tout le module, pas seulement ce client. */
+  /** Une limite atteinte fait patienter tous les clients de la ferme, pas seulement celui-ci. */
   private holdAfterRateLimit(): void {
-    otfRatePacer.notBefore = Math.max(otfRatePacer.notBefore, Date.now() + OTF_RATE_LIMIT_COOLDOWN_MS);
+    const pacer = farmPacer(this.farmKey);
+    pacer.state = holdCallsUntil(pacer.state, this.clock.now() + OTF_RATE_LIMIT_COOLDOWN_MS);
   }
 }
 
-function delay(durationMs: number) {
+function delay(durationMs: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, durationMs));
 }
 
