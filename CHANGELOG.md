@@ -26,6 +26,14 @@ source détaillée commit par commit.
   la clé rendue est celle de la ferme. Un espace d'une autre ferme ne lit
   plus OTF : son dernier instantané s'affiche avec le message de F332.
   Sans ferme connue, aucune page ne s'affiche (F341).
+- **Les appels à Ouvre ta ferme sont régulés ferme par ferme** (D-157,
+  F334, PR 3 sur 3) : 4 par seconde et 30 par minute au plus pour chaque
+  ferme, sans qu'une ferme attende le quota d'une autre. Quand la minute
+  est pleine, un appel attend au plus 5 secondes qu'une place se libère ;
+  sinon il n'est pas envoyé et la page garde le dernier instantané avec le
+  message « Limite de requêtes OTF atteinte », comme sur un `429`. Avant
+  la 4.3, la clé du déploiement a un seul régulateur. Le délai d'un appel
+  part désormais de son envoi, pas de son attente.
 
 ### Corrigé (parcours navigateur)
 

@@ -160,9 +160,15 @@ Cloudflare, et le porteur peut les changer.
   minute : quand elle est pleine, un appel attend au plus 5 secondes qu'une
   place se libère, sinon la lecture s'arrête comme sur une limite atteinte
   (dernier instantané affiché, message existant), sans rien envoyer à OTF.
-  Limite connue : le régulateur vit dans chaque instance du Worker, comme
-  aujourd'hui ; un régulateur partagé entre instances se tranche à la 4.3,
-  avec le budget quotidien.
+  Avant la 4.3, la seule clé est celle du déploiement, rattachée à une seule
+  ferme (F330) : tous ses appels, y compris le premier `GET /me` qui fait
+  connaître cette ferme, passent par un même régulateur, et les 4 appels
+  par seconde tiennent même avant que la ferme soit connue. La minute se
+  compte avec une seconde de marge (OTF compte les appels à leur arrivée,
+  le module à leur départ) ; l'attente d'une place ne compte pas dans le
+  délai de l'appel. Limite connue : le régulateur vit dans chaque instance
+  du Worker, comme aujourd'hui ; un régulateur partagé entre instances se
+  tranche à la 4.3, avec le budget quotidien.
 - **F335 · Restent à la 4.3** : le coffre des jetons (T4-12 : avant OAuth, la
   seule clé est le secret du déploiement, il n'y a rien à y ranger), le
   budget quotidien (T4-14 : la consommation réelle n'est pas mesurée) et

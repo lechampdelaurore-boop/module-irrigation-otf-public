@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { OtfReadClient } from '../lib/adapters/otf/read-client.ts';
+import { OtfReadClient, resetOtfRatePacer } from '../lib/adapters/otf/read-client.ts';
 import {
   readCompleteOtfSnapshot,
   readOtfSeasonSnapshot,
   OtfSeasonUnavailableError,
 } from '../lib/adapters/otf/snapshot-reader.ts';
 import { OtfFarmMismatchError } from '../lib/domain/otf/farm-identity.ts';
+
+// Chaque test est une lecture à part : sans remise à zéro, les appels des
+// tests précédents rempliraient la minute de la ferme (trente appels, F334).
+test.beforeEach(() => resetOtfRatePacer());
 
 test('la lecture ciblée utilise exactement les dix routes GET nécessaires, dans l’ordre, `/me` d’abord (F337)', async () => {
   const calls: string[] = [];
