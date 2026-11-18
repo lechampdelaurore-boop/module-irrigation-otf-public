@@ -42,7 +42,9 @@ registres, elle y renvoie.
   `SITE_CONTACT_EMAIL`, la page de confidentialité vérifiée) ; sa relecture
   est en cours, ses premières remarques (F345 à F347 : vannes et capteurs
   « en cours de développement », « L'essayer » plus clair, contact de
-  préférence par Discord) corrigées le jour même. Restent : la fin de sa relecture, l'envoi du formulaire d'OTF
+  préférence par Discord) corrigées le jour même ; **relecture finie et
+  textes validés par le porteur le 18 novembre 2026 à 20 h 04** (« J'ai
+  fini de relire les 3 pages, je valide en l'état »). Restent : l'envoi du formulaire d'OTF
   par lui, la relecture juridique avant toute ferme
   tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
   2026 à 8 h 43 (run 43824015609, cinq jobs verts).
