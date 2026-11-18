@@ -14,9 +14,11 @@ source détaillée commit par commit.
   amies, puis propose la démonstration sur invitation ; « Contact » dit
   « de préférence par Discord » et demande, en cas de problème, une
   description écrite avec des captures d'écran (F347).
-- **Les conditions d'utilisation disent que le module est gratuit et n'a
-  pas vocation à devenir payant** (F348, choix du porteur du 18 novembre
-  2026), au lieu de « gratuit pendant le pilote » ; textes datés du
+- **Une rubrique « Prix » dans les conditions d'utilisation** (F348, choix
+  du porteur du 18 novembre 2026) : gratuit pendant tout le pilote, les
+  frais payés par une ferme bénévole ; ensuite, selon le nombre de fermes,
+  une participation possible d'environ 1 € par mois et par ferme, pour
+  couvrir les frais seulement, annoncée à l'avance ; textes datés du
   18 novembre 2026.
 - **4.8 close** : textes validés par le porteur le 18 novembre 2026 à
   20 h 04, formulaire d'Ouvre ta ferme envoyé par lui le même soir à

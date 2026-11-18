@@ -374,13 +374,19 @@ en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
   porteur), sinon par courriel ; en cas de problème, le décrire par écrit
   (page, geste, ce qui s'est passé), avec des captures d'écran si possible.
   Les demandes sur les données restent par courriel (confidentialité).
-- **F348 · Gratuité** (choix du porteur du 18 novembre 2026 à 20 h 24,
-  après l'envoi du formulaire) : les conditions d'utilisation disent « Le
-  module est gratuit et n'a pas vocation à devenir payant », au lieu de
-  « gratuit pendant le pilote » ; la mention « en essai, sans garantie »
-  reste. La date des textes passe au 18 novembre 2026. La question 2 (qui
-  paie l'hébergement) n'est pas rouverte : l'hébergement reste à la charge
-  du porteur.
+- **F348 · Prix** (choix du porteur du 18 novembre 2026 à 21 h, après
+  l'envoi du formulaire) : les conditions d'utilisation ont une rubrique
+  « Prix » : gratuit pendant tout le pilote ; développé et maintenu
+  bénévolement par une ferme qui en paie seule les frais (hébergement
+  d'environ 5 € par mois, davantage avec plus de fermes ; outils de
+  développement et de maintenance, environ 100 € par mois) ; après le
+  pilote, selon le nombre de fermes, une participation possible de l'ordre
+  de 1 € par mois et par ferme, pour couvrir ces frais seulement, sans but
+  lucratif, annoncée à l'avance, chaque ferme restant libre d'arrêter. La
+  mention « en essai, sans garantie » reste à part. La date des textes
+  passe au 18 novembre 2026. La question 2 (qui paie l'hébergement) reste
+  tranchée « gratuit pendant le pilote » ; la participation après le
+  pilote sera à décider par le porteur.
 - **Relecture finie** : le porteur valide les trois pages le 18 novembre
   2026 à 20 h 04 (« je valide en l'état »).
 - **Formulaire envoyé** par le porteur lui-même le 18 novembre 2026 à

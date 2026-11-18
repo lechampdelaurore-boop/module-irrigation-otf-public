@@ -96,9 +96,12 @@ test("la page d'accueil dit ce que fait le module, pour qui, ce qu'il ne fait pa
 test("les conditions d'utilisation disent : tel quel, aide à la décision, responsabilité de l'exploitant", async () => {
   const { body } = await get(PAGE_PATHS.terms);
   assert.match(body, /tel quel/);
-  // Gratuit, sans vocation à devenir payant (F348, choix du porteur du 18 novembre 2026).
-  assert.match(body, /Le module est gratuit et n'a pas vocation à devenir payant\./);
-  assert.doesNotMatch(body, /pendant le pilote/);
+  // Le prix (F348, choix du porteur du 18 novembre 2026) : gratuit pendant le
+  // pilote, puis une participation possible aux frais, annoncée à l'avance.
+  assert.match(body, /<strong>Prix\.<\/strong> Le module est gratuit pendant toute la durée du pilote\./);
+  assert.match(body, /de l'ordre de 1 € par mois et par ferme, uniquement pour couvrir ces frais, sans but lucratif/);
+  assert.match(body, /annoncée à l'avance/);
+  assert.match(body, /libre d'arrêter/);
   assert.match(body, /Texte du 18 novembre 2026/);
   assert.match(body, /aide à la décision/i);
   assert.match(body, /responsable de sa ferme/);

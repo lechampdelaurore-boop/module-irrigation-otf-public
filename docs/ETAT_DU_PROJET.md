@@ -48,8 +48,10 @@ registres, elle y renvoie.
   porteur lui-même le 18 novembre 2026 à 20 h 13** : la demande « Module
   d'irrigation pour Ouvre ta ferme » est « En attente » chez OTF, cinq
   droits en lecture, chacun avec sa raison ; **4.8 close**. Le même
-  soir, sur son mot, les conditions d'utilisation disent que le module est
-  gratuit et n'a pas vocation à devenir payant (F348). Restent :
+  soir, sur son mot, les conditions d'utilisation ont une rubrique
+  « Prix » : gratuit pendant le pilote, puis une participation possible
+  d'environ 1 € par mois et par ferme pour couvrir les frais (F348).
+  Restent :
   la validation d'OTF (délai hors de notre main), la relecture juridique
   avant toute ferme tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
   2026 à 8 h 43 (run 43824015609, cinq jobs verts).
