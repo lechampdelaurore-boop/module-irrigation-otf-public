@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.3, le contrat de la connexion à Ouvre ta ferme, sans code)
+
+- `docs/tranche-4-contract.md`, section 6.3 (D-158, F349 à F370) : chaque
+  ferme reliée par OAuth à une seule personne, jetons chiffrés liés à leur
+  ferme, un seul renouvellement à la fois, refus d'OTF sans boucle,
+  « Déconnecter la ferme », rythme des appels partagé entre les instances
+  du serveur, une lecture qui ne part que si elle peut finir, budget du
+  jour mesuré d'abord ; le « SSO » et un lien dans le menu d'OTF hors du
+  module ; la voie de secours par clé collée, question au porteur ; ce que
+  la revue de l'isolation du 18 novembre 2026 confie à la 4.3, dont la
+  règle d'Access : jusqu'au pilote, seules des personnes de la ferme du
+  porteur y sont admises. Aucun changement de comportement.
+- La PR 3 de la 4.1 et de la 4.2 en ligne : #89, déployée le
+  18 novembre 2026 à 11 h 25.
+
 ### Sécurité (Tranche 4, 4.1 et 4.2, l'isolation des fermes)
 
 - **Chaque espace se retrouve par la personne et la ferme ensemble**

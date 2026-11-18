@@ -83,8 +83,39 @@ registres, elle y renvoie.
   limite atteinte. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm
   test`, `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; la suite complète des parcours jouée
-  par la CI de la PR. Reste ensuite : la revue de l'isolation par un second
-  fil, due avant toute ferme tierce (4.6).
+  par la CI de la PR. La revue de l'isolation par un second fil, due avant
+  toute ferme tierce (4.6), est faite le 18 novembre 2026, sans PR (constats
+  dans `/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`) :
+  un appareil partagé reçoit les notifications de deux espaces (constat A),
+  à corriger avant la 4.6 par un chantier de code à part ; toute personne
+  admise par Access ouvre la ferme du porteur (constat B) : règle d'Access
+  ci-dessous, et fin de ce repli au contrat de la 4.3, avec les points D2 à
+  D5 ; D6 à l'accord écrit des fermes pilotes (4.6).
+
+- Tranche 4, **contrat de la 4.3 écrit le 18 novembre 2026** (D-158,
+  F349 à F370, section 6.3 de `docs/tranche-4-contract.md`), en
+  Opus 5.5 · Max, sans code ni accès d'OTF : chaque ferme reliée par OAuth
+  à une seule personne ; `state` et PKCE gardés côté serveur ; jetons
+  chiffrés (AES-256-GCM), liés à leur ferme, sous une clé maîtresse posée
+  par le porteur ; un seul renouvellement à la fois par ferme ; un refus
+  d'OTF met la ferme en « reconnexion demandée », sans boucle ; le rythme
+  des appels compté dans la base pour toutes les instances du serveur,
+  ferme par ferme ; une lecture complète à la fois, qui ne part que si elle
+  peut finir ; le budget du jour mesuré d'abord, la part du quota posée au
+  porteur après quatorze jours de compte ; les journaux d'invocation gardés
+  tels quels (F323 tranché) ; ce que la revue de l'isolation lui confie
+  (une personne sans raccordement n'obtient plus la ferme du déploiement,
+  les notifications d'un appareil suivent la personne, les points D2 à
+  D5). Le « SSO » et un lien dans le menu d'OTF ne dépendent pas du module
+  (F350). **Règle d'exploitation, dès maintenant et jusqu'au pilote**
+  (F366, constat B de la revue) : la règle d'Access du module principal
+  n'admet que des personnes de la ferme du porteur ; les fermes amies
+  essaient la démonstration. Restent au porteur : la question de la voie
+  de secours par clé collée (F369, 1 sur 1) ; le « vas-y » du code (cinq
+  PR, les trois premières sans accès d'OTF) ; ses secrets, à la validation
+  de sa demande par OTF (formulaire envoyé le 18 novembre 2026 à 20 h 13).
+  Aucun contrôle rejoué : PR de documentation seule, la CI de la PR rejoue
+  tout.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
