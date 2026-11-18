@@ -8,6 +8,7 @@ interface __BaseEnv_Env {
 	VAPID_PRIVATE_KEY: string;
 	IRRIGATION_ALARMS: DurableObjectNamespace /* IrrigationAlarm */;
 	PUSH_RECIPIENTS: DurableObjectNamespace /* PushRecipient */;
+	PUSH_DEVICES: DurableObjectNamespace /* PushDevice */;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_Env {}

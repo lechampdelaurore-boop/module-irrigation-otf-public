@@ -144,10 +144,16 @@ test('en démonstration, aucune notification : pas de clé publique, service dé
   process.env.DEMO_MODE = 'true';
   const sent = recordingNetwork();
   assert.equal(getIrrigationPushPublicKey(), null);
-  const result = await registerIrrigationPushSubscription('espace', {
-    endpoint: 'https://push.exemple.net/abonnement',
-    keys: { p256dh: 'p', auth: 'a' },
-  } as Parameters<typeof registerIrrigationPushSubscription>[1]);
+  const result = await registerIrrigationPushSubscription({
+    recipientKey: 'espace',
+    personKey: 'empreinte',
+    intent: 'refresh',
+    subscription: {
+      endpoint: 'https://push.exemple.net/abonnement',
+      expirationTime: null,
+      keys: { p256dh: 'p', auth: 'a' },
+    },
+  });
   assert.deepEqual(result, { status: 'disabled' });
   assert.deepEqual(sent, []);
 });

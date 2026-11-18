@@ -77,11 +77,30 @@ export function validateIrrigationPushAlarmCancellation(value: unknown) {
   return eventEquipmentId && revision ? { eventEquipmentId, revision } : null;
 }
 
-export function validateIrrigationPushSubscriptionRequest(value: unknown) {
+/**
+ * L'inscription d'un appareil dans un espace (docs/tranche-4-contract.md,
+ * F371 à F375) : l'espace, l'empreinte de la personne, calculée par le
+ * module, et le geste. Sans geste dit, c'est un simple renouvellement, qui
+ * ne prend jamais l'appareil d'une autre personne.
+ */
+export type IrrigationPushRegistration = {
+  recipientKey: string;
+  personKey: string;
+  intent: 'activate' | 'refresh';
+  subscription: IrrigationPushSubscription;
+};
+
+export function validateIrrigationPushSubscriptionRequest(value: unknown): IrrigationPushRegistration | null {
   if (!isRecord(value)) return null;
   const recipientKey = normalizeIdentifier(value.recipientKey);
+  const personKey = normalizeIdentifier(value.personKey);
   const subscription = validateIrrigationPushSubscription(value.subscription);
-  return recipientKey && subscription ? { recipientKey, subscription } : null;
+  const intent = value.intent === 'activate'
+    ? 'activate'
+    : value.intent === undefined || value.intent === 'refresh' ? 'refresh' : null;
+  return recipientKey && personKey && subscription && intent
+    ? { recipientKey, personKey, intent, subscription }
+    : null;
 }
 
 export function validateIrrigationPushUnsubscriptionRequest(value: unknown) {

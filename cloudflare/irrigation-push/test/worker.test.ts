@@ -2,12 +2,17 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { PushSubscription, VapidKeys } from '@block65/webcrypto-web-push';
 import { handlePushApiRequest, type PushApiDependencies } from '../src/api.ts';
-import type { IrrigationPushNotification, IrrigationPushSendRequest } from '../src/contract.ts';
+import type {
+  IrrigationPushNotification,
+  IrrigationPushRegistration,
+  IrrigationPushSendRequest,
+} from '../src/contract.ts';
 import { deliverWebPush } from '../src/delivery.ts';
 import {
   compareAlarmRevisions,
   deliveryRetryDelay,
   immediateDeliveryStatus,
+  retryAlarmName,
   shouldRetryDelivery,
 } from '../src/domain.ts';
 
@@ -47,21 +52,68 @@ test('l’API interne refuse tout appel sans secret partagé', async () => {
   assert.equal(response.status, 401);
 });
 
-test('les abonnements sont adressés au seul espace irrigation demandé', async () => {
-  const recipients: string[] = [];
+test('une inscription passe par l’appareil, avec l’espace, l’empreinte de la personne et le geste (F371)', async () => {
+  const registrations: Array<{ endpoint: string; registration: IrrigationPushRegistration }> = [];
   const dependencies = fakeDependencies({
-    onRecipient: (recipientKey) => recipients.push(recipientKey),
+    onRegister: (endpoint, registration) => registrations.push({ endpoint, registration }),
   });
   const response = await handlePushApiRequest(
-    new Request('https://worker.test/v1/subscriptions/upsert', {
-      method: 'POST',
-      headers: { ...authorization, 'content-type': 'application/json' },
-      body: JSON.stringify({ recipientKey: 'workspace-a', subscription }),
-    }),
+    subscriptionRequest({ recipientKey: 'workspace-a', personKey: 'personne-a', intent: 'activate', subscription }),
     dependencies,
   );
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { status: 'registered' });
+  assert.deepEqual(registrations, [{
+    endpoint: subscription.endpoint,
+    registration: { recipientKey: 'workspace-a', personKey: 'personne-a', intent: 'activate', subscription },
+  }]);
+});
+
+test('sans geste dit, une inscription n’est qu’un renouvellement (F372)', async () => {
+  const intents: string[] = [];
+  const response = await handlePushApiRequest(
+    subscriptionRequest({ recipientKey: 'workspace-a', personKey: 'personne-a', subscription }),
+    fakeDependencies({ onRegister: (_endpoint, registration) => intents.push(registration.intent) }),
+  );
+  assert.equal(response.status, 200);
+  assert.deepEqual(intents, ['refresh']);
+});
+
+test('une inscription sans personne, ou avec un geste inconnu, est refusée sans rien toucher', async () => {
+  for (const body of [
+    { recipientKey: 'workspace-a', subscription },
+    { recipientKey: 'workspace-a', personKey: 'personne a', subscription },
+    { recipientKey: 'workspace-a', personKey: 'personne-a', intent: 'prendre', subscription },
+    { personKey: 'personne-a', subscription },
+  ]) {
+    const response = await handlePushApiRequest(
+      subscriptionRequest(body),
+      fakeDependencies({ onRegister: () => assert.fail(`inscrit malgré ${JSON.stringify(body)}`) }),
+    );
+    assert.equal(response.status, 400, JSON.stringify(body));
+  }
+});
+
+test('un retrait passe par l’appareil et nomme l’espace qu’il quitte', async () => {
+  const removals: string[] = [];
+  const response = await handlePushApiRequest(
+    new Request('https://worker.test/v1/subscriptions/remove', {
+      method: 'POST',
+      headers: { ...authorization, 'content-type': 'application/json' },
+      body: JSON.stringify({ recipientKey: 'workspace-a', endpoint: subscription.endpoint }),
+    }),
+    fakeDependencies({ onUnregister: (endpoint, recipientKey) => removals.push(`${recipientKey} ${endpoint}`) }),
+  );
   assert.equal(response.status, 204);
-  assert.deepEqual(recipients, ['workspace-a']);
+  assert.deepEqual(removals, [`workspace-a ${subscription.endpoint}`]);
+});
+
+test('les nouvelles tentatives d’un envoi immédiat sont rangées par espace (D1, F377)', () => {
+  assert.notEqual(
+    retryAlarmName('workspace-a', 'crop-frost:2026-11-18:suite'),
+    retryAlarmName('workspace-b', 'crop-frost:2026-11-18:suite'),
+  );
+  assert.equal(retryAlarmName('workspace-a', 'crop-frost:2026-11-18:suite'), 'send:workspace-a:crop-frost:2026-11-18:suite');
 });
 
 test('les révisions empêchent une ancienne alarme de remplacer la nouvelle', () => {
@@ -103,7 +155,7 @@ test('l’envoi immédiat part vers le seul destinataire demandé et rend le ré
   );
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
-    status: 'sent', subscriptions: 1, delivered: 1, alreadyDelivered: 0, expired: 0, transient: 0, permanent: 0,
+    status: 'sent', subscriptions: 1, delivered: 1, alreadyDelivered: 0, expired: 0, reassigned: 0, transient: 0, permanent: 0,
   });
   assert.deepEqual(sent, [{
     notificationId: 'weather-alert:critere-1:v1:2026-11-03',
@@ -180,9 +232,12 @@ test('l’envoi immédiat garde les limites de texte et la liste blanche des adr
 });
 
 test('le résultat d’un envoi immédiat distingue envoyée, aucun appareil, nouvelle tentative et échec', () => {
-  const none = { subscriptions: 0, delivered: 0, alreadyDelivered: 0, expired: 0, transient: 0, permanent: 0 };
+  const none = { subscriptions: 0, delivered: 0, alreadyDelivered: 0, expired: 0, reassigned: 0, transient: 0, permanent: 0 };
   assert.equal(immediateDeliveryStatus(none), 'no-subscriber');
   assert.equal(immediateDeliveryStatus({ ...none, subscriptions: 2, expired: 2 }), 'no-subscriber');
+  // Un appareil passé à une autre personne n'est plus un appareil de cet espace (F371).
+  assert.equal(immediateDeliveryStatus({ ...none, subscriptions: 2, expired: 1, reassigned: 1 }), 'no-subscriber');
+  assert.equal(immediateDeliveryStatus({ ...none, subscriptions: 2, reassigned: 1, permanent: 1 }), 'failed');
   assert.equal(immediateDeliveryStatus({ ...none, subscriptions: 2, delivered: 1, transient: 1 }), 'sent');
   assert.equal(immediateDeliveryStatus({ ...none, subscriptions: 1, alreadyDelivered: 1 }), 'sent');
   assert.equal(immediateDeliveryStatus({ ...none, subscriptions: 2, transient: 1, permanent: 1 }), 'retrying');
@@ -221,23 +276,35 @@ test('chaque notification part en priorité haute, valable une heure', async () 
   );
 });
 
+function subscriptionRequest(body: unknown) {
+  return new Request('https://worker.test/v1/subscriptions/upsert', {
+    method: 'POST',
+    headers: { ...authorization, 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
 function fakeDependencies(options: {
-  onRecipient?: (recipientKey: string) => void;
+  onRegister?: (endpoint: string, registration: IrrigationPushRegistration) => void;
+  onUnregister?: (endpoint: string, recipientKey: string) => void;
   onSend?: (request: IrrigationPushSendRequest) => void;
 } = {}): PushApiDependencies {
   return {
     serviceToken: 'test-service-token',
     async sendNow(request) {
       options.onSend?.(request);
-      return { status: 'sent', subscriptions: 1, delivered: 1, alreadyDelivered: 0, expired: 0, transient: 0, permanent: 0 };
+      return { status: 'sent', subscriptions: 1, delivered: 1, alreadyDelivered: 0, expired: 0, reassigned: 0, transient: 0, permanent: 0 };
     },
     getAlarm: () => ({
       async schedule() { return { status: 'scheduled' }; },
       async cancel() { return { status: 'canceled' }; },
     }),
-    getRecipient: (recipientKey) => ({
-      async upsert() { options.onRecipient?.(recipientKey); },
-      async remove() { options.onRecipient?.(recipientKey); },
+    getDevice: (endpoint) => ({
+      async register(registration) {
+        options.onRegister?.(endpoint, registration);
+        return { status: 'registered' };
+      },
+      async unregister(recipientKey) { options.onUnregister?.(endpoint, recipientKey); },
     }),
   };
 }
