@@ -791,7 +791,8 @@ selon la règle de la section 10.
     reliée par OAuth, jetons chiffrés, un seul renouvellement à la fois,
     régulateur partagé entre les instances du serveur, une lecture qui ne
     part que si elle peut finir, budget du jour mesuré d'abord ; la voie de
-    secours par clé collée est une question au porteur ; le code attend son
+    secours par clé collée attend que le reste du pilote soit prêt (choix
+    du porteur, F369) ; le code attend son
     « vas-y » (cinq PR, les trois premières sans accès d'OTF), l'essai de
     bout en bout l'accès d'OTF. **Revue de l'isolation par un second fil
     faite le 18 novembre 2026** : un défaut à corriger avant la 4.6 (un
@@ -3914,7 +3915,7 @@ pages.
 | 4.0 | Démo guidée avec saisons : ferme de démonstration séparée, trois fermes fictives, visite guidée (D1 à D4, `docs/demo-guided-contract.md`) | 🔶 contrat validé le 8 novembre 2026, code après la 3.9 ; D1 codée le 13 novembre 2026 sur sa branche, PR après le tag `v0.2.0` ; D2 et D3 codées la même nuit sur les leurs ; D4 codée le 13 novembre 2026 au soir, sur le « vas-y » exprès du porteur ; **D1 à D4 en ligne** (#34 à #37, puis #45 et #46 le 14 novembre 2026) ; **recette réelle conforme le 14 novembre 2026**, Nicolas connecté le soir même ; reste la remise à zéro de nuit à lire dans les journaux | Opus 5.5 · Élevé (ligne 25, à relire au lancement) — D4 (Cloudflare) sur accord exprès du porteur |
 | 4.1 | Identité stable des exploitations (`otf_farm_id` alimenté automatiquement) | 🟡 **commencée le 17 novembre 2026 avec la 4.2, en un seul chantier**, sur le choix du porteur (D-155, F325 à F336, section 5 bis du contrat) : PR 1 sur 3, la clé d'espace dans chaque requête, **en ligne le 18 novembre 2026 à 0 h 35** (#87) ; PR 2, l'identité lue chez OTF et le rattachement automatique (D-156, F337 à F344), **en ligne le 18 novembre 2026 à 10 h 41** (#88) ; PR 3, le régulateur des appels par ferme (D-157), **en ligne le 18 novembre 2026 à 11 h 25** (#89) | Opus 5.5 · Max, avec la 4.2 (choix du porteur, D-155 ; Opus 5.5 · Élevé avant) — champ déjà présent, alimentation à automatiser |
 | 4.2 | Droits et isolation multi-structure | 🟡 **commencée le 17 novembre 2026 avec la 4.1** (D-155) : la PR 1 sur 3, en ligne le 18 novembre 2026 (#87), filtre chaque requête par la personne et la ferme ensemble ; la PR 2, en ligne le 18 novembre 2026 (#88), ferme la lecture d'OTF aux espaces d'une autre ferme ; la PR 3, en ligne le 18 novembre 2026 (#89), tient le quota de chaque ferme à part ; revue par un second fil faite le 18 novembre 2026 : un défaut à corriger avant la 4.6 (un appareil partagé reçoit les notifications de deux espaces), le reste repris au contrat de la 4.3 (D-158) | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — une fuite entre fermes est discrète et grave |
-| 4.3 | Connexion de chaque ferme à OTF par OAuth : coffre des jetons, renouvellement, révocation, droits, régulateur partagé et budget du jour (la ligne de septembre disait « Contrat d'intégration OTF, SSO, lien dans le menu Production » : ni le SSO ni un lien dans le menu d'OTF ne dépendent du module, F350) | 🟡 **contrat écrit le 18 novembre 2026** (D-158, F349 à F370, section 6.3 du contrat), sans code ; voie de secours par clé collée : question au porteur (F369) ; code sur son « vas-y », en cinq PR, dont trois sans accès d'OTF ; essai de bout en bout sur « Ferme v2 » n° 4394 à la validation d'OTF (formulaire envoyé le 18 novembre 2026) | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — identité et contrat avec un tiers, erreur difficile à rattraper |
+| 4.3 | Connexion de chaque ferme à OTF par OAuth : coffre des jetons, renouvellement, révocation, droits, régulateur partagé et budget du jour (la ligne de septembre disait « Contrat d'intégration OTF, SSO, lien dans le menu Production » : ni le SSO ni un lien dans le menu d'OTF ne dépendent du module, F350) | 🟡 **contrat écrit le 18 novembre 2026** (D-158, F349 à F370, section 6.3 du contrat), sans code ; voie de secours par clé collée : pas de code tant que le reste du pilote n'est pas prêt (choix du porteur le 18 novembre 2026, F369) ; code sur son « vas-y », en cinq PR, dont trois sans accès d'OTF ; essai de bout en bout sur « Ferme v2 » n° 4394 à la validation d'OTF (formulaire envoyé le 18 novembre 2026) | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — identité et contrat avec un tiers, erreur difficile à rattraper |
 | 4.4 | Configuration et accueil d'une nouvelle ferme | ⬜ | Opus 5.5 · Élevé — parcours délimité, vérifiable par un essai réel |
 | 4.5 | Exploitation : observabilité, sauvegardes D1, conservation, support | 🟡 à confirmer | Opus 5.5 · Très élevé — une sauvegarde qui ne restaure pas est un défaut silencieux |
 | 4.6 | Pilote multi-fermes et mise en production | ⬜ | Opus 5.5 · Max (Fable 5.1 · Très élevé avant D-055) — vraies fermes, vraies données, isolation à prouver en conditions réelles |
@@ -4105,13 +4106,14 @@ déploiement vérifié de la précédente, registres dans la PR :
 | 5 | Les tests de contrat des routes (T4-15), indépendante, qui peut passer plus tôt ; `GET /me` à plusieurs structures refusé partout | une réponse de forme changée n'est jamais rangée ; le journal nomme la route et le champ |
 
 Ensuite, hors code : la validation d'OTF (formulaire envoyé par le porteur
-le 18 novembre 2026 à 20 h 13), puis ses secrets posés par lui ; l'essai de bout en bout sur « Ferme v2 » n° 4394 ;
-sa ferme réelle reliée sur son « vas-y » ; le secret de la clé du
+le 18 novembre 2026 à 20 h 13), puis ses secrets posés par lui ; l'essai
+de bout en bout sur « Ferme v2 » n° 4394 ; sa ferme réelle reliée sur son
+« vas-y » ; le secret de la clé du
 déploiement retiré par lui, puis une PR qui en retire le chemin ; la part
 du quota quotidien fixée par lui après quatorze jours de compte. La 4.7 se
-ferme avec la 4.3. Question réservée au porteur : la voie de secours par
-clé collée (F369, option recommandée : ne pas la coder tant que le reste
-du pilote n'est pas prêt).
+ferme avec la 4.3. La voie de secours par clé collée attend que le reste
+du pilote soit prêt, et seulement si OTF n'a toujours pas validé (choix du
+porteur le 18 novembre 2026 à 20 h 50, F369).
 
 ### 4.7 — Hébergement et identité
 

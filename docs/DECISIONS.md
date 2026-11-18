@@ -5394,7 +5394,8 @@ instances du Worker, le budget quotidien, l'échelonnement.
 Date : 18 novembre 2026, soir. Décideur : Claude, à l'option recommandée,
 au lancement du coordinateur sur le mot du porteur (« Lance tous les
 chantiers en parallèle que tu peux », 20 h 04, heure de Paris), en
-Opus 5.5 · Max, réglage de la ligne 4.3 de la roadmap. Après D-157.
+Opus 5.5 · Max, réglage de la ligne 4.3 de la roadmap ; le porteur pour
+la voie de secours (F369, 20 h 50). Après D-157.
 
 **Pourquoi la question.** La section 6 du contrat (T4-09 à T4-17) disait
 quoi faire sans dire comment ; la 4.1 et la 4.2 ont laissé à la 4.3 le
@@ -5463,8 +5464,10 @@ section 6.3, F349 à F370) :
     les points D2 à D5 vont aux PR 1, 4 et 5 (F361, F364, F366, F370).
 
 **Réservé au porteur.** La voie de secours par clé personnelle collée
-(T4-10, F369, question 1 sur 1, option recommandée : ne pas la coder tant
-que le reste du pilote n'est pas prêt) ; la part du quota quotidien, après
+(T4-10, F369), tranchée par lui le 18 novembre 2026 à 20 h 50, à l'option
+recommandée (carte « 1 sur 1 ») : pas de code tant que le reste du pilote
+n'est pas prêt, et seulement si OTF n'a toujours pas validé ; la part du
+quota quotidien, après
 la mesure (F363) ; les secrets (F368) et tout réglage Cloudflare, dont la
 règle d'Access qu'il tient lui-même ; le « vas-y » du code ; la ferme
 réelle.

@@ -13,7 +13,8 @@ source détaillée commit par commit.
   « Déconnecter la ferme », rythme des appels partagé entre les instances
   du serveur, une lecture qui ne part que si elle peut finir, budget du
   jour mesuré d'abord ; le « SSO » et un lien dans le menu d'OTF hors du
-  module ; la voie de secours par clé collée, question au porteur ; ce que
+  module ; la voie de secours par clé collée attend que le reste du pilote
+  soit prêt (choix du porteur) ; ce que
   la revue de l'isolation du 18 novembre 2026 confie à la 4.3, dont la
   règle d'Access : jusqu'au pilote, seules des personnes de la ferme du
   porteur y sont admises. Aucun changement de comportement.

@@ -287,9 +287,10 @@ ont laissé à la 4.3 (F334, F335) : le régulateur partagé entre les instances
 du serveur, le budget quotidien, les jetons de chaque ferme et la lecture
 qui ne peut pas finir dans la minute. Tous les points suivent l'option
 recommandée : aucun n'est agronomique, ne touche au budget du porteur ni ne
-change un réglage de Cloudflare, et le porteur peut les changer. Une question lui
-est réservée (la voie de secours, F369) ; la part du quota quotidien laissée
-au module se fixe après une mesure (F363). Elles reprennent aussi ce que la
+change un réglage de Cloudflare, et le porteur peut les changer. La question
+qui lui était réservée (la voie de secours, F369) est tranchée par lui le
+soir même ; la part du quota quotidien laissée au module se fixe après une
+mesure (F363). Elles reprennent aussi ce que la
 revue de l'isolation, faite par un second fil le 18 novembre 2026
 (`/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`),
 confie à la 4.3 : son constat B (F365, F366), la question de son constat A
@@ -597,13 +598,15 @@ confie à la 4.3 : son constat B (F365, F366), la question de son constat A
   temps d'une rotation). Sans `OTF_OAUTH_CLIENT_ID` ou sans clé maîtresse
   lisible, rien de la 4.3 ne s'ouvre, et le module lit comme avant avec la
   clé du déploiement. Poser un secret est un réglage Cloudflare : son acte.
-- **F369 · La voie de secours par clé personnelle collée (T4-10) :
-  [À TRANCHER, question 1 sur 1].** T4-10 la réserve au cas où « la
-  validation d'OTF tarde au moment où l'isolation est prête ». Option
-  recommandée : ne pas la coder tant que le reste du pilote n'est pas prêt
-  (relecture juridique, revue de l'isolation, accord écrit des fermes amies,
-  part du quota fixée), et seulement si OTF n'a toujours pas validé
-  l'application à ce moment-là. Raisons : le pilote attend de toute façon
+- **F369 · La voie de secours par clé personnelle collée (T4-10),
+  tranchée par le porteur le 18 novembre 2026 à 20 h 50** (carte « 1 sur
+  1 », option recommandée). T4-10 la réserve au cas où « la validation
+  d'OTF tarde au moment où l'isolation est prête ». Elle n'est pas codée
+  tant que le reste du pilote n'est pas prêt (relecture juridique,
+  correctif du constat A de la revue de l'isolation, accord écrit des
+  fermes amies, part du quota fixée), et seulement si OTF n'a toujours pas
+  validé l'application à ce moment-là ; son code demande alors le
+  « vas-y » du porteur, comme toute sous-tranche. Raisons : le pilote attend de toute façon
   la relecture juridique ; une clé personnelle peut porter des droits
   d'écriture que le module ne sait pas voir (OTF ne décrit aucune route qui
   dise les droits d'une clé), un risque plus grand qu'une application

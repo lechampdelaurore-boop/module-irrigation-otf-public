@@ -110,9 +110,11 @@ registres, elle y renvoie.
   (F350). **Règle d'exploitation, dès maintenant et jusqu'au pilote**
   (F366, constat B de la revue) : la règle d'Access du module principal
   n'admet que des personnes de la ferme du porteur ; les fermes amies
-  essaient la démonstration. Restent au porteur : la question de la voie
-  de secours par clé collée (F369, 1 sur 1) ; le « vas-y » du code (cinq
-  PR, les trois premières sans accès d'OTF) ; ses secrets, à la validation
+  essaient la démonstration. La voie de secours par clé collée est
+  tranchée par le porteur le 18 novembre 2026 à 20 h 50 (F369, carte
+  « 1 sur 1 ») : pas de code tant que le reste du pilote n'est pas prêt.
+  Restent au porteur : le « vas-y » du code (cinq PR, les trois premières
+  sans accès d'OTF) ; ses secrets, à la validation
   de sa demande par OTF (formulaire envoyé le 18 novembre 2026 à 20 h 13).
   Aucun contrôle rejoué : PR de documentation seule, la CI de la PR rejoue
   tout.
