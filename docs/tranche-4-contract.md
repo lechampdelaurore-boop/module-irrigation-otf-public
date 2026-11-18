@@ -247,6 +247,92 @@ précisent F329 à F332 sans les changer.
   l'écran ; la première lecture d'OTF sous la nouvelle clé est une lecture
   complète, comme une actualisation.
 
+### 5 quater. Un appareil, une personne : les notifications d'un appareil partagé (18 novembre 2026, D-159, F371 à F378)
+
+Le correctif du constat A de la revue de l'isolation du 18 novembre 2026
+(`/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`), avec
+ses points C3 et D1, dû avant la 4.6 (F351). Avant lui, un appareil où deux
+personnes avaient ouvert le module restait inscrit dans leurs deux espaces
+et recevait en silence les notifications des deux : gel avec les noms des
+cultures, fins d'arrosage avec le matériel, suggestions du planning, alertes
+météo. Ces règles précisent celle de F351 (« les notifications d'un
+appareil suivent la personne qui l'a inscrit en dernier, pas l'espace »)
+sans la changer. Décidées avant le code et écrites dans la même PR que lui,
+le 18 novembre 2026 au soir, en Opus 5.5 · Max (réglage de la 4.2), sur le
+mandat de nuit du porteur. Toutes suivent l'option recommandée : aucune
+n'est agronomique ni ne touche au budget, aucune ne demande de changer un
+réglage de Cloudflare à la main, et le porteur peut les changer. La revue
+proposait « un appareil, un espace » ; F351 a gardé « un appareil, une
+personne », pour qu'une personne qui a deux fermes reçoive les deux (F373).
+
+- **F371 · Un appareil, une personne.** Le service de notification garde,
+  pour chaque appareil (son adresse d'abonnement, donnée par le
+  navigateur), la personne à qui il est et les espaces de cette personne où
+  il est inscrit. Une notification d'un espace ne part que vers les
+  appareils inscrits dans cet espace d'après cette fiche : au moment
+  d'envoyer, chaque appareil de la liste de l'espace est vérifié, et celui
+  qui n'est plus à cet espace en est retiré sans rien recevoir. Si la
+  vérification échoue, rien n'est envoyé à cet appareil et l'envoi se
+  retente plus tard, comme après une panne du fournisseur. La personne n'est
+  connue du service que par une empreinte : le SHA-256, en hexadécimal, de
+  `irrigation-push-person:` suivi de son identifiant de connexion, celui de
+  sa clé d'espace (F327). Le serveur du module la calcule ; elle ne vient
+  jamais du navigateur. Le service ne reçoit ni cet identifiant, ni le nom,
+  ni le courriel de la personne ; les espaces d'une même personne ont la
+  même empreinte.
+- **F372 · Seul le geste « Activer » change la personne d'un appareil.**
+  « Activer » inscrit l'appareil pour la personne connectée, dans son espace
+  courant ; s'il était à une autre personne, il passe à elle et quitte
+  aussitôt tous les espaces de la précédente. L'ouverture d'une page, qui
+  renouvelle l'inscription d'un appareil où les notifications sont
+  permises, ne prend jamais un appareil : elle l'inscrit dans l'espace
+  courant s'il est déjà à cette personne, ou s'il n'est à personne ; s'il est
+  à une autre personne, rien ne change. Le geste vient du navigateur, mais
+  seul `activate` exact prend un appareil : toute autre valeur, absente
+  comprise, vaut renouvellement. « La personne qui l'a inscrit en dernier »
+  de F351 est donc celle du dernier « Activer » : la personne qui prête son
+  téléphone pour ouvrir le module ne perd pas ses alertes, et celle qui
+  l'emprunte n'en reçoit aucune.
+- **F373 · Une même personne, plusieurs espaces.** Un appareil reçoit les
+  notifications de chaque espace de sa personne où il a été inscrit, par
+  exemple de ses deux fermes à partir de la 4.4 ; vingt espaces au plus : au
+  vingt et unième, le plus ancien est détaché. Que chaque notification nomme
+  sa ferme reste à la 4.4 (F351).
+- **F374 · Ce que montre la page sur l'appareil d'une autre personne.** Elle
+  le présente comme un appareil où les notifications ne sont pas encore
+  activées (« Cet appareil ne reçoit pas encore les alertes. »), avec le
+  bouton « Activer ». Rien ne dit à qui il est ni ce qu'il reçoit.
+- **F375 · Les appareils inscrits avant le correctif.** Le service n'a pas
+  de fiche pour eux. Le premier espace qui leur envoie une notification les
+  garde, sans personne ; ils quittent la liste des autres espaces au premier
+  envoi de ceux-ci. La première page ouverte sur un tel appareil le donne à
+  la personne connectée, dans son seul espace. Un appareil qui n'était
+  inscrit que dans un espace continue donc de recevoir sans que personne
+  n'ait rien à refaire.
+- **F376 · « Désactiver » et les appareils disparus.** « Désactiver » retire
+  l'appareil de l'espace courant ; il reste à sa personne, même sans plus
+  aucun espace : une ancienne inscription, d'avant le correctif, ne peut plus
+  le reprendre au premier envoi. Un appareil que le fournisseur déclare
+  disparu (abonnement expiré) est retiré de la liste et sa fiche oubliée.
+- **F377 · Nouvelles tentatives par espace (D1).** Une notification qui
+  échoue se retente sous le nom `send:<espace>:<identifiant>` : deux espaces
+  qui envoient le même identifiant le même jour (le gel d'un jour est
+  `crop-frost:<jour>:suite` dans toutes les fermes) gardent chacun sa
+  tentative.
+- **F378 · Les preuves (C3).** Les tests du service font tourner son vrai
+  code, ses trois classes de Durable Objects comprises, sur une mémoire de
+  test qui imite Cloudflare (`cloudflare/irrigation-push/test/support/`) :
+  le même appareil inscrit à A par Alice puis à B par Bob ne reçoit rien
+  d'un envoi à A ; la page de Bob ne prend pas l'appareil d'Alice ;
+  « Activer » le prend ; deux fermes d'une même personne ; le vingt et
+  unième espace ; « Désactiver » ; les appareils d'avant le correctif ; deux
+  inscriptions simultanées ; une alarme de fin d'arrosage programmée avant
+  le changement de personne ; les nouvelles tentatives de deux espaces ; la
+  vérification qui échoue ; l'appareil expiré. Côté module, des tests
+  vérifient l'empreinte, le geste et la réponse du service. Dix sabotages,
+  chacun retirant une de ces règles du code, font chacun échouer au moins
+  un test (la liste est dans la PR).
+
 ## 6. Connexion à l'API d'OTF (4.3)
 
 ### 6.1 Ce que la documentation d'OTF établit (lue le 7/11 ; à relire avant le code)
