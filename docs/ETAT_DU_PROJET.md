@@ -163,12 +163,33 @@ registres, elle y renvoie.
   build`, `pnpm knip`, `pnpm push:check` (43 tests), `pnpm
   weather:check`, `pnpm site:check` réussis en local ; dix sabotages du
   code, chacun détecté par au moins un test ; la suite complète des
-  parcours jouée par la CI de la PR. **PR ouverte**
-  (`fix/notifications-un-appareil-une-personne`). Non vérifié : un essai
+  parcours jouée par la CI de la PR. **En ligne le 18 novembre 2026 à
+  22 h 52** (consigné par la PR suivante, celle des preuves C1 et C2) :
+  #92 fusionnée à 22 h 37, run 44403395921 vérifié job par job
+  (« Application », « Workers Cloudflare », « Parcours navigateur »,
+  « Déploiement Cloudflare », étape « Déployer le Worker Push » comprise,
+  et « Déploiement de la démonstration », verts). Non vérifié : un essai
   physique sur un vrai téléphone partagé par deux personnes (il demande
   deux comptes Access) ; à constater après le déploiement, que la
-  prochaine notification arrive toujours sur le téléphone du porteur. Les
-  preuves C1 et C2 de la revue suivent dans une PR de tests seuls.
+  prochaine notification arrive toujours sur le téléphone du porteur.
+- Tranche 4, **preuves C1 et C2 de la revue de l'isolation** (D-160, F379
+  et F380, section 5 quinquies de `docs/tranche-4-contract.md`), écrites
+  la nuit du 18 au 19 novembre 2026 en Opus 5.5 · Max (réglage de la 4.2),
+  sous le mandat de nuit du porteur. Des tests seuls : `db/` ne change pas.
+  Un troisième passage d'isolation, « rattachement », rejoue les tests de
+  persistance avec l'espace sans ferme d'une personne et son espace de
+  ferme (C2). Un contrôle de cohérence des espaces, à la fin de chaque test
+  qui écrit dans la base de test, refuse toute ligne qui désigne une ligne
+  d'un autre espace et s'arrête sur toute table ou colonne nouvelle non
+  rangée ; sept tests « Bob désigne l'objet d'Alice » de plus (C1).
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 662
+  tests, puis 389 pour chacun des trois passages d'isolation), `pnpm
+  build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm
+  site:check` réussis en local ; sept sabotages, chacun détecté ; la suite
+  complète des parcours jouée par la CI de la PR. **PR ouverte**
+  (`test/preuves-isolation-c1-c2`). La revue de l'isolation est ainsi
+  toute reprise : A, C1 à C3 et D1 faits ; B et D2 à D5 au contrat de la
+  4.3 ; D6 à l'accord écrit des fermes pilotes (4.6).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

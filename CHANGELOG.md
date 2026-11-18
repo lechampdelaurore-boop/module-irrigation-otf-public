@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, isolation : les preuves C1 et C2)
+
+- **Le passage « rattachement »** (F379, point C2 de la revue de
+  l'isolation du 18 novembre 2026) : les tests de persistance sont rejoués
+  une troisième fois, avec l'espace sans ferme d'une personne et son espace
+  de ferme, le cas du rattachement.
+- **Le contrôle de cohérence des espaces** (F380, point C1) : à la fin de
+  chaque test qui écrit dans la base de test, aucune ligne d'un espace ne
+  doit désigner une ligne d'un autre espace ; une table ou une colonne
+  nouvelle doit y être rangée. Sept tests « Bob désigne l'objet d'Alice »
+  de plus. Des tests seuls : aucun changement de comportement.
+- En ligne le 18 novembre 2026 : #92, un appareil, une personne,
+  fusionnée à 22 h 37 et déployée à 22 h 52 (run 44403395921, cinq jobs
+  verts).
+
 ### Corrigé (Tranche 4, isolation : les notifications d'un appareil partagé)
 
 - **Un appareil, une personne** (D-159, F371 à F378, constat A de la revue
