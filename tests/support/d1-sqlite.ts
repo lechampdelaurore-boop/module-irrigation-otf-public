@@ -13,6 +13,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { overrideDatabase } from '../../db/binding';
+import { crossSpaceReferences } from './space-coherence';
 
 type SqliteParameter = null | number | bigint | string | Uint8Array;
 type Row = Record<string, unknown>;
@@ -55,7 +56,11 @@ export function createD1FromSqlite(database: DatabaseSync): D1Database {
 export type TestDatabase = {
   sqlite: DatabaseSync;
   d1: D1Database;
-  /** Rend la main à la liaison du Worker et ferme la base. */
+  /**
+   * Rend la main à la liaison du Worker et ferme la base, après le contrôle
+   * de cohérence des espaces (F380) : si une ligne désigne une ligne d'un
+   * autre espace, le test qui l'a écrite échoue.
+   */
   dispose: () => void;
 };
 
@@ -68,8 +73,16 @@ export function installTestDatabase(): TestDatabase {
     sqlite,
     d1,
     dispose: () => {
-      overrideDatabase(null);
-      sqlite.close();
+      let found: string[] = [];
+      try {
+        found = crossSpaceReferences(sqlite);
+      } finally {
+        overrideDatabase(null);
+        sqlite.close();
+      }
+      if (found.length > 0) {
+        throw new Error(`Une ligne désigne une ligne d’un autre espace (F380) :\n${found.join('\n')}`);
+      }
     },
   };
 }
