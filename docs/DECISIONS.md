@@ -5388,3 +5388,90 @@ s'arrête après quelques appels, avec le dernier instantané et le message
 Ne changent pas : D-155, D-156, la règle du projet de 4 requêtes par
 seconde au plus. Restent à la 4.3 (F335) : le régulateur partagé entre
 instances du Worker, le budget quotidien, l'échelonnement.
+
+## D-158 — Tranche 4, sous-tranche 4.3 : le contrat de la connexion de chaque ferme à Ouvre ta ferme, écrit avant le code
+
+Date : 18 novembre 2026, soir. Décideur : Claude, à l'option recommandée,
+au lancement du coordinateur sur le mot du porteur (« Lance tous les
+chantiers en parallèle que tu peux », 20 h 04, heure de Paris), en
+Opus 5.5 · Max, réglage de la ligne 4.3 de la roadmap ; le porteur pour
+la voie de secours (F369, 20 h 50). Après D-157.
+
+**Pourquoi la question.** La section 6 du contrat (T4-09 à T4-17) disait
+quoi faire sans dire comment ; la 4.1 et la 4.2 ont laissé à la 4.3 le
+régulateur partagé entre les instances du serveur, le budget quotidien, les
+jetons de chaque ferme et la lecture qui ne peut pas finir dans la minute
+(F334, F335) ; F323 laissait à la 4.3 le sort des journaux qui gardent
+l'adresse de retour. La documentation d'OTF, relue le soir même, précise
+l'échange (code valable une minute, ferme rendue avec les jetons, jeton de
+renouvellement remplacé à chaque usage, aucune route de révocation par
+l'application, aucun en-tête de quota restant). La revue de l'isolation,
+faite par un second fil le même jour, confie à la 4.3 son constat B (toute
+personne admise par Access ouvre la ferme de la clé du déploiement), la
+question de son constat A (les notifications d'un appareil partagé) et ses
+points D2 à D5. Le formulaire d'OTF est parti le même soir, à 20 h 13
+(4.8). Aucun de ces points n'est agronomique, ne touche au budget du
+porteur ni ne change un réglage de Cloudflare.
+
+**Décision.** Toutes à l'option recommandée (`docs/tranche-4-contract.md`,
+section 6.3, F349 à F370) :
+
+1. Un raccordement par ferme, à une seule personne ; avant la 4.4, une
+   personne relie une seule ferme. Le départ est une demande `POST`, avec
+   `state` et PKCE gardés dix minutes côté serveur ; le retour vérifie la
+   demande, l'identité par `GET /me`, les droits en lecture seule et
+   l'accès de la ferme avant de rien garder.
+2. Les journaux d'invocation du Worker restent tels quels (F323 tranché) :
+   le code qu'ils gardent vaut une minute, ne sert qu'une fois et ne sert à
+   rien sans le `code_verifier`, qui ne quitte jamais le serveur ; les
+   journaux du module n'écrivent ni code, ni `state`, ni jeton.
+3. Le coffre : AES-256-GCM, le chiffré lié à sa ferme et à son rôle, une
+   clé maîtresse posée par le porteur, sa rotation éprouvée par des tests
+   et essayée pour de vrai avant la première ferme tierce.
+4. Un seul renouvellement à la fois par ferme, par un bail écrit dans la
+   base ; un refus d'OTF met le raccordement en « reconnexion demandée »,
+   jamais en boucle ; un frein coupe tout appel après 10 échecs
+   d'authentification en 15 minutes (OTF bloque à 100).
+5. « Déconnecter la ferme » efface le raccordement, ses jetons et les
+   copies lues dans OTF ; ce que la personne a saisi reste dans son espace.
+6. Le régulateur partagé se compte dans la base D1, par ferme, quelle que
+   soit la clé : aucun nouveau produit Cloudflare, aucune dépense nouvelle.
+   Une lecture complète à la fois par ferme ; elle réserve ses appels et ne
+   part que si elle peut finir ; une lecture de plus de 30 appels ne se fait
+   qu'au calcul du matin.
+7. Le budget du jour se mesure d'abord : le module compte ses appels par
+   ferme et par jour ; seul le `429` du jour d'OTF arrête les appels
+   jusqu'à sa levée ; la part du quota laissée au module est posée au
+   porteur après quatorze jours de compte, chiffres à l'appui, et aucune
+   ferme tierce n'est reliée avant.
+8. Le « SSO » et le « lien dans le menu Production » de la ligne 4.3 de
+   septembre ne dépendent pas du module : OTF ne documente aucune connexion
+   des personnes, la connexion reste Access (T4-05), et un lien dans le menu
+   d'OTF ne peut être posé que par OTF. La ligne 4.3 de la roadmap est
+   alignée sur la section 4 du contrat.
+9. Le code, sur le « vas-y » de sous-tranche du porteur, en cinq PR : le
+   compteur partagé, le coffre, l'autorisation et « Réglages », la lecture
+   par le raccordement, les tests de contrat des routes ; les trois
+   premières ne demandent aucun accès d'OTF. Puis l'essai de bout en bout
+   sur « Ferme v2 » n° 4394, la ferme réelle reliée sur son « vas-y », et
+   le retrait de la clé du déploiement, son acte.
+10. Ce que la revue de l'isolation confie à la 4.3 : à partir de la PR 4,
+    une personne sans raccordement n'obtient plus la ferme de la clé du
+    déploiement, sans repli, et une personne inconnue n'ouvre aucune
+    ferme ; jusqu'au pilote, la règle d'Access du module principal n'admet
+    que des personnes de la ferme du porteur ; les notifications d'un
+    appareil suivent la personne qui l'a inscrit en dernier, pas l'espace ;
+    les points D2 à D5 vont aux PR 1, 4 et 5 (F361, F364, F366, F370).
+
+**Réservé au porteur.** La voie de secours par clé personnelle collée
+(T4-10, F369), tranchée par lui le 18 novembre 2026 à 20 h 50, à l'option
+recommandée (carte « 1 sur 1 ») : pas de code tant que le reste du pilote
+n'est pas prêt, et seulement si OTF n'a toujours pas validé ; la part du
+quota quotidien, après
+la mesure (F363) ; les secrets (F368) et tout réglage Cloudflare, dont la
+règle d'Access qu'il tient lui-même ; le « vas-y » du code ; la ferme
+réelle.
+
+Ne changent pas : D-142 (T4-01 à T4-20, précisés sans être changés),
+D-155 à D-157, D-002 (lecture seule, 4 appels par seconde au plus), D-003
+(rien n'est deviné), D-096 (la démonstration ne lit jamais OTF).

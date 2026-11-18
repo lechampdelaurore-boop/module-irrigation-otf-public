@@ -5,6 +5,26 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.3, le contrat de la connexion à Ouvre ta ferme, sans code)
+
+- `docs/tranche-4-contract.md`, section 6.3 (D-158, F349 à F370) : chaque
+  ferme reliée par OAuth à une seule personne, jetons chiffrés liés à leur
+  ferme, un seul renouvellement à la fois, refus d'OTF sans boucle,
+  « Déconnecter la ferme », rythme des appels partagé entre les instances
+  du serveur, une lecture qui ne part que si elle peut finir, budget du
+  jour mesuré d'abord ; le « SSO » et un lien dans le menu d'OTF hors du
+  module ; la voie de secours par clé collée attend que le reste du pilote
+  soit prêt (choix du porteur) ; ce que
+  la revue de l'isolation du 18 novembre 2026 confie à la 4.3, dont la
+  règle d'Access : jusqu'au pilote, seules des personnes de la ferme du
+  porteur y sont admises. Aucun changement de comportement.
+- En ligne le 18 novembre 2026 : #89, la PR 3 de la 4.1 et de la 4.2,
+  déployée à 11 h 25 ; #90, le site public et la 4.8 close, fusionnée à
+  21 h 20 et déployée à 21 h 38 (run 44389956513, cinq jobs verts).
+- Recette de #88 (PR 2 de la 4.1 et de la 4.2) faite par le porteur le
+  18 novembre 2026 à 20 h 06 : une ouverture du module, rien n'a changé à
+  l'écran (« Le module s'affiche normalement. »).
+
 ### Corrigé (Tranche 4, 4.8, le site public)
 
 - **L'accueil du site public, plus clair** (F345, F346, remarques du
