@@ -82,12 +82,27 @@ test("la page d'accueil dit ce que fait le module, pour qui, ce qu'il ne fait pa
     assert.match(body, new RegExp(`<h2>${heading}</h2>`), heading);
   }
   assert.match(body, /démonstration/);
+  // Précisions du porteur du 18 novembre 2026 (F345, F346).
+  assert.match(body, /pas encore de vanne ni de capteur : c'est en cours de développement/);
+  assert.match(body, /travaillera sur ses vraies données/);
+  assert.match(body, /pas encore ouvert à tous/);
+  // Le contact, de préférence par Discord (F347).
+  assert.match(body, /de préférence par Discord/);
+  assert.match(body, /décrivez-le bien par écrit/);
+  assert.match(body, /captures d'écran si possible/);
   assert.ok(body.includes(RESPONSIBLE));
 });
 
 test("les conditions d'utilisation disent : tel quel, aide à la décision, responsabilité de l'exploitant", async () => {
   const { body } = await get(PAGE_PATHS.terms);
   assert.match(body, /tel quel/);
+  // Le prix (F348, choix du porteur du 18 novembre 2026) : gratuit pendant le
+  // pilote, puis une participation possible aux frais, annoncée à l'avance.
+  assert.match(body, /<strong>Prix\.<\/strong> Le module est gratuit pendant toute la durée du pilote\./);
+  assert.match(body, /de l'ordre de 1 € par mois et par ferme, uniquement pour couvrir ces frais, sans but lucratif/);
+  assert.match(body, /annoncée à l'avance/);
+  assert.match(body, /libre d'arrêter/);
+  assert.match(body, /Texte du 18 novembre 2026/);
   assert.match(body, /aide à la décision/i);
   assert.match(body, /responsable de sa ferme/);
 });

@@ -11,7 +11,7 @@ import { escapeHtml, renderPage } from './layout.ts';
  */
 
 export const RESPONSIBLE = "François PREZEAU, GAEC Le Champ de l'Aurore";
-const TEXT_DATE = '17 novembre 2026';
+const TEXT_DATE = '18 novembre 2026';
 
 /** Une adresse électronique plausible : une valeur mal saisie ne s'affiche pas. */
 const EMAIL_PATTERN = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
@@ -48,14 +48,16 @@ export function homePage(contactEmail: string | undefined): string {
 <p>Pour les fermes maraîchères qui tiennent leur plan dans Ouvre ta ferme et ont l'abonnement qui ouvre son interface de programmation (API). Les AMAP n'y ont pas accès : le module ne peut pas les servir.</p>
 <h2>Ce qu'il ne fait pas</h2>
 <ul>
-<li>Il ne pilote aucune vanne ni aucun capteur.</li>
+<li>Il ne pilote pas encore de vanne ni de capteur : c'est en cours de développement.</li>
 <li>Il ne remplace pas le jugement de l'exploitant : ses calculs sont une aide à la décision, pas une garantie.</li>
 <li>Il n'est pas encore ouvert à toutes les fermes : il est en essai sur une ferme, puis sur quelques fermes amies.</li>
 </ul>
 <h2>L'essayer</h2>
-<p>Le module lui-même est réservé aux fermes reliées, après connexion. Une démonstration avec des fermes fictives existe, sur invitation : demandez-la ${contactHtml(contactEmail)}.</p>
+<p>Une ferme qui utilise Ouvre ta ferme pourra relier le module à son propre compte. Après connexion, elle y travaillera sur ses vraies données : son plan, ses cultures, son matériel et ses arrosages. Ce raccordement n'est pas encore ouvert à tous : il le sera d'abord pour quelques fermes amies.</p>
+<p>En attendant, une démonstration avec des fermes fictives permet de tout essayer sans rien risquer, sur invitation : demandez-la ${contactHtml(contactEmail)}.</p>
 <h2>Contact</h2>
-<p>Responsable : ${RESPONSIBLE}. Pour toute question, ${contactHtml(contactEmail)}.</p>
+<p>Responsable : ${RESPONSIBLE}. Pour toute question, de préférence par Discord ; sinon ${contactHtml(contactEmail)}.</p>
+<p>En cas de problème, décrivez-le bien par écrit : sur quelle page, ce que vous faisiez, ce qui s'est passé. Joignez des captures d'écran si possible.</p>
 <p>Lire aussi la <a href="${PAGE_PATHS.privacy}">politique de confidentialité</a> et les <a href="${PAGE_PATHS.terms}">conditions d'utilisation</a>. Le code du module est public : <a href="${SOURCE_URL}">page du projet</a>.</p>`,
   });
 }
@@ -139,7 +141,8 @@ export function termsPage(contactEmail: string | undefined): string {
     body: `<h1>Conditions d'utilisation</h1>
 <p class="updated">Texte du ${TEXT_DATE}.</p>
 <ul>
-<li><strong>Un service fourni tel quel.</strong> Le module est en essai, gratuit pendant le pilote, sans garantie de disponibilité ni d'absence d'erreur.</li>
+<li><strong>Prix.</strong> Le module est gratuit pendant toute la durée du pilote. Il est développé et maintenu bénévolement par une ferme, qui en paie seule les frais : l'hébergement (environ 5 € par mois aujourd'hui, davantage si le nombre de fermes augmente) et les outils de développement et de maintenance (environ 100 € par mois). Après le pilote, selon le nombre de fermes qui l'utilisent, une petite participation pourra être demandée, de l'ordre de 1 € par mois et par ferme, uniquement pour couvrir ces frais, sans but lucratif. Toute participation sera annoncée à l'avance, et chaque ferme restera libre d'arrêter d'utiliser le module.</li>
+<li><strong>Un service fourni tel quel.</strong> Le module est en essai, sans garantie de disponibilité ni d'absence d'erreur.</li>
 <li><strong>Une aide à la décision.</strong> Les besoins, plannings et alertes sont des calculs à partir de vos réglages et de la météo. Ils ne garantissent aucun résultat : les décisions d'arrosage restent celles de l'exploitant.</li>
 <li><strong>Votre ferme sous votre responsabilité.</strong> L'exploitant reste responsable de sa ferme, de son eau et du respect des arrêtés de restriction.</li>
 <li><strong>Lecture seule.</strong> Le module ne modifie rien dans Ouvre ta ferme. L'accès se retire à tout moment depuis Ouvre ta ferme.</li>

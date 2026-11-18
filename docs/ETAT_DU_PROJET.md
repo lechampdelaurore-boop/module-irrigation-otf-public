@@ -37,11 +37,23 @@ registres, elle y renvoie.
   **En ligne le 17 novembre 2026 à 21 h 59** : #86 fusionnée à 21 h 39,
   run 44171528159 vérifié job par job (« Application », « Workers
   Cloudflare », « Parcours navigateur », « Déploiement Cloudflare », site
-  public compris, et « Déploiement de la démonstration », verts). Restent :
-  l'adresse de contact que le porteur pose lui-même
-  (`SITE_CONTACT_EMAIL`), sa relecture du texte en ligne, l'envoi du
-  formulaire d'OTF par lui, la relecture juridique avant toute ferme
-  tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
+  public compris, et « Déploiement de la démonstration », verts).
+  **Adresse de contact posée par le porteur le 18 novembre 2026** (secret
+  `SITE_CONTACT_EMAIL`, la page de confidentialité vérifiée) ; sa relecture
+  est en cours, ses premières remarques (F345 à F347 : vannes et capteurs
+  « en cours de développement », « L'essayer » plus clair, contact de
+  préférence par Discord) corrigées le jour même ; **relecture finie et
+  textes validés par le porteur le 18 novembre 2026 à 20 h 04** (« J'ai
+  fini de relire les 3 pages, je valide en l'état »). **Formulaire d'OTF envoyé par le
+  porteur lui-même le 18 novembre 2026 à 20 h 13** : la demande « Module
+  d'irrigation pour Ouvre ta ferme » est « En attente » chez OTF, cinq
+  droits en lecture, chacun avec sa raison ; **4.8 close**. Le même
+  soir, sur son mot, les conditions d'utilisation ont une rubrique
+  « Prix » : gratuit pendant le pilote, puis une participation possible
+  d'environ 1 € par mois et par ferme pour couvrir les frais (F348).
+  Restent :
+  la validation d'OTF (délai hors de notre main), la relecture juridique
+  avant toute ferme tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
   2026 à 8 h 43 (run 43824015609, cinq jobs verts).
 - Tranche 4, **4.1 et 4.2 commencées ensemble le 17 novembre 2026 au
   soir, en Opus 5.5 · Max**, sur le choix du porteur (carte « 1 sur 1 »,
@@ -83,11 +95,15 @@ registres, elle y renvoie.
   limite atteinte. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm
   test`, `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; la suite complète des parcours jouée
-  par la CI de la PR. La revue de l'isolation par un second fil, due avant
-  toute ferme tierce (4.6), est faite le 18 novembre 2026, sans PR (constats
-  dans `/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`) :
-  un appareil partagé reçoit les notifications de deux espaces (constat A),
-  à corriger avant la 4.6 par un chantier de code à part ; toute personne
+  par la CI de la PR.
+  **PR 3 sur 3 en ligne** (consigné par la PR suivante, celle du site
+  public, F345 à F347) : #89 fusionnée le 18 novembre 2026 à 11 h 05,
+  déployée à 11 h 25, run 44282058341 vérifié job par job (cinq jobs verts).
+  La revue de l'isolation par un second fil, due avant toute ferme tierce
+  (4.6), est faite le 18 novembre 2026, sans PR (constats dans
+  `/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`) : un
+  appareil partagé reçoit les notifications de deux espaces (constat A), à
+  corriger avant la 4.6 par un chantier de code à part ; toute personne
   admise par Access ouvre la ferme du porteur (constat B) : règle d'Access
   ci-dessous, et fin de ce repli au contrat de la 4.3, avec les points D2 à
   D5 ; D6 à l'accord écrit des fermes pilotes (4.6).
