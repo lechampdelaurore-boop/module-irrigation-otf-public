@@ -7,6 +7,7 @@ import { farmSpaceKey } from '@/lib/domain/farm-space';
 import { farmIdentityShape, otfFarmIdentity, snapshotFarmIdentity } from '@/lib/domain/otf/farm-identity';
 import { readLatestCachedSnapshotOfSpace } from './irrigation-service';
 import { createOtfReadClient, readOtfDataSource } from './otf-connection';
+import { DEPLOYMENT_KEY_UNKNOWN_FARM_PACE, sharedPaceForLoneCalls } from './otf-farm-read';
 
 /**
  * La ferme de la personne connectée (4.1, docs/tranche-4-contract.md, F327,
@@ -38,7 +39,8 @@ export type FarmIdentityDependencies = {
 
 const defaultDependencies: FarmIdentityDependencies = {
   dataSource: readOtfDataSource,
-  readOtfMe: () => createOtfReadClient().getCurrentStructures(),
+  // La ferme n'est pas encore connue : ce seul appel se compte à part (F381).
+  readOtfMe: () => createOtfReadClient({ sharedPace: sharedPaceForLoneCalls(DEPLOYMENT_KEY_UNKNOWN_FARM_PACE) }).getCurrentStructures(),
   now: () => new Date(),
 };
 

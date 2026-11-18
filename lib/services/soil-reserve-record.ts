@@ -50,7 +50,7 @@ export async function recordSoilDaysForAllWorkspaces({
   // Seules les fermes qui ont coché Réserve du sol enregistrent l'état du jour (3.8, R1, P5).
   for (const { ownerUserId } of await listFarmsWithFeature('sol')) {
     try {
-      const snapshot = await getIrrigationSnapshot(ownerUserId, { season });
+      const snapshot = await getIrrigationSnapshot(ownerUserId, { season, context: 'morning' });
       await recordSoilDaysForUser({ ownerUserId, season, snapshot, now });
       recorded += 1;
     } catch (error) {

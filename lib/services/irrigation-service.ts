@@ -14,6 +14,8 @@ import {
 import { readLiveOrLastSuccessfulSnapshot } from '@/lib/domain/snapshot-policy';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { createOtfReadClient, readOtfDataSource } from '@/lib/services/otf-connection';
+import { startFarmRead, type FarmRead } from '@/lib/services/otf-farm-read';
+import type { OtfReadContext } from '@/lib/domain/otf/shared-call-pace';
 import { demoChoiceOfOwner } from '@/lib/domain/demo/catalogue';
 import { demoFarmSnapshot } from '@/lib/adapters/demo/farms';
 
@@ -27,16 +29,22 @@ export { IrrigationDataUnavailableError } from '@/lib/domain/snapshot-policy';
 type IrrigationSnapshotOptions = {
   season: number;
   forceRefresh?: boolean;
+  /** Une page, par défaut, ou le calcul du matin, qui peut attendre une minute (F362). */
+  context?: OtfReadContext;
 };
 
 /**
  * L'instantané d'un espace, rangé sous sa clé (docs/tranche-4-contract.md,
  * F328). Avec Ouvre ta ferme, seul l'espace de la ferme du déploiement le lit,
- * et la lecture commence par vérifier cette ferme (F332, F337, F342).
+ * et la lecture commence par vérifier cette ferme (F332, F337, F342). Depuis
+ * la 4.3 (F361, F362), une lecture complète à la fois par ferme, pour toutes
+ * les instances du serveur, qui ne part que si elle peut finir ; son bail
+ * est rendu après l'écriture du cache, où une seconde lecture de la même
+ * ferme trouve ce qu'elle a rangé (F388).
  */
 export async function getIrrigationSnapshot(
   cacheKey: string,
-  { season, forceRefresh = false }: IrrigationSnapshotOptions,
+  { season, forceRefresh = false, context = 'page' }: IrrigationSnapshotOptions,
 ): Promise<IrrigationSnapshot> {
   if (readOtfDataSource() !== 'live') {
     const source = mockSource(cacheKey);
@@ -56,15 +64,23 @@ export async function getIrrigationSnapshot(
     season,
   ]);
 
+  // La lecture en cours, rendue après l'écriture du cache ou à son échec.
+  let farmRead: FarmRead | null = null;
   return readLiveOrLastSuccessfulSnapshot({
     readLive: async () => {
       // Avant tout appel : la ferme que cet espace peut lire (F342).
       const expectedFarm = await farmToRead(spaceFarm);
       try {
-        const snapshot = await readOtfSeasonSnapshot(createOtfReadClient(), season, new Date(), expectedFarm);
+        // La ferme compte ses appels sous son identifiant, quelle que soit la clé (F361, F381).
+        const read = await startFarmRead(expectedFarm, context);
+        farmRead = read;
+        const client = createOtfReadClient({ sharedPace: read.sharedPace, minuteWaitLimitMs: read.minuteWaitLimitMs });
+        const snapshot = await readOtfSeasonSnapshot(client, season, new Date(), expectedFarm);
+        read.markComplete();
         await keepDeploymentFarm(expectedFarm, snapshot.lastSuccessfulReadAt);
         return snapshot;
       } catch (error) {
+        await farmRead?.finish(error);
         // La clé mène à une autre ferme : elle devient la ferme gardée, et
         // la page suivante ouvre l'espace de celle-ci (F332).
         if (error instanceof OtfFarmMismatchError && error.observedFarmId !== null) {
@@ -81,6 +97,8 @@ export async function getIrrigationSnapshot(
       } catch (error) {
         logSyncFailure('écriture-cache', error);
         throw error;
+      } finally {
+        await farmRead?.finish();
       }
     },
     maxCacheAgeMs: forceRefresh ? 0 : millisecondsFromHours(4),

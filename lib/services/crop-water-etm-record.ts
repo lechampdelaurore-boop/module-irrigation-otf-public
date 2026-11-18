@@ -60,7 +60,7 @@ export async function recordEtmDaysForAllWorkspaces({
   // Seules les fermes qui ont coché Besoin par culture enregistrent l'ETM du matin (3.8, R1, P5).
   for (const { ownerUserId } of await listFarmsWithFeature('cultures')) {
     try {
-      const snapshot = await getIrrigationSnapshot(ownerUserId, { season });
+      const snapshot = await getIrrigationSnapshot(ownerUserId, { season, context: 'morning' });
       await recordEtmDaysForUser({ ownerUserId, season, snapshot, now });
       recorded += 1;
     } catch (error) {

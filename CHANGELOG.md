@@ -5,6 +5,35 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.3, PR 1 sur 5 : le compteur partagé des appels à Ouvre ta ferme)
+
+- **Le rythme de chaque ferme compté dans la base** (D-161, F361, F381,
+  F385), la même pour toutes les instances du serveur : chaque appel à
+  Ouvre ta ferme y prend sa place par une seule écriture conditionnelle,
+  255 millisecondes après le dernier départ de la ferme et 30 départs au
+  plus en 61 secondes. Le régulateur en mémoire de chaque instance reste
+  devant, et oublie les fermes sans départ récent (point D5 de la revue de
+  l'isolation, F389).
+- **Une lecture complète à la fois par ferme, qui ne part que si elle peut
+  finir** (F362, F384, F388) : elle réserve ses places avant son premier
+  appel ; une seconde lecture de la même ferme attend la fin de la
+  première, cinq secondes au plus, et affiche ce qu'elle a rangé. Le calcul
+  du matin attend qu'une minute ait la place, une minute au plus (F383).
+- **Les limites d'OTF valent pour toutes les instances** (F363, F382) :
+  après un `429`, la ferme s'arrête la durée demandée ; la limite du jour
+  l'arrête jusqu'à minuit (heure de Paris) ; un blocage d'adresse arrête
+  tout le module. Dix refus d'accès en quinze minutes arrêtent tout appel
+  pendant quinze minutes (F359).
+- **Le compte des appels de chaque ferme, jour par jour** (F363, F390),
+  gardé trente jours : la mesure qui précède la part du quota laissée au
+  module, posée au porteur après quatorze jours.
+- **Ce que dit la page** (F386) : le dernier instantané, avec la raison et,
+  quand elle est connue, l'heure de la prochaine lecture possible.
+- Migration additive `0032_otf_shared_call_pace.sql` : cinq tables, sans
+  jeton, adresse ni personne.
+- En ligne le 19 novembre 2026 : #93, les preuves C1 et C2, fusionnée à
+  0 h 31 et déployée à 0 h 49 (run 44421479761, cinq jobs verts).
+
 ### Ajouté (Tranche 4, isolation : les preuves C1 et C2)
 
 - **Le passage « rattachement »** (F379, point C2 de la revue de

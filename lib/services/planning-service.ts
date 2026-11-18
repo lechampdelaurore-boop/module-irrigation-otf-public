@@ -181,7 +181,8 @@ export async function recalculateWeeklyPlansForAllWorkspaces({
   for (const { ownerUserId } of await listFarmsWithFeature('planning')) {
     try {
       const stopwatch = startStopwatch();
-      const snapshot = await getIrrigationSnapshot(ownerUserId, { season });
+      // Le calcul du matin peut attendre qu'une minute ait la place pour lire la ferme (F362).
+      const snapshot = await getIrrigationSnapshot(ownerUserId, { season, context: 'morning' });
       stopwatch.lap('snapshot');
       await computeWeeklyPlanForUser({ ownerUserId, season, snapshot, now, trigger: 'daily', stopwatch });
       recalculated += 1;

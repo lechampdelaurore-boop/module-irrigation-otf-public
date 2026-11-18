@@ -4,6 +4,7 @@ import { mapCropPlan } from '../../domain/otf/crop-plan-mapper.ts';
 import type { OtfReadClient } from './read-client.ts';
 import { OtfApiError } from '../../domain/otf/api-contract.ts';
 import { farmIdentityShape, OtfFarmMismatchError, otfFarmIdentity } from '../../domain/otf/farm-identity.ts';
+import { OtfReadDeferredError } from '../../domain/otf/shared-call-pace.ts';
 import { logJsonLine } from '../log.ts';
 
 export class OtfSeasonUnavailableError extends OtfApiError {
@@ -148,7 +149,11 @@ export async function readCompleteOtfSnapshot(
   );
 }
 
-/** Une route sans saison, dont l'erreur garde le nom de la route et le statut. */
+/**
+ * Une route sans saison, dont l'erreur garde le nom de la route et le statut.
+ * Une lecture reportée par le compteur partagé remonte telle quelle : sa
+ * raison et l'heure de la prochaine lecture font le message de la page (F386).
+ */
 async function readRoute(
   route: string,
   read: () => Promise<unknown[]>,
@@ -156,6 +161,7 @@ async function readRoute(
   try {
     return await read();
   } catch (error) {
+    if (error instanceof OtfReadDeferredError) throw error;
     const message = error instanceof Error ? error.message : 'erreur inconnue';
     const status = error instanceof OtfApiError ? error.status : undefined;
     throw new OtfApiError(`${route} — ${message}`, status);
@@ -170,6 +176,7 @@ async function readSeason(
   try {
     return await read();
   } catch (error) {
+    if (error instanceof OtfReadDeferredError) throw error;
     const message = error instanceof Error ? error.message : 'erreur inconnue';
     const status = error instanceof OtfApiError ? error.status : undefined;
     throw new OtfApiError(`${route}, saison ${season} — ${message}`, status);

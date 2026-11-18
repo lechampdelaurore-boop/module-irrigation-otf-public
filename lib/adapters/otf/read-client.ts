@@ -2,13 +2,23 @@ import { OtfApiError, extractCollection } from '../../domain/otf/api-contract.ts
 import {
   EMPTY_CALL_PACE,
   holdCallsUntil,
+  isCallPaceIdle,
   nextCallSlot,
-  OTF_CALLS_PER_MINUTE,
   OTF_MINUTE_LIMIT_MAX_WAIT_MS,
   recordCallStart,
   type CallPaceState,
 } from '../../domain/otf/call-pace.ts';
-import { millisecondsFromSeconds, secondsFromMilliseconds } from '../../domain/units.ts';
+import {
+  OtfReadDeferredError,
+  otfRateLimitCode,
+  pauseAfterRateLimit,
+  retryAfterMilliseconds,
+  type OtfCallPause,
+  type PlaceRefusal,
+  type PlaceRules,
+} from '../../domain/otf/shared-call-pace.ts';
+import { millisecondsFromSeconds } from '../../domain/units.ts';
+import { logJsonLine } from '../log.ts';
 
 const OTF_READ_ROUTES = [
   '/me',
@@ -51,13 +61,42 @@ const OTF_RATE_LIMIT_COOLDOWN_MS = 1_000;
  * tous les clients de cette ferme : deux lectures lancées en même temps par
  * des composants différents ne peuvent pas cumuler leurs quotas (constaté le
  * 20 septembre 2026 par un 429 sur `/bedList`, docs/otf-contract.md), et une
- * ferme n'attend jamais le quota d'une autre. Chaque régulateur vit dans
- * l'instance du Worker qui appelle ; un régulateur partagé entre instances
- * se tranche à la 4.3, avec le budget quotidien.
+ * ferme n'attend jamais le quota d'une autre. Ce régulateur vit dans
+ * l'instance du Worker qui appelle et reste devant ; depuis la 4.3 (F361), le
+ * compteur partagé de la base (`sharedPace`) fait foi pour toutes les
+ * instances.
  */
-type FarmPacer = { state: CallPaceState; queue: Promise<void> };
+type FarmPacer = { state: CallPaceState; queue: Promise<void>; pending: number };
 
 const farmPacers = new Map<string, FarmPacer>();
+
+/**
+ * Le compteur partagé d'une ferme, tel que le connecteur le voit (F361) : la
+ * base, la même pour toutes les instances du serveur, derrière un port que
+ * le service branche (`lib/services/otf-farm-read.ts`) ; le connecteur
+ * n'importe pas `db/`.
+ */
+export type OtfSharedCallPace = {
+  /** Prend la place d'un appel qui part à `atMs`, par une seule écriture conditionnelle ; `false` si la base la refuse. */
+  claimPlace: (atMs: number, spacingMs: number) => Promise<boolean>;
+  /**
+   * Pourquoi la base a refusé la place, d'après ce qu'elle a compté pour la
+   * ferme, et quand en redemander une (`sharedPlaceRefusal`) ; le service sait
+   * si l'appel prend une place réservée par sa lecture.
+   */
+  placeRefusal: (atMs: number, rules: PlaceRules) => Promise<PlaceRefusal>;
+  /** Une limite d'OTF : la pause vaut pour toutes les instances. */
+  holdCalls: (pause: OtfCallPause) => Promise<void>;
+  /** Un `401`, compté pour tout le module (F359) ; rend la pause du frein quand elle court. */
+  recordAuthenticationFailure: (atMs: number) => Promise<OtfCallPause | null>;
+};
+
+/**
+ * Les refus de la base qu'un appel accepte avant de renoncer : chacun suit
+ * une attente (l'espacement, une place de la minute) ou une course perdue
+ * contre une autre instance. Au-delà, l'appel n'est pas envoyé (F385).
+ */
+const SHARED_PLACE_MAX_ATTEMPTS = 20;
 
 /**
  * Avant la 4.3, la seule clé est celle du déploiement, rattachée à une seule
@@ -66,10 +105,19 @@ const farmPacers = new Map<string, FarmPacer>();
  */
 export const DEPLOYMENT_KEY_FARM = 'ferme-de-la-cle-du-deploiement';
 
-function farmPacer(farmKey: string): FarmPacer {
+/**
+ * Le régulateur d'une ferme ; ceux des autres fermes qui ne retiennent plus
+ * rien (aucun appel en attente, aucun départ dans la minute, aucune pause)
+ * sont oubliés au passage : la mémoire ne grandit pas avec le nombre de
+ * fermes (point D5 de la revue de l'isolation, F361).
+ */
+function farmPacer(farmKey: string, nowMs: number): FarmPacer {
+  for (const [key, pacer] of farmPacers) {
+    if (key !== farmKey && pacer.pending === 0 && isCallPaceIdle(pacer.state, nowMs)) farmPacers.delete(key);
+  }
   const known = farmPacers.get(farmKey);
   if (known) return known;
-  const created: FarmPacer = { state: EMPTY_CALL_PACE, queue: Promise.resolve() };
+  const created: FarmPacer = { state: EMPTY_CALL_PACE, queue: Promise.resolve(), pending: 0 };
   farmPacers.set(farmKey, created);
   return created;
 }
@@ -77,6 +125,11 @@ function farmPacer(farmKey: string): FarmPacer {
 /** Remet les régulateurs à zéro entre deux tests, qui se suivent sans attendre. */
 export function resetOtfRatePacer(): void {
   farmPacers.clear();
+}
+
+/** Le nombre de régulateurs gardés en mémoire : les tests du point D5 le lisent. */
+export function otfRatePacerCount(): number {
+  return farmPacers.size;
 }
 
 /** L'horloge du régulateur ; les tests la remplacent pour parcourir une minute sans l'attendre. */
@@ -105,6 +158,18 @@ type OtfReadClientOptions = {
   /** La ferme dont ce client dépense le quota ; par défaut, celle de la clé du déploiement. */
   farmKey?: string;
   clock?: OtfClock;
+  /**
+   * Le compteur partagé de la base (F361). Sans lui, seul le régulateur en
+   * mémoire tient le rythme : les tests du connecteur et le script d'essai
+   * manuel ; le serveur le branche toujours (`lib/services/otf-connection.ts`).
+   */
+  sharedPace?: OtfSharedCallPace;
+  /**
+   * L'attente la plus longue d'une place quand la minute est pleine : cinq
+   * secondes à l'écran (F334), une minute au calcul du matin, qui peut
+   * attendre (F362).
+   */
+  minuteWaitLimitMs?: number;
 };
 
 export function assertAllowedReadRoute(value: string): asserts value is OtfReadRoute {
@@ -123,6 +188,8 @@ export class OtfReadClient {
   private readonly minimumRequestIntervalMs: number;
   private readonly farmKey: string;
   private readonly clock: OtfClock;
+  private readonly sharedPace: OtfSharedCallPace | null;
+  private readonly minuteWaitLimitMs: number;
 
   constructor(options: OtfReadClientOptions) {
     if (!options.token.trim()) {
@@ -158,6 +225,8 @@ export class OtfReadClient {
     );
     this.farmKey = options.farmKey ?? DEPLOYMENT_KEY_FARM;
     this.clock = options.clock ?? realClock;
+    this.sharedPace = options.sharedPace ?? null;
+    this.minuteWaitLimitMs = Math.max(options.minuteWaitLimitMs ?? OTF_MINUTE_LIMIT_MAX_WAIT_MS, OTF_MINUTE_LIMIT_MAX_WAIT_MS);
   }
 
   async getConfiguration(): Promise<unknown> {
@@ -281,7 +350,8 @@ export class OtfReadClient {
 
         // Répéter immédiatement une réponse 429 consommerait encore davantage
         // le quota OTF. Seules les erreurs serveur transitoires sont retentées.
-        if (response.status === 429) this.holdAfterRateLimit();
+        if (response.status === 429) throw await this.holdAfterRateLimit(response);
+        if (response.status === 401) await this.countAuthenticationFailure();
         const retryable = response.status >= 500;
         if (!retryable || attempt === 2) {
           throw new OtfApiError(
@@ -311,41 +381,99 @@ export class OtfReadClient {
    * La place de cet appel dans le rythme de sa ferme (F334) : un départ
    * toutes les 250 ms au plus, trente par minute ; quand la minute est
    * pleine, une attente de cinq secondes au plus, sinon l'appel est refusé
-   * comme sur une limite atteinte, sans rien envoyer à OTF.
+   * comme sur une limite atteinte, sans rien envoyer à OTF. Puis sa place
+   * dans le compteur partagé de la base (F361), qui fait foi pour toutes les
+   * instances ; le départ n'est noté en mémoire qu'ensuite, juste avant
+   * l'envoi, pour que l'espacement mesuré soit celui des envois réels (F385).
    */
   private waitForRateSlot(): Promise<void> {
-    const pacer = farmPacer(this.farmKey);
-    const { now, sleep } = this.clock;
-    const spacingMs = this.minimumRequestIntervalMs + RATE_SLOT_SAFETY_MARGIN_MS;
+    const pacer = farmPacer(this.farmKey, this.clock.now());
+    const { now } = this.clock;
+    pacer.pending += 1;
     const slot = pacer.queue.then(async () => {
-      // Un minuteur peut se réveiller légèrement avant son échéance. Recalculer
-      // évite alors de démarrer une requête trop tôt et sérialise aussi les
-      // lectures lancées simultanément par le lecteur d'instantané.
-      for (;;) {
-        const next = nextCallSlot(pacer.state, now(), spacingMs);
-        if (next.kind === 'refused') {
-          throw new OtfApiError(
-            `Limite de ${OTF_CALLS_PER_MINUTE} appels par minute atteinte pour cette ferme : `
-              + `une place se libère dans plus de ${secondsFromMilliseconds(OTF_MINUTE_LIMIT_MAX_WAIT_MS)} secondes, l'appel n'est pas envoyé.`,
-            429,
-          );
-        }
-        const waitMs = next.at - now();
-        if (waitMs <= 0) break;
-        await sleep(waitMs);
-      }
-
+      await this.waitForLocalSlot(pacer);
+      await this.claimSharedPlace();
       pacer.state = recordCallStart(pacer.state, now());
-    });
+    }).finally(() => { pacer.pending -= 1; });
 
     pacer.queue = slot.catch(() => undefined);
     return slot;
   }
 
-  /** Une limite atteinte fait patienter tous les clients de la ferme, pas seulement celui-ci. */
-  private holdAfterRateLimit(): void {
-    const pacer = farmPacer(this.farmKey);
-    pacer.state = holdCallsUntil(pacer.state, this.clock.now() + OTF_RATE_LIMIT_COOLDOWN_MS);
+  /** Le rythme de cette instance, en mémoire : devant le compteur partagé (F361). */
+  private async waitForLocalSlot(pacer: FarmPacer): Promise<void> {
+    const { now, sleep } = this.clock;
+    const spacingMs = this.minimumRequestIntervalMs + RATE_SLOT_SAFETY_MARGIN_MS;
+    // Un minuteur peut se réveiller légèrement avant son échéance. Recalculer
+    // évite alors de démarrer une requête trop tôt et sérialise aussi les
+    // lectures lancées simultanément par le lecteur d'instantané.
+    for (;;) {
+      const next = nextCallSlot(pacer.state, now(), spacingMs, this.minuteWaitLimitMs);
+      // Trente départs dans la minute et une place trop lointaine : rien n'est
+      // envoyé, comme sur un refus du compteur partagé (F362, F384).
+      if (next.kind === 'refused') throw new OtfReadDeferredError('minute', next.minuteFreesAt);
+      const waitMs = next.at - now();
+      if (waitMs <= 0) return;
+      await sleep(waitMs);
+    }
+  }
+
+  /**
+   * La place de l'appel dans le compteur partagé (F361) : la base l'accorde
+   * ou la refuse ; un refus se lit dans ce qu'elle a compté. Une pause arrête
+   * l'appel, une minute pleine le fait attendre `minuteWaitLimitMs` au plus,
+   * l'espacement le fait attendre ; rien n'est envoyé à OTF sans place.
+   */
+  private async claimSharedPlace(): Promise<void> {
+    const shared = this.sharedPace;
+    if (!shared) return;
+    const { now, sleep } = this.clock;
+    const spacingMs = this.minimumRequestIntervalMs + RATE_SLOT_SAFETY_MARGIN_MS;
+    for (let attempt = 1; attempt <= SHARED_PLACE_MAX_ATTEMPTS; attempt += 1) {
+      if (await shared.claimPlace(now(), spacingMs)) return;
+      const askedAt = now();
+      const refusal = await shared.placeRefusal(askedAt, { spacingMs, maxWaitMs: this.minuteWaitLimitMs });
+      if (refusal.kind === 'stop') throw new OtfReadDeferredError(refusal.reason, refusal.retryAtMs);
+      const waitMs = refusal.atMs - now();
+      if (waitMs > 0) await sleep(waitMs);
+    }
+    logJsonLine('warn', { event: 'otf_shared_place_unavailable', attempts: SHARED_PLACE_MAX_ATTEMPTS });
+    throw new OtfReadDeferredError('minute', null);
+  }
+
+  /**
+   * Une limite atteinte chez OTF (F361, F363, F382) : la ferme, ou tout le
+   * module, ne part plus jusqu'à la fin de la pause, pour toutes les
+   * instances ; en mémoire, une seconde pour tous les clients de la ferme.
+   * Rend l'erreur que la lecture remonte, avec la raison et la fin de la
+   * pause.
+   */
+  private async holdAfterRateLimit(response: Response): Promise<OtfReadDeferredError> {
+    const atMs = this.clock.now();
+    const pacer = farmPacer(this.farmKey, atMs);
+    pacer.state = holdCallsUntil(pacer.state, atMs + OTF_RATE_LIMIT_COOLDOWN_MS);
+    const pause = pauseAfterRateLimit({
+      code: otfRateLimitCode(await response.json().catch(() => null)),
+      retryAfterMs: retryAfterMilliseconds(response.headers.get('Retry-After'), atMs),
+      atMs,
+    });
+    try {
+      await this.sharedPace?.holdCalls(pause);
+    } catch (error) {
+      // La limite d'OTF reste remontée ; sans la base, la mémoire tient la seconde de pause.
+      logJsonLine('warn', { event: 'otf_pause_not_recorded', reason: pause.reason, message: error instanceof Error ? error.message : 'erreur inconnue' });
+    }
+    return new OtfReadDeferredError(pause.reason, pause.untilMs);
+  }
+
+  /** Un refus d'accès compte pour le frein du module (F359) ; le journal dit quand il serre. */
+  private async countAuthenticationFailure(): Promise<void> {
+    try {
+      const brake = await this.sharedPace?.recordAuthenticationFailure(this.clock.now());
+      if (brake) logJsonLine('warn', { event: 'otf_authentication_brake', pausedUntil: new Date(brake.untilMs).toISOString() });
+    } catch (error) {
+      logJsonLine('warn', { event: 'otf_authentication_failure_not_recorded', message: error instanceof Error ? error.message : 'erreur inconnue' });
+    }
   }
 }
 
