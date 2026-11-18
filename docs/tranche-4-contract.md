@@ -333,6 +333,65 @@ personne », pour qu'une personne qui a deux fermes reçoive les deux (F373).
   chacun retirant une de ces règles du code, font chacun échouer au moins
   un test (la liste est dans la PR).
 
+### 5 quinquies. Les preuves C1 et C2 : la cohérence des espaces et le rattachement (18 novembre 2026, D-160, F379 et F380)
+
+Les points C1 et C2 de la revue de l'isolation du 18 novembre 2026
+(`/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`), que la
+revue recommandait avant la 4.6. Elle n'avait trouvé aucune fuite dans la
+base : ce sont des preuves, qui attraperaient une régression. Des tests
+seuls (`tests/db/`, `tests/support/`, et le script `test:isolation`) : aucune
+ligne de `db/` ni du code du module ne change. Décidées avant le code et
+écrites dans la même PR que lui, la nuit du 18 au 19 novembre 2026, en
+Opus 5.5 · Max (réglage de la 4.2), sur le mandat de nuit du porteur, à
+l'option recommandée : rien n'est agronomique, ne touche au budget ni ne
+change ce que voit une ferme.
+
+- **F379 · Le passage « rattachement » (C2).** `pnpm test` rejoue les tests
+  de `tests/db/` dans un troisième passage d'isolation, après « fermes » et
+  « personnes » (F336) : Alice y est l'espace sans ferme d'une personne, et
+  Bob l'espace de ferme de la même personne (`alice` et `alice·ferme·7`).
+  C'est le cas du rattachement quand les données d'une personne viennent
+  d'une autre ferme que celle de la clé (F331) : chaque test qui montre que
+  Bob ne voit rien d'Alice montre alors que l'espace sans ferme et l'espace
+  de ferme d'une même personne ne se voient pas. Le filtre
+  (`otf_farm_id IS ?`) était juste par construction ; il est maintenant
+  prouvé.
+- **F380 · Le contrôle de cohérence des espaces (C1).** À la fin de chaque
+  test de `tests/db/` qui écrit dans la base de test, dans chacun des quatre
+  passages, un contrôle parcourt la base et fait échouer le test si une
+  ligne d'un espace désigne une ligne d'un autre espace : une irrigation
+  dont le matériel, le réglage, la pose ou la pompe est d'un autre espace,
+  par exemple. Il ne regarde pas la forme des requêtes, comme le garde-fou
+  de `tests/farm-space.test.ts`, mais ce qu'elles ont écrit.
+  - L'espace d'une ligne est sa colonne `workspace_id`. Une table qui n'en a
+    pas prend l'espace de la ligne qu'elle complète (le réglage, celui de
+    son matériel). Une ligne commune à tous (`workspace_id` nul, comme une
+    culture de référence commune) peut être désignée par chaque espace.
+  - Sont vérifiées les clés étrangères déclarées, les colonnes qui
+    désignent une ligne sans clé déclarée (une proposition du planning et
+    son matériel, son réglage, sa pose, sa pompe et son origine, son
+    irrigation validée ; le journal des ouvrages d'eau et l'ouvrage qu'il
+    nomme), et la clé de culture (`crop_key`) : une culture commune, ou une
+    culture de l'espace, jamais une culture propre à un autre espace.
+  - Toute table, et toute colonne en `_id` ou en `_key`, doit être rangée
+    dans le contrôle (`tests/support/space-coherence.ts`) : une table ou une
+    colonne nouvelle, non rangée, l'arrête au lieu de lui échapper. Qui
+    l'ajoute dit ce qu'elle désigne.
+  - S'y ajoute le test « Bob désigne l'objet d'Alice » pour chaque action
+    qui reçoit du navigateur l'identifiant d'un objet et qui ne l'avait pas
+    encore (`tests/db/foreign-designation.test.ts`) : Bob, dans son espace,
+    nomme l'objet d'Alice ; l'action est refusée et l'objet d'Alice ne change
+    pas. Sont couverts la correction du volume d'une réserve, l'effacement
+    d'un relevé de compteur, la modification d'un groupe de jardins, la
+    modification d'une pompe et l'origine d'une pompe, la vérification de la
+    pompe d'une irrigation, la culture saisie par une autre ferme (dans une
+    correspondance d'espèce, un Kc ajusté, une déclaration de stade, un
+    profil d'enracinement) et la remise des durées communes d'une culture.
+  - Le contrôle est un test, pas une contrainte de la base : il prouve ce
+    que le code écrit dans les tests, pas ce qu'il écrirait en production.
+    Il ne remplace pas la vérification d'appartenance que chaque action fait
+    avant d'écrire.
+
 ## 6. Connexion à l'API d'OTF (4.3)
 
 ### 6.1 Ce que la documentation d'OTF établit (lue le 7/11 ; à relire avant le code)

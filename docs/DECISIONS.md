@@ -5547,3 +5547,44 @@ règles.
 Ne changent pas : D-142 (T4-06), D-155 à D-158 (F351 précisé sans être
 changé), D-050 (envoi immédiat des alertes météo), D-060 (priorité haute
 et toucher d'une notification).
+
+## D-160 — Les preuves C1 et C2 de la revue de l'isolation : la cohérence des espaces et le passage « rattachement »
+
+Date : nuit du 18 au 19 novembre 2026. Décideur : Claude, à l'option
+recommandée, sous le mandat de nuit du porteur (18 novembre, 21 h 54, heure
+de Paris : enchaîner seul) ; en Opus 5.5 · Max, réglage de la ligne 4.2 de
+la roadmap. Après D-159.
+
+**Pourquoi la question.** La revue de l'isolation du 18 novembre 2026 n'a
+trouvé aucune fuite dans la base, mais elle a relevé deux preuves
+manquantes, recommandées avant la 4.6. C1 : le garde-fou de
+`tests/farm-space.test.ts` ne regarde que la forme des requêtes ; rien, ni
+test ni contrainte de la base, ne vérifie qu'un objet et ce qu'il désigne
+sont du même espace. C2 : les passages d'isolation ne comparent pas
+l'espace sans ferme d'une personne et son espace de ferme, le cas du
+rattachement (F331).
+
+**Décision.** Toutes à l'option recommandée (`docs/tranche-4-contract.md`,
+section 5 quinquies, F379 et F380) :
+
+1. Un troisième passage d'isolation, « rattachement », rejoue les tests de
+   `tests/db/` avec l'espace sans ferme d'une personne et son espace de
+   ferme (F379).
+2. Un contrôle de cohérence des espaces, joué à la fin de chaque test de
+   `tests/db/` qui écrit dans la base de test : une ligne qui désigne une
+   ligne d'un autre espace fait échouer le test. Toute table, et toute
+   colonne en `_id` ou en `_key`, doit y être rangée ; une nouvelle, non
+   rangée, l'arrête (F380).
+3. Le test « Bob désigne l'objet d'Alice » est ajouté pour chaque action
+   qui reçoit du navigateur l'identifiant d'un objet et qui ne l'avait pas
+   encore.
+4. Un contrôle de test, pas une contrainte de la base (clés étrangères
+   composées avec l'espace, ou déclencheurs) : la revue demandait des
+   preuves, sans toucher `db/` ; une contrainte demanderait une migration de
+   chaque table concernée, à décider à part si le besoin s'en montre.
+
+**Réservé au porteur.** Rien : aucun point n'est agronomique, ne touche à
+son budget ni ne change ce que voit une ferme.
+
+Ne changent pas : D-155 (F336, passages « fermes » et « personnes »),
+D-156 (F331, le rattachement), D-159.
