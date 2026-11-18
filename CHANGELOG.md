@@ -14,6 +14,9 @@ source détaillée commit par commit.
   amies, puis propose la démonstration sur invitation ; « Contact » dit
   « de préférence par Discord » et demande, en cas de problème, une
   description écrite avec des captures d'écran (F347).
+- **4.8 close** : textes validés par le porteur le 18 novembre 2026 à
+  20 h 04, formulaire d'Ouvre ta ferme envoyé par lui le même soir à
+  20 h 13 ; la demande attend la validation d'OTF.
 
 ### Sécurité (Tranche 4, 4.1 et 4.2, l'isolation des fermes)
 

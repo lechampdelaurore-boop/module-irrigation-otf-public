@@ -375,8 +375,13 @@ en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
   (page, geste, ce qui s'est passé), avec des captures d'écran si possible.
   Les demandes sur les données restent par courriel (confidentialité).
 - **Relecture finie** : le porteur valide les trois pages le 18 novembre
-  2026 à 20 h 04 (« je valide en l'état »). Reste, pour clore la 4.8,
-  l'envoi du formulaire d'Ouvre ta ferme par lui.
+  2026 à 20 h 04 (« je valide en l'état »).
+- **Formulaire envoyé** par le porteur lui-même le 18 novembre 2026 à
+  20 h 13 : la demande « Module d'irrigation pour Ouvre ta ferme » est
+  « En attente » chez OTF, avec les adresses de la section 9 bis et cinq
+  droits en lecture (structure, parcellaire, cultures, interventions,
+  espèces et variétés), chacun avec sa raison. **La 4.8 est close** ;
+  reste l'étape 2 de l'ordre, la validation d'OTF, hors de notre main.
 
 ## 10. Exploitation (4.5) et pilote (4.6)
 

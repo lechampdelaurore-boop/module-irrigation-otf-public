@@ -44,9 +44,12 @@ registres, elle y renvoie.
   « en cours de développement », « L'essayer » plus clair, contact de
   préférence par Discord) corrigées le jour même ; **relecture finie et
   textes validés par le porteur le 18 novembre 2026 à 20 h 04** (« J'ai
-  fini de relire les 3 pages, je valide en l'état »). Restent : l'envoi du formulaire d'OTF
-  par lui, la relecture juridique avant toute ferme
-  tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
+  fini de relire les 3 pages, je valide en l'état »). **Formulaire d'OTF envoyé par le
+  porteur lui-même le 18 novembre 2026 à 20 h 13** : la demande « Module
+  d'irrigation pour Ouvre ta ferme » est « En attente » chez OTF, cinq
+  droits en lecture, chacun avec sa raison ; **4.8 close**. Restent :
+  la validation d'OTF (délai hors de notre main), la relecture juridique
+  avant toute ferme tierce. Le lot D (#79 à #85) est en ligne, #85 déployée le 16 novembre
   2026 à 8 h 43 (run 43824015609, cinq jobs verts).
 - Tranche 4, **4.1 et 4.2 commencées ensemble le 17 novembre 2026 au
   soir, en Opus 5.5 · Max**, sur le choix du porteur (carte « 1 sur 1 »,
