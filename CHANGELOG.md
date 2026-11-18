@@ -5,6 +5,27 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (Tranche 4, isolation : les notifications d'un appareil partagé)
+
+- **Un appareil, une personne** (D-159, F371 à F378, constat A de la revue
+  de l'isolation du 18 novembre 2026) : un appareil où deux personnes ont
+  ouvert le module ne reçoit plus que les notifications de la personne qui
+  y a activé les alertes en dernier, de chacun de ses espaces. L'ouverture
+  d'une page ne prend plus l'appareil d'une autre personne : seul le bouton
+  « Activer » le fait, et l'appareil quitte alors tous les espaces de la
+  précédente. Avant chaque envoi, le service de notification vérifie que
+  l'appareil est encore à l'espace qui envoie. Il ne connaît la personne
+  que par une empreinte, jamais par son identifiant, son nom ni son
+  courriel. Les appareils déjà inscrits continuent de recevoir sans rien
+  refaire.
+- **Nouvelles tentatives par espace** (F377, point D1 de la revue) : deux
+  espaces qui envoient la même notification le même jour gardent chacun la
+  leur.
+- **Des tests au niveau de l'appareil** (F378, point C3 de la revue) : le
+  vrai code du service de notification, ses trois classes de Durable
+  Objects comprises, tourne dans les tests sur une mémoire qui imite
+  Cloudflare.
+
 ### Ajouté (Tranche 4, 4.3, le contrat de la connexion à Ouvre ta ferme, sans code)
 
 - `docs/tranche-4-contract.md`, section 6.3 (D-158, F349 à F370) : chaque
@@ -20,7 +41,9 @@ source détaillée commit par commit.
   porteur y sont admises. Aucun changement de comportement.
 - En ligne le 18 novembre 2026 : #89, la PR 3 de la 4.1 et de la 4.2,
   déployée à 11 h 25 ; #90, le site public et la 4.8 close, fusionnée à
-  21 h 20 et déployée à 21 h 38 (run 44389956513, cinq jobs verts).
+  21 h 20 et déployée à 21 h 38 (run 44389956513, cinq jobs verts) ; #91,
+  ce contrat, fusionnée à 22 h 03 et déployée à 22 h 21 (run 44397473391,
+  cinq jobs verts).
 - Recette de #88 (PR 2 de la 4.1 et de la 4.2) faite par le porteur le
   18 novembre 2026 à 20 h 06 : une ouverture du module, rien n'a changé à
   l'écran (« Le module s'affiche normalement. »).

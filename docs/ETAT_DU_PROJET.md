@@ -107,7 +107,8 @@ registres, elle y renvoie.
   (4.6), est faite le 18 novembre 2026, sans PR (constats dans
   `/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-18.md`) : un
   appareil partagé reçoit les notifications de deux espaces (constat A), à
-  corriger avant la 4.6 par un chantier de code à part ; toute personne
+  corriger avant la 4.6 par un chantier de code à part (corrigé le soir
+  même : « un appareil, une personne », ci-dessous) ; toute personne
   admise par Access ouvre la ferme du porteur (constat B) : règle d'Access
   ci-dessous, et fin de ce repli au contrat de la 4.3, avec les points D2 à
   D5 ; D6 à l'accord écrit des fermes pilotes (4.6).
@@ -137,7 +138,37 @@ registres, elle y renvoie.
   sans accès d'OTF) ; ses secrets, à la validation
   de sa demande par OTF (formulaire envoyé le 18 novembre 2026 à 20 h 13).
   Aucun contrôle rejoué : PR de documentation seule, la CI de la PR rejoue
-  tout.
+  tout. **En ligne le 18 novembre 2026 à 22 h 21** (consigné par la PR
+  suivante, celle des notifications) : #91 fusionnée à 22 h 03, run
+  44397473391 vérifié job par job (« Application », « Workers
+  Cloudflare », « Parcours navigateur », « Déploiement Cloudflare » et
+  « Déploiement de la démonstration », verts).
+- Tranche 4, **notifications : un appareil, une personne** (D-159, F371 à
+  F378, section 5 quater de `docs/tranche-4-contract.md`) : le correctif
+  du constat A de la revue de l'isolation, avec ses points C3 et D1, dû
+  avant la 4.6, codé le 18 novembre 2026 au soir en Opus 5.5 · Max
+  (réglage de la 4.2), sur le mot du porteur. Un appareil ne reçoit plus
+  que les notifications des espaces de la personne qui y a activé les
+  alertes en dernier ; l'ouverture d'une page ne prend jamais l'appareil
+  d'une autre personne ; le service de notification vérifie chaque
+  appareil avant chaque envoi et ne connaît la personne que par une
+  empreinte ; les nouvelles tentatives sont nommées par l'espace ; les
+  appareils déjà inscrits continuent de recevoir. Le service gagne une
+  classe de Durable Objects (`PushDevice`, migration `v2`), créée par le
+  déploiement de la CI, sans réglage à la main. Le bouton « Se
+  déconnecter », proposé en option par la revue, n'est pas fait : un
+  appareil ne change plus de personne sans le geste de la nouvelle.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 650
+  tests, puis 377 et 377 pour les deux passages d'isolation), `pnpm
+  build`, `pnpm knip`, `pnpm push:check` (43 tests), `pnpm
+  weather:check`, `pnpm site:check` réussis en local ; dix sabotages du
+  code, chacun détecté par au moins un test ; la suite complète des
+  parcours jouée par la CI de la PR. **PR ouverte**
+  (`fix/notifications-un-appareil-une-personne`). Non vérifié : un essai
+  physique sur un vrai téléphone partagé par deux personnes (il demande
+  deux comptes Access) ; à constater après le déploiement, que la
+  prochaine notification arrive toujours sur le téléphone du porteur. Les
+  preuves C1 et C2 de la revue suivent dans une PR de tests seuls.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

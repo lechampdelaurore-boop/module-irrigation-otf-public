@@ -5475,3 +5475,75 @@ réelle.
 Ne changent pas : D-142 (T4-01 à T4-20, précisés sans être changés),
 D-155 à D-157, D-002 (lecture seule, 4 appels par seconde au plus), D-003
 (rien n'est deviné), D-096 (la démonstration ne lit jamais OTF).
+
+## D-159 — Notifications : un appareil, une personne (constat A de la revue de l'isolation, avec C3 et D1)
+
+Date : 18 novembre 2026, soir. Décideur : Claude, à l'option recommandée,
+au lancement du coordinateur sur le mot du porteur (« Lance tous les
+chantiers en parallèle que tu peux », 20 h 04, heure de Paris), puis sous
+son mandat de nuit (21 h 54 : enchaîner seul) ; en Opus 5.5 · Max,
+réglage de la ligne 4.2 de la roadmap. Après D-158.
+
+**Pourquoi la question.** La revue de l'isolation du 18 novembre 2026
+(constat A) : un appareil où deux personnes ont ouvert le module reste
+inscrit dans leurs deux espaces et reçoit en silence les notifications des
+deux (gel avec les noms des cultures, fins d'arrosage, suggestions du
+planning, alertes météo), y compris entre deux personnes d'une même ferme
+(F328). C'est contraire à T4-06 et F336, à corriger avant la 4.6. F351
+(D-158, point 10) a tranché que les notifications d'un appareil suivent la
+personne qui l'a inscrit en dernier, pas l'espace ; restait à dire
+comment, sans qu'une page ouverte par une autre personne retire en silence
+ses alertes à la personne dont c'est le téléphone. Le point C3 (aucun test
+au niveau de l'appareil) et le point D1 (nouvelles tentatives partagées
+entre espaces) vont avec.
+
+**Décision.** Toutes à l'option recommandée (`docs/tranche-4-contract.md`,
+section 5 quater, F371 à F378 ; `docs/push-worker-contract.md`, « Un
+appareil, une personne ») :
+
+1. Le service de notification garde une fiche par appareil : la personne à
+   qui il est, par une empreinte (SHA-256 de son identifiant de connexion,
+   calculée par le serveur du module), et ses espaces, vingt au plus. Avant
+   chaque envoi, chaque appareil est vérifié : celui qui n'est plus à
+   l'espace en est retiré sans rien recevoir ; une vérification qui échoue
+   n'envoie rien et l'envoi se retente.
+2. Seul le bouton « Activer » change la personne d'un appareil, qui quitte
+   alors tous les espaces de la précédente ; l'ouverture d'une page ne fait
+   que renouveler l'inscription de la personne à qui il est déjà. Sur
+   l'appareil d'une autre personne, la page montre « pas encore activé » et
+   le bouton, sans rien dire de plus.
+3. Une même personne reçoit sur son appareil les notifications de chacun
+   de ses espaces où elle l'a inscrit (deux fermes à partir de la 4.4).
+4. Les appareils d'avant le correctif sont gardés par le premier espace qui
+   leur envoie et donnés à la personne de la première page ouverte : un
+   appareil d'un seul espace continue de recevoir sans rien refaire.
+5. « Désactiver » garde la personne de l'appareil ; un abonnement expiré
+   efface sa fiche.
+6. Les nouvelles tentatives sont nommées par l'espace et l'identifiant
+   (D1).
+7. Les preuves (C3) : les tests du service font tourner son vrai code, ses
+   trois classes de Durable Objects comprises, sur une mémoire de test qui
+   imite Cloudflare.
+8. Le bouton « Se déconnecter » que la revue proposait en option n'est pas
+   fait : avec le point 2, un appareil ne change plus de personne sans le
+   geste de la nouvelle.
+
+**Écart avec la revue.** Elle recommandait « un appareil, un seul espace à
+la fois », retiré de l'espace précédent à chaque inscription. Avec cette
+règle, une page ouverte sur le téléphone d'une personne par une autre lui
+retirait ses alertes en silence, et une personne qui a deux fermes n'aurait
+gardé que la dernière ouverte ; F351 avait déjà choisi la personne.
+
+**Ce que le déploiement change.** Le service de notification gagne une
+classe de Durable Objects (`PushDevice`, migration `v2`), créée par le
+déploiement automatique de la CI, sans réglage de Cloudflare à la main ni
+nouveau produit. Revenir en arrière demande une migration qui supprime
+cette classe.
+
+**Réservé au porteur.** Rien : aucun point n'est agronomique, ne touche à
+son budget ni ne demande un réglage de Cloudflare. Il peut changer ces
+règles.
+
+Ne changent pas : D-142 (T4-06), D-155 à D-158 (F351 précisé sans être
+changé), D-050 (envoi immédiat des alertes météo), D-060 (priorité haute
+et toucher d'une notification).
