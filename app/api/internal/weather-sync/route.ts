@@ -2,6 +2,7 @@ import { env } from 'cloudflare:workers';
 import { automaticWeatherRepository } from '@/db/automatic-weather-repository';
 import { evaluateCropAlertsAfterForecastWrite, evaluateCropDryingForAllWorkspaces } from '@/lib/services/crop-alerts-service';
 import { recordEtmDaysForAllWorkspaces } from '@/lib/services/crop-water-etm-record';
+import { resealOtfVaultAtMorning } from '@/lib/services/otf-token-vault';
 import { recalculateWeeklyPlansForAllWorkspaces } from '@/lib/services/planning-service';
 import { recordSoilDaysForAllWorkspaces } from '@/lib/services/soil-reserve-record';
 import { runAutomaticWeatherSync } from '@/lib/services/weather/automatic-sync';
@@ -39,7 +40,10 @@ export async function POST(request: Request) {
     const soilReserve = result.status === 'completed' ? await recordSoilDaysForAllWorkspaces() : null;
     // Le séchage est une échéance du plan de culture : il s'évalue chaque matin, même si la météo est en panne.
     const cropDrying = result.status === 'already-running' ? null : await evaluateCropDryingForAllWorkspaces();
-    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying }, {
+    // Enfin la rotation de la clé du coffre pour les fermes que la journée n'a pas lues (docs/tranche-4-contract.md,
+    // F356, F401) : endormie sans clé maîtresse ; son échec ne fait pas échouer le matin, et sa réponse n'a que des nombres.
+    const otfVault = result.status === 'already-running' ? null : await resealOtfVaultAtMorning();
+    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying, otfVault }, {
       status: result.status === 'already-running' ? 409 : 200,
       headers: { 'cache-control': 'no-store' },
     });

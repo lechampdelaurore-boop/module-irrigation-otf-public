@@ -31,7 +31,10 @@ type Reference = {
  * Les tables qui n'appartiennent à aucun espace : rien de ce qu'elles gardent
  * n'est d'une ferme, ou leur clé est l'espace lui-même. Le compteur partagé
  * des appels à OTF (migration 0032, F390) compte par ferme d'OTF, pour tous
- * les espaces de la ferme : des fermes, des heures et des nombres.
+ * les espaces de la ferme : des fermes, des heures et des nombres. Le
+ * raccordement d'une ferme à OTF (migration 0033, F403) a pour clé la ferme,
+ * et se lit par la personne et la ferme ensemble, l'espace lui-même ; il ne
+ * désigne aucune ligne d'un espace.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
@@ -41,6 +44,7 @@ const COMMON_TABLES = new Set([
   'otf_call_starts',
   'otf_daily_calls',
   'otf_deployment_farm',
+  'otf_farm_connections',
   'otf_farm_reads',
   'otf_snapshots',
 ]);

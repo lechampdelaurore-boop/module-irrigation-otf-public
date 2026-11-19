@@ -5715,3 +5715,71 @@ règles.
 Ne changent pas : D-002 (lecture seule), D-003 (rien n'est deviné : c'est
 la règle que la vérification applique), D-158 (F338 et F370 précisés sans
 être changés), D-161 (le compteur partagé, devant chaque appel).
+
+## D-163 — Tranche 4, sous-tranche 4.3, PR 2 : le coffre des jetons d'Ouvre ta ferme
+
+Date : nuit du 18 au 19 novembre 2026. Décideur : Claude, à l'option
+recommandée, sous le mandat de nuit du porteur (18 novembre, 21 h 54, heure
+de Paris : « enchaîne, code toute la nuit, tout seul ») ; en Opus 5.5 ·
+Max, réglage de la ligne 4.3 de la roadmap. Après D-162. **La fusion
+attend la relecture, par le porteur, des lignes changées de la politique de
+confidentialité (F367).**
+
+**Pourquoi la question.** Chaque ferme reliée confiera au module les jetons
+qu'Ouvre ta ferme lui donne. T4-12 et F355 demandent qu'ils soient chiffrés
+avant d'entrer dans la base, liés à leur ligne et à leur rôle, avec une
+clé maîtresse que seul le porteur pose ; F356 fixe sa rotation. Restaient
+les choix du code : la forme de la clé et du chiffré, ce que fait le module
+quand une clé est mal posée, où les jetons sont rangés, et ce que dit le
+journal pendant une rotation.
+
+**Décision.** Toutes à l'option recommandée (`docs/tranche-4-contract.md`,
+section 6.3 quater, F397 à F403) :
+
+1. La clé maîtresse vaut 32 octets aléatoires en base64, tirée et posée
+   par une seule commande, sans s'afficher ; son empreinte de 16
+   caractères dit quelle clé a fait un chiffré, sans rien apprendre de la
+   clé (F397).
+2. Le coffre est endormi sans clé, hors d'usage quand un secret posé est
+   illisible (rien ne s'ouvre, rien n'est effacé, le journal nomme le
+   secret), prêt sinon ; la démonstration refuse de démarrer avec une clé
+   du coffre (F398).
+3. Le chiffré `v1.<empreinte>.<vecteur>.<chiffré>`, AES-256-GCM, avec des
+   données associées écrites en liste JSON : rôle et ferme pour un jeton,
+   rôle, personne et demande pour un `code_verifier` (F399).
+4. Un chiffré d'une clé perdue, déplacé, pris pour un autre rôle ou
+   altéré ne s'ouvre pas ; l'erreur nomme le problème, jamais une valeur
+   (F400).
+5. La rotation rechiffre à l'usage, par une écriture qui n'écrase jamais
+   un renouvellement, puis au calcul du matin ; le journal du matin dit
+   quand l'ancienne clé peut partir (F401).
+6. La PR 2 crée la table du raccordement (migration additive 0033), seule
+   ligne où les jetons entrent dans la base : lue par la personne et la
+   ferme ensemble, rangée par une seule écriture conditionnelle (F351) ;
+   pas de jetons en « reconnexion demandée », imposé par la base (F402).
+7. Les lignes de la politique de confidentialité que F367 demande, et le
+   raccordement parmi les tables communes du contrôle de cohérence des
+   espaces (F403).
+
+**Écart accepté.** La table de la demande d'autorisation (le
+`code_verifier`, dix minutes) vient avec le départ, dans la PR 3, et le
+bail du renouvellement (F357) aussi, par une migration additive : la PR 2
+n'écrit que ce qu'elle éprouve. Le chiffrement du `code_verifier`, lié à la
+personne et à la demande, est déjà éprouvé.
+
+**Ce que le déploiement change.** Une table vide de plus (migration 0033)
+et une étape de plus au matin, endormie tant que la clé maîtresse n'est pas
+posée : rien à l'écran du module, aucun appel de plus à Ouvre ta ferme. Le
+site public publie la politique de confidentialité datée du 19 novembre
+2026.
+
+**Réservé au porteur.** La relecture des lignes changées de la politique de
+confidentialité, avant la fusion (F367) ; la seconde phrase sur ce que lit
+le responsable (« Il ne les consulte que pour… ») est un engagement qu'il
+garde ou retire. Poser la clé maîtresse, à la validation d'OTF, et la
+retirer après une rotation : des réglages de Cloudflare, ses actes (F368).
+
+Ne changent pas : D-002 (lecture seule), D-003 (rien n'est deviné : un
+chiffré qui ne s'ouvre pas n'est jamais lu autrement), D-158 (F355, F356 et
+F368 précisés sans être changés), D-161 (le compteur partagé), D-162 (les
+tests de contrat des routes).

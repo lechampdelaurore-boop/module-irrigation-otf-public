@@ -20,6 +20,8 @@ export type DeploymentSettings = {
   weatherDataSource: string | undefined;
   /** Présence d'un secret réel, jamais sa valeur. */
   otfApiToken: boolean;
+  /** La clé maîtresse du coffre des jetons, ou l'ancienne le temps d'une rotation (4.3, F355, F356). */
+  otfTokenMasterKey: boolean;
   visualCrossingApiKey: boolean;
   pushServiceToken: boolean;
   weatherSyncServiceToken: boolean;
@@ -31,6 +33,7 @@ export type DeploymentRefusal =
   | 'demo-mode-unreadable'
   | 'otf-live-source'
   | 'otf-token'
+  | 'otf-vault-key'
   | 'weather-live-source'
   | 'weather-key'
   | 'push-token'
@@ -47,6 +50,7 @@ const DEPLOYMENT_REFUSAL_LABELS: Readonly<Record<DeploymentRefusal, string>> = {
   'demo-mode-unreadable': 'DEMO_MODE ne vaut ni « true » ni « false »',
   'otf-live-source': 'la démonstration lit Ouvre ta ferme (OTF_DATA_SOURCE=live)',
   'otf-token': 'la démonstration a un jeton Ouvre ta ferme (OTF_API_TOKEN)',
+  'otf-vault-key': 'la démonstration a une clé du coffre des jetons d’Ouvre ta ferme (OTF_TOKEN_MASTER_KEY ou OTF_TOKEN_MASTER_KEY_PREVIOUS)',
   'weather-live-source': 'la démonstration lit la vraie météo (WEATHER_DATA_SOURCE=live)',
   'weather-key': 'la démonstration a une clé de météo (VISUAL_CROSSING_API_KEY)',
   'push-token': 'la démonstration a le jeton du service de notification (IRRIGATION_PUSH_SERVICE_TOKEN)',
@@ -71,6 +75,7 @@ export function deploymentMode(settings: DeploymentSettings): DeploymentMode {
   const refusals: DeploymentRefusal[] = [];
   if (settings.otfDataSource?.trim() === LIVE) refusals.push('otf-live-source');
   if (settings.otfApiToken) refusals.push('otf-token');
+  if (settings.otfTokenMasterKey) refusals.push('otf-vault-key');
   if (settings.weatherDataSource?.trim() === LIVE) refusals.push('weather-live-source');
   if (settings.visualCrossingApiKey) refusals.push('weather-key');
   if (settings.pushServiceToken) refusals.push('push-token');
