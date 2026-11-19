@@ -5,6 +5,12 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot G, PR 5 sur 5)
+
+- **L'initiale ouvre le menu du compte** (D-172) : le nom, puis « Se
+  déconnecter » ; un appui par mégarde ne déconnecte plus. La ligne de la
+  charte change avec elle.
+
 ### Modifié (audit du 19 novembre 2026, lot G, PR 4 sur 5)
 
 - **Une seule fenêtre de confirmation** (D-171) : les sept gestes qui

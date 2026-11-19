@@ -198,9 +198,12 @@ Précisions du code (7 novembre 2026), sur la recommandation :
   active », sous les noms, disparaissent.
 - **La cloche, au téléphone seulement**, comme sur la maquette : elle mène
   aux réglages des notifications du téléphone, et n'apparaît que si une case
-  cochée envoie des notifications. L'initiale reste le lien de déconnexion.
-  La cloche et l'initiale gardent une cible de 44 px, qui déborde un peu
-  sous la barre de 36 px.
+  cochée envoie des notifications. L'initiale ouvre le menu du compte (nom,
+  « Se déconnecter ») : un appui ne déconnecte plus (audit du 19 novembre
+  2026, lot G, n° 6, F416, D-172 ; avant, l'initiale était le lien de
+  déconnexion). Le menu se ferme par Échap, par un appui ailleurs ou sur
+  l'initiale. La cloche et l'initiale gardent une cible de 44 px, qui
+  déborde un peu sous la barre de 36 px.
 - **Le menu de l'ordinateur** est une colonne de 247 px collée au bord
   gauche, du haut en bas de la page ; ses entrées restent visibles au
   défilement. La page à côté s'arrête à 1 200 px de contenu.

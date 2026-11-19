@@ -6026,6 +6026,26 @@ qu'on peut défaire, est dessiné en rouge comme une suppression.
 
 Ne change pas : ce que chaque geste fait une fois confirmé.
 
+## D-172 — Lot G, PR 5 : l'initiale ouvre le menu du compte
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 6 :
+l'initiale de la barre du haut est le lien de déconnexion ; un appui par
+mégarde déconnecte. La charte le disait (« L'initiale reste le lien de
+déconnexion ») ; le porteur a retenu le lot G, et ce changement de charte
+avec lui, le 19 novembre 2026 à 11 h 39.
+
+**Décision.** L'initiale ouvre un petit menu (`shell/account-menu.tsx`) :
+le nom de la personne, puis « Se déconnecter », le lien de toujours. Le
+menu se ferme par Échap (le focus revient sur l'initiale), par un appui
+ailleurs ou sur l'initiale. Le dessin de l'initiale et sa cible de 44 px
+au téléphone ne changent pas. La ligne de la charte
+(`docs/charte-module.md`, la cloche et l'initiale) change en conséquence
+(F416).
+
+Ne changent pas : l'adresse de déconnexion ; la cloche ; la barre.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
