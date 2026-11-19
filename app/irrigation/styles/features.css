@@ -185,11 +185,12 @@
   line-height: 1.45;
 }
 
+/* La ligne sous la case, en texte ordinaire : en vert gras, elle se lisait comme un lien (lot I, n° 25, F452). */
 .feature-choice-copy em {
-  color: var(--green-dark);
+  color: var(--ink2);
   font-size: 13px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .feature-choice li[data-locked="true"] .feature-choice-copy em {
@@ -277,4 +278,23 @@
   .welcome-actions .primary-button {
     width: 100%;
   }
+}
+
+/* Le point de départ conseillé de la première ouverture (audit du 19 novembre 2026, lot I, n° 25, F452). */
+.welcome-start {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 12px 0;
+}
+
+.welcome-start button {
+  min-height: var(--touch-target);
+  margin-top: 0;
+}
+
+.welcome-start span {
+  color: var(--muted);
+  font-size: 13px;
 }

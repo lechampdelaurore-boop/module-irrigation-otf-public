@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import type { FeatureId } from '@/lib/domain/features/catalogue';
 import { checkFeature, uncheckFeature, type FeatureSelection } from '@/lib/domain/features/selection';
+import { withEssentialFeatures } from '@/lib/domain/features/choice';
 import { saveFeatureSelectionAction } from '../feature-selection-actions';
 import { FeatureChoiceList } from '../shell/feature-choice-list';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
@@ -62,6 +63,13 @@ export function WelcomeChoice({ userName, signOutPath, demo, demoSelection }: {
         <p>
           Cochez ce dont votre ferme a besoin : seules les fonctionnalités cochées s’affichent et tournent. Une fonctionnalité qui
           en demande d’autres les coche avec elle. Vous pourrez changer ce choix à tout moment dans Réglages, sans rien perdre.
+        </p>
+        {/* Un point de départ conseillé, rien de coché d'office (audit du 19 novembre 2026, lot I, n° 25, F452). */}
+        <p className="welcome-start">
+          <button type="button" className="secondary-button" disabled={pending} onClick={() => { setError(null); setSelection(withEssentialFeatures(selection)); }}>
+            Commencer par l’essentiel
+          </button>
+          <span>Arrosages, Objectifs et besoins, Matériel et placement : le reste se coche plus tard, dans Réglages.</span>
         </p>
         <FeatureChoiceList selection={selection} disabled={pending} keepOne={false} onToggle={toggle} />
         {error ? <p className="water-error" role="alert">{error}</p> : null}

@@ -335,6 +335,26 @@ export function weatherAlertDeliveryLabel(status: WeatherAlertDeliveryStatus): s
   }
 }
 
+/** Le résultat d'un envoi lu en démonstration, où les notifications sont coupées. */
+export const DEMO_UNSENT_DELIVERY_LABEL = 'Non envoyée : notifications coupées dans la démonstration';
+
+/**
+ * Le résultat d'un envoi tel que l'écran le montre (audit du 19 novembre
+ * 2026, lot I, n° 25, F454) : en démonstration, un envoi manqué, sans
+ * appareil ou relancé tient aux notifications coupées, pas à une panne ; il
+ * se lit « Non envoyée : notifications coupées dans la démonstration », en
+ * couleur neutre (`demo-unsent`). Hors démonstration, rien ne change.
+ */
+export function shownWeatherAlertDelivery(
+  entry: { deliveryStatus: WeatherAlertDeliveryStatus; deliveryLabel: string },
+  demo: boolean,
+): { status: WeatherAlertDeliveryStatus | 'demo-unsent'; label: string } {
+  const unsent = entry.deliveryStatus === 'failed' || entry.deliveryStatus === 'no-subscriber' || entry.deliveryStatus === 'retrying';
+  return demo && unsent
+    ? { status: 'demo-unsent', label: DEMO_UNSENT_DELIVERY_LABEL }
+    : { status: entry.deliveryStatus, label: entry.deliveryLabel };
+}
+
 /** La valeur prévue avec son unité, comme dans la notification. */
 export function formatWeatherAlertValue(value: number, unit: WeatherAlertUnit): string {
   return formatValue(value, unit);

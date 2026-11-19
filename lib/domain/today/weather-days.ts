@@ -43,6 +43,8 @@ export type TodayWeatherScale = { minimumCelsius: number; maximumCelsius: number
 export type DayAnnouncements = {
   frost: { minimumCelsius: number; crops: readonly string[] } | null;
   alerts: readonly string[];
+  /** Une alerte de froid (la minimale sous un seuil) s'y déclenche : la carte porte le flocon (lot I, n° 25, F453). */
+  cold?: boolean;
 };
 
 function roundedPercent(fraction: number): number {
@@ -77,7 +79,7 @@ export function weatherDays(input: {
       ...(announced?.alerts ?? []),
     ];
     const known = minimumCelsius !== null || maximumCelsius !== null;
-    const frosty = announced?.frost != null || (minimumCelsius !== null && minimumCelsius <= 0);
+    const frosty = announced?.frost != null || announced?.cold === true || (minimumCelsius !== null && minimumCelsius <= 0);
     return {
       date,
       label: date === input.today ? 'Aujourd’hui' : shortDayText(date),

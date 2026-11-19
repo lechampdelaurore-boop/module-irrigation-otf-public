@@ -133,7 +133,9 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
       const first = evaluation.crossings[0];
       if (first) lines.push(sentence(`${weatherAlertCrossingText(criterion, first.value)} le ${shortDayText(first.date)}`));
       for (const crossing of evaluation.crossings) {
-        announce(crossing.date, (item) => ({ ...item, alerts: [...item.alerts, weatherAlertCrossingText(criterion, crossing.value)] }));
+        // Une alerte de froid porte le flocon, même au-dessus de 0 °C (audit du 19 novembre 2026, lot I, n° 25, F453).
+        const cold = criterion.field === 'minimum-temperature' && criterion.direction === 'below';
+        announce(crossing.date, (item) => ({ ...item, cold: item.cold === true || cold, alerts: [...item.alerts, weatherAlertCrossingText(criterion, crossing.value)] }));
       }
     }
   }

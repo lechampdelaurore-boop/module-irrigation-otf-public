@@ -468,7 +468,13 @@ registres, elle y renvoie.
   **PR 4, le bandeau sur tablette** (D-181, F451) : la bannière compacte
   du téléphone (une ligne, « Changer ») vaut jusqu'à 1 000 px ; au-dessus,
   la phrase passe à la ligne au lieu de rétrécir jusqu'à une lettre par
-  ligne ; codée.
+  ligne ; en ligne le 20 novembre 2026 à 4 h 10 (#117, fusionnée à 3 h 47, run
+  44663265596 vérifié job par job).
+  **PR 5, petits défauts de la démonstration** (D-182, F452 à F455) :
+  « Commencer par l'essentiel » à la première ouverture, le flocon pour une
+  alerte de froid, « Non envoyée : notifications coupées dans la
+  démonstration » en couleur neutre, la ligne des notifications coupées
+  sous son titre dans « Réglages » ; codée : **lot I codé en entier**.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

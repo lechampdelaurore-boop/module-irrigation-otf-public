@@ -182,7 +182,13 @@ vierge ; puis la remise en état.
 
 - **F451** la bannière compacte du téléphone jusqu'à 1 000 px ; au-dessus, la phrase passe à la ligne sans rétrécir sous 18 caractères (section 5).
 
-Les précisions de la PR 5 suivent, F452 et au-delà.
+- **F452** « Commencer par l'essentiel » coche Arrosages, Objectifs et besoins, Matériel et placement, avec ce dont elles ont besoin, et garde ce qui l'était ; « Cochera aussi … » en texte ordinaire gris (section 6, point 4).
+
+- **F453** le flocon suit aussi une alerte météo sur la température minimale « en dessous de », même au-dessus de 0 °C (section 6, point 1).
+
+- **F454** en démonstration, un envoi manqué, sans appareil ou relancé se lit « Non envoyée : notifications coupées dans la démonstration », en couleur neutre ; hors démonstration, rien ne change (section 6, point 2).
+
+- **F455** dans « Réglages » en démonstration, la ligne des notifications coupées se lit sous le titre « Notifications du téléphone » (section 6, point 3).
 
 Ce que le lot ne prouve pas : un vrai téléphone, une vraie tablette, un
 lecteur d'écran ; la ferme réelle n'est pas touchée.

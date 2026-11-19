@@ -6292,6 +6292,38 @@ moins (F451). Mesuré sur la bannière seule : 44 px de haut de 390 à
 
 Ne change pas : la bannière au téléphone (J1, D-143) ; sa hauteur à
 l'ordinateur reste au lot K (n° 24).
+
+## D-182 — Lot I, PR 5 : petits défauts de la démonstration
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 25 : sur la
+démonstration, une alerte de froid à 2 °C montrait le soleil ; une alerte
+non envoyée se lisait « Échec du service de notification » en rouge, alors
+que les notifications y sont coupées exprès ; la ligne qui le dit restait
+seule en bas de « Réglages » ; une ferme vierge ne savait pas par où
+commencer, et « Cochera aussi … » ressemblait à un lien. **Causes
+vérifiées** : le flocon ne suivait que le gel des cultures ou une minimale
+sous 0 °C (`lib/domain/today/weather-days.ts`) ; le libellé d'un envoi ne
+savait rien de la démonstration (`weatherAlertDeliveryLabel`).
+
+**Décision.**
+
+- **F452** : la première ouverture propose « Commencer par l'essentiel »,
+  qui coche Arrosages, Objectifs et besoins, Matériel et placement (avec ce
+  dont elles ont besoin) et garde ce qui l'était ; rien n'est coché
+  d'office. « Cochera aussi … » se lit en texte ordinaire, gris.
+- **F453** : un jour qu'une alerte météo sur la température minimale « en
+  dessous de » annonce porte le flocon, même au-dessus de 0 °C.
+- **F454** : en démonstration, un envoi manqué, sans appareil ou relancé se
+  lit « Non envoyée : notifications coupées dans la démonstration », en
+  couleur neutre ; hors démonstration, rien ne change.
+- **F455** : dans « Réglages » en démonstration, la ligne des
+  notifications coupées se lit sous le titre « Notifications du
+  téléphone ».
+
+Ne changent pas : l'envoi des alertes et leur historique enregistré, le
+calcul des alertes, la liste des fonctionnalités. Aucune migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

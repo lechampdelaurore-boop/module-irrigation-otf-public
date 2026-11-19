@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit du 19 novembre 2026, lot I, PR 5 sur 5)
+
+- **Petits défauts de la démonstration** (D-182) : la première ouverture
+  propose « Commencer par l'essentiel » (Arrosages, Objectifs et besoins,
+  Matériel et placement) sans rien cocher d'office, et « Cochera aussi »
+  se lit en texte ordinaire ; un jour qu'une alerte de froid annonce porte
+  le flocon, même au-dessus de 0 °C ; en démonstration, une alerte non
+  envoyée se lit « Non envoyée : notifications coupées dans la
+  démonstration », en couleur neutre, au lieu d'un échec en rouge ; dans
+  « Réglages », la ligne des notifications coupées se lit sous le titre de
+  sa section.
+
 ### Corrigé (audit du 19 novembre 2026, lot I, PR 4 sur 5)
 
 - **Le bandeau de la démonstration sur tablette** (D-181) : entre 601 et

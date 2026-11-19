@@ -8,6 +8,7 @@ import { bedsText, celsiusText, dayText, hourText, upperFirst } from '@/lib/doma
 import { DRYING_DAYS, FROST_DAMAGE_CELSIUS, FROST_OFFSET_CELSIUS } from '@/lib/domain/crop-alerts/thresholds';
 import { frostThresholdOrigin, type CropAlertCommonView, type DryingRow, type FrostThresholdRow } from '@/lib/domain/crop-alerts/view';
 import { FigureOrigin } from './shell/figure-origin';
+import { DeliveryStatus } from './alert-delivery';
 import {
   saveCropAlertSettingsAction,
   saveCropDryingDaysAction,
@@ -35,6 +36,7 @@ export function CropAlertsPanel({
   view,
   onDashboard,
   sprinklerUnavailable = null,
+  demo,
 }: {
   season: number;
   weekStart: string;
@@ -42,6 +44,8 @@ export function CropAlertsPanel({
   onDashboard: (dashboard: WaterDashboard) => void;
   /** Sans le planning, les aspersions à reconsidérer ne paraissent pas : cette ligne le dit (3.8, P1). */
   sprinklerUnavailable?: ReactNode;
+  /** Un déploiement de démonstration : un envoi manqué y tient aux notifications coupées (F454). */
+  demo: boolean;
 }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -142,7 +146,7 @@ export function CropAlertsPanel({
                 <span>{entry.fact}</span>
                 {entry.detail ? <small>{entry.detail}</small> : null}
                 <small>
-                  Envoyée le {instantFormatter.format(new Date(entry.sentAt))} · <span className="weather-alert-delivery" data-status={entry.deliveryStatus}>{entry.deliveryLabel}</span>
+                  Envoyée le {instantFormatter.format(new Date(entry.sentAt))} · <DeliveryStatus entry={entry} demo={demo} />
                 </small>
                 <a href={entry.url}>Voir</a>
               </li>

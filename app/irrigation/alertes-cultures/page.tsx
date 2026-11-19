@@ -22,6 +22,7 @@ export default async function AlertesCulturesPage({ searchParams }: { searchPara
       <CropAlertsPage
         season={context.season}
         initialDashboard={waterDashboard}
+        demo={context.shell.demo}
         sprinklerUnavailable={isPartActive(context.enabled, 'sprinkler-reconsideration')
           ? null
           : <PartUnavailable part={featurePart('sprinkler-reconsideration')} season={context.season} />}
