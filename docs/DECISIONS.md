@@ -6184,5 +6184,8 @@ tranché le 19 novembre 2026 à 13 h 48 la seule question de budget : un
 export hebdomadaire chiffré gardé par lui, gratuit, sans R2 ni service tiers.
 
 Ne change pas : le moteur hydrique, le calcul, les coûts (aucune dépense
-nouvelle). Reste à relire par le porteur avant le code : la phrase des
-30 jours ajoutée à la politique de confidentialité.
+nouvelle). **La phrase des 30 jours** ajoutée à la politique de
+confidentialité (« une donnée effacée reste récupérable dans l'historique
+jusqu'à 30 jours ») **a été approuvée par le porteur le 19 novembre 2026**
+à 20 h 52 (UTC) ; le code de la 4.5 l'applique telle quelle, sur la page
+de confidentialité du site public, dans la PR 5.
