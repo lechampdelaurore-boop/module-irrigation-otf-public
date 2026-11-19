@@ -10,6 +10,7 @@ import { listProtectedSlotsForUser } from '@/db/protected-slots-repository';
 import { usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { calculateIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
 import { getCropCoefficientsViewForUser } from '@/lib/services/crop-water-coefficients';
+import { getIrrigationFormHintsForUser } from '@/lib/services/irrigation-form-hints';
 import { getIrrigationHistoryDashboardForUser } from '@/lib/services/irrigation-history-service';
 import { getIrrigationNeedsDashboardForUser } from '@/lib/services/irrigation-needs-service';
 import { readWeeklyPlanForUser } from '@/lib/services/planning-service';
@@ -102,7 +103,7 @@ export async function loadMaterielPage(context: ReadyPageContext) {
 }
 
 export async function loadArrosagesPage(context: ReadyPageContext) {
-  const [state, irrigationEvents, pumpDashboard, planningSettings, protectedSlots, waterDashboard] = await Promise.all([
+  const [state, irrigationEvents, pumpDashboard, planningSettings, protectedSlots, waterDashboard, formHints] = await Promise.all([
     loadEquipmentState(context),
     listIrrigationEventsForUser(context.userId, context.season, true),
     context.enabled.includes('ressources') ? getPumpDashboardForUser(context.userId) : emptyPumpDashboard(),
@@ -110,9 +111,14 @@ export async function loadArrosagesPage(context: ReadyPageContext) {
     // L'avertissement d'un arrosage planifié dans un créneau protégé (3.8 ter, règle 12) : Planning coché seulement (R1).
     context.enabled.includes('planning') ? listProtectedSlotsForUser(context.userId) : [],
     loadWaterDashboard(context),
+    // La dose du jour et les objectifs de la semaine que le formulaire propose (lot G, n° 9, F409 et F410).
+    getIrrigationFormHintsForUser({
+      ownerUserId: context.userId, season: context.season, snapshot: context.snapshot,
+      now: new Date(context.nowIso), planningEnabled: context.enabled.includes('planning'),
+    }),
   ]);
   context.lap('dashboards');
-  return { ...state, irrigationEvents, pumpDashboard, planningSettings, protectedSlots, waterDashboard };
+  return { ...state, irrigationEvents, pumpDashboard, planningSettings, protectedSlots, waterDashboard, formHints };
 }
 
 export async function loadBesoinsPage(context: ReadyPageContext) {

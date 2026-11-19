@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot G, PR 2 sur 5)
+
+- **La quantité proposée est la dose du jour** (D-169) : « Irriguer
+  maintenant » et « Planifier » ne proposent plus 25 mm d'office, mais la
+  dose que le planning propose pour ce matériel ce jour-là ; sans
+  proposition, le champ reste vide.
+- **Au-delà de l'objectif de la semaine d'une planche, une confirmation**
+  avant d'enregistrer ; sans objectif, aucune.
+
 ### Modifié (audit du 19 novembre 2026, lot G « Le module vous répond », PR 1 sur 5)
 
 - **Le message vient sous le bouton appuyé** (D-167) : au téléphone, la

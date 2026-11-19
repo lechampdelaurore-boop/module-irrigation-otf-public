@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.ts';
 
 /**
  * Parcours P37 : l'audit ergonomique du 19 novembre 2026, lot G, « Le module
@@ -19,6 +20,13 @@ import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from '.
  *   « Enregistrer », la pluie mesurée sous le sien ; aucun « Les besoins ont
  *   été recalculés » ne paraît après un geste fait ailleurs (F404, F405).
  *
+ * - la quantité : vide pour un matériel sans dose du jour, le bouton
+ *   indisponible (F409) ; au-delà de l'objectif de la semaine d'une
+ *   planche, la fenêtre du module demande, « Ne pas irriguer » n'écrit rien
+ *   (F410). La dose du jour elle-même se prouve dans les tests du domaine
+ *   (`tests/irrigation-form-hints.test.ts`) : un plan à l'écran est le
+ *   travail de P10.
+ *
  * Ce qu'il ne prouve pas : un vrai téléphone, un lecteur d'écran.
  */
 
@@ -31,7 +39,10 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   const debut = horodatageLocal(2 * 24 * 60, reference);
-  await choisirMaterielEtReglage(page, materiel, reglage);
+  // Aucune dose du jour pour un matériel neuf : la quantité reste vide, le bouton indisponible (F409).
+  await choisirMaterielEtReglage(page, materiel, reglage, '');
+  await expect(page.getByLabel('Quantité souhaitée')).toHaveValue('');
+  await page.getByLabel('Quantité souhaitée').fill('25');
   await page.getByLabel('Date et heure de début').fill(debut);
   const planifier = page.getByRole('button', { name: 'Planifier l’irrigation' });
   await planifier.click();
@@ -102,5 +113,28 @@ test('« Objectifs et besoins » répond sous chaque bouton, et un rechargement 
     await pluie.getByRole('button', { name: 'Retirer la mesure' }).click();
     await expect(reponse).toContainText('retirée');
     await expect(millimetres).toHaveValue('');
+  }
+});
+
+test('au-delà de l’objectif de la semaine, « Irriguer maintenant » demande d’abord', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await attendreLaPageIrrigation(page);
+  const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p37 objectif' });
+  await attendreLaPageIrrigation(page, 'besoins');
+  await poserUnObjectifDeFerme(page, '10');
+  try {
+    await attendreLaPageIrrigation(page, 'arrosages');
+    await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+    await choisirMaterielEtReglage(page, materiel, reglage);
+    await page.getByRole('button', { name: 'Démarrer l’irrigation' }).click();
+    const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+    await expect(fenetre).toContainText('25 mm dépassent l’objectif de la semaine de N01 (10 mm). Irriguer quand même ?');
+    await fenetre.getByRole('button', { name: 'Ne pas irriguer' }).click();
+    await expect(fenetre).toHaveCount(0);
+    await expect(page.getByLabel('Irrigations en cours').filter({ hasText: materiel })).toHaveCount(0);
+    await verifierLEtape(page, journal, '« Ne pas irriguer » n’écrit rien');
+  } finally {
+    await attendreLaPageIrrigation(page, 'besoins');
+    await retirerLesObjectifs(page);
   }
 });

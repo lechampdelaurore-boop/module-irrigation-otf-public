@@ -5941,6 +5941,35 @@ espèce-culture (extraction de sa ferme réelle acceptée).
 Ne change pas : le moteur hydrique ni les jeux de réglages communs
 (section 11 du contrat), sauf la borne de l'ET0, à confirmer contre le
 contrat commun avant le code. Aucune question de budget.
+## D-169 — Lot G, PR 2 : la quantité proposée est la dose du jour, et l'objectif de la semaine se confirme
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 9 :
+« Irriguer maintenant » et « Planifier » proposent 25 mm d'office, quel que
+soit le matériel, et rien ne compare la quantité à l'objectif de la
+semaine. Deux réponses du porteur le même jour : « la dose du jour, sinon
+vide » (11 h 37) ; « au-delà de l'objectif de la semaine » (11 h 42).
+
+**Décision.**
+
+1. À chaque choix d'un matériel, la quantité prend la dose de la
+   proposition du planning pour ce matériel le jour de l'irrigation
+   (aujourd'hui, ou le jour de la date de début pour « Planifier »),
+   proposée ou validée, la première du jour ; sinon le champ reste vide et
+   le bouton indisponible. Planning décoché : champ vide. Une saisie n'est
+   remplacée qu'au changement de matériel. Le plan est lu enregistré, sans
+   calcul (`lib/services/irrigation-form-hints.ts`) ; la règle vit dans
+   `lib/domain/irrigation-form-hints.ts` (F409).
+2. Avant d'enregistrer une irrigation en cours ou planifiée, si l'apport
+   estimé de cette irrigation sur une planche atteinte dépasse l'objectif
+   adopté de sa semaine, la fenêtre du module le dit et demande ; sans
+   objectif adopté, aucune fenêtre. Un avertissement, jamais un refus :
+   confirmé, l'arrosage s'enregistre. Une irrigation déjà réalisée ne
+   demande rien (F410).
+
+Ne changent pas : le calcul de la durée et de l'apport ; les objectifs et
+leur règle (D-034) ; le planificateur.
 
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 

@@ -104,7 +104,7 @@ ne compare la quantité à l'objectif de la semaine.
    l'apport estimé d'une planche atteinte dépasse son objectif hebdomadaire
    adopté, une fenêtre du module le dit : « 30 mm dépassent l'objectif de la
    semaine de Planche 3 (20 mm). Irriguer quand même ? » (la planche la plus
-   au-delà ; « et 2 autres planches » s'il y en a). Sans objectif adopté,
+   au-delà ; « , et celui de 2 autres planches » s'il y en a). Sans objectif adopté,
    aucune fenêtre. Ce n'est qu'un avertissement : confirmé, l'arrosage
    s'enregistre (F410).
 
@@ -154,7 +154,7 @@ ne compare la quantité à l'objectif de la semaine.
 | 2 | Même matériel, même créneau, second appui après réussite | le bouton est indisponible (formulaire vidé) ; re-choisi et re-planifié : la fenêtre « … déjà une irrigation planifiée de … à … » ; « Ne pas planifier » : une seule carte dans « À venir » |
 | 3 | Objectif hebdomadaire hors bornes, 390 px | « L'objectif doit être compris entre 0 et 500 mm par semaine » sous « Enregistrer » |
 | 4 | Pluie mesurée enregistrée | « La pluie mesurée a été enregistrée » sous son bouton ; aucun « Les besoins ont été recalculés » |
-| 5 | Matériel avec proposition du jour à 8,1 mm | quantité 8,1 ; sans proposition : champ vide, bouton indisponible |
+| 5 | Matériel avec proposition du jour à 8,1 mm | quantité 8,1 (tests du domaine) ; sans proposition : champ vide, bouton indisponible (P37) |
 | 6 | Quantité au-delà de l'objectif de la semaine (20 mm) d'une planche | fenêtre « … dépassent l'objectif de la semaine de … (20 mm) » ; sans objectif : aucune fenêtre |
 | 7 | « Refuser » au planning | fenêtre de confirmation ; confirmée, message « Créneau refusé. Le besoin est replacé … » |
 | 8 | Les sept confirmations, « Vider les objectifs » | la fenêtre du module, aucun `dialog` du navigateur ; bouton de confirmation rouge |

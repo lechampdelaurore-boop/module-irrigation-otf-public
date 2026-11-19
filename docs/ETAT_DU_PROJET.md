@@ -372,7 +372,12 @@ registres, elle y renvoie.
   vue ; le formulaire d'irrigation vidé après une réussite ; une seconde
   irrigation du même matériel sur un créneau déjà planifié demandée dans
   la fenêtre du module, rien n'est écrit sans elle ; un rechargement des
-  besoins muet ; codée.
+  besoins muet ; en ligne le 19 novembre 2026 à 15 h 21 (#100, run
+  44535127926 vérifié job par job, démonstration redéployée par le run
+  44538682844). **PR 2, la quantité proposée** (D-169, F409 et
+  F410) : la dose du jour du planning pour ce matériel, sinon un champ
+  vide ; au-delà de l'objectif de la semaine d'une planche, la fenêtre du
+  module demande ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
