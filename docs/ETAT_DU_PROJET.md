@@ -462,7 +462,13 @@ registres, elle y renvoie.
   chaque page attendait cinq secondes avant de le montrer à moitié écrit ;
   elle est désormais reprise jusqu'au bout par une seule requête après deux
   minutes, et une page qui arrive pendant une préparation dit
-  « Préparation de votre démonstration… » et se relit seule ; codée.
+  « Préparation de votre démonstration… » et se relit seule ; en ligne le
+  20 novembre 2026 à 2 h 55 (#116, fusionnée à 2 h 33, run 44654506190 vérifié job
+  par job).
+  **PR 4, le bandeau sur tablette** (D-181, F451) : la bannière compacte
+  du téléphone (une ligne, « Changer ») vaut jusqu'à 1 000 px ; au-dessus,
+  la phrase passe à la ligne au lieu de rétrécir jusqu'à une lettre par
+  ligne ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
