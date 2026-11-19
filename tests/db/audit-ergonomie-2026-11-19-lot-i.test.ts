@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test, { afterEach, beforeEach } from 'node:test';
 import { demoOwnerUserId, resolveDemoChoice } from '../../lib/domain/demo/catalogue';
-import { prepareDemoSpace } from '../../lib/services/demo-space';
+import { DemoSpacePreparingError, prepareDemoSpace } from '../../lib/services/demo-space';
+import { createWorkspaceIfAbsent } from '../../db/workspace-repository';
+import { readFeatureSelectionForUser } from '../../db/feature-selection-repository';
+import { listEquipmentForUser } from '../../db/equipment/read';
 import { readLatestPlanForUser } from '../../db/planning-repository';
 import { getIrrigationFeasibilityScreenForUser } from '../../lib/services/irrigation-feasibility-service';
 import { beyondNeedSentence, shortageAction, waterBeyondNeed } from '../../lib/domain/planning/shortage-reading';
@@ -118,4 +122,49 @@ test('n° 10, F449 : hors démonstration, la date d’écriture reste l’heure 
   await saveHydricGoalForUser('ferme-reelle', { season: 2026, weekStart: '2026-11-16', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
   const [goal] = await listHydricGoalsForUser('ferme-reelle', 2026, '2026-11-16');
   assert.ok(Date.parse(goal.createdAt) >= before - 1000 && Date.parse(goal.createdAt) <= Date.now() + 1000, goal.createdAt);
+});
+
+// n° 11 — La démonstration se prépare jusqu'au bout (PR 3, F450).
+
+/** Un espace créé il y a `minutes` minutes, dont la préparation s'est arrêtée avant d'écrire quoi que ce soit d'autre. */
+async function interruptedSpace(minutes: number) {
+  const choice = resolveDemoChoice('maraichage', 'ete');
+  const owner = demoOwnerUserId('invite-b', choice);
+  installSimulatedDate();
+  assert.equal(await createWorkspaceIfAbsent(owner), true);
+  database.sqlite.prepare(`UPDATE irrigation_workspaces SET created_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now', ?) WHERE owner_user_id = ?`).run(`-${minutes} minutes`, owner);
+  return { choice, owner };
+}
+
+test('n° 11, F450 : une préparation interrompue depuis plus de deux minutes est reprise jusqu’au bout, une seule fois', async () => {
+  const { choice, owner } = await interruptedSpace(3);
+  assert.equal((await readFeatureSelectionForUser(owner)).kind, 'before-selection', 'à moitié prête : aucune case');
+  // Deux requêtes arrivent ensemble : une seule reprend, l'autre attend qu'elle ait fini.
+  await Promise.all([
+    runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice)),
+    runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice).catch((error: unknown) => assert.ok(error instanceof DemoSpacePreparingError))),
+  ]);
+  assert.equal((await readFeatureSelectionForUser(owner)).kind, 'stored', 'les cases, écrites en dernier');
+  assert.equal((await listEquipmentForUser(owner)).length, 4, 'le matériel, une seule fois');
+  const spaces = database.sqlite.prepare('SELECT owner_user_id FROM irrigation_workspaces WHERE owner_user_id LIKE ?').all(`${owner}%`) as { owner_user_id: string }[];
+  assert.equal(spaces.length, 2, 'l’espace interrompu mis de côté, un espace neuf');
+  assert.equal(spaces.filter((space) => space.owner_user_id.includes('·archive·')).length, 1);
+});
+
+test('n° 11, F450 : une préparation en cours depuis moins de deux minutes n’est pas reprise ; la page dit qu’elle se prépare', async () => {
+  const { choice, owner } = await interruptedSpace(0);
+  await assert.rejects(runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice)), DemoSpacePreparingError);
+  assert.equal((await readFeatureSelectionForUser(owner)).kind, 'before-selection', 'rien n’est écrit à sa place');
+  const spaces = database.sqlite.prepare('SELECT owner_user_id FROM irrigation_workspaces WHERE owner_user_id LIKE ?').all(`${owner}%`);
+  assert.equal(spaces.length, 1, 'rien n’est mis de côté');
+});
+
+test('n° 11, F450 : la page d’attente se relit seule toutes les deux secondes', () => {
+  const source = readFileSync('app/irrigation/shell/unavailable-state.tsx', 'utf8');
+  assert.match(source, /title: 'Préparation de votre démonstration…'/);
+  assert.match(source, /PREPARING_RELOAD_SECONDS = 2;/);
+  assert.match(source, /window\.location\.reload\(\)/);
+  for (const page of ['app/irrigation/page-context.ts', 'app/irrigation/page.tsx', 'app/irrigation/bienvenue/page.tsx']) {
+    assert.match(readFileSync(page, 'utf8'), /instanceof DemoSpacePreparingError/, page);
+  }
 });

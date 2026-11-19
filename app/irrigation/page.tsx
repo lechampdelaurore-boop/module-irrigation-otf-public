@@ -4,8 +4,9 @@ import { WELCOME_PATH } from '@/lib/domain/features/pages';
 import { parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
+import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
-import { farmUnidentifiedState, type IrrigationSearchParams } from './page-context';
+import { demoPreparingState, farmUnidentifiedState, type IrrigationSearchParams } from './page-context';
 import { LegacyRedirect } from './shell/legacy-redirect';
 import { UnavailableState } from './shell/unavailable-state';
 import './irrigation.css';
@@ -27,6 +28,8 @@ export default async function IrrigationIndexPage({ searchParams }: { searchPara
   } catch (error) {
     // La ferme de la clé n'est pas établie : rien n'est montré (F341).
     if (error instanceof FarmIdentityUnavailableError) return <UnavailableState {...farmUnidentifiedState('aujourdhui', todaySeason(new Date()), error)} />;
+    // La démonstration se prépare dans une autre requête : la page le dit et se relit seule (lot I, n° 11, F450).
+    if (error instanceof DemoSpacePreparingError) return <UnavailableState {...demoPreparingState('aujourdhui', todaySeason(new Date()))} />;
     throw error;
   }
   const selection = await getFeatureSelectionForUser(user.userId);

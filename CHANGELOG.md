@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit du 19 novembre 2026, lot I, PR 3 sur 5)
+
+- **La démonstration se prépare jusqu'au bout** (D-180) : une préparation
+  interrompue (onglet fermé, deux ouvertures coup sur coup) laissait la
+  démonstration à moitié prête, chaque page attendant cinq secondes ; elle
+  est désormais reprise et finie à l'ouverture suivante. Une page ouverte
+  pendant la préparation dit « Préparation de votre démonstration… » et
+  s'ouvre d'elle-même quand c'est prêt. Hors démonstration, rien ne change.
+
 ### Corrigé (audit du 19 novembre 2026, lot I, PR 2 sur 5)
 
 - **La démonstration à son jour** (D-179) : un objectif posé dans la

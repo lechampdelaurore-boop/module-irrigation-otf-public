@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { millisecondsFromSeconds } from '@/lib/domain/units';
 import { pageHref, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { closestAvailableSeason } from '@/lib/domain/irrigation-navigation';
 import {
@@ -17,7 +19,7 @@ export type UnavailableStateProps = {
   signOutPath: string;
   userName: string;
   season: number;
-  reason: IrrigationUnavailableReason | 'season-unavailable';
+  reason: IrrigationUnavailableReason | 'season-unavailable' | 'demo-preparing';
   seasonFirst?: number;
   seasonLast?: number;
   /** Un déploiement de démonstration : la bannière permanente (docs/demo-guided-contract.md). */
@@ -92,6 +94,18 @@ const TEXTS: Record<IrrigationUnavailableReason, StateText> = {
   },
 };
 
+/** La démonstration se prépare dans une autre requête (audit du 19 novembre 2026, lot I, n° 11, F450). */
+const DEMO_PREPARING: StateText = {
+  eyebrow: 'Démonstration',
+  title: 'Préparation de votre démonstration…',
+  body: 'La ferme fictive se prépare : ses cultures, son matériel, sa météo et le plan de la semaine. La page s’ouvrira d’elle-même dans un instant.',
+  action: 'Recharger la page',
+  refresh: false,
+};
+
+/** Toutes les deux secondes, la page se relit tant que la démonstration se prépare (F450). */
+const PREPARING_RELOAD_SECONDS = 2;
+
 /** Ouvre ta ferme n'a pas répondu et rien n'est encore enregistré : aucune page ne peut s'afficher. */
 export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast, demo, demoSelection }: UnavailableStateProps) {
   const seasonUnavailable = reason === 'season-unavailable' && seasonFirst !== undefined && seasonLast !== undefined;
@@ -104,12 +118,18 @@ export function UnavailableState({ page, signOutPath, userName, season, reason, 
         action: `Afficher la saison ${fallbackSeason}`,
         refresh: false,
       }
-    : TEXTS[reason === 'season-unavailable' ? 'unavailable' : reason];
+    : reason === 'demo-preparing' ? DEMO_PREPARING : TEXTS[reason === 'season-unavailable' ? 'unavailable' : reason];
+  const preparing = reason === 'demo-preparing';
+  useEffect(() => {
+    if (!preparing) return;
+    const timer = setTimeout(() => window.location.reload(), millisecondsFromSeconds(PREPARING_RELOAD_SECONDS));
+    return () => clearTimeout(timer);
+  }, [preparing]);
 
   return (
     <main className="app-shell">
       <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} />
-      <section className="fatal-state" role="alert">
+      <section className="fatal-state" role={preparing ? 'status' : 'alert'} aria-busy={preparing || undefined}>
         <p className="eyebrow">{text.eyebrow}</p>
         <h1>{text.title}</h1>
         <p>{text.body}</p>
