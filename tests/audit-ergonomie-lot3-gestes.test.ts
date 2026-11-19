@@ -150,7 +150,7 @@ test('cas 10 : six abris « inconnue » portent chacun « Observer » ; onze jar
   assert.equal(group.kind, 'group');
   if (group.kind !== 'group') return;
   assert.equal(group.title, 'Tous les jardins de plein champ');
-  assert.equal(group.detail, '50 % du plein, observé hier');
+  assert.equal(group.detail, '50 % du plein estimé aujourd’hui · dernière observation hier');
   assert.equal(group.plotIds.length, 11);
   const plots = lines.filter((line) => line.kind === 'plot');
   assert.equal(plots.filter((line) => line.groupKey === group.key).length, 11);
@@ -174,7 +174,7 @@ test('cas 10 : un pli ne range que des jardins de plein champ au même pourcenta
   const groups = lines.filter((line) => line.kind === 'group');
   assert.equal(groups.length, 1);
   assert.equal(groups[0].kind === 'group' && groups[0].title, '2 jardins de plein champ');
-  assert.equal(groups[0].kind === 'group' && groups[0].detail, '50 % du plein, observé aujourd’hui');
+  assert.equal(groups[0].kind === 'group' && groups[0].detail, '50 % du plein estimé aujourd’hui · dernière observation aujourd’hui');
   assert.deepEqual(groups[0].kind === 'group' && groups[0].plotIds, ['a', 'c']);
   // Le pli se place à la hauteur de son premier jardin.
   assert.deepEqual(lines.map((line) => (line.kind === 'group' ? 'pli' : line.plot.plotId)), ['pli', 'a', 'b', 'c', 'd', 'e', 'f']);

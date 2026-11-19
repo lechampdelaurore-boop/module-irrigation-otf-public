@@ -6368,6 +6368,34 @@ la saison (les 32 cultures de référence ouvertes, F302), la page passe de
 5 541 à 3 961 px, et P40 la borne à 4 000.
 
 Ne changent pas : les réglages eux-mêmes et leur calcul. Aucune migration.
+
+## D-185 — Lot J, PR 3 : « Réserve du sol », les jardins pareils en une barre
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 15 : sur la
+ferme du porteur, « Réserve du sol » montrait 18 barres de 107 px, dont 11
+identiques à 100 % (3 733 px au téléphone) ; « 100 % » se coupait en
+« 100 » puis « % » ; « 11 jardins de plein champ — 100 % du plein, observé
+le vendredi 6 novembre » se lisait comme une observation à 100 %, alors que
+l'observation était de 50 % et le 100 % l'estimation du jour. **Cause
+vérifiée** : le pli des jardins pareils (lot 3, point 13) rangeait les
+lignes, pas les barres du graphique (`garden-bars.ts`), et sa phrase mêlait
+l'estimation et le jour de l'observation.
+
+**Décision (F458).** Les jardins de plein champ que la page range déjà
+ensemble (même % arrondi, même jour d'observation), au même % prévu
+dimanche, sans planche sous son seuil, n'ont qu'une barre, « 11 jardins de
+plein champ » (« Tous les jardins de plein champ » quand ils le sont tous),
+avec trois noms puis « et n autres » ; chaque planche y reste un point ;
+toucher la barre ouvre le premier jardin et le pli des autres. Un abri, un
+jardin inconnu ou dont une planche est sous son seuil garde sa barre.
+« 100 % » et les repères du curseur ne se coupent plus. Le pli dit « 100 %
+du plein estimé aujourd'hui · dernière observation le … ». Budget de la
+page au téléphone : 2 600 px.
+
+Ne changent pas : la jauge et son calcul (D-047, D-053), l'ordre des
+jardins. Aucune migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

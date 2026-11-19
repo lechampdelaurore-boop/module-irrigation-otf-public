@@ -508,7 +508,14 @@ registres, elle y renvoie.
   5 h 41 (#119, fusionnée à 5 h 18, run 44673550080 vérifié job par job).
   **PR 2, le pli de « Besoin par culture »** (D-184, F457) : « Réglages du
   calcul » rangé dans le pli « Réglages de cette page », fermé, en bas,
-  comme sur les quatre autres pages ; codée.
+  comme sur les quatre autres pages ; en ligne le 20 novembre 2026 à
+  6 h 31 (#120, fusionnée à 6 h 12, run 44679445509 vérifié job par job). **PR 3, les jardins pareils
+  en une barre** (D-185, F458) : sur « Réserve du sol », les jardins de
+  plein champ que la page range déjà ensemble, au même prévu de dimanche
+  et sans planche sous son seuil, n'ont qu'une barre ; « 100 % » et
+  « sec 25 % » ne se coupent plus ; « 100 % du plein estimé aujourd'hui ·
+  dernière observation le … » au lieu de « 100 % du plein, observé le … » ;
+  codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

@@ -61,6 +61,11 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // Les données des parcours n'ont aucune culture de la saison : les 32 cultures de référence
   // s'y montrent ouvertes (F302), d'où 4 000 px ici pour 3 000 sur une ferme qui cultive.
   cultures: 4_000,
+  // PR 3 (F458) : les jardins pareils en une barre. Les données des parcours n'ont que quatre
+  // jardins, aucun pareil (le regroupement est chiffré par tests/soil-reserve-garden-bars.test.ts).
+  // 2 560 px sur les données neuves ; 2 866 px quand P18 à P33 ont saisi et observé le sol de
+  // leurs jardins avant lui, comme dans la suite complète : le budget couvre ce second cas.
+  sol: 3_000,
 };
 
 for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuModule, number][]) {

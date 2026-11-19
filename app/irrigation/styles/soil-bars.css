@@ -164,6 +164,8 @@
 }
 
 .soil-bar-percent {
+  /* « 100 % » ne se coupe plus en « 100 » puis « % » (lot J, n° 15, F458). */
+  white-space: nowrap;
   font-family: var(--font-title);
   font-size: 1.15rem;
   font-weight: 500;
