@@ -6046,6 +6046,35 @@ au téléphone ne changent pas. La ligne de la charte
 
 Ne changent pas : l'adresse de déconnexion ; la cloche ; la barre.
 
+## D-173 — Lot H, PR 1 : la pluie dit d'où elle vient
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 3 : sur
+« Aujourd'hui », la tuile « Eau reçue » écrit « de pluie mesurée » et la
+légende d'« Eau de la semaine » « Pluie mesurée » quelle que soit
+l'origine de la pluie. Or, pour un jour passé, la pluie comptée est celle
+du pluviomètre, sinon la réanalyse, sinon la prévision enregistrée
+(D-019) ; la réanalyse arrive avec cinq jours de retard : sans
+pluviomètre, la pluie de la semaine en cours est presque toujours de la
+prévision. Le lot H a été retenu par le porteur le 19 novembre 2026 à
+11 h 39 ; contrat court `docs/audit-ergonomie-2026-11-19-lot-h-contract.md`.
+
+**Décision.** La page lit la pluie extérieure des jours écoulés par
+origine (`pastRainOrigins`, `lib/domain/today/week.ts`), dans l'ordre même
+de D-019 : mesurée, estimée après coup, prévue. La tuile dit
+« 30,7 mm de pluie prévue, non mesurée », « 12 mm de pluie mesurée »,
+« 8 mm de pluie estimée après coup », ou, mêlée, « 30,7 mm de pluie, dont
+12 mm mesurés et 18,7 mm prévus », chaque part au prorata de la pluie
+extérieure ; sous abri, « 0 mm de pluie, sous abri ». La légende nomme
+les mêmes origines (« Pluie prévue, non mesurée », « Pluie mesurée et
+prévue ») ; sans origine connue, « Pluie » seule, jamais « mesurée »
+(F429).
+
+Ne changent pas : la pluie comptée (D-019), le besoin, le reste à
+apporter, les autres pages ; « Pluie mesurée » d'« Objectifs et besoins »,
+qui est bien la saisie du pluviomètre.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

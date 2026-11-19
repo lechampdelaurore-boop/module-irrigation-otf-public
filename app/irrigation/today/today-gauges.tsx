@@ -45,7 +45,7 @@ export function TodayWeekWater({ week, query }: { week: TodayWeek; query: PageQu
       ) : null}
       <p className="today-legend" aria-hidden="true">
         <span><i data-tone="irrigation" />Irrigation</span>
-        <span><i data-tone="rain" />Pluie mesurée</span>
+        <span><i data-tone="rain" />{week.rainLegend}</span>
         <span><i data-tone="goal" />Objectif</span>
         <span>Échelle : 0 à {week.scaleMaxMm} mm</span>
       </p>

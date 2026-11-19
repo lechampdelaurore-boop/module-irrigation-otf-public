@@ -261,6 +261,7 @@ test('T4 : la semaine pondère les millimètres par la surface, pour la ferme et
       bed('g2', 'Tunnel', 20, { sheltered: true, objectiveMm: 25, actualRainMm: 0, actualIrrigationMm: 14, realRemainingMm: 11 }),
     ],
     water: { weekCubicMeters: 18.04, todayCubicMeters: 4, incomplete: false },
+    rainOrigins: { measuredMm: 2, reanalysisMm: 0, forecastMm: 0 },
   });
   assert.ok(week);
   assert.equal(week.label, 'du lun. 9 nov. au dim. 15 nov.');

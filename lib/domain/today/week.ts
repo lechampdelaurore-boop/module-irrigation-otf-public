@@ -1,12 +1,13 @@
 import { mmText, waterText } from '../figure-origin.ts';
 import type { BedIrrigationNeed } from '../irrigation-needs.ts';
 import { percentFromFraction } from '../units.ts';
+import type { WaterDashboardDay } from '../water-management.ts';
 import { shortDayText } from './today-text.ts';
 
 /**
  * « La semaine » et « Eau de la semaine » du tableau de bord « Aujourd'hui »
  * (docs/aujourdhui-tableau-de-bord-contract.md, section 3.2, précision T4) :
- * l'objectif, l'eau reçue (irrigation réelle et pluie mesurée) et ce qui
+ * l'objectif, l'eau reçue (irrigation réelle et pluie comptée) et ce qui
  * reste à apporter, pour la ferme et par jardin, comme les lit « Objectifs
  * et besoins » pour la semaine en cours. Rien ne se calcule de nouveau : le
  * reste à apporter est celui du tableau des besoins (objectif − pluie réelle
@@ -22,6 +23,30 @@ import { shortDayText } from './today-text.ts';
  * jamais « non fixé » quand des planches en ont un.
  */
 
+/**
+ * La pluie extérieure des jours déjà écoulés de la semaine, par origine
+ * (audit du 19 novembre 2026, lot H, n° 3, F429) : mesurée au pluviomètre,
+ * estimée après coup (la réanalyse), ou prévue (la prévision reprise pour un
+ * jour passé, D-019). Leur somme est la pluie déjà comptée : seul le mot
+ * change, jamais le calcul.
+ */
+export type RainOrigins = { measuredMm: number; reanalysisMm: number; forecastMm: number };
+
+/** Les jours écoulés jusqu'à aujourd'hui compris, comme les compte le tableau des besoins (D-019). */
+export function pastRainOrigins(
+  days: readonly Pick<WaterDashboardDay, 'date' | 'manualRainMm' | 'reanalysisRainMm' | 'forecastRainMm'>[],
+  today: string,
+): RainOrigins {
+  const origins: RainOrigins = { measuredMm: 0, reanalysisMm: 0, forecastMm: 0 };
+  for (const day of days) {
+    if (day.date > today) continue;
+    if (day.manualRainMm !== null) origins.measuredMm += Math.max(0, day.manualRainMm);
+    else if (day.reanalysisRainMm !== null) origins.reanalysisMm += Math.max(0, day.reanalysisRainMm);
+    else if (day.forecastRainMm !== null) origins.forecastMm += Math.max(0, day.forecastRainMm);
+  }
+  return origins;
+}
+
 /** Ce que la page lit d'une planche dans le tableau des besoins de la semaine. */
 export type TodayWeekBed = Pick<BedIrrigationNeed,
   'plotId' | 'plotName' | 'sheltered' | 'areaSquareMeters' | 'objectiveMm' | 'actualRainMm' | 'actualIrrigationMm' | 'realRemainingMm'>;
@@ -33,6 +58,8 @@ export type TodayWeekInputs = {
   beds: readonly TodayWeekBed[];
   /** L'eau d'irrigation réalisée de la semaine et du jour, en m³ ; `incomplete` quand une surface mouillée manque. */
   water: { weekCubicMeters: number; todayCubicMeters: number; incomplete: boolean } | null;
+  /** La pluie des jours écoulés par origine ; absente, la pluie se dit sans origine, jamais « mesurée » (F429). */
+  rainOrigins?: RainOrigins | null;
 };
 
 /** L'échelle des barres va au moins jusqu'à 10 mm, arrondie aux 5 mm au-dessus de la plus haute valeur. */
@@ -65,6 +92,8 @@ type WeekRow = {
 export type TodayWeek = {
   /** « du lun. 2 nov. au dim. 8 nov. ». */
   label: string;
+  /** « Pluie mesurée », « Pluie prévue, non mesurée », « Pluie mesurée et prévue »… : la légende des barres (F429). */
+  rainLegend: string;
   scaleMaxMm: number;
   farm: WeekRow;
   shown: WeekRow[];
@@ -151,6 +180,51 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
   };
 }
 
+const RAIN_SHARE_EPSILON = 0.05;
+
+type RainOrigin = { key: keyof RainOrigins; alone: string; part: string; legend: string };
+const RAIN_ORIGIN_WORDS: readonly RainOrigin[] = [
+  { key: 'measuredMm', alone: 'de pluie mesurée', part: 'mesurés', legend: 'mesurée' },
+  { key: 'reanalysisMm', alone: 'de pluie estimée après coup', part: 'estimés après coup', legend: 'estimée' },
+  { key: 'forecastMm', alone: 'de pluie prévue, non mesurée', part: 'prévus', legend: 'prévue' },
+];
+
+function presentOrigins(origins: RainOrigins | null | undefined): RainOrigin[] {
+  if (!origins) return [];
+  return RAIN_ORIGIN_WORDS.filter((origin) => origins[origin.key] > RAIN_SHARE_EPSILON);
+}
+
+function listed(parts: readonly string[]): string {
+  return parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} et ${parts[parts.length - 1]}`;
+}
+
+/**
+ * « 30,7 mm de pluie prévue, non mesurée », « 12 mm de pluie mesurée »,
+ * « 30,7 mm de pluie, dont 12 mm mesurés et 18,7 mm prévus » : la part de
+ * chaque origine se lit sur la pluie de la ligne, au prorata de la pluie
+ * extérieure (une planche sous abri n'en reçoit pas). Sans origine connue,
+ * « de pluie », jamais « mesurée » (F429).
+ */
+function rainText(rainMm: number, origins: RainOrigins | null | undefined, sheltered: boolean): string {
+  const total = `${mmText(rounded(rainMm))} de pluie`;
+  if (sheltered) return `${total}, sous abri`;
+  const present = presentOrigins(origins);
+  if (rainMm <= RAIN_SHARE_EPSILON || present.length === 0 || !origins) return total;
+  if (present.length === 1) return `${mmText(rounded(rainMm))} ${present[0].alone}`;
+  const exterior = present.reduce((sum, origin) => sum + origins[origin.key], 0);
+  const parts = present.map((origin) => `${mmText(rounded(rainMm * origins[origin.key] / exterior))} ${origin.part}`);
+  return `${total}, dont ${listed(parts)}`;
+}
+
+/** La légende des barres : « Pluie mesurée », « Pluie prévue, non mesurée », « Pluie mesurée et prévue ». */
+function rainLegend(origins: RainOrigins | null | undefined): string {
+  const present = presentOrigins(origins);
+  if (present.length === 0) return 'Pluie';
+  if (present.length === 1 && present[0].key === 'forecastMm') return 'Pluie prévue, non mesurée';
+  if (present.length === 1 && present[0].key === 'reanalysisMm') return 'Pluie estimée après coup';
+  return `Pluie ${listed(present.map((origin) => origin.legend))}`;
+}
+
 function scaleMax(values: readonly (number | null)[]): number {
   const highest = Math.max(WEEK_SCALE_MINIMUM_MM, ...values.filter((value): value is number => value !== null && Number.isFinite(value)));
   return Math.ceil(highest / WEEK_SCALE_STEP_MM) * WEEK_SCALE_STEP_MM;
@@ -182,6 +256,7 @@ export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
   const scoped = (detail: string) => (partial ? `${detail}, ${withObjective === 1 ? 'sur cette planche' : `sur ces ${withObjective} planches`}` : detail);
   return {
     label,
+    rainLegend: rainLegend(input.rainOrigins),
     scaleMaxMm: max,
     farm,
     shown: rows.slice(0, WEEK_GARDENS_SHOWN),
@@ -193,7 +268,7 @@ export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
       received: mm(farm.receivedMm),
       receivedDetail: scoped(farm.rainMm === null
         ? `${mmText(rounded(farm.irrigationMm))} d’irrigation, pluie inconnue`
-        : `${mmText(rounded(farm.irrigationMm))} d’irrigation, ${mmText(rounded(farm.rainMm))} de pluie mesurée`),
+        : `${mmText(rounded(farm.irrigationMm))} d’irrigation, ${rainText(farm.rainMm, input.rainOrigins, farm.sheltered)}`),
       remaining: mm(farm.remainingMm),
       remainingDetail: farm.remainingMm === null
         ? 'une valeur manque : voir « Objectifs et besoins »'

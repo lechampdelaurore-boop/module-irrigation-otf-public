@@ -240,7 +240,7 @@ test('cas 6, F280 : 10 planches, 7 avec un objectif : « objectifs posés sur 7 
     ...Array.from({ length: 7 }, () => weekBed('g1', 'Champ du haut', 20)),
     ...Array.from({ length: 3 }, () => weekBed('g2', 'Abri des noues', null, { actualIrrigationMm: 30 })),
   ];
-  const week = todayWeek({ weekStart: '2026-11-09', weekEnd: '2026-11-15', beds, water: null });
+  const week = todayWeek({ weekStart: '2026-11-09', weekEnd: '2026-11-15', beds, water: null, rainOrigins: { measuredMm: 2, reanalysisMm: 0, forecastMm: 0 } });
   assert.ok(week);
   assert.deepEqual(week.farm.objectiveBeds, { withObjective: 7, total: 10 });
   // L'irrigation des trois planches sans objectif (30 mm) n'entre pas dans les chiffres de la ferme.
