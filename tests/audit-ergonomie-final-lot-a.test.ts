@@ -114,11 +114,11 @@ test('cas 1 : trois arrosages à valider demain à 6 h, rien aujourd’hui : la 
   ])));
   assert.deepEqual(view.tomorrow, {
     count: 3,
-    text: 'Demain à 6 h : 3 arrosages à valider',
-    sentence: '3 arrosages sont à valider demain à 6 h.',
+    text: 'Demain à 6 h : 3 irrigations à valider',
+    sentence: '3 irrigations sont à valider demain à 6 h.',
     link: { page: 'planning', anchor: 'proposal-p1' },
   });
-  assert.equal(view.headline.sentence, '3 arrosages sont à valider demain à 6 h.');
+  assert.equal(view.headline.sentence, '3 irrigations sont à valider demain à 6 h.');
   const chips = view.headline.chips.map((chip) => [chip.key, chip.text]);
   assert.ok(chips.some(([key, text]) => key === 'tomorrow' && text === '3 à valider demain'), JSON.stringify(chips));
   assert.ok(!chips.some(([key]) => key === 'nothing'), '« Rien à arroser » ne se dit plus quand demain parle (F277)');
@@ -136,12 +136,12 @@ test('F275 : un créneau de 0 h 30 compte pour demain ; après-demain, aujourd�
     proposal('refusee', '2026-11-13T06:00:00.000Z', 'refused'),
   ], NOW);
   assert.equal(tomorrow?.count, 2);
-  assert.equal(tomorrow?.text, 'Demain dès 0 h 30 : 2 arrosages à valider');
-  assert.equal(tomorrow?.sentence, '2 arrosages sont à valider demain dès 0 h 30.');
+  assert.equal(tomorrow?.text, 'Demain dès 0 h 30 : 2 irrigations à valider');
+  assert.equal(tomorrow?.sentence, '2 irrigations sont à valider demain dès 0 h 30.');
   assert.equal(tomorrow?.link.anchor, 'proposal-nuit');
   const one = todayTomorrow([proposal('seule', '2026-11-13T17:30:00.000Z')], NOW);
-  assert.equal(one?.text, 'Demain à 18 h 30 : 1 arrosage à valider');
-  assert.equal(one?.sentence, 'Un arrosage est à valider demain à 18 h 30.');
+  assert.equal(one?.text, 'Demain à 18 h 30 : 1 irrigation à valider');
+  assert.equal(one?.sentence, 'Une irrigation est à valider demain à 18 h 30.');
   // Le lendemain du créneau passé : une proposition de demain dont la fin est passée est expirée.
   assert.equal(todayTomorrow([proposal('p', '2026-11-13T05:00:00.000Z')], new Date('2026-11-13T07:00:00.000Z')), null);
   assert.equal(todayTomorrow([], NOW), null);
@@ -244,7 +244,7 @@ test('cas 6, F280 : 10 planches, 7 avec un objectif : « objectifs posés sur 7 
   assert.ok(week);
   assert.deepEqual(week.farm.objectiveBeds, { withObjective: 7, total: 10 });
   // L'irrigation des trois planches sans objectif (30 mm) n'entre pas dans les chiffres de la ferme.
-  assert.equal(week.farm.text, '6 / 20 mm sur 7 planches sur 10');
+  assert.equal(week.farm.text, '6 / 20 mm (7 planches de 10 ont un objectif)');
   assert.equal(week.tiles.objective, '20 mm');
   assert.equal(week.tiles.objectiveDetail, 'objectifs posés sur 7 planches sur 10, du lun. 9 nov. au dim. 15 nov.');
   assert.equal(week.tiles.received, '6 mm');
@@ -373,7 +373,8 @@ test('F286 : les pastilles mènent au bloc avec le seul chiffre, sans redire la 
   const view = todayView(inputs({ ...withProposals([proposal('jour', '2026-11-12T17:00:00.000Z')]) }));
   const todo = view.headline.chips.find((chip) => chip.key === 'todo');
   assert.deepEqual(todo && [todo.text, todo.target], ['1 à faire', 'day']);
-  assert.match(view.headline.sentence, /prévue aujourd’hui/);
+  // Toutes à valider : « à valider aujourd'hui », jamais « dont 1 » sur 1 (audit du 19 novembre 2026, lot H, F443).
+  assert.match(view.headline.sentence, /Une irrigation est à valider aujourd’hui\./);
 });
 
 test('F287 : la pastille du menu dit ce qu’elle compte, « Plus » prend la marque de la page ouverte, la journée courte passe au-dessus du gel', () => {

@@ -8,6 +8,7 @@ import type { IrrigationEventRecord } from '../lib/domain/irrigation-event-recor
 import type { SoilGaugeZone } from '../lib/domain/soil-reserve/gauge-view.ts';
 import { todayHeadline } from '../lib/domain/today/headline.ts';
 import { nowIrrigationLines } from '../lib/domain/today/now-irrigations.ts';
+import type { TodayIrrigationLine } from '../lib/domain/today/today-irrigations.ts';
 import { todaySoil } from '../lib/domain/today/soil.ts';
 import { pastRainOrigins, todayWeek, type RainOrigins, type TodayWeekBed } from '../lib/domain/today/week.ts';
 
@@ -236,4 +237,34 @@ test('n° 14, F437 : la liste « Matériel » se regroupe par jardin, dans l’o
     ['Tunnel 1', ['gag2', 'gag10']],
     ['Sans jardin', ['Perdu']],
   ]);
+});
+
+// n° 13 : petits défauts de lecture (F439, F442, F443).
+
+test('n° 13, F439 : « Reste à apporter » dit pour quels jardins quand une partie seulement reste sous l’objectif', () => {
+  const blocs = ['bloc 1', 'Bloc 10', 'bloc 2'].map((name) => bed(`g-${name}`, { plotName: name, actualRainMm: 38.1, realRemainingMm: 0 }));
+  const tunnels = ['T1', 'T2', 'T3', 'T4', 'T10'].map((name) => bed(`t-${name}`, { plotName: name, sheltered: true, actualRainMm: 0, realRemainingMm: 20 }));
+  const week = todayWeek({ weekStart: '2026-11-16', weekEnd: '2026-11-22', beds: [...blocs, ...tunnels], water: null });
+  assert.equal(week?.tiles.remainingDetail, 'pour les jardins encore sous leur objectif : T1, T2, T3 et 2 autres');
+  const one = todayWeek({ weekStart: '2026-11-16', weekEnd: '2026-11-22', beds: [...blocs, tunnels[0]], water: null });
+  assert.equal(one?.tiles.remainingDetail, 'pour le jardin encore sous son objectif : T1');
+  // Tous sous l'objectif, ou aucun : la phrase de toujours.
+  const all = todayWeek({ weekStart: '2026-11-16', weekEnd: '2026-11-22', beds: tunnels, water: null });
+  assert.equal(all?.tiles.remainingDetail, 'objectif moins l’eau reçue, jamais négatif');
+});
+
+test('n° 13, F443 : un seul « sur » dans la ligne d’un objectif partiel', () => {
+  const week = todayWeek({ weekStart: '2026-11-16', weekEnd: '2026-11-22', water: null, beds: [
+    bed('g1', { plotName: 'Nord', actualRainMm: 5, realRemainingMm: 15 }),
+    bed('g1', { plotName: 'Nord', objectiveMm: null, realRemainingMm: null }),
+  ] });
+  assert.equal(week?.farm.text, `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(5)} / ${screenMm(20)} (1 planche de 2 a un objectif)`);
+});
+
+test('n° 13, F443 : « 3 irrigations sont à valider aujourd’hui », jamais « dont 3 » sur 3', () => {
+  const line = (tone: 'planned' | 'proposed') => ({ tone }) as TodayIrrigationLine;
+  const headline = (todo: TodayIrrigationLine[]) => todayHeadline({ today: '2026-11-19', irrigations: { late: [], todo }, weather: null, reliabilityCount: null, tomorrow: null, shortage: null }).sentence;
+  assert.equal(headline([line('proposed'), line('proposed'), line('proposed')]), '3 irrigations sont à valider aujourd’hui.');
+  assert.equal(headline([line('planned'), line('proposed')]), '2 irrigations sont prévues aujourd’hui, dont 1 à valider.');
+  assert.equal(headline([line('planned')]), 'Une irrigation est prévue aujourd’hui.');
 });

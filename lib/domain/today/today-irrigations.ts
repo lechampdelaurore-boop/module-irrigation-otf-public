@@ -65,7 +65,7 @@ export type TodayIrrigationLine = {
   bedIds: string[];
   equipmentName: string;
   settingName: string;
-  /** Goutte-à-goutte ou aspersion, pour l'icône ; `null` pour une proposition, dont le plan ne garde pas le type. */
+  /** Goutte-à-goutte ou aspersion, pour l'icône ; `null` quand le type n'est pas connu. */
   equipmentKind: EquipmentKind | null;
 };
 
@@ -222,7 +222,8 @@ export function todayTodoLines(input: {
           ...drawn({ startAt: proposal.startAt, durationSeconds: proposal.durationSeconds, doseMm: proposal.doseMm, bedIds, beds }),
           equipmentName: proposal.equipmentName,
           settingName: proposal.settingName,
-          equipmentKind: null,
+          // L'icône de son matériel, comme une irrigation planifiée (lot H, n° 13, F442).
+          equipmentKind: proposal.kind ?? null,
         } satisfies TodayIrrigationLine,
       };
     });

@@ -40,8 +40,9 @@ export type TodayShortage = {
   link: { label: 'Répartir l’eau' | 'Revoir la répartition'; page: 'ressources'; anchor: 'repartition' } | null;
 };
 
-function arrosages(count: number): string {
-  return count === 1 ? '1 arrosage' : `${count} arrosages`;
+/** « irrigation », le mot du module, partout sur la page (audit du 19 novembre 2026, lot H, n° 13, F443). */
+function irrigations(count: number): string {
+  return count === 1 ? '1 irrigation' : `${count} irrigations`;
 }
 
 /**
@@ -63,8 +64,8 @@ export function todayTomorrow(proposals: readonly StoredProposal[], now: Date): 
   const count = waiting.length;
   return {
     count,
-    text: `Demain ${at} : ${arrosages(count)} à valider`,
-    sentence: count === 1 ? `Un arrosage est à valider demain ${at}.` : `${arrosages(count)} sont à valider demain ${at}.`,
+    text: `Demain ${at} : ${irrigations(count)} à valider`,
+    sentence: count === 1 ? `Une irrigation est à valider demain ${at}.` : `${irrigations(count)} sont à valider demain ${at}.`,
     link: { page: 'planning', anchor: proposalAnchor(first.storedId) },
   };
 }

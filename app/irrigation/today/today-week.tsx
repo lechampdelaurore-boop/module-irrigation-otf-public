@@ -13,7 +13,8 @@ import { Icon, type IconName } from '../line-icon';
  */
 export function TodayWeekTiles({ week }: { week: TodayWeek }) {
   const { tiles } = week;
-  const remainingTone = week.farm.remainingMm === null ? 'unknown' : week.farm.remainingMm > 0 ? 'warn' : 'ok';
+  // Une quantité, pas une alerte : la couleur neutre des autres tuiles (lot H, n° 13, F440).
+  const remainingTone = week.farm.remainingMm === null ? 'unknown' : week.farm.remainingMm > 0 ? 'green' : 'ok';
   return (
     <section className="today-kpis" aria-label="Cette semaine">
       <Tile tone="green" icon="calendrier" label="Objectif de la semaine" value={tiles.objective ?? 'aucun objectif posé'} detail={tiles.objectiveDetail} />

@@ -152,6 +152,7 @@
 }
 
 .today-irrigation-time strong {
+  white-space: nowrap;
   font: 500 1.25rem/1.1 var(--font-title);
   font-variant-numeric: tabular-nums;
 }
