@@ -31,6 +31,7 @@ export default async function ArrosagesRoutePage({ searchParams }: { searchParam
         lateToleranceMinutes={data.planningSettings.lateToleranceMinutes}
         protectedSlots={data.protectedSlots}
         waterDashboard={data.waterDashboard}
+        formHints={data.formHints}
         planningEnabled={context.enabled.includes('planning')}
         pumpsEnabled={context.enabled.includes('ressources')}
       />

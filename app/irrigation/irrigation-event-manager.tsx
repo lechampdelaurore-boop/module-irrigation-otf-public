@@ -44,6 +44,9 @@ import {
 import type { IrrigationEventActionResult, IrrigationEventConfirmation, IrrigationPreparationMode } from './irrigation-event/contract';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { ScheduleConflictDialog } from './irrigation-manager/schedule-conflict-dialog';
+import { ObjectiveExcessDialog } from './irrigation-manager/objective-excess-dialog';
+import { NO_FORM_HINTS, objectiveExcess, proposedDoseFor, type IrrigationFormHints, type ObjectiveExcess } from '@/lib/domain/irrigation-form-hints';
+import { dateKeyInTimeZone } from '@/lib/domain/water-management';
 import { recordDoneAsPlannedAction } from './done-as-planned-actions';
 import { isLimitedAlertStatus } from '@/lib/domain/system-alerts-banner';
 
@@ -70,6 +73,8 @@ type Props = {
   onRecalculatePlan?: () => void;
   /** Les créneaux protégés, Planning coché seulement : « Planifier » avertit d'un arrosage qui y tombe, sans le bloquer (3.8 ter, règle 12). */
   protectedSlots?: readonly ProtectedSlot[];
+  /** La dose du jour proposée par le planning et les objectifs de la semaine (audit du 19 novembre 2026, lot G, n° 9). */
+  formHints?: IrrigationFormHints;
 };
 
 
@@ -88,6 +93,7 @@ export function IrrigationEventManager({
   lateToleranceMinutes,
   onRecalculatePlan,
   protectedSlots = [],
+  formHints = NO_FORM_HINTS,
 }: Props) {
   const [creationKind, setCreationKind] = useState<CreationKind>('running');
   // Aucun matériel présélectionné à l'ouverture (audit ergonomique, lot 3, point 6, cas 3) :
@@ -98,7 +104,8 @@ export function IrrigationEventManager({
   const [pumpOriginId, setPumpOriginId] = useState('');
   const [preparationMode, setPreparationMode] =
     useState<IrrigationPreparationMode>('amount');
-  const [targetMillimeters, setTargetMillimeters] = useState('25');
+  // Rien d'office : la dose du jour arrive avec le choix d'un matériel, sinon le champ reste vide (lot G, n° 9, F409).
+  const [targetMillimeters, setTargetMillimeters] = useState('');
   const [durationHours, setDurationHours] = useState('1');
   const [durationMinutes, setDurationMinutes] = useState('0');
   const [referenceBedId, setReferenceBedId] = useState('');
@@ -116,6 +123,7 @@ export function IrrigationEventManager({
   // « formulaire » sous « Planifier l'irrigation », « liste » en tête des irrigations à venir, « haut » pour le reste.
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const [conflict, setConflict] = useState<IrrigationEventConfirmation | null>(null);
+  const [excess, setExcess] = useState<ObjectiveExcess | null>(null);
   const [finishEvent, setFinishEvent] = useState<IrrigationEventRecord | null>(null);
   const [editingEventEquipmentId, setEditingEventEquipmentId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -188,20 +196,36 @@ export function IrrigationEventManager({
     setReferenceBedId('');
     setPumpId('');
     setPumpOriginId('');
-    setTargetMillimeters('25');
+    setTargetMillimeters('');
     setDurationHours('1');
     setDurationMinutes('0');
     setNote('');
     setEditingEventEquipmentId(null);
   };
 
-  const submitCreation = (confirmScheduleConflict = false) => {
+  /** Le jour de l'irrigation : celui de la date de début pour « Planifier », aujourd'hui sinon. */
+  const irrigationDay = () => dateKeyInTimeZone(creationKind === 'planned' ? (isoFromLocalInput(plannedStartAt) ?? now) : now);
+
+  /** La dose du jour pour ce matériel, sinon un champ vide (F409) ; une saisie n'est remplacée qu'au changement de matériel. */
+  const proposeDose = (nextEquipmentId: string) => {
+    const dose = proposedDoseFor(formHints.doses, nextEquipmentId, irrigationDay());
+    setTargetMillimeters(dose === null ? '' : String(dose));
+  };
+
+  const submitCreation = (confirmScheduleConflict = false, confirmExcess = false) => {
     if (!selectedEquipment || !selectedSetting) {
       say('formulaire', 'error', usableEquipment.length > 0 ? 'Choisissez un matériel avant d’enregistrer une irrigation.' : 'Ajoutez, réglez et placez au moins un matériel avant d’enregistrer une irrigation.');
       return;
     }
     setReplies([]);
     setConflict(null);
+    setExcess(null);
+    // Au-delà de l'objectif de la semaine d'une planche : la fenêtre demande d'abord (F410). Rien à demander après coup.
+    const beyond = confirmExcess || creationKind === 'completed' ? null : objectiveExcess(previewApplications, formHints.weeks, irrigationDay());
+    if (beyond) {
+      setExcess(beyond);
+      return;
+    }
     startTransition(async () => {
       const input = {
         kind: creationKind,
@@ -424,6 +448,7 @@ export function IrrigationEventManager({
                     setReferenceBedId('');
                     setPumpId(pumpDashboard.equipmentDefaults.find((item) => item.equipmentId === event.target.value)?.pumpId ?? '');
                     setPumpOriginId('');
+                    proposeDose(event.target.value);
                   }}
                 >
                   <option value="" disabled>Choisissez un matériel</option>
@@ -570,8 +595,16 @@ export function IrrigationEventManager({
         conflict={conflict}
         creationKind={editingEventEquipmentId ? 'edit' : creationKind}
         pending={pending}
-        onConfirm={() => submitCreation(true)}
+        onConfirm={() => submitCreation(true, true)}
         onCancel={() => setConflict(null)}
+      />
+
+      <ObjectiveExcessDialog
+        excess={excess}
+        kind={editingEventEquipmentId ? 'edit' : creationKind === 'planned' ? 'planned' : 'running'}
+        pending={pending}
+        onConfirm={() => submitCreation(false, true)}
+        onCancel={() => setExcess(null)}
       />
 
       {finishEvent ? (

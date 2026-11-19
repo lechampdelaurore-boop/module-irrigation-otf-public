@@ -102,9 +102,13 @@ function debutDeSaison(): string {
  * change au fil du parcours. Chaque liste est donc désignée par le choix
  * qu'elle propose, seul repère stable.
  */
-export async function choisirMaterielEtReglage(page: Page, materiel: string, reglage: string): Promise<void> {
+export async function choisirMaterielEtReglage(page: Page, materiel: string, reglage: string, quantite = '25'): Promise<void> {
   await page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) }).selectOption({ label: materiel });
   await page.locator('select').filter({ has: page.getByRole('option', { name: reglage }) }).selectOption({ label: reglage });
+  // Sans dose du jour proposée par le planning, la quantité reste vide (audit du 19 novembre 2026, lot G, n° 9, F409) :
+  // le parcours la tape, comme un utilisateur.
+  const champ = page.getByLabel('Quantité souhaitée');
+  if (await champ.isVisible() && (await champ.inputValue()) === '') await champ.fill(quantite);
 }
 
 /**

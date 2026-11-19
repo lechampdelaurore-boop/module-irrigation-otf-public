@@ -9,6 +9,7 @@ import { requestPlannedIrrigationForm } from '@/lib/domain/feasibility-notificat
 import { pagePath } from '@/lib/domain/features/pages';
 import type { GardenGroupConfiguration } from '@/lib/domain/garden-group-record';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
+import type { IrrigationFormHints } from '@/lib/domain/irrigation-form-hints';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
@@ -35,6 +36,7 @@ export function ArrosagesPage({
   lateToleranceMinutes,
   protectedSlots,
   waterDashboard,
+  formHints,
   planningEnabled,
   pumpsEnabled,
 }: {
@@ -52,6 +54,8 @@ export function ArrosagesPage({
   /** Les créneaux protégés, Planning coché seulement : « Planifier » avertit d'un arrosage qui y tombe (3.8 ter, règle 12). */
   protectedSlots: ProtectedSlot[];
   waterDashboard: WaterDashboard;
+  /** La dose du jour et les objectifs de la semaine que le formulaire propose (lot G, n° 9). */
+  formHints: IrrigationFormHints;
   /** « Recalculer le plan » sur un arrosage en retard conduit au planning, s'il est coché. */
   planningEnabled: boolean;
   /** Le choix de la pompe, avec la case « Ressources et pompes » (R1). */
@@ -76,6 +80,7 @@ export function ArrosagesPage({
         pumpsEnabled={pumpsEnabled}
         lateToleranceMinutes={lateToleranceMinutes}
         protectedSlots={protectedSlots}
+        formHints={formHints}
         onRecalculatePlan={planningEnabled
           ? () => window.location.assign(hrefWithIntent(pagePath('planning'), season, 'recalculer', '1'))
           : undefined}
