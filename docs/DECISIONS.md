@@ -6129,6 +6129,13 @@ F433 à F435).
 Ne changent pas : « Tout est fait » (T15) ; la frise ; les gestes et les
 confirmations d'« Arrosages ».
 
+**Corrigé en passant.** Le parcours P24 a montré au téléphone qu'une bulle
+« D'où vient ce chiffre ? » très longue (une planche sous une vingtaine de
+matériels) montait au-dessus de l'écran, son « Fermer » hors d'atteinte. La
+bulle a désormais une hauteur maximale, la fenêtre moins le bandeau et la
+barre du bas au téléphone, la fenêtre moins ses marges à l'ordinateur, et
+défile en elle-même ; « Fermer » reste à l'écran.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

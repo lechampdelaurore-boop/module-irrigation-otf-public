@@ -13,6 +13,9 @@ source détaillée commit par commit.
   d'une irrigation partielle, avec « Reprendre le reliquat » ; la phrase
   du jour et les pastilles les comptent, jamais « Rien à arroser » vanne
   ouverte. Le contrat de la page change en conséquence.
+- **Une bulle longue reste refermable** : la bulle « D'où vient ce
+  chiffre ? » ne dépasse plus la hauteur de l'écran et défile en elle-même,
+  « Fermer » toujours visible.
 
 ### Modifié (audit du 19 novembre 2026, lot H, PR 2 sur 5)
 

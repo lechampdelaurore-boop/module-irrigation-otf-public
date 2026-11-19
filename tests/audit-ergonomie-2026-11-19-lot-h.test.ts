@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { FEATURE_IDS } from '../lib/domain/features/catalogue.ts';
 import type { IrrigationEventRecord } from '../lib/domain/irrigation-event-record.ts';
@@ -178,4 +179,11 @@ test('n° 2, F435 : la phrase et les pastilles disent l’en-cours et le reliqua
   assert.deepEqual(headline.chips.map((chip) => chip.text), ['1 en cours', '1 reliquat']);
   const calm = todayHeadline({ today: '2026-11-19', irrigations: { current: [], late: [], todo: [] }, weather: null, reliabilityCount: null, tomorrow: null, shortage: null });
   assert.deepEqual(calm.chips.map((chip) => chip.text), ['Rien à arroser']);
+});
+
+test('corrigé en passant (D-175) : une bulle « D’où vient ce chiffre ? » longue défile en elle-même, « Fermer » reste à l’écran', () => {
+  const css = readFileSync('app/irrigation/styles/help.css', 'utf8');
+  const bubble = css.slice(css.indexOf('.figure-origin-bubble {'));
+  assert.match(bubble, /^\.figure-origin-bubble \{[^}]*max-height: calc\(100vh - 32px\);\s*overflow-y: auto;/);
+  assert.match(css, /@media \(max-width: 980px\) \{\s*\.figure-origin-bubble \{[^}]*max-height: calc\(100dvh - 96px - 68px\);/);
 });
