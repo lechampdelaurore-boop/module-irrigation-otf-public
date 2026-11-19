@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P38 : l'audit ergonomique du 19 novembre 2026, lot H,
@@ -19,6 +19,12 @@ import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from '.
  *   planifiée plus tard dans la journée sur N01 met « Jardin Nord » en tête
  *   d'« Eau de la semaine » et de « Réserve du sol », avant « Jardin du
  *   verger » que l'ordre naturel mettait devant ; l'irrigation annulée.
+ *
+ * - en cours et reliquat (n° 2, F433 à F435) : une irrigation démarrée se
+ *   lit en tête de « Votre journée », « En cours », la phrase du jour le
+ *   dit, sans « Rien à arroser » ; « Arrêter / Terminer » ouvre sa carte sur
+ *   « Arrosages » ; arrêtée en route, son reliquat se lit « Reliquat » avec
+ *   « Reprendre le reliquat » ; le reliquat annulé, il n'y est plus.
  *
  * Ce qu'il ne prouve pas : les parts de chaque origine (les tests du
  * domaine, `tests/audit-ergonomie-2026-11-19-lot-h.test.ts`, les chiffrent),
@@ -116,4 +122,60 @@ test('les jardins qui ont une irrigation aujourd’hui passent en tête', async 
   const fiches = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
   await annulerDepuisLeMenu(page, fiches.first());
   await expect(fiches).toHaveCount(0);
+});
+
+test('une irrigation en cours puis son reliquat se lisent en tête de « Votre journée »', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await attendreLaPageIrrigation(page);
+  const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p38 en cours' });
+  await attendreLaPageIrrigation(page, 'arrosages');
+  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+  await page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) }).selectOption({ label: materiel });
+  await page.locator('select').filter({ has: page.getByRole('option', { name: reglage }) }).selectOption({ label: reglage });
+  await page.getByRole('button', { name: 'Durée d’irrigation' }).click();
+  await page.getByLabel('Heures').fill('0');
+  await page.getByLabel('Minutes').fill('30');
+  await page.getByRole('button', { name: 'Démarrer l’irrigation' }).click();
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  const demarree = page.getByText('L’irrigation a démarré.');
+  await expect(demarree.or(fenetre)).toBeVisible();
+  if (await fenetre.isVisible()) await fenetre.getByRole('button', { name: /quand même$/ }).click();
+  await expect(demarree).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const journee = page.locator('#today-day');
+  const enTete = journee.locator('.today-group[data-group="now"]');
+  const carte = enTete.locator('.today-irrigation').filter({ hasText: materiel });
+  await expect(carte.locator('.today-status')).toHaveText('En cours');
+  await expect(carte).toContainText('fin prévue à');
+  await expect(page.locator('.today-chip').filter({ hasText: 'Rien à arroser' })).toHaveCount(0);
+  await expect(journee.getByText('Rien à arroser aujourd’hui')).toHaveCount(0);
+  await expect(page.locator('.today-sentence')).toContainText(/irrigations? (est|sont) en cours\./);
+  await verifierLEtape(page, journal, 'l’irrigation en cours en tête de la journée');
+
+  // « Arrêter / Terminer » ouvre la carte sur « Arrosages », où l'arrêt se confirme.
+  await carte.getByRole('link', { name: `Arrêter ou terminer : ${materiel}`, exact: false }).click();
+  await attendreLaPagePrete(page, 'arrosages');
+  const enCours = page.getByLabel('Irrigations en cours');
+  await expect(enCours).toContainText(materiel);
+  const minuteur = await enCours.innerText();
+  await expect.poll(async () => (await enCours.innerText()) !== minuteur, { timeout: 15_000 }).toBe(true);
+  await enCours.locator('article').filter({ hasText: materiel }).getByRole('button', { name: 'Arrêter / Terminer' }).click();
+  await page.locator('[role=dialog]').filter({ hasText: 'Terminer l’irrigation' }).getByRole('button', { name: 'Irrigation terminée' }).click();
+  await expect(enCours.locator('article').filter({ hasText: materiel })).toHaveCount(0);
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const reliquat = enTete.locator('.today-irrigation').filter({ hasText: materiel });
+  await expect(reliquat.locator('.today-status')).toHaveText('Reliquat');
+  await expect(reliquat.getByRole('button', { name: 'Reprendre le reliquat' })).toBeVisible();
+  await expect(page.locator('.today-sentence')).toContainText(/reliquats? (est|sont) à reprendre\./);
+  await verifierLEtape(page, journal, 'le reliquat à reprendre');
+
+  // Remise en état : le reliquat annulé, il quitte « Aujourd'hui ».
+  await attendreLaPageIrrigation(page, 'arrosages');
+  const fiche = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
+  await annulerDepuisLeMenu(page, fiche.first(), 'Annuler le reliquat');
+  await expect(fiche).toHaveCount(0);
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  await expect(enTete.locator('.today-irrigation').filter({ hasText: materiel })).toHaveCount(0);
 });

@@ -1,5 +1,6 @@
 import { celsiusText } from '../crop-alerts/text.ts';
 import type { TodayShortage, TodayTomorrow } from './ahead.ts';
+import type { TodayNowLine } from './now-irrigations.ts';
 import type { TodayIrrigationLine } from './today-irrigations.ts';
 import type { TodayWeatherDay } from './weather-days.ts';
 
@@ -36,7 +37,7 @@ export type TodayHeadline = {
 export type HeadlineInputs = {
   today: string;
   /** `null` quand ni le planning ni les arrosages ne sont cochés. */
-  irrigations: { late: readonly TodayIrrigationLine[]; todo: readonly TodayIrrigationLine[] } | null;
+  irrigations: { current?: readonly TodayNowLine[]; late: readonly TodayIrrigationLine[]; todo: readonly TodayIrrigationLine[] } | null;
   /** `null` quand aucune alerte n'est cochée. */
   weather: { tone: 'alert' | 'unknown' | 'calm'; days: readonly TodayWeatherDay[]; calmText: string | null; unposedFrost?: { text: string } | null } | null;
   /** `null` quand la zone « Fiabilité du calcul » n'existe pas. */
@@ -73,6 +74,17 @@ function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>
   const proposed = irrigations.todo.filter((line) => line.tone === 'proposed').length;
   const sentences: string[] = [];
   const chips: TodayChip[] = [];
+  // Une vanne ouverte ou un reliquat se disent d'abord, jamais « Rien à arroser » (lot H, n° 2, F435).
+  const running = (irrigations.current ?? []).filter((line) => line.tone !== 'remainder').length;
+  const remainders = (irrigations.current ?? []).length - running;
+  if (running > 0) {
+    sentences.push(plural(running, 'Une irrigation est en cours.', '{n} irrigations sont en cours.'));
+    chips.push({ key: 'running', tone: 'todo', icon: 'drop', text: `${running} en cours`, target: 'day' });
+  }
+  if (remainders > 0) {
+    sentences.push(plural(remainders, 'Un reliquat est à reprendre.', '{n} reliquats sont à reprendre.'));
+    chips.push({ key: 'remainder', tone: 'todo', icon: 'clock', text: plural(remainders, '1 reliquat', '{n} reliquats'), target: 'day' });
+  }
   if (late > 0) {
     sentences.push(plural(late, 'Une irrigation est à rattraper.', '{n} irrigations sont à rattraper.'));
     chips.push({ key: 'late', tone: 'late', icon: 'clock', text: `${late} à rattraper`, target: 'day' });
@@ -83,7 +95,7 @@ function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>
     chips.push({ key: 'todo', tone: 'todo', icon: 'drop', text: `${todo} à faire`, target: 'day' });
   }
   // « Rien à arroser » ne se dit plus quand demain ou la semaine ont quelque chose à dire (F277).
-  if (late === 0 && todo === 0 && !aheadSaid) chips.push({ key: 'nothing', tone: 'ok', icon: 'check', text: 'Rien à arroser', target: 'day' });
+  if (late === 0 && todo === 0 && running === 0 && remainders === 0 && !aheadSaid) chips.push({ key: 'nothing', tone: 'ok', icon: 'check', text: 'Rien à arroser', target: 'day' });
   return { sentences, chips };
 }
 

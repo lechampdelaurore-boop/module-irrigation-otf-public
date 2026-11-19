@@ -385,5 +385,6 @@ test('F287 : la pastille du menu dit ce qu’elle compte, « Plus » prend la ma
   assert.equal(dayRowLayout(0, 0), 'stack');
   assert.equal(dayRowLayout(1, 0), 'wide');
   assert.equal(dayRowLayout(0, 2), 'wide');
-  assert.match(readFileSync('app/irrigation/today/today-page.tsx', 'utf8'), /layout=\{late && todo \? dayRowLayout\(late\.lines\.length, todo\.lines\.length\) : 'wide'\}/);
+  assert.match(readFileSync('app/irrigation/today/today-page.tsx', 'utf8'), /layout=\{late && todo \? dayRowLayout\(late\.lines\.length \+ view\.current\.length, todo\.lines\.length\) : 'wide'\}/);
+  // Depuis le lot H (n° 2, F433) : une irrigation en cours ou un reliquat comptent comme ce qui reste à faire.
 });

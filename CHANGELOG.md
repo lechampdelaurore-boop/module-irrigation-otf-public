@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot H, PR 3 sur 5)
+
+- **« Aujourd'hui » voit l'arrosage en cours et le reliquat** (D-175) :
+  en tête de « Votre journée », une irrigation en cours, en pause ou à
+  confirmer, avec « Arrêter / Terminer » vers sa carte, et le reliquat
+  d'une irrigation partielle, avec « Reprendre le reliquat » ; la phrase
+  du jour et les pastilles les comptent, jamais « Rien à arroser » vanne
+  ouverte. Le contrat de la page change en conséquence.
+- **Une bulle longue reste refermable** : la bulle « D'où vient ce
+  chiffre ? » ne dépasse plus la hauteur de l'écran et défile en elle-même,
+  « Fermer » toujours visible.
+
 ### Modifié (audit du 19 novembre 2026, lot H, PR 2 sur 5)
 
 - **Les jardins qui comptent d'abord** (D-174) : sur « Aujourd'hui »,
