@@ -1,7 +1,7 @@
 'use client';
 
 import { volumeText } from '@/lib/domain/display-numbers';
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, useTransition } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, manualRainInput, weekStartDateKey } from '@/lib/domain/water-management';
@@ -11,7 +11,9 @@ import { pageHref } from '@/lib/domain/features/pages';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { useConfirm } from './shell/use-confirm';
-import { PageSettingsFold } from './shell/page-settings-fold';
+import { AnchoredFold, PageSettingsFold } from './shell/page-settings-fold';
+import { goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '@/lib/domain/besoins-phone';
+import { automaticRefreshStatus } from '@/lib/domain/weather/automatic-refresh-status';
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
 import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
@@ -104,6 +106,9 @@ export function WaterManagementDashboard({
   const weatherRefreshGate = useRef({ running: false });
   const [weatherRefreshing, setWeatherRefreshing] = useState(false);
   const [weatherClock, setWeatherClock] = useState(0);
+  // Au téléphone, les tuiles en une ligne de résumé, dépliable, comme au planning (lot J, n° 15, F460).
+  const [tilesOpen, setTilesOpen] = useState(false);
+  const tilesId = useId();
 
   const currentDay = dashboard.todayWater;
   const farmGoal = dashboard.goals.find((goal) => goal.scopeType === 'farm');
@@ -111,6 +116,9 @@ export function WaterManagementDashboard({
   const missingEt0Dates = dashboard.days.filter((day) => day.et0Mm === null).map((day) => day.date);
   const missingActualRainDates = dashboard.days.filter((day) => day.date <= today && day.effectiveActualRainMm === null).map((day) => day.date);
   const missingForecastRainDates = dashboard.days.filter((day) => day.date >= today && day.forecastRainMm === null).map((day) => day.date);
+  const weatherPlace = dashboard.weather.location?.displayName ?? dashboard.weather.requestedLocationLabel ?? 'Commune non définie';
+  const weatherNeedsAttention = Boolean(dashboard.weather.error) || dashboard.weather.stale
+    || automaticRefreshStatus(dashboard.weather.preference, new Date()).kind === 'late';
   const weatherCooldown = dashboard.weather.nextRefreshAllowedAt !== null && (
     weatherClock === 0 || Date.parse(dashboard.weather.nextRefreshAllowedAt) > weatherClock
   );
@@ -364,7 +372,18 @@ export function WaterManagementDashboard({
 
       <ActionReply messages={replies} origin="haut" classNames={WATER_REPLY_CLASSES} />
 
-      <div className="water-summary-grid">
+      <button type="button" className="water-summary-line" aria-expanded={tilesOpen} aria-controls={tilesId} onClick={() => setTilesOpen((value) => !value)}>
+        <span>{weekTotalsLine({
+          farmGoalMm: farmGoal?.amountMm ?? null,
+          realizedIrrigationMm: dashboard.totals.realizedIrrigationMm,
+          actualRainMm: dashboard.totals.actualRainMm,
+          remainingForecastRainMm: dashboard.totals.remainingForecastRainMm,
+          et0Mm: dashboard.totals.et0Mm,
+          partial: missingActualRainDates.length + missingForecastRainDates.length + missingEt0Dates.length > 0,
+        })}</span>
+        <small>{tilesOpen ? 'Replier' : 'Détail'}</small>
+      </button>
+      <div className="water-summary-grid" id={tilesId} data-open={tilesOpen}>
         <SummaryCard icon="cible" label="Objectif ferme" value={farmGoal ? `${mm.format(farmGoal.amountMm)} mm` : 'Non défini'} detail={`${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} ciblé${dashboard.goals.length > 1 ? 's' : ''}`} />
         <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
         <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
@@ -376,9 +395,15 @@ export function WaterManagementDashboard({
         ? <p className="weather-stale">Un minuteur attend encore la confirmation de ses horaires réels. Son volume en cours est une estimation, réservée dans le budget mais non ajoutée au réalisé confirmé.</p> : null}
 
       <div className="water-dashboard-columns">
-        <article className="water-panel">
+        {/* Les objectifs, la météo et la pluie mesurée en plis fermés, une ligne de résumé chacun (lot J, n° 15, F460). */}
+        <AnchoredFold
+          id="objectifs-de-la-semaine"
+          className="water-panel water-fold"
+          bodyClassName="water-fold-body"
+          summary={<><h3>Objectifs hebdomadaires</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null)}</small></>}
+        >
           <div className="water-panel-title">
-            <div><h3>Objectifs hebdomadaires</h3><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
+            <div><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
             <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => void clearGoals()}>Vider les objectifs</button>
           </div>
           <GoalScopePicker snapshot={snapshot} season={season} value={scope} onChange={setScope} />
@@ -392,10 +417,17 @@ export function WaterManagementDashboard({
               <span key={goal.id}><strong>{goalLabel(goal, snapshot)}</strong>{mm.format(goal.amountMm)} mm</span>
             ))}
           </div>
-        </article>
+        </AnchoredFold>
 
-        <article className="water-panel">
-          <div className="water-panel-title"><div><h3>Météo de référence</h3><p>{dashboard.weather.location?.displayName ?? dashboard.weather.requestedLocationLabel ?? 'Commune non définie'}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
+        {/* La météo tient sur une ligne ; une erreur, des données anciennes ou une mise à jour automatique en retard l'ouvrent d'office. */}
+        <AnchoredFold
+          id="meteo-de-reference"
+          className="water-panel water-fold"
+          bodyClassName="water-fold-body"
+          initiallyOpen={weatherNeedsAttention}
+          summary={<><h3>Météo de référence</h3><small>{weatherFoldLine(weatherPlace, dashboard.weather.refreshedAt, dashboard.weather.stale, (value) => dateTimeFormatter.format(value))}</small></>}
+        >
+          <div className="water-panel-title"><div><p>{weatherPlace}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
           <ActionReply messages={replies} origin="meteo" classNames={WATER_REPLY_CLASSES} />
           {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error} Les dernières valeurs valides restent affichées.{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
           {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
@@ -403,10 +435,15 @@ export function WaterManagementDashboard({
           {/* La commune se change à un seul endroit, dans Réglages (audit ergonomique, point 9) : ici, le lien qui y mène. */}
           <a className="weather-location-link" href={pageHref('reglages', { season }, 'water-weather-title')}>Changer la commune dans Réglages</a>
           <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
-        </article>
+        </AnchoredFold>
 
-        <article className="water-panel" id="manual-rain">
-          <div className="water-panel-title"><div><h3>Pluie mesurée</h3><p>Mesure de la ferme, prioritaire sur la réanalyse même si la commune météo change.</p></div></div>
+        <AnchoredFold
+          id="manual-rain"
+          className="water-panel water-fold"
+          bodyClassName="water-fold-body"
+          summary={<><h3>Pluie mesurée</h3><small>{manualRainFoldLine(dashboard.days)}</small></>}
+        >
+          <div className="water-panel-title"><div><p>Mesure de la ferme, prioritaire sur la réanalyse même si la commune météo change.</p></div></div>
           <div className="water-inline-form">
             <label><span>Date</span><input type="date" max={today} value={rainDate} onChange={(event) => chooseRainDate(event.target.value)} /></label>
             <label><span>Millimètres</span><input inputMode="decimal" value={rainAmount} onChange={(event) => setRainAmount(event.target.value)} /></label>
@@ -414,7 +451,7 @@ export function WaterManagementDashboard({
             <button type="button" className="secondary-button rain-remove" disabled={pending} onClick={() => startTransition(async () => receiveRain(await removeManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate }), rainDate))}>Retirer la mesure</button>
           </div>
           <ActionReply messages={replies} origin="pluie" classNames={WATER_REPLY_CLASSES} />
-        </article>
+        </AnchoredFold>
 
       </div>
 

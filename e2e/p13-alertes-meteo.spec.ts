@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../lib/domain/water-management.ts';
-import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
 
 /**
  * Parcours P13 : les alertes météo (docs/weather-alerts-contract.md,
@@ -181,7 +181,7 @@ function historique(encart: Locator, libelle: string): Locator {
 
 /** « Actualiser la météo » se rouvre seul après la pause entre deux demandes ; le message dit la fin. */
 async function actualiserLaMeteo(page: Page): Promise<void> {
-  const meteo = page.locator('.water-management-section .water-panel').filter({ hasText: 'Météo de référence' });
+  const meteo = await ouvrirLePli(page.locator('#meteo-de-reference'));
   await meteo.scrollIntoViewIfNeeded();
   const bouton = meteo.getByRole('button', { name: 'Actualiser la météo' });
   await expect(bouton).toBeEnabled(PAUSE_D_ACTUALISATION);

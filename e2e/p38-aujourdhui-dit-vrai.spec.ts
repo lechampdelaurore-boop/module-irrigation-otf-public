@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
 
 /**
  * Parcours P38 : l'audit ergonomique du 19 novembre 2026, lot H,
@@ -69,7 +69,7 @@ test('la pluie dit d’où elle vient, sur la tuile et sur la légende', async (
 
   // Une pluie du jour mesurée au pluviomètre, si la démonstration n'en a pas déjà une.
   await attendreLaPageIrrigation(page, 'besoins');
-  const pluie = page.locator('#manual-rain');
+  const pluie = await ouvrirLePli(page.locator('#manual-rain'));
   await pluie.scrollIntoViewIfNeeded();
   const millimetres = pluie.getByLabel('Millimètres');
   const avant = await millimetres.inputValue();
@@ -88,6 +88,7 @@ test('la pluie dit d’où elle vient, sur la tuile et sur la légende', async (
 
   if (aPoser) {
     await attendreLaPageIrrigation(page, 'besoins');
+    await ouvrirLePli(pluie);
     await pluie.scrollIntoViewIfNeeded();
     if (avant === '') {
       await pluie.getByRole('button', { name: 'Retirer la mesure' }).click();

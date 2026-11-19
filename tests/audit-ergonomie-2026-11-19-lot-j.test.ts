@@ -4,6 +4,7 @@ import test from 'node:test';
 import { pageLabel } from '../lib/domain/features/pages.ts';
 import type { SeasonSpecies, SpeciesWithoutReference } from '../lib/domain/crop-water/species.ts';
 import { withoutReferenceBeyondSpecies } from '../lib/domain/crop-water/species-linking.ts';
+import { gardenState, goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '../lib/domain/besoins-phone.ts';
 
 /**
  * Audit ergonomique du 19 novembre 2026, lot J « Pages courtes au
@@ -77,4 +78,50 @@ test('n° 15, F459 : « Correspondance des espèces » est un pli fermé à ancr
   assert.match(panel, /<AnchoredFold\s+id=\{SPECIES_FOLD_ANCHOR\}[\s\S]*?<strong>\{speciesLinkCounter\(view\.species\)\}<\/strong>[\s\S]*?<SpeciesSection [\s\S]*?<WithoutReferenceSection [\s\S]*?<\/AnchoredFold>/);
   assert.match(panel, /const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';/);
   assert.doesNotMatch(panel, /initiallyOpen/, 'fermé d’office');
+});
+
+// n° 15 — « Objectifs et besoins » court au téléphone (PR 5, F460).
+
+test('n° 15, F460 : les tuiles en une ligne, un total incomplet dit « partiel »', () => {
+  assert.equal(
+    weekTotalsLine({ farmGoalMm: 25, realizedIrrigationMm: 12, actualRainMm: 3.5, remainingForecastRainMm: 5, et0Mm: 18.2, partial: false }),
+    'objectif 25 mm · irrigué 12 mm · pluie 3,5 mm · prévue 5 mm · ET0 18,2 mm',
+  );
+  assert.equal(
+    weekTotalsLine({ farmGoalMm: null, realizedIrrigationMm: 0, actualRainMm: null, remainingForecastRainMm: 14.8, et0Mm: 11.5, partial: true }),
+    'objectif non défini · irrigué 0 mm · pluie non disponible · prévue 14,8 mm · ET0 11,5 mm · totaux partiels',
+  );
+});
+
+test('n° 15, F460 : les résumés des plis des objectifs, de la pluie mesurée et de la météo', () => {
+  assert.equal(goalsFoldLine(0, null), 'Aucun objectif pour cette semaine.');
+  assert.equal(goalsFoldLine(3, 25), 'Toute la ferme : 25 mm · 3 objectifs');
+  assert.equal(goalsFoldLine(1, null), '1 objectif');
+  assert.equal(manualRainFoldLine([{ manualRainMm: null }, { manualRainMm: null }]), 'Aucune mesure cette semaine.');
+  assert.equal(manualRainFoldLine([{ manualRainMm: 0 }, { manualRainMm: 4.5 }, { manualRainMm: null }]), '2 jours mesurés cette semaine, 4,5 mm.');
+  const at = (value: Date) => value.toISOString().slice(0, 10);
+  assert.equal(weatherFoldLine('Rennes', null, false, at), 'Rennes · jamais actualisée');
+  assert.equal(weatherFoldLine('Rennes', '2026-11-19T15:00:00.000Z', true, at), 'Rennes · mise à jour le 2026-11-19 · données anciennes');
+});
+
+test('n° 15, F460 : l’état d’un jardin sur sa ligne compacte', () => {
+  assert.deepEqual(gardenState({ effectiveNeedMm: null, priorityCounts: { high: 2 } }), { text: 'à compléter', tone: 'unknown' });
+  assert.deepEqual(gardenState({ effectiveNeedMm: 0, priorityCounts: { high: 1 } }), { text: 'couvert', tone: 'covered' });
+  assert.deepEqual(gardenState({ effectiveNeedMm: 12, priorityCounts: { high: 1 } }), { text: '1 haute', tone: 'high' });
+  assert.deepEqual(gardenState({ effectiveNeedMm: 12, priorityCounts: { high: 0 } }), { text: '', tone: 'normal' });
+});
+
+test('n° 15, F460 : les trois plis à ancre de la semaine, « À planifier » d’abord, le reste « Pour les experts »', () => {
+  const water = readFileSync('app/irrigation/water-management-dashboard.tsx', 'utf8');
+  for (const id of ['objectifs-de-la-semaine', 'meteo-de-reference', 'manual-rain']) {
+    assert.match(water, new RegExp(`<AnchoredFold\\s+id="${id}"`), id);
+  }
+  assert.match(water, /initiallyOpen=\{weatherNeedsAttention\}/, 'une météo en défaut ouvre son pli');
+  const needs = readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8');
+  const primary = needs.indexOf('<div className="need-primary"><span><small>À planifier');
+  const experts = needs.indexOf('<details className="need-experts"><summary>Pour les experts</summary>');
+  assert.ok(primary > 0 && experts > primary, '« À planifier » puis « Pour les experts »');
+  assert.ok(needs.indexOf('Besoin effectif <HelpButton', experts) > experts, 'le besoin effectif chez les experts');
+  const css = readFileSync('app/irrigation/irrigation.css', 'utf8');
+  assert.ok(css.indexOf('pages-courtes.css') < css.indexOf('gestes-surs.css'), 'les gestes sûrs restent les derniers');
 });

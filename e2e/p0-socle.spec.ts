@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, nomsDesPagesDuMenu, ouvrirLeMenuDesPages, surveillerLaConsole, TITRES_DES_PAGES, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, nomsDesPagesDuMenu, ouvrirLeMenuDesPages, surveillerLaConsole, TITRES_DES_PAGES, verifierLEtape, ouvrirLePli } from './support/parcours.ts';
 
 /**
  * Socle des parcours : la page se charge dans le mode déterministe attendu.
@@ -37,7 +37,8 @@ test('la météo affichée vient du fournisseur de démonstration, sans appel r�
   const journal = surveillerLaConsole(page);
   await attendreLaPageIrrigation(page, 'besoins');
 
-  // L'attribution est la ligne qui dit d'où viennent les valeurs affichées.
+  // L'attribution est la ligne qui dit d'où viennent les valeurs affichées, dans le pli de la météo (lot J, F460).
+  await ouvrirLePli(page.locator('#meteo-de-reference'));
   await expect(page.getByText('Données météo de démonstration', { exact: false })).toBeVisible();
   // Et elle ne crédite aucun fournisseur réel pour des valeurs qui n'en viennent pas.
   await expect(page.getByText('Open-Meteo', { exact: false })).toHaveCount(0);

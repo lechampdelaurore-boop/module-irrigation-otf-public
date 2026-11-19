@@ -6420,6 +6420,37 @@ espèces à rattacher. Budget de la page au téléphone : 3 000 px.
 
 Ne changent pas : les rattachements, les propositions d'après le nom, la
 recherche. Aucune migration.
+
+## D-187 — Lot J, PR 5 : « Objectifs et besoins » court au téléphone
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 15, et le
+cas non conforme de la recette du lot D (16 novembre 2026) : « Objectifs et
+besoins » mesurait 4 704 px à 390 px sur les données des parcours. **Cause
+vérifiée** : les tuiles de la semaine (536 px), les encarts des objectifs,
+de la météo et de la pluie mesurée toujours ouverts (486, 329 et 386 px),
+et chaque jardin replié sur cinq lignes (173 px), son résumé portant la
+zone, le nombre de planches, le besoin réel, le volume et les trois
+priorités.
+
+**Décision (F460).** Les objectifs, la météo de référence et la pluie
+mesurée sont trois plis fermés à ancre (`#objectifs-de-la-semaine`,
+`#meteo-de-reference`, `#manual-rain`), une ligne de résumé chacun ; celui
+de la météo s'ouvre d'office sur une erreur, des données anciennes ou une
+mise à jour automatique en retard. Au téléphone, les tuiles deviennent une
+ligne de résumé qui les déplie, comme au planning (F11), et chaque jardin
+une ligne compacte (le nom, le reste à apporter, l'état : « à compléter »,
+« couvert » ou les planches en priorité haute), son détail en tête du
+jardin ouvert. Dans une planche, « À planifier » puis le besoin réel ;
+besoin effectif, volume et déficit relatif sous « Pour les experts »,
+fermé. 4 704 → 2 750 px ; budget de la page au téléphone : 2 800 px. À
+l'ordinateur, rien ne change au-delà des plis.
+
+Ne changent pas : les calculs, les chiffres affichés, les liens vers
+`#manual-rain` (« Aujourd'hui », « Historique »), qui ouvrent le pli.
+Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

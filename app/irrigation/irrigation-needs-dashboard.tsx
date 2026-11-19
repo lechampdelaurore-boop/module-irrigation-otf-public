@@ -10,6 +10,7 @@ import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { PageSettingsFold } from './shell/page-settings-fold';
+import { gardenState } from '@/lib/domain/besoins-phone';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
@@ -65,7 +66,9 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
       <label><span>Trier les planches</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="priority">Priorités hautes</option><option value="deficit">Déficit le plus fort</option><option value="remaining">Besoin restant</option><option value="covered">Déjà couvert</option></select></label>
     </div>
     <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId}>
-      <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
+      {/* Au téléphone, une ligne compacte : le nom, le reste à apporter, l'état ; le détail s'ouvre dessous. Une seule des deux formes s'affiche, et se lit (lot J, n° 15, F460). */}
+      <summary><span className="garden-compact"><strong>{garden.plotName}</strong><b>{garden.effectiveNeedMm === null ? '—' : formatMm(garden.effectiveNeedMm)}</b>{gardenStateBadge(garden)}</span><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
+      <p className="garden-compact-detail">{gardenSummaryDetail(garden)}</p>
       <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} reply={<ActionReply messages={replies} origin={`planche:${bed.bedId}`} classNames={NEEDS_REPLY_CLASSES} />} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm }), `planche:${bed.bedId}`))} />)}</div>
     </details>)}</div>
     {/* Le seuil minimal de planification dans le pli du bas (audit final, lot D, J2, F305). */}
@@ -87,7 +90,9 @@ function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrriga
   const exceeds = overrideEnabled && numeric(override) > (bed.objectiveMm ?? Number.POSITIVE_INFINITY);
   return <article className="irrigation-need-card" data-priority={bed.priority}>
     <header><div><strong>{bed.bedName}</strong><small>{area.format(bed.areaSquareMeters)} m²</small></div><span className="need-priority-label">Priorité {priorityLabel(bed.priority)}</span></header>
-    <div className="need-primary"><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{formatMm(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{formatMm(bed.calculatedNeedMm)}</strong></span><span><small>Besoin effectif <HelpButton text={help.effective} /></small><strong>{formatMm(bed.effectiveNeedMm)}</strong></span><span><small>Volume</small><strong>{bed.effectiveVolumeCubicMeters === null ? '—' : `${volumeText(bed.effectiveVolumeCubicMeters)}`}</strong></span><span><small>Déficit relatif <HelpButton text={help.deficit} /></small><strong>{bed.relativeDeficitPercent === null ? '—' : `${mm.format(bed.relativeDeficitPercent)} %`}</strong></span></div>
+    {/* « À planifier » et le besoin d'abord ; les trois autres quantités dans « Pour les experts » (lot J, n° 15, F460). */}
+    <div className="need-primary"><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{formatMm(bed.calculatedNeedMm)}</strong></span><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{formatMm(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span></div>
+    <details className="need-experts"><summary>Pour les experts</summary><div className="need-primary"><span><small>Besoin effectif <HelpButton text={help.effective} /></small><strong>{formatMm(bed.effectiveNeedMm)}</strong></span><span><small>Volume</small><strong>{bed.effectiveVolumeCubicMeters === null ? '—' : `${volumeText(bed.effectiveVolumeCubicMeters)}`}</strong></span><span><small>Déficit relatif <HelpButton text={help.deficit} /></small><strong>{bed.relativeDeficitPercent === null ? '—' : `${mm.format(bed.relativeDeficitPercent)} %`}</strong></span></div></details>
     {/* « Non calculable » dit pourquoi, avec la raison que le domaine connaît (audit final, lot A, R2, F282). */}
     {bed.calculatedNeedMm === null && missingLabels(bed, 'planning') ? <p className="need-unknown-reason">Non calculable : {missingLabels(bed, 'planning')}.</p> : null}
     {!bed.completeness.complete ? <NeedDiagnostic bed={bed} /> : null}
@@ -170,6 +175,17 @@ function HelpButton({ text }: { text: string }) {
   const [dismissed, setDismissed] = useState(false);
   const open = !dismissed && (pinned || hovered || focused);
   return <span className="need-help" onMouseLeave={() => setHovered(false)}><button type="button" aria-label="Afficher l’explication" aria-expanded={open} onClick={() => { setDismissed(false); setPinned(!pinned); }} onMouseEnter={() => { setDismissed(false); setHovered(true); }} onFocus={() => { setDismissed(false); setFocused(true); }} onBlur={() => setFocused(false)}>i</button>{open ? <span role="tooltip">{text}<button type="button" aria-label="Fermer l’explication" onClick={(event) => { event.stopPropagation(); setPinned(false); setHovered(false); setFocused(false); setDismissed(true); }}>×</button></span> : null}</span>;
+}
+type GardenNeeds = IrrigationNeedsDashboard['gardens'][number];
+/** L'état d'un jardin sur sa ligne compacte, au téléphone (F460). */
+function gardenStateBadge(garden: GardenNeeds) {
+  const state = gardenState(garden);
+  return state.text ? <small className="garden-compact-state" data-tone={state.tone}>{state.text}</small> : null;
+}
+/** Le détail du jardin que sa ligne compacte cache, en tête du jardin ouvert au téléphone (F460). */
+function gardenSummaryDetail(garden: GardenNeeds) {
+  const priorities = `${garden.priorityCounts.high} haute${garden.priorityCounts.high > 1 ? 's' : ''} · ${garden.priorityCounts.normal} normale${garden.priorityCounts.normal > 1 ? 's' : ''} · ${garden.priorityCounts.low} basse${garden.priorityCounts.low > 1 ? 's' : ''}`;
+  return `${garden.zoneName} · ${garden.sheltered ? 'Abri' : 'Plein champ'} · ${garden.bedCount} planche${garden.bedCount > 1 ? 's' : ''} · besoin réel ${gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · ${garden.effectiveVolumeCubicMeters === null ? 'volume non calculable' : volumeText(garden.effectiveVolumeCubicMeters)} · ${priorities}`;
 }
 function formatMm(value: number | null) { return value === null ? 'Non calculable' : `${mm.format(value)} mm`; }
 /** Le total d'un jardin, ou « Non calculable » avec sa raison (audit final, lot A, R2, F282). */

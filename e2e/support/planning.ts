@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { confirmerDansLaFenetre } from './parcours.ts';
+import { confirmerDansLaFenetre, ouvrirLePli } from './parcours.ts';
 import { annulerDepuisLeMenu } from './materiel.ts';
 
 /**
@@ -49,8 +49,9 @@ export async function lignesNonPlacees(planning: Locator): Promise<Locator> {
   return pli.locator('tbody tr');
 }
 
-function panneauDesObjectifs(page: Page): Locator {
-  return page.locator('.water-management-section .water-panel').filter({ hasText: 'Objectifs hebdomadaires' });
+/** Le pli des objectifs, fermé d'office et ouvert ici (audit du 19 novembre 2026, lot J, n° 15, F460). */
+async function panneauDesObjectifs(page: Page): Promise<Locator> {
+  return ouvrirLePli(page.locator('#objectifs-de-la-semaine'));
 }
 
 /** Va sur la semaine précédente de l'eau et attend que l'en-tête change. */
@@ -89,7 +90,7 @@ export async function poserUnObjectifDeFerme(page: Page, millimetres: string): P
 }
 
 async function enregistrerUnObjectifDeFerme(page: Page, millimetres: string): Promise<void> {
-  const panneau = panneauDesObjectifs(page);
+  const panneau = await panneauDesObjectifs(page);
   const pastilles = panneau.locator('.goal-chip-list');
   await expect(pastilles, 'la semaine doit être sans objectif avant la pose : un parcours a laissé le sien')
     .toContainText('Aucun objectif pour cette semaine.');
@@ -107,7 +108,7 @@ export async function retirerLesObjectifs(page: Page): Promise<void> {
 }
 
 async function viderLesObjectifsDeLaSemaine(page: Page): Promise<void> {
-  const panneau = panneauDesObjectifs(page);
+  const panneau = await panneauDesObjectifs(page);
   await panneau.getByRole('button', { name: 'Vider les objectifs' }).click();
   await expect(page.locator('dialog.module-confirm-dialog[open]')).toContainText('Vider les objectifs de cette semaine ?');
   await confirmerDansLaFenetre(page, 'Vider les objectifs');

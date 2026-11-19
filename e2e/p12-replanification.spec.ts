@@ -3,7 +3,7 @@ import { dateKeyInTimeZone } from '../lib/domain/irrigation-history/dates.ts';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { addDaysToDateKey, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
@@ -209,7 +209,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   // de la recette 3.7, choix du porteur du 7 novembre 2026) : vide la veille,
   // sans mesure ; « 0 » aujourd'hui, une mesure comme une autre ; et de même
   // dès l'ouverture de la page.
-  const pluie = page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' });
+  const pluie = await ouvrirLePli(page.locator('#manual-rain'));
   const aujourdhui = dateKeyInTimeZone(new Date());
   await pluie.getByLabel('Date', { exact: true }).fill(addDaysToDateKey(aujourdhui, -1));
   await expect(pluie.getByLabel('Millimètres')).toHaveValue('', { timeout: 15_000 });
@@ -225,7 +225,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   // affichée. La réponse est retenue jusqu'après le retour à aujourd'hui, pour
   // que la course se joue à chaque passage, quel que soit le jour : sans cela,
   // elle ne se jouait que le lundi, quand la veille est dans la semaine passée.
-  const pluieRouverte = page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' });
+  const pluieRouverte = await ouvrirLePli(page.locator('#manual-rain'));
   const semaineAffichee = page.locator('.water-week-navigation strong');
   const semaineDAujourdhui = (await semaineAffichee.textContent()) ?? '';
   const unJourDeLaSemainePassee = addDaysToDateKey(aujourdhui, -7);
@@ -262,7 +262,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
 
 /** La pluie mesurée d'aujourd'hui, la date que le formulaire propose de lui-même. */
 async function saisirLaPluieDuJour(page: Page, millimetres: string): Promise<void> {
-  const panneau = page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' });
+  const panneau = await ouvrirLePli(page.locator('#manual-rain'));
   await panneau.scrollIntoViewIfNeeded();
   await panneau.getByLabel('Millimètres').fill(millimetres);
   await panneau.getByRole('button', { name: 'Enregistrer' }).click();
