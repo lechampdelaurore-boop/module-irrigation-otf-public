@@ -367,3 +367,103 @@ test('Visual Crossing respecte un quota sans relancer la requête', async () => 
   );
   assert.equal(calls, 1);
 });
+
+/**
+ * Le `fetch` natif d'un Worker refuse d'être appelé comme la méthode d'un autre
+ * objet : c'est ce qui faisait échouer aussitôt, « sans réponse ni statut », la
+ * réanalyse d'Open-Meteo de la synchronisation du matin depuis le 14 novembre
+ * 2026 (D-164). Ce faux `fetch` se comporte de même.
+ */
+function workerLikeFetch(body: unknown) {
+  return function strictFetch(this: unknown) {
+    if (this !== undefined && this !== globalThis) {
+      return Promise.reject(new TypeError('Illegal invocation: function called with incorrect `this` reference.'));
+    }
+    return Promise.resolve(Response.json(body));
+  };
+}
+
+const ARCHIVE_DAYS = { daily: {
+  time: ['2026-11-09', '2026-11-10'],
+  precipitation_sum: [2.8, 9.5],
+  et0_fao_evapotranspiration: [0.33, 0.32],
+} };
+
+test('un fetch de Worker injecté n’est jamais appelé comme méthode de l’adaptateur (D-164)', async () => {
+  const openMeteo = new OpenMeteoWeatherProvider(workerLikeFetch(ARCHIVE_DAYS), () => undefined);
+  assert.deepEqual(await openMeteo.readReanalysis({
+    latitude: 46.4225, longitude: 3.068, timezone: 'Europe/Paris',
+    startDate: '2026-11-09', endDate: '2026-11-10', bypassCache: true,
+  }), [
+    { date: '2026-11-09', precipitationMm: 2.8, et0Mm: 0.33 },
+    { date: '2026-11-10', precipitationMm: 9.5, et0Mm: 0.32 },
+  ]);
+  const visualCrossing = new VisualCrossingWeatherProvider('cle-de-test', workerLikeFetch({ days: [] }), openMeteo, () => undefined);
+  assert.deepEqual(await visualCrossing.readForecast({
+    latitude: 46.4225, longitude: 3.068, timezone: 'Europe/Paris',
+    startDate: '2026-11-19', endDate: '2026-11-20', bypassCache: true,
+  }), []);
+});
+
+test('sans fetch injecté, l’adaptateur lit le fetch global au moment de l’appel (D-164)', async (t) => {
+  // Construit avant que le `fetch` global ne change, comme l'adaptateur partagé au chargement du module.
+  const provider = new OpenMeteoWeatherProvider(undefined, () => undefined);
+  const original = globalThis.fetch;
+  let calls = 0;
+  const replaced = workerLikeFetch(ARCHIVE_DAYS);
+  globalThis.fetch = (() => {
+    calls += 1;
+    return replaced.call(globalThis);
+  }) as unknown as typeof fetch;
+  t.after(() => { globalThis.fetch = original; });
+  const values = await provider.readReanalysis({
+    latitude: 46.4225, longitude: 3.068, timezone: 'Europe/Paris',
+    startDate: '2026-11-09', endDate: '2026-11-10',
+  });
+  assert.equal(values.length, 2);
+  assert.equal(calls, 1);
+});
+
+test('un échec réseau journalise sa vraie erreur, sans adresse ni clé (D-164)', async () => {
+  const logs: Record<string, unknown>[] = [];
+  const failing = async () => {
+    throw new TypeError('fetch failed for https://archive-api.open-meteo.com/v1/archive?latitude=46.42&longitude=3.06', {
+      cause: new Error('connect ECONNREFUSED https://example.invalid/?key=secret'),
+    });
+  };
+  const provider = new OpenMeteoWeatherProvider(failing, (_level, entry) => logs.push(entry));
+  await assert.rejects(
+    provider.readReanalysis({
+      latitude: 46.42, longitude: 3.06, timezone: 'Europe/Paris',
+      startDate: '2026-11-09', endDate: '2026-11-10', bypassCache: true,
+    }),
+    (error) => error instanceof WeatherProviderError && error.kind === 'network',
+  );
+  const failure = logs.find((entry) => entry.event === 'weather_external_failure');
+  assert.ok(failure, 'l’échec est journalisé');
+  assert.equal(failure.failure, 'network');
+  assert.equal(failure.endpoint, 'reanalysis');
+  assert.equal(failure.errorName, 'TypeError');
+  assert.equal(failure.errorMessage, 'fetch failed for <adresse>');
+  assert.equal(failure.errorCause, 'Error: connect ECONNREFUSED <adresse>');
+  assert.equal(typeof failure.elapsedMs, 'number');
+  const serialized = JSON.stringify(logs);
+  assert.doesNotMatch(serialized, /latitude=|secret|open-meteo\.com/);
+});
+
+test('un délai dépassé reste un délai, quel que soit le type de l’erreur levée (D-164)', async () => {
+  const logs: Record<string, unknown>[] = [];
+  const provider = new VisualCrossingWeatherProvider('cle-de-test', async () => {
+    const error = new Error('The operation was aborted.');
+    error.name = 'AbortError';
+    throw error;
+  }, new OpenMeteoWeatherProvider(async () => Response.json({})), (_level, entry) => logs.push(entry));
+  await assert.rejects(
+    provider.readForecast({
+      latitude: 46.42, longitude: 3.06, timezone: 'Europe/Paris',
+      startDate: '2026-11-19', endDate: '2026-11-20',
+    }),
+    (error) => error instanceof WeatherProviderError && error.kind === 'timeout',
+  );
+  assert.equal(logs.find((entry) => entry.event === 'weather_external_failure')?.failure, 'timeout');
+});

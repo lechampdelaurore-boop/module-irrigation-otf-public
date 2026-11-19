@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (la mise à jour automatique de la météo, PR 1 sur 3)
+
+- **La pluie estimée après coup revient** (D-164) : depuis le 14 novembre
+  2026, l'appel à la réanalyse d'Open-Meteo échouait aussitôt dans le
+  Worker, sans réponse ni statut. Les adaptateurs météo lisent désormais
+  le `fetch` global au moment de l'appel, et ne l'appellent jamais comme
+  leur propre méthode, ce que le `fetch` natif d'un Worker refuse.
+- **Un échec dit sa vraie erreur** dans le journal
+  (`weather_external_failure` : nom, message, cause, temps écoulé), sans
+  adresse ni clé ; un délai dépassé n'est plus compté comme une panne
+  réseau.
+- En ligne le 19 novembre 2026 : #96, le coffre des jetons d'OTF,
+  fusionnée à 7 h 55 et déployée à 8 h 17 (run 44475742993, cinq jobs
+  verts).
+
 ### Ajouté (Tranche 4, 4.3, PR 2 : le coffre des jetons d'Ouvre ta ferme)
 
 - **Le coffre des jetons de chaque ferme** (T4-12, D-163, F355, F397 à

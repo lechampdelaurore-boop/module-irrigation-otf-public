@@ -281,10 +281,57 @@ registres, elle y renvoie.
   des trois passages d'isolation), `pnpm build`, `pnpm knip`, `pnpm
   push:check`, `pnpm weather:check`, `pnpm site:check` réussis en local ;
   dix-sept sabotages des règles, chacun détecté ; la suite complète des
-  parcours jouée par la CI de la PR. **PR ouverte** (`feat/coffre-jetons-otf`) : **sa fusion
-  attend la relecture, par le porteur, des lignes changées de la
-  politique de confidentialité** (F367). Ensuite : les PR 3 et 4 attendent
-  l'accès d'OTF.
+  parcours jouée par la CI de la PR. Les lignes changées de la politique
+  de confidentialité **validées telles quelles par le porteur le
+  19 novembre 2026 à 7 h 54** (F367). **En ligne le 19 novembre 2026 à
+  8 h 17** : #96 fusionnée à 7 h 55, run 44475742993 vérifié job par job
+  (« Application », « Workers Cloudflare », « Parcours navigateur »,
+  « Déploiement Cloudflare », « Déploiement de la démonstration », verts).
+  Ensuite : les PR 3 et 4 attendent l'accès d'OTF ; **la 4.3 est en
+  pause** et reprend la main dès que cet accès arrive.
+
+- Correctif, **la mise à jour automatique de la météo** (D-164), demandé
+  par le coordinateur le 19 novembre 2026 avant le lot G, en Opus 5.5 ·
+  Élevé. Constat : sur la ferme réelle, la synchronisation de 6 h 15
+  tourne chaque matin, les prévisions (Visual Crossing) arrivent, mais la
+  pluie estimée après coup (réanalyse d'Open-Meteo) échoue depuis le
+  14 novembre 2026 : trois tentatives « réseau » **immédiates**, sans
+  réponse ni statut, alors que la même adresse répond en 0,2 s depuis un
+  navigateur ordinaire. La dernière réussite, le 13 novembre à 6 h 15,
+  reste affichée en vert. **PR 1 sur 3** (`fix/meteo-appel-reseau`) :
+  cause la plus probable, reproduite par un test : l'adaptateur
+  d'Open-Meteo, créé au chargement du module, gardait le `fetch` natif du
+  Worker dans un champ et l'appelait comme sa propre méthode, ce que le
+  Worker refuse aussitôt (« Illegal invocation ») ; Visual Crossing,
+  créé plus tard, à la première demande, échappait au défaut. Les deux
+  adaptateurs lisent désormais le `fetch` global au moment de l'appel et
+  ne l'appellent jamais comme leur méthode ; un échec journalise sa vraie
+  erreur (nom, message, cause, temps écoulé, sans adresse ni clé) et un
+  délai dépassé n'est plus compté comme une panne réseau. **Non vérifié
+  sur le site** : la confirmation viendra du journal de la synchronisation
+  du matin qui suit le déploiement. PR 2 : une alerte quand la mise à jour
+  automatique a plus de 36 heures, avec sa dernière erreur ; PR 3 : plus
+  de seconde exécution chaque matin. Contrôles de la PR 1 : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm
+  push:check`, `pnpm weather:check`, `pnpm site:check` réussis en local ;
+  `pnpm e2e` omis en local, sans rapport (aucun écran ne change), joué par
+  la CI de la PR.
+
+- **Audit ergonomique du 19 novembre 2026**
+  (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
+  sans code) : **cinq lots de correction retenus par le porteur le
+  19 novembre 2026 à 11 h 39**, dans l'ordre G (« Le module vous
+  répond »), H (« Aujourd'hui dit vrai »), I (« Pénurie et
+  démonstration »), J (« Pages courtes au téléphone ») et K
+  (« Finitions de charte »), inscrits à la roadmap (24 quindecies à 24
+  undevicies, D-164), chacun en **Opus 5.5 · Élevé**, comme les six lots
+  du 14 novembre. Deux réponses du porteur pour le lot G : la quantité
+  proposée d'office par « Irriguer maintenant » et « Planifier » est la
+  dose de la proposition du jour pour ce matériel, sinon un champ vide
+  (11 h 37) ; une quantité qui dépasse l'objectif de la semaine de la
+  planche demande une confirmation (11 h 42). Le lot G commence après la
+  PR 3 du correctif météo ; un seul chantier de code à la fois, la 4.3
+  reprenant la main dès l'accès d'OTF.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

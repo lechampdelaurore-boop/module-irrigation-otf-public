@@ -129,8 +129,17 @@ appel à chacun des deux services. Aucun appel n’est lancé en boucle ou à la
 d’un nouvel affichage causé par une action sans rapport avec la météo.
 
 Les journaux serveur exposent uniquement le service logique, le statut, la date,
-`Retry-After` et une raison fournisseur bornée. Ils ne consignent ni coordonnées,
-ni URL complète, ni secret.
+`Retry-After` et une raison fournisseur bornée. Un appel qui échoue sans réponse
+ajoute la nature de l'échec (réseau ou délai dépassé), le temps écoulé, le nom
+et le message de l'erreur et de sa cause, bornés, toute adresse retirée (D-164).
+Ils ne consignent ni coordonnées, ni URL complète, ni secret.
+
+Les adaptateurs météo lisent le `fetch` global au moment de chaque appel et
+appellent un `fetch` injecté seul, jamais comme leur propre méthode : le
+`fetch` natif d'un Worker refuse d'être appelé ainsi, ce qui faisait échouer
+aussitôt la réanalyse d'Open-Meteo depuis le 14 novembre 2026 (D-164). Un délai
+dépassé se reconnaît au signal d'abandon de l'appel, quel que soit le type de
+l'erreur levée.
 
 La mesure manuelle, y compris la valeur explicite `0`, reste dans la ligne
 `manual_precipitation`. La tâche automatique n’écrit que `forecast` et
