@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import type { SoilGaugeZone } from '../lib/domain/soil-reserve/gauge-view.ts';
+import { todaySoil } from '../lib/domain/today/soil.ts';
 import { pastRainOrigins, todayWeek, type RainOrigins, type TodayWeekBed } from '../lib/domain/today/week.ts';
 
 const screenMm = (value: number) => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(value)} mm`;
@@ -65,4 +67,46 @@ test('n° 3, F429 : la légende d’« Eau de la semaine » dit l’origine de l
     'Pluie',
     'Pluie',
   ]);
+});
+
+// n° 4 : les jardins qui comptent d'abord (F430 à F432).
+
+test('n° 4, F430 et F432 : « Eau de la semaine » montre d’abord les jardins arrosés aujourd’hui, puis les plus loin de leur objectif', () => {
+  // Douze jardins de plein champ pleins, les tunnels à sec : l'ordre de la ferme réelle du 19 novembre 2026.
+  const blocs = ['bloc 1', 'Bloc 10', 'Bloc 11', 'Bloc 2', 'bloc 3', 'bloc 4', 'bloc 5', 'bloc 6', 'bloc 7', 'bloc 8'].map((name) =>
+    bed(`g-${name}`, { plotName: name, actualRainMm: 38.1, realRemainingMm: 0 }));
+  const tunnels = ['T1', 'T2', 'T3', 'T4'].map((name, index) =>
+    bed(`t-${name}`, { plotName: name, sheltered: true, actualRainMm: 0, actualIrrigationMm: index * 2, realRemainingMm: 20 - index * 2 }));
+  const sansObjectif = bed('g-verger', { plotName: 'Verger', objectiveMm: null, realRemainingMm: null });
+  const week = todayWeek({ weekStart: '2026-11-16', weekEnd: '2026-11-22', beds: [...blocs, sansObjectif, ...tunnels], water: null }, new Set(['t-T3']));
+  assert.ok(week);
+  assert.deepEqual(week.shown.map((row) => row.name), ['T3', 'T1', 'T2', 'T4', 'bloc 1', 'Bloc 2', 'bloc 3', 'bloc 4']);
+  // Repliés dans l'ordre naturel : « bloc 5 » avant « Bloc 10 ».
+  assert.deepEqual(week.hidden.map((row) => row.name), ['bloc 5', 'bloc 6', 'bloc 7', 'bloc 8', 'Bloc 10', 'Bloc 11', 'Verger']);
+  assert.equal(week.moreLabel, 'Voir les 7 autres jardins');
+});
+
+test('n° 4, F430 : un reste inconnu passe après les restes connus, un jardin sans objectif après eux', () => {
+  const week = todayWeek({ weekStart: '2026-11-16', weekEnd: '2026-11-22', water: null, beds: [
+    bed('a', { plotName: 'A', objectiveMm: null, realRemainingMm: null }),
+    bed('b', { plotName: 'B', actualRainMm: null, realRemainingMm: null }),
+    bed('c', { plotName: 'C', realRemainingMm: 5 }),
+    bed('d', { plotName: 'D', objectiveMm: 10, realRemainingMm: 5 }),
+  ] });
+  // D (5 sur 10) est plus loin que C (5 sur 20).
+  assert.deepEqual(week?.shown.map((row) => row.name), ['D', 'C', 'B', 'A']);
+});
+
+const plot = (name: string, garden: Partial<SoilGaugeZone['plots'][number]['garden']>): SoilGaugeZone['plots'][number] => ({
+  plotId: `p-${name}`, name, sheltered: false, week: [], observation: null, beds: [],
+  garden: { percent: null, lowest: null, countedBeds: 0, unknownBeds: 0, withoutCrop: [], ...garden },
+});
+
+test('n° 4, F431 et F432 : « Réserve du sol » montre d’abord les jardins arrosés aujourd’hui, puis les plus secs, puis les inconnus', () => {
+  const pleins = ['bloc 1', 'Bloc 10', 'Bloc 11', 'Bloc 2', 'bloc 3', 'bloc 4', 'bloc 5', 'bloc 6'].map((name) => plot(name, { percent: 100, countedBeds: 2 }));
+  const tunnels = ['T1', 'T2', 'T3', 'T4'].map((name) => plot(name, { unknownBeds: 2 }));
+  const soil = todaySoil({ zones: [{ plots: [...pleins, plot('Sec', { percent: 31, countedBeds: 2 }), plot('Friche', {}), ...tunnels] }] }, new Set(['p-T4']));
+  assert.deepEqual(soil.shown.map((garden) => garden.name), ['T4', 'Sec', 'bloc 1', 'Bloc 2', 'bloc 3', 'bloc 4', 'bloc 5', 'bloc 6']);
+  assert.deepEqual(soil.hidden.map((garden) => garden.name), ['Bloc 10', 'Bloc 11', 'Friche', 'T1', 'T2', 'T3']);
+  assert.equal(soil.moreLabel, 'Voir les 6 autres jardins');
 });

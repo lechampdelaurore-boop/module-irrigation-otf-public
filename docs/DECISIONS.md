@@ -6075,6 +6075,30 @@ Ne changent pas : la pluie comptée (D-019), le besoin, le reste à
 apporter, les autres pages ; « Pluie mesurée » d'« Objectifs et besoins »,
 qui est bien la saisie du pluviomètre.
 
+## D-174 — Lot H, PR 2 : les jardins qui comptent d'abord
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 4 :
+« Eau de la semaine » et « Réserve du sol » gardaient les huit premiers
+jardins de la liste ; sur une ferme de douze jardins, les quatre tunnels à
+arroser ce jour-là étaient cachés derrière « Voir les 10 autres jardins »,
+et les noms rangés caractère par caractère. Le contrat de la page (T9)
+disait « huit » sans dire lesquels.
+
+**Décision.** Les huit montrés d'emblée sont ceux qui comptent
+(`lib/domain/today/week.ts`, `soil.ts`) : d'abord les jardins dont une
+planche a une irrigation à faire aujourd'hui (en retard, planifiée ou à
+valider) ; puis, pour l'eau, ceux qui ont un objectif, du plus loin au
+plus près (le reste rapporté à l'objectif, puis le reste en mm ; un reste
+inconnu après les connus), puis ceux sans objectif ; pour le sol, les plus
+secs, puis les « inconnue », puis « aucune planche cultivée » ; à égalité,
+l'ordre naturel. Les jardins repliés suivent l'ordre naturel (F430 à
+F432). La précision T9 du contrat d'« Aujourd'hui » est réécrite.
+
+Ne changent pas : le nombre de jardins montrés (huit), les valeurs, la
+ligne de la ferme en tête d'« Eau de la semaine ».
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

@@ -326,11 +326,12 @@ test('la réserve du sol par jardin : la part estimée, la plus sèche, l’inco
     plot('Verger', {}),
     plot('Sud', { percent: 112, countedBeds: 1, lowest: { bedId: 'b9', bedName: 'S1', percent: 112 } }),
   ] }] });
+  // Les plus secs d'abord, puis l'inconnu, puis sans planche cultivée (audit du 19 novembre 2026, lot H, F431).
   assert.deepEqual(soil.shown.map((garden) => [garden.name, garden.text, garden.barPercent, garden.lowestText]), [
     ['Tunnel', '72 %', 72, 'la plus sèche : T3, 42 %'],
+    ['Sud', '112 %', 100, null],
     ['Nord', 'inconnue', null, null],
     ['Verger', 'aucune planche cultivée', null, null],
-    ['Sud', '112 %', 100, null],
   ]);
   assert.equal(soil.unavailable, null);
   assert.deepEqual(todaySoil({ unavailable: 'Aucune planche cultivée.' }), { shown: [], hidden: [], moreLabel: null, unavailable: 'Aucune planche cultivée.' });

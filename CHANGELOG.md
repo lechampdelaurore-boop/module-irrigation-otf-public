@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot H, PR 2 sur 5)
+
+- **Les jardins qui comptent d'abord** (D-174) : sur « Aujourd'hui »,
+  « Eau de la semaine » et « Réserve du sol » montrent d'emblée les jardins
+  qui ont une irrigation aujourd'hui, puis les plus loin de leur objectif
+  (pour le sol, les plus secs, puis les inconnus) ; les autres, repliés,
+  dans l'ordre naturel (« bloc 2 » avant « bloc 10 »).
+
 ### Modifié (audit du 19 novembre 2026, lot H « Aujourd'hui dit vrai », PR 1 sur 5)
 
 - **La pluie dit d'où elle vient** (D-173) : sur « Aujourd'hui », la tuile

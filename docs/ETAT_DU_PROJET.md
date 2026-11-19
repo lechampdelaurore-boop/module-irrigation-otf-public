@@ -396,7 +396,13 @@ registres, elle y renvoie.
   compris dans le choix du porteur. **PR 1, la pluie dit d'où elle vient**
   (D-173, F429) : « pluie prévue, non mesurée », « mesurée » ou « estimée
   après coup », ou les parts de chacune, sur la tuile « Eau reçue » et la
-  légende d'« Eau de la semaine » ; le calcul ne change pas ; codée.
+  légende d'« Eau de la semaine » ; le calcul ne change pas ; en ligne le
+  19 novembre 2026 à 18 h 56 (#107, fusionnée à 18 h 34, run 44578718992 vérifié
+  job par job).
+  **PR 2, les jardins qui comptent d'abord** (D-174, F430 à F432) : les
+  jardins arrosés aujourd'hui en tête d'« Eau de la semaine » et de
+  « Réserve du sol », puis les plus loin de leur objectif ou les plus
+  secs ; les repliés dans l'ordre naturel ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

@@ -99,6 +99,7 @@ async function readTodayInputs(
     plan: plan ? { computedAt: plan.calculation.computedAt, proposals: plan.proposals } : null,
     shortagePlan: plan,
     bedNames: new Map(snapshot.beds.map((bed) => [bed.id, bed.name])),
+    bedPlots: new Map(snapshot.beds.map((bed) => [bed.id, bed.plotId])),
     infrastructure,
     reliability: {
       actualRainMissingDates: rainMatters ? lookback.filter((date) => !rainKnown.has(date)) : null,

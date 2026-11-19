@@ -1,4 +1,6 @@
+import { compareNamesNaturally } from '../bed-order.ts';
 import type { SoilGaugeZone } from '../soil-reserve/gauge-view.ts';
+import { moreGardensLabel, shownFirst } from './week.ts';
 
 /**
  * « Réserve du sol » sur le tableau de bord « Aujourd'hui »
@@ -15,6 +17,8 @@ const SOIL_GARDENS_SHOWN = 8;
 const PERCENT_MAXIMUM = 100;
 
 type TodaySoilGarden = {
+  /** L'identifiant du jardin, pour le ranger (F431). */
+  key: string;
   plotId: string;
   name: string;
   sheltered: boolean;
@@ -45,6 +49,7 @@ function garden(plot: SoilGaugeZone['plots'][number]): TodaySoilGarden {
     : plot.garden.countedBeds === 0 && plot.garden.unknownBeds === 0 ? 'aucune planche cultivée' : 'inconnue';
   const lowest = plot.garden.lowest;
   return {
+    key: plot.plotId,
     plotId: plot.plotId,
     name: plot.name,
     sheltered: plot.sheltered,
@@ -55,14 +60,28 @@ function garden(plot: SoilGaugeZone['plots'][number]): TodaySoilGarden {
   };
 }
 
-export function todaySoil(input: { zones: readonly Pick<SoilGaugeZone, 'plots'>[] } | { unavailable: string }): TodaySoil {
+/**
+ * Les jardins montrés d'emblée (audit du 19 novembre 2026, lot H, n° 4,
+ * F431) : ceux qui ont une irrigation aujourd'hui, puis les plus secs, puis
+ * les « inconnue », puis « aucune planche cultivée » ; à égalité, l'ordre
+ * naturel. Les autres dans l'ordre naturel (F432).
+ */
+function bySoilPriority(irrigatedToday: ReadonlySet<string>) {
+  const rank = (garden: TodaySoilGarden) => (garden.percent !== null ? 0 : garden.text === 'inconnue' ? 1 : 2);
+  return (a: TodaySoilGarden, b: TodaySoilGarden) =>
+    Number(irrigatedToday.has(b.plotId)) - Number(irrigatedToday.has(a.plotId))
+    || rank(a) - rank(b)
+    || (a.percent ?? 0) - (b.percent ?? 0)
+    || compareNamesNaturally(a.name, b.name)
+    || compareNamesNaturally(a.plotId, b.plotId);
+}
+
+export function todaySoil(
+  input: { zones: readonly Pick<SoilGaugeZone, 'plots'>[] } | { unavailable: string },
+  irrigatedToday: ReadonlySet<string> = new Set(),
+): TodaySoil {
   if ('unavailable' in input) return { shown: [], hidden: [], moreLabel: null, unavailable: input.unavailable };
   const gardens = input.zones.flatMap((zone) => zone.plots.map(garden));
-  const hidden = gardens.slice(SOIL_GARDENS_SHOWN);
-  return {
-    shown: gardens.slice(0, SOIL_GARDENS_SHOWN),
-    hidden,
-    moreLabel: hidden.length === 0 ? null : hidden.length === 1 ? 'Voir l’autre jardin' : `Voir les ${hidden.length} autres jardins`,
-    unavailable: null,
-  };
+  const { shown, hidden } = shownFirst(gardens, bySoilPriority(irrigatedToday), SOIL_GARDENS_SHOWN);
+  return { shown, hidden, moreLabel: moreGardensLabel(hidden.length), unavailable: null };
 }

@@ -1,3 +1,4 @@
+import { compareNamesNaturally } from '../bed-order.ts';
 import { mmText, waterText } from '../figure-origin.ts';
 import type { BedIrrigationNeed } from '../irrigation-needs.ts';
 import { percentFromFraction } from '../units.ts';
@@ -230,8 +231,47 @@ function scaleMax(values: readonly (number | null)[]): number {
   return Math.ceil(highest / WEEK_SCALE_STEP_MM) * WEEK_SCALE_STEP_MM;
 }
 
-/** La semaine de la ferme et de chaque jardin ; `null` sans planche de la saison. */
-export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
+/**
+ * Les jardins montrés d'emblée (audit du 19 novembre 2026, lot H, n° 4,
+ * F430 et F432) : ceux qui ont une irrigation aujourd'hui, puis ceux qui
+ * ont un objectif, du plus loin au plus près (le reste rapporté à
+ * l'objectif, puis le reste en mm ; un reste inconnu après les connus),
+ * puis ceux sans objectif ; à égalité, l'ordre naturel. Les autres, derrière
+ * « Voir les n autres jardins », dans l'ordre naturel.
+ */
+function byWeekPriority(irrigatedToday: ReadonlySet<string>) {
+  const gap = (row: WeekRow) => (row.objectiveMm === null || row.remainingMm === null ? null
+    : row.objectiveMm > 0 ? row.remainingMm / row.objectiveMm : row.remainingMm > 0 ? Number.POSITIVE_INFINITY : 0);
+  const rank = (row: WeekRow) => (row.objectiveMm === null ? 2 : row.remainingMm === null ? 1 : 0);
+  return (a: WeekRow, b: WeekRow) =>
+    Number(irrigatedToday.has(b.key)) - Number(irrigatedToday.has(a.key))
+    || rank(a) - rank(b)
+    || (gap(b) ?? 0) - (gap(a) ?? 0)
+    || (b.remainingMm ?? 0) - (a.remainingMm ?? 0)
+    || compareNamesNaturally(a.name, b.name)
+    || compareNamesNaturally(a.key, b.key);
+}
+
+/** Les montrés selon une priorité, les autres dans l'ordre naturel (F432). */
+export function shownFirst<T extends { key: string; name: string }>(rows: readonly T[], priority: (a: T, b: T) => number, shown: number) {
+  const ordered = [...rows].sort(priority);
+  return {
+    shown: ordered.slice(0, shown),
+    hidden: ordered.slice(shown).sort((a, b) => compareNamesNaturally(a.name, b.name) || compareNamesNaturally(a.key, b.key)),
+  };
+}
+
+/** « Voir l'autre jardin », « Voir les 4 autres jardins ». */
+export function moreGardensLabel(hidden: number): string | null {
+  return hidden === 0 ? null : hidden === 1 ? 'Voir l’autre jardin' : `Voir les ${hidden} autres jardins`;
+}
+
+/**
+ * La semaine de la ferme et de chaque jardin ; `null` sans planche de la
+ * saison. `irrigatedToday` : les jardins qui ont une irrigation aujourd'hui,
+ * montrés d'abord (F430).
+ */
+export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<string> = new Set()): TodayWeek | null {
   if (input.beds.length === 0) return null;
   const gardens = new Map<string, { name: string; beds: TodayWeekBed[] }>();
   for (const bed of input.beds) {
@@ -245,7 +285,7 @@ export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
     return [probe.objectiveMm, probe.receivedMm ?? probe.irrigationMm];
   }));
   const [farm, ...rows] = groups.map((group) => row(group.key, group.name, group.beds, max));
-  const hidden = rows.slice(WEEK_GARDENS_SHOWN);
+  const { shown, hidden } = shownFirst(rows, byWeekPriority(irrigatedToday), WEEK_GARDENS_SHOWN);
   const mm = (value: number | null) => (value === null ? null : mmText(rounded(value)));
   const water = input.water;
   const volume = (value: number) => `${water?.incomplete ? 'au moins ' : ''}${waterText(value, 'm³')}`;
@@ -259,9 +299,9 @@ export function todayWeek(input: TodayWeekInputs): TodayWeek | null {
     rainLegend: rainLegend(input.rainOrigins),
     scaleMaxMm: max,
     farm,
-    shown: rows.slice(0, WEEK_GARDENS_SHOWN),
+    shown,
     hidden,
-    moreLabel: hidden.length === 0 ? null : hidden.length === 1 ? 'Voir l’autre jardin' : `Voir les ${hidden.length} autres jardins`,
+    moreLabel: moreGardensLabel(hidden.length),
     tiles: {
       objective: mm(farm.objectiveMm),
       objectiveDetail: partial ? `objectifs posés sur ${bedsOn(withObjective, total)}, ${label}` : `ferme entière, ${label}`,
