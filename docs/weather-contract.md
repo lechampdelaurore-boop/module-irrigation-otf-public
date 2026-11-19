@@ -141,6 +141,14 @@ aussitôt la réanalyse d'Open-Meteo depuis le 14 novembre 2026 (D-164). Un dél
 dépassé se reconnaît au signal d'abandon de l'appel, quel que soit le type de
 l'erreur levée.
 
+La date de la dernière mise à jour automatique réussie s'affiche en vert tant
+qu'elle a moins de 36 heures (la tâche passe chaque jour à 6 h 15). Au-delà, ou
+quand des tentatives n'ont jamais réussi, l'écran dit « Mise à jour automatique
+de la météo en retard », la date de la dernière réussite et la dernière erreur
+enregistrée, sur le fond des avertissements ; les valeurs déjà enregistrées
+restent affichées (D-165). Constat du 19 novembre 2026 : la date du 13 novembre
+restait affichée en vert, sans alerte, six jours après la dernière réussite.
+
 La mesure manuelle, y compris la valeur explicite `0`, reste dans la ligne
 `manual_precipitation`. La tâche automatique n’écrit que `forecast` et
 `reanalysis` ; elle ne peut donc ni remplacer ni effacer une mesure utilisateur.
