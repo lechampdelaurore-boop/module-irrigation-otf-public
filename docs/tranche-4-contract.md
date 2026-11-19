@@ -1452,7 +1452,7 @@ en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
 
 **4.5.** Sauvegarde et **restauration D1 essayées pour de vrai** (une sauvegarde qui ne restaure pas est un défaut silencieux ; les possibilités d'historique du service sont [NON VÉRIFIÉ]) ; observabilité par ferme sans données sensibles (taux d'erreurs OTF, quota consommé, dernière synchronisation) ; **suppression complète d'une ferme** (jeton, instantanés, réglages, évènements) vérifiée par test ; page d'état simple pour l'exploitant ; procédure de support (une personne) ; **budget de coûts** relu au tableau de bord un mois après la première ferme (les deux alertes de budget existent). Coût estimé : **≈ 5 $/mois jusqu'à 30 fermes sans Access payant**, le calcul étant le seul poste proche du plafond (mesure réelle du 9/11 : ≈ 307 ms de calcul par requête, 1 000 requêtes par mois et par ferme).
 
-**4.6.** 1 ou 2 fermes amies, d'abord en lecture seule, **accord écrit de chacune**, recette sur chaque écran, preuve d'isolation **en conditions réelles** (A ne voit jamais B), retour des fermes consigné. Aucune ouverture au-delà avant le retour du pilote. Question 3 (section 12).
+**4.6.** 1 ou 2 fermes amies, d'abord en lecture seule, **accord écrit de chacune**, recette sur chaque écran, preuve d'isolation **en conditions réelles** (A ne voit jamais B), retour des fermes consigné. Aucune ouverture au-delà avant le retour du pilote. Question 3 (section 12). **Précisions de la 4.6 : section 10 ter** (D-221, F570 à F580).
 
 ### 10 bis. Précisions de la 4.5 : exploitation, sauvegardes, conservation, effacement et support (19 novembre 2026, D-220, F560 à F569)
 
@@ -1688,6 +1688,222 @@ Décidé sans question au porteur (non budgétaire, autonomie du 19 novembre) : 
 ##### F569 · La règle du dépôt
 
 Une fois le registre des tâches codé (F560), `AGENTS.md` dira : tout job planifié s'inscrit au registre, avec son rythme attendu, et un test échoue pour un déclencheur absent. Rien n'est ajouté à `AGENTS.md` avant, la règle n'étant pas encore tenue par un test.
+
+### 10 ter. Précisions de la 4.6 : le pilote multi-fermes (19 novembre 2026, D-221, F570 à F580)
+
+Écrites avant toute ouverture, le 19 novembre 2026, en Sonnet 5.5 · Moyen (contrat sans code, grille générale de la roadmap). Elles précisent la section 10 et ne rouvrent aucune décision déjà prise (sections 2, 5 à 10 bis, 12). La 4.6 est le premier moment où **les données d'une personne qui n'est pas le porteur entrent dans le module** : tout ce qui suit sert à ce que ce moment soit réversible, borné et prouvé. Marques : **[NON VÉRIFIÉ]**, **[À FAIRE]** (à lire ou mesurer le jour venu), **[RÉSERVÉ]** (acte ou décision du porteur, que l'assistant ne prend pas).
+
+#### 10 ter.1 · Objet
+
+Le contrat disait en deux lignes : « 1 ou 2 fermes amies, d'abord en lecture seule, accord écrit de chacune, recette sur chaque écran, preuve d'isolation en conditions réelles, retour consigné ». Ce qui manquait, et que cette section écrit :
+
+- **quand le pilote peut commencer** : une liste de conditions d'entrée, chacune vérifiable à la source (10 ter.3), au lieu d'un « après la 4.5 » ;
+- **ce que veut dire « lecture seule »** et ce que le pilote ne fait pas (F571) ;
+- **comment se prouve « A ne voit jamais B » sur de vraies fermes** sans que l'assistant ouvre l'espace d'une ferme tierce (F573) ;
+- **ce qui arrête le pilote tout de suite** et comment on revient en arrière (F576) ;
+- **ce qui permet de dire que le pilote a réussi**, et ce que cela n'ouvre pas (F577).
+
+La 4.6 n'est pas un chantier de code. Elle est une suite d'étapes, de documents et de constats ; le code n'y entre que pour corriger un défaut trouvé, ou pour le seul contrôle de F573.
+
+#### 10 ter.2 · Contraintes tenues
+
+1. Celles de la section 2 du contrat (multi-fermes, OTF en lecture seule, 4 requêtes par seconde au plus, aucun secret vu par l'assistant, une fuite entre fermes est le pire défaut, accord écrit de chaque ferme tierce).
+2. **Aucune dépense nouvelle** : l'hébergement du pilote est gratuit pour la ferme (question 2 de la section 12, tranchée le 15 novembre 2026) et tient dans l'abonnement Workers déjà pris (D-017). Toute question qui toucherait au budget (la participation d'après le pilote, F348 ; un service payant ; Access au-delà de 50 personnes) est posée **à part au porteur**, jamais tranchée ici.
+3. **Aucune action sur Cloudflare ni sur une ferme réelle par l'assistant sans le « vas-y » exprès du porteur** : l'ajout d'une personne à la règle d'Access, la pose des secrets, la lecture du tableau de bord et chaque recette dans son Chrome sont **ses actes** ou demandent son accord à chaque fois.
+4. **L'assistant n'ouvre jamais l'espace d'une ferme pilote** et ne lit jamais ses données ni ses journaux : la preuve côté ferme pilote est apportée par la personne elle-même, sur sa propre ferme (F573, F574). Le porteur, exploitant, peut techniquement tout lire (D6 de la revue) ; il s'interdit de le faire hors cas d'arrêt (F576), et le dit dans l'accord (F572).
+5. **Aucune donnée de ferme tierce dans le dépôt**, qui est public : ni nom de ferme, ni nom de personne, ni adresse électronique, ni capture, ni extrait de base. Les fermes se nomment « ferme pilote 1 », « ferme pilote 2 » partout. Les accords signés et les courriels restent chez le porteur, hors dépôt.
+6. **Aucune écriture chez OTF, aucun matériel branché, aucune vanne pilotée** pour une ferme pilote (F571).
+7. **Pas de ferme avant les conditions d'entrée** : une seule manque, le pilote ne commence pas, et le dire est un résultat, pas un échec.
+
+#### 10 ter.3 · Les conditions d'entrée
+
+Chaque ligne se **vérifie dans le dépôt, les PR ou le tableau de bord**, jamais de mémoire (consigne 7 du projet). Le pilote commence quand les douze lignes sont vraies et que le porteur a dit « vas-y » sur la fiche d'entrée (F570).
+
+| N° | Condition | Où se vérifie | Qui |
+| --- | --- | --- | --- |
+| E1 | OTF a validé la demande ; le porteur a posé les secrets de la 4.3 (F368) | page des demandes d'OTF ; secrets présents (la commande de pose se lit, pas leur valeur) | porteur |
+| E2 | 4.3 PR 3 et PR 4 **en ligne** ; essai de bout en bout conforme sur « Ferme v2 » n° 4394 ; la ferme du porteur reliée ; le secret `OTF_API_TOKEN` retiré et le chemin de la clé du déploiement retiré (F366, étapes 4 et 5) : **une personne qui n'a pas relié sa ferme n'en ouvre aucune** | roadmap 4.3, registres, test « une personne inconnue n'ouvre aucune ferme » vert | assistant, porteur pour les actes |
+| E3 | La **part du quota** de la ferme du porteur est fixée (F363) : question au porteur, due **à partir du 3 décembre 2026** (quatorze jours après la mise en ligne de #94, le 19 novembre 2026 à 1 h 33) | journal des appels, F363 | porteur [RÉSERVÉ] |
+| E4 | 4.4 **en ligne** (cinq PR) et son essai réel conforme sur « Ferme v2 » n° 4394, aux deux largeurs | roadmap 4.4, section 8 bis.6 | assistant, recette dans le Chrome du porteur avec son accord |
+| E5 | 4.5 **en ligne** (cinq PR) : la veille prévient en vrai, l'effacement d'une ferme est complet et prouvé, la restauration est **jouée** (S1, S2, S3), la phrase des 30 jours est dans la confidentialité | roadmap 4.5, section 10 bis.7 | assistant |
+| E6 | **Relecture juridique** de la confidentialité et des conditions faite par le réseau du porteur, **gratuite** (règle du 15 novembre 2026), son retour reçu et ses remarques reprises | retour du porteur ; PR de reprise | porteur [RÉSERVÉ] |
+| E7 | Le texte de confidentialité en ligne dit ce que fait le code : clé chiffrée gardée puis effacée, l'exploitant peut techniquement lire les données (F367, D6), conservation (4.5), effacement sous sept jours | lecture de la page publique contre le code, ligne à ligne | assistant, porteur relit |
+| E8 | **Revue d'isolation de la 4.3 à la 4.5** par un fil à part, sur `main` : le coffre, les raccordements, l'accueil, la veille et l'effacement ne mélangent pas les fermes ; les points D2 à D5 de la revue du 18 novembre 2026 sont fermés ou écartés par écrit ; le contrôle de cohérence (F380) couvre toute table nouvelle | rapport de la revue, déposé dans le projet | assistant (fil indépendant, Opus 5.5 · Max) |
+| E9 | **Le modèle d'accord, la grille de recette et la fiche de retour** existent dans `docs/` (F572, F574, F575) | dépôt | assistant |
+| E10 | L'**essai à blanc du retour en arrière** (F576) a été joué une fois : déconnexion d'une ferme fictive, retrait de la personne d'Access, effacement sous sept jours, vérification | compte rendu dans la PR | assistant, porteur pour Access [RÉSERVÉ] |
+| E11 | **La démonstration** (4.0) a été essayée par la ferme pilote avant tout raccordement (constat B de la revue du 18 novembre 2026) | retour de la ferme | porteur (contact) |
+| E12 | Le **coût** est relu : l'abonnement Workers, l'alerte de budget présente, le nombre de personnes dans Access loin de 50 | tableau de bord Cloudflare, dans le Chrome du porteur avec son accord | porteur |
+
+E3, E6 et E12 touchent au budget, au juridique ou à Cloudflare : **réservés**. Les autres peuvent être préparés la nuit par l'assistant.
+
+#### 10 ter.4 · Les points
+
+##### F570 · La fiche d'entrée et le « feu vert »
+
+Un document court, `docs/pilote-fiche-entree.md`, **recopie les douze lignes de 10 ter.3 avec, pour chacune, la preuve constatée** (numéro de PR, date, extrait du résultat, **jamais une valeur secrète**). Le pilote commence quand **la dernière ligne est cochée et que le porteur a écrit « vas-y »** sous la fiche. Une ligne cochée de mémoire est refusée (consigne 7). La fiche se met à jour par PR, comme les registres. **Aucun fil de code ne la précède** : on ne la remplit qu'au moment où il reste moins de trois lignes ouvertes.
+
+##### F571 · Ce que veut dire « lecture seule », et ce que le pilote ne fait pas
+
+- **Chez OTF** : toujours en lecture (section 2, contrainte 2). La ferme pilote **ne perd rien dans OTF** et n'y change rien en passant par le module.
+- **Dans le module**, la personne saisit **ses propres réglages** (l'accueil de la 4.4 les lui demande) : c'est la seule chose qu'elle écrit, dans son espace.
+- **Aucun matériel** : ni vanne, ni capteur, ni station (confiés à Tlaloc, D-066). Les vannes et les capteurs restent « en cours de développement » dans le texte public (F345).
+- **Aucun arrosage n'est déclenché** : le module propose, la personne arrose. La phrase est dite à l'accord (F572) : ses conseils ne sont pas une garantie agronomique.
+- **Les notifications** sont possibles **dès la deuxième étape** (F574), si la personne les active elle-même ; elles ne sont pas demandées à la première.
+- **Aucun réglage agronomique du porteur** n'est repris : les valeurs de départ sont celles de la 4.4, « à renseigner » quand elles ne sont pas connues. Un retour qui demanderait de changer une valeur agronomique est **consigné, pas appliqué** : la décision est réservée au porteur [RÉSERVÉ].
+
+##### F572 · L'accord écrit
+
+Un modèle, `docs/pilote-accord-modele.md`, sans aucune donnée de ferme, que le porteur envoie lui-même (contact extérieur, son acte) et dont il garde les réponses. Il dit, en phrases simples :
+
+1. ce que le module **lit** chez OTF (les droits en lecture demandés dans le formulaire et leurs raisons, tels que sur la page de confidentialité) et qu'il **n'écrit rien** ;
+2. ce qu'il **garde**, où (le compte Cloudflare du porteur), combien de temps (le tableau de conservation de la 4.5) ;
+3. que **l'exploitant peut techniquement lire** les données de toutes les fermes dans la base et les journaux (D6), qu'il s'interdit de le faire hors cas d'arrêt, et ce qui l'y ferait entrer ;
+4. que la ferme **arrête quand elle veut** (« Déconnecter la ferme » dans Réglages, ou le retrait de l'accès côté OTF) et peut **demander l'effacement**, fait sous sept jours, annulable pendant ce délai ;
+5. que c'est **gratuit pendant le pilote** ; qu'ensuite une participation d'environ 1 € par mois et par ferme est possible, **sans engagement** et sans rien prélever sans accord nouveau (texte de F348) ;
+6. qu'**aucun engagement de service** n'est pris (pas de délai garanti) ; le support est assuré par une seule personne (4.5-h) ;
+7. que le module **conseille et ne commande rien** (F571) ;
+8. qu'on lui demandera **un retour** (F575), et que la ferme peut le refuser sans perdre l'accès ;
+9. la **version datée** du texte, sur laquelle la ferme répond.
+
+Forme de l'accord : **une réponse écrite explicite** (courriel) à l'envoi de cette version datée suffit ; la ferme reçoit une copie de ce qu'elle a accepté. Le modèle passe par la **relecture juridique gratuite** (E6) avant d'être envoyé. L'assistant le rédige, ne l'envoie à personne. L'accord est **par ferme et par personne** (le propriétaire de la ferme dans OTF, le seul qui puisse l'autoriser, F351).
+
+##### F573 · La preuve « A ne voit jamais B » sur de vraies fermes
+
+Deux espaces réels existent dès la première ferme pilote : la ferme du porteur (A) et la ferme pilote 1 (B). Une seule ferme pilote suffit donc à la preuve ; la deuxième ajoute un cas (F577). Le protocole, joué **une fois à la fin de la première semaine**, puis **après tout changement d'isolation** :
+
+1. **Côté A** (constaté par l'assistant, dans le Chrome du porteur, avec son accord) : rien de la ferme pilote n'apparaît dans les pages de l'espace du porteur : ni plantation, ni planche, ni matériel, ni message d'alerte, ni ligne dans la page d'état autre que « 2 fermes reliées » et leurs compteurs par identifiant interne.
+2. **Côté B** (constaté **par la personne de la ferme pilote**, sur une grille de questions « oui / non » écrite pour elle, F574) : rien de la ferme du porteur n'apparaît chez elle : aucun nom de planche, de culture, de matériel, de jardin que ce n'est pas le sien.
+3. **L'appareil** : si les deux personnes n'ont aucun appareil commun, le cas du constat A de la revue (D-159) n'est pas jouable en réel ; il l'est avec **l'appareil du porteur**, qui s'inscrit successivement aux notifications des deux espaces si le porteur a deux identités dans Access [NON VÉRIFIÉ] ; sinon la preuve reste celle des tests (#92), et le dit.
+4. **Les compteurs** : la page d'état montre un compte d'appels **séparé par ferme** ; un appel de B ne change pas celui de A ; le total reste sous le budget du jour de chacune (F363).
+5. **La base** : le contrôle de cohérence des espaces (F380) est **rejoué sur une copie de la base réelle**, sur l'ordinateur du porteur, à partir de l'export hebdomadaire déchiffré par lui (10 bis.9) : il rend « n lignes vérifiées, 0 qui désigne un autre espace », **sans aucune valeur**. C'est le seul code de la 4.6 (PR 2, 10 ter.6). Tant qu'il n'existe pas, ce point est « non vérifié en réel » et dit comme tel.
+
+Le constat s'écrit **sans nom** (« ferme A », « ferme pilote 1 ») dans `docs/pilote-recette.md`.
+
+##### F574 · La recette sur chaque écran
+
+- **Une grille par page du menu** (`docs/pilote-recette.md`), dressée **au début de la recette depuis le menu réel** [À FAIRE] : pour chaque page, trois questions à la personne (« Voyez-vous votre plan, pas celui d'un autre ? », « Un chiffre vous paraît-il faux ou absurde pour votre ferme ? », « Un mot ou un bouton n'est-il pas clair ? »), aux **deux largeurs** (ordinateur et 390 px).
+- **Ce qui doit se voir pour une ferme neuve** : aucun faux zéro, « à renseigner » là où rien n'est connu (F422, section 8 bis.6) ; la ferme exclue (hors France métropolitaine, plusieurs structures) dite avant toute saisie.
+- **Étapes** : **S0** préparation à blanc (fiche d'entrée) ; **S1** la personne ouvre le module, passe l'accueil, autorise sa ferme dans OTF **elle-même** (l'assistant ne voit jamais le jeton, contrainte 3 de la section 2), **avec le porteur au téléphone ou en visio** ; **S2** une **semaine** d'usage libre, notifications possibles, la page d'état et la veille regardées chaque matin par le porteur ; **S3** la recette de la grille et la preuve de F573 ; **S4** la deuxième ferme, si S3 est conforme et sans défaut grave ; **S5** le bilan (F577).
+- Les **constats** se disent « conforme » ou « non conforme » avec leur cause ; les chiffres de la ferme pilote **ne sont pas copiés** dans le dépôt.
+- **Défaut trouvé** : une PR de correction à part par défaut, comme toujours ; **un défaut d'isolation arrête le pilote (F576)**.
+
+##### F575 · Le retour des fermes
+
+Une fiche, `docs/pilote-retour-modele.md`, que le porteur remplit **avec** la personne (entretien ou courriel), sans la lui imposer : le temps pris par l'accueil, les étapes où elle a hésité ou abandonné, les mots non compris, ce qui manque, ce qui est faux, ce qu'elle refuserait de confier, si le texte de confidentialité lui a paru clair, si elle utiliserait le module sans le porteur, ce qu'elle penserait d'une participation de 1 € par mois (**opinion recueillie, aucune décision**, budget [RÉSERVÉ]). Consigné au dépôt **en résumé sans nom**, avec les verbatim **seulement si la personne les a autorisés par écrit**.
+
+##### F576 · Les arrêts, et le retour en arrière
+
+**Le pilote s'arrête tout de suite** (le porteur en est prévenu aussitôt, dans le chat du projet) si :
+
+1. une donnée d'une ferme apparaît chez une autre, **même soupçonnée** ;
+2. un jeton, une clé, un `code` ou un `state` apparaît quelque part où il ne devrait pas (page, journal, réponse) ;
+3. le module **écrit** chez OTF, ou appelle OTF plus de 4 fois par seconde ;
+4. le budget du jour d'une ferme est atteint **plus de deux jours de suite** et prive une autre ferme (F363) ;
+5. la veille signale une panne non vue depuis plus de 36 heures et que le porteur ne la rattrape pas dans la journée ;
+6. la personne le demande, sans avoir à se justifier.
+
+**Le retour en arrière** (essayé à blanc, E10) : (a) la ferme est **déconnectée** (Réglages ; le coffre efface la clé) ; (b) la personne est **retirée de la règle d'Access** par le porteur [RÉSERVÉ] ; (c) si elle le demande, l'**effacement** (4.5-d) est lancé, sous sept jours ; (d) un **constat écrit** (quoi, quand, d'où vient la découverte) est déposé sans nom ; (e) **aucune reprise** avant la correction et une nouvelle revue de ce qui a été touché. Un arrêt n'est pas un échec du pilote : c'est ce pour quoi il est fait.
+
+##### F577 · Le bilan, et ce que le pilote n'ouvre pas
+
+Le pilote est **réussi** quand, pour chaque ferme pilote : S3 est conforme ; une semaine s'est écoulée sans défaut grave ni panne non vue ; le retour est consigné ; la ferme accepte de continuer ou de s'arrêter proprement ; le coût d'un mois d'exploitation est relu (4.5-i, lecture dans le Chrome du porteur, un mois après la première ferme). Le bilan est écrit par l'assistant et **jugé par le porteur** (D-014). Sa réussite **n'ouvre rien d'elle-même** : ouvrir à une troisième ferme, puis à d'autres, est **une décision nouvelle** du porteur (D-xxx), qui rouvrira au moins les points budgétaires (participation, Access au-delà de 50 personnes) et la question du support. Rien dans ce contrat ne promet une date, un nombre de fermes ou un service.
+
+##### F578 · Le choix des fermes
+
+Les fermes sont **celles que le porteur contacte lui-même** (réponse du 15 novembre 2026) ; leurs noms ne figurent nulle part au dépôt [RÉSERVÉ]. Les critères que recommande ce contrat, dits au porteur pour son choix :
+
+1. une ferme **en France métropolitaine** (la limite de la 4.4) ;
+2. dont **la personne est le propriétaire** de la ferme dans OTF (F351) ;
+3. avec un **plan de culture à jour** dans OTF, sinon l'accueil n'a rien à lire ;
+4. **ni Nicolas ni Vincent** par défaut : ils ont la démonstration (4.0) et un autre rôle ;
+5. pour la **deuxième** : un autre profil (sous abri ou plein champ, taille, sol) que la première, pour que le pilote montre autre chose qu'une répétition.
+
+Ordre : **une seule ferme d'abord** ; la deuxième seulement après une semaine d'usage de la première sans défaut grave (S2 puis S3). Deux fermes pilotes au plus (section 10). Les personnes ajoutées à la règle d'Access le sont **une par ferme** (T4-04), par le porteur [RÉSERVÉ] ; leur adresse n'est jamais écrite dans le dépôt.
+
+##### F579 · Le support pendant le pilote
+
+Une seule personne (le porteur), **sans engagement de délai** (4.5-h). Le canal est celui du site public (Discord de préférence, F347) ; la ferme le reçoit dans l'accord. Chaque question posée est consignée dans la fiche de retour, avec la réponse, sans nom. Si la veille de la 4.5 signale quelque chose pendant le pilote, **le porteur le dit à la ferme** avant qu'elle ne le trouve.
+
+##### F580 · Qui fait quoi
+
+| Acte | Qui |
+| --- | --- |
+| Contacter les fermes, envoyer l'accord, recueillir les réponses, le retour | porteur |
+| Relecture juridique (réseau gratuit) | porteur |
+| Ajouter ou retirer une personne dans Access ; poser les secrets ; lire le tableau de bord | porteur (« vas-y » à chaque fois) |
+| Autoriser une ferme dans OTF, passer l'accueil, répondre à la grille | la personne de la ferme pilote |
+| Rédiger le modèle d'accord, la grille, la fiche de retour, la fiche d'entrée ; revue d'isolation ; constats côté ferme du porteur ; corrections ; registres | assistant |
+| Juger la recette, décider de continuer, d'arrêter ou d'ouvrir | porteur |
+
+#### 10 ter.5 · Ce que la 4.6 ne fait pas
+
+- Aucun **code de fonctionnalité** : seulement le contrôle de F573 et des corrections ;
+- aucune **ouverture** à une troisième ferme, à un public ou à un domaine propre ;
+- aucune **promesse de service** ni de prix (le prix d'après le pilote reste celui de F348, sans engagement) ;
+- aucun **changement du moteur** ni du calcul (section 11) ;
+- aucun **accès de l'assistant** aux données d'une ferme pilote (contrainte 4) ;
+- aucune **valeur agronomique** décidée à la place du porteur.
+
+#### 10 ter.6 · Découpage (une PR à la fois, registres dans chacune)
+
+| PR | Contenu | Code ? | Réglage |
+| --- | --- | --- | --- |
+| 1 | Les quatre documents : `docs/pilote-accord-modele.md`, `docs/pilote-recette.md` (grille et protocole de F573), `docs/pilote-retour-modele.md`, `docs/pilote-fiche-entree.md` (douze lignes, vides) | non | Sonnet 5.5 · Moyen |
+| 2 | Le **contrôle de cohérence sur une copie de la base réelle** (F573, point 5) : un script local qui relit un export, rejoue F380 et rend des comptes sans valeur ; essayé sur une base d'essai à deux fermes, **jamais sur la production** | oui, petit | Opus 5.5 · Max (réglage de la ligne 4.6) |
+| 3 | **L'essai à blanc du retour en arrière** (E10) sur une ferme fictive ; compte rendu | non | Sonnet 5.5 · Moyen, les actes Cloudflare par le porteur |
+| 4… | **La revue d'isolation de la 4.3 à la 4.5** (E8) : un rapport, pas une PR de code ; ses défauts, une PR chacun | non puis oui | Opus 5.5 · Max |
+| n | Les corrections et les constats du pilote lui-même ; le bilan (F577) | selon | Opus 5.5 · Max pour un défaut d'isolation, sinon selon la grille |
+
+La PR 1 peut s'écrire **avant** la fin de la 4.5 : elle ne dépend d'aucun code, et le porteur a besoin du modèle d'accord pour sa relecture juridique (E6) : c'est la seule partie de la 4.6 qui produit quelque chose d'utile sans attendre. Les autres attendent leur condition d'entrée. **La PR 1 attend le « vas-y » du porteur sur le texte de l'accord**, qu'il relit avant tout envoi.
+
+#### 10 ter.7 · Preuves de fin de la 4.6
+
+| Point | Preuve exigée |
+| --- | --- |
+| Entrée | fiche d'entrée à douze lignes, chacune avec sa preuve constatée à la source ; « vas-y » du porteur écrit dessous |
+| Accord | une réponse écrite explicite de chaque ferme, **gardée par le porteur**, à la version datée du modèle ; la version est consignée au dépôt (date seulement) |
+| Isolation | protocole F573 joué : côté A constaté, côté B répondu par la personne, compteurs séparés, contrôle de cohérence de F573 point 5 rendu **ou** dit « non vérifié en réel » avec sa raison |
+| Recette | grille remplie à deux largeurs, chaque « non conforme » avec sa cause et sa PR |
+| Retour en arrière | essai à blanc fait (E10) ; si un arrêt a eu lieu, son constat écrit |
+| Retour | fiche de retour consignée en résumé sans nom |
+| Coût | lecture du tableau de bord un mois après la première ferme, écart inscrit |
+| Bilan | écrit par l'assistant, jugé par le porteur ; **aucune ouverture** sans décision nouvelle |
+
+#### 10 ter.8 · Risques propres à la 4.6
+
+| Risque | Gravité | Réponse |
+| --- | --- | --- |
+| Une fuite entre fermes que les tests n'avaient pas prévue | très grave, discrète | revue E8 ; F573 sur du réel ; une ferme d'abord ; arrêt immédiat (F576) ; l'assistant n'ouvre jamais l'espace d'une ferme tierce |
+| Le porteur, exploitant, lit des données de la ferme pilote | grave pour la confiance | dit dans l'accord (F572, point 3) ; hors cas d'arrêt, il ne lit rien ; l'accord le dit |
+| Quelqu'un est ajouté à Access avant les conditions | grave | règle d'exploitation (constat B) maintenue jusqu'à E1 à E12 ; seul le porteur modifie Access |
+| Le quota d'OTF est dépassé par la ferme pilote et prive ses autres outils | moyen | E3 (part fixée avant), arrêt 4 (F576) ; compteurs séparés par ferme |
+| La ferme pilote se lasse ou abandonne l'accueil | moyen | S1 accompagnée, reprise possible (F417), retour (F575) |
+| Une panne passe inaperçue pendant que la ferme dépend du module | moyen | veille de la 4.5, le porteur prévient la ferme avant qu'elle ne le trouve (F579) |
+| Le texte juridique est jugé insuffisant | moyen | E6 avant toute ferme ; accord par version datée ; arrêt à la demande |
+| Un seul support, absent | moyen | pas d'engagement de délai (F572, point 6) ; une ferme à la fois |
+| Un retour demande de changer une valeur agronomique | moyen | consigné, pas appliqué ; décision du porteur (F571) |
+| Le coût dépasse ce qui est annoncé | faible à moyen | E12 ; lecture après un mois ; toute question de budget posée au porteur à part |
+
+#### 10 ter.9 · Ce qui n'est pas établi (à dire, pas à deviner)
+
+- Le délai de validation d'OTF (hors de notre main) et la **liste exacte** des droits qu'il accordera : les cinq droits demandés le 18 novembre 2026 sont ceux du formulaire, **pas ceux accordés**.
+- Si **le porteur a deux identités** dans Access pour jouer le cas de l'appareil partagé (F573, point 3).
+- La **liste des pages du menu** au moment de la recette (F574).
+- Le **nombre d'appels réellement consommé** par une ferme tierce : mesuré sur la seule ferme du porteur jusqu'ici (F363).
+- Le **retour des fermes amies** : aucune n'a été contactée à l'écriture de ce contrat ; aucune n'a rien vu du module hors démonstration.
+- Tout **avis juridique** (accord, confidentialité, responsabilité) : rien de ce contrat n'en est un ; E6 le fait venir du réseau du porteur.
+- Si les 50 premières personnes d'Access restent gratuites au-delà du seuil (section 15).
+- Rien n'est codé, essayé sur une vraie ferme tierce ni envoyé à quiconque.
+
+#### 10 ter.10 · Tranché dans ce contrat, et ce qui reste au porteur
+
+**Tranché à l'option recommandée** (autonomie du porteur, 19 novembre 2026 ; ni budget, ni agronomie, ni ferme réelle, ni Cloudflare) : une seule ferme pilote d'abord, la seconde après une semaine sans défaut grave ; l'assistant n'ouvre jamais l'espace d'une ferme tierce ; la preuve côté B est apportée par la personne ; la forme de l'accord est la réponse écrite explicite à une version datée ; les douze conditions d'entrée et la revue d'isolation E8 ; les six causes d'arrêt ; les noms de ferme jamais au dépôt ; les notifications dès S2 ; une semaine d'observation par ferme.
+
+**Reste au porteur** [RÉSERVÉ] : le choix et le contact des fermes (F578) ; l'envoi et la garde des accords (F572) ; la relecture juridique (E6) ; l'ajout et le retrait des personnes dans Access, la pose des secrets et la lecture du tableau de bord (contrainte 3) ; la **part du quota** (E3, **à poser à partir du 3 décembre 2026**, budget et fond) ; la participation d'après le pilote (budget) ; toute valeur agronomique demandée par une ferme ; le « vas-y » de la fiche d'entrée ; le jugement du bilan et toute ouverture.
+
+##### La 4.7
+
+La 4.7 (« identité OTF ou multi-structure ») **n'a pas de contrat propre** : son hébergement est fait par Q0, son identité est absorbée par 4.1 à 4.3 (section 4 ; F350 : « la 4.7 se ferme avec la 4.3 »). Elle se ferme **par les registres de la PR qui clôt la 4.3** (PR 4, F370), sans code ; la roadmap le dit dès maintenant.
 
 ## 11. Rapport avec la fusion des moteurs (à ne pas empiéter)
 
