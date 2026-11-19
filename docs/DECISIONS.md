@@ -5913,3 +5913,32 @@ Lot G retenu par le porteur le 19 novembre 2026 à 11 h 39 ; contrat court
 Ne changent pas : ce que chaque bouton écrit une fois confirmé ; le
 moteur, le planificateur ; la règle du refus (D-030) ; les classes de
 dessin des messages.
+
+## D-168 — Tranche 4, sous-tranche 4.4 : le contrat de l'accueil d'une nouvelle ferme
+
+Date : 19 novembre 2026.
+
+**Contexte.** L'inventaire du propre à la ferme (18 novembre 2026) a relevé
+sept défauts silencieux qui feraient un calcul faux pour une ferme neuve
+(n° 1, 4, 13, 14, 19, 21, 22), et le porteur a répondu aux onze questions
+agronomiques qu'il portait (Q1 à Q11).
+
+**Décision.** La section 8 bis du contrat de la Tranche 4 (F417 à F428)
+fixe l'accueil : huit étapes reprenables, état gardé par espace ; la
+commune météo choisie par la personne (le siège d'OTF en dernier recours,
+dit) ; le classement abri ou plein champ validé parcelle par parcelle ; le
+sol préconfirmé depuis la texture d'OTF, TEW et REW au milieu de la
+fourchette du tableau 19 de la FAO-56 ; la région d'origine des cultures
+affichée ; les réglages de départ montrés « proposé, à ajuster » ; aucun
+planning avant validation des réglages de planning ; la borne de l'ET0
+portée de 12 à 15 mm/j ; l'espace existant du porteur marqué, valeurs
+inchangées ; le pilote limité à la France métropolitaine. Cinq PR, une à la
+fois. Le porteur a tranché le 19 novembre 2026 : milieu de la fourchette,
+textures par correspondance directe ou classe voisine, région
+« Auvergne-Rhône-Alpes » pour ses conduites, modèle de ses 78 liens
+espèce-culture (extraction de sa ferme réelle acceptée).
+
+Ne change pas : le moteur hydrique ni les jeux de réglages communs
+(section 11 du contrat), sauf la borne de l'ET0, à confirmer contre le
+contrat commun avant le code. Aucune question de budget.
+

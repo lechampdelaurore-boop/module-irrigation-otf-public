@@ -15,6 +15,12 @@ source détaillée commit par commit.
   seconde irrigation du même matériel sur un créneau déjà planifié
   demande une confirmation dans une fenêtre du module avant d'être écrite.
 - **Un rechargement automatique des besoins ne parle plus.**
+### Documentation (le contrat de l'accueil d'une nouvelle ferme, 4.4)
+
+- **Contrat de la 4.4** (D-168) : section 8 bis du contrat de la Tranche 4,
+  sans code. Une ferme neuve ne reçoit plus aucune valeur de la ferme du
+  porteur en silence : commune, abris, sol, cultures et réglages sont
+  proposés, relus et confirmés.
 
 ### Corrigé (la mise à jour automatique de la météo, PR 3 sur 3)
 

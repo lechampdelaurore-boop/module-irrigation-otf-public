@@ -1171,12 +1171,180 @@ Parcours cible, un écran par étape, reprenable (ferme « pas finie de configur
 
 1. Connexion (courriel + code via Access).
 2. **Relier la ferme OTF** : « Autoriser le module » ; contrôle immédiat par `GET /me` ; **le nom de la ferme est affiché pour confirmation** ; message si AMAP / abonnement manquant.
-3. Saison et commune météo (par défaut : le siège OTF, déjà prévu).
+3. Saison et commune météo (**la personne choisit la commune** ; le siège OTF n'est qu'un dernier recours dit comme tel : section 8 bis, F419).
 4. Fonctionnalités à cocher (3.8 : « plus de mode simple ou complet ») et matériel et ressources, avec l'aide du catalogue et du calculateur.
 5. Correspondance des espèces avec le catalogue (ce qui n'a pas de correspondance reste « inconnu », visible).
 6. Vérification finale : tout est vert, ou la liste de ce qui manque.
 
 La **visite guidée** et la démonstration (4.0) servent de formation : aucune nouvelle visite n'est prévue en 4.4 sauf si la recette en montre le besoin. Notifications push **par ferme** ; **clé météo** : communale à toutes les fermes ou par ferme, coût non relevé [À FAIRE, étape 0].
+
+### 8 bis. Précisions de la 4.4 : configuration et accueil d'une nouvelle ferme (19 novembre 2026, D-168, F417 à F428)
+
+Écrites avant le code, le 19 novembre 2026, en Sonnet 5.5 · Moyen (contrat sans code ; le code de la 4.4 est en Opus 5.5 · Élevé, ligne 4.4 de la roadmap), sans accès d'OTF. Elles précisent la section 8, reprennent l'inventaire du propre à la ferme (`/mnt/project-files/tranche-4/inventaire-propre-a-la-ferme-2026-11-18.md`, défauts n° 1, 4, 13, 14, 19, 21, 22) et les onze réponses du porteur du 18 novembre 2026 (Q1 à Q11), et tranchent quatre questions au porteur le 19 novembre 2026 (F428). Les repères `F417` à `F427` désignent les points « a » à « k » du texte ; le brouillon d'origine est `/mnt/project-files/tranche-4/contrat-4-4-accueil-brouillon-2026-11-19.md`.
+
+#### 8 bis.1 · Objet
+
+Une personne dont la ferme vient d'être reliée à Ouvre ta ferme (4.3) arrive dans un module **qui ne sait rien d'elle**. La 4.4 fait en sorte que, de ce moment jusqu'à son premier planning, **chaque chiffre affiché soit le sien, soit une proposition qu'elle a lue et confirmée, soit « à renseigner »** : jamais une valeur de la ferme de François reprise en silence (règle de la section 7 du contrat ; défauts n° 1, 4, 13, 14, 19, 21, 22 de l'inventaire).
+
+La 4.4 **ne change ni le bilan hydrique ni les jeux de réglages du moteur** (section 11 du contrat) : elle décide *quelles valeurs de départ* sont proposées et *comment la personne les confirme*. Une seule exception de calcul, voulue par François : la borne de l'ET0 passe de 12 à 15 mm/j (F424).
+
+**Limite écrite (réponse Q2 de François) :** le pilote est limité à **la France métropolitaine, en français, fuseau Europe/Paris**. Une ferme hors de ce périmètre est dite hors périmètre à l'étape « Où est la ferme », sans rien enregistrer. Le fuseau par ferme et les autres langues sortent de la 4.4 (n° 17, 18, 20 de l'inventaire).
+
+#### 8 bis.2 · Contraintes tenues
+
+1. Celles de la section 2 du contrat (inconnu reste inconnu, D-003 ; OTF en lecture seule, 4 requêtes par seconde au plus ; aucun secret vu par l'assistant).
+2. **Rien de la ferme de François n'est un défaut silencieux** pour un espace neuf. Preuve par test (section 6).
+3. **L'espace existant de François ne change pas de comportement** (F426) : il n'est ni bloqué à l'accueil ni recalculé autrement.
+4. Une table ou une colonne `_id` / `_key` nouvelle est rangée dans `tests/support/space-coherence.ts` ; aucune requête n'écrit `owner_user_id = ?` ni `otf_farm_id IS NULL` hors `db/workspace-scope.ts` (règle de #87 et #93).
+5. Aucun identifiant de ferme dans une migration (n° 16 de l'inventaire).
+6. Toute lecture d'OTF passe par le régulateur et le budget du jour de la 4.3 (F361, F363) ; chaque nouvel appel entre dans les tests de contrat des routes (6.3 ter).
+
+#### 8 bis.3 · Le parcours (précise la section 8)
+
+Un écran par étape, **reprenable** : fermer l'onglet ou être coupé ne perd rien et ne produit aucune erreur trompeuse. L'état de chaque étape est gardé dans la base (F417). Le fond est le même sur téléphone et à 1440 px.
+
+| Étape | Écran | Ce qui est lu ou proposé | La personne fait | Existe déjà ? |
+| --- | --- | --- | --- | --- |
+| 0 | Fonctionnalités (cases à cocher) | rien coché d'avance | coche | oui (`bienvenue`, R5 : avant toute lecture d'OTF) ; inchangé |
+| 1 | Relier la ferme | 4.3 : « Autoriser le module », `GET /me`, **nom de la ferme affiché pour confirmation** | autorise, confirme le nom | 4.3 ; la 4.4 y ajoute le choix entre plusieurs fermes (F418) |
+| 2 | Où est la ferme | lieu de production d'OTF (`placeLngLat`, `place`, altitude) si présent | **choisit la commune** sur la carte des parcelles | non (F419) |
+| 3 | Parcelles et abris | classement proposé abri / plein champ, parcelle par parcelle | valide ou corrige chacune | non (F420) |
+| 4 | Sol | texture OTF (`System.soil`) si présente, sinon liste | confirme la texture ; TEW et REW proposés | non (F421) |
+| 5 | Cultures | catalogue commun, **région d'origine affichée**, avertissement si autre région | rattache ses espèces (proposition par nom) ; copie le catalogue | partiellement (F422, F423) |
+| 6 | Réglages à relire | planning, gel, alertes, surfaces… en « proposé, à ajuster » | valide, ajuste ou passe | non (F424) |
+| 7 | Vérification finale | liste verte, ou ce qui manque | corrige ou continue | non (F427) |
+
+**Rien n'oblige à tout finir d'un coup.** Une ferme « pas finie » ouvre le module ; chaque page dit ce qui lui manque et renvoie à l'étape (bandeau « À finir : sol des parcelles »), sans erreur ni zéro. Mais **aucun planning n'est calculé** tant que l'étape 6 n'est pas validée (réponse Q10).
+
+#### 8 bis.4 · Les points
+
+##### F417 · L'état de l'accueil
+
+Une table par espace (clé d'espace de #87), une ligne par étape : `étape`, `état` (`à faire`, `proposé`, `confirmé`, `passé`), `confirmé le`, `valeur proposée gardée` (pour montrer ce qui a été proposé et ce qui a été confirmé). Migration additive, numéro pris sur `main` au moment du code (le 0034 est réservé à la 4.3 PR 3). Un « passé » est **dit** à la vérification finale (« Vous n'avez pas confirmé le sol : la réserve utile reste non calculable »). Rien n'est confirmé à la place de la personne.
+
+##### F418 · Plusieurs fermes pour une personne
+
+La 4.3 limite une personne à une ferme (F351 : « Déconnectez d'abord… ») ; la base en admet plusieurs. La 4.4 lève la limite : un sélecteur de ferme dans l'en-tête, un accueil **par ferme** (l'état est par espace), et chaque notification **nomme sa ferme** (reste dû de F373). La ferme active vient du serveur (jamais du navigateur, F327). [NON VÉRIFIÉ] : si une personne liant deux fermes doit être réellement offerte au pilote ; recommandation : coder le sélecteur (le test d'isolation à deux fermes de la même personne est le plus exigeant), l'essayer sur « Ferme v2 » n° 4394 et sur une seconde ferme fictive, ne l'offrir au pilote que sur demande.
+
+##### F419 · Où est la ferme (n° 19, 17, 18)
+
+- **Fin du repli silencieux sur le siège.** Aujourd'hui `weatherLocationKey` prend `legalCity` (siège de la structure OTF) en mode `otf`. Pour un espace neuf, **aucune commune n'est posée seule** : l'étape propose, la personne choisit.
+- Proposition de départ : le point `placeLngLat` du lieu de production (API « Système de production », portée `general`), avec la carte des parcelles de la ferme. **[NON VÉRIFIÉ]** : que le champ soit rempli sur de vraies fermes ; sans lui, la carte part des parcelles lues (`/plotList`), puis d'une recherche de commune. Le siège n'est qu'un **dernier recours, dit comme tel** (« Siège de la structure : peut être loin de vos champs »).
+- La commune est choisie parmi les candidats du géocodage restreint à la France (déjà là, `countryCode=FR`). Un lieu hors France métropolitaine : message « hors du pilote », rien d'enregistré.
+- Tant que l'étape n'est pas confirmée : pas de météo ni de gel ni d'ET0 pour cet espace, **la page le dit** (« Choisissez la commune de votre ferme »).
+- Le lieu enregistré garde sa **provenance** : `lieu de production d'OTF`, `choisi sur la carte`, `siège (dernier recours)`.
+- [À FAIRE] Lire la façon dont `water-dashboard.ts` (l. 136 et 291) et `location.ts` consomment le mode `otf`, puis le remplacer par une préférence **confirmée** ; l'ancien mode `otf` d'un espace existant est conservé (F426).
+- [À FAIRE, non vérifié] Clé météo : communale à toutes les fermes ou par ferme, coût non relevé (section 8 du contrat). **Aucun fournisseur payant n'est introduit par la 4.4** ; s'il en fallait un, la question serait **[BUDGET]**, posée seule.
+
+##### F420 · Parcelles et abris (n° 21)
+
+- `mapPlotMode` classe une parcelle en abri par son **nom** (`abri|cover|greenhouse|shelter|tunnel`) : « serre » et « châssis » n'y sont pas. Une ferme qui écrit « serre » compte la pluie et prend K_abri = 1 **sans alerte**.
+- La 4.4 garde la liste de mots **pour proposer** (et y ajoute « serre », « châssis », « chassis », « multichapelle », « tunnel » reste), mais **le classement n'est plus déduit en silence** : l'étape montre chaque parcelle avec sa proposition (« Abri ? oui / non / je ne sais pas ») et la personne valide. Une parcelle non validée est **« à classer »** : son besoin en eau n'est pas calculé (raison affichée dans « Non calculable », N1).
+- Le classement validé est enregistré par espace (provenance : `nom de la parcelle` ou `confirmé`), pas recalculé à chaque lecture d'OTF.
+- [À FAIRE] Vérifier si un classement abri/plein champ est déjà enregistrable dans le module ou n'existe que dans `mapPlotMode` ; dans ce second cas, c'est la principale migration de la 4.4.
+
+##### F421 · Sol (n° 4 ; réponses Q3, Q4)
+
+- `SOIL_DEFAULTS` (part de référence 2/3, TEW 14 mm, REW 7 mm, Ze 10 cm, « limon sableux ») **ne s'applique plus seul à un espace neuf**. Sans confirmation : sol « à renseigner », réserve utile non calculable.
+- **Préremplissage depuis la texture d'OTF** : `System.soil` (11 textures, API `System_0_1beta`, portée `general`, donc le droit « Structure » suffit). Un appel de plus par lecture d'accueil, compté (F361). **[NON VÉRIFIÉ]** : le champ peut être vide ; le texte exact des 11 textures n'a pas été relu ici. Sans texture : choix dans la liste des textures de la table FAO-56.
+- **TEW et REW par texture : table FAO-56, tableau 19**, avec sa source affichée (« FAO-56, tableau 19 »), les valeurs **ajustables** par parcelle (le système de révisions datées de `soil.ts` est déjà là). Le tableau 19 donne des **fourchettes** par classe de texture (9 classes) : les valeurs retenues dans le code, et la correspondance des **11 textures d'OTF** vers ces classes, sont des choix agronomiques réservés (). Le contrat ne les écrit pas.
+- La texture d'OTF est **une proposition à confirmer**, jamais posée seule. La ferme peut choisir une autre texture ou saisir ses propres TEW/REW.
+- Le **plafond de sol** (`soilDepthCeilingM`) d'un espace neuf est `null` (aucun) ; voir F423.
+- Part de référence 2/3 et Ze 10 cm : propositions sourcées (CRIIAM / FAO), dites « proposé, à ajuster » (réponse Q11).
+
+##### F422 · Catalogue de cultures (n° 13 ; réponse Q6)
+
+- Le jeu commun (19 cultures CRIIAM Sud + 13 FAO-56) porte une **région d'origine** par ligne, **affichée** sur la fiche de la culture (« Dates de stade de la région Sud / Occitanie, validées par François le 31/10/2026 »). Quand la région de la ferme (déduite de la commune confirmée, F419 : département → région, table fixe de 13 régions métropolitaines) diffère, un **avertissement** s'affiche sur les cultures concernées (« Ces dates viennent d'une autre région : vérifiez-les »). Les 13 cultures FAO-56 sont « générales » : pas d'avertissement.
+- L'ajustement se fait **sur la copie de la ferme** (déjà prévue au contrat) ; le jeu commun n'est jamais modifié par une ferme.
+- **Région des conduites « validées par le porteur »** (dates de levée, calendriers) : « ferme du porteur, Auvergne-Rhône-Alpes » (F428, réponse 3).
+- [NON VÉRIFIÉ] : le contenu ligne à ligne du jeu commun ; la colonne « région » existe-t-elle déjà en base ? sinon une colonne additive.
+
+##### F423 · Espèces, rattachements, racines (n° 5, 14, 15 ; réponses Q7, Q9)
+
+- **Rattachement des espèces** : étape « Rattachez vos espèces » partant de la proposition par nom (`species-linking.ts`, déjà là). Ce qui n'est pas rattaché reste « inconnu, à renseigner », visible partout (D-003).
+- **Modèle copiable des 78 rattachements de François** (réponse Q9) : **liens espèce-culture seulement**, jamais d'identifiants d'OTF de sa ferme, jamais ses données de ferme. Les espèces d'OTF n'ont pas les mêmes identifiants d'une ferme à l'autre : le modèle est donc une liste **nom d'espèce normalisé → culture de référence**, proposée à la copie (« Copier ce modèle » : la personne voit chaque lien, en retire, en ajoute). Il est livré comme **un fichier de données du dépôt** (pas dans une migration, règle n° 16), produit par une extraction relue de sa base. **L'extraction lit la ferme réelle et le fichier va dans un dépôt public : accord donné par le porteur le 19 novembre 2026, sous réserve de sa relecture de la liste avant tout dépôt (F428, réponse 4).**
+- **Racines** : profils communs marqués **« estimation »** (réponse Q7) ; profondeur 0,30 m et p = 0,5 proposés à une culture sans profil seulement comme « à vérifier ». Le **plafond de 0,60 m de l'asperge reste à la ferme de François** : un espace neuf **n'hérite d'aucun plafond** du jeu commun et part de la FAO ; il règle lui-même son plafond de parcelle. Test de non-héritage (section 6). [À FAIRE] Lire `0025_soil_reserve.sql` (l. 270-310) : si le plafond est dans le jeu commun lui-même, le sortir.
+
+##### F424 · Réglages à relire (n° 1, 2, 3, 6, 7, 9, 10, 11, 12, 22 ; réponses Q5, Q8, Q10, Q11)
+
+Une étape **« Réglages à relire »**, un seul écran, qui montre chaque valeur de départ **avec sa source** et le mot **« proposé, à ajuster »** :
+
+| Groupe | Valeurs proposées (celles du code) | Source affichée |
+| --- | --- | --- |
+| Abris | K_abri 0,8 (réglable 0,6 à 1), **à confirmer par abri** (réponse Q5) | CRIIAM, tunnel |
+| Calcul | paillage plastique Kc × 0,9 ; borne ET0 portée à 15 mm/j | choix du porteur ; borne de sécurité |
+| Sol et surface | bâche perméable 0,1 ; paillage 0,5 ; engrais verts 0,3 / 0,6 / 1 ; herbe 0,6 ; seuil de la ferme 50 % (20 à 80) | choix du porteur |
+| Gel | marges 3 °C (sensible) et 2 °C (rustique) ; curseur de microclimat à 0 ; seuils par culture « choix prudent » avec leur source (FRAB AuRA / ITAB) | retour du porteur ; **gardés en commun, mention « choix prudent »** (réponse Q8) |
+| Alertes | aspersion 24 °C / 400 W/m² / 3 jours ; modèles gel < 3 °C, chaleur > 33 °C, pluie > 15 mm, « indicatifs » | choix du porteur |
+| Planning | aspersion 21 h–8 h, goutte-à-goutte 6 h–22 h ; doses 5-15 mm et 3-10 mm ; pluie prévue à 100 % ; attente si > 5 mm ; pénurie « priorité puis part égale » ; goutte-à-goutte préféré ; part de commande 0,5 ; retard toléré 30 min | décisions du 29/09/2026 (D-024) |
+
+La personne **valide, ajuste ou passe** chaque groupe. Validé = enregistré comme réglage de la ferme avec sa provenance. **Aucun planning n'est calculé avant validation du groupe « Planning »** (réponse Q10) ; les autres groupes non validés restent des propositions affichées comme telles dans « d'où vient ce chiffre ».
+
+**Borne de l'ET0 : 12 → 15 mm/j** (n° 3, réponse Q11) : changement de constante dans `etm.ts`, qui vaut pour **toutes les fermes, la ferme de François comprise**. Il n'a d'effet que sur les jours où l'ET0 dépasse 12 mm. À tester (cas à 11,9 / 12,1 / 14,9 / 15,1) et à consigner au journal des changements. **[NON VÉRIFIÉ]** : si le contrat commun des deux moteurs (MC-17 à MC-27, banc commun) fixe aussi cette borne ; si oui, la 4.4 le signale au dépôt commun au lieu de le changer seule.
+
+##### F425 · Fermes exclues, dites avant toute saisie (T4-16)
+
+Reprend F353 : AMAP et fermes sans l'abonnement qui ouvre l'API sont **refusées à l'étape 1** avec le message déjà écrit, **avant** que la personne ne saisisse quoi que ce soit dans l'accueil. Aucun écran de l'accueil n'est atteignable sans raccordement « relié » (sinon : renvoi à l'étape 1). Une ferme dont la lecture est refusée en route (« reconnexion demandée », « lecture refusée ») garde son accueil mais le module dit pourquoi les chiffres ne bougent plus.
+
+##### F426 · L'espace existant de François
+
+Un espace qui existe **avant la 4.4** est marqué « accueil fait avant la 4.4 », toutes étapes `confirmé`, **valeurs inchangées** (commune en mode siège, classement abri par nom, sol limon sableux, réglages courants). L'écran de vérification les montre avec leur provenance réelle (« siège OTF, réglage d'avant l'accueil »). Il peut refaire l'accueil à la main depuis Réglages si François le veut (ce n'est pas obligatoire). La migration pose ce marquage sans changer une valeur ; son essai se fait **sur une copie** de la base (comme #88). **Toute action sur la ferme réelle qui irait au-delà (par exemple corriger sa commune) attend son « vas-y ».**
+
+##### F427 · Vérification finale
+
+Un écran liste, par étape, vert (confirmé), orange (passé : conséquence dite en une phrase) ou rouge (manquant). Il liste aussi ce qui reste **inconnu** (espèces non rattachées, parcelles à classer, sol non confirmé), avec le lien vers l'étape. Il montre, par groupe, **ce qui a été proposé et ce qui a été confirmé**. Il ne bloque rien d'autre que le premier planning (F424).
+
+#### 8 bis.5 · Découpage en PR (une à la fois, chacune après le déploiement vérifié de la précédente)
+
+| PR | Contenu | Dépend d'OTF réel ? |
+| --- | --- | --- |
+| 1 | F417 (état, migration), parcours vide reprenable, marquage de l'espace existant (F426), bandeau « À finir », bascule des défauts en « à renseigner » pour un espace neuf | non |
+| 2 | F419 lieu + F420 abris | un peu : `placeLngLat` (nouvel appel, contrat de route) ; essai sur « Ferme v2 » n° 4394 |
+| 3 | F421 sol (table FAO-56, texture OTF) | oui pour la texture (même appel que PR 2) |
+| 4 | F422 catalogue + F423 rattachements, racines, modèle des 78 | non, sauf l'extraction (F428, réponse 4) |
+| 5 | F424 réglages à relire + borne ET0 + F418 plusieurs fermes + F427 vérification | non |
+
+Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient sur la fausse ferme dès que l'accès est donné (formulaire en attente depuis le 18/11), et se testent avant avec les réponses d'OTF enregistrées (les tests de contrat de la 4.3 PR 5 en fournissent le moule). Chaque PR : contrôles de AGENTS.md collés, registres dans la même PR, sabotages notés (convention de #96).
+
+#### 8 bis.6 · Preuves de fin
+
+1. **Test « ferme neuve »** : un espace créé vide ne reçoit **aucune** des valeurs suivantes comme valeur en place, dans aucune lecture du module : commune du siège ; TEW 14 / REW 7 / « limon sableux » ; K_abri sans confirmation ; classement abri déduit du nom ; plafond de sol de l'asperge ; réglages de planning ; liens espèce-culture. Le test **échoue si l'on remet l'ancien défaut** (sabotage de chaque défaut n° 1, 4, 13, 14, 19, 21, 22).
+2. **Tests des étapes** : reprise après coupure (étape à moitié faite) ; une étape « passée » est dite à la vérification ; aucun planning avant validation du groupe « Planning » ; hors France métropolitaine refusé sans rien enregistrer.
+3. **Isolation** : l'état de l'accueil, le classement, les réglages validés et les liens copiés d'une ferme ne sont jamais lus par une autre ; passage « fermes » et « personnes » de `tests/db`, contrôle de cohérence des espaces ; deux fermes de la même personne (F418).
+4. **Non-régression de l'espace existant** : mêmes chiffres avant et après la migration, sur copie (jeu de la ferme fictive de la démonstration et un jeu « ferme complète »).
+5. **Contrats de route** : l'appel `System` (texture, lieu) entre dans les tests de contrat de la 4.3 PR 5 ; compté dans le budget du jour ; jamais plus de 4 requêtes par seconde.
+6. **Essai réel** (preuve de la section 13 du contrat pour 4.4) : un parcours complet sur une ferme neuve (« Ferme v2 » n° 4394, lecture seule), aux deux largeurs ; **recette dans le Chrome de François, avec son accord à chaque fois** ; la ferme exclue dite avant toute saisie. Tant que l'accès d'OTF manque : **« non vérifié en réel »**, dit comme tel.
+7. Le texte de la politique de confidentialité reste exact (nouveaux appels à OTF : texture, lieu) : relecture du passage concerné avant la mise en ligne de la PR 2.
+
+#### 8 bis.7 · Risques
+
+| Risque | Gravité | Réponse |
+| --- | --- | --- |
+| Une valeur de François reste un défaut silencieux (oubli d'un site de lecture) | grave, discret | test « ferme neuve » par sabotage, relecture des 7 défauts de l'inventaire ; revue d'un second fil si possible |
+| Le marquage de l'espace existant change un chiffre de François | grave | migration sur copie, test de non-régression, rien de plus sans « vas-y » |
+| `System.soil` ou `placeLngLat` vides ou inattendus | moyen | « à renseigner » ; aucune valeur inventée ; essai sur « Ferme v2 » |
+| La borne ET0 à 15 change le banc commun | moyen | vérifier le contrat commun avant de changer ; sinon le dire au dépôt commun |
+| Le parcours est trop long et décourage | moyen | reprise, « passer » dit, une seule étape obligatoire (réglages de planning, avant le premier planning) |
+| Choisir la mauvaise commune (même nom de commune) | moyen | carte et code postal ; provenance affichée |
+| Le modèle des 78 liens fuit des données de ferme | moyen | liens espèce-culture seulement, relus par François avant tout dépôt |
+| Deux fermes d'une même personne mélangées (F418) | très grave | ferme active choisie par le serveur ; tests à deux fermes |
+
+#### 8 bis.8 · Ce qui n'est pas établi
+
+- Le contenu des 11 textures d'OTF et la correspondance avec la FAO (non lu) ; que `soil` et `placeLngLat` soient remplis sur de vraies fermes.
+- Si un classement abri/plein champ est déjà enregistrable dans le module.
+- Si la colonne « région d'origine » du jeu commun existe en base.
+- Si la borne d'ET0 est aussi fixée par le contrat commun.
+- Le comportement réel du parcours sur une ferme tierce : aucun essai avant l'accès d'OTF et le pilote.
+- Tout avis juridique (inchangé : la relecture de la confidentialité reste due avant toute ferme tierce).
+
+##### F428 · Les quatre réponses du porteur, le 19 novembre 2026
+
+1. **TEW et REW** : le **milieu** de la fourchette du tableau 19 de la FAO-56 pour chaque texture, arrondi au demi-millimètre, la fourchette entière affichée à côté, ajustable par parcelle. Les valeurs sont lues de la source au début du code et montrées au porteur à la relecture de la PR.
+2. **Textures d'OTF** : correspondance directe quand le nom est le même, sinon la classe voisine la plus fine, avec la mention « proche de ». La liste des onze textures est relue dans le code d'OTF avant d'être montrée.
+3. **Région des conduites validées le 31 octobre 2026** : « ferme du porteur, Auvergne-Rhône-Alpes » ; « Sud / Occitanie » pour les 19 cultures du CRIIAM ; « général » pour les 13 de la FAO-56. Aucune commune dans le dépôt public.
+4. **Modèle des 78 liens espèce-culture** : oui, après relecture de la liste par le porteur ; l'extraction lit la ferme réelle (accord donné) et le fichier est publié dans le dépôt public (liens seulement).
+
 
 ## 9. Site définitif et politique de confidentialité (4.8)
 

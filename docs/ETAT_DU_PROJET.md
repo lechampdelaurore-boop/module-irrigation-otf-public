@@ -324,6 +324,20 @@ registres, elle y renvoie.
   `pnpm e2e` omis en local, sans rapport (aucun écran ne change), joué par
   la CI de la PR.
 
+- Tranche 4, **4.4 : contrat écrit le 19 novembre 2026** (D-168, F417 à F428,
+  section 8 bis de `docs/tranche-4-contract.md`), sans code : un parcours
+  reprenable de huit étapes (fonctionnalités, ferme reliée, commune choisie,
+  parcelles et abris, sol, cultures, réglages à relire, vérification), pour
+  qu'une ferme neuve ne reçoive aucune valeur de la ferme du porteur en
+  silence (défauts n° 1, 4, 13, 14, 19, 21, 22 de l'inventaire) ; l'espace
+  existant du porteur est marqué « accueil fait avant la 4.4 », valeurs
+  inchangées ; aucun planning avant validation des réglages de planning ;
+  cinq PR, la borne de l'ET0 relevée de 12 à 15 mm/j. Rien n'est vérifié en
+  réel (texture du sol et lieu de production d'OTF jamais lus sur une vraie
+  ferme). Contrôles : documentation seule.
+  Consigne aussi le déploiement de la 4.3 PR 2 (coffre des jetons, #96, D-163) :
+  en ligne le 19 novembre 2026 à 8 h 17, run 44475742993, cinq jobs verts.
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le
