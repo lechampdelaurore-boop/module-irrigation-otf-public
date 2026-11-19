@@ -1,6 +1,6 @@
 import { expect, test, type Locator } from '@playwright/test';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
  * Parcours P31b : l'audit ergonomique, lot 3, PR 2 — les gestes par ligne
@@ -48,6 +48,7 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
 
   // Cas 8 : les espèces à rattacher, comptées, en tête ; la recherche par nom.
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   const section = page.locator('section.crop-coefficients');
   await section.scrollIntoViewIfNeeded();
   const compteur = section.locator('.species-link-counter');

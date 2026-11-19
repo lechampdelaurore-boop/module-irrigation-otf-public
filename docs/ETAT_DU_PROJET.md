@@ -308,7 +308,9 @@ registres, elle y renvoie.
   `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 806 tests, puis 435 pour
   chacun des trois passages d'isolation), `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
-  local ; la suite complète des parcours jouée par la CI de la PR.
+  local ; la suite complète des parcours jouée par la CI de la PR. Fusionnée
+  le 20 novembre 2026 à 6 h 46 (#121), en ligne à 7 h 08 (run 44683233365
+  vérifié job par job : les cinq jobs verts).
 
 - Correctif, **la mise à jour automatique de la météo** (D-164), demandé
   par le coordinateur le 19 novembre 2026 avant le lot G, en Opus 5.5 ·
@@ -515,6 +517,11 @@ registres, elle y renvoie.
   et sans planche sous son seuil, n'ont qu'une barre ; « 100 % » et
   « sec 25 % » ne se coupent plus ; « 100 % du plein estimé aujourd'hui ·
   dernière observation le … » au lieu de « 100 % du plein, observé le … » ;
+  en ligne le 20 novembre 2026 à 7 h 32 (#122, fusionnée à 7 h 13, run
+  44686273727 vérifié job par job). **PR 4, les espèces pliées** (D-186, F459) : dans « Réglages »,
+  « Correspondance des espèces » est un pli fermé dont le titre porte le
+  compteur (« 36 espèces à rattacher sur 77 »), ouvert par son ancre ; la
+  liste « sans référence Kc » ne répète plus les espèces à rattacher ;
   codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close

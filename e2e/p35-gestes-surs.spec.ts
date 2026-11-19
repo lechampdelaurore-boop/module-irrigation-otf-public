@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
  * Parcours P35 : l'audit ergonomique final, lot C, gestes sûrs
@@ -97,6 +97,7 @@ test('le « i » garde son dessin dans tout bloc, sur toutes les pages', async (
 /** Rattache la carotte à la carotte du jeu commun (la fiche de V01 a alors son ETM et son « i »), ou retire ce rattachement. */
 async function rattacherLaCarotte(page: Page, rattacher: boolean): Promise<void> {
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   const coefficients = page.locator('section.crop-coefficients');
   const carte = coefficients.locator('details.species-link-card').filter({ has: page.locator('summary strong', { hasText: /^Carotte$/ }) });
   const formulaire = carte.getByRole('group', { name: 'Rattachement de l’espèce Carotte' });

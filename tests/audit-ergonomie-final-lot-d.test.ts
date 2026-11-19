@@ -15,7 +15,9 @@ const fold = source('app/irrigation/shell/page-settings-fold.tsx');
 test('le pli s’appelle « Réglages de cette page », fermé, avec une ancre stable qui l’ouvre (F305, F307)', () => {
   assert.match(fold, /export const PAGE_SETTINGS_ANCHOR = 'reglages-de-la-page';/);
   assert.match(fold, /<strong>Réglages de cette page<\/strong>/);
-  assert.match(fold, /useState\(openReason !== null\)/, 'fermé, sauf raison dite');
+  // Le pli passe par `AnchoredFold`, partagé avec « Correspondance des espèces » (lot J du 19 novembre 2026, F459).
+  assert.match(fold, /initiallyOpen=\{openReason !== null\}/, 'fermé, sauf raison dite');
+  assert.match(fold, /useState\(initiallyOpen\)/);
   assert.match(fold, /addEventListener\('hashchange'/, 'un lien suivi dans la page l’ouvre aussi');
   assert.match(fold, /fold\.current\?\.contains\(target\)/, 'l’ancre d’un élément qu’il contient l’ouvre');
 });

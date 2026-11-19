@@ -194,6 +194,22 @@ export async function ouvrirLesReglagesDeLaPage(page: Page): Promise<Locator> {
 }
 
 /**
+ * Le pli « Correspondance des espèces » de Réglages, ouvert s'il ne l'est pas
+ * déjà : fermé d'office, son compteur en titre (audit du 19 novembre 2026,
+ * lot J, n° 15, F459).
+ */
+export async function ouvrirLaCorrespondanceDesEspeces(page: Page): Promise<Locator> {
+  const pli = page.locator('details#correspondance-des-especes');
+  await expect(pli).toHaveCount(1);
+  if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) {
+    await pli.locator(':scope > summary').click();
+  }
+  await expect(pli).toHaveAttribute('open', '');
+  return pli;
+}
+
+
+/**
  * Confirme dans la fenêtre du module, qui remplace la boîte du navigateur
  * (audit du 19 novembre 2026, lot G, n° 8, F413) : ce qui efface ou annule se
  * confirme en rouge (F414).

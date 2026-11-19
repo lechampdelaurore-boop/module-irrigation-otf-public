@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
  * Parcours P33 : la vue d'ensemble des réserves du sol, variante B
@@ -64,6 +64,7 @@ test('la vue d’ensemble montre une barre par jardin, inconnue sans sol, rempli
 
   // La carotte rattachée à sa culture de référence, sans quoi sa planche reste inconnue (pas d'ETM).
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   const especes = page.locator('section.crop-coefficients');
   await especes.scrollIntoViewIfNeeded();
   const carotte = especes.locator('.species-link-row').filter({ has: page.locator('summary strong', { hasText: /^Carotte$/ }) });

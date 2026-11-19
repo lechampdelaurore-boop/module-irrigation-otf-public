@@ -15,8 +15,40 @@ export const PAGE_SETTINGS_ANCHOR = 'reglages-de-la-page';
  * replié. Ouvert d'office quand `openReason` dit pourquoi.
  */
 export function PageSettingsFold({ children, openReason = null }: { children: ReactNode; openReason?: string | null }) {
+  return (
+    <AnchoredFold
+      id={PAGE_SETTINGS_ANCHOR}
+      className="page-settings"
+      initiallyOpen={openReason !== null}
+      summary={(
+        <>
+          <strong>Réglages de cette page</strong>
+          {openReason ? <small>{openReason}</small> : <small>Ce qui se règle une fois pour toutes ; rien n’y change le travail du jour.</small>}
+        </>
+      )}
+      bodyClassName="page-settings-body"
+    >
+      {children}
+    </AnchoredFold>
+  );
+}
+
+/**
+ * Un pli fermé qui s'ouvre par son ancre ou par celle d'un élément qu'il
+ * contient, au chargement comme à un lien suivi dans la page : la règle du
+ * pli « Réglages de cette page », reprise pour « Correspondance des
+ * espèces » (audit du 19 novembre 2026, lot J, n° 15, F459).
+ */
+export function AnchoredFold({ id, className, summary, bodyClassName, initiallyOpen = false, children }: {
+  id: string;
+  className: string;
+  summary: ReactNode;
+  bodyClassName: string;
+  initiallyOpen?: boolean;
+  children: ReactNode;
+}) {
   const fold = useRef<HTMLDetailsElement>(null);
-  const [open, setOpen] = useState(openReason !== null);
+  const [open, setOpen] = useState(initiallyOpen);
 
   useEffect(() => {
     const openWhenTargeted = () => {
@@ -32,12 +64,9 @@ export function PageSettingsFold({ children, openReason = null }: { children: Re
   }, []);
 
   return (
-    <details ref={fold} id={PAGE_SETTINGS_ANCHOR} className="page-settings" open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
-      <summary>
-        <strong>Réglages de cette page</strong>
-        {openReason ? <small>{openReason}</small> : <small>Ce qui se règle une fois pour toutes ; rien n’y change le travail du jour.</small>}
-      </summary>
-      <div className="page-settings-body">{children}</div>
+    <details ref={fold} id={id} className={className} open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
+      <summary>{summary}</summary>
+      <div className={bodyClassName}>{children}</div>
     </details>
   );
 }

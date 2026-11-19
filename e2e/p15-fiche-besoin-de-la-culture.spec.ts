@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../lib/domain/water-management.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
  * Parcours P15 : le besoin de la culture dans la fiche de la planche
@@ -31,6 +31,7 @@ test('la fiche de la planche montre le stade, le Kc, l’ETM et l’objectif pro
   // planche se lit sur la page du matériel, l'objectif proposé sur celle des
   // besoins (3.8).
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
 
   // Rattacher la carotte à la carotte du CRIIAM.
   const coefficients = page.locator('section.crop-coefficients');
@@ -111,6 +112,7 @@ test('la fiche de la planche montre le stade, le Kc, l’ETM et l’objectif pro
 
   // Retirer le rattachement : la base revient à son état de départ pour l'autre largeur.
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   await coefficients.scrollIntoViewIfNeeded();
   if (!(await formulaire.isVisible())) await carte.locator('summary').first().click();
   await formulaire.getByRole('button', { name: 'Retirer le rattachement' }).click();

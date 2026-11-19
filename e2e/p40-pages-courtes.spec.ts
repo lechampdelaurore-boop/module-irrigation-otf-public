@@ -66,6 +66,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // 2 560 px sur les données neuves ; 2 866 px quand P18 à P33 ont saisi et observé le sol de
   // leurs jardins avant lui, comme dans la suite complète : le budget couvre ce second cas.
   sol: 3_000,
+  // PR 4 (F459) : « Correspondance des espèces » pliée ; 4 378 → 3 338 px avec les 4 espèces des
+  // données des parcours (sur la ferme du porteur, 77 espèces, 8 700 px de moins attendus).
+  reglages: 3_400,
 };
 
 for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuModule, number][]) {
@@ -91,4 +94,17 @@ test('« Besoin par culture » : « Réglages du calcul » dans le pli des régl
   await expect(pli).toHaveAttribute('open', '');
   await expect(pli.getByRole('heading', { name: 'Réglages du calcul' })).toBeVisible();
   await verifierLEtape(page, journal, 'réglages du calcul repliés');
+});
+
+test('« Réglages » : « Correspondance des espèces » fermée, son compteur en titre, ouverte par son ancre', async ({ page }) => {
+  const journal = surveillerLaConsole(page);
+  await attendreLaPageIrrigation(page, 'reglages');
+  const pli = page.locator('details#correspondance-des-especes');
+  await expect(pli).not.toHaveAttribute('open', '');
+  await expect(pli.locator(':scope > summary strong')).toHaveText(/^\d+ espèces? à rattacher sur \d+$|^Les \d+ espèces de la saison sont rattachées$/);
+  await expect(pli.getByRole('searchbox', { name: 'Chercher une espèce' })).toBeHidden();
+  await page.goto('/irrigation/reglages#species-links-title');
+  await expect(pli).toHaveAttribute('open', '');
+  await expect(pli.getByRole('searchbox', { name: 'Chercher une espèce' })).toBeVisible();
+  await verifierLEtape(page, journal, 'espèces repliées');
 });

@@ -203,7 +203,9 @@ Chaque précision faite en codant, numérotée à la suite du registre.
 
 - **F458** sur « Réserve du sol », les jardins pareils (même % arrondi, même jour d'observation, même % prévu dimanche, aucune planche sous son seuil) en une barre, « 11 jardins de plein champ », trois noms puis « et n autres », chaque planche un point ; un abri, un jardin inconnu ou sous son seuil garde sa barre ; « 100 % » et les repères du curseur sans coupure ; « 100 % du plein estimé aujourd'hui · dernière observation le … » (section 6). La règle « un jardin qui a une irrigation aujourd'hui garde sa barre » du point 2 n'a pas lieu d'être sur cette page, qui ne lit pas les irrigations du jour : un jardin sous son seuil garde la sienne.
 
-Les précisions des PR 4 à 7 suivent, F459 et au-delà.
+- **F459** « Correspondance des espèces » : titre et phrase gardés, les deux listes dans un pli fermé à ancre (`#correspondance-des-especes`), le compteur en titre du pli ; il ne s'ouvre pas d'office (une ferme qui a des espèces à rattacher n'y gagnerait rien), mais par son ancre ou celle d'un élément qu'il contient ; la liste « sans référence Kc » ne garde que les exceptions de série d'une espèce rattachée (section 7) ; 4 378 → 3 338 px à 390 px sur les données des parcours (4 espèces).
+
+Les précisions des PR 5 à 7 suivent, F460 et au-delà.
 
 Ce que le lot ne prouve pas : un vrai téléphone, un lecteur d'écran ; la
 ferme réelle n'est pas touchée.

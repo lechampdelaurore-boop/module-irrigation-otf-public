@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { attendreLeChoixDesFonctionnalites, caseDeLaFonctionnalite, entreesDuMenu, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
-import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
  * Parcours P23 : décocher puis recocher une fonctionnalité qui a des données,
@@ -75,6 +75,7 @@ test('décocher une fonctionnalité avertit, retire sa page et ses blocs sans ri
   await expect(caseDeLaFonctionnalite(page, 'Besoin par culture')).toBeChecked();
   await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
   expect(await entreesDuMenu(page)).toContain('Besoin par culture');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   const carotte = page.locator('section.crop-coefficients details.species-link-card').filter({ has: page.locator('summary strong', { hasText: /^Carotte$/ }) });
   await expect(carotte).toHaveAttribute('data-linked', 'true');
   await expect(carotte.locator('summary').first()).not.toContainText('Non rattachée');
@@ -83,6 +84,7 @@ test('décocher une fonctionnalité avertit, retire sa page et ses blocs sans ri
 });
 
 async function rattacherLaCarotte(page: Page): Promise<void> {
+  await ouvrirLaCorrespondanceDesEspeces(page);
   const especes = page.locator('section.crop-coefficients');
   await expect(especes.getByRole('heading', { level: 2, name: 'Correspondance des espèces' })).toBeVisible();
   const carte = especes.locator('details.species-link-card').filter({ has: page.locator('summary strong', { hasText: /^Carotte$/ }) });

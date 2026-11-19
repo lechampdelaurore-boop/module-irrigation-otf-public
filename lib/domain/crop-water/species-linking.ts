@@ -1,5 +1,5 @@
 import type { KcSource } from './reference.ts';
-import type { SeasonSpecies } from './species.ts';
+import type { SeasonSpecies, SpeciesWithoutReference } from './species.ts';
 
 /**
  * Les espèces à rattacher en tête (audit ergonomique, lot 3, point 12,
@@ -32,6 +32,20 @@ export function speciesLinkCounter(species: readonly SeasonSpecies[]): string {
   if (total === 0) return 'Aucune espèce à rattacher';
   if (toLink === 0) return total === 1 ? 'L’espèce de la saison est rattachée' : `Les ${total} espèces de la saison sont rattachées`;
   return `${toLink} espèce${toLink > 1 ? 's' : ''} à rattacher sur ${total}`;
+}
+
+/**
+ * La liste « sans référence Kc » sans les espèces déjà en tête de la liste
+ * des espèces, comme « à rattacher » (audit du 19 novembre 2026, lot J,
+ * n° 15, F459) : il n'y reste que les séries qu'une exception rattache à
+ * « sans référence » quand leur espèce, elle, est rattachée.
+ */
+export function withoutReferenceBeyondSpecies(
+  withoutReference: readonly SpeciesWithoutReference[],
+  species: readonly SeasonSpecies[],
+): SpeciesWithoutReference[] {
+  const toLink = new Set(species.filter(speciesNeedsLink).map((item) => item.plantId));
+  return withoutReference.filter((item) => !toLink.has(item.plantId));
 }
 
 /** La phrase de conséquence d'une espèce à rattacher (cas 8). */
