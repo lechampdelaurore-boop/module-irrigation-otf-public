@@ -74,7 +74,13 @@ déclencheurs SQL des migrations.
   `IRRIGATION_SITE_URL`) servent à construire l'URL des requêtes.
 - Secrets, saisis par `wrangler secret put` et jamais dans Git :
   - application : `OTF_API_TOKEN`, `VISUAL_CROSSING_API_KEY`,
-    `WEATHER_SYNC_SERVICE_TOKEN`, `IRRIGATION_PUSH_SERVICE_TOKEN` ;
+    `WEATHER_SYNC_SERVICE_TOKEN`, `IRRIGATION_PUSH_SERVICE_TOKEN` ; à la
+    validation d'OTF (4.3), la clé du coffre des jetons
+    `OTF_TOKEN_MASTER_KEY`, et `OTF_TOKEN_MASTER_KEY_PREVIOUS` le temps
+    d'une rotation : 32 octets aléatoires en base64, tirés et posés par le
+    porteur seul sans s'afficher, pas encore posés
+    (`docs/tranche-4-contract.md`, F368, F397, F401) ; jamais sur la
+    démonstration, qui refuse alors de démarrer ;
   - Worker Push : `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
     `IRRIGATION_PUSH_SERVICE_TOKEN` ;
   - planificateur météo : `WEATHER_SYNC_SERVICE_TOKEN`.

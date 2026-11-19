@@ -20,6 +20,8 @@ type SettingKey =
   | 'OTF_DATA_SOURCE'
   | 'WEATHER_DATA_SOURCE'
   | 'OTF_API_TOKEN'
+  | 'OTF_TOKEN_MASTER_KEY'
+  | 'OTF_TOKEN_MASTER_KEY_PREVIOUS'
   | 'VISUAL_CROSSING_API_KEY'
   | 'IRRIGATION_PUSH_SERVICE_TOKEN'
   | 'WEATHER_SYNC_SERVICE_TOKEN'
@@ -38,6 +40,7 @@ function readDeploymentSettings(): DeploymentSettings {
     otfDataSource: readSetting('OTF_DATA_SOURCE'),
     weatherDataSource: readSetting('WEATHER_DATA_SOURCE'),
     otfApiToken: present('OTF_API_TOKEN'),
+    otfTokenMasterKey: present('OTF_TOKEN_MASTER_KEY') || present('OTF_TOKEN_MASTER_KEY_PREVIOUS'),
     visualCrossingApiKey: present('VISUAL_CROSSING_API_KEY'),
     pushServiceToken: present('IRRIGATION_PUSH_SERVICE_TOKEN'),
     weatherSyncServiceToken: present('WEATHER_SYNC_SERVICE_TOKEN'),

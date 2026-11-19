@@ -5,6 +5,34 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.3, PR 2 : le coffre des jetons d'Ouvre ta ferme)
+
+- **Le coffre des jetons de chaque ferme** (T4-12, D-163, F355, F397 à
+  F400) : chaque jeton d'Ouvre ta ferme est chiffré avant d'entrer dans la
+  base (AES-256-GCM, un vecteur aléatoire par chiffrement), lié à sa ferme
+  et à son rôle ; un chiffré recopié sur une autre ferme ne s'ouvre pas. La
+  clé maîtresse est un secret que le porteur pose lui-même ; chaque chiffré
+  porte l'empreinte de la clé qui l'a fait. Aucune erreur ni aucun journal
+  ne porte un jeton, une clé ou un chiffré.
+- **La rotation de la clé maîtresse** (F356, F401) : l'ancienne clé ouvre
+  ce qu'elle a chiffré, la nouvelle rechiffre à l'usage puis au calcul du
+  matin ; le journal du matin dit quand l'ancienne clé peut être retirée.
+- **Le raccordement de chaque ferme** (F351, F402) : sa table, seule ligne
+  où les jetons entrent dans la base, lue par la personne et la ferme
+  ensemble ; une ferme n'a qu'un raccordement, à une seule personne ; plus
+  de jetons en « reconnexion demandée », imposé par la base.
+- **Endormi** (F368, F398) : sans clé maîtresse, rien ne s'ouvre et le
+  module lit comme avant ; une clé mal posée ne s'ouvre pas et n'efface
+  rien ; la démonstration refuse de démarrer avec une clé du coffre.
+- **La politique de confidentialité** (F367, F403), datée du 19 novembre
+  2026 : la clé d'accès d'Ouvre ta ferme, gardée chiffrée et effacée à la
+  déconnexion ou au retrait de l'accès ; ce que le responsable du module
+  peut techniquement lire (point D6 de la revue de l'isolation).
+- Migration additive `0033_otf_token_vault.sql` : une table, vide.
+- En ligne le 19 novembre 2026 : #95, les tests de contrat des routes,
+  fusionnée à 1 h 52 et déployée à 2 h 10 (run 44432480748, cinq jobs
+  verts).
+
 ### Ajouté (Tranche 4, 4.3, PR 5 : les tests de contrat des routes d'Ouvre ta ferme)
 
 - **Chaque route lue a sa vérification de forme, dès sa réponse** (T4-15,

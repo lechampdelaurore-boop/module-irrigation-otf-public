@@ -1040,6 +1040,127 @@ en bout, sur une base migrée : le cache reste celui de la dernière lecture
 réussie, avec le message de F394, et sans cache la page d'état) ;
 `tests/snapshot-policy.test.ts` (le motif `shape-changed`).
 
+### 6.3 quater. Précisions de la PR 2 de la 4.3 : le coffre des jetons (19 novembre 2026, D-163, F397 à F403)
+
+Décidées en écrivant le code de la PR 2 (F370, point 2 ; T4-12) et écrites
+dans la même PR que lui, la nuit du 18 au 19 novembre 2026, en Opus 5.5 ·
+Max, sous le mandat de nuit du porteur. Elles précisent F355, F356 et F368
+là où le code a dû choisir, sans les changer, toutes à l'option
+recommandée. Aucune n'est agronomique, ne touche au budget ni ne change un
+réglage de Cloudflare : poser les secrets reste l'acte du porteur (F368),
+à la validation d'OTF. La PR attend, avant sa fusion, que le porteur relise
+les lignes changées de la politique de confidentialité (F367, F403).
+
+- **F397 · La clé maîtresse : sa forme, sa pose et son empreinte.** Elle
+  vaut 32 octets aléatoires écrits en base64, ce que donne
+  `openssl rand -base64 32` ; la variante base64url, l'absence de
+  remplissage et les blancs autour sont admis ; toute autre forme ou
+  longueur est illisible. Le porteur la tire et la pose d'une seule
+  commande sur son poste, qui l'envoie à Cloudflare sans l'afficher
+  (`openssl rand -base64 32 | npx wrangler secret put OTF_TOKEN_MASTER_KEY`,
+  ou son équivalent sous PowerShell, donné avec les autres secrets de la
+  4.3 au moment de les poser). Son empreinte est faite des 8 premiers
+  octets d'un SHA-256 de la clé, précédée d'une étiquette propre au coffre,
+  en hexadécimal (16 caractères) : elle dit quelle clé a fait un chiffré
+  sans rien apprendre de la clé. Le journal ne l'écrit pas : il compte.
+- **F398 · L'état du coffre.** Sans `OTF_TOKEN_MASTER_KEY` ni
+  `OTF_TOKEN_MASTER_KEY_PREVIOUS`, il est **endormi** : rien de la 4.3 ne
+  s'ouvre (F368), et le module lit comme avant. Un secret posé mais
+  illisible, ou l'ancienne clé posée sans la nouvelle, le mettent **hors
+  d'usage** : rien ne s'ouvre et rien n'est effacé ; le calcul du matin le
+  dit au journal (`otf_vault_unavailable`, avec le nom du secret, jamais sa
+  valeur), et tout reprend dès que le secret est corrigé. Il échoue fermé,
+  plutôt que de prendre pour perdus les chiffrés d'une clé mal posée.
+  Sinon, il est **prêt**. La même valeur posée sous les deux noms n'est pas
+  une rotation. La démonstration n'a jamais de coffre : elle refuse de
+  démarrer si l'un des deux secrets lui est posé (refus `otf-vault-key`,
+  comme pour `OTF_API_TOKEN`).
+- **F399 · Le chiffré.** `v1.<empreinte>.<vecteur>.<chiffré>` : AES-256-GCM
+  (WebCrypto), un vecteur aléatoire de 12 octets par chiffrement, une
+  étiquette de 128 bits, le vecteur et le chiffré en base64url. Les données
+  associées sont une liste JSON : l'étiquette du coffre, le rôle et la
+  ferme pour un jeton d'accès ou de renouvellement ; l'étiquette, le rôle,
+  la personne et la demande pour un `code_verifier`. Écrites en liste,
+  aucun caractère d'une valeur ne peut en imiter une autre. Le coffre ne
+  chiffre ni une valeur vide, ni pour une ferme dont l'identifiant n'a pas
+  la forme de F327, ni pour une personne ou une demande vides.
+- **F400 · Ce qui ne s'ouvre pas.** Un chiffré fait par une clé que le
+  trousseau n'a plus : « la ferme doit être reliée de nouveau » (F355) ; la
+  PR 3 le traite comme un accès retiré (« reconnexion demandée », F358).
+  Un chiffré déplacé sur la ligne d'une autre ferme, pris pour un autre
+  rôle ou altéré : il ne s'ouvre pas. Une forme inconnue : refusée sans
+  rien essayer. Jamais une valeur devinée ; chaque erreur nomme son
+  problème, jamais un jeton, une clé ni un chiffré.
+- **F401 · La rotation, à l'usage et au calcul du matin** (précise F356).
+  À l'usage, les deux jetons d'une ferme ouverts avec l'ancienne clé sont
+  chiffrés de nouveau avec la courante, par une écriture conditionnelle
+  qui n'écrase jamais des jetons rangés entre-temps (un renouvellement les
+  a déjà chiffrés avec la courante). Au calcul du matin, à la fin de la
+  route du matin, après ses autres étapes, même si la météo a échoué,
+  jamais pendant qu'un autre passage court, la même chose pour chaque
+  raccordement encore chiffré par l'ancienne clé. Le journal écrit une
+  ligne `otf_vault_morning` : les raccordements qui gardent des jetons,
+  ceux qui viennent d'être chiffrés de nouveau, ceux qui dépendent encore
+  de l'ancienne clé, ceux qu'aucune clé n'ouvre, et `previousKeyRemovable` :
+  à `true`, plus aucun chiffré ne dépend de l'ancienne clé, et le porteur
+  peut la retirer (son acte). Un raccordement illisible est compté, laissé
+  tel quel, et n'arrête pas les autres ; un échec du passage n'est pas un
+  échec du matin.
+- **F402 · Le raccordement dans la base.** La PR 2 crée la table du
+  raccordement (`otf_farm_connections`, migration additive 0033), parce
+  qu'elle est la seule ligne où les jetons entrent dans la base (F351) :
+  la ferme (sa clé : un raccordement par ferme), la personne qui l'a
+  autorisée, le nom de la ferme, l'état (« reliée », « reconnexion
+  demandée », « lecture refusée ») et sa raison, les deux jetons chiffrés,
+  l'échéance du jeton d'accès et la date du raccordement. La base impose
+  qu'un raccordement en « reconnexion demandée » n'ait plus de jetons
+  (F358), et que les deux autres états en aient. Un raccordement se lit
+  par l'espace, sa personne et sa ferme ensemble (le filtre de tous les
+  espaces), jamais depuis l'espace d'une autre personne (F365). Il se
+  range par une seule écriture conditionnelle : une ferme sans raccordement
+  le reçoit ; la même personne qui la relie de nouveau remplace ses jetons
+  et la date ; si une autre personne la relie déjà, rien ne change (F351).
+  Rien n'y écrit avant la PR 3, qui écrit les états et leurs raisons et
+  ajoute, par une migration additive, ce que le renouvellement demande
+  (son bail, F357). La demande d'autorisation, qui ne vit que dix minutes,
+  naît avec le départ (PR 3, F352) et sa table avec lui ; son
+  `code_verifier` est chiffré par ce même coffre, lié à la personne et à
+  la demande, ce que la PR 2 éprouve déjà.
+- **F403 · Le texte public et le contrôle de cohérence des espaces.** La
+  politique de confidentialité du site public dit, datée du
+  19 novembre 2026 : dans « Ce que le module garde », « La clé d'accès
+  donnée par Ouvre ta ferme, quand votre ferme est reliée au module :
+  elle lui permet de lire la ferme sans vous redemander l'autorisation.
+  Elle est gardée chiffrée, et effacée quand vous déconnectez la ferme
+  dans le module, ou dès que le module constate qu'Ouvre ta ferme
+  n'accepte plus son accès (autorisation retirée ou expirée). » ; dans
+  « Où sont les données », « Le responsable du module administre cet
+  hébergement : il peut techniquement lire les données de chaque ferme
+  dans la base de données et dans les journaux techniques. Il ne les
+  consulte que pour faire fonctionner le module, répondre à une demande
+  ou corriger une panne. » (point D6 de la revue de l'isolation ; la
+  seconde phrase est un engagement que le porteur garde ou retire à sa
+  relecture). Les conditions d'utilisation ne changent pas et gardent leur
+  date. Au contrôle de cohérence des espaces (F380), le raccordement est
+  rangé parmi les tables communes : sa clé est la ferme, il se lit par
+  l'espace lui-même et ne désigne aucune ligne d'un espace.
+
+**Preuves** (F370, PR 2) : `tests/otf-token-vault.test.ts` (la clé et ses
+formes, l'état du coffre, chaque rôle chiffré et ouvert, un vecteur neuf à
+chaque chiffrement, le chiffré déplacé sur une autre ferme ou pris pour un
+autre rôle, le `code_verifier` lié à la personne et à la demande, la
+rotation, le chiffré altéré ou mal formé, aucune valeur dans une erreur) ;
+`tests/db/otf-token-vault.test.ts` (sur une base migrée : aucune colonne ne
+porte un jeton ni la clé ; le raccordement ne s'ouvre que pour sa personne
+et sa ferme ; F351 ; le chiffré recopié d'une ferme à l'autre ; la rotation
+à l'usage et au matin, et le journal qui dit quand l'ancienne clé peut
+partir ; une ligne illisible qui n'arrête pas les autres ; l'écriture
+conditionnelle qui n'écrase pas un renouvellement ; le coffre endormi, hors
+d'usage, et absent de la démonstration ; les contraintes de la base ; aucun
+jeton ni aucune clé semés dans un journal) ; `tests/demo-mode.test.ts` (le
+refus `otf-vault-key`) ; `cloudflare/irrigation-site/test/site.test.ts`
+(les lignes de F403).
+
 ## 7. Généralisation : ce qui est propre à la ferme de François (étape 0)
 
 À inventorier **en lisant le code, sans le modifier**, avant 4.4 ; livrable : un tableau « élément · où · pourquoi propre à la ferme · à généraliser comment · question agronomique ? ». Pistes déjà connues : jeu commun de 32 cultures et correspondance de 78 espèces ; valeurs par défaut (K_abri 0,8, rampes tunnel, 10 mm/h mesuré en serre) ; seuils de gel ; noms de lieux dans les recettes ; commune météo par défaut (siège OTF) ; la RFU en mm/m (62 labo, 51 ferme). **Toute valeur agronomique à choisir pour d'autres fermes est une question réservée à François** (une par message). Règle : pour une ferme nouvelle, **aucune valeur de la ferme de François n'est un défaut silencieux** : soit un catalogue neutre, soit « inconnu, à renseigner ».

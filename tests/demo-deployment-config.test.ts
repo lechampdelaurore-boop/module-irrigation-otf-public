@@ -66,6 +66,7 @@ test('le mode démo accepte cette configuration telle qu’elle est écrite', ()
     otfDataSource: demo.vars.OTF_DATA_SOURCE,
     weatherDataSource: demo.vars.WEATHER_DATA_SOURCE,
     otfApiToken: false,
+    otfTokenMasterKey: false,
     visualCrossingApiKey: false,
     pushServiceToken: false,
     weatherSyncServiceToken: false,

@@ -32,6 +32,7 @@ const NOTHING_REAL: DeploymentSettings = {
   otfDataSource: undefined,
   weatherDataSource: undefined,
   otfApiToken: false,
+  otfTokenMasterKey: false,
   visualCrossingApiKey: false,
   pushServiceToken: false,
   weatherSyncServiceToken: false,
@@ -44,6 +45,8 @@ const PRODUCTION: DeploymentSettings = {
   otfDataSource: 'live',
   weatherDataSource: undefined,
   otfApiToken: true,
+  // La clé du coffre (4.3, F368) n'est pas encore posée : le porteur la pose à la validation d'OTF.
+  otfTokenMasterKey: false,
   visualCrossingApiKey: true,
   pushServiceToken: true,
   weatherSyncServiceToken: true,
@@ -70,6 +73,7 @@ test('DEMO_MODE=true sans rien de réel : la démonstration démarre, sources de
 const DEMO_RECEIVES: readonly [string, Partial<DeploymentSettings>, DeploymentRefusal][] = [
   ['la source OTF live', { otfDataSource: 'live' }, 'otf-live-source'],
   ['un jeton OTF', { otfApiToken: true }, 'otf-token'],
+  ['une clé du coffre des jetons OTF', { otfTokenMasterKey: true }, 'otf-vault-key'],
   ['la météo live', { weatherDataSource: 'live' }, 'weather-live-source'],
   ['une clé de météo', { visualCrossingApiKey: true }, 'weather-key'],
   ['le jeton du service de notification', { pushServiceToken: true }, 'push-token'],

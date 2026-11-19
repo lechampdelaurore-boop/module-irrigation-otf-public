@@ -114,6 +114,37 @@ export const otfFarmReads = sqliteTable('otf_farm_reads', {
 });
 
 /**
+ * Le raccordement de chaque ferme à Ouvre ta ferme (4.3, PR 2,
+ * docs/tranche-4-contract.md, F351, F355, F356, F397 à F403) : la seule ligne
+ * où ses jetons entrent dans la base, chiffrés par le coffre, liés à la ferme
+ * et à leur rôle. Effacés en « reconnexion demandée » (F358).
+ */
+export const otfFarmConnections = sqliteTable(
+  'otf_farm_connections',
+  {
+    otfFarmId: text('otf_farm_id').primaryKey(),
+    ownerUserId: text('owner_user_id').notNull(),
+    farmName: text('farm_name').notNull(),
+    state: text('state').notNull().default('linked'),
+    stateReason: text('state_reason'),
+    accessTokenSealed: text('access_token_sealed'),
+    accessExpiresAtMs: integer('access_expires_at_ms'),
+    refreshTokenSealed: text('refresh_token_sealed'),
+    connectedAt: text('connected_at').notNull(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    index('idx_otf_farm_connections_owner').on(table.ownerUserId),
+    check('chk_otf_farm_connections_state', sql`${table.state} IN ('linked', 'reconnect-required', 'read-refused')`),
+    check(
+      'chk_otf_farm_connections_tokens',
+      sql`(${table.state} = 'reconnect-required' AND ${table.accessTokenSealed} IS NULL AND ${table.refreshTokenSealed} IS NULL AND ${table.accessExpiresAtMs} IS NULL)
+        OR (${table.state} <> 'reconnect-required' AND ${table.accessTokenSealed} IS NOT NULL AND ${table.refreshTokenSealed} IS NOT NULL AND ${table.accessExpiresAtMs} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
  * Isolation boundary for irrigation-owned data.
  *
  * OTF remains the source of truth for farms and permissions. Since 4.1

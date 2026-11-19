@@ -3,6 +3,10 @@ declare namespace Cloudflare {
     DB: D1Database;
     OTF_API_BASE_URL?: string;
     OTF_API_TOKEN?: string;
+    /** La clé maîtresse du coffre des jetons (4.3, F355, F368) : un secret posé par le porteur seul. */
+    OTF_TOKEN_MASTER_KEY?: string;
+    /** L'ancienne clé maîtresse, le temps d'une rotation (F356). */
+    OTF_TOKEN_MASTER_KEY_PREVIOUS?: string;
     OTF_DATA_SOURCE?: string;
     WEATHER_DATA_SOURCE?: string;
     IRRIGATION_PUSH_SERVICE_URL?: string;

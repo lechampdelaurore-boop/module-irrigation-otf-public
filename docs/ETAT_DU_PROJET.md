@@ -245,11 +245,46 @@ registres, elle y renvoie.
   build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm
   site:check` réussis en local ; douze sabotages des règles, chacun
   détecté ; la suite complète des parcours jouée par la CI de la PR.
-  **PR ouverte** (`feat/contrat-routes-otf`). Reste de la 4.3 sans accès
-  d'OTF : la PR 2 (le coffre, endormi), qui attend la relecture du
-  porteur pour le texte de confidentialité. Non vérifié : la forme réelle
-  des champs lus par défaut et non constatés (mode d'un jardin, saisons
-  d'un élément) ; à l'essai de bout en bout (F395).
+  **En ligne le 19 novembre 2026 à 2 h 10** (consigné par la PR
+  suivante, celle du coffre) : #95 fusionnée à 1 h 52, run 44432480748
+  vérifié job par job (« Application », « Workers Cloudflare », « Parcours
+  navigateur », « Déploiement Cloudflare » et « Déploiement de la
+  démonstration », verts). Non vérifié : la forme réelle des champs lus
+  par défaut et non constatés (mode d'un jardin, saisons d'un élément) ;
+  à l'essai de bout en bout (F395) ; et la lecture de la ferme réelle avec
+  ces règles (ni accès à OTF ni aux journaux de Cloudflare depuis la
+  session de code).
+- Tranche 4, **4.3, PR 2 : le coffre des jetons** (D-163, F397 à F403,
+  section 6.3 quater de `docs/tranche-4-contract.md`), codée la même nuit
+  en Opus 5.5 · Max, sous le mandat de nuit du porteur, sans accès d'OTF.
+  Chaque jeton d'OTF sera chiffré avant d'entrer dans la base
+  (AES-256-GCM, un vecteur aléatoire par chiffrement), lié à sa ferme et à
+  son rôle : un chiffré recopié sur une autre ferme ne s'ouvre pas. La clé
+  maîtresse (`OTF_TOKEN_MASTER_KEY`, 32 octets aléatoires en base64) et
+  l'ancienne le temps d'une rotation (`OTF_TOKEN_MASTER_KEY_PREVIOUS`) sont
+  des secrets que le porteur pose lui-même, à la validation d'OTF ; chaque
+  chiffré porte l'empreinte de sa clé ; la rotation rechiffre à l'usage,
+  puis au calcul du matin, dont le journal (`otf_vault_morning`) dit quand
+  l'ancienne clé peut partir. La table du raccordement
+  (`otf_farm_connections`, migration additive 0033) est la seule ligne où
+  les jetons entrent dans la base, lue par la personne et la ferme
+  ensemble ; une ferme n'a qu'un raccordement ; plus de jetons en
+  « reconnexion demandée », imposé par la base. Endormi : sans clé, rien ne
+  s'ouvre et le module lit comme avant ; une clé mal posée n'ouvre rien et
+  n'efface rien ; la démonstration refuse de démarrer avec une clé du
+  coffre. Rien n'écrit dans la table avant la PR 3. La politique de
+  confidentialité du site public, datée du 19 novembre 2026, dit que le
+  module garde la clé d'accès d'OTF chiffrée et l'efface à la déconnexion
+  ou au retrait de l'accès, et ce que le responsable peut techniquement
+  lire (point D6 de la revue de l'isolation). Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 757 tests, puis 425 pour chacun
+  des trois passages d'isolation), `pnpm build`, `pnpm knip`, `pnpm
+  push:check`, `pnpm weather:check`, `pnpm site:check` réussis en local ;
+  dix-sept sabotages des règles, chacun détecté ; la suite complète des
+  parcours jouée par la CI de la PR. **PR ouverte** (`feat/coffre-jetons-otf`) : **sa fusion
+  attend la relecture, par le porteur, des lignes changées de la
+  politique de confidentialité** (F367). Ensuite : les PR 3 et 4 attendent
+  l'accès d'OTF.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

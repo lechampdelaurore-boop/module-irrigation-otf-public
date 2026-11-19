@@ -11,7 +11,9 @@ import { escapeHtml, renderPage } from './layout.ts';
  */
 
 export const RESPONSIBLE = "François PREZEAU, GAEC Le Champ de l'Aurore";
-const TEXT_DATE = '18 novembre 2026';
+/** La date de chaque texte : celui des conditions n'a pas changé depuis sa validation. */
+const PRIVACY_TEXT_DATE = '19 novembre 2026';
+const TERMS_TEXT_DATE = '18 novembre 2026';
 
 /** Une adresse électronique plausible : une valeur mal saisie ne s'affiche pas. */
 const EMAIL_PATTERN = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/;
@@ -69,7 +71,7 @@ export function privacyPage(contactEmail: string | undefined): string {
     title: 'Politique de confidentialité',
     description: "Ce que le module d'irrigation lit, garde et envoie, combien de temps, et comment faire effacer ses données.",
     body: `<h1>Politique de confidentialité</h1>
-<p class="updated">Texte du ${TEXT_DATE}.</p>
+<p class="updated">Texte du ${PRIVACY_TEXT_DATE}.</p>
 <p class="note">Ce texte décrit honnêtement ce que fait le module aujourd'hui. Il n'a pas encore été relu par un juriste ; il le sera avant qu'une autre ferme que celle du responsable soit reliée.</p>
 
 <h2>Qui est responsable</h2>
@@ -89,6 +91,7 @@ export function privacyPage(contactEmail: string | undefined): string {
 <h2>Ce que le module garde</h2>
 <ul>
 <li><strong>Une copie du plan lu dans Ouvre ta ferme</strong>, renouvelée quand le module en a besoin (à l'usage, au calcul du planning du matin, ou quand vous demandez une actualisation) ; une copie de moins de quatre heures est réutilisée telle quelle. La dernière copie réussie est gardée pour que le module reste utilisable quand Ouvre ta ferme ne répond pas.</li>
+<li><strong>La clé d'accès donnée par Ouvre ta ferme</strong>, quand votre ferme est reliée au module : elle lui permet de lire la ferme sans vous redemander l'autorisation. Elle est gardée chiffrée, et effacée quand vous déconnectez la ferme dans le module, ou dès que le module constate qu'Ouvre ta ferme n'accepte plus son accès (autorisation retirée ou expirée).</li>
 <li><strong>Ce que vous saisissez dans le module</strong> : matériel d'arrosage, ressources en eau, arrosages faits, pluie mesurée, observations du sol, objectifs, réglages et alertes.</li>
 <li><strong>La météo de votre commune</strong> : prévisions et valeurs passées, jour par jour.</li>
 <li><strong>Un identifiant de connexion</strong> fourni par le service de connexion (une suite de caractères, pas votre adresse électronique). Votre adresse s'affiche à l'écran une fois connecté, mais le module ne l'enregistre pas.</li>
@@ -105,6 +108,7 @@ export function privacyPage(contactEmail: string | undefined): string {
 
 <h2>Où sont les données</h2>
 <p>Chez l'hébergeur Cloudflare (société américaine Cloudflare, Inc.), dans sa base de données D1 et ses serveurs Workers. L'emplacement exact des serveurs n'est pas choisi par le responsable du module.</p>
+<p>Le responsable du module administre cet hébergement : il peut techniquement lire les données de chaque ferme dans la base de données et dans les journaux techniques. Il ne les consulte que pour faire fonctionner le module, répondre à une demande ou corriger une panne.</p>
 
 <h2>Ce qui sort vers l'extérieur</h2>
 <p>Rien n'est vendu, loué ni transmis à des fins commerciales. Seuls ces échanges ont lieu, chacun pour faire fonctionner le module :</p>
@@ -139,7 +143,7 @@ export function termsPage(contactEmail: string | undefined): string {
     title: "Conditions d'utilisation",
     description: "Les conditions d'utilisation du module d'irrigation pour Ouvre ta ferme.",
     body: `<h1>Conditions d'utilisation</h1>
-<p class="updated">Texte du ${TEXT_DATE}.</p>
+<p class="updated">Texte du ${TERMS_TEXT_DATE}.</p>
 <ul>
 <li><strong>Prix.</strong> Le module est gratuit pendant toute la durée du pilote. Il est développé et maintenu bénévolement par une ferme, qui en paie seule les frais : l'hébergement (environ 5 € par mois aujourd'hui, davantage si le nombre de fermes augmente) et les outils de développement et de maintenance (environ 100 € par mois). Après le pilote, selon le nombre de fermes qui l'utilisent, une petite participation pourra être demandée, de l'ordre de 1 € par mois et par ferme, uniquement pour couvrir ces frais, sans but lucratif. Toute participation sera annoncée à l'avance, et chaque ferme restera libre d'arrêter d'utiliser le module.</li>
 <li><strong>Un service fourni tel quel.</strong> Le module est en essai, sans garantie de disponibilité ni d'absence d'erreur.</li>

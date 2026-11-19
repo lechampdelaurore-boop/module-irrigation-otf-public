@@ -8,6 +8,8 @@ LOCAL_DEMO_USER=true
 WEATHER_DATA_SOURCE=mock
 # ACCESS_TEAM_DOMAIN=https://exemple.cloudflareaccess.com
 # ACCESS_AUD=identifiant-d-audience-de-l-application-access
+# Le coffre des jetons d'Ouvre ta ferme (4.3) : sans clé, il reste endormi.
+# OTF_TOKEN_MASTER_KEY=
 # VISUAL_CROSSING_API_KEY=
 # WEATHER_SYNC_SERVICE_TOKEN=
 # IRRIGATION_PUSH_SERVICE_URL=
