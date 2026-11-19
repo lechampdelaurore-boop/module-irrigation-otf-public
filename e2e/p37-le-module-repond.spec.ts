@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -31,6 +31,10 @@ import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.
  *   sept autres confirmations se confirment en rouge dans les parcours qui
  *   les jouent (`confirmerDansLaFenetre`, F413 et F414) ; « Vider les
  *   objectifs » dans le même mot partout (F415).
+ *
+ * - l'initiale ouvre le menu du compte, le nom et « Se déconnecter » ; un
+ *   appui ne déconnecte plus ; Échap, un appui ailleurs ou sur l'initiale le
+ *   ferment (F416).
  *
  * Ce qu'il ne prouve pas : un vrai téléphone, un lecteur d'écran.
  */
@@ -150,4 +154,37 @@ test('au-delà de l’objectif de la semaine, « Irriguer maintenant » demande 
     await attendreLaPageIrrigation(page, 'besoins');
     await retirerLesObjectifs(page);
   }
+});
+
+test('l’initiale ouvre le menu du compte et ne déconnecte plus d’un appui', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  await attendreLaPageIrrigation(page, 'arrosages');
+  const adresse = page.url();
+  const initiale = page.getByRole('button', { name: /^Compte de / });
+  const menu = page.getByRole('menu', { name: 'Compte' });
+  const deconnecter = menu.getByRole('menuitem', { name: 'Se déconnecter' });
+
+  await initiale.click();
+  await expect(menu).toBeVisible();
+  await expect(initiale).toHaveAttribute('aria-expanded', 'true');
+  await expect(menu.locator('.account-menu-name')).not.toBeEmpty();
+  await expect(deconnecter).toHaveAttribute('href', /.+/);
+  await expect(menu).toBeInViewport();
+  expect(page.url(), 'un appui sur l’initiale ne quitte pas la page').toBe(adresse);
+  // La cible de 44 px de l'initiale, posée par son pseudo-élément, se vérifie avec celles de la barre (F22) ; ici le lien du menu.
+  if (telephone) await verifierCibleTactile(deconnecter, '« Se déconnecter »');
+  await verifierLEtape(page, journal, 'le menu du compte ouvert');
+
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+  await expect(initiale).toBeFocused();
+  await initiale.click();
+  await expect(menu).toBeVisible();
+  await page.locator('h1').first().click();
+  await expect(menu).toHaveCount(0);
+  await initiale.click();
+  await initiale.click();
+  await expect(menu).toHaveCount(0);
+  await verifierLEtape(page, journal, 'le menu se ferme par Échap, un appui ailleurs ou l’initiale');
 });

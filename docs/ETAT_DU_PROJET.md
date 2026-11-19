@@ -384,7 +384,12 @@ registres, elle y renvoie.
   à 16 h 58 (#104, run 44557056131 vérifié job par job). **PR 4, une seule
   fenêtre de confirmation** (D-171, F413 à F415) : les sept boîtes du
   navigateur remplacées, le rouge pour ce qui efface, « Vider les
-  objectifs », « Retirer (stocker) » hors du rouge ; codée.
+  objectifs », « Retirer (stocker) » hors du rouge ; en ligne le 19 novembre
+  2026 à 17 h 35 (#105, run 44564244171 vérifié job par job). **PR 5, le
+  menu du compte** (D-172, F416) : l'initiale ouvre un menu (nom, « Se
+  déconnecter ») au lieu de déconnecter d'un appui ; ligne de la charte
+  changée ; codée. Les cinq PR s'ouvrent et se fusionnent une à une, après
+  les PR 2 et 3 du correctif météo.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

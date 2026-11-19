@@ -3,6 +3,7 @@
 import { useSystemAlertsDot } from '../irrigation-manager/system-alerts-memory';
 import { Icon } from '../line-icon';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
+import { AccountMenu } from './account-menu';
 import { DemoBanner } from './demo-banner';
 import type { TourSurroundings } from './guided-tour';
 
@@ -11,7 +12,8 @@ import type { TourSurroundings } from './guided-tour';
  * la refonte, D-068, docs/charte-module.md, points 5 et 6) : à l'ordinateur,
  * une barre blanche avec la pastille verte à goutte, le nom de la session et
  * son initiale ; au téléphone, la barre anthracite de 36 px avec le nom, la
- * cloche des notifications et l'initiale. La cloche prend un point quand le
+ * cloche des notifications et l'initiale, qui ouvre le menu du compte (lot G,
+ * n° 6, F416). La cloche prend un point quand le
  * bandeau « Alertes système non disponibles » s'est replié (audit
  * ergonomique, point 2, précision F10). En démonstration, la bannière
  * permanente la précède (docs/demo-guided-contract.md, section 4).
@@ -60,9 +62,7 @@ export function Topbar({
               <Icon name="cloche" />
             </a>
           ) : null}
-          <a className="avatar" href={signOutPath} aria-label={`Déconnecter ${userName}`} title="Se déconnecter">
-            {userName.slice(0, 1).toLocaleUpperCase('fr-FR')}
-          </a>
+          <AccountMenu userName={userName} signOutPath={signOutPath} />
         </div>
       </header>
     </>

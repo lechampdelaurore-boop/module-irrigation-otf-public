@@ -61,3 +61,56 @@
     flex-direction: column;
   }
 }
+
+/* L'initiale ouvre le menu du compte (n° 6, F416) : son dessin ne change pas, le menu se pose dessous, à droite. */
+.account-menu-zone {
+  position: relative;
+  display: grid;
+}
+
+button.avatar {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  min-width: 220px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 16%);
+  color: var(--ink);
+}
+
+.account-menu-name {
+  margin: 0;
+  padding: 8px 10px;
+  overflow: hidden;
+  color: var(--ink2);
+  font: 500 13px/1.3 var(--font-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu a {
+  display: flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  padding: 0 10px;
+  border-radius: var(--radius-button);
+  color: var(--ink);
+  font: 500 14px/1.2 var(--font-ui);
+  text-decoration: none;
+}
+
+.account-menu a:hover,
+.account-menu a:focus-visible {
+  background: var(--sheet);
+}
