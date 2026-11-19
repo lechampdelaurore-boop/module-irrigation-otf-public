@@ -1,5 +1,7 @@
 import {
+  SITE_SYNC_TIMEOUT_MS,
   isParisDailyWeatherWindow,
+  schedulerErrorRetriable,
   schedulerResponseRetriable,
   schedulerRetryDelayMs,
 } from './domain.ts';
@@ -47,7 +49,7 @@ async function triggerSiteWeatherSync(env: Env, trigger: 'cron' | 'manual') {
           'x-irrigation-weather-sync-token': env.WEATHER_SYNC_SERVICE_TOKEN,
           accept: 'application/json',
         },
-        signal: AbortSignal.timeout(25_000),
+        signal: AbortSignal.timeout(SITE_SYNC_TIMEOUT_MS),
       });
       lastStatus = response.status;
       if (response.ok || response.status === 409) {
@@ -72,6 +74,18 @@ async function triggerSiteWeatherSync(env: Env, trigger: 'cron' | 'manual') {
       }));
       await wait(delayMs);
     } catch (error) {
+      if (!schedulerErrorRetriable(error)) {
+        // La route a reçu la demande et travaille encore : pas de seconde exécution (D-166).
+        console.warn(JSON.stringify({
+          event: 'weather_scheduler_timeout_not_retried',
+          trigger,
+          attempt,
+          timeoutMs: SITE_SYNC_TIMEOUT_MS,
+          error: error instanceof Error ? error.name : 'unknown',
+        }));
+        lastStatus = 504;
+        break;
+      }
       if (attempt === MAX_ATTEMPTS) break;
       const delayMs = Math.min(2_000, 250 * (2 ** (attempt - 1)));
       console.warn(JSON.stringify({

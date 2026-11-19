@@ -5850,3 +5850,25 @@ qui montraient la date (« Objectifs et besoins » et « Réglages »).
 
 Ne changent pas : D-164 ; ce que la tâche enregistre (tentative, réussite,
 erreur) ; la mention « données anciennes » des lectures de la semaine.
+
+## D-166 — Correctif météo, PR 3 : une seule exécution de la synchronisation chaque matin
+
+Date : 19 novembre 2026.
+
+**Contexte.** Les journaux de Cloudflare du 19 novembre 2026 montrent la
+route de synchronisation du site appelée deux fois chaque matin : la
+première, qui enchaîne la météo puis les calculs du matin (planning, eau
+des cultures, réserve du sol, coffre), dépasse les 25 secondes que le
+planificateur lui laissait ; il l'abandonne et la relance, alors qu'elle
+travaille encore. La seconde exécution, après la fin de la première,
+refait tout (environ 15 s).
+
+**Décision.** Le planificateur laisse **90 secondes** à la route
+(`SITE_SYNC_TIMEOUT_MS`) et ne relance **jamais** un appel abandonné pour
+délai dépassé : il le journalise (`weather_scheduler_timeout_not_retried`)
+et s'arrête. Une coupure réseau, une réponse `429` ou `5xx` restent
+retentées comme avant, trois tentatives au plus. La règle vit dans
+`cloudflare/irrigation-weather-scheduler/src/domain.ts` et y est testée.
+
+Ne changent pas : le créneau de 6 h 15 ; le verrou D1 de la météo ; les
+tentatives du moteur auprès du fournisseur météo (D-164).
