@@ -192,3 +192,16 @@ export async function ouvrirLesReglagesDeLaPage(page: Page): Promise<Locator> {
   await expect(pli).toHaveAttribute('open', '');
   return pli;
 }
+
+/**
+ * Confirme dans la fenêtre du module, qui remplace la boîte du navigateur
+ * (audit du 19 novembre 2026, lot G, n° 8, F413) : ce qui efface ou annule se
+ * confirme en rouge (F414).
+ */
+export async function confirmerDansLaFenetre(page: Page, bouton: string): Promise<void> {
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  const confirmer = fenetre.getByRole('button', { name: bouton, exact: true });
+  await expect(confirmer).toHaveCSS('background-color', 'rgb(220, 53, 69)');
+  await confirmer.click();
+  await expect(fenetre).toHaveCount(0);
+}

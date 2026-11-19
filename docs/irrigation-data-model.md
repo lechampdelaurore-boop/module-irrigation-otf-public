@@ -119,7 +119,7 @@ Les objectifs hydriques sont des valeurs directes en `mm/semaine`, propres à
 une semaine civile du lundi au dimanche et à une saison. Ils peuvent viser la
 ferme, une parcelle, un jardin/abri ou une planche. Ces périmètres sont
 indépendants et non cumulatifs. Les révisions sont append-only : modifier un
-objectif ou utiliser « Tout vider » n’efface jamais l’historique. Si une
+objectif ou utiliser « Vider les objectifs » (« Tout vider » avant le 19 novembre 2026, D-171) n’efface jamais l’historique. Si une
 nouvelle semaine ne possède encore aucune révision, ses objectifs sont repris
 de la dernière semaine configurée ; une semaine explicitement vidée ne les
 recrée pas.
@@ -196,7 +196,7 @@ optimiste, vérifiée dans le même batch D1 : deux validations concurrentes ne
 peuvent pas réserver le même budget. Une révision obsolète demande un nouvel
 essai ; l’enregistrement de la réalité reste toujours autorisé.
 
-« Tout vider » retire uniquement les objectifs de la semaine affichée après
+« Vider les objectifs » retire uniquement les objectifs de la semaine affichée après
 confirmation, en ajoutant des révisions `cleared`. Les autres semaines déjà
 configurées, la météo, les restrictions, les irrigations et leurs événements
 ne sont pas supprimés. Les semaines encore vierges reprennent la dernière

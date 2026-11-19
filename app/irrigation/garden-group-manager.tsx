@@ -1,5 +1,6 @@
 'use client';
 
+import { useConfirm } from './shell/use-confirm';
 import type { GardenGroupMemberRecord, GardenGroupRecord } from '@/lib/domain/garden-group-record';
 import {
   Fragment,
@@ -61,6 +62,7 @@ export function GardenGroupManager({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   const groupHelp = useSectionHelp('Groupes de jardins alignés', GARDEN_GROUP_HELP, <GardenGroupDiagram label={GARDEN_GROUP_HELP.figureLabel ?? ''} />);
   const plotById = useMemo(
@@ -150,12 +152,13 @@ export function GardenGroupManager({
     });
   };
 
-  const deleteGroup = (group: GardenGroupRecord) => {
-    if (
-      !window.confirm(
-        `Supprimer le groupe « ${group.name} » ? Les jardins resteront disponibles dans le plan.`,
-      )
-    ) {
+  const deleteGroup = async (group: GardenGroupRecord) => {
+    if (!(await confirm({
+      title: 'Supprimer ce groupe ?',
+      text: `Supprimer le groupe « ${group.name} » ? Les jardins resteront disponibles dans le plan.`,
+      confirmLabel: 'Supprimer le groupe',
+      cancelLabel: 'Garder le groupe',
+    }))) {
       return;
     }
 
@@ -289,6 +292,7 @@ export function GardenGroupManager({
           onSubmit={submitGroup}
         />
       ) : null}
+      {confirmDialog}
     </section>
   );
 }

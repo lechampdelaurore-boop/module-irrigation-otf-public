@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { dateKeyInTimeZone, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, confirmerDansLaFenetre, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { annulerLesIrrigationsDuPlanning, lignesNonPlacees, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -215,8 +215,8 @@ async function ajouterUnCreneau(planning: Locator, nom: string): Promise<void> {
 async function supprimerLeCreneau(page: Page, planning: Locator, nom: string): Promise<void> {
   await ouvrirLesReglages(planning);
   const creneaux = sectionDesCreneaux(planning);
-  page.once('dialog', (fenetre) => fenetre.accept());
   await creneaux.getByRole('button', { name: `Supprimer le créneau protégé ${nom}` }).click();
+  await confirmerDansLaFenetre(page, 'Supprimer le créneau');
   await expect(creneaux.locator('.planning-notice')).toContainText(`Créneau protégé « ${nom} » supprimé`, { timeout: 15_000 });
 }
 

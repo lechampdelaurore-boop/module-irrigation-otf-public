@@ -1,5 +1,6 @@
 'use client';
 
+import { useConfirm } from './shell/use-confirm';
 import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-record';
 import type { EquipmentListItem } from '@/lib/domain/equipment-record';
 import {
@@ -71,6 +72,7 @@ export const EquipmentInventory = forwardRef<EquipmentInventoryHandle, Props>(
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   // Dans l'ordre naturel des noms : gag9 avant gag10 (audit ergonomique, point 4).
   const sortedEquipment = sortByNameNaturally(equipment, (item) => item.name, (item) => item.id);
@@ -201,14 +203,8 @@ export const EquipmentInventory = forwardRef<EquipmentInventoryHandle, Props>(
     });
   };
 
-  const archiveEquipment = (item: EquipmentListItem) => {
-    if (
-      !window.confirm(
-        `Archiver « ${item.name} » ? Son historique sera conservé.`,
-      )
-    ) {
-      return;
-    }
+  const archiveEquipment = async (item: EquipmentListItem) => {
+    if (!(await confirm({ title: 'Archiver ce matériel ?', text: `Archiver « ${item.name} » ? Son historique sera conservé.`, confirmLabel: 'Archiver le matériel', cancelLabel: 'Garder le matériel' }))) return;
 
     clearMessages();
     startTransition(async () => {
@@ -233,14 +229,8 @@ export const EquipmentInventory = forwardRef<EquipmentInventoryHandle, Props>(
     });
   };
 
-  const deleteEquipment = (item: EquipmentListItem) => {
-    if (
-      !window.confirm(
-        `Supprimer définitivement « ${item.name} » ? Cette action est irréversible.`,
-      )
-    ) {
-      return;
-    }
+  const deleteEquipment = async (item: EquipmentListItem) => {
+    if (!(await confirm({ title: 'Supprimer ce matériel ?', text: `Supprimer définitivement « ${item.name} » ? Cette action est irréversible.`, confirmLabel: 'Supprimer définitivement', cancelLabel: 'Garder le matériel' }))) return;
 
     clearMessages();
     startTransition(async () => {
@@ -378,6 +368,7 @@ export const EquipmentInventory = forwardRef<EquipmentInventoryHandle, Props>(
           onClose={() => setSettingsEquipmentId(null)}
         />
       ) : null}
+      {confirmDialog}
     </section>
   );
 });

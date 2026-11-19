@@ -3,7 +3,7 @@ import { dateKeyInTimeZone } from '../../lib/domain/irrigation-history/dates.ts'
 import { formatIrrigationDateTimeInput } from '../../lib/domain/irrigation-format.ts';
 import { millisecondsFromMinutes } from '../../lib/domain/units.ts';
 import { FARM_TIME_ZONE } from '../../lib/domain/water-management.ts';
-import { ouvrirParClic } from './parcours.ts';
+import { confirmerDansLaFenetre, ouvrirParClic } from './parcours.ts';
 
 /**
  * Création d'un matériel prêt à irriguer : une fiche, un réglage, une position
@@ -114,13 +114,14 @@ export async function choisirMaterielEtReglage(page: Page, materiel: string, reg
 /**
  * « Annuler » une irrigation de la liste : rangé dans le menu « … » de sa
  * ligne, loin de « Démarrer maintenant » (audit ergonomique, lot 3,
- * point 6.4, F45). La confirmation du navigateur ne change pas : le parcours
- * l'accepte comme un utilisateur.
+ * point 6.4, F45). La fenêtre de confirmation du module, rouge, remplace la
+ * boîte du navigateur (lot G, n° 8, F413) : le parcours confirme comme un
+ * utilisateur.
  */
 export async function annulerDepuisLeMenu(page: Page, ligne: Locator, action: 'Annuler' | 'Annuler le reliquat' = 'Annuler'): Promise<void> {
   await ligne.locator('.row-menu > summary').click();
-  page.once('dialog', (fenetre) => fenetre.accept());
   await ligne.getByRole('menuitem', { name: action, exact: true }).click();
+  await confirmerDansLaFenetre(page, action === 'Annuler' ? 'Annuler l’irrigation' : 'Annuler le reliquat');
 }
 
 /**

@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot G, PR 4 sur 5)
+
+- **Une seule fenêtre de confirmation** (D-171) : les sept gestes qui
+  passaient par la boîte grise du navigateur se confirment dans la fenêtre
+  du module, le bouton qui efface ou annule en rouge.
+- **« Tout vider » devient « Vider les objectifs »**, le même mot sur le
+  bouton et dans la fenêtre.
+- **« Retirer (stocker) » quitte le rouge** : un geste qui se défait.
+
 ### Modifié (audit du 19 novembre 2026, lot G, PR 3 sur 5)
 
 - **« Refuser » une proposition du planning se confirme** (D-170) : un

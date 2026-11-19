@@ -1,5 +1,6 @@
 'use client';
 
+import { useConfirm } from './shell/use-confirm';
 import type { EquipmentListItem, EquipmentSettingRecord } from '@/lib/domain/equipment-record';
 import { useEffect, useMemo, useState, useTransition, type FormEvent, type ReactNode } from 'react';
 import { interpolateSprinklerRate } from '@/lib/domain/irrigation-calculations';
@@ -50,6 +51,7 @@ export function EquipmentSettingsDialog({ equipment, calculator, onClose }: Prop
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -173,12 +175,13 @@ export function EquipmentSettingsDialog({ equipment, calculator, onClose }: Prop
     });
   };
 
-  const deleteSetting = (setting: EquipmentSettingRecord) => {
-    if (
-      !window.confirm(
-        `Supprimer le réglage « ${setting.name} » ? Cette action est irréversible.`,
-      )
-    ) {
+  const deleteSetting = async (setting: EquipmentSettingRecord) => {
+    if (!(await confirm({
+      title: 'Supprimer ce réglage ?',
+      text: `Supprimer le réglage « ${setting.name} » ? Cette action est irréversible.`,
+      confirmLabel: 'Supprimer le réglage',
+      cancelLabel: 'Garder le réglage',
+    }))) {
       return;
     }
 
@@ -330,6 +333,7 @@ export function EquipmentSettingsDialog({ equipment, calculator, onClose }: Prop
             </p>
           </div>
         )}
+        {confirmDialog}
       </section>
     </div>
   );

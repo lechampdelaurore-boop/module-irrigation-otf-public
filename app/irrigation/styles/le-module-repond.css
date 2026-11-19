@@ -18,6 +18,8 @@
 /* La fenêtre de confirmation du module (F408), dessinée comme « Fait comme prévu ». */
 .module-confirm-dialog {
   width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
   margin: auto;
   inset: 0;
   padding: 20px 20px 16px;

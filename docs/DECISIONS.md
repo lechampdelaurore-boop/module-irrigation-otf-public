@@ -5998,6 +5998,34 @@ recalcul replace souvent le besoin ailleurs.
 Ne changent pas : la règle du refus (D-030) ; le recalcul après un refus ;
 le moteur.
 
+## D-171 — Lot G, PR 4 : une seule fenêtre de confirmation, le rouge pour ce qui efface
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 8 : sept
+gestes se confirment dans la boîte grise du navigateur, les autres dans
+une fenêtre du module ; « Tout vider » ouvre une fenêtre dont le bouton
+dit « Retirer les objectifs », en vert ; « Retirer (stocker) », un geste
+qu'on peut défaire, est dessiné en rouge comme une suppression.
+
+**Décision.**
+
+1. Les sept boîtes du navigateur (archiver et supprimer un matériel,
+   supprimer un réglage, supprimer un groupe de jardins, annuler le
+   reliquat, annuler une irrigation planifiée, supprimer un créneau
+   protégé) deviennent la fenêtre du module (`shell/use-confirm.tsx`, sur
+   `shell/confirm-dialog.tsx`) ; leurs phrases restent, un titre court et
+   deux boutons nommés par leur geste s'y ajoutent (F413).
+2. Le bouton de confirmation est rouge pour ce qui efface ou annule : les
+   sept, « Vider les objectifs », « Refuser le créneau ». « Retirer
+   (stocker) » quitte le rouge (contour neutre) et se confirme en vert
+   (F414).
+3. « Tout vider » devient « Vider les objectifs » ; la fenêtre dit « Vider
+   les objectifs de cette semaine ? » et son bouton « Vider les
+   objectifs » (F415).
+
+Ne change pas : ce que chaque geste fait une fois confirmé.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
