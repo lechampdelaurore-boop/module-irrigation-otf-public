@@ -352,6 +352,22 @@ registres, elle y renvoie.
   appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
 
+- Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
+  F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
+  pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
+  la source et que le porteur a dit « vas-y » sur la fiche ; une seule ferme
+  d'abord, la seconde après une semaine sans défaut grave ; « lecture
+  seule » veut dire rien d'écrit chez OTF, aucun matériel, aucun arrosage
+  déclenché ; accord écrit par version datée, relu gratuitement par le
+  réseau du porteur avant l'envoi ; preuve d'isolation sur de vraies fermes
+  où l'assistant n'ouvre jamais l'espace d'une ferme tierce ; six causes
+  d'arrêt immédiat et un retour en arrière essayé à blanc. Réservé au
+  porteur : le choix et le contact des fermes, la relecture juridique,
+  Access, les secrets, la part du quota (à lui poser à partir du 3 décembre
+  2026), le budget et l'agronomie. La 4.7, sans contrat propre, se ferme avec
+  la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
+  aucun contrôle de code rejoué.
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le

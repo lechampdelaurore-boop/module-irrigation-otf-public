@@ -83,6 +83,15 @@ source détaillée commit par commit.
   seconde irrigation du même matériel sur un créneau déjà planifié
   demande une confirmation dans une fenêtre du module avant d'être écrite.
 - **Un rechargement automatique des besoins ne parle plus.**
+
+### Documentation (le contrat du pilote, 4.6)
+
+- **Contrat de la 4.6** (D-221) : section 10 ter du contrat de la Tranche 4,
+  sans code. Le pilote ne commence que lorsque douze conditions sont
+  vérifiées à la source ; une seule ferme d'abord ; l'isolation se prouve sur
+  de vraies fermes sans que l'assistant ouvre l'espace d'une ferme tierce ;
+  six causes d'arrêt immédiat et un retour en arrière essayé à blanc.
+
 ### Documentation (le contrat de l'exploitation, 4.5)
 
 - **Contrat de la 4.5** (D-220) : section 10 bis du contrat de la Tranche 4,

@@ -6189,3 +6189,34 @@ confidentialité (« une donnée effacée reste récupérable dans l'historique
 jusqu'à 30 jours ») **a été approuvée par le porteur le 19 novembre 2026**
 à 20 h 52 (UTC) ; le code de la 4.5 l'applique telle quelle, sur la page
 de confidentialité du site public, dans la PR 5.
+
+## D-221 — Tranche 4, sous-tranche 4.6 : le contrat du pilote multi-fermes
+
+Date : 19 novembre 2026.
+
+**Contexte.** La 4.6 n'avait que deux lignes au contrat (section 10) : « 1 ou
+2 fermes amies, lecture seule, accord écrit, recette, isolation en
+conditions réelles, retour ». Elle est le premier moment où les données
+d'une personne qui n'est pas le porteur entrent dans le module.
+
+**Décision.** La section 10 ter du contrat de la Tranche 4 (F570 à F580)
+fixe : douze conditions d'entrée, chacune vérifiée à la source et consignée
+sur une fiche signée du « vas-y » du porteur ; le sens de « lecture seule »
+(rien écrit chez OTF, aucun matériel, aucun arrosage déclenché) ; un modèle
+d'accord écrit par version datée, relu gratuitement par le réseau du
+porteur avant tout envoi ; une preuve d'isolation sur de vraies fermes où
+l'assistant n'ouvre jamais l'espace d'une ferme tierce (la personne répond
+pour la sienne, un contrôle de cohérence est rejoué sur une copie de
+l'export) ; six causes d'arrêt immédiat et un retour en arrière essayé à
+blanc ; une seule ferme d'abord, la seconde après une semaine sans défaut
+grave ; un bilan jugé par le porteur qui n'ouvre rien d'elle-même. Aucun
+code de fonctionnalité : un petit contrôle et des corrections. La 4.7, sans
+contrat propre, se ferme avec la 4.3 (F350).
+
+Sont réservés au porteur : le choix et le contact des fermes, l'envoi des
+accords, la relecture juridique, Access, les secrets, le tableau de bord, la
+part du quota (à poser à partir du 3 décembre 2026), le budget et toute
+valeur agronomique.
+
+Ne change pas : le moteur hydrique, le calcul, les coûts (aucune dépense
+nouvelle).
