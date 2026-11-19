@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
-import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
+import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
  * Parcours P10 : planifier la semaine (docs/browser-journeys-contract.md,
@@ -188,9 +188,9 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
   if (await proposees().count() > 0) {
     const troisieme = await carteNommee(planning, proposees().first());
     await montrerLaCarte(planning, troisieme);
-    await troisieme.getByRole('button', { name: 'Refuser' }).click();
+    await refuserLaProposition(page, troisieme);
     await expect(troisieme.locator('.planning-status')).toHaveText('Refusée', { timeout: 30_000 });
-    await expect(troisieme.locator('.planning-proposal-feedback')).toContainText('refusée');
+    await expect(troisieme.locator('.planning-proposal-feedback')).toContainText('Créneau refusé');
     await verifierLEtape(page, journal, 'proposition refusée');
 
     // Relue avec le calcul suivant, la carte refusée se date de son calcul :

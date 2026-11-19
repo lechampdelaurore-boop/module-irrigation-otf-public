@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, useTransition, type CSSProperties, type RefObject } from 'react';
 import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { priorityLabel } from '@/lib/domain/irrigation-feasibility';
-import type { PlanBedOutcome, PlanEventNotice, StoredPlanSuggestion, StoredWeeklyPlan, SupplyBudget } from '@/lib/domain/planning/contract';
+import type { PlanBedOutcome, PlanEventNotice, StoredPlanSuggestion, StoredProposal, StoredWeeklyPlan, SupplyBudget } from '@/lib/domain/planning/contract';
 import {
   PROPOSAL_STATUSES,
   PROPOSAL_STATUS_LABELS,
@@ -50,6 +50,8 @@ import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionCounts, planAc
 import { pageHref } from '@/lib/domain/features/pages';
 import { Icon, type IconName } from '../line-icon';
 import { FigureOrigin } from '../shell/figure-origin';
+import { ConfirmDialog } from '../shell/confirm-dialog';
+import { refusalMessage, refusalReplacement } from '@/lib/domain/planning/refusal-replacement';
 import { proposalsText } from '@/lib/domain/display-words';
 
 type Props = {
@@ -89,7 +91,20 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
   const [pending, startTransition] = useTransition();
   const planRef = useRef(initialPlan);
   useEffect(() => { planRef.current = plan; }, [plan]);
-  const receiveRecalculated = useCallback((recalculated: StoredWeeklyPlan | null) => { setNow(new Date()); setPlan(recalculated); }, []);
+  // Les créneaux refusés qui attendent le recalcul pour dire où leur besoin est allé (lot G, n° 7, F412).
+  const refusals = useRef(new Map<string, StoredProposal>());
+  const [askRefuse, setAskRefuse] = useState<string | null>(null);
+  const receiveRecalculated = useCallback((recalculated: StoredWeeklyPlan | null) => {
+    setNow(new Date());
+    setPlan(recalculated);
+    if (!recalculated) return;
+    for (const [proposalId, refused] of refusals.current) {
+      const replacement = refusalReplacement(refused, recalculated);
+      if (replacement === undefined) continue;
+      refusals.current.delete(proposalId);
+      setFeedback((current) => ({ ...current, [proposalId]: { ok: true, message: refusalMessage(replacement) } }));
+    }
+  }, []);
   const refreshAfterEvent = usePlanRefreshAfterEvents(season, planRef, receiveRecalculated);
   useEffect(() => {
     // Un événement saisi sur une autre page (3.8) — une pluie, une limite, un
@@ -173,11 +188,14 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
   const validate = (proposalIds: string[]) => startTransition(async () => receiveProposals(await validatePlanProposalsAction({ season, proposalIds })));
   const adjust = (proposalId: string, startAt: string, doseMm: number) => startTransition(async () => receiveProposals(await validateAdjustedPlanProposalAction({ season, proposalId, startAt, doseMm })));
   const refuse = (proposalId: string) => startTransition(async () => {
+    setAskRefuse(null);
+    const refused = planRef.current?.proposals.find((proposal) => proposal.storedId === proposalId);
     const result = await refusePlanProposalAction({ season, proposalId });
     setNow(new Date());
     if (!result.ok) { setError(result.message); return; }
     setPlan(result.plan);
-    setFeedback((current) => ({ ...current, [proposalId]: { ok: true, message: result.refused ? 'Proposition refusée : le besoin reste affiché.' : 'Cette proposition avait déjà été décidée.' } }));
+    if (result.refused && refused) refusals.current.set(proposalId, refused);
+    setFeedback((current) => ({ ...current, [proposalId]: { ok: true, message: result.refused ? 'Créneau refusé. Le plan se recalcule pour replacer le besoin…' : 'Cette proposition avait déjà été décidée.' } }));
     setNotice(null);
     setError(null);
     // Un refus est un événement : le serveur recalcule après sa réponse, la section relit le plan quand il est prêt (3.7).
@@ -260,7 +278,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
               const fold = folds.folds[day.dateKey];
               const expanded = dayToggles[day.dateKey] ?? fold === 'open';
               return (
-                <DayBlock key={day.dateKey} day={day} column={index} rows={rows} fold={fold} expanded={expanded} onToggle={() => setDayToggles((current) => ({ ...current, [day.dateKey]: !expanded }))} calculationId={plan.calculation.id} overcommitted={overcommittedDayNotice(plan.calculation.summary.overcommittedDays, day.dateKey, formatVolume)} now={now} pending={pending} feedback={feedback} soilNotes={soilNotes} onValidateDay={validate} onValidate={(id) => validate([id])} onAdjust={adjust} onRefuse={refuse} />
+                <DayBlock key={day.dateKey} day={day} column={index} rows={rows} fold={fold} expanded={expanded} onToggle={() => setDayToggles((current) => ({ ...current, [day.dateKey]: !expanded }))} calculationId={plan.calculation.id} overcommitted={overcommittedDayNotice(plan.calculation.summary.overcommittedDays, day.dateKey, formatVolume)} now={now} pending={pending} feedback={feedback} soilNotes={soilNotes} onValidateDay={validate} onValidate={(id) => validate([id])} onAdjust={adjust} onRefuse={setAskRefuse} />
               );
             })}
           </ol>
@@ -272,6 +290,19 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
       <PlanningSettingsForm initialSettings={initialSettings}>
         <ProtectedSlotsSection initialSlots={initialProtectedSlots} />
       </PlanningSettingsForm>
+      {/* « Refuser » se confirme : un refus vaut pour toute la semaine (D-030 ; lot G, n° 7, F411). */}
+      <ConfirmDialog
+        open={askRefuse !== null}
+        title="Refuser ce créneau pour toute la semaine ?"
+        confirmLabel="Refuser le créneau"
+        cancelLabel="Garder la proposition"
+        tone="erase"
+        pending={pending}
+        onConfirm={() => askRefuse && refuse(askRefuse)}
+        onCancel={() => setAskRefuse(null)}
+      >
+        <p>Ce matériel ne sera plus proposé à ces heures cette semaine ; le besoin sera replacé ailleurs si c’est possible.</p>
+      </ConfirmDialog>
     </section>
   );
 }

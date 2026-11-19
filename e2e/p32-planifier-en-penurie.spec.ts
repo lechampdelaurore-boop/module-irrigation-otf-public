@@ -3,7 +3,7 @@ import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { horodatageLocal, nomUnique, preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
-import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
+import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
  * Parcours P32 : planifier en pénurie (docs/browser-journeys-contract.md,
@@ -201,7 +201,7 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   const creneauRefuse = await refusee.locator('.planning-proposal-time strong').innerText();
   const refuser = refusee.getByRole('button', { name: 'Refuser' });
   await verifierCibleTactile(refuser, 'le bouton « Refuser »');
-  await refuser.click();
+  await refuserLaProposition(page, refusee);
   await expect(refusee.locator('.planning-status')).toHaveText('Refusée', { timeout: 30_000 });
   await expect(meta).toContainText('(après une proposition refusée)', RECALCUL);
   const jourDuRefus = planning.locator('li.planning-day').filter({ has: page.locator(`article.planning-proposal[data-proposal-id="${identifiantRefuse}"]`) });

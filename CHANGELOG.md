@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot G, PR 3 sur 5)
+
+- **« Refuser » une proposition du planning se confirme** (D-170) : un
+  refus vaut pour toute la semaine ; la fenêtre du module le dit avant.
+- **Le message du refus dit où le besoin est allé** : le jour, l'heure et
+  le matériel du créneau qui le replace, ou qu'aucun autre créneau ne
+  reste cette semaine.
+
 ### Modifié (audit du 19 novembre 2026, lot G, PR 2 sur 5)
 
 - **La quantité proposée est la dose du jour** (D-169) : « Irriguer
