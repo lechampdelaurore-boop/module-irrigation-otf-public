@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 5 sur 7)
+
+- **Une échelle de tailles de texte, rien sous 12 px** (D-194) : six
+  tailles de texte en jetons (12, 13, 14, 16, 20 et 28 px) au lieu de
+  trente-six ; plus aucun texte sous 12 px, y compris le plan de
+  « Matériel » ; quatre graisses (300, 400, 500, 700) ; la pastille chiffrée
+  du plan dit ce qu'elle compte, « en mm par heure d'arrosage ». Les grands
+  chiffres et les titres d'affichage gardent leur taille.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 4 sur 7)
 
 - **Mots et formats** (D-193) : les heures s'écrivent « 8 h 50 » et les

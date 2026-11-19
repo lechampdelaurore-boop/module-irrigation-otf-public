@@ -23,7 +23,7 @@
 
   .account-name {
     margin-right: auto;
-    font-size: 13px;
+    font-size: var(--text-13);
   }
 
   .topbar-bell {
@@ -39,7 +39,7 @@
     position: relative;
     width: 24px;
     height: 24px;
-    font-size: 12px;
+    font-size: var(--text-12);
   }
 
   /* Des cibles de 44 px autour de la cloche et de l'initiale, sans grandir la barre. */

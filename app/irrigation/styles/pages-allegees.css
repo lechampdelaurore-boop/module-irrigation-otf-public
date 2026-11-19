@@ -38,7 +38,7 @@
 .page-settings > summary small,
 .species-fold > summary small {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .page-settings > summary::after,
@@ -108,7 +108,7 @@
 
 .soil-beds-same > p {
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .soil-beds-fold > summary {

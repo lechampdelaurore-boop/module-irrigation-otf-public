@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import type { PlanBedOutcome } from '../lib/domain/planning/contract.ts';
 import { informationalBedCount, unplacedDeficitCount, unplacedGroups, unplacedTileDetail, waitingBedCount } from '../lib/domain/planning/action-summary.ts';
@@ -156,4 +156,33 @@ test('n° 22, F476 : « Ressources » et « Réglages » en mots simples ; « Fa
   assert.ok(!feasibility.includes('Analyse préliminaire'));
   assert.match(feasibility, /className="water-notice feasibility-notice"/);
   assert.ok(!readFileSync('app/irrigation/crop-water/crop-coefficients-panel.tsx', 'utf8').includes('sans référence Kc'));
+});
+
+// n° 19 — Une échelle de tailles de texte, rien sous 12 px (PR 5, F477 et F478).
+
+test('n° 19, F477 : six tailles en jetons, aucune taille fixe sous 23 px hors de l’échelle, quatre graisses', () => {
+  const root = readFileSync('app/globals.css', 'utf8');
+  for (const [name, value] of [['12', '.75rem'], ['13', '.8125rem'], ['14', '.875rem'], ['16', '1rem'], ['20', '1.25rem'], ['28', '1.75rem']]) {
+    assert.match(root, new RegExp(`--text-${name}: ${value.replace('.', '\\.')};`));
+  }
+  const sheets = readdirSync('app/irrigation/styles').filter((name) => name.endsWith('.css')).map((name) => `app/irrigation/styles/${name}`);
+  for (const file of [...sheets, 'app/globals.css']) {
+    const css = readFileSync(file, 'utf8');
+    for (const match of css.matchAll(/font-size:\s*([0-9.]+)(px|rem)/g)) {
+      const px = Number(match[1]) * (match[2] === 'rem' ? 16 : 1);
+      assert.ok(px >= 23, `${file} : ${match[0]} hors de l’échelle`);
+    }
+    for (const match of css.matchAll(/font-weight:\s*(\d{3})\b(?!\s*\d)/g)) {
+      assert.ok(['300', '400', '500', '700'].includes(match[1]), `${file} : ${match[0]}`);
+    }
+  }
+  const finish = readFileSync('app/irrigation/styles/finitions-charte.css', 'utf8');
+  assert.match(finish, /small \{\n  font-size: max\(var\(--text-12\), 80%\);/);
+  assert.match(finish, /:where\(main\.app-shell\) :where\(strong, b\) \{\n  font-weight: 700;/);
+});
+
+test('n° 19, F478 : la pastille chiffrée du plan dit ce qu’elle compte', () => {
+  const card = readFileSync('app/irrigation/hierarchy/plot-plan-card.tsx', 'utf8');
+  assert.match(card, /mm par heure d’arrosage/);
+  assert.match(card, /className="plot-coverage-legend"/);
 });

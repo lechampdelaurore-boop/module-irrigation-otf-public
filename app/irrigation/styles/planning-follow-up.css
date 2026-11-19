@@ -12,14 +12,14 @@
 .planning-suggestions h3 {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: 1.125rem;
+  font-size: var(--text-20);
   font-weight: 500;
 }
 
 .planning-suggestions-note {
   margin: .4rem 0 .8rem;
   color: var(--muted);
-  font-size: .85rem;
+  font-size: var(--text-13);
   line-height: 1.5;
 }
 
@@ -59,13 +59,13 @@
 }
 
 .planning-suggestion-head strong {
-  font-size: 1.05rem;
+  font-size: var(--text-16);
 }
 
 .planning-suggestion-head span,
 .planning-suggestion-causes {
   color: var(--muted);
-  font-size: .85rem;
+  font-size: var(--text-13);
   line-height: 1.5;
 }
 
@@ -94,13 +94,13 @@
 
 .planning-changes summary {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .planning-changes ul {
   margin: .6rem 0 0;
   padding-left: 1.1rem;
-  font-size: .9rem;
+  font-size: var(--text-14);
   line-height: 1.5;
 }
 
