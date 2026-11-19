@@ -798,6 +798,147 @@ route d'échange comptent dans le quota (ce contrat les compte) ; le fuseau
 du minuit d'OTF ; les champs de `GET /me` ; si `state` revient avec un
 refus.
 
+### 6.3 bis. Précisions de la PR 1 de la 4.3 : le compteur partagé (19 novembre 2026, D-161, F381 à F390)
+
+Décidées en écrivant le code de la PR 1 (F370, point 1) et écrites dans la
+même PR que lui, la nuit du 18 au 19 novembre 2026, en Opus 5.5 · Max (ligne
+4.3 de la roadmap), sous le mandat de nuit du porteur (« enchaîne, code
+toute la nuit, tout seul »). Elles précisent F359 et F361 à F363 là où le
+code a dû choisir, sans les changer. Toutes suivent l'option recommandée :
+aucune n'est agronomique, ne touche au budget du porteur ni ne change un
+réglage de Cloudflare ; il peut les changer. Le compteur sert dès sa mise
+en ligne la clé du déploiement, la seule jusqu'à la PR 4 : rien ne change à
+l'écran tant qu'Ouvre ta ferme répond dans ses limites.
+
+- **F381 · La ferme, clé du compteur.** Le compteur compte sous
+  l'identifiant de la ferme dans OTF (F361), quelle que soit la clé qui
+  appelle : la lecture d'un espace, sous celui de sa ferme, vérifiée avant
+  tout appel (F342). Le seul appel dont la ferme n'est pas encore connue,
+  le `GET /me` qui la fait connaître quand aucune ferme n'est gardée ni en
+  cache (F339), se compte sous une clé à part,
+  `clé-du-déploiement·ferme-inconnue`, qui n'a pas la forme d'un
+  identifiant de ferme (F327) ; la pause du module entier (F359, F382) se
+  range sous `*`, qui ne l'a pas non plus. Le régulateur en mémoire de
+  l'instance (F334) reste celui de la clé du déploiement jusqu'à la PR 4.
+- **F382 · Après un `429` d'OTF.** Le code se lit dans le corps de la
+  réponse (`error`, `code` ou `error.code`), parmi les quatre que documente
+  OTF (F349) ; rien d'autre n'est deviné, et la forme exacte du corps se
+  constate à l'essai de bout en bout. `rate_limit_day` arrête la ferme
+  jusqu'à l'heure de `Retry-After`, sinon jusqu'à minuit à Paris,
+  changement d'heure compris (F363). `rate_limit_authentication` dit
+  qu'OTF bloque l'adresse du serveur, qui est celle de toutes les fermes :
+  tout le module s'arrête, la durée de `Retry-After`, sinon quinze minutes.
+  Les autres, et un `429` sans code lisible, arrêtent la ferme la durée de
+  `Retry-After`, une seconde au moins. `Retry-After` se lit en secondes ou
+  en date HTTP ; illisible, il est ignoré. La pause s'écrit dans la base,
+  pour toutes les instances ; une pause plus courte ne raccourcit pas celle
+  qui court. Si la base ne répond pas à cet instant, la limite remonte
+  quand même, l'instance tient une seconde en mémoire et le journal le dit
+  (`otf_pause_not_recorded`).
+- **F383 · Le calcul du matin attend.** Ses lectures (le planning de la
+  semaine, l'ETM et la réserve du sol du jour, F364) attendent qu'une
+  minute ait la place au lieu de renoncer : 62 secondes au plus (la minute
+  glissante de 61 secondes, et une seconde), au départ de la lecture comme
+  pour chacun de ses appels. Une page n'attend que cinq secondes (F334). Le
+  bail de deux minutes suffit à une lecture qui tient dans sa réserve ; une
+  lecture du matin de plus de soixante appels pourrait le dépasser et
+  laisser partir une seconde lecture de la ferme, qui ne franchit pas les
+  limites (F385) mais dépense des appels : aucune ferme connue n'en est là.
+- **F384 · Les places réservées.** Elles s'écrivent au départ de la
+  lecture, à son heure, et comptent dans la minute glissante comme des
+  départs, pas dans le compte du jour. Chaque appel de la lecture prend
+  l'une d'elles tant qu'il en reste : elle devient un départ, à l'heure de
+  l'envoi, et compte alors dans le compte du jour ; puis des places
+  neuves, une à une (F362). Une place réservée encore dans la minute n'en
+  demande pas une de plus ; sortie de la minute (une lecture du matin de
+  plus de 61 secondes), elle se juge comme une place neuve. La fin de la
+  lecture rend celles qui restent. La mémoire de l'instance (F334) refuse
+  avant la base un appel dont la place est trop lointaine, pour la même
+  raison, « la minute », sans rien envoyer : la réserve suivante en tient
+  compte de la même façon.
+- **F385 · Ce que garantit la base, et sa limite.** Chaque place se prend
+  par une seule écriture conditionnelle (F361) : les 255 millisecondes et
+  les 30 places en 61 secondes sont tenues à l'instant où la base écrit la
+  place, pour toutes les instances. Entre cette écriture et l'arrivée chez
+  OTF passe le temps d'une réponse de la base, quelques millisecondes :
+  deux instances qui appelleraient la même ferme pourraient arriver chez
+  OTF un peu plus près que 255 millisecondes. La marge de l'espacement
+  (5 millisecondes) et la seconde de la minute le couvrent en partie ;
+  surtout, une seule lecture complète à la fois par ferme (F362) fait qu'en
+  pratique une seule instance appelle une ferme ; un `429` qui en
+  viendrait suivrait F382. Dans une instance, le départ est noté en
+  mémoire juste avant l'envoi, après la place : l'espacement des envois y
+  est exact. Un appel refusé redemande sa place à l'heure que dit la base
+  (l'espacement, la minute), vingt fois au plus ; au-delà, il n'est pas
+  envoyé, comme sur une minute pleine, et le journal le dit
+  (`otf_shared_place_unavailable`).
+- **F386 · Ce que dit la page.** Une lecture qui n'a pas lieu laisse le
+  dernier instantané, avec la raison ; la date des données est celle de la
+  ligne « Dernière synchronisation », juste en dessous, que le message de
+  F363 ne répète donc pas :
+  - minute pleine, ou limite d'OTF à la seconde ou à la minute : « Limite
+    de requêtes OTF atteinte. La dernière lecture réussie est affichée ;
+    nouvelle lecture possible à 22:41. », quand l'heure est connue et dans
+    la journée, sinon le message d'avant (« Patientez quelques minutes
+    avant d'actualiser à nouveau. ») ;
+  - limite du jour (F363) : « Ouvre ta ferme a atteint le nombre d'appels
+    permis aujourd'hui pour cette ferme, tous outils confondus : nouvelle
+    lecture possible demain. » ;
+  - plus de 30 appels : le message de F362 ;
+  - une autre lecture de la ferme en cours (F388) : « Une lecture d'Ouvre
+    ta ferme est déjà en cours pour cette ferme. La dernière lecture
+    réussie est affichée ; actualisez dans un instant. » ;
+  - le frein (F359) ou le blocage d'adresse (F382) : « Connexion à Ouvre ta
+    ferme indisponible. La dernière lecture réussie est affichée. » ; le
+    journal dit le frein (`otf_authentication_brake`, avec son heure de
+    fin).
+
+  Sans dernier instantané, une page d'état par raison (« Limite du jour
+  atteinte », « Lecture en cours », « Lecture au calcul du matin »), qui
+  dit qu'aucune donnée n'a été modifiée.
+- **F387 · Le ménage.** Au départ de chaque lecture complète, dans le même
+  lot que son bail : les départs de plus de deux jours (F361), les comptes
+  du jour de plus de trente jours (F363), les refus d'accès de plus de
+  quinze minutes (F359) et les pauses finies. Aucune tâche planifiée de
+  plus : le calcul du matin lit chaque jour.
+- **F388 · La seconde lecture prend ce que la première a rangé.** Le bail
+  est rendu après l'écriture du cache. Une seconde lecture de la même
+  ferme relève le bail tous les quarts de seconde, cinq secondes au plus
+  (F362), puis relit le cache de son espace : plus récent que celui qu'elle
+  avait trouvé avant, il s'affiche tel quel, sans avertissement ; sinon le
+  sien, avec la raison « lecture en cours ». Deux personnes d'une même
+  ferme ont chacune leur espace et leur cache (F328) : la seconde affiche
+  le sien.
+- **F389 · La mémoire de l'instance ne grandit pas avec le nombre de
+  fermes** (point D5 de la revue de l'isolation). Le régulateur en mémoire
+  d'une ferme (F334) est oublié dès qu'il ne retient plus rien : aucun
+  appel en attente, aucun départ dans les 61 dernières secondes, aucune
+  pause en cours. L'oubli se fait au passage, quand une autre ferme
+  appelle.
+- **F390 · Cinq tables, et ce qu'elles ne contiennent pas.** Migration
+  additive 0032 : `otf_call_starts` (une ligne par départ ou place
+  réservée, gardée deux jours), `otf_daily_calls` (le compte du jour, tenu
+  par deux déclencheurs de la base à chaque départ réel, gardé trente
+  jours), `otf_call_pauses`, `otf_authentication_failures` (quinze
+  minutes) et `otf_farm_reads` (le bail et la base de la réserve). Des
+  fermes (leur identifiant OTF), des heures et des nombres : ni jeton, ni
+  adresse, ni personne. Elles n'appartiennent à aucun espace : le contrôle
+  de cohérence des espaces (F380) les range parmi les tables communes. Le
+  compte du jour s'affichera dans « Réglages » (F367, PR 3) ; la mesure de
+  quatorze jours (F363) commence à la mise en ligne de cette PR.
+
+**Preuves** (F370, PR 1) : `tests/db/otf-farm-read.test.ts` (deux
+instances simulées du connecteur ne dépassent jamais 4 départs par seconde
+ni 30 par minute pour une ferme, quand les deux mémoires seules en
+laisseraient passer plus ; deux lectures simultanées n'en font qu'une ; une
+lecture qui ne peut pas finir n'envoie rien ; la limite du jour, le frein,
+la réserve suivante, la lecture d'un espace de bout en bout, Ouvre ta ferme
+simulé) ; `tests/db/otf-call-ledger.test.ts` (chaque écriture
+conditionnelle de la base) ; `tests/otf-shared-call-pace.test.ts` (les
+règles pures, minuit de Paris et changement d'heure compris) ;
+`tests/otf-read-client-shared-pace.test.ts` (le connecteur et le compteur,
+le point D5) ; `tests/snapshot-policy.test.ts` (les messages de F386).
+
 ## 7. Généralisation : ce qui est propre à la ferme de François (étape 0)
 
 À inventorier **en lisant le code, sans le modifier**, avant 4.4 ; livrable : un tableau « élément · où · pourquoi propre à la ferme · à généraliser comment · question agronomique ? ». Pistes déjà connues : jeu commun de 32 cultures et correspondance de 78 espèces ; valeurs par défaut (K_abri 0,8, rampes tunnel, 10 mm/h mesuré en serre) ; seuils de gel ; noms de lieux dans les recettes ; commune météo par défaut (siège OTF) ; la RFU en mm/m (62 labo, 51 ferme). **Toute valeur agronomique à choisir pour d'autres fermes est une question réservée à François** (une par message). Règle : pour une ferme nouvelle, **aucune valeur de la ferme de François n'est un défaut silencieux** : soit un catalogue neutre, soit « inconnu, à renseigner ».

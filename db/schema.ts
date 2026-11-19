@@ -45,6 +45,75 @@ export const otfDeploymentFarm = sqliteTable(
 );
 
 /**
+ * Le compteur partagé des appels à Ouvre ta ferme (4.3, PR 1,
+ * docs/tranche-4-contract.md, F359, F361 à F363, F381 à F390) : une ligne par
+ * départ ou par place réservée, gardée deux jours.
+ */
+export const otfCallStarts = sqliteTable(
+  'otf_call_starts',
+  {
+    id: integer('id').primaryKey(),
+    paceKey: text('pace_key').notNull(),
+    startedAtMs: integer('started_at_ms').notNull(),
+    parisDay: text('paris_day').notNull(),
+    readId: text('read_id'),
+    reserved: integer('reserved').notNull().default(0),
+  },
+  (table) => [
+    index('idx_otf_call_starts_pace').on(table.paceKey, table.startedAtMs),
+    index('idx_otf_call_starts_started_at').on(table.startedAtMs),
+    index('idx_otf_call_starts_read').on(table.readId, table.reserved),
+    check('chk_otf_call_starts_reserved', sql`${table.reserved} IN (0, 1)`),
+  ],
+);
+
+/** Les appels de chaque ferme par jour de Paris, tenus par les déclencheurs de la migration 0032 ; trente jours. */
+export const otfDailyCalls = sqliteTable(
+  'otf_daily_calls',
+  {
+    paceKey: text('pace_key').notNull(),
+    parisDay: text('paris_day').notNull(),
+    calls: integer('calls').notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.paceKey, table.parisDay] }),
+    index('idx_otf_daily_calls_day').on(table.parisDay),
+  ],
+);
+
+/** La pause d'une ferme, ou du module entier (`*`), pour toutes les instances. */
+export const otfCallPauses = sqliteTable(
+  'otf_call_pauses',
+  {
+    scope: text('scope').primaryKey(),
+    pausedUntilMs: integer('paused_until_ms').notNull(),
+    reason: text('reason').notNull(),
+  },
+  (table) => [
+    check('chk_otf_call_pauses_reason', sql`${table.reason} IN ('rate-limit', 'day-limit', 'authentication-limit', 'authentication-brake')`),
+  ],
+);
+
+/** Les échecs d'authentification (`401`) du module, quinze minutes (F359). */
+export const otfAuthenticationFailures = sqliteTable(
+  'otf_authentication_failures',
+  {
+    id: integer('id').primaryKey(),
+    failedAtMs: integer('failed_at_ms').notNull(),
+  },
+  (table) => [index('idx_otf_authentication_failures_at').on(table.failedAtMs)],
+);
+
+/** Le bail de la lecture complète en cours de chaque ferme et la base de la réserve suivante (F362). */
+export const otfFarmReads = sqliteTable('otf_farm_reads', {
+  paceKey: text('pace_key').primaryKey(),
+  leaseId: text('lease_id'),
+  leaseUntilMs: integer('lease_until_ms').notNull().default(0),
+  reserveBasis: integer('reserve_basis'),
+  updatedAt: updatedAt(),
+});
+
+/**
  * Isolation boundary for irrigation-owned data.
  *
  * OTF remains the source of truth for farms and permissions. Since 4.1

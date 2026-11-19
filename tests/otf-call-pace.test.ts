@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   EMPTY_CALL_PACE,
   holdCallsUntil,
+  isCallPaceIdle,
   nextCallSlot,
   OTF_CALLS_PER_MINUTE,
   OTF_MINUTE_LIMIT_MAX_WAIT_MS,
@@ -94,4 +95,14 @@ test('un appelant qui insiste ne dépasse jamais quatre départs par seconde ni 
     const span = starts[index + OTF_CALLS_PER_MINUTE] - starts[index];
     assert.ok(span > 60_000, `trente et un départs en ${span} ms`);
   }
+});
+
+test('un régulateur qui ne retient plus rien : aucun départ depuis plus de 61 secondes et aucune pause (point D5, F361)', () => {
+  assert.equal(isCallPaceIdle(EMPTY_CALL_PACE, 10_000), true);
+  const started = recordCallStart(EMPTY_CALL_PACE, 10_000);
+  assert.equal(isCallPaceIdle(started, 10_000 + 60_999), false, 'le départ compte encore dans la minute');
+  assert.equal(isCallPaceIdle(started, 10_000 + 61_000), true);
+  const held = holdCallsUntil(started, 10_000 + 90_000);
+  assert.equal(isCallPaceIdle(held, 10_000 + 61_000), false, 'une pause en cours se garde');
+  assert.equal(isCallPaceIdle(held, 10_000 + 90_000), true);
 });

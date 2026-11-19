@@ -2,7 +2,13 @@
 
 import { pageHref, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { closestAvailableSeason } from '@/lib/domain/irrigation-navigation';
-import { FARM_CHANGED_MESSAGE, FARM_UNIDENTIFIED_MESSAGE, type IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
+import {
+  DAY_LIMIT_MESSAGE,
+  FARM_CHANGED_MESSAGE,
+  FARM_UNIDENTIFIED_MESSAGE,
+  READ_TOO_LONG_MESSAGE,
+  type IrrigationUnavailableReason,
+} from '@/lib/domain/snapshot-policy';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import { Topbar } from './topbar';
 
@@ -51,6 +57,30 @@ const TEXTS: Record<IrrigationUnavailableReason, StateText> = {
     body: FARM_UNIDENTIFIED_MESSAGE,
     action: 'Réessayer',
     refresh: true,
+  },
+  // La limite du jour d'OTF est atteinte pour la ferme (F363) : aucun appel ne part avant l'heure qu'OTF a donnée.
+  'day-limit': {
+    eyebrow: 'Limite du jour atteinte',
+    title: 'Ouvre ta ferme ne répond plus aujourd’hui pour cette ferme',
+    body: `${DAY_LIMIT_MESSAGE} Aucune lecture précédente n’est encore enregistrée ; aucune donnée n’a été modifiée.`,
+    action: 'Recharger la page',
+    refresh: false,
+  },
+  // Une autre lecture de la ferme était en cours (F362) : recharger trouve ce qu'elle a rangé.
+  'read-in-progress': {
+    eyebrow: 'Lecture en cours',
+    title: 'Une lecture d’Ouvre ta ferme est déjà en cours',
+    body: 'Une autre lecture de cette ferme est en cours et aucune lecture précédente n’est encore enregistrée. Rechargez la page dans un instant ; aucune donnée n’a été modifiée.',
+    action: 'Recharger la page',
+    refresh: false,
+  },
+  // Plus de 30 appels : la lecture ne se fait qu'au calcul du matin (F362).
+  'read-too-long': {
+    eyebrow: 'Lecture au calcul du matin',
+    title: 'La lecture de cette ferme se fait le matin',
+    body: `${READ_TOO_LONG_MESSAGE} Aucune lecture précédente n’est encore enregistrée ; aucune donnée n’a été modifiée.`,
+    action: 'Recharger la page',
+    refresh: false,
   },
 };
 

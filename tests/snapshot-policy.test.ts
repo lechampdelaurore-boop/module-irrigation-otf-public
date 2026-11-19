@@ -2,12 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { IrrigationSnapshot } from '../lib/domain/domain.ts';
 import {
+  DAY_LIMIT_MESSAGE,
   FARM_CHANGED_MESSAGE,
   IrrigationDataUnavailableError,
+  READ_TOO_LONG_MESSAGE,
   readLiveOrLastSuccessfulSnapshot,
 } from '../lib/domain/snapshot-policy.ts';
 import { OtfApiError } from '../lib/domain/otf/api-contract.ts';
 import { OtfFarmMismatchError } from '../lib/domain/otf/farm-identity.ts';
+import { OtfReadDeferredError, type OtfReadDeferralReason } from '../lib/domain/otf/shared-call-pace.ts';
 
 const completeSnapshot: IrrigationSnapshot = {
   configuration: { seasonFirst: 2026, seasonLast: 2026 },
@@ -205,4 +208,72 @@ test('sans cache, la ferme changée ou inconnue garde son motif, jamais « indis
       (error) => error instanceof IrrigationDataUnavailableError && error.reason === reason,
     );
   }
+});
+
+// --- Les lectures reportées par le compteur partagé (4.3, F362, F363, F386, F388) ---
+
+const deferred = (reason: OtfReadDeferralReason, retryAtMs: number | null = null) => async (): Promise<IrrigationSnapshot> => {
+  throw new OtfReadDeferredError(reason, retryAtMs);
+};
+
+test('une minute pleine : le dernier instantané s’affiche avec l’heure de la prochaine lecture possible, si elle est aujourd’hui (F362, F386)', async () => {
+  const now = new Date('2026-11-18T10:00:00.000Z'); // 11 h à Paris
+  const withTime = await readLiveOrLastSuccessfulSnapshot({
+    readLive: deferred('minute', now.getTime() + 61_000),
+    readCache: async () => completeSnapshot,
+    writeCache: async () => undefined,
+    now: () => now,
+  });
+  assert.equal(withTime.warning, 'Limite de requêtes OTF atteinte. La dernière lecture réussie est affichée ; nouvelle lecture possible à 11:01.');
+
+  const lateEvening = new Date('2026-11-18T22:59:30.000Z'); // 23 h 59 à Paris : la place se libère demain
+  const tomorrow = await readLiveOrLastSuccessfulSnapshot({
+    readLive: deferred('rate-limit', lateEvening.getTime() + 61_000),
+    readCache: async () => completeSnapshot,
+    writeCache: async () => undefined,
+    now: () => lateEvening,
+  });
+  assert.match(tomorrow.warning ?? '', /^Limite de requêtes OTF atteinte\. La dernière lecture réussie est affichée\. Patientez/);
+});
+
+test('la limite du jour, une lecture trop longue, le frein : chacun son message avec le cache, et son motif sans cache (F359, F362, F363)', async () => {
+  const cases = [
+    { reason: 'day-limit', warning: DAY_LIMIT_MESSAGE, motive: 'day-limit' },
+    { reason: 'too-many-calls', warning: READ_TOO_LONG_MESSAGE, motive: 'read-too-long' },
+    { reason: 'authentication-brake', warning: "Connexion à Ouvre ta ferme indisponible. La dernière lecture réussie est affichée.", motive: 'unavailable' },
+    { reason: 'authentication-limit', warning: "Connexion à Ouvre ta ferme indisponible. La dernière lecture réussie est affichée.", motive: 'unavailable' },
+  ] as const;
+  for (const { reason, warning, motive } of cases) {
+    const shown = await readLiveOrLastSuccessfulSnapshot({ readLive: deferred(reason), readCache: async () => completeSnapshot, writeCache: async () => undefined });
+    assert.equal(shown.source, 'cache');
+    assert.equal(shown.warning, warning, reason);
+    await assert.rejects(
+      readLiveOrLastSuccessfulSnapshot({ readLive: deferred(reason), readCache: async () => null, writeCache: async () => undefined }),
+      (error) => error instanceof IrrigationDataUnavailableError && error.reason === motive,
+    );
+  }
+});
+
+test('une autre lecture de la ferme était en cours : ce qu’elle a rangé s’affiche tel quel, sinon le dernier instantané avec la raison (F362, F388)', async () => {
+  const stored: IrrigationSnapshot = { ...completeSnapshot, source: 'cache', lastSuccessfulReadAt: '2026-08-26T10:05:00.000Z' };
+  const reads = [completeSnapshot, stored];
+  const fresh = await readLiveOrLastSuccessfulSnapshot({
+    readLive: deferred('read-in-progress'),
+    readCache: async () => reads.shift() ?? null,
+    writeCache: async () => undefined,
+  });
+  assert.deepEqual(fresh, stored);
+
+  const unchanged = await readLiveOrLastSuccessfulSnapshot({
+    readLive: deferred('read-in-progress'),
+    readCache: async () => completeSnapshot,
+    writeCache: async () => undefined,
+  });
+  assert.equal(unchanged.source, 'cache');
+  assert.match(unchanged.warning ?? '', /déjà en cours pour cette ferme/);
+
+  await assert.rejects(
+    readLiveOrLastSuccessfulSnapshot({ readLive: deferred('read-in-progress'), readCache: async () => null, writeCache: async () => undefined }),
+    (error) => error instanceof IrrigationDataUnavailableError && error.reason === 'read-in-progress',
+  );
 });

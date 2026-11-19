@@ -1,5 +1,5 @@
 import { env } from 'cloudflare:workers';
-import { DEPLOYMENT_KEY_FARM, OTF_MINIMUM_REQUEST_INTERVAL_MS, OtfReadClient } from '@/lib/adapters/otf/read-client';
+import { DEPLOYMENT_KEY_FARM, OTF_MINIMUM_REQUEST_INTERVAL_MS, OtfReadClient, type OtfSharedCallPace } from '@/lib/adapters/otf/read-client';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 
 /**
@@ -20,14 +20,19 @@ export function readOtfDataSource(): 'mock' | 'live' {
 /**
  * Le client de lecture, avec la clé du déploiement, qui reste côté serveur.
  * Avant la 4.3, cette clé mène à une seule ferme : ses appels passent par le
- * régulateur de cette ferme (docs/tranche-4-contract.md, F334).
+ * régulateur en mémoire de cette ferme (docs/tranche-4-contract.md, F334),
+ * puis par le compteur partagé de la base (F361), toujours branché :
+ * celui d'une lecture complète, ou celui d'un appel isolé
+ * (`lib/services/otf-farm-read.ts`).
  */
-export function createOtfReadClient(): OtfReadClient {
+export function createOtfReadClient({ sharedPace, minuteWaitLimitMs }: { sharedPace: OtfSharedCallPace; minuteWaitLimitMs?: number }): OtfReadClient {
   return new OtfReadClient({
     baseUrl: readRequiredServerSetting('OTF_API_BASE_URL'),
     token: readRequiredServerSetting('OTF_API_TOKEN'),
     minimumRequestIntervalMs: OTF_MINIMUM_REQUEST_INTERVAL_MS,
     farmKey: DEPLOYMENT_KEY_FARM,
+    sharedPace,
+    minuteWaitLimitMs,
   });
 }
 

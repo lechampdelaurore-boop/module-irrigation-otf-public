@@ -5588,3 +5588,65 @@ son budget ni ne change ce que voit une ferme.
 
 Ne changent pas : D-155 (F336, passages « fermes » et « personnes »),
 D-156 (F331, le rattachement), D-159.
+
+## D-161 — Tranche 4, sous-tranche 4.3, PR 1 : le compteur partagé des appels à Ouvre ta ferme
+
+Date : nuit du 18 au 19 novembre 2026. Décideur : Claude, à l'option
+recommandée, sous le mandat de nuit du porteur (18 novembre, 21 h 54, heure
+de Paris : « enchaîne, code toute la nuit, tout seul », qui vaut « vas-y »
+pour le code de la Tranche 4 hors ferme réelle, Cloudflare et 3.8) ; en
+Opus 5.5 · Max, réglage de la ligne 4.3 de la roadmap. Après D-160.
+
+**Pourquoi la question.** Le quota d'OTF est celui de la ferme, toutes
+applications confondues ; le module le comptait dans chaque instance du
+serveur (D-157), qui ne voit pas les appels des autres (F334). Le contrat de
+la 4.3 (D-158, F361 à F363) a fixé le principe : le rythme compté dans la
+base pour toutes les instances, une lecture complète à la fois par ferme,
+qui ne part que si elle peut finir, le compte du jour, le `429` du jour et
+le frein des échecs d'authentification. Restaient les choix du code.
+
+**Décision.** Toutes à l'option recommandée (`docs/tranche-4-contract.md`,
+section 6.3 bis, F381 à F390) :
+
+1. Chaque appel prend sa place dans la base par une seule écriture
+   conditionnelle, sous l'identifiant OTF de la ferme ; le seul `GET /me`
+   d'une ferme encore inconnue se compte à part (F381).
+2. Un `429` devient une pause pour toutes les instances : la ferme pour la
+   seconde, la minute et le jour (jusqu'à minuit à Paris sans
+   `Retry-After`), le module entier pour le blocage d'adresse (F382).
+3. Une lecture complète prend un bail de deux minutes et réserve ses
+   places en un seul lot ; elle ne part que si elles tiennent dans la
+   minute glissante ; la fin de la lecture rend les places inutilisées et
+   garde la base de la réserve suivante (F384, F388).
+4. Le calcul du matin attend qu'une minute ait la place, 62 secondes au
+   plus ; une page n'attend que cinq secondes (F383).
+5. Ce que dit la page, raison par raison, avec l'heure de la prochaine
+   lecture possible quand elle est connue et dans la journée (F386).
+6. Le ménage au départ de chaque lecture, sans tâche planifiée de plus
+   (F387) ; la mémoire de l'instance oublie les fermes sans départ récent
+   (point D5, F389).
+7. Cinq tables nouvelles, migration additive 0032, sans jeton, adresse ni
+   personne ; communes à tous les espaces dans le contrôle de cohérence
+   (F390).
+
+**Écart accepté.** La base tient l'espacement à l'instant où elle écrit la
+place, pas à l'arrivée chez OTF : quelques millisecondes de latence entre
+deux instances, couvertes en partie par les marges, et en pratique par une
+seule lecture à la fois par ferme (F385). Faire passer les appels d'une
+ferme par un seul objet de Cloudflare (Durable Object) l'éviterait, au prix
+d'un produit de plus : F361 l'écarte (« Aucun nouveau produit Cloudflare »).
+
+**Ce que le déploiement change.** La migration 0032 s'applique au
+déploiement automatique de la CI, comme les précédentes ; aucune ligne
+existante ne change, aucun réglage de Cloudflare à la main. Le compte du
+jour commence à la mise en ligne : la part du quota laissée au module sera
+posée au porteur après quatorze jours de compte (F363).
+
+**Réservé au porteur.** La part du quota quotidien, après la mesure (F363) ;
+rien d'autre : aucun point n'est agronomique, ne touche à son budget ni ne
+demande un réglage de Cloudflare. Il peut changer ces règles.
+
+Ne changent pas : D-002 (lecture seule, 4 appels par seconde au plus),
+D-003 (rien n'est deviné), D-157 (le régulateur par ferme, qui reste
+devant la base), D-158 (F361 à F363 précisés sans être changés), D-160 (le
+contrôle de cohérence, qui range les tables nouvelles).

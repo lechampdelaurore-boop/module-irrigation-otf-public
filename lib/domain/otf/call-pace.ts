@@ -17,6 +17,11 @@ export const OTF_MINUTE_LIMIT_MAX_WAIT_MS = millisecondsFromSeconds(5);
 // seconde de marge couvre l'écart. Trente appels tiennent donc dans 61
 // secondes au moins, jamais dans une minute.
 const OTF_MINUTE_SAFETY_MARGIN_MS = millisecondsFromSeconds(1);
+/**
+ * La minute glissante, marge comprise : un départ compte tant qu'il a moins
+ * de 61 secondes. Le compteur partagé de la 4.3 (F361) compte sur la même.
+ */
+export const OTF_CALL_WINDOW_MS = OTF_MINUTE_MS + OTF_MINUTE_SAFETY_MARGIN_MS;
 
 /** Ce que le régulateur d'une ferme sait de ses derniers appels, en millisecondes. */
 export type CallPaceState = {
@@ -38,18 +43,19 @@ export const EMPTY_CALL_PACE: CallPaceState = { lastStartedAt: 0, notBefore: 0, 
  * Le prochain départ possible pour un appel qui se présente à `now` : après
  * l'espacement (`spacingMs`, marge comprise) et la pause qui suit une limite
  * atteinte ; si les trente places de la minute sont prises, quand la plus
- * ancienne se libère, à condition que ce soit dans cinq secondes au plus.
- * Sinon l'appel est refusé, et rien n'est compté.
+ * ancienne se libère, à condition que ce soit dans cinq secondes au plus
+ * (`maxWaitMs` ; le calcul du matin, qui peut attendre, en accepte plus :
+ * F362). Sinon l'appel est refusé, et rien n'est compté.
  */
-export function nextCallSlot(state: CallPaceState, now: number, spacingMs: number): CallSlot {
+export function nextCallSlot(state: CallPaceState, now: number, spacingMs: number, maxWaitMs = OTF_MINUTE_LIMIT_MAX_WAIT_MS): CallSlot {
   const spacedAt = Math.max(state.lastStartedAt + spacingMs, state.notBefore, now);
   const inWindow = startsWithinMinute(state.recentStarts, now);
   if (inWindow.length < OTF_CALLS_PER_MINUTE) return { kind: 'start-at', at: spacedAt };
 
   // La place se libère quand le trentième départ avant celui-ci a une minute,
   // marge comprise.
-  const minuteFreesAt = inWindow[inWindow.length - OTF_CALLS_PER_MINUTE] + OTF_MINUTE_MS + OTF_MINUTE_SAFETY_MARGIN_MS;
-  if (minuteFreesAt - now > OTF_MINUTE_LIMIT_MAX_WAIT_MS) return { kind: 'refused', minuteFreesAt };
+  const minuteFreesAt = inWindow[inWindow.length - OTF_CALLS_PER_MINUTE] + OTF_CALL_WINDOW_MS;
+  if (minuteFreesAt - now > maxWaitMs) return { kind: 'refused', minuteFreesAt };
   return { kind: 'start-at', at: Math.max(spacedAt, minuteFreesAt) };
 }
 
@@ -67,9 +73,19 @@ export function holdCallsUntil(state: CallPaceState, until: number): CallPaceSta
   return { ...state, notBefore: Math.max(state.notBefore, until) };
 }
 
+/**
+ * Un régulateur qui ne retient plus rien à `now` : aucun départ dans la
+ * minute glissante, aucune pause en cours. Le connecteur l'oublie alors
+ * (point D5 de la revue de l'isolation, F361) : sa mémoire ne grandit pas
+ * avec le nombre de fermes.
+ */
+export function isCallPaceIdle(state: CallPaceState, now: number): boolean {
+  return state.notBefore <= now && startsWithinMinute(state.recentStarts, now).length === 0;
+}
+
 // Les départs qui comptent encore à `now` : ceux de la dernière minute,
 // marge comprise.
 function startsWithinMinute(starts: readonly number[], now: number): readonly number[] {
-  const horizon = now - OTF_MINUTE_MS - OTF_MINUTE_SAFETY_MARGIN_MS;
+  const horizon = now - OTF_CALL_WINDOW_MS;
   return starts.filter((startedAt) => startedAt > horizon);
 }

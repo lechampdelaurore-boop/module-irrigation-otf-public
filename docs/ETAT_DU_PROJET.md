@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 18 novembre 2026.
+Dernière mise à jour : 19 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -186,10 +186,39 @@ registres, elle y renvoie.
   tests, puis 389 pour chacun des trois passages d'isolation), `pnpm
   build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm
   site:check` réussis en local ; sept sabotages, chacun détecté ; la suite
-  complète des parcours jouée par la CI de la PR. **PR ouverte**
-  (`test/preuves-isolation-c1-c2`). La revue de l'isolation est ainsi
+  complète des parcours jouée par la CI de la PR. **En ligne le
+  19 novembre 2026 à 0 h 49** (consigné par la PR suivante, celle
+  du compteur partagé) : #93 fusionnée à 0 h 31, run 44421479761 vérifié
+  job par job (« Application », « Workers Cloudflare », « Parcours
+  navigateur », « Déploiement Cloudflare » et « Déploiement de la
+  démonstration », verts). La revue de l'isolation est ainsi
   toute reprise : A, C1 à C3 et D1 faits ; B et D2 à D5 au contrat de la
   4.3 ; D6 à l'accord écrit des fermes pilotes (4.6).
+- Tranche 4, **4.3, PR 1 sur 5 : le compteur partagé des appels à OTF**
+  (D-161, F381 à F390, section 6.3 bis de `docs/tranche-4-contract.md`),
+  codée la nuit du 18 au 19 novembre 2026 en Opus 5.5 · Max (ligne 4.3),
+  sous le mandat de nuit du porteur, sans accès d'OTF. Chaque appel prend
+  sa place dans la base, la même pour toutes les instances du serveur,
+  sous l'identifiant de sa ferme (255 millisecondes après le dernier
+  départ, 30 en 61 secondes) ; une lecture complète à la fois par ferme,
+  qui réserve ses places et ne part que si elles tiennent ; une seconde
+  lecture prend ce que la première a rangé ; le calcul du matin attend
+  une minute au plus ; un `429` devient une pause pour toutes les
+  instances, jusqu'à minuit pour la limite du jour ; dix refus d'accès en
+  quinze minutes arrêtent tout appel quinze minutes ; la mémoire de chaque
+  instance oublie les fermes sans départ récent (D5). Le compte du jour de
+  chaque ferme commence à la mise en ligne, gardé trente jours : la part du
+  quota laissée au module sera posée au porteur après quatorze jours
+  (F363). Cinq tables nouvelles (migration additive 0032), sans jeton,
+  adresse ni personne ; rien ne change à l'écran tant qu'OTF répond dans
+  ses limites. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm
+  test` (1 712 tests, puis 411 pour chacun des trois passages
+  d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check` (43 tests),
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; douze
+  sabotages des règles, chacun détecté ; la suite complète des parcours
+  jouée par la CI de la PR. **PR ouverte** (`feat/compteur-partage-otf`).
+  Restent de la 4.3 sans accès d'OTF : la PR 2 (le coffre, endormi) et la
+  PR 5 (les tests de contrat des routes).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

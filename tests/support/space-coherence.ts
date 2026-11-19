@@ -27,11 +27,21 @@ type Reference = {
   when?: string;
 };
 
-/** Les tables qui n'appartiennent à aucun espace : rien de ce qu'elles gardent n'est d'une ferme, ou leur clé est l'espace lui-même. */
+/**
+ * Les tables qui n'appartiennent à aucun espace : rien de ce qu'elles gardent
+ * n'est d'une ferme, ou leur clé est l'espace lui-même. Le compteur partagé
+ * des appels à OTF (migration 0032, F390) compte par ferme d'OTF, pour tous
+ * les espaces de la ferme : des fermes, des heures et des nombres.
+ */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
   'irrigation_crop_alert_common',
+  'otf_authentication_failures',
+  'otf_call_pauses',
+  'otf_call_starts',
+  'otf_daily_calls',
   'otf_deployment_farm',
+  'otf_farm_reads',
   'otf_snapshots',
 ]);
 
@@ -79,9 +89,10 @@ const UNDECLARED: Reference[] = [
  * Les colonnes en `_id` qui ne désignent aucune ligne de la base :
  * identifiants d'Ouvre ta ferme (zones, parcelles, planches, plantes,
  * séries, cultures), personnes, identifiants choisis par le navigateur pour
- * une seule requête.
+ * une seule requête, identifiant d'une lecture complète et de son bail,
+ * tirés par le serveur pour cette seule lecture (F362, F384).
  */
-const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_id|plant_id|series_id|cultivation_id|local_id|request_id)$/;
+const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_id|plant_id|series_id|cultivation_id|local_id|request_id|read_id|lease_id)$/;
 
 /**
  * Les tables qui désignent une culture de référence par sa clé (`crop_key`) :
@@ -96,8 +107,12 @@ const CROP_KEY_TABLES = [
   'irrigation_soil_rooting_profiles',
 ];
 
-/** Les colonnes en `_key` qui ne désignent aucune ligne : clé du cache, d'un lieu météo, d'un traitement, d'un sujet d'alerte. */
-const NOT_A_ROW_KEY = /^(?:cache_key|location_key|job_key|subject_key)$/;
+/**
+ * Les colonnes en `_key` qui ne désignent aucune ligne : clé du cache, d'un
+ * lieu météo, d'un traitement, d'un sujet d'alerte, et la ferme d'OTF dont le
+ * compteur partagé compte les appels (F381).
+ */
+const NOT_A_ROW_KEY = /^(?:cache_key|location_key|job_key|subject_key|pace_key)$/;
 
 const SYSTEM_TABLE = /^(?:sqlite_|_cf_|d1_migrations$|__drizzle)/;
 
