@@ -449,7 +449,12 @@ registres, elle y renvoie.
   de répartition dit d'où vient un manque qu'il ne voit pas, et quoi
   faire ; ses deux avertissements en jargon deviennent des notes ; le
   bassin du moment passe à 5 m³ pour une vraie répartition ; aucun calcul
-  ne change ; codée.
+  ne change ; en ligne le 20 novembre 2026 à 1 h 32 (#114, fusionnée à 1 h 08,
+  run 44643451511 vérifié job par job). **PR 2, la démonstration à son jour** (D-179, F449) :
+  un objectif posé dans la démonstration était daté du jour réel par la
+  base, et la règle le repoussait au lundi suivant fin novembre ; les
+  objectifs et la limite journalière portent désormais l'heure du module,
+  le jour simulé en démonstration, l'heure réelle ailleurs ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

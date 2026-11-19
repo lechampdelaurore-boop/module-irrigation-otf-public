@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit du 19 novembre 2026, lot I, PR 2 sur 5)
+
+- **La démonstration à son jour** (D-179) : un objectif posé dans la
+  démonstration est daté du jour simulé, et compte dès ce jour ; il était
+  daté du jour réel et repoussé à fin novembre, sans effet. La limite
+  journalière de même. Sur une vraie ferme, rien ne change.
+
 ### Modifié (audit du 19 novembre 2026, lot I, PR 1 sur 5)
 
 - **Le manque dit d'où il vient** (D-178) : quand le matériel arrose aussi

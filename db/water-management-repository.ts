@@ -152,12 +152,12 @@ export async function ensureRecurringHydricGoalsForUser(
     `INSERT INTO irrigation_hydric_goal_revisions
        (id, workspace_id, season, week_start, scope_type, otf_zone_id,
         otf_plot_id, otf_bed_id, amount_mm, action, copied_from_goal_id,
-        actor_user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'set', ?, ?)`,
+        actor_user_id, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'set', ?, ?, ?)`,
   ).bind(
     revisionId(), workspaceId, season, weekStart, goal.scopeType,
     goal.otfZoneId, goal.otfPlotId, goal.otfBedId, goal.amountMm,
-    goal.id, ownerUserId,
+    goal.id, ownerUserId, moduleNow(),
   )));
   return listHydricGoalsForUser(ownerUserId, season, weekStart);
 }
@@ -170,12 +170,12 @@ export async function saveHydricGoalForUser(
   await db.prepare(
     `INSERT INTO irrigation_hydric_goal_revisions
        (id, workspace_id, season, week_start, scope_type, otf_zone_id,
-        otf_plot_id, otf_bed_id, amount_mm, action, actor_user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'set', ?)`,
+        otf_plot_id, otf_bed_id, amount_mm, action, actor_user_id, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'set', ?, ?)`,
   ).bind(
     revisionId(), workspaceId, goal.season, goal.weekStart,
     goal.scopeType, goal.otfZoneId, goal.otfPlotId, goal.otfBedId,
-    goal.amountMm, ownerUserId,
+    goal.amountMm, ownerUserId, moduleNow(),
   ).run();
 }
 
@@ -191,11 +191,11 @@ export async function clearHydricGoalsForUser(
   await db.batch(goals.map((goal) => db.prepare(
     `INSERT INTO irrigation_hydric_goal_revisions
        (id, workspace_id, season, week_start, scope_type, otf_zone_id,
-        otf_plot_id, otf_bed_id, amount_mm, action, actor_user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 'cleared', ?)`,
+        otf_plot_id, otf_bed_id, amount_mm, action, actor_user_id, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 'cleared', ?, ?)`,
   ).bind(
     revisionId(), workspaceId, season, weekStart, goal.scopeType,
-    goal.otfZoneId, goal.otfPlotId, goal.otfBedId, ownerUserId,
+    goal.otfZoneId, goal.otfPlotId, goal.otfBedId, ownerUserId, moduleNow(),
   )));
   return goals.length;
 }
@@ -536,12 +536,12 @@ export async function saveDailyWaterLimitForUser(
   await db.batch([waterBudgetRevisionStatement(ownerUserId), db.prepare(
     `INSERT INTO irrigation_daily_water_limit_revisions
        (id, workspace_id, season, enabled, max_cubic_meters_per_day,
-        valid_from, valid_until, note, actor_user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        valid_from, valid_until, note, actor_user_id, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(
     revisionId(), workspaceId, input.season, input.enabled ? 1 : 0,
     input.enabled ? input.maxCubicMetersPerDay : null,
-    input.validFrom, input.validUntil, input.note, ownerUserId,
+    input.validFrom, input.validUntil, input.note, ownerUserId, moduleNow(),
   )]);
 }
 
@@ -562,6 +562,16 @@ function defaultWeatherPreference(): WeatherPreference {
     lastAutomaticRefreshSuccessAt: null,
     lastAutomaticRefreshError: null,
   };
+}
+
+/**
+ * L'heure du module pour la date d'écriture qu'une règle relit (audit du
+ * 19 novembre 2026, lot I, n° 10, F449) : le jour simulé en démonstration,
+ * l'heure réelle ailleurs, jamais l'horloge de la base, qui ignore la
+ * démonstration. Même forme que la valeur par défaut de la base.
+ */
+function moduleNow(): string {
+  return new Date().toISOString();
 }
 
 function revisionId() {

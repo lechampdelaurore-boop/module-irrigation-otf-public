@@ -6223,6 +6223,30 @@ répartition a un choix à proposer (F448, une donnée de la ferme fictive).
 Ne changent pas : le moteur du planning, la faisabilité, les besoins, les
 gestes. Logiciel multi-fermes : la phrase vaut pour toute ferme dont le
 matériel arrose des planches sans besoin.
+
+## D-179 — Lot I, PR 2 : la démonstration à son jour
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 10 : un
+objectif « ferme entière » de 60 mm posé dans la démonstration apparaissait
+dans la liste, mais ne changeait ni les besoins ni « Aujourd'hui ». **Cause
+vérifiée** : la révision recevait sa date de la base (`created_at`, horloge
+réelle) ; la démonstration vit au jour simulé (juin, juillet) ; la règle
+qui fait compter un objectif posé après sa semaine à partir du lundi qui
+suit (`goalRevisionFirstDate`, D-034) le repoussait à fin novembre.
+
+**Décision.** Les écritures dont une règle relit la date portent l'heure
+du module au lieu de celle de la base : les révisions d'objectif (posées,
+reprises de la semaine précédente, vidées) et la limite journalière, dont
+la plus récente l'emporte (F449). En démonstration, l'heure du module est
+le jour simulé ; ailleurs, l'heure réelle, à la même forme que la valeur
+par défaut de la base. Inventaire établi dans le code : les créneaux
+protégés et les objectifs adoptés portaient déjà l'heure du module ; les
+autres dates d'écriture ne sont relues par aucune règle.
+
+Ne changent pas : la règle D-034, les calculs, la ferme réelle (son heure
+du module est l'heure réelle). Aucune migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
