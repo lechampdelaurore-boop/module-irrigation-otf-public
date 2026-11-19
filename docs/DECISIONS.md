@@ -5942,3 +5942,29 @@ Ne change pas : le moteur hydrique ni les jeux de réglages communs
 (section 11 du contrat), sauf la borne de l'ET0, à confirmer contre le
 contrat commun avant le code. Aucune question de budget.
 
+## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
+
+Date : 19 novembre 2026.
+
+**Contexte.** La mise à jour météo est restée en panne du 14 au 19 novembre
+2026 sans que personne ne le voie (D-164 à D-166), la restauration de la
+base D1 n'a jamais été essayée (sections 10, 14 et 15 du contrat), et
+l'effacement d'une ferme est volontairement incomplet (F360).
+
+**Décision.** La section 10 bis du contrat de la Tranche 4 (F560 à F569)
+fixe : un registre des tâches attendues, dont l'état se calcule sur la
+dernière réussite et passe en orange puis en rouge quand elle manque ; une
+veille quotidienne, sur un déclencheur distinct, qui prévient l'exploitant ;
+une page d'état réservée à l'exploitant ; des journaux à noms stables sans
+donnée sensible ; la sauvegarde et la restauration de D1 essayées sur une
+base d'essai fictive (retour en arrière, reconstruction depuis un export,
+perte de la clé maîtresse), jamais sur la production ; une durée de
+conservation écrite par donnée ; l'effacement complet d'une ferme sous sept
+jours, annulable, prouvé par un test d'exhaustivité ; un document de
+support pour une seule personne. Cinq PR, une à la fois. Le porteur a
+tranché le 19 novembre 2026 à 13 h 48 la seule question de budget : un
+export hebdomadaire chiffré gardé par lui, gratuit, sans R2 ni service tiers.
+
+Ne change pas : le moteur hydrique, le calcul, les coûts (aucune dépense
+nouvelle). Reste à relire par le porteur avant le code : la phrase des
+30 jours ajoutée à la politique de confidentialité.

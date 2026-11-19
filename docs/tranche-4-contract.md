@@ -1454,6 +1454,241 @@ en Opus 5.5 · Élevé. Trois réponses du porteur le même soir, une par une.
 
 **4.6.** 1 ou 2 fermes amies, d'abord en lecture seule, **accord écrit de chacune**, recette sur chaque écran, preuve d'isolation **en conditions réelles** (A ne voit jamais B), retour des fermes consigné. Aucune ouverture au-delà avant le retour du pilote. Question 3 (section 12).
 
+### 10 bis. Précisions de la 4.5 : exploitation, sauvegardes, conservation, effacement et support (19 novembre 2026, D-220, F560 à F569)
+
+Écrites avant le code, le 19 novembre 2026, en Sonnet 5.5 · Moyen (contrat sans code ; le code de la 4.5 est en Opus 5.5 · Très élevé, ligne 4.5 de la roadmap). Elles précisent la section 10. Leçon centrale : la panne de la mise à jour météo du 14 au 19 novembre 2026 est passée inaperçue cinq jours (échec silencieux, affichage vert ; correctifs D-164 à D-166). Marques : **[NON VÉRIFIÉ]**, **[À FAIRE]** (à lire ou mesurer au début du code).
+
+#### 10 bis.1 · Objet
+
+Ouvrir le module à d'autres fermes ne tient que si **une défaillance se voit, se rattrape et se prouve**. Aujourd'hui, trois faits dits en clair :
+
+- Une panne peut durer des jours sans que personne ne le sache : la réanalyse d'Open-Meteo a échoué du 14 au 19/11 pendant que l'écran restait vert (correctifs #97, #98, #99, D-164 à D-166). Le seul garde-fou posé est local : un avertissement affiché sur deux pages. **Rien ne prévient l'exploitant.**
+- Le contrat dit que la restauration de la base D1 n'a **jamais été essayée** (sections 10, 14, 15).
+- L'effacement d'une ferme est **volontairement incomplet** : F360 garde ce que la personne a saisi « jusqu'à une demande d'effacement (4.5) ». Cette demande n'existe pas encore.
+
+#### 10 bis.2 · Contraintes tenues
+
+1. Celles de la section 2 du contrat (inconnu reste inconnu ; OTF en lecture seule ; 4 requêtes par seconde au plus ; aucun secret vu par l'assistant).
+2. **Aucune dépense nouvelle sans l'accord du porteur écrit** (le budget se demande toujours au porteur). Le plan retenu en recommandation **n'ajoute aucun service payant** : tout tient dans l'abonnement Workers déjà pris (D-017).
+3. **Aucun essai sur la ferme réelle ni sur sa base de production.** Les essais de sauvegarde et de restauration se font sur **une base D1 d'essai, créée puis détruite**, jamais sur `module-irrigation-otf`. Une restauration en production écrase tout sur place (voir 4.5-b) : elle n'est jamais jouée « pour voir ».
+4. Les journaux et la page d'état ne contiennent **aucun jeton, `code`, `state`, `code_verifier`, nom de ferme ni contenu agronomique** (F354). Une ferme se nomme par son identifiant interne.
+5. Une table ou une colonne `_id` / `_key` nouvelle est rangée dans `tests/support/space-coherence.ts` ; aucune requête n'écrit `owner_user_id = ?` ni `otf_farm_id IS NULL` hors `db/workspace-scope.ts`.
+6. Tout appel à OTF passe par le régulateur et le budget du jour de la 4.3 ; la 4.5 **n'ajoute aucun appel à OTF**.
+7. Aucune donnée n'est copiée dans un lieu public. **Le dépôt est public** : un export de la base n'y est jamais déposé, ni en fichier, ni en « artefact » d'une exécution GitHub Actions (ils sont lisibles de tous).
+
+#### 10 bis.3 · La leçon de la panne météo, posée en règle
+
+Ce qui est passé inaperçu cinq jours, et pourquoi (constats du 19/11) :
+
+| Cause | Règle qui l'aurait vue |
+| --- | --- |
+| Le vert s'appuyait sur « la dernière **tentative** » ou une date ancienne restée affichée | **R1.** L'état se calcule sur la dernière **réussite**, jamais sur la dernière tentative |
+| Un échec « réseau » immédiat, sans statut ni réponse, était compté comme panne passagère | **R2.** Un échec qui **se répète** n'est plus « passager » : au-delà de N échecs consécutifs, il passe en rouge |
+| Rien ne dit « il manque quelque chose qui devait arriver » | **R3.** Chaque tâche automatique **déclare son rythme attendu** ; une réussite qui manque après son délai est un défaut, même sans aucune erreur |
+| L'alerte n'existait que sur l'écran de la personne | **R4.** Un défaut **remonte à l'exploitant** sans qu'il ouvre rien |
+| Le contrôle dépendait de la tâche qui était en panne | **R5.** Le contrôle est **un autre déclencheur**, qui ne dépend pas de ce qu'il surveille |
+| Un correctif a été déclaré en ligne sans voir la tâche réussir (« non vérifié sur le site ») | **R6.** Après chaque déploiement qui touche une tâche automatique, **on attend sa prochaine réussite** avant de dire « réglé » |
+
+#### 10 bis.4 · Les points
+
+##### F560 (4.5-a) · Le registre des tâches attendues (R1, R2, R3)
+
+Un registre en code (pas en base : il fait partie du module, il se relit en revue) liste **chaque tâche automatique** avec : son nom, son **rythme attendu**, son **délai de tolérance**, son effet si elle manque, et **où est gardée sa dernière réussite**.
+
+| Tâche | Rythme attendu | Orange à | Rouge à | Où est gardée la dernière réussite |
+| --- | --- | --- | --- | --- |
+| Synchronisation météo de 6 h 15 (prévisions) | 1 par jour | 30 h | 36 h (reprend D-165) | état automatique du workspace (existe) |
+| Réanalyse (pluie estimée après coup) | 1 par jour | 30 h | 36 h | [À FAIRE] vérifier qu'elle a **sa propre** date de réussite, distincte de celle des prévisions : le 14/11 les prévisions passaient, la réanalyse non |
+| Calcul du matin | 1 par jour | 30 h | 36 h | [À FAIRE] à lire dans le code |
+| Rotation du coffre au matin (`otf_vault_morning`) | 1 par jour | 30 h | 36 h | [À FAIRE] aujourd'hui journal seulement : à mémoriser |
+| Lecture d'OTF par ferme (4.3, PR 4) | selon le raccordement | 12 h | 24 h | [À FAIRE] à poser avec la PR 4 de la 4.3 |
+| Sauvegarde (4.5-b) | 1 par semaine | 8 jours | 10 jours | nouveau |
+| Export hors Cloudflare, fait par le porteur (10 bis.9) | 1 par semaine | 8 jours | 10 jours | geste « J'ai fait l'export du … » de la page d'état |
+| Veille de l'exploitant (4.5-g) | 1 par jour | — | pas de réponse = alerte de dernier recours | nouveau |
+
+Règles : (i) **les seuils sont ici, en code, avec leur raison** ; un seuil changé passe par une PR ; (ii) une tâche **jamais réussie** est « jamais exécutée », en orange, **pas en vert** ; (iii) l'état d'une tâche = `ok` / `en retard` / `en panne` / `jamais exécutée`, calculé à la lecture à partir de la dernière réussite et de l'heure courante (pas de champ « statut » recopié qui pourrait mentir) ; (iv) **N échecs consécutifs** (recommandation : **3 jours de suite**) passent la tâche en `en panne` même si une date de réussite récente existe, quand cette réussite est partielle (R2) ; (v) tout nouveau job planifié **doit** s'inscrire au registre, **vérifié par un test** qui lit les déclencheurs (`wrangler.jsonc` et `cloudflare/*/wrangler.*`) et échoue pour un cron absent du registre.
+
+[NON VÉRIFIÉ] Où est gardée la dernière réussite de chaque tâche : à dresser au début du code (la colonne ci-dessus).
+
+##### F561 (4.5-b) · Sauvegardes de la base D1, et **restauration essayée pour de vrai**
+
+Ce que la documentation de Cloudflare établit (**lue le 19/11** ; à relire avant le code) :
+
+- **Time Travel** : restauration de la base à un instant passé, **30 jours** sur l'offre Workers payante (7 sur la gratuite) ; **sans frais supplémentaires** ; commande `wrangler d1 time-travel restore <base> --timestamp=<instant>` (ou `--bookmark`) ; la base doit être en version « production » (`wrangler d1 info`).
+- **La restauration écrase la base sur place**, annule les requêtes en cours, et rend **un signet de l'état d'avant** pour pouvoir revenir.
+- **Export** : `wrangler d1 export <base> --remote --output=…` ; il **bloque les autres requêtes** pendant qu'il tourne ; les tables virtuelles (FTS5) ne s'exportent pas ; la précision des très grands entiers n'est pas garantie.
+
+Conséquences posées :
+
+1. **Pas d'essai sur la production** (contrainte 3). L'essai se fait sur **une base d'essai** `module-irrigation-otf-essai-restauration`, remplie à partir de l'export d'une base de **données fictives** (deux fermes fictives, dont « Ferme v2 » n° 4394 en copie fictive), puis détruite à la fin.
+2. **Trois scénarios essayés**, chacun avec un résultat écrit dans le compte rendu :
+   - **S1, revenir en arrière** : on écrit des données, on note l'instant, on en efface une partie, on restaure à l'instant noté avec Time Travel, **on compare table par table** (nombre de lignes et empreinte du contenu) avec l'état noté ; on vérifie que le **signet d'avant** permet de revenir à l'état abîmé.
+   - **S2, reconstruire depuis un export** : base neuve, migrations appliquées, import de l'export, **mêmes comparaisons** ; puis les tests d'isolation à deux fermes (4.1 + 4.2) **joués contre cette base restaurée**.
+   - **S3, perdre la clé** : après restauration, le coffre des jetons **sans** la clé maîtresse : les raccordements sont dits « hors d'usage » (4.3, F355) et chaque ferme est invitée à **se reconnecter** ; **aucune clé n'apparaît en clair** nulle part. Avec la bonne clé : les jetons se lisent.
+3. **Un défaut doit casser le test** : comme pour la 4.3, la preuve compte des **sabotages** (retirer une table de l'export, corrompre une ligne, oublier une migration) que le contrôle doit détecter.
+4. **Rattrapage d'une seule ferme** : Time Travel restaure **toute la base, donc toutes les fermes**. Pour l'erreur d'une seule ferme, la procédure écrite est : restaurer **sur une copie**, en extraire les lignes de cette ferme (par la clé d'espace), les réinsérer. Cette extraction est **essayée en S1** sur la ferme fictive A, la ferme fictive B devant rester **inchangée** (empreinte identique).
+5. **Copie hors de Cloudflare** (une sauvegarde dans le même compte ne protège pas de la perte du compte) : voir la décision de la section 10 bis.9. L'export contient des données personnelles et des jetons chiffrés : **jamais dans le dépôt, ni en artefact de GitHub Actions** (contrainte 7).
+6. **Garde de la clé maîtresse** : sans elle, l'export et la restauration ne rendent pas les jetons lisibles. La clé **est gardée par le porteur, hors du module et hors du dépôt** (il la saisit lui-même, règle des secrets) ; la procédure dit où et comment sans jamais la montrer à l'assistant.
+7. Un script de sauvegarde (`pnpm backup:export`) et un script d'essai (`pnpm backup:rehearse`) vivent dans le dépôt, **sans aucun secret en dur** ; leurs sorties ne contiennent pas de données.
+
+[NON VÉRIFIÉ] : la **finesse** de Time Travel (à la minute ?), le **comportement réel** d'une restauration sur une base qui a des migrations récentes, et la durée d'un export sur une base qui grossit : à mesurer pendant l'essai, pas à supposer.
+
+##### F562 (4.5-c) · Conservation : une durée écrite par donnée
+
+Une table dans le contrat, relue par la PR, qui dit **combien de temps** on garde chaque donnée et **qui l'efface** (une tâche planifiée du registre 4.5-a). Propositions de départ, à confirmer en lisant le code :
+
+| Donnée | Durée proposée | Pourquoi |
+| --- | --- | --- |
+| Journaux d'invocation du Worker | 7 jours (Cloudflare, existe, F354) | diagnostic ; non modifiable route par route |
+| Journal des appels à OTF (compteur partagé, migration 0032) | **35 jours** | assez pour lire un mois de quota |
+| Instantanés lus dans OTF (cache) | tant que la ferme est reliée ; **effacés à la déconnexion** (F360, existe) | ce sont des copies |
+| Données saisies par la personne (matériel, ressources, arrosages, pluie, observations, réglages) | tant que l'espace existe ; **après « Déconnecter la ferme » : 90 jours puis effacement**, sauf demande plus tôt | F360 les garde « jusqu'à une demande d'effacement » : on y met une borne |
+| Observations météo et prévisions | tant que l'espace existe | alimentent le bilan |
+| Abonnements de notification d'un appareil | jusqu'à la désinscription ; **effacés après 90 jours sans réponse du service de push** | un appareil perdu ne reste pas |
+| Demandes d'autorisation OTF en cours (4.3, PR 3) | quelques minutes ; **purge au matin** de celles expirées | à usage unique |
+| Journal d'accès du support (4.5-h) | 12 mois | traçabilité de ce que l'exploitant a consulté |
+| Sauvegardes (Time Travel) | 30 jours (Cloudflare) ; export hors compte : export chiffré gardé par le porteur (10 bis.9) | voir ci-dessous |
+
+**Dit sans détour dans le texte de confidentialité** : une donnée effacée **reste récupérable dans l'historique Time Travel jusqu'à 30 jours** après l'effacement. Cette phrase s'ajoute au texte de la page de confidentialité (4.8). **Ce texte passe en relecture de le porteur avant la PR**, comme il l'a fait pour #96 : l'assistant ne le fixe pas seul.
+
+[À FAIRE] dresser, **table par table à partir de `db/schema.ts` et `tests/support/space-coherence.ts`**, la liste réelle des données personnelles ; le tableau ci-dessus est une base, pas un inventaire.
+
+##### F563 (4.5-d) · Suppression complète d'une ferme (le reste de F360)
+
+**La demande.** Le propriétaire de la ferme, dans « Réglages » : « Supprimer ma ferme et mes données », **après avoir tapé le nom de la ferme**. Elle explique ce qui disparaît, ce qui reste dans l'historique 30 jours, et que l'autorisation chez OTF doit être retirée **par un administrateur de la ferme dans Ouvre ta ferme** (le module ne peut pas la retirer : F360).
+
+**Le délai.** L'effacement a lieu **7 jours après la demande** (recommandation), **annulable** pendant ce délai ; pendant ces 7 jours la ferme est **figée** (aucun calcul, aucune notification, aucun appel à OTF). Un effacement immédiat est possible **sur demande écrite de la personne à l'exploitant**, pas depuis l'écran.
+
+**Ce qui est effacé** : jetons (d'accès et de renouvellement) et ligne du coffre ; instantanés ; réglages ; matériel, ressources, planches, arrosages, pluie, observations, événements ; abonnements de notification de cet espace ; lignes du journal des appels de cette ferme ; l'espace lui-même et son rattachement. **Ce qui reste** : un **enregistrement minimal** de la demande (identifiant interne, date de la demande, date d'effacement ; **ni nom, ni contenu**) pour pouvoir **prouver** qu'elle a été traitée.
+
+**La preuve, le cœur du point.**
+
+1. **Un test d'exhaustivité** : il parcourt **toutes les tables qui portent une clé d'espace** (la liste de `space-coherence.ts`) et **échoue** si l'une n'est pas couverte par l'effacement **ou rangée explicitement dans une liste « conservée » justifiée**. Une table ajoutée plus tard sans règle d'effacement **casse la CI**.
+2. **Un test à deux fermes** : on efface A ; **B est strictement inchangée** (empreinte table par table avant et après) ; aucune ligne de A ne subsiste (comptage par table).
+3. **Un test de reprise** : l'effacement coupé au milieu (panne simulée) **reprend sans rien oublier ni rien effacer d'autre** ; il ne laisse jamais une ferme « à moitié » ; il se fait **par lots bornés** (la base D1 limite le travail par requête) [À FAIRE : mesurer la limite].
+4. **Un test d'annulation** dans les 7 jours.
+5. Le résultat se **lit** : la page d'état de l'exploitant (4.5-f) montre « demandes d'effacement : N en attente, N faites, **dernière faite le …** » et le registre 4.5-a surveille **la tâche d'effacement** comme les autres (une demande en retard passe en rouge).
+
+##### F564 (4.5-e) · Observabilité par ferme, sans donnée sensible
+
+Pour **chaque ferme**, calculées à la lecture (aucun nouveau secret, aucun contenu) :
+
+- **taux d'erreurs OTF** sur 24 h et sur 7 jours (réponses `401`, `403`, `429`, `5xx`, délai dépassé, « réseau ») ;
+- **quota consommé** du jour sur la part de la ferme (F363) ;
+- **dernière synchronisation** réussie avec OTF, **dernière météo** réussie, **dernier calcul du matin** réussi ;
+- état du **raccordement** (reliée, révoquée par OTF, hors d'usage) ;
+- état de **l'accueil** (4.4-a), pour savoir où la personne s'est arrêtée.
+
+**Journaux.** Les événements journalisés ont **un nom stable** (`otf_call_failed`, `weather_sync_failed`, `morning_failed`, `backup_failed`, `erasure_step`…) et des champs **listés** : identifiant interne de la ferme, nom de la tâche, classe d'erreur, statut HTTP, durée. **Un test** parcourt les journaux produits par les essais et **échoue** si une valeur ressemble à un jeton, un `code`, une adresse de retour ou un nom de ferme. Pour une panne comme celle du 14/11, la **vraie erreur** (nom, message, cause, durée, sans adresse ni clé) est déjà journalisée depuis #97 : la 4.5 **la garde sous un nom stable** et la remonte (4.5-f).
+
+##### F565 (4.5-f) · La page d'état de l'exploitant
+
+Une page `/irrigation/exploitation` (nom à confirmer) **réservée à l'exploitant** (la personne propriétaire du déploiement, aujourd'hui le porteur ; le droit se lit côté serveur, jamais depuis le navigateur). Elle dit, en mots simples :
+
+1. **Le jugement d'ensemble** en une ligne (« Tout va bien » / « N tâches en retard » / « N tâches en panne ») ;
+2. **Les tâches du registre** (4.5-a), avec leur dernière réussite, leur état et la dernière erreur journalisée ;
+3. **Les fermes** : une ligne par ferme (identifiant, état du raccordement, quota du jour, dernière synchronisation), triées **les plus en difficulté d'abord** ;
+4. **La sauvegarde** : date du dernier export réussi, date du dernier essai de restauration ;
+5. **Les demandes d'effacement** (4.5-d) ;
+6. **Les coûts** : lignes lues/écrites D1, requêtes Workers, calcul, **copiés à la main tous les mois** depuis le tableau de bord (la lecture du tableau de bord passe par le Chrome du porteur, avec l'accord du porteur à chaque fois) ; la page n'appelle pas l'API de Cloudflare.
+
+Mêmes règles que le reste du module : **deux largeurs** (1440 et 390 px), mots simples, jamais un « 0 » ou un vert qui cache un manque.
+
+##### F566 (4.5-g) · La veille de l'exploitant : « Cela remonte à l'exploitant » (R4, R5)
+
+Un **déclencheur distinct** de ceux qu'il surveille (R5), une fois par jour (recommandation : **9 h, heure de Paris**, après le matin et la météo de 6 h 15) : il lit le registre (4.5-a) et, **si au moins une tâche est `en retard` ou `en panne`**, envoie **une notification web push à l'exploitant** qui dit **quelle tâche** et **depuis quand**, avec le lien vers la page d'état. Pas de notification quand tout va bien (pas de bruit) ; **une notification « tout va bien » par semaine** (le dimanche) prouve que la veille elle-même tourne.
+
+- **Aucun service nouveau** : on réutilise le Worker Push existant et le planificateur (un déclencheur de plus). [À FAIRE] vérifier que le Worker Push peut s'adresser **à l'exploitant seul** sans passer par un espace de ferme.
+- **Si la veille elle-même tombe** (le site ne répond pas, le Worker Push non plus) : la notification du dimanche manque, et **l'exploitant sait qu'il doit regarder** (la règle est écrite dans la procédure 4.5-h). Un contrôle extérieur gratuit (service tiers de type « sonde ») ajouterait un tiers et une donnée à protéger : **non retenu** ; on y reviendra si le pilote le justifie.
+- **Preuve** : un test **sabote** chaque tâche du registre (plus de réussite depuis 37 h ; 3 échecs consécutifs) et vérifie que la notification part avec le bon nom ; un test vérifie qu'**une panne qui dure ne renvoie pas** la même notification plus d'une fois par jour.
+
+##### F567 (4.5-h) · Le support par une seule personne
+
+Un document `docs/exploitation.md` (l'état du projet et la roadmap y renvoient), court, qui dit **ce que fait l'exploitant** quand :
+
+- **une notification de panne arrive** (4.5-g) : où regarder, dans quel ordre, ce qui est réglable sans code, ce qui demande un correctif ;
+- **une ferme écrit** : un gabarit de réponse ; ce que l'exploitant peut dire **sans ouvrir ses données** (état du raccordement, quota, dernière synchronisation : la page d'état suffit) ;
+- **une ferme demande l'effacement** : le chemin de 4.5-d ;
+- **la base est abîmée ou perdue** : les trois scénarios de 4.5-b, pas à pas ;
+- **la clé maîtresse est perdue ou soupçonnée** : rotation essayée (F355 : clé précédente), puis reconnexion des fermes ;
+- **OTF révoque, change ses conditions ou ferme son API** : les fermes sont prévenues par le module, le module s'arrête **proprement** (voie de secours F369 non retenue pour l'instant) ;
+- **un compte ou un déploiement est perdu** : redéploiement propre depuis Git (D-016) et reprise de la dernière sauvegarde.
+
+**Accès de l'exploitant aux données d'une ferme.** L'engagement de la page de confidentialité est que l'exploitant **ne consulte les données d'une ferme que pour…** (formulation validée le 19/11 à 7 h 54, 4.3 PR 2). **La 4.5 n'ajoute aucun accès** : la page d'état n'affiche aucun contenu agronomique ; si le support en exige un, c'est **sur demande de la ferme**, **consigné** dans un journal d'accès (date, ferme, raison en une ligne, **sans** le contenu consulté) gardé 12 mois (4.5-c).
+
+**Engagements de délai** : aucun pendant le pilote (une seule personne). La page d'aide le dit : « Réponse en général sous deux jours ouvrés, sans engagement. » (formulation à valider avec le texte de la 4.8).
+
+##### F568 (4.5-i) · Les coûts relus un mois après la première ferme
+
+Reprise de la section 10 : relire au tableau de bord, **un mois après la première ferme tierce reliée**, requêtes, calcul, lignes lues et écrites, stockage D1 ; comparer à l'estimation (≈ 5 $/mois jusqu'à 30 fermes, le calcul étant le poste le plus proche du plafond : ≈ 307 ms par requête mesurés le 9/11) ; **inscrire l'écart** au contrat. Les deux alertes de budget existent déjà (sections 10 et 14). **La 4.5 n'ajoute aucune dépense** (contrainte 2) ; si la mesure montre qu'un poste dépasse, la question **le porteur est posée à part**, avec le chiffre.
+
+#### 10 bis.5 · Ce que la 4.5 ne fait pas
+
+- Aucune **API publique**, aucun **service de supervision** tiers, aucun **abonnement** nouveau.
+- Aucune **restauration en production** : elle n'est jamais jouée comme essai.
+- Aucune **sauvegarde automatique hors de Cloudflare** : l'export hebdomadaire est fait par le porteur (section 10 bis.9).
+- Aucun **engagement de service** (disponibilité, délai de réponse) : la 4.5 prépare le pilote de 1 à 2 fermes amies (4.6), pas une offre.
+- Aucun **changement du moteur** (section 11) ni **du calcul** : rien de l'agronomie.
+
+#### 10 bis.6 · Découpage du code (cinq PR, une à la fois, après le déploiement vérifié de la précédente)
+
+| PR | Contenu | Preuve propre |
+| --- | --- | --- |
+| 1 | **Registre des tâches (4.5-a)** + règles R1 à R3 + dernières réussites distinctes (réanalyse, matin, coffre) ; avertissements existants (D-165) repris sur le registre | test de couverture des déclencheurs ; sabotage de chaque tâche |
+| 2 | **Veille (4.5-g)** + notification à l'exploitant + **page d'état (4.5-f)** + journaux à noms stables et test d'absence de données sensibles (4.5-e) | sabotage → notification ; test des journaux ; parcours à 390 et 1440 px |
+| 3 | **Effacement d'une ferme (4.5-d)** + enregistrement minimal + test d'exhaustivité | test à deux fermes ; reprise après coupure ; annulation |
+| 4 | **Sauvegarde et essais de restauration (4.5-b)**, scripts, essai S1/S2/S3 **joué** sur la base d'essai | compte rendu des trois scénarios avec comparaisons réelles |
+| 5 | **Conservation (4.5-c)** : purges planifiées inscrites au registre, texte de confidentialité relu, `docs/exploitation.md` (4.5-h), coûts (4.5-i) | test de purge ; relecture de le porteur sur le texte |
+
+**Ordre** : 1, 2 (la plus utile aux fermes pilotes : « voir une panne »), puis 4 (« la sauvegarde ne restaure pas = défaut silencieux », ligne de la roadmap), puis 3 et 5. Chaque PR **met à jour les registres** (roadmap : tableau de la section 1, ordre de la section 2, bloc détaillé ; état du projet ; décisions ; changelog).
+
+**Quand coder** : la 4.5 passe **après la 4.4** dans l'ordre du contrat. Mais la PR 1 (registre) **ne dépend pas** de la 4.3 PR 3/4, et peut se coder dès que le fil de code est libre, **à condition d'y ranger les tâches de la 4.3 au fur et à mesure** de leur arrivée. À trancher avec le coordinateur (un seul chantier de code par dépôt).
+
+#### 10 bis.7 · Preuves de fin de la 4.5
+
+| Point | Preuve exigée |
+| --- | --- |
+| 4.5-a | test de couverture des déclencheurs ; chaque tâche passe orange puis rouge **quand on la sabote**, jamais vert faute de réussite |
+| 4.5-b | **S1, S2, S3 joués** sur la base d'essai, comparaisons **collées dans la PR** ; sabotages détectés ; clé jamais visible ; base d'essai détruite |
+| 4.5-c | tableau de conservation inscrit au contrat, **table par table** ; purges testées ; phrase « 30 jours » relue par le porteur |
+| 4.5-d | test d'exhaustivité (casse si une table n'est pas couverte) ; test à deux fermes ; reprise ; annulation |
+| 4.5-e | journaux : aucune valeur sensible dans les sorties des essais |
+| 4.5-f, g | page à deux largeurs ; notification reçue **en vrai** sur l'appareil de l'exploitant (recette, avec son accord) |
+| 4.5-h | `docs/exploitation.md` relu ; **chaque cas de la liste joué une fois à blanc** (au moins : panne, effacement, perte de base) |
+| 4.5-i | lecture du tableau de bord un mois après la première ferme (dans le Chrome du porteur, avec l'accord du porteur) ; écart inscrit |
+
+#### 10 bis.8 · Risques propres à la 4.5
+
+| Risque | Gravité | Réponse |
+| --- | --- | --- |
+| Une sauvegarde qui ne restaure pas | grave, silencieux | S1 à S3 essayés ; sabotages ; essai **rejoué** à chaque changement de schéma important [À FAIRE : tous les trimestres, inscrit au registre] |
+| La veille et la panne tombent ensemble | moyen | déclencheur distinct (R5) ; notification hebdomadaire de bonne santé |
+| Un export bloque le site (il bloque les requêtes) | moyen | export **la nuit**, hors des tâches de 6 h 15, durée mesurée à l'essai |
+| Données personnelles dans un export | grave | jamais dans le dépôt ni en artefact public ; chiffrement avant tout stockage hors de l'ordinateur de l'exploitant |
+| Effacement oublieux d'une table nouvelle | grave, discret | test d'exhaustivité qui casse la CI |
+| Support par une seule personne, absent | moyen | pas d'engagement de délai ; pilote limité à 1 à 2 fermes |
+| Confusion entre « effacé » et « plus récupérable » | moyen | phrase des 30 jours **dans le texte de confidentialité**, relue par le porteur |
+
+#### 10 bis.9 · Décision du porteur sur la copie hors de Cloudflare (19 novembre 2026, 13 h 48)
+
+Une copie dans le même compte ne protège pas d'une perte du compte, et l'export contient des données personnelles. Le porteur a choisi **l'option A, gratuite** : **un export hebdomadaire chiffré, gardé par lui sur son ordinateur**, en plus de l'historique de 30 jours de Cloudflare. **Pas de R2 ni de service tiers** : aucune dépense nouvelle (contrainte 2). Conséquences écrites : l'export est chiffré **avant** d'être écrit sur disque (mot de passe saisi par le porteur, jamais vu de l'assistant) ; la page d'état (F565) a un geste « J'ai fait l'export du … » qui enregistre la date, et la tâche « Export hors Cloudflare » du registre (F560) passe en orange à 8 jours et en rouge à 10 ; la veille (F566) le rappelle. L'option B (stockage d'objets de Cloudflare) reste à rouvrir si le nombre de fermes grandit : sa tarification n'a pas été relue.
+
+Décidé sans question au porteur (non budgétaire, autonomie du 19 novembre) : délai de 7 jours avant l'effacement d'une ferme ; veille à 9 h ; conservation de 35 jours pour le journal des appels et de 90 jours pour les données d'une ferme déconnectée ; pas de sonde extérieure ; notification web push, sans service d'e-mail. **La phrase des 30 jours ajoutée à la politique de confidentialité reste à la relecture du porteur avant le code** (comme le texte de #96) : l'assistant ne la fixe pas seul.
+#### 10 bis.10 · Ce qui n'est pas établi (à dire, pas à deviner)
+
+- La **finesse** de Time Travel et sa tenue **sur la base réelle** (taille, migrations récentes) : mesurer à l'essai.
+- La **tarification de R2** et d'un éventuel autre stockage : non lue.
+- Où se gardent aujourd'hui les **dernières réussites** de la réanalyse, du calcul du matin et de la rotation du coffre (4.5-a).
+- Si le **Worker Push** peut notifier l'exploitant sans espace de ferme (4.5-g).
+- La **limite de travail par requête D1** pour l'effacement par lots (4.5-d).
+- La **liste complète des tables** à effacer et à purger (4.5-c, 4.5-d) : à dresser au code.
+- Tout avis **juridique** sur la durée de conservation, la preuve d'effacement et la mention des 30 jours : la relecture juridique gratuite de son réseau (4.8) doit **les couvrir** avant qu'une ferme tierce soit reliée (règle du 15/11).
+- Rien de ce brouillon n'a été codé, essayé sur une base réelle ni envoyé à quiconque.
+
+##### F569 · La règle du dépôt
+
+Une fois le registre des tâches codé (F560), `AGENTS.md` dira : tout job planifié s'inscrit au registre, avec son rythme attendu, et un test échoue pour un déclencheur absent. Rien n'est ajouté à `AGENTS.md` avant, la règle n'étant pas encore tenue par un test.
+
 ## 11. Rapport avec la fusion des moteurs (à ne pas empiéter)
 
 La Tranche 4 **ne modifie pas le moteur hydrique** : bilan, pluie utile, observations, jeux de réglages relèvent du contrat commun (MC-17 à MC-27, brouillon v0.2.1, relecture par Nicolas). Points de contact **à surveiller, sans les traiter ici** :

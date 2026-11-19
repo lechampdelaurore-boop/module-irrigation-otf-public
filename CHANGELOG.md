@@ -15,6 +15,13 @@ source détaillée commit par commit.
   seconde irrigation du même matériel sur un créneau déjà planifié
   demande une confirmation dans une fenêtre du module avant d'être écrite.
 - **Un rechargement automatique des besoins ne parle plus.**
+### Documentation (le contrat de l'exploitation, 4.5)
+
+- **Contrat de la 4.5** (D-220) : section 10 bis du contrat de la Tranche 4,
+  sans code. Une panne comme celle de la météo du 14 au 19 novembre 2026 se
+  verrait le jour même ; la sauvegarde de la base se restaure sur une base
+  d'essai ; l'effacement d'une ferme est complet et prouvé.
+
 ### Documentation (le contrat de l'accueil d'une nouvelle ferme, 4.4)
 
 - **Contrat de la 4.4** (D-168) : section 8 bis du contrat de la Tranche 4,

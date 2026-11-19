@@ -338,6 +338,18 @@ registres, elle y renvoie.
   Consigne aussi le déploiement de la 4.3 PR 2 (coffre des jetons, #96, D-163) :
   en ligne le 19 novembre 2026 à 8 h 17, run 44475742993, cinq jobs verts.
 
+- Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
+  F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
+  registre des tâches attendues et une veille quotidienne qui préviennent
+  l'exploitant d'une panne silencieuse (leçon de la panne météo du 14 au
+  19 novembre), une page d'état, la sauvegarde et la restauration de D1
+  essayées sur une base d'essai (jamais la production), la conservation
+  écrite par donnée, l'effacement complet d'une ferme sous sept jours, le
+  support par une seule personne ; cinq PR, une à la fois. Le porteur a
+  tranché le 19 novembre 2026 : export hebdomadaire chiffré gardé par lui,
+  gratuit. Rien n'est vérifié en réel (finesse de Time Travel, limites de
+  D1 pour l'effacement par lots). Contrôles : documentation seule.
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le
