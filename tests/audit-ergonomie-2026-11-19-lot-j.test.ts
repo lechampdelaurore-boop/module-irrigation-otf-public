@@ -6,6 +6,7 @@ import type { SeasonSpecies, SpeciesWithoutReference } from '../lib/domain/crop-
 import { withoutReferenceBeyondSpecies } from '../lib/domain/crop-water/species-linking.ts';
 import { gardenState, goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '../lib/domain/besoins-phone.ts';
 import { middleCutParts, parseMaterielTab, plotFoldSummary } from '../lib/domain/materiel-tabs.ts';
+import { historyFilterSummary, previewResultReady } from '../lib/domain/premier-geste.ts';
 
 /**
  * Audit ergonomique du 19 novembre 2026, lot J « Pages courtes au
@@ -161,4 +162,30 @@ test('n° 15, F461 : les trois panneaux à onglets, cachés et non retirés ; po
   }
   assert.match(browser, /const shownTab: MaterielTab = placementEditor \? 'plan' : tab;/);
   assert.ok(browser.indexOf('<CoverageOverview') < browser.indexOf('id="materiel-panel-materiel"'), '« Aperçu instantané » avec le plan');
+});
+
+// n° 15 — « Arrosages » et « Historique » : le premier geste plus haut (PR 7, F462).
+
+test('n° 15, F462 : « Résultat calculé » attend un matériel et une quantité', () => {
+  assert.equal(previewResultReady(false, null), false);
+  assert.equal(previewResultReady(false, 3600), false, 'une durée sans matériel');
+  assert.equal(previewResultReady(true, 0), false, 'un matériel sans quantité');
+  assert.equal(previewResultReady(true, null), true, 'des dates illisibles : « Inconnu — vérifiez le début et la fin »');
+  assert.equal(previewResultReady(true, 5400), true);
+});
+
+test('n° 15, F462 : le bouton et la réponse du module restent hors de l’attente', () => {
+  const form = readFileSync('app/irrigation/irrigation-manager/irrigation-form.tsx', 'utf8');
+  const attente = form.indexOf('<p className="irrigation-preview-waiting">');
+  assert.ok(attente > 0);
+  assert.ok(form.indexOf('className="start-irrigation-button"') > attente, 'le bouton après l’attente, toujours rendu');
+  assert.ok(form.indexOf('{reply}') > attente, 'la réponse du lot G (F404) toujours rendue');
+});
+
+test('n° 15, F462 : le pli « Filtrer » dit le périmètre ; l’export suit les chiffres', () => {
+  assert.equal(historyFilterSummary('farm', 'Ferme de test'), 'toute la ferme');
+  assert.equal(historyFilterSummary('plot', 'Tunnel 1'), 'Tunnel 1');
+  const history = readFileSync('app/irrigation/irrigation-history-dashboard.tsx', 'utf8');
+  assert.ok(history.indexOf('className="history-summary-grid"') < history.indexOf('className="history-export-button"'), 'l’export après les chiffres');
+  assert.ok(history.indexOf('history-filter-fold') < history.indexOf('<span>Parcelle</span>'), 'les filtres dans le pli');
 });

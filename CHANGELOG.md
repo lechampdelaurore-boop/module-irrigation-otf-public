@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 7 sur 7)
+
+- **« Arrosages » et « Historique » : le premier geste plus haut** (D-189) :
+  « Résultat calculé » ne montre ses chiffres qu'une fois un matériel et une
+  quantité choisis, une phrase dit quoi choisir avant ; le bouton et la
+  réponse du module restent à leur place. Dans « Historique », les filtres
+  (parcelle, jardin, planche) sont dans un pli « Filtrer » qui dit le
+  périmètre choisi, et « Exporter CSV… » devient un bouton secondaire, après
+  les chiffres.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 6 sur 7)
 
 - **« Matériel » en trois onglets** (D-188) : Plan, Matériel et Groupes en

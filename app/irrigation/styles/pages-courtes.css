@@ -317,3 +317,41 @@
     display: none;
   }
 }
+
+/* Lot J, PR 7 (F462) : « Résultat calculé » attend le premier choix ; l'historique plie ses filtres. */
+.irrigation-preview-waiting {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.history-filter-fold > summary {
+  display: flex;
+  min-height: var(--touch-target, 44px);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  cursor: pointer;
+}
+
+.history-filter-fold > summary strong {
+  color: var(--green-dark);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.history-filter-summary {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.history-export-row {
+  margin: 4px 0 0;
+}
+
+.history-export-row .history-export-button {
+  background: var(--green-soft);
+  color: var(--green);
+}

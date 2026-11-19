@@ -14,6 +14,7 @@ import { hydraulicMessage } from '@/lib/domain/hydraulic-message';
 import { evaluateHydraulicFeasibility } from '@/lib/domain/pumps';
 import type { Bed } from '@/lib/domain/domain';
 import { FigureOrigin } from '../shell/figure-origin';
+import { PREVIEW_WAITING_TEXT, previewResultReady } from '@/lib/domain/premier-geste';
 
 /**
  * La faisabilité hydraulique en phrase d'action (audit ergonomique, lot 3,
@@ -91,8 +92,11 @@ export function IrrigationPreview({
   reply?: React.ReactNode;
 }) {
   const referenceRate = applications[0]?.rateMmPerHour ?? 0;
+  // Les chiffres une fois le matériel et la quantité choisis ; le bouton et la réponse restent (lot J, n° 15, F462).
+  const ready = previewResultReady(equipment !== null, durationSeconds);
   return (
-    <aside className="irrigation-preview" data-tour="arrosage-resultat" aria-live="polite">
+    <aside className="irrigation-preview" data-tour="arrosage-resultat" data-ready={ready} aria-live="polite">
+      {ready ? (<>
       <p className="eyebrow">Résultat calculé</p>
       <strong className="calculated-duration">{formatDuration(durationSeconds)}<FigureOrigin text={origin} /></strong>
       <dl>
@@ -124,6 +128,7 @@ export function IrrigationPreview({
           </div>
         </details>
       ) : null}
+      </>) : <p className="irrigation-preview-waiting">{PREVIEW_WAITING_TEXT}</p>}
       {warning ? <p className="irrigation-preview-warning" role="status">{warning}</p> : null}
       <button
         type="button"
