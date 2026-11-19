@@ -587,7 +587,8 @@ function availabilityText(value: { availableDays: number; totalDays: number; com
 function objectiveAvailabilityText(value: { availableBedDays: number; totalBedDays: number; complete: boolean }) {
   if (value.complete) return null;
   if (value.availableBedDays === 0) return 'Aucun objectif sur la période';
-  return `Objectif posé sur ${value.availableBedDays}/${value.totalBedDays} journée(s)-planche`;
+  // La portée dite, comme sur « Aujourd'hui » (F280) : ici la moyenne court sur toute la surface (lot H, n° 13, F444).
+  return `Moyenne sur toute la surface, les planches sans objectif comptées à 0 : objectif posé sur ${value.availableBedDays}/${value.totalBedDays} journées-planche`;
 }
 
 function gapTone(value: number | null) {

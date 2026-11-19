@@ -6160,6 +6160,34 @@ changer l'ordre enregistré du plan.
 Ne changent pas : les plans calculés, l'ordre des propositions, les
 comparaisons de doublons de noms.
 
+## D-177 — Lot H, PR 5 : « Aujourd'hui » se lit mieux
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 13 :
+l'heure de la page restait figée (« 9 h 24 » à 9 h 35) ; « Reste à
+apporter 3,9 mm — objectif moins l'eau reçue, jamais négatif » à côté
+d'« Eau reçue 30,7 mm » pour un objectif de 20 mm, sur une tuile orange
+un jour normal ; l'heure coupée en deux lignes au téléphone ; deux
+icônes pour deux goutte-à-goutte ; « dont 3 à valider » sur 3, « arrosage »
+et « irrigation » dans la même phrase, deux « sur » ; l'objectif
+d'« Historique » différent de celui d'« Aujourd'hui » sans explication.
+
+**Décision.** La page se relit seule toutes les cinq minutes à l'écran, et
+au retour sur l'onglet quand sa lecture a plus d'une minute, jamais
+pendant un geste ni fenêtre ouverte (F438). « Reste à apporter » nomme les
+jardins encore sous leur objectif quand une partie seulement l'est (trois
+noms, puis « et n autres », F439), sur la couleur neutre des tuiles
+(F440). L'heure d'une carte ne se coupe plus (F441). Une proposition porte
+l'icône de son matériel, que le plan garde (F442). « Irrigation » partout ;
+« 3 irrigations sont à valider aujourd'hui » quand toutes le sont ;
+« 15 / 26,7 mm (5 planches de 10 ont un objectif) » (F443). La cause de
+l'écart avec « Historique » est établie : il divise par toute la surface,
+les planches sans objectif comptées à 0 ; il le dit sous son chiffre,
+sans changer le calcul (F444).
+
+Ne changent pas : les calculs, l'objectif d'« Historique », les gestes.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

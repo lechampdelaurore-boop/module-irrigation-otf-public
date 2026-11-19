@@ -90,8 +90,11 @@ function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>
     chips.push({ key: 'late', tone: 'late', icon: 'clock', text: `${late} à rattraper`, target: 'day' });
   }
   if (todo > 0) {
-    const planned = plural(todo, 'Une irrigation est prévue aujourd’hui', '{n} irrigations sont prévues aujourd’hui');
-    sentences.push(`${planned}${proposed > 0 ? `, dont ${proposed} à valider` : ''}.`);
+    // Toutes à valider : la phrase le dit d'un mot, jamais « dont 3 » sur 3 (lot H, n° 13, F443).
+    const planned = proposed === todo
+      ? plural(todo, 'Une irrigation est à valider aujourd’hui', '{n} irrigations sont à valider aujourd’hui')
+      : plural(todo, 'Une irrigation est prévue aujourd’hui', '{n} irrigations sont prévues aujourd’hui');
+    sentences.push(`${planned}${proposed > 0 && proposed < todo ? `, dont ${proposed} à valider` : ''}.`);
     chips.push({ key: 'todo', tone: 'todo', icon: 'drop', text: `${todo} à faire`, target: 'day' });
   }
   // « Rien à arroser » ne se dit plus quand demain ou la semaine ont quelque chose à dire (F277).

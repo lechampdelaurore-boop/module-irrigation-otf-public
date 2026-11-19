@@ -159,7 +159,12 @@ irrigation partielle encore planifié, n'y apparaissent pas : la page dit
 7. **Reste de R2** : la cause de l'écart entre « Objectif de la semaine »
    d'« Aujourd'hui » et « Objectif » d'« Historique » est d'abord établie
    dans le code ; la correction porte sur le libellé de portée (F280), pas
-   sur le calcul.
+   sur le calcul. **Cause établie le 19 novembre 2026**
+   (`lib/domain/irrigation-history/summary.ts`) : « Historique » divise par
+   la surface de toutes les planches, celles sans objectif comptées à 0 ;
+   « Aujourd'hui » chiffre les seules planches qui ont un objectif (F280).
+   « Historique » le dit désormais sous son chiffre : « Moyenne sur toute
+   la surface, les planches sans objectif comptées à 0 ».
 
 ## 8. Tests et preuves
 

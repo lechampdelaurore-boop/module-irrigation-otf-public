@@ -30,6 +30,10 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, ver
  *   d'« Arrosages » est regroupée par jardin, les groupes et les matériels
  *   dans l'ordre naturel (« gag2 » avant « gag10 »).
  *
+ * - les petits défauts de lecture (n° 13, F438 à F443) : la tuile « Reste à
+ *   apporter » jamais orange ; l'heure d'une carte d'un seul tenant au
+ *   téléphone ; la page relue d'elle-même au retour sur l'onglet.
+ *
  * Ce qu'il ne prouve pas : les parts de chaque origine (les tests du
  * domaine, `tests/audit-ergonomie-2026-11-19-lot-h.test.ts`, les chiffrent),
  * la ferme réelle, un vrai téléphone.
@@ -122,6 +126,14 @@ test('les jardins qui ont une irrigation aujourd’hui passent en tête', async 
   if (await page.locator('#today-soil').count()) await expect(premier('#today-soil')).toHaveText('Jardin Nord');
   await verifierLEtape(page, journal, 'le jardin arrosé aujourd’hui en tête');
 
+  // Les petits défauts de lecture (F440, F441) : une quantité n'est pas une alerte ; l'heure tient sur une ligne.
+  const reste = page.locator('.today-kpi').filter({ hasText: 'Reste à apporter' });
+  if (await reste.count()) await expect(reste).not.toHaveAttribute('data-tone', 'warn');
+  const heure = page.locator('.today-irrigation-time strong').first();
+  await expect(heure).toHaveCSS('white-space', 'nowrap');
+  const { hauteur, ligne } = await heure.evaluate((element) => ({ hauteur: element.getBoundingClientRect().height, ligne: parseFloat(getComputedStyle(element).lineHeight) }));
+  expect(hauteur).toBeLessThan(ligne * 1.5);
+
   await attendreLaPageIrrigation(page, 'arrosages');
   const fiches = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
   await annulerDepuisLeMenu(page, fiches.first());
@@ -200,4 +212,16 @@ test('la liste « Matériel » se regroupe par jardin, dans l’ordre naturel', 
   expect(libelles).toEqual(range(libelles));
   for (const groupe of groupes) expect(groupe.options, `le jardin « ${groupe.label} »`).toEqual(range(groupe.options));
   await verifierLEtape(page, journal, 'la liste « Matériel » par jardin');
+});
+
+test('la page se relit d’elle-même au retour sur l’onglet', async ({ page }) => {
+  const journal = surveillerLaConsole(page);
+  await page.clock.install();
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  // Plus d'une minute plus tard, l'onglet revient au premier plan : la page relit sa vue (F438).
+  await page.clock.fastForward('02:00');
+  const relue = page.waitForRequest((requete) => requete.method() === 'POST' && requete.url().includes('/irrigation/aujourdhui'));
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  await relue;
+  await verifierLEtape(page, journal, 'la page relue au retour sur l’onglet');
 });

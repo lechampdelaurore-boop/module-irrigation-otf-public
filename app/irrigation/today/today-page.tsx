@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useTransition, type ReactNode } from 'react';
+import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import { dayRowLayout, type TodayBlock, type TodayView } from '@/lib/domain/today/today-view';
+import { millisecondsFromMinutes, millisecondsFromSeconds } from '@/lib/domain/units';
 import { recordDoneAsPlannedAction } from '../done-as-planned-actions';
 import { startIrrigationEventAction } from '../irrigation-event-actions';
 import { computeWeeklyPlanAction } from '../planning-actions';
@@ -15,6 +16,11 @@ import { TodaySoilBlock, TodayWaterBlockView, TodayWeekWater } from './today-gau
 import { TodayWeather } from './today-weather';
 import { TodayWeekTiles } from './today-week';
 
+/** La page se relit seule toutes les cinq minutes, et au retour sur l'onglet après une minute (F438). */
+const TODAY_REFRESH_MS = millisecondsFromMinutes(5);
+const TODAY_REFRESH_SLACK_MS = millisecondsFromSeconds(5);
+const TODAY_RETURN_MS = millisecondsFromMinutes(1);
+
 /**
  * La page « Aujourd'hui », tableau de bord du module
  * (docs/aujourdhui-tableau-de-bord-contract.md, section 3.2) : l'en-tête qui
@@ -22,7 +28,8 @@ import { TodayWeekTiles } from './today-week';
  * présent seulement si sa case est cochée. Un bloc sans rien à dire le dit en
  * une phrase calme. La page ne contient ni formulaire ni calcul : ses boutons
  * sont les actions existantes « Démarrer maintenant » et « Recalculer le
- * plan », et « Tout est fait » (section 3.4) ; elle se relit après chacun.
+ * plan », et « Tout est fait » (section 3.4) ; elle se relit après chacun,
+ * et d'elle-même au fil des minutes (lot H, F438).
  */
 export function TodayPage({ initialView, query }: { initialView: TodayView; query: PageQuery }) {
   const [view, setView] = useState(initialView);
@@ -35,12 +42,38 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const season = Number(view.today.slice(0, 4));
   const dayQuery: PageQuery = { ...query, season };
 
+  const readAt = useRef(0);
   const reload = async () => {
+    readAt.current = Date.now();
     const result = await loadTodayViewAction();
     if (!result.ok) return;
     setView(result.view);
     announceTodayBadge(result.view.badge);
   };
+  const reloadRef = useRef(reload);
+  useEffect(() => {
+    reloadRef.current = reload;
+  });
+
+  // La page se relit seule (audit du 19 novembre 2026, lot H, n° 13, F438) :
+  // toutes les cinq minutes à l'écran, et au retour sur l'onglet quand sa
+  // lecture a plus d'une minute ; jamais pendant un geste, ni quand une
+  // fenêtre de la page est ouverte.
+  useEffect(() => {
+    readAt.current = Date.now();
+    const quiet = () => document.visibilityState === 'visible' && !document.querySelector('.today-page[aria-busy="true"], .today-page dialog[open], .today-page [role="dialog"]');
+    const refresh = (olderThanMs: number) => {
+      if (!quiet() || Date.now() - readAt.current < olderThanMs) return;
+      void reloadRef.current();
+    };
+    const timer = window.setInterval(() => refresh(TODAY_REFRESH_MS - TODAY_REFRESH_SLACK_MS), TODAY_REFRESH_MS);
+    const onVisible = () => refresh(TODAY_RETURN_MS);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
 
   const start = (eventEquipmentId: string) => startTransition(async () => {
     const result = await startIrrigationEventAction(eventEquipmentId);

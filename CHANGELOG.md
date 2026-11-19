@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot H, PR 5 sur 5)
+
+- **« Aujourd'hui » se lit mieux** (D-177) : la page se relit seule toutes
+  les cinq minutes et au retour sur l'onglet ; « Reste à apporter » dit
+  pour quels jardins, en couleur neutre ; l'heure d'une carte tient sur une
+  ligne ; une proposition porte l'icône de son matériel ; « irrigation »
+  partout, « 3 irrigations sont à valider aujourd'hui » sans « dont 3 »,
+  un seul « sur » ; « Historique » dit que son objectif est une moyenne
+  sur toute la surface.
+
 ### Modifié (audit du 19 novembre 2026, lot H, PR 4 sur 5)
 
 - **L'ordre naturel partout** (D-176) : chaque nom affiché (planche,

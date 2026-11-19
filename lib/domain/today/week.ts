@@ -136,6 +136,11 @@ function bedsOn(count: number, total: number): string {
   return `${count} planche${count > 1 ? 's' : ''} sur ${total}`;
 }
 
+/** « 1 planche de 2 a un objectif », « 5 planches de 10 ont un objectif ». */
+function bedsOf(count: number, total: number): string {
+  return `${count} planche${count > 1 ? 's' : ''} de ${total} ${count > 1 ? 'ont' : 'a'} un objectif`;
+}
+
 /**
  * Les planches sur lesquelles se chiffre la ligne (F280) : celles qui ont un
  * objectif quand une partie seulement en a un ; sinon toutes.
@@ -156,7 +161,8 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
   const remainingMm = weighted(scope, (bed) => bed.realRemainingMm);
   const percent = (mm: number) => rounded(percentFromFraction(Math.min(1, Math.max(0, mm / scaleMaxMm))));
   const irrigationPercent = percent(irrigationMm);
-  const on = partial ? ` sur ${bedsOn(objectiveBeds.withObjective, objectiveBeds.total)}` : '';
+  // Un seul « sur » par phrase (lot H, n° 13, F443) : « 15 / 26,7 mm (5 planches de 10 ont un objectif) ».
+  const on = partial ? ` (${bedsOf(objectiveBeds.withObjective, objectiveBeds.total)})` : '';
   const text = objectiveMm === null
     ? `${mmText(rounded(receivedMm ?? irrigationMm))} reçus, aucun objectif posé`
     : receivedMm === null
@@ -182,6 +188,24 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
 }
 
 const RAIN_SHARE_EPSILON = 0.05;
+const REMAINING_NAMES_SHOWN = 3;
+
+/**
+ * « pour les jardins encore sous leur objectif : T1, T2, T3 et 1 autre »
+ * (lot H, n° 13, F439) : quand une partie seulement des jardins qui ont un
+ * objectif reste en dessous, la tuile dit lesquels, pour que « Reste à
+ * apporter » ne contredise pas « Eau reçue ». Nulle sinon.
+ */
+function remainingFor(rows: readonly WeekRow[]): string | null {
+  const withObjective = rows.filter((row) => row.objectiveMm !== null && row.remainingMm !== null);
+  const under = withObjective.filter((row) => (row.remainingMm ?? 0) > RAIN_SHARE_EPSILON)
+    .map((row) => row.name).sort(compareNamesNaturally);
+  if (under.length === 0 || under.length === withObjective.length) return null;
+  const shown = under.slice(0, REMAINING_NAMES_SHOWN);
+  const others = under.length - shown.length;
+  const names = others > 0 ? [...shown, `${others} autre${others > 1 ? 's' : ''}`] : shown;
+  return `pour ${under.length === 1 ? 'le jardin encore sous son objectif' : 'les jardins encore sous leur objectif'} : ${listed(names)}`;
+}
 
 type RainOrigin = { key: keyof RainOrigins; alone: string; part: string; legend: string };
 const RAIN_ORIGIN_WORDS: readonly RainOrigin[] = [
@@ -312,7 +336,7 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
       remaining: mm(farm.remainingMm),
       remainingDetail: farm.remainingMm === null
         ? 'une valeur manque : voir « Objectifs et besoins »'
-        : scoped('objectif moins l’eau reçue, jamais négatif'),
+        : remainingFor(rows) ?? scoped('objectif moins l’eau reçue, jamais négatif'),
       water: water ? volume(water.weekCubicMeters) : null,
       waterToday: water ? `dont ${volume(water.todayCubicMeters)} aujourd’hui` : null,
     },

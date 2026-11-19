@@ -429,7 +429,14 @@ registres, elle y renvoie.
   en ligne le 19 novembre 2026 à 21 h 28 (#109, fusionnée à 21 h 09, run 44605788491
   vérifié job par job). **PR 4, l'ordre naturel partout** (D-176, F436 et F437) : chaque
   nom affiché rangé comme on compte, gardé par un test ; la liste
-  « Matériel » d'« Arrosages » regroupée par jardin ; codée.
+  « Matériel » d'« Arrosages » regroupée par jardin ; en ligne le
+  19 novembre 2026 à 22 h 08 (#110, fusionnée à 21 h 49, run 44612663306 vérifié job par
+  job). **PR 5, les
+  petits défauts de lecture** (D-177, F438 à F444) : la page se relit
+  seule ; « Reste à apporter » dit pour quels jardins, en couleur neutre ;
+  l'heure d'un seul tenant ; l'icône d'une proposition ; « irrigation »
+  partout ; la portée de l'objectif d'« Historique » dite ; codée. Le lot H
+  est codé en entier ; ses cinq PR s'ouvrent après celles du lot G.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
