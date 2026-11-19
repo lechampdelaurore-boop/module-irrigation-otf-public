@@ -32,8 +32,13 @@ de synchronisation que le bouton manuel.
 ## Tolérance aux pannes
 
 Le Worker et le moteur métier appliquent des tentatives bornées aux erreurs
-temporaires (`429`, `5xx`, réseau et délai dépassé). Les refus permanents ne sont
-pas retentés. Un verrou D1 de dix minutes rend l’opération idempotente en cas de
+temporaires (`429`, `5xx`, réseau). Les refus permanents ne sont
+pas retentés. Le planificateur laisse 90 secondes à la route du site, qui
+enchaîne la météo et les calculs du matin ; un délai dépassé n'est **jamais**
+retenté par le planificateur : la route a reçu la demande et travaille encore,
+la relancer refaisait toute la synchronisation une seconde fois (constat du
+19 novembre 2026, D-166). Le délai dépassé d'un appel au fournisseur météo,
+lui, reste retenté par le moteur, dans la limite de trois tentatives. Un verrou D1 de dix minutes rend l’opération idempotente en cas de
 double déclenchement. Chaque workspace conserve sa dernière tentative, sa
 dernière réussite et sa dernière erreur automatique.
 

@@ -5,12 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (la mise à jour automatique de la météo, PR 3 sur 3)
+
+- **Une seule synchronisation chaque matin** (D-166) : le planificateur
+  laisse 90 secondes à la route du site au lieu de 25, et ne relance plus
+  une route abandonnée pour délai dépassé, qui travaillait encore.
+
 ### Corrigé (la mise à jour automatique de la météo, PR 2 sur 3)
 
 - **Une mise à jour automatique en retard se dit** (D-165) : au-delà de
   36 heures sans réussite, la date verte devient un avertissement
   « Mise à jour automatique de la météo en retard », avec la date de la
-  dernière réussite et la dernière erreur enregistrée.
+  dernière réussite et la dernière erreur enregistrée. En ligne le
+  19 novembre 2026 à 13 h 26 (#98).
 
 ### Corrigé (la mise à jour automatique de la météo, PR 1 sur 3)
 

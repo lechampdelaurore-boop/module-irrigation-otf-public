@@ -23,3 +23,22 @@ export function schedulerRetryDelayMs(response: Pick<Response, 'status' | 'heade
 export function schedulerResponseRetriable(status: number) {
   return status === 429 || status >= 500;
 }
+
+/**
+ * Le temps laissé à la route du site pour répondre (correctif météo, PR 3,
+ * D-166). La route enchaîne la météo puis les calculs du matin (planning, eau
+ * des cultures, réserve du sol) : 15 à plus de 25 secondes mesurées le
+ * 19 novembre 2026. Vingt-cinq secondes l'abandonnaient en route.
+ */
+export const SITE_SYNC_TIMEOUT_MS = 90_000;
+
+/**
+ * Une erreur d'appel se retente seulement si la route n'a sans doute rien
+ * commencé. Un délai dépassé veut dire que la route a reçu la demande et
+ * travaille encore : la relancer refaisait toute la synchronisation une
+ * seconde fois chaque matin (D-166).
+ */
+export function schedulerErrorRetriable(error: unknown) {
+  const name = error instanceof Error ? error.name : null;
+  return name !== 'TimeoutError' && name !== 'AbortError';
+}
