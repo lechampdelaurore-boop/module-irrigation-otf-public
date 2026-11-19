@@ -380,7 +380,11 @@ registres, elle y renvoie.
   module demande ; en ligne le 19 novembre 2026 à 16 h 14 (#103, run
   44549609124 vérifié job par job). **PR 3, « Refuser »** (D-170, F411 et F412) : la
   fenêtre du module demande avant un refus ; le message dit où le besoin
-  est replacé, lu dans le plan recalculé ; codée.
+  est replacé, lu dans le plan recalculé ; en ligne le 19 novembre 2026
+  à 16 h 58 (#104, run 44557056131 vérifié job par job). **PR 4, une seule
+  fenêtre de confirmation** (D-171, F413 à F415) : les sept boîtes du
+  navigateur remplacées, le rouge pour ce qui efface, « Vider les
+  objectifs », « Retirer (stocker) » hors du rouge ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

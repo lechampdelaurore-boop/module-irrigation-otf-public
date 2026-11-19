@@ -10,6 +10,7 @@ import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
+import { useConfirm } from './shell/use-confirm';
 import { PageSettingsFold } from './shell/page-settings-fold';
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
 import { Icon, type IconName } from './line-icon';
@@ -69,7 +70,7 @@ export function WaterManagementDashboard({
   part?: WaterDashboardPart;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
-  const clearDialog = useRef<HTMLDialogElement>(null);
+  const { confirm, dialog: confirmDialog } = useConfirm();
   // Chaque message s'affiche sous le bouton de son geste (audit du 19 novembre 2026, lot G, n° 1, F404).
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const say = (origin: string, tone: ActionReplyMessage['tone'], text: string) => setReplies([actionReply(origin, tone, text)]);
@@ -226,8 +227,14 @@ export function WaterManagementDashboard({
     });
   };
 
-  const clearGoals = () => {
-    clearDialog.current?.close();
+  /** « Vider les objectifs » : le même mot sur le bouton et dans la fenêtre, en rouge (lot G, n° 8, F414 et F415). */
+  const clearGoals = async () => {
+    if (!(await confirm({
+      title: 'Vider les objectifs de cette semaine ?',
+      text: 'Les irrigations, la météo, les restrictions et l’historique sont conservés. Seuls les objectifs de la semaine affichée seront retirés.',
+      confirmLabel: 'Vider les objectifs',
+      cancelLabel: 'Garder les objectifs',
+    }))) return;
     startTransition(async () => {
       receive(await clearHydricGoalsAction({
         season,
@@ -372,7 +379,7 @@ export function WaterManagementDashboard({
         <article className="water-panel">
           <div className="water-panel-title">
             <div><h3>Objectifs hebdomadaires</h3><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
-            <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => clearDialog.current?.showModal()}>Tout vider</button>
+            <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => void clearGoals()}>Vider les objectifs</button>
           </div>
           <GoalScopePicker snapshot={snapshot} season={season} value={scope} onChange={setScope} />
           <div className="water-inline-form">
@@ -411,15 +418,8 @@ export function WaterManagementDashboard({
 
       </div>
 
-      <dialog ref={clearDialog} className="irrigation-dialog water-clear-dialog" aria-labelledby="clear-water-goals-title">
-        <p className="eyebrow">Confirmation</p>
-        <h3 id="clear-water-goals-title">Retirer les objectifs de cette semaine ?</h3>
-        <p>Les irrigations, la météo, les restrictions et l’historique sont conservés. Seuls les objectifs de la semaine affichée seront retirés.</p>
-        <div className="irrigation-dialog-actions">
-          <button type="button" onClick={() => clearDialog.current?.close()}>Annuler</button>
-          <button type="button" className="primary" onClick={clearGoals}>Retirer les objectifs</button>
-        </div>
-      </dialog>
+
+      {confirmDialog}
 
       <div className="water-week-table-wrap" id="weather">
         {quietDays ? <p className="water-week-quiet">{quietDays}.</p> : null}

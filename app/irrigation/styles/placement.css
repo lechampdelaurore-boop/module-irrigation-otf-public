@@ -177,14 +177,15 @@
   gap: 8px;
 }
 
+/* « Retirer (stocker) » se défait : il quitte le rouge, contour neutre (audit du 19 novembre 2026, lot G, n° 8, F414). */
 .placement-remove-button {
   min-height: 44px;
   margin-right: auto;
   padding: 0 14px;
-  border: 1px solid var(--danger);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-button);
-  background: var(--danger-soft);
-  color: var(--danger-ink);
+  background: var(--card);
+  color: var(--ink);
   font: inherit;
   font-family: var(--font-ui);
   font-size: 13px;

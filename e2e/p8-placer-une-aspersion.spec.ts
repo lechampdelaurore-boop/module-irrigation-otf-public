@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { verifierLaSurfaceMouillee } from './support/materiel.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P8 : poser, déplacer puis retirer une aspersion sur le plan
@@ -153,8 +153,8 @@ async function compterLesPoses(page: Page): Promise<number> {
 async function archiver(page: Page, materiel: string): Promise<void> {
   const carte = page.locator('.equipment-section article').filter({ hasText: materiel });
   await carte.getByLabel(`Actions pour ${materiel}`).click();
-  page.once('dialog', (fenetre) => void fenetre.accept());
   await carte.getByRole('menuitem', { name: 'Archiver' }).click();
+  await confirmerDansLaFenetre(page, 'Archiver le matériel');
   await expect(page.locator('.equipment-section')).toContainText('archivé', { timeout: 20_000 });
 }
 

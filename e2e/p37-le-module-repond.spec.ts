@@ -27,6 +27,11 @@ import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.
  *   (`tests/irrigation-form-hints.test.ts`) : un plan à l'écran est le
  *   travail de P10.
  *
+ * - « Retirer (stocker) » en contour neutre, aucune boîte du navigateur ; les
+ *   sept autres confirmations se confirment en rouge dans les parcours qui
+ *   les jouent (`confirmerDansLaFenetre`, F413 et F414) ; « Vider les
+ *   objectifs » dans le même mot partout (F415).
+ *
  * Ce qu'il ne prouve pas : un vrai téléphone, un lecteur d'écran.
  */
 
@@ -35,6 +40,13 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
   const reference = Date.now();
   await attendreLaPageIrrigation(page);
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p37' });
+  // « Retirer (stocker) » se défait : il quitte le rouge, contour neutre (lot G, n° 8, F414).
+  const retirer = page.locator('.equipment-section article').filter({ hasText: materiel }).getByRole('button', { name: `Retirer et stocker ${materiel}` });
+  await expect(retirer).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(retirer).toHaveCSS('border-top-color', 'rgb(187, 187, 187)');
+  // Aucune boîte du navigateur de tout le parcours : les confirmations passent par la fenêtre du module (F413).
+  const boitesDuNavigateur: string[] = [];
+  page.on('dialog', (boite) => { boitesDuNavigateur.push(boite.message()); void boite.dismiss(); });
   await attendreLaPageIrrigation(page, 'arrosages');
 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
@@ -78,6 +90,7 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
   await expect(fiches).toHaveCount(1);
   await annulerDepuisLeMenu(page, fiches.first());
   await expect(fiches).toHaveCount(0);
+  expect(boitesDuNavigateur, 'aucune boîte du navigateur').toEqual([]);
 });
 
 test('« Objectifs et besoins » répond sous chaque bouton, et un rechargement ne parle pas', async ({ page }) => {

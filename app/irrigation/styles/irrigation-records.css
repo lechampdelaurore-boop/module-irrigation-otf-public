@@ -80,19 +80,6 @@
   letter-spacing: -.01em;
 }
 
-.water-clear-dialog {
-  margin: auto;
-  inset: 0;
-  border: 0;
-  max-width: calc(100vw - 36px);
-  max-height: calc(100dvh - 36px);
-  overflow-y: auto;
-}
-
-.water-clear-dialog::backdrop {
-  background: rgb(8 30 22 / 55%);
-}
-
 .irrigation-dialog > p:not(.eyebrow) {
   margin: 10px 0 18px;
   color: var(--muted);
@@ -122,10 +109,6 @@
   .irrigation-form-layout {
     grid-template-columns: 1fr;
   }
-}
-
-dialog.water-clear-dialog {
-  border-radius: var(--radius);
 }
 
 @media (max-width: 560px) {

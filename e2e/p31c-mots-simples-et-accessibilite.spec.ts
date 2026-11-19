@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { ciblesTropPetites, textesPeuContrastes, type CibleMesuree, type TexteMesure } from './support/accessibilite.ts';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { type PageDuModule, attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P31c : l'audit ergonomique, lot 3, PR 2 — les mots simples
@@ -232,7 +232,7 @@ test('une pompe et un matériel archivés : cibles de 44 px au téléphone et co
   expect(textes, 'Textes sous le contraste minimal').toEqual([]);
 });
 
-/** Un goutte-à-goutte créé puis archivé : archiver ne se demande qu'une fois, à la confirmation du navigateur. */
+/** Un goutte-à-goutte créé puis archivé : archiver ne se demande qu'une fois, à la fenêtre de confirmation du module (lot G, n° 8). */
 async function creerPuisArchiverUnMateriel(page: Page, materiel: string): Promise<void> {
   const fiche = page.locator('dialog[open], [role=dialog]').filter({ hasText: 'Ajouter un matériel' });
   await ouvrirParClic(page.getByRole('button', { name: 'Ajouter un matériel' }), fiche);
@@ -242,8 +242,8 @@ async function creerPuisArchiverUnMateriel(page: Page, materiel: string): Promis
   const carte = page.locator('.equipment-section article').filter({ hasText: materiel });
   await expect(carte).toContainText('Goutte-à-goutte');
   await carte.getByLabel(`Actions pour ${materiel}`).click();
-  page.once('dialog', (fenetre) => void fenetre.accept());
   await carte.getByRole('menuitem', { name: 'Archiver' }).click();
+  await confirmerDansLaFenetre(page, 'Archiver le matériel');
   await expect(carte).toHaveCount(0, { timeout: 20_000 });
 }
 

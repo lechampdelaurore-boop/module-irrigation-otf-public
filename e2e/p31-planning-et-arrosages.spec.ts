@@ -192,7 +192,7 @@ test('arrosages : rien de présélectionné, « À traiter » en tête, lignes p
   await expect(aTraiter).toHaveCount(0);
   await verifierLEtape(page, journal, 'irrigation enregistrée comme faite');
 
-  // Cas 6, la fin : « Annuler » depuis le menu, avec la confirmation du navigateur.
+  // Cas 6, la fin : « Annuler » depuis le menu, avec la fenêtre de confirmation du module (lot G, n° 8).
   await annulerDepuisLeMenu(page, prevue);
   await expect(prevue).toHaveCount(0);
   await verifierLEtape(page, journal, 'irrigation de demain annulée depuis le menu');

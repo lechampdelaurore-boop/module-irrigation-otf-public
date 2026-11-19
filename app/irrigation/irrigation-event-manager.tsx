@@ -44,6 +44,7 @@ import {
 import type { IrrigationEventActionResult, IrrigationEventConfirmation, IrrigationPreparationMode } from './irrigation-event/contract';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { ScheduleConflictDialog } from './irrigation-manager/schedule-conflict-dialog';
+import { useConfirm } from './shell/use-confirm';
 import { ObjectiveExcessDialog } from './irrigation-manager/objective-excess-dialog';
 import { NO_FORM_HINTS, objectiveExcess, proposedDoseFor, type IrrigationFormHints, type ObjectiveExcess } from '@/lib/domain/irrigation-form-hints';
 import { dateKeyInTimeZone } from '@/lib/domain/water-management';
@@ -127,6 +128,7 @@ export function IrrigationEventManager({
   const [finishEvent, setFinishEvent] = useState<IrrigationEventRecord | null>(null);
   const [editingEventEquipmentId, setEditingEventEquipmentId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { confirm, dialog: confirmDialog } = useConfirm();
   const [finishAt, setFinishAt] = useState(() =>
     localDateTimeInputValue(new Date(initialNowIso), true),
   );
@@ -579,13 +581,14 @@ export function IrrigationEventManager({
         onRecalculatePlan={onRecalculatePlan}
         onStart={(event) => runEventAction(() => startIrrigationEventAction(event.equipment.id), 'liste')}
         onEdit={editPlanned}
-        onCancel={(event) => {
+        onCancel={async (event) => {
+          // La fenêtre du module, en rouge, à la place de la boîte du navigateur (lot G, n° 8, F413).
           if (event.status === 'partially_completed') {
-            if (!window.confirm('Annuler définitivement le reliquat de cette irrigation ?')) return;
+            if (!(await confirm({ title: 'Annuler le reliquat ?', text: 'Annuler définitivement le reliquat de cette irrigation ?', confirmLabel: 'Annuler le reliquat', cancelLabel: 'Garder le reliquat' }))) return;
             runEventAction(() => cancelRemainingIrrigationAction(event.equipment.id), 'liste');
             return;
           }
-          if (!window.confirm('Annuler cette irrigation planifiée ?')) return;
+          if (!(await confirm({ title: 'Annuler l’irrigation ?', text: 'Annuler cette irrigation planifiée ?', confirmLabel: 'Annuler l’irrigation', cancelLabel: 'Garder l’irrigation' }))) return;
           runEventAction(() => cancelPlannedIrrigationAction(event.equipment.id), 'liste');
         }}
         onDoneAsPlanned={recordDoneAsPlanned}
@@ -598,6 +601,8 @@ export function IrrigationEventManager({
         onConfirm={() => submitCreation(true, true)}
         onCancel={() => setConflict(null)}
       />
+
+      {confirmDialog}
 
       <ObjectiveExcessDialog
         excess={excess}

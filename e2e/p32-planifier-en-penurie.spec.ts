@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { horodatageLocal, nomUnique, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
@@ -333,12 +333,12 @@ async function choisirLaPompeHabituelle(page: Page, materiel: string, pompe: str
   await expect(liste).toBeEnabled();
 }
 
-/** Archiver ne se demande qu'une fois, à la confirmation du navigateur, que le parcours accepte comme un utilisateur. */
+/** Archiver ne se demande qu'une fois, à la fenêtre de confirmation du module, que le parcours accepte comme un utilisateur (lot G, n° 8). */
 async function archiverLeMateriel(page: Page, materiel: string): Promise<void> {
   const carte = page.locator('.equipment-section article').filter({ hasText: materiel });
   await carte.getByLabel(`Actions pour ${materiel}`).click();
-  page.once('dialog', (fenetre) => void fenetre.accept());
   await carte.getByRole('menuitem', { name: 'Archiver' }).click();
+  await confirmerDansLaFenetre(page, 'Archiver le matériel');
   await expect(carte).toHaveCount(0, { timeout: 20_000 });
 }
 

@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { confirmerDansLaFenetre } from './parcours.ts';
 import { annulerDepuisLeMenu } from './materiel.ts';
 
 /**
@@ -107,10 +108,9 @@ export async function retirerLesObjectifs(page: Page): Promise<void> {
 
 async function viderLesObjectifsDeLaSemaine(page: Page): Promise<void> {
   const panneau = panneauDesObjectifs(page);
-  await panneau.getByRole('button', { name: 'Tout vider' }).click();
-  const confirmation = page.locator('dialog.water-clear-dialog');
-  await expect(confirmation).toBeVisible();
-  await confirmation.getByRole('button', { name: 'Retirer les objectifs' }).click();
+  await panneau.getByRole('button', { name: 'Vider les objectifs' }).click();
+  await expect(page.locator('dialog.module-confirm-dialog[open]')).toContainText('Vider les objectifs de cette semaine ?');
+  await confirmerDansLaFenetre(page, 'Vider les objectifs');
   await expect(panneau.locator('.goal-chip-list')).toContainText('Aucun objectif pour cette semaine.', { timeout: 15_000 });
 }
 

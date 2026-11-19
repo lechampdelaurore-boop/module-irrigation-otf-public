@@ -1,5 +1,6 @@
 'use client';
 
+import { useConfirm } from '../shell/use-confirm';
 import { useState, useTransition } from 'react';
 import { WEEKDAYS, validateProtectedSlotDraft, type ProtectedSlot, type Weekday } from '@/lib/domain/planning/protected-slots';
 import {
@@ -38,6 +39,7 @@ export function ProtectedSlotsSection({ initialSlots }: { initialSlots: Protecte
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<ProtectedSlotHistoryEntry[] | null>(null);
   const [pending, startTransition] = useTransition();
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   const open = (slot: ProtectedSlot | null) => {
     setEditing({ slotId: slot?.id ?? null, form: protectedSlotForm(slot) });
@@ -80,8 +82,13 @@ export function ProtectedSlotsSection({ initialSlots }: { initialSlots: Protecte
     });
   };
 
-  const remove = (slot: ProtectedSlot) => {
-    if (!window.confirm(`Supprimer le créneau protégé « ${slot.name} » ? Le prochain calcul pourra de nouveau proposer des arrosages à ces heures ; le journal le garde.`)) return;
+  const remove = async (slot: ProtectedSlot) => {
+    if (!(await confirm({
+      title: 'Supprimer ce créneau protégé ?',
+      text: `Supprimer le créneau protégé « ${slot.name} » ? Le prochain calcul pourra de nouveau proposer des arrosages à ces heures ; le journal le garde.`,
+      confirmLabel: 'Supprimer le créneau',
+      cancelLabel: 'Garder le créneau',
+    }))) return;
     setNotice(null);
     setError(null);
     startTransition(async () => {
@@ -175,6 +182,7 @@ export function ProtectedSlotsSection({ initialSlots }: { initialSlots: Protecte
             </ol>
           )
       ) : null}
+      {confirmDialog}
     </section>
   );
 }
