@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot H « Aujourd'hui dit vrai », PR 1 sur 5)
+
+- **La pluie dit d'où elle vient** (D-173) : sur « Aujourd'hui », la tuile
+  « Eau reçue » et la légende d'« Eau de la semaine » disent « pluie
+  prévue, non mesurée », « mesurée » ou « estimée après coup », ou les
+  parts de chacune ; « mesurée » n'est plus écrit pour une pluie prévue.
+  Le calcul ne change pas.
+
 ### Modifié (audit du 19 novembre 2026, lot G, PR 5 sur 5)
 
 - **L'initiale ouvre le menu du compte** (D-172) : le nom, puis « Se

@@ -10,7 +10,7 @@ import type { IrrigationSnapshot } from '../domain/domain';
 import type { FeatureSelection } from '../domain/features/selection';
 import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/today/reliability';
 import { TODAY_WEATHER_DAYS, todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
-import type { TodayWeekInputs } from '../domain/today/week';
+import { pastRainOrigins, type TodayWeekInputs } from '../domain/today/week';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
 import { readCropAlertsView } from './crop-alerts-view';
@@ -134,5 +134,6 @@ async function readWeek(request: { ownerUserId: string; season: number; snapshot
       todayCubicMeters: waterDashboard.todayWater.realizedIrrigationCubicMeters,
       incomplete: waterDashboard.days.some((day) => day.volumeIncomplete),
     },
+    rainOrigins: pastRainOrigins(waterDashboard.days, dateKeyInTimeZone(request.now, FARM_TIME_ZONE)),
   };
 }

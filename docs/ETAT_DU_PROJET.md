@@ -388,8 +388,15 @@ registres, elle y renvoie.
   2026 à 17 h 35 (#105, run 44564244171 vérifié job par job). **PR 5, le
   menu du compte** (D-172, F416) : l'initiale ouvre un menu (nom, « Se
   déconnecter ») au lieu de déconnecter d'un appui ; ligne de la charte
-  changée ; codée. Les cinq PR s'ouvrent et se fusionnent une à une, après
-  les PR 2 et 3 du correctif météo.
+  changée ; en ligne le 19 novembre 2026 à 18 h 12 (#106, fusionnée à
+  17 h 51, run 44570863024 vérifié job par job) : **lot G en ligne en entier**.
+  **Lot H commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
+  court `docs/audit-ergonomie-2026-11-19-lot-h-contract.md` (F429 à F444,
+  parcours P38), cinq PR ; il change le contrat d'« Aujourd'hui » (n° 2),
+  compris dans le choix du porteur. **PR 1, la pluie dit d'où elle vient**
+  (D-173, F429) : « pluie prévue, non mesurée », « mesurée » ou « estimée
+  après coup », ou les parts de chacune, sur la tuile « Eau reçue » et la
+  légende d'« Eau de la semaine » ; le calcul ne change pas ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
