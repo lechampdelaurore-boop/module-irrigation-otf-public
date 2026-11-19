@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
@@ -13,6 +14,11 @@ import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from '.
  *   « mesurée » n'est écrit que pour une pluie du pluviomètre ; une pluie
  *   du jour mesurée sur « Objectifs et besoins » se lit « mesurés » sur
  *   « Aujourd'hui », puis est retirée.
+ *
+ * - les jardins qui comptent d'abord (n° 4, F430 et F431) : une irrigation
+ *   planifiée plus tard dans la journée sur N01 met « Jardin Nord » en tête
+ *   d'« Eau de la semaine » et de « Réserve du sol », avant « Jardin du
+ *   verger » que l'ordre naturel mettait devant ; l'irrigation annulée.
  *
  * Ce qu'il ne prouve pas : les parts de chaque origine (les tests du
  * domaine, `tests/audit-ergonomie-2026-11-19-lot-h.test.ts`, les chiffrent),
@@ -79,4 +85,35 @@ test('la pluie dit d’où elle vient, sur la tuile et sur la légende', async (
     }
     await expect(millimetres).toHaveValue(avant);
   }
+});
+
+test('les jardins qui ont une irrigation aujourd’hui passent en tête', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const reference = Date.now();
+  const debut = horodatageLocal(30, reference);
+  // Une irrigation plus tard dans la journée : à moins de 30 minutes de minuit, rien à prouver.
+  test.skip(debut.slice(0, 10) !== horodatageLocal(0, reference).slice(0, 10), 'trop près de minuit');
+  await attendreLaPageIrrigation(page);
+  const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p38 jardins' });
+  await attendreLaPageIrrigation(page, 'arrosages');
+  await page.getByRole('tab', { name: /^Planifier/ }).click();
+  await choisirMaterielEtReglage(page, materiel, reglage, '5');
+  await page.getByLabel('Date et heure de début').fill(debut);
+  await page.getByRole('button', { name: 'Planifier l’irrigation' }).click();
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  const reponse = page.locator('.irrigation-preview .action-reply .irrigation-event-notice');
+  await expect(reponse.or(fenetre)).toBeVisible();
+  if (await fenetre.isVisible()) await fenetre.getByRole('button', { name: /quand même$/ }).click();
+  await expect(reponse).toHaveText(/planifiée/);
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const premier = (bloc: string) => page.locator(`${bloc} .today-bar-row:not([data-total]) .today-bar-name`).first();
+  if (await page.locator('#today-week-water').count()) await expect(premier('#today-week-water')).toHaveText('Jardin Nord');
+  if (await page.locator('#today-soil').count()) await expect(premier('#today-soil')).toHaveText('Jardin Nord');
+  await verifierLEtape(page, journal, 'le jardin arrosé aujourd’hui en tête');
+
+  await attendreLaPageIrrigation(page, 'arrosages');
+  const fiches = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
+  await annulerDepuisLeMenu(page, fiches.first());
+  await expect(fiches).toHaveCount(0);
 });

@@ -253,6 +253,8 @@ export type TodayInputs = {
    */
   shortagePlan: Pick<StoredWeeklyPlan, 'calculation'> | null;
   bedNames: ReadonlyMap<string, string>;
+  /** Le jardin de chaque planche, pour montrer d'abord les jardins arrosés aujourd'hui (lot H, F430 et F431). */
+  bedPlots?: ReadonlyMap<string, string>;
   /** `null` quand « Ressources et pompes » n'est pas coché. */
   infrastructure: WaterInfrastructure | null;
   reliability: Omit<ReliabilityInputs, 'enabled' | 'now' | 'planComputedAt' | 'reservoirs'>;
@@ -285,6 +287,14 @@ export type TodayView = {
   shortage: TodayShortage | null;
 };
 
+/** Les jardins d'une irrigation à faire aujourd'hui : en retard, planifiée ou à valider (F430). */
+function gardensIrrigatedToday(lines: readonly { bedIds: readonly string[] }[], bedPlots: ReadonlyMap<string, string> | undefined): Set<string> {
+  return new Set(lines.flatMap((line) => line.bedIds.flatMap((bedId) => {
+    const plotId = bedPlots?.get(bedId);
+    return plotId ? [plotId] : [];
+  })));
+}
+
 export function todayView(input: TodayInputs): TodayView {
   const { enabled, now } = input;
   const on = (feature: FeatureId) => enabled.includes(feature);
@@ -313,6 +323,7 @@ export function todayView(input: TodayInputs): TodayView {
   if (reliabilityOn) blocks.push({ kind: 'reliability', zone: reliabilityZone(reliability), checks: reliabilityChecks(reliabilityInputs, reliability) });
   const count = reliability.length + late.length;
   const today = farmDateKey(now);
+  const irrigatedToday = gardensIrrigatedToday([...late, ...todo], input.bedPlots);
   // Ce qui attend après le jour ne se dit que « Planning » coché (lot A, R1) : le plan de la semaine en décide.
   const tomorrow = on('planning') && input.plan ? todayTomorrow(input.plan.proposals, now) : null;
   const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled) : null;
@@ -331,8 +342,8 @@ export function todayView(input: TodayInputs): TodayView {
     }),
     timeline: irrigationsOn ? dayTimeline([...late, ...todo], now) : null,
     allDone: irrigationsOn ? allDone({ lines: [...late, ...todo], events: input.events, now }) : null,
-    week: on('besoins') && input.week ? todayWeek(input.week) : null,
-    soil: on('sol') && input.soil ? todaySoil(input.soil) : null,
+    week: on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null,
+    soil: on('sol') && input.soil ? todaySoil(input.soil, irrigatedToday) : null,
     tomorrow,
     shortage,
   };
