@@ -32,6 +32,7 @@ import {
   cancelRemainingIrrigationForUser,
   finishIrrigationEventForUser,
 } from '@/db/irrigation-event/completion';
+import { findScheduleConflictForUser } from '@/db/irrigation-event/conflicts';
 import { createIrrigationEventForUser, updatePlannedIrrigationForUser } from '@/db/irrigation-event/create';
 import { IrrigationEventInputError } from '@/db/irrigation-event/errors';
 import {
@@ -171,6 +172,18 @@ async function saveIrrigationEventAction(
     }
 
     const timing = resolveTiming(input, equipment.kind, applications);
+    // Une seconde irrigation du même matériel sur un créneau déjà planifié se confirme
+    // avant toute écriture (audit du 19 novembre 2026, lot G, n° 1, F407).
+    if (input.confirmScheduleConflict !== true && timing.plannedStartAt && timing.plannedEndAt) {
+      const conflict = await findScheduleConflictForUser(user.userId, equipment.id, timing.plannedStartAt, timing.plannedEndAt, eventEquipmentId);
+      if (conflict) {
+        return {
+          ok: false,
+          message: 'Ce matériel a déjà une irrigation planifiée sur ce créneau.',
+          confirmation: { kind: 'schedule-conflict', ...conflict },
+        };
+      }
+    }
     const selectedPumpId = input.pumpId === undefined
       ? pumpsEnabled ? pumpConfiguration.equipmentDefaults.find((entry) => entry.equipmentId === equipment.id)?.pumpId ?? null : null
       : input.pumpId;

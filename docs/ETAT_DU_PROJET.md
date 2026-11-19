@@ -314,8 +314,8 @@ registres, elle y renvoie.
   la date verte de la mise à jour automatique devient un avertissement
   « Mise à jour automatique de la météo en retard », avec la date de la
   dernière réussite et la dernière erreur enregistrée, sur « Objectifs et
-  besoins » comme sur « Réglages ». **PR 3 sur 3 codée**
-  (`fix/meteo-une-seule-execution`, D-166) : le planificateur laisse
+  besoins » comme sur « Réglages ». **PR 3 sur 3 en ligne le 19 novembre
+  2026 à 14 h 18** (#99, fusionnée à 14 h 01, run 44529337449 vérifié job par job : « Application », « Workers Cloudflare », « Parcours navigateur », « Déploiement Cloudflare » et « Déploiement de la démonstration », verts) (D-166) : le planificateur laisse
   90 secondes à la route du site au lieu de 25, et ne relance plus une
   route abandonnée pour délai dépassé ; plus de seconde exécution chaque
   matin. Contrôles de la PR 1 : `pnpm lint`,
@@ -339,6 +339,14 @@ registres, elle y renvoie.
   planche demande une confirmation (11 h 42). Le lot G commence après la
   PR 3 du correctif météo ; un seul chantier de code à la fois, la 4.3
   reprenant la main dès l'accès d'OTF.
+  **Lot G commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
+  court `docs/audit-ergonomie-2026-11-19-lot-g-contract.md` (F404 à F416,
+  parcours P37), cinq PR. **PR 1, le module répond à côté du bouton**
+  (D-167, F404 à F408) : chaque message sous le bouton du geste, amené en
+  vue ; le formulaire d'irrigation vidé après une réussite ; une seconde
+  irrigation du même matériel sur un créneau déjà planifié demandée dans
+  la fenêtre du module, rien n'est écrit sans elle ; un rechargement des
+  besoins muet ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

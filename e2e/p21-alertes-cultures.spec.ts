@@ -168,5 +168,6 @@ async function actualiserLaMeteo(page: Page): Promise<void> {
   await expect(bouton).toBeEnabled(PAUSE_D_ACTUALISATION);
   await bouton.click();
   await expect(bouton).toBeDisabled({ timeout: 30_000 });
-  await expect(page.locator('.water-management-section > .water-notice')).toHaveText(/La météo a été actualisée\.|Actualisation météo incomplète/);
+  // Le message vient sous le bouton, dans l'encart de la météo (lot G, n° 1, F404).
+  await expect(meteo.locator('.water-notice')).toHaveText(/La météo a été actualisée\.|Actualisation météo incomplète/);
 }

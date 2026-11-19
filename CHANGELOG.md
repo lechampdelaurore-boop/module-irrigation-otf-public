@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot G « Le module vous répond », PR 1 sur 5)
+
+- **Le message vient sous le bouton appuyé** (D-167) : au téléphone, la
+  réponse d'« Arrosages », d'« Objectifs et besoins » et des besoins ne
+  s'affiche plus en tête de section, hors de l'écran, mais juste sous le
+  bouton du geste.
+- **Le formulaire d'irrigation se vide après une réussite**, et une
+  seconde irrigation du même matériel sur un créneau déjà planifié
+  demande une confirmation dans une fenêtre du module avant d'être écrite.
+- **Un rechargement automatique des besoins ne parle plus.**
+
 ### Corrigé (la mise à jour automatique de la météo, PR 3 sur 3)
 
 - **Une seule synchronisation chaque matin** (D-166) : le planificateur

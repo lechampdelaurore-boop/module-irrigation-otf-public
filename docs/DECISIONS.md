@@ -5872,3 +5872,44 @@ retentées comme avant, trois tentatives au plus. La règle vit dans
 
 Ne changent pas : le créneau de 6 h 15 ; le verrou D1 de la météo ; les
 tentatives du moteur auprès du fournisseur météo (D-164).
+
+## D-167 — Lot G, PR 1 : le module répond à côté du bouton
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 1 : au
+téléphone, le message d'« Arrosages », d'« Objectifs et besoins » et des
+besoins s'affiche en tête de section, plus de 1 000 px au-dessus du bouton
+appuyé ; le formulaire d'irrigation garde ses champs après une réussite,
+et un second appui sur « Planifier l'irrigation » crée une seconde
+irrigation identique, que le serveur ne signale qu'après l'avoir écrite.
+Lot G retenu par le porteur le 19 novembre 2026 à 11 h 39 ; contrat court
+`docs/audit-ergonomie-2026-11-19-lot-g-contract.md` (sections 1 à 3).
+
+**Décision.**
+
+1. Chaque message porte l'endroit du geste qui l'a fait naître et ne
+   s'affiche que là, juste sous le bouton appuyé, amené en vue au plus
+   près (`app/irrigation/shell/action-reply.tsx`) : formulaire
+   d'irrigation, objectif, pluie mesurée, limite journalière, commune,
+   « Actualiser la météo », seuil, décision d'une planche ; une action
+   d'une carte « À venir » en tête de cette liste ; le reste en tête de
+   section, comme avant (F404).
+2. Un rechargement automatique des besoins ne dit plus « Les besoins ont
+   été recalculés » ; seule son erreur s'affiche (F405).
+3. Après une réussite, le formulaire d'irrigation se vide : matériel,
+   réglage et note vides, quantité et durée à leur valeur de départ ; son
+   bouton redevient indisponible. Les dates restent (F406).
+4. Une irrigation du même matériel sur un créneau où il en a déjà une
+   planifiée, non démarrée, demande une confirmation dans la fenêtre du
+   module ; sans elle, le serveur n'écrit rien
+   (`findScheduleConflictForUser`, lue avant toute écriture) ; donnée, il
+   écrit et garde l'avertissement d'aujourd'hui (F407).
+5. La fenêtre de confirmation du module (`shell/confirm-dialog.tsx`) :
+   titre, phrase, le geste qui ne fait rien à gauche, Échap qui ferme ;
+   vert pour ce qui ajoute, rouge pour ce qui efface (F408, reprise par
+   le n° 8 en PR 4).
+
+Ne changent pas : ce que chaque bouton écrit une fois confirmé ; le
+moteur, le planificateur ; la règle du refus (D-030) ; les classes de
+dessin des messages.
