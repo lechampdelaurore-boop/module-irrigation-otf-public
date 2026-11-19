@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { FEATURE_IDS } from '../lib/domain/features/catalogue.ts';
+import type { IrrigationEventRecord } from '../lib/domain/irrigation-event-record.ts';
 import type { SoilGaugeZone } from '../lib/domain/soil-reserve/gauge-view.ts';
+import { todayHeadline } from '../lib/domain/today/headline.ts';
+import { nowIrrigationLines } from '../lib/domain/today/now-irrigations.ts';
 import { todaySoil } from '../lib/domain/today/soil.ts';
 import { pastRainOrigins, todayWeek, type RainOrigins, type TodayWeekBed } from '../lib/domain/today/week.ts';
 
@@ -109,4 +113,69 @@ test('n° 4, F431 et F432 : « Réserve du sol » montre d’abord les jardins a
   assert.deepEqual(soil.shown.map((garden) => garden.name), ['T4', 'Sec', 'bloc 1', 'Bloc 2', 'bloc 3', 'bloc 4', 'bloc 5', 'bloc 6']);
   assert.deepEqual(soil.hidden.map((garden) => garden.name), ['Bloc 10', 'Bloc 11', 'Friche', 'T1', 'T2', 'T3']);
   assert.equal(soil.moreLabel, 'Voir les 6 autres jardins');
+});
+
+// n° 2 : en cours et reliquat (F433 à F435). Aujourd'hui = jeudi 19 novembre 2026, 11 h 00 à la ferme.
+
+const NOW = new Date('2026-11-19T10:00:00.000Z');
+const BED_NAMES = new Map([['b1', 'P1'], ['b2', 'P2']]);
+
+function irrigation(id: string, values: { status?: string; timerState?: 'running' | 'paused' | null; timer?: Record<string, unknown>; remainingCanceledAt?: string | null; actualMm?: number }): IrrigationEventRecord {
+  return {
+    id: `event-${id}`, season: 2026, status: values.status ?? 'running', note: null,
+    remainingCanceledAt: values.remainingCanceledAt ?? null, canceledAt: null,
+    createdAt: '2026-11-19T07:00:00.000Z', updatedAt: '2026-11-19T07:00:00.000Z',
+    equipment: {
+      id, status: values.status ?? 'running',
+      plannedStartAt: '2026-11-19T08:40:00.000Z', plannedEndAt: '2026-11-19T12:50:00.000Z',
+      actualStartAt: '2026-11-19T08:40:00.000Z', actualEndAt: null,
+      plannedDurationSeconds: 4 * 3600 + 10 * 60, actualDurationSeconds: 3600,
+      timerState: values.timerState ?? null, timerStartedAt: null, timerResumedAt: null, timerPausedAt: null,
+      timerTheoreticalEndAt: null, timerAccumulatedSeconds: 0, remainingCanceledAt: null, canceledAt: null,
+      equipmentSnapshot: { id: 'eq', name: 'Goutte-à-goutte de l’abri', kind: 'drip', mobility: 'fixed' },
+      settingSnapshot: { name: 'Réglage 1' },
+      applications: [
+        { otfBedId: 'b1', plannedAmountMm: 20, actualAmountMm: values.actualMm ?? 0, wettedAreaSquareMeters: 50 },
+        { otfBedId: 'b2', plannedAmountMm: 20, actualAmountMm: values.actualMm ?? 0, wettedAreaSquareMeters: 50 },
+      ],
+      ...values.timer,
+    },
+  } as unknown as IrrigationEventRecord;
+}
+
+const running = irrigation('r', { timerState: 'running', timer: {
+  timerStartedAt: '2026-11-19T08:40:00.000Z', timerResumedAt: '2026-11-19T08:40:00.000Z', timerTheoreticalEndAt: '2026-11-19T12:50:00.000Z',
+} });
+
+test('n° 2, F433 : une irrigation en cours, en pause ou à confirmer se lit en tête, avec « Arrêter / Terminer » vers sa carte', () => {
+  const paused = irrigation('p', { timerState: 'paused', timer: {
+    timerStartedAt: '2026-11-19T08:00:00.000Z', timerPausedAt: '2026-11-19T09:05:00.000Z', timerAccumulatedSeconds: 3900,
+  } });
+  const finished = irrigation('f', { timerState: 'running', timer: {
+    timerStartedAt: '2026-11-19T04:00:00.000Z', timerResumedAt: '2026-11-19T04:00:00.000Z', timerTheoreticalEndAt: '2026-11-19T08:10:00.000Z',
+  } });
+  const lines = nowIrrigationLines({ enabled: [...FEATURE_IDS], now: NOW, events: [running, paused, finished], bedNames: BED_NAMES });
+  assert.deepEqual(lines.map((line) => [line.status, line.title, line.detail, line.bedsText, line.canResume, line.open]), [
+    ['Durée atteinte', 'Goutte-à-goutte de l’abri · Réglage 1', 'depuis 5 h, fermer la vanne', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-f' }],
+    ['En pause', 'Goutte-à-goutte de l’abri · Réglage 1', 'en pause depuis 10 h 05', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-p' }],
+    ['En cours', 'Goutte-à-goutte de l’abri · Réglage 1', 'depuis 9 h 40, fin prévue à 13 h 50', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-r' }],
+  ]);
+});
+
+test('n° 2, F434 : le reliquat d’une irrigation partielle se lit avec « Reprendre le reliquat » ; annulé, il n’y est plus', () => {
+  const partial = irrigation('q', { status: 'partially_completed', actualMm: 4.8 });
+  const canceled = irrigation('c', { status: 'partially_completed', remainingCanceledAt: '2026-11-19T09:00:00.000Z' });
+  const completed = irrigation('d', { status: 'completed' });
+  const lines = nowIrrigationLines({ enabled: [...FEATURE_IDS], now: NOW, events: [partial, canceled, completed], bedNames: BED_NAMES });
+  // 4 h 10 prévues, 1 h faite : reste 3 h 10 ; 2 m³ prévus, 0,48 m³ apportés.
+  assert.deepEqual(lines.map((line) => [line.status, line.detail, line.canResume]), [['Reliquat', 'reste 3 h 10 · 1,52 m³', true]]);
+});
+
+test('n° 2, F435 : la phrase et les pastilles disent l’en-cours et le reliquat, jamais « Rien à arroser »', () => {
+  const current = nowIrrigationLines({ enabled: [...FEATURE_IDS], now: NOW, events: [running, irrigation('q', { status: 'partially_completed' })], bedNames: BED_NAMES });
+  const headline = todayHeadline({ today: '2026-11-19', irrigations: { current, late: [], todo: [] }, weather: null, reliabilityCount: null, tomorrow: null, shortage: null });
+  assert.equal(headline.sentence, 'Une irrigation est en cours. Un reliquat est à reprendre.');
+  assert.deepEqual(headline.chips.map((chip) => chip.text), ['1 en cours', '1 reliquat']);
+  const calm = todayHeadline({ today: '2026-11-19', irrigations: { current: [], late: [], todo: [] }, weather: null, reliabilityCount: null, tomorrow: null, shortage: null });
+  assert.deepEqual(calm.chips.map((chip) => chip.text), ['Rien à arroser']);
 });

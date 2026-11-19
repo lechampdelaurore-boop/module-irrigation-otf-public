@@ -70,7 +70,7 @@ export type TodayIrrigationLine = {
 };
 
 /** L'ancre de la carte d'une irrigation sur la page des arrosages (`irrigation-cards.tsx`). */
-function irrigationAnchor(eventEquipmentId: string): string {
+export function irrigationAnchor(eventEquipmentId: string): string {
   return `irrigation-${eventEquipmentId}`;
 }
 
@@ -87,7 +87,7 @@ export function durationText(seconds: number): string {
 }
 
 /** « planche P1 », « planches P1 et P2 », dans l'ordre naturel ; vide sans nom connu. */
-function bedsText(bedIds: Iterable<string>, bedNames: ReadonlyMap<string, string>): string {
+export function bedsText(bedIds: Iterable<string>, bedNames: ReadonlyMap<string, string>): string {
   const names = sortedNames([...bedIds].flatMap((id) => {
     const name = bedNames.get(id);
     return name ? [name] : [];
@@ -97,7 +97,7 @@ function bedsText(bedIds: Iterable<string>, bedNames: ReadonlyMap<string, string
   return `planche${names.length > 1 ? 's' : ''} ${listed}`;
 }
 
-function timeText(instant: string, today: string): string {
+export function timeText(instant: string, today: string): string {
   const day = farmDateKey(instant);
   return day === today ? farmHourText(instant) : `${shortDayText(day)} à ${farmHourText(instant)}`;
 }
@@ -107,7 +107,7 @@ function detailText(parts: (string | null)[]): string {
 }
 
 /** La carte d'une irrigation s'ouvre sur les arrosages, ou sur le planning quand les arrosages ne sont pas cochés. */
-function irrigationPage(enabled: FeatureSelection): IrrigationPageId {
+export function irrigationPage(enabled: FeatureSelection): IrrigationPageId {
   return enabled.includes('arrosages') ? 'arrosages' : 'planning';
 }
 

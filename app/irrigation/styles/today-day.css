@@ -135,6 +135,17 @@
   border-left-style: dashed;
 }
 
+/* Ce qui coule ou attend d'être repris (lot H, n° 2, F433, F434) : sans heure, l'eau en bleu. */
+.today-group[data-group="now"] .today-irrigation {
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-left-color: var(--water);
+}
+
+.today-irrigation[data-tone="finished"],
+.today-irrigation[data-tone="remainder"] {
+  border-left-color: var(--warn);
+}
+
 .today-irrigation-time {
   display: grid;
   margin: 0;
@@ -217,6 +228,18 @@
 .today-status[data-tone="missed"] {
   background: var(--danger-soft);
   color: var(--danger-ink);
+}
+
+.today-status[data-tone="running"],
+.today-status[data-tone="paused"] {
+  background: var(--water-soft);
+  color: var(--water-ink);
+}
+
+.today-status[data-tone="finished"],
+.today-status[data-tone="remainder"] {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
 }
 
 .today-status[data-tone="proposed"] {
@@ -304,6 +327,10 @@
 
   .today-irrigation-actions {
     grid-column: 1 / -1;
+  }
+
+  .today-group[data-group="now"] .today-irrigation {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .today-irrigation-actions > * {

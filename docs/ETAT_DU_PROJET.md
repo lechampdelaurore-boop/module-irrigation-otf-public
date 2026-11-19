@@ -402,7 +402,13 @@ registres, elle y renvoie.
   **PR 2, les jardins qui comptent d'abord** (D-174, F430 à F432) : les
   jardins arrosés aujourd'hui en tête d'« Eau de la semaine » et de
   « Réserve du sol », puis les plus loin de leur objectif ou les plus
-  secs ; les repliés dans l'ordre naturel ; codée.
+  secs ; les repliés dans l'ordre naturel ; en ligne le 19 novembre 2026
+  à 19 h 39 (#108, fusionnée à 19 h 17, run 44586171609 vérifié job par job). **PR 3, en cours et
+  reliquat** (D-175, F433 à F435) : en tête de « Votre journée »,
+  l'irrigation en cours (avec « Arrêter / Terminer » vers sa carte) et le
+  reliquat à reprendre (« Reprendre le reliquat ») ; jamais « Rien à
+  arroser » vanne ouverte ; contrat d'« Aujourd'hui » changé (T20) ;
+  codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

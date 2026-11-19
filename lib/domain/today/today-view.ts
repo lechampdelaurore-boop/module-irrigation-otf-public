@@ -29,6 +29,7 @@ import {
   type ReliabilityZone,
 } from './reliability.ts';
 import { todaySoil, type TodaySoil } from './soil.ts';
+import { nowIrrigationLines, type TodayNowLine } from './now-irrigations.ts';
 import { todayWeek, type TodayWeek, type TodayWeekInputs } from './week.ts';
 import { lateIrrigationLines, NOTHING_LATE, NOTHING_TO_DO, todayTodoLines, type TodayIrrigationLine } from './today-irrigations.ts';
 import { countText, farmDateKey, farmHourText, namesText, shortDayText } from './today-text.ts';
@@ -273,6 +274,8 @@ export type TodayView = {
   badge: number | null;
   /** La date, la phrase de résumé et les pastilles du tableau de bord. */
   headline: TodayHeadline;
+  /** Ce qui coule ou attend d'être repris, en tête de « Votre journée » (lot H, n° 2, F433 et F434) ; vide sans planning ni arrosages. */
+  current: TodayNowLine[];
   /** La frise des irrigations du jour ; `null` sans irrigation aujourd'hui ou sans planning ni arrosages. */
   timeline: DayTimeline | null;
   /** « Tout est fait » : ce que le bouton enregistrera ; `null` sans rien à couvrir, pas de bouton (section 3.4). */
@@ -287,7 +290,7 @@ export type TodayView = {
   shortage: TodayShortage | null;
 };
 
-/** Les jardins d'une irrigation à faire aujourd'hui : en retard, planifiée ou à valider (F430). */
+/** Les jardins d'une irrigation d'aujourd'hui : en cours, reliquat, en retard, planifiée ou à valider (F430). */
 function gardensIrrigatedToday(lines: readonly { bedIds: readonly string[] }[], bedPlots: ReadonlyMap<string, string> | undefined): Set<string> {
   return new Set(lines.flatMap((line) => line.bedIds.flatMap((bedId) => {
     const plotId = bedPlots?.get(bedId);
@@ -310,6 +313,7 @@ export function todayView(input: TodayInputs): TodayView {
   };
   const reliability = reliabilityLines(reliabilityInputs);
   const late = irrigationsOn ? lateIrrigationLines({ ...input, enabled, now }) : [];
+  const current = irrigationsOn ? nowIrrigationLines({ enabled, now, events: input.events, bedNames: input.bedNames }) : [];
   const todo = irrigationsOn ? todayTodoLines({ ...input, enabled, now, proposals: on('planning') ? input.plan?.proposals ?? [] : null }) : [];
   const blocks: TodayBlock[] = [];
   const weather = on('alertes-cultures') || on('alertes-meteo') ? weatherBlock(input.weather, enabled, now) : null;
@@ -323,7 +327,7 @@ export function todayView(input: TodayInputs): TodayView {
   if (reliabilityOn) blocks.push({ kind: 'reliability', zone: reliabilityZone(reliability), checks: reliabilityChecks(reliabilityInputs, reliability) });
   const count = reliability.length + late.length;
   const today = farmDateKey(now);
-  const irrigatedToday = gardensIrrigatedToday([...late, ...todo], input.bedPlots);
+  const irrigatedToday = gardensIrrigatedToday([...current, ...late, ...todo], input.bedPlots);
   // Ce qui attend après le jour ne se dit que « Planning » coché (lot A, R1) : le plan de la semaine en décide.
   const tomorrow = on('planning') && input.plan ? todayTomorrow(input.plan.proposals, now) : null;
   const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled) : null;
@@ -334,12 +338,13 @@ export function todayView(input: TodayInputs): TodayView {
     badge: count === 0 ? null : count,
     headline: todayHeadline({
       today,
-      irrigations: irrigationsOn ? { late, todo } : null,
+      irrigations: irrigationsOn ? { current, late, todo } : null,
       weather: weather ? { tone: weather.tone, days: weather.days, calmText: weather.tone === 'calm' && !weather.unposedFrost ? weather.lines[weather.lines.length - 1] ?? null : null, unposedFrost: weather.unposedFrost } : null,
       reliabilityCount: reliabilityOn ? reliability.length : null,
       tomorrow,
       shortage,
     }),
+    current,
     timeline: irrigationsOn ? dayTimeline([...late, ...todo], now) : null,
     allDone: irrigationsOn ? allDone({ lines: [...late, ...todo], events: input.events, now }) : null,
     week: on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null,

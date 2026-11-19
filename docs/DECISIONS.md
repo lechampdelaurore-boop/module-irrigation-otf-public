@@ -6099,6 +6099,36 @@ F432). La précision T9 du contrat d'« Aujourd'hui » est réécrite.
 Ne changent pas : le nombre de jardins montrés (huit), les valeurs, la
 ligne de la ferme en tête d'« Eau de la semaine ».
 
+## D-175 — Lot H, PR 3 : « Aujourd'hui » voit l'arrosage en cours et le reliquat
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 2 : après
+« Démarrer l'irrigation », « Aujourd'hui » disait « Rien à arroser » et
+« Rien d'urgent aujourd'hui » vanne ouverte ; après un arrêt en route, le
+reliquat restait invisible. La page ne connaissait que quatre états :
+non faite, en retard, planifiée, à valider. Ce constat change le contrat
+de la page validé le 8 novembre 2026 (D-074) ; le porteur l'a retenu avec
+le lot H le 19 novembre 2026 à 11 h 39.
+
+**Décision.** En tête de « Votre journée » (`lib/domain/today/now-irrigations.ts`,
+`app/irrigation/today/today-day.tsx`) : chaque irrigation dont le
+minuteur tourne (« depuis 9 h 40, fin prévue à 13 h 50 »), est en pause
+(« en pause depuis 10 h 05 ») ou attend sa confirmation (« Durée
+atteinte », « fermer la vanne »), avec un lien « Arrêter / Terminer » qui
+ouvre sa carte sur « Arrosages », où l'arrêt garde sa confirmation et sa
+durée réelle (D-028) ; puis chaque reliquat d'une irrigation partielle,
+non annulé, comme le lit « Arrosages » (« reste 3 h 10 · 1,52 m³ »), avec
+« Reprendre le reliquat », le même geste. La phrase du jour, les
+pastilles (« 1 en cours », « 1 reliquat ») et le sous-titre les comptent ;
+« Rien à arroser » ne se dit plus quand l'une d'elles existe. Les jardins
+de ces irrigations comptent parmi ceux arrosés aujourd'hui (F430). Le
+contrat d'« Aujourd'hui » gagne ces lignes (section 3.2, précision T20 ;
+F433 à F435).
+
+Ne changent pas : « Tout est fait » (T15) ; la frise ; les gestes et les
+confirmations d'« Arrosages ».
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

@@ -4,6 +4,7 @@ import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all-done';
 import type { TodayTomorrow } from '@/lib/domain/today/ahead';
 import type { DayTimeline, LateItem } from '@/lib/domain/today/day-plan';
+import type { TodayNowLine } from '@/lib/domain/today/now-irrigations';
 import type { TodayIrrigationLine } from '@/lib/domain/today/today-irrigations';
 import { shortDayText } from '@/lib/domain/today/today-text';
 import type { TodayBlock } from '@/lib/domain/today/today-view';
@@ -26,10 +27,15 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * (section 3.4) ; sur chacune d'elles, « Fait comme prévu » pour elle seule
  * (audit ergonomique, lot 3, point 6.5, F43), avec la même règle. Au pied,
  * les arrosages de demain encore à valider, avec un lien vers le premier sur
- * le planning (audit ergonomique final, lot A, R1, F274).
+ * le planning (audit ergonomique final, lot A, R1, F274). Tout en tête, ce
+ * qui coule ou attend d'être repris : une irrigation en cours, avec
+ * « Arrêter / Terminer » qui ouvre sa carte sur « Arrosages », et un
+ * reliquat, avec « Reprendre le reliquat » (audit du 19 novembre 2026,
+ * lot H, n° 2, F433 et F434).
  */
-export function TodayDay({ today, late, todo, tomorrow, timeline, allDone, query, pending, onStart, onAllDone }: {
+export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, query, pending, onStart, onAllDone }: {
   today: string;
+  current?: readonly TodayNowLine[];
   late: LateBlock;
   todo: TodoBlock;
   tomorrow: TodayTomorrow | null;
@@ -40,7 +46,7 @@ export function TodayDay({ today, late, todo, tomorrow, timeline, allDone, query
   onStart: (eventEquipmentId: string) => void;
   onAllDone: (eventEquipmentIds: string[]) => Promise<void>;
 }) {
-  const nothing = late.lines.length === 0 && todo.lines.length === 0;
+  const nothing = current.length === 0 && late.lines.length === 0 && todo.lines.length === 0;
   const confirmations = doneAsPlannedConfirmations(allDone);
   const card = (line: TodayIrrigationLine) => {
     const id = line.eventEquipmentId;
@@ -63,7 +69,7 @@ export function TodayDay({ today, late, todo, tomorrow, timeline, allDone, query
         <span className="today-block-badge"><Icon name="goutte" /></span>
         <div>
           <h2 id="today-day-title">Votre journée</h2>
-          <p className="today-block-sub">{daySummary(late, todo)}</p>
+          <p className="today-block-sub">{daySummary(current, late, todo)}</p>
         </div>
         {allDone ? <TodayAllDone allDone={allDone} pending={pending} onConfirm={onAllDone} /> : null}
       </div>
@@ -77,6 +83,14 @@ export function TodayDay({ today, late, todo, tomorrow, timeline, allDone, query
             <b>Rien à arroser aujourd’hui</b>
             <p>{late.empty} {todo.empty}</p>
           </div>
+        </div>
+      ) : null}
+      {current.length > 0 ? (
+        <div className="today-group" data-group="now">
+          <h3 className="today-group-title">{nowTitle(current)}</h3>
+          <ul className="today-irrigations">
+            {current.map((line) => <NowCard key={line.key} line={line} query={query} pending={pending} onStart={onStart} />)}
+          </ul>
         </div>
       ) : null}
       {late.lines.length > 0 ? (
@@ -108,11 +122,63 @@ export function TodayDay({ today, late, todo, tomorrow, timeline, allDone, query
   );
 }
 
-/** « Aucune irrigation en retard · 2 à faire aujourd’hui ». */
-function daySummary(late: LateBlock, todo: TodoBlock): string {
-  const lateText = late.lines.length === 0 ? 'Aucune en retard' : `${late.lines.length} à rattraper`;
+/** « 1 en cours · Aucune en retard · 2 à faire aujourd’hui ». */
+function daySummary(current: readonly TodayNowLine[], late: LateBlock, todo: TodoBlock): string {
+  const running = current.filter((line) => line.tone !== 'remainder').length;
+  const remainders = current.length - running;
+  const nowText = [
+    running > 0 ? `${running} en cours` : null,
+    remainders > 0 ? `${remainders} reliquat${remainders > 1 ? 's' : ''} à reprendre` : null,
+  ];
+  const lateText = late.lines.length === 0 ? 'aucune en retard' : `${late.lines.length} à rattraper`;
   const todoText = todo.lines.length === 0 ? 'rien à faire aujourd’hui' : `${todo.lines.length} à faire aujourd’hui`;
-  return `${lateText} · ${todoText}`;
+  const text = [...nowText, lateText, todoText].filter((part): part is string => part !== null).join(' · ');
+  return text.charAt(0).toLocaleUpperCase('fr-FR') + text.slice(1);
+}
+
+/** « En cours (1) », « Reliquat à reprendre (1) », « En cours et reliquats (2) ». */
+function nowTitle(current: readonly TodayNowLine[]): string {
+  const remainders = current.filter((line) => line.tone === 'remainder').length;
+  const label = remainders === 0 ? 'En cours' : remainders === current.length ? `Reliquat${remainders > 1 ? 's' : ''} à reprendre` : 'En cours et reliquats';
+  return `${label} (${current.length})`;
+}
+
+/** Une irrigation en cours, en pause ou à confirmer, ou un reliquat (F433, F434). */
+function NowCard({ line, query, pending, onStart }: {
+  line: TodayNowLine;
+  query: PageQuery;
+  pending: boolean;
+  onStart: (eventEquipmentId: string) => void;
+}) {
+  return (
+    <li className="today-irrigation" data-tone={line.tone}>
+      <div className="today-irrigation-body">
+        <p className="today-irrigation-title">
+          <Icon name={EQUIPMENT_ICONS[line.equipmentKind]} />
+          <span>{line.title}</span>
+          <span className="today-status" data-tone={line.tone}>{line.status}</span>
+        </p>
+        <p className="today-irrigation-meta">
+          <span>{line.detail}</span>
+          {line.bedsText ? <span>{line.bedsText}</span> : null}
+        </p>
+      </div>
+      <div className="today-irrigation-actions">
+        {line.canResume ? (
+          <button type="button" className="primary" disabled={pending} onClick={() => onStart(line.eventEquipmentId)}>
+            Reprendre le reliquat
+          </button>
+        ) : null}
+        <a
+          className="today-action-link"
+          href={pageHref(line.open.page, query, line.open.anchor)}
+          aria-label={`${line.canResume ? 'Ouvrir' : 'Arrêter ou terminer'} : ${line.title}`}
+        >
+          {line.canResume ? 'Ouvrir' : 'Arrêter / Terminer'}
+        </a>
+      </div>
+    </li>
+  );
 }
 
 function Timeline({ timeline }: { timeline: DayTimeline }) {
