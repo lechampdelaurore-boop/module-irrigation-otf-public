@@ -8,11 +8,18 @@ import type {
   Season,
   Zone,
 } from '../domain.ts';
-import { OtfApiError, extractCollection } from './api-contract.ts';
-import { UNKNOWN_STRUCTURE_ID } from './farm-identity.ts';
+import { OtfApiError, OtfShapeError, extractCollection, type OtfReadRoute } from './api-contract.ts';
+import { UNKNOWN_STRUCTURE_ID, otfStructuresOf } from './farm-identity.ts';
 import { readOtfOutline } from './outline.ts';
 
 type RawRecord = Record<string, unknown>;
+
+/**
+ * Où se trouve un champ lu : sa route et son nom dans Ouvre ta ferme, jamais sa
+ * valeur. Une forme illisible devient un écart de forme de cette route
+ * (docs/tranche-4-contract.md, F391) : la lecture s'arrête et rien n'est rangé.
+ */
+export type OtfFieldPlace = { route: OtfReadRoute; field: string };
 
 export function mapOtfSnapshot(
   rawConfiguration: unknown,
@@ -50,13 +57,16 @@ export function mapOtfSnapshot(
   };
 }
 
+/**
+ * La structure de `GET /me`. Plusieurs structures ne font jamais une ferme, ici
+ * comme pour l'identité (F338) : la traduction les refuse au lieu de prendre la
+ * première (point D2 de la revue de l'isolation, F392). Sans structure lisible,
+ * le remplaçant sert à l'affichage, jamais d'identité.
+ */
 function mapOtfStructure(payload: unknown): OtfStructure {
-  const candidates = Array.isArray(payload)
-    ? payload
-    : isRecord(payload)
-      ? tryExtractCollection(payload)
-      : [];
-  const candidate = candidates[0] ?? payload;
+  const structures = otfStructuresOf(payload);
+  if (structures.length > 1) throw new OtfShapeError('/me', 'structure', 'several-structures');
+  const candidate = structures[0];
   if (!isRecord(candidate)) {
     return {
       id: UNKNOWN_STRUCTURE_ID,
@@ -67,7 +77,7 @@ function mapOtfStructure(payload: unknown): OtfStructure {
     };
   }
   const raw = candidate;
-  const id = relationId(raw.id ?? raw['@id'] ?? UNKNOWN_STRUCTURE_ID, 'structure');
+  const id = identifier(raw.id ?? raw['@id'] ?? UNKNOWN_STRUCTURE_ID, { route: '/me', field: 'id' });
   return {
     id,
     name: toName(raw.name ?? raw.label ?? raw.title, `Exploitation ${id}`),
@@ -78,8 +88,8 @@ function mapOtfStructure(payload: unknown): OtfStructure {
 }
 
 function readBedPlotId(value: unknown): string {
-  const raw = asRecord(value, 'planche');
-  return relationId(raw.plotId ?? raw.plot, 'jardin de la planche');
+  const raw = asRecord(value, { route: '/bedList', field: 'element' });
+  return relationId(raw.plotId ?? raw.plot, { route: '/bedList', field: 'plot' });
 }
 
 export function mapOtfConfiguration(payload: unknown): OtfConfiguration {
@@ -88,9 +98,9 @@ export function mapOtfConfiguration(payload: unknown): OtfConfiguration {
     : isRecord(payload)
       ? tryExtractCollection(payload)
       : [];
-  const raw = asRecord(candidates[0] ?? payload, 'configuration');
-  const seasonFirst = toInteger(raw.seasonFirst, 'seasonFirst');
-  const seasonLast = toInteger(raw.seasonLast, 'seasonLast');
+  const raw = asRecord(candidates[0] ?? payload, { route: '/configuration', field: 'configuration' });
+  const seasonFirst = toInteger(raw.seasonFirst, { route: '/configuration', field: 'seasonFirst' });
+  const seasonLast = toInteger(raw.seasonLast, { route: '/configuration', field: 'seasonLast' });
 
   if (seasonFirst > seasonLast || seasonLast - seasonFirst > 100) {
     throw new OtfApiError('Plage de saisons OTF invalide.');
@@ -100,8 +110,8 @@ export function mapOtfConfiguration(payload: unknown): OtfConfiguration {
 }
 
 function mapZone(value: unknown, fallbackSeasons: Season[]): Zone {
-  const raw = asRecord(value, 'parcelle');
-  const id = relationId(raw.id ?? raw['@id'], 'parcelle');
+  const raw = asRecord(value, { route: '/zoneList', field: 'element' });
+  const id = identifier(raw.id ?? raw['@id'], { route: '/zoneList', field: 'id' });
   return {
     id,
     name: toName(raw.name ?? raw.label ?? raw.title, `Parcelle ${id}`),
@@ -112,18 +122,18 @@ function mapZone(value: unknown, fallbackSeasons: Season[]): Zone {
 }
 
 function isUserFacingPlot(value: unknown): boolean {
-  const raw = asRecord(value, 'jardin');
+  const raw = asRecord(value, { route: '/plotList', field: 'element' });
   return raw.zoneFill !== true;
 }
 
 function mapPlot(value: unknown, fallbackSeasons: Season[]): Plot {
-  const raw = asRecord(value, 'jardin');
-  const id = relationId(raw.id ?? raw['@id'], 'jardin');
+  const raw = asRecord(value, { route: '/plotList', field: 'element' });
+  const id = identifier(raw.id ?? raw['@id'], { route: '/plotList', field: 'id' });
   const length = toOptionalNonNegativeNumber(raw.length) ?? 0;
   const width = toOptionalNonNegativeNumber(raw.width) ?? 0;
   return {
     id,
-    zoneId: relationId(raw.zoneId ?? raw.zone, 'parcelle du jardin'),
+    zoneId: relationId(raw.zoneId ?? raw.zone, { route: '/plotList', field: 'zone' }),
     name: toName(raw.name ?? raw.label ?? raw.title, `Jardin ${id}`),
     mode: mapPlotMode(raw.mode ?? raw.type),
     length,
@@ -150,9 +160,9 @@ function mapBed(
   fallbackSeasons: Season[],
   plots: Plot[],
 ): Bed {
-  const raw = asRecord(value, 'planche');
-  const id = relationId(raw.id ?? raw['@id'], 'planche');
-  const plotId = relationId(raw.plotId ?? raw.plot, 'jardin de la planche');
+  const raw = asRecord(value, { route: '/bedList', field: 'element' });
+  const id = identifier(raw.id ?? raw['@id'], { route: '/bedList', field: 'id' });
+  const plotId = relationId(raw.plotId ?? raw.plot, { route: '/bedList', field: 'plot' });
   const parentPlot = plots.find((plot) => plot.id === plotId);
   const length = toOptionalNonNegativeNumber(raw.length) ?? 0;
   const width = centimetersToMeters(raw.width) ?? 0;
@@ -160,7 +170,7 @@ function mapBed(
     id,
     zoneId: relationId(
       raw.zoneId ?? raw.zone ?? parentPlot?.zoneId,
-      'parcelle de la planche',
+      { route: '/bedList', field: 'zone' },
     ),
     plotId,
     name: toName(raw.name ?? raw.label ?? raw.title, id),
@@ -235,19 +245,25 @@ function mapPlotMode(value: unknown): PlotMode {
     : 'garden';
 }
 
-export function relationId(value: unknown, field: string): string {
-  let candidate = value;
-  if (isRecord(value)) candidate = value.id ?? value['@id'];
-  if (typeof candidate !== 'string' && typeof candidate !== 'number') {
-    throw new OtfApiError(`Identifiant OTF invalide pour ${field}.`);
-  }
+/** L'identifiant d'un élément : un nombre ou un texte (d'une adresse `@id`, le dernier segment), jamais vide. */
+export function identifier(value: unknown, place: OtfFieldPlace): string {
+  const id = readableId(value);
+  if (id === null) throw new OtfShapeError(place.route, place.field, 'unreadable-id');
+  return id;
+}
 
-  const text = String(candidate).trim();
-  const normalized = text.split('/').filter(Boolean).at(-1) ?? '';
-  if (!normalized) {
-    throw new OtfApiError(`Identifiant OTF vide pour ${field}.`);
-  }
-  return normalized;
+/** L'identifiant de l'élément qu'un champ désigne : le même, ou celui de l'objet qui le porte (`{ id }`). */
+export function relationId(value: unknown, place: OtfFieldPlace): string {
+  const id = readableId(value);
+  if (id === null) throw new OtfShapeError(place.route, place.field, 'unreadable-relation');
+  return id;
+}
+
+function readableId(value: unknown): string | null {
+  const candidate = isRecord(value) ? value.id ?? value['@id'] : value;
+  if (typeof candidate !== 'string' && typeof candidate !== 'number') return null;
+  const normalized = String(candidate).trim().split('/').filter(Boolean).at(-1) ?? '';
+  return normalized === '' ? null : normalized;
 }
 
 export function toName(value: unknown, fallback: string): string {
@@ -258,9 +274,9 @@ function toOptionalText(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-export function toInteger(value: unknown, field: string): number {
+export function toInteger(value: unknown, place: OtfFieldPlace): number {
   const parsed = toOptionalInteger(value);
-  if (parsed === null) throw new OtfApiError(`Valeur OTF invalide : ${field}.`);
+  if (parsed === null) throw new OtfShapeError(place.route, place.field, 'not-integer');
   return parsed;
 }
 
@@ -283,8 +299,8 @@ export function isRecord(value: unknown): value is RawRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function asRecord(value: unknown, label: string): RawRecord {
-  if (!isRecord(value)) throw new OtfApiError(`Objet OTF invalide : ${label}.`);
+export function asRecord(value: unknown, place: OtfFieldPlace): RawRecord {
+  if (!isRecord(value)) throw new OtfShapeError(place.route, place.field, 'not-object');
   return value;
 }
 

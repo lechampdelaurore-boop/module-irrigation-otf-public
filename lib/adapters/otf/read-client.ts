@@ -1,4 +1,4 @@
-import { OtfApiError, extractCollection } from '../../domain/otf/api-contract.ts';
+import { OTF_READ_ROUTES, OtfApiError, OtfShapeError, extractCollection, type OtfReadRoute } from '../../domain/otf/api-contract.ts';
 import {
   EMPTY_CALL_PACE,
   holdCallsUntil,
@@ -19,21 +19,6 @@ import {
 } from '../../domain/otf/shared-call-pace.ts';
 import { millisecondsFromSeconds } from '../../domain/units.ts';
 import { logJsonLine } from '../log.ts';
-
-const OTF_READ_ROUTES = [
-  '/me',
-  '/configuration',
-  '/zoneList',
-  '/plotList',
-  '/bedList',
-  // Extension « suivi par série » (docs/series-contract.md) : cinq routes GET
-  // de plus, même portée `production:read`, mêmes règles de rythme et de pages.
-  '/actionList',
-  '/plantList',
-  '/seriesList',
-  '/placeList',
-  '/taskList',
-] as const;
 
 /** Les seuls paramètres de requête que le connecteur sait envoyer, écrits ici. */
 type OtfListQuery = {
@@ -139,8 +124,6 @@ type OtfClock = {
 };
 
 const realClock: OtfClock = { now: () => Date.now(), sleep: delay };
-
-export type OtfReadRoute = (typeof OTF_READ_ROUTES)[number];
 
 type FetchLike = (
   input: string | URL,
@@ -281,7 +264,7 @@ export class OtfReadClient {
 
     for (let page = 1; page <= this.maxPages; page += 1) {
       const payload = await this.requestJson(route, page, query);
-      const pageItems = extractCollection(payload);
+      const pageItems = collectionOf(route, payload);
       allItems.push(...pageItems);
 
       const total = extractTotal(payload);
@@ -483,6 +466,18 @@ function delay(durationMs: number): Promise<void> {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Les éléments d'une page. Une page qui ne porte pas de liste est un écart de
+ * forme de sa route (docs/tranche-4-contract.md, F391) : la lecture s'arrête.
+ */
+function collectionOf(route: OtfReadRoute, payload: unknown): unknown[] {
+  try {
+    return extractCollection(payload);
+  } catch {
+    throw new OtfShapeError(route, 'list', 'not-list');
+  }
 }
 
 function extractTotal(payload: unknown): number | null {

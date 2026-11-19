@@ -1,5 +1,5 @@
 import type { IrrigationSnapshot } from './domain.ts';
-import { OtfApiError } from './otf/api-contract.ts';
+import { OtfApiError, OtfShapeError } from './otf/api-contract.ts';
 import { OtfFarmMismatchError } from './otf/farm-identity.ts';
 import { OtfReadDeferredError } from './otf/shared-call-pace.ts';
 import { FARM_TIME_ZONE } from './water-management.ts';
@@ -9,9 +9,10 @@ import { FARM_TIME_ZONE } from './water-management.ts';
  * (docs/tranche-4-contract.md, F332, F341, F342) : la clé mène à une autre
  * ferme que celle de l'espace, ou à aucune ferme lisible. Depuis la 4.3
  * (F362, F363, F386) : la limite du jour d'OTF, une autre lecture de la
- * ferme en cours, une lecture de plus de 30 appels.
+ * ferme en cours, une lecture de plus de 30 appels ; Ouvre ta ferme a changé
+ * la forme de ses données (T4-15, F370 point 5, F394).
  */
-export type IrrigationUnavailableReason = 'rate-limit' | 'unavailable' | 'farm-changed' | 'farm-unidentified' | 'day-limit' | 'read-in-progress' | 'read-too-long';
+export type IrrigationUnavailableReason = 'rate-limit' | 'unavailable' | 'farm-changed' | 'farm-unidentified' | 'day-limit' | 'read-in-progress' | 'read-too-long' | 'shape-changed';
 
 /** Le message de F332, montré avec le dernier instantané de l'espace ou à sa place. */
 export const FARM_CHANGED_MESSAGE =
@@ -25,6 +26,10 @@ export const FARM_UNIDENTIFIED_MESSAGE =
 export const READ_TOO_LONG_MESSAGE =
   "La lecture complète de cette ferme demande plus de 30 appels, le maximum qu'Ouvre ta ferme accepte par minute : elle se fait au calcul du matin.";
 
+/** Le message de F370 (point 5) : une route lue a changé de forme, la lecture s'est arrêtée sans rien ranger. */
+export const SHAPE_CHANGED_MESSAGE =
+  'Ouvre ta ferme a changé la forme de ses données : la dernière lecture réussie est affichée.';
+
 /** Le message de F363, sans la date des données : la page la donne juste après (« Dernière synchronisation », F386). */
 export const DAY_LIMIT_MESSAGE =
   "Ouvre ta ferme a atteint le nombre d'appels permis aujourd'hui pour cette ferme, tous outils confondus : nouvelle lecture possible demain.";
@@ -37,6 +42,7 @@ const CACHED_WARNINGS: Record<IrrigationUnavailableReason, string> = {
   'day-limit': DAY_LIMIT_MESSAGE,
   'read-in-progress': "Une lecture d'Ouvre ta ferme est déjà en cours pour cette ferme. La dernière lecture réussie est affichée ; actualisez dans un instant.",
   'read-too-long': READ_TOO_LONG_MESSAGE,
+  'shape-changed': SHAPE_CHANGED_MESSAGE,
 };
 
 const UNAVAILABLE_MESSAGES: Record<IrrigationUnavailableReason, string> = {
@@ -47,6 +53,7 @@ const UNAVAILABLE_MESSAGES: Record<IrrigationUnavailableReason, string> = {
   'day-limit': "Ouvre ta ferme a atteint la limite d'appels du jour pour cette ferme et aucun cache n'existe.",
   'read-in-progress': "Une autre lecture d'Ouvre ta ferme de cette ferme est en cours et aucun cache n'existe.",
   'read-too-long': "La lecture de cette ferme se fait au calcul du matin et aucun cache n'existe.",
+  'shape-changed': "Ouvre ta ferme a changé la forme de ses données et aucun cache n'existe.",
 };
 
 /**
@@ -150,6 +157,7 @@ function unavailableReason(error: unknown): IrrigationUnavailableReason {
     return error.observedFarmId === null ? 'farm-unidentified' : 'farm-changed';
   }
   if (error instanceof OtfReadDeferredError) return deferralReason(error);
+  if (error instanceof OtfShapeError) return 'shape-changed';
   return error instanceof OtfApiError && error.status === 429
     ? 'rate-limit'
     : 'unavailable';

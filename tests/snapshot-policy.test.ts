@@ -6,9 +6,10 @@ import {
   FARM_CHANGED_MESSAGE,
   IrrigationDataUnavailableError,
   READ_TOO_LONG_MESSAGE,
+  SHAPE_CHANGED_MESSAGE,
   readLiveOrLastSuccessfulSnapshot,
 } from '../lib/domain/snapshot-policy.ts';
-import { OtfApiError } from '../lib/domain/otf/api-contract.ts';
+import { OtfApiError, OtfShapeError } from '../lib/domain/otf/api-contract.ts';
 import { OtfFarmMismatchError } from '../lib/domain/otf/farm-identity.ts';
 import { OtfReadDeferredError, type OtfReadDeferralReason } from '../lib/domain/otf/shared-call-pace.ts';
 
@@ -208,6 +209,37 @@ test('sans cache, la ferme changée ou inconnue garde son motif, jamais « indis
       (error) => error instanceof IrrigationDataUnavailableError && error.reason === reason,
     );
   }
+});
+
+// --- Ouvre ta ferme a changé la forme de ses données (4.3, PR 5 ; T4-15, F370 point 5, F394) ---
+
+test('un écart de forme : rien n’est rangé, le dernier instantané s’affiche avec le message de F370 ; sans cache, son motif à part', async () => {
+  let writeCalled = false;
+  const result = await readLiveOrLastSuccessfulSnapshot({
+    readLive: async () => {
+      throw new OtfShapeError('/bedList', 'width', 'missing-everywhere');
+    },
+    readCache: async () => completeSnapshot,
+    writeCache: async () => {
+      writeCalled = true;
+    },
+  });
+  assert.equal(writeCalled, false);
+  assert.equal(result.source, 'cache');
+  assert.equal(result.lastSuccessfulReadAt, completeSnapshot.lastSuccessfulReadAt);
+  assert.equal(result.warning, SHAPE_CHANGED_MESSAGE);
+  assert.equal(SHAPE_CHANGED_MESSAGE, 'Ouvre ta ferme a changé la forme de ses données : la dernière lecture réussie est affichée.');
+
+  await assert.rejects(
+    () => readLiveOrLastSuccessfulSnapshot({
+      readLive: async () => {
+        throw new OtfShapeError('/me', 'structure', 'several-structures');
+      },
+      readCache: async () => null,
+      writeCache: async () => undefined,
+    }),
+    (error) => error instanceof IrrigationDataUnavailableError && error.reason === 'shape-changed',
+  );
 });
 
 // --- Les lectures reportées par le compteur partagé (4.3, F362, F363, F386, F388) ---
