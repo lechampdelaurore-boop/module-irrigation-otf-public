@@ -1549,7 +1549,7 @@ Une table dans le contrat, relue par la PR, qui dit **combien de temps** on gard
 | Journal d'accès du support (4.5-h) | 12 mois | traçabilité de ce que l'exploitant a consulté |
 | Sauvegardes (Time Travel) | 30 jours (Cloudflare) ; export hors compte : export chiffré gardé par le porteur (10 bis.9) | voir ci-dessous |
 
-**Dit sans détour dans le texte de confidentialité** : une donnée effacée **reste récupérable dans l'historique Time Travel jusqu'à 30 jours** après l'effacement. Cette phrase s'ajoute au texte de la page de confidentialité (4.8). **Ce texte passe en relecture de le porteur avant la PR**, comme il l'a fait pour #96 : l'assistant ne le fixe pas seul.
+**Dit sans détour dans le texte de confidentialité** : une donnée effacée **reste récupérable dans l'historique Time Travel jusqu'à 30 jours** après l'effacement. Cette phrase s'ajoute au texte de la page de confidentialité (4.8). **Phrase approuvée par le porteur le 19 novembre 2026 (20 h 52 UTC)** : le code de la 4.5 l'applique telle quelle (PR 5), comme le texte de #96 ; toute autre formulation lui repasse en relecture.
 
 [À FAIRE] dresser, **table par table à partir de `db/schema.ts` et `tests/support/space-coherence.ts`**, la liste réelle des données personnelles ; le tableau ci-dessus est une base, pas un inventaire.
 
@@ -1650,7 +1650,7 @@ Reprise de la section 10 : relire au tableau de bord, **un mois après la premi�
 | --- | --- |
 | 4.5-a | test de couverture des déclencheurs ; chaque tâche passe orange puis rouge **quand on la sabote**, jamais vert faute de réussite |
 | 4.5-b | **S1, S2, S3 joués** sur la base d'essai, comparaisons **collées dans la PR** ; sabotages détectés ; clé jamais visible ; base d'essai détruite |
-| 4.5-c | tableau de conservation inscrit au contrat, **table par table** ; purges testées ; phrase « 30 jours » relue par le porteur |
+| 4.5-c | tableau de conservation inscrit au contrat, **table par table** ; purges testées ; phrase « 30 jours » approuvée par le porteur le 19/11, appliquée telle quelle |
 | 4.5-d | test d'exhaustivité (casse si une table n'est pas couverte) ; test à deux fermes ; reprise ; annulation |
 | 4.5-e | journaux : aucune valeur sensible dans les sorties des essais |
 | 4.5-f, g | page à deux largeurs ; notification reçue **en vrai** sur l'appareil de l'exploitant (recette, avec son accord) |
@@ -1667,13 +1667,13 @@ Reprise de la section 10 : relire au tableau de bord, **un mois après la premi�
 | Données personnelles dans un export | grave | jamais dans le dépôt ni en artefact public ; chiffrement avant tout stockage hors de l'ordinateur de l'exploitant |
 | Effacement oublieux d'une table nouvelle | grave, discret | test d'exhaustivité qui casse la CI |
 | Support par une seule personne, absent | moyen | pas d'engagement de délai ; pilote limité à 1 à 2 fermes |
-| Confusion entre « effacé » et « plus récupérable » | moyen | phrase des 30 jours **dans le texte de confidentialité**, relue par le porteur |
+| Confusion entre « effacé » et « plus récupérable » | moyen | phrase des 30 jours **dans le texte de confidentialité**, approuvée par le porteur le 19/11 |
 
 #### 10 bis.9 · Décision du porteur sur la copie hors de Cloudflare (19 novembre 2026, 13 h 48)
 
 Une copie dans le même compte ne protège pas d'une perte du compte, et l'export contient des données personnelles. Le porteur a choisi **l'option A, gratuite** : **un export hebdomadaire chiffré, gardé par lui sur son ordinateur**, en plus de l'historique de 30 jours de Cloudflare. **Pas de R2 ni de service tiers** : aucune dépense nouvelle (contrainte 2). Conséquences écrites : l'export est chiffré **avant** d'être écrit sur disque (mot de passe saisi par le porteur, jamais vu de l'assistant) ; la page d'état (F565) a un geste « J'ai fait l'export du … » qui enregistre la date, et la tâche « Export hors Cloudflare » du registre (F560) passe en orange à 8 jours et en rouge à 10 ; la veille (F566) le rappelle. L'option B (stockage d'objets de Cloudflare) reste à rouvrir si le nombre de fermes grandit : sa tarification n'a pas été relue.
 
-Décidé sans question au porteur (non budgétaire, autonomie du 19 novembre) : délai de 7 jours avant l'effacement d'une ferme ; veille à 9 h ; conservation de 35 jours pour le journal des appels et de 90 jours pour les données d'une ferme déconnectée ; pas de sonde extérieure ; notification web push, sans service d'e-mail. **La phrase des 30 jours ajoutée à la politique de confidentialité reste à la relecture du porteur avant le code** (comme le texte de #96) : l'assistant ne la fixe pas seul.
+Décidé sans question au porteur (non budgétaire, autonomie du 19 novembre) : délai de 7 jours avant l'effacement d'une ferme ; veille à 9 h ; conservation de 35 jours pour le journal des appels et de 90 jours pour les données d'une ferme déconnectée ; pas de sonde extérieure ; notification web push, sans service d'e-mail. **La phrase des 30 jours ajoutée à la politique de confidentialité est approuvée par le porteur (19 novembre 2026, 20 h 52 UTC)** : son texte exact est celui de 10 bis.4, F562.
 #### 10 bis.10 · Ce qui n'est pas établi (à dire, pas à deviner)
 
 - La **finesse** de Time Travel et sa tenue **sur la base réelle** (taille, migrations récentes) : mesurer à l'essai.
