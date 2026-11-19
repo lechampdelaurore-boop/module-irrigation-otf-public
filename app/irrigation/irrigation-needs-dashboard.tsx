@@ -8,6 +8,7 @@ import { gardenUnknownReason } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
 import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { FigureOrigin } from './shell/figure-origin';
+import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { PageSettingsFold } from './shell/page-settings-fold';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 
@@ -15,6 +16,8 @@ const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
 type SortMode = 'priority' | 'deficit' | 'covered' | 'remaining';
+/** Les classes de message de la section, gardées telles qu'avant le lot G. */
+const NEEDS_REPLY_CLASSES = { notice: 'water-notice', warning: 'irrigation-needs-warning', error: 'water-error' } as const;
 
 const help = {
   et0: 'ET0 cumulée sur la semaine, réanalyse pour les jours passés et prévision pour les jours à venir. Affichée pour information : elle n’entre pas dans le calcul du besoin.',
@@ -32,19 +35,22 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
   const [dashboard, setDashboard] = useState(initialDashboard);
   const [threshold, setThreshold] = useState(String(initialDashboard.thresholdMm));
   const [sort, setSort] = useState<SortMode>('priority');
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Le message d'un geste s'affiche sous son bouton (F404) ; un rechargement automatique ne parle pas (F405).
+  const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const [pending, startTransition] = useTransition();
   const dashboardRef = useRef(initialDashboard);
-  const receive = useCallback((result: IrrigationNeedActionResult) => {
-    if (result.ok) { dashboardRef.current = result.dashboard; setDashboard(result.dashboard); setThreshold(String(result.dashboard.thresholdMm)); setNotice(result.message); setError(null); notifyFeasibilityChanged(); }
-    else { setError(result.message); setNotice(null); }
+  /** `origin` nul : un rechargement automatique, silencieux s'il réussit. */
+  const receive = useCallback((result: IrrigationNeedActionResult, origin: string | null) => {
+    if (result.ok) {
+      dashboardRef.current = result.dashboard; setDashboard(result.dashboard); setThreshold(String(result.dashboard.thresholdMm)); notifyFeasibilityChanged();
+      if (origin !== null) setReplies([actionReply(origin, 'notice', result.message)]);
+    } else setReplies([actionReply(origin ?? 'haut', 'error', result.message)]);
   }, []);
   useEffect(() => {
     const refresh = (event: Event) => {
       const detail = event instanceof CustomEvent ? event.detail as { weekStart?: unknown } | null : null;
       const weekStart = typeof detail?.weekStart === 'string' ? detail.weekStart : dashboardRef.current.weekStart;
-      startTransition(async () => receive(await loadIrrigationNeedsAction({ season, weekStart })));
+      startTransition(async () => receive(await loadIrrigationNeedsAction({ season, weekStart }), null));
     };
     window.addEventListener('irrigation-events-changed', refresh);
     window.addEventListener('irrigation-needs-source-changed', refresh);
@@ -53,26 +59,27 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
   const sortedGardens = useMemo(() => dashboard.gardens.map((garden) => ({ ...garden, beds: [...garden.beds].sort(sorter(sort)) })), [dashboard.gardens, sort]);
   return <section className="irrigation-needs-section" aria-labelledby="irrigation-needs-title">
     <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">Besoins d’irrigation</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
-    {notice ? <p className="water-notice" role="status">{notice}</p> : null}{error ? <p className="water-error" role="alert">{error}</p> : null}
+    <ActionReply messages={replies} origin="haut" classNames={NEEDS_REPLY_CLASSES} />
     {!dashboard.completeness.complete ? <p className="irrigation-needs-warning" role="status">{dashboardWarning(dashboard)}</p> : null}
     <div className="irrigation-needs-controls">
       <label><span>Trier les planches</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="priority">Priorités hautes</option><option value="deficit">Déficit le plus fort</option><option value="remaining">Besoin restant</option><option value="covered">Déjà couvert</option></select></label>
     </div>
     <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId}>
       <summary><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
-      <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm })))} />)}</div>
+      <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} reply={<ActionReply messages={replies} origin={`planche:${bed.bedId}`} classNames={NEEDS_REPLY_CLASSES} />} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm }), `planche:${bed.bedId}`))} />)}</div>
     </details>)}</div>
     {/* Le seuil minimal de planification dans le pli du bas (audit final, lot D, J2, F305). */}
     <PageSettingsFold>
       <div className="irrigation-needs-controls">
         <label><span>Seuil minimal de planification (mm)</span><input inputMode="decimal" value={threshold} onChange={(event) => setThreshold(event.target.value)} /></label>
-        <button type="button" disabled={pending} onClick={() => startTransition(async () => receive(await saveIrrigationNeedThresholdAction({ season, weekStart: dashboard.weekStart, thresholdMm: numeric(threshold) })))}>Enregistrer le seuil</button>
+        <button type="button" disabled={pending} onClick={() => startTransition(async () => receive(await saveIrrigationNeedThresholdAction({ season, weekStart: dashboard.weekStart, thresholdMm: numeric(threshold) }), 'seuil'))}>Enregistrer le seuil</button>
       </div>
+      <ActionReply messages={replies} origin="seuil" classNames={NEEDS_REPLY_CLASSES} />
     </PageSettingsFold>
   </section>;
 }
 
-function BedNeedCard({ bed, proposal, pending, onSave }: { bed: BedIrrigationNeed; proposal: ProposalSummary | null; pending: boolean; onSave: (priority: IrrigationNeedPriority, override: number | null, reason: string) => void }) {
+function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrrigationNeed; proposal: ProposalSummary | null; pending: boolean; reply: React.ReactNode; onSave: (priority: IrrigationNeedPriority, override: number | null, reason: string) => void }) {
   const [priority, setPriority] = useState(bed.priority);
   const [overrideEnabled, setOverrideEnabled] = useState(bed.manualOverrideMm !== null);
   const [override, setOverride] = useState(bed.manualOverrideMm === null ? '' : String(bed.manualOverrideMm));
@@ -101,6 +108,7 @@ function BedNeedCard({ bed, proposal, pending, onSave }: { bed: BedIrrigationNee
       <label className="need-toggle"><input type="checkbox" checked={overrideEnabled} onChange={(event) => setOverrideEnabled(event.target.checked)} /> Remplacer le besoin calculé</label>
       {overrideEnabled ? <><label><span>Besoin manuel (mm)</span><input inputMode="decimal" value={override} onChange={(event) => setOverride(event.target.value)} /></label><label><span>Raison facultative</span><input value={reason} maxLength={500} onChange={(event) => setReason(event.target.value)} /></label>{exceeds ? <small className="need-override-warning">Cette valeur dépasse l’objectif hydrique de la semaine.</small> : null}</> : null}
       <button type="button" disabled={pending || (overrideEnabled && !validNumber(override))} onClick={() => onSave(priority, overrideEnabled ? numeric(override) : null, reason)}>Enregistrer</button>
+      {reply}
     </div>
     <footer>Échéance : dimanche fin de journée</footer>
   </article>;

@@ -68,6 +68,7 @@ export function IrrigationPreview({
   pending,
   origin = null,
   warning = null,
+  reply = null,
 }: {
   equipment: EquipmentListItem | null;
   setting: EquipmentSettingRecord | null;
@@ -86,6 +87,8 @@ export function IrrigationPreview({
   pending: boolean;
   /** Ce que le maraîcher doit savoir avant d'enregistrer, sans que rien soit bloqué : un créneau protégé (3.8 ter, règle 12). */
   warning?: string | null;
+  /** La réponse du module au bouton, juste dessous (audit du 19 novembre 2026, lot G, n° 1, F404). */
+  reply?: React.ReactNode;
 }) {
   const referenceRate = applications[0]?.rateMmPerHour ?? 0;
   return (
@@ -130,6 +133,7 @@ export function IrrigationPreview({
       >
         {pending ? 'Enregistrement…' : creationButtonLabel(creationKind)}
       </button>
+      {reply}
       {creationKind === 'running' ? (
         <small>Le minuteur retrouvera son état après une actualisation de la page.</small>
       ) : null}

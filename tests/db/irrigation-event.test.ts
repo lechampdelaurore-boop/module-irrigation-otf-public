@@ -10,6 +10,7 @@ import {
   createIrrigationEventForUser,
   updatePlannedIrrigationForUser,
 } from '../../db/irrigation-event/create';
+import { findScheduleConflictForUser } from '../../db/irrigation-event/conflicts';
 import {
   IrrigationEquipmentAlreadyRunningError,
   IrrigationEventInputError,
@@ -238,6 +239,28 @@ test('avertissements : conflit d’horaire sur le même matériel, chevauchement
   }));
   assert.equal(onBusyBeds.overlapBedCount, 1, 'bed-2 est arrosée par l’irrigation en cours');
   assert.equal(onBusyBeds.scheduleConflictCount, 0);
+});
+
+test('le créneau déjà planifié du même matériel se lit avant toute écriture (lot G, n° 1, F407)', async () => {
+  startClock();
+  const fixture = await createDripFixture(ALICE, { beds: ['bed-1'] });
+  const other = await createDripFixture(ALICE, { name: 'Autre', beds: ['bed-2'] });
+  const { eventEquipmentId } = await createPlanned(fixture, 3600, '2026-06-15T10:00:00.000Z', '2026-06-15T11:00:00.000Z');
+  // Le cas de l'audit : le même matériel, le même créneau.
+  assert.deepEqual(
+    await findScheduleConflictForUser(ALICE, fixture.equipment.id, '2026-06-15T10:00:00.000Z', '2026-06-15T11:00:00.000Z', null),
+    { plannedStartAt: '2026-06-15T10:00:00.000Z', plannedEndAt: '2026-06-15T11:00:00.000Z' },
+  );
+  // Un chevauchement partiel compte ; un créneau qui touche sans chevaucher, non.
+  assert.notEqual(await findScheduleConflictForUser(ALICE, fixture.equipment.id, '2026-06-15T10:59:00.000Z', '2026-06-15T12:00:00.000Z', null), null);
+  assert.equal(await findScheduleConflictForUser(ALICE, fixture.equipment.id, '2026-06-15T11:00:00.000Z', '2026-06-15T12:00:00.000Z', null), null);
+  // Un autre matériel, l'irrigation modifiée elle-même, une autre personne : aucun conflit.
+  assert.equal(await findScheduleConflictForUser(ALICE, other.equipment.id, '2026-06-15T10:00:00.000Z', '2026-06-15T11:00:00.000Z', null), null);
+  assert.equal(await findScheduleConflictForUser(ALICE, fixture.equipment.id, '2026-06-15T10:00:00.000Z', '2026-06-15T11:00:00.000Z', eventEquipmentId), null);
+  assert.equal(await findScheduleConflictForUser(BOB, fixture.equipment.id, '2026-06-15T10:00:00.000Z', '2026-06-15T11:00:00.000Z', null), null);
+  // Démarrée, elle n'est plus un créneau planifié.
+  await startIrrigationEventForUser(ALICE, eventEquipmentId, 1, 1);
+  assert.equal(await findScheduleConflictForUser(ALICE, fixture.equipment.id, '2026-06-15T10:00:00.000Z', '2026-06-15T11:00:00.000Z', null), null);
 });
 
 test('cycle complet : planifiée, démarrée, pause, reprise, arrêt anticipé, reprise, terminée, puis immuable', async () => {

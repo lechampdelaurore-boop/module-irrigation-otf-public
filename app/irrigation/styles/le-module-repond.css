@@ -1,0 +1,61 @@
+/*
+ * Audit ergonomique du 19 novembre 2026, lot G, « Le module vous répond »
+ * (docs/audit-ergonomie-2026-11-19-lot-g-contract.md).
+ */
+
+/* La réponse sous le bouton du geste (F404) : un peu d'air au-dessus, et la place qu'il faut pour défiler jusqu'à elle. */
+.action-reply {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  scroll-margin: 96px 0 96px;
+}
+
+.action-reply p {
+  margin: 0;
+}
+
+/* La fenêtre de confirmation du module (F408), dessinée comme « Fait comme prévu ». */
+.module-confirm-dialog {
+  width: min(480px, calc(100vw - 32px));
+  margin: auto;
+  inset: 0;
+  padding: 20px 20px 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: white;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 25%);
+  color: var(--ink);
+}
+
+.module-confirm-dialog::backdrop {
+  background: rgb(8 30 22 / 55%);
+}
+
+.module-confirm-dialog h3 {
+  margin: 0 0 8px;
+  font: 300 var(--title-size)/1.2 var(--font-title);
+}
+
+.module-confirm-body p {
+  margin: 0 0 6px;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.module-confirm-dialog .irrigation-dialog-actions button {
+  min-height: var(--touch-target);
+}
+
+/* Ce qui efface ou annule se confirme en rouge (F408, F414). */
+.irrigation-dialog-actions .confirm-erase {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: white;
+}
+
+@media (max-width: 640px) {
+  .module-confirm-dialog .irrigation-dialog-actions {
+    flex-direction: column;
+  }
+}
