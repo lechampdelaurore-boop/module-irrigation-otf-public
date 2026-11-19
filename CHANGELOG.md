@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 1 sur 7)
+
+- **Un seul titre** (D-183) : « Planning de la semaine », « Réserve du
+  sol », « Besoin par culture », « Alertes météo », « Alertes cultures » et
+  « Historique et cumuls » ne redisent plus leur titre en tête de leur
+  premier bloc ; ce titre reste pour les lecteurs d'écran, et les niveaux
+  de titre se suivent sans saut.
+
 ### Corrigé (audit du 19 novembre 2026, lot I, PR 5 sur 5)
 
 - **Petits défauts de la démonstration** (D-182) : la première ouverture

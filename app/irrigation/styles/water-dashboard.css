@@ -323,7 +323,7 @@
 .limit-exceeded-row { background: var(--danger-soft); color: var(--danger-ink); }
 
 .weather-alerts-panel { margin-top: 12px; }
-.weather-alerts-panel h4 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
+.weather-alerts-panel h3 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
 .weather-alert-device { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-radius: 10px; background: var(--sheet); color: var(--green-dark); font-size: 12px; }
 .weather-alert-device[data-status="denied"],
 .weather-alert-device[data-status="unsupported"],
@@ -413,8 +413,8 @@
 .water-week-quiet { margin: 0; padding: 10px 12px; color: var(--muted); font-size: 12px; }
 /* L'encart « Alertes cultures » (5 quinquies). */
 .crop-alerts-panel { margin-top: 12px; }
-.crop-alerts-panel h4 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
-.crop-alerts-panel h5 { margin: 12px 0 4px; color: var(--ink); font-size: 12px; }
+.crop-alerts-panel h3 { margin: 18px 0 8px; color: var(--ink); font-size: 13px; }
+.crop-alerts-panel h4 { margin: 12px 0 4px; color: var(--ink); font-size: 12px; }
 .crop-alerts-panel .weather-alert-primary { border-color: var(--green); background: var(--green); color: white; }
 .crop-alert-fold { margin-top: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
 .crop-alert-fold > summary { display: grid; min-height: 44px; box-sizing: border-box; gap: 2px; padding: 10px 12px; cursor: pointer; }

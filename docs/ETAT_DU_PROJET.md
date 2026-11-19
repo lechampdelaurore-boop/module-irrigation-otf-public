@@ -474,7 +474,17 @@ registres, elle y renvoie.
   « Commencer par l'essentiel » à la première ouverture, le flocon pour une
   alerte de froid, « Non envoyée : notifications coupées dans la
   démonstration » en couleur neutre, la ligne des notifications coupées
-  sous son titre dans « Réglages » ; codée : **lot I codé en entier**.
+  sous son titre dans « Réglages » ; en ligne le 20 novembre 2026 à 4 h 54
+  (#118, fusionnée à 4 h 37, run 44668982532 vérifié job par job) : **lot I en ligne
+  en entier**.
+  **Lot J commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
+  court `docs/audit-ergonomie-2026-11-19-lot-j-contract.md` (F456 et
+  suivantes, parcours P40), sept PR, un budget de hauteur par page au
+  téléphone (« Matériel » 5 300 px, « Réglages » 3 000, « Objectifs et
+  besoins » 3 200, « Besoin par culture » 3 000, « Réserve du sol »
+  2 600). **PR 1, un seul titre** (D-183, F456) : sur six pages, le titre
+  du premier bloc qui redisait celui de la page est caché à l'écran et
+  gardé pour les lecteurs d'écran, sans niveau de titre sauté ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

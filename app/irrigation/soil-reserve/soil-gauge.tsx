@@ -86,7 +86,7 @@ function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone
   };
   return (
     <section className="soil-zone" aria-label={`Réserve · ${zone.name}`}>
-      <h4>Parcelle {zone.name}</h4>
+      <h3>Parcelle {zone.name}</h3>
       <SoilBars zone={zone} onOpen={openGarden} />
       {zone.fieldPlotCount > 0 && zoneFieldWithoutSoil(zone) ? (
         <div className="soil-zone-without-soil">

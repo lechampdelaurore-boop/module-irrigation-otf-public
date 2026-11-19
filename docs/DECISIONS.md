@@ -6324,6 +6324,31 @@ savait rien de la démonstration (`weatherAlertDeliveryLabel`).
 
 Ne changent pas : l'envoi des alertes et leur historique enregistré, le
 calcul des alertes, la liste des fonctionnalités. Aucune migration.
+
+## D-183 — Lot J, PR 1 : un seul titre
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, lot J « Pages courtes
+au téléphone » (n° 15, n° 18 et le reste du lot D), retenu par le porteur
+le 19 novembre 2026 à 11 h 39 ; contrat court
+`docs/audit-ergonomie-2026-11-19-lot-j-contract.md` écrit avant le code,
+budgets de hauteur par page au téléphone suivant l'option recommandée du
+rapport. Constat n° 18 : six pages disaient leur titre deux fois, la page
+puis son premier bloc (« Historique et cumuls » puis « Cumuls et
+historique »), trois en sautant un niveau de titre. **Cause vérifiée** :
+chaque bloc gardait le titre qu'il avait quand il était un bloc parmi
+d'autres sur une seule page, avant la 3.8.
+
+**Décision (F456).** Le titre d'un premier bloc qui redit la page est
+caché à l'écran et reste pour les lecteurs d'écran, en `h2` sous le `h1`
+de la page ; le surtitre qui redisait la page (« Planning · saison »,
+« Suivi réel · saison ») disparaît. Sur « Réserve du sol », « Alertes
+météo » et « Alertes cultures », les sous-titres remontent d'un niveau, à
+la même taille. Les ancres existantes mènent toujours au bloc.
+
+Ne changent pas : les autres titres, le contenu des blocs. Aucune
+migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

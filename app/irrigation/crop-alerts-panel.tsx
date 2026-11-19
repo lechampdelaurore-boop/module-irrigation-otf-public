@@ -71,7 +71,8 @@ export function CropAlertsPanel({
     <article className="water-panel crop-alerts-panel" id="crop-alerts" data-tour="alertes-cultures" aria-labelledby="crop-alerts-title">
       <div className="water-panel-title">
         <div>
-          <h3 id="crop-alerts-title">Alertes cultures</h3>
+          {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran sans niveau sauté (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+          <h2 id="crop-alerts-title" className="sr-only">Alertes cultures</h2>
           <p>
             Le gel selon chaque culture, l’arrêt d’arrosage avant la récolte et les aspersions sous abri à reconsidérer. Les seuils sont des
             repères ; la prévision est celle de l’air à 2 m, à l’extérieur : au ras du sol et sous abri, la température diffère.
@@ -257,9 +258,9 @@ function Upcoming({ view, sprinklerUnavailable }: { view: CropAlertsView; sprink
   const { settings, upcoming } = view;
   return (
     <section className="crop-alert-upcoming" aria-label="Prochaines échéances">
-      <h4>Prochaines échéances</h4>
+      <h3>Prochaines échéances</h3>
       <p className="crop-alert-note">Ce que la prévision actuelle ferait alerter si elle se confirme ; une alerte déjà annoncée ne repart pas.</p>
-      <h5>Gel</h5>
+      <h4>Gel</h4>
       {!settings.frostActive ? <p className="weather-alert-empty">Alerte de gel inactive.</p> : upcoming.frost.length === 0 ? (
         <p className="weather-alert-empty">Aucun gel prévu sur l’horizon pour les cultures qui ont un seuil.</p>
       ) : (
@@ -276,7 +277,7 @@ function Upcoming({ view, sprinklerUnavailable }: { view: CropAlertsView; sprink
       )}
       {settings.frostActive && upcoming.frostUnavailable ? <p className="weather-alert-unavailable">{upcoming.frostUnavailable}</p> : null}
 
-      <h5>Arrêt d’arrosage</h5>
+      <h4>Arrêt d’arrosage</h4>
       {!settings.dryingActive ? <p className="weather-alert-empty">Alerte d’arrêt d’arrosage inactive.</p> : upcoming.drying.length === 0 ? (
         <p className="weather-alert-empty">Aucune date d’arrêt d’arrosage à venir.</p>
       ) : (
@@ -292,7 +293,7 @@ function Upcoming({ view, sprinklerUnavailable }: { view: CropAlertsView; sprink
         </ul>
       )}
 
-      <h5>Aspersions</h5>
+      <h4>Aspersions</h4>
       {sprinklerUnavailable !== null ? sprinklerUnavailable : !settings.sprinklerActive ? <p className="weather-alert-empty">Alerte d’aspersion inactive.</p> : upcoming.sprinklerUnjudged ? (
         <p className="weather-alert-unavailable">Le lieu météo n’est pas localisé : les aspersions ne sont pas jugées.</p>
       ) : upcoming.sprinkler.length === 0 ? (

@@ -42,7 +42,7 @@ test('les carottes se rattachent au jeu commun, le curseur de microclimat décal
   await attendreLaPageIrrigation(page, 'alertes-cultures');
   const encart = page.locator('#crop-alerts');
   await encart.scrollIntoViewIfNeeded();
-  await expect(encart.getByRole('heading', { name: 'Alertes cultures', exact: true })).toBeVisible();
+  await expect(encart.getByRole('heading', { name: 'Alertes cultures', exact: true })).toBeAttached();
   await expect(encart).toContainText('la prévision est celle de l’air à 2 m, à l’extérieur');
   const statut = encart.locator('.water-notice');
 

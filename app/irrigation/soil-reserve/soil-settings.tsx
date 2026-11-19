@@ -101,7 +101,7 @@ function ZoneSoil({ season, zone, today, pending, run }: { season: number; zone:
   const zoneRecord = zone.soil.current?.record ?? null;
   return (
     <section id={soilParcelAnchor(zone.zoneId)} className="crop-water-settings-block soil-place" aria-label={`Sol · ${zone.name}`}>
-      <h4>Parcelle {zone.name}</h4>
+      <h3>Parcelle {zone.name}</h3>
       <CurrentSoil soil={zone.soil} empty="Aucune réserve utile (RFU) saisie : la jauge de ses planches reste inconnue." />
       <SoilRecordForm
         key={`${zone.zoneId}|${zone.soil.history.length}`}
@@ -335,7 +335,7 @@ function FarmSettingsForm({ season, view, pending, run }: { season: number; view
   };
   return (
     <section className="crop-water-settings-block soil-farm-settings" aria-label="Réglages de l’exploitation">
-      <h4>Pour l’exploitation{view.farm.isDefault ? ' · valeurs de départ' : ''}</h4>
+      <h3>Pour l’exploitation{view.farm.isDefault ? ' · valeurs de départ' : ''}</h3>
       <fieldset className="soil-threshold">
         <legend>Seuil d’arrosage</legend>
         <label className="crop-water-option">

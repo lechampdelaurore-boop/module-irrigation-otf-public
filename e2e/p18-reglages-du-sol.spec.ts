@@ -36,7 +36,7 @@ test('le sol d’une parcelle et d’un jardin se saisit, la RFU du sol se calcu
   await attendreLaPageIrrigation(page, 'sol');
   const section = page.locator('section.soil-reserve');
   await section.scrollIntoViewIfNeeded();
-  await expect(section.getByRole('heading', { name: 'Réserve du sol' })).toBeVisible();
+  await expect(section.getByRole('heading', { name: 'Réserve du sol' })).toBeAttached();
   const statut = section.getByRole('status');
 
   // Le sol de la parcelle : la RFU du sol se calcule pendant la saisie.

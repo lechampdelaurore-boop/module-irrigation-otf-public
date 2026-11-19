@@ -95,7 +95,8 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
         ) : (
           <>
             {/* Le titre et la tête en clair ; le détail technique dans « Pour les experts » (audit ergonomique, lot 3, point 8). */}
-            <h2 id="crop-coefficients-title">Besoin en eau par culture</h2>
+            {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+            <h2 id="crop-coefficients-title" className="sr-only">Besoin en eau par culture</h2>
             <p>
               Une culture ne boit pas autant à la levée qu’en pleine saison. Le module suit le stade de chaque culture, jour après
               jour, pour proposer un objectif d’arrosage. Chaque espèce de vos séries suit une culture de référence, choisie{' '}

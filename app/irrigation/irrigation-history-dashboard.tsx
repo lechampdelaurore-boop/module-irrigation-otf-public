@@ -182,8 +182,8 @@ export function IrrigationHistoryDashboardView({
     <section className="irrigation-history-dashboard" aria-labelledby="irrigation-history-title">
       <header className="irrigation-history-heading">
         <div>
-          <p className="eyebrow">Suivi réel · saison {season}</p>
-          <h2 id="irrigation-history-title">Cumuls et historique</h2>
+          {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+          <h2 id="irrigation-history-title" className="sr-only">Cumuls et historique</h2>
           <p>Analysez l’eau réellement appliquée, la météo observée et les objectifs historisés.</p>
         </div>
         <a className="history-export-button" href={exportHref}>{exportLabel}</a>
