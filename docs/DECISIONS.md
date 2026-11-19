@@ -5783,3 +5783,48 @@ Ne changent pas : D-002 (lecture seule), D-003 (rien n'est deviné : un
 chiffré qui ne s'ouvre pas n'est jamais lu autrement), D-158 (F355, F356 et
 F368 précisés sans être changés), D-161 (le compteur partagé), D-162 (les
 tests de contrat des routes).
+
+## D-164 — La mise à jour automatique de la météo réparée, et les lots G à K de l'audit du 19 novembre 2026 inscrits
+
+Date : 19 novembre 2026.
+
+**Contexte.** Sur la ferme réelle, la pluie estimée après coup manque pour
+tous les jours depuis le 9 novembre ; le module affiche « Dernière
+synchronisation automatique : 13/11/2026 06:15 », en vert, sans alerte
+(audit ergonomique du 19 novembre 2026, section 9). Les journaux de
+Cloudflare, lus le 19 novembre sur l'accord du porteur, montrent la
+synchronisation de 6 h 15 qui tourne chaque matin, Visual Crossing qui
+répond, et la réanalyse d'Open-Meteo qui échoue trois fois, aussitôt, en
+« réseau », sans réponse ni statut ; la même adresse répond en 0,2 s
+depuis un navigateur ordinaire. Le même jour, le porteur retient les cinq
+lots de correction de l'audit (11 h 39).
+
+**Décision.**
+
+1. Le correctif de la météo passe avant le lot G, en trois PR, une à la
+   fois (24 quaterdecies) : l'appel réseau et la vraie erreur journalisée ;
+   une alerte au-delà de 36 heures sans mise à jour automatique réussie ;
+   plus de seconde exécution chaque matin.
+2. **Les adaptateurs météo n'appellent plus jamais un `fetch` gardé comme
+   leur propre méthode.** Le `fetch` natif d'un Worker refuse d'être
+   appelé ainsi ; l'adaptateur d'Open-Meteo, créé au chargement du
+   module, le gardait dans un champ et l'appelait par `this.fetchImpl(…)`.
+   Par défaut, les deux adaptateurs lisent le `fetch` global au moment de
+   l'appel (`lib/adapters/network-call.ts`), et un `fetch` injecté est
+   appelé seul. C'est la cause la plus probable, reproduite par un test ;
+   la preuve sur le site est le journal du matin qui suit le déploiement.
+3. Un échec d'appel météo journalise sa vraie erreur
+   (`weather_external_failure` : nom, message, cause, temps écoulé), sans
+   adresse ni clé ; un délai dépassé se reconnaît au signal d'abandon,
+   quel que soit le type de l'erreur levée, et n'est plus compté comme une
+   panne réseau.
+4. Les lots **G, H, I, J et K** de l'audit du 19 novembre 2026 sont
+   inscrits à la roadmap (24 quindecies à 24 undevicies), chacun en
+   **Opus 5.5 · Élevé**, dans cet ordre, après le correctif météo. Deux
+   réponses du porteur valent pour le lot G : la dose de la proposition du
+   jour pour ce matériel, sinon un champ vide (11 h 37) ; une confirmation
+   au-delà de l'objectif de la semaine de la planche (11 h 42).
+
+Ne changent pas : D-019 (la pluie d'un jour passé : pluviomètre, sinon
+réanalyse, sinon prévision), D-055 (Fable interdit), le calendrier de la
+synchronisation (6 h 15).

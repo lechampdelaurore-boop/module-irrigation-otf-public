@@ -1,4 +1,5 @@
 import { logJsonLine } from '../log.ts';
+import { describeNetworkError, globalFetch, type FetchLike } from '../network-call.ts';
 import { secondsFromMilliseconds } from '../../domain/units.ts';
 import { openMeteoWeatherProvider } from './open-meteo-provider.ts';
 import {
@@ -9,7 +10,6 @@ import {
   type WeatherReadInput,
 } from '../../domain/weather/weather-provider.ts';
 
-type FetchLike = (input: string | URL, init?: RequestInit) => Promise<Response>;
 type WeatherDataEndpoint = 'forecast' | 'reanalysis';
 type WeatherLog = (level: 'info' | 'warn', entry: Record<string, unknown>) => void;
 type CloudflareRequestInit = RequestInit & {
@@ -38,7 +38,7 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
 
   constructor(
     apiKey: string,
-    fetchImpl: FetchLike = fetch,
+    fetchImpl: FetchLike = globalFetch,
     geocoder: Pick<WeatherProvider, 'searchLocations'> = openMeteoWeatherProvider,
     log: WeatherLog = logJsonLine,
   ) {
@@ -144,6 +144,7 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
   ): Promise<unknown> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8_000);
+    const startedAt = Date.now();
     try {
       const init: CloudflareRequestInit = {
         method: 'GET',
@@ -161,7 +162,10 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
               },
             }),
       };
-      const response = await this.fetchImpl(url, init);
+      // Appelée seule, jamais comme méthode de l'adaptateur : un `fetch` natif
+      // injecté refuserait d'être appelé ainsi dans un Worker (D-164).
+      const send = this.fetchImpl;
+      const response = await send(url, init);
       const retryAfterSeconds = parseRetryAfter(response.headers.get('Retry-After'));
       if (!response.ok) {
         const providerReason = await readProviderReason(response);
@@ -181,7 +185,16 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
       return await response.json();
     } catch (error) {
       if (error instanceof WeatherProviderError) throw error;
-      if (error instanceof DOMException && error.name === 'AbortError') {
+      const timedOut = controller.signal.aborted
+        || (error instanceof Error && error.name === 'AbortError');
+      // La vraie erreur, sans adresse, avec le temps écoulé : « réseau » seul ne dit pas pourquoi (D-164).
+      this.log('warn', {
+        ...weatherLogEntry('weather_external_failure', endpoint),
+        failure: timedOut ? 'timeout' : 'network',
+        elapsedMs: Date.now() - startedAt,
+        ...describeNetworkError(error),
+      });
+      if (timedOut) {
         throw new WeatherProviderError('Le service météo met trop longtemps à répondre.', {
           kind: 'timeout', endpoint,
         });
