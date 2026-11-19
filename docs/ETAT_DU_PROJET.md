@@ -309,9 +309,13 @@ registres, elle y renvoie.
   erreur (nom, message, cause, temps écoulé, sans adresse ni clé) et un
   délai dépassé n'est plus compté comme une panne réseau. **Non vérifié
   sur le site** : la confirmation viendra du journal de la synchronisation
-  du matin qui suit le déploiement. PR 2 : une alerte quand la mise à jour
-  automatique a plus de 36 heures, avec sa dernière erreur ; PR 3 : plus
-  de seconde exécution chaque matin. Contrôles de la PR 1 : `pnpm lint`,
+  du matin qui suit le déploiement. **PR 2 sur 3 codée**
+  (`fix/meteo-alerte-retard`, D-165) : au-delà de 36 heures sans réussite,
+  la date verte de la mise à jour automatique devient un avertissement
+  « Mise à jour automatique de la météo en retard », avec la date de la
+  dernière réussite et la dernière erreur enregistrée, sur « Objectifs et
+  besoins » comme sur « Réglages ». PR 3 : plus de seconde exécution
+  chaque matin. Contrôles de la PR 1 : `pnpm lint`,
   `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm
   push:check`, `pnpm weather:check`, `pnpm site:check` réussis en local ;
   `pnpm e2e` omis en local, sans rapport (aucun écran ne change), joué par

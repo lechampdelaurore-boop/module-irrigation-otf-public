@@ -10,6 +10,7 @@ import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
 import { FigureOrigin } from './shell/figure-origin';
 import { PageSettingsFold } from './shell/page-settings-fold';
+import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
 import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
@@ -323,7 +324,7 @@ export function WaterManagementDashboard({
             <div className="water-panel-title"><div><h3>Météo de référence</h3><p>{dashboard.weather.location?.displayName ?? dashboard.weather.requestedLocationLabel ?? 'Commune non définie'}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
             {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error} Les dernières valeurs valides restent affichées.{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
             {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
-            {dashboard.weather.preference.lastAutomaticRefreshSuccessAt ? <p className="weather-fresh">Dernière synchronisation automatique : {dateTimeFormatter.format(new Date(dashboard.weather.preference.lastAutomaticRefreshSuccessAt))}</p> : null}
+            <AutomaticWeatherRefresh preference={dashboard.weather.preference} />
             <div className="water-inline-form">
               <label><span>Commune</span><input value={city} onChange={(event) => setCity(event.target.value)} /></label>
               <label><span>Code postal</span><input value={postcode} onChange={(event) => setPostcode(event.target.value)} /></label>
@@ -389,7 +390,7 @@ export function WaterManagementDashboard({
           <div className="water-panel-title"><div><h3>Météo de référence</h3><p>{dashboard.weather.location?.displayName ?? dashboard.weather.requestedLocationLabel ?? 'Commune non définie'}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
           {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error} Les dernières valeurs valides restent affichées.{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
           {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
-          {dashboard.weather.preference.lastAutomaticRefreshSuccessAt ? <p className="weather-fresh">Dernière synchronisation automatique : {dateTimeFormatter.format(new Date(dashboard.weather.preference.lastAutomaticRefreshSuccessAt))}</p> : null}
+          <AutomaticWeatherRefresh preference={dashboard.weather.preference} />
           {/* La commune se change à un seul endroit, dans Réglages (audit ergonomique, point 9) : ici, le lien qui y mène. */}
           <a className="weather-location-link" href={pageHref('reglages', { season }, 'water-weather-title')}>Changer la commune dans Réglages</a>
           <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>

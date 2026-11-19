@@ -5828,3 +5828,25 @@ lots de correction de l'audit (11 h 39).
 Ne changent pas : D-019 (la pluie d'un jour passé : pluviomètre, sinon
 réanalyse, sinon prévision), D-055 (Fable interdit), le calendrier de la
 synchronisation (6 h 15).
+
+## D-165 — Correctif météo, PR 2 : une mise à jour automatique en retard se dit
+
+Date : 19 novembre 2026.
+
+**Contexte.** Six jours après la dernière réussite de la mise à jour
+automatique de la météo, le module affichait encore sa date en vert, sans
+alerte (audit ergonomique du 19 novembre 2026, section 9 ; D-164).
+
+**Décision.** La date de la dernière mise à jour automatique réussie reste
+en vert tant qu'elle a moins de **36 heures** : la tâche passe chaque jour à
+6 h 15, et 36 heures laissent passer un matin manqué de quelques minutes
+sans fausse alerte. Au-delà, ou quand des tentatives n'ont jamais réussi,
+la ligne devient un avertissement : « Mise à jour automatique de la météo
+en retard », la date de la dernière réussite, la dernière erreur
+enregistrée telle quelle, et le rappel que les valeurs déjà enregistrées
+restent affichées. La règle vit dans
+`lib/domain/weather/automatic-refresh-status.ts`, appelée aux deux endroits
+qui montraient la date (« Objectifs et besoins » et « Réglages »).
+
+Ne changent pas : D-164 ; ce que la tâche enregistre (tentative, réussite,
+erreur) ; la mention « données anciennes » des lectures de la semaine.

@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (la mise à jour automatique de la météo, PR 2 sur 3)
+
+- **Une mise à jour automatique en retard se dit** (D-165) : au-delà de
+  36 heures sans réussite, la date verte devient un avertissement
+  « Mise à jour automatique de la météo en retard », avec la date de la
+  dernière réussite et la dernière erreur enregistrée.
+
 ### Corrigé (la mise à jour automatique de la météo, PR 1 sur 3)
 
 - **La pluie estimée après coup revient** (D-164) : depuis le 14 novembre
