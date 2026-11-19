@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 2 sur 7)
+
+- **« Besoin par culture » plus courte au téléphone** (D-184) : « Réglages
+  du calcul » (abris, paillage, filets, options), ouvert d'office sous les
+  cultures, est rangé dans le pli « Réglages de cette page », fermé, en
+  bas, comme sur « Arrosages », « Objectifs et besoins », « Ressources et
+  pompes » et « Matériel » ; un lien vers ces réglages ouvre le pli.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 1 sur 7)
 
 - **Un seul titre** (D-183) : « Planning de la semaine », « Réserve du

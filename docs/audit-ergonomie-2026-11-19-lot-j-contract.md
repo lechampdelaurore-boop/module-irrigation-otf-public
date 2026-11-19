@@ -51,6 +51,12 @@ une borne haute : la PR qui le dépasse dit pourquoi.
 | Besoin par culture | 4 480 px | 3 000 px |
 | Réserve du sol | 3 733 px | 2 600 px |
 
+Les données des parcours ne sont pas celles de la ferme du porteur : quand
+elles chargent une page plus que sa ferme, P40 fixe la borne sur la mesure
+faite avant et après la PR, et la PR le dit (« Besoin par culture » : aucune
+culture de la saison, les 32 cultures de référence ouvertes, F302 ;
+5 541 px avant la PR 2, 3 961 après, borne de P40 à 4 000).
+
 Les autres pages gardent leur hauteur ; P40 la mesure pour qu'aucune ne
 grandisse de plus de 10 % sans le dire.
 
@@ -193,7 +199,9 @@ Chaque précision faite en codant, numérotée à la suite du registre.
 
 - **F456** le titre du premier bloc qui redit la page est caché à l'écran et reste pour les lecteurs d'écran, en `h2` ; le surtitre qui redit la page disparaît ; sous un titre de bloc devenu `h2`, les sous-titres remontent d'un niveau, à la même taille (section 4).
 
-Les précisions des PR 2 à 7 suivent, F457 et au-delà.
+- **F457** « Réglages du calcul » de « Besoin par culture » dans le pli « Réglages de cette page », fermé, en bas ; un lien vers un élément du pli l'ouvre ; 5 541 px → 3 961 px à 390 px sur les données des parcours (section 5).
+
+Les précisions des PR 3 à 7 suivent, F458 et au-delà.
 
 Ce que le lot ne prouve pas : un vrai téléphone, un lecteur d'écran ; la
 ferme réelle n'est pas touchée.

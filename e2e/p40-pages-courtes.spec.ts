@@ -50,3 +50,40 @@ for (const [cible, noms] of Object.entries(TITRES_EN_DOUBLE) as [PageDuModule, s
     await verifierLEtape(page, journal, `un seul titre sur ${cible}`);
   });
 }
+
+/**
+ * Les budgets de hauteur au téléphone (section 2 du contrat), mesurés à
+ * 390 px, plis fermés, sur les données des parcours. Chaque PR du lot ajoute
+ * sa page.
+ */
+const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
+  // PR 2 (F457) : « Réglages du calcul » dans le pli « Réglages de cette page » ; 5 541 → 3 961 px.
+  // Les données des parcours n'ont aucune culture de la saison : les 32 cultures de référence
+  // s'y montrent ouvertes (F302), d'où 4 000 px ici pour 3 000 sur une ferme qui cultive.
+  cultures: 4_000,
+};
+
+for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuModule, number][]) {
+  test(`« ${TITRES_DES_PAGES[cible]} » tient sous ${budget} px au téléphone`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'telephone', 'le budget vaut au téléphone');
+    const journal = surveillerLaConsole(page);
+    await attendreLaPageIrrigation(page, cible);
+    const hauteur = await page.evaluate(() => document.documentElement.scrollHeight);
+    expect(hauteur, `hauteur de « ${cible} » à 390 px`).toBeLessThanOrEqual(budget);
+    // Rien ne déborde de côté.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await verifierLEtape(page, journal, `hauteur de ${cible}`);
+  });
+}
+
+test('« Besoin par culture » : « Réglages du calcul » dans le pli des réglages, fermé, qu’un lien ouvre', async ({ page }) => {
+  const journal = surveillerLaConsole(page);
+  await attendreLaPageIrrigation(page, 'cultures');
+  const pli = page.locator('details#reglages-de-la-page');
+  await expect(pli).not.toHaveAttribute('open', '');
+  await expect(pli.locator('section.crop-water-settings')).toHaveCount(1);
+  await page.goto('/irrigation/cultures#crop-water-settings-title');
+  await expect(pli).toHaveAttribute('open', '');
+  await expect(pli.getByRole('heading', { name: 'Réglages du calcul' })).toBeVisible();
+  await verifierLEtape(page, journal, 'réglages du calcul repliés');
+});
