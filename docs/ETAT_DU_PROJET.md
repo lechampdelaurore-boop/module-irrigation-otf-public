@@ -307,7 +307,7 @@ registres, elle y renvoie.
   adaptateurs lisent désormais le `fetch` global au moment de l'appel et
   ne l'appellent jamais comme leur méthode ; un échec journalise sa vraie
   erreur (nom, message, cause, temps écoulé, sans adresse ni clé) et un
-  délai dépassé n'est plus compté comme une panne réseau. **Non vérifié
+  délai dépassé n'est plus compté comme une panne réseau. **en ligne le 19 novembre 2026 à 12 h 41** (#97, fusionnée à 12 h 16, run 44513290890 vérifié job par job : « Application », « Workers Cloudflare », « Parcours navigateur », « Déploiement Cloudflare » et « Déploiement de la démonstration », verts). **Non vérifié
   sur le site** : la confirmation viendra du journal de la synchronisation
   du matin qui suit le déploiement. **PR 2 sur 3 codée**
   (`fix/meteo-alerte-retard`, D-165) : au-delà de 36 heures sans réussite,
