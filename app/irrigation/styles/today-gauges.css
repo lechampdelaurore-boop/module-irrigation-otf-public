@@ -51,7 +51,7 @@
   position: relative;
   display: flex;
   height: 16px;
-  border-radius: 5px;
+  border-radius: 9.75px;
   background: var(--sheet);
 }
 
@@ -65,7 +65,7 @@
 }
 
 .today-bar i:first-child {
-  border-radius: 5px 0 0 5px;
+  border-radius: 9.75px 0 0 9.75px;
 }
 
 .today-bar i[data-tone="rain"] {
@@ -132,7 +132,7 @@
   flex: none;
   overflow: hidden;
   border: 2px solid var(--water);
-  border-radius: 7px 7px 11px 11px;
+  border-radius: 9.75px;
   background: var(--card);
 }
 
@@ -280,7 +280,7 @@
   gap: 10px;
   align-items: start;
   padding: 7px 8px;
-  border-radius: 10px;
+  border-radius: 9.75px;
 }
 
 .reliability-check[data-ok="false"] {

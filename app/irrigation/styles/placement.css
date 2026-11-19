@@ -102,7 +102,7 @@
   height: 42px;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: #167eae;
   color: white;
   font-size: var(--text-20);
@@ -124,7 +124,7 @@
   height: 42px;
   padding: 0 36px 0 11px;
   border: 1px solid #9ebfce;
-  border-radius: 10px;
+  border-radius: var(--radius-button);
   background: white;
   color: var(--ink);
   font: inherit;
@@ -140,7 +140,7 @@
 .placement-current-choice {
   padding: 9px 11px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: rgb(255 255 255 / 66%);
 }
 

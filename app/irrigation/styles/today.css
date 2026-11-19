@@ -154,7 +154,7 @@
 
 .today-notice {
   padding: .5rem .75rem;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: var(--ok-soft);
   color: var(--ok-ink);
 }
@@ -166,7 +166,7 @@
 
 .today-error {
   padding: .5rem .75rem;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: var(--danger-soft);
   color: var(--danger-ink);
 }
