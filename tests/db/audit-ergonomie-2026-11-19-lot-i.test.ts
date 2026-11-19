@@ -1,0 +1,94 @@
+import assert from 'node:assert/strict';
+import test, { afterEach, beforeEach } from 'node:test';
+import { demoOwnerUserId, resolveDemoChoice } from '../../lib/domain/demo/catalogue';
+import { prepareDemoSpace } from '../../lib/services/demo-space';
+import { readLatestPlanForUser } from '../../db/planning-repository';
+import { getIrrigationFeasibilityScreenForUser } from '../../lib/services/irrigation-feasibility-service';
+import { beyondNeedSentence, shortageAction, waterBeyondNeed } from '../../lib/domain/planning/shortage-reading';
+import { feasibilityPlanGap } from '../../lib/domain/feasibility-plan-gap';
+import { volumeText } from '../../lib/domain/display-numbers';
+import type { StoredWeeklyPlan } from '../../lib/domain/planning/contract';
+import { installSimulatedDate, runOnSimulatedDay, uninstallSimulatedDate } from '../../lib/services/demo-clock';
+import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+
+/**
+ * Audit ergonomique du 19 novembre 2026, lot I « Pénurie et démonstration »
+ * (docs/audit-ergonomie-2026-11-19-lot-i-contract.md), sur la démonstration
+ * telle que le Worker la prépare.
+ */
+
+let database: TestDatabase;
+const savedDemoMode = process.env.DEMO_MODE;
+beforeEach(() => {
+  database = installTestDatabase();
+  process.env.DEMO_MODE = 'true';
+});
+afterEach(() => {
+  uninstallSimulatedDate();
+  database.dispose();
+  if (savedDemoMode === undefined) delete process.env.DEMO_MODE;
+  else process.env.DEMO_MODE = savedDemoMode;
+});
+
+/** La démonstration « Pic d'été, l'eau manque », préparée au jour du moment, et son plan. */
+async function penurie() {
+  const choice = resolveDemoChoice('maraichage', 'penurie');
+  const owner = demoOwnerUserId('invite-a', choice);
+  installSimulatedDate();
+  await runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice));
+  const plan = (await readLatestPlanForUser(owner, 2026, '2026-07-20'))!;
+  return { choice, owner, plan, now: new Date(plan.calculation.computedAt) };
+}
+
+// n° 5 — Le manque dit d'où il vient (PR 1, F445 à F447).
+
+test('n° 5, F445 : la phrase du manque dit l’eau que les goutte-à-goutte versent sur les planches vides', async () => {
+  const { plan, now } = await penurie();
+  const beyond = waterBeyondNeed(plan, now)!;
+  assert.equal(beyond.withoutNeed, true, 'les planches sans culture de la semaine');
+  assert.deepEqual(beyond.bedNames, ['A03', 'C01', 'H01', 'H03']);
+  assert.ok(beyond.cubicMeters > 0.4 && beyond.cubicMeters < 0.6, `${beyond.cubicMeters} m³`);
+  const sentence = shortageAction(plan, volumeText, now)!.sentence;
+  assert.match(sentence, /^Il manque [\d,]+ L d’eau d’ici dimanche : 5 planches ne recevront pas tout leur besoin\. Le matériel verse aussi [\d,]+ L sur des planches qui n’en ont pas besoin cette semaine \(A03, C01, H01 et 1 autre\)\.$/);
+  // Sans l'heure ni les créneaux, la phrase reste celle du planning (lot B) : rien n'est ajouté.
+  assert.doesNotMatch(shortageAction({ calculation: plan.calculation }, volumeText)!.sentence, /verse aussi/);
+});
+
+test('n° 5, F445 : sous le litre, ni phrase ni volume ; un surplus sur une planche qui a un besoin se dit autrement', async () => {
+  const { plan, now } = await penurie();
+  const withoutSurplus: StoredWeeklyPlan = { ...plan, proposals: plan.proposals.map((proposal) => ({ ...proposal, bedApplications: proposal.bedApplications.map((application) => ({ ...application, surplusMm: 0 })) })) };
+  assert.equal(waterBeyondNeed(withoutSurplus, now), null);
+  const onNeeded = beyondNeedSentence({ cubicMeters: 0.25, unknownVolume: true, bedNames: ['B2'], withoutNeed: false }, volumeText);
+  assert.equal(onNeeded, 'Le matériel verse aussi au moins 250 L au-delà du besoin des planches qu’il arrose (B2).');
+});
+
+test('n° 5, F446 et point 5 : le bassin de la démonstration à 5 m³, la répartition a quelque chose à répartir', async () => {
+  const { choice, owner } = await penurie();
+  const screen = await runOnSimulatedDay(choice.moment.dateKey, () => getIrrigationFeasibilityScreenForUser({ ownerUserId: owner, season: 2026 }));
+  assert.equal(screen.dashboard.requiresManualArbitration, true, 'un choix attend : l’écran de répartition s’ouvre');
+  assert.equal(screen.planGap, null, 'la faisabilité voit le manque : rien à expliquer');
+  assert.deepEqual(screen.dashboard.notes, [
+    '5 planches sans objectif adopté : leur besoin n’est pas compté ici.',
+    'Calcul en volume seulement : les heures, les pompes et le remplissage des réserves sont vérifiés par le planning.',
+  ]);
+  assert.ok(screen.dashboard.warnings.every((warning) => !/non calculable|Analyse volumétrique/.test(warning)), 'plus d’avertissement en jargon');
+});
+
+test('n° 5, F446 : un manque que la faisabilité ne voit pas se dit, d’où il vient et quoi faire', async () => {
+  const { plan, now } = await penurie();
+  const sees = { priorities: [], knownNeedCubicMeters: 1.2, forecastAvailableCubicMeters: 2, requiresManualArbitration: false };
+  const gap = feasibilityPlanGap({ plan, feasibility: sees, now })!;
+  assert.match(gap.lead, /^Le planning compte un manque de [\d,]+ L d’ici dimanche, que cette répartition ne voit pas\.$/);
+  assert.match(gap.cause, /^Les besoins des planches qui ont un objectif \(1,2 m³\) tiennent dans l’eau disponible \(2 m³\)\. Le matériel verse aussi [\d,]+ L sur des planches qui n’en ont pas besoin cette semaine \(A03, C01, H01 et 1 autre\)\. Le manque vient de là\. Fermez leurs lignes, retirez ces planches du matériel, ou fixez leur objectif\.$/);
+  assert.deepEqual(gap.links.map((link) => link.page), ['materiel', 'besoins']);
+  // Sans eau versée au-delà du besoin : les heures, les pompes, le remplissage, et le lien vers le planning.
+  const withoutSurplus: StoredWeeklyPlan = { ...plan, proposals: plan.proposals.map((proposal) => ({ ...proposal, bedApplications: proposal.bedApplications.map((application) => ({ ...application, surplusMm: 0 })) })) };
+  const timing = feasibilityPlanGap({ plan: withoutSurplus, feasibility: sees, now })!;
+  assert.match(timing.cause, /Le manque vient des heures, des pompes ou du remplissage des réserves/);
+  assert.deepEqual(timing.links.map((link) => link.page), ['planning']);
+  // La faisabilité voit le manque, une répartition s'applique, ou le plan ne manque de rien : rien à dire.
+  assert.equal(feasibilityPlanGap({ plan, feasibility: { ...sees, requiresManualArbitration: true }, now }), null);
+  const arbitrated: StoredWeeklyPlan = { ...plan, calculation: { ...plan.calculation, summary: { ...plan.calculation.summary, arbitration: { allocatedCubicMeters: 1, unreceivableCubicMeters: 0, unreceivableBedCount: 0 } as never } } };
+  assert.equal(feasibilityPlanGap({ plan: arbitrated, feasibility: sees, now }), null);
+  assert.equal(feasibilityPlanGap({ plan: null, feasibility: sees, now }), null);
+});

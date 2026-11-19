@@ -252,7 +252,7 @@ export type TodayInputs = {
    * R1, F276) ; `null` quand le planning n'est pas coché ou qu'aucun calcul
    * n'existe.
    */
-  shortagePlan: Pick<StoredWeeklyPlan, 'calculation'> | null;
+  shortagePlan: Pick<StoredWeeklyPlan, 'calculation' | 'proposals'> | null;
   bedNames: ReadonlyMap<string, string>;
   /** Le jardin de chaque planche, pour montrer d'abord les jardins arrosés aujourd'hui (lot H, F430 et F431). */
   bedPlots?: ReadonlyMap<string, string>;
@@ -330,7 +330,7 @@ export function todayView(input: TodayInputs): TodayView {
   const irrigatedToday = gardensIrrigatedToday([...current, ...late, ...todo], input.bedPlots);
   // Ce qui attend après le jour ne se dit que « Planning » coché (lot A, R1) : le plan de la semaine en décide.
   const tomorrow = on('planning') && input.plan ? todayTomorrow(input.plan.proposals, now) : null;
-  const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled) : null;
+  const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled, input.now) : null;
   return {
     today,
     plan: on('planning') ? planLine(input.plan?.computedAt ?? null, now) : null,

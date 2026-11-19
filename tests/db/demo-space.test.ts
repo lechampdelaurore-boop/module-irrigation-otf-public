@@ -191,7 +191,7 @@ test('le matériel et l’eau de la ferme : un goutte-à-goutte par parcelle, le
   assert.ok(equipment.every((item) => item.kind === 'drip' && item.settings.length === 1));
   const water = await listWaterInfrastructureForUser(owner);
   assert.deepEqual(water.resources.map((resource) => [resource.name, resource.status]), [['Puits des noues', 'inactive']]);
-  assert.deepEqual(water.reservoirs.map((reservoir) => [reservoir.name, reservoir.currentVolumeCubicMeters]), [['Bassin des noues', 6]]);
+  assert.deepEqual(water.reservoirs.map((reservoir) => [reservoir.name, reservoir.currentVolumeCubicMeters]), [['Bassin des noues', 5]]);
   const summer = await prepareOnMoment('invite-a', 'maraichage', 'ete');
   assert.deepEqual((await listWaterInfrastructureForUser(summer.owner)).resources.map((resource) => resource.status), ['active']);
 });

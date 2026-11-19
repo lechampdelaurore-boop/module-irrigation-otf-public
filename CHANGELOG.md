@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot I, PR 1 sur 5)
+
+- **Le manque dit d'où il vient** (D-178) : quand le matériel arrose aussi
+  des planches qui n'ont pas besoin d'eau, la phrase du manque le dit, au
+  planning et sur « Aujourd'hui » (« Le matériel verse aussi 486 L sur des
+  planches qui n'en ont pas besoin cette semaine… ») ; l'écran où mène
+  « Répartir l'eau » dit d'où vient un manque du planning qu'il ne voit
+  pas, et quoi faire, au lieu de tuiles vides ; ses deux avertissements en
+  jargon deviennent des notes ; « Recalculer la faisabilité » en bouton
+  secondaire. Démonstration « Pic d'été » : le bassin à 5 m³, une vraie
+  répartition à faire. Aucun calcul ne change.
+
 ### Modifié (audit du 19 novembre 2026, lot H, PR 5 sur 5)
 
 - **« Aujourd'hui » se lit mieux** (D-177) : la page se relit seule toutes

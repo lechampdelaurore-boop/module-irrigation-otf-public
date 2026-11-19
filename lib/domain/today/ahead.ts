@@ -76,8 +76,9 @@ export function todayTomorrow(proposals: readonly StoredProposal[], now: Date): 
  * quand la faisabilité est active (comme au planning). Nulle sans manque
  * d'eau.
  */
-export function todayShortage(plan: Pick<StoredWeeklyPlan, 'calculation'>, enabled: FeatureSelection): TodayShortage | null {
-  const action = shortageAction(plan, volumeText);
+export function todayShortage(plan: Pick<StoredWeeklyPlan, 'calculation'> & Partial<Pick<StoredWeeklyPlan, 'proposals'>>, enabled: FeatureSelection, now?: Date): TodayShortage | null {
+  // La phrase dit aussi l'eau versée au-delà du besoin, quand elle explique le manque (lot I, n° 5, F445).
+  const action = shortageAction(plan, volumeText, now);
   if (!action) return null;
   return {
     sentence: action.sentence,

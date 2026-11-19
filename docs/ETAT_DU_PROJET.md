@@ -435,8 +435,21 @@ registres, elle y renvoie.
   petits défauts de lecture** (D-177, F438 à F444) : la page se relit
   seule ; « Reste à apporter » dit pour quels jardins, en couleur neutre ;
   l'heure d'un seul tenant ; l'icône d'une proposition ; « irrigation »
-  partout ; la portée de l'objectif d'« Historique » dite ; codée. Le lot H
-  est codé en entier ; ses cinq PR s'ouvrent après celles du lot G.
+  partout ; la portée de l'objectif d'« Historique » dite ; en ligne le
+  19 novembre 2026 à 23 h 36 (#113, fusionnée à 23 h 14, run 44626690539 vérifié job par
+  job) : **lot H en ligne en entier**.
+  **Lot I commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
+  court `docs/audit-ergonomie-2026-11-19-lot-i-contract.md` (F445 et
+  suivantes, parcours P39), cinq PR ; les causes des n° 5, 10 et 11
+  établies dans le code avant lui. **PR 1, le manque dit d'où il vient**
+  (D-178, F445 à F448) : sur la démonstration « Pic d'été », chaque
+  goutte-à-goutte arrose aussi des planches sans culture ; le planning
+  compte cette eau, « Ressources » non, d'où un manque que l'écran de
+  répartition ne voyait pas. La phrase du manque dit cette eau ; l'écran
+  de répartition dit d'où vient un manque qu'il ne voit pas, et quoi
+  faire ; ses deux avertissements en jargon deviennent des notes ; le
+  bassin du moment passe à 5 m³ pour une vraie répartition ; aucun calcul
+  ne change ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

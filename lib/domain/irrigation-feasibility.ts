@@ -1,6 +1,7 @@
 import { millimetersFromCubicMeters } from './units.ts';
 import type { BedIrrigationNeed, IrrigationNeedPriority, IrrigationNeedsDashboard } from './irrigation-needs.ts';
 import type { MobilizableWaterPool } from './water-resources.ts';
+import { feasibilityUnknownReason } from './objective-reading.ts';
 
 export const FEASIBILITY_PRIORITIES = ['high', 'normal', 'low'] as const;
 export type HydraulicQuality = 'confirmed' | 'unverified' | 'incompatible';
@@ -63,6 +64,8 @@ export type IrrigationFeasibility = {
   priorities: PriorityFeasibility[];
   pools: FeasibilityPool[];
   warnings: string[];
+  /** Ce que le calcul ne compte pas, dit en texte ordinaire sous l'écran de répartition (audit du 19 novembre 2026, lot I, n° 5, F447). */
+  notes: string[];
 };
 
 const EPS = 1e-7;
@@ -97,7 +100,11 @@ export function allocateIrrigationWater(input: {
   let blocked = false;
   let withheld = 0;
   const warnings: string[] = [];
-  if (unknownCount) warnings.push(`${unknownCount} planche(s) au besoin non calculable : les totaux de la ferme sont incomplets.`);
+  const notes: string[] = [];
+  // Les planches au besoin non calculable : une note sans jargon, plus un avertissement (lot I, n° 5, F447).
+  const unknownBeds = beds.filter((bed) => !known.includes(bed));
+  const unknownReason = feasibilityUnknownReason({ noObjective: unknownBeds.filter((bed) => bed.objectiveMm === null).length, noWettedArea: unknownBeds.filter((bed) => bed.objectiveMm !== null).length });
+  if (unknownReason) notes.push(`${unknownReason.charAt(0).toLocaleUpperCase('fr-FR')}${unknownReason.slice(1)} : leur besoin n’est pas compté ici.`);
   if (unknownWater) warnings.push('Disponibilité incomplète : un stock ou une prévision manque. Les volumes inconnus ne sont pas remplacés par zéro.');
   if ((input.reservedUnassignedCubicMeters ?? 0) > 0) warnings.push('Des irrigations existantes ont une origine inconnue ou insuffisante. Le solde non couvert est réservé une seule fois sur le total connu ; leur acheminement reste à vérifier.');
 
@@ -184,7 +191,7 @@ export function allocateIrrigationWater(input: {
     reservedPlannedCubicMeters: input.reservedPlannedCubicMeters ?? 0,
     reservedUnassignedCubicMeters: input.reservedUnassignedCubicMeters ?? 0,
     requiresManualArbitration,
-    priorities, pools, warnings,
+    priorities, pools, warnings, notes,
   };
 }
 

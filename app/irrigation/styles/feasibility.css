@@ -33,3 +33,10 @@
 .feasibility-help > [role="tooltip"] { display: block; max-width: 100%; padding: .9rem; margin: .4rem 0; background: var(--sheet); color: var(--ink); border: 1px solid var(--line); border-radius: .6rem; font-size: .9rem; font-weight: 400; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 .feasibility-help [role="tooltip"] button { display: block; margin-top: .5rem; min-height: 36px; color: var(--green); background: white; border: 1px solid var(--line-strong); border-radius: .4rem; padding: .3rem .8rem; cursor: pointer; }
 @media (max-width: 480px) { .feasibility-bed-grid { padding: .6rem; } .feasibility-heading > button, .feasibility-validation > button { width: 100%; min-height: 44px; } }
+/* Le manque du planning que la répartition ne voit pas (audit du 19 novembre 2026, lot I, n° 5, F446, F447). */
+.feasibility-plan-gap { background: var(--warn-soft); color: var(--warn-ink); border-radius: .65rem; padding: .8rem 1rem; line-height: 1.55; }
+.feasibility-plan-gap p { margin: 0 0 .5rem; }
+.feasibility-plan-gap-links { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: 0; }
+.feasibility-plan-gap-links a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 600; }
+.feasibility-note { color: var(--muted); font-size: .9rem; line-height: 1.55; margin: .4rem 0; }
+.feasibility-heading button.feasibility-recalculate { background: transparent; color: var(--green); border: 1px solid var(--green); }

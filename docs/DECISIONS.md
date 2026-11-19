@@ -6188,6 +6188,41 @@ sans changer le calcul (F444).
 
 Ne changent pas : les calculs, l'objectif d'« Historique », les gestes.
 
+
+## D-178 — Lot I, PR 1 : le manque dit d'où il vient
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 5 : sur la
+démonstration « Pic d'été, l'eau manque », « Répartir l'eau » menait à un
+écran sans rien à répartir, qui ne parlait jamais du manque annoncé.
+**Cause établie dans le code** (démonstration rejouée sur la machine de
+développement) : le bassin offrait 2 m³ d'ici dimanche pour 1,2 m³ de
+besoins des planches qui ont un objectif ; la faisabilité de
+« Ressources » ne compare l'eau qu'à ces besoins et ne trouvait aucun
+manque. Le moteur du planning compte l'eau que le matériel tire : chaque
+goutte-à-goutte arrose aussi les planches sans culture qu'il couvre, au-delà
+de leur besoin (le surplus, R11) ; quatre irrigations tiraient 1,95 m³ pour
+en porter 0,84 aux planches qui en avaient besoin, d'où 367 L de manque.
+Les deux calculs sont justes ; aucun ne le disait.
+
+**Décision.** Le plan enregistré se lit, sans calcul nouveau : l'eau que
+ses créneaux proposés ou validés versent au-delà du besoin, et les
+planches qui la reçoivent. Quand le plan manque d'eau, la phrase du manque
+la dit, au planning et sur « Aujourd'hui » (F445). Quand la faisabilité ne
+voit pas le manque du planning, l'écran de répartition dit d'où il vient
+et quoi faire (fermer leurs lignes, retirer ces planches du matériel,
+fixer leur objectif), ou, sans eau versée au-delà du besoin, que le manque
+vient des heures, des pompes ou du remplissage, avec le lien vers le
+planning (F446). Les deux avertissements orange deviennent des notes en
+texte ordinaire ; « Recalculer la faisabilité » passe en bouton secondaire
+(F447). Le bassin du moment « Pic d'été » de la démonstration passe de 6 à
+5 m³ : les besoins des planches cultivées dépassent l'eau, et l'écran de
+répartition a un choix à proposer (F448, une donnée de la ferme fictive).
+
+Ne changent pas : le moteur du planning, la faisabilité, les besoins, les
+gestes. Logiciel multi-fermes : la phrase vaut pour toute ferme dont le
+matériel arrose des planches sans besoin.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
