@@ -6,6 +6,7 @@ import type { CropAlertNotification } from './frost.ts';
 import { fitPushBody, pushTag } from './push.ts';
 import { bedsText, dayText, lowerFirst, upperFirst } from './text.ts';
 import { resolveDryingDays, type CropAlertCommonEntry, type DryingRevision, type FrostLinkRevision } from './thresholds.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * L'arrêt d'arrosage avant récolte, le « séchage »
@@ -93,7 +94,7 @@ export function evaluateDrying(input: {
     if (deadline.stopDate > input.today) upcoming.push(deadline);
     else if (!input.alertedSeriesIds.has(series.id)) due.push(deadline);
   }
-  const order = (a: DryingDeadline, b: DryingDeadline) => a.stopDate.localeCompare(b.stopDate) || a.seriesName.localeCompare(b.seriesName, 'fr');
+  const order = (a: DryingDeadline, b: DryingDeadline) => a.stopDate.localeCompare(b.stopDate) || compareNamesNaturally(a.seriesName, b.seriesName);
   return { due: due.sort(order), upcoming: upcoming.sort(order) };
 }
 

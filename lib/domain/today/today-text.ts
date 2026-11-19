@@ -1,5 +1,6 @@
 import { MILLISECONDS_PER_DAY, MINUTES_PER_HOUR } from '../units.ts';
 import { FARM_TIME_ZONE, dateKeyInTimeZone } from '../water-management.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Les mots de la page « Aujourd'hui » et de la zone « Fiabilité du calcul »
@@ -64,5 +65,5 @@ export function namesText(names: readonly string[]): string {
 
 /** Les noms rangés dans l'ordre naturel (B9-9 avant B9-10), sans doublon. */
 export function sortedNames(names: Iterable<string>): string[] {
-  return [...new Set(names)].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
+  return [...new Set(names)].sort((a, b) => compareNamesNaturally(a, b));
 }

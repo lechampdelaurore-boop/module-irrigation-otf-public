@@ -21,6 +21,7 @@ import { FARM_TIME_ZONE } from '@/lib/domain/water-management';
 import { formatDuration } from '../irrigation-manager/presentation';
 import { FigureOrigin } from '../shell/figure-origin';
 import { formatDateTime, formatFlow, formatMm, formatTime, formatVolume } from './format';
+import { compareNamesNaturally } from '@/lib/domain/bed-order';
 
 export type ProposalFeedback = { ok: boolean; message: string };
 
@@ -48,7 +49,9 @@ const doseInput = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2, use
 export function ProposalCard({ proposal, currentCalculationId, now, pending, feedback, soilNotes = [], onValidate, onAdjust, onRefuse }: Props) {
   const status = effectiveProposalStatus(proposal, now);
   const { justification } = proposal;
-  const bedNames = proposal.bedApplications.map((application) => application.bedName);
+  // Les planches dans l'ordre naturel, comme sur « Aujourd'hui » (lot H, n° 14, F436).
+  const bedApplications = [...proposal.bedApplications].sort((left, right) => compareNamesNaturally(left.bedName, right.bedName));
+  const bedNames = bedApplications.map((application) => application.bedName);
   const earlierDate = earlierCalculationDate(proposal, currentCalculationId);
   const origin = earlierDate === null ? null : `calcul du ${formatDateTime(earlierDate)}`;
   return (
@@ -88,7 +91,7 @@ export function ProposalCard({ proposal, currentCalculationId, now, pending, fee
               <tr><th scope="col">Planche</th><th scope="col">Besoin avant</th><th scope="col">Apport</th><th scope="col">Besoin après</th><th scope="col">Sur-apport</th><th scope="col">Surface mouillée</th></tr>
             </thead>
             <tbody>
-              {proposal.bedApplications.map((application) => (
+              {bedApplications.map((application) => (
                 <tr key={application.bedId}>
                   <th scope="row">{application.bedName}</th>
                   <td data-label="Besoin avant">{formatMm(application.needBeforeMm)}</td>

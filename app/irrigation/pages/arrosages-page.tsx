@@ -75,6 +75,7 @@ export function ArrosagesPage({
         poseHistory={equipmentPoseHistory}
         groups={gardenGroupConfiguration.groups}
         beds={snapshot.beds.filter((bed) => bed.seasons.includes(season))}
+        plots={snapshot.plots.map((plot) => ({ id: plot.id, name: plot.name }))}
         events={irrigationEvents}
         pumpDashboard={pumpDashboard}
         pumpsEnabled={pumpsEnabled}

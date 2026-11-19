@@ -5,6 +5,7 @@ import type { SoilObservation, SoilReserveDay, UnknownReason } from './gauge.ts'
 import { gardenSoilSummary, soilReserveSummary, type GardenSoilSummary, type SoilReserveSummary } from './signals.ts';
 import { PERCENT } from './soil.ts';
 import { decimalText, fixedTwoText, mmText, percentText } from '../figure-origin.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Le bloc « Réserve du sol » tel que l'écran le montre
@@ -73,7 +74,7 @@ export function soilGaugeView(input: {
         const sheltered = plot.mode === 'greenhouse';
         const beds = input.beds
           .filter((bed) => bed.plotId === plot.id)
-          .sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }))
+          .sort((a, b) => compareNamesNaturally(a.name, b.name))
           .map((bed) => bedView(bed, input.daysByBed.get(bed.id) ?? [], input.today, dates));
         return {
           plotId: plot.id,

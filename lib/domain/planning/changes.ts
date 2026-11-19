@@ -1,6 +1,7 @@
 import { millisecondsFromMinutes } from '../units.ts';
 import { effectiveProposalStatus, type PlanBedOutcome, type PlanProposal, type PlanSuggestion, type StoredProposal, type StoredWeeklyPlan, type WeeklyPlan } from './contract.ts';
 import { unknownWaterChainCount } from './water-deficit-summary.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * « Ce qui a changé » (docs/replanning-contract.md, règle 25 ;
@@ -132,8 +133,8 @@ function proposalChanges(before: readonly StoredProposal[], after: readonly Plan
     for (const now of unpairedAfter) changes.push(change('appeared', null, now));
   }
   return changes.sort((left, right) => Date.parse(slotOf(left).startAt) - Date.parse(slotOf(right).startAt)
-    || left.equipmentName.localeCompare(right.equipmentName, 'fr')
-    || left.settingName.localeCompare(right.settingName, 'fr')
+    || compareNamesNaturally(left.equipmentName, right.equipmentName)
+    || compareNamesNaturally(left.settingName, right.settingName)
     || left.change.localeCompare(right.change));
 }
 
@@ -229,5 +230,5 @@ function placement(bed: PlanBedOutcome): BedPlacementChange {
 }
 
 function byName(left: BedPlacementChange, right: BedPlacementChange): number {
-  return left.bedName.localeCompare(right.bedName, 'fr') || left.bedId.localeCompare(right.bedId);
+  return compareNamesNaturally(left.bedName, right.bedName) || left.bedId.localeCompare(right.bedId);
 }

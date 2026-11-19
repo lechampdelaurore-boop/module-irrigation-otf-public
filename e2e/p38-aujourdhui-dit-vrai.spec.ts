@@ -26,6 +26,10 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, ver
  *   « Arrosages » ; arrêtée en route, son reliquat se lit « Reliquat » avec
  *   « Reprendre le reliquat » ; le reliquat annulé, il n'y est plus.
  *
+ * - l'ordre naturel (n° 14, F436 et F437) : la liste « Matériel »
+ *   d'« Arrosages » est regroupée par jardin, les groupes et les matériels
+ *   dans l'ordre naturel (« gag2 » avant « gag10 »).
+ *
  * Ce qu'il ne prouve pas : les parts de chaque origine (les tests du
  * domaine, `tests/audit-ergonomie-2026-11-19-lot-h.test.ts`, les chiffrent),
  * la ferme réelle, un vrai téléphone.
@@ -178,4 +182,22 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await expect(fiche).toHaveCount(0);
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(enTete.locator('.today-irrigation').filter({ hasText: materiel })).toHaveCount(0);
+});
+
+test('la liste « Matériel » se regroupe par jardin, dans l’ordre naturel', async ({ page }) => {
+  const journal = surveillerLaConsole(page);
+  await attendreLaPageIrrigation(page, 'arrosages');
+  await page.getByRole('tab', { name: /^Planifier/ }).click();
+  const liste = page.locator('select').filter({ has: page.getByRole('option', { name: 'Choisissez un matériel' }) });
+  const groupes = await liste.locator('optgroup').evaluateAll((elements) => elements.map((element) => ({
+    label: element.getAttribute('label') ?? '',
+    options: [...element.querySelectorAll('option')].map((option) => option.textContent ?? ''),
+  })));
+  expect(groupes.length).toBeGreaterThan(0);
+  const naturel = new Intl.Collator('fr-FR', { numeric: true, sensitivity: 'base' });
+  const range = (noms: string[]) => [...noms].sort((a, b) => naturel.compare(a, b));
+  const libelles = groupes.map((groupe) => groupe.label).filter((label) => label !== 'Sans jardin');
+  expect(libelles).toEqual(range(libelles));
+  for (const groupe of groupes) expect(groupe.options, `le jardin « ${groupe.label} »`).toEqual(range(groupe.options));
+  await verifierLEtape(page, journal, 'la liste « Matériel » par jardin');
 });

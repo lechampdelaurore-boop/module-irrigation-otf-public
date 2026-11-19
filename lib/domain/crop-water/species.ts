@@ -1,4 +1,5 @@
 import type { CropSeries } from '../domain.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * La correspondance des espèces d'Ouvre ta ferme avec les cultures de
@@ -73,7 +74,7 @@ export function speciesWithoutReference(
       listed.set(key, entry);
     }
   }
-  return [...listed.values()].sort((a, b) => a.plantName.localeCompare(b.plantName, 'fr') || a.reason.localeCompare(b.reason));
+  return [...listed.values()].sort((a, b) => compareNamesNaturally(a.plantName, b.plantName) || a.reason.localeCompare(b.reason));
 }
 
 /** Une espèce des séries d'une saison, avec son rattachement et les exceptions de ses séries. */
@@ -116,6 +117,6 @@ export function seasonSpecies(
     }
   }
   return [...species.values()]
-    .map((item) => ({ ...item, series: item.series.sort((a, b) => a.name.localeCompare(b.name, 'fr')) }))
-    .sort((a, b) => a.plantName.localeCompare(b.plantName, 'fr') || a.plantId.localeCompare(b.plantId));
+    .map((item) => ({ ...item, series: item.series.sort((a, b) => compareNamesNaturally(a.name, b.name)) }))
+    .sort((a, b) => compareNamesNaturally(a.plantName, b.plantName) || a.plantId.localeCompare(b.plantId));
 }

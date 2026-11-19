@@ -1,4 +1,5 @@
 import { FARM_TIME_ZONE } from '../water-management.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /** Les mots communs aux textes des alertes par culture. */
 
@@ -33,7 +34,7 @@ export function listText(items: readonly string[]): string {
 
 /** « planche 4 », « planches 12 et 14 ». */
 export function bedsText(bedNames: readonly string[]): string {
-  const sorted = [...new Set(bedNames)].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }));
+  const sorted = [...new Set(bedNames)].sort((a, b) => compareNamesNaturally(a, b));
   return `planche${sorted.length > 1 ? 's' : ''} ${listText(sorted)}`;
 }
 

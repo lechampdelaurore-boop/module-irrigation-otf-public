@@ -17,6 +17,7 @@ import {
   localDateStartUtc,
   weekStartDateKey,
 } from './water-management.ts';
+import { compareNamesNaturally } from './bed-order.ts';
 
 export const IRRIGATION_NEED_PRIORITIES = ['low', 'normal', 'high'] as const;
 export type IrrigationNeedPriority = (typeof IRRIGATION_NEED_PRIORITIES)[number];
@@ -312,7 +313,7 @@ export function buildIrrigationNeedsDashboard(input: {
       effectiveVolumeCubicMeters: volume,
       beds: gardenBeds,
     } satisfies GardenIrrigationNeeds;
-  }).sort((a, b) => a.zoneName.localeCompare(b.zoneName, 'fr') || a.plotName.localeCompare(b.plotName, 'fr'));
+  }).sort((a, b) => compareNamesNaturally(a.zoneName, b.zoneName) || compareNamesNaturally(a.plotName, b.plotName));
   const allBeds = gardens.flatMap((garden) => garden.beds);
   const missing = [...new Set(allBeds.flatMap((bed) => bed.completeness.missing))];
   return {

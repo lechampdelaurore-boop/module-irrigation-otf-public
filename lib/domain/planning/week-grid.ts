@@ -1,5 +1,6 @@
 import type { StoredProposal } from './contract.ts';
 import type { PlanDay } from './presentation.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * La semaine en tableau, sur un grand écran (retour du porteur, 7 novembre
@@ -19,7 +20,7 @@ export function planWeekRows(days: readonly PlanDay[]): PlanWeekRow[] {
     }
   }
   return [...rows.values()].sort((left, right) =>
-    left.equipmentName.localeCompare(right.equipmentName, 'fr', { numeric: true }) || left.equipmentId.localeCompare(right.equipmentId));
+    compareNamesNaturally(left.equipmentName, right.equipmentName) || left.equipmentId.localeCompare(right.equipmentId));
 }
 
 export type PlanWeekCell = { row: number; proposals: StoredProposal[] };

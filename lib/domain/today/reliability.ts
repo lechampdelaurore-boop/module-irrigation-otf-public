@@ -7,6 +7,7 @@ import { millisecondsFromHours } from '../units.ts';
 import { addDaysToDateKey } from '../water-management.ts';
 import { countText, dateWithYearText, daysBetween, farmDateKey, farmHourText, namesText, shortDayText, sortedNames } from './today-text.ts';
 import { ofName } from '../display-words.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * La zone « Fiabilité du calcul » (audit ergonomique, point 3, 3.8 quater
@@ -135,7 +136,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
   const on = (kind: ReliabilityKind) => input.enabled.includes(RELIABILITY_FEATURE[kind]);
   const lines: ReliabilityLine[] = [];
   if (on('reservoir-volume')) {
-    const reservoirs = [...input.reservoirs].sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+    const reservoirs = [...input.reservoirs].sort((a, b) => compareNamesNaturally(a.name, b.name));
     for (const reservoir of reservoirs) {
       const line = reservoirLine(reservoir, today);
       if (line) lines.push(line);
@@ -177,7 +178,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
  */
 function soilLines(all: readonly ReliabilitySoilGarden[]): ReliabilityLine[] {
   const lines: ReliabilityLine[] = [];
-  const gardens = all.filter((garden) => !garden.withoutRfu).sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+  const gardens = all.filter((garden) => !garden.withoutRfu).sort((a, b) => compareNamesNaturally(a.name, b.name));
   if (gardens.length > 0) {
     const first = gardens[0];
     lines.push({
@@ -212,7 +213,7 @@ function soilParcelsWithoutRfu(gardens: readonly ReliabilitySoilGarden[]): { zon
     const parcel = parcels.get(garden.withoutRfu.zoneId) ?? { ...garden.withoutRfu, gardens: 0 };
     parcels.set(parcel.zoneId, { ...parcel, gardens: parcel.gardens + 1 });
   }
-  return [...parcels.values()].sort((a, b) => a.zoneName.localeCompare(b.zoneName, 'fr', { numeric: true }));
+  return [...parcels.values()].sort((a, b) => compareNamesNaturally(a.zoneName, b.zoneName));
 }
 
 function reservoirLine(reservoir: ReliabilityReservoir, today: string): ReliabilityLine | null {

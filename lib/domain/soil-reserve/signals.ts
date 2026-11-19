@@ -2,6 +2,7 @@ import { daysFromTo } from '../crop-water/crop-calendar.ts';
 import { bareSoilRoomMm, type SurfaceState } from './bare-soil.ts';
 import { dayBounds, irrigationBetween, type IrrigationInterval, type SoilReserveDay, type UnknownReason } from './gauge.ts';
 import { PERCENT } from './soil.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Les signaux de la jauge (docs/soil-reserve-contract.md, « Les signaux »,
@@ -216,6 +217,6 @@ export function gardenSoilSummary(beds: readonly GardenBed[]): GardenSoilSummary
     lowest,
     countedBeds,
     unknownBeds,
-    withoutCrop: withoutCrop.sort((a, b) => a.bedName.localeCompare(b.bedName, 'fr')),
+    withoutCrop: withoutCrop.sort((a, b) => compareNamesNaturally(a.bedName, b.bedName)),
   };
 }

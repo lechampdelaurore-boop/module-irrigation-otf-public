@@ -10,6 +10,7 @@ import {
 import { cubicMetersFromMillimeterSquareMeters } from '../units.ts';
 import { addDaysToDateKey, localDateStartUtc } from '../water-management.ts';
 import { isIgnoredSeries, resolveSeriesOccupation, type SeriesOccupation } from './occupation.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Les cumuls d'eau par série (docs/series-contract.md, « L'attribution des
@@ -102,7 +103,7 @@ export function buildSeriesWaterReport(input: {
     else series.push(summary);
   }
 
-  series.sort((left, right) => left.name.localeCompare(right.name, 'fr'));
+  series.sort((left, right) => compareNamesNaturally(left.name, right.name));
   upcoming.sort((left, right) => left.occupation.startDate.localeCompare(right.occupation.startDate));
   return { series, upcoming, ignored };
 }
