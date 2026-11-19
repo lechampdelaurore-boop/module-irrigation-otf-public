@@ -82,6 +82,14 @@ const TEXTS: Record<IrrigationUnavailableReason, StateText> = {
     action: 'Recharger la page',
     refresh: false,
   },
+  // Une route lue a changé de forme (T4-15, F394) : rien n'est lu ni rangé tant que le module ne sait pas la lire.
+  'shape-changed': {
+    eyebrow: 'Données d’Ouvre ta ferme illisibles',
+    title: 'Ouvre ta ferme a changé la forme de ses données',
+    body: 'Le module ne sait plus les lire sans risque d’erreur et aucune lecture précédente n’est encore enregistrée. Rien n’est affiché plutôt que des données fausses ; aucune donnée n’a été modifiée.',
+    action: 'Réessayer',
+    refresh: true,
+  },
 };
 
 /** Ouvre ta ferme n'a pas répondu et rien n'est encore enregistré : aucune page ne peut s'afficher. */

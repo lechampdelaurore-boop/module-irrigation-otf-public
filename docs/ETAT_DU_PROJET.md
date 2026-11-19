@@ -216,9 +216,40 @@ registres, elle y renvoie.
   d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check` (43 tests),
   `pnpm weather:check`, `pnpm site:check` réussis en local ; douze
   sabotages des règles, chacun détecté ; la suite complète des parcours
-  jouée par la CI de la PR. **PR ouverte** (`feat/compteur-partage-otf`).
-  Restent de la 4.3 sans accès d'OTF : la PR 2 (le coffre, endormi) et la
-  PR 5 (les tests de contrat des routes).
+  jouée par la CI de la PR. **En ligne le 19 novembre 2026 à
+  1 h 33** (consigné par la PR suivante, celle des tests de contrat
+  des routes) : #94 fusionnée à 1 h 13, run 44427211802 vérifié job par job
+  (« Application », « Workers Cloudflare », « Parcours navigateur »,
+  « Déploiement Cloudflare », migration 0032 comprise, et « Déploiement de
+  la démonstration », verts). La mesure de quatorze jours du compte du
+  jour (F363) commence là.
+- Tranche 4, **4.3, PR 5 : les tests de contrat des routes** (D-162, F391 à
+  F396, section 6.3 ter de `docs/tranche-4-contract.md`), codée la même
+  nuit en Opus 5.5 · Max, sous le mandat de nuit du porteur, sans accès
+  d'OTF, avant la PR 2, comme F370 le permet : la PR du coffre change la
+  politique de confidentialité et attend la relecture du porteur (F367).
+  Chaque route lue est vérifiée dès sa réponse, avant l'appel suivant : ce
+  que la traduction de l'instantané lit sur chaque élément, et les champs
+  lus avec une valeur par défaut, constatés sur la ferme, qui
+  manqueraient à tous les éléments d'une réponse ; un écart arrête la
+  lecture sans rien ranger ; la page affiche le dernier instantané avec
+  « Ouvre ta ferme a changé la forme de ses données : la dernière lecture
+  réussie est affichée. », ou une page d'état sans cache ; le journal
+  nomme la route, le champ et le problème, jamais une valeur, et les
+  messages de la traduction ne portent plus d'identifiant ; `GET /me` à
+  plusieurs structures est refusé partout, la traduction comprise (point
+  D2 de la revue de l'isolation). Ni migration ni réglage de Cloudflare ;
+  rien ne change à l'écran tant qu'OTF répond dans la forme constatée.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 733
+  tests, puis 413 pour chacun des trois passages d'isolation), `pnpm
+  build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm
+  site:check` réussis en local ; douze sabotages des règles, chacun
+  détecté ; la suite complète des parcours jouée par la CI de la PR.
+  **PR ouverte** (`feat/contrat-routes-otf`). Reste de la 4.3 sans accès
+  d'OTF : la PR 2 (le coffre, endormi), qui attend la relecture du
+  porteur pour le texte de confidentialité. Non vérifié : la forme réelle
+  des champs lus par défaut et non constatés (mode d'un jardin, saisons
+  d'un élément) ; à l'essai de bout en bout (F395).
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

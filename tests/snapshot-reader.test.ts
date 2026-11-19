@@ -39,7 +39,7 @@ test('la lecture ciblée utilise exactement les dix routes GET nécessaires, dan
       if (url.pathname.endsWith('/bedList')) {
         return Response.json({
           count: 1,
-          list: [{ id: 20, zone: 1, plot: 10, name: 'P01', length: 20, width: 75 }],
+          list: [{ id: 20, zone: 1, plot: 10, name: 'P01', length: 20, width: 75, alleyWidth: 45 }],
         });
       }
       if (url.pathname.endsWith('/actionList')) {
@@ -145,7 +145,7 @@ test('la garde de la ferme (F332) : une clé qui mène à une autre ferme s’ar
 });
 
 test('la garde de la ferme (F341) : un `/me` sans identité lisible arrête la lecture, sans rien deviner', async () => {
-  for (const me of [[], [{ name: 'Sans identifiant' }], [{ id: 17 }, { id: 18 }], { list: [] }]) {
+  for (const me of [[], [{ name: 'Sans identifiant' }], { list: [] }]) {
     const calls: string[] = [];
     await assert.rejects(
       () => readOtfSeasonSnapshot(clientAnswering(me, calls), 2026, new Date(), '17'),
@@ -192,7 +192,7 @@ test('la lecture complète parcourt les saisons et fusionne les identifiants', a
       }
       return Response.json({
         count: 1,
-        list: [{ id: 20, zone: 1, plot: 10, name: 'P01', length: 25, width: 80 }],
+        list: [{ id: 20, zone: 1, plot: 10, name: 'P01', length: 25, width: 80, alleyWidth: null }],
       });
     },
   });

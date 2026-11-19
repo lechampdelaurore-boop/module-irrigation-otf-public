@@ -2,8 +2,10 @@ import type { IrrigationSnapshot } from '../../domain/domain.ts';
 import { mapOtfConfiguration, mapOtfSnapshot } from '../../domain/otf/mapper.ts';
 import { mapCropPlan } from '../../domain/otf/crop-plan-mapper.ts';
 import type { OtfReadClient } from './read-client.ts';
-import { OtfApiError } from '../../domain/otf/api-contract.ts';
+import { OtfApiError, OtfShapeError } from '../../domain/otf/api-contract.ts';
 import { farmIdentityShape, OtfFarmMismatchError, otfFarmIdentity } from '../../domain/otf/farm-identity.ts';
+import { identifier } from '../../domain/otf/mapper.ts';
+import { checkListShape, checkMeShape, type OtfListRoute } from '../../domain/otf/route-shapes.ts';
 import { OtfReadDeferredError } from '../../domain/otf/shared-call-pace.ts';
 import { logJsonLine } from '../log.ts';
 
@@ -28,7 +30,9 @@ export class OtfSeasonUnavailableError extends OtfApiError {
 /**
  * L'instantané d'une saison. `GET /me` est lu d'abord (docs/tranche-4-contract.md,
  * F337) : avec `expectedFarmId`, la lecture s'arrête avant toute autre route
- * si la clé mène à une autre ferme, ou à aucune (F332, F341).
+ * si la clé mène à une autre ferme, ou à aucune (F332, F341). Chaque route a
+ * sa vérification de forme, dès sa réponse (T4-15, F391) : un écart arrête la
+ * lecture avant l'appel suivant, et rien n'est rangé.
  */
 export async function readOtfSeasonSnapshot(
   client: OtfReadClient,
@@ -36,7 +40,17 @@ export async function readOtfSeasonSnapshot(
   readAt = new Date(),
   expectedFarmId?: string,
 ): Promise<IrrigationSnapshot> {
+  return logShapeChange(() => readSeasonSnapshot(client, season, readAt, expectedFarmId));
+}
+
+async function readSeasonSnapshot(
+  client: OtfReadClient,
+  season: number,
+  readAt: Date,
+  expectedFarmId: string | undefined,
+): Promise<IrrigationSnapshot> {
   const rawStructures = await client.getCurrentStructures();
+  checkMeShape(rawStructures);
   if (expectedFarmId !== undefined) {
     const observedFarmId = otfFarmIdentity(rawStructures);
     if (observedFarmId !== expectedFarmId) {
@@ -60,21 +74,15 @@ export async function readOtfSeasonSnapshot(
     );
   }
 
-  const zones = await readSeason('/zoneList', season, () =>
-    client.listZones(season),
-  );
-  const plots = await readSeason('/plotList', season, () =>
-    client.listPlots(season),
-  );
-  const beds = await readSeason('/bedList', season, () =>
-    client.listBeds(season),
-  );
+  const zones = await readList('/zoneList', season, () => client.listZones(season));
+  const plots = await readList('/plotList', season, () => client.listPlots(season));
+  const beds = await readList('/bedList', season, () => client.listBeds(season));
 
   const snapshot = mapOtfSnapshot(
     rawConfiguration,
-    uniqueValues(zones, 'parcelle'),
-    uniqueValues(plots, 'jardin'),
-    uniqueValues(beds, 'planche'),
+    uniqueValues(zones, '/zoneList'),
+    uniqueValues(plots, '/plotList'),
+    uniqueValues(beds, '/bedList'),
     readAt,
     [season],
     rawStructures,
@@ -85,18 +93,18 @@ export async function readOtfSeasonSnapshot(
   // séries, une d'emplacements, puis les tâches en entier, toutes saisons.
   // Une lecture qui échoue fait échouer l'instantané entier : rien ne
   // remplace le cache tant que tout n'est pas valide.
-  const rawActions = await readRoute('/actionList', () => client.listActions());
-  const rawPlants = await readRoute('/plantList', () => client.listPlants());
-  const rawSeries = await readSeason('/seriesList', season, () => client.listSeries(season));
-  const rawPlaces = await readSeason('/placeList', season, () => client.listPlaces(season));
-  const rawTasks = await readRoute('/taskList', () => client.listTasks());
+  const rawActions = await readList('/actionList', null, () => client.listActions());
+  const rawPlants = await readList('/plantList', null, () => client.listPlants());
+  const rawSeries = await readList('/seriesList', season, () => client.listSeries(season));
+  const rawPlaces = await readList('/placeList', season, () => client.listPlaces(season));
+  const rawTasks = await readList('/taskList', null, () => client.listTasks());
 
   const cropPlan = mapCropPlan({
     rawActions,
     rawPlants,
-    rawSeries: uniqueValues(rawSeries, 'série'),
-    rawPlaces: uniqueValues(rawPlaces, 'emplacement'),
-    rawTasks: uniqueValues(rawTasks, 'tâche'),
+    rawSeries: uniqueValues(rawSeries, '/seriesList'),
+    rawPlaces: uniqueValues(rawPlaces, '/placeList'),
+    rawTasks: uniqueValues(rawTasks, '/taskList'),
     season,
     beds: snapshot.beds,
   });
@@ -108,9 +116,14 @@ export async function readCompleteOtfSnapshot(
   client: OtfReadClient,
   readAt = new Date(),
 ): Promise<IrrigationSnapshot> {
+  return logShapeChange(() => readAllSeasons(client, readAt));
+}
+
+async function readAllSeasons(client: OtfReadClient, readAt: Date): Promise<IrrigationSnapshot> {
   const rawConfiguration = await client.getConfiguration();
-  const rawStructures = await client.getCurrentStructures();
   const configuration = mapOtfConfiguration(rawConfiguration);
+  const rawStructures = await client.getCurrentStructures();
+  checkMeShape(rawStructures);
   const seasons = Array.from(
     { length: configuration.seasonLast - configuration.seasonFirst + 1 },
     (_, index) => configuration.seasonLast - index,
@@ -121,21 +134,9 @@ export async function readCompleteOtfSnapshot(
   const beds = new Map<string, unknown>();
 
   for (const season of seasons) {
-    mergeUnique(
-      zones,
-      await readSeason('/zoneList', season, () => client.listZones(season)),
-      'parcelle',
-    );
-    mergeUnique(
-      plots,
-      await readSeason('/plotList', season, () => client.listPlots(season)),
-      'jardin',
-    );
-    mergeUnique(
-      beds,
-      await readSeason('/bedList', season, () => client.listBeds(season)),
-      'planche',
-    );
+    mergeUnique(zones, await readList('/zoneList', season, () => client.listZones(season)), '/zoneList');
+    mergeUnique(plots, await readList('/plotList', season, () => client.listPlots(season)), '/plotList');
+    mergeUnique(beds, await readList('/bedList', season, () => client.listBeds(season)), '/bedList');
   }
 
   return mapOtfSnapshot(
@@ -150,66 +151,68 @@ export async function readCompleteOtfSnapshot(
 }
 
 /**
- * Une route sans saison, dont l'erreur garde le nom de la route et le statut.
+ * Une route de liste, toutes pages réunies, puis sa vérification de forme
+ * (F391). L'erreur d'un appel garde le nom de la route, la saison et le statut.
  * Une lecture reportée par le compteur partagé remonte telle quelle : sa
- * raison et l'heure de la prochaine lecture font le message de la page (F386).
+ * raison et l'heure de la prochaine lecture font le message de la page (F386) ;
+ * un écart de forme aussi : il nomme déjà sa route et son champ.
  */
-async function readRoute(
-  route: string,
+async function readList(
+  route: OtfListRoute,
+  season: number | null,
   read: () => Promise<unknown[]>,
 ): Promise<unknown[]> {
+  let elements: unknown[];
   try {
-    return await read();
+    elements = await read();
   } catch (error) {
-    if (error instanceof OtfReadDeferredError) throw error;
+    if (error instanceof OtfReadDeferredError || error instanceof OtfShapeError) throw error;
     const message = error instanceof Error ? error.message : 'erreur inconnue';
     const status = error instanceof OtfApiError ? error.status : undefined;
-    throw new OtfApiError(`${route} — ${message}`, status);
+    const where = season === null ? route : `${route}, saison ${season}`;
+    throw new OtfApiError(`${where} — ${message}`, status);
   }
+  checkListShape(route, elements);
+  return elements;
 }
 
-async function readSeason(
-  route: string,
-  season: number,
-  read: () => Promise<unknown[]>,
-): Promise<unknown[]> {
+/**
+ * Le journal d'un écart de forme (F391) : la route, le champ et le problème,
+ * jamais une valeur. L'erreur remonte ensuite, et rien n'est rangé.
+ */
+async function logShapeChange<T>(read: () => Promise<T>): Promise<T> {
   try {
     return await read();
   } catch (error) {
-    if (error instanceof OtfReadDeferredError) throw error;
-    const message = error instanceof Error ? error.message : 'erreur inconnue';
-    const status = error instanceof OtfApiError ? error.status : undefined;
-    throw new OtfApiError(`${route}, saison ${season} — ${message}`, status);
+    if (error instanceof OtfShapeError) {
+      logJsonLine('warn', { event: 'otf_route_shape_changed', route: error.route, field: error.field, problem: error.problem });
+    }
+    throw error;
   }
 }
 
 function mergeUnique(
   target: Map<string, unknown>,
   values: unknown[],
-  label: string,
+  route: OtfListRoute,
 ) {
   for (const value of values) {
-    const id = readRawId(value, label);
+    const id = readElementId(value, route);
     if (!target.has(id)) target.set(id, value);
   }
 }
 
-function uniqueValues(values: unknown[], label: string): unknown[] {
+function uniqueValues(values: unknown[], route: OtfListRoute): unknown[] {
   const unique = new Map<string, unknown>();
-  mergeUnique(unique, values, label);
+  mergeUnique(unique, values, route);
   return [...unique.values()];
 }
 
-function readRawId(value: unknown, label: string): string {
+/** L'identifiant d'un élément déjà vérifié ; la même règle que sa vérification de forme. */
+function readElementId(value: unknown, route: OtfListRoute): string {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    throw new OtfApiError(`Objet OTF invalide : ${label}.`);
+    throw new OtfShapeError(route, 'element', 'not-object');
   }
   const raw = value as Record<string, unknown>;
-  const candidate = raw.id ?? raw['@id'];
-  if (typeof candidate !== 'string' && typeof candidate !== 'number') {
-    throw new OtfApiError(`Identifiant OTF invalide : ${label}.`);
-  }
-  const id = String(candidate).split('/').filter(Boolean).at(-1)?.trim();
-  if (!id) throw new OtfApiError(`Identifiant OTF vide : ${label}.`);
-  return id;
+  return identifier(raw.id ?? raw['@id'], { route, field: 'id' });
 }

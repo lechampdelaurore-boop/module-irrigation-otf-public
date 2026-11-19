@@ -18,7 +18,7 @@ export const UNKNOWN_STRUCTURE_ID = 'unknown';
 
 /** L'identifiant de la ferme que désigne une réponse de `GET /me`, ou `null`. */
 export function otfFarmIdentity(payload: unknown): string | null {
-  const structures = structuresOf(payload);
+  const structures = otfStructuresOf(payload);
   if (structures.length !== 1) return null;
   const structure = structures[0];
   if (!isRecord(structure)) return null;
@@ -56,15 +56,21 @@ export class OtfFarmMismatchError extends Error {
  * comprendre un refus sans rien écrire de la ferme.
  */
 export function farmIdentityShape(payload: unknown): { structures: number; identifier: string } {
-  const structures = structuresOf(payload);
+  const structures = otfStructuresOf(payload);
   const first = structures[0];
   if (!isRecord(first)) return { structures: structures.length, identifier: 'aucun' };
   const identifier = first.id ?? first['@id'];
   return { structures: structures.length, identifier: identifier === undefined || identifier === null ? 'absent' : typeof identifier };
 }
 
-/** La réponse elle-même, ou les éléments de sa liste. */
-function structuresOf(payload: unknown): unknown[] {
+/**
+ * Les structures que porte une réponse de `GET /me` : la réponse elle-même, ou
+ * les éléments de sa liste. Une seule règle pour l'identité (F338), la
+ * vérification de forme de `/me` et la traduction de l'instantané (point D2
+ * de la revue de l'isolation, F392) : plusieurs structures ne sont jamais une
+ * ferme.
+ */
+export function otfStructuresOf(payload: unknown): unknown[] {
   if (Array.isArray(payload)) return payload;
   if (!isRecord(payload)) return [];
   try {

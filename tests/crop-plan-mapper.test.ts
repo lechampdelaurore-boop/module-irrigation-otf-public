@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { mapCropPlan } from '../lib/domain/otf/crop-plan-mapper.ts';
-import { OtfApiError } from '../lib/domain/otf/api-contract.ts';
+import { OtfShapeError } from '../lib/domain/otf/api-contract.ts';
 
 // Réponses réduites, calquées sur celles constatées sur la ferme le
 // 26 septembre 2026 (docs/series-contract.md, « Ce que l'API fournit »).
@@ -90,20 +90,22 @@ test('seules les tâches de semis direct et de plantation des séries de la sais
   assert.ok(!('description' in implantationTasks[1]), 'ni description, ni temps, ni récolte');
 });
 
-test('une semaine mal formée est refusée : rien ne remplace le cache', () => {
+test('une semaine mal formée est refusée : rien ne remplace le cache, et l’écart nomme la route et le champ, jamais la valeur (F391)', () => {
   assert.throws(
     () => mapCropPlan({
       rawActions: actions, rawPlants: plants, rawSeries: series, rawPlaces: places, season: 2026, beds,
       rawTasks: [{ id: 1, cultivation: null, series: 51010, action: 288, plannedWeek: '2025-45', doneWeek: null, status: 'todo' }],
     }),
-    (error) => error instanceof OtfApiError && /semaine/i.test(error.message),
+    (error) => error instanceof OtfShapeError && error.route === '/taskList' && error.field === 'plannedWeek' && error.problem === 'not-week'
+      && !error.message.includes('2025-45') && !error.message.includes('51010'),
   );
   assert.throws(
     () => mapCropPlan({
       rawActions: actions, rawPlants: plants, rawPlaces: places, rawTasks: tasks, season: 2026, beds,
       rawSeries: [{ id: 1, name: 'X', season: 2026, use: 'bed', cycle: 'annual', cultivations: [{ id: 2, plant: 937, harvestWeeks: ['14'] }] }],
     }),
-    (error) => error instanceof OtfApiError && /semaine/i.test(error.message),
+    (error) => error instanceof OtfShapeError && error.route === '/seriesList' && error.field === 'cultivations[].harvestWeeks' && error.problem === 'not-week'
+      && !/\b14\b/.test(error.message),
   );
 });
 

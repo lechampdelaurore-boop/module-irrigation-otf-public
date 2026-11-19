@@ -5,6 +5,31 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.3, PR 5 : les tests de contrat des routes d'Ouvre ta ferme)
+
+- **Chaque route lue a sa vérification de forme, dès sa réponse** (T4-15,
+  D-162, F391) : une page sans liste, un élément qui n'est pas un objet ou
+  sans identifiant lisible, une relation que la traduction lit et ne peut
+  pas lire arrêtent la lecture avant l'appel suivant ; rien n'est rangé, le
+  dernier instantané reste affiché.
+- **Un champ renommé ne donne plus des données fausses** (F393) : la
+  longueur, la largeur et le passe-pied des planches, le `fqn` des
+  interventions, le type, le cycle et les mises en culture des séries, la
+  longueur des emplacements et les champs des tâches, absents de tous les
+  éléments d'une réponse, sont un écart, au lieu d'être lus à leur valeur
+  par défaut.
+- **`GET /me` à plusieurs structures est refusé partout** (point D2 de la
+  revue de l'isolation, F392) : la traduction de l'instantané ne prend
+  plus la première structure.
+- **Ce que disent la page et le journal** (F394) : « Ouvre ta ferme a
+  changé la forme de ses données : la dernière lecture réussie est
+  affichée. », une page d'état sans cache, et une ligne de journal qui
+  nomme la route, le champ et le problème, jamais une valeur ; les messages
+  de la traduction ne portent plus d'identifiant.
+- Les réponses types de chaque route, pour les tests (F395).
+- En ligne le 19 novembre 2026 : #94, le compteur partagé, fusionnée à
+  1 h 13 et déployée à 1 h 33 (run 44427211802, cinq jobs verts).
+
 ### Ajouté (Tranche 4, 4.3, PR 1 sur 5 : le compteur partagé des appels à Ouvre ta ferme)
 
 - **Le rythme de chaque ferme compté dans la base** (D-161, F361, F381,

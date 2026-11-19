@@ -7,14 +7,16 @@ import type {
   Season,
   WeekKey,
 } from '../domain.ts';
-import { OtfApiError } from './api-contract.ts';
+import { OtfShapeError } from './api-contract.ts';
 import {
   asRecord,
+  identifier,
   isRecord,
   relationId,
   toInteger,
   toName,
   toOptionalNonNegativeNumber,
+  type OtfFieldPlace,
 } from './mapper.ts';
 
 /**
@@ -48,18 +50,18 @@ export function mapCropPlan(input: {
   let placesOfUnknownSeries = 0;
   let placesWithUnknownBed = 0;
   for (const value of input.rawPlaces) {
-    const raw = asRecord(value, 'emplacement');
-    const id = relationId(raw.id ?? raw['@id'], 'emplacement');
+    const raw = asRecord(value, { route: '/placeList', field: 'element' });
+    const id = identifier(raw.id ?? raw['@id'], { route: '/placeList', field: 'id' });
     if (raw.series === null || raw.series === undefined) {
       placesWithoutSeries += 1;
       continue;
     }
-    const seriesId = relationId(raw.series, "série de l'emplacement");
+    const seriesId = relationId(raw.series, { route: '/placeList', field: 'series' });
     if (!seriesIds.has(seriesId)) {
       placesOfUnknownSeries += 1;
       continue;
     }
-    const bedId = relationId(raw.bed, "planche de l'emplacement");
+    const bedId = relationId(raw.bed, { route: '/placeList', field: 'bed' });
     if (!bedIds.has(bedId)) {
       placesWithUnknownBed += 1;
       continue;
@@ -93,8 +95,8 @@ export function mapCropPlan(input: {
 function mapImplantationActions(rawActions: unknown[]): Map<string, ImplantationTask['kind']> {
   const kinds = new Map<string, ImplantationTask['kind']>();
   for (const value of rawActions) {
-    const raw = asRecord(value, 'intervention');
-    const id = relationId(raw.id ?? raw['@id'], 'intervention');
+    const raw = asRecord(value, { route: '/actionList', field: 'element' });
+    const id = identifier(raw.id ?? raw['@id'], { route: '/actionList', field: 'id' });
     if (raw.fqn === 'semis-direct') kinds.set(id, 'direct-sowing');
     else if (raw.fqn === 'plantation') kinds.set(id, 'planting');
     // Semis en pépinière, récolte, fertilisation et interventions à `fqn` nul
@@ -106,21 +108,21 @@ function mapImplantationActions(rawActions: unknown[]): Map<string, Implantation
 function mapPlantNames(rawPlants: unknown[]): Map<string, string> {
   const names = new Map<string, string>();
   for (const value of rawPlants) {
-    const raw = asRecord(value, 'espèce');
-    const id = relationId(raw.id ?? raw['@id'], 'espèce');
+    const raw = asRecord(value, { route: '/plantList', field: 'element' });
+    const id = identifier(raw.id ?? raw['@id'], { route: '/plantList', field: 'id' });
     names.set(id, toName(raw.name, `Espèce ${id}`));
   }
   return names;
 }
 
 function mapSeries(value: unknown, plantNames: Map<string, string>): CropSeries {
-  const raw = asRecord(value, 'série');
-  const id = relationId(raw.id ?? raw['@id'], 'série');
+  const raw = asRecord(value, { route: '/seriesList', field: 'element' });
+  const id = identifier(raw.id ?? raw['@id'], { route: '/seriesList', field: 'id' });
   const cultivations = Array.isArray(raw.cultivations) ? raw.cultivations : [];
   return {
     id,
     name: toName(raw.name, `Série ${id}`),
-    season: toInteger(raw.season, `saison de la série ${id}`),
+    season: toInteger(raw.season, { route: '/seriesList', field: 'season' }),
     use: raw.use === 'block' ? 'block' : 'bed',
     cycle: raw.cycle === 'perennial' ? 'perennial' : 'annual',
     cultivations: cultivations.map((item) => mapCultivation(item, plantNames)),
@@ -128,15 +130,15 @@ function mapSeries(value: unknown, plantNames: Map<string, string>): CropSeries 
 }
 
 function mapCultivation(value: unknown, plantNames: Map<string, string>): CropCultivation {
-  const raw = asRecord(value, 'mise en culture');
-  const id = relationId(raw.id ?? raw['@id'], 'mise en culture');
-  const plantId = relationId(raw.plant, `espèce de la mise en culture ${id}`);
+  const raw = asRecord(value, { route: '/seriesList', field: 'cultivations[]' });
+  const id = identifier(raw.id ?? raw['@id'], { route: '/seriesList', field: 'cultivations[].id' });
+  const plantId = relationId(raw.plant, { route: '/seriesList', field: 'cultivations[].plant' });
   return {
     id,
     plantId,
     plantName: plantNames.get(plantId) ?? `Espèce ${plantId}`,
-    harvestWeeks: mapWeekList(raw.harvestWeeks, `récoltes de la mise en culture ${id}`),
-    harvestWeeksExpected: mapWeekList(raw.harvestWeeksExpected, `récoltes attendues de la mise en culture ${id}`),
+    harvestWeeks: mapWeekList(raw.harvestWeeks, { route: '/seriesList', field: 'cultivations[].harvestWeeks' }),
+    harvestWeeksExpected: mapWeekList(raw.harvestWeeksExpected, { route: '/seriesList', field: 'cultivations[].harvestWeeksExpected' }),
   };
 }
 
@@ -145,46 +147,47 @@ function mapImplantationTask(
   kinds: Map<string, ImplantationTask['kind']>,
   seriesIds: Set<string>,
 ): ImplantationTask | null {
-  const raw = asRecord(value, 'tâche');
+  const raw = asRecord(value, { route: '/taskList', field: 'element' });
   if (raw.series === null || raw.series === undefined) return null;
-  const seriesId = relationId(raw.series, 'série de la tâche');
+  const seriesId = relationId(raw.series, { route: '/taskList', field: 'series' });
   if (!seriesIds.has(seriesId)) return null;
   if (raw.action === null || raw.action === undefined) return null;
-  const kind = kinds.get(relationId(raw.action, 'intervention de la tâche'));
+  const kind = kinds.get(relationId(raw.action, { route: '/taskList', field: 'action' }));
   if (!kind) return null;
 
-  const id = relationId(raw.id ?? raw['@id'], 'tâche');
+  const id = identifier(raw.id ?? raw['@id'], { route: '/taskList', field: 'id' });
   const cultivationId = raw.cultivation === null || raw.cultivation === undefined
     ? null
-    : relationId(raw.cultivation, `mise en culture de la tâche ${id}`);
+    : relationId(raw.cultivation, { route: '/taskList', field: 'cultivation' });
   return {
     id,
     seriesId,
     cultivationId,
     kind,
-    plannedWeek: mapOptionalWeek(raw.plannedWeek, `semaine planifiée de la tâche ${id}`),
-    doneWeek: mapOptionalWeek(raw.doneWeek, `semaine réalisée de la tâche ${id}`),
+    plannedWeek: mapOptionalWeek(raw.plannedWeek, { route: '/taskList', field: 'plannedWeek' }),
+    doneWeek: mapOptionalWeek(raw.doneWeek, { route: '/taskList', field: 'doneWeek' }),
     status: raw.status === 'done' ? 'done' : 'todo',
   };
 }
 
 const WEEK_KEY_PATTERN = /^\d{4}-W\d{2}$/;
 
-function mapOptionalWeek(value: unknown, field: string): WeekKey | null {
+function mapOptionalWeek(value: unknown, place: OtfFieldPlace): WeekKey | null {
   if (value === null || value === undefined) return null;
   if (typeof value !== 'string' || !WEEK_KEY_PATTERN.test(value)) {
-    throw new OtfApiError(`Semaine OTF invalide : ${field}.`);
+    throw new OtfShapeError(place.route, place.field, 'not-week');
   }
   return value;
 }
 
-function mapWeekList(value: unknown, field: string): WeekKey[] {
+/** Une liste de semaines ISO (ou l'objet qui les porte) ; absente ou nulle, une liste vide. */
+export function mapWeekList(value: unknown, place: OtfFieldPlace): WeekKey[] {
   if (value === null || value === undefined) return [];
   const items = Array.isArray(value) ? value : isRecord(value) ? Object.values(value) : null;
-  if (items === null) throw new OtfApiError(`Semaines OTF invalides : ${field}.`);
+  if (items === null) throw new OtfShapeError(place.route, place.field, 'not-list');
   return items.map((item) => {
-    const week = mapOptionalWeek(item, field);
-    if (week === null) throw new OtfApiError(`Semaine OTF invalide : ${field}.`);
+    const week = mapOptionalWeek(item, place);
+    if (week === null) throw new OtfShapeError(place.route, place.field, 'not-week');
     return week;
   });
 }

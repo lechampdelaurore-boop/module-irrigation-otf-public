@@ -939,6 +939,107 @@ règles pures, minuit de Paris et changement d'heure compris) ;
 `tests/otf-read-client-shared-pace.test.ts` (le connecteur et le compteur,
 le point D5) ; `tests/snapshot-policy.test.ts` (les messages de F386).
 
+### 6.3 ter. Précisions de la PR 5 de la 4.3 : les tests de contrat des routes (19 novembre 2026, D-162, F391 à F396)
+
+Décidées en écrivant le code de la PR 5 (F370, point 5 ; T4-15) et écrites
+dans la même PR que lui, la nuit du 18 au 19 novembre 2026, en Opus 5.5 ·
+Max, sous le mandat de nuit du porteur. Elles précisent F370 (point 5) et
+F338 là où le code a dû choisir, sans les changer, toutes à l'option
+recommandée. La PR 5 passe avant la PR 2, comme F370 le permet : la PR du
+coffre attend la relecture, par le porteur, des lignes de la politique de
+confidentialité qu'elle change (F367).
+
+- **F391 · Une vérification par route, dès sa réponse.** Chacune des dix
+  routes lues (F337, `docs/otf-contract.md`) a sa vérification de forme,
+  faite dès que sa réponse est arrivée, toutes pages réunies, avant l'appel
+  suivant : un écart arrête la lecture, rien n'est rangé, et les routes qui
+  restaient ne sont pas appelées (le quota n'est pas dépensé pour rien).
+  Elle refuse ce que le module ne sait pas lire sans deviner (D-003) : une
+  page qui ne porte pas de liste ; un élément qui n'est pas un objet, ou
+  sans identifiant lisible (`id`, ou le dernier segment de `@id`) ; ce que
+  la traduction de l'instantané lit sur chaque élément (la parcelle d'un
+  jardin, sauf un remplissage de parcelle ; le jardin d'une planche ; la
+  saison d'une série et ses mises en culture, chacune avec son identifiant,
+  son espèce et des semaines ISO ; la série d'un emplacement ou d'une
+  tâche, quand elle n'est pas nulle) ; `/configuration` est vérifiée par sa
+  traduction, faite aussitôt lue. Ce que seule la traduction peut voir,
+  parce qu'il dépend d'une autre route (la planche d'un emplacement d'une
+  série de la saison, l'intervention et les semaines d'une tâche gardée),
+  elle le refuse de même, en nommant la route et le champ. La vérification
+  n'est jamais plus stricte que la traduction sur ce que celle-ci ne lit
+  pas : la semaine d'une tâche écartée, la planche d'un emplacement sans
+  série, une liste de mises en culture qui n'en est pas une (lue vide,
+  comme avant) ne sont pas des écarts. Une donnée lisible n'est donc
+  refusée que par F392 et F393, écrits pour cela.
+- **F392 · `GET /me` à plusieurs structures, refusé partout** (point D2 de
+  la revue de l'isolation, F338). Une seule règle lit les structures d'une
+  réponse de `GET /me` (`otfStructuresOf`), pour l'identité, la
+  vérification et la traduction de l'instantané. Plusieurs structures sont
+  un écart de forme de `/me` : la lecture s'arrête après `/me`, qu'une
+  ferme soit attendue ou non, et la traduction ne prend plus la première ;
+  un vieil instantané ne peut donc jamais servir de preuve de ferme. Sans
+  structure lisible, la règle de F341 reste : la ferme n'est pas
+  identifiée, et l'instantané garde le remplaçant d'affichage.
+- **F393 · Un champ lu avec une valeur par défaut, absent de tous les
+  éléments, a changé de nom.** Le module lit certains champs avec une valeur
+  par défaut (une longueur à zéro, une série « en planches », une tâche « à
+  faire ») : s'ils changeaient de nom, il calculerait faux sans rien dire.
+  Pour les champs constatés sur la ferme du porteur (`docs/otf-contract.md`,
+  « Particularités confirmées » ; `docs/series-contract.md`, « Ce que l'API
+  fournit »), un champ absent de tous les éléments d'une réponse qui en
+  porte est un écart : `/bedList` `length`, `width`, `alleyWidth` ;
+  `/actionList` `fqn` ; `/seriesList` `use`, `cycle`, `cultivations`, et
+  `harvestWeeks`, `harvestWeeksExpected` de ses mises en culture ;
+  `/placeList` `length` ; `/taskList` `action`, `series`, `cultivation`,
+  `plannedWeek`, `doneWeek`, `status`. Un champ présent sur un seul
+  élément, même nul, suffit : Ouvre ta ferme écrit les champs vides
+  (`alleyWidth: null`, `fqn: null`). Une réponse vide n'est pas un écart.
+  Les autres champs lus par défaut (le mode d'un jardin, les saisons d'un
+  élément, les noms, la surface d'une parcelle) ne sont pas vérifiés : leur
+  forme réelle n'est pas encore constatée ; ils le seront à l'essai de bout
+  en bout (F395).
+- **F394 · Ce que disent la page et le journal.** Avec un instantané en
+  cache, la page l'affiche avec « Ouvre ta ferme a changé la forme de ses
+  données : la dernière lecture réussie est affichée. » ; sans instantané,
+  une page d'état « Ouvre ta ferme a changé la forme de ses données », avec
+  « Réessayer », qui dit que rien n'est affiché plutôt que des données
+  fausses. Le journal écrit une ligne `otf_route_shape_changed` avec la
+  route, le champ et le problème (champ absent partout, pas un objet,
+  identifiant, relation, entier, liste ou semaine illisible, plusieurs
+  structures), jamais une valeur ; le message de l'erreur aussi. Les
+  messages de la traduction ne portent plus l'identifiant d'une série,
+  d'une mise en culture ni d'une tâche. Le calcul du matin garde le dernier
+  instantané, comme pour toute lecture qui échoue.
+- **F395 · Les réponses types, et l'essai de bout en bout.** Les réponses
+  types de chaque route (`tests/support/otf-typical-responses.ts`) sont
+  réduites et calquées sur celles constatées sur la ferme, champs nuls
+  compris ; chaque règle de F391 à F393 y est éprouvée, pour l'écart comme
+  pour l'absence d'écart. À l'essai de bout en bout sur « Ferme v2 »
+  n° 4394 (F366), les vraies réponses de chaque route sont comparées à ces
+  réponses types, sans garder aucune valeur ; un écart entre elles se
+  corrige dans une PR, avant toute ferme tierce, et les champs de F393 non
+  encore vérifiés y entrent s'ils sont toujours écrits.
+- **F396 · Ce qui n'est pas un écart de forme.** Une valeur incohérente dans
+  une forme juste garde son message d'aujourd'hui (« Connexion à Ouvre ta
+  ferme indisponible ») : une plage de saisons à l'envers, un jardin ou une
+  planche qui désigne un parent absent (`docs/otf-contract.md`, « Lecture
+  atomique »). Une réponse qui n'est pas du JSON, une erreur `5xx` ou une
+  panne réseau restent des pannes (trois essais au plus). L'identité de la
+  ferme lue seule (F339) applique déjà F338 : plusieurs structures n'y sont
+  pas une ferme. Aucun changement à l'écran tant qu'Ouvre ta ferme répond
+  dans sa forme.
+
+**Preuves** (F370, PR 5) : `tests/otf-route-shapes.test.ts` (chaque règle de
+F391 à F393 sur les réponses types, l'écart nommé par sa route et son champ
+sans aucune valeur, ce que la vérification ne refuse pas, D2 à la
+vérification et à la traduction) ; `tests/otf-route-shapes-reader.test.ts`
+(la lecture s'arrête avant l'appel suivant ; le journal ne porte ni valeur
+ni jeton ; `/me` à plusieurs structures, ferme attendue ou non ; la lecture
+de toutes les saisons) ; `tests/db/otf-route-shapes-cache.test.ts` (de bout
+en bout, sur une base migrée : le cache reste celui de la dernière lecture
+réussie, avec le message de F394, et sans cache la page d'état) ;
+`tests/snapshot-policy.test.ts` (le motif `shape-changed`).
+
 ## 7. Généralisation : ce qui est propre à la ferme de François (étape 0)
 
 À inventorier **en lisant le code, sans le modifier**, avant 4.4 ; livrable : un tableau « élément · où · pourquoi propre à la ferme · à généraliser comment · question agronomique ? ». Pistes déjà connues : jeu commun de 32 cultures et correspondance de 78 espèces ; valeurs par défaut (K_abri 0,8, rampes tunnel, 10 mm/h mesuré en serre) ; seuils de gel ; noms de lieux dans les recettes ; commune météo par défaut (siège OTF) ; la RFU en mm/m (62 labo, 51 ferme). **Toute valeur agronomique à choisir pour d'autres fermes est une question réservée à François** (une par message). Règle : pour une ferme nouvelle, **aucune valeur de la ferme de François n'est un défaut silencieux** : soit un catalogue neutre, soit « inconnu, à renseigner ».

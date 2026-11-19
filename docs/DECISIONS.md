@@ -5650,3 +5650,68 @@ Ne changent pas : D-002 (lecture seule, 4 appels par seconde au plus),
 D-003 (rien n'est deviné), D-157 (le régulateur par ferme, qui reste
 devant la base), D-158 (F361 à F363 précisés sans être changés), D-160 (le
 contrôle de cohérence, qui range les tables nouvelles).
+
+## D-162 — Tranche 4, sous-tranche 4.3, PR 5 : les tests de contrat des routes d'Ouvre ta ferme
+
+Date : nuit du 18 au 19 novembre 2026. Décideur : Claude, à l'option
+recommandée, sous le mandat de nuit du porteur (18 novembre, 21 h 54, heure
+de Paris : « enchaîne, code toute la nuit, tout seul ») ; en Opus 5.5 ·
+Max, réglage de la ligne 4.3 de la roadmap. Après D-161.
+
+**Pourquoi la question.** L'API d'Ouvre ta ferme est en bêta, « sujette à
+changement sans préavis ». T4-15 demande un contrôle par route lue qui
+détecte un changement de format au lieu d'afficher des données fausses, et
+F370 (point 5) en fixe la forme : chaque route a sa vérification, éprouvée
+sur des réponses types ; un écart arrête la lecture sans rien ranger ; le
+journal nomme la route et le champ, jamais une valeur ; la page le dit ; et
+`GET /me` à plusieurs structures est refusé partout (point D2 de la revue
+de l'isolation). Restaient les choix du code, et l'ordre des PR.
+
+**Décision.** Toutes à l'option recommandée (`docs/tranche-4-contract.md`,
+section 6.3 ter, F391 à F396) :
+
+1. La PR 5 passe avant la PR 2, comme F370 le permet : la PR du coffre
+   change la politique de confidentialité du site public et attend que le
+   porteur en relise les lignes (F367) ; la PR 5 n'attend personne.
+2. Chaque route est vérifiée dès sa réponse, avant l'appel suivant ; la
+   vérification refuse ce que la traduction de l'instantané lit sur chaque
+   élément, jamais plus sur ce qu'elle ne lit pas : aucune donnée que le
+   module lit aujourd'hui sans erreur n'est refusée, sauf par les deux
+   règles suivantes (F391).
+3. Une seule règle lit les structures de `GET /me` ; plusieurs structures
+   sont un écart de `/me`, à la vérification comme à la traduction (F392).
+4. Un champ lu avec une valeur par défaut et constaté sur la ferme, absent
+   de tous les éléments d'une réponse, est un écart ; un seul élément qui le
+   porte, même nul, suffit (F393).
+5. Le motif `shape-changed`, le message de F370 avec le cache, une page
+   d'état sans cache, une ligne de journal sans valeur ; les messages de la
+   traduction ne portent plus d'identifiant (F394).
+6. Les réponses types des tests, calquées sur celles constatées, comparées
+   aux vraies à l'essai de bout en bout sur « Ferme v2 » (F395).
+
+**Écart accepté.** Les champs lus par défaut dont la forme réelle n'est pas
+constatée (le mode d'un jardin, les saisons d'un élément, les noms) ne sont
+pas encore vérifiés : les exiger sans l'avoir vu risquerait d'arrêter la
+lecture de la ferme du porteur la nuit même. Ils entrent à l'essai de bout
+en bout s'ils sont toujours écrits (F393, F395).
+
+**Ce que le déploiement change.** Rien à l'écran ni dans la base tant
+qu'Ouvre ta ferme répond dans la forme constatée : ni migration ni réglage
+de Cloudflare. Si une route de la ferme du porteur s'écartait déjà des
+règles, la page l'affichera dès la première lecture avec le dernier
+instantané et le message de F394, et le journal nommera la route et le
+champ.
+
+**Écart de registre corrigé.** Le tableau de la roadmap (ligne de la PR 3
+de la 4.3) plaçait la relecture de la page de confidentialité dans la
+PR 3 ; F367 la place dans la PR du coffre (la PR 2). Le contrat fait foi :
+le tableau la place désormais dans la ligne 2. Le porteur peut préférer
+l'autre ; la PR 2 lui sera ouverte pour cette relecture.
+
+**Réservé au porteur.** Rien : aucun point n'est agronomique, ne touche à
+son budget ni ne demande un réglage de Cloudflare. Il peut changer ces
+règles.
+
+Ne changent pas : D-002 (lecture seule), D-003 (rien n'est deviné : c'est
+la règle que la vérification applique), D-158 (F338 et F370 précisés sans
+être changés), D-161 (le compteur partagé, devant chaque appel).
