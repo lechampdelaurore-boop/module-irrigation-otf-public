@@ -377,7 +377,10 @@ registres, elle y renvoie.
   44538682844). **PR 2, la quantité proposée** (D-169, F409 et
   F410) : la dose du jour du planning pour ce matériel, sinon un champ
   vide ; au-delà de l'objectif de la semaine d'une planche, la fenêtre du
-  module demande ; codée.
+  module demande ; en ligne le 19 novembre 2026 à 16 h 14 (#103, run
+  44549609124 vérifié job par job). **PR 3, « Refuser »** (D-170, F411 et F412) : la
+  fenêtre du module demande avant un refus ; le message dit où le besoin
+  est replacé, lu dans le plan recalculé ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

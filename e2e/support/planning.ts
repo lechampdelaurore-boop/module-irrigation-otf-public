@@ -146,3 +146,18 @@ export async function annulerLesIrrigationsDuPlanning(page: Page): Promise<void>
     await expect(fiches).toHaveCount(restantes - 1, { timeout: 15_000 });
   }
 }
+
+/**
+ * « Refuser » une proposition : la fenêtre du module demande d'abord, un refus
+ * valant pour toute la semaine (audit du 19 novembre 2026, lot G, n° 7, F411).
+ */
+export async function refuserLaProposition(page: Page, carte: Locator): Promise<void> {
+  await carte.getByRole('button', { name: 'Refuser' }).click();
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  await expect(fenetre).toContainText('Refuser ce créneau pour toute la semaine ?');
+  const refuser = fenetre.getByRole('button', { name: 'Refuser le créneau' });
+  // Ce qui efface ou annule se confirme en rouge (F408).
+  await expect(refuser).toHaveCSS('background-color', 'rgb(220, 53, 69)');
+  await refuser.click();
+  await expect(fenetre).toHaveCount(0);
+}

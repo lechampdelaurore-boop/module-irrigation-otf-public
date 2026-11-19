@@ -5971,6 +5971,33 @@ vide » (11 h 37) ; « au-delà de l'objectif de la semaine » (11 h 42).
 Ne changent pas : le calcul de la durée et de l'apport ; les objectifs et
 leur règle (D-034) ; le planificateur.
 
+## D-170 — Lot G, PR 3 : « Refuser » se confirme, et le message dit où le besoin est allé
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 7 :
+« Refuser » une proposition du planning agit d'un appui, alors qu'un refus
+vaut pour tout le reste de la semaine (D-030), et son message,
+« Proposition refusée : le besoin reste affiché », ne dit pas que le
+recalcul replace souvent le besoin ailleurs.
+
+**Décision.**
+
+1. « Refuser » ouvre la fenêtre du module : « Refuser ce créneau pour
+   toute la semaine ? », boutons « Garder la proposition » et « Refuser le
+   créneau », ce dernier en rouge (F411).
+2. Après le refus, la carte dit « Créneau refusé. Le plan se recalcule
+   pour replacer le besoin… », puis, le plan recalculé relu : « Créneau
+   refusé. Le besoin est replacé jeudi à 12 h 26 (Goutte-à-goutte du
+   champ du bas). », ou « Créneau refusé. Aucun autre créneau cette
+   semaine : le besoin reste affiché, non placé. ». La règle cherche, dans
+   le nouveau calcul, la proposition qui sert au moins une planche du
+   créneau refusé, la plus proche de son heure
+   (`lib/domain/planning/refusal-replacement.ts`) (F412).
+
+Ne changent pas : la règle du refus (D-030) ; le recalcul après un refus ;
+le moteur.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

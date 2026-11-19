@@ -5,7 +5,7 @@ import { addDaysToDateKey, weekStartDateKey } from '../lib/domain/water-manageme
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
-import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
+import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
  * Parcours P12 : suivre et replanifier (docs/browser-journeys-contract.md,
@@ -100,12 +100,17 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   await montrerLaCarte(planning, refusee);
   const identifiantRefuse = await refusee.getAttribute('data-proposal-id');
   const creneauRefuse = await refusee.locator('.planning-proposal-time strong').innerText();
-  await refusee.getByRole('button', { name: 'Refuser' }).click();
+  await refuserLaProposition(page, refusee);
   await expect(refusee.locator('.planning-status')).toHaveText('Refusée', { timeout: 30_000 });
   await expect(meta).toContainText('(après une proposition refusée)', RECALCUL);
   const jourDuRefus = planning.locator('li.planning-day').filter({ has: page.locator(`article.planning-proposal[data-proposal-id="${identifiantRefuse}"]`) });
   await expect(proposeesDe(jourDuRefus).filter({ has: page.locator('.planning-proposal-time strong').getByText(creneauRefuse, { exact: true }) })).toHaveCount(0);
   const replace = (await proposees().count()) > 0;
+  // Le message du refus dit où le besoin est allé, lu dans le plan recalculé (lot G, n° 7, F412).
+  await expect(refusee.locator('.planning-proposal-feedback')).toHaveText(
+    /^Créneau refusé\. (Le besoin est replacé \S+ à \d{2} h \d{2} \(.+\)\.|Aucun autre créneau cette semaine : le besoin reste affiché, non placé\.)$/,
+    RECALCUL,
+  );
   if (!replace) {
     await expect((await lignesNonPlacees(planning)).filter({ hasText: planche })).toContainText('créneau refusé');
   }
