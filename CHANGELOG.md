@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 3 sur 7)
+
+- **Un bouton plein par écran, un seul dessin de pli, plus de geste muet**
+  (D-192) : tous les plis du module portent le même chevron à droite, qui
+  tourne à l'ouverture ; « Cette semaine », les horizons « 24 h / 48 h /
+  7 jours » et « Créer un groupe » sur une ferme sans asperseur passent en
+  secondaire, le choix fait se lit à son fond ; « Cette semaine » est
+  indisponible quand on y est déjà, « Retirer la mesure » quand le jour n'a
+  pas de mesure ; l'heure réelle de fin se saisit à la minute ; un seul mot
+  pour finir un arrosage, « Terminer l'irrigation ».
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 2 sur 7)
 
 - **Vue satellite : des numéros quand les noms se chevauchent** (D-191) :

@@ -79,7 +79,9 @@ au manque d'eau, à l'erreur et à ce qui efface.
    boîte grise sans signe.
 3. Plus de geste muet : « Retirer la mesure » indisponible sans mesure à
    retirer ; un menu « … » qui ne contiendrait qu'un geste devient ce
-   geste ; « Heure réelle de fin » sans secondes ; un seul mot pour finir
+   geste, sauf le menu d'une ligne planifiée qui ne garde qu'« Annuler » :
+   F45 l'a éloigné exprès de « Démarrer maintenant » (F470) ; « Heure
+   réelle de fin » sans secondes ; un seul mot pour finir
    un arrosage (« Terminer l'irrigation »).
 
 ## 6. n° 22 — Mots et formats (PR 4)
@@ -151,4 +153,10 @@ Chaque précision faite en codant, numérotée à la suite du registre.
 
 - **F468** Vue satellite : un nom se compare aux noms déjà posés, dans l'ordre de la liste ; « chevaucher » veut dire moins de deux pixels d'air entre deux rectangles ; le premier garde son nom, le suivant devient son numéro (pastille ronde de 24 px au moins). Le numéro est celui de la ligne dans la liste, devant le nom, caché au lecteur d'écran (la liste dit déjà le nom). Un nom qui sortirait de son jardin sans gêner un voisin le garde : la bulle et la liste suffisent. Le calcul se refait au chargement, au zoom et quand la carte ou le dessin change de taille. La preuve est dans le domaine (`tests/audit-ergonomie-2026-11-19-lot-k-satellite.test.ts`) et dans P34 étendu, plutôt que dans P41 : P34 a déjà la carte et son dessin de secours.
 
-Les précisions de la PR 3 suivent, F469 et au-delà.
+- **F469** Un seul dessin de pli : une règle commune sur tout `details > summary` du module (le chevron à droite, 2,25 rem de place, qui tourne à l'ouverture ; le triangle du navigateur caché), sauf les menus « … » (`.row-menu`, `.equipment-menu`, `.plan-equipment-menu`), qui ne sont pas des plis, et les lignes « Voir le détail » des cultures et des espèces, qui ont déjà leur signe, la flèche qui tourne (choix du porteur du 8 novembre 2026) : un second chevron les ferait passer sur deux lignes au téléphone (+700 px sur « Besoin par culture »). Elle vit dans `finitions-charte.css`, après les pages courtes et avant les gestes sûrs.
+- **F470** Secondaire veut dire contour et fond vert pâle, texte vert : « Cette semaine », les horizons non choisis de « Ressources » (le choisi reste plein et porte `aria-pressed`), « Créer un groupe » sur une ferme sans asperseur. Le menu « … » d'une ligne planifiée qui ne garde qu'« Annuler » reste un menu : F45 l'a écarté de « Démarrer maintenant » pour qu'on n'annule pas en voulant démarrer.
+- **F471** « Cette semaine » indisponible quand la semaine affichée contient aujourd'hui ; « Retirer la mesure » indisponible quand le jour choisi, dans la semaine affichée, n'a pas de pluie mesurée (hors de la semaine affichée, le serveur répond comme avant).
+- **F472** « Heure réelle de fin » à la minute (`step="60"`) ; laissée telle quelle, c'est l'heure proposée à la seconde qui part, celle du minuteur, pour que la durée ne perde rien ; tapée, elle se lit à la minute (`lib/domain/finish-time.ts`).
+- **F473** Le bouton qui finit un arrosage dit « Terminer l'irrigation » partout (fenêtre de fin, cartes, « Aujourd'hui ») ; « Irrigation terminée » reste l'état et la notification.
+
+Les précisions de la PR 4 suivent, F474 et au-delà.
