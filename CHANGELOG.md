@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot H, PR 4 sur 5)
+
+- **L'ordre naturel partout** (D-176) : chaque nom affiché (planche,
+  jardin, matériel, culture, série) se range comme on compte, « bloc 2 »
+  avant « bloc 10 », « gag2 » avant « gag10 » ; la liste « Matériel »
+  d'« Arrosages » est regroupée par jardin ; les planches d'une carte du
+  planning suivent le même ordre.
+
 ### Modifié (audit du 19 novembre 2026, lot H, PR 3 sur 5)
 
 - **« Aujourd'hui » voit l'arrosage en cours et le reliquat** (D-175) :

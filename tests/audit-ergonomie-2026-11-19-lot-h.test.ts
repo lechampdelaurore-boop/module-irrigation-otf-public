@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import test from 'node:test';
+import { equipmentByGarden } from '../lib/domain/equipment-by-garden.ts';
 import { FEATURE_IDS } from '../lib/domain/features/catalogue.ts';
 import type { IrrigationEventRecord } from '../lib/domain/irrigation-event-record.ts';
 import type { SoilGaugeZone } from '../lib/domain/soil-reserve/gauge-view.ts';
@@ -186,4 +188,52 @@ test('corrigé en passant (D-175) : une bulle « D’où vient ce chiffre ? » l
   const bubble = css.slice(css.indexOf('.figure-origin-bubble {'));
   assert.match(bubble, /^\.figure-origin-bubble \{[^}]*max-height: calc\(100vh - 32px\);\s*overflow-y: auto;/);
   assert.match(css, /@media \(max-width: 980px\) \{\s*\.figure-origin-bubble \{[^}]*max-height: calc\(100dvh - 96px - 68px\);/);
+});
+
+// n° 14 : l'ordre naturel partout (F436, F437).
+
+/**
+ * Les seuls tris par nom qui ne passent pas par l'ordre naturel : ceux du
+ * moteur du planning, qui fixent l'ordre du calcul et jamais un affichage ;
+ * les changer changerait des plans (D-024).
+ */
+const COMPUTATION_ORDER = new Set(['lib/domain/planning/engine.ts', 'lib/domain/planning/demand.ts', 'lib/domain/planning/protected-slots.ts']);
+
+function sources(directory: string): string[] {
+  return readdirSync(directory).flatMap((entry) => {
+    const path = join(directory, entry);
+    return statSync(path).isDirectory() ? sources(path) : /\.tsx?$/.test(entry) ? [path] : [];
+  });
+}
+
+test('n° 14, F436 : chaque nom affiché se range dans l’ordre naturel, jamais caractère par caractère', () => {
+  const offenders = [...sources('lib'), ...sources('app'), ...sources('db')]
+    .filter((path) => !COMPUTATION_ORDER.has(path))
+    .flatMap((path) => readFileSync(path, 'utf8').split('\n').flatMap((line, index, lines) =>
+      // Une comparaison d'égalité (`sensitivity: 'base'`, « === 0 ») cherche un doublon, pas un ordre.
+      /(?:[nN]ame|\bleft|\ba)\.localeCompare\(/.test(line) && /[nN]ame/.test(line) && !/sensitivity/.test(`${line}${lines[index + 1] ?? ''}`)
+        ? [`${path}:${index + 1}`] : []));
+  assert.deepEqual(offenders, []);
+});
+
+test('n° 14, F437 : la liste « Matériel » se regroupe par jardin, dans l’ordre naturel', () => {
+  const items = ['gag10', 'gag2', 'rampe bloc 10', 'rampe bloc 2', 'Asperseur', 'Perdu'].map((name) => ({ id: `e-${name}`, name }));
+  const placements = [
+    { equipmentId: 'e-gag10', otfPlotId: 'p-t1', gardenGroupId: null },
+    { equipmentId: 'e-gag2', otfPlotId: 'p-t1', gardenGroupId: null },
+    { equipmentId: 'e-rampe bloc 10', otfPlotId: 'p-b10', gardenGroupId: null },
+    { equipmentId: 'e-rampe bloc 2', otfPlotId: 'p-b2', gardenGroupId: null },
+    { equipmentId: 'e-Asperseur', otfPlotId: 'p-b2', gardenGroupId: 'g-champ' },
+  ];
+  const groups = equipmentByGarden(items, placements, {
+    plots: [{ id: 'p-t1', name: 'Tunnel 1' }, { id: 'p-b10', name: 'Bloc 10' }, { id: 'p-b2', name: 'bloc 2' }],
+    groups: [{ id: 'g-champ', name: 'Plein champ' }],
+  });
+  assert.deepEqual(groups.map((group) => [group.label, group.items.map((item) => item.name)]), [
+    ['bloc 2', ['rampe bloc 2']],
+    ['Bloc 10', ['rampe bloc 10']],
+    ['Plein champ', ['Asperseur']],
+    ['Tunnel 1', ['gag2', 'gag10']],
+    ['Sans jardin', ['Perdu']],
+  ]);
 });

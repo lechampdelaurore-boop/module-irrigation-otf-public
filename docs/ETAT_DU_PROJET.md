@@ -408,7 +408,10 @@ registres, elle y renvoie.
   l'irrigation en cours (avec « Arrêter / Terminer » vers sa carte) et le
   reliquat à reprendre (« Reprendre le reliquat ») ; jamais « Rien à
   arroser » vanne ouverte ; contrat d'« Aujourd'hui » changé (T20) ;
-  codée.
+  en ligne le 19 novembre 2026 à 21 h 28 (#109, fusionnée à 21 h 09, run 44605788491
+  vérifié job par job). **PR 4, l'ordre naturel partout** (D-176, F436 et F437) : chaque
+  nom affiché rangé comme on compte, gardé par un test ; la liste
+  « Matériel » d'« Arrosages » regroupée par jardin ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

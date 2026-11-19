@@ -1,5 +1,6 @@
 import type { CropPlan } from '../domain.ts';
 import { isIgnoredSeries, resolveSeriesOccupation } from './occupation.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Les séries qui occupaient au moins une des planches données un jour
@@ -24,5 +25,5 @@ export function seriesNamesOccupyingBedsOn(
     if (occupation.endDate !== null && dateKey > occupation.endDate) continue;
     names.push(series.name);
   }
-  return names.sort((left, right) => left.localeCompare(right, 'fr'));
+  return names.sort((left, right) => compareNamesNaturally(left, right));
 }

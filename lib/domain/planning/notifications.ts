@@ -1,6 +1,7 @@
 import { pageHref } from '../features/pages.ts';
 import type { StoredPlanCalculation, StoredPlanSuggestion } from './contract.ts';
 import { millisecondsFromMinutes } from '../units.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 const NEXT_HOURS = 24;
 
@@ -52,7 +53,7 @@ function suggestionsWithinNextHours(suggestions: readonly StoredPlanSuggestion[]
       const end = Date.parse(suggestion.plannedEndAt);
       return Number.isFinite(start) && Number.isFinite(end) && start < horizon && end > now.getTime();
     })
-    .sort((a, b) => a.plannedStartAt.localeCompare(b.plannedStartAt) || a.equipmentName.localeCompare(b.equipmentName, 'fr'));
+    .sort((a, b) => a.plannedStartAt.localeCompare(b.plannedStartAt) || compareNamesNaturally(a.equipmentName, b.equipmentName));
 }
 
 function describeSuggestion(suggestion: StoredPlanSuggestion): string {

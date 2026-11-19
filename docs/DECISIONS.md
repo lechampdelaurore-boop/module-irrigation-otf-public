@@ -6136,6 +6136,30 @@ bulle a désormais une hauteur maximale, la fenêtre moins le bandeau et la
 barre du bas au téléphone, la fenêtre moins ses marges à l'ordinateur, et
 défile en elle-même ; « Fermer » reste à l'écran.
 
+## D-176 — Lot H, PR 4 : l'ordre naturel partout
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 14 : la
+liste « Matériel » d'« Arrosages » offrait 32 choix à plat rangés
+caractère par caractère (« gag10 … gag16, gag2 »), « Eau de la semaine »
+rangeait « bloc 1, Bloc 10, Bloc 11, Bloc 2 », une carte du planning
+« T1-1, T1-8, T1-7 … T1-2 ». L'ordre naturel existait
+(`lib/domain/bed-order.ts`) mais ne servait qu'à une partie des tris.
+
+**Décision.** Chaque tri d'un nom affiché passe par
+`compareNamesNaturally` (vingt fichiers du domaine, des pages et de la
+base) ; un test de garde refuse tout autre tri par nom, sauf ceux du
+moteur du planning, qui fixent l'ordre du calcul et jamais un affichage
+(F436). La liste « Matériel » est regroupée par jardin
+(`lib/domain/equipment-by-garden.ts`) : le jardin où le matériel est
+posé, ou son groupe de jardins, « Sans jardin » en dernier (F437). Les
+planches d'une carte du planning s'affichent dans l'ordre naturel, sans
+changer l'ordre enregistré du plan.
+
+Ne changent pas : les plans calculés, l'ordre des propositions, les
+comparaisons de doublons de noms.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

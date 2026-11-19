@@ -125,9 +125,13 @@ irrigation partielle encore planifié, n'y apparaissent pas : la page dit
    réglage, culture) passe par `compareNamesNaturally` ; un test de garde
    refuse un `localeCompare` sur un nom affiché hors de cette règle.
 2. La liste « Matériel » des formulaires d'« Arrosages » est regroupée par
-   jardin (le jardin des planches où le matériel est posé ; « Plusieurs
-   jardins » ou « Sans planche » sinon), les groupes et les matériels dans
+   jardin : le jardin où le matériel est posé, ou le nom du groupe de
+   jardins pour un matériel posé sur un groupe, « Sans jardin » en dernier
+   quand le jardin n'est plus connu ; les groupes et les matériels dans
    l'ordre naturel.
+4. Restent hors de cette règle les tris du moteur du planning
+   (`engine.ts`, `demand.ts`, `protected-slots.ts`) : ils fixent l'ordre
+   du calcul, jamais un affichage, et les changer changerait des plans.
 3. Les planches d'une carte du planning suivent l'ordre naturel, comme sur
    « Aujourd'hui ».
 

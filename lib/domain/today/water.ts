@@ -4,6 +4,7 @@ import { FARM_TIME_ZONE } from '../water-management.ts';
 import { actualWithdrawalsByResourceAndDate, latestResourceLimit, type WaterInfrastructure } from '../water-resources.ts';
 import { RESERVOIR_VOLUME_MAX_AGE_DAYS } from './reliability.ts';
 import { countText, dateWithYearText, daysBetween, farmDateKey } from './today-text.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Le bloc « Eau disponible » de la page « Aujourd'hui » (audit ergonomique,
@@ -68,7 +69,7 @@ function fillPercent(volume: number, capacity: number): number {
 }
 
 function byName<T extends { name: string }>(items: readonly T[]): T[] {
-  return [...items].sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+  return [...items].sort((a, b) => compareNamesNaturally(a.name, b.name));
 }
 
 function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], today: string): { gauge: ReservoirGauge; line: string } {

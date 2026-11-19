@@ -2,6 +2,7 @@ import type { CropPlan } from './domain.ts';
 import { cultivationDates, daysFromTo, isUnplacedCultivation, type CultivationDates } from './crop-water/crop-calendar.ts';
 import type { CropWaterDay } from './crop-water/etm.ts';
 import { addDaysToDateKey, weekStartDateKey } from './water-management.ts';
+import { compareNamesNaturally } from './bed-order.ts';
 
 /**
  * Les cultures de chaque planche pour l'écran d'arbitrage façon plan
@@ -84,7 +85,7 @@ export function arbitrationCrops(input: {
         if (!isUnplacedCultivation(dates)) crops.push(dates);
       }
     }
-    crops.sort((a, b) => a.presenceStart.localeCompare(b.presenceStart) || a.plantName.localeCompare(b.plantName, 'fr'));
+    crops.sort((a, b) => a.presenceStart.localeCompare(b.presenceStart) || compareNamesNaturally(a.plantName, b.plantName));
     beds[bedId] = bedCrops(crops, input.today, weekStart, input.stagesToday?.get(bedId) ?? []);
   }
   return { weekStart, beds };

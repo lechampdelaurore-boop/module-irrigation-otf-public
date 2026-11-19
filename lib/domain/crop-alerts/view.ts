@@ -15,6 +15,7 @@ import {
   type DryingRevision,
   type FrostLinkRevision,
 } from './thresholds.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * L'encart « Alertes cultures » (docs/weather-crop-alerts-contract.md,
@@ -226,7 +227,7 @@ function speciesOfSeason(series: readonly CropSeries[], tasks: readonly Implanta
       species.set(cultivation.plantId, found);
     }
   }
-  return [...species.values()].sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+  return [...species.values()].sort((a, b) => compareNamesNaturally(a.name, b.name));
 }
 
 function thresholdRow(

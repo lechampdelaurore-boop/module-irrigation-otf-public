@@ -1,5 +1,6 @@
 import { addDaysToDateKey } from '../water-management.ts';
 import { dayBounds, irrigationBetween, type IrrigationInterval, type SoilReserveDay } from './gauge.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * La pastille « eau arrosée en trop » (docs/soil-reserve-contract.md, « La
@@ -91,7 +92,7 @@ export function waterSurplus(input: {
     to,
     cubicMeters: known.length === 0 ? null : known.reduce((total, bed) => total + bed.cubicMeters!, 0),
     volumeIncomplete: known.length < beds.length,
-    beds: beds.sort((a, b) => b.drainedMm - a.drainedMm || a.bedName.localeCompare(b.bedName, 'fr', { numeric: true })),
+    beds: beds.sort((a, b) => b.drainedMm - a.drainedMm || compareNamesNaturally(a.bedName, b.bedName)),
     unknownBeds,
   };
 }

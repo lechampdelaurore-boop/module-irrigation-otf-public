@@ -13,6 +13,7 @@ import {
   type CropAlertCommonEntry,
   type FrostLinkRevision,
 } from './thresholds.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * Le gel par culture (docs/weather-crop-alerts-contract.md, « Le gel par
@@ -85,8 +86,8 @@ export function frostSubjects(input: {
     }
   }
   return {
-    subjects: [...subjects.values()].sort((a, b) => a.name.localeCompare(b.name, 'fr')),
-    withoutThreshold: [...without.values()].sort((a, b) => a.name.localeCompare(b.name, 'fr') || a.reason.localeCompare(b.reason)),
+    subjects: [...subjects.values()].sort((a, b) => compareNamesNaturally(a.name, b.name)),
+    withoutThreshold: [...without.values()].sort((a, b) => compareNamesNaturally(a.name, b.name) || a.reason.localeCompare(b.reason)),
   };
 }
 

@@ -11,6 +11,7 @@ import {
   type StageAnchor,
   type StageStart,
 } from '@/lib/domain/crop-water/reference';
+import { compareNamesNaturally } from '@/lib/domain/bed-order';
 
 /**
  * Persistance des cultures de référence (docs/crop-water-need-contract.md,
@@ -103,7 +104,7 @@ export async function listReferenceCropsForWorkspace(workspaceId: string | null)
   );
   return retained
     .map((row) => storedCrop(row, parts.get(row.id) ?? { stages: [], seasons: [], months: [], starts: [] }))
-    .sort((a, b) => a.crop.name.localeCompare(b.crop.name, 'fr') || a.crop.id.localeCompare(b.crop.id));
+    .sort((a, b) => compareNamesNaturally(a.crop.name, b.crop.name) || a.crop.id.localeCompare(b.crop.id));
 }
 
 /** La culture commune d'une clé, telle que la migration l'a écrite, avec sa provenance ; `null` si la clé n'est pas commune. */

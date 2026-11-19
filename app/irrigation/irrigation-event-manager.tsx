@@ -50,6 +50,7 @@ import { NO_FORM_HINTS, objectiveExcess, proposedDoseFor, type IrrigationFormHin
 import { dateKeyInTimeZone } from '@/lib/domain/water-management';
 import { recordDoneAsPlannedAction } from './done-as-planned-actions';
 import { isLimitedAlertStatus } from '@/lib/domain/system-alerts-banner';
+import { equipmentByGarden } from '@/lib/domain/equipment-by-garden';
 
 /** Les classes de message de la section, gardées telles qu'avant le lot G. */
 const REPLY_CLASSES = { notice: 'irrigation-event-notice', warning: 'irrigation-event-warning', error: 'irrigation-event-error' } as const;
@@ -64,6 +65,8 @@ type Props = {
   poseHistory: ClosedPlacementPose[];
   groups: GardenGroupRecord[];
   beds: Bed[];
+  /** Les jardins de la ferme, pour ranger la liste « Matériel » par jardin (lot H, n° 14, F437). */
+  plots?: readonly { id: string; name: string }[];
   events: IrrigationEventRecord[];
   pumpDashboard: PumpDashboard;
   /** La case « Ressources et pompes » cochée : le choix de la pompe et la faisabilité hydraulique (3.8, R1). */
@@ -88,6 +91,7 @@ export function IrrigationEventManager({
   poseHistory,
   groups,
   beds,
+  plots = [],
   events,
   pumpDashboard,
   pumpsEnabled,
@@ -454,8 +458,10 @@ export function IrrigationEventManager({
                   }}
                 >
                   <option value="" disabled>Choisissez un matériel</option>
-                  {usableEquipment.map((item) => (
-                    <option key={item.id} value={item.id}>{item.name}</option>
+                  {equipmentByGarden(usableEquipment, formPlacements, { plots, groups }).map((garden) => (
+                    <optgroup key={garden.label} label={garden.label}>
+                      {garden.items.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                    </optgroup>
                   ))}
                 </select>
               </label>

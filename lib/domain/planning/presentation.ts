@@ -23,6 +23,7 @@ import {
   type UnplacedReason,
 } from './contract.ts';
 import { validatePlanningSettings, type PlanningSettings, type PlanningSettingsIssue, type TimeWindow } from './settings.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
 
 /**
  * La présentation pure du planning (docs/planning-contract.md, « Interface »
@@ -435,7 +436,7 @@ export function unplacedBeds(plan: StoredWeeklyPlan): PlanBedOutcome[] {
   return plan.calculation.summary.beds
     .filter(isBedUnplaced)
     .sort((left, right) => PRIORITY_RANK[left.priority] - PRIORITY_RANK[right.priority]
-      || left.bedName.localeCompare(right.bedName, 'fr')
+      || compareNamesNaturally(left.bedName, right.bedName)
       || left.bedId.localeCompare(right.bedId));
 }
 
