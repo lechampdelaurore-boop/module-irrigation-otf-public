@@ -347,7 +347,9 @@ registres, elle y renvoie.
   écrite par donnée, l'effacement complet d'une ferme sous sept jours, le
   support par une seule personne ; cinq PR, une à la fois. Le porteur a
   tranché le 19 novembre 2026 : export hebdomadaire chiffré gardé par lui,
-  gratuit. Rien n'est vérifié en réel (finesse de Time Travel, limites de
+  gratuit. **Phrase des 30 jours** de la politique de
+  confidentialité approuvée par lui le 19 novembre 2026 à 20 h 52 (UTC),
+  appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
 
 - **Audit ergonomique du 19 novembre 2026**
