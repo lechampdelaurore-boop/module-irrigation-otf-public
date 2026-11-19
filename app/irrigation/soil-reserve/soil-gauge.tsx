@@ -9,6 +9,7 @@ import { saveSoilObservationAction, type SoilReserveActionResult } from '../soil
 import { SoilBars } from './soil-bars';
 import { SoilBed } from './soil-bed';
 import { revealParcelSoil } from './soil-settings';
+import { clockText } from '@/lib/domain/clock-text';
 
 /**
  * La jauge de la réserve du sol par parcelle et par jardin
@@ -29,7 +30,9 @@ import { revealParcelSoil } from './soil-settings';
 type Run = (operation: () => Promise<SoilReserveActionResult>) => void;
 
 const whole = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
-const timeFormat = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+const dayFormat = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+// « mardi 16 juin à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const timeFormat = { format: (value: Date) => `${dayFormat.format(value)} à ${clockText(value)}` };
 /**
  * Les quatre repères du curseur (D-053), ses seuls crans depuis le retour du
  * porteur du 7 novembre 2026 (3.8, précision P40) : une observation dit l'un

@@ -81,7 +81,7 @@ export function correspondenceTargetLabel(
 /** Pourquoi une culture n'a pas d'ETM, en clair. */
 export function noEtmReasonLabel(reason: Extract<CropWaterDay, { status: 'no-etm' }>['reason']): string {
   if (reason === 'missing-correspondence') return 'espèce non rattachée à une culture de référence';
-  if (reason === 'without-reference') return 'espèce sans référence Kc';
+  if (reason === 'without-reference') return 'espèce sans culture de référence';
   return 'hors de son calendrier';
 }
 

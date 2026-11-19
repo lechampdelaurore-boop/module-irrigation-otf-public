@@ -5,7 +5,8 @@
 .feasibility-heading p, .feasibility-meta { color: var(--muted, var(--muted)); }
 .feasibility-heading button, .feasibility-validation > button { border: 0; border-radius: var(--radius-button); padding: .8rem 1rem; background: var(--green); color: white; cursor: pointer; font-size: .95rem; }
 .feasibility-section button:disabled { opacity: .55; cursor: wait; }
-.feasibility-notice { color: var(--green); }
+/* Un message, pas un lien (audit du 19 novembre 2026, lot K, n° 22, F476) : le style des autres messages, `water-notice`. */
+.feasibility-notice { margin-bottom: 0; }
 .feasibility-warning { background: var(--warn-soft); padding: .8rem 1rem; border-radius: .65rem; color: var(--warn-ink); font-size: .9rem; line-height: 1.55; }
 .feasibility-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: .75rem; margin: 1rem 0; }
 .feasibility-summary > div { border: 1px solid var(--line); border-radius: .75rem; padding: 1rem; background: white; min-width: 0; }

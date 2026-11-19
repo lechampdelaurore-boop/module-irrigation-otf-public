@@ -29,15 +29,15 @@ test('la ligne d’un créneau : son nom, ses jours dans l’ordre de la semaine
   assert.equal(protectedSlotDaysLabel(['thursday', 'tuesday']), 'mardi et jeudi');
   assert.equal(protectedSlotDaysLabel(['friday', 'monday', 'wednesday']), 'lundi, mercredi et vendredi');
   assert.equal(protectedSlotDaysLabel(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']), 'tous les jours');
-  assert.equal(protectedSlotHoursLabel({ startMinute: minutesOfDay(21), endMinute: minutesOfDay(23) }), 'de 21:00 à 23:00');
-  assert.equal(protectedSlotHoursLabel({ startMinute: minutesOfDay(22), endMinute: minutesOfDay(2) }), 'de 22:00 à 02:00 le lendemain', 'règle 3, cas 5');
-  assert.equal(protectedSlotHoursLabel({ startMinute: 0, endMinute: minutesOfDay(23, 59) }), 'de 00:00 à 23:59', 'une journée entière');
-  assert.equal(protectedSlotLine(slot('Lavage', ['tuesday', 'thursday'], minutesOfDay(21), minutesOfDay(23))), 'Lavage · mardi et jeudi · de 21:00 à 23:00');
+  assert.equal(protectedSlotHoursLabel({ startMinute: minutesOfDay(21), endMinute: minutesOfDay(23) }), 'de 21 h à 23 h');
+  assert.equal(protectedSlotHoursLabel({ startMinute: minutesOfDay(22), endMinute: minutesOfDay(2) }), 'de 22 h à 2 h le lendemain', 'règle 3, cas 5');
+  assert.equal(protectedSlotHoursLabel({ startMinute: 0, endMinute: minutesOfDay(23, 59) }), 'de 0 h à 23 h 59', 'une journée entière');
+  assert.equal(protectedSlotLine(slot('Lavage', ['tuesday', 'thursday'], minutesOfDay(21), minutesOfDay(23))), 'Lavage · mardi et jeudi · de 21 h à 23 h');
   assert.equal(
     protectedSlotVersionLine({ ...slot('Nuit calme', ['friday'], minutesOfDay(22), minutesOfDay(2)), change: 'updated' }),
-    'Modifié : Nuit calme · vendredi · de 22:00 à 02:00 le lendemain',
+    'Modifié : Nuit calme · vendredi · de 22 h à 2 h le lendemain',
   );
-  assert.equal(protectedSlotVersionLine({ ...slot('Lavage', ['tuesday'], minutesOfDay(21), minutesOfDay(23)), change: 'deleted' }), 'Supprimé : Lavage · mardi · de 21:00 à 23:00');
+  assert.equal(protectedSlotVersionLine({ ...slot('Lavage', ['tuesday'], minutesOfDay(21), minutesOfDay(23)), change: 'deleted' }), 'Supprimé : Lavage · mardi · de 21 h à 23 h');
 });
 
 test('le formulaire d’un créneau existant redonne le même créneau ; un créneau nouveau ne devine rien et la vérification le dit', () => {

@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 4 sur 7)
+
+- **Mots et formats** (D-193) : les heures s'écrivent « 8 h 50 » et les
+  durées « 1 h 21 » sur tous les écrans, les dates « 16/06/2026 à 8 h 50 » ;
+  les plages et les créneaux « de 21 h à 8 h » ; plus de pluriel entre
+  parenthèses (« 1 jour », « 7 jours ») ; sur « Ressources », « L'eau des
+  jours à venir », « Apport perdu, la réserve étant pleine » et
+  « Utilisable, avant / après les irrigations prévues » ; « Faisabilité
+  recalculée. » prend le style d'un message ; sur « Réglages », « Espèces
+  sans culture de référence ». L'export CSV garde ses formats de tableur.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 3 sur 7)
 
 - **Un bouton plein par écran, un seul dessin de pli, plus de geste muet**

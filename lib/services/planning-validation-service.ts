@@ -21,6 +21,7 @@ import {
 } from './irrigation-limits';
 import { synchronizeIrrigationPushSchedule } from './irrigation-push-orchestration';
 import { hydraulicFailureMessage, validatePumpAssignmentForUser } from './pump-service';
+import { dateClockText } from '../domain/clock-text.ts';
 
 /**
  * Valider ou refuser une proposition du planning (docs/planning-contract.md,
@@ -196,7 +197,7 @@ async function buildDraftParts(ownerUserId: string, season: number, snapshot: Ir
 }
 
 function formatComputedAt(value: string) {
-  return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: FARM_TIME_ZONE }).format(new Date(value));
+  return dateClockText(value, FARM_TIME_ZONE);
 }
 
 function formatDose(value: number) {
