@@ -101,7 +101,10 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
   // Les dates à la française, le déclencheur nommé.
   await expect(meta).toHaveText(/^Semaine du \d{2}\/\d{2} au \d{2}\/\d{2} · calculé le \d{2}\/\d{2}\/\d{4} \d{2}:\d{2} \(à la demande\)/);
   const cartes = planning.locator('article.planning-proposal').filter({ hasText: materiel });
-  await expect(cartes.first()).toBeVisible();
+  // Après 23 h 41, la première carte tombe le lendemain : au téléphone, son jour
+  // est replié ; elle se montre en le dépliant (montrerLaCarte).
+  await expect(cartes.first()).toBeAttached();
+  await montrerLaCarte(planning, cartes.first());
   // À moins d'une heure de la fin de la plage — de 23 h 00 à 23 h 41 —, le
   // créneau du jour est raccourci à ce qui tient dans la plage : la carte lue
   // est la première à la dose entière. Un dimanche à cette heure n'en offre
