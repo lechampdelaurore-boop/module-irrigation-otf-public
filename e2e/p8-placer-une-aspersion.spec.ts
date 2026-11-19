@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { verifierLaSurfaceMouillee } from './support/materiel.ts';
-import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirParClic, surveillerLaConsole, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 
 /**
  * Parcours P8 : poser, déplacer puis retirer une aspersion sur le plan
@@ -81,7 +81,9 @@ test('une aspersion se pose entre deux planches, se déplace, puis se retire', a
   // Retirer, c'est stocker (2.11) : la carte le dit, et propose « Reposer ».
   await retirerLaPosition(page, materiel);
   await expect(carte).toContainText('Stocké depuis le');
+  await ouvrirLOnglet(page, 'Matériel');
   await expect(carte.getByRole('button', { name: 'Reposer' })).toBeVisible();
+  await ouvrirLOnglet(page, 'Plan');
   for (const nom of ['N01', 'N02', 'N03']) {
     await expect(planche(page, nom)).not.toHaveAttribute('title', contribution);
   }
@@ -96,6 +98,8 @@ async function creerUneAspersion(page: Page, nom: string): Promise<void> {
   const fiche = page.locator('dialog[open], [role=dialog]').filter({ hasText: 'Ajouter un matériel' });
   // Premier clic du parcours : la fenêtre n'existe que sous React, elle prouve
   // donc que la page répond (docs/browser-journeys-contract.md).
+  // L'inventaire a son onglet (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   await ouvrirParClic(page.getByRole('button', { name: 'Ajouter un matériel' }), fiche);
   await fiche.getByLabel('Nom du matériel').fill(nom);
   await fiche.locator('label').filter({ hasText: 'Aspersion' }).click();
@@ -132,6 +136,8 @@ async function ajouterLeReglage(page: Page, materiel: string, reglage: string): 
 
 /** Ancre le matériel sur le trait entre deux planches, et enregistre. */
 async function poserEntre(page: Page, materiel: string, reglage: string, avant: string, apres: string): Promise<void> {
+  // La fiche est sous « Matériel » ; poser bascule sur le plan (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   const carte = page.locator('.equipment-section article').filter({ hasText: materiel });
   await carte.getByRole('button', { name: /^(Placer|Déplacer)$/ }).click();
   await expect(page.getByText('Cliquez sur une planche ou sur le trait entre deux planches.')).toBeVisible();
@@ -151,6 +157,7 @@ async function compterLesPoses(page: Page): Promise<number> {
 }
 
 async function archiver(page: Page, materiel: string): Promise<void> {
+  await ouvrirLOnglet(page, 'Matériel');
   const carte = page.locator('.equipment-section article').filter({ hasText: materiel });
   await carte.getByLabel(`Actions pour ${materiel}`).click();
   await carte.getByRole('menuitem', { name: 'Archiver' }).click();
@@ -169,6 +176,7 @@ async function restaurer(page: Page, materiel: string): Promise<void> {
 }
 
 async function retirerLaPosition(page: Page, materiel: string): Promise<void> {
+  await ouvrirLOnglet(page, 'Matériel');
   const carte = page.locator('.equipment-section article').filter({ hasText: materiel });
   await carte.getByRole('button', { name: 'Déplacer' }).click();
   await expect(page.getByText('Cliquez sur une planche ou sur le trait entre deux planches.')).toBeVisible();

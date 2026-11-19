@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
+import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli, ouvrirLOnglet } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -44,7 +44,8 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
   const reference = Date.now();
   await attendreLaPageIrrigation(page);
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p37' });
-  // « Retirer (stocker) » se défait : il quitte le rouge, contour neutre (lot G, n° 8, F414).
+  // « Retirer (stocker) » se défait : il quitte le rouge, contour neutre (lot G, n° 8, F414). La fiche est sous « Matériel » (lot J, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   const retirer = page.locator('.equipment-section article').filter({ hasText: materiel }).getByRole('button', { name: `Retirer et stocker ${materiel}` });
   await expect(retirer).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(retirer).toHaveCSS('border-top-color', 'rgb(187, 187, 187)');

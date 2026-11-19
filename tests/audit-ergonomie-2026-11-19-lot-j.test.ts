@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { pageLabel } from '../lib/domain/features/pages.ts';
+import { pageHref, pageLabel } from '../lib/domain/features/pages.ts';
 import type { SeasonSpecies, SpeciesWithoutReference } from '../lib/domain/crop-water/species.ts';
 import { withoutReferenceBeyondSpecies } from '../lib/domain/crop-water/species-linking.ts';
 import { gardenState, goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '../lib/domain/besoins-phone.ts';
+import { middleCutParts, parseMaterielTab, plotFoldSummary } from '../lib/domain/materiel-tabs.ts';
 
 /**
  * Audit ergonomique du 19 novembre 2026, lot J « Pages courtes au
@@ -124,4 +125,40 @@ test('n° 15, F460 : les trois plis à ancre de la semaine, « À planifier » d
   assert.ok(needs.indexOf('Besoin effectif <HelpButton', experts) > experts, 'le besoin effectif chez les experts');
   const css = readFileSync('app/irrigation/irrigation.css', 'utf8');
   assert.ok(css.indexOf('pages-courtes.css') < css.indexOf('gestes-surs.css'), 'les gestes sûrs restent les derniers');
+});
+
+// n° 15 — « Matériel » en trois onglets (PR 6, F461).
+
+test('n° 15, F461 : l’onglet se lit dans l’adresse, le plan par défaut, et un lien y mène', () => {
+  assert.equal(parseMaterielTab(undefined), 'plan');
+  assert.equal(parseMaterielTab('materiel'), 'materiel');
+  assert.equal(parseMaterielTab(['groupes', 'plan']), 'groupes');
+  assert.equal(parseMaterielTab('inconnu'), 'plan');
+  assert.equal(pageHref('materiel', { season: 2026, tab: 'materiel' }), '/irrigation/materiel?season=2026&onglet=materiel');
+});
+
+test('n° 15, F461 : un nom coupé au milieu garde sa fin, et les deux parties rendent le nom', () => {
+  const noms = ['Goutte-à-goutte du carré 1', 'Goutte-à-goutte du carré 2', 'Goutte-à-goutte du carré 3'];
+  const fins = noms.map((nom) => middleCutParts(nom).tail);
+  assert.equal(new Set(fins).size, 3, 'trois fins distinctes');
+  for (const nom of noms) {
+    const { head, tail } = middleCutParts(nom);
+    assert.equal(head + tail, nom);
+    assert.equal(tail, nom.slice(-8));
+  }
+  assert.deepEqual(middleCutParts('gag2'), { head: 'gag2', tail: '' }, 'un nom court ne se coupe pas');
+});
+
+test('n° 15, F461 : le résumé d’un jardin replié', () => {
+  assert.equal(plotFoldSummary(1, 0), '1 planche · aucun matériel');
+  assert.equal(plotFoldSummary(3, 2), '3 planches · 2 matériels');
+});
+
+test('n° 15, F461 : les trois panneaux à onglets, cachés et non retirés ; poser montre le plan', () => {
+  const browser = readFileSync('app/irrigation/hierarchy-browser.tsx', 'utf8');
+  for (const id of ['plan', 'materiel', 'groupes']) {
+    assert.match(browser, new RegExp(`id="materiel-panel-${id}" role="tabpanel" aria-labelledby="materiel-tab-${id}" hidden=\\{shownTab !== '${id}'\\}`), id);
+  }
+  assert.match(browser, /const shownTab: MaterielTab = placementEditor \? 'plan' : tab;/);
+  assert.ok(browser.indexOf('<CoverageOverview') < browser.indexOf('id="materiel-panel-materiel"'), '« Aperçu instantané » avec le plan');
 });
