@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 1 sur 7)
+
+- **Planning : le rouge pour le manque d'eau seul** (D-190) : une planche
+  dont le besoin est encore sous la dose minimale d'un arrosage attend qu'il
+  grandisse ; elle n'est plus comptée en rouge dans « Planches non
+  servies », elle est dite « en attente », pour information. « Ajuster »
+  montre la dose de la carte (« 8,1 », plus « 8,06 ») ; laissée telle
+  quelle, la dose exacte est gardée. La ligne d'état de la semaine se lit
+  en deux lignes, la source météo et la réserve dessous ; un jour à une
+  seule proposition n'a plus qu'un bouton « Valider » ; « Réglages du
+  planning » porte le signe des autres plis.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 7 sur 7)
 
 - **« Arrosages » et « Historique » : le premier geste plus haut** (D-189) :

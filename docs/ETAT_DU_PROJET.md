@@ -536,7 +536,17 @@ registres, elle y renvoie.
   44701703829 vérifié job par job). **PR 7, « Arrosages » et « Historique », le premier
   geste plus haut** (D-189, F462) : « Résultat calculé » attend un matériel
   et une quantité ; les filtres de l'historique dans un pli « Filtrer »,
-  l'export en bouton secondaire après les chiffres ; codée. Lot J codé.
+  l'export en bouton secondaire après les chiffres ; en ligne le
+  20 novembre 2026 à 10 h 20 (#128, fusionnée à 9 h 58, run 44706780872 vérifié job
+  par job) : **lot J en ligne en entier**.
+  **Lot K commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
+  court `docs/audit-ergonomie-2026-11-19-lot-k-contract.md` (F463 et
+  suivantes, parcours P41), sept PR. **PR 1, planning : le rouge pour le
+  manque d'eau seul** (D-190, F463 à F467) : les planches au besoin sous la
+  dose minimale dites « en attente », pour information ; « Ajuster » à
+  l'arrondi de la carte ; la ligne d'état en deux lignes ; un seul
+  « Valider » pour un jour à une proposition ; « Réglages du planning »
+  signé comme les autres plis ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
