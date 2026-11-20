@@ -9,6 +9,7 @@ import { addDaysToDateKey } from '@/lib/domain/water-management';
 import { ADOPTED_OBJECTIVE_HELP } from '@/lib/domain/objective-reading';
 import { FigureOrigin } from '../shell/figure-origin';
 import { adoptCropWaterProposalAction, declareCropStageAction, loadBedCropWaterAction, type BedCropWaterActionResult } from '../crop-water-actions';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 /**
  * Le besoin de la culture dans la fiche de la planche (docs/crop-water-need-contract.md,
@@ -273,5 +274,5 @@ export function formatDay(dateKey: string): string {
 }
 
 function formatInstant(iso: string): string {
-  return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(new Date(iso));
+  return dateClockText(iso);
 }

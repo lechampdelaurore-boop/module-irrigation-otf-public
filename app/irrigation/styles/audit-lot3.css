@@ -30,7 +30,7 @@
   background: var(--warn-soft);
   padding: .55rem .8rem;
   color: var(--warn-ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .planning-unplaced-action .icon {
@@ -51,7 +51,7 @@
 .planning-unplaced-meaning {
   margin: 0 0 .5rem;
   color: var(--muted);
-  font-size: .82rem;
+  font-size: var(--text-13);
 }
 
 .planning-unplaced-group + .planning-unplaced-group {
@@ -60,7 +60,7 @@
 
 .planning-unplaced-group h4 {
   margin: 0 0 .25rem;
-  font-size: .95rem;
+  font-size: var(--text-16);
 }
 
 /* Point 6 : une ligne par irrigation, rangée par jour, « À traiter » en tête. */
@@ -88,14 +88,14 @@
 .irrigation-to-handle > header h4,
 .irrigation-day > h4 {
   margin: 0;
-  font-size: .95rem;
+  font-size: var(--text-16);
 }
 
 .irrigation-to-handle > header p {
   flex: 1 1 220px;
   margin: 0;
   color: var(--danger-ink);
-  font-size: .82rem;
+  font-size: var(--text-13);
 }
 
 .irrigation-to-handle > header button {
@@ -106,7 +106,7 @@
   background: white;
   color: var(--anthracite);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-13);
   cursor: pointer;
 }
 
@@ -195,8 +195,8 @@
   min-height: var(--touch-target);
   align-items: center;
   color: var(--green);
-  font-size: .85rem;
-  font-weight: 600;
+  font-size: var(--text-13);
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -288,7 +288,7 @@ button.done-as-planned {
 .done-as-planned-dialog p,
 .line-confirm-dialog p {
   margin: 0;
-  font-size: .9rem;
+  font-size: var(--text-14);
   line-height: 1.55;
 }
 

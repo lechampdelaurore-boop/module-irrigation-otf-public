@@ -1,5 +1,6 @@
 import { pageHref } from '../features/pages.ts';
 import { addDaysToDateKey, FARM_TIME_ZONE, isValidDateKey, weekStartDateKey } from '../water-management.ts';
+import { clockFromMinutes } from '../clock-text.ts';
 
 /**
  * Les alertes météo paramétrables (docs/weather-alerts-contract.md, D-050).
@@ -484,7 +485,7 @@ function formatForecastInstant(instant: string, timeZone: string): string {
   const parts = Object.fromEntries(new Intl.DateTimeFormat('fr-FR', {
     day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone,
   }).formatToParts(new Date(instant)).map((part) => [part.type, part.value]));
-  return `${parts.day} ${parts.month}, ${parts.hour} h ${parts.minute}`;
+  return `${parts.day} ${parts.month}, ${clockFromMinutes(Number(parts.hour) * 60 + Number(parts.minute))}`;
 }
 
 function lowerFirst(text: string): string {

@@ -19,6 +19,7 @@ import {
   saveWeatherAlertCriterionAction,
   type WaterActionResult,
 } from './water-actions';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 type Refusals = Partial<Record<keyof WeatherAlertCriterionInput, string>>;
 
@@ -62,7 +63,8 @@ const HORIZONS = Array.from(
 );
 
 const dayFormatter = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
-const instantFormatter = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
+// « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const instantFormatter = { format: (value: Date | number) => dateClockText(new Date(value)) };
 
 /**
  * L'encart « Alertes météo » (docs/weather-alerts-contract.md, « L'écran ») :

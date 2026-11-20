@@ -26,6 +26,7 @@ import { protectedSlotRealSignal } from '@/lib/domain/planning/follow-up';
 import { loadIrrigationHistoryAction } from './irrigation-history-actions';
 import { FigureOrigin } from './shell/figure-origin';
 import { historyFilterSummary } from '@/lib/domain/premier-geste';
+import { clockText, dateClockText, durationMinutesText } from '@/lib/domain/clock-text';
 
 type Props = {
   season: number;
@@ -56,19 +57,9 @@ const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
   timeZone: 'Europe/Paris',
 });
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: 'Europe/Paris',
-});
-const timeFormatter = new Intl.DateTimeFormat('fr-FR', {
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: 'Europe/Paris',
-});
+// « 16/06/2026 à 8 h 50 », « 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const dateTimeFormatter = { format: (value: Date) => dateClockText(value) };
+const timeFormatter = { format: (value: Date) => clockText(value) };
 
 export function IrrigationHistoryDashboardView({
   season,
@@ -513,8 +504,8 @@ function HistoryItem({ item }: { item: IrrigationHistoryItem }) {
           <Detail label="Origine historique" value={item.pumpOriginName ?? 'Non renseignée'} />
           <Detail label="Placement" value={item.placementLabel} />
           <Detail label="Parcelle" value={item.zoneName ?? '—'} />
-          <Detail label="Jardin(s) ou abri(s)" value={item.plotNames.join(', ') || '—'} />
-          <Detail label="Planche(s)" value={item.bedNames.join(', ') || '—'} />
+          <Detail label={item.plotNames.length > 1 ? 'Jardins ou abris' : 'Jardin ou abri'} value={item.plotNames.join(', ') || '—'} />
+          <Detail label={item.bedNames.length > 1 ? 'Planches' : 'Planche'} value={item.bedNames.join(', ') || '—'} />
           <Detail label="Apport réel" value={showsActual ? `${millimetersText(item.actualAmountMm)}` : '0 mm'} />
           <Detail label="Volume réel" value={!showsActual ? '0 m³' : item.actualCubicMeters === null ? '— (surface mouillée inconnue)' : `${volumeText(item.actualCubicMeters)}`} />
           <Detail label="Surface concernée" value={showsActual ? `${numberFormatter.format(item.irrigatedAreaSquareMeters)} m²` : '0 m²'} />
@@ -580,15 +571,12 @@ function formatTime(value: string) {
 
 function formatDuration(seconds: number) {
   if (!Number.isFinite(seconds) || seconds <= 0) return '—';
-  const minutes = Math.round(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-  return hours > 0 ? `${hours} h ${String(remainder).padStart(2, '0')} min` : `${minutes} min`;
+  return durationMinutesText(seconds / 60);
 }
 
 function availabilityText(value: { availableDays: number; totalDays: number; complete: boolean }) {
   if (value.complete) return null;
-  return `${value.availableDays}/${value.totalDays} jour(s) disponible(s)`;
+  return `${value.availableDays} ${value.availableDays < 2 ? 'jour disponible' : 'jours disponibles'} sur ${value.totalDays}`;
 }
 
 function objectiveAvailabilityText(value: { availableBedDays: number; totalBedDays: number; complete: boolean }) {

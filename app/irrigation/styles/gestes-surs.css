@@ -57,14 +57,14 @@
 .planning-section .planning-proposal-actions > button {
   width: 100%;
   min-width: 0;
-  font-size: .85rem;
+  font-size: var(--text-13);
 }
 
 .planning-section .planning-proposal-actions > button.primary {
   grid-column: 1 / -1;
   min-height: 48px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--text-16);
+  font-weight: 700;
 }
 
 /* À l'ordinateur, les trois gestes gardent une largeur de main, pas celle de la carte. */
@@ -100,6 +100,6 @@ button:disabled {
   border-radius: var(--radius-button);
   background: var(--ok-soft);
   color: var(--ok-ink);
-  font-size: .95rem;
-  font-weight: 600;
+  font-size: var(--text-16);
+  font-weight: 700;
 }

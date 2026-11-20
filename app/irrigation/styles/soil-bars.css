@@ -18,7 +18,7 @@
   gap: .3rem 1rem;
   margin: 0;
   color: var(--muted);
-  font-size: .82rem;
+  font-size: var(--text-13);
 }
 
 .soil-bars-legend > span {
@@ -110,7 +110,7 @@
 
 .soil-bar-name small {
   color: var(--muted);
-  font-size: .8rem;
+  font-size: var(--text-13);
 }
 
 .soil-bar-track {
@@ -160,14 +160,14 @@
   border: 1.5px dashed var(--muted);
   background: transparent;
   color: var(--muted);
-  font-size: .8rem;
+  font-size: var(--text-13);
 }
 
 .soil-bar-percent {
   /* « 100 % » ne se coupe plus en « 100 » puis « % » (lot J, n° 15, F458). */
   white-space: nowrap;
   font-family: var(--font-title);
-  font-size: 1.15rem;
+  font-size: var(--text-20);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -176,7 +176,7 @@
 .soil-bar-none {
   grid-column: 2 / -1;
   color: var(--muted);
-  font-size: .85rem;
+  font-size: var(--text-13);
 }
 
 /* Les repères, alignés sur la colonne des barres. */
@@ -184,7 +184,7 @@
   margin: 0;
   padding: 0 .5rem;
   color: var(--muted);
-  font-size: .72rem;
+  font-size: var(--text-12);
 }
 
 .soil-bars-scale {
