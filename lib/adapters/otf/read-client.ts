@@ -31,9 +31,10 @@ const OTF_API_BASE_PATH = '/0.1beta/';
 // OTF accepte au plus quatre appels par seconde : au moins 250 ms entre deux
 // départs de requêtes, même pour des lectures lancées simultanément.
 export const OTF_MINIMUM_REQUEST_INTERVAL_MS = 250;
-// Marge ajoutée à l'attente : l'horodatage du départ est pris avant l'appel
-// réseau lui-même, et un minuteur peut se réveiller un peu tôt. Sans elle, un
-// observateur externe peut mesurer 249 ms entre deux appels.
+// Marge ajoutée à l'espacement. Dans une instance, l'espacement des envois est
+// exact sans elle : le départ est noté après l'appel réseau, et l'attente se
+// vérifie à l'horloge au réveil d'un minuteur. Elle couvre en partie, entre deux
+// instances, le temps d'une réponse de la base entre la place et l'envoi (F385).
 const RATE_SLOT_SAFETY_MARGIN_MS = 5;
 // Après un 429, plus rien ne part vers OTF pendant une seconde pleine :
 // la limite OTF se compte à la seconde, attendre moins la heurterait encore.
@@ -311,14 +312,14 @@ export class OtfReadClient {
     }
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      // L'attente d'une place ne compte pas dans le délai de l'appel ; un
-      // refus du régulateur n'envoie rien et ne se retente pas.
-      await this.waitForRateSlot();
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
-
-      try {
-        const response = await this.fetchImpl(url, {
+      let timeout: ReturnType<typeof setTimeout> | undefined;
+      // L'attente d'une place ne compte pas dans le délai de l'appel : le
+      // minuteur part avec l'envoi. Un refus du régulateur n'envoie rien et ne
+      // se retente pas.
+      const { sending } = await this.sendInTurn(async () => {
+        timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+        return this.fetchImpl(url, {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -326,6 +327,10 @@ export class OtfReadClient {
           },
           signal: controller.signal,
         });
+      });
+
+      try {
+        const response = await sending;
 
         if (response.ok) {
           return await response.json();
@@ -361,26 +366,39 @@ export class OtfReadClient {
   }
 
   /**
-   * La place de cet appel dans le rythme de sa ferme (F334) : un départ
+   * Le tour de cet appel dans le rythme de sa ferme (F334) : un départ
    * toutes les 250 ms au plus, trente par minute ; quand la minute est
    * pleine, une attente de cinq secondes au plus, sinon l'appel est refusé
    * comme sur une limite atteinte, sans rien envoyer à OTF. Puis sa place
    * dans le compteur partagé de la base (F361), qui fait foi pour toutes les
-   * instances ; le départ n'est noté en mémoire qu'ensuite, juste avant
-   * l'envoi, pour que l'espacement mesuré soit celui des envois réels (F385).
+   * instances. L'envoi part dans ce tour, et son départ n'est noté en mémoire
+   * qu'aussitôt après l'appel réseau : l'appel suivant compte son attente à
+   * partir de là, si bien que deux envois ne sont jamais plus proches que
+   * l'espacement, même quand le processus est interrompu entre le tour et
+   * l'envoi (F385). La réponse s'attend hors du tour : l'appel suivant n'attend
+   * que son espacement, pas la réponse.
    */
-  private waitForRateSlot(): Promise<void> {
+  private sendInTurn(send: () => Promise<Response>): Promise<{ sending: Promise<Response> }> {
     const pacer = farmPacer(this.farmKey, this.clock.now());
     const { now } = this.clock;
     pacer.pending += 1;
-    const slot = pacer.queue.then(async () => {
+    const turn = pacer.queue.then(async () => {
       await this.waitForLocalSlot(pacer);
       await this.claimSharedPlace();
-      pacer.state = recordCallStart(pacer.state, now());
+      let sending: Promise<Response>;
+      try {
+        sending = send();
+      } finally {
+        pacer.state = recordCallStart(pacer.state, now());
+      }
+      // L'appelant lit la réponse aussitôt le tour rendu ; d'ici là, un échec
+      // de l'envoi ne doit pas passer pour une erreur que personne n'attend.
+      sending.catch(() => undefined);
+      return { sending };
     }).finally(() => { pacer.pending -= 1; });
 
-    pacer.queue = slot.catch(() => undefined);
-    return slot;
+    pacer.queue = turn.then(() => undefined, () => undefined);
+    return turn;
   }
 
   /** Le rythme de cette instance, en mémoire : devant le compteur partagé (F361). */

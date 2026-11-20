@@ -105,6 +105,42 @@ test('les lectures simultanées restent espacées les unes des autres', async ()
   }
 });
 
+test('un envoi parti en retard sur son tour ne rapproche pas le suivant : 250 ms au moins entre deux envois réels (F385)', async () => {
+  // Le processus peut être interrompu entre le tour d'un appel et son envoi
+  // réel : la CI a mesuré une fois 249 ms entre deux envois. Ici, chaque envoi
+  // part en retard sur son tour, de 10 ms puis de 3 ms ; l'appel suivant
+  // compte son attente à partir de l'envoi réel, pas du tour.
+  const clock = fakeClock();
+  const lateness = [10, 3, 0];
+  const starts: number[] = [];
+  const client = new OtfReadClient({
+    baseUrl,
+    token: 'server-secret',
+    clock,
+    fetchImpl: async (input) => {
+      clock.advance(lateness[starts.length] ?? 0);
+      starts.push(clock.now());
+      return new URL(input).pathname.endsWith('/configuration')
+        ? configurationResponse()
+        : Response.json({ count: 0, list: [] });
+    },
+  });
+
+  await Promise.all([
+    client.getConfiguration(),
+    client.listZones(2026),
+    client.listPlots(2026),
+  ]);
+
+  assert.equal(starts.length, 3);
+  for (let index = 1; index < starts.length; index += 1) {
+    assert.ok(
+      starts[index] - starts[index - 1] >= OTF_MINIMUM_REQUEST_INTERVAL_MS,
+      `Intervalle observé : ${starts[index] - starts[index - 1]} ms`,
+    );
+  }
+});
+
 test('une route hors liste blanche est rejetée avant le réseau', () => {
   assert.throws(
     () => assertAllowedReadRoute('/bed'),

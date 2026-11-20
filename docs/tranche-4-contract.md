@@ -866,11 +866,15 @@ l'écran tant qu'Ouvre ta ferme répond dans ses limites.
   (5 millisecondes) et la seconde de la minute le couvrent en partie ;
   surtout, une seule lecture complète à la fois par ferme (F362) fait qu'en
   pratique une seule instance appelle une ferme ; un `429` qui en
-  viendrait suivrait F382. Dans une instance, le départ est noté en
-  mémoire juste avant l'envoi, après la place : l'espacement des envois y
-  est exact. Un appel refusé redemande sa place à l'heure que dit la base
-  (l'espacement, la minute), vingt fois au plus ; au-delà, il n'est pas
-  envoyé, comme sur une minute pleine, et le journal le dit
+  viendrait suivrait F382. Dans une instance, l'envoi part dans le tour de
+  sa ferme, après la place, et son départ est noté en mémoire aussitôt
+  après l'appel réseau : l'appel suivant compte son attente à partir de
+  là, et l'espacement des envois y est exact, même quand le processus est
+  interrompu entre le tour et l'envoi (précisé le 20 novembre 2026 : le
+  départ noté juste avant l'appel avait laissé la CI mesurer une fois
+  249 ms entre deux envois). Un appel refusé redemande sa place à l'heure
+  que dit la base (l'espacement, la minute), vingt fois au plus ; au-delà,
+  il n'est pas envoyé, comme sur une minute pleine, et le journal le dit
   (`otf_shared_place_unavailable`).
 - **F386 · Ce que dit la page.** Une lecture qui n'a pas lieu laisse le
   dernier instantané, avec la raison ; la date des données est celle de la
