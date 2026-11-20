@@ -33,8 +33,10 @@ export class ExportCaptureError extends Error {
 export function maskedWranglerLine(line: string): string {
   return line
     .replace(/\bhttps?:\/\/\S+/gi, '(adresse masquée)')
-    // Les identifiants du compte et des bases (32 chiffres hexadécimaux, avec ou sans tirets) : les journaux du flux sont publics.
-    .replace(/\b[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}\b/gi, '(identifiant masqué)');
+    // La référence d'une requête que Cloudflare donne avec une erreur (« reference = … ») : un identifiant de requête, à ne pas consigner.
+    .replace(/\b(reference\s*[=:]\s*)[\w-]+/gi, '$1(référence masquée)')
+    // Les identifiants du compte et des bases (32 chiffres hexadécimaux, avec ou sans tirets), même collés à un autre mot : les journaux du flux sont publics.
+    .replace(/(?<![0-9a-z])[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}(?![0-9a-z])/gi, '(identifiant masqué)');
 }
 
 /** Le chemin convenu avec le détour : dans un dossier qui n'existe pas, pour que rien ne s'y écrive jamais. */
@@ -167,7 +169,11 @@ export function runWranglerCommand(args: readonly string[], { cli = wranglerCli(
  */
 export function wranglerFailureReason(output: string): string | null {
   const found = /(no such (?:table|column): [\w.]+|(?:FOREIGN KEY|UNIQUE|NOT NULL|CHECK|PRIMARY KEY) constraint failed(?:: [\w.]+)?|SQLITE_[A-Z_]+|not authorized)/.exec(output);
-  return found ? found[1] : null;
+  if (found) return found[1];
+  // Une erreur de l'API de Cloudflare se dit par son numéro (« [code: 7500] »), jamais par sa référence.
+  const code = /\[code: (\d+)\]/.exec(output);
+  if (!code) return null;
+  return `${/internal error/i.test(output) ? 'erreur interne de Cloudflare, ' : ''}code ${code[1]} de l’API de Cloudflare`;
 }
 
 /** Le JSON que Wrangler écrit avec `--json`, même précédé d'un avertissement. */

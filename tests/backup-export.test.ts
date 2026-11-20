@@ -302,6 +302,12 @@ test('les arguments de Wrangler, et le masque des adresses', () => {
     'Executing on remote database essai ((identifiant masqué)), account (identifiant masqué)',
     'les identifiants du compte et des bases ne passent pas dans les journaux publics du flux',
   );
+  assert.equal(
+    maskedWranglerLine('  internal error; reference = e_xSb5mO_0c3d6226eaff4afeb9c1bcbd5e44a2de [code: 7500]'),
+    '  internal error; reference = (référence masquée) [code: 7500]',
+    'la référence d’une requête, comme Cloudflare la donne avec une erreur (20 novembre 2026)',
+  );
+  assert.equal(maskedWranglerLine('base_0123456789abcdef0123456789abcdef'), 'base_(identifiant masqué)', 'un identifiant collé à un autre mot');
 });
 
 // ─── Où va le fichier ────────────────────────────────────────────────────────

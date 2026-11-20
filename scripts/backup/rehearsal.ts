@@ -219,8 +219,11 @@ export async function runRehearsal(options: RehearsalOptions): Promise<Rehearsal
     const lostTables = compareSummaries(t0.tables, t1.tables).map(({ table }) => table);
     const bUntouchedByDamage = farmSummary(t1.copy, farmB.workspaceId).digest === farmSummary(t0.copy, farmB.workspaceId).digest;
     report.check(lost > 0 && bUntouchedByDamage, `Dégât sur la ferme A : ${plural(lost, 'ligne')} effacée${lost > 1 ? 's' : ''} (\`${DAMAGED_TABLE}\` et les tables qui en dépendent) ; tables touchées : ${lostTables.join(', ')} ; ferme B ${bUntouchedByDamage ? 'intacte' : 'TOUCHÉE'}.`);
-    const fromInstant = await step('Signet de l’instant noté', () => operations.bookmarkAt(primary, notedAt));
-    report.note(`Finesse de Time Travel : le signet que Cloudflare rend pour l’instant noté ${fromInstant === noted ? 'est' : 'n’est pas'} le signet noté à cet instant.`);
+    // Une mesure, pour 10 bis.10 : son échec se dit, sans arrêter le scénario, qui restaure au signet noté.
+    const fromInstant = await step('Signet de l’instant noté', () => operations.bookmarkAt(primary, notedAt).catch((error: unknown) => error instanceof Error ? error : new Error(String(error))));
+    report.note(typeof fromInstant === 'string'
+      ? `Finesse de Time Travel : le signet que Cloudflare rend pour l’instant noté ${fromInstant === noted ? 'est' : 'n’est pas'} le signet noté à cet instant.`
+      : `Finesse de Time Travel : Cloudflare n’a pas rendu de signet pour l’instant noté (${fromInstant.message}) ; la restauration se fait au signet noté, qui n’en dépend pas.`);
     const { previousBookmark } = await step('Restauration au signet noté', () => operations.restore(primary, noted));
     await pause(PAUSE_AFTER_RESTORE_MS);
     const t2 = await capture(primary, 'T2', 'restauré');

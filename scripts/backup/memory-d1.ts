@@ -24,6 +24,8 @@ export type MemorySabotage = {
   exportDropsTable?: string;
   /** Dans cette base, un fichier SQL perd sa dernière insertion en route. */
   importLosesLastRowIn?: string;
+  /** Le signet d'un instant n'est pas rendu (comme D1 le 20 novembre 2026, « internal error », code 7500). */
+  bookmarkAtFails?: boolean;
 };
 
 export type MemoryD1 = D1Operations & {
@@ -120,6 +122,7 @@ export function memoryD1Operations({ sabotage = {}, clock = () => Date.now() }: 
     },
     currentBookmark: async (name) => current(baseOf(name)).bookmark,
     bookmarkAt: async (name, instant) => {
+      if (sabotage.bookmarkAtFails) throw new Error('Wrangler a échoué (d1 time-travel, code 1) : erreur interne de Cloudflare, code 7500 de l’API de Cloudflare');
       const moment = Date.parse(instant);
       const snapshot = baseOf(name).history.findLast((entry) => entry.at <= moment);
       if (!snapshot) throw new Error('Aucun signet à cet instant.');

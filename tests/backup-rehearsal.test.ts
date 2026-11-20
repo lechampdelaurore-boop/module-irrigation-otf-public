@@ -131,7 +131,22 @@ test('la restauration réelle n’accepte qu’un nom de base lisible', () => {
 test('la raison d’un échec de Wrangler se dit par un nom, jamais par une valeur', () => {
   assert.equal(wranglerFailureReason('{"error":{"text":"no such table: main.irrigation_equipment_settings: SQLITE_ERROR"}}'), 'no such table: main.irrigation_equipment_settings');
   assert.equal(wranglerFailureReason("UNIQUE constraint failed: irrigation_events.id ('valeur')"), 'UNIQUE constraint failed: irrigation_events.id');
-  assert.equal(wranglerFailureReason('Authentication error [code: 10000]'), null);
+  assert.equal(wranglerFailureReason('Authentication error [code: 10000]'), 'code 10000 de l’API de Cloudflare');
+  assert.equal(
+    wranglerFailureReason('A request to the Cloudflare API failed.\n  internal error; reference = e_xSb5mO_0c3d6226eaff4afeb9c1bcbd5e44a2de [code: 7500]'),
+    'erreur interne de Cloudflare, code 7500 de l’API de Cloudflare',
+    'le numéro de l’erreur, jamais sa référence',
+  );
+  assert.equal(wranglerFailureReason('Wrangler a fini'), null);
+});
+
+test('le signet d’un instant que Cloudflare ne rend pas se dit, sans arrêter l’essai', async () => {
+  const { operations, run } = simulation({ bookmarkAtFails: true });
+  const report = await run();
+  assert.equal(report.failures, 0, report.markdown);
+  assert.match(report.markdown, /Finesse de Time Travel : Cloudflare n’a pas rendu de signet pour l’instant noté \(.*code 7500 de l’API de Cloudflare\) ; la restauration se fait au signet noté/);
+  assert.match(report.markdown, /\*\*Résultat : réussi\.\*\*/);
+  assert.deepEqual(operations.names(), []);
 });
 
 // ─── Les lignes d'une seule ferme ────────────────────────────────────────────
