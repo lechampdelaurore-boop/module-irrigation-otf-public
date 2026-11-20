@@ -47,8 +47,8 @@ test('le « ? » de chaque page l’explique ; une bulle dit d’où vient un ch
   await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   const resultat = page.locator('.irrigation-preview');
-  await expect(resultat.locator('.calculated-duration')).toContainText('2 h 30 min');
-  await verifierLaBulle(page, resultat.locator('.calculated-duration'), `2 h 30 min : le temps pour que ${planche} reçoive 25 mm à 10 mm/h.`);
+  await expect(resultat.locator('.calculated-duration')).toContainText('2 h 30');
+  await verifierLaBulle(page, resultat.locator('.calculated-duration'), `2 h 30 : le temps pour que ${planche} reçoive 25 mm à 10 mm/h.`);
   await verifierLEtape(page, journal, 'bulle de la durée d’un arrosage');
 });
 

@@ -35,14 +35,14 @@
 }
 
 .irrigation-action-tabs strong {
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 500;
 }
 
 .irrigation-action-tabs span {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .irrigation-form-layout {
@@ -66,7 +66,7 @@
   flex-direction: column;
   gap: 6px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
 }
 
@@ -84,7 +84,7 @@
   background: white;
   color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   letter-spacing: normal;
   text-transform: none;
@@ -109,7 +109,7 @@
 
 .irrigation-form-fields label small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   font-weight: 500;
   letter-spacing: normal;
   text-transform: none;
@@ -124,7 +124,7 @@
   border-radius: 9px;
   background: var(--sheet);
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .calculation-mode {
@@ -144,7 +144,7 @@
   color: var(--muted);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 700;
   cursor: pointer;
 }
@@ -169,7 +169,7 @@
   flex-direction: column;
   gap: 6px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
 }
 
@@ -190,7 +190,7 @@
   min-width: 48px;
   place-items: center;
   background: var(--sheet);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .irrigation-preview {
@@ -225,7 +225,7 @@
   color: white;
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 500;
   box-shadow: none;
   cursor: pointer;
@@ -243,7 +243,7 @@
   display: block;
   margin-top: 9px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   text-align: center;
 }
 
@@ -257,8 +257,8 @@
 .application-details summary {
   padding-top: 11px;
   color: var(--green-dark);
-  font-size: 11px;
-  font-weight: 800;
+  font-size: var(--text-12);
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -271,7 +271,7 @@
 .application-table-wrap table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 10px;
+  font-size: var(--text-12);
 }
 
 .application-table-wrap th,
@@ -296,5 +296,5 @@
 
 .irrigation-empty-action p {
   margin: 5px 0 0;
-  font-size: 12px;
+  font-size: var(--text-12);
 }

@@ -1,6 +1,7 @@
 'use client';
 import { FARM_TIME_ZONE } from '@/lib/domain/water-management';
 import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
+import { clockText, dateClockText } from '@/lib/domain/clock-text';
 
 /**
  * Les formats de l'écran du planning : heures et dates à la ferme (D-004),
@@ -8,8 +9,6 @@ import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
  * Aucune règle ici.
  */
 const flow = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
-const time = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: FARM_TIME_ZONE });
-const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: FARM_TIME_ZONE });
 const longDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 const shortDay = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
 const weekdayAndDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', timeZone: 'UTC' });
@@ -27,11 +26,11 @@ export function formatFlow(value: number | null) {
 }
 
 export function formatTime(iso: string) {
-  return time.format(new Date(iso));
+  return clockText(iso, FARM_TIME_ZONE);
 }
 
 export function formatDateTime(iso: string) {
-  return dateTime.format(new Date(iso));
+  return dateClockText(iso, FARM_TIME_ZONE);
 }
 
 /** Midi UTC : une date métier ne glisse pas d'un jour selon le fuseau du navigateur. */
