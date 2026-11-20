@@ -23,7 +23,9 @@ export const metadata = pageMetadata('reglages');
  * le lieu de la météo (cases 3, 6, 7, 8, 9), les notifications du téléphone
  * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3) ;
  * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
- * enfin, l'accueil de la ferme (4.4, F581), replié.
+ * l'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil, en tête
+ * de la correspondance des espèces (4.4, F587) ; enfin, l'accueil de la
+ * ferme (4.4, F581), replié.
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
@@ -46,6 +48,7 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         locationHere={waterDashboard !== null}
         plotsHere={plotShelters !== null}
         soilHref={soilStep ? pageHref(soilStep.page, { season: context.season, zone: context.zone }, soilStep.anchor) : null}
+        speciesHere={cropCoefficients?.available === true && cropCoefficients.speciesStep !== null}
       />
     </IrrigationShell>
   );

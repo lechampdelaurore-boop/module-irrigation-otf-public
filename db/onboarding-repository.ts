@@ -1,5 +1,5 @@
 import { db } from './binding';
-import { findWorkspaceIdForUser } from './workspace-repository';
+import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import type { StoredOnboardingStep } from '@/lib/domain/onboarding/steps';
 
 /**
@@ -44,7 +44,7 @@ function parseValue(value: string | null): unknown {
  * change sa commune dans Réglages reste « d'avant l'accueil », sans quoi ses
  * jardins redeviendraient « à classer » et son besoin ne serait plus calculé.
  */
-export function confirmOnboardingStepStatement(workspaceId: string, step: 'location' | 'plots' | 'soil', value: unknown, at: string) {
+export function confirmOnboardingStepStatement(workspaceId: string, step: 'location' | 'plots' | 'soil' | 'crops', value: unknown, at: string) {
   return db.prepare(
     `INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, proposed_value, confirmed_at, updated_at)
      VALUES (?, ?, 'confirmed', 'onboarding', ?, ?, ?)
@@ -64,4 +64,13 @@ export function reopenOnboardingStepStatement(workspaceId: string, step: 'plots'
   return db.prepare(
     `DELETE FROM irrigation_onboarding_steps WHERE workspace_id = ? AND step = ? AND origin = 'onboarding'`,
   ).bind(workspaceId, step);
+}
+
+/**
+ * La personne confirme l'étape « Cultures » d'un geste (F587), avec le compte
+ * des espèces rattachées : celles qui ne le sont pas restent « à rattacher ».
+ */
+export async function confirmSpeciesStepForUser(spaceKey: string, value: { linked: number; total: number }, now = new Date()): Promise<void> {
+  const workspaceId = await ensureWorkspaceForUser(spaceKey);
+  await confirmOnboardingStepStatement(workspaceId, 'crops', value, now.toISOString()).run();
 }

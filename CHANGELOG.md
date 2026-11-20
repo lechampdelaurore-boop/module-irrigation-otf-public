@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4c)
+
+- **« Rattachez vos espèces »** (D-228) : une nouvelle ferme voit, en tête
+  de la correspondance des espèces, une proposition pour chaque espèce que
+  son nom désigne ; elle décoche ce qu'elle ne garde pas et rattache le
+  reste d'un geste, puis confirme l'étape « Cultures ». Le bandeau « À
+  finir » rappelle les espèces à rattacher jusque-là.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4b)
 
 - **D'où viennent les dates de chaque culture** (D-227) : la fiche d'une

@@ -465,6 +465,16 @@ registres, elle y renvoie.
   `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
   `pnpm weather:check`, `pnpm site:check` réussis en local ; six sabotages,
   chacun détecté ; parcours P46 étendu, P17, P20 et P31c rejoués en local.
+  **PR 4c, « Rattachez vos espèces »** (D-228, F587, section 8 bis.15 du
+  contrat) : pour une ferme qui fait l'accueil, une proposition par espèce
+  sans rattachement (modèle du porteur, sinon le nom), cochée, rattachée
+  d'un geste, tout ou rien ; l'étape « Cultures » confirmée d'un geste,
+  avec le compte ; bandeau « N espèces à rattacher » jusque-là ; aucune
+  migration ; modèle vide jusqu'à la relecture du porteur (PR 4d). Contrôles
+  de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`,
+  `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm site:check`
+  réussis en local ; sept sabotages, chacun détecté ; parcours P46 étendu,
+  P29 et P28 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
