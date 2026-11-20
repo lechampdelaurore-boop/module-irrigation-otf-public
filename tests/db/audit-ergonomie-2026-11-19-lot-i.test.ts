@@ -24,6 +24,17 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * telle que le Worker la prépare.
  */
 
+/**
+ * L'heure réelle, figée pour la démonstration : elle se prépare « au jour du
+ * moment, à l'heure réelle de la ferme » (`runOnSimulatedDay`), et le soir,
+ * vers 21 h 30 à Paris, un arrosage du jour passe et change l'eau versée sur
+ * les planches vides (0,33 m³ au lieu de 0,49) : sans cela, ce fichier
+ * échouait chaque soir pendant une heure.
+ */
+const OriginalDate = Date;
+const realClockNow = OriginalDate.now;
+const PINNED_REAL_NOW = OriginalDate.UTC(2026, 10, 18, 10, 30);
+
 let database: TestDatabase;
 const savedDemoMode = process.env.DEMO_MODE;
 beforeEach(() => {
@@ -32,6 +43,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   uninstallSimulatedDate();
+  OriginalDate.now = realClockNow;
   database.dispose();
   if (savedDemoMode === undefined) delete process.env.DEMO_MODE;
   else process.env.DEMO_MODE = savedDemoMode;
@@ -41,6 +53,7 @@ afterEach(() => {
 async function penurie() {
   const choice = resolveDemoChoice('maraichage', 'penurie');
   const owner = demoOwnerUserId('invite-a', choice);
+  OriginalDate.now = () => PINNED_REAL_NOW;
   installSimulatedDate();
   await runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice));
   const plan = (await readLatestPlanForUser(owner, 2026, '2026-07-20'))!;
