@@ -500,6 +500,19 @@ registres, elle y renvoie.
   réimporte pas, l'import rangé si ; un export de la base d'essai dure
   environ 2,5 secondes. À fusionner après la première partie.
 
+- Tranche 4, **4.5, PR 4 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-245, F636 et F637, section 10 bis.16 de
+  `docs/tranche-4-contract.md`). L'essai de restauration entre au registre
+  des tâches : une fois par trimestre, orange à 100 jours sans essai noté,
+  rouge à 120, « jamais réussi » en orange avant le premier ; la veille le
+  surveille. Sa carte, sur la page d'état, porte le geste « J'ai fait
+  l'essai du … », aux mêmes règles que celui de l'export ; les deux gestes
+  sont un seul code (`lib/domain/operations/operator-gesture.ts`), un test
+  liant chaque tâche faite par l'exploitant à son geste. Le jugement
+  d'ensemble compte 7 tâches. Sans migration. Le premier essai réussi (20
+  novembre 2026) se note sur la page une fois cette PR en ligne. À
+  fusionner après la seconde partie.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
