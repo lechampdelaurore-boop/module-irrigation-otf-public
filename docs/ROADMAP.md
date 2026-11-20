@@ -894,13 +894,13 @@ selon la règle de la section 10.
     20 novembre 2026** sur la place de code libre (la 4.4 codée hors accès
     d'OTF), en Opus 5.5 · Très élevé, cinq PR une à la fois, dans l'ordre
     1, 2, 4, 3, 5 (section 10 bis.6 du contrat) ; PR 1 (D-240, F600 à
-    F607) : le registre des tâches attendues (migration 0034), fusion après
+    F607) : le registre des tâches attendues (migration 0037), fusion après
     la chaîne de la 4.4 et le lot K ; PR 2, première partie (D-241, F608 à
     F613) : la veille de 9 h et la page « État du module » (migration
-    0035, parcours P50), fusion après la PR 1 ; PR 2, seconde partie
+    0038, parcours P50), fusion après la PR 1 ; PR 2, seconde partie
     (D-242, F614 à F618) : chaque ferme sur la page d'état, les appels à
     OTF comptés par ferme et par heure, le garde des journaux dans les
-    essais (migration 0036), fusion après la première partie ; PR 4,
+    essais (migration 0039), fusion après la première partie ; PR 4,
     première partie (D-243, F620 à F626) : l'export hebdomadaire chiffré,
     reçu en mémoire, contrôlé et relu (`pnpm backup:export`,
     `pnpm backup:verify`, `docs/exploitation.md`), la tâche « Export hors
