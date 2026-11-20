@@ -8,6 +8,7 @@ import { UnavailableState } from '../shell/unavailable-state';
 import { WaterManagementDashboard } from '../water-management-dashboard';
 import { FeatureSettings } from './feature-settings';
 import { NotificationSettings } from './notification-settings';
+import { OnboardingSettings } from './onboarding-settings';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
 
@@ -18,12 +19,13 @@ export const metadata = pageMetadata('reglages');
  * La page « Réglages » (3.8, docs/feature-selection-contract.md, section 3) :
  * la liste des cases, toujours, puis le socle que les cases cochées demandent :
  * le lieu de la météo (cases 3, 6, 7, 8, 9), les notifications du téléphone
- * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3).
+ * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3) ;
+ * enfin, l'accueil de la ferme (4.4, F581), replié.
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, waterDashboard, cropCoefficients } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients } = await loadReglagesPage(context);
   context.logLoaded();
   return (
     <IrrigationShell {...context.shell}>
@@ -33,6 +35,7 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
+      <OnboardingSettings onboarding={onboarding} />
     </IrrigationShell>
   );
 }

@@ -359,6 +359,34 @@ registres, elle y renvoie.
   ferme). Contrôles : documentation seule.
   Consigne aussi le déploiement de la 4.3 PR 2 (coffre des jetons, #96, D-163) :
   en ligne le 19 novembre 2026 à 8 h 17, run 44475742993, cinq jobs verts.
+  **Code commencé le 20 novembre 2026**, sur le « vas-y » du porteur
+  (7 h 52), en Opus 5.5 · Élevé (ligne 4.4 de la roadmap). **PR 1 sur 5,
+  l'état de l'accueil et le marquage de l'espace existant** (D-222, F581,
+  section 8 bis.9 du contrat) : une table `irrigation_onboarding_steps`
+  (migration additive 0034, le numéro libre : les migrations se suivent
+  sans trou, la 4.3 PR 3 prendra le suivant), une ligne par espace et par
+  étape confirmée (commune, parcelles et abris, sol, cultures, réglages à
+  relire) ; une étape sans ligne est « à faire ». La migration marque
+  chaque espace existant « accueil fait avant la 4.4 », cinq étapes
+  confirmées d'origine « avant l'accueil », sans toucher aucune autre
+  table : essai sur une copie (une ferme de la démonstration complète et un
+  espace rattaché, chaque ligne des autres tables identique après la
+  0034). Réglages montre l'accueil replié en bas de page, étape par étape,
+  en couleur et en mots ; la démonstration n'en a pas. **La bascule des
+  défauts en « à renseigner » et le bandeau « À finir » passent aux PR des
+  étapes qui permettent de les remplir** (PR 2 à 5), pour ne jamais montrer
+  un message que la personne ne peut pas suivre ; aucune ferme neuve
+  n'existe en production avant le pilote (F366). Aucun chiffre ne change à
+  l'écran pour l'espace existant. Contrôles de la PR : `pnpm lint`, `pnpm
+  typecheck`, `pnpm test` (1 828 tests, puis 441 pour chacun des trois
+  passages d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check`
+  (43 tests), `pnpm weather:check`, `pnpm site:check` réussis en local ;
+  sept sabotages des règles, chacun détecté ; P46 (nouveau), P40 et P22
+  joués en local aux deux largeurs, réussis (Réglages reste sous son budget
+  de 3 400 px au téléphone) ; la suite complète des parcours jouée par la CI
+  de la PR (longs essais sur GitHub). Non vérifié : le marquage sur la base réelle (aucun
+  accès à la base de production ni à Cloudflare depuis la session de
+  code) ; il sera lu dans Réglages après le déploiement.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

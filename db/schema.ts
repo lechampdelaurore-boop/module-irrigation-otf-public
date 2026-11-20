@@ -2174,3 +2174,29 @@ export const featureSelections = sqliteTable(
     check('chk_feature_selection_known', sql`json_valid(${table.knownFeatures}) AND json_type(${table.knownFeatures}) = 'array'`),
   ],
 );
+
+/**
+ * L'état de l'accueil d'une ferme (4.4, docs/tranche-4-contract.md, F417,
+ * F426, F581) : une ligne par espace et par étape que la personne confirme.
+ */
+export const onboardingSteps = sqliteTable(
+  'irrigation_onboarding_steps',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    step: text('step').notNull(),
+    state: text('state').notNull(),
+    origin: text('origin').notNull(),
+    proposedValue: text('proposed_value'),
+    confirmedAt: text('confirmed_at'),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.step] }),
+    check('chk_onboarding_step', sql`${table.step} IN ('location', 'plots', 'soil', 'crops', 'settings')`),
+    check('chk_onboarding_state', sql`${table.state} IN ('todo', 'proposed', 'confirmed', 'skipped')`),
+    check('chk_onboarding_origin', sql`${table.origin} IN ('onboarding', 'before-onboarding')`),
+    check('chk_onboarding_confirmed_at', sql`(${table.state} = 'confirmed') = (${table.confirmedAt} IS NOT NULL)`),
+    check('chk_onboarding_before', sql`${table.origin} = 'onboarding' OR ${table.state} = 'confirmed'`),
+    check('chk_onboarding_proposed_value', sql`${table.proposedValue} IS NULL OR json_valid(${table.proposedValue})`),
+  ],
+);

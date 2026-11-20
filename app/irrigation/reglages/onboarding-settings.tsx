@@ -1,0 +1,40 @@
+'use client';
+
+import { onboardingExplanation, onboardingSummary, verificationLine, type ResolvedOnboarding } from '@/lib/domain/onboarding/steps';
+
+const TONE_WORDS = { confirmed: 'Confirmé', skipped: 'Passé', missing: 'À faire' } as const;
+
+/**
+ * L'accueil de la ferme, dans Réglages (4.4, docs/tranche-4-contract.md,
+ * F417, F426, F427 ; PR 1, F581) : chaque étape, son état et d'où vient ce
+ * qui est en place. Une ferme d'avant l'accueil y lit que ses réglages sont
+ * gardés tels quels ; une ferme neuve, ce qui lui reste à faire. Fermé par
+ * défaut, en bas de la page ; rien ne s'y règle encore. Absent de la
+ * démonstration, dont les fermes fictives sont déjà réglées.
+ */
+export function OnboardingSettings({ onboarding }: { onboarding: ResolvedOnboarding }) {
+  if (onboarding.kind === 'demonstration') return null;
+  const lines = onboarding.steps.map(verificationLine);
+  return (
+    <section className="water-management-section onboarding-settings" aria-labelledby="accueil-de-la-ferme">
+      <details className="water-panel water-fold">
+        <summary>
+          <h2 id="accueil-de-la-ferme">Accueil de la ferme</h2>
+          <small>{onboardingSummary(onboarding)}</small>
+        </summary>
+        <div className="water-fold-body">
+          <p>{onboardingExplanation(onboarding)}</p>
+          <ol className="onboarding-steps">
+            {lines.map((line) => (
+              <li key={line.id} className={`onboarding-step onboarding-step-${line.tone}`}>
+                <strong>{line.label}</strong>
+                <span className="onboarding-step-state">{TONE_WORDS[line.tone]}</span>
+                <span>{line.text}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </details>
+    </section>
+  );
+}

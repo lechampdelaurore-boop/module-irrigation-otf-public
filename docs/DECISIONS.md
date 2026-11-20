@@ -6511,3 +6511,34 @@ valeur agronomique.
 
 Ne change pas : le moteur hydrique, le calcul, les coûts (aucune dépense
 nouvelle).
+
+## D-222 — Tranche 4, sous-tranche 4.4, PR 1 : l'état de l'accueil et le marquage de l'espace existant
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le code de la 4.4 commence sur le « vas-y » du porteur du
+20 novembre 2026 (7 h 52), en Opus 5.5 · Élevé (ligne 4.4 de la roadmap).
+La section 8 bis.5 du contrat met dans la PR 1 l'état de l'accueil, le
+marquage de l'espace existant, le bandeau « À finir » et la bascule des
+défauts en « à renseigner » pour un espace neuf. Les écrans qui permettent
+de remplir ces valeurs n'arrivent qu'avec les PR 2 à 5.
+
+**Décision** (F581, section 8 bis.9 du contrat).
+
+1. L'état de l'accueil vit dans `irrigation_onboarding_steps`
+   (migration 0034) : une ligne par espace et par étape confirmée par la
+   personne ; une étape sans ligne est « à faire ».
+2. La migration marque chaque espace existant « accueil fait avant la
+   4.4 », cinq étapes confirmées d'origine « avant l'accueil », sans
+   toucher aucune autre table ; essai sur une copie.
+3. La migration prend le numéro 0034 : le test des migrations interdit les
+   trous ; la 4.3, PR 3 prendra le numéro libre.
+4. Réglages montre l'accueil, replié, étape par étape ; la démonstration
+   n'en a pas.
+5. La bascule de chaque défaut et le bandeau « À finir » passent à la PR
+   de l'étape qui permet de les remplir, pour ne jamais montrer un message
+   que la personne ne peut pas suivre (section 8 bis.3). Aucune ferme neuve
+   n'existe en production avant le pilote (F366).
+
+Ne change pas : aucun chiffre de l'espace existant, aucun calcul, aucun
+appel à OTF, aucune valeur agronomique. Aucune question de budget.
