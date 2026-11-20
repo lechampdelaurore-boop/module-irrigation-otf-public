@@ -1,3 +1,4 @@
+import type { IrrigationPageId } from '../features/pages.ts';
 import { FARM_TIME_ZONE } from '../water-management.ts';
 
 /**
@@ -138,6 +139,14 @@ function chosenLocationText(value: unknown): string | null {
   return null;
 }
 
+/** Le nombre de parcelles dont le sol est saisi, gardé à la confirmation de l'étape (F584). */
+function enteredSoilText(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null;
+  const { parcels } = value as { parcels?: unknown };
+  if (typeof parcels !== 'number' || parcels < 1) return null;
+  return `sol de ${parcels} parcelle${parcels > 1 ? 's' : ''} saisi`;
+}
+
 /** Le compte des jardins classés, gardé à la confirmation de l'étape (F583). */
 function classifiedPlotsText(value: unknown): string | null {
   if (!value || typeof value !== 'object') return null;
@@ -157,6 +166,13 @@ export function locationConfirmed(resolved: ResolvedOnboarding): boolean {
   return resolved.steps.some((step) => step.id === 'location' && step.state === 'confirmed');
 }
 
+/** Ce qu'une étape confirmée à l'accueil dit de ce qui a été confirmé. */
+const CONFIRMED_DETAIL: Partial<Record<OnboardingStepId, (value: unknown) => string | null>> = {
+  location: chosenLocationText,
+  plots: classifiedPlotsText,
+  soil: enteredSoilText,
+};
+
 /**
  * La ligne de vérification d'une étape (F427) : ce qui a été confirmé et
  * d'où cela vient, ce qui a été passé et ce que cela laisse de côté, ce qui
@@ -168,7 +184,7 @@ export function verificationLine(step: OnboardingStep): VerificationLine {
     case 'confirmed': {
       if (step.origin === 'before-onboarding') return { ...base, tone: 'confirmed', text: 'Réglage d’avant l’accueil, gardé tel quel.' };
       const when = step.confirmedAt ? `Confirmé le ${dateFormat.format(new Date(step.confirmedAt))}` : 'Confirmé';
-      const detail = step.id === 'location' ? chosenLocationText(step.proposedValue) : step.id === 'plots' ? classifiedPlotsText(step.proposedValue) : null;
+      const detail = CONFIRMED_DETAIL[step.id]?.(step.proposedValue) ?? null;
       return { ...base, tone: 'confirmed', text: detail ? `${when} : ${detail}.` : `${when}.` };
     }
     case 'skipped':
@@ -197,8 +213,8 @@ export function onboardingExplanation(resolved: Exclude<ResolvedOnboarding, { ki
   return 'Les écrans de l’accueil arrivent avec les prochaines versions du module ; rien n’est confirmé à votre place.';
 }
 
-/** Une étape à finir, dite sur chaque page (section 8 bis.3) : son nom court, et l'ancre de Réglages où la faire. */
-export type UnfinishedStep = { id: OnboardingStepId; text: string; anchor: string };
+/** Une étape à finir, dite sur chaque page (section 8 bis.3) : son nom court, la page et l'ancre où la faire. */
+export type UnfinishedStep = { id: OnboardingStepId; text: string; page: IrrigationPageId; anchor: string };
 
 /**
  * Ce que le bandeau « À finir » nomme (section 8 bis.3, F582) : seulement
@@ -206,22 +222,31 @@ export type UnfinishedStep = { id: OnboardingStepId; text: string; anchor: strin
  * cochée a besoin. La 4.4 l'étend étape par étape, avec l'écran de chacune
  * (F581) : la commune de la ferme (PR 2a), pour les cases qui lisent la
  * météo ; les jardins à classer (PR 2b), pour les cases qui calculent un
- * besoin. Une étape passée n'est pas rappelée : elle est dite à la
- * vérification (F427).
+ * besoin ; le sol des parcelles (PR 3), pour la réserve du sol. Une étape
+ * passée n'est pas rappelée : elle est dite à la vérification (F427).
  */
 export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
   weather: boolean;
   /** Les jardins de la saison encore à classer, quand une case calcule un besoin (F583) ; 0 sinon. */
   plotsToClassify: number;
+  /** Les parcelles de la saison sans sol, quand la réserve du sol est cochée (F584), et l'ancre de la première ; `null` sinon. */
+  soilToEnter?: { parcels: number; anchor: string } | null;
 }): UnfinishedStep[] {
   if (resolved.kind !== 'onboarding') return [];
   const remaining = new Set(resolved.remaining.map((step) => step.id));
   const unfinished: UnfinishedStep[] = [];
-  if (needs.weather && remaining.has('location')) unfinished.push({ id: 'location', text: 'commune de la ferme', anchor: 'water-weather-title' });
+  if (needs.weather && remaining.has('location')) {
+    unfinished.push({ id: 'location', text: 'commune de la ferme', page: 'reglages', anchor: 'water-weather-title' });
+  }
   // Un jardin apparu dans Ouvre ta ferme après la confirmation de l'étape est à classer lui aussi : le compte suit le plan.
   if (needs.plotsToClassify > 0) {
     const count = needs.plotsToClassify;
-    unfinished.push({ id: 'plots', text: `${count} jardin${count > 1 ? 's' : ''} à classer`, anchor: 'parcelles-et-abris' });
+    unfinished.push({ id: 'plots', text: `${count} jardin${count > 1 ? 's' : ''} à classer`, page: 'reglages', anchor: 'parcelles-et-abris' });
+  }
+  // Comme les jardins : une parcelle apparue après la confirmation de l'étape a besoin de son sol, et le bandeau la nomme.
+  const soil = needs.soilToEnter;
+  if (soil && soil.parcels > 0) {
+    unfinished.push({ id: 'soil', text: `sol de ${soil.parcels} parcelle${soil.parcels > 1 ? 's' : ''}`, page: 'sol', anchor: soil.anchor });
   }
   return unfinished;
 }

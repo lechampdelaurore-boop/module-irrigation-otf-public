@@ -388,7 +388,7 @@ registres, elle y renvoie.
   accès à la base de production ni à Cloudflare depuis la session de
   code) ; il sera lu dans Réglages après le déploiement.
   **PR 2a, la commune de la ferme** (D-223, F582, section 8 bis.10 du
-  contrat) : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
+  contrat), **en ligne le 20 novembre 2026 à 16 h 40 (#127, fusionnée à 16 h 14, run 44761350240 vérifié job par job : les cinq jobs verts)** : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
   abris ; 2c la proposition par `placeLngLat`, à l'accès d'OTF). Une ferme
   neuve n'a plus le siège de sa structure pour commune en silence : sans
   commune confirmée, ni météo, ni gel, ni ET0, la page le dit, et un
@@ -423,6 +423,25 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; sept sabotages, chacun détecté ;
   P46 (étendu), P28, P29, P31, P31b, P33 joués en local aux deux largeurs,
   réussis ; la suite complète par la CI de la PR.
+  **PR 3, le sol** (D-225, F584, section 8 bis.12 du contrat) : pour une
+  ferme qui fait l'accueil, le formulaire du sol d'une parcelle n'a plus
+  TEW 14 / REW 7 préremplis ; la texture, parmi les neuf du tableau 19 de
+  la FAO-56, propose TEW et REW au milieu de leur fourchette, dite à côté
+  avec sa source, à ajuster (valeurs relues sur la page de la FAO et
+  recoupées par ses exemples 31 et 35) ; la texture est gardée avec la saisie (colonne
+  `texture`, migration additive 0036, nulle avant) ; l'étape « Sol » est
+  confirmée par le sol de la dernière parcelle ; bandeau « À finir : sol de
+  N parcelles », vers « Réserve du sol ». Les fermes d'avant l'accueil et
+  la démonstration gardent leurs valeurs de départ. Garde ajoutée à la
+  PR 2a : une étape d'avant l'accueil n'est jamais réécrite (changer de
+  commune ne fait pas rentrer une ferme existante dans l'accueil). La
+  texture d'OTF attend l'accès d'OTF (3b). Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (1 862 tests, puis 465 pour chacun des
+  trois passages d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; quatre
+  sabotages, chacun détecté ; P46 (étendu), P18, P19, P29, P31b, P33 joués
+  en local aux deux largeurs, réussis (14 sur 14) ; la suite complète par
+  la CI de la PR.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

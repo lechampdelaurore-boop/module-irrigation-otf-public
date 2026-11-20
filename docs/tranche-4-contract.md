@@ -1396,6 +1396,35 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **Preuves.** Test « ferme neuve », défaut n° 21 : chaque jardin d'un espace neuf est à classer, le tunnel d'OTF compris (`tests/db/plot-shelters.test.ts`) ; l'espace d'avant l'accueil garde le classement d'OTF sans une ligne ; reprise d'une étape à moitié faite ; « je ne sais pas » rouvre l'étape ; isolation Alice et Bob, aux trois passages ; besoin, réserve du sol et besoin par culture non calculés pour un jardin à classer (`tests/irrigation-needs.test.ts`, `tests/db/soil-reserve-view.test.ts`, `tests/db/crop-water-bed-sheet.test.ts`) ; la migration 0034 laisse la 0035 vide. Sept sabotages, chacun détecté. Parcours : P46 étendu (une réponse corrigée, les autres confirmées d'un geste, l'étape confirmée avec son compte) ; P28, P29, P31, P31b et P33 préparent leur ferme neuve (commune et jardins) par le bandeau.
 
 
+#### 8 bis.12 · Précisions du code de la PR 3 (20 novembre 2026, D-225, F584)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F584 · Le sol : la texture choisie propose TEW et REW, jamais le limon sableux en silence
+
+- **Ce que le code montrait** (défaut n° 4). `SOIL_DEFAULTS` (part de référence 2/3, TEW 14 mm, REW 7 mm, Ze 10 cm) ne sert qu'à **préremplir** le formulaire du sol d'une parcelle qui n'en a pas (`fieldsOf`, `app/irrigation/soil-reserve/soil-settings.tsx`) ; aucun calcul ne le lit seul : sans saisie, la réserve d'une parcelle est déjà inconnue (D-003), et l'écran le dit. Le défaut silencieux est donc celui du formulaire : une ferme neuve qui saisissait sa RFU enregistrait, sans le voir, l'eau évaporable d'un limon sableux. À noter pour le porteur : TEW 14 / REW 7 ne sont pas le milieu du limon sableux du tableau 19 (17,5 / 8), plutôt d'un sable limoneux ; sa ferme les garde (F426).
+- **La PR 3 en deux.** 3a (celle-ci) : la liste des textures de la FAO-56 et l'étape « Sol », sans appel à OTF ; 3b, la texture d'OTF (`System.soil`) proposée « proche de » sa classe (F428, réponse 2), à l'accès d'OTF, avec la PR 2c (même appel, même contrat de route).
+- **Le tableau 19** (`lib/domain/soil-reserve/texture.ts`) : neuf classes de texture, chacune avec ses fourchettes de REW et de TEW (Ze = 0,10 m) ; TEW et REW proposés au **milieu** de la fourchette, arrondi au demi-millimètre, la fourchette entière dite à côté avec sa source : « FAO-56, tableau 19, pour Ze = 10 cm : TEW de 15 à 20 mm, REW de 6 à 10 mm ; le milieu est proposé, à ajuster. » (F428, réponse 1). **Source** : FAO-56, chapitre 7, tableau 19 (https://www.fao.org/4/x0490e/x0490e0c.htm), relu le 20 novembre 2026 par deux lectures séparées de la page, qui donnent les mêmes fourchettes, et recoupé par les exemples 31 (terre franche : TEW ≈ 20 mm, REW ≈ 9 mm) et 35 (limon sableux : REW ≈ 8 mm) du même chapitre. Le porteur a confié cette relecture au module (19 novembre 2026 : « relis-le toi-même et publie directement »). Les noms français sont du module (« Terre franche » pour *loam*, « Limon » pour *silt loam*…), la classe de la FAO toujours écrite entre parenthèses pour qu'aucune traduction ne trompe.
+
+  | Texture | REW (mm) | TEW (mm) | Proposé (TEW / REW) |
+  | --- | --- | --- | --- |
+  | Sable (sand) | 2 à 7 | 6 à 12 | 9 / 4,5 |
+  | Sable limoneux (loamy sand) | 4 à 8 | 9 à 14 | 11,5 / 6 |
+  | Limon sableux (sandy loam) | 6 à 10 | 15 à 20 | 17,5 / 8 |
+  | Terre franche (loam) | 8 à 10 | 16 à 22 | 19 / 9 |
+  | Limon (silt loam) | 8 à 11 | 18 à 25 | 21,5 / 9,5 |
+  | Limon pur (silt) | 8 à 11 | 22 à 26 | 24 / 9,5 |
+  | Limon argileux (silty clay loam) | 8 à 11 | 22 à 27 | 24,5 / 9,5 |
+  | Argile limoneuse (silty clay) | 8 à 12 | 22 à 28 | 25 / 10 |
+  | Argile (clay) | 8 à 12 | 22 à 29 | 25,5 / 10 |
+
+- **Le formulaire.** Pour un espace qui fait l'accueil, une parcelle sans sol n'a **ni TEW ni REW** préremplis : le bouton d'enregistrement reste indisponible tant que la personne n'a ni choisi une texture ni tapé ses valeurs. La part de référence 2/3 (CRIIAM) et Ze 10 cm (FAO-56) restent préremplies, dites « proposées, à ajuster » (réponse Q11). Une liste « Texture du sol » paraît dans chaque formulaire du sol, pour toute ferme : choisir une texture remplit TEW et REW au milieu de leur fourchette, que la personne ajuste ; « non dite » laisse ses propres valeurs. Un espace d'avant l'accueil garde ses valeurs de départ d'avant, TEW 14 / REW 7 (F426), comme la démonstration.
+- **La texture gardée** (colonne `texture` de `irrigation_soil_records`, migration additive 0036, nulle pour toute saisie d'avant) : elle dit d'où viennent TEW et REW (« texture limon sableux (sandy loam) (FAO-56, tableau 19) » dans la ligne du sol) ; aucun calcul ne la lit, qui lit TEW et REW tels qu'enregistrés. La 4.3, PR 3 prendra le numéro libre suivant.
+- **L'étape « Sol ».** Confirmée dans le même lot que la saisie qui donne son sol à la **dernière parcelle** de la saison qui n'en avait pas (la valeur propre d'un jardin ne fait pas le sol de sa parcelle), avec leur nombre : « Confirmé le … : sol de 3 parcelles saisi. ». Une saisie n'étant jamais effacée (D-006), l'étape ne se rouvre pas ; une parcelle apparue dans OTF après coup est nommée par le bandeau, comme un jardin à classer. Une étape d'avant l'accueil n'est jamais réécrite (F426, même garde que F582).
+- **Le bandeau.** « À finir : … sol de 3 parcelles. », quand la réserve du sol est cochée (`sol`), pour un espace qui fait l'accueil ; le lien mène à la page « Réserve du sol », sur la première parcelle sans sol, réglages du sol et formulaire ouverts. L'accueil replié de Réglages porte « Saisir le sol », vers le même endroit. Le sol des parcelles n'est lu, pour le bandeau, que pour un espace qui fait l'accueil.
+- **Ce que la PR ne fait pas.** Aucune RFU proposée par texture (la RFU reste saisie, d'une analyse ou d'une estimation) ; Ze n'est pas relié à TEW (le tableau vaut pour Ze = 10 cm, la phrase le dit) ; le plafond de sol d'un espace neuf reste vide, comme avant ; aucun appel nouveau à OTF ; aucune question de budget.
+- **Preuves.** Test « ferme neuve », défaut n° 4 : un espace neuf n'a ni TEW ni REW de départ, le bandeau nomme le sol de ses parcelles (`tests/db/onboarding-soil.test.ts`) ; les neuf milieux du tableau ; l'espace d'avant l'accueil et la démonstration gardent TEW 14 / REW 7 ; l'étape confirmée par le sol de la dernière parcelle, pas par la valeur d'un jardin ; la texture gardée et relue ; une texture inconnue refusée ; un espace d'avant l'accueil qui saisit un sol le reste ; isolation Alice et Bob, aux trois passages. Quatre sabotages, chacun détecté. Parcours : P46 étendu (l'étape « Saisir le sol », TEW et REW vides, la texture qui les propose, l'étape confirmée) ; P29 garde le bandeau du sol ; P31b et P33 choisissent une texture pour saisir leur sol.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :

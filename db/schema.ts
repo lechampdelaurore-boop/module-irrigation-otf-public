@@ -1905,6 +1905,7 @@ export const soilRecords = sqliteTable(
     rewMm: real('rew_mm').notNull(),
     surfaceLayerCm: real('surface_layer_cm').notNull(),
     soilDepthCeilingM: real('soil_depth_ceiling_m'),
+    texture: text('texture', { enum: ['sand', 'loamy-sand', 'sandy-loam', 'loam', 'silt-loam', 'silt', 'silty-clay-loam', 'silty-clay', 'clay'] }),
     effectiveFrom: text('effective_from').notNull(),
     recordedAt: text('recorded_at').notNull(),
     actorUserId: text('actor_user_id'),
@@ -1914,6 +1915,7 @@ export const soilRecords = sqliteTable(
     check('chk_soil_record_rfu', sql`${table.labRfuMmPerMeter} > 0`),
     check('chk_soil_record_reference_share', sql`${table.referenceShare} > 0 AND ${table.referenceShare} < 1`),
     check('chk_soil_record_date', sql`${table.effectiveFrom} ${DATE_GLOB}`),
+    check('chk_soil_record_texture', sql`${table.texture} IS NULL OR ${table.texture} IN ('sand', 'loamy-sand', 'sandy-loam', 'loam', 'silt-loam', 'silt', 'silty-clay-loam', 'silty-clay', 'clay')`),
   ],
 );
 

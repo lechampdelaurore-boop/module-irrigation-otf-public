@@ -92,14 +92,16 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await attendreLaPagePrete(page, 'aujourdhui');
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
-  // Une ferme neuve dit ce qui lui manque : la commune et ses jardins, avant la météo, le gel et les besoins (4.4, F582, F583).
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer.');
+  // Une ferme neuve dit ce qui lui manque : la commune, ses jardins et le sol de ses parcelles, avant la météo, le gel,
+  // les besoins et la réserve du sol (4.4, F582, F583, F584).
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles.');
   await preparerLaFermeNeuve(page);
   // `/irrigation` seule y mène aussi (F31).
   await page.goto('/irrigation');
   await attendreLaPagePrete(page, 'aujourdhui');
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
-  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
+  // Le sol reste à saisir : ce parcours le laisse vide, pour le lien « Renseigner la réserve de la parcelle » plus bas.
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : sol de 3 parcelles.');
   await verifierLEtape(page, journal, 'arrivée sur « Aujourd’hui »');
 
   // Les six blocs, dans l'ordre ; les blocs sans rien à dire le disent en une phrase (F3).

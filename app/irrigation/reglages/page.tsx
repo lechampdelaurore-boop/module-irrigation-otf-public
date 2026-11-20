@@ -1,5 +1,6 @@
 import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
+import { pageHref } from '@/lib/domain/features/pages';
 import { CropCoefficientsPanel } from '../crop-water/crop-coefficients-panel';
 import { loadPageContext, type IrrigationSearchParams } from '../page-context';
 import { loadReglagesPage } from '../page-loaders';
@@ -29,6 +30,8 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters } = await loadReglagesPage(context);
   context.logLoaded();
+  // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
+  const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
   return (
     <IrrigationShell {...context.shell}>
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
@@ -38,7 +41,12 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
       {plotShelters ? <PlotShelterSettings season={context.season} initialLines={plotShelters} /> : null}
-      <OnboardingSettings onboarding={onboarding} locationHere={waterDashboard !== null} plotsHere={plotShelters !== null} />
+      <OnboardingSettings
+        onboarding={onboarding}
+        locationHere={waterDashboard !== null}
+        plotsHere={plotShelters !== null}
+        soilHref={soilStep ? pageHref(soilStep.page, { season: context.season, zone: context.zone }, soilStep.anchor) : null}
+      />
     </IrrigationShell>
   );
 }

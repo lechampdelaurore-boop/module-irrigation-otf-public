@@ -139,6 +139,8 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
   await expect(async () => {
     await rfu.fill('');
     await rfu.fill('62');
+    // Une ferme neuve n'a ni TEW ni REW préremplis : la texture les propose (4.4, F584).
+    await sol.getByRole('group', { name: 'Enregistrer le sol de la parcelle' }).getByLabel('Texture du sol').selectOption('sandy-loam');
     await expect(enregistrerLeSol).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   await enregistrerLeSol.click();

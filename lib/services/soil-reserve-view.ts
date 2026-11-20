@@ -17,6 +17,8 @@ import { weatherLocationKey } from '../domain/weather/location';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
 import { cropWaterBedInput, et0Readings } from './crop-water-week';
 import { readWeatherPreference } from './weather-preference';
+import { soilStartingValues } from '../domain/onboarding/soil';
+import { getOnboardingForUser } from './onboarding-service';
 
 /**
  * Le bloc « Réserve du sol » de la section « Planning de la semaine »
@@ -53,9 +55,10 @@ export async function getSoilReserveViewForUser(input: {
 }): Promise<SoilReserveView> {
   const now = input.now ?? new Date();
   const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
-  const workspaceId = await findWorkspaceIdForUser(input.ownerUserId);
+  const [workspaceId, onboarding] = await Promise.all([findWorkspaceIdForUser(input.ownerUserId), getOnboardingForUser(input.ownerUserId)]);
   const inputs = workspaceId === null ? null : await readSoilReserveInputsForWorkspace(workspaceId, addDaysToDateKey(today, -OBSERVATION_LOOKBACK_DAYS));
   const settings = soilSettingsView({
+    starting: soilStartingValues(onboarding),
     zones: input.snapshot.zones,
     plots: input.snapshot.plots,
     season: input.season,

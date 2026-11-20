@@ -29,6 +29,9 @@ import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
 import { usesPlotShelters, usesWeather } from '@/lib/domain/features/socle';
 import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
 import { getOnboardingForUser } from '@/lib/services/onboarding-service';
+import { listZonesWithSoilForUser } from '@/db/soil-reserve/entries';
+import { parcelsWithoutSoil } from '@/lib/domain/onboarding/soil';
+import { soilParcelAnchor } from '@/lib/domain/today/reliability';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
 
@@ -125,6 +128,10 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     };
   }
   const snapshot = loaded.snapshot;
+  // Le sol des parcelles ne se lit que pour un espace qui fait l'accueil et a coché la réserve du sol (F584).
+  const withoutSoil = onboarding.kind === 'onboarding' && enabled.includes('sol')
+    ? parcelsWithoutSoil(snapshot.zones, season, new Set(await listZonesWithSoilForUser(user.userId)))
+    : [];
   return {
     kind: 'ready',
     page,
@@ -156,6 +163,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       unfinished: unfinishedSteps(onboarding, {
         weather: usesWeather(enabled),
         plotsToClassify: usesPlotShelters(enabled) ? unclassifiedPlots(snapshot, season).length : 0,
+        soilToEnter: withoutSoil.length > 0 ? { parcels: withoutSoil.length, anchor: soilParcelAnchor(withoutSoil[0]) } : null,
       }),
     },
     lap: (step) => stopwatch.lap(step),
