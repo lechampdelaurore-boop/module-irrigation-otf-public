@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from '@playwright/test';
-import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
@@ -45,6 +45,7 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot3-gestes');
+  await preparerLaFermeNeuve(page);
 
   // Cas 8 : les espèces à rattacher, comptées, en tête ; la recherche par nom.
   await attendreLaPageIrrigation(page, 'reglages');
@@ -138,6 +139,8 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
   await expect(async () => {
     await rfu.fill('');
     await rfu.fill('62');
+    // Une ferme neuve n'a ni TEW ni REW préremplis : la texture les propose (4.4, F584).
+    await sol.getByRole('group', { name: 'Enregistrer le sol de la parcelle' }).getByLabel('Texture du sol').selectOption('sandy-loam');
     await expect(enregistrerLeSol).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   await enregistrerLeSol.click();

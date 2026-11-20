@@ -8,7 +8,7 @@ import {
   automaticWeatherRequestRanges,
   oldestWeatherReadingInUse,
 } from '../lib/domain/weather/cache-policy.ts';
-import { locationKeyForCandidate, weatherLocationKey } from '../lib/domain/weather/location.ts';
+import { locationKeyForCandidate, outsidePilotArea, weatherLocationKey } from '../lib/domain/weather/location.ts';
 
 const structure = {
   id: '17', name: 'Ferme', legalCity: 'Saint-Aubin',
@@ -17,8 +17,26 @@ const structure = {
 
 test('la commune du siège OTF est la référence par défaut sans être recopiée', () => {
   assert.equal(weatherLocationKey({
-    locationMode: 'otf', customCity: null, customPostcode: null,
+    locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: true,
   }, structure), 'otf:saint-aubin:03160');
+});
+
+test('une commune que la personne n’a pas confirmée ne donne aucune météo (4.4, F419)', () => {
+  assert.equal(weatherLocationKey({
+    locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: false,
+  }, structure), null);
+  assert.equal(weatherLocationKey({
+    locationMode: 'custom', customCity: 'Tronget', customPostcode: '03240', locationConfirmed: false,
+  }, structure), null);
+});
+
+test('une commune hors de la France métropolitaine est hors du pilote (4.4, F419)', () => {
+  const base = { displayName: 'x', city: 'x', latitude: 0, longitude: 0, timezone: 'Europe/Paris' };
+  assert.equal(outsidePilotArea({ ...base, postcode: '03240', countryCode: 'FR' }), false);
+  assert.equal(outsidePilotArea({ ...base, postcode: '20000', countryCode: 'FR' }), false);
+  assert.equal(outsidePilotArea({ ...base, postcode: '97400', countryCode: 'FR' }), true);
+  assert.equal(outsidePilotArea({ ...base, postcode: '98800', countryCode: 'FR' }), true);
+  assert.equal(outsidePilotArea({ ...base, postcode: '1000', countryCode: 'BE' }), true);
 });
 
 test('une commune personnalisée possède une clé distincte et le retour OTF est déterministe', () => {
@@ -28,7 +46,7 @@ test('une commune personnalisée possède une clé distincte et le retour OTF es
   };
   assert.equal(locationKeyForCandidate(candidate), 'custom:tronget:03240');
   assert.equal(weatherLocationKey({
-    locationMode: 'custom', customCity: 'Tronget', customPostcode: '03240',
+    locationMode: 'custom', customCity: 'Tronget', customPostcode: '03240', locationConfirmed: true,
   }, structure), 'custom:tronget:03240');
 });
 
