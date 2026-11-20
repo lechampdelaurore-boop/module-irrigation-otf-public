@@ -339,7 +339,8 @@
   }
 }
 
-@media (max-width: 600px) {
+/* Jusqu'à 980 px : la tablette a la barre du téléphone (lot K, n° 24, F481). */
+@media (max-width: 980px) {
   .phone-bar a {
     position: relative;
   }
