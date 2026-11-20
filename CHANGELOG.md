@@ -151,6 +151,14 @@ source détaillée commit par commit.
   registre. Rien ne change à l'écran : la page d'état et la veille de
   l'exploitant viennent avec la PR 2. Migration 0034, additive.
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 6 sur 7)
+
+- **Rayons et couleurs de la charte** (D-195) : les angles arrondis
+  reviennent aux trois rayons de la charte (les blocs, les boutons et les
+  champs, les entrées de menu et les petites pièces) ; les cercles et les
+  pastilles restent ronds ; les deux couleurs de texte hors palette du menu
+  et de la frise de pénurie reprennent le texte et le gris de la charte.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 5 sur 7)
 
 - **Une échelle de tailles de texte, rien sous 12 px** (D-194) : six

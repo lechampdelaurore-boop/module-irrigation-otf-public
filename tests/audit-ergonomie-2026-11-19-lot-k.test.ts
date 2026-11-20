@@ -186,3 +186,17 @@ test('n° 19, F478 : la pastille chiffrée du plan dit ce qu’elle compte', () 
   assert.match(card, /mm par heure d’arrosage/);
   assert.match(card, /className="plot-coverage-legend"/);
 });
+
+// n° 20 — Rayons et couleurs de la charte (PR 6, F479).
+
+test('n° 20, F479 : trois rayons de charte, les cercles et les pilules restent ; plus de texte hors palette', () => {
+  const sheets = readdirSync('app/irrigation/styles').filter((name) => name.endsWith('.css')).map((name) => `app/irrigation/styles/${name}`);
+  const allowed = /^(var\(--radius\)|var\(--radius-button\)|var\(--radius-button, \.6rem\)|var\(--radius, \.85rem\)|9\.75px|999px|50%|0|1px|2px)$/;
+  for (const file of sheets) {
+    const css = readFileSync(file, 'utf8');
+    for (const match of css.matchAll(/border-radius:\s*([^;}]+?)\s*[;}]/g)) {
+      for (const part of match[1].trim().split(/\s+(?![^(]*\))/)) assert.match(part, allowed, `${file} : ${match[0]}`);
+    }
+    assert.doesNotMatch(css, /#1e1e1e|#4f6e64/i, file);
+  }
+});

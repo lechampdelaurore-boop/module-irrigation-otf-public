@@ -61,7 +61,7 @@
   gap: 10px;
   padding: 10px;
   border: 1.5px solid var(--green-soft);
-  border-radius: 14px;
+  border-radius: 9.75px;
   background: var(--card);
   box-shadow: 0 4px 16px rgb(11 105 77 / 12%);
   color: var(--ink);
@@ -110,7 +110,7 @@
 .menu-group-title {
   display: block;
   padding: 10px 12px 2px;
-  color: #4f6e64;
+  color: var(--ink2);
   font: 700 var(--text-12)/1.4 var(--font-ui);
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -133,7 +133,7 @@
   gap: 10px;
   padding: 6px 12px;
   border-radius: 9.75px;
-  color: #1e1e1e;
+  color: var(--ink);
   font: 500 var(--text-13)/1.25 var(--font-ui);
   text-decoration: none;
 }
@@ -407,7 +407,7 @@
   .feature-menu[data-open="true"] a.menu-home {
     display: grid;
     padding: 8px 10px;
-    border-radius: 14px;
+    border-radius: 9.75px;
   }
 
   /*
