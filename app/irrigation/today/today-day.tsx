@@ -29,7 +29,7 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * les arrosages de demain encore à valider, avec un lien vers le premier sur
  * le planning (audit ergonomique final, lot A, R1, F274). Tout en tête, ce
  * qui coule ou attend d'être repris : une irrigation en cours, avec
- * « Arrêter / Terminer » qui ouvre sa carte sur « Arrosages », et un
+ * « Terminer l’irrigation » (lot K, F473) qui ouvre sa carte sur « Arrosages », et un
  * reliquat, avec « Reprendre le reliquat » (audit du 19 novembre 2026,
  * lot H, n° 2, F433 et F434).
  */
@@ -174,7 +174,7 @@ function NowCard({ line, query, pending, onStart }: {
           href={pageHref(line.open.page, query, line.open.anchor)}
           aria-label={`${line.canResume ? 'Ouvrir' : 'Arrêter ou terminer'} : ${line.title}`}
         >
-          {line.canResume ? 'Ouvrir' : 'Arrêter / Terminer'}
+          {line.canResume ? 'Ouvrir' : 'Terminer l’irrigation'}
         </a>
       </div>
     </li>
