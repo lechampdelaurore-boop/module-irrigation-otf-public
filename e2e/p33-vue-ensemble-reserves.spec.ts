@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
@@ -32,6 +32,7 @@ test('la vue d’ensemble montre une barre par jardin, inconnue sans sol, rempli
   const telephone = testInfo.project.name === 'telephone';
   const journal = surveillerLaConsole(page);
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'p33');
+  await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'sol');
   const section = page.locator('section.soil-reserve');
   const pres = section.getByRole('region', { name: 'Réserve · Les Prés' });
@@ -85,6 +86,8 @@ test('la vue d’ensemble montre une barre par jardin, inconnue sans sol, rempli
   await expect(async () => {
     await formulaire.getByLabel('RFU du laboratoire (mm/m)').fill('');
     await formulaire.getByLabel('RFU du laboratoire (mm/m)').fill('62');
+    // Une ferme neuve n'a ni TEW ni REW préremplis : la texture les propose (4.4, F584).
+    await formulaire.getByLabel('Texture du sol').selectOption('sandy-loam');
     await expect(enregistrerLeSol).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   await formulaire.getByLabel('Part de cailloux (%)').fill('18');

@@ -1,5 +1,6 @@
 import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
+import { pageHref } from '@/lib/domain/features/pages';
 import { CropCoefficientsPanel } from '../crop-water/crop-coefficients-panel';
 import { loadPageContext, type IrrigationSearchParams } from '../page-context';
 import { loadReglagesPage } from '../page-loaders';
@@ -8,6 +9,8 @@ import { UnavailableState } from '../shell/unavailable-state';
 import { WaterManagementDashboard } from '../water-management-dashboard';
 import { FeatureSettings } from './feature-settings';
 import { NotificationSettings } from './notification-settings';
+import { OnboardingSettings } from './onboarding-settings';
+import { PlotShelterSettings } from './plot-shelter-settings';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
 
@@ -18,13 +21,17 @@ export const metadata = pageMetadata('reglages');
  * La page « Réglages » (3.8, docs/feature-selection-contract.md, section 3) :
  * la liste des cases, toujours, puis le socle que les cases cochées demandent :
  * le lieu de la météo (cases 3, 6, 7, 8, 9), les notifications du téléphone
- * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3).
+ * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3) ;
+ * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
+ * enfin, l'accueil de la ferme (4.4, F581), replié.
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, waterDashboard, cropCoefficients } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters } = await loadReglagesPage(context);
   context.logLoaded();
+  // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
+  const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
   return (
     <IrrigationShell {...context.shell}>
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
@@ -33,6 +40,13 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
+      {plotShelters ? <PlotShelterSettings season={context.season} initialLines={plotShelters} /> : null}
+      <OnboardingSettings
+        onboarding={onboarding}
+        locationHere={waterDashboard !== null}
+        plotsHere={plotShelters !== null}
+        soilHref={soilStep ? pageHref(soilStep.page, { season: context.season, zone: context.zone }, soilStep.anchor) : null}
+      />
     </IrrigationShell>
   );
 }

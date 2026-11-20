@@ -1,7 +1,7 @@
 import { listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries';
 import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
-import { listWeatherDailyValuesForUser, readWeatherPreferenceForUser } from '@/db/water-management-repository';
+import { listWeatherDailyValuesForUser } from '@/db/water-management-repository';
 import { listWaterInfrastructureForUser } from '@/db/water-resource-repository';
 import { listWeatherAlertCriteriaForWorkspace, listWeatherAlertForecastDays } from '@/db/weather-alert-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
@@ -18,6 +18,7 @@ import { readWeeklyPlanForUser } from './planning-service';
 import { getSoilReserveViewForUser } from './soil-reserve-view';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
 import { getWaterDashboardForUser } from './water-dashboard';
+import { readWeatherPreference } from './weather-preference';
 
 /**
  * Le modèle de la page « Aujourd'hui » et de la zone « Fiabilité du calcul »
@@ -57,7 +58,7 @@ async function readTodayInputs(
   const on = (feature: FeatureSelection[number]) => enabled.includes(feature);
   const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
   const irrigationsOn = on('planning') || on('arrosages');
-  const [workspaceId, preference] = await Promise.all([findWorkspaceIdForUser(ownerUserId), readWeatherPreferenceForUser(ownerUserId)]);
+  const [workspaceId, preference] = await Promise.all([findWorkspaceIdForUser(ownerUserId), readWeatherPreference(ownerUserId)]);
   const locationKey = weatherLocationKey(preference, snapshot.structure);
   const weatherOn = read.weather && (on('alertes-cultures') || on('alertes-meteo'));
   const lookback = actualRainLookbackDates(today);

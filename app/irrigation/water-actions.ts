@@ -17,7 +17,7 @@ import {
   getWaterDashboardForUser,
   type WaterDashboard,
 } from '@/lib/services/water-dashboard';
-import { locationKeyForCandidate } from '@/lib/domain/weather/location';
+import { locationKeyForCandidate, outsidePilotArea } from '@/lib/domain/weather/location';
 import {
   weekStartDateKey,
   isValidDateKey,
@@ -163,6 +163,9 @@ export async function searchWeatherLocationsAction(input: {
   }
 }
 
+/** Le pilote ne couvre que la France métropolitaine (4.4, F419). */
+const OUTSIDE_PILOT_MESSAGE = 'Cette commune est hors du pilote, qui ne couvre que la France métropolitaine : rien n’est enregistré.';
+
 export async function saveWeatherLocationAction(input: {
   season: number;
   weekStart: string;
@@ -173,6 +176,7 @@ export async function saveWeatherLocationAction(input: {
   if (!validWeatherCandidate(input.candidate)) {
     return { ok: false, message: 'La commune sélectionnée est invalide.' };
   }
+  if (outsidePilotArea(input.candidate)) return { ok: false, message: OUTSIDE_PILOT_MESSAGE };
   const locationKey = locationKeyForCandidate(input.candidate);
   await saveWeatherPreferenceForUser(context.value.ownerUserId, {
     locationMode: 'custom',
@@ -199,18 +203,23 @@ export async function restoreOtfWeatherLocationAction(input: {
 }): Promise<WaterActionResult> {
   const context = await loadContext(input.season);
   if (!context.ok) return context;
-  if (!context.value.snapshot.structure.legalCity) {
+  const { legalCity, legalPostcode, legalCountry } = context.value.snapshot.structure;
+  if (!legalCity) {
     return { ok: false, message: "La commune du siège n'est pas renseignée dans OTF." };
   }
+  // Le siège est pris en dernier recours, sur un geste de la personne (4.4, F419) : hors du pilote, rien n'est enregistré.
+  if (outsidePilotArea({ countryCode: legalCountry ?? 'FR', postcode: legalPostcode })) return { ok: false, message: OUTSIDE_PILOT_MESSAGE };
   await saveWeatherPreferenceForUser(context.value.ownerUserId, {
     locationMode: 'otf',
     customCity: null,
     customPostcode: null,
+    legalCity,
+    legalPostcode,
   });
   return successWithDashboard(
     context.value,
     safeWeekStart(input.weekStart) ?? weekStartDateKey(new Date()),
-    'La commune du siège OTF est de nouveau utilisée.',
+    'La commune du siège OTF est utilisée, en dernier recours.',
     true,
   );
 }
