@@ -226,7 +226,7 @@
 }
 
 .settings-review-group dt {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .settings-review-group dd {
@@ -255,5 +255,5 @@
   display: inline-flex;
   align-items: center;
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
