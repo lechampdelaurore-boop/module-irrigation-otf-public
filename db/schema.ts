@@ -913,13 +913,13 @@ export const backgroundJobs = sqliteTable('irrigation_background_jobs', {
   lastSuccessfulAt: text('last_successful_at'),
   lastError: text('last_error'),
   updatedAt: updatedAt(),
-  // Le registre des tâches attendues (4.5, migration 0034, F604) : les exécutions manquées depuis la dernière réussite.
+  // Le registre des tâches attendues (4.5, migration 0037, F604) : les exécutions manquées depuis la dernière réussite.
   consecutiveFailures: integer('consecutive_failures').notNull().default(0),
   failingSince: text('failing_since'),
 });
 
 /**
- * La notification de la veille de l'exploitant (4.5, migration 0035, F566,
+ * La notification de la veille de l'exploitant (4.5, migration 0038, F566,
  * F609) : une par jour de Paris au plus, prise avant l'envoi et rendue s'il
  * échoue. Une table commune : ni ferme, ni contenu.
  */
@@ -939,7 +939,7 @@ export const operatorNotices = sqliteTable(
 );
 
 /**
- * La demande d'effacement d'un espace (4.5, migration 0037, F563, F640 à
+ * La demande d'effacement d'un espace (4.5, migration 0040, F563, F640 à
  * F648) : l'enregistrement minimal qui reste après l'effacement pour prouver
  * qu'il a été fait. L'identifiant interne de l'espace, l'état et des dates ;
  * ni nom, ni personne, ni ferme, ni contenu ; pas de clé étrangère, l'espace
