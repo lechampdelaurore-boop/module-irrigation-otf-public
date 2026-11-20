@@ -382,7 +382,7 @@ registres, elle y renvoie.
   dans `lib/domain/operations/task-registry.ts` avec leur rythme et leurs
   seuils (orange à 26 heures, rouge à 36, ou trois échecs de suite ;
   « jamais réussie » en orange) ; chaque matin enregistre une exécution par
-  tâche (migration 0034, additive), la réanalyse à part des prévisions ;
+  tâche (migration 0037, additive), la réanalyse à part des prévisions ;
   un test échoue pour tout déclencheur planifié absent du registre, règle
   écrite dans `AGENTS.md` (F569). Rien ne change à l'écran ; la page
   d'état et la veille viennent avec la PR 2. Contrôles de la PR :
@@ -404,7 +404,7 @@ registres, elle y renvoie.
   à l'exploitant (les espaces de la ferme du déploiement, sans appel à
   OTF) quand une tâche est en retard, en panne ou jamais réussie, qui dit
   laquelle et depuis quand ; « tout va bien » le dimanche ; une
-  notification par jour au plus (migration 0035, additive). La veille est
+  notification par jour au plus (migration 0038, additive). La veille est
   elle-même une tâche du registre. La page « État du module »
   (`/irrigation/exploitation`), réservée à l'exploitant côté serveur, dit
   en une ligne si tout va bien, puis l'état de chaque tâche ; parcours

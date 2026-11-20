@@ -6819,7 +6819,7 @@ dont l'état se calcule sur la dernière réussite.
    réanalyse se comptent à part ; trois exécutions manquées de suite font
    une panne ; une tâche sans réussite est « jamais réussie », en orange.
 4. Les exécutions se gardent dans `irrigation_background_jobs`, ligne
-   `task:<tâche>` ; la migration 0034, additive, ajoute le compte des
+   `task:<tâche>` ; la migration 0037, additive, ajoute le compte des
    échecs et « en panne depuis ». Le résumé d'un échec ne porte que des
    nombres et des classes d'erreur.
 5. Tout déclencheur planifié s'inscrit au registre : un test lit les
@@ -6850,7 +6850,7 @@ l'exploitant, et une page d'état qui lui est réservée.
    une alerte quand une tâche est en retard, en panne ou jamais réussie ;
    « tout va bien » le dimanche ; rien sinon. Une notification par jour de
    Paris au plus, prise avant l'envoi et rendue s'il échoue (migration
-   0035, table commune).
+   0038, table commune).
 3. La notification nomme les tâches, la plus grave d'abord, avec depuis
    quand, dans les limites du service (titre de 80 caractères, texte de
    160) ; la veille ne se nomme pas elle-même.
