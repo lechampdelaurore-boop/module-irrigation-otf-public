@@ -6548,6 +6548,31 @@ planning » prend le chevron des autres plis.
 Ne changent pas : le moteur du planning, les motifs, le manque d'eau, les
 gestes. Aucune migration.
 
+## D-191 — Lot K, PR 2 : vue satellite, des numéros quand les noms se chevauchent
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 16 : sur la
+ferme du porteur, là où les jardins sont serrés, les noms posés sur la carte
+se coupaient et se recouvraient (« Tunnel 4 », « …nel 3 », « Bloc Fleurs 3 »
+posé sur « bloc 1 »). **Cause vérifiée** : `satellite-map.tsx` et
+`satellite-svg-drawing.tsx` posent chaque nom au point d'étiquette de son
+jardin, sans regarder ses voisins ; le nom se coupe à 160 px.
+
+**Décision (F468).** Après chaque pose (chargement, zoom, taille changée), les
+noms sont remis entiers, mesurés, puis parcourus dans l'ordre de la liste :
+un nom qui chevaucherait un nom déjà posé (deux pixels d'air compris) devient
+le numéro du jardin dans une pastille ronde, et les suivants l'évitent aussi.
+La liste des jardins à côté de la carte porte ces numéros devant chaque nom
+et sert de légende. Le nom entier reste dans la bulle de l'étiquette ; pour
+le lecteur d'écran, rien ne change : les étiquettes restent cachées, la
+liste dit les noms. La même règle vaut pour la carte et pour le dessin de
+secours. La règle se calcule dans le domaine
+(`lib/domain/satellite-view/labels.ts`), sur des rectangles.
+
+Ne changent pas : les contours, le cadrage, les fonds, la liste elle-même.
+Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
