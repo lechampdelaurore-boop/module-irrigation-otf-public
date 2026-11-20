@@ -12,7 +12,7 @@
   margin: 1rem 0 0;
   padding: .8rem 1rem;
   border: 1px solid var(--danger-line);
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--danger-soft);
   color: var(--danger-ink);
   font-size: var(--text-16);
