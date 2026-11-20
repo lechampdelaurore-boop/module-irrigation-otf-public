@@ -6693,6 +6693,44 @@ groupes `--ink2` ; le nom d'une culture de la frise de pénurie, `--ink`.
 Ne changent pas : les autres couleurs (les couleurs des matériels sur le
 plan, les états), les tailles, les marges. Aucune migration.
 
+## D-196 — Lot K, PR 7 : grand écran, tablette et 320 px
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constats n° 23 et
+n° 24 : à 1 920 px, le contenu restait collé au menu (452 px de vide à
+droite, 205 à gauche, mesurés) et le fond du menu s'arrêtait 42 px avant le
+bas de la page ; sur tablette, le menu latéral à demi-place et des cibles
+de 38 à 41 px (filtres et périodes de l'historique, boutons des réglages et
+des alertes, pastilles « i » de 24 px) ; à 320 px, « Aujourd'hui » (64 px)
+et « Ressources » (65 px) dépassaient les 58 px de leur case et se
+coupaient au milieu du mot. **Cause vérifiée** : la barre du bas et les
+cibles de 44 px étaient réservées aux écrans de 600 px et moins ; la marge
+du bas était portée par `main` entier, sous le menu ; le nom de la barre
+pouvait se couper n'importe où (`overflow-wrap: anywhere`).
+
+**Décision.**
+
+- **F480 Grand écran (981 px et plus).** La page se centre dans la place
+  laissée par le menu ; la marge du bas passe de `main` à la colonne du
+  contenu, le fond du menu descend jusqu'en bas ; les blocs d'une rangée
+  d'« Aujourd'hui » s'étirent à la même hauteur ; au-delà de 1 000 px, les
+  choix de la bannière de démonstration restent sur une ligne.
+- **F481 Tablette (601 à 980 px).** La barre du bas du téléphone (quatre
+  entrées et « Plus ») et sa feuille de menu valent jusqu'à 980 px. Chaque
+  bouton, champ et liste du contenu, « Actualiser », les liens « Voir … »
+  d'« Aujourd'hui » et les actions de l'historique prennent 44 px ; les
+  pastilles « i » gardent leur rond de 24 px dans une boîte de 44 px, comme
+  au téléphone. Les planches du plan ne changent pas.
+- **F482 320 px.** Le nom de la barre ne se coupe plus qu'entre deux mots ;
+  sous 360 px, les cases de la barre perdent leur marge de côté et les
+  lettres se resserrent légèrement, pour que « Aujourd'hui » et
+  « Ressources » tiennent entiers.
+
+Ne changent pas : le téléphone de 360 à 600 px, l'ordinateur de 981 à
+1 280 px hormis le centrage, les pages elles-mêmes. Aucune migration. Le
+lot K est codé en entier.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
