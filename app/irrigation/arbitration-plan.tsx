@@ -8,6 +8,7 @@ import { compareNamesNaturally } from '@/lib/domain/bed-order';
 import { FEASIBILITY_PRIORITIES, priorityLabel, sameBedIds, type IrrigationFeasibility, type PriorityFeasibility } from '@/lib/domain/irrigation-feasibility';
 import type { BedIrrigationNeed } from '@/lib/domain/irrigation-needs';
 import { ArbitrationTimeline, ArbitrationTimelineHeader } from './arbitration-timeline';
+import { clockText } from '@/lib/domain/clock-text';
 
 /**
  * L'écran d'arbitrage façon plan d'assolement (docs/shortage-contract.md,
@@ -19,7 +20,9 @@ import { ArbitrationTimeline, ArbitrationTimelineHeader } from './arbitration-ti
  */
 
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-const decided = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+const decidedDay = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+// « 16 juin à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const decided = { format: (value: Date) => `${decidedDay.format(value)} à ${clockText(value)}` };
 const m3 = volumeText;
 const mm = millimetersText;
 const pct = (value: number) => `${Math.round(value * 100)} %`;

@@ -77,6 +77,75 @@ source détaillée commit par commit.
   chiffre change. Réglages montre l'accueil, replié en bas de la page,
   étape par étape. Les écrans des étapes viendront avec les PR suivantes.
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
+
+- **Grand écran, tablette et 320 px** (D-196) : au grand écran, la page se
+  centre au lieu de rester collée au menu, le fond du menu descend jusqu'en
+  bas, les deux blocs d'une rangée d'« Aujourd'hui » prennent la même
+  hauteur et les choix de la démonstration restent sur une ligne ; sur
+  tablette (601 à 980 px), la barre du bas du téléphone remplace le menu
+  latéral et chaque bouton, champ ou lien d'action garde 44 px ; à 320 px,
+  les noms de la barre du bas ne se coupent plus au milieu d'un mot.
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 6 sur 7)
+
+- **Rayons et couleurs de la charte** (D-195) : les angles arrondis
+  reviennent aux trois rayons de la charte (les blocs, les boutons et les
+  champs, les entrées de menu et les petites pièces) ; les cercles et les
+  pastilles restent ronds ; les deux couleurs de texte hors palette du menu
+  et de la frise de pénurie reprennent le texte et le gris de la charte.
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 5 sur 7)
+
+- **Une échelle de tailles de texte, rien sous 12 px** (D-194) : six
+  tailles de texte en jetons (12, 13, 14, 16, 20 et 28 px) au lieu de
+  trente-six ; plus aucun texte sous 12 px, y compris le plan de
+  « Matériel » ; quatre graisses (300, 400, 500, 700) ; la pastille chiffrée
+  du plan dit ce qu'elle compte, « en mm par heure d'arrosage ». Les grands
+  chiffres et les titres d'affichage gardent leur taille.
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 4 sur 7)
+
+- **Mots et formats** (D-193) : les heures s'écrivent « 8 h 50 » et les
+  durées « 1 h 21 » sur tous les écrans, les dates « 16/06/2026 à 8 h 50 » ;
+  les plages et les créneaux « de 21 h à 8 h » ; plus de pluriel entre
+  parenthèses (« 1 jour », « 7 jours ») ; sur « Ressources », « L'eau des
+  jours à venir », « Apport perdu, la réserve étant pleine » et
+  « Utilisable, avant / après les irrigations prévues » ; « Faisabilité
+  recalculée. » prend le style d'un message ; sur « Réglages », « Espèces
+  sans culture de référence ». L'export CSV garde ses formats de tableur.
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 3 sur 7)
+
+- **Un bouton plein par écran, un seul dessin de pli, plus de geste muet**
+  (D-192) : tous les plis du module portent le même chevron à droite, qui
+  tourne à l'ouverture ; « Cette semaine », les horizons « 24 h / 48 h /
+  7 jours » et « Créer un groupe » sur une ferme sans asperseur passent en
+  secondaire, le choix fait se lit à son fond ; « Cette semaine » est
+  indisponible quand on y est déjà, « Retirer la mesure » quand le jour n'a
+  pas de mesure ; l'heure réelle de fin se saisit à la minute ; un seul mot
+  pour finir un arrosage, « Terminer l'irrigation ».
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 2 sur 7)
+
+- **Vue satellite : des numéros quand les noms se chevauchent** (D-191) :
+  là où les jardins sont serrés, un nom qui en recouvrirait un autre devient
+  le numéro du jardin ; la liste à côté de la carte porte ces numéros et
+  sert de légende. Le calcul se refait à chaque zoom : un numéro redevient
+  nom quand la place revient. Le nom entier reste dans la bulle.
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 1 sur 7)
+
+- **Planning : le rouge pour le manque d'eau seul** (D-190) : une planche
+  dont le besoin est encore sous la dose minimale d'un arrosage attend qu'il
+  grandisse ; elle n'est plus comptée en rouge dans « Planches non
+  servies », elle est dite « en attente », pour information. « Ajuster »
+  montre la dose de la carte (« 8,1 », plus « 8,06 ») ; laissée telle
+  quelle, la dose exacte est gardée. La ligne d'état de la semaine se lit
+  en deux lignes, la source météo et la réserve dessous ; un jour à une
+  seule proposition n'a plus qu'un bouton « Valider » ; « Réglages du
+  planning » porte le signe des autres plis.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 7 sur 7)
 
 - **« Arrosages » et « Historique » : le premier geste plus haut** (D-189) :

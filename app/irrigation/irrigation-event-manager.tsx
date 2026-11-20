@@ -51,6 +51,7 @@ import { dateKeyInTimeZone } from '@/lib/domain/water-management';
 import { recordDoneAsPlannedAction } from './done-as-planned-actions';
 import { isLimitedAlertStatus } from '@/lib/domain/system-alerts-banner';
 import { equipmentByGarden } from '@/lib/domain/equipment-by-garden';
+import { finishInputText, finishValueToSend } from '@/lib/domain/finish-time';
 
 /** Les classes de message de la section, gardées telles qu'avant le lot G. */
 const REPLY_CLASSES = { notice: 'irrigation-event-notice', warning: 'irrigation-event-warning', error: 'irrigation-event-error' } as const;
@@ -133,9 +134,9 @@ export function IrrigationEventManager({
   const [editingEventEquipmentId, setEditingEventEquipmentId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const { confirm, dialog: confirmDialog } = useConfirm();
-  const [finishAt, setFinishAt] = useState(() =>
-    localDateTimeInputValue(new Date(initialNowIso), true),
-  );
+  // L'heure de fin proposée, à la seconde ; le champ la montre à la minute (lot K, n° 21, F472).
+  const [finishPrecise, setFinishPrecise] = useState(() => localDateTimeInputValue(new Date(initialNowIso), true));
+  const [finishAt, setFinishAt] = useState(() => finishInputText(finishPrecise));
   const activeEvents = events.filter((event) => event.equipment.timerState !== null);
   const plannedEvents = events.filter(
     (event) => event.status === 'planned' && !event.equipment.timerState,
@@ -311,10 +312,9 @@ export function IrrigationEventManager({
     const suggestedEnd = event.equipment.timerState === 'paused'
       ? event.equipment.timerPausedAt
       : new Date().toISOString();
-    setFinishAt(localDateTimeInputValue(
-      suggestedEnd ? new Date(suggestedEnd) : new Date(),
-      true,
-    ));
+    const precise = localDateTimeInputValue(suggestedEnd ? new Date(suggestedEnd) : new Date(), true);
+    setFinishPrecise(precise);
+    setFinishAt(finishInputText(precise));
   };
 
   useEffect(() => {
@@ -629,7 +629,7 @@ export function IrrigationEventManager({
             runEventAction(async () => {
               const result = await finishIrrigationEventAction({
                 eventEquipmentId: finishEvent.equipment.id,
-                actualEndAt: isoFromLocalInput(finishAt),
+                actualEndAt: isoFromLocalInput(finishValueToSend(finishAt, finishPrecise)),
               });
               if (result.ok) setFinishEvent(null);
               return result;

@@ -105,6 +105,10 @@ export function PlotPlanCard({
           {beds.length} planche{beds.length > 1 ? 's' : ''}
         </span>
         <div className="plot-plan-content">
+          {/* La pastille chiffrée dit ce qu'elle compte (audit du 19 novembre 2026, lot K, n° 19, F478). */}
+          {beds.some((bed) => coverageByBedId.has(bed.id)) ? (
+            <small className="plot-coverage-legend">Le chiffre sur une planche : ce qu’elle reçoit, en mm par heure d’arrosage.</small>
+          ) : null}
           <div className="bed-strip">
             {beds.length > 0 ? beds.map((bed, index) => {
             const beforeBed = index > 0 ? beds[index - 1] : null;
@@ -274,6 +278,7 @@ export function PlotPlanCard({
                     <span
                       className="coverage-rate-badge"
                       data-overlap={bedCoverage.contributions.length > 1}
+                      title={`${numberFormatter.format(bedCoverage.totalRateMmPerHour)} mm par heure d’arrosage`}
                     >
                       {numberFormatter.format(bedCoverage.totalRateMmPerHour)}
                     </span>

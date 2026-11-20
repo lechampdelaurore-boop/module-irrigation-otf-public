@@ -21,6 +21,7 @@ import { FARM_TIME_ZONE } from '@/lib/domain/water-management';
 import { formatDuration } from '../irrigation-manager/presentation';
 import { FigureOrigin } from '../shell/figure-origin';
 import { formatDateTime, formatFlow, formatMm, formatTime, formatVolume } from './format';
+import { adjustDoseText, adjustedDoseMm } from '@/lib/domain/planning/adjust-dose';
 import { compareNamesNaturally } from '@/lib/domain/bed-order';
 
 export type ProposalFeedback = { ok: boolean; message: string };
@@ -127,8 +128,9 @@ export function ProposalCard({ proposal, currentCalculationId, now, pending, fee
 function ProposalActions({ proposal, pending, onValidate, onAdjust, onRefuse }: Omit<Props, 'now' | 'feedback' | 'currentCalculationId' | 'soilNotes'>) {
   const [adjusting, setAdjusting] = useState(false);
   const [startInput, setStartInput] = useState(() => formatIrrigationDateTimeInput(proposal.startAt, FARM_TIME_ZONE));
-  const [dose, setDose] = useState(() => doseInput.format(proposal.doseMm));
-  const preview = adjustProposalTiming(proposal, { startAt: instantFromIrrigationDateTimeInput(startInput) ?? '', doseMm: decimalFromInput(dose) });
+  // Le chiffre de la carte, à une décimale ; laissé tel quel, la dose exacte de la proposition (lot K, n° 17, F464).
+  const [dose, setDose] = useState(() => adjustDoseText(proposal.doseMm));
+  const preview = adjustProposalTiming(proposal, { startAt: instantFromIrrigationDateTimeInput(startInput) ?? '', doseMm: adjustedDoseMm(dose, proposal.doseMm, decimalFromInput) });
   return (
     <>
       <div className="planning-proposal-actions">

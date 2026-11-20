@@ -24,12 +24,12 @@
 }
 
 .settings-manager-intro > div strong {
-  font-size: 14px;
+  font-size: var(--text-14);
 }
 
 .settings-manager-intro > div span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
 }
 
 .settings-list {
@@ -45,7 +45,7 @@
   gap: 10px;
   padding: 9px 10px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: white;
 }
 
@@ -54,11 +54,11 @@
   width: 30px;
   height: 30px;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: var(--green-soft);
   color: var(--green-dark);
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--text-12);
+  font-weight: 700;
 }
 
 .setting-card > div {
@@ -70,14 +70,14 @@
 
 .setting-card > div strong {
   overflow: hidden;
-  font-size: 12px;
+  font-size: var(--text-12);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .setting-card > div small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-12);
 }
 
 .setting-card > button,
@@ -90,7 +90,7 @@
   color: var(--anthracite);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   cursor: pointer;
 }
@@ -119,14 +119,14 @@
 }
 
 .settings-empty-state strong {
-  font-size: 14px;
+  font-size: var(--text-14);
 }
 
 .settings-empty-state p,
 .settings-calculation-note {
   margin: 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   line-height: 1.5;
 }
 
@@ -139,7 +139,7 @@
 
 .settings-calculation-note {
   padding: 10px 12px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--sheet);
 }
 
@@ -168,7 +168,7 @@
 .profile-help {
   margin: 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   line-height: 1.5;
 }
 
@@ -177,7 +177,7 @@
   align-items: center;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-button);
   background: white;
 }
 
@@ -192,7 +192,7 @@
   flex: 0 0 auto;
   padding: 0 13px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
 }
 
 .symmetry-toggle {
@@ -201,7 +201,7 @@
   gap: 10px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: white;
   cursor: pointer;
 }
@@ -219,12 +219,12 @@
 }
 
 .symmetry-toggle strong {
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .symmetry-toggle small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-12);
 }
 
 .profile-editors {
@@ -251,8 +251,8 @@
 .profile-editor legend {
   padding: 0 5px;
   color: var(--green-dark);
-  font-size: 11px;
-  font-weight: 850;
+  font-size: var(--text-12);
+  font-weight: 700;
 }
 
 .profile-column-labels,
@@ -264,7 +264,7 @@
 
 .profile-column-labels span {
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   font-family: var(--font-ui);
 }
@@ -274,20 +274,20 @@
   height: 38px;
   padding: 0 9px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-button);
   color: var(--ink);
   font: inherit;
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .profile-point-row button {
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-button);
   background: var(--danger-soft);
   color: var(--danger-ink);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 18px;
+  font-size: var(--text-20);
   cursor: pointer;
 }
 
@@ -305,7 +305,7 @@
   color: var(--green);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   cursor: pointer;
 }
@@ -316,7 +316,7 @@
   grid-template-columns: minmax(160px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr);
   gap: 8px;
   padding: 13px;
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: var(--sheet);
 }
 
@@ -330,7 +330,7 @@
 .profile-preview span,
 .profile-preview small {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 500;
   font-family: var(--font-ui);
 }
@@ -339,12 +339,12 @@
   min-height: 54px;
   justify-content: center;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: white;
 }
 
 .profile-preview > div strong {
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .compact-unit-input input {
@@ -353,7 +353,7 @@
   height: 40px;
   padding: 0 9px;
   font: inherit;
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .compact-unit-input strong {
