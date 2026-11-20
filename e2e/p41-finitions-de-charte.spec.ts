@@ -68,3 +68,30 @@ test('un seul dessin de pli, un bouton plein par geste, plus de geste muet', asy
   for (const [choisi, fond] of pleins) expect(fond === 'rgb(11, 105, 77)', `plein seulement s’il est choisi (${choisi})`).toBe(choisi === 'true');
   await verifierLEtape(page, journal, 'plis, boutons et gestes');
 });
+
+test('rien sous 12 px, quatre graisses, sur les douze pages', async ({ page }) => {
+  // n° 19, F477 : l'échelle de la charte. Sur la ferme des parcours, aux deux largeurs.
+  const journal = surveillerLaConsole(page);
+  const pages = ['aujourdhui', 'arrosages', 'planning', 'besoins', 'sol', 'cultures', 'materiel', 'ressources', 'alertes-meteo', 'alertes-cultures', 'historique', 'reglages'] as const;
+  for (const cible of pages) {
+    await attendreLaPageIrrigation(page, cible);
+    const mesure = await page.evaluate(() => {
+      const petits: string[] = [];
+      const graisses = new Set<string>();
+      for (const element of document.querySelectorAll<HTMLElement>('main *')) {
+        const texte = [...element.childNodes].filter((noeud) => noeud.nodeType === Node.TEXT_NODE).map((noeud) => noeud.textContent ?? '').join('').trim();
+        if (!texte) continue;
+        const boite = element.getBoundingClientRect();
+        if (boite.width === 0 || boite.height === 0) continue;
+        const style = getComputedStyle(element);
+        if (style.visibility === 'hidden') continue;
+        if (Number.parseFloat(style.fontSize) < 12) petits.push(`${texte.slice(0, 30)} (${style.fontSize})`);
+        graisses.add(style.fontWeight);
+      }
+      return { petits, graisses: [...graisses].sort() };
+    });
+    expect(mesure.petits, `texte sous 12 px sur ${cible}`).toEqual([]);
+    for (const graisse of mesure.graisses) expect(['300', '400', '500', '700'], `graisse ${graisse} sur ${cible}`).toContain(graisse);
+  }
+  await verifierLEtape(page, journal, 'tailles et graisses');
+});

@@ -6643,6 +6643,33 @@ Ne changent pas : les champs de saisie (heure et date au format du
 navigateur), l'export CSV (ses colonnes et ses formats de tableur), les
 calculs. Aucune migration.
 
+## D-194 — Lot K, PR 5 : une échelle de tailles de texte, rien sous 12 px
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 19 :
+36 tailles de texte au téléphone, 41 à l'ordinateur ; 18 % des lettres sous
+12 px au téléphone, jusqu'à 6,5 px sur le plan de « Matériel » ; dix
+graisses, de 300 à 900. La pastille « 6 » du plan ne disait pas ce qu'elle
+comptait. **Cause vérifiée** : chaque feuille de style posait ses tailles
+en pixels ou en rem ; un `<small>` sans taille prenait 80 % de son parent
+(10,4 px dans un texte de 13 px) ; un `<strong>` dans un texte gras montait
+à 900.
+
+**Décision (F477, F478).** Six jetons de taille sur `:root` (`--text-12`,
+`--text-13`, `--text-14`, `--text-16`, `--text-20`, `--text-28`) ; toute
+taille fixe sous 23 px prend le jeton le plus proche (sous 12,75 px : 12 ;
+sous 13,75 : 13 ; sous 15 : 14 ; sous 18 : 16 ; sous 23 : 20). Les grands
+chiffres et les titres d'affichage (23 px et plus, `--title-size`, les
+`clamp()`) gardent la leur. Un `<small>` ne descend plus sous 12 px. Quatre
+graisses : 600 et au-delà deviennent 700 ; un `<strong>` sans poids propre
+prend 700. La pastille chiffrée du plan porte sa bulle (« 6 mm par heure
+d'arrosage ») et une légende sous le plan, quand une planche en a une
+(F478).
+
+Ne changent pas : les polices, les couleurs, les cibles tactiles. Aucune
+migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

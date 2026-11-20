@@ -32,13 +32,13 @@
 }
 
 .history-view-tabs button strong {
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 500;
 }
 
 .history-view-tabs button small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-12);
   line-height: 1.35;
 }
 
@@ -53,12 +53,12 @@
 }
 
 .series-card-main strong {
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .series-card-main small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -78,12 +78,12 @@
 
 .series-measure small {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-family: var(--font-ui);
 }
 
 .series-measure strong {
-  font-size: 11px;
+  font-size: var(--text-12);
   overflow-wrap: anywhere;
 }
 
@@ -98,13 +98,13 @@
 .series-beds {
   width: 100%;
   border-collapse: collapse;
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .series-beds caption {
   padding: 6px 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   text-align: left;
 }
 
@@ -118,7 +118,7 @@
 
 .series-beds thead th {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-family: var(--font-ui);
 }
 
@@ -137,7 +137,7 @@
   border: 1px dashed var(--line);
   border-radius: 11px;
   background: white;
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .series-upcoming li span {
