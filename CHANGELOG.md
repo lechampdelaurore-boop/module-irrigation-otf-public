@@ -24,7 +24,8 @@ source détaillée commit par commit.
   par un bandeau « À finir : commune de la ferme. », avec un lien vers
   Réglages. Le siège reste possible, d'un geste, « en dernier recours ».
   Une commune hors de France métropolitaine est refusée. Les fermes qui
-  utilisaient déjà le module gardent leur commune telle quelle.
+  utilisaient déjà le module gardent leur commune telle quelle, et peuvent
+  toujours en changer sans repasser par l'accueil.
 
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 1 sur 5)
 

@@ -130,6 +130,20 @@ test('un espace d’avant l’accueil garde sa commune sans rien confirmer de no
   assert.equal(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true, plotsToClassify: 0 }).length, 0);
 });
 
+test('un espace d’avant l’accueil qui change de commune reste d’avant l’accueil (F426)', async () => {
+  const workspaceId = await ensureWorkspaceForUser(ALICE);
+  for (const step of ['location', 'plots', 'soil', 'crops', 'settings']) {
+    database.sqlite.prepare(
+      'INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, proposed_value, confirmed_at, updated_at) VALUES (?, ?, \'confirmed\', \'before-onboarding\', NULL, ?, ?)',
+    ).run(workspaceId, step, NOW.toISOString(), NOW.toISOString());
+  }
+  await saveWeatherPreferenceForUser(ALICE, { locationMode: 'custom', customCity: 'Tronget', customPostcode: '03240' });
+  const rows = await readOnboardingStepsForUser(ALICE);
+  assert.ok(rows.every((row) => row.origin === 'before-onboarding' && row.state === 'confirmed'));
+  assert.equal((await getOnboardingForUser(ALICE)).kind, 'before-onboarding');
+  assert.equal((await readWeatherPreference(ALICE)).customCity, 'Tronget', 'la commune elle-même est bien enregistrée');
+});
+
 test('le bandeau « À finir » nomme la commune seulement quand une case lit la météo, et part quand elle est choisie', async () => {
   await ensureWorkspaceForUser(ALICE);
   const before = await getOnboardingForUser(ALICE);
