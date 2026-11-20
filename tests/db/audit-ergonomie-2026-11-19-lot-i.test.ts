@@ -9,6 +9,9 @@ import { feasibilityPlanGap } from '../../lib/domain/feasibility-plan-gap';
 import { volumeText } from '../../lib/domain/display-numbers';
 import type { StoredWeeklyPlan } from '../../lib/domain/planning/contract';
 import { installSimulatedDate, runOnSimulatedDay, uninstallSimulatedDate } from '../../lib/services/demo-clock';
+import { listDailyWaterLimitsForUser, listHydricGoalsForUser, saveDailyWaterLimitForUser, saveHydricGoalForUser } from '../../db/water-management-repository';
+import { goalRevisionFirstDate } from '../../lib/domain/hydric-goal-revisions';
+import { FARM_TIME_ZONE, dateKeyInTimeZone } from '../../lib/domain/water-management';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 
 /**
@@ -91,4 +94,28 @@ test('n° 5, F446 : un manque que la faisabilité ne voit pas se dit, d’où il
   const arbitrated: StoredWeeklyPlan = { ...plan, calculation: { ...plan.calculation, summary: { ...plan.calculation.summary, arbitration: { allocatedCubicMeters: 1, unreceivableCubicMeters: 0, unreceivableBedCount: 0 } as never } } };
   assert.equal(feasibilityPlanGap({ plan: arbitrated, feasibility: sees, now }), null);
   assert.equal(feasibilityPlanGap({ plan: null, feasibility: sees, now }), null);
+});
+
+// n° 10 — La démonstration à son jour (PR 2, F449).
+
+test('n° 10, F449 : un objectif posé dans la démonstration est daté du jour simulé et compte dès ce jour', async () => {
+  const { choice, owner } = await penurie();
+  const today = choice.moment.dateKey;
+  const weekStart = '2026-07-20';
+  await runOnSimulatedDay(today, () => saveHydricGoalForUser(owner, { season: 2026, weekStart, scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 60 }));
+  const farm = (await listHydricGoalsForUser(owner, 2026, weekStart)).find((goal) => goal.scopeType === 'farm')!;
+  assert.equal(dateKeyInTimeZone(farm.createdAt, FARM_TIME_ZONE), today, 'le jour simulé, pas le jour réel');
+  assert.equal(goalRevisionFirstDate({ weekStart, createdAt: farm.createdAt, copiedFromGoalId: null }), today, 'il compte dès sa pose, dans sa semaine');
+  // La limite journalière aussi, que la plus récente l'emporte entre les écritures de la démonstration.
+  await runOnSimulatedDay(today, () => saveDailyWaterLimitForUser(owner, { season: 2026, enabled: true, maxCubicMetersPerDay: 3, validFrom: today, validUntil: null, note: null }));
+  const [limit] = await listDailyWaterLimitsForUser(owner);
+  assert.equal(dateKeyInTimeZone(limit.createdAt, FARM_TIME_ZONE), today);
+});
+
+test('n° 10, F449 : hors démonstration, la date d’écriture reste l’heure réelle', async () => {
+  delete process.env.DEMO_MODE;
+  const before = Date.now();
+  await saveHydricGoalForUser('ferme-reelle', { season: 2026, weekStart: '2026-11-16', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
+  const [goal] = await listHydricGoalsForUser('ferme-reelle', 2026, '2026-11-16');
+  assert.ok(Date.parse(goal.createdAt) >= before - 1000 && Date.parse(goal.createdAt) <= Date.now() + 1000, goal.createdAt);
 });

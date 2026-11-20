@@ -91,8 +91,10 @@ fin novembre.
 
 1. Toute écriture dont une règle lit la date porte l'heure du module (le
    jour simulé en démonstration, l'heure réelle ailleurs) au lieu de celle
-   de la base. L'inventaire de ces écritures est établi dans le code et
-   écrit dans la PR ; les objectifs d'abord.
+   de la base. Inventaire établi dans le code : les révisions d'objectif
+   (que `goalRevisionFirstDate` relit) et la limite journalière (la plus
+   récente l'emporte) ; les créneaux protégés et les objectifs adoptés
+   portaient déjà l'heure du module.
 2. Sur une vraie ferme, rien ne change : l'heure du module y est l'heure
    réelle.
 
@@ -170,7 +172,9 @@ vierge ; puis la remise en état.
 - **F447** les deux avertissements de la faisabilité deviennent des notes sans jargon ; « Recalculer la faisabilité » en bouton secondaire (section 2.4).
 - **F448** le bassin du moment « Pic d'été » à 5 m³ : une vraie répartition à faire (section 2.5).
 
-Les précisions des PR 2 à 5 suivent, F449 et au-delà.
+- **F449** ce que la démonstration écrit et qu'une règle relit par sa date (les objectifs, la limite journalière) porte l'heure du module, le jour simulé (section 3).
+
+Les précisions des PR 3 à 5 suivent, F450 et au-delà.
 
 Ce que le lot ne prouve pas : un vrai téléphone, une vraie tablette, un
 lecteur d'écran ; la ferme réelle n'est pas touchée.
