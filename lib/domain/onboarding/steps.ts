@@ -147,6 +147,26 @@ function enteredSoilText(value: unknown): string | null {
   return `sol de ${parcels} parcelle${parcels > 1 ? 's' : ''} saisi`;
 }
 
+/** Les groupes des « Réglages à relire » validés et passés, gardés avec l'étape (F588). */
+function reviewedSettingsText(value: unknown): string | null {
+  const groups = value && typeof value === 'object' ? (value as { groups?: unknown }).groups : null;
+  if (!groups || typeof groups !== 'object') return null;
+  const answers = Object.values(groups as Record<string, unknown>);
+  const validated = answers.filter((answer) => answer === 'validated').length;
+  const skipped = answers.filter((answer) => answer === 'skipped').length;
+  if (validated + skipped === 0) return null;
+  const plural = (count: number, word: string) => `${count} groupe${count > 1 ? 's' : ''} ${word}${count > 1 ? 's' : ''}`;
+  return skipped === 0 ? plural(validated, 'validé') : `${plural(validated, 'validé')}, ${plural(skipped, 'passé')}`;
+}
+
+/** Le compte des espèces rattachées, gardé à la confirmation de l'étape (F587). */
+function linkedSpeciesText(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null;
+  const { linked, total } = value as { linked?: unknown; total?: unknown };
+  if (typeof linked !== 'number' || typeof total !== 'number' || total < 1) return null;
+  return `${linked} espèce${linked > 1 ? 's' : ''} rattachée${linked > 1 ? 's' : ''} sur ${total}`;
+}
+
 /** Le compte des jardins classés, gardé à la confirmation de l'étape (F583). */
 function classifiedPlotsText(value: unknown): string | null {
   if (!value || typeof value !== 'object') return null;
@@ -171,6 +191,8 @@ const CONFIRMED_DETAIL: Partial<Record<OnboardingStepId, (value: unknown) => str
   location: chosenLocationText,
   plots: classifiedPlotsText,
   soil: enteredSoilText,
+  crops: linkedSpeciesText,
+  settings: reviewedSettingsText,
 };
 
 /**
@@ -213,8 +235,14 @@ export function onboardingExplanation(resolved: Exclude<ResolvedOnboarding, { ki
   return 'Les écrans de l’accueil arrivent avec les prochaines versions du module ; rien n’est confirmé à votre place.';
 }
 
+/** L'ancre de l'étape « Rattachez vos espèces », dans Réglages (F587). */
+export const SPECIES_STEP_ANCHOR = 'rattachez-vos-especes';
+
+/** L'ancre de l'étape « Réglages à relire », dans Réglages (F588). */
+export const SETTINGS_STEP_ANCHOR = 'reglages-a-relire';
+
 /** Une étape à finir, dite sur chaque page (section 8 bis.3) : son nom court, la page et l'ancre où la faire. */
-export type UnfinishedStep = { id: OnboardingStepId; text: string; page: IrrigationPageId; anchor: string };
+export type UnfinishedStep = { id: OnboardingStepId; text: string; page: IrrigationPageId; anchor: string; count?: number };
 
 /**
  * Ce que le bandeau « À finir » nomme (section 8 bis.3, F582) : seulement
@@ -222,7 +250,9 @@ export type UnfinishedStep = { id: OnboardingStepId; text: string; page: Irrigat
  * cochée a besoin. La 4.4 l'étend étape par étape, avec l'écran de chacune
  * (F581) : la commune de la ferme (PR 2a), pour les cases qui lisent la
  * météo ; les jardins à classer (PR 2b), pour les cases qui calculent un
- * besoin ; le sol des parcelles (PR 3), pour la réserve du sol. Une étape
+ * besoin ; le sol des parcelles (PR 3), pour la réserve du sol ; les espèces
+ * à rattacher (PR 4c), tant que l'étape « Cultures » n'est pas confirmée ;
+ * les réglages du planning à valider (PR 5a), sans quoi aucun planning. Une étape
  * passée n'est pas rappelée : elle est dite à la vérification (F427).
  */
 export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
@@ -231,6 +261,10 @@ export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
   plotsToClassify: number;
   /** Les parcelles de la saison sans sol, quand la réserve du sol est cochée (F584), et l'ancre de la première ; `null` sinon. */
   soilToEnter?: { parcels: number; anchor: string } | null;
+  /** Les espèces de la saison à rattacher, quand une case lit la correspondance des espèces (F587) ; 0 sinon. */
+  speciesToLink?: number;
+  /** Le Planning est coché et son groupe des « Réglages à relire » n'est pas validé : aucun planning (F588). */
+  planningToValidate?: boolean;
 }): UnfinishedStep[] {
   if (resolved.kind !== 'onboarding') return [];
   const remaining = new Set(resolved.remaining.map((step) => step.id));
@@ -246,7 +280,16 @@ export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
   // Comme les jardins : une parcelle apparue après la confirmation de l'étape a besoin de son sol, et le bandeau la nomme.
   const soil = needs.soilToEnter;
   if (soil && soil.parcels > 0) {
-    unfinished.push({ id: 'soil', text: `sol de ${soil.parcels} parcelle${soil.parcels > 1 ? 's' : ''}`, page: 'sol', anchor: soil.anchor });
+    unfinished.push({ id: 'soil', text: `sol de ${soil.parcels} parcelle${soil.parcels > 1 ? 's' : ''}`, page: 'sol', anchor: soil.anchor, count: soil.parcels });
+  }
+  // Une espèce peut rester sans référence par choix : l'étape confirmée, le bandeau ne la rappelle plus.
+  const species = needs.speciesToLink ?? 0;
+  if (species > 0 && remaining.has('crops')) {
+    unfinished.push({ id: 'crops', text: `${species} espèce${species > 1 ? 's' : ''} à rattacher`, page: 'reglages', anchor: SPECIES_STEP_ANCHOR });
+  }
+  // Le seul groupe sans lequel un calcul ne se fait pas : le planning attend sa validation (réponse Q10).
+  if (needs.planningToValidate) {
+    unfinished.push({ id: 'settings', text: 'réglages du planning à valider', page: 'reglages', anchor: SETTINGS_STEP_ANCHOR });
   }
   return unfinished;
 }
