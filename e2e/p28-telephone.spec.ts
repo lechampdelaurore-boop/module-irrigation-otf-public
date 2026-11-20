@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
+import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
@@ -79,6 +79,9 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   expect(bandeau!.y, 'le bandeau des alertes vient sous le formulaire').toBeGreaterThanOrEqual(formulaire!.y + formulaire!.height);
   const cloche = page.locator('header.topbar a.topbar-bell');
   await expect(cloche).toHaveAttribute('data-alerts-limited', 'true');
+  // La commune et les jardins de la ferme neuve (4.4) : le bandeau « À finir » part, les hauteurs sont celles d'une ferme réglée.
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'arrosages');
 
   // La barre du bas (F6) : quatre entrées et « Plus » au téléphone, le menu de gauche à l'ordinateur.
   const barre = barreDuBas(page);

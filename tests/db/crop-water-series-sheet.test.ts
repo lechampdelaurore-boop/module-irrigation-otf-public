@@ -8,6 +8,7 @@ import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { getSeriesCropWaterSheetForUser } from '../../lib/services/crop-water-series';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { confirmFarmLocation } from '../support/onboarding';
 import { ALICE } from '../support/spaces';
 
 /**
@@ -57,12 +58,13 @@ const snapshot: IrrigationSnapshot = {
   lastSuccessfulReadAt: '2026-05-13T00:00:00.000Z',
 };
 
-const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null }, snapshot.structure)!;
+const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: true }, snapshot.structure)!;
 
 async function prepare() {
   await saveSpeciesCorrespondenceForUser(ALICE, { plantId: 'plant-tomate', seriesId: null, target: { kind: 'reference', referenceCropId: 'criiam-tomate', analogy: false } });
   await saveSpeciesCorrespondenceForUser(ALICE, { plantId: 'plant-salade', seriesId: null, target: { kind: 'reference', referenceCropId: 'criiam-salade-ete', analogy: false } });
   const days = Array.from({ length: 7 }, (_, index) => addDaysToDateKey('2026-05-11', index));
+  await confirmFarmLocation(ALICE, snapshot.structure);
   await upsertWeatherDailyValuesForUser(ALICE, location, 'forecast', days.map((date) => ({ date, precipitationMm: 0, et0Mm: 4 })), 'test', '2026-05-11T04:00:00.000Z');
 }
 

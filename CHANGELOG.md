@@ -175,6 +175,69 @@ source détaillée commit par commit.
   registre. Rien ne change à l'écran : la page d'état et la veille de
   l'exploitant viennent avec la PR 2. Migration 0037, additive.
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4b)
+
+- **D'où viennent les dates de chaque culture** (D-227) : la fiche d'une
+  culture de référence dit d'où viennent ses dates de stade (région Sud /
+  Occitanie pour celles du CRIIAM, générales pour celles de la FAO-56, ou
+  celles de la ferme). Une nouvelle ferme d'une autre région est avertie sur
+  les cultures du CRIIAM : « Ces dates viennent d'une autre région que la
+  vôtre : vérifiez-les. » Les fermes qui utilisaient déjà le module ne le
+  sont pas.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4a)
+
+- **Les racines d'une nouvelle ferme** (D-226) : l'asperge et le melon ne
+  sont plus limités, pour une nouvelle ferme, au plafond de 0,60 m choisi
+  pour la ferme du porteur ; ils partent de la profondeur de la FAO-56
+  (1,20 m et 0,80 m), dite « estimation, à vérifier à la tarière », que la
+  ferme ajuste. Les fermes qui utilisaient déjà le module gardent leurs
+  profils.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 3)
+
+- **Le sol, d'après sa texture** (D-225) : une nouvelle ferme n'a plus,
+  en silence, l'eau évaporable d'un limon sableux dans le formulaire du
+  sol. Elle choisit la texture de chaque parcelle parmi les neuf du
+  tableau 19 de la FAO-56 ; le module propose l'eau évaporable (TEW) et
+  l'eau facilement évaporable (REW) au milieu de leur fourchette, qu'il
+  dit à côté, et la personne les ajuste. La texture est gardée avec le
+  sol. Tant qu'une parcelle n'a pas de sol, chaque page le rappelle
+  (« À finir : sol de 3 parcelles. »). Les fermes qui utilisaient déjà
+  le module gardent leurs valeurs ; la liste des textures s'ajoute à leur
+  formulaire.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 2b)
+
+- **Parcelles et abris, classés par la personne** (D-224) : une nouvelle
+  ferme dit, jardin par jardin, s'il est sous abri ou en plein champ ; le
+  module propose (le type du jardin dans Ouvre ta ferme, sinon son nom, et
+  « serre » ou « châssis » comptent désormais), la personne confirme ou
+  corrige. Tant qu'un jardin est « à classer », son besoin en eau n'est pas
+  calculé et la page dit pourquoi. Les fermes qui utilisaient déjà le
+  module gardent leur classement.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 2a)
+
+- **La commune de la ferme, choisie par la personne** (D-223) : une
+  nouvelle ferme n'a plus pour commune, en silence, le siège de sa
+  structure dans Ouvre ta ferme. Tant qu'elle n'a pas choisi sa commune,
+  le module n'affiche ni météo, ni gel, ni ET0, et chaque page le rappelle
+  par un bandeau « À finir : commune de la ferme. », avec un lien vers
+  Réglages. Le siège reste possible, d'un geste, « en dernier recours ».
+  Une commune hors de France métropolitaine est refusée. Les fermes qui
+  utilisaient déjà le module gardent leur commune telle quelle, et peuvent
+  toujours en changer sans repasser par l'accueil.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 1 sur 5)
+
+- **L'accueil d'une ferme : son état, et l'espace existant marqué** (D-222) :
+  le module garde, pour chaque ferme, l'état des cinq étapes de l'accueil
+  qu'elle confirme (commune, parcelles et abris, sol, cultures, réglages à
+  relire). Chaque ferme qui utilisait déjà le module est marquée « accueil
+  fait avant la 4.4 », ses réglages gardés tels quels, sans qu'aucun
+  chiffre change. Réglages montre l'accueil, replié en bas de la page,
+  étape par étape. Les écrans des étapes viendront avec les PR suivantes.
 ### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
 
 - **Grand écran, tablette et 320 px** (D-196) : au grand écran, la page se
