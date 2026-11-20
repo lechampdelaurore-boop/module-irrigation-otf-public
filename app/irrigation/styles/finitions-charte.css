@@ -143,3 +143,121 @@ main.app-shell details[open]:not(.row-menu, .equipment-menu, .plan-equipment-men
 small {
   font-size: max(var(--text-12), 80%);
 }
+
+/*
+ * PR 7 (n° 24) : à 320 px, les noms de la barre du bas tiennent entiers
+ * (F482) : « Aujourd'hui » et « Ressources » faisaient 64 et 65 px pour
+ * 58 px de place, et se coupaient au milieu du mot. Sous 360 px, l'entrée
+ * perd ses marges de côté et les lettres se resserrent d'un rien.
+ */
+@media (max-width: 359px) {
+  .phone-bar a,
+  .phone-bar button {
+    padding-right: 0;
+    padding-left: 0;
+    letter-spacing: -.03em;
+  }
+}
+
+/*
+ * PR 7 (n° 23) : le grand écran (F480). Le contenu se centre au-delà de sa
+ * largeur maximale au lieu de rester collé au menu ; les deux blocs d'une
+ * rangée d'« Aujourd'hui » prennent la même hauteur, sans trou sous le plus
+ * court ; les choix de la bannière de démonstration restent côte à côte.
+ */
+@media (min-width: 981px) {
+  .feature-page {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  /* Le fond vert du menu va jusqu'en bas : la marge du bas passe de la page entière à la colonne du contenu. */
+  main.app-shell:has(> .feature-layout) {
+    padding-bottom: 0;
+  }
+
+  .feature-layout > .feature-page {
+    padding-bottom: 42px;
+  }
+
+  .today-row[data-layout] {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1001px) {
+  .demo-banner-choices {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+  }
+}
+
+/*
+ * PR 7 (n° 24) : la tablette, de 601 à 980 px (F481). Les cibles de 44 px
+ * du téléphone valent jusqu'à 980 px : « Actualiser » de la ligne d'état,
+ * les liens « Voir … » d'« Aujourd'hui », les listes et les champs.
+ */
+@media (min-width: 601px) and (max-width: 980px) {
+  .refresh-link {
+    display: inline-block;
+    margin: -13px -6px;
+    padding: 13px 6px;
+  }
+
+  .today-block-more {
+    display: inline-flex;
+    min-height: var(--touch-target);
+    align-items: center;
+  }
+
+  main.app-shell :is(select, input:not([type="hidden"], [type="checkbox"], [type="radio"], [type="range"]), textarea),
+  main.app-shell .feature-page button:not(.figure-origin-toggle, .need-help > button, .feasibility-help > button, .plot-plan-content button),
+  .history-export-button,
+  .history-summary-action {
+    min-height: var(--touch-target);
+  }
+
+  .history-summary-action,
+  .history-export-button {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+  }
+
+  /* Les pastilles « i » : la boîte du bouton prend les 44 px, le rond dessiné ne change pas (comme au téléphone). */
+  .figure-origin > button.figure-origin-toggle,
+  .feasibility-help > button {
+    position: relative;
+    isolation: isolate;
+    width: var(--touch-target);
+    min-width: var(--touch-target);
+    height: var(--touch-target);
+    min-height: var(--touch-target);
+    margin: -10px;
+    border: 0;
+    background: transparent;
+  }
+
+  .figure-origin > button.figure-origin-toggle::after {
+    position: absolute;
+    z-index: -1;
+    inset: 10px;
+    border: 1px solid var(--green-soft);
+    border-radius: 50%;
+    background: var(--card);
+    content: "";
+  }
+
+  .figure-origin > button.figure-origin-toggle[aria-expanded="true"] {
+    background: transparent;
+  }
+
+  .figure-origin > button.figure-origin-toggle[aria-expanded="true"]::after {
+    border-color: var(--green);
+    background: var(--green);
+  }
+
+  .feasibility-help > button {
+    margin: -6px -4px;
+  }
+}
