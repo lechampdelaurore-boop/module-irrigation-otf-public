@@ -113,8 +113,9 @@ export const SPACE_ROOT_TABLE = 'irrigation_workspaces';
  * - `space-snapshots` : ses instantanés, sous sa clé d'espace (F643) ;
  * - `farm-connection` : le raccordement de sa ferme à Ouvre ta ferme et ses
  *   jetons, si la personne l'a fait, ou si aucun autre espace ne garde la ferme ;
- * - `farm-calls` : le journal des appels de sa ferme, quand aucun autre espace
- *   ne la garde (il compte les appels de la ferme, pour tous ses espaces).
+ * - `farm-calls` : le journal des appels de sa ferme, et le journal d'accès
+ *   du support à ses données (F660), quand aucun autre espace ne la garde
+ *   (ils valent pour la ferme, pour tous ses espaces).
  */
 export type FarmTableRule = 'space-snapshots' | 'farm-connection' | 'farm-calls';
 
@@ -126,6 +127,7 @@ export const FARM_TABLES: Readonly<Record<string, { rule: FarmTableRule; column:
   otf_daily_calls: { rule: 'farm-calls', column: 'pace_key' },
   otf_call_outcomes: { rule: 'farm-calls', column: 'pace_key' },
   otf_call_pauses: { rule: 'farm-calls', column: 'scope' },
+  irrigation_support_accesses: { rule: 'farm-calls', column: 'otf_farm_id' },
 };
 
 /** Les tables qui restent après l'effacement d'un espace, chacune avec sa raison (F563 : « ce qui reste »). */
@@ -136,6 +138,7 @@ export const KEPT_TABLES: Readonly<Record<string, string>> = {
   irrigation_crop_alert_common: 'Les seuils de gel communs, les mêmes pour toutes les fermes : aucune ligne n\'est d\'une ferme.',
   otf_deployment_farm: 'La ferme de la clé du déploiement, un identifiant d\'Ouvre ta ferme et une heure : le réglage du déploiement, réécrit à chaque lecture, pas une donnée de la personne.',
   otf_authentication_failures: 'Les refus d\'authentification du module entier, quinze minutes : des heures seules, d\'aucune ferme.',
+  irrigation_cost_readings: 'Le relevé des coûts du mois, copié du tableau de bord de Cloudflare : des nombres du déploiement, d\'aucune ferme.',
 };
 
 /**

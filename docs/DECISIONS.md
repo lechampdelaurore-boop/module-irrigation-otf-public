@@ -7186,3 +7186,28 @@ ferme qui écrit ou d'une clé perdue (F567).
 Ne changent pas : aucune migration, aucun appel à OTF, aucun secret, aucun
 service nouveau ; l'export lui-même (chiffré avant d'être écrit, jamais dans
 le dépôt) ; la phrase des 30 jours, appliquée mot pour mot.
+
+## D-250 — Tranche 4, 4.5, PR 5 (troisième partie) : le journal d'accès du support et les coûts sur la page d'état
+
+Date : 20 novembre 2026.
+
+**Contexte.** F567 veut que chaque consultation des données d'une ferme par
+l'exploitant soit notée, gardée 12 mois ; F565 (point 6) et F568 veulent
+les coûts sur la page d'état, copiés à la main chaque mois, sans appel à
+l'API de Cloudflare. Rien de cela n'existait.
+
+**Décision.** Section 10 bis.21 du contrat de la Tranche 4 (F660 à F664) :
+
+1. Une migration (0038, numéro provisoire), deux tables communes : le
+   journal d'accès du support et le relevé des coûts du mois.
+2. Une note d'accès : le jour, la ferme, la raison en une ligne, jamais ce
+   qui a été vu ; 12 mois, puis la purge du matin ; partie avec le dernier
+   espace de la ferme. La page de confidentialité le dit.
+3. Un relevé des coûts par mois, recopié du tableau de bord ; chaque poste
+   comparé à ce que l'offre Workers payante inclut (pages des prix lues le
+   20 novembre 2026), à surveiller dès 80 %, avec le prix d'un dépassement.
+4. La carte des coûts n'entre pas au registre : la veille ne la rappelle
+   pas ; sans relevé du mois écoulé, elle est en orange.
+
+Ne changent pas : aucun appel à Cloudflare ni à OTF, aucun secret, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches).

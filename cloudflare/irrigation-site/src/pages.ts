@@ -108,12 +108,13 @@ export function privacyPage(contactEmail: string | undefined): string {
 <li>Chaque semaine, le responsable du module fait une copie chiffrée de la base de données, qu'il garde lui-même hors de l'hébergeur, pour le cas où l'hébergement serait perdu. Chaque copie est effacée au bout de cinq semaines au plus : une donnée effacée peut y rester jusque-là.</li>
 <li>Le compte des lectures dans Ouvre ta ferme est gardé 30 jours au plus.</li>
 <li>Les journaux techniques du module (erreurs, durées) sont gardés sept jours par l'hébergeur.</li>
+<li>La note de chaque consultation des données de votre ferme par le responsable est gardée 12 mois ; elle est aussi effacée avec vos données de ferme.</li>
 <li>L'abonnement aux notifications est gardé jusqu'à ce que vous les désactiviez ou que votre navigateur le retire. Il est aussi effacé avec vos données de ferme, et quand plus aucune notification n'a pu lui être remise depuis 90 jours.</li>
 </ul>
 
 <h2>Où sont les données</h2>
 <p>Chez l'hébergeur Cloudflare (société américaine Cloudflare, Inc.), dans sa base de données D1 et ses serveurs Workers. L'emplacement exact des serveurs n'est pas choisi par le responsable du module.</p>
-<p>Le responsable du module administre cet hébergement : il peut techniquement lire les données de chaque ferme dans la base de données et dans les journaux techniques. Il ne les consulte que pour faire fonctionner le module, répondre à une demande ou corriger une panne.</p>
+<p>Le responsable du module administre cet hébergement : il peut techniquement lire les données de chaque ferme dans la base de données et dans les journaux techniques. Il ne les consulte que pour faire fonctionner le module, répondre à une demande ou corriger une panne. Quand il regarde les données de votre ferme, il le note : le jour, la ferme et la raison en une ligne, jamais ce qu'il a vu.</p>
 
 <h2>Ce qui sort vers l'extérieur</h2>
 <p>Rien n'est vendu, loué ni transmis à des fins commerciales. Seuls ces échanges ont lieu, chacun pour faire fonctionner le module :</p>
