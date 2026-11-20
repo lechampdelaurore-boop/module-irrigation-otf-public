@@ -15,12 +15,14 @@ import {
   saveCropFrostLinkAction,
   type WaterActionResult,
 } from './water-actions';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 type Run = (action: () => Promise<WaterActionResult>, after?: () => void) => void;
 type Scope = { season: number; weekStart: string };
 
 const HORIZONS = [1, 2, 3, 4, 5, 6, 7];
-const instantFormatter = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
+// « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const instantFormatter = { format: (value: Date | number) => dateClockText(new Date(value)) };
 
 /**
  * L'encart « Alertes cultures » (docs/weather-crop-alerts-contract.md,

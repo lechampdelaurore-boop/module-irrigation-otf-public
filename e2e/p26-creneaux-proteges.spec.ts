@@ -81,7 +81,7 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
 
   // Le créneau se crée dans le pli des réglages ; il ne fait pas recalculer (règle 8).
   await ajouterUnCreneau(planning, 'Lavage');
-  await expect(listeDesCreneaux(planning)).toContainText('Lavage · tous les jours · de 00:00 à 23:59');
+  await expect(listeDesCreneaux(planning)).toContainText('Lavage · tous les jours · de 0 h à 23 h 59');
   await expect(creneaux.locator('.planning-notice')).toContainText('Créneau protégé « Lavage » enregistré : il vaut au prochain calcul.');
   if (offertes) await expect(proposees().first(), 'le plan affiché reste celui d’avant le créneau').toBeVisible();
   await verifierLEtape(page, journal, 'créneau « Lavage » enregistré');
@@ -117,7 +117,7 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
   await expect(formulaire.getByLabel('Nom du créneau')).toHaveValue('Lavage');
   await formulaire.getByLabel('Nom du créneau').fill('Lavage des légumes');
   await formulaire.getByRole('button', { name: 'Enregistrer le créneau' }).click();
-  await expect(listeDesCreneaux(planning)).toContainText('Lavage des légumes · tous les jours · de 00:00 à 23:59', { timeout: 15_000 });
+  await expect(listeDesCreneaux(planning)).toContainText('Lavage des légumes · tous les jours · de 0 h à 23 h 59', { timeout: 15_000 });
   await verifierLEtape(page, journal, 'créneau posé après coup et renommé');
 
   // « Planifier » à la main dans le créneau : averti, jamais bloqué (règle 12, cas 14). Celui-ci n'est pas enregistré.
@@ -155,7 +155,7 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
   await ouvrirLesReglages(planning);
   await creneaux.getByRole('button', { name: 'Voir l’historique des créneaux' }).click();
   const historique = creneaux.getByRole('list', { name: 'Historique des créneaux protégés' });
-  await expect(historique.locator('li').first()).toContainText('Modifié : Lavage des légumes · tous les jours · de 00:00 à 23:59');
+  await expect(historique.locator('li').first()).toContainText('Modifié : Lavage des légumes · tous les jours · de 0 h à 23 h 59');
   expect(await historique.locator('li').count()).toBeGreaterThanOrEqual(4);
   await verifierLEtape(page, journal, 'journal des créneaux');
 

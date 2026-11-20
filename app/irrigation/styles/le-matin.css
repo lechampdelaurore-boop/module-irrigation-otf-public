@@ -16,8 +16,8 @@
   border-radius: 10px;
   background: var(--danger-soft);
   color: var(--danger-ink);
-  font-size: .95rem;
-  font-weight: 650;
+  font-size: var(--text-16);
+  font-weight: 700;
   line-height: 1.5;
   scroll-margin-top: 16px;
 }
@@ -60,7 +60,7 @@
   margin: 12px 0 0;
   padding-top: 10px;
   border-top: 1px solid var(--line);
-  font-size: .9rem;
+  font-size: var(--text-14);
   line-height: 1.5;
 }
 
@@ -72,7 +72,7 @@
 }
 
 .today-tomorrow > span {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .today-tomorrow > a {
@@ -80,7 +80,7 @@
   align-items: center;
   min-height: var(--touch-target, 44px);
   color: var(--green);
-  font-weight: 600;
+  font-weight: 700;
   text-underline-offset: 3px;
 }
 
@@ -95,11 +95,11 @@
 
 .today-tank-minimum {
   color: var(--warn-ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* « Non calculable » d'une planche dit pourquoi (lot A, R2, F282). */
-.need-unknown-reason { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }
+.need-unknown-reason { margin: .35rem 0 0; color: var(--muted); font-size: var(--text-13); }
 
 /* J14 : un gel annoncé sans alerte de gel posée, la phrase et le modèle à poser (F283, F284). */
 .today-unposed-frost {
@@ -112,8 +112,8 @@
   border-radius: 8px;
   background: var(--warn-soft);
   color: var(--warn-ink);
-  font-size: .9rem;
-  font-weight: 600;
+  font-size: var(--text-14);
+  font-weight: 700;
   line-height: 1.5;
 }
 

@@ -21,8 +21,8 @@
   color: var(--muted);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-12);
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -50,12 +50,12 @@
 .history-summary-action {
   color: var(--green);
   font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-12);
+  font-weight: 700;
 }
 
 .history-summary-action.is-main {
-  font-size: 15px;
+  font-size: var(--text-16);
   line-height: 1.25;
 }
 
