@@ -13,6 +13,7 @@ import {
   type WeatherSyncLogger,
 } from './sync-engine.ts';
 import type { WeatherProvider } from '../../domain/weather/weather-provider.ts';
+import { weatherFailureKind, type WeatherFailureKind } from '../../domain/operations/morning-task-outcomes.ts';
 
 export type { AutomaticWeatherSyncRepository, AutomaticWeatherTarget } from '../../domain/weather/automatic-sync-contract.ts';
 import type { AutomaticWeatherSyncRepository, AutomaticWeatherTarget } from '../../domain/weather/automatic-sync-contract.ts';
@@ -26,6 +27,10 @@ export type AutomaticWeatherSyncResult = {
   failedTargets: number;
   forecastRequests: number;
   reanalysisRequests: number;
+  /** La classe de l'échec de chaque lieu sans prévisions (4.5, F602) : aucun message, aucune adresse. */
+  forecastFailures: WeatherFailureKind[];
+  /** La classe de l'échec de chaque lieu sans réanalyse, comptée à part des prévisions (4.5, F600). */
+  reanalysisFailures: WeatherFailureKind[];
 };
 
 const AUTOMATIC_LOCK_MS = millisecondsFromMinutes(10);
@@ -100,6 +105,8 @@ export async function runAutomaticWeatherSync({
       });
       finalResult.forecastRequests += ranges.forecast ? 1 : 0;
       finalResult.reanalysisRequests += ranges.reanalysis ? 1 : 0;
+      if (outcome.forecast.status === 'rejected') finalResult.forecastFailures.push(weatherFailureKind(outcome.forecast.error));
+      if (outcome.reanalysis.status === 'rejected') finalResult.reanalysisFailures.push(weatherFailureKind(outcome.reanalysis.error));
       await persistOutcomeForTargets({
         repository,
         provider,
@@ -231,5 +238,7 @@ function emptyResult(status: AutomaticWeatherSyncResult['status']): AutomaticWea
     failedTargets: 0,
     forecastRequests: 0,
     reanalysisRequests: 0,
+    forecastFailures: [],
+    reanalysisFailures: [],
   };
 }

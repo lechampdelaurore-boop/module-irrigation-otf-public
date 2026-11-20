@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
+
+- **Le registre des tâches attendues** (D-240, F600 à F607) : les quatre
+  tâches du matin (prévisions, pluie estimée après coup, calcul du matin,
+  rotation du coffre) sont déclarées en code avec leur rythme et leurs
+  seuils ; chacune garde sa dernière réussite, la réanalyse à part des
+  prévisions. Une tâche passe « en retard » à 26 heures sans réussite, « en
+  panne » à 36 heures ou après trois échecs de suite, et n'est jamais verte
+  faute de réussite. Un test échoue pour tout déclencheur planifié absent du
+  registre. Rien ne change à l'écran : la page d'état et la veille de
+  l'exploitant viennent avec la PR 2. Migration 0034, additive.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 1 sur 7)
 
 - **Planning : le rouge pour le manque d'eau seul** (D-190) : une planche

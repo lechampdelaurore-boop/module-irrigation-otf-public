@@ -374,6 +374,28 @@ registres, elle y renvoie.
   appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
 
+- Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
+  (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
+  codée le 20 novembre 2026 en Opus 5.5 · Très élevé, sur la place de code
+  libre (la 4.4 codée hors accès d'OTF) : les quatre tâches du matin
+  (prévisions, réanalyse, calcul du matin, rotation du coffre) déclarées
+  dans `lib/domain/operations/task-registry.ts` avec leur rythme et leurs
+  seuils (orange à 26 heures, rouge à 36, ou trois échecs de suite ;
+  « jamais réussie » en orange) ; chaque matin enregistre une exécution par
+  tâche (migration 0034, additive), la réanalyse à part des prévisions ;
+  un test échoue pour tout déclencheur planifié absent du registre, règle
+  écrite dans `AGENTS.md` (F569). Rien ne change à l'écran ; la page
+  d'état et la veille viennent avec la PR 2. Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 854 tests, puis les 441 de
+  la base rejoués trois fois pour l'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; `pnpm e2e` non rejoué en local (aucun écran ni service appelé
+  par un écran ne change), la suite complète des parcours jouée par la CI
+  de la PR. Non vérifié sur le site : le premier matin après le
+  déploiement (R6), à lire au journal (`task_run_succeeded` ou
+  `task_run_failed`, une ligne par tâche) ou sur la page d'état de la
+  PR 2.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
