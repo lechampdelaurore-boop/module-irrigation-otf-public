@@ -66,6 +66,8 @@ test('besoin par culture en mots simples : titre en clair, plis « Pour les expe
   await expect(carte.locator(':scope > summary')).not.toContainText(/CRIIAM Sud|FAO-56|escalier|trapèze/);
   await expect(carte.locator('details.experts-fold')).toContainText(/CRIIAM Sud|FAO-56/);
   // Un seul tableau des K_abri, un seul formulaire ; la formule et le lissage dans le pli d'experts.
+  // « Réglages du calcul » est dans le pli « Réglages de cette page » (lot J, n° 15, F457).
+  await ouvrirLesReglagesDeLaPage(page);
   const reglages = section.locator('section.crop-water-settings');
   await expect(reglages.getByRole('table', { name: 'K_abri des abris' })).toBeVisible();
   await expect(reglages.getByRole('group', { name: 'Régler un K_abri' })).toHaveCount(1);

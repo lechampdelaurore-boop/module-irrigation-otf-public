@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { carteDeCulture } from './support/cultures.ts';
 
 /**
@@ -65,6 +65,8 @@ test('un Kc se surcharge et revient à la source, et le K_abri, le paillage, l�
   await verifierLEtape(page, journal, 'retour à la valeur de la source');
 
   // Le K_abri du tunnel.
+  // « Réglages du calcul » est dans le pli « Réglages de cette page » (lot J, n° 15, F457).
+  await ouvrirLesReglagesDeLaPage(page);
   const reglages = section.locator('section.crop-water-settings');
   await reglages.scrollIntoViewIfNeeded();
   await expect(reglages.getByRole('heading', { name: 'Réglages du calcul' })).toBeVisible();

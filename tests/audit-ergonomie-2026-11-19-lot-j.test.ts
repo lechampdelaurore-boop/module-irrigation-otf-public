@@ -42,3 +42,11 @@ test('n° 18, F456 : sous un titre de bloc devenu h2, les sous-titres remontent 
   }
   assert.doesNotMatch(readFileSync('app/irrigation/crop-alerts-panel.tsx', 'utf8'), /<h5[ >]/);
 });
+
+// n° 15 — « Besoin par culture » : le pli des réglages (PR 2, F457).
+
+test('n° 15, F457 : « Réglages du calcul » est rangé dans le pli « Réglages de cette page »', () => {
+  const panel = readFileSync('app/irrigation/crop-water/crop-coefficients-panel.tsx', 'utf8');
+  assert.match(panel, /<PageSettingsFold>\s*<CropWaterSettingsSection /);
+  assert.equal(panel.match(/<CropWaterSettingsSection /g)?.length, 1, 'jamais hors du pli');
+});
