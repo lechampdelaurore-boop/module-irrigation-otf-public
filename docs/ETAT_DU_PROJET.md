@@ -388,7 +388,7 @@ registres, elle y renvoie.
   accès à la base de production ni à Cloudflare depuis la session de
   code) ; il sera lu dans Réglages après le déploiement.
   **PR 2a, la commune de la ferme** (D-223, F582, section 8 bis.10 du
-  contrat) : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
+  contrat), **en ligne le 20 novembre 2026 à 16 h 40 (#127, fusionnée à 16 h 14, run 44761350240 vérifié job par job : les cinq jobs verts)** : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
   abris ; 2c la proposition par `placeLngLat`, à l'accès d'OTF). Une ferme
   neuve n'a plus le siège de sa structure pour commune en silence : sans
   commune confirmée, ni météo, ni gel, ni ET0, la page le dit, et un
