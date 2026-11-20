@@ -98,7 +98,9 @@ export async function getCropWaterWeekForUser(input: {
   const readings = et0Readings(weather);
   const plots = new Map(input.snapshot.plots.map((plot) => [plot.id, plot]));
   const wanted = input.bedIds ? new Set(input.bedIds) : null;
-  const beds = input.snapshot.beds.filter((bed) => bed.seasons.includes(input.season) && (wanted === null || wanted.has(bed.id)));
+  // Un jardin à classer (4.4, F583) : sans abri ni plein champ confirmé, aucune proposition n'est calculée.
+  const beds = input.snapshot.beds.filter((bed) => bed.seasons.includes(input.season) && (wanted === null || wanted.has(bed.id))
+    && plots.get(bed.plotId)?.mode !== 'unclassified');
 
   return {
     available: true,
@@ -143,7 +145,7 @@ export async function getCropWaterDaysForUser(input: {
   return {
     workspaceId,
     beds: input.snapshot.beds
-      .filter((bed) => bed.seasons.includes(input.season))
+      .filter((bed) => bed.seasons.includes(input.season) && plots.get(bed.plotId)?.mode !== 'unclassified')
       .map((bed) => ({
         bedId: bed.id,
         days: bedWaterDays(cropWaterBedInput(bed, plots.get(bed.plotId)?.mode === 'greenhouse', today, cropPlan, inputs, readings), sorted).days,

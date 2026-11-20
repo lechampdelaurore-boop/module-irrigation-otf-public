@@ -157,9 +157,12 @@ function summarizeSeries(
   let availableBedDays = 0;
   let totalBedDays = 0;
   let allSheltered = places.length > 0;
+  let rainUnknown = false;
 
   const beds = places.map(({ place, bed, plot }) => {
     const sheltered = plot?.mode === 'greenhouse';
+    // Un jardin à classer (4.4, F583) : on ne sait pas s'il reçoit la pluie.
+    const unclassified = plot?.mode === 'unclassified';
     if (!sheltered) allSheltered = false;
     const area = placeArea(place.lengthMeters, bed);
     const irrigation = irrigationOnBed(input.events, bed, place.lengthMeters, observed);
@@ -167,7 +170,8 @@ function summarizeSeries(
     // Sous abri, la pluie vaut explicitement zéro ; ailleurs, la mesure, sinon
     // la réanalyse — et seulement quand tous les jours sont là : une somme
     // partielle affichée comme un total tromperait (recette du 29 septembre 2026).
-    const rainMm = sheltered ? 0 : weather.actualRainAvailability.complete ? weather.actualRainMm : null;
+    const rainMm = sheltered ? 0 : unclassified ? null : weather.actualRainAvailability.complete ? weather.actualRainMm : null;
+    if (unclassified) rainUnknown = true;
 
     cubicMeters += irrigation.cubicMeters ?? 0;
     if (irrigation.cubicMeters === null) volumeIncomplete = true;
@@ -191,7 +195,7 @@ function summarizeSeries(
     };
   });
 
-  const rainComplete = allSheltered || weather.actualRainAvailability.complete;
+  const rainComplete = !rainUnknown && (allSheltered || weather.actualRainAvailability.complete);
   const weighted = (value: number) => (totalArea !== null && totalArea > 0 ? value / totalArea : null);
   const irrigationMm = weighted(millimeterSquareMeters);
   const rainMm = rainComplete ? weighted(rainMillimeterSquareMeters) : null;

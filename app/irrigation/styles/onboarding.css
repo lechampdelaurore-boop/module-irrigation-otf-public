@@ -84,3 +84,48 @@
   color: var(--ink);
   font-weight: 700;
 }
+
+/* « Parcelles et abris » (F583) : un jardin par ligne, sa proposition et trois réponses. */
+.plot-shelter-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.plot-shelter fieldset {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.plot-shelter-sheltered fieldset,
+.plot-shelter-open-field fieldset {
+  border-left-color: var(--ok);
+}
+
+.plot-shelter legend {
+  padding: 0 4px;
+}
+
+.plot-shelter-proposal {
+  margin: 4px 0 8px;
+  line-height: 1.45;
+}
+
+.plot-shelter-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.plot-shelter-answers label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+}

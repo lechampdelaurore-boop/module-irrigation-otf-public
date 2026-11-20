@@ -9,7 +9,7 @@ import { objectiveForBed } from '../../lib/domain/irrigation-needs';
 import { weekDateKeys } from '../../lib/domain/water-management';
 import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { getBedCropWaterSheetForUser } from '../../lib/services/crop-water-bed';
-import { et0Readings } from '../../lib/services/crop-water-week';
+import { et0Readings, getCropWaterWeekForUser } from '../../lib/services/crop-water-week';
 import { createIrrigationEventForUser } from '../../db/irrigation-event/create';
 import { EARLY_SPRINKLER_WARNING } from '../../lib/domain/crop-water/proposal';
 import { cultivation, series, task } from '../support/crop-water-references';
@@ -195,4 +195,14 @@ test('aspersion en début de cycle : une aspersion posée sur la planche et deux
   const later = await sheetFor(ALICE);
   assert.ok(later.available);
   assert.equal(later.sprinklerWarning, null, 'au deuxième stade, plus d’avertissement');
+});
+
+test('un jardin à classer n’a pas de proposition calculée : ni abri ni plein champ n’est supposé (4.4, F583)', async () => {
+  await prepareFarm(ALICE);
+  const read = (plotMode: 'greenhouse' | 'unclassified') => getCropWaterWeekForUser({
+    ownerUserId: ALICE, season: 2026, weekStart: WEEK, now: MONDAY_MORNING, objectiveMmByBed: new Map(),
+    snapshot: { ...snapshot, plots: snapshot.plots.map((plot) => ({ ...plot, mode: plotMode })) },
+  });
+  assert.ok((await read('greenhouse')).beds.some((item) => item.bedId === BED));
+  assert.equal((await read('unclassified')).beds.some((item) => item.bedId === BED), false);
 });

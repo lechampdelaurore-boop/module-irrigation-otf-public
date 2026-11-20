@@ -6852,3 +6852,29 @@ Ne change pas : la commune et les chiffres d'un espace existant (sa
 préférence est gardée telle quelle, F426) ; aucun appel nouveau à OTF ; le
 texte de la politique de confidentialité ; aucune valeur agronomique.
 Aucune question de budget.
+
+## D-224 — Tranche 4, sous-tranche 4.4, PR 2b : parcelles et abris, classés par la personne
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le classement abri ou plein champ d'un jardin venait seulement
+de la lecture d'OTF (`mapPlotMode`), qui lit le type du jardin et non son
+nom : une ferme neuve était classée sans le savoir, et un « Serre » déclaré
+plein champ dans OTF recevait la pluie.
+
+**Décision** (F583, section 8 bis.11 du contrat).
+
+1. Le classement confirmé est gardé par espace (`irrigation_plot_shelters`,
+   migration 0035) et posé sur le plan lu d'OTF à chaque lecture.
+2. Pour un espace qui fait l'accueil, un jardin non classé est « à
+   classer » : son besoin, sa réserve et sa proposition ne sont pas
+   calculés, et la raison est dite.
+3. La proposition vient du type d'OTF, sinon d'un mot du nom (« serre »,
+   « châssis », « multichapelle » ajoutés) ; la personne confirme, corrige
+   ou laisse à classer, jardin par jardin ou d'un geste pour les
+   propositions qui restent.
+4. Un espace d'avant l'accueil et la démonstration gardent le classement
+   d'OTF ; la migration n'écrit rien.
+
+Ne change pas : aucun chiffre d'un espace existant ; K_abri et toute valeur
+agronomique ; aucun appel nouveau à OTF. Aucune question de budget.

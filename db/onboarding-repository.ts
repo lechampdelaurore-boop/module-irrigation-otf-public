@@ -44,7 +44,7 @@ function parseValue(value: string | null): unknown {
  * change sa commune dans Réglages reste « d'avant l'accueil », sans quoi ses
  * jardins redeviendraient « à classer » et son besoin ne serait plus calculé.
  */
-export function confirmOnboardingStepStatement(workspaceId: string, step: 'location', value: unknown, at: string) {
+export function confirmOnboardingStepStatement(workspaceId: string, step: 'location' | 'plots', value: unknown, at: string) {
   return db.prepare(
     `INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, proposed_value, confirmed_at, updated_at)
      VALUES (?, ?, 'confirmed', 'onboarding', ?, ?, ?)
@@ -53,4 +53,15 @@ export function confirmOnboardingStepStatement(workspaceId: string, step: 'locat
        confirmed_at = excluded.confirmed_at, updated_at = excluded.updated_at
      WHERE irrigation_onboarding_steps.origin = 'onboarding'`,
   ).bind(workspaceId, step, JSON.stringify(value), at, at);
+}
+
+/**
+ * Une étape confirmée à l'accueil redevient « à faire » (un jardin remis
+ * « à classer ») : sa ligne s'efface. Une étape d'avant l'accueil n'est
+ * jamais touchée (F426).
+ */
+export function reopenOnboardingStepStatement(workspaceId: string, step: 'plots') {
+  return db.prepare(
+    `DELETE FROM irrigation_onboarding_steps WHERE workspace_id = ? AND step = ? AND origin = 'onboarding'`,
+  ).bind(workspaceId, step);
 }

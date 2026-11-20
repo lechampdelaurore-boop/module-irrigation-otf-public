@@ -179,7 +179,10 @@ async function soilDays(input: {
   const irrigations = irrigationIntervalsByBed({ events, plan, now: input.now, horizonEnd });
 
   const daysByBed = new Map<string, SoilReserveDay[]>();
+  // Un jardin à classer (4.4, F583) : ni la pluie ni K_abri ne se savent ; sa réserve n'est pas calculée.
+  const unclassified = new Set(plots.filter((plot) => plot.mode === 'unclassified').map((plot) => plot.id));
   for (const bed of beds) {
+    if (unclassified.has(bed.plotId)) continue;
     const underShelter = sheltered.has(bed.plotId);
     const water = cropWaterBedInput(bed, underShelter, today, cropPlan, cropInputs, readings);
     daysByBed.set(bed.id, bedSoilReserve({

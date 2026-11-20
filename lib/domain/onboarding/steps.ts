@@ -138,6 +138,15 @@ function chosenLocationText(value: unknown): string | null {
   return null;
 }
 
+/** Le compte des jardins classés, gardé à la confirmation de l'étape (F583). */
+function classifiedPlotsText(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null;
+  const { sheltered, openField } = value as { sheltered?: unknown; openField?: unknown };
+  if (typeof sheltered !== 'number' || typeof openField !== 'number') return null;
+  const plural = (count: number, one: string, many: string) => `${count} ${count > 1 ? many : one}`;
+  return `${plural(sheltered, 'abri', 'abris')}, ${plural(openField, 'jardin de plein champ', 'jardins de plein champ')}`;
+}
+
 /**
  * La commune de la météo est-elle confirmée (F419) ? Oui pour un espace
  * d'avant l'accueil (son réglage est gardé tel quel) et pour la
@@ -159,7 +168,7 @@ export function verificationLine(step: OnboardingStep): VerificationLine {
     case 'confirmed': {
       if (step.origin === 'before-onboarding') return { ...base, tone: 'confirmed', text: 'Réglage d’avant l’accueil, gardé tel quel.' };
       const when = step.confirmedAt ? `Confirmé le ${dateFormat.format(new Date(step.confirmedAt))}` : 'Confirmé';
-      const detail = step.id === 'location' ? chosenLocationText(step.proposedValue) : null;
+      const detail = step.id === 'location' ? chosenLocationText(step.proposedValue) : step.id === 'plots' ? classifiedPlotsText(step.proposedValue) : null;
       return { ...base, tone: 'confirmed', text: detail ? `${when} : ${detail}.` : `${when}.` };
     }
     case 'skipped':
@@ -195,14 +204,24 @@ export type UnfinishedStep = { id: OnboardingStepId; text: string; anchor: strin
  * Ce que le bandeau « À finir » nomme (section 8 bis.3, F582) : seulement
  * une étape que la personne peut faire dès maintenant et dont une case
  * cochée a besoin. La 4.4 l'étend étape par étape, avec l'écran de chacune
- * (F581) : la commune de la ferme d'abord (PR 2), pour les cases qui lisent
- * la météo. Une étape passée n'est pas rappelée : elle est dite à la
+ * (F581) : la commune de la ferme (PR 2a), pour les cases qui lisent la
+ * météo ; les jardins à classer (PR 2b), pour les cases qui calculent un
+ * besoin. Une étape passée n'est pas rappelée : elle est dite à la
  * vérification (F427).
  */
-export function unfinishedSteps(resolved: ResolvedOnboarding, needs: { weather: boolean }): UnfinishedStep[] {
+export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
+  weather: boolean;
+  /** Les jardins de la saison encore à classer, quand une case calcule un besoin (F583) ; 0 sinon. */
+  plotsToClassify: number;
+}): UnfinishedStep[] {
   if (resolved.kind !== 'onboarding') return [];
   const remaining = new Set(resolved.remaining.map((step) => step.id));
   const unfinished: UnfinishedStep[] = [];
   if (needs.weather && remaining.has('location')) unfinished.push({ id: 'location', text: 'commune de la ferme', anchor: 'water-weather-title' });
+  // Un jardin apparu dans Ouvre ta ferme après la confirmation de l'étape est à classer lui aussi : le compte suit le plan.
+  if (needs.plotsToClassify > 0) {
+    const count = needs.plotsToClassify;
+    unfinished.push({ id: 'plots', text: `${count} jardin${count > 1 ? 's' : ''} à classer`, anchor: 'parcelles-et-abris' });
+  }
   return unfinished;
 }

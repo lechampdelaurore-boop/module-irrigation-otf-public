@@ -26,7 +26,8 @@ import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
-import { usesWeather } from '@/lib/domain/features/socle';
+import { usesPlotShelters, usesWeather } from '@/lib/domain/features/socle';
+import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
 import { getOnboardingForUser } from '@/lib/services/onboarding-service';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
@@ -152,7 +153,10 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       notice: absentPageNotice(params.absente),
       demo: isDemoDeployment(),
       demoSelection: isDemoDeployment() ? demoSelectionOfOwner(user.userId) : null,
-      unfinished: unfinishedSteps(onboarding, { weather: usesWeather(enabled) }),
+      unfinished: unfinishedSteps(onboarding, {
+        weather: usesWeather(enabled),
+        plotsToClassify: usesPlotShelters(enabled) ? unclassifiedPlots(snapshot, season).length : 0,
+      }),
     },
     lap: (step) => stopwatch.lap(step),
     logLoaded: () => {

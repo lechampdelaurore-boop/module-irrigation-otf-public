@@ -2200,3 +2200,22 @@ export const onboardingSteps = sqliteTable(
     check('chk_onboarding_proposed_value', sql`${table.proposedValue} IS NULL OR json_valid(${table.proposedValue})`),
   ],
 );
+
+/** Le classement d'un jardin, abri ou plein champ, confirmé par la personne (4.4, F420, F583, migration 0035). */
+export const plotShelters = sqliteTable(
+  'irrigation_plot_shelters',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    plotId: text('otf_plot_id').notNull(),
+    sheltered: integer('sheltered').notNull(),
+    proposedSheltered: integer('proposed_sheltered'),
+    confirmedAt: text('confirmed_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.plotId] }),
+    check('chk_plot_shelter_sheltered', sql`${table.sheltered} IN (0, 1)`),
+    check('chk_plot_shelter_proposed', sql`${table.proposedSheltered} IS NULL OR ${table.proposedSheltered} IN (0, 1)`),
+    check('chk_plot_shelter_plot', sql`length(${table.plotId}) > 0`),
+  ],
+);

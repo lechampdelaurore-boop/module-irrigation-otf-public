@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { choisirLeSiegeCommeCommune, ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
@@ -32,7 +32,7 @@ test('la vue d’ensemble montre une barre par jardin, inconnue sans sol, rempli
   const telephone = testInfo.project.name === 'telephone';
   const journal = surveillerLaConsole(page);
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'p33');
-  await choisirLeSiegeCommeCommune(page);
+  await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'sol');
   const section = page.locator('section.soil-reserve');
   const pres = section.getByRole('region', { name: 'Réserve · Les Prés' });

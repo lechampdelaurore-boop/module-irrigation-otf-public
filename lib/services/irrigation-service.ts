@@ -18,6 +18,9 @@ import { startFarmRead, type FarmRead } from '@/lib/services/otf-farm-read';
 import type { OtfReadContext } from '@/lib/domain/otf/shared-call-pace';
 import { demoChoiceOfOwner } from '@/lib/domain/demo/catalogue';
 import { demoFarmSnapshot } from '@/lib/adapters/demo/farms';
+import { listPlotSheltersForUser } from '@/db/plot-shelter-repository';
+import { applyPlotShelters } from '@/lib/domain/onboarding/plots';
+import { getOnboardingForUser } from '@/lib/services/onboarding-service';
 
 // Le plan de culture s'ajoute à l'instantané le 29 septembre 2026 : un cache
 // de la version précédente n'en a pas, une nouvelle clé force sa lecture.
@@ -42,7 +45,17 @@ type IrrigationSnapshotOptions = {
  * est rendu après l'écriture du cache, où une seconde lecture de la même
  * ferme trouve ce qu'elle a rangé (F388).
  */
-export async function getIrrigationSnapshot(
+export async function getIrrigationSnapshot(cacheKey: string, options: IrrigationSnapshotOptions): Promise<IrrigationSnapshot> {
+  // Le plan lu d'Ouvre ta ferme est rangé tel quel ; le classement des jardins de l'espace s'y pose à la sortie (4.4, F583).
+  const [snapshot, onboarding, shelters] = await Promise.all([
+    readFarmSnapshot(cacheKey, options),
+    getOnboardingForUser(cacheKey),
+    listPlotSheltersForUser(cacheKey),
+  ]);
+  return applyPlotShelters(snapshot, onboarding, shelters);
+}
+
+async function readFarmSnapshot(
   cacheKey: string,
   { season, forceRefresh = false, context = 'page' }: IrrigationSnapshotOptions,
 ): Promise<IrrigationSnapshot> {

@@ -13,10 +13,12 @@ const TONE_WORDS = { confirmed: 'Confirmé', skipped: 'Passé', missing: 'À fai
  * météo, plus haut (PR 2, F582). Absent de la
  * démonstration, dont les fermes fictives sont déjà réglées.
  */
-export function OnboardingSettings({ onboarding, locationHere }: {
+export function OnboardingSettings({ onboarding, locationHere, plotsHere }: {
   onboarding: ResolvedOnboarding;
   /** Le lieu de la météo est sur cette page (une case cochée lit la météo) : l'étape « Où est la ferme » y mène (F582). */
   locationHere: boolean;
+  /** « Parcelles et abris » est sur cette page : l'étape y mène (F583). */
+  plotsHere: boolean;
 }) {
   if (onboarding.kind === 'demonstration') return null;
   const lines = onboarding.steps.map(verificationLine);
@@ -36,6 +38,7 @@ export function OnboardingSettings({ onboarding, locationHere }: {
                 <span className="onboarding-step-state">{TONE_WORDS[line.tone]}</span>
                 <span>{line.text}</span>
                 {line.id === 'location' && line.tone === 'missing' && locationHere ? <a href="#water-weather-title">Choisir la commune</a> : null}
+                {line.id === 'plots' && line.tone === 'missing' && plotsHere ? <a href="#parcelles-et-abris">Classer les jardins</a> : null}
               </li>
             ))}
           </ol>

@@ -127,7 +127,7 @@ test('un espace d’avant l’accueil garde sa commune sans rien confirmer de no
   assert.equal(preference.locationConfirmed, true);
   const dashboard = await getWaterDashboardForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW, provider: new CountingProvider() });
   assert.equal(dashboard.weather.locationKey, 'otf:saint-aubin:03160');
-  assert.equal(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true }).length, 0);
+  assert.equal(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true, plotsToClassify: 0 }).length, 0);
 });
 
 test('un espace d’avant l’accueil qui change de commune reste d’avant l’accueil (F426)', async () => {
@@ -147,14 +147,14 @@ test('un espace d’avant l’accueil qui change de commune reste d’avant l’
 test('le bandeau « À finir » nomme la commune seulement quand une case lit la météo, et part quand elle est choisie', async () => {
   await ensureWorkspaceForUser(ALICE);
   const before = await getOnboardingForUser(ALICE);
-  assert.deepEqual(unfinishedSteps(before, { weather: true }), [{ id: 'location', text: 'commune de la ferme', anchor: 'water-weather-title' }]);
-  assert.deepEqual(unfinishedSteps(before, { weather: false }), []);
+  assert.deepEqual(unfinishedSteps(before, { weather: true, plotsToClassify: 0 }), [{ id: 'location', text: 'commune de la ferme', anchor: 'water-weather-title' }]);
+  assert.deepEqual(unfinishedSteps(before, { weather: false, plotsToClassify: 0 }), []);
   await saveWeatherPreferenceForUser(ALICE, { locationMode: 'custom', customCity: 'Tronget', customPostcode: '03240' });
-  assert.deepEqual(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true }), []);
+  assert.deepEqual(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true, plotsToClassify: 0 }), []);
 });
 
 test('la démonstration n’a pas d’accueil : sa commune est tenue pour confirmée, sans bandeau', async () => {
   process.env.DEMO_MODE = 'true';
   assert.equal((await readWeatherPreference(ALICE)).locationConfirmed, true);
-  assert.deepEqual(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true }), []);
+  assert.deepEqual(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true, plotsToClassify: 0 }), []);
 });

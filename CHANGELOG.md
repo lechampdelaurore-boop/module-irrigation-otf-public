@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 2b)
+
+- **Parcelles et abris, classés par la personne** (D-224) : une nouvelle
+  ferme dit, jardin par jardin, s'il est sous abri ou en plein champ ; le
+  module propose (le type du jardin dans Ouvre ta ferme, sinon son nom, et
+  « serre » ou « châssis » comptent désormais), la personne confirme ou
+  corrige. Tant qu'un jardin est « à classer », son besoin en eau n'est pas
+  calculé et la page dit pourquoi. Les fermes qui utilisaient déjà le
+  module gardent leur classement.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 2a)
 
 - **La commune de la ferme, choisie par la personne** (D-223) : une
