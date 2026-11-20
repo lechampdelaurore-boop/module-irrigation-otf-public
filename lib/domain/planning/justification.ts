@@ -1,5 +1,6 @@
 import type { DoseReason, TimingReason } from './contract.ts';
 import type { SupplyChain } from './supply.ts';
+import { clockText } from '../clock-text.ts';
 
 /**
  * La justification d'un créneau, dite en mots (docs/planning-contract.md,
@@ -29,8 +30,7 @@ export function describeLimitingConstraint(
   timeZone: string,
 ): string | null {
   const { doseReason, timingReason, pump } = placement;
-  const clock = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone });
-  const hour = clock.format(new Date(placement.startMs));
+  const hour = clockText(new Date(placement.startMs), timeZone);
   if (doseReason === 'pump-gap' || timingReason === 'pump-capacity') {
     const parts: string[] = [];
     if (timingReason === 'pump-capacity') {
@@ -38,7 +38,7 @@ export function describeLimitingConstraint(
         ? `libre trop peu de temps avant ${hour}, ${pump.before.occupants} dès cette heure`
         : `saturée avant ${hour} : ${pump.before?.occupants ?? 'aucun'}`);
     }
-    if (doseReason === 'pump-gap') parts.push(`saturée dès ${clock.format(new Date(placement.endMs))} : ${pump.after ?? 'aucun'}`);
+    if (doseReason === 'pump-gap') parts.push(`saturée dès ${clockText(new Date(placement.endMs), timeZone)} : ${pump.after ?? 'aucun'}`);
     return `pompe « ${chain.pumpTimeline?.pump.name ?? '?'} » ${parts.join(' ; ')}`;
   }
   if (doseReason === 'daily-limit' || timingReason === 'daily-limit') return 'limite journalière d’irrigation atteinte';

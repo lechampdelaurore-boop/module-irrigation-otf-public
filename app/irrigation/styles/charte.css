@@ -59,8 +59,8 @@
 
   :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) thead th {
     color: var(--ink2);
-    font-size: .73125rem;
-    font-weight: 600;
+    font-size: var(--text-12);
+    font-weight: 700;
   }
 
   :is(.water-week-table, .series-beds, .planning-table, .reference-crop-table, .resource-flow-history table, .resource-flow-consumption table) tbody tr:nth-child(odd) {

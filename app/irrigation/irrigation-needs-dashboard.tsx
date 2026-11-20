@@ -13,10 +13,12 @@ import { ActionReply, actionReply, type ActionReplyMessage } from './shell/actio
 import { PageSettingsFold } from './shell/page-settings-fold';
 import { gardenState } from '@/lib/domain/besoins-phone';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
-const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
+// « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const dateTime = { format: (value: Date | number) => dateClockText(new Date(value)) };
 type SortMode = 'priority' | 'deficit' | 'covered' | 'remaining';
 /** Les classes de message de la section, gardées telles qu'avant le lot G. */
 const NEEDS_REPLY_CLASSES = { notice: 'water-notice', warning: 'irrigation-needs-warning', error: 'water-error' } as const;

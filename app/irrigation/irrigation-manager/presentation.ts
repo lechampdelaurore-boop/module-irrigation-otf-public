@@ -10,6 +10,7 @@ import {
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import { type PumpOrigin } from '@/lib/domain/pumps';
 import { activeTimerSeconds, remainingTimerSeconds } from '@/lib/domain/irrigation-timer';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 export type CreationKind = 'running' | 'planned' | 'completed';
 
@@ -17,11 +18,8 @@ export const decimalFormatter = new Intl.NumberFormat('fr-FR', {
   maximumFractionDigits: 2,
 });
 
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'Europe/Paris',
-});
+// « 16 juin 2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const dateTimeFormatter = { format: (value: Date) => dateClockText(value, 'Europe/Paris', 'medium') };
 
 export function pumpOriginLabel(
   origin: PumpOrigin,
@@ -79,7 +77,7 @@ export function formatDuration(seconds: number | null) {
   const minutes = roundedMinutes % 60;
   if (hours === 0) return `${minutes} min`;
   if (minutes === 0) return `${hours} h`;
-  return `${hours} h ${String(minutes).padStart(2, '0')} min`;
+  return `${hours} h ${String(minutes).padStart(2, '0')}`;
 }
 
 export function formatCountdown(seconds: number) {

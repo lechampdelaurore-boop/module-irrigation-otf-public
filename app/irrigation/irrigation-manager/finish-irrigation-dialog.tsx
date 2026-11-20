@@ -35,7 +35,7 @@ export function FinishIrrigationDialog({
           <span>Heure réelle de fin</span>
           <input
             type="datetime-local"
-            step="1"
+            step="60"
             value={finishAt}
             onChange={(event) => onFinishAtChange(event.target.value)}
           />
@@ -43,7 +43,7 @@ export function FinishIrrigationDialog({
         <div className="irrigation-dialog-actions">
           <button type="button" disabled={pending} onClick={onCancel}>Retour</button>
           <button type="button" className="primary" disabled={pending} onClick={onConfirm}>
-            {pending ? 'Enregistrement…' : 'Irrigation terminée'}
+            {pending ? 'Enregistrement…' : 'Terminer l’irrigation'}
           </button>
         </div>
       </div>
