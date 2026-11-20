@@ -9,7 +9,7 @@ import { assertPassphrase, samePassphrase } from './export-crypto.ts';
 type Keyboard = NodeJS.ReadStream;
 type Screen = { write(text: string): unknown };
 
-export class PassphraseInputError extends Error {
+class PassphraseInputError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'PassphraseInputError';

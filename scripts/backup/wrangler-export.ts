@@ -31,11 +31,14 @@ export class ExportCaptureError extends Error {
 
 /** Une ligne de Wrangler, sans adresse : on y lit ce qu'il fait, jamais où se télécharge l'export. */
 export function maskedWranglerLine(line: string): string {
-  return line.replace(/\bhttps?:\/\/\S+/gi, '(adresse masquée)');
+  return line
+    .replace(/\bhttps?:\/\/\S+/gi, '(adresse masquée)')
+    // Les identifiants du compte et des bases (32 chiffres hexadécimaux, avec ou sans tirets) : les journaux du flux sont publics.
+    .replace(/\b[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}\b/gi, '(identifiant masqué)');
 }
 
 /** Le chemin convenu avec le détour : dans un dossier qui n'existe pas, pour que rien ne s'y écrive jamais. */
-export function captureTarget(): string {
+function captureTarget(): string {
   return path.join(tmpdir(), `module-irrigation-export-sans-dossier-${randomUUID()}`, 'export.sql');
 }
 
@@ -121,4 +124,55 @@ export function captureWranglerExport(source: ExportSource, { cli = wranglerCli(
       resolve({ sql, sha256: createHash('sha256').update(sql).digest('hex'), durationMs: Date.now() - startedAt });
     });
   });
+}
+
+/**
+ * Une commande de Wrangler (essai de restauration, 10 bis.15) : sa sortie
+ * standard est rendue (le JSON demandé par `--json`), ses messages relayés
+ * ligne par ligne, chaque adresse masquée. Un code d'erreur lève une erreur
+ * qui ne cite que la commande.
+ */
+export function runWranglerCommand(args: readonly string[], { cli = wranglerCli(), cwd = process.cwd(), relay = () => {} }: RunOptions = {}): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ['--no-warnings', cli, ...args], { cwd, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let out = '';
+    let pending = '';
+    child.stdout?.setEncoding('utf8');
+    child.stdout?.on('data', (text: string) => { out += text; });
+    child.stderr?.setEncoding('utf8');
+    child.stderr?.on('data', (text: string) => {
+      pending += text;
+      const lines = pending.split(/\r?\n/);
+      pending = lines.pop() ?? '';
+      for (const line of lines) if (line.trim()) relay(maskedWranglerLine(line));
+    });
+    child.on('error', () => reject(new ExportCaptureError('Wrangler n’a pas pu être lancé.')));
+    let errors = '';
+    child.stderr?.on('data', (text: string) => { errors += text; });
+    child.on('close', (code) => {
+      if (pending.trim()) relay(maskedWranglerLine(pending));
+      if (code === 0) resolve(out);
+      else {
+        for (const line of out.split(/\r?\n/)) if (line.trim()) relay(maskedWranglerLine(line));
+        const reason = wranglerFailureReason(`${errors}\n${out}`);
+        reject(new ExportCaptureError(`Wrangler a échoué (${args.slice(0, 2).join(' ')}, code ${String(code)}${reason ? ` : ${reason}` : ''}).`));
+      }
+    });
+  });
+}
+
+/**
+ * La raison d'un échec de SQLite ou de D1, quand Wrangler la dit : un nom de
+ * contrainte ou de table, jamais une valeur. Rien si elle n'est pas reconnue.
+ */
+export function wranglerFailureReason(output: string): string | null {
+  const found = /(no such (?:table|column): [\w.]+|(?:FOREIGN KEY|UNIQUE|NOT NULL|CHECK|PRIMARY KEY) constraint failed(?:: [\w.]+)?|SQLITE_[A-Z_]+|not authorized)/.exec(output);
+  return found ? found[1] : null;
+}
+
+/** Le JSON que Wrangler écrit avec `--json`, même précédé d'un avertissement. */
+export function wranglerJson<T>(output: string): T {
+  const start = output.search(/^[[{]/m);
+  if (start < 0) throw new ExportCaptureError('Wrangler n’a pas rendu de JSON.');
+  return JSON.parse(output.slice(start)) as T;
 }

@@ -6831,3 +6831,52 @@ porteur. La règle de conservation des exports (un export garde les données
 d'une ferme effacée depuis) s'écrit avec la PR 5 (F562), sous la relecture
 du porteur.
 
+
+## D-244 — Tranche 4, 4.5, PR 4 (seconde partie) : l'essai de restauration et la restauration depuis un export
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat (F561) demande trois scénarios joués pour de vrai
+sur une base d'essai remplie de données fictives, puis détruite : S1
+(revenir en arrière avec Time Travel, et rattraper une seule ferme), S2
+(reconstruire depuis un export, puis l'isolation des deux fermes contre la
+base restaurée), S3 (perdre la clé du coffre). Les sabotages doivent faire
+échouer l'essai, et sa sortie ne contient aucune donnée. Créer une base
+chez Cloudflare attend le « vas-y » du porteur. La simulation du script a
+montré qu'un export brut de D1 ne se réimporte pas tel quel dans une base
+aux clés étrangères actives, et que rattraper une ferme fait avancer ses
+compteurs de révision.
+
+**Décision.** Section 10 bis.15 du contrat de la Tranche 4 (F627 à F635) :
+
+1. `pnpm backup:rehearse --cloudflare` joue l'essai sur trois bases nommées
+   à partir de `module-irrigation-otf-essai-restauration`, et sur elles
+   seules : chaque geste refuse tout autre nom avant d'appeler Wrangler,
+   lancé depuis un dossier sans réglages. Les bases sont détruites à la fin,
+   réussi ou non. Il se lance par un flux GitHub à part, à la main ou par la
+   branche `essai-restauration`, jamais sur une PR, sans artefact. Sans
+   option, la même commande joue une simulation contre une fausse D1 en
+   mémoire.
+2. Le rattrapage d'une seule ferme : restauration sur place, export de
+   l'état d'avant (la copie), retour au signet noté ; puis seules les lignes
+   de la ferme absentes de l'état présent, par leur clé primaire, sont
+   réinsérées ; une ligne encore présente n'est jamais réécrite, seulement
+   signalée. Les compteurs de révision avancent et ne reculent jamais. En
+   vrai : le soir, avec l'assistant, sur la décision du porteur.
+3. Un export se réimporte **rangé** : les tables d'abord, puis les lignes,
+   chaque table après celles qu'elle désigne, puis index et déclencheurs.
+   L'essai essaie aussi l'export brut, pour savoir ce que D1 en dit.
+4. Contre la base reconstruite, l'isolation se prouve par le contrôle de
+   cohérence (F380) et par les lectures des dépôts du module pour chacune
+   des deux fermes ; S3 se joue sur cette même base.
+5. `pnpm backup:restore` reconstruit une base perdue depuis un export
+   chiffré, dans une base neuve ou vide seulement (une base qui a des
+   tables est refusée, jamais écrasée), puis la compare table par table.
+   L'import rangé y est écrit le temps de l'envoi dans un dossier privé
+   effacé aussitôt : `wrangler d1 execute` ne lit qu'un fichier.
+
+Ne changent pas : aucun secret dans le dépôt, aucune dépense, aucune
+migration, aucun appel à OTF ; rien chez Cloudflare avant le « vas-y » du
+porteur ; l'essai réel et son compte rendu, collé dans la PR, avant la
+fusion. L'essai inscrit au registre (une fois par trimestre) et sa date sur
+la page d'état viennent dans une PR à part.

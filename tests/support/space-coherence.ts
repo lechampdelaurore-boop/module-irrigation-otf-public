@@ -136,17 +136,7 @@ export function crossSpaceReferences(database: DatabaseSync): string[] {
   const references = [...tables.flatMap((table) => declaredReferences(database, table)), ...UNDECLARED];
   assertClassified(tables, columns, references);
 
-  const spaceOf = (table: string, alias: string): string | null => {
-    if (COMMON_TABLES.has(table)) return null;
-    if (table === 'irrigation_workspaces') return `${alias}.id`;
-    if (columns.get(table)?.includes('workspace_id')) return `${alias}.workspace_id`;
-    const owner = OWNER[table];
-    const parent = `${alias}_up`;
-    const parentSpace = spaceOf(owner.target, parent);
-    return parentSpace === null
-      ? null
-      : `(SELECT ${parentSpace} FROM "${owner.target}" AS ${parent} WHERE ${parent}.id = ${alias}."${owner.column}")`;
-  };
+  const spaceOf = (table: string, alias: string): string | null => spaceOfRow(columns, table, alias);
 
   const found: string[] = [];
   for (const reference of references) {
@@ -178,6 +168,33 @@ export function crossSpaceReferences(database: DatabaseSync): string[] {
     }
   }
   return found;
+}
+
+/** L'espace d'une ligne : sa colonne `workspace_id`, sinon celui de la ligne qu'elle complète ; `null` pour une table commune. */
+function spaceOfRow(columns: ReadonlyMap<string, string[]>, table: string, alias: string): string | null {
+  if (COMMON_TABLES.has(table)) return null;
+  if (table === 'irrigation_workspaces') return `${alias}.id`;
+  if (columns.get(table)?.includes('workspace_id')) return `${alias}.workspace_id`;
+  const owner = OWNER[table];
+  if (!owner) throw new UnclassifiedSchemaError(`Table sans espace connu : ${table}`);
+  const parent = `${alias}_up`;
+  const parentSpace = spaceOfRow(columns, owner.target, parent);
+  return parentSpace === null
+    ? null
+    : `(SELECT ${parentSpace} FROM "${owner.target}" AS ${parent} WHERE ${parent}.id = ${alias}."${owner.column}")`;
+}
+
+/**
+ * L'expression SQL de l'espace d'une ligne de `table`, sous l'alias donné, ou
+ * `null` pour une table commune à tous les espaces. L'essai de restauration
+ * s'en sert pour lire, réinsérer et comparer les lignes d'une seule ferme
+ * (docs/tranche-4-contract.md, F561, point 4 ; 10 bis.15).
+ */
+export function spaceExpression(database: DatabaseSync, table: string, alias: string): string | null {
+  const tables = (database.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[])
+    .map(({ name }) => name)
+    .filter((name) => !SYSTEM_TABLE.test(name));
+  return spaceOfRow(new Map(tables.map((name) => [name, columnsOf(database, name)])), table, alias);
 }
 
 function columnsOf(database: DatabaseSync, table: string): string[] {

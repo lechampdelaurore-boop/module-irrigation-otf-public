@@ -5,6 +5,34 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 4 sur 5, seconde partie)
+
+- **L'essai de restauration** (D-244, F627 à F635) : `pnpm backup:rehearse`
+  joue les trois scénarios du contrat sur deux fermes fictives et compare
+  chaque état table par table : revenir en arrière avec Time Travel (et
+  revenir à l'état d'avant), rattraper une seule ferme sans toucher l'autre,
+  reconstruire la base depuis un export puis prouver l'isolation des deux
+  fermes contre elle, perdre la clé du coffre des jetons. Sans option, une
+  simulation sur l'ordinateur ; avec `--cloudflare`, l'essai sur une base
+  d'essai chez Cloudflare (flux « Essai de restauration », jamais sur une
+  PR, seulement sur le « vas-y » du porteur), qui ne peut toucher aucune
+  autre base et la détruit à la fin. Le compte rendu ne dit que des noms
+  de tables, des nombres et des empreintes.
+- **La restauration d'une base perdue depuis un export** : `pnpm
+  backup:restore <fichier> --base <nom>` déchiffre l'export en mémoire, le
+  contrôle, l'importe dans une base neuve ou vide (jamais dans une base qui
+  a des tables), puis compare la base reconstruite à l'export. Procédures
+  dans `docs/exploitation.md` (« Restaurer la base »).
+
+### Changé (Tranche 4, 4.5, PR 4 sur 5, seconde partie)
+
+- Un export se réimporte **rangé** (les tables d'abord, puis les lignes,
+  chaque table après celles qu'elle désigne) : la simulation a montré que
+  l'export brut de D1, qui range les tables dans l'ordre de leur création,
+  ne se réimporte pas tel quel là où les clés étrangères sont actives.
+- `pnpm knip` lit aussi les modules de `scripts/backup/` ; les exports
+  qu'aucun autre fichier n'utilisait n'en sont plus.
+
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, première partie)
 
 - **L'export hebdomadaire chiffré de la base, hors de Cloudflare** (D-243,

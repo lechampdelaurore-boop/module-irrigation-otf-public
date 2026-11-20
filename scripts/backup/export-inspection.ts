@@ -109,11 +109,16 @@ function canonicalValue(value: unknown): unknown {
   return value;
 }
 
+/** Une ligne écrite d'une seule façon, colonnes rangées : la même ligne donne la même chaîne, où qu'elle soit lue. */
+export function canonicalRow(columns: readonly string[], row: Record<string, unknown>): string {
+  return JSON.stringify(columns.map((column) => canonicalValue(row[column])));
+}
+
 /** Le nombre de lignes et l'empreinte du contenu d'une table, indépendante de l'ordre des lignes et des colonnes. */
-export function tableSummary(database: DatabaseSync, name: string): TableSummary {
+function tableSummary(database: DatabaseSync, name: string): TableSummary {
   const columns = (database.prepare(`PRAGMA table_info(${quoteIdentifier(name)})`).all() as { name: string }[]).map((column) => column.name).sort();
   const rows = (database.prepare(`SELECT * FROM ${quoteIdentifier(name)}`).all() as Record<string, unknown>[])
-    .map((row) => JSON.stringify(columns.map((column) => canonicalValue(row[column]))))
+    .map((row) => canonicalRow(columns, row))
     .sort();
   const hash = createHash('sha256').update(`${name}\n${JSON.stringify(columns)}\n`);
   for (const row of rows) hash.update(`${row}\n`);

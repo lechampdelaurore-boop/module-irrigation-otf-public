@@ -14,7 +14,7 @@ import { FARM_TIME_ZONE } from '../../lib/domain/water-management.ts';
 import type { ExportInspection } from './export-inspection.ts';
 
 export const DEFAULT_DATABASE = 'module-irrigation-otf';
-export const EXPORT_EXTENSION = '.chiffre';
+const EXPORT_EXTENSION = '.chiffre';
 
 export function repositoryRoot(): string {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
