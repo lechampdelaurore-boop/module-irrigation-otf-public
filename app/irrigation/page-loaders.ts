@@ -13,6 +13,7 @@ import { getCropCoefficientsViewForUser } from '@/lib/services/crop-water-coeffi
 import { getIrrigationFormHintsForUser } from '@/lib/services/irrigation-form-hints';
 import { getIrrigationHistoryDashboardForUser } from '@/lib/services/irrigation-history-service';
 import { getIrrigationNeedsDashboardForUser } from '@/lib/services/irrigation-needs-service';
+import { getOnboardingForUser } from '@/lib/services/onboarding-service';
 import { readWeeklyPlanForUser } from '@/lib/services/planning-service';
 import { shortageDecisionPending } from '@/lib/domain/planning/shortage-reading';
 import { emptyPumpDashboard, getPumpDashboardForUser } from '@/lib/services/pump-dashboard';
@@ -217,13 +218,14 @@ export async function loadHistoriquePage(context: ReadyPageContext) {
  * lieu de la météo et la correspondance des espèces (P3).
  */
 export async function loadReglagesPage(context: ReadyPageContext) {
-  const [counts, waterDashboard, cropCoefficients] = await Promise.all([
+  const [counts, onboarding, waterDashboard, cropCoefficients] = await Promise.all([
     countFeatureDataForUser(context.userId),
+    getOnboardingForUser(context.userId),
     usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
     usesSpeciesCorrespondence(context.enabled)
       ? getCropCoefficientsViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot })
       : null,
   ]);
   context.lap('dashboards');
-  return { counts, waterDashboard, cropCoefficients };
+  return { counts, onboarding, waterDashboard, cropCoefficients };
 }

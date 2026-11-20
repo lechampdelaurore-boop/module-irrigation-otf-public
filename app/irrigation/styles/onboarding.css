@@ -1,0 +1,58 @@
+/*
+ * L'accueil de la ferme, dans Réglages (4.4, docs/tranche-4-contract.md,
+ * F417, F427, F581) : une ligne par étape, sa couleur dite aussi en mots
+ * (vert confirmé, orange passé, rouge à faire). Couleurs de la charte du
+ * module.
+ */
+
+.onboarding-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.onboarding-step > span:last-child {
+  grid-column: 1 / -1;
+  line-height: 1.45;
+}
+
+.onboarding-step-state {
+  font-weight: 700;
+}
+
+.onboarding-step-confirmed {
+  border-left-color: var(--ok);
+}
+
+.onboarding-step-confirmed .onboarding-step-state {
+  color: var(--ok-ink);
+}
+
+.onboarding-step-skipped {
+  border-left-color: var(--warn);
+}
+
+.onboarding-step-skipped .onboarding-step-state {
+  color: var(--warn-ink);
+}
+
+.onboarding-step-missing {
+  border-left-color: var(--danger);
+}
+
+.onboarding-step-missing .onboarding-step-state {
+  color: var(--danger-ink);
+}

@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 1 sur 5)
+
+- **L'accueil d'une ferme : son état, et l'espace existant marqué** (D-222) :
+  le module garde, pour chaque ferme, l'état des cinq étapes de l'accueil
+  qu'elle confirme (commune, parcelles et abris, sol, cultures, réglages à
+  relire). Chaque ferme qui utilisait déjà le module est marquée « accueil
+  fait avant la 4.4 », ses réglages gardés tels quels, sans qu'aucun
+  chiffre change. Réglages montre l'accueil, replié en bas de la page,
+  étape par étape. Les écrans des étapes viendront avec les PR suivantes.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
 
 - **Grand écran, tablette et 320 px** (D-196) : au grand écran, la page se

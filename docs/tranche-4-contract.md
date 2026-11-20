@@ -1350,6 +1350,19 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 4. **Modèle des 78 liens espèce-culture** : oui, après relecture de la liste par le porteur ; l'extraction lit la ferme réelle (accord donné) et le fichier est publié dans le dépôt public (liens seulement).
 
 
+#### 8 bis.9 · Précisions du code de la PR 1 (20 novembre 2026, D-222, F581)
+
+Écrites avec le code de la PR 1, le 20 novembre 2026, en Opus 5.5 · Élevé (ligne 4.4 de la roadmap), sur le « vas-y » du porteur du même jour (7 h 52), sans accès d'OTF.
+
+##### F581 · L'état de l'accueil et le marquage de l'espace existant, sans bascule ni bandeau
+
+- **La table** `irrigation_onboarding_steps` (migration 0034) : une ligne par espace et par étape que la personne confirme, les étapes 2 à 6 du parcours (`location` où est la ferme, `plots` parcelles et abris, `soil` sol, `crops` cultures, `settings` réglages à relire) ; son état (`todo`, `proposed`, `confirmed`, `skipped`), son origine (`onboarding`, ou `before-onboarding` pour un réglage d'avant l'accueil), la date de la confirmation (présente si et seulement si l'étape est confirmée) et la valeur proposée gardée (JSON). Les étapes 0 (fonctionnalités) et 1 (ferme reliée) gardent leur propre état (choix de la 3.8, raccordement de la 4.3) ; l'étape 7 (vérification) est un écran, pas un état. **Une étape sans ligne est « à faire »** : un espace créé après la migration commence l'accueil, et rien n'y est confirmé à sa place. Un espace n'est « d'avant l'accueil » que si ses cinq étapes le sont : une ligne qui manque le remet dans l'accueil, plutôt que de tenir pour confirmé ce qui ne l'a pas été.
+- **Le numéro** : 0034, et non le numéro suivant, comme F417 le laissait entendre : les migrations se suivent sans trou (`tests/irrigation-migration.test.ts`) ; la 4.3, PR 3 prendra le numéro libre au moment de son code.
+- **Le marquage** (F426) : la migration donne à chaque espace qui existe ses cinq étapes « confirmées », d'origine `before-onboarding`, sans identifiant de ferme ni de personne, et ne touche aucune autre table. Essai sur une copie : une base arrêtée à la 0033, remplie d'une ferme de la démonstration préparée par les dépôts ordinaires et d'un espace rattaché à sa ferme ; après la 0034, chaque ligne de chaque autre table est identique (`tests/db/onboarding-migration.test.ts`). La base locale des parcours navigateur marque de même sa ferme habituelle.
+- **La démonstration** n'a pas d'accueil : ses fermes fictives sont déjà réglées, et aucune visite nouvelle n'est prévue (section 8).
+- **L'écran** : une section repliée « Accueil de la ferme », en bas de Réglages. Chaque étape, son état dit en couleur et en mots (vert « Confirmé », orange « Passé » avec sa conséquence en une phrase, rouge « À faire » ou « Proposé, à confirmer »), et, pour l'espace existant, « Réglage d'avant l'accueil, gardé tel quel. » Rien ne s'y règle encore.
+- **Ce qui passe aux PR suivantes, et pourquoi.** La bascule de chaque défaut en « à renseigner » et le bandeau « À finir » arrivent avec l'écran de l'étape qui permet de les remplir : PR 2, la commune (fin du repli sur le siège) et le classement des abris avec K_abri ; PR 3, le sol ; PR 4, le catalogue et les racines ; PR 5, les réglages à relire, et aucun planning avant la validation du groupe « Planning ». Une bascule sans son écran laisserait une ferme neuve devant un « à renseigner » qu'elle ne peut pas remplir, et un bandeau nommerait une étape qu'elle ne peut pas faire : deux messages trompeurs, que la section 8 bis.3 exclut. Aucune ferme neuve n'existe en production avant le pilote (F366 : Access n'admet que des personnes de la ferme du porteur). Le test « ferme neuve » (preuve 1 de la section 8 bis.6) grandit ainsi PR par PR, chaque défaut avec son sabotage.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :
