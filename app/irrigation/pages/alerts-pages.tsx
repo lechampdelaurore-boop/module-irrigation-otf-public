@@ -24,13 +24,15 @@ export function WeatherAlertsPage({ season, initialDashboard, cropAlertsHref, de
   return <WeatherAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.weatherAlerts} cropAlertsHref={cropAlertsHref} demo={demo} onDashboard={setDashboard} />;
 }
 
-export function CropAlertsPage({ season, initialDashboard, sprinklerUnavailable }: {
+export function CropAlertsPage({ season, initialDashboard, sprinklerUnavailable, demo }: {
   season: number;
   initialDashboard: WaterDashboard;
   /** La ligne qui remplace les aspersions à reconsidérer sans le planning (P1), ou `null`. */
   sprinklerUnavailable: ReactNode;
+  /** Un déploiement de démonstration : les notifications y sont coupées (F454). */
+  demo: boolean;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
   if (!dashboard.cropAlerts) return null;
-  return <CropAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.cropAlerts} onDashboard={setDashboard} sprinklerUnavailable={sprinklerUnavailable} />;
+  return <CropAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.cropAlerts} onDashboard={setDashboard} sprinklerUnavailable={sprinklerUnavailable} demo={demo} />;
 }

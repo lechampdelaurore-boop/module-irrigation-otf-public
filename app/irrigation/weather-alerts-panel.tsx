@@ -13,6 +13,7 @@ import {
 import { FROST_TEMPLATE, FROST_TEMPLATE_ANCHOR, weatherAlertTemplates, type WeatherAlertTemplate } from '@/lib/domain/weather/weather-alert-templates';
 import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { WeatherAlertsDevice } from './weather-alerts-device';
+import { DeliveryStatus } from './alert-delivery';
 import {
   deleteWeatherAlertCriterionAction,
   saveWeatherAlertCriterionAction,
@@ -321,7 +322,7 @@ export function WeatherAlertsPanel({
               <span>{alertFact(entry)}</span>
               <small>{entry.criterionSummary}</small>
               <small>
-                Prévision du {instantFormatter.format(new Date(entry.forecastedAt))} · envoyée le {instantFormatter.format(new Date(entry.sentAt))} · <span className="weather-alert-delivery" data-status={entry.deliveryStatus}>{entry.deliveryLabel}</span>
+                Prévision du {instantFormatter.format(new Date(entry.forecastedAt))} · envoyée le {instantFormatter.format(new Date(entry.sentAt))} · <DeliveryStatus entry={entry} demo={demo} />
               </small>
               <a href={entry.url}>Voir la semaine</a>
             </li>

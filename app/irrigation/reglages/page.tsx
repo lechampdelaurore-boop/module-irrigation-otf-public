@@ -30,9 +30,27 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
       {waterDashboard ? <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} part="reglages" /> : null}
       {usesPushNotifications(context.enabled)
-        ? context.shell.demo ? <p className="demo-push-notice" role="note">{DEMO_PUSH_NOTICE}</p> : <NotificationSettings season={context.season} />
+        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
     </IrrigationShell>
+  );
+}
+
+/**
+ * En démonstration, la ligne qui dit les notifications coupées se lit sous
+ * le titre de leur section, à la place de leurs réglages, et non plus seule
+ * entre deux encarts (audit du 19 novembre 2026, lot I, n° 25, F455).
+ */
+function DemoNotificationSettings() {
+  return (
+    <section className="water-management-section" aria-labelledby="notifications-title">
+      <header className="water-management-heading">
+        <div>
+          <h2 id="notifications-title">Notifications du téléphone</h2>
+        </div>
+      </header>
+      <p className="demo-push-notice" role="note">{DEMO_PUSH_NOTICE}</p>
+    </section>
   );
 }
