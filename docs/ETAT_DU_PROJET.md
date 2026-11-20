@@ -721,6 +721,19 @@ registres, elle y renvoie.
   0041. La page de confidentialité dit le journal
   (relue avec la deuxième partie). À fusionner après la deuxième partie.
 
+- Tranche 4, **4.5, PR 3 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-251, F665 à F669, section 10 bis.22 de
+  `docs/tranche-4-contract.md`). « Supprimer ma ferme et mes données », en
+  bas de Réglages, après avoir tapé le nom de la ferme (relu par le
+  serveur, sans appel à OTF) ; dès la demande, l'espace est figé : chaque
+  page montre le jour de l'effacement, rien n'est lu chez OTF ni saisi, et
+  la personne peut annuler tant que l'effacement n'a pas commencé ; sur la
+  page d'état, l'exploitant efface sans attendre, sur demande écrite, en
+  retapant le numéro de la ferme. La page de confidentialité le dit.
+  Parcours P51. Sans migration. Codée après la fusion de la 4.4 ; à
+  fusionner après la troisième partie de la PR 5. Avec elle, une demande
+  peut naître en production.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
