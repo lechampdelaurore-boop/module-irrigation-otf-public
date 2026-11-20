@@ -404,6 +404,25 @@ registres, elle y renvoie.
   détecté ; P46 (étendu), P29, P33, P40, P22, P23, P25, P28, P30, P31,
   P31b, P31c joués en local aux deux largeurs, réussis ; la suite complète
   par la CI de la PR.
+  **PR 2b, parcelles et abris** (D-224, F583, section 8 bis.11 du
+  contrat) : la lecture d'OTF classait chaque jardin par le type que lui
+  donne OTF (une énumération, pas son nom, contrairement à ce que F420
+  supposait). Le classement confirmé est désormais gardé par espace (table
+  `irrigation_plot_shelters`, migration additive 0035) et posé sur le plan
+  à chaque lecture ; pour une ferme qui fait l'accueil, un jardin non classé
+  est « à classer » : ni besoin, ni réserve, ni proposition calculés, la
+  raison dite (« Non calculable : jardin à classer… »). Dans Réglages,
+  « Parcelles et abris » propose (type d'OTF, sinon nom : « serre »,
+  « châssis » ajoutés), la personne confirme, corrige ou laisse à classer ;
+  l'étape suit dans le même lot ; bandeau « À finir : N jardins à
+  classer. ». Les fermes d'avant l'accueil gardent le classement d'OTF ; la
+  migration n'écrit rien ; K_abri inchangé ; aucun appel nouveau à OTF.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`
+  (1 854 tests, puis 457 pour chacun des trois passages d'isolation),
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; sept sabotages, chacun détecté ;
+  P46 (étendu), P28, P29, P31, P31b, P33 joués en local aux deux largeurs,
+  réussis ; la suite complète par la CI de la PR.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

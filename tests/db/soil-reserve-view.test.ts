@@ -175,3 +175,16 @@ test('une proposition qui apporte plus que ce que le sol peut encore retenir le 
   const room = tomato.summary.current!.capacityMm - tomato.summary.current!.mm;
   assert.ok(Math.abs(notes[0][0].beyondMm - (60 - room)) < 1, `60 mm moins la place du sol (${room.toFixed(1)} mm), à la consommation des premières heures près`);
 });
+
+test('un jardin à classer n’a pas de réserve calculée, même avec son sol saisi et observé (4.4, F583)', async () => {
+  await prepare();
+  assert.equal((await addSoilRecordForUser(ALICE, SOIL_ENTRY, NOW)).ok, true);
+  assert.equal((await addSoilObservationForUser(ALICE, { zoneId: 'parcelle', plotId: SHELTER, percent: 60, observedAt: '2026-05-11T04:30:00.000Z' }, NOW)).ok, true);
+  const unclassified = { ...snapshot, plots: snapshot.plots.map((plot) => ({ ...plot, mode: 'unclassified' as const })) };
+  const view = await getSoilReserveViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: unclassified, now: NOW });
+  const [plot] = view.gauge!.zones[0].plots;
+  for (const bed of plot.beds) {
+    assert.equal(bed.summary.current, null);
+    assert.equal(bed.today, null);
+  }
+});

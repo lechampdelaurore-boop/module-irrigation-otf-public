@@ -1,5 +1,6 @@
 'use client';
 
+import { UNCLASSIFIED_PLOT_REASON } from '@/lib/domain/onboarding/plots';
 import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
@@ -206,11 +207,12 @@ function rainFallbackText(bed: BedIrrigationNeed) {
 function missingDatesText(dates: readonly string[]) { return dates.length === 0 ? 'donnée indisponible' : `manquante ${dates.length === 1 ? 'le' : 'les'} ${dates.map((date) => formatDate(date, false)).join(', ')}`; }
 function missingLabels(bed: BedIrrigationNeed, level: 'real' | 'planning') {
   const missing = bed.completeness.missing.filter((item) => level === 'planning' || item !== 'forecast-rain');
-  return missing.map((item) => item === 'objective' ? 'aucun objectif adopté' : item === 'actual-rain' ? `pluie réelle ${missingDatesText(bed.completeness.missingDates.actualRain)}` : `pluie prévue ${missingDatesText(bed.completeness.missingDates.forecastRain)}`).join(' ; ');
+  return missing.map((item) => item === 'unclassified-plot' ? UNCLASSIFIED_PLOT_REASON : item === 'objective' ? 'aucun objectif adopté' : item === 'actual-rain' ? `pluie réelle ${missingDatesText(bed.completeness.missingDates.actualRain)}` : `pluie prévue ${missingDatesText(bed.completeness.missingDates.forecastRain)}`).join(' ; ');
 }
 function dashboardWarning(dashboard: IrrigationNeedsDashboard) {
   const beds = dashboard.gardens.flatMap((garden) => garden.beds);
   const causes = [
+    ['unclassified-plot', UNCLASSIFIED_PLOT_REASON, []] as const,
     ['objective', 'aucun objectif hydrique adopté', []] as const,
     ['actual-rain', 'pluie réelle incomplète', dashboard.completeness.missingDates.actualRain] as const,
     ['forecast-rain', 'pluie prévue incomplète', dashboard.completeness.missingDates.forecastRain] as const,

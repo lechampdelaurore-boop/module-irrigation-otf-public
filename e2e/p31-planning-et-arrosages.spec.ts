@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
 import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme } from './support/planning.ts';
@@ -35,6 +35,7 @@ test('planning : les gestes en tête, les planches sans matériel en action vers
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot3-planning');
+  await preparerLaFermeNeuve(page);
 
   // Un objectif de ferme, aucun matériel : toutes les planches attendent un matériel, aucune ne manque d'eau.
   await attendreLaPageIrrigation(page, 'besoins');
@@ -108,6 +109,7 @@ test('arrosages : rien de présélectionné, « À traiter » en tête, lignes p
   // Un seul « maintenant » par parcours : toutes les dates en découlent.
   const reference = Date.now();
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot3-arrosages');
+  await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'materiel');
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo);
 

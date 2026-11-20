@@ -68,7 +68,7 @@ export function PlotPlanCard({
   open?: boolean;
   onToggle?: () => void;
 }) {
-  const type = plot.mode === 'greenhouse' ? 'Abri' : 'Jardin';
+  const type = plot.mode === 'greenhouse' ? 'Abri' : plot.mode === 'unclassified' ? 'À classer' : 'Jardin';
   const columns = bedColumns(beds.length);
   const layoutVariables = {
     '--bed-columns': columns,

@@ -1,5 +1,5 @@
 import { expect, test, type Locator } from '@playwright/test';
-import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
@@ -45,6 +45,7 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'lot3-gestes');
+  await preparerLaFermeNeuve(page);
 
   // Cas 8 : les espèces à rattacher, comptées, en tête ; la recherche par nom.
   await attendreLaPageIrrigation(page, 'reglages');

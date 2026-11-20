@@ -8,6 +8,7 @@ import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
 import { listProtectedSlotsForUser } from '@/db/protected-slots-repository';
 import { usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
+import { plotShelterLines } from '@/lib/domain/onboarding/plots';
 import { calculateIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
 import { getCropCoefficientsViewForUser } from '@/lib/services/crop-water-coefficients';
 import { getIrrigationFormHintsForUser } from '@/lib/services/irrigation-form-hints';
@@ -227,5 +228,7 @@ export async function loadReglagesPage(context: ReadyPageContext) {
       : null,
   ]);
   context.lap('dashboards');
-  return { counts, onboarding, waterDashboard, cropCoefficients };
+  // Le classement des jardins, pour une ferme qui fait l'accueil (4.4, F583).
+  const plotShelters = plotShelterLines(context.snapshot, context.season);
+  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters };
 }

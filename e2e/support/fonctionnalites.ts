@@ -31,7 +31,7 @@ export async function ouvrirUneFermeToutCochee(page: Page, context: BrowserConte
  * elle, ni météo, ni gel, ni ET0. Ici, le siège de la structure, pris en
  * dernier recours dans Réglages, par le lien du bandeau « À finir ».
  */
-export async function choisirLeSiegeCommeCommune(page: Page): Promise<void> {
+async function choisirLeSiegeCommeCommune(page: Page): Promise<void> {
   await page.goto('/irrigation/reglages');
   await attendreLaPagePrete(page, 'reglages');
   await page.locator('.onboarding-unfinished').getByRole('link', { name: 'commune de la ferme' }).click();
@@ -40,6 +40,27 @@ export async function choisirLeSiegeCommeCommune(page: Page): Promise<void> {
   await attendreLaPagePrete(page, 'reglages');
   await page.getByRole('button', { name: 'Prendre le siège OTF, en dernier recours' }).click();
   await expect(page.getByText('La commune du siège OTF est utilisée, en dernier recours.')).toBeVisible();
+}
+
+/**
+ * Une ferme neuve classe ses jardins comme proposé (4.4, F420, F583) : sans
+ * classement, leur besoin en eau n'est pas calculé. Dans Réglages, par le
+ * lien du bandeau « À finir », après avoir lu chaque proposition.
+ */
+async function classerLesJardinsCommeProposes(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  await page.locator('.onboarding-unfinished').getByRole('link', { name: /jardins? à classer$/ }).click();
+  await expect(page).toHaveURL(/#parcelles-et-abris$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Confirmer les propositions restantes' }).click();
+  await expect(page.getByText(/^\d+ jardins? classés? comme proposé\.$/)).toBeVisible();
+}
+
+/** Une ferme neuve qui a fait ce que les calculs attendent d'elle : sa commune et ses jardins (4.4, F582, F583). */
+export async function preparerLaFermeNeuve(page: Page): Promise<void> {
+  await choisirLeSiegeCommeCommune(page);
+  await classerLesJardinsCommeProposes(page);
 }
 
 /** L'écran de la première ouverture, prêt à répondre. */

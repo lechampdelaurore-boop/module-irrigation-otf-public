@@ -40,7 +40,7 @@ function parseValue(value: string | null): unknown {
  * Placée dans le même lot que l'écriture de la valeur elle-même : l'une ne
  * va jamais sans l'autre.
  */
-export function confirmOnboardingStepStatement(workspaceId: string, step: 'location', value: unknown, at: string) {
+export function confirmOnboardingStepStatement(workspaceId: string, step: 'location' | 'plots', value: unknown, at: string) {
   return db.prepare(
     `INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, proposed_value, confirmed_at, updated_at)
      VALUES (?, ?, 'confirmed', 'onboarding', ?, ?, ?)
@@ -48,4 +48,15 @@ export function confirmOnboardingStepStatement(workspaceId: string, step: 'locat
        state = 'confirmed', origin = 'onboarding', proposed_value = excluded.proposed_value,
        confirmed_at = excluded.confirmed_at, updated_at = excluded.updated_at`,
   ).bind(workspaceId, step, JSON.stringify(value), at, at);
+}
+
+/**
+ * Une étape confirmée à l'accueil redevient « à faire » (un jardin remis
+ * « à classer ») : sa ligne s'efface. Une étape d'avant l'accueil n'est
+ * jamais touchée (F426).
+ */
+export function reopenOnboardingStepStatement(workspaceId: string, step: 'plots') {
+  return db.prepare(
+    `DELETE FROM irrigation_onboarding_steps WHERE workspace_id = ? AND step = ? AND origin = 'onboarding'`,
+  ).bind(workspaceId, step);
 }

@@ -41,7 +41,7 @@ export function SatelliteGardenList({ gardens, highlightedPlotId, onSelectGarden
         const content = (
           <>
             <strong>{garden.name}</strong>
-            <span>{garden.mode === 'greenhouse' ? 'abri' : 'plein champ'}</span>
+            <span>{garden.mode === 'greenhouse' ? 'abri' : garden.mode === 'unclassified' ? 'à classer' : 'plein champ'}</span>
             <span>{formatMeasure(garden.areaSquareMeters, 'm²')}</span>
             <span className="satellite-garden-outline">
               {garden.outlined ? 'contour dessiné' : 'contour non dessiné'}

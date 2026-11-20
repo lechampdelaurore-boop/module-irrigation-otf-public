@@ -54,7 +54,10 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
 
     applyMigrationsAfter(sqlite, BEFORE);
 
-    assert.deepEqual(dump(sqlite), before, 'aucune ligne d’aucune autre table ne change');
+    const after = dump(sqlite);
+    // Les migrations suivantes ajoutent leurs tables ; la 0035 (classement des jardins, F583) n'écrit rien pour un espace existant.
+    assert.deepEqual(after.irrigation_plot_shelters, [], 'aucun jardin n’est classé à la place d’un espace existant');
+    assert.deepEqual(Object.fromEntries(Object.keys(before).map((table) => [table, after[table]])), before, 'aucune ligne d’aucune autre table ne change');
     const marks = sqlite.prepare(`SELECT workspace_id, step, state, origin, proposed_value, confirmed_at FROM ${NEW_TABLE} ORDER BY workspace_id, step`).all() as {
       workspace_id: string; step: string; state: string; origin: string; proposed_value: string | null; confirmed_at: string | null;
     }[];
