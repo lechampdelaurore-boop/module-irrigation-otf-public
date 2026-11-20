@@ -18,8 +18,9 @@ import { HOURS_PER_DAY } from '../units.ts';
  * notification ne sont pas des déclencheurs planifiés : chacune suit un
  * arrosage, sans rythme attendu, et n'est pas une tâche du registre.
  *
- * L'effacement des fermes qui l'ont demandé (4.5, PR 3 ; 10 bis.17, F645)
- * est la dernière tâche du matin.
+ * L'effacement des fermes qui l'ont demandé (4.5, PR 3 ; 10 bis.17, F645),
+ * puis les purges de conservation (4.5, PR 5 ; 10 bis.18, F650) finissent
+ * le matin.
  *
  * L'export de la base hors de Cloudflare (4.5, PR 4 ; 10 bis.14, F624) et
  * l'essai de restauration (10 bis.16, F636) y sont aussi, bien que faits par
@@ -35,6 +36,7 @@ export type TaskKey =
   | 'morning-calculation'
   | 'otf-vault-morning'
   | 'farm-erasure'
+  | 'retention-purge'
   | 'offsite-export'
   | 'restore-rehearsal'
   | 'operator-watch';
@@ -110,7 +112,7 @@ export const TASK_TRIGGERS: readonly TriggerDeclaration[] = [
     key: 'weather-morning',
     config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
     cron: '15 4,5 * * *',
-    description: 'Le planificateur appelle le site à 6 h 15, heure de Paris (l\'un des deux créneaux UTC, selon l\'heure d\'été) : météo, puis calculs du matin, puis coffre des jetons, puis effacement des fermes qui l\'ont demandé.',
+    description: 'Le planificateur appelle le site à 6 h 15, heure de Paris (l\'un des deux créneaux UTC, selon l\'heure d\'été) : météo, puis calculs du matin, puis coffre des jetons, puis effacement des fermes qui l\'ont demandé, puis purges de conservation.',
     monitored: true,
   },
   {
@@ -174,6 +176,15 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ...MORNING_THRESHOLDS,
     ifMissing: 'Une ferme qui a demandé l\'effacement de ses données les garde au-delà des 7 jours promis (elle reste figée : aucun calcul, aucune notification).',
     successKeptIn: 'Ligne « task:farm-erasure » de irrigation_background_jobs (réussie quand aucune demande échue ne reste à effacer : sans demande, chaque matin réussit).',
+    trigger: 'weather-morning',
+  },
+  {
+    key: 'retention-purge',
+    label: 'Purges de conservation',
+    rhythm: '1 par jour, à la fin du matin : efface, par lots, les lignes plus vieilles que leur durée écrite (journal des appels à Ouvre ta ferme, notifications de la veille) ; ce qui reste reprend au passage suivant',
+    ...MORNING_THRESHOLDS,
+    ifMissing: 'Des données techniques restent au-delà de la durée écrite au contrat et dans la politique de confidentialité ; rien ne manque aux fermes.',
+    successKeptIn: 'Ligne « task:retention-purge » de irrigation_background_jobs (réussie quand chaque purge est allée au bout).',
     trigger: 'weather-morning',
   },
   {

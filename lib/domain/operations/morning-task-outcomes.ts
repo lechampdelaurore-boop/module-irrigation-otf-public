@@ -1,5 +1,6 @@
 import { WeatherProviderError } from '../weather/weather-provider.ts';
 import type { FarmErasureRunReport } from './farm-erasure.ts';
+import type { RetentionPurgeRunReport } from './retention.ts';
 import { tasksOfTrigger, type TaskKey } from './task-registry.ts';
 
 /**
@@ -7,7 +8,8 @@ import { tasksOfTrigger, type TaskKey } from './task-registry.ts';
  * docs/tranche-4-contract.md, F560 et F602).
  *
  * La route du matin enchaîne la météo, les calculs du matin, la rotation du
- * coffre, puis l'effacement des fermes qui l'ont demandé ; son compte rendu devient ici une exécution par tâche du
+ * coffre, puis l'effacement des fermes qui l'ont demandé et les purges de
+ * conservation ; son compte rendu devient ici une exécution par tâche du
  * déclencheur « weather-morning », réussie ou manquée. Une exécution n'est
  * **réussie que si elle a tout fait** : un lieu sans prévisions, une ferme
  * remise à plus tard ou une ferme dont le calcul échoue la rendent manquée,
@@ -38,6 +40,7 @@ export type MorningRunReport = {
   cropDrying?: { failed: number } | null;
   otfVault?: { status: 'dormant' | 'unavailable' | 'failed' } | { status: 'done'; unreadable: number } | null;
   farmErasure?: FarmErasureRunReport | null;
+  retentionPurge?: RetentionPurgeRunReport | null;
   /** La classe de l'erreur qui a interrompu la route, si elle l'a été. */
   interruptedBy?: string;
 };
@@ -69,6 +72,7 @@ export function morningTaskOutcomes(report: MorningRunReport): TaskOutcome[] {
     'morning-calculation': morningCalculationOutcome(report, interrupted),
     'otf-vault-morning': vaultOutcome(report, interrupted),
     'farm-erasure': farmErasureOutcome(report, interrupted),
+    'retention-purge': retentionPurgeOutcome(report, interrupted),
   };
   return tasksOfTrigger('weather-morning').map((task) => outcomes[task] ?? failed(task, 'tâche du matin sans résultat'));
 }
@@ -143,6 +147,25 @@ function farmErasureOutcome(report: MorningRunReport, interrupted: string): Task
       : null,
   ].filter((problem): problem is string => problem !== null);
   return problems.length === 0 ? succeeded('farm-erasure') : failed('farm-erasure', problems.join(' ; '));
+}
+
+/**
+ * Réussie quand chaque purge est allée au bout (10 bis.18, F650) : une purge
+ * arrêtée par la borne du passage reprend au suivant, mais ce matin-là des
+ * lignes ont dépassé leur durée écrite ; trois de suite font une panne.
+ */
+function retentionPurgeOutcome(report: MorningRunReport, interrupted: string): TaskOutcome {
+  const purge = report.retentionPurge;
+  if (!purge) return failed('retention-purge', interrupted);
+  const problems = [
+    purge.failures.length > 0
+      ? `${countWords(purge.failures.length, 'purge', 'purges')} en échec (${purge.failures.map((kind) => errorClassWords(kind === 'unknown' ? undefined : kind)).join(', ')})`
+      : null,
+    purge.unfinished > 0
+      ? `${countWords(purge.unfinished, 'purge', 'purges')} à finir au prochain passage`
+      : null,
+  ].filter((problem): problem is string => problem !== null);
+  return problems.length === 0 ? succeeded('retention-purge') : failed('retention-purge', problems.join(' ; '));
 }
 
 function succeeded(task: TaskKey): TaskOutcome {

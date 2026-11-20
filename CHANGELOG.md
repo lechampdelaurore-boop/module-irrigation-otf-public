@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- **La conservation, table par table** (D-247, F649 à F653) : chaque table
+  de la base a sa durée et qui l'efface, écrites en code et au contrat ; une
+  table ajoutée sans durée casse la CI. La tâche du matin « Purges de
+  conservation » efface, par lots bornés et pour toutes les fermes, ce qui a
+  dépassé sa durée : le journal des appels à Ouvre ta ferme (2, 8 ou 30
+  jours selon la ligne), même quand rien ne lit la ferme, et la notification
+  du jour de la veille (35 jours). Sans migration. La politique de
+  confidentialité, le support et les coûts viennent avec la seconde partie.
+
+### Changé (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- Le registre compte 9 tâches ; le matin en a six.
+
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, première partie)
 
 - **L'effacement d'une ferme, le moteur** (D-246, F640 à F648) : une
