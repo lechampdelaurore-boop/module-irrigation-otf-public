@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4d)
+
+- **Le modèle des rattachements** (D-231) : une nouvelle ferme reçoit, pour
+  ses espèces, les rattachements d'une ferme maraîchère (40 espèces, dont
+  la mâche « par analogie » avec la salade d'été) ; elle décoche ce qu'elle
+  ne garde pas.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 5b)
 
 - **La vérification de l'accueil** (D-230) : le pli « Accueil de la

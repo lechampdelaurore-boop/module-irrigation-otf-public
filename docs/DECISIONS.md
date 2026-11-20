@@ -7023,3 +7023,30 @@ est confirmé, passé ou manquant, et ce qui reste inconnu.
 
 Ne change pas : la base ; le calcul ; la ferme du porteur et la
 démonstration. Aucune question de budget.
+
+## D-231 — Tranche 4, sous-tranche 4.4, PR 4d : le modèle des rattachements du porteur
+
+Date : 20 novembre 2026.
+
+**Contexte.** La PR 4c (D-228) a posé l'étape « Rattachez vos espèces » avec
+un modèle vide ; la liste des liens de la ferme du porteur devait être relue
+par lui avant tout dépôt (F428, réponse 4). Le porteur a délégué cette
+relecture le 19 novembre 2026 (« relis-le toi-même et publie directement »),
+délégation confirmée pour ces liens le 20 novembre 2026 ; il a ouvert son
+navigateur pour la lecture le 20 novembre 2026 à 13 h 45.
+
+**Décision** (F590, section 8 bis.18 du contrat).
+
+1. Le modèle est relevé en lecture seule dans « Réglages », « Correspondance
+   des espèces » de la ferme du porteur, saison 2026 : 77 espèces (et non 78,
+   chiffre de mémoire), dont 40 rattachées à une culture de référence du jeu
+   commun, reprises telles quelles ; 11 le sont par analogie.
+2. Un lien du modèle garde l'analogie : la proposition la dit (« Salade
+   d'été, par analogie ») et le rattachement la garde.
+3. Les 36 espèces « sans référence Kc » (fleurs) et l'engrais vert (état de
+   la surface du sol) n'entrent pas au modèle : il ne propose qu'une culture
+   de référence.
+
+Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
+et la démonstration ; la proposition d'après le nom quand le modèle ne
+connaît pas l'espèce. Aucune question de budget.

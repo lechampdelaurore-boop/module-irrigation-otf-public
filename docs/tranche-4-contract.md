@@ -1487,6 +1487,18 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **Inchangé** : la ferme du porteur (espace d'avant l'accueil) lit ses étapes « Réglage d'avant l'accueil, gardé tel quel », sans « Encore inconnu » ; la démonstration n'a pas le pli.
 - **Preuves.** `tests/onboarding-verification.test.ts` : les textes de ce qui reste inconnu et des groupes. Parcours P46 : les six groupes, « Gel : passé, valeurs proposées », et les espèces non rattachées sous « Encore inconnu », avec leur lien.
 
+#### 8 bis.18 · Précisions du code de la PR 4d (20 novembre 2026, D-231, F590)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F590 · Le modèle des rattachements du porteur
+
+- **Le relevé.** Lu en lecture seule le 20 novembre 2026 dans « Réglages », « Correspondance des espèces » de la ferme du porteur, saison 2026, dans son navigateur, onglet refermé ensuite : 77 espèces, dont **40 rattachées à une culture de référence du jeu commun** (11 par analogie), 36 « sans référence Kc » et 1 engrais vert. Les 40 liens entrent dans `lib/domain/onboarding/species-model-data.ts` : un nom d'espèce, l'identifiant d'une culture du jeu commun, l'analogie ; jamais un identifiant d'OTF ni une donnée de ferme. La relecture prévue par F428 (réponse 4) est faite par l'assistant, sur la délégation du porteur (19 novembre 2026, confirmée le 20 pour ces liens).
+- **L'analogie gardée.** Un lien du modèle par analogie (la mâche suit la salade d'été) est proposé « Salade d'été, par analogie » et rattaché par analogie ; une proposition d'après le nom ne l'est jamais.
+- **Hors du modèle** : les espèces « sans référence Kc » et l'engrais vert ; le modèle ne propose qu'une culture de référence. Une nouvelle ferme les rattache à la main.
+- **Inchangé** : la ferme du porteur et la démonstration n'ont pas l'étape (F426) ; le modèle ne vise qu'une culture commune utilisable de la ferme ; sans lui, la proposition d'après le nom.
+- **Preuves.** `tests/db/onboarding-species.test.ts` : le modèle d'abord, le nom ensuite, sur la ferme d'essai ; 40 liens, des noms tous différents, chacun vers une culture du jeu commun (lue dans la migration 0023) ; l'analogie gardée au rattachement. Cinq sabotages, chacun détecté. Parcours P46 : la mâche proposée « par analogie », d'après le modèle.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :

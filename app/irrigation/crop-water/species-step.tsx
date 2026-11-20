@@ -48,7 +48,7 @@ export function SpeciesStep({ step, species, pending, onLink, onConfirm }: {
               <li key={proposal.plantId}>
                 <label>
                   <input type="checkbox" checked={!unchecked.has(proposal.plantId)} disabled={pending} onChange={() => toggle(proposal.plantId)} />
-                  <span><strong>{proposal.plantName}</strong> → {proposal.cropName}</span>
+                  <span><strong>{proposal.plantName}</strong> → {proposal.cropName}{proposal.analogy ? ', par analogie' : ''}</span>
                   <small>{proposalOriginText(proposal)}</small>
                 </label>
               </li>

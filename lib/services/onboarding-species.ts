@@ -26,7 +26,7 @@ export async function linkProposedSpeciesForUser(input: StepInput & { plantIds: 
   if (wanted.size === 0) return { ok: false, message: 'Cochez au moins une espèce à rattacher.' };
   const chosen = view.speciesStep.proposals.filter((proposal) => wanted.has(proposal.plantId));
   if (chosen.length !== wanted.size) return { ok: false, message: 'Une espèce cochée n’a plus de proposition : la liste est remise à jour.' };
-  const saved = await linkSpeciesForUser(input.ownerUserId, chosen.map(({ plantId, referenceCropId }) => ({ plantId, referenceCropId })), input.now);
+  const saved = await linkSpeciesForUser(input.ownerUserId, chosen.map(({ plantId, referenceCropId, analogy }) => ({ plantId, referenceCropId, analogy })), input.now);
   return saved.ok ? { ok: true, count: saved.value } : { ok: false, message: saved.problems.join(' ') };
 }
 

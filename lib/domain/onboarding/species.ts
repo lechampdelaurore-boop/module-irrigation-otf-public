@@ -31,8 +31,12 @@ export function linkCandidatesOf(crops: readonly KnownCrop[], commonVersions: Re
   }));
 }
 
-/** Un lien du modèle : un nom d'espèce, normalisé, et la culture de référence du jeu commun. */
-export type SpeciesModelLink = { species: string; referenceCropId: string };
+/**
+ * Un lien du modèle : un nom d'espèce, la culture de référence du jeu commun,
+ * et si le rattachement se fait par analogie (une espèce sans Kc publié qui
+ * suit une culture proche, comme la mâche la salade d'été).
+ */
+export type SpeciesModelLink = { species: string; referenceCropId: string; analogy: boolean };
 
 /** Le nom d'une espèce tel que le modèle le compare : sans accents ni majuscules, espaces simples. */
 export function normalizedSpeciesName(name: string): string {
@@ -44,6 +48,8 @@ export type SpeciesLinkProposal = {
   plantName: string;
   referenceCropId: string;
   cropName: string;
+  /** Rattachée par analogie : seul le modèle le dit ; une proposition d'après le nom ne l'est jamais. */
+  analogy: boolean;
   /** D'où vient la proposition : le modèle de la ferme du porteur, ou le nom de l'espèce. */
   from: 'model' | 'name';
 };
@@ -61,13 +67,16 @@ export function speciesLinkProposals(
   model: readonly SpeciesModelLink[] = SPECIES_MODEL_LINKS,
 ): SpeciesLinkProposal[] {
   const usable = new Map(candidates.filter((candidate) => candidate.fromCommonSet && candidate.usable).map((candidate) => [candidate.id, candidate]));
-  const fromModel = new Map(model.map((link) => [normalizedSpeciesName(link.species), link.referenceCropId]));
+  const fromModel = new Map(model.map((link) => [normalizedSpeciesName(link.species), link]));
   return species.flatMap((item): SpeciesLinkProposal[] => {
     if (item.link !== null) return [];
-    const modelCrop = usable.get(fromModel.get(normalizedSpeciesName(item.plantName)) ?? '');
-    if (modelCrop) return [{ plantId: item.plantId, plantName: item.plantName, referenceCropId: modelCrop.id, cropName: modelCrop.name, from: 'model' }];
+    const modelLink = fromModel.get(normalizedSpeciesName(item.plantName));
+    const modelCrop = modelLink ? usable.get(modelLink.referenceCropId) : undefined;
+    if (modelLink && modelCrop) {
+      return [{ plantId: item.plantId, plantName: item.plantName, referenceCropId: modelCrop.id, cropName: modelCrop.name, analogy: modelLink.analogy, from: 'model' }];
+    }
     const named = suggestReferenceCrop(item.plantName, candidates);
-    return named ? [{ plantId: item.plantId, plantName: item.plantName, referenceCropId: named.id, cropName: named.name, from: 'name' }] : [];
+    return named ? [{ plantId: item.plantId, plantName: item.plantName, referenceCropId: named.id, cropName: named.name, analogy: false, from: 'name' }] : [];
   });
 }
 

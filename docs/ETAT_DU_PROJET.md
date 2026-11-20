@@ -476,7 +476,7 @@ registres, elle y renvoie.
   réussis en local ; sept sabotages, chacun détecté ; parcours P46 étendu,
   P29 et P28 rejoués en local.
   **PR 5a, « Réglages à relire »** (D-229, F588, section 8 bis.16 du
-  contrat) : pour une ferme qui fait l'accueil, les groupes de valeurs de
+  contrat), **en ligne le 20 novembre 2026 à 20 h 09 (#135, fusionnée à 19 h 45, run 44795804220 vérifié job par job : les cinq jobs verts)** : pour une ferme qui fait l'accueil, les groupes de valeurs de
   départ des cases cochées, avec leur source, validés ou passés ; aucun
   planning avant la validation du groupe « Planning », le calcul du matin
   la passe sans échec ; bandeau « réglages du planning à valider » ; aucune
@@ -494,6 +494,13 @@ registres, elle y renvoie.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
+  **PR 4d, le modèle des rattachements du porteur** (D-231, F590, section
+  8 bis.18 du contrat) : 40 liens espèce-culture relevés en lecture seule
+  dans sa ferme (saison 2026, 77 espèces), 11 par analogie, l'analogie
+  gardée ; les espèces sans référence et l'engrais vert hors du modèle.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip` réussis en local ; cinq sabotages, chacun
+  détecté ; parcours P46 et P29 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

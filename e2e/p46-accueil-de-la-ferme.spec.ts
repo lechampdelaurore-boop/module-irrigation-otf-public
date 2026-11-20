@@ -149,8 +149,9 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   await expect(brocoli.locator('summary').first()).not.toContainText('dates d’une autre région');
   await verifierLEtape(page, journal, 'cultures d’une autre région signalées');
 
-  // Rattachez vos espèces (F587) : le bandeau mène à l'étape ; chaque proposition se lit, cochée ; une décochée n'est pas
-  // rattachée ; l'étape « Cultures » se confirme d'un geste, avec son compte, et le bandeau part.
+  // Rattachez vos espèces (F587, F590) : le bandeau mène à l'étape ; chaque proposition se lit, cochée, avec son origine
+  // (le modèle de la ferme du porteur, sinon le nom) ; une décochée n'est pas rattachée ; l'étape « Cultures » se
+  // confirme d'un geste, avec son compte, et le bandeau part.
   await attendreLaPageIrrigation(page, 'reglages');
   await page.locator('.onboarding-unfinished').getByRole('link', { name: '4 espèces à rattacher' }).click();
   await expect(page).toHaveURL(/#rattachez-vos-especes$/);
@@ -159,17 +160,19 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   await expect(etape.getByRole('heading', { name: 'Rattachez vos espèces' })).toBeVisible();
   await expect(etape).toContainText('4 espèces à rattacher sur 4');
   const propositions = etape.getByRole('checkbox');
-  const nombre = await propositions.count();
-  expect(nombre, 'au moins deux propositions d’après le nom').toBeGreaterThanOrEqual(2);
-  await expect(etape).not.toContainText('Mâche →');
+  await expect(propositions).toHaveCount(4);
+  const nombre = 4;
   for (const proposition of await propositions.all()) await expect(proposition).toBeChecked();
-  await expect(etape.locator('.species-step-proposals small').first()).toHaveText('d’après le nom');
+  const lignes = etape.locator('.species-step-proposals li');
+  await expect(lignes.filter({ hasText: 'Mâche' })).toContainText("Mâche → Salade d'été, par analogie");
+  await expect(lignes.filter({ hasText: 'Mâche' }).locator('small')).toHaveText('d’après le modèle d’une ferme maraîchère');
+  await expect(lignes.filter({ hasText: 'Radis' }).locator('small')).toHaveText('d’après le nom');
   await propositions.first().uncheck();
-  const rattacher = etape.getByRole('button', { name: nombre - 1 === 1 ? 'Rattacher l’espèce cochée' : `Rattacher les ${nombre - 1} espèces cochées` });
+  const rattacher = etape.getByRole('button', { name: `Rattacher les ${nombre - 1} espèces cochées` });
   await rattacher.click();
-  await expect(page.locator('section.crop-coefficients').getByRole('status')).toHaveText(`${nombre - 1} espèce${nombre - 1 > 1 ? 's' : ''} rattachée${nombre - 1 > 1 ? 's' : ''}.`);
+  await expect(page.locator('section.crop-coefficients').getByRole('status')).toHaveText(`${nombre - 1} espèces rattachées.`);
   await expect(etape.getByRole('checkbox')).toHaveCount(1);
-  await expect(etape).toContainText(`${4 - (nombre - 1)} espèces à rattacher sur 4`);
+  await expect(etape).toContainText('1 espèce à rattacher sur 4');
   await etape.getByRole('button', { name: 'Confirmer l’étape « Cultures »' }).click();
   await expect(page.locator('section.crop-coefficients').getByRole('status')).toHaveText('L’étape « Cultures » est confirmée.');
   await page.reload();
@@ -210,7 +213,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   ]);
   const inconnu = terminee.locator('.onboarding-unknowns');
   await expect(inconnu.getByRole('heading', { name: 'Encore inconnu' })).toBeVisible();
-  await expect(inconnu.getByRole('link')).toHaveText([`${4 - (nombre - 1)} espèces non rattachées : besoin non calculé`]);
+  await expect(inconnu.getByRole('link')).toHaveText(['1 espèce non rattachée : besoin non calculé']);
   await expect(inconnu.getByRole('link')).toHaveAttribute('href', '#correspondance-des-especes');
   await verifierLEtape(page, journal, 'réglages relus, accueil terminé, vérification lue');
 });
