@@ -640,7 +640,11 @@ registres, elle y renvoie.
   démonstration » en couleur neutre, la ligne des notifications coupées
   sous son titre dans « Réglages » ; en ligne le 20 novembre 2026 à 4 h 54
   (#118, fusionnée à 4 h 37, run 44668982532 vérifié job par job) : **lot I en ligne
-  en entier**.
+  en entier**. Le 20 novembre 2026 au soir, son épreuve n° 5 (F445)
+  échouait de 21 h 14 à 21 h 30 environ : la démonstration se joue à
+  l'heure réelle, et son plan verse alors moins d'eau sur les planches
+  vides ; les épreuves de la pénurie se jouent désormais à 8 h, heure de la
+  ferme (épreuves seules, aucun code du logiciel modifié).
   **Lot J commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
   court `docs/audit-ergonomie-2026-11-19-lot-j-contract.md` (F456 et
   suivantes, parcours P40), sept PR, un budget de hauteur par page au

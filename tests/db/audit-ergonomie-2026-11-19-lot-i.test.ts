@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import test, { afterEach, beforeEach } from 'node:test';
+import test, { afterEach, beforeEach, mock } from 'node:test';
 import { demoOwnerUserId, resolveDemoChoice } from '../../lib/domain/demo/catalogue';
 import { DemoSpacePreparingError, prepareDemoSpace } from '../../lib/services/demo-space';
 import { createWorkspaceIfAbsent } from '../../db/workspace-repository';
@@ -32,15 +32,35 @@ beforeEach(() => {
 });
 afterEach(() => {
   uninstallSimulatedDate();
+  mock.restoreAll();
   database.dispose();
   if (savedDemoMode === undefined) delete process.env.DEMO_MODE;
   else process.env.DEMO_MODE = savedDemoMode;
 });
 
-/** La démonstration « Pic d'été, l'eau manque », préparée au jour du moment, et son plan. */
+/** 8 h à la ferme, un jour réel quelconque : l'heure où se jouent les épreuves de la pénurie. */
+const FARM_MORNING_MS = Date.parse('2026-11-20T07:00:00.000Z');
+
+/**
+ * La démonstration se joue le jour du moment, à l'heure réelle de la ferme
+ * (docs/demo-guided-contract.md, C3), et son plan change avec l'heure : vers
+ * 21 h 14 à 21 h 30, celui de la pénurie verse moins de 0,4 m³ sur les
+ * planches vides (0,378 m³ dans la CI du 20 novembre 2026 à 21 h 17). Les
+ * épreuves de la pénurie mettent donc l'horloge réelle à 8 h, heure de la
+ * ferme, et la laissent courir de là, quelle que soit l'heure où elles
+ * tournent. L'horloge réelle reprend son cours après chaque épreuve.
+ */
+function realClockFromFarmMorning(): void {
+  const realNow = Date.now;
+  const shift = FARM_MORNING_MS - realNow();
+  mock.method(Date, 'now', () => realNow() + shift);
+}
+
+/** La démonstration « Pic d'été, l'eau manque », préparée au jour du moment à 8 h, heure de la ferme, et son plan. */
 async function penurie() {
   const choice = resolveDemoChoice('maraichage', 'penurie');
   const owner = demoOwnerUserId('invite-a', choice);
+  realClockFromFarmMorning();
   installSimulatedDate();
   await runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice));
   const plan = (await readLatestPlanForUser(owner, 2026, '2026-07-20'))!;

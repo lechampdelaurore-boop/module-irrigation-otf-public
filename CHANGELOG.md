@@ -242,6 +242,18 @@ source détaillée commit par commit.
   premier bloc ; ce titre reste pour les lecteurs d'écran, et les niveaux
   de titre se suivent sans saut.
 
+### Corrigé (audit du 19 novembre 2026, lot I : une épreuve à heure fixe)
+
+- **L'épreuve du manque ne dépend plus de l'heure où elle tourne** : la
+  démonstration se joue le jour du moment, à l'heure réelle de la ferme,
+  et le plan de la pénurie change avec l'heure. De 21 h 14 à 21 h 30
+  environ, il verse moins de 0,4 m³ sur les planches vides, et l'épreuve
+  n° 5 (F445), qui en attend de 0,4 à 0,6, échouait : 0,378 m³ dans la CI
+  du 20 novembre 2026 à 21 h 17 (sur #157), 0,306 m³ en local sur `main`
+  à 21 h 25. Les épreuves de la pénurie mettent désormais l'horloge réelle
+  à 8 h, heure de la ferme, et la laissent courir de là. Aucun code du
+  logiciel modifié.
+
 ### Corrigé (audit du 19 novembre 2026, lot I, PR 5 sur 5)
 
 - **Petits défauts de la démonstration** (D-182) : la première ouverture
