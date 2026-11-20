@@ -362,7 +362,7 @@ registres, elle y renvoie.
   **Code commencé le 20 novembre 2026**, sur le « vas-y » du porteur
   (7 h 52), en Opus 5.5 · Élevé (ligne 4.4 de la roadmap). **PR 1 sur 5,
   l'état de l'accueil et le marquage de l'espace existant** (D-222, F581,
-  section 8 bis.9 du contrat) : une table `irrigation_onboarding_steps`
+  section 8 bis.9 du contrat), **en ligne le 20 novembre 2026 à 16 h 13 (#126, fusionnée à 15 h 51, run 44757499085 vérifié job par job : les cinq jobs verts)** : une table `irrigation_onboarding_steps`
   (migration additive 0034, le numéro libre : les migrations se suivent
   sans trou, la 4.3 PR 3 prendra le suivant), une ligne par espace et par
   étape confirmée (commune, parcelles et abris, sol, cultures, réglages à
@@ -388,7 +388,7 @@ registres, elle y renvoie.
   accès à la base de production ni à Cloudflare depuis la session de
   code) ; il sera lu dans Réglages après le déploiement.
   **PR 2a, la commune de la ferme** (D-223, F582, section 8 bis.10 du
-  contrat) : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
+  contrat), **en ligne le 20 novembre 2026 à 16 h 40 (#127, fusionnée à 16 h 14, run 44761350240 vérifié job par job : les cinq jobs verts)** : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
   abris ; 2c la proposition par `placeLngLat`, à l'accès d'OTF). Une ferme
   neuve n'a plus le siège de sa structure pour commune en silence : sans
   commune confirmée, ni météo, ni gel, ni ET0, la page le dit, et un
@@ -405,7 +405,7 @@ registres, elle y renvoie.
   P31b, P31c joués en local aux deux largeurs, réussis ; la suite complète
   par la CI de la PR.
   **PR 2b, parcelles et abris** (D-224, F583, section 8 bis.11 du
-  contrat) : la lecture d'OTF classait chaque jardin par le type que lui
+  contrat), **en ligne le 20 novembre 2026 à 17 h 34 (#129, fusionnée à 17 h 09, run 44770488501 vérifié job par job : les cinq jobs verts)** : la lecture d'OTF classait chaque jardin par le type que lui
   donne OTF (une énumération, pas son nom, contrairement à ce que F420
   supposait). Le classement confirmé est désormais gardé par espace (table
   `irrigation_plot_shelters`, migration additive 0035) et posé sur le plan
@@ -423,7 +423,7 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; sept sabotages, chacun détecté ;
   P46 (étendu), P28, P29, P31, P31b, P33 joués en local aux deux largeurs,
   réussis ; la suite complète par la CI de la PR.
-  **PR 3, le sol** (D-225, F584, section 8 bis.12 du contrat) : pour une
+  **PR 3, le sol** (D-225, F584, section 8 bis.12 du contrat), **en ligne le 20 novembre 2026 à 18 h 03 (#131, fusionnée à 17 h 37, run 44775171860 vérifié job par job : les cinq jobs verts)** : pour une
   ferme qui fait l'accueil, le formulaire du sol d'une parcelle n'a plus
   TEW 14 / REW 7 préremplis ; la texture, parmi les neuf du tableau 19 de
   la FAO-56, propose TEW et REW au milieu de leur fourchette, dite à côté
@@ -442,7 +442,7 @@ registres, elle y renvoie.
   sabotages, chacun détecté ; P46 (étendu), P18, P19, P29, P31b, P33 joués
   en local aux deux largeurs, réussis (14 sur 14) ; la suite complète par
   la CI de la PR.
-  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat) : le
+  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat), **en ligne le 20 novembre 2026 à 18 h 25 (#132, fusionnée à 18 h 06, run 44779979091 vérifié job par job : les cinq jobs verts)** : le
   plafond de 0,60 m de l'asperge et du melon, celui de la ferme du porteur,
   est dans le jeu commun ; pour une ferme qui fait l'accueil, il est
   remplacé à la lecture par la borne basse de la FAO-56 (asperge 1,20 m,
