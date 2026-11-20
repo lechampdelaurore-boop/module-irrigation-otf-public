@@ -200,3 +200,25 @@ test('n° 20, F479 : trois rayons de charte, les cercles et les pilules restent 
     assert.doesNotMatch(css, /#1e1e1e|#4f6e64/i, file);
   }
 });
+
+// n° 23 et n° 24 — Grand écran, tablette, 320 px (PR 7, F480 à F482).
+
+test('n° 24, F481 : la barre du bas jusqu’à 980 px, ses cibles de 44 px aussi ; à 320 px les noms ne se coupent plus', () => {
+  const navigation = readFileSync('app/irrigation/styles/navigation.css', 'utf8');
+  const finitions = readFileSync('app/irrigation/styles/finitions-charte.css', 'utf8');
+  assert.match(navigation, /@media \(max-width: 980px\) \{[^@]*\.phone-bar \{/);
+  assert.doesNotMatch(navigation, /overflow-wrap: anywhere/);
+  const tablette = finitions.slice(finitions.indexOf('@media (min-width: 601px) and (max-width: 980px)'));
+  assert.ok(tablette.length > 0);
+  for (const cible of ['.refresh-link', '.today-block-more', '.history-summary-action', 'button.figure-origin-toggle', '.feasibility-help > button']) assert.ok(tablette.includes(cible), cible);
+  assert.match(tablette, /main\.app-shell \.feature-page button:not\(/);
+  assert.match(finitions, /@media \(max-width: 359px\) \{[^}]*\.phone-bar a,\s*\.phone-bar button \{/);
+});
+
+test('n° 23, F480 : au grand écran, la page se centre et le fond du menu descend jusqu’en bas', () => {
+  const finitions = readFileSync('app/irrigation/styles/finitions-charte.css', 'utf8');
+  const grand = finitions.slice(finitions.indexOf('@media (min-width: 981px)'));
+  assert.match(grand, /\.feature-page \{\s*margin-right: auto;\s*margin-left: auto;/);
+  assert.match(grand, /main\.app-shell:has\(> \.feature-layout\) \{\s*padding-bottom: 0;/);
+  assert.match(grand, /\.today-row\[data-layout\] \{\s*align-items: stretch;/);
+});
