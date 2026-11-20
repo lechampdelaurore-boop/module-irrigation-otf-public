@@ -4,8 +4,7 @@ import { millisecondsFromDays, millisecondsFromHours } from '@/lib/domain/units'
 import { listWaterInfrastructureForUser } from '@/db/water-resource-repository';
 import {
   listWeatherDailyValuesForUser,
-  readWeatherPreferenceForUser,
-} from '@/db/water-management-repository';
+  } from '@/db/water-management-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import {
   FARM_TIME_ZONE,
@@ -20,6 +19,7 @@ import {
 } from '../domain/water-resources';
 import { weatherLocationKey } from '../domain/weather/location';
 import { plannedWaterForPeriod } from '../domain/planned-irrigation';
+import { readWeatherPreference } from './weather-preference';
 
 export type WaterResourceDashboard = {
   infrastructure: WaterInfrastructure;
@@ -54,7 +54,7 @@ export async function getWaterResourceDashboardForUser({
   const [infrastructure, events, preference, flowHistory] = await Promise.all([
     listWaterInfrastructureForUser(ownerUserId),
     listCountedIrrigationEventsForUser(ownerUserId, season),
-    readWeatherPreferenceForUser(ownerUserId),
+    readWeatherPreference(ownerUserId),
     getResourceFlowHistoryForUser(ownerUserId),
   ]);
   const locationKey = weatherLocationKey(preference, snapshot.structure);

@@ -19,6 +19,13 @@ const PUSH_FEATURES: readonly FeatureId[] = ['arrosages', 'planning', 'alertes-m
 /** Les cases qui lisent la correspondance des espèces d'Ouvre ta ferme avec les cultures du jeu commun (P3). */
 const SPECIES_FEATURES: readonly FeatureId[] = ['cultures', 'alertes-cultures'];
 
+/** Les cases dont un calcul dépend de l'abri d'un jardin : la pluie qu'il reçoit, son coefficient d'abri (4.4, F583). */
+const PLOT_SHELTER_FEATURES: readonly FeatureId[] = ['besoins', 'planning', 'sol', 'cultures', 'alertes-cultures'];
+
+export function usesPlotShelters(selection: FeatureSelection): boolean {
+  return hasAny(selection, PLOT_SHELTER_FEATURES);
+}
+
 export function usesWeather(selection: FeatureSelection): boolean {
   return hasAny(selection, WEATHER_FEATURES);
 }

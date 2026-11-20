@@ -1,7 +1,7 @@
 import { bedWaterSettings, readCropWaterInputsForWorkspace } from '@/db/crop-water/inputs';
 import { readLatestPlanForUser, readPlanningSettingsForUser } from '@/db/planning-repository';
 import { readSoilReserveInputsForWorkspace, type SoilReserveInputs } from '@/db/soil-reserve/inputs';
-import { listWeatherDailyValuesForUser, readWeatherPreferenceForUser } from '@/db/water-management-repository';
+import { listWeatherDailyValuesForUser } from '@/db/water-management-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import type { StoredWeeklyPlan } from '../domain/planning/contract';
@@ -16,6 +16,10 @@ import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc,
 import { weatherLocationKey } from '../domain/weather/location';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
 import { cropWaterBedInput, et0Readings } from './crop-water-week';
+import { readWeatherPreference } from './weather-preference';
+import { soilStartingValues } from '../domain/onboarding/soil';
+import { getOnboardingForUser } from './onboarding-service';
+import { rootingProfilesForSpace } from '../domain/onboarding/rooting';
 
 /**
  * Le bloc « Réserve du sol » de la section « Planning de la semaine »
@@ -52,9 +56,10 @@ export async function getSoilReserveViewForUser(input: {
 }): Promise<SoilReserveView> {
   const now = input.now ?? new Date();
   const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
-  const workspaceId = await findWorkspaceIdForUser(input.ownerUserId);
+  const [workspaceId, onboarding] = await Promise.all([findWorkspaceIdForUser(input.ownerUserId), getOnboardingForUser(input.ownerUserId)]);
   const inputs = workspaceId === null ? null : await readSoilReserveInputsForWorkspace(workspaceId, addDaysToDateKey(today, -OBSERVATION_LOOKBACK_DAYS));
   const settings = soilSettingsView({
+    starting: soilStartingValues(onboarding),
     zones: input.snapshot.zones,
     plots: input.snapshot.plots,
     season: input.season,
@@ -160,8 +165,8 @@ async function soilDays(input: {
   const dates: string[] = [];
   for (let date = from; date <= weekEnd; date = addDaysToDateKey(date, 1)) dates.push(date);
 
-  const locationKey = weatherLocationKey(await readWeatherPreferenceForUser(input.ownerUserId), snapshot.structure);
-  const [cropInputs, weather, events, plan, planningSettings] = await Promise.all([
+  const locationKey = weatherLocationKey(await readWeatherPreference(input.ownerUserId), snapshot.structure);
+  const [cropInputs, weather, events, plan, planningSettings, onboarding] = await Promise.all([
     readCropWaterInputsForWorkspace(input.workspaceId, season),
     locationKey ? listWeatherDailyValuesForUser(input.ownerUserId, locationKey, from, weekEnd) : Promise.resolve([]),
     // Toutes saisons, comme le planning : une irrigation compte sur la planche qu'elle arrose.
@@ -172,13 +177,19 @@ async function soilDays(input: {
     }),
     readLatestPlanForUser(input.ownerUserId, season, weekStartDateKey(today)),
     readPlanningSettingsForUser(input.ownerUserId),
+    getOnboardingForUser(input.ownerUserId),
   ]);
+  // Une ferme neuve n'hérite pas des plafonds de racines de la ferme du porteur (4.4, F585).
+  const rootingProfiles = rootingProfilesForSpace(inputs.rootingProfiles, onboarding);
   const readings = et0Readings(weather);
   const rain = dayRainFromWeather(weather, today);
   const irrigations = irrigationIntervalsByBed({ events, plan, now: input.now, horizonEnd });
 
   const daysByBed = new Map<string, SoilReserveDay[]>();
+  // Un jardin à classer (4.4, F583) : ni la pluie ni K_abri ne se savent ; sa réserve n'est pas calculée.
+  const unclassified = new Set(plots.filter((plot) => plot.mode === 'unclassified').map((plot) => plot.id));
   for (const bed of beds) {
+    if (unclassified.has(bed.plotId)) continue;
     const underShelter = sheltered.has(bed.plotId);
     const water = cropWaterBedInput(bed, underShelter, today, cropPlan, cropInputs, readings);
     daysByBed.set(bed.id, bedSoilReserve({
@@ -188,7 +199,7 @@ async function soilDays(input: {
       rain,
       irrigations: irrigations.get(bed.id) ?? [],
       soilRecords: inputs.soilRecords,
-      rootingProfiles: inputs.rootingProfiles,
+      rootingProfiles,
       referenceCrops: cropInputs.referenceCrops,
       upcomingCrops: bedUpcomingCrops(water),
       observations: inputs.observations,

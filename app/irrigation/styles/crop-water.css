@@ -61,6 +61,7 @@ details[open] > summary .detail-hint-closed, details:not([open]) > summary .deta
 .without-reference-list { display: grid; gap: .35rem; margin: .6rem 0 0; padding: 0; list-style: none; }
 .without-reference-list li { display: grid; border-radius: 9.75px; background: var(--sheet); padding: .5rem .7rem; }
 .without-reference-list small { color: var(--muted); }
+.reference-crop-region-warning { margin: 0 .9rem .5rem; border-radius: 9.75px; background: var(--warn-soft); padding: .45rem .7rem; color: var(--warn-ink); font-size: var(--text-13); }
 .reference-crop-problems { margin: 0 .9rem .5rem; color: var(--danger-ink); font-size: var(--text-13); }
 .reference-crop-note, .reference-crop-meta { margin: .4rem .9rem; color: var(--muted); font-size: var(--text-13); overflow-wrap: anywhere; }
 .reference-crop-kc { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .4rem; margin: .4rem .9rem; }

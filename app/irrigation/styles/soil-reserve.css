@@ -20,6 +20,8 @@
 .soil-warning { margin: 0; border-radius: 9.75px; background: var(--danger-soft); padding: .5rem .7rem; color: var(--danger-ink); font-size: var(--text-13); grid-column: 1 / -1; }
 .soil-computed { margin: 0; align-self: center; font-weight: 700; }
 .soil-source { grid-column: span 2; }
+/* La texture propose TEW et REW (FAO-56, tableau 19 ; 4.4, F584) : la phrase de la source tient toute la largeur. */
+.soil-texture-proposal { margin: 0; grid-column: 1 / -1; color: var(--muted); font-size: var(--text-13); overflow-wrap: anywhere; }
 .soil-record-fold > summary { min-height: 44px; box-sizing: border-box; padding: .5rem 0; cursor: pointer; font-weight: 700; }
 .soil-threshold { display: grid; gap: .4rem; margin: 0; border: 1px solid var(--line); border-radius: 9.75px; padding: .5rem .7rem; }
 .soil-threshold legend { font-weight: 700; }
