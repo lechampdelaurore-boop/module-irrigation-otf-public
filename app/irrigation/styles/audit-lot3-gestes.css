@@ -36,7 +36,7 @@
   min-height: var(--touch-target);
   box-sizing: border-box;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-button);
   background: white;
   padding: .6rem .7rem;
   color: inherit;
@@ -60,7 +60,7 @@
   justify-content: space-between;
   gap: .4rem .75rem;
   margin-left: 4px;
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--warn-soft);
   padding: .4rem .5rem .4rem .8rem;
   color: var(--warn-ink);
@@ -105,7 +105,7 @@
   align-items: center;
   justify-content: space-between;
   gap: .4rem .75rem;
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--card);
   padding: .4rem .5rem .4rem .75rem;
 }
@@ -205,7 +205,7 @@
 
 .coverage-setting-name {
   flex: none;
-  border-radius: 4px;
+  border-radius: 9.75px;
   background: var(--tile);
   padding: 0 4px;
   color: var(--green-dark);
