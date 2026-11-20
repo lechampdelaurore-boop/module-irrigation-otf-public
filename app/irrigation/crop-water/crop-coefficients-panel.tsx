@@ -29,6 +29,7 @@ import {
   type CropWaterActionResult,
 } from '../crop-water-actions';
 import { CropWaterSettingsSection } from './crop-water-settings';
+import { PageSettingsFold } from '../shell/page-settings-fold';
 import { ReferenceCropCard } from './reference-crop-card';
 import { referenceCropSeriesCount, referenceCropSummary, splitBySeasonUse } from '@/lib/domain/crop-water/crop-summary';
 import { DetailHint } from './detail-hint';
@@ -156,7 +157,10 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
               }}
             </ReferenceCropGroups>
           </section>
-          <CropWaterSettingsSection season={season} settings={view.settings} pending={pending} run={run} />
+          {/* « Réglages du calcul » dans le pli « Réglages de cette page », fermé, en bas, comme sur les autres pages (audit du 19 novembre 2026, lot J, n° 15, F457). */}
+          <PageSettingsFold>
+            <CropWaterSettingsSection season={season} settings={view.settings} pending={pending} run={run} />
+          </PageSettingsFold>
         </>
       )}
     </section>

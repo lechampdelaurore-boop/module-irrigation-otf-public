@@ -484,7 +484,11 @@ registres, elle y renvoie.
   besoins » 3 200, « Besoin par culture » 3 000, « Réserve du sol »
   2 600). **PR 1, un seul titre** (D-183, F456) : sur six pages, le titre
   du premier bloc qui redisait celui de la page est caché à l'écran et
-  gardé pour les lecteurs d'écran, sans niveau de titre sauté ; codée.
+  gardé pour les lecteurs d'écran, sans niveau de titre sauté ; en ligne le 20 novembre 2026 à
+  5 h 41 (#119, fusionnée à 5 h 18, run 44673550080 vérifié job par job).
+  **PR 2, le pli de « Besoin par culture »** (D-184, F457) : « Réglages du
+  calcul » rangé dans le pli « Réglages de cette page », fermé, en bas,
+  comme sur les quatre autres pages ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

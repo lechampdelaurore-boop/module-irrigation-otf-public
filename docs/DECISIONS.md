@@ -6349,6 +6349,25 @@ la même taille. Les ancres existantes mènent toujours au bloc.
 
 Ne changent pas : les autres titres, le contenu des blocs. Aucune
 migration.
+
+## D-184 — Lot J, PR 2 : « Besoin par culture », le pli des réglages
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 15 :
+« Besoin par culture » mesurait 4 480 px au téléphone, dont 1 500 à
+1 700 px pour « Réglages du calcul », ouvert d'office. **Cause vérifiée** :
+le pli « Réglages de cette page » du lot D (J2, D-149) avait été posé sur
+quatre pages, pas sur celle-ci (`crop-coefficients-panel.tsx`).
+
+**Décision (F457).** « Réglages du calcul » est rangé dans le pli
+« Réglages de cette page », fermé, en bas de la page ; un lien vers un
+élément qu'il contient l'ouvre. Budget de la page au téléphone : 3 000 px
+sur une ferme qui cultive ; sur les données des parcours, sans culture de
+la saison (les 32 cultures de référence ouvertes, F302), la page passe de
+5 541 à 3 961 px, et P40 la borne à 4 000.
+
+Ne changent pas : les réglages eux-mêmes et leur calcul. Aucune migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
