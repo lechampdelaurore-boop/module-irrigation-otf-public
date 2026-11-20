@@ -1448,6 +1448,57 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **L'avertissement** : « Ces dates viennent d'une autre région que la vôtre (Bretagne) : vérifiez-les. », sur chaque culture **commune du CRIIAM**, pour une ferme **qui fait l'accueil** dont la région n'est ni Provence-Alpes-Côte d'Azur ni Occitanie. Il se lit sur la fiche ouverte, hors du pli « Pour les experts », et la carte fermée dit « dates d'une autre région ». Jamais sur la FAO-56 (générale), ni sur une culture aux durées de la ferme, ni pour la ferme du porteur (espace d'avant l'accueil) ou la démonstration (F426). L'origine et les délais du porteur sont dans « Pour les experts ».
 - **Preuves.** `tests/db/onboarding-regions.test.ts` : codes postaux et régions, outre-mer refusé ; une ferme neuve de Bretagne avertie sur toutes les cultures du CRIIAM et sur elles seules ; une ferme neuve du Vaucluse, aucun avertissement ; sans commune confirmée, aucun ; la ferme d'avant l'accueil et la démonstration, aucun ; la région d'une ferme ne passe pas à l'autre ; aux trois passages d'isolation. Six sabotages, chacun détecté. Parcours P46 étendu : l'asperge avertie, carte fermée et ouverte ; le brocoli de la FAO-56 non.
 
+#### 8 bis.15 · Précisions du code de la PR 4c (20 novembre 2026, D-228, F587)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F587 · L'étape « Rattachez vos espèces »
+
+- **La PR 4c en deux.** 4c (celle-ci) : l'étape et le mécanisme du modèle, **le modèle vide** ; 4d : la liste des liens de la ferme du porteur, extraite de sa ferme réelle et **relue par lui avant tout dépôt** (F428, réponse 4), versée dans `lib/domain/onboarding/species-model-data.ts`, fichier de données du dépôt (pas une migration).
+- **L'étape**, pour un espace qui fait l'accueil seulement, en tête de la correspondance des espèces dans Réglages (ancre `#rattachez-vos-especes`) : le compteur des espèces de la saison, puis **une proposition par espèce sans aucun rattachement**, du modèle quand il connaît son nom (sans accents ni majuscules), sinon d'après le nom (`suggestReferenceCrop`, lot 3, cas 9), chacune dite « d'après le modèle d'une ferme maraîchère » ou « d'après le nom ». Le modèle ne vise qu'une culture du jeu commun utilisable ; une espèce rattachée à « sans référence » l'a été par la personne et n'est pas proposée.
+- **Un geste** : chaque proposition est cochée ; la personne décoche ce qu'elle ne garde pas, puis « Rattacher les N espèces cochées ». Le serveur relit lui-même les propositions : une espèce qui n'est plus proposée refuse tout le geste, rien n'est écrit (un seul lot). Les rattachements se font par espèce, sans analogie ; les exceptions de séries ne sont pas touchées.
+- **L'étape « Cultures » se confirme d'un geste** (« Confirmer l'étape « Cultures » »), quand la personne le décide : une espèce peut rester sans référence par choix. La confirmation garde le compte (« 3 espèces rattachées sur 4 »). Les espèces non rattachées restent « à rattacher », signalées partout (D-003).
+- **Le bandeau « À finir »** nomme « N espèces à rattacher » (vers l'étape), quand une case cochée lit la correspondance des espèces et tant que l'étape n'est pas confirmée ; l'étape de l'accueil, dans Réglages, mène à l'étape (« Rattacher les espèces »).
+- **Inchangé** : aucune migration ; la ferme du porteur (espace d'avant l'accueil) et la démonstration n'ont pas l'étape, le geste y est refusé (F426) ; la proposition une par une (« Rattacher comme… ») reste pour tous.
+- **Preuves.** `tests/db/onboarding-species.test.ts` : le modèle passe avant le nom et ne vise qu'une culture commune utilisable ; une espèce déjà rattachée n'est pas proposée ; une ferme neuve reçoit ses propositions sans rien de rattaché ; les gardées se rattachent d'un geste, les décochées non ; une espèce non proposée refuse tout le geste ; un rattachement à la main n'est pas remplacé ; la confirmation garde le compte et le bandeau ne rappelle plus ; la ferme d'avant l'accueil et la démonstration sans étape ; isolation Alice et Bob, aux trois passages. Sept sabotages, chacun détecté. Parcours P46 étendu ; les parcours d'une ferme neuve confirment l'étape sans rien rattacher (`preparerLaFermeNeuve`).
+
+#### 8 bis.16 · Précisions du code de la PR 5a (20 novembre 2026, D-229, F588)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F588 · « Réglages à relire », et aucun planning avant le groupe « Planning »
+
+- **La PR 5 en deux.** 5a (celle-ci) : « Réglages à relire » et la garde du planning (F424, réponse Q10) ; 5b : la vérification finale (F427) et plusieurs fermes d'une même personne (F418).
+- **La borne de l'ET0 ne change pas ici.** Le [NON VÉRIFIÉ] de F424 est levé : le contrat commun fixe aussi 0 ≤ ET0 ≤ 12 mm/j (`docs/contrat-moteur-partie-otf.md` du dépôt commun, MC-16, cas `cas-otf.json`). Comme F424 le prévoit, le changement est proposé au dépôt commun (PR n° 10, MC-37, 20 novembre 2026) ; le module garde 12 mm/j jusqu'à l'accord, puis change la constante dans une PR à part, avec les cas 11,9 / 12,1 / 14,9 / 15,1.
+- **L'étape**, pour un espace qui fait l'accueil seulement, dans Réglages (ancre `#reglages-a-relire`) : six groupes, seulement ceux des cases cochées : Abris (K_abri), Calcul du besoin (paillage plastique, borne de l'ET0), Sol et surface, Gel, Alerte d'aspersion, Planning. Chaque ligne dit sa valeur et sa source ; **les valeurs sont lues des constantes du calcul** (`lib/domain/onboarding/settings-review.ts`), jamais recopiées à la main. Chaque groupe dit « Proposé, à ajuster », puis « Validé » ou « Passé » ; « Ajuster » mène à sa page. Les modèles d'alerte météo, « indicatifs », se lisent dans leur page : ils ne sont pas des valeurs de départ d'un calcul.
+- **Valider ou passer** un groupe s'enregistre dans la ligne de l'étape (valeur JSON, aucune migration) : « proposée » tant qu'un groupe des cases cochées reste sans réponse, « confirmée » quand chacun en a une, avec le compte (« 5 groupes validés, 1 groupe passé »). Un groupe passé dit ce qu'il laisse de côté. Un groupe que les cases cochées ne montrent pas est refusé.
+- **Aucun planning avant la validation du groupe « Planning »** (réponse Q10) : le calcul refuse (« Aucun planning avant que vous ayez validé les réglages du planning… ») et n'enregistre rien ; le calcul du matin et le recalcul sur événement passent la ferme, sans échec compté ni ligne de journal ; passer le groupe ne le permet pas. Le bandeau « À finir » nomme « réglages du planning à valider » quand le Planning est coché.
+- **Inchangé** : la ferme du porteur (espace d'avant l'accueil) et la démonstration n'ont rien à relire et gardent leur planning (F426) ; aucune valeur de calcul ne change.
+- **Preuves.** `tests/db/onboarding-settings.test.ts` : les groupes des cases cochées et leurs valeurs ; aucun planning ni enregistrement avant la validation ; passer ne permet pas, valider si ; l'étape proposée puis confirmée avec son compte ; un groupe non montré refusé ; la ferme d'avant l'accueil et la démonstration ; le calcul du matin et le recalcul sur événement sans échec ; isolation Alice et Bob, aux trois passages. Sept sabotages, chacun détecté. Les tests du planning valident le groupe pour leurs fermes neuves (`validatePlanningSettings`) ; les parcours aussi (`preparerLaFermeNeuve`). Parcours P46 étendu jusqu'à « Accueil terminé ».
+
+#### 8 bis.17 · Précisions du code de la PR 5b (20 novembre 2026, D-230, F589)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F589 · La vérification finale, et plusieurs fermes remis après la 4.3
+
+- **La vérification** (F427) est le pli « Accueil de la ferme » de Réglages, pour un espace qui fait l'accueil : chaque étape en vert (confirmé, avec ce qui l'a été), orange (passé, avec la conséquence) ou rouge (à faire, avec son lien), comme depuis la PR 1 ; la PR 5b y ajoute, sous l'étape « Réglages à relire », **chaque groupe** : « confirmé », « passé, valeurs proposées » ou « proposé » ; et **« Encore inconnu »** : les espèces non rattachées, les jardins à classer, les parcelles sans sol (quand la réserve du sol est cochée), chacun avec sa conséquence en mots et son lien, **même après une étape confirmée** (une espèce laissée sans référence, un jardin apparu dans Ouvre ta ferme). « Rien ne reste inconnu. » quand c'est le cas. Une phrase rappelle que rien n'est bloqué, sauf le planning tant que ses réglages ne sont pas validés.
+- **Plusieurs fermes d'une même personne (F418) : remis après la 4.3, PR 3.** Le sélecteur de ferme suppose le raccordement d'OTF par ferme (la 4.3 limite à une ferme, F351, et son raccordement attend l'accès d'OTF) ; l'état de l'accueil est déjà par espace. Le sélecteur, la notification qui nomme sa ferme et le test à deux fermes d'une même personne se codent avec la 4.3, PR 3.
+- **Inchangé** : la ferme du porteur (espace d'avant l'accueil) lit ses étapes « Réglage d'avant l'accueil, gardé tel quel », sans « Encore inconnu » ; la démonstration n'a pas le pli.
+- **Preuves.** `tests/onboarding-verification.test.ts` : les textes de ce qui reste inconnu et des groupes. Parcours P46 : les six groupes, « Gel : passé, valeurs proposées », et les espèces non rattachées sous « Encore inconnu », avec leur lien.
+
+#### 8 bis.18 · Précisions du code de la PR 4d (20 novembre 2026, D-231, F590)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F590 · Le modèle des rattachements du porteur
+
+- **Le relevé.** Lu en lecture seule le 20 novembre 2026 dans « Réglages », « Correspondance des espèces » de la ferme du porteur, saison 2026, dans son navigateur, onglet refermé ensuite : 77 espèces, dont **40 rattachées à une culture de référence du jeu commun** (11 par analogie), 36 « sans référence Kc » et 1 engrais vert. Les 40 liens entrent dans `lib/domain/onboarding/species-model-data.ts` : un nom d'espèce, l'identifiant d'une culture du jeu commun, l'analogie ; jamais un identifiant d'OTF ni une donnée de ferme. La relecture prévue par F428 (réponse 4) est faite par l'assistant, sur la délégation du porteur (19 novembre 2026, confirmée le 20 pour ces liens).
+- **L'analogie gardée.** Un lien du modèle par analogie (la mâche suit la salade d'été) est proposé « Salade d'été, par analogie » et rattaché par analogie ; une proposition d'après le nom ne l'est jamais.
+- **Hors du modèle** : les espèces « sans référence Kc » et l'engrais vert ; le modèle ne propose qu'une culture de référence. Une nouvelle ferme les rattache à la main.
+- **Inchangé** : la ferme du porteur et la démonstration n'ont pas l'étape (F426) ; le modèle ne vise qu'une culture commune utilisable de la ferme ; sans lui, la proposition d'après le nom.
+- **Preuves.** `tests/db/onboarding-species.test.ts` : le modèle d'abord, le nom ensuite, sur la ferme d'essai ; 40 liens, des noms tous différents, chacun vers une culture du jeu commun (lue dans la migration 0023) ; l'analogie gardée au rattachement. Cinq sabotages, chacun détecté. Parcours P46 : la mâche proposée « par analogie », d'après le modèle.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :
