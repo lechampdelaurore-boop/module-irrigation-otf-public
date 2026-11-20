@@ -74,7 +74,16 @@ test('la politique de confidentialité couvre ce que demande le contrat (section
     [/<strong>La clé d'accès donnée par Ouvre ta ferme<\/strong>/, 'la clé d’accès gardée'],
     [/Elle est gardée chiffrée, et effacée quand vous déconnectez la ferme dans le module, ou dès que le module constate qu'Ouvre ta ferme n'accepte plus son accès/, 'chiffrée, effacée à la déconnexion ou au retrait'],
     [/il peut techniquement lire les données de chaque ferme dans la base de données et dans les journaux techniques/, 'ce que le responsable peut lire (D6)'],
-    [/Texte du 19 novembre 2026/, 'date du texte'],
+    // Les durées de conservation (4.5, PR 5 ; docs/tranche-4-contract.md, F562,
+    // 10 bis.18 et 10 bis.20) : la phrase des 30 jours telle qu'approuvée par
+    // le porteur le 19 novembre 2026, et chaque durée que tient le code.
+    [/Une donnée effacée reste récupérable dans l'historique jusqu'à 30 jours\./, 'la phrase des 30 jours, telle qu’approuvée'],
+    [/la preuve que la demande a été traitée : un numéro interne et des dates, sans nom, sans ferme et sans contenu/, 'la trace d’un effacement (F640)'],
+    [/Chaque copie est effacée au bout de cinq semaines au plus/, 'les exports hebdomadaires (F657)'],
+    [/<strong>Le compte des lectures dans Ouvre ta ferme<\/strong>/, 'le compte des appels (F614)'],
+    [/Le compte des lectures dans Ouvre ta ferme est gardé 30 jours au plus\./, 'sa durée (F651)'],
+    [/plus aucune notification n'a pu lui être remise depuis 90 jours/, 'les abonnements muets (F655)'],
+    [/Texte du 20 novembre 2026/, 'date du texte'],
   ];
   for (const [pattern, label] of required) assert.match(body, pattern, label);
   assert.ok(body.includes(OAUTH_RETURN_URL), "l'adresse de retour est écrite");
@@ -95,6 +104,8 @@ test("la page d'accueil dit ce que fait le module, pour qui, ce qu'il ne fait pa
   assert.match(body, /de préférence par Discord/);
   assert.match(body, /décrivez-le bien par écrit/);
   assert.match(body, /captures d'écran si possible/);
+  // Le délai de réponse, sans engagement (4.5, F567 ; 10 bis.20, F659).
+  assert.match(body, /réponse en général sous deux jours ouvrés, sans engagement/);
   assert.ok(body.includes(RESPONSIBLE));
 });
 

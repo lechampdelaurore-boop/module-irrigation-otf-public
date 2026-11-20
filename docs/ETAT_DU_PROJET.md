@@ -556,6 +556,20 @@ registres, elle y renvoie.
   partie, après la fusion de la 4.4. À fusionner après la première partie
   de la PR 5.
 
+- Tranche 4, **4.5, PR 5 sur 5, deuxième partie : codée le 20 novembre
+  2026** (D-249, F657 à F659, section 10 bis.20 de
+  `docs/tranche-4-contract.md`). La page de confidentialité (texte du
+  20 novembre 2026) dit chaque durée que le code tient, avec la phrase des
+  30 jours telle qu'approuvée, l'export de la semaine gardé cinq semaines
+  au plus et le compte des lectures dans Ouvre ta ferme ; **texte relu par
+  le porteur avant la fusion**, qui le met en ligne. La commande de
+  l'export efface elle-même, après un export vérifié, ceux de 25 jours ou
+  plus. `docs/exploitation.md` dit que faire, cas par cas (« Que faire
+  quand… »), avec un gabarit de réponse ; la page d'accueil du site, le
+  délai de réponse, sans engagement. Sans migration. La PR 5 se fait
+  désormais en trois : le journal d'accès du support et les coûts viennent
+  en troisième partie. À fusionner après la deuxième partie de la PR 3.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

@@ -7113,3 +7113,38 @@ Ne changent pas : aucune migration de la base D1, aucun appel à OTF, aucun
 secret, aucun service nouveau ; les alarmes et leurs tentatives ; la règle
 « un appareil, une personne » (F371) ; le texte de la page de
 confidentialité (PR 5, seconde partie).
+
+## D-249 — Tranche 4, 4.5, PR 5 (deuxième partie) : la page de confidentialité, les exports gardés cinq semaines, le support
+
+Date : 20 novembre 2026.
+
+**Contexte.** La première partie de la PR 5 (D-247) a donné une durée à
+chaque table ; la page de confidentialité n'en disait encore que deux, sans
+la phrase des 30 jours approuvée par le porteur le 19 novembre 2026. Un
+export hebdomadaire garde aussi les données d'une ferme effacée depuis, et
+aucune règle ne disait combien de temps l'exploitant les garde.
+`docs/exploitation.md` ne disait pas encore que faire d'une panne, d'une
+ferme qui écrit ou d'une clé perdue (F567).
+
+**Décision.** Section 10 bis.20 du contrat de la Tranche 4 (F657 à F659) :
+
+1. La PR 5 en trois : la conservation (D-247), ce qui se lit et se relit
+   (cette deuxième partie), puis le journal d'accès du support et les coûts.
+2. Un export est gardé cinq semaines au plus. La commande de l'export le
+   tient : après un export vérifié, elle efface du même dossier ceux de
+   25 jours ou plus (35 jours moins les 10 jours du rouge de la tâche), et
+   seulement les fichiers qu'elle a nommés ; les copies hors de l'ordinateur
+   suivent la même règle, à la main.
+3. La page de confidentialité (texte du 20 novembre 2026) dit chaque durée
+   que le code tient, la phrase des 30 jours telle qu'approuvée, et le
+   compte des lectures dans Ouvre ta ferme ; ce qui n'existe pas encore ne
+   s'écrit qu'avec son code. Le texte est relu par le porteur avant la
+   fusion, qui le met en ligne.
+4. `docs/exploitation.md` dit, cas par cas, ce que fait l'exploitant seul,
+   avec un gabarit de réponse fondé sur la page d'état ; la page d'accueil
+   du site dit le délai de réponse, sans engagement.
+5. La 4.5 prend aussi F660 à F669 et D-250 à D-252.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun secret, aucun
+service nouveau ; l'export lui-même (chiffré avant d'être écrit, jamais dans
+le dépôt) ; la phrase des 30 jours, appliquée mot pour mot.
