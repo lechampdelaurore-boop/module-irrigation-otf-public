@@ -76,7 +76,7 @@
 .weather-fresh {
   margin: 16px 0 0;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 9.75px;
   font-size: var(--text-12);
 }
 
@@ -215,7 +215,7 @@
   height: 38px;
   padding: 0 10px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-button);
   background: white;
   color: var(--ink);
   font: inherit;
@@ -253,7 +253,7 @@
   height: 38px;
   padding: 0 10px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-button);
   background: white;
   color: var(--ink);
   font: inherit;
@@ -324,7 +324,7 @@
 
 .weather-alerts-panel { margin-top: 12px; }
 .weather-alerts-panel h3 { margin: 18px 0 8px; color: var(--ink); font-size: var(--text-13); }
-.weather-alert-device { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-radius: 10px; background: var(--sheet); color: var(--green-dark); font-size: var(--text-12); }
+.weather-alert-device { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-radius: 9.75px; background: var(--sheet); color: var(--green-dark); font-size: var(--text-12); }
 .weather-alert-device[data-status="denied"],
 .weather-alert-device[data-status="unsupported"],
 .weather-alert-device[data-status="unavailable"] { background: var(--warn-soft); color: var(--warn-ink); }

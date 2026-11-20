@@ -58,7 +58,7 @@
 .resource-flow-form input:not([type="checkbox"]),
 .resource-flow-stopped input {
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-button);
   padding: 10px;
   min-height: 44px;
   font: inherit;
