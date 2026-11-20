@@ -12,11 +12,11 @@
   margin: 1rem 0 0;
   padding: .8rem 1rem;
   border: 1px solid var(--danger-line);
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--danger-soft);
   color: var(--danger-ink);
-  font-size: .95rem;
-  font-weight: 650;
+  font-size: var(--text-16);
+  font-weight: 700;
   line-height: 1.5;
 }
 
@@ -35,7 +35,7 @@
   min-height: var(--touch-target, 44px);
   padding: .75rem 1rem;
   cursor: pointer;
-  font-weight: 750;
+  font-weight: 700;
   line-height: 1.5;
 }
 
@@ -80,14 +80,14 @@
 
 /* R5 : les cultures en place à côté du nom de la planche, à toutes les largeurs (F249). */
 .arbitration-name .arbitration-bed-crops {
-  font-weight: 600;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 /* J7 : un groupe sans manque (« Sans objectif ») se dit en simple information, sans alerte (F252). */
 .planning-unplaced-group[data-informational] h4 {
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* J7 : « sur 10,9 mm » ne s'écrit qu'au téléphone, où la colonne « Besoin » se replie dans la ligne compacte (F253). */
@@ -120,7 +120,7 @@
 
   .planning-unplaced-table tbody th {
     color: var(--ink, inherit);
-    font-weight: 750;
+    font-weight: 700;
   }
 
   .planning-unplaced-table td::before {
@@ -153,7 +153,7 @@
   .planning-unplaced-table td[data-cell="reason"] {
     flex-basis: 100%;
     color: var(--muted);
-    font-size: .8rem;
+    font-size: var(--text-13);
     line-height: 1.4;
   }
 }
@@ -162,13 +162,13 @@
 .planning-budgets-validated {
   margin: 0 1rem .6rem;
   color: var(--ink2);
-  font-size: .85rem;
+  font-size: var(--text-13);
 }
 
 /* Remarque 5 de la recette 3.9 (F256) : le jour au-delà de sa limite journalière le dit sous son en-tête, en rouge foncé. */
 .planning-day-overcommitted {
   margin: .3rem 0 0;
   color: var(--danger-ink);
-  font-size: .8rem;
-  font-weight: 650;
+  font-size: var(--text-13);
+  font-weight: 700;
 }

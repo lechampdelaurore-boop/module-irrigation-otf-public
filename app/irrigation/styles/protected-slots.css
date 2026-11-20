@@ -33,13 +33,13 @@
   gap: .5rem;
   padding: .6rem .8rem;
   border: 1px solid var(--line-soft);
-  border-radius: 9px;
-  font-size: .85rem;
+  border-radius: 9.75px;
+  font-size: var(--text-13);
 }
 
 .protected-slot-list li > span {
   min-width: 0;
-  font-weight: 750;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
@@ -59,10 +59,10 @@
 .irrigation-preview-warning {
   margin: 0;
   padding: .6rem .8rem;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--warn-soft);
   color: var(--warn-ink);
-  font-size: .85rem;
+  font-size: var(--text-13);
   line-height: 1.45;
 }
 

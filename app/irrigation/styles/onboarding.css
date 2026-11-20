@@ -30,7 +30,7 @@
 }
 
 .onboarding-step-state {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .onboarding-step-confirmed {
@@ -75,14 +75,14 @@
 
 .onboarding-unfinished a {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .onboarding-step > a {
   grid-column: 1 / -1;
   justify-self: start;
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* « Parcelles et abris » (F583) : un jardin par ligne, sa proposition et trois réponses. */

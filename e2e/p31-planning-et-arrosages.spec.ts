@@ -73,7 +73,7 @@ test('planning : les gestes en tête, les planches sans matériel en action vers
   // Le pli se déplie : « Sans matériel (n) » en tête, avec ce qu'il veut dire.
   const pli = planning.locator('details.planning-unplaced');
   // Le titre ne compte en rouge que les planches en manque ; celles sans objectif sont dites à part (audit final, lot B, J7, F251).
-  await expect(pli.locator('summary h3')).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?|Planches sans objectif \(\d+\))$/);
+  await expect(pli.locator('summary h3')).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?( · \d+ en attente)?|Planches sans objectif \(\d+\)( · \d+ en attente)?|Planches en attente \(\d+\))$/);
   await pli.locator('summary').click();
   const premier = pli.locator('section.planning-unplaced-group').first();
   await expect(premier).toHaveAttribute('data-group', 'no-equipment');

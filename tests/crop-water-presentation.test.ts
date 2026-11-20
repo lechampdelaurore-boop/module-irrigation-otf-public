@@ -76,7 +76,7 @@ test('les espèces à rattacher sont celles des séries sur planches, avec leur 
 
 test('la fiche de la planche dit en clair pourquoi une culture n\'a pas d\'ETM, la nature de l\'ET0 et l\'état de la proposition', () => {
   assert.equal(noEtmReasonLabel('missing-correspondence'), 'espèce non rattachée à une culture de référence');
-  assert.equal(noEtmReasonLabel('without-reference'), 'espèce sans référence Kc');
+  assert.equal(noEtmReasonLabel('without-reference'), 'espèce sans culture de référence');
   assert.equal(noEtmReasonLabel('off-calendar'), 'hors de son calendrier');
   assert.equal(et0NatureLabel('reanalysis'), 'réanalyse');
   assert.equal(et0NatureLabel('estimated'), 'prévision reprise pour un jour passé');

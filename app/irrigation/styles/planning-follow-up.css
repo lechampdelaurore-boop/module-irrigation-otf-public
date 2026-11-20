@@ -12,14 +12,14 @@
 .planning-suggestions h3 {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: 1.125rem;
+  font-size: var(--text-20);
   font-weight: 500;
 }
 
 .planning-suggestions-note {
   margin: .4rem 0 .8rem;
   color: var(--muted);
-  font-size: .85rem;
+  font-size: var(--text-13);
   line-height: 1.5;
 }
 
@@ -37,7 +37,7 @@
   min-width: 0;
   border: 1px solid var(--line);
   border-left: 5px solid #b9892b;
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: var(--card);
   padding: .8rem .9rem;
 }
@@ -59,13 +59,13 @@
 }
 
 .planning-suggestion-head strong {
-  font-size: 1.05rem;
+  font-size: var(--text-16);
 }
 
 .planning-suggestion-head span,
 .planning-suggestion-causes {
   color: var(--muted);
-  font-size: .85rem;
+  font-size: var(--text-13);
   line-height: 1.5;
 }
 
@@ -87,20 +87,20 @@
 .planning-changes {
   margin-top: 1rem;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: var(--card);
   padding: .7rem .9rem;
 }
 
 .planning-changes summary {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .planning-changes ul {
   margin: .6rem 0 0;
   padding-left: 1.1rem;
-  font-size: .9rem;
+  font-size: var(--text-14);
   line-height: 1.5;
 }
 

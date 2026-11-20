@@ -417,6 +417,7 @@ export function HierarchyBrowser({
           plots={seasonPlots}
           beds={seasonBeds}
           zones={zones}
+          hasSprinkler={equipment.some((item) => item.kind === 'sprinkler')}
         />
       </div>
       {removal ? (
