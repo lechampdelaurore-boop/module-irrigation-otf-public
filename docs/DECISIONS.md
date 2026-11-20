@@ -6792,6 +6792,172 @@ valeur agronomique.
 Ne change pas : le moteur hydrique, le calcul, les coûts (aucune dépense
 nouvelle).
 
+## D-222 — Tranche 4, sous-tranche 4.4, PR 1 : l'état de l'accueil et le marquage de l'espace existant
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le code de la 4.4 commence sur le « vas-y » du porteur du
+20 novembre 2026 (7 h 52), en Opus 5.5 · Élevé (ligne 4.4 de la roadmap).
+La section 8 bis.5 du contrat met dans la PR 1 l'état de l'accueil, le
+marquage de l'espace existant, le bandeau « À finir » et la bascule des
+défauts en « à renseigner » pour un espace neuf. Les écrans qui permettent
+de remplir ces valeurs n'arrivent qu'avec les PR 2 à 5.
+
+**Décision** (F581, section 8 bis.9 du contrat).
+
+1. L'état de l'accueil vit dans `irrigation_onboarding_steps`
+   (migration 0034) : une ligne par espace et par étape confirmée par la
+   personne ; une étape sans ligne est « à faire ».
+2. La migration marque chaque espace existant « accueil fait avant la
+   4.4 », cinq étapes confirmées d'origine « avant l'accueil », sans
+   toucher aucune autre table ; essai sur une copie.
+3. La migration prend le numéro 0034 : le test des migrations interdit les
+   trous ; la 4.3, PR 3 prendra le numéro libre.
+4. Réglages montre l'accueil, replié, étape par étape ; la démonstration
+   n'en a pas.
+5. La bascule de chaque défaut et le bandeau « À finir » passent à la PR
+   de l'étape qui permet de les remplir, pour ne jamais montrer un message
+   que la personne ne peut pas suivre (section 8 bis.3). Aucune ferme neuve
+   n'existe en production avant le pilote (F366).
+
+Ne change pas : aucun chiffre de l'espace existant, aucun calcul, aucun
+appel à OTF, aucune valeur agronomique. Aucune question de budget.
+
+## D-223 — Tranche 4, sous-tranche 4.4, PR 2a : la commune de la ferme, choisie par la personne
+
+Date : 20 novembre 2026.
+
+**Contexte.** La section 8 bis.5 du contrat met dans une seule PR 2 la
+commune (F419), le classement des abris (F420) et la proposition de départ
+par `placeLngLat`, un nouvel appel à OTF qui attend l'accès demandé le
+18 novembre 2026. Jusqu'ici, un espace sans commune choisie prenait en
+silence la commune du siège de sa structure (`legalCity`).
+
+**Décision** (F582, section 8 bis.10 du contrat).
+
+1. La PR 2 se fait en trois : 2a la commune, 2b parcelles et abris, 2c la
+   proposition par `placeLngLat`, à l'accès d'OTF.
+2. Le lieu de la météo n'existe que si la commune est confirmée : espace
+   d'avant l'accueil, démonstration, ou étape « Où est la ferme »
+   confirmée. Sinon, ni météo, ni gel, ni ET0, et la page dit quoi faire.
+3. Choisir une commune, ou prendre le siège d'un geste, en dernier recours,
+   confirme l'étape dans le même lot d'écriture, avec la commune et sa
+   provenance.
+4. Hors de France métropolitaine (outre-mer compris) : refusé, rien
+   d'enregistré.
+5. Le bandeau « À finir : commune de la ferme. » paraît sur chaque page
+   quand une case lit la météo, jusqu'à ce que la commune soit confirmée.
+
+Ne change pas : la commune et les chiffres d'un espace existant (sa
+préférence est gardée telle quelle, F426) ; aucun appel nouveau à OTF ; le
+texte de la politique de confidentialité ; aucune valeur agronomique.
+Aucune question de budget.
+
+## D-224 — Tranche 4, sous-tranche 4.4, PR 2b : parcelles et abris, classés par la personne
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le classement abri ou plein champ d'un jardin venait seulement
+de la lecture d'OTF (`mapPlotMode`), qui lit le type du jardin et non son
+nom : une ferme neuve était classée sans le savoir, et un « Serre » déclaré
+plein champ dans OTF recevait la pluie.
+
+**Décision** (F583, section 8 bis.11 du contrat).
+
+1. Le classement confirmé est gardé par espace (`irrigation_plot_shelters`,
+   migration 0035) et posé sur le plan lu d'OTF à chaque lecture.
+2. Pour un espace qui fait l'accueil, un jardin non classé est « à
+   classer » : son besoin, sa réserve et sa proposition ne sont pas
+   calculés, et la raison est dite.
+3. La proposition vient du type d'OTF, sinon d'un mot du nom (« serre »,
+   « châssis », « multichapelle » ajoutés) ; la personne confirme, corrige
+   ou laisse à classer, jardin par jardin ou d'un geste pour les
+   propositions qui restent.
+4. Un espace d'avant l'accueil et la démonstration gardent le classement
+   d'OTF ; la migration n'écrit rien.
+
+Ne change pas : aucun chiffre d'un espace existant ; K_abri et toute valeur
+agronomique ; aucun appel nouveau à OTF. Aucune question de budget.
+
+## D-225 — Tranche 4, sous-tranche 4.4, PR 3 : le sol, la texture qui propose TEW et REW
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le formulaire du sol d'une parcelle préremplissait TEW 14 mm
+et REW 7 mm, dits d'un « limon sableux » (D-053) : une ferme neuve qui
+saisissait sa RFU les enregistrait sans le voir (défaut n° 4).
+
+**Décision** (F584, section 8 bis.12 du contrat).
+
+1. Pour un espace qui fait l'accueil, une parcelle sans sol n'a ni TEW ni
+   REW préremplis ; la part de référence 2/3 et Ze 10 cm restent proposées,
+   dites « proposées, à ajuster ».
+2. La texture du sol, parmi les neuf classes du tableau 19 de la FAO-56,
+   propose TEW et REW au milieu de leur fourchette, arrondi au
+   demi-millimètre, la fourchette et la source dites à côté (F428,
+   réponse 1) ; la personne ajuste. Valeurs relues sur la page de la FAO
+   (chapitre 7) et recoupées par ses exemples 31 et 35.
+3. La texture choisie est gardée avec la saisie (`texture`, migration
+   0036), pour dire d'où viennent TEW et REW ; aucun calcul ne la lit.
+4. L'étape « Sol » est confirmée par la saisie qui donne son sol à la
+   dernière parcelle de la saison ; bandeau « À finir : sol de N
+   parcelles », vers la page « Réserve du sol ».
+5. La texture d'OTF (`System.soil`) attend l'accès d'OTF (PR 3b, avec la
+   2c).
+
+Ne change pas : les valeurs de départ d'un espace d'avant l'accueil et de la
+démonstration (TEW 14 / REW 7 gardés ; la liste des textures s'ajoute à leur
+formulaire sans rien remplir) ; aucun calcul ; aucun appel nouveau à OTF.
+Aucune question de budget.
+
+## D-226 — Tranche 4, sous-tranche 4.4, PR 4a : les racines d'une ferme neuve
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le jeu commun des profils racinaires porte, pour l'asperge et
+le melon, le plafond de 0,60 m de la ferme du porteur (D-056) au lieu de la
+profondeur de la FAO-56 ; une ferme neuve l'héritait (défaut n° 14).
+
+**Décision** (F585, section 8 bis.13 du contrat).
+
+1. Pour un espace qui fait l'accueil, le profil commun de l'asperge et du
+   melon prend, à la lecture, la borne basse de la FAO-56 (tableau 22) :
+   asperge 1,20 m ; melon 0,80 m aux stades 3 et 4. Dit « estimation, à
+   vérifier à la tarière ».
+2. Une révision de la ferme le remplace toujours.
+3. La PR 4 se fait en trois : 4a les racines, 4b la région des cultures,
+   4c le rattachement des espèces et le modèle des 78 liens.
+
+Ne change pas : la base (aucune migration) ; la ferme du porteur et la
+démonstration ; la tomate à 0,65 m. Aucune question de budget.
+
+## D-227 — Tranche 4, sous-tranche 4.4, PR 4b : la région d'origine des cultures
+
+Date : 20 novembre 2026.
+
+**Contexte.** Les dates de stade du jeu commun viennent du CRIIAM Sud
+(région Sud / Occitanie) ou de la FAO-56 (générales) ; une ferme d'une autre
+région les recevait sans le savoir (F422, défaut n° 13).
+
+**Décision** (F586, section 8 bis.14 du contrat).
+
+1. La région d'origine se déduit de la source de la culture, sans colonne
+   nouvelle : CRIIAM Sud → « Sud / Occitanie », FAO-56 → « générales »,
+   version de la ferme → « votre ferme ». Elle est dite sur chaque fiche,
+   avec les délais de levée et calendriers du jeu commun, « ceux de la
+   ferme du porteur, Auvergne-Rhône-Alpes » (F428, réponse 3).
+2. La région de la ferme se déduit de sa commune confirmée (F419) : les deux
+   premiers chiffres du code postal, puis l'une des treize régions de France
+   métropolitaine (table fixe, découpage de 2016).
+3. Une ferme qui fait l'accueil, d'une autre région que Provence-Alpes-Côte
+   d'Azur ou Occitanie, est avertie sur chaque culture commune du CRIIAM,
+   sur la fiche et sur la carte fermée ; jamais sur la FAO-56, ni sur une
+   culture dont la ferme a ses propres dates, ni sans commune confirmée.
+
+Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
+et la démonstration (aucun avertissement, F426). Aucune question de budget.
+
+
 ## D-240 — Tranche 4, 4.5, PR 1 : le registre des tâches attendues
 
 Date : 20 novembre 2026.

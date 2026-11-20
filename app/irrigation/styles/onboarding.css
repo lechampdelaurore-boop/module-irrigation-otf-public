@@ -1,0 +1,131 @@
+/*
+ * L'accueil de la ferme, dans Réglages (4.4, docs/tranche-4-contract.md,
+ * F417, F427, F581) : une ligne par étape, sa couleur dite aussi en mots
+ * (vert confirmé, orange passé, rouge à faire). Couleurs de la charte du
+ * module.
+ */
+
+.onboarding-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.onboarding-step > span:nth-child(3) {
+  grid-column: 1 / -1;
+  line-height: 1.45;
+}
+
+.onboarding-step-state {
+  font-weight: 700;
+}
+
+.onboarding-step-confirmed {
+  border-left-color: var(--ok);
+}
+
+.onboarding-step-confirmed .onboarding-step-state {
+  color: var(--ok-ink);
+}
+
+.onboarding-step-skipped {
+  border-left-color: var(--warn);
+}
+
+.onboarding-step-skipped .onboarding-step-state {
+  color: var(--warn-ink);
+}
+
+.onboarding-step-missing {
+  border-left-color: var(--danger);
+}
+
+.onboarding-step-missing .onboarding-step-state {
+  color: var(--danger-ink);
+}
+
+/* Le bandeau « À finir » (F582) : ce qui manque à la ferme, sur chaque page, avec le lien vers l'étape. */
+.onboarding-unfinished {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.onboarding-unfinished p {
+  margin: 0;
+}
+
+.onboarding-unfinished a {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.onboarding-step > a {
+  grid-column: 1 / -1;
+  justify-self: start;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* « Parcelles et abris » (F583) : un jardin par ligne, sa proposition et trois réponses. */
+.plot-shelter-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.plot-shelter fieldset {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.plot-shelter-sheltered fieldset,
+.plot-shelter-open-field fieldset {
+  border-left-color: var(--ok);
+}
+
+.plot-shelter legend {
+  padding: 0 4px;
+}
+
+.plot-shelter-proposal {
+  margin: 4px 0 8px;
+  line-height: 1.45;
+}
+
+.plot-shelter-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.plot-shelter-answers label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+}

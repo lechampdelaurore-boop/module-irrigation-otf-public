@@ -3,6 +3,7 @@ import type { SurfaceDeclaration, SurfaceState } from '@/lib/domain/soil-reserve
 import type { SoilObservation } from '@/lib/domain/soil-reserve/gauge';
 import type { RootingProfile } from '@/lib/domain/soil-reserve/rooting';
 import type { SoilRecord, SoilSettingsRevision } from '@/lib/domain/soil-reserve/soil';
+import { isSoilTexture } from '@/lib/domain/soil-reserve/texture';
 import { addDaysToDateKey } from '@/lib/domain/water-management';
 
 /**
@@ -29,7 +30,7 @@ export async function readSoilReserveInputsForWorkspace(workspaceId: string, fro
   const [soil, settings, observations, declarations] = await db.batch([
     db.prepare(
       `SELECT otf_zone_id, otf_plot_id, lab_rfu_mm_per_meter, stone_share_percent, reference_share, provenance, sampled_depth_cm,
-              source, tew_mm, rew_mm, surface_layer_cm, soil_depth_ceiling_m, effective_from, recorded_at
+              source, tew_mm, rew_mm, surface_layer_cm, soil_depth_ceiling_m, texture, effective_from, recorded_at
        FROM irrigation_soil_records WHERE workspace_id = ? ORDER BY recorded_at, rowid`,
     ).bind(workspaceId),
     db.prepare(
@@ -114,6 +115,7 @@ type SoilRow = {
   rew_mm: number;
   surface_layer_cm: number;
   soil_depth_ceiling_m: number | null;
+  texture: string | null;
   effective_from: string;
   recorded_at: string;
 };
@@ -160,6 +162,7 @@ function soilRecordOf(row: SoilRow): SoilRecord {
     rewMm: row.rew_mm,
     surfaceLayerCm: row.surface_layer_cm,
     soilDepthCeilingM: row.soil_depth_ceiling_m,
+    texture: isSoilTexture(row.texture) ? row.texture : null,
     effectiveFrom: row.effective_from,
     recordedAt: row.recorded_at,
   };
