@@ -9,6 +9,8 @@ import { getEnabledFeaturesForUser } from './feature-selection-service';
 import { getIrrigationSnapshot } from './irrigation-service';
 import { computeWeeklyPlanForUser } from './planning-service';
 
+import { getOnboardingForUser } from './onboarding-service';
+import { planningAllowed } from '../domain/onboarding/settings-review';
 /**
  * Le recalcul sur événement (3.7, docs/replanning-contract.md, règles 4 à 8 ;
  * docs/planning-contract.md, « Le recalcul sur événement »). Après chaque
@@ -110,6 +112,7 @@ export async function recalculatePlanAfterFeatureChange(
   }: Pick<Dependencies, 'now' | 'compute' | 'log' | 'afterPlan'> = {},
 ): Promise<void> {
   try {
+    if (!planningAllowed(await getOnboardingForUser(ownerUserId))) return;
     await compute({ ownerUserId, season, now, triggerEvent: 'features-changed' });
     await afterPlan(ownerUserId, now);
   } catch (error) {
@@ -118,7 +121,9 @@ export async function recalculatePlanAfterFeatureChange(
 }
 
 async function isPlanningEnabled(ownerUserId: string): Promise<boolean> {
-  return (await getEnabledFeaturesForUser(ownerUserId)).includes('planning');
+  // Une ferme neuve qui n'a pas validé les réglages du planning n'en a pas : rien à recalculer (4.4, F588).
+  const [enabled, onboarding] = await Promise.all([getEnabledFeaturesForUser(ownerUserId), getOnboardingForUser(ownerUserId)]);
+  return enabled.includes('planning') && planningAllowed(onboarding);
 }
 
 /** Un événement d'une autre semaine ne change pas le plan de celle-ci (règle 5) ; un événement durable compte dès qu'il n'est pas à venir. */

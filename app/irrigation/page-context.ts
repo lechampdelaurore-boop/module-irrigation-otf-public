@@ -26,12 +26,17 @@ import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
-import { usesPlotShelters, usesWeather } from '@/lib/domain/features/socle';
+import { usesPlotShelters, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
 import { getOnboardingForUser } from '@/lib/services/onboarding-service';
 import { listZonesWithSoilForUser } from '@/db/soil-reserve/entries';
 import { parcelsWithoutSoil } from '@/lib/domain/onboarding/soil';
 import { soilParcelAnchor } from '@/lib/domain/today/reliability';
+import { listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries';
+import { findWorkspaceIdForUser } from '@/db/workspace-repository';
+import { seasonSpecies } from '@/lib/domain/crop-water/species';
+import { speciesNeedsLink } from '@/lib/domain/crop-water/species-linking';
+import { planningAllowed } from '@/lib/domain/onboarding/settings-review';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
 
@@ -132,6 +137,9 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const withoutSoil = onboarding.kind === 'onboarding' && enabled.includes('sol')
     ? parcelsWithoutSoil(snapshot.zones, season, new Set(await listZonesWithSoilForUser(user.userId)))
     : [];
+  // Les espèces à rattacher ne se comptent que tant que l'étape « Cultures » d'un espace qui fait l'accueil reste à faire (F587).
+  const speciesToLink = await countSpeciesToLink(user.userId, snapshot, season, onboarding.kind === 'onboarding'
+    && onboarding.remaining.some((step) => step.id === 'crops') && usesSpeciesCorrespondence(enabled));
   return {
     kind: 'ready',
     page,
@@ -164,6 +172,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
         weather: usesWeather(enabled),
         plotsToClassify: usesPlotShelters(enabled) ? unclassifiedPlots(snapshot, season).length : 0,
         soilToEnter: withoutSoil.length > 0 ? { parcels: withoutSoil.length, anchor: soilParcelAnchor(withoutSoil[0]) } : null,
+        speciesToLink,
+        planningToValidate: enabled.includes('planning') && !planningAllowed(onboarding),
       }),
     },
     lap: (step) => stopwatch.lap(step),
@@ -216,4 +226,12 @@ async function loadSnapshot(userId: string, season: number, forceRefresh: boolea
     }
     throw error;
   }
+}
+
+/** Les espèces de la saison à rattacher (F587), lues seulement quand le bandeau peut les nommer. */
+async function countSpeciesToLink(spaceKey: string, snapshot: IrrigationSnapshot, season: number, wanted: boolean): Promise<number> {
+  if (!wanted || !snapshot.cropPlan) return 0;
+  const workspaceId = await findWorkspaceIdForUser(spaceKey);
+  const entries = workspaceId === null ? [] : await listSpeciesCorrespondencesForWorkspace(workspaceId);
+  return seasonSpecies(snapshot.cropPlan.series.filter((item) => item.season === season), entries).filter(speciesNeedsLink).length;
 }
