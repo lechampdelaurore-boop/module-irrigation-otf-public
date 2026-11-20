@@ -6670,6 +6670,29 @@ d'arrosage ») et une légende sous le plan, quand une planche en a une
 Ne changent pas : les polices, les couleurs, les cibles tactiles. Aucune
 migration.
 
+## D-195 — Lot K, PR 6 : rayons et couleurs de la charte
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 20 : des
+rayons d'angle de 3, 4, 5, 8, 9, 10, 11 et 14 px, hors des trois de la
+charte (12 ; 14,6 ; 9,75 px) ; à l'ordinateur, deux couleurs de texte hors
+palette, `#1e1e1e` et `#4f6e64`. **Cause vérifiée** : les feuilles de style
+écrites lot après lot posaient leur rayon en pixels ; `navigation.css` et
+`arbitration-plan.css` portaient les deux couleurs.
+
+**Décision (F479).** Chaque rayon de 3 px et plus, hors cercles et
+pilules (40 px et plus, 50 %), prend un des trois rayons de la charte selon
+ce qu'il arrondit : une entrée de menu, 9,75 px ; un bouton ou un champ
+(`button`, `input`, `select`, `textarea`, `…-button`), `--radius-button` ;
+un bloc de 11,5 px et plus, `--radius` ; une pièce plus petite (pastille,
+étiquette, barre), 9,75 px. Les rayons d'un ou deux pixels (les filets) et
+les angles droits restent. Le texte du menu prend `--ink`, le titre de ses
+groupes `--ink2` ; le nom d'une culture de la frise de pénurie, `--ink`.
+
+Ne changent pas : les autres couleurs (les couleurs des matériels sur le
+plan, les états), les tailles, les marges. Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

@@ -152,7 +152,7 @@
 .water-empty {
   margin: 14px 0 0;
   padding: 16px;
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--sheet);
   color: var(--muted);
 }
@@ -191,7 +191,7 @@
   min-width: 0;
   min-height: 44px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-button);
   background: #fff;
   padding: 8px 10px;
   color: var(--ink);
@@ -200,7 +200,7 @@
 .water-editor fieldset {
   margin: 16px 0 0;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   padding: 12px;
 }
 
@@ -223,7 +223,7 @@
 
 .water-editor-help {
   padding: 10px 12px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--tile);
 }
 
@@ -336,7 +336,7 @@
   display: grid;
   gap: 5px;
   padding: 11px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--warn-soft);
   color: var(--warn-ink);
 }
