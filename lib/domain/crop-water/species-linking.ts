@@ -48,6 +48,9 @@ export function withoutReferenceBeyondSpecies(
   return withoutReference.filter((item) => !toLink.has(item.plantId));
 }
 
+/** L'ancre du pli des espèces, dans Réglages : `…/reglages#correspondance-des-especes` l'ouvre. */
+export const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';
+
 /** La phrase de conséquence d'une espèce à rattacher (cas 8). */
 export const WITHOUT_REFERENCE_CONSEQUENCE = 'Sans référence : le besoin n’est pas calculé, seul votre objectif compte.';
 
