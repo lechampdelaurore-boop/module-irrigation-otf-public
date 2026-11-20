@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 5b)
+
+- **La vérification de l'accueil** (D-230) : le pli « Accueil de la
+  ferme » dit, pour chaque groupe de réglages, s'il est confirmé ou passé,
+  et ce qui reste inconnu dans la ferme (espèces non rattachées, jardins à
+  classer, parcelles sans sol), avec le lien pour le renseigner.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 5a)
 
 - **« Réglages à relire »** (D-229) : une nouvelle ferme lit, dans

@@ -1476,6 +1476,17 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **Inchangé** : la ferme du porteur (espace d'avant l'accueil) et la démonstration n'ont rien à relire et gardent leur planning (F426) ; aucune valeur de calcul ne change.
 - **Preuves.** `tests/db/onboarding-settings.test.ts` : les groupes des cases cochées et leurs valeurs ; aucun planning ni enregistrement avant la validation ; passer ne permet pas, valider si ; l'étape proposée puis confirmée avec son compte ; un groupe non montré refusé ; la ferme d'avant l'accueil et la démonstration ; le calcul du matin et le recalcul sur événement sans échec ; isolation Alice et Bob, aux trois passages. Sept sabotages, chacun détecté. Les tests du planning valident le groupe pour leurs fermes neuves (`validatePlanningSettings`) ; les parcours aussi (`preparerLaFermeNeuve`). Parcours P46 étendu jusqu'à « Accueil terminé ».
 
+#### 8 bis.17 · Précisions du code de la PR 5b (20 novembre 2026, D-230, F589)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F589 · La vérification finale, et plusieurs fermes remis après la 4.3
+
+- **La vérification** (F427) est le pli « Accueil de la ferme » de Réglages, pour un espace qui fait l'accueil : chaque étape en vert (confirmé, avec ce qui l'a été), orange (passé, avec la conséquence) ou rouge (à faire, avec son lien), comme depuis la PR 1 ; la PR 5b y ajoute, sous l'étape « Réglages à relire », **chaque groupe** : « confirmé », « passé, valeurs proposées » ou « proposé » ; et **« Encore inconnu »** : les espèces non rattachées, les jardins à classer, les parcelles sans sol (quand la réserve du sol est cochée), chacun avec sa conséquence en mots et son lien, **même après une étape confirmée** (une espèce laissée sans référence, un jardin apparu dans Ouvre ta ferme). « Rien ne reste inconnu. » quand c'est le cas. Une phrase rappelle que rien n'est bloqué, sauf le planning tant que ses réglages ne sont pas validés.
+- **Plusieurs fermes d'une même personne (F418) : remis après la 4.3, PR 3.** Le sélecteur de ferme suppose le raccordement d'OTF par ferme (la 4.3 limite à une ferme, F351, et son raccordement attend l'accès d'OTF) ; l'état de l'accueil est déjà par espace. Le sélecteur, la notification qui nomme sa ferme et le test à deux fermes d'une même personne se codent avec la 4.3, PR 3.
+- **Inchangé** : la ferme du porteur (espace d'avant l'accueil) lit ses étapes « Réglage d'avant l'accueil, gardé tel quel », sans « Encore inconnu » ; la démonstration n'a pas le pli.
+- **Preuves.** `tests/onboarding-verification.test.ts` : les textes de ce qui reste inconnu et des groupes. Parcours P46 : les six groupes, « Gel : passé, valeurs proposées », et les espèces non rattachées sous « Encore inconnu », avec leur lien.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :

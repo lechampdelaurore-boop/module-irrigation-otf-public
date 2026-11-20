@@ -257,3 +257,33 @@
   color: var(--ink);
   font-weight: 700;
 }
+
+/* La vérification finale (F589) : les groupes des réglages sous leur étape, puis ce qui reste inconnu, chaque ligne un lien. */
+.onboarding-step-groups {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  padding-left: 1.1rem;
+  color: var(--ink2);
+}
+
+.onboarding-unknowns h3 {
+  margin: 14px 0 4px;
+}
+
+.onboarding-unknowns ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.onboarding-unknowns li {
+  min-height: 44px;
+  display: list-item;
+}
+
+.onboarding-unknowns a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 700;
+}

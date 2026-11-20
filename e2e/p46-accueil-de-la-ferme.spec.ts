@@ -204,5 +204,13 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   const terminee = await ouvrirLAccueil(page);
   await expect(terminee.locator('summary')).toContainText('Accueil terminé.');
   await expect(terminee.locator('li.onboarding-step').nth(4)).toContainText(/Confirmé le .+ : 5 groupes validés, 1 groupe passé\./);
-  await verifierLEtape(page, journal, 'réglages relus, accueil terminé');
+  // La vérification finale (F427, F589) : chaque groupe, confirmé ou passé ; ce qui reste inconnu, avec son lien.
+  await expect(terminee.locator('.onboarding-step-groups li')).toHaveText([
+    'Abris : confirmé', 'Calcul du besoin : confirmé', 'Sol et surface : confirmé', 'Gel : passé, valeurs proposées', 'Alerte d’aspersion : confirmé', 'Planning : confirmé',
+  ]);
+  const inconnu = terminee.locator('.onboarding-unknowns');
+  await expect(inconnu.getByRole('heading', { name: 'Encore inconnu' })).toBeVisible();
+  await expect(inconnu.getByRole('link')).toHaveText([`${4 - (nombre - 1)} espèces non rattachées : besoin non calculé`]);
+  await expect(inconnu.getByRole('link')).toHaveAttribute('href', '#correspondance-des-especes');
+  await verifierLEtape(page, journal, 'réglages relus, accueil terminé, vérification lue');
 });

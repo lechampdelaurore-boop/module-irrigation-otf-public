@@ -466,7 +466,7 @@ registres, elle y renvoie.
   `pnpm weather:check`, `pnpm site:check` réussis en local ; six sabotages,
   chacun détecté ; parcours P46 étendu, P17, P20 et P31c rejoués en local.
   **PR 4c, « Rattachez vos espèces »** (D-228, F587, section 8 bis.15 du
-  contrat) : pour une ferme qui fait l'accueil, une proposition par espèce
+  contrat), **en ligne le 20 novembre 2026 à 19 h 21 (#134, fusionnée à 18 h 55, run 44787894765 vérifié job par job : les cinq jobs verts)** : pour une ferme qui fait l'accueil, une proposition par espèce
   sans rattachement (modèle du porteur, sinon le nom), cochée, rattachée
   d'un geste, tout ou rien ; l'étape « Cultures » confirmée d'un geste,
   avec le compte ; bandeau « N espèces à rattacher » jusque-là ; aucune
@@ -486,6 +486,14 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
   P31 et P10 rejoués en local.
+  **PR 5b, la vérification finale** (D-230, F589, section 8 bis.17 du
+  contrat) : le pli « Accueil de la ferme » dit chaque groupe des réglages
+  (confirmé, passé ou proposé) et ce qui reste inconnu (espèces non
+  rattachées, jardins à classer, parcelles sans sol), avec leur lien ;
+  plusieurs fermes d'une même personne (F418) remis à la 4.3, PR 3.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

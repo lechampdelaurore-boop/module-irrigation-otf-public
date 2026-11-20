@@ -7003,3 +7003,23 @@ calculait sur eux (réponse Q10).
 
 Ne change pas : la base (aucune migration) ; aucune valeur de calcul ; la
 ferme du porteur et la démonstration. Aucune question de budget.
+
+## D-230 — Tranche 4, sous-tranche 4.4, PR 5b : la vérification finale
+
+Date : 20 novembre 2026.
+
+**Contexte.** F427 demande un écran qui dise, à la fin de l'accueil, ce qui
+est confirmé, passé ou manquant, et ce qui reste inconnu.
+
+**Décision** (F589, section 8 bis.17 du contrat).
+
+1. La vérification est le pli « Accueil de la ferme » de Réglages : les
+   étapes (depuis la PR 1), chaque groupe des réglages (confirmé, passé ou
+   proposé) et « Encore inconnu » (espèces non rattachées, jardins à
+   classer, parcelles sans sol), avec leur lien, même après une étape
+   confirmée.
+2. Plusieurs fermes d'une même personne (F418) se code avec la 4.3, PR 3,
+   dont le raccordement par ferme attend l'accès d'OTF.
+
+Ne change pas : la base ; le calcul ; la ferme du porteur et la
+démonstration. Aucune question de budget.

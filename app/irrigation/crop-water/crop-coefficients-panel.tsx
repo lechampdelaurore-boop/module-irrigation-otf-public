@@ -6,6 +6,7 @@ import { correspondenceTargetLabel, kcSourceLabel } from '@/lib/domain/crop-wate
 import type { KcSource } from '@/lib/domain/crop-water/reference';
 import type { CorrespondenceEntry, SeasonSpecies } from '@/lib/domain/crop-water/species';
 import {
+  SPECIES_FOLD_ANCHOR,
   speciesInLinkOrder,
   speciesLinkCounter,
   speciesNeedsLink,
@@ -223,8 +224,6 @@ function ReferenceCropGroups({ crops, seriesCount, children }: {
   );
 }
 
-/** L'ancre du pli des espèces : `…/reglages#correspondance-des-especes` l'ouvre. */
-const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';
 
 /** La recherche par nom paraît dès deux espèces (précision F64). */
 const SEARCH_FROM = 2;
