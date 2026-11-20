@@ -74,10 +74,16 @@ const plural = (count: number, singular: string, pluralForm = `${singular}s`) =>
  * ergonomique, lot 3, point 5, précision F48) ; le titre reprend celui de la
  * tuile du résumé.
  */
-export function unplacedFoldLabel(unplacedCount: number, informationalCount = 0): string {
-  // Les planches sans manque, dites à part, sans entrer dans le compte (audit final, lot B, J7, F251).
+export function unplacedFoldLabel(unplacedCount: number, informationalCount = 0, waitingCount = 0): string {
+  // Les planches sans manque, dites à part, sans entrer dans le compte (audit final, lot B, J7, F251) ;
+  // de même celles qui attendent que leur besoin grandisse (audit du 19 novembre 2026, lot K, n° 17, F463).
+  const noObjective = informationalCount - waitingCount;
   if (informationalCount === 0) return `Planches non servies (${unplacedCount})`;
-  return unplacedCount === 0 ? `Planches sans objectif (${informationalCount})` : `Planches non servies (${unplacedCount}) · ${informationalCount} sans objectif`;
+  const parts = [...(noObjective > 0 ? [`${noObjective} sans objectif`] : []), ...(waitingCount > 0 ? [`${waitingCount} en attente`] : [])];
+  if (unplacedCount > 0) return `Planches non servies (${unplacedCount}) · ${parts.join(' · ')}`;
+  return noObjective > 0
+    ? `Planches sans objectif (${noObjective})${waitingCount > 0 ? ` · ${waitingCount} en attente` : ''}`
+    : `Planches en attente (${waitingCount})`;
 }
 
 /**
@@ -104,4 +110,13 @@ export function planSummaryLine(
   if (unplacedCount > 0) parts.push(plural(unplacedCount, 'planche non servie', 'planches non servies'));
   if (summary.unverifiedCount > 0) parts.push(`${summary.unverifiedCount} non vérifié${summary.unverifiedCount > 1 ? 's' : ''}`);
   return parts.join(' · ');
+}
+
+/**
+ * « Valider les propositions du jour » : seulement pour deux propositions ou
+ * plus ; une seule a déjà son « Valider » sur sa carte, un second bouton
+ * pour le même geste en trop (audit du 19 novembre 2026, lot K, n° 17, F466).
+ */
+export function dayValidateShown(proposedCount: number): boolean {
+  return proposedCount > 1;
 }

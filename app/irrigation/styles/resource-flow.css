@@ -17,13 +17,13 @@
 
 .resource-flow-heading h3 {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--text-16);
 }
 
 .resource-flow-heading p {
   margin: 4px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .resource-flow-heading button {
@@ -51,14 +51,14 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--text-13);
+  font-weight: 700;
 }
 
 .resource-flow-form input:not([type="checkbox"]),
 .resource-flow-stopped input {
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-button);
   padding: 10px;
   min-height: 44px;
   font: inherit;
@@ -75,7 +75,7 @@
 }
 
 .resource-flow-stopped legend {
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 700;
 }
 
@@ -83,7 +83,7 @@
   grid-column: 1 / -1;
   margin: 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .resource-flow-stopped[disabled] {
@@ -95,8 +95,8 @@
   align-items: center;
   gap: 8px;
   margin-top: 14px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--text-13);
+  font-weight: 700;
 }
 
 .resource-flow-toggle input {
@@ -139,7 +139,7 @@
   background: var(--sheet);
   padding: 8px 12px;
   color: var(--ink);
-  font-size: 0.92rem;
+  font-size: var(--text-14);
 }
 
 .resource-flow-row-actions {
@@ -158,7 +158,7 @@
 .resource-flow-latest h4,
 .resource-flow-history h4 {
   margin: 0 0 10px;
-  font-size: 15px;
+  font-size: var(--text-16);
 }
 
 .resource-flow-latest dl {
@@ -170,7 +170,7 @@
 
 .resource-flow-latest dt {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .resource-flow-latest dd {
@@ -186,7 +186,7 @@
 
 .resource-flow-apply p {
   margin: 0 0 10px;
-  font-size: 14px;
+  font-size: var(--text-14);
 }
 
 .resource-flow-apply button {
@@ -211,7 +211,7 @@
 .resource-flow-note {
   margin: 10px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .resource-flow-chart {
@@ -226,7 +226,7 @@
 .resource-flow-chart-empty {
   margin: 18px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .resource-flow-grid {
@@ -236,7 +236,7 @@
 
 .resource-flow-axis {
   fill: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .resource-flow-line {
@@ -259,7 +259,7 @@
 
 .resource-flow-last-label {
   fill: var(--ink);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 700;
 }
 
@@ -269,7 +269,7 @@
   gap: 16px;
   margin: 8px 0 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .resource-flow-legend span {
@@ -297,7 +297,7 @@
 .resource-flow-history table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .resource-flow-history th,
@@ -350,13 +350,13 @@
 
 .resource-flow-consumption h4 {
   margin: 0 0 10px;
-  font-size: 15px;
+  font-size: var(--text-16);
 }
 
 .resource-flow-consumption table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .resource-flow-consumption th,
@@ -368,11 +368,11 @@
 
 .resource-flow-consumption thead th {
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .resource-flow-consumption tbody th {
-  font-weight: 600;
+  font-weight: 700;
   text-transform: capitalize;
 }
 

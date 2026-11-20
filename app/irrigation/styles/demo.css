@@ -15,7 +15,7 @@
   background: var(--card);
   color: var(--ink);
   font-family: var(--font-text);
-  font-size: 14px;
+  font-size: var(--text-14);
 }
 
 .demo-banner-icon {
@@ -58,7 +58,7 @@
   align-items: center;
   gap: 6px;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--ink2);
 }
 
@@ -71,7 +71,7 @@
   background: var(--card);
   color: var(--ink);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--text-14);
 }
 
 /*
@@ -118,7 +118,7 @@
     flex: 1 1 0;
     overflow: hidden;
     font-family: var(--font-ui);
-    font-size: 13px;
+    font-size: var(--text-13);
     line-height: 1.25;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -136,7 +136,7 @@
     background: var(--green-soft);
     color: var(--green);
     font-family: var(--font-ui);
-    font-size: 14px;
+    font-size: var(--text-14);
     font-weight: 500;
     cursor: pointer;
   }
@@ -222,7 +222,7 @@
   background: var(--card);
   color: var(--ink);
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 500;
   cursor: pointer;
 }
@@ -270,13 +270,13 @@
 .demo-reset-dialog h2 {
   margin: 0 0 4px;
   font-family: var(--font-title);
-  font-size: 18px;
+  font-size: var(--text-20);
 }
 
 .demo-reset-dialog p {
   margin: 0 0 12px;
   color: var(--ink2);
-  font-size: 14px;
+  font-size: var(--text-14);
   line-height: 1.4;
 }
 
