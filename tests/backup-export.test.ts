@@ -21,7 +21,7 @@ import {
 } from '../scripts/backup/export-inspection.ts';
 import { askHidden, askNewPassphrase, typedText } from '../scripts/backup/passphrase-prompt.ts';
 import { ExportCaptureError, captureWranglerExport, maskedWranglerLine, wranglerExportArguments } from '../scripts/backup/wrangler-export.ts';
-import { quoteIdentifier, quoteLiteral } from '../lib/services/d1-export-import.ts';
+import { dumpDatabase, dumpStatements, quoteSqlIdentifier, recordD1Migrations, sqlLiteral } from '../scripts/backup/sqlite-dump.ts';
 
 /**
  * L'export hebdomadaire chiffré (4.5, PR 4 ; docs/tranche-4-contract.md,
@@ -122,53 +122,23 @@ test('la saisie est refusée hors d’un terminal, et un mot de passe neuf se ta
 
 // ─── Le contrôle d'un export ─────────────────────────────────────────────────
 
-const D1_MIGRATIONS_TABLE = `CREATE TABLE IF NOT EXISTS "d1_migrations"(
-		id         INTEGER PRIMARY KEY AUTOINCREMENT,
-		name       TEXT UNIQUE,
-		applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-)`;
-
 /** Une base où les migrations nommées ont été appliquées, et la liste que garde D1. */
 function sourceDatabase({ applied = MIGRATIONS, listed = applied }: { applied?: readonly string[]; listed?: readonly string[] } = {}): DatabaseSync {
   const database = migratedReference('drizzle', applied);
-  database.exec(D1_MIGRATIONS_TABLE);
-  const insert = database.prepare('INSERT INTO d1_migrations (name, applied_at) VALUES (?, ?)');
-  for (const name of listed) insert.run(name, '2026-11-20 20:30:00');
+  recordD1Migrations(database, listed, '2026-11-20 20:30:00');
   return database;
-}
-
-/** L'export d'une base, dans la forme de `wrangler d1 export` : chaque table et ses lignes, puis les compteurs, puis les index et déclencheurs. */
-function wranglerStyleStatements(database: DatabaseSync): string[] {
-  const objects = database.prepare("SELECT type, name, sql FROM sqlite_schema WHERE sql IS NOT NULL ORDER BY rowid").all() as { type: string; name: string; sql: string }[];
-  const statements = ['PRAGMA defer_foreign_keys=TRUE;'];
-  for (const table of objects.filter((object) => object.type === 'table' && !object.name.startsWith('sqlite_'))) {
-    statements.push(`${table.sql};`);
-    for (const row of database.prepare(`SELECT * FROM ${quoteIdentifier(table.name)}`).all() as Record<string, unknown>[]) {
-      const columns = Object.keys(row);
-      statements.push(`INSERT INTO "${table.name}" (${columns.map((column) => `"${column}"`).join(',')}) VALUES(${columns.map((column) => quoteLiteral(row[column])).join(',')});`);
-    }
-  }
-  const sequences = database.prepare('SELECT name, seq FROM sqlite_sequence').all() as { name: string; seq: number }[];
-  statements.push('DELETE FROM sqlite_sequence;');
-  for (const { name, seq } of sequences) statements.push(`INSERT INTO "sqlite_sequence" VALUES(${quoteLiteral(name)},${seq});`);
-  for (const object of objects.filter((candidate) => candidate.type !== 'table')) statements.push(`${object.sql};`);
-  return statements;
-}
-
-function wranglerStyleDump(database: DatabaseSync): string {
-  return wranglerStyleStatements(database).join('\n');
 }
 
 /** L'export sans une table : ni sa création, ni ses lignes, ni ses index, ni son compteur (ni la table des compteurs, s'il était le seul). */
 function withoutTable(database: DatabaseSync, table: string): string {
-  const statements = wranglerStyleStatements(database)
+  const statements = dumpStatements(database)
     .filter((statement) => !statement.includes(`\`${table}\``) && !statement.includes(`"${table}"`) && !statement.includes(`'${table}'`));
   const counters = statements.some((statement) => statement.startsWith('INSERT INTO "sqlite_sequence"'));
   return statements.filter((statement) => counters || statement !== 'DELETE FROM sqlite_sequence;').join('\n');
 }
 
 const source = sourceDatabase();
-const goodDump = wranglerStyleDump(source);
+const goodDump = dumpDatabase(source);
 const sourceSummary = summarizeDatabase(source);
 
 test('un export fidèle : rejoué dans une base vide, il ne montre aucun problème et rend la même empreinte que la base d’origine', () => {
@@ -208,37 +178,37 @@ test('sabotage : une ligne corrompue est trouvée, par sa contrainte ou par l’
 
   const changed = sourceDatabase();
   const table = sourceSummary.tables.find(({ rows }) => rows > 1)!.name;
-  const column = (changed.prepare(`PRAGMA table_info(${quoteIdentifier(table)})`).all() as { name: string; type: string }[]).find(({ type }) => type.toUpperCase() === 'TEXT')!.name;
-  changed.exec(`UPDATE ${quoteIdentifier(table)} SET ${quoteIdentifier(column)} = ${quoteLiteral(CANARY)} WHERE rowid = (SELECT MIN(rowid) FROM ${quoteIdentifier(table)})`);
-  const corrupted = inspectExport(wranglerStyleDump(changed));
+  const column = (changed.prepare(`PRAGMA table_info(${quoteSqlIdentifier(table)})`).all() as { name: string; type: string }[]).find(({ type }) => type.toUpperCase() === 'TEXT')!.name;
+  changed.exec(`UPDATE ${quoteSqlIdentifier(table)} SET ${quoteSqlIdentifier(column)} = ${sqlLiteral(CANARY)} WHERE rowid = (SELECT MIN(rowid) FROM ${quoteSqlIdentifier(table)})`);
+  const corrupted = inspectExport(dumpDatabase(changed));
   assert.deepEqual(corrupted.problems, [], 'une valeur changée reste un export lisible…');
   const differences = compareSummaries(sourceSummary.tables, corrupted.tables).map(differenceWords);
   assert.deepEqual(differences, [`${table} : même nombre de lignes (${sourceSummary.tables.find(({ name }) => name === table)!.rows}), contenu différent`], '… mais son empreinte la trahit');
   assert.ok(!differences.join().includes('canari'));
 
-  changed.exec(`DELETE FROM ${quoteIdentifier(table)} WHERE rowid = (SELECT MIN(rowid) FROM ${quoteIdentifier(table)})`);
+  changed.exec(`DELETE FROM ${quoteSqlIdentifier(table)} WHERE rowid = (SELECT MIN(rowid) FROM ${quoteSqlIdentifier(table)})`);
   const rows = sourceSummary.tables.find(({ name }) => name === table)!.rows;
-  assert.deepEqual(compareSummaries(sourceSummary.tables, inspectExport(wranglerStyleDump(changed)).tables).map(differenceWords), [
+  assert.deepEqual(compareSummaries(sourceSummary.tables, inspectExport(dumpDatabase(changed)).tables).map(differenceWords), [
     `${table} : ${rows} lignes attendues, ${rows - 1} trouvée${rows - 1 > 1 ? 's' : ''}`,
   ]);
 });
 
 test('sabotage : une migration oubliée se voit, que la base dise l’avoir reçue ou non', () => {
-  const forgotten = inspectExport(wranglerStyleDump(sourceDatabase({ applied: MIGRATIONS.filter((name) => name !== OUTCOMES_MIGRATION), listed: MIGRATIONS })));
+  const forgotten = inspectExport(dumpDatabase(sourceDatabase({ applied: MIGRATIONS.filter((name) => name !== OUTCOMES_MIGRATION), listed: MIGRATIONS })));
   assert.ok(forgotten.problems.includes('Schéma : table otf_call_outcomes absente de l’export.'), forgotten.problems.join('\n'));
   assert.ok(forgotten.problems.includes('Schéma : table otf_farm_reads : colonne last_complete_at absente de l’export.'));
 
-  const unlisted = inspectExport(wranglerStyleDump(sourceDatabase({ listed: MIGRATIONS.filter((name) => name !== OUTCOMES_MIGRATION) })));
+  const unlisted = inspectExport(dumpDatabase(sourceDatabase({ listed: MIGRATIONS.filter((name) => name !== OUTCOMES_MIGRATION) })));
   assert.ok(unlisted.problems.includes('Schéma : table otf_call_outcomes inconnue des migrations.'), unlisted.problems.join('\n'));
   assert.deepEqual(unlisted.migrations.missingFromExport, [OUTCOMES_MIGRATION]);
 
-  const behind = inspectExport(wranglerStyleDump(sourceDatabase({ applied: MIGRATIONS.slice(0, -1) })));
+  const behind = inspectExport(dumpDatabase(sourceDatabase({ applied: MIGRATIONS.slice(0, -1) })));
   assert.deepEqual(behind.problems, [], 'une base qui n’a pas encore reçu la dernière migration du dépôt reste bien sauvegardée');
   assert.deepEqual(behind.migrations.missingFromExport, MIGRATIONS.slice(-1));
 });
 
 test('un export venu d’une base plus récente que le dépôt, ou sans la liste de ses migrations, est signalé', () => {
-  const ahead = inspectExport(wranglerStyleDump(sourceDatabase({ listed: [...MIGRATIONS, '9999_venue_du_futur.sql'] })));
+  const ahead = inspectExport(dumpDatabase(sourceDatabase({ listed: [...MIGRATIONS, '9999_venue_du_futur.sql'] })));
   assert.deepEqual(ahead.migrations.unknownToRepository, ['9999_venue_du_futur.sql']);
   assert.ok(ahead.problems.some((problem) => problem.includes('mettez le dépôt à jour')));
 
@@ -262,8 +232,8 @@ test('un export coupé en route ne se rejoue pas, et le dit sans citer la ligne 
 
 test('ce que disent les commandes : des nombres, des noms de migrations et une empreinte, jamais une valeur', () => {
   const changed = sourceDatabase();
-  changed.exec(`INSERT INTO otf_call_outcomes (pace_key, hour_start_ms, outcome, calls) VALUES (${quoteLiteral(CANARY)}, 0, 'ok', 1)`);
-  const lines = inspectionLines(inspectExport(wranglerStyleDump(changed)));
+  changed.exec(`INSERT INTO otf_call_outcomes (pace_key, hour_start_ms, outcome, calls) VALUES (${sqlLiteral(CANARY)}, 0, 'ok', 1)`);
+  const lines = inspectionLines(inspectExport(dumpDatabase(changed)));
   assert.match(lines[0], /^\d+ tables, [\d  ]+ lignes ; \d+ migrations reçues, la dernière : \d{4}_.+\.sql\.$/);
   assert.match(lines[1], /^Empreinte de la base : [0-9a-f]{16}$/);
   assert.ok(!lines.join('\n').includes('canari'));
@@ -327,6 +297,17 @@ test('les arguments de Wrangler, et le masque des adresses', () => {
   ]);
   assert.deepEqual(wranglerExportArguments({ database: 'b', location: 'local', config: 'wrangler.essai.jsonc' }, 'o').slice(3), ['--local', '--output=o', '--skip-confirmation', '--config=wrangler.essai.jsonc']);
   assert.equal(maskedWranglerLine('URL : https://a.example/b?c=d, valable une heure'), 'URL : (adresse masquée) valable une heure');
+  assert.equal(
+    maskedWranglerLine('Executing on remote database essai (4f0c7f3e-1a2b-4c3d-8e9f-0123456789ab), account 0123456789abcdef0123456789ABCDEF'),
+    'Executing on remote database essai ((identifiant masqué)), account (identifiant masqué)',
+    'les identifiants du compte et des bases ne passent pas dans les journaux publics du flux',
+  );
+  assert.equal(
+    maskedWranglerLine('  internal error; reference = e_xSb5mO_0c3d6226eaff4afeb9c1bcbd5e44a2de [code: 7500]'),
+    '  internal error; reference = (référence masquée) [code: 7500]',
+    'la référence d’une requête, comme Cloudflare la donne avec une erreur (20 novembre 2026)',
+  );
+  assert.equal(maskedWranglerLine('base_0123456789abcdef0123456789abcdef'), 'base_(identifiant masqué)', 'un identifiant collé à un autre mot');
 });
 
 // ─── Où va le fichier ────────────────────────────────────────────────────────

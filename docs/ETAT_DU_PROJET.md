@@ -611,6 +611,37 @@ registres, elle y renvoie.
   partie) attend le « vas-y » du porteur pour créer cette base chez
   Cloudflare. À fusionner après la PR 2.
 
+- Tranche 4, **4.5, PR 4 sur 5, seconde partie : codée le 20 novembre
+  2026** (D-244, F627 à F635, section 10 bis.15 de
+  `docs/tranche-4-contract.md`). L'essai de restauration,
+  `pnpm backup:rehearse` : deux fermes fictives écrites par les dépôts du
+  module, puis S1 (Time Travel : retour au signet noté, retour à l'état
+  d'avant, rattrapage de la seule ferme A, la ferme B à l'empreinte
+  identique), S2 (reconstruction depuis un export dans une base neuve,
+  comparée table par table, puis le contrôle de cohérence F380 et les
+  lectures des dépôts pour chaque ferme contre la base reconstruite) et S3
+  (clé du coffre perdue, absente, retrouvée). Sans option, une simulation
+  contre une fausse D1 en mémoire ; avec `--cloudflare`, sur trois bases
+  d'essai chez Cloudflare, détruites à la fin, par le flux « Essai de
+  restauration » (jamais sur une PR). Deux leçons de la simulation : l'export
+  brut de D1 ne se réimporte pas tel quel là où les clés étrangères sont
+  actives (d'où l'import rangé), et rattraper une ferme fait avancer ses
+  compteurs de révision (voulu). `pnpm backup:restore` reconstruit une base
+  perdue depuis un export chiffré, dans une base neuve ou vide seulement.
+  Procédures dans `docs/exploitation.md`. Sans migration. Contrôles :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 953 tests, puis les 453 de
+  la base rejoués trois fois pour l'isolation, sous le garde des journaux),
+  `pnpm knip` (qui lit désormais `scripts/backup/`) réussis en local, et la
+  simulation de `pnpm backup:rehearse` réussie ; `pnpm build` et les
+  parcours sans rapport (aucune page ni route changée), joués par la CI de
+  la PR. **L'essai chez Cloudflare, joué le 20 novembre 2026 sur le
+  « vas-y » du porteur, a réussi** : S1, S2 et S3 sur trois bases d'essai,
+  détruites à la fin, compte rendu collé dans la PR. La restauration à un
+  signet noté marche ; le signet d'un instant n'a pas été rendu (erreur
+  interne de Cloudflare, sur une base d'une minute) ; l'export brut ne se
+  réimporte pas, l'import rangé si ; un export de la base d'essai dure
+  environ 2,5 secondes. À fusionner après la première partie.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

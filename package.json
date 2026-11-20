@@ -30,6 +30,8 @@
     "db:migrate:local": "wrangler d1 migrations apply module-irrigation-otf --local",
     "backup:export": "node --experimental-strip-types --no-warnings scripts/backup-export.ts",
     "backup:verify": "node --experimental-strip-types --no-warnings scripts/backup-verify.ts",
+    "backup:restore": "node --experimental-strip-types --no-warnings scripts/backup-restore.ts",
+    "backup:rehearse": "node --experimental-strip-types --no-warnings --import ./tests/support/register.mjs scripts/backup-rehearse.ts",
     "e2e:reset": "node scripts/reset-local-database.mjs",
     "e2e": "playwright test",
     "e2e:demo": "playwright test --config playwright.demo.config.ts",
