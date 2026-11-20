@@ -6,13 +6,13 @@ import { correspondenceTargetLabel, kcSourceLabel } from '@/lib/domain/crop-wate
 import type { KcSource } from '@/lib/domain/crop-water/reference';
 import type { CorrespondenceEntry, SeasonSpecies } from '@/lib/domain/crop-water/species';
 import {
+  SPECIES_FOLD_ANCHOR,
   speciesInLinkOrder,
   speciesLinkCounter,
   speciesNeedsLink,
   suggestReferenceCrop,
   WITHOUT_REFERENCE_CONSEQUENCE,
   withoutReferenceBeyondSpecies,
-  type LinkCandidate,
 } from '@/lib/domain/crop-water/species-linking';
 import { matchesSearch } from '@/lib/domain/name-search';
 import type { CropCoefficientsView } from '@/lib/services/crop-water-coefficients';
@@ -22,7 +22,9 @@ import { plantVignetteSpriteHref, referenceCropSymbol, speciesSymbol } from '@/l
 import { rootingProfileView } from '@/lib/domain/soil-reserve/rooting-view';
 import {
   addKcOverrideAction,
+  confirmSpeciesStepAction,
   deleteSpeciesCorrespondenceAction,
+  linkProposedSpeciesAction,
   resetFarmDurationsAction,
   saveFarmDurationsAction,
   saveRootingProfileAction,
@@ -37,6 +39,8 @@ import { DetailHint } from './detail-hint';
 import { ExpertsFold } from './experts-fold';
 import { PlantVignette } from './plant-vignette';
 import { SpeciesLinkSuggestion } from './species-link-suggestion';
+import { linkCandidatesOf } from '@/lib/domain/onboarding/species';
+import { SpeciesStep } from './species-step';
 
 /**
  * La page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -114,7 +118,18 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
           Le plan de culture d’Ouvre ta ferme n’est pas encore lu pour la saison {view.season} : actualisez la lecture pour rattacher ses espèces.
         </p>
       ) : species ? (
-        // Un pli fermé, son compteur en titre : la liste des espèces pesait 8 700 px au téléphone (audit du 19 novembre 2026, lot J, n° 15, F459).
+        <>
+        {/* L'étape de l'accueil d'une ferme neuve, au-dessus du pli : ses propositions se lisent d'un coup d'œil (4.4, F587). */}
+        {view.speciesStep ? (
+          <SpeciesStep
+            step={view.speciesStep}
+            species={view.species}
+            pending={pending}
+            onLink={(plantIds) => run(() => linkProposedSpeciesAction({ season, plantIds }))}
+            onConfirm={() => run(() => confirmSpeciesStepAction({ season }))}
+          />
+        ) : null}
+        {/* Un pli fermé, son compteur en titre : la liste des espèces pesait 8 700 px au téléphone (audit du 19 novembre 2026, lot J, n° 15, F459). */}
         <AnchoredFold
           id={SPECIES_FOLD_ANCHOR}
           className="species-fold"
@@ -129,6 +144,7 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
           <SpeciesSection season={season} view={view} spriteHref={spriteHref} pending={pending} run={run} />
           <WithoutReferenceSection view={view} />
         </AnchoredFold>
+        </>
       ) : (
         <>
           <section className="crop-coefficients-part" aria-labelledby="reference-crops-title">
@@ -208,8 +224,6 @@ function ReferenceCropGroups({ crops, seriesCount, children }: {
   );
 }
 
-/** L'ancre du pli des espèces : `…/reglages#correspondance-des-especes` l'ouvre. */
-const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';
 
 /** La recherche par nom paraît dès deux espèces (précision F64). */
 const SEARCH_FROM = 2;
@@ -226,13 +240,7 @@ function SpeciesSection({ season, view, spriteHref, pending, run }: {
   const toLink = view.species.filter(speciesNeedsLink).length;
   const shown = speciesInLinkOrder(view.species.filter((species) => matchesSearch(species.plantName, query)));
   // La proposition ne lit que le jeu commun : une culture saisie par la ferme n'est jamais proposée (cas 9).
-  const candidates: LinkCandidate[] = view.crops.map((stored) => ({
-    id: stored.crop.id,
-    name: stored.crop.name,
-    source: stored.crop.source,
-    fromCommonSet: stored.origin === 'common' || stored.crop.id in view.commonVersions,
-    usable: stored.problems.length === 0,
-  }));
+  const candidates = linkCandidatesOf(view.crops, view.commonVersions);
   return (
     <section className="crop-coefficients-part" aria-labelledby="species-links-title">
       <h3 id="species-links-title">Espèces de la saison</h3>

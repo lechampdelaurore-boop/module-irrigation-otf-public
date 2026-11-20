@@ -6957,6 +6957,101 @@ région les recevait sans le savoir (F422, défaut n° 13).
 Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
 et la démonstration (aucun avertissement, F426). Aucune question de budget.
 
+## D-228 — Tranche 4, sous-tranche 4.4, PR 4c : l'étape « Rattachez vos espèces »
+
+Date : 20 novembre 2026.
+
+**Contexte.** Une ferme neuve part sans aucun rattachement (défaut n° 15) ;
+la proposition d'après le nom existait, une espèce à la fois (lot 3, cas 9).
+
+**Décision** (F587, section 8 bis.15 du contrat).
+
+1. Pour un espace qui fait l'accueil, une étape en tête de la
+   correspondance des espèces : une proposition par espèce sans
+   rattachement, du modèle de la ferme du porteur s'il connaît son nom,
+   sinon d'après le nom ; chacune cochée, la personne décoche et rattache
+   le reste d'un geste, tout ou rien.
+2. L'étape « Cultures » se confirme d'un geste, avec le compte des espèces
+   rattachées ; le bandeau « À finir » nomme les espèces à rattacher tant
+   qu'elle ne l'est pas.
+3. La PR 4c en deux : 4c, l'étape et le mécanisme, modèle vide ; 4d, la
+   liste des liens du porteur, après sa relecture (F428, réponse 4).
+
+Ne change pas : la base (aucune migration) ; la ferme du porteur et la
+démonstration ; la proposition une par une. Aucune question de budget.
+
+## D-229 — Tranche 4, sous-tranche 4.4, PR 5a : « Réglages à relire »
+
+Date : 20 novembre 2026.
+
+**Contexte.** Une ferme neuve recevait les réglages de la ferme du porteur
+sans les voir (défauts n° 1, 2, 3, 6, 7, 9, 10, 11, 12, 22) ; le planning se
+calculait sur eux (réponse Q10).
+
+**Décision** (F588, section 8 bis.16 du contrat).
+
+1. Pour un espace qui fait l'accueil, six groupes de valeurs de départ, ceux
+   des cases cochées, chacun avec sa source, lus des constantes du calcul ;
+   la personne valide ou passe chaque groupe, l'ajuste dans sa page.
+2. Aucun planning avant la validation du groupe « Planning » ; le calcul du
+   matin et le recalcul sur événement passent la ferme sans échec.
+3. La borne de l'ET0 reste à 12 mm/j : le contrat commun la fixe aussi ; le
+   passage à 15 est proposé au dépôt commun (MC-37) et se fera dans une PR à
+   part après l'accord.
+4. La PR 5 en deux : 5a, celle-ci ; 5b, la vérification finale et plusieurs
+   fermes d'une même personne.
+
+Ne change pas : la base (aucune migration) ; aucune valeur de calcul ; la
+ferme du porteur et la démonstration. Aucune question de budget.
+
+## D-230 — Tranche 4, sous-tranche 4.4, PR 5b : la vérification finale
+
+Date : 20 novembre 2026.
+
+**Contexte.** F427 demande un écran qui dise, à la fin de l'accueil, ce qui
+est confirmé, passé ou manquant, et ce qui reste inconnu.
+
+**Décision** (F589, section 8 bis.17 du contrat).
+
+1. La vérification est le pli « Accueil de la ferme » de Réglages : les
+   étapes (depuis la PR 1), chaque groupe des réglages (confirmé, passé ou
+   proposé) et « Encore inconnu » (espèces non rattachées, jardins à
+   classer, parcelles sans sol), avec leur lien, même après une étape
+   confirmée.
+2. Plusieurs fermes d'une même personne (F418) se code avec la 4.3, PR 3,
+   dont le raccordement par ferme attend l'accès d'OTF.
+
+Ne change pas : la base ; le calcul ; la ferme du porteur et la
+démonstration. Aucune question de budget.
+
+## D-231 — Tranche 4, sous-tranche 4.4, PR 4d : le modèle des rattachements du porteur
+
+Date : 20 novembre 2026.
+
+**Contexte.** La PR 4c (D-228) a posé l'étape « Rattachez vos espèces » avec
+un modèle vide ; la liste des liens de la ferme du porteur devait être relue
+par lui avant tout dépôt (F428, réponse 4). Le porteur a délégué cette
+relecture le 19 novembre 2026 (« relis-le toi-même et publie directement »),
+délégation confirmée pour ces liens le 20 novembre 2026 ; il a ouvert son
+navigateur pour la lecture le 20 novembre 2026 à 13 h 45.
+
+**Décision** (F590, section 8 bis.18 du contrat).
+
+1. Le modèle est relevé en lecture seule dans « Réglages », « Correspondance
+   des espèces » de la ferme du porteur, saison 2026 : 77 espèces (et non 78,
+   chiffre de mémoire), dont 40 rattachées à une culture de référence du jeu
+   commun, reprises telles quelles ; 11 le sont par analogie.
+2. Un lien du modèle garde l'analogie : la proposition la dit (« Salade
+   d'été, par analogie ») et le rattachement la garde.
+3. Les 36 espèces « sans référence Kc » (fleurs) et l'engrais vert (état de
+   la surface du sol) n'entrent pas au modèle : il ne propose qu'une culture
+   de référence.
+
+Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
+et la démonstration ; la proposition d'après le nom quand le modèle ne
+connaît pas l'espèce. Aucune question de budget.
+
+
 
 ## D-240 — Tranche 4, 4.5, PR 1 : le registre des tâches attendues
 

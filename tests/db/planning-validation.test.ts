@@ -15,6 +15,7 @@ import { refusePlanProposalForUser, validatePlanProposalForUser } from '../../li
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture } from '../support/irrigation-fixtures';
 import { ALICE, BOB } from '../support/spaces';
+import { validatePlanningSettings } from '../support/onboarding';
 
 const NOW = new Date('2026-09-29T10:52:00.000Z');
 
@@ -40,6 +41,7 @@ const snapshot: IrrigationSnapshot = {
 };
 
 async function farmWithPlan(owner = ALICE) {
+  await validatePlanningSettings(owner);
   const fixture = await createDripFixture(owner, { beds: ['bed-1', 'bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
   const resourceId = await saveWaterResourceForUser(owner, owner, null, { name: 'Forage', type: 'borehole', nominalFlowCubicMetersPerHour: 0.511, status: 'active', availableFrom: null, availableUntil: null, notes: null });
   const reservoirId = await saveWaterReservoirForUser(owner, owner, null, {
@@ -170,6 +172,7 @@ test('S20, valider en pénurie ne refait pas le partage : au recalcul, l’autre
   // Deux goutte-à-goutte sur la même pompe et la même réserve, 0,6 m³ sans apport pour 1,2 m³ demandés : 10 mm chacun.
   const one = await createDripFixture(ALICE, { name: 'Goutte 1', beds: ['bed-1'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
   const two = await createDripFixture(ALICE, { name: 'Goutte 2', beds: ['bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
+  await validatePlanningSettings(ALICE);
   const reservoirId = await saveWaterReservoirForUser(ALICE, ALICE, null, {
     name: 'Réserve tampon', type: 'tank', capacityCubicMeters: 60, currentVolumeCubicMeters: 0.6, minimumSafetyCubicMeters: 0,
     exposedSurfaceSquareMeters: 0, receivesRain: false, evaporationEnabled: false, evaporationCoefficient: 0, status: 'active', notes: null,
