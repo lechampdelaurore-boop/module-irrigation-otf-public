@@ -142,7 +142,7 @@ test('5.0 une surface mouillée inconnue laisse le besoin inconnu et le signale,
   const result = run([bed('A', 10, { effectiveVolumeCubicMeters: null, wettedAreaSquareMeters: null, wettedAreaSource: 'unknown-alley' }), bed('B', 10)], 20);
   assert.equal(row(result, 'A').status, 'unknown'); assert.equal(result.unknownNeedCount, 1); assert.equal(result.totalNeedCubicMeters, null);
   close(row(result, 'B').allocatedCubicMeters, 10);
-  assert.ok(result.warnings.some((warning) => warning.includes('non calculable')));
+  assert.ok(result.notes.some((note) => note.endsWith('leur besoin n’est pas compté ici.')));
 });
 test('3.4 réutilise les contraintes pompe : défaut explicite exclu, donnée manquante inconnue', () => {
   const beds = [bed('A', 10)];

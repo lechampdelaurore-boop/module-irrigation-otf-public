@@ -1,4 +1,6 @@
-import { cubicMetersFromLiters } from '../units.ts';
+import { cubicMetersFromLiters, cubicMetersFromMillimeters } from '../units.ts';
+import { compareNamesNaturally } from '../bed-order.ts';
+import { namesText } from '../today/today-text.ts';
 import { effectiveProposalStatus, type OvercommittedDay, type PlanBedOutcome, type StoredWeeklyPlan } from './contract.ts';
 import { isCanceledValidation } from './presentation.ts';
 import { uncountedWaterCount, unknownWaterChainCount, waterDeficitValue } from './water-deficit-summary.ts';
@@ -45,7 +47,11 @@ const bedsText = (count: number) => (count > 1 ? `${count} planches ne recevront
  * un manque, elle rend seulement le volume « au moins » (D-089). Le volume
  * s'écrit comme la tuile « Manque d'eau ». Nulle sans manque d'eau.
  */
-export function shortageAction(plan: Pick<StoredWeeklyPlan, 'calculation'>, formatVolume: (cubicMeters: number) => string): ShortageAction | null {
+export function shortageAction(
+  plan: Pick<StoredWeeklyPlan, 'calculation'> & Partial<Pick<StoredWeeklyPlan, 'proposals'>>,
+  formatVolume: (cubicMeters: number) => string,
+  now?: Date,
+): ShortageAction | null {
   const { deficit, budgets, beds, arbitration } = plan.calculation.summary;
   if (!lacksWater(deficit)) return null;
   const uncounted = uncountedWaterCount(deficit, unknownWaterChainCount(budgets));
@@ -55,11 +61,67 @@ export function shortageAction(plan: Pick<StoredWeeklyPlan, 'calculation'>, form
   // Une planche qu'aucun matériel n'arrose est un réglage à faire, jamais un manque d'eau (audit ergonomique, lot 3, cas 2).
   const count = beds.filter((bed) => keepsDeficit(bed) && !bed.reasons.includes('no-equipment')).length;
   const consequence = count > 0 ? bedsText(count) : null;
+  // L'eau que le matériel verse au-delà du besoin, quand elle explique le manque (audit du 19 novembre 2026, lot I, n° 5, F445).
+  const beyond = plan.proposals && now ? beyondNeedSentence(waterBeyondNeed({ proposals: plan.proposals, calculation: plan.calculation }, now), formatVolume) : null;
+  const after = beyond ? ` ${beyond}` : '';
   if (arbitration) {
-    return { arbitrated: true, sentence: `Votre répartition s’applique : ${missing}${consequence ? `, ${consequence}` : ''}.` };
+    return { arbitrated: true, sentence: `Votre répartition s’applique : ${missing}${consequence ? `, ${consequence}` : ''}.${after}` };
   }
   const lead = `${missing.charAt(0).toLocaleUpperCase('fr-FR')}${missing.slice(1)}`;
-  return { arbitrated: false, sentence: `${lead}${consequence ? ` : ${consequence}` : ''}.` };
+  return { arbitrated: false, sentence: `${lead}${consequence ? ` : ${consequence}` : ''}.${after}` };
+}
+
+/** L'eau versée au-delà du besoin, sur les créneaux de la semaine (n° 5 du lot I, F445). */
+export type WaterBeyondNeed = {
+  /** Le volume chiffré : le surplus de chaque planche sur sa surface mouillée. */
+  cubicMeters: number;
+  /** Une planche au surplus sans surface mouillée connue : le volume se lit « au moins » (D-003). */
+  unknownVolume: boolean;
+  /** Les planches qui reçoivent ce surplus, dans l'ordre naturel. */
+  bedNames: string[];
+  /** Aucune de ces planches n'a de besoin cette semaine : le matériel arrose des planches qui n'en ont pas besoin. */
+  withoutNeed: boolean;
+};
+
+/**
+ * L'eau que les créneaux proposés ou validés de la semaine versent au-delà
+ * du besoin des planches (audit du 19 novembre 2026, lot I, n° 5, F445) :
+ * un matériel arrose toutes les planches qu'il couvre, et le moteur compte
+ * l'eau qu'il tire, celle du surplus comprise (R11). Lecture seule du plan
+ * enregistré : ni le manque, ni le placé, ni aucun total n'en changent.
+ * Nulle sous le litre, sauf un surplus au volume inconnu.
+ */
+export function waterBeyondNeed(plan: Pick<StoredWeeklyPlan, 'proposals' | 'calculation'>, now: Date): WaterBeyondNeed | null {
+  let cubicMeters = 0;
+  let unknownVolume = false;
+  const beds = new Map<string, string>();
+  for (const proposal of plan.proposals) {
+    if (isCanceledValidation(proposal)) continue;
+    const status = effectiveProposalStatus(proposal, now);
+    if (status !== 'proposed' && status !== 'validated') continue;
+    for (const application of proposal.bedApplications) {
+      if (application.surplusMm < RECEIVED_TOLERANCE_MM) continue;
+      beds.set(application.bedId, application.bedName);
+      if (application.wettedAreaSquareMeters === null) unknownVolume = true;
+      else cubicMeters += cubicMetersFromMillimeters(application.surplusMm, application.wettedAreaSquareMeters);
+    }
+  }
+  if (beds.size === 0 || (cubicMeters < ONE_LITER_CUBIC_METERS && !unknownVolume)) return null;
+  const needs = new Map(plan.calculation.summary.beds.map((bed) => [bed.bedId, bed.needMm]));
+  const withoutNeed = [...beds.keys()].every((bedId) => (needs.get(bedId) ?? 0) < NEGLIGIBLE_DEFICIT_MM);
+  return { cubicMeters, unknownVolume, bedNames: [...beds.values()].sort(compareNamesNaturally), withoutNeed };
+}
+
+/**
+ * La phrase de l'eau versée au-delà du besoin (F445) : « Le matériel verse
+ * aussi 1,1 m³ sur des planches qui n'en ont pas besoin cette semaine (A3,
+ * C1, H1 et 2 autres). » Nulle sans cette eau.
+ */
+export function beyondNeedSentence(beyond: WaterBeyondNeed | null, formatVolume: (cubicMeters: number) => string): string | null {
+  if (!beyond) return null;
+  const amount = beyond.cubicMeters < ONE_LITER_CUBIC_METERS ? 'de l’eau' : `${beyond.unknownVolume ? 'au moins ' : ''}${formatVolume(beyond.cubicMeters)}`;
+  const where = beyond.withoutNeed ? 'sur des planches qui n’en ont pas besoin cette semaine' : 'au-delà du besoin des planches qu’il arrose';
+  return `Le matériel verse aussi ${amount} ${where} (${namesText(beyond.bedNames)}).`;
 }
 
 /**

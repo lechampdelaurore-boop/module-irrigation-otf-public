@@ -93,7 +93,7 @@ export const DEMO_WATER: Readonly<Record<string, DemoWaterDefinition>> = {
       name: 'Bassin des noues',
       capacityCubicMeters: 40,
       minimumSafetyCubicMeters: 4,
-      volumeByMoment: { 'gel-printemps': 36, ete: 30, penurie: 6, automne: 22 },
+      volumeByMoment: { 'gel-printemps': 36, ete: 30, penurie: 5, automne: 22 },
     },
     pump: { name: 'Pompe du bassin', maximumFlowCubicMetersPerHour: 3 },
     dryMoments: { penurie: 'À sec depuis la mi-juillet : le bassin ne se remplit plus.' },

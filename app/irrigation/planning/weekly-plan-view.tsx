@@ -250,7 +250,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
               {pendingEventNotice(plan.pendingEvent, formatDateTime(plan.pendingEvent.occurredAt))}
             </p>
           ) : null}
-          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplacedDeficitCount(groups)} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} /> : null}
+          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplacedDeficitCount(groups)} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} now={now} /> : null}
           {plan.calculation.summary.changes ? <ChangesFold changes={plan.calculation.summary.changes} /> : null}
           {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} validatedNote={budgetValidatedNote(plan, formatVolume)} /> : null}
           <SuggestionList suggestions={plan.suggestions} pending={pending} feedback={suggestionFeedback} onApply={applySuggestion} onKeep={keepSuggestion} />
@@ -422,7 +422,7 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
   );
 }
 
-function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, unplacedDetail, repartitionHref }: {
+function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, unplacedDetail, repartitionHref, now }: {
   summary: PlanSummary;
   plan: StoredWeeklyPlan;
   /** « À valider », « Faites », « En retard » : les cartes de tête (audit ergonomique, lot 3, point 5, cas 1). */
@@ -431,6 +431,7 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   unplacedCount: number;
   unplacedDetail: string;
   repartitionHref: string | null;
+  now: Date;
 }) {
   const { deficit } = plan.calculation.summary;
   // Une chaîne servie à l'eau inconnue : son manque ne peut pas être chiffré, et le résumé le dit (point ouvert 51, D-089) ;
@@ -439,7 +440,7 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   const explanation = waterDeficitExplanation(plan);
   // Sous un arbitrage validé, aucune ligne de budget : la note dit l'eau allouée et ce qui ne peut pas être reçu (D-052).
   const arbitration = arbitrationNote(plan.calculation.summary);
-  const action = shortageAction(plan, formatVolume);
+  const action = shortageAction(plan, formatVolume, now);
   // Au téléphone, les tuiles tiennent en une ligne de résumé, dépliable (F11).
   const [open, setOpen] = useState(false);
   const tilesId = useId();

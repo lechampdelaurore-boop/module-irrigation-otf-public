@@ -11,6 +11,8 @@ import { feasibilityHeadTiles, isPriorityLevelShown } from '@/lib/domain/feasibi
 import { feasibilityUnknownReason } from '@/lib/domain/objective-reading';
 import { bedUnknownReason, feasibilityUnknownReasons, notComputableInline, notComputableLine } from '@/lib/domain/feasibility-unknown';
 import { ArbitrationPlan } from './arbitration-plan';
+import type { FeasibilityPlanGap } from '@/lib/domain/feasibility-plan-gap';
+import { pageHref } from '@/lib/domain/features/pages';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 const dates = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' });
@@ -38,6 +40,7 @@ const help = {
 export function IrrigationFeasibilityDashboardView({ season }: { season: number }) {
   const [dashboard, setDashboard] = useState<IrrigationFeasibility | null>(null);
   const [crops, setCrops] = useState<ArbitrationCrops | null>(null);
+  const [planGap, setPlanGap] = useState<FeasibilityPlanGap | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -47,7 +50,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
   // Le nom de ce tableau dans ses propres notifications : il ne relit pas la répartition qu'il vient de valider (D-129).
   const self = useId();
   const receive = useCallback((result: FeasibilityActionResult) => {
-    if (result.ok) { setDashboard(result.dashboard); setCrops(result.crops); setError(null); setNotice(result.message); }
+    if (result.ok) { setDashboard(result.dashboard); setCrops(result.crops); setPlanGap(result.planGap); setError(null); setNotice(result.message); }
     else setError(result.message);
   }, []);
   const refresh = useCallback(async () => {
@@ -75,12 +78,20 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
   const reasons = dashboard ? feasibilityUnknownReasons(dashboard) : null;
   // L'ancre de « Répartir l'eau », depuis le planning (audit final, lot B, R4, F247).
   return <section ref={root} id="repartition" className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
-    <header className="feasibility-heading"><div><h2 id="feasibility-title">Faisabilité et répartition de l’eau</h2><p>De maintenant à dimanche soir · Analyse préliminaire <FeasibilityHelp label="Faisabilité préliminaire" text={help.preliminary} /></p></div><button type="button" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
+    <header className="feasibility-heading"><div><h2 id="feasibility-title">Faisabilité et répartition de l’eau</h2><p>De maintenant à dimanche soir · Analyse préliminaire <FeasibilityHelp label="Faisabilité préliminaire" text={help.preliminary} /></p></div><button type="button" className="feasibility-recalculate" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
     {error ? <p className="water-error" role="alert">{error}</p> : null}
     {notice ? <p className="feasibility-notice" role="status">{notice}</p> : null}
     {!dashboard ? <p>Les besoins et ressources seront chargés pour la semaine en cours.</p> : <>
       <p className="feasibility-meta">Semaine du {jour(dashboard.weekStart)} au {jour(dashboard.weekEnd)} · Calculé le {dates.format(new Date(dashboard.calculatedAt))}</p>
+      {/* Le manque du planning que cette répartition ne voit pas : d'où il vient et quoi faire (audit du 19 novembre 2026, lot I, n° 5, F446). */}
+      {planGap ? <div className="feasibility-plan-gap" role="note">
+        <p><strong>{planGap.lead}</strong></p>
+        <p>{planGap.cause}</p>
+        <p className="feasibility-plan-gap-links">{planGap.links.map((link) => <a key={link.page} href={pageHref(link.page, { season })}>{link.label}</a>)}</p>
+      </div> : null}
       {dashboard.warnings.map((warning) => <p className="feasibility-warning" key={warning}>{warning}</p>)}
+      {/* Ce que le calcul ne compte pas, en texte ordinaire (F447). */}
+      {dashboard.notes.map((note) => <p className="feasibility-note" key={note}>{note}</p>)}
       {/* Quatre tuiles au plus en tête ; l'écran de répartition, quand un niveau attend un choix, porte les siennes (audit final, lot B, R3, F245). */}
       {head ? <div className="feasibility-summary is-head">
         <Summary label="Eau disponible" value={volume(head.availableCubicMeters)} detail={head.availableCubicMeters === null && reasons ? reasons.forecast : 'd’ici dimanche soir, après les arrosages déjà planifiés'} />

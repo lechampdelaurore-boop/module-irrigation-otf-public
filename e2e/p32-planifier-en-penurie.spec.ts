@@ -103,7 +103,7 @@ test('la pénurie se lit dans le plan, une proposition validée compte au recalc
   // un repli fermé (F244).
   await expect(planning.locator('.planning-shortage-action')).toBeVisible();
   // La phrase seule, sans le lien « Répartir l'eau » qui la suit (R4, F247).
-  await expect(planning.locator('.planning-shortage-action > span')).toHaveText(/^Il manque .+ d’eau d’ici dimanche.* : \d+ planches? ne recevr(a|ont) pas tout (son|leur) besoin\.$/);
+  await expect(planning.locator('.planning-shortage-action > span')).toHaveText(/^Il manque .+ d’eau d’ici dimanche.* : \d+ planches? ne recevr(a|ont) pas tout (son|leur) besoin\.( Le matériel verse aussi .+\.)?$/);
   for (const repli of await planning.locator('details.planning-calculation').all()) {
     await expect(repli).toHaveJSProperty('open', false);
     await expect(repli.locator('summary')).toHaveText('Le détail du calcul');

@@ -11,6 +11,8 @@ import { getIrrigationSnapshot } from './irrigation-service';
 import { allocateIrrigationWater, sameBedIds, type IrrigationFeasibility } from '../domain/irrigation-feasibility';
 import { isArbitrationEditable } from '../domain/arbitration-preview';
 import { arbitrationCrops, stagesToday, type ArbitrationCrops } from '../domain/arbitration-crops';
+import { feasibilityPlanGap, type FeasibilityPlanGap } from '../domain/feasibility-plan-gap';
+import { readLatestPlanForUser } from '@/db/planning-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import { describeFeasibilityPaths } from '../domain/feasibility-hydraulics';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
@@ -30,14 +32,16 @@ export async function getIrrigationFeasibilityForUser(input: { ownerUserId: stri
  * façon plan d'assolement (docs/shortage-contract.md, 2 bis, D-083). Le
  * planning, qui relit la faisabilité, ne les lit pas.
  */
-export async function getIrrigationFeasibilityScreenForUser(input: { ownerUserId: string; season: number; now?: Date }): Promise<{ dashboard: IrrigationFeasibility; crops: ArbitrationCrops | null }> {
+export async function getIrrigationFeasibilityScreenForUser(input: { ownerUserId: string; season: number; now?: Date }): Promise<{ dashboard: IrrigationFeasibility; crops: ArbitrationCrops | null; planGap: FeasibilityPlanGap | null }> {
   const now = input.now ?? new Date();
   const { result, snapshot } = await computeIrrigationFeasibility({ ...input, now });
+  // Le manque du planning que la faisabilité ne voit pas : l'écran dit d'où il vient (audit du 19 novembre 2026, lot I, n° 5, F446).
+  const planGap = feasibilityPlanGap({ plan: await readLatestPlanForUser(input.ownerUserId, input.season, result.weekStart), feasibility: result, now });
   const cropPlan = snapshot.cropPlan;
-  if (!cropPlan || !result.priorities.some(isArbitrationEditable)) return { dashboard: result, crops: null };
+  if (!cropPlan || !result.priorities.some(isArbitrationEditable)) return { dashboard: result, crops: null, planGap };
   const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
   const bedIds = result.priorities.flatMap((level) => level.beds.map((row) => row.need.bedId));
-  return { dashboard: result, crops: arbitrationCrops({ cropPlan, bedIds, today, stagesToday: await stagesTodayByBed(input.ownerUserId, input.season, snapshot, today, now) }) };
+  return { dashboard: result, planGap, crops: arbitrationCrops({ cropPlan, bedIds, today, stagesToday: await stagesTodayByBed(input.ownerUserId, input.season, snapshot, today, now) }) };
 }
 
 /** Le stade et le Kc du jour, une information : un échec du calcul laisse l'écran sans eux. */
@@ -85,7 +89,7 @@ async function computeIrrigationFeasibility(input: { ownerUserId: string; season
     } else result.revision = before;
     const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(snapshot.beds.filter((bed) => bed.seasons.includes(season)).sort((a, b) => a.id.localeCompare(b.id)))));
     result.snapshotSignature = [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-    result.warnings.push('Analyse volumétrique préliminaire : les horaires, l’alternance des pompes et les remplissages pendant de nouvelles irrigations restent à vérifier dans le futur planning.');
+    result.notes.push('Calcul en volume seulement : les heures, les pompes et le remplissage des réserves sont vérifiés par le planning.');
     return { result, snapshot };
   }
   throw new Error('Les données viennent de changer. Recalculez la faisabilité avant de valider votre sélection.');

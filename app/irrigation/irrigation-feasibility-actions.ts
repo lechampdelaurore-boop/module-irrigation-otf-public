@@ -7,10 +7,12 @@ import { recalculatePlanAfterEvent } from '@/lib/services/planning-recalculation
 import { FEASIBILITY_PRIORITIES, type IrrigationFeasibility } from '@/lib/domain/irrigation-feasibility';
 import { isArbitrationEditable } from '@/lib/domain/arbitration-preview';
 import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
+import type { FeasibilityPlanGap } from '@/lib/domain/feasibility-plan-gap';
 import type { IrrigationNeedPriority } from '@/lib/domain/irrigation-needs';
 
 /** `crops` : les cultures des planches pour l'écran d'arbitrage, quand un niveau demande un choix (2 bis, D-083). */
-export type FeasibilityActionResult = { ok: true; dashboard: IrrigationFeasibility; crops: ArbitrationCrops | null; message: string } | { ok: false; message: string };
+/** `planGap` : le manque du planning que la faisabilité ne voit pas, et d'où il vient (lot I, n° 5, F446). */
+export type FeasibilityActionResult = { ok: true; dashboard: IrrigationFeasibility; crops: ArbitrationCrops | null; planGap: FeasibilityPlanGap | null; message: string } | { ok: false; message: string };
 
 export async function loadIrrigationFeasibilityAction(input: { season: number }): Promise<FeasibilityActionResult> {
   return withContext(input.season, async (context) => ({ ok: true, message: 'Faisabilité recalculée.', ...await getIrrigationFeasibilityScreenForUser(context) }));
