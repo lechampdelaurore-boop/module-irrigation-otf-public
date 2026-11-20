@@ -475,6 +475,17 @@ registres, elle y renvoie.
   `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm site:check`
   réussis en local ; sept sabotages, chacun détecté ; parcours P46 étendu,
   P29 et P28 rejoués en local.
+  **PR 5a, « Réglages à relire »** (D-229, F588, section 8 bis.16 du
+  contrat) : pour une ferme qui fait l'accueil, les groupes de valeurs de
+  départ des cases cochées, avec leur source, validés ou passés ; aucun
+  planning avant la validation du groupe « Planning », le calcul du matin
+  la passe sans échec ; bandeau « réglages du planning à valider » ; aucune
+  migration ; la borne de l'ET0 reste à 12 mm/j, son passage à 15 proposé
+  au dépôt commun (MC-37). Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; huit sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
+  P31 et P10 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
