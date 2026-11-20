@@ -174,7 +174,7 @@
 }
 
 .history-summary-card strong {
-  font-size: 18px;
+  font-size: var(--text-20);
 }
 
 .planning-summary-card strong {
@@ -200,7 +200,7 @@
   border-radius: 999px;
   background: var(--green);
   color: white;
-  font: 600 11px/1.4 var(--font-ui);
+  font: 700 var(--text-12)/1.4 var(--font-ui);
   vertical-align: 1px;
 }
 

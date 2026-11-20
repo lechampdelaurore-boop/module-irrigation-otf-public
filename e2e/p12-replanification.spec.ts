@@ -108,7 +108,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   const replace = (await proposees().count()) > 0;
   // Le message du refus dit où le besoin est allé, lu dans le plan recalculé (lot G, n° 7, F412).
   await expect(refusee.locator('.planning-proposal-feedback')).toHaveText(
-    /^Créneau refusé\. (Le besoin est replacé \S+ à \d{2} h \d{2} \(.+\)\.|Aucun autre créneau cette semaine : le besoin reste affiché, non placé\.)$/,
+    /^Créneau refusé\. (Le besoin est replacé \S+ à \d{1,2} h( \d{2})? \(.+\)\.|Aucun autre créneau cette semaine : le besoin reste affiché, non placé\.)$/,
     RECALCUL,
   );
   if (!replace) {

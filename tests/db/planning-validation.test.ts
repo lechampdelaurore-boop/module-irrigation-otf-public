@@ -163,7 +163,7 @@ test('un ajustement déplace le début et fait suivre la durée à la dose, par 
   assert.equal(event.equipment.plannedDurationSeconds, 1543, '6 mm : la durée suit la dose au prorata, à la seconde');
   assert.equal(event.equipment.plannedEndAt, '2026-09-29T16:25:43.000Z');
   assert.ok(event.equipment.applications.every((application) => Math.abs(application.plannedAmountMm - 6) < 0.01), 'chaque planche reçoit 6 mm au taux du réglage');
-  assert.match(event.note ?? '', /proposition p-1 ajustée \(6 mm, début le 29\/09\/2026 18:00\)/);
+  assert.match(event.note ?? '', /proposition p-1 ajustée \(6 mm, début le 29\/09\/2026 à 18 h\)/);
   const stored = await readLatestPlanForUser(ALICE, 2026, '2026-09-28');
   assert.equal(stored?.proposals.find((proposal) => proposal.storedId === first.storedId)?.validatedEventId, event.id);
 });

@@ -42,7 +42,7 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   await section.scrollIntoViewIfNeeded();
   await expect(section.getByRole('heading', { level: 2, name: 'Correspondance des espèces' })).toBeVisible();
   // La liste « sans référence Kc » ne répète pas les espèces à rattacher, déjà en tête (lot J, n° 15, F459).
-  const sansReference = section.getByRole('list', { name: 'Espèces sans référence Kc' });
+  const sansReference = section.getByRole('list', { name: 'Espèces sans culture de référence' });
   const dansSansReference = (espece: string) => sansReference.locator('li').filter({ has: page.locator('strong', { hasText: new RegExp(`^${espece}$`) }) });
   const ligneEspece = section.locator('.species-link-row').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.espece}$`) }) });
   await expect(ligneEspece).toHaveAttribute('data-to-link', 'true');

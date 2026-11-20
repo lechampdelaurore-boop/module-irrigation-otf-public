@@ -6513,6 +6513,224 @@ passe après les tuiles des cumuls, en bouton secondaire.
 Ne changent pas : les calculs, l'export, les filtres eux-mêmes. Aucune
 migration.
 
+## D-190 — Lot K, PR 1 : planning, le rouge pour le manque d'eau seul
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 17, lot K
+« Finitions de charte » (contrat court
+`docs/audit-ergonomie-2026-11-19-lot-k-contract.md`, écrit avant le code et
+joint à cette PR) : une semaine normale, la tuile « Planches non servies 2 »
+était rouge pour deux planches dont le besoin (1,1 mm) est sous la dose
+minimale et attend de grandir ; « Ajuster » montrait « 8,06 » quand la carte
+disait « 8,1 mm » ; la ligne d'état de la semaine, très dense ; deux boutons
+pour valider la seule proposition d'un jour ; « Réglages du planning » sans
+signe qu'il s'ouvre. **Cause vérifiée** : `unplacedGroups`
+(`lib/domain/planning/action-summary.ts`) ne disait « pour information »
+qu'un groupe sans manque, or une planche sous la dose minimale garde un
+petit manque ; le champ de la dose se formait à deux décimales ; la ligne
+d'état tenait en un seul paragraphe ; le bouton du jour paraissait dès une
+proposition ; le résumé du pli n'avait pas le chevron des autres plis.
+
+**Décision (F463 à F467).** Une planche dont le seul motif est « besoin sous
+la dose minimale » est dite pour information, comme une planche sans
+objectif : hors du compte rouge de la tuile, de la ligne du téléphone et du
+titre du pli, « en attente d'un besoin plus grand » dans le détail de la
+tuile et « en attente » dans le titre du pli ; son groupe dit pourquoi. Le
+manque d'eau et le temps de pompage, qui ne la comptaient déjà pas, ne
+changent pas. Le champ de la dose d'« Ajuster » montre le chiffre de la
+carte, à une décimale ; laissé tel quel, il rend la dose exacte de la
+proposition, sans arrondi. La ligne d'état : la semaine et l'heure du calcul,
+puis dessous, en petit, la prévision météo et les réserves. Le bouton qui
+valide les propositions d'un jour paraît à partir de deux. « Réglages du
+planning » prend le chevron des autres plis.
+
+Ne changent pas : le moteur du planning, les motifs, le manque d'eau, les
+gestes. Aucune migration.
+
+## D-191 — Lot K, PR 2 : vue satellite, des numéros quand les noms se chevauchent
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 16 : sur la
+ferme du porteur, là où les jardins sont serrés, les noms posés sur la carte
+se coupaient et se recouvraient (« Tunnel 4 », « …nel 3 », « Bloc Fleurs 3 »
+posé sur « bloc 1 »). **Cause vérifiée** : `satellite-map.tsx` et
+`satellite-svg-drawing.tsx` posent chaque nom au point d'étiquette de son
+jardin, sans regarder ses voisins ; le nom se coupe à 160 px.
+
+**Décision (F468).** Après chaque pose (chargement, zoom, taille changée), les
+noms sont remis entiers, mesurés, puis parcourus dans l'ordre de la liste :
+un nom qui chevaucherait un nom déjà posé (deux pixels d'air compris) devient
+le numéro du jardin dans une pastille ronde, et les suivants l'évitent aussi.
+La liste des jardins à côté de la carte porte ces numéros devant chaque nom
+et sert de légende. Le nom entier reste dans la bulle de l'étiquette ; pour
+le lecteur d'écran, rien ne change : les étiquettes restent cachées, la
+liste dit les noms. La même règle vaut pour la carte et pour le dessin de
+secours. La règle se calcule dans le domaine
+(`lib/domain/satellite-view/labels.ts`), sur des rectangles.
+
+Ne changent pas : les contours, le cadrage, les fonds, la liste elle-même.
+Aucune migration.
+
+## D-192 — Lot K, PR 3 : un bouton plein par écran, un seul dessin de pli, plus de geste muet
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 21 : trois
+dessins de pli cohabitaient (le chevron des lots D et J, le triangle du
+navigateur, une boîte grise sans signe) ; des raccourcis et des choix en
+vert plein disputaient le geste de la page (« Cette semaine », « 24 h /
+48 h / 7 jours », « Créer un groupe » sur une ferme sans asperseur) ;
+« Cette semaine » et « Retirer la mesure » répondaient sans rien faire ;
+l'heure réelle de fin montrait les secondes ; finir un arrosage se disait
+« Irrigation terminée », « Terminer maintenant » ou « Terminer
+l'irrigation » selon l'écran.
+
+**Décision (F469 à F473).** Une règle commune donne à tout pli du module
+le chevron à droite de la charte, qui tourne à l'ouverture, et cache le
+triangle du navigateur ; les menus « … » gardent leur dessin, ce ne sont
+pas des plis, et les lignes « Voir le détail » des cultures et des espèces
+gardent leur flèche, choisie par le porteur le 8 novembre 2026 (F469). Les raccourcis et les choix passent en secondaire,
+contour et fond vert pâle ; l'horizon choisi se lit à son fond plein et à
+`aria-pressed` ; « Créer un groupe » reste plein sur une ferme qui a un
+asperseur (F470). « Cette semaine » est indisponible quand la semaine
+affichée est la semaine en cours ; « Retirer la mesure » l'est quand le jour
+choisi n'a pas de pluie mesurée (F471). « Heure réelle de fin » se saisit
+à la minute ; laissée telle quelle, l'heure proposée part à la seconde du
+minuteur, pour que la durée enregistrée ne perde rien (F472). Le bouton
+qui finit un arrosage dit partout « Terminer l'irrigation » ; « Irrigation
+terminée » reste l'état affiché et le titre de la notification (F473). Le
+menu « … » d'une ligne planifiée qui ne garde qu'« Annuler » reste un
+menu : F45 l'a éloigné de « Démarrer maintenant » exprès, pour qu'un doigt
+pressé n'annule pas un arrosage.
+
+Ne changent pas : les gestes eux-mêmes, les messages, le calcul de la durée.
+Aucune migration.
+
+## D-193 — Lot K, PR 4 : mots et formats
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 22 : les
+heures s'écrivaient de cinq façons (« 8 h 50 », « 07:00 », « 08:51 →
+10:11 », « 16/06/2026 08:50 », « 21:00 – 08:00 »), les durées de deux
+(« 1 h 21 », « 1 h 21 min ») ; des pluriels entre parenthèses
+(« 0/7 jour(s) disponible(s) ») ; du jargon sur « Ressources »
+(« Disponibilité / projections », « Apport non retenu (réserve pleine) »,
+« Disponible théorique … mobilisables », « Analyse préliminaire »),
+« Faisabilité recalculée. » en vert gras comme un lien, et « Espèces sans
+référence Kc » sur « Réglages ». **Cause vérifiée** : chaque écran avait
+son propre `Intl.DateTimeFormat` (`timeStyle: 'short'` rend « 08:50 »).
+
+**Décision (F474 à F476).** Un seul module, `lib/domain/clock-text.ts`,
+écrit l'heure (« 8 h 50 », « 18 h », « 0 h 05 »), la date et l'heure
+(« 16/06/2026 à 8 h 50 », « 16 juin 2026 à 8 h 50 »), une heure de la
+journée (« de 21 h à 8 h ») et la durée (« 1 h 21 », « 2 h »,
+« 45 min »), toujours à l'heure de la ferme (D-004) ; les écrans et les
+messages l'appellent (F474). Un compte s'accorde à son nombre (« 0 jour »,
+« 1 jour », « 7 jours ») ; un intitulé se met au singulier ou au pluriel
+selon la ligne (« Planche », « Planches ») (F475). Sur « Ressources » :
+« L'eau des jours à venir », « Apport perdu, la réserve étant pleine »,
+« Utilisable, avant les irrigations prévues » et « Utilisable, après les
+irrigations prévues », sans « mobilisables » ; « De maintenant à dimanche
+soir · les volumes, pas encore les horaires », la bulle « Ce que vérifie ce
+calcul » ; « Faisabilité recalculée. » dans la boîte des autres messages.
+Sur « Réglages », « Espèces sans culture de référence » (F476). Les
+chiffres et le sens ne changent pas.
+
+Ne changent pas : les champs de saisie (heure et date au format du
+navigateur), l'export CSV (ses colonnes et ses formats de tableur), les
+calculs. Aucune migration.
+
+## D-194 — Lot K, PR 5 : une échelle de tailles de texte, rien sous 12 px
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 19 :
+36 tailles de texte au téléphone, 41 à l'ordinateur ; 18 % des lettres sous
+12 px au téléphone, jusqu'à 6,5 px sur le plan de « Matériel » ; dix
+graisses, de 300 à 900. La pastille « 6 » du plan ne disait pas ce qu'elle
+comptait. **Cause vérifiée** : chaque feuille de style posait ses tailles
+en pixels ou en rem ; un `<small>` sans taille prenait 80 % de son parent
+(10,4 px dans un texte de 13 px) ; un `<strong>` dans un texte gras montait
+à 900.
+
+**Décision (F477, F478).** Six jetons de taille sur `:root` (`--text-12`,
+`--text-13`, `--text-14`, `--text-16`, `--text-20`, `--text-28`) ; toute
+taille fixe sous 23 px prend le jeton le plus proche (sous 12,75 px : 12 ;
+sous 13,75 : 13 ; sous 15 : 14 ; sous 18 : 16 ; sous 23 : 20). Les grands
+chiffres et les titres d'affichage (23 px et plus, `--title-size`, les
+`clamp()`) gardent la leur. Un `<small>` ne descend plus sous 12 px. Quatre
+graisses : 600 et au-delà deviennent 700 ; un `<strong>` sans poids propre
+prend 700. La pastille chiffrée du plan porte sa bulle (« 6 mm par heure
+d'arrosage ») et une légende sous le plan, quand une planche en a une
+(F478).
+
+Ne changent pas : les polices, les couleurs, les cibles tactiles. Aucune
+migration.
+
+## D-195 — Lot K, PR 6 : rayons et couleurs de la charte
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 20 : des
+rayons d'angle de 3, 4, 5, 8, 9, 10, 11 et 14 px, hors des trois de la
+charte (12 ; 14,6 ; 9,75 px) ; à l'ordinateur, deux couleurs de texte hors
+palette, `#1e1e1e` et `#4f6e64`. **Cause vérifiée** : les feuilles de style
+écrites lot après lot posaient leur rayon en pixels ; `navigation.css` et
+`arbitration-plan.css` portaient les deux couleurs.
+
+**Décision (F479).** Chaque rayon de 3 px et plus, hors cercles et
+pilules (40 px et plus, 50 %), prend un des trois rayons de la charte selon
+ce qu'il arrondit : une entrée de menu, 9,75 px ; un bouton ou un champ
+(`button`, `input`, `select`, `textarea`, `…-button`), `--radius-button` ;
+un bloc de 11,5 px et plus, `--radius` ; une pièce plus petite (pastille,
+étiquette, barre), 9,75 px. Les rayons d'un ou deux pixels (les filets) et
+les angles droits restent. Le texte du menu prend `--ink`, le titre de ses
+groupes `--ink2` ; le nom d'une culture de la frise de pénurie, `--ink`.
+
+Ne changent pas : les autres couleurs (les couleurs des matériels sur le
+plan, les états), les tailles, les marges. Aucune migration.
+
+## D-196 — Lot K, PR 7 : grand écran, tablette et 320 px
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constats n° 23 et
+n° 24 : à 1 920 px, le contenu restait collé au menu (452 px de vide à
+droite, 205 à gauche, mesurés) et le fond du menu s'arrêtait 42 px avant le
+bas de la page ; sur tablette, le menu latéral à demi-place et des cibles
+de 38 à 41 px (filtres et périodes de l'historique, boutons des réglages et
+des alertes, pastilles « i » de 24 px) ; à 320 px, « Aujourd'hui » (64 px)
+et « Ressources » (65 px) dépassaient les 58 px de leur case et se
+coupaient au milieu du mot. **Cause vérifiée** : la barre du bas et les
+cibles de 44 px étaient réservées aux écrans de 600 px et moins ; la marge
+du bas était portée par `main` entier, sous le menu ; le nom de la barre
+pouvait se couper n'importe où (`overflow-wrap: anywhere`).
+
+**Décision.**
+
+- **F480 Grand écran (981 px et plus).** La page se centre dans la place
+  laissée par le menu ; la marge du bas passe de `main` à la colonne du
+  contenu, le fond du menu descend jusqu'en bas ; les blocs d'une rangée
+  d'« Aujourd'hui » s'étirent à la même hauteur ; au-delà de 1 000 px, les
+  choix de la bannière de démonstration restent sur une ligne.
+- **F481 Tablette (601 à 980 px).** La barre du bas du téléphone (quatre
+  entrées et « Plus ») et sa feuille de menu valent jusqu'à 980 px. Chaque
+  bouton, champ et liste du contenu, « Actualiser », les liens « Voir … »
+  d'« Aujourd'hui » et les actions de l'historique prennent 44 px ; les
+  pastilles « i » gardent leur rond de 24 px dans une boîte de 44 px, comme
+  au téléphone. Les planches du plan ne changent pas.
+- **F482 320 px.** Le nom de la barre ne se coupe plus qu'entre deux mots ;
+  sous 360 px, les cases de la barre perdent leur marge de côté et les
+  lettres se resserrent légèrement, pour que « Aujourd'hui » et
+  « Ressources » tiennent entiers.
+
+Ne changent pas : le téléphone de 360 à 600 px, l'ordinateur de 981 à
+1 280 px hormis le centrage, les pages elles-mêmes. Aucune migration. Le
+lot K est codé en entier.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

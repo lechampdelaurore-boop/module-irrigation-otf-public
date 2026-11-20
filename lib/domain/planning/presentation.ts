@@ -24,6 +24,7 @@ import {
 } from './contract.ts';
 import { validatePlanningSettings, type PlanningSettings, type PlanningSettingsIssue, type TimeWindow } from './settings.ts';
 import { compareNamesNaturally } from '../bed-order.ts';
+import { clockFromMinutes } from '../clock-text.ts';
 
 /**
  * La présentation pure du planning (docs/planning-contract.md, « Interface »
@@ -638,7 +639,7 @@ export function settingsIssueLabel(path: string): string {
 
 /** « 21:00 – 08:00 ». */
 export function windowLabel(window: TimeWindow): string {
-  return `${timeInputFromMinutes(window.startMinute)} – ${timeInputFromMinutes(window.endMinute)}`;
+  return `de ${clockFromMinutes(window.startMinute)} à ${clockFromMinutes(window.endMinute)}`;
 }
 
 /** Les réglages en une ligne, pour l'historique. */

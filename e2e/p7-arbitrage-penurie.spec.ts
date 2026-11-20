@@ -34,10 +34,10 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   await attendreLaPageIrrigation(page, 'ressources');
 
   // La bulle d'aide de la faisabilité : la ligne B6.2 de la recette.
-  const aide = page.getByRole('button', { name: 'Explication : Faisabilité préliminaire' });
+  const aide = page.getByRole('button', { name: 'Explication : Ce que vérifie ce calcul' });
   const bulle = page.getByRole('tooltip');
   await epinglerLaBulle(page, aide, bulle);
-  await page.getByRole('button', { name: 'Fermer : Faisabilité préliminaire' }).click();
+  await page.getByRole('button', { name: 'Fermer : Ce que vérifie ce calcul' }).click();
   await expect(bulle).toHaveCount(0);
   await verifierLEtape(page, journal, 'bulle d’aide ouverte puis fermée');
 

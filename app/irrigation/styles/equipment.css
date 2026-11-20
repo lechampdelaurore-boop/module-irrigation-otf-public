@@ -12,7 +12,7 @@
   border-radius: var(--radius-button);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   cursor: pointer;
 }
@@ -49,7 +49,7 @@
   border-radius: 999px;
   background: rgb(255 255 255 / 70%);
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
 }
 
 .equipment-summary strong {
@@ -115,11 +115,11 @@
   width: 36px;
   height: 36px;
   place-items: center;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--green-soft);
   color: var(--green-dark);
-  font-size: 9px;
-  font-weight: 900;
+  font-size: var(--text-12);
+  font-weight: 700;
   letter-spacing: .04em;
 }
 
@@ -138,7 +138,7 @@
 
 .equipment-card-copy strong {
   overflow: hidden;
-  font-size: 13px;
+  font-size: var(--text-13);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -146,7 +146,7 @@
 .equipment-card-copy span,
 .equipment-setting-count span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
 }
 
 .equipment-setting-count {
@@ -156,7 +156,7 @@
   flex-direction: column;
   padding: 2px 6px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: transparent;
   color: var(--ink);
   font: inherit;
@@ -165,7 +165,7 @@
 }
 
 .equipment-setting-count strong {
-  font-size: 15px;
+  font-size: var(--text-16);
 }
 
 .equipment-setting-count:hover:not(:disabled) {
@@ -186,7 +186,7 @@
   color: var(--green);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   cursor: pointer;
 }
@@ -207,7 +207,7 @@
   border-radius: 999px;
   background: var(--sheet);
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 500;
   font-family: var(--font-ui);
 }
@@ -222,11 +222,11 @@
   width: 44px;
   height: 44px;
   place-items: center;
-  border-radius: 9px;
+  border-radius: 9.75px;
   color: var(--muted);
   cursor: pointer;
-  font-size: 22px;
-  font-weight: 800;
+  font-size: var(--text-20);
+  font-weight: 700;
   list-style: none;
 }
 
@@ -250,7 +250,7 @@
   overflow: hidden;
   padding: 5px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: white;
   box-shadow: var(--shadow-raised);
 }
@@ -259,12 +259,12 @@
   min-height: 36px;
   padding: 0 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 9.75px;
   background: transparent;
   color: var(--ink);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 11px;
+  font-size: var(--text-12);
   font-weight: 700;
   text-align: left;
   cursor: pointer;
@@ -280,7 +280,7 @@
 
 .equipment-menu .delete-action {
   border-top: 1px solid var(--danger-line);
-  border-radius: 0 0 7px 7px;
+  border-radius: 0 0 9.75px 9.75px;
   color: var(--danger-ink);
 }
 
@@ -317,13 +317,13 @@
 }
 
 .equipment-empty-state > strong {
-  font-size: 15px;
+  font-size: var(--text-16);
 }
 
 .equipment-empty-state p {
   margin: 0 0 8px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .archived-equipment {
@@ -340,8 +340,8 @@
   background: transparent;
   color: var(--muted);
   font: inherit;
-  font-size: 11px;
-  font-weight: 750;
+  font-size: var(--text-12);
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -353,8 +353,8 @@
 .equipment-error {
   margin: 10px 0;
   padding: 10px 12px;
-  border-radius: 9px;
-  font-size: 11px;
+  border-radius: 9.75px;
+  font-size: var(--text-12);
   font-weight: 700;
 }
 
@@ -436,7 +436,7 @@
 .equipment-field > span,
 .equipment-choice-group legend {
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   font-family: var(--font-ui);
 }
@@ -446,11 +446,11 @@
   height: 46px;
   padding: 0 13px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-button);
   background: white;
   color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .equipment-choice-group {
@@ -485,7 +485,7 @@
   justify-content: center;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: white;
 }
 
@@ -508,22 +508,22 @@
 }
 
 .equipment-choice-group strong {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .equipment-choice-group small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-12);
 }
 
 .equipment-form-note {
   margin: -4px 0 0;
   padding: 10px 12px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--sheet);
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   line-height: 1.45;
 }
 
@@ -553,7 +553,7 @@
 }
 
 .equipment-setting-picker label {
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   color: var(--muted);
 }
@@ -565,9 +565,9 @@
   min-height: 34px;
   padding: 4px 8px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-button);
   background: #fff;
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--ink);
 }
 
@@ -580,5 +580,5 @@
   margin: 0;
   flex-basis: 100%;
   color: var(--danger-ink);
-  font-size: 11px;
+  font-size: var(--text-12);
 }
