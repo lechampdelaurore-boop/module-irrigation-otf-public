@@ -20,6 +20,7 @@ import { resetFarmDurationsForUser, saveFarmDurationsForUser } from '@/lib/servi
 import type { FarmDurations } from '@/lib/domain/crop-water/farm-durations';
 import { getIrrigationSnapshot } from '@/lib/services/irrigation-service';
 import { ofName } from '@/lib/domain/display-words';
+import { confirmSpeciesStepOfUser, linkProposedSpeciesForUser } from '@/lib/services/onboarding-species';
 
 /**
  * Les actions de la page « Coefficients culturaux » (5 quater, PR 3) : la
@@ -56,6 +57,33 @@ export async function saveSpeciesCorrespondenceAction(input: {
     return {
       ok: true,
       message: input.seriesId === null ? 'Le rattachement de l’espèce est enregistré.' : 'L’exception de la série est enregistrée.',
+      view: await getCropCoefficientsViewForUser({ ownerUserId, season: input.season, snapshot }),
+    };
+  });
+}
+
+/** L'étape « Rattachez vos espèces » (4.4, F587) : les propositions gardées, rattachées d'un geste. */
+export async function linkProposedSpeciesAction(input: { season: number; plantIds: string[] }): Promise<CropWaterActionResult> {
+  return withContext(input.season, async ({ ownerUserId, snapshot }) => {
+    if (!Array.isArray(input.plantIds) || input.plantIds.some((id) => typeof id !== 'string')) return { ok: false, message: 'Espèces invalides.' };
+    const result = await linkProposedSpeciesForUser({ ownerUserId, season: input.season, snapshot, plantIds: input.plantIds });
+    if (!result.ok) return { ok: false, message: result.message };
+    return {
+      ok: true,
+      message: `${result.count} espèce${result.count > 1 ? 's' : ''} rattachée${result.count > 1 ? 's' : ''}.`,
+      view: await getCropCoefficientsViewForUser({ ownerUserId, season: input.season, snapshot }),
+    };
+  });
+}
+
+/** L'étape « Cultures » confirmée d'un geste (F587) : les espèces non rattachées restent « à rattacher ». */
+export async function confirmSpeciesStepAction(input: { season: number }): Promise<CropWaterActionResult> {
+  return withContext(input.season, async ({ ownerUserId, snapshot }) => {
+    const result = await confirmSpeciesStepOfUser({ ownerUserId, season: input.season, snapshot });
+    if (!result.ok) return { ok: false, message: result.message };
+    return {
+      ok: true,
+      message: 'L’étape « Cultures » est confirmée.',
       view: await getCropCoefficientsViewForUser({ ownerUserId, season: input.season, snapshot }),
     };
   });
