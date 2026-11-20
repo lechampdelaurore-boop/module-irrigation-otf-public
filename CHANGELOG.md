@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Fusion des moteurs, étape 3, PR 1)
+
+- **Le moteur hydrique commun, en essai à côté de la jauge** (D-270) :
+  chaque matin, la jauge de la réserve du sol de chaque planche est aussi
+  calculée par le moteur commun d'OTF et de Tlaloc, et les deux calculs sont
+  comparés au journal, sans aucune donnée de la ferme. Rien ne change à
+  l'écran : la jauge affichée reste celle d'avant, jusqu'à ce que l'égalité
+  soit prouvée sur la ferme.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4d)
 
 - **Le modèle des rattachements** (D-231) : une nouvelle ferme reçoit, pour

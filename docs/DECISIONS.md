@@ -7050,3 +7050,67 @@ navigateur pour la lecture le 20 novembre 2026 à 13 h 45.
 Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
 et la démonstration ; la proposition d'après le nom quand le modèle ne
 connaît pas l'espèce. Aucune question de budget.
+
+## D-270 — Fusion des moteurs, étapes 2 et 3 : le moteur commun écrit, la jauge branchée derrière un interrupteur
+
+Date : 20 novembre 2026, soir. Décideur : le porteur pour le lancement et le
+réglage (« Max », le 20 novembre 2026 à 18 h 56, MC-26) ; la recommandation
+pour le reste, sur son mandat d'autonomie du 19 novembre 2026 (aucune
+question agronomique ni de budget). Contrat :
+`docs/shared-engine-adapter-contract.md`. Après D-114, D-116 et D-154.
+
+**Contexte.** Le plan de la fusion validé par le porteur le 14 novembre 2026
+(§ 4 et § 5) : un adaptateur remplace le cœur de `gauge.ts` par le moteur
+commun, derrière un interrupteur ; l'ancien code reste jusqu'à preuve
+d'égalité ; la version du moteur est figée dans ce dépôt ; un rejeu comparé
+sur la ferme réelle, écart admis 0,01 mm, chaque écart listé, jamais corrigé
+en silence. MC-26 : le moteur et l'adaptateur en Opus 5.5 · Max, leur ligne
+de roadmap par une PR de registres à ce moment ; D-154 : deux chantiers de
+code ensemble s'ils touchent deux dépôts.
+
+**Établi.**
+
+- **Étape 2, le moteur**, codée le 20 novembre 2026 dans le dépôt commun
+  (`lechampdelaurore-boop/moteur-hydrique-commun-public`) : la v0.1.0, le
+  cœur du bilan (PR n° 11), la v0.2.0, les options du jeu Tlaloc (PR n° 12,
+  empilée), et ses types construits avec lui (PR n° 13) ; relecture de
+  Nicolas en cours, le choix 19 corrigé à sa demande ; fusion dès son
+  approbation.
+- **Étape 3, PR 1 sur 3** : le moteur v0.2.0 figé dans le module avec ses
+  types et l'empreinte de chaque fichier ; l'adaptateur ; l'interrupteur sur
+  l'ancien calcul. **Rien ne change en ligne.** Les preuves : tous les tests
+  du module rejoués l'interrupteur sur le moteur, sans en modifier un seul ;
+  20 000 planches tirées au hasard, 437 355 jours, chaque grandeur égale à
+  0,000001 mm près (plus grand écart 9e-14 mm) ; les cas O01 à O10 et les
+  huit cas limites de l'étape 1, mêmes verdicts par les deux calculs (l'écart
+  d'O07, D-116, est le même des deux côtés).
+
+**Décisions.**
+
+1. Les engrais verts et les planches enherbées passent par le moteur, comme
+   les cultures (un compartiment, D-053) ; le sol nu et ses deux
+   compartiments restent au module (MC-18). Choix présenté à Nicolas (choix
+   21 de la PR n° 13 du dépôt commun).
+2. Un appel au moteur par suite de jours consécutifs à un compartiment ; le
+   sol nu et les jours sans sol font le lien, comme avant.
+3. L'interrupteur est une constante du domaine (`gauge-switch.ts`), changée
+   par une PR ; le rejeu des tests sur le moteur remplace ce fichier par un
+   passage de test. Aucune variable d'environnement, aucune migration.
+4. Deux données impossibles changent un chiffre par le moteur : une RFU de
+   0 mm/m vaut un sol absent ; une consommation impossible sous un couvert
+   (ET0 négative ou illisible) rend le jour inconnu, « ET0 manquante ». Elles
+   sont dites au porteur avec la PR 2, avec leurs deux valeurs.
+5. Chaque matin, l'enregistrement de la jauge rejoue l'autre calcul et écrit
+   une ligne au journal (`soil_reserve_engine_comparison`), sans aucune donnée
+   de la ferme ; au plus 50 000 jours comparés par matin, pour ne jamais
+   mettre en péril le matin ; son échec n'arrête jamais l'enregistrement.
+6. PR 2 (l'interrupteur sur le moteur) après trois matins de suite sans
+   écart, sans échec et sans planche laissée de côté sur la ferme réelle ;
+   PR 3 (l'ancien code retiré) après une semaine sur le moteur sans écart.
+   Un écart arrête la suite et se présente au porteur avec les deux valeurs.
+7. La copie du moteur vient du dossier `dist/` de la branche principale du
+   dépôt commun : la PR 1 attend la fusion des PR n° 11 à 13, puis se
+   recale sur ce commit, ses preuves rejouées.
+
+Ne changent pas : D-028, D-047, D-053, D-114, D-116, D-154. Aucune
+migration ; aucun test existant modifié. Aucune question de budget.

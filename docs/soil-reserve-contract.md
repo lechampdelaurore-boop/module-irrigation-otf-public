@@ -420,6 +420,12 @@ surface déclaré.
 Le calcul vit dans `lib/domain/` et s'y teste ; l'écran et la persistance
 l'appellent.
 
+Depuis le 20 novembre 2026 (D-270), le bilan à un compartiment peut aussi
+être calculé par le moteur hydrique commun, derrière un interrupteur, sans
+qu'aucune règle de cette section ne change : ce qui passe par le moteur, ce
+qui reste au module et la preuve d'égalité sont dans
+`docs/shared-engine-adapter-contract.md`.
+
 ### Par planche cultivée
 
 1. **Profondeur racinaire** : celle des cultures des séries qui occupent la
