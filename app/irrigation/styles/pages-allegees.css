@@ -9,14 +9,17 @@
   au moins ; trop nombreuses pour une ligne, elles passent à la ligne (F313,
   F314).
 */
-.page-settings {
+/* Le même pli pour « Correspondance des espèces » dans Réglages (audit du 19 novembre 2026, lot J, n° 15, F459). */
+.page-settings,
+.species-fold {
   margin-top: 1.5rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--card);
 }
 
-.page-settings > summary {
+.page-settings > summary,
+.species-fold > summary {
   position: relative;
   display: grid;
   min-height: var(--touch-target);
@@ -27,16 +30,19 @@
   list-style: none;
 }
 
-.page-settings > summary::-webkit-details-marker {
+.page-settings > summary::-webkit-details-marker,
+.species-fold > summary::-webkit-details-marker {
   display: none;
 }
 
-.page-settings > summary small {
+.page-settings > summary small,
+.species-fold > summary small {
   color: var(--muted);
   font-size: 12px;
 }
 
-.page-settings > summary::after {
+.page-settings > summary::after,
+.species-fold > summary::after {
   position: absolute;
   top: 50%;
   right: 18px;
@@ -48,11 +54,13 @@
   transform: translateY(-70%) rotate(45deg);
 }
 
-.page-settings[open] > summary::after {
+.page-settings[open] > summary::after,
+.species-fold[open] > summary::after {
   transform: translateY(-30%) rotate(-135deg);
 }
 
-.page-settings-body {
+.page-settings-body,
+.species-fold-body {
   display: grid;
   gap: 1rem;
   padding: 0 1rem 1rem;

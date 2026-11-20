@@ -6396,6 +6396,30 @@ page au téléphone : 2 600 px.
 
 Ne changent pas : la jauge et son calcul (D-047, D-053), l'ordre des
 jardins. Aucune migration.
+
+## D-186 — Lot J, PR 4 : « Réglages », les espèces pliées, une seule liste
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 15 :
+« Réglages » mesurait 11 672 px au téléphone sur la ferme du porteur, dont
+8 692 pour « Correspondance des espèces » (77 espèces), et les 36 espèces à
+rattacher y paraissaient deux fois. **Cause vérifiée** : la liste des
+espèces était toujours ouverte, et la liste « Espèces sans référence Kc »
+reprenait chaque espèce non rattachée ou rattachée à « sans référence »,
+celles que la liste des espèces met déjà en tête (`speciesNeedsLink`).
+
+**Décision (F459).** « Correspondance des espèces » garde son titre et sa
+phrase ; ses deux listes sont dans un pli fermé dont le titre porte le
+compteur (« 36 espèces à rattacher sur 77 »), ouvert par son ancre
+(`#correspondance-des-especes`) ou celle d'un élément qu'il contient, comme
+le pli « Réglages de cette page » (même composant). La liste « sans
+référence Kc » ne garde que les séries qu'une exception met « sans
+référence » quand leur espèce est rattachée ; sinon une phrase renvoie aux
+espèces à rattacher. Budget de la page au téléphone : 3 000 px.
+
+Ne changent pas : les rattachements, les propositions d'après le nom, la
+recherche. Aucune migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

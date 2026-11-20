@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 import { carteDeCulture } from './support/cultures.ts';
 
 /**
@@ -71,6 +71,7 @@ test('les durées d’une culture se règlent puis reviennent au jeu commun, et 
 
   // Rattacher la carotte à la carotte du CRIIAM, dans Réglages.
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   const espece = coefficients.locator('details.species-link-card').filter({ has: page.locator('summary strong', { hasText: /^Carotte$/ }) });
   const rattachement = espece.getByRole('group', { name: 'Rattachement de l’espèce Carotte' });
   await espece.scrollIntoViewIfNeeded();
@@ -117,6 +118,7 @@ test('les durées d’une culture se règlent puis reviennent au jeu commun, et 
 
   // Retirer le rattachement : la base revient à son état de départ pour l'autre largeur.
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
   await espece.scrollIntoViewIfNeeded();
   if (!(await rattachement.isVisible())) await espece.locator('summary').first().click();
   await rattachement.getByRole('button', { name: 'Retirer le rattachement' }).click();

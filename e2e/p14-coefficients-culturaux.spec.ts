@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 import { carteDeCulture } from './support/cultures.ts';
 
 /**
@@ -36,13 +36,18 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   // La correspondance des espèces est dans Réglages, les cultures de
   // référence sur la page « Besoin par culture » (3.8, précision P3).
   await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
 
   const section = page.locator('section.crop-coefficients');
   await section.scrollIntoViewIfNeeded();
   await expect(section.getByRole('heading', { level: 2, name: 'Correspondance des espèces' })).toBeVisible();
+  // La liste « sans référence Kc » ne répète pas les espèces à rattacher, déjà en tête (lot J, n° 15, F459).
   const sansReference = section.getByRole('list', { name: 'Espèces sans référence Kc' });
-  await expect(sansReference).toContainText(cas.espece);
-  await expect(sansReference).not.toContainText('Endive');
+  const dansSansReference = (espece: string) => sansReference.locator('li').filter({ has: page.locator('strong', { hasText: new RegExp(`^${espece}$`) }) });
+  const ligneEspece = section.locator('.species-link-row').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.espece}$`) }) });
+  await expect(ligneEspece).toHaveAttribute('data-to-link', 'true');
+  await expect(dansSansReference(cas.espece)).toHaveCount(0);
+  await expect(dansSansReference('Endive')).toHaveCount(0);
   await verifierLEtape(page, journal, 'correspondance des espèces affichée');
 
   // Chaque espèce porte le dessin de son espèce, servi par le module : celui
@@ -74,7 +79,7 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   await enregistrer.click();
   await expect(section.getByRole('status')).toHaveText('Le rattachement de l’espèce est enregistré.');
   await expect(carte.locator('summary').first()).toContainText(cas.attendu);
-  await expect(sansReference).not.toContainText(cas.espece);
+  await expect(dansSansReference(cas.espece)).toHaveCount(0);
   await verifierLEtape(page, journal, 'espèce rattachée');
 
   // Une exception sur sa série : sans référence.
@@ -84,7 +89,8 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   await exception.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(section.getByRole('status')).toHaveText('L’exception de la série est enregistrée.');
   await expect(carte.locator('summary').first()).toContainText('1 exception');
-  await expect(sansReference).toContainText(cas.espece);
+  // L'espèce est rattachée, sa série suit « sans référence » par exception : la liste la montre.
+  await expect(dansSansReference(cas.espece)).toHaveCount(1);
   await verifierLEtape(page, journal, 'exception de série enregistrée');
 
   // Tout retirer : l'espèce redevient non rattachée.
@@ -93,7 +99,8 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   await formulaire.getByRole('button', { name: 'Retirer le rattachement' }).click();
   await expect(section.getByRole('status')).toHaveText('Le rattachement de l’espèce est retiré : elle est de nouveau non rattachée.');
   await expect(carte.locator('summary').first()).toContainText('Non rattachée');
-  await expect(sansReference).toContainText(cas.espece);
+  await expect(ligneEspece).toHaveAttribute('data-to-link', 'true');
+  await expect(dansSansReference(cas.espece)).toHaveCount(0);
   await verifierLEtape(page, journal, 'rattachement retiré');
 
   // La table de la culture de référence se lit, sur la page « Besoin par culture ».

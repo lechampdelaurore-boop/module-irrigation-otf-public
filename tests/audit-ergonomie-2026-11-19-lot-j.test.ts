@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { pageLabel } from '../lib/domain/features/pages.ts';
+import type { SeasonSpecies, SpeciesWithoutReference } from '../lib/domain/crop-water/species.ts';
+import { withoutReferenceBeyondSpecies } from '../lib/domain/crop-water/species-linking.ts';
 
 /**
  * Audit ergonomique du 19 novembre 2026, lot J « Pages courtes au
@@ -49,4 +51,30 @@ test('n° 15, F457 : « Réglages du calcul » est rangé dans le pli « Réglag
   const panel = readFileSync('app/irrigation/crop-water/crop-coefficients-panel.tsx', 'utf8');
   assert.match(panel, /<PageSettingsFold>\s*<CropWaterSettingsSection /);
   assert.equal(panel.match(/<CropWaterSettingsSection /g)?.length, 1, 'jamais hors du pli');
+});
+
+// n° 15 — « Réglages » : les espèces pliées, une seule liste (PR 4, F459).
+
+test('n° 15, F459 : la liste « sans référence Kc » ne répète pas les espèces à rattacher ; une exception de série y reste', () => {
+  const species = (plantId: string, target: 'none' | 'reference' | 'without-reference') => ({
+    plantId,
+    plantName: plantId,
+    series: [{ id: `s-${plantId}`, name: `Série ${plantId}` }],
+    link: target === 'none' ? null : { seriesId: null, plantId, target: target === 'reference' ? { kind: 'reference', referenceCropId: 'tomate', analogy: false } : { kind: 'without-reference' } },
+    exceptions: [],
+  }) as unknown as SeasonSpecies;
+  const list = [species('Carotte', 'none'), species('Fenouil', 'without-reference'), species('Tomate', 'reference')];
+  const withoutReference: SpeciesWithoutReference[] = [
+    { plantId: 'Carotte', plantName: 'Carotte', reason: 'missing', seriesIds: ['s-Carotte'] },
+    { plantId: 'Fenouil', plantName: 'Fenouil', reason: 'without-reference', seriesIds: ['s-Fenouil'] },
+    { plantId: 'Tomate', plantName: 'Tomate', reason: 'without-reference', seriesIds: ['s-Tomate-2'] },
+  ];
+  assert.deepEqual(withoutReferenceBeyondSpecies(withoutReference, list).map((item) => item.plantId), ['Tomate']);
+});
+
+test('n° 15, F459 : « Correspondance des espèces » est un pli fermé à ancre, son compteur en titre', () => {
+  const panel = readFileSync('app/irrigation/crop-water/crop-coefficients-panel.tsx', 'utf8');
+  assert.match(panel, /<AnchoredFold\s+id=\{SPECIES_FOLD_ANCHOR\}[\s\S]*?<strong>\{speciesLinkCounter\(view\.species\)\}<\/strong>[\s\S]*?<SpeciesSection [\s\S]*?<WithoutReferenceSection [\s\S]*?<\/AnchoredFold>/);
+  assert.match(panel, /const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';/);
+  assert.doesNotMatch(panel, /initiallyOpen/, 'fermé d’office');
 });

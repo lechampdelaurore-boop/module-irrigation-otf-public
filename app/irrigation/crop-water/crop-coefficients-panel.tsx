@@ -11,6 +11,7 @@ import {
   speciesNeedsLink,
   suggestReferenceCrop,
   WITHOUT_REFERENCE_CONSEQUENCE,
+  withoutReferenceBeyondSpecies,
   type LinkCandidate,
 } from '@/lib/domain/crop-water/species-linking';
 import { matchesSearch } from '@/lib/domain/name-search';
@@ -29,7 +30,7 @@ import {
   type CropWaterActionResult,
 } from '../crop-water-actions';
 import { CropWaterSettingsSection } from './crop-water-settings';
-import { PageSettingsFold } from '../shell/page-settings-fold';
+import { AnchoredFold, PageSettingsFold } from '../shell/page-settings-fold';
 import { ReferenceCropCard } from './reference-crop-card';
 import { referenceCropSeriesCount, referenceCropSummary, splitBySeasonUse } from '@/lib/domain/crop-water/crop-summary';
 import { DetailHint } from './detail-hint';
@@ -113,10 +114,21 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
           Le plan de culture d’Ouvre ta ferme n’est pas encore lu pour la saison {view.season} : actualisez la lecture pour rattacher ses espèces.
         </p>
       ) : species ? (
-        <>
+        // Un pli fermé, son compteur en titre : la liste des espèces pesait 8 700 px au téléphone (audit du 19 novembre 2026, lot J, n° 15, F459).
+        <AnchoredFold
+          id={SPECIES_FOLD_ANCHOR}
+          className="species-fold"
+          bodyClassName="species-fold-body"
+          summary={(
+            <>
+              <strong>{speciesLinkCounter(view.species)}</strong>
+              <small>Rattacher une espèce, chercher par nom, voir ses séries.</small>
+            </>
+          )}
+        >
           <SpeciesSection season={season} view={view} spriteHref={spriteHref} pending={pending} run={run} />
           <WithoutReferenceSection view={view} />
-        </>
+        </AnchoredFold>
       ) : (
         <>
           <section className="crop-coefficients-part" aria-labelledby="reference-crops-title">
@@ -194,6 +206,9 @@ function ReferenceCropGroups({ crops, seriesCount, children }: {
     </>
   );
 }
+
+/** L'ancre du pli des espèces : `…/reglages#correspondance-des-especes` l'ouvre. */
+const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';
 
 /** La recherche par nom paraît dès deux espèces (précision F64). */
 const SEARCH_FROM = 2;
@@ -382,16 +397,24 @@ function CorrespondenceForm({ label, crops, current, pending, onSave, onRemove, 
 }
 
 function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView, { available: true }> }) {
+  // Les espèces à rattacher sont déjà en tête de la liste : celle-ci ne les répète pas (lot J, n° 15, F459).
+  const beyond = withoutReferenceBeyondSpecies(view.withoutReference, view.species);
+  const toLink = view.species.filter(speciesNeedsLink).length;
   return (
     <section className="crop-coefficients-part" aria-labelledby="without-reference-title">
       <h3 id="without-reference-title">Espèces sans référence Kc</h3>
       {view.withoutReference.length === 0 ? (
         <p>Toutes les espèces de la saison ont une culture de référence ou sont de l’engrais vert.</p>
+      ) : beyond.length === 0 ? (
+        <p>{WITHOUT_REFERENCE_CONSEQUENCE} Ce sont les {toLink > 1 ? `${toLink} espèces` : 'espèce'} à rattacher, en tête de la liste ci-dessus.</p>
       ) : (
         <>
-          <p>{WITHOUT_REFERENCE_CONSEQUENCE} La liste compte aussi les séries dont l’exception est « sans référence ».</p>
+          <p>
+            {WITHOUT_REFERENCE_CONSEQUENCE}{' '}
+            {toLink > 0 ? `En plus des ${toLink > 1 ? `${toLink} espèces` : 'espèce'} à rattacher ci-dessus, ces séries suivent « sans référence » par exception :` : 'Ces séries suivent « sans référence » par exception :'}
+          </p>
           <ul className="without-reference-list" aria-label="Espèces sans référence Kc">
-            {view.withoutReference.map((item) => (
+            {beyond.map((item) => (
               <li key={`${item.plantId}:${item.reason}`}>
                 <strong>{item.plantName}</strong>
                 <small>

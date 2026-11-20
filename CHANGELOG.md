@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 4 sur 7)
+
+- **« Réglages » : les espèces pliées, une seule liste** (D-186) :
+  « Correspondance des espèces », qui faisait 8 700 px au téléphone sur une
+  ferme de 77 espèces, est un pli fermé dont le titre dit ce qui attend
+  (« 36 espèces à rattacher sur 77 ») ; un lien vers la liste l'ouvre. La
+  liste « Espèces sans référence Kc » ne répète plus les espèces à
+  rattacher, déjà en tête : il n'y reste que les séries qu'une exception
+  met « sans référence ».
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 3 sur 7)
 
 - **« Réserve du sol » : les jardins pareils en une barre** (D-185) : onze
