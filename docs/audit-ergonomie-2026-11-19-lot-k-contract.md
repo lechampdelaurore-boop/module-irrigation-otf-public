@@ -149,4 +149,6 @@ Chaque précision faite en codant, numérotée à la suite du registre.
 - **F466** « Valider les propositions du jour » paraît à partir de deux propositions à valider ; « Valider toute la semaine » ne change pas.
 - **F467** « Réglages du planning » prend le chevron à droite des plis des lots D et J, qui tourne à l'ouverture ; l'unification de tous les plis suit à la PR 3.
 
-Les précisions de la PR 2 suivent, F468 et au-delà.
+- **F468** Vue satellite : un nom se compare aux noms déjà posés, dans l'ordre de la liste ; « chevaucher » veut dire moins de deux pixels d'air entre deux rectangles ; le premier garde son nom, le suivant devient son numéro (pastille ronde de 24 px au moins). Le numéro est celui de la ligne dans la liste, devant le nom, caché au lecteur d'écran (la liste dit déjà le nom). Un nom qui sortirait de son jardin sans gêner un voisin le garde : la bulle et la liste suffisent. Le calcul se refait au chargement, au zoom et quand la carte ou le dessin change de taille. La preuve est dans le domaine (`tests/audit-ergonomie-2026-11-19-lot-k-satellite.test.ts`) et dans P34 étendu, plutôt que dans P41 : P34 a déjà la carte et son dessin de secours.
+
+Les précisions de la PR 3 suivent, F469 et au-delà.

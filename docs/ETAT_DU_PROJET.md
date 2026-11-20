@@ -546,7 +546,11 @@ registres, elle y renvoie.
   dose minimale dites « en attente », pour information ; « Ajuster » à
   l'arrondi de la carte ; la ligne d'état en deux lignes ; un seul
   « Valider » pour un jour à une proposition ; « Réglages du planning »
-  signé comme les autres plis ; codée.
+  signé comme les autres plis ; en ligne le 20 novembre 2026 à 11 h 08
+  (#130, fusionnée à 10 h 45, run 44713406262 vérifié job par job). **PR 2, vue satellite : des numéros
+  quand les noms se chevauchent** (D-191, F468) : le nom qui en recouvrirait
+  un autre devient le numéro du jardin, la liste à côté sert de légende,
+  recalculé à chaque zoom ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
