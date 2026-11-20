@@ -36,6 +36,7 @@ import { listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries'
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import { seasonSpecies } from '@/lib/domain/crop-water/species';
 import { speciesNeedsLink } from '@/lib/domain/crop-water/species-linking';
+import { planningAllowed } from '@/lib/domain/onboarding/settings-review';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
 
@@ -172,6 +173,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
         plotsToClassify: usesPlotShelters(enabled) ? unclassifiedPlots(snapshot, season).length : 0,
         soilToEnter: withoutSoil.length > 0 ? { parcels: withoutSoil.length, anchor: soilParcelAnchor(withoutSoil[0]) } : null,
         speciesToLink,
+        planningToValidate: enabled.includes('planning') && !planningAllowed(onboarding),
       }),
     },
     lap: (step) => stopwatch.lap(step),

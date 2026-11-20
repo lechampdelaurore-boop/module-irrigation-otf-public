@@ -74,3 +74,31 @@ export async function confirmSpeciesStepForUser(spaceKey: string, value: { linke
   const workspaceId = await ensureWorkspaceForUser(spaceKey);
   await confirmOnboardingStepStatement(workspaceId, 'crops', value, now.toISOString()).run();
 }
+
+/**
+ * Une réponse à un groupe des « Réglages à relire » (F588) : la ligne de
+ * l'étape garde les réponses de chaque groupe ; elle est « proposée » tant
+ * qu'un groupe à relire reste sans réponse, « confirmée » quand chacun est
+ * validé ou passé. Lue puis écrite : une étape d'avant l'accueil n'est
+ * jamais réécrite (F426).
+ */
+export async function answerSettingsGroupForUser(
+  spaceKey: string,
+  answers: (current: unknown) => { value: unknown; complete: boolean },
+  now = new Date(),
+): Promise<void> {
+  const workspaceId = await ensureWorkspaceForUser(spaceKey);
+  const row = await db.prepare(
+    `SELECT proposed_value FROM irrigation_onboarding_steps WHERE workspace_id = ? AND step = 'settings'`,
+  ).bind(workspaceId).first<{ proposed_value: string | null }>();
+  const { value, complete } = answers(parseValue(row?.proposed_value ?? null));
+  const at = now.toISOString();
+  await db.prepare(
+    `INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, proposed_value, confirmed_at, updated_at)
+     VALUES (?, 'settings', ?, 'onboarding', ?, ?, ?)
+     ON CONFLICT (workspace_id, step) DO UPDATE SET
+       state = excluded.state, proposed_value = excluded.proposed_value,
+       confirmed_at = excluded.confirmed_at, updated_at = excluded.updated_at
+     WHERE irrigation_onboarding_steps.origin = 'onboarding'`,
+  ).bind(workspaceId, complete ? 'confirmed' : 'proposed', JSON.stringify(value), complete ? at : null, at).run();
+}

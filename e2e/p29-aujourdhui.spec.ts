@@ -94,7 +94,7 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
   // Une ferme neuve dit ce qui lui manque : la commune, ses jardins, le sol de ses parcelles et ses espèces, avant la météo,
   // le gel, les besoins et la réserve du sol (4.4, F582, F583, F584, F587).
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher, réglages du planning à valider.');
   await preparerLaFermeNeuve(page);
   // `/irrigation` seule y mène aussi (F31).
   await page.goto('/irrigation');

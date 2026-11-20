@@ -456,7 +456,7 @@ registres, elle y renvoie.
   local ; quatre sabotages, chacun détecté ; aucun écran changé, la suite
   des parcours par la CI de la PR.
   **PR 4b, la région des cultures** (D-227, F586, section 8 bis.14 du
-  contrat) : chaque fiche de culture dit d'où viennent ses dates de stade
+  contrat), **en ligne le 20 novembre 2026 à 18 h 54 (#133, fusionnée à 18 h 26, run 44783377195 vérifié job par job : les cinq jobs verts)** : chaque fiche de culture dit d'où viennent ses dates de stade
   (Sud / Occitanie pour le CRIIAM, générales pour la FAO-56, ou la ferme) ;
   une ferme qui fait l'accueil, d'une autre région, est avertie sur les
   cultures communes du CRIIAM ; région tirée du code postal de la commune
@@ -475,6 +475,17 @@ registres, elle y renvoie.
   `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm site:check`
   réussis en local ; sept sabotages, chacun détecté ; parcours P46 étendu,
   P29 et P28 rejoués en local.
+  **PR 5a, « Réglages à relire »** (D-229, F588, section 8 bis.16 du
+  contrat) : pour une ferme qui fait l'accueil, les groupes de valeurs de
+  départ des cases cochées, avec leur source, validés ou passés ; aucun
+  planning avant la validation du groupe « Planning », le calcul du matin
+  la passe sans échec ; bandeau « réglages du planning à valider » ; aucune
+  migration ; la borne de l'ET0 reste à 12 mm/j, son passage à 15 proposé
+  au dépôt commun (MC-37). Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
+  P31 et P10 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
@@ -20,6 +20,8 @@ import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from '.
 test('planning : la ligne d’état en deux lignes, le pli des réglages signé comme les autres', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'lotk-planning');
+  // Sans sa commune, ses jardins classés et ses réglages validés, une ferme neuve n'a pas de planning (4.4, F582, F583, F588).
+  await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'planning');
   const planning = page.locator('section.planning-section');
   await planning.getByRole('button', { name: /^(Calculer le plan de la semaine|Recalculer le plan)$/ }).click();

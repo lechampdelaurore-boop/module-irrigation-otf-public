@@ -10,6 +10,7 @@ import { WaterManagementDashboard } from '../water-management-dashboard';
 import { FeatureSettings } from './feature-settings';
 import { NotificationSettings } from './notification-settings';
 import { OnboardingSettings } from './onboarding-settings';
+import { SettingsReviewSection } from './settings-review';
 import { PlotShelterSettings } from './plot-shelter-settings';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
@@ -24,13 +25,14 @@ export const metadata = pageMetadata('reglages');
  * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3) ;
  * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
  * l'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil, en tête
- * de la correspondance des espèces (4.4, F587) ; enfin, l'accueil de la
+ * de la correspondance des espèces (4.4, F587) ; « Réglages à relire »
+ * (4.4, F588) ; enfin, l'accueil de la
  * ferme (4.4, F581), replié.
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview } = await loadReglagesPage(context);
   context.logLoaded();
   // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
   const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
@@ -43,12 +45,14 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
       {plotShelters ? <PlotShelterSettings season={context.season} initialLines={plotShelters} /> : null}
+      {settingsReview ? <SettingsReviewSection season={context.season} initialReview={settingsReview} /> : null}
       <OnboardingSettings
         onboarding={onboarding}
         locationHere={waterDashboard !== null}
         plotsHere={plotShelters !== null}
         soilHref={soilStep ? pageHref(soilStep.page, { season: context.season, zone: context.zone }, soilStep.anchor) : null}
         speciesHere={cropCoefficients?.available === true && cropCoefficients.speciesStep !== null}
+        settingsHere={settingsReview !== null && settingsReview.groups.length > 0}
       />
     </IrrigationShell>
   );

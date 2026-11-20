@@ -6979,3 +6979,27 @@ la proposition d'après le nom existait, une espèce à la fois (lot 3, cas 9).
 
 Ne change pas : la base (aucune migration) ; la ferme du porteur et la
 démonstration ; la proposition une par une. Aucune question de budget.
+
+## D-229 — Tranche 4, sous-tranche 4.4, PR 5a : « Réglages à relire »
+
+Date : 20 novembre 2026.
+
+**Contexte.** Une ferme neuve recevait les réglages de la ferme du porteur
+sans les voir (défauts n° 1, 2, 3, 6, 7, 9, 10, 11, 12, 22) ; le planning se
+calculait sur eux (réponse Q10).
+
+**Décision** (F588, section 8 bis.16 du contrat).
+
+1. Pour un espace qui fait l'accueil, six groupes de valeurs de départ, ceux
+   des cases cochées, chacun avec sa source, lus des constantes du calcul ;
+   la personne valide ou passe chaque groupe, l'ajuste dans sa page.
+2. Aucun planning avant la validation du groupe « Planning » ; le calcul du
+   matin et le recalcul sur événement passent la ferme sans échec.
+3. La borne de l'ET0 reste à 12 mm/j : le contrat commun la fixe aussi ; le
+   passage à 15 est proposé au dépôt commun (MC-37) et se fera dans une PR à
+   part après l'accord.
+4. La PR 5 en deux : 5a, celle-ci ; 5b, la vérification finale et plusieurs
+   fermes d'une même personne.
+
+Ne change pas : la base (aucune migration) ; aucune valeur de calcul ; la
+ferme du porteur et la démonstration. Aucune question de budget.

@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 5a)
+
+- **« Réglages à relire »** (D-229) : une nouvelle ferme lit, dans
+  Réglages, chaque groupe de valeurs de départ avec sa source, et le valide
+  ou le passe. Aucun planning n'est calculé avant qu'elle ait validé les
+  réglages du planning ; le bandeau « À finir » le lui rappelle.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4c)
 
 - **« Rattachez vos espèces »** (D-228) : une nouvelle ferme voit, en tête

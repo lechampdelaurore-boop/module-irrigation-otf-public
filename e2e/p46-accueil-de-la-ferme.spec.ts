@@ -14,7 +14,8 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, surveillerL
  * et en mots ; elle choisit sa commune (F582), classe ses jardins (F583) et
  * saisit le sol de ses parcelles, la texture proposant TEW et REW (F584) ;
  * les cultures du CRIIAM lui disent venir d'une autre région (F586) ; elle
- * rattache ses espèces proposées d'un geste et confirme l'étape (F587).
+ * rattache ses espèces proposées d'un geste et confirme l'étape (F587) ;
+ * elle relit ses réglages, groupe par groupe, et valide le planning (F588).
  */
 
 const ETAPES = ['Où est la ferme', 'Parcelles et abris', 'Sol', 'Cultures', 'Réglages à relire'];
@@ -44,7 +45,7 @@ test('une ferme d’avant la 4.4 lit que ses réglages sont gardés tels quels',
   await verifierLEtape(page, journal, 'accueil d’avant la 4.4');
 });
 
-test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer ses jardins, saisir le sol de ses parcelles, puis rattacher ses espèces confirme les quatre premières', async ({ page, context }, testInfo) => {
+test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer ses jardins, saisir le sol de ses parcelles, rattacher ses espèces puis relire ses réglages confirme les cinq étapes', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'accueil');
   await attendreLaPageIrrigation(page, 'reglages');
@@ -58,7 +59,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
     await expect(etapes.nth(index)).toContainText('À faire.');
   }
   // L'étape de la commune mène au lieu de la météo ; le siège n'y est pas pris en silence (F419, F582).
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher, réglages du planning à valider.');
   await expect(page.locator('#water-weather-title').locator('xpath=ancestor::section[1]')).toContainText('Choisissez la commune de votre ferme : tant qu’elle n’est pas choisie, ni météo, ni gel, ni ET0.');
   await etapes.first().getByRole('link', { name: 'Choisir la commune' }).click();
   await expect(page).toHaveURL(/#water-weather-title$/);
@@ -68,7 +69,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   await expect(page.getByText('La commune du siège OTF est utilisée, en dernier recours.')).toBeVisible();
   await page.reload();
   await attendreLaPagePrete(page, 'reglages');
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher, réglages du planning à valider.');
   const apres = await ouvrirLAccueil(page);
   await expect(apres.locator('summary')).toContainText('4 étapes sur 5 à finir.');
   await expect(apres.locator('li.onboarding-step').first()).toContainText(/Confirmé le .+ : .+, siège de la structure dans Ouvre ta ferme, pris en dernier recours\./);
@@ -91,7 +92,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   await expect(tunnel).toContainText('Classé : abri, proposition confirmée.');
   await page.reload();
   await attendreLaPagePrete(page, 'reglages');
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : sol de 3 parcelles, 4 espèces à rattacher.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : sol de 3 parcelles, 4 espèces à rattacher, réglages du planning à valider.');
   const classes = await ouvrirLAccueil(page);
   await expect(classes.locator('summary')).toContainText('3 étapes sur 5 à finir.');
   await expect(classes.locator('li.onboarding-step').nth(1)).toContainText(/Confirmé le .+ : 2 abris, 2 jardins de plein champ\./);
@@ -129,7 +130,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   }
   await verifierLEtape(page, journal, 'sol des trois parcelles saisi');
   await attendreLaPageIrrigation(page, 'reglages');
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : 4 espèces à rattacher.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : 4 espèces à rattacher, réglages du planning à valider.');
   const fin = await ouvrirLAccueil(page);
   await expect(fin.locator('summary')).toContainText('2 étapes sur 5 à finir.');
   await expect(fin.locator('li.onboarding-step').nth(2)).toContainText(/Confirmé le .+ : sol de 3 parcelles saisi\./);
@@ -173,9 +174,35 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   await expect(page.locator('section.crop-coefficients').getByRole('status')).toHaveText('L’étape « Cultures » est confirmée.');
   await page.reload();
   await attendreLaPagePrete(page, 'reglages');
-  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : réglages du planning à valider.');
   const confirmee = await ouvrirLAccueil(page);
   await expect(confirmee.locator('summary')).toContainText('1 étape sur 5 à finir.');
   await expect(confirmee.locator('li.onboarding-step').nth(3)).toContainText(new RegExp(`Confirmé le .+ : ${nombre - 1} espèces? rattachées? sur 4\\.`));
   await verifierLEtape(page, journal, 'espèces rattachées, étape « Cultures » confirmée');
+
+  // Réglages à relire (F424, F588) : chaque groupe et sa source, « proposé, à ajuster » ; un groupe passé dit ce qu'il
+  // laisse de côté ; le planning attend son groupe validé, et l'étape se confirme quand chaque groupe a sa réponse.
+  await page.locator('.onboarding-unfinished').getByRole('link', { name: 'réglages du planning à valider' }).click();
+  await expect(page).toHaveURL(/#reglages-a-relire$/);
+  await attendreLaPagePrete(page, 'reglages');
+  const relire = page.locator('section.settings-review');
+  const groupes = relire.locator('li.settings-review-group');
+  await expect(groupes.locator('h3')).toHaveText([/^Abris/, /^Calcul du besoin/, /^Sol et surface/, /^Gel/, /^Alerte d’aspersion/, /^Planning/]);
+  await expect(groupes.first()).toContainText('Proposé, à ajuster');
+  await expect(groupes.first()).toContainText('0,8 sous abri, réglable de 0,6 à 1, à confirmer pour chaque abri (CRIIAM, tunnel)');
+  const statut = relire.getByRole('status');
+  await groupes.filter({ hasText: /^Gel/ }).getByRole('button', { name: 'Passer' }).click();
+  await expect(statut).toHaveText('Gel : passé.');
+  await expect(groupes.filter({ hasText: /^Gel/ })).toContainText('Les alertes de gel suivent les valeurs proposées.');
+  for (const nom of ['Abris', 'Calcul du besoin', 'Sol et surface', 'Alerte d’aspersion', 'Planning']) {
+    await relire.getByRole('button', { name: `Valider « ${nom} »` }).click();
+    await expect(statut).toHaveText(`${nom} : validé.`);
+  }
+  await page.reload();
+  await attendreLaPagePrete(page, 'reglages');
+  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
+  const terminee = await ouvrirLAccueil(page);
+  await expect(terminee.locator('summary')).toContainText('Accueil terminé.');
+  await expect(terminee.locator('li.onboarding-step').nth(4)).toContainText(/Confirmé le .+ : 5 groupes validés, 1 groupe passé\./);
+  await verifierLEtape(page, journal, 'réglages relus, accueil terminé');
 });

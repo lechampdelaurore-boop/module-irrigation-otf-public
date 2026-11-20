@@ -75,11 +75,29 @@ async function confirmerLEtapeDesCultures(page: Page): Promise<void> {
   await expect(page.getByText('L’étape « Cultures » est confirmée.')).toBeVisible();
 }
 
-/** Une ferme neuve qui a fait ce que les calculs attendent d'elle : sa commune, ses jardins et l'étape « Cultures » (4.4, F582, F583, F587). */
+/**
+ * Une ferme neuve valide les réglages du planning (4.4, F424, F588) : sans
+ * eux, aucun planning. Seulement quand le bandeau le demande : le Planning
+ * est coché.
+ */
+async function validerLesReglagesDuPlanning(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  const lien = page.locator('.onboarding-unfinished').getByRole('link', { name: 'réglages du planning à valider' });
+  if (await lien.count() === 0) return;
+  await lien.click();
+  await expect(page).toHaveURL(/#reglages-a-relire$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Valider « Planning »' }).click();
+  await expect(page.locator('section.settings-review').getByRole('status')).toHaveText('Planning : validé.');
+}
+
+/** Une ferme neuve qui a fait ce que les calculs attendent d'elle : sa commune, ses jardins, l'étape « Cultures » et les réglages du planning (4.4, F582, F583, F587, F588). */
 export async function preparerLaFermeNeuve(page: Page): Promise<void> {
   await choisirLeSiegeCommeCommune(page);
   await classerLesJardinsCommeProposes(page);
   await confirmerLEtapeDesCultures(page);
+  await validerLesReglagesDuPlanning(page);
 }
 
 /** L'écran de la première ouverture, prêt à répondre. */
