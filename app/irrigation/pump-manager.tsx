@@ -13,6 +13,7 @@ import {
   setPumpArchivedAction,
   type PumpActionResult,
 } from './pump-actions';
+import { countText } from '@/lib/domain/clock-text';
 
 const flow = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 });
 
@@ -78,7 +79,7 @@ export function PumpManager({
         <div className="pump-card-title"><div><strong>{pump.name}</strong><span>{pump.status === 'active' ? 'Active' : 'Archivée'}</span></div><button type="button" onClick={() => setEditor(pump)}>Modifier</button></div>
         <dl><dt>Débit maximal</dt><dd>{flow.format(pump.maximumFlowCubicMetersPerHour)} m³/h</dd><dt>Origine par défaut</dt><dd>{sourceName(pump, true)}</dd><dt>Origines possibles</dt><dd>{sourceName(pump)}</dd></dl>
         {pump.notes ? <p>{pump.notes}</p> : null}
-        {conflicts.conflictingEventEquipmentIds.length ? <p className="pump-conflict"><strong>{conflicts.conflictingEventEquipmentIds.length} planification(s) à vérifier.</strong> Le débit cumulé atteint {flow.format(conflicts.maximumFlowCubicMetersPerHour)} m³/h pour une capacité de {flow.format(pump.maximumFlowCubicMetersPerHour)} m³/h.</p> : null}
+        {conflicts.conflictingEventEquipmentIds.length ? <p className="pump-conflict"><strong>{countText(conflicts.conflictingEventEquipmentIds.length, 'planification')} à vérifier.</strong> Le débit cumulé atteint {flow.format(conflicts.maximumFlowCubicMetersPerHour)} m³/h pour une capacité de {flow.format(pump.maximumFlowCubicMetersPerHour)} m³/h.</p> : null}
         <button className="pump-archive" type="button" disabled={pending} onClick={() => run(() => setPumpArchivedAction({ pumpId: pump.id, archived: pump.status === 'active' }))}>{pump.status === 'active' ? 'Archiver' : 'Réactiver'}</button>
       </article>; })}
       {dashboard.pumps.length === 0 ? <p className="pump-empty"><strong>Aucune pompe configurée.</strong> Les irrigations restent possibles ; leur faisabilité hydraulique n’est simplement pas vérifiée.</p> : null}

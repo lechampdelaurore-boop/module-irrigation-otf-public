@@ -36,6 +36,15 @@ test('« Retirer la mesure » se distingue d’« Enregistrer » et s’en écar
   await pluie.scrollIntoViewIfNeeded();
   const enregistrer = pluie.getByRole('button', { name: 'Enregistrer', exact: true });
   const retirer = pluie.getByRole('button', { name: 'Retirer la mesure' });
+  // Sans mesure, « Retirer la mesure » est indisponible (lot K, F471) : une mesure posée le temps du parcours, retirée à la fin.
+  const millimetres = pluie.getByLabel('Millimètres');
+  const avant = await millimetres.inputValue();
+  if (avant === '') {
+    await millimetres.fill('0');
+    await enregistrer.click();
+    await expect(pluie.locator('.action-reply .water-notice')).toHaveText('La pluie mesurée a été enregistrée.');
+  }
+  await expect(retirer).toBeEnabled();
   await expect(enregistrer).toHaveCSS('background-color', 'rgb(11, 105, 77)');
   await expect(retirer).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(retirer).toHaveCSS('color', 'rgb(143, 29, 42)');
@@ -44,6 +53,11 @@ test('« Retirer la mesure » se distingue d’« Enregistrer » et s’en écar
   const [a, b] = await Promise.all([enregistrer.boundingBox(), retirer.boundingBox()]);
   const ecart = telephone ? b!.y - (a!.y + a!.height) : b!.x - (a!.x + a!.width);
   expect(Math.round(ecart), '« Retirer la mesure » écarté d’« Enregistrer »').toBeGreaterThanOrEqual(ECART_DES_GESTES_PX);
+  if (avant === '') {
+    await retirer.click();
+    await expect(pluie.locator('.action-reply .water-notice')).toContainText('retirée');
+    await expect(retirer).toBeDisabled();
+  }
   await verifierLEtape(page, journal, '« Retirer la mesure » en contour rouge, écarté');
 });
 

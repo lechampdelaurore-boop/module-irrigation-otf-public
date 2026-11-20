@@ -120,7 +120,7 @@ test('scénario 5 : trois jours de gel font une seule notification qui nomme lun
   const notification = weatherAlertNotification(FROST, evaluation.crossings);
   assert.deepEqual(notification, {
     title: 'Alerte météo',
-    body: 'Température minimale prévue 2 °C lundi 2 novembre, et 2 autres jours (seuil : sous 5 °C). Prévision du 2 novembre, 06 h 15.',
+    body: 'Température minimale prévue 2 °C lundi 2 novembre, et 2 autres jours (seuil : sous 5 °C). Prévision du 2 novembre, 6 h 15.',
     tag: 'weather-alert:critere-gel:v1:2026-11-02',
     url: '/irrigation/alertes-meteo?season=2026&week=2026-11-02',
   });
@@ -173,7 +173,7 @@ test('la notification de pluie et de chaleur dit « prévue », le seuil et l’
   const notification = weatherAlertNotification(rain, [{ date: '2026-11-05', value: 24.4, forecastedAt: MORNING_READ }]);
   assert.deepEqual(notification, {
     title: 'Alerte météo · Forte pluie',
-    body: 'Pluie prévue 24,4 mm jeudi 5 novembre (seuil : au-dessus de 20 mm). Prévision du 2 novembre, 06 h 15.',
+    body: 'Pluie prévue 24,4 mm jeudi 5 novembre (seuil : au-dessus de 20 mm). Prévision du 2 novembre, 6 h 15.',
     tag: 'weather-alert:pluie:v3:2026-11-05',
     url: '/irrigation/alertes-meteo?season=2026&week=2026-11-02',
   });
@@ -207,7 +207,7 @@ test('la notification passe les contrôles du Worker Web Push, même au plus lon
 
 test('l’heure de la prévision est celle de la ferme, en été comme en hiver', () => {
   const summer = weatherAlertNotification(FROST, [{ date: '2026-07-01', value: 4, forecastedAt: '2026-07-01T04:15:00.000Z' }]);
-  assert.match(summer?.body ?? '', /Prévision du 1 juillet, 06 h 15\.$/);
+  assert.match(summer?.body ?? '', /Prévision du 1 juillet, 6 h 15\.$/);
 });
 
 test('le clic ouvre la semaine du jour visé, saison comprise, y compris à cheval sur deux années', () => {

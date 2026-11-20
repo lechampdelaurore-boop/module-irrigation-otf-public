@@ -51,7 +51,7 @@
   border-left: 3px solid var(--line-strong);
   background: var(--sheet);
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-12);
 }
 
 .irrigation-dialog-backdrop {
@@ -83,7 +83,7 @@
 .irrigation-dialog > p:not(.eyebrow) {
   margin: 10px 0 18px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   line-height: 1.5;
 }
 

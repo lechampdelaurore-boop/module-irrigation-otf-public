@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition, type ReactNode } from 'reac
 import type { SeriesWaterDashboard } from '@/lib/services/series-water-service';
 import { loadSeriesWaterAction } from './irrigation-history-actions';
 import { SeriesCropWaterPanel } from './crop-water/series-crop-water-panel';
+import { countText } from '@/lib/domain/clock-text';
 
 type Report = Extract<SeriesWaterDashboard, { available: true }>['report'];
 type SeriesSummary = Report['series'][number];
@@ -137,7 +138,7 @@ function SeriesCard({ item, season, cropWater }: { item: SeriesSummary; season: 
           <Detail label="Statut" value={item.occupation.status === 'ongoing' ? 'En cours' : 'Terminée'} />
           <Detail label="Surface occupée" value={item.areaSquareMeters === null ? 'Inconnue — largeur de planche manquante, pas de moyenne' : `${numberFormatter.format(item.areaSquareMeters)} m²`} />
           <Detail label="Volume d’irrigation" value={`${volumeText(item.irrigationCubicMeters)}${item.irrigationVolumeIncomplete ? ' — incomplet, surface mouillée inconnue' : ''}`} />
-          <Detail label="Pluie réelle" value={item.rainAvailability.complete ? `${numberFormatter.format(item.rainMm ?? 0)} mm` : `Indisponible — ${item.rainAvailability.availableDays}/${item.rainAvailability.totalDays} jour(s)`} />
+          <Detail label="Pluie réelle" value={item.rainAvailability.complete ? `${numberFormatter.format(item.rainMm ?? 0)} mm` : `Indisponible — ${item.rainAvailability.availableDays} sur ${countText(item.rainAvailability.totalDays, 'jour')}`} />
           <Detail label="Objectif restant" value={item.objectiveRemainingMm === null ? '—' : `${numberFormatter.format(item.objectiveRemainingMm)} mm jusqu’à la dernière récolte attendue`} />
         </dl>
         <table className="series-beds">
