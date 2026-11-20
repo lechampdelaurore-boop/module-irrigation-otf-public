@@ -39,6 +39,7 @@ import {
 import { weekStartDateKey } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
 import { readWeatherPreference } from './weather-preference';
+import { countText } from '../domain/clock-text.ts';
 
 export type IrrigationHistoryDashboard = {
   season: number;
@@ -242,12 +243,12 @@ function historyWarnings(summary: IrrigationHistorySummary) {
   if (!summary.actualRainAvailability.complete) {
     warnings.push(summary.actualRainAvailability.availableDays === 0
       ? 'La pluie réelle est indisponible sur cette période. L’écart à l’objectif ne peut pas être calculé.'
-      : `La pluie réelle n’est disponible que pour ${summary.actualRainAvailability.availableDays} jour(s) sur ${summary.actualRainAvailability.totalDays}. L’écart à l’objectif reste indisponible.`);
+      : `La pluie réelle n’est disponible que pour ${countText(summary.actualRainAvailability.availableDays, 'jour')} sur ${summary.actualRainAvailability.totalDays}. L’écart à l’objectif reste indisponible.`);
   }
   if (!summary.et0Availability.complete) {
     warnings.push(summary.et0Availability.availableDays === 0
       ? 'L’ET0 est indisponible sur cette période.'
-      : `L’ET0 n’est disponible que pour ${summary.et0Availability.availableDays} jour(s) sur ${summary.et0Availability.totalDays}.`);
+      : `L’ET0 n’est disponible que pour ${countText(summary.et0Availability.availableDays, 'jour')} sur ${summary.et0Availability.totalDays}.`);
   }
   // Une couverture partielle n'est pas une donnée manquante (D-036) : la carte
   // « Objectif » affiche le nombre de journées-planche couvertes.

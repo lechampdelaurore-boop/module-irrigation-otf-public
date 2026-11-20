@@ -10,6 +10,7 @@ import {
   type ProtectedSlotVersion,
   type Weekday,
 } from './protected-slots.ts';
+import { clockFromMinutes } from '../clock-text.ts';
 
 /**
  * L'écran des créneaux protégés (docs/protected-slots-contract.md, section 7
@@ -47,7 +48,7 @@ export function protectedSlotDaysLabel(weekdays: readonly Weekday[]): string {
 
 /** « de 21:00 à 23:00 » ; une fin avant le début passe minuit (règle 3) : « de 22:00 à 02:00 le lendemain ». */
 export function protectedSlotHoursLabel(slot: Pick<ProtectedSlot, 'startMinute' | 'endMinute'>): string {
-  const hours = `de ${timeInputFromMinutes(slot.startMinute)} à ${timeInputFromMinutes(slot.endMinute)}`;
+  const hours = `de ${clockFromMinutes(slot.startMinute)} à ${clockFromMinutes(slot.endMinute)}`;
   return slot.endMinute < slot.startMinute ? `${hours} le lendemain` : hours;
 }
 

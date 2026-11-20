@@ -1,4 +1,6 @@
 'use client';
+import { useEffect, useRef } from 'react';
+import { fitGardenLabels } from './fit-labels';
 import type { OutlinePosition, Plot, Zone } from '@/lib/domain/domain';
 import { svgOutlinePath, svgProjection, type SvgProjection } from '@/lib/domain/satellite-view/svg-drawing';
 import type { SatelliteView } from '@/lib/domain/satellite-view/view';
@@ -26,6 +28,16 @@ function labelStyle(position: OutlinePosition, projection: SvgProjection) {
  * la liste à côté reste l'alternative au clavier et au lecteur d'écran.
  */
 export function SatelliteSvgDrawing({ zone, plots, view, highlightedPlotId, onSelectGarden }: Props) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Les noms qui se chevauchent deviennent des numéros, recalculés quand le dessin change de taille (lot K, n° 16, F468).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    fitGardenLabels(root);
+    const observer = new ResizeObserver(() => fitGardenLabels(root));
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [view]);
   if (view.framing === null) return null;
   const projection = svgProjection(view.framing);
   const ratio = projection.width / Math.max(projection.height, 1);
@@ -34,6 +46,7 @@ export function SatelliteSvgDrawing({ zone, plots, view, highlightedPlotId, onSe
   );
   return (
     <div
+      ref={rootRef}
       className="satellite-svg"
       style={{
         aspectRatio: `${projection.width} / ${Math.max(projection.height, 1)}`,
@@ -61,11 +74,15 @@ export function SatelliteSvgDrawing({ zone, plots, view, highlightedPlotId, onSe
         ) : null}
       </svg>
       {/* Le nom de la parcelle est le titre du bloc : seuls les jardins portent le leur (F270). */}
-      {view.gardens.map((garden) =>
+      {view.gardens.map((garden, index) =>
         garden.labelAt ? (
           <span
             key={garden.plotId}
             className="satellite-label"
+            data-plot-id={garden.plotId}
+            data-name={garden.name}
+            data-number={index + 1}
+            title={garden.name}
             data-mode={garden.mode}
             data-highlighted={garden.plotId === highlightedPlotId}
             style={labelStyle(garden.labelAt, projection)}

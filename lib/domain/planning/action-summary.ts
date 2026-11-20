@@ -156,7 +156,10 @@ type UnplacedGroup = {
   /**
    * Aucune de ses planches ne garde de manque (« Sans objectif ») : un groupe
    * dit en simple information, en dernier, jamais compté en rouge (audit
-   * final, lot B, J7, F251 et F252).
+   * final, lot B, J7, F251 et F252). De même pour les planches qui n'ont
+   * pour motif que leur besoin sous la dose minimale : elles attendent qu'il
+   * grandisse, ce n'est pas un manque d'eau (audit du 19 novembre 2026,
+   * lot K, n° 17, F463).
    */
   informational: boolean;
 };
@@ -171,6 +174,11 @@ export type UnplacedGroups = {
   /** Tous les groupes, celui des planches sans matériel compris, le plus gros d'abord. */
   groups: UnplacedGroup[];
 };
+
+/** Une planche dont le seul motif est un besoin sous la dose minimale : elle attend qu'il grandisse (F463). */
+function waitsToGrow(bed: Pick<PlanBedOutcome, 'reasons'>): boolean {
+  return bed.reasons.length > 0 && bed.reasons.every((reason) => reason === 'below-minimum-dose');
+}
 
 /**
  * Le motif qui range une planche : son premier motif, celui que le moteur
@@ -202,7 +210,7 @@ export function unplacedGroups(beds: readonly PlanBedOutcome[]): UnplacedGroups 
   }
   const order = Object.keys(GROUP_TITLES) as UnplacedGroupKey[];
   // Un groupe sans manque se dit pour information ; les planches sans matériel, un réglage à faire, jamais (cas 2).
-  const informational = (key: UnplacedGroupKey, grouped: readonly PlanBedOutcome[]) => key !== 'no-equipment' && grouped.every((bed) => bed.deficitMm < NEGLIGIBLE_DEFICIT_MM);
+  const informational = (key: UnplacedGroupKey, grouped: readonly PlanBedOutcome[]) => key !== 'no-equipment' && grouped.every((bed) => bed.deficitMm < NEGLIGIBLE_DEFICIT_MM || waitsToGrow(bed));
   // Les groupes sans manque passent en dernier (F252) ; sinon, le plus gros d'abord, puis l'ordre des motifs.
   const groups = [...byKey.entries()]
     .sort(([leftKey, left], [rightKey, right]) => Number(informational(leftKey, left)) - Number(informational(rightKey, right)) || right.length - left.length || order.indexOf(leftKey) - order.indexOf(rightKey))
@@ -221,18 +229,40 @@ export function unplacedTileDetail(groups: UnplacedGroups, bedsWithDeficit: numb
 }
 
 function deficitTileDetail(groups: UnplacedGroups, bedsWithDeficit: number): string {
-  if (!groups.noEquipment) return `${bedsWithDeficit} avec un manque chiffré`;
+  // Les planches en attente gardent un petit manque, qui n'en est pas un : hors du compte (F463).
+  const waiting = waitingBedCount(groups);
+  if (!groups.noEquipment) return `${Math.max(0, bedsWithDeficit - waiting)} avec un manque chiffré`;
   const others = groups.groups
     .filter((group) => group.key !== 'no-equipment')
-    .reduce((count, group) => count + group.beds.filter((bed) => bed.deficitMm >= NEGLIGIBLE_DEFICIT_MM).length, 0);
+    .reduce((count, group) => count + (group.informational ? 0 : group.beds.filter((bed) => bed.deficitMm >= NEGLIGIBLE_DEFICIT_MM).length), 0);
   const withoutEquipment = `dont ${groups.noEquipment.count} sans matériel`;
   return others === 0 ? withoutEquipment : `${withoutEquipment} · ${plural(others, 'autre', 'autres')} avec un manque chiffré`;
 }
 
-/** « · 5 sans objectif, pour information » : les planches sans manque, dites à part, jamais en rouge (F251). */
+/**
+ * « · 5 sans objectif, pour information » : les planches sans manque, dites
+ * à part, jamais en rouge (F251) ; « · 2 en attente d'un besoin plus grand,
+ * pour information » pour celles dont le besoin est sous la dose minimale
+ * (F463).
+ */
 function informationalText(groups: UnplacedGroups): string {
-  const count = informationalBedCount(groups);
-  return count === 0 ? '' : ` · ${count} sans objectif, pour information`;
+  const parts = informationalParts(groups);
+  return parts.length === 0 ? '' : ` · ${parts.join(' et ')}, pour information`;
+}
+
+/** Les planches pour information, sans objectif puis en attente, en mots. */
+function informationalParts(groups: UnplacedGroups): string[] {
+  const waiting = waitingBedCount(groups);
+  const noObjective = informationalBedCount(groups) - waiting;
+  const parts: string[] = [];
+  if (noObjective > 0) parts.push(`${noObjective} sans objectif`);
+  if (waiting > 0) parts.push(`${waiting} en attente d’un besoin plus grand`);
+  return parts;
+}
+
+/** Les planches des groupes pour information qui attendent que leur besoin grandisse (F463). */
+export function waitingBedCount(groups: UnplacedGroups): number {
+  return groups.groups.reduce((count, group) => count + (group.informational ? group.beds.filter(waitsToGrow).length : 0), 0);
 }
 
 /**
@@ -255,6 +285,8 @@ export const UNPLACED_GROUP_MEANING: Partial<Record<UnplacedGroupKey, string>> =
   'no-equipment': 'Aucun matériel posé ne les arrose : c’est un réglage à faire dans « Matériel », pas un manque d’eau.',
   // Pour information : ces planches n'ont rien à recevoir cette semaine (audit final, lot B, J7, F252).
   'no-objective': 'Aucun objectif ne s’applique à elles cette semaine : rien à leur donner, pour information.',
+  // Pour information : un besoin sous la dose minimale attend qu'il grandisse, ce n'est pas un manque d'eau (lot K, n° 17, F463).
+  'below-minimum-dose': 'Leur besoin est encore sous la dose minimale d’un arrosage : elles attendent qu’il grandisse. Ce n’est pas un manque d’eau, pour information.',
   'water-budget': 'Le stock et les ressources ne suffisent pas d’ici dimanche.',
   // Sous le report, la file n'avance qu'au calcul qui suit un événement (décision 4 de la 3.9, D-052).
   deferred: 'Elles passent en tête au calcul qui suit un événement : un arrosage validé ou fait, de l’eau nouvelle, un stock corrigé. Recalculer sans événement ne change pas leur tour.',
