@@ -6819,7 +6819,7 @@ dont l'état se calcule sur la dernière réussite.
    réanalyse se comptent à part ; trois exécutions manquées de suite font
    une panne ; une tâche sans réussite est « jamais réussie », en orange.
 4. Les exécutions se gardent dans `irrigation_background_jobs`, ligne
-   `task:<tâche>` ; la migration 0034, additive, ajoute le compte des
+   `task:<tâche>` ; la migration 0037, additive, ajoute le compte des
    échecs et « en panne depuis ». Le résumé d'un échec ne porte que des
    nombres et des classes d'erreur.
 5. Tout déclencheur planifié s'inscrit au registre : un test lit les
@@ -6850,7 +6850,7 @@ l'exploitant, et une page d'état qui lui est réservée.
    une alerte quand une tâche est en retard, en panne ou jamais réussie ;
    « tout va bien » le dimanche ; rien sinon. Une notification par jour de
    Paris au plus, prise avant l'envoi et rendue s'il échoue (migration
-   0035, table commune).
+   0038, table commune).
 3. La notification nomme les tâches, la plus grave d'abord, avec depuis
    quand, dans les limites du service (titre de 80 caractères, texte de
    160) ; la veille ne se nomme pas elle-même.
@@ -6882,7 +6882,7 @@ qui échoue si un journal porte une valeur sensible.
 
 1. Chaque essai envoyé à OTF est compté pour sa ferme, par heure pleine et
    par résultat (réussi, 401, 403, 429, 5xx, autre refus, délai dépassé,
-   réseau), huit jours (migration 0036, table commune) ; un échec se
+   réseau), huit jours (migration 0039, table commune) ; un échec se
    journalise sous le nom stable `otf_call_failed`, avec ses seuls champs,
    jamais l'adresse, la ferme ni le jeton. La dernière lecture complète de
    chaque ferme est gardée.
@@ -7057,7 +7057,7 @@ encore.
    l'écran figé, l'oubli des abonnements de notification et l'effacement
    immédiat ensuite, après la chaîne de la 4.4. Sans la seconde partie,
    aucune demande ne naît en production.
-2. La note de la demande (`irrigation_farm_erasures`, migration 0037) :
+2. La note de la demande (`irrigation_farm_erasures`, migration 0040) :
    l'identifiant interne de l'espace, l'état et des heures ; ni nom, ni
    personne, ni ferme, ni contenu ; sans clé étrangère.
 3. Un plan qui range chaque table de la base, une fois : effacée avec
@@ -7198,7 +7198,7 @@ l'API de Cloudflare. Rien de cela n'existait.
 
 **Décision.** Section 10 bis.21 du contrat de la Tranche 4 (F660 à F664) :
 
-1. Une migration (0038, numéro provisoire), deux tables communes : le
+1. Une migration (0041), deux tables communes : le
    journal d'accès du support et le relevé des coûts du mois.
 2. Une note d'accès : le jour, la ferme, la raison en une ligne, jamais ce
    qui a été vu ; 12 mois, puis la purge du matin ; partie avec le dernier

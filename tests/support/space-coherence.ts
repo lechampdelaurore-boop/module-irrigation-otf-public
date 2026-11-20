@@ -35,8 +35,8 @@ type Reference = {
  * raccordement d'une ferme à OTF (migration 0033, F403) a pour clé la ferme,
  * et se lit par la personne et la ferme ensemble, l'espace lui-même ; il ne
  * désigne aucune ligne d'un espace. La notification du jour de la veille de
- * l'exploitant (migration 0035, F609) : un genre, un nombre et des heures.
- * Le journal d'accès du support (migration 0038, F660) note une ferme d'OTF,
+ * l'exploitant (migration 0038, F609) : un genre, un nombre et des heures.
+ * Le journal d'accès du support (migration 0041, F660) note une ferme d'OTF,
  * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
  * coûts du mois (F662), des nombres du déploiement.
  */

@@ -382,7 +382,7 @@ registres, elle y renvoie.
   dans `lib/domain/operations/task-registry.ts` avec leur rythme et leurs
   seuils (orange à 26 heures, rouge à 36, ou trois échecs de suite ;
   « jamais réussie » en orange) ; chaque matin enregistre une exécution par
-  tâche (migration 0034, additive), la réanalyse à part des prévisions ;
+  tâche (migration 0037, additive), la réanalyse à part des prévisions ;
   un test échoue pour tout déclencheur planifié absent du registre, règle
   écrite dans `AGENTS.md` (F569). Rien ne change à l'écran ; la page
   d'état et la veille viennent avec la PR 2. Contrôles de la PR :
@@ -404,7 +404,7 @@ registres, elle y renvoie.
   à l'exploitant (les espaces de la ferme du déploiement, sans appel à
   OTF) quand une tâche est en retard, en panne ou jamais réussie, qui dit
   laquelle et depuis quand ; « tout va bien » le dimanche ; une
-  notification par jour au plus (migration 0035, additive). La veille est
+  notification par jour au plus (migration 0038, additive). La veille est
   elle-même une tâche du registre. La page « État du module »
   (`/irrigation/exploitation`), réservée à l'exploitant côté serveur, dit
   en une ligne si tout va bien, puis l'état de chaque tâche ; parcours
@@ -428,7 +428,7 @@ registres, elle y renvoie.
   complète, sa dernière météo et son dernier calcul du matin, jugés avec
   les seuils du registre ; le jugement d'ensemble compte les fermes.
   Chaque appel envoyé à OTF est compté par ferme et par heure (migration
-  0036, additive), et chaque échec se journalise sous le nom stable
+  0039, additive), et chaque échec se journalise sous le nom stable
   `otf_call_failed`, sans adresse, ferme ni jeton. Un garde lit chaque
   ligne écrite pendant `pnpm test`, même d'une console remplacée, et fait
   échouer le fichier pour un jeton, un code d'autorisation, une adresse de
@@ -516,8 +516,7 @@ registres, elle y renvoie.
 - Tranche 4, **4.5, PR 3 sur 5, première partie : codée le 20 novembre
   2026** (D-246, F640 à F648, section 10 bis.17 de
   `docs/tranche-4-contract.md`). Le moteur de l'effacement d'une ferme :
-  une table des demandes (migration 0037, numéro provisoire, à renuméroter
-  après la 4.4), sept jours d'attente pendant lesquels l'espace est figé,
+  une table des demandes (migration 0040), sept jours d'attente pendant lesquels l'espace est figé,
   puis, le premier matin après, la tâche « farm-erasure » efface par lots
   de 200 lignes tout ce que l'espace garde, table par table, et l'espace
   lui-même en dernier ; un passage s'arrête à 300 instructions ou 20
@@ -577,7 +576,7 @@ registres, elle y renvoie.
   vu ; 12 mois, puis la purge du matin ; effacé avec la ferme) et les coûts
   du mois, recopiés à la main du tableau de bord de Cloudflare et comparés
   à ce que l'offre inclut ; la page n'appelle jamais Cloudflare. Migration
-  0038, au numéro provisoire. La page de confidentialité dit le journal
+  0041. La page de confidentialité dit le journal
   (relue avec la deuxième partie). À fusionner après la deuxième partie.
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
