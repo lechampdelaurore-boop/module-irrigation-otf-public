@@ -147,7 +147,7 @@ test('un espace d’avant l’accueil qui change de commune reste d’avant l’
 test('le bandeau « À finir » nomme la commune seulement quand une case lit la météo, et part quand elle est choisie', async () => {
   await ensureWorkspaceForUser(ALICE);
   const before = await getOnboardingForUser(ALICE);
-  assert.deepEqual(unfinishedSteps(before, { weather: true, plotsToClassify: 0 }), [{ id: 'location', text: 'commune de la ferme', anchor: 'water-weather-title' }]);
+  assert.deepEqual(unfinishedSteps(before, { weather: true, plotsToClassify: 0 }), [{ id: 'location', text: 'commune de la ferme', page: 'reglages', anchor: 'water-weather-title' }]);
   assert.deepEqual(unfinishedSteps(before, { weather: false, plotsToClassify: 0 }), []);
   await saveWeatherPreferenceForUser(ALICE, { locationMode: 'custom', customCity: 'Tronget', customPostcode: '03240' });
   assert.deepEqual(unfinishedSteps(await getOnboardingForUser(ALICE), { weather: true, plotsToClassify: 0 }), []);

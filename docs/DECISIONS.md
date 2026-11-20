@@ -6660,3 +6660,34 @@ plein champ dans OTF recevait la pluie.
 
 Ne change pas : aucun chiffre d'un espace existant ; K_abri et toute valeur
 agronomique ; aucun appel nouveau à OTF. Aucune question de budget.
+
+## D-225 — Tranche 4, sous-tranche 4.4, PR 3 : le sol, la texture qui propose TEW et REW
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le formulaire du sol d'une parcelle préremplissait TEW 14 mm
+et REW 7 mm, dits d'un « limon sableux » (D-053) : une ferme neuve qui
+saisissait sa RFU les enregistrait sans le voir (défaut n° 4).
+
+**Décision** (F584, section 8 bis.12 du contrat).
+
+1. Pour un espace qui fait l'accueil, une parcelle sans sol n'a ni TEW ni
+   REW préremplis ; la part de référence 2/3 et Ze 10 cm restent proposées,
+   dites « proposées, à ajuster ».
+2. La texture du sol, parmi les neuf classes du tableau 19 de la FAO-56,
+   propose TEW et REW au milieu de leur fourchette, arrondi au
+   demi-millimètre, la fourchette et la source dites à côté (F428,
+   réponse 1) ; la personne ajuste. Valeurs lues dans un résumé de la
+   source, à relire par le porteur.
+3. La texture choisie est gardée avec la saisie (`texture`, migration
+   0036), pour dire d'où viennent TEW et REW ; aucun calcul ne la lit.
+4. L'étape « Sol » est confirmée par la saisie qui donne son sol à la
+   dernière parcelle de la saison ; bandeau « À finir : sol de N
+   parcelles », vers la page « Réserve du sol ».
+5. La texture d'OTF (`System.soil`) attend l'accès d'OTF (PR 3b, avec la
+   2c).
+
+Ne change pas : les valeurs de départ d'un espace d'avant l'accueil et de la
+démonstration (TEW 14 / REW 7 gardés ; la liste des textures s'ajoute à leur
+formulaire sans rien remplir) ; aucun calcul ; aucun appel nouveau à OTF.
+Aucune question de budget.

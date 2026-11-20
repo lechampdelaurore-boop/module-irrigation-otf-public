@@ -13,12 +13,14 @@ const TONE_WORDS = { confirmed: 'Confirmé', skipped: 'Passé', missing: 'À fai
  * météo, plus haut (PR 2, F582). Absent de la
  * démonstration, dont les fermes fictives sont déjà réglées.
  */
-export function OnboardingSettings({ onboarding, locationHere, plotsHere }: {
+export function OnboardingSettings({ onboarding, locationHere, plotsHere, soilHref }: {
   onboarding: ResolvedOnboarding;
   /** Le lieu de la météo est sur cette page (une case cochée lit la météo) : l'étape « Où est la ferme » y mène (F582). */
   locationHere: boolean;
   /** « Parcelles et abris » est sur cette page : l'étape y mène (F583). */
   plotsHere: boolean;
+  /** Où saisir le sol de la première parcelle qui n'en a pas, sur la page « Réserve du sol » (F584) ; `null` : rien à y faire. */
+  soilHref: string | null;
 }) {
   if (onboarding.kind === 'demonstration') return null;
   const lines = onboarding.steps.map(verificationLine);
@@ -39,6 +41,7 @@ export function OnboardingSettings({ onboarding, locationHere, plotsHere }: {
                 <span>{line.text}</span>
                 {line.id === 'location' && line.tone === 'missing' && locationHere ? <a href="#water-weather-title">Choisir la commune</a> : null}
                 {line.id === 'plots' && line.tone === 'missing' && plotsHere ? <a href="#parcelles-et-abris">Classer les jardins</a> : null}
+                {line.id === 'soil' && line.tone === 'missing' && soilHref ? <a href={soilHref}>Saisir le sol</a> : null}
               </li>
             ))}
           </ol>

@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 3)
+
+- **Le sol, d'après sa texture** (D-225) : une nouvelle ferme n'a plus,
+  en silence, l'eau évaporable d'un limon sableux dans le formulaire du
+  sol. Elle choisit la texture de chaque parcelle parmi les neuf du
+  tableau 19 de la FAO-56 ; le module propose l'eau évaporable (TEW) et
+  l'eau facilement évaporable (REW) au milieu de leur fourchette, qu'il
+  dit à côté, et la personne les ajuste. La texture est gardée avec le
+  sol. Tant qu'une parcelle n'a pas de sol, chaque page le rappelle
+  (« À finir : sol de 3 parcelles. »). Les fermes qui utilisaient déjà
+  le module gardent leurs valeurs ; la liste des textures s'ajoute à leur
+  formulaire.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 2b)
 
 - **Parcelles et abris, classés par la personne** (D-224) : une nouvelle

@@ -10,7 +10,8 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, surveillerL
  * nouvelles fermes : ses cinq étapes sont confirmées, « réglage d'avant
  * l'accueil, gardé tel quel », comme la migration 0034 l'a fait pour les
  * espaces réels. Une ferme neuve a ses cinq étapes à faire, dites en rouge
- * et en mots.
+ * et en mots ; elle choisit sa commune (F582), classe ses jardins (F583) et
+ * saisit le sol de ses parcelles, la texture proposant TEW et REW (F584).
  */
 
 const ETAPES = ['Où est la ferme', 'Parcelles et abris', 'Sol', 'Cultures', 'Réglages à relire'];
@@ -40,7 +41,7 @@ test('une ferme d’avant la 4.4 lit que ses réglages sont gardés tels quels',
   await verifierLEtape(page, journal, 'accueil d’avant la 4.4');
 });
 
-test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, puis classer ses jardins, confirme les deux premières', async ({ page, context }, testInfo) => {
+test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer ses jardins, puis saisir le sol de ses parcelles confirme les trois premières', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'accueil');
   await attendreLaPageIrrigation(page, 'reglages');
@@ -54,7 +55,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, puis cla
     await expect(etapes.nth(index)).toContainText('À faire.');
   }
   // L'étape de la commune mène au lieu de la météo ; le siège n'y est pas pris en silence (F419, F582).
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles.');
   await expect(page.locator('#water-weather-title').locator('xpath=ancestor::section[1]')).toContainText('Choisissez la commune de votre ferme : tant qu’elle n’est pas choisie, ni météo, ni gel, ni ET0.');
   await etapes.first().getByRole('link', { name: 'Choisir la commune' }).click();
   await expect(page).toHaveURL(/#water-weather-title$/);
@@ -64,7 +65,7 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, puis cla
   await expect(page.getByText('La commune du siège OTF est utilisée, en dernier recours.')).toBeVisible();
   await page.reload();
   await attendreLaPagePrete(page, 'reglages');
-  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : 4 jardins à classer.');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : 4 jardins à classer, sol de 3 parcelles.');
   const apres = await ouvrirLAccueil(page);
   await expect(apres.locator('summary')).toContainText('4 étapes sur 5 à finir.');
   await expect(apres.locator('li.onboarding-step').first()).toContainText(/Confirmé le .+ : .+, siège de la structure dans Ouvre ta ferme, pris en dernier recours\./);
@@ -87,9 +88,47 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, puis cla
   await expect(tunnel).toContainText('Classé : abri, proposition confirmée.');
   await page.reload();
   await attendreLaPagePrete(page, 'reglages');
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : sol de 3 parcelles.');
+  const classes = await ouvrirLAccueil(page);
+  await expect(classes.locator('summary')).toContainText('3 étapes sur 5 à finir.');
+  await expect(classes.locator('li.onboarding-step').nth(1)).toContainText(/Confirmé le .+ : 2 abris, 2 jardins de plein champ\./);
+  await verifierLEtape(page, journal, 'jardins classés');
+
+  // Le sol (F421, F584) : l'étape mène à la page « Réserve du sol », sur la première parcelle sans sol ; ni TEW ni REW
+  // préremplis, la texture les propose (FAO-56, tableau 19), et le sol de chaque parcelle confirme l'étape.
+  await classes.locator('li.onboarding-step').nth(2).getByRole('link', { name: 'Saisir le sol' }).click();
+  await attendreLaPagePrete(page, 'sol');
+  await expect(page).toHaveURL(/\/irrigation\/sol\?season=\d{4}#soil-parcel-zone-pres$/);
+  await expect(page.locator('details.soil-settings')).toHaveJSProperty('open', true);
+  for (const [index, parcelle] of ['Les Prés', 'Le Coteau', 'Sous le verger'].entries()) {
+    const sol = page.getByRole('region', { name: `Sol · ${parcelle}` });
+    const formulaire = sol.getByRole('group', { name: 'Enregistrer le sol de la parcelle' });
+    const pli = sol.locator('details.soil-record-fold').first();
+    if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) await pli.locator('summary').click();
+    const enregistrer = formulaire.getByRole('button', { name: 'Enregistrer le sol de la parcelle' });
+    if (index === 0) {
+      await expect(formulaire.getByLabel('Eau évaporable TEW (mm)')).toHaveValue('');
+      await expect(formulaire.getByLabel('Eau facilement évaporable REW (mm)')).toHaveValue('');
+      await expect(formulaire).toContainText('Part de référence 2/3 (CRIIAM) et couche de surface Ze 10 cm (FAO-56) : proposées, à ajuster.');
+    }
+    await expect(async () => {
+      await formulaire.getByLabel('RFU du laboratoire (mm/m)').fill('');
+      await formulaire.getByLabel('RFU du laboratoire (mm/m)').fill('62');
+      await formulaire.getByLabel('Texture du sol').selectOption('sandy-loam');
+      await expect(formulaire.getByLabel('Eau évaporable TEW (mm)')).toHaveValue('17,5', { timeout: 1_000 });
+      await expect(enregistrer).toBeEnabled({ timeout: 1_000 });
+    }).toPass({ timeout: 30_000 });
+    await expect(formulaire.getByLabel('Eau facilement évaporable REW (mm)')).toHaveValue('8');
+    await expect(formulaire).toContainText('FAO-56, tableau 19, pour Ze = 10 cm : TEW de 15 à 20 mm, REW de 6 à 10 mm ; le milieu est proposé, à ajuster.');
+    await enregistrer.click();
+    await expect(page.locator('section.soil-reserve').getByRole('status')).toHaveText('Le sol de la parcelle est enregistré.');
+    await expect(sol.locator('.soil-current')).toContainText('texture limon sableux (sandy loam) (FAO-56, tableau 19)');
+  }
+  await verifierLEtape(page, journal, 'sol des trois parcelles saisi');
+  await attendreLaPageIrrigation(page, 'reglages');
   await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
   const fin = await ouvrirLAccueil(page);
-  await expect(fin.locator('summary')).toContainText('3 étapes sur 5 à finir.');
-  await expect(fin.locator('li.onboarding-step').nth(1)).toContainText(/Confirmé le .+ : 2 abris, 2 jardins de plein champ\./);
-  await verifierLEtape(page, journal, 'jardins classés');
+  await expect(fin.locator('summary')).toContainText('2 étapes sur 5 à finir.');
+  await expect(fin.locator('li.onboarding-step').nth(2)).toContainText(/Confirmé le .+ : sol de 3 parcelles saisi\./);
+  await verifierLEtape(page, journal, 'étape du sol confirmée');
 });

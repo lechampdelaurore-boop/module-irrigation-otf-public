@@ -6,7 +6,8 @@ import type { UnfinishedStep } from '@/lib/domain/onboarding/steps';
 /**
  * Le bandeau « À finir » de l'accueil (4.4, docs/tranche-4-contract.md,
  * section 8 bis.3, F582) : chaque page dit ce qui manque encore à la ferme et
- * renvoie à l'endroit de Réglages où le faire, sans erreur ni zéro. Il ne se
+ * renvoie à l'endroit où le faire (Réglages, ou la page « Réserve du sol »
+ * pour le sol, F584), sans erreur ni zéro. Il ne se
  * ferme pas : il part quand l'étape est faite.
  */
 export function UnfinishedBanner({ steps, query }: { steps: readonly UnfinishedStep[]; query: { season: number; zone: string | null } }) {
@@ -18,7 +19,7 @@ export function UnfinishedBanner({ steps, query }: { steps: readonly UnfinishedS
         {steps.map((step, index) => (
           <span key={step.id}>
             {index > 0 ? ', ' : null}
-            <a href={pageHref('reglages', query, step.anchor)}>{step.text}</a>
+            <a href={pageHref(step.page, query, step.anchor)}>{step.text}</a>
           </span>
         ))}
         .

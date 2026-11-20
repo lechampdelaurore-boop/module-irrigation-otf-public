@@ -44,7 +44,7 @@ function parseValue(value: string | null): unknown {
  * change sa commune dans Réglages reste « d'avant l'accueil », sans quoi ses
  * jardins redeviendraient « à classer » et son besoin ne serait plus calculé.
  */
-export function confirmOnboardingStepStatement(workspaceId: string, step: 'location' | 'plots', value: unknown, at: string) {
+export function confirmOnboardingStepStatement(workspaceId: string, step: 'location' | 'plots' | 'soil', value: unknown, at: string) {
   return db.prepare(
     `INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, proposed_value, confirmed_at, updated_at)
      VALUES (?, ?, 'confirmed', 'onboarding', ?, ?, ?)
