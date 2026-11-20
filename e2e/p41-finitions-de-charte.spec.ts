@@ -26,7 +26,7 @@ test('planning : la ligne d’état en deux lignes, le pli des réglages signé 
   const principale = planning.locator('.planning-meta-main');
   const sources = planning.locator('.planning-meta-sources');
   await expect(principale).toContainText('calculé le', { timeout: 30_000 });
-  await expect(principale).toHaveText(/^Semaine du \d{2}\/\d{2} au \d{2}\/\d{2} · calculé le \d{2}\/\d{2}\/\d{4} \d{2}:\d{2} \(à la demande\)$/);
+  await expect(principale).toHaveText(/^Semaine du \d{2}\/\d{2} au \d{2}\/\d{2} · calculé le \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})? \(à la demande\)$/);
   await expect(sources).toHaveText(/^Prévision météo sur \d+ jours?/);
   const [haut, bas] = await Promise.all([principale.boundingBox(), sources.boundingBox()]);
   expect(haut && bas && bas.y >= haut.y + haut.height - 1, 'les sources sous la semaine').toBe(true);

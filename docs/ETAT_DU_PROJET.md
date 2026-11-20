@@ -555,7 +555,9 @@ registres, elle y renvoie.
   chevron de la charte sur tous les plis, les raccourcis et les choix en
   secondaire, « Cette semaine » et « Retirer la mesure » indisponibles
   quand ils ne feraient rien, la fin à la minute, « Terminer
-  l'irrigation » partout ; codée.
+  l'irrigation » partout ; en ligne le 20 novembre 2026 à 12 h 37 (#139, fusionnée à 12 h 18, run 44726582192 vérifié job par job). **PR 4, mots et formats** (D-193, F474 à
+  F476) : « 8 h 50 » et « 1 h 21 » partout, plus de pluriel entre
+  parenthèses, « Ressources » et « Réglages » en mots simples ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

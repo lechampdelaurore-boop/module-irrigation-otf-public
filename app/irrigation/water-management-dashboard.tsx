@@ -34,6 +34,7 @@ import {
   restoreOtfWeatherLocationAction,
   type WaterActionResult,
 } from './water-actions';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -43,11 +44,8 @@ const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
   year: 'numeric',
   timeZone: 'UTC',
 });
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-  timeZone: 'Europe/Paris',
-});
+// « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const dateTimeFormatter = { format: (value: Date | number) => dateClockText(new Date(value)) };
 
 /**
  * Le tableau de l'eau de la semaine, rangé en trois parts depuis la 3.8

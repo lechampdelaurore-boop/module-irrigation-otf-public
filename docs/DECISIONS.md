@@ -6608,6 +6608,41 @@ pressé n'annule pas un arrosage.
 Ne changent pas : les gestes eux-mêmes, les messages, le calcul de la durée.
 Aucune migration.
 
+## D-193 — Lot K, PR 4 : mots et formats
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 22 : les
+heures s'écrivaient de cinq façons (« 8 h 50 », « 07:00 », « 08:51 →
+10:11 », « 16/06/2026 08:50 », « 21:00 – 08:00 »), les durées de deux
+(« 1 h 21 », « 1 h 21 min ») ; des pluriels entre parenthèses
+(« 0/7 jour(s) disponible(s) ») ; du jargon sur « Ressources »
+(« Disponibilité / projections », « Apport non retenu (réserve pleine) »,
+« Disponible théorique … mobilisables », « Analyse préliminaire »),
+« Faisabilité recalculée. » en vert gras comme un lien, et « Espèces sans
+référence Kc » sur « Réglages ». **Cause vérifiée** : chaque écran avait
+son propre `Intl.DateTimeFormat` (`timeStyle: 'short'` rend « 08:50 »).
+
+**Décision (F474 à F476).** Un seul module, `lib/domain/clock-text.ts`,
+écrit l'heure (« 8 h 50 », « 18 h », « 0 h 05 »), la date et l'heure
+(« 16/06/2026 à 8 h 50 », « 16 juin 2026 à 8 h 50 »), une heure de la
+journée (« de 21 h à 8 h ») et la durée (« 1 h 21 », « 2 h »,
+« 45 min »), toujours à l'heure de la ferme (D-004) ; les écrans et les
+messages l'appellent (F474). Un compte s'accorde à son nombre (« 0 jour »,
+« 1 jour », « 7 jours ») ; un intitulé se met au singulier ou au pluriel
+selon la ligne (« Planche », « Planches ») (F475). Sur « Ressources » :
+« L'eau des jours à venir », « Apport perdu, la réserve étant pleine »,
+« Utilisable, avant les irrigations prévues » et « Utilisable, après les
+irrigations prévues », sans « mobilisables » ; « De maintenant à dimanche
+soir · les volumes, pas encore les horaires », la bulle « Ce que vérifie ce
+calcul » ; « Faisabilité recalculée. » dans la boîte des autres messages.
+Sur « Réglages », « Espèces sans culture de référence » (F476). Les
+chiffres et le sens ne changent pas.
+
+Ne changent pas : les champs de saisie (heure et date au format du
+navigateur), l'export CSV (ses colonnes et ses formats de tableur), les
+calculs. Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

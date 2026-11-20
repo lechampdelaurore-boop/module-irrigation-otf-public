@@ -59,7 +59,7 @@ const CROP_PREFIX = 'crop:';
 
 /**
  * Depuis la 3.8 (docs/feature-selection-contract.md, précision P3), la
- * correspondance des espèces et la liste « sans référence Kc » sont dans
+ * correspondance des espèces et la liste « sans culture de référence » sont dans
  * Réglages (`part="especes"`) : les alertes de gel en ont besoin sans les
  * coefficients. La page « Besoin par culture » garde les cultures de
  * référence et les réglages du calcul (`part="coefficients"`).
@@ -402,7 +402,7 @@ function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView,
   const toLink = view.species.filter(speciesNeedsLink).length;
   return (
     <section className="crop-coefficients-part" aria-labelledby="without-reference-title">
-      <h3 id="without-reference-title">Espèces sans référence Kc</h3>
+      <h3 id="without-reference-title">Espèces sans culture de référence</h3>
       {view.withoutReference.length === 0 ? (
         <p>Toutes les espèces de la saison ont une culture de référence ou sont de l’engrais vert.</p>
       ) : beyond.length === 0 ? (
@@ -413,7 +413,7 @@ function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView,
             {WITHOUT_REFERENCE_CONSEQUENCE}{' '}
             {toLink > 0 ? `En plus des ${toLink > 1 ? `${toLink} espèces` : 'espèce'} à rattacher ci-dessus, ces séries suivent « sans référence » par exception :` : 'Ces séries suivent « sans référence » par exception :'}
           </p>
-          <ul className="without-reference-list" aria-label="Espèces sans référence Kc">
+          <ul className="without-reference-list" aria-label="Espèces sans culture de référence">
             {beyond.map((item) => (
               <li key={`${item.plantId}:${item.reason}`}>
                 <strong>{item.plantName}</strong>

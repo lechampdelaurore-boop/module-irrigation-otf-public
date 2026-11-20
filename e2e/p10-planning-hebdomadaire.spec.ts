@@ -101,7 +101,7 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
   const meta = planning.locator('.planning-meta');
   await expect(meta).toContainText('calculé le', { timeout: 30_000 });
   // Les dates à la française, le déclencheur nommé.
-  await expect(meta).toHaveText(/^Semaine du \d{2}\/\d{2} au \d{2}\/\d{2} · calculé le \d{2}\/\d{2}\/\d{4} \d{2}:\d{2} \(à la demande\)/);
+  await expect(meta).toHaveText(/^Semaine du \d{2}\/\d{2} au \d{2}\/\d{2} · calculé le \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})? \(à la demande\)/);
   const cartes = planning.locator('article.planning-proposal').filter({ hasText: materiel });
   // Après 23 h 41, la première carte tombe le lendemain : au téléphone, son jour
   // est replié ; elle se montre en le dépliant (montrerLaCarte).
@@ -210,8 +210,8 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
     // une proposition du nouveau calcul peut porter le même numéro.
     await planning.getByRole('button', { name: 'Recalculer le plan' }).click();
     const refusee = planning.locator('article.planning-proposal[data-status="refused"]').filter({ hasText: materiel }).first();
-    await expect(refusee).toContainText(/calcul du \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/, { timeout: 30_000 });
-    await expect(refusee).toHaveAttribute('aria-label', /^Proposition p-\d+ du calcul du \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}, /);
+    await expect(refusee).toContainText(/calcul du \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})?/, { timeout: 30_000 });
+    await expect(refusee).toHaveAttribute('aria-label', /^Proposition p-\d+ du calcul du \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})?, /);
     await verifierLEtape(page, journal, 'carte refusée datée après recalcul');
   }
 

@@ -129,7 +129,7 @@ test('scénarios 1 et 4 : l’alerte du matin part une fois pour mardi ; l’act
   assert.equal(request.notificationId, `weather-alert:${criterion.id}:v1:2026-11-03`);
   assert.deepEqual(request.notification, {
     title: 'Alerte météo',
-    body: 'Température minimale prévue 4 °C mardi 3 novembre (seuil : sous 5 °C). Prévision du 2 novembre, 06 h 15.',
+    body: 'Température minimale prévue 4 °C mardi 3 novembre (seuil : sous 5 °C). Prévision du 2 novembre, 6 h 15.',
     tag: `weather-alert:${criterion.id}:v1:2026-11-03`,
     data: { url: '/irrigation/alertes-meteo?season=2026&week=2026-11-02' },
   });
