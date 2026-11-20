@@ -22,6 +22,7 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, completedDraft, createDripFixture } from '../support/irrigation-fixtures';
 import { ALICE, BOB } from '../support/spaces';
 import { SPACE_FILTER, spaceParams } from '../../db/workspace-scope';
+import { validatePlanningSettings } from '../support/onboarding';
 
 const NOW = new Date('2026-09-29T10:52:00.000Z'); // mardi 12 h 52 à la ferme
 
@@ -47,6 +48,7 @@ const snapshot: IrrigationSnapshot = {
 };
 
 async function farmWithWater(owner = ALICE) {
+  await validatePlanningSettings(owner);
   const fixture = await createDripFixture(owner, { beds: ['bed-1', 'bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
   const resourceId = await saveWaterResourceForUser(owner, owner, null, { name: 'Forage', type: 'borehole', nominalFlowCubicMetersPerHour: 0.511, status: 'active', availableFrom: null, availableUntil: null, notes: null });
   const reservoirId = await saveWaterReservoirForUser(owner, owner, null, {
@@ -302,6 +304,7 @@ test('idempotence : deux calculs sans événement entre eux gardent les mêmes p
 
 test('sans rien à planifier, le calcul s’enregistre vide et le dit', async () => {
   await createDripFixture(ALICE, { beds: ['bed-1'] });
+  await validatePlanningSettings(ALICE);
   const stored = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
   assert.equal(stored.proposals.length, 0);
   assert.ok(stored.calculation.summary.beds.every((bed) => bed.reasons.includes('no-objective')), 'sans objectif, aucune planche n’est planifiable, et le motif est donné');
@@ -356,6 +359,7 @@ test('3.8 : Ressources et pompes décochée, le plan est celui d’une ferme san
   const { fixture } = await farmWithWater();
   await saveFeatureSelectionForUser(ALICE, FEATURE_IDS.filter((id) => id !== 'ressources'), NOW);
   const bob = await createDripFixture(BOB, { beds: ['bed-1', 'bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
+  await validatePlanningSettings(BOB);
   await saveHydricGoalForUser(BOB, { season: 2026, weekStart: '2026-09-21', scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
   const alices = await computeWeeklyPlanForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: NOW });
   const bobs = await computeWeeklyPlanForUser({ ownerUserId: BOB, season: 2026, snapshot, now: NOW });
@@ -396,6 +400,7 @@ test('3.8 : un changement des fonctionnalités qui touche le plan le recalcule, 
  * « report » : la première planche de l'inventaire tient, l'autre est reportée (S12, décision 4 de la 3.9).
  */
 async function farmUnderDefer(owner = ALICE) {
+  await validatePlanningSettings(owner);
   const first = await createDripFixture(owner, { beds: ['bed-1'], rateMmPerHour: 14, bedAreaSquareMeters: 30, name: 'Goutte-à-goutte P1' });
   const second = await createDripFixture(owner, { beds: ['bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30, name: 'Goutte-à-goutte P2' });
   const reservoirId = await saveWaterReservoirForUser(owner, owner, null, {
