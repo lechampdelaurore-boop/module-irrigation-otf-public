@@ -52,6 +52,7 @@ test('sabotage de chaque tâche surveillée : la notification part, la nomme, di
   for (const declaration of WATCHED) {
     await t.test(declaration.key, () => {
       const late = millisecondsFromHours(declaration.lateAfterHours) + millisecondsFromMinutes(1);
+      const broken = millisecondsFromHours(declaration.brokenAfterHours + 1);
       const sabotages: { name: string; run: TaskRunRecord; state: string; since: string }[] = [
         {
           name: 'plus de réussite depuis le seuil orange',
@@ -60,10 +61,10 @@ test('sabotage de chaque tâche surveillée : la notification part, la nomme, di
           since: `aucune réussite depuis le ${parisMoment(ago(FRIDAY, late))}`,
         },
         {
-          name: 'plus de réussite depuis 37 heures',
-          run: { ...EMPTY_TASK_RUN, lastSuccessAt: ago(FRIDAY, millisecondsFromHours(37)), lastAttemptAt: ago(FRIDAY, millisecondsFromHours(37)) },
+          name: 'plus de réussite depuis le seuil rouge et une heure',
+          run: { ...EMPTY_TASK_RUN, lastSuccessAt: ago(FRIDAY, broken), lastAttemptAt: ago(FRIDAY, broken) },
           state: 'en panne',
-          since: `aucune réussite depuis le ${parisMoment(ago(FRIDAY, millisecondsFromHours(37)))}`,
+          since: `aucune réussite depuis le ${parisMoment(ago(FRIDAY, broken))}`,
         },
         {
           name: 'trois échecs de suite après une réussite récente',
@@ -139,7 +140,7 @@ test('la veille ne se nomme pas elle-même : jamais réussie à sa première ex�
   assert.equal(operatorWatchNotice(firstRun, FRIDAY), null, 'un vendredi où tout va bien : rien');
   const sunday = operatorWatchNotice(registry(SUNDAY, { 'operator-watch': EMPTY_TASK_RUN }), SUNDAY);
   assert.equal(sunday?.kind, 'all-good');
-  assert.equal(sunday?.body, `Les ${WATCHED.length} tâches automatiques sont à l'heure. Ce message revient chaque dimanche : s'il manque, regardez la page d'état.`);
+  assert.equal(sunday?.body, `Les ${WATCHED.length} tâches sont à l'heure. Ce message revient chaque dimanche : s'il manque, regardez la page d'état.`);
 });
 
 test('rien à signaler : « tout va bien » le dimanche seulement, pas de bruit les autres jours', () => {
@@ -163,7 +164,7 @@ test('les dates sont à l’heure de Paris, en hiver comme en été ; une notifi
 
 test('la page d’état : un jugement d’ensemble en une ligne, chaque tâche avec son état, jamais un vert faute de réussite', () => {
   const allGood = operatorStatusView(registry(FRIDAY), null);
-  assert.deepEqual(allGood.verdict, { tone: 'ok', text: `Tout va bien : les ${TASK_REGISTRY.length} tâches automatiques sont à l'heure.` });
+  assert.deepEqual(allGood.verdict, { tone: 'ok', text: `Tout va bien : les ${TASK_REGISTRY.length} tâches sont à l'heure.` });
   assert.ok(allGood.tasks.every((task) => task.tone === 'ok' && task.state === 'À l\'heure' && task.failing === null));
   assert.equal(
     allGood.lastNotice,

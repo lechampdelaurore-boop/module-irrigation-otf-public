@@ -1,4 +1,5 @@
 import type { FarmObservationLine } from './farm-observation.ts';
+import type { OffsiteExportDates } from './offsite-export.ts';
 import { parisMoment, stateWords, tasksToWatch, type WatchedTask } from './operator-watch.ts';
 import type { TaskState } from './task-state.ts';
 
@@ -35,6 +36,8 @@ export type OperatorStatusView = {
   lastNotice: string;
   /** Une ligne par ferme, la plus en difficulté d'abord (F616). */
   farms: FarmObservationLine[];
+  /** Les jours que le geste « J'ai fait l'export du … » propose (F625), ou `null` hors de la page. */
+  exportDates: OffsiteExportDates | null;
 };
 
 export type LatestNotice = { kind: 'alert' | 'all-good'; problems: number; sentAt: string };
@@ -43,11 +46,13 @@ export function operatorStatusView(
   tasks: readonly WatchedTask[],
   latestNotice: LatestNotice | null,
   farms: readonly FarmObservationLine[] = [],
+  exportDates: OffsiteExportDates | null = null,
 ): OperatorStatusView {
   return {
     verdict: verdict(tasks, farms),
     tasks: tasks.map(taskLine),
     farms: [...farms],
+    exportDates,
     lastNotice: latestNotice
       ? `Dernière notification de la veille : ${latestNotice.kind === 'all-good'
         ? '« tout va bien »'
@@ -64,9 +69,9 @@ export function operatorStatusView(
 function verdict(tasks: readonly WatchedTask[], farms: readonly FarmObservationLine[]): OperatorStatusView['verdict'] {
   const problems = tasksToWatch(tasks);
   const farmWords = farmCounts(farms);
-  if (problems.length === 0 && farmWords === null) return { tone: 'ok', text: `Tout va bien : les ${tasks.length} tâches automatiques sont à l'heure.` };
+  if (problems.length === 0 && farmWords === null) return { tone: 'ok', text: `Tout va bien : les ${tasks.length} tâches sont à l'heure.` };
   const taskWords = problems.length === 0
-    ? `les ${tasks.length} tâches automatiques sont à l'heure`
+    ? `les ${tasks.length} tâches sont à l'heure`
     : (['broken', 'late', 'never'] as const)
       .map((kind) => ({ kind, count: problems.filter((task) => task.state.kind === kind).length }))
       .filter(({ count }) => count > 0)

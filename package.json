@@ -28,6 +28,8 @@
     "demo:migrate:remote": "wrangler d1 migrations apply module-irrigation-otf-demo --remote --config wrangler.demo.jsonc",
     "demo:deploy": "wrangler deploy --config dist/server/wrangler.json",
     "db:migrate:local": "wrangler d1 migrations apply module-irrigation-otf --local",
+    "backup:export": "node --experimental-strip-types --no-warnings scripts/backup-export.ts",
+    "backup:verify": "node --experimental-strip-types --no-warnings scripts/backup-verify.ts",
     "e2e:reset": "node scripts/reset-local-database.mjs",
     "e2e": "playwright test",
     "e2e:demo": "playwright test --config playwright.demo.config.ts",

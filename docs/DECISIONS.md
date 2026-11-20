@@ -7165,3 +7165,53 @@ Ne changent pas : le rythme des appels à OTF et leur compte du jour (F361,
 F363) ; aucun appel nouveau à OTF, aucun secret nouveau, aucune dépense.
 L'état de l'accueil (4.4-a) entre sur la carte avec la fusion de la 4.4 ;
 la consommation sur la part du quota, quand la part sera fixée (F363).
+
+## D-243 — Tranche 4, 4.5, PR 4 (première partie) : l'export hebdomadaire chiffré et son contrôle
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le porteur a choisi le 19 novembre 2026 (10 bis.9) une copie
+gratuite hors de Cloudflare : un export hebdomadaire chiffré, gardé par
+lui, chiffré avant d'être écrit sur disque, et un geste « J'ai fait
+l'export du … » sur la page d'état, que la veille surveille. Le contrat
+(F561) demande que les sabotages d'un export (table retirée, ligne
+corrompue, migration oubliée) soient détectés, et des scripts sans secret
+dont les sorties ne contiennent pas de données. L'essai des scénarios S1 à
+S3 demande une base d'essai chez Cloudflare, donc le « vas-y » du porteur.
+
+**Décision.** Section 10 bis.14 du contrat de la Tranche 4 (F620 à F626) :
+
+1. La PR 4 se fait en deux PR : celle-ci, tout ce qui s'essaie sans
+   toucher à Cloudflare ; la suivante, l'essai S1 à S3 sur la base
+   d'essai, après le « vas-y » du porteur.
+2. `pnpm backup:export` reçoit l'export de Wrangler **en mémoire** : un
+   module chargé dans le processus de Wrangler détourne son écriture vers
+   le processus parent ; le chemin convenu est dans un dossier qui
+   n'existe pas, pour qu'un détour qui ne jouerait plus fasse échouer
+   l'écriture au lieu de poser l'export en clair. L'adresse de
+   téléchargement que Wrangler affiche est masquée.
+3. Avant d'être chiffré, l'export est **rejoué dans une base vide** :
+   schéma comparé à celui des migrations qu'il dit avoir reçues,
+   intégrité, clés étrangères comptées par table, empreinte de chaque
+   table indépendante de l'ordre des lignes. Les problèmes se disent par
+   des noms de tables et de contraintes, jamais par une valeur.
+4. Chiffrement AES-256-GCM, clé tirée du mot de passe par scrypt
+   (N = 2^17), en-tête authentifié ; mot de passe de 12 caractères au
+   moins, tapé deux fois, sans écho, jamais par un argument. Le fichier va
+   hors du dépôt (refusé dedans, même par un lien), ne remplace jamais le
+   précédent, et il est relu et déchiffré avant que la commande dise
+   « vérifié ». `pnpm backup:verify` contrôle un export fait.
+5. L'export entre au registre comme la première tâche faite à la main :
+   une fois par semaine, orange à 8 jours, rouge à 10 ; le geste de la page
+   d'état note un jour, jamais à venir, jamais plus ancien que celui déjà
+   noté. Le jugement d'ensemble dit « les 6 tâches ». La ligne
+   « Sauvegarde » de F560 (Time Travel, tenu par Cloudflare) n'entre pas au
+   registre, ni le nom `backup_failed` de F618 : aucune sauvegarde ne tourne
+   dans le Worker.
+
+Ne changent pas : aucun secret dans le dépôt, aucune dépense, aucune
+migration, aucun appel à OTF ; rien chez Cloudflare avant le « vas-y » du
+porteur. La règle de conservation des exports (un export garde les données
+d'une ferme effacée depuis) s'écrit avec la PR 5 (F562), sous la relecture
+du porteur.
+
