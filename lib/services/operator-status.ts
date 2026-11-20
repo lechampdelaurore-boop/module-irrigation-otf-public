@@ -1,3 +1,4 @@
+import { readFarmErasureCounts } from '@/db/farm-erasure-repository';
 import { readFarmObservations } from '@/db/farm-observation-repository';
 import { readLatestOperatorNotice } from '@/db/operator-repository';
 import { readTaskRuns, recordTaskRun } from '@/db/task-run-repository';
@@ -35,12 +36,13 @@ export async function isOperator(spaceKey: string, deploymentFarm = knownDeploym
 
 /**
  * Ce que montre la page : les tâches du registre, la dernière notification
- * de la veille et chaque ferme (F616). Les erreurs d'OTF se comptent par
- * heure pleine : « 24 heures », c'est l'heure en cours et les 23 d'avant.
+ * de la veille, chaque ferme (F616) et les demandes d'effacement (F646). Les
+ * erreurs d'OTF se comptent par heure pleine : « 24 heures », c'est l'heure en
+ * cours et les 23 d'avant.
  */
 export async function readOperatorStatus(now = new Date(), deploymentFarm = knownDeploymentFarm): Promise<OperatorStatusView> {
   const hourStartMs = outcomeHourStartMs(now.getTime());
-  const [tasks, latestNotice, records, farm, planning] = await Promise.all([
+  const [tasks, latestNotice, records, farm, planning, erasures] = await Promise.all([
     readTaskStates(now),
     readLatestOperatorNotice(),
     readFarmObservations({
@@ -50,10 +52,11 @@ export async function readOperatorStatus(now = new Date(), deploymentFarm = know
     }),
     deploymentFarm(),
     listFarmsWithFeature('planning'),
+    readFarmErasureCounts(now),
   ]);
   const planningFarms = new Set(planning.flatMap(({ ownerUserId }) => farmSpaceOf(ownerUserId).otfFarmId ?? []));
   const farms = farmObservationLines(records, { now, deploymentFarm: farm, unknownFarmKey: DEPLOYMENT_KEY_UNKNOWN_FARM_PACE, planningFarms });
-  return operatorStatusView(tasks, latestNotice, farms, gestureDates(now));
+  return operatorStatusView(tasks, latestNotice, farms, gestureDates(now), erasures);
 }
 
 /**

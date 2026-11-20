@@ -139,6 +139,6 @@ test('le jugement d’ensemble compte les fermes : « tout va bien » seulement 
   const okFarm = farmObservationLines([healthy('17')], context());
   const warnFarm = farmObservationLines([healthy('17', { lastWeatherAt: hoursAgo(27) })], context());
   const tasks = TASK_REGISTRY.map((declaration) => ({ declaration, state: taskState(declaration, { ...EMPTY_TASK_RUN, lastSuccessAt: hoursAgo(3) }, NOW) }));
-  assert.deepEqual(operatorStatusView(tasks, null, okFarm).verdict, { tone: 'ok', text: 'Tout va bien : les 7 tâches sont à l\'heure.' });
-  assert.deepEqual(operatorStatusView(tasks, null, warnFarm).verdict, { tone: 'warn', text: 'Les 7 tâches sont à l\'heure ; 1 ferme à regarder.' });
+  assert.deepEqual(operatorStatusView(tasks, null, okFarm).verdict, { tone: 'ok', text: 'Tout va bien : les 8 tâches sont à l\'heure.' });
+  assert.deepEqual(operatorStatusView(tasks, null, warnFarm).verdict, { tone: 'warn', text: 'Les 8 tâches sont à l\'heure ; 1 ferme à regarder.' });
 });
