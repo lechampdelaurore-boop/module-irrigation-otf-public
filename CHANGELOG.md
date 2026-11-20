@@ -5,6 +5,30 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 4 sur 5, première partie)
+
+- **L'export hebdomadaire chiffré de la base, hors de Cloudflare** (D-243,
+  F620 à F626) : `pnpm backup:export`, lancé par l'exploitant sur son
+  ordinateur, reçoit l'export de la base par Wrangler en mémoire (jamais en
+  clair sur le disque, l'adresse de téléchargement masquée), le contrôle en
+  le rejouant dans une base vide (schéma des migrations, contraintes, clés
+  étrangères, empreinte de chaque table), le chiffre avec un mot de passe
+  tapé deux fois sans écho (AES-256-GCM, scrypt), l'écrit hors du dépôt
+  sans écraser le précédent, puis le relit et le déchiffre pour vérifier
+  qu'il rend l'export à l'octet près. `pnpm backup:verify` contrôle un
+  export déjà fait. Les sorties ne disent que des nombres, des noms de
+  migrations et des empreintes. Procédure dans `docs/exploitation.md`.
+- **L'export au registre des tâches, et le geste « J'ai fait l'export du
+  … »** de la page d'état : une fois par semaine, orange à 8 jours, rouge à
+  10 ; la veille de 9 h le rappelle ; la dernière réussite ne recule
+  jamais. Parcours P50 étendu.
+
+### Changé (Tranche 4, 4.5, PR 4 sur 5, première partie)
+
+- Le jugement d'ensemble de la page d'état et le « tout va bien » de la
+  veille disent « les 6 tâches » au lieu des « 5 tâches automatiques » :
+  l'export, fait à la main, en est une.
+
 ### Ajouté (Tranche 4, 4.5, PR 2 sur 5, seconde partie)
 
 - **Chaque ferme sur la page d'état de l'exploitant** (D-242, F614 à

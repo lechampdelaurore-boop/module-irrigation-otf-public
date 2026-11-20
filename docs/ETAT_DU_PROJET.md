@@ -443,6 +443,32 @@ registres, elle y renvoie.
   site : les premiers comptes réels de la ferme du porteur. À fusionner
   après la première partie.
 
+- Tranche 4, **4.5, PR 4 sur 5, première partie : codée le 20 novembre
+  2026** (D-243, F620 à F626, section 10 bis.14 de
+  `docs/tranche-4-contract.md`). L'export hebdomadaire de la base hors de
+  Cloudflare (décision 10 bis.9) : `pnpm backup:export`, lancé par le
+  porteur sur son ordinateur, reçoit l'export de Wrangler en mémoire,
+  jamais en clair sur le disque (l'adresse de téléchargement masquée), le
+  rejoue dans une base vide pour vérifier qu'il restaurerait la base
+  fidèlement (schéma des migrations, contraintes, clés étrangères,
+  empreinte de chaque table), le chiffre (AES-256-GCM, scrypt, mot de passe
+  tapé deux fois sans écho), l'écrit hors du dépôt, puis le relit et le
+  déchiffre. `pnpm backup:verify` contrôle un export fait. Les sabotages
+  (table retirée, ligne corrompue, migration oubliée, ligne orpheline) sont
+  trouvés par les essais ; un vrai export de la base locale des parcours,
+  par le vrai Wrangler, passe sans problème. L'export entre au registre
+  des tâches (orange à 8 jours, rouge à 10) avec le geste « J'ai fait
+  l'export du … » de la page d'état ; procédure dans
+  `docs/exploitation.md`. Sans migration. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (1 939 tests, puis les 453 de la base
+  rejoués trois fois pour l'isolation, sous le garde des journaux),
+  `pnpm build`, `pnpm knip` réussis en local, et le parcours P50 aux deux
+  largeurs ; la suite complète des parcours jouée par la CI de la PR. Non
+  vérifié : un export de la base en ligne (le premier, par le porteur, avec
+  la procédure). L'essai des scénarios S1 à S3 sur la base d'essai (seconde
+  partie) attend le « vas-y » du porteur pour créer cette base chez
+  Cloudflare. À fusionner après la PR 2.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

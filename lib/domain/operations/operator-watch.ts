@@ -73,7 +73,7 @@ export function operatorWatchNotice(registered: readonly WatchedTask[], now: Dat
     kind: 'all-good',
     problems: 0,
     title: 'Module d\'irrigation : tout va bien',
-    body: `Les ${tasks.length} tâches automatiques sont à l'heure. Ce message revient chaque dimanche : s'il manque, regardez la page d'état.`,
+    body: `Les ${tasks.length} tâches sont à l'heure. Ce message revient chaque dimanche : s'il manque, regardez la page d'état.`,
     tag: 'operator-watch',
     url: OPERATOR_PAGE_PATH,
   };

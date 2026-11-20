@@ -1,3 +1,5 @@
+import { HOURS_PER_DAY } from '../units.ts';
+
 /**
  * Le registre des tâches attendues (4.5, PR 1 ; docs/tranche-4-contract.md,
  * section 10 bis, F560, et 10 bis.11, F600 à F607).
@@ -15,12 +17,24 @@
  * déclencheur absent d'ici (F560, règle v ; F569). Les alarmes du Worker de
  * notification ne sont pas des déclencheurs planifiés : chacune suit un
  * arrosage, sans rythme attendu, et n'est pas une tâche du registre.
+ *
+ * L'export de la base hors de Cloudflare (4.5, PR 4 ; 10 bis.14, F624) y est
+ * aussi, bien que fait à la main par l'exploitant : aucun déclencheur ne le
+ * lance (`OPERATOR_GESTURE`), le geste de la page d'état note sa réussite,
+ * et la veille le surveille comme les autres.
  */
 
 /** Les tâches du registre ; la clé est aussi celle de la ligne qui garde leurs exécutions. */
-export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning' | 'operator-watch';
+export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning' | 'offsite-export' | 'operator-watch';
 
 export type TriggerKey = 'weather-morning' | 'operator-watch' | 'demo-nightly-reset';
+
+/**
+ * Une tâche faite à la main par l'exploitant, hors de Cloudflare, et notée
+ * par un geste de la page d'état : aucun déclencheur ne la lance, mais la
+ * veille la surveille comme les autres (10 bis.9 ; 10 bis.14, F625).
+ */
+export const OPERATOR_GESTURE = 'operator-gesture';
 
 export type TaskDeclaration = {
   key: TaskKey;
@@ -38,7 +52,7 @@ export type TaskDeclaration = {
   ifMissing: string;
   /** Où est gardée sa dernière réussite. */
   successKeptIn: string;
-  trigger: TriggerKey;
+  trigger: TriggerKey | typeof OPERATOR_GESTURE;
 };
 
 /** Un déclencheur planifié d'une configuration Wrangler. */
@@ -140,6 +154,17 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ifMissing: 'Les jetons chiffrés avec l\'ancienne clé ne sont pas chiffrés de nouveau ; un jeton illisible n\'est pas signalé.',
     successKeptIn: 'Ligne « task:otf-vault-morning » de irrigation_background_jobs (réussie quand le coffre est endormi sans clé, ou quand chaque jeton se lit).',
     trigger: 'weather-morning',
+  },
+  {
+    key: 'offsite-export',
+    label: 'Export de la base hors de Cloudflare',
+    rhythm: '1 par semaine, le soir, fait par l\'exploitant sur son ordinateur (pnpm backup:export), puis noté ici',
+    lateAfterHours: 8 * HOURS_PER_DAY,
+    brokenAfterHours: 10 * HOURS_PER_DAY,
+    thresholdReason: 'Une fois par semaine : orange à 8 jours (un jour de marge), rouge à 10 jours (la semaine est manquée). L\'historique de 30 jours de Cloudflare ne protège pas d\'une perte du compte : seule cette copie le fait (10 bis.9).',
+    ifMissing: 'Si le compte Cloudflare était perdu, les fermes perdraient tout ce qui a été saisi depuis le dernier export gardé hors de Cloudflare.',
+    successKeptIn: 'Ligne « task:offsite-export » de irrigation_background_jobs, écrite par le geste « J\'ai fait l\'export du … » de la page d\'état (le jour noté, jamais en recul).',
+    trigger: OPERATOR_GESTURE,
   },
   {
     key: 'operator-watch',

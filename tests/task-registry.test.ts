@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { morningTaskOutcomes } from '../lib/domain/operations/morning-task-outcomes.ts';
 import {
+  OPERATOR_GESTURE,
   REPEATED_FAILURES_FOR_BROKEN,
   TASK_REGISTRY,
   TASK_TRIGGERS,
@@ -75,9 +76,11 @@ test('le registre est cohérent : clés uniques, seuils croissants et expliqués
     for (const field of ['label', 'rhythm', 'thresholdReason', 'ifMissing', 'successKeptIn'] as const) {
       assert.ok(task[field].trim().length > 0, `${task.key} : ${field} écrit`);
     }
+    if (task.trigger === OPERATOR_GESTURE) continue;
     const trigger = TASK_TRIGGERS.find((candidate) => candidate.key === task.trigger);
     assert.ok(trigger?.monitored, `${task.key} : son déclencheur existe et est surveillé`);
   }
+  assert.deepEqual(TASK_REGISTRY.filter((task) => task.trigger === OPERATOR_GESTURE).map((task) => task.key), ['offsite-export'], 'une seule tâche faite à la main : l’export hors de Cloudflare');
   for (const trigger of TASK_TRIGGERS) {
     if (trigger.monitored) assert.ok(tasksOfTrigger(trigger.key).length > 0, `${trigger.key} : au moins une tâche`);
     else assert.ok(trigger.reason.trim().length > 0, `${trigger.key} : hors veille, avec sa raison`);
