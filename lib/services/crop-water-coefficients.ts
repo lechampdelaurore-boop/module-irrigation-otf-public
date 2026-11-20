@@ -10,6 +10,8 @@ import type { ReferenceCrop } from '../domain/crop-water/reference';
 import { cropWaterSettingsView, type CropWaterSettingsView } from '../domain/crop-water/settings-view';
 import { dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
 import { seasonSpecies, speciesWithoutReference, type SeasonSpecies, type SpeciesWithoutReference } from '../domain/crop-water/species';
+import { rootingProfilesForSpace } from '../domain/onboarding/rooting';
+import { getOnboardingForUser } from './onboarding-service';
 
 /**
  * La page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -47,7 +49,7 @@ export async function getCropCoefficientsViewForUser(input: {
   const cropPlan = input.snapshot.cropPlan;
   if (!cropPlan) return { available: false, season: input.season, reason: 'crop-plan-not-read' };
   const workspaceId = await findWorkspaceIdForUser(input.ownerUserId);
-  const [crops, entries, overrides, settings, rootingProfiles] = await Promise.all([
+  const [crops, entries, overrides, settings, storedProfiles, onboarding] = await Promise.all([
     listReferenceCropsForWorkspace(workspaceId),
     workspaceId === null ? Promise.resolve([]) : listSpeciesCorrespondencesForWorkspace(workspaceId),
     workspaceId === null ? Promise.resolve([]) : listKcOverridesForWorkspace(workspaceId),
@@ -55,7 +57,10 @@ export async function getCropCoefficientsViewForUser(input: {
       ? Promise.resolve({ shelterFactors: [], mulch: [], shadeNets: [], options: { ...DEFAULT_CROP_WATER_OPTIONS } })
       : readCropWaterSettingsForWorkspace(workspaceId),
     listRootingProfilesForWorkspace(workspaceId),
+    getOnboardingForUser(input.ownerUserId),
   ]);
+  // Une ferme neuve n'hérite pas des plafonds de racines de la ferme du porteur (4.4, F585).
+  const rootingProfiles = rootingProfilesForSpace(storedProfiles, onboarding);
   const series = cropPlan.series.filter((item) => item.season === input.season);
   const commons = await Promise.all(crops.filter((stored) => stored.origin === 'farm').map((stored) => readCommonReferenceCrop(stored.crop.id)));
   return {

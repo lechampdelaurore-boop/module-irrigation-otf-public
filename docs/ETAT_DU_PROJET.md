@@ -405,7 +405,7 @@ registres, elle y renvoie.
   P31b, P31c joués en local aux deux largeurs, réussis ; la suite complète
   par la CI de la PR.
   **PR 2b, parcelles et abris** (D-224, F583, section 8 bis.11 du
-  contrat) : la lecture d'OTF classait chaque jardin par le type que lui
+  contrat), **en ligne le 20 novembre 2026 à 17 h 34 (#129, fusionnée à 17 h 09, run 44770488501 vérifié job par job : les cinq jobs verts)** : la lecture d'OTF classait chaque jardin par le type que lui
   donne OTF (une énumération, pas son nom, contrairement à ce que F420
   supposait). Le classement confirmé est désormais gardé par espace (table
   `irrigation_plot_shelters`, migration additive 0035) et posé sur le plan
@@ -442,6 +442,19 @@ registres, elle y renvoie.
   sabotages, chacun détecté ; P46 (étendu), P18, P19, P29, P31b, P33 joués
   en local aux deux largeurs, réussis (14 sur 14) ; la suite complète par
   la CI de la PR.
+  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat) : le
+  plafond de 0,60 m de l'asperge et du melon, celui de la ferme du porteur,
+  est dans le jeu commun ; pour une ferme qui fait l'accueil, il est
+  remplacé à la lecture par la borne basse de la FAO-56 (asperge 1,20 m,
+  melon 0,80 m), dite « estimation » ; une révision de la ferme le remplace
+  toujours ; aucune migration ; la ferme du porteur et la démonstration
+  inchangées. La PR 4 en trois : 4b la région des cultures, 4c le
+  rattachement des espèces et le modèle des 78 liens. Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 867 tests, puis 470 pour
+  chacun des trois passages d'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; quatre sabotages, chacun détecté ; aucun écran changé, la suite
+  des parcours par la CI de la PR.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
