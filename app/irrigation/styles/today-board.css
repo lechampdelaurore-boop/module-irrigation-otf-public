@@ -253,7 +253,7 @@
   display: inline-block;
   width: 14px;
   height: 9px;
-  border-radius: 3px;
+  border-radius: 9.75px;
   background: var(--green);
 }
 
