@@ -157,6 +157,7 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
                     common={view.commonVersions[stored.crop.id] ?? null}
                     overrideRows={overrideRows}
                     rooting={rooting}
+                    region={view.regions[stored.crop.id] ?? { origin: '', warning: null }}
                     summary={referenceCropSummary(stored.crop.id, overrideRows, rooting, view.species)}
                     today={view.settings.today}
                     pending={pending}
