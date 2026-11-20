@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (audit du 19 novembre 2026, lot I, PR 4 sur 5)
+
+- **Le bandeau de la démonstration sur tablette** (D-181) : entre 601 et
+  1 000 px, la phrase s'écrivait à une lettre par ligne et repoussait la
+  page sous le premier écran ; la version compacte du téléphone (une
+  ligne, « Changer ») vaut désormais jusqu'à 1 000 px, et au-dessus la
+  phrase passe à la ligne au lieu de rétrécir.
+
 ### Corrigé (audit du 19 novembre 2026, lot I, PR 3 sur 5)
 
 - **La démonstration se prépare jusqu'au bout** (D-180) : une préparation

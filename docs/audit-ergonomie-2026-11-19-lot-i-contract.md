@@ -128,7 +128,8 @@ de 600 px, le bandeau tient sur une ligne, et sa phrase est le seul
 
 1. La version compacte du téléphone vaut jusqu'à 1 000 px.
 2. Au-dessus, la phrase passe à la ligne plutôt que de rétrécir sous sa
-   largeur lisible.
+   largeur lisible (18 caractères au moins). Mesuré sur la bannière seule :
+   44 px de haut de 390 à 1 000 px, au lieu de 150 px à 768 px.
 3. Aucune page ne déborde de côté entre 600 et 1 000 px.
 
 ## 6. n° 25 — Petits défauts de la démonstration (PR 5)
@@ -179,7 +180,9 @@ vierge ; puis la remise en état.
 
 - **F450** une préparation interrompue est reprise jusqu'au bout par une seule requête ; une préparation en cours se dit « Préparation de votre démonstration… » et la page se relit seule (section 4).
 
-Les précisions des PR 4 et 5 suivent, F451 et au-delà.
+- **F451** la bannière compacte du téléphone jusqu'à 1 000 px ; au-dessus, la phrase passe à la ligne sans rétrécir sous 18 caractères (section 5).
+
+Les précisions de la PR 5 suivent, F452 et au-delà.
 
 Ce que le lot ne prouve pas : un vrai téléphone, une vraie tablette, un
 lecteur d'écran ; la ferme réelle n'est pas touchée.

@@ -6272,6 +6272,26 @@ cases n'a jamais été ouvert.
 
 Ne changent pas : la remise à zéro, la tâche de nuit, la ferme réelle
 (refusé hors démonstration). Aucune migration.
+
+## D-181 — Lot I, PR 4 : le bandeau sur tablette
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 12 : entre
+601 et 950 px environ (une tablette debout), la phrase de la bannière de la
+démonstration s'écrivait à une lettre par ligne ; la bannière faisait
+1 169 px de haut à 768 px. **Cause vérifiée** : au-dessus de 600 px, la
+bannière tient sur une ligne, et la phrase est le seul élément qui accepte
+de rétrécir, jusqu'à zéro (`app/irrigation/styles/demo.css`).
+
+**Décision.** La version compacte du téléphone (une ligne de 44 px, la
+ferme et le moment, « Changer ») vaut jusqu'à 1 000 px ; au-dessus, la
+bannière passe à la ligne et la phrase garde 18 caractères de large au
+moins (F451). Mesuré sur la bannière seule : 44 px de haut de 390 à
+1 000 px.
+
+Ne change pas : la bannière au téléphone (J1, D-143) ; sa hauteur à
+l'ordinateur reste au lot K (n° 24).
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

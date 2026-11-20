@@ -39,7 +39,8 @@ function choose(profile: string, moment: string | undefined) {
  * Au téléphone (docs/audit-ergonomie-final-lot-f-contract.md, section 3 ;
  * J1), une ligne de 44 px dit la ferme et le moment, et « Changer » ouvre le
  * reste dessous. Le détail est fermé à chaque page : toute navigation du
- * module est un chargement complet. Au-dessus de 600 px, rien ne change.
+ * module est un chargement complet. De même sur tablette, jusqu'à 1 000 px
+ * (audit du 19 novembre 2026, lot I, n° 12, F451) ; au-dessus, rien ne change.
  * La ferme porte le nom de l'exploitation, partout ; son profil n'est que la
  * description de la liste (J9, F292).
  */
