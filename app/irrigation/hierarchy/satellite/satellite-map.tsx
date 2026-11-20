@@ -13,6 +13,7 @@ import {
 } from '@/lib/domain/satellite-view/map-style';
 import type { SatelliteView } from '@/lib/domain/satellite-view/view';
 import { loadMapLibre } from './load-maplibre';
+import { fitGardenLabels } from './fit-labels';
 
 type Props = {
   zone: Zone;
@@ -76,6 +77,9 @@ function labelElement(text: string, className: string, mode: string | null): HTM
   const element = document.createElement('span');
   element.className = className;
   element.textContent = text;
+  // Le nom entier, gardé pour la bulle et pour le remettre quand la place revient (lot K, n° 16, F468).
+  element.dataset.name = text;
+  element.title = text;
   if (mode) element.dataset.mode = mode;
   // La liste à côté de la carte dit déjà chaque nom : le lecteur d'écran ne l'entend pas deux fois.
   element.setAttribute('aria-hidden', 'true');
@@ -142,9 +146,11 @@ export function SatelliteMap({
 
         // Le nom de la parcelle est le titre du bloc : seuls les jardins portent le leur sur la carte (audit final, lot E, J15, F270).
         const labels: [OutlinePosition | null, HTMLSpanElement][] = [
-          ...view.gardens.map((garden): [OutlinePosition | null, HTMLSpanElement] => {
+          ...view.gardens.map((garden, index): [OutlinePosition | null, HTMLSpanElement] => {
             const element = labelElement(garden.name, 'satellite-label', garden.mode);
             element.dataset.plotId = garden.plotId;
+            // Le numéro de la liste à côté de la carte, qui sert de légende (F468).
+            element.dataset.number = String(index + 1);
             element.dataset.highlighted = String(garden.plotId === highlightedRef.current);
             element.addEventListener('click', (event) => {
               // Le nom est posé sur le jardin : la carte ne doit pas recevoir le même toucher une seconde fois.
@@ -181,8 +187,13 @@ export function SatelliteMap({
           }
         });
         const created = map;
+        // Les noms qui se chevauchent deviennent des numéros ; le calcul se refait à chaque zoom (F468).
+        const fitLabels = () => fitGardenLabels(container);
+        created.on('zoomend', fitLabels);
+        created.on('resize', fitLabels);
         created.on('load', () => {
           if (cancelled) return;
+          fitLabels();
           applyHighlight(created, null, highlightedRef.current);
           setLoadedMap(created);
         });

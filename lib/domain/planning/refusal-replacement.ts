@@ -1,5 +1,6 @@
 import { FARM_TIME_ZONE } from '../water-management.ts';
 import type { StoredProposal, StoredWeeklyPlan } from './contract.ts';
+import { clockText } from '../clock-text.ts';
 
 /**
  * Où le besoin d'un créneau refusé est allé (audit ergonomique du 19 novembre
@@ -30,6 +31,6 @@ export function refusalMessage(replacement: Pick<StoredProposal, 'startAt' | 'eq
   if (!replacement) return 'Créneau refusé. Aucun autre créneau cette semaine : le besoin reste affiché, non placé.';
   const start = new Date(replacement.startAt);
   const weekday = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', timeZone }).format(start);
-  const clock = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone }).format(start).replace(':', ' h ');
+  const clock = clockText(start, timeZone);
   return `Créneau refusé. Le besoin est replacé ${weekday} à ${clock} (${replacement.equipmentName}).`;
 }

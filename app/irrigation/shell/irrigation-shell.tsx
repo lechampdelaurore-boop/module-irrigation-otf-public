@@ -15,6 +15,7 @@ import { FeatureMenu } from './feature-menu';
 import { UnfinishedBanner } from './unfinished-banner';
 import { PageTitle } from './page-title';
 import { Topbar } from './topbar';
+import { dateClockText } from '@/lib/domain/clock-text';
 
 /**
  * Le gabarit commun des pages du module (3.8, docs/feature-selection-contract.md,
@@ -82,11 +83,7 @@ export function IrrigationShell({
     window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
   }, []);
 
-  const updatedAt = new Intl.DateTimeFormat('fr-FR', {
-    dateStyle: 'long',
-    timeStyle: 'short',
-    timeZone: 'Europe/Paris',
-  }).format(new Date(lastSuccessfulReadAt));
+  const updatedAt = dateClockText(lastSuccessfulReadAt, 'Europe/Paris', 'long');
   const title = pageLabel(page);
 
   return (
