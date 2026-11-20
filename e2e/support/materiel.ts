@@ -3,7 +3,7 @@ import { dateKeyInTimeZone } from '../../lib/domain/irrigation-history/dates.ts'
 import { formatIrrigationDateTimeInput } from '../../lib/domain/irrigation-format.ts';
 import { millisecondsFromMinutes } from '../../lib/domain/units.ts';
 import { FARM_TIME_ZONE } from '../../lib/domain/water-management.ts';
-import { confirmerDansLaFenetre, ouvrirParClic } from './parcours.ts';
+import { confirmerDansLaFenetre, ouvrirParClic, ouvrirLOnglet } from './parcours.ts';
 
 /**
  * Création d'un matériel prêt à irriguer : une fiche, un réglage, une position
@@ -43,6 +43,8 @@ export async function preparerMaterielArrosant(
   const apportMmParHeure = options.apportMmParHeure ?? 10;
 
   const fiche = page.locator('dialog[open], [role=dialog]').filter({ hasText: 'Ajouter un matériel' });
+  // L'inventaire a son onglet (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   await ouvrirParClic(page.getByRole('button', { name: 'Ajouter un matériel' }), fiche);
   await fiche.getByLabel('Nom du matériel').fill(materiel);
   // Le bouton radio réel est masqué derrière sa présentation : un utilisateur

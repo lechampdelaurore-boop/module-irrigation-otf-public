@@ -26,6 +26,7 @@ import { PAGE_SETTINGS_ANCHOR, PageSettingsFold } from './shell/page-settings-fo
 import { IrrigationShell, type ShellProps } from './shell/irrigation-shell';
 import { PlanViewTabs, type PlanView } from './hierarchy/plan-view-tabs';
 import { SatelliteViewTab } from './hierarchy/satellite/satellite-view-tab';
+import { MATERIEL_TABS, MATERIEL_TAB_PARAM, type MaterielTab } from '@/lib/domain/materiel-tabs';
 
 type Props = {
   shell: ShellProps;
@@ -40,12 +41,16 @@ type Props = {
   showBedCropWater: boolean;
   /** Le calculateur d'irrigation, s'il est coché (3.8 bis) : la provenance de chaque réglage. */
   calculator: CalculatorContext | null;
+  /** L'onglet que l'adresse demande (audit du 19 novembre 2026, lot J, n° 15, F461). */
+  initialTab?: MaterielTab;
 };
 
 /**
  * La page « Matériel et placement » (3.8, docs/feature-selection-contract.md,
- * section 5) : le plan des parcelles, la fiche de la planche, les groupes de
- * jardins alignés et le matériel, dans l'ordre d'avant la 3.8.
+ * section 5) en trois onglets depuis le lot J de l'audit du 19 novembre 2026
+ * (n° 15, F461) : « Plan » (le plan des parcelles, la fiche de la planche,
+ * l'aperçu), « Matériel » (l'inventaire), « Groupes » (les groupes de jardins
+ * alignés). Poser un matériel depuis l'inventaire bascule sur le plan.
  */
 export function HierarchyBrowser({
   shell,
@@ -58,6 +63,7 @@ export function HierarchyBrowser({
   gardenGroupConfiguration,
   showBedCropWater,
   calculator,
+  initialTab = 'plan',
 }: Props) {
   const season = selectedSeason;
   const [zoneId, setZoneId] = useState<string | null>(shell.zone);
@@ -65,6 +71,9 @@ export function HierarchyBrowser({
   // Un seul onglet du bloc de la parcelle à la fois ; la vue satellite ne se charge qu'à son ouverture (F204).
   const [planView, setPlanView] = useState<PlanView>('plan');
   const equipmentInventoryRef = useRef<EquipmentInventoryHandle>(null);
+  const [tab, setTab] = useState<MaterielTab>(initialTab);
+  // Au téléphone, les jardins repliés sur une ligne ; celui de la planche choisie ouvert (F461).
+  const [openPlots, setOpenPlots] = useState<Record<string, boolean>>({});
 
   const zones = snapshot.zones.filter((zone) => zone.seasons.includes(season));
   const seasonPlots = snapshot.plots.filter((plot) =>
@@ -171,6 +180,19 @@ export function HierarchyBrowser({
 
   // Poser un matériel se fait sur le plan : la vue satellite lui cède la place le temps de la pose.
   const shownPlanView: PlanView = placementEditor ? 'plan' : planView;
+  // De même l'onglet « Plan » pendant une pose ; poser depuis l'inventaire y bascule et y reste (F461).
+  const shownTab: MaterielTab = placementEditor ? 'plan' : tab;
+  // Pendant une pose, tous les jardins sont ouverts : la planche à choisir peut être dans n'importe lequel.
+  const plotOpen = (plotId: string) => placementEditor !== null || (openPlots[plotId] ?? plotId === selectedPlot?.id);
+
+  const chooseTab = (next: MaterielTab) => {
+    setTab(next);
+    // L'onglet reste dans l'adresse : un lien y mène, un rechargement y revient.
+    const url = new URL(window.location.href);
+    if (next === 'plan') url.searchParams.delete(MATERIEL_TAB_PARAM);
+    else url.searchParams.set(MATERIEL_TAB_PARAM, next);
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  };
 
   const chooseZone = (value: string) => {
     setZoneId(value);
@@ -210,6 +232,33 @@ export function HierarchyBrowser({
         <strong aria-current="page">{selectedBed?.name ?? 'Planche'}</strong>
       </nav>
 
+      <div className="materiel-tabs" role="tablist" aria-label="Parties de la page">
+        {MATERIEL_TABS.map(({ id, label }) => (
+          <button
+            key={id}
+            id={`materiel-tab-${id}`}
+            type="button"
+            role="tab"
+            aria-selected={shownTab === id}
+            aria-controls={`materiel-panel-${id}`}
+            tabIndex={shownTab === id ? 0 : -1}
+            disabled={placementEditor !== null && id !== 'plan'}
+            onClick={() => chooseTab(id)}
+            onKeyDown={(event) => {
+              const index = MATERIEL_TABS.findIndex((item) => item.id === id);
+              const target = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: MATERIEL_TABS.length - 1 }[event.key];
+              if (target === undefined || placementEditor) return;
+              event.preventDefault();
+              const next = MATERIEL_TABS[(target + MATERIEL_TABS.length) % MATERIEL_TABS.length].id;
+              chooseTab(next);
+              document.getElementById(`materiel-tab-${next}`)?.focus();
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {placementNotice ? (
         <p className="placement-notice" role="status">{placementNotice}</p>
       ) : null}
@@ -241,6 +290,7 @@ export function HierarchyBrowser({
         </p>
       ) : null}
 
+      <div id="materiel-panel-plan" role="tabpanel" aria-labelledby="materiel-tab-plan" hidden={shownTab !== 'plan'}>
       <section
         id="farm-plan"
         className="farm-plan"
@@ -294,6 +344,8 @@ export function HierarchyBrowser({
                       onSelectBed={setBedId}
                       onChoosePlacementBed={chooseBedForPlacement}
                       onChoosePlacementGap={chooseGapForPlacement}
+                      open={plotOpen(plot.id)}
+                      onToggle={() => setOpenPlots((current) => ({ ...current, [plot.id]: !plotOpen(plot.id) }))}
                     />
                   );
                 })}
@@ -327,36 +379,46 @@ export function HierarchyBrowser({
         </p>
       ) : null}
 
-      {/* Le plan de la parcelle d'abord, la planche choisie juste dessous, puis l'aperçu (retour du porteur du 8 novembre 2026). */}
+      {/* Le plan de la parcelle d'abord, la planche choisie juste dessous, puis l'aperçu (retour du porteur du 8 novembre 2026) ; « Aperçu instantané » va avec le plan (F461). */}
       <CoverageOverview
         coverage={irrigationCoverage}
         highlightedEquipmentId={highlightedEquipmentId}
         onHighlightEquipment={setHighlightedEquipmentId}
-      />
-
-      <GardenGroupManager
-        season={season}
-        groups={gardenGroupConfiguration.groups}
-        copiedFromSeason={gardenGroupConfiguration.copiedFromSeason}
-        plots={seasonPlots}
-        beds={seasonBeds}
-        zones={zones}
-      />
-
-      <EquipmentInventory
-        ref={equipmentInventoryRef}
-        equipment={equipment}
-        placements={currentEquipmentPlacements}
-        poseContext={{ poses: currentPoses, history: poseHistory, bedName, onRemove: openRemoval }}
-        onStartPlacement={startEquipmentPlacement}
-        onPlacementChanged={applyPlacementUpdate}
-        calculator={calculator}
       />
       {selectedBed && showBedCropWater ? (
         <PageSettingsFold>
           <BedCropWaterPanel key={`${season}:${selectedBed.id}`} season={season} bedId={selectedBed.id} bedName={selectedBed.name} />
         </PageSettingsFold>
       ) : null}
+      </div>
+
+      {/* L'inventaire et les groupes restent rendus, cachés hors de leur onglet : rien de ce qui s'y saisit ne se perd. */}
+      <div id="materiel-panel-materiel" role="tabpanel" aria-labelledby="materiel-tab-materiel" hidden={shownTab !== 'materiel'}>
+        <EquipmentInventory
+          ref={equipmentInventoryRef}
+          equipment={equipment}
+          placements={currentEquipmentPlacements}
+          poseContext={{ poses: currentPoses, history: poseHistory, bedName, onRemove: openRemoval }}
+          onStartPlacement={(equipmentId) => {
+            // Poser depuis l'inventaire bascule sur le plan, où la pose se voit (point 5, F461).
+            chooseTab('plan');
+            startEquipmentPlacement(equipmentId);
+          }}
+          onPlacementChanged={applyPlacementUpdate}
+          calculator={calculator}
+        />
+      </div>
+
+      <div id="materiel-panel-groupes" role="tabpanel" aria-labelledby="materiel-tab-groupes" hidden={shownTab !== 'groupes'}>
+        <GardenGroupManager
+          season={season}
+          groups={gardenGroupConfiguration.groups}
+          copiedFromSeason={gardenGroupConfiguration.copiedFromSeason}
+          plots={seasonPlots}
+          beds={seasonBeds}
+          zones={zones}
+        />
+      </div>
       {removal ? (
         <EquipmentRemovalDialog
           equipmentName={equipmentById.get(removal.equipmentId)?.name ?? 'ce matériel'}

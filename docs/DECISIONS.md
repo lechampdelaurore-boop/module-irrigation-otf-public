@@ -6451,6 +6451,38 @@ Ne changent pas : les calculs, les chiffres affichés, les liens vers
 `#manual-rain` (« Aujourd'hui », « Historique »), qui ouvrent le pli.
 Aucune migration.
 
+## D-188 — Lot J, PR 6 : « Matériel » en trois onglets
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 15 :
+« Matériel » mesurait 17 546 px au téléphone sur la ferme du porteur, son
+inventaire commençait vers 11 300 px ; trois noms de matériel y étaient
+coupés à la fin, impossibles à distinguer (« Goutte-à-goutte du c… »), et
+le fil d'Ariane sortait de l'écran. **Cause vérifiée** :
+`hierarchy-browser.tsx` montrait le plan (chaque jardin ouvert), l'aperçu,
+les groupes et l'inventaire l'un sous l'autre ; les noms se coupaient par
+`text-overflow: ellipsis`, en fin de nom ; le fil d'Ariane ne passait pas à
+la ligne (`white-space: nowrap`).
+
+**Décision (F461).** Trois onglets en tête de page, **Plan · Matériel ·
+Groupes**, le plan d'abord ; l'onglet est gardé dans l'adresse
+(`?onglet=materiel`, `?onglet=groupes`) ; « Aperçu instantané » et le pli
+des réglages de la planche vont avec le plan. Les onglets cachés restent
+rendus : rien de ce qui s'y saisit ne se perd. Poser un matériel depuis
+l'inventaire bascule sur le plan et y reste (les autres onglets sont
+indisponibles pendant la pose). Au téléphone, chaque jardin du plan est replié
+sur une ligne (nom, planches, matériel posé) et s'ouvre à l'appui ; celui
+de la planche choisie est ouvert, et tous le sont pendant une pose. Les
+noms de matériel de l'inventaire et de l'aperçu se coupent au milieu :
+leurs huit derniers caractères restent entiers, le nom complet est dans la
+bulle et reste le texte de l'élément. Le fil d'Ariane passe à la ligne.
+Budget de la page au téléphone : 5 300 px (1 782 px sur les données des
+parcours, quatre jardins).
+
+Ne changent pas : le placement, l'inventaire, les groupes, la vue
+satellite. Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

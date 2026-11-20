@@ -203,6 +203,17 @@ export async function ouvrirLaCorrespondanceDesEspeces(page: Page): Promise<Loca
 }
 
 /**
+ * Un onglet de « Matériel » : Plan, Matériel ou Groupes (audit du 19 novembre
+ * 2026, lot J, n° 15, F461). Le plan est montré d'office ; l'inventaire et
+ * les groupes ne se touchent qu'une fois leur onglet choisi.
+ */
+export async function ouvrirLOnglet(page: Page, nom: 'Plan' | 'Matériel' | 'Groupes'): Promise<void> {
+  const onglet = page.getByRole('tablist', { name: 'Parties de la page' }).getByRole('tab', { name: nom, exact: true });
+  await onglet.click();
+  await expect(onglet).toHaveAttribute('aria-selected', 'true');
+}
+
+/**
  * Un pli de la page ouvert s'il ne l'est pas déjà : ceux d'« Objectifs et
  * besoins » (les objectifs, la météo, la pluie mesurée) sont fermés d'office,
  * une ligne de résumé chacun (audit du 19 novembre 2026, lot J, n° 15, F460).

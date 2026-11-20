@@ -19,6 +19,7 @@ import type { Bed, Plot } from '@/lib/domain/domain';
 import { type BedIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
 import { bedColumns, bedRowCount } from '@/lib/domain/irrigation-layout';
 import { type EquipmentInventoryAction } from '../equipment-inventory';
+import { plotFoldSummary } from '@/lib/domain/materiel-tabs';
 
 const EQUIPMENT_DRAG_TYPE = 'application/x-irrigation-equipment';
 
@@ -38,6 +39,8 @@ export function PlotPlanCard({
   onSelectBed,
   onChoosePlacementBed,
   onChoosePlacementGap,
+  open = true,
+  onToggle,
 }: {
   plot: Plot;
   beds: Bed[];
@@ -61,6 +64,9 @@ export function PlotPlanCard({
     beforeBed: Bed,
     afterBed: Bed,
   ) => void;
+  /** Au téléphone, le jardin replié sur une ligne s'ouvre à l'appui (audit du 19 novembre 2026, lot J, n° 15, F461). */
+  open?: boolean;
+  onToggle?: () => void;
 }) {
   const type = plot.mode === 'greenhouse' ? 'Abri' : 'Jardin';
   const columns = bedColumns(beds.length);
@@ -71,6 +77,7 @@ export function PlotPlanCard({
   return (
     <article
       className="plot-plan-card"
+      data-open={open}
       data-mode={plot.mode}
       data-bed-rows={bedRowCount(beds.length)}
       style={layoutVariables}
@@ -79,6 +86,19 @@ export function PlotPlanCard({
         <strong>{plot.name}</strong>
         <span className="plot-type-badge">{type}</span>
         <span className="plot-area">{formatMeasure(plot.area, 'm²')}</span>
+        {/* Au téléphone seulement : le jardin sur une ligne, son nom, ses planches, le matériel posé ; l'appui l'ouvre (F461). */}
+        {onToggle ? (
+          <button
+            type="button"
+            className="plot-card-toggle"
+            aria-expanded={open}
+            aria-label={`${plot.name} : ${plotFoldSummary(beds.length, placements.length)}`}
+            onClick={onToggle}
+          >
+            <strong>{plot.name}</strong>
+            <small>{plotFoldSummary(beds.length, placements.length)}</small>
+          </button>
+        ) : null}
       </header>
       <div className="plot-card-body">
         <span className="plot-bed-count">

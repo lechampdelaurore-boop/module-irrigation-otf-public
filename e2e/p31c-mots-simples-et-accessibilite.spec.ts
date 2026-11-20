@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { ciblesTropPetites, textesPeuContrastes, type CibleMesuree, type TexteMesure } from './support/accessibilite.ts';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { type PageDuModule, attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { type PageDuModule, attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 
 /**
  * Parcours P31c : l'audit ergonomique, lot 3, PR 2 — les mots simples
@@ -223,6 +223,8 @@ test('une pompe et un matériel archivés : cibles de 44 px au téléphone et co
   await mesurer('ressources, plis ouverts');
   await verifierLEtape(page, journal, 'mesures de la page ressources, une pompe archivée');
   await attendreLaPageIrrigation(page, 'materiel');
+  await mesurer('materiel, plan');
+  await ouvrirLOnglet(page, 'Matériel');
   await mesurer('materiel, archives repliées');
   const archives = page.getByRole('button', { name: 'Matériels archivés (1)' });
   await archives.click();
@@ -237,6 +239,8 @@ test('une pompe et un matériel archivés : cibles de 44 px au téléphone et co
 /** Un goutte-à-goutte créé puis archivé : archiver ne se demande qu'une fois, à la fenêtre de confirmation du module (lot G, n° 8). */
 async function creerPuisArchiverUnMateriel(page: Page, materiel: string): Promise<void> {
   const fiche = page.locator('dialog[open], [role=dialog]').filter({ hasText: 'Ajouter un matériel' });
+  // L'inventaire a son onglet (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   await ouvrirParClic(page.getByRole('button', { name: 'Ajouter un matériel' }), fiche);
   await fiche.getByLabel('Nom du matériel').fill(materiel);
   await fiche.locator('label').filter({ hasText: 'Goutte-à-goutte' }).click();

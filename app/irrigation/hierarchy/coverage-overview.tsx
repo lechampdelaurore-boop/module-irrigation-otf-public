@@ -1,4 +1,5 @@
 'use client';
+import { MiddleCut } from '../shell/middle-cut';
 import { formatIrrigationRate, numberFormatter } from './presentation';
 
 import { sortByNameNaturally } from '@/lib/domain/bed-order';
@@ -73,7 +74,7 @@ export function CoverageOverview({
                 >
                   <span className="coverage-equipment-dot" aria-hidden="true" />
                   <span>
-                    <strong>{item.equipmentName}</strong>
+                    <strong><MiddleCut text={item.equipmentName} /></strong>
                     {/* Le nom du réglage (« 5 planches ») et les planches couvertes, séparés (point 8). */}
                     <small>
                       <span className="coverage-setting-name">{settingText(item.settingName)}</span>

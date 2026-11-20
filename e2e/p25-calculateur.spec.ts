@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { attendreLeChoixDesFonctionnalites, caseDeLaFonctionnalite, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
-import { attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 
 /**
  * Parcours P25 : le calculateur d'irrigation (3.8 bis,
@@ -18,6 +18,8 @@ import { attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleT
 
 async function ouvrirLesReglages(page: Page, nom: string, nature: 'Goutte-à-goutte' | 'Aspersion'): Promise<Locator> {
   const fiche = page.locator('dialog[open], [role=dialog]').filter({ hasText: 'Ajouter un matériel' });
+  // L'inventaire a son onglet (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   await ouvrirParClic(page.getByRole('button', { name: 'Ajouter un matériel' }), fiche);
   await fiche.getByLabel('Nom du matériel').fill(nom);
   await fiche.locator('label').filter({ hasText: nature }).click();
