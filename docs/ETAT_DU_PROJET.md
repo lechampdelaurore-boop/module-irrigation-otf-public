@@ -522,7 +522,12 @@ registres, elle y renvoie.
   « Correspondance des espèces » est un pli fermé dont le titre porte le
   compteur (« 36 espèces à rattacher sur 77 »), ouvert par son ancre ; la
   liste « sans référence Kc » ne répète plus les espèces à rattacher ;
-  codée.
+  en ligne le 20 novembre 2026 à 8 h 12 (#123, fusionnée à 7 h 56, run
+  44691338209 vérifié job par job). **PR 5, « Objectifs et besoins » court** (D-187, F460) : les
+  objectifs, la météo et la pluie mesurée en plis fermés d'une ligne ; au
+  téléphone, les tuiles en une ligne, chaque jardin en une ligne compacte ;
+  « À planifier » et le besoin d'abord, le reste « Pour les experts » ;
+  4 704 → 2 750 px à 390 px ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

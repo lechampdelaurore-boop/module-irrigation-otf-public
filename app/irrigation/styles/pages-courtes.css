@@ -1,0 +1,180 @@
+/*
+  Audit du 19 novembre 2026, lot J, « Pages courtes au téléphone »
+  (docs/audit-ergonomie-2026-11-19-lot-j-contract.md).
+  PR 5 : « Objectifs et besoins » court au téléphone (F460) : les objectifs,
+  la météo et la pluie mesurée en plis fermés d'une ligne ; les tuiles en une
+  ligne de résumé ; chaque jardin en une ligne compacte ; dans une planche
+  ouverte, « À planifier » et le besoin d'abord, le reste « Pour les experts ».
+*/
+
+/* Les trois plis de la semaine, à l'ordinateur comme au téléphone. */
+.water-dashboard-columns:has(> .water-fold) {
+  align-items: start;
+}
+
+.water-management-section .water-fold {
+  padding: 0;
+}
+
+.water-fold > summary {
+  position: relative;
+  display: grid;
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  gap: 2px;
+  padding: .7rem 2.75rem .7rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.water-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.water-fold > summary h3 {
+  margin: 0;
+}
+
+.water-fold > summary small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.water-fold > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.water-fold[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.water-fold-body {
+  padding: 0 17px 17px;
+}
+
+/* Les quantités « Pour les experts » d'une planche, fermées, comme « Voir le calcul ». */
+.need-experts {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+}
+
+.need-experts > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  padding: .3rem .65rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.need-experts > .need-primary {
+  padding: 0 .55rem .55rem;
+}
+
+/* Les formes du téléphone, cachées à l'ordinateur. */
+.water-summary-line,
+.irrigation-needs-gardens summary span.garden-compact,
+.garden-compact-detail {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .water-summary-line {
+    display: flex;
+    width: 100%;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: space-between;
+    gap: .6rem;
+    margin: .8rem 0 .4rem;
+    padding: .55rem .9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--tile);
+    color: var(--ink);
+    font: 500 13px/1.4 var(--font-ui);
+    text-align: left;
+  }
+
+  .water-summary-line small {
+    flex: none;
+    color: var(--green);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  .water-summary-grid:not([data-open="true"]) {
+    display: none;
+  }
+
+  /* Un jardin, une ligne : le nom, coupé s'il le faut, le reste à apporter, l'état. */
+  .irrigation-needs-gardens > details > summary {
+    min-height: var(--touch-target);
+    box-sizing: border-box;
+    flex-direction: row;
+    align-items: center;
+    padding: .55rem 1rem;
+  }
+
+  .irrigation-needs-gardens > details > summary > span:not(.garden-compact) {
+    display: none;
+  }
+
+  .irrigation-needs-gardens summary span.garden-compact {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: .5rem;
+    text-align: left;
+  }
+
+  .garden-compact strong {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .garden-compact b {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .irrigation-needs-gardens summary .garden-compact-state {
+    flex: none;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--sheet);
+    color: var(--ink);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .irrigation-needs-gardens summary .garden-compact-state[data-tone="high"] {
+    background: var(--danger-soft);
+    color: var(--danger-ink);
+  }
+
+  .irrigation-needs-gardens summary .garden-compact-state[data-tone="covered"] {
+    color: var(--green-dark);
+  }
+
+  .garden-compact-detail {
+    display: block;
+    margin: 0 1rem .6rem;
+    color: var(--muted);
+    font-size: 12px;
+  }
+}

@@ -4,6 +4,7 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   nomsDesPagesDuMenu,
+  ouvrirLePli,
   surveillerLaConsole,
   TITRES_DES_PAGES,
   verifierCibleTactile,
@@ -70,12 +71,13 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
 
   // Point 9 : la météo de référence sur la page des besoins, la commune dans Réglages.
   await attendreLaPageIrrigation(page, 'besoins');
-  const meteo = page.locator('.water-panel').filter({ hasText: 'Météo de référence' });
+  // La météo, les objectifs et la pluie mesurée en plis fermés (lot J, n° 15, F460).
+  const meteo = await ouvrirLePli(page.locator('#meteo-de-reference'));
   await expect(meteo.getByRole('button', { name: 'Actualiser la météo' })).toBeVisible();
   await expect(meteo.getByLabel('Commune')).toHaveCount(0);
 
   // Point 4 : le périmètre d'un objectif, cherché puis rangé par jardin.
-  const objectifs = page.locator('.water-panel').filter({ hasText: 'Objectifs hebdomadaires' });
+  const objectifs = await ouvrirLePli(page.locator('#objectifs-de-la-semaine'));
   const recherche = objectifs.getByLabel('Chercher un périmètre');
   // Le nom accessible d'une liste enveloppée dans son libellé porte aussi l'option choisie : on la vise par sa place.
   const perimetre = objectifs.locator('.goal-scope-picker select');

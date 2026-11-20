@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 5 sur 7)
+
+- **« Objectifs et besoins » court au téléphone** (D-187) : les objectifs,
+  la météo et la pluie mesurée se replient, une ligne de résumé chacun (la
+  météo s'ouvre d'elle-même si elle a un souci) ; au téléphone, les tuiles
+  tiennent en une ligne et chaque jardin en une ligne : son nom, ce qu'il
+  reste à apporter et son état. Dans une planche, « À planifier » et le
+  besoin réel d'abord, le reste sous « Pour les experts ». La page passe
+  de 4 700 à 2 750 px au téléphone.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 4 sur 7)
 
 - **« Réglages » : les espèces pliées, une seule liste** (D-186) :

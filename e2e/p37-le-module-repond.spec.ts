@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -101,7 +101,7 @@ test('« Objectifs et besoins » répond sous chaque bouton, et un rechargement 
   const journal = surveillerLaConsole(page);
   await attendreLaPageIrrigation(page, 'besoins');
 
-  const objectifs = page.locator('.water-panel').filter({ hasText: 'Objectifs hebdomadaires' });
+  const objectifs = await ouvrirLePli(page.locator('#objectifs-de-la-semaine'));
   await objectifs.scrollIntoViewIfNeeded();
   await objectifs.getByLabel('mm / semaine').fill('600');
   await objectifs.getByRole('button', { name: 'Enregistrer', exact: true }).click();
@@ -113,7 +113,7 @@ test('« Objectifs et besoins » répond sous chaque bouton, et un rechargement 
   await verifierLEtape(page, journal, 'l’objectif refusé sous son bouton');
 
   // La pluie du jour : réenregistrée telle quelle, ou posée puis retirée.
-  const pluie = page.locator('#manual-rain');
+  const pluie = await ouvrirLePli(page.locator('#manual-rain'));
   await pluie.scrollIntoViewIfNeeded();
   const millimetres = pluie.getByLabel('Millimètres');
   const avant = await millimetres.inputValue();

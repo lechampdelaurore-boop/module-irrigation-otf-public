@@ -69,6 +69,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // PR 4 (F459) : « Correspondance des espèces » pliée ; 4 378 → 3 338 px avec les 4 espèces des
   // données des parcours (sur la ferme du porteur, 77 espèces, 8 700 px de moins attendus).
   reglages: 3_400,
+  // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
+  // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
+  besoins: 2_800,
 };
 
 for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuModule, number][]) {
@@ -107,4 +110,47 @@ test('« Réglages » : « Correspondance des espèces » fermée, son compteur 
   await expect(pli).toHaveAttribute('open', '');
   await expect(pli.getByRole('searchbox', { name: 'Chercher une espèce' })).toBeVisible();
   await verifierLEtape(page, journal, 'espèces repliées');
+});
+
+test('« Objectifs et besoins » : trois plis fermés d’une ligne, un jardin par ligne, « À planifier » d’abord', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  await attendreLaPageIrrigation(page, 'besoins');
+  for (const id of ['objectifs-de-la-semaine', 'meteo-de-reference', 'manual-rain']) {
+    const pli = page.locator(`details#${id}`);
+    await expect(pli).not.toHaveAttribute('open', '');
+    await expect(pli.locator(':scope > summary small')).not.toHaveText('');
+  }
+  await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeHidden();
+  // Les tuiles : une ligne de résumé au téléphone, qui les déplie ; à l'ordinateur, les tuiles.
+  const ligne = page.locator('.water-summary-line');
+  const tuiles = page.locator('.water-summary-grid');
+  if (telephone) {
+    await expect(tuiles).toBeHidden();
+    await expect(ligne).toContainText('irrigué');
+    await ligne.click();
+    await expect(tuiles).toBeVisible();
+  } else {
+    await expect(ligne).toBeHidden();
+    await expect(tuiles).toBeVisible();
+  }
+  // Un jardin, une ligne de 64 px au plus au téléphone.
+  const jardins = page.locator('.irrigation-needs-gardens > details');
+  const hauteurs = await jardins.evaluateAll((plis) => plis.map((pli) => (pli.querySelector(':scope > summary') as HTMLElement).getBoundingClientRect().height));
+  expect(hauteurs.length).toBeGreaterThan(0);
+  if (telephone) expect(Math.max(...hauteurs), 'un jardin replié tient sur une ligne').toBeLessThanOrEqual(64);
+  // Une planche ouverte : « À planifier » puis le besoin réel ; le reste dans « Pour les experts », fermé.
+  const premier = jardins.first();
+  await premier.locator(':scope > summary').click();
+  const carte = premier.locator('article.irrigation-need-card').first();
+  await expect(carte.locator(':scope > .need-primary > span > small')).toHaveText([/^À planifier/, /^Besoin réel/]);
+  const experts = carte.locator('details.need-experts');
+  await expect(experts).not.toHaveAttribute('open', '');
+  await experts.locator(':scope > summary').click();
+  await expect(experts.locator('.need-primary > span > small')).toHaveText([/^Besoin effectif/, /^Volume/, /^Déficit relatif/]);
+  // Le lien vers la pluie mesurée (« Aujourd’hui », « Historique ») ouvre son pli.
+  await page.goto('/irrigation/besoins#manual-rain');
+  await expect(page.locator('details#manual-rain')).toHaveAttribute('open', '');
+  await expect(page.locator('details#manual-rain').getByLabel('Millimètres')).toBeVisible();
+  await verifierLEtape(page, journal, 'objectifs et besoins courts');
 });

@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
 
 /**
  * Parcours P21 : les alertes cultures (docs/weather-crop-alerts-contract.md,
@@ -162,7 +162,7 @@ async function reglerLaMarge(encart: Locator, valeur: string, affiche: string): 
 
 /** « Actualiser la météo » se rouvre seul après la pause entre deux demandes ; le message dit la fin. */
 async function actualiserLaMeteo(page: Page): Promise<void> {
-  const meteo = page.locator('.water-management-section .water-panel').filter({ hasText: 'Météo de référence' });
+  const meteo = await ouvrirLePli(page.locator('#meteo-de-reference'));
   await meteo.scrollIntoViewIfNeeded();
   const bouton = meteo.getByRole('button', { name: 'Actualiser la météo' });
   await expect(bouton).toBeEnabled(PAUSE_D_ACTUALISATION);

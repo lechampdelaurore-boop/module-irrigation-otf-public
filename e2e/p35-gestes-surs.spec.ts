@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
+import { type PageDuModule, attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces , ouvrirLePli } from './support/parcours.ts';
 
 /**
  * Parcours P35 : l'audit ergonomique final, lot C, gestes sûrs
@@ -32,7 +32,7 @@ test('« Retirer la mesure » se distingue d’« Enregistrer » et s’en écar
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await attendreLaPageIrrigation(page, 'besoins');
-  const pluie = page.locator('#manual-rain');
+  const pluie = await ouvrirLePli(page.locator('#manual-rain'));
   await pluie.scrollIntoViewIfNeeded();
   const enregistrer = pluie.getByRole('button', { name: 'Enregistrer', exact: true });
   const retirer = pluie.getByRole('button', { name: 'Retirer la mesure' });

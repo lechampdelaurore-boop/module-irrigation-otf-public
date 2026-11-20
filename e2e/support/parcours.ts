@@ -199,7 +199,15 @@ export async function ouvrirLesReglagesDeLaPage(page: Page): Promise<Locator> {
  * lot J, n° 15, F459).
  */
 export async function ouvrirLaCorrespondanceDesEspeces(page: Page): Promise<Locator> {
-  const pli = page.locator('details#correspondance-des-especes');
+  return ouvrirLePli(page.locator('details#correspondance-des-especes'));
+}
+
+/**
+ * Un pli de la page ouvert s'il ne l'est pas déjà : ceux d'« Objectifs et
+ * besoins » (les objectifs, la météo, la pluie mesurée) sont fermés d'office,
+ * une ligne de résumé chacun (audit du 19 novembre 2026, lot J, n° 15, F460).
+ */
+export async function ouvrirLePli(pli: Locator): Promise<Locator> {
   await expect(pli).toHaveCount(1);
   if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await pli.locator(':scope > summary').click();

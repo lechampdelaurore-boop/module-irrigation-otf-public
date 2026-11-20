@@ -205,7 +205,9 @@ Chaque précision faite en codant, numérotée à la suite du registre.
 
 - **F459** « Correspondance des espèces » : titre et phrase gardés, les deux listes dans un pli fermé à ancre (`#correspondance-des-especes`), le compteur en titre du pli ; il ne s'ouvre pas d'office (une ferme qui a des espèces à rattacher n'y gagnerait rien), mais par son ancre ou celle d'un élément qu'il contient ; la liste « sans référence Kc » ne garde que les exceptions de série d'une espèce rattachée (section 7) ; 4 378 → 3 338 px à 390 px sur les données des parcours (4 espèces).
 
-Les précisions des PR 5 à 7 suivent, F460 et au-delà.
+- **F460** « Objectifs et besoins » : les objectifs, la météo et la pluie mesurée en trois plis fermés à ancre, à l'ordinateur aussi (point 6), une ligne de résumé chacun ; le pli de la météo s'ouvre d'office sur une erreur, des données anciennes ou une mise à jour automatique en retard, pour que le défaut ne se cache pas ; « Météo sur une ligne » (point 3) est la ligne de résumé de son pli. L'état d'un jardin sur sa ligne compacte : « à compléter » (besoin non calculable), « couvert » (rien à apporter), sinon les planches en priorité haute ; le reste du résumé passe en tête du jardin ouvert. Le titre et la navigation de la semaine (234 px) restent : le contrat ne les touche pas. 4 704 → 2 750 px à 390 px sur les données des parcours (section 8). Le poids de la page (section 12) ne baisse pas : les plis gardent leur contenu rendu, pour que la recherche du navigateur y trouve le texte (comme F305) et que les parcours retrouvent un jardin par ses planches ; ne rendre les cartes des planches qu'à l'ouverture d'un jardin est laissé à un lot suivant, avec la recette sur la ferme du porteur.
+
+Les précisions des PR 6 et 7 suivent, F461 et au-delà.
 
 Ce que le lot ne prouve pas : un vrai téléphone, un lecteur d'écran ; la
 ferme réelle n'est pas touchée.
