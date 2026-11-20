@@ -1,0 +1,44 @@
+/*
+ * Audit ergonomique du 19 novembre 2026, lot K « Finitions de charte »
+ * (docs/audit-ergonomie-2026-11-19-lot-k-contract.md). Importée avant
+ * `gestes-surs.css`, qui reste la dernière.
+ */
+
+/* PR 1 (n° 17) : la ligne d'état du planning en deux lignes (F465). */
+.planning-meta-main,
+.planning-meta-sources {
+  display: block;
+}
+
+.planning-meta-sources {
+  margin-top: .15rem;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* PR 1 (n° 17) : « Réglages du planning » porte le signe des autres plis (F467). */
+.planning-settings > summary {
+  position: relative;
+  padding-right: 2.75rem;
+  list-style: none;
+}
+
+.planning-settings > summary::-webkit-details-marker {
+  display: none;
+}
+
+.planning-settings > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.planning-settings[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}

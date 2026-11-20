@@ -6513,6 +6513,41 @@ passe après les tuiles des cumuls, en bouton secondaire.
 Ne changent pas : les calculs, l'export, les filtres eux-mêmes. Aucune
 migration.
 
+## D-190 — Lot K, PR 1 : planning, le rouge pour le manque d'eau seul
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 17, lot K
+« Finitions de charte » (contrat court
+`docs/audit-ergonomie-2026-11-19-lot-k-contract.md`, écrit avant le code et
+joint à cette PR) : une semaine normale, la tuile « Planches non servies 2 »
+était rouge pour deux planches dont le besoin (1,1 mm) est sous la dose
+minimale et attend de grandir ; « Ajuster » montrait « 8,06 » quand la carte
+disait « 8,1 mm » ; la ligne d'état de la semaine, très dense ; deux boutons
+pour valider la seule proposition d'un jour ; « Réglages du planning » sans
+signe qu'il s'ouvre. **Cause vérifiée** : `unplacedGroups`
+(`lib/domain/planning/action-summary.ts`) ne disait « pour information »
+qu'un groupe sans manque, or une planche sous la dose minimale garde un
+petit manque ; le champ de la dose se formait à deux décimales ; la ligne
+d'état tenait en un seul paragraphe ; le bouton du jour paraissait dès une
+proposition ; le résumé du pli n'avait pas le chevron des autres plis.
+
+**Décision (F463 à F467).** Une planche dont le seul motif est « besoin sous
+la dose minimale » est dite pour information, comme une planche sans
+objectif : hors du compte rouge de la tuile, de la ligne du téléphone et du
+titre du pli, « en attente d'un besoin plus grand » dans le détail de la
+tuile et « en attente » dans le titre du pli ; son groupe dit pourquoi. Le
+manque d'eau et le temps de pompage, qui ne la comptaient déjà pas, ne
+changent pas. Le champ de la dose d'« Ajuster » montre le chiffre de la
+carte, à une décimale ; laissé tel quel, il rend la dose exacte de la
+proposition, sans arrondi. La ligne d'état : la semaine et l'heure du calcul,
+puis dessous, en petit, la prévision météo et les réserves. Le bouton qui
+valide les propositions d'un jour paraît à partir de deux. « Réglages du
+planning » prend le chevron des autres plis.
+
+Ne changent pas : le moteur du planning, les motifs, le manque d'eau, les
+gestes. Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

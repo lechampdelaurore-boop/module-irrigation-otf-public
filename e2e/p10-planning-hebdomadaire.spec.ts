@@ -65,6 +65,8 @@ async function verifierLeJourEcarte(jour: Locator): Promise<void> {
   const toutValider = jour.getByRole('button', { name: /^Valider (?:la proposition|les \d+ propositions) du jour$/ });
   await expect(pli).toBeVisible();
   await expect(pli).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  // Un jour à une seule proposition n'a pas de bouton du jour (lot K, n° 17, F466) : rien à écarter.
+  if (await toutValider.count() === 0) return;
   await expect(toutValider).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
   const [haut, bas] = await Promise.all([pli.boundingBox(), toutValider.boundingBox()]);
   expect(Math.round(bas!.y - (haut!.y + haut!.height)), 'la validation du jour écartée du pli').toBeGreaterThanOrEqual(ECART_DES_GESTES_PX);
@@ -151,7 +153,7 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
   const nonPlace = planning.locator('details.planning-unplaced');
   await expect(nonPlace).toHaveJSProperty('open', false);
   const titreNonPlace = nonPlace.locator('summary');
-  await expect(titreNonPlace).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?|Planches sans objectif \(\d+\))$/);
+  await expect(titreNonPlace).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?( · \d+ en attente)?|Planches sans objectif \(\d+\)( · \d+ en attente)?|Planches en attente \(\d+\))$/);
   await expect(nonPlace.locator('tbody tr').first()).toBeHidden();
   await verifierCibleTactile(titreNonPlace, 'le titre « Planches non servies »');
   await expect((await lignesNonPlacees(planning)).filter({ hasText: 'S01' })).toContainText('aucun matériel ne l’arrose');
@@ -183,7 +185,15 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
     const deuxieme = await carteNommee(planning, proposees().first());
     const jour = planning.locator('li.planning-day').filter({ has: proposeesDe(page) }).first();
     if (testInfo.project.name === 'telephone') await verifierLeJourEcarte(jour);
-    await jour.getByRole('button', { name: /^Valider (?:la proposition|les \d+ propositions) du jour$/ }).click();
+    // Une seule proposition à valider : son « Valider » suffit, le jour n'a pas de second bouton (lot K, n° 17, F466).
+    const boutonDuJour = jour.getByRole('button', { name: /^Valider les \d+ propositions du jour$/ });
+    if (await boutonDuJour.count() > 0) await boutonDuJour.click();
+    else {
+      await expect(jour.getByRole('button', { name: /du jour$/ })).toHaveCount(0);
+      const pli = jour.locator('.planning-day-toggle');
+      if (await pli.isVisible() && await pli.getAttribute('aria-expanded') === 'false') await pli.click();
+      await deuxieme.getByRole('button', { name: 'Valider', exact: true }).click();
+    }
     await expect(deuxieme.locator('.planning-status')).toHaveText('Validée', { timeout: 30_000 });
     validees += 1;
     await verifierLEtape(page, journal, 'jour validé');
