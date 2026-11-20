@@ -250,11 +250,18 @@
   }
 }
 
+/*
+ * Jusqu'à 980 px, et non plus 600 : la tablette prend la barre du
+ * téléphone, quatre entrées et « Plus », au lieu d'une bande qui défilait
+ * de côté (audit du 19 novembre 2026, lot K, n° 24, F481).
+ */
 @media (max-width: 600px) {
   .feature-page {
     padding: 14px 14px 0;
   }
+}
 
+@media (max-width: 980px) {
   .app-shell:has(.phone-bar) {
     padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   }
@@ -308,7 +315,8 @@
     font: 500 var(--text-12)/1.15 var(--font-ui);
     text-align: center;
     text-decoration: none;
-    overflow-wrap: anywhere;
+    /* Un nom ne se coupe plus au milieu d'un mot (n° 24, F482). */
+    overflow-wrap: normal;
   }
 
   .phone-bar .icon {

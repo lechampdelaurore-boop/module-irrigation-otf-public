@@ -95,3 +95,53 @@ test('rien sous 12 px, quatre graisses, sur les douze pages', async ({ page }) =
   }
   await verifierLEtape(page, journal, 'tailles et graisses');
 });
+
+test('la tablette garde la barre du bas et ses cibles de 44 px ; à 320 px les noms tiennent', async ({ page }, testInfo) => {
+  // n° 24, F481 et F482 : de 601 à 980 px, la barre du bas du téléphone, pas un menu latéral à demi-place.
+  test.skip(testInfo.project.name !== 'telephone', 'les largeurs de tablette et de petit téléphone se jouent une fois');
+  const journal = surveillerLaConsole(page);
+  await page.setViewportSize({ width: 768, height: 1024 });
+  for (const cible of ['aujourdhui', 'historique', 'ressources', 'reglages'] as const) {
+    await attendreLaPageIrrigation(page, cible);
+    const barre = page.getByRole('navigation', { name: 'Pages principales' });
+    await expect(barre).toBeVisible();
+    await expect(barre.locator('li')).toHaveCount(5);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `défilement de côté sur ${cible}`).toBeLessThanOrEqual(768);
+    const petites = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>('main .feature-page :is(button, select, input:not([type="hidden"], [type="checkbox"], [type="radio"], [type="range"]), .history-summary-action, .refresh-link)')]
+      .filter((element) => element.getClientRects().length > 0 && element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && !element.closest('.plot-plan-content, [aria-hidden="true"]'))
+      .map((element) => ({ texte: (element.textContent ?? '').trim().slice(0, 24), boite: element.getBoundingClientRect() }))
+      .filter(({ boite }) => boite.height < 44 || boite.width < 44)
+      .map(({ texte, boite }) => `${texte} ${Math.round(boite.width)}×${Math.round(boite.height)}`));
+    expect(petites, `cibles sous 44 px sur ${cible} à 768 px`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 320, height: 640 });
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const coupes = await page.locator('.phone-bar :is(a, button) > span:not(.menu-home-badge)').evaluateAll((noms) => noms
+    .filter((nom) => nom.scrollWidth > nom.clientWidth + 1 || nom.getBoundingClientRect().height > 20)
+    .map((nom) => nom.textContent));
+  expect(coupes, 'noms de la barre coupés à 320 px').toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  await verifierLEtape(page, journal, 'tablette et 320 px');
+});
+
+test('au grand écran, la page se centre et le menu descend jusqu’en bas', async ({ page }, testInfo) => {
+  // n° 23, F480.
+  test.skip(testInfo.project.name !== 'ordinateur', 'le grand écran se joue sur ordinateur');
+  const journal = surveillerLaConsole(page);
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  for (const cible of ['ressources', 'historique'] as const) {
+    await attendreLaPageIrrigation(page, cible);
+    const mesure = await page.evaluate(() => {
+      const contenu = document.querySelector<HTMLElement>('.feature-layout > .feature-page')!;
+      const colonne = contenu.parentElement!.getBoundingClientRect();
+      const menu = document.querySelector<HTMLElement>('.feature-layout > .feature-menu')!.getBoundingClientRect();
+      const page = contenu.getBoundingClientRect();
+      const gauche = page.left - Math.max(colonne.left, menu.right);
+      const droite = colonne.right - page.right;
+      return { gauche, droite, basDuMenu: menu.bottom + window.scrollY, hauteur: document.documentElement.scrollHeight };
+    });
+    expect(Math.abs(mesure.gauche - mesure.droite), `page centrée sur ${cible} (${Math.round(mesure.gauche)} / ${Math.round(mesure.droite)})`).toBeLessThanOrEqual(2);
+    expect(mesure.basDuMenu, `le menu va jusqu’en bas sur ${cible}`).toBeGreaterThanOrEqual(mesure.hauteur - 1);
+  }
+  await verifierLEtape(page, journal, 'grand écran');
+});
