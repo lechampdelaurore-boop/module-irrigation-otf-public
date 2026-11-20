@@ -6930,3 +6930,29 @@ profondeur de la FAO-56 ; une ferme neuve l'héritait (défaut n° 14).
 
 Ne change pas : la base (aucune migration) ; la ferme du porteur et la
 démonstration ; la tomate à 0,65 m. Aucune question de budget.
+
+## D-227 — Tranche 4, sous-tranche 4.4, PR 4b : la région d'origine des cultures
+
+Date : 20 novembre 2026.
+
+**Contexte.** Les dates de stade du jeu commun viennent du CRIIAM Sud
+(région Sud / Occitanie) ou de la FAO-56 (générales) ; une ferme d'une autre
+région les recevait sans le savoir (F422, défaut n° 13).
+
+**Décision** (F586, section 8 bis.14 du contrat).
+
+1. La région d'origine se déduit de la source de la culture, sans colonne
+   nouvelle : CRIIAM Sud → « Sud / Occitanie », FAO-56 → « générales »,
+   version de la ferme → « votre ferme ». Elle est dite sur chaque fiche,
+   avec les délais de levée et calendriers du jeu commun, « ceux de la
+   ferme du porteur, Auvergne-Rhône-Alpes » (F428, réponse 3).
+2. La région de la ferme se déduit de sa commune confirmée (F419) : les deux
+   premiers chiffres du code postal, puis l'une des treize régions de France
+   métropolitaine (table fixe, découpage de 2016).
+3. Une ferme qui fait l'accueil, d'une autre région que Provence-Alpes-Côte
+   d'Azur ou Occitanie, est avertie sur chaque culture commune du CRIIAM,
+   sur la fiche et sur la carte fermée ; jamais sur la FAO-56, ni sur une
+   culture dont la ferme a ses propres dates, ni sans commune confirmée.
+
+Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
+et la démonstration (aucun avertissement, F426). Aucune question de budget.

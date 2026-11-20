@@ -12,6 +12,8 @@ import { dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
 import { seasonSpecies, speciesWithoutReference, type SeasonSpecies, type SpeciesWithoutReference } from '../domain/crop-water/species';
 import { rootingProfilesForSpace } from '../domain/onboarding/rooting';
 import { getOnboardingForUser } from './onboarding-service';
+import { cropOriginText, cropRegionWarning, regionOfPostcode } from '../domain/onboarding/regions';
+import { readWeatherPreference } from './weather-preference';
 
 /**
  * La page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -37,6 +39,8 @@ export type CropCoefficientsView =
       overrides: KcOverride[];
       settings: CropWaterSettingsView;
       rootingProfiles: StoredRootingProfile[];
+      /** Par culture, d'où viennent ses dates de stade, et l'avertissement d'une autre région (4.4, F586). */
+      regions: Record<string, { origin: string; warning: string | null }>;
     }
   | { available: false; season: number; reason: 'crop-plan-not-read' };
 
@@ -49,7 +53,7 @@ export async function getCropCoefficientsViewForUser(input: {
   const cropPlan = input.snapshot.cropPlan;
   if (!cropPlan) return { available: false, season: input.season, reason: 'crop-plan-not-read' };
   const workspaceId = await findWorkspaceIdForUser(input.ownerUserId);
-  const [crops, entries, overrides, settings, storedProfiles, onboarding] = await Promise.all([
+  const [crops, entries, overrides, settings, storedProfiles, onboarding, preference] = await Promise.all([
     listReferenceCropsForWorkspace(workspaceId),
     workspaceId === null ? Promise.resolve([]) : listSpeciesCorrespondencesForWorkspace(workspaceId),
     workspaceId === null ? Promise.resolve([]) : listKcOverridesForWorkspace(workspaceId),
@@ -58,7 +62,15 @@ export async function getCropCoefficientsViewForUser(input: {
       : readCropWaterSettingsForWorkspace(workspaceId),
     listRootingProfilesForWorkspace(workspaceId),
     getOnboardingForUser(input.ownerUserId),
+    readWeatherPreference(input.ownerUserId),
   ]);
+  // La région de la ferme, de sa commune confirmée seulement (F419, F586).
+  const postcode = preference.locationMode === 'custom' ? preference.customPostcode : input.snapshot.structure.legalPostcode;
+  const farmRegion = preference.locationConfirmed ? regionOfPostcode(postcode) : null;
+  const regions = Object.fromEntries(crops.map((stored) => [stored.crop.id, {
+    origin: cropOriginText(stored.crop.source, stored.origin),
+    warning: cropRegionWarning({ source: stored.crop.source, origin: stored.origin, farmRegion, onboarding }),
+  }]));
   // Une ferme neuve n'hérite pas des plafonds de racines de la ferme du porteur (4.4, F585).
   const rootingProfiles = rootingProfilesForSpace(storedProfiles, onboarding);
   const series = cropPlan.series.filter((item) => item.season === input.season);
@@ -79,5 +91,6 @@ export async function getCropCoefficientsViewForUser(input: {
       today: dateKeyInTimeZone(input.now ?? new Date(), FARM_TIME_ZONE),
     }),
     rootingProfiles,
+    regions,
   };
 }
