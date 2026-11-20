@@ -1,0 +1,173 @@
+# Contrat court — audit ergonomique du 19 novembre 2026, lot K : finitions de charte (24 undevicies)
+
+Écrit le 19 novembre 2026, avant tout code, en Opus 5.5 · Élevé (la ligne
+24 undevicies de la roadmap), après le lot J (24 duodevicies). Il couvre
+les constats **n° 16, n° 17 et n° 19 à n° 24** du rapport
+`audit-ergonomie-2026-11-19.md`, retenus par le porteur le 19 novembre 2026
+à 11 h 39 (choix n° 1 du rapport : les cinq lots, dans l'ordre G, H, I, J,
+K). Le porteur est en autonomie totale depuis 11 h 44 : chaque précision
+ci-dessous, aucune agronomique, suit l'option recommandée du rapport et
+reste modifiable par lui. **Aucune règle de calcul ne change**, aucun
+chiffre n'est recalculé : le lot range ce qui s'affiche selon la charte
+(`docs/charte-module.md`) ; aucune migration. Logiciel multi-fermes : chaque
+règle vaut pour toute ferme, les noms de jardins serrés de la ferme du
+porteur n'en sont que l'exemple.
+
+Registres : décisions **D-190 et suivantes** (jusqu'à D-199), précisions
+**F463 et suivantes** (jusqu'à F499), parcours **P41** (P40 est le
+dernier).
+
+## 1. Livraison en sept PR, une à la fois
+
+| PR | Point | Fichiers principaux | Preuve |
+| --- | --- | --- | --- |
+| 1 · Planning : le rouge pour le manque d'eau seul | n° 17 | `planning/weekly-plan-view.tsx` et ses blocs, `lib/domain/planning/` (lecture seule) | tests du domaine, P41 |
+| 2 · Vue satellite : des numéros quand les noms se chevauchent | n° 16 | `hierarchy/satellite-*`, `lib/domain/` (placement des étiquettes) | tests du domaine, P41 |
+| 3 · Un bouton plein par écran, un seul dessin de pli, plus de geste muet | n° 21 | feuilles `styles/`, les boutons et plis relevés | test de garde, P41 |
+| 4 · Mots et formats | n° 22 | `lib/domain/` (heures, durées, pluriels), « Ressources », « Réglages » | tests du domaine |
+| 5 · Une échelle de tailles de texte, rien sous 12 px | n° 19 | `styles/` (jetons), le plan de « Matériel » | test de garde des feuilles, P41 |
+| 6 · Rayons et couleurs de la charte | n° 20 | `styles/` | test de garde des feuilles |
+| 7 · Grand écran, 320 px et tablette | n° 23, n° 24 | `shell/`, `styles/` | P41 (320, 768, 1 920 px) |
+
+Chaque PR : `lint`, `typecheck`, `test`, `build`, `knip`, `push:check`,
+`weather:check`, `site:check` collés ; `e2e` joué en local sur les
+parcours touchés, la suite complète par la CI de la PR ; registres dans la
+même PR. L'ordre suit le gain sur l'effort : les deux constats « gain
+moyen » d'abord, puis les règles de la charte, page par page.
+
+## 2. Ce qui ne change pas
+
+Le calcul, les données, les gestes et leurs confirmations (lot G), le
+contrat d'« Aujourd'hui » (lot H), les budgets de hauteur au téléphone
+(lot J : aucune page ne grandit de plus de 10 % sans le dire), les ancres
+des liens existants, les couleurs de la charte elle-même. Le rouge reste
+au manque d'eau, à l'erreur et à ce qui efface.
+
+## 3. n° 17 — Planning : le rouge pour le manque d'eau seul (PR 1)
+
+1. Une planche « non servie » parce que son besoin est **sous la dose
+   minimale** (elle attend qu'il grandisse) est une information : la tuile
+   qui ne compte qu'elles est neutre, et dit « en attente » ; le rouge
+   reste à la planche non servie faute d'eau, de pompe ou de créneau.
+2. Un même chiffre, un seul arrondi : la dose de référence de « Ajuster »
+   s'affiche comme sur la carte (une décimale) ; la saisie garde sa
+   précision.
+3. La ligne d'état de la semaine se lit en deux lignes au plus : la
+   semaine et l'heure du calcul d'abord ; la source météo et la réserve
+   tampon dans une seconde ligne, plus discrète.
+4. Un jour à une seule proposition n'a qu'un bouton « Valider » ; le pli
+   « Réglages du planning » porte le signe des autres plis.
+
+## 4. n° 16 — Vue satellite : des numéros quand les noms se chevauchent (PR 2)
+
+1. Une étiquette de jardin qui chevaucherait une autre, ou sortirait de
+   son jardin, devient un **numéro** dans une pastille ; la légende sous la
+   carte associe chaque numéro à son nom, dans l'ordre naturel des noms.
+2. Une étiquette qui tient garde son nom. Le calcul se refait au zoom : un
+   numéro redevient nom quand la place le permet.
+3. Le nom complet reste le nom accessible du jardin sur la carte.
+
+## 5. n° 21 — Un bouton plein par écran, un seul dessin de pli, plus de geste muet (PR 3)
+
+1. Le bouton plein reste **le** geste de la page : « Cette semaine » quand
+   on y est déjà, les choix « 24 h / 48 h / 7 jours », « Créer un groupe »
+   passent en secondaire ou en onglets (l'option choisie se lit à son fond,
+   pas à un liseré) ; « Groupes de jardins alignés » ne s'ouvre pas avec
+   un bouton plein sur une ferme sans asperseur.
+2. Un seul dessin de pli dans le module : le chevron à droite de la
+   charte, qui tourne à l'ouverture ; plus de triangle du navigateur ni de
+   boîte grise sans signe.
+3. Plus de geste muet : « Retirer la mesure » indisponible sans mesure à
+   retirer ; un menu « … » qui ne contiendrait qu'un geste devient ce
+   geste, sauf le menu d'une ligne planifiée qui ne garde qu'« Annuler » :
+   F45 l'a éloigné exprès de « Démarrer maintenant » (F470) ; « Heure
+   réelle de fin » sans secondes ; un seul mot pour finir
+   un arrosage (« Terminer l'irrigation »).
+
+## 6. n° 22 — Mots et formats (PR 4)
+
+1. Heures « 8 h 50 », durées « 1 h 21 », partout où le module les écrit
+   (l'export CSV garde son format de tableur).
+2. Plus de pluriel entre parenthèses : « 1 jour », « 7 jours ».
+3. « Ressources » et « Réglages » en mots simples : les libellés relevés
+   par le rapport sont réécrits, le sens et les chiffres inchangés ;
+   « Faisabilité recalculée. » prend le style d'un message, pas d'un lien.
+
+## 7. n° 19 — Une échelle de tailles de texte, rien sous 12 px (PR 5)
+
+1. Six tailles de texte en jetons (12, 13, 14, 16, 20 et 28 px environ,
+   en rem) ; plus rien sous 12 px ; quatre graisses (300, 400, 500, 700).
+2. Le plan de « Matériel » : noms et sigles à 12 px au moins ; la pastille
+   chiffrée du plan dit ce qu'elle compte (bulle et légende), ou se retire
+   si elle ne dit rien d'utile.
+3. Les grands chiffres (durée calculée, tuiles) gardent leur taille de
+   titre.
+
+## 8. n° 20 — Rayons et couleurs de la charte (PR 6)
+
+Les rayons hors charte (3 à 14 px) reviennent aux trois rayons de la
+charte (bloc 0,75 rem, bouton `--radius-button`, entrée du menu 9,75 px) ;
+les cercles restent des cercles. Les deux couleurs de texte hors palette
+reviennent au texte (`#111`) ou au secondaire (`#5f5f5f`).
+
+## 9. n° 23 et n° 24 — Grand écran, 320 px et tablette (PR 7)
+
+1. Grand écran : le contenu se centre au-delà de sa largeur maximale ; le
+   fond du menu de gauche va jusqu'en bas ; la grille d'« Aujourd'hui »
+   ne laisse plus de trou ; le bandeau de la démonstration tient sur une
+   ligne quand la place le permet.
+2. 320 px : les noms de la barre du bas ne se coupent plus au milieu d'un
+   mot (nom court ou passage à la ligne entre les mots).
+3. Tablette (601 à 980 px) : la barre du bas suit celle du téléphone
+   (quatre entrées et « Plus ») au lieu de défiler ; les cibles de 44 px
+   valent jusqu'à 980 px.
+
+## 10. Tests et preuves
+
+Tests du domaine pour chaque règle qui se calcule (tuile neutre ou rouge,
+placement des étiquettes, formats d'heure et de durée, pluriels). Tests de
+garde des feuilles de style (aucune taille sous 12 px, aucun rayon hors
+charte, aucune couleur de texte hors palette). Parcours **P41** « Finitions
+de charte », à 390 et 1 280 px, et aux tailles limites (320, 768,
+1 920 px) pour la PR 7.
+
+## 11. Risques
+
+- Les règles de la charte touchent toutes les pages : chaque PR mesure
+  les hauteurs de P40 et le contraste de P31c, qui restent verts.
+- Des parcours existants lisent des libellés réécrits (PR 4) : ils suivent
+  le mot nouveau, aucun parcours n'est retiré.
+- Le placement des étiquettes de la vue satellite dépend de la taille de
+  la carte : le test du domaine le chiffre sur des rectangles, P41 le
+  vérifie à 390 px.
+
+## 12. Précisions
+
+Chaque précision faite en codant, numérotée à la suite du registre.
+
+- **F463** « En attente » : une planche dont **tous** les motifs sont « besoin sous la dose minimale » ; avec un autre motif (espacement, plage…), elle reste un manque. Comptée à part des planches sans objectif : « · 2 sans objectif et 1 en attente d'un besoin plus grand, pour information » dans le détail de la tuile ; « Planches non servies (n) · 2 sans objectif · 1 en attente », ou « Planches en attente (n) » quand rien d'autre, dans le titre du pli. Le détail « avec un manque chiffré » ne les compte plus.
+- **F464** La dose d'« Ajuster » s'écrit comme sur la carte (une décimale au plus) ; laissée telle quelle, c'est la dose exacte de la proposition qui part, jamais l'arrondi ; tapée, elle se lit à sa précision.
+- **F465** La ligne d'état : « Semaine du … au … · calculé le … (déclencheur) », puis dessous, à 12 px en gris, « Prévision météo sur n jours » et les réserves observées.
+- **F466** « Valider les propositions du jour » paraît à partir de deux propositions à valider ; « Valider toute la semaine » ne change pas.
+- **F467** « Réglages du planning » prend le chevron à droite des plis des lots D et J, qui tourne à l'ouverture ; l'unification de tous les plis suit à la PR 3.
+
+- **F468** Vue satellite : un nom se compare aux noms déjà posés, dans l'ordre de la liste ; « chevaucher » veut dire moins de deux pixels d'air entre deux rectangles ; le premier garde son nom, le suivant devient son numéro (pastille ronde de 24 px au moins). Le numéro est celui de la ligne dans la liste, devant le nom, caché au lecteur d'écran (la liste dit déjà le nom). Un nom qui sortirait de son jardin sans gêner un voisin le garde : la bulle et la liste suffisent. Le calcul se refait au chargement, au zoom et quand la carte ou le dessin change de taille. La preuve est dans le domaine (`tests/audit-ergonomie-2026-11-19-lot-k-satellite.test.ts`) et dans P34 étendu, plutôt que dans P41 : P34 a déjà la carte et son dessin de secours.
+
+- **F469** Un seul dessin de pli : une règle commune sur tout `details > summary` du module (le chevron à droite, 2,25 rem de place, qui tourne à l'ouverture ; le triangle du navigateur caché), sauf les menus « … » (`.row-menu`, `.equipment-menu`, `.plan-equipment-menu`), qui ne sont pas des plis, et les lignes « Voir le détail » des cultures et des espèces, qui ont déjà leur signe, la flèche qui tourne (choix du porteur du 8 novembre 2026) : un second chevron les ferait passer sur deux lignes au téléphone (+700 px sur « Besoin par culture »). Elle vit dans `finitions-charte.css`, après les pages courtes et avant les gestes sûrs.
+- **F470** Secondaire veut dire contour et fond vert pâle, texte vert : « Cette semaine », les horizons non choisis de « Ressources » (le choisi reste plein et porte `aria-pressed`), « Créer un groupe » sur une ferme sans asperseur. Le menu « … » d'une ligne planifiée qui ne garde qu'« Annuler » reste un menu : F45 l'a écarté de « Démarrer maintenant » pour qu'on n'annule pas en voulant démarrer.
+- **F471** « Cette semaine » indisponible quand la semaine affichée contient aujourd'hui ; « Retirer la mesure » indisponible quand le jour choisi, dans la semaine affichée, n'a pas de pluie mesurée (hors de la semaine affichée, le serveur répond comme avant).
+- **F472** « Heure réelle de fin » à la minute (`step="60"`) ; laissée telle quelle, c'est l'heure proposée à la seconde qui part, celle du minuteur, pour que la durée ne perde rien ; tapée, elle se lit à la minute (`lib/domain/finish-time.ts`).
+- **F473** Le bouton qui finit un arrosage dit « Terminer l'irrigation » partout (fenêtre de fin, cartes, « Aujourd'hui ») ; « Irrigation terminée » reste l'état et la notification.
+
+- **F474** Les heures : « 8 h 50 », « 18 h » à l'heure pile, « 0 h 05 » ; les dates avec l'heure : « 16/06/2026 à 8 h 50 » (« 16 juin 2026 à 8 h 50 » là où la date s'écrivait en mots) ; les plages : « de 21 h à 8 h » ; les durées : « 1 h 21 », « 2 h », « 45 min ». Un seul module, `lib/domain/clock-text.ts`, à l'heure de la ferme. Les champs de saisie gardent le format du navigateur ; l'export CSV le sien.
+- **F475** Un compte s'accorde à son nombre, 0 et 1 au singulier (« 0 jour », « 1 jour », « 7 jours ») ; « 3 jours disponibles sur 7 » remplace « 3/7 jour(s) disponible(s) » ; « Planche » ou « Planches », « Jardin ou abri » ou « Jardins ou abris » selon la ligne. Les colonnes de l'export CSV gardent « Planche(s) » : un tableur les attend.
+- **F476** « Ressources » : « L'eau des jours à venir » (« Disponibilité / projections ») ; « Apport perdu, la réserve étant pleine » ; « Utilisable, avant les irrigations prévues » et « Utilisable, après les irrigations prévues », le volume seul, sans « mobilisables » ; « De maintenant à dimanche soir · les volumes, pas encore les horaires », sa bulle « Ce que vérifie ce calcul » ; « Faisabilité recalculée. » dans la boîte verte pâle des autres messages. « Réglages » : « Espèces sans culture de référence », et « espèce sans culture de référence » comme raison d'un besoin non calculé. Le planning garde « mobilisables » dans sa ligne de budget : le mot y est suivi de « pour … demandés », il se lit.
+
+- **F477** Les six jetons vivent sur `:root` (`--text-12` à `--text-28`, en rem). Une taille fixe sous 23 px prend le jeton le plus proche : sous 12,75 px, 12 ; sous 13,75, 13 ; sous 15, 14 ; sous 18, 16 ; sous 23, 20. Les tailles de 23 px et plus, `--title-size` et les `clamp()` des grands chiffres restent. Un `<small>` sans taille propre prend `max(12 px, 80 %)`. Les graisses 600 à 900 deviennent 700 ; un `<strong>` sans poids propre prend 700 (règle de spécificité nulle). P41 mesure les douze pages aux deux largeurs : aucun texte visible sous 12 px, aucune autre graisse.
+- **F478** La pastille du plan de « Matériel » est l'apport de la planche en mm/h : elle le dit dans sa bulle (« 6 mm par heure d'arrosage ») et dans une ligne au-dessus du plan, « Le chiffre sur une planche : ce qu'elle reçoit, en mm par heure d'arrosage », quand une planche du jardin en porte une. Elle reste : elle dit quelle planche le matériel couvre et combien.
+
+- **F479** Le rayon se choisit selon ce qu'il arrondit, par le sélecteur de la règle : une entrée de menu (sélecteur qui contient « menu »), 9,75 px ; un bouton ou un champ, `--radius-button` ; un bloc de 11,5 px et plus, `--radius` ; une pièce plus petite, 9,75 px. Restent : les cercles et pilules (40 px et plus, 50 %), les filets d'un ou deux pixels, les angles droits, les replis `var(--radius-button, .6rem)`. Les couleurs : `#1e1e1e` devient `--ink`, `#4f6e64` devient `--ink2`. La preuve est dans le test du domaine, qui lit chaque feuille ; aucun parcours ne mesure un rayon.
+
+- **F480** Grand écran, à partir de 981 px : `.feature-page` centrée (marges automatiques) dans sa colonne de la grille ; la marge du bas de 42 px passe de `main` à `.feature-page`, le fond du menu va jusqu'en bas ; `.today-row[data-layout]` en `align-items: stretch` ; à partir de 1 001 px, les choix de la bannière de démonstration ne passent plus à la ligne.
+- **F481** Tablette, de 601 à 980 px : la barre du bas et la feuille du menu du téléphone (règles de 600 px portées à 980 px ; la marge de côté de 14 px de la page reste au téléphone). Les cibles de 44 px : chaque `button` du contenu hors planches du plan et pastilles « i », les listes et les champs, « Actualiser », « Voir … » d'« Aujourd'hui », les liens d'action et l'export de l'historique ; les pastilles « i » comme au téléphone (boîte de 44 px, rond de 24 px dessiné dessous). La cloche et l'initiale du bandeau gardent leur zone tactile invisible de 44 px.
+- **F482** 320 px : le nom de la barre se coupe entre les mots seulement (`overflow-wrap: normal`) ; sous 360 px, les cases de la barre sans marge de côté et un espacement des lettres de −0,03 em.

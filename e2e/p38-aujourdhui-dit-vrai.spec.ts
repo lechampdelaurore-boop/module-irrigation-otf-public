@@ -22,7 +22,7 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, ver
  *
  * - en cours et reliquat (n° 2, F433 à F435) : une irrigation démarrée se
  *   lit en tête de « Votre journée », « En cours », la phrase du jour le
- *   dit, sans « Rien à arroser » ; « Arrêter / Terminer » ouvre sa carte sur
+ *   dit, sans « Rien à arroser » ; « Terminer l’irrigation » ouvre sa carte sur
  *   « Arrosages » ; arrêtée en route, son reliquat se lit « Reliquat » avec
  *   « Reprendre le reliquat » ; le reliquat annulé, il n'y est plus.
  *
@@ -170,15 +170,15 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await expect(page.locator('.today-sentence')).toContainText(/irrigations? (est|sont) en cours\./);
   await verifierLEtape(page, journal, 'l’irrigation en cours en tête de la journée');
 
-  // « Arrêter / Terminer » ouvre la carte sur « Arrosages », où l'arrêt se confirme.
+  // « Terminer l’irrigation » ouvre la carte sur « Arrosages », où l'arrêt se confirme.
   await carte.getByRole('link', { name: `Arrêter ou terminer : ${materiel}`, exact: false }).click();
   await attendreLaPagePrete(page, 'arrosages');
   const enCours = page.getByLabel('Irrigations en cours');
   await expect(enCours).toContainText(materiel);
   const minuteur = await enCours.innerText();
   await expect.poll(async () => (await enCours.innerText()) !== minuteur, { timeout: 15_000 }).toBe(true);
-  await enCours.locator('article').filter({ hasText: materiel }).getByRole('button', { name: 'Arrêter / Terminer' }).click();
-  await page.locator('[role=dialog]').filter({ hasText: 'Terminer l’irrigation' }).getByRole('button', { name: 'Irrigation terminée' }).click();
+  await enCours.locator('article').filter({ hasText: materiel }).getByRole('button', { name: 'Terminer l’irrigation' }).click();
+  await page.locator('[role=dialog]').filter({ hasText: 'Terminer l’irrigation' }).getByRole('button', { name: 'Terminer l’irrigation' }).click();
   await expect(enCours.locator('article').filter({ hasText: materiel })).toHaveCount(0);
 
   await attendreLaPageIrrigation(page, 'aujourdhui');

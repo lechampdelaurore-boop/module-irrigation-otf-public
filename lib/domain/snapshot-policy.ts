@@ -3,6 +3,7 @@ import { OtfApiError, OtfShapeError } from './otf/api-contract.ts';
 import { OtfFarmMismatchError } from './otf/farm-identity.ts';
 import { OtfReadDeferredError } from './otf/shared-call-pace.ts';
 import { FARM_TIME_ZONE } from './water-management.ts';
+import { clockText } from './clock-text.ts';
 
 /**
  * Pourquoi la lecture d'Ouvre ta ferme n'a pas abouti. Depuis la 4.1
@@ -67,7 +68,7 @@ function cachedWarning(reason: IrrigationUnavailableReason, retryAtMs: number | 
 }
 
 function parisTime(atMs: number): string {
-  return new Intl.DateTimeFormat('fr-FR', { timeStyle: 'short', timeZone: FARM_TIME_ZONE }).format(new Date(atMs));
+  return clockText(new Date(atMs), FARM_TIME_ZONE);
 }
 
 function sameParisDay(firstMs: number, secondMs: number): boolean {

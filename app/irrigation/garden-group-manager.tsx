@@ -29,6 +29,12 @@ type Props = {
   plots: Plot[];
   beds: Bed[];
   zones: Zone[];
+  /**
+   * Un asperseur sur la ferme : sans lui, aucun groupe n'est utile et
+   * « Créer un groupe » n'est pas le geste de la page ; il passe en
+   * secondaire (audit du 19 novembre 2026, lot K, n° 21, F470).
+   */
+  hasSprinkler?: boolean;
 };
 
 type MemberEditor = {
@@ -57,6 +63,7 @@ export function GardenGroupManager({
   plots,
   beds,
   zones,
+  hasSprinkler = true,
 }: Props) {
   const [editor, setEditor] = useState<GroupEditor | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -194,6 +201,7 @@ export function GardenGroupManager({
         </div>
         <button
           className="add-equipment-button"
+          data-secondary={!hasSprinkler || undefined}
           type="button"
           disabled={ungroupedPlots.length < 2 || isPending}
           title={

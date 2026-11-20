@@ -135,7 +135,8 @@ export async function reglerLaPlageDuGoutteAGoutte(planning: Locator, plage: { d
   await reglages.getByLabel('R8 fin de plage Goutte-à-goutte').fill(plage.fin);
   await reglages.getByRole('button', { name: 'Enregistrer les réglages' }).click();
   await expect(reglages.locator('.planning-notice')).toContainText('Réglages enregistrés', { timeout: 15_000 });
-  await expect(reglages.locator('summary')).toContainText(`${plage.debut} – ${plage.fin}`);
+  // La plage s'écrit « de 6 h à 22 h » dans le résumé (audit du 19 novembre 2026, lot K, n° 22, F474).
+  await expect(reglages.locator('summary')).toContainText(`de ${heureEcrite(plage.debut)} à ${heureEcrite(plage.fin)}`);
 }
 
 /** Les irrigations planifiées que le planning a créées, annulées une à une depuis leur menu « … », avec leur confirmation. */
@@ -161,4 +162,10 @@ export async function refuserLaProposition(page: Page, carte: Locator): Promise<
   await expect(refuser).toHaveCSS('background-color', 'rgb(220, 53, 69)');
   await refuser.click();
   await expect(fenetre).toHaveCount(0);
+}
+
+/** « 06:00 » saisi s'écrit « 6 h » ; « 23:59 », « 23 h 59 » (F474). */
+function heureEcrite(saisie: string): string {
+  const [heures, minutes] = saisie.split(':').map(Number);
+  return minutes === 0 ? `${heures} h` : `${heures} h ${String(minutes).padStart(2, '0')}`;
 }

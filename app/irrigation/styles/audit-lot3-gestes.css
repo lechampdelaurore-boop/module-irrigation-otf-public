@@ -28,15 +28,15 @@
 .species-search label {
   display: grid;
   gap: .3rem;
-  font-size: .78rem;
-  font-weight: 750;
+  font-size: var(--text-12);
+  font-weight: 700;
 }
 
 .species-search input {
   min-height: var(--touch-target);
   box-sizing: border-box;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-button);
   background: white;
   padding: .6rem .7rem;
   color: inherit;
@@ -60,11 +60,11 @@
   justify-content: space-between;
   gap: .4rem .75rem;
   margin-left: 4px;
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--warn-soft);
   padding: .4rem .5rem .4rem .8rem;
   color: var(--warn-ink);
-  font-size: .82rem;
+  font-size: var(--text-13);
 }
 
 .species-link-suggestion > button {
@@ -74,7 +74,7 @@
   background: white;
   padding: .55rem .85rem;
   color: var(--green);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -105,7 +105,7 @@
   align-items: center;
   justify-content: space-between;
   gap: .4rem .75rem;
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--card);
   padding: .4rem .5rem .4rem .75rem;
 }
@@ -134,7 +134,7 @@
 .weather-alert-templates p {
   margin: 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .weather-alert-device > div {
@@ -151,7 +151,7 @@
 
 .weather-alerts-margin {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .weather-alerts-margin > summary {
@@ -159,7 +159,7 @@
   min-height: var(--touch-target);
   align-items: center;
   color: var(--green-dark);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -182,8 +182,8 @@
   min-height: var(--touch-target);
   align-items: center;
   color: var(--green-dark);
-  font-size: .82rem;
-  font-weight: 600;
+  font-size: var(--text-13);
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -205,11 +205,11 @@
 
 .coverage-setting-name {
   flex: none;
-  border-radius: 4px;
+  border-radius: 9.75px;
   background: var(--tile);
   padding: 0 4px;
   color: var(--green-dark);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .coverage-equipment-list small > span:last-child {
@@ -220,7 +220,7 @@
 
 .coverage-metric-meaning {
   color: var(--muted);
-  font: 400 11px/1.35 var(--font-ui);
+  font: 400 var(--text-12)/1.35 var(--font-ui);
   font-style: normal;
   white-space: normal;
 }
@@ -238,7 +238,7 @@
   background: var(--green);
   padding: 0 16px;
   color: white;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   transform: translateY(-200%);
 }

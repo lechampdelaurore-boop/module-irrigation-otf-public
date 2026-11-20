@@ -45,8 +45,8 @@ import type { ProposalSoilNote } from '@/lib/domain/soil-reserve/proposal-soil';
 import { capitalize, formatDateTime, formatLongDay, formatShortDay, formatVolume, formatWeekdayAndDay } from './format';
 import { unplacedOrigin } from '@/lib/domain/planning/origins';
 import { planDayCells, planWeekRows, type PlanWeekRow } from '@/lib/domain/planning/week-grid';
-import { pastDaysLabel, phoneWeekFolds, planSummaryLine, unplacedFoldLabel, type PhoneDayFold } from '@/lib/domain/planning/phone-week';
-import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionCounts, planActionLine, planActionTiles, unplacedDeficitCount, unplacedGroups, unplacedTileDetail, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
+import { dayValidateShown, pastDaysLabel, phoneWeekFolds, planSummaryLine, unplacedFoldLabel, type PhoneDayFold } from '@/lib/domain/planning/phone-week';
+import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionCounts, planActionLine, planActionTiles, unplacedDeficitCount, unplacedGroups, unplacedTileDetail, waitingBedCount, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
 import { pageHref } from '@/lib/domain/features/pages';
 import { Icon, type IconName } from '../line-icon';
 import { FigureOrigin } from '../shell/figure-origin';
@@ -239,11 +239,15 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
         <p className="planning-empty">Aucun calcul pour cette semaine. Le plan se calcule chaque matin après la météo, ou maintenant d’un clic.</p>
       ) : (
         <>
+          {/* La semaine et l'heure du calcul d'abord ; ses sources, plus discrètes, dessous (audit du 19 novembre 2026, lot K, n° 17, F465). */}
           <p className="planning-meta">
-            Semaine du {formatShortDay(plan.calculation.weekStart)} au {formatShortDay(plan.calculation.summary.weekEnd)} · calculé le {formatDateTime(plan.calculation.computedAt)} ({calculationTriggerLabel(plan.calculation)}) · prévision météo sur {plan.calculation.summary.assumptions.forecastDays} jour{plan.calculation.summary.assumptions.forecastDays > 1 ? 's' : ''}
-            {plan.calculation.summary.assumptions.reservoirsObservedAt.map((reservoir) => (
-              <span key={reservoir.reservoirId}> · {reservoir.name} : {reservoir.currentCubicMeters === null ? 'niveau inconnu' : `${formatVolume(reservoir.currentCubicMeters)} observés${reservoir.observedAt ? ` le ${formatDateTime(reservoir.observedAt)}` : ''}`}</span>
-            ))}
+            <span className="planning-meta-main">Semaine du {formatShortDay(plan.calculation.weekStart)} au {formatShortDay(plan.calculation.summary.weekEnd)} · calculé le {formatDateTime(plan.calculation.computedAt)} ({calculationTriggerLabel(plan.calculation)})</span>
+            <small className="planning-meta-sources">
+              Prévision météo sur {plan.calculation.summary.assumptions.forecastDays} jour{plan.calculation.summary.assumptions.forecastDays > 1 ? 's' : ''}
+              {plan.calculation.summary.assumptions.reservoirsObservedAt.map((reservoir) => (
+                <span key={reservoir.reservoirId}> · {reservoir.name} : {reservoir.currentCubicMeters === null ? 'niveau inconnu' : `${formatVolume(reservoir.currentCubicMeters)} observés${reservoir.observedAt ? ` le ${formatDateTime(reservoir.observedAt)}` : ''}`}</span>
+              ))}
+            </small>
           </p>
           {plan.pendingEvent ? (
             <p className={plan.pendingEvent.status === 'failed' ? 'planning-error' : 'planning-empty'} role={plan.pendingEvent.status === 'failed' ? 'alert' : 'status'}>
@@ -400,7 +404,8 @@ function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, 
             </button>
           ) : null}
         </div>
-        {proposed.length > 0 ? (
+        {/* Une seule proposition : son « Valider » suffit, pas un second bouton pour le même geste (lot K, n° 17, F466). */}
+        {dayValidateShown(proposed.length) ? (
           <button type="button" className="planning-day-validate" disabled={pending} aria-label={`Valider ${proposalsText(proposed.length)} du jour`} onClick={() => onValidateDay(proposed)}>
             <span className="planning-label-long">Valider {proposalsText(proposed.length)} du jour</span>
             <span className="planning-label-short">Tout valider ({proposed.length})</span>
@@ -540,7 +545,7 @@ function UnplacedList({ beds, groups, season, received }: { beds: readonly PlanB
       ) : null}
       <details className="planning-unplaced">
         <summary>
-          <h3>{unplacedFoldLabel(unplacedDeficitCount(groups), informationalBedCount(groups))}</h3>
+          <h3>{unplacedFoldLabel(unplacedDeficitCount(groups), informationalBedCount(groups), waitingBedCount(groups))}</h3>
           <Icon name="fleche-bas" />
         </summary>
         <p className="planning-unplaced-caption">Chaque planche que le plan ne sert pas en entier, rangée par motif : aussi important que ce qui est placé.</p>

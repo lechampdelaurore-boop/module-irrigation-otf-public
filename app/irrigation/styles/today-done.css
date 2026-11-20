@@ -44,12 +44,12 @@
 
 .today-done-dialog > p:not(.eyebrow) {
   margin: 0 0 8px;
-  font-size: .88rem;
+  font-size: var(--text-14);
   line-height: 1.55;
 }
 
 .today-done-final {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .today-done-days {
@@ -63,7 +63,7 @@
   margin: 0;
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius);
   overflow: hidden;
 }
 
@@ -102,14 +102,14 @@
 
 .today-done-check span {
   min-width: 0;
-  font-size: .86rem;
+  font-size: var(--text-14);
   line-height: 1.4;
 }
 
 .today-done-check small {
   display: block;
   color: var(--muted);
-  font-size: .8rem;
+  font-size: var(--text-13);
 }
 
 .today-done-note {
