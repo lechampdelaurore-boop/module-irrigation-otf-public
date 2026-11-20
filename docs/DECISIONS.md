@@ -6677,8 +6677,8 @@ saisissait sa RFU les enregistrait sans le voir (défaut n° 4).
 2. La texture du sol, parmi les neuf classes du tableau 19 de la FAO-56,
    propose TEW et REW au milieu de leur fourchette, arrondi au
    demi-millimètre, la fourchette et la source dites à côté (F428,
-   réponse 1) ; la personne ajuste. Valeurs lues dans un résumé de la
-   source, à relire par le porteur.
+   réponse 1) ; la personne ajuste. Valeurs relues sur la page de la FAO
+   (chapitre 7) et recoupées par ses exemples 31 et 35.
 3. La texture choisie est gardée avec la saisie (`texture`, migration
    0036), pour dire d'où viennent TEW et REW ; aucun calcul ne la lit.
 4. L'étape « Sol » est confirmée par la saisie qui donne son sol à la

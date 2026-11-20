@@ -33,10 +33,11 @@ type TextureRow = {
 /**
  * FAO-56 (Allen et al., 1998), chapitre 7, tableau 19 : eau facilement
  * évaporable (REW) et eau évaporable (TEW, pour Ze = 0,10 m) par classe de
- * texture. Lu le 20 novembre 2026 dans un résumé de la page
- * https://www.fao.org/4/x0490e/x0490e0c.htm (la page elle-même n'était pas
- * joignable depuis le poste de code) et recoupé de mémoire : à relire par le
- * porteur à la relecture de la PR (F428, réponse 1 ; F584).
+ * texture. Relu le 20 novembre 2026 sur la page
+ * https://www.fao.org/4/x0490e/x0490e0c.htm, par deux lectures séparées
+ * qui donnent les mêmes fourchettes, et recoupé par les exemples 31 (terre
+ * franche : TEW ≈ 20 mm, REW ≈ 9 mm) et 35 (limon sableux : REW ≈ 8 mm) du
+ * même chapitre ; le porteur a confié cette relecture au module (F584).
  */
 const TABLE_19: Record<SoilTexture, TextureRow> = {
   sand: { label: 'Sable (sand)', rew: { min: 2, max: 7 }, tew: { min: 6, max: 12 } },

@@ -427,8 +427,8 @@ registres, elle y renvoie.
   ferme qui fait l'accueil, le formulaire du sol d'une parcelle n'a plus
   TEW 14 / REW 7 préremplis ; la texture, parmi les neuf du tableau 19 de
   la FAO-56, propose TEW et REW au milieu de leur fourchette, dite à côté
-  avec sa source, à ajuster (valeurs lues dans un résumé de la source, à
-  relire par le porteur) ; la texture est gardée avec la saisie (colonne
+  avec sa source, à ajuster (valeurs relues sur la page de la FAO et
+  recoupées par ses exemples 31 et 35) ; la texture est gardée avec la saisie (colonne
   `texture`, migration additive 0036, nulle avant) ; l'étape « Sol » est
   confirmée par le sol de la dernière parcelle ; bandeau « À finir : sol de
   N parcelles », vers « Réserve du sol ». Les fermes d'avant l'accueil et
