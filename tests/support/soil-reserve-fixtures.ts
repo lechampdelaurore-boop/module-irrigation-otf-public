@@ -32,6 +32,7 @@ export function soilRecord(overrides: Partial<SoilRecord> = {}): SoilRecord {
     rewMm: SOIL_DEFAULTS.rewMm,
     surfaceLayerCm: SOIL_DEFAULTS.surfaceLayerCm,
     soilDepthCeilingM: null,
+    texture: null,
     effectiveFrom: '2026-01-01',
     recordedAt: '2026-01-01T08:00:00.000Z',
     ...overrides,

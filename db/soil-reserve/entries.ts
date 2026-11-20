@@ -1,6 +1,7 @@
 import { db } from '../binding';
 import { listReferenceCropsForWorkspace, type CropWaterWriteResult } from '../crop-water/references';
-import { ensureWorkspaceForUser } from '../workspace-repository';
+import { confirmOnboardingStepStatement } from '../onboarding-repository';
+import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../workspace-repository';
 import type { SurfaceDeclaration } from '@/lib/domain/soil-reserve/bare-soil';
 import type { SoilObservation } from '@/lib/domain/soil-reserve/gauge';
 import { soilObservationProblems, soilObservationTimeAt, surfaceDeclarationProblems } from '@/lib/domain/soil-reserve/records';
@@ -20,11 +21,18 @@ import { isValidDateKey } from '@/lib/domain/water-management';
 
 type WriteResult<T> = CropWaterWriteResult<T>;
 
-/** Enregistre le sol d'une parcelle (`plotId` nul) ou la valeur propre d'un jardin ou d'un abri. */
+/**
+ * Enregistre le sol d'une parcelle (`plotId` nul) ou la valeur propre d'un
+ * jardin ou d'un abri. Avec les parcelles du plan (`planZoneIds`), l'étape
+ * « Sol » de l'accueil suit dans le même lot (4.4, F584) : confirmée quand
+ * chaque parcelle du plan a son sol, avec leur nombre. Une étape d'avant
+ * l'accueil n'est pas réécrite (F426).
+ */
 export async function addSoilRecordForUser(
   ownerUserId: string,
   record: Omit<SoilRecord, 'recordedAt'>,
   now = new Date(),
+  planZoneIds: readonly string[] = [],
 ): Promise<WriteResult<SoilRecord>> {
   const problems = [
     ...soilRecordProblems(record),
@@ -35,17 +43,35 @@ export async function addSoilRecordForUser(
   if (problems.length > 0) return { ok: false, problems };
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const recordedAt = now.toISOString();
-  await db.prepare(
+  const insert = db.prepare(
     `INSERT INTO irrigation_soil_records
        (id, workspace_id, otf_zone_id, otf_plot_id, lab_rfu_mm_per_meter, stone_share_percent, reference_share, provenance,
-        sampled_depth_cm, source, tew_mm, rew_mm, surface_layer_cm, soil_depth_ceiling_m, effective_from, recorded_at, actor_user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        sampled_depth_cm, source, tew_mm, rew_mm, surface_layer_cm, soil_depth_ceiling_m, texture, effective_from, recorded_at, actor_user_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(
     crypto.randomUUID(), workspaceId, record.zoneId, record.plotId, record.labRfuMmPerMeter, record.stoneSharePercent,
     record.referenceShare, record.provenance, record.sampledDepthCm, record.source, record.tewMm, record.rewMm,
-    record.surfaceLayerCm, record.soilDepthCeilingM, record.effectiveFrom, recordedAt, ownerUserId,
-  ).run();
+    record.surfaceLayerCm, record.soilDepthCeilingM, record.texture, record.effectiveFrom, recordedAt, ownerUserId,
+  );
+  const withSoil = new Set(record.plotId === null ? [record.zoneId] : []);
+  for (const zoneId of await zonesWithSoil(workspaceId)) withSoil.add(zoneId);
+  const complete = planZoneIds.length > 0 && planZoneIds.every((zoneId) => withSoil.has(zoneId));
+  await db.batch(complete ? [insert, confirmOnboardingStepStatement(workspaceId, 'soil', { parcels: planZoneIds.length }, recordedAt)] : [insert]);
   return { ok: true, value: { ...record, recordedAt } };
+}
+
+/** Les parcelles d'un espace qui ont un sol saisi pour elles-mêmes (la valeur d'un seul jardin n'en fait pas le sol de la parcelle). */
+async function zonesWithSoil(workspaceId: string): Promise<string[]> {
+  const result = await db.prepare(
+    'SELECT DISTINCT otf_zone_id FROM irrigation_soil_records WHERE workspace_id = ? AND otf_plot_id IS NULL',
+  ).bind(workspaceId).all<{ otf_zone_id: string }>();
+  return result.results.map((row) => row.otf_zone_id);
+}
+
+/** Les parcelles qui ont un sol saisi, pour le bandeau « À finir » (4.4, F584). Lire ne crée rien. */
+export async function listZonesWithSoilForUser(spaceKey: string): Promise<string[]> {
+  const workspaceId = await findWorkspaceIdForUser(spaceKey);
+  return workspaceId === null ? [] : zonesWithSoil(workspaceId);
 }
 
 /** Enregistre les réglages de l'exploitation : seuil d'arrosage (D-059), coefficients des états de surface, pluie sous paillage. */
