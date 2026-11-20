@@ -487,7 +487,7 @@ registres, elle y renvoie.
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
   P31 et P10 rejoués en local.
   **PR 5b, la vérification finale** (D-230, F589, section 8 bis.17 du
-  contrat) : le pli « Accueil de la ferme » dit chaque groupe des réglages
+  contrat), en ligne le 20 novembre 2026 à 20 h 39 (#137, fusionnée à 20 h 12, run 44799990126 vérifié job par job : les cinq jobs verts) : le pli « Accueil de la ferme » dit chaque groupe des réglages
   (confirmé, passé ou proposé) et ce qui reste inconnu (espèces non
   rattachées, jardins à classer, parcelles sans sol), avec leur lien ;
   plusieurs fermes d'une même personne (F418) remis à la 4.3, PR 3.
@@ -495,7 +495,7 @@ registres, elle y renvoie.
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
   **PR 4d, le modèle des rattachements du porteur** (D-231, F590, section
-  8 bis.18 du contrat) : 40 liens espèce-culture relevés en lecture seule
+  8 bis.18 du contrat), en ligne le 20 novembre 2026 à 21 h 01 (#146, fusionnée à 20 h 41, run 44804467204 vérifié job par job : les cinq jobs verts) : 40 liens espèce-culture relevés en lecture seule
   dans sa ferme (saison 2026, 77 espèces), 11 par analogie, l'analogie
   gardée ; les espèces sans référence et l'engrais vert hors du modèle.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
@@ -515,6 +515,28 @@ registres, elle y renvoie.
   confidentialité approuvée par lui le 19 novembre 2026 à 20 h 52 (UTC),
   appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
+
+- Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
+  (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
+  codée le 20 novembre 2026 en Opus 5.5 · Très élevé, sur la place de code
+  libre (la 4.4 codée hors accès d'OTF) : les quatre tâches du matin
+  (prévisions, réanalyse, calcul du matin, rotation du coffre) déclarées
+  dans `lib/domain/operations/task-registry.ts` avec leur rythme et leurs
+  seuils (orange à 26 heures, rouge à 36, ou trois échecs de suite ;
+  « jamais réussie » en orange) ; chaque matin enregistre une exécution par
+  tâche (migration 0037, additive), la réanalyse à part des prévisions ;
+  un test échoue pour tout déclencheur planifié absent du registre, règle
+  écrite dans `AGENTS.md` (F569). Rien ne change à l'écran ; la page
+  d'état et la veille viennent avec la PR 2. Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 854 tests, puis les 441 de
+  la base rejoués trois fois pour l'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; `pnpm e2e` non rejoué en local (aucun écran ni service appelé
+  par un écran ne change), la suite complète des parcours jouée par la CI
+  de la PR. Non vérifié sur le site : le premier matin après le
+  déploiement (R6), à lire au journal (`task_run_succeeded` ou
+  `task_run_failed`, une ligne par tâche) ou sur la page d'état de la
+  PR 2.
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le

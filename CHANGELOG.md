@@ -14,6 +14,26 @@ source détaillée commit par commit.
   l'écran : la jauge affichée reste celle d'avant, jusqu'à ce que l'égalité
   soit prouvée sur la ferme.
 
+### Corrigé (un essai du lot I, qui échouait chaque soir)
+
+- **L'essai de la démonstration « Pic d'été, l'eau manque » ne dépend plus de
+  l'heure** : la démonstration se prépare au jour du moment, à l'heure réelle
+  de la ferme, et chaque soir vers 21 h 30 à Paris un arrosage du jour passé
+  changeait l'eau versée sur les planches vides (0,33 m³ au lieu de 0,49) ;
+  l'essai fige l'heure réelle. Rien ne change dans le module.
+
+### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
+
+- **Le registre des tâches attendues** (D-240, F600 à F607) : les quatre
+  tâches du matin (prévisions, pluie estimée après coup, calcul du matin,
+  rotation du coffre) sont déclarées en code avec leur rythme et leurs
+  seuils ; chacune garde sa dernière réussite, la réanalyse à part des
+  prévisions. Une tâche passe « en retard » à 26 heures sans réussite, « en
+  panne » à 36 heures ou après trois échecs de suite, et n'est jamais verte
+  faute de réussite. Un test échoue pour tout déclencheur planifié absent du
+  registre. Rien ne change à l'écran : la page d'état et la veille de
+  l'exploitant viennent avec la PR 2. Migration 0037, additive.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4d)
 
 - **Le modèle des rattachements** (D-231) : une nouvelle ferme reçoit, pour
@@ -42,7 +62,6 @@ source détaillée commit par commit.
   son nom désigne ; elle décoche ce qu'elle ne garde pas et rattache le
   reste d'un geste, puis confirme l'étape « Cultures ». Le bandeau « À
   finir » rappelle les espèces à rattacher jusque-là.
-
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4b)
 
 - **D'où viennent les dates de chaque culture** (D-227) : la fiche d'une
@@ -106,7 +125,6 @@ source détaillée commit par commit.
   fait avant la 4.4 », ses réglages gardés tels quels, sans qu'aucun
   chiffre change. Réglages montre l'accueil, replié en bas de la page,
   étape par étape. Les écrans des étapes viendront avec les PR suivantes.
-
 ### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
 
 - **Grand écran, tablette et 320 px** (D-196) : au grand écran, la page se
