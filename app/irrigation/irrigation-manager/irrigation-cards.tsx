@@ -104,7 +104,7 @@ export function ActiveIrrigationCard({
           disabled={pending}
           onClick={onFinish}
         >
-          {finished ? 'Confirmer l’irrigation terminée' : 'Arrêter / Terminer'}
+          Terminer l’irrigation
         </button>
       </div>
     </article>

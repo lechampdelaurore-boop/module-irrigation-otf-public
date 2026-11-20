@@ -35,3 +35,36 @@ test('planning : la ligne d’état en deux lignes, le pli des réglages signé 
   expect(signe, 'le chevron des plis').toBe('""');
   await verifierLEtape(page, journal, 'ligne d’état et pli des réglages');
 });
+
+test('un seul dessin de pli, un bouton plein par geste, plus de geste muet', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'lotk-gestes');
+  // Chaque pli de ces pages porte le chevron à droite, aucun le triangle du navigateur (n° 21, F469).
+  for (const cible of ['besoins', 'sol', 'cultures', 'ressources', 'reglages'] as const) {
+    await attendreLaPageIrrigation(page, cible);
+    const plis = await page.locator('main details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))').evaluateAll((resumes) => resumes
+      .filter((resume) => (resume as HTMLElement).offsetParent !== null)
+      .map((resume) => ({ signe: getComputedStyle(resume, '::after').content, marque: getComputedStyle(resume).listStyleType, texte: (resume.textContent ?? '').trim().slice(0, 30) })));
+    expect(plis.length, `des plis sur ${cible}`).toBeGreaterThan(0);
+    for (const pli of plis) {
+      expect(pli.signe, `le chevron du pli « ${pli.texte} » (${cible})`).toBe('""');
+      expect(pli.marque, `sans triangle : « ${pli.texte} » (${cible})`).toBe('none');
+    }
+  }
+  // « Cette semaine » : un raccourci en secondaire, sans effet quand on y est déjà (F470).
+  await attendreLaPageIrrigation(page, 'besoins');
+  const cetteSemaine = page.locator('.water-week-navigation').getByRole('button', { name: 'Cette semaine' });
+  await expect(cetteSemaine).toBeDisabled();
+  await expect(cetteSemaine).not.toHaveCSS('background-color', 'rgb(11, 105, 77)');
+  // « Retirer la mesure » ne fait pas semblant sur un jour sans mesure (F471).
+  const pluie = page.locator('#manual-rain');
+  await pluie.locator('summary').click();
+  await expect(pluie.getByRole('button', { name: 'Retirer la mesure' })).toBeDisabled();
+  // « 24 h / 48 h / 7 jours » : un seul choix plein, celui qui est fait (F470).
+  await attendreLaPageIrrigation(page, 'ressources');
+  const horizons = page.locator('.projection-shortcuts button[aria-pressed]');
+  await expect(horizons).toHaveCount(3);
+  const pleins = await horizons.evaluateAll((boutons) => boutons.map((bouton) => [bouton.getAttribute('aria-pressed'), getComputedStyle(bouton).backgroundColor]));
+  for (const [choisi, fond] of pleins) expect(fond === 'rgb(11, 105, 77)', `plein seulement s’il est choisi (${choisi})`).toBe(choisi === 'true');
+  await verifierLEtape(page, journal, 'plis, boutons et gestes');
+});

@@ -366,7 +366,8 @@ export function WaterManagementDashboard({
           <button type="button" disabled={pending} aria-label="Semaine précédente" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, -7))}>←</button>
           <strong>{formatDateRange(dashboard.weekStart, dashboard.weekEnd)}</strong>
           <button type="button" disabled={pending} aria-label="Semaine suivante" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, 7))}>→</button>
-          <button type="button" disabled={pending} onClick={() => loadWeek(dateKeyInTimeZone(new Date()))}>Cette semaine</button>
+          {/* Un raccourci, pas le geste de la page : en secondaire, et sans effet quand on y est déjà (audit du 19 novembre 2026, lot K, n° 21, F470). */}
+          <button type="button" className="water-week-today" disabled={pending || (today >= dashboard.weekStart && today <= dashboard.weekEnd)} onClick={() => loadWeek(dateKeyInTimeZone(new Date()))}>Cette semaine</button>
         </div>
       </header>
 
@@ -448,7 +449,8 @@ export function WaterManagementDashboard({
             <label><span>Date</span><input type="date" max={today} value={rainDate} onChange={(event) => chooseRainDate(event.target.value)} /></label>
             <label><span>Millimètres</span><input inputMode="decimal" value={rainAmount} onChange={(event) => setRainAmount(event.target.value)} /></label>
             <button type="button" disabled={pending} onClick={() => startTransition(async () => receiveRain(await saveManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate, precipitationMm: numeric(rainAmount) }), rainDate))}>Enregistrer</button>
-            <button type="button" className="secondary-button rain-remove" disabled={pending} onClick={() => startTransition(async () => receiveRain(await removeManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate }), rainDate))}>Retirer la mesure</button>
+            {/* Rien à retirer sur ce jour : le bouton ne fait pas semblant (audit du 19 novembre 2026, lot K, n° 21, F471). */}
+            <button type="button" className="secondary-button rain-remove" disabled={pending || nothingToRemove(dashboard.days, rainDate)} onClick={() => startTransition(async () => receiveRain(await removeManualRainfallAction({ season, weekStart: dashboard.weekStart, date: rainDate }), rainDate))}>Retirer la mesure</button>
           </div>
           <ActionReply messages={replies} origin="pluie" classNames={WATER_REPLY_CLASSES} />
         </AnchoredFold>
@@ -541,4 +543,10 @@ function formatDateRange(start: string, end: string) {
 
 function missingWeatherDates(dates: readonly string[]) {
   return `${dates.length === 1 ? 'donnée manquante le' : 'données manquantes les'} ${dates.map(formatDate).join(', ')}`;
+}
+
+/** Le jour choisi est dans la semaine affichée et n'a aucune mesure de la ferme : rien à retirer (F471). */
+function nothingToRemove(days: readonly { date: string; manualRainMm: number | null }[], date: string): boolean {
+  const day = days.find((candidate) => candidate.date === date);
+  return day !== undefined && day.manualRainMm === null;
 }

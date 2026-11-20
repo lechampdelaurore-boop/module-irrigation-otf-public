@@ -572,7 +572,12 @@ registres, elle y renvoie.
   (#130, fusionnée à 10 h 45, run 44713406262 vérifié job par job). **PR 2, vue satellite : des numéros
   quand les noms se chevauchent** (D-191, F468) : le nom qui en recouvrirait
   un autre devient le numéro du jardin, la liste à côté sert de légende,
-  recalculé à chaque zoom ; codée.
+  recalculé à chaque zoom ; en ligne le 20 novembre 2026 à 11 h 53 (#136, fusionnée à 11 h 35, run 44720522951 vérifié job par job). **PR 3, un bouton plein par écran, un
+  seul dessin de pli, plus de geste muet** (D-192, F469 à F473) : le
+  chevron de la charte sur tous les plis, les raccourcis et les choix en
+  secondaire, « Cette semaine » et « Retirer la mesure » indisponibles
+  quand ils ne feraient rien, la fin à la minute, « Terminer
+  l'irrigation » partout ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

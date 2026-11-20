@@ -151,7 +151,7 @@ const running = irrigation('r', { timerState: 'running', timer: {
   timerStartedAt: '2026-11-19T08:40:00.000Z', timerResumedAt: '2026-11-19T08:40:00.000Z', timerTheoreticalEndAt: '2026-11-19T12:50:00.000Z',
 } });
 
-test('n° 2, F433 : une irrigation en cours, en pause ou à confirmer se lit en tête, avec « Arrêter / Terminer » vers sa carte', () => {
+test('n° 2, F433 : une irrigation en cours, en pause ou à confirmer se lit en tête, avec « Terminer l’irrigation » (son nom depuis le lot K, F473) vers sa carte', () => {
   const paused = irrigation('p', { timerState: 'paused', timer: {
     timerStartedAt: '2026-11-19T08:00:00.000Z', timerPausedAt: '2026-11-19T09:05:00.000Z', timerAccumulatedSeconds: 3900,
   } });
