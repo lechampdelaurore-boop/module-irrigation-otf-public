@@ -11,6 +11,8 @@ import { FeatureSettings } from './feature-settings';
 import { NotificationSettings } from './notification-settings';
 import { OnboardingSettings } from './onboarding-settings';
 import { SettingsReviewSection } from './settings-review';
+import { remainingUnknowns, settingsGroupsText } from '@/lib/domain/onboarding/verification';
+import { SPECIES_FOLD_ANCHOR, speciesNeedsLink } from '@/lib/domain/crop-water/species-linking';
 import { PlotShelterSettings } from './plot-shelter-settings';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
@@ -53,6 +55,13 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         soilHref={soilStep ? pageHref(soilStep.page, { season: context.season, zone: context.zone }, soilStep.anchor) : null}
         speciesHere={cropCoefficients?.available === true && cropCoefficients.speciesStep !== null}
         settingsHere={settingsReview !== null && settingsReview.groups.length > 0}
+        unknowns={remainingUnknowns({
+          speciesToLink: cropCoefficients?.available ? cropCoefficients.species.filter(speciesNeedsLink).length : 0,
+          plotsToClassify: plotShelters?.filter((line) => line.state === 'unclassified').length ?? 0,
+          soil: soilStep ? { parcels: soilStep.count ?? 0, href: pageHref(soilStep.page, { season: context.season, zone: context.zone }, soilStep.anchor) } : null,
+          hrefs: { species: `#${SPECIES_FOLD_ANCHOR}`, plots: '#parcelles-et-abris' },
+        })}
+        settingsGroups={settingsReview ? settingsGroupsText(settingsReview.groups) : []}
       />
     </IrrigationShell>
   );

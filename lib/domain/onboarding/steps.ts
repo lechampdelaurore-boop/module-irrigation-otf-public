@@ -242,7 +242,7 @@ export const SPECIES_STEP_ANCHOR = 'rattachez-vos-especes';
 export const SETTINGS_STEP_ANCHOR = 'reglages-a-relire';
 
 /** Une étape à finir, dite sur chaque page (section 8 bis.3) : son nom court, la page et l'ancre où la faire. */
-export type UnfinishedStep = { id: OnboardingStepId; text: string; page: IrrigationPageId; anchor: string };
+export type UnfinishedStep = { id: OnboardingStepId; text: string; page: IrrigationPageId; anchor: string; count?: number };
 
 /**
  * Ce que le bandeau « À finir » nomme (section 8 bis.3, F582) : seulement
@@ -280,7 +280,7 @@ export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
   // Comme les jardins : une parcelle apparue après la confirmation de l'étape a besoin de son sol, et le bandeau la nomme.
   const soil = needs.soilToEnter;
   if (soil && soil.parcels > 0) {
-    unfinished.push({ id: 'soil', text: `sol de ${soil.parcels} parcelle${soil.parcels > 1 ? 's' : ''}`, page: 'sol', anchor: soil.anchor });
+    unfinished.push({ id: 'soil', text: `sol de ${soil.parcels} parcelle${soil.parcels > 1 ? 's' : ''}`, page: 'sol', anchor: soil.anchor, count: soil.parcels });
   }
   // Une espèce peut rester sans référence par choix : l'étape confirmée, le bandeau ne la rappelle plus.
   const species = needs.speciesToLink ?? 0;

@@ -486,6 +486,14 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
   P31 et P10 rejoués en local.
+  **PR 5b, la vérification finale** (D-230, F589, section 8 bis.17 du
+  contrat) : le pli « Accueil de la ferme » dit chaque groupe des réglages
+  (confirmé, passé ou proposé) et ce qui reste inconnu (espèces non
+  rattachées, jardins à classer, parcelles sans sol), avec leur lien ;
+  plusieurs fermes d'une même personne (F418) remis à la 4.3, PR 3.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
