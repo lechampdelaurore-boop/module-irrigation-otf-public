@@ -194,6 +194,16 @@ source détaillée commit par commit.
   registre. Rien ne change à l'écran : la page d'état et la veille de
   l'exploitant viennent avec la PR 2. Migration 0034, additive.
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
+
+- **Grand écran, tablette et 320 px** (D-196) : au grand écran, la page se
+  centre au lieu de rester collée au menu, le fond du menu descend jusqu'en
+  bas, les deux blocs d'une rangée d'« Aujourd'hui » prennent la même
+  hauteur et les choix de la démonstration restent sur une ligne ; sur
+  tablette (601 à 980 px), la barre du bas du téléphone remplace le menu
+  latéral et chaque bouton, champ ou lien d'action garde 44 px ; à 320 px,
+  les noms de la barre du bas ne se coupent plus au milieu d'un mot.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 6 sur 7)
 
 - **Rayons et couleurs de la charte** (D-195) : les angles arrondis
