@@ -20,7 +20,7 @@
 
 .control-field > span {
   color: var(--muted);
-  font: 500 13px/1.4 var(--font-ui);
+  font: 500 var(--text-13)/1.4 var(--font-ui);
 }
 
 .control-field select {
@@ -76,7 +76,7 @@
 .placement-setting-field > span,
 .placement-current-choice small {
   color: #286c8a;
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   font-family: var(--font-ui);
 }
@@ -84,7 +84,7 @@
 .placement-toolbar-heading h2 {
   margin: 2px 0 3px;
   overflow: hidden;
-  font-size: 18px;
+  font-size: var(--text-20);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -92,7 +92,7 @@
 .placement-toolbar-heading p {
   margin: 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-12);
   line-height: 1.4;
 }
 
@@ -105,8 +105,8 @@
   border-radius: 11px;
   background: #167eae;
   color: white;
-  font-size: 22px;
-  font-weight: 850;
+  font-size: var(--text-20);
+  font-weight: 700;
 }
 
 .placement-setting-field,
@@ -128,13 +128,13 @@
   background: white;
   color: var(--ink);
   font: inherit;
-  font-size: 11px;
-  font-weight: 750;
+  font-size: var(--text-12);
+  font-weight: 700;
 }
 
 .placement-setting-field small {
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-12);
 }
 
 .placement-current-choice {
@@ -152,12 +152,12 @@
 }
 
 .placement-current-choice strong {
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .placement-current-choice > span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-12);
 }
 
 .placement-current-choice[data-ready="true"] {
@@ -188,7 +188,7 @@
   color: var(--ink);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   cursor: pointer;
 }

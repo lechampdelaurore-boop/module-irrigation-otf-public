@@ -15,8 +15,8 @@
   border-radius: 999px;
   background: var(--water-soft);
   color: var(--water-ink);
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-12);
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
@@ -40,13 +40,13 @@
   color: var(--ink);
   font: inherit;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   cursor: pointer;
 }
 
 .equipment-pose-history {
-  font-size: 10px;
+  font-size: var(--text-12);
 }
 
 .equipment-pose-history[open] {
@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   color: var(--water-ink);
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -75,7 +75,7 @@
   border-radius: 9px;
   background: var(--warn-soft);
   color: var(--warn-ink);
-  font-size: 11px;
+  font-size: var(--text-12);
   font-weight: 700;
 }
 
@@ -86,7 +86,7 @@
   border-radius: 8px;
   background: var(--warn-soft);
   color: var(--warn-ink);
-  font-size: .85rem;
+  font-size: var(--text-13);
   line-height: 1.5;
 }
 

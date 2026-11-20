@@ -6608,6 +6608,68 @@ pressé n'annule pas un arrosage.
 Ne changent pas : les gestes eux-mêmes, les messages, le calcul de la durée.
 Aucune migration.
 
+## D-193 — Lot K, PR 4 : mots et formats
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 22 : les
+heures s'écrivaient de cinq façons (« 8 h 50 », « 07:00 », « 08:51 →
+10:11 », « 16/06/2026 08:50 », « 21:00 – 08:00 »), les durées de deux
+(« 1 h 21 », « 1 h 21 min ») ; des pluriels entre parenthèses
+(« 0/7 jour(s) disponible(s) ») ; du jargon sur « Ressources »
+(« Disponibilité / projections », « Apport non retenu (réserve pleine) »,
+« Disponible théorique … mobilisables », « Analyse préliminaire »),
+« Faisabilité recalculée. » en vert gras comme un lien, et « Espèces sans
+référence Kc » sur « Réglages ». **Cause vérifiée** : chaque écran avait
+son propre `Intl.DateTimeFormat` (`timeStyle: 'short'` rend « 08:50 »).
+
+**Décision (F474 à F476).** Un seul module, `lib/domain/clock-text.ts`,
+écrit l'heure (« 8 h 50 », « 18 h », « 0 h 05 »), la date et l'heure
+(« 16/06/2026 à 8 h 50 », « 16 juin 2026 à 8 h 50 »), une heure de la
+journée (« de 21 h à 8 h ») et la durée (« 1 h 21 », « 2 h »,
+« 45 min »), toujours à l'heure de la ferme (D-004) ; les écrans et les
+messages l'appellent (F474). Un compte s'accorde à son nombre (« 0 jour »,
+« 1 jour », « 7 jours ») ; un intitulé se met au singulier ou au pluriel
+selon la ligne (« Planche », « Planches ») (F475). Sur « Ressources » :
+« L'eau des jours à venir », « Apport perdu, la réserve étant pleine »,
+« Utilisable, avant les irrigations prévues » et « Utilisable, après les
+irrigations prévues », sans « mobilisables » ; « De maintenant à dimanche
+soir · les volumes, pas encore les horaires », la bulle « Ce que vérifie ce
+calcul » ; « Faisabilité recalculée. » dans la boîte des autres messages.
+Sur « Réglages », « Espèces sans culture de référence » (F476). Les
+chiffres et le sens ne changent pas.
+
+Ne changent pas : les champs de saisie (heure et date au format du
+navigateur), l'export CSV (ses colonnes et ses formats de tableur), les
+calculs. Aucune migration.
+
+## D-194 — Lot K, PR 5 : une échelle de tailles de texte, rien sous 12 px
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 19 :
+36 tailles de texte au téléphone, 41 à l'ordinateur ; 18 % des lettres sous
+12 px au téléphone, jusqu'à 6,5 px sur le plan de « Matériel » ; dix
+graisses, de 300 à 900. La pastille « 6 » du plan ne disait pas ce qu'elle
+comptait. **Cause vérifiée** : chaque feuille de style posait ses tailles
+en pixels ou en rem ; un `<small>` sans taille prenait 80 % de son parent
+(10,4 px dans un texte de 13 px) ; un `<strong>` dans un texte gras montait
+à 900.
+
+**Décision (F477, F478).** Six jetons de taille sur `:root` (`--text-12`,
+`--text-13`, `--text-14`, `--text-16`, `--text-20`, `--text-28`) ; toute
+taille fixe sous 23 px prend le jeton le plus proche (sous 12,75 px : 12 ;
+sous 13,75 : 13 ; sous 15 : 14 ; sous 18 : 16 ; sous 23 : 20). Les grands
+chiffres et les titres d'affichage (23 px et plus, `--title-size`, les
+`clamp()`) gardent la leur. Un `<small>` ne descend plus sous 12 px. Quatre
+graisses : 600 et au-delà deviennent 700 ; un `<strong>` sans poids propre
+prend 700. La pastille chiffrée du plan porte sa bulle (« 6 mm par heure
+d'arrosage ») et une légende sous le plan, quand une planche en a une
+(F478).
+
+Ne changent pas : les polices, les couleurs, les cibles tactiles. Aucune
+migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

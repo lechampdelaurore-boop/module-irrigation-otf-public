@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import type { PlanBedOutcome } from '../lib/domain/planning/contract.ts';
 import { informationalBedCount, unplacedDeficitCount, unplacedGroups, unplacedTileDetail, waitingBedCount } from '../lib/domain/planning/action-summary.ts';
 import { dayValidateShown, unplacedFoldLabel } from '../lib/domain/planning/phone-week.ts';
 import { adjustDoseText, adjustedDoseMm } from '../lib/domain/planning/adjust-dose.ts';
 import { finishInputText, finishValueToSend } from '../lib/domain/finish-time.ts';
+import { clockFromMinutes, clockText, countText, dateClockText, durationMinutesText } from '../lib/domain/clock-text.ts';
 
 /**
  * Audit ergonomique du 19 novembre 2026, lot K « Finitions de charte »
@@ -114,4 +115,74 @@ test('n° 21, F473 : un seul mot pour finir un arrosage', () => {
     assert.ok(source.includes('Terminer l’irrigation'), file);
     assert.doesNotMatch(source, /Terminer maintenant|'Irrigation terminée'\}/, file);
   }
+});
+
+// n° 22 — Mots et formats (PR 4, F474 à F476).
+
+test('n° 22, F474 : les heures s’écrivent « 8 h 50 », à l’heure de la ferme, l’hiver comme l’été', () => {
+  assert.equal(clockText('2026-11-19T07:50:00Z'), '8 h 50', 'hiver, UTC+1');
+  assert.equal(clockText('2026-06-16T06:50:00Z'), '8 h 50', 'été, UTC+2');
+  assert.equal(clockText('2026-06-16T16:00:00Z'), '18 h');
+  assert.equal(clockText('2026-06-16T22:05:00Z'), '0 h 05');
+  assert.equal(clockFromMinutes(21 * 60), '21 h');
+  assert.equal(clockFromMinutes(23 * 60 + 59), '23 h 59');
+  assert.equal(clockFromMinutes(0), '0 h');
+  assert.equal(dateClockText('2026-06-16T06:50:00Z'), '16/06/2026 à 8 h 50');
+  assert.equal(dateClockText('2026-06-16T06:50:00Z', 'Europe/Paris', 'medium'), '16 juin 2026 à 8 h 50');
+});
+
+test('n° 22, F474 : les durées s’écrivent « 1 h 21 », « 2 h », « 45 min »', () => {
+  assert.equal(durationMinutesText(81), '1 h 21');
+  assert.equal(durationMinutesText(120), '2 h');
+  assert.equal(durationMinutesText(45), '45 min');
+  assert.equal(durationMinutesText(64.6), '1 h 05');
+});
+
+test('n° 22, F475 : plus de pluriel entre parenthèses', () => {
+  assert.equal(countText(0, 'jour'), '0 jour');
+  assert.equal(countText(1, 'jour'), '1 jour');
+  assert.equal(countText(7, 'jour'), '7 jours');
+  assert.equal(countText(3, 'planification'), '3 planifications');
+  for (const file of ['app/irrigation/irrigation-history-dashboard.tsx', 'app/irrigation/series-water-view.tsx', 'app/irrigation/pump-manager.tsx', 'app/irrigation/water-resource-manager.tsx', 'lib/services/irrigation-history-service.ts']) {
+    assert.doesNotMatch(readFileSync(file, 'utf8'), /\(s\)/, file);
+  }
+  assert.match(readFileSync('lib/domain/irrigation-history-csv.ts', 'utf8'), /'Planche\(s\)'/, 'l’export garde ses colonnes de tableur');
+});
+
+test('n° 22, F476 : « Ressources » et « Réglages » en mots simples ; « Faisabilité recalculée. » est un message', () => {
+  const resources = readFileSync('app/irrigation/water-resource-manager.tsx', 'utf8');
+  for (const word of ['Disponibilité / projections', 'Apport non retenu', 'Disponible théorique', 'mobilisables']) assert.ok(!resources.includes(word), word);
+  const feasibility = readFileSync('app/irrigation/irrigation-feasibility-dashboard.tsx', 'utf8');
+  assert.ok(!feasibility.includes('Analyse préliminaire'));
+  assert.match(feasibility, /className="water-notice feasibility-notice"/);
+  assert.ok(!readFileSync('app/irrigation/crop-water/crop-coefficients-panel.tsx', 'utf8').includes('sans référence Kc'));
+});
+
+// n° 19 — Une échelle de tailles de texte, rien sous 12 px (PR 5, F477 et F478).
+
+test('n° 19, F477 : six tailles en jetons, aucune taille fixe sous 23 px hors de l’échelle, quatre graisses', () => {
+  const root = readFileSync('app/globals.css', 'utf8');
+  for (const [name, value] of [['12', '.75rem'], ['13', '.8125rem'], ['14', '.875rem'], ['16', '1rem'], ['20', '1.25rem'], ['28', '1.75rem']]) {
+    assert.match(root, new RegExp(`--text-${name}: ${value.replace('.', '\\.')};`));
+  }
+  const sheets = readdirSync('app/irrigation/styles').filter((name) => name.endsWith('.css')).map((name) => `app/irrigation/styles/${name}`);
+  for (const file of [...sheets, 'app/globals.css']) {
+    const css = readFileSync(file, 'utf8');
+    for (const match of css.matchAll(/font-size:\s*([0-9.]+)(px|rem)/g)) {
+      const px = Number(match[1]) * (match[2] === 'rem' ? 16 : 1);
+      assert.ok(px >= 23, `${file} : ${match[0]} hors de l’échelle`);
+    }
+    for (const match of css.matchAll(/font-weight:\s*(\d{3})\b(?!\s*\d)/g)) {
+      assert.ok(['300', '400', '500', '700'].includes(match[1]), `${file} : ${match[0]}`);
+    }
+  }
+  const finish = readFileSync('app/irrigation/styles/finitions-charte.css', 'utf8');
+  assert.match(finish, /small \{\n  font-size: max\(var\(--text-12\), 80%\);/);
+  assert.match(finish, /:where\(main\.app-shell\) :where\(strong, b\) \{\n  font-weight: 700;/);
+});
+
+test('n° 19, F478 : la pastille chiffrée du plan dit ce qu’elle compte', () => {
+  const card = readFileSync('app/irrigation/hierarchy/plot-plan-card.tsx', 'utf8');
+  assert.match(card, /mm par heure d’arrosage/);
+  assert.match(card, /className="plot-coverage-legend"/);
 });
