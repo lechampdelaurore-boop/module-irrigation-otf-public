@@ -55,3 +55,21 @@ export async function archiveInactiveDemoWorkspaces(archivedAt: string): Promise
   ).bind(ARCHIVE_MARK, archivedAt, DEMO_MARK, ARCHIVE_MARK).run();
   return Number(result.meta.changes ?? 0);
 }
+
+/**
+ * Une préparation interrompue (audit du 19 novembre 2026, lot I, n° 11,
+ * F450) : l'espace de l'invité existe depuis plus de `staleMinutes` sans ses
+ * cases cochées, que la préparation écrit en dernier. Il est mis de côté,
+ * d'une seule écriture qui n'aboutit que pour une requête : celle-ci le
+ * prépare de nouveau jusqu'au bout. Dit si c'est cet appel qui l'a mis de
+ * côté. Une préparation en cours depuis moins longtemps n'est pas touchée.
+ */
+export async function archiveStaleDemoPreparation(ownerUserId: string, archivedAt: string, staleMinutes: number): Promise<boolean> {
+  const result = await db.prepare(
+    `UPDATE irrigation_workspaces SET owner_user_id = ?, updated_at = ${NOW}
+     WHERE owner_user_id = ? AND otf_farm_id IS NULL
+       AND created_at < strftime('%Y-%m-%dT%H:%M:%fZ', 'now', ?)
+       AND NOT EXISTS (SELECT 1 FROM irrigation_feature_selections selection WHERE selection.workspace_id = irrigation_workspaces.id)`,
+  ).bind(archivedOwnerId(ownerUserId, archivedAt), ownerUserId, `-${staleMinutes} minutes`).run();
+  return Number(result.meta.changes ?? 0) === 1;
+}

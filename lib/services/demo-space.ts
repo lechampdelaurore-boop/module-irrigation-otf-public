@@ -10,6 +10,7 @@ import { saveSpeciesCorrespondenceForUser } from '@/db/crop-water/entries';
 import { readFeatureSelectionForUser, saveFeatureSelectionForUser } from '@/db/feature-selection-repository';
 import { createWeatherAlertCriterionForUser } from '@/db/weather-alert-repository';
 import { createWorkspaceIfAbsent } from '@/db/workspace-repository';
+import { archiveStaleDemoPreparation } from '@/db/demo-space-repository';
 import { getBedCropWaterSheetForUser } from './crop-water-bed.ts';
 import { isDemoDeployment } from './deployment-mode.ts';
 import { seedDemoEquipment } from './demo-equipment-seed.ts';
@@ -31,10 +32,15 @@ import { computeWeeklyPlanForUser } from './planning-service.ts';
  * `lib/adapters/demo/farms.ts`, la météo du fournisseur de la démonstration.
  *
  * Deux requêtes simultanées ne préparent l'espace qu'une fois : seule celle
- * qui le crée l'écrit ; l'autre attend qu'il soit prêt. Un espace déjà ouvert
- * n'est jamais réécrit : les essais de l'invité restent jusqu'à la remise à
- * zéro (D4). Refusé hors démonstration : le module en production n'a aucun
- * peuplement.
+ * qui le crée l'écrit ; l'autre attend qu'il soit prêt, deux secondes au
+ * plus, puis dit qu'il se prépare (`DemoSpacePreparingError`) plutôt que de
+ * montrer un espace à moitié écrit. Une préparation interrompue, commencée
+ * depuis plus de deux minutes sans avoir fini, est reprise par la requête
+ * suivante, et une seule : l'espace est mis de côté, puis préparé de nouveau
+ * jusqu'au bout (audit du 19 novembre 2026, lot I, n° 11, F450). Un espace
+ * déjà ouvert n'est jamais réécrit : les essais de l'invité restent jusqu'à
+ * la remise à zéro (D4). Refusé hors démonstration : le module en
+ * production n'a aucun peuplement.
  */
 export async function prepareDemoSpace(ownerUserId: string, choice: DemoChoice): Promise<void> {
   if (!isDemoDeployment()) throw new Error('Un espace de démonstration ne se prépare qu’en démonstration.');
@@ -44,7 +50,24 @@ export async function prepareDemoSpace(ownerUserId: string, choice: DemoChoice):
     await seedDemoSpace(ownerUserId, choice);
     return;
   }
-  await waitUntilPrepared(ownerUserId);
+  // Une préparation interrompue : cette requête, seule à la mettre de côté, la reprend jusqu'au bout.
+  if (await archiveStaleDemoPreparation(ownerUserId, `${new Date().toISOString()}-reprise-${crypto.randomUUID().slice(0, 8)}`, STALE_PREPARATION_MINUTES)
+    && await createWorkspaceIfAbsent(ownerUserId)) {
+    await seedDemoSpace(ownerUserId, choice);
+    return;
+  }
+  if (!(await waitUntilPrepared(ownerUserId))) throw new DemoSpacePreparingError();
+}
+
+/** Au-delà, une préparation sans ses cases cochées est tenue pour interrompue (F450). */
+const STALE_PREPARATION_MINUTES = 2;
+
+/** L'espace de l'invité se prépare dans une autre requête : la page le dit, et se relit seule (F450). */
+export class DemoSpacePreparingError extends Error {
+  constructor() {
+    super('Préparation de votre démonstration en cours.');
+    this.name = 'DemoSpacePreparingError';
+  }
 }
 
 async function seedDemoSpace(ownerUserId: string, choice: DemoChoice): Promise<void> {
@@ -64,19 +87,21 @@ async function seedDemoSpace(ownerUserId: string, choice: DemoChoice): Promise<v
 }
 
 const WAIT_STEP_MS = 100;
-const WAIT_STEPS = 50;
+const WAIT_STEPS = 20;
 
 /**
  * Une autre requête prépare l'espace (la page et ses données partent
  * ensemble à la première ouverture) : on attend qu'elle ait fini, au plus
- * cinq secondes, plutôt que de montrer un espace à moitié écrit. Les cases
- * cochées, écrites en dernier, disent qu'il est prêt.
+ * deux secondes. Les cases cochées, écrites en dernier, disent qu'il est
+ * prêt. Dit s'il l'est ; sinon, la page dit que la démonstration se prépare
+ * (F450), au lieu de montrer un espace à moitié écrit.
  */
-async function waitUntilPrepared(ownerUserId: string): Promise<void> {
+async function waitUntilPrepared(ownerUserId: string): Promise<boolean> {
   for (let step = 0; step < WAIT_STEPS; step += 1) {
-    if ((await readFeatureSelectionForUser(ownerUserId)).kind === 'stored') return;
+    if ((await readFeatureSelectionForUser(ownerUserId)).kind === 'stored') return true;
     await new Promise((resolve) => setTimeout(resolve, WAIT_STEP_MS));
   }
+  return false;
 }
 
 /**

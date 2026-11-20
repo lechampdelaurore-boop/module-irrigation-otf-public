@@ -454,7 +454,15 @@ registres, elle y renvoie.
   un objectif posé dans la démonstration était daté du jour réel par la
   base, et la règle le repoussait au lundi suivant fin novembre ; les
   objectifs et la limite journalière portent désormais l'heure du module,
-  le jour simulé en démonstration, l'heure réelle ailleurs ; codée.
+  le jour simulé en démonstration, l'heure réelle ailleurs ; en ligne le
+  20 novembre 2026 à 2 h 14 (#115, fusionnée à 1 h 51, run 44649217228 vérifié job
+  par job).
+  **PR 3, la démonstration se prépare jusqu'au bout** (D-180, F450) : une
+  préparation interrompue laissait un espace sans ses cases cochées, que
+  chaque page attendait cinq secondes avant de le montrer à moitié écrit ;
+  elle est désormais reprise jusqu'au bout par une seule requête après deux
+  minutes, et une page qui arrive pendant une préparation dit
+  « Préparation de votre démonstration… » et se relit seule ; codée.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

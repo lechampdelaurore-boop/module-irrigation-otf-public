@@ -112,9 +112,12 @@ zéro de nuit. D'où les pages à 9,5 s et la démonstration à moitié prête.
    deux minutes sans avoir fini est reprise par la requête suivante : elle
    remet l'espace à zéro et le prépare jusqu'au bout. Deux requêtes ne la
    reprennent jamais ensemble.
-2. Pendant une préparation en cours, la page affiche « Préparation de
-   votre démonstration… » et se relit seule toutes les deux secondes,
-   au lieu d'attendre en silence ; elle s'ouvre dès que l'espace est prêt.
+2. Une requête qui arrive pendant une préparation en cours attend deux
+   secondes au plus, puis la page affiche « Préparation de votre
+   démonstration… » et se relit seule toutes les deux secondes, au lieu
+   d'attendre en silence et de montrer un espace à moitié écrit ; elle
+   s'ouvre dès que l'espace est prêt. La requête qui prépare, elle, rend la
+   page une fois la préparation finie.
 3. Hors démonstration, rien ne change.
 
 ## 5. n° 12 — Le bandeau sur tablette (PR 4)
@@ -174,7 +177,9 @@ vierge ; puis la remise en état.
 
 - **F449** ce que la démonstration écrit et qu'une règle relit par sa date (les objectifs, la limite journalière) porte l'heure du module, le jour simulé (section 3).
 
-Les précisions des PR 3 à 5 suivent, F450 et au-delà.
+- **F450** une préparation interrompue est reprise jusqu'au bout par une seule requête ; une préparation en cours se dit « Préparation de votre démonstration… » et la page se relit seule (section 4).
+
+Les précisions des PR 4 et 5 suivent, F451 et au-delà.
 
 Ce que le lot ne prouve pas : un vrai téléphone, une vraie tablette, un
 lecteur d'écran ; la ferme réelle n'est pas touchée.

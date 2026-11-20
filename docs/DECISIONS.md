@@ -6247,6 +6247,31 @@ autres dates d'écriture ne sont relues par aucune règle.
 
 Ne changent pas : la règle D-034, les calculs, la ferme réelle (son heure
 du module est l'heure réelle). Aucune migration.
+
+## D-180 — Lot I, PR 3 : la démonstration se prépare jusqu'au bout
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 11 : une
+démonstration en ligne restait à moitié prête plus de 30 minutes (planning
+« Aucun calcul », 9,5 s par page), jusqu'à « Remettre à zéro ». **Cause
+établie dans le code** : la préparation crée l'espace, écrit ses données,
+puis coche les cases en dernier, qui disent « prêt ». Interrompue entre les
+deux, elle laissait un espace créé sans cases : chaque requête suivante
+attendait cinq secondes qu'une autre finisse, puis montrait l'espace à
+moitié écrit, et rien ne le complétait.
+
+**Décision.** Une préparation commencée depuis plus de deux minutes sans
+ses cases est reprise par la requête suivante : l'espace est mis de côté
+(comme par « Remettre à zéro »), d'une seule écriture qui n'aboutit que pour
+une requête, puis préparé de nouveau jusqu'au bout (F450). Une requête qui
+arrive pendant une préparation en cours attend deux secondes au plus, puis
+la page dit « Préparation de votre démonstration… » et se relit seule
+toutes les deux secondes. Aucun essai d'invité ne se perd : un espace sans
+cases n'a jamais été ouvert.
+
+Ne changent pas : la remise à zéro, la tâche de nuit, la ferme réelle
+(refusé hors démonstration). Aucune migration.
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.

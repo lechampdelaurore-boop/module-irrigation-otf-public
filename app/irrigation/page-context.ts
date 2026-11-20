@@ -22,6 +22,7 @@ import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-ser
 import { getIrrigationSnapshot, IrrigationDataUnavailableError } from '@/lib/services/irrigation-service';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
+import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import type { ShellProps } from './shell/irrigation-shell';
@@ -79,6 +80,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     user = await requireAuthenticatedUser();
   } catch (error) {
     if (error instanceof FarmIdentityUnavailableError) return { kind: 'unavailable', props: farmUnidentifiedState(page, season, error) };
+    if (error instanceof DemoSpacePreparingError) return { kind: 'unavailable', props: demoPreparingState(page, season) };
     throw error;
   }
   const signOutHref = signOutPath();
@@ -168,6 +170,14 @@ export function farmUnidentifiedState(page: IrrigationPageId, season: number, er
     demo: false,
     demoSelection: null,
   };
+}
+
+/**
+ * L'espace de la démonstration se prépare dans une autre requête (audit du
+ * 19 novembre 2026, lot I, n° 11, F450) : la page le dit, et se relit seule.
+ */
+export function demoPreparingState(page: IrrigationPageId, season: number): UnavailableStateProps {
+  return { page, signOutPath: signOutPath(), userName: '', season, reason: 'demo-preparing', demo: true, demoSelection: null };
 }
 
 type SnapshotLoadResult =
