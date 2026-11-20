@@ -80,7 +80,11 @@ test('le registre est cohérent : clés uniques, seuils croissants et expliqués
     const trigger = TASK_TRIGGERS.find((candidate) => candidate.key === task.trigger);
     assert.ok(trigger?.monitored, `${task.key} : son déclencheur existe et est surveillé`);
   }
-  assert.deepEqual(TASK_REGISTRY.filter((task) => task.trigger === OPERATOR_GESTURE).map((task) => task.key), ['offsite-export'], 'une seule tâche faite à la main : l’export hors de Cloudflare');
+  assert.deepEqual(
+    TASK_REGISTRY.filter((task) => task.trigger === OPERATOR_GESTURE).map((task) => task.key),
+    ['offsite-export', 'restore-rehearsal'],
+    'deux tâches faites par l’exploitant : l’export hors de Cloudflare et l’essai de restauration',
+  );
   for (const trigger of TASK_TRIGGERS) {
     if (trigger.monitored) assert.ok(tasksOfTrigger(trigger.key).length > 0, `${trigger.key} : au moins une tâche`);
     else assert.ok(trigger.reason.trim().length > 0, `${trigger.key} : hors veille, avec sa raison`);

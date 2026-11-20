@@ -1,5 +1,5 @@
 import type { FarmObservationLine } from './farm-observation.ts';
-import type { OffsiteExportDates } from './offsite-export.ts';
+import { isGestureTask, type GestureDates, type GestureTask } from './operator-gesture.ts';
 import { parisMoment, stateWords, tasksToWatch, type WatchedTask } from './operator-watch.ts';
 import type { TaskState } from './task-state.ts';
 
@@ -27,6 +27,8 @@ type OperatorTaskLine = {
   failing: string | null;
   lastError: string | null;
   ifMissing: string;
+  /** La tâche faite par l'exploitant, dont la carte porte le geste (F625, F637), ou `null`. */
+  gesture: GestureTask | null;
 };
 
 export type OperatorStatusView = {
@@ -36,8 +38,8 @@ export type OperatorStatusView = {
   lastNotice: string;
   /** Une ligne par ferme, la plus en difficulté d'abord (F616). */
   farms: FarmObservationLine[];
-  /** Les jours que le geste « J'ai fait l'export du … » propose (F625), ou `null` hors de la page. */
-  exportDates: OffsiteExportDates | null;
+  /** Les jours que proposent les gestes « J'ai fait l'export du … » et « J'ai fait l'essai du … » (F625, F637), ou `null` hors de la page. */
+  gestureDates: GestureDates | null;
 };
 
 export type LatestNotice = { kind: 'alert' | 'all-good'; problems: number; sentAt: string };
@@ -46,13 +48,13 @@ export function operatorStatusView(
   tasks: readonly WatchedTask[],
   latestNotice: LatestNotice | null,
   farms: readonly FarmObservationLine[] = [],
-  exportDates: OffsiteExportDates | null = null,
+  gestureDates: GestureDates | null = null,
 ): OperatorStatusView {
   return {
     verdict: verdict(tasks, farms),
     tasks: tasks.map(taskLine),
     farms: [...farms],
-    exportDates,
+    gestureDates,
     lastNotice: latestNotice
       ? `Dernière notification de la veille : ${latestNotice.kind === 'all-good'
         ? '« tout va bien »'
@@ -106,6 +108,7 @@ function taskLine({ declaration, state }: WatchedTask): OperatorTaskLine {
       : null,
     lastError: state.consecutiveFailures > 0 ? state.lastError : null,
     ifMissing: declaration.ifMissing,
+    gesture: isGestureTask(declaration.key) ? declaration.key : null,
   };
 }
 

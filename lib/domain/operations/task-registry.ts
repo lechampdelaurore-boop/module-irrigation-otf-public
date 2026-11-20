@@ -18,21 +18,22 @@ import { HOURS_PER_DAY } from '../units.ts';
  * notification ne sont pas des déclencheurs planifiés : chacune suit un
  * arrosage, sans rythme attendu, et n'est pas une tâche du registre.
  *
- * L'export de la base hors de Cloudflare (4.5, PR 4 ; 10 bis.14, F624) y est
- * aussi, bien que fait à la main par l'exploitant : aucun déclencheur ne le
- * lance (`OPERATOR_GESTURE`), le geste de la page d'état note sa réussite,
- * et la veille le surveille comme les autres.
+ * L'export de la base hors de Cloudflare (4.5, PR 4 ; 10 bis.14, F624) et
+ * l'essai de restauration (10 bis.16, F636) y sont aussi, bien que faits par
+ * l'exploitant : aucun déclencheur ne les lance (`OPERATOR_GESTURE`), un
+ * geste de la page d'état note leur réussite, et la veille les surveille
+ * comme les autres.
  */
 
 /** Les tâches du registre ; la clé est aussi celle de la ligne qui garde leurs exécutions. */
-export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning' | 'offsite-export' | 'operator-watch';
+export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning' | 'offsite-export' | 'restore-rehearsal' | 'operator-watch';
 
 export type TriggerKey = 'weather-morning' | 'operator-watch' | 'demo-nightly-reset';
 
 /**
- * Une tâche faite à la main par l'exploitant, hors de Cloudflare, et notée
- * par un geste de la page d'état : aucun déclencheur ne la lance, mais la
- * veille la surveille comme les autres (10 bis.9 ; 10 bis.14, F625).
+ * Une tâche faite par l'exploitant, hors du Worker, et notée par un geste de
+ * la page d'état : aucun déclencheur ne la lance, mais la veille la surveille
+ * comme les autres (10 bis.9 ; 10 bis.14, F625 ; 10 bis.16, F636).
  */
 export const OPERATOR_GESTURE = 'operator-gesture';
 
@@ -164,6 +165,17 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     thresholdReason: 'Une fois par semaine : orange à 8 jours (un jour de marge), rouge à 10 jours (la semaine est manquée). L\'historique de 30 jours de Cloudflare ne protège pas d\'une perte du compte : seule cette copie le fait (10 bis.9).',
     ifMissing: 'Si le compte Cloudflare était perdu, les fermes perdraient tout ce qui a été saisi depuis le dernier export gardé hors de Cloudflare.',
     successKeptIn: 'Ligne « task:offsite-export » de irrigation_background_jobs, écrite par le geste « J\'ai fait l\'export du … » de la page d\'état (le jour noté, jamais en recul).',
+    trigger: OPERATOR_GESTURE,
+  },
+  {
+    key: 'restore-rehearsal',
+    label: 'Essai de restauration',
+    rhythm: '1 par trimestre, et après un changement de schéma important : joué sur une base d\'essai par le flux « Essai de restauration » de GitHub Actions (pnpm backup:rehearse), sur le « vas-y » de l\'exploitant, puis noté ici',
+    lateAfterHours: 100 * HOURS_PER_DAY,
+    brokenAfterHours: 120 * HOURS_PER_DAY,
+    thresholdReason: 'Une fois par trimestre : orange à 100 jours (un trimestre et neuf jours de marge), rouge à 120 jours (quatre mois : le trimestre est manqué). Une sauvegarde dont la restauration n\'est pas essayée peut ne rien rendre le jour où il le faut (10 bis.8).',
+    ifMissing: 'Rien ne prouve plus que l\'historique de Cloudflare et l\'export de la semaine rendraient la base : un défaut ne se verrait que le jour d\'une restauration.',
+    successKeptIn: 'Ligne « task:restore-rehearsal » de irrigation_background_jobs, écrite par le geste « J\'ai fait l\'essai du … » de la page d\'état (le jour noté, jamais en recul).',
     trigger: OPERATOR_GESTURE,
   },
   {

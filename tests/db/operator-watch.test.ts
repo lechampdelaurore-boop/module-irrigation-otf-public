@@ -8,7 +8,7 @@ import { farmSpaceKey } from '../../lib/domain/farm-space';
 import type { IrrigationPushSendRequest } from '../../lib/domain/irrigation-push-contract';
 import { tasksOfTrigger } from '../../lib/domain/operations/task-registry';
 import type { IrrigationPushSendResult } from '../../lib/services/irrigation-push-service';
-import { isOperator, readOperatorStatus, recordOffsiteExport } from '../../lib/services/operator-status';
+import { isOperator, readOperatorStatus, recordOperatorGesture } from '../../lib/services/operator-status';
 import { runOperatorWatch } from '../../lib/services/operator-watch';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 
@@ -35,8 +35,9 @@ beforeEach(async () => {
   database = installTestDatabase();
   operatorWorkspace = await ensureWorkspaceForUser(OPERATOR);
   otherWorkspace = await ensureWorkspaceForUser(OTHER_FARM_PERSON);
-  // L'export de la semaine, noté la veille au soir : seules les tâches du matin sont en jeu ici.
+  // L'export de la semaine, noté la veille au soir, et l'essai du trimestre : seules les tâches du matin sont en jeu ici.
   await recordTaskRun({ task: 'offsite-export', at: '2026-11-19T20:30:00.000Z', successful: true, error: null });
+  await recordTaskRun({ task: 'restore-rehearsal', at: '2026-11-02T12:00:00.000Z', successful: true, error: null });
 });
 afterEach(() => {
   database.dispose();
@@ -219,28 +220,44 @@ test('l’exploitant est une personne de la ferme du déploiement ; la page d’
   const status = await readOperatorStatus(FRIDAY, deploymentFarm);
   // La veille, avant sa première exécution ; les deux fermes, jamais lues ni servies en météo sur cette base neuve (F616).
   assert.deepEqual(status.verdict, { tone: 'warn', text: '1 tâche jamais réussie ; 2 fermes à regarder.' });
-  assert.deepEqual(status.tasks.map((task) => task.tone), ['ok', 'ok', 'ok', 'ok', 'ok', 'warn']);
+  assert.deepEqual(status.tasks.map((task) => task.tone), ['ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'warn']);
   assert.deepEqual(status.farms.map((farm) => farm.title), ['Ferme n° 4394, celle de la clé du déploiement', 'Ferme n° 5120']);
-  assert.deepEqual(status.exportDates, { today: '2026-11-20', earliest: '2026-10-21' });
+  assert.deepEqual(status.gestureDates, { today: '2026-11-20', earliest: '2026-10-21' });
 });
 
-test('le geste « J’ai fait l’export du … » : le jour noté devient la dernière réussite de l’export, sans jamais reculer', async () => {
+test('les gestes « J’ai fait l’export du … » et « J’ai fait l’essai du … » : le jour noté devient la dernière réussite de sa tâche, sans jamais reculer', async () => {
   const { lines, log } = journal();
-  const exportRun = async () => (await readTaskRuns(['offsite-export'])).get('offsite-export')!;
+  const lastSuccess = async (task: 'offsite-export' | 'restore-rehearsal') => (await readTaskRuns([task])).get(task)!.lastSuccessAt;
   const now = new Date('2026-11-27T20:30:00.000Z');
 
-  assert.deepEqual(await recordOffsiteExport('2026-11-19', now), { ok: false, message: 'L’export du 19/11/2026 est déjà noté.' });
-  assert.deepEqual(await recordOffsiteExport('2026-11-26', now, log), { ok: true, message: 'L’export du 26/11/2026 est noté.' });
-  assert.equal((await exportRun()).lastSuccessAt, '2026-11-26T12:00:00.000Z');
-  assert.deepEqual(await recordOffsiteExport('2026-11-22', now), { ok: false, message: 'Un export plus récent est déjà noté : celui du 26/11/2026.' });
-  assert.deepEqual(await recordOffsiteExport('2026-11-27', now, log), { ok: true, message: 'L’export du 27/11/2026 est noté.' });
-  assert.equal((await exportRun()).lastSuccessAt, now.toISOString(), 'le jour même : l’heure du geste');
-  assert.deepEqual(lines, [{ event: 'offsite_export_recorded', day: '2026-11-26' }, { event: 'offsite_export_recorded', day: '2026-11-27' }], 'un jour, rien d’autre');
+  assert.deepEqual(await recordOperatorGesture('offsite-export', '2026-11-19', now), { ok: false, message: 'L’export du 19/11/2026 est déjà noté.' });
+  assert.deepEqual(await recordOperatorGesture('offsite-export', '2026-11-26', now, log), { ok: true, message: 'L’export du 26/11/2026 est noté.' });
+  assert.equal(await lastSuccess('offsite-export'), '2026-11-26T12:00:00.000Z');
+  assert.deepEqual(await recordOperatorGesture('offsite-export', '2026-11-22', now), { ok: false, message: 'Un export plus récent est déjà noté : celui du 26/11/2026.' });
+  assert.deepEqual(await recordOperatorGesture('offsite-export', '2026-11-27', now, log), { ok: true, message: 'L’export du 27/11/2026 est noté.' });
+  assert.equal(await lastSuccess('offsite-export'), now.toISOString(), 'le jour même : l’heure du geste');
+  assert.equal(await lastSuccess('restore-rehearsal'), '2026-11-02T12:00:00.000Z', 'noter l’export ne touche pas l’essai');
 
-  database.sqlite.prepare("DELETE FROM irrigation_background_jobs WHERE job_key = 'task:offsite-export'").run();
+  assert.deepEqual(await recordOperatorGesture('restore-rehearsal', '2026-11-01', now), { ok: false, message: 'Un essai plus récent est déjà noté : celui du 02/11/2026.' });
+  assert.deepEqual(await recordOperatorGesture('restore-rehearsal', '2026-11-25', now, log), { ok: true, message: 'L’essai du 25/11/2026 est noté.' });
+  assert.equal(await lastSuccess('restore-rehearsal'), '2026-11-25T12:00:00.000Z');
+  assert.equal(await lastSuccess('offsite-export'), now.toISOString(), 'noter l’essai ne touche pas l’export');
+  assert.deepEqual(lines, [
+    { event: 'offsite_export_recorded', day: '2026-11-26' },
+    { event: 'offsite_export_recorded', day: '2026-11-27' },
+    { event: 'restore_rehearsal_recorded', day: '2026-11-25' },
+  ], 'un jour, rien d’autre');
+
+  database.sqlite.prepare("DELETE FROM irrigation_background_jobs WHERE job_key IN ('task:offsite-export', 'task:restore-rehearsal')").run();
   await morningAt('2026-11-27', { reanalysis: true });
   const before = await readOperatorStatus(now, deploymentFarm);
-  assert.equal(before.tasks.find((task) => task.key === 'offsite-export')?.state, 'Jamais réussie', 'avant le premier export : orange, jamais vert');
-  await recordOffsiteExport('2026-11-27', now);
-  assert.equal((await readOperatorStatus(now, deploymentFarm)).tasks.find((task) => task.key === 'offsite-export')?.state, 'À l\'heure');
+  for (const key of ['offsite-export', 'restore-rehearsal']) {
+    assert.equal(before.tasks.find((task) => task.key === key)?.state, 'Jamais réussie', `${key} : avant le premier, orange, jamais vert`);
+  }
+  await recordOperatorGesture('offsite-export', '2026-11-27', now);
+  await recordOperatorGesture('restore-rehearsal', '2026-11-27', now);
+  const after = await readOperatorStatus(now, deploymentFarm);
+  for (const key of ['offsite-export', 'restore-rehearsal']) {
+    assert.equal(after.tasks.find((task) => task.key === key)?.state, 'À l\'heure', key);
+  }
 });

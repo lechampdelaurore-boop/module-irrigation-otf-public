@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
+
+- **L'essai de restauration au registre des tâches** (D-245, F636 et F637) :
+  une fois par trimestre, orange à 100 jours sans essai noté, rouge à 120 ;
+  la veille de 9 h le rappelle, comme l'export de la semaine. Sur la page
+  d'état, sa carte porte le geste « J'ai fait l'essai du … », aux mêmes
+  règles que celui de l'export.
+
+### Changé (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
+
+- Les gestes de la page d'état (l'export, l'essai) sont un seul code : un
+  test lie chaque tâche faite par l'exploitant à son geste, et la tâche
+  venue du navigateur est relue côté serveur. Le jugement d'ensemble compte
+  désormais 7 tâches ; le parcours P50 note aussi l'essai, aux deux
+  largeurs.
+
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, seconde partie)
 
 - **L'essai de restauration** (D-244, F627 à F635) : `pnpm backup:rehearse`

@@ -7272,3 +7272,29 @@ interne de l'API, code 7500, sur une base d'une minute) : sa mesure se dit
 en une note sans arrêter l'essai, et la procédure demande ce signet avant
 de rien restaurer. L'export brut ne se réimporte pas (« no such table »),
 l'import rangé si. Un export dure environ 2,5 secondes pour 705 lignes.
+
+## D-245 — Tranche 4, 4.5, PR 4 (troisième partie) : l'essai de restauration au registre
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat (10 bis.8) veut l'essai de restauration rejoué une
+fois par trimestre et après un changement de schéma important, inscrit au
+registre ; la page d'état dit la date du dernier essai (F565, point 4). Le
+premier essai chez Cloudflare a réussi le 20 novembre 2026 (D-244). D-244
+renvoyait ce registre à une PR à part.
+
+**Décision.** Section 10 bis.16 du contrat de la Tranche 4 (F636 et F637) :
+
+1. La tâche « Essai de restauration » entre au registre, faite par
+   l'exploitant (`operator-gesture`) : une fois par trimestre, orange à
+   100 jours, rouge à 120 ; jamais réussie, en orange, avant le premier essai
+   noté. La veille la surveille comme les autres.
+2. Le geste « J'ai fait l'essai du … » de la page d'état, aux mêmes règles
+   que celui de l'export ; les deux gestes sont un seul code, et un test
+   lie chaque tâche faite par l'exploitant à son geste.
+3. Un changement de schéma important (une table refaite, des clés
+   étrangères changées) se dit dans sa PR, et l'essai se rejoue avant sa
+   fusion.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
+aucun secret ; les seuils et le geste de l'export (D-243).
