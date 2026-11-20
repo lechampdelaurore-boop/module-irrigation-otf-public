@@ -75,12 +75,12 @@
 
 .onboarding-unfinished a {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .onboarding-step > a {
   grid-column: 1 / -1;
   justify-self: start;
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
