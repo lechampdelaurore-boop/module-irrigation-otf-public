@@ -7050,3 +7050,42 @@ navigateur pour la lecture le 20 novembre 2026 à 13 h 45.
 Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
 et la démonstration ; la proposition d'après le nom quand le modèle ne
 connaît pas l'espèce. Aucune question de budget.
+
+
+
+## D-240 — Tranche 4, 4.5, PR 1 : le registre des tâches attendues
+
+Date : 20 novembre 2026.
+
+**Contexte.** La mise à jour de la météo est restée en panne du 14 au
+19 novembre 2026 sans que personne ne le voie (D-164 à D-166) : l'écran
+s'appuyait sur une date restée verte, la réanalyse n'avait pas de réussite
+à elle, et rien ne disait qu'une réussite attendue manquait. Le contrat de
+la 4.5 (D-220, F560) demande un registre des tâches attendues, en code,
+dont l'état se calcule sur la dernière réussite.
+
+**Décision.** Section 10 bis.11 du contrat de la Tranche 4 (F600 à F607) :
+
+1. Le registre vit dans `lib/domain/operations/task-registry.ts` : les
+   quatre tâches du matin (prévisions, réanalyse, calcul du matin, rotation
+   du coffre), chacune avec son rythme, ses seuils et leur raison, l'effet
+   d'un manque et l'endroit de sa dernière réussite. Les autres tâches
+   entrent avec le code qui les crée. Le déclencheur de la démonstration est
+   rangé hors veille, avec sa raison.
+2. Seuils du matin : **orange à 26 heures** (le tableau F560 proposait 30 :
+   à 9 h, l'heure de la veille, un 6 h 15 manqué se voit ainsi le matin
+   même), **rouge à 36 heures** (D-165, qui lit désormais ce seuil au
+   registre).
+3. Une exécution n'est réussie que si elle a tout fait ; prévisions et
+   réanalyse se comptent à part ; trois exécutions manquées de suite font
+   une panne ; une tâche sans réussite est « jamais réussie », en orange.
+4. Les exécutions se gardent dans `irrigation_background_jobs`, ligne
+   `task:<tâche>` ; la migration 0037, additive, ajoute le compte des
+   échecs et « en panne depuis ». Le résumé d'un échec ne porte que des
+   nombres et des classes d'erreur.
+5. Tout déclencheur planifié s'inscrit au registre : un test lit les
+   configurations Wrangler et échoue pour un déclencheur absent (F569,
+   écrit dans `AGENTS.md`).
+
+Ne changent pas : l'écran des fermes ; le créneau de 6 h 15 ; le verrou de
+la météo ; les calculs du matin ; aucun appel nouveau à OTF ni dépense.
