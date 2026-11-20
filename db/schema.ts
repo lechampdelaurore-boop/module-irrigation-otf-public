@@ -110,8 +110,33 @@ export const otfFarmReads = sqliteTable('otf_farm_reads', {
   leaseId: text('lease_id'),
   leaseUntilMs: integer('lease_until_ms').notNull().default(0),
   reserveBasis: integer('reserve_basis'),
+  /** La dernière lecture complète de la ferme (4.5, F615) : la page d'état de l'exploitant la montre. */
+  lastCompleteAt: text('last_complete_at'),
   updatedAt: updatedAt(),
 });
+
+/**
+ * Les appels envoyés à Ouvre ta ferme, par ferme, heure pleine et résultat
+ * (4.5, PR 2, docs/tranche-4-contract.md, F564, F614) ; huit jours.
+ */
+export const otfCallOutcomes = sqliteTable(
+  'otf_call_outcomes',
+  {
+    paceKey: text('pace_key').notNull(),
+    hourStartMs: integer('hour_start_ms').notNull(),
+    outcome: text('outcome').notNull(),
+    calls: integer('calls').notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.paceKey, table.hourStartMs, table.outcome] }),
+    index('idx_otf_call_outcomes_hour').on(table.hourStartMs),
+    check(
+      'chk_otf_call_outcomes_outcome',
+      sql`${table.outcome} IN ('ok', 'unauthorized', 'forbidden', 'rate-limited', 'server', 'refused', 'timeout', 'network')`,
+    ),
+    check('chk_otf_call_outcomes_calls', sql`${table.calls} >= 0`),
+  ],
+);
 
 /**
  * Le raccordement de chaque ferme à Ouvre ta ferme (4.3, PR 2,

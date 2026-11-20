@@ -1,8 +1,15 @@
+import { readFarmObservations } from '@/db/farm-observation-repository';
 import { readLatestOperatorNotice } from '@/db/operator-repository';
 import { farmSpaceOf } from '../domain/farm-space';
+import { farmObservationLines } from '../domain/operations/farm-observation';
 import { operatorStatusView, type OperatorStatusView } from '../domain/operations/operator-status-view';
+import { outcomeHourStartMs } from '../domain/otf/call-outcome';
+import { parisDayOf } from '../domain/otf/shared-call-pace';
+import { HOURS_PER_DAY, millisecondsFromHours } from '../domain/units';
 import { isDemoDeployment } from './deployment-mode';
 import { knownDeploymentFarm } from './farm-identity-service';
+import { listFarmsWithFeature } from './feature-selection-service';
+import { DEPLOYMENT_KEY_UNKNOWN_FARM_PACE } from './otf-farm-read';
 import { readTaskStates } from './task-runs';
 
 /**
@@ -23,7 +30,25 @@ export async function isOperator(spaceKey: string, deploymentFarm = knownDeploym
   return otfFarmId === await deploymentFarm();
 }
 
-export async function readOperatorStatus(now = new Date()): Promise<OperatorStatusView> {
-  const [tasks, latestNotice] = await Promise.all([readTaskStates(now), readLatestOperatorNotice()]);
-  return operatorStatusView(tasks, latestNotice);
+/**
+ * Ce que montre la page : les tâches du registre, la dernière notification
+ * de la veille et chaque ferme (F616). Les erreurs d'OTF se comptent par
+ * heure pleine : « 24 heures », c'est l'heure en cours et les 23 d'avant.
+ */
+export async function readOperatorStatus(now = new Date(), deploymentFarm = knownDeploymentFarm): Promise<OperatorStatusView> {
+  const hourStartMs = outcomeHourStartMs(now.getTime());
+  const [tasks, latestNotice, records, farm, planning] = await Promise.all([
+    readTaskStates(now),
+    readLatestOperatorNotice(),
+    readFarmObservations({
+      parisDay: parisDayOf(now.getTime()),
+      dayStartMs: hourStartMs - millisecondsFromHours(HOURS_PER_DAY - 1),
+      weekStartMs: hourStartMs - millisecondsFromHours(7 * HOURS_PER_DAY - 1),
+    }),
+    deploymentFarm(),
+    listFarmsWithFeature('planning'),
+  ]);
+  const planningFarms = new Set(planning.flatMap(({ ownerUserId }) => farmSpaceOf(ownerUserId).otfFarmId ?? []));
+  const farms = farmObservationLines(records, { now, deploymentFarm: farm, unknownFarmKey: DEPLOYMENT_KEY_UNKNOWN_FARM_PACE, planningFarms });
+  return operatorStatusView(tasks, latestNotice, farms);
 }

@@ -139,17 +139,20 @@ test('une base indisponible au moment d’un 429 : la limite remonte quand même
   const client = new OtfReadClient({ baseUrl, token: 'jeton', farmKey: 'ferme-a', clock, sharedPace: shared.pace, fetchImpl: async () => new Response(null, { status: 429 }) });
 
   await assert.rejects(client.getConfiguration(), (error) => error instanceof OtfReadDeferredError && error.reason === 'rate-limit');
-  assert.deepEqual(events().map((entry) => [entry.event, entry.reason]), [['otf_pause_not_recorded', 'rate-limit']]);
+  assert.deepEqual(events().map((entry) => [entry.event, entry.reason]), [['otf_call_failed', undefined], ['otf_pause_not_recorded', 'rate-limit']]);
 });
 
-test('chaque refus d’accès compte pour le frein ; quand il serre, le journal dit jusqu’à quand, sans rien d’autre (F359)', async () => {
+test('chaque refus d’accès compte pour le frein ; quand il serre, le journal dit jusqu’à quand, sans rien d’autre que l’appel manqué (F359, F614)', async () => {
   const clock = fakeClock(Date.parse('2026-11-18T20:00:00Z'));
   const brake: OtfCallPause = { scope: 'module', untilMs: Date.parse('2026-11-18T20:15:00Z'), reason: 'authentication-brake' };
   const shared = fakeSharedPace({ recordAuthenticationFailure: async () => brake });
   const client = new OtfReadClient({ baseUrl, token: 'jeton-secret-de-test', farmKey: 'ferme-a', clock, sharedPace: shared.pace, fetchImpl: async () => new Response(null, { status: 401 }) });
 
   await assert.rejects(client.getConfiguration(), (error) => error instanceof OtfApiError && error.status === 401);
-  assert.deepEqual(events(), [{ event: 'otf_authentication_brake', pausedUntil: '2026-11-18T20:15:00.000Z' }]);
+  assert.deepEqual(events(), [
+    { event: 'otf_call_failed', route: '/configuration', attempt: 1, outcome: 'unauthorized', status: 401, durationMs: 0 },
+    { event: 'otf_authentication_brake', pausedUntil: '2026-11-18T20:15:00.000Z' },
+  ]);
   assert.ok(!logs.join('').includes('jeton-secret-de-test'), 'aucun jeton au journal');
 });
 
@@ -159,7 +162,7 @@ test('un refus d’accès que la base ne peut pas noter n’arrête rien : l’e
   const client = new OtfReadClient({ baseUrl, token: 'jeton', farmKey: 'ferme-a', clock, sharedPace: shared.pace, fetchImpl: async () => new Response(null, { status: 401 }) });
 
   await assert.rejects(client.getConfiguration(), (error) => error instanceof OtfApiError && error.status === 401);
-  assert.deepEqual(events().map((entry) => entry.event), ['otf_authentication_failure_not_recorded']);
+  assert.deepEqual(events().map((entry) => entry.event), ['otf_call_failed', 'otf_authentication_failure_not_recorded']);
 });
 
 test('les régulateurs en mémoire des fermes sans départ depuis plus de 61 secondes sont oubliés ; celui d’une ferme partie dans la minute est gardé (point D5, F361)', async () => {

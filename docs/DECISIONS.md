@@ -6709,3 +6709,40 @@ l'exploitant, et une page d'état qui lui est réservée.
 Ne changent pas : le matin de 6 h 15 et ses tâches ; le service de
 notification (aucune route nouvelle) ; aucun secret nouveau, aucun appel
 nouveau à OTF, aucune dépense.
+
+## D-242 — Tranche 4, 4.5, PR 2 (seconde partie) : l'observation par ferme et les journaux sans donnée sensible
+
+Date : 20 novembre 2026.
+
+**Contexte.** La page d'état de l'exploitant (D-241) dit l'état des tâches,
+pas celui de chaque ferme ; avec la 4.6, une ferme pilote en difficulté
+(raccordement révoqué, OTF qui refuse, météo qui manque) doit se voir sans
+ouvrir son espace. Le contrat de la 4.5 (D-220, F564) demande aussi un test
+qui échoue si un journal porte une valeur sensible.
+
+**Décision.** Section 10 bis.13 du contrat de la Tranche 4 (F614 à F618) :
+
+1. Chaque essai envoyé à OTF est compté pour sa ferme, par heure pleine et
+   par résultat (réussi, 401, 403, 429, 5xx, autre refus, délai dépassé,
+   réseau), huit jours (migration 0036, table commune) ; un échec se
+   journalise sous le nom stable `otf_call_failed`, avec ses seuls champs,
+   jamais l'adresse, la ferme ni le jeton. La dernière lecture complète de
+   chaque ferme est gardée.
+2. La page d'état montre une carte par ferme, la plus en difficulté
+   d'abord : raccordement, appels du jour, erreurs d'OTF sur 24 heures et
+   7 jours, dernière lecture complète, dernière météo, dernier calcul du
+   matin, jugés avec les seuils du registre ; la ferme de la clé du
+   déploiement a toujours sa carte. Le jugement d'ensemble compte les
+   fermes. Ni nom de ferme ni personne.
+3. Un garde, chargé par chaque processus d'essais, lit chaque ligne écrite
+   dans la console, même remplacée par un essai, et fait échouer le fichier
+   qui en écrit une qui ressemble à un jeton, un paramètre d'autorisation,
+   une adresse de retour, une adresse électronique, un nom de ferme ou une
+   longue chaîne opaque ; un essai témoin le prouve. Il a trouvé quatre
+   lignes qui recopiaient le message d'une erreur de la base : elles disent
+   désormais sa classe.
+
+Ne changent pas : le rythme des appels à OTF et leur compte du jour (F361,
+F363) ; aucun appel nouveau à OTF, aucun secret nouveau, aucune dépense.
+L'état de l'accueil (4.4-a) entre sur la carte avec la fusion de la 4.4 ;
+la consommation sur la part du quota, quand la part sera fixée (F363).
