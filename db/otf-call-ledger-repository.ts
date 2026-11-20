@@ -1,5 +1,6 @@
 import { db } from './binding';
 import { aEcritUneLigne } from './write-result';
+import { OTF_CALL_OUTCOME_HOURS_KEPT, outcomeHourStartMs, type OtfCallOutcome } from '@/lib/domain/otf/call-outcome';
 import { OTF_CALL_WINDOW_MS, OTF_CALLS_PER_MINUTE } from '@/lib/domain/otf/call-pace';
 import {
   OTF_AUTHENTICATION_BRAKE_FAILURES,
@@ -14,6 +15,7 @@ import {
   type OtfPauseReason,
   type SharedPaceState,
 } from '@/lib/domain/otf/shared-call-pace';
+import { millisecondsFromHours } from '@/lib/domain/units';
 
 /**
  * Le compteur partagé des appels à Ouvre ta ferme (4.3, PR 1 ;
@@ -174,16 +176,41 @@ export async function beginOtfFarmRead({ paceKey, readId, atMs, places }: { pace
 /**
  * La fin d'une lecture : ses places réservées et inutilisées sont rendues, le
  * bail libéré s'il est encore à elle, et la base de la réserve suivante
- * gardée (F362). Une lecture dont le bail a été repris ne touche à rien de la
- * suivante.
+ * gardée (F362). Une lecture qui a tout lu garde aussi son heure, la
+ * dernière lecture complète de la ferme (F615). Une lecture dont le bail a
+ * été repris ne touche à rien de la suivante.
  */
-export async function endOtfFarmRead({ paceKey, readId, reserveBasis, atMs }: { paceKey: string; readId: string; reserveBasis: number | null; atMs: number }): Promise<void> {
+export async function endOtfFarmRead({ paceKey, readId, reserveBasis, atMs, complete = false }: {
+  paceKey: string;
+  readId: string;
+  reserveBasis: number | null;
+  atMs: number;
+  complete?: boolean;
+}): Promise<void> {
+  const at = new Date(atMs).toISOString();
   await db.batch([
     db.prepare('DELETE FROM otf_call_starts WHERE pace_key = ? AND read_id = ? AND reserved = 1').bind(paceKey, readId),
     db.prepare(
-      `UPDATE otf_farm_reads SET lease_id = NULL, lease_until_ms = 0, reserve_basis = ?, updated_at = ?
+      `UPDATE otf_farm_reads SET lease_id = NULL, lease_until_ms = 0, reserve_basis = ?, updated_at = ?,
+         last_complete_at = CASE WHEN ? THEN ? ELSE last_complete_at END
        WHERE pace_key = ? AND lease_id = ?`,
-    ).bind(reserveBasis, new Date(atMs).toISOString(), paceKey, readId),
+    ).bind(reserveBasis, at, complete ? 1 : 0, at, paceKey, readId),
+  ]);
+}
+
+/**
+ * Un appel envoyé à OTF, compté pour la ferme à son heure pleine (F564,
+ * F614) ; les heures de plus de huit jours partent au passage.
+ */
+export async function recordOtfCallOutcome(paceKey: string, outcome: OtfCallOutcome, atMs: number): Promise<void> {
+  const hourStartMs = outcomeHourStartMs(atMs);
+  await db.batch([
+    db.prepare(
+      `INSERT INTO otf_call_outcomes (pace_key, hour_start_ms, outcome, calls) VALUES (?, ?, ?, 1)
+       ON CONFLICT (pace_key, hour_start_ms, outcome) DO UPDATE SET calls = otf_call_outcomes.calls + 1`,
+    ).bind(paceKey, hourStartMs, outcome),
+    db.prepare('DELETE FROM otf_call_outcomes WHERE hour_start_ms < ?')
+      .bind(hourStartMs - millisecondsFromHours(OTF_CALL_OUTCOME_HOURS_KEPT)),
   ]);
 }
 

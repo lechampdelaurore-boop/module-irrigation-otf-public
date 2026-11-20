@@ -42,6 +42,7 @@ const COMMON_TABLES = new Set([
   'irrigation_crop_alert_common',
   'irrigation_operator_notices',
   'otf_authentication_failures',
+  'otf_call_outcomes',
   'otf_call_pauses',
   'otf_call_starts',
   'otf_daily_calls',

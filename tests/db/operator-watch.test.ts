@@ -214,7 +214,9 @@ test('l’exploitant est une personne de la ferme du déploiement ; la page d’
   assert.equal(await isOperator(OPERATOR, async () => null), false, 'ferme du déploiement inconnue');
 
   await morningAt('2026-11-20', { reanalysis: true });
-  const status = await readOperatorStatus(FRIDAY);
-  assert.deepEqual(status.verdict, { tone: 'warn', text: '1 tâche jamais réussie.' }, 'la veille, avant sa première exécution');
+  const status = await readOperatorStatus(FRIDAY, deploymentFarm);
+  // La veille, avant sa première exécution ; les deux fermes, jamais lues ni servies en météo sur cette base neuve (F616).
+  assert.deepEqual(status.verdict, { tone: 'warn', text: '1 tâche jamais réussie ; 2 fermes à regarder.' });
   assert.deepEqual(status.tasks.map((task) => task.tone), ['ok', 'ok', 'ok', 'ok', 'warn']);
+  assert.deepEqual(status.farms.map((farm) => farm.title), ['Ferme n° 4394, celle de la clé du déploiement', 'Ferme n° 5120']);
 });

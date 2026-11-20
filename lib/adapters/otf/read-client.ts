@@ -1,4 +1,5 @@
 import { OTF_READ_ROUTES, OtfApiError, OtfShapeError, extractCollection, type OtfReadRoute } from '../../domain/otf/api-contract.ts';
+import { outcomeOfSendFailure, outcomeOfStatus, type OtfCallOutcome } from '../../domain/otf/call-outcome.ts';
 import {
   EMPTY_CALL_PACE,
   holdCallsUntil,
@@ -75,6 +76,11 @@ export type OtfSharedCallPace = {
   holdCalls: (pause: OtfCallPause) => Promise<void>;
   /** Un `401`, compté pour tout le module (F359) ; rend la pause du frein quand elle court. */
   recordAuthenticationFailure: (atMs: number) => Promise<OtfCallPause | null>;
+  /**
+   * Ce qu'est devenu un appel envoyé, compté pour la ferme à l'heure (F564,
+   * F614) : la page d'état de l'exploitant en tire le taux d'erreurs.
+   */
+  recordOutcome?: (outcome: OtfCallOutcome, atMs: number) => Promise<void>;
 };
 
 /**
@@ -314,10 +320,12 @@ export class OtfReadClient {
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const controller = new AbortController();
       let timeout: ReturnType<typeof setTimeout> | undefined;
+      let sentAtMs = 0;
       // L'attente d'une place ne compte pas dans le délai de l'appel : le
       // minuteur part avec l'envoi. Un refus du régulateur n'envoie rien et ne
       // se retente pas.
       const { sending } = await this.sendInTurn(async () => {
+        sentAtMs = this.clock.now();
         timeout = setTimeout(() => controller.abort(), this.timeoutMs);
         return this.fetchImpl(url, {
           method: 'GET',
@@ -329,8 +337,14 @@ export class OtfReadClient {
         });
       });
 
+      // Un appel envoyé compte une fois : par le statut de sa réponse, ou par
+      // l'envoi resté sans réponse ; une erreur levée en lisant le corps
+      // d'une réponse déjà comptée ne le recompte pas (F614).
+      let received = false;
       try {
         const response = await sending;
+        received = true;
+        await this.noteOutcome(route, attempt, outcomeOfStatus(response.status), sentAtMs, response.status);
 
         if (response.ok) {
           return await response.json();
@@ -348,6 +362,7 @@ export class OtfReadClient {
           );
         }
       } catch (error) {
+        if (!received) await this.noteOutcome(route, attempt, outcomeOfSendFailure(error), sentAtMs);
         if (error instanceof OtfApiError) throw error;
         if (isDnsError(error)) {
           throw new OtfApiError("L'adresse de l'API OTF est introuvable (DNS).");
@@ -462,9 +477,28 @@ export class OtfReadClient {
       await this.sharedPace?.holdCalls(pause);
     } catch (error) {
       // La limite d'OTF reste remontée ; sans la base, la mémoire tient la seconde de pause.
-      logJsonLine('warn', { event: 'otf_pause_not_recorded', reason: pause.reason, message: error instanceof Error ? error.message : 'erreur inconnue' });
+      logJsonLine('warn', { event: 'otf_pause_not_recorded', reason: pause.reason, errorClass: errorClassOf(error) });
     }
     return new OtfReadDeferredError(pause.reason, pause.untilMs);
+  }
+
+  /**
+   * Le résultat d'un appel envoyé (F564, F614) : compté pour la ferme, à
+   * l'heure, et journalisé sous un nom stable quand il échoue. Le journal
+   * dit la route, l'essai, la classe d'erreur, le statut et la durée :
+   * jamais l'adresse complète, la ferme ni le jeton. Un compte impossible
+   * n'arrête pas la lecture.
+   */
+  private async noteOutcome(route: OtfReadRoute, attempt: number, outcome: OtfCallOutcome, sentAtMs: number, status?: number): Promise<void> {
+    const atMs = this.clock.now();
+    if (outcome !== 'ok') {
+      logJsonLine('warn', { event: 'otf_call_failed', route, attempt: attempt + 1, outcome, status, durationMs: Math.max(0, atMs - sentAtMs) });
+    }
+    try {
+      await this.sharedPace?.recordOutcome?.(outcome, atMs);
+    } catch (error) {
+      logJsonLine('warn', { event: 'otf_call_outcome_not_recorded', outcome, errorClass: errorClassOf(error) });
+    }
   }
 
   /** Un refus d'accès compte pour le frein du module (F359) ; le journal dit quand il serre. */
@@ -473,9 +507,17 @@ export class OtfReadClient {
       const brake = await this.sharedPace?.recordAuthenticationFailure(this.clock.now());
       if (brake) logJsonLine('warn', { event: 'otf_authentication_brake', pausedUntil: new Date(brake.untilMs).toISOString() });
     } catch (error) {
-      logJsonLine('warn', { event: 'otf_authentication_failure_not_recorded', message: error instanceof Error ? error.message : 'erreur inconnue' });
+      logJsonLine('warn', { event: 'otf_authentication_failure_not_recorded', errorClass: errorClassOf(error) });
     }
   }
+}
+
+/**
+ * La classe d'une erreur de la base, pour le journal : jamais son message,
+ * qui peut recopier une requête ou une valeur (F564, F617).
+ */
+function errorClassOf(error: unknown): string {
+  return error instanceof Error ? error.name : 'inconnue';
 }
 
 function delay(durationMs: number): Promise<void> {

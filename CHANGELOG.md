@@ -5,6 +5,26 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 2 sur 5, seconde partie)
+
+- **Chaque ferme sur la page d'état de l'exploitant** (D-242, F614 à
+  F618) : une carte par ferme, la plus en difficulté d'abord, avec son
+  raccordement à Ouvre ta ferme, ses appels du jour, ses erreurs d'OTF sur
+  24 heures et 7 jours, sa dernière lecture complète, sa dernière météo et
+  son dernier calcul du matin ; le jugement d'ensemble compte les fermes.
+  Chaque appel envoyé à OTF est compté par ferme et par heure, et chaque
+  échec se journalise sous un nom stable, sans adresse, ferme ni jeton.
+  Migration 0039, additive ; parcours P50 étendu.
+- **Un garde des journaux dans les essais** : chaque ligne écrite pendant
+  `pnpm test` est lue, et le fichier échoue si l'une ressemble à un jeton,
+  un code d'autorisation, une adresse de retour, une adresse électronique
+  ou un nom de ferme.
+
+### Corrigé (Tranche 4, 4.5, PR 2 sur 5, seconde partie)
+
+- Quatre lignes de journal du raccordement à OTF recopiaient le message
+  d'une erreur de la base ; elles disent désormais sa seule classe.
+
 ### Ajouté (Tranche 4, 4.5, PR 2 sur 5, première partie)
 
 - **La veille de l'exploitant et sa page d'état** (D-241, F608 à F613) :

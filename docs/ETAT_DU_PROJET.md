@@ -562,6 +562,29 @@ registres, elle y renvoie.
   PR 1 et son premier matin, sinon la première veille annoncerait les
   tâches du matin « jamais réussies ».
 
+- Tranche 4, **4.5, PR 2 sur 5, seconde partie : codée le 20 novembre
+  2026** (D-242, F614 à F618, section 10 bis.13 de
+  `docs/tranche-4-contract.md`). La page « État du module » montre chaque
+  ferme, la plus en difficulté d'abord : son raccordement, ses appels du
+  jour, ses erreurs d'OTF sur 24 heures et 7 jours, sa dernière lecture
+  complète, sa dernière météo et son dernier calcul du matin, jugés avec
+  les seuils du registre ; le jugement d'ensemble compte les fermes.
+  Chaque appel envoyé à OTF est compté par ferme et par heure (migration
+  0039, additive), et chaque échec se journalise sous le nom stable
+  `otf_call_failed`, sans adresse, ferme ni jeton. Un garde lit chaque
+  ligne écrite pendant `pnpm test`, même d'une console remplacée, et fait
+  échouer le fichier pour un jeton, un code d'autorisation, une adresse de
+  retour, une adresse électronique ou un nom de ferme ; son essai témoin a
+  trouvé quatre lignes qui recopiaient le message d'une erreur de la base,
+  corrigées. L'état de l'accueil (4.4-a) viendra sur la carte avec la
+  fusion de la 4.4. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test` (1 905 tests, puis les 452 de la base rejoués trois fois
+  pour l'isolation, tous sous le garde des journaux), `pnpm build`,
+  `pnpm knip` réussis en local, et le parcours P50 aux deux largeurs ; la
+  suite complète des parcours jouée par la CI de la PR. Non vérifié sur le
+  site : les premiers comptes réels de la ferme du porteur. À fusionner
+  après la première partie.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
