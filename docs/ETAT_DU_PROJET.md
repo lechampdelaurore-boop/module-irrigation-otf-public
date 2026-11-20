@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 19 novembre 2026.
+Dernière mise à jour : 20 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -289,6 +289,26 @@ registres, elle y renvoie.
   « Déploiement Cloudflare », « Déploiement de la démonstration », verts).
   Ensuite : les PR 3 et 4 attendent l'accès d'OTF ; **la 4.3 est en
   pause** et reprend la main dès que cet accès arrive.
+
+- Correctif, **l'espacement des lectures d'OTF** (F385 précisé, sans
+  décision nouvelle), demandé par le coordinateur le 20 novembre 2026, en
+  Opus 5.5 · Max (ligne 4.3). Constat : la CI de la PR #120 a mesuré une
+  fois 249 ms entre deux envois à OTF, pour 250 au moins (quatre appels
+  par seconde au plus, D-002). Le départ d'un appel était noté juste avant
+  l'appel réseau ; un processus interrompu entre les deux laissait l'appel
+  suivant partir un peu tôt. Désormais, l'envoi part dans le tour de sa
+  ferme et son départ est noté aussitôt après l'appel réseau : l'appel
+  suivant compte son attente à partir de là ; le délai d'un appel part
+  toujours de son envoi. Côté code, seuls le client de lecture
+  (`lib/adapters/otf/read-client.ts`) et son test changent ; la marge de
+  5 ms et le compteur partagé restent tels quels. Un test nouveau fait
+  partir les envois en retard sur leur tour (10 ms, puis 3 ms) et vérifie
+  250 ms au moins entre deux envois réels ; il échoue sur l'ancien client
+  (248 ms) et quand le départ est noté avant l'appel. Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 806 tests, puis 435 pour
+  chacun des trois passages d'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; la suite complète des parcours jouée par la CI de la PR.
 
 - Correctif, **la mise à jour automatique de la météo** (D-164), demandé
   par le coordinateur le 19 novembre 2026 avant le lot G, en Opus 5.5 ·

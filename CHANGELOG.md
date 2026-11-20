@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (Tranche 4, 4.3 : l'espacement des lectures d'OTF)
+
+- **Quatre appels à OTF par seconde au plus, même sur une machine chargée**
+  (F385) : le départ d'un appel était noté juste avant l'appel réseau ;
+  quand le processus était interrompu entre les deux, l'appel suivant
+  pouvait partir un peu trop tôt (la CI a mesuré une fois 249 ms entre deux
+  envois, sur la PR #120). L'envoi part désormais dans le tour de sa ferme,
+  et son départ est noté aussitôt après l'appel réseau : dans une instance,
+  deux envois sont toujours espacés de 250 ms au moins.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 1 sur 7)
 
 - **Un seul titre** (D-183) : « Planning de la semaine », « Réserve du
