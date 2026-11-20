@@ -226,7 +226,7 @@
 }
 
 .settings-review-group dt {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .settings-review-group dd {
@@ -255,7 +255,7 @@
   display: inline-flex;
   align-items: center;
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* La vérification finale (F589) : les groupes des réglages sous leur étape, puis ce qui reste inconnu, chaque ligne un lien. */
