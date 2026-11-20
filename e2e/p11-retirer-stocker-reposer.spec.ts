@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 
 /**
  * Parcours P11 : retirer un goutte-à-goutte, le stocker puis le reposer, à des
@@ -39,6 +39,8 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
   // Le retrait se confirme, avec sa date, sur la fiche du matériel. Une date
   // dans le futur est refusée, et la fenêtre dit pourquoi sans se refermer.
   await attendreLaPageIrrigation(page, 'materiel');
+  // L'inventaire a son onglet (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   const stockesAvant = await compter(page, 'stocké');
   await carte.getByRole('button', { name: `Retirer et stocker ${materiel}` }).click();
   const confirmation = page.getByRole('dialog', { name: `Retirer et stocker ${materiel}` });
@@ -74,6 +76,7 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
   // sa fiche, ouvre l'éditeur sur la planche de la dernière pose ; la date se
   // reporte dans le passé.
   await attendreLaPageIrrigation(page, 'materiel');
+  await ouvrirLOnglet(page, 'Matériel');
   await carte.getByRole('button', { name: 'Reposer' }).click();
   await expect(page.getByText('Cliquez sur chaque planche alimentée par ce matériel.')).toBeVisible();
   await expect(page.getByText('1 planche sélectionnée')).toBeVisible();
@@ -84,7 +87,8 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
   await expect(carte).toContainText(`Posé sur ${planche} depuis le ${enClair(repose)}`);
   await verifierLEtape(page, journal, 'matériel reposé au même endroit');
 
-  // La pose fermée reste lisible (règle 8).
+  // La pose fermée reste lisible (règle 8) ; reposer a basculé sur le plan, la fiche est sous « Matériel ».
+  await ouvrirLOnglet(page, 'Matériel');
   const historique = carte.locator('details').filter({ hasText: 'Historique des poses (1)' });
   await historique.locator('summary').click();
   await expect(historique.locator('li')).toHaveText(

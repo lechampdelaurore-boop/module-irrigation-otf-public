@@ -572,7 +572,16 @@ registres, elle y renvoie.
   objectifs, la météo et la pluie mesurée en plis fermés d'une ligne ; au
   téléphone, les tuiles en une ligne, chaque jardin en une ligne compacte ;
   « À planifier » et le besoin d'abord, le reste « Pour les experts » ;
-  4 704 → 2 750 px à 390 px ; codée.
+  4 704 → 2 750 px à 390 px ; en ligne le 20 novembre 2026 à 9 h 01
+  (#124, fusionnée à 8 h 37, run 44696399302 vérifié job par job). **PR 6, « Matériel » en trois
+  onglets** (D-188, F461) : Plan · Matériel · Groupes, l'onglet gardé
+  dans l'adresse ; au téléphone, les jardins du plan repliés sur une ligne ;
+  les noms de matériel coupés au milieu ; le fil d'Ariane qui passe à la
+  ligne ; en ligne le 20 novembre 2026 à 9 h 38 (#125, fusionnée à 9 h 20, run
+  44701703829 vérifié job par job). **PR 7, « Arrosages » et « Historique », le premier
+  geste plus haut** (D-189, F462) : « Résultat calculé » attend un matériel
+  et une quantité ; les filtres de l'historique dans un pli « Filtrer »,
+  l'export en bouton secondaire après les chiffres ; codée. Lot J codé.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

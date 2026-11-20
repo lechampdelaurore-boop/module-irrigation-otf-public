@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape, TITRES_DES_PAGES, type PageDuModule } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape, TITRES_DES_PAGES, type PageDuModule } from './support/parcours.ts';
+import { preparerMaterielArrosant } from './support/materiel.ts';
 
 /**
  * Parcours P40 : l'audit ergonomique du 19 novembre 2026, lot J,
@@ -72,6 +73,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
   // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
   besoins: 2_800,
+  // PR 6 (F461) : trois onglets, le plan d'abord ; au téléphone, les jardins repliés. 1 782 px avec
+  // les quatre jardins des données des parcours : le budget du contrat, pour une ferme de dix-huit jardins.
+  materiel: 5_300,
 };
 
 for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuModule, number][]) {
@@ -153,4 +157,78 @@ test('« Objectifs et besoins » : trois plis fermés d’une ligne, un jardin p
   await expect(page.locator('details#manual-rain')).toHaveAttribute('open', '');
   await expect(page.locator('details#manual-rain').getByLabel('Millimètres')).toBeVisible();
   await verifierLEtape(page, journal, 'objectifs et besoins courts');
+});
+
+test('« Matériel » : trois onglets gardés dans l’adresse, les jardins repliés au téléphone, le fil d’Ariane à l’écran', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  await attendreLaPageIrrigation(page, 'materiel');
+  const onglets = page.getByRole('tablist', { name: 'Parties de la page' }).getByRole('tab');
+  await expect(onglets).toHaveText(['Plan', 'Matériel', 'Groupes']);
+  await expect(onglets.first()).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('section.farm-plan')).toBeVisible();
+  await expect(page.locator('section.coverage-overview')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ajouter un matériel' })).toBeHidden();
+  // Le fil d'Ariane passe à la ligne : il ne sort pas de l'écran.
+  const fil = await page.locator('nav.breadcrumb').evaluate((nav) => ({ scroll: nav.scrollWidth, client: nav.clientWidth }));
+  expect(fil.scroll, 'le fil d’Ariane tient dans sa largeur').toBeLessThanOrEqual(fil.client + 1);
+  // Au téléphone, un jardin replié tient sur une ligne ; celui de la planche choisie est ouvert.
+  if (telephone) {
+    const jardins = page.locator('.plot-plan-card');
+    const ouverts = await jardins.evaluateAll((cartes) => cartes.map((carte) => carte.getAttribute('data-open')));
+    expect(ouverts.filter((valeur) => valeur === 'true').length, 'un seul jardin ouvert').toBe(1);
+    const replie = jardins.nth(ouverts.indexOf('false'));
+    const hauteur = await replie.evaluate((carte) => carte.getBoundingClientRect().height);
+    expect(hauteur, 'un jardin replié sur une ligne').toBeLessThanOrEqual(64);
+    await replie.locator('.plot-card-toggle').click();
+    await expect(replie.locator('.plot-card-body')).toBeVisible();
+  }
+  // L'onglet « Matériel » : l'inventaire, et l'adresse le garde.
+  await onglets.nth(1).click();
+  await expect(page.getByRole('button', { name: 'Ajouter un matériel' })).toBeVisible();
+  await expect(page.locator('section.farm-plan')).toBeHidden();
+  await expect(page).toHaveURL(/[?&]onglet=materiel\b/);
+  await page.reload();
+  await attendreLaPagePrete(page, 'materiel');
+  await expect(page.getByRole('tablist', { name: 'Parties de la page' }).getByRole('tab', { name: 'Matériel' })).toHaveAttribute('aria-selected', 'true');
+  // « Groupes » : les groupes de jardins alignés.
+  await page.getByRole('tablist', { name: 'Parties de la page' }).getByRole('tab', { name: 'Groupes' }).click();
+  await expect(page).toHaveURL(/[?&]onglet=groupes\b/);
+  await expect(page.locator('#materiel-panel-groupes')).toBeVisible();
+  await expect(page.locator('#materiel-panel-materiel')).toBeHidden();
+  await verifierLEtape(page, journal, 'matériel en onglets');
+});
+
+test('« Arrosages » attend le premier choix ; « Historique » plie ses filtres et exporte après les chiffres', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  // PR 7 (F462) : sans matériel ni quantité, pas de chiffres, une phrase qui dit quoi choisir ; le bouton reste.
+  await attendreLaPageIrrigation(page, 'arrosages');
+  if (await page.locator('.irrigation-empty-action').isVisible()) {
+    // Seul ou en tête de suite, aucun matériel n'est encore prêt : le parcours en pose un, comme P1.
+    await attendreLaPageIrrigation(page, 'materiel');
+    await preparerMaterielArrosant(page, testInfo, { repere: 'p40' });
+    await attendreLaPageIrrigation(page, 'arrosages');
+  }
+  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+  const resultat = page.locator('.irrigation-preview');
+  await expect(resultat).toHaveAttribute('data-ready', 'false');
+  await expect(resultat.locator('.calculated-duration')).toHaveCount(0);
+  await expect(resultat).toContainText('Choisissez un matériel et une quantité');
+  await expect(resultat.locator('.start-irrigation-button')).toBeDisabled();
+
+  // L'historique : le pli « Filtrer » fermé dit le périmètre ; l'export, secondaire, suit les chiffres.
+  await attendreLaPageIrrigation(page, 'historique');
+  const pli = page.locator('details.history-filter-fold');
+  await expect(pli).not.toHaveAttribute('open', '');
+  await expect(pli.locator('summary')).toHaveText(/Filtrer\s*toute la ferme/);
+  await expect(pli.getByText('Parcelle', { exact: true })).toBeHidden();
+  const chiffres = await page.locator('.history-summary-grid').boundingBox();
+  const exporter = page.locator('a.history-export-button');
+  const bouton = await exporter.boundingBox();
+  // Secondaire : le fond clair des autres boutons de la page, plus le vert plein.
+  await expect(exporter).not.toHaveCSS('color', 'rgb(255, 255, 255)');
+  expect(bouton && chiffres && bouton.y >= chiffres.y + chiffres.height, 'l’export après les chiffres').toBe(true);
+  await pli.locator('summary').click();
+  await expect(pli.getByText('Parcelle', { exact: true })).toBeVisible();
+  await verifierLEtape(page, journal, 'premier geste plus haut');
 });

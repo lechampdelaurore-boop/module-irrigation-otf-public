@@ -5,6 +5,9 @@
   la météo et la pluie mesurée en plis fermés d'une ligne ; les tuiles en une
   ligne de résumé ; chaque jardin en une ligne compacte ; dans une planche
   ouverte, « À planifier » et le besoin d'abord, le reste « Pour les experts ».
+  PR 6 : « Matériel » en trois onglets, Plan · Matériel · Groupes ; au
+  téléphone, chaque jardin du plan replié sur une ligne ; un nom de matériel
+  coupé au milieu ; le fil d'Ariane qui passe à la ligne (F461).
 */
 
 /* Les trois plis de la semaine, à l'ordinateur comme au téléphone. */
@@ -177,4 +180,178 @@
     color: var(--muted);
     font-size: 12px;
   }
+}
+
+/* PR 6 · « Matériel » : les trois onglets, comme ceux du plan et de la vue satellite. */
+.materiel-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(3, auto);
+  margin: 0 0 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.materiel-tabs button {
+  min-height: var(--touch-target);
+  padding: 8px 18px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.materiel-tabs button:last-child {
+  border-right: 0;
+}
+
+.materiel-tabs button[aria-selected="true"] {
+  box-shadow: inset 0 -4px var(--green);
+  background: var(--card);
+}
+
+.materiel-tabs button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Le fil d'Ariane passe à la ligne au lieu de sortir de l'écran. */
+.breadcrumb {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  row-gap: 2px;
+  white-space: normal;
+}
+
+/* Un nom coupé au milieu : le début se coupe, la fin reste entière. */
+.middle-cut {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+.middle-cut-head {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.middle-cut-tail {
+  flex: none;
+  white-space: pre;
+}
+
+/* Le bouton qui replie un jardin n'existe qu'au téléphone. */
+.plot-card-toggle {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .materiel-tabs {
+    display: grid;
+    width: 100%;
+  }
+
+  .materiel-tabs button {
+    padding: 8px 6px;
+  }
+
+  .plot-plan-card .plot-card-heading > :not(.plot-card-toggle) {
+    display: none;
+  }
+
+  .plot-card-toggle {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: space-between;
+    gap: .6rem;
+    padding: 0 1.75rem 0 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .plot-card-toggle strong {
+    min-width: 0;
+    overflow: hidden;
+    font: 500 14px/1.3 var(--font-ui);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .plot-card-toggle small {
+    flex: none;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .plot-card-toggle::after {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    content: "";
+    transform: translateY(-70%) rotate(45deg);
+  }
+
+  .plot-card-toggle[aria-expanded="true"]::after {
+    transform: translateY(-30%) rotate(-135deg);
+  }
+
+  .plot-plan-card[data-open="false"] > .plot-card-body,
+  .plot-plan-card[data-open="false"] > .plot-card-footer {
+    display: none;
+  }
+}
+
+/* Lot J, PR 7 (F462) : « Résultat calculé » attend le premier choix ; l'historique plie ses filtres. */
+.irrigation-preview-waiting {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.history-filter-fold > summary {
+  display: flex;
+  min-height: var(--touch-target, 44px);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  cursor: pointer;
+}
+
+.history-filter-fold > summary strong {
+  color: var(--green-dark);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.history-filter-summary {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.history-export-row {
+  margin: 4px 0 0;
+}
+
+.history-export-row .history-export-button {
+  background: var(--green-soft);
+  color: var(--green);
 }

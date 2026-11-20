@@ -47,6 +47,8 @@ export type IrrigationSearchParams = Promise<{
   zone?: string | string[];
   /** La page demandée n'était pas cochée (précision P14). */
   absente?: string | string[];
+  /** L'onglet de « Matériel » (audit du 19 novembre 2026, lot J, n° 15, F461). */
+  onglet?: string | string[];
 }>;
 
 export type ReadyPageContext = {

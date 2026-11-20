@@ -64,6 +64,8 @@ export type PageQuery = {
    * (P14), en la nommant quand on la connaît (audit final, lot E, J11, F265).
    */
   absent?: boolean | IrrigationPageId;
+  /** L'onglet de « Matériel » (audit du 19 novembre 2026, lot J, n° 15, F461) ; le plan sans paramètre. */
+  tab?: 'materiel' | 'groupes';
 };
 
 /** La ligne de la page d'arrivée quand la page demandée n'est pas cochée et qu'on ne sait pas laquelle (section 5, P14). */
@@ -154,6 +156,7 @@ export function pageHref(page: IrrigationPageId, query: PageQuery = {}, hash?: s
   if (query.week) params.set('week', query.week);
   if (query.refresh) params.set('refresh', '1');
   if (query.absent) params.set('absente', query.absent === true ? '1' : query.absent);
+  if (query.tab) params.set('onglet', query.tab);
   const search = params.toString();
   return `${pagePath(page)}${search ? `?${search}` : ''}${hash ? `#${hash.replace(/^#/, '')}` : ''}`;
 }
