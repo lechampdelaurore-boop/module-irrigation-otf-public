@@ -23,6 +23,9 @@ source détaillée commit par commit.
   contrôle, l'importe dans une base neuve ou vide (jamais dans une base qui
   a des tables), puis compare la base reconstruite à l'export. Procédures
   dans `docs/exploitation.md` (« Restaurer la base »).
+- **Le premier essai chez Cloudflare, le 20 novembre 2026** : réussi (S1,
+  S2 et S3 sur trois bases d'essai, détruites à la fin) ; compte rendu dans
+  la PR.
 
 ### Changé (Tranche 4, 4.5, PR 4 sur 5, seconde partie)
 
@@ -32,6 +35,10 @@ source détaillée commit par commit.
   ne se réimporte pas tel quel là où les clés étrangères sont actives.
 - `pnpm knip` lit aussi les modules de `scripts/backup/` ; les exports
   qu'aucun autre fichier n'utilisait n'en sont plus.
+- Le signet d'un instant que Cloudflare ne rend pas (erreur interne, code
+  7500, au premier passage de l'essai) se dit en une note, sans arrêter
+  l'essai ; les lignes de Wrangler masquent aussi la référence d'une
+  requête donnée avec une erreur.
 
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, première partie)
 

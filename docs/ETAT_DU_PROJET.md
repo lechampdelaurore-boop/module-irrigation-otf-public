@@ -492,9 +492,13 @@ registres, elle y renvoie.
   `pnpm knip` (qui lit désormais `scripts/backup/`) réussis en local, et la
   simulation de `pnpm backup:rehearse` réussie ; `pnpm build` et les
   parcours sans rapport (aucune page ni route changée), joués par la CI de
-  la PR. **Non vérifié : l'essai chez Cloudflare**, qui attend le « vas-y »
-  du porteur ; son compte rendu sera collé dans la PR avant la fusion. À
-  fusionner après la première partie.
+  la PR. **L'essai chez Cloudflare, joué le 20 novembre 2026 sur le
+  « vas-y » du porteur, a réussi** : S1, S2 et S3 sur trois bases d'essai,
+  détruites à la fin, compte rendu collé dans la PR. La restauration à un
+  signet noté marche ; le signet d'un instant n'a pas été rendu (erreur
+  interne de Cloudflare, sur une base d'une minute) ; l'export brut ne se
+  réimporte pas, l'import rangé si ; un export de la base d'essai dure
+  environ 2,5 secondes. À fusionner après la première partie.
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le

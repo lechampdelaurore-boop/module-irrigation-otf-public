@@ -6880,3 +6880,11 @@ migration, aucun appel à OTF ; rien chez Cloudflare avant le « vas-y » du
 porteur ; l'essai réel et son compte rendu, collé dans la PR, avant la
 fusion. L'essai inscrit au registre (une fois par trimestre) et sa date sur
 la page d'état viennent dans une PR à part.
+
+**L'essai chez Cloudflare, le 20 novembre 2026** (sur le « vas-y » du
+porteur) : réussi, S1, S2 et S3, bases détruites. La restauration à un
+signet noté marche ; le signet d'un instant n'a pas été rendu (erreur
+interne de l'API, code 7500, sur une base d'une minute) : sa mesure se dit
+en une note sans arrêter l'essai, et la procédure demande ce signet avant
+de rien restaurer. L'export brut ne se réimporte pas (« no such table »),
+l'import rangé si. Un export dure environ 2,5 secondes pour 705 lignes.
