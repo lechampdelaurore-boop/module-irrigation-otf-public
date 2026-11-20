@@ -155,6 +155,9 @@ function shelterObservedRain(
   period: Pick<HistoryPeriod, 'startDate' | 'endDate'>,
 ) {
   const shelteredPlots = new Set(plots.filter((plot) => plot.mode === 'greenhouse').map((plot) => plot.id));
+  // Un jardin à classer (4.4, F583) : la pluie qu'il a reçue n'est pas connue.
+  const unclassifiedPlots = new Set(plots.filter((plot) => plot.mode === 'unclassified').map((plot) => plot.id));
+  if (scopeBeds.some((bed) => unclassifiedPlots.has(bed.plotId))) return { ...observed, actualRainMm: null };
   let totalArea = 0;
   let openFieldArea = 0;
   for (const bed of scopeBeds) {

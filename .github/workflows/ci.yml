@@ -78,10 +78,12 @@ jobs:
     runs-on: ubuntu-latest
     # Job séparé du job « Application » : il installe un navigateur, son temps et
     # ses échecs doivent rester lisibles (docs/browser-journeys-contract.md).
-    # 25 minutes : les parcours en prennent onze, et l'installation du
-    # navigateur, quinze secondes d'habitude, en a pris jusqu'à dix et demie
-    # quand le miroir Ubuntu de GitHub est lent.
-    timeout-minutes: 25
+    # 35 minutes : les parcours en prennent dix-sept à dix-neuf depuis le
+    # lot K et l'accueil (4.4), et l'installation du navigateur, quinze
+    # secondes d'habitude, en a pris jusqu'à dix et demie quand le miroir
+    # Ubuntu de GitHub est lent (sept et demie le 20 novembre 2026, run
+    # 44761479471 : 25 minutes ne suffisaient plus).
+    timeout-minutes: 35
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7

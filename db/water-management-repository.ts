@@ -4,6 +4,7 @@ import { hasWeatherValue, type WeatherDailyValue, type WeatherLocationCandidate 
 import { weatherRefreshClaimed } from '@/lib/domain/weather/cache-policy';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser, waterBudgetRevisionStatement } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
+import { confirmOnboardingStepStatement } from './onboarding-repository';
 
 type WeatherLocationMode = 'otf' | 'custom';
 
@@ -239,11 +240,17 @@ export async function readWeatherPreferenceForUser(
 
 export async function saveWeatherPreferenceForUser(
   ownerUserId: string,
-  preference: Pick<WeatherPreference, 'locationMode' | 'customCity' | 'customPostcode'>,
+  preference: Pick<WeatherPreference, 'locationMode' | 'customCity' | 'customPostcode'> & {
+    /** Le siège de la structure, gardé comme valeur confirmée quand la personne le prend en dernier recours. */
+    legalCity?: string | null;
+    legalPostcode?: string | null;
+  },
 ): Promise<void> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const now = new Date().toISOString();
-  await db.prepare(
+  const custom = preference.locationMode === 'custom';
+  // Choisir la commune, ou le siège en dernier recours, confirme l'étape « Où est la ferme » (4.4, F419) : dans le même lot.
+  await db.batch([db.prepare(
     `INSERT INTO irrigation_weather_preferences
        (workspace_id, location_mode, custom_city, custom_postcode, updated_at)
      VALUES (?, ?, ?, ?, ?)
@@ -258,10 +265,14 @@ export async function saveWeatherPreferenceForUser(
   ).bind(
     workspaceId,
     preference.locationMode,
-    preference.locationMode === 'custom' ? preference.customCity : null,
-    preference.locationMode === 'custom' ? preference.customPostcode : null,
+    custom ? preference.customCity : null,
+    custom ? preference.customPostcode : null,
     now,
-  ).run();
+  ), confirmOnboardingStepStatement(workspaceId, 'location', {
+    source: preference.locationMode,
+    city: custom ? preference.customCity : preference.legalCity ?? null,
+    postcode: custom ? preference.customPostcode : preference.legalPostcode ?? null,
+  }, now)]);
 }
 
 export async function recordWeatherRefreshForUser(

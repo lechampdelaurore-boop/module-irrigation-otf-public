@@ -127,7 +127,7 @@ test('un export du vrai schéma se réimporte dans une base neuve avec des compt
   exported.tables.push({ name: '__appgarden_migrations', columns: ['id', 'name'], rows: [{ id: 1, name: '0000' }] });
   const data = validateExport(JSON.parse(JSON.stringify(exported)));
   const tables = schemaTables(source);
-  assert.equal(tables.length, 86); // 47 + les trois tables des alertes météo (0022) + les treize du besoin par culture (0023) + les sept de la réserve du sol (0025) + les cinq des alertes par culture (0026) + le choix des fonctionnalités (0027) + la provenance des réglages (0029) + les deux des créneaux protégés (0030) + la ferme de la clé du déploiement (0031) + les cinq du compteur partagé des appels à OTF (0032) + le raccordement de chaque ferme à OTF, coffre de ses jetons (0033)
+  assert.equal(tables.length, 88); // 47 + les trois tables des alertes météo (0022) + les treize du besoin par culture (0023) + les sept de la réserve du sol (0025) + les cinq des alertes par culture (0026) + le choix des fonctionnalités (0027) + la provenance des réglages (0029) + les deux des créneaux protégés (0030) + la ferme de la clé du déploiement (0031) + les cinq du compteur partagé des appels à OTF (0032) + le raccordement de chaque ferme à OTF, coffre de ses jetons (0033) + l'état de l'accueil d'une ferme (0034) + le classement des jardins (0035)
 
   const target = migratedDatabase();
   target.exec(`INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES ('ws-auto', 'nouveau-proprietaire')`);

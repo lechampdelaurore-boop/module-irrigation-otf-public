@@ -63,14 +63,16 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_garden_groups',
     'irrigation_hydric_goal_revisions',
     'irrigation_need_decision_log',
-    'irrigation_need_preferences',
+    // Même raison : l'état de l'accueil (4.4, migration 0034) partage la ligne de sa voisine.
+    'irrigation_need_preferences', 'irrigation_onboarding_steps',
     'irrigation_placement_selected_beds',
     // Même raison : la table des événements de la 3.7 partage la ligne de sa voisine.
     'irrigation_plan_calculations', 'irrigation_plan_events',
     'irrigation_plan_proposals', 'irrigation_plan_suggestion_keeps',
     'irrigation_planning_settings',
     // Même raison : les deux tables des créneaux protégés (3.8 ter, migration 0030) partagent la ligne de leur voisine.
-    'irrigation_planning_settings_log', 'irrigation_protected_slots', 'irrigation_protected_slots_log',
+    // Même raison : le classement des jardins (4.4, migration 0035) partage la ligne de ses voisines.
+    'irrigation_planning_settings_log', 'irrigation_plot_shelters', 'irrigation_protected_slots', 'irrigation_protected_slots_log',
     'irrigation_pump_log',
     'irrigation_pump_origins',
     'irrigation_pumps',

@@ -1,4 +1,5 @@
 import type { Plot, Season, Zone } from '../domain.ts';
+import type { SoilStartingValues } from '../onboarding/soil.ts';
 import {
   DEFAULT_SOIL_SETTINGS,
   labRfuWarning,
@@ -38,6 +39,8 @@ export type ZoneSoilSetting = { zoneId: string; name: string; soil: PlaceSoil; p
 
 export type SoilSettingsView = {
   today: string;
+  /** Les valeurs qui préremplissent la saisie d'une parcelle sans sol (4.4, F584). */
+  starting: SoilStartingValues;
   zones: ZoneSoilSetting[];
   farm: { current: SoilSettings; isDefault: boolean; history: SoilSettingsRevision[] };
 };
@@ -49,6 +52,7 @@ export function soilSettingsView(input: {
   records: readonly SoilRecord[];
   settings: readonly SoilSettingsRevision[];
   today: string;
+  starting: SoilStartingValues;
 }): SoilSettingsView {
   const place = (zoneId: string, plotId: string | null): PlaceSoil => {
     const own = input.records.filter((record) => record.zoneId === zoneId && record.plotId === plotId);
@@ -61,6 +65,7 @@ export function soilSettingsView(input: {
   const inForce = latestEffective(input.settings, input.today);
   return {
     today: input.today,
+    starting: input.starting,
     zones: input.zones
       .filter((zone) => zone.seasons.includes(input.season))
       .map((zone) => ({
