@@ -24,7 +24,8 @@ export function SoilReserveSection({ initialView }: { initialView: SoilReserveVi
   });
   return (
     <section className="soil-reserve" aria-labelledby="soil-reserve-title" aria-busy={pending}>
-      <h3 id="soil-reserve-title">Réserve du sol</h3>
+      {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran sans niveau sauté (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+      <h2 id="soil-reserve-title" className="sr-only">Réserve du sol</h2>
       <p>
         L’eau que le sol de chaque planche tient à la disposition des racines, estimée jour par jour à partir de la réserve utile (RFU)
         de sa parcelle. C’est une information : elle ne change ni le besoin, ni le plan, ni les priorités.

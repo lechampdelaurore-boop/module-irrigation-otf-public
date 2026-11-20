@@ -40,7 +40,7 @@ test('les cumuls suivent la période choisie, un détail s’ouvre et le CSV s�
 
   const historique = page.locator('.irrigation-history-dashboard');
   await historique.scrollIntoViewIfNeeded();
-  await expect(historique.getByRole('heading', { name: 'Cumuls et historique' })).toBeVisible();
+  await expect(historique.getByRole('heading', { name: 'Cumuls et historique' })).toBeAttached();
   // Les parcours précédents ont laissé leurs irrigations dans la même
   // semaine : la fiche peut être au-delà de la première page.
   const fiche = await trouverLaFiche(historique, materiel);

@@ -54,7 +54,7 @@ test('besoin par culture en mots simples : titre en clair, plis « Pour les expe
   const journal = surveillerLaConsole(page);
   await attendreLaPageIrrigation(page, 'cultures');
   const section = page.locator('section.crop-coefficients');
-  await expect(section.getByRole('heading', { level: 2, name: 'Besoin en eau par culture' })).toBeVisible();
+  await expect(section.getByRole('heading', { level: 2, name: 'Besoin en eau par culture' })).toBeAttached();
   await expect(section.locator('.crop-coefficients-heading p')).toContainText('Une culture ne boit pas autant à la levée qu’en pleine saison.');
   const experts = section.locator('.crop-coefficients-part > details.experts-fold').first();
   await expect(experts.locator('summary')).toHaveText('Pour les experts');

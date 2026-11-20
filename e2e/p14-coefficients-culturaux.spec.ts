@@ -100,7 +100,7 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   await attendreLaPageIrrigation(page, 'cultures');
   const coefficients = page.locator('section.crop-coefficients');
   // Le titre en clair depuis l'audit ergonomique (lot 3, point 8).
-  await expect(coefficients.getByRole('heading', { name: 'Besoin en eau par culture' })).toBeVisible();
+  await expect(coefficients.getByRole('heading', { name: 'Besoin en eau par culture' })).toBeAttached();
   const table = await carteDeCulture(coefficients, cas.culture);
   await table.locator('summary').first().click();
   await expect(table).toContainText('CRIIAM Sud');

@@ -53,7 +53,7 @@ test('une alerte météo se règle, refuse un seuil non numérique, s’enregist
 
   const encart = page.locator('#weather-alerts');
   await encart.scrollIntoViewIfNeeded();
-  await expect(encart.getByRole('heading', { name: 'Alertes météo' })).toBeVisible();
+  await expect(encart.getByRole('heading', { name: 'Alertes météo' })).toBeAttached();
   await expect(encart.locator('.weather-alert-device')).toContainText('appareils de l’exploitation où les alertes sont activées');
   const ajouter = encart.getByRole('button', { name: 'Ajouter une alerte' });
   if (testInfo.project.name === 'telephone') await verifierCibleTactile(ajouter, 'le bouton « Ajouter une alerte »');

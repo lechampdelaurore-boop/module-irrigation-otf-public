@@ -186,7 +186,8 @@ export function WeatherAlertsPanel({
     <article className="water-panel weather-alerts-panel" id="weather-alerts" data-tour="alertes-meteo" aria-labelledby="weather-alerts-title">
       <div className="water-panel-title">
         <div>
-          <h3 id="weather-alerts-title">Alertes météo</h3>
+          {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran sans niveau sauté (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+          <h2 id="weather-alerts-title" className="sr-only">Alertes météo</h2>
           <p>Une notification quand la prévision de la commune franchit le seuil que vous choisissez, sans marge ajoutée.</p>
           <details className="weather-alerts-margin">
             <summary>Pour le gel : la prévision est celle de l’air à 2 m</summary>
@@ -313,7 +314,7 @@ export function WeatherAlertsPanel({
         ))}
       </ul>
 
-      <h4 className="weather-alert-history-title">Alertes envoyées</h4>
+      <h3 className="weather-alert-history-title">Alertes envoyées</h3>
       {view.history.length === 0 ? <p className="weather-alert-empty">Aucune alerte envoyée pour l’instant.</p> : (
         <ol className="weather-alert-history" aria-label="Historique des alertes météo">
           {view.history.map((entry) => (

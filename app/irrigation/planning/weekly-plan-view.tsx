@@ -220,8 +220,8 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
     <section className="planning-section" aria-labelledby="planning-title" aria-busy={pending}>
       <header className="planning-heading">
         <div>
-          <p className="eyebrow">Planning · saison {season}</p>
-          <h2 id="planning-title">Planning de la semaine</h2>
+          {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+          <h2 id="planning-title" className="sr-only">Planning de la semaine</h2>
           <p>Des propositions de créneaux, du calcul à dimanche, que vous validez une par une, par jour ou toutes ensemble. Rien n’est arrosé sans vous.</p>
         </div>
         <div className="planning-heading-actions">

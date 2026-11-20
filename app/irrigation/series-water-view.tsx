@@ -35,8 +35,8 @@ export function SeriesWaterView({ season, viewTabs, cropWater }: { season: numbe
     <section className="irrigation-history-dashboard series-water-view" aria-labelledby="series-water-title">
       <header className="irrigation-history-heading">
         <div>
-          <p className="eyebrow">Suivi réel · saison {season}</p>
-          <h2 id="series-water-title">Cumuls et historique</h2>
+          {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+          <h2 id="series-water-title" className="sr-only">Cumuls et historique</h2>
           <p>L’eau reçue par chaque série culturale, de son implantation à sa dernière récolte, d’après le plan de culture d’Ouvre ta ferme.</p>
         </div>
       </header>
