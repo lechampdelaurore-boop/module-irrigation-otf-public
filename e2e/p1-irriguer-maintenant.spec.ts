@@ -64,13 +64,13 @@ test('un matériel neuf permet de démarrer un minuteur qui survit au rechargeme
     .poll(async () => (await enCours.innerText()) !== minuteurAuDepart, { timeout: 15_000 })
     .toBe(true);
 
-  await page.getByRole('button', { name: 'Arrêter / Terminer' }).click();
+  await page.getByRole('button', { name: 'Terminer l’irrigation' }).click();
   const confirmation = page.locator('dialog[open], [role=dialog]').filter({ hasText: 'Terminer l’irrigation' });
   await expect(confirmation).toContainText(materiel);
-  await confirmation.getByRole('button', { name: 'Irrigation terminée' }).click();
+  await confirmation.getByRole('button', { name: 'Terminer l’irrigation' }).click();
 
   // Plus rien en cours : l'irrigation est passée dans les archives.
   await expect(enCours).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Arrêter / Terminer' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Terminer l’irrigation' })).toHaveCount(0);
   await verifierLEtape(page, journal, 'irrigation terminée');
 });

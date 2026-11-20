@@ -6573,6 +6573,41 @@ secours. La règle se calcule dans le domaine
 Ne changent pas : les contours, le cadrage, les fonds, la liste elle-même.
 Aucune migration.
 
+## D-192 — Lot K, PR 3 : un bouton plein par écran, un seul dessin de pli, plus de geste muet
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 21 : trois
+dessins de pli cohabitaient (le chevron des lots D et J, le triangle du
+navigateur, une boîte grise sans signe) ; des raccourcis et des choix en
+vert plein disputaient le geste de la page (« Cette semaine », « 24 h /
+48 h / 7 jours », « Créer un groupe » sur une ferme sans asperseur) ;
+« Cette semaine » et « Retirer la mesure » répondaient sans rien faire ;
+l'heure réelle de fin montrait les secondes ; finir un arrosage se disait
+« Irrigation terminée », « Terminer maintenant » ou « Terminer
+l'irrigation » selon l'écran.
+
+**Décision (F469 à F473).** Une règle commune donne à tout pli du module
+le chevron à droite de la charte, qui tourne à l'ouverture, et cache le
+triangle du navigateur ; les menus « … » gardent leur dessin, ce ne sont
+pas des plis, et les lignes « Voir le détail » des cultures et des espèces
+gardent leur flèche, choisie par le porteur le 8 novembre 2026 (F469). Les raccourcis et les choix passent en secondaire,
+contour et fond vert pâle ; l'horizon choisi se lit à son fond plein et à
+`aria-pressed` ; « Créer un groupe » reste plein sur une ferme qui a un
+asperseur (F470). « Cette semaine » est indisponible quand la semaine
+affichée est la semaine en cours ; « Retirer la mesure » l'est quand le jour
+choisi n'a pas de pluie mesurée (F471). « Heure réelle de fin » se saisit
+à la minute ; laissée telle quelle, l'heure proposée part à la seconde du
+minuteur, pour que la durée enregistrée ne perde rien (F472). Le bouton
+qui finit un arrosage dit partout « Terminer l'irrigation » ; « Irrigation
+terminée » reste l'état affiché et le titre de la notification (F473). Le
+menu « … » d'une ligne planifiée qui ne garde qu'« Annuler » reste un
+menu : F45 l'a éloigné de « Démarrer maintenant » exprès, pour qu'un doigt
+pressé n'annule pas un arrosage.
+
+Ne changent pas : les gestes eux-mêmes, les messages, le calcul de la durée.
+Aucune migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
