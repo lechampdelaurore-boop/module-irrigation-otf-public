@@ -84,7 +84,7 @@ test('une seule ligne au journal chaque matin, même sans ferme à suivre, faite
     event: 'soil_reserve_engine_comparison',
     reference: GAUGE_ENGINE,
     compared: otherGaugeEngine(GAUGE_ENGINE),
-    engineVersion: '0.2.0',
+    engineVersion: '0.3.0',
     toleranceMm: 0.01,
     beds: 0,
     days: 0,

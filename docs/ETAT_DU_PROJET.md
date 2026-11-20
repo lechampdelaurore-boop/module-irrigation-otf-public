@@ -952,11 +952,15 @@ registres, elle y renvoie.
 - Fusion des moteurs, **étapes 2 et 3** (section 6 quater de la roadmap,
   D-270), en Opus 5.5 · Max sur le mot du porteur (MC-26) : **le moteur
   commun codé le 20 novembre 2026** dans son dépôt (v0.1.0, PR n° 11 ;
-  v0.2.0, PR n° 12 ; ses types, PR n° 13), relecture de Nicolas en cours ;
+  v0.2.0, PR n° 12 ; ses types, PR n° 13 ; v0.3.0, la pluie sans heure du
+  jeu Tlaloc, PR n° 14), **approuvé par Nicolas et fusionné le soir même**
+  (21 h 19, 21 h 20, 21 h 47 et 21 h 48, branche principale verte après
+  chaque fusion) ;
   **l'adaptateur de la jauge, PR 1 sur 3, codé le même soir** (contrat
   `docs/shared-engine-adapter-contract.md`), posé sur une PR de découpage
   sans changement de comportement (la forme du jour de la jauge dans
-  `lib/domain/soil-reserve/gauge-shape.ts`). Le moteur v0.2.0 figé dans
+  `lib/domain/soil-reserve/gauge-shape.ts`). Le moteur v0.3.0 (commit
+  `a36ca0d` de la branche principale du dépôt commun) figé dans
   `lib/domain/soil-reserve/shared-engine/`, avec ses types et l'empreinte
   de chaque fichier ; l'interrupteur `GAUGE_ENGINE` reste sur l'ancien
   calcul : **rien ne change en ligne** ; chaque matin, l'enregistrement de
@@ -964,14 +968,14 @@ registres, elle y renvoie.
   ferme, au plus 50 000 jours comparés. Preuves : les 1 930 tests rejoués
   sur le moteur sans en modifier un seul ; 20 000 planches tirées au
   hasard, 437 355 jours égaux à 0,000001 mm près ; O01 à O10 et les huit
-  cas limites, mêmes verdicts par les deux calculs. Contrôles avant la PR :
+  cas limites, mêmes verdicts par les deux calculs ; comparaison et cas
+  rejoués sur la v0.3.0, mêmes résultats. Contrôles avant la PR :
   lint, typage, 1 930 tests et les trois passages d'isolation, le rejeu des
   1 930 sur le moteur, compilation, knip, `demo:check`, verts ; parcours
   navigateur et Workers sans rapport (ni interface ni Worker touchés), joués
-  par la CI. Reste : l'approbation de Nicolas et la fusion des PR n° 11 à 13
-  du dépôt commun, puis la copie recalée sur ce commit et ses preuves
-  rejouées ; la PR passe en dernier dans la file ; la PR 2 (l'interrupteur
-  sur le moteur) après trois matins sans écart sur la ferme.
+  par la CI. Reste : la PR passe en dernier dans la file, rebasée après les
+  chaînes 4.4 et 4.5 ; la PR 2 (l'interrupteur sur le moteur) après trois
+  matins sans écart sur la ferme.
 - **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
   22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
   culture et par stade (5 quater), les alertes météo par culture (5

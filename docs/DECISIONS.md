@@ -7073,17 +7073,21 @@ code ensemble s'ils touchent deux dépôts.
 - **Étape 2, le moteur**, codée le 20 novembre 2026 dans le dépôt commun
   (`lechampdelaurore-boop/moteur-hydrique-commun-public`) : la v0.1.0, le
   cœur du bilan (PR n° 11), la v0.2.0, les options du jeu Tlaloc (PR n° 12,
-  empilée), et ses types construits avec lui (PR n° 13) ; relecture de
-  Nicolas en cours, le choix 19 corrigé à sa demande ; fusion dès son
-  approbation.
-- **Étape 3, PR 1 sur 3** : le moteur v0.2.0 figé dans le module avec ses
-  types et l'empreinte de chaque fichier ; l'adaptateur ; l'interrupteur sur
+  empilée), ses types construits avec lui (PR n° 13), puis la v0.3.0, la
+  pluie sans heure du jeu Tlaloc (PR n° 14, choix 1 tranché par Nicolas,
+  sans effet pour OTF) ; le choix 19 corrigé à sa demande ; les quatre PR
+  approuvées par Nicolas et fusionnées le soir même (21 h 19, 21 h 20,
+  21 h 47 et 21 h 48).
+- **Étape 3, PR 1 sur 3** : le moteur v0.3.0 (commit `a36ca0d` du dépôt
+  commun) figé dans le module avec ses types et l'empreinte de chaque
+  fichier ; l'adaptateur ; l'interrupteur sur
   l'ancien calcul. **Rien ne change en ligne.** Les preuves : tous les tests
   du module rejoués l'interrupteur sur le moteur, sans en modifier un seul ;
   20 000 planches tirées au hasard, 437 355 jours, chaque grandeur égale à
   0,000001 mm près (plus grand écart 9e-14 mm) ; les cas O01 à O10 et les
   huit cas limites de l'étape 1, mêmes verdicts par les deux calculs (l'écart
-  d'O07, D-116, est le même des deux côtés).
+  d'O07, D-116, est le même des deux côtés) ; comparaison et cas rejoués
+  sur la v0.3.0, mêmes résultats.
 
 **Décisions.**
 
@@ -7109,8 +7113,8 @@ code ensemble s'ils touchent deux dépôts.
    PR 3 (l'ancien code retiré) après une semaine sur le moteur sans écart.
    Un écart arrête la suite et se présente au porteur avec les deux valeurs.
 7. La copie du moteur vient du dossier `dist/` de la branche principale du
-   dépôt commun : la PR 1 attend la fusion des PR n° 11 à 13, puis se
-   recale sur ce commit, ses preuves rejouées.
+   dépôt commun : la PR 1 s'y est recalée le soir même, sur `a36ca0d`
+   (v0.3.0, après la fusion des PR n° 11 à 14), ses preuves rejouées.
 
 Ne changent pas : D-028, D-047, D-053, D-114, D-116, D-154. Aucune
 migration ; aucun test existant modifié. Aucune question de budget.
