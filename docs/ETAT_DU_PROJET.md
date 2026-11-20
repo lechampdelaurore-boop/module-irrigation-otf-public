@@ -608,7 +608,10 @@ registres, elle y renvoie.
   F478) : six tailles en jetons, quatre graisses, la pastille du plan
   expliquée ; en ligne le 20 novembre 2026 à 14 h 02 (#144, fusionnée à 13 h 44, run 44738264610 vérifié job par job). **PR 6, rayons et couleurs de la charte** (D-195,
   F479) : trois rayons, les cercles restent ; plus de texte hors palette ;
-  codée.
+  en ligne le 20 novembre 2026 à 14 h 45 (#148, fusionnée à 14 h 23, run 44743952625 vérifié job par job). **PR 7, grand écran, tablette et 320 px** (D-196, F480 à F482) :
+  la page centrée et le menu jusqu'en bas au grand écran, la barre du bas
+  et les cibles de 44 px jusqu'à 980 px, les noms entiers à 320 px ;
+  codée. Lot K codé en entier.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec
