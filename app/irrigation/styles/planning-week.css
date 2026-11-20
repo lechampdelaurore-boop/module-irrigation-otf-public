@@ -206,7 +206,7 @@
   .planning-cell .planning-proposal:not(:has(> details[open])) {
     padding: 0 .45rem;
     border-left-width: 4px;
-    border-radius: 8px;
+    border-radius: 9.75px;
   }
 
   .planning-cell .planning-proposal:not(:has(> details[open])) > details > summary {

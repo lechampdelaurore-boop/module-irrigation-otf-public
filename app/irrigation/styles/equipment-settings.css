@@ -45,7 +45,7 @@
   gap: 10px;
   padding: 9px 10px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: white;
 }
 
@@ -54,7 +54,7 @@
   width: 30px;
   height: 30px;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: var(--green-soft);
   color: var(--green-dark);
   font-size: var(--text-12);
@@ -139,7 +139,7 @@
 
 .settings-calculation-note {
   padding: 10px 12px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--sheet);
 }
 
@@ -177,7 +177,7 @@
   align-items: center;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-button);
   background: white;
 }
 
@@ -201,7 +201,7 @@
   gap: 10px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: white;
   cursor: pointer;
 }
@@ -274,7 +274,7 @@
   height: 38px;
   padding: 0 9px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-button);
   color: var(--ink);
   font: inherit;
   font-size: var(--text-12);
@@ -282,7 +282,7 @@
 
 .profile-point-row button {
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-button);
   background: var(--danger-soft);
   color: var(--danger-ink);
   font: inherit;
@@ -316,7 +316,7 @@
   grid-template-columns: minmax(160px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr);
   gap: 8px;
   padding: 13px;
-  border-radius: 11px;
+  border-radius: 9.75px;
   background: var(--sheet);
 }
 
@@ -339,7 +339,7 @@
   min-height: 54px;
   justify-content: center;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 9.75px;
   background: white;
 }
 
