@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
+import { carteDeCulture } from './support/cultures.ts';
 import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
@@ -11,7 +12,8 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, surveillerL
  * l'accueil, gardé tel quel », comme la migration 0034 l'a fait pour les
  * espaces réels. Une ferme neuve a ses cinq étapes à faire, dites en rouge
  * et en mots ; elle choisit sa commune (F582), classe ses jardins (F583) et
- * saisit le sol de ses parcelles, la texture proposant TEW et REW (F584).
+ * saisit le sol de ses parcelles, la texture proposant TEW et REW (F584) ;
+ * les cultures du CRIIAM lui disent venir d'une autre région (F586).
  */
 
 const ETAPES = ['Où est la ferme', 'Parcelles et abris', 'Sol', 'Cultures', 'Réglages à relire'];
@@ -131,4 +133,17 @@ test('une ferme neuve a ses cinq étapes à faire ; choisir sa commune, classer 
   await expect(fin.locator('summary')).toContainText('2 étapes sur 5 à finir.');
   await expect(fin.locator('li.onboarding-step').nth(2)).toContainText(/Confirmé le .+ : sol de 3 parcelles saisi\./);
   await verifierLEtape(page, journal, 'étape du sol confirmée');
+
+  // Les cultures (F422, F586) : les dates du CRIIAM viennent du Sud / Occitanie, une ferme d'une autre région en est
+  // avertie sur la carte, fermée comme ouverte ; les cultures de la FAO-56 sont générales, sans avertissement.
+  await attendreLaPageIrrigation(page, 'cultures');
+  const cultures = page.locator('section.crop-coefficients');
+  const asperge = await carteDeCulture(cultures, 'Asperge');
+  await expect(asperge.locator('summary').first()).toContainText('dates d’une autre région');
+  await asperge.locator('summary').first().click();
+  await expect(asperge.locator('.reference-crop-region-warning')).toHaveText(/^Ces dates viennent d’une autre région que la vôtre \(.+\) : vérifiez-les\.$/);
+  const brocoli = await carteDeCulture(cultures, 'Brocoli');
+  await expect(brocoli.locator('.reference-crop-region-warning')).toHaveCount(0);
+  await expect(brocoli.locator('summary').first()).not.toContainText('dates d’une autre région');
+  await verifierLEtape(page, journal, 'cultures d’une autre région signalées');
 });

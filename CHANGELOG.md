@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4b)
+
+- **D'où viennent les dates de chaque culture** (D-227) : la fiche d'une
+  culture de référence dit d'où viennent ses dates de stade (région Sud /
+  Occitanie pour celles du CRIIAM, générales pour celles de la FAO-56, ou
+  celles de la ferme). Une nouvelle ferme d'une autre région est avertie sur
+  les cultures du CRIIAM : « Ces dates viennent d'une autre région que la
+  vôtre : vérifiez-les. » Les fermes qui utilisaient déjà le module ne le
+  sont pas.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4a)
 
 - **Les racines d'une nouvelle ferme** (D-226) : l'asperge et le melon ne

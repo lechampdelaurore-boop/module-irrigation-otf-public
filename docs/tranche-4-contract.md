@@ -1437,6 +1437,17 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **Inchangé** : la base (aucune migration) ; la ferme du porteur (espace d'avant l'accueil) et la démonstration lisent le jeu commun tel quel (F426) ; la tomate à 0,65 m, choisie par le porteur dans la fourchette de l'ITAB (50-80 cm), reste commune : ce n'est pas un plafond hors des sources.
 - **Preuves.** `tests/db/onboarding-rooting.test.ts` : le jeu commun en base garde 0,60 m ; une ferme neuve lit 1,20 m (asperge) et 0,80 m (melon), la source et la note dites ; la vue « Besoin par culture » aussi ; la ferme d'avant l'accueil et la démonstration lisent 0,60 m ; une révision de la ferme neuve remplace la proposition et ne touche pas l'autre ferme ; aux trois passages d'isolation. Quatre sabotages, chacun détecté. Aucun parcours navigateur nouveau : l'écran ne change pas.
 
+#### 8 bis.14 · Précisions du code de la PR 4b (20 novembre 2026, D-227, F586)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F586 · La région d'origine des cultures et l'avertissement d'une autre région
+
+- **Le [NON VÉRIFIÉ] de F422** : le jeu commun n'a pas de colonne « région ». Il n'en faut pas : la région d'origine se lit de la **source** de chaque culture, déjà en base (F428, réponse 3) : CRIIAM Sud → « Dates de stade de la région Sud / Occitanie (CRIIAM Sud), validées par la ferme du porteur le 31 octobre 2026. » ; FAO-56 → « Dates de stade générales (FAO-56), sans région. » ; une culture dont la ferme a ses propres durées → « Dates de stade de votre ferme. ». Aucune migration. Chaque fiche commune ajoute : « Délais de levée et calendriers du jeu commun : ceux de la ferme du porteur, Auvergne-Rhône-Alpes, validés le 31 octobre 2026. » Aucune commune dans le dépôt public.
+- **La région de la ferme** (`lib/domain/onboarding/regions.ts`) : la commune confirmée (F419 ; la commune choisie, sinon le siège pris en dernier recours), les deux premiers chiffres de son code postal, puis l'une des treize régions de France métropolitaine (table fixe, découpage de 2016 ; « 20 » pour la Corse). Un code d'outre-mer ou inconnu ne donne aucune région ; sans commune confirmée, la région n'est pas connue et rien n'est affirmé.
+- **L'avertissement** : « Ces dates viennent d'une autre région que la vôtre (Bretagne) : vérifiez-les. », sur chaque culture **commune du CRIIAM**, pour une ferme **qui fait l'accueil** dont la région n'est ni Provence-Alpes-Côte d'Azur ni Occitanie. Il se lit sur la fiche ouverte, hors du pli « Pour les experts », et la carte fermée dit « dates d'une autre région ». Jamais sur la FAO-56 (générale), ni sur une culture aux durées de la ferme, ni pour la ferme du porteur (espace d'avant l'accueil) ou la démonstration (F426). L'origine et les délais du porteur sont dans « Pour les experts ».
+- **Preuves.** `tests/db/onboarding-regions.test.ts` : codes postaux et régions, outre-mer refusé ; une ferme neuve de Bretagne avertie sur toutes les cultures du CRIIAM et sur elles seules ; une ferme neuve du Vaucluse, aucun avertissement ; sans commune confirmée, aucun ; la ferme d'avant l'accueil et la démonstration, aucun ; la région d'une ferme ne passe pas à l'autre ; aux trois passages d'isolation. Six sabotages, chacun détecté. Parcours P46 étendu : l'asperge avertie, carte fermée et ouverte ; le brocoli de la FAO-56 non.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :

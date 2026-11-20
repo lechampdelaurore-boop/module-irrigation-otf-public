@@ -14,6 +14,7 @@ import { KcOverrides, type KcOverrideSubmit } from './kc-overrides';
 import { PlantVignette } from './plant-vignette';
 import { RootingProfileSection, type RootingProfileSubmit } from './rooting-profile';
 import type { RootingProfileView } from '@/lib/domain/soil-reserve/rooting-view';
+import { CARRIER_CONDUCT_TEXT } from '@/lib/domain/onboarding/regions';
 
 /**
  * Une culture de référence, telle que la ferme la lit (5 quater, PR 3) : sa
@@ -30,7 +31,7 @@ const surveyDay = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'lon
 /** Une année sans 29 février, pour écrire un jour `MM-JJ` de calendrier. */
 const COMMON_YEAR = 2025;
 
-export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, rooting, summary, today, pending, onOverride, onSaveDurations, onResetDurations, onSaveRooting }: {
+export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, rooting, region, summary, today, pending, onOverride, onSaveDurations, onResetDurations, onSaveRooting }: {
   stored: StoredReferenceCrop;
   /** L'adresse des dessins d'Ouvre ta ferme de la page (précision P41) ; `null` sans dessin. */
   spriteHref: string | null;
@@ -38,6 +39,8 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
   common: ReferenceCrop | null;
   overrideRows: readonly KcOverrideRow[];
   rooting: RootingProfileView;
+  /** D'où viennent ses dates de stade, et l'avertissement d'une autre région que celle de la ferme (4.4, F586). */
+  region: { origin: string; warning: string | null };
   /** Le résumé lu à droite du nom, sous le nom au téléphone (choix du porteur du 8 novembre 2026). */
   summary: ReferenceCropSummary;
   today: string;
@@ -53,6 +56,7 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
   const farmMarks = [
     ...(stored.origin === 'farm' ? ['durées de la ferme'] : []),
     ...(unusable ? ['inutilisable'] : []),
+    ...(region.warning ? ['dates d’une autre région'] : []),
     ...(overridden > 0 ? [`${overridden} Kc surchargé${overridden > 1 ? 's' : ''}`] : []),
     ...(rooting.inForce?.origin === 'farm' ? ['profil racinaire de la ferme'] : []),
   ];
@@ -71,6 +75,7 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
           {stored.problems.map((problem) => <li key={problem}>{problem}</li>)}
         </ul>
       ) : null}
+      {region.warning ? <p className="reference-crop-region-warning" role="note">{region.warning}</p> : null}
       <ExpertsFold>
         {unusable ? null : <p className="reference-crop-meta reference-crop-expert-summary">{referenceCropExpertText(summary)}</p>}
         <p className="reference-crop-meta">
@@ -86,6 +91,8 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
           {stored.surveyedOn ? ` · relevée le ${surveyDay.format(new Date(`${stored.surveyedOn}T12:00:00Z`))}` : ''}
           {stored.datesSource ? ` · dates par défaut : ${stored.datesSource}` : ''}
         </p>
+        <p className="reference-crop-meta reference-crop-origin">{region.origin}</p>
+        {stored.origin === 'common' ? <p className="reference-crop-meta">{CARRIER_CONDUCT_TEXT}</p> : null}
       </ExpertsFold>
       <CurveDetails curve={crop.curve} />
       <p className="reference-crop-meta">

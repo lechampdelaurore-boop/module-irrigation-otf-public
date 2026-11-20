@@ -455,6 +455,16 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; quatre sabotages, chacun détecté ; aucun écran changé, la suite
   des parcours par la CI de la PR.
+  **PR 4b, la région des cultures** (D-227, F586, section 8 bis.14 du
+  contrat) : chaque fiche de culture dit d'où viennent ses dates de stade
+  (Sud / Occitanie pour le CRIIAM, générales pour la FAO-56, ou la ferme) ;
+  une ferme qui fait l'accueil, d'une autre région, est avertie sur les
+  cultures communes du CRIIAM ; région tirée du code postal de la commune
+  confirmée ; aucune migration ; la ferme du porteur et la démonstration
+  sans avertissement. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; six sabotages,
+  chacun détecté ; parcours P46 étendu, P17, P20 et P31c rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
