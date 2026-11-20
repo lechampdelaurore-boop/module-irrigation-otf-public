@@ -59,7 +59,12 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
   // Aucune dose du jour pour un matériel neuf : la quantité reste vide, le bouton indisponible (F409).
   await choisirMaterielEtReglage(page, materiel, reglage, '');
   await expect(page.getByLabel('Quantité souhaitée')).toHaveValue('');
+  // Sans quantité, « Résultat calculé » attend : pas de chiffre, le bouton à sa place (lot J, F462).
+  const resultat = page.locator('.irrigation-preview');
+  await expect(resultat).toHaveAttribute('data-ready', 'false');
   await page.getByLabel('Quantité souhaitée').fill('25');
+  await expect(resultat).toHaveAttribute('data-ready', 'true');
+  await expect(resultat.locator('.calculated-duration')).toBeVisible();
   await page.getByLabel('Date et heure de début').fill(debut);
   const planifier = page.getByRole('button', { name: 'Planifier l’irrigation' });
   await planifier.click();

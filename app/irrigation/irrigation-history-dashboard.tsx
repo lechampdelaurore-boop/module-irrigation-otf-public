@@ -25,6 +25,7 @@ import {
 import { protectedSlotRealSignal } from '@/lib/domain/planning/follow-up';
 import { loadIrrigationHistoryAction } from './irrigation-history-actions';
 import { FigureOrigin } from './shell/figure-origin';
+import { historyFilterSummary } from '@/lib/domain/premier-geste';
 
 type Props = {
   season: number;
@@ -186,7 +187,6 @@ export function IrrigationHistoryDashboardView({
           <h2 id="irrigation-history-title" className="sr-only">Cumuls et historique</h2>
           <p>Analysez l’eau réellement appliquée, la météo observée et les objectifs historisés.</p>
         </div>
-        <a className="history-export-button" href={exportHref}>{exportLabel}</a>
       </header>
 
       {viewTabs}
@@ -257,8 +257,12 @@ export function IrrigationHistoryDashboardView({
           )}
         </div>
 
-        <div className="history-control-block">
-          <strong>Filtres</strong>
+        {/* Les filtres dans un pli qui dit ceux qui sont actifs (audit du 19 novembre 2026, lot J, n° 15, F462). */}
+        <details className="history-control-block history-filter-fold">
+          <summary>
+            <strong>Filtrer</strong>
+            <span className="history-filter-summary">{historyFilterSummary(dashboard.scope.level, dashboard.scopeLabel)}</span>
+          </summary>
           <div className="history-scope-filters">
             <label>
               <span>Ferme</span>
@@ -326,7 +330,7 @@ export function IrrigationHistoryDashboardView({
             </label>
           </div>
           <p className="history-active-scope">Périmètre analysé : <strong>{dashboard.scopeLabel}</strong></p>
-        </div>
+        </details>
       </div>
 
       {error ? <p className="history-error" role="alert">{error}</p> : null}
@@ -370,6 +374,9 @@ export function IrrigationHistoryDashboardView({
           missingAction={gapWaitsForRain ? rainAction : null}
         />
       </div>
+
+      {/* L'export après les chiffres, en bouton secondaire (F462). */}
+      <p className="history-export-row"><a className="history-export-button" href={exportHref}>{exportLabel}</a></p>
 
       {dashboard.warnings.length > 0 ? (
         <div className="history-warnings">

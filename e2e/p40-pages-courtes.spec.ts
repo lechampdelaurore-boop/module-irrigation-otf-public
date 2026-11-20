@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape, TITRES_DES_PAGES, type PageDuModule } from './support/parcours.ts';
+import { preparerMaterielArrosant } from './support/materiel.ts';
 
 /**
  * Parcours P40 : l'audit ergonomique du 19 novembre 2026, lot J,
@@ -196,4 +197,38 @@ test('« Matériel » : trois onglets gardés dans l’adresse, les jardins repl
   await expect(page.locator('#materiel-panel-groupes')).toBeVisible();
   await expect(page.locator('#materiel-panel-materiel')).toBeHidden();
   await verifierLEtape(page, journal, 'matériel en onglets');
+});
+
+test('« Arrosages » attend le premier choix ; « Historique » plie ses filtres et exporte après les chiffres', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  // PR 7 (F462) : sans matériel ni quantité, pas de chiffres, une phrase qui dit quoi choisir ; le bouton reste.
+  await attendreLaPageIrrigation(page, 'arrosages');
+  if (await page.locator('.irrigation-empty-action').isVisible()) {
+    // Seul ou en tête de suite, aucun matériel n'est encore prêt : le parcours en pose un, comme P1.
+    await attendreLaPageIrrigation(page, 'materiel');
+    await preparerMaterielArrosant(page, testInfo, { repere: 'p40' });
+    await attendreLaPageIrrigation(page, 'arrosages');
+  }
+  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+  const resultat = page.locator('.irrigation-preview');
+  await expect(resultat).toHaveAttribute('data-ready', 'false');
+  await expect(resultat.locator('.calculated-duration')).toHaveCount(0);
+  await expect(resultat).toContainText('Choisissez un matériel et une quantité');
+  await expect(resultat.locator('.start-irrigation-button')).toBeDisabled();
+
+  // L'historique : le pli « Filtrer » fermé dit le périmètre ; l'export, secondaire, suit les chiffres.
+  await attendreLaPageIrrigation(page, 'historique');
+  const pli = page.locator('details.history-filter-fold');
+  await expect(pli).not.toHaveAttribute('open', '');
+  await expect(pli.locator('summary')).toHaveText(/Filtrer\s*toute la ferme/);
+  await expect(pli.getByText('Parcelle', { exact: true })).toBeHidden();
+  const chiffres = await page.locator('.history-summary-grid').boundingBox();
+  const exporter = page.locator('a.history-export-button');
+  const bouton = await exporter.boundingBox();
+  // Secondaire : le fond clair des autres boutons de la page, plus le vert plein.
+  await expect(exporter).not.toHaveCSS('color', 'rgb(255, 255, 255)');
+  expect(bouton && chiffres && bouton.y >= chiffres.y + chiffres.height, 'l’export après les chiffres').toBe(true);
+  await pli.locator('summary').click();
+  await expect(pli.getByText('Parcelle', { exact: true })).toBeVisible();
+  await verifierLEtape(page, journal, 'premier geste plus haut');
 });

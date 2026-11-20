@@ -6483,6 +6483,36 @@ parcours, quatre jardins).
 Ne changent pas : le placement, l'inventaire, les groupes, la vue
 satellite. Aucune migration.
 
+## D-189 — Lot J, PR 7 : « Arrosages » et « Historique », le premier geste plus haut
+
+Date : 19 novembre 2026.
+
+**Contexte.** Audit ergonomique du 19 novembre 2026, constat n° 15 : sur
+« Arrosages », « Résultat calculé » occupait près de 380 px au téléphone
+avant tout choix (une durée nulle, des tirets) ; sur « Historique », les
+quatre listes de filtres et le bouton d'export, en vert plein, passaient
+avant les chiffres. **Cause vérifiée** : `IrrigationPreview` rendait ses
+chiffres sans condition ; `irrigation-history-dashboard.tsx` plaçait
+l'export dans l'en-tête et les filtres dans un bloc toujours ouvert.
+
+**Décision (F462).** Les chiffres de « Résultat calculé » (durée, matériel,
+réglage, étendue, volume, apport par planche) n'apparaissent qu'une fois un
+matériel choisi et une durée qui n'est plus nulle (une quantité, une durée,
+ou les dates d'une irrigation déjà réalisée : illisibles, le volume dit
+toujours « Inconnu — vérifiez le début et la fin ») ; avant, une
+phrase : « Choisissez un matériel et une quantité : la durée et le volume
+s'afficheront ici. » Le bloc lui-même, son bouton, l'avertissement d'un
+créneau protégé et la réponse du module (lot G, F404) restent toujours
+rendus : la visite guidée garde son ancre, et le message qui suit un envoi
+reste sous le bouton quand le formulaire se vide. Dans « Historique », la
+période reste visible ; les filtres de périmètre vont dans un pli
+« Filtrer », fermé, dont la ligne dit le périmètre choisi (« toute la
+ferme » ou son nom) ; « Exporter CSV… » garde son libellé et son adresse,
+passe après les tuiles des cumuls, en bouton secondaire.
+
+Ne changent pas : les calculs, l'export, les filtres eux-mêmes. Aucune
+migration.
+
 ## D-220 — Tranche 4, sous-tranche 4.5 : le contrat de l'exploitation
 
 Date : 19 novembre 2026.
