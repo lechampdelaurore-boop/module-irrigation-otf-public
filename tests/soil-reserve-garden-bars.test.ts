@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { SOIL_BAR_MARKS, soilBarPosition, soilGardenBars } from '../lib/domain/soil-reserve/garden-bars.ts';
+import { SOIL_BAR_MARKS, soilBarPosition, soilGardenBarRows, soilGardenBars } from '../lib/domain/soil-reserve/garden-bars.ts';
 import type { SoilReserveDay } from '../lib/domain/soil-reserve/gauge.ts';
 import type { SoilGaugeBed, SoilGaugePlot } from '../lib/domain/soil-reserve/gauge-view.ts';
 import type { SoilReserveSummary } from '../lib/domain/soil-reserve/signals.ts';
@@ -168,4 +168,38 @@ test('la place sur la barre reste entre 0 et 100 ; les repères sont les crans d
   assert.equal(soilBarPosition(104), 100);
   assert.deepEqual(SOIL_BAR_MARKS.map((mark) => (mark.word ? `${mark.word} ${mark.value}` : mark.value)), ['0 %', 'sec 25', 'frais 50', 'humide 75', '100 %']);
   assert.deepEqual(SOIL_BAR_MARKS.map((mark) => mark.percent), [0, 25, 50, 75, 100]);
+});
+
+// Audit du 19 novembre 2026, lot J, n° 15, F458 : les jardins pareils en une seule barre.
+
+test('F458 : onze jardins de plein champ pareils tiennent en une barre ; un abri et un jardin sous son seuil gardent la leur', () => {
+  const pareils = Array.from({ length: 11 }, (_, index) => plot(`Jardin ${index + 1}`, { percent: 100, sunday: 100, beds: [bed(`R${index + 1}`, { percent: 100 })] }));
+  const sec = plot('Jardin 12', { percent: 100, sunday: 100, beds: [bed('S1', { percent: 20, advisedDoseMm: 8 })] });
+  const abri = plot('Tunnel 1', { percent: 100, sheltered: true, sunday: 100, beds: [bed('T1', { percent: 100 })] });
+  const rows = soilGardenBarRows({ plots: [...pareils, sec, abri], fieldPlotCount: 12 });
+  assert.deepEqual(rows.map((row) => row.kind), ['group', 'garden', 'garden']);
+  const [group] = rows;
+  assert.ok(group?.kind === 'group');
+  assert.equal(group.bar.name, '11 jardins de plein champ');
+  assert.equal(group.members, 'Jardin 1, Jardin 2, Jardin 3 et 8 autres');
+  assert.equal(group.plotIds.length, 11);
+  assert.equal(group.bar.plotId, 'plot-Jardin 1', 'toucher la barre ouvre le premier jardin, et le pli des autres');
+  assert.equal(group.bar.beds.length, 11, 'chaque planche reste un point');
+  assert.match(group.bar.label, /^11 jardins de plein champ \(Jardin 1, .*Jardin 11\) : 100 % du plein maintenant, 100 % prévu dimanche$/);
+  assert.deepEqual(rows.slice(1).map((row) => row.bar.name), ['Jardin 12', 'Tunnel 1']);
+});
+
+test('F458 : des jardins au même % mais à un prévu de dimanche différent gardent chacun leur barre ; un seul jardin n’est pas un groupe', () => {
+  const rows = soilGardenBarRows({
+    plots: [
+      plot('A', { percent: 60, sunday: 40 }),
+      plot('B', { percent: 60, sunday: 50 }),
+      plot('C', { percent: 30, sunday: 20 }),
+    ],
+    fieldPlotCount: 3,
+  });
+  assert.deepEqual(rows.map((row) => row.kind), ['garden', 'garden', 'garden']);
+  const tous = soilGardenBarRows({ plots: [plot('A', { percent: 60, sunday: 40 }), plot('B', { percent: 60.3, sunday: 40.2 })], fieldPlotCount: 2 });
+  assert.equal(tous.length, 1);
+  assert.equal(tous[0]?.bar.name, 'Tous les jardins de plein champ');
 });

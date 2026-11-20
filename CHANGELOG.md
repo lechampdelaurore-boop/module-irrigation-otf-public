@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 3 sur 7)
+
+- **« Réserve du sol » : les jardins pareils en une barre** (D-185) : onze
+  jardins de plein champ à 100 % ne font plus onze barres identiques, mais
+  une seule, « 11 jardins de plein champ », avec leurs noms ; un jardin
+  dont une planche est sous son seuil, un abri ou un jardin inconnu garde
+  la sienne. « 100 % » et « sec 25 % » ne se coupent plus sur deux lignes ;
+  le pli des jardins pareils dit « 100 % du plein estimé aujourd'hui ·
+  dernière observation le … », qui ne se lit plus comme une observation à
+  100 %.
+
 ### Corrigé (Tranche 4, 4.3 : l'espacement des lectures d'OTF)
 
 - **Quatre appels à OTF par seconde au plus, même sur une machine chargée**

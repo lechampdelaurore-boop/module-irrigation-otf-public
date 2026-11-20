@@ -2,6 +2,8 @@ import { percentText } from '../figure-origin.ts';
 import type { SoilGaugePlot, SoilGaugeZone } from './gauge-view.ts';
 import { countsInGardenPercent } from './signals.ts';
 import { PERCENT } from './soil.ts';
+import { soilGardenGroupKey, soilGardenGroupTitle } from './garden-lines.ts';
+import { namesText } from '../today/today-text.ts';
 
 /**
  * Le graphique des réserves du sol, variante B (docs/soil-reserve-contract.md,
@@ -64,6 +66,68 @@ export function soilBarPosition(percent: number): number {
 /** Les barres d'une parcelle, dans l'ordre de ses jardins sur la page. */
 export function soilGardenBars(zone: Pick<SoilGaugeZone, 'plots'>): SoilGardenBar[] {
   return zone.plots.map(gardenBar);
+}
+
+/**
+ * Une ligne du graphique : la barre d'un jardin, ou celle de plusieurs
+ * jardins pareils (audit du 19 novembre 2026, lot J, n° 15, F458).
+ */
+export type SoilBarRow =
+  | { kind: 'garden'; bar: SoilGardenBar }
+  | {
+      kind: 'group';
+      /** La barre commune : son % est celui de chacun, ses points sont les planches de tous. */
+      bar: SoilGardenBar;
+      /** « Jardin 1, Jardin 2, Jardin 3 et 8 autres ». */
+      members: string;
+      plotIds: string[];
+    };
+
+/**
+ * Les barres d'une parcelle, les jardins pareils en une seule : au moins deux
+ * jardins de plein champ que la page range déjà ensemble (même % arrondi,
+ * même jour d'observation, `soilGardenGroupKey`), au même % prévu dimanche,
+ * sans planche sous son seuil. Un jardin dont une planche est sous son seuil
+ * garde sa barre. La barre commune se place à la hauteur de son premier
+ * jardin ; toucher la barre ouvre ce jardin et le pli des autres.
+ */
+export function soilGardenBarRows(zone: Pick<SoilGaugeZone, 'plots' | 'fieldPlotCount'>): SoilBarRow[] {
+  const bars = zone.plots.map((plot) => ({ plot, bar: gardenBar(plot) }));
+  const keyOf = ({ plot, bar }: { plot: SoilGaugePlot; bar: SoilGardenBar }): string | null => {
+    const key = soilGardenGroupKey(plot);
+    if (key === null || bar.kind !== 'known' || bar.lowCount > 0) return null;
+    return `${key}|${bar.sundayPercent === null ? 'aucun' : Math.round(bar.sundayPercent)}`;
+  };
+  const members = new Map<string, SoilGardenBar[]>();
+  for (const entry of bars) {
+    const key = keyOf(entry);
+    if (key !== null) members.set(key, [...(members.get(key) ?? []), entry.bar]);
+  }
+  const rows: SoilBarRow[] = [];
+  const placed = new Set<string>();
+  for (const entry of bars) {
+    const key = keyOf(entry);
+    const group = key === null ? [] : members.get(key) ?? [];
+    if (key === null || group.length < 2) {
+      rows.push({ kind: 'garden', bar: entry.bar });
+      continue;
+    }
+    if (placed.has(key)) continue;
+    placed.add(key);
+    const [first] = group;
+    if (!first) continue;
+    const title = soilGardenGroupTitle(group.length, zone.fieldPlotCount);
+    const names = namesText(group.map((bar) => bar.name));
+    const parts = [`${percentText(first.percent ?? 0)} du plein maintenant`];
+    if (first.sundayPercent !== null) parts.push(`${percentText(first.sundayPercent)} prévu dimanche`);
+    rows.push({
+      kind: 'group',
+      bar: { ...first, name: title, beds: group.flatMap((bar) => bar.beds), label: `${title} (${group.map((bar) => bar.name).join(', ')}) : ${parts.join(', ')}` },
+      members: names,
+      plotIds: group.map((bar) => bar.plotId),
+    });
+  }
+  return rows;
 }
 
 function gardenBar(plot: SoilGaugePlot): SoilGardenBar {

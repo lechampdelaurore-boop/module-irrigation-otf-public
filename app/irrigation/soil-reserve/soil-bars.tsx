@@ -1,7 +1,7 @@
 'use client';
 
 import { soilGardenAnchor } from '@/lib/domain/today/reliability';
-import { SOIL_BAR_MARKS, soilBarPosition, soilGardenBars, type SoilGardenBar } from '@/lib/domain/soil-reserve/garden-bars';
+import { SOIL_BAR_MARKS, soilBarPosition, soilGardenBarRows, type SoilGardenBar } from '@/lib/domain/soil-reserve/garden-bars';
 import type { SoilGaugeZone } from '@/lib/domain/soil-reserve/gauge-view';
 
 /**
@@ -14,9 +14,10 @@ import type { SoilGaugeZone } from '@/lib/domain/soil-reserve/gauge-view';
 
 const whole = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 
-export function SoilBars({ zone, onOpen }: { zone: Pick<SoilGaugeZone, 'plots' | 'name'>; onOpen: (plotId: string) => void }) {
-  const bars = soilGardenBars(zone);
-  if (bars.length === 0) return null;
+export function SoilBars({ zone, onOpen }: { zone: Pick<SoilGaugeZone, 'plots' | 'name' | 'fieldPlotCount'>; onOpen: (plotId: string) => void }) {
+  // Les jardins pareils en une seule barre (audit du 19 novembre 2026, lot J, n° 15, F458).
+  const rows = soilGardenBarRows(zone);
+  if (rows.length === 0) return null;
   return (
     <div className="soil-bars" role="group" aria-label={`Vue d’ensemble · ${zone.name}`}>
       <p className="soil-bars-legend">
@@ -25,7 +26,11 @@ export function SoilBars({ zone, onOpen }: { zone: Pick<SoilGaugeZone, 'plots' |
         <span><i className="soil-bars-swatch is-sunday" aria-hidden="true" />prévu dimanche</span>
       </p>
       <ul className="soil-bars-list">
-        {bars.map((bar) => <li key={bar.plotId}><GardenBar bar={bar} onOpen={onOpen} /></li>)}
+        {rows.map((row) => (
+          <li key={row.bar.plotId} data-group={row.kind === 'group' ? row.plotIds.length : undefined}>
+            <GardenBar bar={row.bar} members={row.kind === 'group' ? row.members : null} onOpen={onOpen} />
+          </li>
+        ))}
       </ul>
       <p className="soil-bars-axis" aria-hidden="true">
         <span />
@@ -42,8 +47,8 @@ export function SoilBars({ zone, onOpen }: { zone: Pick<SoilGaugeZone, 'plots' |
   );
 }
 
-function GardenBar({ bar, onOpen }: { bar: SoilGardenBar; onOpen: (plotId: string) => void }) {
-  const place = bar.sheltered ? 'abri' : 'plein champ';
+function GardenBar({ bar, members, onOpen }: { bar: SoilGardenBar; members: string | null; onOpen: (plotId: string) => void }) {
+  const place = members ?? (bar.sheltered ? 'abri' : 'plein champ');
   const head = (
     <span className="soil-bar-name">
       <strong>{bar.name}</strong>

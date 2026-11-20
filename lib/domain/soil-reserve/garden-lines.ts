@@ -21,7 +21,7 @@ export type SoilGardenLine =
       key: string;
       /** « Tous les jardins de plein champ » ou « 3 jardins de plein champ ». */
       title: string;
-      /** « 50 % du plein, observé hier ». */
+      /** « 50 % du plein estimé aujourd’hui · dernière observation hier ». */
       detail: string;
       plotIds: string[];
     }
@@ -73,6 +73,34 @@ export function observationDayText(day: string | null, today: string): string {
 }
 
 /**
+ * La clé qui range un jardin avec ses pareils : plein champ, connu, même
+ * pourcentage arrondi (celui que l'écran montre), même jour d'observation ;
+ * `null` pour un abri ou un jardin inconnu, qui gardent leur ligne.
+ */
+export function soilGardenGroupKey(plot: SoilGaugePlot): string | null {
+  if (plot.sheltered || plot.garden.percent === null) return null;
+  return `${Math.round(plot.garden.percent)}|${observationDay(plot) ?? 'aucune'}`;
+}
+
+/** « Tous les jardins de plein champ » ou « 3 jardins de plein champ ». */
+export function soilGardenGroupTitle(count: number, fieldPlotCount: number): string {
+  return count === fieldPlotCount ? 'Tous les jardins de plein champ' : `${count} jardins de plein champ`;
+}
+
+/**
+ * « 100 % du plein estimé aujourd'hui · dernière observation le vendredi
+ * 6 novembre » : l'estimation du jour et l'observation, sans les mêler dans
+ * une même phrase (audit du 19 novembre 2026, lot J, n° 15, F458) ; avant,
+ * « 100 % du plein, observé le vendredi 6 novembre » se lisait comme une
+ * observation à 100 %.
+ */
+function soilGardenGroupDetail(plot: SoilGaugePlot, today: string): string {
+  const day = observationDay(plot);
+  const observed = day === null ? 'sans observation' : `dernière ${observationDayText(day, today).replace(/^observé/, 'observation')}`;
+  return `${Math.round(plot.garden.percent ?? 0)} % du plein estimé aujourd’hui · ${observed}`;
+}
+
+/**
  * Les lignes d'une parcelle, dans l'ordre de ses jardins. Un pli range au
  * moins deux jardins de plein champ dont le pourcentage arrondi (celui que
  * l'écran montre) et le jour d'observation sont les mêmes ; il se place à la
@@ -81,10 +109,7 @@ export function observationDayText(day: string | null, today: string): string {
  * « Observer ».
  */
 export function soilGardenLines(zone: Pick<SoilGaugeZone, 'plots' | 'fieldPlotCount'>, today: string): SoilGardenLine[] {
-  const keyOf = (plot: SoilGaugePlot): string | null => {
-    if (plot.sheltered || plot.garden.percent === null) return null;
-    return `${Math.round(plot.garden.percent)}|${observationDay(plot) ?? 'aucune'}`;
-  };
+  const keyOf = soilGardenGroupKey;
   const members = new Map<string, SoilGaugePlot[]>();
   for (const plot of zone.plots) {
     const key = keyOf(plot);
@@ -101,8 +126,8 @@ export function soilGardenLines(zone: Pick<SoilGaugeZone, 'plots' | 'fieldPlotCo
       lines.push({
         kind: 'group',
         key,
-        title: group.length === zone.fieldPlotCount ? 'Tous les jardins de plein champ' : `${group.length} jardins de plein champ`,
-        detail: `${Math.round(plot.garden.percent ?? 0)} % du plein, ${observationDayText(observationDay(plot), today)}`,
+        title: soilGardenGroupTitle(group.length, zone.fieldPlotCount),
+        detail: soilGardenGroupDetail(plot, today),
         plotIds: group.map((member) => member.plotId),
       });
     }

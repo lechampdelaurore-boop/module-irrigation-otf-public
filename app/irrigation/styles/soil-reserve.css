@@ -47,6 +47,9 @@
 .soil-cursor { display: grid; gap: .3rem; font-weight: 700; }
 .soil-cursor input { width: 100%; min-height: 44px; accent-color: #145940; }
 .soil-cursor-marks { display: flex; justify-content: space-between; gap: .3rem; margin: 0; color: var(--muted); font-size: .75rem; }
+/* « sec 25 % » ne se coupe plus sur deux lignes (lot J, n° 15, F458). */
+.soil-cursor-marks { flex-wrap: wrap; }
+.soil-cursor-marks span { white-space: nowrap; }
 .soil-observation-when { display: grid; gap: .3rem; margin: 0; border: 0; padding: 0; }
 .soil-observation-when legend { font-weight: 700; }
 .soil-observation-time { display: grid; gap: .3rem; max-width: 18rem; }
