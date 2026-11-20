@@ -422,7 +422,7 @@ nouvelle.
 - **Goutte-à-goutte** : aucune correction ; les Kc du CRIIAM la contiennent
   déjà. La fraction de sol mouillé de la FAO n'est pas appliquée aux valeurs
   du CRIIAM : ce serait compter deux fois la même réduction.
-- **Bornes** : 0 ≤ Kc ≤ 1,3 ; 0 ≤ ET0 ≤ 12 mm/j ; 0,5 ≤ K_abri ≤ 1. Une
+- **Bornes** : 0 ≤ Kc ≤ 1,3 ; 0 ≤ ET0 ≤ 15 mm/j (12 jusqu'au 20 novembre 2026 ; MC-37 du contrat commun, D-232) ; 0,5 ≤ K_abri ≤ 1. Une
   valeur hors bornes bloque le calcul du jour avec un message qui la nomme ;
   la dernière valeur valide n'est pas écrasée.
 - **Alerte de cohérence** : une ETM au-delà de 8 mm/j, ou une proposition qui

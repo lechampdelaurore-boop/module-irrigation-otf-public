@@ -481,7 +481,11 @@ registres, elle y renvoie.
   planning avant la validation du groupe « Planning », le calcul du matin
   la passe sans échec ; bandeau « réglages du planning à valider » ; aucune
   migration ; la borne de l'ET0 reste à 12 mm/j, son passage à 15 proposé
-  au dépôt commun (MC-37). Contrôles de la PR : `pnpm lint`,
+  au dépôt commun (MC-37). **MC-37 acceptée par Nicolas le 20 novembre
+  2026** : la borne passe à 15 dans une PR à part (D-232, F591, section
+  8 bis.19 du contrat), avec la table des ETM du jour recréée (sa
+  contrainte bornait aussi à 12) ; cas L6 exécuté, conforme ; fusion après
+  la 4.5 et l'export de la base par le porteur. Contrôles de la PR : `pnpm lint`,
   `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,

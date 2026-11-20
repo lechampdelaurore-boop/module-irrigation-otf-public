@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (Tranche 4, borne de l'ET0)
+
+- **L'ET0 du jour admise jusqu'à 15 mm** (D-232) : un jour de forte
+  évaporation, de 12 à 15 mm, se calcule au lieu de bloquer le besoin du
+  jour ; au-delà, le jour reste bloqué, comme avant. Décision partagée avec
+  le moteur commun (MC-37).
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4d)
 
 - **Le modèle des rattachements** (D-231) : une nouvelle ferme reçoit, pour
