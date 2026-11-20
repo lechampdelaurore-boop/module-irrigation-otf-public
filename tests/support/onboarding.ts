@@ -1,4 +1,5 @@
 import { saveWeatherPreferenceForUser } from '../../db/water-management-repository';
+import { answerSettingsGroupOfUser } from '../../lib/services/onboarding-settings';
 import type { OtfStructure } from '../../lib/domain/domain';
 
 /**
@@ -14,4 +15,13 @@ export async function confirmFarmLocation(spaceKey: string, structure: OtfStruct
     legalCity: structure.legalCity,
     legalPostcode: structure.legalPostcode,
   });
+}
+
+/**
+ * La personne valide les réglages du planning (4.4, F424, F588) : sans ce
+ * geste, un espace créé par un test, qui fait l'accueil, n'a aucun planning.
+ */
+export async function validatePlanningSettings(spaceKey: string): Promise<void> {
+  const result = await answerSettingsGroupOfUser({ spaceKey, enabled: ['planning'], group: 'planning', answer: 'validated' });
+  if (!result.ok) throw new Error(result.message);
 }

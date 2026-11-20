@@ -88,7 +88,7 @@ test('ferme neuve : ni TEW 14 ni REW 7 préremplis, la part de référence et Ze
   assert.deepEqual(withoutSoil, PLAN_ZONES);
   assert.deepEqual(
     unfinishedSteps(onboarding, { weather: false, plotsToClassify: 0, soilToEnter: { parcels: withoutSoil.length, anchor: `soil-parcel-${withoutSoil[0]}` } }),
-    [{ id: 'soil', text: `sol de ${PLAN_ZONES.length} parcelles`, page: 'sol', anchor: `soil-parcel-${PLAN_ZONES[0]}` }],
+    [{ id: 'soil', text: `sol de ${PLAN_ZONES.length} parcelles`, page: 'sol', anchor: `soil-parcel-${PLAN_ZONES[0]}`, count: PLAN_ZONES.length }],
   );
 });
 

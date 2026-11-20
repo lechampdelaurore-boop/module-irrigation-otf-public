@@ -78,7 +78,8 @@ test('n° 15, F459 : la liste « sans référence Kc » ne répète pas les esp�
 test('n° 15, F459 : « Correspondance des espèces » est un pli fermé à ancre, son compteur en titre', () => {
   const panel = readFileSync('app/irrigation/crop-water/crop-coefficients-panel.tsx', 'utf8');
   assert.match(panel, /<AnchoredFold\s+id=\{SPECIES_FOLD_ANCHOR\}[\s\S]*?<strong>\{speciesLinkCounter\(view\.species\)\}<\/strong>[\s\S]*?<SpeciesSection [\s\S]*?<WithoutReferenceSection [\s\S]*?<\/AnchoredFold>/);
-  assert.match(panel, /const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';/);
+  // L'ancre est partagée avec la vérification de l'accueil (4.4, F589) : elle vit avec la correspondance des espèces.
+  assert.match(readFileSync('lib/domain/crop-water/species-linking.ts', 'utf8'), /export const SPECIES_FOLD_ANCHOR = 'correspondance-des-especes';/);
   assert.doesNotMatch(panel, /initiallyOpen/, 'fermé d’office');
 });
 
