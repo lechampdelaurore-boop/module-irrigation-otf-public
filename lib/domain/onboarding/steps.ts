@@ -29,6 +29,8 @@ export type StoredOnboardingStep = {
   state: unknown;
   origin: unknown;
   confirmedAt: string | null;
+  /** La valeur proposée ou confirmée gardée (JSON lu), pour dire d'où vient ce qui est en place. */
+  proposedValue?: unknown;
 };
 
 /** Ce que l'on sait de l'accueil d'un espace : ses lignes, ou la démonstration, dont les fermes fictives sont déjà réglées. */
@@ -42,6 +44,7 @@ export type OnboardingStep = {
   state: OnboardingStepState;
   origin: OnboardingOrigin;
   confirmedAt: string | null;
+  proposedValue: unknown;
 };
 
 export type ResolvedOnboarding =
@@ -98,7 +101,7 @@ export function resolveOnboarding(stored: StoredOnboarding): ResolvedOnboarding 
   }
   const steps = ONBOARDING_STEP_IDS.map((id): OnboardingStep => {
     const row = byId.get(id);
-    if (!row) return { id, label: LABELS[id], state: 'todo', origin: 'onboarding', confirmedAt: null };
+    if (!row) return { id, label: LABELS[id], state: 'todo', origin: 'onboarding', confirmedAt: null, proposedValue: null };
     const state = row.state as OnboardingStepState;
     return {
       id,
@@ -106,6 +109,7 @@ export function resolveOnboarding(stored: StoredOnboarding): ResolvedOnboarding 
       state,
       origin: row.origin as OnboardingOrigin,
       confirmedAt: state === 'confirmed' ? row.confirmedAt : null,
+      proposedValue: row.proposedValue ?? null,
     };
   });
   if (steps.every((step) => step.origin === 'before-onboarding' && step.state === 'confirmed')) {
@@ -121,6 +125,29 @@ export type VerificationLine = { id: OnboardingStepId; label: string; tone: Veri
 
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { timeZone: FARM_TIME_ZONE, day: 'numeric', month: 'long', year: 'numeric' });
 
+/** Ce qu'un espace garde de la commune choisie à l'accueil (F419) : sa provenance et son nom. */
+type ChosenLocation = { source: 'custom' | 'otf'; city: string; postcode: string | null };
+
+function chosenLocationText(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null;
+  const { source, city, postcode } = value as Partial<ChosenLocation>;
+  if (typeof city !== 'string' || city.trim() === '') return null;
+  const place = typeof postcode === 'string' && postcode.trim() ? `${city} (${postcode})` : city;
+  if (source === 'otf') return `${place}, siège de la structure dans Ouvre ta ferme, pris en dernier recours`;
+  if (source === 'custom') return `${place}, commune choisie`;
+  return null;
+}
+
+/**
+ * La commune de la météo est-elle confirmée (F419) ? Oui pour un espace
+ * d'avant l'accueil (son réglage est gardé tel quel) et pour la
+ * démonstration ; sinon seulement si l'étape « Où est la ferme » l'est.
+ */
+export function locationConfirmed(resolved: ResolvedOnboarding): boolean {
+  if (resolved.kind !== 'onboarding') return true;
+  return resolved.steps.some((step) => step.id === 'location' && step.state === 'confirmed');
+}
+
 /**
  * La ligne de vérification d'une étape (F427) : ce qui a été confirmé et
  * d'où cela vient, ce qui a été passé et ce que cela laisse de côté, ce qui
@@ -129,14 +156,12 @@ const dateFormat = new Intl.DateTimeFormat('fr-FR', { timeZone: FARM_TIME_ZONE, 
 export function verificationLine(step: OnboardingStep): VerificationLine {
   const base = { id: step.id, label: step.label };
   switch (step.state) {
-    case 'confirmed':
-      return {
-        ...base,
-        tone: 'confirmed',
-        text: step.origin === 'before-onboarding'
-          ? 'Réglage d’avant l’accueil, gardé tel quel.'
-          : step.confirmedAt ? `Confirmé le ${dateFormat.format(new Date(step.confirmedAt))}.` : 'Confirmé.',
-      };
+    case 'confirmed': {
+      if (step.origin === 'before-onboarding') return { ...base, tone: 'confirmed', text: 'Réglage d’avant l’accueil, gardé tel quel.' };
+      const when = step.confirmedAt ? `Confirmé le ${dateFormat.format(new Date(step.confirmedAt))}` : 'Confirmé';
+      const detail = step.id === 'location' ? chosenLocationText(step.proposedValue) : null;
+      return { ...base, tone: 'confirmed', text: detail ? `${when} : ${detail}.` : `${when}.` };
+    }
     case 'skipped':
       return { ...base, tone: 'skipped', text: SKIPPED_CONSEQUENCES[step.id] };
     case 'proposed':
@@ -161,4 +186,23 @@ export function onboardingExplanation(resolved: Exclude<ResolvedOnboarding, { ki
   }
   if (resolved.remaining.length === 0) return 'Chaque étape est confirmée ou passée.';
   return 'Les écrans de l’accueil arrivent avec les prochaines versions du module ; rien n’est confirmé à votre place.';
+}
+
+/** Une étape à finir, dite sur chaque page (section 8 bis.3) : son nom court, et l'ancre de Réglages où la faire. */
+export type UnfinishedStep = { id: OnboardingStepId; text: string; anchor: string };
+
+/**
+ * Ce que le bandeau « À finir » nomme (section 8 bis.3, F582) : seulement
+ * une étape que la personne peut faire dès maintenant et dont une case
+ * cochée a besoin. La 4.4 l'étend étape par étape, avec l'écran de chacune
+ * (F581) : la commune de la ferme d'abord (PR 2), pour les cases qui lisent
+ * la météo. Une étape passée n'est pas rappelée : elle est dite à la
+ * vérification (F427).
+ */
+export function unfinishedSteps(resolved: ResolvedOnboarding, needs: { weather: boolean }): UnfinishedStep[] {
+  if (resolved.kind !== 'onboarding') return [];
+  const remaining = new Set(resolved.remaining.map((step) => step.id));
+  const unfinished: UnfinishedStep[] = [];
+  if (needs.weather && remaining.has('location')) unfinished.push({ id: 'location', text: 'commune de la ferme', anchor: 'water-weather-title' });
+  return unfinished;
 }

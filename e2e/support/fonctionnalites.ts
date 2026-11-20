@@ -26,6 +26,22 @@ export async function ouvrirUneFermeToutCochee(page: Page, context: BrowserConte
   await attendreLaPagePrete(page, 'aujourdhui');
 }
 
+/**
+ * Une ferme neuve choisit la commune de sa ferme (4.4, F419, F582) : sans
+ * elle, ni météo, ni gel, ni ET0. Ici, le siège de la structure, pris en
+ * dernier recours dans Réglages, par le lien du bandeau « À finir ».
+ */
+export async function choisirLeSiegeCommeCommune(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  await page.locator('.onboarding-unfinished').getByRole('link', { name: 'commune de la ferme' }).click();
+  // Le lien porte la saison : la page se recharge, et répond après son titre.
+  await expect(page).toHaveURL(/#water-weather-title$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Prendre le siège OTF, en dernier recours' }).click();
+  await expect(page.getByText('La commune du siège OTF est utilisée, en dernier recours.')).toBeVisible();
+}
+
 /** L'écran de la première ouverture, prêt à répondre. */
 export async function attendreLeChoixDesFonctionnalites(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/irrigation\/bienvenue$/);

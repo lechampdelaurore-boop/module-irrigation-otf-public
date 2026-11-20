@@ -24,7 +24,7 @@
   color: var(--ink);
 }
 
-.onboarding-step > span:last-child {
+.onboarding-step > span:nth-child(3) {
   grid-column: 1 / -1;
   line-height: 1.45;
 }
@@ -55,4 +55,32 @@
 
 .onboarding-step-missing .onboarding-step-state {
   color: var(--danger-ink);
+}
+
+/* Le bandeau « À finir » (F582) : ce qui manque à la ferme, sur chaque page, avec le lien vers l'étape. */
+.onboarding-unfinished {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.onboarding-unfinished p {
+  margin: 0;
+}
+
+.onboarding-unfinished a {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.onboarding-step > a {
+  grid-column: 1 / -1;
+  justify-self: start;
+  color: var(--ink);
+  font-weight: 700;
 }

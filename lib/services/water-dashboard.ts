@@ -6,7 +6,6 @@ import {
   ensureRecurringHydricGoalsForUser,
   listWeatherDailyValuesForUser,
   readWeatherGeocodeForUser,
-  readWeatherPreferenceForUser,
   recordWeatherRefreshForUser,
   saveWeatherGeocodeForUser,
   tryClaimWeatherRefreshForUser,
@@ -36,7 +35,7 @@ import { listCountedIrrigationEventsForUser } from './counted-irrigation-events'
 import { getConfiguredWeatherProvider, weatherAttribution } from './weather/configured-provider';
 import { WeatherProviderError, type WeatherProvider } from '../domain/weather/weather-provider';
 import { oldestWeatherReadingInUse, weatherRefreshRequired, weatherRequestRanges } from '../domain/weather/cache-policy';
-import { weatherLocationKey } from '../domain/weather/location';
+import { weatherLocationKey, weatherLocationQuery } from '../domain/weather/location';
 import { weatherGeocodingRequired } from '../domain/weather/refresh-control';
 import {
   fetchWeatherForLocation,
@@ -44,6 +43,7 @@ import {
   weatherOutcomeNotBeforeAt,
   weatherOutcomeSucceeded,
 } from './weather/sync-engine';
+import { readWeatherPreference, type ResolvedWeatherPreference } from './weather-preference';
 
 const WEATHER_REFRESH_INTERVAL_MS = millisecondsFromHours(3);
 const WEATHER_STALE_AFTER_MS = millisecondsFromHours(6);
@@ -69,7 +69,7 @@ export type WaterDashboard = {
     et0ReanalysisMm: number | null;
   };
   weather: {
-    preference: WeatherPreference;
+    preference: ResolvedWeatherPreference;
     location: WeatherGeocodeRecord | null;
     requestedLocationLabel: string | null;
     locationKey: string | null;
@@ -109,7 +109,7 @@ export async function getWaterDashboardForUser({
   provider?: WeatherProvider;
   preloadedEvents?: IrrigationEventRecord[] | Promise<IrrigationEventRecord[]>;
 }): Promise<WaterDashboard> {
-  const preference = await readWeatherPreferenceForUser(ownerUserId);
+  const preference = await readWeatherPreference(ownerUserId);
   const requestedWeek = weekStartDateKey(weekStart ?? now, FARM_TIME_ZONE);
   const dates = weekDateKeys(requestedWeek);
   const locationKey = weatherLocationKey(preference, snapshot.structure);
@@ -131,12 +131,9 @@ export async function getWaterDashboardForUser({
     forceWeatherRefresh,
     hasCachedWeather,
   );
-  const query = preference.locationMode === 'custom'
-    ? preference.customCity
-    : snapshot.structure.legalCity;
-  const postcode = preference.locationMode === 'custom'
-    ? preference.customPostcode
-    : snapshot.structure.legalPostcode;
+  const locationQuery = weatherLocationQuery(preference, snapshot.structure);
+  const query = locationQuery?.city ?? null;
+  const postcode = locationQuery?.postcode ?? null;
   let weatherRefreshAttempted = false;
   const refreshClaimed = refreshWanted && (location !== null || Boolean(query))
     ? await tryClaimWeatherRefreshForUser(ownerUserId, now.toISOString(), WEATHER_MANUAL_COOLDOWN_MS)
@@ -178,7 +175,7 @@ export async function getWaterDashboardForUser({
     });
   }
 
-  const refreshedPreference = await readWeatherPreferenceForUser(ownerUserId);
+  const refreshedPreference = await readWeatherPreference(ownerUserId);
   const alertsWorkspaceId = includeWeatherAlerts ? findWorkspaceIdForUser(ownerUserId) : null;
   const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts] = await Promise.all([
     ensureRecurringHydricGoalsForUser(ownerUserId, season, requestedWeek),
@@ -267,7 +264,9 @@ export async function getWaterDashboardForUser({
       refreshedAt: oldestReading,
       stale: isWeatherStale(oldestReading, now),
       error: refreshedPreference.lastRefreshError ?? (
-        !locationKey
+        !refreshedPreference.locationConfirmed
+          ? UNCONFIRMED_LOCATION_MESSAGE
+          : !locationKey
           ? "La commune du siège OTF n'est pas renseignée. Choisissez une commune manuellement."
           : location
             ? remoteRows.length === 0 ? 'Aucune donnée météo disponible pour cette semaine.' : null
@@ -282,17 +281,18 @@ export async function getWaterDashboardForUser({
   };
 }
 
+/**
+ * Tant que la personne n'a pas choisi la commune de sa ferme, rien n'est
+ * cherché ni calculé (4.4, F419) : la phrase dit quoi faire.
+ */
+export const UNCONFIRMED_LOCATION_MESSAGE = 'Choisissez la commune de votre ferme : tant qu’elle n’est pas choisie, ni météo, ni gel, ni ET0.';
+
 function weatherLocationLabel(
-  preference: WeatherPreference,
+  preference: ResolvedWeatherPreference,
   structure: IrrigationSnapshot['structure'],
 ) {
-  const city = preference.locationMode === 'custom'
-    ? preference.customCity
-    : structure.legalCity;
-  const postcode = preference.locationMode === 'custom'
-    ? preference.customPostcode
-    : structure.legalPostcode;
-  return city ? [city, postcode].filter(Boolean).join(' · ') : null;
+  const query = weatherLocationQuery(preference, structure);
+  return query ? [query.city, query.postcode].filter(Boolean).join(' · ') : null;
 }
 
 async function refreshWeather({

@@ -48,7 +48,7 @@ test('l’accueil d’Alice n’est jamais lu pour Bob, ni l’inverse (isolatio
   insertStep(bob, 'soil', 'skipped', 'onboarding', null);
 
   assert.equal((await getOnboardingForUser(ALICE)).kind, 'before-onboarding');
-  assert.deepEqual(await readOnboardingStepsForUser(BOB), [{ step: 'soil', state: 'skipped', origin: 'onboarding', confirmedAt: null }]);
+  assert.deepEqual(await readOnboardingStepsForUser(BOB), [{ step: 'soil', state: 'skipped', origin: 'onboarding', confirmedAt: null, proposedValue: null }]);
   const bobResolved = await getOnboardingForUser(BOB);
   assert.equal(bobResolved.kind, 'onboarding');
   assert.deepEqual(bobResolved.kind === 'onboarding' ? bobResolved.remaining.map((step) => step.id) : null, ['location', 'plots', 'crops', 'settings']);

@@ -15,6 +15,7 @@ import { EARLY_SPRINKLER_WARNING } from '../../lib/domain/crop-water/proposal';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { completedDraft, createDripFixture } from '../support/irrigation-fixtures';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { confirmFarmLocation } from '../support/onboarding';
 import { ALICE, BOB } from '../support/spaces';
 
 /**
@@ -59,8 +60,9 @@ const snapshot: IrrigationSnapshot = {
 
 async function prepareFarm(owner: string) {
   await saveSpeciesCorrespondenceForUser(owner, { plantId: 'plant-tomate', seriesId: null, target: { kind: 'reference', referenceCropId: 'criiam-tomate', analogy: false } });
-  const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null }, snapshot.structure);
+  const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: true }, snapshot.structure);
   assert.ok(location);
+  await confirmFarmLocation(owner, snapshot.structure);
   await upsertWeatherDailyValuesForUser(owner, location, 'forecast', weekDateKeys(WEEK).map((date) => ({ date, precipitationMm: 0, et0Mm: 7.3 })), 'test', '2026-05-11T04:00:00.000Z');
   await saveHydricGoalForUser(owner, { season: 2026, weekStart: WEEK, scopeType: 'bed', otfZoneId: 'parcelle', otfPlotId: SHELTER, otfBedId: BED, amountMm: 20 });
   // L'objectif saisi a été posé avant la semaine : il en couvre chaque jour (D-034).
