@@ -6819,7 +6819,7 @@ dont l'état se calcule sur la dernière réussite.
    réanalyse se comptent à part ; trois exécutions manquées de suite font
    une panne ; une tâche sans réussite est « jamais réussie », en orange.
 4. Les exécutions se gardent dans `irrigation_background_jobs`, ligne
-   `task:<tâche>` ; la migration 0034, additive, ajoute le compte des
+   `task:<tâche>` ; la migration 0037, additive, ajoute le compte des
    échecs et « en panne depuis ». Le résumé d'un échec ne porte que des
    nombres et des classes d'erreur.
 5. Tout déclencheur planifié s'inscrit au registre : un test lit les

@@ -382,7 +382,7 @@ registres, elle y renvoie.
   dans `lib/domain/operations/task-registry.ts` avec leur rythme et leurs
   seuils (orange à 26 heures, rouge à 36, ou trois échecs de suite ;
   « jamais réussie » en orange) ; chaque matin enregistre une exécution par
-  tâche (migration 0034, additive), la réanalyse à part des prévisions ;
+  tâche (migration 0037, additive), la réanalyse à part des prévisions ;
   un test échoue pour tout déclencheur planifié absent du registre, règle
   écrite dans `AGENTS.md` (F569). Rien ne change à l'écran ; la page
   d'état et la veille viennent avec la PR 2. Contrôles de la PR :

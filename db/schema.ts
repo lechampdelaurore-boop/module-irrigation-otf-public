@@ -888,7 +888,7 @@ export const backgroundJobs = sqliteTable('irrigation_background_jobs', {
   lastSuccessfulAt: text('last_successful_at'),
   lastError: text('last_error'),
   updatedAt: updatedAt(),
-  // Le registre des tâches attendues (4.5, migration 0034, F604) : les exécutions manquées depuis la dernière réussite.
+  // Le registre des tâches attendues (4.5, migration 0037, F604) : les exécutions manquées depuis la dernière réussite.
   consecutiveFailures: integer('consecutive_failures').notNull().default(0),
   failingSince: text('failing_since'),
 });
