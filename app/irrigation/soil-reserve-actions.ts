@@ -28,7 +28,9 @@ export async function saveSoilRecordAction(input: {
   return withContext(input.season, async ({ ownerUserId, snapshot }) => {
     const place = placeOf(snapshot, input.season, input.record.zoneId, input.record.plotId);
     if (!place.ok) return { ok: false, message: place.problem };
-    const result = await addSoilRecordForUser(ownerUserId, input.record);
+    // Les parcelles du plan de la saison, pour confirmer l'étape « Sol » de l'accueil quand chacune a son sol (4.4, F584).
+    const planZoneIds = snapshot.zones.filter((zone) => zone.seasons.includes(input.season)).map((zone) => zone.id);
+    const result = await addSoilRecordForUser(ownerUserId, input.record, new Date(), planZoneIds);
     if (!result.ok) return { ok: false, message: result.problems.join(' ') };
     return {
       ok: true,

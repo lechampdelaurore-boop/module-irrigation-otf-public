@@ -1,3 +1,5 @@
+import type { PlotClassification } from './onboarding/plots.ts';
+
 export type Season = number;
 
 export type OtfConfiguration = {
@@ -42,7 +44,12 @@ export type Zone = {
   outline?: Outline;
 };
 
-export type PlotMode = 'garden' | 'greenhouse';
+/**
+ * Plein champ, abri, ou à classer : un jardin qu'une ferme en accueil n'a pas
+ * encore classé (4.4, F420, F583). Ouvre ta ferme ne donne que les deux
+ * premiers ; le troisième vient du classement de l'espace.
+ */
+export type PlotMode = 'garden' | 'greenhouse' | 'unclassified';
 
 export type Plot = {
   id: string;
@@ -55,6 +62,8 @@ export type Plot = {
   seasons: Season[];
   /** Absent : jardin non dessiné dans OTF, ou cache antérieur à S3 (« contour absent »). */
   outline?: Outline;
+  /** Pour un espace qui fait l'accueil : la proposition et le classement confirmé (4.4, F583). */
+  classification?: PlotClassification;
 };
 
 export type Bed = {

@@ -82,11 +82,18 @@ console.log('Base locale recréée et migrée.');
 // coché et le bandeau (docs/feature-selection-contract.md, R6), comme les fermes
 // réelles le jour de la mise en ligne. Une ferme neuve, pour la première
 // ouverture, se choisit par le témoin `demo-farm` (app/access-auth.ts).
+// Elle utilisait aussi le module avant l'accueil des nouvelles fermes (4.4) :
+// ses cinq étapes sont marquées « réglage d'avant l'accueil », comme la
+// migration 0034 l'a fait pour les espaces réels (docs/tranche-4-contract.md,
+// F426, F581).
 const seed = spawnSync(
   'pnpm',
   [
     'exec', 'wrangler', 'd1', 'execute', 'module-irrigation-otf', '--local', '--command',
-    "INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES ('local-demo-workspace', 'local-demo-user')",
+    "INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES ('local-demo-workspace', 'local-demo-user'); "
+      + 'INSERT INTO irrigation_onboarding_steps (workspace_id, step, state, origin, confirmed_at, updated_at) '
+      + "SELECT 'local-demo-workspace', step, 'confirmed', 'before-onboarding', strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now') "
+      + "FROM (SELECT 'location' AS step UNION ALL SELECT 'plots' UNION ALL SELECT 'soil' UNION ALL SELECT 'crops' UNION ALL SELECT 'settings')",
   ],
   {
     encoding: 'utf8',
@@ -100,4 +107,4 @@ if (seed.error || seed.status !== 0) {
   console.error('L’espace de la ferme de démonstration n’a pas pu être créé.');
   process.exit(seed.status ?? 1);
 }
-console.log('Espace de la ferme de démonstration créé, sans choix des fonctionnalités.');
+console.log('Espace de la ferme de démonstration créé, sans choix des fonctionnalités, accueil fait avant la 4.4.');

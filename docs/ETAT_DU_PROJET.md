@@ -359,6 +359,112 @@ registres, elle y renvoie.
   ferme). Contrôles : documentation seule.
   Consigne aussi le déploiement de la 4.3 PR 2 (coffre des jetons, #96, D-163) :
   en ligne le 19 novembre 2026 à 8 h 17, run 44475742993, cinq jobs verts.
+  **Code commencé le 20 novembre 2026**, sur le « vas-y » du porteur
+  (7 h 52), en Opus 5.5 · Élevé (ligne 4.4 de la roadmap). **PR 1 sur 5,
+  l'état de l'accueil et le marquage de l'espace existant** (D-222, F581,
+  section 8 bis.9 du contrat), **en ligne le 20 novembre 2026 à 16 h 13 (#126, fusionnée à 15 h 51, run 44757499085 vérifié job par job : les cinq jobs verts)** : une table `irrigation_onboarding_steps`
+  (migration additive 0034, le numéro libre : les migrations se suivent
+  sans trou, la 4.3 PR 3 prendra le suivant), une ligne par espace et par
+  étape confirmée (commune, parcelles et abris, sol, cultures, réglages à
+  relire) ; une étape sans ligne est « à faire ». La migration marque
+  chaque espace existant « accueil fait avant la 4.4 », cinq étapes
+  confirmées d'origine « avant l'accueil », sans toucher aucune autre
+  table : essai sur une copie (une ferme de la démonstration complète et un
+  espace rattaché, chaque ligne des autres tables identique après la
+  0034). Réglages montre l'accueil replié en bas de page, étape par étape,
+  en couleur et en mots ; la démonstration n'en a pas. **La bascule des
+  défauts en « à renseigner » et le bandeau « À finir » passent aux PR des
+  étapes qui permettent de les remplir** (PR 2 à 5), pour ne jamais montrer
+  un message que la personne ne peut pas suivre ; aucune ferme neuve
+  n'existe en production avant le pilote (F366). Aucun chiffre ne change à
+  l'écran pour l'espace existant. Contrôles de la PR : `pnpm lint`, `pnpm
+  typecheck`, `pnpm test` (1 828 tests, puis 441 pour chacun des trois
+  passages d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check`
+  (43 tests), `pnpm weather:check`, `pnpm site:check` réussis en local ;
+  sept sabotages des règles, chacun détecté ; P46 (nouveau), P40 et P22
+  joués en local aux deux largeurs, réussis (Réglages reste sous son budget
+  de 3 400 px au téléphone) ; la suite complète des parcours jouée par la CI
+  de la PR (longs essais sur GitHub). Non vérifié : le marquage sur la base réelle (aucun
+  accès à la base de production ni à Cloudflare depuis la session de
+  code) ; il sera lu dans Réglages après le déploiement.
+  **PR 2a, la commune de la ferme** (D-223, F582, section 8 bis.10 du
+  contrat), **en ligne le 20 novembre 2026 à 16 h 40 (#127, fusionnée à 16 h 14, run 44761350240 vérifié job par job : les cinq jobs verts)** : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
+  abris ; 2c la proposition par `placeLngLat`, à l'accès d'OTF). Une ferme
+  neuve n'a plus le siège de sa structure pour commune en silence : sans
+  commune confirmée, ni météo, ni gel, ni ET0, la page le dit, et un
+  bandeau « À finir : commune de la ferme. » paraît sur chaque page quand
+  une case lit la météo. Choisir une commune, ou prendre le siège d'un
+  geste « en dernier recours », confirme l'étape dans le même lot
+  d'écriture, avec sa provenance ; hors de France métropolitaine, refusé.
+  Les fermes d'avant l'accueil gardent leur commune telle quelle ; aucun
+  appel nouveau à OTF. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test` (1 837 tests, puis 448 pour chacun des trois passages
+  d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; cinq sabotages, chacun
+  détecté ; P46 (étendu), P29, P33, P40, P22, P23, P25, P28, P30, P31,
+  P31b, P31c joués en local aux deux largeurs, réussis ; la suite complète
+  par la CI de la PR.
+  **PR 2b, parcelles et abris** (D-224, F583, section 8 bis.11 du
+  contrat), **en ligne le 20 novembre 2026 à 17 h 34 (#129, fusionnée à 17 h 09, run 44770488501 vérifié job par job : les cinq jobs verts)** : la lecture d'OTF classait chaque jardin par le type que lui
+  donne OTF (une énumération, pas son nom, contrairement à ce que F420
+  supposait). Le classement confirmé est désormais gardé par espace (table
+  `irrigation_plot_shelters`, migration additive 0035) et posé sur le plan
+  à chaque lecture ; pour une ferme qui fait l'accueil, un jardin non classé
+  est « à classer » : ni besoin, ni réserve, ni proposition calculés, la
+  raison dite (« Non calculable : jardin à classer… »). Dans Réglages,
+  « Parcelles et abris » propose (type d'OTF, sinon nom : « serre »,
+  « châssis » ajoutés), la personne confirme, corrige ou laisse à classer ;
+  l'étape suit dans le même lot ; bandeau « À finir : N jardins à
+  classer. ». Les fermes d'avant l'accueil gardent le classement d'OTF ; la
+  migration n'écrit rien ; K_abri inchangé ; aucun appel nouveau à OTF.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`
+  (1 854 tests, puis 457 pour chacun des trois passages d'isolation),
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; sept sabotages, chacun détecté ;
+  P46 (étendu), P28, P29, P31, P31b, P33 joués en local aux deux largeurs,
+  réussis ; la suite complète par la CI de la PR.
+  **PR 3, le sol** (D-225, F584, section 8 bis.12 du contrat), **en ligne le 20 novembre 2026 à 18 h 03 (#131, fusionnée à 17 h 37, run 44775171860 vérifié job par job : les cinq jobs verts)** : pour une
+  ferme qui fait l'accueil, le formulaire du sol d'une parcelle n'a plus
+  TEW 14 / REW 7 préremplis ; la texture, parmi les neuf du tableau 19 de
+  la FAO-56, propose TEW et REW au milieu de leur fourchette, dite à côté
+  avec sa source, à ajuster (valeurs relues sur la page de la FAO et
+  recoupées par ses exemples 31 et 35) ; la texture est gardée avec la saisie (colonne
+  `texture`, migration additive 0036, nulle avant) ; l'étape « Sol » est
+  confirmée par le sol de la dernière parcelle ; bandeau « À finir : sol de
+  N parcelles », vers « Réserve du sol ». Les fermes d'avant l'accueil et
+  la démonstration gardent leurs valeurs de départ. Garde ajoutée à la
+  PR 2a : une étape d'avant l'accueil n'est jamais réécrite (changer de
+  commune ne fait pas rentrer une ferme existante dans l'accueil). La
+  texture d'OTF attend l'accès d'OTF (3b). Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (1 862 tests, puis 465 pour chacun des
+  trois passages d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; quatre
+  sabotages, chacun détecté ; P46 (étendu), P18, P19, P29, P31b, P33 joués
+  en local aux deux largeurs, réussis (14 sur 14) ; la suite complète par
+  la CI de la PR.
+  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat) : le
+  plafond de 0,60 m de l'asperge et du melon, celui de la ferme du porteur,
+  est dans le jeu commun ; pour une ferme qui fait l'accueil, il est
+  remplacé à la lecture par la borne basse de la FAO-56 (asperge 1,20 m,
+  melon 0,80 m), dite « estimation » ; une révision de la ferme le remplace
+  toujours ; aucune migration ; la ferme du porteur et la démonstration
+  inchangées. La PR 4 en trois : 4b la région des cultures, 4c le
+  rattachement des espèces et le modèle des 78 liens. Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 867 tests, puis 470 pour
+  chacun des trois passages d'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; quatre sabotages, chacun détecté ; aucun écran changé, la suite
+  des parcours par la CI de la PR.
+  **PR 4b, la région des cultures** (D-227, F586, section 8 bis.14 du
+  contrat) : chaque fiche de culture dit d'où viennent ses dates de stade
+  (Sud / Occitanie pour le CRIIAM, générales pour la FAO-56, ou la ferme) ;
+  une ferme qui fait l'accueil, d'une autre région, est avertie sur les
+  cultures communes du CRIIAM ; région tirée du code postal de la commune
+  confirmée ; aucune migration ; la ferme du porteur et la démonstration
+  sans avertissement. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; six sabotages,
+  chacun détecté ; parcours P46 étendu, P17, P20 et P31c rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un
@@ -734,7 +840,7 @@ registres, elle y renvoie.
   en ligne le 20 novembre 2026 à 14 h 45 (#148, fusionnée à 14 h 23, run 44743952625 vérifié job par job). **PR 7, grand écran, tablette et 320 px** (D-196, F480 à F482) :
   la page centrée et le menu jusqu'en bas au grand écran, la barre du bas
   et les cibles de 44 px jusqu'à 980 px, les noms entiers à 320 px ;
-  codée. Lot K codé en entier.
+  en ligne le 20 novembre 2026 à 15 h 23 (#150, fusionnée à 15 h 05, run 44750080070 vérifié job par job : les cinq jobs verts). Lot K codé en entier et en ligne.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

@@ -1,23 +1,45 @@
 import type { OtfStructure } from '../domain.ts';
 import type { WeatherLocationCandidate } from './weather-provider.ts';
 
-export function weatherLocationKey(
-  preference: {
-    locationMode: 'otf' | 'custom';
-    customCity: string | null;
-    customPostcode: string | null;
-  },
+/**
+ * La préférence de lieu d'un espace, telle que le calcul la lit : le mode
+ * enregistré, et si la commune est confirmée (4.4, F419). Un espace qui fait
+ * l'accueil sans avoir choisi sa commune n'a pas de lieu : le siège de la
+ * structure d'OTF n'est jamais pris en silence.
+ */
+type LocationPreference = {
+  locationMode: 'otf' | 'custom';
+  customCity: string | null;
+  customPostcode: string | null;
+  locationConfirmed: boolean;
+};
+
+/** La commune à chercher pour la météo, et d'où elle vient ; `null` : aucune commune (non choisie, ou siège vide). */
+export function weatherLocationQuery(
+  preference: LocationPreference,
   structure: OtfStructure,
-): string | null {
-  const city = preference.locationMode === 'custom'
-    ? preference.customCity
-    : structure.legalCity;
-  const postcode = preference.locationMode === 'custom'
-    ? preference.customPostcode
-    : structure.legalPostcode;
+): { source: 'otf' | 'custom'; city: string; postcode: string | null } | null {
+  if (!preference.locationConfirmed) return null;
+  const source = preference.locationMode;
+  const city = source === 'custom' ? preference.customCity : structure.legalCity;
+  const postcode = source === 'custom' ? preference.customPostcode : structure.legalPostcode;
   if (!city?.trim()) return null;
-  const prefix = preference.locationMode === 'custom' ? 'custom' : 'otf';
-  return `${prefix}:${normalizeLocation(city)}:${normalizeLocation(postcode ?? '')}`;
+  return { source, city, postcode: postcode ?? null };
+}
+
+export function weatherLocationKey(preference: LocationPreference, structure: OtfStructure): string | null {
+  const query = weatherLocationQuery(preference, structure);
+  if (!query) return null;
+  return `${query.source}:${normalizeLocation(query.city)}:${normalizeLocation(query.postcode ?? '')}`;
+}
+
+/**
+ * Une commune hors de France métropolitaine (outre-mer : codes postaux en 97
+ * et 98) est hors du pilote (4.4, F419, réponse Q2 du porteur) : rien n'est
+ * enregistré.
+ */
+export function outsidePilotArea(candidate: Pick<WeatherLocationCandidate, 'countryCode' | 'postcode'>): boolean {
+  return candidate.countryCode !== 'FR' || /^9[78]/.test(candidate.postcode?.trim() ?? '');
 }
 
 export function locationKeyForCandidate(candidate: WeatherLocationCandidate): string {

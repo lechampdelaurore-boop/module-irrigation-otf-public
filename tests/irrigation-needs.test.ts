@@ -386,6 +386,24 @@ test('les boutons d’information sont utilisables au clavier, au clic, au touch
   assert.match(source, /planningComplete/);
 });
 
+test('un jardin à classer n’a pas de besoin calculé, et la raison le dit (4.4, F583)', () => {
+  const dashboard = build({
+    plots: [plot('plot-out', 'Jardin', 'garden'), plot('plot-new', 'Jardin neuf', 'unclassified')],
+    beds: [bed('bed-a', 'Planche A', 'plot-out', 100), bed('bed-b', 'Planche B', 'plot-new', 100)],
+    actualRain: 10,
+  });
+  const beds = dashboard.gardens.flatMap((garden) => garden.beds);
+  const known = beds.find((item) => item.bedId === 'bed-a')!;
+  const unclassified = beds.find((item) => item.bedId === 'bed-b')!;
+  assert.notEqual(known.calculatedNeedMm, null);
+  assert.equal(unclassified.calculatedNeedMm, null);
+  assert.equal(unclassified.realRemainingMm, null);
+  assert.equal(unclassified.actualRainMm, null, 'ni zéro d’abri, ni pluie de plein champ');
+  assert.equal(unclassified.sheltered, false);
+  assert.deepEqual(unclassified.completeness.missing, ['unclassified-plot']);
+  assert.equal(dashboard.gardens.find((garden) => garden.plotId === 'plot-new')!.effectiveNeedMm, null);
+});
+
 function build(options: {
   et0?: number; actualRain?: number; forecastRain?: number; missingEt0?: boolean; missingActualRain?: boolean; missingForecast?: boolean;
   /** Prévision absente sur le premier jour de la semaine, celui qui est aussi le jour courant. */
@@ -440,7 +458,7 @@ function weekDays(weekStart: string) {
   });
 }
 
-function plot(id: string, name: string, mode: 'garden' | 'greenhouse') { return { id, zoneId: 'zone', name, mode, length: 10, width: 10, area: 100, seasons: [2026] as number[] }; }
+function plot(id: string, name: string, mode: 'garden' | 'greenhouse' | 'unclassified') { return { id, zoneId: 'zone', name, mode, length: 10, width: 10, area: 100, seasons: [2026] as number[] }; }
 function bed(id: string, name: string, plotId: string, bedArea: number) { return { id, zoneId: 'zone', plotId, name, length: 10, width: 1, alleyWidth: .5 as number | null, area: bedArea, seasons: [2026] as number[] }; }
 function day(date: string, et0Mm: number | null, actualRainMm: number | null, forecastRainMm: number | null): WaterDashboardDay { return { date, volumeIncomplete: false, realizedIrrigationCubicMeters: 0, plannedIrrigationCubicMeters: 0, estimatedOngoingCubicMeters: 0, reanalysisRainMm: actualRainMm, manualRainMm: null, effectiveActualRainMm: actualRainMm, forecastRainMm, forecastMinimumTemperatureCelsius: null, forecastMaximumTemperatureCelsius: null, et0Mm, et0Kind: et0Mm === null ? null : 'forecast', limitCubicMeters: null, limitExceededByCubicMeters: 0, actualLimitExceededByCubicMeters: 0 }; }
 function goal(scopeType: 'farm' | 'zone' | 'plot' | 'bed', zoneId: string | null, plotId: string | null, bedId: string | null, amountMm: number) { return { id: `goal-${scopeType}-${bedId ?? plotId ?? zoneId ?? 'all'}`, weekStart: '2026-09-07', scopeType, otfZoneId: zoneId, otfPlotId: plotId, otfBedId: bedId, amountMm, action: 'set' as const, createdAt: '2026-09-07T00:00:00.000Z' }; }
