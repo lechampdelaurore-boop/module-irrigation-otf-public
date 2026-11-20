@@ -487,7 +487,7 @@ registres, elle y renvoie.
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
   P31 et P10 rejoués en local.
   **PR 5b, la vérification finale** (D-230, F589, section 8 bis.17 du
-  contrat) : le pli « Accueil de la ferme » dit chaque groupe des réglages
+  contrat), en ligne le 20 novembre 2026 à 20 h 39 (#137, fusionnée à 20 h 12, run 44799990126 vérifié job par job : les cinq jobs verts) : le pli « Accueil de la ferme » dit chaque groupe des réglages
   (confirmé, passé ou proposé) et ce qui reste inconnu (espèces non
   rattachées, jardins à classer, parcelles sans sol), avec leur lien ;
   plusieurs fermes d'une même personne (F418) remis à la 4.3, PR 3.
@@ -495,7 +495,7 @@ registres, elle y renvoie.
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
   **PR 4d, le modèle des rattachements du porteur** (D-231, F590, section
-  8 bis.18 du contrat) : 40 liens espèce-culture relevés en lecture seule
+  8 bis.18 du contrat), en ligne le 20 novembre 2026 à 21 h 01 (#146, fusionnée à 20 h 41, run 44804467204 vérifié job par job : les cinq jobs verts) : 40 liens espèce-culture relevés en lecture seule
   dans sa ferme (saison 2026, 77 espèces), 11 par analogie, l'analogie
   gardée ; les espèces sans référence et l'engrais vert hors du modèle.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
