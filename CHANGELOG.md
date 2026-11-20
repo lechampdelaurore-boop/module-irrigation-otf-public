@@ -14,7 +14,7 @@ source détaillée commit par commit.
   son dernier calcul du matin ; le jugement d'ensemble compte les fermes.
   Chaque appel envoyé à OTF est compté par ferme et par heure, et chaque
   échec se journalise sous un nom stable, sans adresse, ferme ni jeton.
-  Migration 0036, additive ; parcours P50 étendu.
+  Migration 0039, additive ; parcours P50 étendu.
 - **Un garde des journaux dans les essais** : chaque ligne écrite pendant
   `pnpm test` est lue, et le fichier échoue si l'une ressemble à un jeton,
   un code d'autorisation, une adresse de retour, une adresse électronique
@@ -36,7 +36,7 @@ source détaillée commit par commit.
   page « État du module » (`/irrigation/exploitation`), réservée à
   l'exploitant, dit en une ligne si tout va bien, puis l'état de chaque
   tâche, sa dernière réussite et son dernier échec. La veille est elle-même
-  une tâche du registre. Migration 0035, additive ; parcours P50.
+  une tâche du registre. Migration 0038, additive ; parcours P50.
 
 ### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
 
@@ -48,7 +48,7 @@ source détaillée commit par commit.
   panne » à 36 heures ou après trois échecs de suite, et n'est jamais verte
   faute de réussite. Un test échoue pour tout déclencheur planifié absent du
   registre. Rien ne change à l'écran : la page d'état et la veille de
-  l'exploitant viennent avec la PR 2. Migration 0034, additive.
+  l'exploitant viennent avec la PR 2. Migration 0037, additive.
 
 ### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
 
