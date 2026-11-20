@@ -4,13 +4,13 @@ import { FARM_TIME_ZONE } from '@/lib/domain/water-management';
 import type { IrrigationEventConfirmation } from '../irrigation-event/contract';
 import { ConfirmDialog } from '../shell/confirm-dialog';
 import type { CreationKind } from './presentation';
+import { clockText as farmClockText } from '@/lib/domain/clock-text';
 
 const dayFormatter = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', timeZone: FARM_TIME_ZONE });
-const timeFormatter = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: FARM_TIME_ZONE });
 
-/** « 11 h 13 », à l'heure de la ferme. */
+/** « 11 h 13 », « 8 h 05 », à l'heure de la ferme (audit du 19 novembre 2026, lot K, n° 22, F474). */
 function clockText(value: string) {
-  return timeFormatter.format(new Date(value)).replace(':', ' h ');
+  return farmClockText(value, FARM_TIME_ZONE);
 }
 
 const LABELS: Record<CreationKind | 'edit', { title: string; question: string; confirm: string; cancel: string }> = {
