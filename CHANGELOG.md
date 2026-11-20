@@ -15,6 +15,24 @@ source détaillée commit par commit.
   chiffre change. Réglages montre l'accueil, replié en bas de la page,
   étape par étape. Les écrans des étapes viendront avec les PR suivantes.
 
+### Modifié (audit du 19 novembre 2026, lot J, PR 7 sur 7)
+
+- **« Arrosages » et « Historique » : le premier geste plus haut** (D-189) :
+  « Résultat calculé » ne montre ses chiffres qu'une fois un matériel et une
+  quantité choisis, une phrase dit quoi choisir avant ; le bouton et la
+  réponse du module restent à leur place. Dans « Historique », les filtres
+  (parcelle, jardin, planche) sont dans un pli « Filtrer » qui dit le
+  périmètre choisi, et « Exporter CSV… » devient un bouton secondaire, après
+  les chiffres.
+
+### Modifié (audit du 19 novembre 2026, lot J, PR 6 sur 7)
+
+- **« Matériel » en trois onglets** (D-188) : Plan, Matériel et Groupes en
+  tête de page, l'onglet gardé dans l'adresse ; l'inventaire ne commence
+  plus à 11 000 px au téléphone. Au téléphone, chaque jardin du plan tient
+  sur une ligne et s'ouvre à l'appui. Un nom de matériel trop long se coupe
+  au milieu, sa fin reste lisible ; le fil d'Ariane passe à la ligne.
+
 ### Modifié (audit du 19 novembre 2026, lot J, PR 5 sur 7)
 
 - **« Objectifs et besoins » court au téléphone** (D-187) : les objectifs,

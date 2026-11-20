@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 
 /**
  * Parcours P6 : changer le réglage appliqué sans déplacer le matériel
@@ -28,6 +28,8 @@ test('la liste « Réglage appliqué » change l’apport sans passer par le pla
   // Un seul réglage ne laisse aucun choix : la liste n'a pas lieu d'être.
   await expect(carte.getByLabel('Réglage appliqué')).toHaveCount(0);
 
+  // Les réglages se changent sur la fiche, sous « Matériel » (lot J, n° 15, F461).
+  await ouvrirLOnglet(page, 'Matériel');
   await carte.getByLabel(`Actions pour ${materiel}`).click();
   await carte.getByRole('menuitem', { name: 'Configurer les réglages' }).click();
   const reglages = page.locator('dialog[open], [role=dialog]').filter({ hasText: materiel });
@@ -48,6 +50,7 @@ test('la liste « Réglage appliqué » change l’apport sans passer par le pla
   const choix = carte.getByLabel('Réglage appliqué');
   await expect(choix).toBeVisible();
   await choix.selectOption({ label: 'Plein débit' });
+  await ouvrirLOnglet(page, 'Plan');
   await expect(surLaPlanche).toHaveAttribute('title', contribution(25), { timeout: 10_000 });
   await expect(page.getByText('Cliquez sur chaque planche alimentée par ce matériel.')).toHaveCount(0);
   await expect(carte).toContainText(`Posé sur ${planche} depuis le`);

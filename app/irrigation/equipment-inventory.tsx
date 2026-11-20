@@ -1,5 +1,6 @@
 'use client';
 
+import { MiddleCut } from './shell/middle-cut';
 import { useConfirm } from './shell/use-confirm';
 import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-record';
 import type { EquipmentListItem } from '@/lib/domain/equipment-record';
@@ -429,7 +430,7 @@ function EquipmentCard({
         {item.kind === 'sprinkler' ? 'ASP' : 'GÀG'}
       </span>
       <div className="equipment-card-copy">
-        <strong>{item.name}</strong>
+        <strong><MiddleCut text={item.name} /></strong>
         <span>
           {kindLabel(item.kind)} · {mobilityLabel(item.mobility)}
         </span>
