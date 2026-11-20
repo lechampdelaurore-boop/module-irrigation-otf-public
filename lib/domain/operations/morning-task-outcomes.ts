@@ -60,13 +60,14 @@ const WEATHER_FAILURE_WORDS: Record<WeatherFailureKind, string> = {
 export function morningTaskOutcomes(report: MorningRunReport): TaskOutcome[] {
   if (report.weather?.status === 'already-running') return [];
   const interrupted = `interrompu avant la fin (${errorClassWords(report.interruptedBy)})`;
-  const outcomes: Record<TaskKey, TaskOutcome> = {
+  // Les tâches d'un autre déclencheur (la veille de 9 h) n'ont rien à dire du matin.
+  const outcomes: Partial<Record<TaskKey, TaskOutcome>> = {
     'weather-forecast': weatherOutcome('weather-forecast', report, 'forecastFailures', 'sans prévisions', interrupted),
     'weather-reanalysis': weatherOutcome('weather-reanalysis', report, 'reanalysisFailures', 'sans pluie estimée', interrupted),
     'morning-calculation': morningCalculationOutcome(report, interrupted),
     'otf-vault-morning': vaultOutcome(report, interrupted),
   };
-  return tasksOfTrigger('weather-morning').map((task) => outcomes[task]);
+  return tasksOfTrigger('weather-morning').map((task) => outcomes[task] ?? failed(task, 'tâche du matin sans résultat'));
 }
 
 function weatherOutcome(
@@ -142,6 +143,7 @@ function kindsWords(kinds: readonly WeatherFailureKind[]): string {
 }
 
 /** Le nom d'une classe d'erreur, gardé seulement s'il n'est fait que de lettres (jamais un message). */
-function errorClassWords(errorClass: string | undefined): string {
+/** « erreur TypeError », ou « erreur inconnue » pour un nom qui n'est pas une classe d'erreur (F604). */
+export function errorClassWords(errorClass: string | undefined): string {
   return errorClass && /^[A-Za-z_]{1,40}$/.test(errorClass) ? `erreur ${errorClass}` : 'erreur inconnue';
 }

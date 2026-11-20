@@ -34,11 +34,13 @@ type Reference = {
  * les espaces de la ferme : des fermes, des heures et des nombres. Le
  * raccordement d'une ferme à OTF (migration 0033, F403) a pour clé la ferme,
  * et se lit par la personne et la ferme ensemble, l'espace lui-même ; il ne
- * désigne aucune ligne d'un espace.
+ * désigne aucune ligne d'un espace. La notification du jour de la veille de
+ * l'exploitant (migration 0038, F609) : un genre, un nombre et des heures.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
   'irrigation_crop_alert_common',
+  'irrigation_operator_notices',
   'otf_authentication_failures',
   'otf_call_pauses',
   'otf_call_starts',

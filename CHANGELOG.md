@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 2 sur 5, première partie)
+
+- **La veille de l'exploitant et sa page d'état** (D-241, F608 à F613) :
+  chaque jour à 9 h, un second déclencheur du planificateur lit le registre
+  des tâches et, si l'une est en retard, en panne ou jamais réussie, envoie
+  une notification à l'exploitant qui dit laquelle et depuis quand ; le
+  dimanche, quand tout va bien, « tout va bien », dont l'absence dit que la
+  veille elle-même ne tourne plus. Une notification par jour au plus. La
+  page « État du module » (`/irrigation/exploitation`), réservée à
+  l'exploitant, dit en une ligne si tout va bien, puis l'état de chaque
+  tâche, sa dernière réussite et son dernier échec. La veille est elle-même
+  une tâche du registre. Migration 0038, additive ; parcours P50.
+
 ### Corrigé (un essai du lot I, qui échouait chaque soir)
 
 - **L'essai de la démonstration « Pic d'été, l'eau manque » ne dépend plus de
@@ -12,7 +25,6 @@ source détaillée commit par commit.
   de la ferme, et chaque soir vers 21 h 30 à Paris un arrosage du jour passé
   changeait l'eau versée sur les planches vides (0,33 m³ au lieu de 0,49) ;
   l'essai fige l'heure réelle. Rien ne change dans le module.
-
 ### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
 
 - **Le registre des tâches attendues** (D-240, F600 à F607) : les quatre

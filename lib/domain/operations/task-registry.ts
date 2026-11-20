@@ -18,9 +18,9 @@
  */
 
 /** Les tâches du registre ; la clé est aussi celle de la ligne qui garde leurs exécutions. */
-export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning';
+export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning' | 'operator-watch';
 
-export type TriggerKey = 'weather-morning' | 'demo-nightly-reset';
+export type TriggerKey = 'weather-morning' | 'operator-watch' | 'demo-nightly-reset';
 
 export type TaskDeclaration = {
   key: TaskKey;
@@ -88,6 +88,13 @@ export const TASK_TRIGGERS: readonly TriggerDeclaration[] = [
     monitored: true,
   },
   {
+    key: 'operator-watch',
+    config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
+    cron: '0 7,8 * * *',
+    description: 'Le planificateur appelle la veille de l\'exploitant à 9 h, heure de Paris : un déclencheur distinct de ceux qu\'elle surveille (R5).',
+    monitored: true,
+  },
+  {
     key: 'demo-nightly-reset',
     config: 'wrangler.demo.jsonc',
     cron: '17 2 * * *',
@@ -133,6 +140,17 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ifMissing: 'Les jetons chiffrés avec l\'ancienne clé ne sont pas chiffrés de nouveau ; un jeton illisible n\'est pas signalé.',
     successKeptIn: 'Ligne « task:otf-vault-morning » de irrigation_background_jobs (réussie quand le coffre est endormi sans clé, ou quand chaque jeton se lit).',
     trigger: 'weather-morning',
+  },
+  {
+    key: 'operator-watch',
+    label: 'Veille de l\'exploitant',
+    rhythm: '1 par jour, à 9 h (heure de Paris)',
+    lateAfterHours: 26,
+    brokenAfterHours: 36,
+    thresholdReason: 'Une exécution par jour à 9 h : orange à 26 heures (un jour et deux heures de marge), rouge à 36 heures (au moins un jour sans veille). Si la veille ne passe plus, la notification « tout va bien » du dimanche manque : l\'exploitant sait qu\'il doit regarder (F566).',
+    ifMissing: 'Une panne d\'une autre tâche ne remonte plus à l\'exploitant sans qu\'il ouvre la page d\'état.',
+    successKeptIn: 'Ligne « task:operator-watch » de irrigation_background_jobs (réussie quand la veille a lu le registre et que la notification due, s\'il y en avait une, est partie vers un appareil de l\'exploitant).',
+    trigger: 'operator-watch',
   },
 ];
 
