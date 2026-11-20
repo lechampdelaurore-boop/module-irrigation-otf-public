@@ -7,6 +7,7 @@ import {
 } from '@/db/operator-repository';
 import { logJsonLine } from '../adapters/log';
 import type { IrrigationPushSendRequest } from '../domain/irrigation-push-contract';
+import { errorClassWords } from '../domain/operations/morning-task-outcomes';
 import { operatorWatchNotice, parisDay, type OperatorNotice } from '../domain/operations/operator-watch';
 import { knownDeploymentFarm } from './farm-identity-service';
 import { type IrrigationPushSendResult, sendIrrigationPushNotification } from './irrigation-push-service';
@@ -73,7 +74,7 @@ export async function runOperatorWatch({
       }
     }
   } catch (caught) {
-    error = `interrompue avant la fin (erreur ${caught instanceof Error && /^[A-Za-z_]{1,40}$/.test(caught.name) ? caught.name : 'inconnue'})`;
+    error = `interrompue avant la fin (${errorClassWords(caught instanceof Error ? caught.name : undefined)})`;
     result = { notice: 'none', problems: 0, successful: false };
   }
   await recordTaskOutcomes([{ task: 'operator-watch', successful: result.successful, error }], { at, log });

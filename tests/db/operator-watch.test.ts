@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach } from 'node:test';
+import { overrideDatabase } from '../../db/binding';
 import { claimOperatorNotice, readLatestOperatorNotice } from '../../db/operator-repository';
 import { readTaskRuns, recordTaskRun } from '../../db/task-run-repository';
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
@@ -162,6 +163,25 @@ test('le service de notification en panne, ou la ferme du déploiement inconnue 
     { lastError: 'ferme du déploiement inconnue : aucun exploitant à prévenir', consecutiveFailures: 3 },
     'trois veilles manquées de suite : la page d’état la montrera en panne',
   );
+});
+
+test('la base hors d’usage : la veille ne lève pas, elle dit qu’elle a été interrompue, sans recopier le message de la base', async () => {
+  const { requests, send } = sender();
+  const { lines, log } = journal();
+  overrideDatabase({ prepare: () => { throw new TypeError('D1_ERROR: base indisponible'); } } as unknown as D1Database);
+  let result;
+  try {
+    result = await runOperatorWatch({ now: FRIDAY, send, deploymentFarm, log });
+  } finally {
+    overrideDatabase(database.d1);
+  }
+  assert.deepEqual(result, { notice: 'none', problems: 0, successful: false });
+  assert.equal(requests.length, 0);
+  assert.deepEqual(lines.find((line) => line.event === 'operator_watch_failed'), {
+    event: 'operator_watch_failed', notice: 'none', problems: 0, summary: 'interrompue avant la fin (erreur TypeError)',
+  });
+  assert.deepEqual(lines.find((line) => line.event === 'task_run_record_failed'), { event: 'task_run_record_failed', task: 'operator-watch', error: 'TypeError' });
+  assert.ok(!JSON.stringify(lines).includes('base indisponible'));
 });
 
 test('rien à signaler : aucune notification en semaine, « tout va bien » le dimanche, et la veille réussie dans les deux cas', async () => {

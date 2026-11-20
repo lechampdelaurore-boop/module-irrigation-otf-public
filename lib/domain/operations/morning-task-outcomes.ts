@@ -143,6 +143,7 @@ function kindsWords(kinds: readonly WeatherFailureKind[]): string {
 }
 
 /** Le nom d'une classe d'erreur, gardé seulement s'il n'est fait que de lettres (jamais un message). */
-function errorClassWords(errorClass: string | undefined): string {
+/** « erreur TypeError », ou « erreur inconnue » pour un nom qui n'est pas une classe d'erreur (F604). */
+export function errorClassWords(errorClass: string | undefined): string {
   return errorClass && /^[A-Za-z_]{1,40}$/.test(errorClass) ? `erreur ${errorClass}` : 'erreur inconnue';
 }
