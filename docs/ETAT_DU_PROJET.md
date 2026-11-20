@@ -387,6 +387,23 @@ registres, elle y renvoie.
   de la PR (longs essais sur GitHub). Non vérifié : le marquage sur la base réelle (aucun
   accès à la base de production ni à Cloudflare depuis la session de
   code) ; il sera lu dans Réglages après le déploiement.
+  **PR 2a, la commune de la ferme** (D-223, F582, section 8 bis.10 du
+  contrat) : la PR 2 se fait en trois (2a la commune ; 2b parcelles et
+  abris ; 2c la proposition par `placeLngLat`, à l'accès d'OTF). Une ferme
+  neuve n'a plus le siège de sa structure pour commune en silence : sans
+  commune confirmée, ni météo, ni gel, ni ET0, la page le dit, et un
+  bandeau « À finir : commune de la ferme. » paraît sur chaque page quand
+  une case lit la météo. Choisir une commune, ou prendre le siège d'un
+  geste « en dernier recours », confirme l'étape dans le même lot
+  d'écriture, avec sa provenance ; hors de France métropolitaine, refusé.
+  Les fermes d'avant l'accueil gardent leur commune telle quelle ; aucun
+  appel nouveau à OTF. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test` (1 837 tests, puis 448 pour chacun des trois passages
+  d'isolation), `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local ; cinq sabotages, chacun
+  détecté ; P46 (étendu), P29, P33, P40, P22, P23, P25, P28, P30, P31,
+  P31b, P31c joués en local aux deux largeurs, réussis ; la suite complète
+  par la CI de la PR.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

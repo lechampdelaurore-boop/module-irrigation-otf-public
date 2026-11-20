@@ -35,7 +35,7 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
-      <OnboardingSettings onboarding={onboarding} />
+      <OnboardingSettings onboarding={onboarding} locationHere={waterDashboard !== null} />
     </IrrigationShell>
   );
 }

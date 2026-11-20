@@ -25,6 +25,9 @@ import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-servi
 import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
+import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
+import { usesWeather } from '@/lib/domain/features/socle';
+import { getOnboardingForUser } from '@/lib/services/onboarding-service';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
 
@@ -98,7 +101,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const enabled: FeatureId[] = selection.enabled;
   stopwatch.lap('selection');
 
-  const loaded = await loadSnapshot(user.userId, season, forceRefresh);
+  // L'accueil de la ferme se lit avec le plan : le bandeau « À finir » de chaque page (4.4, F582).
+  const [loaded, onboarding] = await Promise.all([loadSnapshot(user.userId, season, forceRefresh), getOnboardingForUser(user.userId)]);
   stopwatch.lap('snapshot');
   if (!loaded.snapshot) {
     return {
@@ -146,6 +150,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       notice: absentPageNotice(params.absente),
       demo: isDemoDeployment(),
       demoSelection: isDemoDeployment() ? demoSelectionOfOwner(user.userId) : null,
+      unfinished: unfinishedSteps(onboarding, { weather: usesWeather(enabled) }),
     },
     lap: (step) => stopwatch.lap(step),
     logLoaded: () => {

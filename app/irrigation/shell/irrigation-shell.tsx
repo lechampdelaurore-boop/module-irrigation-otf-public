@@ -7,10 +7,12 @@ import { pageHelp } from '@/lib/domain/features/help';
 import { FEATURE_SETTINGS_ANCHOR, pageHref, pageLabel, pagePath, type AbsentPageNotice, type IrrigationPageId } from '@/lib/domain/features/pages';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
+import type { UnfinishedStep } from '@/lib/domain/onboarding/steps';
 import { createSeasons, sourceLabel } from '../hierarchy/presentation';
 import { Icon } from '../line-icon';
 import { FeatureBanner } from './feature-banner';
 import { FeatureMenu } from './feature-menu';
+import { UnfinishedBanner } from './unfinished-banner';
 import { PageTitle } from './page-title';
 import { Topbar } from './topbar';
 
@@ -47,6 +49,8 @@ export type ShellProps = {
   demo: boolean;
   /** En démonstration, la ferme fictive et le moment de l'invité. */
   demoSelection: DemoSelection | null;
+  /** Les étapes de l'accueil à finir, dites sur chaque page (4.4, F582) ; vide pour une ferme réglée. */
+  unfinished: readonly UnfinishedStep[];
 };
 
 export function IrrigationShell({
@@ -61,7 +65,7 @@ export function IrrigationShell({
   /** La pastille de « Aujourd'hui » quand la page la connaît (F12) ; absente, le menu la lit après l'affichage. */
   todayBadge?: number | null;
 }) {
-  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice, demo, demoSelection } = props;
+  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice, demo, demoSelection, unfinished } = props;
 
   const shell = useRef<HTMLElement>(null);
 
@@ -126,6 +130,8 @@ export function IrrigationShell({
               <a href={pageHref('reglages', { season, zone }, FEATURE_SETTINGS_ANCHOR)}>{notice.settingsLabel}</a>
             </p>
           ) : null}
+
+          <UnfinishedBanner steps={unfinished} query={{ season, zone }} />
 
           {banner ? <FeatureBanner text={banner} settingsHref={page === 'reglages' ? null : pageHref('reglages', { season, zone })} /> : null}
 

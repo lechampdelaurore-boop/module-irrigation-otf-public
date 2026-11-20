@@ -1,7 +1,7 @@
 import { bedWaterSettings, readCropWaterInputsForWorkspace } from '@/db/crop-water/inputs';
 import { readLatestPlanForUser, readPlanningSettingsForUser } from '@/db/planning-repository';
 import { readSoilReserveInputsForWorkspace, type SoilReserveInputs } from '@/db/soil-reserve/inputs';
-import { listWeatherDailyValuesForUser, readWeatherPreferenceForUser } from '@/db/water-management-repository';
+import { listWeatherDailyValuesForUser } from '@/db/water-management-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import type { StoredWeeklyPlan } from '../domain/planning/contract';
@@ -16,6 +16,7 @@ import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc,
 import { weatherLocationKey } from '../domain/weather/location';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
 import { cropWaterBedInput, et0Readings } from './crop-water-week';
+import { readWeatherPreference } from './weather-preference';
 
 /**
  * Le bloc « Réserve du sol » de la section « Planning de la semaine »
@@ -160,7 +161,7 @@ async function soilDays(input: {
   const dates: string[] = [];
   for (let date = from; date <= weekEnd; date = addDaysToDateKey(date, 1)) dates.push(date);
 
-  const locationKey = weatherLocationKey(await readWeatherPreferenceForUser(input.ownerUserId), snapshot.structure);
+  const locationKey = weatherLocationKey(await readWeatherPreference(input.ownerUserId), snapshot.structure);
   const [cropInputs, weather, events, plan, planningSettings] = await Promise.all([
     readCropWaterInputsForWorkspace(input.workspaceId, season),
     locationKey ? listWeatherDailyValuesForUser(input.ownerUserId, locationKey, from, weekEnd) : Promise.resolve([]),

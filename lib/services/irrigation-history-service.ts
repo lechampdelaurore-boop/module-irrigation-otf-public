@@ -9,8 +9,7 @@ import { getEnabledFeaturesForUser } from './feature-selection-service';
 import {
   listHydricGoalRevisionsThroughWeekForUser,
   listWeatherDailyValuesForUser,
-  readWeatherPreferenceForUser,
-} from '@/db/water-management-repository';
+  } from '@/db/water-management-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import {
   HISTORY_PAGE_SIZE,
@@ -39,6 +38,7 @@ import {
 } from '../domain/irrigation-history/status-filter';
 import { weekStartDateKey } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
+import { readWeatherPreference } from './weather-preference';
 
 export type IrrigationHistoryDashboard = {
   season: number;
@@ -164,7 +164,7 @@ async function readHistoryAnalysis({
   const period = resolveHistoryPeriod(season, selection.period, now);
   const scope = normalizeHistoryScope(selection.scope, snapshot, season);
   const scopeBeds = bedsForHistoryScope(snapshot, season, scope);
-  const preference = await readWeatherPreferenceForUser(ownerUserId);
+  const preference = await readWeatherPreference(ownerUserId);
   const locationKey = weatherLocationKey(preference, snapshot.structure) ?? 'unconfigured';
   const repositoryScope: IrrigationHistoryScopeFilter = scope;
   const throughWeek = weekStartDateKey(period.endDate);

@@ -6542,3 +6542,33 @@ de remplir ces valeurs n'arrivent qu'avec les PR 2 à 5.
 
 Ne change pas : aucun chiffre de l'espace existant, aucun calcul, aucun
 appel à OTF, aucune valeur agronomique. Aucune question de budget.
+
+## D-223 — Tranche 4, sous-tranche 4.4, PR 2a : la commune de la ferme, choisie par la personne
+
+Date : 20 novembre 2026.
+
+**Contexte.** La section 8 bis.5 du contrat met dans une seule PR 2 la
+commune (F419), le classement des abris (F420) et la proposition de départ
+par `placeLngLat`, un nouvel appel à OTF qui attend l'accès demandé le
+18 novembre 2026. Jusqu'ici, un espace sans commune choisie prenait en
+silence la commune du siège de sa structure (`legalCity`).
+
+**Décision** (F582, section 8 bis.10 du contrat).
+
+1. La PR 2 se fait en trois : 2a la commune, 2b parcelles et abris, 2c la
+   proposition par `placeLngLat`, à l'accès d'OTF.
+2. Le lieu de la météo n'existe que si la commune est confirmée : espace
+   d'avant l'accueil, démonstration, ou étape « Où est la ferme »
+   confirmée. Sinon, ni météo, ni gel, ni ET0, et la page dit quoi faire.
+3. Choisir une commune, ou prendre le siège d'un geste, en dernier recours,
+   confirme l'étape dans le même lot d'écriture, avec la commune et sa
+   provenance.
+4. Hors de France métropolitaine (outre-mer compris) : refusé, rien
+   d'enregistré.
+5. Le bandeau « À finir : commune de la ferme. » paraît sur chaque page
+   quand une case lit la météo, jusqu'à ce que la commune soit confirmée.
+
+Ne change pas : la commune et les chiffres d'un espace existant (sa
+préférence est gardée telle quelle, F426) ; aucun appel nouveau à OTF ; le
+texte de la politique de confidentialité ; aucune valeur agronomique.
+Aucune question de budget.

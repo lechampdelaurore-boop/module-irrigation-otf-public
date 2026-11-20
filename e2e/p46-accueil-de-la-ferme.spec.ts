@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
-import { attendreLaPageIrrigation, ouvrirLePli, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P46 : l'accueil de la ferme, dans Réglages (4.4,
@@ -35,10 +35,12 @@ test('une ferme d’avant la 4.4 lit que ses réglages sont gardés tels quels',
     await expect(etapes.nth(index)).toContainText('Confirmé');
     await expect(etapes.nth(index)).toContainText('Réglage d’avant l’accueil, gardé tel quel.');
   }
+  // Rien à finir : aucun bandeau, sur Réglages comme ailleurs (F582).
+  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
   await verifierLEtape(page, journal, 'accueil d’avant la 4.4');
 });
 
-test('une ferme neuve a ses cinq étapes à faire', async ({ page, context }, testInfo) => {
+test('une ferme neuve a ses cinq étapes à faire, et choisir sa commune confirme la première', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'accueil');
   await attendreLaPageIrrigation(page, 'reglages');
@@ -51,5 +53,20 @@ test('une ferme neuve a ses cinq étapes à faire', async ({ page, context }, te
     await expect(etapes.nth(index)).toContainText(nom);
     await expect(etapes.nth(index)).toContainText('À faire.');
   }
+  // L'étape de la commune mène au lieu de la météo ; le siège n'y est pas pris en silence (F419, F582).
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme.');
+  await expect(page.locator('#water-weather-title').locator('xpath=ancestor::section[1]')).toContainText('Choisissez la commune de votre ferme : tant qu’elle n’est pas choisie, ni météo, ni gel, ni ET0.');
+  await etapes.first().getByRole('link', { name: 'Choisir la commune' }).click();
+  await expect(page).toHaveURL(/#water-weather-title$/);
   await verifierLEtape(page, journal, 'accueil d’une ferme neuve');
+
+  await page.getByRole('button', { name: 'Prendre le siège OTF, en dernier recours' }).click();
+  await expect(page.getByText('La commune du siège OTF est utilisée, en dernier recours.')).toBeVisible();
+  await page.reload();
+  await attendreLaPagePrete(page, 'reglages');
+  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
+  const apres = await ouvrirLAccueil(page);
+  await expect(apres.locator('summary')).toContainText('4 étapes sur 5 à finir.');
+  await expect(apres.locator('li.onboarding-step').first()).toContainText(/Confirmé le .+ : .+, siège de la structure dans Ouvre ta ferme, pris en dernier recours\./);
+  await verifierLEtape(page, journal, 'commune prise en dernier recours');
 });

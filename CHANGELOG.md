@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 2a)
+
+- **La commune de la ferme, choisie par la personne** (D-223) : une
+  nouvelle ferme n'a plus pour commune, en silence, le siège de sa
+  structure dans Ouvre ta ferme. Tant qu'elle n'a pas choisi sa commune,
+  le module n'affiche ni météo, ni gel, ni ET0, et chaque page le rappelle
+  par un bandeau « À finir : commune de la ferme. », avec un lien vers
+  Réglages. Le siège reste possible, d'un geste, « en dernier recours ».
+  Une commune hors de France métropolitaine est refusée. Les fermes qui
+  utilisaient déjà le module gardent leur commune telle quelle.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 1 sur 5)
 
 - **L'accueil d'une ferme : son état, et l'espace existant marqué** (D-222) :

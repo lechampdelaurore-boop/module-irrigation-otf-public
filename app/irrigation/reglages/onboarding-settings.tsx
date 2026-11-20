@@ -9,10 +9,15 @@ const TONE_WORDS = { confirmed: 'Confirmé', skipped: 'Passé', missing: 'À fai
  * F417, F426, F427 ; PR 1, F581) : chaque étape, son état et d'où vient ce
  * qui est en place. Une ferme d'avant l'accueil y lit que ses réglages sont
  * gardés tels quels ; une ferme neuve, ce qui lui reste à faire. Fermé par
- * défaut, en bas de la page ; rien ne s'y règle encore. Absent de la
+ * défaut, en bas de la page ; l'étape de la commune mène au lieu de la
+ * météo, plus haut (PR 2, F582). Absent de la
  * démonstration, dont les fermes fictives sont déjà réglées.
  */
-export function OnboardingSettings({ onboarding }: { onboarding: ResolvedOnboarding }) {
+export function OnboardingSettings({ onboarding, locationHere }: {
+  onboarding: ResolvedOnboarding;
+  /** Le lieu de la météo est sur cette page (une case cochée lit la météo) : l'étape « Où est la ferme » y mène (F582). */
+  locationHere: boolean;
+}) {
   if (onboarding.kind === 'demonstration') return null;
   const lines = onboarding.steps.map(verificationLine);
   return (
@@ -30,6 +35,7 @@ export function OnboardingSettings({ onboarding }: { onboarding: ResolvedOnboard
                 <strong>{line.label}</strong>
                 <span className="onboarding-step-state">{TONE_WORDS[line.tone]}</span>
                 <span>{line.text}</span>
+                {line.id === 'location' && line.tone === 'missing' && locationHere ? <a href="#water-weather-title">Choisir la commune</a> : null}
               </li>
             ))}
           </ol>

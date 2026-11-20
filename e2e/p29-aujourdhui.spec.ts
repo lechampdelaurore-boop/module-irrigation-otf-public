@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
+import { attendreLeChoixDesFonctionnalites, choisirLeSiegeCommeCommune, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
@@ -92,10 +92,14 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await attendreLaPagePrete(page, 'aujourdhui');
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
+  // Une ferme neuve dit ce qui lui manque : la commune, choisie avant la météo et le gel (4.4, F582).
+  await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme.');
+  await choisirLeSiegeCommeCommune(page);
   // `/irrigation` seule y mène aussi (F31).
   await page.goto('/irrigation');
   await attendreLaPagePrete(page, 'aujourdhui');
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
+  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
   await verifierLEtape(page, journal, 'arrivée sur « Aujourd’hui »');
 
   // Les six blocs, dans l'ordre ; les blocs sans rien à dire le disent en une phrase (F3).
