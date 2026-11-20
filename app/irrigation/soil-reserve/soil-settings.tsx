@@ -11,14 +11,23 @@ import {
   type SoilSettingsView,
   type ZoneSoilSetting,
 } from '@/lib/domain/soil-reserve/settings-view';
+import { STARTING_VALUES_TEXT, type SoilStartingValues } from '@/lib/domain/onboarding/soil';
 import {
   FARM_THRESHOLD,
   labRfuWarning,
-  SOIL_DEFAULTS,
   soilRfuMmPerMeter,
   type SoilRecord,
   type SoilSettings,
 } from '@/lib/domain/soil-reserve/soil';
+import {
+  isSoilTexture,
+  SOIL_TEXTURE_SOURCE,
+  SOIL_TEXTURES,
+  soilTextureLabel,
+  textureProposal,
+  textureProposalText,
+  type SoilTexture,
+} from '@/lib/domain/soil-reserve/texture';
 import { saveSoilRecordAction, saveSoilSettingsAction, type SoilReserveActionResult } from '../soil-reserve-actions';
 
 /**
@@ -29,6 +38,10 @@ import { saveSoilRecordAction, saveSoilSettingsAction, type SoilReserveActionRes
  * valeur propre ; pour l'exploitation, le seuil d'arrosage (D-059), les
  * coefficients des états de surface et la part de pluie sous paillage
  * plastique. Chaque enregistrement est une révision datée.
+ *
+ * Depuis la 4.4 (F584) : la texture du sol propose TEW et REW (FAO-56,
+ * tableau 19), et un espace qui fait l'accueil n'a plus TEW et REW d'un
+ * limon sableux préremplis en silence.
  */
 
 type Run = (operation: () => Promise<SoilReserveActionResult>) => void;
@@ -84,7 +97,9 @@ export function SoilSettingsPart({ season, view, pending, run }: { season: numbe
         sa parcelle. Chaque enregistrement vaut à partir de son jour ; l’histoire reste lisible.
       </p>
       {view.zones.length === 0 ? <p className="crop-coefficients-empty">Aucune parcelle cette saison.</p> : null}
-      {view.zones.map((zone) => <ZoneSoil key={zone.zoneId} season={season} zone={zone} today={view.today} pending={pending} run={run} />)}
+      {view.zones.map((zone) => (
+        <ZoneSoil key={zone.zoneId} season={season} zone={zone} today={view.today} starting={view.starting} pending={pending} run={run} />
+      ))}
       <FarmSettingsForm key={JSON.stringify(view.farm.current)} season={season} view={view} pending={pending} run={run} />
     </details>
   );
@@ -97,7 +112,14 @@ function summaryLabel(view: SoilSettingsView): string {
   }`;
 }
 
-function ZoneSoil({ season, zone, today, pending, run }: { season: number; zone: ZoneSoilSetting; today: string; pending: boolean; run: Run }) {
+function ZoneSoil({ season, zone, today, starting, pending, run }: {
+  season: number;
+  zone: ZoneSoilSetting;
+  today: string;
+  starting: SoilStartingValues;
+  pending: boolean;
+  run: Run;
+}) {
   const zoneRecord = zone.soil.current?.record ?? null;
   return (
     <section id={soilParcelAnchor(zone.zoneId)} className="crop-water-settings-block soil-place" aria-label={`Sol · ${zone.name}`}>
@@ -110,6 +132,7 @@ function ZoneSoil({ season, zone, today, pending, run }: { season: number; zone:
         place={{ zoneId: zone.zoneId, plotId: null }}
         season={season}
         today={today}
+        starting={starting}
         pending={pending}
         run={run}
         folded
@@ -131,6 +154,7 @@ function ZoneSoil({ season, zone, today, pending, run }: { season: number; zone:
                 place={{ zoneId: zone.zoneId, plotId: plot.plotId }}
                 season={season}
                 today={today}
+                starting={starting}
                 pending={pending}
                 run={run}
                 folded
@@ -172,6 +196,7 @@ function recordLine(view: SoilRecordView): string {
     `laboratoire ${number.format(record.labRfuMmPerMeter)} mm/m`,
     record.stoneSharePercent === null ? 'cailloux non renseignés' : `cailloux ${number.format(record.stoneSharePercent)} %`,
     `part de référence ${shareLabel(record.referenceShare)}`,
+    record.texture === null ? null : `texture ${soilTextureLabel(record.texture).toLocaleLowerCase('fr-FR')} (${SOIL_TEXTURE_SOURCE})`,
     `TEW ${number.format(record.tewMm)} mm, REW ${number.format(record.rewMm)} mm, Ze ${number.format(record.surfaceLayerCm)} cm`,
     record.soilDepthCeilingM === null ? null : `sol limité à ${number.format(record.soilDepthCeilingM)} m`,
     PROVENANCES.find((item) => item.value === record.provenance)?.label ?? record.provenance,
@@ -185,6 +210,7 @@ type Fields = {
   stones: string;
   share: string;
   provenance: SoilRecord['provenance'];
+  texture: SoilTexture | '';
   sampled: string;
   source: string;
   tew: string;
@@ -194,34 +220,43 @@ type Fields = {
   effectiveFrom: string;
 };
 
-function fieldsOf(record: SoilRecord | null, today: string): Fields {
+/** Les champs de départ : la saisie en place, sinon les valeurs de départ de l'espace (F584), TEW et REW vides à l'accueil. */
+function fieldsOf(record: SoilRecord | null, today: string, starting: SoilStartingValues): Fields {
   const text = (value: number | null | undefined) => (value === null || value === undefined ? '' : number.format(value));
   return {
     lab: text(record?.labRfuMmPerMeter),
     stones: text(record?.stoneSharePercent),
-    share: shareLabel(record?.referenceShare ?? SOIL_DEFAULTS.referenceShare),
+    share: shareLabel(record?.referenceShare ?? starting.referenceShare),
     provenance: record?.provenance ?? 'analysis',
+    texture: record?.texture ?? '',
     sampled: text(record?.sampledDepthCm),
     source: record?.source ?? '',
-    tew: text(record?.tewMm ?? SOIL_DEFAULTS.tewMm),
-    rew: text(record?.rewMm ?? SOIL_DEFAULTS.rewMm),
-    ze: text(record?.surfaceLayerCm ?? SOIL_DEFAULTS.surfaceLayerCm),
+    tew: text(record ? record.tewMm : starting.tewMm),
+    rew: text(record ? record.rewMm : starting.rewMm),
+    ze: text(record?.surfaceLayerCm ?? starting.surfaceLayerCm),
     ceiling: text(record?.soilDepthCeilingM),
     effectiveFrom: today,
   };
 }
 
-function SoilRecordForm({ title, initial, place, season, today, pending, run, folded = false }: {
+function SoilRecordForm({ title, initial, place, season, today, starting, pending, run, folded = false }: {
   title: string;
   initial: SoilRecord | null;
   place: { zoneId: string; plotId: string | null };
   season: number;
   today: string;
+  starting: SoilStartingValues;
   pending: boolean;
   run: Run;
   folded?: boolean;
 }) {
-  const [fields, setFields] = useState<Fields>(() => fieldsOf(initial, today));
+  const [fields, setFields] = useState<Fields>(() => fieldsOf(initial, today, starting));
+  // Choisir une texture propose TEW et REW au milieu de la fourchette du tableau 19 ; la personne les ajuste ensuite.
+  const chooseTexture = (value: string) => setFields((current) => {
+    if (!isSoilTexture(value)) return { ...current, texture: '' };
+    const proposal = textureProposal(value);
+    return { ...current, texture: value, tew: number.format(proposal.tewMm), rew: number.format(proposal.rewMm) };
+  });
   const set = (key: keyof Fields) => (event: { target: { value: string } }) => setFields((current) => ({ ...current, [key]: event.target.value }));
   const lab = parseDecimal(fields.lab);
   const stones = fields.stones.trim() === '' ? null : parseDecimal(fields.stones);
@@ -246,6 +281,7 @@ function SoilRecordForm({ title, initial, place, season, today, pending, run, fo
       stoneSharePercent: stones,
       referenceShare: share,
       provenance: fields.provenance,
+      texture: fields.texture === '' ? null : fields.texture,
       sampledDepthCm: optional(fields.sampled),
       source: fields.source.trim(),
       tewMm: tew,
@@ -272,6 +308,15 @@ function SoilRecordForm({ title, initial, place, season, today, pending, run, fo
       </label>
       <label><span>Profondeur prélevée (cm)</span><input type="text" inputMode="decimal" placeholder="facultatif" value={fields.sampled} onChange={set('sampled')} /></label>
       <label className="soil-source"><span>Source (laboratoire, référence, date, remarque)</span><input type="text" value={fields.source} onChange={set('source')} /></label>
+      <label className="soil-texture">
+        <span>Texture du sol</span>
+        <select value={fields.texture} onChange={(event) => chooseTexture(event.target.value)}>
+          <option value="">{initial ? 'non dite' : 'à choisir'}</option>
+          {SOIL_TEXTURES.map((texture) => <option key={texture} value={texture}>{soilTextureLabel(texture)}</option>)}
+        </select>
+      </label>
+      {fields.texture !== '' ? <p className="soil-texture-proposal">{textureProposalText(fields.texture)}</p> : null}
+      {!initial && starting.proposed ? <p className="soil-texture-proposal">{STARTING_VALUES_TEXT}</p> : null}
       <label><span>Eau évaporable TEW (mm)</span><input type="text" inputMode="decimal" value={fields.tew} onChange={set('tew')} /></label>
       <label><span>Eau facilement évaporable REW (mm)</span><input type="text" inputMode="decimal" value={fields.rew} onChange={set('rew')} /></label>
       <label><span>Couche de surface Ze (cm)</span><input type="text" inputMode="decimal" value={fields.ze} onChange={set('ze')} /></label>

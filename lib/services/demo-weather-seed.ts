@@ -23,7 +23,7 @@ const FORECAST_DAYS = 7;
 
 /** La clé de lieu de la ferme, ou `null` quand sa commune ne se lit pas. */
 export async function seedDemoWeather(ownerUserId: string, snapshot: IrrigationSnapshot, momentDateKey: string, now: Date): Promise<string | null> {
-  const locationKey = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null }, snapshot.structure);
+  const locationKey = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: true }, snapshot.structure);
   const [candidate] = await demoSeasonWeatherProvider.searchLocations(snapshot.structure.legalCity ?? '', snapshot.structure.legalPostcode);
   if (!locationKey || !candidate) return null;
   const provider = demoSeasonWeatherProvider;

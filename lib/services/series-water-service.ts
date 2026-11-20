@@ -2,13 +2,13 @@ import { listIrrigationHistoryForUser } from '@/db/irrigation-history-repository
 import {
   listHydricGoalRevisionsThroughWeekForUser,
   listWeatherDailyValuesForUser,
-  readWeatherPreferenceForUser,
-} from '@/db/water-management-repository';
+  } from '@/db/water-management-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import { isIgnoredSeries, resolveSeriesOccupation } from '../domain/series/occupation';
 import { buildSeriesWaterReport, periodBetween, type SeriesWaterReport } from '../domain/series/water';
 import { dateKeyInTimeZone, weekStartDateKey } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
+import { readWeatherPreference } from './weather-preference';
 
 export type SeriesWaterDashboard =
   | {
@@ -95,7 +95,7 @@ async function readInputs(
   latestEnd: string,
 ) {
   const observed = periodBetween(startDate, today);
-  const preference = await readWeatherPreferenceForUser(ownerUserId);
+  const preference = await readWeatherPreference(ownerUserId);
   const locationKey = weatherLocationKey(preference, snapshot.structure) ?? 'unconfigured';
   const throughWeek = weekStartDateKey(latestEnd);
   const [events, weather, currentGoals, previousGoals] = await Promise.all([

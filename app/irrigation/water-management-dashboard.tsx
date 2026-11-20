@@ -335,7 +335,7 @@ export function WaterManagementDashboard({
           <article className="water-panel">
             <div className="water-panel-title"><div><h3>Météo de référence</h3><p>{dashboard.weather.location?.displayName ?? dashboard.weather.requestedLocationLabel ?? 'Commune non définie'}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
             <ActionReply messages={replies} origin="meteo" classNames={WATER_REPLY_CLASSES} />
-            {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error} Les dernières valeurs valides restent affichées.{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
+            {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error}{dashboard.weather.preference.locationConfirmed ? ' Les dernières valeurs valides restent affichées.' : ''}{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
             {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
             <AutomaticWeatherRefresh preference={dashboard.weather.preference} />
             <div className="water-inline-form">
@@ -345,7 +345,7 @@ export function WaterManagementDashboard({
             </div>
             <ActionReply messages={replies} origin="commune" classNames={WATER_REPLY_CLASSES} />
             {candidates.length > 0 ? <div className="weather-candidates">{candidates.map((candidate) => <button key={`${candidate.latitude}:${candidate.longitude}`} type="button" disabled={pending} onClick={() => startTransition(async () => { receive(await saveWeatherLocationAction({ season, weekStart: dashboard.weekStart, candidate }), 'commune'); setCandidates([]); })}>{candidate.displayName}</button>)}</div> : null}
-            {dashboard.weather.preference.locationMode === 'custom' ? <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receive(await restoreOtfWeatherLocationAction({ season, weekStart: dashboard.weekStart }), 'commune'))}>Utiliser la commune du siège OTF</button> : null}
+            {dashboard.weather.preference.locationMode === 'custom' || !dashboard.weather.preference.locationConfirmed ? <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receive(await restoreOtfWeatherLocationAction({ season, weekStart: dashboard.weekStart }), 'commune'))}>{dashboard.weather.preference.locationConfirmed ? 'Utiliser la commune du siège OTF' : 'Prendre le siège OTF, en dernier recours'}</button> : null}
             <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
           </article>
         </div>
@@ -428,7 +428,7 @@ export function WaterManagementDashboard({
         >
           <div className="water-panel-title"><div><p>{weatherPlace}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
           <ActionReply messages={replies} origin="meteo" classNames={WATER_REPLY_CLASSES} />
-          {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error} Les dernières valeurs valides restent affichées.{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
+          {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error}{dashboard.weather.preference.locationConfirmed ? ' Les dernières valeurs valides restent affichées.' : ''}{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
           {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
           <AutomaticWeatherRefresh preference={dashboard.weather.preference} />
           {/* La commune se change à un seul endroit, dans Réglages (audit ergonomique, point 9) : ici, le lien qui y mène. */}

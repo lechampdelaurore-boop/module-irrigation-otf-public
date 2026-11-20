@@ -13,6 +13,7 @@ import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { getSoilReserveViewForUser } from '../../lib/services/soil-reserve-view';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { confirmFarmLocation } from '../support/onboarding';
 import { FARM_SOIL } from '../support/soil-reserve-fixtures';
 import { ALICE, BOB } from '../support/spaces';
 
@@ -57,13 +58,14 @@ const snapshot: IrrigationSnapshot = {
   lastSuccessfulReadAt: '2026-05-11T00:00:00.000Z',
 };
 
-const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null }, snapshot.structure)!;
+const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: true }, snapshot.structure)!;
 const days = (from: string, count: number) => Array.from({ length: count }, (_, index) => addDaysToDateKey(from, index));
 /** Le sol de la ferme du porteur tel qu'il se saisit : l'heure d'enregistrement vient de la base. */
 const SOIL_ENTRY = Object.fromEntries(Object.entries({ ...FARM_SOIL, zoneId: 'parcelle', plotId: null }).filter(([key]) => key !== 'recordedAt')) as Omit<SoilRecord, 'recordedAt'>;
 
 async function prepare(): Promise<void> {
   await saveSpeciesCorrespondenceForUser(ALICE, { plantId: 'plant-tomate', seriesId: null, target: { kind: 'reference', referenceCropId: 'criiam-tomate', analogy: false } });
+  await confirmFarmLocation(ALICE, snapshot.structure);
   await upsertWeatherDailyValuesForUser(ALICE, location, 'forecast', days('2026-04-01', 47).map((date) => ({ date, precipitationMm: 0, et0Mm: 5 })), 'test', '2026-04-01T04:00:00.000Z');
 }
 
@@ -109,6 +111,7 @@ test('le sol saisi et une observation à 60 % : l’état maintenant, le prévu 
 });
 
 test('une observation sur une culture sans Kc nomme la culture, au lieu d’attendre un départ', async () => {
+  await confirmFarmLocation(ALICE, snapshot.structure);
   await upsertWeatherDailyValuesForUser(ALICE, location, 'forecast', days('2026-04-01', 47).map((date) => ({ date, precipitationMm: 0, et0Mm: 5 })), 'test', '2026-04-01T04:00:00.000Z');
   assert.equal((await addSoilRecordForUser(ALICE, SOIL_ENTRY, NOW)).ok, true);
   assert.equal((await addSoilObservationForUser(ALICE, { zoneId: 'parcelle', plotId: SHELTER, percent: 60, observedAt: '2026-05-11T04:30:00.000Z' }, NOW)).ok, true);
@@ -171,4 +174,17 @@ test('une proposition qui apporte plus que ce que le sol peut encore retenir le 
   const tomato = view.gauge!.zones[0].plots[0].beds.find((item) => item.bedId === BED)!;
   const room = tomato.summary.current!.capacityMm - tomato.summary.current!.mm;
   assert.ok(Math.abs(notes[0][0].beyondMm - (60 - room)) < 1, `60 mm moins la place du sol (${room.toFixed(1)} mm), à la consommation des premières heures près`);
+});
+
+test('un jardin à classer n’a pas de réserve calculée, même avec son sol saisi et observé (4.4, F583)', async () => {
+  await prepare();
+  assert.equal((await addSoilRecordForUser(ALICE, SOIL_ENTRY, NOW)).ok, true);
+  assert.equal((await addSoilObservationForUser(ALICE, { zoneId: 'parcelle', plotId: SHELTER, percent: 60, observedAt: '2026-05-11T04:30:00.000Z' }, NOW)).ok, true);
+  const unclassified = { ...snapshot, plots: snapshot.plots.map((plot) => ({ ...plot, mode: 'unclassified' as const })) };
+  const view = await getSoilReserveViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: unclassified, now: NOW });
+  const [plot] = view.gauge!.zones[0].plots;
+  for (const bed of plot.beds) {
+    assert.equal(bed.summary.current, null);
+    assert.equal(bed.today, null);
+  }
 });
