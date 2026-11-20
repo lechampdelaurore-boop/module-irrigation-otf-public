@@ -6645,3 +6645,42 @@ dont l'état se calcule sur la dernière réussite.
 
 Ne changent pas : l'écran des fermes ; le créneau de 6 h 15 ; le verrou de
 la météo ; les calculs du matin ; aucun appel nouveau à OTF ni dépense.
+
+## D-241 — Tranche 4, 4.5, PR 2 : la veille de l'exploitant et sa page d'état
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le registre des tâches (D-240) dit l'état de chaque tâche,
+mais personne ne le lit : la panne de la météo du 14 novembre 2026 s'est
+vue cinq jours plus tard, par hasard. Le contrat de la 4.5 (D-220, F565,
+F566) demande une veille, sur un déclencheur à part, qui prévient
+l'exploitant, et une page d'état qui lui est réservée.
+
+**Décision.** Section 10 bis.12 du contrat de la Tranche 4 (F608 à F613) :
+
+1. L'exploitant est une personne dont l'espace est sur la ferme du
+   déploiement, lue sans appel à OTF ; la notification va vers ces espaces,
+   où ses appareils sont inscrits ; la page d'état leur est réservée, côté
+   serveur, et n'existe pas pour les autres.
+2. Un second déclencheur du planificateur, à 9 h à Paris (`0 7,8 * * *`),
+   appelle une route interne gardée par le jeton de service de la météo :
+   une alerte quand une tâche est en retard, en panne ou jamais réussie ;
+   « tout va bien » le dimanche ; rien sinon. Une notification par jour de
+   Paris au plus, prise avant l'envoi et rendue s'il échoue (migration
+   0035, table commune).
+3. La notification nomme les tâches, la plus grave d'abord, avec depuis
+   quand, dans les limites du service (titre de 80 caractères, texte de
+   160) ; la veille ne se nomme pas elle-même.
+4. La veille est une tâche du registre : réussie quand la notification due
+   est partie ou confiée au service, manquée avec une raison écrite par le
+   module ; la route répond 200 même manquée, pour que le planificateur ne
+   la relance pas trois fois (R2).
+5. La page `/irrigation/exploitation` dit le jugement d'ensemble en une
+   ligne, chaque tâche avec son état et sa dernière réussite, et la
+   dernière notification ; les fermes, la sauvegarde, les effacements et
+   les coûts viennent avec leur code. La PR 2 du découpage se fait en deux
+   PR : l'observation par ferme et le test des journaux suivent.
+
+Ne changent pas : le matin de 6 h 15 et ses tâches ; le service de
+notification (aucune route nouvelle) ; aucun secret nouveau, aucun appel
+nouveau à OTF, aucune dépense.

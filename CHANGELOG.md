@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 2 sur 5, première partie)
+
+- **La veille de l'exploitant et sa page d'état** (D-241, F608 à F613) :
+  chaque jour à 9 h, un second déclencheur du planificateur lit le registre
+  des tâches et, si l'une est en retard, en panne ou jamais réussie, envoie
+  une notification à l'exploitant qui dit laquelle et depuis quand ; le
+  dimanche, quand tout va bien, « tout va bien », dont l'absence dit que la
+  veille elle-même ne tourne plus. Une notification par jour au plus. La
+  page « État du module » (`/irrigation/exploitation`), réservée à
+  l'exploitant, dit en une ligne si tout va bien, puis l'état de chaque
+  tâche, sa dernière réussite et son dernier échec. La veille est elle-même
+  une tâche du registre. Migration 0035, additive ; parcours P50.
+
 ### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
 
 - **Le registre des tâches attendues** (D-240, F600 à F607) : les quatre

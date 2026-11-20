@@ -396,6 +396,30 @@ registres, elle y renvoie.
   `task_run_failed`, une ligne par tâche) ou sur la page d'état de la
   PR 2.
 
+- Tranche 4, **4.5, PR 2 sur 5, première partie : la veille de
+  l'exploitant et sa page d'état** (D-241, F608 à F613, section 10 bis.12
+  de `docs/tranche-4-contract.md`), codée le 20 novembre 2026 en Opus 5.5 ·
+  Très élevé, à la suite de la PR 1 : un second déclencheur du
+  planificateur, à 9 h à Paris, lit le registre et envoie une notification
+  à l'exploitant (les espaces de la ferme du déploiement, sans appel à
+  OTF) quand une tâche est en retard, en panne ou jamais réussie, qui dit
+  laquelle et depuis quand ; « tout va bien » le dimanche ; une
+  notification par jour au plus (migration 0035, additive). La veille est
+  elle-même une tâche du registre. La page « État du module »
+  (`/irrigation/exploitation`), réservée à l'exploitant côté serveur, dit
+  en une ligne si tout va bien, puis l'état de chaque tâche ; parcours
+  P50 aux deux largeurs. L'observation par ferme et le test des journaux
+  (F564) suivent dans une seconde PR. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (1 874 tests, puis les 448 de la base
+  rejoués trois fois pour l'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local, et le parcours P50 aux deux largeurs ; la suite complète des
+  parcours jouée par la CI de la PR. Non vérifié sur le site : la première
+  veille réelle, et la notification reçue en vrai sur l'appareil de
+  l'exploitant (recette avec l'accord du porteur). À fusionner après la
+  PR 1 et son premier matin, sinon la première veille annoncerait les
+  tâches du matin « jamais réussies ».
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

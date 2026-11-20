@@ -95,6 +95,15 @@ test('les tâches du matin : 26 heures pour l’orange, 36 pour le rouge, le seu
   assert.throws(() => taskDeclaration('inconnue' as never), /absente du registre/);
 });
 
+test('la veille de 9 h a son propre déclencheur, distinct de ceux qu’elle surveille (R5)', () => {
+  assert.deepEqual(tasksOfTrigger('operator-watch'), ['operator-watch']);
+  const watch = TASK_TRIGGERS.find((trigger) => trigger.key === 'operator-watch')!;
+  const morning = TASK_TRIGGERS.find((trigger) => trigger.key === 'weather-morning')!;
+  assert.equal(watch.config, morning.config, 'le même planificateur, sans service nouveau');
+  assert.notEqual(watch.cron, morning.cron, 'un déclencheur à part : une panne du matin ne l’emporte pas');
+  assert.equal(watch.cron, '0 7,8 * * *', '9 h à Paris, l’un des deux créneaux UTC selon l’heure d’été');
+});
+
 test('le matin rend une exécution pour chaque tâche de son déclencheur, ni plus ni moins', () => {
   const tasks = morningTaskOutcomes({
     weather: { status: 'completed', locations: 1, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },

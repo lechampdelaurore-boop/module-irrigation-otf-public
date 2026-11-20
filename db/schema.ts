@@ -893,6 +893,26 @@ export const backgroundJobs = sqliteTable('irrigation_background_jobs', {
   failingSince: text('failing_since'),
 });
 
+/**
+ * La notification de la veille de l'exploitant (4.5, migration 0035, F566,
+ * F609) : une par jour de Paris au plus, prise avant l'envoi et rendue s'il
+ * échoue. Une table commune : ni ferme, ni contenu.
+ */
+export const operatorNotices = sqliteTable(
+  'irrigation_operator_notices',
+  {
+    parisDay: text('paris_day').primaryKey(),
+    kind: text('kind').notNull(),
+    problems: integer('problems').notNull(),
+    claimedAt: text('claimed_at').notNull(),
+    sentAt: text('sent_at'),
+  },
+  (table) => [
+    check('chk_irrigation_operator_notices_kind', sql`${table.kind} IN ('alert', 'all-good')`),
+    check('chk_irrigation_operator_notices_problems', sql`${table.problems} >= 0`),
+  ],
+);
+
 export const weatherGeocodes = sqliteTable(
   'irrigation_weather_geocodes',
   {

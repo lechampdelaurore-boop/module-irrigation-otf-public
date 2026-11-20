@@ -60,13 +60,14 @@ const WEATHER_FAILURE_WORDS: Record<WeatherFailureKind, string> = {
 export function morningTaskOutcomes(report: MorningRunReport): TaskOutcome[] {
   if (report.weather?.status === 'already-running') return [];
   const interrupted = `interrompu avant la fin (${errorClassWords(report.interruptedBy)})`;
-  const outcomes: Record<TaskKey, TaskOutcome> = {
+  // Les tâches d'un autre déclencheur (la veille de 9 h) n'ont rien à dire du matin.
+  const outcomes: Partial<Record<TaskKey, TaskOutcome>> = {
     'weather-forecast': weatherOutcome('weather-forecast', report, 'forecastFailures', 'sans prévisions', interrupted),
     'weather-reanalysis': weatherOutcome('weather-reanalysis', report, 'reanalysisFailures', 'sans pluie estimée', interrupted),
     'morning-calculation': morningCalculationOutcome(report, interrupted),
     'otf-vault-morning': vaultOutcome(report, interrupted),
   };
-  return tasksOfTrigger('weather-morning').map((task) => outcomes[task]);
+  return tasksOfTrigger('weather-morning').map((task) => outcomes[task] ?? failed(task, 'tâche du matin sans résultat'));
 }
 
 function weatherOutcome(

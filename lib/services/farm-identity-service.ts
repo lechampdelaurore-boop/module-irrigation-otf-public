@@ -80,6 +80,16 @@ export async function resolveDeploymentFarm(dependencies = defaultDependencies):
 }
 
 /**
+ * La ferme du déploiement déjà établie, sans rien appeler ni écrire (4.5,
+ * F608) : la veille de l'exploitant et sa page la lisent, et la 4.5 n'ajoute
+ * aucun appel à OTF. Avec les données fictives, la ferme fictive.
+ */
+export async function knownDeploymentFarm(dataSource: () => 'mock' | 'live' = readOtfDataSource): Promise<string | null> {
+  if (dataSource() !== 'live') return mockSnapshot.structure.id;
+  return (await readDeploymentFarm())?.otfFarmId ?? null;
+}
+
+/**
  * La clé d'espace de la personne (F327) : sa personne et la ferme du
  * déploiement. Avant de la rendre, son espace d'avant la 4.1, s'il existe,
  * reçoit la ferme d'où viennent ses données : celle de son dernier

@@ -11,7 +11,7 @@
     }
   ],
   "triggers": {
-    "crons": ["15 4,5 * * *"]
+    "crons": ["15 4,5 * * *", "0 7,8 * * *"]
   },
   "vars": {
     "IRRIGATION_SITE_URL": "https://module-irrigation-otf.lechampdelaurore.workers.dev"
