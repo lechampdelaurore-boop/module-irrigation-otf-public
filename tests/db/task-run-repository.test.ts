@@ -120,7 +120,7 @@ test('un enregistrement impossible ne fait pas échouer le matin : il se journal
   assert.ok(lines.every((line) => !JSON.stringify(line).includes('base indisponible')), 'le message de la base n’est pas recopié');
 });
 
-test('la migration 0034 garde la ligne du verrou de la météo telle quelle, sans échec compté', () => {
+test('la migration 0037 garde la ligne du verrou de la météo telle quelle, sans échec compté', () => {
   const sqlite = createMigratedSqliteDatabase('drizzle', '0033_otf_token_vault.sql');
   sqlite.exec(`INSERT INTO irrigation_background_jobs (job_key, last_successful_at, last_error) VALUES ('automatic-weather-sync', '2026-11-19T05:16:00.000Z', NULL)`);
   applyMigrationsAfter(sqlite, '0033_otf_token_vault.sql');
