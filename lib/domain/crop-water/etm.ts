@@ -27,17 +27,17 @@ export type Et0Reading = { date: string; reanalysisMm: number | null; forecastMm
 export type DayEt0 = { mm: number; nature: Et0Nature };
 
 /** K_abri : 0,8 sous abri par défaut (CRIIAM), réglable de 0,6 à 1 ; le calcul refuse hors de 0,5 à 1. */
-const SHELTER_FACTOR = {
+export const SHELTER_FACTOR = {
   default: 0.8,
   setting: { minimum: 0.6, maximum: 1 },
   bounds: { minimum: 0.5, maximum: 1 },
 } as const;
 
 /** Paillage plastique : Kc × 0,9, plutôt que « retirer 0,10 », pour ne jamais donner un Kc négatif. */
-const PLASTIC_MULCH_FACTOR = 0.9;
+export const PLASTIC_MULCH_FACTOR = 0.9;
 
 /** Bornes de l'ET0 du jour, comprises, en mm/j. */
-const ET0_BOUNDS = { minimum: 0, maximum: 12 } as const;
+export const ET0_BOUNDS = { minimum: 0, maximum: 12 } as const;
 
 /** Une valeur de K_abri pour un abri, à partir d'un jour (révisions datées). */
 type ShelterFactorRevision = { shelterId: string; value: number; effectiveFrom: string; recordedAt: string };

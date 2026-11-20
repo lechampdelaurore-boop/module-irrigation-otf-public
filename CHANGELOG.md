@@ -166,6 +166,34 @@ source détaillée commit par commit.
   registre. Rien ne change à l'écran : la page d'état et la veille de
   l'exploitant viennent avec la PR 2. Migration 0037, additive.
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4d)
+
+- **Le modèle des rattachements** (D-231) : une nouvelle ferme reçoit, pour
+  ses espèces, les rattachements d'une ferme maraîchère (40 espèces, dont
+  la mâche « par analogie » avec la salade d'été) ; elle décoche ce qu'elle
+  ne garde pas.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 5b)
+
+- **La vérification de l'accueil** (D-230) : le pli « Accueil de la
+  ferme » dit, pour chaque groupe de réglages, s'il est confirmé ou passé,
+  et ce qui reste inconnu dans la ferme (espèces non rattachées, jardins à
+  classer, parcelles sans sol), avec le lien pour le renseigner.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 5a)
+
+- **« Réglages à relire »** (D-229) : une nouvelle ferme lit, dans
+  Réglages, chaque groupe de valeurs de départ avec sa source, et le valide
+  ou le passe. Aucun planning n'est calculé avant qu'elle ait validé les
+  réglages du planning ; le bandeau « À finir » le lui rappelle.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4c)
+
+- **« Rattachez vos espèces »** (D-228) : une nouvelle ferme voit, en tête
+  de la correspondance des espèces, une proposition pour chaque espèce que
+  son nom désigne ; elle décoche ce qu'elle ne garde pas et rattache le
+  reste d'un geste, puis confirme l'étape « Cultures ». Le bandeau « À
+  finir » rappelle les espèces à rattacher jusque-là.
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 4b)
 
 - **D'où viennent les dates de chaque culture** (D-227) : la fiche d'une
