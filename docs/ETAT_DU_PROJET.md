@@ -442,7 +442,7 @@ registres, elle y renvoie.
   sabotages, chacun détecté ; P46 (étendu), P18, P19, P29, P31b, P33 joués
   en local aux deux largeurs, réussis (14 sur 14) ; la suite complète par
   la CI de la PR.
-  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat) : le
+  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat), **en ligne le 20 novembre 2026 à 18 h 25 (#132, fusionnée à 18 h 06, run 44779979091 vérifié job par job : les cinq jobs verts)** : le
   plafond de 0,60 m de l'asperge et du melon, celui de la ferme du porteur,
   est dans le jeu commun ; pour une ferme qui fait l'accueil, il est
   remplacé à la lecture par la borne basse de la FAO-56 (asperge 1,20 m,
@@ -456,7 +456,7 @@ registres, elle y renvoie.
   local ; quatre sabotages, chacun détecté ; aucun écran changé, la suite
   des parcours par la CI de la PR.
   **PR 4b, la région des cultures** (D-227, F586, section 8 bis.14 du
-  contrat) : chaque fiche de culture dit d'où viennent ses dates de stade
+  contrat), **en ligne le 20 novembre 2026 à 18 h 54 (#133, fusionnée à 18 h 26, run 44783377195 vérifié job par job : les cinq jobs verts)** : chaque fiche de culture dit d'où viennent ses dates de stade
   (Sud / Occitanie pour le CRIIAM, générales pour la FAO-56, ou la ferme) ;
   une ferme qui fait l'accueil, d'une autre région, est avertie sur les
   cultures communes du CRIIAM ; région tirée du code postal de la commune
@@ -465,6 +465,42 @@ registres, elle y renvoie.
   `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
   `pnpm weather:check`, `pnpm site:check` réussis en local ; six sabotages,
   chacun détecté ; parcours P46 étendu, P17, P20 et P31c rejoués en local.
+  **PR 4c, « Rattachez vos espèces »** (D-228, F587, section 8 bis.15 du
+  contrat), **en ligne le 20 novembre 2026 à 19 h 21 (#134, fusionnée à 18 h 55, run 44787894765 vérifié job par job : les cinq jobs verts)** : pour une ferme qui fait l'accueil, une proposition par espèce
+  sans rattachement (modèle du porteur, sinon le nom), cochée, rattachée
+  d'un geste, tout ou rien ; l'étape « Cultures » confirmée d'un geste,
+  avec le compte ; bandeau « N espèces à rattacher » jusque-là ; aucune
+  migration ; modèle vide jusqu'à la relecture du porteur (PR 4d). Contrôles
+  de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`,
+  `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm site:check`
+  réussis en local ; sept sabotages, chacun détecté ; parcours P46 étendu,
+  P29 et P28 rejoués en local.
+  **PR 5a, « Réglages à relire »** (D-229, F588, section 8 bis.16 du
+  contrat), **en ligne le 20 novembre 2026 à 20 h 09 (#135, fusionnée à 19 h 45, run 44795804220 vérifié job par job : les cinq jobs verts)** : pour une ferme qui fait l'accueil, les groupes de valeurs de
+  départ des cases cochées, avec leur source, validés ou passés ; aucun
+  planning avant la validation du groupe « Planning », le calcul du matin
+  la passe sans échec ; bandeau « réglages du planning à valider » ; aucune
+  migration ; la borne de l'ET0 reste à 12 mm/j, son passage à 15 proposé
+  au dépôt commun (MC-37). Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
+  P31 et P10 rejoués en local.
+  **PR 5b, la vérification finale** (D-230, F589, section 8 bis.17 du
+  contrat) : le pli « Accueil de la ferme » dit chaque groupe des réglages
+  (confirmé, passé ou proposé) et ce qui reste inconnu (espèces non
+  rattachées, jardins à classer, parcelles sans sol), avec leur lien ;
+  plusieurs fermes d'une même personne (F418) remis à la 4.3, PR 3.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
+  **PR 4d, le modèle des rattachements du porteur** (D-231, F590, section
+  8 bis.18 du contrat) : 40 liens espèce-culture relevés en lecture seule
+  dans sa ferme (saison 2026, 77 espèces), 11 par analogie, l'analogie
+  gardée ; les espèces sans référence et l'engrais vert hors du modèle.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip` réussis en local ; cinq sabotages, chacun
+  détecté ; parcours P46 et P29 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

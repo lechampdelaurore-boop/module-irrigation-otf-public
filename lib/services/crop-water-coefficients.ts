@@ -14,6 +14,7 @@ import { rootingProfilesForSpace } from '../domain/onboarding/rooting';
 import { getOnboardingForUser } from './onboarding-service';
 import { cropOriginText, cropRegionWarning, regionOfPostcode } from '../domain/onboarding/regions';
 import { readWeatherPreference } from './weather-preference';
+import { linkCandidatesOf, speciesLinkProposals, type SpeciesLinkProposal } from '../domain/onboarding/species';
 
 /**
  * La page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -41,6 +42,8 @@ export type CropCoefficientsView =
       rootingProfiles: StoredRootingProfile[];
       /** Par culture, d'où viennent ses dates de stade, et l'avertissement d'une autre région (4.4, F586). */
       regions: Record<string, { origin: string; warning: string | null }>;
+      /** L'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil (4.4, F587) ; `null` pour les autres espaces. */
+      speciesStep: { confirmed: boolean; proposals: SpeciesLinkProposal[] } | null;
     }
   | { available: false; season: number; reason: 'crop-plan-not-read' };
 
@@ -75,12 +78,14 @@ export async function getCropCoefficientsViewForUser(input: {
   const rootingProfiles = rootingProfilesForSpace(storedProfiles, onboarding);
   const series = cropPlan.series.filter((item) => item.season === input.season);
   const commons = await Promise.all(crops.filter((stored) => stored.origin === 'farm').map((stored) => readCommonReferenceCrop(stored.crop.id)));
+  const commonVersions: Record<string, ReferenceCrop> = Object.fromEntries(commons.flatMap((common) => (common ? [[common.crop.id, common.crop]] : [])));
+  const species = seasonSpecies(series, entries);
   return {
     available: true,
     season: input.season,
     crops,
-    commonVersions: Object.fromEntries(commons.flatMap((common) => (common ? [[common.crop.id, common.crop]] : []))),
-    species: seasonSpecies(series, entries),
+    commonVersions,
+    species,
     withoutReference: speciesWithoutReference(series, entries),
     overrides,
     settings: cropWaterSettingsView({
@@ -92,5 +97,9 @@ export async function getCropCoefficientsViewForUser(input: {
     }),
     rootingProfiles,
     regions,
+    speciesStep: onboarding.kind !== 'onboarding' ? null : {
+      confirmed: onboarding.steps.some((step) => step.id === 'crops' && step.state === 'confirmed'),
+      proposals: speciesLinkProposals(species, linkCandidatesOf(crops, commonVersions)),
+    },
   };
 }
