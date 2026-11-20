@@ -154,6 +154,13 @@ source détaillée commit par commit.
   tâche, sa dernière réussite et son dernier échec. La veille est elle-même
   une tâche du registre. Migration 0038, additive ; parcours P50.
 
+### Corrigé (un essai du lot I, qui échouait chaque soir)
+
+- **L'essai de la démonstration « Pic d'été, l'eau manque » ne dépend plus de
+  l'heure** : la démonstration se prépare au jour du moment, à l'heure réelle
+  de la ferme, et chaque soir vers 21 h 30 à Paris un arrosage du jour passé
+  changeait l'eau versée sur les planches vides (0,33 m³ au lieu de 0,49) ;
+  l'essai fige l'heure réelle. Rien ne change dans le module.
 ### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
 
 - **Le registre des tâches attendues** (D-240, F600 à F607) : les quatre
