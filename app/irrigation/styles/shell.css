@@ -57,7 +57,7 @@
 }
 
 .brand strong {
-  font: 500 17px/1.2 var(--font-title);
+  font: 500 var(--text-16)/1.2 var(--font-title);
 }
 
 .account {
@@ -70,7 +70,7 @@
 .account-name {
   max-width: 260px;
   overflow: hidden;
-  font: 500 13px/1.3 var(--font-ui);
+  font: 500 var(--text-13)/1.3 var(--font-ui);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -89,7 +89,7 @@
   border-radius: 50%;
   background: var(--tile);
   color: var(--green);
-  font: 600 13px/1 var(--font-ui);
+  font: 700 var(--text-13)/1 var(--font-ui);
   text-decoration: none;
 }
 
@@ -117,7 +117,7 @@
 .eyebrow {
   margin: 0 0 10px;
   color: var(--green);
-  font: 500 13px/1.4 var(--font-ui);
+  font: 500 var(--text-13)/1.4 var(--font-ui);
 }
 
 .intro h1 {
@@ -131,7 +131,7 @@
 .sync-card {
   min-width: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   line-height: 1.45;
 }
 
@@ -139,7 +139,7 @@
 .sync-card strong,
 .sync-card small {
   display: inline;
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 400;
 }
 
@@ -161,8 +161,8 @@
 
 .refresh-link {
   color: var(--green);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--text-13);
+  font-weight: 700;
 }
 
 .status-dot {
@@ -183,7 +183,7 @@
   margin-bottom: 12px;
   overflow-x: auto;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   white-space: nowrap;
 }
 
@@ -197,7 +197,7 @@
   border-radius: var(--radius);
   background: var(--warn-soft);
   color: var(--warn-ink);
-  font-size: 12px;
+  font-size: var(--text-12);
 }
 
 .cache-warning strong {

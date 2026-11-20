@@ -74,6 +74,26 @@ source détaillée commit par commit.
   registre. Rien ne change à l'écran : la page d'état et la veille de
   l'exploitant viennent avec la PR 2. Migration 0034, additive.
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 5 sur 7)
+
+- **Une échelle de tailles de texte, rien sous 12 px** (D-194) : six
+  tailles de texte en jetons (12, 13, 14, 16, 20 et 28 px) au lieu de
+  trente-six ; plus aucun texte sous 12 px, y compris le plan de
+  « Matériel » ; quatre graisses (300, 400, 500, 700) ; la pastille chiffrée
+  du plan dit ce qu'elle compte, « en mm par heure d'arrosage ». Les grands
+  chiffres et les titres d'affichage gardent leur taille.
+
+### Modifié (audit du 19 novembre 2026, lot K, PR 4 sur 7)
+
+- **Mots et formats** (D-193) : les heures s'écrivent « 8 h 50 » et les
+  durées « 1 h 21 » sur tous les écrans, les dates « 16/06/2026 à 8 h 50 » ;
+  les plages et les créneaux « de 21 h à 8 h » ; plus de pluriel entre
+  parenthèses (« 1 jour », « 7 jours ») ; sur « Ressources », « L'eau des
+  jours à venir », « Apport perdu, la réserve étant pleine » et
+  « Utilisable, avant / après les irrigations prévues » ; « Faisabilité
+  recalculée. » prend le style d'un message ; sur « Réglages », « Espèces
+  sans culture de référence ». L'export CSV garde ses formats de tableur.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 3 sur 7)
 
 - **Un bouton plein par écran, un seul dessin de pli, plus de geste muet**

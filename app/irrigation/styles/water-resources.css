@@ -177,7 +177,7 @@
 
 .water-editor label > span,
 .projection-shortcuts label > span {
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   color: var(--muted);
   font-family: var(--font-ui);
@@ -206,7 +206,7 @@
 
 .water-editor legend {
   padding: 0 6px;
-  font-weight: 750;
+  font-weight: 700;
 }
 
 .water-editor .water-toggle {
@@ -279,8 +279,8 @@
 
 .water-connection > span {
   color: var(--green);
-  font-size: 1.25rem;
-  font-weight: 900;
+  font-size: var(--text-20);
+  font-weight: 700;
 }
 
 .projection-shortcuts {
@@ -316,14 +316,14 @@
 
 .projection-card > div:first-child > span {
   color: var(--green);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   font-family: var(--font-ui);
 }
 
 .projection-card h4 {
   margin: 3px 0 0;
-  font-size: 1.2rem;
+  font-size: var(--text-20);
 }
 
 .projection-card small {
