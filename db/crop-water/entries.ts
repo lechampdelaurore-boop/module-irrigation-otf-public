@@ -102,12 +102,13 @@ export async function saveSpeciesCorrespondenceForUser(
  * Rattache d'un geste les espèces que la personne a gardées parmi les
  * propositions de l'étape « Rattachez vos espèces » (4.4, F587), dans un
  * seul lot : toutes ou aucune. Refusé si l'une vise une culture que la ferme
- * ne connaît pas. Chaque espèce reçoit un rattachement d'espèce, sans
- * analogie ; les exceptions de séries ne sont pas touchées.
+ * ne connaît pas. Chaque espèce reçoit un rattachement d'espèce, par
+ * analogie quand la proposition le dit ; les exceptions de séries ne sont
+ * pas touchées.
  */
 export async function linkSpeciesForUser(
   ownerUserId: string,
-  links: readonly { plantId: string; referenceCropId: string }[],
+  links: readonly { plantId: string; referenceCropId: string; analogy: boolean }[],
   now = new Date(),
 ): Promise<CropWaterWriteResult<number>> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
@@ -115,7 +116,7 @@ export async function linkSpeciesForUser(
   const entries: CorrespondenceEntry[] = links.map((link) => ({
     plantId: link.plantId,
     seriesId: null,
-    target: { kind: 'reference', referenceCropId: link.referenceCropId, analogy: false },
+    target: { kind: 'reference', referenceCropId: link.referenceCropId, analogy: link.analogy },
   }));
   const problems = entries.flatMap((entry) => correspondenceProblem(entry, crops) ?? []);
   if (problems.length > 0) return { ok: false, problems: [...new Set(problems)] };

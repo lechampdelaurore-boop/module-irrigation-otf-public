@@ -494,6 +494,13 @@ registres, elle y renvoie.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
+  **PR 4d, le modèle des rattachements du porteur** (D-231, F590, section
+  8 bis.18 du contrat) : 40 liens espèce-culture relevés en lecture seule
+  dans sa ferme (saison 2026, 77 espèces), 11 par analogie, l'analogie
+  gardée ; les espèces sans référence et l'engrais vert hors du modèle.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip` réussis en local ; cinq sabotages, chacun
+  détecté ; parcours P46 et P29 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

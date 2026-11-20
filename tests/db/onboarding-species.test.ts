@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test, { afterEach, beforeEach } from 'node:test';
 import { listSpeciesCorrespondencesForWorkspace, saveSpeciesCorrespondenceForUser } from '../../db/crop-water/entries';
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
@@ -6,6 +7,7 @@ import { mockSnapshot } from '../../lib/adapters/mock-data';
 import type { SeasonSpecies } from '../../lib/domain/crop-water/species';
 import type { LinkCandidate } from '../../lib/domain/crop-water/species-linking';
 import { normalizedSpeciesName, speciesLinkProposals } from '../../lib/domain/onboarding/species';
+import { SPECIES_MODEL_LINKS } from '../../lib/domain/onboarding/species-model-data';
 import { unfinishedSteps, verificationLine } from '../../lib/domain/onboarding/steps';
 import { getCropCoefficientsViewForUser } from '../../lib/services/crop-water-coefficients';
 import { getOnboardingForUser } from '../../lib/services/onboarding-service';
@@ -15,7 +17,8 @@ import { ALICE, BOB } from '../support/spaces';
 
 /**
  * L'étape « Rattachez vos espèces » d'une ferme neuve (4.4,
- * docs/tranche-4-contract.md, F423, F428 réponse 4 ; PR 4c, F587) : une
+ * docs/tranche-4-contract.md, F423, F428 réponse 4 ; PR 4c, F587 ; PR 4d,
+ * F590) : une
  * proposition par espèce sans rattachement, du modèle sinon du nom ; la
  * personne garde celles qu'elle veut, d'un geste ; rien n'est rattaché à sa
  * place ; la ferme du porteur et la démonstration n'ont pas l'étape (F426).
@@ -57,10 +60,10 @@ const species = (plantId: string, plantName: string, link: SeasonSpecies['link']
 test('le modèle passe avant le nom ; il ne vise qu’une culture commune utilisable ; une espèce déjà rattachée n’est pas proposée', () => {
   const candidates = [candidate('criiam-tomate', 'Tomate'), candidate('fao-laitue', 'Laitue', { source: 'fao56' }), candidate('ferme-x', 'Courge', { fromCommonSet: false }), candidate('criiam-ko', 'Poireau', { usable: false })];
   const model = [
-    { species: 'mache', referenceCropId: 'fao-laitue' },
-    { species: 'Tomate cerise', referenceCropId: 'fao-laitue' },
-    { species: 'courge butternut', referenceCropId: 'ferme-x' },
-    { species: 'Poireau', referenceCropId: 'criiam-ko' },
+    { species: 'mache', referenceCropId: 'fao-laitue', analogy: true },
+    { species: 'Tomate cerise', referenceCropId: 'fao-laitue', analogy: false },
+    { species: 'courge butternut', referenceCropId: 'ferme-x', analogy: false },
+    { species: 'Poireau', referenceCropId: 'criiam-ko', analogy: false },
   ];
   const proposals = speciesLinkProposals([
     species('p1', 'Mâche'),
@@ -70,24 +73,35 @@ test('le modèle passe avant le nom ; il ne vise qu’une culture commune utilis
     species('p5', 'Tomate ancienne', { plantId: 'p5', seriesId: null, target: { kind: 'without-reference' } }),
     species('p6', 'Tomate ronde'),
   ], candidates, model);
-  assert.deepEqual(proposals.map((proposal) => [proposal.plantId, proposal.referenceCropId, proposal.from]), [
-    ['p1', 'fao-laitue', 'model'],
-    ['p2', 'fao-laitue', 'model'],
-    ['p6', 'criiam-tomate', 'name'],
+  assert.deepEqual(proposals.map((proposal) => [proposal.plantId, proposal.referenceCropId, proposal.analogy, proposal.from]), [
+    ['p1', 'fao-laitue', true, 'model'],
+    ['p2', 'fao-laitue', false, 'model'],
+    ['p6', 'criiam-tomate', false, 'name'],
   ]);
   assert.equal(normalizedSpeciesName('  Mâche   de  Nantes '), 'mache de nantes');
 });
 
-test('ferme neuve : chaque espèce que son nom désigne est proposée ; rien n’est rattaché avant le geste', async () => {
+test('ferme neuve : le modèle de la ferme du porteur d’abord, le nom ensuite ; rien n’est rattaché avant le geste', async () => {
   const workspaceId = await ensureWorkspaceForUser(ALICE);
   const { step, species: all } = await stepOf(ALICE);
   assert.ok(step);
   assert.equal(step.confirmed, false);
-  assert.ok(step.proposals.length > 0);
-  assert.ok(step.proposals.every((proposal) => proposal.from === 'name'), 'modèle vide tant que le porteur ne l’a pas relu');
-  assert.ok(!step.proposals.some((proposal) => proposal.plantName === 'Mâche'), 'la mâche ne reçoit rien (cas 9)');
-  assert.ok(step.proposals.length < all.length);
+  assert.deepEqual(all.map((item) => item.plantName), ['Carotte', 'Mâche', 'Radis', 'Tomate']);
+  assert.deepEqual(step.proposals.map((proposal) => [proposal.plantName, proposal.referenceCropId, proposal.analogy, proposal.from]), [
+    ['Carotte', 'criiam-carotte', false, 'model'],
+    ['Mâche', 'criiam-salade-ete', true, 'model'],
+    ['Radis', 'fao-radis', false, 'name'],
+    ['Tomate', 'criiam-tomate', false, 'model'],
+  ]);
   assert.deepEqual(await listSpeciesCorrespondencesForWorkspace(workspaceId), []);
+});
+
+test('le modèle relevé : 40 liens, des noms tous différents, chacun vers une culture du jeu commun', () => {
+  assert.equal(SPECIES_MODEL_LINKS.length, 40);
+  assert.equal(SPECIES_MODEL_LINKS.filter((link) => link.analogy).length, 11);
+  assert.equal(new Set(SPECIES_MODEL_LINKS.map((link) => normalizedSpeciesName(link.species))).size, SPECIES_MODEL_LINKS.length);
+  const common = new Set(readFileSync('drizzle/0023_crop_water_need.sql', 'utf8').match(/'(criiam|fao)-[a-z-]+'/g)?.map((id) => id.slice(1, -1)));
+  assert.deepEqual(SPECIES_MODEL_LINKS.filter((link) => !common.has(link.referenceCropId)), []);
 });
 
 test('les propositions gardées se rattachent d’un geste, les décochées non ; puis elles ne sont plus proposées', async () => {
@@ -100,15 +114,18 @@ test('les propositions gardées se rattachent d’un geste, les décochées non 
   assert.deepEqual(await listSpeciesCorrespondencesForWorkspace(workspaceId), [
     { plantId: kept.plantId, seriesId: null, target: { kind: 'reference', referenceCropId: kept.referenceCropId, analogy: false } },
   ]);
+  const mache = dropped.find((proposal) => proposal.plantName === 'Mâche')!;
+  assert.deepEqual(await linkProposedSpeciesForUser({ ...input(ALICE), plantIds: [mache.plantId] }), { ok: true, count: 1 });
+  assert.deepEqual((await listSpeciesCorrespondencesForWorkspace(workspaceId)).find((link) => link.plantId === mache.plantId)?.target,
+    { kind: 'reference', referenceCropId: 'criiam-salade-ete', analogy: true }, 'l’analogie du modèle est gardée');
   const after = (await stepOf(ALICE)).step!;
-  assert.deepEqual(after.proposals.map((proposal) => proposal.plantId), dropped.map((proposal) => proposal.plantId));
+  assert.deepEqual(after.proposals.map((proposal) => proposal.plantId), dropped.filter((proposal) => proposal !== mache).map((proposal) => proposal.plantId));
 });
 
 test('une espèce non proposée refuse tout le geste : rien n’est écrit', async () => {
   const workspaceId = await ensureWorkspaceForUser(ALICE);
-  const { step, species: all } = await stepOf(ALICE);
-  const notProposed = all.find((item) => !step!.proposals.some((proposal) => proposal.plantId === item.plantId))!;
-  const result = await linkProposedSpeciesForUser({ ...input(ALICE), plantIds: [step!.proposals[0].plantId, notProposed.plantId] });
+  const { step } = await stepOf(ALICE);
+  const result = await linkProposedSpeciesForUser({ ...input(ALICE), plantIds: [step!.proposals[0].plantId, 'plante-inconnue'] });
   assert.equal(result.ok, false);
   assert.deepEqual(await listSpeciesCorrespondencesForWorkspace(workspaceId), []);
   assert.equal((await linkProposedSpeciesForUser({ ...input(ALICE), plantIds: [] })).ok, false);
