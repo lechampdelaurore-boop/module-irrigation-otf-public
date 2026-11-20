@@ -374,6 +374,20 @@ registres, elle y renvoie.
   appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
 
+- Tranche 4, **4.6, PR 1 : les quatre documents du pilote écrits le 20
+  novembre 2026** (D-260, F570, F572, F573, F574, F575 ; sans code, Sonnet
+  5.5 · Moyen) : `docs/pilote-accord-modele.md` (accord par version datée,
+  neuf points, à faire relire gratuitement par le réseau du porteur avant
+  tout envoi, E6), `docs/pilote-recette.md` (étapes S0 à S5, protocole
+  d'isolation I1 à I5, grille par page, questions oui/non pour la personne
+  de la ferme pilote), `docs/pilote-retour-modele.md` (fiche de retour,
+  résumé sans nom) et `docs/pilote-fiche-entree.md` (les douze conditions
+  d'entrée, vides). Aucun nom, adresse ni donnée de ferme dans ces
+  fichiers. Rien n'est envoyé : le choix et le contact des fermes, l'envoi
+  de l'accord et la relecture juridique restent au porteur. Contrôles :
+  documentation seule, aucun contrôle de code rejoué ; relecture faite par
+  l'assistant contre le contrat (10 ter) et contre les textes publics
+  (`cloudflare/irrigation-site/src/pages.ts`).
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

@@ -6791,3 +6791,27 @@ valeur agronomique.
 
 Ne change pas : le moteur hydrique, le calcul, les coûts (aucune dépense
 nouvelle).
+
+## D-260 — Tranche 4, sous-tranche 4.6 : les quatre documents du pilote
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat de la 4.6 (D-221, 10 ter.6) prévoit une première PR
+sans code : le modèle d'accord, la grille de recette, la fiche de retour et
+la fiche d'entrée. Le porteur a besoin du modèle d'accord pour la relecture
+juridique gratuite de son réseau (condition d'entrée E6), qui précède tout
+envoi à une ferme.
+
+**Décision.** Les quatre documents sont ajoutés à `docs/` :
+`pilote-accord-modele.md`, `pilote-recette.md`, `pilote-retour-modele.md`,
+`pilote-fiche-entree.md`. Ils suivent le contrat sans le rouvrir (F570,
+F572, F573, F574, F575). Les durées de conservation ne sont pas recopiées
+dans l'accord : la politique de confidentialité en ligne, à sa version
+datée, fait foi (condition E7). Aucune donnée de ferme n'entre au dépôt : les
+fermes se nomment « ferme A » et « ferme pilote n ». Le numéro D-260 est
+pris hors des plages réservées aux chaînes 4.4 et 4.5 ; aucun numéro F nouveau.
+
+**Réservé au porteur.** Choisir et contacter les fermes, relire (ou faire
+relire) puis envoyer l'accord, recueillir les réponses, juger la recette.
+
+Ne change pas : le code, le moteur, les coûts (aucune dépense nouvelle).
