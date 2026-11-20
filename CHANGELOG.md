@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4a)
+
+- **Les racines d'une nouvelle ferme** (D-226) : l'asperge et le melon ne
+  sont plus limités, pour une nouvelle ferme, au plafond de 0,60 m choisi
+  pour la ferme du porteur ; ils partent de la profondeur de la FAO-56
+  (1,20 m et 0,80 m), dite « estimation, à vérifier à la tarière », que la
+  ferme ajuste. Les fermes qui utilisaient déjà le module gardent leurs
+  profils.
+
 ### Ajouté (Tranche 4, sous-tranche 4.4, PR 3)
 
 - **Le sol, d'après sa texture** (D-225) : une nouvelle ferme n'a plus,

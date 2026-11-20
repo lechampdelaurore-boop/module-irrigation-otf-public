@@ -1425,6 +1425,18 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **Ce que la PR ne fait pas.** Aucune RFU proposée par texture (la RFU reste saisie, d'une analyse ou d'une estimation) ; Ze n'est pas relié à TEW (le tableau vaut pour Ze = 10 cm, la phrase le dit) ; le plafond de sol d'un espace neuf reste vide, comme avant ; aucun appel nouveau à OTF ; aucune question de budget.
 - **Preuves.** Test « ferme neuve », défaut n° 4 : un espace neuf n'a ni TEW ni REW de départ, le bandeau nomme le sol de ses parcelles (`tests/db/onboarding-soil.test.ts`) ; les neuf milieux du tableau ; l'espace d'avant l'accueil et la démonstration gardent TEW 14 / REW 7 ; l'étape confirmée par le sol de la dernière parcelle, pas par la valeur d'un jardin ; la texture gardée et relue ; une texture inconnue refusée ; un espace d'avant l'accueil qui saisit un sol le reste ; isolation Alice et Bob, aux trois passages. Quatre sabotages, chacun détecté. Parcours : P46 étendu (l'étape « Saisir le sol », TEW et REW vides, la texture qui les propose, l'étape confirmée) ; P29 garde le bandeau du sol ; P31b et P33 choisissent une texture pour saisir leur sol.
 
+#### 8 bis.13 · Précisions du code de la PR 4a (20 novembre 2026, D-226, F585)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé, sans accès d'OTF.
+
+##### F585 · Les racines d'une ferme neuve : la FAO, pas le plafond du porteur
+
+- **La PR 4 en trois, une à la fois.** 4a (celle-ci) : les racines (F423, défaut n° 14) ; 4b : la région d'origine des cultures et son avertissement (F422) ; 4c : l'étape « Rattachez vos espèces » et le modèle copiable des 78 liens (F423, F428 réponse 4), dont l'extraction lit la ferme réelle.
+- **Ce que le code montrait** (le [À FAIRE] de F423). Le plafond de 0,60 m est **dans le jeu commun lui-même** (migration 0025) : pour l'asperge (« Maximum : plafond du porteur, 0,60 m (D-056) », FAO 1,2-1,8 m non retenue) et aussi pour le **melon** (même plafond, FAO 0,8-1,5 m non retenue). Le jeu commun ne se modifie pas en place (une ligne par culture, ni mise à jour ni effacement).
+- **La correction se pose à la lecture**, pour un espace qui fait l'accueil seulement (`rootingProfilesForSpace`, `lib/domain/onboarding/rooting.ts`), là où les services lisent les profils (réserve du sol, « Besoin par culture ») : le profil commun de l'asperge et du melon prend la borne basse de la fourchette de la FAO-56 (tableau 22), comme les autres profils construits sur la FAO (D-056) : asperge 1,20 m à tous les stades (culture installée) ; melon 0,30 m, 0,55 m, puis 0,80 m aux stades 3 et 4. p ne change pas (tableau 22). La source le dit, la note dit « Estimation » et que le plafond de 0,60 m est celui de la ferme du porteur. Ses dates restent celles du jeu commun : une révision de la ferme le remplace toujours.
+- **Inchangé** : la base (aucune migration) ; la ferme du porteur (espace d'avant l'accueil) et la démonstration lisent le jeu commun tel quel (F426) ; la tomate à 0,65 m, choisie par le porteur dans la fourchette de l'ITAB (50-80 cm), reste commune : ce n'est pas un plafond hors des sources.
+- **Preuves.** `tests/db/onboarding-rooting.test.ts` : le jeu commun en base garde 0,60 m ; une ferme neuve lit 1,20 m (asperge) et 0,80 m (melon), la source et la note dites ; la vue « Besoin par culture » aussi ; la ferme d'avant l'accueil et la démonstration lisent 0,60 m ; une révision de la ferme neuve remplace la proposition et ne touche pas l'autre ferme ; aux trois passages d'isolation. Quatre sabotages, chacun détecté. Aucun parcours navigateur nouveau : l'écran ne change pas.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :

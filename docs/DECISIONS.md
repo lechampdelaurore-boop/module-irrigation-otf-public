@@ -6691,3 +6691,24 @@ Ne change pas : les valeurs de départ d'un espace d'avant l'accueil et de la
 démonstration (TEW 14 / REW 7 gardés ; la liste des textures s'ajoute à leur
 formulaire sans rien remplir) ; aucun calcul ; aucun appel nouveau à OTF.
 Aucune question de budget.
+
+## D-226 — Tranche 4, sous-tranche 4.4, PR 4a : les racines d'une ferme neuve
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le jeu commun des profils racinaires porte, pour l'asperge et
+le melon, le plafond de 0,60 m de la ferme du porteur (D-056) au lieu de la
+profondeur de la FAO-56 ; une ferme neuve l'héritait (défaut n° 14).
+
+**Décision** (F585, section 8 bis.13 du contrat).
+
+1. Pour un espace qui fait l'accueil, le profil commun de l'asperge et du
+   melon prend, à la lecture, la borne basse de la FAO-56 (tableau 22) :
+   asperge 1,20 m ; melon 0,80 m aux stades 3 et 4. Dit « estimation, à
+   vérifier à la tarière ».
+2. Une révision de la ferme le remplace toujours.
+3. La PR 4 se fait en trois : 4a les racines, 4b la région des cultures,
+   4c le rattachement des espèces et le modèle des 78 liens.
+
+Ne change pas : la base (aucune migration) ; la ferme du porteur et la
+démonstration ; la tomate à 0,65 m. Aucune question de budget.
