@@ -129,3 +129,57 @@
   gap: 6px;
   min-height: 44px;
 }
+
+/* « Rattachez vos espèces » (F587) : chaque proposition cochée, sa provenance dessous ; un geste pour toutes. */
+.species-step {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.species-step h3 {
+  margin: 0 0 6px;
+}
+
+.species-step-proposals {
+  margin: 8px 0;
+  padding: 0;
+  border: 0;
+}
+
+.species-step-proposals ul {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.species-step-proposals label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 8px;
+  min-height: 44px;
+}
+
+.species-step-proposals label small {
+  grid-column: 2;
+  color: var(--ink2);
+}
+
+.species-step-proposals input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+}
+
+.species-step button {
+  min-height: 44px;
+}
+
+.species-step-confirm p {
+  margin: 10px 0 6px;
+}

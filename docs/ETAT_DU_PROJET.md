@@ -442,7 +442,7 @@ registres, elle y renvoie.
   sabotages, chacun détecté ; P46 (étendu), P18, P19, P29, P31b, P33 joués
   en local aux deux largeurs, réussis (14 sur 14) ; la suite complète par
   la CI de la PR.
-  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat) : le
+  **PR 4a, les racines** (D-226, F585, section 8 bis.13 du contrat), **en ligne le 20 novembre 2026 à 18 h 25 (#132, fusionnée à 18 h 06, run 44779979091 vérifié job par job : les cinq jobs verts)** : le
   plafond de 0,60 m de l'asperge et du melon, celui de la ferme du porteur,
   est dans le jeu commun ; pour une ferme qui fait l'accueil, il est
   remplacé à la lecture par la borne basse de la FAO-56 (asperge 1,20 m,
@@ -465,6 +465,16 @@ registres, elle y renvoie.
   `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
   `pnpm weather:check`, `pnpm site:check` réussis en local ; six sabotages,
   chacun détecté ; parcours P46 étendu, P17, P20 et P31c rejoués en local.
+  **PR 4c, « Rattachez vos espèces »** (D-228, F587, section 8 bis.15 du
+  contrat) : pour une ferme qui fait l'accueil, une proposition par espèce
+  sans rattachement (modèle du porteur, sinon le nom), cochée, rattachée
+  d'un geste, tout ou rien ; l'étape « Cultures » confirmée d'un geste,
+  avec le compte ; bandeau « N espèces à rattacher » jusque-là ; aucune
+  migration ; modèle vide jusqu'à la relecture du porteur (PR 4d). Contrôles
+  de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`,
+  `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm site:check`
+  réussis en local ; sept sabotages, chacun détecté ; parcours P46 étendu,
+  P29 et P28 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
   F569, section 10 bis de `docs/tranche-4-contract.md`), sans code : un

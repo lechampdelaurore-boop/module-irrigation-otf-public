@@ -6956,3 +6956,26 @@ région les recevait sans le savoir (F422, défaut n° 13).
 
 Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
 et la démonstration (aucun avertissement, F426). Aucune question de budget.
+
+## D-228 — Tranche 4, sous-tranche 4.4, PR 4c : l'étape « Rattachez vos espèces »
+
+Date : 20 novembre 2026.
+
+**Contexte.** Une ferme neuve part sans aucun rattachement (défaut n° 15) ;
+la proposition d'après le nom existait, une espèce à la fois (lot 3, cas 9).
+
+**Décision** (F587, section 8 bis.15 du contrat).
+
+1. Pour un espace qui fait l'accueil, une étape en tête de la
+   correspondance des espèces : une proposition par espèce sans
+   rattachement, du modèle de la ferme du porteur s'il connaît son nom,
+   sinon d'après le nom ; chacune cochée, la personne décoche et rattache
+   le reste d'un geste, tout ou rien.
+2. L'étape « Cultures » se confirme d'un geste, avec le compte des espèces
+   rattachées ; le bandeau « À finir » nomme les espèces à rattacher tant
+   qu'elle ne l'est pas.
+3. La PR 4c en deux : 4c, l'étape et le mécanisme, modèle vide ; 4d, la
+   liste des liens du porteur, après sa relecture (F428, réponse 4).
+
+Ne change pas : la base (aucune migration) ; la ferme du porteur et la
+démonstration ; la proposition une par une. Aucune question de budget.

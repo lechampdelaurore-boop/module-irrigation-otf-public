@@ -1,6 +1,6 @@
 'use client';
 
-import { onboardingExplanation, onboardingSummary, verificationLine, type ResolvedOnboarding } from '@/lib/domain/onboarding/steps';
+import { onboardingExplanation, onboardingSummary, SPECIES_STEP_ANCHOR, verificationLine, type ResolvedOnboarding } from '@/lib/domain/onboarding/steps';
 
 const TONE_WORDS = { confirmed: 'Confirmé', skipped: 'Passé', missing: 'À faire' } as const;
 
@@ -13,7 +13,7 @@ const TONE_WORDS = { confirmed: 'Confirmé', skipped: 'Passé', missing: 'À fai
  * météo, plus haut (PR 2, F582). Absent de la
  * démonstration, dont les fermes fictives sont déjà réglées.
  */
-export function OnboardingSettings({ onboarding, locationHere, plotsHere, soilHref }: {
+export function OnboardingSettings({ onboarding, locationHere, plotsHere, soilHref, speciesHere }: {
   onboarding: ResolvedOnboarding;
   /** Le lieu de la météo est sur cette page (une case cochée lit la météo) : l'étape « Où est la ferme » y mène (F582). */
   locationHere: boolean;
@@ -21,6 +21,8 @@ export function OnboardingSettings({ onboarding, locationHere, plotsHere, soilHr
   plotsHere: boolean;
   /** Où saisir le sol de la première parcelle qui n'en a pas, sur la page « Réserve du sol » (F584) ; `null` : rien à y faire. */
   soilHref: string | null;
+  /** « Rattachez vos espèces » est sur cette page (une case lit la correspondance des espèces) : l'étape y mène (F587). */
+  speciesHere: boolean;
 }) {
   if (onboarding.kind === 'demonstration') return null;
   const lines = onboarding.steps.map(verificationLine);
@@ -42,6 +44,7 @@ export function OnboardingSettings({ onboarding, locationHere, plotsHere, soilHr
                 {line.id === 'location' && line.tone === 'missing' && locationHere ? <a href="#water-weather-title">Choisir la commune</a> : null}
                 {line.id === 'plots' && line.tone === 'missing' && plotsHere ? <a href="#parcelles-et-abris">Classer les jardins</a> : null}
                 {line.id === 'soil' && line.tone === 'missing' && soilHref ? <a href={soilHref}>Saisir le sol</a> : null}
+                {line.id === 'crops' && line.tone === 'missing' && speciesHere ? <a href={`#${SPECIES_STEP_ANCHOR}`}>Rattacher les espèces</a> : null}
               </li>
             ))}
           </ol>
