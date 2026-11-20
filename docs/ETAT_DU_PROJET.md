@@ -362,7 +362,7 @@ registres, elle y renvoie.
   **Code commencé le 20 novembre 2026**, sur le « vas-y » du porteur
   (7 h 52), en Opus 5.5 · Élevé (ligne 4.4 de la roadmap). **PR 1 sur 5,
   l'état de l'accueil et le marquage de l'espace existant** (D-222, F581,
-  section 8 bis.9 du contrat) : une table `irrigation_onboarding_steps`
+  section 8 bis.9 du contrat), **en ligne le 20 novembre 2026 à 16 h 13 (#126, fusionnée à 15 h 51, run 44757499085 vérifié job par job : les cinq jobs verts)** : une table `irrigation_onboarding_steps`
   (migration additive 0034, le numéro libre : les migrations se suivent
   sans trou, la 4.3 PR 3 prendra le suivant), une ligne par espace et par
   étape confirmée (commune, parcelles et abris, sol, cultures, réglages à
