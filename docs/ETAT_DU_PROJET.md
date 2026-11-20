@@ -484,7 +484,7 @@ registres, elle y renvoie.
   au dépôt commun (MC-37). Contrôles de la PR : `pnpm lint`,
   `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
-  local ; huit sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
+  local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
   P31 et P10 rejoués en local.
 
 - Tranche 4, **4.5 : contrat écrit le 19 novembre 2026** (D-220, F560 à
