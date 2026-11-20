@@ -1,6 +1,7 @@
 import {
   validateIrrigationPushAlarmCancellation,
   validateIrrigationPushAlarmRequest,
+  validateIrrigationPushRecipientForget,
   validateIrrigationPushSendRequest,
   validateIrrigationPushSubscriptionRequest,
   validateIrrigationPushUnsubscriptionRequest,
@@ -26,11 +27,17 @@ type DeviceApiStub = {
   unregister: (recipientKey: string, endpoint: string) => Promise<void>;
 };
 
+/** La liste des appareils d'un espace : son oubli entier, quand l'espace est effacé (F654). */
+type RecipientApiStub = {
+  forgetAll: (recipientKey: string) => Promise<{ forgotten: number }>;
+};
+
 export type PushApiDependencies = {
   serviceToken: string;
   sendNow: (request: IrrigationPushSendRequest) => Promise<unknown>;
   getAlarm: (eventEquipmentId: string) => AlarmApiStub;
   getDevice: (endpoint: string) => DeviceApiStub;
+  getRecipient: (recipientKey: string) => RecipientApiStub;
 };
 
 export async function handlePushApiRequest(
@@ -83,6 +90,11 @@ export async function handlePushApiRequest(
     await dependencies.getDevice(registration.endpoint)
       .unregister(registration.recipientKey, registration.endpoint);
     return new Response(null, { status: 204 });
+  }
+  if (pathname === '/v1/recipients/forget') {
+    const forget = validateIrrigationPushRecipientForget(input);
+    if (!forget) return json({ error: 'invalid_recipient' }, 400);
+    return json(await dependencies.getRecipient(forget.recipientKey).forgetAll(forget.recipientKey), 200);
   }
   return json({ error: 'not_found' }, 404);
 }

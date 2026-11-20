@@ -16,6 +16,7 @@ import {
   type DeviceHolder,
 } from './devices.ts';
 import {
+  afterMissedDelivery,
   compareAlarmRevisions,
   deliveryRetryDelay,
   immediateDeliveryStatus,
@@ -56,6 +57,8 @@ type SubscriptionRow = {
   p256dh: string;
   auth: string;
   last_sent_revision: string | null;
+  /** Le premier envoi manqué depuis la dernière réussite, ou `null` (F655). */
+  failing_since: number | null;
 };
 
 export type DeviceRegistrationResult = { status: 'registered' | 'other-person' };
@@ -67,6 +70,7 @@ export default {
       sendNow: (request) => sendNow(env, request),
       getAlarm: (eventEquipmentId) => alarmStub(env, eventEquipmentId),
       getDevice: (endpoint) => deviceStub(env, endpoint),
+      getRecipient: (recipientKey) => recipientStub(env, recipientKey),
     });
   },
 } satisfies ExportedHandler<Env>;
@@ -135,9 +139,16 @@ export class PushRecipient extends DurableObject<Env> {
         auth TEXT NOT NULL,
         last_sent_revision TEXT,
         created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL
+        updated_at INTEGER NOT NULL,
+        failing_since INTEGER
       )`,
     );
+    // Une liste d'avant le 20 novembre 2026 reçoit la colonne à son premier réveil, ses lignes intactes (F655).
+    try {
+      this.ctx.storage.sql.exec('ALTER TABLE push_subscriptions ADD COLUMN failing_since INTEGER');
+    } catch (error) {
+      if (!(error instanceof Error && /duplicate column/i.test(error.message))) throw error;
+    }
   }
 
   async upsert(subscription: IrrigationPushSubscription) {
@@ -175,6 +186,23 @@ export class PushRecipient extends DurableObject<Env> {
       'DELETE FROM push_subscriptions WHERE endpoint = ?',
       endpoint,
     );
+  }
+
+  /**
+   * L'espace est effacé (docs/tranche-4-contract.md, F563, et 10 bis.19,
+   * F654) : chaque appareil de sa liste le quitte (sa fiche est oubliée s'il
+   * ne sert plus aucun espace), puis sa ligne part. Coupé en route, l'oubli
+   * se reprend : ce qui est fait n'est pas à refaire.
+   */
+  async forgetAll(recipientKey: string): Promise<{ forgotten: number }> {
+    const rows = this.ctx.storage.sql
+      .exec<{ endpoint: string }>('SELECT endpoint FROM push_subscriptions ORDER BY created_at')
+      .toArray();
+    for (const { endpoint } of rows) {
+      await deviceStub(this.env, endpoint).leave(recipientKey);
+      await this.remove(endpoint);
+    }
+    return { forgotten: rows.length };
   }
 
   async count() {
@@ -235,11 +263,25 @@ export class PushRecipient extends DurableObject<Env> {
         request.notification,
         vapid,
       );
+      if (disposition === 'transient' || disposition === 'permanent') {
+        // Sans réponse du service depuis 90 jours : oublié comme un abonnement expiré (F562, F655).
+        const missed = afterMissedDelivery(row.failing_since, Date.now());
+        if (missed.forget) {
+          await this.forgetExpired(row.endpoint);
+          result.expired += 1;
+          continue;
+        }
+        this.ctx.storage.sql.exec(
+          'UPDATE push_subscriptions SET failing_since = ? WHERE endpoint = ?',
+          missed.failingSince,
+          row.endpoint,
+        );
+      }
       result[disposition] += 1;
       if (disposition === 'delivered') {
         this.ctx.storage.sql.exec(
           `UPDATE push_subscriptions
-           SET last_sent_revision = ?, updated_at = ?
+           SET last_sent_revision = ?, updated_at = ?, failing_since = NULL
            WHERE endpoint = ?`,
           request.revision,
           Date.now(),
@@ -306,6 +348,19 @@ export class PushDevice extends DurableObject<Env> {
     await this.ctx.blockConcurrencyWhile(async () => this.ctx.storage.deleteAll());
   }
 
+  /**
+   * L'espace est effacé (F654) : l'appareil le quitte ; s'il ne sert plus
+   * aucun espace, sa fiche est oubliée, l'empreinte de la personne avec elle.
+   * La liste de l'espace retire elle-même sa ligne.
+   */
+  async leave(recipientKey: string): Promise<void> {
+    await this.ctx.blockConcurrencyWhile(async () => {
+      const holder = holderAfterUnregistration(await this.holder(), recipientKey);
+      if (holder.recipientKeys.length === 0) await this.ctx.storage.deleteAll();
+      else await this.ctx.storage.put(DEVICE_HOLDER_KEY, holder);
+    });
+  }
+
   private async holder(): Promise<DeviceHolder | null> {
     return (await this.ctx.storage.get<DeviceHolder>(DEVICE_HOLDER_KEY)) ?? null;
   }
@@ -349,13 +404,13 @@ function alarmStub(env: Env, eventEquipmentId: string) {
 function recipientStub(env: Env, recipientKey: string) {
   return env.PUSH_RECIPIENTS.get(
     env.PUSH_RECIPIENTS.idFromName(recipientKey),
-  ) as unknown as DurableObjectStub & Pick<PushRecipient, 'upsert' | 'remove' | 'count' | 'deliver'>;
+  ) as unknown as DurableObjectStub & Pick<PushRecipient, 'upsert' | 'remove' | 'count' | 'deliver' | 'forgetAll'>;
 }
 
 function deviceStub(env: Env, endpoint: string) {
   return env.PUSH_DEVICES.get(
     env.PUSH_DEVICES.idFromName(endpoint),
-  ) as unknown as DurableObjectStub & Pick<PushDevice, 'register' | 'unregister' | 'admit' | 'forget'>;
+  ) as unknown as DurableObjectStub & Pick<PushDevice, 'register' | 'unregister' | 'admit' | 'forget' | 'leave'>;
 }
 
 function vapidKeys(env: Env): VapidKeys {
