@@ -17,6 +17,14 @@ source détaillée commit par commit.
   registre. Rien ne change à l'écran : la page d'état et la veille de
   l'exploitant viennent avec la PR 2. Migration 0034, additive.
 
+### Modifié (audit du 19 novembre 2026, lot K, PR 2 sur 7)
+
+- **Vue satellite : des numéros quand les noms se chevauchent** (D-191) :
+  là où les jardins sont serrés, un nom qui en recouvrirait un autre devient
+  le numéro du jardin ; la liste à côté de la carte porte ces numéros et
+  sert de légende. Le calcul se refait à chaque zoom : un numéro redevient
+  nom quand la place revient. Le nom entier reste dans la bulle.
+
 ### Modifié (audit du 19 novembre 2026, lot K, PR 1 sur 7)
 
 - **Planning : le rouge pour le manque d'eau seul** (D-190) : une planche
