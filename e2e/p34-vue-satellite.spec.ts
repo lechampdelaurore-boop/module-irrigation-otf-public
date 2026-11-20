@@ -84,9 +84,9 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
     'https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-ORTHO',
   );
   // Le nom de la parcelle est le titre du bloc : il n'est plus posé sur la carte (F270).
-  await expect(carte.locator('.satellite-label', { hasText: 'Les Prés' })).toHaveCount(0);
-  await expect(carte.locator('.satellite-label', { hasText: 'Jardin Nord' })).toBeVisible();
-  await expect(carte.locator('.satellite-label', { hasText: 'Tunnel 1' })).toBeVisible();
+  await expect(carte.locator('.satellite-label[data-name="Les Prés"]')).toHaveCount(0);
+  await expect(carte.locator('.satellite-label[data-name="Jardin Nord"]')).toBeVisible();
+  await expect(carte.locator('.satellite-label[data-name="Tunnel 1"]')).toBeVisible();
   await expect(carte.locator('.maplibregl-ctrl-scale')).toHaveText(/^\d+\s?m$/);
   await expect(panneau.getByText('L’IGN voit quelle zone est regardée, pas qui la regarde.', { exact: false })).toBeVisible();
   await expect(ligneNord).toHaveText(/Jardin Nord\s*plein champ\s*756 m²\s*contour dessiné/);
@@ -126,8 +126,8 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   // Toucher une ligne met son jardin en évidence ; toucher un nom sur la carte, sa ligne.
   await ligneTunnel.click();
   await expect(ligneTunnel).toHaveAttribute('aria-pressed', 'true');
-  await expect(carte.locator('.satellite-label', { hasText: 'Tunnel 1' })).toHaveAttribute('data-highlighted', 'true');
-  await carte.locator('.satellite-label', { hasText: 'Jardin Nord' }).click();
+  await expect(carte.locator('.satellite-label[data-name="Tunnel 1"]')).toHaveAttribute('data-highlighted', 'true');
+  await carte.locator('.satellite-label[data-name="Jardin Nord"]').click();
   await expect(ligneNord).toHaveAttribute('aria-pressed', 'true');
   await expect(ligneTunnel).toHaveAttribute('aria-pressed', 'false');
   await verifierLEtape(page, journal, 'mise en évidence d’un jardin');
@@ -138,7 +138,7 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   await expect(carte).toHaveAttribute('data-basemap', 'drawing');
   await expect(carte).toHaveAttribute('data-ready', 'true');
   await expect(carte.getByRole('link', { name: '© IGN – Géoplateforme' })).toHaveCount(0);
-  await expect(carte.locator('.satellite-label', { hasText: 'Jardin Nord' })).toBeVisible();
+  await expect(carte.locator('.satellite-label[data-name="Jardin Nord"]')).toBeVisible();
   await page.reload();
   await ouvrirParClic(ongletSatellite, dessin);
   await expect(dessin).toHaveAttribute('aria-pressed', 'true');
@@ -168,7 +168,7 @@ test('la vue satellite montre la parcelle, ses jardins et leur liste, mémorise 
   await choisirLaParcelle(page, 'Les Prés');
   await expect(panneau.getByRole('status')).toHaveText('Fond satellite indisponible : la carte montre les contours seuls.');
   await expect(carte).toHaveAttribute('data-basemap', 'drawing');
-  await expect(carte.locator('.satellite-label', { hasText: 'Jardin Nord' })).toBeVisible();
+  await expect(carte.locator('.satellite-label[data-name="Jardin Nord"]')).toBeVisible();
   await expect(dessin).toHaveAttribute('aria-pressed', 'true');
   await expect(satellite).toHaveAttribute('aria-pressed', 'false');
   await verifierLEtape(page, journal, 'fond indisponible');
@@ -200,7 +200,13 @@ test('sans WebGL, la vue satellite dessine les contours en SVG, avec la même li
   await expect(panneau.getByRole('button', { name: 'Photo', exact: true })).toHaveCount(0);
   await expect(dessin.locator('path.satellite-svg-garden')).toHaveCount(2);
   await expect(dessin.locator('path.satellite-svg-zone')).toHaveCount(1);
-  await expect(panneau.locator('.satellite-svg .satellite-label', { hasText: 'Tunnel 1' })).toBeVisible();
+  await expect(panneau.locator('.satellite-svg .satellite-label[data-name="Tunnel 1"]')).toBeVisible();
+  // Chaque nom porte le numéro de sa ligne dans la liste, qui sert de légende quand il n'a pas la place (lot K, n° 16, F468).
+  const numeros = await panneau.getByRole('list', { name: 'Jardins de la parcelle' }).locator('.satellite-garden-number').allTextContents();
+  expect(numeros, 'la liste numérotée dans l’ordre').toEqual(numeros.map((_, index) => String(index + 1)));
+  const tunnel = panneau.locator('.satellite-svg .satellite-label[data-name="Tunnel 1"]');
+  const numero = await tunnel.getAttribute('data-number');
+  await expect(tunnel).toHaveText((await tunnel.getAttribute('data-short')) === 'true' ? numero! : 'Tunnel 1');
   const ligneTunnel = panneau.getByRole('list', { name: 'Jardins de la parcelle' }).getByRole('button', { name: /^Tunnel 1/ });
   await ligneTunnel.click();
   await expect(dessin.locator('path.satellite-svg-garden[data-mode="greenhouse"]')).toHaveAttribute('data-highlighted', 'true');

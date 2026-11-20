@@ -152,7 +152,7 @@
 .water-empty {
   margin: 14px 0 0;
   padding: 16px;
-  border-radius: 10px;
+  border-radius: 9.75px;
   background: var(--sheet);
   color: var(--muted);
 }
@@ -177,7 +177,7 @@
 
 .water-editor label > span,
 .projection-shortcuts label > span {
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   color: var(--muted);
   font-family: var(--font-ui);
@@ -191,7 +191,7 @@
   min-width: 0;
   min-height: 44px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--radius-button);
   background: #fff;
   padding: 8px 10px;
   color: var(--ink);
@@ -200,13 +200,13 @@
 .water-editor fieldset {
   margin: 16px 0 0;
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 9.75px;
   padding: 12px;
 }
 
 .water-editor legend {
   padding: 0 6px;
-  font-weight: 750;
+  font-weight: 700;
 }
 
 .water-editor .water-toggle {
@@ -223,7 +223,7 @@
 
 .water-editor-help {
   padding: 10px 12px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--tile);
 }
 
@@ -279,8 +279,8 @@
 
 .water-connection > span {
   color: var(--green);
-  font-size: 1.25rem;
-  font-weight: 900;
+  font-size: var(--text-20);
+  font-weight: 700;
 }
 
 .projection-shortcuts {
@@ -316,14 +316,14 @@
 
 .projection-card > div:first-child > span {
   color: var(--green);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 500;
   font-family: var(--font-ui);
 }
 
 .projection-card h4 {
   margin: 3px 0 0;
-  font-size: 1.2rem;
+  font-size: var(--text-20);
 }
 
 .projection-card small {
@@ -336,7 +336,7 @@
   display: grid;
   gap: 5px;
   padding: 11px;
-  border-radius: 9px;
+  border-radius: 9.75px;
   background: var(--warn-soft);
   color: var(--warn-ink);
 }

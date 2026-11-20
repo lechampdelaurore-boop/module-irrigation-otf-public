@@ -256,7 +256,7 @@ test('une minute pleine : le dernier instantané s’affiche avec l’heure de l
     writeCache: async () => undefined,
     now: () => now,
   });
-  assert.equal(withTime.warning, 'Limite de requêtes OTF atteinte. La dernière lecture réussie est affichée ; nouvelle lecture possible à 11:01.');
+  assert.equal(withTime.warning, 'Limite de requêtes OTF atteinte. La dernière lecture réussie est affichée ; nouvelle lecture possible à 11 h 01.');
 
   const lateEvening = new Date('2026-11-18T22:59:30.000Z'); // 23 h 59 à Paris : la place se libère demain
   const tomorrow = await readLiveOrLastSuccessfulSnapshot({

@@ -325,12 +325,12 @@ test('pompe tenue par une irrigation validée : le motif nomme ce qui la tenait,
   assert.ok(waiting.length >= 2, `${waiting.length} rampe(s) à 21 h 47, la minute après la fin de la rampe validée`);
   for (const proposal of waiting) {
     assert.equal(proposal.justification.timingReason, 'pump-capacity', `${proposal.equipmentName} a attendu la pompe`);
-    assert.equal(proposal.justification.limitingConstraint, 'pompe « La pompe » saturée avant 21:47 : rampe-bloc-2', proposal.equipmentName);
+    assert.equal(proposal.justification.limitingConstraint, 'pompe « La pompe » saturée avant 21 h 47 : rampe-bloc-2', proposal.equipmentName);
   }
   const fourth = plan.proposals.find((proposal) => proposal.startAt === '2026-09-29T20:32:00.000Z');
   assert.ok(fourth, 'la quatrième rampe attend la fin des deux rampes de 45 min');
   assert.equal(fourth?.justification.timingReason, 'pump-capacity');
-  assert.equal(fourth?.justification.limitingConstraint, 'pompe « La pompe » saturée avant 22:32 : Rampe de serre tunnel 1, Rampe de serre tunnel 2, Rampe de serre tunnel 3');
+  assert.equal(fourth?.justification.limitingConstraint, 'pompe « La pompe » saturée avant 22 h 32 : Rampe de serre tunnel 1, Rampe de serre tunnel 2, Rampe de serre tunnel 3');
 });
 
 test('espacement après une irrigation validée du vendredi matin : samedi dit « espacement », pas « après la pluie prévue » (point 33)', () => {

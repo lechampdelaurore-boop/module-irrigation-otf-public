@@ -671,7 +671,36 @@ registres, elle y renvoie.
   44701703829 vérifié job par job). **PR 7, « Arrosages » et « Historique », le premier
   geste plus haut** (D-189, F462) : « Résultat calculé » attend un matériel
   et une quantité ; les filtres de l'historique dans un pli « Filtrer »,
-  l'export en bouton secondaire après les chiffres ; codée. Lot J codé.
+  l'export en bouton secondaire après les chiffres ; en ligne le
+  20 novembre 2026 à 10 h 20 (#128, fusionnée à 9 h 58, run 44706780872 vérifié job
+  par job) : **lot J en ligne en entier**.
+  **Lot K commencé le 19 novembre 2026**, en Opus 5.5 · Élevé : contrat
+  court `docs/audit-ergonomie-2026-11-19-lot-k-contract.md` (F463 et
+  suivantes, parcours P41), sept PR. **PR 1, planning : le rouge pour le
+  manque d'eau seul** (D-190, F463 à F467) : les planches au besoin sous la
+  dose minimale dites « en attente », pour information ; « Ajuster » à
+  l'arrondi de la carte ; la ligne d'état en deux lignes ; un seul
+  « Valider » pour un jour à une proposition ; « Réglages du planning »
+  signé comme les autres plis ; en ligne le 20 novembre 2026 à 11 h 08
+  (#130, fusionnée à 10 h 45, run 44713406262 vérifié job par job). **PR 2, vue satellite : des numéros
+  quand les noms se chevauchent** (D-191, F468) : le nom qui en recouvrirait
+  un autre devient le numéro du jardin, la liste à côté sert de légende,
+  recalculé à chaque zoom ; en ligne le 20 novembre 2026 à 11 h 53 (#136, fusionnée à 11 h 35, run 44720522951 vérifié job par job). **PR 3, un bouton plein par écran, un
+  seul dessin de pli, plus de geste muet** (D-192, F469 à F473) : le
+  chevron de la charte sur tous les plis, les raccourcis et les choix en
+  secondaire, « Cette semaine » et « Retirer la mesure » indisponibles
+  quand ils ne feraient rien, la fin à la minute, « Terminer
+  l'irrigation » partout ; en ligne le 20 novembre 2026 à 12 h 37 (#139, fusionnée à 12 h 18, run 44726582192 vérifié job par job). **PR 4, mots et formats** (D-193, F474 à
+  F476) : « 8 h 50 » et « 1 h 21 » partout, plus de pluriel entre
+  parenthèses, « Ressources » et « Réglages » en mots simples ; en ligne le 20 novembre 2026 à 13 h 23 (#142, fusionnée à 13 h 03, run 44732632542 vérifié job par job).
+  **PR 5, une échelle de tailles de texte, rien sous 12 px** (D-194, F477,
+  F478) : six tailles en jetons, quatre graisses, la pastille du plan
+  expliquée ; en ligne le 20 novembre 2026 à 14 h 02 (#144, fusionnée à 13 h 44, run 44738264610 vérifié job par job). **PR 6, rayons et couleurs de la charte** (D-195,
+  F479) : trois rayons, les cercles restent ; plus de texte hors palette ;
+  en ligne le 20 novembre 2026 à 14 h 45 (#148, fusionnée à 14 h 23, run 44743952625 vérifié job par job). **PR 7, grand écran, tablette et 320 px** (D-196, F480 à F482) :
+  la page centrée et le menu jusqu'en bas au grand écran, la barre du bas
+  et les cibles de 44 px jusqu'à 980 px, les noms entiers à 320 px ;
+  en ligne le 20 novembre 2026 à 15 h 23 (#150, fusionnée à 15 h 05, run 44750080070 vérifié job par job : les cinq jobs verts). Lot K codé en entier et en ligne.
 
 - 3.9, scénarios, tests de pénurie, recette et publication : **close
   le 13 novembre 2026 à 19 h 28 sur le mot de clôture du porteur**, la Tranche 3 avec

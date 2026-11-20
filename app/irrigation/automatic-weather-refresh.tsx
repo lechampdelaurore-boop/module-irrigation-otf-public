@@ -1,12 +1,10 @@
 'use client';
 
 import { automaticRefreshStatus, type AutomaticRefreshRecord } from '@/lib/domain/weather/automatic-refresh-status';
+import { dateClockText } from '@/lib/domain/clock-text';
 
-const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-  timeZone: 'Europe/Paris',
-});
+// « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
+const dateTimeFormatter = { format: (value: Date | number) => dateClockText(new Date(value)) };
 
 /**
  * La ligne de la mise à jour automatique de la météo (correctif météo, PR 2,

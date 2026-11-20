@@ -265,9 +265,9 @@ test('les réglages font l’aller-retour par le formulaire, et une saisie absur
   assert.equal(timeInputFromMinutes(1260), '21:00');
   assert.equal(minutesFromTimeInput('8:05'), 485);
   assert.equal(minutesFromTimeInput('24:00'), null);
-  assert.equal(windowLabel({ startMinute: 1260, endMinute: 480 }), '21:00 – 08:00');
+  assert.equal(windowLabel({ startMinute: 1260, endMinute: 480 }), 'de 21 h à 8 h');
   const summary = summarizeSettings(DEFAULT_PLANNING_SETTINGS);
-  assert.match(summary, /aspersion 5 à 15 mm, 1 par jour, 1 j d’espacement, 21:00 – 08:00/);
+  assert.match(summary, /aspersion 5 à 15 mm, 1 par jour, 1 j d’espacement, de 21 h à 8 h/);
   assert.match(summary, /goutte-à-goutte 3 à 10 mm/);
   assert.match(summary, /pluie prévue déduite à 100 %/);
   assert.match(summary, /pénurie : prioritaires d’abord, puis part égale/);

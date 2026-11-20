@@ -66,6 +66,18 @@
   --shadow-raised: 0 8px 24px rgb(0 0 0 / 14%);
   --touch-target: 44px;
   --focus-ring: rgb(11 105 77 / 70%);
+  /*
+    L'échelle des tailles de texte (audit du 19 novembre 2026, lot K, n° 19,
+    F477) : six tailles, rien sous 12 px ; les grands chiffres et les titres
+    d'affichage (23 px et plus) gardent la leur. Quatre graisses : 300, 400,
+    500 et 700.
+  */
+  --text-12: .75rem;
+  --text-13: .8125rem;
+  --text-14: .875rem;
+  --text-16: 1rem;
+  --text-20: 1.25rem;
+  --text-28: 1.75rem;
 }
 
 /* Téléphone : les titres de la charte passent à 20 px. */
@@ -89,7 +101,7 @@ body {
   background: var(--sheet);
   color: var(--ink);
   font-family: var(--font-text);
-  font-size: .8125rem;
+  font-size: var(--text-13);
   -webkit-font-smoothing: antialiased;
 }
 

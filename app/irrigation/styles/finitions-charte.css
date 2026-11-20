@@ -1,0 +1,263 @@
+/*
+ * Audit ergonomique du 19 novembre 2026, lot K « Finitions de charte »
+ * (docs/audit-ergonomie-2026-11-19-lot-k-contract.md). Importée avant
+ * `gestes-surs.css`, qui reste la dernière.
+ */
+
+/* PR 1 (n° 17) : la ligne d'état du planning en deux lignes (F465). */
+.planning-meta-main,
+.planning-meta-sources {
+  display: block;
+}
+
+.planning-meta-sources {
+  margin-top: .15rem;
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
+/* PR 1 (n° 17) : « Réglages du planning » porte le signe des autres plis (F467). */
+.planning-settings > summary {
+  position: relative;
+  padding-right: 2.75rem;
+  list-style: none;
+}
+
+.planning-settings > summary::-webkit-details-marker {
+  display: none;
+}
+
+.planning-settings > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.planning-settings[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+/* PR 2 (n° 16) : un nom qui n'a pas la place devient le numéro de la liste, qui sert de légende (F468). */
+.satellite-label[data-short='true'] {
+  min-width: 24px;
+  padding: 2px 4px;
+  border-radius: 999px;
+  text-align: center;
+}
+
+.satellite-garden-number {
+  display: inline-flex;
+  min-width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line-strong, #bbb);
+  color: var(--ink);
+  font-size: var(--text-12);
+  font-variant-numeric: tabular-nums;
+  vertical-align: 1px;
+}
+
+/*
+ * PR 3 (n° 21) : un seul dessin de pli dans le module (F469) : le chevron
+ * à droite des lots D et J, qui tourne à l'ouverture. Plus de triangle du
+ * navigateur ni de pli sans signe. Les menus « … » gardent leur dessin : ce
+ * ne sont pas des plis. Les lignes « Voir le détail » (cultures, espèces)
+ * ont déjà leur signe, la flèche qui tourne, choisi par le porteur le
+ * 8 novembre 2026 : pas de second chevron.
+ */
+main.app-shell details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint)) {
+  position: relative;
+  padding-right: 2.25rem;
+  list-style: none;
+}
+
+main.app-shell details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))::-webkit-details-marker {
+  display: none;
+}
+
+main.app-shell details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))::after {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+main.app-shell details[open]:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+/* PR 3 (n° 21) : un bouton plein par écran (F470). Un raccourci ou un choix non fait passe en secondaire. */
+.water-week-navigation button.water-week-today,
+.projection-shortcuts button:not(.is-active),
+.add-equipment-button[data-secondary] {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.water-week-navigation button.water-week-today:disabled {
+  cursor: default;
+  opacity: .6;
+}
+
+.projection-shortcuts button.is-active {
+  outline: 0;
+}
+
+/* PR 5 (n° 19) : la pastille chiffrée du plan dit ce qu'elle compte (F478). */
+.plot-coverage-legend {
+  color: var(--ink2);
+  font-size: var(--text-12);
+  line-height: 1.35;
+}
+
+/*
+ * PR 5 (n° 19) : quatre graisses (F477). Le « bolder » du navigateur faisait
+ * monter un <strong> dans un texte déjà gras à 900 ; sans poids propre, il
+ * prend 700. Spécificité nulle : un poids voulu par une règle l'emporte.
+ */
+:where(main.app-shell) :where(strong, b) {
+  font-weight: 700;
+}
+
+/*
+ * PR 5 (n° 19) : rien sous 12 px (F477). Un <small> sans taille propre
+ * prenait 80 % de son parent, 10,4 px dans un texte de 13 px ; il garde
+ * 80 % au-dessus de 15 px et ne descend plus sous 12 px.
+ */
+small {
+  font-size: max(var(--text-12), 80%);
+}
+
+/*
+ * PR 7 (n° 24) : à 320 px, les noms de la barre du bas tiennent entiers
+ * (F482) : « Aujourd'hui » et « Ressources » faisaient 64 et 65 px pour
+ * 58 px de place, et se coupaient au milieu du mot. Sous 360 px, l'entrée
+ * perd ses marges de côté et les lettres se resserrent d'un rien.
+ */
+@media (max-width: 359px) {
+  .phone-bar a,
+  .phone-bar button {
+    padding-right: 0;
+    padding-left: 0;
+    letter-spacing: -.03em;
+  }
+}
+
+/*
+ * PR 7 (n° 23) : le grand écran (F480). Le contenu se centre au-delà de sa
+ * largeur maximale au lieu de rester collé au menu ; les deux blocs d'une
+ * rangée d'« Aujourd'hui » prennent la même hauteur, sans trou sous le plus
+ * court ; les choix de la bannière de démonstration restent côte à côte.
+ */
+@media (min-width: 981px) {
+  .feature-page {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  /* Le fond vert du menu va jusqu'en bas : la marge du bas passe de la page entière à la colonne du contenu. */
+  main.app-shell:has(> .feature-layout) {
+    padding-bottom: 0;
+  }
+
+  .feature-layout > .feature-page {
+    padding-bottom: 42px;
+  }
+
+  .today-row[data-layout] {
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1001px) {
+  .demo-banner-choices {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+  }
+}
+
+/*
+ * PR 7 (n° 24) : la tablette, de 601 à 980 px (F481). Les cibles de 44 px
+ * du téléphone valent jusqu'à 980 px : « Actualiser » de la ligne d'état,
+ * les liens « Voir … » d'« Aujourd'hui », les listes et les champs.
+ */
+@media (min-width: 601px) and (max-width: 980px) {
+  .refresh-link {
+    display: inline-block;
+    margin: -13px -6px;
+    padding: 13px 6px;
+  }
+
+  .today-block-more {
+    display: inline-flex;
+    min-height: var(--touch-target);
+    align-items: center;
+  }
+
+  main.app-shell :is(select, input:not([type="hidden"], [type="checkbox"], [type="radio"], [type="range"]), textarea),
+  main.app-shell .feature-page button:not(.figure-origin-toggle, .need-help > button, .feasibility-help > button, .plot-plan-content button),
+  .history-export-button,
+  .history-summary-action {
+    min-height: var(--touch-target);
+  }
+
+  .history-summary-action,
+  .history-export-button {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+  }
+
+  /* Les pastilles « i » : la boîte du bouton prend les 44 px, le rond dessiné ne change pas (comme au téléphone). */
+  .figure-origin > button.figure-origin-toggle,
+  .feasibility-help > button {
+    position: relative;
+    isolation: isolate;
+    width: var(--touch-target);
+    min-width: var(--touch-target);
+    height: var(--touch-target);
+    min-height: var(--touch-target);
+    margin: -10px;
+    border: 0;
+    background: transparent;
+  }
+
+  .figure-origin > button.figure-origin-toggle::after {
+    position: absolute;
+    z-index: -1;
+    inset: 10px;
+    border: 1px solid var(--green-soft);
+    border-radius: 50%;
+    background: var(--card);
+    content: "";
+  }
+
+  .figure-origin > button.figure-origin-toggle[aria-expanded="true"] {
+    background: transparent;
+  }
+
+  .figure-origin > button.figure-origin-toggle[aria-expanded="true"]::after {
+    border-color: var(--green);
+    background: var(--green);
+  }
+
+  .feasibility-help > button {
+    margin: -6px -4px;
+  }
+}
