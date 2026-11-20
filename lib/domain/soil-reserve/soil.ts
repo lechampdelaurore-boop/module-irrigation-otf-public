@@ -12,6 +12,8 @@
  * datées. Rien ici n'entre dans le besoin, le planning ni la dose (D-047).
  */
 
+import { isSoilTexture, type SoilTexture } from './texture.ts';
+
 type SoilProvenance = 'analysis' | 'estimate' | 'default';
 
 export type SoilRecord = {
@@ -33,6 +35,8 @@ export type SoilRecord = {
   rewMm: number;
   /** Épaisseur de la couche de surface (Ze), en cm. */
   surfaceLayerCm: number;
+  /** La texture choisie, d'où TEW et REW ont été proposés (FAO-56, tableau 19 ; 4.4, F584) ; `null` : non dite. */
+  texture: SoilTexture | null;
   /** Profondeur de sol au-delà de laquelle les racines ne descendent pas (D-056) ; `null` : aucune limite. */
   soilDepthCeilingM: number | null;
   /** Le jour à partir duquel la révision vaut. */
@@ -70,6 +74,7 @@ export function soilRecordProblems(record: Omit<SoilRecord, 'zoneId' | 'plotId' 
   if (!isPositive(record.rewMm) || (isPositive(record.tewMm) && record.rewMm >= record.tewMm)) {
     problems.push('Eau facilement évaporable (REW) invalide : strictement positive et inférieure à TEW.');
   }
+  if (record.texture !== null && !isSoilTexture(record.texture)) problems.push('Texture du sol inconnue.');
   if (!isPositive(record.surfaceLayerCm)) problems.push('Épaisseur de la couche de surface (Ze) invalide : strictement positive, en cm.');
   if (record.soilDepthCeilingM !== null && !isPositive(record.soilDepthCeilingM)) {
     problems.push('Profondeur de sol invalide : strictement positive, en m, ou vide.');

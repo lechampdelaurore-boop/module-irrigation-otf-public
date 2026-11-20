@@ -1981,6 +1981,7 @@ export const soilRecords = sqliteTable(
     rewMm: real('rew_mm').notNull(),
     surfaceLayerCm: real('surface_layer_cm').notNull(),
     soilDepthCeilingM: real('soil_depth_ceiling_m'),
+    texture: text('texture', { enum: ['sand', 'loamy-sand', 'sandy-loam', 'loam', 'silt-loam', 'silt', 'silty-clay-loam', 'silty-clay', 'clay'] }),
     effectiveFrom: text('effective_from').notNull(),
     recordedAt: text('recorded_at').notNull(),
     actorUserId: text('actor_user_id'),
@@ -1990,6 +1991,7 @@ export const soilRecords = sqliteTable(
     check('chk_soil_record_rfu', sql`${table.labRfuMmPerMeter} > 0`),
     check('chk_soil_record_reference_share', sql`${table.referenceShare} > 0 AND ${table.referenceShare} < 1`),
     check('chk_soil_record_date', sql`${table.effectiveFrom} ${DATE_GLOB}`),
+    check('chk_soil_record_texture', sql`${table.texture} IS NULL OR ${table.texture} IN ('sand', 'loamy-sand', 'sandy-loam', 'loam', 'silt-loam', 'silt', 'silty-clay-loam', 'silty-clay', 'clay')`),
   ],
 );
 
@@ -2248,5 +2250,50 @@ export const featureSelections = sqliteTable(
   (table) => [
     check('chk_feature_selection_enabled', sql`json_valid(${table.enabledFeatures}) AND json_type(${table.enabledFeatures}) = 'array'`),
     check('chk_feature_selection_known', sql`json_valid(${table.knownFeatures}) AND json_type(${table.knownFeatures}) = 'array'`),
+  ],
+);
+
+/**
+ * L'état de l'accueil d'une ferme (4.4, docs/tranche-4-contract.md, F417,
+ * F426, F581) : une ligne par espace et par étape que la personne confirme.
+ */
+export const onboardingSteps = sqliteTable(
+  'irrigation_onboarding_steps',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    step: text('step').notNull(),
+    state: text('state').notNull(),
+    origin: text('origin').notNull(),
+    proposedValue: text('proposed_value'),
+    confirmedAt: text('confirmed_at'),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.step] }),
+    check('chk_onboarding_step', sql`${table.step} IN ('location', 'plots', 'soil', 'crops', 'settings')`),
+    check('chk_onboarding_state', sql`${table.state} IN ('todo', 'proposed', 'confirmed', 'skipped')`),
+    check('chk_onboarding_origin', sql`${table.origin} IN ('onboarding', 'before-onboarding')`),
+    check('chk_onboarding_confirmed_at', sql`(${table.state} = 'confirmed') = (${table.confirmedAt} IS NOT NULL)`),
+    check('chk_onboarding_before', sql`${table.origin} = 'onboarding' OR ${table.state} = 'confirmed'`),
+    check('chk_onboarding_proposed_value', sql`${table.proposedValue} IS NULL OR json_valid(${table.proposedValue})`),
+  ],
+);
+
+/** Le classement d'un jardin, abri ou plein champ, confirmé par la personne (4.4, F420, F583, migration 0035). */
+export const plotShelters = sqliteTable(
+  'irrigation_plot_shelters',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    plotId: text('otf_plot_id').notNull(),
+    sheltered: integer('sheltered').notNull(),
+    proposedSheltered: integer('proposed_sheltered'),
+    confirmedAt: text('confirmed_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.plotId] }),
+    check('chk_plot_shelter_sheltered', sql`${table.sheltered} IN (0, 1)`),
+    check('chk_plot_shelter_proposed', sql`${table.proposedSheltered} IS NULL OR ${table.proposedSheltered} IN (0, 1)`),
+    check('chk_plot_shelter_plot', sql`length(${table.plotId}) > 0`),
   ],
 );

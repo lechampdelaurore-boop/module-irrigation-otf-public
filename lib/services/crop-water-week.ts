@@ -1,5 +1,5 @@
 import { readCropWaterInputsForWorkspace, bedWaterSettings, type CropWaterInputs } from '@/db/crop-water/inputs';
-import { listWeatherDailyValuesForUser, readWeatherPreferenceForUser, type WeatherDailyRecord } from '@/db/water-management-repository';
+import { listWeatherDailyValuesForUser, type WeatherDailyRecord } from '@/db/water-management-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import type { Bed, IrrigationSnapshot } from '../domain/domain';
 import type { Et0Reading } from '../domain/crop-water/etm';
@@ -8,6 +8,7 @@ import type { UnplacedCultivation } from '../domain/crop-water/crop-calendar';
 import { curveStages, type ReferenceCrop } from '../domain/crop-water/reference';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
+import { readWeatherPreference } from './weather-preference';
 
 /**
  * Le besoin par culture et par stade d'une semaine, planche par planche
@@ -86,7 +87,7 @@ export async function getCropWaterWeekForUser(input: {
   const empty = { today, weekStart, weekEnd, beds: [], unusableCrops: [] };
   if (!cropPlan || workspaceId === null) return { ...empty, available: Boolean(cropPlan) };
 
-  const preference = await readWeatherPreferenceForUser(input.ownerUserId);
+  const preference = await readWeatherPreference(input.ownerUserId);
   const locationKey = weatherLocationKey(preference, input.snapshot.structure);
   const from = today < weekStart ? today : weekStart;
   const to = today > weekEnd ? today : weekEnd;
@@ -97,7 +98,9 @@ export async function getCropWaterWeekForUser(input: {
   const readings = et0Readings(weather);
   const plots = new Map(input.snapshot.plots.map((plot) => [plot.id, plot]));
   const wanted = input.bedIds ? new Set(input.bedIds) : null;
-  const beds = input.snapshot.beds.filter((bed) => bed.seasons.includes(input.season) && (wanted === null || wanted.has(bed.id)));
+  // Un jardin à classer (4.4, F583) : sans abri ni plein champ confirmé, aucune proposition n'est calculée.
+  const beds = input.snapshot.beds.filter((bed) => bed.seasons.includes(input.season) && (wanted === null || wanted.has(bed.id))
+    && plots.get(bed.plotId)?.mode !== 'unclassified');
 
   return {
     available: true,
@@ -131,7 +134,7 @@ export async function getCropWaterDaysForUser(input: {
   if (!cropPlan || workspaceId === null || input.dates.length === 0) return null;
   const today = dateKeyInTimeZone(input.now ?? new Date(), FARM_TIME_ZONE);
   const sorted = [...input.dates].sort();
-  const preference = await readWeatherPreferenceForUser(input.ownerUserId);
+  const preference = await readWeatherPreference(input.ownerUserId);
   const locationKey = weatherLocationKey(preference, input.snapshot.structure);
   const [inputs, weather] = await Promise.all([
     readCropWaterInputsForWorkspace(workspaceId, input.season),
@@ -142,7 +145,7 @@ export async function getCropWaterDaysForUser(input: {
   return {
     workspaceId,
     beds: input.snapshot.beds
-      .filter((bed) => bed.seasons.includes(input.season))
+      .filter((bed) => bed.seasons.includes(input.season) && plots.get(bed.plotId)?.mode !== 'unclassified')
       .map((bed) => ({
         bedId: bed.id,
         days: bedWaterDays(cropWaterBedInput(bed, plots.get(bed.plotId)?.mode === 'greenhouse', today, cropPlan, inputs, readings), sorted).days,
