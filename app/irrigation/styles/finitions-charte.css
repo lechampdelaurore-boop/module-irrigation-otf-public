@@ -66,3 +66,55 @@
   font-variant-numeric: tabular-nums;
   vertical-align: 1px;
 }
+
+/*
+ * PR 3 (n° 21) : un seul dessin de pli dans le module (F469) : le chevron
+ * à droite des lots D et J, qui tourne à l'ouverture. Plus de triangle du
+ * navigateur ni de pli sans signe. Les menus « … » gardent leur dessin : ce
+ * ne sont pas des plis. Les lignes « Voir le détail » (cultures, espèces)
+ * ont déjà leur signe, la flèche qui tourne, choisi par le porteur le
+ * 8 novembre 2026 : pas de second chevron.
+ */
+main.app-shell details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint)) {
+  position: relative;
+  padding-right: 2.25rem;
+  list-style: none;
+}
+
+main.app-shell details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))::-webkit-details-marker {
+  display: none;
+}
+
+main.app-shell details:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))::after {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+main.app-shell details[open]:not(.row-menu, .equipment-menu, .plan-equipment-menu) > summary:not(:has(> .detail-hint))::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+/* PR 3 (n° 21) : un bouton plein par écran (F470). Un raccourci ou un choix non fait passe en secondaire. */
+.water-week-navigation button.water-week-today,
+.projection-shortcuts button:not(.is-active),
+.add-equipment-button[data-secondary] {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.water-week-navigation button.water-week-today:disabled {
+  cursor: default;
+  opacity: .6;
+}
+
+.projection-shortcuts button.is-active {
+  outline: 0;
+}
