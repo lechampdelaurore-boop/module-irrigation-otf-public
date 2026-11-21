@@ -5,6 +5,7 @@ import { listEquipmentForUser } from '@/db/equipment/read';
 import { listSettingProvenancesForUser } from '@/db/equipment/setting-calculations';
 import { listGardenGroupConfigurationForUser } from '@/db/garden-group-repository';
 import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
+import { readPhoneNoticeSettingsForUser } from '@/db/phone-notice-repository';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
 import { listProtectedSlotsForUser } from '@/db/protected-slots-repository';
 import { usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
@@ -220,7 +221,7 @@ export async function loadHistoriquePage(context: ReadyPageContext) {
  * lieu de la météo et la correspondance des espèces (P3).
  */
 export async function loadReglagesPage(context: ReadyPageContext) {
-  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview] = await Promise.all([
+  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices] = await Promise.all([
     countFeatureDataForUser(context.userId),
     getOnboardingForUser(context.userId),
     usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
@@ -229,9 +230,14 @@ export async function loadReglagesPage(context: ReadyPageContext) {
       : null,
     // « Réglages à relire », pour une ferme qui fait l'accueil (4.4, F588).
     getSettingsReviewForUser(context.userId, context.enabled),
+    // Le message du matin suit le calcul du matin du Planning (amélioration n° 3, F712), le rappel du soir les Arrosages
+    // (n° 2, F714) ; pas de réglage en démonstration.
+    (context.enabled.includes('planning') || context.enabled.includes('arrosages')) && !context.shell.demo
+      ? readPhoneNoticeSettingsForUser(context.userId)
+      : null,
   ]);
   context.lap('dashboards');
   // Le classement des jardins, pour une ferme qui fait l'accueil (4.4, F583).
   const plotShelters = plotShelterLines(context.snapshot, context.season);
-  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview };
+  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices };
 }

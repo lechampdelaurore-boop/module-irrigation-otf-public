@@ -188,6 +188,17 @@ export function countsInGardenPercent(mode: SoilReserveDay['mode'], surfaceState
   return mode === 'crop' || (mode === 'cover' && surfaceState !== 'grass');
 }
 
+/**
+ * Une planche dont le jardin ne connaît pas l'état : cultivée ou en engrais
+ * vert sans état ni capacité, ou sans culture et sans état de surface. La
+ * même règle compte les planches inconnues du jardin et nomme, planche par
+ * planche, la réserve du sol non saisie (amélioration n° 6, F700).
+ */
+export function gardenBedUnknown(bed: Pick<GardenBed, 'mode' | 'surfaceState' | 'stateMm' | 'capacityMm'>): boolean {
+  if (!countsInGardenPercent(bed.mode, bed.surfaceState)) return bed.surfaceState === null;
+  return bed.stateMm === null || bed.capacityMm === null || !(bed.capacityMm > 0);
+}
+
 /** Le jardin : les mm ne s'additionnent pas entre surfaces, ils se pondèrent par la surface des planches. */
 export function gardenSoilSummary(beds: readonly GardenBed[]): GardenSoilSummary {
   let water = 0;
@@ -197,13 +208,13 @@ export function gardenSoilSummary(beds: readonly GardenBed[]): GardenSoilSummary
   let lowest: GardenSoilSummary['lowest'] = null;
   const withoutCrop: GardenSoilSummary['withoutCrop'] = [];
   for (const bed of beds) {
-    if (!countsInGardenPercent(bed.mode, bed.surfaceState)) {
-      if (bed.surfaceState !== null) withoutCrop.push({ bedId: bed.bedId, bedName: bed.bedName, surfaceState: bed.surfaceState, declared: bed.surfaceStateDeclared });
-      else unknownBeds += 1;
+    if (gardenBedUnknown(bed)) {
+      unknownBeds += 1;
       continue;
     }
-    if (bed.stateMm === null || bed.capacityMm === null || !(bed.capacityMm > 0)) {
-      unknownBeds += 1;
+    // Connue sans entrer dans le % : une planche sans culture, avec son état de surface.
+    if (bed.stateMm === null || bed.capacityMm === null || !countsInGardenPercent(bed.mode, bed.surfaceState)) {
+      if (bed.surfaceState !== null) withoutCrop.push({ bedId: bed.bedId, bedName: bed.bedName, surfaceState: bed.surfaceState, declared: bed.surfaceStateDeclared });
       continue;
     }
     countedBeds += 1;

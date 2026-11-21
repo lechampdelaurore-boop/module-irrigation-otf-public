@@ -1,4 +1,5 @@
 import {
+  EVENING_REMINDER_TIMEOUT_MS,
   OPERATOR_WATCH_TIMEOUT_MS,
   SITE_SYNC_TIMEOUT_MS,
   scheduledJob,
@@ -18,6 +19,20 @@ const MAX_ATTEMPTS = 3;
 const SITE_ROUTES: Record<ScheduledJob, { path: string; timeoutMs: number; event: string }> = {
   weather: { path: '/api/internal/weather-sync', timeoutMs: SITE_SYNC_TIMEOUT_MS, event: 'weather_scheduler' },
   'operator-watch': { path: '/api/internal/operator-watch', timeoutMs: OPERATOR_WATCH_TIMEOUT_MS, event: 'operator_watch_scheduler' },
+  'evening-reminder': { path: '/api/internal/evening-reminder', timeoutMs: EVENING_REMINDER_TIMEOUT_MS, event: 'evening_reminder_scheduler' },
+};
+
+/** Les relances à la main, par le jeton de service : une adresse par tâche. */
+const MANUAL_PATHS: Record<string, ScheduledJob> = {
+  '/run': 'weather',
+  '/run-watch': 'operator-watch',
+  '/run-evening': 'evening-reminder',
+};
+
+const FAILURE_BODIES: Record<ScheduledJob, string> = {
+  weather: 'Weather synchronization failed',
+  'operator-watch': 'Operator watch failed',
+  'evening-reminder': 'Evening reminder failed',
 };
 
 export default {
@@ -37,7 +52,7 @@ export default {
 
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
-    const job: ScheduledJob | null = url.pathname === '/run' ? 'weather' : url.pathname === '/run-watch' ? 'operator-watch' : null;
+    const job: ScheduledJob | null = MANUAL_PATHS[url.pathname] ?? null;
     if (request.method !== 'POST' || !job) {
       return new Response('Not found', { status: 404 });
     }
@@ -120,7 +135,7 @@ async function triggerSiteRoute(env: Env, job: ScheduledJob, trigger: 'cron' | '
     status: lastStatus,
     failedAt: new Date().toISOString(),
   }));
-  return { status: lastStatus, body: { error: job === 'weather' ? 'Weather synchronization failed' : 'Operator watch failed' } };
+  return { status: lastStatus, body: { error: FAILURE_BODIES[job] } };
 }
 
 async function secureEqual(provided: string, expected: string) {
