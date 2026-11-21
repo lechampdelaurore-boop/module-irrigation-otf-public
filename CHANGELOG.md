@@ -36,6 +36,18 @@ source détaillée commit par commit.
   comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
   23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
   qu'il avait laissé.
+### Ajouté (Améliorations, n° 6, PR 1 sur 7)
+
+- **Le panneau « données manquantes », planche par planche** (D-282, F700,
+  F701, F710, F711) : sous la zone « Fiabilité du calcul » de « Aujourd'hui », un
+  dépliant « Par planche » qui dit, fermé, combien de planches ont une
+  donnée manquante, ou « Tout est à jour » ; ouvert, les planches par
+  culture, chacune avec ce qui lui manque — la réserve du sol non saisie,
+  le stade deviné d'après le calendrier, le pluviomètre absent depuis plus
+  de 30 jours — et le geste qui le corrige. « Déclarer le stade » ouvre
+  « Matériel » sur la planche, le formulaire du stade ouvert. Le « ? » de la
+  zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
+  Sans migration. Parcours P52.
 
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
 

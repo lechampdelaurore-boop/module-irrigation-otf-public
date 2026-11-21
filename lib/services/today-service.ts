@@ -9,11 +9,13 @@ import { speciesWithoutReference } from '../domain/crop-water/species';
 import type { IrrigationSnapshot } from '../domain/domain';
 import type { FeatureSelection } from '../domain/features/selection';
 import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/today/reliability';
+import { guessedStages, lastMeasuredRainOn, missingByBedBeds, rainGaugeLookbackStart, unknownSoilBeds } from '../domain/today/missing-by-bed';
 import { TODAY_WEATHER_DAYS, todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
 import { pastRainOrigins, type TodayWeekInputs } from '../domain/today/week';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
 import { readCropAlertsView } from './crop-alerts-view';
+import { getCropWaterDaysForUser } from './crop-water-week';
 import { readWeeklyPlanForUser } from './planning-service';
 import { getSoilReserveViewForUser } from './soil-reserve-view';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
@@ -62,8 +64,10 @@ async function readTodayInputs(
   const locationKey = weatherLocationKey(preference, snapshot.structure);
   const weatherOn = read.weather && (on('alertes-cultures') || on('alertes-meteo'));
   const lookback = actualRainLookbackDates(today);
+  // Le dépliant « Par planche » (amélioration n° 6) se lit pour la page seulement : la pastille ne le compte pas (F710).
+  const byBed = read.weather;
 
-  const [forecasts, cropAlerts, criteria, events, settings, plan, infrastructure, rainRows, soil, correspondences, week] = await Promise.all([
+  const [forecasts, cropAlerts, criteria, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays] = await Promise.all([
     weatherOn && workspaceId && locationKey
       ? listWeatherAlertForecastDays(workspaceId, locationKey, today, addDaysToDateKey(today, TODAY_WEATHER_DAYS - 1))
       : [],
@@ -73,10 +77,12 @@ async function readTodayInputs(
     readPlanningSettingsForUser(ownerUserId),
     on('planning') ? readWeeklyPlanForUser({ ownerUserId, season, now }) : null,
     on('ressources') ? listWaterInfrastructureForUser(ownerUserId) : null,
-    on('besoins') ? listWeatherDailyValuesForUser(ownerUserId, locationKey ?? 'unconfigured', lookback[0], lookback[lookback.length - 1]) : [],
+    // Trente jours lus pour le pluviomètre (F701) ; la pluie réelle n'en regarde que sept.
+    on('besoins') ? listWeatherDailyValuesForUser(ownerUserId, locationKey ?? 'unconfigured', rainGaugeLookbackStart(today), today) : [],
     on('sol') ? getSoilReserveViewForUser({ ownerUserId, season, snapshot, now }) : null,
     on('cultures') && workspaceId && snapshot.cropPlan ? listSpeciesCorrespondencesForWorkspace(workspaceId) : [],
     read.weather && on('besoins') ? readWeek({ ownerUserId, season, snapshot, now }) : null,
+    byBed && on('cultures') ? getCropWaterDaysForUser({ ownerUserId, season, snapshot, dates: [today], now }) : null,
   ]);
 
   const seasonBeds = snapshot.beds.filter((bed) => bed.seasons.includes(season));
@@ -111,6 +117,14 @@ async function readTodayInputs(
           .map((species) => species.plantName)
         : [],
     },
+    missingByBed: byBed
+      ? {
+          beds: missingByBedBeds(snapshot, season, today),
+          unknownSoilBeds: soil?.gauge ? unknownSoilBeds(soil.gauge.zones) : null,
+          guessedStages: cropDays ? guessedStages(cropDays.beds, today) : null,
+          lastMeasuredRainOn: lastMeasuredRainOn(rainRows),
+        }
+      : null,
     week,
     soil: soil ? (soil.gauge ? { zones: soil.gauge.zones } : { unavailable: soil.gaugeUnavailable ?? GAUGE_UNAVAILABLE }) : null,
   };
