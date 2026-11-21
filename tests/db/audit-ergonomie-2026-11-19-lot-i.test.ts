@@ -177,7 +177,10 @@ test('n° 11, F450 : la page d’attente se relit seule toutes les deux secondes
   assert.match(source, /title: 'Préparation de votre démonstration…'/);
   assert.match(source, /PREPARING_RELOAD_SECONDS = 2;/);
   assert.match(source, /window\.location\.reload\(\)/);
-  for (const page of ['app/irrigation/page-context.ts', 'app/irrigation/page.tsx', 'app/irrigation/bienvenue/page.tsx']) {
-    assert.match(readFileSync(page, 'utf8'), /instanceof DemoSpacePreparingError/, page);
+  // Les trois entrées passent par le même tri des refus d'accès (4.5, F666) : la démonstration qui se prépare en est un.
+  assert.match(readFileSync('app/irrigation/page-context.ts', 'utf8'), /if \(error instanceof DemoSpacePreparingError\) return demoPreparingState\(page, season\);/);
+  assert.match(readFileSync('app/irrigation/page-context.ts', 'utf8'), /const props = accessRefusedState\(page, season, error\);/);
+  for (const page of ['app/irrigation/page.tsx', 'app/irrigation/bienvenue/page.tsx']) {
+    assert.match(readFileSync(page, 'utf8'), /const refused = accessRefusedState\('aujourdhui', todaySeason\(new Date\(\)\), error\);\n\s+if \(refused\) return <UnavailableState \{\.\.\.refused\} \/>;/, page);
   }
 });
