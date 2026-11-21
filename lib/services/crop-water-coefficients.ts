@@ -1,5 +1,6 @@
 import { listKcOverridesForWorkspace, listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries';
 import { listReferenceCropsForWorkspace, readCommonReferenceCrop, type StoredReferenceCrop } from '@/db/crop-water/references';
+import { listSensitiveStageChoicesForWorkspace, listSensitiveStageReferences } from '@/db/crop-water/sensitive-stages';
 import { readCropWaterSettingsForWorkspace } from '@/db/crop-water/settings';
 import { listRootingProfilesForWorkspace, type StoredRootingProfile } from '@/db/soil-reserve/inputs';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
@@ -7,6 +8,7 @@ import type { IrrigationSnapshot } from '../domain/domain';
 import { DEFAULT_CROP_WATER_OPTIONS } from '../domain/crop-water/etm';
 import type { KcOverride } from '../domain/crop-water/kc';
 import type { ReferenceCrop } from '../domain/crop-water/reference';
+import { cropSensitiveStages, type SensitiveStageRow } from '../domain/crop-water/sensitive-stages';
 import { cropWaterSettingsView, type CropWaterSettingsView } from '../domain/crop-water/settings-view';
 import { dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
 import { seasonSpecies, speciesWithoutReference, type SeasonSpecies, type SpeciesWithoutReference } from '../domain/crop-water/species';
@@ -42,6 +44,8 @@ export type CropCoefficientsView =
       rootingProfiles: StoredRootingProfile[];
       /** Par culture, d'où viennent ses dates de stade, et l'avertissement d'une autre région (4.4, F586). */
       regions: Record<string, { origin: string; warning: string | null }>;
+      /** Par culture utilisable, ses stades sensibles au manque d'eau en vigueur et d'où vient chaque valeur (amélioration n° 4, F730). */
+      sensitiveStages: Record<string, SensitiveStageRow[]>;
       /** L'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil (4.4, F587) ; `null` pour les autres espaces. */
       speciesStep: { confirmed: boolean; proposals: SpeciesLinkProposal[] } | null;
     }
@@ -56,7 +60,7 @@ export async function getCropCoefficientsViewForUser(input: {
   const cropPlan = input.snapshot.cropPlan;
   if (!cropPlan) return { available: false, season: input.season, reason: 'crop-plan-not-read' };
   const workspaceId = await findWorkspaceIdForUser(input.ownerUserId);
-  const [crops, entries, overrides, settings, storedProfiles, onboarding, preference] = await Promise.all([
+  const [crops, entries, overrides, settings, storedProfiles, onboarding, preference, sensitiveReferences, sensitiveChoices] = await Promise.all([
     listReferenceCropsForWorkspace(workspaceId),
     workspaceId === null ? Promise.resolve([]) : listSpeciesCorrespondencesForWorkspace(workspaceId),
     workspaceId === null ? Promise.resolve([]) : listKcOverridesForWorkspace(workspaceId),
@@ -66,6 +70,8 @@ export async function getCropCoefficientsViewForUser(input: {
     listRootingProfilesForWorkspace(workspaceId),
     getOnboardingForUser(input.ownerUserId),
     readWeatherPreference(input.ownerUserId),
+    listSensitiveStageReferences(),
+    listSensitiveStageChoicesForWorkspace(workspaceId),
   ]);
   // La région de la ferme, de sa commune confirmée seulement (F419, F586).
   const postcode = preference.locationMode === 'custom' ? preference.customPostcode : input.snapshot.structure.legalPostcode;
@@ -97,6 +103,8 @@ export async function getCropCoefficientsViewForUser(input: {
     }),
     rootingProfiles,
     regions,
+    sensitiveStages: Object.fromEntries(crops.filter((stored) => stored.problems.length === 0)
+      .map((stored) => [stored.crop.id, cropSensitiveStages(stored.crop, sensitiveReferences, sensitiveChoices)])),
     speciesStep: onboarding.kind !== 'onboarding' ? null : {
       confirmed: onboarding.steps.some((step) => step.id === 'crops' && step.state === 'confirmed'),
       proposals: speciesLinkProposals(species, linkCandidatesOf(crops, commonVersions)),

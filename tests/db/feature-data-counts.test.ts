@@ -45,6 +45,8 @@ async function seedFarm(owner: string) {
   insert(`INSERT INTO irrigation_pumps (id, workspace_id, name, maximum_flow_cubic_meters_per_hour) VALUES (?, ?, 'Pompe', 5)`, `${owner}-pu-1`, ws);
   insert(`INSERT INTO irrigation_soil_observations (id, workspace_id, otf_zone_id, percent, observed_at, recorded_at) VALUES (?, ?, 'z-1', 60, '2026-06-02', '2026-06-02T08:00:00.000Z')`, `${owner}-so-1`, ws);
   insert(`INSERT INTO irrigation_crop_species_links (id, workspace_id, plant_id, target_kind, crop_key) VALUES (?, ?, 'carotte', 'reference', 'carrot')`, `${owner}-sl-1`, ws);
+  // Un stade sensible choisi par la ferme (amélioration n° 4, F730) : un réglage de culture.
+  insert(`INSERT INTO irrigation_crop_sensitive_stages (workspace_id, crop_key, stage_rank, stage_label, sensitive, actor_user_id) VALUES (?, 'criiam-poireau', 1, 'Reprise → Récolte', 1, ?)`, ws, owner);
   insert(`INSERT INTO irrigation_weather_alert_criteria (id, workspace_id, current_version) VALUES (?, ?, 1)`, `${owner}-wa-1`, ws);
   insert(`INSERT INTO irrigation_weather_alert_criteria (id, workspace_id, current_version, deleted_at) VALUES (?, ?, 1, '2026-06-03T00:00:00.000Z')`, `${owner}-wa-2`, ws);
   const settings = `INSERT INTO irrigation_crop_alert_settings (id, workspace_id, frost_active, drying_active, sprinkler_active, horizon_days, frost_offset_celsius, sprinkler_max_temperature_celsius, sprinkler_radiation_w_per_square_meter, recorded_at) VALUES (?, ?, 1, 1, 0, 3, 0, 18, 250, ?)`;
@@ -74,7 +76,7 @@ test('les comptes disent ce que la ferme reconnaît comme siens, sans ceux d’u
     resources: 1,
     pumps: 1,
     soilRecords: 1,
-    cropSettings: 1,
+    cropSettings: 2,
     weatherAlertCriteria: 1,
     cropAlertSettings: 1,
     settingCalculations: 1,

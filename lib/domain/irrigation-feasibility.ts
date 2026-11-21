@@ -34,6 +34,13 @@ export type PriorityFeasibility = {
   residualCubicMeters: number;
   coveragePercent: number;
   arbitration: 'automatic' | 'required' | 'validated' | 'revalidation_required' | 'obsolete' | 'waiting';
+  /**
+   * L'eau ne peut pas servir en entier les besoins de ce niveau, après les
+   * niveaux précédents : le plus grand partage commun est inférieur à 1. La
+   * règle du calcul, montrée telle quelle pour le conseil selon le stade
+   * sensible (amélioration n° 4, F731), qui ne la change pas.
+   */
+  shortage: boolean;
   decision: IrrigationArbitration | null;
   candidates: string[];
   beds: BedWaterAllocation[];
@@ -158,7 +165,7 @@ export function allocateIrrigationWater(input: {
     });
     const allocated = sum(rows.map((row) => row.allocatedCubicMeters ?? 0));
     priorities.push({ priority, knownNeedCubicMeters: levelNeed, availableCubicMeters: available,
-      allocatedCubicMeters: allocated, residualCubicMeters: Math.max(0, levelNeed - allocated), coveragePercent: ratio(allocated, levelNeed), arbitration, decision, candidates: ids, beds: rows });
+      allocatedCubicMeters: allocated, residualCubicMeters: Math.max(0, levelNeed - allocated), coveragePercent: ratio(allocated, levelNeed), arbitration, shortage, decision, candidates: ids, beds: rows });
     // Never pass a withheld micro-dose, an unresolved choice or an unknown higher priority downwards.
     if (awaiting || rows.some((row) => row.status === 'below_threshold' || row.need.effectiveVolumeCubicMeters === null)) blocked = true;
   }

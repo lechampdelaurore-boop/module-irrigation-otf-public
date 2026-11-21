@@ -40,7 +40,7 @@ export function usesSpeciesCorrespondence(selection: FeatureSelection): boolean 
 
 /** Une partie de case qui a besoin d'une autre case (P1). */
 export type FeaturePart = {
-  id: 'sprinkler-reconsideration' | 'feasibility';
+  id: 'sprinkler-reconsideration' | 'feasibility' | 'stage-advice';
   /** La case qui la porte. */
   feature: FeatureId;
   /** La case dont elle a besoin en plus. */
@@ -61,6 +61,13 @@ const FEATURE_PARTS: readonly FeaturePart[] = [
     feature: 'ressources',
     needs: 'besoins',
     missingNotice: 'La faisabilité et la répartition en cas de manque demandent Objectifs et besoins.',
+  },
+  {
+    // Le conseil lit le stade du jour de chaque culture (5 quater) : amélioration n° 4, F732.
+    id: 'stage-advice',
+    feature: 'ressources',
+    needs: 'cultures',
+    missingNotice: 'Le conseil selon le stade sensible des cultures demande Besoin par culture.',
   },
 ];
 

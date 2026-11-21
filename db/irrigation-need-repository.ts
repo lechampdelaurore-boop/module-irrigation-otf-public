@@ -40,10 +40,16 @@ export async function saveIrrigationNeedThresholdForUser(ownerUserId: string, se
   ]);
 }
 
+/**
+ * La priorité et le besoin manuel d'une planche pour une semaine. `origin` :
+ * le geste « Adopter » d'un conseil selon le stade sensible (amélioration
+ * n° 4, F732), que le journal des décisions garde ; absent pour un choix à la
+ * main.
+ */
 export async function saveIrrigationBedNeedDecisionForUser(ownerUserId: string, input: {
   season: number; weekStart: string; otfZoneId: string; otfPlotId: string; otfBedId: string;
   priority: IrrigationNeedPriority; manualOverrideMm: number | null; overrideReason: string | null;
-  calculatedNeedAtOverrideMm: number | null;
+  calculatedNeedAtOverrideMm: number | null; origin?: 'stage-advice';
 }) {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const now = new Date().toISOString();
@@ -63,7 +69,8 @@ export async function saveIrrigationBedNeedDecisionForUser(ownerUserId: string, 
       .bind(crypto.randomUUID(), workspaceId, input.season, input.weekStart, input.otfZoneId, input.otfPlotId, input.otfBedId,
         input.priority, input.manualOverrideMm, input.overrideReason, input.calculatedNeedAtOverrideMm, ownerUserId, now, now),
     logStatement(workspaceId, ownerUserId, input.season, input.weekStart, input.otfBedId, action,
-      { priority: input.priority, manualOverrideMm: input.manualOverrideMm, overrideReason: input.overrideReason, calculatedNeedAtOverrideMm: input.calculatedNeedAtOverrideMm }, now),
+      { priority: input.priority, manualOverrideMm: input.manualOverrideMm, overrideReason: input.overrideReason, calculatedNeedAtOverrideMm: input.calculatedNeedAtOverrideMm,
+        ...(input.origin ? { origin: input.origin } : {}) }, now),
   ]);
 }
 
