@@ -19,8 +19,11 @@ registres, elle y renvoie.
   manquantes (n° 6) ; restent le rappel du soir (n° 2), le journal des
   modifications (n° 7) et, **réservées à l'avis agronomique du porteur**, la
   priorité selon le stade critique (n° 4) et l'écart prévu/réel expliqué
-  (n° 5). Place : après la Tranche 4 ; un contrat court d'abord, aucun code
-  sans son « vas-y » exprès. PR de registres seule : **aucun contrôle rejoué**,
+  (n° 5). **Démarrage avancé le 21 novembre 2026 (« Vas-y », D-281)** : le
+  contrat court des n° 6, 2, 3 et 7 est écrit
+  (`docs/ameliorations-6-2-3-7-contract.md`, sept PR de code), leur code part
+  sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
+  et 5 attendent l'avis agronomique. PR de registres seule : **aucun contrôle rejoué**,
   sans rapport avec le code.
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
