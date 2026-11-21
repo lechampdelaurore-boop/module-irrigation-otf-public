@@ -7543,3 +7543,437 @@ Ne changent pas : aucun code, aucune migration, aucun calcul, aucune
 décision antérieure. Le numéro D-280 est pris au-dessus de ceux des PR de la
 4.5, de la 4.6 et du moteur commun encore ouvertes (D-246 à D-251, D-260,
 D-270), pour éviter toute collision à la fusion.
+
+## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** La zone « Fiabilité du calcul » de « Aujourd'hui » dit cinq
+données pour la ferme entière ; rien ne disait, planche par planche, ce qui
+manque. Le contrat court des améliorations
+(`docs/ameliorations-6-2-3-7-contract.md`, section 3, F700 et F701) ajoute
+trois données par planche : la réserve du sol non saisie, le stade deviné
+(« stade déduit du calendrier »), le pluviomètre absent.
+
+**Décision.** Le code suit la section 3 ; les précisions de code :
+
+1. **F710.** Le dépliant « Par planche » vit sous l'anneau de la zone,
+   fermé, et ne compte ni dans la pastille du menu ni dans l'anneau, qui
+   gardent leurs cinq données : il informe, il ne relance personne. Il ne
+   se lit que pour la page (la pastille ne le lit pas). Le geste du stade
+   mène à « Matériel », sur la parcelle de la planche, par l'ancre
+   `#bed-stage-<planche>` : la planche se choisit seule, le pli « Réglages
+   de cette page » et le formulaire « Déclarer un stade » s'ouvrent une fois
+   la fiche lue. L'ancre ne porte sur aucun identifiant de la page : le
+   navigateur ouvrirait le pli avant React. Les planches se rangent par
+   culture (les cultures présentes ce jour-là, « Sans culture en cours » en
+   dernier à effet égal), les groupes par l'effet de leur première planche ;
+   les cinq premières planches dans l'ordre de l'écran, les autres derrière
+   « Voir les n autres planches ».
+2. **F711.** Le stade deviné : une culture dont le stade et le Kc sont
+   connus, sans déclaration qui la place ; un stade calculé recalé sur une
+   déclaration est déclaré (D-057). La réserve du sol non saisie : les
+   planches inconnues des jardins que la zone nomme déjà (jamais observés,
+   ou sans RFU), par la même règle que le jardin (`gardenBedUnknown`). Le
+   pluviomètre : la pluie mesurée lue de J − 30 à aujourd'hui, `0 mm`
+   compris ; seule une planche hors abri qui porte une culture ce jour-là
+   reçoit la ligne. Une donnée non lue (case décochée, jauge indisponible,
+   plan de culture absent) ne donne aucune ligne.
+3. Le dépliant s'ouvre par son ancre `#donnees-manquantes` : le lien « Ce
+   qui manque » de la fin de l'accueil (4.4) l'emploiera ; il n'existe pas
+   encore.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun calcul du
+besoin, du planning, des priorités ni de la dose ; les cinq données de la
+zone et leurs seuils.
+
+## D-283 — Améliorations, n° 3 : le message unique du matin et son réglage par ferme
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 3, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** Le calcul du matin n'envoyait qu'une notification, celle des
+suggestions du planning (3.7, règles 21 à 24). Le contrat court des
+améliorations (`docs/ameliorations-6-2-3-7-contract.md`, sections 4.1 et
+4.2, F702 et F703) la remplace par un seul message par jour et par ferme,
+avec un réglage par ferme ; option recommandée retenue : remplacer, non
+compléter.
+
+**Décision.** Le code suit les sections 4.1 et 4.2 ; les précisions de code :
+
+1. **F712.** Le réglage vit dans une table d'un espace,
+   `irrigation_phone_notice_settings` (migration 0042), avec la personne qui
+   le change et l'heure ; une colonne vide vaut le défaut, jamais écrit. Le
+   message du matin est activé par défaut : le module ne sait pas quels
+   appareils sont inscrits (le Worker de notification les garde), et sans
+   appareil le message ne trouve personne, ce qui revient au défaut du
+   contrat (« activé pour une ferme qui a au moins un appareil inscrit »).
+   La case se montre dans « Notifications du téléphone » pour une ferme qui
+   coche le Planning, dont le calcul du matin envoie le message ; pas en
+   démonstration. Les colonnes du rappel du soir (n° 2) sont créées par la
+   même migration et restent vides ; leur case et leur heure viennent avec
+   la PR du rappel du soir. La prise du jour vit dans
+   `irrigation_phone_notices` : une ligne par espace et par genre
+   (`morning`, `evening`), réécrite chaque jour de Paris, prise avant
+   l'envoi et rendue s'il échoue ou si le service n'est pas configuré. Les
+   deux tables entrent dans le plan d'effacement.
+2. **F713.** Le message, titre « Votre journée », au plus quatre phrases :
+   les irrigations planifiées d'aujourd'hui qui attendent un geste
+   (`isWaitingPlannedIrrigation`), une déjà en retard comprise, par heure de
+   début, trois nommées avec leur heure puis « et n autres » ; les
+   propositions encore à valider ne comptent pas (ce ne sont pas des
+   irrigations planifiées) ; la pluie prévue aujourd'hui, celle que lit le
+   plan, dite seulement connue et supérieure à 0 une fois arrondie ; les
+   alertes en cours, comptées comme le bloc « Gel ou chaleur » de
+   « Aujourd'hui » les annonce sur ses trois jours (le gel des cultures en
+   compte une, chaque alerte météo qui se déclenche une), sans rien lire si
+   ni « Alertes météo » ni « Alertes cultures » n'est cochée ; les
+   suggestions, la phrase d'avant suivie de leurs gestes. Identifiant
+   d'alarme `morning:<jour>`, étiquette `morning-<jour>`, journaux
+   `morning_message_sent`, `morning_message_already_sent`,
+   `morning_message_failed`, avec des nombres et le jour, jamais un nom.
+3. **F715.** Les réglages des messages vivent dans un pli fermé,
+   « Messages de la ferme », sous « Notifications du téléphone », comme
+   « Correspondance des espèces » (F459) : sa ligne dit le réglage tel qu'il
+   est enregistré (« Message du matin activé. ») et suit chaque changement ;
+   l'ancre d'un réglage (`#message-du-matin`) ouvre le pli. Fermé, il coûte
+   une ligne au téléphone ; le budget de hauteur de « Réglages » à 390 px
+   (P40, F459, porté à 3 500 par le pli de la suppression de la ferme, F665)
+   passe à 3 650 px : la page sur `main` en prend déjà 3 482 dans la CI, et
+   le pli 64 de plus. Le budget reste une borne : toute section nouvelle de
+   « Réglages » se plie.
+
+Ne changent pas : le Worker de notification, le déclencheur du matin, les
+règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des
+alertes ; aucun appel à OTF.
+
+## D-284 — Améliorations, n° 2 : le rappel du soir
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 2, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** Rien ne relançait un arrosage validé jamais confirmé. Le
+contrat court des améliorations (`docs/ameliorations-6-2-3-7-contract.md`,
+sections 4.1 et 4.3, F702, F704 et F705) ajoute un rappel par jour et par
+ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
+
+**Décision.** Le code suit les sections 4.1 et 4.3 ; la précision de code :
+
+1. **F714.** Le rappel est dû au premier passage horaire où l'heure de Paris
+   a atteint l'heure réglée, et jusqu'à deux heures après : jamais avant
+   l'heure choisie (une heure à 19 h 45 part au passage de 20 h 05, non à
+   celui de 19 h 05, qui la devancerait), et un passage en panne ne
+   rattrape pas un rappel en pleine nuit ; minuit passé, le jour est fini.
+   Il nomme les irrigations planifiées dont la fin prévue est passée
+   aujourd'hui et qui attendent encore un geste (`isWaitingPlannedIrrigation`),
+   par heure de début, chaque matériel une fois, trois noms puis « et n
+   autres » ; titre « Arrosages à confirmer », identifiant `evening:<jour>`.
+   Le réglage du soir (case, heure de 17 h à 22 h au quart d'heure, 19 h et
+   activé par défaut) se montre dans « Notifications du téléphone » pour une
+   ferme qui coche « Arrosages », pas en démonstration, dans le pli
+   « Messages de la ferme » du message du matin (F715), dont la ligne dit
+   aussi « Rappel du soir à 19 h. » ou « Rappel du soir coupé. » ; la ferme sans
+   « Arrosages » ou figée par une demande d'effacement n'est pas lue. Avant
+   17 h, le passage ne lit rien et réussit. Une ferme en panne (lecture ou
+   Worker) fait manquer le passage au registre, sans arrêter les autres ; le
+   service non configuré n'est pas une panne. Le registre gagne la tâche
+   `evening-reminder` (orange à 3 heures, rouge à 6) et le déclencheur
+   `5 * * * *` du planificateur ; la page d'état compte dix tâches.
+
+Ne changent pas : le Worker de notification, la confirmation d'un arrosage
+(aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
+de plus (les colonnes du soir viennent de la 0042), aucun appel à OTF.
+
+## D-285 — Améliorations, n° 7 : le journal des modifications, général, écrit en plus et gardé autant que la ferme
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 4
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52, D-281 ; réglage Opus 5.5 · Très élevé, section 6 septies).
+
+**Contexte.** Le module a des révisions et des journaux par domaine
+(créneaux, pompes, infrastructure de l'eau, décisions de besoin, objectifs
+historisés…), chacun de sa forme, certains sans « avant ». Aucun ne dit,
+pour toute la ferme, qui a changé quoi, quand, de quoi à quoi. Le contrat
+court des améliorations (`docs/ameliorations-6-2-3-7-contract.md`,
+section 5, F706 à F709) retient l'option recommandée : **une table générale,
+écrite en plus des journaux de domaine**, et **gardée autant que la ferme**
+(choix rappelés par le porteur le 21 novembre 2026 : sans retour en
+arrière dans cette version, §5.8).
+
+**Décision.** La table `irrigation_change_journal` (migration 0043,
+provisoire, à renuméroter après la file de fusion) garde, par ferme, une
+ligne par changement d'un objectif, d'un réglage ou du matériel : la
+famille, le sujet (code court et stable de la liste fermée
+`lib/domain/change-journal/subjects.ts`), l'objet touché et son repère,
+l'action (créé, modifié, supprimé), l'avant et l'après des seuls champs
+qui changent, la personne et l'instant. Elle est d'un espace : au plan
+d'effacement (`SPACE_TABLES`), donc à l'export chiffré et à l'effacement de
+la ferme ; aucune purge à part. Ses déclencheurs refusent toute
+modification et tout effacement, sauf pendant l'effacement de sa ferme.
+La page de confidentialité le dit (texte du 21 novembre 2026). Les
+précisions de code :
+
+1. **F716.** L'avant se lit dans la base, **dans le lot même** du
+   changement, à sa condition même (`db/change-journal/statements.ts`) : la
+   ligne du journal s'écrit si et seulement si le changement s'écrit, et
+   deux gestes presque simultanés ne laissent jamais un avant périmé.
+   Création : après l'insertion, l'après lu sur la ligne écrite.
+   Modification : avant l'écriture, l'avant lu sur la ligne d'avant,
+   l'après donné par l'écrivain, et seuls les champs qui changent (comparés
+   par `IS`) ; un geste qui ne change rien n'écrit rien. Suppression : avant
+   l'effacement, l'avant de chaque champ. Une ligne absente peut valoir
+   « créé » (un enregistrement qui insère ou remplace) ou les valeurs par
+   défaut (un réglage jamais enregistré). Les noms de table et de champ
+   viennent du code et sont vérifiés ; seules les valeurs sont des
+   paramètres. Le contrôle de cohérence des espaces (F380) relève toute
+   ligne du journal qui désignerait l'objet d'une autre ferme.
+2. **F717.** L'inventaire (`db/change-journal/inventory.ts`, §5.4, premier
+   garde-fou) range **chaque table de la base**, au journal ou hors du
+   journal avec sa raison, et **chaque écrivain** d'une table du journal,
+   « fichier › fonction › table » : branché, à brancher par la PR 5 ou 6,
+   ou sans objet avec sa raison. `tests/change-journal-inventory.test.ts`
+   relit le code et échoue pour une table ou un écrivain non rangé.
+3. **F718.** Les réglages que la liste du contrat (§5.1) ne nomme pas — les
+   réglages du besoin par culture (Kc corrigés, abri, paillage, ombrage,
+   options, cultures de référence propres à la ferme, correspondances
+   d'espèces), les parcelles sous abri, les groupes de jardins et le lieu
+   météo — restent hors du journal dans cette version, chacun rangé avec
+   cette raison ; ils y entreront sur le mot du porteur, par une PR qui les
+   branche comme les autres.
+
+Ne changent pas : les journaux de domaine, aucun calcul du besoin, du
+planning ni de la répartition, aucun écran dans cette PR (la lecture vient
+avec la PR 7), aucun appel à OTF.
+
+## D-286 — Améliorations, n° 7 : les objectifs et les réglages écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 5
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285).
+
+**Contexte.** D-285 a posé la table, la règle et l'inventaire ; aucun
+écrivain n'écrivait encore. La liste du contrat (§5.1) nomme, pour les
+objectifs et les réglages : l'objectif hydrique (posé à la main ou adopté
+d'une proposition), le seuil minimal de besoin, la décision sur le besoin
+d'une planche, les réglages du planning, les créneaux protégés, la limite
+d'eau de la journée et celle d'une ressource, le sol d'une zone ou d'une
+parcelle, les réglages du sol, la profondeur des racines, les alertes météo
+et par culture, les fonctionnalités et les messages du téléphone.
+
+**Décision.** Les 23 écrivains rangés « PR 5 » dans l'inventaire placent
+leur ligne dans leur lot, par les fonctions de
+`db/change-journal/objectives.ts` et `db/change-journal/settings.ts`, et
+l'inventaire les dit « branchés ». Les écritures faites d'une seule
+instruction passent en lot (`db.batch`) pour que la ligne et le changement
+réussissent ou échouent ensemble. Deux précisions de code :
+
+1. **F719. L'avant d'un réglage.** Une table d'un réglage de toute la
+   ferme (planning, seuil de besoin, fonctionnalités, messages du
+   téléphone, réglages du sol et des alertes par culture) se lit à sa
+   ligne, ou à sa révision la plus récente ; **sans enregistrement, elle
+   vaut ses valeurs de départ**, celles du domaine, et son premier
+   enregistrement dit « modifié », de la valeur de départ à la nouvelle. Un
+   objet qui n'existait pas (un objectif, un créneau, une limite, le sol
+   d'un lieu, un rattachement au gel, un délai de séchage) dit « créé ». Le
+   profil racinaire d'une culture part du profil commun quand la ferme n'a
+   pas le sien. Un objectif retiré dit « supprimé », avec la hauteur qu'il
+   avait. Les réglages du planning sont aplatis, une valeur par champ
+   (`dosesDripMaximumMm`) ; les fonctionnalités, une case par champ (0 ou
+   1) ; les stades d'un profil racinaire, un texte `[[rang, profondeur,
+   fin, jours], …]`. Un drapeau s'écrit 0 ou 1, comme la base.
+2. **F720. L'écrivain nomme son sujet.** Chaque fonction branchée passe son
+   sujet en premier argument (`goalJournal('objectif-adopte', …)`) ; le test
+   de l'inventaire relit le code de chaque écrivain « branché » et y cherche
+   ce sujet, et vérifie qu'aucun écrivain rangé autrement n'écrit au
+   journal. L'essai de la migration 0034 sur une copie arrêtée à la 0033
+   écrit les lignes du journal de la ferme de démonstration dans une table
+   temporaire, hors de la copie.
+
+Ne changent pas : les journaux de domaine (écrits comme avant, à côté),
+aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
+migration, aucun appel à OTF. Le matériel et les ressources viennent avec
+la PR 6.
+
+## D-287 — Améliorations, n° 7 : le matériel et les ressources écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 6
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285
+et D-286).
+
+**Contexte.** Après D-286, restaient « à brancher » les 21 écrivains du
+matériel et des ressources que nomme le contrat (§5.1) : le matériel, ses
+réglages, sa copie et sa pompe par défaut, les pompes et leurs origines, les
+ressources en eau et leur débit mesuré, les réserves, les liaisons d'une
+ressource à une réserve et entre réserves, l'alimentation par défaut et les
+poses du matériel.
+
+**Décision.** Ces 21 écrivains placent leur ligne dans leur lot, par les
+fonctions de `db/change-journal/equipment.ts`, et l'inventaire les dit
+« branchés » : il n'a plus d'écrivain « à brancher », chacun est branché ou
+sans objet. Une modification se lit avant l'écriture, à la condition même de
+l'écriture (un matériel actif, une pose à sa date de mise à jour) ; une
+création s'écrit après l'insertion, lue sur la ligne écrite ; un effacement
+se lit avant. Une précision de code :
+
+1. **F721. Une valeur désignée se lit par son nom, des deux côtés.** Une
+   ressource, une réserve, un réglage, une pompe, un groupe de jardin
+   désignés par un identifiant s'écrivent par leur nom, et la nouvelle
+   valeur est lue en SQL dans le lot (`nextSql`), comme l'ancienne : les
+   deux sont formatées pareil, et un nom changé ensuite n'est pas réécrit.
+   Les valeurs composées s'écrivent en texte, triées pour qu'un même
+   ensemble dans un autre ordre ne compte pas comme un changement : le
+   profil d'une aspersion `[[distance, débit], …]` par distance, les
+   origines d'une pompe `[[sorte, nom, par défaut], …]`, les planches d'une
+   pose par leur ordre de pose. Le volume présent d'une réserve n'est pas
+   un réglage : il n'entre pas au journal. Le débit mesuré appliqué à une
+   ressource dit « modifié » sur son débit, avec l'origine « débit mesuré ».
+   Une pose retirée dit « modifié » sur sa date de retrait ; reposée, sur
+   ses dates. La copie d'un matériel écrit la création de la copie, avec le
+   nom de l'original, et celle de chacun de ses réglages. Les écrivains sans
+   personne nommée (le matériel, ses réglages, les poses) écrivent la clé de
+   l'espace, comme D-286.
+
+Ne changent pas : les journaux de domaine (écrits comme avant, à côté),
+aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
+migration, aucun appel à OTF.
+
+## D-288 — Améliorations, n° 7 : l'écran du journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 7
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285
+à D-287).
+
+**Contexte.** Depuis D-287, tous les écrivains de la liste du contrat
+(§5.1) écrivent au journal ; rien ne le lit encore. Le contrat (§5.5,
+§5.6) demande une section « Journal des modifications » dans « Réglages »,
+en lecture seule : les 50 dernières lignes, une carte par ligne, un filtre
+par famille, « Voir plus » par 50, le texte composé dans `lib/domain/`, pas
+de case de fonctionnalité, au téléphone une carte par ligne et jamais de
+tableau, une section vide qui dit « Aucune modification enregistrée depuis
+le <date de mise en service> », et une phrase de tête qui dit que le
+journal commence à sa mise en service.
+
+**Décision.** La section vient en bas de « Réglages », juste avant
+« Supprimer ma ferme et mes données » (F665), pour toute ferme, toutes cases
+cochées ou non, démonstration comprise. Sa lecture porte l'espace de la
+session ; « Voir plus » et le filtre passent par une action serveur qui
+vérifie la famille et le repère de reprise. Trois précisions :
+
+1. **F722. Les mots du journal, en un endroit.** Chaque champ qu'un
+   écrivain garde a son nom à l'écran et l'écriture de sa valeur, avec son
+   unité (`lib/domain/change-journal/fields.ts`) : « Objectif : 30 mm →
+   35 mm », « Fin : 12 h → 13 h », « Part de la pluie prévue déduite :
+   100 % → 50 % », un profil d'aspersion « à 2 m, 8 mm/h ; à 4 m,
+   6 mm/h », une case 0 ou 1 « oui » ou « non ». Une valeur vide dit ce
+   qu'elle veut dire pour son champ (« aucune », « sans fin », « en
+   place »), sinon « non renseigné » (D-003). La carte
+   (`lib/domain/change-journal/card.ts`) dit quand, à l'heure de la ferme,
+   qui (« Vous » quand l'auteur est la clé d'espace de la session, sinon
+   « Une autre personne connectée », jamais une adresse, F708), le sujet,
+   l'action (« Création », « Modification », « Suppression ») et l'objet par
+   son nom ou son repère ; un lieu ou une culture d'Ouvre ta ferme se lit
+   par son nom quand l'instantané le connaît (« Planche · B1 »), sinon par
+   sa sorte, jamais par son identifiant. Un champ que la version ne sait pas
+   lire est compté, jamais tu ni montré par son code. Les essais des
+   écrivains (PR 5 et 6) échouent pour un champ écrit sans ses mots ; ceux
+   du domaine, pour un champ des réglages gardés en entier (planning,
+   fonctionnalités, alertes par culture, sol) sans ses mots. Les noms des
+   natures de ressource et de réserve passent dans le domaine
+   (`lib/domain/water-resource-labels.ts`), relus par « Ressources » et
+   par le journal.
+2. **F723. Le début du journal.** Le jour où le journal d'une ferme
+   commence est le plus tard de sa mise en service, lue dans la liste des
+   migrations reçues par la base (`d1_migrations`, tenue par Cloudflare,
+   migration `…_change_journal.sql`, quel que soit son numéro final), et de
+   la création de l'espace. Une base sans cette liste (les essais en local)
+   prend la création de l'espace. Rien n'est reconstitué d'avant (§5.6).
+3. **F724. Plié, comme toute section nouvelle de « Réglages ».** La
+   section est un pli fermé, celui de « Correspondance des espèces », dont
+   la ligne dit « N modifications, la dernière le … » ; l'ancre
+   `#journal-des-modifications` l'ouvre. Fermé, il coûte une ligne au
+   téléphone, 84 px (3 489 → 3 573 px en local ; 3 704 px avec « Supprimer
+   ma ferme et mes données », #160) : le budget de hauteur de « Réglages »
+   à 390 px (P40, F459, F665, F715) passe de 3 650 à 3 750 px.
+
+Preuves : `tests/change-journal-card.test.ts` (le texte de chaque famille,
+les valeurs et leurs unités, les champs inconnus, les phrases de la
+section), `tests/db/change-journal-view.test.ts` (50 cartes puis « Voir
+plus », le filtre et sa suite, deux fermes, le début du journal), les essais
+des écrivains (aucun champ sans ses mots), le parcours P55 à 390 et
+1 440 px. Ne changent pas : les écrivains, la table, aucune migration,
+aucun calcul, aucun appel à OTF.
+
+## D-289 — Améliorations, n° 7 : les réglages restants écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (suite de l'amélioration n° 7,
+PR 8, empilée sur la PR 7 ; règle la précision F718 de D-285 ; réglage
+Opus 5.5 · Très élevé, section 6 septies). F718 laissait hors du journal
+les réglages que la liste du contrat (§5.1) ne nommait pas, « sur le mot du
+porteur ». Le coordinateur du projet a tranché pour une PR à part, codée
+aussitôt, dans l'autonomie que le porteur lui a confiée le 19 novembre 2026
+pour les questions qui ne touchent ni au budget, ni à l'agronomie, ni à la
+ferme réelle ; le porteur peut la refuser à la relecture de la PR.
+
+**Contexte.** Depuis D-287, tous les écrivains de la liste du contrat
+écrivent au journal, et l'écran le lit (D-288). Restaient hors du journal,
+chacun rangé avec la raison F718 : les réglages du besoin par culture (Kc
+corrigés, cultures de référence propres à la ferme, correspondance des
+espèces, effet des abris, paillage plastique, filets d'ombrage, options),
+le classement des jardins sous abri ou de plein champ, les groupes de
+jardins et le lieu de la météo.
+
+**Décision.** Ces réglages écrivent leur ligne dans le lot même de leur
+geste, avec les règles de D-286 (F716) : avant l'écriture pour un
+changement ou une suppression, après pour une création, seuls les champs
+qui changent, rien pour un geste refusé ou sans changement. Dix sujets
+nouveaux, tous de la famille « Réglages » : « Kc corrigé d'une culture »,
+« Culture de référence de la ferme », « Correspondance d'une espèce »,
+« Effet d'un abri (K_abri) », « Paillage plastique d'une planche »,
+« Filet d'ombrage », « Options du besoin par culture », « Jardin sous abri
+ou de plein champ », « Groupe de jardins » et « Lieu de la météo ». Cinq
+précisions :
+
+1. **F725. Ce qui reste hors du journal, et pourquoi.** Le repère de saison
+   des groupes de jardins (un état que le module tient), le report des
+   groupes de la saison d'avant sur une saison neuve (le module, à la
+   première lecture, sans geste), l'état des synchronisations météo
+   (tentative, réussite, erreur, attente), la proposition du module à côté
+   du classement d'un jardin. L'inventaire (F717) les range avec ces
+   raisons ; plus aucune table n'y porte la raison F718.
+2. **F726. Une valeur composée se garde en un texte, relu à l'identique.**
+   Les stades, les jeux de saison et les débuts de stade d'une culture de
+   référence, et les jardins d'un groupe (dans leur ordre, avec leur sens
+   et leur écart), se gardent chacun en un texte JSON. Le code l'écrit et
+   SQLite le relit dans le lot sous la même forme (un nombre entier sans
+   décimale, les mois triés) : une culture ou un groupe enregistré de
+   nouveau tel quel n'écrit aucune ligne, les trois formes de Kc
+   comprises. Les lignes filles d'une culture se composent en un seul
+   endroit (`referenceCropPartRows`), pour l'écriture et pour le journal.
+3. **F727. La version de la ferme d'une culture de référence.** La première
+   version que la ferme enregistre est une **création**, avec chacune de
+   ses valeurs, et non une modification de la culture commune ; la suivante
+   est une modification de la précédente ; la retirer est une
+   **suppression** (la commune revient, sans ligne à elle). Un Kc corrigé
+   dit sa culture par son nom et sa cible (« Tomate, stade 2 », « Brocoli,
+   Kc pleine saison ») ; une correspondance dit la culture de référence par
+   son nom, avant comme après (F721).
+4. **F728. Un jardin remis « à classer ».** Remettre un jardin « à classer »
+   efface son classement : la ligne dit une suppression, avec le
+   classement d'avant. Seul le choix de la personne compte (« sous abri »,
+   « plein champ ») ; la proposition du module, gardée à côté, n'est pas un
+   geste.
+5. **F729. Le lieu de la météo.** Seul le choix compte : l'adresse de la
+   ferme dans Ouvre ta ferme (le départ) ou une commune choisie, sa commune
+   et son code postal. La première commune choisie dit « modifié », de
+   l'adresse de la ferme à la commune.
+
+Preuves : `tests/db/change-journal-remaining-settings.test.ts` (chaque
+écrivain : création, changement, inchangé sans ligne, refus d'une autre
+ferme, suppression ; les trois formes de Kc relues à l'identique ; le texte
+des cartes), `tests/change-journal-inventory.test.ts` (chaque table et
+chaque écrivain rangé, chaque écrivain branché nomme son sujet), contrôle de
+cohérence des espaces. Ne changent pas : la table du journal, l'écran
+(D-288), aucune migration, aucun calcul, aucun appel à OTF.

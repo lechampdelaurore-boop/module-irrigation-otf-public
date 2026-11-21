@@ -5,6 +5,9 @@ import { weatherRefreshClaimed } from '@/lib/domain/weather/cache-policy';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser, waterBudgetRevisionStatement } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
 import { confirmOnboardingStepStatement } from './onboarding-repository';
+import { clearedGoalJournal, goalJournal } from './change-journal/objectives';
+import { dailyWaterLimitJournal } from './change-journal/settings';
+import { weatherLocationJournal } from './change-journal/places';
 
 type WeatherLocationMode = 'otf' | 'custom';
 
@@ -168,7 +171,9 @@ export async function saveHydricGoalForUser(
   goal: Omit<HydricGoal, 'id' | 'createdAt'>,
 ): Promise<void> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.prepare(
+  const at = moduleNow();
+  // Le journal des modifications d'abord, dans le même lot : l'avant est l'objectif en vigueur (amélioration n° 7, D-286).
+  await db.batch([goalJournal('objectif-hydrique', { workspaceId, actorUserId: ownerUserId, at }, goal, goal.amountMm), db.prepare(
     `INSERT INTO irrigation_hydric_goal_revisions
        (id, workspace_id, season, week_start, scope_type, otf_zone_id,
         otf_plot_id, otf_bed_id, amount_mm, action, actor_user_id, created_at)
@@ -176,8 +181,8 @@ export async function saveHydricGoalForUser(
   ).bind(
     revisionId(), workspaceId, goal.season, goal.weekStart,
     goal.scopeType, goal.otfZoneId, goal.otfPlotId, goal.otfBedId,
-    goal.amountMm, ownerUserId, moduleNow(),
-  ).run();
+    goal.amountMm, ownerUserId, at,
+  )]);
 }
 
 export async function clearHydricGoalsForUser(
@@ -189,15 +194,16 @@ export async function clearHydricGoalsForUser(
   if (!workspaceId) return 0;
   const goals = await listHydricGoalsForUser(ownerUserId, season, weekStart);
   if (goals.length === 0) return 0;
-  await db.batch(goals.map((goal) => db.prepare(
+  const at = moduleNow();
+  await db.batch(goals.flatMap((goal) => [clearedGoalJournal('objectif-hydrique', { workspaceId, actorUserId: ownerUserId, at }, goal), db.prepare(
     `INSERT INTO irrigation_hydric_goal_revisions
        (id, workspace_id, season, week_start, scope_type, otf_zone_id,
         otf_plot_id, otf_bed_id, amount_mm, action, actor_user_id, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 'cleared', ?, ?)`,
   ).bind(
     revisionId(), workspaceId, season, weekStart, goal.scopeType,
-    goal.otfZoneId, goal.otfPlotId, goal.otfBedId, ownerUserId, moduleNow(),
-  )));
+    goal.otfZoneId, goal.otfPlotId, goal.otfBedId, ownerUserId, at,
+  )]));
   return goals.length;
 }
 
@@ -249,8 +255,10 @@ export async function saveWeatherPreferenceForUser(
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const now = new Date().toISOString();
   const custom = preference.locationMode === 'custom';
-  // Choisir la commune, ou le siège en dernier recours, confirme l'étape « Où est la ferme » (4.4, F419) : dans le même lot.
-  await db.batch([db.prepare(
+  // Choisir la commune, ou le siège en dernier recours, confirme l'étape « Où est la ferme » (4.4, F419) : dans le même lot,
+  // avec la ligne du journal des modifications, avant l'écriture (D-289).
+  const location = { locationMode: preference.locationMode, customCity: custom ? preference.customCity : null, customPostcode: custom ? preference.customPostcode : null };
+  await db.batch([weatherLocationJournal('lieu-meteo', { workspaceId, actorUserId: ownerUserId, at: now }, location), db.prepare(
     `INSERT INTO irrigation_weather_preferences
        (workspace_id, location_mode, custom_city, custom_postcode, updated_at)
      VALUES (?, ?, ?, ?, ?)
@@ -544,15 +552,16 @@ export async function saveDailyWaterLimitForUser(
   input: Omit<DailyWaterLimit, 'id' | 'createdAt'>,
 ): Promise<void> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.batch([waterBudgetRevisionStatement(ownerUserId), db.prepare(
+  const at = moduleNow();
+  const limit = { ...input, maxCubicMetersPerDay: input.enabled ? input.maxCubicMetersPerDay : null };
+  await db.batch([waterBudgetRevisionStatement(ownerUserId), dailyWaterLimitJournal('limite-d-eau-du-jour', { workspaceId, actorUserId: ownerUserId, at }, limit), db.prepare(
     `INSERT INTO irrigation_daily_water_limit_revisions
        (id, workspace_id, season, enabled, max_cubic_meters_per_day,
         valid_from, valid_until, note, actor_user_id, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(
-    revisionId(), workspaceId, input.season, input.enabled ? 1 : 0,
-    input.enabled ? input.maxCubicMetersPerDay : null,
-    input.validFrom, input.validUntil, input.note, ownerUserId, moduleNow(),
+    revisionId(), workspaceId, limit.season, limit.enabled ? 1 : 0, limit.maxCubicMetersPerDay,
+    limit.validFrom, limit.validUntil, limit.note, ownerUserId, at,
   )]);
 }
 

@@ -12,7 +12,7 @@ import { escapeHtml, renderPage } from './layout.ts';
 
 export const RESPONSIBLE = "François PREZEAU, GAEC Le Champ de l'Aurore";
 /** La date de chaque texte : celui des conditions n'a pas changé depuis sa validation. */
-const PRIVACY_TEXT_DATE = '20 novembre 2026';
+const PRIVACY_TEXT_DATE = '21 novembre 2026';
 const TERMS_TEXT_DATE = '18 novembre 2026';
 
 /** Une adresse électronique plausible : une valeur mal saisie ne s'affiche pas. */
@@ -93,7 +93,7 @@ export function privacyPage(contactEmail: string | undefined): string {
 <ul>
 <li><strong>Une copie du plan lu dans Ouvre ta ferme</strong>, renouvelée quand le module en a besoin (à l'usage, au calcul du planning du matin, ou quand vous demandez une actualisation) ; une copie de moins de quatre heures est réutilisée telle quelle. La dernière copie réussie est gardée pour que le module reste utilisable quand Ouvre ta ferme ne répond pas.</li>
 <li><strong>La clé d'accès donnée par Ouvre ta ferme</strong>, quand votre ferme est reliée au module : elle lui permet de lire la ferme sans vous redemander l'autorisation. Elle est gardée chiffrée, et effacée quand vous déconnectez la ferme dans le module, ou dès que le module constate qu'Ouvre ta ferme n'accepte plus son accès (autorisation retirée ou expirée).</li>
-<li><strong>Ce que vous saisissez dans le module</strong> : matériel d'arrosage, ressources en eau, arrosages faits, pluie mesurée, observations du sol, objectifs, réglages et alertes.</li>
+<li><strong>Ce que vous saisissez dans le module</strong> : matériel d'arrosage, ressources en eau, arrosages faits, pluie mesurée, observations du sol, objectifs, réglages et alertes. Le journal des modifications garde qui a changé quoi et quand (un objectif, un réglage, le matériel, avec la valeur d'avant et celle d'après), tant que la ferme existe ; il part avec vos données de ferme.</li>
 <li><strong>La météo de votre commune</strong> : prévisions et valeurs passées, jour par jour.</li>
 <li><strong>Un identifiant de connexion</strong> fourni par le service de connexion (une suite de caractères, pas votre adresse électronique). Votre adresse s'affiche à l'écran une fois connecté, mais le module ne l'enregistre pas.</li>
 <li><strong>Si vous activez les notifications</strong> : l'adresse technique que votre navigateur fournit pour les recevoir.</li>

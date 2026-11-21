@@ -4,6 +4,7 @@ import { type EquipmentKind, type ValidEquipmentDraft } from '@/lib/domain/irrig
 import type { EquipmentStatus } from '@/lib/domain/equipment-record';
 import { EquipmentKindLockedBySettingsError } from './errors';
 import { assertEquipmentNameAvailable, ensureWorkspace, findWorkspaceId } from './ownership';
+import { equipmentArchiveJournal, equipmentDeletionJournal, equipmentJournal } from '../change-journal/equipment';
 
 export type DeleteEquipmentResult = 'deleted' | 'has_history' | 'not_found';
 
@@ -14,20 +15,24 @@ export async function createEquipmentForUser(
   const workspaceId = await ensureWorkspace(ownerUserId);
   await assertEquipmentNameAvailable(workspaceId, equipment.name);
   const equipmentId = crypto.randomUUID();
+  // Le journal des modifications, après l'insertion : l'après lu sur la ligne écrite (amélioration n° 7, D-287).
+  const journal = equipmentJournal('materiel', { workspaceId, actorUserId: ownerUserId, at: new Date().toISOString() }, equipmentId, equipment, false);
 
-  await db.prepare(
-    `INSERT INTO irrigation_equipment (
-       id, workspace_id, name, kind, mobility
-     ) VALUES (?, ?, ?, ?, ?)`,
-  )
-    .bind(
-      equipmentId,
-      workspaceId,
-      equipment.name,
-      equipment.kind,
-      equipment.mobility,
+  await db.batch([
+    db.prepare(
+      `INSERT INTO irrigation_equipment (
+         id, workspace_id, name, kind, mobility
+       ) VALUES (?, ?, ?, ?, ?)`,
     )
-    .run();
+      .bind(
+        equipmentId,
+        workspaceId,
+        equipment.name,
+        equipment.kind,
+        equipment.mobility,
+      ),
+    ...journal.after,
+  ]);
 
   return equipmentId;
 }
@@ -58,24 +63,29 @@ export async function updateEquipmentForUser(
   }
 
   await assertEquipmentNameAvailable(workspaceId, equipment.name, equipmentId);
-  const result = await db.prepare(
-    `UPDATE irrigation_equipment
-     SET name = ?, kind = ?, mobility = ?, updated_at = ?
-     WHERE id = ?
-       AND workspace_id = ?
-       AND status = 'active'`,
-  )
-    .bind(
-      equipment.name,
-      equipment.kind,
-      equipment.mobility,
-      new Date().toISOString(),
-      equipmentId,
-      workspaceId,
+  const now = new Date().toISOString();
+  // Le journal des modifications d'abord, à la condition même de l'écriture : l'avant est la ligne active (amélioration n° 7, D-287).
+  const journal = equipmentJournal('materiel', { workspaceId, actorUserId: ownerUserId, at: now }, equipmentId, equipment, true);
+  const results = await db.batch([
+    ...journal.before,
+    db.prepare(
+      `UPDATE irrigation_equipment
+       SET name = ?, kind = ?, mobility = ?, updated_at = ?
+       WHERE id = ?
+         AND workspace_id = ?
+         AND status = 'active'`,
     )
-    .run();
+      .bind(
+        equipment.name,
+        equipment.kind,
+        equipment.mobility,
+        now,
+        equipmentId,
+        workspaceId,
+      ),
+  ]);
 
-  return aEcritUneLigne(result.meta);
+  return aEcritUneLigne(results.at(-1)?.meta);
 }
 
 export async function setEquipmentArchivedForUser(
@@ -88,15 +98,18 @@ export async function setEquipmentArchivedForUser(
 
   const now = new Date().toISOString();
   const status: EquipmentStatus = archived ? 'archived' : 'active';
-  const result = await db.prepare(
-    `UPDATE irrigation_equipment
-     SET status = ?, archived_at = ?, updated_at = ?
-     WHERE id = ? AND workspace_id = ?`,
-  )
-    .bind(status, archived ? now : null, now, equipmentId, workspaceId)
-    .run();
+  const results = await db.batch([
+    // Le journal des modifications d'abord : rangé ou ressorti, rien si l'état ne change pas (amélioration n° 7, D-287).
+    equipmentArchiveJournal('materiel', { workspaceId, actorUserId: ownerUserId, at: now }, equipmentId, archived),
+    db.prepare(
+      `UPDATE irrigation_equipment
+       SET status = ?, archived_at = ?, updated_at = ?
+       WHERE id = ? AND workspace_id = ?`,
+    )
+      .bind(status, archived ? now : null, now, equipmentId, workspaceId),
+  ]);
 
-  return aEcritUneLigne(result.meta);
+  return aEcritUneLigne(results.at(-1)?.meta);
 }
 
 export async function deleteEquipmentForUser(
@@ -128,6 +141,8 @@ export async function deleteEquipmentForUser(
   let results: D1Result[];
   try {
     results = await database.batch([
+      // Le journal des modifications d'abord : l'avant du matériel effacé (amélioration n° 7, D-287).
+      equipmentDeletionJournal('materiel', { workspaceId, actorUserId: ownerUserId, at: new Date().toISOString() }, equipmentId),
       // Le registre des poses ne s'efface qu'avec son matériel, quand
       // celui-ci n'a jamais arrosé (2.11, règle 8).
       database

@@ -1,6 +1,7 @@
 import { db } from '../binding';
 import { ensureWorkspaceForUser } from '../workspace-repository';
 import { spaceKeyOfRow } from '../workspace-scope';
+import { cropAlertSettingsJournal, dryingDaysJournal, frostLinkJournal } from '../change-journal/settings';
 import {
   DEFAULT_CROP_ALERT_SETTINGS,
   validateCropAlertSettings,
@@ -106,7 +107,9 @@ export async function saveCropAlertSettingsForUser(
   const validation = validateCropAlertSettings({ ...current, ...input });
   if (!validation.ok) return { ok: false, problems: validation.refusals.map((refusal) => refusal.message) };
   const settings = validation.settings;
-  await db.prepare(
+  const at = now.toISOString();
+  // Le journal des modifications d'abord : l'avant est la révision en vigueur, sinon les réglages du contrat (amélioration n° 7, D-286).
+  await db.batch([cropAlertSettingsJournal('alertes-de-culture', { workspaceId, actorUserId: ownerUserId, at }, settings), db.prepare(
     `INSERT INTO irrigation_crop_alert_settings
        (id, workspace_id, frost_active, drying_active, sprinkler_active, horizon_days, frost_offset_celsius,
         frost_margin_sensitive_celsius, frost_margin_hardy_celsius,
@@ -116,8 +119,8 @@ export async function saveCropAlertSettingsForUser(
     crypto.randomUUID(), workspaceId, settings.frostActive ? 1 : 0, settings.dryingActive ? 1 : 0, settings.sprinklerActive ? 1 : 0,
     settings.horizonDays, settings.frostOffsetCelsius, settings.frostMarginSensitiveCelsius, settings.frostMarginHardyCelsius,
     settings.sprinklerMaxTemperatureCelsius,
-    settings.sprinklerRadiationWattsPerSquareMeter, ownerUserId, now.toISOString(),
-  ).run();
+    settings.sprinklerRadiationWattsPerSquareMeter, ownerUserId, at,
+  )]);
   return { ok: true, value: settings };
 }
 
@@ -144,10 +147,11 @@ export async function saveFrostLinkForUser(
     damageCelsius: validation.damageCelsius,
     recordedAt: now.toISOString(),
   };
-  await db.prepare(
+  // Le journal des modifications d'abord : l'avant est le rattachement en vigueur (amélioration n° 7, D-286).
+  await db.batch([frostLinkJournal('seuil-de-gel', { workspaceId, actorUserId: ownerUserId, at: revision.recordedAt }, revision), db.prepare(
     `INSERT INTO irrigation_crop_frost_links (id, workspace_id, plant_id, series_id, common_key, damage_celsius, actor_user_id, recorded_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).bind(revision.id, workspaceId, revision.plantId, revision.seriesId, revision.commonKey, revision.damageCelsius, ownerUserId, revision.recordedAt).run();
+  ).bind(revision.id, workspaceId, revision.plantId, revision.seriesId, revision.commonKey, revision.damageCelsius, ownerUserId, revision.recordedAt)]);
   return { ok: true, value: revision };
 }
 
@@ -162,9 +166,10 @@ export async function saveDryingDaysForUser(
   if (input.plantId.trim() === '') return { ok: false, problems: ['Espèce inconnue.'] };
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const revision: DryingRevision = { id: crypto.randomUUID(), plantId: input.plantId, dryingDays: validation.dryingDays, recordedAt: now.toISOString() };
-  await db.prepare(
+  // Le journal des modifications d'abord : l'avant est le délai en vigueur (amélioration n° 7, D-286).
+  await db.batch([dryingDaysJournal('jours-de-sechage', { workspaceId, actorUserId: ownerUserId, at: revision.recordedAt }, revision.plantId, revision.dryingDays), db.prepare(
     `INSERT INTO irrigation_crop_drying_revisions (id, workspace_id, plant_id, drying_days, actor_user_id, recorded_at) VALUES (?, ?, ?, ?, ?, ?)`,
-  ).bind(revision.id, workspaceId, revision.plantId, revision.dryingDays, ownerUserId, revision.recordedAt).run();
+  ).bind(revision.id, workspaceId, revision.plantId, revision.dryingDays, ownerUserId, revision.recordedAt)]);
   return { ok: true, value: revision };
 }
 

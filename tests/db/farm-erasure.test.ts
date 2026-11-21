@@ -406,7 +406,8 @@ test('hors d’un effacement en cours, les tables qui ne s’effacent pas refuse
   const immutable = (database.sqlite.prepare("SELECT tbl_name AS name FROM sqlite_schema WHERE type = 'trigger' AND name LIKE '%no_delete'").all() as { name: string }[])
     .map(({ name }) => name)
     .sort((left, right) => order.indexOf(left) - order.indexOf(right));
-  assert.equal(immutable.length, 12);
+  // Les douze de la 4.5, et le journal des modifications (amélioration n° 7, D-285).
+  assert.equal(immutable.length, 13);
   const deleteOne = (table: string, workspaceId: string) => {
     const condition = table === 'irrigation_soil_rooting_stages'
       ? 'profile_id IN (SELECT id FROM irrigation_soil_rooting_profiles WHERE workspace_id = ?)'

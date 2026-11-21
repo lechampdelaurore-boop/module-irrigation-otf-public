@@ -39,9 +39,10 @@ export type TaskKey =
   | 'retention-purge'
   | 'offsite-export'
   | 'restore-rehearsal'
-  | 'operator-watch';
+  | 'operator-watch'
+  | 'evening-reminder';
 
-export type TriggerKey = 'weather-morning' | 'operator-watch' | 'demo-nightly-reset';
+export type TriggerKey = 'weather-morning' | 'operator-watch' | 'evening-reminder' | 'demo-nightly-reset';
 
 /**
  * Une tâche faite par l'exploitant, hors du Worker, et notée par un geste de
@@ -120,6 +121,13 @@ export const TASK_TRIGGERS: readonly TriggerDeclaration[] = [
     config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
     cron: '0 7,8 * * *',
     description: 'Le planificateur appelle la veille de l\'exploitant à 9 h, heure de Paris : un déclencheur distinct de ceux qu\'elle surveille (R5).',
+    monitored: true,
+  },
+  {
+    key: 'evening-reminder',
+    config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
+    cron: '5 * * * *',
+    description: 'Le planificateur appelle le passage du rappel du soir à chaque heure et cinq minutes : chaque ferme règle son heure, de 17 h à 22 h au quart d\'heure, et le passage envoie les rappels dus (amélioration n° 2, F705, F714). Avant 17 h, heure de Paris, il ne lit rien.',
     monitored: true,
   },
   {
@@ -219,6 +227,17 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ifMissing: 'Une panne d\'une autre tâche ne remonte plus à l\'exploitant sans qu\'il ouvre la page d\'état.',
     successKeptIn: 'Ligne « task:operator-watch » de irrigation_background_jobs (réussie quand la veille a lu le registre et que la notification due, s\'il y en avait une, est partie vers un appareil de l\'exploitant).',
     trigger: 'operator-watch',
+  },
+  {
+    key: 'evening-reminder',
+    label: 'Rappel du soir des arrosages non confirmés',
+    rhythm: '1 passage par heure, à l\'heure et cinq minutes ; chaque ferme reçoit son rappel au premier passage après l\'heure qu\'elle a réglée',
+    lateAfterHours: 3,
+    brokenAfterHours: 6,
+    thresholdReason: 'Un passage par heure : orange à 3 heures (deux passages manqués), rouge à 6 heures (une soirée de rappels peut être perdue, puisqu\'un rappel n\'est plus envoyé deux heures après l\'heure réglée).',
+    ifMissing: 'Les fermes ne reçoivent pas le rappel des arrosages validés du jour jamais confirmés ; rien n\'est confirmé à leur place.',
+    successKeptIn: 'Ligne « task:evening-reminder » de irrigation_background_jobs (réussi quand chaque rappel dû est parti, ou qu\'aucun n\'était dû).',
+    trigger: 'evening-reminder',
   },
 ];
 

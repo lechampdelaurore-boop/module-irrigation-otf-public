@@ -12,6 +12,7 @@ import {
   type StageStart,
 } from '@/lib/domain/crop-water/reference';
 import { compareNamesNaturally } from '@/lib/domain/bed-order';
+import { farmReferenceCropDeletionJournal, farmReferenceCropJournal } from '../change-journal/crop-settings';
 
 /**
  * Persistance des cultures de référence (docs/crop-water-need-contract.md,
@@ -140,7 +141,9 @@ export async function saveFarmReferenceCropForUser(
   const at = now.toISOString();
   const curve = crop.curve;
   const trapezoid = curve.shape === 'trapezoid' ? curve : null;
+  // Le journal des modifications d'abord : l'avant est la version de la ferme remplacée (amélioration n° 7, D-289).
   const statements = [
+    farmReferenceCropJournal('culture-de-reference', { workspaceId, actorUserId: ownerUserId, at }, crop, provenance),
     db.prepare(`DELETE FROM irrigation_crop_reference_crops WHERE workspace_id = ? AND crop_key = ?`).bind(workspaceId, crop.id),
     db.prepare(
       `INSERT INTO irrigation_crop_reference_crops
@@ -164,7 +167,7 @@ export async function saveFarmReferenceCropForUser(
 }
 
 /** Retire la version de la ferme : la culture commune revient. `false` quand la ferme n'en avait pas. */
-export async function deleteFarmReferenceCropForUser(ownerUserId: string, cropKey: string): Promise<boolean> {
+export async function deleteFarmReferenceCropForUser(ownerUserId: string, cropKey: string, now = new Date()): Promise<boolean> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return false;
   // `meta.changes` n'est pas fiable sur D1 (db/write-result.ts) : on lit d'abord.
@@ -172,44 +175,60 @@ export async function deleteFarmReferenceCropForUser(ownerUserId: string, cropKe
     `SELECT id FROM irrigation_crop_reference_crops WHERE workspace_id = ? AND crop_key = ?`,
   ).bind(workspaceId, cropKey).first<{ id: string }>();
   if (!row) return false;
-  await db.prepare(`DELETE FROM irrigation_crop_reference_crops WHERE id = ? AND workspace_id = ?`).bind(row.id, workspaceId).run();
+  await db.batch([
+    farmReferenceCropDeletionJournal('culture-de-reference', { workspaceId, actorUserId: ownerUserId, at: now.toISOString() }, cropKey),
+    db.prepare(`DELETE FROM irrigation_crop_reference_crops WHERE id = ? AND workspace_id = ?`).bind(row.id, workspaceId),
+  ]);
   return true;
 }
 
-function partStatements(id: string, crop: ReferenceCrop) {
+/** Les lignes filles d'une culture de référence, telles qu'elles s'écrivent ; le journal des modifications les relit (D-289). */
+export function referenceCropPartRows(crop: ReferenceCrop) {
   const curve = crop.curve;
-  const statements = [];
-  const stages = curve.shape === 'trapezoid' ? [] : curve.shape === 'steps'
-    ? curve.stages.map((stage) => ({ ...stage, start: null, estimated: false, months: null }))
-    : calendarStageRows(curve);
-  for (const stage of stages) {
-    statements.push(db.prepare(
-      `INSERT INTO irrigation_crop_reference_stages (reference_id, rank, label, kc, calendar_start, estimated, establishment_months)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    ).bind(id, stage.rank, stage.label, stage.kc, stage.start, stage.estimated ? 1 : 0, stage.months));
+  const stages = (curve.shape === 'trapezoid' ? [] : curve.shape === 'steps'
+    ? curve.stages.map((stage) => ({ ...stage, start: null as string | null, estimated: false, months: null as number | null }))
+    : calendarStageRows(curve))
+    .map((stage) => ({ rank: stage.rank, label: stage.label, kc: stage.kc, start: stage.start, estimated: stage.estimated, months: stage.months }));
+  const seasons: { setNumber: number; lengths: FaoPhaseLengths | null; months: readonly number[] }[] = [];
+  const starts: { setNumber: number; rank: number; anchor: StageAnchor['from']; duration: number | null; estimated: boolean }[] = [];
+  if (curve.shape !== 'calendar') {
+    curve.sets.forEach((set, index) => {
+      const setNumber = index + 1;
+      seasons.push({ setNumber, lengths: curve.shape === 'trapezoid' ? curve.sets[index].value : null, months: set.months });
+      if (curve.shape !== 'steps') return;
+      curve.sets[index].value.forEach((start, position) => {
+        const anchor = start.anchor;
+        starts.push({ setNumber, rank: curve.stages[position].rank, anchor: anchor.from, duration: 'days' in anchor ? anchor.days : null, estimated: start.estimated });
+      });
+    });
   }
-  if (curve.shape === 'calendar') return statements;
-  curve.sets.forEach((set, index) => {
-    const setNumber = index + 1;
-    const lengths: FaoPhaseLengths | null = curve.shape === 'trapezoid' ? curve.sets[index].value : null;
+  return { stages, seasons, starts };
+}
+
+function partStatements(id: string, crop: ReferenceCrop) {
+  const rows = referenceCropPartRows(crop);
+  const statements = rows.stages.map((stage) => db.prepare(
+    `INSERT INTO irrigation_crop_reference_stages (reference_id, rank, label, kc, calendar_start, estimated, establishment_months)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  ).bind(id, stage.rank, stage.label, stage.kc, stage.start, stage.estimated ? 1 : 0, stage.months));
+  for (const season of rows.seasons) {
+    const lengths = season.lengths;
     statements.push(db.prepare(
       `INSERT INTO irrigation_crop_reference_seasons (reference_id, set_number, initial_days, development_days, mid_days, late_days)
        VALUES (?, ?, ?, ?, ?, ?)`,
-    ).bind(id, setNumber, lengths?.initial ?? null, lengths?.development ?? null, lengths?.mid ?? null, lengths?.late ?? null));
-    for (const month of set.months) {
+    ).bind(id, season.setNumber, lengths?.initial ?? null, lengths?.development ?? null, lengths?.mid ?? null, lengths?.late ?? null));
+    for (const month of season.months) {
       statements.push(db.prepare(
         `INSERT INTO irrigation_crop_reference_season_months (reference_id, month, set_number) VALUES (?, ?, ?)`,
-      ).bind(id, month, setNumber));
+      ).bind(id, month, season.setNumber));
     }
-    if (curve.shape !== 'steps') return;
-    curve.sets[index].value.forEach((start, position) => {
-      const anchor = start.anchor;
-      statements.push(db.prepare(
-        `INSERT INTO irrigation_crop_reference_stage_starts (reference_id, set_number, rank, anchor, duration, duration_unit, estimated)
-         VALUES (?, ?, ?, ?, ?, 'days', ?)`,
-      ).bind(id, setNumber, curve.stages[position].rank, anchor.from, 'days' in anchor ? anchor.days : null, start.estimated ? 1 : 0));
-    });
-  });
+  }
+  for (const start of rows.starts) {
+    statements.push(db.prepare(
+      `INSERT INTO irrigation_crop_reference_stage_starts (reference_id, set_number, rank, anchor, duration, duration_unit, estimated)
+       VALUES (?, ?, ?, ?, ?, 'days', ?)`,
+    ).bind(id, start.setNumber, start.rank, start.anchor, start.duration, start.estimated ? 1 : 0));
+  }
   return statements;
 }
 

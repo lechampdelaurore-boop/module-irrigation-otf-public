@@ -10,6 +10,7 @@ import type {
   GardenGroupMemberRecord,
   GardenGroupRecord,
 } from '@/lib/domain/garden-group-record';
+import { gardenGroupCreationJournal, gardenGroupDeletionJournal, gardenGroupUpdateJournal } from './change-journal/places';
 
 export type AvailableGardenReference = {
   otfZoneId: string;
@@ -184,7 +185,10 @@ export async function saveGardenGroupForUser(
     currentGroups.reduce((highest, item) => Math.max(highest, item.position), 0) + 1;
   const now = new Date().toISOString();
   const database = db;
+  // Le journal des modifications (amélioration n° 7, D-289) : un changement avant l'écriture, une création après.
+  const gesture = { workspaceId, actorUserId: ownerUserId, at: now };
   const statements: D1PreparedStatement[] = [
+    ...(groupId ? [gardenGroupUpdateJournal('groupe-de-jardins', gesture, savedGroupId, group)] : []),
     database
       .prepare(
         `INSERT OR IGNORE INTO irrigation_season_geometry (
@@ -248,6 +252,7 @@ export async function saveGardenGroupForUser(
         ),
     );
   });
+  if (!groupId) statements.push(gardenGroupCreationJournal('groupe-de-jardins', gesture, savedGroupId, group.season));
 
   await database.batch(statements);
   return savedGroupId;
@@ -270,14 +275,16 @@ export async function deleteGardenGroupForUser(
   if (!ownedGroup) return false;
 
   const database = db;
+  const now = new Date().toISOString();
   const results = await database.batch([
+    gardenGroupDeletionJournal('groupe-de-jardins', { workspaceId, actorUserId: ownerUserId, at: now }, groupId, season),
     database
       .prepare(
         `UPDATE irrigation_equipment_placements
          SET garden_group_id = NULL, updated_at = ?
          WHERE garden_group_id = ? AND workspace_id = ? AND season = ?`,
       )
-      .bind(new Date().toISOString(), groupId, workspaceId, season),
+      .bind(now, groupId, workspaceId, season),
     database
       .prepare('DELETE FROM irrigation_garden_group_members WHERE group_id = ?')
       .bind(groupId),

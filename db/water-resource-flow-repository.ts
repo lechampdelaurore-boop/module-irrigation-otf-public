@@ -1,5 +1,6 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser as findWorkspaceId } from './workspace-repository';
+import { measuredFlowJournal } from './change-journal/equipment';
 import {
   validateMeterReading,
   type MeterReadingDraft,
@@ -199,6 +200,8 @@ export async function applyResourceFlowForUser(
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).bind(id, workspaceId, input.resourceId, input.flowCubicMetersPerHour, validFrom,
       input.fromReadingId, input.toReadingId, input.referenceNote, actorUserId),
+    // Le journal des modifications, juste avant : le débit nominal d'avant et celui mesuré (amélioration n° 7, D-287).
+    measuredFlowJournal('ressource', { workspaceId, actorUserId, at: validFrom }, input.resourceId, input.flowCubicMetersPerHour),
     db.prepare(
       `UPDATE irrigation_water_resources
        SET nominal_flow_cubic_meters_per_hour = ?,

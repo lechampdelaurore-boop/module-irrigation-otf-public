@@ -7,6 +7,7 @@ import { loadReglagesPage } from '../page-loaders';
 import { IrrigationShell } from '../shell/irrigation-shell';
 import { UnavailableState } from '../shell/unavailable-state';
 import { WaterManagementDashboard } from '../water-management-dashboard';
+import { ChangeJournalSection } from './change-journal';
 import { FeatureSettings } from './feature-settings';
 import { NotificationSettings } from './notification-settings';
 import { OnboardingSettings } from './onboarding-settings';
@@ -29,14 +30,15 @@ export const metadata = pageMetadata('reglages');
  * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
  * l'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil, en tête
  * de la correspondance des espèces (4.4, F587) ; « Réglages à relire »
- * (4.4, F588) ; l'accueil de la ferme (4.4, F581), replié ; enfin,
+ * (4.4, F588) ; l'accueil de la ferme (4.4, F581), replié ; le journal
+ * des modifications, plié, toujours là (amélioration n° 7, D-288) ; enfin,
  * « Supprimer ma ferme et mes données » (4.5, F665), replié, hors
  * démonstration.
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal } = await loadReglagesPage(context);
   context.logLoaded();
   // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
   const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
@@ -45,7 +47,11 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
       {waterDashboard ? <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} part="reglages" /> : null}
       {usesPushNotifications(context.enabled)
-        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} />
+        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings
+            season={context.season}
+            morningMessage={phoneNotices && context.enabled.includes('planning') ? phoneNotices.morningMessage : null}
+            evening={phoneNotices && context.enabled.includes('arrosages') ? { enabled: phoneNotices.eveningReminder, time: phoneNotices.eveningTime } : null}
+          />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
       {plotShelters ? <PlotShelterSettings season={context.season} initialLines={plotShelters} /> : null}
@@ -65,6 +71,7 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         })}
         settingsGroups={settingsReview ? settingsGroupsText(settingsReview.groups) : []}
       />
+      <ChangeJournalSection season={context.season} initialView={changeJournal} />
       {context.shell.demo ? null : <FarmErasureSettings farmName={context.snapshot.structure.name} season={context.season} />}
     </IrrigationShell>
   );

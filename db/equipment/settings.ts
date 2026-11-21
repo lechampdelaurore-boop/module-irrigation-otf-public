@@ -17,6 +17,7 @@ import {
   type SubmittedProvenance,
 } from '@/lib/domain/irrigation-calculator/provenance';
 import { provenanceStatements, readSettingStateForWorkspace } from './setting-calculations';
+import { equipmentSettingDeletionJournal, equipmentSettingJournal } from '../change-journal/equipment';
 
 /** Un réglage enregistré sans rien dire de sa provenance, calculateur décoché (3.8 bis, section 10). */
 const WITHOUT_CALCULATOR: SubmittedProvenance = { calculation: null, measured: null };
@@ -86,7 +87,9 @@ export async function saveEquipmentSettingForUser(
     editedSetting?.position ?? firstAvailableSettingPosition(existingSettings);
   const now = new Date().toISOString();
   const database = db;
-  const statements: D1PreparedStatement[] = [];
+  // Le journal des modifications : un changement lu avant l'effacement des anciens débits, une création après les nouveaux (amélioration n° 7, D-287).
+  const journal = equipmentSettingJournal('reglage-de-materiel', { workspaceId, actorUserId: ownerUserId, at: now }, { settingId: savedSettingId, equipmentId }, setting, settingId !== null);
+  const statements: D1PreparedStatement[] = [...journal.before];
 
   if (settingId) {
     statements.push(
@@ -156,7 +159,7 @@ export async function saveEquipmentSettingForUser(
     }
   }
 
-  statements.push(...provenanceStatements(provenanceDecision, workspaceId, savedSettingId, now));
+  statements.push(...journal.after, ...provenanceStatements(provenanceDecision, workspaceId, savedSettingId, now));
 
   await database.batch(statements);
   return savedSettingId;
@@ -196,6 +199,8 @@ export async function deleteEquipmentSettingForUser(
 
   const database = db;
   const results = await database.batch([
+    // Le journal des modifications d'abord : l'avant du réglage effacé (amélioration n° 7, D-287).
+    equipmentSettingDeletionJournal('reglage-de-materiel', { workspaceId, actorUserId: ownerUserId, at: new Date().toISOString() }, settingId, equipmentId),
     database
       .prepare(
         `DELETE FROM irrigation_placement_selected_beds
