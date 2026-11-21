@@ -5,6 +5,25 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, deuxième partie)
+
+- **La page de confidentialité dit chaque durée** (D-249, F657 à F659),
+  texte du 20 novembre 2026 : la phrase des 30 jours telle qu'approuvée
+  (« Une donnée effacée reste récupérable dans l'historique jusqu'à
+  30 jours. »), l'export de la semaine gardé cinq semaines au plus, le
+  compte des lectures dans Ouvre ta ferme (30 jours au plus), la preuve
+  d'un effacement sans nom ni contenu, l'abonnement aux notifications
+  effacé avec la ferme ou après 90 jours sans notification remise.
+- **Les exports gardés cinq semaines au plus** : après un export vérifié,
+  `pnpm backup:export` efface du même dossier ceux de 25 jours ou plus, et
+  seulement les fichiers qu'il a nommés, puis rappelle d'effacer les mêmes
+  copies ailleurs.
+- **« Que faire quand… »** dans `docs/exploitation.md` : une notification de
+  la veille, une ferme qui écrit (gabarit de réponse), une demande
+  d'effacement, une base perdue, la clé du coffre perdue, Ouvre ta ferme
+  qui change, un compte perdu. La page d'accueil du site dit le délai de
+  réponse, sans engagement.
+
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, deuxième partie)
 
 - **Les appareils d'une ferme effacée sont oubliés** (D-248, F654 à F656) :
