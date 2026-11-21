@@ -10,7 +10,7 @@ contrat ici. La n° 1 existe déjà.
 
 **Le porteur a avancé le démarrage le 21 novembre 2026** (« Vas-y », à
 9 h 52, après avoir fait remarquer qu'aucun chantier de code n'était en
-cours) : ces améliorations ne attendent plus la fin de la Tranche 4. Rien de
+cours) : ces améliorations n'attendent plus la fin de la Tranche 4. Rien de
 technique ne l'empêche ; leur code se fait sur sa propre branche, une PR à la
 fois, et **ne se fusionne qu'après la file de fusion en cours** (4.5, 4.4,
 moteur commun), pour ne pas se mêler à elle. Ordre du code : 6, puis 2 et 3,
