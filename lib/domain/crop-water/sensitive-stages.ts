@@ -30,7 +30,7 @@ export type SensitiveStageReference = StageDesignation & { confidence: Sensitive
 export type SensitiveStageChoice = StageDesignation & { sensitive: boolean };
 
 /** D'où vient la valeur d'un stade : le choix de la ferme, la liste préremplie, ou rien (non sensible). */
-export type SensitiveStageOrigin = 'farm' | 'reference' | 'none';
+type SensitiveStageOrigin = 'farm' | 'reference' | 'none';
 
 export type SensitiveStageRow = {
   rank: number;

@@ -7726,3 +7726,80 @@ compléter.
 Ne changent pas : le Worker de notification, le déclencheur du matin, les
 règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des
 alertes ; aucun appel à OTF.
+
+## D-290 — Améliorations, n° 4 : la priorité conseillée selon le stade sensible, en pénurie
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 4, sur
+les réponses agronomiques du porteur du 21 novembre 2026 et son mot
+« Allons-y pour le point numéro 1 » à 22 h 12 ; liste préremplie validée
+telle quelle à 22 h 51).
+
+**Contexte.** Le stade et le Kc du jour de chaque culture étaient calculés
+(5 quater) et la priorité d'une planche choisie par semaine (3.3), sans lien
+entre les deux. Le contrat court des n° 4 et 5
+(`docs/ameliorations-4-5-contract.md`, section 3, F730 à F732) met en règles
+les réponses du porteur : une liste de stades sensibles par culture,
+préremplie et réglable par ferme ; un conseil en pénurie seulement, jamais
+appliqué seul ; « Adopter » pour la semaine en cours.
+
+**Décision.** Le code suit la section 3 ; les précisions de code :
+
+1. **F736, le stockage.** La liste préremplie vit dans une table commune,
+   `irrigation_crop_sensitive_stage_common` (migration 0044, numéro
+   provisoire qui se recale à la fusion) : une ligne par stade sensible
+   d'une culture commune, son rang, son nom, sa confiance, sa source et sa
+   date, comme le jeu de référence ; seule une migration l'écrit
+   (41 lignes, 28 cultures, la liste validée ligne pour ligne). Les choix
+   d'une ferme vivent dans `irrigation_crop_sensitive_stages`, table d'un
+   espace, avec la personne et l'heure, au plan d'effacement et de
+   rétention. La culture se désigne par sa clé commune, que la version de
+   la ferme garde : une ferme qui règle ses durées garde ses choix. Une
+   ferme n'enregistre que ce qui diffère de la liste : cocher comme la
+   liste efface sa ligne, « Reprendre la liste préremplie » efface toutes
+   les siennes, et un enregistrement qui ne change pas une case lui garde
+   sa personne et son heure. Le serveur refuse un rang absent de la table
+   de la culture et une culture qu'il ne connaît pas pour cette ferme.
+2. **F737, le réglage à l'écran.** Dans la fiche de chaque culture
+   utilisable de « Besoin par culture », un pli fermé « Stades sensibles au
+   manque d'eau », dont la ligne compte les stades sensibles (« aucun stade
+   sensible », « 1 stade sensible sur 2 ») ; chaque case dit d'où vient sa
+   valeur : « choisi par la ferme », « d'après les références » ou
+   « d'après les références, par analogie » ; les sources de la liste dans
+   le pli « Sources de la liste préremplie » ; une culture sans ligne le dit
+   et invite à cocher ; « Reprendre la liste préremplie » paraît quand la
+   ferme a un choix à elle. Enregistrer ne recalcule pas le plan : le
+   réglage ne change aucun calcul. Une fiche inutilisable n'a pas le pli.
+3. **F738, le conseil à l'écran.** Le bloc se calcule après la
+   répartition, sur les cultures du jour : une culture dont l'ET0 du jour
+   manque garde son stade et compte ; le « Non calculable » du déficit
+   relatif se lit avec sa raison (« aucun objectif adopté », « besoin réel
+   inconnu », F316) ; la phrase de la part égale lit la stratégie de
+   pénurie du planning. Le conseil est la partie `stage-advice` de
+   « Ressources et pompes », qui demande « Besoin par culture » ; sans
+   elle, en pénurie, la ligne « Le conseil selon le stade sensible des
+   cultures demande Besoin par culture. ». Les cultures du jour ne se
+   lisent que si un niveau demande un choix ou si un conseil est possible ;
+   un échec de leur lecture, de la liste ou des choix laisse l'écran sans
+   conseil et se journalise (`arbitration_crop_stages_failed`,
+   `stage_advice_failed`), jamais en panne.
+4. **F739, « Adopter ».** Le geste passe par le service
+   (`lib/services/stage-advice-adoption.ts`), qui relit la répartition
+   d'abord : une semaine changée est refusée (« La semaine a changé.
+   Rechargez la faisabilité. ») ; une planche déjà haute le dit sans rien
+   écrire ; un conseil qui ne tient plus n'écrit rien (« Ce conseil ne
+   tient plus : rien n'a été changé. Voici la répartition à jour. »).
+   Sinon, la décision de la semaine passe en priorité haute en gardant le
+   besoin manuel, sa raison et le besoin calculé qu'il remplaçait ; le
+   journal des décisions porte `origin: "stage-advice"` ; le plan se
+   recalcule comme après tout changement de priorité ; la réponse dit
+   « Priorité haute enregistrée pour <planche>, pour cette semaine
+   seulement. Les quantités ont été recalculées. » avec la répartition
+   relue, et les autres blocs relisent (D-129).
+
+La démonstration « Pic d'été, l'eau manque » le montre : la courgette de
+H02 en floraison, puis les tomates d'A01 et A02, chacune « d'après le
+calendrier ». Ne changent pas : le besoin (3.3), la répartition (3.4) et le
+planning (3.5) ; la priorité reste un choix par semaine ; aucun appel à OTF,
+aucun réglage de Cloudflare. Reste, quand le journal des modifications (n° 7)
+sera sur `main` : y faire entrer le choix d'un stade sensible (famille
+« réglages »).

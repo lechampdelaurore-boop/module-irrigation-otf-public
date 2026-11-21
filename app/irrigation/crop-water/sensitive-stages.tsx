@@ -22,7 +22,7 @@ export function SensitiveStagesForm({ cropName, rows, pending, onSave }: {
   const count = rows.filter((row) => row.sensitive).length;
   const sources = [...new Set(rows.flatMap((row) => (row.reference ? [row.reference.source] : [])))];
   return (
-    <details className="farm-durations-wrap sensitive-stages" suppressHydrationWarning>
+    <details className="sensitive-stages" suppressHydrationWarning>
       <summary>
         Stades sensibles au manque d’eau
         <small>{count === 0 ? 'aucun stade sensible' : `${count} stade${count > 1 ? 's' : ''} sensible${count > 1 ? 's' : ''} sur ${rows.length}`}</small>

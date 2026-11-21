@@ -22,7 +22,7 @@ const NOT_FULLY_SERVED: ReadonlySet<AllocationStatus> = new Set([
 ]);
 
 /** Une culture de la planche à un stade sensible, ce jour-là. */
-export type StageAdviceCrop = {
+type StageAdviceCrop = {
   seriesId: string;
   seriesName: string;
   plantName: string;
@@ -44,7 +44,7 @@ export type StageAdviceBed = {
   crops: StageAdviceCrop[];
 };
 
-export type StageAdviceGroup = {
+type StageAdviceGroup = {
   referenceCropId: string;
   referenceCropName: string;
   beds: StageAdviceBed[];

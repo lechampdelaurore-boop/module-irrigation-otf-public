@@ -14,8 +14,9 @@
 .stage-advice-bed > button { min-height: 44px; border: 0; border-radius: var(--radius-button); padding: .6rem 1rem; background: var(--green); color: white; cursor: pointer; font-size: var(--text-16); }
 .stage-advice-missing { margin: 1rem 0; }
 
-/* Le réglage, dans la fiche de chaque culture de référence. */
-.sensitive-stages { margin: .4rem .9rem .8rem; }
+/* Le réglage, dans la fiche de chaque culture de référence : un pli comme celui des durées de la ferme, sous sa propre classe. */
+.sensitive-stages { margin: .4rem .9rem .8rem; border: 1px solid transparent; border-radius: 9.75px; }
+.sensitive-stages > summary { min-height: 44px; box-sizing: border-box; padding: .5rem .65rem; cursor: pointer; font-weight: 700; }
 .sensitive-stages > summary small { display: block; color: var(--muted); font-size: var(--text-13); font-weight: 400; }
 .sensitive-stages-form { display: grid; gap: .35rem; padding: .3rem .65rem .7rem; }
 .sensitive-stages-form .reference-crop-meta { margin: 0; }
