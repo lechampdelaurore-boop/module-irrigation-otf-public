@@ -230,8 +230,11 @@ export async function loadReglagesPage(context: ReadyPageContext) {
       : null,
     // « Réglages à relire », pour une ferme qui fait l'accueil (4.4, F588).
     getSettingsReviewForUser(context.userId, context.enabled),
-    // Le message du matin suit le calcul du matin du Planning (amélioration n° 3, F712) ; pas de réglage en démonstration.
-    context.enabled.includes('planning') && !context.shell.demo ? readPhoneNoticeSettingsForUser(context.userId) : null,
+    // Le message du matin suit le calcul du matin du Planning (amélioration n° 3, F712), le rappel du soir les Arrosages
+    // (n° 2, F714) ; pas de réglage en démonstration.
+    (context.enabled.includes('planning') || context.enabled.includes('arrosages')) && !context.shell.demo
+      ? readPhoneNoticeSettingsForUser(context.userId)
+      : null,
   ]);
   context.lap('dashboards');
   // Le classement des jardins, pour une ferme qui fait l'accueil (4.4, F583).

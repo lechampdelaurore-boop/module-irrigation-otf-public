@@ -43,7 +43,11 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
       {waterDashboard ? <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} part="reglages" /> : null}
       {usesPushNotifications(context.enabled)
-        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} morningMessage={phoneNotices?.morningMessage ?? null} />
+        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings
+            season={context.season}
+            morningMessage={phoneNotices && context.enabled.includes('planning') ? phoneNotices.morningMessage : null}
+            evening={phoneNotices && context.enabled.includes('arrosages') ? { enabled: phoneNotices.eveningReminder, time: phoneNotices.eveningTime } : null}
+          />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
       {plotShelters ? <PlotShelterSettings season={context.season} initialLines={plotShelters} /> : null}

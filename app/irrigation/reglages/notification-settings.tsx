@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 import { NotificationReadiness } from '../irrigation-manager/notification-readiness';
 import { useIrrigationNotifications } from '../irrigation-manager/use-irrigation-notifications';
-import { saveMorningMessageAction } from '../phone-notice-actions';
+import { EVENING_TIMES, eveningTimeText } from '@/lib/domain/today/evening-reminder';
+import { saveEveningReminderAction, saveMorningMessageAction } from '../phone-notice-actions';
 import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
 
 const REPLY_CLASSES = { notice: 'water-notice', warning: 'weather-stale', error: 'water-error' } as const;
@@ -16,12 +17,16 @@ const NO_EVENTS: readonly IrrigationEventRecord[] = [];
  * section 3) : l'autorisation et son état, pour une ferme qui reçoit des
  * notifications sans avoir coché les arrosages (alertes météo ou cultures).
  * Le même abonnement que sur la page des arrosages. Pour une ferme qui coche
- * le Planning, la case du message du matin (amélioration n° 3, F702, F712).
+ * le Planning, la case du message du matin (amélioration n° 3, F702, F712) ;
+ * pour une ferme qui coche les Arrosages, celle du rappel du soir et son
+ * heure (amélioration n° 2, F714).
  */
-export function NotificationSettings({ season, morningMessage }: {
+export function NotificationSettings({ season, morningMessage, evening }: {
   season: number;
   /** Le réglage du message du matin ; `null` sans le Planning, dont le calcul du matin l'envoie. */
   morningMessage: boolean | null;
+  /** Le rappel du soir et son heure ; `null` sans les Arrosages, dont il rappelle les irrigations. */
+  evening: { enabled: boolean; time: string } | null;
 }) {
   const [warning, setWarning] = useState<string | null>(null);
   const [now] = useState(() => new Date());
@@ -38,10 +43,11 @@ export function NotificationSettings({ season, morningMessage }: {
       <header className="water-management-heading">
         <div>
           <h2 id="notifications-title">Notifications du téléphone</h2>
-          <p>Les fins d’arrosage, le message du matin et les alertes arrivent sur chaque appareil où vous les activez.</p>
+          <p>Les fins d’arrosage, le message du matin, le rappel du soir et les alertes arrivent sur chaque appareil où vous les activez.</p>
         </div>
       </header>
       {morningMessage === null ? null : <MorningMessageSetting initial={morningMessage} />}
+      {evening === null ? null : <EveningReminderSetting initial={evening} />}
       <NotificationReadiness
         status={notificationStatus}
         pending={pending}
@@ -82,6 +88,46 @@ function MorningMessageSetting({ initial }: { initial: boolean }) {
         les alertes en cours et les suggestions du planning. Rien n’est envoyé quand il n’y a rien à dire.
       </p>
       <ActionReply messages={replies} origin="matin" classNames={REPLY_CLASSES} />
+    </div>
+  );
+}
+
+/**
+ * La case du rappel du soir et son heure : à l'heure choisie, un message dit
+ * les arrosages prévus du jour jamais confirmés ; rien quand tout est
+ * confirmé. Chaque changement s'enregistre aussitôt, pour toute la ferme.
+ */
+function EveningReminderSetting({ initial }: { initial: { enabled: boolean; time: string } }) {
+  const [setting, setSetting] = useState(initial);
+  const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
+  const [pending, startTransition] = useTransition();
+  // Le réglage suit le geste tout de suite ; un échec le remet comme avant et le dit.
+  const change = (next: { enabled: boolean; time: string }) => {
+    const before = setting;
+    setSetting(next);
+    startTransition(async () => {
+      const result = await saveEveningReminderAction(next);
+      setSetting(result.ok ? { enabled: result.enabled, time: result.time } : before);
+      setReplies([actionReply('soir', result.ok ? 'notice' : 'error', result.message)]);
+    });
+  };
+  return (
+    <div className="phone-notice-setting" id="rappel-du-soir">
+      <label className="water-toggle">
+        <input type="checkbox" checked={setting.enabled} disabled={pending} onChange={(event) => change({ ...setting, enabled: event.target.checked })} />
+        Rappel du soir
+      </label>
+      <label className="phone-notice-time">
+        <span>Heure du rappel</span>
+        <select value={setting.time} disabled={pending || !setting.enabled} onChange={(event) => change({ ...setting, time: event.target.value })}>
+          {EVENING_TIMES.map((time) => <option key={time} value={time}>{eveningTimeText(time)}</option>)}
+        </select>
+      </label>
+      <p className="phone-notice-hint">
+        À l’heure choisie, un message dit les arrosages prévus du jour que personne n’a confirmés. Il ne confirme rien
+        lui-même : « Aujourd’hui » s’ouvre, avec « Fait comme prévu ». Rien n’est envoyé quand tout est confirmé.
+      </p>
+      <ActionReply messages={replies} origin="soir" classNames={REPLY_CLASSES} />
     </div>
   );
 }

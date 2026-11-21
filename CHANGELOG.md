@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 2, PR 3 sur 7)
+
+- **Le rappel du soir** (D-284, F704, F705, F714) : à l'heure que la ferme
+  choisit dans « Réglages » (de 17 h à 22 h au quart d'heure, 19 h par
+  défaut), une notification « Arrosages à confirmer » nomme les arrosages
+  prévus du jour dont la fin est passée et que personne n'a confirmés ; un
+  clic ouvre « Aujourd'hui ». Rien quand tout est confirmé, un seul rappel
+  par jour, jamais rien confirmé à la place du maraîcher. Un nouveau
+  déclencheur horaire du planificateur et une tâche de plus au registre
+  (orange à 3 heures, rouge à 6). Parcours P54 ; P50 compte dix tâches.
+
 ### Ajouté (Améliorations, n° 3, PR 2 sur 7)
 
 - **Le message unique du matin** (D-283, F702, F703, F712, F713) : après le

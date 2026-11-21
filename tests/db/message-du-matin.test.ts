@@ -122,9 +122,9 @@ test('un seul message par jour et par ferme : un second calcul du même jour ne 
 test('la ferme coupe le message : rien ne part ; le réglage est d’elle seule et se rallume', async () => {
   await ensureWorkspaceForUser(ALICE);
   await ensureWorkspaceForUser(BOB);
-  assert.deepEqual(await readPhoneNoticeSettingsForUser(ALICE), { morningMessage: true }, 'activé par défaut, sans ligne écrite');
+  assert.equal((await readPhoneNoticeSettingsForUser(ALICE)).morningMessage, true, 'activé par défaut, sans ligne écrite');
   assert.equal(database.sqlite.prepare('SELECT COUNT(*) AS n FROM irrigation_phone_notice_settings').get()?.n, 0);
-  assert.deepEqual(await saveMorningMessageForUser(ALICE, ALICE, false, NOW.toISOString()), { morningMessage: false });
+  assert.equal((await saveMorningMessageForUser(ALICE, ALICE, false, NOW.toISOString())).morningMessage, false);
   const row = database.sqlite.prepare('SELECT morning_message, evening_reminder, evening_time, actor_user_id, updated_at FROM irrigation_phone_notice_settings').get();
   assert.deepEqual({ ...row }, { morning_message: 0, evening_reminder: null, evening_time: null, actor_user_id: ALICE, updated_at: NOW.toISOString() }, 'la personne et l’heure ; le soir reste au défaut');
 
@@ -133,7 +133,7 @@ test('la ferme coupe le message : rien ne part ; le réglage est d’elle seule 
   assert.equal(calls.requests.length, 0, 'coupé : rien');
   await send(BOB, calls);
   assert.deepEqual(calls.requests.map((request) => request.eventEquipmentId), ['morning:2026-09-30'], 'B garde son message');
-  assert.deepEqual(await readPhoneNoticeSettingsForUser(BOB), { morningMessage: true });
+  assert.equal((await readPhoneNoticeSettingsForUser(BOB)).morningMessage, true);
 
   await saveMorningMessageForUser(ALICE, ALICE, true, NOW.toISOString());
   await send(ALICE, calls);
