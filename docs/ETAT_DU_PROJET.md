@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Sept améliorations validées par le porteur le 21 novembre 2026** (D-280,
+  roadmap, section 6 septies), inscrites après vérification dans le code :
+  « Fait comme prévu » (n° 1) existe déjà, le résumé du matin (n° 3) existe en
+  écran et la zone « Fiabilité du calcul » couvre en partie les données
+  manquantes (n° 6) ; restent le rappel du soir (n° 2), le journal des
+  modifications (n° 7) et, **réservées à l'avis agronomique du porteur**, la
+  priorité selon le stade critique (n° 4) et l'écart prévu/réel expliqué
+  (n° 5). **Démarrage avancé le 21 novembre 2026 (« Vas-y », D-281)** : le
+  contrat court des n° 6, 2, 3 et 7 est écrit
+  (`docs/ameliorations-6-2-3-7-contract.md`, sept PR de code), leur code part
+  sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
+  et 5 attendent l'avis agronomique. PR de registres seule : **aucun contrôle rejoué**,
+  sans rapport avec le code.
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -516,6 +529,21 @@ registres, elle y renvoie.
   appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
 
+- Tranche 4, **4.6, PR 1 : les quatre documents du pilote écrits le 20
+  novembre 2026** (D-260, F570, F572, F573, F574, F575 ; sans code, Sonnet
+  5.5 · Moyen) : `docs/pilote-accord-modele.md` (accord par version datée,
+  neuf points, à faire relire gratuitement par le réseau du porteur avant
+  tout envoi, E6), `docs/pilote-recette.md` (étapes S0 à S5, protocole
+  d'isolation I1 à I5, grille par page, questions oui/non pour la personne
+  de la ferme pilote), `docs/pilote-retour-modele.md` (fiche de retour,
+  résumé sans nom) et `docs/pilote-fiche-entree.md` (les douze conditions
+  d'entrée, vides). Aucun nom, adresse ni donnée de ferme dans ces
+  fichiers. Rien n'est envoyé : le choix et le contact des fermes, l'envoi
+  de l'accord et la relecture juridique restent au porteur. Contrôles :
+  documentation seule, aucun contrôle de code rejoué ; relecture faite par
+  l'assistant contre le contrat (10 ter) et contre les textes publics
+  (`cloudflare/irrigation-site/src/pages.ts`).
+
 - Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
   (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
   codée le 20 novembre 2026 en Opus 5.5 · Très élevé, sur la place de code
@@ -774,6 +802,23 @@ registres, elle y renvoie.
   (3 338 → 3 482 px sur les données des parcours, CI du 21 novembre 2026) :
   la borne de P40 passe de 3 400 à 3 500 px, comme le contrat du lot J le
   permet à la PR qui le dit (section 2).
+  **En ligne le 21 novembre 2026 à 13 h 32** (#160, fusionnée à 13 h 04, run
+  44902063396 vérifié job par job : les cinq jobs verts ; consigné par
+  #161). La 4.5 est en ligne en entier.
+
+- Correctif, **le parcours P12 au téléphone à la fin de la soirée**, trouvé
+  en fusionnant la 4.5 (Opus 5.5 · Très élevé, ligne 4.5), sans décision
+  nouvelle. Constat : sur la CI de #147, le 20 novembre 2026 à 23 h 45,
+  P12 a échoué au téléphone, sa première proposition « cachée » : plus rien
+  ne tenait aujourd'hui, elle était le lendemain, jour replié parce
+  qu'aujourd'hui portait encore des propositions ou des arrosages validés
+  d'autres parcours (F11). P12
+  a laissé son objectif de 70 mm, et P26, P32, P37 et P38 sont tombés
+  derrière lui. Relancés à 0 h 07, tous sont passés. Désormais, P12 montre
+  cette première carte en dépliant son jour (`montrerLaCarte`), comme ses
+  autres cartes ; `docs/browser-journeys-contract.md` (« l'heure où il
+  tourne ») le dit. Seul le parcours change, pas l'application. À
+  fusionner après la 4.5.
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
