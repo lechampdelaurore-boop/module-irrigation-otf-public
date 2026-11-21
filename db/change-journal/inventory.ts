@@ -2,7 +2,7 @@ import type { ChangeSubject } from '@/lib/domain/change-journal/subjects';
 
 /**
  * L'inventaire du journal des modifications (amélioration n° 7,
- * docs/ameliorations-6-2-3-7-contract.md, §5.4 ; D-285, F716).
+ * docs/ameliorations-6-2-3-7-contract.md, §5.4 ; D-285, F717).
  *
  * Le piège de ce chantier est le changement qui ne passe pas par le journal.
  * Deux listes, relues en revue et tenues par
@@ -18,7 +18,7 @@ import type { ChangeSubject } from '@/lib/domain/change-journal/subjects';
  *    sur le journal, sous son sujet, ou « sans objet » avec sa raison. Le
  *    test relit le code : un écrivain nouveau, absent de la liste, le fait
  *    échouer, et un écrivain branché doit nommer son sujet dans son code
- *    (F719).
+ *    (F720).
  */
 
 /** Les tables d'objectifs, de réglages et de matériel, avec les sujets que leurs écrivains portent au journal. */
@@ -67,8 +67,8 @@ const WEATHER = 'Une synchronisation météo et ce qu’elle garde : le contrat 
 const DOMAIN_LOG = 'Un journal de domaine, écrit en même temps que le réglage qu’il garde et inchangé : le journal général s’écrit en plus, il ne le relit pas (F706).';
 const OTF = 'Une lecture d’Ouvre ta ferme, son raccordement ou son rythme : des copies et des compteurs, aucun geste du maraîcher sur ses réglages.';
 const COMMON = 'Une table de l’exploitant du service ou commune à toutes les fermes : le contrat laisse ses actes hors du journal (§5.1).';
-/** Réglages que la liste du contrat (§5.1) ne nomme pas : hors du journal dans cette version, à ajouter sur le mot du porteur (F717). */
-const NOT_LISTED = 'Un réglage que la liste du contrat (§5.1) ne nomme pas : hors du journal dans cette version, à y ajouter si le porteur le demande (F717).';
+/** Réglages que la liste du contrat (§5.1) ne nomme pas : hors du journal dans cette version, à ajouter sur le mot du porteur (F718). */
+const NOT_LISTED = 'Un réglage que la liste du contrat (§5.1) ne nomme pas : hors du journal dans cette version, à y ajouter si le porteur le demande (F718).';
 
 /** Les tables hors du journal, chacune avec sa raison. */
 export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
@@ -230,5 +230,5 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/equipment-placement-repository.ts › saveEquipmentPlacementForUser › irrigation_placement_selected_beds': CHILD_OF('irrigation_equipment_placements'),
   'db/equipment-placement-repository.ts › updateEquipmentPlacementSettingForUser › irrigation_equipment_placements': branche('pose'),
   'db/equipment-placement-repository.ts › removeEquipmentPlacementForUser › irrigation_equipment_placements': branche('pose'),
-  'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_equipment_placements': sansObjet('Une pose détachée du groupe de jardins qu’on supprime : la conséquence d’un geste sur les groupes, hors de la liste du contrat (F717) ; la pose elle-même ne change pas.'),
+  'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_equipment_placements': sansObjet('Une pose détachée du groupe de jardins qu’on supprime : la conséquence d’un geste sur les groupes, hors de la liste du contrat (F718) ; la pose elle-même ne change pas.'),
 };

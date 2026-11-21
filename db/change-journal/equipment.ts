@@ -18,10 +18,10 @@ import {
  * Un enregistrement qui crée ou modifie rend ses instructions des deux côtés
  * de son écriture : `before` (un changement, lu sur la ligne d'avant) ou
  * `after` (une création, lue sur la ligne écrite) ; l'écrivain les place
- * autour de son écriture, dans son lot (F715). Une valeur désignée par un
+ * autour de son écriture, dans son lot (F716). Une valeur désignée par un
  * identifiant (le réglage d'une pose, la ressource d'une liaison) se garde
- * par son nom, lu en SQL des deux côtés (F720). L'écrivain nomme son sujet
- * en premier argument (F719).
+ * par son nom, lu en SQL des deux côtés (F721). L'écrivain nomme son sujet
+ * en premier argument (F720).
  */
 
 /** Les instructions d'un geste, de part et d'autre de son écriture. */

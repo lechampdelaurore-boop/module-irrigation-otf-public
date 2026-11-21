@@ -8,7 +8,7 @@ source détaillée commit par commit.
 ### Ajouté (Améliorations, n° 7, PR 6 sur 7)
 
 - **Le matériel et les ressources écrivent au journal des modifications**
-  (D-287, F720) : un matériel créé, modifié, rangé, ressorti, copié ou
+  (D-287, F721) : un matériel créé, modifié, rangé, ressorti, copié ou
   effacé, ses réglages (débit, profil d'une aspersion), les pompes et leurs
   origines, la pompe par défaut d'un matériel, les ressources en eau et leur
   débit mesuré, les réserves, leurs liaisons, l'alimentation par défaut et
@@ -19,7 +19,7 @@ source détaillée commit par commit.
 ### Ajouté (Améliorations, n° 7, PR 5 sur 7)
 
 - **Les objectifs et les réglages écrivent au journal des modifications**
-  (D-286, F718, F719) : un objectif hydrique posé, adopté d'une proposition
+  (D-286, F719, F720) : un objectif hydrique posé, adopté d'une proposition
   ou retiré, le seuil minimal de besoin, la décision sur le besoin d'une
   planche, les réglages du planning, les créneaux protégés, la limite d'eau
   de la journée et celle d'une ressource, le sol d'une parcelle, les
@@ -31,8 +31,8 @@ source détaillée commit par commit.
 
 ### Ajouté (Améliorations, n° 7, PR 4 sur 7)
 
-- **Le journal des modifications, sa table et sa règle** (D-285, F715 à
-  F717) : une table par ferme garde, pour chaque changement d'un objectif,
+- **Le journal des modifications, sa table et sa règle** (D-285, F716 à
+  F718) : une table par ferme garde, pour chaque changement d'un objectif,
   d'un réglage ou du matériel, qui l'a fait, quand, et la valeur d'avant et
   d'après des seuls champs changés ; la ligne s'écrit dans le même lot que
   le changement, jamais l'un sans l'autre. Elle ne se modifie ni ne
