@@ -23,6 +23,7 @@ import { getIrrigationSnapshot, IrrigationDataUnavailableError } from '@/lib/ser
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
 import { DemoSpacePreparingError } from '@/lib/services/demo-space';
+import { FarmFrozenError } from '@/lib/services/farm-erasure-request';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
@@ -93,8 +94,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   try {
     user = await requireAuthenticatedUser();
   } catch (error) {
-    if (error instanceof FarmIdentityUnavailableError) return { kind: 'unavailable', props: farmUnidentifiedState(page, season, error) };
-    if (error instanceof DemoSpacePreparingError) return { kind: 'unavailable', props: demoPreparingState(page, season) };
+    const props = accessRefusedState(page, season, error);
+    if (props) return { kind: 'unavailable', props };
     throw error;
   }
   const signOutHref = signOutPath();
@@ -186,10 +187,23 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
 }
 
 /**
+ * Ce que montre une page quand la personne n'entre pas dans son espace : la
+ * ferme de la clé n'est pas établie (F341), la démonstration se prépare
+ * (F450), ou l'espace est figé par une demande d'effacement (F666). `null` :
+ * une autre erreur, que l'appelant relance.
+ */
+export function accessRefusedState(page: IrrigationPageId, season: number, error: unknown): UnavailableStateProps | null {
+  if (error instanceof FarmIdentityUnavailableError) return farmUnidentifiedState(page, season, error);
+  if (error instanceof DemoSpacePreparingError) return demoPreparingState(page, season);
+  if (error instanceof FarmFrozenError) return farmFrozenState(page, season, error);
+  return null;
+}
+
+/**
  * La ferme de la clé n'est pas établie (docs/tranche-4-contract.md, F341) :
  * aucune page ne s'affiche, et celle-ci le dit à la personne.
  */
-export function farmUnidentifiedState(page: IrrigationPageId, season: number, error: FarmIdentityUnavailableError): UnavailableStateProps {
+function farmUnidentifiedState(page: IrrigationPageId, season: number, error: FarmIdentityUnavailableError): UnavailableStateProps {
   return {
     page,
     signOutPath: signOutPath(),
@@ -205,8 +219,18 @@ export function farmUnidentifiedState(page: IrrigationPageId, season: number, er
  * L'espace de la démonstration se prépare dans une autre requête (audit du
  * 19 novembre 2026, lot I, n° 11, F450) : la page le dit, et se relit seule.
  */
-export function demoPreparingState(page: IrrigationPageId, season: number): UnavailableStateProps {
+function demoPreparingState(page: IrrigationPageId, season: number): UnavailableStateProps {
   return { page, signOutPath: signOutPath(), userName: '', season, reason: 'demo-preparing', demo: true, demoSelection: null };
+}
+
+/**
+ * L'espace a une demande d'effacement ouverte (docs/tranche-4-contract.md,
+ * F666) : aucune page ne s'affiche, aucune lecture d'Ouvre ta ferme ne part ;
+ * l'écran dit le jour de l'effacement et, tant qu'il n'a pas commencé, offre
+ * l'annulation.
+ */
+function farmFrozenState(page: IrrigationPageId, season: number, error: FarmFrozenError): UnavailableStateProps {
+  return { page, signOutPath: signOutPath(), userName: error.displayName, season, reason: 'farm-frozen', demo: false, demoSelection: null, frozen: error.view };
 }
 
 type SnapshotLoadResult =

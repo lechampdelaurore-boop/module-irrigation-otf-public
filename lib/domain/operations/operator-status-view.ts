@@ -4,6 +4,7 @@ import type { FarmObservationLine } from './farm-observation.ts';
 import { isGestureTask, type GestureDates, type GestureTask } from './operator-gesture.ts';
 import { parisMoment, stateWords, tasksToWatch, type WatchedTask } from './operator-watch.ts';
 import type { SupportAccessLine } from './support-access.ts';
+import type { OperatorErasureLine } from './farm-erasure-request.ts';
 import type { TaskState } from './task-state.ts';
 
 /**
@@ -50,6 +51,8 @@ export type OperatorStatusView = {
   support: { farms: string[]; lines: SupportAccessLine[] } | null;
   /** Les coûts du mois (F662, F663) et les mois qu'un relevé peut viser, ou `null` hors de la page. */
   costs: (CostView & { months: { value: string; label: string }[] }) | null;
+  /** Les demandes d'effacement ouvertes (F668) : la ferme, le jour de la demande, le jour prévu ; `null` hors de la page. */
+  erasureRequests: OperatorErasureLine[] | null;
 };
 
 export type LatestNotice = { kind: 'alert' | 'all-good'; problems: number; sentAt: string };
@@ -69,6 +72,7 @@ export function operatorStatusView(
     erasures: erasures ? farmErasureLine(erasures) : null,
     support: null,
     costs: null,
+    erasureRequests: null,
     lastNotice: latestNotice
       ? `Dernière notification de la veille : ${latestNotice.kind === 'all-good'
         ? '« tout va bien »'
