@@ -74,9 +74,9 @@ test('le début du journal : la mise en service lue dans les migrations reçues,
   // Sans la liste des migrations (les essais en local), la création de l'espace.
   assert.equal((await getChangeJournalViewForUser(ALICE, null)).startedAt, created);
   database.sqlite.exec(`CREATE TABLE d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL);
-    INSERT INTO d1_migrations (name, applied_at) VALUES ('0042_phone_notices.sql', '2026-11-20 08:00:00'), ('0043_change_journal.sql', '2999-01-02 03:04:05');`);
+    INSERT INTO d1_migrations (name, applied_at) VALUES ('0043_phone_notices.sql', '2026-11-20 08:00:00'), ('0044_change_journal.sql', '2999-01-02 03:04:05');`);
   assert.equal((await getChangeJournalViewForUser(ALICE, null)).startedAt, '2999-01-02T03:04:05.000Z');
-  database.sqlite.exec(`UPDATE d1_migrations SET applied_at = '2000-01-01 00:00:00' WHERE name = '0043_change_journal.sql'`);
+  database.sqlite.exec(`UPDATE d1_migrations SET applied_at = '2000-01-01 00:00:00' WHERE name = '0044_change_journal.sql'`);
   assert.equal((await getChangeJournalViewForUser(ALICE, null)).startedAt, created);
   database.sqlite.exec('DROP TABLE d1_migrations');
 });

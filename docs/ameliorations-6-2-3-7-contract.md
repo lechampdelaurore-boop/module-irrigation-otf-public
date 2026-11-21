@@ -373,6 +373,26 @@ décidé avec le porteur. Il ne défera **jamais** une irrigation réalisée
 (D-006). Rien dans le code de la n° 7 ne doit le rendre impossible : les
 lignes gardent l'« avant » complet des champs changés.
 
+**Précisions du code (21 novembre 2026, D-285 à D-288).** F716 : la ligne
+du journal s'écrit dans le lot même du changement, à sa condition même ;
+l'avant se lit dans la base (avant l'écriture pour une modification ou une
+suppression, après pour une création), seuls les champs qui changent, rien
+pour un geste refusé ou sans changement. F717 : l'inventaire
+(`db/change-journal/inventory.ts`) range chaque table et chaque écrivain,
+relu par un test. F718 : les réglages que §5.1 ne nomme pas restent hors du
+journal, sur le mot du porteur. F719 : un réglage jamais enregistré vaut ses
+valeurs de départ ; son premier enregistrement dit « modifié ». F720 :
+chaque écrivain branché nomme son sujet. F721 : une valeur désignée par un
+identifiant s'écrit par son nom, lu en SQL des deux côtés ; une valeur
+composée, en texte trié. F722 : les mots de chaque champ, avec son unité,
+et la carte vivent dans `lib/domain/change-journal/` ; l'auteur se lit
+« Vous » ou « Une autre personne connectée », jamais une adresse. F723 : le
+journal commence au plus tard de sa mise en service (migration
+`…_change_journal.sql`, la 0044) et de la création de l'espace. F724 : la
+section est un pli fermé en bas de « Réglages », juste avant « Supprimer ma
+ferme et mes données » ; le budget de hauteur au téléphone passe à
+3 750 px ; parcours P55.
+
 **Preuves (PR 4 à 7).** Tests de persistance (atomicité, un changement refusé
 n'écrit rien, immuabilité), d'isolation entre deux fermes, d'effacement, de
 couverture ; tests du domaine (le texte de chaque famille) ; P-n° à 390 et
