@@ -7473,6 +7473,35 @@ l'API de Cloudflare. Rien de cela n'existait.
 Ne changent pas : aucun appel à Cloudflare ni à OTF, aucun secret, aucun
 service nouveau, aucune dépense ; le registre des tâches (9 tâches).
 
+## D-251 — Tranche 4, 4.5, PR 3 (troisième partie) : la demande dans « Réglages », l'espace figé, l'annulation et l'effacement sans attendre
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le moteur de l'effacement (D-246) et l'oubli des appareils
+(D-248) sont prêts, mais aucune demande ne peut naître : F563 veut la
+demande dans « Réglages », après le nom de la ferme tapé, annulable sept
+jours, l'espace figé pendant ce temps (aucun appel à OTF, aucune saisie),
+et l'effacement immédiat sur demande écrite à l'exploitant.
+
+**Décision.** Section 10 bis.22 du contrat de la Tranche 4 (F665 à F669) :
+
+1. « Supprimer ma ferme et mes données », replié en bas de Réglages, hors
+   démonstration ; le serveur relit le nom tapé dans l'instantané en cache,
+   sans appel à OTF. La demande vaut pour l'espace de la personne.
+2. L'espace figé : la lecture de la personne connectée refuse l'espace dès
+   la demande, avant toute lecture d'OTF et toute saisie ; chaque page montre
+   l'écran de l'espace figé. Seules exceptions : l'annulation et la page
+   d'état de l'exploitant.
+3. L'annulation, sur cet écran, tant que l'effacement n'a pas commencé.
+4. L'effacement sans attendre, sur la page d'état : une demande en attente,
+   le numéro de sa ferme retapé ; le délai s'arrête, l'effacement passe
+   aussitôt dans la borne du matin, le matin finit le reste.
+5. La page de confidentialité dit la demande dans Réglages.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
+moteur de l'effacement et ses preuves.
+
 ## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
