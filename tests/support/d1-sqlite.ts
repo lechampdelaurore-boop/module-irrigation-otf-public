@@ -34,9 +34,14 @@ export function createMigratedSqliteDatabase(migrationsDir = 'drizzle', upToMigr
   return database;
 }
 
-/** Applique les migrations qui suivent `afterMigration` : un test y éprouve ce qu'une migration fait aux lignes existantes. */
-export function applyMigrationsAfter(database: DatabaseSync, afterMigration: string, migrationsDir = 'drizzle'): void {
+/**
+ * Applique les migrations qui suivent `afterMigration`, jusqu'à `upToMigration`
+ * comprise si elle est donnée : un test y éprouve ce qu'une migration fait aux
+ * lignes existantes, sans celles qui viennent après elle.
+ */
+export function applyMigrationsAfter(database: DatabaseSync, afterMigration: string, migrationsDir = 'drizzle', upToMigration?: string): void {
   for (const migration of listMigrations(migrationsDir)) {
+    if (upToMigration !== undefined && migration > upToMigration) break;
     if (migration > afterMigration) applyMigration(database, migrationsDir, migration);
   }
 }

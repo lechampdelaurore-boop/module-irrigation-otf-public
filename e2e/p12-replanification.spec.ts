@@ -78,7 +78,13 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   // part de la page, jamais de la section, sans quoi il ne trouve rien.
   const proposeesDe = (racine: Locator | Page) => racine.locator('article.planning-proposal[data-status="proposed"]').filter({ hasText: materiel });
   const proposees = () => proposeesDe(planning);
-  await expect(proposees().first()).toBeVisible();
+  // Au téléphone, la première proposition peut tomber un jour replié : à la
+  // fin de la soirée, plus rien ne tient aujourd'hui et elle passe au
+  // lendemain, replié quand aujourd'hui porte encore les propositions ou les
+  // arrosages validés d'autres parcours (F11). Elle se montre en dépliant son
+  // jour (CI du 20 novembre 2026 à 23 h 45).
+  await expect(proposees()).not.toHaveCount(0);
+  await montrerLaCarte(planning, await carteNommee(planning, proposees().first()));
   await verifierLEtape(page, journal, 'plan calculé');
 
   // Une pluie saisie au pluviomètre est un événement : le plan se recalcule

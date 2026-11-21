@@ -453,8 +453,11 @@ const EDGE_CASES: EdgeCase[] = [
       const blockedMessage = (text: string): Measure => ({ kind: 'check', ok: text.startsWith('blocked') && text.includes('ET0 hors bornes'), observed: text });
       const [blockedDay] = gauge({ capacityMm: FARM_CAPACITY, days: [{ etm: null, blocked: ['ET0 hors bornes (essai)'] }], overrides: { observations: [observation(PERCENT, midnight(D1))] } });
       return [
-        ['et0_12', 'computed', value(status(12))],
-        ['et0_12_5', 'bloqué, ET0 nommée', blockedMessage(status(12.5))],
+        // Bornes 0 à 15 mm/j depuis MC-37 (D-232) : 11,9, 12,1 et 14,9 calculées, 15,1 et −0,1 bloquées.
+        ['et0_11_9', 'computed', value(status(11.9))],
+        ['et0_12_1', 'computed', value(status(12.1))],
+        ['et0_14_9', 'computed', value(status(14.9))],
+        ['et0_15_1', 'bloqué, ET0 nommée', blockedMessage(status(15.1))],
         ['et0_moins_0_1', 'bloqué, ET0 nommée', blockedMessage(status(-0.1))],
         ['jauge_etat', null, value(blockedDay.stateMm)], ['jauge_raison', 'blocked', value(kind(blockedDay))],
       ];
