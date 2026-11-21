@@ -163,7 +163,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       />
       <Pair
         wide={water ? <TodayWaterBlockView block={water} /> : null}
-        narrow={reliability ? <ReliabilityZoneView zone={reliability.zone} checks={reliability.checks} query={dayQuery} pending={pending} onRecalculatePlan={recalculatePlan} /> : null}
+        narrow={reliability ? <ReliabilityZoneView zone={reliability.zone} checks={reliability.checks} byBed={reliability.byBed} query={dayQuery} pending={pending} onRecalculatePlan={recalculatePlan} /> : null}
         layout="half"
       />
     </div>

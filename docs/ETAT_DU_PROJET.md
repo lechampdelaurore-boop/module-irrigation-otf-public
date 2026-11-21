@@ -840,6 +840,28 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 6, le panneau « données manquantes » : codée le
+  21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
+  `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé, sur le
+  « vas-y » du porteur (9 h 52) ; PR 1 sur 7 des améliorations. La zone
+  « Fiabilité du calcul » de « Aujourd'hui » gagne un dépliant
+  « Par planche », fermé, qui dit le total (« 7 planches ont une donnée
+  manquante ») ou « Tout est à jour » ; ouvert, il range par culture puis
+  par planche trois données de plus — la réserve du sol non saisie, le
+  stade deviné d'après le calendrier, le pluviomètre absent depuis plus de
+  30 jours —, chacune avec sa phrase, sa conséquence et son geste
+  (formulaire du sol, « Déclarer un stade » de la planche sur « Matériel »,
+  « Pluie mesurée »). Une case décochée ne compte pas ; rien ne change le
+  calcul, la pastille ni l'anneau. Sans migration. Le lien « Ce qui manque »
+  de la fin de l'accueil (4.4) n'existe pas encore : il ouvrira le dépliant
+  par son ancre `#donnees-manquantes`. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; P52 (nouveau), P15, P29 et P30 joués en local aux deux largeurs ;
+  la suite complète des parcours jouée par la CI de la PR. À fusionner après
+  la file en cours (4.5, #162 et le contrat des améliorations, 4.4, moteur
+  commun).
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le

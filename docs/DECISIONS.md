@@ -7599,6 +7599,50 @@ Ne changent pas : aucun code, aucune migration, aucun calcul. Numéros D-281,
 F700 et suivants, P52 et suivants, à renuméroter à la fusion si la file préfère
 une suite sans trou.
 
+## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** La zone « Fiabilité du calcul » de « Aujourd'hui » dit cinq
+données pour la ferme entière ; rien ne disait, planche par planche, ce qui
+manque. Le contrat court des améliorations
+(`docs/ameliorations-6-2-3-7-contract.md`, section 3, F700 et F701) ajoute
+trois données par planche : la réserve du sol non saisie, le stade deviné
+(« stade déduit du calendrier »), le pluviomètre absent.
+
+**Décision.** Le code suit la section 3 ; les précisions de code :
+
+1. **F710.** Le dépliant « Par planche » vit sous l'anneau de la zone,
+   fermé, et ne compte ni dans la pastille du menu ni dans l'anneau, qui
+   gardent leurs cinq données : il informe, il ne relance personne. Il ne
+   se lit que pour la page (la pastille ne le lit pas). Le geste du stade
+   mène à « Matériel », sur la parcelle de la planche, par l'ancre
+   `#bed-stage-<planche>` : la planche se choisit seule, le pli « Réglages
+   de cette page » et le formulaire « Déclarer un stade » s'ouvrent une fois
+   la fiche lue. L'ancre ne porte sur aucun identifiant de la page : le
+   navigateur ouvrirait le pli avant React. Les planches se rangent par
+   culture (les cultures présentes ce jour-là, « Sans culture en cours » en
+   dernier à effet égal), les groupes par l'effet de leur première planche ;
+   les cinq premières planches dans l'ordre de l'écran, les autres derrière
+   « Voir les n autres planches ».
+2. **F711.** Le stade deviné : une culture dont le stade et le Kc sont
+   connus, sans déclaration qui la place ; un stade calculé recalé sur une
+   déclaration est déclaré (D-057). La réserve du sol non saisie : les
+   planches inconnues des jardins que la zone nomme déjà (jamais observés,
+   ou sans RFU), par la même règle que le jardin (`gardenBedUnknown`). Le
+   pluviomètre : la pluie mesurée lue de J − 30 à aujourd'hui, `0 mm`
+   compris ; seule une planche hors abri qui porte une culture ce jour-là
+   reçoit la ligne. Une donnée non lue (case décochée, jauge indisponible,
+   plan de culture absent) ne donne aucune ligne.
+3. Le dépliant s'ouvre par son ancre `#donnees-manquantes` : le lien « Ce
+   qui manque » de la fin de l'accueil (4.4) l'emploiera ; il n'existe pas
+   encore.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun calcul du
+besoin, du planning, des priorités ni de la dose ; les cinq données de la
+zone et leurs seuils.
+
 ## D-232 — La borne haute de l'ET0 portée à 15 mm/j (MC-37)
 
 Date : 20 novembre 2026.

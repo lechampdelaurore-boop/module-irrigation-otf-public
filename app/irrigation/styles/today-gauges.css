@@ -346,6 +346,117 @@
   line-height: 1.5;
 }
 
+/*
+  Amélioration n° 6 (docs/ameliorations-6-2-3-7-contract.md, section 3) :
+  le dépliant « Par planche » sous l'anneau, fermé ; ouvert, les planches par
+  culture, chacune avec ses lignes et leurs gestes.
+*/
+.reliability-by-bed {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9.75px;
+  background: var(--card);
+}
+
+.reliability-by-bed > summary {
+  position: relative;
+  display: grid;
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  gap: 2px;
+  padding: 8px 40px 8px 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.reliability-by-bed > summary::-webkit-details-marker {
+  display: none;
+}
+
+.reliability-by-bed > summary small {
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
+.reliability-by-bed > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.reliability-by-bed[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.reliability-by-bed-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 12px 12px;
+}
+
+.reliability-by-bed-clear {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.reliability-by-bed-group {
+  display: grid;
+  gap: 6px;
+}
+
+.reliability-by-bed-group h3 {
+  margin: 0;
+  font: 700 var(--text-14)/1.4 var(--font-ui);
+}
+
+.reliability-by-bed-beds,
+.reliability-by-bed-lines {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reliability-by-bed-bed {
+  display: grid;
+  gap: 6px;
+  padding: 7px 8px;
+  border-radius: 9.75px;
+  background: var(--warn-soft);
+}
+
+.reliability-by-bed-line {
+  display: grid;
+  gap: 6px;
+}
+
+.reliability-by-bed-line + .reliability-by-bed-line {
+  padding-top: 8px;
+  border-top: 1px solid var(--warn-line);
+}
+
+.reliability-by-bed-name {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+  margin: 0;
+  font-size: var(--text-13);
+}
+
+.reliability-by-bed-name small {
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
 @container (max-width: 620px) {
   /* Au téléphone, le nom et le chiffre sur une ligne, la barre dessous sur toute la largeur. */
   .today-bar-row {
@@ -374,6 +485,11 @@
 
   .reliability-line .today-action-link,
   .reliability-line button {
+    justify-self: stretch;
+  }
+
+  .reliability-by-bed-line .today-action-link,
+  .reliability-by-bed .today-more {
     justify-self: stretch;
   }
 }

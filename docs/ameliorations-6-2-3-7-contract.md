@@ -113,6 +113,19 @@ donnée manquante) ; P52 : au téléphone et à 1440 px, le dépliant s'ouvre, l
 geste d'une ligne mène au bon formulaire, la ligne disparaît après la
 correction. Aucune migration.
 
+**Précisions du code (21 novembre 2026, D-282).** F710 : le dépliant vit sous
+l'anneau de la zone, fermé ; il ne compte ni dans la pastille du menu ni dans
+l'anneau, qui gardent leurs cinq données ; le geste du stade ouvre
+« Matériel » sur la planche par l'ancre `#bed-stage-<planche>`, le formulaire
+du stade ouvert ; les planches se rangent par culture, puis par l'effet de
+leur première planche. F711 : le stade deviné est celui d'une culture dont
+le stade et le Kc sont connus sans déclaration qui la place ; la réserve du
+sol non saisie suit la règle du jardin (`gardenBedUnknown`) ; le pluviomètre
+lit la pluie mesurée de J − 30 à aujourd'hui, `0 mm` compris, pour une
+planche hors abri qui porte une culture ce jour-là ; une donnée non lue ne
+donne aucune ligne. Le dépliant s'ouvre aussi par son ancre
+`#donnees-manquantes`.
+
 ## 4. n° 3 et n° 2 — Le message du matin et le rappel du soir
 
 **Aujourd'hui.** Une notification du matin existe : les suggestions du
