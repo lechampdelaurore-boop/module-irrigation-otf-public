@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (parcours navigateur)
+
+- **P12, au téléphone, ne dépend plus de l'heure où il tourne** : à la fin
+  de la soirée, sa première proposition tombe le lendemain, un jour replié
+  quand aujourd'hui porte encore des propositions ou des arrosages validés
+  d'autres parcours (F11). Il la montre désormais en dépliant son jour,
+  comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
+  23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
+  qu'il avait laissé.
+
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
 
 - **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à
