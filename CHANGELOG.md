@@ -5,6 +5,95 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 7 sur 7)
+
+- **« Journal des modifications » dans « Réglages »** (D-288, F722 à F724) :
+  en bas de la page, un pli fermé dont la ligne dit combien de
+  modifications et la dernière ; ouvert, les 50 dernières, une carte par
+  modification : quand, « Vous » ou « Une autre personne connectée », ce
+  qui a changé et sur quoi (un matériel, une semaine et sa planche…), puis
+  chaque champ changé, de l'ancienne à la nouvelle valeur, avec son unité.
+  Un filtre par famille (objectifs, réglages, matériel et ressources),
+  « Voir plus » par 50. Lecture seule, toujours là, sans case à cocher. Le
+  journal commence à sa mise en service : une phrase le dit, et une liste
+  vide dit « Aucune modification enregistrée depuis le … ».
+
+### Ajouté (Améliorations, n° 7, PR 6 sur 7)
+
+- **Le matériel et les ressources écrivent au journal des modifications**
+  (D-287, F721) : un matériel créé, modifié, rangé, ressorti, copié ou
+  effacé, ses réglages (débit, profil d'une aspersion), les pompes et leurs
+  origines, la pompe par défaut d'un matériel, les ressources en eau et leur
+  débit mesuré, les réserves, leurs liaisons, l'alimentation par défaut et
+  les poses (posée, réglage ou planches changés, retirée). Une valeur
+  désignée par un identifiant (une ressource, une réserve, un réglage, une
+  pompe) se lit par son nom, avant comme après. Sans migration.
+
+### Ajouté (Améliorations, n° 7, PR 5 sur 7)
+
+- **Les objectifs et les réglages écrivent au journal des modifications**
+  (D-286, F719, F720) : un objectif hydrique posé, adopté d'une proposition
+  ou retiré, le seuil minimal de besoin, la décision sur le besoin d'une
+  planche, les réglages du planning, les créneaux protégés, la limite d'eau
+  de la journée et celle d'une ressource, le sol d'une parcelle, les
+  réglages du sol, la profondeur des racines, les alertes météo, les
+  alertes par culture (réglages, seuil de gel, dessèchement), les
+  fonctionnalités, le message du matin et le rappel du soir. Chaque geste
+  écrit sa ligne dans son lot, avec les seuls champs changés ; un réglage
+  jamais enregistré part de ses valeurs de départ. Sans migration.
+
+### Ajouté (Améliorations, n° 7, PR 4 sur 7)
+
+- **Le journal des modifications, sa table et sa règle** (D-285, F716 à
+  F718) : une table par ferme garde, pour chaque changement d'un objectif,
+  d'un réglage ou du matériel, qui l'a fait, quand, et la valeur d'avant et
+  d'après des seuls champs changés ; la ligne s'écrit dans le même lot que
+  le changement, jamais l'un sans l'autre. Elle ne se modifie ni ne
+  s'efface, sauf avec la ferme ; elle est à l'export et à l'effacement de
+  la ferme ; la page de confidentialité le dit. L'inventaire range chaque
+  table et chaque écrivain : un écrivain oublié fait échouer la CI. Les
+  écrivains sont branchés par les PR 5 et 6, la lecture par la PR 7.
+  Migration 0043, additive.
+
+### Ajouté (Améliorations, n° 2, PR 3 sur 7)
+
+- **Le rappel du soir** (D-284, F704, F705, F714) : à l'heure que la ferme
+  choisit dans « Réglages » (de 17 h à 22 h au quart d'heure, 19 h par
+  défaut), une notification « Arrosages à confirmer » nomme les arrosages
+  prévus du jour dont la fin est passée et que personne n'a confirmés ; un
+  clic ouvre « Aujourd'hui ». Rien quand tout est confirmé, un seul rappel
+  par jour, jamais rien confirmé à la place du maraîcher. Un nouveau
+  déclencheur horaire du planificateur et une tâche de plus au registre
+  (orange à 3 heures, rouge à 6). Le réglage rejoint le pli « Messages de
+  la ferme », dont la ligne le dit. Parcours P54 ; P50 compte dix tâches.
+
+### Ajouté (Améliorations, n° 3, PR 2 sur 7)
+
+- **Le message unique du matin** (D-283, F702, F703, F712, F713) : après le
+  calcul du matin, une seule notification par jour et par ferme, « Votre
+  journée », dit les arrosages planifiés d'aujourd'hui avec leur heure, la
+  pluie prévue, les alertes en cours et les suggestions du planning ; elle
+  remplace la notification des seules suggestions. Rien quand il n'y a rien
+  à dire ; jamais deux messages le même jour ; un clic ouvre
+  « Aujourd'hui ». Dans « Réglages », la case « Message du matin », cochée
+  par défaut, la coupe pour toute la ferme ; elle vit dans le pli fermé
+  « Messages de la ferme », dont la ligne dit le réglage (F715). Migration
+  0042, additive.
+  Parcours P53.
+
+### Ajouté (Améliorations, n° 6, PR 1 sur 7)
+
+- **Le panneau « données manquantes », planche par planche** (D-282, F700,
+  F701, F710, F711) : sous la zone « Fiabilité du calcul » de « Aujourd'hui », un
+  dépliant « Par planche » qui dit, fermé, combien de planches ont une
+  donnée manquante, ou « Tout est à jour » ; ouvert, les planches par
+  culture, chacune avec ce qui lui manque — la réserve du sol non saisie,
+  le stade deviné d'après le calendrier, le pluviomètre absent depuis plus
+  de 30 jours — et le geste qui le corrige. « Déclarer le stade » ouvre
+  « Matériel » sur la planche, le formulaire du stade ouvert. Le « ? » de la
+  zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
+  Sans migration. Parcours P52.
+
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
 
 - **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à

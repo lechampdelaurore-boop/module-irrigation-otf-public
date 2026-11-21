@@ -1,6 +1,7 @@
 import { db } from './binding';
 import type { IrrigationNeedDecision, IrrigationNeedPriority } from '@/lib/domain/irrigation-needs';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
+import { bedDecisionJournal, needThresholdJournal } from './change-journal/objectives';
 
 type DecisionRow = {
   otf_zone_id: string; otf_plot_id: string; otf_bed_id: string;
@@ -33,6 +34,8 @@ export async function saveIrrigationNeedThresholdForUser(ownerUserId: string, se
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const now = new Date().toISOString();
   await db.batch([
+    // Le journal des modifications d'abord : l'avant est le seuil en vigueur, 0 mm sans réglage (amélioration n° 7, D-286).
+    needThresholdJournal('seuil-de-besoin', { workspaceId, actorUserId: ownerUserId, at: now }, thresholdMm),
     db.prepare(`INSERT INTO irrigation_need_preferences (workspace_id, minimum_need_threshold_mm, actor_user_id, updated_at) VALUES (?, ?, ?, ?)
       ON CONFLICT(workspace_id) DO UPDATE SET minimum_need_threshold_mm = excluded.minimum_need_threshold_mm, actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`)
       .bind(workspaceId, thresholdMm, ownerUserId, now),
@@ -53,6 +56,8 @@ export async function saveIrrigationBedNeedDecisionForUser(ownerUserId: string, 
     ? existing == null || existing.manual_override_mm === null ? 'priority_set' : 'override_cleared'
     : 'override_set';
   await db.batch([
+    // Le journal des modifications d'abord : l'avant est la décision en vigueur de la planche (amélioration n° 7, D-286).
+    bedDecisionJournal('decision-de-planche', { workspaceId, actorUserId: ownerUserId, at: now }, input),
     db.prepare(`INSERT INTO irrigation_bed_need_decisions
       (id, workspace_id, season, week_start, otf_zone_id, otf_plot_id, otf_bed_id, priority, manual_override_mm, override_reason, calculated_need_at_override_mm, actor_user_id, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
