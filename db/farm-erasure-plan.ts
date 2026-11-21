@@ -55,6 +55,8 @@ export const SPACE_TABLES: readonly SpaceTable[] = [
   { table: 'irrigation_protected_slots_log' },
   { table: 'irrigation_protected_slots' },
   { table: 'irrigation_plot_shelters' },
+  { table: 'irrigation_phone_notices' },
+  { table: 'irrigation_phone_notice_settings' },
   { table: 'irrigation_planning_settings_log' },
   { table: 'irrigation_planning_settings' },
   { table: 'irrigation_plan_suggestion_keeps' },

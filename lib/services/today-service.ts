@@ -3,23 +3,22 @@ import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
 import { listWeatherDailyValuesForUser } from '@/db/water-management-repository';
 import { listWaterInfrastructureForUser } from '@/db/water-resource-repository';
-import { listWeatherAlertCriteriaForWorkspace, listWeatherAlertForecastDays } from '@/db/weather-alert-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import { speciesWithoutReference } from '../domain/crop-water/species';
 import type { IrrigationSnapshot } from '../domain/domain';
 import type { FeatureSelection } from '../domain/features/selection';
 import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/today/reliability';
 import { guessedStages, lastMeasuredRainOn, missingByBedBeds, rainGaugeLookbackStart, unknownSoilBeds } from '../domain/today/missing-by-bed';
-import { TODAY_WEATHER_DAYS, todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
+import { todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
 import { pastRainOrigins, type TodayWeekInputs } from '../domain/today/week';
-import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
+import { dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
-import { readCropAlertsView } from './crop-alerts-view';
 import { getCropWaterDaysForUser } from './crop-water-week';
 import { readWeeklyPlanForUser } from './planning-service';
 import { getSoilReserveViewForUser } from './soil-reserve-view';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
 import { getWaterDashboardForUser } from './water-dashboard';
+import { readTodayWeatherInputs } from './today-weather';
 import { readWeatherPreference } from './weather-preference';
 
 /**
@@ -62,17 +61,14 @@ async function readTodayInputs(
   const irrigationsOn = on('planning') || on('arrosages');
   const [workspaceId, preference] = await Promise.all([findWorkspaceIdForUser(ownerUserId), readWeatherPreference(ownerUserId)]);
   const locationKey = weatherLocationKey(preference, snapshot.structure);
-  const weatherOn = read.weather && (on('alertes-cultures') || on('alertes-meteo'));
   const lookback = actualRainLookbackDates(today);
   // Le dépliant « Par planche » (amélioration n° 6) se lit pour la page seulement : la pastille ne le compte pas (F710).
   const byBed = read.weather;
 
-  const [forecasts, cropAlerts, criteria, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays] = await Promise.all([
-    weatherOn && workspaceId && locationKey
-      ? listWeatherAlertForecastDays(workspaceId, locationKey, today, addDaysToDateKey(today, TODAY_WEATHER_DAYS - 1))
-      : [],
-    read.weather && on('alertes-cultures') ? readCropAlertsView({ ownerUserId, workspaceId, locationKey, snapshot, season, now }) : null,
-    read.weather && on('alertes-meteo') && workspaceId ? listWeatherAlertCriteriaForWorkspace(workspaceId) : [],
+  const [weather, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays] = await Promise.all([
+    read.weather
+      ? readTodayWeatherInputs({ ownerUserId, workspaceId, locationKey, snapshot, season, enabled, now })
+      : { forecasts: [], frost: null, criteria: on('alertes-meteo') ? [] : null },
     irrigationsOn ? listIrrigationEventsForUser(ownerUserId, season) : [],
     readPlanningSettingsForUser(ownerUserId),
     on('planning') ? readWeeklyPlanForUser({ ownerUserId, season, now }) : null,
@@ -96,11 +92,7 @@ async function readTodayInputs(
   return {
     enabled,
     now,
-    weather: {
-      forecasts,
-      frost: cropAlerts ? cropAlerts.upcoming.frost : null,
-      criteria: on('alertes-meteo') ? criteria.filter((criterion) => criterion.active) : null,
-    },
+    weather,
     events,
     lateToleranceMinutes: settings.lateToleranceMinutes,
     plan: plan ? { computedAt: plan.calculation.computedAt, proposals: plan.proposals } : null,

@@ -7666,3 +7666,63 @@ les fermes. Le contrat commun la fixait aussi à 12 : la 4.4 l'a gardée
 
 Ne change pas : aucune autre valeur de calcul ; les jours déjà enregistrés ;
 MC-16. Aucune question de budget.
+
+## D-283 — Améliorations, n° 3 : le message unique du matin et son réglage par ferme
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 3, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** Le calcul du matin n'envoyait qu'une notification, celle des
+suggestions du planning (3.7, règles 21 à 24). Le contrat court des
+améliorations (`docs/ameliorations-6-2-3-7-contract.md`, sections 4.1 et
+4.2, F702 et F703) la remplace par un seul message par jour et par ferme,
+avec un réglage par ferme ; option recommandée retenue : remplacer, non
+compléter.
+
+**Décision.** Le code suit les sections 4.1 et 4.2 ; les précisions de code :
+
+1. **F712.** Le réglage vit dans une table d'un espace,
+   `irrigation_phone_notice_settings` (migration 0043), avec la personne qui
+   le change et l'heure ; une colonne vide vaut le défaut, jamais écrit. Le
+   message du matin est activé par défaut : le module ne sait pas quels
+   appareils sont inscrits (le Worker de notification les garde), et sans
+   appareil le message ne trouve personne, ce qui revient au défaut du
+   contrat (« activé pour une ferme qui a au moins un appareil inscrit »).
+   La case se montre dans « Notifications du téléphone » pour une ferme qui
+   coche le Planning, dont le calcul du matin envoie le message ; pas en
+   démonstration. Les colonnes du rappel du soir (n° 2) sont créées par la
+   même migration et restent vides ; leur case et leur heure viennent avec
+   la PR du rappel du soir. La prise du jour vit dans
+   `irrigation_phone_notices` : une ligne par espace et par genre
+   (`morning`, `evening`), réécrite chaque jour de Paris, prise avant
+   l'envoi et rendue s'il échoue ou si le service n'est pas configuré. Les
+   deux tables entrent dans le plan d'effacement.
+2. **F713.** Le message, titre « Votre journée », au plus quatre phrases :
+   les irrigations planifiées d'aujourd'hui qui attendent un geste
+   (`isWaitingPlannedIrrigation`), une déjà en retard comprise, par heure de
+   début, trois nommées avec leur heure puis « et n autres » ; les
+   propositions encore à valider ne comptent pas (ce ne sont pas des
+   irrigations planifiées) ; la pluie prévue aujourd'hui, celle que lit le
+   plan, dite seulement connue et supérieure à 0 une fois arrondie ; les
+   alertes en cours, comptées comme le bloc « Gel ou chaleur » de
+   « Aujourd'hui » les annonce sur ses trois jours (le gel des cultures en
+   compte une, chaque alerte météo qui se déclenche une), sans rien lire si
+   ni « Alertes météo » ni « Alertes cultures » n'est cochée ; les
+   suggestions, la phrase d'avant suivie de leurs gestes. Identifiant
+   d'alarme `morning:<jour>`, étiquette `morning-<jour>`, journaux
+   `morning_message_sent`, `morning_message_already_sent`,
+   `morning_message_failed`, avec des nombres et le jour, jamais un nom.
+3. **F715.** Les réglages des messages vivent dans un pli fermé,
+   « Messages de la ferme », sous « Notifications du téléphone », comme
+   « Correspondance des espèces » (F459) : sa ligne dit le réglage tel qu'il
+   est enregistré (« Message du matin activé. ») et suit chaque changement ;
+   l'ancre d'un réglage (`#message-du-matin`) ouvre le pli. Fermé, il coûte
+   une ligne au téléphone ; le budget de hauteur de « Réglages » à 390 px
+   (P40, F459, porté à 3 500 par le pli de la suppression de la ferme, F665)
+   passe à 3 650 px : la page sur `main` en prend déjà 3 482 dans la CI, et
+   le pli 64 de plus. Le budget reste une borne : toute section nouvelle de
+   « Réglages » se plie.
+
+Ne changent pas : le Worker de notification, le déclencheur du matin, les
+règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des
+alertes ; aucun appel à OTF.

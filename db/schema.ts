@@ -2380,3 +2380,46 @@ export const plotShelters = sqliteTable(
     check('chk_plot_shelter_plot', sql`length(${table.plotId}) > 0`),
   ],
 );
+
+/**
+ * Le réglage des messages du téléphone d'une ferme (améliorations n° 3 et
+ * n° 2, migration 0043, F702, F712) : une ligne par espace ; une colonne vide
+ * vaut le défaut, jamais écrit en base.
+ */
+export const phoneNoticeSettings = sqliteTable(
+  'irrigation_phone_notice_settings',
+  {
+    workspaceId: text('workspace_id').primaryKey().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    morningMessage: integer('morning_message'),
+    eveningReminder: integer('evening_reminder'),
+    eveningTime: text('evening_time'),
+    actorUserId: text('actor_user_id').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    check('chk_phone_notice_settings_morning', sql`${table.morningMessage} IS NULL OR ${table.morningMessage} IN (0, 1)`),
+    check('chk_phone_notice_settings_evening', sql`${table.eveningReminder} IS NULL OR ${table.eveningReminder} IN (0, 1)`),
+    check('chk_phone_notice_settings_time', sql`${table.eveningTime} IS NULL OR ${table.eveningTime} GLOB '[12][0-9]:[0-5][0-9]'`),
+  ],
+);
+
+/**
+ * La prise du jour d'un message du téléphone (migration 0043, F703) : une
+ * ligne par espace et par genre, réécrite chaque jour de Paris, prise avant
+ * l'envoi et rendue s'il échoue.
+ */
+export const phoneNotices = sqliteTable(
+  'irrigation_phone_notices',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    kind: text('kind').notNull(),
+    parisDay: text('paris_day').notNull(),
+    claimedAt: text('claimed_at').notNull(),
+    sentAt: text('sent_at'),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.kind] }),
+    check('chk_phone_notices_kind', sql`${table.kind} IN ('morning', 'evening')`),
+    check('chk_phone_notices_day', sql`${table.parisDay} ${DATE_GLOB}`),
+  ],
+);

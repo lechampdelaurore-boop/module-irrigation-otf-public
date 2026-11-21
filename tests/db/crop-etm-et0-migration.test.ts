@@ -17,6 +17,8 @@ import { applyMigrationsAfter, createD1FromSqlite, createMigratedSqliteDatabase 
  */
 
 const BEFORE = '0041_support_accesses_cost_readings.sql';
+/** La migration éprouvée, seule : celles d'après (0043, les messages du téléphone) ajoutent leurs tables. */
+const MIGRATION = '0042_crop_etm_et0_15.sql';
 const TABLE = 'irrigation_crop_etm_days';
 
 function dump(database: DatabaseSync): Record<string, string[]> {
@@ -56,7 +58,7 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     const filled = Object.entries(before).filter(([, rows]) => rows.length > 0).length;
     assert.ok(filled >= 15, `la copie est une ferme complète (${filled} tables remplies)`);
 
-    applyMigrationsAfter(sqlite, BEFORE);
+    applyMigrationsAfter(sqlite, BEFORE, 'drizzle', MIGRATION);
 
     assert.deepEqual(dump(sqlite), before, 'aucune ligne d’aucune table ne change');
     assert.equal(normalized(tableSql(sqlite)), normalized(sqlBefore).replace('`et0_mm` <= 12', '`et0_mm` <= 15'), 'seule la borne change');
