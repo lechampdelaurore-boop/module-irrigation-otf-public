@@ -1,0 +1,289 @@
+/*
+ * L'accueil de la ferme, dans Réglages (4.4, docs/tranche-4-contract.md,
+ * F417, F427, F581) : une ligne par étape, sa couleur dite aussi en mots
+ * (vert confirmé, orange passé, rouge à faire). Couleurs de la charte du
+ * module.
+ */
+
+.onboarding-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.onboarding-step > span:nth-child(3) {
+  grid-column: 1 / -1;
+  line-height: 1.45;
+}
+
+.onboarding-step-state {
+  font-weight: 700;
+}
+
+.onboarding-step-confirmed {
+  border-left-color: var(--ok);
+}
+
+.onboarding-step-confirmed .onboarding-step-state {
+  color: var(--ok-ink);
+}
+
+.onboarding-step-skipped {
+  border-left-color: var(--warn);
+}
+
+.onboarding-step-skipped .onboarding-step-state {
+  color: var(--warn-ink);
+}
+
+.onboarding-step-missing {
+  border-left-color: var(--danger);
+}
+
+.onboarding-step-missing .onboarding-step-state {
+  color: var(--danger-ink);
+}
+
+/* Le bandeau « À finir » (F582) : ce qui manque à la ferme, sur chaque page, avec le lien vers l'étape. */
+.onboarding-unfinished {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.onboarding-unfinished p {
+  margin: 0;
+}
+
+.onboarding-unfinished a {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.onboarding-step > a {
+  grid-column: 1 / -1;
+  justify-self: start;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* « Parcelles et abris » (F583) : un jardin par ligne, sa proposition et trois réponses. */
+.plot-shelter-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.plot-shelter fieldset {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.plot-shelter-sheltered fieldset,
+.plot-shelter-open-field fieldset {
+  border-left-color: var(--ok);
+}
+
+.plot-shelter legend {
+  padding: 0 4px;
+}
+
+.plot-shelter-proposal {
+  margin: 4px 0 8px;
+  line-height: 1.45;
+}
+
+.plot-shelter-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.plot-shelter-answers label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+}
+
+/* « Rattachez vos espèces » (F587) : chaque proposition cochée, sa provenance dessous ; un geste pour toutes. */
+.species-step {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.species-step h3 {
+  margin: 0 0 6px;
+}
+
+.species-step-proposals {
+  margin: 8px 0;
+  padding: 0;
+  border: 0;
+}
+
+.species-step-proposals ul {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.species-step-proposals label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 8px;
+  min-height: 44px;
+}
+
+.species-step-proposals label small {
+  grid-column: 2;
+  color: var(--ink2);
+}
+
+.species-step-proposals input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+}
+
+.species-step button {
+  min-height: 44px;
+}
+
+.species-step-confirm p {
+  margin: 10px 0 6px;
+}
+
+/* « Réglages à relire » (F588) : un groupe par carte, ses valeurs et leur source, deux réponses et le lien pour ajuster. */
+.settings-review-groups {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-review-group {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.settings-review-group[data-answer="validated"] {
+  border-left-color: var(--ok);
+}
+
+.settings-review-group h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin: 0 0 6px;
+}
+
+.settings-review-group h3 small,
+.settings-review-group dd small {
+  color: var(--ink2);
+  font-weight: 400;
+}
+
+.settings-review-group dl {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.settings-review-group dt {
+  font-weight: 700;
+}
+
+.settings-review-group dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-review-consequence {
+  margin: 0 0 8px;
+  color: var(--warn-ink);
+}
+
+.settings-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.settings-review-actions button,
+.settings-review-actions a {
+  min-height: 44px;
+}
+
+.settings-review-actions a {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* La vérification finale (F589) : les groupes des réglages sous leur étape, puis ce qui reste inconnu, chaque ligne un lien. */
+.onboarding-step-groups {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  padding-left: 1.1rem;
+  color: var(--ink2);
+}
+
+.onboarding-unknowns h3 {
+  margin: 14px 0 4px;
+}
+
+.onboarding-unknowns ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.onboarding-unknowns li {
+  min-height: 44px;
+  display: list-item;
+}
+
+.onboarding-unknowns a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 700;
+}

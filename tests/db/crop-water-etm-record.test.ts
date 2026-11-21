@@ -10,6 +10,7 @@ import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { etmRecordDates, recordEtmDaysForUser } from '../../lib/services/crop-water-etm-record';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
+import { confirmFarmLocation } from '../support/onboarding';
 import { ALICE, BOB } from '../support/spaces';
 
 /**
@@ -53,7 +54,7 @@ const snapshot: IrrigationSnapshot = {
   lastSuccessfulReadAt: '2026-05-11T00:00:00.000Z',
 };
 
-const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null }, snapshot.structure)!;
+const location = weatherLocationKey({ locationMode: 'otf', customCity: null, customPostcode: null, locationConfirmed: true }, snapshot.structure)!;
 const days = (from: string, count: number) => Array.from({ length: count }, (_, index) => addDaysToDateKey(from, index));
 
 test('les jours enregistrés sont aujourd’hui et les sept d’avant, sans déborder sur la saison d’avant', () => {
@@ -63,6 +64,7 @@ test('les jours enregistrés sont aujourd’hui et les sept d’avant, sans déb
 
 test('chaque matin, l’ETM de chaque planche s’enregistre pour huit jours avec sa trace, et le lendemain la réanalyse remplace la prévision', async () => {
   await saveSpeciesCorrespondenceForUser(ALICE, { plantId: 'plant-tomate', seriesId: null, target: { kind: 'reference', referenceCropId: 'criiam-tomate', analogy: false } });
+  await confirmFarmLocation(ALICE, snapshot.structure);
   await upsertWeatherDailyValuesForUser(ALICE, location, 'forecast', days('2026-05-04', 9).map((date) => ({ date, precipitationMm: 0, et0Mm: 5 })), 'test', '2026-05-04T04:00:00.000Z');
   await upsertWeatherDailyValuesForUser(ALICE, location, 'reanalysis', [{ date: '2026-05-04', precipitationMm: 0, et0Mm: 4 }], 'test', '2026-05-10T04:00:00.000Z');
   const workspaceId = await findWorkspaceIdForUser(ALICE);
@@ -80,6 +82,7 @@ test('chaque matin, l’ETM de chaque planche s’enregistre pour huit jours ave
   assert.equal(today.etmMm?.toFixed(2), (5 * 0.8 * today.trace!.kc).toFixed(2), 'ETM = ET0 × K_abri × Kc');
   assert.ok(monday.filter((row) => row.bedId === EMPTY_BED).every((row) => row.status === 'no-crop' && row.etmMm === 0), 'une planche sans culture compte 0');
 
+  await confirmFarmLocation(ALICE, snapshot.structure);
   await upsertWeatherDailyValuesForUser(ALICE, location, 'reanalysis', [{ date: '2026-05-05', precipitationMm: 0, et0Mm: 3 }], 'test', '2026-05-11T04:00:00.000Z');
   await recordEtmDaysForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: TUESDAY_MORNING });
   const tuesday = (await listEtmDaysForWorkspace(workspaceId, 2026, '2026-05-01', '2026-05-31')).filter((row) => row.bedId === BED);

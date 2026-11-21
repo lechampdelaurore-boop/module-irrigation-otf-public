@@ -94,21 +94,36 @@ export async function saveSpeciesCorrespondenceForUser(
   const crops = await listReferenceCropsForWorkspace(workspaceId);
   const problem = correspondenceProblem(entry, crops.map((stored) => stored.crop));
   if (problem) return { ok: false, problems: [problem] };
-  const target = entry.target;
-  const at = now.toISOString();
-  await db.batch([
-    deleteLinkStatement(workspaceId, entry.plantId, entry.seriesId),
-    db.prepare(
-      `INSERT INTO irrigation_crop_species_links (id, workspace_id, plant_id, series_id, target_kind, crop_key, analogy, actor_user_id, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    ).bind(
-      crypto.randomUUID(), workspaceId, entry.plantId, entry.seriesId, target.kind,
-      target.kind === 'reference' ? target.referenceCropId : null,
-      target.kind === 'reference' && target.analogy ? 1 : 0,
-      ownerUserId, at,
-    ),
-  ]);
+  await db.batch(linkStatements(workspaceId, ownerUserId, entry, now.toISOString()));
   return { ok: true, value: entry };
+}
+
+/**
+ * Rattache d'un geste les espèces que la personne a gardées parmi les
+ * propositions de l'étape « Rattachez vos espèces » (4.4, F587), dans un
+ * seul lot : toutes ou aucune. Refusé si l'une vise une culture que la ferme
+ * ne connaît pas. Chaque espèce reçoit un rattachement d'espèce, par
+ * analogie quand la proposition le dit ; les exceptions de séries ne sont
+ * pas touchées.
+ */
+export async function linkSpeciesForUser(
+  ownerUserId: string,
+  links: readonly { plantId: string; referenceCropId: string; analogy: boolean }[],
+  now = new Date(),
+): Promise<CropWaterWriteResult<number>> {
+  const workspaceId = await ensureWorkspaceForUser(ownerUserId);
+  const crops = (await listReferenceCropsForWorkspace(workspaceId)).map((stored) => stored.crop);
+  const entries: CorrespondenceEntry[] = links.map((link) => ({
+    plantId: link.plantId,
+    seriesId: null,
+    target: { kind: 'reference', referenceCropId: link.referenceCropId, analogy: link.analogy },
+  }));
+  const problems = entries.flatMap((entry) => correspondenceProblem(entry, crops) ?? []);
+  if (problems.length > 0) return { ok: false, problems: [...new Set(problems)] };
+  if (entries.length === 0) return { ok: true, value: 0 };
+  const at = now.toISOString();
+  await db.batch(entries.flatMap((entry) => linkStatements(workspaceId, ownerUserId, entry, at)));
+  return { ok: true, value: entries.length };
 }
 
 /** Retire un rattachement ou une exception de série. `false` quand il n'existait pas. */
@@ -185,6 +200,23 @@ export async function listStageDeclarationsForWorkspace(workspaceId: string, sea
     date: row.stage_date,
     recordedAt: row.recorded_at,
   }));
+}
+
+/** Le rattachement d'une espèce ou d'une série remplace le précédent au même niveau. */
+function linkStatements(workspaceId: string, ownerUserId: string, entry: CorrespondenceEntry, at: string) {
+  const target = entry.target;
+  return [
+    deleteLinkStatement(workspaceId, entry.plantId, entry.seriesId),
+    db.prepare(
+      `INSERT INTO irrigation_crop_species_links (id, workspace_id, plant_id, series_id, target_kind, crop_key, analogy, actor_user_id, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).bind(
+      crypto.randomUUID(), workspaceId, entry.plantId, entry.seriesId, target.kind,
+      target.kind === 'reference' ? target.referenceCropId : null,
+      target.kind === 'reference' && target.analogy ? 1 : 0,
+      ownerUserId, at,
+    ),
+  ];
 }
 
 function deleteLinkStatement(workspaceId: string, plantId: string, seriesId: string | null) {

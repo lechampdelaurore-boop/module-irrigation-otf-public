@@ -1,3 +1,4 @@
+import { taskDeclaration } from '../operations/task-registry.ts';
 import { millisecondsFromHours } from '../units.ts';
 
 /**
@@ -8,8 +9,12 @@ import { millisecondsFromHours } from '../units.ts';
  * réussite, au moins une mise à jour a manqué, et la date de la dernière
  * réussite ne se dit plus « en vert » comme si tout allait bien. Le retard se
  * dit avec la dernière erreur enregistrée, telle quelle.
+ *
+ * Les 36 heures sont le seuil rouge des prévisions dans le registre des
+ * tâches (4.5, F560, F606) : l'écran de la ferme et la veille de l'exploitant
+ * lisent le même nombre, à un seul endroit.
  */
-export const AUTOMATIC_REFRESH_LATE_AFTER_HOURS = 36;
+export const AUTOMATIC_REFRESH_LATE_AFTER_HOURS = taskDeclaration('weather-forecast').brokenAfterHours;
 
 export type AutomaticRefreshRecord = {
   lastAutomaticRefreshAttemptAt: string | null;

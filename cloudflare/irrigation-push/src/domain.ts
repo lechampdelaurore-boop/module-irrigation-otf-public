@@ -64,3 +64,21 @@ export function immediateDeliveryStatus(counts: ImmediateDeliveryCounts): Immedi
 export function retryAlarmName(recipientKey: string, notificationId: string): string {
   return `send:${recipientKey}:${notificationId}`;
 }
+
+/**
+ * Un abonnement sans réponse du service de notification depuis 90 jours est
+ * oublié, comme un abonnement expiré (docs/tranche-4-contract.md, F562, et
+ * 10 bis.19, F655) : un appareil perdu ne reste pas. Seuls comptent les envois
+ * manqués : un abonnement à qui rien n'est envoyé (un hiver sans arrosage)
+ * n'est jamais « sans réponse ».
+ */
+export const SILENT_SUBSCRIPTION_FORGET_MS = 90 * 24 * 60 * 60 * 1000;
+
+/**
+ * Après un envoi manqué : depuis quand l'abonnement manque (le premier envoi
+ * manqué depuis la dernière réussite), et s'il est temps de l'oublier.
+ */
+export function afterMissedDelivery(failingSince: number | null, now: number): { failingSince: number; forget: boolean } {
+  const since = failingSince ?? now;
+  return { failingSince: since, forget: now - since >= SILENT_SUBSCRIPTION_FORGET_MS };
+}

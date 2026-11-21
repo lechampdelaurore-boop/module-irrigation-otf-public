@@ -2,13 +2,17 @@ import { env } from 'cloudflare:workers';
 import { automaticWeatherRepository } from '@/db/automatic-weather-repository';
 import { evaluateCropAlertsAfterForecastWrite, evaluateCropDryingForAllWorkspaces } from '@/lib/services/crop-alerts-service';
 import { recordEtmDaysForAllWorkspaces } from '@/lib/services/crop-water-etm-record';
+import { runDueFarmErasures } from '@/lib/services/farm-erasure';
 import { resealOtfVaultAtMorning } from '@/lib/services/otf-token-vault';
+import { runRetentionPurges } from '@/lib/services/retention-purge';
 import { recalculateWeeklyPlansForAllWorkspaces } from '@/lib/services/planning-service';
 import { recordSoilDaysForAllWorkspaces } from '@/lib/services/soil-reserve-record';
+import { recordMorningTaskRuns } from '@/lib/services/task-runs';
 import { runAutomaticWeatherSync } from '@/lib/services/weather/automatic-sync';
 import { getConfiguredWeatherProvider } from '@/lib/services/weather/configured-provider';
 import { evaluateWeatherAlertsAfterForecastWrite } from '@/lib/services/weather-alerts-service';
 import { verifyWeatherSyncToken } from '@/lib/services/weather/internal-auth';
+import type { MorningRunReport } from '@/lib/domain/operations/morning-task-outcomes';
 
 export async function POST(request: Request) {
   const providedToken = request.headers.get('x-irrigation-weather-sync-token');
@@ -19,6 +23,9 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Ce que le matin fait de chacune de ses tâches (4.5, docs/tranche-4-contract.md, F560, F602) :
+  // enregistré à la fin, même quand la route s'interrompt en route.
+  const report: MorningRunReport = {};
   try {
     const result = await runAutomaticWeatherSync({
       repository: automaticWeatherRepository,
@@ -30,24 +37,34 @@ export async function POST(request: Request) {
         await evaluateCropAlertsAfterForecastWrite(input);
       },
     });
+    report.weather = result;
     // Le planning se recalcule après la météo du matin (docs/planning-contract.md, « Le cycle ») :
     // un échec du planning n'est pas un échec de la météo, il est compté à part.
-    const planning = result.status === 'completed' ? await recalculateWeeklyPlansForAllWorkspaces() : null;
+    const planning = report.planning = result.status === 'completed' ? await recalculateWeeklyPlansForAllWorkspaces() : null;
     // L'ETM de chaque planche s'enregistre après la météo du matin (docs/crop-water-need-contract.md,
     // « La traçabilité ») ; comme le planning, un échec est compté à part.
-    const cropWater = result.status === 'completed' ? await recordEtmDaysForAllWorkspaces() : null;
+    const cropWater = report.cropWater = result.status === 'completed' ? await recordEtmDaysForAllWorkspaces() : null;
     // Puis l'état du jour de la jauge de la réserve du sol (docs/soil-reserve-contract.md, 5 ter, PR 3d).
-    const soilReserve = result.status === 'completed' ? await recordSoilDaysForAllWorkspaces() : null;
+    const soilReserve = report.soilReserve = result.status === 'completed' ? await recordSoilDaysForAllWorkspaces() : null;
     // Le séchage est une échéance du plan de culture : il s'évalue chaque matin, même si la météo est en panne.
-    const cropDrying = result.status === 'already-running' ? null : await evaluateCropDryingForAllWorkspaces();
+    const cropDrying = report.cropDrying = result.status === 'already-running' ? null : await evaluateCropDryingForAllWorkspaces();
     // Enfin la rotation de la clé du coffre pour les fermes que la journée n'a pas lues (docs/tranche-4-contract.md,
     // F356, F401) : endormie sans clé maîtresse ; son échec ne fait pas échouer le matin, et sa réponse n'a que des nombres.
-    const otfVault = result.status === 'already-running' ? null : await resealOtfVaultAtMorning();
-    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying, otfVault }, {
+    const otfVault = report.otfVault = result.status === 'already-running' ? null : await resealOtfVaultAtMorning();
+    // Puis l'effacement des fermes qui l'ont demandé, sept jours avant (docs/tranche-4-contract.md, F563, F645) :
+    // par lots bornés ; ce qui reste reprend au passage suivant, et un échec ne fait pas échouer le matin.
+    const farmErasure = report.farmErasure = result.status === 'already-running' ? null : await runDueFarmErasures();
+    // Enfin les purges des données à durée limitée (docs/tranche-4-contract.md, F562, F650) : par lots bornés,
+    // même quand rien ne lit Ouvre ta ferme ; un échec ne fait pas échouer le matin.
+    const retentionPurge = report.retentionPurge = result.status === 'already-running' ? null : await runRetentionPurges();
+    await recordMorningTaskRuns(report);
+    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying, otfVault, farmErasure, retentionPurge }, {
       status: result.status === 'already-running' ? 409 : 200,
       headers: { 'cache-control': 'no-store' },
     });
   } catch (error) {
+    report.interruptedBy = error instanceof Error ? error.name : undefined;
+    await recordMorningTaskRuns(report);
     console.error(JSON.stringify({
       event: 'weather_automatic_sync_route_failed',
       error: error instanceof Error ? error.message : 'unknown',

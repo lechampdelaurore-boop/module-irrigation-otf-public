@@ -13,6 +13,338 @@ source détaillée commit par commit.
   la fiche de retour et la fiche d'entrée aux douze conditions. Sans code,
   sans aucun nom ni donnée de ferme ; rien n'est envoyé.
 
+### Ajouté (registres : sept améliorations validées)
+
+- **Section 6 septies de la roadmap et D-280** : les sept idées d'amélioration
+  proposées le 6 novembre 2026 sont inscrites après vérification dans le code
+  (n° 1 et 3 existent, n° 6 en partie ; n° 2, 4, 5 et 7 à faire), après la
+  Tranche 4 ; les n° 4 et 5 sont réservées à l'avis agronomique du porteur.
+  Aucun code, aucun contrôle rejoué.
+
+### Corrigé (parcours navigateur)
+
+- **P12, au téléphone, ne dépend plus de l'heure où il tourne** : à la fin
+  de la soirée, sa première proposition tombe le lendemain, un jour replié
+  quand aujourd'hui porte encore des propositions ou des arrosages validés
+  d'autres parcours (F11). Il la montre désormais en dépliant son jour,
+  comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
+  23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
+  qu'il avait laissé.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
+
+- **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à
+  F669) : en bas de Réglages, replié, ce qui disparaît, ce qui reste, le
+  délai de sept jours et l'autorisation à retirer dans Ouvre ta ferme ; la
+  demande ne part qu'avec le nom de la ferme tapé, relu par le serveur.
+  Absent de la démonstration.
+- **L'espace figé** : dès la demande, chaque page du module montre le jour
+  de l'effacement, sans rien lire d'Ouvre ta ferme ni rien laisser saisir,
+  et « Annuler la demande » tant que l'effacement n'a pas commencé.
+- **L'effacement sans attendre**, sur la page d'état, sur demande écrite :
+  l'exploitant choisit la demande, retape le numéro de sa ferme, et
+  l'effacement passe aussitôt ; `docs/exploitation.md` dit comment.
+- La page de confidentialité dit la demande dans Réglages. Parcours P51.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, troisième partie)
+
+- **Le journal d'accès du support** (D-250, F660 à F664) : sur la page
+  d'état, l'exploitant note chaque consultation des données d'une ferme (le
+  jour, la ferme, la raison en une ligne, jamais ce qu'il a vu) ; gardée
+  12 mois, effacée avec la ferme. La page de confidentialité le dit.
+- **Les coûts sur la page d'état** : le relevé du mois, recopié du tableau
+  de bord de Cloudflare, comparé à ce que l'offre inclut (à surveiller dès
+  80 %, prix d'un dépassement) ; la page n'appelle jamais Cloudflare.
+  Migration 0041.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, deuxième partie)
+
+- **La page de confidentialité dit chaque durée** (D-249, F657 à F659),
+  texte du 20 novembre 2026 : la phrase des 30 jours telle qu'approuvée
+  (« Une donnée effacée reste récupérable dans l'historique jusqu'à
+  30 jours. »), l'export de la semaine gardé cinq semaines au plus, le
+  compte des lectures dans Ouvre ta ferme (30 jours au plus), la preuve
+  d'un effacement sans nom ni contenu, l'abonnement aux notifications
+  effacé avec la ferme ou après 90 jours sans notification remise.
+- **Les exports gardés cinq semaines au plus** : après un export vérifié,
+  `pnpm backup:export` efface du même dossier ceux de 25 jours ou plus, et
+  seulement les fichiers qu'il a nommés, puis rappelle d'effacer les mêmes
+  copies ailleurs.
+- **« Que faire quand… »** dans `docs/exploitation.md` : une notification de
+  la veille, une ferme qui écrit (gabarit de réponse), une demande
+  d'effacement, une base perdue, la clé du coffre perdue, Ouvre ta ferme
+  qui change, un compte perdu. La page d'accueil du site dit le délai de
+  réponse, sans engagement.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, deuxième partie)
+
+- **Les appareils d'une ferme effacée sont oubliés** (D-248, F654 à F656) :
+  le Worker de notification retire chaque appareil de l'espace effacé, et
+  oublie la fiche d'un appareil qui ne sert plus aucun espace ;
+  l'effacement n'est noté fait qu'après. Un abonnement dont les envois
+  manquent depuis 90 jours est oublié comme un abonnement expiré ; un
+  abonnement à qui rien n'est envoyé ne l'est jamais.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- **La conservation, table par table** (D-247, F649 à F653) : chaque table
+  de la base a sa durée et qui l'efface, écrites en code et au contrat ; une
+  table ajoutée sans durée casse la CI. La tâche du matin « Purges de
+  conservation » efface, par lots bornés et pour toutes les fermes, ce qui a
+  dépassé sa durée : le journal des appels à Ouvre ta ferme (2, 8 ou 30
+  jours selon la ligne), même quand rien ne lit la ferme, et la notification
+  du jour de la veille (35 jours). Sans migration. La politique de
+  confidentialité, le support et les coûts viennent avec la seconde partie.
+
+### Changé (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- Le registre compte 9 tâches ; le matin en a six.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, première partie)
+
+- **L'effacement d'une ferme, le moteur** (D-246, F640 à F648) : une
+  demande d'effacement s'exécute sept jours après, annulable jusque-là ;
+  l'espace est figé pendant ce temps (les traitements du matin le sautent).
+  Le premier matin après le délai, la tâche « Effacement des fermes qui
+  l'ont demandé » efface, par lots bornés et repris au passage suivant, tout
+  ce que l'espace garde, puis l'espace lui-même avec la note « faite », d'un
+  bloc. Il ne reste qu'une note de la demande, sans nom ni contenu
+  (`irrigation_farm_erasures`, migration 0040). La page
+  d'état dit les demandes en attente, à effacer et faites, et la dernière.
+  La demande dans « Réglages » vient avec la seconde partie.
+- Les preuves de F563 : chaque table de la base est rangée dans le plan
+  d'effacement, et une table sans règle casse la CI ; à deux fermes, avec
+  des lignes dans chaque table d'espace, l'autre ferme reste inchangée dans
+  les quatre passages de l'isolation ; reprise après une coupure ou une
+  panne ; annulation.
+
+### Changé (Tranche 4, 4.5, PR 3 sur 5, première partie)
+
+- Les douze tables que le module garde immuables acceptent l'effacement des
+  seules lignes d'un espace dont l'effacement est en cours : leurs
+  déclencheurs sont recréés à l'identique avec cette exception (procédure
+  exceptionnelle des migrations, D-246).
+- Le registre compte 8 tâches ; le matin en a cinq.
+
+
+### Ajouté (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
+
+- **L'essai de restauration au registre des tâches** (D-245, F636 et F637) :
+  une fois par trimestre, orange à 100 jours sans essai noté, rouge à 120 ;
+  la veille de 9 h le rappelle, comme l'export de la semaine. Sur la page
+  d'état, sa carte porte le geste « J'ai fait l'essai du … », aux mêmes
+  règles que celui de l'export.
+
+### Changé (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
+
+- Les gestes de la page d'état (l'export, l'essai) sont un seul code : un
+  test lie chaque tâche faite par l'exploitant à son geste, et la tâche
+  venue du navigateur est relue côté serveur. Le jugement d'ensemble compte
+  désormais 7 tâches ; le parcours P50 note aussi l'essai, aux deux
+  largeurs.
+
+### Ajouté (Tranche 4, 4.5, PR 4 sur 5, seconde partie)
+
+- **L'essai de restauration** (D-244, F627 à F635) : `pnpm backup:rehearse`
+  joue les trois scénarios du contrat sur deux fermes fictives et compare
+  chaque état table par table : revenir en arrière avec Time Travel (et
+  revenir à l'état d'avant), rattraper une seule ferme sans toucher l'autre,
+  reconstruire la base depuis un export puis prouver l'isolation des deux
+  fermes contre elle, perdre la clé du coffre des jetons. Sans option, une
+  simulation sur l'ordinateur ; avec `--cloudflare`, l'essai sur une base
+  d'essai chez Cloudflare (flux « Essai de restauration », jamais sur une
+  PR, seulement sur le « vas-y » du porteur), qui ne peut toucher aucune
+  autre base et la détruit à la fin. Le compte rendu ne dit que des noms
+  de tables, des nombres et des empreintes.
+- **La restauration d'une base perdue depuis un export** : `pnpm
+  backup:restore <fichier> --base <nom>` déchiffre l'export en mémoire, le
+  contrôle, l'importe dans une base neuve ou vide (jamais dans une base qui
+  a des tables), puis compare la base reconstruite à l'export. Procédures
+  dans `docs/exploitation.md` (« Restaurer la base »).
+- **Le premier essai chez Cloudflare, le 20 novembre 2026** : réussi (S1,
+  S2 et S3 sur trois bases d'essai, détruites à la fin) ; compte rendu dans
+  la PR.
+
+### Changé (Tranche 4, 4.5, PR 4 sur 5, seconde partie)
+
+- Un export se réimporte **rangé** (les tables d'abord, puis les lignes,
+  chaque table après celles qu'elle désigne) : la simulation a montré que
+  l'export brut de D1, qui range les tables dans l'ordre de leur création,
+  ne se réimporte pas tel quel là où les clés étrangères sont actives.
+- `pnpm knip` lit aussi les modules de `scripts/backup/` ; les exports
+  qu'aucun autre fichier n'utilisait n'en sont plus.
+- Le signet d'un instant que Cloudflare ne rend pas (erreur interne, code
+  7500, au premier passage de l'essai) se dit en une note, sans arrêter
+  l'essai ; les lignes de Wrangler masquent aussi la référence d'une
+  requête donnée avec une erreur.
+
+### Ajouté (Tranche 4, 4.5, PR 4 sur 5, première partie)
+
+- **L'export hebdomadaire chiffré de la base, hors de Cloudflare** (D-243,
+  F620 à F626) : `pnpm backup:export`, lancé par l'exploitant sur son
+  ordinateur, reçoit l'export de la base par Wrangler en mémoire (jamais en
+  clair sur le disque, l'adresse de téléchargement masquée), le contrôle en
+  le rejouant dans une base vide (schéma des migrations, contraintes, clés
+  étrangères, empreinte de chaque table), le chiffre avec un mot de passe
+  tapé deux fois sans écho (AES-256-GCM, scrypt), l'écrit hors du dépôt
+  sans écraser le précédent, puis le relit et le déchiffre pour vérifier
+  qu'il rend l'export à l'octet près. `pnpm backup:verify` contrôle un
+  export déjà fait. Les sorties ne disent que des nombres, des noms de
+  migrations et des empreintes. Procédure dans `docs/exploitation.md`.
+- **L'export au registre des tâches, et le geste « J'ai fait l'export du
+  … »** de la page d'état : une fois par semaine, orange à 8 jours, rouge à
+  10 ; la veille de 9 h le rappelle ; la dernière réussite ne recule
+  jamais. Parcours P50 étendu.
+
+### Changé (Tranche 4, 4.5, PR 4 sur 5, première partie)
+
+- Le jugement d'ensemble de la page d'état et le « tout va bien » de la
+  veille disent « les 6 tâches » au lieu des « 5 tâches automatiques » :
+  l'export, fait à la main, en est une.
+
+### Ajouté (Tranche 4, 4.5, PR 2 sur 5, seconde partie)
+
+- **Chaque ferme sur la page d'état de l'exploitant** (D-242, F614 à
+  F618) : une carte par ferme, la plus en difficulté d'abord, avec son
+  raccordement à Ouvre ta ferme, ses appels du jour, ses erreurs d'OTF sur
+  24 heures et 7 jours, sa dernière lecture complète, sa dernière météo et
+  son dernier calcul du matin ; le jugement d'ensemble compte les fermes.
+  Chaque appel envoyé à OTF est compté par ferme et par heure, et chaque
+  échec se journalise sous un nom stable, sans adresse, ferme ni jeton.
+  Migration 0039, additive ; parcours P50 étendu.
+- **Un garde des journaux dans les essais** : chaque ligne écrite pendant
+  `pnpm test` est lue, et le fichier échoue si l'une ressemble à un jeton,
+  un code d'autorisation, une adresse de retour, une adresse électronique
+  ou un nom de ferme.
+
+### Corrigé (Tranche 4, 4.5, PR 2 sur 5, seconde partie)
+
+- Quatre lignes de journal du raccordement à OTF recopiaient le message
+  d'une erreur de la base ; elles disent désormais sa seule classe.
+
+### Ajouté (Tranche 4, 4.5, PR 2 sur 5, première partie)
+
+- **La veille de l'exploitant et sa page d'état** (D-241, F608 à F613) :
+  chaque jour à 9 h, un second déclencheur du planificateur lit le registre
+  des tâches et, si l'une est en retard, en panne ou jamais réussie, envoie
+  une notification à l'exploitant qui dit laquelle et depuis quand ; le
+  dimanche, quand tout va bien, « tout va bien », dont l'absence dit que la
+  veille elle-même ne tourne plus. Une notification par jour au plus. La
+  page « État du module » (`/irrigation/exploitation`), réservée à
+  l'exploitant, dit en une ligne si tout va bien, puis l'état de chaque
+  tâche, sa dernière réussite et son dernier échec. La veille est elle-même
+  une tâche du registre. Migration 0038, additive ; parcours P50.
+
+### Corrigé (un essai du lot I, qui échouait chaque soir)
+
+- **L'essai de la démonstration « Pic d'été, l'eau manque » ne dépend plus de
+  l'heure** : la démonstration se prépare au jour du moment, à l'heure réelle
+  de la ferme, et chaque soir vers 21 h 30 à Paris un arrosage du jour passé
+  changeait l'eau versée sur les planches vides (0,33 m³ au lieu de 0,49) ;
+  l'essai fige l'heure réelle. Rien ne change dans le module.
+### Ajouté (Tranche 4, 4.5, PR 1 sur 5)
+
+- **Le registre des tâches attendues** (D-240, F600 à F607) : les quatre
+  tâches du matin (prévisions, pluie estimée après coup, calcul du matin,
+  rotation du coffre) sont déclarées en code avec leur rythme et leurs
+  seuils ; chacune garde sa dernière réussite, la réanalyse à part des
+  prévisions. Une tâche passe « en retard » à 26 heures sans réussite, « en
+  panne » à 36 heures ou après trois échecs de suite, et n'est jamais verte
+  faute de réussite. Un test échoue pour tout déclencheur planifié absent du
+  registre. Rien ne change à l'écran : la page d'état et la veille de
+  l'exploitant viennent avec la PR 2. Migration 0037, additive.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4d)
+
+- **Le modèle des rattachements** (D-231) : une nouvelle ferme reçoit, pour
+  ses espèces, les rattachements d'une ferme maraîchère (40 espèces, dont
+  la mâche « par analogie » avec la salade d'été) ; elle décoche ce qu'elle
+  ne garde pas.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 5b)
+
+- **La vérification de l'accueil** (D-230) : le pli « Accueil de la
+  ferme » dit, pour chaque groupe de réglages, s'il est confirmé ou passé,
+  et ce qui reste inconnu dans la ferme (espèces non rattachées, jardins à
+  classer, parcelles sans sol), avec le lien pour le renseigner.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 5a)
+
+- **« Réglages à relire »** (D-229) : une nouvelle ferme lit, dans
+  Réglages, chaque groupe de valeurs de départ avec sa source, et le valide
+  ou le passe. Aucun planning n'est calculé avant qu'elle ait validé les
+  réglages du planning ; le bandeau « À finir » le lui rappelle.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4c)
+
+- **« Rattachez vos espèces »** (D-228) : une nouvelle ferme voit, en tête
+  de la correspondance des espèces, une proposition pour chaque espèce que
+  son nom désigne ; elle décoche ce qu'elle ne garde pas et rattache le
+  reste d'un geste, puis confirme l'étape « Cultures ». Le bandeau « À
+  finir » rappelle les espèces à rattacher jusque-là.
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4b)
+
+- **D'où viennent les dates de chaque culture** (D-227) : la fiche d'une
+  culture de référence dit d'où viennent ses dates de stade (région Sud /
+  Occitanie pour celles du CRIIAM, générales pour celles de la FAO-56, ou
+  celles de la ferme). Une nouvelle ferme d'une autre région est avertie sur
+  les cultures du CRIIAM : « Ces dates viennent d'une autre région que la
+  vôtre : vérifiez-les. » Les fermes qui utilisaient déjà le module ne le
+  sont pas.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 4a)
+
+- **Les racines d'une nouvelle ferme** (D-226) : l'asperge et le melon ne
+  sont plus limités, pour une nouvelle ferme, au plafond de 0,60 m choisi
+  pour la ferme du porteur ; ils partent de la profondeur de la FAO-56
+  (1,20 m et 0,80 m), dite « estimation, à vérifier à la tarière », que la
+  ferme ajuste. Les fermes qui utilisaient déjà le module gardent leurs
+  profils.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 3)
+
+- **Le sol, d'après sa texture** (D-225) : une nouvelle ferme n'a plus,
+  en silence, l'eau évaporable d'un limon sableux dans le formulaire du
+  sol. Elle choisit la texture de chaque parcelle parmi les neuf du
+  tableau 19 de la FAO-56 ; le module propose l'eau évaporable (TEW) et
+  l'eau facilement évaporable (REW) au milieu de leur fourchette, qu'il
+  dit à côté, et la personne les ajuste. La texture est gardée avec le
+  sol. Tant qu'une parcelle n'a pas de sol, chaque page le rappelle
+  (« À finir : sol de 3 parcelles. »). Les fermes qui utilisaient déjà
+  le module gardent leurs valeurs ; la liste des textures s'ajoute à leur
+  formulaire.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 2b)
+
+- **Parcelles et abris, classés par la personne** (D-224) : une nouvelle
+  ferme dit, jardin par jardin, s'il est sous abri ou en plein champ ; le
+  module propose (le type du jardin dans Ouvre ta ferme, sinon son nom, et
+  « serre » ou « châssis » comptent désormais), la personne confirme ou
+  corrige. Tant qu'un jardin est « à classer », son besoin en eau n'est pas
+  calculé et la page dit pourquoi. Les fermes qui utilisaient déjà le
+  module gardent leur classement.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 2a)
+
+- **La commune de la ferme, choisie par la personne** (D-223) : une
+  nouvelle ferme n'a plus pour commune, en silence, le siège de sa
+  structure dans Ouvre ta ferme. Tant qu'elle n'a pas choisi sa commune,
+  le module n'affiche ni météo, ni gel, ni ET0, et chaque page le rappelle
+  par un bandeau « À finir : commune de la ferme. », avec un lien vers
+  Réglages. Le siège reste possible, d'un geste, « en dernier recours ».
+  Une commune hors de France métropolitaine est refusée. Les fermes qui
+  utilisaient déjà le module gardent leur commune telle quelle, et peuvent
+  toujours en changer sans repasser par l'accueil.
+
+### Ajouté (Tranche 4, sous-tranche 4.4, PR 1 sur 5)
+
+- **L'accueil d'une ferme : son état, et l'espace existant marqué** (D-222) :
+  le module garde, pour chaque ferme, l'état des cinq étapes de l'accueil
+  qu'elle confirme (commune, parcelles et abris, sol, cultures, réglages à
+  relire). Chaque ferme qui utilisait déjà le module est marquée « accueil
+  fait avant la 4.4 », ses réglages gardés tels quels, sans qu'aucun
+  chiffre change. Réglages montre l'accueil, replié en bas de la page,
+  étape par étape. Les écrans des étapes viendront avec les PR suivantes.
 ### Modifié (audit du 19 novembre 2026, lot K, PR 7 sur 7)
 
 - **Grand écran, tablette et 320 px** (D-196) : au grand écran, la page se

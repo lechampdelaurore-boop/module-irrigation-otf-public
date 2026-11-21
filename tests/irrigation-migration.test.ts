@@ -47,8 +47,8 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_arbitrations',
     'irrigation_background_jobs',
     'irrigation_bed_applications',
-    // Les treize tables du besoin par culture et par stade (5 quater) et les cinq des alertes par culture (5 quinquies) partagent la ligne de leur voisine, même raison.
-    'irrigation_bed_need_decisions', 'irrigation_crop_alert_common', 'irrigation_crop_alert_settings', 'irrigation_crop_alerts', 'irrigation_crop_bed_mulch', 'irrigation_crop_drying_revisions', 'irrigation_crop_etm_days', 'irrigation_crop_frost_links', 'irrigation_crop_kc_overrides', 'irrigation_crop_reference_crops', 'irrigation_crop_reference_season_months', 'irrigation_crop_reference_seasons', 'irrigation_crop_reference_stage_starts', 'irrigation_crop_reference_stages', 'irrigation_crop_shade_nets', 'irrigation_crop_shelter_factors', 'irrigation_crop_species_links', 'irrigation_crop_stage_declarations', 'irrigation_crop_water_options',
+    // Les treize tables du besoin par culture et par stade (5 quater), les cinq des alertes par culture (5 quinquies) et le relevé des coûts (4.5, migration 0041) partagent la ligne de leur voisine, même raison.
+    'irrigation_bed_need_decisions', 'irrigation_cost_readings', 'irrigation_crop_alert_common', 'irrigation_crop_alert_settings', 'irrigation_crop_alerts', 'irrigation_crop_bed_mulch', 'irrigation_crop_drying_revisions', 'irrigation_crop_etm_days', 'irrigation_crop_frost_links', 'irrigation_crop_kc_overrides', 'irrigation_crop_reference_crops', 'irrigation_crop_reference_season_months', 'irrigation_crop_reference_seasons', 'irrigation_crop_reference_stage_starts', 'irrigation_crop_reference_stages', 'irrigation_crop_shade_nets', 'irrigation_crop_shelter_factors', 'irrigation_crop_species_links', 'irrigation_crop_stage_declarations', 'irrigation_crop_water_options',
     'irrigation_daily_water_limit_revisions',
     'irrigation_equipment',
     // Fichier à la limite de 600 lignes : la table de la 2.11 partage la ligne de sa voisine.
@@ -58,24 +58,27 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_equipment_setting_calculations', 'irrigation_equipment_settings',
     'irrigation_event_equipment',
     'irrigation_event_log',
-    'irrigation_events', 'irrigation_feature_selections',
+    // Même raison : la demande d'effacement d'une ferme (4.5, migration 0040) partage la ligne de sa voisine.
+    'irrigation_events', 'irrigation_farm_erasures', 'irrigation_feature_selections',
     'irrigation_garden_group_members',
     'irrigation_garden_groups',
     'irrigation_hydric_goal_revisions',
     'irrigation_need_decision_log',
-    'irrigation_need_preferences',
+    // Même raison : l'état de l'accueil (4.4, migration 0034) et la notification du jour de la veille de l'exploitant (4.5, migration 0038) partagent la ligne de leur voisine.
+    'irrigation_need_preferences', 'irrigation_onboarding_steps', 'irrigation_operator_notices',
     'irrigation_placement_selected_beds',
     // Même raison : la table des événements de la 3.7 partage la ligne de sa voisine.
     'irrigation_plan_calculations', 'irrigation_plan_events',
     'irrigation_plan_proposals', 'irrigation_plan_suggestion_keeps',
     'irrigation_planning_settings',
     // Même raison : les deux tables des créneaux protégés (3.8 ter, migration 0030) partagent la ligne de leur voisine.
-    'irrigation_planning_settings_log', 'irrigation_protected_slots', 'irrigation_protected_slots_log',
+    // Même raison : le classement des jardins (4.4, migration 0035) partage la ligne de ses voisines.
+    'irrigation_planning_settings_log', 'irrigation_plot_shelters', 'irrigation_protected_slots', 'irrigation_protected_slots_log',
     'irrigation_pump_log',
     'irrigation_pump_origins',
     'irrigation_pumps',
-    // Les sept tables de la réserve du sol (5 ter) partagent la ligne de leur voisine, même raison.
-    'irrigation_season_geometry', 'irrigation_soil_days', 'irrigation_soil_observations', 'irrigation_soil_records', 'irrigation_soil_rooting_profiles', 'irrigation_soil_rooting_stages', 'irrigation_soil_settings', 'irrigation_soil_surface_declarations',
+    // Les sept tables de la réserve du sol (5 ter) et le journal d'accès du support (4.5, migration 0041) partagent la ligne de leur voisine, même raison.
+    'irrigation_season_geometry', 'irrigation_soil_days', 'irrigation_soil_observations', 'irrigation_soil_records', 'irrigation_soil_rooting_profiles', 'irrigation_soil_rooting_stages', 'irrigation_soil_settings', 'irrigation_soil_surface_declarations', 'irrigation_support_accesses',
     'irrigation_water_infrastructure_log',
     'irrigation_water_reservoir_links',
     'irrigation_water_reservoirs',

@@ -24,6 +24,8 @@ import { getIrrigationSnapshot } from './irrigation-service';
 import { notifyMorningSuggestions, type PlanningAlarmScheduler } from './planning-notifications';
 import { emptyPumpDashboard } from './pump-dashboard';
 import { getWaterDashboardForUser } from './water-dashboard';
+import { getOnboardingForUser } from './onboarding-service';
+import { PLANNING_AWAITS_SETTINGS, planningAllowed } from '../domain/onboarding/settings-review';
 
 /**
  * Le service du planning hebdomadaire (docs/planning-contract.md) : il
@@ -58,6 +60,8 @@ export async function computeWeeklyPlanForUser({
   /** Le Worker de notification, remplaçable en test ; le calcul du matin seul s'en sert (3.7, règles 21 à 23). */
   scheduleAlarm?: PlanningAlarmScheduler;
 }): Promise<StoredWeeklyPlan> {
+  // Une ferme neuve n'a aucun planning avant d'avoir validé les réglages du planning (4.4, F424, réponse Q10, F588).
+  if (!planningAllowed(await getOnboardingForUser(ownerUserId))) throw new PlanningAwaitsSettingsError();
   const weekStart = weekStartDateKey(now, FARM_TIME_ZONE);
   const weekEnd = addDaysToDateKey(weekStart, 6);
   const weekStartAt = localDateStartUtc(weekStart, FARM_TIME_ZONE);
@@ -159,6 +163,14 @@ export async function computeWeeklyPlanForUser({
   return stored;
 }
 
+/** Le planning d'une ferme neuve attend la validation de ses réglages (F588) : l'écran dit où la faire. */
+export class PlanningAwaitsSettingsError extends Error {
+  constructor() {
+    super(PLANNING_AWAITS_SETTINGS);
+    this.name = 'PlanningAwaitsSettingsError';
+  }
+}
+
 /** Le dernier plan enregistré de la semaine courante, sans recalcul. */
 export async function readWeeklyPlanForUser({ ownerUserId, season, now = new Date() }: { ownerUserId: string; season: number; now?: Date }): Promise<StoredWeeklyPlan | null> {
   return readLatestPlanForUser(ownerUserId, season, weekStartDateKey(now, FARM_TIME_ZONE));
@@ -180,6 +192,8 @@ export async function recalculateWeeklyPlansForAllWorkspaces({
   // Seules les fermes qui ont coché le Planning reçoivent le calcul du matin et sa notification (3.8, R1).
   for (const { ownerUserId } of await listFarmsWithFeature('planning')) {
     try {
+      // Une ferme neuve qui n'a pas validé les réglages du planning n'en reçoit pas : ni calcul, ni échec compté (F588).
+      if (!planningAllowed(await getOnboardingForUser(ownerUserId))) continue;
       const stopwatch = startStopwatch();
       // Le calcul du matin peut attendre qu'une minute ait la place pour lire la ferme (F362).
       const snapshot = await getIrrigationSnapshot(ownerUserId, { season, context: 'morning' });

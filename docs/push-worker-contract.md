@@ -7,10 +7,11 @@ service n’est envoyé au navigateur.
 
 ## Frontière serveur
 
-L’application appelle cinq routes versionnées : inscription et retrait d’un
-abonnement, programmation et annulation d’une alarme, et, depuis la 5 bis
+L’application appelle six routes versionnées : inscription et retrait d’un
+abonnement, programmation et annulation d’une alarme, depuis la 5 bis
 (31 octobre 2026), envoi immédiat d’une notification (voir « Envoi
-immédiat »). Ces appels utilisent
+immédiat »), et, depuis le 20 novembre 2026, oubli de tous les appareils
+d’un espace effacé (voir « Un espace effacé, un appareil muet »). Ces appels utilisent
 HTTPS, un jeton Bearer serveur et un délai maximal de huit secondes. Sur
 Cloudflare, ils passent par la liaison de service `IRRIGATION_PUSH` : un
 Worker ne peut pas joindre un autre Worker du même compte par son adresse
@@ -52,7 +53,9 @@ traits d’union, rien d’autre.
 - une même révision délivrée est mémorisée par abonnement afin d’éviter un
   doublon ;
 - les abonnements expirés sont retirés ; les échecs transitoires sont retentés
-  avec temporisation bornée, au maximum douze tentatives.
+  avec temporisation bornée, au maximum douze tentatives ;
+- un abonnement sans réponse du service depuis 90 jours est retiré comme un
+  abonnement expiré (voir « Un espace effacé, un appareil muet »).
 
 ## Un appareil, une personne (18 novembre 2026)
 
@@ -86,6 +89,26 @@ dans les deux espaces et recevait les notifications des deux.
 Le service worker `public/irrigation-notifications-sw.js` affiche une
 notification persistante et sécurise l’URL ouverte au clic. Une panne Push
 n’altère jamais l’état métier du minuteur ou de l’historique.
+
+## Un espace effacé, un appareil muet (20 novembre 2026)
+
+`docs/tranche-4-contract.md`, 10 bis.19, F654 à F656 (D-248).
+
+- **L’oubli d’un espace effacé.** Route `/v1/recipients/forget`, avec le seul
+  identifiant de l’espace. Chaque appareil de sa liste quitte l’espace : sa
+  fiche le perd, et s’il ne sert plus aucun espace, la fiche est oubliée,
+  l’empreinte de la personne avec elle ; puis sa ligne part. La réponse dit
+  combien d’appareils ont été oubliés ; un second oubli n’a plus rien à
+  faire. Le module l’appelle à la fin de l’effacement d’une ferme, avant de
+  le noter fait : sans réponse, rien n’est noté. Les alarmes en attente ne
+  sont pas rangées par espace : elles ne trouvent plus aucun appareil quand
+  elles partent, et disparaissent alors.
+- **Un appareil muet.** Chaque abonnement garde l’heure de son premier envoi
+  manqué depuis sa dernière réussite (`failing_since`) ; une réussite
+  l’efface. À un envoi manqué, si elle a 90 jours ou plus, l’abonnement est
+  retiré comme un abonnement expiré, sa fiche oubliée. Un abonnement à qui
+  rien n’est envoyé n’est jamais « sans réponse ». La colonne s’ajoute à
+  chaque liste à son premier réveil, ses lignes intactes.
 
 ## Priorité et toucher (6 novembre 2026)
 
@@ -157,7 +180,8 @@ même appareil inscrit par deux personnes, deux fermes d’une même personne,
 « Désactiver », les appareils d’avant le correctif, deux inscriptions
 simultanées, une alarme programmée avant le changement de personne, les
 nouvelles tentatives de deux espaces, la vérification qui échoue et
-l’appareil expiré.
+l’appareil expiré ; depuis le 20 novembre 2026, l’oubli d’un espace effacé,
+l’appareil muet depuis 90 jours et la colonne ajoutée à une liste ancienne.
 
 Ces tests ne remplacent pas une recette physique avec téléphone verrouillé ou
 navigateur réellement arrêté. Cette vérification reste manuelle et ne doit

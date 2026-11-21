@@ -2,8 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Plot, Zone } from '../lib/domain/domain.ts';
 import { parseDecimal, parseShare, shareLabel, soilSettingsView } from '../lib/domain/soil-reserve/settings-view.ts';
+import { soilStartingValues } from '../lib/domain/onboarding/soil.ts';
 import { DEFAULT_SOIL_SETTINGS, type SoilSettingsRevision } from '../lib/domain/soil-reserve/soil.ts';
 import { FARM_SOIL, soilRecord } from './support/soil-reserve-fixtures.ts';
+
+const STARTING = soilStartingValues({ kind: 'demonstration' });
 
 /**
  * Les réglages de la réserve du sol tels que l'écran les montre (5 ter,
@@ -57,6 +60,7 @@ test('par parcelle et par jardin de la saison : la saisie qui vaut aujourd’hui
     records: [older, sameDayEarlier, future, sameDayLater, own],
     settings: [],
     today: '2026-06-10',
+    starting: STARTING,
   });
 
   assert.deepEqual(view.zones.map((item) => item.zoneId), ['parcelle']);
@@ -76,7 +80,7 @@ test('par parcelle et par jardin de la saison : la saisie qui vaut aujourd’hui
 });
 
 test('sans réglage, l’exploitation part des valeurs par défaut ; ensuite, le réglage qui vaut aujourd’hui, l’histoire comprise', () => {
-  const empty = soilSettingsView({ zones: ZONES, plots: PLOTS, season: 2026, records: [], settings: [], today: '2026-06-10' });
+  const empty = soilSettingsView({ zones: ZONES, plots: PLOTS, season: 2026, records: [], settings: [], today: '2026-06-10', starting: STARTING });
   assert.equal(empty.farm.isDefault, true);
   assert.deepEqual(empty.farm.current, DEFAULT_SOIL_SETTINGS);
   assert.deepEqual(empty.farm.history, []);
@@ -84,7 +88,7 @@ test('sans réglage, l’exploitation part des valeurs par défaut ; ensuite, le
 
   const farm = revision({ threshold: { mode: 'farm', percent: 50 }, effectiveFrom: '2026-05-01', recordedAt: '2026-05-01T08:00:00.000Z' });
   const back = revision({ effectiveFrom: '2026-07-01', recordedAt: '2026-06-09T08:00:00.000Z' });
-  const view = soilSettingsView({ zones: ZONES, plots: PLOTS, season: 2026, records: [], settings: [revision({}), back, farm], today: '2026-06-10' });
+  const view = soilSettingsView({ zones: ZONES, plots: PLOTS, season: 2026, records: [], settings: [revision({}), back, farm], today: '2026-06-10', starting: STARTING });
   assert.equal(view.farm.isDefault, false);
   assert.deepEqual(view.farm.current, { threshold: { mode: 'farm', percent: 50 }, surface: DEFAULT_SOIL_SETTINGS.surface, plasticMulchRainShare: 1 });
   assert.deepEqual(view.farm.history.map((item) => item.effectiveFrom), ['2026-07-01', '2026-05-01', '2026-01-01']);

@@ -8,11 +8,13 @@ import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
 import { listProtectedSlotsForUser } from '@/db/protected-slots-repository';
 import { usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
+import { plotShelterLines } from '@/lib/domain/onboarding/plots';
 import { calculateIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
 import { getCropCoefficientsViewForUser } from '@/lib/services/crop-water-coefficients';
 import { getIrrigationFormHintsForUser } from '@/lib/services/irrigation-form-hints';
 import { getIrrigationHistoryDashboardForUser } from '@/lib/services/irrigation-history-service';
 import { getIrrigationNeedsDashboardForUser } from '@/lib/services/irrigation-needs-service';
+import { getOnboardingForUser } from '@/lib/services/onboarding-service';
 import { readWeeklyPlanForUser } from '@/lib/services/planning-service';
 import { shortageDecisionPending } from '@/lib/domain/planning/shortage-reading';
 import { emptyPumpDashboard, getPumpDashboardForUser } from '@/lib/services/pump-dashboard';
@@ -22,6 +24,7 @@ import { getWaterResourceDashboardForUser } from '@/lib/services/water-resource-
 import { getTodayViewForUser } from '@/lib/services/today-service';
 import type { ReadyPageContext } from './page-context';
 
+import { getSettingsReviewForUser } from '@/lib/services/onboarding-settings';
 /**
  * Chaque page ne lit que ses données (3.8, docs/feature-selection-contract.md,
  * section 5) : avant la 3.8, la page unique chargeait tous les tableaux de
@@ -217,13 +220,18 @@ export async function loadHistoriquePage(context: ReadyPageContext) {
  * lieu de la météo et la correspondance des espèces (P3).
  */
 export async function loadReglagesPage(context: ReadyPageContext) {
-  const [counts, waterDashboard, cropCoefficients] = await Promise.all([
+  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview] = await Promise.all([
     countFeatureDataForUser(context.userId),
+    getOnboardingForUser(context.userId),
     usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
     usesSpeciesCorrespondence(context.enabled)
       ? getCropCoefficientsViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot })
       : null,
+    // « Réglages à relire », pour une ferme qui fait l'accueil (4.4, F588).
+    getSettingsReviewForUser(context.userId, context.enabled),
   ]);
   context.lap('dashboards');
-  return { counts, waterDashboard, cropCoefficients };
+  // Le classement des jardins, pour une ferme qui fait l'accueil (4.4, F583).
+  const plotShelters = plotShelterLines(context.snapshot, context.season);
+  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview };
 }

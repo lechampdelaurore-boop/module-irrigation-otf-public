@@ -69,7 +69,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   sol: 3_000,
   // PR 4 (F459) : « Correspondance des espèces » pliée ; 4 378 → 3 338 px avec les 4 espèces des
   // données des parcours (sur la ferme du porteur, 77 espèces, 8 700 px de moins attendus).
-  reglages: 3_400,
+  // 4.5, PR 3, troisième partie (F665) : « Supprimer ma ferme et mes données », un pli fermé en bas
+  // de la page ; 3 338 → 3 482 px (CI du 21 novembre 2026), d'où 3 500 au lieu de 3 400.
+  reglages: 3_500,
   // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
   // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
   besoins: 2_800,

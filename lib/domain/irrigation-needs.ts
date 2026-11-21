@@ -35,7 +35,8 @@ export type IrrigationNeedDecision = {
 
 type IrrigationNeedCompleteness = {
   complete: boolean;
-  missing: Array<'objective' | 'actual-rain' | 'forecast-rain'>;
+  /** `unclassified-plot` : le jardin est à classer, abri ou plein champ (4.4, F583). */
+  missing: Array<'objective' | 'actual-rain' | 'forecast-rain' | 'unclassified-plot'>;
   demandComplete: boolean;
   realComplete: boolean;
   planningComplete: boolean;
@@ -227,9 +228,11 @@ export function buildIrrigationNeedsDashboard(input: {
     const zone = zones.get(bed.zoneId);
     if (!plot || !zone) continue;
     const sheltered = plot.mode === 'greenhouse';
+    // Un jardin à classer (4.4, F583) : on ne sait pas s'il reçoit la pluie ; son besoin n'est pas calculé.
+    const unclassified = plot.mode === 'unclassified';
     const objective = objectiveForBed(goalRevisions, bed, weekStart, weekEnd);
-    const actualRain = sheltered ? 0 : actualExteriorRainMm;
-    const forecastRain = sheltered ? 0 : forecastExteriorRainMm;
+    const actualRain = unclassified ? null : sheltered ? 0 : actualExteriorRainMm;
+    const forecastRain = unclassified ? null : sheltered ? 0 : forecastExteriorRainMm;
     const actualIrrigation = actualByBed.get(bed.id) ?? 0;
     const plannedIrrigation = plannedByBed.get(bed.id) ?? 0;
     const realRemaining = realRemainingMm(objective.value, actualRain, actualIrrigation);
@@ -240,11 +243,12 @@ export function buildIrrigationNeedsDashboard(input: {
     const wettedArea = resolveBedWettedArea(bed, positionedKindsByBed.get(bed.id) ?? []);
     // Une ET0 incomplète est signalée par missingDates.et0 mais ne bloque jamais le besoin (D-010).
     const demandMissing: IrrigationNeedCompleteness['missing'] = [];
+    if (unclassified) demandMissing.push('unclassified-plot');
     if (!objective.complete) demandMissing.push('objective');
     const realMissing: IrrigationNeedCompleteness['missing'] = [...demandMissing];
-    if (!sheltered && actualRainMissingDates.length > 0) realMissing.push('actual-rain');
+    if (!sheltered && !unclassified && actualRainMissingDates.length > 0) realMissing.push('actual-rain');
     const planningMissing: IrrigationNeedCompleteness['missing'] = [...realMissing];
-    if (!sheltered && forecastRainMissingDates.length > 0) planningMissing.push('forecast-rain');
+    if (!sheltered && !unclassified && forecastRainMissingDates.length > 0) planningMissing.push('forecast-rain');
     const missing = [...new Set(planningMissing)];
     const row: BedIrrigationNeed = {
       bedId: bed.id, bedName: bed.name, plotId: plot.id, plotName: plot.name,

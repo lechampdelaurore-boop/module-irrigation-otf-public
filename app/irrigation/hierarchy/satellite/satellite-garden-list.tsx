@@ -42,7 +42,7 @@ export function SatelliteGardenList({ gardens, highlightedPlotId, onSelectGarden
           <>
             {/* Le numéro que la carte montre à la place d'un nom qui n'y tient pas : la liste sert de légende (lot K, n° 16, F468). */}
             <strong><span className="satellite-garden-number" aria-hidden="true">{index + 1}</span>{garden.name}</strong>
-            <span>{garden.mode === 'greenhouse' ? 'abri' : 'plein champ'}</span>
+            <span>{garden.mode === 'greenhouse' ? 'abri' : garden.mode === 'unclassified' ? 'à classer' : 'plein champ'}</span>
             <span>{formatMeasure(garden.areaSquareMeters, 'm²')}</span>
             <span className="satellite-garden-outline">
               {garden.outlined ? 'contour dessiné' : 'contour non dessiné'}

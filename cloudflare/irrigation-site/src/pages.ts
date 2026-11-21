@@ -12,7 +12,7 @@ import { escapeHtml, renderPage } from './layout.ts';
 
 export const RESPONSIBLE = "François PREZEAU, GAEC Le Champ de l'Aurore";
 /** La date de chaque texte : celui des conditions n'a pas changé depuis sa validation. */
-const PRIVACY_TEXT_DATE = '19 novembre 2026';
+const PRIVACY_TEXT_DATE = '20 novembre 2026';
 const TERMS_TEXT_DATE = '18 novembre 2026';
 
 /** Une adresse électronique plausible : une valeur mal saisie ne s'affiche pas. */
@@ -60,6 +60,7 @@ export function homePage(contactEmail: string | undefined): string {
 <h2>Contact</h2>
 <p>Responsable : ${RESPONSIBLE}. Pour toute question, de préférence par Discord ; sinon ${contactHtml(contactEmail)}.</p>
 <p>En cas de problème, décrivez-le bien par écrit : sur quelle page, ce que vous faisiez, ce qui s'est passé. Joignez des captures d'écran si possible.</p>
+<p>Une seule personne s'occupe du module : réponse en général sous deux jours ouvrés, sans engagement.</p>
 <p>Lire aussi la <a href="${PAGE_PATHS.privacy}">politique de confidentialité</a> et les <a href="${PAGE_PATHS.terms}">conditions d'utilisation</a>. Le code du module est public : <a href="${SOURCE_URL}">page du projet</a>.</p>`,
   });
 }
@@ -96,19 +97,24 @@ export function privacyPage(contactEmail: string | undefined): string {
 <li><strong>La météo de votre commune</strong> : prévisions et valeurs passées, jour par jour.</li>
 <li><strong>Un identifiant de connexion</strong> fourni par le service de connexion (une suite de caractères, pas votre adresse électronique). Votre adresse s'affiche à l'écran une fois connecté, mais le module ne l'enregistre pas.</li>
 <li><strong>Si vous activez les notifications</strong> : l'adresse technique que votre navigateur fournit pour les recevoir.</li>
+<li><strong>Le compte des lectures dans Ouvre ta ferme</strong> : pour chaque ferme, combien de demandes de lecture le module a envoyées, à quelle heure, et la réponse reçue (acceptée, refusée, pas de réponse) ; jamais ce qui a été lu. Il sert à respecter les limites d'Ouvre ta ferme et à voir une panne.</li>
 <li><strong>Dans votre navigateur</strong> : deux préférences d'affichage (le fond de carte choisi, l'avancement de la visite guidée). Aucun témoin (cookie) publicitaire ni de mesure d'audience ; le seul témoin est celui de la connexion.</li>
 </ul>
 
 <h2>Combien de temps</h2>
 <ul>
-<li>Vos données de ferme sont gardées tant que la ferme utilise le module. Sur demande, elles sont effacées entièrement, dans un délai d'un mois au plus.</li>
+<li>Vos données de ferme sont gardées tant que la ferme utilise le module. Vous pouvez demander vous-même leur effacement complet, dans les réglages du module (« Supprimer ma ferme et mes données ») : il a lieu sept jours après la demande, et vous pouvez annuler jusque-là ; pendant ce temps, le module ne calcule plus rien et ne lit plus votre ferme. Une demande écrite au responsable est traitée dans un délai d'un mois au plus. Le module garde seulement la preuve que la demande a été traitée : un numéro interne et des dates, sans nom, sans ferme et sans contenu.</li>
+<li>L'hébergeur garde un historique de la base de données, qui permet de la remettre dans l'état d'un jour passé après une panne. Une donnée effacée reste récupérable dans l'historique jusqu'à 30 jours.</li>
+<li>Chaque semaine, le responsable du module fait une copie chiffrée de la base de données, qu'il garde lui-même hors de l'hébergeur, pour le cas où l'hébergement serait perdu. Chaque copie est effacée au bout de cinq semaines au plus : une donnée effacée peut y rester jusque-là.</li>
+<li>Le compte des lectures dans Ouvre ta ferme est gardé 30 jours au plus.</li>
 <li>Les journaux techniques du module (erreurs, durées) sont gardés sept jours par l'hébergeur.</li>
-<li>L'abonnement aux notifications est gardé jusqu'à ce que vous les désactiviez ou que votre navigateur le retire.</li>
+<li>La note de chaque consultation des données de votre ferme par le responsable est gardée 12 mois ; elle est aussi effacée avec vos données de ferme.</li>
+<li>L'abonnement aux notifications est gardé jusqu'à ce que vous les désactiviez ou que votre navigateur le retire. Il est aussi effacé avec vos données de ferme, et quand plus aucune notification n'a pu lui être remise depuis 90 jours.</li>
 </ul>
 
 <h2>Où sont les données</h2>
 <p>Chez l'hébergeur Cloudflare (société américaine Cloudflare, Inc.), dans sa base de données D1 et ses serveurs Workers. L'emplacement exact des serveurs n'est pas choisi par le responsable du module.</p>
-<p>Le responsable du module administre cet hébergement : il peut techniquement lire les données de chaque ferme dans la base de données et dans les journaux techniques. Il ne les consulte que pour faire fonctionner le module, répondre à une demande ou corriger une panne.</p>
+<p>Le responsable du module administre cet hébergement : il peut techniquement lire les données de chaque ferme dans la base de données et dans les journaux techniques. Il ne les consulte que pour faire fonctionner le module, répondre à une demande ou corriger une panne. Quand il regarde les données de votre ferme, il le note : le jour, la ferme et la raison en une ligne, jamais ce qu'il a vu.</p>
 
 <h2>Ce qui sort vers l'extérieur</h2>
 <p>Rien n'est vendu, loué ni transmis à des fins commerciales. Seuls ces échanges ont lieu, chacun pour faire fonctionner le module :</p>

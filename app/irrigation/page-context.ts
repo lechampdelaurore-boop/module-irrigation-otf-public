@@ -23,8 +23,21 @@ import { getIrrigationSnapshot, IrrigationDataUnavailableError } from '@/lib/ser
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
 import { DemoSpacePreparingError } from '@/lib/services/demo-space';
+import { FarmFrozenError } from '@/lib/services/farm-erasure-request';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
+import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
+import { usesPlotShelters, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
+import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
+import { getOnboardingForUser } from '@/lib/services/onboarding-service';
+import { listZonesWithSoilForUser } from '@/db/soil-reserve/entries';
+import { parcelsWithoutSoil } from '@/lib/domain/onboarding/soil';
+import { soilParcelAnchor } from '@/lib/domain/today/reliability';
+import { listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries';
+import { findWorkspaceIdForUser } from '@/db/workspace-repository';
+import { seasonSpecies } from '@/lib/domain/crop-water/species';
+import { speciesNeedsLink } from '@/lib/domain/crop-water/species-linking';
+import { planningAllowed } from '@/lib/domain/onboarding/settings-review';
 import type { ShellProps } from './shell/irrigation-shell';
 import type { UnavailableStateProps } from './shell/unavailable-state';
 
@@ -81,8 +94,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   try {
     user = await requireAuthenticatedUser();
   } catch (error) {
-    if (error instanceof FarmIdentityUnavailableError) return { kind: 'unavailable', props: farmUnidentifiedState(page, season, error) };
-    if (error instanceof DemoSpacePreparingError) return { kind: 'unavailable', props: demoPreparingState(page, season) };
+    const props = accessRefusedState(page, season, error);
+    if (props) return { kind: 'unavailable', props };
     throw error;
   }
   const signOutHref = signOutPath();
@@ -100,7 +113,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const enabled: FeatureId[] = selection.enabled;
   stopwatch.lap('selection');
 
-  const loaded = await loadSnapshot(user.userId, season, forceRefresh);
+  // L'accueil de la ferme se lit avec le plan : le bandeau « À finir » de chaque page (4.4, F582).
+  const [loaded, onboarding] = await Promise.all([loadSnapshot(user.userId, season, forceRefresh), getOnboardingForUser(user.userId)]);
   stopwatch.lap('snapshot');
   if (!loaded.snapshot) {
     return {
@@ -120,6 +134,13 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     };
   }
   const snapshot = loaded.snapshot;
+  // Le sol des parcelles ne se lit que pour un espace qui fait l'accueil et a coché la réserve du sol (F584).
+  const withoutSoil = onboarding.kind === 'onboarding' && enabled.includes('sol')
+    ? parcelsWithoutSoil(snapshot.zones, season, new Set(await listZonesWithSoilForUser(user.userId)))
+    : [];
+  // Les espèces à rattacher ne se comptent que tant que l'étape « Cultures » d'un espace qui fait l'accueil reste à faire (F587).
+  const speciesToLink = await countSpeciesToLink(user.userId, snapshot, season, onboarding.kind === 'onboarding'
+    && onboarding.remaining.some((step) => step.id === 'crops') && usesSpeciesCorrespondence(enabled));
   return {
     kind: 'ready',
     page,
@@ -148,6 +169,13 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       notice: absentPageNotice(params.absente),
       demo: isDemoDeployment(),
       demoSelection: isDemoDeployment() ? demoSelectionOfOwner(user.userId) : null,
+      unfinished: unfinishedSteps(onboarding, {
+        weather: usesWeather(enabled),
+        plotsToClassify: usesPlotShelters(enabled) ? unclassifiedPlots(snapshot, season).length : 0,
+        soilToEnter: withoutSoil.length > 0 ? { parcels: withoutSoil.length, anchor: soilParcelAnchor(withoutSoil[0]) } : null,
+        speciesToLink,
+        planningToValidate: enabled.includes('planning') && !planningAllowed(onboarding),
+      }),
     },
     lap: (step) => stopwatch.lap(step),
     logLoaded: () => {
@@ -159,10 +187,23 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
 }
 
 /**
+ * Ce que montre une page quand la personne n'entre pas dans son espace : la
+ * ferme de la clé n'est pas établie (F341), la démonstration se prépare
+ * (F450), ou l'espace est figé par une demande d'effacement (F666). `null` :
+ * une autre erreur, que l'appelant relance.
+ */
+export function accessRefusedState(page: IrrigationPageId, season: number, error: unknown): UnavailableStateProps | null {
+  if (error instanceof FarmIdentityUnavailableError) return farmUnidentifiedState(page, season, error);
+  if (error instanceof DemoSpacePreparingError) return demoPreparingState(page, season);
+  if (error instanceof FarmFrozenError) return farmFrozenState(page, season, error);
+  return null;
+}
+
+/**
  * La ferme de la clé n'est pas établie (docs/tranche-4-contract.md, F341) :
  * aucune page ne s'affiche, et celle-ci le dit à la personne.
  */
-export function farmUnidentifiedState(page: IrrigationPageId, season: number, error: FarmIdentityUnavailableError): UnavailableStateProps {
+function farmUnidentifiedState(page: IrrigationPageId, season: number, error: FarmIdentityUnavailableError): UnavailableStateProps {
   return {
     page,
     signOutPath: signOutPath(),
@@ -178,8 +219,18 @@ export function farmUnidentifiedState(page: IrrigationPageId, season: number, er
  * L'espace de la démonstration se prépare dans une autre requête (audit du
  * 19 novembre 2026, lot I, n° 11, F450) : la page le dit, et se relit seule.
  */
-export function demoPreparingState(page: IrrigationPageId, season: number): UnavailableStateProps {
+function demoPreparingState(page: IrrigationPageId, season: number): UnavailableStateProps {
   return { page, signOutPath: signOutPath(), userName: '', season, reason: 'demo-preparing', demo: true, demoSelection: null };
+}
+
+/**
+ * L'espace a une demande d'effacement ouverte (docs/tranche-4-contract.md,
+ * F666) : aucune page ne s'affiche, aucune lecture d'Ouvre ta ferme ne part ;
+ * l'écran dit le jour de l'effacement et, tant qu'il n'a pas commencé, offre
+ * l'annulation.
+ */
+function farmFrozenState(page: IrrigationPageId, season: number, error: FarmFrozenError): UnavailableStateProps {
+  return { page, signOutPath: signOutPath(), userName: error.displayName, season, reason: 'farm-frozen', demo: false, demoSelection: null, frozen: error.view };
 }
 
 type SnapshotLoadResult =
@@ -199,4 +250,12 @@ async function loadSnapshot(userId: string, season: number, forceRefresh: boolea
     }
     throw error;
   }
+}
+
+/** Les espèces de la saison à rattacher (F587), lues seulement quand le bandeau peut les nommer. */
+async function countSpeciesToLink(spaceKey: string, snapshot: IrrigationSnapshot, season: number, wanted: boolean): Promise<number> {
+  if (!wanted || !snapshot.cropPlan) return 0;
+  const workspaceId = await findWorkspaceIdForUser(spaceKey);
+  const entries = workspaceId === null ? [] : await listSpeciesCorrespondencesForWorkspace(workspaceId);
+  return seasonSpecies(snapshot.cropPlan.series.filter((item) => item.season === season), entries).filter(speciesNeedsLink).length;
 }

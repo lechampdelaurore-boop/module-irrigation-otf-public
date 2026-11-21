@@ -26,6 +26,80 @@ export async function ouvrirUneFermeToutCochee(page: Page, context: BrowserConte
   await attendreLaPagePrete(page, 'aujourdhui');
 }
 
+/**
+ * Une ferme neuve choisit la commune de sa ferme (4.4, F419, F582) : sans
+ * elle, ni météo, ni gel, ni ET0. Ici, le siège de la structure, pris en
+ * dernier recours dans Réglages, par le lien du bandeau « À finir ».
+ */
+async function choisirLeSiegeCommeCommune(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  await page.locator('.onboarding-unfinished').getByRole('link', { name: 'commune de la ferme' }).click();
+  // Le lien porte la saison : la page se recharge, et répond après son titre.
+  await expect(page).toHaveURL(/#water-weather-title$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Prendre le siège OTF, en dernier recours' }).click();
+  await expect(page.getByText('La commune du siège OTF est utilisée, en dernier recours.')).toBeVisible();
+}
+
+/**
+ * Une ferme neuve classe ses jardins comme proposé (4.4, F420, F583) : sans
+ * classement, leur besoin en eau n'est pas calculé. Dans Réglages, par le
+ * lien du bandeau « À finir », après avoir lu chaque proposition.
+ */
+async function classerLesJardinsCommeProposes(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  await page.locator('.onboarding-unfinished').getByRole('link', { name: /jardins? à classer$/ }).click();
+  await expect(page).toHaveURL(/#parcelles-et-abris$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Confirmer les propositions restantes' }).click();
+  await expect(page.getByText(/^\d+ jardins? classés? comme proposé\.$/)).toBeVisible();
+}
+
+/**
+ * Une ferme neuve confirme l'étape « Cultures » (4.4, F587) sans rien
+ * rattacher : ses espèces restent comme le parcours les attend, et le
+ * bandeau « À finir » ne les rappelle plus. Seulement quand le bandeau les
+ * nomme : une case qui lit la correspondance des espèces est cochée.
+ */
+async function confirmerLEtapeDesCultures(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  const lien = page.locator('.onboarding-unfinished').getByRole('link', { name: /espèces? à rattacher$/ });
+  if (await lien.count() === 0) return;
+  await lien.click();
+  await expect(page).toHaveURL(/#rattachez-vos-especes$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Confirmer l’étape « Cultures »' }).click();
+  await expect(page.getByText('L’étape « Cultures » est confirmée.')).toBeVisible();
+}
+
+/**
+ * Une ferme neuve valide les réglages du planning (4.4, F424, F588) : sans
+ * eux, aucun planning. Seulement quand le bandeau le demande : le Planning
+ * est coché.
+ */
+async function validerLesReglagesDuPlanning(page: Page): Promise<void> {
+  await page.goto('/irrigation/reglages');
+  await attendreLaPagePrete(page, 'reglages');
+  const lien = page.locator('.onboarding-unfinished').getByRole('link', { name: 'réglages du planning à valider' });
+  if (await lien.count() === 0) return;
+  await lien.click();
+  await expect(page).toHaveURL(/#reglages-a-relire$/);
+  await attendreLaPagePrete(page, 'reglages');
+  await page.getByRole('button', { name: 'Valider « Planning »' }).click();
+  await expect(page.locator('section.settings-review').getByRole('status')).toHaveText('Planning : validé.');
+}
+
+/** Une ferme neuve qui a fait ce que les calculs attendent d'elle : sa commune, ses jardins, l'étape « Cultures » et les réglages du planning (4.4, F582, F583, F587, F588). */
+export async function preparerLaFermeNeuve(page: Page): Promise<void> {
+  await choisirLeSiegeCommeCommune(page);
+  await classerLesJardinsCommeProposes(page);
+  await confirmerLEtapeDesCultures(page);
+  await validerLesReglagesDuPlanning(page);
+}
+
 /** L'écran de la première ouverture, prêt à répondre. */
 export async function attendreLeChoixDesFonctionnalites(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/irrigation\/bienvenue$/);

@@ -14,6 +14,7 @@ import { validatePumpAssignmentForUser } from '../../lib/services/pump-service';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, createDripFixture, type IrrigationFixture } from '../support/irrigation-fixtures';
 import { ALICE } from '../support/spaces';
+import { validatePlanningSettings } from '../support/onboarding';
 
 /**
  * Pose datée et stockage du matériel, ce que voient les calculs (sous-tranche
@@ -51,6 +52,7 @@ const snapshot: IrrigationSnapshot = {
 };
 
 async function farmWithTwoDrips(pumpMaximumCubicMetersPerHour = 8) {
+  await validatePlanningSettings(ALICE);
   const first = await createDripFixture(ALICE, { name: 'Goutte-à-goutte P1', beds: ['bed-1'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
   const second = await createDripFixture(ALICE, { name: 'Goutte-à-goutte P2', beds: ['bed-2'], rateMmPerHour: 14, bedAreaSquareMeters: 30 });
   const resourceId = await saveWaterResourceForUser(ALICE, ALICE, null, { name: 'Forage', type: 'borehole', nominalFlowCubicMetersPerHour: 0.511, status: 'active', availableFrom: null, availableUntil: null, notes: null });
