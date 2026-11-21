@@ -48,6 +48,18 @@ test('chaque écrivain d’une table du journal est dans l’inventaire, et l’
   assert.deepEqual(listed.filter((key) => !found.includes(key)), [], 'un écrivain de l’inventaire qui n’existe plus');
 });
 
+test('un écrivain branché nomme son sujet dans son code, et seul un écrivain branché écrit au journal', () => {
+  const bodies = new Map(sites.map((site) => [siteKey(site.file, site.fn, site.table), site.body]));
+  // Une table fille est écrite par la fonction de sa mère : c'est la ligne de la mère qui dit le changement.
+  const functionOf = (key: string) => key.split(' › ').slice(0, 2).join(' › ');
+  const wiredFunctions = new Set(Object.entries(JOURNAL_WRITE_SITES).filter(([, site]) => site.status === 'branche').map(([key]) => functionOf(key)));
+  for (const [key, site] of Object.entries(JOURNAL_WRITE_SITES)) {
+    const body = bodies.get(key) ?? '';
+    if (site.status === 'branche') assert.ok(body.includes(`'${site.subject}'`), `${key} : écrit sa ligne sous « ${site.subject} »`);
+    else if (!wiredFunctions.has(functionOf(key))) assert.ok(!/Journal\(/.test(body), `${key} : rangé ${site.status}, mais écrit au journal`);
+  }
+});
+
 test('un écrivain sans objet dit pourquoi', () => {
   for (const [key, site] of Object.entries(JOURNAL_WRITE_SITES)) {
     if (site.status === 'sans-objet') assert.ok(site.reason.trim().length > 40, `${key} : sans objet avec sa raison`);

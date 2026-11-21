@@ -845,6 +845,18 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
+  objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
+  F719, F720), empilée sur la PR 4. Les 23 écrivains des objectifs et des
+  réglages (§5.1) écrivent leur ligne dans leur lot, l'avant lu dans le
+  lot : objectifs hydriques (posés, adoptés, retirés), seuil de besoin,
+  décisions de planche, planning, créneaux protégés, limites d'eau (journée
+  et ressource), sol (parcelle, réglages, profondeur des racines), alertes
+  météo et par culture, fonctionnalités, message du matin, rappel du soir.
+  L'inventaire les dit « branchés » ; son test vérifie que chacun nomme son
+  sujet dans son code. Restent 21 écrivains du matériel et des ressources
+  (PR 6) et l'écran (PR 7). Sans migration. Contrôles : voir la PR.
+
 - Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
   table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
   contrat, F716 à F718, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
@@ -906,7 +918,10 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
   local aux deux largeurs ; la suite complète par la CI de la PR. Le
   nouveau déclencheur se déploie avec le planificateur, à la fusion. À
-  fusionner après la PR de la n° 3.
+  fusionner après la PR de la n° 3. **En ligne le 22 novembre 2026 à
+  0 h 03** (#165, fusionnée le 21 novembre à 23 h 35, run 44957510571
+  vérifié job par job : les cinq jobs verts ; planificateur redéployé avec
+  le déclencheur « 5 * * * * »).
 
 - Améliorations, **n° 3, le message unique du matin : codée le
   21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2

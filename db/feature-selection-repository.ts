@@ -1,6 +1,7 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { spaceKeyOfRow } from './workspace-scope';
+import { featureSelectionJournal } from './change-journal/settings';
 import { FEATURE_IDS, FEATURES_BEFORE_SELECTION, type FeatureId } from '@/lib/domain/features/catalogue';
 import {
   isCompleteSelection,
@@ -115,7 +116,8 @@ export async function saveFeatureSelectionForUser(
   if (!isCompleteSelection(enabled)) throw new InvalidFeatureSelectionError();
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const at = now.toISOString();
-  await db.prepare(
+  // Le journal des modifications d'abord : l'avant est le choix en vigueur, tout coché avant le premier choix (amélioration n° 7, D-286).
+  await db.batch([featureSelectionJournal('fonctionnalites', { workspaceId, actorUserId: ownerUserId, at }, enabled), db.prepare(
     `INSERT INTO irrigation_feature_selections
        (workspace_id, enabled_features, known_features, chosen_at, banner_dismissed_at, updated_at)
      VALUES (?, ?, ?, ?, NULL, ?)
@@ -124,7 +126,7 @@ export async function saveFeatureSelectionForUser(
        known_features = excluded.known_features,
        chosen_at = excluded.chosen_at,
        updated_at = excluded.updated_at`,
-  ).bind(workspaceId, JSON.stringify(orderedSelection(enabled)), JSON.stringify(FEATURE_IDS), at, at).run();
+  ).bind(workspaceId, JSON.stringify(orderedSelection(enabled)), JSON.stringify(FEATURE_IDS), at, at)]);
 }
 
 /**

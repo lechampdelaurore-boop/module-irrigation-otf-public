@@ -5,6 +5,7 @@ import type { ChangeSubject } from '@/lib/domain/change-journal/subjects';
  * (amélioration n° 7, §5.2 ; D-285) : la table de l'objet touché, ou `null`
  * quand l'objet n'a pas de ligne propre (un réglage de toute la ferme, un
  * objectif repéré par sa planche et sa semaine, une culture d'Ouvre ta
+ * ferme, une culture de référence repérée par sa clé, commune ou de la
  * ferme) ; son repère est alors dans `object_context`.
  *
  * Le contrôle de cohérence des espaces (F380, tests/support/space-coherence.ts)
@@ -23,7 +24,7 @@ export const JOURNAL_OBJECT_TABLES: Readonly<Record<ChangeSubject, string | null
   'limite-de-ressource': 'irrigation_water_resources',
   'sol-de-parcelle': null,
   'reglages-du-sol': null,
-  'profil-racinaire': 'irrigation_crop_reference_crops',
+  'profil-racinaire': null,
   'critere-meteo': 'irrigation_weather_alert_criteria',
   'alertes-de-culture': null,
   'seuil-de-gel': null,

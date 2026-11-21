@@ -147,15 +147,15 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
 /**
  * Ce que fait un écrivain d'une table du journal :
  * - `branche` : il écrit sa ligne du journal, dans le même lot, sous ce sujet ;
- * - `a-brancher` : il le fera dans la PR nommée (amélioration n° 7, PR 5 ou 6) ;
+ * - `a-brancher` : il le fera dans la PR nommée (amélioration n° 7, PR 6) ;
  * - `sans-objet` : il n'a rien à y écrire, pour la raison dite.
  */
 export type WriteSiteStatus =
   | { status: 'branche'; subject: ChangeSubject }
-  | { status: 'a-brancher'; by: 'PR 5' | 'PR 6' }
+  | { status: 'a-brancher'; by: 'PR 6' }
   | { status: 'sans-objet'; reason: string };
 
-const PR5 = { status: 'a-brancher', by: 'PR 5' } as const;
+const branche = (subject: ChangeSubject) => ({ status: 'branche', subject }) as const;
 const PR6 = { status: 'a-brancher', by: 'PR 6' } as const;
 const sansObjet = (reason: string) => ({ status: 'sans-objet', reason }) as const;
 
@@ -169,34 +169,34 @@ const CHILD_OF = (parent: string) => sansObjet(`Table fille, écrite dans le mê
  */
 export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   // Objectifs.
-  'db/water-management-repository.ts › saveHydricGoalForUser › irrigation_hydric_goal_revisions': PR5,
-  'db/water-management-repository.ts › clearHydricGoalsForUser › irrigation_hydric_goal_revisions': PR5,
+  'db/water-management-repository.ts › saveHydricGoalForUser › irrigation_hydric_goal_revisions': branche('objectif-hydrique'),
+  'db/water-management-repository.ts › clearHydricGoalsForUser › irrigation_hydric_goal_revisions': branche('objectif-hydrique'),
   'db/water-management-repository.ts › ensureRecurringHydricGoalsForUser › irrigation_hydric_goal_revisions': sansObjet('Le report des objectifs de la semaine d’avant sur une semaine neuve, par le module : les mêmes valeurs, aucun geste ni changement.'),
-  'db/crop-water/adoptions.ts › saveAdoptedGoalForUser › irrigation_hydric_goal_revisions': PR5,
-  'db/irrigation-need-repository.ts › saveIrrigationNeedThresholdForUser › irrigation_need_preferences': PR5,
-  'db/irrigation-need-repository.ts › saveIrrigationBedNeedDecisionForUser › irrigation_bed_need_decisions': PR5,
+  'db/crop-water/adoptions.ts › saveAdoptedGoalForUser › irrigation_hydric_goal_revisions': branche('objectif-adopte'),
+  'db/irrigation-need-repository.ts › saveIrrigationNeedThresholdForUser › irrigation_need_preferences': branche('seuil-de-besoin'),
+  'db/irrigation-need-repository.ts › saveIrrigationBedNeedDecisionForUser › irrigation_bed_need_decisions': branche('decision-de-planche'),
   // Réglages.
-  'db/planning-repository.ts › savePlanningSettingsForUser › irrigation_planning_settings': PR5,
-  'db/protected-slots-repository.ts › createProtectedSlotForUser › irrigation_protected_slots': PR5,
-  'db/protected-slots-repository.ts › updateProtectedSlotForUser › irrigation_protected_slots': PR5,
-  'db/protected-slots-repository.ts › deleteProtectedSlotForUser › irrigation_protected_slots': PR5,
-  'db/water-management-repository.ts › saveDailyWaterLimitForUser › irrigation_daily_water_limit_revisions': PR5,
-  'db/water-resource-repository.ts › saveWaterResourceLimitForUser › irrigation_water_resource_limit_revisions': PR5,
-  'db/soil-reserve/entries.ts › addSoilRecordForUser › irrigation_soil_records': PR5,
-  'db/soil-reserve/entries.ts › addSoilSettingsForUser › irrigation_soil_settings': PR5,
-  'db/soil-reserve/entries.ts › addRootingProfileForUser › irrigation_soil_rooting_profiles': PR5,
+  'db/planning-repository.ts › savePlanningSettingsForUser › irrigation_planning_settings': branche('reglages-du-planning'),
+  'db/protected-slots-repository.ts › createProtectedSlotForUser › irrigation_protected_slots': branche('creneau-protege'),
+  'db/protected-slots-repository.ts › updateProtectedSlotForUser › irrigation_protected_slots': branche('creneau-protege'),
+  'db/protected-slots-repository.ts › deleteProtectedSlotForUser › irrigation_protected_slots': branche('creneau-protege'),
+  'db/water-management-repository.ts › saveDailyWaterLimitForUser › irrigation_daily_water_limit_revisions': branche('limite-d-eau-du-jour'),
+  'db/water-resource-repository.ts › saveWaterResourceLimitForUser › irrigation_water_resource_limit_revisions': branche('limite-de-ressource'),
+  'db/soil-reserve/entries.ts › addSoilRecordForUser › irrigation_soil_records': branche('sol-de-parcelle'),
+  'db/soil-reserve/entries.ts › addSoilSettingsForUser › irrigation_soil_settings': branche('reglages-du-sol'),
+  'db/soil-reserve/entries.ts › addRootingProfileForUser › irrigation_soil_rooting_profiles': branche('profil-racinaire'),
   'db/soil-reserve/entries.ts › addRootingProfileForUser › irrigation_soil_rooting_stages': CHILD_OF('irrigation_soil_rooting_profiles'),
-  'db/weather-alert-repository.ts › createWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': PR5,
-  'db/weather-alert-repository.ts › updateWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': PR5,
-  'db/weather-alert-repository.ts › deleteWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': PR5,
+  'db/weather-alert-repository.ts › createWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': branche('critere-meteo'),
+  'db/weather-alert-repository.ts › updateWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': branche('critere-meteo'),
+  'db/weather-alert-repository.ts › deleteWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': branche('critere-meteo'),
   'db/weather-alert-repository.ts › versionStatement › irrigation_weather_alert_criterion_versions': CHILD_OF('irrigation_weather_alert_criteria'),
-  'db/crop-alerts/inputs.ts › saveCropAlertSettingsForUser › irrigation_crop_alert_settings': PR5,
-  'db/crop-alerts/inputs.ts › saveFrostLinkForUser › irrigation_crop_frost_links': PR5,
-  'db/crop-alerts/inputs.ts › saveDryingDaysForUser › irrigation_crop_drying_revisions': PR5,
-  'db/feature-selection-repository.ts › saveFeatureSelectionForUser › irrigation_feature_selections': PR5,
+  'db/crop-alerts/inputs.ts › saveCropAlertSettingsForUser › irrigation_crop_alert_settings': branche('alertes-de-culture'),
+  'db/crop-alerts/inputs.ts › saveFrostLinkForUser › irrigation_crop_frost_links': branche('seuil-de-gel'),
+  'db/crop-alerts/inputs.ts › saveDryingDaysForUser › irrigation_crop_drying_revisions': branche('jours-de-sechage'),
+  'db/feature-selection-repository.ts › saveFeatureSelectionForUser › irrigation_feature_selections': branche('fonctionnalites'),
   'db/feature-selection-repository.ts › dismissFeatureBannerForUser › irrigation_feature_selections': sansObjet('Le bandeau des fonctionnalités fermé : ni case cochée ni décochée.'),
-  'db/phone-notice-repository.ts › saveMorningMessageForUser › irrigation_phone_notice_settings': PR5,
-  'db/phone-notice-repository.ts › saveEveningReminderForUser › irrigation_phone_notice_settings': PR5,
+  'db/phone-notice-repository.ts › saveMorningMessageForUser › irrigation_phone_notice_settings': branche('message-du-matin'),
+  'db/phone-notice-repository.ts › saveEveningReminderForUser › irrigation_phone_notice_settings': branche('rappel-du-soir'),
   // Matériel et ressources.
   'db/equipment/equipment.ts › createEquipmentForUser › irrigation_equipment': PR6,
   'db/equipment/equipment.ts › updateEquipmentForUser › irrigation_equipment': PR6,
