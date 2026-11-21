@@ -21,7 +21,7 @@ import { getEnabledFeaturesForUser, listFarmsWithFeature } from './feature-selec
 import { getIrrigationFeasibilityForUser } from './irrigation-feasibility-service';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
 import { getIrrigationSnapshot } from './irrigation-service';
-import { notifyMorningSuggestions, type PlanningAlarmScheduler } from './planning-notifications';
+import { sendMorningMessage, type PlanningAlarmScheduler } from './morning-message';
 import { emptyPumpDashboard } from './pump-dashboard';
 import { getWaterDashboardForUser } from './water-dashboard';
 import { getOnboardingForUser } from './onboarding-service';
@@ -79,7 +79,8 @@ export async function computeWeeklyPlanForUser({
   const weekEvents = weekIrrigations.then((split) => split.counted);
   // Ressources et pompes décochée (3.8, docs/feature-selection-contract.md, section 7) : le moteur reçoit des
   // ressources et des pompes vides et fait ce qu'il fait pour une ferme qui n'en déclare pas ; aucune ligne ne change.
-  const resourcesEnabled = getEnabledFeaturesForUser(ownerUserId).then((enabled) => enabled.includes('ressources'));
+  const enabledFeatures = getEnabledFeaturesForUser(ownerUserId);
+  const resourcesEnabled = enabledFeatures.then((enabled) => enabled.includes('ressources'));
   const [events, water, infrastructure, pumps, equipment, placements, groups, dailyLimits, settings, previous, arbitrations, blockedIrrigations, protectedSlots] = await Promise.all([
     weekEvents,
     getWaterDashboardForUser({ ownerUserId, season, snapshot, weekStart, allowWeatherRefresh: false, now, preloadedEvents: weekEvents }),
@@ -158,8 +159,22 @@ export async function computeWeeklyPlanForUser({
   // Les durées du recalcul (docs/planning-contract.md, point ouvert 34) : des nombres et des dates, jamais d'identifiant de personne.
   const { durationsMs, totalMs } = stopwatch.report();
   log('info', { event: 'planning_calculation_completed', trigger, ...(triggerEvent ? { triggerEvent } : {}), season, weekStart, snapshotSource: snapshot.source, beds: seasonBeds.length, proposals: stored.proposals.length, durationsMs, totalMs, completedAt: new Date().toISOString() });
-  // Le calcul du matin, et lui seul, notifie ses suggestions sur les arrosages des prochaines 24 heures (3.7, règles 21 et 22) ; jamais après un geste à l'écran.
-  if (trigger === 'daily') await notifyMorningSuggestions({ ownerUserId, plan: stored, now, schedule: scheduleAlarm, log });
+  // Le calcul du matin, et lui seul, envoie le message du matin (amélioration n° 3, F703 ; 3.7, règles 21 et 22) ; jamais après un geste à l'écran.
+  if (trigger === 'daily') {
+    const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
+    await sendMorningMessage({
+      ownerUserId,
+      season,
+      snapshot,
+      enabled: await enabledFeatures,
+      plan: stored,
+      events,
+      forecastRainMm: water.days.find((day) => day.date === today)?.forecastRainMm ?? null,
+      now,
+      schedule: scheduleAlarm,
+      log,
+    });
+  }
   return stored;
 }
 

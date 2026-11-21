@@ -81,6 +81,12 @@ export type TodayWeatherBlock = {
    * d'écran, et le ton du bloc ne change pas (aucune alerte ne se déclenche).
    */
   unposedFrost: TodayUnposedFrost | null;
+  /**
+   * Les alertes annoncées sur les trois jours : le gel des cultures en compte
+   * une, chaque alerte météo qui se déclenche une. Le message du matin les
+   * compte (amélioration n° 3, F713).
+   */
+  alerts: number;
 };
 
 type TodayUnposedFrost = {
@@ -142,6 +148,7 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
   }
 
   const criteriaAnnounced = lines.length > (frostAnnounced ? 1 : 0);
+  const alerts = lines.length;
   const unposedFrost = criteriaOn && !frostAnnounced ? unposedFrostText(input, days) : null;
 
   // Un jour sans prévision n'est jamais lu comme un jour calme (D-003, cas 6).
@@ -161,6 +168,7 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
     days: weatherDays({ dates: days, today, forecasts, announcements, scale }),
     scale,
     unposedFrost,
+    alerts,
   };
 }
 

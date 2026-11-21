@@ -187,6 +187,20 @@ y sont une phrase du message (F703).
 7. **Un seuil d'« arrosage prévu » n'est pas ajouté** : tout arrosage
    planifié d'aujourd'hui compte, comme sur la page « Aujourd'hui ».
 
+**Précisions du code (21 novembre 2026, D-283).** F712 : le réglage vit dans
+une table d'un espace (migration 0043), activé par défaut, une colonne vide
+valant le défaut ; la prise du jour (`irrigation_phone_notices`) se garde
+avant l'envoi, se marque envoyée après, se rend en cas d'échec, et une prise
+sans envoi de plus de 5 minutes se reprend. F713 : au plus quatre phrases,
+titre « Votre journée » ; les irrigations planifiées d'aujourd'hui qui
+attendent un geste, trois nommées avec leur heure ; les propositions encore
+à valider ne comptent pas ; la pluie prévue d'aujourd'hui, celle que lit le
+plan, dite seulement si elle dépasse 0 une fois arrondie ; les alertes
+comptées comme le bloc « Gel ou chaleur » de « Aujourd'hui ». F715 : la case
+vit dans le pli fermé « Messages de la ferme » de « Notifications du
+téléphone », dont la ligne dit le réglage ; l'ancre `#message-du-matin`
+l'ouvre.
+
 ### 4.3 Le rappel du soir (PR 3)
 
 Pour chaque arrosage **validé du jour jamais confirmé** (F704) : une
