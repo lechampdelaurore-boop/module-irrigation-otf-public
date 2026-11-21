@@ -9,6 +9,7 @@ import { realNow } from '@/lib/services/demo-clock';
 import { recordDemoVisit } from '@/lib/services/demo-reset';
 import { prepareDemoSpace } from '@/lib/services/demo-space';
 import { FarmIdentityUnavailableError, resolveSpaceKey } from '@/lib/services/farm-identity-service';
+import { assertSpaceNotFrozen, FarmFrozenError } from '@/lib/services/farm-erasure-request';
 
 /**
  * Identité de l'utilisateur connecté.
@@ -54,10 +55,20 @@ function demoUser(farm: string | undefined): AuthenticatedUser {
   return { ...DEMO_USER, userId: `local-demo-${farm}` };
 }
 
-export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+/**
+ * La personne connectée et son espace. Un espace qui a une demande
+ * d'effacement ouverte est figé (docs/tranche-4-contract.md, F647, F666) :
+ * `FarmFrozenError`, avant toute lecture d'Ouvre ta ferme et toute saisie,
+ * sauf pour qui le demande (`allowFrozen` : l'annulation, la page d'état de
+ * l'exploitant, qui ne touche pas aux données de sa ferme).
+ */
+export async function getAuthenticatedUser({ allowFrozen = false }: { allowFrozen?: boolean } = {}): Promise<AuthenticatedUser | null> {
   const user = await readUser();
   if (!user) return null;
-  return isDemoDeployment() ? demoSpaceUser(user) : farmSpaceUser(user);
+  if (isDemoDeployment()) return demoSpaceUser(user);
+  const spaceUser = await farmSpaceUser(user);
+  if (!allowFrozen) await assertSpaceNotFrozen(spaceUser.userId, spaceUser.displayName);
+  return spaceUser;
 }
 
 /**
@@ -99,8 +110,8 @@ async function demoSpaceUser(user: AuthenticatedUser): Promise<AuthenticatedUser
   return { ...user, userId };
 }
 
-export async function requireAuthenticatedUser(): Promise<AuthenticatedUser> {
-  const user = await getAuthenticatedUser();
+export async function requireAuthenticatedUser(options: { allowFrozen?: boolean } = {}): Promise<AuthenticatedUser> {
+  const user = await getAuthenticatedUser(options);
   if (user) return user;
   redirect(signInPath());
 }
@@ -114,6 +125,8 @@ export async function authenticatedUserOrRefusal(): Promise<AuthenticatedUser | 
   try {
     return (await getAuthenticatedUser()) ?? new Response('Session expirée.', { status: 401 });
   } catch (error) {
+    // L'espace est figé par une demande d'effacement : rien ne se lit (F666).
+    if (error instanceof FarmFrozenError) return new Response(error.view.title, { status: 423, headers: { 'Cache-Control': 'no-store' } });
     if (!(error instanceof FarmIdentityUnavailableError)) throw error;
     return new Response(FARM_UNIDENTIFIED_MESSAGE, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }
