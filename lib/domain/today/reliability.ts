@@ -52,7 +52,7 @@ export const RAIN_GAUGE_MAX_AGE_DAYS = 30;
 /**
  * Le geste qui corrige une donnée : un lien vers son formulaire, ou l'action
  * existante « Recalculer le plan ». `zone` : la parcelle à ouvrir sur la page,
- * quand le formulaire dépend d'elle (le stade d'une planche, F702).
+ * quand le formulaire dépend d'elle (le stade d'une planche, F710).
  */
 export type ReliabilityAction =
   | { kind: 'link'; label: string; page: IrrigationPageId; anchor: string | null; zone?: string }

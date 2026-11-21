@@ -7,8 +7,8 @@ source détaillée commit par commit.
 
 ### Ajouté (Améliorations, n° 6, PR 1 sur 7)
 
-- **Le panneau « données manquantes », planche par planche** (D-282, F700
-  à F703) : sous la zone « Fiabilité du calcul » de « Aujourd'hui », un
+- **Le panneau « données manquantes », planche par planche** (D-282, F700,
+  F701, F710, F711) : sous la zone « Fiabilité du calcul » de « Aujourd'hui », un
   dépliant « Par planche » qui dit, fermé, combien de planches ont une
   donnée manquante, ou « Tout est à jour » ; ouvert, les planches par
   culture, chacune avec ce qui lui manque — la réserve du sol non saisie,

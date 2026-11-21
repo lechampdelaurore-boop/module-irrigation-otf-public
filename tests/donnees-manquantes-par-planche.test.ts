@@ -27,7 +27,7 @@ import { crop, cropDay, cropWithoutKc, observation, soilInput, soilRecord, stage
 
 /**
  * Amélioration n° 6 : le panneau « données manquantes », planche par planche
- * (docs/ameliorations-6-2-3-7-contract.md, section 3, F700 à F703). Trois
+ * (docs/ameliorations-6-2-3-7-contract.md, section 3, F700, F701, F710 et F711). Trois
  * données par planche — la réserve du sol non saisie, le stade deviné, le
  * pluviomètre absent —, chacune avec sa phrase, sa conséquence et son geste ;
  * une case décochée ne compte pas ; une ferme sans manque le dit. Le parcours
@@ -296,7 +296,7 @@ test('les planches de la saison et leurs cultures du jour, sans les séries en b
   assert.deepEqual(missingByBedBeds({ ...snapshot, cropPlan: undefined }, 2026, TODAY).map((item) => item.cultures), [[], []]);
 });
 
-test('« Aujourd’hui » : le dépliant vit dans la zone « Fiabilité du calcul », sans toucher la pastille ni l’anneau (F702)', () => {
+test('« Aujourd’hui » : le dépliant vit dans la zone « Fiabilité du calcul », sans toucher la pastille ni l’anneau (F710)', () => {
   const base: TodayInputs = {
     enabled: ALL,
     now: new Date('2026-11-08T08:00:00.000Z'),

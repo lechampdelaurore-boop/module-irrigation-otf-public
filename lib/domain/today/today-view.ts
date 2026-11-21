@@ -266,7 +266,7 @@ export type TodayInputs = {
   reliability: Omit<ReliabilityInputs, 'enabled' | 'now' | 'planComputedAt' | 'reservoirs'>;
   /**
    * Ce que lit le dépliant « Par planche » (amélioration n° 6) ; absent ou
-   * `null` quand il n'est pas lu, pour la pastille, qui ne le compte pas (F702).
+   * `null` quand il n'est pas lu, pour la pastille, qui ne le compte pas (F710).
    */
   missingByBed?: Omit<MissingByBedInputs, 'enabled' | 'today'> | null;
   /** La semaine en cours lue dans le tableau des besoins ; `null` quand « Objectifs et besoins » n'est pas coché ou pas lu (la pastille). */

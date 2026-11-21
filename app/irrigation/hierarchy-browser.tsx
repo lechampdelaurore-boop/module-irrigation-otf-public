@@ -69,7 +69,7 @@ export function HierarchyBrowser({
   const season = selectedSeason;
   const [zoneId, setZoneId] = useState<string | null>(shell.zone);
   const [bedId, setBedId] = useState<string | null>(null);
-  // « Déclarer le stade » depuis « Aujourd'hui » (amélioration n° 6, F702) : l'ancre désigne la planche, qui se choisit seule.
+  // « Déclarer le stade » depuis « Aujourd'hui » (amélioration n° 6, F710) : l'ancre désigne la planche, qui se choisit seule.
   useEffect(() => {
     const selectFromHash = () => {
       const target = bedIdFromStageAnchor(window.location.hash);

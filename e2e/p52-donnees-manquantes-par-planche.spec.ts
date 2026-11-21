@@ -13,7 +13,7 @@ import {
 /**
  * Parcours P52 : le panneau « données manquantes », planche par planche
  * (amélioration n° 6, docs/ameliorations-6-2-3-7-contract.md, section 3,
- * précisions F700 à F703 ; docs/browser-journeys-contract.md).
+ * précisions F700, F701, F710 et F711 ; docs/browser-journeys-contract.md).
  *
  * Sur une ferme neuve de démonstration, toutes cases cochées, la carotte
  * rattachée à sa culture de référence, le sol des parcelles laissé vide et

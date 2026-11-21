@@ -102,7 +102,7 @@ export function ReliabilityZoneView({
 
 /**
  * Le dépliant « Par planche » (amélioration n° 6, docs/ameliorations-6-2-3-7-contract.md,
- * section 3, F700 à F703) : les planches qui ont une donnée manquante, par
+ * section 3, F700, F701, F710 et F711) : les planches qui ont une donnée manquante, par
  * culture puis par planche, chacune avec sa phrase et son geste ; cinq
  * planches d'emblée, les autres derrière « Voir les n autres ». Fermé, il dit
  * le total ; son ancre l'ouvre, depuis la fin de l'accueil (4.4).

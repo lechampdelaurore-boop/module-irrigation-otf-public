@@ -64,7 +64,7 @@ async function readTodayInputs(
   const locationKey = weatherLocationKey(preference, snapshot.structure);
   const weatherOn = read.weather && (on('alertes-cultures') || on('alertes-meteo'));
   const lookback = actualRainLookbackDates(today);
-  // Le dépliant « Par planche » (amélioration n° 6) se lit pour la page seulement : la pastille ne le compte pas (F702).
+  // Le dépliant « Par planche » (amélioration n° 6) se lit pour la page seulement : la pastille ne le compte pas (F710).
   const byBed = read.weather;
 
   const [forecasts, cropAlerts, criteria, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays] = await Promise.all([

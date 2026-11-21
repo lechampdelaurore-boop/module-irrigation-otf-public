@@ -7427,7 +7427,7 @@ trois données par planche : la réserve du sol non saisie, le stade deviné
 
 **Décision.** Le code suit la section 3 ; les précisions de code :
 
-1. **F702.** Le dépliant « Par planche » vit sous l'anneau de la zone,
+1. **F710.** Le dépliant « Par planche » vit sous l'anneau de la zone,
    fermé, et ne compte ni dans la pastille du menu ni dans l'anneau, qui
    gardent leurs cinq données : il informe, il ne relance personne. Il ne
    se lit que pour la page (la pastille ne le lit pas). Le geste du stade
@@ -7440,7 +7440,7 @@ trois données par planche : la réserve du sol non saisie, le stade deviné
    dernier à effet égal), les groupes par l'effet de leur première planche ;
    les cinq premières planches dans l'ordre de l'écran, les autres derrière
    « Voir les n autres planches ».
-2. **F703.** Le stade deviné : une culture dont le stade et le Kc sont
+2. **F711.** Le stade deviné : une culture dont le stade et le Kc sont
    connus, sans déclaration qui la place ; un stade calculé recalé sur une
    déclaration est déclaré (D-057). La réserve du sol non saisie : les
    planches inconnues des jardins que la zone nomme déjà (jamais observés,

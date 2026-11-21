@@ -21,8 +21,8 @@ import { countText, dateWithYearText, daysBetween, sortedNames } from './today-t
 
 /**
  * Le panneau « données manquantes », planche par planche (amélioration
- * n° 6, docs/ameliorations-6-2-3-7-contract.md, section 3, précisions F700 à
- * F703) : la liste fermée de la zone « Fiabilité du calcul » s'allonge de
+ * n° 6, docs/ameliorations-6-2-3-7-contract.md, section 3, précisions F700,
+ * F701, F710 et F711) : la liste fermée de la zone « Fiabilité du calcul » s'allonge de
  * trois données par planche — la réserve du sol non saisie, le stade deviné,
  * le pluviomètre absent —, calculées ici et nulle part ailleurs. Chaque ligne
  * a sa phrase, sa conséquence en clair et le geste qui la corrige, comme une
@@ -31,7 +31,7 @@ import { countText, dateWithYearText, daysBetween, sortedNames } from './today-t
  * Le panneau informe : il n'écrit rien, ne change aucun calcul et n'entre
  * jamais dans le besoin, le planning, les priorités ni la dose (D-010,
  * D-041) ; il ne compte pas non plus dans la pastille du menu ni dans
- * l'anneau de la zone, qui gardent leurs cinq données (F702).
+ * l'anneau de la zone, qui gardent leurs cinq données (F710).
  */
 
 /** Les trois données, dans l'ordre de leur effet sur le plan (section 3, règle 5). */
@@ -52,7 +52,7 @@ export const NO_CULTURE_GROUP = 'Sans culture en cours';
 /** L'ancre du dépliant « Par planche » : le lien « Ce qui manque » de la fin de l'accueil (4.4) l'ouvre. */
 export const MISSING_BY_BED_ANCHOR = 'donnees-manquantes';
 
-/** L'ancre du besoin de la culture d'une planche, sur la page « Matériel » : son formulaire « Déclarer un stade » (F702). */
+/** L'ancre du besoin de la culture d'une planche, sur la page « Matériel » : son formulaire « Déclarer un stade » (F710). */
 export function bedStageAnchor(bedId: string): string {
   return `bed-stage-${bedId}`;
 }

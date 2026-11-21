@@ -43,7 +43,7 @@ export function BedCropWaterPanel({ season, bedId, bedName }: { season: number; 
     if (result.sheet.available) afterSuccess?.(result.sheet);
   });
 
-  // « Déclarer le stade » depuis « Aujourd'hui » (amélioration n° 6, F702) : une fois la fiche lue, le pli et le formulaire s'ouvrent.
+  // « Déclarer le stade » depuis « Aujourd'hui » (amélioration n° 6, F710) : une fois la fiche lue, le pli et le formulaire s'ouvrent.
   // L'ancre ne porte sur aucun identifiant : le navigateur ouvrirait le pli avant React, qui ne s'y retrouverait plus.
   const section = useRef<HTMLElement>(null);
   const revealed = useRef(false);

@@ -714,7 +714,7 @@ registres, elle y renvoie.
   aucun contrôle de code rejoué.
 
 - Améliorations, **n° 6, le panneau « données manquantes » : codée le
-  21 novembre 2026** (D-282, F700 à F703, section 3 de
+  21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
   `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé, sur le
   « vas-y » du porteur (9 h 52) ; PR 1 sur 7 des améliorations. La zone
   « Fiabilité du calcul » de « Aujourd'hui » gagne un dépliant
