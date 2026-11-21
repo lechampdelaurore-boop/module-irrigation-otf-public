@@ -2,10 +2,12 @@ import { HOURS_PER_DAY, millisecondsFromHours } from '../units.ts';
 import { addDaysToDateKey } from '../water-management.ts';
 import { OTF_CALL_OUTCOME_HOURS_KEPT, outcomeHourStartMs } from '../otf/call-outcome.ts';
 import { OTF_AUTHENTICATION_BRAKE_WINDOW_MS, OTF_CALL_ROWS_KEPT_MS, oldestKeptCountDay, parisDayOf } from '../otf/shared-call-pace.ts';
+import { oldestKeptSupportDay, SUPPORT_ACCESS_KEPT_MONTHS } from './support-access.ts';
 
 /**
  * La conservation des données à durée limitée (4.5, PR 5 ;
- * docs/tranche-4-contract.md, F562, et 10 bis.18, F649 à F653) : ce qui ne
+ * docs/tranche-4-contract.md, F562, et 10 bis.18, F649 à F653 ; le journal
+ * d'accès du support, 10 bis.21, F660) : ce qui ne
  * dépend pas de la base.
  *
  * Chaque table de la base a sa durée et qui l'efface (`db/retention-plan.ts`).
@@ -41,7 +43,8 @@ export type RetentionPurgeKey =
   | 'otf_daily_calls'
   | 'otf_call_pauses'
   | 'otf_authentication_failures'
-  | 'irrigation_operator_notices';
+  | 'irrigation_operator_notices'
+  | 'irrigation_support_accesses';
 
 /**
  * La limite de chaque purge à l'instant `atMs` : une ligne en deçà est
@@ -59,6 +62,8 @@ export const RETENTION_LIMITS: Readonly<Record<RetentionPurgeKey, (atMs: number)
   // Les refus d'authentification comptés par le frein, quinze minutes (F359).
   otf_authentication_failures: (atMs) => atMs - OTF_AUTHENTICATION_BRAKE_WINDOW_MS,
   irrigation_operator_notices: (atMs) => addDaysToDateKey(parisDayOf(atMs), -OPERATOR_NOTICES_KEPT_DAYS),
+  // Le journal d'accès du support, douze mois (F567, F660) : le même jour, un an plus tôt, reste.
+  irrigation_support_accesses: (atMs) => oldestKeptSupportDay(parisDayOf(atMs)),
 };
 
 /** Les durées, en clair, telles que le contrat et la politique de confidentialité les disent. */
@@ -69,6 +74,7 @@ export const RETENTION_WORDS: Readonly<Record<RetentionPurgeKey, string>> = {
   otf_call_pauses: 'jusqu’à la fin de la pause',
   otf_authentication_failures: '15 minutes',
   irrigation_operator_notices: `${OPERATOR_NOTICES_KEPT_DAYS} jours`,
+  irrigation_support_accesses: `${SUPPORT_ACCESS_KEPT_MONTHS} mois`,
 };
 
 /** Ce que le matin a purgé. */

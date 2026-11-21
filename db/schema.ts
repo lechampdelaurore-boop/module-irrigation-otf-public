@@ -966,6 +966,52 @@ export const farmErasures = sqliteTable(
   ],
 );
 
+/**
+ * Le journal d'accès du support (4.5, migration 0041, F567, F660) : le jour,
+ * la ferme et la raison en une ligne de chaque fois que l'exploitant regarde
+ * les données d'une ferme ; jamais ce qu'il a vu. Gardé 12 mois, effacé avec
+ * le dernier espace de la ferme. Une table commune, d'aucun espace.
+ */
+export const supportAccesses = sqliteTable(
+  'irrigation_support_accesses',
+  {
+    id: text('id').primaryKey(),
+    otfFarmId: text('otf_farm_id').notNull(),
+    accessedOn: text('accessed_on').notNull(),
+    reason: text('reason').notNull(),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    index('idx_irrigation_support_accesses_day').on(table.accessedOn),
+    check('chk_irrigation_support_accesses_day', sql`length(${table.accessedOn}) = 10`),
+    check('chk_irrigation_support_accesses_reason', sql`length(trim(${table.reason})) BETWEEN 3 AND 200`),
+  ],
+);
+
+/**
+ * Le relevé des coûts du mois (4.5, migration 0041, F565 point 6, F568,
+ * F662), copié à la main depuis le tableau de bord de Cloudflare : des
+ * nombres du déploiement, d'aucune ferme ; un relevé par mois.
+ */
+export const costReadings = sqliteTable(
+  'irrigation_cost_readings',
+  {
+    month: text('month').primaryKey(),
+    workersRequests: integer('workers_requests').notNull(),
+    workersCpuMs: integer('workers_cpu_ms').notNull(),
+    d1RowsRead: integer('d1_rows_read').notNull(),
+    d1RowsWritten: integer('d1_rows_written').notNull(),
+    d1StorageMb: real('d1_storage_mb').notNull(),
+    billedUsd: real('billed_usd'),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    check('chk_irrigation_cost_readings_month', sql`length(${table.month}) = 7`),
+    check('chk_irrigation_cost_readings_counts', sql`${table.workersRequests} >= 0 AND ${table.workersCpuMs} >= 0 AND ${table.d1RowsRead} >= 0 AND ${table.d1RowsWritten} >= 0 AND ${table.d1StorageMb} >= 0`),
+    check('chk_irrigation_cost_readings_billed', sql`${table.billedUsd} IS NULL OR ${table.billedUsd} >= 0`),
+  ],
+);
+
 export const weatherGeocodes = sqliteTable(
   'irrigation_weather_geocodes',
   {
@@ -2300,7 +2346,7 @@ export const plotShelters = sqliteTable(
 
 /**
  * Le réglage des messages du téléphone d'une ferme (améliorations n° 3 et
- * n° 2, migration 0041, F702, F712) : une ligne par espace ; une colonne vide
+ * n° 2, migration 0042, F702, F712) : une ligne par espace ; une colonne vide
  * vaut le défaut, jamais écrit en base.
  */
 export const phoneNoticeSettings = sqliteTable(
@@ -2321,7 +2367,7 @@ export const phoneNoticeSettings = sqliteTable(
 );
 
 /**
- * La prise du jour d'un message du téléphone (migration 0041, F703) : une
+ * La prise du jour d'un message du téléphone (migration 0042, F703) : une
  * ligne par espace et par genre, réécrite chaque jour de Paris, prise avant
  * l'envoi et rendue s'il échoue.
  */
