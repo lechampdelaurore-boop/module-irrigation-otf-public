@@ -15,6 +15,7 @@ import { SettingsReviewSection } from './settings-review';
 import { remainingUnknowns, settingsGroupsText } from '@/lib/domain/onboarding/verification';
 import { SPECIES_FOLD_ANCHOR, speciesNeedsLink } from '@/lib/domain/crop-water/species-linking';
 import { PlotShelterSettings } from './plot-shelter-settings';
+import { FarmErasureSettings } from './farm-erasure-settings';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
 
@@ -29,9 +30,10 @@ export const metadata = pageMetadata('reglages');
  * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
  * l'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil, en tête
  * de la correspondance des espèces (4.4, F587) ; « Réglages à relire »
- * (4.4, F588) ; l'accueil de la
- * ferme (4.4, F581), replié ; enfin, le journal des modifications, plié,
- * toujours là (amélioration n° 7, D-288).
+ * (4.4, F588) ; l'accueil de la ferme (4.4, F581), replié ; le journal
+ * des modifications, plié, toujours là (amélioration n° 7, D-288) ; enfin,
+ * « Supprimer ma ferme et mes données » (4.5, F665), replié, hors
+ * démonstration.
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
@@ -70,6 +72,7 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         settingsGroups={settingsReview ? settingsGroupsText(settingsReview.groups) : []}
       />
       <ChangeJournalSection season={context.season} initialView={changeJournal} />
+      {context.shell.demo ? null : <FarmErasureSettings farmName={context.snapshot.structure.name} season={context.season} />}
     </IrrigationShell>
   );
 }

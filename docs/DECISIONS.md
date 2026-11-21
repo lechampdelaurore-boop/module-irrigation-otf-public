@@ -7473,6 +7473,35 @@ l'API de Cloudflare. Rien de cela n'existait.
 Ne changent pas : aucun appel à Cloudflare ni à OTF, aucun secret, aucun
 service nouveau, aucune dépense ; le registre des tâches (9 tâches).
 
+## D-251 — Tranche 4, 4.5, PR 3 (troisième partie) : la demande dans « Réglages », l'espace figé, l'annulation et l'effacement sans attendre
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le moteur de l'effacement (D-246) et l'oubli des appareils
+(D-248) sont prêts, mais aucune demande ne peut naître : F563 veut la
+demande dans « Réglages », après le nom de la ferme tapé, annulable sept
+jours, l'espace figé pendant ce temps (aucun appel à OTF, aucune saisie),
+et l'effacement immédiat sur demande écrite à l'exploitant.
+
+**Décision.** Section 10 bis.22 du contrat de la Tranche 4 (F665 à F669) :
+
+1. « Supprimer ma ferme et mes données », replié en bas de Réglages, hors
+   démonstration ; le serveur relit le nom tapé dans l'instantané en cache,
+   sans appel à OTF. La demande vaut pour l'espace de la personne.
+2. L'espace figé : la lecture de la personne connectée refuse l'espace dès
+   la demande, avant toute lecture d'OTF et toute saisie ; chaque page montre
+   l'écran de l'espace figé. Seules exceptions : l'annulation et la page
+   d'état de l'exploitant.
+3. L'annulation, sur cet écran, tant que l'effacement n'a pas commencé.
+4. L'effacement sans attendre, sur la page d'état : une demande en attente,
+   le numéro de sa ferme retapé ; le délai s'arrête, l'effacement passe
+   aussitôt dans la borne du matin, le matin finit le reste.
+5. La page de confidentialité dit la demande dans Réglages.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
+moteur de l'effacement et ses preuves.
+
 ## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
@@ -7568,9 +7597,10 @@ compléter.
    est enregistré (« Message du matin activé. ») et suit chaque changement ;
    l'ancre d'un réglage (`#message-du-matin`) ouvre le pli. Fermé, il coûte
    une ligne au téléphone ; le budget de hauteur de « Réglages » à 390 px
-   (P40, F459) passe de 3 400 à 3 500 px, la page sur `main` en prenant déjà
-   environ 3 350 dans la CI : 3 400 laissait 50 px, moins que le pli. Le
-   budget reste une borne : toute section nouvelle de « Réglages » se plie.
+   (P40, F459, porté à 3 500 par le pli de la suppression de la ferme, F665)
+   passe à 3 650 px : la page sur `main` en prend déjà 3 482 dans la CI, et
+   le pli 64 de plus. Le budget reste une borne : toute section nouvelle de
+   « Réglages » se plie.
 
 Ne changent pas : le Worker de notification, le déclencheur du matin, les
 règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des
@@ -7784,7 +7814,8 @@ tableau, une section vide qui dit « Aucune modification enregistrée depuis
 le <date de mise en service> », et une phrase de tête qui dit que le
 journal commence à sa mise en service.
 
-**Décision.** La section finit « Réglages », pour toute ferme, toutes cases
+**Décision.** La section vient en bas de « Réglages », juste avant
+« Supprimer ma ferme et mes données » (F665), pour toute ferme, toutes cases
 cochées ou non, démonstration comprise. Sa lecture porte l'espace de la
 session ; « Voir plus » et le filtre passent par une action serveur qui
 vérifie la famille et le repère de reprise. Trois précisions :
@@ -7821,8 +7852,9 @@ vérifie la famille et le repère de reprise. Trois précisions :
    section est un pli fermé, celui de « Correspondance des espèces », dont
    la ligne dit « N modifications, la dernière le … » ; l'ancre
    `#journal-des-modifications` l'ouvre. Fermé, il coûte une ligne au
-   téléphone, 84 px (3 489 → 3 573 px en local) : le budget de hauteur de
-   « Réglages » à 390 px (P40, F459, F715) passe de 3 500 à 3 600 px.
+   téléphone, 84 px (3 489 → 3 573 px en local ; 3 704 px avec « Supprimer
+   ma ferme et mes données », #160) : le budget de hauteur de « Réglages »
+   à 390 px (P40, F459, F665, F715) passe de 3 650 à 3 750 px.
 
 Preuves : `tests/change-journal-card.test.ts` (le texte de chaque famille,
 les valeurs et leurs unités, les champs inconnus, les phrases de la
