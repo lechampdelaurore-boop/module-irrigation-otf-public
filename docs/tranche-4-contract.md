@@ -2015,6 +2015,7 @@ Le jugement d'une carte : **rouge** pour un raccordement révoqué ou hors d'usa
 | `irrigation_farm_erasures` | la note d'une demande d'effacement : l'identifiant interne de l'espace, un état, des dates | sans limite : la preuve qu'elle a été traitée | personne ; une fois l'espace effacé, elle ne désigne plus rien (F640) |
 | `irrigation_background_jobs` | une ligne par tâche du registre : des heures, des nombres, des classes d'erreur | réécrite à chaque exécution | personne |
 | `irrigation_crop_alert_common` | les seuils de gel communs, les mêmes pour toutes les fermes | sans limite | une migration qui les change |
+| `irrigation_crop_sensitive_stage_common` (amélioration n° 4, F730) | la liste préremplie des stades sensibles au manque d'eau, la même pour toutes les fermes | sans limite | une migration qui la change, après la relecture du porteur |
 | `otf_deployment_farm` | la ferme de la clé du déploiement | réécrite à chaque lecture | personne : un réglage du déploiement |
 | `irrigation_support_accesses` (10 bis.21) | le journal d'accès du support : le jour, la ferme, la raison en une ligne | 12 mois | la purge du matin ; l'effacement du dernier espace de la ferme (F642) |
 | `irrigation_cost_readings` (10 bis.21) | le relevé des coûts du mois, copié du tableau de bord | sans limite | personne : des nombres du déploiement, d'aucune ferme |

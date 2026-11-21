@@ -10,7 +10,7 @@ import {
 
 /**
  * Persistance des stades sensibles au manque d'eau (amélioration n° 4,
- * docs/ameliorations-4-5-contract.md, §3.1, F730 ; migration 0045) : la
+ * docs/ameliorations-4-5-contract.md, §3.1, F730 ; migration 0044) : la
  * liste préremplie commune, que seule une migration écrit, et les choix de
  * chaque ferme, qui ne valent que pour elle. La règle (ce qui est en vigueur,
  * ce qu'un geste enregistre) vit dans `lib/domain/crop-water/sensitive-stages.ts`.

@@ -1970,7 +1970,7 @@ export const cropWaterOptions = sqliteTable(
   (table) => [check('chk_crop_water_options', sql`${table.smoothing} IN (0, 1) AND ${table.shading} IN (0, 1)`)],
 );
 
-/** La liste préremplie commune des stades sensibles au manque d'eau (amélioration n° 4, migration 0045, F730). */
+/** La liste préremplie commune des stades sensibles au manque d'eau (amélioration n° 4, migration 0044, F730). */
 export const cropSensitiveStageCommon = sqliteTable(
   'irrigation_crop_sensitive_stage_common',
   {
@@ -1988,7 +1988,7 @@ export const cropSensitiveStageCommon = sqliteTable(
   ],
 );
 
-/** Le choix d'une ferme pour un stade : sensible ou non, quoi que dise la liste préremplie (migration 0045, F730). */
+/** Le choix d'une ferme pour un stade : sensible ou non, quoi que dise la liste préremplie (migration 0044, F730). */
 export const cropSensitiveStages = sqliteTable(
   'irrigation_crop_sensitive_stages',
   {

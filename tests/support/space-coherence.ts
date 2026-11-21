@@ -39,7 +39,7 @@ type Reference = {
  * Le journal d'accès du support (migration 0041, F660) note une ferme d'OTF,
  * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
  * coûts du mois (F662), des nombres du déploiement. La liste préremplie des
- * stades sensibles (migration 0045, F730) : des stades des cultures communes.
+ * stades sensibles (migration 0044, F730) : des stades des cultures communes.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
