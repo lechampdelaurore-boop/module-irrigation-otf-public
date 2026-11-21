@@ -40,11 +40,22 @@ const ACTUAL_RAIN_LOOKBACK_DAYS = 7;
 /** F8 : le plan est à recalculer après quarante-huit heures. */
 const PLAN_MAX_AGE_HOURS = 48;
 /** Les lignes affichées d'emblée ; les autres derrière « Voir les n autres ». */
-const RELIABILITY_LINES_SHOWN = 5;
+export const RELIABILITY_LINES_SHOWN = 5;
+/**
+ * F701 (amélioration n° 6, dépliant « Par planche ») : le pluviomètre est dit
+ * absent quand la dernière pluie mesurée date de plus de trente jours, ou
+ * qu'aucune n'est notée. Une pluie mesurée il y a trente jours compte encore ;
+ * il y a trente et un jours, non.
+ */
+export const RAIN_GAUGE_MAX_AGE_DAYS = 30;
 
-/** Le geste qui corrige une donnée : un lien vers son formulaire, ou l'action existante « Recalculer le plan ». */
-type ReliabilityAction =
-  | { kind: 'link'; label: string; page: IrrigationPageId; anchor: string | null }
+/**
+ * Le geste qui corrige une donnée : un lien vers son formulaire, ou l'action
+ * existante « Recalculer le plan ». `zone` : la parcelle à ouvrir sur la page,
+ * quand le formulaire dépend d'elle (le stade d'une planche, F702).
+ */
+export type ReliabilityAction =
+  | { kind: 'link'; label: string; page: IrrigationPageId; anchor: string | null; zone?: string }
   | { kind: 'recalculate-plan'; label: string };
 
 export type ReliabilityLine = {
@@ -126,7 +137,7 @@ export function soilParcelAnchor(zoneId: string): string {
 export const ACTUAL_RAIN_CONSEQUENCE = 'Sans elle, le besoin est surévalué.';
 
 /** Le bloc « Pluie mesurée » de « Objectifs et besoins », celui que l'historique ouvre déjà (lot 1, point 11). */
-const MEASURED_RAIN_ANCHOR = 'manual-rain';
+export const MEASURED_RAIN_ANCHOR = 'manual-rain';
 /** La correspondance des espèces, dans Réglages. */
 const SPECIES_CORRESPONDENCE_ANCHOR = 'species-correspondence-title';
 
@@ -351,5 +362,7 @@ export function reliabilityThresholdsText(): string {
   return `Une donnée est à rafraîchir quand le volume d’une réserve date de plus de ${RESERVOIR_VOLUME_MAX_AGE_DAYS} jours, `
     + `quand la pluie réelle manque un des ${ACTUAL_RAIN_LOOKBACK_DAYS} derniers jours, quand le sol d’un jardin n’a jamais été observé, `
     + `quand une espèce plantée n’est rattachée à aucune culture de référence, ou quand le plan date de plus de ${PLAN_MAX_AGE_HOURS} heures. `
+    + 'Le dépliant « Par planche » nomme, planche par planche, la réserve du sol non saisie, le stade deviné d’après le calendrier '
+    + `et le pluviomètre absent, quand aucune pluie mesurée n’est notée depuis plus de ${RAIN_GAUGE_MAX_AGE_DAYS} jours. `
     + 'Ces seuils servent à l’affichage : ils ne changent aucun calcul.';
 }
