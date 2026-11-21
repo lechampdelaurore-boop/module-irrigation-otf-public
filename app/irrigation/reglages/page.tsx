@@ -36,7 +36,7 @@ export const metadata = pageMetadata('reglages');
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices } = await loadReglagesPage(context);
   context.logLoaded();
   // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
   const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
@@ -45,7 +45,11 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
       <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
       {waterDashboard ? <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} part="reglages" /> : null}
       {usesPushNotifications(context.enabled)
-        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings season={context.season} />
+        ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings
+            season={context.season}
+            morningMessage={phoneNotices && context.enabled.includes('planning') ? phoneNotices.morningMessage : null}
+            evening={phoneNotices && context.enabled.includes('arrosages') ? { enabled: phoneNotices.eveningReminder, time: phoneNotices.eveningTime } : null}
+          />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
       {plotShelters ? <PlotShelterSettings season={context.season} initialLines={plotShelters} /> : null}
