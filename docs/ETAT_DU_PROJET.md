@@ -737,6 +737,21 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
+  l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
+  la PR 6. « Réglages » finit par le pli « Journal des modifications »,
+  fermé, sa ligne « N modifications, la dernière le … » ; ouvert, les 50
+  dernières cartes (quand, « Vous » ou « Une autre personne connectée », le
+  sujet, l'action, l'objet, chaque champ avant → après avec son unité), un
+  filtre par famille et « Voir plus » par 50. Les mots de chaque champ et
+  la carte se composent dans `lib/domain/change-journal/` ; les essais des
+  écrivains échouent pour un champ sans ses mots. Le journal commence à sa
+  mise en service, lue dans la liste des migrations reçues par la base. Le
+  budget de hauteur de « Réglages » au téléphone (P40) passe à 3 600 px.
+  Parcours P55 à 390 et 1 440 px. Sans migration. Contrôles : voir la PR.
+  L'amélioration n° 7 est codée en entier ; reste F718 (les réglages hors
+  de la liste du contrat), sur le mot du porteur.
+
 - Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
   matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,
   F721), empilée sur la PR 5. Les 21 écrivains du matériel et des

@@ -7766,3 +7766,68 @@ se lit avant. Une précision de code :
 Ne changent pas : les journaux de domaine (écrits comme avant, à côté),
 aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
 migration, aucun appel à OTF.
+
+## D-288 — Améliorations, n° 7 : l'écran du journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 7
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285
+à D-287).
+
+**Contexte.** Depuis D-287, tous les écrivains de la liste du contrat
+(§5.1) écrivent au journal ; rien ne le lit encore. Le contrat (§5.5,
+§5.6) demande une section « Journal des modifications » dans « Réglages »,
+en lecture seule : les 50 dernières lignes, une carte par ligne, un filtre
+par famille, « Voir plus » par 50, le texte composé dans `lib/domain/`, pas
+de case de fonctionnalité, au téléphone une carte par ligne et jamais de
+tableau, une section vide qui dit « Aucune modification enregistrée depuis
+le <date de mise en service> », et une phrase de tête qui dit que le
+journal commence à sa mise en service.
+
+**Décision.** La section finit « Réglages », pour toute ferme, toutes cases
+cochées ou non, démonstration comprise. Sa lecture porte l'espace de la
+session ; « Voir plus » et le filtre passent par une action serveur qui
+vérifie la famille et le repère de reprise. Trois précisions :
+
+1. **F722. Les mots du journal, en un endroit.** Chaque champ qu'un
+   écrivain garde a son nom à l'écran et l'écriture de sa valeur, avec son
+   unité (`lib/domain/change-journal/fields.ts`) : « Objectif : 30 mm →
+   35 mm », « Fin : 12 h → 13 h », « Part de la pluie prévue déduite :
+   100 % → 50 % », un profil d'aspersion « à 2 m, 8 mm/h ; à 4 m,
+   6 mm/h », une case 0 ou 1 « oui » ou « non ». Une valeur vide dit ce
+   qu'elle veut dire pour son champ (« aucune », « sans fin », « en
+   place »), sinon « non renseigné » (D-003). La carte
+   (`lib/domain/change-journal/card.ts`) dit quand, à l'heure de la ferme,
+   qui (« Vous » quand l'auteur est la clé d'espace de la session, sinon
+   « Une autre personne connectée », jamais une adresse, F708), le sujet,
+   l'action (« Création », « Modification », « Suppression ») et l'objet par
+   son nom ou son repère ; un lieu ou une culture d'Ouvre ta ferme se lit
+   par son nom quand l'instantané le connaît (« Planche · B1 »), sinon par
+   sa sorte, jamais par son identifiant. Un champ que la version ne sait pas
+   lire est compté, jamais tu ni montré par son code. Les essais des
+   écrivains (PR 5 et 6) échouent pour un champ écrit sans ses mots ; ceux
+   du domaine, pour un champ des réglages gardés en entier (planning,
+   fonctionnalités, alertes par culture, sol) sans ses mots. Les noms des
+   natures de ressource et de réserve passent dans le domaine
+   (`lib/domain/water-resource-labels.ts`), relus par « Ressources » et
+   par le journal.
+2. **F723. Le début du journal.** Le jour où le journal d'une ferme
+   commence est le plus tard de sa mise en service, lue dans la liste des
+   migrations reçues par la base (`d1_migrations`, tenue par Cloudflare,
+   migration `…_change_journal.sql`, quel que soit son numéro final), et de
+   la création de l'espace. Une base sans cette liste (les essais en local)
+   prend la création de l'espace. Rien n'est reconstitué d'avant (§5.6).
+3. **F724. Plié, comme toute section nouvelle de « Réglages ».** La
+   section est un pli fermé, celui de « Correspondance des espèces », dont
+   la ligne dit « N modifications, la dernière le … » ; l'ancre
+   `#journal-des-modifications` l'ouvre. Fermé, il coûte une ligne au
+   téléphone, 84 px (3 489 → 3 573 px en local) : le budget de hauteur de
+   « Réglages » à 390 px (P40, F459, F715) passe de 3 500 à 3 600 px.
+
+Preuves : `tests/change-journal-card.test.ts` (le texte de chaque famille,
+les valeurs et leurs unités, les champs inconnus, les phrases de la
+section), `tests/db/change-journal-view.test.ts` (50 cartes puis « Voir
+plus », le filtre et sa suite, deux fermes, le début du journal), les essais
+des écrivains (aucun champ sans ses mots), le parcours P55 à 390 et
+1 440 px. Ne changent pas : les écrivains, la table, aucune migration,
+aucun calcul, aucun appel à OTF.

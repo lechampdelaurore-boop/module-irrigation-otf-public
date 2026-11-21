@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 7 sur 7)
+
+- **« Journal des modifications » dans « Réglages »** (D-288, F722 à F724) :
+  en bas de la page, un pli fermé dont la ligne dit combien de
+  modifications et la dernière ; ouvert, les 50 dernières, une carte par
+  modification : quand, « Vous » ou « Une autre personne connectée », ce
+  qui a changé et sur quoi (un matériel, une semaine et sa planche…), puis
+  chaque champ changé, de l'ancienne à la nouvelle valeur, avec son unité.
+  Un filtre par famille (objectifs, réglages, matériel et ressources),
+  « Voir plus » par 50. Lecture seule, toujours là, sans case à cocher. Le
+  journal commence à sa mise en service : une phrase le dit, et une liste
+  vide dit « Aucune modification enregistrée depuis le … ».
+
 ### Ajouté (Améliorations, n° 7, PR 6 sur 7)
 
 - **Le matériel et les ressources écrivent au journal des modifications**

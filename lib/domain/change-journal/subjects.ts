@@ -19,6 +19,13 @@
 const CHANGE_FAMILIES = ['objectif', 'reglage', 'materiel'] as const;
 export type ChangeFamily = (typeof CHANGE_FAMILIES)[number];
 
+/** Le nom de chaque famille, dans l'ordre du filtre de l'écran (§5.5 ; D-288). */
+export const CHANGE_FAMILY_LABELS: Readonly<Record<ChangeFamily, string>> = {
+  objectif: 'Objectifs',
+  reglage: 'Réglages',
+  materiel: 'Matériel et ressources',
+};
+
 export type ChangeAction = 'cree' | 'modifie' | 'supprime';
 
 type SubjectDefinition = { family: ChangeFamily; label: string };
@@ -38,7 +45,7 @@ const CHANGE_SUBJECTS = {
   'creneau-protege': { family: 'reglage', label: 'Créneau protégé' },
   'limite-d-eau-du-jour': { family: 'reglage', label: 'Limite d’eau de la journée' },
   'limite-de-ressource': { family: 'reglage', label: 'Limite de prélèvement d’une ressource' },
-  'sol-de-parcelle': { family: 'reglage', label: 'Sol d’une zone ou d’une parcelle' },
+  'sol-de-parcelle': { family: 'reglage', label: 'Sol d’une parcelle ou d’un jardin' },
   'reglages-du-sol': { family: 'reglage', label: 'Réglages du sol' },
   'profil-racinaire': { family: 'reglage', label: 'Profondeur des racines' },
   'critere-meteo': { family: 'reglage', label: 'Alerte météo' },
@@ -68,6 +75,11 @@ export const CHANGE_SUBJECT_CODES = Object.keys(CHANGE_SUBJECTS) as ChangeSubjec
 /** La famille d'un sujet : elle se lit de la liste, jamais de l'écrivain. */
 export function familyOfSubject(subject: ChangeSubject): ChangeFamily {
   return CHANGE_SUBJECTS[subject].family;
+}
+
+/** Le nom d'un sujet à l'écran. */
+export function changeSubjectLabel(subject: ChangeSubject): string {
+  return CHANGE_SUBJECTS[subject].label;
 }
 
 export function isChangeSubject(value: string): value is ChangeSubject {

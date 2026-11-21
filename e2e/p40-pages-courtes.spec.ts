@@ -71,7 +71,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // données des parcours (sur la ferme du porteur, 77 espèces, 8 700 px de moins attendus).
   // Amélioration n° 3 (F715) : le pli fermé « Messages de la ferme » ; 3 400 → 3 500 px, la page de
   // `main` en prenant déjà environ 3 350 dans la CI. Toute section nouvelle de « Réglages » se plie.
-  reglages: 3_500,
+  // Amélioration n° 7 (D-288, F724) : le pli fermé « Journal des modifications », une ligne de
+  // plus, 84 px au téléphone (3 489 → 3 573 px en local) ; 100 px de plus au budget.
+  reglages: 3_500 + 100,
   // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
   // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
   besoins: 2_800,

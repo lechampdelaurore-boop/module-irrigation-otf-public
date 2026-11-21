@@ -16,6 +16,7 @@ import type { ChangeJournalEntry } from '../../lib/domain/change-journal/entry';
 import { FEATURE_IDS } from '../../lib/domain/features/catalogue';
 import { DEFAULT_PLANNING_SETTINGS } from '../../lib/domain/planning/settings';
 import { DEFAULT_SOIL_SETTINGS, type SoilRecord } from '../../lib/domain/soil-reserve/soil';
+import { fieldsWithoutWords } from '../support/change-journal-words';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FARM_SOIL } from '../support/soil-reserve-fixtures';
 import { crossSpaceReferences } from '../support/space-coherence';
@@ -43,7 +44,10 @@ const LATER = new Date('2026-11-21T10:05:00.000Z');
 /** Le journal d'une ferme, dans l'ordre des gestes (l'ordre d'écriture). */
 async function journal(spaceKey = ALICE): Promise<ChangeJournalEntry[]> {
   const order = (database.sqlite.prepare('SELECT id FROM irrigation_change_journal ORDER BY rowid').all() as { id: string }[]).map(({ id }) => id);
-  return (await listChangeJournalForUser(spaceKey, { limit: 200 })).sort((left, right) => order.indexOf(left.id) - order.indexOf(right.id));
+  const entries = (await listChangeJournalForUser(spaceKey, { limit: 200 })).sort((left, right) => order.indexOf(left.id) - order.indexOf(right.id));
+  // Chaque champ écrit a ses mots à l'écran (PR 7, D-288, F722).
+  assert.deepEqual(fieldsWithoutWords(entries), []);
+  return entries;
 }
 
 function summary(entry: ChangeJournalEntry) {

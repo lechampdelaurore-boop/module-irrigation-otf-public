@@ -7,6 +7,7 @@ import { loadReglagesPage } from '../page-loaders';
 import { IrrigationShell } from '../shell/irrigation-shell';
 import { UnavailableState } from '../shell/unavailable-state';
 import { WaterManagementDashboard } from '../water-management-dashboard';
+import { ChangeJournalSection } from './change-journal';
 import { FeatureSettings } from './feature-settings';
 import { NotificationSettings } from './notification-settings';
 import { OnboardingSettings } from './onboarding-settings';
@@ -28,13 +29,14 @@ export const metadata = pageMetadata('reglages');
  * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
  * l'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil, en tête
  * de la correspondance des espèces (4.4, F587) ; « Réglages à relire »
- * (4.4, F588) ; enfin, l'accueil de la
- * ferme (4.4, F581), replié.
+ * (4.4, F588) ; l'accueil de la
+ * ferme (4.4, F581), replié ; enfin, le journal des modifications, plié,
+ * toujours là (amélioration n° 7, D-288).
  */
 export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal } = await loadReglagesPage(context);
   context.logLoaded();
   // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
   const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
@@ -67,6 +69,7 @@ export default async function ReglagesPage({ searchParams }: { searchParams: Irr
         })}
         settingsGroups={settingsReview ? settingsGroupsText(settingsReview.groups) : []}
       />
+      <ChangeJournalSection season={context.season} initialView={changeJournal} />
     </IrrigationShell>
   );
 }
