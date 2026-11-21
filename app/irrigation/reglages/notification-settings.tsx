@@ -7,6 +7,7 @@ import { useIrrigationNotifications } from '../irrigation-manager/use-irrigation
 import { EVENING_TIMES, eveningTimeText } from '@/lib/domain/today/evening-reminder';
 import { saveEveningReminderAction, saveMorningMessageAction } from '../phone-notice-actions';
 import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
+import { AnchoredFold } from '../shell/page-settings-fold';
 
 const REPLY_CLASSES = { notice: 'water-notice', warning: 'weather-stale', error: 'water-error' } as const;
 
@@ -19,7 +20,9 @@ const NO_EVENTS: readonly IrrigationEventRecord[] = [];
  * Le même abonnement que sur la page des arrosages. Pour une ferme qui coche
  * le Planning, la case du message du matin (amélioration n° 3, F702, F712) ;
  * pour une ferme qui coche les Arrosages, celle du rappel du soir et son
- * heure (amélioration n° 2, F714).
+ * heure (amélioration n° 2, F714). Les deux dans un pli fermé dont la ligne
+ * dit les réglages (F715) : « Réglages » garde sa hauteur au téléphone, et
+ * l'ancre d'un réglage (`#message-du-matin`, `#rappel-du-soir`) l'ouvre.
  */
 export function NotificationSettings({ season, morningMessage, evening }: {
   season: number;
@@ -46,8 +49,7 @@ export function NotificationSettings({ season, morningMessage, evening }: {
           <p>Les fins d’arrosage, le message du matin, le rappel du soir et les alertes arrivent sur chaque appareil où vous les activez.</p>
         </div>
       </header>
-      {morningMessage === null ? null : <MorningMessageSetting initial={morningMessage} />}
-      {evening === null ? null : <EveningReminderSetting initial={evening} />}
+      {morningMessage === null && evening === null ? null : <PhoneNoticesFold morningMessage={morningMessage} evening={evening} />}
       <NotificationReadiness
         status={notificationStatus}
         pending={pending}
@@ -59,12 +61,39 @@ export function NotificationSettings({ season, morningMessage, evening }: {
   );
 }
 
+type EveningSetting = { enabled: boolean; time: string };
+
+/** La ligne du pli : les réglages tels qu'ils sont enregistrés, relus à chaque changement. */
+function phoneNoticesLine(morningMessage: boolean | null, evening: EveningSetting | null): string {
+  const parts: string[] = [];
+  if (morningMessage !== null) parts.push(morningMessage ? 'Message du matin activé.' : 'Message du matin coupé.');
+  if (evening !== null) parts.push(evening.enabled ? `Rappel du soir à ${eveningTimeText(evening.time)}.` : 'Rappel du soir coupé.');
+  return parts.join(' ');
+}
+
+/** Le pli des messages de la ferme, fermé, sa ligne de résumé à jour. */
+function PhoneNoticesFold({ morningMessage, evening }: { morningMessage: boolean | null; evening: EveningSetting | null }) {
+  const [morning, setMorning] = useState(morningMessage);
+  const [eveningSaved, setEveningSaved] = useState(evening);
+  return (
+    <AnchoredFold
+      id="messages-de-la-ferme"
+      className="species-fold phone-notice-fold"
+      bodyClassName="species-fold-body"
+      summary={<><strong>Messages de la ferme</strong><small>{phoneNoticesLine(morning, eveningSaved)}</small></>}
+    >
+      {morningMessage === null ? null : <MorningMessageSetting initial={morningMessage} onSaved={setMorning} />}
+      {evening === null ? null : <EveningReminderSetting initial={evening} onSaved={setEveningSaved} />}
+    </AnchoredFold>
+  );
+}
+
 /**
  * La case du message du matin : chaque matin, après le calcul du planning, un
  * seul message dit la journée ; rien quand il n'y a rien à dire. Le choix
  * vaut pour toute la ferme et s'enregistre aussitôt.
  */
-function MorningMessageSetting({ initial }: { initial: boolean }) {
+function MorningMessageSetting({ initial, onSaved }: { initial: boolean; onSaved: (enabled: boolean) => void }) {
   const [enabled, setEnabled] = useState(initial);
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const [pending, startTransition] = useTransition();
@@ -74,6 +103,7 @@ function MorningMessageSetting({ initial }: { initial: boolean }) {
     startTransition(async () => {
       const result = await saveMorningMessageAction({ enabled: next });
       setEnabled(result.ok ? result.morningMessage : !next);
+      if (result.ok) onSaved(result.morningMessage);
       setReplies([actionReply('matin', result.ok ? 'notice' : 'error', result.message)]);
     });
   };
@@ -97,17 +127,18 @@ function MorningMessageSetting({ initial }: { initial: boolean }) {
  * les arrosages prévus du jour jamais confirmés ; rien quand tout est
  * confirmé. Chaque changement s'enregistre aussitôt, pour toute la ferme.
  */
-function EveningReminderSetting({ initial }: { initial: { enabled: boolean; time: string } }) {
+function EveningReminderSetting({ initial, onSaved }: { initial: EveningSetting; onSaved: (setting: EveningSetting) => void }) {
   const [setting, setSetting] = useState(initial);
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const [pending, startTransition] = useTransition();
   // Le réglage suit le geste tout de suite ; un échec le remet comme avant et le dit.
-  const change = (next: { enabled: boolean; time: string }) => {
+  const change = (next: EveningSetting) => {
     const before = setting;
     setSetting(next);
     startTransition(async () => {
       const result = await saveEveningReminderAction(next);
       setSetting(result.ok ? { enabled: result.enabled, time: result.time } : before);
+      if (result.ok) onSaved({ enabled: result.enabled, time: result.time });
       setReplies([actionReply('soir', result.ok ? 'notice' : 'error', result.message)]);
     });
   };
