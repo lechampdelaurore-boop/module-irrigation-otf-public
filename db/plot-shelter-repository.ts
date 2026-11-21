@@ -2,6 +2,7 @@ import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { confirmOnboardingStepStatement, reopenOnboardingStepStatement } from './onboarding-repository';
 import type { StoredPlotShelter } from '@/lib/domain/onboarding/plots';
+import { plotShelterJournal } from './change-journal/places';
 
 /**
  * Le classement des jardins d'un espace, abri ou plein champ, confirmé par la
@@ -30,7 +31,8 @@ export type PlotShelterAnswer = { plotId: string; sheltered: boolean | null; pro
  * La personne classe un ou plusieurs jardins, ou en remet un « à classer ».
  * L'étape « Parcelles et abris » suit dans le même lot : confirmée quand
  * chaque jardin du plan est classé, avec le compte de ses abris et de ses
- * jardins de plein champ ; rouverte sinon.
+ * jardins de plein champ ; rouverte sinon. Chaque classement changé écrit sa
+ * ligne du journal des modifications, avant son écriture (D-289).
  */
 export async function savePlotSheltersForUser(spaceKey: string, input: {
   answers: readonly PlotShelterAnswer[];
@@ -41,19 +43,21 @@ export async function savePlotSheltersForUser(spaceKey: string, input: {
   const workspaceId = await ensureWorkspaceForUser(spaceKey);
   const existing = await listPlotSheltersForUser(spaceKey);
   const after = new Map(existing.map((row) => [row.plotId, row.sheltered]));
-  const writes = input.answers.map((answer) => {
+  const gesture = { workspaceId, actorUserId: spaceKey, at: input.at };
+  const writes = input.answers.flatMap((answer) => {
+    const journal = plotShelterJournal('jardin-sous-abri', gesture, answer.plotId, answer.sheltered);
     if (answer.sheltered === null) {
       after.delete(answer.plotId);
-      return db.prepare('DELETE FROM irrigation_plot_shelters WHERE workspace_id = ? AND otf_plot_id = ?').bind(workspaceId, answer.plotId);
+      return [journal, db.prepare('DELETE FROM irrigation_plot_shelters WHERE workspace_id = ? AND otf_plot_id = ?').bind(workspaceId, answer.plotId)];
     }
     after.set(answer.plotId, answer.sheltered);
-    return db.prepare(
+    return [journal, db.prepare(
       `INSERT INTO irrigation_plot_shelters (workspace_id, otf_plot_id, sheltered, proposed_sheltered, confirmed_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT (workspace_id, otf_plot_id) DO UPDATE SET
          sheltered = excluded.sheltered, proposed_sheltered = excluded.proposed_sheltered,
          confirmed_at = excluded.confirmed_at, updated_at = excluded.updated_at`,
-    ).bind(workspaceId, answer.plotId, answer.sheltered ? 1 : 0, answer.proposedSheltered ? 1 : 0, input.at, input.at);
+    ).bind(workspaceId, answer.plotId, answer.sheltered ? 1 : 0, answer.proposedSheltered ? 1 : 0, input.at, input.at)];
   });
   const classified = input.planPlotIds.filter((plotId) => after.has(plotId));
   const complete = input.planPlotIds.length > 0 && classified.length === input.planPlotIds.length;

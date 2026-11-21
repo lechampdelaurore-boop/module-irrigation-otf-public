@@ -1,4 +1,6 @@
 import { clockFromMinutes, countText, dateClockText } from '../clock-text.ts';
+import { kcSourceLabel, monthsLabel, stageAnchorLabel } from '../crop-water/presentation.ts';
+import type { KcSource, StageAnchor } from '../crop-water/reference.ts';
 import { celsiusText } from '../crop-alerts/text.ts';
 import { featureLabel, FEATURE_IDS } from '../features/catalogue.ts';
 import { decimalText, mmText, percentText, rateText, waterText } from '../figure-origin.ts';
@@ -131,6 +133,68 @@ const beds: Format = (value, nameOf) => {
   if (ids.length === 0) return 'aucune planche';
   const names = ids.map((id) => nameOf(String(id)));
   return names.every((name) => name !== null) ? names.join(', ') : countText(ids.length, 'planche');
+};
+
+/** « 03-15 » : un jour de l'année, écrit « 15/03 ». */
+function monthDayText(value: unknown): string {
+  const [month, date] = String(value).split('-');
+  return month && date ? `${date}/${month}` : String(value);
+}
+
+/** Les stades d'une culture de référence, `[[rang, libellé, Kc, début, estimé, mois], …]` : « Levée : Kc 0,4 dès le 15/03 ». */
+const referenceStages: Format = (value) => {
+  const items = list(value);
+  if (items === null) return String(value);
+  if (items.length === 0) return 'aucun stade';
+  return items.map((item) => {
+    if (!Array.isArray(item)) return '?';
+    const [, label, kc, start, estimated, months] = item;
+    const from = start === null ? '' : ` dès le ${monthDayText(start)}${Number(estimated) === 1 ? ' (estimé)' : ''}`;
+    const installation = months === null ? '' : `, ${countText(Number(months), 'mois')} d’installation`;
+    return `${String(label)} : Kc ${decimalText(Number(kc))}${from}${installation}`;
+  }).join(' ; ');
+};
+
+/** Les jeux de saison, `[[jeu, début, développement, pleine saison, fin, [mois]], …]` : « mars à août : 20, 30, 40 et 20 jours ». */
+const referenceSeasons: Format = (value) => {
+  const items = list(value);
+  if (items === null) return String(value);
+  if (items.length === 0) return 'aucun';
+  return items.map((item) => {
+    if (!Array.isArray(item)) return '?';
+    const [, initial, development, mid, late, months] = item;
+    const label = monthsLabel(Array.isArray(months) ? months.map(Number) : []);
+    if (initial === null) return label;
+    return `${label} : ${[initial, development, mid].map((length) => decimalText(Number(length))).join(', ')} et ${countText(Number(late), 'jour')}`;
+  }).join(' ; ');
+};
+
+/** Les débuts des stades, `[[jeu, rang, ancrage, durée, estimé], …]` : « jeu 1, stade 2 : 15 j après l'implantation ». */
+const referenceStarts: Format = (value) => {
+  const items = list(value);
+  if (items === null) return String(value);
+  if (items.length === 0) return 'aucun';
+  return items.map((item) => {
+    if (!Array.isArray(item)) return '?';
+    const [set, rank, from, duration, estimated] = item;
+    const anchor = (from === 'first-harvest' || from === 'mid-harvest' ? { from } : { from, days: Number(duration ?? 0) }) as StageAnchor;
+    return `jeu ${String(set)}, stade ${String(rank)} : ${stageAnchorLabel(anchor)}${Number(estimated) === 1 ? ' (estimé)' : ''}`;
+  }).join(' ; ');
+};
+
+/** Les jardins d'un groupe, dans leur ordre, `[[jardin, sens, écart], …]` : « Nord ; Sud, sens inversé, à 1,5 m ». */
+const gardens: Format = (value, nameOf) => {
+  const items = list(value);
+  if (items === null) return String(value);
+  if (items.length === 0) return 'aucun jardin';
+  return items.map((item) => {
+    if (!Array.isArray(item)) return '?';
+    const [plotId, order, gap] = item;
+    const parts = [nameOf(String(plotId)) ?? 'un jardin'];
+    if (order === 'reversed') parts.push('sens inversé');
+    if (Number(gap) > 0) parts.push(`à ${decimalText(Number(gap))} m du précédent`);
+    return parts.join(', ');
+  }).join(' ; ');
 };
 
 // --- Les champs -------------------------------------------------------------
@@ -270,6 +334,49 @@ const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWo
   fonctionnalites: featureFields(),
   'message-du-matin': { enabled: { label: 'Message du matin', format: flag } },
   'rappel-du-soir': { enabled: { label: 'Rappel du soir', format: flag }, time: { label: 'Heure', format: timeOfDay } },
+  'kc-corrige': { kc: { label: 'Kc de la ferme', format: decimal, empty: 'celui de la source' } },
+  'culture-de-reference': {
+    source: { label: 'Source des Kc', format: (value) => kcSourceLabel(String(value) as KcSource) },
+    curveShape: { label: 'Forme des Kc', format: words({ trapezoid: 'trois Kc (FAO-56)', steps: 'un Kc par stade', calendar: 'au calendrier' }) },
+    kcInitial: { label: 'Kc début', format: decimal, empty: 'aucun' },
+    kcMid: { label: 'Kc pleine saison', format: decimal, empty: 'aucun' },
+    kcEnd: { label: 'Kc fin', format: decimal, empty: 'aucun' },
+    abatement: { label: 'Coefficient d’abattement', format: decimal, empty: 'aucun' },
+    calendarEnd: { label: 'Fin du calendrier', format: (value) => monthDayText(value), empty: 'aucune' },
+    emergenceSowingDays: { label: 'Levée après un semis', format: days },
+    emergencePlantingDays: { label: 'Reprise après une plantation', format: days },
+    sourceUrl: { label: 'Lien de la source', format: text, empty: 'aucun' },
+    datesSource: { label: 'Source des dates', format: text, empty: 'aucune' },
+    stages: { label: 'Stades', format: referenceStages },
+    seasons: { label: 'Jeux de saison', format: referenceSeasons },
+    starts: { label: 'Débuts des stades', format: referenceStarts },
+  },
+  'correspondance-d-espece': {
+    targetKind: {
+      label: 'Rattachement',
+      format: words({ reference: 'une culture de référence', 'without-reference': 'sans référence Kc', 'surface-state': 'engrais vert : état de la surface du sol' }),
+    },
+    referenceCrop: { label: 'Culture de référence', format: text, empty: 'aucune' },
+    analogy: { label: 'Par analogie', format: flag },
+  },
+  'k-abri': { factor: { label: 'K_abri', format: decimal } },
+  'paillage-plastique': { plasticMulch: { label: 'Paillage plastique', format: flag } },
+  'filet-d-ombrage': {
+    rate: { label: 'Ombrage', format: share },
+    placedOn: { label: 'Posé le', format: day },
+    removedOn: { label: 'Retiré le', format: day, empty: 'toujours posé' },
+  },
+  'options-du-besoin': {
+    smoothing: { label: 'Lissage des passages de stade', format: flag },
+    shading: { label: 'Ombrage compté', format: flag },
+  },
+  'jardin-sous-abri': { sheltered: { label: 'Classement', format: words({ 1: 'sous abri', 0: 'plein champ' }) } },
+  'groupe-de-jardins': { members: { label: 'Jardins', format: gardens } },
+  'lieu-meteo': {
+    locationMode: { label: 'Lieu', format: words({ otf: 'l’adresse de la ferme dans Ouvre ta ferme', custom: 'une commune choisie' }) },
+    customCity: { label: 'Commune', format: text, empty: 'aucune' },
+    customPostcode: { label: 'Code postal', format: text, empty: 'aucun' },
+  },
   materiel: {
     kind: { label: 'Nature', format: words(KIND_WORDS) },
     mobility: { label: 'Installation', format: words({ fixed: 'fixe', mobile: 'mobile' }) },

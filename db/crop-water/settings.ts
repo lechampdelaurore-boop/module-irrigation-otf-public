@@ -11,6 +11,7 @@ import {
   type ShadeNet,
 } from '@/lib/domain/crop-water/etm';
 import { isValidDateKey } from '@/lib/domain/water-management';
+import { bedMulchJournal, cropWaterOptionsJournal, shadeNetCreationJournal, shadeNetRemovalJournal, shelterFactorJournal } from '../change-journal/crop-settings';
 
 /**
  * Persistance des réglages du besoin par culture et par stade
@@ -18,7 +19,8 @@ import { isValidDateKey } from '@/lib/domain/water-management';
  * migration 0023) : le K_abri de chaque abri, révisions datées jamais
  * modifiées ni effacées ; le paillage plastique par planche et par saison ;
  * les filets d'ombrage, datés ; les options de la ferme, lissage et ombrage,
- * désactivées tant que rien n'est enregistré (D-054).
+ * désactivées tant que rien n'est enregistré (D-054). Chaque geste écrit sa
+ * ligne du journal des modifications dans son lot (amélioration n° 7, D-289).
  */
 
 type ShelterRevision = BedWaterSettings['shelterFactors'][number];
@@ -46,10 +48,10 @@ export async function addShelterFactorForUser(
   if (problems.length > 0) return { ok: false, problems };
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const recordedAt = now.toISOString();
-  await db.prepare(
+  await db.batch([shelterFactorJournal('k-abri', { workspaceId, actorUserId: ownerUserId, at: recordedAt }, revision), db.prepare(
     `INSERT INTO irrigation_crop_shelter_factors (id, workspace_id, otf_plot_id, factor, effective_from, recorded_at, actor_user_id)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).bind(crypto.randomUUID(), workspaceId, revision.shelterId, revision.value, revision.effectiveFrom, recordedAt, ownerUserId).run();
+  ).bind(crypto.randomUUID(), workspaceId, revision.shelterId, revision.value, revision.effectiveFrom, recordedAt, ownerUserId)]);
   return { ok: true, value: { ...revision, recordedAt } };
 }
 
@@ -60,12 +62,13 @@ export async function saveBedMulchForUser(
   now = new Date(),
 ): Promise<void> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.prepare(
+  const at = now.toISOString();
+  await db.batch([bedMulchJournal('paillage-plastique', { workspaceId, actorUserId: ownerUserId, at }, setting), db.prepare(
     `INSERT INTO irrigation_crop_bed_mulch (workspace_id, season, otf_bed_id, plastic_mulch, actor_user_id, updated_at)
      VALUES (?, ?, ?, ?, ?, ?)
      ON CONFLICT (workspace_id, season, otf_bed_id)
      DO UPDATE SET plastic_mulch = excluded.plastic_mulch, actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`,
-  ).bind(workspaceId, setting.season, setting.bedId, setting.plasticMulch ? 1 : 0, ownerUserId, now.toISOString()).run();
+  ).bind(workspaceId, setting.season, setting.bedId, setting.plasticMulch ? 1 : 0, ownerUserId, at)]);
 }
 
 /** Pose un filet d'ombrage sur une planche, d'un jour à un autre ; `to` nul : toujours posé. */
@@ -81,10 +84,11 @@ export async function addShadeNetForUser(
   if (problems.length > 0) return { ok: false, problems };
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const id = crypto.randomUUID();
-  await db.prepare(
+  const at = now.toISOString();
+  await db.batch([db.prepare(
     `INSERT INTO irrigation_crop_shade_nets (id, workspace_id, otf_bed_id, rate, placed_on, removed_on, actor_user_id, recorded_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).bind(id, workspaceId, net.bedId, net.rate, net.from, net.to, ownerUserId, now.toISOString()).run();
+  ).bind(id, workspaceId, net.bedId, net.rate, net.from, net.to, ownerUserId, at), shadeNetCreationJournal('filet-d-ombrage', { workspaceId, actorUserId: ownerUserId, at }, id)]);
   return { ok: true, value: { ...net, id } };
 }
 
@@ -97,6 +101,7 @@ export async function removeShadeNetForUser(
   ownerUserId: string,
   netId: string,
   removedOn: string,
+  now = new Date(),
 ): Promise<CropWaterWriteResult<StoredShadeNet> | null> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return null;
@@ -107,9 +112,9 @@ export async function removeShadeNetForUser(
   const net: StoredShadeNet = { id: row.id, bedId: row.otf_bed_id, rate: row.rate, from: row.placed_on, to: removedOn };
   const problem = isValidDateKey(removedOn) ? shadeNetProblem(net) : 'Jour du filet invalide.';
   if (problem) return { ok: false, problems: [problem] };
-  await db.prepare(
+  await db.batch([shadeNetRemovalJournal('filet-d-ombrage', { workspaceId, actorUserId: ownerUserId, at: now.toISOString() }, netId, removedOn), db.prepare(
     `UPDATE irrigation_crop_shade_nets SET removed_on = ? WHERE id = ? AND workspace_id = ?`,
-  ).bind(removedOn, netId, workspaceId).run();
+  ).bind(removedOn, netId, workspaceId)]);
   return { ok: true, value: net };
 }
 
@@ -120,13 +125,14 @@ export async function saveCropWaterOptionsForUser(
   now = new Date(),
 ): Promise<void> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.prepare(
+  const at = now.toISOString();
+  await db.batch([cropWaterOptionsJournal('options-du-besoin', { workspaceId, actorUserId: ownerUserId, at }, options), db.prepare(
     `INSERT INTO irrigation_crop_water_options (workspace_id, smoothing, shading, actor_user_id, updated_at)
      VALUES (?, ?, ?, ?, ?)
      ON CONFLICT (workspace_id)
      DO UPDATE SET smoothing = excluded.smoothing, shading = excluded.shading,
                    actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`,
-  ).bind(workspaceId, options.smoothing ? 1 : 0, options.shading ? 1 : 0, ownerUserId, now.toISOString()).run();
+  ).bind(workspaceId, options.smoothing ? 1 : 0, options.shading ? 1 : 0, ownerUserId, at)]);
 }
 
 /** Les réglages d'une exploitation : K_abri, paillages, filets et options, désactivées par défaut. */

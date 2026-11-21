@@ -791,6 +791,22 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 8, les
+  réglages restants, codée le 21 novembre 2026** (D-289, F725 à F729),
+  empilée sur la PR 7 ; règle F718. Les réglages que la liste du contrat ne
+  nommait pas écrivent leur ligne dans leur lot : Kc corrigés, cultures de
+  référence de la ferme (créée, modifiée, retirée), correspondance des
+  espèces, K_abri, paillage plastique, filets d'ombrage, options du besoin
+  par culture, jardins sous abri, groupes de jardins, lieu de la météo ;
+  dix sujets nouveaux, famille « Réglages ». Une valeur composée (stades,
+  jeux de saison, jardins d'un groupe) se garde en un texte relu à
+  l'identique : un enregistrement identique n'écrit rien. Hors du journal,
+  avec leur raison : l'état des synchronisations météo, le report des
+  groupes d'une saison sur l'autre, la proposition du module pour un
+  jardin. Sans migration ni écran nouveau. Contrôles : voir la PR. Décidé
+  par le coordinateur dans l'autonomie que le porteur lui a confiée
+  (19 novembre 2026) ; le porteur peut la refuser à la relecture.
+
 - Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
   l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
   la PR 6. « Réglages » finit par le pli « Journal des modifications »,
@@ -803,8 +819,8 @@ registres, elle y renvoie.
   mise en service, lue dans la liste des migrations reçues par la base. Le
   budget de hauteur de « Réglages » au téléphone (P40) passe à 3 750 px.
   Parcours P55 à 390 et 1 440 px. Sans migration. Contrôles : voir la PR.
-  L'amélioration n° 7 est codée en entier ; reste F718 (les réglages hors
-  de la liste du contrat), sur le mot du porteur.
+  L'amélioration n° 7 est codée en entier ; F718 (les réglages hors de la
+  liste du contrat) est réglée par la PR 8 (D-289).
 
 - Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
   matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,

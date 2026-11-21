@@ -7,6 +7,7 @@ import { aEcritUneLigne } from './write-result';
 import { confirmOnboardingStepStatement } from './onboarding-repository';
 import { clearedGoalJournal, goalJournal } from './change-journal/objectives';
 import { dailyWaterLimitJournal } from './change-journal/settings';
+import { weatherLocationJournal } from './change-journal/places';
 
 type WeatherLocationMode = 'otf' | 'custom';
 
@@ -254,8 +255,10 @@ export async function saveWeatherPreferenceForUser(
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const now = new Date().toISOString();
   const custom = preference.locationMode === 'custom';
-  // Choisir la commune, ou le siège en dernier recours, confirme l'étape « Où est la ferme » (4.4, F419) : dans le même lot.
-  await db.batch([db.prepare(
+  // Choisir la commune, ou le siège en dernier recours, confirme l'étape « Où est la ferme » (4.4, F419) : dans le même lot,
+  // avec la ligne du journal des modifications, avant l'écriture (D-289).
+  const location = { locationMode: preference.locationMode, customCity: custom ? preference.customCity : null, customPostcode: custom ? preference.customPostcode : null };
+  await db.batch([weatherLocationJournal('lieu-meteo', { workspaceId, actorUserId: ownerUserId, at: now }, location), db.prepare(
     `INSERT INTO irrigation_weather_preferences
        (workspace_id, location_mode, custom_city, custom_postcode, updated_at)
      VALUES (?, ?, ?, ?, ?)
