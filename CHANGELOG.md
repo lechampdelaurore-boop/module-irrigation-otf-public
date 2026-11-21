@@ -81,6 +81,21 @@ source détaillée commit par commit.
   zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
   Sans migration. Parcours P52.
 
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
+
+- **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à
+  F669) : en bas de Réglages, replié, ce qui disparaît, ce qui reste, le
+  délai de sept jours et l'autorisation à retirer dans Ouvre ta ferme ; la
+  demande ne part qu'avec le nom de la ferme tapé, relu par le serveur.
+  Absent de la démonstration.
+- **L'espace figé** : dès la demande, chaque page du module montre le jour
+  de l'effacement, sans rien lire d'Ouvre ta ferme ni rien laisser saisir,
+  et « Annuler la demande » tant que l'effacement n'a pas commencé.
+- **L'effacement sans attendre**, sur la page d'état, sur demande écrite :
+  l'exploitant choisit la demande, retape le numéro de sa ferme, et
+  l'effacement passe aussitôt ; `docs/exploitation.md` dit comment.
+- La page de confidentialité dit la demande dans Réglages. Parcours P51.
+
 ### Ajouté (Tranche 4, 4.5, PR 5 sur 5, troisième partie)
 
 - **Le journal d'accès du support** (D-250, F660 à F664) : sur la page
