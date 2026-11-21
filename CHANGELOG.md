@@ -18,6 +18,15 @@ source détaillée commit par commit.
   zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
   Sans migration. Parcours P52.
 
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, deuxième partie)
+
+- **Les appareils d'une ferme effacée sont oubliés** (D-248, F654 à F656) :
+  le Worker de notification retire chaque appareil de l'espace effacé, et
+  oublie la fiche d'un appareil qui ne sert plus aucun espace ;
+  l'effacement n'est noté fait qu'après. Un abonnement dont les envois
+  manquent depuis 90 jours est oublié comme un abonnement expiré ; un
+  abonnement à qui rien n'est envoyé ne l'est jamais.
+
 ### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
 
 - **La conservation, table par table** (D-247, F649 à F653) : chaque table

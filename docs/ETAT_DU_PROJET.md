@@ -685,6 +685,18 @@ registres, elle y renvoie.
   viennent avec la seconde partie. À fusionner après la première partie de
   la PR 3.
 
+- Tranche 4, **4.5, PR 3 sur 5, deuxième partie : codée le 20 novembre
+  2026** (D-248, F654 à F656, section 10 bis.19 de
+  `docs/tranche-4-contract.md`). Le Worker de notification oublie les
+  appareils d'une ferme effacée (route `/v1/recipients/forget` ; la fiche
+  d'un appareil qui ne sert plus aucun espace est oubliée), et l'effacement
+  n'est noté fait qu'après ; un abonnement dont les envois manquent depuis
+  90 jours est oublié comme un abonnement expiré, jamais un abonnement à
+  qui rien n'est envoyé. Sans migration de la base. La PR 3 se fait
+  désormais en trois : la demande dans « Réglages » vient en troisième
+  partie, après la fusion de la 4.4. À fusionner après la première partie
+  de la PR 5.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

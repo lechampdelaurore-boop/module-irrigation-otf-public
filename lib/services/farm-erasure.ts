@@ -9,6 +9,7 @@ import {
   type ErasingRequest,
 } from '@/db/farm-erasure-repository';
 import { logJsonLine } from '../adapters/log';
+import { forgetIrrigationPushRecipient, type IrrigationPushServiceResult } from './irrigation-push-service';
 import {
   FARM_ERASURE_BATCH_ROWS,
   FARM_ERASURE_RUN_BUDGET,
@@ -27,15 +28,30 @@ import {
  * les tables où il reste des lignes, sans rien oublier ni rien effacer
  * d'autre.
  *
+ * Avant la fin, le Worker de notification oublie les appareils de l'espace
+ * (10 bis.19, F654) : tant qu'il ne l'a pas fait, la demande reste « en
+ * cours » et le passage suivant le lui redemande.
+ *
  * Le journal ne porte que l'identifiant de la demande, des noms de table, des
  * nombres et des classes d'erreur : ni personne, ni ferme, ni contenu (F564).
  */
+
+/** Le Worker de notification n'a pas oublié les appareils de l'espace : rien n'est noté fait. */
+class PushForgetError extends Error {
+  constructor() {
+    super('Le service d’alerte n’a pas oublié les appareils de l’espace.');
+    this.name = 'PushForgetError';
+  }
+}
+
+type ForgetPush = (recipientKey: string) => Promise<IrrigationPushServiceResult>;
 
 type RunOptions = {
   now?: Date;
   budget?: { statements: number; milliseconds: number };
   clock?: () => number;
   log?: typeof logJsonLine;
+  forgetPush?: ForgetPush;
 };
 
 type Allowance = { statements: number; deadlineMs: number; clock: () => number };
@@ -52,6 +68,7 @@ export async function runDueFarmErasures({
   budget = FARM_ERASURE_RUN_BUDGET,
   clock = Date.now,
   log = logJsonLine,
+  forgetPush = forgetIrrigationPushRecipient,
 }: RunOptions = {}): Promise<FarmErasureRunReport> {
   const allowance: Allowance = { statements: budget.statements, deadlineMs: clock() + budget.milliseconds, clock };
   let requests: ErasingRequest[];
@@ -66,7 +83,7 @@ export async function runDueFarmErasures({
   const report = { due: requests.length, erased: 0, unfinished: 0, failures: [] as string[] };
   for (const request of requests) {
     try {
-      if (await eraseSpace(request, allowance, log)) report.erased += 1;
+      if (await eraseSpace(request, allowance, log, forgetPush)) report.erased += 1;
       else report.unfinished += 1;
     } catch (error) {
       report.failures.push(errorClass(error));
@@ -77,11 +94,12 @@ export async function runDueFarmErasures({
 }
 
 /** Efface ce que l'espace garde, puis l'espace ; `false` quand la borne du passage arrête avant la fin. */
-async function eraseSpace(request: ErasingRequest, allowance: Allowance, log: typeof logJsonLine): Promise<boolean> {
+async function eraseSpace(request: ErasingRequest, allowance: Allowance, log: typeof logJsonLine, forgetPush: ForgetPush): Promise<boolean> {
   const space = await readErasedSpace(request.workspaceId);
   if (space === null) {
-    // L'espace n'existe plus : seule la note reste à écrire.
+    // L'espace n'existe plus : ses appareils et la note restent à faire.
     if (!take(allowance)) return false;
+    await forgetDevices(request.workspaceId, forgetPush);
     await finishFarmErasure(request, new Date(allowance.clock()).toISOString());
     log('warn', { event: 'farm_erasure_done', erasure: request.id, rows: 0, spaceAlreadyGone: true });
     return true;
@@ -106,9 +124,20 @@ async function eraseSpace(request: ErasingRequest, allowance: Allowance, log: ty
     rows += tableRows;
   }
   if (!take(allowance)) return false;
+  await forgetDevices(request.workspaceId, forgetPush);
   await finishFarmErasure(request, new Date(allowance.clock()).toISOString());
   log('info', { event: 'farm_erasure_done', erasure: request.id, rows: rows + 1 });
   return true;
+}
+
+/**
+ * Les appareils de l'espace, oubliés par le Worker de notification (F654).
+ * Sans service configuré (développement, démonstration), aucun appareil n'a
+ * pu s'inscrire : rien à oublier.
+ */
+async function forgetDevices(workspaceId: string, forgetPush: ForgetPush): Promise<void> {
+  const result = await forgetPush(workspaceId);
+  if (result.status === 'failed') throw new PushForgetError();
 }
 
 /** Le nom de la classe d'erreur, jamais son message (F604). */
