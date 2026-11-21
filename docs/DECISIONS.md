@@ -7382,3 +7382,33 @@ d'accès du support).
 Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
 aucun secret, aucun service nouveau ; les durées déjà tenues par le code ;
 le texte de la page de confidentialité (seconde partie).
+
+## D-248 — Tranche 4, 4.5, PR 3 (deuxième partie) : les appareils d'une ferme effacée, et ceux qui ne répondent plus
+
+Date : 20 novembre 2026.
+
+**Contexte.** F563 efface, avec la ferme, les abonnements de notification de
+son espace ; ils vivent dans le Worker de notification, pas dans la base, et
+aucune route ne les oubliait. F562 veut qu'un abonnement sans réponse du
+service depuis 90 jours soit oublié ; le Worker ne gardait rien de ses
+échecs. Rien de cela ne touche « Réglages », que la chaîne de la 4.4 occupe
+encore.
+
+**Décision.** Section 10 bis.19 du contrat de la Tranche 4 (F654 à F656) :
+
+1. La PR 3 en trois : le moteur (première partie, D-246), le Worker de
+   notification (cette deuxième partie), puis la demande dans « Réglages »
+   après la 4.4.
+2. Une route `/v1/recipients/forget` : chaque appareil de l'espace le quitte,
+   et la fiche d'un appareil qui ne sert plus aucun espace est oubliée.
+3. Le moteur de l'effacement l'appelle avant de noter l'effacement fait ;
+   sans réponse, rien n'est noté et le passage suivant recommence.
+4. Un abonnement dont les envois manquent depuis 90 jours est oublié comme un
+   abonnement expiré ; un abonnement à qui rien n'est envoyé ne l'est jamais.
+5. La colonne qui garde le premier envoi manqué s'ajoute aux listes
+   existantes à leur réveil, sans toucher leurs lignes.
+
+Ne changent pas : aucune migration de la base D1, aucun appel à OTF, aucun
+secret, aucun service nouveau ; les alarmes et leurs tentatives ; la règle
+« un appareil, une personne » (F371) ; le texte de la page de
+confidentialité (PR 5, seconde partie).

@@ -315,6 +315,38 @@ test('jamais faite à moitié : une ligne écrite pendant l’effacement fait re
   assertAliceGone(database.sqlite);
 });
 
+test('les appareils de l’espace sont oubliés avant la fin ; sans réponse du service d’alerte, rien n’est noté fait (F654)', async () => {
+  aliceWorkspace = await populate(ALICE, 'A');
+  bobWorkspace = await populate(BOB, 'B');
+  await requestFarmErasure(ALICE, REQUESTED);
+  const asked: string[] = [];
+  const lines: Record<string, unknown>[] = [];
+  const failing = async (recipientKey: string) => {
+    asked.push(recipientKey);
+    return { status: 'failed' as const, message: 'Le service d’alerte ne répond pas.' };
+  };
+  assert.deepEqual(
+    await runDueFarmErasures({ now: FIRST_MORNING_AFTER, log: (_level, entry) => lines.push(entry), forgetPush: failing }),
+    { due: 1, erased: 0, unfinished: 0, failures: ['PushForgetError'] },
+  );
+  assert.deepEqual(asked, [aliceWorkspace], 'l’espace effacé, et lui seul');
+  assert.deepEqual(lines.filter((line) => line.event === 'farm_erasure_failed').map((line) => line.error), ['PushForgetError']);
+  assert.ok(await findWorkspaceIdForUser(ALICE), 'tant que ses appareils restent inscrits, l’espace reste');
+  assert.equal((await listErasingFarmErasures()).length, 1, 'la demande reste « en cours »');
+
+  const forgotten = async (recipientKey: string) => {
+    asked.push(recipientKey);
+    return { status: 'ok' as const };
+  };
+  assert.deepEqual(
+    await runDueFarmErasures({ now: new Date('2026-11-28T06:15:00.000Z'), log: silent, forgetPush: forgotten }),
+    { due: 1, erased: 1, unfinished: 0, failures: [] },
+  );
+  assert.deepEqual(asked, [aliceWorkspace, aliceWorkspace]);
+  assertAliceGone(database.sqlite);
+  assert.ok(await findWorkspaceIdForUser(BOB) === bobWorkspace, 'BOB garde son espace');
+});
+
 test('preuve 4 : annulée pendant les sept jours, la demande n’efface rien, et une nouvelle demande reste possible', async () => {
   aliceWorkspace = await populate(ALICE, 'A');
   bobWorkspace = await populate(BOB, 'B');

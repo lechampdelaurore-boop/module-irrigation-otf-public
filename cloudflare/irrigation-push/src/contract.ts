@@ -110,6 +110,16 @@ export function validateIrrigationPushUnsubscriptionRequest(value: unknown) {
   return recipientKey && endpoint ? { recipientKey, endpoint } : null;
 }
 
+/**
+ * L'oubli de tous les appareils d'un espace effacé (docs/tranche-4-contract.md,
+ * 10 bis.19, F654) : le seul identifiant de l'espace.
+ */
+export function validateIrrigationPushRecipientForget(value: unknown) {
+  if (!isRecord(value)) return null;
+  const recipientKey = normalizeIdentifier(value.recipientKey);
+  return recipientKey ? { recipientKey } : null;
+}
+
 function normalizePushEndpoint(value: unknown) {
   if (typeof value !== 'string') return null;
   const endpoint = value.trim();
