@@ -39,7 +39,7 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
   overrideDatabase(createD1FromSqlite(sqlite));
   try {
     process.env.DEMO_MODE = 'true';
-    // Les dépôts d'aujourd'hui écrivent aussi au journal des modifications (0043, amélioration n° 7) : sur la copie
+    // Les dépôts d'aujourd'hui écrivent aussi au journal des modifications (0044, amélioration n° 7) : sur la copie
     // arrêtée à la 0033, ses lignes vont dans une table temporaire, hors de la copie, effacée avant les migrations.
     sqlite.exec(`CREATE TEMP TABLE irrigation_change_journal (id, workspace_id, family, subject, object_id, object_context, action,
       before_values, after_values, actor_user_id, created_at)`);
