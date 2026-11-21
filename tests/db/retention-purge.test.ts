@@ -55,6 +55,11 @@ function writeAgedRows(sqlite: DatabaseSync): void {
   const notice = sqlite.prepare('INSERT INTO irrigation_operator_notices (paris_day, kind, problems, claimed_at, sent_at) VALUES (?, ?, ?, ?, ?)');
   notice.run('2026-10-23', 'alert', 1, '2026-10-23T07:00:00.000Z', '2026-10-23T07:00:01.000Z');
   notice.run('2026-10-24', 'all-good', 0, '2026-10-24T07:00:00.000Z', '2026-10-24T07:00:01.000Z');
+  const access = sqlite.prepare('INSERT INTO irrigation_support_accesses (id, otf_farm_id, accessed_on, reason, recorded_at) VALUES (?, ?, ?, ?, ?)');
+  for (const farm of FARMS) {
+    access.run(`trop-vieux-${farm}`, farm, '2025-11-27', 'La ferme demande pourquoi son planning est vide', '2025-11-27T10:00:00.000Z');
+    access.run(`a-sa-limite-${farm}`, farm, '2025-11-28', 'La ferme demande pourquoi son planning est vide', '2025-11-28T10:00:00.000Z');
+  }
 }
 
 /** Ce que gardent les tables purgées, ligne par ligne, dans un ordre stable. */
@@ -67,6 +72,7 @@ function aged(sqlite: DatabaseSync) {
     otf_call_pauses: all('SELECT scope FROM otf_call_pauses ORDER BY scope'),
     otf_authentication_failures: all('SELECT failed_at_ms FROM otf_authentication_failures ORDER BY failed_at_ms'),
     irrigation_operator_notices: all('SELECT paris_day FROM irrigation_operator_notices ORDER BY paris_day'),
+    irrigation_support_accesses: all('SELECT otf_farm_id, accessed_on FROM irrigation_support_accesses ORDER BY otf_farm_id, accessed_on'),
   };
 }
 
@@ -78,6 +84,7 @@ const KEPT = {
   otf_call_pauses: ['5120'],
   otf_authentication_failures: [`${ms('2026-11-28T05:01:00.001Z')}`],
   irrigation_operator_notices: ['2026-10-24'],
+  irrigation_support_accesses: FARMS.map((farm) => `${farm} 2025-11-28`),
 };
 
 /** Le nombre de lignes de chaque table que les purges ne visent pas. */
@@ -103,7 +110,7 @@ test('chaque purge efface, pour toutes les fermes, ce qui a dépassé sa durée,
 
   const report = await runRetentionPurges({ now: NOW, log: (_level, entry) => lines.push(entry) });
 
-  assert.deepEqual(report, { purged: 9, unfinished: 0, failures: [] });
+  assert.deepEqual(report, { purged: 11, unfinished: 0, failures: [] });
   assert.deepEqual(aged(database.sqlite), KEPT);
   assert.deepEqual(untouched(database.sqlite), before, 'aucune table d’espace ni table commune sans durée n’est touchée');
   assert.deepEqual(lines, [
@@ -113,6 +120,7 @@ test('chaque purge efface, pour toutes les fermes, ce qui a dépassé sa durée,
     { event: 'retention_purge_step', table: 'otf_call_pauses', rows: 1 },
     { event: 'retention_purge_step', table: 'otf_authentication_failures', rows: 1 },
     { event: 'retention_purge_step', table: 'irrigation_operator_notices', rows: 1 },
+    { event: 'retention_purge_step', table: 'irrigation_support_accesses', rows: 2 },
   ], 'le journal ne dit que des noms de table et des nombres');
 
   assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 0, unfinished: 0, failures: [] }, 'un second passage n’a plus rien à faire');
@@ -125,10 +133,10 @@ test('bornée, une purge reprend au passage suivant, sans rien effacer de plus',
   for (let index = 0; index < 1_200; index += 1) start.run('4394', ms('2026-11-01T05:16:00.000Z') + index, '2026-11-01');
 
   const cut = await runRetentionPurges({ now: NOW, statements: 2, log: () => undefined });
-  assert.deepEqual(cut, { purged: 1_000, unfinished: 6, failures: [] }, 'deux lots de 500, puis plus rien de neuf : six purges à finir');
+  assert.deepEqual(cut, { purged: 1_000, unfinished: 7, failures: [] }, 'deux lots de 500, puis plus rien de neuf : sept purges à finir');
   assert.equal(Number((database.sqlite.prepare('SELECT COUNT(*) AS n FROM otf_call_starts').get() as { n: number }).n), 1_202 - 1_000 + 2);
 
-  assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 1_202 - 1_000 + 7, unfinished: 0, failures: [] });
+  assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 1_202 - 1_000 + 9, unfinished: 0, failures: [] });
   assert.deepEqual(aged(database.sqlite), KEPT);
 });
 
@@ -151,7 +159,7 @@ test('une purge en échec n’arrête pas les autres, et son message ne va pas a
   } finally {
     overrideDatabase(database.d1);
   }
-  assert.deepEqual(report, { purged: 7, unfinished: 0, failures: ['Error'] });
+  assert.deepEqual(report, { purged: 9, unfinished: 0, failures: ['Error'] });
   assert.deepEqual(lines.filter((line) => line.event === 'retention_purge_failed'), [{ event: 'retention_purge_failed', table: 'otf_call_outcomes', error: 'Error' }]);
   assert.ok(!JSON.stringify(lines).includes('panne simulée'), 'le message de la base n’est pas recopié');
   assert.deepEqual(aged(database.sqlite), { ...KEPT, otf_call_outcomes: FARMS.flatMap((farm) => [`${farm} ${ms('2026-11-20T04:00:00.000Z')}`, `${farm} ${ms('2026-11-20T05:00:00.000Z')}`]) });
