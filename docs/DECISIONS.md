@@ -7413,6 +7413,66 @@ secret, aucun service nouveau ; les alarmes et leurs tentatives ; la règle
 « un appareil, une personne » (F371) ; le texte de la page de
 confidentialité (PR 5, seconde partie).
 
+## D-249 — Tranche 4, 4.5, PR 5 (deuxième partie) : la page de confidentialité, les exports gardés cinq semaines, le support
+
+Date : 20 novembre 2026.
+
+**Contexte.** La première partie de la PR 5 (D-247) a donné une durée à
+chaque table ; la page de confidentialité n'en disait encore que deux, sans
+la phrase des 30 jours approuvée par le porteur le 19 novembre 2026. Un
+export hebdomadaire garde aussi les données d'une ferme effacée depuis, et
+aucune règle ne disait combien de temps l'exploitant les garde.
+`docs/exploitation.md` ne disait pas encore que faire d'une panne, d'une
+ferme qui écrit ou d'une clé perdue (F567).
+
+**Décision.** Section 10 bis.20 du contrat de la Tranche 4 (F657 à F659) :
+
+1. La PR 5 en trois : la conservation (D-247), ce qui se lit et se relit
+   (cette deuxième partie), puis le journal d'accès du support et les coûts.
+2. Un export est gardé cinq semaines au plus. La commande de l'export le
+   tient : après un export vérifié, elle efface du même dossier ceux de
+   25 jours ou plus (35 jours moins les 10 jours du rouge de la tâche), et
+   seulement les fichiers qu'elle a nommés ; les copies hors de l'ordinateur
+   suivent la même règle, à la main.
+3. La page de confidentialité (texte du 20 novembre 2026) dit chaque durée
+   que le code tient, la phrase des 30 jours telle qu'approuvée, et le
+   compte des lectures dans Ouvre ta ferme ; ce qui n'existe pas encore ne
+   s'écrit qu'avec son code. Le texte est relu par le porteur avant la
+   fusion, qui le met en ligne.
+4. `docs/exploitation.md` dit, cas par cas, ce que fait l'exploitant seul,
+   avec un gabarit de réponse fondé sur la page d'état ; la page d'accueil
+   du site dit le délai de réponse, sans engagement.
+5. La 4.5 prend aussi F660 à F669 et D-250 à D-252.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun secret, aucun
+service nouveau ; l'export lui-même (chiffré avant d'être écrit, jamais dans
+le dépôt) ; la phrase des 30 jours, appliquée mot pour mot.
+
+## D-250 — Tranche 4, 4.5, PR 5 (troisième partie) : le journal d'accès du support et les coûts sur la page d'état
+
+Date : 20 novembre 2026.
+
+**Contexte.** F567 veut que chaque consultation des données d'une ferme par
+l'exploitant soit notée, gardée 12 mois ; F565 (point 6) et F568 veulent
+les coûts sur la page d'état, copiés à la main chaque mois, sans appel à
+l'API de Cloudflare. Rien de cela n'existait.
+
+**Décision.** Section 10 bis.21 du contrat de la Tranche 4 (F660 à F664) :
+
+1. Une migration (0041), deux tables communes : le
+   journal d'accès du support et le relevé des coûts du mois.
+2. Une note d'accès : le jour, la ferme, la raison en une ligne, jamais ce
+   qui a été vu ; 12 mois, puis la purge du matin ; partie avec le dernier
+   espace de la ferme. La page de confidentialité le dit.
+3. Un relevé des coûts par mois, recopié du tableau de bord ; chaque poste
+   comparé à ce que l'offre Workers payante inclut (pages des prix lues le
+   20 novembre 2026), à surveiller dès 80 %, avec le prix d'un dépassement.
+4. La carte des coûts n'entre pas au registre : la veille ne la rappelle
+   pas ; sans relevé du mois écoulé, elle est en orange.
+
+Ne changent pas : aucun appel à Cloudflare ni à OTF, aucun secret, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches).
+
 ## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
@@ -7472,7 +7532,7 @@ compléter.
 **Décision.** Le code suit les sections 4.1 et 4.2 ; les précisions de code :
 
 1. **F712.** Le réglage vit dans une table d'un espace,
-   `irrigation_phone_notice_settings` (migration 0041), avec la personne qui
+   `irrigation_phone_notice_settings` (migration 0042), avec la personne qui
    le change et l'heure ; une colonne vide vaut le défaut, jamais écrit. Le
    message du matin est activé par défaut : le module ne sait pas quels
    appareils sont inscrits (le Worker de notification les garde), et sans
@@ -7540,7 +7600,7 @@ ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
 
 Ne changent pas : le Worker de notification, la confirmation d'un arrosage
 (aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
-de plus (les colonnes du soir viennent de la 0041), aucun appel à OTF.
+de plus (les colonnes du soir viennent de la 0042), aucun appel à OTF.
 
 ## D-285 — Améliorations, n° 7 : le journal des modifications, général, écrit en plus et gardé autant que la ferme
 

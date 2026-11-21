@@ -131,6 +131,8 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   irrigation_background_jobs: COMMON,
   irrigation_operator_notices: COMMON,
   irrigation_crop_alert_common: COMMON,
+  irrigation_support_accesses: COMMON,
+  irrigation_cost_readings: COMMON,
   otf_snapshots: OTF,
   otf_farm_connections: OTF,
   otf_farm_reads: OTF,

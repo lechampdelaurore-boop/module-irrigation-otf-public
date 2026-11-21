@@ -12,7 +12,10 @@
  *    fidèlement (schéma des migrations, contraintes, clés étrangères) ;
  * 4. le fichier chiffré, écrit hors du dépôt, sans écraser un export
  *    précédent ; puis relu et déchiffré pour vérifier qu'il rend l'export
- *    à l'octet près.
+ *    à l'octet près ;
+ * 5. une fois l'export vérifié, les exports du même dossier faits 25 jours
+ *    ou plus avant lui sont effacés : aucun n'est gardé plus de cinq
+ *    semaines (10 bis.20, F657 ; `backup/export-retention.ts`).
  *
  * Aucun secret en dur : Wrangler se sert de la connexion de l'exploitant
  * (`pnpm exec wrangler login`). La sortie ne dit que des nombres, des noms
@@ -33,6 +36,7 @@ import {
   sizeWords,
 } from './backup/export-files.ts';
 import { inspectExport } from './backup/export-inspection.ts';
+import { removalLines, removeReplacedExports } from './backup/export-retention.ts';
 import { askNewPassphrase } from './backup/passphrase-prompt.ts';
 import { captureWranglerExport, type ExportSource } from './backup/wrangler-export.ts';
 import { secondsFromMilliseconds } from '../lib/domain/units.ts';
@@ -102,6 +106,9 @@ async function main(): Promise<number> {
       say('Ne le notez pas comme fait. Transmettez ces lignes à l’assistant : elles ne contiennent aucune donnée.');
       return 1;
     }
+    const removal = removalLines(removeReplacedExports(file));
+    for (const line of removal) say(line);
+    if (removal.length > 0) say();
     say(`Notez-le sur la page d’état du module : « J’ai fait l’export du ${parisDate(now)} ».`);
     say('Copiez le fichier hors de cet ordinateur (clé USB, disque externe ou votre stockage en ligne) : il est chiffré.');
     say('Gardez le mot de passe à part du fichier : sans lui, l’export est illisible, même pour vous.');
