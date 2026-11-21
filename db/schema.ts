@@ -2346,7 +2346,7 @@ export const plotShelters = sqliteTable(
 
 /**
  * Le réglage des messages du téléphone d'une ferme (améliorations n° 3 et
- * n° 2, migration 0042, F702, F712) : une ligne par espace ; une colonne vide
+ * n° 2, migration 0043, F702, F712) : une ligne par espace ; une colonne vide
  * vaut le défaut, jamais écrit en base.
  */
 export const phoneNoticeSettings = sqliteTable(
@@ -2367,7 +2367,7 @@ export const phoneNoticeSettings = sqliteTable(
 );
 
 /**
- * La prise du jour d'un message du téléphone (migration 0042, F703) : une
+ * La prise du jour d'un message du téléphone (migration 0043, F703) : une
  * ligne par espace et par genre, réécrite chaque jour de Paris, prise avant
  * l'envoi et rendue s'il échoue.
  */

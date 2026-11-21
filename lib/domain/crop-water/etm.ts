@@ -36,8 +36,8 @@ export const SHELTER_FACTOR = {
 /** Paillage plastique : Kc × 0,9, plutôt que « retirer 0,10 », pour ne jamais donner un Kc négatif. */
 export const PLASTIC_MULCH_FACTOR = 0.9;
 
-/** Bornes de l'ET0 du jour, comprises, en mm/j. */
-export const ET0_BOUNDS = { minimum: 0, maximum: 12 } as const;
+/** Bornes de l'ET0 du jour, comprises, en mm/j : 15 depuis MC-37 (D-232), 12 avant. */
+export const ET0_BOUNDS = { minimum: 0, maximum: 15 } as const;
 
 /** Une valeur de K_abri pour un abri, à partir d'un jour (révisions datées). */
 type ShelterFactorRevision = { shelterId: string; value: number; effectiveFrom: string; recordedAt: string };
