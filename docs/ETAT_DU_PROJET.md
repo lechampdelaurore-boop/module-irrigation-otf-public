@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 20 novembre 2026.
+Dernière mise à jour : 21 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -12,6 +12,16 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Sept améliorations validées par le porteur le 21 novembre 2026** (D-280,
+  roadmap, section 6 septies), inscrites après vérification dans le code :
+  « Fait comme prévu » (n° 1) existe déjà, le résumé du matin (n° 3) existe en
+  écran et la zone « Fiabilité du calcul » couvre en partie les données
+  manquantes (n° 6) ; restent le rappel du soir (n° 2), le journal des
+  modifications (n° 7) et, **réservées à l'avis agronomique du porteur**, la
+  priorité selon le stade critique (n° 4) et l'écart prévu/réel expliqué
+  (n° 5). Place : après la Tranche 4 ; un contrat court d'abord, aucun code
+  sans son « vas-y » exprès. PR de registres seule : **aucun contrôle rejoué**,
+  sans rapport avec le code.
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
