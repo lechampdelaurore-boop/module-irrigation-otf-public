@@ -43,6 +43,10 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
   overrideDatabase(createD1FromSqlite(sqlite));
   try {
     process.env.DEMO_MODE = 'true';
+    // Les dépôts d'aujourd'hui écrivent aussi au journal des modifications (0044, amélioration n° 7) : sur la copie
+    // arrêtée à la 0041, ses lignes vont dans une table temporaire, hors de la copie, effacée avant la migration.
+    sqlite.exec(`CREATE TEMP TABLE irrigation_change_journal (id, workspace_id, family, subject, object_id, object_context, action,
+      before_values, after_values, actor_user_id, created_at)`);
     const choice = resolveDemoChoice('maraichage', 'ete');
     await prepareDemoSpace(demoOwnerUserId('copie', choice), choice);
     delete process.env.DEMO_MODE;
@@ -52,6 +56,7 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     insertDay(sqlite, workspace, '2026-07-03', null);
     assert.throws(() => insertDay(sqlite, workspace, '2026-07-04', 12.1), /CHECK constraint failed/, 'avant : 12 au plus');
     const sqlBefore = tableSql(sqlite);
+    sqlite.exec('DROP TABLE temp.irrigation_change_journal');
 
     const before = dump(sqlite);
     assert.ok(before[TABLE].length >= 3);
