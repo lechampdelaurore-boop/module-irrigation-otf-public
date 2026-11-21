@@ -8,8 +8,9 @@ import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, ve
  * docs/browser-journeys-contract.md).
  *
  * Sur une ferme neuve, toutes cases cochées : dans « Réglages »,
- * « Notifications du téléphone » porte la case « Message du matin »,
- * cochée par défaut. La décocher l'enregistre aussitôt et le dit ; la page
+ * « Notifications du téléphone » porte le pli « Messages de la ferme »,
+ * fermé, dont la ligne dit le réglage (F715) ; ouvert, la case « Message du
+ * matin », cochée par défaut. L'ancre `#message-du-matin` ouvre le pli. La décocher l'enregistre aussitôt et le dit ; la page
  * rechargée la relit décochée ; la recocher l'enregistre de nouveau. Au
  * téléphone (390 px) et à l'ordinateur, à 1 440 px de large.
  *
@@ -33,24 +34,35 @@ test('« Message du matin » : coché par défaut, se coupe, se relit et se rall
 
   await attendreLaPageIrrigation(page, 'reglages');
   const section = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Notifications du téléphone' }) });
-  const reglage = section.locator('#message-du-matin');
+  const pli = section.locator('#messages-de-la-ferme');
+  await expect(pli).not.toHaveAttribute('open', '');
+  await expect(pli.locator('summary')).toContainText('Message du matin activé.');
+  if (telephone) await verifierCibleTactile(pli.locator('summary'), 'Le pli « Messages de la ferme »');
+  await pli.locator('summary').click();
+  const reglage = pli.locator('#message-du-matin');
   const caseDuMatin = reglage.getByRole('checkbox', { name: 'Message du matin' });
   await reglage.scrollIntoViewIfNeeded();
   await expect(caseDuMatin).toBeChecked();
   await expect(reglage).toContainText('Rien n’est envoyé quand il n’y a rien à dire.');
   if (telephone) await verifierCibleTactile(reglage.locator('label'), 'La case « Message du matin »');
-  await verifierLEtape(page, journal, 'case cochée par défaut');
+  await verifierLEtape(page, journal, 'pli fermé, case cochée par défaut');
 
   await caseDuMatin.uncheck();
   await expect(reglage.getByRole('status')).toHaveText('Le message du matin est coupé.');
   await expect(caseDuMatin).not.toBeChecked();
+  await expect(pli.locator('summary')).toContainText('Message du matin coupé.');
   await attendreLaPageIrrigation(page, 'reglages');
-  await expect(page.locator('#message-du-matin').getByRole('checkbox', { name: 'Message du matin' })).not.toBeChecked();
+  await expect(page.locator('#messages-de-la-ferme summary')).toContainText('Message du matin coupé.');
   await verifierLEtape(page, journal, 'coupé, relu après rechargement');
 
-  await page.locator('#message-du-matin').getByRole('checkbox', { name: 'Message du matin' }).check();
+  // L'ancre du réglage ouvre le pli.
+  await page.goto('/irrigation/reglages#message-du-matin');
+  const caseRelue = page.locator('#message-du-matin').getByRole('checkbox', { name: 'Message du matin' });
+  await expect(caseRelue).toBeVisible();
+  await expect(caseRelue).not.toBeChecked();
+  await caseRelue.check();
   await expect(page.locator('#message-du-matin').getByRole('status')).toHaveText('Le message du matin est activé.');
   await attendreLaPageIrrigation(page, 'reglages');
-  await expect(page.locator('#message-du-matin').getByRole('checkbox', { name: 'Message du matin' })).toBeChecked();
-  await verifierLEtape(page, journal, 'rallumé, relu');
+  await expect(page.locator('#messages-de-la-ferme summary')).toContainText('Message du matin activé.');
+  await verifierLEtape(page, journal, 'rallumé par l’ancre, relu');
 });

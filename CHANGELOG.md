@@ -14,7 +14,8 @@ source détaillée commit par commit.
   clic ouvre « Aujourd'hui ». Rien quand tout est confirmé, un seul rappel
   par jour, jamais rien confirmé à la place du maraîcher. Un nouveau
   déclencheur horaire du planificateur et une tâche de plus au registre
-  (orange à 3 heures, rouge à 6). Parcours P54 ; P50 compte dix tâches.
+  (orange à 3 heures, rouge à 6). Le réglage rejoint le pli « Messages de
+  la ferme », dont la ligne le dit. Parcours P54 ; P50 compte dix tâches.
 
 ### Ajouté (Améliorations, n° 3, PR 2 sur 7)
 
@@ -25,7 +26,9 @@ source détaillée commit par commit.
   remplace la notification des seules suggestions. Rien quand il n'y a rien
   à dire ; jamais deux messages le même jour ; un clic ouvre
   « Aujourd'hui ». Dans « Réglages », la case « Message du matin », cochée
-  par défaut, la coupe pour toute la ferme. Migration 0042, additive.
+  par défaut, la coupe pour toute la ferme ; elle vit dans le pli fermé
+  « Messages de la ferme », dont la ligne dit le réglage (F715). Migration
+  0042, additive.
   Parcours P53.
 
 ### Ajouté (Améliorations, n° 6, PR 1 sur 7)

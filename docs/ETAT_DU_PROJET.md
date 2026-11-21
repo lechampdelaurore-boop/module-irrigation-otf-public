@@ -771,10 +771,11 @@ registres, elle y renvoie.
   `/api/internal/evening-reminder` ; le registre, la tâche
   `evening-reminder` (orange à 3 heures, rouge à 6), que la veille et la
   page d'état suivent. Dans « Réglages », la case « Rappel du soir » et son
-  heure, pour une ferme qui coche « Arrosages ». Sans migration de plus.
+  heure, pour une ferme qui coche « Arrosages », dans le pli fermé
+  « Messages de la ferme » (F715). Sans migration de plus.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
-  `pnpm site:check` réussis en local ; P54 (nouveau), P53 et P50 joués en
+  `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
   local aux deux largeurs ; la suite complète par la CI de la PR. Le
   nouveau déclencheur se déploie avec le planificateur, à la fusion. À
   fusionner après la PR de la n° 3.
@@ -792,13 +793,15 @@ registres, elle y renvoie.
   jour ne renvoie rien : la prise du jour se garde en base avant l'envoi et
   se rend s'il échoue. Dans « Réglages », « Notifications du téléphone »
   porte la case « Message du matin », cochée par défaut, pour une ferme qui
-  coche le Planning. Migration 0042, additive : le réglage de la ferme (les
+  coche le Planning, dans le pli fermé « Messages de la ferme » dont la
+  ligne dit le réglage (F715) ; le budget de « Réglages » au téléphone (P40)
+  passe de 3 400 à 3 500 px. Migration 0042, additive : le réglage de la ferme (les
   colonnes du rappel du soir comprises, vides) et la prise du jour, deux
   tables d'un espace, au plan d'effacement ; numéro provisoire, à reprendre selon la
   file (0042 voulue aussi par l’ET0 de la 4.4, #156). Contrôles de la PR :
   `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
-  local ; P53 (nouveau) et P28 joués en local aux deux largeurs ; la suite
+  local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
   complète des parcours jouée par la CI de la PR. À fusionner après la PR
   de la n° 6.
 
