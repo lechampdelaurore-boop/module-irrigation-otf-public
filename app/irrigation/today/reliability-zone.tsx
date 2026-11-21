@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { RELIABILITY_HELP } from '@/lib/domain/features/help';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
-import type { ReliabilityCheck, ReliabilityLine, ReliabilityZone } from '@/lib/domain/today/reliability';
+import { MISSING_BY_BED_ANCHOR, type MissingByBed } from '@/lib/domain/today/missing-by-bed';
+import type { ReliabilityAction as ReliabilityGesture, ReliabilityCheck, ReliabilityLine, ReliabilityZone } from '@/lib/domain/today/reliability';
 import { Icon, type IconName } from '../line-icon';
+import { AnchoredFold } from '../shell/page-settings-fold';
 import { useSectionHelp } from '../shell/section-help';
 
 const RELIABILITY_TITLE = 'Fiabilité du calcul';
@@ -32,12 +34,15 @@ const CHECK_ICONS: Record<ReliabilityCheck['kind'], IconName> = {
 export function ReliabilityZoneView({
   zone,
   checks,
+  byBed,
   query,
   pending,
   onRecalculatePlan,
 }: {
   zone: ReliabilityZone;
   checks: readonly ReliabilityCheck[];
+  /** Le dépliant « Par planche » (amélioration n° 6) ; `null` sans ses cases. */
+  byBed: MissingByBed | null;
   query: PageQuery;
   pending: boolean;
   onRecalculatePlan: () => void;
@@ -90,8 +95,65 @@ export function ReliabilityZoneView({
           {showAll ? 'Voir moins' : zone.moreLabel}
         </button>
       ) : null}
+      {byBed ? <MissingByBedFold byBed={byBed} query={query} /> : null}
     </section>
   );
+}
+
+/**
+ * Le dépliant « Par planche » (amélioration n° 6, docs/ameliorations-6-2-3-7-contract.md,
+ * section 3, F700, F701, F710 et F711) : les planches qui ont une donnée manquante, par
+ * culture puis par planche, chacune avec sa phrase et son geste ; cinq
+ * planches d'emblée, les autres derrière « Voir les n autres ». Fermé, il dit
+ * le total ; son ancre l'ouvre, depuis la fin de l'accueil (4.4).
+ */
+function MissingByBedFold({ byBed, query }: { byBed: MissingByBed; query: PageQuery }) {
+  const [showAll, setShowAll] = useState(false);
+  return (
+    <AnchoredFold
+      id={MISSING_BY_BED_ANCHOR}
+      className="reliability-by-bed"
+      summary={<><strong>Par planche</strong><small>{byBed.total ?? byBed.allClear}</small></>}
+      bodyClassName="reliability-by-bed-body"
+    >
+      {byBed.allClear ? <p className="reliability-by-bed-clear">{byBed.allClear}</p> : null}
+      {byBed.groups.map((group) => {
+        const beds = group.beds.filter((bed) => showAll || !bed.hidden);
+        if (beds.length === 0) return null;
+        return (
+          <section key={group.culture} className="reliability-by-bed-group" aria-label={group.culture}>
+            <h3>{group.culture}</h3>
+            <ul className="reliability-by-bed-beds">
+              {beds.map((bed) => (
+                <li key={bed.bedId} className="reliability-by-bed-bed" data-bed={bed.bedId}>
+                  <p className="reliability-by-bed-name"><b>{bed.bedName}</b>{bed.plotName ? <small>{bed.plotName}</small> : null}</p>
+                  <ul className="reliability-by-bed-lines">
+                    {bed.lines.map((line) => (
+                      <li key={line.key} className="reliability-by-bed-line" data-missing={line.kind}>
+                        <p className="reliability-line-text">{line.text}</p>
+                        <GestureLink action={line.action} query={query} />
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+      {byBed.moreLabel ? (
+        <button type="button" className="today-more" aria-expanded={showAll} onClick={() => setShowAll((value) => !value)}>
+          {showAll ? 'Voir moins' : byBed.moreLabel}
+        </button>
+      ) : null}
+    </AnchoredFold>
+  );
+}
+
+/** Le lien d'un geste : la page, sa parcelle quand le formulaire en dépend, et l'ancre du formulaire. */
+function GestureLink({ action, query }: { action: Extract<ReliabilityGesture, { kind: 'link' }>; query: PageQuery }) {
+  const target = action.zone ? { ...query, zone: action.zone } : query;
+  return <a className="today-action-link" href={pageHref(action.page, target, action.anchor ?? undefined)}>{action.label}</a>;
 }
 
 /** L'anneau : une part par donnée suivie, dessinée sur un tour de cent. */
@@ -132,5 +194,5 @@ function ReliabilityAction({ line, query, pending, onRecalculatePlan }: {
       </button>
     );
   }
-  return <a className="today-action-link" href={pageHref(action.page, query, action.anchor ?? undefined)}>{action.label}</a>;
+  return <GestureLink action={action} query={query} />;
 }
