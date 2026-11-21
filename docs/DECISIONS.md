@@ -7567,3 +7567,34 @@ pris hors des plages réservées aux chaînes 4.4 et 4.5 ; aucun numéro F nouve
 relire) puis envoyer l'accord, recueillir les réponses, juger la recette.
 
 Ne change pas : le code, le moteur, les coûts (aucune dépense nouvelle).
+
+## D-281 — Démarrage avancé des améliorations n° 6, 2, 3 et 7, et leur contrat court
+
+Date : 21 novembre 2026.
+
+**Contexte.** D-280 plaçait les sept améliorations après la Tranche 4, avec un
+« vas-y » avant chaque code, par prudence. Le porteur a fait remarquer le
+21 novembre 2026 qu'aucun chantier de code n'était en cours ; il a dit
+« Vas-y ».
+
+**Décision.**
+
+1. Le démarrage des n° 6, 2, 3 et 7 est **avancé** : le contrat court
+   (`docs/ameliorations-6-2-3-7-contract.md`) est écrit, leur code part sans
+   attendre la Tranche 4, sur sa propre branche, une PR à la fois, et **ne se
+   fusionne qu'après la file de fusion en cours**. Le « vas-y » de code est
+   donné pour ces quatre ; il reste attendu pour les n° 4 et 5, réservées à
+   l'avis agronomique.
+2. Le contrat retient, sur l'option recommandée : « stade deviné » = stade
+   déduit du calendrier ; un message unique du matin qui remplace la
+   notification des suggestions ; rappel du soir à 19 h par défaut, heure
+   réglable par ferme, déclencheur horaire inscrit au registre des tâches ;
+   journal général écrit en plus des journaux de domaine, dans la même
+   opération, gardé autant que la ferme, sans retour en arrière (second temps,
+   Opus 5.5 · Max, contrat à part).
+3. Ordre et réglages inchangés : n° 6, puis n° 2 et 3, puis n° 7 ; Opus 5.5 ·
+   Élevé, Très élevé pour la n° 7.
+
+Ne changent pas : aucun code, aucune migration, aucun calcul. Numéros D-281,
+F700 et suivants, P52 et suivants, à renuméroter à la fusion si la file préfère
+une suite sans trou.
