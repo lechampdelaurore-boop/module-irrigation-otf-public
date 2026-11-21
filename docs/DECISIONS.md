@@ -7600,4 +7600,4 @@ ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
 
 Ne changent pas : le Worker de notification, la confirmation d'un arrosage
 (aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
-de plus (les colonnes du soir viennent de la 0041), aucun appel à OTF.
+de plus (les colonnes du soir viennent de la 0042), aucun appel à OTF.
