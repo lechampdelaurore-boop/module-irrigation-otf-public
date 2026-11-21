@@ -1,0 +1,27 @@
+/* Amélioration n° 5 : l'écart entre l'eau prévue et l'eau apportée (docs/ameliorations-4-5-contract.md, §4.3, F735). */
+
+/* Sur « Planning de la semaine », après les suggestions du plan : une note à lire, pas une alerte. */
+.water-gap { margin: 1rem 0; padding: .9rem 1rem; border: 1px solid var(--line); border-left: 4px solid var(--amber); border-radius: var(--radius); background: white; min-width: 0; }
+.water-gap h3 { margin: 0 0 .4rem; font-size: var(--text-16); }
+.water-gap-lead, .water-gap-note { margin: 0 0 .5rem; font-size: var(--text-14); line-height: 1.55; }
+.water-gap-note { color: var(--muted); }
+.water-gap-beds { display: grid; gap: .6rem; margin: 0; padding: 0; list-style: none; }
+.water-gap-bed { padding: .6rem .75rem; border-radius: 9.75px; background: var(--sheet); overflow-wrap: anywhere; min-width: 0; }
+.water-gap-bed p { margin: .15rem 0; font-size: var(--text-14); line-height: 1.5; }
+.water-gap-bed-name { font-size: var(--text-16); }
+.water-gap-direction, .water-gap-figures, .water-gap-undetermined { color: var(--muted); }
+.water-gap-weeks { width: 100%; max-width: 30rem; margin: .4rem 0; border-collapse: collapse; font-size: var(--text-14); font-variant-numeric: tabular-nums; }
+.water-gap-weeks th, .water-gap-weeks td { padding: .25rem .4rem; border-bottom: 1px solid var(--line-soft); text-align: right; white-space: nowrap; }
+.water-gap-weeks th:first-child { padding-left: 0; text-align: left; }
+.water-gap-weeks thead th { color: var(--muted); font-weight: 500; }
+.water-gap-causes { display: grid; gap: .5rem; margin: .4rem 0 0; padding: 0; list-style: none; }
+.water-gap-cause { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding-top: .4rem; border-top: 1px solid var(--line-soft); }
+.water-gap-cause > div { flex: 1 1 16rem; min-width: 0; }
+.water-gap-cause-title { font-weight: 700; }
+.water-gap-cause > button { min-height: 44px; border: 0; border-radius: var(--radius-button); padding: .6rem 1rem; background: var(--green); color: white; cursor: pointer; font-size: var(--text-16); }
+.water-gap-cause > button:disabled { opacity: .55; cursor: default; }
+.water-gap-link { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--text-14); }
+
+@media (max-width: 480px) {
+  .water-gap-cause > button { width: 100%; }
+}

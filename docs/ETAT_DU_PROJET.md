@@ -25,7 +25,7 @@ registres, elle y renvoie.
   sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
   et 5 attendaient l'avis agronomique, **donné le 21 novembre 2026 au soir** :
   contrat court `docs/ameliorations-4-5-contract.md`, n° 4 codée (D-290),
-  n° 5 en code. PR de registres seule : **aucun contrôle rejoué**,
+  n° 5 codée (D-291). PR de registres seule : **aucun contrôle rejoué**,
   sans rapport avec le code. Registres en ligne le 21 novembre 2026 à
   14 h 52 (#162, fusionnée à 14 h 25, run 44908773229 vérifié job par job : les cinq jobs verts) ;
   contrat en ligne le 21 novembre 2026 à 16 h 04 (#170, fusionnée à
@@ -948,6 +948,38 @@ registres, elle y renvoie.
   par la CI de la PR. À fusionner après la file en cours (la n° 7, #157,
   #158). La même PR consigne la remise à zéro de nuit de la
   démonstration, lue dans les journaux (ligne 4.0).
+
+- Améliorations, **n° 5, l'écart entre l'eau prévue et l'eau apportée,
+  expliqué : codée le 22 novembre 2026** (D-291, F733 à F735 et F740 à
+  F743, section 4 de `docs/ameliorations-4-5-contract.md`), en Opus 5.5 ·
+  Max, sur les réponses agronomiques du porteur du 21 novembre 2026 ; PR 2
+  sur 2 des n° 4 et 5, empilée sur la n° 4. Quand, sur les trois dernières
+  semaines complètes, l'eau apportée à une planche s'écarte chaque semaine
+  de plus de 20 % de l'eau prévue, dans le même sens, avec au moins trois
+  irrigations faites, « Planning de la semaine » porte, après les
+  suggestions du plan, le bloc « L'eau apportée s'écarte du prévu » : par
+  planche le sens, les trois semaines (prévu, apporté, écart) et la cause
+  que les données soutiennent, ou « Cause non déterminée » ; un débit réel
+  plus faible que celui réglé (au moins trois irrigations prévues puis faites
+  en entier avec le même réglage, chacune plus de 20 % plus longue que
+  prévu ; le débit proposé est le débit réglé multiplié par la médiane des
+  rapports de durée, au dixième de mm/h) ; un objectif plus haut que le
+  besoin de la culture (l'objectif proposé de la 5 quater, plus bas de plus
+  de 20 %, avec « Besoin par culture ») ; une pluie mesurée différente de la
+  réanalyse, hors abri, avec le lien « Saisir la pluie mesurée ».
+  « Adopter » est vérifié par le serveur, qui n'écrit rien si la proposition
+  ne tient plus ; le débit s'enregistre dans le réglage comme une saisie à la
+  main, l'objectif comme une adoption de la 5 quater, puis le plan se
+  recalcule ; les irrigations passées gardent leur débit. Une semaine ne se
+  juge qu'avec les réglages d'aujourd'hui : après un ajustement, le bloc
+  disparaît. Sans migration. **Constat** : retoucher les débits d'un réglage
+  sur « Matériel et placement » ne recalcule pas le plan (règle 4 de la
+  replanification), alors qu'« Adopter » le fait ; à proposer au porteur.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; P57 (nouveau), P10, P26, P28, P31,
+  P40 et P41 joués en local aux deux largeurs ; la suite complète des
+  parcours jouée par la CI de la PR. À fusionner après la n° 4 (#172).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,

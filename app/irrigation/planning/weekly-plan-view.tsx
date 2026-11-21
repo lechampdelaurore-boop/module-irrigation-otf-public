@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState, useTransition, type CSSProperties, type RefObject } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, useTransition, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { priorityLabel } from '@/lib/domain/irrigation-feasibility';
 import type { PlanBedOutcome, PlanEventNotice, StoredPlanSuggestion, StoredProposal, StoredWeeklyPlan, SupplyBudget } from '@/lib/domain/planning/contract';
@@ -67,6 +67,8 @@ type Props = {
   repartitionHref?: string | null;
   /** « Ajouter un créneau à la main » : le formulaire « Planifier » est sur la page des arrosages depuis la 3.8. */
   onAddManualSlot: () => void;
+  /** Un bloc de suivi des semaines passées, après les suggestions et avant la semaine : l'écart du prévu (amélioration n° 5, F735). */
+  followUp?: ReactNode;
 };
 
 /** Les délais entre deux relectures après un événement, en secondes : un recalcul prend de quelques secondes à trois quarts de minute sur le site (point ouvert 34). */
@@ -81,7 +83,7 @@ const REFRESH_SIGNALS = ['irrigation-events-changed', 'irrigation-needs-source-c
  * appelle les actions du moteur ; les regroupements et les comptes viennent
  * de `lib/domain/planning/presentation.ts`.
  */
-export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSettings, initialProtectedSlots, soilNotes = {}, repartitionHref = null, onAddManualSlot }: Props) {
+export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSettings, initialProtectedSlots, soilNotes = {}, repartitionHref = null, onAddManualSlot, followUp = null }: Props) {
   const [plan, setPlan] = useState(initialPlan);
   const [now, setNow] = useState(() => new Date(initialNowIso));
   const [notice, setNotice] = useState<string | null>(null);
@@ -236,7 +238,10 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
       {error ? <p className="planning-error" role="alert">{error}</p> : null}
 
       {!plan || !summary ? (
-        <p className="planning-empty">Aucun calcul pour cette semaine. Le plan se calcule chaque matin après la météo, ou maintenant d’un clic.</p>
+        <>
+          <p className="planning-empty">Aucun calcul pour cette semaine. Le plan se calcule chaque matin après la météo, ou maintenant d’un clic.</p>
+          {followUp}
+        </>
       ) : (
         <>
           {/* La semaine et l'heure du calcul d'abord ; ses sources, plus discrètes, dessous (audit du 19 novembre 2026, lot K, n° 17, F465). */}
@@ -258,6 +263,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
           {plan.calculation.summary.changes ? <ChangesFold changes={plan.calculation.summary.changes} /> : null}
           {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} validatedNote={budgetValidatedNote(plan, formatVolume)} /> : null}
           <SuggestionList suggestions={plan.suggestions} pending={pending} feedback={suggestionFeedback} onApply={applySuggestion} onKeep={keepSuggestion} />
+          {followUp}
 
           <div className="planning-week-heading">
             <h3>La semaine</h3>
