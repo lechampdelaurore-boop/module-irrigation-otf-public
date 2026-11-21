@@ -1,0 +1,95 @@
+/*
+ * L'effacement d'une ferme, vu de la personne et de l'exploitant (4.5, PR 3,
+ * troisième partie ; docs/tranche-4-contract.md, 10 bis.22) : la section de
+ * Réglages, l'écran de l'espace figé et le bouton qui efface.
+ */
+
+/* Plus précis que `.water-panel button` (38 px) : le bouton qui efface garde ses 44 px et son rouge. */
+.danger-button,
+.farm-erasure-form .danger-button {
+  min-height: var(--touch-target);
+  padding: 0 18px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-button, .6rem);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.danger-button:disabled,
+.farm-erasure-form .danger-button:disabled {
+  border-color: var(--line-strong);
+  background: var(--paper);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.farm-erasure-settings .water-fold-body > p {
+  margin: 0 0 10px;
+  line-height: 1.55;
+}
+
+.farm-erasure-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.farm-erasure-form label {
+  display: grid;
+  flex: 1 1 280px;
+  gap: 4px;
+  font-size: var(--text-14);
+}
+
+.farm-erasure-form input {
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.frozen-farm > p:not(.eyebrow) {
+  margin: 12px 0;
+}
+
+.frozen-farm > .water-notice,
+.frozen-farm > .water-error {
+  font-size: var(--text-14);
+}
+
+.frozen-farm-cancel {
+  min-height: var(--touch-target);
+  margin-top: 12px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--green);
+  color: white;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.frozen-farm-cancel:disabled {
+  cursor: wait;
+  opacity: .7;
+}
+
+@media (max-width: 600px) {
+  .farm-erasure-form button,
+  .frozen-farm-cancel,
+  .frozen-farm .primary-link {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .frozen-farm {
+    padding: 24px 18px;
+  }
+}

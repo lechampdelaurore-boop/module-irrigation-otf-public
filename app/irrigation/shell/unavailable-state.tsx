@@ -12,6 +12,8 @@ import {
   type IrrigationUnavailableReason,
 } from '@/lib/domain/snapshot-policy';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
+import type { FrozenFarmView } from '@/lib/domain/operations/farm-erasure-request';
+import { FrozenFarm } from './frozen-farm';
 import { Topbar } from './topbar';
 
 export type UnavailableStateProps = {
@@ -19,12 +21,14 @@ export type UnavailableStateProps = {
   signOutPath: string;
   userName: string;
   season: number;
-  reason: IrrigationUnavailableReason | 'season-unavailable' | 'demo-preparing';
+  reason: IrrigationUnavailableReason | 'season-unavailable' | 'demo-preparing' | 'farm-frozen';
   seasonFirst?: number;
   seasonLast?: number;
   /** Un déploiement de démonstration : la bannière permanente (docs/demo-guided-contract.md). */
   demo: boolean;
   demoSelection: DemoSelection | null;
+  /** L'espace figé par une demande d'effacement (4.5, F666) : ce que son écran dit. */
+  frozen?: FrozenFarmView;
 };
 
 type StateText = { eyebrow: string; title: string; body: string; action: string; refresh: boolean };
@@ -107,7 +111,7 @@ const DEMO_PREPARING: StateText = {
 const PREPARING_RELOAD_SECONDS = 2;
 
 /** Ouvre ta ferme n'a pas répondu et rien n'est encore enregistré : aucune page ne peut s'afficher. */
-export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast, demo, demoSelection }: UnavailableStateProps) {
+export function UnavailableState({ page, signOutPath, userName, season, reason, seasonFirst, seasonLast, demo, demoSelection, frozen }: UnavailableStateProps) {
   const seasonUnavailable = reason === 'season-unavailable' && seasonFirst !== undefined && seasonLast !== undefined;
   const fallbackSeason = seasonUnavailable ? closestAvailableSeason(season, seasonFirst, seasonLast) : season;
   const text: StateText = seasonUnavailable
@@ -118,7 +122,7 @@ export function UnavailableState({ page, signOutPath, userName, season, reason, 
         action: `Afficher la saison ${fallbackSeason}`,
         refresh: false,
       }
-    : reason === 'demo-preparing' ? DEMO_PREPARING : TEXTS[reason === 'season-unavailable' ? 'unavailable' : reason];
+    : reason === 'demo-preparing' ? DEMO_PREPARING : TEXTS[reason === 'season-unavailable' || reason === 'farm-frozen' ? 'unavailable' : reason];
   const preparing = reason === 'demo-preparing';
   useEffect(() => {
     if (!preparing) return;
@@ -129,14 +133,18 @@ export function UnavailableState({ page, signOutPath, userName, season, reason, 
   return (
     <main className="app-shell">
       <Topbar userName={userName} signOutPath={signOutPath} demo={demo} demoSelection={demoSelection} />
-      <section className="fatal-state" role={preparing ? 'status' : 'alert'} aria-busy={preparing || undefined}>
-        <p className="eyebrow">{text.eyebrow}</p>
-        <h1>{text.title}</h1>
-        <p>{text.body}</p>
-        <a className="primary-link" href={pageHref(page, { season: fallbackSeason, refresh: text.refresh })}>
-          {text.action}
-        </a>
-      </section>
+      {reason === 'farm-frozen' && frozen
+        ? <FrozenFarm view={frozen} reopenHref={pageHref(page, { season })} />
+        : (
+          <section className="fatal-state" role={preparing ? 'status' : 'alert'} aria-busy={preparing || undefined}>
+            <p className="eyebrow">{text.eyebrow}</p>
+            <h1>{text.title}</h1>
+            <p>{text.body}</p>
+            <a className="primary-link" href={pageHref(page, { season: fallbackSeason, refresh: text.refresh })}>
+              {text.action}
+            </a>
+          </section>
+        )}
     </main>
   );
 }
