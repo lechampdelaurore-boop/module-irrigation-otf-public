@@ -9,7 +9,7 @@ import { siteKey, writeSites } from './support/write-sites.ts';
 
 /**
  * L'inventaire du journal des modifications (amélioration n° 7, §5.4,
- * premier garde-fou ; D-285, F716) : chaque table de la base est rangée, et
+ * premier garde-fou ; D-285, F717) : chaque table de la base est rangée, et
  * chaque endroit du code qui écrit dans une table d'objectifs, de réglages
  * ou de matériel est connu, avec ce qu'il fait au journal. Une table ou un
  * écrivain ajouté plus tard sans être rangé fait échouer ce test, donc la CI.

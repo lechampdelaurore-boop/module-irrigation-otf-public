@@ -739,7 +739,7 @@ registres, elle y renvoie.
 
 - Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
   table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
-  contrat, F715 à F717, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
+  contrat, F716 à F718, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
   en Opus 5.5 · Très élevé, sur le « vas-y » du porteur (9 h 52) ; empilée
   sur la PR de la n° 2. La table `irrigation_change_journal` (migration 0043,
   provisoire) garde une ligne par changement d'un objectif, d'un réglage ou
@@ -751,7 +751,7 @@ registres, elle y renvoie.
   objet avec leur raison). Rien n'écrit encore au journal et rien ne change à l'écran : les
   PR 5 et 6 branchent les écrivains, la PR 7 ajoute la lecture dans
   « Réglages ». La page de confidentialité dit le journal (texte du
-  21 novembre 2026). Contrôles : voir la PR. Restent ouverts : F717, les
+  21 novembre 2026). Contrôles : voir la PR. Restent ouverts : F718, les
   réglages que la liste du contrat ne nomme pas (réglages du besoin par
   culture, abris des parcelles, groupes de jardins, lieu météo), hors du
   journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)

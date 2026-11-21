@@ -7631,7 +7631,7 @@ modification et tout effacement, sauf pendant l'effacement de sa ferme.
 La page de confidentialité le dit (texte du 21 novembre 2026). Les
 précisions de code :
 
-1. **F715.** L'avant se lit dans la base, **dans le lot même** du
+1. **F716.** L'avant se lit dans la base, **dans le lot même** du
    changement, à sa condition même (`db/change-journal/statements.ts`) : la
    ligne du journal s'écrit si et seulement si le changement s'écrit, et
    deux gestes presque simultanés ne laissent jamais un avant périmé.
@@ -7645,13 +7645,13 @@ précisions de code :
    viennent du code et sont vérifiés ; seules les valeurs sont des
    paramètres. Le contrôle de cohérence des espaces (F380) relève toute
    ligne du journal qui désignerait l'objet d'une autre ferme.
-2. **F716.** L'inventaire (`db/change-journal/inventory.ts`, §5.4, premier
+2. **F717.** L'inventaire (`db/change-journal/inventory.ts`, §5.4, premier
    garde-fou) range **chaque table de la base**, au journal ou hors du
    journal avec sa raison, et **chaque écrivain** d'une table du journal,
    « fichier › fonction › table » : branché, à brancher par la PR 5 ou 6,
    ou sans objet avec sa raison. `tests/change-journal-inventory.test.ts`
    relit le code et échoue pour une table ou un écrivain non rangé.
-3. **F717.** Les réglages que la liste du contrat (§5.1) ne nomme pas — les
+3. **F718.** Les réglages que la liste du contrat (§5.1) ne nomme pas — les
    réglages du besoin par culture (Kc corrigés, abri, paillage, ombrage,
    options, cultures de référence propres à la ferme, correspondances
    d'espèces), les parcelles sous abri, les groupes de jardins et le lieu

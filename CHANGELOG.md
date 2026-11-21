@@ -7,8 +7,8 @@ source détaillée commit par commit.
 
 ### Ajouté (Améliorations, n° 7, PR 4 sur 7)
 
-- **Le journal des modifications, sa table et sa règle** (D-285, F715 à
-  F717) : une table par ferme garde, pour chaque changement d'un objectif,
+- **Le journal des modifications, sa table et sa règle** (D-285, F716 à
+  F718) : une table par ferme garde, pour chaque changement d'un objectif,
   d'un réglage ou du matériel, qui l'a fait, quand, et la valeur d'avant et
   d'après des seuls champs changés ; la ligne s'écrit dans le même lot que
   le changement, jamais l'un sans l'autre. Elle ne se modifie ni ne
