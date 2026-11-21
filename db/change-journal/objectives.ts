@@ -9,7 +9,7 @@ import { journalDeletion, journalUpdate, latestRevision, type JournalGesture, ty
  * besoin d'une planche.
  *
  * Chaque fonction rend l'instruction que l'écrivain place dans son lot,
- * **avant** son écriture : l'avant se lit sur la ligne d'avant (F715).
+ * **avant** son écriture : l'avant se lit sur la ligne d'avant (F716).
  * L'écrivain nomme son sujet en premier argument ; le test de l'inventaire
  * le relit dans son code.
  */

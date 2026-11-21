@@ -28,7 +28,7 @@ import {
  *
  * Chaque fonction rend l'instruction que l'écrivain place dans son lot :
  * **avant** son écriture pour un changement ou une suppression, **après**
- * pour une création (F715). L'écrivain nomme son sujet en premier argument.
+ * pour une création (F716). L'écrivain nomme son sujet en premier argument.
  *
  * Un réglage de toute la ferme qui n'a jamais été enregistré vaut ses
  * valeurs de départ, celles du domaine (`COALESCE(current.x, <départ>)`) :

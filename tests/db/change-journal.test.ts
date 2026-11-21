@@ -12,7 +12,7 @@ import { ALICE, BOB } from '../support/spaces';
 /**
  * La règle du journal des modifications (amélioration n° 7,
  * docs/ameliorations-6-2-3-7-contract.md, §5.2 et §5.3 ; D-285, F706 à
- * F709, F715) : une ligne par changement, écrite dans le même lot que lui et à
+ * F709, F716) : une ligne par changement, écrite dans le même lot que lui et à
  * ses conditions ; les champs qui changent seulement ; rien pour un
  * changement refusé ni pour un geste qui ne change rien ; jamais réécrite ni
  * effacée, sauf avec la ferme ; chaque ferme ne lit que son journal.

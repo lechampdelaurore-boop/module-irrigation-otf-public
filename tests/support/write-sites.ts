@@ -1,6 +1,6 @@
 /**
  * Les endroits du code qui écrivent dans la base (amélioration n° 7, §5.4 ;
- * F716) : chaque `INSERT INTO`, `UPDATE` ou `DELETE FROM` d'une table nommée
+ * F717) : chaque `INSERT INTO`, `UPDATE` ou `DELETE FROM` d'une table nommée
  * en clair, rangé sous la fonction de premier niveau qui le contient, sous la
  * forme « fichier › fonction › table » de `db/change-journal/inventory.ts`.
  *
