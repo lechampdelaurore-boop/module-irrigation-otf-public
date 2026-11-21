@@ -7298,3 +7298,50 @@ renvoyait ce registre à une PR à part.
 
 Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
 aucun secret ; les seuils et le geste de l'export (D-243).
+
+## D-246 — Tranche 4, 4.5, PR 3 (première partie) : l'effacement d'une ferme, le moteur et ses preuves
+
+Date : 20 novembre 2026.
+
+**Contexte.** F563 veut l'effacement complet d'une ferme sept jours après sa
+demande, annulable, par lots bornés, avec une note minimale qui reste, et
+quatre preuves (exhaustivité, deux fermes, reprise, annulation). Douze tables
+que le module garde immuables refusent tout effacement de ligne par un
+déclencheur : sans changement, aucune ferme ne pourrait s'effacer. La
+demande elle-même se fait dans « Réglages », que la chaîne de la 4.4 touche
+encore.
+
+**Décision.** Section 10 bis.17 du contrat de la Tranche 4 (F640 à F648) :
+
+1. La PR 3 en deux : le moteur d'abord (note, plan, tâche du matin, gel des
+   traitements du matin, page d'état, preuves) ; la demande, l'annulation,
+   l'écran figé, l'oubli des abonnements de notification et l'effacement
+   immédiat ensuite, après la chaîne de la 4.4. Sans la seconde partie,
+   aucune demande ne naît en production.
+2. La note de la demande (`irrigation_farm_erasures`, migration 0040) :
+   l'identifiant interne de l'espace, l'état et des heures ; ni nom, ni
+   personne, ni ferme, ni contenu ; sans clé étrangère.
+3. Un plan qui range chaque table de la base, une fois : effacée avec
+   l'espace (les filles d'abord), gardée par une table commune avec sa règle,
+   ou gardée avec sa raison. Un test casse la CI pour une table sans règle.
+4. Le raccordement et ses jetons partent avec la personne qui l'a fait, ou
+   avec le dernier espace de la ferme ; le journal des appels de la ferme,
+   avec le dernier espace de la ferme.
+5. Lots de 200 lignes, passages de 300 instructions et 20 secondes au plus,
+   repris au passage suivant ; l'espace et la note « faite » d'un bloc, que
+   les clés étrangères refusent s'il reste une ligne.
+6. **Procédure exceptionnelle des migrations (règle 3 et « Interdits » de
+   docs/migrations-contract.md) : douze `DROP TRIGGER`.** Chaque déclencheur
+   qui refuse l'effacement est supprimé puis recréé à l'identique dans la
+   même migration, avec une seule exception : les lignes d'un espace dont
+   l'effacement est en cours. Un déclencheur ne contient aucune donnée :
+   aucune ligne n'est lue, copiée ni changée, et la migration reste additive
+   pour les données. Le code du module n'efface jamais dans ces tables
+   ailleurs que dans l'effacement d'une ferme : la fenêtre entre la
+   suppression et la recréation, pendant le déploiement, ne laisse rien
+   passer. La PR est dédiée, comme la procédure le veut, et l'export de la
+   semaine (F624) est noté avant sa fusion.
+
+Ne changent pas : aucun appel à OTF ni à Cloudflare, aucun secret, aucun
+service nouveau ; les autres tâches du matin et leurs seuils ; le contenu de
+la page de confidentialité (la phrase des 30 jours vient avec la PR 5).

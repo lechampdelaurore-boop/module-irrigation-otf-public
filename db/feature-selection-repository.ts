@@ -73,7 +73,9 @@ export type FarmForTreatment = { workspaceId: string; ownerUserId: string };
  * traitement d'arrière-plan ne tourne que pour elles (R1 ; section 7, « La
  * prise en compte »). Une ferme d'avant la 3.8, sans ligne, a tout coché (R6).
  * Tous les espaces, avec ou sans ferme d'Ouvre ta ferme, chacun sous sa clé
- * d'espace (4.2, F328).
+ * d'espace (4.2, F328), sauf ceux dont l'effacement est demandé : figés
+ * pendant les sept jours, puis pendant l'effacement, ils ne sont plus
+ * calculés ni notifiés (4.5, F563, F647).
  */
 export async function listFarmsWithSelection(
   condition: (enabled: FeatureSelection) => boolean,
@@ -83,6 +85,8 @@ export async function listFarmsWithSelection(
             selection.enabled_features, selection.known_features, selection.chosen_at, selection.banner_dismissed_at
      FROM irrigation_workspaces AS workspace
      LEFT JOIN irrigation_feature_selections AS selection ON selection.workspace_id = workspace.id
+     WHERE NOT EXISTS (SELECT 1 FROM irrigation_farm_erasures AS erasure
+                       WHERE erasure.workspace_id = workspace.id AND erasure.state IN ('pending', 'erasing'))
      ORDER BY workspace.owner_user_id, workspace.otf_farm_id`,
   ).all<SelectionRow & { workspace_id: string; owner_user_id: string; otf_farm_id: string | null; selection_workspace_id: string | null }>();
   return result.results

@@ -18,6 +18,9 @@ import { HOURS_PER_DAY } from '../units.ts';
  * notification ne sont pas des déclencheurs planifiés : chacune suit un
  * arrosage, sans rythme attendu, et n'est pas une tâche du registre.
  *
+ * L'effacement des fermes qui l'ont demandé (4.5, PR 3 ; 10 bis.17, F645)
+ * est la dernière tâche du matin.
+ *
  * L'export de la base hors de Cloudflare (4.5, PR 4 ; 10 bis.14, F624) et
  * l'essai de restauration (10 bis.16, F636) y sont aussi, bien que faits par
  * l'exploitant : aucun déclencheur ne les lance (`OPERATOR_GESTURE`), un
@@ -26,7 +29,15 @@ import { HOURS_PER_DAY } from '../units.ts';
  */
 
 /** Les tâches du registre ; la clé est aussi celle de la ligne qui garde leurs exécutions. */
-export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning' | 'offsite-export' | 'restore-rehearsal' | 'operator-watch';
+export type TaskKey =
+  | 'weather-forecast'
+  | 'weather-reanalysis'
+  | 'morning-calculation'
+  | 'otf-vault-morning'
+  | 'farm-erasure'
+  | 'offsite-export'
+  | 'restore-rehearsal'
+  | 'operator-watch';
 
 export type TriggerKey = 'weather-morning' | 'operator-watch' | 'demo-nightly-reset';
 
@@ -99,7 +110,7 @@ export const TASK_TRIGGERS: readonly TriggerDeclaration[] = [
     key: 'weather-morning',
     config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
     cron: '15 4,5 * * *',
-    description: 'Le planificateur appelle le site à 6 h 15, heure de Paris (l\'un des deux créneaux UTC, selon l\'heure d\'été) : météo, puis calculs du matin, puis coffre des jetons.',
+    description: 'Le planificateur appelle le site à 6 h 15, heure de Paris (l\'un des deux créneaux UTC, selon l\'heure d\'été) : météo, puis calculs du matin, puis coffre des jetons, puis effacement des fermes qui l\'ont demandé.',
     monitored: true,
   },
   {
@@ -154,6 +165,15 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ...MORNING_THRESHOLDS,
     ifMissing: 'Les jetons chiffrés avec l\'ancienne clé ne sont pas chiffrés de nouveau ; un jeton illisible n\'est pas signalé.',
     successKeptIn: 'Ligne « task:otf-vault-morning » de irrigation_background_jobs (réussie quand le coffre est endormi sans clé, ou quand chaque jeton se lit).',
+    trigger: 'weather-morning',
+  },
+  {
+    key: 'farm-erasure',
+    label: 'Effacement des fermes qui l\'ont demandé',
+    rhythm: '1 par jour, à la fin du matin : efface, par lots, les espaces dont la demande a plus de 7 jours ; ce qui reste reprend au passage suivant',
+    ...MORNING_THRESHOLDS,
+    ifMissing: 'Une ferme qui a demandé l\'effacement de ses données les garde au-delà des 7 jours promis (elle reste figée : aucun calcul, aucune notification).',
+    successKeptIn: 'Ligne « task:farm-erasure » de irrigation_background_jobs (réussie quand aucune demande échue ne reste à effacer : sans demande, chaque matin réussit).',
     trigger: 'weather-morning',
   },
   {
