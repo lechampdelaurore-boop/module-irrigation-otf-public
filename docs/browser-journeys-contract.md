@@ -216,7 +216,14 @@ en défaut lui aussi. P12 lit donc le dépassement dans la colonne du jour de
 l'arrosage validé, et non dans toute la semaine. Il a échoué en CI le
 17 novembre 2026 à 23 h 16 (#87) en comptant deux colonnes au lieu d'une,
 et trois parcours derrière lui, que sa limite et son objectif laissés en
-place ont fait tomber.
+place ont fait tomber. Au téléphone, un jour à venir est replié quand
+aujourd'hui porte encore des propositions ou des arrosages validés (F11) ; à
+la fin de la soirée, plus rien ne tient aujourd'hui pour P12 et sa première
+proposition tombe le lendemain, replié derrière les propositions ou les
+arrosages validés d'autres parcours. P12 la montre donc en dépliant son jour, comme ses autres cartes.
+Il a échoué en CI le 20 novembre 2026 à 23 h 45 (#147) sur cette carte
+cachée, et P26, P32, P37 et P38 derrière lui, devant l'objectif de 70 mm
+qu'il avait laissé.
 
 **Deux parcours sur une même planche.** P10 laisse sa ligne posée sur son
 tunnel ; P12, qui y pose la sienne, la fait débiter plus fort — 12 mm/h

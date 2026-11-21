@@ -655,6 +655,20 @@ registres, elle y renvoie.
   novembre 2026) se note sur la page une fois cette PR en ligne. À
   fusionner après la seconde partie.
 
+- Correctif, **le parcours P12 au téléphone à la fin de la soirée**, trouvé
+  en fusionnant la 4.5 (Opus 5.5 · Très élevé, ligne 4.5), sans décision
+  nouvelle. Constat : sur la CI de #147, le 20 novembre 2026 à 23 h 45,
+  P12 a échoué au téléphone, sa première proposition « cachée » : plus rien
+  ne tenait aujourd'hui, elle était le lendemain, jour replié parce
+  qu'aujourd'hui portait encore des propositions ou des arrosages validés
+  d'autres parcours (F11). P12
+  a laissé son objectif de 70 mm, et P26, P32, P37 et P38 sont tombés
+  derrière lui. Relancés à 0 h 07, tous sont passés. Désormais, P12 montre
+  cette première carte en dépliant son jour (`montrerLaCarte`), comme ses
+  autres cartes ; `docs/browser-journeys-contract.md` (« l'heure où il
+  tourne ») le dit. Seul le parcours change, pas l'application. À
+  fusionner après la 4.5.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
