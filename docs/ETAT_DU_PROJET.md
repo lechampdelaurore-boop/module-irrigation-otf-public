@@ -774,6 +774,9 @@ registres, elle y renvoie.
   (3 338 → 3 482 px sur les données des parcours, CI du 21 novembre 2026) :
   la borne de P40 passe de 3 400 à 3 500 px, comme le contrat du lot J le
   permet à la PR qui le dit (section 2).
+  **En ligne le 21 novembre 2026 à 13 h 32** (#160, fusionnée à 13 h 04, run
+  44902063396 vérifié job par job : les cinq jobs verts ; consigné par
+  #161). La 4.5 est en ligne en entier.
 
 - Correctif, **le parcours P12 au téléphone à la fin de la soirée**, trouvé
   en fusionnant la 4.5 (Opus 5.5 · Très élevé, ligne 4.5), sans décision
