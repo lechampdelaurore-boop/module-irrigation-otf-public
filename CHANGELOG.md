@@ -14,7 +14,9 @@ source détaillée commit par commit.
   remplace la notification des seules suggestions. Rien quand il n'y a rien
   à dire ; jamais deux messages le même jour ; un clic ouvre
   « Aujourd'hui ». Dans « Réglages », la case « Message du matin », cochée
-  par défaut, la coupe pour toute la ferme. Migration 0042, additive.
+  par défaut, la coupe pour toute la ferme ; elle vit dans le pli fermé
+  « Messages de la ferme », dont la ligne dit le réglage (F715). Migration
+  0042, additive.
   Parcours P53.
 
 ### Ajouté (Améliorations, n° 6, PR 1 sur 7)

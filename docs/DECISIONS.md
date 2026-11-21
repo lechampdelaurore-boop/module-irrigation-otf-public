@@ -7562,6 +7562,15 @@ compléter.
    d'alarme `morning:<jour>`, étiquette `morning-<jour>`, journaux
    `morning_message_sent`, `morning_message_already_sent`,
    `morning_message_failed`, avec des nombres et le jour, jamais un nom.
+3. **F715.** Les réglages des messages vivent dans un pli fermé,
+   « Messages de la ferme », sous « Notifications du téléphone », comme
+   « Correspondance des espèces » (F459) : sa ligne dit le réglage tel qu'il
+   est enregistré (« Message du matin activé. ») et suit chaque changement ;
+   l'ancre d'un réglage (`#message-du-matin`) ouvre le pli. Fermé, il coûte
+   une ligne au téléphone ; le budget de hauteur de « Réglages » à 390 px
+   (P40, F459) passe de 3 400 à 3 500 px, la page sur `main` en prenant déjà
+   environ 3 350 dans la CI : 3 400 laissait 50 px, moins que le pli. Le
+   budget reste une borne : toute section nouvelle de « Réglages » se plie.
 
 Ne changent pas : le Worker de notification, le déclencheur du matin, les
 règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des

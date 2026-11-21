@@ -6,6 +6,7 @@ import { NotificationReadiness } from '../irrigation-manager/notification-readin
 import { useIrrigationNotifications } from '../irrigation-manager/use-irrigation-notifications';
 import { saveMorningMessageAction } from '../phone-notice-actions';
 import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
+import { AnchoredFold } from '../shell/page-settings-fold';
 
 const REPLY_CLASSES = { notice: 'water-notice', warning: 'weather-stale', error: 'water-error' } as const;
 
@@ -16,7 +17,9 @@ const NO_EVENTS: readonly IrrigationEventRecord[] = [];
  * section 3) : l'autorisation et son état, pour une ferme qui reçoit des
  * notifications sans avoir coché les arrosages (alertes météo ou cultures).
  * Le même abonnement que sur la page des arrosages. Pour une ferme qui coche
- * le Planning, la case du message du matin (amélioration n° 3, F702, F712).
+ * le Planning, la case du message du matin (amélioration n° 3, F702, F712),
+ * dans un pli fermé dont la ligne dit le réglage (F715) : « Réglages » garde
+ * sa hauteur au téléphone, et l'ancre `#message-du-matin` l'ouvre.
  */
 export function NotificationSettings({ season, morningMessage }: {
   season: number;
@@ -41,7 +44,7 @@ export function NotificationSettings({ season, morningMessage }: {
           <p>Les fins d’arrosage, le message du matin et les alertes arrivent sur chaque appareil où vous les activez.</p>
         </div>
       </header>
-      {morningMessage === null ? null : <MorningMessageSetting initial={morningMessage} />}
+      {morningMessage === null ? null : <PhoneNoticesFold morningMessage={morningMessage} />}
       <NotificationReadiness
         status={notificationStatus}
         pending={pending}
@@ -53,12 +56,32 @@ export function NotificationSettings({ season, morningMessage }: {
   );
 }
 
+/** La ligne du pli : le réglage tel qu'il est enregistré, relu à chaque changement. */
+function phoneNoticesLine(morningMessage: boolean): string {
+  return morningMessage ? 'Message du matin activé.' : 'Message du matin coupé.';
+}
+
+/** Le pli des messages de la ferme, fermé, sa ligne de résumé à jour. */
+function PhoneNoticesFold({ morningMessage }: { morningMessage: boolean }) {
+  const [morning, setMorning] = useState(morningMessage);
+  return (
+    <AnchoredFold
+      id="messages-de-la-ferme"
+      className="species-fold phone-notice-fold"
+      bodyClassName="species-fold-body"
+      summary={<><strong>Messages de la ferme</strong><small>{phoneNoticesLine(morning)}</small></>}
+    >
+      <MorningMessageSetting initial={morningMessage} onSaved={setMorning} />
+    </AnchoredFold>
+  );
+}
+
 /**
  * La case du message du matin : chaque matin, après le calcul du planning, un
  * seul message dit la journée ; rien quand il n'y a rien à dire. Le choix
  * vaut pour toute la ferme et s'enregistre aussitôt.
  */
-function MorningMessageSetting({ initial }: { initial: boolean }) {
+function MorningMessageSetting({ initial, onSaved }: { initial: boolean; onSaved: (enabled: boolean) => void }) {
   const [enabled, setEnabled] = useState(initial);
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const [pending, startTransition] = useTransition();
@@ -68,6 +91,7 @@ function MorningMessageSetting({ initial }: { initial: boolean }) {
     startTransition(async () => {
       const result = await saveMorningMessageAction({ enabled: next });
       setEnabled(result.ok ? result.morningMessage : !next);
+      if (result.ok) onSaved(result.morningMessage);
       setReplies([actionReply('matin', result.ok ? 'notice' : 'error', result.message)]);
     });
   };
