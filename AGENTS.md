@@ -177,6 +177,11 @@ que par une nouvelle décision dans `docs/DECISIONS.md`.
 - Modifier une migration déjà fusionnée, ou écrire une migration destructive
   hors la procédure exceptionnelle de `docs/migrations-contract.md`.
 - Annoncer testé, vérifié ou terminé ce qui ne l'a pas été.
+- Ajouter un déclencheur planifié (`triggers.crons` d'une configuration
+  Wrangler) sans l'inscrire au registre des tâches
+  (`lib/domain/operations/task-registry.ts`) avec son rythme attendu, ses
+  seuils et leur raison : `tests/task-registry.test.ts` échoue pour un
+  déclencheur absent du registre (F560, F569).
 - Employer le modèle Fable, pour toute tâche (coordination, fils, code,
   documents) : interdit depuis le 1er novembre 2026 (D-055). Tout ce qui était prévu en Fable
   passe en Opus 5.5 · Max, quel que soit l'effort d'avant ;

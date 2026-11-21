@@ -7051,6 +7051,554 @@ Ne change pas : la base (aucune migration) ; le calcul ; la ferme du porteur
 et la démonstration ; la proposition d'après le nom quand le modèle ne
 connaît pas l'espèce. Aucune question de budget.
 
+
+
+## D-240 — Tranche 4, 4.5, PR 1 : le registre des tâches attendues
+
+Date : 20 novembre 2026.
+
+**Contexte.** La mise à jour de la météo est restée en panne du 14 au
+19 novembre 2026 sans que personne ne le voie (D-164 à D-166) : l'écran
+s'appuyait sur une date restée verte, la réanalyse n'avait pas de réussite
+à elle, et rien ne disait qu'une réussite attendue manquait. Le contrat de
+la 4.5 (D-220, F560) demande un registre des tâches attendues, en code,
+dont l'état se calcule sur la dernière réussite.
+
+**Décision.** Section 10 bis.11 du contrat de la Tranche 4 (F600 à F607) :
+
+1. Le registre vit dans `lib/domain/operations/task-registry.ts` : les
+   quatre tâches du matin (prévisions, réanalyse, calcul du matin, rotation
+   du coffre), chacune avec son rythme, ses seuils et leur raison, l'effet
+   d'un manque et l'endroit de sa dernière réussite. Les autres tâches
+   entrent avec le code qui les crée. Le déclencheur de la démonstration est
+   rangé hors veille, avec sa raison.
+2. Seuils du matin : **orange à 26 heures** (le tableau F560 proposait 30 :
+   à 9 h, l'heure de la veille, un 6 h 15 manqué se voit ainsi le matin
+   même), **rouge à 36 heures** (D-165, qui lit désormais ce seuil au
+   registre).
+3. Une exécution n'est réussie que si elle a tout fait ; prévisions et
+   réanalyse se comptent à part ; trois exécutions manquées de suite font
+   une panne ; une tâche sans réussite est « jamais réussie », en orange.
+4. Les exécutions se gardent dans `irrigation_background_jobs`, ligne
+   `task:<tâche>` ; la migration 0037, additive, ajoute le compte des
+   échecs et « en panne depuis ». Le résumé d'un échec ne porte que des
+   nombres et des classes d'erreur.
+5. Tout déclencheur planifié s'inscrit au registre : un test lit les
+   configurations Wrangler et échoue pour un déclencheur absent (F569,
+   écrit dans `AGENTS.md`).
+
+Ne changent pas : l'écran des fermes ; le créneau de 6 h 15 ; le verrou de
+la météo ; les calculs du matin ; aucun appel nouveau à OTF ni dépense.
+
+## D-241 — Tranche 4, 4.5, PR 2 : la veille de l'exploitant et sa page d'état
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le registre des tâches (D-240) dit l'état de chaque tâche,
+mais personne ne le lit : la panne de la météo du 14 novembre 2026 s'est
+vue cinq jours plus tard, par hasard. Le contrat de la 4.5 (D-220, F565,
+F566) demande une veille, sur un déclencheur à part, qui prévient
+l'exploitant, et une page d'état qui lui est réservée.
+
+**Décision.** Section 10 bis.12 du contrat de la Tranche 4 (F608 à F613) :
+
+1. L'exploitant est une personne dont l'espace est sur la ferme du
+   déploiement, lue sans appel à OTF ; la notification va vers ces espaces,
+   où ses appareils sont inscrits ; la page d'état leur est réservée, côté
+   serveur, et n'existe pas pour les autres.
+2. Un second déclencheur du planificateur, à 9 h à Paris (`0 7,8 * * *`),
+   appelle une route interne gardée par le jeton de service de la météo :
+   une alerte quand une tâche est en retard, en panne ou jamais réussie ;
+   « tout va bien » le dimanche ; rien sinon. Une notification par jour de
+   Paris au plus, prise avant l'envoi et rendue s'il échoue (migration
+   0038, table commune).
+3. La notification nomme les tâches, la plus grave d'abord, avec depuis
+   quand, dans les limites du service (titre de 80 caractères, texte de
+   160) ; la veille ne se nomme pas elle-même.
+4. La veille est une tâche du registre : réussie quand la notification due
+   est partie ou confiée au service, manquée avec une raison écrite par le
+   module ; la route répond 200 même manquée, pour que le planificateur ne
+   la relance pas trois fois (R2).
+5. La page `/irrigation/exploitation` dit le jugement d'ensemble en une
+   ligne, chaque tâche avec son état et sa dernière réussite, et la
+   dernière notification ; les fermes, la sauvegarde, les effacements et
+   les coûts viennent avec leur code. La PR 2 du découpage se fait en deux
+   PR : l'observation par ferme et le test des journaux suivent.
+
+Ne changent pas : le matin de 6 h 15 et ses tâches ; le service de
+notification (aucune route nouvelle) ; aucun secret nouveau, aucun appel
+nouveau à OTF, aucune dépense.
+
+## D-242 — Tranche 4, 4.5, PR 2 (seconde partie) : l'observation par ferme et les journaux sans donnée sensible
+
+Date : 20 novembre 2026.
+
+**Contexte.** La page d'état de l'exploitant (D-241) dit l'état des tâches,
+pas celui de chaque ferme ; avec la 4.6, une ferme pilote en difficulté
+(raccordement révoqué, OTF qui refuse, météo qui manque) doit se voir sans
+ouvrir son espace. Le contrat de la 4.5 (D-220, F564) demande aussi un test
+qui échoue si un journal porte une valeur sensible.
+
+**Décision.** Section 10 bis.13 du contrat de la Tranche 4 (F614 à F618) :
+
+1. Chaque essai envoyé à OTF est compté pour sa ferme, par heure pleine et
+   par résultat (réussi, 401, 403, 429, 5xx, autre refus, délai dépassé,
+   réseau), huit jours (migration 0039, table commune) ; un échec se
+   journalise sous le nom stable `otf_call_failed`, avec ses seuls champs,
+   jamais l'adresse, la ferme ni le jeton. La dernière lecture complète de
+   chaque ferme est gardée.
+2. La page d'état montre une carte par ferme, la plus en difficulté
+   d'abord : raccordement, appels du jour, erreurs d'OTF sur 24 heures et
+   7 jours, dernière lecture complète, dernière météo, dernier calcul du
+   matin, jugés avec les seuils du registre ; la ferme de la clé du
+   déploiement a toujours sa carte. Le jugement d'ensemble compte les
+   fermes. Ni nom de ferme ni personne.
+3. Un garde, chargé par chaque processus d'essais, lit chaque ligne écrite
+   dans la console, même remplacée par un essai, et fait échouer le fichier
+   qui en écrit une qui ressemble à un jeton, un paramètre d'autorisation,
+   une adresse de retour, une adresse électronique, un nom de ferme ou une
+   longue chaîne opaque ; un essai témoin le prouve. Il a trouvé quatre
+   lignes qui recopiaient le message d'une erreur de la base : elles disent
+   désormais sa classe.
+
+Ne changent pas : le rythme des appels à OTF et leur compte du jour (F361,
+F363) ; aucun appel nouveau à OTF, aucun secret nouveau, aucune dépense.
+L'état de l'accueil (4.4-a) entre sur la carte avec la fusion de la 4.4 ;
+la consommation sur la part du quota, quand la part sera fixée (F363).
+
+## D-243 — Tranche 4, 4.5, PR 4 (première partie) : l'export hebdomadaire chiffré et son contrôle
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le porteur a choisi le 19 novembre 2026 (10 bis.9) une copie
+gratuite hors de Cloudflare : un export hebdomadaire chiffré, gardé par
+lui, chiffré avant d'être écrit sur disque, et un geste « J'ai fait
+l'export du … » sur la page d'état, que la veille surveille. Le contrat
+(F561) demande que les sabotages d'un export (table retirée, ligne
+corrompue, migration oubliée) soient détectés, et des scripts sans secret
+dont les sorties ne contiennent pas de données. L'essai des scénarios S1 à
+S3 demande une base d'essai chez Cloudflare, donc le « vas-y » du porteur.
+
+**Décision.** Section 10 bis.14 du contrat de la Tranche 4 (F620 à F626) :
+
+1. La PR 4 se fait en deux PR : celle-ci, tout ce qui s'essaie sans
+   toucher à Cloudflare ; la suivante, l'essai S1 à S3 sur la base
+   d'essai, après le « vas-y » du porteur.
+2. `pnpm backup:export` reçoit l'export de Wrangler **en mémoire** : un
+   module chargé dans le processus de Wrangler détourne son écriture vers
+   le processus parent ; le chemin convenu est dans un dossier qui
+   n'existe pas, pour qu'un détour qui ne jouerait plus fasse échouer
+   l'écriture au lieu de poser l'export en clair. L'adresse de
+   téléchargement que Wrangler affiche est masquée.
+3. Avant d'être chiffré, l'export est **rejoué dans une base vide** :
+   schéma comparé à celui des migrations qu'il dit avoir reçues,
+   intégrité, clés étrangères comptées par table, empreinte de chaque
+   table indépendante de l'ordre des lignes. Les problèmes se disent par
+   des noms de tables et de contraintes, jamais par une valeur.
+4. Chiffrement AES-256-GCM, clé tirée du mot de passe par scrypt
+   (N = 2^17), en-tête authentifié ; mot de passe de 12 caractères au
+   moins, tapé deux fois, sans écho, jamais par un argument. Le fichier va
+   hors du dépôt (refusé dedans, même par un lien), ne remplace jamais le
+   précédent, et il est relu et déchiffré avant que la commande dise
+   « vérifié ». `pnpm backup:verify` contrôle un export fait.
+5. L'export entre au registre comme la première tâche faite à la main :
+   une fois par semaine, orange à 8 jours, rouge à 10 ; le geste de la page
+   d'état note un jour, jamais à venir, jamais plus ancien que celui déjà
+   noté. Le jugement d'ensemble dit « les 6 tâches ». La ligne
+   « Sauvegarde » de F560 (Time Travel, tenu par Cloudflare) n'entre pas au
+   registre, ni le nom `backup_failed` de F618 : aucune sauvegarde ne tourne
+   dans le Worker.
+
+Ne changent pas : aucun secret dans le dépôt, aucune dépense, aucune
+migration, aucun appel à OTF ; rien chez Cloudflare avant le « vas-y » du
+porteur. La règle de conservation des exports (un export garde les données
+d'une ferme effacée depuis) s'écrit avec la PR 5 (F562), sous la relecture
+du porteur.
+
+
+## D-244 — Tranche 4, 4.5, PR 4 (seconde partie) : l'essai de restauration et la restauration depuis un export
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat (F561) demande trois scénarios joués pour de vrai
+sur une base d'essai remplie de données fictives, puis détruite : S1
+(revenir en arrière avec Time Travel, et rattraper une seule ferme), S2
+(reconstruire depuis un export, puis l'isolation des deux fermes contre la
+base restaurée), S3 (perdre la clé du coffre). Les sabotages doivent faire
+échouer l'essai, et sa sortie ne contient aucune donnée. Créer une base
+chez Cloudflare attend le « vas-y » du porteur. La simulation du script a
+montré qu'un export brut de D1 ne se réimporte pas tel quel dans une base
+aux clés étrangères actives, et que rattraper une ferme fait avancer ses
+compteurs de révision.
+
+**Décision.** Section 10 bis.15 du contrat de la Tranche 4 (F627 à F635) :
+
+1. `pnpm backup:rehearse --cloudflare` joue l'essai sur trois bases nommées
+   à partir de `module-irrigation-otf-essai-restauration`, et sur elles
+   seules : chaque geste refuse tout autre nom avant d'appeler Wrangler,
+   lancé depuis un dossier sans réglages. Les bases sont détruites à la fin,
+   réussi ou non. Il se lance par un flux GitHub à part, à la main ou par la
+   branche `essai-restauration`, jamais sur une PR, sans artefact. Sans
+   option, la même commande joue une simulation contre une fausse D1 en
+   mémoire.
+2. Le rattrapage d'une seule ferme : restauration sur place, export de
+   l'état d'avant (la copie), retour au signet noté ; puis seules les lignes
+   de la ferme absentes de l'état présent, par leur clé primaire, sont
+   réinsérées ; une ligne encore présente n'est jamais réécrite, seulement
+   signalée. Les compteurs de révision avancent et ne reculent jamais. En
+   vrai : le soir, avec l'assistant, sur la décision du porteur.
+3. Un export se réimporte **rangé** : les tables d'abord, puis les lignes,
+   chaque table après celles qu'elle désigne, puis index et déclencheurs.
+   L'essai essaie aussi l'export brut, pour savoir ce que D1 en dit.
+4. Contre la base reconstruite, l'isolation se prouve par le contrôle de
+   cohérence (F380) et par les lectures des dépôts du module pour chacune
+   des deux fermes ; S3 se joue sur cette même base.
+5. `pnpm backup:restore` reconstruit une base perdue depuis un export
+   chiffré, dans une base neuve ou vide seulement (une base qui a des
+   tables est refusée, jamais écrasée), puis la compare table par table.
+   L'import rangé y est écrit le temps de l'envoi dans un dossier privé
+   effacé aussitôt : `wrangler d1 execute` ne lit qu'un fichier.
+
+Ne changent pas : aucun secret dans le dépôt, aucune dépense, aucune
+migration, aucun appel à OTF ; rien chez Cloudflare avant le « vas-y » du
+porteur ; l'essai réel et son compte rendu, collé dans la PR, avant la
+fusion. L'essai inscrit au registre (une fois par trimestre) et sa date sur
+la page d'état viennent dans une PR à part.
+
+**L'essai chez Cloudflare, le 20 novembre 2026** (sur le « vas-y » du
+porteur) : réussi, S1, S2 et S3, bases détruites. La restauration à un
+signet noté marche ; le signet d'un instant n'a pas été rendu (erreur
+interne de l'API, code 7500, sur une base d'une minute) : sa mesure se dit
+en une note sans arrêter l'essai, et la procédure demande ce signet avant
+de rien restaurer. L'export brut ne se réimporte pas (« no such table »),
+l'import rangé si. Un export dure environ 2,5 secondes pour 705 lignes.
+
+## D-245 — Tranche 4, 4.5, PR 4 (troisième partie) : l'essai de restauration au registre
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat (10 bis.8) veut l'essai de restauration rejoué une
+fois par trimestre et après un changement de schéma important, inscrit au
+registre ; la page d'état dit la date du dernier essai (F565, point 4). Le
+premier essai chez Cloudflare a réussi le 20 novembre 2026 (D-244). D-244
+renvoyait ce registre à une PR à part.
+
+**Décision.** Section 10 bis.16 du contrat de la Tranche 4 (F636 et F637) :
+
+1. La tâche « Essai de restauration » entre au registre, faite par
+   l'exploitant (`operator-gesture`) : une fois par trimestre, orange à
+   100 jours, rouge à 120 ; jamais réussie, en orange, avant le premier essai
+   noté. La veille la surveille comme les autres.
+2. Le geste « J'ai fait l'essai du … » de la page d'état, aux mêmes règles
+   que celui de l'export ; les deux gestes sont un seul code, et un test
+   lie chaque tâche faite par l'exploitant à son geste.
+3. Un changement de schéma important (une table refaite, des clés
+   étrangères changées) se dit dans sa PR, et l'essai se rejoue avant sa
+   fusion.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
+aucun secret ; les seuils et le geste de l'export (D-243).
+
+## D-246 — Tranche 4, 4.5, PR 3 (première partie) : l'effacement d'une ferme, le moteur et ses preuves
+
+Date : 20 novembre 2026.
+
+**Contexte.** F563 veut l'effacement complet d'une ferme sept jours après sa
+demande, annulable, par lots bornés, avec une note minimale qui reste, et
+quatre preuves (exhaustivité, deux fermes, reprise, annulation). Douze tables
+que le module garde immuables refusent tout effacement de ligne par un
+déclencheur : sans changement, aucune ferme ne pourrait s'effacer. La
+demande elle-même se fait dans « Réglages », que la chaîne de la 4.4 touche
+encore.
+
+**Décision.** Section 10 bis.17 du contrat de la Tranche 4 (F640 à F648) :
+
+1. La PR 3 en deux : le moteur d'abord (note, plan, tâche du matin, gel des
+   traitements du matin, page d'état, preuves) ; la demande, l'annulation,
+   l'écran figé, l'oubli des abonnements de notification et l'effacement
+   immédiat ensuite, après la chaîne de la 4.4. Sans la seconde partie,
+   aucune demande ne naît en production.
+2. La note de la demande (`irrigation_farm_erasures`, migration 0040) :
+   l'identifiant interne de l'espace, l'état et des heures ; ni nom, ni
+   personne, ni ferme, ni contenu ; sans clé étrangère.
+3. Un plan qui range chaque table de la base, une fois : effacée avec
+   l'espace (les filles d'abord), gardée par une table commune avec sa règle,
+   ou gardée avec sa raison. Un test casse la CI pour une table sans règle.
+4. Le raccordement et ses jetons partent avec la personne qui l'a fait, ou
+   avec le dernier espace de la ferme ; le journal des appels de la ferme,
+   avec le dernier espace de la ferme.
+5. Lots de 200 lignes, passages de 300 instructions et 20 secondes au plus,
+   repris au passage suivant ; l'espace et la note « faite » d'un bloc, que
+   les clés étrangères refusent s'il reste une ligne.
+6. **Procédure exceptionnelle des migrations (règle 3 et « Interdits » de
+   docs/migrations-contract.md) : douze `DROP TRIGGER`.** Chaque déclencheur
+   qui refuse l'effacement est supprimé puis recréé à l'identique dans la
+   même migration, avec une seule exception : les lignes d'un espace dont
+   l'effacement est en cours. Un déclencheur ne contient aucune donnée :
+   aucune ligne n'est lue, copiée ni changée, et la migration reste additive
+   pour les données. Le code du module n'efface jamais dans ces tables
+   ailleurs que dans l'effacement d'une ferme : la fenêtre entre la
+   suppression et la recréation, pendant le déploiement, ne laisse rien
+   passer. La PR est dédiée, comme la procédure le veut, et l'export de la
+   semaine (F624) est noté avant sa fusion.
+
+Ne changent pas : aucun appel à OTF ni à Cloudflare, aucun secret, aucun
+service nouveau ; les autres tâches du matin et leurs seuils ; le contenu de
+la page de confidentialité (la phrase des 30 jours vient avec la PR 5).
+
+## D-247 — Tranche 4, 4.5, PR 5 (première partie) : la conservation, table par table, et les purges du matin
+
+Date : 20 novembre 2026.
+
+**Contexte.** F562 veut une durée écrite par donnée et qui l'efface, et
+renvoyait au code la liste réelle, table par table. Le journal des appels à
+Ouvre ta ferme se purgeait seulement au départ d'une lecture : sans lecture,
+rien ne partait. La notification du jour de la veille, elle, ne se purgeait
+jamais. Plusieurs durées de F562 portent sur des données qui n'existent pas
+encore (la déconnexion d'une ferme, les demandes d'autorisation, le journal
+d'accès du support).
+
+**Décision.** Section 10 bis.18 du contrat de la Tranche 4 (F649 à F653) :
+
+1. La PR 5 en deux : les durées et les purges d'abord ; la politique de
+   confidentialité (phrase des 30 jours telle qu'approuvée, et les durées,
+   relue par le porteur avant la fusion), le support et les coûts ensuite.
+2. Un plan de conservation range chaque table de la base, une fois, avec sa
+   durée et qui l'efface ; un test casse la CI pour une table sans durée, et
+   vérifie que le tableau du contrat dit la même chose que le code.
+3. Une tâche du matin, « Purges de conservation », après l'effacement des
+   fermes : lots de 500 lignes, 50 instructions au plus par passage, la
+   limite elle-même gardée ; reprise au passage suivant ; une purge en
+   échec n'arrête pas les autres. Le registre compte 9 tâches.
+4. Une seule durée par donnée : les purges du matin reprennent les
+   constantes des purges faites au passage (2, 8 et 30 jours pour le
+   journal des appels, plus court que les 35 jours proposés par F562).
+5. La notification du jour de la veille : 35 jours.
+6. Une durée entre avec le code qui crée sa donnée : 90 jours après
+   « Déconnecter la ferme » avec la 4.3, PR 3 ; le journal d'accès du
+   support avec la seconde partie de cette PR ; les abonnements de
+   notification avec la seconde partie de la PR 3.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
+aucun secret, aucun service nouveau ; les durées déjà tenues par le code ;
+le texte de la page de confidentialité (seconde partie).
+
+## D-248 — Tranche 4, 4.5, PR 3 (deuxième partie) : les appareils d'une ferme effacée, et ceux qui ne répondent plus
+
+Date : 20 novembre 2026.
+
+**Contexte.** F563 efface, avec la ferme, les abonnements de notification de
+son espace ; ils vivent dans le Worker de notification, pas dans la base, et
+aucune route ne les oubliait. F562 veut qu'un abonnement sans réponse du
+service depuis 90 jours soit oublié ; le Worker ne gardait rien de ses
+échecs. Rien de cela ne touche « Réglages », que la chaîne de la 4.4 occupe
+encore.
+
+**Décision.** Section 10 bis.19 du contrat de la Tranche 4 (F654 à F656) :
+
+1. La PR 3 en trois : le moteur (première partie, D-246), le Worker de
+   notification (cette deuxième partie), puis la demande dans « Réglages »
+   après la 4.4.
+2. Une route `/v1/recipients/forget` : chaque appareil de l'espace le quitte,
+   et la fiche d'un appareil qui ne sert plus aucun espace est oubliée.
+3. Le moteur de l'effacement l'appelle avant de noter l'effacement fait ;
+   sans réponse, rien n'est noté et le passage suivant recommence.
+4. Un abonnement dont les envois manquent depuis 90 jours est oublié comme un
+   abonnement expiré ; un abonnement à qui rien n'est envoyé ne l'est jamais.
+5. La colonne qui garde le premier envoi manqué s'ajoute aux listes
+   existantes à leur réveil, sans toucher leurs lignes.
+
+Ne changent pas : aucune migration de la base D1, aucun appel à OTF, aucun
+secret, aucun service nouveau ; les alarmes et leurs tentatives ; la règle
+« un appareil, une personne » (F371) ; le texte de la page de
+confidentialité (PR 5, seconde partie).
+
+## D-249 — Tranche 4, 4.5, PR 5 (deuxième partie) : la page de confidentialité, les exports gardés cinq semaines, le support
+
+Date : 20 novembre 2026.
+
+**Contexte.** La première partie de la PR 5 (D-247) a donné une durée à
+chaque table ; la page de confidentialité n'en disait encore que deux, sans
+la phrase des 30 jours approuvée par le porteur le 19 novembre 2026. Un
+export hebdomadaire garde aussi les données d'une ferme effacée depuis, et
+aucune règle ne disait combien de temps l'exploitant les garde.
+`docs/exploitation.md` ne disait pas encore que faire d'une panne, d'une
+ferme qui écrit ou d'une clé perdue (F567).
+
+**Décision.** Section 10 bis.20 du contrat de la Tranche 4 (F657 à F659) :
+
+1. La PR 5 en trois : la conservation (D-247), ce qui se lit et se relit
+   (cette deuxième partie), puis le journal d'accès du support et les coûts.
+2. Un export est gardé cinq semaines au plus. La commande de l'export le
+   tient : après un export vérifié, elle efface du même dossier ceux de
+   25 jours ou plus (35 jours moins les 10 jours du rouge de la tâche), et
+   seulement les fichiers qu'elle a nommés ; les copies hors de l'ordinateur
+   suivent la même règle, à la main.
+3. La page de confidentialité (texte du 20 novembre 2026) dit chaque durée
+   que le code tient, la phrase des 30 jours telle qu'approuvée, et le
+   compte des lectures dans Ouvre ta ferme ; ce qui n'existe pas encore ne
+   s'écrit qu'avec son code. Le texte est relu par le porteur avant la
+   fusion, qui le met en ligne.
+4. `docs/exploitation.md` dit, cas par cas, ce que fait l'exploitant seul,
+   avec un gabarit de réponse fondé sur la page d'état ; la page d'accueil
+   du site dit le délai de réponse, sans engagement.
+5. La 4.5 prend aussi F660 à F669 et D-250 à D-252.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun secret, aucun
+service nouveau ; l'export lui-même (chiffré avant d'être écrit, jamais dans
+le dépôt) ; la phrase des 30 jours, appliquée mot pour mot.
+
+## D-250 — Tranche 4, 4.5, PR 5 (troisième partie) : le journal d'accès du support et les coûts sur la page d'état
+
+Date : 20 novembre 2026.
+
+**Contexte.** F567 veut que chaque consultation des données d'une ferme par
+l'exploitant soit notée, gardée 12 mois ; F565 (point 6) et F568 veulent
+les coûts sur la page d'état, copiés à la main chaque mois, sans appel à
+l'API de Cloudflare. Rien de cela n'existait.
+
+**Décision.** Section 10 bis.21 du contrat de la Tranche 4 (F660 à F664) :
+
+1. Une migration (0041), deux tables communes : le
+   journal d'accès du support et le relevé des coûts du mois.
+2. Une note d'accès : le jour, la ferme, la raison en une ligne, jamais ce
+   qui a été vu ; 12 mois, puis la purge du matin ; partie avec le dernier
+   espace de la ferme. La page de confidentialité le dit.
+3. Un relevé des coûts par mois, recopié du tableau de bord ; chaque poste
+   comparé à ce que l'offre Workers payante inclut (pages des prix lues le
+   20 novembre 2026), à surveiller dès 80 %, avec le prix d'un dépassement.
+4. La carte des coûts n'entre pas au registre : la veille ne la rappelle
+   pas ; sans relevé du mois écoulé, elle est en orange.
+
+Ne changent pas : aucun appel à Cloudflare ni à OTF, aucun secret, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches).
+
+## D-251 — Tranche 4, 4.5, PR 3 (troisième partie) : la demande dans « Réglages », l'espace figé, l'annulation et l'effacement sans attendre
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le moteur de l'effacement (D-246) et l'oubli des appareils
+(D-248) sont prêts, mais aucune demande ne peut naître : F563 veut la
+demande dans « Réglages », après le nom de la ferme tapé, annulable sept
+jours, l'espace figé pendant ce temps (aucun appel à OTF, aucune saisie),
+et l'effacement immédiat sur demande écrite à l'exploitant.
+
+**Décision.** Section 10 bis.22 du contrat de la Tranche 4 (F665 à F669) :
+
+1. « Supprimer ma ferme et mes données », replié en bas de Réglages, hors
+   démonstration ; le serveur relit le nom tapé dans l'instantané en cache,
+   sans appel à OTF. La demande vaut pour l'espace de la personne.
+2. L'espace figé : la lecture de la personne connectée refuse l'espace dès
+   la demande, avant toute lecture d'OTF et toute saisie ; chaque page montre
+   l'écran de l'espace figé. Seules exceptions : l'annulation et la page
+   d'état de l'exploitant.
+3. L'annulation, sur cet écran, tant que l'effacement n'a pas commencé.
+4. L'effacement sans attendre, sur la page d'état : une demande en attente,
+   le numéro de sa ferme retapé ; le délai s'arrête, l'effacement passe
+   aussitôt dans la borne du matin, le matin finit le reste.
+5. La page de confidentialité dit la demande dans Réglages.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
+moteur de l'effacement et ses preuves.
+
+## D-280 — Sept améliorations validées par le porteur, inscrites à la roadmap (section 6 septies)
+
+Date : 21 novembre 2026.
+
+**Contexte.** Le 6 novembre 2026, l'assistant a proposé sept idées
+d'amélioration, sans accès au dépôt. Le porteur les a validées toutes le
+21 novembre 2026 (« Ok, je valide tout »). Les inscrire est du travail sans
+code : aucun « vas-y » de code n'est donné.
+
+**Constat dans le code (21 novembre 2026, `main` à 5b42519).**
+
+- N° 1, « Fait comme prévu » : existe déjà (3.8 quater, lot 3, D-076).
+- N° 3, résumé du matin : existe en écran (page « Aujourd'hui », D-074) et en
+  notification des suggestions du matin.
+- N° 6, données manquantes : existe en partie (zone « Fiabilité du calcul »,
+  cinq données ; vérification finale de l'accueil, 4.4).
+- N° 2, 4, 5, 7 : n'existent pas.
+
+**Décision.**
+
+1. Les sept idées sont inscrites en section 6 septies de la roadmap (tableau de
+   la section 1, ordre de la section 2, bloc détaillé). Aucune n'est codée ni
+   cadrée.
+2. **Place : après la Tranche 4** (après la 4.6), dans l'ordre n° 6, n° 2 et 3,
+   n° 7, puis n° 4 et 5 selon l'avis du porteur. Un seul chantier de code à
+   la fois.
+3. **Les n° 4 (priorité conseillée selon le stade critique) et n° 5 (écart
+   prévu/réel expliqué) sont réservées à l'avis agronomique du porteur** : pas
+   de contrat, pas d'option choisie à sa place, avant ses réponses. Une
+   priorité conseillée ne règle jamais seule la répartition.
+4. La n° 1 ne demande rien. Les n° 2, 3 et 6 : Opus 5.5 · Élevé ; la n° 7 :
+   Opus 5.5 · Très élevé (Max pour un éventuel retour en arrière) ; les n° 4 et
+   5 : Opus 5.5 · Max ; les contrats : Sonnet 5.5 · Moyen. Chaque code attend
+   son contrat court et le « vas-y » exprès du porteur.
+5. Un retour en arrière du journal ne défait jamais une irrigation réalisée
+   (D-006) ; les rôles d'utilisateur restent écartés.
+
+Ne changent pas : aucun code, aucune migration, aucun calcul, aucune
+décision antérieure. Le numéro D-280 est pris au-dessus de ceux des PR de la
+4.5, de la 4.6 et du moteur commun encore ouvertes (D-246 à D-251, D-260,
+D-270), pour éviter toute collision à la fusion.
+
+## D-260 — Tranche 4, sous-tranche 4.6 : les quatre documents du pilote
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat de la 4.6 (D-221, 10 ter.6) prévoit une première PR
+sans code : le modèle d'accord, la grille de recette, la fiche de retour et
+la fiche d'entrée. Le porteur a besoin du modèle d'accord pour la relecture
+juridique gratuite de son réseau (condition d'entrée E6), qui précède tout
+envoi à une ferme.
+
+**Décision.** Les quatre documents sont ajoutés à `docs/` :
+`pilote-accord-modele.md`, `pilote-recette.md`, `pilote-retour-modele.md`,
+`pilote-fiche-entree.md`. Ils suivent le contrat sans le rouvrir (F570,
+F572, F573, F574, F575). Les durées de conservation ne sont pas recopiées
+dans l'accord : la politique de confidentialité en ligne, à sa version
+datée, fait foi (condition E7). Aucune donnée de ferme n'entre au dépôt : les
+fermes se nomment « ferme A » et « ferme pilote n ». Le numéro D-260 est
+pris hors des plages réservées aux chaînes 4.4 et 4.5 ; aucun numéro F nouveau.
+
+**Réservé au porteur.** Choisir et contacter les fermes, relire (ou faire
+relire) puis envoyer l'accord, recueillir les réponses, juger la recette.
+
+Ne change pas : le code, le moteur, les coûts (aucune dépense nouvelle).
+
+## D-281 — Démarrage avancé des améliorations n° 6, 2, 3 et 7, et leur contrat court
+
+Date : 21 novembre 2026.
+
+**Contexte.** D-280 plaçait les sept améliorations après la Tranche 4, avec un
+« vas-y » avant chaque code, par prudence. Le porteur a fait remarquer le
+21 novembre 2026 qu'aucun chantier de code n'était en cours ; il a dit
+« Vas-y ».
+
+**Décision.**
+
+1. Le démarrage des n° 6, 2, 3 et 7 est **avancé** : le contrat court
+   (`docs/ameliorations-6-2-3-7-contract.md`) est écrit, leur code part sans
+   attendre la Tranche 4, sur sa propre branche, une PR à la fois, et **ne se
+   fusionne qu'après la file de fusion en cours**. Le « vas-y » de code est
+   donné pour ces quatre ; il reste attendu pour les n° 4 et 5, réservées à
+   l'avis agronomique.
+2. Le contrat retient, sur l'option recommandée : « stade deviné » = stade
+   déduit du calendrier ; un message unique du matin qui remplace la
+   notification des suggestions ; rappel du soir à 19 h par défaut, heure
+   réglable par ferme, déclencheur horaire inscrit au registre des tâches ;
+   journal général écrit en plus des journaux de domaine, dans la même
+   opération, gardé autant que la ferme, sans retour en arrière (second temps,
+   Opus 5.5 · Max, contrat à part).
+3. Ordre et réglages inchangés : n° 6, puis n° 2 et 3, puis n° 7 ; Opus 5.5 ·
+   Élevé, Très élevé pour la n° 7.
+
+Ne changent pas : aucun code, aucune migration, aucun calcul. Numéros D-281,
+F700 et suivants, P52 et suivants, à renuméroter à la fusion si la file préfère
+une suite sans trou.
+
 ## D-232 — La borne haute de l'ET0 portée à 15 mm/j (MC-37)
 
 Date : 20 novembre 2026.
@@ -7067,7 +7615,8 @@ les fermes. Le contrat commun la fixait aussi à 12 : la 4.4 l'a gardée
    la dernière valeur valide reste.
 2. La table des ETM du jour est recréée pour porter sa contrainte à 15
    (règle 3 des migrations : exceptionnel, PR dédiée, après export de la
-   base par le porteur) ; les lignes sont copiées telles quelles.
+   base par le porteur ; migration 0042, après les 0037 à 0041 de la 4.5) ;
+   les lignes sont copiées telles quelles.
 3. Le cas L6 du script des cas de test passe aux limites de MC-37 (11,9,
    12,1 et 14,9 calculées ; 15,1 et −0,1 bloquées), exécuté conforme.
 

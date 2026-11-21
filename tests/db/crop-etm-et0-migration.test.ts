@@ -8,15 +8,15 @@ import { prepareDemoSpace } from '../../lib/services/demo-space';
 import { applyMigrationsAfter, createD1FromSqlite, createMigratedSqliteDatabase } from '../support/d1-sqlite';
 
 /**
- * La migration 0037 (borne haute de l'ET0 portée à 15 mm/j, MC-37 ; F591,
+ * La migration 0042 (borne haute de l'ET0 portée à 15 mm/j, MC-37 ; F591,
  * D-232) recrée la table des ETM du jour pour changer sa contrainte : l'essai
- * se fait sur une copie, une base arrêtée à la 0036, remplie comme une ferme
+ * se fait sur une copie, une base arrêtée à la 0041, remplie comme une ferme
  * de la démonstration et de jours d'ETM écrits à la main (ET0 de 0 et 12,
  * bornes d'avant comprises). Aucune ligne d'aucune table ne change ; l'index
  * est recréé ; seule la borne de la contrainte change.
  */
 
-const BEFORE = '0036_soil_record_texture.sql';
+const BEFORE = '0041_support_accesses_cost_readings.sql';
 const TABLE = 'irrigation_crop_etm_days';
 
 function dump(database: DatabaseSync): Record<string, string[]> {
