@@ -886,7 +886,10 @@ registres, elle y renvoie.
   réglages que la liste du contrat ne nomme pas (réglages du besoin par
   culture, abris des parcelles, groupes de jardins, lieu météo), hors du
   journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)
-  se complète avec la chaîne, après #162 et la PR du contrat.
+  se complète avec la chaîne, après #162 et la PR du contrat. **En ligne le
+  22 novembre 2026 à 0 h 32** (#166, fusionnée à 0 h 04, run 44959950487
+  vérifié job par job : les cinq jobs verts ; migration 0044 appliquée sur
+  les deux bases).
 
 - Améliorations, **n° 6, le panneau « données manquantes » : codée le
   21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
