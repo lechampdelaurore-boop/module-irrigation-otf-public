@@ -770,6 +770,10 @@ registres, elle y renvoie.
   Parcours P51. Sans migration. Codée après la fusion de la 4.4 ; à
   fusionner après la troisième partie de la PR 5. Avec elle, une demande
   peut naître en production.
+  La page « Réglages » grandit au téléphone de 144 px avec ce pli fermé
+  (3 338 → 3 482 px sur les données des parcours, CI du 21 novembre 2026) :
+  la borne de P40 passe de 3 400 à 3 500 px, comme le contrat du lot J le
+  permet à la PR qui le dit (section 2).
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
