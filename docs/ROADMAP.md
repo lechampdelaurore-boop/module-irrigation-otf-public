@@ -5008,7 +5008,7 @@ inscrites.
 
 **Démarrage avancé le 21 novembre 2026** (« Vas-y » du porteur, D-281) : le
 contrat court des n° 6, 2, 3 et 7 est `docs/ameliorations-6-2-3-7-contract.md` ;
-leur code ne attend plus la Tranche 4 et se fusionne après la file en cours,
+leur code n'attend plus la Tranche 4 et se fusionne après la file en cours,
 sans toucher à ses PR. Ordre proposé :
 n° 6, puis n° 2 et 3, puis n° 7 ; les n° 4 et 5 quand le porteur aura donné
 son avis, dans l'ordre qu'il choisira. Réglages d'après la grille de cette
