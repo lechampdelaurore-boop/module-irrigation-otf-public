@@ -665,6 +665,36 @@ registres, elle y renvoie.
   novembre 2026) se note sur la page une fois cette PR en ligne. À
   fusionner après la seconde partie.
 
+- Tranche 4, **4.5, PR 3 sur 5, première partie : codée le 20 novembre
+  2026** (D-246, F640 à F648, section 10 bis.17 de
+  `docs/tranche-4-contract.md`). Le moteur de l'effacement d'une ferme :
+  une table des demandes (migration 0040), sept jours d'attente pendant lesquels l'espace est figé,
+  puis, le premier matin après, la tâche « farm-erasure » efface par lots
+  de 200 lignes tout ce que l'espace garde, table par table, et l'espace
+  lui-même en dernier ; un passage s'arrête à 300 instructions ou 20
+  secondes et le suivant reprend là où il en était. Un plan range chaque
+  table de la base (effacée, gardée par une table commune, ou gardée avec
+  sa raison) : une table ajoutée sans règle fait échouer la CI. Les douze
+  tables immuables acceptent l'effacement pendant une demande « en cours »
+  seulement. La page d'état gagne la ligne « Effacements » ; le registre
+  compte 8 tâches. Aucune demande ne peut encore être faite : le geste dans
+  « Réglages » viendra avec la seconde partie, après la fusion de la 4.4. À
+  fusionner après la troisième partie de la PR 4.
+
+- Tranche 4, **4.5, PR 5 sur 5, première partie : codée le 20 novembre
+  2026** (D-247, F649 à F653, section 10 bis.18 de
+  `docs/tranche-4-contract.md`). La conservation, table par table : chaque
+  table de la base a sa durée et qui l'efface (`db/retention-plan.ts`),
+  le même tableau au contrat, et un test qui casse la CI pour une table
+  sans durée. La tâche « Purges de conservation » du matin efface, par lots
+  de 500 lignes et 50 instructions au plus par passage, le journal des
+  appels à Ouvre ta ferme (2, 8 ou 30 jours selon la ligne, même quand rien
+  ne lit la ferme) et la notification du jour de la veille (35 jours) ; le
+  registre compte 9 tâches. Sans migration. La politique de confidentialité
+  (phrase des 30 jours, relue par le porteur), le support et les coûts
+  viennent avec la seconde partie. À fusionner après la première partie de
+  la PR 3.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à

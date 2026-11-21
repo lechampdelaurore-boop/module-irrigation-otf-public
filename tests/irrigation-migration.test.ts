@@ -58,7 +58,8 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_equipment_setting_calculations', 'irrigation_equipment_settings',
     'irrigation_event_equipment',
     'irrigation_event_log',
-    'irrigation_events', 'irrigation_feature_selections',
+    // Même raison : la demande d'effacement d'une ferme (4.5, migration 0040) partage la ligne de sa voisine.
+    'irrigation_events', 'irrigation_farm_erasures', 'irrigation_feature_selections',
     'irrigation_garden_group_members',
     'irrigation_garden_groups',
     'irrigation_hydric_goal_revisions',

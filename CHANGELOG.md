@@ -13,6 +13,48 @@ source détaillée commit par commit.
   Tranche 4 ; les n° 4 et 5 sont réservées à l'avis agronomique du porteur.
   Aucun code, aucun contrôle rejoué.
 
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- **La conservation, table par table** (D-247, F649 à F653) : chaque table
+  de la base a sa durée et qui l'efface, écrites en code et au contrat ; une
+  table ajoutée sans durée casse la CI. La tâche du matin « Purges de
+  conservation » efface, par lots bornés et pour toutes les fermes, ce qui a
+  dépassé sa durée : le journal des appels à Ouvre ta ferme (2, 8 ou 30
+  jours selon la ligne), même quand rien ne lit la ferme, et la notification
+  du jour de la veille (35 jours). Sans migration. La politique de
+  confidentialité, le support et les coûts viennent avec la seconde partie.
+
+### Changé (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- Le registre compte 9 tâches ; le matin en a six.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, première partie)
+
+- **L'effacement d'une ferme, le moteur** (D-246, F640 à F648) : une
+  demande d'effacement s'exécute sept jours après, annulable jusque-là ;
+  l'espace est figé pendant ce temps (les traitements du matin le sautent).
+  Le premier matin après le délai, la tâche « Effacement des fermes qui
+  l'ont demandé » efface, par lots bornés et repris au passage suivant, tout
+  ce que l'espace garde, puis l'espace lui-même avec la note « faite », d'un
+  bloc. Il ne reste qu'une note de la demande, sans nom ni contenu
+  (`irrigation_farm_erasures`, migration 0040). La page
+  d'état dit les demandes en attente, à effacer et faites, et la dernière.
+  La demande dans « Réglages » vient avec la seconde partie.
+- Les preuves de F563 : chaque table de la base est rangée dans le plan
+  d'effacement, et une table sans règle casse la CI ; à deux fermes, avec
+  des lignes dans chaque table d'espace, l'autre ferme reste inchangée dans
+  les quatre passages de l'isolation ; reprise après une coupure ou une
+  panne ; annulation.
+
+### Changé (Tranche 4, 4.5, PR 3 sur 5, première partie)
+
+- Les douze tables que le module garde immuables acceptent l'effacement des
+  seules lignes d'un espace dont l'effacement est en cours : leurs
+  déclencheurs sont recréés à l'identique avec cette exception (procédure
+  exceptionnelle des migrations, D-246).
+- Le registre compte 8 tâches ; le matin en a cinq.
+
+
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
 
 - **L'essai de restauration au registre des tâches** (D-245, F636 et F637) :

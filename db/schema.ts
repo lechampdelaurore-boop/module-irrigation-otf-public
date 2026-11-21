@@ -938,6 +938,34 @@ export const operatorNotices = sqliteTable(
   ],
 );
 
+/**
+ * La demande d'effacement d'un espace (4.5, migration 0040, F563, F640 à
+ * F648) : l'enregistrement minimal qui reste après l'effacement pour prouver
+ * qu'il a été fait. L'identifiant interne de l'espace, l'état et des dates ;
+ * ni nom, ni personne, ni ferme, ni contenu ; pas de clé étrangère, l'espace
+ * disparaissant. Une seule demande ouverte par espace.
+ */
+export const farmErasures = sqliteTable(
+  'irrigation_farm_erasures',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id').notNull(),
+    state: text('state').notNull().default('pending'),
+    requestedAt: text('requested_at').notNull(),
+    eraseAfter: text('erase_after').notNull(),
+    cancelledAt: text('cancelled_at'),
+    startedAt: text('started_at'),
+    erasedAt: text('erased_at'),
+  },
+  (table) => [
+    uniqueIndex('idx_irrigation_farm_erasures_open').on(table.workspaceId).where(sql`${table.state} IN ('pending', 'erasing')`),
+    check('chk_irrigation_farm_erasures_state', sql`${table.state} IN ('pending', 'erasing', 'erased', 'cancelled')`),
+    check('chk_irrigation_farm_erasures_cancelled', sql`(${table.state} = 'cancelled') = (${table.cancelledAt} IS NOT NULL)`),
+    check('chk_irrigation_farm_erasures_erased', sql`(${table.state} = 'erased') = (${table.erasedAt} IS NOT NULL)`),
+    check('chk_irrigation_farm_erasures_started', sql`(${table.state} IN ('erasing', 'erased')) = (${table.startedAt} IS NOT NULL)`),
+  ],
+);
+
 export const weatherGeocodes = sqliteTable(
   'irrigation_weather_geocodes',
   {
