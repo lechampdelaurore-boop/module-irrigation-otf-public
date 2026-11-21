@@ -406,8 +406,8 @@ enregistrement identique n'écrit rien. F727 : la première version de la
 ferme d'une culture est une création, la suivante une modification, la
 retirer une suppression. F728 : un jardin remis « à classer » est une
 suppression. F729 : le lieu de la météo, seul le choix. Décidé par le
-coordinateur dans l'autonomie que le porteur lui a confiée ; le porteur
-peut la refuser à la relecture.
+coordinateur dans l'autonomie que le porteur lui a confiée, confirmé par
+le porteur le 21 novembre 2026 à 23 h 13.
 
 **Preuves (PR 4 à 7).** Tests de persistance (atomicité, un changement refusé
 n'écrit rien, immuabilité), d'isolation entre deux fermes, d'effacement, de

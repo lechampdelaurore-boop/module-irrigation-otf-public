@@ -859,7 +859,8 @@ registres, elle y renvoie.
   groupes d'une saison sur l'autre, la proposition du module pour un
   jardin. Sans migration ni écran nouveau. Contrôles : voir la PR. Décidé
   par le coordinateur dans l'autonomie que le porteur lui a confiée
-  (19 novembre 2026) ; le porteur peut la refuser à la relecture.
+  (19 novembre 2026), confirmé par le porteur le 21 novembre 2026 à
+  23 h 13.
 
 - Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
   l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur

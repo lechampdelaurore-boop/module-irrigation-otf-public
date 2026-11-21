@@ -7993,7 +7993,9 @@ les réglages que la liste du contrat (§5.1) ne nommait pas, « sur le mot du
 porteur ». Le coordinateur du projet a tranché pour une PR à part, codée
 aussitôt, dans l'autonomie que le porteur lui a confiée le 19 novembre 2026
 pour les questions qui ne touchent ni au budget, ni à l'agronomie, ni à la
-ferme réelle ; le porteur peut la refuser à la relecture de la PR.
+ferme réelle. **Le porteur l'a confirmé le 21 novembre 2026 à 23 h 13** (« Bon,
+c'est bien, laisse comme ça. ») : les réglages hors de la liste restent au
+journal.
 
 **Contexte.** Depuis D-287, tous les écrivains de la liste du contrat
 écrivent au journal, et l'écran le lit (D-288). Restaient hors du journal,
