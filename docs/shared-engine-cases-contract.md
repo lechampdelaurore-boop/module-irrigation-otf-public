@@ -74,7 +74,7 @@ juin 2026 (jours de 24 heures), plein champ sauf mention :
 | L3 bis | Capacité qui baisse : 60 % de 30,6 mm le jour 1 (60 cm), 30 cm le jour 2 | jour 2 : départ 9,18 mm (60 % conservé) |
 | L4 | Arrosage proposé, jour prévu : plein à minuit, ETM 4, un créneau `proposed` de 3 mm et un `planned` de 2 mm | jour « prévu » ; irrigation 5 mm ; fin 15,3 (16,3 bornée), drainage 1 mm |
 | L5 | Abri sans pluie : planche sous abri, plein à minuit, ETM 2, 20 mm au pluviomètre ; puis un jour sans aucune pluie enregistrée | jour 1 : pluie comptée 0, fin 13,3 mm ; jour 2 : jauge connue, fin 11,3 mm (aucune pluie à lire sous abri) |
-| L6 | ET0 hors bornes : ET0 de 12, 12,5 et −0,1 mm/j | 12 : ETM calculée (bornes comprises) ; 12,5 et −0,1 : jour bloqué, message qui nomme l'ET0 ; dans la jauge, un jour bloqué rend la jauge inconnue, raison « bloqué » |
+| L6 | ET0 hors bornes : ET0 de 11,9, 12,1, 14,9, 15,1 et −0,1 mm/j (bornes 0 à 15 depuis MC-37, D-232 ; avant : 12 et 12,5) | 11,9, 12,1 et 14,9 : ETM calculée (bornes comprises) ; 15,1 et −0,1 : jour bloqué, message qui nomme l'ET0 ; dans la jauge, un jour bloqué rend la jauge inconnue, raison « bloqué » |
 | L7 | Plancher atteint puis pluie : 2 mm à la fin du jour 0, ETM 5 les jours 1 et 2, 3 mm de pluie et ETM 1 le jour 3 | 0 ; 0 ; 2 mm (rien du déficit n'est retenu) |
 
 ## Ce que le script rend
