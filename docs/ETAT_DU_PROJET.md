@@ -547,6 +547,9 @@ registres, elle y renvoie.
   déploiement (R6), à lire au journal (`task_run_succeeded` ou
   `task_run_failed`, une ligne par tâche) ou sur la page d'état de la
   PR 2.
+  **En ligne le 20 novembre 2026 à 22 h 07** (#138, fusionnée à 21 h 48, run
+  44814597995 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
 
 - Tranche 4, **4.5, PR 2 sur 5, première partie : la veille de
   l'exploitant et sa page d'état** (D-241, F608 à F613, section 10 bis.12
@@ -571,6 +574,9 @@ registres, elle y renvoie.
   l'exploitant (recette avec l'accord du porteur). À fusionner après la
   PR 1 et son premier matin, sinon la première veille annoncerait les
   tâches du matin « jamais réussies ».
+  **En ligne le 20 novembre 2026 à 22 h 35** (#140, fusionnée à 22 h 15, run
+  44818616335 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
 
 - Tranche 4, **4.5, PR 2 sur 5, seconde partie : codée le 20 novembre
   2026** (D-242, F614 à F618, section 10 bis.13 de
@@ -594,6 +600,9 @@ registres, elle y renvoie.
   suite complète des parcours jouée par la CI de la PR. Non vérifié sur le
   site : les premiers comptes réels de la ferme du porteur. À fusionner
   après la première partie.
+  **En ligne le 20 novembre 2026 à 22 h 59** (#141, fusionnée à 22 h 38, run
+  44822149823 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
 
 - Tranche 4, **4.5, PR 4 sur 5, première partie : codée le 20 novembre
   2026** (D-243, F620 à F626, section 10 bis.14 de
@@ -620,6 +629,12 @@ registres, elle y renvoie.
   la procédure). L'essai des scénarios S1 à S3 sur la base d'essai (seconde
   partie) attend le « vas-y » du porteur pour créer cette base chez
   Cloudflare. À fusionner après la PR 2.
+  **En ligne le 20 novembre 2026 à 23 h 33** (#143, fusionnée à 23 h 05, run
+  44825972893 vérifié job par job : les cinq jobs verts ; consigné par
+  #160). **Premier export de la semaine fait par le porteur le 21 novembre
+  2026 à 10 h 08**, sur son ordinateur, dans une copie neuve du dépôt public
+  (« Export vérifié » : 90 tables, 40 migrations reçues, la dernière 0039),
+  et noté sur la page d'état à 10 h 17.
 
 - Tranche 4, **4.5, PR 4 sur 5, seconde partie : codée le 20 novembre
   2026** (D-244, F627 à F635, section 10 bis.15 de
@@ -651,6 +666,9 @@ registres, elle y renvoie.
   interne de Cloudflare, sur une base d'une minute) ; l'export brut ne se
   réimporte pas, l'import rangé si ; un export de la base d'essai dure
   environ 2,5 secondes. À fusionner après la première partie.
+  **En ligne le 20 novembre 2026 à 23 h 54** (#145, fusionnée à 23 h 35, run
+  44830015559 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
 
 - Tranche 4, **4.5, PR 4 sur 5, troisième partie : codée le 20 novembre
   2026** (D-245, F636 et F637, section 10 bis.16 de
@@ -664,6 +682,10 @@ registres, elle y renvoie.
   d'ensemble compte 7 tâches. Sans migration. Le premier essai réussi (20
   novembre 2026) se note sur la page une fois cette PR en ligne. À
   fusionner après la seconde partie.
+  **En ligne le 21 novembre 2026 à 0 h 54** (#147, fusionnée à 0 h 27, run
+  44836928404 vérifié job par job : les cinq jobs verts ; consigné par
+  #160). L'essai du 20 novembre est noté sur la page d'état le 21 novembre à
+  10 h 17.
 
 - Tranche 4, **4.5, PR 3 sur 5, première partie : codée le 20 novembre
   2026** (D-246, F640 à F648, section 10 bis.17 de
@@ -680,6 +702,9 @@ registres, elle y renvoie.
   compte 8 tâches. Aucune demande ne peut encore être faite : le geste dans
   « Réglages » viendra avec la seconde partie, après la fusion de la 4.4. À
   fusionner après la troisième partie de la PR 4.
+  **En ligne le 21 novembre 2026 à 10 h 41** (#149, fusionnée à 10 h 19,
+  après l'export noté, run 44889012698 vérifié job par job : les cinq jobs
+  verts ; consigné par #160).
 
 - Tranche 4, **4.5, PR 5 sur 5, première partie : codée le 20 novembre
   2026** (D-247, F649 à F653, section 10 bis.18 de
@@ -694,6 +719,88 @@ registres, elle y renvoie.
   (phrase des 30 jours, relue par le porteur), le support et les coûts
   viennent avec la seconde partie. À fusionner après la première partie de
   la PR 3.
+  **En ligne le 21 novembre 2026 à 11 h 08** (#151, fusionnée à 10 h 42, run
+  44890788265 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 3 sur 5, deuxième partie : codée le 20 novembre
+  2026** (D-248, F654 à F656, section 10 bis.19 de
+  `docs/tranche-4-contract.md`). Le Worker de notification oublie les
+  appareils d'une ferme effacée (route `/v1/recipients/forget` ; la fiche
+  d'un appareil qui ne sert plus aucun espace est oubliée), et l'effacement
+  n'est noté fait qu'après ; un abonnement dont les envois manquent depuis
+  90 jours est oublié comme un abonnement expiré, jamais un abonnement à
+  qui rien n'est envoyé. Sans migration de la base. La PR 3 se fait
+  désormais en trois : la demande dans « Réglages » vient en troisième
+  partie, après la fusion de la 4.4. À fusionner après la première partie
+  de la PR 5.
+  **En ligne le 21 novembre 2026 à 11 h 27** (#152, fusionnée à 11 h 09, run
+  44892961732 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 5 sur 5, deuxième partie : codée le 20 novembre
+  2026** (D-249, F657 à F659, section 10 bis.20 de
+  `docs/tranche-4-contract.md`). La page de confidentialité (texte du
+  20 novembre 2026) dit chaque durée que le code tient, avec la phrase des
+  30 jours telle qu'approuvée, l'export de la semaine gardé cinq semaines
+  au plus et le compte des lectures dans Ouvre ta ferme ; **texte relu par
+  le porteur avant la fusion**, qui le met en ligne. La commande de
+  l'export efface elle-même, après un export vérifié, ceux de 25 jours ou
+  plus. `docs/exploitation.md` dit que faire, cas par cas (« Que faire
+  quand… »), avec un gabarit de réponse ; la page d'accueil du site, le
+  délai de réponse, sans engagement. Sans migration. La PR 5 se fait
+  désormais en trois : le journal d'accès du support et les coûts viennent
+  en troisième partie. À fusionner après la deuxième partie de la PR 3.
+  **En ligne le 21 novembre 2026 à 11 h 56** (#153, fusionnée à 11 h 29, run
+  44894563523 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 5 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-250, F660 à F664, section 10 bis.21 de
+  `docs/tranche-4-contract.md`). La page d'état gagne le journal d'accès du
+  support (le jour, la ferme, la raison en une ligne, jamais ce qui a été
+  vu ; 12 mois, puis la purge du matin ; effacé avec la ferme) et les coûts
+  du mois, recopiés à la main du tableau de bord de Cloudflare et comparés
+  à ce que l'offre inclut ; la page n'appelle jamais Cloudflare. Migration
+  0041. La page de confidentialité dit le journal
+  (relue avec la deuxième partie). À fusionner après la deuxième partie.
+  **En ligne le 21 novembre 2026 à 12 h 17** (#154, fusionnée à 11 h 56, run
+  44896717442 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 3 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-251, F665 à F669, section 10 bis.22 de
+  `docs/tranche-4-contract.md`). « Supprimer ma ferme et mes données », en
+  bas de Réglages, après avoir tapé le nom de la ferme (relu par le
+  serveur, sans appel à OTF) ; dès la demande, l'espace est figé : chaque
+  page montre le jour de l'effacement, rien n'est lu chez OTF ni saisi, et
+  la personne peut annuler tant que l'effacement n'a pas commencé ; sur la
+  page d'état, l'exploitant efface sans attendre, sur demande écrite, en
+  retapant le numéro de la ferme. La page de confidentialité le dit.
+  Parcours P51. Sans migration. Codée après la fusion de la 4.4 ; à
+  fusionner après la troisième partie de la PR 5. Avec elle, une demande
+  peut naître en production.
+  La page « Réglages » grandit au téléphone de 144 px avec ce pli fermé
+  (3 338 → 3 482 px sur les données des parcours, CI du 21 novembre 2026) :
+  la borne de P40 passe de 3 400 à 3 500 px, comme le contrat du lot J le
+  permet à la PR qui le dit (section 2).
+  **En ligne le 21 novembre 2026 à 13 h 32** (#160, fusionnée à 13 h 04, run
+  44902063396 vérifié job par job : les cinq jobs verts ; consigné par
+  #161). La 4.5 est en ligne en entier.
+
+- Correctif, **le parcours P12 au téléphone à la fin de la soirée**, trouvé
+  en fusionnant la 4.5 (Opus 5.5 · Très élevé, ligne 4.5), sans décision
+  nouvelle. Constat : sur la CI de #147, le 20 novembre 2026 à 23 h 45,
+  P12 a échoué au téléphone, sa première proposition « cachée » : plus rien
+  ne tenait aujourd'hui, elle était le lendemain, jour replié parce
+  qu'aujourd'hui portait encore des propositions ou des arrosages validés
+  d'autres parcours (F11). P12
+  a laissé son objectif de 70 mm, et P26, P32, P37 et P38 sont tombés
+  derrière lui. Relancés à 0 h 07, tous sont passés. Désormais, P12 montre
+  cette première carte en dépliant son jour (`montrerLaCarte`), comme ses
+  autres cartes ; `docs/browser-journeys-contract.md` (« l'heure où il
+  tourne ») le dit. Seul le parcours change, pas l'application. À
+  fusionner après la 4.5.
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le

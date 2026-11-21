@@ -13,6 +13,70 @@ source détaillée commit par commit.
   Tranche 4 ; les n° 4 et 5 sont réservées à l'avis agronomique du porteur.
   Aucun code, aucun contrôle rejoué.
 
+### Corrigé (parcours navigateur)
+
+- **P12, au téléphone, ne dépend plus de l'heure où il tourne** : à la fin
+  de la soirée, sa première proposition tombe le lendemain, un jour replié
+  quand aujourd'hui porte encore des propositions ou des arrosages validés
+  d'autres parcours (F11). Il la montre désormais en dépliant son jour,
+  comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
+  23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
+  qu'il avait laissé.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
+
+- **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à
+  F669) : en bas de Réglages, replié, ce qui disparaît, ce qui reste, le
+  délai de sept jours et l'autorisation à retirer dans Ouvre ta ferme ; la
+  demande ne part qu'avec le nom de la ferme tapé, relu par le serveur.
+  Absent de la démonstration.
+- **L'espace figé** : dès la demande, chaque page du module montre le jour
+  de l'effacement, sans rien lire d'Ouvre ta ferme ni rien laisser saisir,
+  et « Annuler la demande » tant que l'effacement n'a pas commencé.
+- **L'effacement sans attendre**, sur la page d'état, sur demande écrite :
+  l'exploitant choisit la demande, retape le numéro de sa ferme, et
+  l'effacement passe aussitôt ; `docs/exploitation.md` dit comment.
+- La page de confidentialité dit la demande dans Réglages. Parcours P51.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, troisième partie)
+
+- **Le journal d'accès du support** (D-250, F660 à F664) : sur la page
+  d'état, l'exploitant note chaque consultation des données d'une ferme (le
+  jour, la ferme, la raison en une ligne, jamais ce qu'il a vu) ; gardée
+  12 mois, effacée avec la ferme. La page de confidentialité le dit.
+- **Les coûts sur la page d'état** : le relevé du mois, recopié du tableau
+  de bord de Cloudflare, comparé à ce que l'offre inclut (à surveiller dès
+  80 %, prix d'un dépassement) ; la page n'appelle jamais Cloudflare.
+  Migration 0041.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, deuxième partie)
+
+- **La page de confidentialité dit chaque durée** (D-249, F657 à F659),
+  texte du 20 novembre 2026 : la phrase des 30 jours telle qu'approuvée
+  (« Une donnée effacée reste récupérable dans l'historique jusqu'à
+  30 jours. »), l'export de la semaine gardé cinq semaines au plus, le
+  compte des lectures dans Ouvre ta ferme (30 jours au plus), la preuve
+  d'un effacement sans nom ni contenu, l'abonnement aux notifications
+  effacé avec la ferme ou après 90 jours sans notification remise.
+- **Les exports gardés cinq semaines au plus** : après un export vérifié,
+  `pnpm backup:export` efface du même dossier ceux de 25 jours ou plus, et
+  seulement les fichiers qu'il a nommés, puis rappelle d'effacer les mêmes
+  copies ailleurs.
+- **« Que faire quand… »** dans `docs/exploitation.md` : une notification de
+  la veille, une ferme qui écrit (gabarit de réponse), une demande
+  d'effacement, une base perdue, la clé du coffre perdue, Ouvre ta ferme
+  qui change, un compte perdu. La page d'accueil du site dit le délai de
+  réponse, sans engagement.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, deuxième partie)
+
+- **Les appareils d'une ferme effacée sont oubliés** (D-248, F654 à F656) :
+  le Worker de notification retire chaque appareil de l'espace effacé, et
+  oublie la fiche d'un appareil qui ne sert plus aucun espace ;
+  l'effacement n'est noté fait qu'après. Un abonnement dont les envois
+  manquent depuis 90 jours est oublié comme un abonnement expiré ; un
+  abonnement à qui rien n'est envoyé ne l'est jamais.
+
 ### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
 
 - **La conservation, table par table** (D-247, F649 à F653) : chaque table

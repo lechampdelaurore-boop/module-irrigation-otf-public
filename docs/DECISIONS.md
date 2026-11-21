@@ -7383,6 +7383,125 @@ Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
 aucun secret, aucun service nouveau ; les durées déjà tenues par le code ;
 le texte de la page de confidentialité (seconde partie).
 
+## D-248 — Tranche 4, 4.5, PR 3 (deuxième partie) : les appareils d'une ferme effacée, et ceux qui ne répondent plus
+
+Date : 20 novembre 2026.
+
+**Contexte.** F563 efface, avec la ferme, les abonnements de notification de
+son espace ; ils vivent dans le Worker de notification, pas dans la base, et
+aucune route ne les oubliait. F562 veut qu'un abonnement sans réponse du
+service depuis 90 jours soit oublié ; le Worker ne gardait rien de ses
+échecs. Rien de cela ne touche « Réglages », que la chaîne de la 4.4 occupe
+encore.
+
+**Décision.** Section 10 bis.19 du contrat de la Tranche 4 (F654 à F656) :
+
+1. La PR 3 en trois : le moteur (première partie, D-246), le Worker de
+   notification (cette deuxième partie), puis la demande dans « Réglages »
+   après la 4.4.
+2. Une route `/v1/recipients/forget` : chaque appareil de l'espace le quitte,
+   et la fiche d'un appareil qui ne sert plus aucun espace est oubliée.
+3. Le moteur de l'effacement l'appelle avant de noter l'effacement fait ;
+   sans réponse, rien n'est noté et le passage suivant recommence.
+4. Un abonnement dont les envois manquent depuis 90 jours est oublié comme un
+   abonnement expiré ; un abonnement à qui rien n'est envoyé ne l'est jamais.
+5. La colonne qui garde le premier envoi manqué s'ajoute aux listes
+   existantes à leur réveil, sans toucher leurs lignes.
+
+Ne changent pas : aucune migration de la base D1, aucun appel à OTF, aucun
+secret, aucun service nouveau ; les alarmes et leurs tentatives ; la règle
+« un appareil, une personne » (F371) ; le texte de la page de
+confidentialité (PR 5, seconde partie).
+
+## D-249 — Tranche 4, 4.5, PR 5 (deuxième partie) : la page de confidentialité, les exports gardés cinq semaines, le support
+
+Date : 20 novembre 2026.
+
+**Contexte.** La première partie de la PR 5 (D-247) a donné une durée à
+chaque table ; la page de confidentialité n'en disait encore que deux, sans
+la phrase des 30 jours approuvée par le porteur le 19 novembre 2026. Un
+export hebdomadaire garde aussi les données d'une ferme effacée depuis, et
+aucune règle ne disait combien de temps l'exploitant les garde.
+`docs/exploitation.md` ne disait pas encore que faire d'une panne, d'une
+ferme qui écrit ou d'une clé perdue (F567).
+
+**Décision.** Section 10 bis.20 du contrat de la Tranche 4 (F657 à F659) :
+
+1. La PR 5 en trois : la conservation (D-247), ce qui se lit et se relit
+   (cette deuxième partie), puis le journal d'accès du support et les coûts.
+2. Un export est gardé cinq semaines au plus. La commande de l'export le
+   tient : après un export vérifié, elle efface du même dossier ceux de
+   25 jours ou plus (35 jours moins les 10 jours du rouge de la tâche), et
+   seulement les fichiers qu'elle a nommés ; les copies hors de l'ordinateur
+   suivent la même règle, à la main.
+3. La page de confidentialité (texte du 20 novembre 2026) dit chaque durée
+   que le code tient, la phrase des 30 jours telle qu'approuvée, et le
+   compte des lectures dans Ouvre ta ferme ; ce qui n'existe pas encore ne
+   s'écrit qu'avec son code. Le texte est relu par le porteur avant la
+   fusion, qui le met en ligne.
+4. `docs/exploitation.md` dit, cas par cas, ce que fait l'exploitant seul,
+   avec un gabarit de réponse fondé sur la page d'état ; la page d'accueil
+   du site dit le délai de réponse, sans engagement.
+5. La 4.5 prend aussi F660 à F669 et D-250 à D-252.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun secret, aucun
+service nouveau ; l'export lui-même (chiffré avant d'être écrit, jamais dans
+le dépôt) ; la phrase des 30 jours, appliquée mot pour mot.
+
+## D-250 — Tranche 4, 4.5, PR 5 (troisième partie) : le journal d'accès du support et les coûts sur la page d'état
+
+Date : 20 novembre 2026.
+
+**Contexte.** F567 veut que chaque consultation des données d'une ferme par
+l'exploitant soit notée, gardée 12 mois ; F565 (point 6) et F568 veulent
+les coûts sur la page d'état, copiés à la main chaque mois, sans appel à
+l'API de Cloudflare. Rien de cela n'existait.
+
+**Décision.** Section 10 bis.21 du contrat de la Tranche 4 (F660 à F664) :
+
+1. Une migration (0041), deux tables communes : le
+   journal d'accès du support et le relevé des coûts du mois.
+2. Une note d'accès : le jour, la ferme, la raison en une ligne, jamais ce
+   qui a été vu ; 12 mois, puis la purge du matin ; partie avec le dernier
+   espace de la ferme. La page de confidentialité le dit.
+3. Un relevé des coûts par mois, recopié du tableau de bord ; chaque poste
+   comparé à ce que l'offre Workers payante inclut (pages des prix lues le
+   20 novembre 2026), à surveiller dès 80 %, avec le prix d'un dépassement.
+4. La carte des coûts n'entre pas au registre : la veille ne la rappelle
+   pas ; sans relevé du mois écoulé, elle est en orange.
+
+Ne changent pas : aucun appel à Cloudflare ni à OTF, aucun secret, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches).
+
+## D-251 — Tranche 4, 4.5, PR 3 (troisième partie) : la demande dans « Réglages », l'espace figé, l'annulation et l'effacement sans attendre
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le moteur de l'effacement (D-246) et l'oubli des appareils
+(D-248) sont prêts, mais aucune demande ne peut naître : F563 veut la
+demande dans « Réglages », après le nom de la ferme tapé, annulable sept
+jours, l'espace figé pendant ce temps (aucun appel à OTF, aucune saisie),
+et l'effacement immédiat sur demande écrite à l'exploitant.
+
+**Décision.** Section 10 bis.22 du contrat de la Tranche 4 (F665 à F669) :
+
+1. « Supprimer ma ferme et mes données », replié en bas de Réglages, hors
+   démonstration ; le serveur relit le nom tapé dans l'instantané en cache,
+   sans appel à OTF. La demande vaut pour l'espace de la personne.
+2. L'espace figé : la lecture de la personne connectée refuse l'espace dès
+   la demande, avant toute lecture d'OTF et toute saisie ; chaque page montre
+   l'écran de l'espace figé. Seules exceptions : l'annulation et la page
+   d'état de l'exploitant.
+3. L'annulation, sur cet écran, tant que l'effacement n'a pas commencé.
+4. L'effacement sans attendre, sur la page d'état : une demande en attente,
+   le numéro de sa ferme retapé ; le délai s'arrête, l'effacement passe
+   aussitôt dans la borne du matin, le matin finit le reste.
+5. La page de confidentialité dit la demande dans Réglages.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
+service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
+moteur de l'effacement et ses preuves.
+
 ## D-280 — Sept améliorations validées par le porteur, inscrites à la roadmap (section 6 septies)
 
 Date : 21 novembre 2026.

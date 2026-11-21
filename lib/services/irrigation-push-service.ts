@@ -69,6 +69,15 @@ export async function unregisterIrrigationPushSubscription(
 }
 
 /**
+ * L'oubli de tous les appareils d'un espace effacé (docs/tranche-4-contract.md,
+ * F563, et 10 bis.19, F654) : chacun quitte l'espace, et le Worker oublie sa
+ * fiche s'il ne sert plus aucun espace.
+ */
+export async function forgetIrrigationPushRecipient(recipientKey: string): Promise<IrrigationPushServiceResult> {
+  return callPushService('/v1/recipients/forget', { recipientKey });
+}
+
+/**
  * L'envoi immédiat d'une notification (alertes météo) : le Worker la délivre
  * tout de suite et dit ce qu'il en est (docs/push-worker-contract.md,
  * « Envoi immédiat ») ; une réponse illisible compte comme un échec.

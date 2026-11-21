@@ -78,6 +78,15 @@ export const RETENTION_PLAN: Readonly<Record<string, RetentionRule & { purge?: s
     erasedBy: 'La purge du matin (F650). Un genre, un nombre et des heures, d’aucune ferme.',
     purge: 'paris_day < ?',
   },
+  irrigation_support_accesses: {
+    kept: RETENTION_WORDS.irrigation_support_accesses,
+    erasedBy: 'La purge du matin (F660) ; l’effacement du dernier espace de la ferme (F642). Le jour, la ferme et la raison en une ligne, jamais ce que l’exploitant a vu.',
+    purge: 'accessed_on < ?',
+  },
+  irrigation_cost_readings: {
+    kept: 'Sans limite : un relevé par mois, les coûts du déploiement.',
+    erasedBy: 'Personne : des nombres copiés du tableau de bord de Cloudflare, d’aucune ferme (F662).',
+  },
   irrigation_farm_erasures: {
     kept: 'Sans limite : la preuve qu’une demande d’effacement a été traitée.',
     erasedBy: 'Personne. L’identifiant interne de l’espace, un état et des dates ; ni nom, ni personne, ni ferme, ni contenu ; une fois l’espace effacé, il ne désigne plus rien (F640).',

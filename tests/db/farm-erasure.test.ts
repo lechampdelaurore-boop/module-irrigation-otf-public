@@ -76,7 +76,7 @@ function snapshotPayload(farm: string): string {
   return JSON.stringify({ structure: { id: farm, name: `Ferme ${farm}` }, zones: [], plots: [], beds: [] });
 }
 
-/** Ce que les tables communes gardent d'un espace et de sa ferme : instantanés, raccordement, journal des appels. */
+/** Ce que les tables communes gardent d'un espace et de sa ferme : instantanés, raccordement, journal des appels, journal d'accès du support. */
 function writeSharedRows(sqlite: DatabaseSync, spaceKey: string, connectionOwner: string | null) {
   const { otfFarmId } = farmSpaceOf(spaceKey);
   const snapshot = sqlite.prepare('INSERT INTO otf_snapshots (cache_key, payload, last_successful_read_at, updated_at) VALUES (?, ?, ?, ?)');
@@ -89,6 +89,8 @@ function writeSharedRows(sqlite: DatabaseSync, spaceKey: string, connectionOwner
   sqlite.prepare('INSERT OR IGNORE INTO otf_call_outcomes (pace_key, hour_start_ms, outcome, calls) VALUES (?, ?, ?, ?)').run(otfFarmId, 1_763_600_000_000, 'ok', 12);
   sqlite.prepare('INSERT OR IGNORE INTO otf_call_pauses (scope, paused_until_ms, reason) VALUES (?, ?, ?)').run(otfFarmId, 1_763_600_000_000, 'rate-limit');
   sqlite.prepare('INSERT OR IGNORE INTO otf_farm_reads (pace_key, lease_until_ms, last_complete_at) VALUES (?, ?, ?)').run(otfFarmId, 0, '2026-11-19T06:00:00.000Z');
+  sqlite.prepare('INSERT OR IGNORE INTO irrigation_support_accesses (id, otf_farm_id, accessed_on, reason, recorded_at) VALUES (?, ?, ?, ?, ?)')
+    .run(`acces-${otfFarmId}`, otfFarmId, '2026-11-19', 'La ferme demande pourquoi son planning est vide', '2026-11-19T10:00:00.000Z');
   if (connectionOwner !== null) {
     sqlite.prepare(`INSERT OR IGNORE INTO otf_farm_connections
       (otf_farm_id, owner_user_id, farm_name, state, access_token_sealed, access_expires_at_ms, refresh_token_sealed, connected_at)
@@ -96,12 +98,14 @@ function writeSharedRows(sqlite: DatabaseSync, spaceKey: string, connectionOwner
   }
 }
 
-/** Ce qui reste quoi qu'il arrive : les tâches, la veille, la ferme du déploiement, les refus du module, et une autre ferme. */
+/** Ce qui reste quoi qu'il arrive : les tâches, la veille, la ferme du déploiement, les refus du module, le relevé des coûts, et une autre ferme. */
 function writeKeptRows(sqlite: DatabaseSync) {
   sqlite.prepare(`INSERT INTO irrigation_background_jobs (job_key, last_successful_at, updated_at) VALUES ('task:weather-forecast', '2026-11-20T05:16:00.000Z', '2026-11-20T05:16:00.000Z')`).run();
   sqlite.prepare(`INSERT INTO irrigation_operator_notices (paris_day, kind, problems, claimed_at, sent_at) VALUES ('2026-11-20', 'alert', 1, '2026-11-20T08:00:00.000Z', '2026-11-20T08:00:01.000Z')`).run();
   sqlite.prepare(`INSERT INTO otf_deployment_farm (id, otf_farm_id, observed_at) VALUES (1, '7', '2026-11-20T06:00:00.000Z')`).run();
   sqlite.prepare('INSERT INTO otf_authentication_failures (failed_at_ms) VALUES (?)').run(1_763_600_000_000);
+  sqlite.prepare(`INSERT INTO irrigation_cost_readings (month, workers_requests, workers_cpu_ms, d1_rows_read, d1_rows_written, d1_storage_mb, billed_usd, recorded_at)
+    VALUES ('2026-10', 61000, 18000000, 2100000, 140000, 12.5, 5, '2026-11-02T18:00:00.000Z')`).run();
   writeSharedRows(sqlite, farmSpaceKey('carole', '99'), 'carole');
 }
 
@@ -313,6 +317,38 @@ test('jamais faite à moitié : une ligne écrite pendant l’effacement fait re
 
   assert.deepEqual(await runDueFarmErasures({ now: new Date('2026-11-28T06:15:00.000Z'), log: silent }), { due: 1, erased: 1, unfinished: 0, failures: [] });
   assertAliceGone(database.sqlite);
+});
+
+test('les appareils de l’espace sont oubliés avant la fin ; sans réponse du service d’alerte, rien n’est noté fait (F654)', async () => {
+  aliceWorkspace = await populate(ALICE, 'A');
+  bobWorkspace = await populate(BOB, 'B');
+  await requestFarmErasure(ALICE, REQUESTED);
+  const asked: string[] = [];
+  const lines: Record<string, unknown>[] = [];
+  const failing = async (recipientKey: string) => {
+    asked.push(recipientKey);
+    return { status: 'failed' as const, message: 'Le service d’alerte ne répond pas.' };
+  };
+  assert.deepEqual(
+    await runDueFarmErasures({ now: FIRST_MORNING_AFTER, log: (_level, entry) => lines.push(entry), forgetPush: failing }),
+    { due: 1, erased: 0, unfinished: 0, failures: ['PushForgetError'] },
+  );
+  assert.deepEqual(asked, [aliceWorkspace], 'l’espace effacé, et lui seul');
+  assert.deepEqual(lines.filter((line) => line.event === 'farm_erasure_failed').map((line) => line.error), ['PushForgetError']);
+  assert.ok(await findWorkspaceIdForUser(ALICE), 'tant que ses appareils restent inscrits, l’espace reste');
+  assert.equal((await listErasingFarmErasures()).length, 1, 'la demande reste « en cours »');
+
+  const forgotten = async (recipientKey: string) => {
+    asked.push(recipientKey);
+    return { status: 'ok' as const };
+  };
+  assert.deepEqual(
+    await runDueFarmErasures({ now: new Date('2026-11-28T06:15:00.000Z'), log: silent, forgetPush: forgotten }),
+    { due: 1, erased: 1, unfinished: 0, failures: [] },
+  );
+  assert.deepEqual(asked, [aliceWorkspace, aliceWorkspace]);
+  assertAliceGone(database.sqlite);
+  assert.ok(await findWorkspaceIdForUser(BOB) === bobWorkspace, 'BOB garde son espace');
 });
 
 test('preuve 4 : annulée pendant les sept jours, la demande n’efface rien, et une nouvelle demande reste possible', async () => {
