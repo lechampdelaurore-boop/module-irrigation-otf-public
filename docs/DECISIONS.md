@@ -7642,3 +7642,27 @@ trois données par planche : la réserve du sol non saisie, le stade deviné
 Ne changent pas : aucune migration, aucun appel à OTF, aucun calcul du
 besoin, du planning, des priorités ni de la dose ; les cinq données de la
 zone et leurs seuils.
+
+## D-232 — La borne haute de l'ET0 portée à 15 mm/j (MC-37)
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le porteur a choisi le 19 novembre 2026 (réponse Q11 de la
+4.4) de porter la borne haute de l'ET0 du jour de 12 à 15 mm/j, pour toutes
+les fermes. Le contrat commun la fixait aussi à 12 : la 4.4 l'a gardée
+(D-229) et l'a proposée au dépôt commun (MC-37). Nicolas l'a acceptée le
+20 novembre 2026 (PR n° 10 du dépôt commun, fusionnée, `a8127d9`).
+
+**Décision** (F591, section 8 bis.19 du contrat de la Tranche 4).
+
+1. `ET0_BOUNDS.maximum` passe à 15 ; hors bornes, le jour reste bloqué et
+   la dernière valeur valide reste.
+2. La table des ETM du jour est recréée pour porter sa contrainte à 15
+   (règle 3 des migrations : exceptionnel, PR dédiée, après export de la
+   base par le porteur ; migration 0042, après les 0037 à 0041 de la 4.5) ;
+   les lignes sont copiées telles quelles.
+3. Le cas L6 du script des cas de test passe aux limites de MC-37 (11,9,
+   12,1 et 14,9 calculées ; 15,1 et −0,1 bloquées), exécuté conforme.
+
+Ne change pas : aucune autre valeur de calcul ; les jours déjà enregistrés ;
+MC-16. Aucune question de budget.

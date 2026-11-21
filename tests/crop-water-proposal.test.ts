@@ -203,10 +203,10 @@ test('une série posée sur la planche sans semaine d\'implantation est rendue �
 });
 
 test('un jour bloqué par une valeur hors bornes est nommé ; la semaine est partielle', () => {
-  const readings = constantEt0(3).map((reading) => (reading.date === '2026-04-16' ? { ...reading, reanalysisMm: 14 } : reading));
+  const readings = constantEt0(3).map((reading) => (reading.date === '2026-04-16' ? { ...reading, reanalysisMm: 16 } : reading));
   const proposal = bedWeekProposal(weekInput([carrotSeries], carrotTasks, readings));
   assert.equal(proposal.status, 'partial');
-  assert.deepEqual(proposal.blockedDays, [{ date: '2026-04-16', problems: ['ET0 hors bornes le 16 avril 2026 : 14 mm/j (entre 0 et 12).'] }]);
+  assert.deepEqual(proposal.blockedDays, [{ date: '2026-04-16', problems: ['ET0 hors bornes le 16 avril 2026 : 16 mm/j (entre 0 et 15).'] }]);
   assert.equal(proposal.proposedMm, 18);
 });
 
