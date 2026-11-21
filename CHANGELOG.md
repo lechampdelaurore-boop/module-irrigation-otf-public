@@ -29,8 +29,46 @@ source détaillée commit par commit.
   la ferme ; la page de confidentialité le dit. L'inventaire range chaque
   table et chaque écrivain : un écrivain oublié fait échouer la CI. Les
   écrivains sont branchés par les PR 5 et 6, la lecture par la PR 7.
-  Migration 0043, additive.
+  Migration 0044, additive.
 
+### Modifié (Tranche 4, borne de l'ET0)
+
+- **L'ET0 du jour admise jusqu'à 15 mm** (D-232) : un jour de forte
+  évaporation, de 12 à 15 mm, se calcule au lieu de bloquer le besoin du
+  jour ; au-delà, le jour reste bloqué, comme avant. Décision partagée avec
+  le moteur commun (MC-37).
+
+### Documentation (les documents du pilote, 4.6, PR 1)
+
+- **Quatre documents pour le pilote multi-fermes** (D-260) : le modèle
+  d'accord avec une ferme (à relire par un juriste avant tout envoi), la
+  grille de recette avec le protocole « une ferme ne voit jamais l'autre »,
+  la fiche de retour et la fiche d'entrée aux douze conditions. Sans code,
+  sans aucun nom ni donnée de ferme ; rien n'est envoyé.
+
+### Ajouté (registres : sept améliorations validées)
+
+- **Section 6 septies de la roadmap et D-280** : les sept idées d'amélioration
+  proposées le 6 novembre 2026 sont inscrites après vérification dans le code
+  (n° 1 et 3 existent, n° 6 en partie ; n° 2, 4, 5 et 7 à faire), après la
+  Tranche 4 ; les n° 4 et 5 sont réservées à l'avis agronomique du porteur.
+  Aucun code, aucun contrôle rejoué.
+- **Contrat court des n° 6, 2, 3 et 7 et D-281** :
+  `docs/ameliorations-6-2-3-7-contract.md` (panneau « données manquantes »
+  par planche, message unique du matin, rappel du soir, journal des
+  modifications, sept PR de code) ; le porteur avance leur démarrage sans
+  attendre la Tranche 4, fusion après la file en cours. Aucun code, aucun
+  contrôle rejoué.
+
+### Corrigé (parcours navigateur)
+
+- **P12, au téléphone, ne dépend plus de l'heure où il tourne** : à la fin
+  de la soirée, sa première proposition tombe le lendemain, un jour replié
+  quand aujourd'hui porte encore des propositions ou des arrosages validés
+  d'autres parcours (F11). Il la montre désormais en dépliant son jour,
+  comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
+  23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
+  qu'il avait laissé.
 ### Ajouté (Améliorations, n° 2, PR 3 sur 7)
 
 - **Le rappel du soir** (D-284, F704, F705, F714) : à l'heure que la ferme
@@ -54,7 +92,7 @@ source détaillée commit par commit.
   « Aujourd'hui ». Dans « Réglages », la case « Message du matin », cochée
   par défaut, la coupe pour toute la ferme ; elle vit dans le pli fermé
   « Messages de la ferme », dont la ligne dit le réglage (F715). Migration
-  0042, additive.
+  0043, additive.
   Parcours P53.
 
 ### Ajouté (Améliorations, n° 6, PR 1 sur 7)
@@ -164,6 +202,7 @@ source détaillée commit par commit.
   déclencheurs sont recréés à l'identique avec cette exception (procédure
   exceptionnelle des migrations, D-246).
 - Le registre compte 8 tâches ; le matin en a cinq.
+
 
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
 

@@ -1499,6 +1499,19 @@ Les PR 1, 4 et 5 se codent **sans l'accès d'OTF** ; les PR 2 et 3 s'essaient su
 - **Inchangé** : la ferme du porteur et la démonstration n'ont pas l'étape (F426) ; le modèle ne vise qu'une culture commune utilisable de la ferme ; sans lui, la proposition d'après le nom.
 - **Preuves.** `tests/db/onboarding-species.test.ts` : le modèle d'abord, le nom ensuite, sur la ferme d'essai ; 40 liens, des noms tous différents, chacun vers une culture du jeu commun (lue dans la migration 0023) ; l'analogie gardée au rattachement. Cinq sabotages, chacun détecté. Parcours P46 : la mâche proposée « par analogie », d'après le modèle.
 
+#### 8 bis.19 · Précisions du code de la borne de l'ET0 (20 novembre 2026, D-232, F591)
+
+Écrites avec le code, le 20 novembre 2026, en Opus 5.5 · Élevé.
+
+##### F591 · La borne haute de l'ET0 portée à 15 mm/j
+
+- **L'accord du dépôt commun.** MC-37 (contrat fusionné v0.2.4) a été accepté par Nicolas le 20 novembre 2026 et la PR n° 10 du dépôt commun fusionnée (`a8127d9`) : 0 ≤ ET0 ≤ 15 mm/j pour toutes les fermes, jeu Tlaloc compris ; rien à changer côté Tlaloc. Le [NON VÉRIFIÉ] de 8 bis.16 est donc levé dans l'autre sens : la borne change maintenant, dans cette PR à part.
+- **Le code.** `ET0_BOUNDS.maximum` passe de 12 à 15 (`lib/domain/crop-water/etm.ts`) ; « Réglages à relire » le dit de lui-même (« de 0 à 15 mm par jour »). Hors bornes, le jour reste bloqué avec un message qui nomme l'ET0, et la dernière valeur valide reste (comportement inchangé).
+- **La base.** La contrainte `chk_crop_etm_et0` de la table des ETM du jour (migration 0023) bornait aussi l'ET0 à 12 : la migration 0042 recrée la table avec la borne 15, les lignes copiées colonne par colonne, l'index recréé (règle 3 de `docs/migrations-contract.md` : exceptionnel, PR dédiée, **après export de la base** par le porteur, `pnpm backup:export` de la 4.5). Elle prend le numéro 0042, après la dernière migration de la 4.5 (0041), qui a fusionné avant.
+- **Le cas L6** du script des cas de test du moteur commun : 11,9, 12,1 et 14,9 calculées ; 15,1 et −0,1 bloquées ; dans la jauge, un jour bloqué rend la jauge inconnue. Exécuté le 20 novembre 2026 : conforme. Le statut de L6 dans `cas/cas-otf.json` du dépôt commun se met à jour par une PR commune après la fusion.
+- **Inchangé** : aucune autre valeur de calcul ; les jours déjà enregistrés (ET0 de 12 au plus) ; MC-16 (l'ETP reste hors du moteur).
+- **Preuves.** `tests/db/crop-etm-et0-migration.test.ts` : sur une copie arrêtée à la migration d'avant et remplie comme une ferme de démonstration, la migration ne change aucune ligne d'aucune table, recrée l'index, ne change que la borne ; 12,1, 14,9 et 15 acceptés après, 15,1 et −0,1 refusés. Les tests de l'ETM et de la proposition bloquent maintenant au-delà de 15. Trois sabotages de la migration (borne laissée à 12, index oublié, colonne mal copiée), chacun détecté.
+
 ## 9. Site définitif et politique de confidentialité (4.8)
 
 **[T4-18] Trois pièces**, toutes en français, simples, sans jargon :
