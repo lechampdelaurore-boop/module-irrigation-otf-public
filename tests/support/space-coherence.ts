@@ -36,11 +36,16 @@ type Reference = {
  * et se lit par la personne et la ferme ensemble, l'espace lui-même ; il ne
  * désigne aucune ligne d'un espace. La notification du jour de la veille de
  * l'exploitant (migration 0038, F609) : un genre, un nombre et des heures.
+ * Le journal d'accès du support (migration 0041, F660) note une ferme d'OTF,
+ * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
+ * coûts du mois (F662), des nombres du déploiement.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
+  'irrigation_cost_readings',
   'irrigation_crop_alert_common',
   'irrigation_operator_notices',
+  'irrigation_support_accesses',
   'otf_authentication_failures',
   'otf_call_outcomes',
   'otf_call_pauses',

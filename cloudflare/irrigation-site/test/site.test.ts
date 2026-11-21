@@ -83,6 +83,8 @@ test('la politique de confidentialité couvre ce que demande le contrat (section
     [/<strong>Le compte des lectures dans Ouvre ta ferme<\/strong>/, 'le compte des appels (F614)'],
     [/Le compte des lectures dans Ouvre ta ferme est gardé 30 jours au plus\./, 'sa durée (F651)'],
     [/plus aucune notification n'a pu lui être remise depuis 90 jours/, 'les abonnements muets (F655)'],
+    [/Quand il regarde les données de votre ferme, il le note : le jour, la ferme et la raison en une ligne, jamais ce qu'il a vu\./, 'le journal d’accès du support (F660)'],
+    [/La note de chaque consultation des données de votre ferme par le responsable est gardée 12 mois ; elle est aussi effacée avec vos données de ferme\./, 'sa durée (F660)'],
     [/Texte du 20 novembre 2026/, 'date du texte'],
   ];
   for (const [pattern, label] of required) assert.match(body, pattern, label);

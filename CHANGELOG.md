@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, troisième partie)
+
+- **Le journal d'accès du support** (D-250, F660 à F664) : sur la page
+  d'état, l'exploitant note chaque consultation des données d'une ferme (le
+  jour, la ferme, la raison en une ligne, jamais ce qu'il a vu) ; gardée
+  12 mois, effacée avec la ferme. La page de confidentialité le dit.
+- **Les coûts sur la page d'état** : le relevé du mois, recopié du tableau
+  de bord de Cloudflare, comparé à ce que l'offre inclut (à surveiller dès
+  80 %, prix d'un dépassement) ; la page n'appelle jamais Cloudflare.
+  Migration 0041.
+
 ### Ajouté (Tranche 4, 4.5, PR 5 sur 5, deuxième partie)
 
 - **La page de confidentialité dit chaque durée** (D-249, F657 à F659),

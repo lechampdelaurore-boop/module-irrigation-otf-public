@@ -711,6 +711,16 @@ registres, elle y renvoie.
   désormais en trois : le journal d'accès du support et les coûts viennent
   en troisième partie. À fusionner après la deuxième partie de la PR 3.
 
+- Tranche 4, **4.5, PR 5 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-250, F660 à F664, section 10 bis.21 de
+  `docs/tranche-4-contract.md`). La page d'état gagne le journal d'accès du
+  support (le jour, la ferme, la raison en une ligne, jamais ce qui a été
+  vu ; 12 mois, puis la purge du matin ; effacé avec la ferme) et les coûts
+  du mois, recopiés à la main du tableau de bord de Cloudflare et comparés
+  à ce que l'offre inclut ; la page n'appelle jamais Cloudflare. Migration
+  0041. La page de confidentialité dit le journal
+  (relue avec la deuxième partie). À fusionner après la deuxième partie.
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
