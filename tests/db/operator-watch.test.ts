@@ -48,6 +48,8 @@ async function morningAt(day: string, { reanalysis }: { reanalysis: boolean }) {
     const successful = task !== 'weather-reanalysis' || reanalysis;
     await recordTaskRun({ task, at: `${day}T05:16:00.000Z`, successful, error: successful ? null : '1 lieu sur 1 sans pluie estimée (réseau)' });
   }
+  // Le passage horaire du rappel du soir, réussi à 8 h 05 : il n'est pas en jeu ici.
+  await recordTaskRun({ task: 'evening-reminder', at: `${day}T07:05:00.000Z`, successful: true, error: null });
 }
 
 function sender(status: IrrigationPushSendResult['status'] = 'sent') {
@@ -110,6 +112,7 @@ test('une panne qui dure ne renvoie pas la notification plus d’une fois par jo
   const silent = journal().log;
 
   assert.equal((await runOperatorWatch({ now: FRIDAY, send, deploymentFarm, log: silent })).notice, 'alert');
+  await recordTaskRun({ task: 'evening-reminder', at: '2026-11-20T13:05:00.000Z', successful: true, error: null });
   const again = await runOperatorWatch({ now: new Date('2026-11-20T14:00:00.000Z'), send, deploymentFarm, log: silent });
   assert.deepEqual(again, { notice: 'already-sent', problems: 1, successful: true }, 'relancée l’après-midi : rien ne repart');
   assert.equal(requests.length, 1);
@@ -220,7 +223,7 @@ test('l’exploitant est une personne de la ferme du déploiement ; la page d’
   const status = await readOperatorStatus(FRIDAY, deploymentFarm);
   // La veille, avant sa première exécution ; les deux fermes, jamais lues ni servies en météo sur cette base neuve (F616).
   assert.deepEqual(status.verdict, { tone: 'warn', text: '1 tâche jamais réussie ; 2 fermes à regarder.' });
-  assert.deepEqual(status.tasks.map((task) => task.tone), ['ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'warn']);
+  assert.deepEqual(status.tasks.map((task) => task.tone), ['ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'warn', 'ok']);
   assert.deepEqual(status.farms.map((farm) => farm.title), ['Ferme n° 4394, celle de la clé du déploiement', 'Ferme n° 5120']);
   assert.deepEqual(status.gestureDates, { today: '2026-11-20', earliest: '2026-10-21' });
 });

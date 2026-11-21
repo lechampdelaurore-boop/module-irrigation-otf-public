@@ -7726,3 +7726,40 @@ compléter.
 Ne changent pas : le Worker de notification, le déclencheur du matin, les
 règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des
 alertes ; aucun appel à OTF.
+
+## D-284 — Améliorations, n° 2 : le rappel du soir
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 2, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** Rien ne relançait un arrosage validé jamais confirmé. Le
+contrat court des améliorations (`docs/ameliorations-6-2-3-7-contract.md`,
+sections 4.1 et 4.3, F702, F704 et F705) ajoute un rappel par jour et par
+ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
+
+**Décision.** Le code suit les sections 4.1 et 4.3 ; la précision de code :
+
+1. **F714.** Le rappel est dû au premier passage horaire où l'heure de Paris
+   a atteint l'heure réglée, et jusqu'à deux heures après : jamais avant
+   l'heure choisie (une heure à 19 h 45 part au passage de 20 h 05, non à
+   celui de 19 h 05, qui la devancerait), et un passage en panne ne
+   rattrape pas un rappel en pleine nuit ; minuit passé, le jour est fini.
+   Il nomme les irrigations planifiées dont la fin prévue est passée
+   aujourd'hui et qui attendent encore un geste (`isWaitingPlannedIrrigation`),
+   par heure de début, chaque matériel une fois, trois noms puis « et n
+   autres » ; titre « Arrosages à confirmer », identifiant `evening:<jour>`.
+   Le réglage du soir (case, heure de 17 h à 22 h au quart d'heure, 19 h et
+   activé par défaut) se montre dans « Notifications du téléphone » pour une
+   ferme qui coche « Arrosages », pas en démonstration, dans le pli
+   « Messages de la ferme » du message du matin (F715), dont la ligne dit
+   aussi « Rappel du soir à 19 h. » ou « Rappel du soir coupé. » ; la ferme sans
+   « Arrosages » ou figée par une demande d'effacement n'est pas lue. Avant
+   17 h, le passage ne lit rien et réussit. Une ferme en panne (lecture ou
+   Worker) fait manquer le passage au registre, sans arrêter les autres ; le
+   service non configuré n'est pas une panne. Le registre gagne la tâche
+   `evening-reminder` (orange à 3 heures, rouge à 6) et le déclencheur
+   `5 * * * *` du planificateur ; la page d'état compte dix tâches.
+
+Ne changent pas : le Worker de notification, la confirmation d'un arrosage
+(aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
+de plus (les colonnes du soir viennent de la 0043), aucun appel à OTF.

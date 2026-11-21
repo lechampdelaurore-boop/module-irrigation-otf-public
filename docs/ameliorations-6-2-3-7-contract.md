@@ -236,6 +236,17 @@ annulée).
 6. **Pas de relance** : un seul rappel par jour, jamais un second le lendemain
    pour la veille.
 
+**Précisions du code (21 novembre 2026, D-284).** F714 : le rappel part au
+premier passage horaire où l'heure de Paris a atteint l'heure réglée, et
+dans les deux heures qui suivent, jamais avant ; il nomme les irrigations
+planifiées dont la fin prévue est passée aujourd'hui et qui attendent un
+geste, chaque matériel une fois, trois noms puis « et n autres » ; le
+réglage (case, heure de 17 h à 22 h au quart d'heure, 19 h par défaut) vit
+dans le pli « Messages de la ferme » (F715), l'ancre `#rappel-du-soir`
+l'ouvre ; une ferme en panne fait manquer le passage au registre sans
+arrêter les autres. Aucune migration de plus : les colonnes du soir viennent
+de la 0043.
+
 **Preuves (PR 2 et 3).** Tests du domaine (chaque règle ci-dessus, dont la
 ferme sans appareil, la ferme sans rien à dire, le jour d'une seconde
 exécution du calcul, le changement d'heure), du service (panne du Worker
