@@ -7502,6 +7502,48 @@ Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
 service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
 moteur de l'effacement et ses preuves.
 
+## D-280 — Sept améliorations validées par le porteur, inscrites à la roadmap (section 6 septies)
+
+Date : 21 novembre 2026.
+
+**Contexte.** Le 6 novembre 2026, l'assistant a proposé sept idées
+d'amélioration, sans accès au dépôt. Le porteur les a validées toutes le
+21 novembre 2026 (« Ok, je valide tout »). Les inscrire est du travail sans
+code : aucun « vas-y » de code n'est donné.
+
+**Constat dans le code (21 novembre 2026, `main` à 5b42519).**
+
+- N° 1, « Fait comme prévu » : existe déjà (3.8 quater, lot 3, D-076).
+- N° 3, résumé du matin : existe en écran (page « Aujourd'hui », D-074) et en
+  notification des suggestions du matin.
+- N° 6, données manquantes : existe en partie (zone « Fiabilité du calcul »,
+  cinq données ; vérification finale de l'accueil, 4.4).
+- N° 2, 4, 5, 7 : n'existent pas.
+
+**Décision.**
+
+1. Les sept idées sont inscrites en section 6 septies de la roadmap (tableau de
+   la section 1, ordre de la section 2, bloc détaillé). Aucune n'est codée ni
+   cadrée.
+2. **Place : après la Tranche 4** (après la 4.6), dans l'ordre n° 6, n° 2 et 3,
+   n° 7, puis n° 4 et 5 selon l'avis du porteur. Un seul chantier de code à
+   la fois.
+3. **Les n° 4 (priorité conseillée selon le stade critique) et n° 5 (écart
+   prévu/réel expliqué) sont réservées à l'avis agronomique du porteur** : pas
+   de contrat, pas d'option choisie à sa place, avant ses réponses. Une
+   priorité conseillée ne règle jamais seule la répartition.
+4. La n° 1 ne demande rien. Les n° 2, 3 et 6 : Opus 5.5 · Élevé ; la n° 7 :
+   Opus 5.5 · Très élevé (Max pour un éventuel retour en arrière) ; les n° 4 et
+   5 : Opus 5.5 · Max ; les contrats : Sonnet 5.5 · Moyen. Chaque code attend
+   son contrat court et le « vas-y » exprès du porteur.
+5. Un retour en arrière du journal ne défait jamais une irrigation réalisée
+   (D-006) ; les rôles d'utilisateur restent écartés.
+
+Ne changent pas : aucun code, aucune migration, aucun calcul, aucune
+décision antérieure. Le numéro D-280 est pris au-dessus de ceux des PR de la
+4.5, de la 4.6 et du moteur commun encore ouvertes (D-246 à D-251, D-260,
+D-270), pour éviter toute collision à la fusion.
+
 ## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur

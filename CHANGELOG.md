@@ -108,6 +108,24 @@ source détaillée commit par commit.
   zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
   Sans migration. Parcours P52.
 
+### Ajouté (registres : sept améliorations validées)
+
+- **Section 6 septies de la roadmap et D-280** : les sept idées d'amélioration
+  proposées le 6 novembre 2026 sont inscrites après vérification dans le code
+  (n° 1 et 3 existent, n° 6 en partie ; n° 2, 4, 5 et 7 à faire), après la
+  Tranche 4 ; les n° 4 et 5 sont réservées à l'avis agronomique du porteur.
+  Aucun code, aucun contrôle rejoué.
+
+### Corrigé (parcours navigateur)
+
+- **P12, au téléphone, ne dépend plus de l'heure où il tourne** : à la fin
+  de la soirée, sa première proposition tombe le lendemain, un jour replié
+  quand aujourd'hui porte encore des propositions ou des arrosages validés
+  d'autres parcours (F11). Il la montre désormais en dépliant son jour,
+  comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
+  23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
+  qu'il avait laissé.
+
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
 
 - **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à
@@ -202,6 +220,7 @@ source détaillée commit par commit.
   déclencheurs sont recréés à l'identique avec cette exception (procédure
   exceptionnelle des migrations, D-246).
 - Le registre compte 8 tâches ; le matin en a cinq.
+
 
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
 
