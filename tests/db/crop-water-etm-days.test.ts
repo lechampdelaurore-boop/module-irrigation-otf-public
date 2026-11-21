@@ -140,7 +140,7 @@ test('un jour bloqué par une ET0 hors bornes n\'écrase pas la dernière valeur
   await linkSpecies(ALICE);
   const date = '2026-05-13';
   await saveEtmDaysForWorkspace(workspace, 2026, records(await daysFromDatabase(workspace, [tomatoSeries], tomatoTasks, forecastWeek(5), [date])), MORNING);
-  const blocked = await daysFromDatabase(workspace, [tomatoSeries], tomatoTasks, forecastWeek(15), [date]);
+  const blocked = await daysFromDatabase(workspace, [tomatoSeries], tomatoTasks, forecastWeek(16), [date]);
   assert.equal(blocked[0].status, 'blocked');
   assert.equal(etmDayRecord(BED, blocked[0]), null);
   await saveEtmDaysForWorkspace(workspace, 2026, records(blocked), NEXT_MORNING);
@@ -177,7 +177,7 @@ test('la base refuse une ETM incohérente : calculée sans trace, inconnue chiff
     VALUES ('${workspace}', 2026, 'p', '2026-05-11', '${status}', ${etm}, ${et0}, ${nature}, '2026-05-11T05:00:00.000Z')`);
   assert.throws(insert('computed', '3.5', '7.3', "'forecast'"), /CHECK constraint failed/);
   assert.throws(insert('unknown', '0', 'NULL', 'NULL'), /CHECK constraint failed/);
-  assert.throws(insert('no-crop', '0', '13', "'forecast'"), /CHECK constraint failed/);
+  assert.throws(insert('no-crop', '0', '15.1', "'forecast'"), /CHECK constraint failed/, 'ET0 au-delà de 15 mm/j (MC-37, D-232)');
   assert.throws(insert('no-crop', '0', 'NULL', "'forecast'"), /CHECK constraint failed/);
   assert.throws(insert('blocked', 'NULL', 'NULL', 'NULL'), /CHECK constraint failed/);
   insert('no-crop', '0', 'NULL', 'NULL')();
