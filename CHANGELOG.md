@@ -10,10 +10,90 @@ source détaillée commit par commit.
 - **P12, au téléphone, ne dépend plus de l'heure où il tourne** : à la fin
   de la soirée, sa première proposition tombe le lendemain, un jour replié
   quand aujourd'hui porte encore des propositions ou des arrosages validés
-  d'autres parcours (F11). Il
-  la montre désormais en dépliant son jour, comme ses autres cartes. Il
-  avait échoué en CI le 20 novembre 2026 à 23 h 45 (#147), et P26, P32,
-  P37 et P38 derrière lui, devant l'objectif qu'il avait laissé.
+  d'autres parcours (F11). Il la montre désormais en dépliant son jour,
+  comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
+  23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
+  qu'il avait laissé.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, troisième partie)
+
+- **Le journal d'accès du support** (D-250, F660 à F664) : sur la page
+  d'état, l'exploitant note chaque consultation des données d'une ferme (le
+  jour, la ferme, la raison en une ligne, jamais ce qu'il a vu) ; gardée
+  12 mois, effacée avec la ferme. La page de confidentialité le dit.
+- **Les coûts sur la page d'état** : le relevé du mois, recopié du tableau
+  de bord de Cloudflare, comparé à ce que l'offre inclut (à surveiller dès
+  80 %, prix d'un dépassement) ; la page n'appelle jamais Cloudflare.
+  Migration 0041.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, deuxième partie)
+
+- **La page de confidentialité dit chaque durée** (D-249, F657 à F659),
+  texte du 20 novembre 2026 : la phrase des 30 jours telle qu'approuvée
+  (« Une donnée effacée reste récupérable dans l'historique jusqu'à
+  30 jours. »), l'export de la semaine gardé cinq semaines au plus, le
+  compte des lectures dans Ouvre ta ferme (30 jours au plus), la preuve
+  d'un effacement sans nom ni contenu, l'abonnement aux notifications
+  effacé avec la ferme ou après 90 jours sans notification remise.
+- **Les exports gardés cinq semaines au plus** : après un export vérifié,
+  `pnpm backup:export` efface du même dossier ceux de 25 jours ou plus, et
+  seulement les fichiers qu'il a nommés, puis rappelle d'effacer les mêmes
+  copies ailleurs.
+- **« Que faire quand… »** dans `docs/exploitation.md` : une notification de
+  la veille, une ferme qui écrit (gabarit de réponse), une demande
+  d'effacement, une base perdue, la clé du coffre perdue, Ouvre ta ferme
+  qui change, un compte perdu. La page d'accueil du site dit le délai de
+  réponse, sans engagement.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, deuxième partie)
+
+- **Les appareils d'une ferme effacée sont oubliés** (D-248, F654 à F656) :
+  le Worker de notification retire chaque appareil de l'espace effacé, et
+  oublie la fiche d'un appareil qui ne sert plus aucun espace ;
+  l'effacement n'est noté fait qu'après. Un abonnement dont les envois
+  manquent depuis 90 jours est oublié comme un abonnement expiré ; un
+  abonnement à qui rien n'est envoyé ne l'est jamais.
+
+### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- **La conservation, table par table** (D-247, F649 à F653) : chaque table
+  de la base a sa durée et qui l'efface, écrites en code et au contrat ; une
+  table ajoutée sans durée casse la CI. La tâche du matin « Purges de
+  conservation » efface, par lots bornés et pour toutes les fermes, ce qui a
+  dépassé sa durée : le journal des appels à Ouvre ta ferme (2, 8 ou 30
+  jours selon la ligne), même quand rien ne lit la ferme, et la notification
+  du jour de la veille (35 jours). Sans migration. La politique de
+  confidentialité, le support et les coûts viennent avec la seconde partie.
+
+### Changé (Tranche 4, 4.5, PR 5 sur 5, première partie)
+
+- Le registre compte 9 tâches ; le matin en a six.
+
+### Ajouté (Tranche 4, 4.5, PR 3 sur 5, première partie)
+
+- **L'effacement d'une ferme, le moteur** (D-246, F640 à F648) : une
+  demande d'effacement s'exécute sept jours après, annulable jusque-là ;
+  l'espace est figé pendant ce temps (les traitements du matin le sautent).
+  Le premier matin après le délai, la tâche « Effacement des fermes qui
+  l'ont demandé » efface, par lots bornés et repris au passage suivant, tout
+  ce que l'espace garde, puis l'espace lui-même avec la note « faite », d'un
+  bloc. Il ne reste qu'une note de la demande, sans nom ni contenu
+  (`irrigation_farm_erasures`, migration 0040). La page
+  d'état dit les demandes en attente, à effacer et faites, et la dernière.
+  La demande dans « Réglages » vient avec la seconde partie.
+- Les preuves de F563 : chaque table de la base est rangée dans le plan
+  d'effacement, et une table sans règle casse la CI ; à deux fermes, avec
+  des lignes dans chaque table d'espace, l'autre ferme reste inchangée dans
+  les quatre passages de l'isolation ; reprise après une coupure ou une
+  panne ; annulation.
+
+### Changé (Tranche 4, 4.5, PR 3 sur 5, première partie)
+
+- Les douze tables que le module garde immuables acceptent l'effacement des
+  seules lignes d'un espace dont l'effacement est en cours : leurs
+  déclencheurs sont recréés à l'identique avec cette exception (procédure
+  exceptionnelle des migrations, D-246).
+- Le registre compte 8 tâches ; le matin en a cinq.
 
 ### Ajouté (Tranche 4, 4.5, PR 4 sur 5, troisième partie)
 

@@ -315,3 +315,100 @@ test('un appareil expiré quitte la liste et le service l’oublie', async () =>
   assert.equal(result?.expired, 1);
   assert.deepEqual(service.devices.storedKeys(telephone.endpoint), []);
 });
+
+// L'effacement d'une ferme et les appareils muets (docs/tranche-4-contract.md, 10 bis.19, F654 et F655).
+
+function forgetSpace(service: Service, recipientKey: string) {
+  return call(service, '/v1/recipients/forget', { recipientKey });
+}
+
+function recipientSql(service: Service, recipientKey: string) {
+  const recipient = service.recipients.get(service.recipients.idFromName(recipientKey)) as unknown as {
+    ctx: DurableObjectState & { storage: { sql: { exec: (query: string, ...values: unknown[]) => { toArray: () => Record<string, unknown>[] } } } };
+  };
+  return recipient.ctx;
+}
+
+test('un espace effacé : chacun de ses appareils le quitte, les autres espaces les gardent, une fiche sans espace est oubliée (F654)', async () => {
+  const service = await createService();
+  const telephone = await createDevice('telephone-alice');
+  const tablette = await createDevice('tablette-alice');
+  const ordinateur = await createDevice('ordinateur-bob');
+  await register(service, telephone, 'espace-a', 'alice');
+  await register(service, telephone, 'espace-b', 'alice');
+  await register(service, tablette, 'espace-a', 'alice');
+  await register(service, ordinateur, 'espace-c', 'bob');
+
+  assert.deepEqual(await forgetSpace(service, 'espace-a'), { forgotten: 2 });
+  assert.deepEqual(spacesListing(service, telephone, ['espace-a', 'espace-b']), ['espace-b']);
+  assert.deepEqual(spacesListing(service, tablette, ['espace-a']), []);
+  assert.deepEqual(service.devices.storedKeys(tablette.endpoint), [], 'la tablette ne servait que l’espace effacé : sa fiche, et l’empreinte d’Alice, sont oubliées');
+  assert.deepEqual(service.devices.storedKeys(telephone.endpoint), ['holder'], 'le téléphone sert encore l’espace B');
+
+  assert.deepEqual(await receivedDuring(service, () => send(service, 'espace-a')), [], 'plus rien ne part de l’espace effacé');
+  assert.deepEqual(await receivedDuring(service, () => send(service, 'espace-b')), [telephone.endpoint]);
+  assert.deepEqual(await receivedDuring(service, () => send(service, 'espace-c')), [ordinateur.endpoint], 'l’espace de Bob n’a rien perdu');
+  assert.deepEqual(await forgetSpace(service, 'espace-a'), { forgotten: 0 }, 'un second oubli n’a plus rien à faire');
+});
+
+test('90 jours sans réponse du service : l’abonnement est oublié comme un abonnement expiré ; une réussite remet le compte à zéro ; sans envoi, rien ne bouge (F655)', async () => {
+  const service = await createService();
+  const day = 24 * 60 * 60 * 1000;
+  const start = Date.parse('2026-11-20T08:00:00.000Z');
+  const realNow = Date.now;
+  let now = start;
+  Date.now = () => now;
+  try {
+    const telephone = await createDevice('telephone-muet');
+    const refuse = await createDevice('appareil-refuse');
+    const fidele = await createDevice('tablette-fidele');
+    const hiver = await createDevice('telephone-hiver');
+    await register(service, telephone, 'espace-a', 'alice');
+    await register(service, refuse, 'espace-a', 'alice');
+    await register(service, fidele, 'espace-a', 'alice');
+    await register(service, hiver, 'espace-b', 'alice');
+    service.providerStatus.set(telephone.endpoint, 503);
+    service.providerStatus.set(refuse.endpoint, 403);
+
+    await send(service, 'espace-a');
+    now = start + 45 * day;
+    service.providerStatus.delete(telephone.endpoint);
+    assert.deepEqual(await receivedDuring(service, () => send(service, 'espace-a')), [telephone.endpoint, fidele.endpoint], 'le téléphone répond de nouveau');
+    service.providerStatus.set(telephone.endpoint, 503);
+    now = start + 46 * day;
+    await send(service, 'espace-a');
+
+    now = start + 90 * day - 1;
+    let result = await send(service, 'espace-a');
+    assert.equal(result?.expired, 0, 'l’appareil refusé manque depuis presque 90 jours : gardé');
+    now = start + 90 * day;
+    result = await send(service, 'espace-a');
+    assert.equal(result?.expired, 1, 'l’appareil refusé depuis 90 jours est oublié');
+    assert.deepEqual(spacesListing(service, refuse, ['espace-a']), []);
+    assert.deepEqual(service.devices.storedKeys(refuse.endpoint), []);
+    assert.deepEqual(spacesListing(service, telephone, ['espace-a']), ['espace-a'], 'le téléphone a répondu au 45e jour : son compte est reparti du 46e');
+
+    now = start + 136 * day;
+    result = await send(service, 'espace-a');
+    assert.equal(result?.expired, 1);
+    assert.deepEqual(spacesListing(service, telephone, ['espace-a']), []);
+    assert.deepEqual(spacesListing(service, fidele, ['espace-a']), ['espace-a']);
+    assert.deepEqual(spacesListing(service, hiver, ['espace-b']), ['espace-b'], 'rien ne lui a été envoyé : jamais « sans réponse »');
+  } finally {
+    Date.now = realNow;
+  }
+});
+
+test('une liste d’avant le 20 novembre 2026 reçoit la colonne à son réveil, ses abonnements intacts (F655)', async () => {
+  const service = await createService();
+  const telephone = await createDevice('telephone-ancien');
+  await register(service, telephone, 'espace-a', 'alice');
+  const ctx = recipientSql(service, 'espace-a');
+  ctx.storage.sql.exec('ALTER TABLE push_subscriptions DROP COLUMN failing_since');
+  new PushRecipient(ctx, service.env);
+  new PushRecipient(ctx, service.env);
+  assert.deepEqual(
+    ctx.storage.sql.exec('SELECT endpoint, failing_since FROM push_subscriptions').toArray().map((row) => ({ ...row })),
+    [{ endpoint: telephone.endpoint, failing_since: null }],
+  );
+});

@@ -21,18 +21,22 @@ const ALL_DONE: MorningRunReport = {
   soilReserve: { failed: 0 },
   cropDrying: { failed: 0 },
   otfVault: { status: 'done', unreadable: 0 },
+  farmErasure: { due: 0, erased: 0, unfinished: 0, failures: [] },
+  retentionPurge: { purged: 0, unfinished: 0, failures: [] },
 };
 
 const byTask = (report: MorningRunReport) => Object.fromEntries(
   morningTaskOutcomes(report).map((outcome) => [outcome.task, outcome.successful ? 'réussie' : outcome.error]),
 );
 
-test('un matin complet : les quatre tâches réussies', () => {
+test('un matin complet : les six tâches réussies', () => {
   assert.deepEqual(byTask(ALL_DONE), {
     'weather-forecast': 'réussie',
     'weather-reanalysis': 'réussie',
     'morning-calculation': 'réussie',
     'otf-vault-morning': 'réussie',
+    'farm-erasure': 'réussie',
+    'retention-purge': 'réussie',
   });
 });
 
@@ -79,10 +83,40 @@ test('le coffre : endormi sans clé, c’est une réussite ; illisible ou en err
   assert.equal(byTask({ ...ALL_DONE, otfVault: { status: 'failed' } })['otf-vault-morning'], 'erreur du coffre');
 });
 
+test('l’effacement des fermes : réussi quand aucune demande échue ne reste à effacer, sans demande comme avec', () => {
+  assert.equal(byTask({ ...ALL_DONE, farmErasure: { due: 2, erased: 2, unfinished: 0, failures: [] } })['farm-erasure'], 'réussie');
+  assert.equal(
+    byTask({ ...ALL_DONE, farmErasure: { due: 3, erased: 1, unfinished: 2, failures: [] } })['farm-erasure'],
+    '2 effacements commencés, à finir au prochain passage',
+    'arrêté par la borne du passage : la promesse des sept jours n’est pas tenue ce matin-là',
+  );
+  assert.equal(
+    byTask({ ...ALL_DONE, farmErasure: { due: 2, erased: 0, unfinished: 1, failures: ['Error'] } })['farm-erasure'],
+    '1 effacement en échec (erreur Error) ; 1 effacement commencé, à finir au prochain passage',
+  );
+  assert.equal(
+    byTask({ ...ALL_DONE, farmErasure: { due: 0, erased: 0, unfinished: 0, failures: ['unknown'] } })['farm-erasure'],
+    '1 effacement en échec (erreur inconnue)',
+  );
+});
+
+test('les purges de conservation : réussies quand chacune est allée au bout', () => {
+  assert.equal(byTask({ ...ALL_DONE, retentionPurge: { purged: 1200, unfinished: 0, failures: [] } })['retention-purge'], 'réussie');
+  assert.equal(
+    byTask({ ...ALL_DONE, retentionPurge: { purged: 25_000, unfinished: 2, failures: [] } })['retention-purge'],
+    '2 purges à finir au prochain passage',
+    'arrêtées par la borne du passage : des lignes ont dépassé leur durée ce matin-là',
+  );
+  assert.equal(
+    byTask({ ...ALL_DONE, retentionPurge: { purged: 0, unfinished: 0, failures: ['Error', 'unknown'] } })['retention-purge'],
+    '2 purges en échec (erreur Error, erreur inconnue)',
+  );
+});
+
 test('une autre exécution tient le verrou : rien n’est enregistré, c’est elle qui le dira', () => {
   assert.deepEqual(morningTaskOutcomes({
     weather: { status: 'already-running', locations: 0, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },
-    planning: null, cropWater: null, soilReserve: null, cropDrying: null, otfVault: null,
+    planning: null, cropWater: null, soilReserve: null, cropDrying: null, otfVault: null, farmErasure: null, retentionPurge: null,
   }), []);
 });
 
@@ -92,12 +126,16 @@ test('une route interrompue : ce qui a eu lieu compte, le reste est manqué', ()
     'weather-reanalysis': 'interrompu avant la fin (erreur TypeError)',
     'morning-calculation': 'interrompu avant la fin (erreur TypeError)',
     'otf-vault-morning': 'interrompu avant la fin (erreur TypeError)',
+    'farm-erasure': 'interrompu avant la fin (erreur TypeError)',
+    'retention-purge': 'interrompu avant la fin (erreur TypeError)',
   }, 'interrompue dans la météo');
   assert.deepEqual(byTask({ weather: ALL_DONE.weather, planning: { failed: 0 }, interruptedBy: 'Error' }), {
     'weather-forecast': 'réussie',
     'weather-reanalysis': 'réussie',
     'morning-calculation': 'interrompu avant la fin (erreur Error)',
     'otf-vault-morning': 'interrompu avant la fin (erreur Error)',
+    'farm-erasure': 'interrompu avant la fin (erreur Error)',
+    'retention-purge': 'interrompu avant la fin (erreur Error)',
   }, 'interrompue après le planning');
 });
 

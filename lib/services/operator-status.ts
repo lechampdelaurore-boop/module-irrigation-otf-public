@@ -1,11 +1,15 @@
+import { readFarmErasureCounts } from '@/db/farm-erasure-repository';
 import { readFarmObservations } from '@/db/farm-observation-repository';
+import { listCostReadings, listSupportAccesses, recordCostReading, recordSupportAccess } from '@/db/operator-notes-repository';
 import { readLatestOperatorNotice } from '@/db/operator-repository';
 import { readTaskRuns, recordTaskRun } from '@/db/task-run-repository';
 import { logJsonLine } from '../adapters/log';
+import { costMonths, costReadingDecision, costReadingRecordedMessage, costView, monthWords } from '../domain/operations/costs';
 import { farmSpaceOf } from '../domain/farm-space';
 import { farmObservationLines } from '../domain/operations/farm-observation';
 import { gestureDates, gestureDecision, gestureRecordedMessage, OPERATOR_GESTURES, type GestureTask } from '../domain/operations/operator-gesture';
 import { operatorStatusView, type OperatorStatusView } from '../domain/operations/operator-status-view';
+import { oldestKeptSupportDay, supportAccessDecision, supportAccessLines, supportAccessRecordedMessage } from '../domain/operations/support-access';
 import { outcomeHourStartMs } from '../domain/otf/call-outcome';
 import { parisDayOf } from '../domain/otf/shared-call-pace';
 import { HOURS_PER_DAY, millisecondsFromHours } from '../domain/units';
@@ -35,12 +39,13 @@ export async function isOperator(spaceKey: string, deploymentFarm = knownDeploym
 
 /**
  * Ce que montre la page : les tâches du registre, la dernière notification
- * de la veille et chaque ferme (F616). Les erreurs d'OTF se comptent par
- * heure pleine : « 24 heures », c'est l'heure en cours et les 23 d'avant.
+ * de la veille, chaque ferme (F616) et les demandes d'effacement (F646). Les
+ * erreurs d'OTF se comptent par heure pleine : « 24 heures », c'est l'heure en
+ * cours et les 23 d'avant.
  */
 export async function readOperatorStatus(now = new Date(), deploymentFarm = knownDeploymentFarm): Promise<OperatorStatusView> {
   const hourStartMs = outcomeHourStartMs(now.getTime());
-  const [tasks, latestNotice, records, farm, planning] = await Promise.all([
+  const [tasks, latestNotice, records, farm, planning, erasures, accesses, readings] = await Promise.all([
     readTaskStates(now),
     readLatestOperatorNotice(),
     readFarmObservations({
@@ -50,10 +55,55 @@ export async function readOperatorStatus(now = new Date(), deploymentFarm = know
     }),
     deploymentFarm(),
     listFarmsWithFeature('planning'),
+    readFarmErasureCounts(now),
+    listSupportAccesses(oldestKeptSupportDay(parisDayOf(now.getTime()))),
+    listCostReadings(),
   ]);
   const planningFarms = new Set(planning.flatMap(({ ownerUserId }) => farmSpaceOf(ownerUserId).otfFarmId ?? []));
   const farms = farmObservationLines(records, { now, deploymentFarm: farm, unknownFarmKey: DEPLOYMENT_KEY_UNKNOWN_FARM_PACE, planningFarms });
-  return operatorStatusView(tasks, latestNotice, farms, gestureDates(now));
+  return {
+    ...operatorStatusView(tasks, latestNotice, farms, gestureDates(now), erasures),
+    support: { farms: supportFarms(farms.map(({ farmKey }) => farmKey)), lines: supportAccessLines(accesses) },
+    costs: { ...costView(readings, now), months: costMonths(now).map((value) => ({ value, label: monthWords(value) })) },
+  };
+}
+
+/** Les fermes dont un accès se note : celles de la page d'état, par leur identifiant d'Ouvre ta ferme (jamais la carte des appels sans ferme connue). */
+function supportFarms(farmKeys: readonly string[]): string[] {
+  return farmKeys.filter((key) => key !== DEPLOYMENT_KEY_UNKNOWN_FARM_PACE);
+}
+
+/**
+ * Le journal d'accès du support (F567 ; 10 bis.21, F660, F661) : le jour, la
+ * ferme et la raison en une ligne. L'appelant a vérifié que la personne est
+ * l'exploitant. Le journal du Worker ne dit que le jour : la raison peut
+ * nommer une personne, elle reste dans la base.
+ */
+export async function noteSupportAccess(
+  input: { otfFarmId?: unknown; day?: unknown; reason?: unknown },
+  now = new Date(),
+  log = logJsonLine,
+  deploymentFarm = knownDeploymentFarm,
+): Promise<{ ok: boolean; message: string }> {
+  const status = await readOperatorStatus(now, deploymentFarm);
+  const decision = supportAccessDecision(input, now, status.support?.farms ?? []);
+  if (!decision.ok) return decision;
+  await recordSupportAccess(decision.access, now.toISOString());
+  log('info', { event: 'support_access_recorded', day: decision.access.accessedOn });
+  return { ok: true, message: supportAccessRecordedMessage(decision.access) };
+}
+
+/**
+ * Le relevé des coûts du mois (F565, point 6 ; F568 ; 10 bis.21, F662),
+ * copié à la main depuis le tableau de bord de Cloudflare : la page
+ * n'appelle jamais son API. Un nouveau relevé du même mois remplace l'autre.
+ */
+export async function noteCostReading(input: Record<string, unknown>, now = new Date(), log = logJsonLine): Promise<{ ok: boolean; message: string }> {
+  const decision = costReadingDecision(input, now);
+  if (!decision.ok) return decision;
+  const replaced = await recordCostReading(decision.reading, now.toISOString());
+  log('info', { event: 'cost_reading_recorded', month: decision.reading.month, replaced });
+  return { ok: true, message: costReadingRecordedMessage(decision.reading, replaced) };
 }
 
 /**

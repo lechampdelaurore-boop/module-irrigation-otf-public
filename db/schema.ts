@@ -938,6 +938,80 @@ export const operatorNotices = sqliteTable(
   ],
 );
 
+/**
+ * La demande d'effacement d'un espace (4.5, migration 0040, F563, F640 à
+ * F648) : l'enregistrement minimal qui reste après l'effacement pour prouver
+ * qu'il a été fait. L'identifiant interne de l'espace, l'état et des dates ;
+ * ni nom, ni personne, ni ferme, ni contenu ; pas de clé étrangère, l'espace
+ * disparaissant. Une seule demande ouverte par espace.
+ */
+export const farmErasures = sqliteTable(
+  'irrigation_farm_erasures',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id').notNull(),
+    state: text('state').notNull().default('pending'),
+    requestedAt: text('requested_at').notNull(),
+    eraseAfter: text('erase_after').notNull(),
+    cancelledAt: text('cancelled_at'),
+    startedAt: text('started_at'),
+    erasedAt: text('erased_at'),
+  },
+  (table) => [
+    uniqueIndex('idx_irrigation_farm_erasures_open').on(table.workspaceId).where(sql`${table.state} IN ('pending', 'erasing')`),
+    check('chk_irrigation_farm_erasures_state', sql`${table.state} IN ('pending', 'erasing', 'erased', 'cancelled')`),
+    check('chk_irrigation_farm_erasures_cancelled', sql`(${table.state} = 'cancelled') = (${table.cancelledAt} IS NOT NULL)`),
+    check('chk_irrigation_farm_erasures_erased', sql`(${table.state} = 'erased') = (${table.erasedAt} IS NOT NULL)`),
+    check('chk_irrigation_farm_erasures_started', sql`(${table.state} IN ('erasing', 'erased')) = (${table.startedAt} IS NOT NULL)`),
+  ],
+);
+
+/**
+ * Le journal d'accès du support (4.5, migration 0041, F567, F660) : le jour,
+ * la ferme et la raison en une ligne de chaque fois que l'exploitant regarde
+ * les données d'une ferme ; jamais ce qu'il a vu. Gardé 12 mois, effacé avec
+ * le dernier espace de la ferme. Une table commune, d'aucun espace.
+ */
+export const supportAccesses = sqliteTable(
+  'irrigation_support_accesses',
+  {
+    id: text('id').primaryKey(),
+    otfFarmId: text('otf_farm_id').notNull(),
+    accessedOn: text('accessed_on').notNull(),
+    reason: text('reason').notNull(),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    index('idx_irrigation_support_accesses_day').on(table.accessedOn),
+    check('chk_irrigation_support_accesses_day', sql`length(${table.accessedOn}) = 10`),
+    check('chk_irrigation_support_accesses_reason', sql`length(trim(${table.reason})) BETWEEN 3 AND 200`),
+  ],
+);
+
+/**
+ * Le relevé des coûts du mois (4.5, migration 0041, F565 point 6, F568,
+ * F662), copié à la main depuis le tableau de bord de Cloudflare : des
+ * nombres du déploiement, d'aucune ferme ; un relevé par mois.
+ */
+export const costReadings = sqliteTable(
+  'irrigation_cost_readings',
+  {
+    month: text('month').primaryKey(),
+    workersRequests: integer('workers_requests').notNull(),
+    workersCpuMs: integer('workers_cpu_ms').notNull(),
+    d1RowsRead: integer('d1_rows_read').notNull(),
+    d1RowsWritten: integer('d1_rows_written').notNull(),
+    d1StorageMb: real('d1_storage_mb').notNull(),
+    billedUsd: real('billed_usd'),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    check('chk_irrigation_cost_readings_month', sql`length(${table.month}) = 7`),
+    check('chk_irrigation_cost_readings_counts', sql`${table.workersRequests} >= 0 AND ${table.workersCpuMs} >= 0 AND ${table.d1RowsRead} >= 0 AND ${table.d1RowsWritten} >= 0 AND ${table.d1StorageMb} >= 0`),
+    check('chk_irrigation_cost_readings_billed', sql`${table.billedUsd} IS NULL OR ${table.billedUsd} >= 0`),
+  ],
+);
+
 export const weatherGeocodes = sqliteTable(
   'irrigation_weather_geocodes',
   {

@@ -93,7 +93,7 @@ test('le registre est cohérent : clés uniques, seuils croissants et expliqués
 });
 
 test('les tâches du matin : 26 heures pour l’orange, 36 pour le rouge, le seuil de l’avertissement de la météo (D-165)', () => {
-  assert.deepEqual(tasksOfTrigger('weather-morning'), ['weather-forecast', 'weather-reanalysis', 'morning-calculation', 'otf-vault-morning']);
+  assert.deepEqual(tasksOfTrigger('weather-morning'), ['weather-forecast', 'weather-reanalysis', 'morning-calculation', 'otf-vault-morning', 'farm-erasure', 'retention-purge']);
   for (const key of tasksOfTrigger('weather-morning')) {
     assert.equal(taskDeclaration(key).lateAfterHours, 26);
     assert.equal(taskDeclaration(key).brokenAfterHours, 36);
@@ -116,6 +116,8 @@ test('le matin rend une exécution pour chaque tâche de son déclencheur, ni pl
     weather: { status: 'completed', locations: 1, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },
     planning: { failed: 0 }, cropWater: { failed: 0 }, soilReserve: { failed: 0 }, cropDrying: { failed: 0 },
     otfVault: { status: 'dormant' },
+    farmErasure: { due: 0, erased: 0, unfinished: 0, failures: [] },
+    retentionPurge: { purged: 0, unfinished: 0, failures: [] },
   }).map((outcome) => outcome.task);
   assert.deepEqual(tasks, tasksOfTrigger('weather-morning'));
 });

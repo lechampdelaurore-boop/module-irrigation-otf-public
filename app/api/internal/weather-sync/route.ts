@@ -2,7 +2,9 @@ import { env } from 'cloudflare:workers';
 import { automaticWeatherRepository } from '@/db/automatic-weather-repository';
 import { evaluateCropAlertsAfterForecastWrite, evaluateCropDryingForAllWorkspaces } from '@/lib/services/crop-alerts-service';
 import { recordEtmDaysForAllWorkspaces } from '@/lib/services/crop-water-etm-record';
+import { runDueFarmErasures } from '@/lib/services/farm-erasure';
 import { resealOtfVaultAtMorning } from '@/lib/services/otf-token-vault';
+import { runRetentionPurges } from '@/lib/services/retention-purge';
 import { recalculateWeeklyPlansForAllWorkspaces } from '@/lib/services/planning-service';
 import { recordSoilDaysForAllWorkspaces } from '@/lib/services/soil-reserve-record';
 import { recordMorningTaskRuns } from '@/lib/services/task-runs';
@@ -49,8 +51,14 @@ export async function POST(request: Request) {
     // Enfin la rotation de la clé du coffre pour les fermes que la journée n'a pas lues (docs/tranche-4-contract.md,
     // F356, F401) : endormie sans clé maîtresse ; son échec ne fait pas échouer le matin, et sa réponse n'a que des nombres.
     const otfVault = report.otfVault = result.status === 'already-running' ? null : await resealOtfVaultAtMorning();
+    // Puis l'effacement des fermes qui l'ont demandé, sept jours avant (docs/tranche-4-contract.md, F563, F645) :
+    // par lots bornés ; ce qui reste reprend au passage suivant, et un échec ne fait pas échouer le matin.
+    const farmErasure = report.farmErasure = result.status === 'already-running' ? null : await runDueFarmErasures();
+    // Enfin les purges des données à durée limitée (docs/tranche-4-contract.md, F562, F650) : par lots bornés,
+    // même quand rien ne lit Ouvre ta ferme ; un échec ne fait pas échouer le matin.
+    const retentionPurge = report.retentionPurge = result.status === 'already-running' ? null : await runRetentionPurges();
     await recordMorningTaskRuns(report);
-    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying, otfVault }, {
+    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying, otfVault, farmErasure, retentionPurge }, {
       status: result.status === 'already-running' ? 409 : 200,
       headers: { 'cache-control': 'no-store' },
     });
