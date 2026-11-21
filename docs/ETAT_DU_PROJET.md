@@ -845,6 +845,26 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
+  table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
+  contrat, F716 à F718, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
+  en Opus 5.5 · Très élevé, sur le « vas-y » du porteur (9 h 52) ; empilée
+  sur la PR de la n° 2. La table `irrigation_change_journal` (migration
+  0044) garde une ligne par changement d'un objectif, d'un réglage ou
+  du matériel : qui, quand, l'action, l'avant et l'après des seuls champs
+  changés ; écrite dans le même lot que le changement, l'avant lu dans le
+  lot ; immuable, sauf pendant l'effacement de sa ferme ; au plan
+  d'effacement et à l'export. L'inventaire range chaque table et chaque
+  écrivain (62 : 23 à brancher par la PR 5, 21 par la PR 6, 18 sans
+  objet avec leur raison). Rien n'écrit encore au journal et rien ne change à l'écran : les
+  PR 5 et 6 branchent les écrivains, la PR 7 ajoute la lecture dans
+  « Réglages ». La page de confidentialité dit le journal (texte du
+  21 novembre 2026). Contrôles : voir la PR. Restent ouverts : F718, les
+  réglages que la liste du contrat ne nomme pas (réglages du besoin par
+  culture, abris des parcelles, groupes de jardins, lieu météo), hors du
+  journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)
+  se complète avec la chaîne, après #162 et la PR du contrat.
+
 - Améliorations, **n° 6, le panneau « données manquantes » : codée le
   21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
   `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé, sur le
@@ -911,7 +931,9 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
   complète des parcours jouée par la CI de la PR. À fusionner après la PR
-  de la n° 6.
+  de la n° 6. **En ligne le 21 novembre 2026 à 23 h 27** (#164, fusionnée
+  à 23 h 07, run 44955085109 vérifié job par job : les cinq jobs verts ;
+  migration 0043 appliquée sur les deux bases).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,

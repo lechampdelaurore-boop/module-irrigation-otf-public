@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 4 sur 7)
+
+- **Le journal des modifications, sa table et sa règle** (D-285, F716 à
+  F718) : une table par ferme garde, pour chaque changement d'un objectif,
+  d'un réglage ou du matériel, qui l'a fait, quand, et la valeur d'avant et
+  d'après des seuls champs changés ; la ligne s'écrit dans le même lot que
+  le changement, jamais l'un sans l'autre. Elle ne se modifie ni ne
+  s'efface, sauf avec la ferme ; elle est à l'export et à l'effacement de
+  la ferme ; la page de confidentialité le dit. L'inventaire range chaque
+  table et chaque écrivain : un écrivain oublié fait échouer la CI. Les
+  écrivains sont branchés par les PR 5 et 6, la lecture par la PR 7.
+  Migration 0044, additive.
+
 ### Modifié (Tranche 4, borne de l'ET0)
 
 - **L'ET0 du jour admise jusqu'à 15 mm** (D-232) : un jour de forte
