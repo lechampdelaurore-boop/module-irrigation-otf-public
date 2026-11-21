@@ -7502,6 +7502,103 @@ Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
 service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
 moteur de l'effacement et ses preuves.
 
+## D-280 — Sept améliorations validées par le porteur, inscrites à la roadmap (section 6 septies)
+
+Date : 21 novembre 2026.
+
+**Contexte.** Le 6 novembre 2026, l'assistant a proposé sept idées
+d'amélioration, sans accès au dépôt. Le porteur les a validées toutes le
+21 novembre 2026 (« Ok, je valide tout »). Les inscrire est du travail sans
+code : aucun « vas-y » de code n'est donné.
+
+**Constat dans le code (21 novembre 2026, `main` à 5b42519).**
+
+- N° 1, « Fait comme prévu » : existe déjà (3.8 quater, lot 3, D-076).
+- N° 3, résumé du matin : existe en écran (page « Aujourd'hui », D-074) et en
+  notification des suggestions du matin.
+- N° 6, données manquantes : existe en partie (zone « Fiabilité du calcul »,
+  cinq données ; vérification finale de l'accueil, 4.4).
+- N° 2, 4, 5, 7 : n'existent pas.
+
+**Décision.**
+
+1. Les sept idées sont inscrites en section 6 septies de la roadmap (tableau de
+   la section 1, ordre de la section 2, bloc détaillé). Aucune n'est codée ni
+   cadrée.
+2. **Place : après la Tranche 4** (après la 4.6), dans l'ordre n° 6, n° 2 et 3,
+   n° 7, puis n° 4 et 5 selon l'avis du porteur. Un seul chantier de code à
+   la fois.
+3. **Les n° 4 (priorité conseillée selon le stade critique) et n° 5 (écart
+   prévu/réel expliqué) sont réservées à l'avis agronomique du porteur** : pas
+   de contrat, pas d'option choisie à sa place, avant ses réponses. Une
+   priorité conseillée ne règle jamais seule la répartition.
+4. La n° 1 ne demande rien. Les n° 2, 3 et 6 : Opus 5.5 · Élevé ; la n° 7 :
+   Opus 5.5 · Très élevé (Max pour un éventuel retour en arrière) ; les n° 4 et
+   5 : Opus 5.5 · Max ; les contrats : Sonnet 5.5 · Moyen. Chaque code attend
+   son contrat court et le « vas-y » exprès du porteur.
+5. Un retour en arrière du journal ne défait jamais une irrigation réalisée
+   (D-006) ; les rôles d'utilisateur restent écartés.
+
+Ne changent pas : aucun code, aucune migration, aucun calcul, aucune
+décision antérieure. Le numéro D-280 est pris au-dessus de ceux des PR de la
+4.5, de la 4.6 et du moteur commun encore ouvertes (D-246 à D-251, D-260,
+D-270), pour éviter toute collision à la fusion.
+
+## D-260 — Tranche 4, sous-tranche 4.6 : les quatre documents du pilote
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le contrat de la 4.6 (D-221, 10 ter.6) prévoit une première PR
+sans code : le modèle d'accord, la grille de recette, la fiche de retour et
+la fiche d'entrée. Le porteur a besoin du modèle d'accord pour la relecture
+juridique gratuite de son réseau (condition d'entrée E6), qui précède tout
+envoi à une ferme.
+
+**Décision.** Les quatre documents sont ajoutés à `docs/` :
+`pilote-accord-modele.md`, `pilote-recette.md`, `pilote-retour-modele.md`,
+`pilote-fiche-entree.md`. Ils suivent le contrat sans le rouvrir (F570,
+F572, F573, F574, F575). Les durées de conservation ne sont pas recopiées
+dans l'accord : la politique de confidentialité en ligne, à sa version
+datée, fait foi (condition E7). Aucune donnée de ferme n'entre au dépôt : les
+fermes se nomment « ferme A » et « ferme pilote n ». Le numéro D-260 est
+pris hors des plages réservées aux chaînes 4.4 et 4.5 ; aucun numéro F nouveau.
+
+**Réservé au porteur.** Choisir et contacter les fermes, relire (ou faire
+relire) puis envoyer l'accord, recueillir les réponses, juger la recette.
+
+Ne change pas : le code, le moteur, les coûts (aucune dépense nouvelle).
+
+## D-281 — Démarrage avancé des améliorations n° 6, 2, 3 et 7, et leur contrat court
+
+Date : 21 novembre 2026.
+
+**Contexte.** D-280 plaçait les sept améliorations après la Tranche 4, avec un
+« vas-y » avant chaque code, par prudence. Le porteur a fait remarquer le
+21 novembre 2026 qu'aucun chantier de code n'était en cours ; il a dit
+« Vas-y ».
+
+**Décision.**
+
+1. Le démarrage des n° 6, 2, 3 et 7 est **avancé** : le contrat court
+   (`docs/ameliorations-6-2-3-7-contract.md`) est écrit, leur code part sans
+   attendre la Tranche 4, sur sa propre branche, une PR à la fois, et **ne se
+   fusionne qu'après la file de fusion en cours**. Le « vas-y » de code est
+   donné pour ces quatre ; il reste attendu pour les n° 4 et 5, réservées à
+   l'avis agronomique.
+2. Le contrat retient, sur l'option recommandée : « stade deviné » = stade
+   déduit du calendrier ; un message unique du matin qui remplace la
+   notification des suggestions ; rappel du soir à 19 h par défaut, heure
+   réglable par ferme, déclencheur horaire inscrit au registre des tâches ;
+   journal général écrit en plus des journaux de domaine, dans la même
+   opération, gardé autant que la ferme, sans retour en arrière (second temps,
+   Opus 5.5 · Max, contrat à part).
+3. Ordre et réglages inchangés : n° 6, puis n° 2 et 3, puis n° 7 ; Opus 5.5 ·
+   Élevé, Très élevé pour la n° 7.
+
+Ne changent pas : aucun code, aucune migration, aucun calcul. Numéros D-281,
+F700 et suivants, P52 et suivants, à renuméroter à la fusion si la file préfère
+une suite sans trou.
+
 ## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
@@ -7546,6 +7643,30 @@ Ne changent pas : aucune migration, aucun appel à OTF, aucun calcul du
 besoin, du planning, des priorités ni de la dose ; les cinq données de la
 zone et leurs seuils.
 
+## D-232 — La borne haute de l'ET0 portée à 15 mm/j (MC-37)
+
+Date : 20 novembre 2026.
+
+**Contexte.** Le porteur a choisi le 19 novembre 2026 (réponse Q11 de la
+4.4) de porter la borne haute de l'ET0 du jour de 12 à 15 mm/j, pour toutes
+les fermes. Le contrat commun la fixait aussi à 12 : la 4.4 l'a gardée
+(D-229) et l'a proposée au dépôt commun (MC-37). Nicolas l'a acceptée le
+20 novembre 2026 (PR n° 10 du dépôt commun, fusionnée, `a8127d9`).
+
+**Décision** (F591, section 8 bis.19 du contrat de la Tranche 4).
+
+1. `ET0_BOUNDS.maximum` passe à 15 ; hors bornes, le jour reste bloqué et
+   la dernière valeur valide reste.
+2. La table des ETM du jour est recréée pour porter sa contrainte à 15
+   (règle 3 des migrations : exceptionnel, PR dédiée, après export de la
+   base par le porteur ; migration 0042, après les 0037 à 0041 de la 4.5) ;
+   les lignes sont copiées telles quelles.
+3. Le cas L6 du script des cas de test passe aux limites de MC-37 (11,9,
+   12,1 et 14,9 calculées ; 15,1 et −0,1 bloquées), exécuté conforme.
+
+Ne change pas : aucune autre valeur de calcul ; les jours déjà enregistrés ;
+MC-16. Aucune question de budget.
+
 ## D-283 — Améliorations, n° 3 : le message unique du matin et son réglage par ferme
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 3, sur
@@ -7561,7 +7682,7 @@ compléter.
 **Décision.** Le code suit les sections 4.1 et 4.2 ; les précisions de code :
 
 1. **F712.** Le réglage vit dans une table d'un espace,
-   `irrigation_phone_notice_settings` (migration 0042), avec la personne qui
+   `irrigation_phone_notice_settings` (migration 0043), avec la personne qui
    le change et l'heure ; une colonne vide vaut le défaut, jamais écrit. Le
    message du matin est activé par défaut : le module ne sait pas quels
    appareils sont inscrits (le Worker de notification les garde), et sans
@@ -7641,4 +7762,4 @@ ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
 
 Ne changent pas : le Worker de notification, la confirmation d'un arrosage
 (aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
-de plus (les colonnes du soir viennent de la 0042), aucun appel à OTF.
+de plus (les colonnes du soir viennent de la 0043), aucun appel à OTF.

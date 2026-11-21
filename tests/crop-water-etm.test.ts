@@ -225,8 +225,8 @@ test('une valeur hors bornes bloque le calcul du jour avec un message qui la nom
   assert.equal(kc.etmMm, null);
   assert.deepEqual(kc.problems, ['Kc hors bornes pour Carotte, 30 j → Récolte : 1,5 (entre 0 et 1,3).']);
 
-  const et0 = oneDay(input([carrotSeries], carrotTasks, [reanalysis('2026-04-16', 13.2)]), '2026-04-16');
-  assert.deepEqual(et0.problems, ['ET0 hors bornes le 16 avril 2026 : 13,2 mm/j (entre 0 et 12).']);
+  const et0 = oneDay(input([carrotSeries], carrotTasks, [reanalysis('2026-04-16', 15.2)]), '2026-04-16');
+  assert.deepEqual(et0.problems, ['ET0 hors bornes le 16 avril 2026 : 15,2 mm/j (entre 0 et 15).']);
 
   const shelter: BedWaterSettings = { ...SHELTERED, shelterFactors: [{ shelterId: 'jardin-serre', value: 0.4, effectiveFrom: '2026-01-01', recordedAt: '2026-01-01T00:00:00.000Z' }] };
   const kAbri = oneDay(input([carrotSeries], carrotTasks, [reanalysis('2026-04-16', 5)], { settings: shelter }), '2026-04-16');
