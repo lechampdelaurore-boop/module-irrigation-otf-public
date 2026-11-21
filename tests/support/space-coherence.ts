@@ -17,6 +17,7 @@
  * échapper.
  */
 import type { DatabaseSync } from 'node:sqlite';
+import { JOURNAL_OBJECT_TABLES } from '../../db/change-journal/objects.ts';
 
 type Reference = {
   table: string;
@@ -90,6 +91,10 @@ const UNDECLARED: Reference[] = [
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_water_resource_reservoir_links', "entity_type = 'resource_reservoir_link'"),
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_water_reservoir_links', "entity_type = 'reservoir_link'"),
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_workspaces', "entity_type = 'supply_default'"),
+  // Le journal des modifications (amélioration n° 7, D-285) : l'objet touché, selon le sujet de la ligne.
+  ...Object.entries(JOURNAL_OBJECT_TABLES).flatMap(([subject, table]) => (
+    table === null ? [] : [ROW('irrigation_change_journal', 'object_id', table, `subject = '${subject}'`)]
+  )),
 ];
 
 /**

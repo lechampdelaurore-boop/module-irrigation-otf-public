@@ -7541,3 +7541,64 @@ ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
 Ne changent pas : le Worker de notification, la confirmation d'un arrosage
 (aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
 de plus (les colonnes du soir viennent de la 0041), aucun appel à OTF.
+
+## D-285 — Améliorations, n° 7 : le journal des modifications, général, écrit en plus et gardé autant que la ferme
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 4
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52, D-281 ; réglage Opus 5.5 · Très élevé, section 6 septies).
+
+**Contexte.** Le module a des révisions et des journaux par domaine
+(créneaux, pompes, infrastructure de l'eau, décisions de besoin, objectifs
+historisés…), chacun de sa forme, certains sans « avant ». Aucun ne dit,
+pour toute la ferme, qui a changé quoi, quand, de quoi à quoi. Le contrat
+court des améliorations (`docs/ameliorations-6-2-3-7-contract.md`,
+section 5, F706 à F709) retient l'option recommandée : **une table générale,
+écrite en plus des journaux de domaine**, et **gardée autant que la ferme**
+(choix rappelés par le porteur le 21 novembre 2026 : sans retour en
+arrière dans cette version, §5.8).
+
+**Décision.** La table `irrigation_change_journal` (migration 0043,
+provisoire, à renuméroter après la file de fusion) garde, par ferme, une
+ligne par changement d'un objectif, d'un réglage ou du matériel : la
+famille, le sujet (code court et stable de la liste fermée
+`lib/domain/change-journal/subjects.ts`), l'objet touché et son repère,
+l'action (créé, modifié, supprimé), l'avant et l'après des seuls champs
+qui changent, la personne et l'instant. Elle est d'un espace : au plan
+d'effacement (`SPACE_TABLES`), donc à l'export chiffré et à l'effacement de
+la ferme ; aucune purge à part. Ses déclencheurs refusent toute
+modification et tout effacement, sauf pendant l'effacement de sa ferme.
+La page de confidentialité le dit (texte du 21 novembre 2026). Les
+précisions de code :
+
+1. **F715.** L'avant se lit dans la base, **dans le lot même** du
+   changement, à sa condition même (`db/change-journal/statements.ts`) : la
+   ligne du journal s'écrit si et seulement si le changement s'écrit, et
+   deux gestes presque simultanés ne laissent jamais un avant périmé.
+   Création : après l'insertion, l'après lu sur la ligne écrite.
+   Modification : avant l'écriture, l'avant lu sur la ligne d'avant,
+   l'après donné par l'écrivain, et seuls les champs qui changent (comparés
+   par `IS`) ; un geste qui ne change rien n'écrit rien. Suppression : avant
+   l'effacement, l'avant de chaque champ. Une ligne absente peut valoir
+   « créé » (un enregistrement qui insère ou remplace) ou les valeurs par
+   défaut (un réglage jamais enregistré). Les noms de table et de champ
+   viennent du code et sont vérifiés ; seules les valeurs sont des
+   paramètres. Le contrôle de cohérence des espaces (F380) relève toute
+   ligne du journal qui désignerait l'objet d'une autre ferme.
+2. **F716.** L'inventaire (`db/change-journal/inventory.ts`, §5.4, premier
+   garde-fou) range **chaque table de la base**, au journal ou hors du
+   journal avec sa raison, et **chaque écrivain** d'une table du journal,
+   « fichier › fonction › table » : branché, à brancher par la PR 5 ou 6,
+   ou sans objet avec sa raison. `tests/change-journal-inventory.test.ts`
+   relit le code et échoue pour une table ou un écrivain non rangé.
+3. **F717.** Les réglages que la liste du contrat (§5.1) ne nomme pas — les
+   réglages du besoin par culture (Kc corrigés, abri, paillage, ombrage,
+   options, cultures de référence propres à la ferme, correspondances
+   d'espèces), les parcelles sous abri, les groupes de jardins et le lieu
+   météo — restent hors du journal dans cette version, chacun rangé avec
+   cette raison ; ils y entreront sur le mot du porteur, par une PR qui les
+   branche comme les autres.
+
+Ne changent pas : les journaux de domaine, aucun calcul du besoin, du
+planning ni de la répartition, aucun écran dans cette PR (la lecture vient
+avec la PR 7), aucun appel à OTF.
