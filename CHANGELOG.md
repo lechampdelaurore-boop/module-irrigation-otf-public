@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 6, PR 1 sur 7)
+
+- **Le panneau « données manquantes », planche par planche** (D-282, F700
+  à F703) : sous la zone « Fiabilité du calcul » de « Aujourd'hui », un
+  dépliant « Par planche » qui dit, fermé, combien de planches ont une
+  donnée manquante, ou « Tout est à jour » ; ouvert, les planches par
+  culture, chacune avec ce qui lui manque — la réserve du sol non saisie,
+  le stade deviné d'après le calendrier, le pluviomètre absent depuis plus
+  de 30 jours — et le geste qui le corrige. « Déclarer le stade » ouvre
+  « Matériel » sur la planche, le formulaire du stade ouvert. Le « ? » de la
+  zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
+  Sans migration. Parcours P52.
+
 ### Ajouté (Tranche 4, 4.5, PR 5 sur 5, première partie)
 
 - **La conservation, table par table** (D-247, F649 à F653) : chaque table
