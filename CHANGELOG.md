@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documentation (les documents du pilote, 4.6, PR 1)
+
+- **Quatre documents pour le pilote multi-fermes** (D-260) : le modèle
+  d'accord avec une ferme (à relire par un juriste avant tout envoi), la
+  grille de recette avec le protocole « une ferme ne voit jamais l'autre »,
+  la fiche de retour et la fiche d'entrée aux douze conditions. Sans code,
+  sans aucun nom ni donnée de ferme ; rien n'est envoyé.
+
 ### Ajouté (registres : sept améliorations validées)
 
 - **Section 6 septies de la roadmap et D-280** : les sept idées d'amélioration
