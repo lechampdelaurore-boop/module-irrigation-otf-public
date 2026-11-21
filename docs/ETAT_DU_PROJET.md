@@ -793,8 +793,9 @@ registres, elle y renvoie.
 
 - Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
   l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
-  la PR 6. « Réglages » finit par le pli « Journal des modifications »,
-  fermé, sa ligne « N modifications, la dernière le … » ; ouvert, les 50
+  la PR 6. En bas de « Réglages », juste avant « Supprimer ma ferme et mes
+  données », le pli « Journal des modifications », fermé, sa ligne
+  « N modifications, la dernière le … » ; ouvert, les 50
   dernières cartes (quand, « Vous » ou « Une autre personne connectée », le
   sujet, l'action, l'objet, chaque champ avant → après avec son unité), un
   filtre par famille et « Voir plus » par 50. Les mots de chaque champ et
