@@ -7662,3 +7662,52 @@ précisions de code :
 Ne changent pas : les journaux de domaine, aucun calcul du besoin, du
 planning ni de la répartition, aucun écran dans cette PR (la lecture vient
 avec la PR 7), aucun appel à OTF.
+
+## D-286 — Améliorations, n° 7 : les objectifs et les réglages écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 5
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285).
+
+**Contexte.** D-285 a posé la table, la règle et l'inventaire ; aucun
+écrivain n'écrivait encore. La liste du contrat (§5.1) nomme, pour les
+objectifs et les réglages : l'objectif hydrique (posé à la main ou adopté
+d'une proposition), le seuil minimal de besoin, la décision sur le besoin
+d'une planche, les réglages du planning, les créneaux protégés, la limite
+d'eau de la journée et celle d'une ressource, le sol d'une zone ou d'une
+parcelle, les réglages du sol, la profondeur des racines, les alertes météo
+et par culture, les fonctionnalités et les messages du téléphone.
+
+**Décision.** Les 23 écrivains rangés « PR 5 » dans l'inventaire placent
+leur ligne dans leur lot, par les fonctions de
+`db/change-journal/objectives.ts` et `db/change-journal/settings.ts`, et
+l'inventaire les dit « branchés ». Les écritures faites d'une seule
+instruction passent en lot (`db.batch`) pour que la ligne et le changement
+réussissent ou échouent ensemble. Deux précisions de code :
+
+1. **F718. L'avant d'un réglage.** Une table d'un réglage de toute la
+   ferme (planning, seuil de besoin, fonctionnalités, messages du
+   téléphone, réglages du sol et des alertes par culture) se lit à sa
+   ligne, ou à sa révision la plus récente ; **sans enregistrement, elle
+   vaut ses valeurs de départ**, celles du domaine, et son premier
+   enregistrement dit « modifié », de la valeur de départ à la nouvelle. Un
+   objet qui n'existait pas (un objectif, un créneau, une limite, le sol
+   d'un lieu, un rattachement au gel, un délai de séchage) dit « créé ». Le
+   profil racinaire d'une culture part du profil commun quand la ferme n'a
+   pas le sien. Un objectif retiré dit « supprimé », avec la hauteur qu'il
+   avait. Les réglages du planning sont aplatis, une valeur par champ
+   (`dosesDripMaximumMm`) ; les fonctionnalités, une case par champ (0 ou
+   1) ; les stades d'un profil racinaire, un texte `[[rang, profondeur,
+   fin, jours], …]`. Un drapeau s'écrit 0 ou 1, comme la base.
+2. **F719. L'écrivain nomme son sujet.** Chaque fonction branchée passe son
+   sujet en premier argument (`goalJournal('objectif-adopte', …)`) ; le test
+   de l'inventaire relit le code de chaque écrivain « branché » et y cherche
+   ce sujet, et vérifie qu'aucun écrivain rangé autrement n'écrit au
+   journal. L'essai de la migration 0034 sur une copie arrêtée à la 0033
+   écrit les lignes du journal de la ferme de démonstration dans une table
+   temporaire, hors de la copie.
+
+Ne changent pas : les journaux de domaine (écrits comme avant, à côté),
+aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
+migration, aucun appel à OTF. Le matériel et les ressources viennent avec
+la PR 6.

@@ -2,6 +2,7 @@ import { db } from '../binding';
 import { listReferenceCropsForWorkspace, type CropWaterWriteResult } from '../crop-water/references';
 import { confirmOnboardingStepStatement } from '../onboarding-repository';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../workspace-repository';
+import { rootingProfileJournal, soilRecordJournal, soilSettingsJournal } from '../change-journal/settings';
 import type { SurfaceDeclaration } from '@/lib/domain/soil-reserve/bare-soil';
 import type { SoilObservation } from '@/lib/domain/soil-reserve/gauge';
 import { soilObservationProblems, soilObservationTimeAt, surfaceDeclarationProblems } from '@/lib/domain/soil-reserve/records';
@@ -56,7 +57,9 @@ export async function addSoilRecordForUser(
   const withSoil = new Set(record.plotId === null ? [record.zoneId] : []);
   for (const zoneId of await zonesWithSoil(workspaceId)) withSoil.add(zoneId);
   const complete = planZoneIds.length > 0 && planZoneIds.every((zoneId) => withSoil.has(zoneId));
-  await db.batch(complete ? [insert, confirmOnboardingStepStatement(workspaceId, 'soil', { parcels: planZoneIds.length }, recordedAt)] : [insert]);
+  // Le journal des modifications d'abord : l'avant est la saisie la plus récente de ce lieu (amélioration n° 7, D-286).
+  const journal = soilRecordJournal('sol-de-parcelle', { workspaceId, actorUserId: ownerUserId, at: recordedAt }, record);
+  await db.batch(complete ? [journal, insert, confirmOnboardingStepStatement(workspaceId, 'soil', { parcels: planZoneIds.length }, recordedAt)] : [journal, insert]);
   return { ok: true, value: { ...record, recordedAt } };
 }
 
@@ -88,7 +91,8 @@ export async function addSoilSettingsForUser(
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const recordedAt = now.toISOString();
   const { threshold, surface } = revision;
-  await db.prepare(
+  // Le journal des modifications d'abord : l'avant est la saisie la plus récente, sinon les réglages de départ (amélioration n° 7, D-286).
+  await db.batch([soilSettingsJournal('reglages-du-sol', { workspaceId, actorUserId: ownerUserId, at: recordedAt }, revision), db.prepare(
     `INSERT INTO irrigation_soil_settings
        (id, workspace_id, threshold_mode, threshold_percent, permeable_tarp_evaporation, mulched_evaporation,
         green_manure_emergence_kc, green_manure_partial_kc, green_manure_full_kc, grass_kc, plastic_mulch_rain_share,
@@ -99,7 +103,7 @@ export async function addSoilSettingsForUser(
     surface.permeableTarpEvaporation, surface.mulchedEvaporation, surface.greenManureEmergenceKc,
     surface.greenManurePartialKc, surface.greenManureFullKc, surface.grassKc, revision.plasticMulchRainShare,
     revision.effectiveFrom, recordedAt, ownerUserId,
-  ).run();
+  )]);
   return { ok: true, value: { ...revision, recordedAt } };
 }
 
@@ -127,6 +131,8 @@ export async function addRootingProfileForUser(
   const id = crypto.randomUUID();
   const recordedAt = now.toISOString();
   await db.batch([
+    // Le journal des modifications d'abord : l'avant est le profil en vigueur, de la ferme ou commun (amélioration n° 7, D-286).
+    rootingProfileJournal('profil-racinaire', { workspaceId, actorUserId: ownerUserId, at: recordedAt }, profile),
     db.prepare(
       `INSERT INTO irrigation_soil_rooting_profiles (id, workspace_id, crop_key, p, source, note, effective_from, recorded_at, actor_user_id)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,

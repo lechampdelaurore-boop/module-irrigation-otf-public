@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 5 sur 7)
+
+- **Les objectifs et les réglages écrivent au journal des modifications**
+  (D-286, F718, F719) : un objectif hydrique posé, adopté d'une proposition
+  ou retiré, le seuil minimal de besoin, la décision sur le besoin d'une
+  planche, les réglages du planning, les créneaux protégés, la limite d'eau
+  de la journée et celle d'une ressource, le sol d'une parcelle, les
+  réglages du sol, la profondeur des racines, les alertes météo, les
+  alertes par culture (réglages, seuil de gel, dessèchement), les
+  fonctionnalités, le message du matin et le rappel du soir. Chaque geste
+  écrit sa ligne dans son lot, avec les seuls champs changés ; un réglage
+  jamais enregistré part de ses valeurs de départ. Sans migration.
+
 ### Ajouté (Améliorations, n° 7, PR 4 sur 7)
 
 - **Le journal des modifications, sa table et sa règle** (D-285, F715 à

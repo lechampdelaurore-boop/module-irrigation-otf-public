@@ -40,8 +40,15 @@ export type JournalLine = {
   context?: Readonly<Record<string, JournalValue>>;
 };
 
-/** Une valeur du repère ou de l'après : donnée par l'écrivain, ou lue en SQL sur la ligne `current`. */
-type JournalValue = { value: string | number | boolean | null } | { sql: string };
+/** Ce que l'écrivain sait du geste : l'espace, la personne, l'instant. */
+export type JournalGesture = Pick<JournalLine, 'workspaceId' | 'actorUserId' | 'at'>;
+
+/**
+ * Une valeur du repère : donnée par l'écrivain, ou lue en SQL, sur la ligne
+ * `current` ou par une sous-requête dont les valeurs sont des paramètres
+ * (le nom d'une ressource, par exemple).
+ */
+type JournalValue = { value: string | number | boolean | null } | { sql: string; params?: readonly unknown[] };
 
 /**
  * La ligne de l'objet, lue sous l'alias `current` : sa table et la condition
@@ -55,6 +62,37 @@ export type JournalField = { key: string; current: string; next?: unknown };
 type Statement = { sql: string; params: unknown[] };
 
 const TABLE_NAME = /^[a-z_]+$/;
+
+/** Une valeur liée : un drapeau devient 0 ou 1, comme la base l'écrit ; `undefined` devient `null`. */
+function bound(value: unknown): unknown {
+  if (value === undefined) return null;
+  return typeof value === 'boolean' ? (value ? 1 : 0) : value;
+}
+
+/**
+ * Une valeur de départ du code écrite en SQL, pour une expression `current`
+ * d'un réglage jamais enregistré (`COALESCE(current.x, <défaut>)`) : jamais
+ * une saisie, seulement une constante du module.
+ */
+export function sqlLiteral(value: string | number | boolean | null): string {
+  if (value === null) return 'NULL';
+  if (typeof value === 'boolean') return value ? '1' : '0';
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) throw new Error(`Valeur de départ invalide : ${value}`);
+    return String(value);
+  }
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+/**
+ * La ligne la plus récente d'une table de révisions, sous l'alias `current` :
+ * `condition` la choisit (sans `current.`), `order` dit laquelle est la plus
+ * récente, comme le lit le module.
+ */
+export function latestRevision(table: string, condition: string, params: readonly unknown[], order = 'created_at DESC, rowid DESC'): JournalTarget {
+  if (!TABLE_NAME.test(table)) throw new Error(`Table du journal invalide : ${table}`);
+  return { table, where: `current.rowid = (SELECT rowid FROM ${table} WHERE ${condition} ORDER BY ${order} LIMIT 1)`, params };
+}
 
 function checkTarget(target: JournalTarget): void {
   if (!TABLE_NAME.test(target.table)) throw new Error(`Table du journal invalide : ${target.table}`);
@@ -74,8 +112,11 @@ function jsonObject(entries: readonly (readonly [string, JournalValue])[]): Stat
   if (entries.length === 0) return { sql: 'NULL', params: [] };
   const params: unknown[] = [];
   const parts = entries.map(([key, value]) => {
-    if ('sql' in value) return `'${key}', ${value.sql}`;
-    params.push(value.value);
+    if ('sql' in value) {
+      params.push(...(value.params ?? []).map(bound));
+      return `'${key}', ${value.sql}`;
+    }
+    params.push(bound(value.value));
     return `'${key}', ?`;
   });
   return { sql: `json_object(${parts.join(', ')})`, params };
@@ -159,7 +200,7 @@ export function journalUpdate(
   const after = `json_remove(json_object(${next.map(({ key, alias }) => `'${key}', ${alias}`).join(', ')}), ${unchangedPaths})`;
   const changed = next.map(({ current, alias }) => `(${current}) IS NOT ${alias}`).join(' OR ');
   const values = `SELECT ${next.map((_, index) => `? AS v${index}`).join(', ')}`;
-  const nextParams = next.map(({ next: value }) => (value === undefined ? null : value));
+  const nextParams = next.map(({ next: value }) => bound(value));
   const sql = missing === 'create'
     ? `${INSERT_HEAD}
       SELECT ?, ?, ?, ?, ?, ${context.sql},

@@ -737,6 +737,18 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
+  objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
+  F718, F719), empilée sur la PR 4. Les 23 écrivains des objectifs et des
+  réglages (§5.1) écrivent leur ligne dans leur lot, l'avant lu dans le
+  lot : objectifs hydriques (posés, adoptés, retirés), seuil de besoin,
+  décisions de planche, planning, créneaux protégés, limites d'eau (journée
+  et ressource), sol (parcelle, réglages, profondeur des racines), alertes
+  météo et par culture, fonctionnalités, message du matin, rappel du soir.
+  L'inventaire les dit « branchés » ; son test vérifie que chacun nomme son
+  sujet dans son code. Restent 21 écrivains du matériel et des ressources
+  (PR 6) et l'écran (PR 7). Sans migration. Contrôles : voir la PR.
+
 - Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
   table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
   contrat, F715 à F717, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
