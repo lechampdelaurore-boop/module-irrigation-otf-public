@@ -24,7 +24,10 @@ registres, elle y renvoie.
   (`docs/ameliorations-6-2-3-7-contract.md`, sept PR de code), leur code part
   sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
   et 5 attendent l'avis agronomique. PR de registres seule : **aucun contrôle rejoué**,
-  sans rapport avec le code.
+  sans rapport avec le code. Registres en ligne le 21 novembre 2026 à
+  14 h 52 (#162, fusionnée à 14 h 25, run 44908773229 vérifié job par job : les cinq jobs verts) ;
+  contrat en ligne le 21 novembre 2026 à 16 h 04 (#170, fusionnée à
+  15 h 44, run 44915463270 vérifié job par job : les cinq jobs verts).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -498,7 +501,7 @@ registres, elle y renvoie.
   2026** : la borne passe à 15 dans une PR à part (D-232, F591, section
   8 bis.19 du contrat), avec la table des ETM du jour recréée par la migration 0042 (sa
   contrainte bornait aussi à 12) ; cas L6 exécuté, conforme ; fusion après
-  la 4.5 et l'export de la base par le porteur. Contrôles de la PR : `pnpm lint`,
+  la 4.5 et l'export de la base par le porteur ; en ligne le 21 novembre 2026 à 22 h 37 (#156, fusionnée à 22 h 08, run 44950009344 vérifié job par job : les cinq jobs verts ; export de la base fait par le porteur à 22 h 08, 42 migrations reçues). Contrôles de la PR : `pnpm lint`,
   `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
@@ -546,7 +549,8 @@ registres, elle y renvoie.
   de l'accord et la relecture juridique restent au porteur. Contrôles :
   documentation seule, aucun contrôle de code rejoué ; relecture faite par
   l'assistant contre le contrat (10 ter) et contre les textes publics
-  (`cloudflare/irrigation-site/src/pages.ts`).
+  (`cloudflare/irrigation-site/src/pages.ts`). En ligne le 21 novembre 2026
+  à 15 h 21 (#155, fusionnée à 14 h 53, run 44911074686 vérifié job par job : les cinq jobs verts).
 
 - Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
   (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
@@ -821,8 +825,9 @@ registres, elle y renvoie.
   derrière lui. Relancés à 0 h 07, tous sont passés. Désormais, P12 montre
   cette première carte en dépliant son jour (`montrerLaCarte`), comme ses
   autres cartes ; `docs/browser-journeys-contract.md` (« l'heure où il
-  tourne ») le dit. Seul le parcours change, pas l'application. À
-  fusionner après la 4.5.
+  tourne ») le dit. Seul le parcours change, pas l'application. En ligne
+  le 21 novembre 2026 à 14 h 24 (#161, fusionnée à 13 h 56, run
+  44906377633 vérifié job par job : les cinq jobs verts).
 
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
@@ -917,10 +922,9 @@ registres, elle y renvoie.
   `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; P52 (nouveau), P15, P29 et P30 joués en local aux deux largeurs ;
-  la suite complète des parcours jouée par la CI de la PR. À fusionner après
-  la file en cours (4.5, #162 et le contrat des améliorations, 4.4, moteur
-  commun).
-
+  la suite complète des parcours jouée par la CI de la PR. En ligne le
+  21 novembre 2026 à 17 h 49 (#163, fusionnée à 17 h 20, run 44924000313
+  vérifié job par job : les cinq jobs verts).
 
 - Améliorations, **n° 2, le rappel du soir : codée le 21 novembre 2026**
   (D-284, F702, F704, F705 et F714, sections 4.1 et 4.3 de
