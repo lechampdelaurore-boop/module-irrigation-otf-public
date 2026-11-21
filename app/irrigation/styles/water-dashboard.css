@@ -457,3 +457,8 @@
   min-height: 44px;
   box-sizing: border-box;
 }
+
+/* Le message du matin, dans « Notifications du téléphone » (amélioration n° 3, F712). */
+.phone-notice-setting { margin: 0 0 16px; }
+.phone-notice-setting .water-toggle { min-height: var(--touch-target, 44px); margin-bottom: 4px; font-size: var(--text-14); }
+.phone-notice-hint { margin: 0; color: var(--muted); font-size: var(--text-12); }

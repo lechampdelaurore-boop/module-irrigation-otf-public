@@ -64,8 +64,9 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_garden_groups',
     'irrigation_hydric_goal_revisions',
     'irrigation_need_decision_log',
-    // Même raison : l'état de l'accueil (4.4, migration 0034) et la notification du jour de la veille de l'exploitant (4.5, migration 0038) partagent la ligne de leur voisine.
-    'irrigation_need_preferences', 'irrigation_onboarding_steps', 'irrigation_operator_notices',
+    // Même raison : l'état de l'accueil (4.4, migration 0034), la notification du jour de la veille de l'exploitant (4.5, migration 0038)
+    // et les deux tables des messages du téléphone (améliorations n° 3 et n° 2, migration 0041) partagent la ligne de leur voisine.
+    'irrigation_need_preferences', 'irrigation_onboarding_steps', 'irrigation_operator_notices', 'irrigation_phone_notice_settings', 'irrigation_phone_notices',
     'irrigation_placement_selected_beds',
     // Même raison : la table des événements de la 3.7 partage la ligne de sa voisine.
     'irrigation_plan_calculations', 'irrigation_plan_events',

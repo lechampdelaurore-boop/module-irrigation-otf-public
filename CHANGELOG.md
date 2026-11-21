@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 3, PR 2 sur 7)
+
+- **Le message unique du matin** (D-283, F702, F703, F712, F713) : après le
+  calcul du matin, une seule notification par jour et par ferme, « Votre
+  journée », dit les arrosages planifiés d'aujourd'hui avec leur heure, la
+  pluie prévue, les alertes en cours et les suggestions du planning ; elle
+  remplace la notification des seules suggestions. Rien quand il n'y a rien
+  à dire ; jamais deux messages le même jour ; un clic ouvre
+  « Aujourd'hui ». Dans « Réglages », la case « Message du matin », cochée
+  par défaut, la coupe pour toute la ferme. Migration 0041, additive.
+  Parcours P53.
+
 ### Ajouté (Améliorations, n° 6, PR 1 sur 7)
 
 - **Le panneau « données manquantes », planche par planche** (D-282, F700,

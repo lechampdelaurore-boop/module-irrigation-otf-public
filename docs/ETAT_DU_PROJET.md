@@ -735,6 +735,29 @@ registres, elle y renvoie.
   la file en cours (4.5, #162 et le contrat des améliorations, 4.4, moteur
   commun).
 
+- Améliorations, **n° 3, le message unique du matin : codée le
+  21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2
+  de `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 2
+  sur 7 des améliorations, empilée sur celle de la n° 6. Le calcul du matin
+  n'envoie plus la seule notification des suggestions : un message par jour
+  et par ferme, « Votre journée », dit les arrosages planifiés d'aujourd'hui
+  (trois nommés avec leur heure, puis « et n autres »), la pluie prévue
+  quand elle est connue et supérieure à 0, le nombre d'alertes en cours et
+  les suggestions du planning ; rien quand il n'y a ni arrosage, ni alerte,
+  ni suggestion ; un clic ouvre « Aujourd'hui ». Un second calcul du même
+  jour ne renvoie rien : la prise du jour se garde en base avant l'envoi et
+  se rend s'il échoue. Dans « Réglages », « Notifications du téléphone »
+  porte la case « Message du matin », cochée par défaut, pour une ferme qui
+  coche le Planning. Migration 0041, additive : le réglage de la ferme (les
+  colonnes du rappel du soir comprises, vides) et la prise du jour, deux
+  tables d'un espace, au plan d'effacement ; numéro à reprendre après la
+  file (0041 de la 4.5 et 0042 de l'ET0 de la 4.4). Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; P53 (nouveau) et P28 joués en local aux deux largeurs ; la suite
+  complète des parcours jouée par la CI de la PR. À fusionner après la PR
+  de la n° 6.
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le
