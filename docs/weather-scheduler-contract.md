@@ -67,3 +67,21 @@ tâche du registre (`task:operator-watch`).
   relancer, et la notification du jour n’est jamais envoyée deux fois.
 - L’endpoint manuel `POST /run-watch`, protégé par le même secret, relance
   la veille pour la recette et le diagnostic.
+
+## Le rappel du soir (depuis l’amélioration n° 2)
+
+Un troisième déclencheur, `5 * * * *`, appelle chaque heure à la minute 5
+`POST /api/internal/evening-reminder`, par la même liaison de service et
+avec le même secret partagé (docs/ameliorations-6-2-3-7-contract.md,
+section 4.3, F705 ; D-284, F714). Chaque ferme règle son heure, de 17 h à
+22 h au quart d’heure : le Worker ne trie rien, le site envoie les rappels
+dus. Avant 17 h, heure de Paris, la route ne lit rien. Le passage est une
+tâche du registre (`task:evening-reminder`, orange à 3 heures, rouge à 6).
+
+- Le planificateur lui laisse 30 secondes ; ses lignes de journal portent le
+  préfixe `evening_reminder_scheduler`.
+- La route répond 200 dès que le passage a tourné, même manqué, comme la
+  veille ; un rappel n’est jamais envoyé deux fois le même jour (la prise du
+  jour en base).
+- L’endpoint manuel `POST /run-evening`, protégé par le même secret, relance
+  le passage pour la recette et le diagnostic.

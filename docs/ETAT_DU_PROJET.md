@@ -869,6 +869,27 @@ registres, elle y renvoie.
   21 novembre 2026 à 17 h 49 (#163, fusionnée à 17 h 20, run 44924000313
   vérifié job par job : les cinq jobs verts).
 
+- Améliorations, **n° 2, le rappel du soir : codée le 21 novembre 2026**
+  (D-284, F702, F704, F705 et F714, sections 4.1 et 4.3 de
+  `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 3 sur
+  7 des améliorations, empilée sur celle de la n° 3. À l'heure que la ferme
+  règle (de 17 h à 22 h au quart d'heure, 19 h par défaut), une
+  notification « Arrosages à confirmer » nomme les arrosages validés du jour
+  dont la fin est passée et qui attendent encore un geste ; un clic ouvre
+  « Aujourd'hui » ; rien quand tout est confirmé ; un seul rappel par jour.
+  Le planificateur gagne le déclencheur `5 * * * *` et la route
+  `/api/internal/evening-reminder` ; le registre, la tâche
+  `evening-reminder` (orange à 3 heures, rouge à 6), que la veille et la
+  page d'état suivent. Dans « Réglages », la case « Rappel du soir » et son
+  heure, pour une ferme qui coche « Arrosages », dans le pli fermé
+  « Messages de la ferme » (F715). Sans migration de plus.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
+  local aux deux largeurs ; la suite complète par la CI de la PR. Le
+  nouveau déclencheur se déploie avec le planificateur, à la fusion. À
+  fusionner après la PR de la n° 3.
+
 - Améliorations, **n° 3, le message unique du matin : codée le
   21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2
   de `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 2
@@ -924,8 +945,8 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P56 (nouveau), P7, P14, P15, P16,
   P17, P20, P31c, P32, P39, P40 et P52 joués en local aux deux largeurs, et
   la visite V4 de la démonstration ; la suite complète des parcours jouée
-  par la CI de la PR. À fusionner après la file en cours (#165, la n° 7,
-  #157, #158). La même PR consigne la remise à zéro de nuit de la
+  par la CI de la PR. À fusionner après la file en cours (la n° 7, #157,
+  #158). La même PR consigne la remise à zéro de nuit de la
   démonstration, lue dans les journaux (ligne 4.0).
 
 - **Audit ergonomique du 19 novembre 2026**

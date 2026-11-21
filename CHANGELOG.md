@@ -43,6 +43,7 @@ source détaillée commit par commit.
   comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
   23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
   qu'il avait laissé.
+
 ### Ajouté (Améliorations, n° 4, PR 1 sur 2 des n° 4 et 5)
 
 - **Le conseil de servir d'abord les stades sensibles, en pénurie** (D-290,
@@ -57,6 +58,18 @@ source détaillée commit par commit.
   priorité haute pour la semaine en cours seulement et recalcule. Rien ne
   change sans ce geste ; aucun calcul du besoin, de la répartition ni du
   planning ne change. Migration 0044, additive. Parcours P56.
+
+### Ajouté (Améliorations, n° 2, PR 3 sur 7)
+
+- **Le rappel du soir** (D-284, F704, F705, F714) : à l'heure que la ferme
+  choisit dans « Réglages » (de 17 h à 22 h au quart d'heure, 19 h par
+  défaut), une notification « Arrosages à confirmer » nomme les arrosages
+  prévus du jour dont la fin est passée et que personne n'a confirmés ; un
+  clic ouvre « Aujourd'hui ». Rien quand tout est confirmé, un seul rappel
+  par jour, jamais rien confirmé à la place du maraîcher. Un nouveau
+  déclencheur horaire du planificateur et une tâche de plus au registre
+  (orange à 3 heures, rouge à 6). Le réglage rejoint le pli « Messages de
+  la ferme », dont la ligne le dit. Parcours P54 ; P50 compte dix tâches.
 
 ### Ajouté (Améliorations, n° 3, PR 2 sur 7)
 

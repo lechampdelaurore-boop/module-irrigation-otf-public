@@ -111,6 +111,16 @@ test('la veille de 9 h a son propre déclencheur, distinct de ceux qu’elle sur
   assert.equal(watch.cron, '0 7,8 * * *', '9 h à Paris, l’un des deux créneaux UTC selon l’heure d’été');
 });
 
+test('le rappel du soir a son déclencheur horaire, sa tâche, orange à 3 heures et rouge à 6 (amélioration n° 2, F705)', () => {
+  assert.deepEqual(tasksOfTrigger('evening-reminder'), ['evening-reminder']);
+  const evening = TASK_TRIGGERS.find((trigger) => trigger.key === 'evening-reminder')!;
+  assert.equal(evening.cron, '5 * * * *', 'chaque heure, à l’heure et cinq minutes');
+  assert.equal(evening.config, 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc', 'le même planificateur, sans service nouveau');
+  assert.ok(evening.monitored, 'surveillé par la veille');
+  assert.equal(taskDeclaration('evening-reminder').lateAfterHours, 3);
+  assert.equal(taskDeclaration('evening-reminder').brokenAfterHours, 6);
+});
+
 test('le matin rend une exécution pour chaque tâche de son déclencheur, ni plus ni moins', () => {
   const tasks = morningTaskOutcomes({
     weather: { status: 'completed', locations: 1, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },
