@@ -7345,3 +7345,40 @@ encore.
 Ne changent pas : aucun appel à OTF ni à Cloudflare, aucun secret, aucun
 service nouveau ; les autres tâches du matin et leurs seuils ; le contenu de
 la page de confidentialité (la phrase des 30 jours vient avec la PR 5).
+
+## D-247 — Tranche 4, 4.5, PR 5 (première partie) : la conservation, table par table, et les purges du matin
+
+Date : 20 novembre 2026.
+
+**Contexte.** F562 veut une durée écrite par donnée et qui l'efface, et
+renvoyait au code la liste réelle, table par table. Le journal des appels à
+Ouvre ta ferme se purgeait seulement au départ d'une lecture : sans lecture,
+rien ne partait. La notification du jour de la veille, elle, ne se purgeait
+jamais. Plusieurs durées de F562 portent sur des données qui n'existent pas
+encore (la déconnexion d'une ferme, les demandes d'autorisation, le journal
+d'accès du support).
+
+**Décision.** Section 10 bis.18 du contrat de la Tranche 4 (F649 à F653) :
+
+1. La PR 5 en deux : les durées et les purges d'abord ; la politique de
+   confidentialité (phrase des 30 jours telle qu'approuvée, et les durées,
+   relue par le porteur avant la fusion), le support et les coûts ensuite.
+2. Un plan de conservation range chaque table de la base, une fois, avec sa
+   durée et qui l'efface ; un test casse la CI pour une table sans durée, et
+   vérifie que le tableau du contrat dit la même chose que le code.
+3. Une tâche du matin, « Purges de conservation », après l'effacement des
+   fermes : lots de 500 lignes, 50 instructions au plus par passage, la
+   limite elle-même gardée ; reprise au passage suivant ; une purge en
+   échec n'arrête pas les autres. Le registre compte 9 tâches.
+4. Une seule durée par donnée : les purges du matin reprennent les
+   constantes des purges faites au passage (2, 8 et 30 jours pour le
+   journal des appels, plus court que les 35 jours proposés par F562).
+5. La notification du jour de la veille : 35 jours.
+6. Une durée entre avec le code qui crée sa donnée : 90 jours après
+   « Déconnecter la ferme » avec la 4.3, PR 3 ; le journal d'accès du
+   support avec la seconde partie de cette PR ; les abonnements de
+   notification avec la seconde partie de la PR 3.
+
+Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare,
+aucun secret, aucun service nouveau ; les durées déjà tenues par le code ;
+le texte de la page de confidentialité (seconde partie).

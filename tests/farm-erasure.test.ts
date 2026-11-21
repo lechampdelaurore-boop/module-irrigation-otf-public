@@ -24,8 +24,8 @@ test('un passage reste loin des bornes de D1 : lots de 200 lignes, 300 requêtes
   assert.ok(FARM_ERASURE_RUN_BUDGET.milliseconds < 30_000, 'les 30 secondes d’une requête à D1');
 });
 
-test('la tâche du matin : la dernière du déclencheur, aux seuils du matin', () => {
-  assert.equal(tasksOfTrigger('weather-morning').at(-1), 'farm-erasure');
+test('la tâche du matin : après le coffre, avant les purges, aux seuils du matin', () => {
+  assert.deepEqual(tasksOfTrigger('weather-morning').slice(-3), ['otf-vault-morning', 'farm-erasure', 'retention-purge']);
   const task = taskDeclaration('farm-erasure');
   assert.equal(task.label, 'Effacement des fermes qui l\'ont demandé');
   assert.equal(task.lateAfterHours, 26);
