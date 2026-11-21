@@ -931,7 +931,9 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
   complète des parcours jouée par la CI de la PR. À fusionner après la PR
-  de la n° 6.
+  de la n° 6. **En ligne le 21 novembre 2026 à 23 h 27** (#164, fusionnée
+  à 23 h 07, run 44955085109 vérifié job par job : les cinq jobs verts ;
+  migration 0043 appliquée sur les deux bases).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
