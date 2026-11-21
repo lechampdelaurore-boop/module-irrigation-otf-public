@@ -12,6 +12,12 @@ source détaillée commit par commit.
   (n° 1 et 3 existent, n° 6 en partie ; n° 2, 4, 5 et 7 à faire), après la
   Tranche 4 ; les n° 4 et 5 sont réservées à l'avis agronomique du porteur.
   Aucun code, aucun contrôle rejoué.
+- **Contrat court des n° 6, 2, 3 et 7 et D-281** :
+  `docs/ameliorations-6-2-3-7-contract.md` (panneau « données manquantes »
+  par planche, message unique du matin, rappel du soir, journal des
+  modifications, sept PR de code) ; le porteur avance leur démarrage sans
+  attendre la Tranche 4, fusion après la file en cours. Aucun code, aucun
+  contrôle rejoué.
 
 ### Corrigé (parcours navigateur)
 
