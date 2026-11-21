@@ -5,26 +5,32 @@ export function isParisDailyWeatherWindow(date: Date) {
 }
 
 /**
- * Les deux déclencheurs du planificateur, chacun déclaré deux fois en UTC
- * pour tenir son heure de Paris en été comme en hiver. Ils doivent rester
+ * Les déclencheurs du planificateur : les deux du matin, chacun déclaré deux
+ * fois en UTC pour tenir son heure de Paris en été comme en hiver, et celui
+ * du rappel du soir, chaque heure (amélioration n° 2, F705) : chaque ferme
+ * règle son heure, et le site trie les fermes dues. Ils doivent rester
  * identiques à `wrangler.jsonc` et au registre des tâches du site
  * (lib/domain/operations/task-registry.ts) : un test le vérifie de chaque côté.
  */
 export const WEATHER_CRON = '15 4,5 * * *';
 export const OPERATOR_WATCH_CRON = '0 7,8 * * *';
+export const EVENING_REMINDER_CRON = '5 * * * *';
 
-export type ScheduledJob = 'weather' | 'operator-watch';
+export type ScheduledJob = 'weather' | 'operator-watch' | 'evening-reminder';
 
 /**
  * Ce qu'un déclenchement doit lancer (4.5, docs/tranche-4-contract.md, F566,
  * F608) : la météo et les calculs du matin à 6 h 15 ; la veille de
- * l'exploitant à 9 h, un déclencheur distinct de ce qu'elle surveille (R5).
+ * l'exploitant à 9 h, un déclencheur distinct de ce qu'elle surveille (R5) ;
+ * le passage du rappel du soir chaque heure (amélioration n° 2).
  * Rien pour le créneau UTC qui ne tombe pas à la bonne heure de Paris, ni pour
  * une expression inconnue.
  */
 export function scheduledJob(cron: string, date: Date): ScheduledJob | null {
   if (cron === WEATHER_CRON) return isParisDailyWeatherWindow(date) ? 'weather' : null;
   if (cron === OPERATOR_WATCH_CRON) return isParisTime(date, 9, 0) ? 'operator-watch' : null;
+  // Chaque heure : l'heure de Paris n'importe pas ici, le site lit l'heure réglée de chaque ferme.
+  if (cron === EVENING_REMINDER_CRON) return 'evening-reminder';
   return null;
 }
 
@@ -66,6 +72,13 @@ export const SITE_SYNC_TIMEOUT_MS = 90_000;
  * la marge sans bloquer le planificateur.
  */
 export const OPERATOR_WATCH_TIMEOUT_MS = 30_000;
+
+/**
+ * Le temps laissé au passage du rappel du soir (amélioration n° 2) : il lit
+ * les fermes dues et confie au plus un rappel par ferme au Worker de
+ * notification ; trente secondes, comme la veille.
+ */
+export const EVENING_REMINDER_TIMEOUT_MS = 30_000;
 
 /**
  * Une erreur d'appel se retente seulement si la route n'a sans doute rien

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { bedStageAnchor } from '@/lib/domain/today/missing-by-bed';
 import { bedEtmOrigin, et0NatureLabel, kcSourceLabel, noEtmReasonLabel, proposalStatusLabel, proposedObjectiveOrigin } from '@/lib/domain/crop-water/presentation';
 import type { CropWaterDay } from '@/lib/domain/crop-water/etm';
 import type { BedCropWaterSheet } from '@/lib/services/crop-water-bed';
@@ -42,6 +43,20 @@ export function BedCropWaterPanel({ season, bedId, bedName }: { season: number; 
     if (result.sheet.available) afterSuccess?.(result.sheet);
   });
 
+  // « Déclarer le stade » depuis « Aujourd'hui » (amélioration n° 6, F710) : une fois la fiche lue, le pli et le formulaire s'ouvrent.
+  // L'ancre ne porte sur aucun identifiant : le navigateur ouvrirait le pli avant React, qui ne s'y retrouverait plus.
+  const section = useRef<HTMLElement>(null);
+  const revealed = useRef(false);
+  useEffect(() => {
+    const element = section.current;
+    if (revealed.current || !sheet?.available || !element || window.location.hash !== `#${bedStageAnchor(bedId)}`) return;
+    revealed.current = true;
+    for (let fold = element.parentElement?.closest('details'); fold; fold = fold.parentElement?.closest('details')) fold.open = true;
+    const form = element.querySelector<HTMLDetailsElement>('.bed-crop-water-declare');
+    if (form) form.open = true;
+    requestAnimationFrame(() => (form ?? element).scrollIntoView({ block: 'center' }));
+  }, [sheet, bedId]);
+
   useEffect(() => {
     let current = true;
     startTransition(async () => {
@@ -53,7 +68,7 @@ export function BedCropWaterPanel({ season, bedId, bedName }: { season: number; 
   }, [season, bedId]);
 
   return (
-    <section className="bed-crop-water" aria-labelledby={`bed-crop-water-${bedId}`} aria-busy={pending}>
+    <section ref={section} data-bed={bedId} className="bed-crop-water" aria-labelledby={`bed-crop-water-${bedId}`} aria-busy={pending}>
       <h3 id={`bed-crop-water-${bedId}`}>Besoin de la culture · planche {bedName}</h3>
       {notice ? <p className="water-notice" role="status">{notice}</p> : null}
       {error ? <p className="water-error" role="alert">{error}</p> : null}

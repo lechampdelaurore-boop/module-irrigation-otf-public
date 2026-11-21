@@ -5,6 +5,45 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 2, PR 3 sur 7)
+
+- **Le rappel du soir** (D-284, F704, F705, F714) : à l'heure que la ferme
+  choisit dans « Réglages » (de 17 h à 22 h au quart d'heure, 19 h par
+  défaut), une notification « Arrosages à confirmer » nomme les arrosages
+  prévus du jour dont la fin est passée et que personne n'a confirmés ; un
+  clic ouvre « Aujourd'hui ». Rien quand tout est confirmé, un seul rappel
+  par jour, jamais rien confirmé à la place du maraîcher. Un nouveau
+  déclencheur horaire du planificateur et une tâche de plus au registre
+  (orange à 3 heures, rouge à 6). Le réglage rejoint le pli « Messages de
+  la ferme », dont la ligne le dit. Parcours P54 ; P50 compte dix tâches.
+
+### Ajouté (Améliorations, n° 3, PR 2 sur 7)
+
+- **Le message unique du matin** (D-283, F702, F703, F712, F713) : après le
+  calcul du matin, une seule notification par jour et par ferme, « Votre
+  journée », dit les arrosages planifiés d'aujourd'hui avec leur heure, la
+  pluie prévue, les alertes en cours et les suggestions du planning ; elle
+  remplace la notification des seules suggestions. Rien quand il n'y a rien
+  à dire ; jamais deux messages le même jour ; un clic ouvre
+  « Aujourd'hui ». Dans « Réglages », la case « Message du matin », cochée
+  par défaut, la coupe pour toute la ferme ; elle vit dans le pli fermé
+  « Messages de la ferme », dont la ligne dit le réglage (F715). Migration
+  0042, additive.
+  Parcours P53.
+
+### Ajouté (Améliorations, n° 6, PR 1 sur 7)
+
+- **Le panneau « données manquantes », planche par planche** (D-282, F700,
+  F701, F710, F711) : sous la zone « Fiabilité du calcul » de « Aujourd'hui », un
+  dépliant « Par planche » qui dit, fermé, combien de planches ont une
+  donnée manquante, ou « Tout est à jour » ; ouvert, les planches par
+  culture, chacune avec ce qui lui manque — la réserve du sol non saisie,
+  le stade deviné d'après le calendrier, le pluviomètre absent depuis plus
+  de 30 jours — et le geste qui le corrige. « Déclarer le stade » ouvre
+  « Matériel » sur la planche, le formulaire du stade ouvert. Le « ? » de la
+  zone écrit le seuil de 30 jours. Rien ne change le calcul ni la pastille.
+  Sans migration. Parcours P52.
+
 ### Ajouté (Tranche 4, 4.5, PR 3 sur 5, troisième partie)
 
 - **Supprimer sa ferme et ses données, depuis Réglages** (D-251, F665 à

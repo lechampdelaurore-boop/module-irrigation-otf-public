@@ -791,6 +791,74 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 6, le panneau « données manquantes » : codée le
+  21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
+  `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé, sur le
+  « vas-y » du porteur (9 h 52) ; PR 1 sur 7 des améliorations. La zone
+  « Fiabilité du calcul » de « Aujourd'hui » gagne un dépliant
+  « Par planche », fermé, qui dit le total (« 7 planches ont une donnée
+  manquante ») ou « Tout est à jour » ; ouvert, il range par culture puis
+  par planche trois données de plus — la réserve du sol non saisie, le
+  stade deviné d'après le calendrier, le pluviomètre absent depuis plus de
+  30 jours —, chacune avec sa phrase, sa conséquence et son geste
+  (formulaire du sol, « Déclarer un stade » de la planche sur « Matériel »,
+  « Pluie mesurée »). Une case décochée ne compte pas ; rien ne change le
+  calcul, la pastille ni l'anneau. Sans migration. Le lien « Ce qui manque »
+  de la fin de l'accueil (4.4) n'existe pas encore : il ouvrira le dépliant
+  par son ancre `#donnees-manquantes`. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; P52 (nouveau), P15, P29 et P30 joués en local aux deux largeurs ;
+  la suite complète des parcours jouée par la CI de la PR. À fusionner après
+  la file en cours (4.5, #162 et le contrat des améliorations, 4.4, moteur
+  commun).
+
+- Améliorations, **n° 2, le rappel du soir : codée le 21 novembre 2026**
+  (D-284, F702, F704, F705 et F714, sections 4.1 et 4.3 de
+  `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 3 sur
+  7 des améliorations, empilée sur celle de la n° 3. À l'heure que la ferme
+  règle (de 17 h à 22 h au quart d'heure, 19 h par défaut), une
+  notification « Arrosages à confirmer » nomme les arrosages validés du jour
+  dont la fin est passée et qui attendent encore un geste ; un clic ouvre
+  « Aujourd'hui » ; rien quand tout est confirmé ; un seul rappel par jour.
+  Le planificateur gagne le déclencheur `5 * * * *` et la route
+  `/api/internal/evening-reminder` ; le registre, la tâche
+  `evening-reminder` (orange à 3 heures, rouge à 6), que la veille et la
+  page d'état suivent. Dans « Réglages », la case « Rappel du soir » et son
+  heure, pour une ferme qui coche « Arrosages », dans le pli fermé
+  « Messages de la ferme » (F715). Sans migration de plus.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
+  local aux deux largeurs ; la suite complète par la CI de la PR. Le
+  nouveau déclencheur se déploie avec le planificateur, à la fusion. À
+  fusionner après la PR de la n° 3.
+
+- Améliorations, **n° 3, le message unique du matin : codée le
+  21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2
+  de `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 2
+  sur 7 des améliorations, empilée sur celle de la n° 6. Le calcul du matin
+  n'envoie plus la seule notification des suggestions : un message par jour
+  et par ferme, « Votre journée », dit les arrosages planifiés d'aujourd'hui
+  (trois nommés avec leur heure, puis « et n autres »), la pluie prévue
+  quand elle est connue et supérieure à 0, le nombre d'alertes en cours et
+  les suggestions du planning ; rien quand il n'y a ni arrosage, ni alerte,
+  ni suggestion ; un clic ouvre « Aujourd'hui ». Un second calcul du même
+  jour ne renvoie rien : la prise du jour se garde en base avant l'envoi et
+  se rend s'il échoue. Dans « Réglages », « Notifications du téléphone »
+  porte la case « Message du matin », cochée par défaut, pour une ferme qui
+  coche le Planning, dans le pli fermé « Messages de la ferme » dont la
+  ligne dit le réglage (F715) ; le budget de « Réglages » au téléphone (P40)
+  passe de 3 500 à 3 650 px. Migration 0042, additive : le réglage de la ferme (les
+  colonnes du rappel du soir comprises, vides) et la prise du jour, deux
+  tables d'un espace, au plan d'effacement ; numéro provisoire, à reprendre selon la
+  file (0042 voulue aussi par l’ET0 de la 4.4, #156). Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
+  complète des parcours jouée par la CI de la PR. À fusionner après la PR
+  de la n° 6.
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le

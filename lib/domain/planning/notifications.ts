@@ -1,46 +1,31 @@
-import { pageHref } from '../features/pages.ts';
-import type { StoredPlanCalculation, StoredPlanSuggestion } from './contract.ts';
+import type { StoredPlanSuggestion } from './contract.ts';
 import { millisecondsFromMinutes } from '../units.ts';
 import { compareNamesNaturally } from '../bed-order.ts';
 
 const NEXT_HOURS = 24;
 
 /**
- * La notification du matin (docs/replanning-contract.md, règles 21 et 22) :
- * quand le calcul que le maraîcher n'a pas lancé lui-même — celui du matin —
- * fait une suggestion sur un arrosage validé des prochaines 24 heures, une
- * seule notification regroupe les suggestions ; un clic ouvre le planning.
- * Les suggestions « gardées » (règle 17) se taisent ; un arrosage dont le
+ * Les suggestions du matin (docs/replanning-contract.md, règles 21 et 22 ;
+ * amélioration n° 3, F703) : quand le calcul que le maraîcher n'a pas lancé
+ * lui-même — celui du matin — fait une suggestion sur un arrosage validé des
+ * prochaines 24 heures, une phrase du message du matin les regroupe. Les
+ * suggestions « gardées » (règle 17) se taisent ; un arrosage dont le
  * créneau est passé n'est plus à venir.
  */
-export type MorningSuggestionNotification = {
+export type MorningSuggestions = {
   count: number;
-  title: string;
-  body: string;
-  /** L'identifiant d'alarme du Worker : un par calcul, jamais deux notifications pour le même. */
-  alarmId: string;
-  tag: string;
-  url: string;
+  /** « 2 suggestions sur vos arrosages des prochaines 24 heures : Annuler Rampe 1, Réduire Goutte-à-goutte à 8 mm. » */
+  text: string;
 };
 
-export function morningSuggestionNotification(
-  plan: { calculation: Pick<StoredPlanCalculation, 'id' | 'season'>; suggestions: readonly StoredPlanSuggestion[] },
-  now: Date,
-): MorningSuggestionNotification | null {
-  const upcoming = suggestionsWithinNextHours(plan.suggestions, now);
+export function morningSuggestions(suggestions: readonly StoredPlanSuggestion[], now: Date): MorningSuggestions | null {
+  const upcoming = suggestionsWithinNextHours(suggestions, now);
   if (upcoming.length === 0) return null;
   const count = upcoming.length;
   const lead = count === 1
     ? '1 suggestion sur un arrosage des prochaines 24 heures'
     : `${count} suggestions sur vos arrosages des prochaines 24 heures`;
-  return {
-    count,
-    title: 'Suggestions du planning',
-    body: [lead, ...upcoming.map(describeSuggestion)].join(' · '),
-    alarmId: `plan:${plan.calculation.id}`,
-    tag: `planning-suggestions-${plan.calculation.id}`,
-    url: pageHref('planning', { season: plan.calculation.season }),
-  };
+  return { count, text: `${lead} : ${upcoming.map(describeSuggestion).join(', ')}.` };
 }
 
 /** Les suggestions non gardées dont l'arrosage commence dans les 24 heures et n'est pas déjà passé, dans l'ordre du temps. */

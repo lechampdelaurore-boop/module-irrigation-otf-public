@@ -7502,3 +7502,143 @@ Ne changent pas : aucune migration, aucun appel à OTF ni à Cloudflare, aucun
 service nouveau, aucune dépense ; le registre des tâches (9 tâches) ; le
 moteur de l'effacement et ses preuves.
 
+## D-282 — Améliorations, n° 6 : le panneau « données manquantes », planche par planche
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 6, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** La zone « Fiabilité du calcul » de « Aujourd'hui » dit cinq
+données pour la ferme entière ; rien ne disait, planche par planche, ce qui
+manque. Le contrat court des améliorations
+(`docs/ameliorations-6-2-3-7-contract.md`, section 3, F700 et F701) ajoute
+trois données par planche : la réserve du sol non saisie, le stade deviné
+(« stade déduit du calendrier »), le pluviomètre absent.
+
+**Décision.** Le code suit la section 3 ; les précisions de code :
+
+1. **F710.** Le dépliant « Par planche » vit sous l'anneau de la zone,
+   fermé, et ne compte ni dans la pastille du menu ni dans l'anneau, qui
+   gardent leurs cinq données : il informe, il ne relance personne. Il ne
+   se lit que pour la page (la pastille ne le lit pas). Le geste du stade
+   mène à « Matériel », sur la parcelle de la planche, par l'ancre
+   `#bed-stage-<planche>` : la planche se choisit seule, le pli « Réglages
+   de cette page » et le formulaire « Déclarer un stade » s'ouvrent une fois
+   la fiche lue. L'ancre ne porte sur aucun identifiant de la page : le
+   navigateur ouvrirait le pli avant React. Les planches se rangent par
+   culture (les cultures présentes ce jour-là, « Sans culture en cours » en
+   dernier à effet égal), les groupes par l'effet de leur première planche ;
+   les cinq premières planches dans l'ordre de l'écran, les autres derrière
+   « Voir les n autres planches ».
+2. **F711.** Le stade deviné : une culture dont le stade et le Kc sont
+   connus, sans déclaration qui la place ; un stade calculé recalé sur une
+   déclaration est déclaré (D-057). La réserve du sol non saisie : les
+   planches inconnues des jardins que la zone nomme déjà (jamais observés,
+   ou sans RFU), par la même règle que le jardin (`gardenBedUnknown`). Le
+   pluviomètre : la pluie mesurée lue de J − 30 à aujourd'hui, `0 mm`
+   compris ; seule une planche hors abri qui porte une culture ce jour-là
+   reçoit la ligne. Une donnée non lue (case décochée, jauge indisponible,
+   plan de culture absent) ne donne aucune ligne.
+3. Le dépliant s'ouvre par son ancre `#donnees-manquantes` : le lien « Ce
+   qui manque » de la fin de l'accueil (4.4) l'emploiera ; il n'existe pas
+   encore.
+
+Ne changent pas : aucune migration, aucun appel à OTF, aucun calcul du
+besoin, du planning, des priorités ni de la dose ; les cinq données de la
+zone et leurs seuils.
+
+## D-283 — Améliorations, n° 3 : le message unique du matin et son réglage par ferme
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 3, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** Le calcul du matin n'envoyait qu'une notification, celle des
+suggestions du planning (3.7, règles 21 à 24). Le contrat court des
+améliorations (`docs/ameliorations-6-2-3-7-contract.md`, sections 4.1 et
+4.2, F702 et F703) la remplace par un seul message par jour et par ferme,
+avec un réglage par ferme ; option recommandée retenue : remplacer, non
+compléter.
+
+**Décision.** Le code suit les sections 4.1 et 4.2 ; les précisions de code :
+
+1. **F712.** Le réglage vit dans une table d'un espace,
+   `irrigation_phone_notice_settings` (migration 0042), avec la personne qui
+   le change et l'heure ; une colonne vide vaut le défaut, jamais écrit. Le
+   message du matin est activé par défaut : le module ne sait pas quels
+   appareils sont inscrits (le Worker de notification les garde), et sans
+   appareil le message ne trouve personne, ce qui revient au défaut du
+   contrat (« activé pour une ferme qui a au moins un appareil inscrit »).
+   La case se montre dans « Notifications du téléphone » pour une ferme qui
+   coche le Planning, dont le calcul du matin envoie le message ; pas en
+   démonstration. Les colonnes du rappel du soir (n° 2) sont créées par la
+   même migration et restent vides ; leur case et leur heure viennent avec
+   la PR du rappel du soir. La prise du jour vit dans
+   `irrigation_phone_notices` : une ligne par espace et par genre
+   (`morning`, `evening`), réécrite chaque jour de Paris, prise avant
+   l'envoi et rendue s'il échoue ou si le service n'est pas configuré. Les
+   deux tables entrent dans le plan d'effacement.
+2. **F713.** Le message, titre « Votre journée », au plus quatre phrases :
+   les irrigations planifiées d'aujourd'hui qui attendent un geste
+   (`isWaitingPlannedIrrigation`), une déjà en retard comprise, par heure de
+   début, trois nommées avec leur heure puis « et n autres » ; les
+   propositions encore à valider ne comptent pas (ce ne sont pas des
+   irrigations planifiées) ; la pluie prévue aujourd'hui, celle que lit le
+   plan, dite seulement connue et supérieure à 0 une fois arrondie ; les
+   alertes en cours, comptées comme le bloc « Gel ou chaleur » de
+   « Aujourd'hui » les annonce sur ses trois jours (le gel des cultures en
+   compte une, chaque alerte météo qui se déclenche une), sans rien lire si
+   ni « Alertes météo » ni « Alertes cultures » n'est cochée ; les
+   suggestions, la phrase d'avant suivie de leurs gestes. Identifiant
+   d'alarme `morning:<jour>`, étiquette `morning-<jour>`, journaux
+   `morning_message_sent`, `morning_message_already_sent`,
+   `morning_message_failed`, avec des nombres et le jour, jamais un nom.
+3. **F715.** Les réglages des messages vivent dans un pli fermé,
+   « Messages de la ferme », sous « Notifications du téléphone », comme
+   « Correspondance des espèces » (F459) : sa ligne dit le réglage tel qu'il
+   est enregistré (« Message du matin activé. ») et suit chaque changement ;
+   l'ancre d'un réglage (`#message-du-matin`) ouvre le pli. Fermé, il coûte
+   une ligne au téléphone ; le budget de hauteur de « Réglages » à 390 px
+   (P40, F459, porté à 3 500 par le pli de la suppression de la ferme, F665)
+   passe à 3 650 px : la page sur `main` en prend déjà 3 482 dans la CI, et
+   le pli 64 de plus. Le budget reste une borne : toute section nouvelle de
+   « Réglages » se plie.
+
+Ne changent pas : le Worker de notification, le déclencheur du matin, les
+règles 22 et 23 du replanning, aucun calcul du besoin, du planning ni des
+alertes ; aucun appel à OTF.
+
+## D-284 — Améliorations, n° 2 : le rappel du soir
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 2, sur
+le « vas-y » du porteur du 21 novembre 2026 à 9 h 52, D-281).
+
+**Contexte.** Rien ne relançait un arrosage validé jamais confirmé. Le
+contrat court des améliorations (`docs/ameliorations-6-2-3-7-contract.md`,
+sections 4.1 et 4.3, F702, F704 et F705) ajoute un rappel par jour et par
+ferme, à l'heure qu'elle règle, sur le réglage posé par D-283.
+
+**Décision.** Le code suit les sections 4.1 et 4.3 ; la précision de code :
+
+1. **F714.** Le rappel est dû au premier passage horaire où l'heure de Paris
+   a atteint l'heure réglée, et jusqu'à deux heures après : jamais avant
+   l'heure choisie (une heure à 19 h 45 part au passage de 20 h 05, non à
+   celui de 19 h 05, qui la devancerait), et un passage en panne ne
+   rattrape pas un rappel en pleine nuit ; minuit passé, le jour est fini.
+   Il nomme les irrigations planifiées dont la fin prévue est passée
+   aujourd'hui et qui attendent encore un geste (`isWaitingPlannedIrrigation`),
+   par heure de début, chaque matériel une fois, trois noms puis « et n
+   autres » ; titre « Arrosages à confirmer », identifiant `evening:<jour>`.
+   Le réglage du soir (case, heure de 17 h à 22 h au quart d'heure, 19 h et
+   activé par défaut) se montre dans « Notifications du téléphone » pour une
+   ferme qui coche « Arrosages », pas en démonstration, dans le pli
+   « Messages de la ferme » du message du matin (F715), dont la ligne dit
+   aussi « Rappel du soir à 19 h. » ou « Rappel du soir coupé. » ; la ferme sans
+   « Arrosages » ou figée par une demande d'effacement n'est pas lue. Avant
+   17 h, le passage ne lit rien et réussit. Une ferme en panne (lecture ou
+   Worker) fait manquer le passage au registre, sans arrêter les autres ; le
+   service non configuré n'est pas une panne. Le registre gagne la tâche
+   `evening-reminder` (orange à 3 heures, rouge à 6) et le déclencheur
+   `5 * * * *` du planificateur ; la page d'état compte dix tâches.
+
+Ne changent pas : le Worker de notification, la confirmation d'un arrosage
+(aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
+de plus (les colonnes du soir viennent de la 0042), aucun appel à OTF.
