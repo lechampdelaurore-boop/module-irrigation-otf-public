@@ -48,7 +48,8 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_background_jobs',
     'irrigation_bed_applications',
     // Les treize tables du besoin par culture et par stade (5 quater), les cinq des alertes par culture (5 quinquies) et le relevé des coûts (4.5, migration 0041) partagent la ligne de leur voisine, même raison.
-    'irrigation_bed_need_decisions', 'irrigation_cost_readings', 'irrigation_crop_alert_common', 'irrigation_crop_alert_settings', 'irrigation_crop_alerts', 'irrigation_crop_bed_mulch', 'irrigation_crop_drying_revisions', 'irrigation_crop_etm_days', 'irrigation_crop_frost_links', 'irrigation_crop_kc_overrides', 'irrigation_crop_reference_crops', 'irrigation_crop_reference_season_months', 'irrigation_crop_reference_seasons', 'irrigation_crop_reference_stage_starts', 'irrigation_crop_reference_stages', 'irrigation_crop_shade_nets', 'irrigation_crop_shelter_factors', 'irrigation_crop_species_links', 'irrigation_crop_stage_declarations', 'irrigation_crop_water_options',
+    // Même raison : le journal des modifications (amélioration n° 7, migration 0043) partage la ligne de ses voisines.
+    'irrigation_bed_need_decisions', 'irrigation_change_journal', 'irrigation_cost_readings', 'irrigation_crop_alert_common', 'irrigation_crop_alert_settings', 'irrigation_crop_alerts', 'irrigation_crop_bed_mulch', 'irrigation_crop_drying_revisions', 'irrigation_crop_etm_days', 'irrigation_crop_frost_links', 'irrigation_crop_kc_overrides', 'irrigation_crop_reference_crops', 'irrigation_crop_reference_season_months', 'irrigation_crop_reference_seasons', 'irrigation_crop_reference_stage_starts', 'irrigation_crop_reference_stages', 'irrigation_crop_shade_nets', 'irrigation_crop_shelter_factors', 'irrigation_crop_species_links', 'irrigation_crop_stage_declarations', 'irrigation_crop_water_options',
     'irrigation_daily_water_limit_revisions',
     'irrigation_equipment',
     // Fichier à la limite de 600 lignes : la table de la 2.11 partage la ligne de sa voisine.
@@ -64,8 +65,9 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_garden_groups',
     'irrigation_hydric_goal_revisions',
     'irrigation_need_decision_log',
-    // Même raison : l'état de l'accueil (4.4, migration 0034) et la notification du jour de la veille de l'exploitant (4.5, migration 0038) partagent la ligne de leur voisine.
-    'irrigation_need_preferences', 'irrigation_onboarding_steps', 'irrigation_operator_notices',
+    // Même raison : l'état de l'accueil (4.4, migration 0034), la notification du jour de la veille de l'exploitant (4.5, migration 0038)
+    // et les deux tables des messages du téléphone (améliorations n° 3 et n° 2, migration 0042) partagent la ligne de leur voisine.
+    'irrigation_need_preferences', 'irrigation_onboarding_steps', 'irrigation_operator_notices', 'irrigation_phone_notice_settings', 'irrigation_phone_notices',
     'irrigation_placement_selected_beds',
     // Même raison : la table des événements de la 3.7 partage la ligne de sa voisine.
     'irrigation_plan_calculations', 'irrigation_plan_events',

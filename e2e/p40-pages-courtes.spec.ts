@@ -71,7 +71,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // données des parcours (sur la ferme du porteur, 77 espèces, 8 700 px de moins attendus).
   // 4.5, PR 3, troisième partie (F665) : « Supprimer ma ferme et mes données », un pli fermé en bas
   // de la page ; 3 338 → 3 482 px (CI du 21 novembre 2026), d'où 3 500 au lieu de 3 400.
-  reglages: 3_500,
+  // Amélioration n° 3 (F715) : le pli fermé « Messages de la ferme », une ligne de plus ; 3 500 → 3 650 px (3 600 s’écrirait comme un facteur d’unité).
+  // Toute section nouvelle de « Réglages » se plie.
+  reglages: 3_650,
   // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
   // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
   besoins: 2_800,

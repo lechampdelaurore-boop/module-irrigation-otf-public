@@ -76,7 +76,8 @@ test('la veille rappelle l’export et l’essai manqués, par leur nom et depui
       declaration,
       state: taskState(declaration, {
         ...EMPTY_TASK_RUN,
-        lastSuccessAt: declaration.key === key ? late[key]! : new Date(NOW.getTime() - millisecondsFromHours(14)).toISOString(),
+        // Le matin il y a 14 heures ; le passage horaire du rappel du soir, il y a une heure.
+        lastSuccessAt: declaration.key === key ? late[key]! : new Date(NOW.getTime() - millisecondsFromHours(declaration.key === 'evening-reminder' ? 1 : 14)).toISOString(),
       }, NOW),
     }));
     const notice = operatorWatchNotice(watched, NOW);

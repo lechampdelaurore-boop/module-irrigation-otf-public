@@ -282,6 +282,13 @@ réécrit, aucun arrosage validé n'est modifié sans le geste du maraîcher.
     pas changer ; s'il doit, son code se déploie par la CI à la fusion,
     comme le reste. Aucun réglage Cloudflare n'est touché.
 
+**21 novembre 2026 (amélioration n° 3, D-283, F703).** La notification des
+suggestions du matin devient une phrase du message unique du matin : un
+message par jour et par ferme, envoyé par le même calcul du matin et par la
+même route, qui dit aussi les arrosages planifiés d'aujourd'hui, la pluie
+prévue et les alertes en cours ; un clic ouvre « Aujourd'hui ». Les règles 22
+(rien après un geste à l'écran) et 23 (une panne n'altère rien) restent.
+
 ### Ce qui a changé
 
 25. Après chaque calcul, un pli « Ce qui a changé depuis le calcul de

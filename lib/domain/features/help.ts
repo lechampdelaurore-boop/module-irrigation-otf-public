@@ -149,7 +149,7 @@ export const RELIABILITY_HELP: SectionHelp = {
   entries: [
     {
       title: 'Ce que dit la zone',
-      text: 'Les données dont l’état rend le plan douteux : le volume d’une réserve, la pluie réelle, le sol d’un jardin, les espèces sans référence, le plan lui-même. Seules comptent celles de vos fonctionnalités cochées.',
+      text: 'Les données dont l’état rend le plan douteux : le volume d’une réserve, la pluie réelle, le sol d’un jardin, les espèces sans référence, le plan lui-même. Le dépliant « Par planche » dit en plus, planche par planche, ce qui manque. Seules comptent celles de vos fonctionnalités cochées.',
     },
     { title: 'Les seuils', text: reliabilityThresholdsText() },
     {
