@@ -15,9 +15,10 @@ import type { ChangeSubject } from '@/lib/domain/change-journal/subjects';
  *    ajoutée plus tard sans être rangée fait échouer le test.
  * 2. **Chaque endroit du code qui écrit** dans une table du journal
  *    (`JOURNAL_WRITE_SITES`, « fichier › fonction › table ») est « branché »
- *    sur le journal, « à brancher » par la PR qui le fera, ou « sans objet »
- *    avec sa raison. Le test relit le code : un écrivain nouveau, absent de
- *    la liste, le fait échouer.
+ *    sur le journal, sous son sujet, ou « sans objet » avec sa raison. Le
+ *    test relit le code : un écrivain nouveau, absent de la liste, le fait
+ *    échouer, et un écrivain branché doit nommer son sujet dans son code
+ *    (F719).
  */
 
 /** Les tables d'objectifs, de réglages et de matériel, avec les sujets que leurs écrivains portent au journal. */
@@ -147,16 +148,13 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
 /**
  * Ce que fait un écrivain d'une table du journal :
  * - `branche` : il écrit sa ligne du journal, dans le même lot, sous ce sujet ;
- * - `a-brancher` : il le fera dans la PR nommée (amélioration n° 7, PR 6) ;
  * - `sans-objet` : il n'a rien à y écrire, pour la raison dite.
  */
 export type WriteSiteStatus =
   | { status: 'branche'; subject: ChangeSubject }
-  | { status: 'a-brancher'; by: 'PR 6' }
   | { status: 'sans-objet'; reason: string };
 
 const branche = (subject: ChangeSubject) => ({ status: 'branche', subject }) as const;
-const PR6 = { status: 'a-brancher', by: 'PR 6' } as const;
 const sansObjet = (reason: string) => ({ status: 'sans-objet', reason }) as const;
 
 /** Une table fille, écrite par la même fonction que sa mère : la ligne de la mère dit son changement. */
@@ -198,39 +196,39 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/phone-notice-repository.ts › saveMorningMessageForUser › irrigation_phone_notice_settings': branche('message-du-matin'),
   'db/phone-notice-repository.ts › saveEveningReminderForUser › irrigation_phone_notice_settings': branche('rappel-du-soir'),
   // Matériel et ressources.
-  'db/equipment/equipment.ts › createEquipmentForUser › irrigation_equipment': PR6,
-  'db/equipment/equipment.ts › updateEquipmentForUser › irrigation_equipment': PR6,
-  'db/equipment/equipment.ts › setEquipmentArchivedForUser › irrigation_equipment': PR6,
-  'db/equipment/equipment.ts › deleteEquipmentForUser › irrigation_equipment': PR6,
+  'db/equipment/equipment.ts › createEquipmentForUser › irrigation_equipment': branche('materiel'),
+  'db/equipment/equipment.ts › updateEquipmentForUser › irrigation_equipment': branche('materiel'),
+  'db/equipment/equipment.ts › setEquipmentArchivedForUser › irrigation_equipment': branche('materiel'),
+  'db/equipment/equipment.ts › deleteEquipmentForUser › irrigation_equipment': branche('materiel'),
   'db/equipment/equipment.ts › deleteEquipmentForUser › irrigation_equipment_settings': CHILD_OF('irrigation_equipment'),
   'db/equipment/equipment.ts › deleteEquipmentForUser › irrigation_equipment_placements': CHILD_OF('irrigation_equipment'),
   'db/equipment/equipment.ts › deleteEquipmentForUser › irrigation_placement_selected_beds': CHILD_OF('irrigation_equipment'),
-  'db/equipment/duplication.ts › duplicateEquipmentForUser › irrigation_equipment': PR6,
-  'db/equipment/duplication.ts › duplicateEquipmentForUser › irrigation_equipment_settings': PR6,
+  'db/equipment/duplication.ts › duplicateEquipmentForUser › irrigation_equipment': branche('materiel'),
+  'db/equipment/duplication.ts › duplicateEquipmentForUser › irrigation_equipment_settings': branche('reglage-de-materiel'),
   'db/equipment/duplication.ts › duplicateEquipmentForUser › drip_setting_rates': CHILD_OF('irrigation_equipment_settings'),
   'db/equipment/duplication.ts › duplicateEquipmentForUser › sprinkler_profile_points': CHILD_OF('irrigation_equipment_settings'),
-  'db/equipment/settings.ts › saveEquipmentSettingForUser › irrigation_equipment_settings': PR6,
+  'db/equipment/settings.ts › saveEquipmentSettingForUser › irrigation_equipment_settings': branche('reglage-de-materiel'),
   'db/equipment/settings.ts › saveEquipmentSettingForUser › drip_setting_rates': CHILD_OF('irrigation_equipment_settings'),
   'db/equipment/settings.ts › saveEquipmentSettingForUser › sprinkler_profile_points': CHILD_OF('irrigation_equipment_settings'),
-  'db/equipment/settings.ts › deleteEquipmentSettingForUser › irrigation_equipment_settings': PR6,
+  'db/equipment/settings.ts › deleteEquipmentSettingForUser › irrigation_equipment_settings': branche('reglage-de-materiel'),
   'db/equipment/settings.ts › deleteEquipmentSettingForUser › drip_setting_rates': CHILD_OF('irrigation_equipment_settings'),
   'db/equipment/settings.ts › deleteEquipmentSettingForUser › sprinkler_profile_points': CHILD_OF('irrigation_equipment_settings'),
   'db/equipment/settings.ts › deleteEquipmentSettingForUser › irrigation_equipment_placements': CHILD_OF('irrigation_equipment_settings'),
   'db/equipment/settings.ts › deleteEquipmentSettingForUser › irrigation_placement_selected_beds': CHILD_OF('irrigation_equipment_settings'),
-  'db/pump-repository.ts › savePumpForUser › irrigation_pumps': PR6,
-  'db/pump-repository.ts › savePumpForUser › irrigation_pump_origins': PR6,
-  'db/pump-repository.ts › setPumpArchivedForUser › irrigation_pumps': PR6,
-  'db/pump-repository.ts › saveEquipmentDefaultPumpForUser › irrigation_equipment_pump_defaults': PR6,
-  'db/water-resource-repository.ts › saveWaterResourceForUser › irrigation_water_resources': PR6,
-  'db/water-resource-flow-repository.ts › applyResourceFlowForUser › irrigation_water_resources': PR6,
-  'db/water-resource-repository.ts › saveWaterReservoirForUser › irrigation_water_reservoirs': PR6,
+  'db/pump-repository.ts › savePumpForUser › irrigation_pumps': branche('pompe'),
+  'db/pump-repository.ts › savePumpForUser › irrigation_pump_origins': CHILD_OF('irrigation_pumps'),
+  'db/pump-repository.ts › setPumpArchivedForUser › irrigation_pumps': branche('pompe'),
+  'db/pump-repository.ts › saveEquipmentDefaultPumpForUser › irrigation_equipment_pump_defaults': branche('pompe-par-defaut'),
+  'db/water-resource-repository.ts › saveWaterResourceForUser › irrigation_water_resources': branche('ressource'),
+  'db/water-resource-flow-repository.ts › applyResourceFlowForUser › irrigation_water_resources': branche('ressource'),
+  'db/water-resource-repository.ts › saveWaterReservoirForUser › irrigation_water_reservoirs': branche('reserve'),
   'db/water-resource-repository.ts › correctWaterReservoirVolumeForUser › irrigation_water_reservoirs': sansObjet('Le volume observé d’une réserve : une mesure, gardée avec son mouvement de stock (§5.1), pas un réglage.'),
-  'db/water-resource-repository.ts › saveResourceReservoirLinkForUser › irrigation_water_resource_reservoir_links': PR6,
-  'db/water-resource-repository.ts › saveReservoirLinkForUser › irrigation_water_reservoir_links': PR6,
-  'db/water-resource-repository.ts › saveDefaultWaterSupplyForUser › irrigation_water_supply_defaults': PR6,
-  'db/equipment-placement-repository.ts › saveEquipmentPlacementForUser › irrigation_equipment_placements': PR6,
+  'db/water-resource-repository.ts › saveResourceReservoirLinkForUser › irrigation_water_resource_reservoir_links': branche('liaison-ressource-reserve'),
+  'db/water-resource-repository.ts › saveReservoirLinkForUser › irrigation_water_reservoir_links': branche('liaison-entre-reserves'),
+  'db/water-resource-repository.ts › saveDefaultWaterSupplyForUser › irrigation_water_supply_defaults': branche('alimentation-par-defaut'),
+  'db/equipment-placement-repository.ts › saveEquipmentPlacementForUser › irrigation_equipment_placements': branche('pose'),
   'db/equipment-placement-repository.ts › saveEquipmentPlacementForUser › irrigation_placement_selected_beds': CHILD_OF('irrigation_equipment_placements'),
-  'db/equipment-placement-repository.ts › updateEquipmentPlacementSettingForUser › irrigation_equipment_placements': PR6,
-  'db/equipment-placement-repository.ts › removeEquipmentPlacementForUser › irrigation_equipment_placements': PR6,
+  'db/equipment-placement-repository.ts › updateEquipmentPlacementSettingForUser › irrigation_equipment_placements': branche('pose'),
+  'db/equipment-placement-repository.ts › removeEquipmentPlacementForUser › irrigation_equipment_placements': branche('pose'),
   'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_equipment_placements': sansObjet('Une pose détachée du groupe de jardins qu’on supprime : la conséquence d’un geste sur les groupes, hors de la liste du contrat (F717) ; la pose elle-même ne change pas.'),
 };

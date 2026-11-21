@@ -56,8 +56,13 @@ type JournalValue = { value: string | number | boolean | null } | { sql: string;
  */
 export type JournalTarget = { table: string; where: string; params?: readonly unknown[] };
 
-/** Un champ : son nom, sa valeur actuelle lue en SQL sur `current`, et pour un changement, la valeur écrite. */
-export type JournalField = { key: string; current: string; next?: unknown };
+/**
+ * Un champ : son nom, sa valeur actuelle lue en SQL sur `current`, et pour un
+ * changement, la valeur écrite (`next`), ou lue en SQL par une requête dont
+ * les valeurs sont des paramètres (`nextSql` : le nom de la pompe choisie,
+ * pour qu'avant et après se lisent de la même façon).
+ */
+export type JournalField = { key: string; current: string; next?: unknown; nextSql?: { sql: string; params?: readonly unknown[] } };
 
 type Statement = { sql: string; params: unknown[] };
 
@@ -82,6 +87,14 @@ export function sqlLiteral(value: string | number | boolean | null): string {
     return String(value);
   }
   return `'${value.replaceAll("'", "''")}'`;
+}
+
+/**
+ * Un nombre réel entier rendu entier, pour qu'une profondeur de 1 m se lise
+ * `1` comme le code l'écrit, et non `1.0`.
+ */
+export function plainNumber(expression: string): string {
+  return `CASE WHEN (${expression}) = CAST((${expression}) AS INTEGER) THEN CAST((${expression}) AS INTEGER) ELSE (${expression}) END`;
 }
 
 /**
@@ -199,8 +212,8 @@ export function journalUpdate(
   const before = `json_remove(json_object(${next.map(({ key, current }) => `'${key}', ${current}`).join(', ')}), ${unchangedPaths})`;
   const after = `json_remove(json_object(${next.map(({ key, alias }) => `'${key}', ${alias}`).join(', ')}), ${unchangedPaths})`;
   const changed = next.map(({ current, alias }) => `(${current}) IS NOT ${alias}`).join(' OR ');
-  const values = `SELECT ${next.map((_, index) => `? AS v${index}`).join(', ')}`;
-  const nextParams = next.map(({ next: value }) => bound(value));
+  const values = `SELECT ${next.map(({ nextSql }, index) => (nextSql ? `(${nextSql.sql}) AS v${index}` : `? AS v${index}`)).join(', ')}`;
+  const nextParams = next.flatMap(({ next: value, nextSql }) => (nextSql ? (nextSql.params ?? []).map(bound) : [bound(value)]));
   const sql = missing === 'create'
     ? `${INSERT_HEAD}
       SELECT ?, ?, ?, ?, ?, ${context.sql},
