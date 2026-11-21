@@ -103,7 +103,7 @@ export function privacyPage(contactEmail: string | undefined): string {
 
 <h2>Combien de temps</h2>
 <ul>
-<li>Vos données de ferme sont gardées tant que la ferme utilise le module. Sur demande, elles sont effacées entièrement, dans un délai d'un mois au plus. Le module garde seulement la preuve que la demande a été traitée : un numéro interne et des dates, sans nom, sans ferme et sans contenu.</li>
+<li>Vos données de ferme sont gardées tant que la ferme utilise le module. Vous pouvez demander vous-même leur effacement complet, dans les réglages du module (« Supprimer ma ferme et mes données ») : il a lieu sept jours après la demande, et vous pouvez annuler jusque-là ; pendant ce temps, le module ne calcule plus rien et ne lit plus votre ferme. Une demande écrite au responsable est traitée dans un délai d'un mois au plus. Le module garde seulement la preuve que la demande a été traitée : un numéro interne et des dates, sans nom, sans ferme et sans contenu.</li>
 <li>L'hébergeur garde un historique de la base de données, qui permet de la remettre dans l'état d'un jour passé après une panne. Une donnée effacée reste récupérable dans l'historique jusqu'à 30 jours.</li>
 <li>Chaque semaine, le responsable du module fait une copie chiffrée de la base de données, qu'il garde lui-même hors de l'hébergeur, pour le cas où l'hébergement serait perdu. Chaque copie est effacée au bout de cinq semaines au plus : une donnée effacée peut y rester jusque-là.</li>
 <li>Le compte des lectures dans Ouvre ta ferme est gardé 30 jours au plus.</li>

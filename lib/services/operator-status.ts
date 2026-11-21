@@ -1,10 +1,11 @@
-import { readFarmErasureCounts } from '@/db/farm-erasure-repository';
+import { listOpenFarmErasures, readFarmErasureCounts } from '@/db/farm-erasure-repository';
 import { readFarmObservations } from '@/db/farm-observation-repository';
 import { listCostReadings, listSupportAccesses, recordCostReading, recordSupportAccess } from '@/db/operator-notes-repository';
 import { readLatestOperatorNotice } from '@/db/operator-repository';
 import { readTaskRuns, recordTaskRun } from '@/db/task-run-repository';
 import { logJsonLine } from '../adapters/log';
 import { costMonths, costReadingDecision, costReadingRecordedMessage, costView, monthWords } from '../domain/operations/costs';
+import { operatorErasureLines } from '../domain/operations/farm-erasure-request';
 import { farmSpaceOf } from '../domain/farm-space';
 import { farmObservationLines } from '../domain/operations/farm-observation';
 import { gestureDates, gestureDecision, gestureRecordedMessage, OPERATOR_GESTURES, type GestureTask } from '../domain/operations/operator-gesture';
@@ -45,7 +46,7 @@ export async function isOperator(spaceKey: string, deploymentFarm = knownDeploym
  */
 export async function readOperatorStatus(now = new Date(), deploymentFarm = knownDeploymentFarm): Promise<OperatorStatusView> {
   const hourStartMs = outcomeHourStartMs(now.getTime());
-  const [tasks, latestNotice, records, farm, planning, erasures, accesses, readings] = await Promise.all([
+  const [tasks, latestNotice, records, farm, planning, erasures, accesses, readings, openErasures] = await Promise.all([
     readTaskStates(now),
     readLatestOperatorNotice(),
     readFarmObservations({
@@ -58,6 +59,7 @@ export async function readOperatorStatus(now = new Date(), deploymentFarm = know
     readFarmErasureCounts(now),
     listSupportAccesses(oldestKeptSupportDay(parisDayOf(now.getTime()))),
     listCostReadings(),
+    listOpenFarmErasures(),
   ]);
   const planningFarms = new Set(planning.flatMap(({ ownerUserId }) => farmSpaceOf(ownerUserId).otfFarmId ?? []));
   const farms = farmObservationLines(records, { now, deploymentFarm: farm, unknownFarmKey: DEPLOYMENT_KEY_UNKNOWN_FARM_PACE, planningFarms });
@@ -65,6 +67,7 @@ export async function readOperatorStatus(now = new Date(), deploymentFarm = know
     ...operatorStatusView(tasks, latestNotice, farms, gestureDates(now), erasures),
     support: { farms: supportFarms(farms.map(({ farmKey }) => farmKey)), lines: supportAccessLines(accesses) },
     costs: { ...costView(readings, now), months: costMonths(now).map((value) => ({ value, label: monthWords(value) })) },
+    erasureRequests: operatorErasureLines(openErasures),
   };
 }
 

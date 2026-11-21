@@ -3,6 +3,7 @@ import { FARM_TABLES, SPACE_ROOT_TABLE, SPACE_TABLES, spaceRowsCondition, type F
 import { findWorkspaceIdForUser } from './workspace-repository';
 import { spaceKeyOfRow } from './workspace-scope';
 import { farmErasureDueAt, type FarmErasureCounts, type FarmErasureState } from '@/lib/domain/operations/farm-erasure';
+import type { OperatorErasureRequest } from '@/lib/domain/operations/farm-erasure-request';
 import { legacySnapshotKey, seasonSnapshotPrefix } from '@/lib/domain/otf/snapshot-keys';
 
 /**
@@ -66,6 +67,35 @@ export async function cancelFarmErasure(spaceKey: string, now: Date): Promise<bo
     `UPDATE irrigation_farm_erasures SET state = 'cancelled', cancelled_at = ?
      WHERE workspace_id = ? AND state = 'pending'`,
   ).bind(now.toISOString(), workspaceId).run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
+/**
+ * Les demandes ouvertes, pour l'exploitant (F563, effacement sans attendre ;
+ * 10 bis.22, F668) : la ferme de l'espace, lue tant qu'il existe, et les
+ * heures. Jamais la personne.
+ */
+export async function listOpenFarmErasures(): Promise<OperatorErasureRequest[]> {
+  const { results } = await db.prepare(
+    `SELECT erasure.id, erasure.state, erasure.requested_at, erasure.erase_after, workspace.otf_farm_id
+     FROM irrigation_farm_erasures AS erasure
+     LEFT JOIN irrigation_workspaces AS workspace ON workspace.id = erasure.workspace_id
+     WHERE erasure.state IN ${OPEN_STATES}
+     ORDER BY erasure.requested_at, erasure.id`,
+  ).all<OpenRow & { otf_farm_id: string | null }>();
+  return results.map((row) => ({ id: row.id, state: row.state, requestedAt: row.requested_at, eraseAfter: row.erase_after, otfFarmId: row.otf_farm_id }));
+}
+
+/**
+ * L'effacement sans attendre, sur demande écrite (F563) : le délai de la
+ * demande s'arrête à `at` (une demande déjà échue le reste). Seulement une
+ * demande encore en attente ; `false` sinon (annulée, commencée ou faite
+ * entre-temps).
+ */
+export async function advanceFarmErasure(id: string, at: string): Promise<boolean> {
+  const result = await db.prepare(
+    `UPDATE irrigation_farm_erasures SET erase_after = MIN(erase_after, ?) WHERE id = ? AND state = 'pending'`,
+  ).bind(at, id).run();
   return (result.meta.changes ?? 0) > 0;
 }
 
