@@ -8420,3 +8420,40 @@ Ne changent pas : le Worker de notification, le texte des messages, leurs
 réglages, l'écran, aucune migration ; un message déjà parti sous l'ancien
 identifiant le jour de la mise en ligne ne repart pas (la prise du jour, en
 base, est par espace).
+
+## D-296 — Outillage : `next` 16.4.6, les sept alertes modérées fermées
+
+Date : 22 novembre 2026. Statut : décidé (lot à part rangé par D-292 ;
+couvert par le « vas-y pour tout » du porteur du 22 novembre 2026 à
+10 h 53).
+
+**Contexte.** Après le lot eslint 10 (D-292), `pnpm audit` relevait sept
+vulnérabilités modérées, toutes sur `next` 16.4.3, paquet de production
+(versions vulnérables jusqu'à 16.4.4, corrigées en 16.4.5) :
+GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8, GHSA-rhh4-g77r-r9qj et
+GHSA-vvgp-ww4w-46vf (cache `use cache` et Cache Components),
+GHSA-7qx7-33qx-rqx2 (optimisation d'images, SVG), GHSA-f3mh-rxg3-f5g2
+(cookie HttpOnly, routes Edge) et GHSA-pc58-hwjq-p385 (serveur Next
+auto-hébergé qui relaie des réponses). Le module est servi par vinext, qui
+remplace lui-même les imports `next/*` : le paquet construit ne contient pas
+de code de `next/dist`, et aucune de ces fonctions n'est employée d'après
+leurs titres, sans que ce soit vérifié une à une. La montée se fait quand
+même, pour fermer les alertes et garder `next` (types, outillage) à jour.
+
+**Décision.**
+
+1. `next` passe de 16.4.3 à 16.4.6 (9 novembre 2026, la dernière de la
+   ligne 16.4), version exacte ; `eslint-config-next` le suit, de 16.4.3 à
+   16.4.6, comme le 8 octobre 2026 (D-292 : les deux ensemble). Dans le
+   verrou, `@next/env`, `@next/eslint-plugin-next` et les `@next/swc-*`
+   suivent ; `nanoid` 3.3.19, que `next` 16.4.6 ne demande plus, quitte
+   l'arbre. Aucun autre paquet ne change ; les greffons d'eslint gardent
+   leurs versions, l'acceptation sous eslint 10 de `pnpm-workspace.yaml`
+   reste.
+2. `pnpm audit` et `pnpm audit --prod` : « No known vulnerabilities found ».
+3. Rien d'autre ne change : ni le code, ni la configuration (Next, vinext,
+   ESLint, Wrangler), ni les épinglages.
+
+**Contrôles.** Voir `docs/ETAT_DU_PROJET.md` (outillage, lot `next`
+16.4.6) : les huit contrôles réussis avant et après le changement, et les
+parcours navigateur joués en local après.

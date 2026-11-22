@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Sécurité (outillage : `next` 16.4.6)
+
+- **`next` 16.4.3 → 16.4.6, les sept alertes modérées fermées** (D-296) :
+  `next` et `eslint-config-next` passent en 16.4.6 ; `pnpm audit` ne
+  signale plus rien. Le site est servi par vinext, qui remplace lui-même
+  les imports `next/*` : rien ne change à l'écran ni dans le code.
+
 ### Corrigé (Améliorations, n° 2 et 3 : une alarme par espace)
 
 - **Le message du matin et le rappel du soir ne se perdent plus quand
