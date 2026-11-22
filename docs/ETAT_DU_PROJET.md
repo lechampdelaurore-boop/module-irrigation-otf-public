@@ -887,7 +887,9 @@ registres, elle y renvoie.
   défaut, poses. Une ressource, une réserve, un réglage ou une pompe se lit
   par son nom, avant comme après. L'inventaire n'a plus d'écrivain « à
   brancher » : tous sont branchés ou sans objet. Reste l'écran (PR 7). Sans
-  migration. Contrôles : voir la PR.
+  migration. Contrôles : voir la PR. **En ligne le 22 novembre 2026 à
+  1 h 23** (#168, fusionnée à 1 h 01, run 44964576478 vérifié job par job :
+  les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
   objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
