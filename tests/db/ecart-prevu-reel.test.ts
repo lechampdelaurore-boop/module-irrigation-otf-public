@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach, mock } from 'node:test';
+import { listChangeJournalForUser } from '../../db/change-journal/read';
 import { listAdoptionsForBedForUser } from '../../db/crop-water/adoptions';
 import { saveSpeciesCorrespondenceForUser } from '../../db/crop-water/entries';
 import { listEquipmentForUser } from '../../db/equipment/read';
@@ -106,6 +107,13 @@ function planEvents(): string[] {
   return database.sqlite.prepare('SELECT kind FROM irrigation_plan_events ORDER BY occurred_at, rowid').all().map((row) => String(row.kind));
 }
 
+/** Les lignes du journal des modifications d'un sujet, de la plus ancienne à la plus récente : l'action, l'avant et l'après. */
+async function journalOf(owner: string, subject: string) {
+  return (await listChangeJournalForUser(owner, { limit: 200 })).reverse()
+    .filter((entry) => entry.subject === subject)
+    .map((entry) => ({ action: entry.action, before: entry.before, after: entry.after, context: entry.context }));
+}
+
 async function rateOf(owner: string, settingId: string): Promise<number | null> {
   const setting = (await listEquipmentForUser(owner)).flatMap((item) => item.settings).find((item) => item.id === settingId);
   return setting?.kind === 'drip' ? setting.rateMmPerHour : null;
@@ -169,6 +177,10 @@ test('« Adopter » le débit : le réglage change sous son nom, provenance « s
   }
   assert.deepEqual(planEvents().slice(before), ['equipment-setting-changed'], 'le plan se recalcule, comme après un réglage appliqué changé');
   assert.deepEqual(result.gaps, [], 'les semaines faites avec l’ancien débit ne se jugent plus (F741)');
+  // Le journal des modifications (n° 7) garde le geste comme un réglage changé à la main : le débit seul, de 6 à 4 mm/h.
+  assert.deepEqual((await journalOf(ALICE, 'reglage-de-materiel')).slice(-1), [{
+    action: 'modifie', before: { rateMmPerHour: 6 }, after: { rateMmPerHour: 4 }, context: { equipment: 'Goutte-à-goutte', name: 'Réglage 1' },
+  }]);
 });
 
 test('la vérification avant d’adopter : semaine changée, proposition différente, réglage retouché depuis, autre ferme ; rien n’est écrit', async () => {
@@ -185,6 +197,7 @@ test('la vérification avant d’adopter : semaine changée, proposition différ
   const fromB = await adopt(BOB, flow);
   assert.deepEqual([fromB.adopted, fromB.message, fromB.gaps.length], [false, stale, 0], 'la ferme B ne voit pas l’écart de A');
   assert.equal(await rateOf(ALICE, fixture.setting.id), 6, 'rien n’a été écrit');
+  const settingLines = (await journalOf(ALICE, 'reglage-de-materiel')).length;
 
   // Le réglage retouché à la main depuis l'affichage : la proposition ne tient plus.
   await saveEquipmentSettingForUser(ALICE, fixture.equipment.id, fixture.setting.id, { name: 'Réglage 1', kind: 'drip', rateMmPerHour: 5 });
@@ -192,6 +205,8 @@ test('la vérification avant d’adopter : semaine changée, proposition différ
   assert.deepEqual([retouched.adopted, retouched.message, retouched.gaps.length], [false, stale, 0]);
   assert.equal(await rateOf(ALICE, fixture.setting.id), 5, 'le geste à la main reste');
   assert.equal(planEvents().length, 0, 'aucun recalcul sans écriture');
+  // Au journal, le seul geste à la main : une proposition refusée n'écrit aucune ligne.
+  assert.deepEqual((await journalOf(ALICE, 'reglage-de-materiel')).slice(settingLines).map((line) => [line.before, line.after]), [[{ rateMmPerHour: 6 }, { rateMmPerHour: 5 }]]);
 });
 
 test('moins d’eau que prévu : l’objectif plus haut que le besoin de la culture, adopté par le geste de la 5 quater ; sans « Besoin par culture », la cause ne se cherche pas', async () => {
@@ -220,11 +235,13 @@ test('moins d’eau que prévu : l’objectif plus haut que le besoin de la cult
   const stale = await adopt(ALICE, { kind: 'objective', bedId: BED, proposedMm: proposedMm + 1 });
   assert.equal(stale.adopted, false);
   assert.deepEqual(await listAdoptionsForBedForUser(ALICE, SEASON, BED), [], 'une autre valeur que celle recalculée : rien n’est écrit');
+  assert.deepEqual(await journalOf(ALICE, 'objectif-adopte'), [], 'ni au journal des modifications');
 
   const result = await adopt(ALICE, { kind: 'objective', bedId: BED, proposedMm });
   assert.equal(result.adopted, true);
   assert.equal(result.message, `L’objectif proposé est adopté : ${String(proposedMm).replace('.', ',')} mm par semaine deviennent l’objectif de N01 à partir d’aujourd’hui ; le plan se recalcule.`);
   assert.deepEqual((await listAdoptionsForBedForUser(ALICE, SEASON, BED)).map((adoption) => [adoption.weekStart, adoption.amountMm]), [[WEEK, proposedMm]], 'origine « proposition adoptée »');
   assert.deepEqual(planEvents(), ['objective-changed'], 'le plan se recalcule comme après tout objectif enregistré');
+  assert.deepEqual((await journalOf(ALICE, 'objectif-adopte')).map((line) => [line.action, line.before?.amountMm ?? null, line.after?.amountMm]), [['cree', null, proposedMm]], 'au journal, sous « Objectif proposé adopté »');
   assert.deepEqual(result.gaps, [], 'l’objectif abaissé cette semaine : la planche se juge sur les semaines qui suivent (F741)');
 });

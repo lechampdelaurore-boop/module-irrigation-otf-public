@@ -8079,7 +8079,12 @@ seule.
    de la semaine en cours, ouverte, la révision d'adoption), seulement si
    la fiche propose encore la valeur montrée, avec l'origine « proposition
    adoptée », et le plan se recalcule sous « un objectif hydrique changé ».
-   La réponse relit l'écart, et les autres onglets relisent (D-129).
+   La réponse relit l'écart, et les autres onglets relisent (D-129). Le
+   journal des modifications (n° 7) garde chaque geste par ces mêmes
+   chemins, sans rien de plus : le débit comme un réglage de matériel
+   changé (« Réglage de matériel », le débit d'avant et d'après), l'objectif
+   sous « Objectif proposé adopté » ; une proposition qui ne tient plus
+   n'y écrit rien.
 
 Ne changent pas : le besoin (3.3), la répartition (3.4) et le planning
 (3.5), qui ne lisent pas l'écart ; les irrigations passées gardent leur

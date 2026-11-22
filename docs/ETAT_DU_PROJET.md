@@ -1022,7 +1022,8 @@ registres, elle y renvoie.
   « Adopter » est vérifié par le serveur, qui n'écrit rien si la proposition
   ne tient plus ; le débit s'enregistre dans le réglage comme une saisie à la
   main, l'objectif comme une adoption de la 5 quater, puis le plan se
-  recalcule ; les irrigations passées gardent leur débit. Une semaine ne se
+  recalcule ; les irrigations passées gardent leur débit ; le journal des
+  modifications garde le geste par ces mêmes chemins. Une semaine ne se
   juge qu'avec les réglages d'aujourd'hui : après un ajustement, le bloc
   disparaît. Sans migration. **Constat** : retoucher les débits d'un réglage
   sur « Matériel et placement » ne recalcule pas le plan (règle 4 de la

@@ -95,7 +95,8 @@ source détaillée commit par commit.
   débit proposé dans le réglage, ou l'objectif proposé de la planche, après
   que le serveur a vérifié qu'il tient encore, puis le plan se recalcule.
   Rien ne change sans ce geste ; les irrigations passées gardent leur
-  débit. Sans migration. Parcours P57.
+  débit. Le geste entre au journal des modifications comme un réglage
+  changé, ou un objectif proposé adopté. Sans migration. Parcours P57.
 
 ### Ajouté (Améliorations, n° 4, PR 1 sur 2 des n° 4 et 5)
 
