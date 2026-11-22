@@ -2,19 +2,22 @@
 
 import { getAuthenticatedUser } from '@/app/access-auth';
 import type { ChangeJournalCursor } from '@/lib/domain/change-journal/entry';
-import { changeFamilyFilter, type ChangeJournalPage } from '@/lib/domain/change-journal/view';
-import { getChangeJournalPageForUser } from '@/lib/services/change-journal-view';
+import { changeFamilyFilter, type ChangeJournalView } from '@/lib/domain/change-journal/view';
+import { getChangeJournalViewForUser } from '@/lib/services/change-journal-view';
 import { getIrrigationSnapshot } from '@/lib/services/irrigation-service';
 
 export type ChangeJournalActionResult =
-  | { ok: true; page: ChangeJournalPage }
+  | { ok: true; view: ChangeJournalView }
   | { ok: false; message: string };
 
 /**
  * Une page du journal des modifications (amélioration n° 7, §5.5 ; D-288) :
- * le filtre par famille et « Voir plus ». Lecture seule ; l'espace vient de
- * la session, jamais du navigateur. Sans instantané lisible, les lieux se
- * disent par leur sorte, et la page se lit quand même.
+ * le filtre par famille, « Voir plus », et la relecture après un changement
+ * fait sur la page ou à l'ouverture du pli (F746, D-294). Avec la page, la
+ * ligne du pli : le compte, la dernière ligne et le début du journal, toutes
+ * familles. Lecture seule ; l'espace vient de la session, jamais du
+ * navigateur. Sans instantané lisible, les lieux se disent par leur sorte,
+ * et la page se lit quand même.
  */
 export async function loadChangeJournalPageAction(input: { season: number; family: unknown; after: unknown }): Promise<ChangeJournalActionResult> {
   const user = await getAuthenticatedUser();
@@ -26,7 +29,7 @@ export async function loadChangeJournalPageAction(input: { season: number; famil
   if (after === undefined) return { ok: false, message: 'La suite du journal est introuvable : rechargez la page.' };
   try {
     const snapshot = await getIrrigationSnapshot(user.userId, { season: input.season }).catch(() => null);
-    return { ok: true, page: await getChangeJournalPageForUser({ ownerUserId: user.userId, snapshot, family: changeFamilyFilter(input.family), after }) };
+    return { ok: true, view: await getChangeJournalViewForUser(user.userId, snapshot, { family: changeFamilyFilter(input.family), after }) };
   } catch {
     return { ok: false, message: 'Le journal des modifications est momentanément illisible.' };
   }

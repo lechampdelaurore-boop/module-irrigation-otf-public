@@ -39,12 +39,14 @@ export function PageSettingsFold({ children, openReason = null }: { children: Re
  * pli « Réglages de cette page », reprise pour « Correspondance des
  * espèces » (audit du 19 novembre 2026, lot J, n° 15, F459).
  */
-export function AnchoredFold({ id, className, summary, bodyClassName, initiallyOpen = false, children }: {
+export function AnchoredFold({ id, className, summary, bodyClassName, initiallyOpen = false, onOpen, children }: {
   id: string;
   className: string;
   summary: ReactNode;
   bodyClassName: string;
   initiallyOpen?: boolean;
+  /** À chaque ouverture du pli, par la personne ou par une ancre : le journal des modifications s'y relit (F746). */
+  onOpen?: () => void;
   children: ReactNode;
 }) {
   const fold = useRef<HTMLDetailsElement>(null);
@@ -64,7 +66,17 @@ export function AnchoredFold({ id, className, summary, bodyClassName, initiallyO
   }, []);
 
   return (
-    <details ref={fold} id={id} className={className} open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
+    <details
+      ref={fold}
+      id={id}
+      className={className}
+      open={open}
+      onToggle={(event) => {
+        const opened = event.currentTarget.open;
+        setOpen(opened);
+        if (opened) onOpen?.();
+      }}
+    >
       <summary>{summary}</summary>
       <div className={bodyClassName}>{children}</div>
     </details>

@@ -8,6 +8,7 @@ import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, 
 import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-days';
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
+import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { useConfirm } from './shell/use-confirm';
@@ -133,6 +134,12 @@ export function WaterManagementDashboard({
     say(origin, 'notice', result.message);
   };
 
+  /** Un réglage ou un objectif enregistré : le journal des modifications de la page se relit (F746). */
+  const receiveChange = (result: WaterActionResult, origin = 'haut') => {
+    receive(result, origin);
+    if (result.ok) notifyChangeJournalChanged();
+  };
+
   /**
    * Le jour de la pluie mesurée change : le champ montre sa mesure ; hors de la semaine affichée, la semaine suit.
    * Le dernier jour choisi l'emporte : la semaine d'un jour choisi plus tôt, arrivée après un autre choix, ne
@@ -224,7 +231,7 @@ export function WaterManagementDashboard({
   const saveGoal = () => {
     const target = parseGoalScope(scope);
     startTransition(async () => {
-      receive(await saveHydricGoalAction({
+      receiveChange(await saveHydricGoalAction({
         season,
         weekStart: dashboard.weekStart,
         amountMm: numeric(goalAmount),
@@ -242,7 +249,7 @@ export function WaterManagementDashboard({
       cancelLabel: 'Garder les objectifs',
     }))) return;
     startTransition(async () => {
-      receive(await clearHydricGoalsAction({
+      receiveChange(await clearHydricGoalsAction({
         season,
         weekStart: dashboard.weekStart,
         confirmed: true,
@@ -310,7 +317,7 @@ export function WaterManagementDashboard({
               <label><span>Du</span><input type="date" value={limitFrom} onChange={(event) => setLimitFrom(event.target.value)} /></label>
               <label><span>Au</span><input type="date" value={limitUntil} onChange={(event) => setLimitUntil(event.target.value)} /></label>
               <label><span>Note facultative</span><input value={limitNote} onChange={(event) => setLimitNote(event.target.value)} /></label>
-              <button type="button" disabled={pending} onClick={() => startTransition(async () => receive(await saveDailyWaterLimitAction({ season, weekStart: dashboard.weekStart, enabled: limitEnabled, maxCubicMetersPerDay: limitEnabled ? numeric(limitAmount) : null, validFrom: limitFrom, validUntil: limitUntil, note: limitNote }), 'limite'))}>Enregistrer</button>
+              <button type="button" disabled={pending} onClick={() => startTransition(async () => receiveChange(await saveDailyWaterLimitAction({ season, weekStart: dashboard.weekStart, enabled: limitEnabled, maxCubicMetersPerDay: limitEnabled ? numeric(limitAmount) : null, validFrom: limitFrom, validUntil: limitUntil, note: limitNote }), 'limite'))}>Enregistrer</button>
             </div>
             <ActionReply messages={replies} origin="limite" classNames={WATER_REPLY_CLASSES} />
           </article>
@@ -344,8 +351,8 @@ export function WaterManagementDashboard({
               <button type="button" disabled={pending} onClick={searchLocations}>Rechercher</button>
             </div>
             <ActionReply messages={replies} origin="commune" classNames={WATER_REPLY_CLASSES} />
-            {candidates.length > 0 ? <div className="weather-candidates">{candidates.map((candidate) => <button key={`${candidate.latitude}:${candidate.longitude}`} type="button" disabled={pending} onClick={() => startTransition(async () => { receive(await saveWeatherLocationAction({ season, weekStart: dashboard.weekStart, candidate }), 'commune'); setCandidates([]); })}>{candidate.displayName}</button>)}</div> : null}
-            {dashboard.weather.preference.locationMode === 'custom' || !dashboard.weather.preference.locationConfirmed ? <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receive(await restoreOtfWeatherLocationAction({ season, weekStart: dashboard.weekStart }), 'commune'))}>{dashboard.weather.preference.locationConfirmed ? 'Utiliser la commune du siège OTF' : 'Prendre le siège OTF, en dernier recours'}</button> : null}
+            {candidates.length > 0 ? <div className="weather-candidates">{candidates.map((candidate) => <button key={`${candidate.latitude}:${candidate.longitude}`} type="button" disabled={pending} onClick={() => startTransition(async () => { receiveChange(await saveWeatherLocationAction({ season, weekStart: dashboard.weekStart, candidate }), 'commune'); setCandidates([]); })}>{candidate.displayName}</button>)}</div> : null}
+            {dashboard.weather.preference.locationMode === 'custom' || !dashboard.weather.preference.locationConfirmed ? <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receiveChange(await restoreOtfWeatherLocationAction({ season, weekStart: dashboard.weekStart }), 'commune'))}>{dashboard.weather.preference.locationConfirmed ? 'Utiliser la commune du siège OTF' : 'Prendre le siège OTF, en dernier recours'}</button> : null}
             <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
           </article>
         </div>
