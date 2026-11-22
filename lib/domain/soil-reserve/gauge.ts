@@ -1,35 +1,25 @@
 import type { ReferenceCrop } from '../crop-water/reference.ts';
-import { plasticMulchOn, shelterFactorOn, type BedWaterSettings, type CropWaterDay } from '../crop-water/etm.ts';
+import { plasticMulchOn, shelterFactorOn, type BedWaterSettings } from '../crop-water/etm.ts';
 import type { BedWaterDay } from '../crop-water/proposal.ts';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc } from '../water-management.ts';
 import {
-  bareSoilCapacity,
   bareSoilDay,
   bareSoilFillMm,
   bareSoilGauge,
-  bareSoilGeometry,
   coverKc,
   evaporationShare,
   splitFullness,
   surfaceRainShare,
-  surfaceStateHasThreshold,
   surfaceStateModel,
   type BareSoilGeometry,
   type BareSoilState,
   type SurfaceDeclaration,
   type SurfaceState,
 } from './bare-soil.ts';
-import {
-  cappedDepth,
-  cropRooting,
-  cropThresholdPercent,
-  DEFAULT_P,
-  firstStageDepth,
-  PROPOSED_DEPTH_M,
-  rootingProfileOn,
-  thresholdMm,
-  type RootingProfile,
-} from './rooting.ts';
+import { engineRun, type EngineDay } from './gauge-engine.ts';
+import { dayShape, soilCrops, surfaceStateOf, type DayShape, type GaugeMode, type SoilCrop } from './gauge-shape.ts';
+import { GAUGE_ENGINE, type GaugeEngine } from './gauge-switch.ts';
+import { cropThresholdPercent, thresholdMm, type RootingProfile } from './rooting.ts';
 import { PERCENT, resolveBedSoil, soilSettingsOn, type ResolvedSoil, type SoilRecord, type SoilSettings, type SoilSettingsRevision } from './soil.ts';
 
 /**
@@ -88,18 +78,6 @@ export type UnknownReason =
   | { kind: 'crop-without-etm'; date: string; crops: { seriesName: string; plantName: string }[] }
   | { kind: 'blocked'; date: string; problems: string[] };
 
-type GaugeMode = 'crop' | 'bare' | 'cover';
-
-type SoilCrop = {
-  seriesName: string;
-  plantName: string;
-  referenceCropName: string;
-  depthM: number;
-  proposedDepth: boolean;
-  p: number;
-  defaultP: boolean;
-};
-
 export type SoilReserveDay = {
   date: string;
   nature: 'estimated' | 'forecast';
@@ -141,8 +119,17 @@ export type SoilReserveDay = {
 
 type Carry = { mode: GaugeMode; capacityMm: number; stateMm: number; bare: BareSoilState | null; geometry: BareSoilGeometry | null; surfaceState: SurfaceState | null };
 
-/** La jauge d'une planche sur les jours suivis. */
-export function bedSoilReserve(input: BedSoilInput): SoilReserveDay[] {
+/**
+ * La jauge d'une planche sur les jours suivis, par le calcul que choisit
+ * l'interrupteur (docs/shared-engine-adapter-contract.md) : l'ancien calcul
+ * du module, ou le moteur commun.
+ */
+export function bedSoilReserve(input: BedSoilInput, engine: GaugeEngine = GAUGE_ENGINE): SoilReserveDay[] {
+  return engine === 'commun' ? sharedEngineSoilReserve(input) : moduleSoilReserve(input);
+}
+
+/** L'ancien calcul de la jauge, gardé tel quel jusqu'à la preuve d'égalité. */
+function moduleSoilReserve(input: BedSoilInput): SoilReserveDay[] {
   const result: SoilReserveDay[] = [];
   let carry: Carry | null = null;
   let reason: UnknownReason = { kind: 'not-started' };
@@ -168,6 +155,111 @@ export function bedSoilReserve(input: BedSoilInput): SoilReserveDay[] {
   return result;
 }
 
+type Surface = { state: SurfaceState; declared: boolean; since: string | null };
+type Frame = { water: BedWaterDay; soil: ResolvedSoil | null; settings: SoilSettings; surface: Surface | null };
+
+/**
+ * La jauge par le moteur commun : les jours à un compartiment (cultures,
+ * engrais verts, enherbée) passent au moteur par tronçons ; le sol nu et les
+ * jours sans sol restent au module, qui fait le lien entre les tronçons
+ * (docs/shared-engine-adapter-contract.md, « Les passages »).
+ */
+function sharedEngineSoilReserve(input: BedSoilInput): SoilReserveDay[] {
+  const frames = bedFrames(input);
+  const observations = input.observations
+    .filter((observation) => coversBed(input, observation))
+    .map((observation) => ({ observation, date: dateKeyInTimeZone(observation.observedAt, FARM_TIME_ZONE) }));
+  const result: SoilReserveDay[] = [];
+  let carry: Carry | null = null;
+  let reason: UnknownReason = { kind: 'not-started' };
+  let index = 0;
+  while (index < frames.length) {
+    const { water, soil, settings, surface } = frames[index];
+    if (soil === null) {
+      result.push(emptyDay(input, water, { kind: 'no-soil' }));
+      carry = null;
+      reason = { kind: 'not-started' };
+      index += 1;
+      continue;
+    }
+    if (!oneCompartment(frames[index])) {
+      // Le sol nu et ses deux compartiments restent au module (MC-18).
+      const day = computeDay({ input, water, soil, settings, surface, carry, reason });
+      result.push(day.output);
+      carry = day.carry;
+      reason = day.reason;
+      index += 1;
+      continue;
+    }
+    let end = index;
+    while (end < frames.length && oneCompartment(frames[end])) end += 1;
+    const run = frames.slice(index, end).filter(oneCompartment).map((frame) => engineDay(input, frame));
+    const days = engineRun({
+      today: input.today,
+      sheltered: input.bed.sheltered,
+      forecastRainShare: input.forecastRainShare,
+      days: run,
+      irrigations: input.irrigations,
+      observations,
+      start: carry === null ? null : { stateMm: carry.stateMm, capacityMm: carry.capacityMm },
+      reason,
+    });
+    result.push(...days);
+    const last = days[days.length - 1];
+    const lastRun = run[run.length - 1];
+    carry = last.stateMm === null || last.capacityMm === null || last.mode === null
+      ? null
+      : { mode: last.mode, capacityMm: last.capacityMm, stateMm: last.stateMm, bare: null, geometry: null, surfaceState: lastRun.surfaceState };
+    reason = last.unknown ?? { kind: 'not-started' };
+    index = end;
+  }
+  return result;
+}
+
+/**
+ * Les jours de la planche avant tout bilan : le sol, les réglages, l'état de
+ * surface. Un sol qui ne retient rien (RFU 0 mm/m) vaut un sol absent : le
+ * moteur refuse un sol sans réserve (contrat de l'adaptateur).
+ */
+function bedFrames(input: BedSoilInput): Frame[] {
+  let lastCropDate: string | null = null;
+  return input.waterDays.map((water) => {
+    const date = water.date;
+    const resolved = resolveBedSoil(input.soilRecords, input.bed, date);
+    const hasCrop = water.status !== 'no-crop';
+    const surface = hasCrop ? null : surfaceStateOf(input, water, date, lastCropDate);
+    if (hasCrop) lastCropDate = date;
+    const soil = resolved !== null && resolved.soilRfuMmPerMeter > 0 ? resolved : null;
+    return { water, soil, settings: soilSettingsOn(input.settings, date), surface };
+  });
+}
+
+/** Un jour à un compartiment, qui passe au moteur : une culture, un engrais vert levé ou couvrant, l'enherbée. */
+function oneCompartment(frame: Frame): frame is Frame & { soil: ResolvedSoil } {
+  return frame.soil !== null && (frame.surface === null || surfaceStateModel(frame.surface.state) === 'cover');
+}
+
+/** Un jour d'un tronçon, tel que le module le voit : tout sauf le bilan. */
+function engineDay(input: BedSoilInput, frame: Frame & { soil: ResolvedSoil }): EngineDay {
+  const { water, soil, settings, surface } = frame;
+  const date = water.date;
+  const { mode, shape, base, mulched } = dayFrame({ input, water, soil, settings, surface });
+  const observation = shape.capacityMm === null ? null : latestObservation(input, date);
+  const rain = input.bed.sheltered ? null : input.rain.get(date) ?? null;
+  const consumption = consumptionOfDay(water, mode, surface?.state ?? null, settings, shelterFactorOn(input.waterSettings, date));
+  return {
+    base: { ...base, rainNature: rain?.nature ?? null, observation },
+    referenceShare: soil.record.referenceShare,
+    // Une consommation impossible (ET0 négative ou illisible sous un couvert) rend le jour inconnu, au lieu d'un nombre faux.
+    consumption: consumption.mm !== null && Number.isFinite(consumption.mm) && consumption.mm >= 0
+      ? { mm: consumption.mm, gap: null }
+      : { mm: null, gap: consumption.gap ?? { kind: 'missing-et0', date } },
+    rain,
+    mulchShare: mulched ? settings.plasticMulchRainShare : 1,
+    surfaceState: surface?.state ?? null,
+  };
+}
+
 type DayContext = {
   input: BedSoilInput;
   water: BedWaterDay;
@@ -178,7 +270,10 @@ type DayContext = {
   reason: UnknownReason;
 };
 
-function computeDay(context: DayContext): { output: SoilReserveDay; carry: Carry | null; reason: UnknownReason } {
+type DayFrame = { mode: GaugeMode; shape: DayShape; base: SoilReserveDay; mulched: boolean };
+
+/** Le jour de la jauge avant tout bilan : son mode, sa forme (profondeur, capacité, p) et ce qu'il affiche sans le bilan. */
+function dayFrame(context: Omit<DayContext, 'carry' | 'reason'>): DayFrame {
   const { input, water, soil, settings, surface } = context;
   const date = water.date;
   const record = soil.record;
@@ -206,6 +301,13 @@ function computeDay(context: DayContext): { output: SoilReserveDay; carry: Carry
     geometry: shape.geometry,
     mentions: { stonesMissing: soil.stonesMissing, mulchRainShare: mulched ? settings.plasticMulchRainShare : null, weeds: surface?.state === 'grass' },
   };
+  return { mode, shape, base, mulched };
+}
+
+function computeDay(context: DayContext): { output: SoilReserveDay; carry: Carry | null; reason: UnknownReason } {
+  const { input, water, settings, surface } = context;
+  const date = water.date;
+  const { mode, shape, base, mulched } = dayFrame(context);
 
   // Changement de capacité : la jauge garde son % du plein (règle 7, passages entre culture et sol nu).
   let start = context.carry === null || shape.capacityMm === null ? null : carried(context.carry, shape, surface?.state ?? null);
@@ -278,94 +380,7 @@ function computeDay(context: DayContext): { output: SoilReserveDay; carry: Carry
   return { output, carry: toCarry(output, shape, surface?.state ?? null), reason: { kind: 'not-started' } };
 }
 
-type DayShape = { depthM: number | null; capacityMm: number | null; p: number | null; geometry: BareSoilGeometry | null };
 type GaugeState = { mm: number; bare: BareSoilState | null };
-
-/** La profondeur, la capacité et la part p du jour, selon le mode. */
-function dayShape(input: {
-  input: BedSoilInput;
-  mode: GaugeMode;
-  soil: ResolvedSoil;
-  crops: readonly SoilCrop[];
-  surface: { state: SurfaceState } | null;
-  date: string;
-}): DayShape {
-  const { soil, mode } = input;
-  const rfu = soil.soilRfuMmPerMeter;
-  const ceiling = soil.record.soilDepthCeilingM;
-  if (mode === 'crop') {
-    if (input.crops.length === 0) return { depthM: null, capacityMm: null, p: null, geometry: null };
-    // Plusieurs cultures : la moins profonde fixe la capacité, la plus sensible le seuil (D-053).
-    const depthM = cappedDepth(Math.min(...input.crops.map((crop) => crop.depthM)), ceiling);
-    return { depthM, capacityMm: rfu * depthM, p: Math.min(...input.crops.map((crop) => crop.p)), geometry: null };
-  }
-  if (mode === 'cover') {
-    const depthM = cappedDepth(PROPOSED_DEPTH_M, ceiling);
-    const p = input.surface && surfaceStateHasThreshold(input.surface.state) ? DEFAULT_P : null;
-    return { depthM, capacityMm: rfu * depthM, p, geometry: null };
-  }
-  const depthM = cappedDepth(referenceDepth(input.input, input.date), ceiling);
-  const geometry = bareSoilGeometry({
-    soilRfuMmPerMeter: rfu,
-    depthM,
-    surfaceLayerCm: soil.record.surfaceLayerCm,
-    tewMm: soil.record.tewMm,
-    rewMm: soil.record.rewMm,
-  });
-  return { depthM, capacityMm: bareSoilCapacity(geometry), p: null, geometry };
-}
-
-/** La profondeur de référence d'une planche sans culture : le premier stade de sa prochaine culture connue, sinon 30 cm. */
-function referenceDepth(input: BedSoilInput, date: string): number {
-  const next = input.upcomingCrops
-    .filter((crop) => crop.presenceStart > date)
-    .sort((a, b) => a.presenceStart.localeCompare(b.presenceStart))[0];
-  const crop = next?.referenceCropId ? input.referenceCrops.find((candidate) => candidate.id === next.referenceCropId) : undefined;
-  if (!next || !crop) return PROPOSED_DEPTH_M;
-  return firstStageDepth(rootingProfileOn(input.rootingProfiles, crop.id, date), crop).depthM;
-}
-
-/** Les cultures de la planche ce jour-là, avec leur profondeur au stade du jour et leur part p. */
-function soilCrops(input: BedSoilInput, water: BedWaterDay): SoilCrop[] {
-  return water.crops.flatMap((crop): SoilCrop[] => {
-    if (crop.status !== 'computed' && crop.status !== 'unknown') return [];
-    const profile = rootingProfileOn(input.rootingProfiles, crop.trace.referenceCropId, water.date);
-    const rooting = cropRooting(profile, crop.trace.stage, water.date);
-    return [{
-      seriesName: crop.seriesName,
-      plantName: crop.plantName,
-      referenceCropName: crop.trace.referenceCropName,
-      depthM: rooting.depthM,
-      proposedDepth: rooting.proposedDepth,
-      p: rooting.p,
-      defaultP: rooting.defaultP,
-    }];
-  });
-}
-
-/**
- * L'état de surface d'une planche sans culture : la dernière déclaration
- * depuis la fin de sa dernière culture ; sans elle, l'engrais vert levé
- * quand une série d'engrais vert occupe la planche, sinon « nue » (D-053).
- */
-function surfaceStateOf(
-  input: BedSoilInput,
-  water: BedWaterDay,
-  date: string,
-  lastCropDate: string | null,
-): { state: SurfaceState; declared: boolean; since: string | null } {
-  let chosen: SurfaceDeclaration | null = null;
-  for (const declaration of input.surfaceDeclarations) {
-    if (declaration.bedId !== input.bed.id || declaration.date > date) continue;
-    if (lastCropDate !== null && declaration.date <= lastCropDate) continue;
-    if (chosen === null || declaration.date > chosen.date || (declaration.date === chosen.date && declaration.recordedAt >= chosen.recordedAt)) {
-      chosen = declaration;
-    }
-  }
-  if (chosen) return { state: chosen.state, declared: true, since: chosen.date };
-  const greenManure = water.crops.some((crop: CropWaterDay) => crop.status === 'surface-state');
-  return { state: greenManure ? 'green-manure-emergence' : 'bare', declared: false, since: null };
-}
 
 /** L'état du début du jour quand la capacité ou le mode changent : la jauge garde son % du plein. */
 function carried(carry: Carry, shape: DayShape, surfaceState: SurfaceState | null): GaugeState | null {
@@ -477,13 +492,18 @@ function dataGap(
 function latestObservation(input: BedSoilInput, date: string): SoilObservation | null {
   let chosen: SoilObservation | null = null;
   for (const observation of input.observations) {
-    if (observation.zoneId !== input.bed.zoneId) continue;
-    if (observation.plotId === null ? input.bed.sheltered : observation.plotId !== input.bed.plotId) continue;
+    if (!coversBed(input, observation)) continue;
     if (dateKeyInTimeZone(observation.observedAt, FARM_TIME_ZONE) !== date) continue;
     if (chosen === null || observation.observedAt > chosen.observedAt
       || (observation.observedAt === chosen.observedAt && observation.recordedAt >= chosen.recordedAt)) chosen = observation;
   }
   return chosen;
+}
+
+/** Une observation couvre la planche : celle de son jardin, ou celle de sa parcelle pour le plein champ (D-053). */
+function coversBed(input: BedSoilInput, observation: SoilObservation): boolean {
+  if (observation.zoneId !== input.bed.zoneId) return false;
+  return observation.plotId === null ? !input.bed.sheltered : observation.plotId === input.bed.plotId;
 }
 
 /** Les mm d'irrigation apportés entre deux instants, au prorata de la durée de chaque apport. */

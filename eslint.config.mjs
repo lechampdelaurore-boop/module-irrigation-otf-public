@@ -117,6 +117,12 @@ const eslintConfig = defineConfig([
   ...nextTs,
   ...boundaryRules,
   globalIgnores([
+    // La copie figée du moteur hydrique commun : fichiers construits dans son
+    // dépôt, jamais modifiés ici, vérifiés par leur empreinte
+    // (docs/shared-engine-adapter-contract.md, « Le moteur figé ») ; son
+    // manifeste, écrit ici, reste lu.
+    'lib/domain/soil-reserve/shared-engine/**/*',
+    '!lib/domain/soil-reserve/shared-engine/version.ts',
     '.next/**',
     'out/**',
     'build/**',
