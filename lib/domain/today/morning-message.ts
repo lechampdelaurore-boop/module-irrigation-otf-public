@@ -5,6 +5,7 @@ import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
 import { isWaitingPlannedIrrigation } from '../planned-irrigation.ts';
 import type { StoredPlanSuggestion } from '../planning/contract.ts';
 import { morningSuggestions } from '../planning/notifications.ts';
+import { phoneNoticeAlarmKeys } from './phone-notice-alarm.ts';
 import { countText, farmDateKey, farmHourText, namesText } from './today-text.ts';
 
 /**
@@ -29,6 +30,8 @@ export const MORNING_MESSAGE_DEFAULT = true;
 
 export type MorningMessageInputs = {
   now: Date;
+  /** L'espace de la ferme : il entre dans l'identifiant d'alarme et l'étiquette (§4.4, F744). */
+  workspaceId: string;
   /** Les irrigations lues pour le calcul : celles qui attendent leur heure aujourd'hui sont dites. */
   events: readonly IrrigationEventRecord[];
   /** La pluie prévue aujourd'hui à la ferme, celle que lit le plan ; `null` quand elle n'est pas connue (D-003). */
@@ -43,7 +46,7 @@ export type MorningMessage = {
   parisDay: string;
   title: string;
   body: string;
-  /** L'identifiant d'alarme du Worker : le jour, jamais deux messages le même jour. */
+  /** L'identifiant d'alarme du Worker : l'espace et le jour, jamais deux messages le même jour pour une ferme, jamais une alarme partagée entre deux fermes (§4.4, F744). */
   alarmId: string;
   tag: string;
   url: string;
@@ -69,8 +72,7 @@ export function morningMessage(input: MorningMessageInputs): MorningMessage | nu
     parisDay,
     title: MORNING_MESSAGE_TITLE,
     body: sentences.join(' '),
-    alarmId: `morning:${parisDay}`,
-    tag: `morning-${parisDay}`,
+    ...phoneNoticeAlarmKeys('morning', input.workspaceId, parisDay),
     url: pageHref('aujourdhui'),
     counts: { irrigations: irrigations.length, alerts, suggestions: suggestions?.count ?? 0 },
   };

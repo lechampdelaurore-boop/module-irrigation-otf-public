@@ -348,6 +348,53 @@ test('la ferme de l’espace : `/me` d’abord, la lecture complète est rangée
   assert.deepEqual(await readDeploymentFarm(), { otfFarmId: '17', observedAt: read.lastSuccessfulReadAt });
 });
 
+/** Le format UTC que toutes les dates de la ferme gardée partagent : `toISOString`, à la milliseconde, en « Z ». */
+const CANONICAL_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;
+
+test('la ferme gardée se départage par sa date, écrite au même format UTC par chacun de ses quatre écrivains (F366, point D4 de la revue de l’isolation)', async () => {
+  // La comparaison de la base (`excluded.observed_at >= observed_at`) est
+  // alphabétique : elle ne suit l'ordre du temps que si toutes les dates ont
+  // le même format. Chaque chemin qui écrit la ferme gardée est joué ici.
+  const observed: Record<string, string> = {};
+  const alice17 = farmSpaceKey('alice', '17');
+
+  // 1. Une lecture complète réussie : l'heure de la lecture.
+  otfNetwork({ me: [{ id: 17, name: 'Ferme' }] });
+  await saveDeploymentFarm('17', '2026-01-01T00:00:00.000Z');
+  const read = await getIrrigationSnapshot(alice17, { season: 2026, forceRefresh: true });
+  assert.equal(read.source, 'live');
+  observed['lecture complète'] = (await readDeploymentFarm())?.observedAt ?? '';
+  assert.equal(observed['lecture complète'], read.lastSuccessfulReadAt);
+
+  // 2. Une clé qui mène à une autre ferme : l'heure du refus.
+  otfNetwork({ me: [{ id: 18, name: 'Autre ferme' }] });
+  await getIrrigationSnapshot(alice17, { season: 2026, forceRefresh: true });
+  const mismatch = await readDeploymentFarm();
+  assert.equal(mismatch?.otfFarmId, '18');
+  observed['autre ferme'] = mismatch?.observedAt ?? '';
+
+  // 3. Sans ferme gardée : l'heure du dernier instantané en cache, celui de la lecture 1.
+  database.sqlite.prepare('DELETE FROM otf_deployment_farm').run();
+  assert.equal(await resolveDeploymentFarm(dependencies()), '17');
+  observed['instantané en cache'] = (await readDeploymentFarm())?.observedAt ?? '';
+  assert.equal(observed['instantané en cache'], read.lastSuccessfulReadAt);
+
+  // 4. Sans ferme gardée ni cache : l'heure de `GET /me`.
+  database.sqlite.prepare('DELETE FROM otf_deployment_farm').run();
+  database.sqlite.prepare('DELETE FROM otf_snapshots').run();
+  assert.equal(await resolveDeploymentFarm(dependencies({ readOtfMe: async () => [{ id: 17, name: 'Ferme' }], now: () => new Date() })), '17');
+  observed['GET /me'] = (await readDeploymentFarm())?.observedAt ?? '';
+
+  for (const [path, at] of Object.entries(observed)) {
+    assert.match(at, CANONICAL_UTC, `${path} : ${at}`);
+    assert.equal(new Date(at).toISOString(), at, `${path} : la date relue est la même`);
+  }
+  // Au même format, l'ordre alphabétique est l'ordre du temps : une observation plus ancienne ne remplace pas la plus récente.
+  const latest = observed['GET /me'];
+  await saveDeploymentFarm('18', new Date(Date.parse(latest) - 1).toISOString());
+  assert.deepEqual(await readDeploymentFarm(), { otfFarmId: '17', observedAt: latest });
+});
+
 test('continuité du cache : la nouvelle clé lit le dernier instantané de sa personne d’avant la 4.1, seulement s’il est de la même ferme, sans le copier (F343)', async () => {
   otfNetwork({ me: [{ id: 17 }] });
   await saveCachedSnapshot(cacheKeyOf('alice', 2026), snapshot('17', '2026-11-17T08:00:00.000Z'));

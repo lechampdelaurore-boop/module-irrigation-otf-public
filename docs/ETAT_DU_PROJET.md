@@ -30,6 +30,26 @@ registres, elle y renvoie.
   14 h 52 (#162, fusionnée à 14 h 25, run 44908773229 vérifié job par job : les cinq jobs verts) ;
   contrat en ligne le 21 novembre 2026 à 16 h 04 (#170, fusionnée à
   15 h 44, run 44915463270 vérifié job par job : les cinq jobs verts).
+- **Améliorations n° 2 et 3 : une alarme par espace, correctif codé le
+  22 novembre 2026** (D-293, F744, F745,
+  `docs/ameliorations-6-2-3-7-contract.md`, section 4.4), en Opus 5.5 ·
+  Élevé, le réglage des n° 2 et 3. La revue de l'isolation de la 4.3 à la
+  4.5 (constat A, condition E8) avait trouvé que le message du matin et le
+  rappel du soir portaient le même identifiant d'alarme dans toutes les
+  fermes : deux espaces qui envoient le même jour en perdaient un sans
+  bruit, compté comme parti. L'identifiant et l'étiquette portent désormais
+  l'espace, et un refus du Worker (`stale`) n'est plus jamais compté comme
+  un envoi : la prise du jour est rendue et l'envoi réessaie. Le Worker ne
+  change pas ; sans migration ; rien ne change à l'écran. Le test du point
+  D4 de la revue du 18 novembre 2026 (F366, la date de la ferme gardée
+  écrite au même format UTC par ses quatre écrivains) est ajouté. Contrôles
+  de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`,
+  `pnpm knip`, `pnpm push:check`, `pnpm weather:check`, `pnpm site:check`
+  en local ; **`pnpm e2e` non rejoué en local**, sans rapport : ni
+  l'interface ni les services qu'elle appelle ne changent (seuls les envois
+  de fond du matin et du soir) ; la suite complète des parcours est jouée
+  par la CI de la PR. Fusion après la file en cours (#174, fusionnée,
+  puis #175, les registres de la revue).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
