@@ -8305,3 +8305,73 @@ changement : retoucher les débits d'un réglage sur « Matériel et placement �
 ne recalcule pas le plan (règle 4 de `docs/replanning-contract.md`, qui ne
 nomme que le réglage appliqué changé), alors qu'« Adopter » le fait ; à
 proposer au porteur.
+
+## D-292 — Outillage : eslint 10, l'alerte minimatch fermée
+
+Date : 22 novembre 2026. Statut : décidé (lot à part de l'alerte minimatch,
+rangé depuis le 9 novembre 2026, D-095 ; « vas-y » du porteur le
+22 novembre 2026 à 10 h 53).
+
+**Contexte.** `pnpm audit` signalait depuis la revue de sécurité de la 3.9
+une vulnérabilité modérée de minimatch (GHSA-g3hv-75wg-m249, déni de service
+par amplification des motifs, versions 7.0.0 à 11.0.0), tirée par l'outil de
+lint : `minimatch` 10.2.6 par `@typescript-eslint/typescript-estree` 8.68.0
+(`eslint-config-next`). Outil de développement, absent du site servi
+(`pnpm audit --prod` ne le voit pas). Le correctif demandait `minimatch` 11 :
+seule la version 8.73.0 de typescript-eslint (16 novembre 2026) le demande ;
+eslint 10 le demande lui-même (11.0.5 ou plus).
+
+**Décision.**
+
+1. `eslint` passe de 9.39.4 à 10.15.0 (13 novembre 2026), version exacte ;
+   typescript-eslint passe de 8.68.0 à 8.73.0 dans le verrou, dans la plage
+   que demande déjà `eslint-config-next` 16.4.3 (`^8.56.0`), qui ne change
+   pas. `minimatch` 10.2.6 quitte l'arbre ; il reste 11.0.9 (eslint,
+   typescript-eslint) et 3.1.5 (greffons `import`, `jsx-a11y`, `react`), hors
+   de la plage vulnérable. `pnpm audit` ne signale plus minimatch.
+2. **Trois greffons hors de leur plage déclarée.** `eslint-plugin-import`
+   2.32.0, `eslint-plugin-jsx-a11y` 6.10.2 et `eslint-plugin-react` 7.37.5,
+   tirés par `eslint-config-next`, ne déclarent encore qu'eslint 9 au plus ;
+   ce sont leurs dernières versions. Ils sont acceptés sous eslint 10 par
+   `peerDependencyRules.allowedVersions` de `pnpm-workspace.yaml`, avec sa
+   raison et sa condition de retrait (quand chacun déclarera eslint 10),
+   après deux vérifications : un même fichier d'essai, écrit pour déclencher
+   une règle de chaque greffon (`react/jsx-key`, `react/display-name`,
+   `react/no-danger-with-children`, `jsx-a11y/alt-text`,
+   `jsx-a11y/aria-props`, `import/no-anonymous-default-export`,
+   `react-hooks/rules-of-hooks`, `react-hooks/exhaustive-deps`,
+   `@next/next/no-img-element`, trois règles de typescript-eslint et
+   `no-var`), donne les mêmes treize signalements sous eslint 9 et sous
+   eslint 10 ; la configuration résolue d'un fichier de l'interface
+   (`eslint --print-config`) a les mêmes 115 règles au même niveau, une seule
+   différence d'écriture sur `no-unused-vars`, éteinte dans les deux cas.
+3. **Deux épinglages levés**, devenus sans objet : `brace-expansion@5`
+   (minimatch 11 demande lui-même 5.0.12, la version épinglée) et `js-yaml@4`
+   (il venait de `@eslint/eslintrc`, qu'eslint 10 n'emploie plus : js-yaml
+   quitte l'arbre). `brace-expansion@1` reste, pour minimatch 3.
+4. `eslint.config.mjs` ne change pas : il emploie déjà la configuration
+   « plate » et `defineConfig` d'`eslint/config`, seules formes qu'accepte
+   eslint 10. La CI garde Node 22.13.0, le minimum qu'eslint 10 demande sur
+   cette génération (`^22.13.0`).
+
+**Hors de ce lot, signalé au porteur.** Le même `pnpm audit` relève sept
+vulnérabilités modérées de `next` 16.4.3, paquet de production (versions
+16.0.0 à 16.4.4, corrigées en 16.4.5 ; 16.4.6 est la dernière) : aucune
+touche aux fonctions qu'emploie le module d'après leurs titres (cache
+`use cache`, optimisation d'images, serveur Next auto-hébergé ; le module
+est servi par vinext), sans que ce soit vérifié une à une. La montée de
+`next` et d'`eslint-config-next` ensemble se fait dans un lot à part, comme
+le 8 octobre 2026.
+
+**Contrôles.** `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 245 tests
+verts, dont ceux de `tests/lint-boundaries.test.ts`, qui joue ESLint
+lui-même, puis les 603 tests de la persistance sous chacune des trois
+isolations et les 2 245 de nouveau sous la jauge du moteur commun, aucun
+échec), `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`
+et `pnpm site:check` réussis en local avant et après le changement ; `pnpm
+audit` avant : huit vulnérabilités modérées (minimatch et les sept de
+`next`), après : sept (`next`). `pnpm e2e` n'est pas joué en local : ni
+l'interface ni ses services ne changent, aucun paquet de production ne
+change (`pnpm why eslint --prod` ne trouve rien, le paquet construit ne
+contient aucune trace d'eslint) ; la suite complète des parcours est jouée
+par la CI de la PR.

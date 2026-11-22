@@ -28,12 +28,24 @@ overrides:
   sharp@0.35: 0.35.5
   # fast-uri, via webpack et ajv (chaîne de compilation de @vitejs/plugin-rsc).
   fast-uri@3: 3.1.9
-  # brace-expansion, via minimatch (eslint et eslint-config-next).
+  # brace-expansion, via minimatch 3 (eslint-plugin-import, eslint-plugin-jsx-a11y
+  # et eslint-plugin-react, tirés par eslint-config-next). Les épinglages
+  # `brace-expansion@5` (minimatch 11 demande lui-même 5.0.12) et `js-yaml@4`
+  # (@eslint/eslintrc, que n'emploie plus eslint 10) sont levés le
+  # 22 novembre 2026 avec le passage à eslint 10.
   brace-expansion@1: 1.1.21
-  brace-expansion@5: 5.0.12
-  # js-yaml, via @eslint/eslintrc.
-  js-yaml@4: 4.3.2
   # zod, via eslint-plugin-react-hooks (eslint-config-next).
   zod@4: 4.6.7
   # fflate, via satori et @vercel/og (vinext), absent du site déployé.
   fflate@0.7: 0.7.5
+
+# eslint 10 (22 novembre 2026) : trois greffons tirés par eslint-config-next
+# 16.4.3 ne déclarent encore qu'eslint 9 au plus. Leurs règles ont été jouées
+# sous eslint 9 et sous eslint 10 sur un même fichier d'essai, avec les mêmes
+# signalements, et la configuration résolue est la même règle pour règle.
+# À retirer quand chacun déclarera lui-même eslint 10.
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-import>eslint: '10'
+    eslint-plugin-jsx-a11y>eslint: '10'
+    eslint-plugin-react>eslint: '10'
