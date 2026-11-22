@@ -43,6 +43,22 @@ export const JOURNAL_TABLES: Readonly<Record<string, readonly ChangeSubject[]>> 
   irrigation_crop_drying_revisions: ['jours-de-sechage'],
   irrigation_feature_selections: ['fonctionnalites'],
   irrigation_phone_notice_settings: ['message-du-matin', 'rappel-du-soir'],
+  // Réglages que la liste du contrat ne nommait pas, au journal depuis D-289 (F718).
+  irrigation_crop_kc_overrides: ['kc-corrige'],
+  irrigation_crop_reference_crops: ['culture-de-reference'],
+  irrigation_crop_reference_seasons: ['culture-de-reference'],
+  irrigation_crop_reference_season_months: ['culture-de-reference'],
+  irrigation_crop_reference_stages: ['culture-de-reference'],
+  irrigation_crop_reference_stage_starts: ['culture-de-reference'],
+  irrigation_crop_species_links: ['correspondance-d-espece'],
+  irrigation_crop_shelter_factors: ['k-abri'],
+  irrigation_crop_bed_mulch: ['paillage-plastique'],
+  irrigation_crop_shade_nets: ['filet-d-ombrage'],
+  irrigation_crop_water_options: ['options-du-besoin'],
+  irrigation_plot_shelters: ['jardin-sous-abri'],
+  irrigation_garden_groups: ['groupe-de-jardins'],
+  irrigation_garden_group_members: ['groupe-de-jardins'],
+  irrigation_weather_preferences: ['lieu-meteo'],
   // Matériel et ressources.
   irrigation_equipment: ['materiel'],
   irrigation_equipment_settings: ['reglage-de-materiel'],
@@ -67,8 +83,6 @@ const WEATHER = 'Une synchronisation météo et ce qu’elle garde : le contrat 
 const DOMAIN_LOG = 'Un journal de domaine, écrit en même temps que le réglage qu’il garde et inchangé : le journal général s’écrit en plus, il ne le relit pas (F706).';
 const OTF = 'Une lecture d’Ouvre ta ferme, son raccordement ou son rythme : des copies et des compteurs, aucun geste du maraîcher sur ses réglages.';
 const COMMON = 'Une table de l’exploitant du service ou commune à toutes les fermes : le contrat laisse ses actes hors du journal (§5.1).';
-/** Réglages que la liste du contrat (§5.1) ne nomme pas : hors du journal dans cette version, à ajouter sur le mot du porteur (F718). */
-const NOT_LISTED = 'Un réglage que la liste du contrat (§5.1) ne nomme pas : hors du journal dans cette version, à y ajouter si le porteur le demande (F718).';
 
 /** Les tables hors du journal, chacune avec sa raison. */
 export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
@@ -104,7 +118,6 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   // Météo.
   irrigation_weather_daily_values: `${WEATHER} La pluie mesurée y est aussi : une observation.`,
   irrigation_weather_geocodes: WEATHER,
-  irrigation_weather_preferences: `${NOT_LISTED} Le lieu météo de la ferme y côtoie l’état de ses synchronisations.`,
   // Journaux de domaine.
   irrigation_planning_settings_log: DOMAIN_LOG,
   irrigation_protected_slots_log: DOMAIN_LOG,
@@ -112,22 +125,7 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   irrigation_water_infrastructure_log: DOMAIN_LOG,
   irrigation_need_decision_log: DOMAIN_LOG,
   irrigation_equipment_placement_history: `${DOMAIN_LOG} Le registre des poses (2.11) garde chaque période posée.`,
-  // Réglages que la liste du contrat ne nomme pas.
-  irrigation_crop_bed_mulch: NOT_LISTED,
-  irrigation_crop_kc_overrides: NOT_LISTED,
-  irrigation_crop_reference_crops: NOT_LISTED,
-  irrigation_crop_reference_season_months: NOT_LISTED,
-  irrigation_crop_reference_seasons: NOT_LISTED,
-  irrigation_crop_reference_stage_starts: NOT_LISTED,
-  irrigation_crop_reference_stages: NOT_LISTED,
-  irrigation_crop_shade_nets: NOT_LISTED,
-  irrigation_crop_shelter_factors: NOT_LISTED,
-  irrigation_crop_species_links: NOT_LISTED,
-  irrigation_crop_water_options: NOT_LISTED,
-  irrigation_plot_shelters: NOT_LISTED,
-  irrigation_garden_groups: NOT_LISTED,
-  irrigation_garden_group_members: NOT_LISTED,
-  irrigation_season_geometry: NOT_LISTED,
+  irrigation_season_geometry: 'Le repère d’une saison des groupes de jardins (créée, ou copiée de la saison d’avant) : un état que le module tient, pas un réglage ; les groupes eux-mêmes sont au journal (D-289).',
   // Tables communes, de l'exploitant, et lectures d'Ouvre ta ferme.
   irrigation_background_jobs: COMMON,
   irrigation_operator_notices: COMMON,
@@ -159,6 +157,9 @@ const sansObjet = (reason: string) => ({ status: 'sans-objet', reason }) as cons
 
 /** Une table fille, écrite par la même fonction que sa mère : la ligne de la mère dit son changement. */
 const CHILD_OF = (parent: string) => sansObjet(`Table fille, écrite dans le même lot que ${parent} : la ligne de journal de la mère porte son changement.`);
+
+const WEATHER_SYNC = sansObjet('L’état d’une synchronisation météo (tentative, réussite, erreur, attente) : le module le tient, ce n’est pas un réglage (§5.1).');
+const GROUPS_CARRIED = sansObjet('Les groupes de la saison d’avant reportés sur une saison neuve, par le module, à la première lecture : les mêmes groupes, aucun geste.');
 
 /**
  * Chaque endroit qui écrit dans une table du journal, « fichier › fonction ›
@@ -230,5 +231,31 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/equipment-placement-repository.ts › saveEquipmentPlacementForUser › irrigation_placement_selected_beds': CHILD_OF('irrigation_equipment_placements'),
   'db/equipment-placement-repository.ts › updateEquipmentPlacementSettingForUser › irrigation_equipment_placements': branche('pose'),
   'db/equipment-placement-repository.ts › removeEquipmentPlacementForUser › irrigation_equipment_placements': branche('pose'),
-  'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_equipment_placements': sansObjet('Une pose détachée du groupe de jardins qu’on supprime : la conséquence d’un geste sur les groupes, hors de la liste du contrat (F718) ; la pose elle-même ne change pas.'),
+  'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_equipment_placements': sansObjet('Une pose détachée du groupe de jardins qu’on supprime : la conséquence d’un geste sur les groupes, que la ligne du groupe supprimé dit (D-289) ; la pose elle-même ne change pas.'),
+  // Réglages que la liste du contrat ne nommait pas (F718 ; D-289).
+  'db/crop-water/entries.ts › addKcOverrideForUser › irrigation_crop_kc_overrides': branche('kc-corrige'),
+  'db/crop-water/references.ts › saveFarmReferenceCropForUser › irrigation_crop_reference_crops': branche('culture-de-reference'),
+  'db/crop-water/references.ts › deleteFarmReferenceCropForUser › irrigation_crop_reference_crops': branche('culture-de-reference'),
+  'db/crop-water/references.ts › partStatements › irrigation_crop_reference_stages': CHILD_OF('irrigation_crop_reference_crops'),
+  'db/crop-water/references.ts › partStatements › irrigation_crop_reference_seasons': CHILD_OF('irrigation_crop_reference_crops'),
+  'db/crop-water/references.ts › partStatements › irrigation_crop_reference_season_months': CHILD_OF('irrigation_crop_reference_crops'),
+  'db/crop-water/references.ts › partStatements › irrigation_crop_reference_stage_starts': CHILD_OF('irrigation_crop_reference_crops'),
+  'db/crop-water/entries.ts › linkStatements › irrigation_crop_species_links': branche('correspondance-d-espece'),
+  'db/crop-water/entries.ts › deleteSpeciesCorrespondenceForUser › irrigation_crop_species_links': branche('correspondance-d-espece'),
+  'db/crop-water/settings.ts › addShelterFactorForUser › irrigation_crop_shelter_factors': branche('k-abri'),
+  'db/crop-water/settings.ts › saveBedMulchForUser › irrigation_crop_bed_mulch': branche('paillage-plastique'),
+  'db/crop-water/settings.ts › addShadeNetForUser › irrigation_crop_shade_nets': branche('filet-d-ombrage'),
+  'db/crop-water/settings.ts › removeShadeNetForUser › irrigation_crop_shade_nets': branche('filet-d-ombrage'),
+  'db/crop-water/settings.ts › saveCropWaterOptionsForUser › irrigation_crop_water_options': branche('options-du-besoin'),
+  'db/plot-shelter-repository.ts › savePlotSheltersForUser › irrigation_plot_shelters': branche('jardin-sous-abri'),
+  'db/garden-group-repository.ts › saveGardenGroupForUser › irrigation_garden_groups': branche('groupe-de-jardins'),
+  'db/garden-group-repository.ts › saveGardenGroupForUser › irrigation_garden_group_members': CHILD_OF('irrigation_garden_groups'),
+  'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_garden_groups': branche('groupe-de-jardins'),
+  'db/garden-group-repository.ts › deleteGardenGroupForUser › irrigation_garden_group_members': CHILD_OF('irrigation_garden_groups'),
+  'db/garden-group-repository.ts › listGardenGroupConfigurationForUser › irrigation_garden_groups': GROUPS_CARRIED,
+  'db/garden-group-repository.ts › listGardenGroupConfigurationForUser › irrigation_garden_group_members': GROUPS_CARRIED,
+  'db/water-management-repository.ts › saveWeatherPreferenceForUser › irrigation_weather_preferences': branche('lieu-meteo'),
+  'db/water-management-repository.ts › recordWeatherRefreshForUser › irrigation_weather_preferences': WEATHER_SYNC,
+  'db/water-management-repository.ts › tryClaimWeatherRefreshForUser › irrigation_weather_preferences': WEATHER_SYNC,
+  'db/automatic-weather-repository.ts › recordAutomaticWeatherWorkspaceResult › irrigation_weather_preferences': WEATHER_SYNC,
 };

@@ -1,4 +1,5 @@
 import { countText, dateClockText } from '../clock-text.ts';
+import { FAO_POINTS } from '../crop-water/settings-view.ts';
 import type { IrrigationSnapshot } from '../domain.ts';
 import type { ChangeJournalEntry, ChangeValues } from './entry.ts';
 import { changeFieldWords, changeValueText, dayKeyText, type NameOf } from './fields.ts';
@@ -98,6 +99,10 @@ function objectText(context: ChangeValues, nameOf: NameOf): string | null {
   const name = textOf('name') ?? textOf('label');
   if (equipment !== null) parts.push(name === null ? equipment : `${equipment} › ${name}`);
   else if (name !== null) parts.push(name);
+  // Le Kc corrigé d'une culture de référence : l'un des trois Kc de la FAO, ou un stade par son rang (D-289).
+  const faoPoint = FAO_POINTS.find((point) => point.fao === textOf('faoPoint'));
+  if (faoPoint !== undefined) parts.push(faoPoint.label);
+  else if (typeof context.stageRank === 'number') parts.push(`stade ${context.stageRank}`);
   const weekStart = textOf('weekStart');
   if (weekStart !== null) parts.push(`semaine du ${dayKeyText(weekStart)}`);
   else if (context.season !== undefined && context.season !== null) parts.push(`saison ${String(context.season)}`);

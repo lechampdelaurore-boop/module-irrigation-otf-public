@@ -845,6 +845,24 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 8, les
+  réglages restants, codée le 21 novembre 2026** (D-289, F725 à F729),
+  empilée sur la PR 7 ; règle F718. Les réglages que la liste du contrat ne
+  nommait pas écrivent leur ligne dans leur lot : Kc corrigés, cultures de
+  référence de la ferme (créée, modifiée, retirée), correspondance des
+  espèces, K_abri, paillage plastique, filets d'ombrage, options du besoin
+  par culture, jardins sous abri, groupes de jardins, lieu de la météo ;
+  dix sujets nouveaux, famille « Réglages ». Une valeur composée (stades,
+  jeux de saison, jardins d'un groupe) se garde en un texte relu à
+  l'identique : un enregistrement identique n'écrit rien. Hors du journal,
+  avec leur raison : l'état des synchronisations météo, le report des
+  groupes d'une saison sur l'autre, la proposition du module pour un
+  jardin. Sans migration ni écran nouveau. Contrôles : voir la PR. Décidé
+  par le coordinateur dans l'autonomie que le porteur lui a confiée
+  (19 novembre 2026), confirmé par le porteur le 21 novembre 2026 à
+  23 h 13. **En ligne le 22 novembre 2026 à 2 h 18** (#171, fusionnée à
+  1 h 54, run 44968875446 vérifié job par job : les cinq jobs verts).
+
 - Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
   l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
   la PR 6. En bas de « Réglages », juste avant « Supprimer ma ferme et mes
@@ -858,8 +876,10 @@ registres, elle y renvoie.
   mise en service, lue dans la liste des migrations reçues par la base. Le
   budget de hauteur de « Réglages » au téléphone (P40) passe à 3 750 px.
   Parcours P55 à 390 et 1 440 px. Sans migration. Contrôles : voir la PR.
-  L'amélioration n° 7 est codée en entier ; reste F718 (les réglages hors
-  de la liste du contrat), sur le mot du porteur.
+  L'amélioration n° 7 est codée en entier ; F718 (les réglages hors de la
+  liste du contrat) est réglée par la PR 8 (D-289). **En ligne le
+  22 novembre 2026 à 1 h 53** (#169, fusionnée à 1 h 24, run 44966444472
+  vérifié job par job : les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
   matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,
@@ -870,7 +890,9 @@ registres, elle y renvoie.
   défaut, poses. Une ressource, une réserve, un réglage ou une pompe se lit
   par son nom, avant comme après. L'inventaire n'a plus d'écrivain « à
   brancher » : tous sont branchés ou sans objet. Reste l'écran (PR 7). Sans
-  migration. Contrôles : voir la PR.
+  migration. Contrôles : voir la PR. **En ligne le 22 novembre 2026 à
+  1 h 23** (#168, fusionnée à 1 h 01, run 44964576478 vérifié job par job :
+  les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
   objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
@@ -1408,8 +1430,10 @@ registres, elle y renvoie.
   chaque fusion) ;
   **l'adaptateur de la jauge, PR 1 sur 3, codé le même soir** (contrat
   `docs/shared-engine-adapter-contract.md`), posé sur une PR de découpage
-  sans changement de comportement (la forme du jour de la jauge dans
-  `lib/domain/soil-reserve/gauge-shape.ts`). Le moteur v0.3.0 (commit
+  sans changement de comportement (#157, la forme du jour de la jauge dans
+  `lib/domain/soil-reserve/gauge-shape.ts` ; **#157 en ligne le
+  22 novembre 2026 à 2 h 39**, fusionnée à 2 h 19, run 44970891913 vérifié
+  job par job : les cinq jobs verts). Le moteur v0.3.0 (commit
   `a36ca0d` de la branche principale du dépôt commun) figé dans
   `lib/domain/soil-reserve/shared-engine/`, avec ses types et l'empreinte
   de chaque fichier ; l'interrupteur `GAUGE_ENGINE` reste sur l'ancien
@@ -1423,9 +1447,10 @@ registres, elle y renvoie.
   lint, typage, 1 930 tests et les trois passages d'isolation, le rejeu des
   1 930 sur le moteur, compilation, knip, `demo:check`, verts ; parcours
   navigateur et Workers sans rapport (ni interface ni Worker touchés), joués
-  par la CI. Reste : la PR passe en dernier dans la file, rebasée après les
-  chaînes 4.4 et 4.5 ; la PR 2 (l'interrupteur sur le moteur) après trois
-  matins sans écart sur la ferme.
+  par la CI. Reste : la PR passe en dernier dans la file, après les
+  chaînes 4.4 et 4.5 et #157, remise à jour par fusion de la branche
+  principale ; la PR 2 (l'interrupteur sur le moteur) après trois matins
+  sans écart sur la ferme.
 - **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
   22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
   culture et par stade (5 quater), les alertes météo par culture (5

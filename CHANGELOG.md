@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 8 : les réglages restants)
+
+- **Les réglages restants écrivent eux aussi au journal des
+  modifications** (D-289, F725 à F729) : les Kc corrigés, les cultures de
+  référence propres à la ferme, la correspondance des espèces, l'effet des
+  abris (K_abri), le paillage plastique d'une planche, les filets
+  d'ombrage, les options du besoin par culture, le classement d'un jardin
+  sous abri ou de plein champ, les groupes de jardins et le lieu de la
+  météo. Chacun a sa carte dans « Journal des modifications », famille
+  « Réglages », avec l'avant et l'après de chaque champ changé. Restent
+  hors du journal, avec leur raison : l'état des synchronisations météo, le
+  report des groupes de jardins d'une saison sur l'autre, la proposition
+  du module pour un jardin.
+
 ### Ajouté (Améliorations, n° 7, PR 7 sur 7)
 
 - **« Journal des modifications » dans « Réglages »** (D-288, F722 à F724) :
