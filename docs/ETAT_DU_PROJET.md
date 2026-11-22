@@ -25,7 +25,8 @@ registres, elle y renvoie.
   sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
   et 5 attendaient l'avis agronomique, **donné le 21 novembre 2026 au soir** :
   contrat court `docs/ameliorations-4-5-contract.md`, n° 4 codée (D-290),
-  n° 5 codée (D-291). PR de registres seule : **aucun contrôle rejoué**,
+  n° 5 codée (D-291), **toutes deux en ligne le 22 novembre 2026 à 4 h 34 et
+  5 h 00** (#172, #173 ; ci-dessous). PR de registres seule : **aucun contrôle rejoué**,
   sans rapport avec le code. Registres en ligne le 21 novembre 2026 à
   14 h 52 (#162, fusionnée à 14 h 25, run 44908773229 vérifié job par job : les cinq jobs verts) ;
   contrat en ligne le 21 novembre 2026 à 16 h 04 (#170, fusionnée à
@@ -48,8 +49,8 @@ registres, elle y renvoie.
   en local ; **`pnpm e2e` non rejoué en local**, sans rapport : ni
   l'interface ni les services qu'elle appelle ne changent (seuls les envois
   de fond du matin et du soir) ; la suite complète des parcours est jouée
-  par la CI de la PR. Fusion après la file en cours (#174, fusionnée,
-  puis #175, les registres de la revue).
+  par la CI de la PR. Fusionnée le 22 novembre 2026 à 12 h 22 (#176),
+  avant les registres de la revue (#175).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -574,6 +575,76 @@ registres, elle y renvoie.
   (`cloudflare/irrigation-site/src/pages.ts`). En ligne le 21 novembre 2026
   à 15 h 21 (#155, fusionnée à 14 h 53, run 44911074686 vérifié job par job : les cinq jobs verts).
 
+- Tranche 4, **4.6 : revue de l'isolation de la 4.3 à la 4.5 (condition E8
+  de la fiche d'entrée), faite le 22 novembre 2026** par un fil à part, en
+  Opus 5.5 · Max (réglage de la ligne 4.7), sur `main` à `ba8cbde`, sans
+  code (rapport :
+  `/mnt/project-files/tranche-4/revue-isolation-fermes-2026-11-22.md`).
+  **Revue partielle, assumée** : la 4.3 PR 3 et PR 4 n'existent pas, le
+  coffre est relu endormi. **Aucune fuite de données entre fermes** :
+  121 requêtes nouvelles ou changées depuis la revue du 18 novembre, les 80
+  sans filtre d'espace visible relues une à une ; le contrôle de cohérence
+  des espaces (F380) range les 98 tables d'une base migrée jusqu'à 0045,
+  sans problème. **Constat A, à corriger avant l'essai E2 et le pilote** :
+  le message du matin (#164) et le rappel du soir (#165) portent le même
+  identifiant d'alarme dans toutes les fermes (`morning:<jour>`,
+  `evening:<jour>`) ; quand deux espaces en envoient un le même jour, l'un
+  se perd sans bruit, et il est noté parti (la réponse `stale` du Worker de
+  notification comptée comme réussie) ; aucun contenu ne passe chez
+  l'autre ferme ; reproduit sur le code du Worker. Correctif retenu le
+  22 novembre 2026 : l'espace dans l'identifiant et l'étiquette, `stale`
+  traité comme non parti, des tests à deux espaces et une précision du
+  contrat des améliorations, dans un fil de code à part, après le lot
+  minimatch, avec le test du point D4 : **codé et fusionné le même jour**
+  (#176, D-293). **Constat B, à trancher avant la
+  4.6** : l'exploitant est toute personne de la ferme du déploiement
+  (F608) ; au pilote, une autre personne de la ferme du porteur admise par
+  Access verrait la page d'état des fermes pilotes. **Points D2 à D5 du
+  18 novembre** : D2 fermé (#95), D5 fermé (#94), D3 à la 4.3 PR 4 (F364),
+  D4 (le test promis par F366) avec le correctif du constat A. Points
+  mineurs : une restauration de toute la base fait revenir les fermes
+  effacées après l'instant choisi (une étape à ajouter à la procédure de
+  `docs/exploitation.md`) ; le texte de confidentialité promet l'effacement
+  de la clé à « Déconnecter la ferme », geste de la 4.3 PR 3 et 4 (E7) ; le
+  frein des refus d'accès vaut pour toutes les fermes, par conception
+  (F359), à revoir avec la PR 3 et la PR 4. **E8 pas encore cochable** :
+  restent D3 et une relecture de la 4.3 PR 3 et PR 4 (le correctif du
+  constat A et le test D4 sont fusionnés, #176). Mesuré : `pnpm test`
+  rejoué en entier sur `ba8cbde` (2 245 tests,
+  puis 603 pour chacune des trois passes d'isolation et 2 245 pour la passe
+  de la jauge du moteur commun, tous réussis, en 5 min 2 s) ; rien n'est
+  lu en production.
+- Tranche 4, **4.6 : constats du 22 novembre 2026 pour la fiche d'entrée,
+  gardés hors de la fiche** (un fil à part, en lecture seule, sur `main` à
+  `ba8cbde`). La fiche `docs/pilote-fiche-entree.md` reste vide : elle ne
+  se remplit qu'au moment où il reste moins de trois lignes ouvertes (sa
+  propre règle, maintenue le 22 novembre 2026). **E9 cochable** : les trois
+  documents existent (`docs/pilote-accord-modele.md`,
+  `docs/pilote-recette.md`, `docs/pilote-retour-modele.md`, 20 novembre
+  2026). **E7 pas encore** : la page de confidentialité dit la clé d'accès
+  « effacée quand vous déconnectez la ferme dans le module », geste qui
+  n'existe pas avant la 4.3 PR 3 et PR 4 (à cocher après E2, ou la page
+  reformulée d'ici là) ; le reste de la page dit ce que fait le code
+  (journal d'accès du support, 12 mois ; effacement 7 jours après la
+  demande ; durées ; phrase des 30 jours) ; la fiche dit « effacement sous
+  sept jours », le code efface 7 jours après la demande. **E5 pas encore** :
+  la 4.5 est en ligne en entier, l'effacement et la restauration (S1 à S3)
+  sont prouvés, la phrase des 30 jours est en ligne ; **la première veille
+  réelle a tourné le dimanche 22 novembre 2026 à 9 h 00** (page « État du
+  module » lue dans le Chrome du porteur vers 10 h 45, sans rien changer :
+  « Tout va bien : les 10 tâches sont à l'heure. », « Dernière notification
+  de la veille : « tout va bien », le 22/11 à 9 h 00. ») ; restent non
+  vérifiés la réception sur l'appareil du porteur et le cas d'une alerte
+  réelle. La même lecture dit la tâche du rappel du soir à l'heure
+  (dernière réussite le 22 novembre 2026 à 10 h 05). Détail :
+  `/mnt/project-files/pilote-fiche/preremplissage-E5-E7-E9-2026-11-22.md`.
+  PR de registres seule : **aucun contrôle rejoué pour cette PR** (la revue
+  a rejoué `pnpm test`, ci-dessus) ; elle date aussi les mises en ligne
+  de #172 et #173, consignées par le lot eslint 10, de la fin de leur run
+  (4 h 34 et 5 h 00), comme les autres entrées, au lieu de la fin du
+  déploiement du site (4 h 33 et 4 h 59) ; et elle consigne la mise en
+  ligne de #174 (eslint 10), le 22 novembre 2026 à 12 h 13.
+
 - Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
   (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
   codée le 20 novembre 2026 en Opus 5.5 · Très élevé, sur la place de code
@@ -1061,7 +1132,7 @@ registres, elle y renvoie.
   de la branche principale après la n° 7, #157 et #158. La même PR consigne
   la remise à zéro de nuit de la démonstration, lue dans les journaux
   (ligne 4.0), et la mise en ligne de #158.
-  **En ligne le 22 novembre 2026 à 4 h 33** (#172, fusionnée à 4 h 08, run
+  **En ligne le 22 novembre 2026 à 4 h 34** (#172, fusionnée à 4 h 08, run
   44979248732 vérifié job par job : les cinq jobs verts ; migration 0045
   appliquée sur les deux bases).
 
@@ -1097,8 +1168,9 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P57 (nouveau), P10, P26, P28, P31,
   P40 et P41 joués en local aux deux largeurs ; la suite complète des
   parcours jouée par la CI de la PR. À fusionner après la n° 4 (#172).
-  **En ligne le 22 novembre 2026 à 4 h 59** (#173, fusionnée à 4 h 35, run
-  44981325097 vérifié job par job : les cinq jobs verts).
+  **En ligne le 22 novembre 2026 à 5 h 00** (#173, fusionnée à 4 h 35, run
+  44981325097 vérifié job par job : les cinq jobs verts ; sans migration,
+  « No migrations to apply » sur les deux bases).
 
 - Outillage, **lot eslint 10 : codé le 22 novembre 2026** (D-292), le lot à
   part de l'alerte minimatch, sur le « vas-y » du porteur, en Opus 5.5 ·
@@ -1117,6 +1189,10 @@ registres, elle y renvoie.
   de production, corrigé en 16.4.5), pour un lot à part. `pnpm e2e` omis en
   local, sans rapport (ni l'interface ni ses services ne changent) ; la
   suite complète des parcours jouée par la CI de la PR.
+  **En ligne le 22 novembre 2026 à 12 h 13** (#174, fusionnée à 11 h 40,
+  run 45013604410 vérifié job par job : les cinq jobs verts ; sans
+  migration, « No migrations to apply » sur les deux bases ; consigné par
+  la PR de la revue de l'isolation de la 4.3 à la 4.5).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
@@ -2651,7 +2727,7 @@ registres, elle y renvoie.
   Sonnet 5.5 · Moyen pour le travail sans code.
 - Reste au jugement du porteur : la lisibilité sur téléphone ; l'alerte
   minimatch (eslint 10), lot à part, est traitée le 22 novembre 2026 sur son
-  « vas-y » (D-292).
+  « vas-y » (D-292), en ligne le même jour (#174).
 - Charte graphique d'Ouvre ta ferme relevée le 6 novembre 2026 :
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot

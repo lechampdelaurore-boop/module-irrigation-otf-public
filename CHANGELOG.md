@@ -5,6 +5,27 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documentation (revue de l'isolation de la 4.3 à la 4.5, registres)
+
+- **La revue de l'isolation de la 4.3 à la 4.5** (condition E8 de la fiche
+  d'entrée du pilote), faite le 22 novembre 2026 par un fil à part, sur
+  `main` à `ba8cbde`, sans code : aucune fuite de données entre fermes ; un
+  défaut à corriger avant l'essai E2 et le pilote (le message du matin et le
+  rappel du soir partagent leur identifiant d'alarme d'une ferme à l'autre :
+  un message se perd et il est noté parti), correctif retenu, codé le même
+  jour dans un fil à part (#176) ; l'état des points D2 à D5 du 18 novembre
+  2026 (D2 et D5 fermés, D3 ouvert, D4 venu avec le correctif). Rapport dans le dossier du projet, résumé dans
+  l'état du projet et la roadmap. Aucun code, aucun contrôle rejoué pour la
+  PR.
+- **Les constats du 22 novembre 2026 pour la fiche d'entrée** (E5, E7, E9)
+  consignés dans l'état du projet ; la fiche elle-même reste vide, comme le
+  veut sa règle (moins de trois lignes ouvertes).
+- **Heures de mise en ligne** des améliorations n° 4 (#172) et n° 5
+  (#173) : la fin de leur run, le 22 novembre 2026 à 4 h 34 et 5 h 00,
+  comme les autres entrées.
+- En ligne le 22 novembre 2026 : #174, eslint 10, fusionnée à 11 h 40 et
+  déployée à 12 h 13 (run 45013604410, cinq jobs verts).
+
 ### Corrigé (Améliorations, n° 2 et 3 : une alarme par espace)
 
 - **Le message du matin et le rappel du soir ne se perdent plus quand
