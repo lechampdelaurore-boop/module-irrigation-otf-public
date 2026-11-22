@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 20 novembre 2026.
+Dernière mise à jour : 21 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Sept améliorations validées par le porteur le 21 novembre 2026** (D-280,
+  roadmap, section 6 septies), inscrites après vérification dans le code :
+  « Fait comme prévu » (n° 1) existe déjà, le résumé du matin (n° 3) existe en
+  écran et la zone « Fiabilité du calcul » couvre en partie les données
+  manquantes (n° 6) ; restent le rappel du soir (n° 2), le journal des
+  modifications (n° 7) et, **réservées à l'avis agronomique du porteur**, la
+  priorité selon le stade critique (n° 4) et l'écart prévu/réel expliqué
+  (n° 5). **Démarrage avancé le 21 novembre 2026 (« Vas-y », D-281)** : le
+  contrat court des n° 6, 2, 3 et 7 est écrit
+  (`docs/ameliorations-6-2-3-7-contract.md`, sept PR de code), leur code part
+  sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
+  et 5 attendent l'avis agronomique. PR de registres seule : **aucun contrôle rejoué**,
+  sans rapport avec le code. Registres en ligne le 21 novembre 2026 à
+  14 h 52 (#162, fusionnée à 14 h 25, run 44908773229 vérifié job par job : les cinq jobs verts) ;
+  contrat en ligne le 21 novembre 2026 à 16 h 04 (#170, fusionnée à
+  15 h 44, run 44915463270 vérifié job par job : les cinq jobs verts).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -481,13 +497,17 @@ registres, elle y renvoie.
   planning avant la validation du groupe « Planning », le calcul du matin
   la passe sans échec ; bandeau « réglages du planning à valider » ; aucune
   migration ; la borne de l'ET0 reste à 12 mm/j, son passage à 15 proposé
-  au dépôt commun (MC-37). Contrôles de la PR : `pnpm lint`,
+  au dépôt commun (MC-37). **MC-37 acceptée par Nicolas le 20 novembre
+  2026** : la borne passe à 15 dans une PR à part (D-232, F591, section
+  8 bis.19 du contrat), avec la table des ETM du jour recréée par la migration 0042 (sa
+  contrainte bornait aussi à 12) ; cas L6 exécuté, conforme ; fusion après
+  la 4.5 et l'export de la base par le porteur ; en ligne le 21 novembre 2026 à 22 h 37 (#156, fusionnée à 22 h 08, run 44950009344 vérifié job par job : les cinq jobs verts ; export de la base fait par le porteur à 22 h 08, 42 migrations reçues). Contrôles de la PR : `pnpm lint`,
   `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; sept sabotages, chacun détecté ; parcours P46 étendu, P29, P28,
   P31 et P10 rejoués en local.
   **PR 5b, la vérification finale** (D-230, F589, section 8 bis.17 du
-  contrat) : le pli « Accueil de la ferme » dit chaque groupe des réglages
+  contrat), en ligne le 20 novembre 2026 à 20 h 39 (#137, fusionnée à 20 h 12, run 44799990126 vérifié job par job : les cinq jobs verts) : le pli « Accueil de la ferme » dit chaque groupe des réglages
   (confirmé, passé ou proposé) et ce qui reste inconnu (espèces non
   rattachées, jardins à classer, parcelles sans sol), avec leur lien ;
   plusieurs fermes d'une même personne (F418) remis à la 4.3, PR 3.
@@ -495,7 +515,7 @@ registres, elle y renvoie.
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; parcours P46 rejoué en local.
   **PR 4d, le modèle des rattachements du porteur** (D-231, F590, section
-  8 bis.18 du contrat) : 40 liens espèce-culture relevés en lecture seule
+  8 bis.18 du contrat), en ligne le 20 novembre 2026 à 21 h 01 (#146, fusionnée à 20 h 41, run 44804467204 vérifié job par job : les cinq jobs verts) : 40 liens espèce-culture relevés en lecture seule
   dans sa ferme (saison 2026, 77 espèces), 11 par analogie, l'analogie
   gardée ; les espèces sans référence et l'engrais vert hors du modèle.
   Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
@@ -516,6 +536,299 @@ registres, elle y renvoie.
   appliquée telle quelle par le code (PR 5). Rien n'est vérifié en réel (finesse de Time Travel, limites de
   D1 pour l'effacement par lots). Contrôles : documentation seule.
 
+- Tranche 4, **4.6, PR 1 : les quatre documents du pilote écrits le 20
+  novembre 2026** (D-260, F570, F572, F573, F574, F575 ; sans code, Sonnet
+  5.5 · Moyen) : `docs/pilote-accord-modele.md` (accord par version datée,
+  neuf points, à faire relire gratuitement par le réseau du porteur avant
+  tout envoi, E6), `docs/pilote-recette.md` (étapes S0 à S5, protocole
+  d'isolation I1 à I5, grille par page, questions oui/non pour la personne
+  de la ferme pilote), `docs/pilote-retour-modele.md` (fiche de retour,
+  résumé sans nom) et `docs/pilote-fiche-entree.md` (les douze conditions
+  d'entrée, vides). Aucun nom, adresse ni donnée de ferme dans ces
+  fichiers. Rien n'est envoyé : le choix et le contact des fermes, l'envoi
+  de l'accord et la relecture juridique restent au porteur. Contrôles :
+  documentation seule, aucun contrôle de code rejoué ; relecture faite par
+  l'assistant contre le contrat (10 ter) et contre les textes publics
+  (`cloudflare/irrigation-site/src/pages.ts`). En ligne le 21 novembre 2026
+  à 15 h 21 (#155, fusionnée à 14 h 53, run 44911074686 vérifié job par job : les cinq jobs verts).
+
+- Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
+  (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
+  codée le 20 novembre 2026 en Opus 5.5 · Très élevé, sur la place de code
+  libre (la 4.4 codée hors accès d'OTF) : les quatre tâches du matin
+  (prévisions, réanalyse, calcul du matin, rotation du coffre) déclarées
+  dans `lib/domain/operations/task-registry.ts` avec leur rythme et leurs
+  seuils (orange à 26 heures, rouge à 36, ou trois échecs de suite ;
+  « jamais réussie » en orange) ; chaque matin enregistre une exécution par
+  tâche (migration 0037, additive), la réanalyse à part des prévisions ;
+  un test échoue pour tout déclencheur planifié absent du registre, règle
+  écrite dans `AGENTS.md` (F569). Rien ne change à l'écran ; la page
+  d'état et la veille viennent avec la PR 2. Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 854 tests, puis les 441 de
+  la base rejoués trois fois pour l'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; `pnpm e2e` non rejoué en local (aucun écran ni service appelé
+  par un écran ne change), la suite complète des parcours jouée par la CI
+  de la PR. Non vérifié sur le site : le premier matin après le
+  déploiement (R6), à lire au journal (`task_run_succeeded` ou
+  `task_run_failed`, une ligne par tâche) ou sur la page d'état de la
+  PR 2.
+  **En ligne le 20 novembre 2026 à 22 h 07** (#138, fusionnée à 21 h 48, run
+  44814597995 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 2 sur 5, première partie : la veille de
+  l'exploitant et sa page d'état** (D-241, F608 à F613, section 10 bis.12
+  de `docs/tranche-4-contract.md`), codée le 20 novembre 2026 en Opus 5.5 ·
+  Très élevé, à la suite de la PR 1 : un second déclencheur du
+  planificateur, à 9 h à Paris, lit le registre et envoie une notification
+  à l'exploitant (les espaces de la ferme du déploiement, sans appel à
+  OTF) quand une tâche est en retard, en panne ou jamais réussie, qui dit
+  laquelle et depuis quand ; « tout va bien » le dimanche ; une
+  notification par jour au plus (migration 0038, additive). La veille est
+  elle-même une tâche du registre. La page « État du module »
+  (`/irrigation/exploitation`), réservée à l'exploitant côté serveur, dit
+  en une ligne si tout va bien, puis l'état de chaque tâche ; parcours
+  P50 aux deux largeurs. L'observation par ferme et le test des journaux
+  (F564) suivent dans une seconde PR. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (1 874 tests, puis les 448 de la base
+  rejoués trois fois pour l'isolation), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local, et le parcours P50 aux deux largeurs ; la suite complète des
+  parcours jouée par la CI de la PR. Non vérifié sur le site : la première
+  veille réelle, et la notification reçue en vrai sur l'appareil de
+  l'exploitant (recette avec l'accord du porteur). À fusionner après la
+  PR 1 et son premier matin, sinon la première veille annoncerait les
+  tâches du matin « jamais réussies ».
+  **En ligne le 20 novembre 2026 à 22 h 35** (#140, fusionnée à 22 h 15, run
+  44818616335 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 2 sur 5, seconde partie : codée le 20 novembre
+  2026** (D-242, F614 à F618, section 10 bis.13 de
+  `docs/tranche-4-contract.md`). La page « État du module » montre chaque
+  ferme, la plus en difficulté d'abord : son raccordement, ses appels du
+  jour, ses erreurs d'OTF sur 24 heures et 7 jours, sa dernière lecture
+  complète, sa dernière météo et son dernier calcul du matin, jugés avec
+  les seuils du registre ; le jugement d'ensemble compte les fermes.
+  Chaque appel envoyé à OTF est compté par ferme et par heure (migration
+  0039, additive), et chaque échec se journalise sous le nom stable
+  `otf_call_failed`, sans adresse, ferme ni jeton. Un garde lit chaque
+  ligne écrite pendant `pnpm test`, même d'une console remplacée, et fait
+  échouer le fichier pour un jeton, un code d'autorisation, une adresse de
+  retour, une adresse électronique ou un nom de ferme ; son essai témoin a
+  trouvé quatre lignes qui recopiaient le message d'une erreur de la base,
+  corrigées. L'état de l'accueil (4.4-a) viendra sur la carte avec la
+  fusion de la 4.4. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test` (1 905 tests, puis les 452 de la base rejoués trois fois
+  pour l'isolation, tous sous le garde des journaux), `pnpm build`,
+  `pnpm knip` réussis en local, et le parcours P50 aux deux largeurs ; la
+  suite complète des parcours jouée par la CI de la PR. Non vérifié sur le
+  site : les premiers comptes réels de la ferme du porteur. À fusionner
+  après la première partie.
+  **En ligne le 20 novembre 2026 à 22 h 59** (#141, fusionnée à 22 h 38, run
+  44822149823 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 4 sur 5, première partie : codée le 20 novembre
+  2026** (D-243, F620 à F626, section 10 bis.14 de
+  `docs/tranche-4-contract.md`). L'export hebdomadaire de la base hors de
+  Cloudflare (décision 10 bis.9) : `pnpm backup:export`, lancé par le
+  porteur sur son ordinateur, reçoit l'export de Wrangler en mémoire,
+  jamais en clair sur le disque (l'adresse de téléchargement masquée), le
+  rejoue dans une base vide pour vérifier qu'il restaurerait la base
+  fidèlement (schéma des migrations, contraintes, clés étrangères,
+  empreinte de chaque table), le chiffre (AES-256-GCM, scrypt, mot de passe
+  tapé deux fois sans écho), l'écrit hors du dépôt, puis le relit et le
+  déchiffre. `pnpm backup:verify` contrôle un export fait. Les sabotages
+  (table retirée, ligne corrompue, migration oubliée, ligne orpheline) sont
+  trouvés par les essais ; un vrai export de la base locale des parcours,
+  par le vrai Wrangler, passe sans problème. L'export entre au registre
+  des tâches (orange à 8 jours, rouge à 10) avec le geste « J'ai fait
+  l'export du … » de la page d'état ; procédure dans
+  `docs/exploitation.md`. Sans migration. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (1 939 tests, puis les 453 de la base
+  rejoués trois fois pour l'isolation, sous le garde des journaux),
+  `pnpm build`, `pnpm knip` réussis en local, et le parcours P50 aux deux
+  largeurs ; la suite complète des parcours jouée par la CI de la PR. Non
+  vérifié : un export de la base en ligne (le premier, par le porteur, avec
+  la procédure). L'essai des scénarios S1 à S3 sur la base d'essai (seconde
+  partie) attend le « vas-y » du porteur pour créer cette base chez
+  Cloudflare. À fusionner après la PR 2.
+  **En ligne le 20 novembre 2026 à 23 h 33** (#143, fusionnée à 23 h 05, run
+  44825972893 vérifié job par job : les cinq jobs verts ; consigné par
+  #160). **Premier export de la semaine fait par le porteur le 21 novembre
+  2026 à 10 h 08**, sur son ordinateur, dans une copie neuve du dépôt public
+  (« Export vérifié » : 90 tables, 40 migrations reçues, la dernière 0039),
+  et noté sur la page d'état à 10 h 17.
+
+- Tranche 4, **4.5, PR 4 sur 5, seconde partie : codée le 20 novembre
+  2026** (D-244, F627 à F635, section 10 bis.15 de
+  `docs/tranche-4-contract.md`). L'essai de restauration,
+  `pnpm backup:rehearse` : deux fermes fictives écrites par les dépôts du
+  module, puis S1 (Time Travel : retour au signet noté, retour à l'état
+  d'avant, rattrapage de la seule ferme A, la ferme B à l'empreinte
+  identique), S2 (reconstruction depuis un export dans une base neuve,
+  comparée table par table, puis le contrôle de cohérence F380 et les
+  lectures des dépôts pour chaque ferme contre la base reconstruite) et S3
+  (clé du coffre perdue, absente, retrouvée). Sans option, une simulation
+  contre une fausse D1 en mémoire ; avec `--cloudflare`, sur trois bases
+  d'essai chez Cloudflare, détruites à la fin, par le flux « Essai de
+  restauration » (jamais sur une PR). Deux leçons de la simulation : l'export
+  brut de D1 ne se réimporte pas tel quel là où les clés étrangères sont
+  actives (d'où l'import rangé), et rattraper une ferme fait avancer ses
+  compteurs de révision (voulu). `pnpm backup:restore` reconstruit une base
+  perdue depuis un export chiffré, dans une base neuve ou vide seulement.
+  Procédures dans `docs/exploitation.md`. Sans migration. Contrôles :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test` (1 953 tests, puis les 453 de
+  la base rejoués trois fois pour l'isolation, sous le garde des journaux),
+  `pnpm knip` (qui lit désormais `scripts/backup/`) réussis en local, et la
+  simulation de `pnpm backup:rehearse` réussie ; `pnpm build` et les
+  parcours sans rapport (aucune page ni route changée), joués par la CI de
+  la PR. **L'essai chez Cloudflare, joué le 20 novembre 2026 sur le
+  « vas-y » du porteur, a réussi** : S1, S2 et S3 sur trois bases d'essai,
+  détruites à la fin, compte rendu collé dans la PR. La restauration à un
+  signet noté marche ; le signet d'un instant n'a pas été rendu (erreur
+  interne de Cloudflare, sur une base d'une minute) ; l'export brut ne se
+  réimporte pas, l'import rangé si ; un export de la base d'essai dure
+  environ 2,5 secondes. À fusionner après la première partie.
+  **En ligne le 20 novembre 2026 à 23 h 54** (#145, fusionnée à 23 h 35, run
+  44830015559 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 4 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-245, F636 et F637, section 10 bis.16 de
+  `docs/tranche-4-contract.md`). L'essai de restauration entre au registre
+  des tâches : une fois par trimestre, orange à 100 jours sans essai noté,
+  rouge à 120, « jamais réussi » en orange avant le premier ; la veille le
+  surveille. Sa carte, sur la page d'état, porte le geste « J'ai fait
+  l'essai du … », aux mêmes règles que celui de l'export ; les deux gestes
+  sont un seul code (`lib/domain/operations/operator-gesture.ts`), un test
+  liant chaque tâche faite par l'exploitant à son geste. Le jugement
+  d'ensemble compte 7 tâches. Sans migration. Le premier essai réussi (20
+  novembre 2026) se note sur la page une fois cette PR en ligne. À
+  fusionner après la seconde partie.
+  **En ligne le 21 novembre 2026 à 0 h 54** (#147, fusionnée à 0 h 27, run
+  44836928404 vérifié job par job : les cinq jobs verts ; consigné par
+  #160). L'essai du 20 novembre est noté sur la page d'état le 21 novembre à
+  10 h 17.
+
+- Tranche 4, **4.5, PR 3 sur 5, première partie : codée le 20 novembre
+  2026** (D-246, F640 à F648, section 10 bis.17 de
+  `docs/tranche-4-contract.md`). Le moteur de l'effacement d'une ferme :
+  une table des demandes (migration 0040), sept jours d'attente pendant lesquels l'espace est figé,
+  puis, le premier matin après, la tâche « farm-erasure » efface par lots
+  de 200 lignes tout ce que l'espace garde, table par table, et l'espace
+  lui-même en dernier ; un passage s'arrête à 300 instructions ou 20
+  secondes et le suivant reprend là où il en était. Un plan range chaque
+  table de la base (effacée, gardée par une table commune, ou gardée avec
+  sa raison) : une table ajoutée sans règle fait échouer la CI. Les douze
+  tables immuables acceptent l'effacement pendant une demande « en cours »
+  seulement. La page d'état gagne la ligne « Effacements » ; le registre
+  compte 8 tâches. Aucune demande ne peut encore être faite : le geste dans
+  « Réglages » viendra avec la seconde partie, après la fusion de la 4.4. À
+  fusionner après la troisième partie de la PR 4.
+  **En ligne le 21 novembre 2026 à 10 h 41** (#149, fusionnée à 10 h 19,
+  après l'export noté, run 44889012698 vérifié job par job : les cinq jobs
+  verts ; consigné par #160).
+
+- Tranche 4, **4.5, PR 5 sur 5, première partie : codée le 20 novembre
+  2026** (D-247, F649 à F653, section 10 bis.18 de
+  `docs/tranche-4-contract.md`). La conservation, table par table : chaque
+  table de la base a sa durée et qui l'efface (`db/retention-plan.ts`),
+  le même tableau au contrat, et un test qui casse la CI pour une table
+  sans durée. La tâche « Purges de conservation » du matin efface, par lots
+  de 500 lignes et 50 instructions au plus par passage, le journal des
+  appels à Ouvre ta ferme (2, 8 ou 30 jours selon la ligne, même quand rien
+  ne lit la ferme) et la notification du jour de la veille (35 jours) ; le
+  registre compte 9 tâches. Sans migration. La politique de confidentialité
+  (phrase des 30 jours, relue par le porteur), le support et les coûts
+  viennent avec la seconde partie. À fusionner après la première partie de
+  la PR 3.
+  **En ligne le 21 novembre 2026 à 11 h 08** (#151, fusionnée à 10 h 42, run
+  44890788265 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 3 sur 5, deuxième partie : codée le 20 novembre
+  2026** (D-248, F654 à F656, section 10 bis.19 de
+  `docs/tranche-4-contract.md`). Le Worker de notification oublie les
+  appareils d'une ferme effacée (route `/v1/recipients/forget` ; la fiche
+  d'un appareil qui ne sert plus aucun espace est oubliée), et l'effacement
+  n'est noté fait qu'après ; un abonnement dont les envois manquent depuis
+  90 jours est oublié comme un abonnement expiré, jamais un abonnement à
+  qui rien n'est envoyé. Sans migration de la base. La PR 3 se fait
+  désormais en trois : la demande dans « Réglages » vient en troisième
+  partie, après la fusion de la 4.4. À fusionner après la première partie
+  de la PR 5.
+  **En ligne le 21 novembre 2026 à 11 h 27** (#152, fusionnée à 11 h 09, run
+  44892961732 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 5 sur 5, deuxième partie : codée le 20 novembre
+  2026** (D-249, F657 à F659, section 10 bis.20 de
+  `docs/tranche-4-contract.md`). La page de confidentialité (texte du
+  20 novembre 2026) dit chaque durée que le code tient, avec la phrase des
+  30 jours telle qu'approuvée, l'export de la semaine gardé cinq semaines
+  au plus et le compte des lectures dans Ouvre ta ferme ; **texte relu par
+  le porteur avant la fusion**, qui le met en ligne. La commande de
+  l'export efface elle-même, après un export vérifié, ceux de 25 jours ou
+  plus. `docs/exploitation.md` dit que faire, cas par cas (« Que faire
+  quand… »), avec un gabarit de réponse ; la page d'accueil du site, le
+  délai de réponse, sans engagement. Sans migration. La PR 5 se fait
+  désormais en trois : le journal d'accès du support et les coûts viennent
+  en troisième partie. À fusionner après la deuxième partie de la PR 3.
+  **En ligne le 21 novembre 2026 à 11 h 56** (#153, fusionnée à 11 h 29, run
+  44894563523 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 5 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-250, F660 à F664, section 10 bis.21 de
+  `docs/tranche-4-contract.md`). La page d'état gagne le journal d'accès du
+  support (le jour, la ferme, la raison en une ligne, jamais ce qui a été
+  vu ; 12 mois, puis la purge du matin ; effacé avec la ferme) et les coûts
+  du mois, recopiés à la main du tableau de bord de Cloudflare et comparés
+  à ce que l'offre inclut ; la page n'appelle jamais Cloudflare. Migration
+  0041. La page de confidentialité dit le journal
+  (relue avec la deuxième partie). À fusionner après la deuxième partie.
+  **En ligne le 21 novembre 2026 à 12 h 17** (#154, fusionnée à 11 h 56, run
+  44896717442 vérifié job par job : les cinq jobs verts ; consigné par
+  #160).
+
+- Tranche 4, **4.5, PR 3 sur 5, troisième partie : codée le 20 novembre
+  2026** (D-251, F665 à F669, section 10 bis.22 de
+  `docs/tranche-4-contract.md`). « Supprimer ma ferme et mes données », en
+  bas de Réglages, après avoir tapé le nom de la ferme (relu par le
+  serveur, sans appel à OTF) ; dès la demande, l'espace est figé : chaque
+  page montre le jour de l'effacement, rien n'est lu chez OTF ni saisi, et
+  la personne peut annuler tant que l'effacement n'a pas commencé ; sur la
+  page d'état, l'exploitant efface sans attendre, sur demande écrite, en
+  retapant le numéro de la ferme. La page de confidentialité le dit.
+  Parcours P51. Sans migration. Codée après la fusion de la 4.4 ; à
+  fusionner après la troisième partie de la PR 5. Avec elle, une demande
+  peut naître en production.
+  La page « Réglages » grandit au téléphone de 144 px avec ce pli fermé
+  (3 338 → 3 482 px sur les données des parcours, CI du 21 novembre 2026) :
+  la borne de P40 passe de 3 400 à 3 500 px, comme le contrat du lot J le
+  permet à la PR qui le dit (section 2).
+  **En ligne le 21 novembre 2026 à 13 h 32** (#160, fusionnée à 13 h 04, run
+  44902063396 vérifié job par job : les cinq jobs verts ; consigné par
+  #161). La 4.5 est en ligne en entier.
+
+- Correctif, **le parcours P12 au téléphone à la fin de la soirée**, trouvé
+  en fusionnant la 4.5 (Opus 5.5 · Très élevé, ligne 4.5), sans décision
+  nouvelle. Constat : sur la CI de #147, le 20 novembre 2026 à 23 h 45,
+  P12 a échoué au téléphone, sa première proposition « cachée » : plus rien
+  ne tenait aujourd'hui, elle était le lendemain, jour replié parce
+  qu'aujourd'hui portait encore des propositions ou des arrosages validés
+  d'autres parcours (F11). P12
+  a laissé son objectif de 70 mm, et P26, P32, P37 et P38 sont tombés
+  derrière lui. Relancés à 0 h 07, tous sont passés. Désormais, P12 montre
+  cette première carte en dépliant son jour (`montrerLaCarte`), comme ses
+  autres cartes ; `docs/browser-journeys-contract.md` (« l'heure où il
+  tourne ») le dit. Seul le parcours change, pas l'application. En ligne
+  le 21 novembre 2026 à 14 h 24 (#161, fusionnée à 13 h 56, run
+  44906377633 vérifié job par job : les cinq jobs verts).
+
 - Tranche 4, **4.6 : contrat écrit le 19 novembre 2026** (D-221, F570 à
   F580, section 10 ter de `docs/tranche-4-contract.md`), sans code : le
   pilote ne commence que lorsque douze conditions d'entrée sont vérifiées à
@@ -531,6 +844,143 @@ registres, elle y renvoie.
   2026), le budget et l'agronomie. La 4.7, sans contrat propre, se ferme avec
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
+
+- Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
+  l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
+  la PR 6. En bas de « Réglages », juste avant « Supprimer ma ferme et mes
+  données », le pli « Journal des modifications », fermé, sa ligne
+  « N modifications, la dernière le … » ; ouvert, les 50
+  dernières cartes (quand, « Vous » ou « Une autre personne connectée », le
+  sujet, l'action, l'objet, chaque champ avant → après avec son unité), un
+  filtre par famille et « Voir plus » par 50. Les mots de chaque champ et
+  la carte se composent dans `lib/domain/change-journal/` ; les essais des
+  écrivains échouent pour un champ sans ses mots. Le journal commence à sa
+  mise en service, lue dans la liste des migrations reçues par la base. Le
+  budget de hauteur de « Réglages » au téléphone (P40) passe à 3 750 px.
+  Parcours P55 à 390 et 1 440 px. Sans migration. Contrôles : voir la PR.
+  L'amélioration n° 7 est codée en entier ; reste F718 (les réglages hors
+  de la liste du contrat), sur le mot du porteur.
+
+- Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
+  matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,
+  F721), empilée sur la PR 5. Les 21 écrivains du matériel et des
+  ressources (§5.1) écrivent leur ligne dans leur lot : matériel (créé,
+  modifié, rangé, copié, effacé), réglages de matériel, pompes et pompe par
+  défaut, ressources et débit mesuré, réserves, liaisons, alimentation par
+  défaut, poses. Une ressource, une réserve, un réglage ou une pompe se lit
+  par son nom, avant comme après. L'inventaire n'a plus d'écrivain « à
+  brancher » : tous sont branchés ou sans objet. Reste l'écran (PR 7). Sans
+  migration. Contrôles : voir la PR.
+
+- Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
+  objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
+  F719, F720), empilée sur la PR 4. Les 23 écrivains des objectifs et des
+  réglages (§5.1) écrivent leur ligne dans leur lot, l'avant lu dans le
+  lot : objectifs hydriques (posés, adoptés, retirés), seuil de besoin,
+  décisions de planche, planning, créneaux protégés, limites d'eau (journée
+  et ressource), sol (parcelle, réglages, profondeur des racines), alertes
+  météo et par culture, fonctionnalités, message du matin, rappel du soir.
+  L'inventaire les dit « branchés » ; son test vérifie que chacun nomme son
+  sujet dans son code. Restent 21 écrivains du matériel et des ressources
+  (PR 6) et l'écran (PR 7). Sans migration. Contrôles : voir la PR.
+  **En ligne le 22 novembre 2026 à 0 h 57** (#167, fusionnée à 0 h 33, run
+  44962375049 vérifié job par job : les cinq jobs verts).
+
+- Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
+  table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
+  contrat, F716 à F718, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
+  en Opus 5.5 · Très élevé, sur le « vas-y » du porteur (9 h 52) ; empilée
+  sur la PR de la n° 2. La table `irrigation_change_journal` (migration
+  0044) garde une ligne par changement d'un objectif, d'un réglage ou
+  du matériel : qui, quand, l'action, l'avant et l'après des seuls champs
+  changés ; écrite dans le même lot que le changement, l'avant lu dans le
+  lot ; immuable, sauf pendant l'effacement de sa ferme ; au plan
+  d'effacement et à l'export. L'inventaire range chaque table et chaque
+  écrivain (62 : 23 à brancher par la PR 5, 21 par la PR 6, 18 sans
+  objet avec leur raison). Rien n'écrit encore au journal et rien ne change à l'écran : les
+  PR 5 et 6 branchent les écrivains, la PR 7 ajoute la lecture dans
+  « Réglages ». La page de confidentialité dit le journal (texte du
+  21 novembre 2026). Contrôles : voir la PR. Restent ouverts : F718, les
+  réglages que la liste du contrat ne nomme pas (réglages du besoin par
+  culture, abris des parcelles, groupes de jardins, lieu météo), hors du
+  journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)
+  se complète avec la chaîne, après #162 et la PR du contrat. **En ligne le
+  22 novembre 2026 à 0 h 32** (#166, fusionnée à 0 h 04, run 44959950487
+  vérifié job par job : les cinq jobs verts ; migration 0044 appliquée sur
+  les deux bases).
+
+- Améliorations, **n° 6, le panneau « données manquantes » : codée le
+  21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
+  `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé, sur le
+  « vas-y » du porteur (9 h 52) ; PR 1 sur 7 des améliorations. La zone
+  « Fiabilité du calcul » de « Aujourd'hui » gagne un dépliant
+  « Par planche », fermé, qui dit le total (« 7 planches ont une donnée
+  manquante ») ou « Tout est à jour » ; ouvert, il range par culture puis
+  par planche trois données de plus — la réserve du sol non saisie, le
+  stade deviné d'après le calendrier, le pluviomètre absent depuis plus de
+  30 jours —, chacune avec sa phrase, sa conséquence et son geste
+  (formulaire du sol, « Déclarer un stade » de la planche sur « Matériel »,
+  « Pluie mesurée »). Une case décochée ne compte pas ; rien ne change le
+  calcul, la pastille ni l'anneau. Sans migration. Le lien « Ce qui manque »
+  de la fin de l'accueil (4.4) n'existe pas encore : il ouvrira le dépliant
+  par son ancre `#donnees-manquantes`. Contrôles de la PR : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; P52 (nouveau), P15, P29 et P30 joués en local aux deux largeurs ;
+  la suite complète des parcours jouée par la CI de la PR. En ligne le
+  21 novembre 2026 à 17 h 49 (#163, fusionnée à 17 h 20, run 44924000313
+  vérifié job par job : les cinq jobs verts).
+
+- Améliorations, **n° 2, le rappel du soir : codée le 21 novembre 2026**
+  (D-284, F702, F704, F705 et F714, sections 4.1 et 4.3 de
+  `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 3 sur
+  7 des améliorations, empilée sur celle de la n° 3. À l'heure que la ferme
+  règle (de 17 h à 22 h au quart d'heure, 19 h par défaut), une
+  notification « Arrosages à confirmer » nomme les arrosages validés du jour
+  dont la fin est passée et qui attendent encore un geste ; un clic ouvre
+  « Aujourd'hui » ; rien quand tout est confirmé ; un seul rappel par jour.
+  Le planificateur gagne le déclencheur `5 * * * *` et la route
+  `/api/internal/evening-reminder` ; le registre, la tâche
+  `evening-reminder` (orange à 3 heures, rouge à 6), que la veille et la
+  page d'état suivent. Dans « Réglages », la case « Rappel du soir » et son
+  heure, pour une ferme qui coche « Arrosages », dans le pli fermé
+  « Messages de la ferme » (F715). Sans migration de plus.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
+  local aux deux largeurs ; la suite complète par la CI de la PR. Le
+  nouveau déclencheur se déploie avec le planificateur, à la fusion. À
+  fusionner après la PR de la n° 3. **En ligne le 22 novembre 2026 à
+  0 h 03** (#165, fusionnée le 21 novembre à 23 h 35, run 44957510571
+  vérifié job par job : les cinq jobs verts ; planificateur redéployé avec
+  le déclencheur « 5 * * * * »).
+
+- Améliorations, **n° 3, le message unique du matin : codée le
+  21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2
+  de `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé ; PR 2
+  sur 7 des améliorations, empilée sur celle de la n° 6. Le calcul du matin
+  n'envoie plus la seule notification des suggestions : un message par jour
+  et par ferme, « Votre journée », dit les arrosages planifiés d'aujourd'hui
+  (trois nommés avec leur heure, puis « et n autres »), la pluie prévue
+  quand elle est connue et supérieure à 0, le nombre d'alertes en cours et
+  les suggestions du planning ; rien quand il n'y a ni arrosage, ni alerte,
+  ni suggestion ; un clic ouvre « Aujourd'hui ». Un second calcul du même
+  jour ne renvoie rien : la prise du jour se garde en base avant l'envoi et
+  se rend s'il échoue. Dans « Réglages », « Notifications du téléphone »
+  porte la case « Message du matin », cochée par défaut, pour une ferme qui
+  coche le Planning, dans le pli fermé « Messages de la ferme » dont la
+  ligne dit le réglage (F715) ; le budget de « Réglages » au téléphone (P40)
+  passe de 3 500 à 3 650 px. Migration 0043, additive : le réglage de la ferme (les
+  colonnes du rappel du soir comprises, vides) et la prise du jour, deux
+  tables d'un espace, au plan d'effacement ; numéro 0043, après la
+  0042 de l’ET0 de la 4.4 (#156). Contrôles de la PR :
+  `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
+  local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
+  complète des parcours jouée par la CI de la PR. À fusionner après la PR
+  de la n° 6. **En ligne le 21 novembre 2026 à 23 h 27** (#164, fusionnée
+  à 23 h 07, run 44955085109 vérifié job par job : les cinq jobs verts ;
+  migration 0043 appliquée sur les deux bases).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,

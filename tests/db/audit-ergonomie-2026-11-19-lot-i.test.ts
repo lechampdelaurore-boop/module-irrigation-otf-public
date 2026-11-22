@@ -24,6 +24,17 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
  * telle que le Worker la prépare.
  */
 
+/**
+ * L'heure réelle, figée pour la démonstration : elle se prépare « au jour du
+ * moment, à l'heure réelle de la ferme » (`runOnSimulatedDay`), et le soir,
+ * vers 21 h 30 à Paris, un arrosage du jour passe et change l'eau versée sur
+ * les planches vides (0,33 m³ au lieu de 0,49) : sans cela, ce fichier
+ * échouait chaque soir pendant une heure.
+ */
+const OriginalDate = Date;
+const realClockNow = OriginalDate.now;
+const PINNED_REAL_NOW = OriginalDate.UTC(2026, 10, 18, 10, 30);
+
 let database: TestDatabase;
 const savedDemoMode = process.env.DEMO_MODE;
 beforeEach(() => {
@@ -32,6 +43,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   uninstallSimulatedDate();
+  OriginalDate.now = realClockNow;
   database.dispose();
   if (savedDemoMode === undefined) delete process.env.DEMO_MODE;
   else process.env.DEMO_MODE = savedDemoMode;
@@ -41,6 +53,7 @@ afterEach(() => {
 async function penurie() {
   const choice = resolveDemoChoice('maraichage', 'penurie');
   const owner = demoOwnerUserId('invite-a', choice);
+  OriginalDate.now = () => PINNED_REAL_NOW;
   installSimulatedDate();
   await runOnSimulatedDay(choice.moment.dateKey, () => prepareDemoSpace(owner, choice));
   const plan = (await readLatestPlanForUser(owner, 2026, '2026-07-20'))!;
@@ -164,7 +177,10 @@ test('n° 11, F450 : la page d’attente se relit seule toutes les deux secondes
   assert.match(source, /title: 'Préparation de votre démonstration…'/);
   assert.match(source, /PREPARING_RELOAD_SECONDS = 2;/);
   assert.match(source, /window\.location\.reload\(\)/);
-  for (const page of ['app/irrigation/page-context.ts', 'app/irrigation/page.tsx', 'app/irrigation/bienvenue/page.tsx']) {
-    assert.match(readFileSync(page, 'utf8'), /instanceof DemoSpacePreparingError/, page);
+  // Les trois entrées passent par le même tri des refus d'accès (4.5, F666) : la démonstration qui se prépare en est un.
+  assert.match(readFileSync('app/irrigation/page-context.ts', 'utf8'), /if \(error instanceof DemoSpacePreparingError\) return demoPreparingState\(page, season\);/);
+  assert.match(readFileSync('app/irrigation/page-context.ts', 'utf8'), /const props = accessRefusedState\(page, season, error\);/);
+  for (const page of ['app/irrigation/page.tsx', 'app/irrigation/bienvenue/page.tsx']) {
+    assert.match(readFileSync(page, 'utf8'), /const refused = accessRefusedState\('aujourdhui', todaySeason\(new Date\(\)\), error\);\n\s+if \(refused\) return <UnavailableState \{\.\.\.refused\} \/>;/, page);
   }
 });

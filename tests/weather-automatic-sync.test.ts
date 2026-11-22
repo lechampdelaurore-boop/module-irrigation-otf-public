@@ -186,6 +186,24 @@ test('les alertes météo sont évaluées après chaque écriture de prévisions
   assert.deepEqual(calls, [], 'aucune prévision écrite, rien à évaluer');
 });
 
+test('4.5 (F600, F602) : la réanalyse en panne se compte à part des prévisions, par classe d’erreur et sans message', async () => {
+  const provider = new FakeProvider();
+  provider.readReanalysis = async () => {
+    throw new WeatherProviderError('fetch failed https://archive-api.open-meteo.com/v1/archive?latitude=46.42', { kind: 'network', endpoint: 'reanalysis' });
+  };
+  const result = await runAutomaticWeatherSync({
+    repository: new FakeRepository([target('a'), target('b', { locationKey: 'ailleurs', latitude: 45 })]),
+    provider,
+    now: new Date('2026-11-14T05:15:00Z'),
+    retry: { sleep: async () => undefined },
+    log: () => undefined,
+  });
+  assert.equal(result.locations, 2);
+  assert.deepEqual(result.forecastFailures, [], 'les prévisions sont passées');
+  assert.deepEqual(result.reanalysisFailures, ['network', 'network'], 'une classe par lieu, jamais le message');
+  assert.equal(result.failedTargets, 2, 'la synchronisation, elle, reste manquée comme avant');
+});
+
 test('la route interne refuse un secret absent ou différent', async () => {
   assert.equal(await verifyWeatherSyncToken(null, 'attendu'), false);
   assert.equal(await verifyWeatherSyncToken('incorrect', 'attendu'), false);

@@ -21,6 +21,7 @@ import type { ClosedPlacementPose } from '@/db/equipment-placement-poses';
 import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import { GardenGroupManager } from './garden-group-manager';
 import { BedCropWaterPanel } from './crop-water/bed-crop-water-panel';
+import { bedIdFromStageAnchor } from '@/lib/domain/today/missing-by-bed';
 import { pageHref } from '@/lib/domain/features/pages';
 import { PAGE_SETTINGS_ANCHOR, PageSettingsFold } from './shell/page-settings-fold';
 import { IrrigationShell, type ShellProps } from './shell/irrigation-shell';
@@ -68,6 +69,19 @@ export function HierarchyBrowser({
   const season = selectedSeason;
   const [zoneId, setZoneId] = useState<string | null>(shell.zone);
   const [bedId, setBedId] = useState<string | null>(null);
+  // « Déclarer le stade » depuis « Aujourd'hui » (amélioration n° 6, F710) : l'ancre désigne la planche, qui se choisit seule.
+  useEffect(() => {
+    const selectFromHash = () => {
+      const target = bedIdFromStageAnchor(window.location.hash);
+      const bed = target ? snapshot.beds.find((candidate) => candidate.id === target && candidate.seasons.includes(season)) : undefined;
+      if (!bed) return;
+      setZoneId(bed.zoneId);
+      setBedId(bed.id);
+    };
+    selectFromHash();
+    window.addEventListener('hashchange', selectFromHash);
+    return () => window.removeEventListener('hashchange', selectFromHash);
+  }, [snapshot.beds, season]);
   // Un seul onglet du bloc de la parcelle à la fois ; la vue satellite ne se charge qu'à son ouverture (F204).
   const [planView, setPlanView] = useState<PlanView>('plan');
   const equipmentInventoryRef = useRef<EquipmentInventoryHandle>(null);

@@ -9,6 +9,7 @@ import {
   readIrrigationUses,
 } from './equipment-placement-poses';
 import { aEcritUneLigne } from './write-result';
+import { poseJournal, poseRemovalJournal, poseSettingJournal } from './change-journal/equipment';
 import { findWorkspaceIdForUser as findWorkspaceId } from './workspace-repository';
 import type { ValidEquipmentPlacementInput } from '@/lib/domain/equipment-placement-domain';
 import {
@@ -138,7 +139,22 @@ export async function saveEquipmentPlacementForUser(
     anchorValues.beforeBedOtfId,
     anchorValues.afterBedOtfId,
   ];
-  const statements: D1PreparedStatement[] = [];
+  // Le journal des modifications : une pose changée lue avant l'écriture, à sa condition ; une pose créée, après ses planches (amélioration n° 7, D-287).
+  const keepsPlacedAt = current !== null && current.removedAt === null && samePlace(current, placement);
+  const journal = poseJournal('pose', { workspaceId, actorUserId: ownerUserId, at: nowIso }, placementId, {
+    settingId: placement.settingId,
+    gardenGroupId: placement.gardenGroupId,
+    zoneId: placement.otfZoneId,
+    plotId: placement.otfPlotId,
+    anchorType: anchorValues.anchorType,
+    anchorBedId: anchorValues.anchorBedOtfId,
+    beforeBedId: anchorValues.beforeBedOtfId,
+    afterBedId: anchorValues.afterBedOtfId,
+    placedAt: keepsPlacedAt ? current.placedAt : at,
+    removedAt: null,
+    beds: placement.selectedBeds.map((bed) => bed.otfBedId),
+  }, current?.updatedAt ?? null);
+  const statements: D1PreparedStatement[] = [...journal.before];
 
   if (!current) {
     refuseIfDateRefused(checkPlacementDate({ placedAt: at, now, season: placement.season, current: null }));
@@ -218,6 +234,7 @@ export async function saveEquipmentPlacementForUser(
     );
   });
 
+  statements.push(...journal.after);
   const results = await db.batch(statements);
   if (!aEcritUneLigne(results[poseStatementIndex]?.meta)) {
     throw new EquipmentPlacementChangedError();
@@ -282,13 +299,17 @@ export async function updateEquipmentPlacementSettingForUser(
     .first<{ id: string }>();
   if (!existing) return null;
 
-  await db.prepare(
-    `UPDATE irrigation_equipment_placements
-     SET setting_id = ?, updated_at = ?
-     WHERE id = ? AND workspace_id = ? AND removed_at IS NULL`,
-  )
-    .bind(settingId, new Date().toISOString(), existing.id, workspaceId)
-    .run();
+  const now = new Date().toISOString();
+  await db.batch([
+    // Le journal des modifications d'abord : le réglage d'avant et le nouveau, par leur nom (amélioration n° 7, D-287).
+    poseSettingJournal('pose', { workspaceId, actorUserId: ownerUserId, at: now }, existing.id, settingId),
+    db.prepare(
+      `UPDATE irrigation_equipment_placements
+       SET setting_id = ?, updated_at = ?
+       WHERE id = ? AND workspace_id = ? AND removed_at IS NULL`,
+    )
+      .bind(settingId, now, existing.id, workspaceId),
+  ]);
 
   const placements = await listEquipmentPlacementsForUser(ownerUserId, season);
   return placements.find((placement) => placement.id === existing.id) ?? null;
@@ -325,6 +346,8 @@ export async function removeEquipmentPlacementForUser(
   }));
 
   const results = await db.batch([
+    // Le journal des modifications d'abord, à la condition même du retrait (amélioration n° 7, D-287).
+    poseRemovalJournal('pose', { workspaceId, actorUserId: ownerUserId, at: now.toISOString() }, current.id, current.updatedAt, removedAt),
     historyInsertStatement(workspaceId, current, removedAt),
     db.prepare(
       `UPDATE irrigation_equipment_placements

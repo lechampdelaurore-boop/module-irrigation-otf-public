@@ -1,5 +1,6 @@
 import { db } from '../binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../workspace-repository';
+import { goalJournal } from '../change-journal/objectives';
 import type { AdoptedGoalRevision } from '@/lib/domain/crop-water/proposal';
 
 /**
@@ -19,7 +20,9 @@ export async function saveAdoptedGoalForUser(
   revision: AdoptedGoalRevision,
 ): Promise<void> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.prepare(
+  const gesture = { workspaceId, actorUserId: ownerUserId, at: revision.createdAt };
+  // Le journal des modifications d'abord, dans le même lot : l'avant est l'objectif en vigueur de la planche (amélioration n° 7, D-286).
+  await db.batch([goalJournal('objectif-adopte', gesture, { ...revision, season, scopeType: 'bed' }, revision.amountMm), db.prepare(
     `INSERT INTO irrigation_hydric_goal_revisions
        (id, workspace_id, season, week_start, scope_type, otf_zone_id, otf_plot_id, otf_bed_id,
         amount_mm, action, actor_user_id, created_at, origin)
@@ -28,7 +31,7 @@ export async function saveAdoptedGoalForUser(
     crypto.randomUUID(), workspaceId, season, revision.weekStart,
     revision.otfZoneId, revision.otfPlotId, revision.otfBedId,
     revision.amountMm, ownerUserId, revision.createdAt, revision.origin,
-  ).run();
+  )]);
 }
 
 /** Les adoptions d'une planche pour une saison, la plus récente d'abord. */

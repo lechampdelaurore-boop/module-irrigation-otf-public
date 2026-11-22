@@ -110,8 +110,33 @@ export const otfFarmReads = sqliteTable('otf_farm_reads', {
   leaseId: text('lease_id'),
   leaseUntilMs: integer('lease_until_ms').notNull().default(0),
   reserveBasis: integer('reserve_basis'),
+  /** La dernière lecture complète de la ferme (4.5, F615) : la page d'état de l'exploitant la montre. */
+  lastCompleteAt: text('last_complete_at'),
   updatedAt: updatedAt(),
 });
+
+/**
+ * Les appels envoyés à Ouvre ta ferme, par ferme, heure pleine et résultat
+ * (4.5, PR 2, docs/tranche-4-contract.md, F564, F614) ; huit jours.
+ */
+export const otfCallOutcomes = sqliteTable(
+  'otf_call_outcomes',
+  {
+    paceKey: text('pace_key').notNull(),
+    hourStartMs: integer('hour_start_ms').notNull(),
+    outcome: text('outcome').notNull(),
+    calls: integer('calls').notNull().default(0),
+  },
+  (table) => [
+    primaryKey({ columns: [table.paceKey, table.hourStartMs, table.outcome] }),
+    index('idx_otf_call_outcomes_hour').on(table.hourStartMs),
+    check(
+      'chk_otf_call_outcomes_outcome',
+      sql`${table.outcome} IN ('ok', 'unauthorized', 'forbidden', 'rate-limited', 'server', 'refused', 'timeout', 'network')`,
+    ),
+    check('chk_otf_call_outcomes_calls', sql`${table.calls} >= 0`),
+  ],
+);
 
 /**
  * Le raccordement de chaque ferme à Ouvre ta ferme (4.3, PR 2,
@@ -888,7 +913,104 @@ export const backgroundJobs = sqliteTable('irrigation_background_jobs', {
   lastSuccessfulAt: text('last_successful_at'),
   lastError: text('last_error'),
   updatedAt: updatedAt(),
+  // Le registre des tâches attendues (4.5, migration 0037, F604) : les exécutions manquées depuis la dernière réussite.
+  consecutiveFailures: integer('consecutive_failures').notNull().default(0),
+  failingSince: text('failing_since'),
 });
+
+/**
+ * La notification de la veille de l'exploitant (4.5, migration 0038, F566,
+ * F609) : une par jour de Paris au plus, prise avant l'envoi et rendue s'il
+ * échoue. Une table commune : ni ferme, ni contenu.
+ */
+export const operatorNotices = sqliteTable(
+  'irrigation_operator_notices',
+  {
+    parisDay: text('paris_day').primaryKey(),
+    kind: text('kind').notNull(),
+    problems: integer('problems').notNull(),
+    claimedAt: text('claimed_at').notNull(),
+    sentAt: text('sent_at'),
+  },
+  (table) => [
+    check('chk_irrigation_operator_notices_kind', sql`${table.kind} IN ('alert', 'all-good')`),
+    check('chk_irrigation_operator_notices_problems', sql`${table.problems} >= 0`),
+  ],
+);
+
+/**
+ * La demande d'effacement d'un espace (4.5, migration 0040, F563, F640 à
+ * F648) : l'enregistrement minimal qui reste après l'effacement pour prouver
+ * qu'il a été fait. L'identifiant interne de l'espace, l'état et des dates ;
+ * ni nom, ni personne, ni ferme, ni contenu ; pas de clé étrangère, l'espace
+ * disparaissant. Une seule demande ouverte par espace.
+ */
+export const farmErasures = sqliteTable(
+  'irrigation_farm_erasures',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id').notNull(),
+    state: text('state').notNull().default('pending'),
+    requestedAt: text('requested_at').notNull(),
+    eraseAfter: text('erase_after').notNull(),
+    cancelledAt: text('cancelled_at'),
+    startedAt: text('started_at'),
+    erasedAt: text('erased_at'),
+  },
+  (table) => [
+    uniqueIndex('idx_irrigation_farm_erasures_open').on(table.workspaceId).where(sql`${table.state} IN ('pending', 'erasing')`),
+    check('chk_irrigation_farm_erasures_state', sql`${table.state} IN ('pending', 'erasing', 'erased', 'cancelled')`),
+    check('chk_irrigation_farm_erasures_cancelled', sql`(${table.state} = 'cancelled') = (${table.cancelledAt} IS NOT NULL)`),
+    check('chk_irrigation_farm_erasures_erased', sql`(${table.state} = 'erased') = (${table.erasedAt} IS NOT NULL)`),
+    check('chk_irrigation_farm_erasures_started', sql`(${table.state} IN ('erasing', 'erased')) = (${table.startedAt} IS NOT NULL)`),
+  ],
+);
+
+/**
+ * Le journal d'accès du support (4.5, migration 0041, F567, F660) : le jour,
+ * la ferme et la raison en une ligne de chaque fois que l'exploitant regarde
+ * les données d'une ferme ; jamais ce qu'il a vu. Gardé 12 mois, effacé avec
+ * le dernier espace de la ferme. Une table commune, d'aucun espace.
+ */
+export const supportAccesses = sqliteTable(
+  'irrigation_support_accesses',
+  {
+    id: text('id').primaryKey(),
+    otfFarmId: text('otf_farm_id').notNull(),
+    accessedOn: text('accessed_on').notNull(),
+    reason: text('reason').notNull(),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    index('idx_irrigation_support_accesses_day').on(table.accessedOn),
+    check('chk_irrigation_support_accesses_day', sql`length(${table.accessedOn}) = 10`),
+    check('chk_irrigation_support_accesses_reason', sql`length(trim(${table.reason})) BETWEEN 3 AND 200`),
+  ],
+);
+
+/**
+ * Le relevé des coûts du mois (4.5, migration 0041, F565 point 6, F568,
+ * F662), copié à la main depuis le tableau de bord de Cloudflare : des
+ * nombres du déploiement, d'aucune ferme ; un relevé par mois.
+ */
+export const costReadings = sqliteTable(
+  'irrigation_cost_readings',
+  {
+    month: text('month').primaryKey(),
+    workersRequests: integer('workers_requests').notNull(),
+    workersCpuMs: integer('workers_cpu_ms').notNull(),
+    d1RowsRead: integer('d1_rows_read').notNull(),
+    d1RowsWritten: integer('d1_rows_written').notNull(),
+    d1StorageMb: real('d1_storage_mb').notNull(),
+    billedUsd: real('billed_usd'),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    check('chk_irrigation_cost_readings_month', sql`length(${table.month}) = 7`),
+    check('chk_irrigation_cost_readings_counts', sql`${table.workersRequests} >= 0 AND ${table.workersCpuMs} >= 0 AND ${table.d1RowsRead} >= 0 AND ${table.d1RowsWritten} >= 0 AND ${table.d1StorageMb} >= 0`),
+    check('chk_irrigation_cost_readings_billed', sql`${table.billedUsd} IS NULL OR ${table.billedUsd} >= 0`),
+  ],
+);
 
 export const weatherGeocodes = sqliteTable(
   'irrigation_weather_geocodes',
@@ -2219,5 +2341,80 @@ export const plotShelters = sqliteTable(
     check('chk_plot_shelter_sheltered', sql`${table.sheltered} IN (0, 1)`),
     check('chk_plot_shelter_proposed', sql`${table.proposedSheltered} IS NULL OR ${table.proposedSheltered} IN (0, 1)`),
     check('chk_plot_shelter_plot', sql`length(${table.plotId}) > 0`),
+  ],
+);
+
+/**
+ * Le réglage des messages du téléphone d'une ferme (améliorations n° 3 et
+ * n° 2, migration 0043, F702, F712) : une ligne par espace ; une colonne vide
+ * vaut le défaut, jamais écrit en base.
+ */
+export const phoneNoticeSettings = sqliteTable(
+  'irrigation_phone_notice_settings',
+  {
+    workspaceId: text('workspace_id').primaryKey().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    morningMessage: integer('morning_message'),
+    eveningReminder: integer('evening_reminder'),
+    eveningTime: text('evening_time'),
+    actorUserId: text('actor_user_id').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    check('chk_phone_notice_settings_morning', sql`${table.morningMessage} IS NULL OR ${table.morningMessage} IN (0, 1)`),
+    check('chk_phone_notice_settings_evening', sql`${table.eveningReminder} IS NULL OR ${table.eveningReminder} IN (0, 1)`),
+    check('chk_phone_notice_settings_time', sql`${table.eveningTime} IS NULL OR ${table.eveningTime} GLOB '[12][0-9]:[0-5][0-9]'`),
+  ],
+);
+
+/**
+ * La prise du jour d'un message du téléphone (migration 0043, F703) : une
+ * ligne par espace et par genre, réécrite chaque jour de Paris, prise avant
+ * l'envoi et rendue s'il échoue.
+ */
+export const phoneNotices = sqliteTable(
+  'irrigation_phone_notices',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    kind: text('kind').notNull(),
+    parisDay: text('paris_day').notNull(),
+    claimedAt: text('claimed_at').notNull(),
+    sentAt: text('sent_at'),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.kind] }),
+    check('chk_phone_notices_kind', sql`${table.kind} IN ('morning', 'evening')`),
+    check('chk_phone_notices_day', sql`${table.parisDay} ${DATE_GLOB}`),
+  ],
+);
+
+/**
+ * Le journal des modifications d'une ferme (amélioration n° 7, migration
+ * 0042, D-285, F706 à F709) : une ligne par changement d'un objectif, d'un
+ * réglage ou du matériel, écrite dans le même lot que le changement ; les
+ * champs qui changent seulement, avant et après, en JSON. Immuable : ni
+ * modifiée ni effacée, sauf avec la ferme.
+ */
+export const changeJournal = sqliteTable(
+  'irrigation_change_journal',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    family: text('family').notNull(),
+    subject: text('subject').notNull(),
+    objectId: text('object_id'),
+    objectContext: text('object_context'),
+    action: text('action').notNull(),
+    beforeValues: text('before_values'),
+    afterValues: text('after_values'),
+    actorUserId: text('actor_user_id').notNull(),
+    createdAt: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_change_journal_workspace_created').on(table.workspaceId, table.createdAt),
+    check('chk_change_journal_family', sql`${table.family} IN ('objectif', 'reglage', 'materiel')`),
+    check('chk_change_journal_action', sql`${table.action} IN ('cree', 'modifie', 'supprime')`),
+    check('chk_change_journal_before', sql`(${table.action} = 'cree') = (${table.beforeValues} IS NULL)`),
+    check('chk_change_journal_after', sql`(${table.action} = 'supprime') = (${table.afterValues} IS NULL)`),
+    check('chk_change_journal_json', sql`(${table.beforeValues} IS NULL OR json_valid(${table.beforeValues})) AND (${table.afterValues} IS NULL OR json_valid(${table.afterValues})) AND (${table.objectContext} IS NULL OR json_valid(${table.objectContext}))`),
   ],
 );

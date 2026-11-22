@@ -62,7 +62,7 @@ test('les groupes des cases cochées, dans l’ordre, avec les valeurs du calcul
   assert.deepEqual(settingsGroupsFor(['arrosages']).map((group) => group.id), []);
   const [abris, calcul] = settingsGroupsFor(ALL);
   assert.deepEqual(abris.lines[0], { label: 'Coefficient d’abri (K_abri)', value: '0,8 sous abri, réglable de 0,6 à 1, à confirmer pour chaque abri', source: 'CRIIAM, tunnel' });
-  assert.equal(calcul.lines[1].value, 'de 0 à 12 mm par jour');
+  assert.equal(calcul.lines[1].value, 'de 0 à 15 mm par jour');
   const planning = settingsGroupsFor(ALL).at(-1)!;
   assert.equal(planning.lines[0].value, 'aspersion de 21 h à 8 h, goutte-à-goutte de 6 h à 22 h');
   assert.equal(planning.lines[1].value, 'aspersion de 5 à 15 mm, goutte-à-goutte de 3 à 10 mm');

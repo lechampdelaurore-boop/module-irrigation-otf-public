@@ -17,6 +17,7 @@
  * échapper.
  */
 import type { DatabaseSync } from 'node:sqlite';
+import { JOURNAL_OBJECT_TABLES } from '../../db/change-journal/objects.ts';
 
 type Reference = {
   table: string;
@@ -34,12 +35,20 @@ type Reference = {
  * les espaces de la ferme : des fermes, des heures et des nombres. Le
  * raccordement d'une ferme à OTF (migration 0033, F403) a pour clé la ferme,
  * et se lit par la personne et la ferme ensemble, l'espace lui-même ; il ne
- * désigne aucune ligne d'un espace.
+ * désigne aucune ligne d'un espace. La notification du jour de la veille de
+ * l'exploitant (migration 0038, F609) : un genre, un nombre et des heures.
+ * Le journal d'accès du support (migration 0041, F660) note une ferme d'OTF,
+ * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
+ * coûts du mois (F662), des nombres du déploiement.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
+  'irrigation_cost_readings',
   'irrigation_crop_alert_common',
+  'irrigation_operator_notices',
+  'irrigation_support_accesses',
   'otf_authentication_failures',
+  'otf_call_outcomes',
   'otf_call_pauses',
   'otf_call_starts',
   'otf_daily_calls',
@@ -87,6 +96,10 @@ const UNDECLARED: Reference[] = [
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_water_resource_reservoir_links', "entity_type = 'resource_reservoir_link'"),
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_water_reservoir_links', "entity_type = 'reservoir_link'"),
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_workspaces', "entity_type = 'supply_default'"),
+  // Le journal des modifications (amélioration n° 7, D-285) : l'objet touché, selon le sujet de la ligne.
+  ...Object.entries(JOURNAL_OBJECT_TABLES).flatMap(([subject, table]) => (
+    table === null ? [] : [ROW('irrigation_change_journal', 'object_id', table, `subject = '${subject}'`)]
+  )),
 ];
 
 /**
@@ -133,17 +146,7 @@ export function crossSpaceReferences(database: DatabaseSync): string[] {
   const references = [...tables.flatMap((table) => declaredReferences(database, table)), ...UNDECLARED];
   assertClassified(tables, columns, references);
 
-  const spaceOf = (table: string, alias: string): string | null => {
-    if (COMMON_TABLES.has(table)) return null;
-    if (table === 'irrigation_workspaces') return `${alias}.id`;
-    if (columns.get(table)?.includes('workspace_id')) return `${alias}.workspace_id`;
-    const owner = OWNER[table];
-    const parent = `${alias}_up`;
-    const parentSpace = spaceOf(owner.target, parent);
-    return parentSpace === null
-      ? null
-      : `(SELECT ${parentSpace} FROM "${owner.target}" AS ${parent} WHERE ${parent}.id = ${alias}."${owner.column}")`;
-  };
+  const spaceOf = (table: string, alias: string): string | null => spaceOfRow(columns, table, alias);
 
   const found: string[] = [];
   for (const reference of references) {
@@ -175,6 +178,33 @@ export function crossSpaceReferences(database: DatabaseSync): string[] {
     }
   }
   return found;
+}
+
+/** L'espace d'une ligne : sa colonne `workspace_id`, sinon celui de la ligne qu'elle complète ; `null` pour une table commune. */
+function spaceOfRow(columns: ReadonlyMap<string, string[]>, table: string, alias: string): string | null {
+  if (COMMON_TABLES.has(table)) return null;
+  if (table === 'irrigation_workspaces') return `${alias}.id`;
+  if (columns.get(table)?.includes('workspace_id')) return `${alias}.workspace_id`;
+  const owner = OWNER[table];
+  if (!owner) throw new UnclassifiedSchemaError(`Table sans espace connu : ${table}`);
+  const parent = `${alias}_up`;
+  const parentSpace = spaceOfRow(columns, owner.target, parent);
+  return parentSpace === null
+    ? null
+    : `(SELECT ${parentSpace} FROM "${owner.target}" AS ${parent} WHERE ${parent}.id = ${alias}."${owner.column}")`;
+}
+
+/**
+ * L'expression SQL de l'espace d'une ligne de `table`, sous l'alias donné, ou
+ * `null` pour une table commune à tous les espaces. L'essai de restauration
+ * s'en sert pour lire, réinsérer et comparer les lignes d'une seule ferme
+ * (docs/tranche-4-contract.md, F561, point 4 ; 10 bis.15).
+ */
+export function spaceExpression(database: DatabaseSync, table: string, alias: string): string | null {
+  const tables = (database.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[])
+    .map(({ name }) => name)
+    .filter((name) => !SYSTEM_TABLE.test(name));
+  return spaceOfRow(new Map(tables.map((name) => [name, columnsOf(database, name)])), table, alias);
 }
 
 function columnsOf(database: DatabaseSync, table: string): string[] {

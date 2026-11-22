@@ -9,11 +9,13 @@ import type {
 } from '../src/contract.ts';
 import { deliverWebPush } from '../src/delivery.ts';
 import {
+  afterMissedDelivery,
   compareAlarmRevisions,
   deliveryRetryDelay,
   immediateDeliveryStatus,
   retryAlarmName,
   shouldRetryDelivery,
+  SILENT_SUBSCRIPTION_FORGET_MS,
 } from '../src/domain.ts';
 
 const authorization = { authorization: 'Bearer test-service-token' };
@@ -106,6 +108,34 @@ test('un retrait passe par l’appareil et nomme l’espace qu’il quitte', asy
   );
   assert.equal(response.status, 204);
   assert.deepEqual(removals, [`workspace-a ${subscription.endpoint}`]);
+});
+
+test('l’oubli d’un espace effacé passe par sa liste, avec son seul identifiant, et refuse le reste (F654)', async () => {
+  const forgets: string[] = [];
+  const forget = (body: unknown, headers: Record<string, string> = authorization) => handlePushApiRequest(
+    new Request('https://worker.test/v1/recipients/forget', {
+      method: 'POST',
+      headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+    fakeDependencies({ onForget: (stub, recipientKey) => forgets.push(`${stub} ${recipientKey}`) }),
+  );
+  const response = await forget({ recipientKey: 'workspace-a' });
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { forgotten: 2 });
+  assert.deepEqual(forgets, ['workspace-a workspace-a']);
+  assert.equal((await forget({ recipientKey: 'espace a' })).status, 400, 'un identifiant hors de la forme attendue');
+  assert.equal((await forget({})).status, 400);
+  assert.equal((await forget({ recipientKey: 'workspace-a' }, {})).status, 401, 'sans le secret partagé');
+  assert.deepEqual(forgets, ['workspace-a workspace-a'], 'rien d’autre n’a été oublié');
+});
+
+test('90 jours sans réponse du service : oublié ; une réussite remet le compte à zéro (F655)', () => {
+  const day = 24 * 60 * 60 * 1000;
+  assert.equal(SILENT_SUBSCRIPTION_FORGET_MS, 90 * day);
+  assert.deepEqual(afterMissedDelivery(null, 10 * day), { failingSince: 10 * day, forget: false }, 'le premier envoi manqué ouvre le compte');
+  assert.deepEqual(afterMissedDelivery(10 * day, 99 * day), { failingSince: 10 * day, forget: false }, '89 jours : gardé');
+  assert.deepEqual(afterMissedDelivery(10 * day, 100 * day), { failingSince: 10 * day, forget: true }, '90 jours : oublié');
 });
 
 test('les nouvelles tentatives d’un envoi immédiat sont rangées par espace (D1, F377)', () => {
@@ -288,6 +318,7 @@ function fakeDependencies(options: {
   onRegister?: (endpoint: string, registration: IrrigationPushRegistration) => void;
   onUnregister?: (endpoint: string, recipientKey: string) => void;
   onSend?: (request: IrrigationPushSendRequest) => void;
+  onForget?: (stub: string, recipientKey: string) => void;
 } = {}): PushApiDependencies {
   return {
     serviceToken: 'test-service-token',
@@ -305,6 +336,12 @@ function fakeDependencies(options: {
         return { status: 'registered' };
       },
       async unregister(recipientKey) { options.onUnregister?.(endpoint, recipientKey); },
+    }),
+    getRecipient: (stub) => ({
+      async forgetAll(recipientKey) {
+        options.onForget?.(stub, recipientKey);
+        return { forgotten: 2 };
+      },
     }),
   };
 }

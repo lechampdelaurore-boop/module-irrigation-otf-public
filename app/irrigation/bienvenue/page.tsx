@@ -2,10 +2,8 @@ import { redirect } from 'next/navigation';
 import { requireAuthenticatedUser, signOutPath, type AuthenticatedUser } from '@/app/access-auth';
 import { landingPage, pageHref } from '@/lib/domain/features/pages';
 import { todaySeason } from '@/lib/domain/today/today-view';
-import { FarmIdentityUnavailableError } from '@/lib/services/farm-identity-service';
-import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
-import { demoPreparingState, farmUnidentifiedState } from '../page-context';
+import { accessRefusedState } from '../page-context';
 import { UnavailableState } from '../shell/unavailable-state';
 import { isDemoDeployment } from '@/lib/services/deployment-mode';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
@@ -27,10 +25,11 @@ export default async function BienvenuePage() {
   try {
     user = await requireAuthenticatedUser();
   } catch (error) {
-    // La ferme de la clé n'est pas établie : rien n'est montré (F341).
-    if (error instanceof FarmIdentityUnavailableError) return <UnavailableState {...farmUnidentifiedState('aujourdhui', todaySeason(new Date()), error)} />;
-    // La démonstration se prépare dans une autre requête : la page le dit et se relit seule (lot I, n° 11, F450).
-    if (error instanceof DemoSpacePreparingError) return <UnavailableState {...demoPreparingState('aujourdhui', todaySeason(new Date()))} />;
+    // La ferme de la clé n'est pas établie (F341), la démonstration se prépare
+    // (lot I, n° 11, F450) ou l'espace est figé par une demande d'effacement
+    // (F666) : la page le dit, sans rien lire d'autre.
+    const refused = accessRefusedState('aujourdhui', todaySeason(new Date()), error);
+    if (refused) return <UnavailableState {...refused} />;
     throw error;
   }
   const selection = await getFeatureSelectionForUser(user.userId);

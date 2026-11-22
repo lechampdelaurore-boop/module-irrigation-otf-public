@@ -4,6 +4,7 @@ import { attachPendingWorkspace, findWorkspaceIdForUser } from '@/db/workspace-r
 import { logJsonLine } from '@/lib/adapters/log';
 import { mockSnapshot } from '@/lib/adapters/mock-data';
 import { farmSpaceKey } from '@/lib/domain/farm-space';
+import { OtfApiError } from '@/lib/domain/otf/api-contract';
 import { farmIdentityShape, otfFarmIdentity, snapshotFarmIdentity } from '@/lib/domain/otf/farm-identity';
 import { readLatestCachedSnapshotOfSpace } from './irrigation-service';
 import { createOtfReadClient, readOtfDataSource } from './otf-connection';
@@ -66,7 +67,8 @@ export async function resolveDeploymentFarm(dependencies = defaultDependencies):
   try {
     me = await dependencies.readOtfMe();
   } catch (error) {
-    logJsonLine('warn', { event: 'otf_farm_identity_unreadable', message: error instanceof Error ? error.message : 'erreur inconnue' });
+    // Le message d'une erreur du connecteur est écrit par le module ; d'une autre erreur, seule sa classe (F617).
+    logJsonLine('warn', { event: 'otf_farm_identity_unreadable', ...(error instanceof OtfApiError ? { message: error.message } : { errorClass: error instanceof Error ? error.name : 'inconnue' }) });
     return null;
   }
   const observedFarm = otfFarmIdentity(me);
@@ -77,6 +79,16 @@ export async function resolveDeploymentFarm(dependencies = defaultDependencies):
   }
   await saveDeploymentFarm(observedFarm, dependencies.now().toISOString());
   return observedFarm;
+}
+
+/**
+ * La ferme du déploiement déjà établie, sans rien appeler ni écrire (4.5,
+ * F608) : la veille de l'exploitant et sa page la lisent, et la 4.5 n'ajoute
+ * aucun appel à OTF. Avec les données fictives, la ferme fictive.
+ */
+export async function knownDeploymentFarm(dataSource: () => 'mock' | 'live' = readOtfDataSource): Promise<string | null> {
+  if (dataSource() !== 'live') return mockSnapshot.structure.id;
+  return (await readDeploymentFarm())?.otfFarmId ?? null;
 }
 
 /**
