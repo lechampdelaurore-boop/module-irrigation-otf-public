@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach, mock } from 'node:test';
 import { addKcOverrideForUser, addStageDeclarationForUser, saveSpeciesCorrespondenceForUser } from '../../db/crop-water/entries';
 import { saveFarmReferenceCropForUser } from '../../db/crop-water/references';
+import { saveSensitiveStagesForUser } from '../../db/crop-water/sensitive-stages';
 import { saveGardenGroupForUser } from '../../db/garden-group-repository';
 import { savePumpForUser } from '../../db/pump-repository';
 import { addRootingProfileForUser } from '../../db/soil-reserve/entries';
@@ -133,8 +134,10 @@ test('Bob désigne la culture saisie par la ferme d’Alice : inconnue dans son 
     source: 'tarière', note: null, effectiveFrom: '2026-09-01',
   });
   assert.deepEqual(profile, { ok: false, problems: [unknown] });
+  // Les stades sensibles au manque d'eau (amélioration n° 4, F730).
+  assert.deepEqual(await saveSensitiveStagesForUser(BOB, { cropKey: ALICE_CROP.id, sensitiveRanks: [1] }), { ok: false, problems: [unknown] });
 
-  for (const table of ['irrigation_crop_species_links', 'irrigation_crop_kc_overrides', 'irrigation_crop_stage_declarations', 'irrigation_soil_rooting_profiles']) {
+  for (const table of ['irrigation_crop_species_links', 'irrigation_crop_kc_overrides', 'irrigation_crop_stage_declarations', 'irrigation_soil_rooting_profiles', 'irrigation_crop_sensitive_stages']) {
     assert.equal(one(`SELECT count(*) AS count FROM ${table} WHERE crop_key = ?`, ALICE_CROP.id)?.count, 0, table);
   }
 });

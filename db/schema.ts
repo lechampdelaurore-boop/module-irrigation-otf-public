@@ -1970,6 +1970,43 @@ export const cropWaterOptions = sqliteTable(
   (table) => [check('chk_crop_water_options', sql`${table.smoothing} IN (0, 1) AND ${table.shading} IN (0, 1)`)],
 );
 
+/** La liste préremplie commune des stades sensibles au manque d'eau (amélioration n° 4, migration 0045, F730). */
+export const cropSensitiveStageCommon = sqliteTable(
+  'irrigation_crop_sensitive_stage_common',
+  {
+    cropKey: text('crop_key').notNull().references(() => cropReferenceCrops.id, { onDelete: 'restrict' }),
+    stageRank: integer('stage_rank').notNull(),
+    stageLabel: text('stage_label').notNull(),
+    confidence: text('confidence').notNull(),
+    source: text('source').notNull(),
+    recordedOn: text('recorded_on').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.cropKey, table.stageRank] }),
+    check('chk_crop_sensitive_common_rank', sql`${table.stageRank} >= 1`),
+    check('chk_crop_sensitive_common_confidence', sql`${table.confidence} IN ('source-directe', 'analogie')`),
+  ],
+);
+
+/** Le choix d'une ferme pour un stade : sensible ou non, quoi que dise la liste préremplie (migration 0045, F730). */
+export const cropSensitiveStages = sqliteTable(
+  'irrigation_crop_sensitive_stages',
+  {
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    cropKey: text('crop_key').notNull(),
+    stageRank: integer('stage_rank').notNull(),
+    stageLabel: text('stage_label').notNull(),
+    sensitive: integer('sensitive').notNull(),
+    actorUserId: text('actor_user_id').notNull(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.cropKey, table.stageRank] }),
+    check('chk_crop_sensitive_stage_rank', sql`${table.stageRank} >= 1`),
+    check('chk_crop_sensitive_stage_value', sql`${table.sensitive} IN (0, 1)`),
+  ],
+);
+
 export const cropEtmDays = sqliteTable(
   'irrigation_crop_etm_days',
   {

@@ -128,7 +128,7 @@ export async function getCropWaterDaysForUser(input: {
   snapshot: IrrigationSnapshot;
   dates: readonly string[];
   now?: Date;
-}): Promise<{ workspaceId: string; beds: { bedId: string; days: BedWaterDay[] }[] } | null> {
+}): Promise<{ workspaceId: string; referenceCrops: ReferenceCrop[]; beds: { bedId: string; days: BedWaterDay[] }[] } | null> {
   const cropPlan = input.snapshot.cropPlan;
   const workspaceId = await findWorkspaceIdForUser(input.ownerUserId);
   if (!cropPlan || workspaceId === null || input.dates.length === 0) return null;
@@ -144,6 +144,8 @@ export async function getCropWaterDaysForUser(input: {
   const plots = new Map(input.snapshot.plots.map((plot) => [plot.id, plot]));
   return {
     workspaceId,
+    // Les cultures de référence qui servent la ferme : le conseil selon le stade sensible en lit les stades (n° 4, F731).
+    referenceCrops: inputs.referenceCrops,
     beds: input.snapshot.beds
       .filter((bed) => bed.seasons.includes(input.season) && plots.get(bed.plotId)?.mode !== 'unclassified')
       .map((bed) => ({

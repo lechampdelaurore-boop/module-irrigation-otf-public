@@ -99,6 +99,10 @@ export const RETENTION_PLAN: Readonly<Record<string, RetentionRule & { purge?: s
     kept: 'Sans limite : les seuils de gel communs, les mêmes pour toutes les fermes.',
     erasedBy: 'Une migration qui les change ; aucune ligne n’est d’une ferme.',
   },
+  irrigation_crop_sensitive_stage_common: {
+    kept: 'Sans limite : la liste préremplie des stades sensibles au manque d’eau, la même pour toutes les fermes.',
+    erasedBy: 'Une migration qui la change, après la relecture du porteur ; aucune ligne n’est d’une ferme.',
+  },
   otf_deployment_farm: {
     kept: 'Une ligne, réécrite à chaque lecture par la clé du déploiement.',
     erasedBy: 'Personne : le réglage du déploiement, pas une donnée de la personne.',

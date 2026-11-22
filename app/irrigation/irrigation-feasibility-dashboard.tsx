@@ -6,7 +6,7 @@ import { priorityLabel, type AllocationStatus, type IrrigationFeasibility, type 
 import { feasibilityNoticeSource, notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { isArbitrationEditable } from '@/lib/domain/arbitration-preview';
 import type { ArbitrationCrops } from '@/lib/domain/arbitration-crops';
-import { loadIrrigationFeasibilityAction, saveIrrigationArbitrationAction, type FeasibilityActionResult } from './irrigation-feasibility-actions';
+import { adoptStageAdviceAction, loadIrrigationFeasibilityAction, saveIrrigationArbitrationAction, type FeasibilityActionResult } from './irrigation-feasibility-actions';
 import { feasibilityHeadTiles, isPriorityLevelShown } from '@/lib/domain/feasibility-reading';
 import { feasibilityUnknownReason } from '@/lib/domain/objective-reading';
 import { bedUnknownReason, feasibilityUnknownReasons, notComputableInline, notComputableLine } from '@/lib/domain/feasibility-unknown';
@@ -14,6 +14,8 @@ import { ArbitrationPlan } from './arbitration-plan';
 import type { FeasibilityPlanGap } from '@/lib/domain/feasibility-plan-gap';
 import { pageHref } from '@/lib/domain/features/pages';
 import { dateClockText } from '@/lib/domain/clock-text';
+import type { StageAdviceScreen } from '@/lib/domain/stage-advice';
+import { StageAdviceBlock } from './stage-advice-block';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 // « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
@@ -43,6 +45,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
   const [dashboard, setDashboard] = useState<IrrigationFeasibility | null>(null);
   const [crops, setCrops] = useState<ArbitrationCrops | null>(null);
   const [planGap, setPlanGap] = useState<FeasibilityPlanGap | null>(null);
+  const [stageAdvice, setStageAdvice] = useState<StageAdviceScreen | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -52,7 +55,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
   // Le nom de ce tableau dans ses propres notifications : il ne relit pas la répartition qu'il vient de valider (D-129).
   const self = useId();
   const receive = useCallback((result: FeasibilityActionResult) => {
-    if (result.ok) { setDashboard(result.dashboard); setCrops(result.crops); setPlanGap(result.planGap); setError(null); setNotice(result.message); }
+    if (result.ok) { setDashboard(result.dashboard); setCrops(result.crops); setPlanGap(result.planGap); setStageAdvice(result.stageAdvice); setError(null); setNotice(result.message); }
     else setError(result.message);
   }, []);
   const refresh = useCallback(async () => {
@@ -102,6 +105,17 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
         <Summary label="Part servie" value={percent(head.coveragePercent)} detail={head.coveragePercent === null && reasons ? reasons.need : 'du besoin, en volume'} />
         <Summary label="Planches servies en entier" value={`${head.fullyServedBeds} sur ${head.bedsWithNeed}`} detail="parmi les planches qui ont un besoin" />
       </div> : null}
+      {/* En pénurie, le conseil selon le stade sensible, après les tuiles de tête et avant les niveaux (amélioration n° 4, F732). */}
+      {stageAdvice ? <StageAdviceBlock screen={stageAdvice} pending={pending} onAdopt={async (bed) => {
+        const request = ++sequence.current; setPending(true);
+        try {
+          const result = await adoptStageAdviceAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId });
+          if (request === sequence.current) receive(result);
+          // La priorité change aussi le planning et les besoins : les autres blocs et onglets relisent, celui-ci non (D-129).
+          if (result.ok) notifyFeasibilityChanged(self);
+        } catch { setError('La priorité n’a pas pu être enregistrée. Recalculez avant de réessayer.'); }
+        finally { if (request === sequence.current) setPending(false); }
+      }} /> : null}
       <div>{dashboard.priorities.filter(isPriorityLevelShown).map((level) => isArbitrationEditable(level)
         // L'écran d'arbitrage façon plan d'assolement (docs/shortage-contract.md, 2 bis, D-083).
         ? <ArbitrationPlan key={`${dashboard.revision}:${level.priority}`} feasibility={dashboard} level={level} crops={crops} pending={pending} onSave={async (selectedBedIds) => {

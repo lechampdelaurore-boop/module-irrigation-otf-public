@@ -27,7 +27,8 @@ const COUNTS = {
                      + (SELECT COUNT(*) FROM irrigation_soil_observations WHERE workspace_id = ?)`,
   cropSettings: `SELECT (SELECT COUNT(*) FROM irrigation_crop_species_links WHERE workspace_id = ?)
                       + (SELECT COUNT(*) FROM irrigation_crop_kc_overrides WHERE workspace_id = ?)
-                      + (SELECT COUNT(*) FROM irrigation_soil_rooting_profiles WHERE workspace_id = ?)`,
+                      + (SELECT COUNT(*) FROM irrigation_soil_rooting_profiles WHERE workspace_id = ?)
+                      + (SELECT COUNT(*) FROM irrigation_crop_sensitive_stages WHERE workspace_id = ?)`,
   weatherAlertCriteria: `SELECT COUNT(*) FROM irrigation_weather_alert_criteria WHERE workspace_id = ? AND deleted_at IS NULL`,
   // Les réglages des alertes cultures sont versionnés : leur présence compte pour un, plus chaque seuil de gel propre à la ferme.
   cropAlertSettings: `SELECT (SELECT CASE WHEN EXISTS (SELECT 1 FROM irrigation_crop_alert_settings WHERE workspace_id = ?) THEN 1 ELSE 0 END)

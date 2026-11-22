@@ -28,6 +28,7 @@ import {
   resetFarmDurationsAction,
   saveFarmDurationsAction,
   saveRootingProfileAction,
+  saveSensitiveStagesAction,
   saveSpeciesCorrespondenceAction,
   type CropWaterActionResult,
 } from '../crop-water-actions';
@@ -181,6 +182,8 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
                     onSaveDurations={(durations) => run(() => saveFarmDurationsAction({ season, referenceCropId: stored.crop.id, durations }))}
                     onResetDurations={() => run(() => resetFarmDurationsAction({ season, referenceCropId: stored.crop.id }))}
                     onSaveRooting={(input) => run(() => saveRootingProfileAction({ season, referenceCropId: stored.crop.id, ...input }))}
+                    sensitiveStages={view.sensitiveStages[stored.crop.id] ?? null}
+                    onSaveSensitiveStages={(sensitiveRanks) => run(() => saveSensitiveStagesAction({ season, referenceCropId: stored.crop.id, sensitiveRanks }))}
                   />
                 );
               }}

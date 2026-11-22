@@ -331,6 +331,7 @@ const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWo
     damageCelsius: { label: 'Dégâts à', format: celsius, empty: 'selon la culture de référence' },
   },
   'jours-de-sechage': { dryingDays: { label: 'Délai de séchage', format: days, empty: 'celui de départ' } },
+  'stade-sensible': { sensitive: { label: 'Sensible au manque d’eau', format: flag } },
   fonctionnalites: featureFields(),
   'message-du-matin': { enabled: { label: 'Message du matin', format: flag } },
   'rappel-du-soir': { enabled: { label: 'Rappel du soir', format: flag }, time: { label: 'Heure', format: timeOfDay } },

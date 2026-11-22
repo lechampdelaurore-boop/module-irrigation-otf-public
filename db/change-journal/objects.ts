@@ -29,6 +29,7 @@ export const JOURNAL_OBJECT_TABLES: Readonly<Record<ChangeSubject, string | null
   'alertes-de-culture': null,
   'seuil-de-gel': null,
   'jours-de-sechage': null,
+  'stade-sensible': null,
   fonctionnalites: null,
   'message-du-matin': null,
   'rappel-du-soir': null,

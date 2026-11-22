@@ -52,6 +52,7 @@ const CHANGE_SUBJECTS = {
   'alertes-de-culture': { family: 'reglage', label: 'Alertes de culture' },
   'seuil-de-gel': { family: 'reglage', label: 'Seuil de gel d’une culture' },
   'jours-de-sechage': { family: 'reglage', label: 'Dessèchement d’une culture' },
+  'stade-sensible': { family: 'reglage', label: 'Stade sensible au manque d’eau' },
   fonctionnalites: { family: 'reglage', label: 'Fonctionnalités' },
   'message-du-matin': { family: 'reglage', label: 'Message du matin' },
   'rappel-du-soir': { family: 'reglage', label: 'Rappel du soir' },

@@ -13,6 +13,8 @@ import { FarmDurationsForm } from './farm-durations';
 import { KcOverrides, type KcOverrideSubmit } from './kc-overrides';
 import { PlantVignette } from './plant-vignette';
 import { RootingProfileSection, type RootingProfileSubmit } from './rooting-profile';
+import { SensitiveStagesForm } from './sensitive-stages';
+import type { SensitiveStageRow } from '@/lib/domain/crop-water/sensitive-stages';
 import type { RootingProfileView } from '@/lib/domain/soil-reserve/rooting-view';
 import { CARRIER_CONDUCT_TEXT } from '@/lib/domain/onboarding/regions';
 
@@ -22,7 +24,8 @@ import { CARRIER_CONDUCT_TEXT } from '@/lib/domain/onboarding/regions';
  * de levée et d'où viennent ses valeurs. Une culture inutilisable dit
  * pourquoi ; le calcul ne s'en sert pas. Depuis la PR 3e : les durées propres
  * à la ferme d'une culture du jeu commun. Depuis la 5 ter (PR 3c) : son profil
- * racinaire, la profondeur par stade et la part p.
+ * racinaire, la profondeur par stade et la part p. Depuis l'amélioration
+ * n° 4 : ses stades sensibles au manque d'eau, pour la ferme (F730).
  */
 
 const kcFormat = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
@@ -31,7 +34,7 @@ const surveyDay = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'lon
 /** Une année sans 29 février, pour écrire un jour `MM-JJ` de calendrier. */
 const COMMON_YEAR = 2025;
 
-export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, rooting, region, summary, today, pending, onOverride, onSaveDurations, onResetDurations, onSaveRooting }: {
+export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, rooting, region, summary, today, pending, onOverride, onSaveDurations, onResetDurations, onSaveRooting, sensitiveStages, onSaveSensitiveStages }: {
   stored: StoredReferenceCrop;
   /** L'adresse des dessins d'Ouvre ta ferme de la page (précision P41) ; `null` sans dessin. */
   spriteHref: string | null;
@@ -49,6 +52,9 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
   onSaveDurations: (durations: FarmDurations) => void;
   onResetDurations: () => void;
   onSaveRooting: (input: RootingProfileSubmit) => void;
+  /** Ses stades sensibles en vigueur ; `null` pour une culture inutilisable. */
+  sensitiveStages: readonly SensitiveStageRow[] | null;
+  onSaveSensitiveStages: (sensitiveRanks: number[]) => void;
 }) {
   const { crop } = stored;
   const unusable = stored.problems.length > 0;
@@ -114,6 +120,15 @@ export function ReferenceCropCard({ stored, common, spriteHref, overrideRows, ro
       )}
       {unusable ? null : (
         <RootingProfileSection cropName={crop.name} view={rooting} today={today} pending={pending} onSubmit={onSaveRooting} />
+      )}
+      {unusable || sensitiveStages === null ? null : (
+        <SensitiveStagesForm
+          key={JSON.stringify(sensitiveStages.map((row) => [row.rank, row.sensitive, row.origin]))}
+          cropName={crop.name}
+          rows={sensitiveStages}
+          pending={pending}
+          onSave={onSaveSensitiveStages}
+        />
       )}
     </details>
   );

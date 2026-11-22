@@ -107,6 +107,24 @@ source détaillée commit par commit.
   comme ses autres cartes. Il avait échoué en CI le 20 novembre 2026 à
   23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
   qu'il avait laissé.
+
+### Ajouté (Améliorations, n° 4, PR 1 sur 2 des n° 4 et 5)
+
+- **Le conseil de servir d'abord les stades sensibles, en pénurie** (D-290,
+  F730 à F732, F736 à F739) : sur « Besoin par culture », chaque culture de
+  référence porte ses stades sensibles au manque d'eau, préremplis d'après
+  les références (la liste validée par le porteur le 21 novembre 2026,
+  41 stades de 28 cultures, avec leurs sources et les analogies dites comme
+  telles) et réglables pour la ferme seule. Quand l'eau manque, « Ressources
+  et pompes » conseille de servir d'abord les planches dont une culture est
+  à un stade sensible, regroupées par culture et par déficit, le stade
+  deviné d'après le calendrier dit tel ; « Adopter » met la planche en
+  priorité haute pour la semaine en cours seulement et recalcule. Rien ne
+  change sans ce geste ; aucun calcul du besoin, de la répartition ni du
+  planning ne change. Le choix d'un stade sensible entre au journal des
+  modifications, une ligne par stade qui change. Migration 0045, additive.
+  Parcours P56.
+
 ### Ajouté (Améliorations, n° 2, PR 3 sur 7)
 
 - **Le rappel du soir** (D-284, F704, F705, F714) : à l'heure que la ferme

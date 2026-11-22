@@ -39,12 +39,14 @@ type Reference = {
  * l'exploitant (migration 0038, F609) : un genre, un nombre et des heures.
  * Le journal d'accès du support (migration 0041, F660) note une ferme d'OTF,
  * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
- * coûts du mois (F662), des nombres du déploiement.
+ * coûts du mois (F662), des nombres du déploiement. La liste préremplie des
+ * stades sensibles (migration 0045, F730) : des stades des cultures communes.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
   'irrigation_cost_readings',
   'irrigation_crop_alert_common',
+  'irrigation_crop_sensitive_stage_common',
   'irrigation_operator_notices',
   'irrigation_support_accesses',
   'otf_authentication_failures',
@@ -118,6 +120,7 @@ const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_
  */
 const CROP_KEY_TABLES = [
   'irrigation_crop_kc_overrides',
+  'irrigation_crop_sensitive_stages',
   'irrigation_crop_species_links',
   'irrigation_crop_stage_declarations',
   'irrigation_crop_etm_days',

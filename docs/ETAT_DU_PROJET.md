@@ -23,7 +23,9 @@ registres, elle y renvoie.
   contrat court des n° 6, 2, 3 et 7 est écrit
   (`docs/ameliorations-6-2-3-7-contract.md`, sept PR de code), leur code part
   sans attendre la Tranche 4 et se fusionne après la file en cours ; les n° 4
-  et 5 attendent l'avis agronomique. PR de registres seule : **aucun contrôle rejoué**,
+  et 5 attendaient l'avis agronomique, **donné le 21 novembre 2026 au soir** :
+  contrat court `docs/ameliorations-4-5-contract.md`, n° 4 codée (D-290),
+  n° 5 en code. PR de registres seule : **aucun contrôle rejoué**,
   sans rapport avec le code. Registres en ligne le 21 novembre 2026 à
   14 h 52 (#162, fusionnée à 14 h 25, run 44908773229 vérifié job par job : les cinq jobs verts) ;
   contrat en ligne le 21 novembre 2026 à 16 h 04 (#170, fusionnée à
@@ -1004,6 +1006,42 @@ registres, elle y renvoie.
   à 23 h 07, run 44955085109 vérifié job par job : les cinq jobs verts ;
   migration 0043 appliquée sur les deux bases).
 
+- Améliorations, **n° 4, la priorité conseillée selon le stade sensible :
+  codée le 21 novembre 2026** (D-290, F730 à F732 et F736 à F739, section 3
+  de `docs/ameliorations-4-5-contract.md`), en Opus 5.5 · Max, sur les
+  réponses agronomiques du porteur du même soir ; PR 1 sur 2 des n° 4 et 5.
+  Sur « Besoin par culture », chaque culture de référence utilisable porte
+  le pli « Stades sensibles au manque d'eau » : une case par stade, qui dit
+  d'où vient sa valeur (« d'après les références », par analogie s'il y a
+  lieu, ou « choisi par la ferme ») ; la liste préremplie est celle que le
+  porteur a validée telle quelle à 22 h 51 (41 stades de 28 cultures, avec
+  leurs sources), écrite en base par la migration ; la ferme n'enregistre
+  que ce qui en diffère et la reprend d'un geste. Quand l'eau disponible
+  est connue et qu'un niveau de priorité ne peut pas être servi en entier,
+  « Faisabilité et répartition de l'eau » porte, après les tuiles, le bloc
+  « Conseil : servir d'abord les stades sensibles » : les planches qui ne
+  sont ni hautes ni servies en entier et dont une culture du jour est à un
+  stade sensible, regroupées par culture et par déficit relatif, le stade
+  deviné dit « stade d'après le calendrier » ; « Adopter » met la planche en
+  priorité haute pour la semaine en cours seulement, garde son besoin
+  manuel, recalcule le plan et garde l'origine du geste au journal. Sans
+  « Besoin par culture », en pénurie, une ligne le dit. Aucun calcul du
+  besoin, de la répartition ni du planning ne change. La démonstration
+  « Pic d'été, l'eau manque » conseille la courgette de H02, puis les
+  tomates d'A01 et A02. Migration 0045, additive, après la 0044 du journal
+  des modifications : la liste commune et les choix de la ferme (table d'un
+  espace, au plan d'effacement et de rétention) ; chaque stade dont la
+  valeur change entre au journal des modifications, une ligne par stade.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; P56 (nouveau), P7, P14, P15, P16,
+  P17, P20, P31c, P32, P39, P40 et P52 joués en local aux deux largeurs, et
+  la visite V4 de la démonstration ; la suite complète des parcours jouée
+  par la CI de la PR. À fusionner juste après #158, mise à jour par fusion
+  de la branche principale après la n° 7, #157 et #158. La même PR consigne
+  la remise à zéro de nuit de la démonstration, lue dans les journaux
+  (ligne 4.0), et la mise en ligne de #158.
+
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
   sans code) : **cinq lots de correction retenus par le porteur le
@@ -1447,10 +1485,10 @@ registres, elle y renvoie.
   lint, typage, 1 930 tests et les trois passages d'isolation, le rejeu des
   1 930 sur le moteur, compilation, knip, `demo:check`, verts ; parcours
   navigateur et Workers sans rapport (ni interface ni Worker touchés), joués
-  par la CI. Reste : la PR passe en dernier dans la file, après les
-  chaînes 4.4 et 4.5 et #157, remise à jour par fusion de la branche
-  principale ; la PR 2 (l'interrupteur sur le moteur) après trois matins
-  sans écart sur la ferme.
+  par la CI. **En ligne le 22 novembre 2026 à 3 h 39** (#158, fusionnée à
+  3 h 09, run 44974783445 vérifié job par job : les cinq jobs verts). Reste :
+  la PR 2 (l'interrupteur sur le moteur) après trois matins sans écart sur
+  la ferme.
 - **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
   22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
   culture et par stade (5 quater), les alertes météo par culture (5
@@ -1827,9 +1865,16 @@ registres, elle y renvoie.
   (`remarques-recette-demo.md`, hors dépôt). **Nicolas connecté le
   14 novembre 2026 à 20 h 53**, après l'ajout de la connexion par code reçu
   par courriel, pour la démonstration seule (choix du porteur à 20 h 24 ;
-  la production garde la seule connexion Cloudflare). Restent la remise à
-  zéro de nuit à lire dans les journaux le 15 novembre 2026 et la première
-  connexion de Vincent. Contrôles
+  la production garde la seule connexion Cloudflare). **La remise à zéro de
+  nuit est lue dans les journaux le 21 novembre 2026** (vers 22 h 20, dans
+  le navigateur du porteur, sur son accord, en lecture seule : Worker de
+  démonstration, « Observability », trois jours) : l'événement
+  `irrigation_demo_nightly_reset` chaque nuit, du déclencheur `17 2 * * *`,
+  le 19 novembre à 3 h 17 min 45 s (0 espace mis de côté), le 20 à
+  3 h 17 min 45 s (3) et le 21 à 3 h 17 min 44 s (3), heure de Paris ;
+  aucun `irrigation_demo_nightly_reset_refused`, 0 erreur sur 280
+  événements ; conforme à F188 (consigné avec l'amélioration n° 4,
+  D-290). Reste la première connexion de Vincent. Contrôles
   du 13 novembre 2026 au soir : lint sans avertissement, typage sans
   erreur, 1 441 tests sur 1 441 (10 nouveaux), compilation réussie, knip,
   `push:check` et `weather:check` sans erreur, 88 parcours sur 88

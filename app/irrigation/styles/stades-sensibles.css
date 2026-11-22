@@ -1,0 +1,35 @@
+/* Amélioration n° 4 : les stades sensibles au manque d'eau (docs/ameliorations-4-5-contract.md, F730, F732). */
+
+/* Le conseil, sur « Ressources et pompes », après les tuiles de tête : une note, pas une alerte. */
+.stage-advice { margin: 1rem 0; padding: .9rem 1rem; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: var(--radius); background: white; min-width: 0; }
+.stage-advice h3 { margin: 0 0 .4rem; font-size: var(--text-16); }
+.stage-advice-lead { margin: 0 0 .5rem; font-size: var(--text-14); line-height: 1.55; }
+.stage-advice-group h4 { margin: .8rem 0 .3rem; font-size: var(--text-14); }
+.stage-advice-group ul { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.stage-advice-bed { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding: .6rem .75rem; border-radius: 9.75px; background: var(--sheet); overflow-wrap: anywhere; }
+.stage-advice-bed > div { flex: 1 1 16rem; min-width: 0; }
+.stage-advice-bed p { margin: .15rem 0; font-size: var(--text-14); line-height: 1.5; }
+.stage-advice-bed-name { font-size: var(--text-16); }
+.stage-advice-calendar, .stage-advice-figures { color: var(--muted); }
+.stage-advice-bed > button { min-height: 44px; border: 0; border-radius: var(--radius-button); padding: .6rem 1rem; background: var(--green); color: white; cursor: pointer; font-size: var(--text-16); }
+.stage-advice-missing { margin: 1rem 0; }
+
+/* Le réglage, dans la fiche de chaque culture de référence : un pli comme celui des durées de la ferme, sous sa propre classe. */
+.sensitive-stages { margin: .4rem .9rem .8rem; border: 1px solid transparent; border-radius: 9.75px; }
+.sensitive-stages > summary { min-height: 44px; box-sizing: border-box; padding: .5rem .65rem; cursor: pointer; font-weight: 700; }
+.sensitive-stages > summary small { display: block; color: var(--muted); font-size: var(--text-13); font-weight: 400; }
+.sensitive-stages-form { display: grid; gap: .35rem; padding: .3rem .65rem .7rem; }
+.sensitive-stages-form .reference-crop-meta { margin: 0; }
+.sensitive-stage { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: .5rem; min-height: 44px; cursor: pointer; }
+.sensitive-stage input { width: 22px; height: 22px; margin: .1rem 0 0; accent-color: #176b4d; }
+.sensitive-stage small { display: block; color: var(--muted); font-size: var(--text-13); }
+.sensitive-stages-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.sensitive-stages-actions button { min-height: 44px; border: 0; border-radius: var(--radius-button); background: var(--green); padding: .65rem .85rem; color: white; font-weight: 500; cursor: pointer; }
+.sensitive-stages-actions button.secondary { border: 1px solid var(--anthracite); background: transparent; color: var(--anthracite); }
+.sensitive-stages-actions button:disabled { opacity: .55; cursor: default; }
+.sensitive-stages-sources > summary { min-height: 44px; box-sizing: border-box; padding: .5rem 0; cursor: pointer; font-size: var(--text-13); }
+.sensitive-stages-sources ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: var(--text-13); overflow-wrap: anywhere; }
+
+@media (max-width: 480px) {
+  .stage-advice-bed > button, .sensitive-stages-actions button { width: 100%; }
+}

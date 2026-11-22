@@ -6,6 +6,7 @@ import { saveAdoptedGoalForUser } from '@/db/crop-water/adoptions';
 import { addKcOverrideForUser, addStageDeclarationForUser, deleteSpeciesCorrespondenceForUser, saveSpeciesCorrespondenceForUser } from '@/db/crop-water/entries';
 import { addShadeNetForUser, addShelterFactorForUser, removeShadeNetForUser, saveBedMulchForUser, saveCropWaterOptionsForUser } from '@/db/crop-water/settings';
 import { addRootingProfileForUser } from '@/db/soil-reserve/entries';
+import { saveSensitiveStagesForUser } from '@/db/crop-water/sensitive-stages';
 import type { RootingStage } from '@/lib/domain/soil-reserve/rooting';
 import { overrideTargetOfKey } from '@/lib/domain/crop-water/settings-view';
 import { adoptionRevision } from '@/lib/domain/crop-water/proposal';
@@ -170,6 +171,28 @@ export async function resetFarmDurationsAction(input: { season: number; referenc
     };
   });
 }
+
+/**
+ * Les stades sensibles au manque d'eau d'une culture, pour la ferme
+ * (amélioration n° 4, F730) : aucun calcul ne change, le plan ne se recalcule
+ * pas ; seul le conseil de la répartition, en pénurie, les lit.
+ */
+export async function saveSensitiveStagesAction(input: { season: number; referenceCropId: string; sensitiveRanks: number[] }): Promise<CropWaterActionResult> {
+  return withContext(input.season, async ({ ownerUserId, snapshot }) => {
+    if (typeof input.referenceCropId !== 'string' || !Array.isArray(input.sensitiveRanks) || input.sensitiveRanks.length > MAX_STAGES
+      || input.sensitiveRanks.some((rank) => !Number.isSafeInteger(rank))) return { ok: false, message: 'Stades invalides.' };
+    const result = await saveSensitiveStagesForUser(ownerUserId, { cropKey: input.referenceCropId, sensitiveRanks: input.sensitiveRanks });
+    if (!result.ok) return { ok: false, message: result.problems.join(' ') };
+    return {
+      ok: true,
+      message: `Stades sensibles enregistrés pour ${result.value.cropName}.`,
+      view: await getCropCoefficientsViewForUser({ ownerUserId, season: input.season, snapshot }),
+    };
+  });
+}
+
+/** Une table de stades n'en a jamais autant : une liste plus longue est refusée sans être lue. */
+const MAX_STAGES = 50;
 
 /**
  * Enregistrer le profil racinaire d'une culture pour la ferme (5 ter, PR 3c) :
