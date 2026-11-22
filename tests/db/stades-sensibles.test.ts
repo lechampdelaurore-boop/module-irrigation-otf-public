@@ -13,7 +13,7 @@ import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Amélioration n° 4 : les stades sensibles au manque d'eau, enregistrés
- * (docs/ameliorations-4-5-contract.md, §3.1, F730 ; migration 0044). La
+ * (docs/ameliorations-4-5-contract.md, §3.1, F730 ; migration 0045). La
  * liste préremplie validée par le porteur le 21 novembre 2026 est en base,
  * ligne pour ligne ; le choix d'une ferme ne vaut que pour elle. `pnpm test`
  * rejoue ce fichier dans les quatre passages de l'isolation.

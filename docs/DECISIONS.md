@@ -7764,6 +7764,115 @@ Ne changent pas : le Worker de notification, la confirmation d'un arrosage
 (aucun geste n'est fait à la place du maraîcher, D-006), aucune migration
 de plus (les colonnes du soir viennent de la 0043), aucun appel à OTF.
 
+## D-285 — Améliorations, n° 7 : le journal des modifications, général, écrit en plus et gardé autant que la ferme
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 4
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52, D-281 ; réglage Opus 5.5 · Très élevé, section 6 septies).
+
+**Contexte.** Le module a des révisions et des journaux par domaine
+(créneaux, pompes, infrastructure de l'eau, décisions de besoin, objectifs
+historisés…), chacun de sa forme, certains sans « avant ». Aucun ne dit,
+pour toute la ferme, qui a changé quoi, quand, de quoi à quoi. Le contrat
+court des améliorations (`docs/ameliorations-6-2-3-7-contract.md`,
+section 5, F706 à F709) retient l'option recommandée : **une table générale,
+écrite en plus des journaux de domaine**, et **gardée autant que la ferme**
+(choix rappelés par le porteur le 21 novembre 2026 : sans retour en
+arrière dans cette version, §5.8).
+
+**Décision.** La table `irrigation_change_journal` (migration 0044) garde, par ferme, une
+ligne par changement d'un objectif, d'un réglage ou du matériel : la
+famille, le sujet (code court et stable de la liste fermée
+`lib/domain/change-journal/subjects.ts`), l'objet touché et son repère,
+l'action (créé, modifié, supprimé), l'avant et l'après des seuls champs
+qui changent, la personne et l'instant. Elle est d'un espace : au plan
+d'effacement (`SPACE_TABLES`), donc à l'export chiffré et à l'effacement de
+la ferme ; aucune purge à part. Ses déclencheurs refusent toute
+modification et tout effacement, sauf pendant l'effacement de sa ferme.
+La page de confidentialité le dit (texte du 21 novembre 2026). Les
+précisions de code :
+
+1. **F716.** L'avant se lit dans la base, **dans le lot même** du
+   changement, à sa condition même (`db/change-journal/statements.ts`) : la
+   ligne du journal s'écrit si et seulement si le changement s'écrit, et
+   deux gestes presque simultanés ne laissent jamais un avant périmé.
+   Création : après l'insertion, l'après lu sur la ligne écrite.
+   Modification : avant l'écriture, l'avant lu sur la ligne d'avant,
+   l'après donné par l'écrivain, et seuls les champs qui changent (comparés
+   par `IS`) ; un geste qui ne change rien n'écrit rien. Suppression : avant
+   l'effacement, l'avant de chaque champ. Une ligne absente peut valoir
+   « créé » (un enregistrement qui insère ou remplace) ou les valeurs par
+   défaut (un réglage jamais enregistré). Les noms de table et de champ
+   viennent du code et sont vérifiés ; seules les valeurs sont des
+   paramètres. Le contrôle de cohérence des espaces (F380) relève toute
+   ligne du journal qui désignerait l'objet d'une autre ferme.
+2. **F717.** L'inventaire (`db/change-journal/inventory.ts`, §5.4, premier
+   garde-fou) range **chaque table de la base**, au journal ou hors du
+   journal avec sa raison, et **chaque écrivain** d'une table du journal,
+   « fichier › fonction › table » : branché, à brancher par la PR 5 ou 6,
+   ou sans objet avec sa raison. `tests/change-journal-inventory.test.ts`
+   relit le code et échoue pour une table ou un écrivain non rangé.
+3. **F718.** Les réglages que la liste du contrat (§5.1) ne nomme pas — les
+   réglages du besoin par culture (Kc corrigés, abri, paillage, ombrage,
+   options, cultures de référence propres à la ferme, correspondances
+   d'espèces), les parcelles sous abri, les groupes de jardins et le lieu
+   météo — restent hors du journal dans cette version, chacun rangé avec
+   cette raison ; ils y entreront sur le mot du porteur, par une PR qui les
+   branche comme les autres.
+
+Ne changent pas : les journaux de domaine, aucun calcul du besoin, du
+planning ni de la répartition, aucun écran dans cette PR (la lecture vient
+avec la PR 7), aucun appel à OTF.
+
+## D-286 — Améliorations, n° 7 : les objectifs et les réglages écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 5
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285).
+
+**Contexte.** D-285 a posé la table, la règle et l'inventaire ; aucun
+écrivain n'écrivait encore. La liste du contrat (§5.1) nomme, pour les
+objectifs et les réglages : l'objectif hydrique (posé à la main ou adopté
+d'une proposition), le seuil minimal de besoin, la décision sur le besoin
+d'une planche, les réglages du planning, les créneaux protégés, la limite
+d'eau de la journée et celle d'une ressource, le sol d'une zone ou d'une
+parcelle, les réglages du sol, la profondeur des racines, les alertes météo
+et par culture, les fonctionnalités et les messages du téléphone.
+
+**Décision.** Les 23 écrivains rangés « PR 5 » dans l'inventaire placent
+leur ligne dans leur lot, par les fonctions de
+`db/change-journal/objectives.ts` et `db/change-journal/settings.ts`, et
+l'inventaire les dit « branchés ». Les écritures faites d'une seule
+instruction passent en lot (`db.batch`) pour que la ligne et le changement
+réussissent ou échouent ensemble. Deux précisions de code :
+
+1. **F719. L'avant d'un réglage.** Une table d'un réglage de toute la
+   ferme (planning, seuil de besoin, fonctionnalités, messages du
+   téléphone, réglages du sol et des alertes par culture) se lit à sa
+   ligne, ou à sa révision la plus récente ; **sans enregistrement, elle
+   vaut ses valeurs de départ**, celles du domaine, et son premier
+   enregistrement dit « modifié », de la valeur de départ à la nouvelle. Un
+   objet qui n'existait pas (un objectif, un créneau, une limite, le sol
+   d'un lieu, un rattachement au gel, un délai de séchage) dit « créé ». Le
+   profil racinaire d'une culture part du profil commun quand la ferme n'a
+   pas le sien. Un objectif retiré dit « supprimé », avec la hauteur qu'il
+   avait. Les réglages du planning sont aplatis, une valeur par champ
+   (`dosesDripMaximumMm`) ; les fonctionnalités, une case par champ (0 ou
+   1) ; les stades d'un profil racinaire, un texte `[[rang, profondeur,
+   fin, jours], …]`. Un drapeau s'écrit 0 ou 1, comme la base.
+2. **F720. L'écrivain nomme son sujet.** Chaque fonction branchée passe son
+   sujet en premier argument (`goalJournal('objectif-adopte', …)`) ; le test
+   de l'inventaire relit le code de chaque écrivain « branché » et y cherche
+   ce sujet, et vérifie qu'aucun écrivain rangé autrement n'écrit au
+   journal. L'essai de la migration 0034 sur une copie arrêtée à la 0033
+   écrit les lignes du journal de la ferme de démonstration dans une table
+   temporaire, hors de la copie.
+
+Ne changent pas : les journaux de domaine (écrits comme avant, à côté),
+aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
+migration, aucun appel à OTF. Le matériel et les ressources viennent avec
+la PR 6.
+
 ## D-290 — Améliorations, n° 4 : la priorité conseillée selon le stade sensible, en pénurie
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 4, sur
@@ -7782,8 +7891,8 @@ appliqué seul ; « Adopter » pour la semaine en cours.
 **Décision.** Le code suit la section 3 ; les précisions de code :
 
 1. **F736, le stockage.** La liste préremplie vit dans une table commune,
-   `irrigation_crop_sensitive_stage_common` (migration 0044, numéro
-   provisoire qui se recale à la fusion) : une ligne par stade sensible
+   `irrigation_crop_sensitive_stage_common` (migration 0045, après la 0044
+   du journal des modifications) : une ligne par stade sensible
    d'une culture commune, son rang, son nom, sa confiance, sa source et sa
    date, comme le jeu de référence ; seule une migration l'écrit
    (41 lignes, 28 cultures, la liste validée ligne pour ligne). Les choix

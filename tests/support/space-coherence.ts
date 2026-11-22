@@ -17,6 +17,7 @@
  * échapper.
  */
 import type { DatabaseSync } from 'node:sqlite';
+import { JOURNAL_OBJECT_TABLES } from '../../db/change-journal/objects.ts';
 
 type Reference = {
   table: string;
@@ -39,7 +40,7 @@ type Reference = {
  * Le journal d'accès du support (migration 0041, F660) note une ferme d'OTF,
  * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
  * coûts du mois (F662), des nombres du déploiement. La liste préremplie des
- * stades sensibles (migration 0044, F730) : des stades des cultures communes.
+ * stades sensibles (migration 0045, F730) : des stades des cultures communes.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
@@ -97,6 +98,10 @@ const UNDECLARED: Reference[] = [
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_water_resource_reservoir_links', "entity_type = 'resource_reservoir_link'"),
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_water_reservoir_links', "entity_type = 'reservoir_link'"),
   ROW('irrigation_water_infrastructure_log', 'entity_id', 'irrigation_workspaces', "entity_type = 'supply_default'"),
+  // Le journal des modifications (amélioration n° 7, D-285) : l'objet touché, selon le sujet de la ligne.
+  ...Object.entries(JOURNAL_OBJECT_TABLES).flatMap(([subject, table]) => (
+    table === null ? [] : [ROW('irrigation_change_journal', 'object_id', table, `subject = '${subject}'`)]
+  )),
 ];
 
 /**

@@ -5,6 +5,32 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 5 sur 7)
+
+- **Les objectifs et les réglages écrivent au journal des modifications**
+  (D-286, F719, F720) : un objectif hydrique posé, adopté d'une proposition
+  ou retiré, le seuil minimal de besoin, la décision sur le besoin d'une
+  planche, les réglages du planning, les créneaux protégés, la limite d'eau
+  de la journée et celle d'une ressource, le sol d'une parcelle, les
+  réglages du sol, la profondeur des racines, les alertes météo, les
+  alertes par culture (réglages, seuil de gel, dessèchement), les
+  fonctionnalités, le message du matin et le rappel du soir. Chaque geste
+  écrit sa ligne dans son lot, avec les seuls champs changés ; un réglage
+  jamais enregistré part de ses valeurs de départ. Sans migration.
+
+### Ajouté (Améliorations, n° 7, PR 4 sur 7)
+
+- **Le journal des modifications, sa table et sa règle** (D-285, F716 à
+  F718) : une table par ferme garde, pour chaque changement d'un objectif,
+  d'un réglage ou du matériel, qui l'a fait, quand, et la valeur d'avant et
+  d'après des seuls champs changés ; la ligne s'écrit dans le même lot que
+  le changement, jamais l'un sans l'autre. Elle ne se modifie ni ne
+  s'efface, sauf avec la ferme ; elle est à l'export et à l'effacement de
+  la ferme ; la page de confidentialité le dit. L'inventaire range chaque
+  table et chaque écrivain : un écrivain oublié fait échouer la CI. Les
+  écrivains sont branchés par les PR 5 et 6, la lecture par la PR 7.
+  Migration 0044, additive.
+
 ### Modifié (Tranche 4, borne de l'ET0)
 
 - **L'ET0 du jour admise jusqu'à 15 mm** (D-232) : un jour de forte
@@ -57,7 +83,7 @@ source détaillée commit par commit.
   deviné d'après le calendrier dit tel ; « Adopter » met la planche en
   priorité haute pour la semaine en cours seulement et recalcule. Rien ne
   change sans ce geste ; aucun calcul du besoin, de la répartition ni du
-  planning ne change. Migration 0044, additive. Parcours P56.
+  planning ne change. Migration 0045, additive. Parcours P56.
 
 ### Ajouté (Améliorations, n° 2, PR 3 sur 7)
 

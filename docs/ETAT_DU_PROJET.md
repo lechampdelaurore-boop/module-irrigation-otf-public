@@ -847,6 +847,38 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
+  objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
+  F719, F720), empilée sur la PR 4. Les 23 écrivains des objectifs et des
+  réglages (§5.1) écrivent leur ligne dans leur lot, l'avant lu dans le
+  lot : objectifs hydriques (posés, adoptés, retirés), seuil de besoin,
+  décisions de planche, planning, créneaux protégés, limites d'eau (journée
+  et ressource), sol (parcelle, réglages, profondeur des racines), alertes
+  météo et par culture, fonctionnalités, message du matin, rappel du soir.
+  L'inventaire les dit « branchés » ; son test vérifie que chacun nomme son
+  sujet dans son code. Restent 21 écrivains du matériel et des ressources
+  (PR 6) et l'écran (PR 7). Sans migration. Contrôles : voir la PR.
+
+- Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
+  table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
+  contrat, F716 à F718, section 5 de `docs/ameliorations-6-2-3-7-contract.md`),
+  en Opus 5.5 · Très élevé, sur le « vas-y » du porteur (9 h 52) ; empilée
+  sur la PR de la n° 2. La table `irrigation_change_journal` (migration
+  0044) garde une ligne par changement d'un objectif, d'un réglage ou
+  du matériel : qui, quand, l'action, l'avant et l'après des seuls champs
+  changés ; écrite dans le même lot que le changement, l'avant lu dans le
+  lot ; immuable, sauf pendant l'effacement de sa ferme ; au plan
+  d'effacement et à l'export. L'inventaire range chaque table et chaque
+  écrivain (62 : 23 à brancher par la PR 5, 21 par la PR 6, 18 sans
+  objet avec leur raison). Rien n'écrit encore au journal et rien ne change à l'écran : les
+  PR 5 et 6 branchent les écrivains, la PR 7 ajoute la lecture dans
+  « Réglages ». La page de confidentialité dit le journal (texte du
+  21 novembre 2026). Contrôles : voir la PR. Restent ouverts : F718, les
+  réglages que la liste du contrat ne nomme pas (réglages du besoin par
+  culture, abris des parcelles, groupes de jardins, lieu météo), hors du
+  journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)
+  se complète avec la chaîne, après #162 et la PR du contrat.
+
 - Améliorations, **n° 6, le panneau « données manquantes » : codée le
   21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
   `docs/ameliorations-6-2-3-7-contract.md`), en Opus 5.5 · Élevé, sur le
@@ -888,7 +920,10 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
   local aux deux largeurs ; la suite complète par la CI de la PR. Le
   nouveau déclencheur se déploie avec le planificateur, à la fusion. À
-  fusionner après la PR de la n° 3.
+  fusionner après la PR de la n° 3. **En ligne le 22 novembre 2026 à
+  0 h 03** (#165, fusionnée le 21 novembre à 23 h 35, run 44957510571
+  vérifié job par job : les cinq jobs verts ; planificateur redéployé avec
+  le déclencheur « 5 * * * * »).
 
 - Améliorations, **n° 3, le message unique du matin : codée le
   21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2
@@ -913,7 +948,9 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
   complète des parcours jouée par la CI de la PR. À fusionner après la PR
-  de la n° 6.
+  de la n° 6. **En ligne le 21 novembre 2026 à 23 h 27** (#164, fusionnée
+  à 23 h 07, run 44955085109 vérifié job par job : les cinq jobs verts ;
+  migration 0043 appliquée sur les deux bases).
 
 - Améliorations, **n° 4, la priorité conseillée selon le stade sensible :
   codée le 21 novembre 2026** (D-290, F730 à F732 et F736 à F739, section 3
@@ -937,10 +974,10 @@ registres, elle y renvoie.
   « Besoin par culture », en pénurie, une ligne le dit. Aucun calcul du
   besoin, de la répartition ni du planning ne change. La démonstration
   « Pic d'été, l'eau manque » conseille la courgette de H02, puis les
-  tomates d'A01 et A02. Migration 0044, additive : la liste commune et les
-  choix de la ferme (table d'un espace, au plan d'effacement et de
-  rétention) ; numéro provisoire, qui se recale après la migration de la
-  n° 7. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  tomates d'A01 et A02. Migration 0045, additive, après la 0044 du journal
+  des modifications : la liste commune et les choix de la ferme (table d'un
+  espace, au plan d'effacement et de rétention) ; un choix de la ferme
+  s'écrit au journal des modifications. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; P56 (nouveau), P7, P14, P15, P16,
   P17, P20, P31c, P32, P39, P40 et P52 joués en local aux deux largeurs, et

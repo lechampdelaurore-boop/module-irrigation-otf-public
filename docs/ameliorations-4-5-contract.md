@@ -29,8 +29,8 @@ l'historique reste immuable (D-006).
 Registres : décisions **D-290 et suivantes**, précisions **F730 et
 suivantes**, parcours **P56 et suivants**, vérifiés libres le 21 novembre 2026
 au-dessus des PR ouvertes de la file (#157, #158, #164 à #169, #171).
-Migration **0045**, provisoire : 0043 et 0044 sont prises par les PR de la file,
-le numéro se recale à la fusion si la file en a besoin.
+Migration **0045** : 0043 et 0044 sont prises par les PR de la file (la n° 3
+et la n° 7, sur main depuis le 21 novembre 2026).
 
 ## 1. Livraison en deux PR, une à la fois
 
@@ -163,9 +163,8 @@ préremplie dans une table commune que seule une migration écrit (41 lignes,
 28 cultures), les choix de la ferme dans une table d'un espace ; la culture
 désignée par sa clé commune, que la version de la ferme garde ; la ferme
 n'enregistre que ce qui diffère de la liste, et cocher comme elle efface la
-ligne. Migration 0044 sur la branche depuis la fusion de la n° 3 (0043),
-0045 si celle de la n° 7 passe avant. F737 : le pli « Stades sensibles au
-manque d'eau », fermé, dans la fiche de chaque culture utilisable, sa ligne
+ligne. Migration 0045, après la 0044 de la n° 7, passée avant. F737 : le
+pli « Stades sensibles au manque d'eau », fermé, dans la fiche de chaque culture utilisable, sa ligne
 qui compte les stades sensibles, l'analogie dite, les sources dans un pli,
 « Reprendre la liste préremplie » quand la ferme a un choix ; enregistrer ne
 recalcule rien. F738 : une culture dont l'ET0 du jour manque garde son stade

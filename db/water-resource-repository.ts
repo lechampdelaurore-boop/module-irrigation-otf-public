@@ -1,5 +1,6 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser } from './workspace-repository';
+import { resourceLimitJournal } from './change-journal/settings';
 import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import {
   hasReservoirCycle,
@@ -157,6 +158,8 @@ export async function saveWaterResourceLimitForUser(
   await assertOwned('irrigation_water_resources', resourceId, workspaceId, 'Ressource introuvable.');
   const id = crypto.randomUUID();
   await db.batch([
+    // Le journal des modifications d'abord : l'avant est la limite en vigueur de la ressource (amélioration n° 7, D-286).
+    resourceLimitJournal('limite-de-ressource', { workspaceId, actorUserId, at: new Date().toISOString() }, resourceId, limit),
     db.prepare(`INSERT INTO irrigation_water_resource_limit_revisions
       (id, workspace_id, resource_id, enabled, max_cubic_meters_per_day,
        valid_from, valid_until, reference_note, actor_user_id)

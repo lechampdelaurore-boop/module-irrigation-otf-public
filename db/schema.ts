@@ -1970,7 +1970,7 @@ export const cropWaterOptions = sqliteTable(
   (table) => [check('chk_crop_water_options', sql`${table.smoothing} IN (0, 1) AND ${table.shading} IN (0, 1)`)],
 );
 
-/** La liste préremplie commune des stades sensibles au manque d'eau (amélioration n° 4, migration 0044, F730). */
+/** La liste préremplie commune des stades sensibles au manque d'eau (amélioration n° 4, migration 0045, F730). */
 export const cropSensitiveStageCommon = sqliteTable(
   'irrigation_crop_sensitive_stage_common',
   {
@@ -1988,7 +1988,7 @@ export const cropSensitiveStageCommon = sqliteTable(
   ],
 );
 
-/** Le choix d'une ferme pour un stade : sensible ou non, quoi que dise la liste préremplie (migration 0044, F730). */
+/** Le choix d'une ferme pour un stade : sensible ou non, quoi que dise la liste préremplie (migration 0045, F730). */
 export const cropSensitiveStages = sqliteTable(
   'irrigation_crop_sensitive_stages',
   {
@@ -2421,5 +2421,37 @@ export const phoneNotices = sqliteTable(
     primaryKey({ columns: [table.workspaceId, table.kind] }),
     check('chk_phone_notices_kind', sql`${table.kind} IN ('morning', 'evening')`),
     check('chk_phone_notices_day', sql`${table.parisDay} ${DATE_GLOB}`),
+  ],
+);
+
+/**
+ * Le journal des modifications d'une ferme (amélioration n° 7, migration
+ * 0042, D-285, F706 à F709) : une ligne par changement d'un objectif, d'un
+ * réglage ou du matériel, écrite dans le même lot que le changement ; les
+ * champs qui changent seulement, avant et après, en JSON. Immuable : ni
+ * modifiée ni effacée, sauf avec la ferme.
+ */
+export const changeJournal = sqliteTable(
+  'irrigation_change_journal',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id').notNull().references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    family: text('family').notNull(),
+    subject: text('subject').notNull(),
+    objectId: text('object_id'),
+    objectContext: text('object_context'),
+    action: text('action').notNull(),
+    beforeValues: text('before_values'),
+    afterValues: text('after_values'),
+    actorUserId: text('actor_user_id').notNull(),
+    createdAt: text('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_change_journal_workspace_created').on(table.workspaceId, table.createdAt),
+    check('chk_change_journal_family', sql`${table.family} IN ('objectif', 'reglage', 'materiel')`),
+    check('chk_change_journal_action', sql`${table.action} IN ('cree', 'modifie', 'supprime')`),
+    check('chk_change_journal_before', sql`(${table.action} = 'cree') = (${table.beforeValues} IS NULL)`),
+    check('chk_change_journal_after', sql`(${table.action} = 'supprime') = (${table.afterValues} IS NULL)`),
+    check('chk_change_journal_json', sql`(${table.beforeValues} IS NULL OR json_valid(${table.beforeValues})) AND (${table.afterValues} IS NULL OR json_valid(${table.afterValues})) AND (${table.objectContext} IS NULL OR json_valid(${table.objectContext}))`),
   ],
 );
