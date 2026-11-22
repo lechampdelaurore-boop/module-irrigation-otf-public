@@ -6,6 +6,7 @@ import type { KcOverride } from '@/lib/domain/crop-water/kc';
 import { correspondenceProblem, kcOverrideProblem, stageDeclarationProblem } from '@/lib/domain/crop-water/records';
 import type { CorrespondenceEntry } from '@/lib/domain/crop-water/species';
 import type { StageDeclaration } from '@/lib/domain/crop-water/stage';
+import { kcOverrideJournal, speciesLinkDeletionJournal, speciesLinkJournal } from '../change-journal/crop-settings';
 
 /**
  * Persistance des saisies de la ferme pour le besoin par culture et par
@@ -13,7 +14,8 @@ import type { StageDeclaration } from '@/lib/domain/crop-water/stage';
  * les surcharges de Kc et les stades déclarés, révisions datées jamais
  * modifiées ni effacées (D-006, déclencheurs de la migration), et la
  * correspondance des espèces, par espèce avec une exception possible par
- * série.
+ * série. Une surcharge de Kc et un rattachement écrivent leur ligne du
+ * journal des modifications dans leur lot (amélioration n° 7, D-289).
  */
 
 type OverrideRow = {
@@ -51,7 +53,7 @@ export async function addKcOverrideForUser(
   const problem = kcOverrideProblem(crops.find((stored) => stored.crop.id === override.referenceCropId)?.crop, override);
   if (problem) return { ok: false, problems: [problem] };
   const recordedAt = now.toISOString();
-  await db.prepare(
+  await db.batch([kcOverrideJournal('kc-corrige', { workspaceId, actorUserId: ownerUserId, at: recordedAt }, override), db.prepare(
     `INSERT INTO irrigation_crop_kc_overrides (id, workspace_id, crop_key, stage_rank, fao_point, kc, effective_from, recorded_at, actor_user_id)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(
@@ -59,7 +61,7 @@ export async function addKcOverrideForUser(
     'rank' in override.target ? override.target.rank : null,
     'fao' in override.target ? override.target.fao : null,
     override.kc, override.effectiveFrom, recordedAt, ownerUserId,
-  ).run();
+  )]);
   return { ok: true, value: { ...override, recordedAt } };
 }
 
@@ -127,7 +129,12 @@ export async function linkSpeciesForUser(
 }
 
 /** Retire un rattachement ou une exception de série. `false` quand il n'existait pas. */
-export async function deleteSpeciesCorrespondenceForUser(ownerUserId: string, plantId: string, seriesId: string | null): Promise<boolean> {
+export async function deleteSpeciesCorrespondenceForUser(
+  ownerUserId: string,
+  plantId: string,
+  seriesId: string | null,
+  now = new Date(),
+): Promise<boolean> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return false;
   // `meta.changes` n'est pas fiable sur D1 (db/write-result.ts) : on lit d'abord.
@@ -135,7 +142,10 @@ export async function deleteSpeciesCorrespondenceForUser(ownerUserId: string, pl
     `SELECT id FROM irrigation_crop_species_links WHERE workspace_id = ? AND plant_id = ? AND series_id IS ?`,
   ).bind(workspaceId, plantId, seriesId).first<{ id: string }>();
   if (!row) return false;
-  await deleteLinkStatement(workspaceId, plantId, seriesId).run();
+  await db.batch([
+    speciesLinkDeletionJournal('correspondance-d-espece', { workspaceId, actorUserId: ownerUserId, at: now.toISOString() }, plantId, seriesId),
+    db.prepare(`DELETE FROM irrigation_crop_species_links WHERE workspace_id = ? AND plant_id = ? AND series_id IS ?`).bind(workspaceId, plantId, seriesId),
+  ]);
   return true;
 }
 
@@ -202,11 +212,12 @@ export async function listStageDeclarationsForWorkspace(workspaceId: string, sea
   }));
 }
 
-/** Le rattachement d'une espèce ou d'une série remplace le précédent au même niveau. */
+/** Le rattachement d'une espèce ou d'une série remplace le précédent au même niveau ; le journal d'abord, l'avant est l'ancien. */
 function linkStatements(workspaceId: string, ownerUserId: string, entry: CorrespondenceEntry, at: string) {
   const target = entry.target;
   return [
-    deleteLinkStatement(workspaceId, entry.plantId, entry.seriesId),
+    speciesLinkJournal('correspondance-d-espece', { workspaceId, actorUserId: ownerUserId, at }, entry),
+    db.prepare(`DELETE FROM irrigation_crop_species_links WHERE workspace_id = ? AND plant_id = ? AND series_id IS ?`).bind(workspaceId, entry.plantId, entry.seriesId),
     db.prepare(
       `INSERT INTO irrigation_crop_species_links (id, workspace_id, plant_id, series_id, target_kind, crop_key, analogy, actor_user_id, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -217,10 +228,4 @@ function linkStatements(workspaceId: string, ownerUserId: string, entry: Corresp
       ownerUserId, at,
     ),
   ];
-}
-
-function deleteLinkStatement(workspaceId: string, plantId: string, seriesId: string | null) {
-  return db.prepare(
-    `DELETE FROM irrigation_crop_species_links WHERE workspace_id = ? AND plant_id = ? AND series_id IS ?`,
-  ).bind(workspaceId, plantId, seriesId);
 }
