@@ -5,6 +5,24 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documentation (revue de l'isolation de la 4.3 à la 4.5, registres)
+
+- **La revue de l'isolation de la 4.3 à la 4.5** (condition E8 de la fiche
+  d'entrée du pilote), faite le 22 novembre 2026 par un fil à part, sur
+  `main` à `ba8cbde`, sans code : aucune fuite de données entre fermes ; un
+  défaut à corriger avant l'essai E2 et le pilote (le message du matin et le
+  rappel du soir partagent leur identifiant d'alarme d'une ferme à l'autre :
+  un message se perd et il est noté parti), correctif retenu, à coder dans
+  un fil à part ; l'état des points D2 à D5 du 18 novembre 2026 (D2 et D5
+  fermés, D3 et D4 ouverts). Rapport dans le dossier du projet, résumé dans
+  l'état du projet et la roadmap. Aucun code, aucun contrôle rejoué pour la
+  PR.
+- **Les constats du 22 novembre 2026 pour la fiche d'entrée** (E5, E7, E9)
+  consignés dans l'état du projet ; la fiche elle-même reste vide, comme le
+  veut sa règle (moins de trois lignes ouvertes).
+- **Mises en ligne consignées** : les améliorations n° 4 (#172) et n° 5
+  (#173), le 22 novembre 2026 à 4 h 34 et 5 h 00.
+
 ### Ajouté (Améliorations, n° 7, PR 8 : les réglages restants)
 
 - **Les réglages restants écrivent eux aussi au journal des
