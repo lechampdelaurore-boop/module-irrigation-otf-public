@@ -33,13 +33,26 @@ export async function getChangeJournalPageForUser({ ownerUserId, snapshot, famil
   };
 }
 
-/** La section à l'ouverture de la page : la première page de toutes les familles, le compte et le début du journal. */
-export async function getChangeJournalViewForUser(ownerUserId: string, snapshot: IrrigationSnapshot | null): Promise<ChangeJournalView> {
-  const [page, total, startedAt] = await Promise.all([
-    getChangeJournalPageForUser({ ownerUserId, snapshot }),
+/**
+ * La section : une page d'une famille ou de toutes, et la ligne du pli, qui
+ * dit toujours toutes les familles (le compte, la dernière ligne, le début
+ * du journal). À l'ouverture de la page, la première page de toutes les
+ * familles ; relue après un changement, au filtre et à « Voir plus », la
+ * ligne suit l'état enregistré (F746, D-294).
+ */
+export async function getChangeJournalViewForUser(
+  ownerUserId: string,
+  snapshot: IrrigationSnapshot | null,
+  { family = null, after = null }: Pick<PageInput, 'family' | 'after'> = {},
+): Promise<ChangeJournalView> {
+  // La première page de toutes les familles commence par la ligne la plus récente ; sinon, celle-ci se lit à part.
+  const firstOfAll = family === null && after === null;
+  const [page, total, startedAt, latest] = await Promise.all([
+    getChangeJournalPageForUser({ ownerUserId, snapshot, family, after }),
     countChangeJournalForUser(ownerUserId),
     changeJournalStartForUser(ownerUserId),
+    firstOfAll ? null : listChangeJournalForUser(ownerUserId, { limit: 1 }),
   ]);
-  // La page de toutes les familles commence par la ligne la plus récente.
-  return { ...page, total, latestAt: page.cards[0]?.at ?? null, startedAt };
+  const latestAt = latest === null ? page.cards[0]?.at ?? null : latest[0]?.createdAt ?? null;
+  return { ...page, total, latestAt, startedAt };
 }

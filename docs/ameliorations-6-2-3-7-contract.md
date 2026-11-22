@@ -463,6 +463,24 @@ suppression. F729 : le lieu de la météo, seul le choix. Décidé par le
 coordinateur dans l'autonomie que le porteur lui a confiée, confirmé par
 le porteur le 21 novembre 2026 à 23 h 13.
 
+**Précision de la recette (22 novembre 2026, D-294, écart E1).** F746 :
+**le journal se relit sans recharger la page.** La recette du 22 novembre
+2026 a vu qu'un changement fait sur « Réglages » n'y paraissait qu'au
+rechargement : la ligne du pli restait « Aucune modification enregistrée »
+et la liste vide, rien n'était perdu. Désormais, dès qu'un geste de
+« Réglages » qui écrit au journal a réussi, la section se relit au
+serveur, pli fermé comme ouvert : sa ligne (« N modifications, la dernière
+le … ») et ses cartes disent ce qui est enregistré. Un geste refusé ne
+relit rien. La section se relit aussi à chaque ouverture de son pli, ce
+qui rattrape un changement fait dans un autre onglet ou sur une page
+revenue de l'historique du navigateur. Une relecture garde le filtre
+choisi et repart des 50 dernières lignes ; la réponse d'une lecture plus
+ancienne, arrivée après une plus récente, ne remplace rien. Le filtre et
+« Voir plus » relisent la ligne du pli avec leurs cartes. Chaque action
+serveur que « Réglages » peut appeler est rangée par un test : elle
+prévient le journal, elle recharge la page, ou elle n'écrit pas au journal,
+avec sa raison ; une action nouvelle sans rangement le fait échouer.
+
 **Preuves (PR 4 à 7).** Tests de persistance (atomicité, un changement refusé
 n'écrit rien, immuabilité), d'isolation entre deux fermes, d'effacement, de
 couverture ; tests du domaine (le texte de chaque famille) ; P-n° à 390 et

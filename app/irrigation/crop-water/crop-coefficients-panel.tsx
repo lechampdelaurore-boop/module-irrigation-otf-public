@@ -15,6 +15,7 @@ import {
   withoutReferenceBeyondSpecies,
 } from '@/lib/domain/crop-water/species-linking';
 import { matchesSearch } from '@/lib/domain/name-search';
+import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
 import type { CropCoefficientsView } from '@/lib/services/crop-water-coefficients';
 import { pageHref } from '@/lib/domain/features/pages';
 import { kcOverrideRows } from '@/lib/domain/crop-water/settings-view';
@@ -80,7 +81,8 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
   const [pending, startTransition] = useTransition();
   const run: Pending = (operation) => startTransition(async () => {
     const result = await operation();
-    if (result.ok) { setView(result.view); setNotice(result.message); setError(null); }
+    // Chaque geste du panneau est un enregistrement : réussi, le journal des modifications de « Réglages » se relit (F746).
+    if (result.ok) { setView(result.view); setNotice(result.message); setError(null); notifyChangeJournalChanged(); }
     else { setError(result.message); setNotice(null); }
   });
   const species = part === 'especes';
