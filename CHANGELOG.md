@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Sécurité (outillage : `next` 16.4.6)
+
+- **`next` 16.4.3 → 16.4.6, les sept alertes modérées fermées** (D-296) :
+  `next` et `eslint-config-next` passent en 16.4.6 ; `pnpm audit` ne
+  signale plus rien. Le site est servi par vinext, qui remplace lui-même
+  les imports `next/*` : rien ne change à l'écran ni dans le code.
+
 ### Ajouté (Démonstration : le cas d'écart de l'amélioration n° 5)
 
 - **La démonstration montre le bloc « L'eau apportée s'écarte du prévu »**

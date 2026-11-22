@@ -75,6 +75,11 @@ registres, elle y renvoie.
   8 sautés comme sur `main` ; `pnpm e2e:demo` : 22 réussis). Fusion après
   #177. La même PR consigne la mise en ligne des registres de la revue de
   l'isolation (#175).
+- Outillage, **lot `next` 16.4.6 codé le 22 novembre 2026** (D-296), le
+  lot à part rangé par D-292 : `next` et `eslint-config-next` 16.4.3 →
+  16.4.6, les sept alertes modérées de `next` fermées, `pnpm audit` ne
+  signale plus rien ; aucun code ni aucune configuration ne change.
+  Contrôles et parcours plus bas (outillage). Fusion après #178.
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -1245,6 +1250,28 @@ registres, elle y renvoie.
   run 45013604410 vérifié job par job : les cinq jobs verts ; sans
   migration, « No migrations to apply » sur les deux bases ; consigné par
   la PR de la revue de l'isolation de la 4.3 à la 4.5).
+- Outillage, **lot `next` 16.4.6 : codé le 22 novembre 2026** (D-296), le
+  lot à part rangé par D-292, couvert par le « vas-y pour tout » du porteur
+  du 22 novembre 2026 à 10 h 53, en Opus 5.5 · Élevé (ligne Q4 de la
+  roadmap, dépendances et configuration, comme #174) : `next` et
+  `eslint-config-next` 16.4.3 → 16.4.6 (la dernière de la ligne 16.4) ;
+  dans le verrou, `@next/env`, `@next/eslint-plugin-next` et les
+  `@next/swc-*` suivent, `nanoid` 3.3.19 quitte l'arbre ; aucun autre
+  paquet, aucun code, aucune configuration ne change. `pnpm audit` et
+  `pnpm audit --prod` : sept alertes modérées avant, toutes sur `next`
+  (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8, GHSA-7qx7-33qx-rqx2,
+  GHSA-f3mh-rxg3-f5g2, GHSA-pc58-hwjq-p385, GHSA-rhh4-g77r-r9qj,
+  GHSA-vvgp-ww4w-46vf) ; après : « No known vulnerabilities found ».
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 256
+  tests verts, puis les 608 tests de la persistance sous chacune des trois
+  isolations et les 2 256 de nouveau sous la jauge du moteur commun, aucun
+  échec), `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm
+  weather:check` et `pnpm site:check` réussis en local avant et après le
+  changement ; **`pnpm e2e` joué en local après le changement** (paquet de
+  production) : 188 parcours, 180 réussis, 8 sautés par conception (ceux
+  propres à l'autre largeur), aucun échec, en 29,8 minutes, avec le
+  navigateur déjà installé du poste de travail ; la suite complète jouée
+  de nouveau par la CI de la PR.
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
@@ -2779,7 +2806,8 @@ registres, elle y renvoie.
   Sonnet 5.5 · Moyen pour le travail sans code.
 - Reste au jugement du porteur : la lisibilité sur téléphone ; l'alerte
   minimatch (eslint 10), lot à part, est traitée le 22 novembre 2026 sur son
-  « vas-y » (D-292), en ligne le même jour (#174).
+  « vas-y » (D-292), en ligne le même jour (#174) ; les sept alertes de
+  `next`, lot à part, le même jour (D-296).
 - Charte graphique d'Ouvre ta ferme relevée le 6 novembre 2026 :
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot
