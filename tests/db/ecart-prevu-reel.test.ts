@@ -21,6 +21,7 @@ import { weatherLocationKey } from '../../lib/domain/weather/location';
 import { getAppliedWaterGapsForUser } from '../../lib/services/applied-water-gap';
 import { adoptAppliedWaterGapForUser } from '../../lib/services/applied-water-gap-adoption';
 import { getBedCropWaterSheetForUser } from '../../lib/services/crop-water-bed';
+import { fieldsWithoutWords } from '../support/change-journal-words';
 import { cultivation, series, task } from '../support/crop-water-references';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { createDripFixture, FIXTURE_PLOT_ID, FIXTURE_ZONE_ID, plannedDraft, type IrrigationFixture } from '../support/irrigation-fixtures';
@@ -181,6 +182,7 @@ test('« Adopter » le débit : le réglage change sous son nom, provenance « s
   assert.deepEqual((await journalOf(ALICE, 'reglage-de-materiel')).slice(-1), [{
     action: 'modifie', before: { rateMmPerHour: 6 }, after: { rateMmPerHour: 4 }, context: { equipment: 'Goutte-à-goutte', name: 'Réglage 1' },
   }]);
+  assert.deepEqual(fieldsWithoutWords(await listChangeJournalForUser(ALICE, { limit: 200 })), [], 'l’écran du journal sait dire chaque champ');
 });
 
 test('la vérification avant d’adopter : semaine changée, proposition différente, réglage retouché depuis, autre ferme ; rien n’est écrit', async () => {
