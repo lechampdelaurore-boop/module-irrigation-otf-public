@@ -8,6 +8,7 @@ import { copyEquipmentSettings } from '@/lib/domain/equipment-duplication';
 import { EquipmentDuplicateKindMismatchError, EquipmentSettingsLimitError } from './errors';
 import { assertEquipmentNameAvailable, findWorkspaceId } from './ownership';
 import { listEquipmentForUser } from './read';
+import { duplicatedEquipmentJournal, equipmentSettingJournal } from '../change-journal/equipment';
 
 export type DuplicateEquipmentResult = {
   equipmentId: string;
@@ -46,6 +47,7 @@ export async function duplicateEquipmentForUser(
   const database = db;
   const duplicatedEquipmentId = crypto.randomUUID();
   const now = new Date().toISOString();
+  const gesture = { workspaceId, actorUserId: ownerUserId, at: now };
   const statements: D1PreparedStatement[] = [
     database
       .prepare(
@@ -61,6 +63,8 @@ export async function duplicateEquipmentForUser(
         equipment.mobility,
         now,
       ),
+    // Le journal des modifications, après l'insertion : un matériel créé, copié d'un autre (amélioration n° 7, D-287).
+    duplicatedEquipmentJournal('materiel', gesture, duplicatedEquipmentId, sourceEquipmentId),
   ];
 
   for (const copy of settingCopies) {
@@ -94,6 +98,7 @@ export async function duplicateEquipmentForUser(
             copy.setting.rateMmPerHour,
             now,
           ),
+        ...equipmentSettingJournal('reglage-de-materiel', gesture, { settingId: duplicatedSettingId, equipmentId: duplicatedEquipmentId }, copy.setting, false).after,
       );
       continue;
     }
@@ -122,6 +127,8 @@ export async function duplicateEquipmentForUser(
         );
       }
     }
+    // Le journal des modifications, après les débits du réglage copié (amélioration n° 7, D-287).
+    statements.push(...equipmentSettingJournal('reglage-de-materiel', gesture, { settingId: duplicatedSettingId, equipmentId: duplicatedEquipmentId }, copy.setting, false).after);
   }
 
   await database.batch(statements);

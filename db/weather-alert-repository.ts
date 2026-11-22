@@ -1,5 +1,6 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
+import { weatherCriterionCreationJournal, weatherCriterionDeletionJournal, weatherCriterionUpdateJournal } from './change-journal/settings';
 import {
   weatherAlertCriterionNeedsNewVersion,
   type WeatherAlertCriterion,
@@ -58,6 +59,8 @@ export async function createWeatherAlertCriterionForUser(
        VALUES (?, ?, 1, ?, ?, ?)`,
     ).bind(id, workspaceId, settings.active ? 1 : 0, at, at),
     versionStatement(id, 1, settings, ownerUserId, at),
+    // Le journal des modifications, après le critère et sa version : l'après lu sur ce qui vient d'être écrit (amélioration n° 7, D-286).
+    weatherCriterionCreationJournal('critere-meteo', { workspaceId, actorUserId: ownerUserId, at }, id),
   ]);
   return { ...settings, id, version: 1 };
 }
@@ -93,6 +96,8 @@ export async function updateWeatherAlertCriterionForUser(
     ).bind(version, settings.active ? 1 : 0, at, criterionId, workspaceId, previous.version),
   ];
   if (version !== previous.version) statements.unshift(versionStatement(criterionId, version, settings, ownerUserId, at));
+  // Le journal des modifications en tête du lot : l'avant est la version lue, à la condition même de l'écriture (amélioration n° 7, D-286).
+  statements.unshift(weatherCriterionUpdateJournal('critere-meteo', { workspaceId, actorUserId: ownerUserId, at }, criterionId, previous.version, settings));
   await db.batch(statements);
   return version === previous.version
     ? { ...previous, active: settings.active }
@@ -113,11 +118,15 @@ export async function deleteWeatherAlertCriterionForUser(
   ).bind(criterionId, workspaceId).first<{ deleted_at: string | null }>();
   if (!row || row.deleted_at !== null) return false;
   const at = now.toISOString();
-  await db.prepare(
-    `UPDATE irrigation_weather_alert_criteria
-     SET deleted_at = ?, updated_at = ?
-     WHERE id = ? AND workspace_id = ? AND deleted_at IS NULL`,
-  ).bind(at, at, criterionId, workspaceId).run();
+  await db.batch([
+    // Le journal des modifications d'abord, à la condition même de la suppression (amélioration n° 7, D-286).
+    weatherCriterionDeletionJournal('critere-meteo', { workspaceId, actorUserId: ownerUserId, at }, criterionId),
+    db.prepare(
+      `UPDATE irrigation_weather_alert_criteria
+       SET deleted_at = ?, updated_at = ?
+       WHERE id = ? AND workspace_id = ? AND deleted_at IS NULL`,
+    ).bind(at, at, criterionId, workspaceId),
+  ]);
   return true;
 }
 

@@ -1,6 +1,7 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
+import { eveningReminderJournal, morningMessageJournal } from './change-journal/settings';
 import { EVENING_REMINDER_DEFAULT, EVENING_REMINDER_DEFAULT_TIME, isEveningTime } from '@/lib/domain/today/evening-reminder';
 import { MORNING_MESSAGE_DEFAULT } from '@/lib/domain/today/morning-message';
 import { millisecondsFromMinutes } from '@/lib/domain/units';
@@ -64,10 +65,11 @@ export async function readPhoneNoticeSettingsForUser(ownerUserId: string): Promi
 /** Active ou coupe le message du matin, avec la personne qui le change et l'heure ; les autres colonnes ne bougent pas. */
 export async function saveMorningMessageForUser(ownerUserId: string, actorUserId: string, enabled: boolean, at: string): Promise<PhoneNoticeSettings> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.prepare(
+  // Le journal des modifications d'abord : l'avant est le réglage en vigueur, défaut compris (amélioration n° 7, D-286).
+  await db.batch([morningMessageJournal('message-du-matin', { workspaceId, actorUserId, at }, enabled), db.prepare(
     `INSERT INTO irrigation_phone_notice_settings (workspace_id, morning_message, actor_user_id, updated_at) VALUES (?, ?, ?, ?)
      ON CONFLICT (workspace_id) DO UPDATE SET morning_message = excluded.morning_message, actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`,
-  ).bind(workspaceId, enabled ? 1 : 0, actorUserId, at).run();
+  ).bind(workspaceId, enabled ? 1 : 0, actorUserId, at)]);
   return readPhoneNoticeSettingsForWorkspace(workspaceId);
 }
 
@@ -80,11 +82,12 @@ export async function saveEveningReminderForUser(
 ): Promise<PhoneNoticeSettings> {
   if (!isEveningTime(setting.time)) throw new InvalidEveningTimeError();
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.prepare(
+  // Le journal des modifications d'abord : l'avant est le réglage en vigueur, défauts compris (amélioration n° 7, D-286).
+  await db.batch([eveningReminderJournal('rappel-du-soir', { workspaceId, actorUserId, at }, setting), db.prepare(
     `INSERT INTO irrigation_phone_notice_settings (workspace_id, evening_reminder, evening_time, actor_user_id, updated_at) VALUES (?, ?, ?, ?, ?)
      ON CONFLICT (workspace_id) DO UPDATE SET evening_reminder = excluded.evening_reminder, evening_time = excluded.evening_time,
        actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`,
-  ).bind(workspaceId, setting.enabled ? 1 : 0, setting.time, actorUserId, at).run();
+  ).bind(workspaceId, setting.enabled ? 1 : 0, setting.time, actorUserId, at)]);
   return readPhoneNoticeSettingsForWorkspace(workspaceId);
 }
 

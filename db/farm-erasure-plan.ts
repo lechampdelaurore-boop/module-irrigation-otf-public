@@ -93,6 +93,7 @@ export const SPACE_TABLES: readonly SpaceTable[] = [
   { table: 'irrigation_crop_bed_mulch' },
   { table: 'irrigation_crop_alerts' },
   { table: 'irrigation_crop_alert_settings' },
+  { table: 'irrigation_change_journal' },
   { table: 'irrigation_bed_need_decisions' },
   { table: 'irrigation_bed_applications', via: { column: 'event_equipment_id', parent: 'irrigation_event_equipment' } },
   { table: 'irrigation_event_equipment', via: { column: 'event_id', parent: 'irrigation_events' } },
