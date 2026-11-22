@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (Améliorations, n° 2 et 3 : une alarme par espace)
+
+- **Le message du matin et le rappel du soir ne se perdent plus quand
+  plusieurs fermes envoient le même jour** (D-293, F744, F745) : leur
+  identifiant d'alarme et leur étiquette portent l'espace de la ferme
+  (`morning:<espace>:<jour>`, `evening:<espace>:<jour>`), et un refus du
+  service de notification n'est plus compté comme un envoi : le message se
+  réessaie. Le test promis par F366 (point D4 de la revue de l'isolation)
+  est ajouté : la date de la ferme gardée s'écrit partout au même format
+  UTC.
+
 ### Modifié (outillage : eslint 10)
 
 - **eslint 10, l'alerte minimatch fermée** (D-292) : `eslint` 9.39.4 →

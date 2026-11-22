@@ -5,7 +5,10 @@ import { MemoryNamespace } from './support/durable-objects.ts';
 
 /**
  * Un appareil, une personne (docs/tranche-4-contract.md, F371 à F378 ;
- * constats A, C3 et D1 de la revue de l'isolation du 18 novembre 2026).
+ * constats A, C3 et D1 de la revue de l'isolation du 18 novembre 2026), et
+ * une alarme par espace pour le message du matin et le rappel du soir
+ * (docs/ameliorations-6-2-3-7-contract.md, section 4.4, F744 et F745 ;
+ * constat A de la revue de l'isolation du 22 novembre 2026).
  *
  * Ces tests font tourner le vrai code du Worker, ses trois classes de
  * Durable Objects comprises, sur une mémoire de test à la place de
@@ -264,6 +267,52 @@ test('une alarme de fin d’arrosage d’Alice ne part pas vers l’appareil pas
   });
   await register(service, telephone, 'espace-b', 'bob');
   assert.deepEqual(await receivedDuring(service, () => service.alarms.fireAlarms()), []);
+});
+
+/** L'alarme à échéance immédiate du message du matin, comme le module la demande. */
+function scheduleMorning(service: Service, eventEquipmentId: string, recipientKey: string, alarmRevision: string) {
+  return call(service, '/v1/alarms/schedule', {
+    eventEquipmentId,
+    recipientKey,
+    revision: alarmRevision,
+    dueAt: new Date().toISOString(),
+    notification: { title: 'Votre journée', body: '1 alerte en cours.', tag: eventEquipmentId.replaceAll(':', '-'), data: { url: '/irrigation/aujourdhui' } },
+  });
+}
+
+test('deux espaces le même matin, chacun sous l’identifiant de son espace : chaque appareil reçoit son message (revue du 22 novembre 2026, constat A, F744)', async () => {
+  const service = await createService();
+  const telephoneAlice = await createDevice('telephone-alice');
+  const telephoneBob = await createDevice('telephone-bob');
+  await register(service, telephoneAlice, 'espace-a', 'alice');
+  await register(service, telephoneBob, 'espace-b', 'bob');
+
+  assert.deepEqual(await scheduleMorning(service, 'morning:espace-a:2026-11-22', 'espace-a', '1795320000000-a'), { status: 'scheduled', revision: '1795320000000-a' });
+  assert.deepEqual(await scheduleMorning(service, 'morning:espace-b:2026-11-22', 'espace-b', '1795320000001-b'), { status: 'scheduled', revision: '1795320000001-b' });
+  const fired = await receivedDuring(service, () => service.alarms.fireAlarms());
+  assert.deepEqual(fired.sort(), [telephoneAlice.endpoint, telephoneBob.endpoint].sort(), 'deux alarmes, deux messages');
+});
+
+test('sous un identifiant partagé par deux espaces, une seule alarme survit : d’où l’espace dans l’identifiant (revue du 22 novembre 2026, constat A)', async () => {
+  const service = await createService();
+  const telephoneAlice = await createDevice('telephone-alice');
+  const telephoneBob = await createDevice('telephone-bob');
+  await register(service, telephoneAlice, 'espace-a', 'alice');
+  await register(service, telephoneBob, 'espace-b', 'bob');
+
+  // L'identifiant d'avant le correctif, le jour seul.
+  await scheduleMorning(service, 'morning:2026-11-22', 'espace-a', '1795320000002-a');
+  assert.deepEqual(
+    await scheduleMorning(service, 'morning:2026-11-22', 'espace-b', '1795320000001-b'),
+    { status: 'stale', revision: '1795320000002-a' },
+    'une révision plus ancienne est refusée : le module ne doit pas la compter comme partie (F745)',
+  );
+  await scheduleMorning(service, 'morning:2026-11-22', 'espace-b', '1795320000003-b');
+  assert.deepEqual(
+    await receivedDuring(service, () => service.alarms.fireAlarms()),
+    [telephoneBob.endpoint],
+    'une révision plus récente remplace l’alarme de l’autre espace : le message d’Alice est perdu',
+  );
 });
 
 test('les nouvelles tentatives de deux espaces sous le même identifiant restent séparées (D1)', async () => {

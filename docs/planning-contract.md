@@ -1512,7 +1512,9 @@ Deux notifications seulement, par le Worker de notification existant
   (amélioration n° 3, docs/ameliorations-6-2-3-7-contract.md, section 4.2,
   F703, D-283) : les suggestions en sont une phrase ; l'identifiant devient
   `morning:<jour de Paris>`, un clic ouvre « Aujourd'hui », et les journaux
-  `morning_message_sent`, `morning_message_failed`.
+  `morning_message_sent`, `morning_message_failed`. **Depuis le 22 novembre
+  2026, l'identifiant porte aussi l'espace** (`morning:<espace>:<jour de
+  Paris>`, docs/ameliorations-6-2-3-7-contract.md, section 4.4, F744, D-293).
 
 Le Worker ne change pas : il reçoit titre, texte, étiquette et adresse comme
 pour la fin du minuteur. Tests : `tests/db/irrigation-event.test.ts`
