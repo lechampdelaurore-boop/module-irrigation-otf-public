@@ -20,8 +20,18 @@ source détaillée commit par commit.
 - **Les constats du 22 novembre 2026 pour la fiche d'entrée** (E5, E7, E9)
   consignés dans l'état du projet ; la fiche elle-même reste vide, comme le
   veut sa règle (moins de trois lignes ouvertes).
-- **Mises en ligne consignées** : les améliorations n° 4 (#172) et n° 5
-  (#173), le 22 novembre 2026 à 4 h 34 et 5 h 00.
+- **Heures de mise en ligne** des améliorations n° 4 (#172) et n° 5
+  (#173) : la fin de leur run, le 22 novembre 2026 à 4 h 34 et 5 h 00,
+  comme les autres entrées.
+
+### Modifié (outillage : eslint 10)
+
+- **eslint 10, l'alerte minimatch fermée** (D-292) : `eslint` 9.39.4 →
+  10.15.0, typescript-eslint 8.68.0 → 8.73.0 ; `minimatch` 10.2.6,
+  vulnérable (GHSA-g3hv-75wg-m249), quitte l'outil de lint. Trois greffons
+  d'`eslint-config-next` acceptés sous eslint 10 (`pnpm-workspace.yaml`),
+  les épinglages `brace-expansion@5` et `js-yaml@4` levés. Rien ne change
+  dans le site servi ni dans les règles de lint.
 
 ### Ajouté (Améliorations, n° 7, PR 8 : les réglages restants)
 
