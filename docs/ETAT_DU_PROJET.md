@@ -50,7 +50,8 @@ registres, elle y renvoie.
   l'interface ni les services qu'elle appelle ne changent (seuls les envois
   de fond du matin et du soir) ; la suite complète des parcours est jouée
   par la CI de la PR. Fusionnée le 22 novembre 2026 à 12 h 22 (#176),
-  avant les registres de la revue (#175).
+  avant les registres de la revue (#175) ; **en ligne à 12 h 57** (run
+  45016969088 vérifié job par job : les cinq jobs verts).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -937,6 +938,29 @@ registres, elle y renvoie.
   2026), le budget et l'agronomie. La 4.7, sans contrat propre, se ferme avec
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
+
+- Améliorations, **n° 7, le journal des modifications : l'écart E1 de la
+  recette corrigé le 22 novembre 2026** (#177, D-294, F746), en Opus 5.5 ·
+  Très élevé, le réglage de la n° 7. La recette des n° 2 à 7, faite par
+  l'assistant le 22 novembre 2026 sur la version en ligne, avait vu qu'un
+  changement fait sur « Réglages » ne paraissait dans « Journal des
+  modifications » qu'au rechargement de la page : la ligne du pli restait
+  « Aucune modification enregistrée » et la liste vide ; rien n'était
+  perdu. Désormais, chaque geste de « Réglages » qui écrit au journal le
+  signale une fois réussi, et la section se relit au serveur, sa ligne
+  avec, pli fermé comme ouvert ; elle se relit aussi à chaque ouverture de
+  son pli (un changement fait dans un autre onglet) ; le filtre et « Voir
+  plus » relisent la ligne du pli. Un test range chaque action serveur que
+  « Réglages » peut appeler : elle prévient le journal, recharge la page,
+  ou n'écrit pas au journal, avec sa raison. P55 prouve la ligne et la
+  carte nouvelles sans rechargement. Sans migration ; rien ne change aux
+  lignes écrites. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`,
+  `pnpm test` (2249, isolation 3 × 605, jauge du moteur commun 2249),
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` réussis en local ; P55 (étendu), P40, P46, P53, P54,
+  P14, P16, P56, P37 et P2 joués en local aux deux largeurs (53 réussis,
+  5 sans objet) ; la suite complète des parcours jouée par la CI de la PR.
+  Recette sur le site en ligne : à faire après le déploiement.
 
 - Améliorations, **n° 7, le journal des modifications : PR 8, les
   réglages restants, codée le 21 novembre 2026** (D-289, F725 à F729),

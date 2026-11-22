@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
 import type { PlotShelterLine } from '@/lib/domain/onboarding/plots';
 import { confirmRemainingProposalsAction, savePlotShelterAction, type PlotShelterActionResult } from '../plot-shelter-actions';
 import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
@@ -30,7 +31,8 @@ export function PlotShelterSettings({ season, initialLines }: { season: number; 
   const remaining = lines.filter((line) => line.state === 'unclassified').length;
 
   const receive = (result: PlotShelterActionResult, origin: string) => {
-    if (result.ok) setLines(result.lines);
+    // Enregistré : le journal des modifications de la page se relit (F746).
+    if (result.ok) { setLines(result.lines); notifyChangeJournalChanged(); }
     setReplies([actionReply(origin, result.ok ? 'notice' : 'error', result.message)]);
   };
 

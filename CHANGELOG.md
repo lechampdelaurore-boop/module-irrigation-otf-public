@@ -46,6 +46,19 @@ source détaillée commit par commit.
   les épinglages `brace-expansion@5` et `js-yaml@4` levés. Rien ne change
   dans le site servi ni dans les règles de lint.
 
+### Corrigé (Améliorations, n° 7 : le journal sans recharger la page)
+
+- **Un changement fait dans « Réglages » paraît aussitôt dans « Journal
+  des modifications »** (D-294, F746, écart E1 de la recette du
+  22 novembre 2026) : la ligne du pli et ses cartes se relisent dès que le
+  changement est enregistré, pli fermé comme ouvert, sans recharger la
+  page ; le journal se relit aussi quand on rouvre son pli, ce qui montre
+  un changement fait dans un autre onglet. Avant, il fallait recharger la
+  page ; rien n'était perdu.
+- En ligne le 22 novembre 2026 : #176, une alarme par espace pour le
+  message du matin et le rappel du soir, fusionnée à 12 h 22 et déployée à
+  12 h 57 (run 45016969088, cinq jobs verts).
+
 ### Ajouté (Améliorations, n° 7, PR 8 : les réglages restants)
 
 - **Les réglages restants écrivent eux aussi au journal des

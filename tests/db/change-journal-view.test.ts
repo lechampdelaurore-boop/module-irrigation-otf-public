@@ -80,3 +80,36 @@ test('le début du journal : la mise en service lue dans les migrations reçues,
   assert.equal((await getChangeJournalViewForUser(ALICE, null)).startedAt, created);
   database.sqlite.exec('DROP TABLE d1_migrations');
 });
+
+test('la ligne du pli dit toutes les familles, quels que soient le filtre et la suite (F746)', async () => {
+  await fiftyFourChanges();
+  const all = await getChangeJournalViewForUser(ALICE, null);
+  // Le matériel, créé en dernier, est la ligne la plus récente : la ligne du pli la garde sous le filtre « Réglages ».
+  const settings = await getChangeJournalViewForUser(ALICE, null, { family: 'reglage' });
+  assert.equal(settings.family, 'reglage');
+  assert.ok(settings.cards.every((card) => card.family === 'reglage'));
+  assert.deepEqual([settings.total, settings.latestAt, settings.startedAt], [54, all.latestAt, all.startedAt]);
+  assert.notEqual(settings.cards[0].at, all.latestAt, 'la première carte du filtre n’est pas la dernière ligne');
+  // « Voir plus » : la suite, et la même ligne du pli.
+  const more = await getChangeJournalViewForUser(ALICE, null, { after: all.next });
+  assert.equal(more.cards.length, 4);
+  assert.deepEqual([more.total, more.latestAt, more.next], [54, all.latestAt, null]);
+  // Une famille sans ligne : aucune carte, mais la ligne du pli dit toujours tout.
+  const goals = await getChangeJournalViewForUser(ALICE, null, { family: 'objectif' });
+  assert.deepEqual([goals.cards.length, goals.total, goals.latestAt], [0, 54, all.latestAt]);
+  // Une autre ferme ne voit rien de celle-ci, filtre ou non.
+  const other = await getChangeJournalViewForUser(BOB, null, { family: 'reglage' });
+  assert.deepEqual([other.total, other.cards.length, other.latestAt], [0, 0, null]);
+});
+
+test('relue après un changement, la section dit la ligne nouvelle, en tête et dans la ligne du pli (F746)', async () => {
+  await saveMorningMessageForUser(ALICE, ALICE, false, instant(0));
+  const before = await getChangeJournalViewForUser(ALICE, null, { family: 'reglage' });
+  assert.equal(before.total, 1);
+  await saveMorningMessageForUser(ALICE, ALICE, true, instant(5));
+  const after = await getChangeJournalViewForUser(ALICE, null, { family: 'reglage' });
+  assert.equal(after.total, 2);
+  assert.equal(after.latestAt, instant(5));
+  assert.equal(after.cards[0].at, instant(5));
+  assert.deepEqual(after.cards[0].lines.map((line) => line.text), ['non → oui']);
+});

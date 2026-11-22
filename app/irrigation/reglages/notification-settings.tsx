@@ -5,6 +5,7 @@ import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record
 import { NotificationReadiness } from '../irrigation-manager/notification-readiness';
 import { useIrrigationNotifications } from '../irrigation-manager/use-irrigation-notifications';
 import { EVENING_TIMES, eveningTimeText } from '@/lib/domain/today/evening-reminder';
+import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
 import { saveEveningReminderAction, saveMorningMessageAction } from '../phone-notice-actions';
 import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { AnchoredFold } from '../shell/page-settings-fold';
@@ -103,7 +104,8 @@ function MorningMessageSetting({ initial, onSaved }: { initial: boolean; onSaved
     startTransition(async () => {
       const result = await saveMorningMessageAction({ enabled: next });
       setEnabled(result.ok ? result.morningMessage : !next);
-      if (result.ok) onSaved(result.morningMessage);
+      // Enregistré : le journal des modifications de la page se relit (F746).
+      if (result.ok) { onSaved(result.morningMessage); notifyChangeJournalChanged(); }
       setReplies([actionReply('matin', result.ok ? 'notice' : 'error', result.message)]);
     });
   };
@@ -138,7 +140,7 @@ function EveningReminderSetting({ initial, onSaved }: { initial: EveningSetting;
     startTransition(async () => {
       const result = await saveEveningReminderAction(next);
       setSetting(result.ok ? { enabled: result.enabled, time: result.time } : before);
-      if (result.ok) onSaved({ enabled: result.enabled, time: result.time });
+      if (result.ok) { onSaved({ enabled: result.enabled, time: result.time }); notifyChangeJournalChanged(); }
       setReplies([actionReply('soir', result.ok ? 'notice' : 'error', result.message)]);
     });
   };

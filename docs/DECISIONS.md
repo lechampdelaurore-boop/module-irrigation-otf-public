@@ -8420,3 +8420,62 @@ Ne changent pas : le Worker de notification, le texte des messages, leurs
 réglages, l'écran, aucune migration ; un message déjà parti sous l'ancien
 identifiant le jour de la mise en ligne ne repart pas (la prise du jour, en
 base, est par espace).
+
+## D-294 — Améliorations, n° 7 : le journal des modifications se relit sans recharger la page
+
+Date : 22 novembre 2026. Statut : décidé (correction de l'écart E1 de la
+recette des améliorations n° 2 à 7, faite par l'assistant le 22 novembre
+2026 ; autonomie donnée par le porteur le 22 novembre 2026, « vas-y pour
+tout » ; réglage Opus 5.5 · Très élevé, celui de la n° 7, section
+6 septies ; suite de D-288).
+
+**Contexte.** La recette a vu, sur « Réglages », qu'après un changement
+fait sur la page même (le rappel du soir, le message du matin), la section
+« Journal des modifications » ne bougeait pas : sa ligne disait encore
+« Aucune modification enregistrée » et sa liste restait vide jusqu'au
+rechargement de la page ; un clic sur un filtre faisait paraître les cartes,
+mais la ligne du pli restait fausse. Rien n'était perdu : tout était en base
+et paraissait au rechargement. La cause : la section gardait ce qu'elle
+avait lu à l'ouverture de la page, et rien ne la prévenait d'un changement
+enregistré par un autre bloc de la page (les actions de « Réglages » ne
+relisent pas la page, à dessein).
+
+**Décision. F746 : un signal de la fenêtre, et une relecture au serveur.**
+
+1. Chaque geste de « Réglages » qui écrit au journal, une fois réussi, le
+   dit par un signal de la fenêtre (`notifyChangeJournalChanged`,
+   `lib/domain/feasibility-notifications.ts`, à côté des signaux de la
+   faisabilité et des ressources, D-093, D-129) : les messages de la ferme,
+   le lieu de la météo et les autres enregistrements du tableau de l'eau,
+   la correspondance des espèces et tout geste du panneau du besoin par
+   culture, les parcelles et les abris. Un geste refusé ne signale rien.
+2. La section écoute ce signal et se relit au serveur, pli fermé comme
+   ouvert ; elle se relit aussi à chaque ouverture de son pli, ce qui
+   rattrape un changement fait dans un autre onglet ou une page revenue de
+   l'historique du navigateur. Une relecture garde le filtre choisi et
+   repart des 50 dernières lignes ; la réponse d'une lecture plus ancienne,
+   arrivée après une plus récente, ne remplace rien.
+3. La lecture rend la page de cartes **et** la ligne du pli (le compte, la
+   dernière ligne toutes familles, le début du journal), pour le filtre et
+   « Voir plus » comme pour la relecture : la ligne ne peut plus rester
+   fausse après un clic sur un filtre.
+4. **Aucune action oubliée.** Un test
+   (`tests/change-journal-refresh.test.ts`) relit le code de « Réglages »
+   et de tout ce qu'elle affiche, relève chaque action serveur qu'elle peut
+   appeler et échoue si l'une n'est pas rangée : elle prévient le journal
+   (et son fichier porte le signal), elle recharge la page, ou elle n'écrit
+   pas au journal, avec sa raison.
+
+**Écarté.** Relire toute la page après chaque action serveur (`refresh()`
+ou `revalidatePath`) : la page entière se recalculerait au serveur à chaque
+case cochée, instantané d'Ouvre ta ferme compris, et les blocs qui gardent
+leur état ne se remettraient pas à jour pour autant.
+
+Preuves : `tests/db/change-journal-view.test.ts` (la ligne du pli suit
+toutes les familles quels que soient le filtre et la suite, et se relit
+après un changement), `tests/change-journal-refresh.test.ts` (le
+rangement des actions), le parcours P55 à 390 et 1 440 px (la ligne et la
+carte nouvelles sans rechargement, pli fermé puis ouvert, filtre gardé ; un
+changement fait dans un autre onglet paraît à la réouverture du pli). Ne
+changent pas : la table, les écrivains, les lignes écrites, aucune
+migration, aucun calcul, aucun appel à Ouvre ta ferme.
