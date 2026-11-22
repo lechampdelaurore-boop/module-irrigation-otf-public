@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (icône de l'onglet)
+
+- **L'onglet du navigateur porte l'icône du module** (D-298) : la page ne
+  déclarait aucune icône, et un navigateur ordinaire demandait
+  `/favicon.ico`, absent du site, avec une erreur 404 dans sa console. La
+  page déclare désormais `/favicon.svg`, l'icône du manifeste, dans
+  l'application et la démonstration ; le parcours P0 le vérifie.
+- En ligne le 22 novembre 2026 : #180 à 16 h 25 (run 45035287223, cinq jobs
+  verts, migration 0046 appliquée sur les deux bases).
+- Recette des améliorations n° 2 à 7 : les écarts E1 (journal sans
+  rechargement) et E2 (cas d'écart de la démonstration) constatés corrigés
+  sur la démonstration en ligne le 22 novembre 2026.
+
 ### Sécurité (outillage : `next` 16.4.6)
 
 - **`next` 16.4.3 → 16.4.6, les sept alertes modérées fermées** (D-296) :
