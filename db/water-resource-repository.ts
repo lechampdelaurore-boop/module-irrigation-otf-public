@@ -1,6 +1,7 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser } from './workspace-repository';
 import { resourceLimitJournal } from './change-journal/settings';
+import { defaultSupplyJournal, reservoirLinkJournal, resourceReservoirLinkJournal, waterReservoirJournal, waterResourceJournal } from './change-journal/equipment';
 import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import {
   hasReservoirCycle,
@@ -144,7 +145,9 @@ export async function saveWaterResourceForUser(
          status, available_from, available_until, notes)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(id, workspaceId, draft.name, draft.type,
           draft.nominalFlowCubicMetersPerHour, draft.status, draft.availableFrom, draft.availableUntil, draft.notes);
-  await db.batch([statement, auditStatement(workspaceId, 'resource', id, resourceId ? 'updated' : 'created', draft, actorUserId)]);
+  // Le journal des modifications : un changement lu avant l'écriture, une création après (amélioration n° 7, D-287).
+  const journal = waterResourceJournal('ressource', { workspaceId, actorUserId, at: new Date().toISOString() }, id, draft, resourceId !== null);
+  await db.batch([...journal.before, statement, ...journal.after, auditStatement(workspaceId, 'resource', id, resourceId ? 'updated' : 'created', draft, actorUserId)]);
   return id;
 }
 
@@ -199,7 +202,9 @@ export async function saveWaterReservoirForUser(
           draft.capacityCubicMeters, draft.currentVolumeCubicMeters, currentObservation,
           draft.minimumSafetyCubicMeters, draft.exposedSurfaceSquareMeters, draft.receivesRain ? 1 : 0,
           draft.evaporationEnabled ? 1 : 0, draft.evaporationCoefficient, draft.status, draft.notes);
-  await db.batch([statement, auditStatement(workspaceId, 'reservoir', id, reservoirId ? 'updated' : 'created', draft, actorUserId)]);
+  // Le journal des modifications : un changement lu avant l'écriture, une création après ; le volume observé n'y est pas (amélioration n° 7, D-287).
+  const journal = waterReservoirJournal('reserve', { workspaceId, actorUserId, at: new Date().toISOString() }, id, draft, reservoirId !== null);
+  await db.batch([...journal.before, statement, ...journal.after, auditStatement(workspaceId, 'reservoir', id, reservoirId ? 'updated' : 'created', draft, actorUserId)]);
   return id;
 }
 
@@ -254,7 +259,8 @@ export async function saveResourceReservoirLinkForUser(
     : db.prepare(`INSERT INTO irrigation_water_resource_reservoir_links
         (id, workspace_id, resource_id, reservoir_id, fill_mode, active)
         VALUES (?, ?, ?, ?, ?, ?)`).bind(id, workspaceId, input.resourceId, input.reservoirId, input.fillMode, input.active ? 1 : 0);
-  await db.batch([statement, auditStatement(workspaceId, 'resource_reservoir_link', id, input.id ? 'updated' : 'created', input, actorUserId)]);
+  const journal = resourceReservoirLinkJournal('liaison-ressource-reserve', { workspaceId, actorUserId, at: new Date().toISOString() }, id, input, input.id !== undefined);
+  await db.batch([...journal.before, statement, ...journal.after, auditStatement(workspaceId, 'resource_reservoir_link', id, input.id ? 'updated' : 'created', input, actorUserId)]);
   return id;
 }
 
@@ -293,7 +299,8 @@ export async function saveReservoirLinkForUser(
         (id, workspace_id, upstream_reservoir_id, downstream_reservoir_id, transfer_mode, active)
         VALUES (?, ?, ?, ?, ?, ?)`).bind(id, workspaceId, input.upstreamReservoirId,
           input.downstreamReservoirId, input.transferMode, input.active ? 1 : 0);
-  await db.batch([statement, auditStatement(workspaceId, 'reservoir_link', id, input.id ? 'updated' : 'created', input, actorUserId)]);
+  const journal = reservoirLinkJournal('liaison-entre-reserves', { workspaceId, actorUserId, at: new Date().toISOString() }, id, input, input.id !== undefined);
+  await db.batch([...journal.before, statement, ...journal.after, auditStatement(workspaceId, 'reservoir_link', id, input.id ? 'updated' : 'created', input, actorUserId)]);
   return id;
 }
 
@@ -314,7 +321,12 @@ export async function saveDefaultWaterSupplyForUser(
           updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`)
         .bind(workspaceId, supply.sourceKind, supply.resourceId, supply.reservoirId)
     : db.prepare('DELETE FROM irrigation_water_supply_defaults WHERE workspace_id = ?').bind(workspaceId);
-  await db.batch([statement, auditStatement(workspaceId, 'supply_default', workspaceId, 'configured', supply, actorUserId)]);
+  await db.batch([
+    // Le journal des modifications d'abord : l'avant est l'alimentation en vigueur, aucune sans réglage (amélioration n° 7, D-287).
+    defaultSupplyJournal('alimentation-par-defaut', { workspaceId, actorUserId, at: new Date().toISOString() }, supply),
+    statement,
+    auditStatement(workspaceId, 'supply_default', workspaceId, 'configured', supply, actorUserId),
+  ]);
 }
 
 function mapResource(row: ResourceRow): WaterResource {

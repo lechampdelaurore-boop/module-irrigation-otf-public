@@ -30,7 +30,7 @@ Registres : décisions **D-290 et suivantes**, précisions **F730 et
 suivantes**, parcours **P56 et suivants**, vérifiés libres le 21 novembre 2026
 au-dessus des PR ouvertes de la file (#157, #158, #164 à #169, #171).
 Migration **0045** : 0043 et 0044 sont prises par les PR de la file (la n° 3
-et la n° 7, sur main depuis le 21 novembre 2026).
+et la n° 7, sur main depuis le 21 et le 22 novembre 2026).
 
 ## 1. Livraison en deux PR, une à la fois
 

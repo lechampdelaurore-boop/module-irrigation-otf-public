@@ -2,6 +2,7 @@ import { db } from './binding';
 import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import { ensureWorkspaceForUser } from './workspace-repository';
 import { hydraulicRevisionStatement } from './workspace-repository';
+import { defaultPumpJournal, pumpArchiveJournal, pumpJournal } from './change-journal/equipment';
 import {
   normalizePumpDraft,
   type EquipmentPumpDefault,
@@ -150,8 +151,11 @@ export async function savePumpForUser(
   await assertOriginsOwned(workspaceId, draft);
   const now = new Date().toISOString();
   const statusChangedToArchived = draft.status === 'archived';
+  // Le journal des modifications : un changement lu avant l'effacement des anciennes origines, une création après les nouvelles (amélioration n° 7, D-287).
+  const journal = pumpJournal('pompe', { workspaceId, actorUserId, at: now }, id, draft, pumpId !== null);
   const statements: D1PreparedStatement[] = [
     hydraulicRevisionStatement(ownerUserId),
+    ...journal.before,
     pumpId
     ? db.prepare(`UPDATE irrigation_pumps SET name = ?, maximum_flow_cubic_meters_per_hour = ?,
         status = ?, archived_at = ?, notes = ?, updated_at = ? WHERE id = ? AND workspace_id = ?`)
@@ -174,7 +178,7 @@ export async function savePumpForUser(
       .bind(crypto.randomUUID(), workspaceId, id, origin.sourceKind,
         origin.resourceId, origin.reservoirId, origin.isDefault ? 1 : 0));
   }
-  statements.push(auditStatement(workspaceId, id, pumpId ? 'updated' : 'created', draft, actorUserId));
+  statements.push(...journal.after, auditStatement(workspaceId, id, pumpId ? 'updated' : 'created', draft, actorUserId));
   await db.batch(statements);
   return id;
 }
@@ -190,6 +194,8 @@ export async function setPumpArchivedForUser(
   const now = new Date().toISOString();
   await db.batch([
     hydraulicRevisionStatement(ownerUserId),
+    // Le journal des modifications d'abord : rangée ou ressortie (amélioration n° 7, D-287).
+    pumpArchiveJournal('pompe', { workspaceId, actorUserId, at: now }, pumpId, archived),
     db.prepare(`UPDATE irrigation_pumps SET status = ?, archived_at = ?, updated_at = ?
       WHERE id = ? AND workspace_id = ?`)
       .bind(archived ? 'archived' : 'active', archived ? now : null, now, pumpId, workspaceId),
@@ -224,6 +230,8 @@ export async function saveEquipmentDefaultPumpForUser(
     : db.prepare('DELETE FROM irrigation_equipment_pump_defaults WHERE equipment_id = ? AND workspace_id = ?')
         .bind(equipmentId, workspaceId);
   await db.batch([
+    // Le journal des modifications d'abord : l'avant est la pompe par défaut en vigueur, aucune sans réglage (amélioration n° 7, D-287).
+    defaultPumpJournal('pompe-par-defaut', { workspaceId, actorUserId, at: new Date().toISOString() }, equipmentId, pumpId),
     statement,
     // Sans pompe (retrait de la pompe par défaut), le journal reçoit NULL : la
     // colonne est nullable et sa clé étrangère refuserait toute autre valeur.

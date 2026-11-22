@@ -847,6 +847,17 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
+  matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,
+  F721), empilée sur la PR 5. Les 21 écrivains du matériel et des
+  ressources (§5.1) écrivent leur ligne dans leur lot : matériel (créé,
+  modifié, rangé, copié, effacé), réglages de matériel, pompes et pompe par
+  défaut, ressources et débit mesuré, réserves, liaisons, alimentation par
+  défaut, poses. Une ressource, une réserve, un réglage ou une pompe se lit
+  par son nom, avant comme après. L'inventaire n'a plus d'écrivain « à
+  brancher » : tous sont branchés ou sans objet. Reste l'écran (PR 7). Sans
+  migration. Contrôles : voir la PR.
+
 - Améliorations, **n° 7, le journal des modifications : PR 5 sur 7, les
   objectifs et les réglages branchés, codée le 21 novembre 2026** (D-286,
   F719, F720), empilée sur la PR 4. Les 23 écrivains des objectifs et des
@@ -877,7 +888,10 @@ registres, elle y renvoie.
   réglages que la liste du contrat ne nomme pas (réglages du besoin par
   culture, abris des parcelles, groupes de jardins, lieu météo), hors du
   journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)
-  se complète avec la chaîne, après #162 et la PR du contrat.
+  se complète avec la chaîne, après #162 et la PR du contrat. **En ligne le
+  22 novembre 2026 à 0 h 32** (#166, fusionnée à 0 h 04, run 44959950487
+  vérifié job par job : les cinq jobs verts ; migration 0044 appliquée sur
+  les deux bases).
 
 - Améliorations, **n° 6, le panneau « données manquantes » : codée le
   21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de

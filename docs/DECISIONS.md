@@ -7873,6 +7873,50 @@ aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
 migration, aucun appel à OTF. Le matériel et les ressources viennent avec
 la PR 6.
 
+## D-287 — Améliorations, n° 7 : le matériel et les ressources écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 7, PR 6
+sur 7 des améliorations, sur le « vas-y » du porteur du 21 novembre 2026 à
+9 h 52 ; réglage Opus 5.5 · Très élevé, section 6 septies ; suite de D-285
+et D-286).
+
+**Contexte.** Après D-286, restaient « à brancher » les 21 écrivains du
+matériel et des ressources que nomme le contrat (§5.1) : le matériel, ses
+réglages, sa copie et sa pompe par défaut, les pompes et leurs origines, les
+ressources en eau et leur débit mesuré, les réserves, les liaisons d'une
+ressource à une réserve et entre réserves, l'alimentation par défaut et les
+poses du matériel.
+
+**Décision.** Ces 21 écrivains placent leur ligne dans leur lot, par les
+fonctions de `db/change-journal/equipment.ts`, et l'inventaire les dit
+« branchés » : il n'a plus d'écrivain « à brancher », chacun est branché ou
+sans objet. Une modification se lit avant l'écriture, à la condition même de
+l'écriture (un matériel actif, une pose à sa date de mise à jour) ; une
+création s'écrit après l'insertion, lue sur la ligne écrite ; un effacement
+se lit avant. Une précision de code :
+
+1. **F721. Une valeur désignée se lit par son nom, des deux côtés.** Une
+   ressource, une réserve, un réglage, une pompe, un groupe de jardin
+   désignés par un identifiant s'écrivent par leur nom, et la nouvelle
+   valeur est lue en SQL dans le lot (`nextSql`), comme l'ancienne : les
+   deux sont formatées pareil, et un nom changé ensuite n'est pas réécrit.
+   Les valeurs composées s'écrivent en texte, triées pour qu'un même
+   ensemble dans un autre ordre ne compte pas comme un changement : le
+   profil d'une aspersion `[[distance, débit], …]` par distance, les
+   origines d'une pompe `[[sorte, nom, par défaut], …]`, les planches d'une
+   pose par leur ordre de pose. Le volume présent d'une réserve n'est pas
+   un réglage : il n'entre pas au journal. Le débit mesuré appliqué à une
+   ressource dit « modifié » sur son débit, avec l'origine « débit mesuré ».
+   Une pose retirée dit « modifié » sur sa date de retrait ; reposée, sur
+   ses dates. La copie d'un matériel écrit la création de la copie, avec le
+   nom de l'original, et celle de chacun de ses réglages. Les écrivains sans
+   personne nommée (le matériel, ses réglages, les poses) écrivent la clé de
+   l'espace, comme D-286.
+
+Ne changent pas : les journaux de domaine (écrits comme avant, à côté),
+aucun calcul, aucun écran (la lecture vient avec la PR 7), aucune
+migration, aucun appel à OTF.
+
 ## D-290 — Améliorations, n° 4 : la priorité conseillée selon le stade sensible, en pénurie
 
 Date : 21 novembre 2026. Statut : décidé (code de l'amélioration n° 4, sur
