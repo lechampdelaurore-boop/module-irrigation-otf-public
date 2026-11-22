@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (outillage : eslint 10)
+
+- **eslint 10, l'alerte minimatch fermée** (D-292) : `eslint` 9.39.4 →
+  10.15.0, typescript-eslint 8.68.0 → 8.73.0 ; `minimatch` 10.2.6,
+  vulnérable (GHSA-g3hv-75wg-m249), quitte l'outil de lint. Trois greffons
+  d'`eslint-config-next` acceptés sous eslint 10 (`pnpm-workspace.yaml`),
+  les épinglages `brace-expansion@5` et `js-yaml@4` levés. Rien ne change
+  dans le site servi ni dans les règles de lint.
+
 ### Ajouté (Améliorations, n° 7, PR 8 : les réglages restants)
 
 - **Les réglages restants écrivent eux aussi au journal des
