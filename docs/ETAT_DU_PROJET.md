@@ -900,6 +900,8 @@ registres, elle y renvoie.
   L'inventaire les dit « branchés » ; son test vérifie que chacun nomme son
   sujet dans son code. Restent 21 écrivains du matériel et des ressources
   (PR 6) et l'écran (PR 7). Sans migration. Contrôles : voir la PR.
+  **En ligne le 22 novembre 2026 à 0 h 57** (#167, fusionnée à 0 h 33, run
+  44962375049 vérifié job par job : les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
   table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
@@ -919,7 +921,10 @@ registres, elle y renvoie.
   réglages que la liste du contrat ne nomme pas (réglages du besoin par
   culture, abris des parcelles, groupes de jardins, lieu météo), hors du
   journal dans cette version ; la roadmap (tableau, ordre, bloc 6 septies)
-  se complète avec la chaîne, après #162 et la PR du contrat.
+  se complète avec la chaîne, après #162 et la PR du contrat. **En ligne le
+  22 novembre 2026 à 0 h 32** (#166, fusionnée à 0 h 04, run 44959950487
+  vérifié job par job : les cinq jobs verts ; migration 0044 appliquée sur
+  les deux bases).
 
 - Améliorations, **n° 6, le panneau « données manquantes » : codée le
   21 novembre 2026** (D-282, F700, F701, F710 et F711, section 3 de
@@ -962,7 +967,10 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P54 (nouveau), P53, P50 et P40 joués en
   local aux deux largeurs ; la suite complète par la CI de la PR. Le
   nouveau déclencheur se déploie avec le planificateur, à la fusion. À
-  fusionner après la PR de la n° 3.
+  fusionner après la PR de la n° 3. **En ligne le 22 novembre 2026 à
+  0 h 03** (#165, fusionnée le 21 novembre à 23 h 35, run 44957510571
+  vérifié job par job : les cinq jobs verts ; planificateur redéployé avec
+  le déclencheur « 5 * * * * »).
 
 - Améliorations, **n° 3, le message unique du matin : codée le
   21 novembre 2026** (D-283, F702, F703, F712 et F713, sections 4.1 et 4.2
@@ -987,7 +995,9 @@ registres, elle y renvoie.
   `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` réussis en
   local ; P53 (nouveau), P28 et P40 joués en local aux deux largeurs ; la suite
   complète des parcours jouée par la CI de la PR. À fusionner après la PR
-  de la n° 6.
+  de la n° 6. **En ligne le 21 novembre 2026 à 23 h 27** (#164, fusionnée
+  à 23 h 07, run 44955085109 vérifié job par job : les cinq jobs verts ;
+  migration 0043 appliquée sur les deux bases).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
