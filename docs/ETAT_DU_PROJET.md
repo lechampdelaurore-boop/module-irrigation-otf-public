@@ -620,7 +620,8 @@ registres, elle y renvoie.
   a rejoué `pnpm test`, ci-dessus) ; elle date aussi les mises en ligne
   de #172 et #173, consignées par le lot eslint 10, de la fin de leur run
   (4 h 34 et 5 h 00), comme les autres entrées, au lieu de la fin du
-  déploiement du site (4 h 33 et 4 h 59).
+  déploiement du site (4 h 33 et 4 h 59) ; et elle consigne la mise en
+  ligne de #174 (eslint 10), le 22 novembre 2026 à 12 h 13.
 
 - Tranche 4, **4.5, PR 1 sur 5 : le registre des tâches attendues**
   (D-240, F600 à F607, section 10 bis.11 de `docs/tranche-4-contract.md`),
@@ -1166,6 +1167,10 @@ registres, elle y renvoie.
   de production, corrigé en 16.4.5), pour un lot à part. `pnpm e2e` omis en
   local, sans rapport (ni l'interface ni ses services ne changent) ; la
   suite complète des parcours jouée par la CI de la PR.
+  **En ligne le 22 novembre 2026 à 12 h 13** (#174, fusionnée à 11 h 40,
+  run 45013604410 vérifié job par job : les cinq jobs verts ; sans
+  migration, « No migrations to apply » sur les deux bases ; consigné par
+  la PR de la revue de l'isolation de la 4.3 à la 4.5).
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
@@ -2700,7 +2705,7 @@ registres, elle y renvoie.
   Sonnet 5.5 · Moyen pour le travail sans code.
 - Reste au jugement du porteur : la lisibilité sur téléphone ; l'alerte
   minimatch (eslint 10), lot à part, est traitée le 22 novembre 2026 sur son
-  « vas-y » (D-292).
+  « vas-y » (D-292), en ligne le même jour (#174).
 - Charte graphique d'Ouvre ta ferme relevée le 6 novembre 2026 :
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot

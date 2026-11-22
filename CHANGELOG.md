@@ -23,6 +23,8 @@ source détaillée commit par commit.
 - **Heures de mise en ligne** des améliorations n° 4 (#172) et n° 5
   (#173) : la fin de leur run, le 22 novembre 2026 à 4 h 34 et 5 h 00,
   comme les autres entrées.
+- En ligne le 22 novembre 2026 : #174, eslint 10, fusionnée à 11 h 40 et
+  déployée à 12 h 13 (run 45013604410, cinq jobs verts).
 
 ### Modifié (outillage : eslint 10)
 
