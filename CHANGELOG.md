@@ -12,9 +12,9 @@ source détaillée commit par commit.
   `main` à `ba8cbde`, sans code : aucune fuite de données entre fermes ; un
   défaut à corriger avant l'essai E2 et le pilote (le message du matin et le
   rappel du soir partagent leur identifiant d'alarme d'une ferme à l'autre :
-  un message se perd et il est noté parti), correctif retenu, à coder dans
-  un fil à part ; l'état des points D2 à D5 du 18 novembre 2026 (D2 et D5
-  fermés, D3 et D4 ouverts). Rapport dans le dossier du projet, résumé dans
+  un message se perd et il est noté parti), correctif retenu, codé le même
+  jour dans un fil à part (#176) ; l'état des points D2 à D5 du 18 novembre
+  2026 (D2 et D5 fermés, D3 ouvert, D4 venu avec le correctif). Rapport dans le dossier du projet, résumé dans
   l'état du projet et la roadmap. Aucun code, aucun contrôle rejoué pour la
   PR.
 - **Les constats du 22 novembre 2026 pour la fiche d'entrée** (E5, E7, E9)
@@ -25,6 +25,17 @@ source détaillée commit par commit.
   comme les autres entrées.
 - En ligne le 22 novembre 2026 : #174, eslint 10, fusionnée à 11 h 40 et
   déployée à 12 h 13 (run 45013604410, cinq jobs verts).
+
+### Corrigé (Améliorations, n° 2 et 3 : une alarme par espace)
+
+- **Le message du matin et le rappel du soir ne se perdent plus quand
+  plusieurs fermes envoient le même jour** (D-293, F744, F745) : leur
+  identifiant d'alarme et leur étiquette portent l'espace de la ferme
+  (`morning:<espace>:<jour>`, `evening:<espace>:<jour>`), et un refus du
+  service de notification n'est plus compté comme un envoi : le message se
+  réessaie. Le test promis par F366 (point D4 de la revue de l'isolation)
+  est ajouté : la date de la ferme gardée s'écrit partout au même format
+  UTC.
 
 ### Modifié (outillage : eslint 10)
 

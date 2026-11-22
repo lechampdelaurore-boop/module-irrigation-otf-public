@@ -713,7 +713,9 @@ confie à la 4.3 : son constat B (F365, F366), la question de son constat A
   une PR retire le chemin de la clé du déploiement, sans migration
   destructive (la table `otf_deployment_farm` reste). D'ici là, la ferme
   gardée dans cette table se départage par sa date, écrite partout au même
-  format UTC, ce qu'un test fixe (point D4 de la revue de l'isolation).
+  format UTC, ce qu'un test fixe (point D4 de la revue de l'isolation ;
+  test ajouté le 22 novembre 2026, `tests/db/farm-identity.test.ts`, qui
+  joue chacun des quatre chemins qui écrivent la ferme gardée, D-293).
   **Jusqu'au pilote (4.6), la règle d'Access du module principal n'admet que
   des personnes de la ferme du porteur** ; les fermes amies essaient la
   démonstration (constat B de la revue) : avant la PR 4 (F370), toute
