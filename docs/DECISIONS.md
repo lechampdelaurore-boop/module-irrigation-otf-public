@@ -7983,3 +7983,77 @@ plus », le filtre et sa suite, deux fermes, le début du journal), les essais
 des écrivains (aucun champ sans ses mots), le parcours P55 à 390 et
 1 440 px. Ne changent pas : les écrivains, la table, aucune migration,
 aucun calcul, aucun appel à OTF.
+
+## D-289 — Améliorations, n° 7 : les réglages restants écrivent au journal des modifications
+
+Date : 21 novembre 2026. Statut : décidé (suite de l'amélioration n° 7,
+PR 8, empilée sur la PR 7 ; règle la précision F718 de D-285 ; réglage
+Opus 5.5 · Très élevé, section 6 septies). F718 laissait hors du journal
+les réglages que la liste du contrat (§5.1) ne nommait pas, « sur le mot du
+porteur ». Le coordinateur du projet a tranché pour une PR à part, codée
+aussitôt, dans l'autonomie que le porteur lui a confiée le 19 novembre 2026
+pour les questions qui ne touchent ni au budget, ni à l'agronomie, ni à la
+ferme réelle. **Le porteur l'a confirmé le 21 novembre 2026 à 23 h 13** (« Bon,
+c'est bien, laisse comme ça. ») : les réglages hors de la liste restent au
+journal.
+
+**Contexte.** Depuis D-287, tous les écrivains de la liste du contrat
+écrivent au journal, et l'écran le lit (D-288). Restaient hors du journal,
+chacun rangé avec la raison F718 : les réglages du besoin par culture (Kc
+corrigés, cultures de référence propres à la ferme, correspondance des
+espèces, effet des abris, paillage plastique, filets d'ombrage, options),
+le classement des jardins sous abri ou de plein champ, les groupes de
+jardins et le lieu de la météo.
+
+**Décision.** Ces réglages écrivent leur ligne dans le lot même de leur
+geste, avec les règles de D-286 (F716) : avant l'écriture pour un
+changement ou une suppression, après pour une création, seuls les champs
+qui changent, rien pour un geste refusé ou sans changement. Dix sujets
+nouveaux, tous de la famille « Réglages » : « Kc corrigé d'une culture »,
+« Culture de référence de la ferme », « Correspondance d'une espèce »,
+« Effet d'un abri (K_abri) », « Paillage plastique d'une planche »,
+« Filet d'ombrage », « Options du besoin par culture », « Jardin sous abri
+ou de plein champ », « Groupe de jardins » et « Lieu de la météo ». Cinq
+précisions :
+
+1. **F725. Ce qui reste hors du journal, et pourquoi.** Le repère de saison
+   des groupes de jardins (un état que le module tient), le report des
+   groupes de la saison d'avant sur une saison neuve (le module, à la
+   première lecture, sans geste), l'état des synchronisations météo
+   (tentative, réussite, erreur, attente), la proposition du module à côté
+   du classement d'un jardin. L'inventaire (F717) les range avec ces
+   raisons ; plus aucune table n'y porte la raison F718.
+2. **F726. Une valeur composée se garde en un texte, relu à l'identique.**
+   Les stades, les jeux de saison et les débuts de stade d'une culture de
+   référence, et les jardins d'un groupe (dans leur ordre, avec leur sens
+   et leur écart), se gardent chacun en un texte JSON. Le code l'écrit et
+   SQLite le relit dans le lot sous la même forme (un nombre entier sans
+   décimale, les mois triés) : une culture ou un groupe enregistré de
+   nouveau tel quel n'écrit aucune ligne, les trois formes de Kc
+   comprises. Les lignes filles d'une culture se composent en un seul
+   endroit (`referenceCropPartRows`), pour l'écriture et pour le journal.
+3. **F727. La version de la ferme d'une culture de référence.** La première
+   version que la ferme enregistre est une **création**, avec chacune de
+   ses valeurs, et non une modification de la culture commune ; la suivante
+   est une modification de la précédente ; la retirer est une
+   **suppression** (la commune revient, sans ligne à elle). Un Kc corrigé
+   dit sa culture par son nom et sa cible (« Tomate, stade 2 », « Brocoli,
+   Kc pleine saison ») ; une correspondance dit la culture de référence par
+   son nom, avant comme après (F721).
+4. **F728. Un jardin remis « à classer ».** Remettre un jardin « à classer »
+   efface son classement : la ligne dit une suppression, avec le
+   classement d'avant. Seul le choix de la personne compte (« sous abri »,
+   « plein champ ») ; la proposition du module, gardée à côté, n'est pas un
+   geste.
+5. **F729. Le lieu de la météo.** Seul le choix compte : l'adresse de la
+   ferme dans Ouvre ta ferme (le départ) ou une commune choisie, sa commune
+   et son code postal. La première commune choisie dit « modifié », de
+   l'adresse de la ferme à la commune.
+
+Preuves : `tests/db/change-journal-remaining-settings.test.ts` (chaque
+écrivain : création, changement, inchangé sans ligne, refus d'une autre
+ferme, suppression ; les trois formes de Kc relues à l'identique ; le texte
+des cartes), `tests/change-journal-inventory.test.ts` (chaque table et
+chaque écrivain rangé, chaque écrivain branché nomme son sujet), contrôle de
+cohérence des espaces. Ne changent pas : la table du journal, l'écran
+(D-288), aucune migration, aucun calcul, aucun appel à OTF.
