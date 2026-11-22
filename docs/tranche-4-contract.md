@@ -2128,6 +2128,8 @@ Chaque ligne se **vérifie dans le dépôt, les PR ou le tableau de bord**, jama
 
 E3, E6 et E12 touchent au budget, au juridique ou à Cloudflare : **réservés**. Les autres peuvent être préparés la nuit par l'assistant.
 
+> **Note du 22 novembre 2026 à 17 h 50 (D-299).** Le porteur n'a trouvé aucun relecteur et **lève la condition E6** : il prend la responsabilité des textes non relus. Toute mention de ce contrat qui subordonne une ferme tierce, un envoi ou le pilote à la relecture juridique (T4-20, question 4, 4.8, 10 ter) se lit désormais ainsi : condition levée par le porteur, textes toujours non relus par un juriste, rien d'autre ne change.
+
 #### 10 ter.4 · Les points
 
 ##### F570 · La fiche d'entrée et le « feu vert »
