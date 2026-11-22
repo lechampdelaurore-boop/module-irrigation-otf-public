@@ -1064,6 +1064,9 @@ registres, elle y renvoie.
   de la branche principale après la n° 7, #157 et #158. La même PR consigne
   la remise à zéro de nuit de la démonstration, lue dans les journaux
   (ligne 4.0), et la mise en ligne de #158.
+  **En ligne le 22 novembre 2026 à 4 h 33** (#172, fusionnée à 4 h 08, run
+  44979248732 vérifié job par job : les cinq jobs verts ; migration 0045
+  appliquée sur les deux bases).
 
 - Améliorations, **n° 5, l'écart entre l'eau prévue et l'eau apportée,
   expliqué : codée le 22 novembre 2026** (D-291, F733 à F735 et F740 à
@@ -1097,6 +1100,26 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P57 (nouveau), P10, P26, P28, P31,
   P40 et P41 joués en local aux deux largeurs ; la suite complète des
   parcours jouée par la CI de la PR. À fusionner après la n° 4 (#172).
+  **En ligne le 22 novembre 2026 à 4 h 59** (#173, fusionnée à 4 h 35, run
+  44981325097 vérifié job par job : les cinq jobs verts).
+
+- Outillage, **lot eslint 10 : codé le 22 novembre 2026** (D-292), le lot à
+  part de l'alerte minimatch, sur le « vas-y » du porteur, en Opus 5.5 ·
+  Élevé : `eslint` 9.39.4 → 10.15.0 et typescript-eslint 8.68.0 → 8.73.0
+  (verrou) ; `minimatch` 10.2.6, vulnérable, quitte l'arbre de l'outil de
+  lint. Trois greffons d'`eslint-config-next` acceptés sous eslint 10 après
+  comparaison des signalements, deux épinglages devenus sans objet levés,
+  `eslint.config.mjs` inchangé, rien du site servi ne change. Contrôles de
+  la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 245 tests verts,
+  dont ceux de `tests/lint-boundaries.test.ts`, qui joue ESLint lui-même,
+  puis les 603 tests de la persistance sous chacune des trois isolations et
+  les 2 245 de nouveau sous la jauge du moteur commun, aucun échec), `pnpm
+  build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check` et `pnpm
+  site:check` réussis en local avant et après le changement ; `pnpm audit` :
+  huit alertes modérées avant, sept après, toutes sur `next` 16.4.3 (paquet
+  de production, corrigé en 16.4.5), pour un lot à part. `pnpm e2e` omis en
+  local, sans rapport (ni l'interface ni ses services ne changent) ; la
+  suite complète des parcours jouée par la CI de la PR.
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
@@ -2630,7 +2653,8 @@ registres, elle y renvoie.
 - Réglage de chaque tâche : la colonne « Modèle · effort » de la roadmap, et
   Sonnet 5.5 · Moyen pour le travail sans code.
 - Reste au jugement du porteur : la lisibilité sur téléphone ; l'alerte
-  minimatch (eslint 10) est un lot à part, sur son « vas-y ».
+  minimatch (eslint 10), lot à part, est traitée le 22 novembre 2026 sur son
+  « vas-y » (D-292).
 - Charte graphique d'Ouvre ta ferme relevée le 6 novembre 2026 :
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot
