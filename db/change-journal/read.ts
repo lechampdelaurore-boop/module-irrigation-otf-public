@@ -87,3 +87,31 @@ function entryOf(row: JournalRow): ChangeJournalEntry[] {
     sequence: Number(row.sequence),
   }];
 }
+
+/**
+ * Le jour où le journal de la ferme commence (§5.6, D-288, F723) : le plus
+ * tard de la mise en service du journal, lue dans la liste des migrations
+ * reçues par la base (`d1_migrations`, tenue par Cloudflare), et de la
+ * création de l'espace. Une base sans cette liste (les essais en local) prend
+ * la création de l'espace ; `null` pour qui n'a pas d'espace.
+ */
+export async function changeJournalStartForUser(ownerUserId: string): Promise<string | null> {
+  const workspaceId = await findWorkspaceIdForUser(ownerUserId);
+  if (!workspaceId) return null;
+  const workspace = await db.prepare('SELECT created_at FROM irrigation_workspaces WHERE id = ?').bind(workspaceId).first<{ created_at: string }>();
+  const tracked = await db.prepare("SELECT 1 AS present FROM sqlite_master WHERE type = 'table' AND name = 'd1_migrations'").first<{ present: number }>();
+  const migration = tracked
+    ? await db.prepare("SELECT MIN(applied_at) AS applied_at FROM d1_migrations WHERE name LIKE '%\\_change\\_journal.sql' ESCAPE '\\'")
+      .first<{ applied_at: string | null }>()
+    : null;
+  const applied = migration?.applied_at ? utcInstant(migration.applied_at) : null;
+  const created = workspace?.created_at ?? null;
+  if (applied === null || created === null) return created ?? applied;
+  return applied > created ? applied : created;
+}
+
+/** `applied_at` est un instant UTC, sans fuseau quand D1 l'écrit (« 2026-11-21 12:00:00 ») ; illisible, il ne compte pas. */
+function utcInstant(value: string): string | null {
+  const date = new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}

@@ -17,6 +17,7 @@ import type {
   WaterResource,
   WaterResourceDraft,
 } from '@/lib/domain/water-resources';
+import { RESERVOIR_TYPE_LABELS, RESOURCE_TYPE_LABELS } from '@/lib/domain/water-resource-labels';
 import { availableAfterPlanningOrigin } from '@/lib/domain/reservoir-origin';
 import { reservoirAnchor } from '@/lib/domain/today/reliability';
 import { ResourceFlowPanel } from './resource-flow-panel';
@@ -38,14 +39,8 @@ import { countText } from '@/lib/domain/clock-text';
 
 const volume = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 });
 
-const resourceTypes: Array<[WaterResource['type'], string]> = [
-  ['borehole', 'Forage'], ['well', 'Puits'], ['spring', 'Source'], ['network', 'Réseau d’eau'],
-  ['catchment', 'Captage'], ['river', 'Rivière'], ['other', 'Autre'],
-];
-const reservoirTypes: Array<[WaterReservoir['type'], string]> = [
-  ['buffer', 'Réserve tampon'], ['pond', 'Bassin'], ['cistern', 'Citerne'],
-  ['tank', 'Cuve'], ['reservoir', 'Retenue'], ['other', 'Autre'],
-];
+const resourceTypes = Object.entries(RESOURCE_TYPE_LABELS) as Array<[WaterResource['type'], string]>;
+const reservoirTypes = Object.entries(RESERVOIR_TYPE_LABELS) as Array<[WaterReservoir['type'], string]>;
 
 export function WaterResourceManager({
   season,

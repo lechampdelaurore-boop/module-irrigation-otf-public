@@ -16,6 +16,7 @@ import {
 } from '../../db/water-resource-repository';
 import type { ChangeJournalEntry } from '../../lib/domain/change-journal/entry';
 import type { PumpDraft } from '../../lib/domain/pumps';
+import { fieldsWithoutWords } from '../support/change-journal-words';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { FIXTURE_PLOT_ID, FIXTURE_ZONE_ID } from '../support/irrigation-fixtures';
 import { crossSpaceReferences } from '../support/space-coherence';
@@ -41,7 +42,10 @@ afterEach(() => {
 /** Le journal d'une ferme, dans l'ordre des gestes (l'ordre d'écriture). */
 async function journal(spaceKey = ALICE): Promise<ChangeJournalEntry[]> {
   const order = (database.sqlite.prepare('SELECT id FROM irrigation_change_journal ORDER BY rowid').all() as { id: string }[]).map(({ id }) => id);
-  return (await listChangeJournalForUser(spaceKey, { limit: 200 })).sort((left, right) => order.indexOf(left.id) - order.indexOf(right.id));
+  const entries = (await listChangeJournalForUser(spaceKey, { limit: 200 })).sort((left, right) => order.indexOf(left.id) - order.indexOf(right.id));
+  // Chaque champ écrit a ses mots à l'écran (PR 7, D-288, F722).
+  assert.deepEqual(fieldsWithoutWords(entries), []);
+  return entries;
 }
 
 const summary = (entry: ChangeJournalEntry) => ({ subject: entry.subject, action: entry.action, before: entry.before, after: entry.after });

@@ -847,6 +847,22 @@ registres, elle y renvoie.
   la 4.3. Rien n'est vérifié en réel. Contrôles : documentation seule,
   aucun contrôle de code rejoué.
 
+- Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
+  l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
+  la PR 6. En bas de « Réglages », juste avant « Supprimer ma ferme et mes
+  données », le pli « Journal des modifications », fermé, sa ligne
+  « N modifications, la dernière le … » ; ouvert, les 50
+  dernières cartes (quand, « Vous » ou « Une autre personne connectée », le
+  sujet, l'action, l'objet, chaque champ avant → après avec son unité), un
+  filtre par famille et « Voir plus » par 50. Les mots de chaque champ et
+  la carte se composent dans `lib/domain/change-journal/` ; les essais des
+  écrivains échouent pour un champ sans ses mots. Le journal commence à sa
+  mise en service, lue dans la liste des migrations reçues par la base. Le
+  budget de hauteur de « Réglages » au téléphone (P40) passe à 3 750 px.
+  Parcours P55 à 390 et 1 440 px. Sans migration. Contrôles : voir la PR.
+  L'amélioration n° 7 est codée en entier ; reste F718 (les réglages hors
+  de la liste du contrat), sur le mot du porteur.
+
 - Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
   matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,
   F721), empilée sur la PR 5. Les 21 écrivains du matériel et des
@@ -869,6 +885,8 @@ registres, elle y renvoie.
   L'inventaire les dit « branchés » ; son test vérifie que chacun nomme son
   sujet dans son code. Restent 21 écrivains du matériel et des ressources
   (PR 6) et l'écran (PR 7). Sans migration. Contrôles : voir la PR.
+  **En ligne le 22 novembre 2026 à 0 h 57** (#167, fusionnée à 0 h 33, run
+  44962375049 vérifié job par job : les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 4 sur 7, la
   table et la règle, codée le 21 novembre 2026** (D-285, F706 à F709 du
