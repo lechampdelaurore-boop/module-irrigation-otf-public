@@ -1037,9 +1037,10 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P56 (nouveau), P7, P14, P15, P16,
   P17, P20, P31c, P32, P39, P40 et P52 joués en local aux deux largeurs, et
   la visite V4 de la démonstration ; la suite complète des parcours jouée
-  par la CI de la PR. À fusionner après la file en cours (la n° 7, #157,
-  #158). La même PR consigne la remise à zéro de nuit de la
-  démonstration, lue dans les journaux (ligne 4.0).
+  par la CI de la PR. À fusionner juste après #158, mise à jour par fusion
+  de la branche principale après la n° 7, #157 et #158. La même PR consigne
+  la remise à zéro de nuit de la démonstration, lue dans les journaux
+  (ligne 4.0), et la mise en ligne de #158.
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
@@ -1484,10 +1485,10 @@ registres, elle y renvoie.
   lint, typage, 1 930 tests et les trois passages d'isolation, le rejeu des
   1 930 sur le moteur, compilation, knip, `demo:check`, verts ; parcours
   navigateur et Workers sans rapport (ni interface ni Worker touchés), joués
-  par la CI. Reste : la PR passe en dernier dans la file, après les
-  chaînes 4.4 et 4.5 et #157, remise à jour par fusion de la branche
-  principale ; la PR 2 (l'interrupteur sur le moteur) après trois matins
-  sans écart sur la ferme.
+  par la CI. **En ligne le 22 novembre 2026 à 3 h 39** (#158, fusionnée à
+  3 h 09, run 44974783445 vérifié job par job : les cinq jobs verts). Reste :
+  la PR 2 (l'interrupteur sur le moteur) après trois matins sans écart sur
+  la ferme.
 - **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
   22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
   culture et par stade (5 quater), les alertes météo par culture (5
