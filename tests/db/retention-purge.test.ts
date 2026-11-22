@@ -60,6 +60,16 @@ function writeAgedRows(sqlite: DatabaseSync): void {
     access.run(`trop-vieux-${farm}`, farm, '2025-11-27', 'La ferme demande pourquoi son planning est vide', '2025-11-27T10:00:00.000Z');
     access.run(`a-sa-limite-${farm}`, farm, '2025-11-28', 'La ferme demande pourquoi son planning est vide', '2025-11-28T10:00:00.000Z');
   }
+  // L'archive des prévisions (D-297) : une table d'espace, 24 mois par jour d'émission ; un espace par ferme.
+  const space = sqlite.prepare('INSERT OR IGNORE INTO irrigation_workspaces (id, owner_user_id, otf_farm_id) VALUES (?, ?, NULL)');
+  const archive = sqlite.prepare(`INSERT INTO irrigation_weather_forecast_archive
+    (workspace_id, location_key, issued_on, target_date, horizon_days, precipitation_mm, et0_mm, source, fetched_at)
+    VALUES (?, 'otf:ferme', ?, date(?, '+1 days'), 1, 2.5, NULL, 'visual-crossing', ?)`);
+  for (const farm of FARMS) {
+    space.run(`archive-${farm}`, `archive-${farm}`);
+    archive.run(`archive-${farm}`, '2024-11-27', '2024-11-27', '2024-11-27T05:15:00.000Z');
+    archive.run(`archive-${farm}`, '2024-11-28', '2024-11-28', '2024-11-28T05:15:00.000Z');
+  }
 }
 
 /** Ce que gardent les tables purgées, ligne par ligne, dans un ordre stable. */
@@ -73,6 +83,7 @@ function aged(sqlite: DatabaseSync) {
     otf_authentication_failures: all('SELECT failed_at_ms FROM otf_authentication_failures ORDER BY failed_at_ms'),
     irrigation_operator_notices: all('SELECT paris_day FROM irrigation_operator_notices ORDER BY paris_day'),
     irrigation_support_accesses: all('SELECT otf_farm_id, accessed_on FROM irrigation_support_accesses ORDER BY otf_farm_id, accessed_on'),
+    irrigation_weather_forecast_archive: all("SELECT workspace_id, issued_on FROM irrigation_weather_forecast_archive WHERE workspace_id LIKE 'archive-%' ORDER BY workspace_id, issued_on"),
   };
 }
 
@@ -85,6 +96,7 @@ const KEPT = {
   otf_authentication_failures: [`${ms('2026-11-28T05:01:00.001Z')}`],
   irrigation_operator_notices: ['2026-10-24'],
   irrigation_support_accesses: FARMS.map((farm) => `${farm} 2025-11-28`),
+  irrigation_weather_forecast_archive: FARMS.map((farm) => `archive-${farm} 2024-11-28`),
 };
 
 /** Le nombre de lignes de chaque table que les purges ne visent pas. */
@@ -110,7 +122,7 @@ test('chaque purge efface, pour toutes les fermes, ce qui a dépassé sa durée,
 
   const report = await runRetentionPurges({ now: NOW, log: (_level, entry) => lines.push(entry) });
 
-  assert.deepEqual(report, { purged: 11, unfinished: 0, failures: [] });
+  assert.deepEqual(report, { purged: 13, unfinished: 0, failures: [] });
   assert.deepEqual(aged(database.sqlite), KEPT);
   assert.deepEqual(untouched(database.sqlite), before, 'aucune table d’espace ni table commune sans durée n’est touchée');
   assert.deepEqual(lines, [
@@ -121,6 +133,7 @@ test('chaque purge efface, pour toutes les fermes, ce qui a dépassé sa durée,
     { event: 'retention_purge_step', table: 'otf_authentication_failures', rows: 1 },
     { event: 'retention_purge_step', table: 'irrigation_operator_notices', rows: 1 },
     { event: 'retention_purge_step', table: 'irrigation_support_accesses', rows: 2 },
+    { event: 'retention_purge_step', table: 'irrigation_weather_forecast_archive', rows: 2 },
   ], 'le journal ne dit que des noms de table et des nombres');
 
   assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 0, unfinished: 0, failures: [] }, 'un second passage n’a plus rien à faire');
@@ -133,10 +146,10 @@ test('bornée, une purge reprend au passage suivant, sans rien effacer de plus',
   for (let index = 0; index < 1_200; index += 1) start.run('4394', ms('2026-11-01T05:16:00.000Z') + index, '2026-11-01');
 
   const cut = await runRetentionPurges({ now: NOW, statements: 2, log: () => undefined });
-  assert.deepEqual(cut, { purged: 1_000, unfinished: 7, failures: [] }, 'deux lots de 500, puis plus rien de neuf : sept purges à finir');
+  assert.deepEqual(cut, { purged: 1_000, unfinished: 8, failures: [] }, 'deux lots de 500, puis plus rien de neuf : huit purges à finir');
   assert.equal(Number((database.sqlite.prepare('SELECT COUNT(*) AS n FROM otf_call_starts').get() as { n: number }).n), 1_202 - 1_000 + 2);
 
-  assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 1_202 - 1_000 + 9, unfinished: 0, failures: [] });
+  assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 1_202 - 1_000 + 11, unfinished: 0, failures: [] });
   assert.deepEqual(aged(database.sqlite), KEPT);
 });
 
@@ -159,7 +172,7 @@ test('une purge en échec n’arrête pas les autres, et son message ne va pas a
   } finally {
     overrideDatabase(database.d1);
   }
-  assert.deepEqual(report, { purged: 9, unfinished: 0, failures: ['Error'] });
+  assert.deepEqual(report, { purged: 11, unfinished: 0, failures: ['Error'] });
   assert.deepEqual(lines.filter((line) => line.event === 'retention_purge_failed'), [{ event: 'retention_purge_failed', table: 'otf_call_outcomes', error: 'Error' }]);
   assert.ok(!JSON.stringify(lines).includes('panne simulée'), 'le message de la base n’est pas recopié');
   assert.deepEqual(aged(database.sqlite), { ...KEPT, otf_call_outcomes: FARMS.flatMap((farm) => [`${farm} ${ms('2026-11-20T04:00:00.000Z')}`, `${farm} ${ms('2026-11-20T05:00:00.000Z')}`]) });

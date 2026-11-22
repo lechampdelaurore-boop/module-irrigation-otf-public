@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { writeForecastArchive } from './forecast-archive-repository';
 import { listFarmsWithSelection } from './feature-selection-repository';
 import { usesWeather } from '@/lib/domain/features/socle';
 import type {
@@ -29,6 +30,7 @@ export const automaticWeatherRepository: AutomaticWeatherSyncRepository = {
   finishJob: finishAutomaticWeatherSync,
   listTargets: listAutomaticWeatherTargets,
   upsertValues: upsertAutomaticWeatherValues,
+  archiveForecast: writeForecastArchive,
   recordWorkspaceResult: recordAutomaticWeatherWorkspaceResult,
 };
 

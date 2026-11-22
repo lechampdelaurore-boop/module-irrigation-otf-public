@@ -2021,6 +2021,7 @@ Le jugement d'une carte : **rouge** pour un raccordement révoqué ou hors d'usa
 | `otf_deployment_farm` | la ferme de la clé du déploiement | réécrite à chaque lecture | personne : un réglage du déploiement |
 | `irrigation_support_accesses` (10 bis.21) | le journal d'accès du support : le jour, la ferme, la raison en une ligne | 12 mois | la purge du matin ; l'effacement du dernier espace de la ferme (F642) |
 | `irrigation_cost_readings` (10 bis.21) | le relevé des coûts du mois, copié du tableau de bord | sans limite | personne : des nombres du déploiement, d'aucune ferme |
+| `irrigation_weather_forecast_archive` (archive des prévisions, D-297) | une table d'espace : chaque jour, les prévisions J+1 à J+7 de la première lecture réussie, jamais écrasées | 24 mois | la purge du matin, par jour d'émission ; l'effacement de la ferme, comme toute table d'un espace (F563) |
 
 Hors de la base D1, les durées de F562 tiennent sans code nouveau : les journaux des Workers, 7 jours chez Cloudflare (F354) ; l'historique Time Travel, 30 jours ; l'export de la semaine, gardé par le porteur (10 bis.9), cinq semaines au plus (10 bis.20, F657). Les abonnements de notification vivent dans le Worker de notification, pas dans D1 (voir plus haut).
 

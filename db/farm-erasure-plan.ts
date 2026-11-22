@@ -32,6 +32,7 @@ export const SPACE_TABLES: readonly SpaceTable[] = [
   { table: 'irrigation_weather_preferences' },
   { table: 'irrigation_weather_geocodes' },
   { table: 'irrigation_weather_daily_values' },
+  { table: 'irrigation_weather_forecast_archive' },
   { table: 'irrigation_weather_alerts' },
   { table: 'irrigation_weather_alert_criterion_versions', via: { column: 'criterion_id', parent: 'irrigation_weather_alert_criteria' } },
   { table: 'irrigation_weather_alert_criteria' },

@@ -9,6 +9,9 @@ import { SPACE_ROOT_TABLE, SPACE_TABLES } from './farm-erasure-plan.ts';
  * - Les tables d'un espace (celles du plan d'effacement, `SPACE_TABLES`, et
  *   l'espace lui-même) ont une seule règle, `SPACE_RETENTION` : gardées tant
  *   que l'espace existe.
+ * - Une table d'espace dont les lignes vieillissent avant l'espace (l'archive
+ *   des prévisions, 24 mois, D-297) a sa règle dans `RETENTION_PLAN`, et non
+ *   `SPACE_RETENTION` : elle reste au plan d'effacement d'une ferme.
  * - Chaque autre table a la sienne dans `RETENTION_PLAN`, en clair ; celles
  *   dont les lignes vieillissent nomment leur purge, que la tâche
  *   « Purges de conservation » du matin applique (`RETENTION_PURGES`).
@@ -107,10 +110,18 @@ export const RETENTION_PLAN: Readonly<Record<string, RetentionRule & { purge?: s
     kept: 'Une ligne, réécrite à chaque lecture par la clé du déploiement.',
     erasedBy: 'Personne : le réglage du déploiement, pas une donnée de la personne.',
   },
+  irrigation_weather_forecast_archive: {
+    kept: RETENTION_WORDS.irrigation_weather_forecast_archive,
+    erasedBy: 'La purge du matin, par jour d’émission (D-297) ; l’effacement de la ferme, sept jours après sa demande, comme toute table d’un espace (F563, F641).',
+    purge: 'issued_on < ?',
+  },
 };
 
-/** Les tables d'un espace, l'espace compris. */
-export const SPACE_RETENTION_TABLES: readonly string[] = [...SPACE_TABLES.map(({ table }) => table), SPACE_ROOT_TABLE];
+/** Les tables d'un espace, l'espace compris, sauf celles qui ont leur propre durée dans `RETENTION_PLAN`. */
+export const SPACE_RETENTION_TABLES: readonly string[] = [
+  ...SPACE_TABLES.map(({ table }) => table).filter((table) => !(table in RETENTION_PLAN)),
+  SPACE_ROOT_TABLE,
+];
 
 /** Les purges par durée, dans l'ordre du plan. */
 export const RETENTION_PURGES: readonly RetentionPurge[] = Object.entries(RETENTION_PLAN).flatMap(([table, rule]) => (

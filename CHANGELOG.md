@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (archive des prévisions J+1 à J+7)
+
+- **La prévision de la veille n'est plus perdue** (D-297,
+  `docs/forecast-archive-contract.md`, migration 0046) : chaque jour, la
+  première lecture réussie des prévisions est gardée pour les sept jours
+  suivants, par exploitation, sans jamais être écrasée, pendant 24 mois.
+  Elle servira plus tard à comparer prévu et réalisé. Aucun appel météo de
+  plus, aucun écran, aucun calcul changé ; un échec de l'archive ne bloque
+  jamais la météo. Inscrite aux plans d'effacement et de conservation,
+  purgée par la tâche du matin.
+
 ### Documentation (revue de l'isolation de la 4.3 à la 4.5, registres)
 
 - **La revue de l'isolation de la 4.3 à la 4.5** (condition E8 de la fiche
