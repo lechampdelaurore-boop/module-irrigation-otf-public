@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Décidé (relecture juridique)
+
+- **Relecture juridique abandonnée par le porteur** le 22 novembre 2026 à
+  17 h 50 (D-299) : condition d'entrée E6 du pilote levée, textes toujours
+  non relus par un juriste, responsabilité prise par le porteur. Registres
+  seuls, aucun code.
+- En ligne le 22 novembre 2026 : #181 à 17 h 34 (run 45041483079, cinq jobs
+  verts).
+
 ### Corrigé (icône de l'onglet)
 
 - **L'onglet du navigateur porte l'icône du module** (D-298) : la page ne

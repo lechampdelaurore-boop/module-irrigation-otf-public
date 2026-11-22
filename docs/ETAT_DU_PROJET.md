@@ -12,6 +12,20 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Relecture juridique abandonnée par le porteur le 22 novembre 2026 à
+  17 h 50** (D-299) : il n'a trouvé aucun relecteur gratuit et prend la
+  responsabilité des textes tels quels. La condition E6 du pilote (fiche
+  d'entrée) est **levée**, non cochée comme « faite » ; la confidentialité,
+  les conditions et le modèle d'accord restent non relus par un juriste.
+  Consignée dans D-299, la fiche d'entrée, le modèle d'accord (statut et
+  mode d'emploi), le contrat de la Tranche 4 (note au 10 ter.3) et la
+  roadmap (4.6). Ouvert, à sa décision : la page publique de confidentialité
+  promet encore une relecture « avant qu'une autre ferme soit reliée »
+  (D-299, « Reste »). Mise en ligne de #181 (icône de l'onglet, D-298)
+  consignée ici : fusionnée le 22 novembre 2026 à 17 h 01, **en ligne à
+  17 h 34** (run 45041483079 vérifié job par job : les cinq jobs verts).
+  PR de registres seule : **aucun contrôle de code rejoué**, sans rapport
+  avec le code.
 - **Sept améliorations validées par le porteur le 21 novembre 2026** (D-280,
   roadmap, section 6 septies), inscrites après vérification dans le code :
   « Fait comme prévu » (n° 1) existe déjà, le résumé du matin (n° 3) existe en

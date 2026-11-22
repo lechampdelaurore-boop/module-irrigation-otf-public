@@ -1,13 +1,13 @@
 # Pilote multi-fermes : modèle d'accord avec une ferme
 
-> **Statut : modèle, non envoyé, non relu par un juriste.** Écrit le 20 novembre 2026 (4.6, PR 1, F572 du contrat `docs/tranche-4-contract.md`, section 10 ter). Ce texte **n'est pas un avis juridique**. Il doit passer par la relecture juridique gratuite du réseau du porteur (condition d'entrée E6) **avant tout envoi**. Le porteur l'envoie lui-même, à chaque ferme, par courriel : l'assistant ne l'envoie à personne.
+> **Statut : modèle, non envoyé, non relu par un juriste.** *Le 22 novembre 2026 à 17 h 50, le porteur a renoncé à la relecture juridique (condition E6 levée, D-299) : il n'a trouvé aucun relecteur et prend la responsabilité des textes tels quels. Ils restent donc non relus ; la phrase ci-dessous sur la relecture est conservée comme l'état d'origine.* Écrit le 20 novembre 2026 (4.6, PR 1, F572 du contrat `docs/tranche-4-contract.md`, section 10 ter). Ce texte **n'est pas un avis juridique**. Il doit passer par la relecture juridique gratuite du réseau du porteur (condition d'entrée E6) **avant tout envoi**. Le porteur l'envoie lui-même, à chaque ferme, par courriel : l'assistant ne l'envoie à personne.
 >
 > **Aucune donnée de ferme ne s'écrit dans ce fichier**, qui est public : ni nom de ferme, ni nom de personne, ni adresse. Les réponses reçues restent chez le porteur, hors dépôt.
 
 ## Mode d'emploi pour le porteur
 
 1. Choisir la ferme (critères de F578 : France métropolitaine, la personne est propriétaire de la ferme dans Ouvre ta ferme, plan de culture à jour).
-2. Après la relecture juridique (E6), recopier le texte « À envoyer » ci-dessous dans un courriel, en remplaçant les trois repères entre crochets, **et en datant la version** (le jour de l'envoi).
+2. La relecture juridique (E6) est levée (D-299, 22 novembre 2026 à 17 h 50) ; recopier le texte « À envoyer » ci-dessous dans un courriel, en remplaçant les trois repères entre crochets, **et en datant la version** (le jour de l'envoi).
 3. Vérifier, ligne à ligne, que les durées du texte correspondent à la page de confidentialité en ligne ce jour-là (condition E7). En cas d'écart, la page en ligne fait foi et ce modèle se corrige par PR avant l'envoi.
 4. Garder la réponse de la ferme (courriel) et lui en laisser une copie. Dans le dépôt, on ne consigne que **la date de la version acceptée**, jamais la réponse.
 
@@ -58,7 +58,7 @@ Une semaine d'usage libre, puis un court moment pour repasser les écrans avec m
 
 ## Ce que ce modèle ne dit pas (à décider ou à faire relire)
 
-- Aucune clause de responsabilité chiffrée, aucune durée d'engagement, aucun prix ferme : le contrat n'en promet pas (10 ter.5). Si la relecture juridique en demande, la décision est celle du porteur.
+- Aucune clause de responsabilité chiffrée, aucune durée d'engagement, aucun prix ferme : le contrat n'en promet pas (10 ter.5). Aucune relecture juridique n'étant faite (E6 levée, D-299), la décision reste celle du porteur.
 - Les durées exactes de conservation ne sont pas recopiées ici : elles changent avec la 4.5 et la page en ligne fait foi (point 2).
 - La phrase sur les sauvegardes (conservation de 30 jours) est celle de la politique de confidentialité ; elle doit y être en ligne avant l'envoi (E7).
 - Aucun avis juridique : rien de ce fichier n'en est un.

@@ -8645,3 +8645,36 @@ même image, alors que tout navigateur en service lit une icône SVG
 déclarée. (b) Un fichier `app/icon.svg` lu par le cadre : la route d'image
 qu'il crée est ce qui a déjà produit une 404 le 7 novembre 2026. Le site
 public (`irrigation-otf-site`, un Worker à part) n'est pas traité ici.
+
+## D-299 — La relecture juridique est abandonnée par le porteur (condition E6 levée)
+
+Date : 22 novembre 2026, 17 h 50. Statut : décidé par le porteur (décision
+réservée, prise de sa main ; message : « j'ai trouvé personne pour la
+relecture juridique, donc écoute, tant pis, on va laisser comme ça, et puis
+j'en prends la responsabilité »). Réglage de la grille : Sonnet 5.5 · Moyen,
+registres seuls.
+
+**Contexte.** Le contrat de la 4.6 (D-221, 10 ter.3) et la règle du
+15 novembre 2026 faisaient de la relecture juridique gratuite, par le réseau
+du porteur, la condition d'entrée E6 de la fiche du pilote, avant l'envoi de
+l'accord à une ferme tierce et avant toute ferme tierce reliée (T4-20,
+question 4). Le porteur n'a trouvé aucun relecteur.
+
+**Décision.** La condition E6 est **levée** : le porteur renonce à la
+relecture et prend la responsabilité de la confidentialité, des conditions
+et du modèle d'accord tels qu'ils sont. Les textes restent **non relus par
+un juriste** ; la levée n'est pas une relecture faite et ne se présente
+jamais comme telle. L'envoi de l'accord, le choix des fermes et les autres
+conditions d'entrée (E1 à E5, E7 à E12) ne changent pas. Consignée dans la
+fiche d'entrée (E6 « levée »), le modèle d'accord (statut et mode d'emploi),
+le contrat de la Tranche 4 (note au 10 ter.3) et la roadmap (4.6).
+
+**Reste.** (a) La page publique de confidentialité
+(`cloudflare/irrigation-site/src/pages.ts`, ligne de note) dit encore : « Il
+n'a pas encore été relu par un juriste ; il le sera avant qu'une autre ferme
+que celle du responsable soit reliée », phrase que le test du site
+(`site.test.ts`) fige. Elle promet une relecture qui n'aura pas lieu : le
+texte à y mettre est à la décision du porteur, dans une PR de code à part
+(le site public se redéploie). Non modifiée ici. (b) Les mentions
+historiques de la relecture dans les registres plus anciens et dans le
+contrat gardent leur texte d'origine ; la note du 10 ter.3 les corrige.
