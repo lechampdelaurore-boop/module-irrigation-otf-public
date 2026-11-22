@@ -46,3 +46,15 @@ export const PLANNED_IRRIGATION_FORM_REQUESTED = 'irrigation-planned-form-reques
 export function requestPlannedIrrigationForm() {
   window.dispatchEvent(new CustomEvent(PLANNED_IRRIGATION_FORM_REQUESTED));
 }
+
+/**
+ * « Réglages » : un geste qui écrit au journal des modifications le dit une
+ * fois réussi, et la section du journal se relit au serveur, sa ligne avec,
+ * sans recharger la page (amélioration n° 7, écart E1 de la recette du
+ * 22 novembre 2026 ; F746, D-294). Le signal ne porte rien.
+ */
+export const CHANGE_JOURNAL_CHANGED = 'irrigation-change-journal-changed';
+
+export function notifyChangeJournalChanged() {
+  window.dispatchEvent(new CustomEvent(CHANGE_JOURNAL_CHANGED));
+}

@@ -8421,6 +8421,114 @@ réglages, l'écran, aucune migration ; un message déjà parti sous l'ancien
 identifiant le jour de la mise en ligne ne repart pas (la prise du jour, en
 base, est par espace).
 
+## D-294 — Améliorations, n° 7 : le journal des modifications se relit sans recharger la page
+
+Date : 22 novembre 2026. Statut : décidé (correction de l'écart E1 de la
+recette des améliorations n° 2 à 7, faite par l'assistant le 22 novembre
+2026 ; autonomie donnée par le porteur le 22 novembre 2026, « vas-y pour
+tout » ; réglage Opus 5.5 · Très élevé, celui de la n° 7, section
+6 septies ; suite de D-288).
+
+**Contexte.** La recette a vu, sur « Réglages », qu'après un changement
+fait sur la page même (le rappel du soir, le message du matin), la section
+« Journal des modifications » ne bougeait pas : sa ligne disait encore
+« Aucune modification enregistrée » et sa liste restait vide jusqu'au
+rechargement de la page ; un clic sur un filtre faisait paraître les cartes,
+mais la ligne du pli restait fausse. Rien n'était perdu : tout était en base
+et paraissait au rechargement. La cause : la section gardait ce qu'elle
+avait lu à l'ouverture de la page, et rien ne la prévenait d'un changement
+enregistré par un autre bloc de la page (les actions de « Réglages » ne
+relisent pas la page, à dessein).
+
+**Décision. F746 : un signal de la fenêtre, et une relecture au serveur.**
+
+1. Chaque geste de « Réglages » qui écrit au journal, une fois réussi, le
+   dit par un signal de la fenêtre (`notifyChangeJournalChanged`,
+   `lib/domain/feasibility-notifications.ts`, à côté des signaux de la
+   faisabilité et des ressources, D-093, D-129) : les messages de la ferme,
+   le lieu de la météo et les autres enregistrements du tableau de l'eau,
+   la correspondance des espèces et tout geste du panneau du besoin par
+   culture, les parcelles et les abris. Un geste refusé ne signale rien.
+2. La section écoute ce signal et se relit au serveur, pli fermé comme
+   ouvert ; elle se relit aussi à chaque ouverture de son pli, ce qui
+   rattrape un changement fait dans un autre onglet ou une page revenue de
+   l'historique du navigateur. Une relecture garde le filtre choisi et
+   repart des 50 dernières lignes ; la réponse d'une lecture plus ancienne,
+   arrivée après une plus récente, ne remplace rien.
+3. La lecture rend la page de cartes **et** la ligne du pli (le compte, la
+   dernière ligne toutes familles, le début du journal), pour le filtre et
+   « Voir plus » comme pour la relecture : la ligne ne peut plus rester
+   fausse après un clic sur un filtre.
+4. **Aucune action oubliée.** Un test
+   (`tests/change-journal-refresh.test.ts`) relit le code de « Réglages »
+   et de tout ce qu'elle affiche, relève chaque action serveur qu'elle peut
+   appeler et échoue si l'une n'est pas rangée : elle prévient le journal
+   (et son fichier porte le signal), elle recharge la page, ou elle n'écrit
+   pas au journal, avec sa raison.
+
+**Écarté.** Relire toute la page après chaque action serveur (`refresh()`
+ou `revalidatePath`) : la page entière se recalculerait au serveur à chaque
+case cochée, instantané d'Ouvre ta ferme compris, et les blocs qui gardent
+leur état ne se remettraient pas à jour pour autant.
+
+Preuves : `tests/db/change-journal-view.test.ts` (la ligne du pli suit
+toutes les familles quels que soient le filtre et la suite, et se relit
+après un changement), `tests/change-journal-refresh.test.ts` (le
+rangement des actions), le parcours P55 à 390 et 1 440 px (la ligne et la
+carte nouvelles sans rechargement, pli fermé puis ouvert, filtre gardé ; un
+changement fait dans un autre onglet paraît à la réouverture du pli). Ne
+changent pas : la table, les écrivains, les lignes écrites, aucune
+migration, aucun calcul, aucun appel à Ouvre ta ferme.
+
+## D-295 — La démonstration montre le cas d'écart entre l'eau prévue et l'eau apportée (n° 5)
+
+Date : 22 novembre 2026. Statut : décidé (écart E2 de la recette des
+améliorations n° 2 à 7, faite par l'assistant le 22 novembre 2026,
+`/mnt/project-files/ameliorations/recette-ameliorations-2-a-7-2026-11-22.md` ;
+demandé par le coordinateur sous l'autonomie que le porteur a donnée le
+22 novembre 2026, « vas-y pour tout »).
+
+**Contexte.** L'amélioration n° 5 (D-291) porte sur « Planning de la
+semaine » le bloc « L'eau apportée s'écarte du prévu » quand, trois semaines
+complètes de suite, l'eau apportée à une planche s'écarte de plus de 20 % de
+l'eau prévue. La recette n'a pu le voir nulle part : la ferme n'arrose pas en
+novembre, et l'historique de la démonstration (F169) prévoyait chaque
+arrosage pour la durée qu'il a faite, sans début prévu, si bien qu'aucune
+semaine ne s'écartait du prévu et qu'aucune cause ne pouvait se lire.
+
+**Décision** (`docs/ameliorations-4-5-contract.md`, section 4, F747) :
+
+1. **Un seul cas.** La « Ferme des Trois Noues », la seule ferme de la
+   démonstration qui coche « Planning de la semaine », au moment « Début
+   d'été » (16 juin 2026), celui de la visite du planning, où le clos a un
+   arrosage proposé la semaine même. Les trois semaines complètes avant la
+   semaine du moment (lundis 25 mai, 1er et 8 juin), l'arrosage habituel du
+   lundi du « Goutte-à-goutte du clos » est prévu à l'heure où il commence,
+   pour les deux tiers de sa durée habituelle (40 min, puis 1 h 20), et dure
+   la durée habituelle. Le jeu le dit en une ligne (`DEMO_LONGER_THAN_PLANNED`,
+   `lib/adapters/demo/module-data.ts`) ; la période est celle que la règle
+   juge (`appliedWaterGapPeriod`).
+2. **Seule la prévision change.** Les durées faites, les volumes, les cumuls
+   et l'historique des autres matériels restent ceux de F169. Le bloc se lit
+   sur S01 et S02, les deux planches du clos que ce goutte-à-goutte arrose
+   ensemble : plus d'eau apportée que prévu, de 50 % chaque semaine ; la
+   cause du débit (trois irrigations plus longues de 50 % en médiane), réglé
+   à 6 mm/h, proposé à 4 mm/h. Le module les calcule lui-même ; aucune autre
+   cause, la démonstration n'ayant aucune pluie mesurée.
+3. **Écrit comme le reste de l'historique.** Ces arrosages s'écrivent d'un
+   coup, déjà faits, avec leur début et leur fin prévus ; l'historique les
+   dit « Déjà réalisée », la démonstration ne rejouant pas le minuteur.
+4. **Remis à zéro comme le reste.** « Adopter » ne change que l'espace de
+   l'invité ; le bouton « Remettre à zéro » et la tâche de nuit rendent le
+   cas, l'espace se préparant de nouveau à la visite suivante. Preuves :
+   `tests/db/ecart-prevu-reel-demo.test.ts` et le parcours V11 de la
+   démonstration (`e2e-demo/v11-ecart-prevu-reel.spec.ts`), aux deux
+   largeurs.
+
+Ne changent pas : la règle de l'écart (D-291), l'écran, la ferme réelle, les
+autres fermes et les autres moments de la démonstration ; aucune migration,
+aucune valeur agronomique (des durées d'arrosage d'une ferme inventée).
+
 ## D-296 — Outillage : `next` 16.4.6, les sept alertes modérées fermées
 
 Date : 22 novembre 2026. Statut : décidé (lot à part rangé par D-292 ;

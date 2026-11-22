@@ -272,7 +272,12 @@ attendant sa réponse, et changera si elle diffère.
   par semaine et par goutte-à-goutte, le lundi à 7 h, de 45 min en avril,
   1 h en mai, 2 h en juin, 2 h 30 en juillet et en août, 1 h 30 en
   septembre et 45 min en octobre : les gestes d'une ferme inventée, que le
-  module compte, pas une recommandation.
+  module compte, pas une recommandation. Chaque arrosage est prévu pour la
+  durée qu'il a faite, sauf un cas (F747, D-295,
+  `docs/ameliorations-4-5-contract.md`, section 4) : au début de l'été de la
+  ferme A, le goutte-à-goutte du clos, les trois semaines d'avant, a été
+  prévu pour les deux tiers de sa durée, pour montrer l'écart entre l'eau
+  prévue et l'eau apportée.
 - **F170 — la météo selon le mois.** Le motif des parcours navigateur est
   une arrière-saison (des nuits à 2,6 °C) : la démonstration le réchauffe
   de 4 °C en mai, 7 °C en juin, 9 °C en juillet et en août, 5 °C en

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import type { ChangeJournalCard } from '@/lib/domain/change-journal/card';
+import type { ChangeJournalCursor } from '@/lib/domain/change-journal/entry';
 import type { ChangeFamily } from '@/lib/domain/change-journal/subjects';
 import {
   CHANGE_JOURNAL_FILTERS,
@@ -10,6 +11,7 @@ import {
   changeJournalSummary,
   type ChangeJournalView,
 } from '@/lib/domain/change-journal/view';
+import { CHANGE_JOURNAL_CHANGED } from '@/lib/domain/feasibility-notifications';
 import { loadChangeJournalPageAction } from '../change-journal-actions';
 import { AnchoredFold } from '../shell/page-settings-fold';
 
@@ -23,25 +25,43 @@ const CHANGE_JOURNAL_ANCHOR = 'journal-des-modifications';
  * Toujours là, sans case de fonctionnalité ; dans un pli fermé dont la ligne
  * dit combien et la dernière, pour que « Réglages » garde sa hauteur au
  * téléphone (F715 : toute section nouvelle de « Réglages » se plie).
+ *
+ * Sans recharger la page (F746, D-294) : un changement enregistré sur la
+ * page le signale, et la section se relit au serveur, sa ligne avec, pli
+ * fermé comme ouvert ; elle se relit aussi à chaque ouverture de son pli.
  */
 export function ChangeJournalSection({ season, initialView }: { season: number; initialView: ChangeJournalView }) {
-  const [family, setFamily] = useState<ChangeFamily | null>(initialView.family);
-  const [cards, setCards] = useState(initialView.cards);
-  const [next, setNext] = useState(initialView.next);
+  const [view, setView] = useState(initialView);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // La dernière lecture demandée l'emporte : la réponse d'une plus ancienne, arrivée après, ne remplace rien.
+  const lastRead = useRef(0);
+  // La famille demandée en dernier : une relecture la garde, même si sa réponse n'est pas encore là.
+  const wantedFamily = useRef<ChangeFamily | null>(initialView.family);
 
-  const load = (wanted: ChangeFamily | null, more: boolean) => startTransition(async () => {
-    const result = await loadChangeJournalPageAction({ season, family: wanted, after: more ? next : null });
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
-    setError(null);
-    setFamily(result.page.family);
-    setCards((current) => (more ? [...current, ...result.page.cards] : result.page.cards));
-    setNext(result.page.next);
-  });
+  const read = useCallback((family: ChangeFamily | null, after: ChangeJournalCursor | null) => {
+    const ticket = lastRead.current + 1;
+    lastRead.current = ticket;
+    wantedFamily.current = family;
+    startTransition(async () => {
+      const result = await loadChangeJournalPageAction({ season, family, after });
+      if (ticket !== lastRead.current) return;
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
+      setError(null);
+      // « Voir plus » ajoute la suite ; le filtre et la relecture repartent des dernières lignes. La ligne du pli suit toujours.
+      setView((current) => (after === null ? result.view : { ...result.view, cards: [...current.cards, ...result.view.cards] }));
+    });
+  }, [season]);
+
+  const reread = useCallback(() => read(wantedFamily.current, null), [read]);
+
+  useEffect(() => {
+    window.addEventListener(CHANGE_JOURNAL_CHANGED, reread);
+    return () => window.removeEventListener(CHANGE_JOURNAL_CHANGED, reread);
+  }, [reread]);
 
   return (
     <section className="change-journal" aria-labelledby="change-journal-title">
@@ -49,28 +69,29 @@ export function ChangeJournalSection({ season, initialView }: { season: number; 
         id={CHANGE_JOURNAL_ANCHOR}
         className="species-fold change-journal-fold"
         bodyClassName="species-fold-body"
-        summary={<><h2 id="change-journal-title">Journal des modifications</h2><small>{changeJournalSummary(initialView)}</small></>}
+        summary={<><h2 id="change-journal-title">Journal des modifications</h2><small>{changeJournalSummary(view)}</small></>}
+        onOpen={reread}
       >
-        <p className="change-journal-intro">{changeJournalIntro(initialView.startedAt)}</p>
+        <p className="change-journal-intro">{changeJournalIntro(view.startedAt)}</p>
         <div className="change-journal-filters" role="group" aria-label="Familles du journal">
           {CHANGE_JOURNAL_FILTERS.map((filter) => (
             <button
               type="button"
               key={filter.label}
-              aria-pressed={family === filter.family}
+              aria-pressed={view.family === filter.family}
               disabled={pending}
-              onClick={() => load(filter.family, false)}
+              onClick={() => read(filter.family, null)}
             >
               {filter.label}
             </button>
           ))}
         </div>
         {error ? <p className="water-error" role="alert">{error}</p> : null}
-        {cards.length === 0
-          ? <p className="change-journal-empty">{changeJournalEmpty(initialView.startedAt, family)}</p>
-          : <ol className="change-journal-cards" aria-busy={pending}>{cards.map((card) => <ChangeCard key={card.id} card={card} />)}</ol>}
-        {next ? (
-          <button type="button" className="change-journal-more" disabled={pending} onClick={() => load(family, true)}>
+        {view.cards.length === 0
+          ? <p className="change-journal-empty">{changeJournalEmpty(view.startedAt, view.family)}</p>
+          : <ol className="change-journal-cards" aria-busy={pending}>{view.cards.map((card) => <ChangeCard key={card.id} card={card} />)}</ol>}
+        {view.next ? (
+          <button type="button" className="change-journal-more" disabled={pending} onClick={() => read(view.family, view.next)}>
             Voir plus
           </button>
         ) : null}

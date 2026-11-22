@@ -128,6 +128,32 @@ export const DEMO_HISTORY_MINUTES_BY_MONTH: Readonly<Record<string, number>> = {
 };
 
 /**
+ * Le cas d'écart entre l'eau prévue et l'eau apportée (amélioration n° 5,
+ * docs/ameliorations-4-5-contract.md, section 4, F747 ; écart E2 de la
+ * recette du 22 novembre 2026) : un goutte-à-goutte qui donne moins que son
+ * réglage, et que la ferme laisse donc tourner plus longtemps que prévu. Les
+ * trois semaines complètes avant la semaine du moment, son arrosage du lundi
+ * était prévu pour une part de la durée habituelle, et a duré la durée
+ * habituelle : l'eau apportée reste celle de l'historique, seule la
+ * prévision change. Un geste de ferme inventée, pas une valeur agronomique :
+ * l'écart, sa cause et le débit proposé, le module les tire lui-même.
+ */
+export type DemoLongerThanPlannedDefinition = {
+  /** La parcelle du goutte-à-goutte arrosé plus longtemps que prévu. */
+  plotId: string;
+  /** La durée prévue, en part de la durée faite. */
+  plannedShareOfDuration: number;
+};
+
+/** Les deux tiers : l'arrosage a duré moitié plus que prévu. */
+const TWO_THIRDS = 2 / 3;
+
+/** Par ferme, puis par moment ; un seul cas, au début de l'été de la ferme A, dont le clos a un arrosage proposé cette semaine-là. */
+export const DEMO_LONGER_THAN_PLANNED: Readonly<Record<string, Readonly<Record<string, DemoLongerThanPlannedDefinition>>>> = {
+  maraichage: { ete: { plotId: 'plot-clos-saules', plannedShareOfDuration: TWO_THIRDS } },
+};
+
+/**
  * Les alertes météo que la ferme a déjà posées (audit ergonomique final,
  * lot F, docs/audit-ergonomie-final-lot-f-contract.md, section 5 ; F295) :
  * des modèles de la page « Alertes météo », posés par le même geste qu'un

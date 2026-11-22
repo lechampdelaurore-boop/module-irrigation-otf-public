@@ -11,9 +11,18 @@ source détaillée commit par commit.
   `next` et `eslint-config-next` passent en 16.4.6 ; `pnpm audit` ne
   signale plus rien. Le site est servi par vinext, qui remplace lui-même
   les imports `next/*` : rien ne change à l'écran ni dans le code.
-- En ligne le 22 novembre 2026 : #176, une alarme par espace (D-293),
-  fusionnée à 12 h 22 et déployée à 12 h 57 (run 45016969088, cinq jobs
-  verts).
+
+### Ajouté (Démonstration : le cas d'écart de l'amélioration n° 5)
+
+- **La démonstration montre le bloc « L'eau apportée s'écarte du prévu »**
+  (D-295, F747) : au début de l'été de la « Ferme des Trois Noues », le
+  goutte-à-goutte du clos a été prévu, les trois semaines d'avant, pour les
+  deux tiers de la durée qu'il a faite. « Planning de la semaine » porte le
+  bloc pour S01 et S02 : 50 % d'eau en plus chaque semaine, la cause du
+  débit, 6 mm/h réglés, 4 mm/h proposés, et « Adopter ». Rien d'autre ne
+  change dans le jeu ; « Adopter » ne touche que l'espace du visiteur, et la
+  remise à zéro, du bouton comme de la nuit, rend le cas. Nouveau parcours
+  V11 de la démonstration.
 
 ### Documentation (revue de l'isolation de la 4.3 à la 4.5, registres)
 
@@ -55,6 +64,19 @@ source détaillée commit par commit.
   d'`eslint-config-next` acceptés sous eslint 10 (`pnpm-workspace.yaml`),
   les épinglages `brace-expansion@5` et `js-yaml@4` levés. Rien ne change
   dans le site servi ni dans les règles de lint.
+
+### Corrigé (Améliorations, n° 7 : le journal sans recharger la page)
+
+- **Un changement fait dans « Réglages » paraît aussitôt dans « Journal
+  des modifications »** (D-294, F746, écart E1 de la recette du
+  22 novembre 2026) : la ligne du pli et ses cartes se relisent dès que le
+  changement est enregistré, pli fermé comme ouvert, sans recharger la
+  page ; le journal se relit aussi quand on rouvre son pli, ce qui montre
+  un changement fait dans un autre onglet. Avant, il fallait recharger la
+  page ; rien n'était perdu.
+- En ligne le 22 novembre 2026 : #176, une alarme par espace pour le
+  message du matin et le rappel du soir, fusionnée à 12 h 22 et déployée à
+  12 h 57 (run 45016969088, cinq jobs verts).
 
 ### Ajouté (Améliorations, n° 7, PR 8 : les réglages restants)
 
