@@ -52,6 +52,34 @@ registres, elle y renvoie.
   par la CI de la PR. Fusionnée le 22 novembre 2026 à 12 h 22 (#176),
   avant les registres de la revue (#175) ; **en ligne à 12 h 57** (run
   45016969088 vérifié job par job : les cinq jobs verts).
+- **Amélioration n° 5 : le cas d'écart dans la démonstration, codé le
+  22 novembre 2026** (D-295, F747, `docs/ameliorations-4-5-contract.md`,
+  section 4), en Opus 5.5 · Max, le réglage des n° 4 et 5. Écart E2 de la
+  recette des n° 2 à 7 : le bloc « L'eau apportée s'écarte du prévu » ne se
+  voyait nulle part, l'historique de la démonstration ne s'écartant jamais
+  du prévu. Au début de l'été de la « Ferme des Trois Noues », l'arrosage du
+  lundi du goutte-à-goutte du clos, les trois semaines d'avant, est prévu
+  pour les deux tiers de la durée qu'il garde : « Planning de la semaine »
+  porte le bloc pour S01 et S02 (50 % d'eau en plus chaque semaine, la cause
+  du débit, 6 mm/h réglés, 4 mm/h proposés). Seule la prévision change ;
+  aucune autre ferme, aucun autre moment ; « Adopter » ne touche que
+  l'espace du visiteur, et la remise à zéro, du bouton comme de la nuit,
+  rend le cas. Sans migration ; l'écran et la règle ne changent pas.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
+  `pnpm site:check` et `pnpm demo:check` réussis en local ; les 22 parcours
+  de la démonstration (V1 à V11, dont V11, nouveau) joués en local aux deux
+  largeurs ; **`pnpm e2e` non rejoué en local**, sans rapport : l'application
+  ordinaire ne prépare jamais la démonstration ; la suite complète des
+  parcours est jouée par la CI de la PR (`pnpm e2e` : 180 réussis,
+  8 sautés comme sur `main` ; `pnpm e2e:demo` : 22 réussis). Fusion après
+  #177. La même PR consigne la mise en ligne des registres de la revue de
+  l'isolation (#175).
+- Outillage, **lot `next` 16.4.6 codé le 22 novembre 2026** (D-296), le
+  lot à part rangé par D-292 : `next` et `eslint-config-next` 16.4.3 →
+  16.4.6, les sept alertes modérées de `next` fermées, `pnpm audit` ne
+  signale plus rien ; aucun code ni aucune configuration ne change.
+  Contrôles et parcours plus bas (outillage). Fusion après #178.
 - **Archive des prévisions J+1 à J+7 : codée le 22 novembre 2026** (D-297,
   `docs/forecast-archive-contract.md`, F748 à F754, migration 0046), en
   Opus 5.5 · Élevé, le réglage de son contrat, sur le « vas-y pour tout » du
@@ -69,7 +97,13 @@ registres, elle y renvoie.
   en local (sorties dans la PR). Le test 10 du contrat sur une copie de la
   base réelle n'est pas joué en local (aucune copie ici) : le déploiement
   applique la migration aux bases réelle et de démonstration, à vérifier
-  dans ses journaux.
+  dans ses journaux. La même PR consigne trois mises en ligne du
+  22 novembre 2026, chacune vérifiée job par job (les cinq jobs verts) :
+  #177 (journal des modifications sans rechargement) fusionnée à 13 h 32,
+  en ligne à 13 h 56 (run 45022773652) ; #178 (cas d'écart de la
+  démonstration) fusionnée à 14 h 14, en ligne à 14 h 38 (run
+  45026416442) ; #179 (`next` 16.4.6) fusionnée à 14 h 59, en ligne à
+  15 h 21 (run 45030394463).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -632,7 +666,10 @@ registres, elle y renvoie.
   rejoué en entier sur `ba8cbde` (2 245 tests,
   puis 603 pour chacune des trois passes d'isolation et 2 245 pour la passe
   de la jauge du moteur commun, tous réussis, en 5 min 2 s) ; rien n'est
-  lu en production.
+  lu en production. Registres de la revue **en ligne le 22 novembre 2026 à
+  13 h 30** (#175, fusionnée à 12 h 58, run 45019879666 vérifié job par
+  job : les cinq jobs verts ; consigné par la PR du cas d'écart de la
+  démonstration, #178).
 - Tranche 4, **4.6 : constats du 22 novembre 2026 pour la fiche d'entrée,
   gardés hors de la fiche** (un fil à part, en lecture seule, sur `main` à
   `ba8cbde`). La fiche `docs/pilote-fiche-entree.md` reste vide : elle ne
@@ -1212,7 +1249,9 @@ registres, elle y renvoie.
   parcours jouée par la CI de la PR. À fusionner après la n° 4 (#172).
   **En ligne le 22 novembre 2026 à 5 h 00** (#173, fusionnée à 4 h 35, run
   44981325097 vérifié job par job : les cinq jobs verts ; sans migration,
-  « No migrations to apply » sur les deux bases).
+  « No migrations to apply » sur les deux bases). **Le cas de la
+  démonstration est codé le 22 novembre 2026** (D-295, F747, parcours V11 ;
+  écart E2 de la recette) : voir « Où on en est ».
 
 - Outillage, **lot eslint 10 : codé le 22 novembre 2026** (D-292), le lot à
   part de l'alerte minimatch, sur le « vas-y » du porteur, en Opus 5.5 ·
@@ -1235,6 +1274,28 @@ registres, elle y renvoie.
   run 45013604410 vérifié job par job : les cinq jobs verts ; sans
   migration, « No migrations to apply » sur les deux bases ; consigné par
   la PR de la revue de l'isolation de la 4.3 à la 4.5).
+- Outillage, **lot `next` 16.4.6 : codé le 22 novembre 2026** (D-296), le
+  lot à part rangé par D-292, couvert par le « vas-y pour tout » du porteur
+  du 22 novembre 2026 à 10 h 53, en Opus 5.5 · Élevé (ligne Q4 de la
+  roadmap, dépendances et configuration, comme #174) : `next` et
+  `eslint-config-next` 16.4.3 → 16.4.6 (la dernière de la ligne 16.4) ;
+  dans le verrou, `@next/env`, `@next/eslint-plugin-next` et les
+  `@next/swc-*` suivent, `nanoid` 3.3.19 quitte l'arbre ; aucun autre
+  paquet, aucun code, aucune configuration ne change. `pnpm audit` et
+  `pnpm audit --prod` : sept alertes modérées avant, toutes sur `next`
+  (GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8, GHSA-7qx7-33qx-rqx2,
+  GHSA-f3mh-rxg3-f5g2, GHSA-pc58-hwjq-p385, GHSA-rhh4-g77r-r9qj,
+  GHSA-vvgp-ww4w-46vf) ; après : « No known vulnerabilities found ».
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 256
+  tests verts, puis les 608 tests de la persistance sous chacune des trois
+  isolations et les 2 256 de nouveau sous la jauge du moteur commun, aucun
+  échec), `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm
+  weather:check` et `pnpm site:check` réussis en local avant et après le
+  changement ; **`pnpm e2e` joué en local après le changement** (paquet de
+  production) : 188 parcours, 180 réussis, 8 sautés par conception (ceux
+  propres à l'autre largeur), aucun échec, en 29,8 minutes, avec le
+  navigateur déjà installé du poste de travail ; la suite complète jouée
+  de nouveau par la CI de la PR.
 
 - **Audit ergonomique du 19 novembre 2026**
   (`/mnt/project-files/audit-ergonomie/audit-ergonomie-2026-11-19.md`,
@@ -2769,7 +2830,8 @@ registres, elle y renvoie.
   Sonnet 5.5 · Moyen pour le travail sans code.
 - Reste au jugement du porteur : la lisibilité sur téléphone ; l'alerte
   minimatch (eslint 10), lot à part, est traitée le 22 novembre 2026 sur son
-  « vas-y » (D-292), en ligne le même jour (#174).
+  « vas-y » (D-292), en ligne le même jour (#174) ; les sept alertes de
+  `next`, lot à part, le même jour (D-296).
 - Charte graphique d'Ouvre ta ferme relevée le 6 novembre 2026 :
   `docs/charte-otf.md` (couleurs, polices, composants, téléphone, onze
   recommandations pour harmoniser le module). Aucun contrôle rejoué ; le lot

@@ -5,6 +5,25 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Sécurité (outillage : `next` 16.4.6)
+
+- **`next` 16.4.3 → 16.4.6, les sept alertes modérées fermées** (D-296) :
+  `next` et `eslint-config-next` passent en 16.4.6 ; `pnpm audit` ne
+  signale plus rien. Le site est servi par vinext, qui remplace lui-même
+  les imports `next/*` : rien ne change à l'écran ni dans le code.
+
+### Ajouté (Démonstration : le cas d'écart de l'amélioration n° 5)
+
+- **La démonstration montre le bloc « L'eau apportée s'écarte du prévu »**
+  (D-295, F747) : au début de l'été de la « Ferme des Trois Noues », le
+  goutte-à-goutte du clos a été prévu, les trois semaines d'avant, pour les
+  deux tiers de la durée qu'il a faite. « Planning de la semaine » porte le
+  bloc pour S01 et S02 : 50 % d'eau en plus chaque semaine, la cause du
+  débit, 6 mm/h réglés, 4 mm/h proposés, et « Adopter ». Rien d'autre ne
+  change dans le jeu ; « Adopter » ne touche que l'espace du visiteur, et la
+  remise à zéro, du bouton comme de la nuit, rend le cas. Nouveau parcours
+  V11 de la démonstration.
+
 ### Ajouté (archive des prévisions J+1 à J+7)
 
 - **La prévision de la veille n'est plus perdue** (D-297,
@@ -15,6 +34,9 @@ source détaillée commit par commit.
   plus, aucun écran, aucun calcul changé ; un échec de l'archive ne bloque
   jamais la météo. Inscrite aux plans d'effacement et de conservation,
   purgée par la tâche du matin.
+- En ligne le 22 novembre 2026 : #177 à 13 h 56 (run 45022773652), #178
+  à 14 h 38 (run 45026416442), #179 à 15 h 21 (run 45030394463), cinq jobs
+  verts chacun.
 
 ### Documentation (revue de l'isolation de la 4.3 à la 4.5, registres)
 

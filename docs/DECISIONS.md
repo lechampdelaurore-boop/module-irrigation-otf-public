@@ -8480,6 +8480,92 @@ changement fait dans un autre onglet paraît à la réouverture du pli). Ne
 changent pas : la table, les écrivains, les lignes écrites, aucune
 migration, aucun calcul, aucun appel à Ouvre ta ferme.
 
+## D-295 — La démonstration montre le cas d'écart entre l'eau prévue et l'eau apportée (n° 5)
+
+Date : 22 novembre 2026. Statut : décidé (écart E2 de la recette des
+améliorations n° 2 à 7, faite par l'assistant le 22 novembre 2026,
+`/mnt/project-files/ameliorations/recette-ameliorations-2-a-7-2026-11-22.md` ;
+demandé par le coordinateur sous l'autonomie que le porteur a donnée le
+22 novembre 2026, « vas-y pour tout »).
+
+**Contexte.** L'amélioration n° 5 (D-291) porte sur « Planning de la
+semaine » le bloc « L'eau apportée s'écarte du prévu » quand, trois semaines
+complètes de suite, l'eau apportée à une planche s'écarte de plus de 20 % de
+l'eau prévue. La recette n'a pu le voir nulle part : la ferme n'arrose pas en
+novembre, et l'historique de la démonstration (F169) prévoyait chaque
+arrosage pour la durée qu'il a faite, sans début prévu, si bien qu'aucune
+semaine ne s'écartait du prévu et qu'aucune cause ne pouvait se lire.
+
+**Décision** (`docs/ameliorations-4-5-contract.md`, section 4, F747) :
+
+1. **Un seul cas.** La « Ferme des Trois Noues », la seule ferme de la
+   démonstration qui coche « Planning de la semaine », au moment « Début
+   d'été » (16 juin 2026), celui de la visite du planning, où le clos a un
+   arrosage proposé la semaine même. Les trois semaines complètes avant la
+   semaine du moment (lundis 25 mai, 1er et 8 juin), l'arrosage habituel du
+   lundi du « Goutte-à-goutte du clos » est prévu à l'heure où il commence,
+   pour les deux tiers de sa durée habituelle (40 min, puis 1 h 20), et dure
+   la durée habituelle. Le jeu le dit en une ligne (`DEMO_LONGER_THAN_PLANNED`,
+   `lib/adapters/demo/module-data.ts`) ; la période est celle que la règle
+   juge (`appliedWaterGapPeriod`).
+2. **Seule la prévision change.** Les durées faites, les volumes, les cumuls
+   et l'historique des autres matériels restent ceux de F169. Le bloc se lit
+   sur S01 et S02, les deux planches du clos que ce goutte-à-goutte arrose
+   ensemble : plus d'eau apportée que prévu, de 50 % chaque semaine ; la
+   cause du débit (trois irrigations plus longues de 50 % en médiane), réglé
+   à 6 mm/h, proposé à 4 mm/h. Le module les calcule lui-même ; aucune autre
+   cause, la démonstration n'ayant aucune pluie mesurée.
+3. **Écrit comme le reste de l'historique.** Ces arrosages s'écrivent d'un
+   coup, déjà faits, avec leur début et leur fin prévus ; l'historique les
+   dit « Déjà réalisée », la démonstration ne rejouant pas le minuteur.
+4. **Remis à zéro comme le reste.** « Adopter » ne change que l'espace de
+   l'invité ; le bouton « Remettre à zéro » et la tâche de nuit rendent le
+   cas, l'espace se préparant de nouveau à la visite suivante. Preuves :
+   `tests/db/ecart-prevu-reel-demo.test.ts` et le parcours V11 de la
+   démonstration (`e2e-demo/v11-ecart-prevu-reel.spec.ts`), aux deux
+   largeurs.
+
+Ne changent pas : la règle de l'écart (D-291), l'écran, la ferme réelle, les
+autres fermes et les autres moments de la démonstration ; aucune migration,
+aucune valeur agronomique (des durées d'arrosage d'une ferme inventée).
+
+## D-296 — Outillage : `next` 16.4.6, les sept alertes modérées fermées
+
+Date : 22 novembre 2026. Statut : décidé (lot à part rangé par D-292 ;
+couvert par le « vas-y pour tout » du porteur du 22 novembre 2026 à
+10 h 53).
+
+**Contexte.** Après le lot eslint 10 (D-292), `pnpm audit` relevait sept
+vulnérabilités modérées, toutes sur `next` 16.4.3, paquet de production
+(versions vulnérables jusqu'à 16.4.4, corrigées en 16.4.5) :
+GHSA-mfr8-8qww-v76h, GHSA-vc7v-qv4w-wrv8, GHSA-rhh4-g77r-r9qj et
+GHSA-vvgp-ww4w-46vf (cache `use cache` et Cache Components),
+GHSA-7qx7-33qx-rqx2 (optimisation d'images, SVG), GHSA-f3mh-rxg3-f5g2
+(cookie HttpOnly, routes Edge) et GHSA-pc58-hwjq-p385 (serveur Next
+auto-hébergé qui relaie des réponses). Le module est servi par vinext, qui
+remplace lui-même les imports `next/*` : le paquet construit ne contient pas
+de code de `next/dist`, et aucune de ces fonctions n'est employée d'après
+leurs titres, sans que ce soit vérifié une à une. La montée se fait quand
+même, pour fermer les alertes et garder `next` (types, outillage) à jour.
+
+**Décision.**
+
+1. `next` passe de 16.4.3 à 16.4.6 (9 novembre 2026, la dernière de la
+   ligne 16.4), version exacte ; `eslint-config-next` le suit, de 16.4.3 à
+   16.4.6, comme le 8 octobre 2026 (D-292 : les deux ensemble). Dans le
+   verrou, `@next/env`, `@next/eslint-plugin-next` et les `@next/swc-*`
+   suivent ; `nanoid` 3.3.19, que `next` 16.4.6 ne demande plus, quitte
+   l'arbre. Aucun autre paquet ne change ; les greffons d'eslint gardent
+   leurs versions, l'acceptation sous eslint 10 de `pnpm-workspace.yaml`
+   reste.
+2. `pnpm audit` et `pnpm audit --prod` : « No known vulnerabilities found ».
+3. Rien d'autre ne change : ni le code, ni la configuration (Next, vinext,
+   ESLint, Wrangler), ni les épinglages.
+
+**Contrôles.** Voir `docs/ETAT_DU_PROJET.md` (outillage, lot `next`
+16.4.6) : les huit contrôles réussis avant et après le changement, et les
+parcours navigateur joués en local après.
+
 ## D-297 — L'archive des prévisions J+1 à J+7, jamais écrasée
 
 Date : 22 novembre 2026. Statut : décidé (idée rangée sans engagement de la
