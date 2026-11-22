@@ -106,6 +106,9 @@ function objectText(context: ChangeValues, nameOf: NameOf): string | null {
   else if (textOf('scopeType') === 'farm') parts.push('toute la ferme');
   const crop = named('seriesId', 'Série', 'une série') ?? named('plantId', 'Culture', 'une culture');
   if (crop !== null) parts.push(crop);
+  // Un stade d'une culture de référence, par son nom : un stade sensible au manque d'eau (amélioration n° 4, D-290).
+  const stage = textOf('stage');
+  if (stage !== null) parts.push(stage);
   const copiedFrom = textOf('copiedFrom');
   if (copiedFrom !== null) parts.push(`copie de ${copiedFrom}`);
   if (textOf('origin') === 'debit-mesure') parts.push('débit mesuré');

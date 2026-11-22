@@ -167,7 +167,8 @@ n'enregistre que ce qui diffère de la liste, et cocher comme elle efface la
 ligne. Migration 0045, après la 0044 de la n° 7, passée avant. Chaque stade
 dont la valeur en vigueur change entre au journal des modifications (n° 7),
 une ligne par stade, sujet « Stade sensible au manque d'eau », l'avant lu
-dans la base ; la liste préremplie reste hors du journal. F737 : le
+dans la base, que l'écran du journal dit par le nom de la culture et du
+stade ; la liste préremplie reste hors du journal. F737 : le
 pli « Stades sensibles au manque d'eau », fermé, dans la fiche de chaque
 culture utilisable, sa ligne qui compte les stades sensibles, l'analogie
 dite, les sources dans un pli, « Reprendre la liste préremplie » quand la

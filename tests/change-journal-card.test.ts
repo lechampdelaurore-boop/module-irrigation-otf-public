@@ -165,3 +165,15 @@ test('la section : la phrase de tête, la ligne du pli, la liste vide, le filtre
   assert.equal(changeFamilyFilter('DROP TABLE'), null);
   assert.equal(changeFamilyFilter(undefined), null);
 });
+
+test('un stade sensible au manque d’eau : la culture et le stade par leur nom, puis l’avant et l’après (amélioration n° 4, D-290)', () => {
+  const stage = entry('stade-sensible', {
+    objectId: 'criiam-tomate',
+    context: { name: 'Tomate', rank: 1, stage: 'Plantation → Reprise' },
+    before: { sensitive: 0 },
+    after: { sensitive: 1 },
+  });
+  assert.deepEqual([card(stage).subject, card(stage).object, lines(stage)], [
+    'Stade sensible au manque d’eau', 'Tomate, Plantation → Reprise', ['Sensible au manque d’eau : non → oui'],
+  ]);
+});

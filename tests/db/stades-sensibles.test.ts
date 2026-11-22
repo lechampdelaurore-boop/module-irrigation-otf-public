@@ -9,6 +9,7 @@ import { farmDurationsOf } from '../../lib/domain/crop-water/farm-durations';
 import { curveStages } from '../../lib/domain/crop-water/reference';
 import { getCropCoefficientsViewForUser } from '../../lib/services/crop-water-coefficients';
 import { saveFarmDurationsForUser } from '../../lib/services/crop-water-durations';
+import { fieldsWithoutWords } from '../support/change-journal-words';
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { ALICE, BOB } from '../support/spaces';
 
@@ -107,12 +108,14 @@ test('chaque stade dont la valeur change entre au journal des modifications, dan
   await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [1, 2] }, new Date('2026-07-01T09:00:00.000Z'));
   // « Reprendre la liste préremplie » : les deux stades reviennent à la liste.
   await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [2, 3] }, new Date('2026-07-02T08:00:00.000Z'));
-  const lines = (await listChangeJournalForUser(ALICE, { limit: 50 })).reverse().map((entry) => ({
+  const entries = await listChangeJournalForUser(ALICE, { limit: 50 });
+  assert.deepEqual(fieldsWithoutWords(entries), [], 'chaque champ écrit a ses mots à l’écran');
+  const lines = [...entries].reverse().map((entry) => ({
     family: entry.family, subject: entry.subject, objectId: entry.objectId, context: entry.context, action: entry.action,
     before: entry.before, after: entry.after, actor: entry.actorUserId, at: entry.createdAt,
   }));
   const line = (rank: number, label: string, from: number, to: number, at: string) => ({
-    family: 'reglage', subject: 'stade-sensible', objectId: 'criiam-tomate', context: { name: 'Tomate', stageRank: rank, stage: label },
+    family: 'reglage', subject: 'stade-sensible', objectId: 'criiam-tomate', context: { name: 'Tomate', rank, stage: label },
     action: 'modifie', before: { sensitive: from }, after: { sensitive: to }, actor: ALICE, at,
   });
   assert.deepEqual(lines, [
@@ -134,7 +137,7 @@ test('un choix fait pour un autre stade au même rang ne compte pas au journal :
   await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [2] }, new Date('2026-07-02T08:00:00.000Z'));
   const second = (await listChangeJournalForUser(ALICE, { limit: 50 })).filter((entry) => entry.createdAt === '2026-07-02T08:00:00.000Z');
   // En vigueur avant : le stade 3 suit la liste (sensible) ; le choix d'« Ancien stade » ne vaut rien.
-  assert.deepEqual(second.map((entry) => [entry.context.stageRank, entry.before, entry.after]), [[3, { sensitive: 1 }, { sensitive: 0 }]]);
+  assert.deepEqual(second.map((entry) => [entry.context.rank, entry.before, entry.after]), [[3, { sensitive: 1 }, { sensitive: 0 }]]);
   assert.deepEqual(database.sqlite.prepare('SELECT stage_rank, stage_label, sensitive FROM irrigation_crop_sensitive_stages WHERE workspace_id = ?').all(workspaceId)
     .map((row) => [row.stage_rank, row.stage_label, row.sensitive]), [[3, 'Floraison 3e bouquet → Mi-récolte', 0]]);
 });

@@ -8066,7 +8066,9 @@ une ligne par stade dont la valeur en vigueur change, écrite dans le lot du
 geste, avant lui ; l'avant est lu dans la base, le choix de la ferme pour ce
 stade, sinon la liste préremplie, qui en est la valeur de départ ; un choix
 fait pour un autre stade au même rang ne compte pas, comme dans la règle. La
-ligne garde la culture (sa clé, son nom) et le stade (son rang, son nom). La
-liste préremplie, que seule une migration écrit, reste hors du journal,
-comme les autres tables communes (§5.1 du contrat de la n° 7). Un
-enregistrement qui ne change aucune valeur n'écrit rien.
+ligne garde la culture (sa clé, son nom) et le stade (son rang, son nom) ;
+l'écran du journal (« Réglages », D-288) la lit « Tomate, Plantation →
+Reprise », puis « Sensible au manque d'eau : non → oui ». La liste
+préremplie, que seule une migration écrit, reste hors du journal, comme les
+autres tables communes (§5.1 du contrat de la n° 7). Un enregistrement qui
+ne change aucune valeur n'écrit rien.
