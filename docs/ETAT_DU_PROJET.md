@@ -22,7 +22,10 @@ registres, elle y renvoie.
   `pnpm build`, `pnpm knip`, `pnpm push:check` (50 tests),
   `pnpm weather:check` (6 tests) et `pnpm site:check` (12 tests, état de
   départ : 12 sur 12) réussis ; `pnpm e2e` omis, sans rapport : seul le
-  site public, un Worker à part sans parcours navigateur, change.
+  site public, un Worker à part sans parcours navigateur, change. Mise en
+  ligne de #182 (registres de D-299) consignée ici : fusionnée le
+  22 novembre 2026 à 18 h 29, **en ligne à 19 h 02** (run 45049763436
+  vérifié job par job : les cinq jobs verts).
 - **Relecture juridique abandonnée par le porteur le 22 novembre 2026 à
   17 h 50** (D-299) : il n'a trouvé aucun relecteur gratuit et prend la
   responsabilité des textes tels quels. La condition E6 du pilote (fiche

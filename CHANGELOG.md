@@ -12,6 +12,8 @@ source détaillée commit par commit.
   été relu par un juriste. », sans « il le sera avant qu'une autre ferme
   […] soit reliée » ; texte daté du 22 novembre 2026. Le test du site fige
   la phrase et vérifie qu'aucune relecture n'est promise.
+- En ligne le 22 novembre 2026 : #182 à 19 h 02 (run 45049763436, cinq jobs
+  verts).
 
 ### Décidé (relecture juridique)
 
