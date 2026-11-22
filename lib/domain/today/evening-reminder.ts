@@ -2,6 +2,7 @@ import { compareNamesNaturally } from '../bed-order.ts';
 import { pageHref } from '../features/pages.ts';
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
 import { isWaitingPlannedIrrigation } from '../planned-irrigation.ts';
+import { phoneNoticeAlarmKeys } from './phone-notice-alarm.ts';
 import { farmDateKey, farmMinutesOfDay, namesText } from './today-text.ts';
 
 /**
@@ -61,7 +62,7 @@ export type EveningReminder = {
   parisDay: string;
   title: string;
   body: string;
-  /** L'identifiant d'alarme du Worker : le jour, jamais deux rappels le même jour. */
+  /** L'identifiant d'alarme du Worker : l'espace et le jour, jamais deux rappels le même jour pour une ferme, jamais une alarme partagée entre deux fermes (§4.4, F744). */
   alarmId: string;
   tag: string;
   url: string;
@@ -69,7 +70,12 @@ export type EveningReminder = {
   count: number;
 };
 
-export function eveningReminder({ now, events }: { now: Date; events: readonly IrrigationEventRecord[] }): EveningReminder | null {
+export function eveningReminder({ now, workspaceId, events }: {
+  now: Date;
+  /** L'espace de la ferme : il entre dans l'identifiant d'alarme et l'étiquette (§4.4, F744). */
+  workspaceId: string;
+  events: readonly IrrigationEventRecord[];
+}): EveningReminder | null {
   const parisDay = farmDateKey(now);
   const unconfirmed = events
     .filter(isWaitingPlannedIrrigation)
@@ -89,8 +95,7 @@ export function eveningReminder({ now, events }: { now: Date; events: readonly I
     parisDay,
     title: 'Arrosages à confirmer',
     body,
-    alarmId: `evening:${parisDay}`,
-    tag: `evening-${parisDay}`,
+    ...phoneNoticeAlarmKeys('evening', workspaceId, parisDay),
     url: pageHref('aujourdhui'),
     count,
   };

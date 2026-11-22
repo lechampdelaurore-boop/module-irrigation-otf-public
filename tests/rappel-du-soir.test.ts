@@ -17,10 +17,14 @@ import type { IrrigationEventRecord } from '../lib/domain/irrigation-event-recor
  * docs/ameliorations-6-2-3-7-contract.md, section 4.3, F704, F705, F714) :
  * les arrosages validés du jour jamais confirmés, à l'heure réglée par la
  * ferme ; rien quand tout est confirmé ; jamais avant l'heure, jamais plus de
- * deux heures après ; un identifiant par jour de Paris.
+ * deux heures après ; un identifiant par espace et par jour de Paris (§4.4,
+ * F744).
  */
 
 const HOUR_MS = 3_600_000;
+/** Un espace, tel que la base le crée : un UUID. */
+const SPACE = '0b8e6c1a-5f0e-4a43-9d64-1c2a7e9f3b10';
+const OTHER_SPACE = 'f3d2a9b4-7c61-4e0a-8b5d-2a9c4e7f1d36';
 const EVENING = new Date('2026-09-30T17:05:00.000Z'); // mercredi 30 septembre, 19 h 05 à la ferme (heure d'été)
 
 type EventOptions = { status?: 'planned' | 'completed' | 'canceled'; started?: boolean; minutes?: number };
@@ -85,6 +89,7 @@ test('dû à l’heure réglée et jusqu’à deux heures après, jamais avant ;
 test('le rappel nomme les arrosages validés du jour dont la fin est passée et qui attendent encore un geste', () => {
   const reminder = eveningReminder({
     now: EVENING,
+    workspaceId: SPACE,
     events: [
       irrigation('Goutte-à-goutte nord', '2026-09-30T06:00:00.000Z'),
       irrigation('Rampe 1', '2026-09-30T04:30:00.000Z'),
@@ -99,8 +104,8 @@ test('le rappel nomme les arrosages validés du jour dont la fin est passée et 
     parisDay: '2026-09-30',
     title: 'Arrosages à confirmer',
     body: '2 arrosages prévus aujourd’hui ne sont pas confirmés : Rampe 1, Goutte-à-goutte nord. Les avez-vous faits ?',
-    alarmId: 'evening:2026-09-30',
-    tag: 'evening-2026-09-30',
+    alarmId: `evening:${SPACE}:2026-09-30`,
+    tag: `evening-${SPACE}-2026-09-30`,
     url: '/irrigation/aujourdhui',
     count: 2,
   });
@@ -108,28 +113,42 @@ test('le rappel nomme les arrosages validés du jour dont la fin est passée et 
 
 test('au singulier ; au plus trois noms puis « et n autres » ; rien quand tout est confirmé', () => {
   assert.equal(
-    eveningReminder({ now: EVENING, events: [irrigation('Rampe 1', '2026-09-30T04:30:00.000Z')] })?.body,
+    eveningReminder({ now: EVENING, workspaceId: SPACE, events: [irrigation('Rampe 1', '2026-09-30T04:30:00.000Z')] })?.body,
     '1 arrosage prévu aujourd’hui n’est pas confirmé : Rampe 1. L’avez-vous fait ?',
   );
   const many = eveningReminder({
     now: EVENING,
+    workspaceId: SPACE,
     events: ['B9-10', 'B9-9', 'Tunnel 1', 'Tunnel 2', 'Tunnel 3'].map((name, index) => irrigation(name, `2026-09-30T0${4 + index}:00:00.000Z`)),
   });
   assert.equal(many?.body, '5 arrosages prévus aujourd’hui ne sont pas confirmés : B9-10, B9-9, Tunnel 1 et 2 autres. Les avez-vous faits ?');
-  assert.equal(eveningReminder({ now: EVENING, events: [] }), null);
-  assert.equal(eveningReminder({ now: EVENING, events: [irrigation('Faite', '2026-09-30T05:00:00.000Z', { status: 'completed' })] }), null);
+  assert.equal(eveningReminder({ now: EVENING, workspaceId: SPACE, events: [] }), null);
+  assert.equal(eveningReminder({ now: EVENING, workspaceId: SPACE, events: [irrigation('Faite', '2026-09-30T05:00:00.000Z', { status: 'completed' })] }), null);
 });
 
 test('un même matériel arrosé deux fois se nomme une fois et compte deux arrosages', () => {
   const reminder = eveningReminder({
     now: EVENING,
+    workspaceId: SPACE,
     events: [irrigation('Rampe 1', '2026-09-30T04:00:00.000Z'), irrigation('Rampe 1', '2026-09-30T10:00:00.000Z')],
   });
   assert.equal(reminder?.body, '2 arrosages prévus aujourd’hui ne sont pas confirmés : Rampe 1. Les avez-vous faits ?');
   assert.equal(reminder?.count, 2);
   assert.equal(
-    eveningReminder({ now: new Date(EVENING.getTime() + 2 * HOUR_MS), events: [irrigation('Rampe 1', '2026-09-30T04:00:00.000Z')] })?.alarmId,
-    'evening:2026-09-30',
+    eveningReminder({ now: new Date(EVENING.getTime() + 2 * HOUR_MS), workspaceId: SPACE, events: [irrigation('Rampe 1', '2026-09-30T04:00:00.000Z')] })?.alarmId,
+    `evening:${SPACE}:2026-09-30`,
     'le même jour, le même identifiant',
   );
+});
+
+test('deux fermes le même soir : deux identifiants d’alarme et deux étiquettes, jamais une alarme partagée (§4.4, F744, revue de l’isolation du 22 novembre 2026, constat A)', () => {
+  const events = [irrigation('Rampe 1', '2026-09-30T04:30:00.000Z')];
+  const ours = eveningReminder({ now: EVENING, workspaceId: SPACE, events });
+  const theirs = eveningReminder({ now: EVENING, workspaceId: OTHER_SPACE, events });
+  assert.ok(ours && theirs);
+  assert.equal(ours.parisDay, theirs.parisDay, 'le même jour');
+  assert.notEqual(ours.alarmId, theirs.alarmId, 'le Worker garde une alarme par identifiant : chaque ferme a la sienne');
+  assert.notEqual(ours.tag, theirs.tag, 'un appareil de deux espaces garde les deux rappels');
+  assert.match(ours.alarmId, /^[A-Za-z0-9._:-]{1,128}$/u);
+  assert.match(ours.tag, /^[A-Za-z0-9._:-]{1,180}$/u);
 });

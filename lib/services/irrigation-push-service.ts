@@ -26,6 +26,31 @@ export async function scheduleIrrigationPushAlarm(
   return callPushService('/v1/alarms/schedule', request);
 }
 
+/**
+ * L'alarme du message du matin et du rappel du soir
+ * (docs/ameliorations-6-2-3-7-contract.md, section 4.4, F745) : le Worker
+ * répond `scheduled` quand il garde l'alarme, `stale` quand il garde déjà,
+ * sous le même identifiant, une alarme de révision plus récente et refuse
+ * celle-ci. Un refus n'est pas un envoi : il se dit `stale`, pour que le
+ * message ne soit jamais compté comme parti. Une réponse illisible compte
+ * comme un échec.
+ */
+export type PhoneNoticeAlarmResult = IrrigationPushServiceResult | { status: 'stale' };
+
+export async function schedulePhoneNoticeAlarm(
+  request: IrrigationPushAlarmRequest,
+): Promise<PhoneNoticeAlarmResult> {
+  let answer: unknown = null;
+  const result = await callPushService('/v1/alarms/schedule', request, async (response) => {
+    const body = await response.json().catch(() => null) as { status?: unknown } | null;
+    answer = body?.status ?? null;
+  });
+  if (result.status !== 'ok') return result;
+  if (answer === 'scheduled') return { status: 'ok' };
+  if (answer === 'stale') return { status: 'stale' };
+  return { status: 'failed', message: 'Réponse du service d’alerte illisible.' };
+}
+
 export async function cancelIrrigationPushAlarm(request: {
   eventEquipmentId: string;
   revision: string;
