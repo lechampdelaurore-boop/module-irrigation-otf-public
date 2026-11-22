@@ -108,6 +108,23 @@ source détaillée commit par commit.
   23 h 45 (#147), et P26, P32, P37 et P38 derrière lui, devant l'objectif
   qu'il avait laissé.
 
+### Ajouté (Améliorations, n° 5, PR 2 sur 2 des n° 4 et 5)
+
+- **L'eau apportée qui s'écarte du prévu, expliquée** (D-291, F733 à F735,
+  F740 à F743) : quand, trois semaines complètes de suite, l'eau apportée à
+  une planche s'écarte de plus de 20 % de l'eau prévue, toujours dans le
+  même sens, avec au moins trois irrigations faites, « Planning de la
+  semaine » porte le bloc « L'eau apportée s'écarte du prévu » : les trois
+  semaines (prévu, apporté, écart), la cause que les données soutiennent ou
+  « Cause non déterminée » — un débit réel plus faible que celui réglé, un
+  objectif plus haut que le besoin de la culture, une pluie mesurée
+  différente de la réanalyse — et la proposition. « Adopter » enregistre le
+  débit proposé dans le réglage, ou l'objectif proposé de la planche, après
+  que le serveur a vérifié qu'il tient encore, puis le plan se recalcule.
+  Rien ne change sans ce geste ; les irrigations passées gardent leur
+  débit. Le geste entre au journal des modifications comme un réglage
+  changé, ou un objectif proposé adopté. Sans migration. Parcours P57.
+
 ### Ajouté (Améliorations, n° 4, PR 1 sur 2 des n° 4 et 5)
 
 - **Le conseil de servir d'abord les stades sensibles, en pénurie** (D-290,

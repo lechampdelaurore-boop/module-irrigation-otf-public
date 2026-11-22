@@ -40,7 +40,7 @@ export function usesSpeciesCorrespondence(selection: FeatureSelection): boolean 
 
 /** Une partie de case qui a besoin d'une autre case (P1). */
 export type FeaturePart = {
-  id: 'sprinkler-reconsideration' | 'feasibility' | 'stage-advice';
+  id: 'sprinkler-reconsideration' | 'feasibility' | 'stage-advice' | 'gap-objective-cause';
   /** La case qui la porte. */
   feature: FeatureId;
   /** La case dont elle a besoin en plus. */
@@ -68,6 +68,13 @@ const FEATURE_PARTS: readonly FeaturePart[] = [
     feature: 'ressources',
     needs: 'cultures',
     missingNotice: 'Le conseil selon le stade sensible des cultures demande Besoin par culture.',
+  },
+  {
+    // La cause de l'objectif trop haut lit l'objectif proposé de la semaine (5 quater) : amélioration n° 5, F734, point 2.
+    id: 'gap-objective-cause',
+    feature: 'planning',
+    needs: 'cultures',
+    missingNotice: 'La cause « Objectif plus haut que le besoin de la culture » se cherche avec Besoin par culture.',
   },
 ];
 

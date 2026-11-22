@@ -272,6 +272,29 @@ toutes.
    cause de l'objectif demande « Besoin par culture » ; sans elle, cette cause
    ne se cherche pas.
 
+**Précisions du code (22 novembre 2026, D-291).** F740 : les irrigations de
+la période se lisent par date, quelle que soit leur saison ; le bloc ne se
+calcule que pour la saison du jour ; les quantités se comparent en
+centièmes de millimètre entiers ; « hors abri » est le jardin classé en
+plein champ, la pluie n'est pas une cause sous abri ni dans un jardin à
+classer ; la cause de l'objectif est une partie de « Planning de la
+semaine » qui demande « Besoin par culture », dite par une ligne quand elle
+manque (P1) ; un échec de lecture laisse le planning sans bloc, jamais en
+panne. F741 : une semaine ne se juge qu'avec les réglages d'aujourd'hui ;
+après un débit adopté, un réglage retouché ou un matériel retiré, la
+planche se juge sur les semaines qui suivent ; après un objectif proposé
+adopté cette semaine, plus bas de plus de 20 %, la planche qui reçoit moins
+que prévu se tait. F742 : le bloc après les suggestions du plan et avant la
+semaine ; par planche le sens, le tableau des trois semaines, les causes
+ou « Cause non déterminée » ; le débit dit la médiane de l'allongement, le
+réglé et le proposé ; le lien « Saisir la pluie mesurée » quand la ferme
+coche « Objectifs et besoins ». F743 : « Adopter » passe par le service, qui
+relit l'écart, refuse une semaine changée et n'écrit rien pour une
+proposition qui ne tient plus ; le débit par le chemin d'un réglage changé
+à la main, puis le plan recalculé sous « un réglage appliqué changé » ;
+l'objectif par le geste de la 5 quater, puis le plan recalculé sous « un
+objectif hydrique changé ».
+
 **Preuves.** Tests du domaine : moins de trois irrigations, une semaine non
 jugée (irrigation non confirmée, rien de prévu), écarts de 20 % tout juste et
 au-delà, sens mêlés, irrigations annulées, irrigation saisie après coup,

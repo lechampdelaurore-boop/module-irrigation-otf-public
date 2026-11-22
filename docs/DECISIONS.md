@@ -8214,3 +8214,94 @@ Reprise », puis « Sensible au manque d'eau : non → oui ». La liste
 préremplie, que seule une migration écrit, reste hors du journal, comme les
 autres tables communes (§5.1 du contrat de la n° 7). Un enregistrement qui
 ne change aucune valeur n'écrit rien.
+
+## D-291 — Améliorations, n° 5 : l'écart entre l'eau prévue et l'eau apportée, expliqué
+
+Date : 22 novembre 2026. Statut : décidé (code de l'amélioration n° 5, sur
+les réponses agronomiques du porteur du 21 novembre 2026, son récapitulatif
+des questions 4 à 9 validé à 22 h 14, et sa consigne de la nuit : continuer
+en autonomie, chaque question sans réponse prenant l'option recommandée).
+
+**Contexte.** Le module disait l'écart du manque d'eau avant et après une
+replanification, et l'écart d'un plan à la faisabilité, jamais l'écart entre
+l'eau prévue et l'eau apportée sur plusieurs semaines. Le contrat court des
+n° 4 et 5 (`docs/ameliorations-4-5-contract.md`, section 4, F733 à F735) met
+en règles les réponses du porteur : trois semaines complètes d'écart de plus
+de 20 % dans le même sens, au moins trois irrigations faites, une cause dite
+seulement si les données la soutiennent, une proposition jamais appliquée
+seule.
+
+**Décision.** Le code suit la section 4 ; les précisions de code :
+
+1. **F740, la lecture.** Les irrigations de la période se lisent par date, à
+   l'heure de Paris, quelle que soit leur saison : début janvier, les
+   semaines de décembre comptent. Le bloc ne se calcule que pour la saison
+   du jour (les trois semaines sont celles d'avant aujourd'hui) et pour une
+   ferme qui coche « Planning de la semaine » ; une irrigation dont le
+   minuteur tourne attend encore (sa semaine n'est pas jugée). Les
+   quantités se comparent en centièmes de millimètre entiers : un écart de
+   20 % tout juste ne compte jamais. « Hors abri » se lit sur le jardin
+   classé en plein champ (4.4, F583) : sous abri, ou dans un jardin à
+   classer, la pluie n'est pas une cause. La cause de l'objectif est la
+   partie `gap-objective-cause` de « Planning de la semaine », qui demande
+   « Besoin par culture » ; sans elle, une planche qui reçoit moins que
+   prévu fait dire « La cause « Objectif plus haut que le besoin de la
+   culture » se cherche avec Besoin par culture. » (P1). L'objectif lu est
+   celui de la planche pour la semaine en cours, et la proposition celle de
+   la fiche de la 5 quater pour la même semaine, adoptable comme elle le
+   dit. Un échec de lecture laisse le planning sans bloc et se journalise
+   (`applied_water_gap_failed`), jamais en panne.
+2. **F741, après un ajustement.** Une semaine ne se juge qu'avec les
+   réglages d'aujourd'hui : chaque irrigation faite de la semaine a copié
+   les débits du réglage tel qu'il est, d'un matériel en service. Après
+   « Adopter » le débit, comme après un réglage retouché à la main ou un
+   matériel retiré, la planche se juge sur les semaines qui suivent : le
+   bloc disparaît et ne revient pas sur les semaines d'avant. De même,
+   quand un objectif proposé a été adopté cette semaine, plus bas de plus
+   de 20 % que l'objectif de la planche la dernière semaine de la période,
+   la planche qui reçoit moins que prévu se tait : ses semaines passées ont
+   été prévues avec l'ancien objectif.
+3. **F742, le bloc.** Sur « Planning de la semaine », après les suggestions
+   du plan et avant la semaine (sous la phrase « Aucun calcul… » quand le
+   plan manque) : « L'eau apportée s'écarte du prévu », une phrase qui dit
+   la règle et que rien ne change sans le geste, puis par planche (jardin
+   puis nom, dans l'ordre naturel) le sens (« Plus d'eau apportée que prévu,
+   trois semaines de suite »), le tableau des trois semaines (semaine du,
+   prévu, apporté, écart en %) et ses causes, ou « Cause non déterminée ».
+   Le débit dit les irrigations retenues et la médiane de leur allongement,
+   « Réglé aujourd'hui » et « Proposé » (ou « Pas de débit à proposer au
+   dixième de mm/h près. ») ; l'objectif dit l'objectif de la semaine et
+   l'objectif proposé d'après les cultures ; la pluie dit les sommes des
+   jours mesurés, mesure contre réanalyse, et les jours sans mesure, avec le
+   lien « Saisir la pluie mesurée » vers la saisie au pluviomètre d'« Objectifs
+   et besoins », quand la ferme coche cette page. Plusieurs causes se disent
+   toutes, le débit ou l'objectif d'abord, la pluie ensuite.
+4. **F743, « Adopter ».** Le geste passe par le service
+   (`lib/services/applied-water-gap-adoption.ts`), qui relit l'écart d'abord :
+   une semaine changée est refusée (« La semaine a changé. Rechargez le
+   planning. ») ; une proposition qui ne tient plus — irrigation confirmée
+   entre-temps, réglage retouché, objectif changé — n'écrit rien (« Cette
+   proposition ne tient plus : rien n'a été changé. Voici l'écart à
+   jour. »). Le débit s'enregistre par le chemin d'un réglage changé à la
+   main (`saveEquipmentSettingForUser`, mêmes vérifications, le nom gardé,
+   provenance « saisi », sans calcul retenu) et le plan se recalcule sous
+   l'événement « un réglage appliqué changé » : le débit des planches
+   alimentées change. L'objectif passe par le geste de la 5 quater (la fiche
+   de la semaine en cours, ouverte, la révision d'adoption), seulement si
+   la fiche propose encore la valeur montrée, avec l'origine « proposition
+   adoptée », et le plan se recalcule sous « un objectif hydrique changé ».
+   La réponse relit l'écart, et les autres onglets relisent (D-129). Le
+   journal des modifications (n° 7) garde chaque geste par ces mêmes
+   chemins, sans rien de plus : le débit comme un réglage de matériel
+   changé (« Réglage de matériel », le débit d'avant et d'après), l'objectif
+   sous « Objectif proposé adopté » ; une proposition qui ne tient plus
+   n'y écrit rien.
+
+Ne changent pas : le besoin (3.3), la répartition (3.4) et le planning
+(3.5), qui ne lisent pas l'écart ; les irrigations passées gardent leur
+copie du réglage et les objectifs leurs révisions (D-006) ; aucune
+migration, aucun appel à OTF, aucun réglage de Cloudflare. **Constat**, sans
+changement : retoucher les débits d'un réglage sur « Matériel et placement »
+ne recalcule pas le plan (règle 4 de `docs/replanning-contract.md`, qui ne
+nomme que le réglage appliqué changé), alors qu'« Adopter » le fait ; à
+proposer au porteur.
