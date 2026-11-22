@@ -15,11 +15,14 @@ import {
   DEMO_HISTORY_HOUR_UTC,
   DEMO_HISTORY_MINUTES_BY_MONTH,
   DEMO_HISTORY_START,
+  DEMO_LONGER_THAN_PLANNED,
   DEMO_PLACED_AT,
   DEMO_WATER,
+  type DemoEquipmentDefinition,
 } from '../adapters/demo/module-data.ts';
+import { appliedWaterGapPeriod } from '../domain/applied-water-gap.ts';
 import type { EquipmentPlacementRecord } from '../domain/equipment-placement-record.ts';
-import { MILLISECONDS_PER_HOUR, MINUTES_PER_HOUR, SECONDS_PER_HOUR } from '../domain/units.ts';
+import { MILLISECONDS_PER_HOUR, MINUTES_PER_HOUR, SECONDS_PER_HOUR, millisecondsFromSeconds } from '../domain/units.ts';
 import { addDaysToDateKey } from '../domain/water-management.ts';
 import type { DemoChoice } from '../domain/demo/catalogue.ts';
 import type { IrrigationSnapshot } from '../domain/domain.ts';
@@ -58,14 +61,17 @@ export async function seedDemoEquipment(ownerUserId: string, choice: DemoChoice,
     if (!placement) throw new Error(`Démonstration : ${definition.name} non posé.`);
     if (pumpId) await saveEquipmentDefaultPumpForUser(ownerUserId, ownerUserId, equipmentId, pumpId);
     if (choice.profile.features.includes('arrosages')) {
-      await seedDemoHistory(ownerUserId, choice, snapshot, equipmentId, settingId, placement, definition.rateMmPerHour);
+      await seedDemoHistory(ownerUserId, choice, snapshot, equipmentId, settingId, placement, definition);
     }
   }
 }
 
 /**
  * Les arrosages faits avant le jour du moment, saisis comme une ferme les
- * aurait notés : un par semaine, aux habitudes de la ferme fictive.
+ * aurait notés : un par semaine, aux habitudes de la ferme fictive. Le
+ * goutte-à-goutte du cas d'écart (F747) a de plus, les trois semaines
+ * complètes avant celle du moment, un début et une fin prévus, sa durée
+ * prévue plus courte que la durée faite ; la durée faite reste l'habitude.
  */
 async function seedDemoHistory(
   ownerUserId: string,
@@ -74,7 +80,7 @@ async function seedDemoHistory(
   equipmentId: string,
   settingId: string,
   placement: EquipmentPlacementRecord,
-  rateMmPerHour: number,
+  definition: DemoEquipmentDefinition,
 ): Promise<void> {
   const equipment = (await listEquipmentForUser(ownerUserId)).find((item) => item.id === equipmentId);
   const setting = equipment?.settings.find((item) => item.id === settingId);
@@ -82,8 +88,9 @@ async function seedDemoHistory(
   const beds = new Map(snapshot.beds.map((bed) => [bed.id, bed]));
   const applications = placement.selectedBeds.map((selected) => {
     const area = beds.get(selected.otfBedId)?.area ?? 0;
-    return { ...selected, rateMmPerHour, bedAreaSquareMeters: area, wettedAreaSquareMeters: area };
+    return { ...selected, rateMmPerHour: definition.rateMmPerHour, bedAreaSquareMeters: area, wettedAreaSquareMeters: area };
   });
+  const longer = longerThanPlanned(choice, definition);
   for (let day = DEMO_HISTORY_START; day < choice.moment.dateKey; day = addDaysToDateKey(day, 7)) {
     const minutes = DEMO_HISTORY_MINUTES_BY_MONTH[day.slice(5, 7)] ?? 0;
     if (minutes === 0) continue;
@@ -91,6 +98,7 @@ async function seedDemoHistory(
     const seconds = hours * SECONDS_PER_HOUR;
     const start = new Date(`${day}T${String(DEMO_HISTORY_HOUR_UTC).padStart(2, '0')}:00:00.000Z`);
     const end = new Date(start.getTime() + hours * MILLISECONDS_PER_HOUR);
+    const plannedSeconds = longer && day >= longer.start && day <= longer.end ? Math.round(seconds * longer.plannedShareOfDuration) : null;
     await createIrrigationEventForUser(ownerUserId, {
       kind: 'completed',
       season: snapshot.configuration.seasonFirst,
@@ -98,16 +106,31 @@ async function seedDemoHistory(
       equipment,
       setting,
       placement,
-      plannedStartAt: null,
-      plannedEndAt: null,
+      plannedStartAt: plannedSeconds === null ? null : start.toISOString(),
+      plannedEndAt: plannedSeconds === null ? null : new Date(start.getTime() + millisecondsFromSeconds(plannedSeconds)).toISOString(),
       actualStartAt: start.toISOString(),
       actualEndAt: end.toISOString(),
-      plannedDurationSeconds: seconds,
+      plannedDurationSeconds: plannedSeconds ?? seconds,
       actualDurationSeconds: seconds,
       applications,
       pumpAssignment: null,
     });
   }
+}
+
+/**
+ * Le cas d'écart de ce goutte-à-goutte (F747), ou `null` : les trois
+ * semaines que l'amélioration n° 5 compare au jour du moment, et la part
+ * prévue de la durée habituelle.
+ */
+function longerThanPlanned(
+  choice: DemoChoice,
+  definition: DemoEquipmentDefinition,
+): { start: string; end: string; plannedShareOfDuration: number } | null {
+  const longer = DEMO_LONGER_THAN_PLANNED[choice.profile.id]?.[choice.moment.id];
+  if (!longer || longer.plotId !== definition.plotId) return null;
+  const period = appliedWaterGapPeriod(choice.moment.dateKey);
+  return { start: period.start, end: period.end, plannedShareOfDuration: longer.plannedShareOfDuration };
 }
 
 /** La ressource, la réserve et la pompe qui en tire l'eau ; la pompe, quand la ferme en a une. */

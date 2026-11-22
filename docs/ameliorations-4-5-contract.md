@@ -304,6 +304,38 @@ des trois semaines, la vérification avant d'adopter. P57, à 390 et 1440 px :
 trois semaines d'irrigations plus longues que prévu, le bloc, la cause du
 débit, « Adopter », le réglage changé, le bloc disparu.
 
+**Le cas de la démonstration (22 novembre 2026, D-295).** F747 : la recette
+du 22 novembre 2026 n'a pu voir le bloc ni sur la ferme (aucun arrosage en
+novembre) ni dans la démonstration, dont l'historique ne s'écarte jamais du
+prévu (écart E2). Le jeu de la démonstration a désormais un cas, un seul :
+la « Ferme des Trois Noues », au moment « Début d'été » (16 juin 2026),
+arrose son clos plus longtemps que prévu, son goutte-à-goutte donnant moins
+que son réglage. Les trois semaines complètes avant la semaine du moment
+(lundis 25 mai, 1er et 8 juin), l'arrosage habituel du lundi du
+« Goutte-à-goutte du clos » (F169 de `docs/demo-guided-contract.md` : 1 h en
+mai, 2 h en juin, à 7 h) était prévu pour les deux tiers de cette durée
+(40 min, puis 1 h 20) et a duré la durée habituelle : l'eau apportée reste
+celle de l'historique, seule la prévision change (4 mm prévus pour 6 mm
+apportés, puis 8 mm pour 12 mm). « Planning de la semaine » porte donc le
+bloc pour S01 et S02 : ce goutte-à-goutte arrose ensemble les deux planches
+du clos, et l'écart se lit sur chacune. Plus d'eau apportée que prévu, de
+50 % chaque semaine ; la cause du débit, trois irrigations plus longues de
+50 % en médiane, réglé à 6 mm/h, proposé à 4 mm/h, calculés par le module
+lui-même ; aucune autre cause (aucune pluie mesurée dans la démonstration).
+Aucune autre ferme, aucun autre moment ne change ; les durées faites, les
+volumes et les cumuls restent ceux de F169. Comme tout l'historique de la
+démonstration, ces arrosages s'écrivent d'un coup, déjà faits, avec leur
+début et leur fin prévus : l'historique les dit « Déjà réalisée », la
+démonstration ne rejouant pas le minuteur. « Adopter » ne change que
+l'espace de l'invité ; le bouton « Remettre à zéro » et la tâche de nuit
+rendent le cas, comme le reste du jeu, puisque l'espace se prépare de
+nouveau à la visite suivante. Des durées d'arrosage d'une ferme inventée,
+aucune valeur agronomique. Preuves : un test de persistance (la démonstration
+préparée au jour du moment, le bloc lu par le service, rien ailleurs,
+« Adopter », puis la remise à zéro et la tâche de nuit qui rendent le cas)
+et le parcours V11 de la démonstration, aux deux largeurs (le bloc sur
+« Planning de la semaine », sans rien écrire).
+
 ## 5. Questions pour le porteur
 
 Aucune n'est ouverte : **la liste préremplie des stades sensibles** (§3.1.3)
