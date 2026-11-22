@@ -26,7 +26,8 @@ export type KcOverrideRow = {
   history: KcOverride[];
 };
 
-const FAO_POINTS = [
+/** Les trois Kc de la FAO, avec leur nom à l'écran ; relus par le journal des modifications (D-289). */
+export const FAO_POINTS = [
   { fao: 'initial', label: 'Kc début' },
   { fao: 'mid', label: 'Kc pleine saison' },
   { fao: 'end', label: 'Kc fin' },

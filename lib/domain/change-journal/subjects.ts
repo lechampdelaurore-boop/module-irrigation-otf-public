@@ -56,6 +56,17 @@ const CHANGE_SUBJECTS = {
   fonctionnalites: { family: 'reglage', label: 'Fonctionnalités' },
   'message-du-matin': { family: 'reglage', label: 'Message du matin' },
   'rappel-du-soir': { family: 'reglage', label: 'Rappel du soir' },
+  // Réglages que la liste du contrat ne nommait pas, ajoutés par D-289 (F718, F725).
+  'kc-corrige': { family: 'reglage', label: 'Kc corrigé d’une culture' },
+  'culture-de-reference': { family: 'reglage', label: 'Culture de référence de la ferme' },
+  'correspondance-d-espece': { family: 'reglage', label: 'Correspondance d’une espèce' },
+  'k-abri': { family: 'reglage', label: 'Effet d’un abri (K_abri)' },
+  'paillage-plastique': { family: 'reglage', label: 'Paillage plastique d’une planche' },
+  'filet-d-ombrage': { family: 'reglage', label: 'Filet d’ombrage' },
+  'options-du-besoin': { family: 'reglage', label: 'Options du besoin par culture' },
+  'jardin-sous-abri': { family: 'reglage', label: 'Jardin sous abri ou de plein champ' },
+  'groupe-de-jardins': { family: 'reglage', label: 'Groupe de jardins' },
+  'lieu-meteo': { family: 'reglage', label: 'Lieu de la météo' },
   // Matériel et ressources.
   materiel: { family: 'materiel', label: 'Matériel' },
   'reglage-de-materiel': { family: 'materiel', label: 'Réglage de matériel' },

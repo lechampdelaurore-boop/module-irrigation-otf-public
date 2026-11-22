@@ -393,6 +393,22 @@ section est un pli fermé en bas de « Réglages », juste avant « Supprimer ma
 ferme et mes données » ; le budget de hauteur au téléphone passe à
 3 750 px ; parcours P55.
 
+**Précisions du code (21 novembre 2026, D-289, PR 8).** F718 est réglée :
+les réglages que §5.1 ne nommait pas écrivent eux aussi leur ligne dans leur
+lot, famille « Réglages » (Kc corrigés, cultures de référence de la ferme,
+correspondance des espèces, K_abri, paillage plastique, filets d'ombrage,
+options du besoin par culture, jardins sous abri, groupes de jardins, lieu
+de la météo). F725 : restent hors du journal, avec leur raison, le repère
+de saison des groupes, leur report d'une saison sur l'autre, l'état des
+synchronisations météo et la proposition du module pour un jardin. F726 :
+une valeur composée se garde en un texte relu à l'identique ; un
+enregistrement identique n'écrit rien. F727 : la première version de la
+ferme d'une culture est une création, la suivante une modification, la
+retirer une suppression. F728 : un jardin remis « à classer » est une
+suppression. F729 : le lieu de la météo, seul le choix. Décidé par le
+coordinateur dans l'autonomie que le porteur lui a confiée, confirmé par
+le porteur le 21 novembre 2026 à 23 h 13.
+
 **Preuves (PR 4 à 7).** Tests de persistance (atomicité, un changement refusé
 n'écrit rien, immuabilité), d'isolation entre deux fermes, d'effacement, de
 couverture ; tests du domaine (le texte de chaque famille) ; P-n° à 390 et
