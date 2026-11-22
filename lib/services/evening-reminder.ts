@@ -12,7 +12,7 @@ import { errorClassWords } from '../domain/operations/morning-task-outcomes';
 import { eveningPassUseful, eveningReminder, eveningReminderDue } from '../domain/today/evening-reminder';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc } from '../domain/water-management';
 import { listFarmsWithFeature } from './feature-selection-service';
-import { scheduleIrrigationPushAlarm } from './irrigation-push-service';
+import { schedulePhoneNoticeAlarm } from './irrigation-push-service';
 import type { PlanningAlarmScheduler } from './morning-message';
 import { recordTaskOutcomes } from './task-runs';
 
@@ -23,11 +23,13 @@ import { recordTaskOutcomes } from './task-runs';
  * qui cochent « Arrosages » et ne sont pas figées par une demande
  * d'effacement sont lues ; parmi elles, celles dont le rappel est activé et
  * dû à cette heure. Pour chacune, le rappel part par l'alarme à échéance
- * immédiate du Worker de notification, sous la clé de l'espace, une fois par
- * jour au plus : la prise du jour se garde en base avant l'envoi et se rend
- * s'il échoue. Une ferme en panne n'arrête pas les autres. Le passage
- * s'enregistre comme une tâche du registre (`evening-reminder`). Le journal
- * ne porte que des nombres.
+ * immédiate du Worker de notification, sous la clé de l'espace et un
+ * identifiant d'alarme qui porte l'espace et le jour (§4.4, F744), une fois
+ * par jour au plus : la prise du jour se garde en base avant l'envoi et se
+ * rend s'il échoue ou si le Worker refuse l'alarme (`stale`, F745), qui
+ * compte alors comme une panne, jamais comme un envoi. Une ferme en panne
+ * n'arrête pas les autres. Le passage s'enregistre comme une tâche du
+ * registre (`evening-reminder`). Le journal ne porte que des nombres.
  */
 
 export type EveningPassResult = {
@@ -41,7 +43,7 @@ export type EveningPassResult = {
 
 export async function runEveningReminders({
   now = new Date(),
-  schedule = scheduleIrrigationPushAlarm,
+  schedule = schedulePhoneNoticeAlarm,
   log = logJsonLine,
 }: {
   now?: Date;
@@ -92,7 +94,7 @@ async function remindFarm(farm: { workspaceId: string; ownerUserId: string }, no
       startAt: localDateStartUtc(today, FARM_TIME_ZONE).toISOString(),
       endAt: localDateStartUtc(addDaysToDateKey(today, 1), FARM_TIME_ZONE).toISOString(),
     });
-    const reminder = eveningReminder({ now, events });
+    const reminder = eveningReminder({ now, workspaceId: farm.workspaceId, events });
     if (!reminder) return 'nothing';
     if (!(await claimPhoneNotice(farm.workspaceId, 'evening', reminder.parisDay, now.toISOString()))) return 'already-sent';
     claimedDay = reminder.parisDay;
@@ -109,6 +111,7 @@ async function remindFarm(farm: { workspaceId: string; ownerUserId: string }, no
     }
     await releasePhoneNotice(farm.workspaceId, 'evening', reminder.parisDay);
     // Le service non configuré n'est pas une panne de la ferme : rien n'est parti, rien n'est compté.
+    // Un refus du Worker (`stale`) n'est pas un envoi : il compte comme une panne, et le passage suivant réessaie (F745).
     return sent.status === 'disabled' ? 'nothing' : 'failed';
   } catch {
     if (claimedDay) await releasePhoneNotice(farm.workspaceId, 'evening', claimedDay).catch(() => undefined);

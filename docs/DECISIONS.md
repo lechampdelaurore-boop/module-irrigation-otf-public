@@ -8376,6 +8376,51 @@ change (`pnpm why eslint --prod` ne trouve rien, le paquet construit ne
 contient aucune trace d'eslint) ; la suite complète des parcours est jouée
 par la CI de la PR.
 
+## D-293 — Le message du matin et le rappel du soir : une alarme par espace
+
+Date : 22 novembre 2026. Statut : décidé (correctif du constat A de la revue
+de l'isolation de la 4.3 à la 4.5, faite le 22 novembre 2026 pour la
+condition E8 de la fiche d'entrée du pilote ; accepté par le coordinateur
+sous l'autonomie que le porteur a donnée le 22 novembre 2026, « vas-y pour
+tout »).
+
+**Contexte.** Le message du matin (n° 3, D-283) et le rappel du soir (n° 2,
+D-284) partaient sous un identifiant d'alarme fait du seul jour de Paris
+(`morning:<jour>`, `evening:<jour>`), le même dans toutes les fermes. Le
+Worker de notification ne garde qu'une alarme par identifiant : quand deux
+espaces envoient le même jour, la seconde demande remplace la première
+(révision plus récente) ou est refusée (`stale`, révision plus ancienne),
+et le module comptait le refus comme un envoi. Un message se perdait sans
+bruit. Aucun contenu ne passait chez l'autre ferme (chaque alarme garde sa
+clé de récepteur), et le défaut restait latent avec un seul espace ; il se
+serait déclenché à l'essai E2 et au pilote.
+
+**Décision** (`docs/ameliorations-6-2-3-7-contract.md`, section 4.4) :
+
+1. **F744.** L'identifiant et l'étiquette portent l'espace :
+   `morning:<espace>:<jour>` et `morning-<espace>-<jour>`,
+   `evening:<espace>:<jour>` et `evening-<espace>-<jour>`, composés par une
+   seule fonction (`lib/domain/today/phone-notice-alarm.ts`). L'espace est
+   l'identifiant de l'espace d'irrigation, déjà clé de récepteur. Le Worker
+   ne change pas.
+2. **F745.** Le module lit la réponse du Worker à ces alarmes
+   (`schedulePhoneNoticeAlarm`) : seul `scheduled` vaut un envoi ; `stale`
+   et une réponse illisible comptent comme une panne, la prise du jour est
+   rendue et l'envoi se réessaie (le calcul relancé le matin, le passage
+   suivant le soir). Les alarmes de fin et de retard d'arrosage, propres à
+   chaque irrigation, ne changent pas.
+3. **Point D4 de la revue du 18 novembre 2026.** Le test que promettait F366
+   est ajouté (`tests/db/farm-identity.test.ts`) : chacun des quatre chemins
+   qui écrivent la ferme gardée du déploiement (lecture complète, clé qui
+   mène à une autre ferme, dernier instantané en cache, `GET /me`) écrit sa
+   date au même format UTC, ce qui rend juste la comparaison alphabétique de
+   la base.
+
+Ne changent pas : le Worker de notification, le texte des messages, leurs
+réglages, l'écran, aucune migration ; un message déjà parti sous l'ancien
+identifiant le jour de la mise en ligne ne repart pas (la prise du jour, en
+base, est par espace).
+
 ## D-294 — Améliorations, n° 7 : le journal des modifications se relit sans recharger la page
 
 Date : 22 novembre 2026. Statut : décidé (correction de l'écart E1 de la

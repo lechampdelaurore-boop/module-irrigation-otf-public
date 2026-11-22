@@ -181,6 +181,8 @@ y sont une phrase du message (F703).
    l'étiquette portent le jour de Paris (`morning:<jour>`), de sorte qu'une
    seconde exécution du calcul du même jour ne renvoie rien (même principe que
    `claimOperatorNotice`) ; la prise du jour se garde en base avant l'envoi.
+   **Précisé le 22 novembre 2026 (section 4.4, F744)** : ils portent aussi
+   l'espace, `morning:<espace>:<jour>`.
 5. **Un clic ouvre « Aujourd'hui »**, au lieu du planning.
 6. **Une panne n'altère jamais le plan** : la fonction ne lève pas, elle
    journalise sans nommer personne (règle 23).
@@ -256,6 +258,58 @@ L'envoi réel d'une notification se prouve en simulation (le Worker de
 notification est simulé, comme pour la fin d'irrigation) ; l'essai sur
 appareil réel est une recette du porteur, jamais jouée sans son accord
 (ferme réelle).
+
+### 4.4 Une alarme par espace (précision du 22 novembre 2026, D-293)
+
+**Le défaut.** La revue de l'isolation de la 4.3 à la 4.5 (22 novembre 2026,
+constat A, condition E8 de la fiche d'entrée du pilote) a trouvé que le
+message du matin et le rappel du soir portaient le même identifiant d'alarme
+dans toutes les fermes (`morning:<jour>`, `evening:<jour>`). Le Worker de
+notification ne garde qu'une alarme par identifiant
+(`cloudflare/irrigation-push/src/index.ts`, `IrrigationAlarm`) : quand deux
+espaces envoient le même jour, la seconde demande remplace la première si
+sa révision est plus récente, et l'un des messages se perd ; elle est
+refusée (`stale`) si elle est plus ancienne, et le module la comptait
+pourtant comme partie. Aucun contenu ne passe chez l'autre ferme : chaque
+alarme garde sa clé de récepteur. Le défaut restait latent tant qu'un seul
+espace envoyait ; il se serait déclenché à l'essai E2 (« Ferme v2 » à côté de
+la ferme réelle) et au pilote.
+
+- **F744 · L'identifiant et l'étiquette portent l'espace.** Le message du
+  matin part sous `morning:<espace>:<jour>`, étiquette
+  `morning-<espace>-<jour>` ; le rappel du soir sous
+  `evening:<espace>:<jour>`, étiquette `evening-<espace>-<jour>` (une seule
+  fonction les compose, `lib/domain/today/phone-notice-alarm.ts`). L'espace
+  est l'identifiant de l'espace d'irrigation, celui qui sert déjà de clé de
+  récepteur ; il tient dans ce que le Worker accepte (lettres, chiffres,
+  `.`, `_`, `:` et `-`, 128 signes au plus pour l'identifiant, 180 pour
+  l'étiquette). L'étiquette porte l'espace pour la même raison sur
+  l'appareil : un téléphone inscrit dans deux espaces de la même personne
+  (F371) garde les deux messages, sans que l'un remplace l'autre. Le
+  Worker ne change pas. Un message déjà parti sous l'ancien identifiant le
+  jour de la mise en ligne ne repart pas : la prise du jour en base, par
+  espace, l'en empêche.
+- **F745 · Un refus du Worker n'est pas un envoi.** Le module lit la
+  réponse du Worker à chaque alarme du matin et du soir : seul `scheduled`
+  vaut un envoi ; `stale` (une alarme plus récente gardée sous le même
+  identifiant) et une réponse illisible comptent comme une panne. La prise
+  du jour est alors rendue : le message du matin se journalise
+  (`morning_message_failed`, sans nom) et un calcul relancé le même jour
+  réessaie ; le rappel du soir compte la ferme en échec au passage, qui
+  manque au registre, et le passage suivant réessaie. Les alarmes de fin et
+  de retard d'arrosage, dont l'identifiant est propre à chaque irrigation,
+  ne changent pas.
+
+**Preuves.** Tests du domaine (deux espaces le même jour : deux identifiants,
+deux étiquettes, au format du Worker), du service (deux fermes le même matin
+et au même passage du soir, chacune son alarme, contre un Worker simulé qui
+range ses alarmes comme le vrai ; `stale` jamais compté comme parti, la prise
+rendue et réessayée), de la lecture de la réponse du Worker
+(`tests/phone-notice-alarm.test.ts`) et du vrai code du Worker
+(`cloudflare/irrigation-push/test/device-isolation.test.ts` : deux espaces
+sous leur identifiant reçoivent chacun leur message ; sous un identifiant
+partagé, une seule alarme survit). Aucune migration, aucun changement à
+l'écran.
 
 ## 5. n° 7 — Journal des modifications
 

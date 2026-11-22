@@ -10,13 +10,17 @@ import { MORNING_MESSAGE_DEFAULT, morningMessage, type MorningMessageInputs } fr
  * docs/ameliorations-6-2-3-7-contract.md, section 4.2, F703, F712, F713) :
  * une phrase pour les arrosages planifiés d'aujourd'hui, une pour la pluie
  * prévue, une pour les alertes en cours, une pour les suggestions ; rien
- * quand il n'y a rien à dire ; un identifiant par jour de Paris ; un clic
+ * quand il n'y a rien à dire ; un identifiant par espace et par jour de
+ * Paris (§4.4, F744) ; un clic
  * ouvre « Aujourd'hui ». Les suggestions gardent leur règle (docs/replanning-contract.md,
  * règles 21 et 22).
  */
 
 const NOW = new Date('2026-09-30T04:15:00.000Z'); // mercredi 30 septembre, 6 h 15 à la ferme
 const HOUR_MS = 3_600_000;
+/** Un espace, tel que la base le crée : un UUID. */
+const SPACE = '0b8e6c1a-5f0e-4a43-9d64-1c2a7e9f3b10';
+const OTHER_SPACE = 'f3d2a9b4-7c61-4e0a-8b5d-2a9c4e7f1d36';
 
 function hoursFromNow(hours: number): string {
   return new Date(NOW.getTime() + hours * HOUR_MS).toISOString();
@@ -76,10 +80,10 @@ function irrigation(name: string, startAt: string, options: EventOptions = {}): 
 }
 
 function inputs(overrides: Partial<MorningMessageInputs> = {}): MorningMessageInputs {
-  return { now: NOW, events: [], forecastRainMm: null, alerts: 0, suggestions: [], ...overrides };
+  return { now: NOW, workspaceId: SPACE, events: [], forecastRainMm: null, alerts: 0, suggestions: [], ...overrides };
 }
 
-test('les quatre phrases, dans l’ordre : arrosages, pluie, alertes, suggestions ; un identifiant du jour ; un clic ouvre « Aujourd’hui »', () => {
+test('les quatre phrases, dans l’ordre : arrosages, pluie, alertes, suggestions ; un identifiant de l’espace et du jour ; un clic ouvre « Aujourd’hui »', () => {
   const message = morningMessage(inputs({
     events: [
       irrigation('Goutte-à-goutte nord', '2026-09-30T06:00:00.000Z'),
@@ -98,8 +102,8 @@ test('les quatre phrases, dans l’ordre : arrosages, pluie, alertes, suggestion
       '2 alertes en cours.',
       '1 suggestion sur un arrosage des prochaines 24 heures : Annuler Rampe bloc 2.',
     ].join(' '),
-    alarmId: 'morning:2026-09-30',
-    tag: 'morning-2026-09-30',
+    alarmId: `morning:${SPACE}:2026-09-30`,
+    tag: `morning-${SPACE}-2026-09-30`,
     url: '/irrigation/aujourdhui',
     counts: { irrigations: 2, alerts: 2, suggestions: 1 },
   });
@@ -152,13 +156,25 @@ test('un second calcul du même jour porte le même identifiant ; le lendemain, 
   const again = morningMessage(inputs({ ...alerts, now: new Date(NOW.getTime() + 5 * HOUR_MS) }));
   const tomorrow = morningMessage(inputs({ ...alerts, now: new Date(NOW.getTime() + 24 * HOUR_MS) }));
   assert.equal(again?.alarmId, morning?.alarmId);
-  assert.equal(tomorrow?.alarmId, 'morning:2026-10-01');
+  assert.equal(tomorrow?.alarmId, `morning:${SPACE}:2026-10-01`);
   // Le jour du passage à l'heure d'hiver : le jour de Paris reste un seul jour.
   const autumn = morningMessage(inputs({ ...alerts, now: new Date('2026-10-25T00:30:00.000Z') }));
   const autumnLater = morningMessage(inputs({ ...alerts, now: new Date('2026-10-25T22:30:00.000Z') }));
-  assert.equal(autumn?.alarmId, 'morning:2026-10-25');
-  assert.equal(autumnLater?.alarmId, 'morning:2026-10-25', '23 h 30 heure d’hiver, toujours le 25');
+  assert.equal(autumn?.alarmId, `morning:${SPACE}:2026-10-25`);
+  assert.equal(autumnLater?.alarmId, `morning:${SPACE}:2026-10-25`, '23 h 30 heure d’hiver, toujours le 25');
   assert.equal(MORNING_MESSAGE_DEFAULT, true, 'activé tant que la ferme ne l’a pas coupé');
+});
+
+test('deux fermes le même jour : deux identifiants d’alarme et deux étiquettes, jamais une alarme partagée (§4.4, F744, revue de l’isolation du 22 novembre 2026, constat A)', () => {
+  const ours = morningMessage(inputs({ alerts: 1 }));
+  const theirs = morningMessage(inputs({ alerts: 1, workspaceId: OTHER_SPACE }));
+  assert.ok(ours && theirs);
+  assert.equal(ours.parisDay, theirs.parisDay, 'le même jour');
+  assert.notEqual(ours.alarmId, theirs.alarmId, 'le Worker garde une alarme par identifiant : chaque ferme a la sienne');
+  assert.notEqual(ours.tag, theirs.tag, 'un appareil de deux espaces garde les deux messages');
+  // Le Worker n'accepte que [A-Za-z0-9._:-], 128 signes pour l'identifiant et 180 pour l'étiquette.
+  assert.match(ours.alarmId, /^[A-Za-z0-9._:-]{1,128}$/u);
+  assert.match(ours.tag, /^[A-Za-z0-9._:-]{1,180}$/u);
 });
 
 test('les suggestions : celles des prochaines 24 heures, dans l’ordre du temps, au singulier ou au pluriel', () => {
