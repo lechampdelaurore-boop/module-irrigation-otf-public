@@ -8678,3 +8678,22 @@ texte à y mettre est à la décision du porteur, dans une PR de code à part
 (le site public se redéploie). Non modifiée ici. (b) Les mentions
 historiques de la relecture dans les registres plus anciens et dans le
 contrat gardent leur texte d'origine ; la note du 10 ter.3 les corrige.
+
+## D-300 — La page de confidentialité ne promet plus de relecture juridique
+
+Date : 22 novembre 2026. Statut : décidé par le porteur (« oui » du
+22 novembre 2026 à 18 h 35, à la question de remplacer la promesse par une
+phrase simple ; réglage de la roadmap, ligne 4.8 : Opus 5.5 · Élevé, code).
+
+**Contexte.** D-299 lève la relecture juridique, mais laisse ouverte (« Reste »,
+point a) la note de la page publique de confidentialité : « Il n'a pas encore
+été relu par un juriste ; il le sera avant qu'une autre ferme que celle du
+responsable soit reliée. » Cette promesse ne sera pas tenue.
+
+**Décision.** La note dit désormais : « Ce texte décrit honnêtement ce que fait
+le module aujourd'hui. Il n'a pas été relu par un juriste. » Elle ne promet
+plus rien. Le texte change, sa date passe au 22 novembre 2026. Le test du site
+(`cloudflare/irrigation-site/test/site.test.ts`) fige la nouvelle phrase et
+vérifie qu'aucune relecture n'est promise ; le commentaire de
+`cloudflare/irrigation-site/src/pages.ts` suit. Rien d'autre ne change sur
+le site ; les conditions n'avaient pas de telle phrase.

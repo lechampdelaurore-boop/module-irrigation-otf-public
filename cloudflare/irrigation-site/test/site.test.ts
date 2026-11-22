@@ -69,7 +69,8 @@ test('la politique de confidentialité couvre ce que demande le contrat (section
     [/CNIL/, 'réclamation'],
     [/Si Ouvre ta ferme change ou s'arrête/, 'si OTF change'],
     [/aucune mesure d'audience/i, 'aucune mesure d’audience'],
-    [/pas encore été relu par un juriste/, 'relecture annoncée honnêtement'],
+    // Relecture juridique abandonnée par le porteur (D-299) : la page le dit, sans rien promettre.
+    [/Il n'a pas été relu par un juriste\./, 'absence de relecture dite honnêtement'],
     // Le journal des modifications (amélioration n° 7, docs/ameliorations-6-2-3-7-contract.md, §5.3.4 ; D-285).
     [/Le journal des modifications garde qui a changé quoi et quand .*, tant que la ferme existe/, 'journal des modifications, gardé autant que la ferme'],
     // Le coffre des jetons (4.3, PR 2 ; docs/tranche-4-contract.md, F367) et le point D6 de la revue de l'isolation.
@@ -88,9 +89,10 @@ test('la politique de confidentialité couvre ce que demande le contrat (section
     [/plus aucune notification n'a pu lui être remise depuis 90 jours/, 'les abonnements muets (F655)'],
     [/Quand il regarde les données de votre ferme, il le note : le jour, la ferme et la raison en une ligne, jamais ce qu'il a vu\./, 'le journal d’accès du support (F660)'],
     [/La note de chaque consultation des données de votre ferme par le responsable est gardée 12 mois ; elle est aussi effacée avec vos données de ferme\./, 'sa durée (F660)'],
-    [/Texte du 21 novembre 2026/, 'date du texte'],
+    [/Texte du 22 novembre 2026/, 'date du texte'],
   ];
   for (const [pattern, label] of required) assert.match(body, pattern, label);
+  assert.doesNotMatch(body, /il le sera avant/, 'aucune relecture promise (D-299)');
   assert.ok(body.includes(OAUTH_RETURN_URL), "l'adresse de retour est écrite");
   assert.ok(body.includes(MODULE_URL), "l'adresse du module est écrite");
 });

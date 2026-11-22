@@ -6,13 +6,14 @@ import { escapeHtml, renderPage } from './layout.ts';
  * docs/tranche-4-contract.md, section 9, T4-18 ; D-153). Il décrit ce que
  * fait réellement le code à la date indiquée : toute évolution du module qui
  * change ce qui est lu, gardé ou envoyé à l'extérieur met ce texte à jour dans
- * la même PR. Ce n'est pas un avis juridique (T4-20) : il sera relu par une
- * personne compétente avant qu'une autre ferme soit reliée.
+ * la même PR. Ce n'est pas un avis juridique (T4-20) : il n'a pas été relu
+ * par un juriste, le porteur ayant renoncé à cette relecture et pris la
+ * responsabilité des textes tels quels (D-299).
  */
 
 export const RESPONSIBLE = "François PREZEAU, GAEC Le Champ de l'Aurore";
 /** La date de chaque texte : celui des conditions n'a pas changé depuis sa validation. */
-const PRIVACY_TEXT_DATE = '21 novembre 2026';
+const PRIVACY_TEXT_DATE = '22 novembre 2026';
 const TERMS_TEXT_DATE = '18 novembre 2026';
 
 /** Une adresse électronique plausible : une valeur mal saisie ne s'affiche pas. */
@@ -73,7 +74,7 @@ export function privacyPage(contactEmail: string | undefined): string {
     description: "Ce que le module d'irrigation lit, garde et envoie, combien de temps, et comment faire effacer ses données.",
     body: `<h1>Politique de confidentialité</h1>
 <p class="updated">Texte du ${PRIVACY_TEXT_DATE}.</p>
-<p class="note">Ce texte décrit honnêtement ce que fait le module aujourd'hui. Il n'a pas encore été relu par un juriste ; il le sera avant qu'une autre ferme que celle du responsable soit reliée.</p>
+<p class="note">Ce texte décrit honnêtement ce que fait le module aujourd'hui. Il n'a pas été relu par un juriste.</p>
 
 <h2>Qui est responsable</h2>
 <p>${RESPONSIBLE}. Pour toute question ou demande sur vos données : ${contact}.</p>
