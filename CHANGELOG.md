@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (page de confidentialité)
+
+- **La page publique de confidentialité ne promet plus de relecture
+  juridique** (D-300, suite de D-299) : sa note dit désormais « Il n'a pas
+  été relu par un juriste. », sans « il le sera avant qu'une autre ferme
+  […] soit reliée » ; texte daté du 22 novembre 2026. Le test du site fige
+  la phrase et vérifie qu'aucune relecture n'est promise.
+
 ### Décidé (relecture juridique)
 
 - **Relecture juridique abandonnée par le porteur** le 22 novembre 2026 à

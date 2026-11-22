@@ -12,6 +12,17 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **La page de confidentialité ne promet plus de relecture juridique,
+  corrigée le 22 novembre 2026** (D-300, sur le « oui » du porteur à
+  18 h 35), en Opus 5.5 · Élevé, le réglage de code de la 4.8 : sa note dit
+  « Il n'a pas été relu par un juriste. », texte daté du 22 novembre 2026 ;
+  le test du site fige la phrase et vérifie qu'aucune relecture n'est
+  promise. Rien d'autre ne change sur le site. Contrôles du 22 novembre
+  2026 : `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 284 tests, 0 échec),
+  `pnpm build`, `pnpm knip`, `pnpm push:check` (50 tests),
+  `pnpm weather:check` (6 tests) et `pnpm site:check` (12 tests, état de
+  départ : 12 sur 12) réussis ; `pnpm e2e` omis, sans rapport : seul le
+  site public, un Worker à part sans parcours navigateur, change.
 - **Relecture juridique abandonnée par le porteur le 22 novembre 2026 à
   17 h 50** (D-299) : il n'a trouvé aucun relecteur gratuit et prend la
   responsabilité des textes tels quels. La condition E6 du pilote (fiche
@@ -19,9 +30,9 @@ registres, elle y renvoie.
   les conditions et le modèle d'accord restent non relus par un juriste.
   Consignée dans D-299, la fiche d'entrée, le modèle d'accord (statut et
   mode d'emploi), le contrat de la Tranche 4 (note au 10 ter.3) et la
-  roadmap (4.6). Ouvert, à sa décision : la page publique de confidentialité
-  promet encore une relecture « avant qu'une autre ferme soit reliée »
-  (D-299, « Reste »). Mise en ligne de #181 (icône de l'onglet, D-298)
+  roadmap (4.6). La page publique de confidentialité, qui promettait encore
+  une relecture « avant qu'une autre ferme soit reliée » (D-299, « Reste »),
+  est corrigée (D-300, ci-dessous). Mise en ligne de #181 (icône de l'onglet, D-298)
   consignée ici : fusionnée le 22 novembre 2026 à 17 h 01, **en ligne à
   17 h 34** (run 45041483079 vérifié job par job : les cinq jobs verts).
   PR de registres seule : **aucun contrôle de code rejoué**, sans rapport
