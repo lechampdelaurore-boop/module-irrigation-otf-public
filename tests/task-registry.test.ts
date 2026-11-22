@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { morningTaskOutcomes } from '../lib/domain/operations/morning-task-outcomes.ts';
 import {
+  OPERATOR_GESTURE,
   REPEATED_FAILURES_FOR_BROKEN,
   TASK_REGISTRY,
   TASK_TRIGGERS,
@@ -75,9 +76,15 @@ test('le registre est cohérent : clés uniques, seuils croissants et expliqués
     for (const field of ['label', 'rhythm', 'thresholdReason', 'ifMissing', 'successKeptIn'] as const) {
       assert.ok(task[field].trim().length > 0, `${task.key} : ${field} écrit`);
     }
+    if (task.trigger === OPERATOR_GESTURE) continue;
     const trigger = TASK_TRIGGERS.find((candidate) => candidate.key === task.trigger);
     assert.ok(trigger?.monitored, `${task.key} : son déclencheur existe et est surveillé`);
   }
+  assert.deepEqual(
+    TASK_REGISTRY.filter((task) => task.trigger === OPERATOR_GESTURE).map((task) => task.key),
+    ['offsite-export', 'restore-rehearsal'],
+    'deux tâches faites par l’exploitant : l’export hors de Cloudflare et l’essai de restauration',
+  );
   for (const trigger of TASK_TRIGGERS) {
     if (trigger.monitored) assert.ok(tasksOfTrigger(trigger.key).length > 0, `${trigger.key} : au moins une tâche`);
     else assert.ok(trigger.reason.trim().length > 0, `${trigger.key} : hors veille, avec sa raison`);
@@ -86,7 +93,7 @@ test('le registre est cohérent : clés uniques, seuils croissants et expliqués
 });
 
 test('les tâches du matin : 26 heures pour l’orange, 36 pour le rouge, le seuil de l’avertissement de la météo (D-165)', () => {
-  assert.deepEqual(tasksOfTrigger('weather-morning'), ['weather-forecast', 'weather-reanalysis', 'morning-calculation', 'otf-vault-morning']);
+  assert.deepEqual(tasksOfTrigger('weather-morning'), ['weather-forecast', 'weather-reanalysis', 'morning-calculation', 'otf-vault-morning', 'farm-erasure', 'retention-purge']);
   for (const key of tasksOfTrigger('weather-morning')) {
     assert.equal(taskDeclaration(key).lateAfterHours, 26);
     assert.equal(taskDeclaration(key).brokenAfterHours, 36);
@@ -95,11 +102,32 @@ test('les tâches du matin : 26 heures pour l’orange, 36 pour le rouge, le seu
   assert.throws(() => taskDeclaration('inconnue' as never), /absente du registre/);
 });
 
+test('la veille de 9 h a son propre déclencheur, distinct de ceux qu’elle surveille (R5)', () => {
+  assert.deepEqual(tasksOfTrigger('operator-watch'), ['operator-watch']);
+  const watch = TASK_TRIGGERS.find((trigger) => trigger.key === 'operator-watch')!;
+  const morning = TASK_TRIGGERS.find((trigger) => trigger.key === 'weather-morning')!;
+  assert.equal(watch.config, morning.config, 'le même planificateur, sans service nouveau');
+  assert.notEqual(watch.cron, morning.cron, 'un déclencheur à part : une panne du matin ne l’emporte pas');
+  assert.equal(watch.cron, '0 7,8 * * *', '9 h à Paris, l’un des deux créneaux UTC selon l’heure d’été');
+});
+
+test('le rappel du soir a son déclencheur horaire, sa tâche, orange à 3 heures et rouge à 6 (amélioration n° 2, F705)', () => {
+  assert.deepEqual(tasksOfTrigger('evening-reminder'), ['evening-reminder']);
+  const evening = TASK_TRIGGERS.find((trigger) => trigger.key === 'evening-reminder')!;
+  assert.equal(evening.cron, '5 * * * *', 'chaque heure, à l’heure et cinq minutes');
+  assert.equal(evening.config, 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc', 'le même planificateur, sans service nouveau');
+  assert.ok(evening.monitored, 'surveillé par la veille');
+  assert.equal(taskDeclaration('evening-reminder').lateAfterHours, 3);
+  assert.equal(taskDeclaration('evening-reminder').brokenAfterHours, 6);
+});
+
 test('le matin rend une exécution pour chaque tâche de son déclencheur, ni plus ni moins', () => {
   const tasks = morningTaskOutcomes({
     weather: { status: 'completed', locations: 1, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },
     planning: { failed: 0 }, cropWater: { failed: 0 }, soilReserve: { failed: 0 }, cropDrying: { failed: 0 },
     otfVault: { status: 'dormant' },
+    farmErasure: { due: 0, erased: 0, unfinished: 0, failures: [] },
+    retentionPurge: { purged: 0, unfinished: 0, failures: [] },
   }).map((outcome) => outcome.task);
   assert.deepEqual(tasks, tasksOfTrigger('weather-morning'));
 });

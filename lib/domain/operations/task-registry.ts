@@ -1,3 +1,5 @@
+import { HOURS_PER_DAY } from '../units.ts';
+
 /**
  * Le registre des tâches attendues (4.5, PR 1 ; docs/tranche-4-contract.md,
  * section 10 bis, F560, et 10 bis.11, F600 à F607).
@@ -15,12 +17,39 @@
  * déclencheur absent d'ici (F560, règle v ; F569). Les alarmes du Worker de
  * notification ne sont pas des déclencheurs planifiés : chacune suit un
  * arrosage, sans rythme attendu, et n'est pas une tâche du registre.
+ *
+ * L'effacement des fermes qui l'ont demandé (4.5, PR 3 ; 10 bis.17, F645),
+ * puis les purges de conservation (4.5, PR 5 ; 10 bis.18, F650) finissent
+ * le matin.
+ *
+ * L'export de la base hors de Cloudflare (4.5, PR 4 ; 10 bis.14, F624) et
+ * l'essai de restauration (10 bis.16, F636) y sont aussi, bien que faits par
+ * l'exploitant : aucun déclencheur ne les lance (`OPERATOR_GESTURE`), un
+ * geste de la page d'état note leur réussite, et la veille les surveille
+ * comme les autres.
  */
 
 /** Les tâches du registre ; la clé est aussi celle de la ligne qui garde leurs exécutions. */
-export type TaskKey = 'weather-forecast' | 'weather-reanalysis' | 'morning-calculation' | 'otf-vault-morning';
+export type TaskKey =
+  | 'weather-forecast'
+  | 'weather-reanalysis'
+  | 'morning-calculation'
+  | 'otf-vault-morning'
+  | 'farm-erasure'
+  | 'retention-purge'
+  | 'offsite-export'
+  | 'restore-rehearsal'
+  | 'operator-watch'
+  | 'evening-reminder';
 
-export type TriggerKey = 'weather-morning' | 'demo-nightly-reset';
+export type TriggerKey = 'weather-morning' | 'operator-watch' | 'evening-reminder' | 'demo-nightly-reset';
+
+/**
+ * Une tâche faite par l'exploitant, hors du Worker, et notée par un geste de
+ * la page d'état : aucun déclencheur ne la lance, mais la veille la surveille
+ * comme les autres (10 bis.9 ; 10 bis.14, F625 ; 10 bis.16, F636).
+ */
+export const OPERATOR_GESTURE = 'operator-gesture';
 
 export type TaskDeclaration = {
   key: TaskKey;
@@ -38,7 +67,7 @@ export type TaskDeclaration = {
   ifMissing: string;
   /** Où est gardée sa dernière réussite. */
   successKeptIn: string;
-  trigger: TriggerKey;
+  trigger: TriggerKey | typeof OPERATOR_GESTURE;
 };
 
 /** Un déclencheur planifié d'une configuration Wrangler. */
@@ -84,7 +113,21 @@ export const TASK_TRIGGERS: readonly TriggerDeclaration[] = [
     key: 'weather-morning',
     config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
     cron: '15 4,5 * * *',
-    description: 'Le planificateur appelle le site à 6 h 15, heure de Paris (l\'un des deux créneaux UTC, selon l\'heure d\'été) : météo, puis calculs du matin, puis coffre des jetons.',
+    description: 'Le planificateur appelle le site à 6 h 15, heure de Paris (l\'un des deux créneaux UTC, selon l\'heure d\'été) : météo, puis calculs du matin, puis coffre des jetons, puis effacement des fermes qui l\'ont demandé, puis purges de conservation.',
+    monitored: true,
+  },
+  {
+    key: 'operator-watch',
+    config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
+    cron: '0 7,8 * * *',
+    description: 'Le planificateur appelle la veille de l\'exploitant à 9 h, heure de Paris : un déclencheur distinct de ceux qu\'elle surveille (R5).',
+    monitored: true,
+  },
+  {
+    key: 'evening-reminder',
+    config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
+    cron: '5 * * * *',
+    description: 'Le planificateur appelle le passage du rappel du soir à chaque heure et cinq minutes : chaque ferme règle son heure, de 17 h à 22 h au quart d\'heure, et le passage envoie les rappels dus (amélioration n° 2, F705, F714). Avant 17 h, heure de Paris, il ne lit rien.',
     monitored: true,
   },
   {
@@ -133,6 +176,68 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ifMissing: 'Les jetons chiffrés avec l\'ancienne clé ne sont pas chiffrés de nouveau ; un jeton illisible n\'est pas signalé.',
     successKeptIn: 'Ligne « task:otf-vault-morning » de irrigation_background_jobs (réussie quand le coffre est endormi sans clé, ou quand chaque jeton se lit).',
     trigger: 'weather-morning',
+  },
+  {
+    key: 'farm-erasure',
+    label: 'Effacement des fermes qui l\'ont demandé',
+    rhythm: '1 par jour, à la fin du matin : efface, par lots, les espaces dont la demande a plus de 7 jours ; ce qui reste reprend au passage suivant',
+    ...MORNING_THRESHOLDS,
+    ifMissing: 'Une ferme qui a demandé l\'effacement de ses données les garde au-delà des 7 jours promis (elle reste figée : aucun calcul, aucune notification).',
+    successKeptIn: 'Ligne « task:farm-erasure » de irrigation_background_jobs (réussie quand aucune demande échue ne reste à effacer : sans demande, chaque matin réussit).',
+    trigger: 'weather-morning',
+  },
+  {
+    key: 'retention-purge',
+    label: 'Purges de conservation',
+    rhythm: '1 par jour, à la fin du matin : efface, par lots, les lignes plus vieilles que leur durée écrite (journal des appels à Ouvre ta ferme, notifications de la veille) ; ce qui reste reprend au passage suivant',
+    ...MORNING_THRESHOLDS,
+    ifMissing: 'Des données techniques restent au-delà de la durée écrite au contrat et dans la politique de confidentialité ; rien ne manque aux fermes.',
+    successKeptIn: 'Ligne « task:retention-purge » de irrigation_background_jobs (réussie quand chaque purge est allée au bout).',
+    trigger: 'weather-morning',
+  },
+  {
+    key: 'offsite-export',
+    label: 'Export de la base hors de Cloudflare',
+    rhythm: '1 par semaine, le soir, fait par l\'exploitant sur son ordinateur (pnpm backup:export), puis noté ici',
+    lateAfterHours: 8 * HOURS_PER_DAY,
+    brokenAfterHours: 10 * HOURS_PER_DAY,
+    thresholdReason: 'Une fois par semaine : orange à 8 jours (un jour de marge), rouge à 10 jours (la semaine est manquée). L\'historique de 30 jours de Cloudflare ne protège pas d\'une perte du compte : seule cette copie le fait (10 bis.9).',
+    ifMissing: 'Si le compte Cloudflare était perdu, les fermes perdraient tout ce qui a été saisi depuis le dernier export gardé hors de Cloudflare.',
+    successKeptIn: 'Ligne « task:offsite-export » de irrigation_background_jobs, écrite par le geste « J\'ai fait l\'export du … » de la page d\'état (le jour noté, jamais en recul).',
+    trigger: OPERATOR_GESTURE,
+  },
+  {
+    key: 'restore-rehearsal',
+    label: 'Essai de restauration',
+    rhythm: '1 par trimestre, et après un changement de schéma important : joué sur une base d\'essai par le flux « Essai de restauration » de GitHub Actions (pnpm backup:rehearse), sur le « vas-y » de l\'exploitant, puis noté ici',
+    lateAfterHours: 100 * HOURS_PER_DAY,
+    brokenAfterHours: 120 * HOURS_PER_DAY,
+    thresholdReason: 'Une fois par trimestre : orange à 100 jours (un trimestre et neuf jours de marge), rouge à 120 jours (quatre mois : le trimestre est manqué). Une sauvegarde dont la restauration n\'est pas essayée peut ne rien rendre le jour où il le faut (10 bis.8).',
+    ifMissing: 'Rien ne prouve plus que l\'historique de Cloudflare et l\'export de la semaine rendraient la base : un défaut ne se verrait que le jour d\'une restauration.',
+    successKeptIn: 'Ligne « task:restore-rehearsal » de irrigation_background_jobs, écrite par le geste « J\'ai fait l\'essai du … » de la page d\'état (le jour noté, jamais en recul).',
+    trigger: OPERATOR_GESTURE,
+  },
+  {
+    key: 'operator-watch',
+    label: 'Veille de l\'exploitant',
+    rhythm: '1 par jour, à 9 h (heure de Paris)',
+    lateAfterHours: 26,
+    brokenAfterHours: 36,
+    thresholdReason: 'Une exécution par jour à 9 h : orange à 26 heures (un jour et deux heures de marge), rouge à 36 heures (au moins un jour sans veille). Si la veille ne passe plus, la notification « tout va bien » du dimanche manque : l\'exploitant sait qu\'il doit regarder (F566).',
+    ifMissing: 'Une panne d\'une autre tâche ne remonte plus à l\'exploitant sans qu\'il ouvre la page d\'état.',
+    successKeptIn: 'Ligne « task:operator-watch » de irrigation_background_jobs (réussie quand la veille a lu le registre et que la notification due, s\'il y en avait une, est partie vers un appareil de l\'exploitant).',
+    trigger: 'operator-watch',
+  },
+  {
+    key: 'evening-reminder',
+    label: 'Rappel du soir des arrosages non confirmés',
+    rhythm: '1 passage par heure, à l\'heure et cinq minutes ; chaque ferme reçoit son rappel au premier passage après l\'heure qu\'elle a réglée',
+    lateAfterHours: 3,
+    brokenAfterHours: 6,
+    thresholdReason: 'Un passage par heure : orange à 3 heures (deux passages manqués), rouge à 6 heures (une soirée de rappels peut être perdue, puisqu\'un rappel n\'est plus envoyé deux heures après l\'heure réglée).',
+    ifMissing: 'Les fermes ne reçoivent pas le rappel des arrosages validés du jour jamais confirmés ; rien n\'est confirmé à leur place.',
+    successKeptIn: 'Ligne « task:evening-reminder » de irrigation_background_jobs (réussi quand chaque rappel dû est parti, ou qu\'aucun n\'était dû).',
+    trigger: 'evening-reminder',
   },
 ];
 

@@ -1,12 +1,15 @@
 import { WeatherProviderError } from '../weather/weather-provider.ts';
+import type { FarmErasureRunReport } from './farm-erasure.ts';
+import type { RetentionPurgeRunReport } from './retention.ts';
 import { tasksOfTrigger, type TaskKey } from './task-registry.ts';
 
 /**
  * Ce que le matin dit de chacune de ses tâches (4.5, PR 1 ;
  * docs/tranche-4-contract.md, F560 et F602).
  *
- * La route du matin enchaîne la météo, les calculs du matin, puis la rotation
- * du coffre ; son compte rendu devient ici une exécution par tâche du
+ * La route du matin enchaîne la météo, les calculs du matin, la rotation du
+ * coffre, puis l'effacement des fermes qui l'ont demandé et les purges de
+ * conservation ; son compte rendu devient ici une exécution par tâche du
  * déclencheur « weather-morning », réussie ou manquée. Une exécution n'est
  * **réussie que si elle a tout fait** : un lieu sans prévisions, une ferme
  * remise à plus tard ou une ferme dont le calcul échoue la rendent manquée,
@@ -36,6 +39,8 @@ export type MorningRunReport = {
   soilReserve?: { failed: number } | null;
   cropDrying?: { failed: number } | null;
   otfVault?: { status: 'dormant' | 'unavailable' | 'failed' } | { status: 'done'; unreadable: number } | null;
+  farmErasure?: FarmErasureRunReport | null;
+  retentionPurge?: RetentionPurgeRunReport | null;
   /** La classe de l'erreur qui a interrompu la route, si elle l'a été. */
   interruptedBy?: string;
 };
@@ -60,13 +65,16 @@ const WEATHER_FAILURE_WORDS: Record<WeatherFailureKind, string> = {
 export function morningTaskOutcomes(report: MorningRunReport): TaskOutcome[] {
   if (report.weather?.status === 'already-running') return [];
   const interrupted = `interrompu avant la fin (${errorClassWords(report.interruptedBy)})`;
-  const outcomes: Record<TaskKey, TaskOutcome> = {
+  // Les tâches d'un autre déclencheur (la veille de 9 h) n'ont rien à dire du matin.
+  const outcomes: Partial<Record<TaskKey, TaskOutcome>> = {
     'weather-forecast': weatherOutcome('weather-forecast', report, 'forecastFailures', 'sans prévisions', interrupted),
     'weather-reanalysis': weatherOutcome('weather-reanalysis', report, 'reanalysisFailures', 'sans pluie estimée', interrupted),
     'morning-calculation': morningCalculationOutcome(report, interrupted),
     'otf-vault-morning': vaultOutcome(report, interrupted),
+    'farm-erasure': farmErasureOutcome(report, interrupted),
+    'retention-purge': retentionPurgeOutcome(report, interrupted),
   };
-  return tasksOfTrigger('weather-morning').map((task) => outcomes[task]);
+  return tasksOfTrigger('weather-morning').map((task) => outcomes[task] ?? failed(task, 'tâche du matin sans résultat'));
 }
 
 function weatherOutcome(
@@ -122,6 +130,44 @@ function vaultOutcome(report: MorningRunReport, interrupted: string): TaskOutcom
   }
 }
 
+/**
+ * Réussie quand aucune demande échue ne reste à effacer (10 bis.17, F645) :
+ * un effacement arrêté par la borne du passage reprend au suivant, mais ce
+ * matin-là n'a pas tenu la promesse ; trois de suite font une panne.
+ */
+function farmErasureOutcome(report: MorningRunReport, interrupted: string): TaskOutcome {
+  const erasure = report.farmErasure;
+  if (!erasure) return failed('farm-erasure', interrupted);
+  const problems = [
+    erasure.failures.length > 0
+      ? `${countWords(erasure.failures.length, 'effacement', 'effacements')} en échec (${erasure.failures.map((kind) => errorClassWords(kind === 'unknown' ? undefined : kind)).join(', ')})`
+      : null,
+    erasure.unfinished > 0
+      ? `${countWords(erasure.unfinished, 'effacement commencé', 'effacements commencés')}, à finir au prochain passage`
+      : null,
+  ].filter((problem): problem is string => problem !== null);
+  return problems.length === 0 ? succeeded('farm-erasure') : failed('farm-erasure', problems.join(' ; '));
+}
+
+/**
+ * Réussie quand chaque purge est allée au bout (10 bis.18, F650) : une purge
+ * arrêtée par la borne du passage reprend au suivant, mais ce matin-là des
+ * lignes ont dépassé leur durée écrite ; trois de suite font une panne.
+ */
+function retentionPurgeOutcome(report: MorningRunReport, interrupted: string): TaskOutcome {
+  const purge = report.retentionPurge;
+  if (!purge) return failed('retention-purge', interrupted);
+  const problems = [
+    purge.failures.length > 0
+      ? `${countWords(purge.failures.length, 'purge', 'purges')} en échec (${purge.failures.map((kind) => errorClassWords(kind === 'unknown' ? undefined : kind)).join(', ')})`
+      : null,
+    purge.unfinished > 0
+      ? `${countWords(purge.unfinished, 'purge', 'purges')} à finir au prochain passage`
+      : null,
+  ].filter((problem): problem is string => problem !== null);
+  return problems.length === 0 ? succeeded('retention-purge') : failed('retention-purge', problems.join(' ; '));
+}
+
 function succeeded(task: TaskKey): TaskOutcome {
   return { task, successful: true, error: null };
 }
@@ -142,6 +188,7 @@ function kindsWords(kinds: readonly WeatherFailureKind[]): string {
 }
 
 /** Le nom d'une classe d'erreur, gardé seulement s'il n'est fait que de lettres (jamais un message). */
-function errorClassWords(errorClass: string | undefined): string {
+/** « erreur TypeError », ou « erreur inconnue » pour un nom qui n'est pas une classe d'erreur (F604). */
+export function errorClassWords(errorClass: string | undefined): string {
   return errorClass && /^[A-Za-z_]{1,40}$/.test(errorClass) ? `erreur ${errorClass}` : 'erreur inconnue';
 }

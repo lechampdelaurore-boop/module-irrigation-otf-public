@@ -69,6 +69,8 @@ const morning = (reanalysisFailures: WeatherFailureKind[]): MorningRunReport => 
   weather: { status: 'completed', locations: 1, skippedBackoff: 0, forecastFailures: [], reanalysisFailures },
   planning: { failed: 0 }, cropWater: { failed: 0 }, soilReserve: { failed: 0 }, cropDrying: { failed: 0 },
   otfVault: { status: 'dormant' },
+  farmErasure: { due: 0, erased: 0, unfinished: 0, failures: [] },
+  retentionPurge: { purged: 0, unfinished: 0, failures: [] },
 });
 
 test('la panne du 14 novembre 2026 rejouée : la réanalyse passe en retard, puis en panne, pendant que les prévisions restent vertes', async () => {
@@ -77,12 +79,12 @@ test('la panne du 14 novembre 2026 rejouée : la réanalyse passe en retard, pui
   const states = async (now: string) => Object.fromEntries((await readTaskStates(new Date(now)))
     .map(({ declaration, state }) => [declaration.key, state.kind]));
   assert.deepEqual(await states('2026-11-13T08:00:00.000Z'), {
-    'weather-forecast': 'ok', 'weather-reanalysis': 'ok', 'morning-calculation': 'ok', 'otf-vault-morning': 'ok',
-  });
+    'weather-forecast': 'ok', 'weather-reanalysis': 'ok', 'morning-calculation': 'ok', 'otf-vault-morning': 'ok', 'farm-erasure': 'ok', 'retention-purge': 'ok', 'offsite-export': 'never', 'restore-rehearsal': 'never', 'operator-watch': 'never', 'evening-reminder': 'never',
+  }, 'la veille de 9 h, l’export et l’essai du porteur ne passent pas par le matin : jamais réussis tant qu’ils n’ont pas eu lieu');
 
   await recordMorningTaskRuns(morning(['network']), { at: '2026-11-14T05:16:00.000Z', log: silent });
   assert.deepEqual(await states('2026-11-14T08:00:00.000Z'), {
-    'weather-forecast': 'ok', 'weather-reanalysis': 'late', 'morning-calculation': 'ok', 'otf-vault-morning': 'ok',
+    'weather-forecast': 'ok', 'weather-reanalysis': 'late', 'morning-calculation': 'ok', 'otf-vault-morning': 'ok', 'farm-erasure': 'ok', 'retention-purge': 'ok', 'offsite-export': 'never', 'restore-rehearsal': 'never', 'operator-watch': 'never', 'evening-reminder': 'never',
   }, 'à 9 h le 14, la réanalyse manquée est déjà en retard (avant la 4.5, l’écran restait vert cinq jours)');
 
   await recordMorningTaskRuns(morning(['network']), { at: '2026-11-15T05:16:00.000Z', log: silent });
@@ -106,14 +108,14 @@ test('un enregistrement impossible ne fait pas échouer le matin : il se journal
   }
   assert.deepEqual(
     lines.filter((line) => line.event === 'task_run_record_failed').map((line) => line.task),
-    ['weather-forecast', 'weather-reanalysis', 'morning-calculation', 'otf-vault-morning'],
+    ['weather-forecast', 'weather-reanalysis', 'morning-calculation', 'otf-vault-morning', 'farm-erasure', 'retention-purge'],
   );
   assert.deepEqual(lines.filter((line) => line.event === 'task_run_failed'), [
     { event: 'task_run_failed', task: 'weather-reanalysis', summary: '1 lieu sur 1 sans pluie estimée (réseau)' },
   ]);
   assert.deepEqual(
     lines.filter((line) => line.event === 'task_run_succeeded').map((line) => line.task),
-    ['weather-forecast', 'morning-calculation', 'otf-vault-morning'],
+    ['weather-forecast', 'morning-calculation', 'otf-vault-morning', 'farm-erasure', 'retention-purge'],
     'chaque tâche dit son matin au journal, même quand la base ne l’a pas gardé',
   );
   assert.ok(lines.every((line) => !JSON.stringify(line).includes('base indisponible')), 'le message de la base n’est pas recopié');

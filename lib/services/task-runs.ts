@@ -1,6 +1,6 @@
 import { readTaskRuns, recordTaskRun } from '@/db/task-run-repository';
 import { logJsonLine } from '../adapters/log';
-import { morningTaskOutcomes, type MorningRunReport } from '../domain/operations/morning-task-outcomes';
+import { morningTaskOutcomes, type MorningRunReport, type TaskOutcome } from '../domain/operations/morning-task-outcomes';
 import { TASK_REGISTRY, type TaskDeclaration } from '../domain/operations/task-registry';
 import { taskState, type TaskState } from '../domain/operations/task-state';
 
@@ -14,11 +14,18 @@ import { taskState, type TaskState } from '../domain/operations/task-state';
  * l'enregistrement ne fait pas échouer le matin : il se journalise sous un
  * nom stable, et la tâche, sans réussite nouvelle, passera en retard d'elle-même.
  */
-export async function recordMorningTaskRuns(
-  report: MorningRunReport,
-  { at = new Date().toISOString(), log = logJsonLine }: { at?: string; log?: typeof logJsonLine } = {},
+export async function recordMorningTaskRuns(report: MorningRunReport, options: RecordOptions = {}): Promise<void> {
+  await recordTaskOutcomes(morningTaskOutcomes(report), options);
+}
+
+type RecordOptions = { at?: string; log?: typeof logJsonLine };
+
+/** Enregistre l'exécution de chaque tâche, comme le matin (la veille de 9 h l'emploie aussi). */
+export async function recordTaskOutcomes(
+  outcomes: readonly TaskOutcome[],
+  { at = new Date().toISOString(), log = logJsonLine }: RecordOptions = {},
 ): Promise<void> {
-  for (const outcome of morningTaskOutcomes(report)) {
+  for (const outcome of outcomes) {
     try {
       await recordTaskRun({ ...outcome, at });
     } catch (error) {

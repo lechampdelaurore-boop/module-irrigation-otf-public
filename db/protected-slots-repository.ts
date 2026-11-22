@@ -10,6 +10,7 @@ import {
 } from '@/lib/domain/planning/protected-slots';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
+import { protectedSlotCreationJournal, protectedSlotDeletionJournal, protectedSlotUpdateJournal } from './change-journal/settings';
 
 /**
  * Le registre des créneaux protégés nommés (docs/protected-slots-contract.md,
@@ -64,6 +65,8 @@ export async function createProtectedSlotForUser(ownerUserId: string, actorUserI
       VALUES (?, ?, ?, ${WEEKDAYS.map(() => '?').join(', ')}, ?, ?, 'active', ?, ?, ?)`)
       .bind(id, workspaceId, value.name, ...dayFlags(value.weekdays), value.startMinute, value.endMinute, actorUserId, now, now),
     logVersion('created', { id, workspaceId, actorUserId, at: now }),
+    // Le journal des modifications, après l'insertion : l'après lu sur la ligne écrite (amélioration n° 7, D-286).
+    protectedSlotCreationJournal('creneau-protege', { workspaceId, actorUserId, at: now }, id),
   ]);
   return { id, ...value };
 }
@@ -74,14 +77,18 @@ export async function updateProtectedSlotForUser(ownerUserId: string, actorUserI
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) throw new ProtectedSlotNotFoundError();
   const now = new Date().toISOString();
+  const flags = dayFlags(value.weekdays);
+  const written = { name: value.name, ...Object.fromEntries(WEEKDAYS.map((day, index) => [day, flags[index]])), startMinute: value.startMinute, endMinute: value.endMinute };
   const results = await db.batch([
+    // Le journal des modifications d'abord, à la condition même du geste : l'avant est la ligne active (amélioration n° 7, D-286).
+    protectedSlotUpdateJournal('creneau-protege', { workspaceId, actorUserId, at: now }, slotId, written),
     db.prepare(`UPDATE irrigation_protected_slots
       SET name = ?, ${WEEKDAYS.map((day) => `${day} = ?`).join(', ')}, start_minute = ?, end_minute = ?, actor_user_id = ?, updated_at = ?
       WHERE id = ? AND workspace_id = ? AND status = 'active'`)
-      .bind(value.name, ...dayFlags(value.weekdays), value.startMinute, value.endMinute, actorUserId, now, slotId, workspaceId),
+      .bind(value.name, ...flags, value.startMinute, value.endMinute, actorUserId, now, slotId, workspaceId),
     logVersion('updated', { id: slotId, workspaceId, actorUserId, at: now }),
   ]);
-  if (!aEcritUneLigne(results[0]?.meta)) throw new ProtectedSlotNotFoundError();
+  if (!aEcritUneLigne(results[1]?.meta)) throw new ProtectedSlotNotFoundError();
   return { id: slotId, ...value };
 }
 
@@ -93,11 +100,12 @@ export async function deleteProtectedSlotForUser(ownerUserId: string, actorUserI
   const results = await db.batch([
     // Le journal d'abord, à la condition même du geste : la ligne encore active (voir `logVersion`).
     logVersion('deleted', { id: slotId, workspaceId, actorUserId, at: now }),
+    protectedSlotDeletionJournal('creneau-protege', { workspaceId, actorUserId, at: now }, slotId),
     db.prepare(`UPDATE irrigation_protected_slots SET status = 'deleted', actor_user_id = ?, updated_at = ?
       WHERE id = ? AND workspace_id = ? AND status = 'active'`)
       .bind(actorUserId, now, slotId, workspaceId),
   ]);
-  if (!aEcritUneLigne(results[1]?.meta)) throw new ProtectedSlotNotFoundError();
+  if (!aEcritUneLigne(results[2]?.meta)) throw new ProtectedSlotNotFoundError();
 }
 
 /** Le journal de l'exploitation, du plus récent au plus ancien. */

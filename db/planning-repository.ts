@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { planningSettingsJournal } from './change-journal/settings';
 import type { EquipmentKind } from '@/lib/domain/irrigation-domain';
 import type { PlannedIrrigationState } from '@/lib/domain/planned-irrigation';
 import type { PlanChanges } from '@/lib/domain/planning/changes';
@@ -60,6 +61,8 @@ export async function savePlanningSettingsForUser(ownerUserId: string, actorUser
   const now = new Date().toISOString();
   const payload = JSON.stringify(validation.settings);
   await db.batch([
+    // Le journal des modifications d'abord, dans le même lot : l'avant est le réglage en vigueur (amélioration n° 7, D-286).
+    planningSettingsJournal('reglages-du-planning', { workspaceId, actorUserId, at: now }, validation.settings),
     db.prepare(`INSERT INTO irrigation_planning_settings (workspace_id, payload, actor_user_id, updated_at) VALUES (?, ?, ?, ?)
       ON CONFLICT(workspace_id) DO UPDATE SET payload = excluded.payload, actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`)
       .bind(workspaceId, payload, actorUserId, now),

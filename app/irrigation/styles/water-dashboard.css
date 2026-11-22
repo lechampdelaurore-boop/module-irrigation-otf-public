@@ -457,3 +457,12 @@
   min-height: 44px;
   box-sizing: border-box;
 }
+
+/* Le message du matin et le rappel du soir, dans « Notifications du téléphone » (améliorations n° 3 et n° 2, F712, F714). */
+.phone-notice-setting { margin: 0; }
+/* Le pli des messages de la ferme (F715) : le pli de « Correspondance des espèces », collé à son titre. */
+.species-fold.phone-notice-fold { margin: 0 0 16px; }
+.phone-notice-setting .water-toggle { min-height: var(--touch-target, 44px); margin-bottom: 4px; font-size: var(--text-14); }
+.phone-notice-hint { margin: 0; color: var(--muted); font-size: var(--text-12); }
+.phone-notice-time { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: var(--text-14); }
+.phone-notice-time select { min-height: var(--touch-target, 44px); }

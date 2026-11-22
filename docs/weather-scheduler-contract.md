@@ -44,3 +44,44 @@ dernière réussite et sa dernière erreur automatique.
 
 La synchronisation écrit uniquement les provenances `forecast` et
 `reanalysis`. Une pluie manuelle, y compris `0 mm`, ne peut pas être écrasée.
+
+## La veille de l’exploitant (depuis la 4.5, PR 2)
+
+Le même Worker porte un second déclencheur, distinct de celui qu’elle
+surveille (docs/tranche-4-contract.md, F566, R5) : la veille de 09 h 00 à
+Paris, inscrite sur les deux créneaux `07:00` et `08:00` UTC
+(`0 7,8 * * *`) ; le Worker n’exécute que celui qui tombe à 9 h à Paris,
+comme pour la météo. Il appelle `POST /api/internal/operator-watch`, par la
+même liaison de service et avec le même secret partagé : aucun secret
+nouveau. La route lit le registre des tâches, envoie la notification due à
+l’exploitant et enregistre l’exécution de la veille comme celle de toute
+tâche du registre (`task:operator-watch`).
+
+- Le planificateur lui laisse 30 secondes ; ses lignes de journal portent le
+  préfixe `operator_watch_scheduler` (`_completed`, `_retry_scheduled`,
+  `_timeout_not_retried`, `_network_retry`, `_failed`), celles de la météo
+  gardent le leur (`weather_scheduler`).
+- La route répond 200 dès que la veille a tourné, même manquée : une réponse
+  5xx ferait relancer la veille trois fois, et trois échecs du même matin
+  compteraient pour trois matins (R2). Seule une panne du site la fait
+  relancer, et la notification du jour n’est jamais envoyée deux fois.
+- L’endpoint manuel `POST /run-watch`, protégé par le même secret, relance
+  la veille pour la recette et le diagnostic.
+
+## Le rappel du soir (depuis l’amélioration n° 2)
+
+Un troisième déclencheur, `5 * * * *`, appelle chaque heure à la minute 5
+`POST /api/internal/evening-reminder`, par la même liaison de service et
+avec le même secret partagé (docs/ameliorations-6-2-3-7-contract.md,
+section 4.3, F705 ; D-284, F714). Chaque ferme règle son heure, de 17 h à
+22 h au quart d’heure : le Worker ne trie rien, le site envoie les rappels
+dus. Avant 17 h, heure de Paris, la route ne lit rien. Le passage est une
+tâche du registre (`task:evening-reminder`, orange à 3 heures, rouge à 6).
+
+- Le planificateur lui laisse 30 secondes ; ses lignes de journal portent le
+  préfixe `evening_reminder_scheduler`.
+- La route répond 200 dès que le passage a tourné, même manqué, comme la
+  veille ; un rappel n’est jamais envoyé deux fois le même jour (la prise du
+  jour en base).
+- L’endpoint manuel `POST /run-evening`, protégé par le même secret, relance
+  le passage pour la recette et le diagnostic.

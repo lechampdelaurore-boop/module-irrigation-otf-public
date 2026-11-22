@@ -5,6 +5,7 @@ import {
   holdOtfCalls,
   readOtfFarmPace,
   recordOtfAuthenticationFailure,
+  recordOtfCallOutcome,
 } from '@/db/otf-call-ledger-repository';
 import type { OtfSharedCallPace } from '@/lib/adapters/otf/read-client';
 import { logJsonLine } from '@/lib/adapters/log';
@@ -55,6 +56,7 @@ export function sharedPaceForLoneCalls(paceKey: string): OtfSharedCallPace {
     placeRefusal: async (atMs, rules) => sharedPlaceRefusal((await readOtfFarmPace(paceKey, atMs)).state, atMs, rules),
     holdCalls: (pause) => holdOtfCalls(paceKey, pause),
     recordAuthenticationFailure: (atMs) => recordOtfAuthenticationFailure(atMs),
+    recordOutcome: (outcome, atMs) => recordOtfCallOutcome(paceKey, outcome, atMs),
   };
 }
 
@@ -143,6 +145,7 @@ function farmRead({ paceKey, readId, reservedAtMs, places, previousBasis, contex
       }),
       holdCalls: (pause) => holdOtfCalls(paceKey, pause),
       recordAuthenticationFailure: (atMs) => recordOtfAuthenticationFailure(atMs),
+      recordOutcome: (outcome, atMs) => recordOtfCallOutcome(paceKey, outcome, atMs),
     },
     minuteWaitLimitMs: context === 'morning' ? OTF_MORNING_MINUTE_WAIT_MS : undefined,
     markComplete: () => { complete = true; },
@@ -155,10 +158,10 @@ function farmRead({ paceKey, readId, reservedAtMs, places, previousBasis, contex
           ? { kind: 'out-of-places', calls }
           : { kind: 'failed' };
       try {
-        await endOtfFarmRead({ paceKey, readId, reserveBasis: nextReserveBasis(previousBasis, outcome), atMs: clock.now() });
+        await endOtfFarmRead({ paceKey, readId, reserveBasis: nextReserveBasis(previousBasis, outcome), atMs: clock.now(), complete: outcome.kind === 'complete' });
       } catch (endError) {
         // Le bail expire seul dans deux minutes ; la lecture, elle, a eu lieu ou non.
-        logJsonLine('warn', { event: 'otf_farm_read_not_released', message: endError instanceof Error ? endError.message : 'erreur inconnue' });
+        logJsonLine('warn', { event: 'otf_farm_read_not_released', errorClass: endError instanceof Error ? endError.name : 'inconnue' });
       }
       logJsonLine('info', { event: 'otf_farm_read_finished', outcome: outcome.kind, calls, reserved: places });
     },
