@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Démonstration : le cas d'écart de l'amélioration n° 5)
+
+- **La démonstration montre le bloc « L'eau apportée s'écarte du prévu »**
+  (D-295, F747) : au début de l'été de la « Ferme des Trois Noues », le
+  goutte-à-goutte du clos a été prévu, les trois semaines d'avant, pour les
+  deux tiers de la durée qu'il a faite. « Planning de la semaine » porte le
+  bloc pour S01 et S02 : 50 % d'eau en plus chaque semaine, la cause du
+  débit, 6 mm/h réglés, 4 mm/h proposés, et « Adopter ». Rien d'autre ne
+  change dans le jeu ; « Adopter » ne touche que l'espace du visiteur, et la
+  remise à zéro, du bouton comme de la nuit, rend le cas. Nouveau parcours
+  V11 de la démonstration.
+
 ### Corrigé (Améliorations, n° 2 et 3 : une alarme par espace)
 
 - **Le message du matin et le rappel du soir ne se perdent plus quand

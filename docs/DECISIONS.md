@@ -8420,3 +8420,52 @@ Ne changent pas : le Worker de notification, le texte des messages, leurs
 réglages, l'écran, aucune migration ; un message déjà parti sous l'ancien
 identifiant le jour de la mise en ligne ne repart pas (la prise du jour, en
 base, est par espace).
+
+## D-295 — La démonstration montre le cas d'écart entre l'eau prévue et l'eau apportée (n° 5)
+
+Date : 22 novembre 2026. Statut : décidé (écart E2 de la recette des
+améliorations n° 2 à 7, faite par l'assistant le 22 novembre 2026,
+`/mnt/project-files/ameliorations/recette-ameliorations-2-a-7-2026-11-22.md` ;
+demandé par le coordinateur sous l'autonomie que le porteur a donnée le
+22 novembre 2026, « vas-y pour tout »).
+
+**Contexte.** L'amélioration n° 5 (D-291) porte sur « Planning de la
+semaine » le bloc « L'eau apportée s'écarte du prévu » quand, trois semaines
+complètes de suite, l'eau apportée à une planche s'écarte de plus de 20 % de
+l'eau prévue. La recette n'a pu le voir nulle part : la ferme n'arrose pas en
+novembre, et l'historique de la démonstration (F169) prévoyait chaque
+arrosage pour la durée qu'il a faite, sans début prévu, si bien qu'aucune
+semaine ne s'écartait du prévu et qu'aucune cause ne pouvait se lire.
+
+**Décision** (`docs/ameliorations-4-5-contract.md`, section 4, F747) :
+
+1. **Un seul cas.** La « Ferme des Trois Noues », la seule ferme de la
+   démonstration qui coche « Planning de la semaine », au moment « Début
+   d'été » (16 juin 2026), celui de la visite du planning, où le clos a un
+   arrosage proposé la semaine même. Les trois semaines complètes avant la
+   semaine du moment (lundis 25 mai, 1er et 8 juin), l'arrosage habituel du
+   lundi du « Goutte-à-goutte du clos » est prévu à l'heure où il commence,
+   pour les deux tiers de sa durée habituelle (40 min, puis 1 h 20), et dure
+   la durée habituelle. Le jeu le dit en une ligne (`DEMO_LONGER_THAN_PLANNED`,
+   `lib/adapters/demo/module-data.ts`) ; la période est celle que la règle
+   juge (`appliedWaterGapPeriod`).
+2. **Seule la prévision change.** Les durées faites, les volumes, les cumuls
+   et l'historique des autres matériels restent ceux de F169. Le bloc se lit
+   sur S01 et S02, les deux planches du clos que ce goutte-à-goutte arrose
+   ensemble : plus d'eau apportée que prévu, de 50 % chaque semaine ; la
+   cause du débit (trois irrigations plus longues de 50 % en médiane), réglé
+   à 6 mm/h, proposé à 4 mm/h. Le module les calcule lui-même ; aucune autre
+   cause, la démonstration n'ayant aucune pluie mesurée.
+3. **Écrit comme le reste de l'historique.** Ces arrosages s'écrivent d'un
+   coup, déjà faits, avec leur début et leur fin prévus ; l'historique les
+   dit « Déjà réalisée », la démonstration ne rejouant pas le minuteur.
+4. **Remis à zéro comme le reste.** « Adopter » ne change que l'espace de
+   l'invité ; le bouton « Remettre à zéro » et la tâche de nuit rendent le
+   cas, l'espace se préparant de nouveau à la visite suivante. Preuves :
+   `tests/db/ecart-prevu-reel-demo.test.ts` et le parcours V11 de la
+   démonstration (`e2e-demo/v11-ecart-prevu-reel.spec.ts`), aux deux
+   largeurs.
+
+Ne changent pas : la règle de l'écart (D-291), l'écran, la ferme réelle, les
+autres fermes et les autres moments de la démonstration ; aucune migration,
+aucune valeur agronomique (des durées d'arrosage d'une ferme inventée).

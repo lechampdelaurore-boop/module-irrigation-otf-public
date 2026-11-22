@@ -159,9 +159,9 @@ test('la tâche de nuit rend le cas à l’invité qui revient après plus de 24
   const [gap] = (await mine.view()).gaps;
   const [flow] = gap.causes;
   assert.ok(flow.kind === 'flow' && flow.proposed);
+  const adoption: GapAdoption = { kind: 'flow', bedId: gap.bedId, settingId: flow.settingId, proposed: flow.proposed };
   await mine.onDay(() => adoptAppliedWaterGapForUser({
-    ownerUserId: mine.owner, season: SEASON, snapshot: mine.snapshot, weekStart: '2026-06-15',
-    adoption: { kind: 'flow', bedId: gap.bedId, settingId: flow.settingId, proposed: flow.proposed },
+    ownerUserId: mine.owner, season: SEASON, snapshot: mine.snapshot, weekStart: '2026-06-15', adoption,
   }));
   assert.deepEqual((await mine.view()).gaps, []);
 
