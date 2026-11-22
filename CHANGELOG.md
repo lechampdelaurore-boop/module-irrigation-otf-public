@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (Améliorations, n° 7, PR 6 sur 7)
+
+- **Le matériel et les ressources écrivent au journal des modifications**
+  (D-287, F721) : un matériel créé, modifié, rangé, ressorti, copié ou
+  effacé, ses réglages (débit, profil d'une aspersion), les pompes et leurs
+  origines, la pompe par défaut d'un matériel, les ressources en eau et leur
+  débit mesuré, les réserves, leurs liaisons, l'alimentation par défaut et
+  les poses (posée, réglage ou planches changés, retirée). Une valeur
+  désignée par un identifiant (une ressource, une réserve, un réglage, une
+  pompe) se lit par son nom, avant comme après. Sans migration.
+
 ### Ajouté (Améliorations, n° 7, PR 5 sur 7)
 
 - **Les objectifs et les réglages écrivent au journal des modifications**

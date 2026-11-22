@@ -13,6 +13,7 @@ import {
   journalDeletion,
   journalUpdate,
   latestRevision,
+  plainNumber,
   sqlLiteral,
   type JournalField,
   type JournalGesture,
@@ -56,14 +57,6 @@ function snake(key: string): string {
 
 function columns(...keys: string[]): Column[] {
   return keys.map((key) => ({ key, column: snake(key) }));
-}
-
-/**
- * Un nombre réel entier rendu entier, pour qu'une profondeur de 1 m se lise
- * `1` comme le code l'écrit, et non `1.0`.
- */
-function plainNumber(expression: string): string {
-  return `CASE WHEN (${expression}) = CAST((${expression}) AS INTEGER) THEN CAST((${expression}) AS INTEGER) ELSE (${expression}) END`;
 }
 
 // --- Le planning -----------------------------------------------------------
