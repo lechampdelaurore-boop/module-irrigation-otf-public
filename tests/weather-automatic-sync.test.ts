@@ -204,6 +204,42 @@ test('4.5 (F600, F602) : la réanalyse en panne se compte à part des prévision
   assert.equal(result.failedTargets, 2, 'la synchronisation, elle, reste manquée comme avant');
 });
 
+test('archive des prévisions (D-297) : un seul appel pour deux exploitations au même lieu, une photographie par exploitation', async () => {
+  const repository = new FakeRepository([target('a'), target('b')]);
+  const provider = new FakeProvider({ forecast: [
+    { date: '2026-09-16', precipitationMm: 0.2, et0Mm: 2.8 },
+    { date: '2026-09-17', precipitationMm: 1.4, et0Mm: 2.1 },
+    { date: '2026-09-24', precipitationMm: 9, et0Mm: 1 },
+  ] });
+  const result = await runAutomaticWeatherSync({
+    repository, provider, now: new Date('2026-09-16T04:15:00Z'), retry: { sleep: async () => undefined }, log: () => undefined,
+  });
+  assert.equal(provider.forecastCalls.length, 1, 'aucun appel externe de plus (règle 6)');
+  assert.equal(result.forecastRequests, 1);
+  assert.deepEqual(repository.archived.map((snapshot) => [snapshot.workspaceId, snapshot.issuedOn, snapshot.rows.map((row) => row.targetDate)]), [
+    ['a', '2026-09-16', ['2026-09-17']],
+    ['b', '2026-09-16', ['2026-09-17']],
+  ], 'J0 et J+8 ne sont pas gardés ; chaque exploitation reçoit sa propre ligne');
+  assert.equal(repository.archived[0].source, 'fake');
+  assert.equal(repository.archived[0].fetchedAt, '2026-09-16T04:15:00.000Z');
+});
+
+test('archive des prévisions (D-297) : son échec ne fait échouer ni la synchronisation ni ce qu’elle enregistre', async () => {
+  const repository = new FakeRepository([target('a')]);
+  repository.archiveFails = true;
+  const provider = new FakeProvider({ forecast: [{ date: '2026-09-17', precipitationMm: 1.4, et0Mm: 2.1 }] });
+  const lines: Record<string, unknown>[] = [];
+  const result = await runAutomaticWeatherSync({
+    repository, provider, now: new Date('2026-09-16T04:15:00Z'), retry: { sleep: async () => undefined }, log: (_level, entry) => lines.push(entry),
+  });
+  assert.equal(result.successfulTargets, 1);
+  assert.equal(result.failedTargets, 0);
+  assert.equal(repository.values.get('a:forecast:2026-09-17'), 1.4, 'les prévisions sont écrites comme avant');
+  assert.equal(repository.recorded[0].successful, true);
+  assert.equal(repository.finished[0].successful, true);
+  assert.deepEqual(lines.filter((line) => line.event === 'weather_forecast_archive_failed').map((line) => Object.keys(line).sort()), [['event', 'failedAt', 'service', 'status']]);
+});
+
 test('la route interne refuse un secret absent ou différent', async () => {
   assert.equal(await verifyWeatherSyncToken(null, 'attendu'), false);
   assert.equal(await verifyWeatherSyncToken('incorrect', 'attendu'), false);
@@ -257,6 +293,13 @@ class FakeRepository implements AutomaticWeatherSyncRepository {
         value.precipitationMm,
       );
     }
+  }
+  archived: Array<Parameters<AutomaticWeatherSyncRepository['archiveForecast']>[0]> = [];
+  archiveFails = false;
+  async archiveForecast(input: Parameters<AutomaticWeatherSyncRepository['archiveForecast']>[0]) {
+    if (this.archiveFails) throw new Error('D1_ERROR: écriture refusée');
+    this.archived.push(input);
+    return input.rows.length;
   }
   async recordWorkspaceResult(input: Parameters<AutomaticWeatherSyncRepository['recordWorkspaceResult']>[0]) {
     this.recorded.push(input);

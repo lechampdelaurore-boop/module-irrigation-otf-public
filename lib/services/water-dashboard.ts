@@ -15,6 +15,7 @@ import {
   type WeatherPreference,
 } from '@/db/water-management-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
+import { writeForecastArchiveForUser } from '@/db/forecast-archive-repository';
 import { evaluateCropAlertsAfterForecastWrite } from './crop-alerts-service';
 import { evaluateWeatherAlertsAfterForecastWrite } from './weather-alerts-service';
 import { readCropAlertsView, type CropAlertsView } from './crop-alerts-view';
@@ -33,6 +34,7 @@ import {
 } from '../domain/water-management';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
 import { getConfiguredWeatherProvider, weatherAttribution } from './weather/configured-provider';
+import { archiveForecastReading } from './weather/forecast-archive';
 import { WeatherProviderError, type WeatherProvider } from '../domain/weather/weather-provider';
 import { oldestWeatherReadingInUse, weatherRefreshRequired, weatherRequestRanges } from '../domain/weather/cache-policy';
 import { weatherLocationKey, weatherLocationQuery } from '../domain/weather/location';
@@ -349,6 +351,17 @@ async function refreshWeather({
         at,
       ),
     ]);
+    if (outcome.forecast.status === 'fulfilled') {
+      // L'archive J+1 à J+7 de la même lecture, sans appel de plus (docs/forecast-archive-contract.md).
+      await archiveForecastReading({
+        write: (snapshot) => writeForecastArchiveForUser(ownerUserId, snapshot),
+        locationKey: location.locationKey,
+        values: outcome.forecast.values,
+        source: provider.sourceId?.('forecast') ?? provider.id,
+        fetchedAt: at,
+        now,
+      });
+    }
     if (outcome.forecast.status === 'fulfilled' && outcome.forecast.values.length > 0) {
       // Les alertes météo après chaque écriture de prévisions (docs/weather-alerts-contract.md).
       const workspaceId = await findWorkspaceIdForUser(ownerUserId);

@@ -49,7 +49,7 @@ test('chaque purge vise une colonne de sa table, avec un seul paramètre, la lim
   }
 });
 
-test('les limites à 6 h 16 le 28 novembre 2026 : deux jours, huit jours à l’heure pleine, trente jours, quinze minutes, trente-cinq jours, douze mois', () => {
+test('les limites à 6 h 16 le 28 novembre 2026 : deux jours, huit jours à l’heure pleine, trente jours, quinze minutes, trente-cinq jours, douze mois, vingt-quatre mois', () => {
   const at = (key: keyof typeof RETENTION_LIMITS) => RETENTION_LIMITS[key](NOW_MS);
   assert.equal(new Date(at('otf_call_starts') as number).toISOString(), '2026-11-26T05:16:00.000Z');
   assert.equal(new Date(at('otf_call_outcomes') as number).toISOString(), '2026-11-20T05:00:00.000Z');
@@ -58,6 +58,7 @@ test('les limites à 6 h 16 le 28 novembre 2026 : deux jours, huit jours à l’
   assert.equal(new Date(at('otf_authentication_failures') as number).toISOString(), '2026-11-28T05:01:00.000Z');
   assert.equal(at('irrigation_operator_notices'), '2026-10-24');
   assert.equal(at('irrigation_support_accesses'), '2025-11-28');
+  assert.equal(at('irrigation_weather_forecast_archive'), '2024-11-28', 'l’archive des prévisions, 24 mois (D-297)');
   assert.equal(OPERATOR_NOTICES_KEPT_DAYS, 35);
   assert.deepEqual(RETENTION_WORDS, {
     otf_call_starts: '2 jours',
@@ -67,6 +68,7 @@ test('les limites à 6 h 16 le 28 novembre 2026 : deux jours, huit jours à l’
     otf_authentication_failures: '15 minutes',
     irrigation_operator_notices: '35 jours',
     irrigation_support_accesses: '12 mois',
+    irrigation_weather_forecast_archive: '24 mois',
   });
 });
 

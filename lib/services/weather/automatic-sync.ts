@@ -13,6 +13,7 @@ import {
   type WeatherSyncLogger,
 } from './sync-engine.ts';
 import type { WeatherProvider } from '../../domain/weather/weather-provider.ts';
+import { archiveForecastReading } from './forecast-archive.ts';
 import { weatherFailureKind, type WeatherFailureKind } from '../../domain/operations/morning-task-outcomes.ts';
 
 export type { AutomaticWeatherSyncRepository, AutomaticWeatherTarget } from '../../domain/weather/automatic-sync-contract.ts';
@@ -115,6 +116,7 @@ export async function runAutomaticWeatherSync({
         at,
         now,
         onForecastWritten,
+        log,
       });
       if (weatherOutcomeSucceeded(outcome)) {
         finalResult.successfulTargets += groupedTargets.length;
@@ -184,6 +186,7 @@ async function persistOutcomeForTargets({
   at,
   now,
   onForecastWritten,
+  log,
 }: {
   repository: AutomaticWeatherSyncRepository;
   provider: WeatherProvider;
@@ -192,18 +195,30 @@ async function persistOutcomeForTargets({
   at: string;
   now: Date;
   onForecastWritten?: ForecastWrittenHandler;
+  log: WeatherSyncLogger;
 }) {
   const error = weatherOutcomeError(outcome);
   const successful = weatherOutcomeSucceeded(outcome);
   const notBeforeAt = weatherOutcomeNotBeforeAt(outcome, now);
   for (const target of targets) {
     if (outcome.forecast.status === 'fulfilled') {
+      const source = provider.sourceId?.('forecast') ?? provider.id;
       await repository.upsertValues({
         target,
         kind: 'forecast',
         values: outcome.forecast.values,
-        source: provider.sourceId?.('forecast') ?? provider.id,
+        source,
         fetchedAt: at,
+      });
+      // L'archive J+1 à J+7, par exploitation, de la même lecture (docs/forecast-archive-contract.md).
+      await archiveForecastReading({
+        write: (snapshot) => repository.archiveForecast({ ...snapshot, workspaceId: target.workspaceId }),
+        locationKey: target.locationKey,
+        values: outcome.forecast.values,
+        source,
+        fetchedAt: at,
+        now,
+        log,
       });
       if (outcome.forecast.values.length > 0) {
         await onForecastWritten?.({ workspaceId: target.workspaceId, locationKey: target.locationKey, now });

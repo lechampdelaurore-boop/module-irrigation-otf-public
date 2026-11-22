@@ -153,6 +153,18 @@ La mesure manuelle, y compris la valeur explicite `0`, reste dans la ligne
 `manual_precipitation`. La tâche automatique n’écrit que `forecast` et
 `reanalysis` ; elle ne peut donc ni remplacer ni effacer une mesure utilisateur.
 
+## Archive des prévisions
+
+Depuis le 22 novembre 2026 (D-297, `docs/forecast-archive-contract.md`,
+migration 0046), la première lecture réussie des prévisions d'un jour civil
+de Paris est aussi recopiée, pour J+1 à J+7, dans une archive par
+exploitation qui ne s'écrase jamais (`irrigation_weather_forecast_archive`) :
+la prévision faite la veille pour aujourd'hui reste lisible quand la table
+des prévisions l'a remplacée. Aucun appel externe de plus : les nombres
+d'appels ci-dessus ne changent pas. L'archive est gardée 24 mois, n'a aucun
+écran et n'entre dans aucun calcul ; un échec de son écriture ne fait jamais
+échouer la lecture météo.
+
 ## Licence et déploiement
 
 Visual Crossing est crédité dans l’interface. Son offre gratuite fournit 1 000

@@ -8565,3 +8565,58 @@ même, pour fermer les alertes et garder `next` (types, outillage) à jour.
 **Contrôles.** Voir `docs/ETAT_DU_PROJET.md` (outillage, lot `next`
 16.4.6) : les huit contrôles réussis avant et après le changement, et les
 parcours navigateur joués en local après.
+
+## D-297 — L'archive des prévisions J+1 à J+7, jamais écrasée
+
+Date : 22 novembre 2026. Statut : décidé (idée rangée sans engagement de la
+section 6 ter de la roadmap, entrée dans l'ordre d'exécution sur le « vas-y
+pour tout » du porteur du 22 novembre 2026 à 10 h 53, qui la lui listait ;
+contrat écrit le même jour sans code, choix par défaut de son § 7).
+
+**Contexte.** La prévision d'un jour était écrasée à chaque nouvelle lecture
+(clé : exploitation, lieu, date, nature) : la prévision faite la veille pour
+aujourd'hui n'existait plus. Sans elle, on ne peut ni mesurer l'erreur des
+prévisions que voient les maraîchers, ni vérifier sur des données vécues les
+hypothèses de la seconde passe du banc commun.
+
+**Décision** (`docs/forecast-archive-contract.md`, F748 à F754 ;
+migration 0046) :
+
+1. Une table neuve, `irrigation_weather_forecast_archive`, par
+   exploitation, lieu, jour d'émission (jour civil de Paris, D-004) et jour
+   visé ; seuls J+1 à J+7 sont gardés. Les écritures sont des `INSERT … ON
+   CONFLICT DO NOTHING` : la première ligne reste, aucune mise à jour.
+2. La première lecture réussie du jour l'écrit, tâche de 6 h 15 ou
+   actualisation à l'écran, juste après les prévisions et avec les mêmes
+   valeurs : **aucun appel externe de plus**. Une lecture plus tard le même
+   jour ne change rien de ce qui est écrit ; elle n'ajoute qu'un horizon
+   absent (F748, le cas d'une tâche du matin manquée).
+3. Une valeur absente reste nulle (D-003) ; un jour sans lecture réussie n'a
+   pas de ligne et n'est jamais reconstitué.
+4. 24 mois glissants, purgés par la tâche « Purges de conservation » du
+   matin ; la table garde le plan d'effacement d'une ferme et prend sa
+   propre règle au plan de conservation (F753).
+5. Un échec d'écriture ne fait jamais échouer la lecture météo ; il est
+   journalisé par le service, le statut et la date seulement (F751).
+6. Aucun écran, aucun calcul changé : D-010, D-041, D-047 intacts. Une
+   lecture de domaine, `listForecastArchive`, attend les chantiers futurs.
+
+**Écarté.** (a) Une archive par lieu partagée entre exploitations : moins de
+lignes, mais l'isolation et l'effacement d'une ferme se compliquent pour un
+gain de stockage négligeable (§ 7). (b) Garder J+8 à J+14 : précision trop
+faible pour servir, volume doublé. (c) Bloquer le jour entier à la première
+lecture : une actualisation de la semaine affichée, un samedi, aurait privé
+la journée de J+2 à J+7 (F748).
+
+**Coût.** Relu le 22 novembre 2026 sur les pages de Cloudflare (F754) :
+100 fermes écriraient environ 85 000 lignes par mois, 0,17 % des 50 millions
+inclus, et de l'ordre de 0,1 Go sur 24 mois, contre 5 Go inclus. Aucun coût
+supplémentaire.
+
+Preuves : `tests/forecast-archive.test.ts`, `tests/db/forecast-archive.test.ts`
+(les dix tests du § 5 du contrat ; le test 10 sur base vide par chaque test
+qui migre la base, sur la base réelle par le déploiement),
+`tests/weather-automatic-sync.test.ts`, `tests/db/retention-purge.test.ts`,
+`tests/retention-plan.test.ts`, et les plans d'effacement et de conservation
+qui relisent la base migrée. Ne changent pas : la table des prévisions, les
+appels au fournisseur, le besoin, les alertes, l'ET0, aucun écran.

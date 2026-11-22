@@ -80,6 +80,30 @@ registres, elle y renvoie.
   16.4.6, les sept alertes modérées de `next` fermées, `pnpm audit` ne
   signale plus rien ; aucun code ni aucune configuration ne change.
   Contrôles et parcours plus bas (outillage). Fusion après #178.
+- **Archive des prévisions J+1 à J+7 : codée le 22 novembre 2026** (D-297,
+  `docs/forecast-archive-contract.md`, F748 à F754, migration 0046), en
+  Opus 5.5 · Élevé, le réglage de son contrat, sur le « vas-y pour tout » du
+  porteur du même jour (idée rangée de la section 6 ter de la roadmap, étape
+  27 de l'ordre). Chaque jour, la première lecture réussie des prévisions
+  (tâche de 6 h 15, sinon actualisation à l'écran) est gardée pour J+1 à
+  J+7, par exploitation, sans jamais être écrasée ; 24 mois, purgés par la
+  tâche du matin ; effacée avec la ferme. Aucun appel externe de plus, aucun
+  écran, aucun calcul changé ; un échec de l'archive ne fait jamais échouer
+  la météo. Migration additive (une table neuve) : aucun export de la base
+  demandé avant la fusion. Quota de D1 relu le 22 novembre 2026 : aucun coût
+  (F754). Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`
+  (avec ses passages d'isolation et de la jauge), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check`, `pnpm site:check` et `pnpm e2e`
+  en local (sorties dans la PR). Le test 10 du contrat sur une copie de la
+  base réelle n'est pas joué en local (aucune copie ici) : le déploiement
+  applique la migration aux bases réelle et de démonstration, à vérifier
+  dans ses journaux. La même PR consigne trois mises en ligne du
+  22 novembre 2026, chacune vérifiée job par job (les cinq jobs verts) :
+  #177 (journal des modifications sans rechargement) fusionnée à 13 h 32,
+  en ligne à 13 h 56 (run 45022773652) ; #178 (cas d'écart de la
+  démonstration) fusionnée à 14 h 14, en ligne à 14 h 38 (run
+  45026416442) ; #179 (`next` 16.4.6) fusionnée à 14 h 59, en ligne à
+  15 h 21 (run 45030394463).
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,

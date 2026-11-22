@@ -118,6 +118,7 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   irrigation_equipment_setting_calculations: 'La provenance d’un réglage de matériel (calculateur ou mesure), écrite avec lui : la ligne du réglage garde ses valeurs.',
   // Météo.
   irrigation_weather_daily_values: `${WEATHER} La pluie mesurée y est aussi : une observation.`,
+  irrigation_weather_forecast_archive: `${WEATHER} L’archive des prévisions J+1 à J+7, jamais écrasée (D-297).`,
   irrigation_weather_geocodes: WEATHER,
   // Journaux de domaine.
   irrigation_planning_settings_log: DOMAIN_LOG,

@@ -1,3 +1,4 @@
+import type { ForecastArchiveRow } from './forecast-archive.ts';
 import type { WeatherDailyValue } from './weather-provider.ts';
 
 /**
@@ -34,6 +35,19 @@ export type AutomaticWeatherSyncRepository = {
     source: string;
     fetchedAt: string;
   }): Promise<void>;
+  /**
+   * La photographie du jour des prévisions J+1 à J+7 d'une exploitation
+   * (docs/forecast-archive-contract.md, D-297) : jamais écrasée ; rend le
+   * nombre de lignes nouvelles.
+   */
+  archiveForecast(input: {
+    workspaceId: string;
+    locationKey: string;
+    issuedOn: string;
+    rows: readonly ForecastArchiveRow[];
+    source: string;
+    fetchedAt: string;
+  }): Promise<number>;
   recordWorkspaceResult(input: {
     workspaceId: string;
     at: string;

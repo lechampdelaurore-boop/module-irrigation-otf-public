@@ -24,6 +24,20 @@ source détaillée commit par commit.
   remise à zéro, du bouton comme de la nuit, rend le cas. Nouveau parcours
   V11 de la démonstration.
 
+### Ajouté (archive des prévisions J+1 à J+7)
+
+- **La prévision de la veille n'est plus perdue** (D-297,
+  `docs/forecast-archive-contract.md`, migration 0046) : chaque jour, la
+  première lecture réussie des prévisions est gardée pour les sept jours
+  suivants, par exploitation, sans jamais être écrasée, pendant 24 mois.
+  Elle servira plus tard à comparer prévu et réalisé. Aucun appel météo de
+  plus, aucun écran, aucun calcul changé ; un échec de l'archive ne bloque
+  jamais la météo. Inscrite aux plans d'effacement et de conservation,
+  purgée par la tâche du matin.
+- En ligne le 22 novembre 2026 : #177 à 13 h 56 (run 45022773652), #178
+  à 14 h 38 (run 45026416442), #179 à 15 h 21 (run 45030394463), cinq jobs
+  verts chacun.
+
 ### Documentation (revue de l'isolation de la 4.3 à la 4.5, registres)
 
 - **La revue de l'isolation de la 4.3 à la 4.5** (condition E8 de la fiche

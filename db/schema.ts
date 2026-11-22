@@ -1071,6 +1071,40 @@ export const weatherDailyValues = sqliteTable(
   ],
 );
 
+// L'archive des prévisions J+1 à J+7 (migration 0046, docs/forecast-archive-contract.md, D-297) : jamais écrasée.
+export const weatherForecastArchive = sqliteTable(
+  'irrigation_weather_forecast_archive',
+  {
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    locationKey: text('location_key').notNull(),
+    issuedOn: text('issued_on').notNull(),
+    targetDate: text('target_date').notNull(),
+    horizonDays: integer('horizon_days').notNull(),
+    precipitationMm: real('precipitation_mm'),
+    et0Mm: real('et0_mm'),
+    minimumTemperatureCelsius: real('minimum_temperature_celsius'),
+    maximumTemperatureCelsius: real('maximum_temperature_celsius'),
+    solarEnergyMjPerSquareMeter: real('solar_energy_mj_per_square_meter'),
+    source: text('source').notNull(),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.locationKey, table.issuedOn, table.targetDate] }),
+    index('idx_forecast_archive_issued_on').on(table.issuedOn),
+    index('idx_forecast_archive_target').on(table.workspaceId, table.locationKey, table.targetDate),
+    check('chk_forecast_archive_issued_on', sql`${table.issuedOn} GLOB '[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]'`),
+    check('chk_forecast_archive_horizon', sql`${table.horizonDays} BETWEEN 1 AND 7`),
+    check('chk_forecast_archive_target', sql`${table.targetDate} = date(${table.issuedOn}, '+' || ${table.horizonDays} || ' days')`),
+    check(
+      'chk_forecast_archive_non_negative',
+      sql`(${table.precipitationMm} IS NULL OR ${table.precipitationMm} >= 0) AND (${table.et0Mm} IS NULL OR ${table.et0Mm} >= 0)`,
+    ),
+    check('chk_forecast_archive_source', sql`length(${table.source}) >= 1`),
+  ],
+);
+
 export const dailyWaterLimitRevisions = sqliteTable(
   'irrigation_daily_water_limit_revisions',
   {

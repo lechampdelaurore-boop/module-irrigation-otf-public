@@ -3,6 +3,7 @@ import { addDaysToDateKey } from '../water-management.ts';
 import { OTF_CALL_OUTCOME_HOURS_KEPT, outcomeHourStartMs } from '../otf/call-outcome.ts';
 import { OTF_AUTHENTICATION_BRAKE_WINDOW_MS, OTF_CALL_ROWS_KEPT_MS, oldestKeptCountDay, parisDayOf } from '../otf/shared-call-pace.ts';
 import { oldestKeptSupportDay, SUPPORT_ACCESS_KEPT_MONTHS } from './support-access.ts';
+import { FORECAST_ARCHIVE_KEPT_MONTHS, oldestKeptForecastArchiveDay } from '../weather/forecast-archive.ts';
 
 /**
  * La conservation des données à durée limitée (4.5, PR 5 ;
@@ -44,7 +45,8 @@ export type RetentionPurgeKey =
   | 'otf_call_pauses'
   | 'otf_authentication_failures'
   | 'irrigation_operator_notices'
-  | 'irrigation_support_accesses';
+  | 'irrigation_support_accesses'
+  | 'irrigation_weather_forecast_archive';
 
 /**
  * La limite de chaque purge à l'instant `atMs` : une ligne en deçà est
@@ -64,6 +66,8 @@ export const RETENTION_LIMITS: Readonly<Record<RetentionPurgeKey, (atMs: number)
   irrigation_operator_notices: (atMs) => addDaysToDateKey(parisDayOf(atMs), -OPERATOR_NOTICES_KEPT_DAYS),
   // Le journal d'accès du support, douze mois (F567, F660) : le même jour, un an plus tôt, reste.
   irrigation_support_accesses: (atMs) => oldestKeptSupportDay(parisDayOf(atMs)),
+  // L'archive des prévisions, vingt-quatre mois par jour d'émission (D-297) : le même jour, deux ans plus tôt, reste.
+  irrigation_weather_forecast_archive: (atMs) => oldestKeptForecastArchiveDay(parisDayOf(atMs)),
 };
 
 /** Les durées, en clair, telles que le contrat et la politique de confidentialité les disent. */
@@ -75,6 +79,7 @@ export const RETENTION_WORDS: Readonly<Record<RetentionPurgeKey, string>> = {
   otf_authentication_failures: '15 minutes',
   irrigation_operator_notices: `${OPERATOR_NOTICES_KEPT_DAYS} jours`,
   irrigation_support_accesses: `${SUPPORT_ACCESS_KEPT_MONTHS} mois`,
+  irrigation_weather_forecast_archive: `${FORECAST_ARCHIVE_KEPT_MONTHS} mois`,
 };
 
 /** Ce que le matin a purgé. */
