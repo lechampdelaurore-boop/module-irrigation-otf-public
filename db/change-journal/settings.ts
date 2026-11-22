@@ -425,7 +425,7 @@ export function sensitiveStageJournal(subject: 'stade-sensible', gesture: Journa
       ...gesture,
       subject,
       objectId: stage.cropKey,
-      context: { name: { value: stage.cropName }, stageRank: { value: stage.rank }, stage: { value: stage.label } },
+      context: { name: { value: stage.cropName }, rank: { value: stage.rank }, stage: { value: stage.label } },
     },
     {
       table: 'irrigation_crop_sensitive_stages',

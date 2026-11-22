@@ -1,3 +1,4 @@
+import { getChangeJournalViewForUser } from '@/lib/services/change-journal-view';
 import { listEquipmentPlacementsForUser } from '@/db/equipment-placement-repository';
 import { logJsonLine } from '@/lib/adapters/log';
 import { countFeatureDataForUser } from '@/db/feature-data-counts';
@@ -241,7 +242,7 @@ export async function loadHistoriquePage(context: ReadyPageContext) {
  * lieu de la météo et la correspondance des espèces (P3).
  */
 export async function loadReglagesPage(context: ReadyPageContext) {
-  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices] = await Promise.all([
+  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices, changeJournal] = await Promise.all([
     countFeatureDataForUser(context.userId),
     getOnboardingForUser(context.userId),
     usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
@@ -255,9 +256,11 @@ export async function loadReglagesPage(context: ReadyPageContext) {
     (context.enabled.includes('planning') || context.enabled.includes('arrosages')) && !context.shell.demo
       ? readPhoneNoticeSettingsForUser(context.userId)
       : null,
+    // Le journal des modifications se lit toujours, sans case de fonctionnalité (amélioration n° 7, §5.5).
+    getChangeJournalViewForUser(context.userId, context.snapshot),
   ]);
   context.lap('dashboards');
   // Le classement des jardins, pour une ferme qui fait l'accueil (4.4, F583).
   const plotShelters = plotShelterLines(context.snapshot, context.season);
-  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices };
+  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal };
 }
