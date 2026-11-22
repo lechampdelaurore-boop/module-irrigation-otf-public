@@ -350,6 +350,15 @@ source détaillée commit par commit.
   tâche, sa dernière réussite et son dernier échec. La veille est elle-même
   une tâche du registre. Migration 0038, additive ; parcours P50.
 
+### Ajouté (Fusion des moteurs, étape 3, PR 1)
+
+- **Le moteur hydrique commun, en essai à côté de la jauge** (D-270) :
+  chaque matin, la jauge de la réserve du sol de chaque planche est aussi
+  calculée par le moteur commun d'OTF et de Tlaloc, et les deux calculs sont
+  comparés au journal, sans aucune donnée de la ferme. Rien ne change à
+  l'écran : la jauge affichée reste celle d'avant, jusqu'à ce que l'égalité
+  soit prouvée sur la ferme.
+
 ### Corrigé (un essai du lot I, qui échouait chaque soir)
 
 - **L'essai de la démonstration « Pic d'été, l'eau manque » ne dépend plus de

@@ -16,7 +16,9 @@ import {
   type SurfaceDeclaration,
   type SurfaceState,
 } from './bare-soil.ts';
+import { engineRun, type EngineDay } from './gauge-engine.ts';
 import { dayShape, soilCrops, surfaceStateOf, type DayShape, type GaugeMode, type SoilCrop } from './gauge-shape.ts';
+import { GAUGE_ENGINE, type GaugeEngine } from './gauge-switch.ts';
 import { cropThresholdPercent, thresholdMm, type RootingProfile } from './rooting.ts';
 import { PERCENT, resolveBedSoil, soilSettingsOn, type ResolvedSoil, type SoilRecord, type SoilSettings, type SoilSettingsRevision } from './soil.ts';
 
@@ -117,8 +119,17 @@ export type SoilReserveDay = {
 
 type Carry = { mode: GaugeMode; capacityMm: number; stateMm: number; bare: BareSoilState | null; geometry: BareSoilGeometry | null; surfaceState: SurfaceState | null };
 
-/** La jauge d'une planche sur les jours suivis. */
-export function bedSoilReserve(input: BedSoilInput): SoilReserveDay[] {
+/**
+ * La jauge d'une planche sur les jours suivis, par le calcul que choisit
+ * l'interrupteur (docs/shared-engine-adapter-contract.md) : l'ancien calcul
+ * du module, ou le moteur commun.
+ */
+export function bedSoilReserve(input: BedSoilInput, engine: GaugeEngine = GAUGE_ENGINE): SoilReserveDay[] {
+  return engine === 'commun' ? sharedEngineSoilReserve(input) : moduleSoilReserve(input);
+}
+
+/** L'ancien calcul de la jauge, gardé tel quel jusqu'à la preuve d'égalité. */
+function moduleSoilReserve(input: BedSoilInput): SoilReserveDay[] {
   const result: SoilReserveDay[] = [];
   let carry: Carry | null = null;
   let reason: UnknownReason = { kind: 'not-started' };
@@ -142,6 +153,111 @@ export function bedSoilReserve(input: BedSoilInput): SoilReserveDay[] {
     reason = day.reason;
   }
   return result;
+}
+
+type Surface = { state: SurfaceState; declared: boolean; since: string | null };
+type Frame = { water: BedWaterDay; soil: ResolvedSoil | null; settings: SoilSettings; surface: Surface | null };
+
+/**
+ * La jauge par le moteur commun : les jours à un compartiment (cultures,
+ * engrais verts, enherbée) passent au moteur par tronçons ; le sol nu et les
+ * jours sans sol restent au module, qui fait le lien entre les tronçons
+ * (docs/shared-engine-adapter-contract.md, « Les passages »).
+ */
+function sharedEngineSoilReserve(input: BedSoilInput): SoilReserveDay[] {
+  const frames = bedFrames(input);
+  const observations = input.observations
+    .filter((observation) => coversBed(input, observation))
+    .map((observation) => ({ observation, date: dateKeyInTimeZone(observation.observedAt, FARM_TIME_ZONE) }));
+  const result: SoilReserveDay[] = [];
+  let carry: Carry | null = null;
+  let reason: UnknownReason = { kind: 'not-started' };
+  let index = 0;
+  while (index < frames.length) {
+    const { water, soil, settings, surface } = frames[index];
+    if (soil === null) {
+      result.push(emptyDay(input, water, { kind: 'no-soil' }));
+      carry = null;
+      reason = { kind: 'not-started' };
+      index += 1;
+      continue;
+    }
+    if (!oneCompartment(frames[index])) {
+      // Le sol nu et ses deux compartiments restent au module (MC-18).
+      const day = computeDay({ input, water, soil, settings, surface, carry, reason });
+      result.push(day.output);
+      carry = day.carry;
+      reason = day.reason;
+      index += 1;
+      continue;
+    }
+    let end = index;
+    while (end < frames.length && oneCompartment(frames[end])) end += 1;
+    const run = frames.slice(index, end).filter(oneCompartment).map((frame) => engineDay(input, frame));
+    const days = engineRun({
+      today: input.today,
+      sheltered: input.bed.sheltered,
+      forecastRainShare: input.forecastRainShare,
+      days: run,
+      irrigations: input.irrigations,
+      observations,
+      start: carry === null ? null : { stateMm: carry.stateMm, capacityMm: carry.capacityMm },
+      reason,
+    });
+    result.push(...days);
+    const last = days[days.length - 1];
+    const lastRun = run[run.length - 1];
+    carry = last.stateMm === null || last.capacityMm === null || last.mode === null
+      ? null
+      : { mode: last.mode, capacityMm: last.capacityMm, stateMm: last.stateMm, bare: null, geometry: null, surfaceState: lastRun.surfaceState };
+    reason = last.unknown ?? { kind: 'not-started' };
+    index = end;
+  }
+  return result;
+}
+
+/**
+ * Les jours de la planche avant tout bilan : le sol, les réglages, l'état de
+ * surface. Un sol qui ne retient rien (RFU 0 mm/m) vaut un sol absent : le
+ * moteur refuse un sol sans réserve (contrat de l'adaptateur).
+ */
+function bedFrames(input: BedSoilInput): Frame[] {
+  let lastCropDate: string | null = null;
+  return input.waterDays.map((water) => {
+    const date = water.date;
+    const resolved = resolveBedSoil(input.soilRecords, input.bed, date);
+    const hasCrop = water.status !== 'no-crop';
+    const surface = hasCrop ? null : surfaceStateOf(input, water, date, lastCropDate);
+    if (hasCrop) lastCropDate = date;
+    const soil = resolved !== null && resolved.soilRfuMmPerMeter > 0 ? resolved : null;
+    return { water, soil, settings: soilSettingsOn(input.settings, date), surface };
+  });
+}
+
+/** Un jour à un compartiment, qui passe au moteur : une culture, un engrais vert levé ou couvrant, l'enherbée. */
+function oneCompartment(frame: Frame): frame is Frame & { soil: ResolvedSoil } {
+  return frame.soil !== null && (frame.surface === null || surfaceStateModel(frame.surface.state) === 'cover');
+}
+
+/** Un jour d'un tronçon, tel que le module le voit : tout sauf le bilan. */
+function engineDay(input: BedSoilInput, frame: Frame & { soil: ResolvedSoil }): EngineDay {
+  const { water, soil, settings, surface } = frame;
+  const date = water.date;
+  const { mode, shape, base, mulched } = dayFrame({ input, water, soil, settings, surface });
+  const observation = shape.capacityMm === null ? null : latestObservation(input, date);
+  const rain = input.bed.sheltered ? null : input.rain.get(date) ?? null;
+  const consumption = consumptionOfDay(water, mode, surface?.state ?? null, settings, shelterFactorOn(input.waterSettings, date));
+  return {
+    base: { ...base, rainNature: rain?.nature ?? null, observation },
+    referenceShare: soil.record.referenceShare,
+    // Une consommation impossible (ET0 négative ou illisible sous un couvert) rend le jour inconnu, au lieu d'un nombre faux.
+    consumption: consumption.mm !== null && Number.isFinite(consumption.mm) && consumption.mm >= 0
+      ? { mm: consumption.mm, gap: null }
+      : { mm: null, gap: consumption.gap ?? { kind: 'missing-et0', date } },
+    rain,
+    mulchShare: mulched ? settings.plasticMulchRainShare : 1,
+    surfaceState: surface?.state ?? null,
+  };
 }
 
 type DayContext = {

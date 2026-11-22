@@ -6,8 +6,10 @@ import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import type { StoredWeeklyPlan } from '../domain/planning/contract';
 import { bedUpcomingCrops, bedWaterDays } from '../domain/crop-water/proposal';
-import { bedSoilReserve, type IrrigationInterval, type SoilReserveDay } from '../domain/soil-reserve/gauge';
+import { bedSoilReserve, type BedSoilInput, type IrrigationInterval, type SoilReserveDay } from '../domain/soil-reserve/gauge';
+import { compareBed, otherGaugeEngine, type GaugeComparison } from '../domain/soil-reserve/gauge-comparison';
 import { actualIrrigationsByBed, dayRainFromWeather, gaugeStartDate, irrigationIntervalsByBed } from '../domain/soil-reserve/gauge-inputs';
+import { GAUGE_ENGINE } from '../domain/soil-reserve/gauge-switch';
 import { soilGaugeView, type SoilGaugeView } from '../domain/soil-reserve/gauge-view';
 import { proposalSoilNotes, type ProposalSoilNote } from '../domain/soil-reserve/proposal-soil';
 import { SURPLUS_DAYS, waterSurplus, type ActualIrrigation, type WaterSurplus } from '../domain/soil-reserve/water-surplus';
@@ -109,13 +111,17 @@ export async function getSoilReserveViewForUser(input: {
 /**
  * Les jours de la jauge de chaque planche de la saison en cours, pour
  * l'enregistrement du matin ; `null` quand la jauge ne se calcule pas (pas
- * d'espace, une autre saison, le plan de culture non lu).
+ * d'espace, une autre saison, le plan de culture non lu). Avec `comparison`,
+ * l'autre calcul de la jauge est rejoué sur chaque planche et comparé
+ * (docs/shared-engine-adapter-contract.md, « L'interrupteur et la preuve
+ * d'égalité ») ; seuls ses nombres s'ajoutent au bilan.
  */
 export async function soilReserveDaysForUser(input: {
   ownerUserId: string;
   season: number;
   snapshot: IrrigationSnapshot;
   now: Date;
+  comparison?: GaugeComparison;
 }): Promise<{ workspaceId: string; today: string; daysByBed: ReadonlyMap<string, readonly SoilReserveDay[]> } | null> {
   const today = dateKeyInTimeZone(input.now, FARM_TIME_ZONE);
   if (Number(today.slice(0, 4)) !== input.season || !input.snapshot.cropPlan) return null;
@@ -145,6 +151,7 @@ async function soilDays(input: {
   today: string;
   workspaceId: string;
   inputs: SoilReserveInputs;
+  comparison?: GaugeComparison;
 }): Promise<SoilDays> {
   const { snapshot, season, today, inputs } = input;
   const cropPlan = snapshot.cropPlan!;
@@ -192,7 +199,7 @@ async function soilDays(input: {
     if (unclassified.has(bed.plotId)) continue;
     const underShelter = sheltered.has(bed.plotId);
     const water = cropWaterBedInput(bed, underShelter, today, cropPlan, cropInputs, readings);
-    daysByBed.set(bed.id, bedSoilReserve({
+    const bedInput: BedSoilInput = {
       bed: { id: bed.id, zoneId: bed.zoneId, plotId: bed.plotId, sheltered: underShelter },
       today,
       waterDays: bedWaterDays(water, dates).days,
@@ -207,7 +214,12 @@ async function soilDays(input: {
       settings: inputs.settings,
       waterSettings: bedWaterSettings(cropInputs.settings, bed.id, underShelter ? bed.plotId : null),
       forecastRainShare: planningSettings.forecastRainShare,
-    }));
+    };
+    const days = bedSoilReserve(bedInput);
+    daysByBed.set(bed.id, days);
+    // La comparaison du matin : l'autre calcul de la jauge sur la même planche ; son échec n'arrête jamais l'enregistrement.
+    if (input.comparison) compareBed(input.comparison, days, () => bedSoilReserve(bedInput, otherGaugeEngine(GAUGE_ENGINE)));
   }
   return { weekEnd, zones, plots, beds, daysByBed, intervalsByBed: irrigations, actualByBed: actualIrrigationsByBed(events, input.now), plan };
 }
+

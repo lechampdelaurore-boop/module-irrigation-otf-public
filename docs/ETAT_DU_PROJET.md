@@ -860,7 +860,8 @@ registres, elle y renvoie.
   jardin. Sans migration ni écran nouveau. Contrôles : voir la PR. Décidé
   par le coordinateur dans l'autonomie que le porteur lui a confiée
   (19 novembre 2026), confirmé par le porteur le 21 novembre 2026 à
-  23 h 13.
+  23 h 13. **En ligne le 22 novembre 2026 à 2 h 18** (#171, fusionnée à
+  1 h 54, run 44968875446 vérifié job par job : les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 7 sur 7,
   l'écran, codée le 21 novembre 2026** (D-288, F722 à F724), empilée sur
@@ -876,7 +877,9 @@ registres, elle y renvoie.
   budget de hauteur de « Réglages » au téléphone (P40) passe à 3 750 px.
   Parcours P55 à 390 et 1 440 px. Sans migration. Contrôles : voir la PR.
   L'amélioration n° 7 est codée en entier ; F718 (les réglages hors de la
-  liste du contrat) est réglée par la PR 8 (D-289).
+  liste du contrat) est réglée par la PR 8 (D-289). **En ligne le
+  22 novembre 2026 à 1 h 53** (#169, fusionnée à 1 h 24, run 44966444472
+  vérifié job par job : les cinq jobs verts).
 
 - Améliorations, **n° 7, le journal des modifications : PR 6 sur 7, le
   matériel et les ressources branchés, codée le 21 novembre 2026** (D-287,
@@ -1418,6 +1421,36 @@ registres, elle y renvoie.
   1 508 tests, compilation, knip, `push:check`, `weather:check`, verts ;
   parcours navigateur non rejoués en local, sans rapport (ni interface ni
   service touchés), joués par la CI.
+- Fusion des moteurs, **étapes 2 et 3** (section 6 quater de la roadmap,
+  D-270), en Opus 5.5 · Max sur le mot du porteur (MC-26) : **le moteur
+  commun codé le 20 novembre 2026** dans son dépôt (v0.1.0, PR n° 11 ;
+  v0.2.0, PR n° 12 ; ses types, PR n° 13 ; v0.3.0, la pluie sans heure du
+  jeu Tlaloc, PR n° 14), **approuvé par Nicolas et fusionné le soir même**
+  (21 h 19, 21 h 20, 21 h 47 et 21 h 48, branche principale verte après
+  chaque fusion) ;
+  **l'adaptateur de la jauge, PR 1 sur 3, codé le même soir** (contrat
+  `docs/shared-engine-adapter-contract.md`), posé sur une PR de découpage
+  sans changement de comportement (#157, la forme du jour de la jauge dans
+  `lib/domain/soil-reserve/gauge-shape.ts` ; **#157 en ligne le
+  22 novembre 2026 à 2 h 39**, fusionnée à 2 h 19, run 44970891913 vérifié
+  job par job : les cinq jobs verts). Le moteur v0.3.0 (commit
+  `a36ca0d` de la branche principale du dépôt commun) figé dans
+  `lib/domain/soil-reserve/shared-engine/`, avec ses types et l'empreinte
+  de chaque fichier ; l'interrupteur `GAUGE_ENGINE` reste sur l'ancien
+  calcul : **rien ne change en ligne** ; chaque matin, l'enregistrement de
+  la jauge rejoue le moteur et écrit une ligne au journal, sans donnée de la
+  ferme, au plus 50 000 jours comparés. Preuves : les 1 930 tests rejoués
+  sur le moteur sans en modifier un seul ; 20 000 planches tirées au
+  hasard, 437 355 jours égaux à 0,000001 mm près ; O01 à O10 et les huit
+  cas limites, mêmes verdicts par les deux calculs ; comparaison et cas
+  rejoués sur la v0.3.0, mêmes résultats. Contrôles avant la PR :
+  lint, typage, 1 930 tests et les trois passages d'isolation, le rejeu des
+  1 930 sur le moteur, compilation, knip, `demo:check`, verts ; parcours
+  navigateur et Workers sans rapport (ni interface ni Worker touchés), joués
+  par la CI. Reste : la PR passe en dernier dans la file, après les
+  chaînes 4.4 et 4.5 et #157, remise à jour par fusion de la branche
+  principale ; la PR 2 (l'interrupteur sur le moteur) après trois matins
+  sans écart sur la ferme.
 - **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
   22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
   culture et par stade (5 quater), les alertes météo par culture (5
