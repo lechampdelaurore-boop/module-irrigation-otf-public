@@ -1,7 +1,9 @@
 import { db } from '../binding';
+import { sensitiveStageJournal } from '../change-journal/settings';
 import { ensureWorkspaceForUser } from '../workspace-repository';
 import { listReferenceCropsForWorkspace, type CropWaterWriteResult } from './references';
 import {
+  cropSensitiveStages,
   sensitiveStageChoicesFor,
   type SensitiveStageChoice,
   type SensitiveStageConfidence,
@@ -49,6 +51,8 @@ export async function listSensitiveStageChoicesForWorkspace(workspaceId: string 
  * choix qui ne change pas garde sa personne et sa date ; un choix qui revient
  * à la liste préremplie est retiré. Une culture qui ne sert pas cette ferme
  * (celle d'une autre ferme, par exemple) est refusée, et rien n'est écrit.
+ * Chaque stade dont la valeur change entre au journal des modifications, dans
+ * le même lot (amélioration n° 7, D-290).
  */
 export async function saveSensitiveStagesForUser(
   ownerUserId: string,
@@ -70,7 +74,7 @@ export async function saveSensitiveStagesForUser(
   const removed = before.filter((choice) => !result.choices.some((wanted) => wanted.rank === choice.rank));
   const written = result.choices.filter((wanted) => !before.some((choice) => same(choice, wanted)));
   const updatedAt = now.toISOString();
-  const statements = [
+  const writes = [
     ...removed.map((choice) => db.prepare(
       'DELETE FROM irrigation_crop_sensitive_stages WHERE workspace_id = ? AND crop_key = ? AND stage_rank = ?',
     ).bind(workspaceId, input.cropKey, choice.rank)),
@@ -82,7 +86,15 @@ export async function saveSensitiveStagesForUser(
          actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`,
     ).bind(workspaceId, input.cropKey, choice.rank, choice.label, choice.sensitive ? 1 : 0, ownerUserId, updatedAt)),
   ];
-  if (statements.length > 0) await db.batch(statements);
+  if (writes.length > 0) {
+    // Le journal des modifications d'abord : l'avant de chaque stade est sa valeur en vigueur, lue dans le lot.
+    const gesture = { workspaceId, actorUserId: ownerUserId, at: updatedAt };
+    const wanted = new Set(input.sensitiveRanks);
+    const journal = (crop ? cropSensitiveStages(crop, references, []) : []).map((stage) => sensitiveStageJournal('stade-sensible', gesture, {
+      cropKey: input.cropKey, cropName: result.cropName, rank: stage.rank, label: stage.label, prefilled: stage.sensitive, sensitive: wanted.has(stage.rank),
+    }));
+    await db.batch([...journal, ...writes]);
+  }
   return { ok: true, value: { cropName: result.cropName, choices: result.choices } };
 }
 

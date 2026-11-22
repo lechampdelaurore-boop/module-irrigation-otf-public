@@ -7990,6 +7990,16 @@ La démonstration « Pic d'été, l'eau manque » le montre : la courgette de
 H02 en floraison, puis les tomates d'A01 et A02, chacune « d'après le
 calendrier ». Ne changent pas : le besoin (3.3), la répartition (3.4) et le
 planning (3.5) ; la priorité reste un choix par semaine ; aucun appel à OTF,
-aucun réglage de Cloudflare. Reste, quand le journal des modifications (n° 7)
-sera sur `main` : y faire entrer le choix d'un stade sensible (famille
-« réglages »).
+aucun réglage de Cloudflare.
+
+**Le journal des modifications** (n° 7, sur `main` depuis le 22 novembre
+2026, D-285 et D-286). Le choix d'un stade sensible y entre, famille
+« réglages », sujet « Stade sensible au manque d'eau » (`stade-sensible`) :
+une ligne par stade dont la valeur en vigueur change, écrite dans le lot du
+geste, avant lui ; l'avant est lu dans la base, le choix de la ferme pour ce
+stade, sinon la liste préremplie, qui en est la valeur de départ ; un choix
+fait pour un autre stade au même rang ne compte pas, comme dans la règle. La
+ligne garde la culture (sa clé, son nom) et le stade (son rang, son nom). La
+liste préremplie, que seule une migration écrit, reste hors du journal,
+comme les autres tables communes (§5.1 du contrat de la n° 7). Un
+enregistrement qui ne change aucune valeur n'écrit rien.

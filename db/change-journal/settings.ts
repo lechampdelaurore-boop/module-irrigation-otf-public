@@ -396,3 +396,43 @@ export function eveningReminderJournal(subject: 'rappel-du-soir', gesture: Journ
     { key: 'time', current: `COALESCE(current.evening_time, ${sqlLiteral(EVENING_REMINDER_DEFAULT_TIME)})`, next: setting.time },
   ], 'defaults');
 }
+
+// --- Les stades sensibles au manque d'eau (amélioration n° 4) ----------------
+
+export type SensitiveStageJournal = {
+  /** La culture de référence, par sa clé commune, que sa version de la ferme garde. */
+  cropKey: string;
+  cropName: string;
+  rank: number;
+  label: string;
+  /** La valeur de la liste préremplie pour ce stade : sa valeur de départ. */
+  prefilled: boolean;
+  /** La valeur que la ferme enregistre. */
+  sensitive: boolean;
+};
+
+/**
+ * Un stade sensible au manque d'eau d'une culture de référence (D-290) : la
+ * valeur en vigueur est le choix de la ferme pour ce stade, sinon la liste
+ * préremplie commune, que seule une migration écrit, et qui en est la valeur
+ * de départ. Un choix fait pour un autre stade au même rang (la table de la
+ * culture a changé depuis) ne compte pas, comme dans la règle. Une ligne par
+ * stade dont la valeur change, rien pour les autres.
+ */
+export function sensitiveStageJournal(subject: 'stade-sensible', gesture: JournalGesture, stage: SensitiveStageJournal): D1PreparedStatement {
+  return journalUpdate(
+    {
+      ...gesture,
+      subject,
+      objectId: stage.cropKey,
+      context: { name: { value: stage.cropName }, stageRank: { value: stage.rank }, stage: { value: stage.label } },
+    },
+    {
+      table: 'irrigation_crop_sensitive_stages',
+      where: 'current.workspace_id = ? AND current.crop_key = ? AND current.stage_rank = ? AND current.stage_label = ?',
+      params: [gesture.workspaceId, stage.cropKey, stage.rank, stage.label],
+    },
+    [{ key: 'sensitive', current: `COALESCE(current.sensitive, ${sqlLiteral(stage.prefilled)})`, next: stage.sensitive }],
+    'defaults',
+  );
+}

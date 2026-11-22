@@ -94,7 +94,9 @@ source détaillée commit par commit.
   deviné d'après le calendrier dit tel ; « Adopter » met la planche en
   priorité haute pour la semaine en cours seulement et recalcule. Rien ne
   change sans ce geste ; aucun calcul du besoin, de la répartition ni du
-  planning ne change. Migration 0045, additive. Parcours P56.
+  planning ne change. Le choix d'un stade sensible entre au journal des
+  modifications, une ligne par stade qui change. Migration 0045, additive.
+  Parcours P56.
 
 ### Ajouté (Améliorations, n° 2, PR 3 sur 7)
 

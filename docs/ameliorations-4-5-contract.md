@@ -44,9 +44,10 @@ La PR 2 s'empile sur la PR 1. Chaque PR : `lint`, `typecheck`, `test`, `build`,
 local sur les parcours touchés, la suite complète par la CI de la PR ;
 registres dans la même PR (AGENTS.md). Fusion **après la file en cours**
 (#164, #165, la n° 7, #157, #158), une à la fois, branches mises à jour par
-fusion de `main`, jamais par rebase. Quand le journal des modifications
-(n° 7) sera sur `main`, la mise à jour de la branche y fait entrer le choix
-d'un stade sensible (famille « réglages ») : son inventaire échoue sinon.
+fusion de `main`, jamais par rebase. Le journal des modifications (n° 7)
+étant sur `main` depuis le 22 novembre 2026, la mise à jour de la branche y
+fait entrer le choix d'un stade sensible (famille « réglages ») : son
+inventaire échouait sinon.
 
 ## 2. Ce qui ne change pas
 
@@ -163,11 +164,14 @@ préremplie dans une table commune que seule une migration écrit (41 lignes,
 28 cultures), les choix de la ferme dans une table d'un espace ; la culture
 désignée par sa clé commune, que la version de la ferme garde ; la ferme
 n'enregistre que ce qui diffère de la liste, et cocher comme elle efface la
-ligne. Migration 0045, après la 0044 de la n° 7, passée avant. F737 : le
-pli « Stades sensibles au manque d'eau », fermé, dans la fiche de chaque culture utilisable, sa ligne
-qui compte les stades sensibles, l'analogie dite, les sources dans un pli,
-« Reprendre la liste préremplie » quand la ferme a un choix ; enregistrer ne
-recalcule rien. F738 : une culture dont l'ET0 du jour manque garde son stade
+ligne. Migration 0045, après la 0044 de la n° 7, passée avant. Chaque stade
+dont la valeur en vigueur change entre au journal des modifications (n° 7),
+une ligne par stade, sujet « Stade sensible au manque d'eau », l'avant lu
+dans la base ; la liste préremplie reste hors du journal. F737 : le
+pli « Stades sensibles au manque d'eau », fermé, dans la fiche de chaque
+culture utilisable, sa ligne qui compte les stades sensibles, l'analogie
+dite, les sources dans un pli, « Reprendre la liste préremplie » quand la
+ferme a un choix ; enregistrer ne recalcule rien. F738 : une culture dont l'ET0 du jour manque garde son stade
 et compte ; un déficit inconnu se lit « Non calculable » avec sa raison ; un
 échec de lecture laisse l'écran sans conseil, jamais en panne. F739 :
 « Adopter » passe par le service, qui relit la répartition, refuse une

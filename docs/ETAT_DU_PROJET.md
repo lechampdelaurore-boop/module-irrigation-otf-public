@@ -990,8 +990,9 @@ registres, elle y renvoie.
   « Pic d'été, l'eau manque » conseille la courgette de H02, puis les
   tomates d'A01 et A02. Migration 0045, additive, après la 0044 du journal
   des modifications : la liste commune et les choix de la ferme (table d'un
-  espace, au plan d'effacement et de rétention) ; un choix de la ferme
-  s'écrit au journal des modifications. Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+  espace, au plan d'effacement et de rétention) ; chaque stade dont la
+  valeur change entre au journal des modifications, une ligne par stade.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test`,
   `pnpm build`, `pnpm knip`, `pnpm push:check`, `pnpm weather:check`,
   `pnpm site:check` réussis en local ; P56 (nouveau), P7, P14, P15, P16,
   P17, P20, P31c, P32, P39, P40 et P52 joués en local aux deux largeurs, et

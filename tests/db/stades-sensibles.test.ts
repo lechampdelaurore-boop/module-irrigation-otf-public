@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach } from 'node:test';
+import { listChangeJournalForUser } from '../../db/change-journal/read';
 import { listReferenceCropsForWorkspace } from '../../db/crop-water/references';
 import { listSensitiveStageChoicesForWorkspace, listSensitiveStageReferences, saveSensitiveStagesForUser } from '../../db/crop-water/sensitive-stages';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../../db/workspace-repository';
@@ -100,6 +101,44 @@ test('un choix inchangé garde sa personne et sa date ; cocher comme la liste y 
   assert.deepEqual(rows(), []);
 });
 
+test('chaque stade dont la valeur change entre au journal des modifications, dans le même lot ; rien quand rien ne change', async () => {
+  // La tomate : la liste préremplie coche les stades 2 et 3.
+  await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [1, 2] }, new Date('2026-07-01T08:00:00.000Z'));
+  await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [1, 2] }, new Date('2026-07-01T09:00:00.000Z'));
+  // « Reprendre la liste préremplie » : les deux stades reviennent à la liste.
+  await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [2, 3] }, new Date('2026-07-02T08:00:00.000Z'));
+  const lines = (await listChangeJournalForUser(ALICE, { limit: 50 })).reverse().map((entry) => ({
+    family: entry.family, subject: entry.subject, objectId: entry.objectId, context: entry.context, action: entry.action,
+    before: entry.before, after: entry.after, actor: entry.actorUserId, at: entry.createdAt,
+  }));
+  const line = (rank: number, label: string, from: number, to: number, at: string) => ({
+    family: 'reglage', subject: 'stade-sensible', objectId: 'criiam-tomate', context: { name: 'Tomate', stageRank: rank, stage: label },
+    action: 'modifie', before: { sensitive: from }, after: { sensitive: to }, actor: ALICE, at,
+  });
+  assert.deepEqual(lines, [
+    line(1, 'Plantation → Reprise', 0, 1, '2026-07-01T08:00:00.000Z'),
+    line(3, 'Floraison 3e bouquet → Mi-récolte', 1, 0, '2026-07-01T08:00:00.000Z'),
+    line(1, 'Plantation → Reprise', 1, 0, '2026-07-02T08:00:00.000Z'),
+    line(3, 'Floraison 3e bouquet → Mi-récolte', 0, 1, '2026-07-02T08:00:00.000Z'),
+  ]);
+  // Une autre ferme ne lit rien du journal de la première.
+  await saveSensitiveStagesForUser(BOB, { cropKey: 'criiam-tomate', sensitiveRanks: [2, 3] });
+  assert.deepEqual(await listChangeJournalForUser(BOB), []);
+});
+
+test('un choix fait pour un autre stade au même rang ne compte pas au journal : l’avant est la liste préremplie', async () => {
+  await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [2] }, new Date('2026-07-01T08:00:00.000Z'));
+  const workspaceId = await findWorkspaceIdForUser(ALICE);
+  // La table de la culture a changé depuis : le choix du stade 3 désigne un nom qui n'est plus le sien.
+  database.sqlite.prepare("UPDATE irrigation_crop_sensitive_stages SET stage_label = 'Ancien stade' WHERE workspace_id = ? AND stage_rank = 3").run(workspaceId);
+  await saveSensitiveStagesForUser(ALICE, { cropKey: 'criiam-tomate', sensitiveRanks: [2] }, new Date('2026-07-02T08:00:00.000Z'));
+  const second = (await listChangeJournalForUser(ALICE, { limit: 50 })).filter((entry) => entry.createdAt === '2026-07-02T08:00:00.000Z');
+  // En vigueur avant : le stade 3 suit la liste (sensible) ; le choix d'« Ancien stade » ne vaut rien.
+  assert.deepEqual(second.map((entry) => [entry.context.stageRank, entry.before, entry.after]), [[3, { sensitive: 1 }, { sensitive: 0 }]]);
+  assert.deepEqual(database.sqlite.prepare('SELECT stage_rank, stage_label, sensitive FROM irrigation_crop_sensitive_stages WHERE workspace_id = ?').all(workspaceId)
+    .map((row) => [row.stage_rank, row.stage_label, row.sensitive]), [[3, 'Floraison 3e bouquet → Mi-récolte', 0]]);
+});
+
 test('la version de la ferme d’une culture commune garde ses stades sensibles, qui la désignent par sa clé', async () => {
   const crops = await listReferenceCropsForWorkspace(await ensureWorkspaceForUser(ALICE));
   const cruciferes = crops.find((stored) => stored.crop.id === 'fao-cruciferes');
@@ -121,4 +160,5 @@ test('un rang absent de la table est refusé, et rien n’est écrit', async () 
     ok: false, problems: ['Poireau : le stade 4 n’existe pas dans sa table.'],
   });
   assert.equal(database.sqlite.prepare('SELECT count(*) AS count FROM irrigation_crop_sensitive_stages').get()?.count, 0);
+  assert.equal(database.sqlite.prepare('SELECT count(*) AS count FROM irrigation_change_journal').get()?.count, 0);
 });

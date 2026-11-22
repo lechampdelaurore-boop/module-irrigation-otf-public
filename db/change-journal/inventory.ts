@@ -41,6 +41,7 @@ export const JOURNAL_TABLES: Readonly<Record<string, readonly ChangeSubject[]>> 
   irrigation_crop_alert_settings: ['alertes-de-culture'],
   irrigation_crop_frost_links: ['seuil-de-gel'],
   irrigation_crop_drying_revisions: ['jours-de-sechage'],
+  irrigation_crop_sensitive_stages: ['stade-sensible'],
   irrigation_feature_selections: ['fonctionnalites'],
   irrigation_phone_notice_settings: ['message-du-matin', 'rappel-du-soir'],
   // Matériel et ressources.
@@ -132,6 +133,7 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   irrigation_background_jobs: COMMON,
   irrigation_operator_notices: COMMON,
   irrigation_crop_alert_common: COMMON,
+  irrigation_crop_sensitive_stage_common: `${COMMON} La liste préremplie des stades sensibles, que seule une migration écrit.`,
   irrigation_support_accesses: COMMON,
   irrigation_cost_readings: COMMON,
   otf_snapshots: OTF,
@@ -191,6 +193,7 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/crop-alerts/inputs.ts › saveCropAlertSettingsForUser › irrigation_crop_alert_settings': branche('alertes-de-culture'),
   'db/crop-alerts/inputs.ts › saveFrostLinkForUser › irrigation_crop_frost_links': branche('seuil-de-gel'),
   'db/crop-alerts/inputs.ts › saveDryingDaysForUser › irrigation_crop_drying_revisions': branche('jours-de-sechage'),
+  'db/crop-water/sensitive-stages.ts › saveSensitiveStagesForUser › irrigation_crop_sensitive_stages': branche('stade-sensible'),
   'db/feature-selection-repository.ts › saveFeatureSelectionForUser › irrigation_feature_selections': branche('fonctionnalites'),
   'db/feature-selection-repository.ts › dismissFeatureBannerForUser › irrigation_feature_selections': sansObjet('Le bandeau des fonctionnalités fermé : ni case cochée ni décochée.'),
   'db/phone-notice-repository.ts › saveMorningMessageForUser › irrigation_phone_notice_settings': branche('message-du-matin'),
