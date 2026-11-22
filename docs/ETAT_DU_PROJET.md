@@ -72,14 +72,20 @@ registres, elle y renvoie.
   largeurs ; **`pnpm e2e` non rejoué en local**, sans rapport : l'application
   ordinaire ne prépare jamais la démonstration ; la suite complète des
   parcours est jouée par la CI de la PR (`pnpm e2e` : 180 réussis,
-  8 sautés comme sur `main` ; `pnpm e2e:demo` : 22 réussis). Fusion après
-  #177. La même PR consigne la mise en ligne des registres de la revue de
-  l'isolation (#175).
+  8 sautés comme sur `main` ; `pnpm e2e:demo` : 22 réussis). Fusionnée le
+  22 novembre 2026 à 14 h 14 (#178), **en ligne à 14 h 38** ; **bloc vu sur
+  la démonstration en ligne** le même jour vers 14 h 45, par l'assistant
+  dans le Chrome du porteur, en lecture seule : « Ferme des Trois Noues »,
+  « Début d'été », S01 et S02 du clos, 6 → 4 mm/h, « Adopter » non cliqué ;
+  à 390 px, rien ne déborde ; le moment remis sur « Pic d'été ». La même PR
+  consigne la mise en ligne des registres de la revue de l'isolation
+  (#175).
 - Outillage, **lot `next` 16.4.6 codé le 22 novembre 2026** (D-296), le
   lot à part rangé par D-292 : `next` et `eslint-config-next` 16.4.3 →
   16.4.6, les sept alertes modérées de `next` fermées, `pnpm audit` ne
   signale plus rien ; aucun code ni aucune configuration ne change.
-  Contrôles et parcours plus bas (outillage). Fusion après #178.
+  Contrôles et parcours plus bas (outillage). Fusionnée le 22 novembre
+  2026 à 14 h 59 (#179), **en ligne à 15 h 21**.
 - **Archive des prévisions J+1 à J+7 : codée le 22 novembre 2026** (D-297,
   `docs/forecast-archive-contract.md`, F748 à F754, migration 0046), en
   Opus 5.5 · Élevé, le réglage de son contrat, sur le « vas-y pour tout » du
@@ -103,7 +109,35 @@ registres, elle y renvoie.
   en ligne à 13 h 56 (run 45022773652) ; #178 (cas d'écart de la
   démonstration) fusionnée à 14 h 14, en ligne à 14 h 38 (run
   45026416442) ; #179 (`next` 16.4.6) fusionnée à 14 h 59, en ligne à
-  15 h 21 (run 45030394463).
+  15 h 21 (run 45030394463). L'archive elle-même : fusionnée le
+  22 novembre 2026 à 15 h 53 (#180), **en ligne à 16 h 25** (run 45035287223 vérifié job par job : les cinq jobs verts, migration 0046 appliquée sur les deux bases).
+- **Icône de l'onglet déclarée le 22 novembre 2026** (D-298), en Opus 5.5 ·
+  Élevé (grille : corrections). Constat du fil du cas d'écart de la
+  démonstration : la page ne déclarait aucune icône ; un navigateur
+  ordinaire demandait alors `/favicon.ico`, absent du site, recevait une
+  erreur 404 et l'écrivait dans sa console (le navigateur sans tête des
+  parcours ne le demande pas, d'où un défaut resté inaperçu).
+  `app/layout.tsx` déclare désormais l'icône du manifeste, `/favicon.svg`,
+  pour l'application et la démonstration ; P0 vérifie qu'elle est déclarée
+  et répond 200 (rouge sans la correction, vert avec). Vérifié en local
+  dans un Chromium complet : avant, la page finit sur une erreur 404 en
+  console ; après, seul `/favicon.svg` est demandé (200), console vide. Le
+  site public (`irrigation-otf-site`) n'a pas d'icône non plus : non
+  touché, idée notée. Sans migration ; rien d'autre ne change à l'écran.
+  Contrôles de la PR : `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 284, isolation
+  3 × 624, jauge du moteur commun 2 284), `pnpm build`, `pnpm knip`,
+  `pnpm push:check`, `pnpm weather:check` et `pnpm site:check` réussis en
+  local ; P0 joué en local aux deux largeurs ; la suite complète des
+  parcours (`pnpm e2e`) jouée en local et par la CI de la PR, sorties dans
+  la PR. Fusion après la mise en ligne de #180. La
+  même PR consigne l'avancement de la recette des n° 2 à 7 : **écart E1
+  constaté corrigé sur la démonstration en ligne** le 22 novembre 2026 vers
+  14 h 50, par l'assistant dans le Chrome du porteur (un changement du lieu
+  de la météo, Nantes → Angers : la ligne du pli fermé passe de 43 à 44
+  sans rechargement, puis 45, les deux cartes en tête, pli ouvert ; lieu
+  remis par « Utiliser la commune du siège OTF ») ; **écart E2 vu en ligne**
+  (ci-dessus). Reste non vérifié : la réception réelle des messages du
+  matin et du soir sur le téléphone.
 - Tranche 4, **contrat validé par le porteur le 15 novembre 2026** (D-142,
   `docs/tranche-4-contract.md`) : préparation, puis 4.8 (site et
   confidentialité, qui débloque le formulaire d'OTF), 4.1 et 4.2, 4.3, 4.4,
@@ -1015,7 +1049,9 @@ registres, elle y renvoie.
   `pnpm site:check` réussis en local ; P55 (étendu), P40, P46, P53, P54,
   P14, P16, P56, P37 et P2 joués en local aux deux largeurs (53 réussis,
   5 sans objet) ; la suite complète des parcours jouée par la CI de la PR.
-  Recette sur le site en ligne : à faire après le déploiement.
+  Recette sur le site en ligne : **faite le 22 novembre 2026 vers 14 h 50**
+  sur la démonstration déployée (#177 en ligne à 13 h 56), conforme (voir
+  « Où on en est », D-298).
 
 - Améliorations, **n° 7, le journal des modifications : PR 8, les
   réglages restants, codée le 21 novembre 2026** (D-289, F725 à F729),

@@ -8620,3 +8620,28 @@ qui migre la base, sur la base réelle par le déploiement),
 `tests/retention-plan.test.ts`, et les plans d'effacement et de conservation
 qui relisent la base migrée. Ne changent pas : la table des prévisions, les
 appels au fournisseur, le besoin, les alertes, l'ET0, aucun écran.
+
+## D-298 — La page déclare l'icône de l'onglet
+
+Date : 22 novembre 2026. Statut : décidé (correction, couverte par le
+« vas-y pour tout » du porteur du 22 novembre 2026 à 10 h 53 ; réglage de
+la grille : Opus 5.5 · Élevé, corrections).
+
+**Contexte.** La page ne déclarait aucune icône : un navigateur ordinaire
+demandait alors `/favicon.ico`, que le site ne sert pas, et recevait une
+erreur 404, écrite dans sa console. Le constat vient du fil du cas d'écart
+de la démonstration (D-295) : un Chromium complet, contrairement au
+navigateur sans tête des parcours, fait cette demande.
+
+**Décision.** `app/layout.tsx` déclare l'icône déjà servie par `public/` et
+nommée par le manifeste, `/favicon.svg` (`image/svg+xml`), par les
+métadonnées de la page, comme le manifeste et l'image de partage ; aucun
+fichier de métadonnées sous `app/` (la règle de
+`tests/app-metadata-files.test.ts` reste vide). Le parcours P0 vérifie que
+l'icône est déclarée et qu'elle répond 200.
+
+**Écarté.** (a) Servir un `/favicon.ico` : un second fichier à tenir pour la
+même image, alors que tout navigateur en service lit une icône SVG
+déclarée. (b) Un fichier `app/icon.svg` lu par le cadre : la route d'image
+qu'il crée est ce qui a déjà produit une 404 le 7 novembre 2026. Le site
+public (`irrigation-otf-site`, un Worker à part) n'est pas traité ici.

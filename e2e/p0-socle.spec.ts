@@ -22,6 +22,9 @@ test('la page d’irrigation se charge avec les données de démonstration', asy
   // Les icônes et le manifeste que la page déclare : le navigateur sans tête ne
   // les demande pas, une ressource manquante y passerait inaperçue ; le parcours
   // les demande lui-même (le 7 novembre 2026, `/irrigation/icon` répondait 404).
+  // L'icône de l'onglet est déclarée : sans elle, un navigateur ordinaire
+  // demande `/favicon.ico`, absent du site, et reçoit 404 (D-298).
+  await expect(page.locator('link[rel="icon"][href="/favicon.svg"][type="image/svg+xml"]')).toHaveCount(1);
   const ressourcesDeclarees = await page
     .locator('link[rel~="icon"], link[rel="manifest"]')
     .evaluateAll((liens) => liens.map((lien) => (lien as HTMLLinkElement).href));

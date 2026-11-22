@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   description:
     "Module de suivi et d'aide à l'irrigation connecté à Ouvre ta ferme.",
   manifest: '/manifest.webmanifest',
+  // L'icône de l'onglet, celle du manifeste : sans elle, le navigateur demande
+  // `/favicon.ico`, absent du site, et reçoit une erreur 404 (constat du
+  // 22 novembre 2026, D-298).
+  icons: { icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }] },
   themeColor: '#0f6849',
   openGraph: {
     title: 'Irrigation · Ouvre ta ferme',
