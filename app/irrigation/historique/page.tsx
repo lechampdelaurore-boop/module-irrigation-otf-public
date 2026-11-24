@@ -6,12 +6,13 @@ import { HistoryViews } from '../history-views';
 import { pageHref } from '@/lib/domain/features/pages';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('historique');
 
 /** La page « Historique et cumuls » (3.8) : cumuls, historique, suivi par série, export CSV. */
-export default async function HistoriquePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function HistoriquePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('historique', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { irrigationHistory } = await loadHistoriquePage(context);
@@ -24,3 +25,5 @@ export default async function HistoriquePage({ searchParams }: { searchParams: I
     </IrrigationShell>
   );
 }
+
+export default renderOncePerRequest(HistoriquePage);

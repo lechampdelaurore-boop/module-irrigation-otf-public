@@ -6,12 +6,13 @@ import { IrrigationNeedsDashboardView } from '../irrigation-needs-dashboard';
 import { WaterManagementDashboard } from '../water-management-dashboard';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('besoins');
 
 /** La page « Objectifs et besoins » (3.8) : objectifs, météo de la semaine, pluie mesurée, tableau des jours, puis les besoins et priorités par planche. */
-export default async function BesoinsPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function BesoinsPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('besoins', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { waterDashboard, irrigationNeeds } = await loadBesoinsPage(context);
@@ -23,3 +24,5 @@ export default async function BesoinsPage({ searchParams }: { searchParams: Irri
     </IrrigationShell>
   );
 }
+
+export default renderOncePerRequest(BesoinsPage);

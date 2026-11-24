@@ -5,12 +5,13 @@ import { UnavailableState } from '../shell/unavailable-state';
 import { ArrosagesPage } from '../pages/arrosages-page';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('arrosages');
 
 /** La page « Arrosages » (3.8) : irriguer maintenant, planifier, saisir un arrosage fait, l'eau du jour et la limite journalière. */
-export default async function ArrosagesRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function ArrosagesRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('arrosages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const data = await loadArrosagesPage(context);
@@ -38,3 +39,5 @@ export default async function ArrosagesRoutePage({ searchParams }: { searchParam
     </IrrigationShell>
   );
 }
+
+export default renderOncePerRequest(ArrosagesRoutePage);

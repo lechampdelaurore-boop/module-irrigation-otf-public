@@ -7,12 +7,13 @@ import { PartUnavailable } from '../shell/part-unavailable';
 import { featurePart, isPartActive } from '@/lib/domain/features/socle';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('alertes-cultures');
 
 /** La page « Alertes cultures » (3.8) : gel selon la culture, arrêt d'arrosage avant récolte, aspersions à reconsidérer, microclimat. */
-export default async function AlertesCulturesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function AlertesCulturesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('alertes-cultures', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { waterDashboard } = await loadWaterDashboardPage(context, true);
@@ -30,3 +31,5 @@ export default async function AlertesCulturesPage({ searchParams }: { searchPara
     </IrrigationShell>
   );
 }
+
+export default renderOncePerRequest(AlertesCulturesPage);

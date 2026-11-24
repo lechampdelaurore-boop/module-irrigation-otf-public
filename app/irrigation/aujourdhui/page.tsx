@@ -5,6 +5,7 @@ import { UnavailableState } from '../shell/unavailable-state';
 import { TodayPage } from '../today/today-page';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('aujourdhui');
@@ -15,7 +16,7 @@ export const metadata = pageMetadata('aujourdhui');
  * module, la réponse à la question du matin, et la zone « Fiabilité du
  * calcul ». Elle ne calcule rien : elle lit le modèle construit côté serveur.
  */
-export default async function AujourdhuiRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function AujourdhuiRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('aujourdhui', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { view } = await loadAujourdhuiPage(context);
@@ -26,3 +27,5 @@ export default async function AujourdhuiRoutePage({ searchParams }: { searchPara
     </IrrigationShell>
   );
 }
+
+export default renderOncePerRequest(AujourdhuiRoutePage);

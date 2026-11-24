@@ -18,6 +18,7 @@ import { PlotShelterSettings } from './plot-shelter-settings';
 import { FarmErasureSettings } from './farm-erasure-settings';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('reglages');
@@ -35,7 +36,7 @@ export const metadata = pageMetadata('reglages');
  * « Supprimer ma ferme et mes données » (4.5, F665), replié, hors
  * démonstration.
  */
-export default async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal } = await loadReglagesPage(context);
@@ -94,3 +95,5 @@ function DemoNotificationSettings() {
     </section>
   );
 }
+
+export default renderOncePerRequest(ReglagesPage);

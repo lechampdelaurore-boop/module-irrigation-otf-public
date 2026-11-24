@@ -58,6 +58,20 @@ contenu de la page est demandé au serveur, sans relancer les scripts.
 - Le clavier et le lecteur d'écran repartent du contenu de la nouvelle page
   (`#contenu`), comme après un chargement, au lieu de rester sur le lien du
   menu. Un clic sur la page déjà ouverte ne déplace rien.
+- **Une page n'est calculée qu'une fois par requête.** Pour une page demandée
+  par le routeur, vinext 1.0.1 appelle d'abord la page pour y chercher une
+  redirection, puis la rend : chaque lecture se faisait deux fois (constat du
+  fil de N3 : 338 lectures de la base pour « Aujourd'hui » par le routeur,
+  contre 174 en chargement complet). Chaque page du module garde, le temps de
+  la requête, ce que son premier appel a rendu (`renderOncePerRequest`, par
+  `cacheForRequest` de vinext) ; hors d'une requête, rien n'est gardé.
+- Mesuré (banc de la section 2, barre du bas, moyenne de deux tours, page
+  utilisable) : sans lecture lente de la base, « Arrosages » 1,66 s → 0,90 s,
+  « Planning » 1,65 s → 0,91 s, « Ressources » 1,71 s → 0,42 s,
+  « Aujourd'hui » 1,49 s → 1,22 s ; à 20 ms la lecture, 2,22 s → 0,95 s,
+  2,05 s → 0,95 s, 1,93 s → 0,97 s et 2,05 s → 1,92 s. Sans la page calculée
+  une fois, « Aujourd'hui » par le menu était plus lent qu'avant (1,92 s et
+  2,96 s) : les deux vont ensemble.
 - Les autres liens (tuiles, jauges, « Actualiser », bandeaux) ne changent pas
   dans cette PR : un geste à la fois.
 - Parcours P59, aux deux largeurs.

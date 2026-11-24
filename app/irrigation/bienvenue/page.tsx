@@ -10,6 +10,7 @@ import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { WelcomeChoice } from './welcome-choice';
 import { WELCOME_TITLE } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: WELCOME_TITLE };
@@ -20,7 +21,7 @@ export const metadata = { title: WELCOME_TITLE };
  * lecture d'Ouvre ta ferme. Une ferme qui a déjà ouvert le module va à sa
  * page d'arrivée ; elle change son choix dans Réglages.
  */
-export default async function BienvenuePage() {
+async function BienvenuePage() {
   let user: AuthenticatedUser;
   try {
     user = await requireAuthenticatedUser();
@@ -41,3 +42,5 @@ export default async function BienvenuePage() {
     demoSelection={isDemoDeployment() ? demoSelectionOfOwner(user.userId) : null}
   />;
 }
+
+export default renderOncePerRequest(BienvenuePage);

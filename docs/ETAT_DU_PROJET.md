@@ -21,8 +21,9 @@ registres, elle y renvoie.
   « Aujourd'hui » contre 173 avant) ; trois freins anciens. N1 : les liens
   du menu passent par le routeur de l'application, sans rien demander
   d'avance ; seule la page voulue est demandée au serveur, sans relancer les
-  scripts ; un menu neuf à chaque page, le clavier repart du contenu
-  (parcours P59). Restent N2, l'ouverture directe de l'application, et N3,
+  scripts ; chaque page n'est calculée qu'une fois par requête (vinext
+  l'appelait deux fois pour une page demandée par le routeur) ; un menu
+  neuf à chaque page, le clavier repart du contenu (parcours P59). Restent N2, l'ouverture directe de l'application, et N3,
   les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
   sur le téléphone réel du porteur reste à faire, sur son accord.
   Contrôles : voir la PR.
