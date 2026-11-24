@@ -392,8 +392,9 @@ test('les blocs suivent leurs cases, dans l’ordre du contrat, et jamais caché
   assert.equal(block(noPlan.blocks, 'reliability').zone.shown[0].text, 'Le plan de la semaine n’a pas été calculé.');
 });
 
-test('la liste fermée des cinq données, et le « ? » qui écrit chaque seuil', () => {
-  assert.deepEqual([...RELIABILITY_KINDS], ['reservoir-volume', 'actual-rain', 'soil', 'species', 'plan']);
+test('la liste fermée des données, et le « ? » qui écrit chaque seuil', () => {
+  // La sixième, l'objectif automatique, n'est suivie que réglage allumé (6 decies, O4, D-319).
+  assert.deepEqual([...RELIABILITY_KINDS], ['reservoir-volume', 'actual-rain', 'automatic-objective', 'soil', 'species', 'plan']);
   const help = reliabilityThresholdsText();
   assert.match(help, /plus de 7 jours/);
   assert.match(help, /7 derniers jours/);

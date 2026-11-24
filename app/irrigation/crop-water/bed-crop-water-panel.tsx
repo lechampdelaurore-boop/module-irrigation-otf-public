@@ -7,7 +7,7 @@ import type { CropWaterDay } from '@/lib/domain/crop-water/etm';
 import type { BedCropWaterSheet } from '@/lib/services/crop-water-bed';
 import type { StageChoice } from '@/lib/services/crop-water-week';
 import { addDaysToDateKey } from '@/lib/domain/water-management';
-import { ADOPTED_OBJECTIVE_HELP } from '@/lib/domain/objective-reading';
+import { ADOPTED_OBJECTIVE_HELP, FOLLOWS_CROP_NEED_TEXT } from '@/lib/domain/objective-reading';
 import { FigureOrigin } from '../shell/figure-origin';
 import { adoptCropWaterProposalAction, declareCropStageAction, loadBedCropWaterAction, type BedCropWaterActionResult } from '../crop-water-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
@@ -184,7 +184,7 @@ function WeekView({ sheet, pending, run, season }: { sheet: AvailableSheet; pend
   return (
     <div className="bed-crop-water-proposal">
       <dl>
-        <div><dt>Objectif adopté</dt><dd>{week.objectiveMm === null ? 'Aucun' : `${mm.format(week.objectiveMm)} mm`}<FigureOrigin text={ADOPTED_OBJECTIVE_HELP} /></dd></div>
+        <div><dt>Objectif adopté</dt><dd>{week.objectiveMm === null ? 'Aucun' : `${mm.format(week.objectiveMm)} mm`}{sheet.objectiveOrigin ? <small> · {sheet.objectiveOrigin}</small> : null}<FigureOrigin text={ADOPTED_OBJECTIVE_HELP} /></dd></div>
         <div><dt>Objectif proposé</dt><dd>{week.proposedMm === null ? 'Non calculable' : `${mm.format(week.proposedMm)} mm`}<FigureOrigin text={proposedObjectiveOrigin(week)} /></dd></div>
         <div>
           <dt>Écart</dt>
@@ -209,7 +209,9 @@ function WeekView({ sheet, pending, run, season }: { sheet: AvailableSheet; pend
           </li>
         ))}
       </ul>
-      {week.adoptable && sheet.weekOpen ? (
+      {week.adoptable && sheet.followsCropNeed ? (
+        <p className="bed-crop-water-muted">{FOLLOWS_CROP_NEED_TEXT}</p>
+      ) : week.adoptable && sheet.weekOpen ? (
         <div className="bed-crop-water-actions">
           <button type="button" disabled={pending} onClick={adopt}>Adopter la proposition</button>
           <small>Elle devient l’objectif de la planche à partir d’aujourd’hui ; l’objectif d’avant reste dans l’historique.</small>

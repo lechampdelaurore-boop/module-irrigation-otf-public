@@ -1,4 +1,11 @@
 import type { BedIrrigationNeed } from './irrigation-needs.ts';
+import type { Bed } from './domain.ts';
+import type { HydricGoal } from './water-management.ts';
+import { automaticObjectiveSchedule, type AutomaticObjectiveSettingRevision, type AutomaticObjectiveWeek } from './automatic-objective.ts';
+import { et0OfDay, type Et0Reading } from './crop-water/etm.ts';
+import { et0NatureLabel } from './crop-water/presentation.ts';
+import { decimalText, mmText } from './figure-origin.ts';
+import { shortDayText } from './today/today-text.ts';
 
 /**
  * L'objectif d'une planche lu de la même façon sur chaque page (audit
@@ -46,4 +53,182 @@ export function feasibilityUnknownReason(unknown: { noObjective: number; noWette
     unknown.noWettedArea > 0 ? `${unknown.noWettedArea} planche${unknown.noWettedArea > 1 ? 's' : ''} sans surface mouillée connue` : null,
   ].filter((part): part is string => part !== null);
   return parts.length === 0 ? null : parts.join(', ');
+}
+
+/*
+ * L'objectif automatique dit à l'écran (6 decies, O4,
+ * docs/objectif-automatique-contract.md, section 5 ; D-319). Affichage seul :
+ * la valeur vient d'`objectiveForBed`, ces fonctions la mettent en mots.
+ * Réglage éteint, ou objectif automatique qui ne s'applique à aucun jour,
+ * elles ne disent rien : l'écran reste celui d'avant.
+ */
+
+/** La phrase du réglage, dans le volet « Objectifs hebdomadaires » (section 5, point 1). */
+export const AUTOMATIC_OBJECTIVE_SETTING_TEXT = 'Sans objectif saisi, l’objectif d’une planche suit chaque matin le besoin de sa culture, ou l’ET0 quand ce besoin n’est pas connu.';
+
+/** Ce que les écrans lisent de l'objectif d'une planche pour en dire l'origine. */
+export type ObjectiveOriginReading = Pick<BedIrrigationNeed, 'objectiveOrigin' | 'automaticObjective'>;
+
+type AutomaticBasis = NonNullable<AutomaticObjectiveWeek['basis']>;
+
+const BASIS_TEXT: Record<AutomaticBasis, string> = {
+  crop: 'd’après le besoin de la culture',
+  et0: 'd’après l’ET0',
+  'sheltered-et0': 'd’après l’ET0 sous abri',
+  mixed: 'd’après la culture et l’ET0',
+};
+
+/**
+ * L'origine de l'objectif de la semaine d'une planche, en quelques mots :
+ * « saisi », « automatique, d’après l’ET0 », « saisi et automatique, d’après
+ * la culture »… (section 5, point 3). `null` quand l'objectif automatique ne
+ * s'applique à aucun jour : l'écran d'avant, sans mot de plus.
+ */
+export function objectiveOriginText(bed: ObjectiveOriginReading): string | null {
+  const automatic = bed.automaticObjective;
+  if (automatic === null) return null;
+  const basis = automatic.basis === null ? '' : `, ${BASIS_TEXT[automatic.basis]}`;
+  if (bed.objectiveOrigin === 'automatic') return `automatique${basis}`;
+  if (bed.objectiveOrigin === 'both') return `saisi et automatique${basis}`;
+  if (bed.objectiveOrigin === 'entered') return 'saisi';
+  // L'objectif automatique s'applique sans aucune valeur : il le dit, jamais un zéro (D-003).
+  if (automatic.noCropWeek) return 'automatique : pas de culture cette semaine';
+  return 'automatique, sans valeur : aucun jour n’est connu';
+}
+
+/**
+ * La bulle de l'objectif automatique d'une planche (section 5, point 3) :
+ * ses jours, sa base, ses millimètres par nature d'ET0 (passé, estimé,
+ * prévu), les jours sans valeur, nommés, et la clôture de la semaine.
+ * `null` quand il ne s'applique à aucun jour.
+ */
+export function automaticObjectiveOriginText(bed: ObjectiveOriginReading): string | null {
+  const automatic = bed.automaticObjective;
+  if (automatic === null) return null;
+  const parts: string[] = [];
+  const applied = automatic.days.length;
+  if (automatic.noCropWeek) {
+    parts.push(`Objectif automatique sur ${dayCount(applied)} : la planche ne porte aucune culture de la semaine, elle n’a pas d’objectif automatique.`);
+  } else if (automatic.mm === null) {
+    parts.push(`Objectif automatique sur ${dayCount(applied)} : aucun n’a de valeur, il ne compte pas.`);
+  } else {
+    const basis = automatic.basis === null ? '' : ` ${BASIS_TEXT[automatic.basis]}`;
+    parts.push(`Objectif automatique sur ${dayCount(applied)} : ${mmText(automatic.mm)}${basis}.`);
+    const shelter = shelterFactorOf(automatic);
+    if (shelter !== null) parts.push(`Sous abri, l’ET0 est multipliée par le K_abri, ${decimalText(shelter)}.`);
+    const natures = (['reanalysis', 'estimated', 'forecast'] as const)
+      .filter((nature) => automatic.byNature[nature] > 0)
+      .map((nature) => `${mmText(automatic.byNature[nature])} sur ${et0NatureLabel(nature)}`);
+    if (natures.length > 0) parts.push(`Dont ${natures.join(', ')}.`);
+  }
+  if (bed.objectiveOrigin === 'both') parts.push('Les autres jours, l’objectif saisi passe avant.');
+  const missing = automatic.days.filter((day) => !('mm' in day));
+  if (missing.length > 0 && !automatic.noCropWeek) {
+    parts.push(`Sans valeur, non comptés : ${missing.map((day) => `${shortDayText(day.date)} (${missingDayReason(day)})`).join(', ')}.`);
+  }
+  if (automatic.closure === 'recorded') parts.push('Semaine close, enregistrée : elle ne bouge plus.');
+  if (automatic.closure === 'provisional') parts.push('Semaine close, provisoire : la tâche du matin l’enregistrera.');
+  if (automatic.closure === 'open') parts.push('Mis à jour chaque matin avec la météo.');
+  return parts.join(' ');
+}
+
+/** Pourquoi un jour de l'objectif automatique n'a pas de valeur, en quelques mots. */
+function missingDayReason(day: AutomaticObjectiveWeek['days'][number]): string {
+  switch (day.status) {
+    case 'missing-et0': return 'ET0 manquante';
+    case 'blocked': return day.problems.join(' ') || 'calcul bloqué';
+    case 'crop-plan-unread': return 'plan de culture non lu';
+    case 'unclassified-plot': return 'jardin à classer';
+    default: return 'sans valeur';
+  }
+}
+
+/** Le K_abri des jours où l'ET0 sous abri a servi ; `null` en plein champ ou sans ce cas. */
+function shelterFactorOf(automatic: AutomaticObjectiveWeek): number | null {
+  for (const day of automatic.days) {
+    if (day.status === 'et0' && day.shelterFactor !== null) return day.shelterFactor;
+  }
+  return null;
+}
+
+function dayCount(count: number): string {
+  return `${count} jour${count > 1 ? 's' : ''}`;
+}
+
+/**
+ * Une planche dont l'objectif automatique est déjà, tous ses jours, le besoin
+ * de la culture n'a plus de proposition à adopter : elle l'applique déjà
+ * (section 5, point 4).
+ */
+export function objectiveFollowsCropNeed(objective: { origin: BedIrrigationNeed['objectiveOrigin']; automatic: AutomaticObjectiveWeek | null }): boolean {
+  return objective.origin === 'automatic' && objective.automatic?.basis === 'crop';
+}
+
+/** La phrase qui remplace « Adopter la proposition » quand l'objectif suit déjà la culture. */
+export const FOLLOWS_CROP_NEED_TEXT = 'L’objectif automatique suit déjà le besoin de la culture : rien à adopter.';
+
+/**
+ * Les planches de la saison qui gardent un objectif saisi cette semaine
+ * (section 5, point 2, cas 5) : un objectif de ferme les couvre toutes ; un
+ * objectif de parcelle, de jardin ou de planche, celles qu'il vise.
+ */
+export function bedsKeepingEnteredGoal(
+  goals: readonly Pick<HydricGoal, 'otfZoneId' | 'otfPlotId' | 'otfBedId'>[],
+  beds: readonly Pick<Bed, 'id' | 'zoneId' | 'plotId' | 'seasons'>[],
+  season: number,
+): number {
+  return beds.filter((bed) => bed.seasons.includes(season) && goals.some((goal) =>
+    (goal.otfZoneId === null || goal.otfZoneId === bed.zoneId)
+    && (goal.otfPlotId === null || goal.otfPlotId === bed.plotId)
+    && (goal.otfBedId === null || goal.otfBedId === bed.id))).length;
+}
+
+/**
+ * L'origine de l'objectif d'un groupe de planches (la ferme, un jardin), pour
+ * « Aujourd'hui » : « automatique, d’après l’ET0 » quand il l'est partout avec
+ * une seule base, « automatique » avec plusieurs bases, « saisi et
+ * automatique » quand les deux se mêlent. `null` quand l'objectif automatique
+ * ne compte pour aucune planche : la phrase d'avant, sans mot de plus.
+ */
+export function groupObjectiveOriginText(beds: readonly ObjectiveOriginReading[], withBasis = true): string | null {
+  const withObjective = beds.filter((bed) => bed.objectiveOrigin !== null);
+  if (!withObjective.some((bed) => bed.objectiveOrigin === 'automatic' || bed.objectiveOrigin === 'both')) return null;
+  if (!withObjective.every((bed) => bed.objectiveOrigin === 'automatic')) return 'saisi et automatique';
+  const bases = new Set(withObjective.map((bed) => bed.automaticObjective?.basis ?? null));
+  if (bases.size !== 1 || !withBasis) return 'automatique';
+  const [basis] = [...bases];
+  return basis === null ? 'automatique' : `automatique, ${BASIS_TEXT[basis]}`;
+}
+
+/**
+ * L'origine de l'objectif d'une période de l'historique : « automatique »
+ * quand l'objectif automatique a rempli toutes les journées-planche
+ * couvertes, « saisi et automatique » quand il en a rempli une partie, avec
+ * leur nombre. `null` quand il n'en a rempli aucune.
+ */
+export function historyObjectiveOriginText(
+  availableBedDays: number,
+  automatic: { bedDays: number } | undefined,
+): string | null {
+  if (!automatic || automatic.bedDays === 0) return null;
+  if (automatic.bedDays >= availableBedDays) return 'Objectif automatique';
+  return `Objectif saisi et automatique : ${automatic.bedDays} journée${automatic.bedDays > 1 ? 's' : ''}-planche automatique${automatic.bedDays > 1 ? 's' : ''} sur ${availableBedDays}`;
+}
+
+/**
+ * Les jours de la semaine où le réglage est allumé et où l'ET0 manque
+ * (section 5, point 5) : l'objectif automatique ne les compte pas. `null`
+ * quand le réglage est éteint aujourd'hui : la ligne de fiabilité n'existe
+ * pas.
+ */
+export function automaticObjectiveMissingEt0Dates(
+  settings: readonly AutomaticObjectiveSettingRevision[],
+  readings: readonly Et0Reading[],
+  weekDates: readonly string[],
+  today: string,
+): string[] | null {
+  const enabledOn = automaticObjectiveSchedule(settings);
+  if (!enabledOn(today)) return null;
+  const byDate = new Map(readings.map((reading) => [reading.date, reading]));
+  return weekDates.filter((date) => enabledOn(date) && et0OfDay(byDate.get(date), date, today) === null);
 }
