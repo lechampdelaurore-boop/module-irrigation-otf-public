@@ -17,6 +17,10 @@ import { completedDraft, createDripFixture } from '../support/irrigation-fixture
 import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { confirmFarmLocation } from '../support/onboarding';
 import { ALICE, BOB } from '../support/spaces';
+import { saveAutomaticObjectiveForUser } from '../../db/automatic-objective-repository';
+import { saveFeatureSelectionForUser } from '../../db/feature-selection-repository';
+import { findWorkspaceIdForUser } from '../../db/workspace-repository';
+import { FOLLOWS_CROP_NEED_TEXT } from '../../lib/domain/objective-reading';
 
 /**
  * La fiche de la planche lue depuis la base (5 quater, PR 3b) : le stade, le
@@ -205,4 +209,30 @@ test('un jardin à classer n’a pas de proposition calculée : ni abri ni plein
   });
   assert.ok((await read('greenhouse')).beds.some((item) => item.bedId === BED));
   assert.equal((await read('unclassified')).beds.some((item) => item.bedId === BED), false);
+});
+
+test('objectif automatique d’après la culture : la fiche dit son origine et ne propose plus d’adopter ; la ferme d’à côté garde son objectif saisi (O4, D-319, F793)', async () => {
+  const before = new Date('2026-05-01T07:00:00.000Z');
+  for (const owner of [ALICE, BOB]) {
+    await saveFeatureSelectionForUser(owner, ['materiel', 'arrosages', 'besoins', 'cultures', 'historique'], before);
+    await prepareFarm(owner);
+  }
+  // ALICE n'a pas d'objectif saisi et allume l'objectif automatique avant la semaine.
+  database.sqlite.prepare('DELETE FROM irrigation_hydric_goal_revisions WHERE workspace_id = ?').run(await findWorkspaceIdForUser(ALICE));
+  await saveAutomaticObjectiveForUser(ALICE, true, before);
+
+  const alice = await sheetFor(ALICE);
+  assert.equal(alice.available, true);
+  if (!alice.available) return;
+  assert.equal(alice.objectiveOrigin, 'automatique, d’après le besoin de la culture');
+  assert.equal(alice.followsCropNeed, true, 'l’objectif suit déjà la culture : rien à adopter');
+  assert.equal(alice.bed.week.objectiveMm?.toFixed(1), alice.bed.week.proposedMm?.toFixed(1), 'l’objectif est la proposition elle-même');
+  assert.match(FOLLOWS_CROP_NEED_TEXT, /rien à adopter/);
+
+  const bob = await sheetFor(BOB);
+  assert.equal(bob.available, true);
+  if (!bob.available) return;
+  assert.equal(bob.objectiveOrigin, null, 'BOB n’a rien allumé : l’écran d’avant');
+  assert.equal(bob.followsCropNeed, false);
+  assert.equal(bob.bed.week.adoptable, true, 'la proposition de BOB reste à adopter');
 });
