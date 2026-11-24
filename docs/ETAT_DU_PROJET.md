@@ -27,7 +27,9 @@ registres, elle y renvoie.
   d'une carte ne touche plus son texte au téléphone ; un nom de jardin des
   jauges se lit en entier à 390 et à 360 px. Affichage seul, aucune
   migration. Parcours P30 étendu par mesures. Contrôles : voir la PR.
-  Reste L6.
+  Reste L6. Mise en ligne de #194 (L3, avec le délai des parcours porté à
+  50 minutes) consignée ici : fusionnée le 24 novembre 2026 à 17 h 17,
+  **en ligne à 17 h 40** (run 45435366050, les cinq jobs verts).
 - **« Aujourd'hui » mène aux menus, L4 : la réponse d'un geste s'écrit
   sous le bouton, codé le 24 novembre 2026** (D-313, F764, F765, roadmap
   section 6 nonies, PR 4 sur 6), en Opus 5.5 · Élevé. « Démarrer
@@ -36,7 +38,10 @@ registres, elle y renvoie.
   l'écran ; une carte démarrée garde sa réponse en passant « En cours » ;
   les deux paragraphes de tête de page disparaissent. Affichage seul, aucune
   migration. Parcours P29, P30 et P38 étendus. Contrôles : voir la PR.
-  Reste L5 et L6.
+  Reste L5 et L6. Mise en ligne de #193 (L2) consignée ici : fusionnée le
+  24 novembre 2026 à 16 h 09, coupée à 35 minutes puis relancée une fois,
+  **en ligne à 17 h 11** (run 45422205205, deuxième tentative, les cinq
+  jobs verts).
 - **« Aujourd'hui » mène aux menus, L3 : les autres liens de la page,
   codé le 24 novembre 2026** (D-312, F761, F762, roadmap section 6 nonies,
   PR 3 sur 6), en Opus 5.5 · Élevé. Un jour en alerte de « Gel ou
