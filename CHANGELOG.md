@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documenté (heures de silence des notifications)
+
+- **Le contrat des heures de silence** (D-320, `docs/heures-de-silence-contract.md`) :
+  une plage de nuit par ferme, éteinte tant que la ferme ne l'allume pas ;
+  la fin d'un arrosage et le gel passent, le reste attend la fin de la plage.
+  Aucun code, aucune ferme ne change.
+
 ### Ajouté (objectif automatique sur l'ET0, O1)
 
 - **La règle de l'objectif automatique** (D-316) : quand une ferme
