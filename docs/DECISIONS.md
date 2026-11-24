@@ -9011,3 +9011,90 @@ serveur dit l'heure seule, la même partout. Contrats :
 
 **Ne change pas.** Les lectures elles-mêmes, les alertes, leur envoi.
 Aucune migration.
+
+## D-308 — Le tableau de bord « Aujourd'hui » mène aux menus : contrat en six PR
+
+Date : 24 novembre 2026. Statut : contrat écrit sans code, à coder ;
+roadmap section 6 nonies. Diagnostic et contrat en Fable 5.2 · Élevé, par
+exception expresse du porteur pour ce seul fil (« exceptionnellement en
+fable élevé ») ; D-055 reste la règle et le code se fait dans un autre fil,
+en Opus 5.5 · Élevé.
+
+**Contexte.** Le porteur constate le 24 novembre 2026 (13 h 24) que les
+tuiles du tableau de bord « Aujourd'hui » ne mènent nulle part, sur
+téléphone comme sur ordinateur, et demande de vérifier la page entière. Le
+diagnostic, fait sur la démonstration locale aux deux largeurs
+(`/mnt/project-files/aujourdhui-liens/diagnostic-aujourdhui-2026-11-24.md`),
+confirme : les quatre tuiles sont inertes alors que leurs cibles existent
+sur « Objectifs et besoins » ; neuf autres endroits de la page sont dans le
+même cas ; la réponse d'un geste s'écrit en tête de page, hors de l'écran
+du téléphone ; l'heure d'une carte chevauche son texte ; des noms de
+jardins sont coupés ; des blocs sont étirés sur ordinateur.
+
+**Décision.** Le contrat `docs/aujourdhui-liens-contract.md` fixe six PR de
+code, une à la fois : L1, les tuiles mènent à leur menu, avec un mot
+d'action écrit sur la tuile ; L2, les jauges mènent à leur page et leurs
+liens d'en-tête restent visibles sur le téléphone ; L3, les autres liens de
+la page ; L4, la réponse d'un geste s'écrit sous le bouton pressé (la règle
+du lot G, F404, étendue à « Aujourd'hui ») ; L5, la mise en page ; L6, sur
+le téléphone, « Votre journée » passe avant les tuiles. Un lien mène, il
+n'enregistre ni ne démarre rien (D-028) ; il n'existe que si la page visée
+est cochée dans la ferme.
+
+**À la main du porteur.** L6 change la précision T5 du contrat de la page,
+validée le 8 novembre 2026, sur le téléphone seulement : option
+recommandée, qu'il peut refuser avant le code de L6.
+
+**Ne change pas.** Aucun calcul, aucune donnée, aucune migration ; l'ordre
+des blocs sur ordinateur ; les pages d'arrivée, sauf une ancre par jardin
+dans le tableau des besoins.
+
+## D-309 — L'objectif automatique : l'objectif de la semaine peut suivre l'ET0, si la ferme l'allume
+
+Date : 24 novembre 2026. Statut : **choix du porteur consignés, contrat
+écrit sans code ; aucun code avant sa réponse à la question 5** ; roadmap
+section 6 decies. Contrat en Fable 5.2 · Élevé, par exception expresse du
+porteur pour ce seul fil ; code dans un autre fil, en Opus.
+
+**Contexte.** Le porteur demande le 24 novembre 2026 (13 h 25) « un bouton
+pour que on puisse, par défaut, régler les objectifs de la semaine sur
+l'ET0. Et qu'on le modifie si besoin ». L'ET0 est une information depuis
+D-010 ; le besoin par culture est un objectif proposé, adopté par un geste,
+depuis D-045 ; le mode automatique a été écarté le 31 octobre 2026, à
+reconsidérer « après une saison de comparaison, par une décision nouvelle »
+(D-054).
+
+**Décision du porteur**, sur quatre cartes de décision le 24 novembre 2026 :
+
+1. l'objectif **suit l'ET0 tout seul**, contre la recommandation de
+   l'assistant, qui proposait un bouton de préremplissage validé à la main
+   (13 h 30) ;
+2. il est **mis à jour chaque matin** (13 h 32) ;
+3. sous abri, c'est **l'ET0 multipliée par le K_abri de l'abri** (13 h 33) ;
+4. quand le **besoin de la culture** (ETM) est connu pour une planche,
+   c'est lui qui sert ; sinon l'ET0 (13 h 35).
+
+**Garde-fous posés par l'assistant**, annoncés au porteur : le réglage est
+par ferme et **éteint tant que la ferme ne l'allume pas** (D-028) ; **un
+objectif saisi, à n'importe quel niveau, passe toujours avant** ; un jour
+sans ET0 n'est jamais compté pour zéro en silence (D-003) ; une semaine
+close ne bouge plus (D-006, D-039). Contrat :
+`docs/objectif-automatique-contract.md`, quatre PR de code, O1 à O4.
+
+**Ce que cela change.** D-010 et D-045 gagnent une exception : réglage
+allumé, l'objectif d'une planche sans objectif saisi est la somme des ETM
+ou des ET0 de ses jours. L'ET0 n'entre que par l'objectif : l'écart reste
+« objectif − (irrigation réelle + pluie réelle) », sans bilan hydrique.
+`AGENTS.md` et les contrats qui portent D-010 et D-045 sont corrigés par la
+PR O1, avec le code : d'ici là, ils disent vrai du code.
+
+**Contradiction signalée.** Cette décision revient sur D-054 avant la
+saison de comparaison qu'elle demandait. L'assistant l'a signalée au
+porteur le jour même (question 5, 13 h 43 : maintenir, attendre une saison,
+ou un bouton de préremplissage seul). **Aucun code de l'objectif
+automatique avant sa réponse** ; elle sera consignée ici.
+
+**Ne change pas.** Réglage éteint, rien ne change, pour aucune ferme. Le
+calcul de l'ETM, la pluie comptée, la pénurie, les priorités, la
+faisabilité, la règle du planning, la réserve du sol (information, D-041,
+D-047).
