@@ -132,8 +132,10 @@ la PR 3 de ce contrat et reprise par le lot 3.
   on décoche ce qui n'a pas été fait ; le bouton dit le nombre exact
   (« Enregistrer 21 irrigations ») ; « Annuler » ferme sans rien écrire. La
   confirmation rappelle pourquoi les irrigations à venir n'y sont pas.
-- **Après** : un message « n irrigations enregistrées comme faites », la page
-  se relit, la pastille du menu baisse. L'historique dit chacune
+- **Après** : un message « n irrigations enregistrées comme faites », sous
+  le bouton, en tête de « Votre journée » (`docs/aujourdhui-liens-contract.md`,
+  L4, D-313 ; sous sa carte pour « Fait comme prévu ») ; la page se relit,
+  la pastille du menu baisse. L'historique dit chacune
   « Planifiée, faite comme prévu ». Une irrigation enregistrée **ne se
   modifie plus** (D-006, T16) : la confirmation le dit en gras, et c'est
   pourquoi chaque ligne s'y décoche.

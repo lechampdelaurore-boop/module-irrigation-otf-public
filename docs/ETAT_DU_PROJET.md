@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **« Aujourd'hui » mène aux menus, L4 : la réponse d'un geste s'écrit
+  sous le bouton, codé le 24 novembre 2026** (D-313, F763, F764, roadmap
+  section 6 nonies, PR 4 sur 6), en Opus 5.5 · Élevé. « Démarrer
+  maintenant », « Reprendre le reliquat », « Fait comme prévu », « Tout est
+  fait » et les deux « Recalculer » répondent sous leur bouton, dans
+  l'écran ; une carte démarrée garde sa réponse en passant « En cours » ;
+  les deux paragraphes de tête de page disparaissent. Affichage seul, aucune
+  migration. Parcours P29, P30 et P38 étendus. Contrôles : voir la PR.
+  Reste L5 et L6.
 - **« Aujourd'hui » mène aux menus, L3 : les autres liens de la page,
   codé le 24 novembre 2026** (D-312, F761, F762, roadmap section 6 nonies,
   PR 3 sur 6), en Opus 5.5 · Élevé. Un jour en alerte de « Gel ou

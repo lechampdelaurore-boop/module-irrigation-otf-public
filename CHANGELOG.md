@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (« Aujourd'hui » mène aux menus, L4)
+
+- **Sur « Aujourd'hui », la réponse s'écrit sous le bouton** (D-313) :
+  « L’irrigation a démarré. », « Plan calculé. » ou un refus se lisent
+  sous le bouton pressé, dans l'écran, et non plus en haut de la page ; une
+  irrigation démarrée garde sa réponse en passant « En cours ».
+
 ### Ajouté (« Aujourd'hui » mène aux menus, L3)
 
 - **Les autres liens de « Aujourd'hui »** (D-312) : un jour de gel ou
