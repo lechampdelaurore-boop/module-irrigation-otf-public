@@ -60,8 +60,8 @@ test('la copie figée du moteur commun : la version du manifeste est celle du mo
   assert.match(readFileSync(new URL('NOTICE', ENGINE_FOLDER), 'utf8'), /^Required Notice: /m);
 });
 
-test('l’interrupteur : l’ancien calcul en ligne, le moteur commun au second passage des tests', () => {
-  assert.equal(GAUGE_ENGINE, process.env.JAUGE_MOTEUR_ATTENDU ?? 'module');
+test('l’interrupteur : le moteur commun en ligne, l’ancien calcul au second passage des tests', () => {
+  assert.equal(GAUGE_ENGINE, process.env.JAUGE_MOTEUR_ATTENDU ?? 'commun');
   assert.equal(otherGaugeEngine('module'), 'commun');
   assert.equal(otherGaugeEngine('commun'), 'module');
 });

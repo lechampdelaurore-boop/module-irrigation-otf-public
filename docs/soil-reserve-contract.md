@@ -424,7 +424,13 @@ Depuis le 20 novembre 2026 (D-270), le bilan à un compartiment peut aussi
 être calculé par le moteur hydrique commun, derrière un interrupteur, sans
 qu'aucune règle de cette section ne change : ce qui passe par le moteur, ce
 qui reste au module et la preuve d'égalité sont dans
-`docs/shared-engine-adapter-contract.md`.
+`docs/shared-engine-adapter-contract.md`. **Depuis le 24 novembre 2026
+(D-301), la jauge est calculée par le moteur commun** ; l'ancien calcul reste
+derrière l'interrupteur jusqu'à son retrait. Seules deux données impossibles,
+qui n'arrivent que par une faute de saisie ou de météo, y rendent la jauge
+inconnue au lieu d'un chiffre faux : une RFU de 0 mm/m (« aucune RFU
+saisie ») et une ET0 négative ou illisible sous un couvert (« ET0
+manquante »).
 
 ### Par planche cultivée
 
