@@ -85,3 +85,56 @@ tâche du registre (`task:evening-reminder`, orange à 3 heures, rouge à 6).
   jour en base).
 - L’endpoint manuel `POST /run-evening`, protégé par le même secret, relance
   le passage pour la recette et le diagnostic.
+
+## La relecture de la journée (depuis le 24 novembre 2026, C1, D-303)
+
+Constat du 24 novembre 2026 : une alerte de gel n'est arrivée sur le
+téléphone du porteur qu'à la réouverture du module. Les alertes météo et de
+gel ne s'évaluaient qu'à la lecture de 06 h 15 et à l'ouverture du module
+(lecture de plus de 3 heures) : un gel apparu dans les prévisions après
+06 h 15 n'alertait que si quelqu'un ouvrait le module, derrière Cloudflare
+Access.
+
+Un quatrième déclencheur, `30 7,8,10,11,13,14,16,17,19,20 * * *`, appelle
+`POST /api/internal/weather-intraday` à **9 h 30, 12 h 30, 15 h 30, 18 h 30 et
+21 h 30, heure de Paris**, par la même liaison de service et avec le même
+secret partagé : aucun secret nouveau. Les dix créneaux UTC couvrent l'hiver
+et l'été ; le Worker n'exécute que celui qui tombe à la bonne heure de Paris.
+
+- **Qui est relu.** Seules les fermes qui lisent la météo (comme le matin) et
+  ont au moins une alerte qui lit les prévisions : un critère d'alerte météo
+  actif avec la case « Alertes météo », ou le gel ou les aspersions actifs
+  avec la case « Alertes cultures » (les aspersions demandent aussi le
+  Planning). Une ferme sans alerte active n'appelle pas le fournisseur. La
+  règle vit dans `lib/domain/weather/intraday-alerts.ts`.
+- **Ce qui est lu.** Les prévisions seules, d'aujourd'hui à J+6 (7 jours : le
+  plus long horizon d'une alerte météo comme du gel), un appel par lieu
+  partagé, comme le matin ; jamais la réanalyse, qui reste au matin. Rien
+  n'est archivé : l'archive des prévisions garde la première lecture du jour
+  (D-297).
+- **Ce qui suit.** Après chaque écriture, les alertes météo puis par culture
+  (gel, aspersions) s'évaluent exactement comme après la lecture du matin ;
+  la règle de répétition de chacune (critère ou culture, version, jour visé)
+  empêche tout second envoi d'une même alerte. Le séchage ne lit pas les
+  prévisions : il reste au matin.
+- **Ce qui est noté.** La dernière lecture de la ferme (celle qui évite une
+  relecture à l'ouverture du module) et, en cas de refus du fournisseur,
+  l'attente qu'il demande, partagée avec le bouton « Actualiser la météo ».
+  L'état de la mise à jour automatique du matin, qui lit aussi la réanalyse
+  (D-165), n'est pas touché. Un verrou D1 propre (`intraday-weather-sync`)
+  rend la relecture idempotente sans gêner le matin.
+- **Coût** (chiffré le 24 novembre 2026) : 5 lectures de prévisions de plus
+  par jour et par lieu relu. Visual Crossing compte une lecture de prévisions
+  pour un enregistrement, quel que soit le nombre de jours : 5 sur les 1 000
+  enregistrements gratuits par jour. Sans clé Visual Crossing, Open-Meteo :
+  5 appels sur les 10 000 gratuits par jour. Aucun service payant nouveau.
+- **Surveillance.** Le passage est une tâche du registre
+  (`task:weather-intraday`) : réussi quand chaque lieu relu a reçu ses
+  prévisions, ou qu'aucune ferme n'avait d'alerte active ; orange à 16 heures
+  (deux passages de suite manqués, la nuit en dure douze), rouge à 27 heures
+  (une journée entière manquée), ou à trois échecs de suite.
+- Le planificateur lui laisse 60 secondes ; ses lignes de journal portent le
+  préfixe `weather_intraday_scheduler`. La route répond 200 dès que le
+  passage a tourné, même manqué, comme la veille et le rappel du soir.
+- L'endpoint manuel `POST /run-intraday`, protégé par le même secret, relance
+  le passage pour la recette et le diagnostic.

@@ -36,6 +36,31 @@ registres, elle y renvoie.
   (D-301) consignée ici : fusionnée le 24 novembre 2026 à 9 h 47, **en
   ligne à 10 h 17** (run 45359207603 vérifié job par job : les cinq jobs
   verts).
+- **Alertes sur le téléphone : les prévisions relues dans la journée,
+  codé le 24 novembre 2026** (C1, D-303, roadmap section 6 octies), en
+  Opus 5.5 · Élevé, sur la délégation du porteur du jour (9 h 36). Son
+  constat : une alerte de gel arrivée seulement à la réouverture du module,
+  après une session Access expirée sur son téléphone. La livraison ne
+  dépend pas d'Access ; les alertes météo et de gel, elles, ne s'évaluaient
+  qu'à 6 h 15 et à l'ouverture du module. Désormais, à 9 h 30, 12 h 30,
+  15 h 30, 18 h 30 et 21 h 30, le planificateur relit 7 jours de
+  prévisions des seules fermes qui ont une alerte active et évalue leurs
+  alertes (déclencheur `30 7,8,10,11,13,14,16,17,19,20 * * *`, route
+  `/api/internal/weather-intraday`, tâche du registre `weather-intraday`,
+  orange à 16 heures, rouge à 27). Coût chiffré : gratuit (5 lectures de
+  plus par jour et par lieu ; Visual Crossing compte une lecture de
+  prévisions pour un enregistrement, 5 sur 1 000 par jour ; Open-Meteo,
+  5 appels sur 10 000). Aucune migration, aucun écran changé. Tests à deux
+  fermes (`tests/db/weather-intraday-alerts.test.ts`) : un gel apparu à
+  midi alerte à 12 h 30 une seule fois, la ferme sans alerte n'appelle pas
+  le fournisseur, un refus 429 est compté sans lever. Contrôles du
+  24 novembre 2026 : voir la PR (`pnpm lint`, `pnpm typecheck`,
+  `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
+  `pnpm weather:check`, `pnpm site:check` réussis en local) ; parcours P50
+  (page d'état, la tâche nouvelle s'ajoutant à la liste) rejoué aux deux
+  largeurs ; les autres parcours, joués par la CI. Restent C2 à C5 (section 6 octies) ; la cause du retard du
+  24 novembre reste à confirmer par l'heure d'envoi de l'alerte dans
+  « Alertes cultures ».
 - **La jauge passe au moteur commun le 24 novembre 2026** (fusion des
   moteurs, étape 3, PR 2 ; D-301, D-270), en Opus 5.5 · Max (MC-26) :
   l'interrupteur `GAUGE_ENGINE` passe sur `commun` après trois matins sans

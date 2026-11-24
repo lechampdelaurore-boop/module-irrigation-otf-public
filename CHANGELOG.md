@@ -18,6 +18,20 @@ source détaillée commit par commit.
   quatre carrés bleus dans l'onglet et les favoris, devient l'icône de
   l'application installée et de l'écran d'accueil de l'iPhone, s'affiche
   sur la notification de fin d'irrigation et sur le site public.
+
+### Corrigé (alertes sur le téléphone, C1)
+
+- **Les prévisions sont relues dans la journée pour les alertes** (D-303,
+  section 6 octies de la roadmap) : à 9 h 30, 12 h 30, 15 h 30, 18 h 30 et
+  21 h 30, heure de Paris, le planificateur relit 7 jours de prévisions des
+  seules fermes qui ont une alerte active, puis évalue leurs alertes météo,
+  de gel et d'aspersion, sans que personne ouvre le module. Avant, un gel
+  apparu dans les prévisions après 6 h 15 n'alertait qu'à l'ouverture du
+  module (constat du porteur, 24 novembre 2026). Une même alerte ne part
+  jamais deux fois. Coût : 5 lectures de prévisions de plus par jour et par
+  lieu, dans les offres gratuites de Visual Crossing (5 enregistrements sur
+  1 000) et d'Open-Meteo (5 appels sur 10 000). Nouvelle tâche du registre
+  `weather-intraday`, surveillée par la veille. Aucune migration.
 - En ligne le 24 novembre 2026 : #184 à 10 h 17 (run 45359207603, cinq jobs
   verts).
 

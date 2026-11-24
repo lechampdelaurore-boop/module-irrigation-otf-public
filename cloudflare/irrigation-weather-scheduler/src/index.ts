@@ -1,5 +1,6 @@
 import {
   EVENING_REMINDER_TIMEOUT_MS,
+  INTRADAY_WEATHER_TIMEOUT_MS,
   OPERATOR_WATCH_TIMEOUT_MS,
   SITE_SYNC_TIMEOUT_MS,
   scheduledJob,
@@ -20,6 +21,7 @@ const SITE_ROUTES: Record<ScheduledJob, { path: string; timeoutMs: number; event
   weather: { path: '/api/internal/weather-sync', timeoutMs: SITE_SYNC_TIMEOUT_MS, event: 'weather_scheduler' },
   'operator-watch': { path: '/api/internal/operator-watch', timeoutMs: OPERATOR_WATCH_TIMEOUT_MS, event: 'operator_watch_scheduler' },
   'evening-reminder': { path: '/api/internal/evening-reminder', timeoutMs: EVENING_REMINDER_TIMEOUT_MS, event: 'evening_reminder_scheduler' },
+  'weather-intraday': { path: '/api/internal/weather-intraday', timeoutMs: INTRADAY_WEATHER_TIMEOUT_MS, event: 'weather_intraday_scheduler' },
 };
 
 /** Les relances à la main, par le jeton de service : une adresse par tâche. */
@@ -27,12 +29,14 @@ const MANUAL_PATHS: Record<string, ScheduledJob> = {
   '/run': 'weather',
   '/run-watch': 'operator-watch',
   '/run-evening': 'evening-reminder',
+  '/run-intraday': 'weather-intraday',
 };
 
 const FAILURE_BODIES: Record<ScheduledJob, string> = {
   weather: 'Weather synchronization failed',
   'operator-watch': 'Operator watch failed',
   'evening-reminder': 'Evening reminder failed',
+  'weather-intraday': 'Intraday weather reading failed',
 };
 
 export default {

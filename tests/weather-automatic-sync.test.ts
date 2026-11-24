@@ -17,6 +17,8 @@ import {
   type WeatherReadInput,
 } from '../lib/domain/weather/weather-provider.ts';
 import { verifyWeatherSyncToken } from '../lib/services/weather/internal-auth.ts';
+import { INTRADAY_FORECAST_DAYS, intradayWeatherRequestRanges, readsForecastAlerts } from '../lib/domain/weather/intraday-alerts.ts';
+import { intradayWeatherOutcome } from '../lib/domain/operations/morning-task-outcomes.ts';
 
 const target = (workspaceId: string, overrides: Partial<AutomaticWeatherTarget> = {}): AutomaticWeatherTarget => ({
   workspaceId,
@@ -238,6 +240,87 @@ test('archive des prévisions (D-297) : son échec ne fait échouer ni la synchr
   assert.equal(repository.recorded[0].successful, true);
   assert.equal(repository.finished[0].successful, true);
   assert.deepEqual(lines.filter((line) => line.event === 'weather_forecast_archive_failed').map((line) => Object.keys(line).sort()), [['event', 'failedAt', 'service', 'status']]);
+});
+
+test('C1 (D-303) : la relecture de la journée lit 7 jours de prévisions, jamais la réanalyse, pour les seules fermes retenues, sans archiver', async () => {
+  const repository = new FakeRepository([target('a'), target('b', { locationKey: 'ailleurs', latitude: 45 }), target('c')]);
+  const provider = new FakeProvider();
+  const written: string[] = [];
+  const result = await runAutomaticWeatherSync({
+    repository,
+    provider,
+    now: new Date('2026-11-24T11:30:00Z'),
+    mode: 'intraday',
+    includeTarget: async (candidate) => candidate.workspaceId !== 'b',
+    onForecastWritten: async (input) => { written.push(input.workspaceId); },
+    retry: { sleep: async () => undefined },
+    log: () => undefined,
+  });
+  assert.equal(INTRADAY_FORECAST_DAYS, 7, 'le plus long horizon des alertes météo et du gel');
+  assert.deepEqual(provider.forecastCalls.map((call) => [call.startDate, call.endDate]), [['2026-11-24', '2026-11-30']], 'un appel pour le lieu partagé par a et c ; b, sans alerte, n’est pas relue');
+  assert.equal(provider.reanalysisCalls.length, 0, 'la réanalyse reste au matin');
+  assert.deepEqual(repository.archived, [], 'l’archive garde la lecture du matin (D-297)');
+  assert.deepEqual(written, ['a', 'c'], 'les alertes s’évaluent après l’écriture, ferme par ferme');
+  assert.deepEqual([result.targets, result.locations, result.forecastRequests, result.reanalysisRequests], [2, 1, 1, 0]);
+  assert.deepEqual(intradayWeatherRequestRanges({ today: '2026-11-24' }), { forecast: { startDate: '2026-11-24', endDate: '2026-11-30' }, reanalysis: null });
+});
+
+test('C1 (D-303) : un filtre qui échoue écarte la ferme de ce passage sans arrêter les autres ; aucune ferme retenue, aucun appel', async () => {
+  const provider = new FakeProvider();
+  const result = await runAutomaticWeatherSync({
+    repository: new FakeRepository([target('a'), target('b', { locationKey: 'ailleurs' })]),
+    provider,
+    now: new Date('2026-11-24T11:30:00Z'),
+    mode: 'intraday',
+    includeTarget: async (candidate) => {
+      if (candidate.workspaceId === 'a') throw new Error('D1_ERROR');
+      return true;
+    },
+    retry: { sleep: async () => undefined },
+    log: () => undefined,
+  });
+  assert.equal(result.targets, 1);
+  assert.equal(provider.forecastCalls.length, 1);
+
+  const idle = new FakeProvider();
+  const none = await runAutomaticWeatherSync({
+    repository: new FakeRepository([target('a')]), provider: idle, now: new Date('2026-11-24T11:30:00Z'),
+    mode: 'intraday', includeTarget: async () => false, log: () => undefined,
+  });
+  assert.equal(idle.forecastCalls.length + idle.reanalysisCalls.length, 0, 'une ferme sans alerte active n’appelle pas le fournisseur');
+  assert.deepEqual(intradayWeatherOutcome({ weather: none }), [{ task: 'weather-intraday', successful: true, error: null }], 'rien à relire : le passage est réussi');
+});
+
+test('C1 (D-303) : un refus du fournisseur (429) est compté, sans message, et la relecture ne lève pas', async () => {
+  const provider = new FakeProvider();
+  provider.readForecast = async () => {
+    throw new WeatherProviderError('Too many requests https://weather.visualcrossing.com/?key=secret', { kind: 'rate-limit', status: 429, endpoint: 'forecast' });
+  };
+  const repository = new FakeRepository([target('a')]);
+  const result = await runAutomaticWeatherSync({
+    repository, provider, now: new Date('2026-11-24T11:30:00Z'), mode: 'intraday', includeTarget: async () => true,
+    retry: { sleep: async () => undefined }, log: () => undefined,
+  });
+  assert.deepEqual(result.forecastFailures, ['rate-limit']);
+  const [outcome] = intradayWeatherOutcome({ weather: result });
+  assert.equal(outcome.successful, false);
+  assert.equal(outcome.error, '1 lieu sur 1 sans prévisions (limite du fournisseur)');
+  assert.ok(!/secret|http/.test(outcome.error ?? ''), 'jamais l’adresse ni la clé');
+  assert.equal(repository.recorded[0].successful, false, 'la ferme garde sa dernière lecture réussie');
+  assert.deepEqual(intradayWeatherOutcome({ weather: { ...result, status: 'already-running' } }), [], 'une relecture déjà en cours parle pour elle');
+  assert.deepEqual(intradayWeatherOutcome({ interruptedBy: 'TypeError' }), [{ task: 'weather-intraday', successful: false, error: 'interrompu avant la fin (erreur TypeError)' }]);
+});
+
+test('C1 (D-303) : une ferme est relue dans la journée seulement si une de ses alertes lit les prévisions', () => {
+  const crop = { frostActive: false, sprinklerActive: false };
+  assert.equal(readsForecastAlerts({ enabled: ['alertes-meteo'], activeWeatherCriteria: 1, cropAlerts: null }), true, 'un critère météo actif');
+  assert.equal(readsForecastAlerts({ enabled: ['alertes-meteo'], activeWeatherCriteria: 0, cropAlerts: null }), false, 'aucun critère actif');
+  assert.equal(readsForecastAlerts({ enabled: ['arrosages'], activeWeatherCriteria: 2, cropAlerts: null }), false, 'case « Alertes météo » décochée');
+  assert.equal(readsForecastAlerts({ enabled: ['alertes-cultures'], activeWeatherCriteria: 0, cropAlerts: { ...crop, frostActive: true } }), true, 'le gel actif');
+  assert.equal(readsForecastAlerts({ enabled: ['arrosages'], activeWeatherCriteria: 0, cropAlerts: { ...crop, frostActive: true } }), false, 'case « Alertes cultures » décochée');
+  assert.equal(readsForecastAlerts({ enabled: ['alertes-cultures'], activeWeatherCriteria: 0, cropAlerts: { ...crop, sprinklerActive: true } }), false, 'les aspersions demandent aussi le Planning');
+  assert.equal(readsForecastAlerts({ enabled: ['alertes-cultures', 'planning'], activeWeatherCriteria: 0, cropAlerts: { ...crop, sprinklerActive: true } }), true, 'aspersions avec le Planning');
+  assert.equal(readsForecastAlerts({ enabled: ['alertes-cultures'], activeWeatherCriteria: 0, cropAlerts: crop }), false, 'séchage seul : il reste au matin');
 });
 
 test('la route interne refuse un secret absent ou différent', async () => {

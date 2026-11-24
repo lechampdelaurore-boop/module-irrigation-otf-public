@@ -96,8 +96,11 @@ décidera à part (question 2).
 ## L'évaluation
 
 - Elle a lieu **après chaque écriture réussie de prévisions** pour
-  l'exploitation : la synchronisation de 06 h 15 et toute actualisation
-  (bouton, consultation de la semaine courante).
+  l'exploitation : la synchronisation de 06 h 15, la relecture de la journée
+  à 9 h 30, 12 h 30, 15 h 30, 18 h 30 et 21 h 30 pour les fermes qui ont une
+  alerte active (depuis le 24 novembre 2026, C1, D-303,
+  `docs/weather-scheduler-contract.md`), et toute actualisation (bouton,
+  consultation de la semaine courante).
 - Elle porte sur la **prévision la plus récente** de chaque jour de l'horizon,
   aujourd'hui compris, jour civil de Paris (D-004).
 - « En dessous de 5 °C » veut dire **strictement inférieur** à 5 ; « au-dessus

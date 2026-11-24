@@ -185,3 +185,19 @@ test('un 6 h 15 manqué se voit à 9 h le matin même ; réussi, il reste vert j
   // Le dimanche du passage à l'heure d'hiver dure 25 heures : la réussite du samedi suffit encore le dimanche avant 6 h 15.
   assert.equal(taskState(forecast, run({ lastSuccessAt: '2026-10-24T04:16:00.000Z' }), new Date('2026-10-25T05:14:00.000Z')).kind, 'ok');
 });
+
+test('C1 (D-303) : la relecture des prévisions de la journée a son déclencheur et sa tâche, orange à 16 heures et rouge à 27', () => {
+  assert.deepEqual(tasksOfTrigger('weather-intraday'), ['weather-intraday']);
+  const intraday = TASK_TRIGGERS.find((trigger) => trigger.key === 'weather-intraday')!;
+  assert.equal(intraday.cron, '30 7,8,10,11,13,14,16,17,19,20 * * *', '9 h 30 à 21 h 30 à Paris, toutes les trois heures, hiver et été');
+  assert.equal(intraday.config, 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc', 'le même planificateur, sans service nouveau');
+  assert.ok(intraday.monitored, 'surveillé par la veille');
+  const declaration = taskDeclaration('weather-intraday');
+  assert.equal(declaration.lateAfterHours, 16, 'plus que les douze heures de la nuit, entre 21 h 30 et 9 h 30');
+  assert.equal(declaration.brokenAfterHours, 27);
+  const lastEvening = new Date('2026-11-23T20:30:00Z');
+  const run = (at: Date): TaskRunRecord => ({ ...EMPTY_TASK_RUN, lastSuccessAt: at.toISOString(), lastAttemptAt: at.toISOString() });
+  assert.equal(taskState(declaration, run(lastEvening), new Date('2026-11-24T08:00:00Z')).kind, 'ok', 'la veille de 9 h ne voit rien après une nuit normale');
+  assert.equal(taskState(declaration, run(lastEvening), new Date('2026-11-24T12:31:00Z')).kind, 'late', '9 h 30 et 12 h 30 manqués');
+  assert.equal(taskState(declaration, run(lastEvening), new Date('2026-11-25T00:00:00Z')).kind, 'broken', 'une journée entière manquée');
+});
