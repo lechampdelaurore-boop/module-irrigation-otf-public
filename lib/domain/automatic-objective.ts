@@ -194,7 +194,7 @@ export type AutomaticObjectiveDayValues = ReadonlyMap<string, ReadonlyMap<string
  * du lundi au dimanche : la même découpe pour toutes les planches de la
  * ferme, faite une fois (mesure de coût de la PR O2, D-317).
  */
-export type AutomaticObjectivePeriod = readonly { weekDates: readonly string[]; days: readonly string[] }[];
+type AutomaticObjectivePeriod = readonly { weekDates: readonly string[]; days: readonly string[] }[];
 
 export function automaticObjectivePeriod(
   settings: readonly AutomaticObjectiveSettingRevision[],

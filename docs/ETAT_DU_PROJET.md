@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Objectif automatique sur l'ET0, O2 : le réglage par ferme et ses
+  lecteurs, codé le 24 novembre 2026** (D-317, F774 à F781, roadmap
+  section 6 decies, PR 2 sur 4), en Opus 5.5 · Max, le réglage de la
+  roadmap. Le réglage est gardé par ferme, geste par geste (migration
+  0047), écrit au journal des modifications ; un geste sans changement
+  n'écrit rien ; il rend la faisabilité à refaire. Chaque lecteur de
+  l'objectif reçoit la source automatique, lue une fois : le besoin, et
+  par lui le planning, la faisabilité et « Aujourd'hui » ; l'aide du
+  formulaire d'irrigation ; les fiches d'une planche et d'une série ;
+  l'écart entre prévu et réel ; l'historique et les séries, qui comptent à
+  part un jour sans valeur automatique, jamais pour zéro. Aucun écran ne
+  l'allume encore : rien ne change pour aucune ferme. Coût mesuré sur une
+  ferme fictive de 300 planches (F781). Tests à deux fermes
+  (`tests/db/objectif-automatique-reglage.test.ts`). Contrôles : voir la
+  PR. Reste O3 et O4. Mises en ligne consignées ici : #197 (L6, D-315),
+  fusionnée le 24 novembre 2026 à 18 h 54, **en ligne à 19 h 27** (run
+  45453771319, les cinq jobs verts) ; #198 (O1, D-316), fusionnée à
+  19 h 41, **en ligne à XX h XX** (run 45462295779, les cinq jobs verts).
 - **Objectif automatique sur l'ET0, O1 : la règle, codé le
   24 novembre 2026** (D-316, F769 à F773, roadmap section 6 decies, PR 1
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. **Le porteur a

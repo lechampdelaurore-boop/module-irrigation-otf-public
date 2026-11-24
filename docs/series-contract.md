@@ -224,8 +224,12 @@ Sur la période d'occupation, pour chaque série, par planche puis pondéré :
   dans `lib/domain/hydric-goal-revisions.ts` (D-039, point ouvert 40, 9
   octobre 2026). Les objectifs sont enregistrés par saison ; une série
   implantée l'année précédente relit ceux de sa saison **et de la précédente**
-  comme un seul historique (précisé le 29 septembre 2026). Ce qui reste prévu,
-  de demain à la dernière récolte attendue, se présente à part ;
+  comme un seul historique (précisé le 29 septembre 2026). Quand la ferme a
+  allumé l'objectif automatique (D-309, D-317), un jour sans objectif saisi
+  prend sa valeur automatique ; un jour où il s'applique sans valeur n'est
+  pas compté pour zéro, il est compté à part (F778). Ce qui reste prévu,
+  de demain à la dernière récolte attendue, se présente à part ; il est
+  inconnu dès qu'un de ses jours n'a pas de valeur automatique (F779) ;
 - **écart** : `objectif cumulé − (irrigation réelle + pluie réelle)`, positif
   en déficit ;
 - **ET0** de la période, pour information seulement, à côté, jamais dans une

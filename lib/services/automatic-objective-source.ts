@@ -32,7 +32,7 @@ import { readWeatherPreference } from './weather-preference';
  * Rien n'est écrit : la valeur se relit depuis la météo enregistrée, l'objectif
  * du matin suit la synchronisation du matin (règle 5).
  */
-export type AutomaticObjectiveSource = {
+type AutomaticObjectiveSource = {
   /** L'entrée d'une planche pour `objectiveForBed`, aux jours de la période. */
   inputFor(bed: Bed): AutomaticObjectiveInput;
   /** Les entrées de plusieurs planches, par identifiant : celles du tableau des besoins. */
