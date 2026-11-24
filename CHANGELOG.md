@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Documenté (« Aujourd'hui » mène aux menus, et l'objectif automatique sur l'ET0)
+
+- **Deux contrats écrits sans code** (D-308, D-309), sur les demandes du
+  porteur du 24 novembre 2026. `docs/aujourdhui-liens-contract.md` : les
+  tuiles et les jauges du tableau de bord « Aujourd'hui » mènent à leur
+  menu, la réponse d'un geste s'écrit sous le bouton, la mise en page du
+  téléphone est corrigée ; six PR de code, affichage seul.
+  `docs/objectif-automatique-contract.md` : l'objectif de la semaine peut
+  suivre chaque matin le besoin de la culture, sinon l'ET0, quand la ferme
+  l'allume ; un objectif saisi passe toujours avant ; quatre PR de code.
+  Cette seconde décision change D-010 et D-045 et revient sur D-054 :
+  aucun code avant la confirmation du porteur.
+
 ### Corrigé (alertes sur le téléphone, C4)
 
 - **L'écran des alertes dit quand l'appareil n'est plus inscrit** (D-306) :

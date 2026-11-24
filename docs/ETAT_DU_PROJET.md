@@ -12,6 +12,20 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **« Aujourd'hui » mène aux menus, et l'objectif automatique sur l'ET0 :
+  diagnostic et deux contrats écrits le 24 novembre 2026, sans code**
+  (D-308, D-309, roadmap sections 6 nonies et 6 decies), en Fable 5.2 ·
+  Élevé par exception expresse du porteur pour ce seul fil (D-055 reste la
+  règle ; le code se fait ailleurs, en Opus). `docs/aujourdhui-liens-contract.md` :
+  les quatre tuiles et neuf autres endroits de la page sans lien, la
+  réponse d'un geste hors de l'écran du téléphone, la mise en page ; six PR
+  de code L1 à L6, affichage seul, **à coder**. `docs/objectif-automatique-contract.md` :
+  quatre choix du porteur (l'objectif suit l'ET0 tout seul, chaque matin,
+  ET0 × K_abri sous abri, le besoin de la culture quand il est connu),
+  éteint tant que la ferme ne l'allume pas, un objectif saisi passe avant ;
+  quatre PR de code O1 à O4. **Il change D-010 et D-045 et revient sur
+  D-054 : question 5 posée au porteur, aucun code de l'objectif automatique
+  avant sa réponse.** PR de registres seule : **aucun contrôle rejoué**.
 - **Alertes sur le téléphone : l'écran des alertes dit quand l'appareil
   n'est plus inscrit, codé le 24 novembre 2026** (C4, D-306, roadmap
   section 6 octies), en Opus 5.5 · Élevé. Une autorisation donnée sans
