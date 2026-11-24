@@ -1,13 +1,24 @@
 import { db } from './binding';
 import { farmSpaceKey, farmSpaceOf, InvalidFarmSpaceError } from '@/lib/domain/farm-space';
+import { rememberedWorkspaceId } from './request-memo';
 import { SPACE_FILTER, spaceKeyOfRow, spaceParams } from './workspace-scope';
 
+/**
+ * L'espace d'une clé, lu au plus une fois par requête (section 5 sexies du
+ * contrat de la tranche 4, `db/request-memo.ts`) : la personne et la ferme
+ * ensemble, jamais l'une sans l'autre ; hors d'une requête, lu à chaque fois.
+ */
 export async function findWorkspaceIdForUser(ownerUserId: string): Promise<string | null> {
+  const params = spaceParams(ownerUserId);
+  return rememberedWorkspaceId(...params, () => readWorkspaceId(params));
+}
+
+async function readWorkspaceId(params: [string, string | null]): Promise<string | null> {
   const row = await db.prepare(
     `SELECT id FROM irrigation_workspaces
      WHERE ${SPACE_FILTER} LIMIT 1`,
   )
-    .bind(...spaceParams(ownerUserId))
+    .bind(...params)
     .first<{ id: string }>();
   return row?.id ?? null;
 }

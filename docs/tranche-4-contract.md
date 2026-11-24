@@ -392,6 +392,89 @@ change ce que voit une ferme.
     Il ne remplace pas la vérification d'appartenance que chaque action fait
     avant d'écrire.
 
+### 5 sexies. La mémoire d'une requête : l'espace lu une fois (24 novembre 2026, D-324, F803 à F809)
+
+La correction N3 du correctif « Lenteur du module » (roadmap, section
+6 duodecies ; `docs/lenteur-du-module-contract.md`), sur le constat du
+porteur du 24 novembre 2026 : « Le logiciel rame », l'ouverture surtout,
+puis chaque changement de page. Mesuré en local avant le code : pour ouvrir
+« Aujourd'hui », le serveur lisait 57 fois l'identifiant du même espace,
+12 fois son accueil et 8 fois sa préférence météo, une fois par service qui
+les demande. Décidée avant le code et écrite dans la même PR que lui, en
+Opus 5.5 · Max (elle touche à la résolution de l'espace d'une ferme, donc à
+l'isolation), sur le mandat d'autonomie du porteur, à l'option recommandée :
+rien n'est agronomique ni ne touche au budget, et aucune ferme ne voit
+autre chose qu'une page plus rapide.
+
+- **F803 · Une mémoire par requête, jamais plus.** Pendant une requête,
+  l'identifiant de l'espace d'une clé ne se lit qu'une fois. La mémoire naît
+  avec la requête et disparaît avec elle (`cacheForRequest` de vinext, posé
+  par `app/request-memo.ts`) : rien n'est gardé d'une requête à l'autre, ni
+  dans le Worker. Une requête, c'est une page, une action ou une route ; à un
+  changement de page, vinext exécute la page une première fois pour y
+  chercher une redirection, puis la rend : les deux passages partagent la
+  mémoire de leur requête. Hors d'une requête (une tâche sans requête, les
+  tests), il n'y en a pas : chaque lecture va à la base, comme avant.
+- **F804 · Rangée par la personne et la ferme ensemble.** Une lecture est
+  rangée sous la clé entière de l'espace, la personne et la ferme, comme le
+  filtre des requêtes (F327) : l'espace sans ferme et l'espace de ferme d'une
+  même personne sont deux entrées, deux fermes aussi, deux personnes aussi.
+  Une lecture d'un service est rangée sous son nom et tous ses arguments,
+  clé d'espace comprise.
+- **F805 · Toute écriture la vide.** Une instruction qui n'est pas une
+  lecture (tout ce qui ne commence pas par `SELECT`, `WITH` compris), un lot
+  qui en contient une, et `exec` vident la mémoire de la requête quand ils
+  commencent et quand ils finissent, même en échec (`db/binding.ts`) ; une
+  lecture qui a croisé une écriture n'est pas gardée. Un espace rattaché à sa
+  ferme (F331), mis de côté par la démonstration ou effacé (F647) ne se relit
+  donc jamais sous son ancienne forme, ni une valeur que la requête vient de
+  changer.
+- **F806 · L'absence ne reste pas.** Une lecture qui ne trouve pas d'espace,
+  ou qui échoue, est oubliée : un espace créé pendant la requête, par elle ou
+  par une autre, se lit aussitôt.
+- **F807 · Trois lectures de service, une copie par appelant.** Sont aussi
+  gardées pour la requête : le choix des fonctionnalités résolu, l'accueil
+  et la préférence météo d'un espace. Chaque appelant reçoit sa propre
+  copie : ce que l'un change ne se voit pas chez l'autre. Ne sont jamais
+  gardés : le compteur des appels à OTF, le dépôt du choix des
+  fonctionnalités que la démonstration relit en attendant une autre requête,
+  et toute autre lecture. Une PR suivante pourra en ajouter, mesurée en
+  ligne d'abord et avec les mêmes preuves.
+- **F808 · La personne connectée, une fois par rendu de page.** Le jeton, la
+  ferme et l'effacement se vérifient une fois par rendu de page pour chaque
+  valeur de `allowFrozen` (`cache` de React), jamais d'une requête à
+  l'autre ; hors d'un rendu (une action, une route, le premier passage de
+  vinext), à chaque appel, comme avant : le rendu qui suit une action voit
+  l'espace qu'elle vient de figer ou de rattacher. Chaque appelant reçoit sa
+  copie.
+- **F809 · Les preuves.** `tests/db/memoire-de-requete.test.ts`, rejoué dans
+  les quatre passages d'isolation (F336, F379) : une lecture par clé même
+  demandée en parallèle ; deux fermes dans une même requête, chacune son
+  espace ; deux requêtes simultanées qui ne partagent rien ; rien qui reste
+  après une requête ni hors d'une requête ; l'absence, l'échec et la lecture
+  qui croise une écriture oubliés ; le rattachement, la mise de côté de la
+  démonstration et l'effacement, par une instruction ou par un lot ; ce qui
+  vide la mémoire et ce qui ne la vide pas ; les lectures de service et le
+  choix des fonctionnalités relu après son écriture ; enfin vinext lui-même,
+  avec trois changements de page simultanés (Alice, Bob, Alice) dont le
+  premier passage partage la mémoire de sa requête. Les tests ont été
+  éprouvés en cassant le code exprès : une clé qui oublie la ferme, une
+  mémoire commune au Worker et une écriture qui ne vide plus la mémoire font
+  chacune échouer des tests.
+
+**La mesure** (en local, base locale, mêmes données, deuxième passage de
+chaque page) : ouvrir « Aujourd'hui » coûtait 174 lectures de la base, dont
+57 de l'espace ; il en coûte 97, dont 2. Y changer de page par le menu
+coûtait 338 lectures ; il en coûte 190. Sur les treize pages du menu,
+890 lectures deviennent 458 à l'ouverture, et 1 650 deviennent 866 aux
+changements de page. L'espace reste lu deux fois à l'ouverture et trois fois
+au changement de page : l'espace sans ferme de la personne, qui n'existe
+pas, est relu à chaque vérification de la personne connectée (F806). Un
+changement de page coûte encore près de deux fois une ouverture : les
+lectures qui ne sont pas gardées sont faites dans les deux passages de
+vinext. Le temps gagné en ligne, où chaque lecture traverse le réseau, reste
+à mesurer.
+
 ## 6. Connexion à l'API d'OTF (4.3)
 
 ### 6.1 Ce que la documentation d'OTF établit (lue le 7/11 ; à relire avant le code)
