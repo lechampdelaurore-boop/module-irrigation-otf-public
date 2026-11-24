@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **« Aujourd'hui » mène aux menus, L5 : la mise en page, codé le
+  24 novembre 2026** (D-314, F766, roadmap section 6 nonies, PR 5 sur 6),
+  en Opus 5.5 · Élevé. Un bloc étiré garde son contenu en haut ; l'heure
+  d'une carte ne touche plus son texte au téléphone ; un nom de jardin des
+  jauges se lit en entier à 390 et à 360 px. Affichage seul, aucune
+  migration. Parcours P30 étendu par mesures. Contrôles : voir la PR.
+  Reste L6. Mise en ligne de #194 (L3, avec le délai des parcours porté à
+  50 minutes) consignée ici : fusionnée le 24 novembre 2026 à 17 h 17,
+  **en ligne à 17 h 40** (run 45435366050, les cinq jobs verts).
 - **« Aujourd'hui » mène aux menus, L4 : la réponse d'un geste s'écrit
   sous le bouton, codé le 24 novembre 2026** (D-313, F764, F765, roadmap
   section 6 nonies, PR 4 sur 6), en Opus 5.5 · Élevé. « Démarrer

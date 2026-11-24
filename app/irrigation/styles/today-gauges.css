@@ -547,16 +547,26 @@ a.today-limit:focus-visible {
     align-content: center;
   }
 
-  /* Au téléphone, le nom et le chiffre sur une ligne, la barre dessous sur toute la largeur. */
+  /*
+   * Au téléphone, une seule colonne : le nom sur sa ligne, en entier, au
+   * besoin sur deux ; la barre dessous ; le chiffre sous la barre
+   * (6 nonies, L5, D-314). « Champ du haut » et « Champ du bas » ne se
+   * lisent plus tous deux « Champ d… », et un long chiffre (« 15 / 26,7 mm
+   * (5 planches de 10 ont un objectif) ») ne serre plus ni le nom ni la barre.
+   */
   .today-bar-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 4px 8px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
   }
 
-  .today-bar-row .today-bar,
-  .today-bar-row .today-soil-bar {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .today-bar-row .today-bar-name {
+    overflow: visible;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .today-bar-row .today-bar-text {
+    text-align: left;
   }
 
   .today-bar-note {

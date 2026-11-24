@@ -9294,3 +9294,41 @@ carte en cours, dans l'écran, jamais en tête de page) aux deux largeurs.
 
 **Ne change pas.** Les gestes, leurs messages et leurs refus ; aucune
 donnée, aucune migration. Les autres pages gardent leurs réponses.
+
+## D-314 — « Aujourd'hui » mène aux menus, L5 : la mise en page
+
+Date : 24 novembre 2026. Statut : codé (PR 5 sur 6 du contrat
+`docs/aujourdhui-liens-contract.md`, D-308, section 7) ; roadmap section
+6 nonies. Code en Opus 5.5 · Élevé.
+
+**Décision.** Trois défauts de dessin corrigés, sans rien changer à ce
+que dit la page :
+
+- Ordinateur : un bloc étiré à la hauteur de son voisin garde son contenu
+  en haut (`.today-block { align-content: start }`) ; la rangée de titre
+  d'« Eau disponible » mesurait 705 px à 1440 px, elle en mesure 44.
+- Téléphone : la colonne de l'heure d'une carte prend la place qu'il lui
+  faut (`minmax(56px, max-content)`) ; l'heure recouvrait le texte de
+  2,25 px à 390 px.
+- Téléphone : une ligne de « Eau de la semaine » et de « Réserve du sol »
+  passe sur une colonne : le nom en entier sur sa ligne, au besoin sur
+  deux, la barre dessous, le chiffre sous la barre. Trois noms étaient
+  coupés à 360 px.
+
+**Précision tranchée en codant.**
+
+- F766 : au téléphone, le chiffre d'une jauge passe sous la barre plutôt
+  qu'à côté : un long chiffre (« 15 / 26,7 mm (5 planches de 10 ont un
+  objectif) ») serrait sinon la barre à presque rien, comme il serrait le
+  nom avant.
+
+**Preuve.** Par mesures dans P30, aux deux largeurs : à 1440 px, aucune
+rangée de titre de plus de 60 px ; à 390 et à 360 px, aucun nom de jauge
+dont la largeur utile dépasse sa place (`scrollWidth`), et l'heure d'une
+carte qui ne touche pas son texte (rectangles). Contre-épreuve : sans le
+correctif, les trois mesures échouent (705 px, trois noms coupés,
+2,25 px). `tests/aujourdhui-liens.test.ts` lit les trois règles de dessin.
+
+**Ne change pas.** Les chiffres, les phrases, l'ordre des blocs et des
+lignes ; l'ordinateur garde le nom, la barre et le chiffre sur une ligne.
+Aucune donnée, aucune migration.
