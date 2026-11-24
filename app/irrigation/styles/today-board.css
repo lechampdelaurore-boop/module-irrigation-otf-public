@@ -148,6 +148,39 @@
   margin: 0;
 }
 
+/* Un jour en alerte mène à la page de son alerte (6 nonies, L3) : la carte entière, « Voir l'alerte » écrit dessous. */
+.today-day-link {
+  display: grid;
+  gap: 6px;
+  margin: -10px -12px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+.today-day-link:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.today-day-link:hover .today-day-action {
+  text-decoration: underline;
+}
+
+.today-day-action {
+  color: var(--danger-ink);
+  font: 500 var(--text-13)/1.3 var(--font-ui);
+}
+
+.today-day-action .icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-left: 2px;
+  vertical-align: -3px;
+}
+
 .today-day-top {
   display: flex;
   align-items: center;

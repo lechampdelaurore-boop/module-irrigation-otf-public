@@ -73,7 +73,12 @@ export function ReliabilityZoneView({
                 <span className="reliability-mark"><Icon name={check.ok ? 'coche' : CHECK_ICONS[check.kind]} /></span>
                 <div className="reliability-check-text">
                   {/* Un manque montré dit lui-même sa phrase : le résumé ne reste que pour ce qui est à jour ou replié. */}
-                  <p><b>{check.label}</b>{lines.length > 0 ? null : check.summary}</p>
+                  {/* À jour, la ligne mène à la page où vit sa donnée (6 nonies, L3, D-312). */}
+                  {check.link ? (
+                    <a className="reliability-check-link" href={pageHref(check.link.page, query, check.link.anchor ?? undefined)}>
+                      <b>{check.label}</b>{check.summary}<Icon name="chevron" />
+                    </a>
+                  ) : <p><b>{check.label}</b>{lines.length > 0 ? null : check.summary}</p>}
                   {lines.length > 0 ? (
                     <ul className="reliability-lines">
                       {lines.map((line) => (

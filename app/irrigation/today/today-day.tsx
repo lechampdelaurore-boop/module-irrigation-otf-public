@@ -1,15 +1,16 @@
 'use client';
 
-import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
+import { pageHref, pagePath, type PageQuery } from '@/lib/domain/features/pages';
 import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all-done';
 import type { TodayTomorrow } from '@/lib/domain/today/ahead';
 import type { DayTimeline, LateItem } from '@/lib/domain/today/day-plan';
 import type { TodayNowLine } from '@/lib/domain/today/now-irrigations';
 import type { TodayIrrigationLine } from '@/lib/domain/today/today-irrigations';
 import { shortDayText } from '@/lib/domain/today/today-text';
-import type { TodayBlock } from '@/lib/domain/today/today-view';
+import type { TodayBlock, TodayDayEmptyLink } from '@/lib/domain/today/today-view';
 import { Icon, type IconName } from '../line-icon';
 import { DoneAsPlannedButton } from '../done-as-planned-button';
+import { hrefWithIntent } from '../shell/url-intent';
 import { TodayAllDone } from './today-all-done';
 
 type LateBlock = Extract<TodayBlock, { kind: 'late' }>;
@@ -33,7 +34,7 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * reliquat, avec « Reprendre le reliquat » (audit du 19 novembre 2026,
  * lot H, n° 2, F433 et F434).
  */
-export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, query, pending, onStart, onAllDone }: {
+export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, query, pending, onStart, onAllDone }: {
   today: string;
   current?: readonly TodayNowLine[];
   late: LateBlock;
@@ -41,6 +42,8 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
   tomorrow: TodayTomorrow | null;
   timeline: DayTimeline | null;
   allDone: AllDone | null;
+  /** Le lien de « Rien à arroser aujourd’hui » (6 nonies, L3) ; `null` : aucun. */
+  emptyLink?: TodayDayEmptyLink | null;
   query: PageQuery;
   pending: boolean;
   onStart: (eventEquipmentId: string) => void;
@@ -82,6 +85,11 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
           <div>
             <b>Rien à arroser aujourd’hui</b>
             <p>{late.empty} {todo.empty}</p>
+            {emptyLink ? (
+              <a className="today-action-link" href={emptyLink.intent && query.season ? hrefWithIntent(pagePath(emptyLink.page), query.season, emptyLink.intent, '1') : pageHref(emptyLink.page, query)}>
+                {emptyLink.label}
+              </a>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -253,8 +261,9 @@ function IrrigationCard({ line, today, query, pending, onStart, doneAsPlanned }:
             Démarrer maintenant
           </button>
         ) : null}
-        <a className="today-action-link" href={pageHref(line.open.page, query, line.open.anchor)} aria-label={`Ouvrir : ${line.title}, ${line.time}`}>
-          Ouvrir
+        {/* « Valider au planning » pour une proposition : le lien y mène, rien n'est validé (6 nonies, L3, D-028). */}
+        <a className="today-action-link" href={pageHref(line.open.page, query, line.open.anchor)} aria-label={`${line.open.label} : ${line.title}, ${line.time}`}>
+          {line.open.label}
         </a>
       </div>
     </li>

@@ -363,6 +363,41 @@ a.today-limit:focus-visible {
   font: 700 var(--text-14)/1.4 var(--font-ui);
 }
 
+/* Une donnée à jour mène à la page où elle vit (6 nonies, L3) : la ligne entière, le chevron au bout. */
+.reliability-check-link {
+  display: block;
+  margin: -4px -6px;
+  padding: 4px 6px;
+  border-radius: 9.75px;
+  color: var(--muted);
+  font-size: var(--text-13);
+  text-decoration: none;
+}
+
+.reliability-check-link b {
+  display: block;
+  color: var(--ink);
+  font: 700 var(--text-14)/1.4 var(--font-ui);
+}
+
+.reliability-check-link .icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+  color: var(--green);
+  vertical-align: -2px;
+}
+
+.reliability-check-link:hover {
+  background: var(--tile);
+}
+
+.reliability-check-link:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .reliability-check[data-ok="false"] .reliability-check-text > p {
   color: var(--warn-ink);
 }
@@ -496,6 +531,10 @@ a.today-limit:focus-visible {
 }
 
 @container (max-width: 620px) {
+  .reliability-check-link {
+    min-height: var(--touch-target);
+  }
+
   .today-page .today-block .today-block-foot {
     display: inline-flex;
     justify-self: stretch;

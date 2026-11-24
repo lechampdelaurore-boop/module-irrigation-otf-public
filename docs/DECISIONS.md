@@ -9189,3 +9189,63 @@ ou en bas) aux deux largeurs.
 **Ne change pas.** Les chiffres, les phrases, les dessins et l'ordre des
 blocs ; aucune donnée, aucune migration. Les blocs étirés sur ordinateur
 restent pour L5.
+
+## D-312 — « Aujourd'hui » mène aux menus, L3 : les autres liens de la page
+
+Date : 24 novembre 2026. Statut : codé (PR 3 sur 6 du contrat
+`docs/aujourdhui-liens-contract.md`, D-308, section 5) ; roadmap section
+6 nonies. Code en Opus 5.5 · Élevé.
+
+**Décision.** Cinq endroits inertes de la page deviennent des liens, sans
+rien enregistrer (D-028) :
+
+- « Gel ou chaleur » : un jour en alerte est un lien entier vers la page de
+  son alerte, « Voir l’alerte » écrit dessous en rouge ; un jour calme ou
+  inconnu reste inerte (`alertPage`, `lib/domain/today/weather-days.ts`).
+- « Fiabilité du calcul » : une ligne à jour mène à la page où vit sa
+  donnée, là où son geste mènerait si elle était à rafraîchir
+  (`link`, `lib/domain/today/reliability.ts`) : « Ressources et pompes »,
+  la pluie mesurée des besoins (`#manual-rain`), « Réserve du sol »,
+  la correspondance des espèces des réglages, le planning. Une ligne à
+  rafraîchir garde ses propres gestes.
+- En-tête : « Plan calculé … » mène au planning de la semaine, comme
+  « Plan non calculé : ouvrir le planning » ; la ligne n'existe que
+  « Planning » coché.
+- État vide de « Votre journée » : « Voir le planning de la semaine » quand
+  « Planning » est coché ; sinon « Planifier un arrosage »
+  (`arrosages?planifier=1`, l'intention d'adresse existante) quand
+  « Arrosages » est coché ; sinon rien (`dayEmptyLink`,
+  `lib/domain/today/today-view.ts`).
+- Une carte « À valider » dit « Valider au planning » au lieu
+  d'« Ouvrir » ; la cible ne change pas. Une carte planifiée garde
+  « Ouvrir ». Le nom lu par un lecteur d'écran est le mot, puis le titre et
+  l'heure de la carte.
+
+Chaque lien fait au moins 44 px de haut au téléphone, avec un focus
+visible.
+
+**Précisions tranchées en codant.**
+
+- F761 : un jour qui annonce à la fois un gel des cultures et une alerte de
+  l'exploitation mène à « Alertes cultures », dans le même ordre que
+  « Voir les alertes » du bloc (le gel des cultures d'abord). C'était le
+  point « à confirmer en codant » de la règle 1 du contrat.
+- F762 : à jour, la ligne des réserves mène à « Ressources et pompes » sans
+  viser une réserve, et celle du sol à « Réserve du sol » sans viser un
+  jardin : à jour, aucune n'est à montrer plus qu'une autre.
+- F763 : le job « Parcours navigateur » passe de 35 à 50 minutes. Les
+  parcours ordinaires prennent désormais 27 à 33 minutes sur GitHub (17 à
+  19 au lot K) ; la fusion de #193 (L2) a été coupée à 35 minutes, pendant
+  les parcours de la démonstration (run 45422205205), et n'a donc pas été
+  déployée à la première tentative. Aucun test retiré ni sauté.
+
+**Preuve.** `tests/aujourdhui-liens.test.ts` (la page du jour en alerte,
+le lien des lignes à jour et son absence à rafraîchir, l'état vide selon
+les cases cochées, « Valider au planning ») ; parcours P29 aux deux
+largeurs (l'état vide mène au planning ; la ligne du plan à jour et
+« Plan calculé … » aussi ; le jour en alerte mène à la page de son
+alerte, à 44 px au téléphone).
+
+**Ne change pas.** Les chiffres, les phrases, les dessins et l'ordre des
+blocs ; aucune donnée, aucune migration. Les barres de la frise de
+« Votre journée » restent inertes (contrat, section 9).

@@ -43,7 +43,7 @@ export function TodayWeather({ block, query }: { block: WeatherBlock; query: Pag
         </div>
       </div>
       <ul className="today-days">
-        {block.days.map((day) => <WeatherDay key={day.date} day={day} zeroPercent={scale.zeroPercent} />)}
+        {block.days.map((day) => <WeatherDay key={day.date} day={day} zeroPercent={scale.zeroPercent} query={query} />)}
       </ul>
       <div className={block.tone === 'alert' ? 'today-weather-lines sr-only' : 'today-weather-lines'}>
         {block.lines.map((line) => <p key={line} className="today-weather-line">{line}</p>)}
@@ -63,10 +63,28 @@ export function TodayWeather({ block, query }: { block: WeatherBlock; query: Pag
   );
 }
 
-function WeatherDay({ day, zeroPercent }: { day: TodayWeatherDay; zeroPercent: number }) {
-  const known = day.minimumCelsius !== null || day.maximumCelsius !== null;
+/**
+ * Un jour de « Gel ou chaleur » ; un jour en alerte est un lien entier vers
+ * la page de son alerte, « Voir l'alerte » écrit dessous (6 nonies, L3,
+ * D-312) ; un jour calme reste inerte.
+ */
+function WeatherDay({ day, zeroPercent, query }: { day: TodayWeatherDay; zeroPercent: number; query: PageQuery }) {
   return (
     <li className="today-day" data-tone={day.tone} data-icon={day.icon}>
+      {day.alertPage ? (
+        <a className="today-day-link" href={pageHref(day.alertPage, query)}>
+          <WeatherDayBody day={day} zeroPercent={zeroPercent} />
+          <span className="today-day-action">Voir l’alerte<Icon name="chevron" /></span>
+        </a>
+      ) : <WeatherDayBody day={day} zeroPercent={zeroPercent} />}
+    </li>
+  );
+}
+
+function WeatherDayBody({ day, zeroPercent }: { day: TodayWeatherDay; zeroPercent: number }) {
+  const known = day.minimumCelsius !== null || day.maximumCelsius !== null;
+  return (
+    <>
       <p className="today-day-top">
         <span className="today-day-name">{day.label}</span>
         <Icon name={DAY_ICONS[day.icon]} />
@@ -90,6 +108,6 @@ function WeatherDay({ day, zeroPercent }: { day: TodayWeatherDay; zeroPercent: n
         </p>
       ) : null}
       {day.notes.map((note) => <p key={note} className="today-day-note">{note}</p>)}
-    </li>
+    </>
   );
 }

@@ -3,10 +3,16 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { pageHref } from '../lib/domain/features/pages';
 import type { SoilGaugeZone } from '../lib/domain/soil-reserve/gauge-view';
+import { reliabilityChecks, reliabilityLines, type ReliabilityInputs } from '../lib/domain/today/reliability';
 import { todaySoil } from '../lib/domain/today/soil';
+import { todayTodoLines } from '../lib/domain/today/today-irrigations';
+import { todayView, weatherBlock, type TodayInputs } from '../lib/domain/today/today-view';
 import { waterBlock } from '../lib/domain/today/water';
 import { needsGardenAnchor, todayWeek, type TodayWeekBed, type TodayWeekInputs } from '../lib/domain/today/week';
 import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-resources';
+import type { WeatherAlertCriterion, WeatherAlertForecastDay } from '../lib/domain/weather/weather-alerts';
+import type { StoredProposal } from '../lib/domain/planning/contract';
+import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue';
 
 /**
  * « Aujourd'hui » mène aux menus (docs/aujourdhui-liens-contract.md, D-308).
@@ -19,6 +25,10 @@ import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-re
  * les cuves et les ressources limitées d'« Eau disponible » mènent à leur
  * page ; leur lien porte la phrase écrite pour un lecteur d'écran
  * (section 4).
+ *
+ * L3 (D-312) : un jour en alerte, une donnée à jour de « Fiabilité du
+ * calcul », « Plan calculé … », l'état vide de « Votre journée » et une
+ * proposition « Valider au planning » (section 5).
  */
 
 const bed = (plotId: string, plotName: string, objectiveMm: number | null, values: Partial<TodayWeekBed> = {}): TodayWeekBed => ({
@@ -174,4 +184,93 @@ test('L2 : les lignes, cuves et ressources sont des liens ; le dessin caché, la
   assert.match(css, /a\.today-limit \{\n {4}min-height: var\(--touch-target\);/);
   const needs = readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8');
   assert.match(needs, /<details key=\{garden\.plotId\} id=\{needsGardenAnchor\(garden\.plotId\)\}>/);
+});
+
+// L3 — les autres liens de la page (section 5). Aujourd'hui = jeudi 12 novembre 2026, 6 h 00 à la ferme.
+
+const NOW = new Date('2026-11-12T05:00:00.000Z');
+const ALL: FeatureId[] = [...FEATURE_IDS];
+const forecast = (date: string, minimum: number | null = 6, maximum: number | null = 14): WeatherAlertForecastDay => ({
+  date, minimumTemperatureCelsius: minimum, maximumTemperatureCelsius: maximum, precipitationMm: 0, forecastedAt: '2026-11-12T04:00:00.000Z',
+});
+
+test('L3, règle 1 : un jour en alerte mène à la page de son alerte ; un jour calme reste inerte (F761)', () => {
+  const crops = (names: string[]) => names.map((name) => ({ name, alertCelsius: 0, underShelter: false, alreadyAlerted: false }));
+  const heat: WeatherAlertCriterion = { id: 'c1', version: 1, field: 'maximum-temperature', direction: 'above', threshold: 30, horizonDays: 7, active: true, label: 'Chaleur' };
+  const forecasts = [forecast('2026-11-12'), forecast('2026-11-13', 10, 31.5), forecast('2026-11-14', -1, 31)];
+  const frost = [{ date: '2026-11-14', minimumCelsius: -1, crops: crops(['Laitue']) }];
+  const block = weatherBlock({ forecasts, frost, criteria: [heat] }, ALL, NOW);
+  // Calme ; chaleur seule → « Alertes météo » ; gel des cultures et chaleur le même jour → « Alertes cultures », comme « Voir les alertes ».
+  assert.deepEqual(block.days.map((day) => day.alertPage), [null, 'alertes-meteo', 'alertes-cultures']);
+  // Un jour sans prévision n'est pas un lien non plus.
+  const unknown = weatherBlock({ forecasts: [forecast('2026-11-12')], frost: [], criteria: [] }, ALL, NOW);
+  assert.deepEqual(unknown.days.map((day) => day.alertPage), [null, null, null]);
+});
+
+test('L3, règle 2 : une donnée à jour mène à la page où elle vit ; à rafraîchir, ses lignes portent leur geste', () => {
+  const input: ReliabilityInputs = {
+    enabled: ALL,
+    now: NOW,
+    reservoirs: [{ id: 'r1', name: 'Bassin', observedAt: '2026-11-01T08:00:00.000Z' }],
+    actualRainMissingDates: [],
+    soilGardensNeverObserved: [],
+    speciesWithoutReference: [],
+    planComputedAt: '2026-11-12T05:02:00.000Z',
+  };
+  const checks = reliabilityChecks(input, reliabilityLines(input));
+  assert.deepEqual(checks.map((check) => [check.label, check.ok, check.link]), [
+    ['Volume des réserves', false, null],
+    ['Pluie mesurée', true, { page: 'besoins', anchor: 'manual-rain' }],
+    ['Réserve du sol', true, { page: 'sol', anchor: null }],
+    ['Espèces', true, { page: 'reglages', anchor: 'species-correspondence-title' }],
+    ['Plan de la semaine', true, { page: 'planning', anchor: null }],
+  ]);
+  const fresh = { ...input, reservoirs: [{ id: 'r1', name: 'Bassin', observedAt: '2026-11-11T08:00:00.000Z' }] };
+  assert.deepEqual(reliabilityChecks(fresh, reliabilityLines(fresh))[0].link, { page: 'ressources', anchor: null });
+});
+
+const todayInputs = (enabled: FeatureId[], overrides: Partial<TodayInputs> = {}): TodayInputs => ({
+  enabled,
+  now: NOW,
+  weather: { forecasts: [forecast('2026-11-12'), forecast('2026-11-13'), forecast('2026-11-14')], frost: [], criteria: [] },
+  events: [],
+  lateToleranceMinutes: 30,
+  plan: { computedAt: '2026-11-12T05:02:00.000Z', proposals: [] },
+  shortagePlan: null,
+  bedNames: new Map([['b2', 'P2']]),
+  infrastructure: null,
+  reliability: { actualRainMissingDates: [], soilGardensNeverObserved: [], speciesWithoutReference: [] },
+  week: null,
+  soil: null,
+  ...overrides,
+});
+
+test('L3, règle 4 : « Rien à arroser aujourd’hui » mène au planning, sinon à « Planifier un arrosage »', () => {
+  assert.deepEqual(todayView(todayInputs(ALL)).dayEmptyLink, { label: 'Voir le planning de la semaine', page: 'planning', intent: null });
+  assert.deepEqual(todayView(todayInputs(['arrosages'])).dayEmptyLink, { label: 'Planifier un arrosage', page: 'arrosages', intent: 'planifier' });
+  assert.equal(todayView(todayInputs(['besoins'])).dayEmptyLink, null, 'sans « Votre journée », aucun lien');
+});
+
+test('L3, règle 5 : une proposition dit « Valider au planning », une irrigation planifiée garde « Ouvrir » ; la cible ne change pas', () => {
+  const proposal = {
+    storedId: 'p20', status: 'proposed', startAt: '2026-11-12T17:00:00.000Z', endAt: '2026-11-12T18:00:00.000Z', durationSeconds: 3600, doseMm: 8,
+    equipmentName: 'Asperseur A', settingName: 'Buse 2', applications: [{ otfBedId: 'b2' }],
+  } as unknown as StoredProposal;
+  const [line] = todayTodoLines({ enabled: ALL, now: NOW, events: [], lateToleranceMinutes: 30, bedNames: new Map([['b2', 'P2']]), proposals: [proposal] });
+  assert.deepEqual(line.open, { page: 'planning', anchor: 'proposal-p20', label: 'Valider au planning' });
+  const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
+  assert.match(day, /aria-label=\{`\$\{line\.open\.label\} : \$\{line\.title\}, \$\{line\.time\}`\}>\n {10}\{line\.open\.label\}/);
+});
+
+test('L3 : les liens dessinés — jour en alerte, donnée à jour, plan, état vide', () => {
+  const weather = readFileSync('app/irrigation/today/today-weather.tsx', 'utf8');
+  assert.match(weather, /<a className="today-day-link" href=\{pageHref\(day\.alertPage, query\)\}>/);
+  assert.match(weather, /<span className="today-day-action">Voir l’alerte<Icon name="chevron" \/><\/span>/);
+  const zone = readFileSync('app/irrigation/today/reliability-zone.tsx', 'utf8');
+  assert.match(zone, /<a className="reliability-check-link" href=\{pageHref\(check\.link\.page, query, check\.link\.anchor \?\? undefined\)\}>/);
+  const header = readFileSync('app/irrigation/today/today-header.tsx', 'utf8');
+  assert.match(header, /<a href=\{pageHref\('planning', query\)\}>\{plan\.text\}<\/a>/);
+  assert.doesNotMatch(header, /plan\.linkToPlanning \? <a/);
+  const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
+  assert.match(day, /hrefWithIntent\(pagePath\(emptyLink\.page\), query\.season, emptyLink\.intent, '1'\)/);
 });
