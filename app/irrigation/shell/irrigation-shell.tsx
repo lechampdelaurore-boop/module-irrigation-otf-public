@@ -11,7 +11,7 @@ import type { UnfinishedStep } from '@/lib/domain/onboarding/steps';
 import { createSeasons, sourceLabel } from '../hierarchy/presentation';
 import { Icon } from '../line-icon';
 import { FeatureBanner } from './feature-banner';
-import { FeatureMenu } from './feature-menu';
+import { FeatureMenu, takeMenuNavigation } from './feature-menu';
 import { UnfinishedBanner } from './unfinished-banner';
 import { PageTitle } from './page-title';
 import { Topbar } from './topbar';
@@ -70,10 +70,15 @@ export function IrrigationShell({
 
   const shell = useRef<HTMLElement>(null);
 
+  // Rejoué à chaque page : sans rechargement, le gabarit peut rester en place d'une page à l'autre (D-322).
   useEffect(() => {
     // La page répond aux clics : les parcours navigateur l'attendent avant d'agir
     // (docs/browser-journeys-contract.md), au lieu de réessayer leur premier clic.
     shell.current?.setAttribute('data-interactive', 'true');
+    // Après un clic du menu, la page change sans rechargement (D-322) : le
+    // clavier et le lecteur d'écran repartent du contenu de la nouvelle page,
+    // comme après un chargement, au lieu de rester sur le lien du menu.
+    if (takeMenuNavigation()) document.getElementById('contenu')?.focus({ preventScroll: true });
     // « Actualiser » relit Ouvre ta ferme une fois, et la ligne d'une page non
     // cochée se dit une fois : l'adresse ne garde ni l'une ni l'autre.
     const url = new URL(window.location.href);
@@ -81,7 +86,7 @@ export function IrrigationShell({
     url.searchParams.delete('refresh');
     url.searchParams.delete('absente');
     window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
-  }, []);
+  }, [page]);
 
   const updatedAt = dateClockText(lastSuccessfulReadAt, 'Europe/Paris', 'long');
   const title = pageLabel(page);
@@ -100,7 +105,8 @@ export function IrrigationShell({
       />
 
       <div className="feature-layout">
-        <FeatureMenu menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} />
+        {/* Un menu neuf à chaque page, comme après un rechargement (D-322) : la feuille « Plus » refermée, la pastille relue. */}
+        <FeatureMenu key={page} menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} />
 
         <div className="feature-page" id="contenu" tabIndex={-1}>
           <section className="intro" aria-labelledby="page-title">
