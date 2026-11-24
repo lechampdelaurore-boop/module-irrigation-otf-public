@@ -1,7 +1,7 @@
 'use client';
 
 import { volumeText } from '@/lib/domain/display-numbers';
-import { useEffect, useId, useMemo, useRef, useState, useTransition } from 'react';
+import { useEffect, useId, useMemo, useOptimistic, useRef, useState, useTransition } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, manualRainInput, weekStartDateKey } from '@/lib/domain/water-management';
@@ -246,8 +246,11 @@ export function WaterManagementDashboard({
    * Le réglage « Objectif automatique » (6 decies, O4, D-319) : un geste
    * daté, enregistré tout de suite ; le besoin et le journal se relisent.
    */
+  // L'interrupteur suit le geste tout de suite ; un refus le rend à l'état enregistré.
+  const [automaticShown, showAutomatic] = useOptimistic(dashboard.automaticObjective?.enabled ?? false);
   const saveAutomaticObjective = (enabled: boolean) => {
     startTransition(async () => {
+      showAutomatic(enabled);
       receiveChange(await saveAutomaticObjectiveAction({ season, weekStart: dashboard.weekStart, enabled }), 'objectif-automatique');
     });
   };
@@ -420,7 +423,7 @@ export function WaterManagementDashboard({
           bodyClassName="water-fold-body"
           summary={<><h3>Objectifs hebdomadaires</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null, dashboard.automaticObjective?.enabled === true)}</small></>}
         >
-          {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} pending={pending} onChange={saveAutomaticObjective} onClearGoals={() => void clearGoals()} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
+          {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} shown={automaticShown} pending={pending} onChange={saveAutomaticObjective} onClearGoals={() => void clearGoals()} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
           <div className="water-panel-title">
             <div><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
             <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => void clearGoals()}>Vider les objectifs</button>
@@ -516,8 +519,10 @@ const WATER_REPLY_CLASSES = { notice: 'water-notice', warning: 'weather-stale', 
  * gardent un objectif saisi avec le geste existant « Vider les objectifs ».
  * L'écran ne vide jamais seul (règle 2).
  */
-function AutomaticObjectiveSetting({ setting, pending, onChange, onClearGoals, reply }: {
+function AutomaticObjectiveSetting({ setting, shown, pending, onChange, onClearGoals, reply }: {
   setting: NonNullable<WaterDashboard['automaticObjective']>;
+  /** L'état que l'interrupteur montre : celui du geste en cours, sinon l'état enregistré. */
+  shown: boolean;
   pending: boolean;
   onChange: (enabled: boolean) => void;
   onClearGoals: () => void;
@@ -527,8 +532,8 @@ function AutomaticObjectiveSetting({ setting, pending, onChange, onClearGoals, r
   return (
     <div className="automatic-objective-setting">
       <label className="automatic-objective-toggle">
-        <input type="checkbox" role="switch" checked={setting.enabled} disabled={pending} onChange={(event) => onChange(event.target.checked)} />
-        <span><strong>Objectif automatique</strong> · {setting.enabled ? 'allumé' : 'éteint'}</span>
+        <input type="checkbox" role="switch" checked={shown} disabled={pending} onChange={(event) => onChange(event.target.checked)} />
+        <span><strong>Objectif automatique</strong> · {shown ? 'allumé' : 'éteint'}</span>
       </label>
       <p>{AUTOMATIC_OBJECTIVE_SETTING_TEXT} Un objectif saisi passe toujours avant.</p>
       {setting.enabled && kept > 0 ? (

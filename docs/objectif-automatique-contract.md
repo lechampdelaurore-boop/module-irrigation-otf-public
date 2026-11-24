@@ -433,8 +433,8 @@ plus prudente :
   quand l'objectif automatique est le besoin de la culture tous les jours
   de la semaine et qu'aucun objectif saisi ne compte ; la fiche dit
   « L'objectif automatique suit déjà le besoin de la culture : rien à
-  adopter. », et l'écart entre prévu et réel ne propose plus d'adopter
-  pour cette planche. Avec des jours d'après l'ET0, ou un objectif saisi
+  adopter. » ; l'écart entre prévu et réel n'a rien à lui proposer, son
+  objectif étant la proposition elle-même. Avec des jours d'après l'ET0, ou un objectif saisi
   une partie de la semaine, la proposition reste adoptable : elle
   changerait l'objectif.
 - **F794, « Fiabilité du calcul »** (section 5, point 5) : une sixième

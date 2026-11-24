@@ -72,7 +72,7 @@ test('l’origine dite : saisi, automatique d’après la culture, d’après l�
   assert.equal(objectiveOriginText(reading(automatic({ plotMode: 'greenhouse' }))), 'automatique, d’après l’ET0 sous abri', 'cas 2');
   const crop = WEEK.map((_, index) => cropDay(index, 'computed', 0.7 * ET0[index]));
   assert.equal(objectiveOriginText(reading(automatic({ cropNeed: { status: 'read', days: crop } }))), 'automatique, d’après le besoin de la culture', 'cas 3');
-  const half = WEEK.map((_, index) => (index < 3 ? cropDay(index, 'computed', 0.7 * ET0[index]) : cropDay(index, 'unavailable', null)));
+  const half = WEEK.map((_, index) => (index < 3 ? cropDay(index, 'computed', 0.7 * ET0[index]) : cropDay(index, 'no-etm', null)));
   assert.equal(objectiveOriginText(reading(automatic({ cropNeed: { status: 'read', days: half } }))), 'automatique, d’après la culture et l’ET0', 'la culture puis l’ET0 faute de besoin connu');
   // Cas 6 : un objectif de planche vidé le jeudi : les deux.
   const both = reading(automatic(), [goal('bed', 20, '2026-06-15T07:00:00.000Z'), goal('bed', null, '2026-06-18T07:00:00.000Z')]);
@@ -127,7 +127,7 @@ test('une planche dont l’objectif automatique est déjà le besoin de la cultu
   const follows = objectiveForBed([], BED, MONDAY, SUNDAY, automatic({ cropNeed: { status: 'read', days: crop } }));
   assert.equal(objectiveFollowsCropNeed(follows), true);
   assert.equal(objectiveFollowsCropNeed(objectiveForBed([], BED, MONDAY, SUNDAY, automatic())), false, 'd’après l’ET0 : la proposition reste à adopter');
-  const half = WEEK.map((_, index) => (index < 3 ? cropDay(index, 'computed', 0.7 * ET0[index]) : cropDay(index, 'unavailable', null)));
+  const half = WEEK.map((_, index) => (index < 3 ? cropDay(index, 'computed', 0.7 * ET0[index]) : cropDay(index, 'no-etm', null)));
   assert.equal(objectiveFollowsCropNeed(objectiveForBed([], BED, MONDAY, SUNDAY, automatic({ cropNeed: { status: 'read', days: half } }))), false, 'en partie d’après l’ET0');
   const both = objectiveForBed([goal('bed', 20, '2026-06-15T07:00:00.000Z'), goal('bed', null, '2026-06-18T07:00:00.000Z')], BED, MONDAY, SUNDAY, automatic({ cropNeed: { status: 'read', days: crop } }));
   assert.equal(objectiveFollowsCropNeed(both), false, 'un objectif saisi une partie de la semaine');

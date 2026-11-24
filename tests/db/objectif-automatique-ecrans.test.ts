@@ -90,6 +90,9 @@ test('le volet des objectifs lit le réglage de sa ferme et compte les planches 
   await saveHydricGoalForUser(ALICE, { season: 2026, weekStart: WEEK, scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null, amountMm: 20 });
   assert.deepEqual((await waterOf(ALICE)).automaticObjective, { enabled: true, keptGoalBeds: 2 }, 'un objectif de ferme les couvre toutes (cas 5)');
   assert.deepEqual((await waterOf(BOB)).automaticObjective, { enabled: false, keptGoalBeds: 0 }, 'la ferme d’à côté ne voit rien');
+  // Éteint ensuite : le dernier geste fait foi, les objectifs saisis restent comptés.
+  await saveAutomaticObjectiveForUser(ALICE, false, new Date('2026-06-10T07:00:00.000Z'));
+  assert.deepEqual((await waterOf(ALICE)).automaticObjective, { enabled: false, keptGoalBeds: 2 });
 });
 
 test('le tableau des besoins rend l’origine dite à l’écran, et la bulle nomme le jour sans ET0 (section 5, point 3)', async () => {
