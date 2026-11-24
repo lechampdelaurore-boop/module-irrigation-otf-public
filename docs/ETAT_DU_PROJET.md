@@ -29,7 +29,7 @@ registres, elle y renvoie.
   PR. Reste O3 et O4. Mises en ligne consignées ici : #197 (L6, D-315),
   fusionnée le 24 novembre 2026 à 18 h 54, **en ligne à 19 h 27** (run
   45453771319, les cinq jobs verts) ; #198 (O1, D-316), fusionnée à
-  19 h 41, **en ligne à XX h XX** (run 45462295779, les cinq jobs verts).
+  19 h 41, **en ligne à 20 h 15** (run 45462295779, les cinq jobs verts).
 - **Objectif automatique sur l'ET0, O1 : la règle, codé le
   24 novembre 2026** (D-316, F769 à F773, roadmap section 6 decies, PR 1
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. **Le porteur a
