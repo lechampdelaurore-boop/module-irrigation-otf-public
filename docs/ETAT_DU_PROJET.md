@@ -29,6 +29,17 @@ registres, elle y renvoie.
   Contrôles : voir la PR. Reste O2 à O4. Mise en ligne de #196 (L5,
   D-314) consignée ici : fusionnée le 24 novembre 2026 à 18 h 22, **en
   ligne à 18 h 54** (run 45447955147, les cinq jobs verts).
+- **« Aujourd'hui » mène aux menus, L6 : au téléphone, la page commence
+  par la journée, codé le 24 novembre 2026** (D-315, F767, F768, roadmap
+  section 6 nonies, PR 6 sur 6, la dernière), en Opus 5.5 · Élevé. Sous
+  620 px, « Votre journée » (avec « Gel ou chaleur ») passe juste après
+  l'en-tête, avant les tuiles, à l'écran comme dans l'ordre de lecture ;
+  change la précision T5, au téléphone seulement (option recommandée du
+  contrat, que le porteur peut encore refuser). Affichage seul, aucune
+  migration. Parcours P30 étendu. Contrôles : voir la PR. **Le chantier
+  6 nonies est entièrement codé.** Mise en ligne de #195 (L4) consignée
+  ici : fusionnée le 24 novembre 2026 à 17 h 49, **en ligne à 18 h 22**
+  (run 45441532277, les cinq jobs verts).
 - **« Aujourd'hui » mène aux menus, L5 : la mise en page, codé le
   24 novembre 2026** (D-314, F766, roadmap section 6 nonies, PR 5 sur 6),
   en Opus 5.5 · Élevé. Un bloc étiré garde son contenu en haut ; l'heure

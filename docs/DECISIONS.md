@@ -9339,6 +9339,44 @@ correctif, les trois mesures échouent (705 px, trois noms coupés,
 lignes ; l'ordinateur garde le nom, la barre et le chiffre sur une ligne.
 Aucune donnée, aucune migration.
 
+## D-315 — « Aujourd'hui » mène aux menus, L6 : au téléphone, la page commence par la journée
+
+Date : 24 novembre 2026. Statut : codé (PR 6 sur 6 du contrat
+`docs/aujourdhui-liens-contract.md`, D-308, section 8) ; roadmap section
+6 nonies. Code en Opus 5.5 · Élevé. Change la précision T5 du contrat de
+la page (`docs/aujourdhui-tableau-de-bord-contract.md`), au téléphone
+seulement : c'était l'option recommandée du contrat, que le porteur pouvait
+refuser d'un mot ; il ne l'a pas refusée, et l'assistant l'a retenue selon
+la règle d'autonomie du 19 novembre 2026 (l'option recommandée, sauf
+blocage). Si le porteur la refuse à la recette, elle se retire seule, sans
+toucher aux cinq autres PR.
+
+**Décision.** Quand la page fait 620 px de large ou moins (la borne de ses
+requêtes de conteneur), « Votre journée » se place juste après l'en-tête,
+avant les tuiles de la semaine, toujours, et non selon le jour. Sur
+ordinateur, l'ordre ne change pas. L'ordre de lecture au clavier et au
+lecteur d'écran suit l'ordre affiché : la page lit sa propre largeur et
+rend la journée avant les tuiles dans le DOM.
+
+**Précisions tranchées en codant.**
+
+- F767 : « Gel ou chaleur » monte avec « Votre journée » : les deux
+  partagent la même rangée de la page (D-141), qui passe entière avant les
+  tuiles. Le gel annoncé reste ainsi dans les premiers écrans du
+  téléphone.
+- F768 : avant que la page ait lu sa largeur (le premier dessin, avant le
+  JavaScript), deux règles `order` du dessin du téléphone remontent déjà la
+  rangée de la journée : pas de saut de la page à l'ouverture. Dès la
+  lecture, le DOM prend le même ordre.
+
+**Preuve.** Parcours P30 aux deux largeurs : au téléphone, la journée
+avant les tuiles dans l'ordre du document et à l'écran, sous l'en-tête ; à
+l'ordinateur, les tuiles d'abord. `tests/aujourdhui-liens.test.ts` lit la
+borne, l'ordre du rendu et les deux règles du premier dessin.
+
+**Ne change pas.** Le contenu des blocs, l'ordre à l'ordinateur ; aucune
+donnée, aucune migration.
+
 ## D-316 — L'objectif automatique, O1 : la règle
 
 Date : 24 novembre 2026. Statut : codé (PR O1 sur 4 du contrat

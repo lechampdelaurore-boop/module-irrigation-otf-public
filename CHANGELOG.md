@@ -15,6 +15,13 @@ source détaillée commit par commit.
   le 24 novembre 2026 (D-309). Rien ne change encore pour aucune ferme :
   aucun écran ne l'allume, aucun calcul ne la lit (O2 à O4).
 
+### Modifié (« Aujourd'hui » mène aux menus, L6)
+
+- **Au téléphone, « Aujourd'hui » commence par la journée** (D-315) :
+  « Votre journée » et « Gel ou chaleur » passent juste sous l'en-tête,
+  avant les chiffres de la semaine ; la première irrigation à faire n'est
+  plus à plus d'un écran du haut. L'ordinateur ne change pas.
+
 ### Corrigé (« Aujourd'hui » mène aux menus, L5)
 
 - **La mise en page de « Aujourd'hui »** (D-314) : sur ordinateur, un bloc

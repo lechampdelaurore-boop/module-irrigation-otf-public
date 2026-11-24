@@ -254,7 +254,7 @@ de 2 m³ »).
 | T2 | Seuil de repli des retards | plus de trois le même jour passé |
 | T3 | Bornes de la frise | 5 h à 22 h, élargies à l'heure ronde si une irrigation du jour en sort |
 | T4 | « Eau de la semaine » | la semaine en cours, du lundi au dimanche (D-004), par jardin, comme « Objectifs et besoins » |
-| T5 | Ordre des blocs | celui du 3.2 ; le gel annoncé n'est plus remonté en tête, il est déjà en tête à droite et dans les pastilles |
+| T5 | Ordre des blocs | celui du 3.2 ; le gel annoncé n'est plus remonté en tête, il est déjà en tête à droite et dans les pastilles ; **au téléphone** (page de 620 px ou moins), « Votre journée » et « Gel ou chaleur » passent juste après l'en-tête, avant les tuiles de la semaine, toujours, à l'écran comme dans l'ordre de lecture ; à l'ordinateur, l'ordre ne change pas (`docs/aujourdhui-liens-contract.md`, L6, D-315, 24 novembre 2026) |
 | T6 | Fiabilité | les données à jour s'affichent, cochées en vert |
 | T7 | Réserve du sol | pas de trait de seuil par jardin : les seuils de la réserve sont par planche, un seuil de jardin serait une règle nouvelle ; la planche la plus sèche du jardin est nommée à la place |
 | T8 | Icône de la pluie | un jour de 1 mm de pluie prévue ou plus porte la goutte ; le gel prime |
