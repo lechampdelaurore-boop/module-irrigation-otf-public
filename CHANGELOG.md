@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (« Aujourd'hui » mène aux menus, L1)
+
+- **Les quatre tuiles de la semaine mènent à leur menu** (D-310) : un
+  appui sur « Objectif de la semaine » ouvre les objectifs de la semaine,
+  sur « Eau reçue » la saisie d'une pluie mesurée, sur « Reste à apporter »
+  les besoins par planche, sur « Eau utilisée » les jours de la semaine ; le
+  mot d'action est écrit sur chaque tuile. « rien aujourd'hui » remplace
+  « dont 0 m³ aujourd'hui » ; « 7 planches sur 10 ont un objectif ».
+
 ### Documenté (« Aujourd'hui » mène aux menus, et l'objectif automatique sur l'ET0)
 
 - **Deux contrats écrits sans code** (D-308, D-309), sur les demandes du

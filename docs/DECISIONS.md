@@ -9071,3 +9071,49 @@ automatique avant sa réponse** ; elle sera consignée ici.
 calcul de l'ETM, la pluie comptée, la pénurie, les priorités, la
 faisabilité, la règle du planning, la réserve du sol (information, D-041,
 D-047).
+
+## D-310 — « Aujourd'hui » mène aux menus, L1 : les quatre tuiles mènent à leur menu
+
+Date : 24 novembre 2026. Statut : codé (PR 1 sur 6 du contrat
+`docs/aujourdhui-liens-contract.md`, D-308, section 3) ; roadmap section
+6 nonies. Code en Opus 5.5 · Élevé, le réglage de la ligne 6 nonies.
+
+**Décision.** Les quatre tuiles de « Cette semaine » deviennent chacune un
+lien entier vers « Objectifs et besoins », avec la saison et la zone de la
+page : « Objectif de la semaine » ouvre le volet des objectifs
+(`#objectifs-de-la-semaine`), « Eau reçue » le volet « Pluie mesurée »
+(`#manual-rain`) ou, pour une ferme toute sous abri où la pluie ne compte
+pas (D-032), les jours de la semaine (`#weather`), « Reste à apporter » le
+tableau des besoins par planche (`#irrigation-needs-title`), « Eau
+utilisée » les jours de la semaine. Le mot d'action est écrit en bas de la
+tuile, avec un chevron qui ne passe jamais seul à la ligne : « Modifier les
+objectifs » (« Poser un objectif » sans objectif), « Noter une pluie
+mesurée » (« Voir jour par jour » sous abri), « Voir par planche » (« Voir
+ce qui manque » quand le reste est inconnu), « Voir jour par jour ». Le
+mot et la cible viennent du domaine (`lib/domain/today/week.ts`,
+`links`) ; le lien n'enregistre rien (D-028). Les tuiles n'existent que
+« Objectifs et besoins » cochée : la page visée existe toujours. Deux
+textes corrigés : « rien aujourd'hui » au lieu de « dont 0 m³
+aujourd'hui » ; « 7 planches sur 10 ont un objectif » au lieu de
+« objectifs posés sur 7 planches sur 10 » (un seul « sur », F443).
+
+**Précisions tranchées en codant.**
+
+- F757 : « rien aujourd'hui » ne s'écrit que si le volume du jour est nul
+  **et** qu'aucune surface mouillée ne manque dans la semaine ; sinon un
+  zéro peut cacher une irrigation sans volume, et la tuile garde « dont au
+  moins 0 m³ aujourd'hui » plutôt que d'affirmer « rien » (D-003).
+- F758 : « Eau reçue » mène à la pluie mesurée dès qu'une seule planche de
+  la saison est dehors ; « Voir jour par jour » seulement quand toutes sont
+  sous abri.
+
+**Preuve.** `tests/aujourdhui-liens.test.ts` (les quatre cas du contrat,
+le singulier, la cible avec saison et zone, la tuile en lien sans geste) ;
+`tests/aujourdhui-tableau-de-bord.test.ts` et
+`tests/audit-ergonomie-final-lot-a.test.ts` suivent le texte corrigé ;
+parcours P30 aux deux largeurs : quatre tuiles en liens, leur mot écrit,
+44 px au téléphone, « Objectif de la semaine » ouvre le volet des objectifs
+le champ dans l'écran, « Eau reçue » le volet de la pluie mesurée.
+
+**Ne change pas.** Les chiffres, les phrases de détail, les couleurs et
+l'ordre des tuiles ; les pages d'arrivée ; aucune donnée, aucune migration.

@@ -3,6 +3,7 @@ import { mmText, waterText } from '../figure-origin.ts';
 import type { BedIrrigationNeed } from '../irrigation-needs.ts';
 import { percentFromFraction } from '../units.ts';
 import type { WaterDashboardDay } from '../water-management.ts';
+import { MEASURED_RAIN_ANCHOR } from './reliability.ts';
 import { shortDayText } from './today-text.ts';
 
 /**
@@ -90,6 +91,21 @@ type WeekRow = {
   bars: { irrigationPercent: number; rainPercent: number; objectivePercent: number | null };
 };
 
+/**
+ * Ce qu'une tuile de la semaine ouvre (6 nonies, L1,
+ * docs/aujourdhui-liens-contract.md, section 3) : un endroit de la page
+ * « Objectifs et besoins », qui existe dès que la semaine se lit (elle n'est
+ * lue que cette case cochée). Le mot d'action est écrit sur la tuile : au
+ * téléphone, rien d'autre ne dit qu'elle est un lien. Un lien mène, il
+ * n'enregistre rien (D-028).
+ */
+export type TodayTileLink = { label: string; page: 'besoins'; anchor: string };
+
+/** Les volets et tableaux d'« Objectifs et besoins » que les tuiles visent (water-management-dashboard.tsx, irrigation-needs-dashboard.tsx). */
+const WEEK_OBJECTIVES_ANCHOR = 'objectifs-de-la-semaine';
+const WEEK_DAYS_ANCHOR = 'weather';
+const NEEDS_TABLE_ANCHOR = 'irrigation-needs-title';
+
 export type TodayWeek = {
   /** « du lun. 2 nov. au dim. 8 nov. ». */
   label: string;
@@ -113,6 +129,13 @@ export type TodayWeek = {
     water: string | null;
     waterToday: string | null;
   };
+  /** Où mène chaque tuile, et le mot qui le dit (L1). */
+  links: {
+    objective: TodayTileLink;
+    received: TodayTileLink;
+    remaining: TodayTileLink;
+    water: TodayTileLink;
+  };
 };
 
 function weighted(beds: readonly TodayWeekBed[], pick: (bed: TodayWeekBed) => number | null): number | null {
@@ -131,9 +154,9 @@ function rounded(value: number): number {
   return Math.round(value * PERCENT_DECIMALS) / PERCENT_DECIMALS;
 }
 
-/** « 1 planche sur 2 », « 7 planches sur 10 ». */
-function bedsOn(count: number, total: number): string {
-  return `${count} planche${count > 1 ? 's' : ''} sur ${total}`;
+/** « 1 planche sur 2 a un objectif », « 7 planches sur 10 ont un objectif » : un seul « sur » par phrase (F443). */
+function bedsWithObjective(count: number, total: number): string {
+  return `${count} planche${count > 1 ? 's' : ''} sur ${total} ${count > 1 ? 'ont' : 'a'} un objectif`;
 }
 
 /** « 1 planche de 2 a un objectif », « 5 planches de 10 ont un objectif ». */
@@ -328,7 +351,7 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
     moreLabel: moreGardensLabel(hidden.length),
     tiles: {
       objective: mm(farm.objectiveMm),
-      objectiveDetail: partial ? `objectifs posés sur ${bedsOn(withObjective, total)}, ${label}` : `ferme entière, ${label}`,
+      objectiveDetail: partial ? `${bedsWithObjective(withObjective, total)}, ${label}` : `ferme entière, ${label}`,
       received: mm(farm.receivedMm),
       receivedDetail: scoped(farm.rainMm === null
         ? `${mmText(rounded(farm.irrigationMm))} d’irrigation, pluie inconnue`
@@ -338,7 +361,37 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
         ? 'une valeur manque : voir « Objectifs et besoins »'
         : remainingFor(rows) ?? scoped('objectif moins l’eau reçue, jamais négatif'),
       water: water ? volume(water.weekCubicMeters) : null,
-      waterToday: water ? `dont ${volume(water.todayCubicMeters)} aujourd’hui` : null,
+      waterToday: water ? waterTodayText(water, volume) : null,
     },
+    links: weekLinks(farm),
+  };
+}
+
+/**
+ * « dont 4 m³ aujourd'hui » ; « rien aujourd'hui » quand le volume du jour
+ * est nul et sûr (L1) : jamais « dont 0 m³ ». Quand une surface mouillée
+ * manque dans la semaine, un zéro peut cacher une irrigation sans volume :
+ * la tuile garde « dont au moins 0 m³ aujourd'hui » plutôt que d'affirmer
+ * « rien » (D-003, F757).
+ */
+function waterTodayText(water: NonNullable<TodayWeekInputs['water']>, volume: (value: number) => string): string {
+  if (water.todayCubicMeters <= 0 && !water.incomplete) return 'rien aujourd’hui';
+  return `dont ${volume(water.todayCubicMeters)} aujourd’hui`;
+}
+
+/**
+ * Les quatre tuiles mènent à leur menu (L1, section 3, règle 1) : l'objectif
+ * au volet des objectifs de la semaine ; l'eau reçue au volet « Pluie
+ * mesurée », sauf pour une ferme toute sous abri, où la pluie ne compte pas
+ * (D-032) et où elle mène aux jours de la semaine ; le reste à apporter au
+ * tableau des besoins par planche ; l'eau utilisée aux jours de la semaine.
+ */
+function weekLinks(farm: WeekRow): TodayWeek['links'] {
+  const besoins = (label: string, anchor: string): TodayTileLink => ({ label, page: 'besoins', anchor });
+  return {
+    objective: besoins(farm.objectiveMm === null ? 'Poser un objectif' : 'Modifier les objectifs', WEEK_OBJECTIVES_ANCHOR),
+    received: farm.sheltered ? besoins('Voir jour par jour', WEEK_DAYS_ANCHOR) : besoins('Noter une pluie mesurée', MEASURED_RAIN_ANCHOR),
+    remaining: besoins(farm.remainingMm === null ? 'Voir ce qui manque' : 'Voir par planche', NEEDS_TABLE_ANCHOR),
+    water: besoins('Voir jour par jour', WEEK_DAYS_ANCHOR),
   };
 }

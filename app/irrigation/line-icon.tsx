@@ -31,6 +31,8 @@ const PATHS = {
   soleil: 'M12 16a4 4 0 1 0 0-8a4 4 0 1 0 0 8zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4',
   // La flèche d'un pli : vers le bas replié, retournée une fois déplié.
   'fleche-bas': 'M6 9l6 6 6-6',
+  // Le chevron d'un lien du tableau de bord « Aujourd'hui » (6 nonies, L1) : ce qui se touche mène ailleurs.
+  chevron: 'M9 6l6 6-6 6',
   // Le tableau de bord « Aujourd'hui » (docs/aujourdhui-tableau-de-bord-contract.md) :
   // l'heure, le gel, la fiabilité, une prévision manquante, et les deux sortes de matériel.
   horloge: 'M12 20.5a8.5 8.5 0 1 0 0-17a8.5 8.5 0 1 0 0 17zM12 7.5V12l3 2',

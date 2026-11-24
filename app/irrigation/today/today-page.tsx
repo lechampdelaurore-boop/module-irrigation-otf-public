@@ -150,7 +150,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
           <ul>{refused.map((line) => <li key={line}>{line}</li>)}</ul>
         </div>
       ) : null}
-      {view.week ? <TodayWeekTiles week={view.week} /> : null}
+      {view.week ? <TodayWeekTiles week={view.week} query={dayQuery} /> : null}
       <Pair
         wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} query={dayQuery} pending={pending} onStart={start} onAllDone={recordAllDone} /> : null}
         narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
