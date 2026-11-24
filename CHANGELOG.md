@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Changé (la jauge sur le moteur commun)
+
+- **La jauge de la réserve du sol est calculée par le moteur hydrique
+  commun** (fusion des moteurs, étape 3, PR 2 ; D-301, D-270) :
+  l'interrupteur passe sur `commun` après trois matins de suite sans écart,
+  sans échec et sans planche laissée de côté (22, 23 et 24 novembre 2026 :
+  164 planches, 5 084, 6 068 puis 5 904 jours comparés). Sur la ferme du
+  porteur, aucun chiffre ne change ; ailleurs, deux données impossibles
+  rendent la jauge inconnue au lieu d'un chiffre faux : une RFU de 0 mm/m
+  (« aucune RFU saisie ») et une ET0 négative ou illisible sous un couvert
+  (« ET0 manquante »). L'ancien calcul reste derrière l'interrupteur jusqu'à
+  la PR 3 : tous les tests le rejouent (`pnpm test:jauge-ancien-calcul`) et
+  la comparaison du matin compare dans l'autre sens.
+- En ligne le 22 novembre 2026 : #183 à 20 h 04 (run 45055688184, cinq jobs
+  verts).
+
 ### Corrigé (page de confidentialité)
 
 - **La page publique de confidentialité ne promet plus de relecture

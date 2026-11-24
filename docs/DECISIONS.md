@@ -8119,6 +8119,7 @@ code ensemble s'ils touchent deux dépôts.
    écart, sans échec et sans planche laissée de côté sur la ferme réelle ;
    PR 3 (l'ancien code retiré) après une semaine sur le moteur sans écart.
    Un écart arrête la suite et se présente au porteur avec les deux valeurs.
+   La PR 2 est faite le 24 novembre 2026 (D-301).
 7. La copie du moteur vient du dossier `dist/` de la branche principale du
    dépôt commun : la PR 1 s'y est recalée le soir même, sur `a36ca0d`
    (v0.3.0, après la fusion des PR n° 11 à 14), ses preuves rejouées.
@@ -8697,3 +8698,50 @@ plus rien. Le texte change, sa date passe au 22 novembre 2026. Le test du site
 vérifie qu'aucune relecture n'est promise ; le commentaire de
 `cloudflare/irrigation-site/src/pages.ts` suit. Rien d'autre ne change sur
 le site ; les conditions n'avaient pas de telle phrase.
+
+## D-301 — La jauge passe au moteur commun (fusion des moteurs, étape 3, PR 2)
+
+Date : 24 novembre 2026. Statut : la PR 2 du plan de la fusion validé par le
+porteur (D-270, décision 6 ; contrat `docs/shared-engine-adapter-contract.md`),
+après la lecture des trois matins faite avec son accord (« Vas-y », le
+24 novembre 2026 à 8 h 59) ; réglage : Opus 5.5 · Max (MC-26).
+
+**Contexte.** La PR 1 (#158, en ligne le 22 novembre 2026 à 3 h 39) a branché
+la jauge sur le moteur commun derrière l'interrupteur `GAUGE_ENGINE`, resté
+sur l'ancien calcul, et fait comparer chaque matin les deux calculs au
+journal. Le contrat fixe la bascule après trois matins de suite sans écart,
+sans échec et sans planche laissée de côté sur la ferme réelle.
+
+**Les trois matins.** Lus le 24 novembre 2026 vers 9 h 15 au journal du
+Worker `module-irrigation-otf` (Observability de Cloudflare), dans le Chrome
+du porteur, en lecture seule, l'onglet refermé ensuite (le porteur s'est
+connecté lui-même) : les 22, 23 et 24 novembre 2026 vers 6 h 15,
+164 planches et 5 084, 6 068 puis 5 904 jours comparés, `daysWithGap` 0,
+`failures` 0, `skippedBeds` 0, le plus grand écart 2,8e-14 mm, niveau
+« info » ; aucune ligne `soil_reserve_day_record_failed` sur ces trois jours.
+
+**Décision.** L'interrupteur passe sur `commun` : la jauge est calculée par
+le moteur commun v0.3.0, jeu OTF. L'ancien calcul reste derrière
+l'interrupteur jusqu'à la PR 3 : le second passage des tests le rejoue en
+entier (`pnpm test:jauge-ancien-calcul`, qui remplace
+`pnpm test:jauge-moteur-commun` ; seul le test de l'interrupteur change), et
+la comparaison du matin compare dans l'autre sens
+(`"reference":"commun","compared":"module"`).
+
+**Ce qui change.** Sur la ferme du porteur, aucun chiffre : les trois matins
+le montrent. Ailleurs, les deux seules données impossibles du contrat, dites
+au porteur le 24 novembre 2026 avec leurs deux valeurs : une RFU de 0 mm/m
+(avant : 0 mm, % du plein inconnu, tout l'apport compté en drainage ;
+après : « Inconnue : aucune RFU saisie pour sa parcelle ») ; une ET0
+négative ou illisible sous un couvert (avant : la jauge montait sans eau ;
+après : le jour inconnu, « ET0 manquante », jusqu'au prochain départ).
+
+**Temps de calcul**, remesuré (contrat, choix 7) : médiane de sept passages
+sur 3 000 planches tirées au hasard, 34 microsecondes par jour pour l'ancien
+calcul, 50 pour le moteur, 4 pour comparer ; le matin rejoue désormais
+l'ancien calcul, le plus rapide.
+
+**Reste.** La PR 3 : l'ancien calcul et la comparaison du matin retirés
+après une semaine sur `commun` sans écart, lue au journal comme les trois
+matins. Ne changent pas : D-028, D-047, D-053, D-270. Aucune migration.
+Aucune question de budget.
