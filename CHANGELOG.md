@@ -13,7 +13,9 @@ source détaillée commit par commit.
   Aucune migration.
 - En ligne le 24 novembre 2026 : #185 à 11 h 25 (run 45369110943, cinq jobs
   verts) ; #186 à 11 h 55 (run 45375391314, cinq jobs verts, planificateur
-  redéployé avec le déclencheur de la relecture).
+  redéployé avec le déclencheur de la relecture) ; #187 à 12 h 29 (run
+  45380954584) ; #188 à 13 h 00 (run 45385740978) ; #189 à 13 h 36 (run
+  45390228188), cinq jobs verts chacun.
 
 ### Corrigé (alertes sur le téléphone, C4)
 

@@ -27,6 +27,11 @@ registres, elle y renvoie.
   consignée ici : fusionnée le 24 novembre 2026 à 11 h 30, **en ligne à
   11 h 55** (run 45375391314 vérifié job par job : les cinq jobs verts ; le
   planificateur déployé avec le déclencheur `30 7,8,10,11,13,14,16,17,19,20 * * *`).
+  Mises en ligne consignées ici, chaque run vérifié job par job (les cinq
+  jobs verts) : #187 (C2, D-304) fusionnée à 12 h 06, **en ligne à 12 h 29**
+  (run 45380954584) ; #188 (C3, D-305) fusionnée à 12 h 37, **en ligne à
+  13 h 00** (run 45385740978) ; #189 (C4, D-306) fusionnée à 13 h 06,
+  **en ligne à 13 h 36** (run 45390228188).
   Contrôles : voir la PR.
 - **Alertes sur le téléphone : l'écran des alertes dit quand l'appareil
   n'est plus inscrit, codé le 24 novembre 2026** (C4, D-306, roadmap
