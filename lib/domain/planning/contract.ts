@@ -243,6 +243,8 @@ export type PlanSuggestionCause =
     /** L'objectif de la semaine, ou le besoin posé à la main quand il en tient lieu (`manual`). */
     objectiveMm: number;
     manual: boolean;
+    /** L'objectif automatique compte dans cet objectif (6 decies, O4, D-319) : tous ses jours, ou une partie ; absent, il est saisi. */
+    objectiveOrigin?: 'automatic' | 'both';
     actualRainMm: number;
     /** La part de la pluie prévue déduite (R2). */
     forecastRainMm: number;

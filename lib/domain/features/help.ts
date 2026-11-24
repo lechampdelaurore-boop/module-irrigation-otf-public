@@ -31,7 +31,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   besoins: {
     purpose: 'Fixer l’eau que vos planches doivent recevoir chaque semaine, et voir ce qu’il leur manque.',
-    reading: 'Le besoin d’une planche est son objectif de la semaine moins l’eau déjà reçue, arrosages et pluie. Le tableau des jours donne la pluie prévue, la pluie mesurée et l’évapotranspiration.',
+    reading: 'Le besoin d’une planche est son objectif de la semaine moins l’eau déjà reçue, arrosages et pluie. Le tableau des jours donne la pluie et l’évapotranspiration. Objectif automatique allumé, une planche sans objectif saisi suit le besoin de sa culture, ou l’ET0.',
     firstStep: 'Fixez un objectif en millimètres par semaine, pour la ferme, un jardin ou une planche. Après une pluie, saisissez ce qu’indique votre pluviomètre.',
   },
   planning: {
@@ -51,7 +51,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   cultures: {
     purpose: 'Adapter le besoin en eau à chaque culture et à son stade, à partir de la météo.',
-    reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez.',
+    reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez, ou si l’objectif automatique est allumé dans « Objectifs et besoins ».',
     firstStep: 'Vérifiez dans Réglages que vos espèces d’Ouvre ta ferme correspondent à une culture de référence, puis ajustez coefficients, profils racinaires et durées si besoin.',
   },
   'alertes-meteo': {

@@ -28,6 +28,21 @@ registres, elle y renvoie.
   contre-épreuve de trente-cinq altérations. Contrôles : voir la PR.
   **Fusion après la mise en ligne vérifiée d'O4.** Restent H2, en
   Opus 5.5 · Max, et H3, en Opus 5.5 · Élevé.
+- **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
+  2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en
+  Opus 5.5 · Élevé, le réglage choisi par le porteur. Le réglage se voit
+  et s'allume dans le volet « Objectifs hebdomadaires » ; son geste
+  recalcule le plan ; le volet compte les planches qui gardent un objectif
+  saisi et propose « Vider les objectifs ». L'origine de l'objectif se dit
+  dans le tableau des besoins (et sa bulle : jours, natures d'ET0, jours
+  sans valeur, clôture), la fiche de la culture, « Aujourd'hui », le
+  planning et l'historique ; « Adopter la proposition » est retiré quand
+  l'objectif suit déjà la culture ; « Fiabilité du calcul » gagne la ligne
+  « Objectif automatique » (jours sans ET0), réglage allumé seulement.
+  Réglage éteint, aucun écran ne change. Tests à deux fermes
+  (`tests/db/objectif-automatique-ecrans.test.ts`), parcours P58 aux deux
+  largeurs. Contrôles : voir la PR. **La ligne 30 (6 decies) est codée en
+  entier.** Mise en ligne de #201 (O3, D-318) consignée ici : #201 fusionnée le 24 novembre 2026 à 22 h 02, en ligne à 22 h 36 (run 45486987409, les cinq jobs verts ; migration 0048 appliquée en production et sur la démonstration) ; celle de #200 (contrat des heures de silence, D-320) aussi : en ligne le 24 novembre 2026 à 21 h 50 (run 45479608364, les cinq jobs verts).
 - **Objectif automatique sur l'ET0, O3 : les semaines closes, codé le
   24 novembre 2026** (D-318, F782 à F788, roadmap section 6 decies, PR 3
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. Une semaine finie
