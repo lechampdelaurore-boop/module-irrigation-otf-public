@@ -31,7 +31,9 @@ registres, elle y renvoie.
   Affichage seul, aucune migration. Parcours P29 étendu. Contrôles : voir la
   PR. Reste L4 à L6. Mise en ligne de #192 (L1) consignée ici : fusionnée
   le 24 novembre 2026 à 15 h 36, **en ligne à 16 h 08** (run 45416076063,
-  les cinq jobs verts).
+  les cinq jobs verts). Le job « Parcours navigateur » passe de 35 à
+  50 minutes (F763) : la fusion de #193 (L2) avait été coupée à 35 minutes
+  (run 45422205205), relancée une fois.
 - **« Aujourd'hui » mène aux menus, L2 : les jauges mènent à leur page,
   codé le 24 novembre 2026** (D-311, F759, F760, roadmap section 6 nonies,
   PR 2 sur 6), en Opus 5.5 · Élevé. Chaque ligne de « Eau de la semaine »
