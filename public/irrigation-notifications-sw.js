@@ -21,6 +21,8 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(self.registration.showNotification(title, {
     body,
+    // Le logo du module (D-302), le même que celui de l'application installée.
+    icon: '/icon-192.png',
     tag,
     renotify: true,
     requireInteraction: true,
