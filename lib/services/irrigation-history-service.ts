@@ -203,6 +203,7 @@ async function readHistoryAnalysis({
       weather,
       goalRevisions,
       automaticObjective: automatic?.dayValuesFor(scopeBeds, dateKeys(period.startDate, period.endDate)),
+      automaticObjectiveProvisionalWeeks: automatic?.provisionalWeeks,
     }),
     events,
     protectedSlotVersions,
@@ -264,6 +265,13 @@ function historyWarnings(summary: IrrigationHistorySummary) {
   const automaticMissing = summary.objectiveAutomatic?.missingBedDays ?? 0;
   if (automaticMissing > 0) {
     warnings.push(`L’objectif automatique n’a pas de valeur pour ${countText(automaticMissing, 'journée-planche', 'journées-planche')} (jours au-delà de la prévision météo, ET0 manquante ou hors bornes, jardin à classer, plan de culture non lu) : l’objectif et l’écart ne les comptent pas.`);
+  }
+  // Une semaine close pas encore enregistrée par la tâche du matin se relit : son objectif automatique est provisoire (règle 6, D-318).
+  const provisional = summary.objectiveAutomatic?.provisionalWeeks ?? 0;
+  if (provisional > 0) {
+    warnings.push(`${provisional > 1
+      ? `L’objectif automatique de ${provisional} semaines closes est provisoire : elles ne sont pas encore enregistrées`
+      : 'L’objectif automatique d’une semaine close est provisoire : elle n’est pas encore enregistrée'}, la tâche du matin le fera. D’ici là, il se relit sur la météo et le plan de culture du jour.`);
   }
   return warnings;
 }

@@ -304,3 +304,80 @@ deux fermes, le journal, la faisabilité, le besoin, l'historique et l'aide
 du formulaire, cas 1, 2, 5, 8 et 11), `tests/objectif-automatique-lecteurs.test.ts`
 (les valeurs jour par jour égales à celles d'`objectiveForBed`, F772 sur
 une période, l'historique) et `tests/series-water.test.ts` (les séries).
+
+## 10. Précisions faites en codant O3 (24 novembre 2026, D-318)
+
+Une semaine finie ne bouge plus (règle 6) : la tâche du matin l'enregistre,
+`lib/services/automatic-objective-record.ts`, et ses lecteurs la lisent
+dans cet enregistrement, par la source automatique (`closedWeeks` de
+l'entrée d'`objectiveForBed`). Aucun écran n'allume encore le réglage
+(O4) : rien ne s'écrit, rien ne change pour aucune ferme. Sept cas que les
+sections 3 à 7 ne tranchaient pas, réglés par l'option la plus prudente :
+
+- **F782, l'enregistrement** : une ligne par planche de la saison et par
+  semaine close où le réglage était allumé au moins un jour, dans
+  `irrigation_automatic_objective_weeks` (migration 0048) : les jours
+  allumés de la semaine, chacun avec sa valeur et la nature de son ET0, ou
+  ce qui l'empêchait (ET0 manquante ou hors bornes, jardin à classer, plan
+  de culture non lu), et la semaine sans culture. Tous les jours allumés
+  s'enregistrent, qu'un objectif saisi les couvre ou non : l'objectif
+  saisi passe avant à la lecture, comme avant (règle 2). Une semaine est
+  close quand son dimanche est passé ; la tâche du matin l'enregistre
+  juste après l'ETM du matin, avec ce qui est connu ce matin-là
+  (section 6) : la nature de chaque jour reste celle de ce matin, et un
+  jour sans valeur ce matin-là le reste. Une ligne n'est jamais réécrite.
+  Elle s'efface avec la ferme et part dans son export ; la faisabilité ne
+  la lit pas, elle porte sur la semaine en cours et la suivante.
+- **F783, une semaine à cheval sur deux années** se ferme pour chacune de
+  ses deux saisons, avec ses jours de chacune, comme les lecteurs la
+  lisent ; la tâche du matin regarde aussi la saison d'avant, toute
+  l'année, pour la rattraper (F785).
+- **F784, une planche apparue après l'enregistrement** d'une semaine n'y a
+  pas d'objectif automatique : la semaine close ne bouge pas quand une
+  planche s'ajoute. Ses journées-planche y sont sans objectif, comptées
+  comme telles (D-036), et ne se disent pas provisoires.
+- **F785, le rattrapage et « provisoire »** : une semaine close pas encore
+  enregistrée (le lundi avant la tâche, un matin manqué) se relit, comme
+  en O2, et se dit provisoire. L'historique le dit dans ses
+  avertissements, en comptant les semaines closes où l'objectif
+  automatique s'est appliqué à une planche du périmètre ; le tableau des
+  besoins rend `closure` (en cours, enregistrée, provisoire) pour les
+  écrans d'O4. Le matin suivant la rattrape, au plus huit semaines par
+  ferme et par matin, les plus anciennes d'abord ; le reste suit les
+  matins d'après. Le rattrapage vaut aussi pour les semaines closes
+  pendant qu'« Objectifs et besoins » était décochée : la précision P5 du
+  choix des fonctionnalités (ce qui n'a pas tourné ne se rattrape pas)
+  laisserait ces semaines relues et provisoires pour toujours, ce que la
+  règle 6 exclut ; elles s'enregistrent avec ce qui est connu le matin du
+  rattrapage.
+- **F786, quelles fermes** : celles qui ont coché « Objectifs et besoins »
+  (R1) et allumé le réglage au moins une fois ; une seule lecture pour
+  toutes les fermes quand aucune ne l'a allumé. Rien n'est lu d'Ouvre ta
+  ferme quand aucune semaine ne manque.
+- **F787, le compte rendu du matin** : une étape « objectif automatique »
+  du calcul du matin, après l'eau des cultures (F560, F602) ; une ferme en
+  échec est comptée et n'arrête pas les autres ; une étape qui n'a pas eu
+  lieu rend le calcul du matin manqué.
+- **F788, le coût** (section 7 ; F781), mesuré le 24 novembre 2026 sur la
+  même ferme fictive de 300 planches et 570 séries, « Besoin par culture »
+  cochée, réglage allumé depuis mars, un 15 juillet (Node 22 et la base
+  SQLite des tests, médiane de cinq lectures). La source lit en une
+  requête les semaines closes enregistrées de la période et ne calcule le
+  besoin de la culture que sur les autres. Toutes enregistrées,
+  l'historique de la saison passe de 469 à 297 ms, les séries de 586 à
+  336 ms, le besoin de la semaine de 124 à 104 ms, au même nombre de
+  requêtes. Enregistrer huit semaines prend 190 ms, en un lot par semaine
+  (une ligne par planche) ; une semaine de cette ferme pèse 128 Kio, 436
+  octets par planche.
+
+Preuve : `tests/objectif-automatique-semaines-closes.test.ts` (une semaine
+close enregistrée ne bouge pas quand la météo est relue ou qu'un Kc est
+corrigé ; ses natures et ses jours sans valeur restent ; la semaine sans
+culture ; l'objectif saisi passe avant ; F783 ; F784 ; les semaines
+provisoires de l'historique) et
+`tests/db/objectif-automatique-semaines-closes.test.ts` (à deux fermes :
+l'enregistrement du lundi, jamais réécrit, rien le dimanche ; la météo
+relue chez l'une, pendant que la ferme d'à côté, sans enregistrement,
+relit et dit « provisoire » ; un Kc corrigé ; le rattrapage après un
+matin manqué, huit semaines au plus, les plus anciennes d'abord ; F784 ;
+les fermes de la tâche du matin).

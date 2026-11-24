@@ -116,6 +116,7 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   irrigation_crop_alerts: CALCULATION,
   irrigation_weather_alerts: CALCULATION,
   irrigation_soil_days: CALCULATION,
+  irrigation_automatic_objective_weeks: 'Les semaines closes de l’objectif automatique (D-318) : ce que le module en calcule, enregistré une fois par la tâche du matin et jamais réécrit ; pas un réglage, le réglage lui-même est au journal.',
   irrigation_equipment_setting_calculations: 'La provenance d’un réglage de matériel (calculateur ou mesure), écrite avec lui : la ligne du réglage garde ses valeurs.',
   // Météo.
   irrigation_weather_daily_values: `${WEATHER} La pluie mesurée y est aussi : une observation.`,

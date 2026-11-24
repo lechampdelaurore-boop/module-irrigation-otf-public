@@ -69,6 +69,7 @@ export const SPACE_TABLES: readonly SpaceTable[] = [
   { table: 'irrigation_need_preferences' },
   { table: 'irrigation_need_decision_log' },
   { table: 'irrigation_hydric_goal_revisions' },
+  { table: 'irrigation_automatic_objective_weeks' },
   { table: 'irrigation_automatic_objective_revisions' },
   { table: 'irrigation_garden_group_members', via: { column: 'group_id', parent: 'irrigation_garden_groups' } },
   { table: 'irrigation_feature_selections' },

@@ -18,6 +18,7 @@ const ALL_DONE: MorningRunReport = {
   weather: { status: 'completed', locations: 2, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },
   planning: { failed: 0 },
   cropWater: { failed: 0 },
+  automaticObjective: { failed: 0 },
   soilReserve: { failed: 0 },
   cropDrying: { failed: 0 },
   otfVault: { status: 'done', unreadable: 0 },
@@ -73,6 +74,13 @@ test('le calcul du matin manqué dès qu’une ferme échoue, étape par étape'
     'planning : 1 ferme en échec ; réserve du sol : 2 fermes en échec',
   );
   assert.equal(byTask({ ...ALL_DONE, cropDrying: { failed: 1 } })['morning-calculation'], 'séchage avant récolte : 1 ferme en échec');
+  // Les semaines closes de l'objectif automatique (6 decies, O3, D-318) : une étape du calcul du matin comme les autres.
+  assert.equal(byTask({ ...ALL_DONE, automaticObjective: { failed: 1 } })['morning-calculation'], 'objectif automatique : 1 ferme en échec');
+  assert.equal(
+    byTask({ ...ALL_DONE, automaticObjective: undefined })['morning-calculation'],
+    'interrompu avant la fin (erreur inconnue)',
+    'une étape qui n’a pas eu lieu : le calcul du matin n’a pas tout fait',
+  );
 });
 
 test('le coffre : endormi sans clé, c’est une réussite ; illisible ou en erreur, c’est un manque', () => {
@@ -116,7 +124,7 @@ test('les purges de conservation : réussies quand chacune est allée au bout', 
 test('une autre exécution tient le verrou : rien n’est enregistré, c’est elle qui le dira', () => {
   assert.deepEqual(morningTaskOutcomes({
     weather: { status: 'already-running', locations: 0, skippedBackoff: 0, forecastFailures: [], reanalysisFailures: [] },
-    planning: null, cropWater: null, soilReserve: null, cropDrying: null, otfVault: null, farmErasure: null, retentionPurge: null,
+    planning: null, cropWater: null, automaticObjective: null, soilReserve: null, cropDrying: null, otfVault: null, farmErasure: null, retentionPurge: null,
   }), []);
 });
 

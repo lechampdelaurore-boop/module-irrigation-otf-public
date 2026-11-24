@@ -169,10 +169,10 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
   },
   {
     key: 'morning-calculation',
-    label: 'Calcul du matin (planning, eau des cultures, réserve du sol, séchage)',
+    label: 'Calcul du matin (planning, eau des cultures, objectif automatique, réserve du sol, séchage)',
     rhythm: '1 par jour, après la météo de 6 h 15',
     ...MORNING_THRESHOLDS,
-    ifMissing: 'Le planning de la semaine, l\'eau des cultures et la réserve du sol ne sont pas recalculés ; l\'arrêt d\'arrosage avant récolte n\'est pas prévenu.',
+    ifMissing: 'Le planning de la semaine, l\'eau des cultures et la réserve du sol ne sont pas recalculés ; les semaines closes de l\'objectif automatique attendent le matin suivant ; l\'arrêt d\'arrosage avant récolte n\'est pas prévenu.',
     successKeptIn: 'Ligne « task:morning-calculation » de irrigation_background_jobs (réussie quand aucune ferme n\'a échoué).',
     trigger: 'weather-morning',
   },

@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Objectif automatique sur l'ET0, O3 : les semaines closes, codé le
+  24 novembre 2026** (D-318, F782 à F788, roadmap section 6 decies, PR 3
+  sur 4), en Opus 5.5 · Max, le réglage de la roadmap. Une semaine finie
+  ne bouge plus : chaque matin, juste après l'ETM du matin, la tâche du
+  matin enregistre l'objectif automatique de chaque semaine close où le
+  réglage était allumé (migration 0048), une ligne par planche, jamais
+  réécrite ; les lecteurs la lisent dans cet enregistrement, et relire la
+  météo ou corriger un Kc ne la change plus. Une semaine close pas encore
+  enregistrée se relit et se dit provisoire dans l'historique ; le matin
+  suivant la rattrape, au plus huit semaines par ferme et par matin. Une
+  étape « objectif automatique » au compte rendu du calcul du matin.
+  Aucun écran ne l'allume encore : rien ne s'écrit, rien ne change pour
+  aucune ferme. Coût mesuré sur la ferme fictive de 300 planches (F788).
+  Tests à deux fermes (`tests/db/objectif-automatique-semaines-closes.test.ts`).
+  Contrôles : voir la PR. Reste O4, en Opus 5.5 · Élevé. Mise en ligne de
+  #199 (O2, D-317) consignée ici : fusionnée le 24 novembre 2026 à
+  ⟪O2-FUSION⟫, **en ligne à ⟪O2-EN-LIGNE⟫** (run ⟪O2-RUN⟫, les cinq jobs
+  verts).
 - **Objectif automatique sur l'ET0, O2 : le réglage par ferme et ses
   lecteurs, codé le 24 novembre 2026** (D-317, F774 à F781, roadmap
   section 6 decies, PR 2 sur 4), en Opus 5.5 · Max, le réglage de la

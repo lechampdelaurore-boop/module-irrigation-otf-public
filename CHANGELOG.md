@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (objectif automatique sur l'ET0, O3)
+
+- **Les semaines closes de l'objectif automatique ne bougent plus**
+  (D-318) : quand une ferme l'allumera, chaque matin enregistrera
+  l'objectif automatique de chaque semaine finie, planche par planche ;
+  relire la météo ou corriger un Kc après coup ne la changera plus. Une
+  semaine finie pas encore enregistrée sera dite provisoire dans
+  l'historique, et le matin suivant la rattrapera. Le compte rendu du
+  calcul du matin gagne une étape « objectif automatique ». Rien ne change
+  encore pour aucune ferme : aucun écran ne l'allume (O4).
+
 ### Ajouté (objectif automatique sur l'ET0, O2)
 
 - **Le réglage « Objectif automatique » de chaque ferme et ses lecteurs**

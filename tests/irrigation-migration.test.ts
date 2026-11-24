@@ -44,8 +44,8 @@ test('la migration irrigation s’applique sur une base vide', () => {
 
   assert.deepEqual(tables, [
     'irrigation_arbitration_log',
-    // Même raison que plus bas : le réglage « Objectif automatique » (6 decies, O2, migration 0047) partage la ligne de sa voisine.
-    'irrigation_arbitrations', 'irrigation_automatic_objective_revisions',
+    // Même raison que plus bas : le réglage « Objectif automatique » (6 decies, O2, migration 0047) et ses semaines closes (O3, 0048) partagent la ligne de leur voisine.
+    'irrigation_arbitrations', 'irrigation_automatic_objective_revisions', 'irrigation_automatic_objective_weeks',
     'irrigation_background_jobs',
     'irrigation_bed_applications',
     // Les treize tables du besoin par culture et par stade (5 quater), les cinq des alertes par culture (5 quinquies) et le relevé des coûts (4.5, migration 0041) partagent la ligne de leur voisine, même raison.

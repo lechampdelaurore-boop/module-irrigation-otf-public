@@ -67,7 +67,7 @@ test('les lignes des tâches ne touchent pas au verrou de la météo, ni lui à 
 
 const morning = (reanalysisFailures: WeatherFailureKind[]): MorningRunReport => ({
   weather: { status: 'completed', locations: 1, skippedBackoff: 0, forecastFailures: [], reanalysisFailures },
-  planning: { failed: 0 }, cropWater: { failed: 0 }, soilReserve: { failed: 0 }, cropDrying: { failed: 0 },
+  planning: { failed: 0 }, cropWater: { failed: 0 }, automaticObjective: { failed: 0 }, soilReserve: { failed: 0 }, cropDrying: { failed: 0 },
   otfVault: { status: 'dormant' },
   farmErasure: { due: 0, erased: 0, unfinished: 0, failures: [] },
   retentionPurge: { purged: 0, unfinished: 0, failures: [] },

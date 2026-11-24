@@ -2,7 +2,7 @@ import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
 import { cubicMetersFromMillimeterSquareMeters } from '../units.ts';
 import { decimalText, mmText } from '../figure-origin.ts';
 import type { Bed, Plot } from '../domain.ts';
-import { irrigationActiveIntervals } from '../water-management.ts';
+import { irrigationActiveIntervals, weekStartDateKey } from '../water-management.ts';
 import { goalRevisionFirstDate } from '../hydric-goal-revisions.ts';
 import type { AutomaticObjectiveDayValues } from '../automatic-objective.ts';
 import type {
@@ -25,6 +25,7 @@ export function buildIrrigationHistorySummary({
   weather,
   goalRevisions,
   automaticObjective,
+  automaticObjectiveProvisionalWeeks,
 }: {
   events: readonly IrrigationEventRecord[];
   scopeBeds: readonly Bed[];
@@ -35,10 +36,12 @@ export function buildIrrigationHistorySummary({
   goalRevisions: readonly GoalRevisionLike[];
   /** Les valeurs de l'objectif automatique, quand la ferme l'a allumé sur la période (D-309). */
   automaticObjective?: AutomaticObjectiveDayValues;
+  /** Les semaines closes, par leur lundi, que la tâche du matin n'a pas encore enregistrées : provisoires (règle 6, D-318). */
+  automaticObjectiveProvisionalWeeks?: ReadonlySet<string>;
 }): IrrigationHistorySummary {
   const irrigation = aggregateActualIrrigation(events, scopeBeds, scope, period);
   const weatherSummary = shelterObservedRain(aggregateObservedWeather(weather, period), scopeBeds, plots, period);
-  const objective = aggregateHydricObjective(goalRevisions, scopeBeds, period, automaticObjective);
+  const objective = aggregateHydricObjective(goalRevisions, scopeBeds, period, automaticObjective, automaticObjectiveProvisionalWeeks);
   const inputs = irrigation.irrigationMm !== null
     && weatherSummary.actualRainMm !== null
     && weatherSummary.actualRainAvailability.complete
@@ -187,13 +190,16 @@ function shelterObservedRain(
  * (D-309, contrat de l'objectif automatique, règle 7). Avec `automatic`, le
  * résultat dit aussi `objectiveAutomatic` : les journées-planche qu'il a
  * remplies et celles où il s'appliquait sans valeur, jamais comptées pour
- * zéro (D-003). Sans `automatic`, le résultat est celui d'avant (D-317).
+ * zéro (D-003), et les semaines `provisional` (closes, pas encore
+ * enregistrées) où il s'est appliqué (D-318). Sans `automatic`, le résultat
+ * est celui d'avant (D-317).
  */
 export function aggregateHydricObjective(
   revisions: readonly GoalRevisionLike[],
   scopeBeds: readonly Pick<Bed, 'id' | 'zoneId' | 'plotId' | 'area'>[],
   period: Pick<HistoryPeriod, 'startDate' | 'endDate'>,
   automatic?: AutomaticObjectiveDayValues,
+  provisional?: ReadonlySet<string>,
 ): HydricObjectiveAggregate {
   const dates = dateKeys(period.startDate, period.endDate);
   // Tri stable, semaine puis date, sans départage par l'identifiant (docs/revision-order-contract.md).
@@ -211,9 +217,11 @@ export function aggregateHydricObjective(
   let availableBedDays = 0;
   let automaticBedDays = 0;
   let automaticMissingBedDays = 0;
+  const provisionalWeeks = new Set<string>();
   const totalBedDays = dates.length * scopeBeds.length;
 
   for (const date of dates) {
+    const provisionalWeek = provisionalWeekOf(date, provisional);
     while (activationIndex < activations.length && activations[activationIndex].from <= date) {
       const activation = activations[activationIndex];
       const key = goalScopeKey(activation.revision);
@@ -233,6 +241,7 @@ export function aggregateHydricObjective(
       // Un objectif saisi, à n'importe quel niveau, passe toujours avant l'objectif automatique (D-309).
       const automaticMm = automatic?.get(bed.id)?.get(date);
       if (automaticMm === undefined) continue;
+      if (provisionalWeek !== null) provisionalWeeks.add(provisionalWeek);
       if (automaticMm === null) {
         automaticMissingBedDays += 1;
         continue;
@@ -259,10 +268,17 @@ export function aggregateHydricObjective(
   };
   return automatic === undefined
     ? aggregate
-    : { ...aggregate, objectiveAutomatic: { bedDays: automaticBedDays, missingBedDays: automaticMissingBedDays } };
+    : { ...aggregate, objectiveAutomatic: { bedDays: automaticBedDays, missingBedDays: automaticMissingBedDays, provisionalWeeks: provisionalWeeks.size } };
 }
 
 type HydricObjectiveAggregate = Pick<IrrigationHistorySummary, 'objectiveMm' | 'objectiveAvailability' | 'objectiveAutomatic'>;
+
+/** Le lundi de `date` quand sa semaine est close sans être encore enregistrée (D-318). */
+function provisionalWeekOf(date: string, provisional: ReadonlySet<string> | undefined): string | null {
+  if (provisional === undefined || provisional.size === 0) return null;
+  const monday = weekStartDateKey(date);
+  return provisional.has(monday) ? monday : null;
+}
 
 export function contributesRealWater(event: IrrigationEventRecord) {
   return event.status === 'completed' || event.status === 'partially_completed';

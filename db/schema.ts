@@ -898,6 +898,33 @@ export const automaticObjectiveRevisions = sqliteTable(
   ],
 );
 
+/**
+ * Les semaines closes de l'objectif automatique (6 decies, O3, migration
+ * 0048 ; D-318) : une ligne par planche et par semaine close, écrite par la
+ * tâche du matin, jamais réécrite ; ses jours allumés, en JSON.
+ */
+export const automaticObjectiveWeeks = sqliteTable(
+  'irrigation_automatic_objective_weeks',
+  {
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    season: integer('season').notNull(),
+    weekStart: text('week_start').notNull(),
+    otfBedId: text('otf_bed_id').notNull(),
+    noCropWeek: integer('no_crop_week').notNull(),
+    days: text('days').notNull(),
+    recordedAt: text('recorded_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.season, table.weekStart, table.otfBedId] }),
+    check('chk_automatic_objective_week_season', sql`${table.season} BETWEEN 1900 AND 9999`),
+    check('chk_automatic_objective_week_start', sql`${table.weekStart} GLOB '[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]' AND strftime('%w', ${table.weekStart}) = '1'`),
+    check('chk_automatic_objective_week_no_crop', sql`${table.noCropWeek} IN (0, 1)`),
+    check('chk_automatic_objective_week_days', sql`json_valid(${table.days}) AND json_type(${table.days}) = 'array' AND json_array_length(${table.days}) BETWEEN 1 AND 7`),
+  ],
+);
+
 export const weatherPreferences = sqliteTable(
   'irrigation_weather_preferences',
   {

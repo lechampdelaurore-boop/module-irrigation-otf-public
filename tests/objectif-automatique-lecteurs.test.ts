@@ -135,7 +135,7 @@ test('l’historique : sans objectif automatique, le résultat d’avant ; allum
   const automaticOnly = aggregateHydricObjective([], [BED], PERIOD, values);
   near(automaticOnly.objectiveMm, 30, 'la semaine du contrat, cas 1');
   assert.deepEqual(automaticOnly.objectiveAvailability, { availableBedDays: 7, totalBedDays: 7, complete: true });
-  assert.deepEqual(automaticOnly.objectiveAutomatic, { bedDays: 7, missingBedDays: 0 });
+  assert.deepEqual(automaticOnly.objectiveAutomatic, { bedDays: 7, missingBedDays: 0, provisionalWeeks: 0 });
 
   // Un objectif de planche de 14 mm posé le lundi, vidé le jeudi : 3 × 2 + (4,5 + 5,0 + 4,6 + 3,9) = 24,0 mm (cas 6).
   const cleared = aggregateHydricObjective(
@@ -143,13 +143,13 @@ test('l’historique : sans objectif automatique, le résultat d’avant ; allum
     [BED], PERIOD, values,
   );
   near(cleared.objectiveMm, 24, 'saisi d’abord, l’automatique ensuite');
-  assert.deepEqual(cleared.objectiveAutomatic, { bedDays: 4, missingBedDays: 0 });
+  assert.deepEqual(cleared.objectiveAutomatic, { bedDays: 4, missingBedDays: 0, provisionalWeeks: 0 });
   assert.equal(cleared.objectiveAvailability.complete, true);
 
   // Un objectif de ferme saisi à 0 mm passe avant, comme tout objectif saisi (cas 5).
   const zero = aggregateHydricObjective([goal('farm', 0, '2026-06-01T07:00:00.000Z')], [BED], PERIOD, values);
   assert.equal(zero.objectiveMm, 0);
-  assert.deepEqual(zero.objectiveAutomatic, { bedDays: 0, missingBedDays: 0 });
+  assert.deepEqual(zero.objectiveAutomatic, { bedDays: 0, missingBedDays: 0, provisionalWeeks: 0 });
 });
 
 test('l’historique : un jour sans valeur n’est pas compté pour zéro en silence, il est compté à part (cas 8, D-003)', () => {
@@ -157,12 +157,12 @@ test('l’historique : un jour sans valeur n’est pas compté pour zéro en sil
   const result = aggregateHydricObjective([], [BED], PERIOD, values);
   near(result.objectiveMm, 26.1, 'les six jours connus');
   assert.deepEqual(result.objectiveAvailability, { availableBedDays: 6, totalBedDays: 7, complete: false });
-  assert.deepEqual(result.objectiveAutomatic, { bedDays: 6, missingBedDays: 1 });
+  assert.deepEqual(result.objectiveAutomatic, { bedDays: 6, missingBedDays: 1, provisionalWeeks: 0 });
 
   // Le même jour couvert par un objectif saisi : il compte, rien ne manque.
   const covered = aggregateHydricObjective([goal('bed', 7, '2026-06-21T06:00:00.000Z')], [BED], PERIOD, values);
   near(covered.objectiveMm, 26.1 + 1, 'le dimanche prend le septième de l’objectif saisi');
-  assert.deepEqual(covered.objectiveAutomatic, { bedDays: 6, missingBedDays: 0 });
+  assert.deepEqual(covered.objectiveAutomatic, { bedDays: 6, missingBedDays: 0, provisionalWeeks: 0 });
 });
 
 test('l’historique : plusieurs planches, chacune son objectif automatique, pondéré par sa surface', () => {
@@ -172,5 +172,5 @@ test('l’historique : plusieurs planches, chacune son objectif automatique, pon
   ]);
   const result = aggregateHydricObjective([], [BED, SHELTERED_BED], PERIOD, values);
   near(result.objectiveMm, (30 * 8 + 24 * 24) / 32, '30 mm sur 8 m², 24 mm sous abri sur 24 m²');
-  assert.deepEqual(result.objectiveAutomatic, { bedDays: 14, missingBedDays: 0 });
+  assert.deepEqual(result.objectiveAutomatic, { bedDays: 14, missingBedDays: 0, provisionalWeeks: 0 });
 });
