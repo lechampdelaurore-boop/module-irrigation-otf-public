@@ -131,3 +131,29 @@ test('une fenêtre déjà sur la bonne page n’est pas rechargée, et une adres
   const foreign = await clickNotification({ windows: () => [], url: 'https://pirate.exemple/irrigation' });
   assert.deepEqual(foreign.calls, ['close', `openWindow ${ORIGIN}/irrigation`]);
 });
+
+test('la notification porte le logo du module (D-302)', async () => {
+  const shown: { title: string; options: { icon?: string } }[] = [];
+  const listeners = new Map<string, (event: unknown) => void>();
+  const pending: Promise<unknown>[] = [];
+  const self = {
+    location: { origin: ORIGIN },
+    addEventListener: (type: string, listener: (event: unknown) => void) => listeners.set(type, listener),
+    skipWaiting: () => undefined,
+    registration: {
+      showNotification: async (title: string, options: { icon?: string }) => {
+        shown.push({ title, options });
+      },
+    },
+    clients: { claim: async () => undefined },
+  };
+  const source = await readFile('public/irrigation-notifications-sw.js', 'utf8');
+  vm.runInNewContext(source, { self, URL });
+  listeners.get('push')?.({
+    data: { json: () => ({ title: 'Irrigation terminée', data: { url: '/irrigation' } }) },
+    waitUntil: (promise: Promise<unknown>) => pending.push(promise),
+  });
+  await Promise.all(pending);
+  assert.equal(shown.length, 1);
+  assert.equal(shown[0]?.options.icon, '/icon-192.png');
+});

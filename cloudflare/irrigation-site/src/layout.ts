@@ -24,6 +24,10 @@ export function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
+/** Le logo du module dans l'onglet et les favoris (D-302). */
+export const FAVICON_PATH = '/favicon.svg';
+export const FAVICON_LINK = `<link rel="icon" href="${FAVICON_PATH}" type="image/svg+xml">`;
+
 export function renderPage(input: { id: PageId; title: string; description: string; body: string }): string {
   const nav = (Object.keys(PAGE_PATHS) as PageId[])
     .map((id) => {
@@ -38,6 +42,7 @@ export function renderPage(input: { id: PageId; title: string; description: stri
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${input.title} · Module d'irrigation pour Ouvre ta ferme</title>
 <meta name="description" content="${input.description}">
+${FAVICON_LINK}
 <link rel="stylesheet" href="/site.css">
 </head>
 <body>

@@ -1,11 +1,13 @@
 import { PAGE_PATHS } from './addresses.ts';
-import { SITE_CSS } from './layout.ts';
+import { FAVICON_SVG } from './favicon.ts';
+import { FAVICON_LINK, FAVICON_PATH, SITE_CSS } from './layout.ts';
 import { homePage, privacyPage, termsPage } from './pages.ts';
 
 /**
  * Le Worker du site public (sous-tranche 4.8, D-153) : trois pages en
- * lecture seule et leur feuille de style. Aucune base, aucun journal, aucun
- * témoin, aucun script ; seules les méthodes GET et HEAD sont acceptées.
+ * lecture seule, leur feuille de style et le logo du module (D-302). Aucune
+ * base, aucun journal, aucun témoin, aucun script ; seules les méthodes GET
+ * et HEAD sont acceptées.
  */
 
 export type SiteEnv = {
@@ -27,7 +29,7 @@ const CACHE_CONTROL = 'public, max-age=3600';
 
 const NOT_FOUND_HTML = `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Page introuvable</title><link rel="stylesheet" href="/site.css"></head>
+<title>Page introuvable</title>${FAVICON_LINK}<link rel="stylesheet" href="/site.css"></head>
 <body><main id="contenu"><h1>Page introuvable</h1><p>Cette adresse ne correspond à aucune page du site.</p>
 <p><a href="/">Retour à l'accueil</a></p></main></body></html>
 `;
@@ -62,6 +64,8 @@ export function handleSiteRequest(request: Request, env: SiteEnv): Response {
       return respond(termsPage(env.SITE_CONTACT_EMAIL), html, 200, method);
     case '/site.css':
       return respond(SITE_CSS, 'text/css; charset=utf-8', 200, method);
+    case FAVICON_PATH:
+      return respond(FAVICON_SVG, 'image/svg+xml', 200, method);
     default:
       return respond(NOT_FOUND_HTML, html, 404, method);
   }
