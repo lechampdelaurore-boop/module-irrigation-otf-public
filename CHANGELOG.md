@@ -12,7 +12,8 @@ source détaillée commit par commit.
   les alertes, et, dans un pli, pourquoi une alerte peut arriver en retard.
   Aucune migration.
 - En ligne le 24 novembre 2026 : #185 à 11 h 25 (run 45369110943, cinq jobs
-  verts).
+  verts) ; #186 à 11 h 55 (run 45375391314, cinq jobs verts, planificateur
+  redéployé avec le déclencheur de la relecture).
 
 ### Corrigé (alertes sur le téléphone, C4)
 
