@@ -91,7 +91,7 @@ function farm(options: Options) {
       bedId: bed.id, bedName: bed.id, plotId: bed.plotId, plotName: bed.plotId, zoneId: 'zone', zoneName: 'Zone',
       sheltered, areaSquareMeters: bed.area, wettedAreaSquareMeters: bed.area, wettedAreaSource: 'sprinkler',
       et0Mm: null, et0KnownMm: null, et0ReanalysisMm: null, et0ForecastMm: null,
-      objectiveMm: need, objectiveSource: 'farm', actualRainMm: 0, actualIrrigationMm: 0, realRemainingMm: need, relativeDeficitPercent: 100,
+      objectiveMm: need, objectiveSource: 'farm', objectiveOrigin: 'entered', automaticObjective: null, actualRainMm: 0, actualIrrigationMm: 0, realRemainingMm: need, relativeDeficitPercent: 100,
       forecastRainMm: 0, plannedIrrigationMm: 0, rawPlanningNeedMm: need, thresholdMm: 0, calculatedNeedMm: need,
       manualOverrideMm: null, overrideReason: null, effectiveNeedMm: need, effectiveVolumeCubicMeters: need * bed.area / 1000,
       priority: 'normal', weekStart: WEEK.weekStart, weekEnd: WEEK.weekEnd, deadlineAt: '2026-10-04T22:00:00.000Z',

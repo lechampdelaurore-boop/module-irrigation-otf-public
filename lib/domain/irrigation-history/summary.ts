@@ -4,6 +4,7 @@ import { decimalText, mmText } from '../figure-origin.ts';
 import type { Bed, Plot } from '../domain.ts';
 import { irrigationActiveIntervals } from '../water-management.ts';
 import { goalRevisionFirstDate } from '../hydric-goal-revisions.ts';
+import type { AutomaticObjectiveDayValues } from '../automatic-objective.ts';
 import type {
   GoalRevisionLike,
   HistoryAvailability,
@@ -23,6 +24,7 @@ export function buildIrrigationHistorySummary({
   period,
   weather,
   goalRevisions,
+  automaticObjective,
 }: {
   events: readonly IrrigationEventRecord[];
   scopeBeds: readonly Bed[];
@@ -31,10 +33,12 @@ export function buildIrrigationHistorySummary({
   period: HistoryPeriod;
   weather: readonly WeatherDailyLike[];
   goalRevisions: readonly GoalRevisionLike[];
+  /** Les valeurs de l'objectif automatique, quand la ferme l'a allumé sur la période (D-309). */
+  automaticObjective?: AutomaticObjectiveDayValues;
 }): IrrigationHistorySummary {
   const irrigation = aggregateActualIrrigation(events, scopeBeds, scope, period);
   const weatherSummary = shelterObservedRain(aggregateObservedWeather(weather, period), scopeBeds, plots, period);
-  const objective = aggregateHydricObjective(goalRevisions, scopeBeds, period);
+  const objective = aggregateHydricObjective(goalRevisions, scopeBeds, period, automaticObjective);
   const inputs = irrigation.irrigationMm !== null
     && weatherSummary.actualRainMm !== null
     && weatherSummary.actualRainAvailability.complete
@@ -176,11 +180,21 @@ function shelterObservedRain(
   };
 }
 
+/**
+ * L'objectif d'une période sur des planches : jour par jour, l'objectif saisi
+ * le plus précis apporte un septième de sa valeur ; un jour sans objectif
+ * saisi prend la valeur de l'objectif automatique quand `automatic` en a une
+ * (D-309, contrat de l'objectif automatique, règle 7). Avec `automatic`, le
+ * résultat dit aussi `objectiveAutomatic` : les journées-planche qu'il a
+ * remplies et celles où il s'appliquait sans valeur, jamais comptées pour
+ * zéro (D-003). Sans `automatic`, le résultat est celui d'avant (D-317).
+ */
 export function aggregateHydricObjective(
   revisions: readonly GoalRevisionLike[],
   scopeBeds: readonly Pick<Bed, 'id' | 'zoneId' | 'plotId' | 'area'>[],
   period: Pick<HistoryPeriod, 'startDate' | 'endDate'>,
-) {
+  automatic?: AutomaticObjectiveDayValues,
+): HydricObjectiveAggregate {
   const dates = dateKeys(period.startDate, period.endDate);
   // Tri stable, semaine puis date, sans départage par l'identifiant (docs/revision-order-contract.md).
   // Chaque révision compte à partir de son jour de pose, la règle du tableau des besoins (D-039,
@@ -195,6 +209,8 @@ export function aggregateHydricObjective(
   let activationIndex = 0;
   let objectiveMm = 0;
   let availableBedDays = 0;
+  let automaticBedDays = 0;
+  let automaticMissingBedDays = 0;
   const totalBedDays = dates.length * scopeBeds.length;
 
   for (const date of dates) {
@@ -208,9 +224,22 @@ export function aggregateHydricObjective(
     let weightedDaily = 0;
     for (const bed of scopeBeds) {
       const goal = applicableGoal(state, bed);
-      if (!goal || totalArea <= 0) continue;
+      if (totalArea <= 0) continue;
+      if (goal) {
+        availableBedDays += 1;
+        weightedDaily += Math.max(0, goal.amountMm ?? 0) / 7 * Math.max(0, bed.area);
+        continue;
+      }
+      // Un objectif saisi, à n'importe quel niveau, passe toujours avant l'objectif automatique (D-309).
+      const automaticMm = automatic?.get(bed.id)?.get(date);
+      if (automaticMm === undefined) continue;
+      if (automaticMm === null) {
+        automaticMissingBedDays += 1;
+        continue;
+      }
       availableBedDays += 1;
-      weightedDaily += Math.max(0, goal.amountMm ?? 0) / 7 * Math.max(0, bed.area);
+      automaticBedDays += 1;
+      weightedDaily += Math.max(0, automaticMm) * Math.max(0, bed.area);
     }
     if (totalArea > 0) objectiveMm += weightedDaily / totalArea;
   }
@@ -220,7 +249,7 @@ export function aggregateHydricObjective(
   // sans aucune journée-planche couverte est sans objectif (D-036, point ouvert 39).
   // « complete » dit si toutes le sont, pour l'affichage du nombre couvert.
   const complete = totalBedDays > 0 && availableBedDays === totalBedDays;
-  return {
+  const aggregate: HydricObjectiveAggregate = {
     objectiveMm: availableBedDays > 0 ? objectiveMm : null,
     objectiveAvailability: {
       availableBedDays,
@@ -228,7 +257,12 @@ export function aggregateHydricObjective(
       complete,
     },
   };
+  return automatic === undefined
+    ? aggregate
+    : { ...aggregate, objectiveAutomatic: { bedDays: automaticBedDays, missingBedDays: automaticMissingBedDays } };
 }
+
+type HydricObjectiveAggregate = Pick<IrrigationHistorySummary, 'objectiveMm' | 'objectiveAvailability' | 'objectiveAutomatic'>;
 
 export function contributesRealWater(event: IrrigationEventRecord) {
   return event.status === 'completed' || event.status === 'partially_completed';

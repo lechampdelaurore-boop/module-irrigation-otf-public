@@ -40,6 +40,8 @@ const CHANGE_SUBJECTS = {
   'objectif-adopte': { family: 'objectif', label: 'Objectif proposé adopté' },
   'seuil-de-besoin': { family: 'objectif', label: 'Seuil minimal de besoin' },
   'decision-de-planche': { family: 'objectif', label: 'Décision sur le besoin d’une planche' },
+  // L'objectif automatique sur l'ET0, allumé ou éteint pour toute la ferme (6 decies, O2 ; D-309, D-317).
+  'objectif-automatique': { family: 'objectif', label: 'Objectif automatique' },
   // Réglages.
   'reglages-du-planning': { family: 'reglage', label: 'Réglages du planning' },
   'creneau-protege': { family: 'reglage', label: 'Créneau protégé' },

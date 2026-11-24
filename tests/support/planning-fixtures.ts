@@ -138,7 +138,7 @@ export function farm(options: FixtureOptions = {}) {
       bedId: item.id, bedName: item.name, plotId: item.plotId, plotName: plotName(item.plotId), zoneId: 'clementiere', zoneName: 'Clémentière',
       sheltered: sheltered(item.plotId), areaSquareMeters: item.area, wettedAreaSquareMeters: item.area, wettedAreaSource: 'drip',
       et0Mm: null, et0KnownMm: null, et0ReanalysisMm: null, et0ForecastMm: null,
-      objectiveMm: 20, objectiveSource: 'farm', actualRainMm: 0, actualIrrigationMm: 0, realRemainingMm: 20, relativeDeficitPercent: 100,
+      objectiveMm: 20, objectiveSource: 'farm', objectiveOrigin: 'entered', automaticObjective: null, actualRainMm: 0, actualIrrigationMm: 0, realRemainingMm: 20, relativeDeficitPercent: 100,
       forecastRainMm: 0, plannedIrrigationMm: 0, rawPlanningNeedMm: 20, thresholdMm: 0, calculatedNeedMm: 20,
       manualOverrideMm: null, overrideReason: null, effectiveNeedMm: 20, effectiveVolumeCubicMeters: cubicMetersFromMillimeters(20, item.area),
       priority: options.priorities?.[item.plotId] ?? options.priorities?.[item.id] ?? 'normal', weekStart: WEEK.weekStart, weekEnd: WEEK.weekEnd,

@@ -9,7 +9,7 @@ import {
   type Et0Nature,
   type Et0Reading,
 } from './crop-water/etm.ts';
-import { FARM_TIME_ZONE, dateKeyInTimeZone } from './water-management.ts';
+import { FARM_TIME_ZONE, addDaysToDateKey, dateKeyInTimeZone, weekStartDateKey } from './water-management.ts';
 
 /**
  * L'objectif automatique (6 decies, docs/objectif-automatique-contract.md,
@@ -110,12 +110,24 @@ export type AutomaticObjectiveWeek = {
  * la journée (F773, docs/revision-order-contract.md). Aucun geste : éteint.
  */
 export function automaticObjectiveEnabledOn(settings: readonly AutomaticObjectiveSettingRevision[], date: string): boolean {
-  let latest: AutomaticObjectiveSettingRevision | null = null;
-  for (const revision of settings) {
-    if (dateKeyInTimeZone(revision.createdAt, FARM_TIME_ZONE) > date) continue;
-    if (latest === null || revision.createdAt >= latest.createdAt) latest = revision;
-  }
-  return latest?.enabled === true;
+  return automaticObjectiveSchedule(settings)(date);
+}
+
+/**
+ * Le réglage jour par jour, pour qui le lit sur beaucoup de jours : le jour
+ * de chaque geste, en heure de Paris, ne se calcule qu'une fois (mesure de
+ * coût de la PR O2, D-317). Même règle qu'`automaticObjectiveEnabledOn`.
+ */
+export function automaticObjectiveSchedule(settings: readonly AutomaticObjectiveSettingRevision[]): (date: string) => boolean {
+  const gestures = settings.map((revision) => ({ revision, day: dateKeyInTimeZone(revision.createdAt, FARM_TIME_ZONE) }));
+  return (date) => {
+    let latest: AutomaticObjectiveSettingRevision | null = null;
+    for (const { revision, day } of gestures) {
+      if (day > date) continue;
+      if (latest === null || revision.createdAt >= latest.createdAt) latest = revision;
+    }
+    return latest?.enabled === true;
+  };
 }
 
 /**
@@ -129,8 +141,29 @@ export function automaticObjectiveWeek(
   weekDates: readonly string[],
   dates: readonly string[],
 ): AutomaticObjectiveWeek {
-  const readings = new Map(input.et0Readings.map((reading) => [reading.date, reading]));
-  const cropDays = input.cropNeed.status === 'read' ? new Map(input.cropNeed.days.map((day) => [day.date, day])) : null;
+  return weekOf(input, bed, weekDates, dates, dayLookups(input));
+}
+
+/** L'ET0 et le besoin de la culture, jour par jour : construits une fois par planche, lus chaque semaine. */
+type DayLookups = {
+  readings: ReadonlyMap<string, Et0Reading>;
+  cropDays: ReadonlyMap<string, BedWaterDay> | null;
+};
+
+function dayLookups(input: AutomaticObjectiveInput): DayLookups {
+  return {
+    readings: new Map(input.et0Readings.map((reading) => [reading.date, reading])),
+    cropDays: input.cropNeed.status === 'read' ? new Map(input.cropNeed.days.map((day) => [day.date, day])) : null,
+  };
+}
+
+function weekOf(
+  input: AutomaticObjectiveInput,
+  bed: Pick<Bed, 'plotId'>,
+  weekDates: readonly string[],
+  dates: readonly string[],
+  { readings, cropDays }: DayLookups,
+): AutomaticObjectiveWeek {
   const noCropWeek = cropDays !== null && weekDates.every((date) => cropDays.get(date)?.status === 'no-crop');
   const days = dates.map((date) => automaticObjectiveDay(input, bed, date, readings, cropDays));
   const valued = noCropWeek ? [] : days.filter(isValued);
@@ -145,6 +178,62 @@ export function automaticObjectiveWeek(
     noCropWeek,
     basis: basisOf(valued),
   };
+}
+
+/**
+ * Les valeurs automatiques, jour par jour et planche par planche, pour un
+ * lecteur qui compose lui-même l'objectif sur une période (l'historique, les
+ * séries ; contrat, règle 7) : pour chaque jour où l'objectif automatique
+ * s'applique, sa valeur en mm, ou `null` quand il n'en a pas (D-003). Un jour
+ * absent : il ne s'y applique pas (réglage éteint, semaine sans culture).
+ */
+export type AutomaticObjectiveDayValues = ReadonlyMap<string, ReadonlyMap<string, number | null>>;
+
+/**
+ * Les jours `dates` où le réglage de la ferme est allumé, groupés par semaine
+ * du lundi au dimanche : la même découpe pour toutes les planches de la
+ * ferme, faite une fois (mesure de coût de la PR O2, D-317).
+ */
+type AutomaticObjectivePeriod = readonly { weekDates: readonly string[]; days: readonly string[] }[];
+
+export function automaticObjectivePeriod(
+  settings: readonly AutomaticObjectiveSettingRevision[],
+  dates: readonly string[],
+): AutomaticObjectivePeriod {
+  const enabledOn = automaticObjectiveSchedule(settings);
+  const byWeek = new Map<string, string[]>();
+  for (const date of dates) {
+    if (!enabledOn(date)) continue;
+    const monday = weekStartDateKey(date);
+    const days = byWeek.get(monday);
+    if (days) days.push(date);
+    else byWeek.set(monday, [date]);
+  }
+  return [...byWeek].map(([monday, days]) => ({
+    weekDates: Array.from({ length: 7 }, (_, offset) => addDaysToDateKey(monday, offset)),
+    days,
+  }));
+}
+
+/**
+ * Les valeurs automatiques d'une planche aux jours de `period`, découpée avec
+ * les gestes de sa ferme : la semaine de chaque jour se lit entière, du lundi
+ * au dimanche, pour savoir si la planche porte une culture (F772) ; la valeur
+ * d'un jour est celle que `objectiveForBed` lui donne.
+ */
+export function automaticObjectiveDayValues(
+  input: AutomaticObjectiveInput,
+  bed: Pick<Bed, 'plotId'>,
+  period: AutomaticObjectivePeriod,
+): Map<string, number | null> {
+  const lookups = dayLookups(input);
+  const values = new Map<string, number | null>();
+  for (const { weekDates, days } of period) {
+    const week = weekOf(input, bed, weekDates, days, lookups);
+    if (week.noCropWeek) continue;
+    for (const day of week.days) values.set(day.date, isValued(day) ? day.mm : null);
+  }
+  return values;
 }
 
 function automaticObjectiveDay(

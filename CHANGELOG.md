@@ -12,6 +12,17 @@ source détaillée commit par commit.
   la fin d'un arrosage et le gel passent, le reste attend la fin de la plage.
   Aucun code, aucune ferme ne change.
 
+### Ajouté (objectif automatique sur l'ET0, O2)
+
+- **Le réglage « Objectif automatique » de chaque ferme et ses lecteurs**
+  (D-317) : le réglage est gardé par ferme, geste par geste, et chaque
+  geste s'écrit au journal des modifications. Quand une ferme l'allumera,
+  le besoin, le planning, la faisabilité, « Aujourd'hui », l'aide du
+  formulaire d'irrigation, les fiches, l'écart, l'historique et les séries
+  liront tous la même règle ; un jour sans valeur y sera compté à part,
+  jamais pour zéro. Rien ne change encore pour aucune ferme : aucun écran
+  ne l'allume (O4).
+
 ### Ajouté (objectif automatique sur l'ET0, O1)
 
 - **La règle de l'objectif automatique** (D-316) : quand une ferme
