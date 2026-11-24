@@ -848,6 +848,25 @@ registres, elle y renvoie.
   13 h 30** (#175, fusionnée à 12 h 58, run 45019879666 vérifié job par
   job : les cinq jobs verts ; consigné par la PR du cas d'écart de la
   démonstration, #178).
+- Tranche 4, **4.6 : pré-vérification du 24 novembre 2026 pour la fiche
+  d'entrée** (lecture de `main` à `e88dcb7`, rien rejoué ; fiche toujours
+  vide). **E5** : la 4.5 en ligne en entier (21 novembre 2026, 13 h 32),
+  l'effacement et la restauration prouvés (S1 à S3, essai chez Cloudflare
+  du 20 novembre 2026) et la phrase des 30 jours (`pages.ts` l. 108, test
+  du site) sont constatés ; la première veille réelle (22 novembre 2026,
+  9 h 00) est vue sur la page d'état ; **reste la notification reçue sur
+  l'appareil du porteur** (contrat, 10 bis.7, 4.5-f, g), attendue avec le
+  « tout va bien » du dimanche 29 novembre 2026 : sa confirmation coche la
+  ligne. Le risque « alertes non délivrées », ajouté à E5 le 24 novembre
+  2026, est couvert par les corrections C1 à C4 (section 6 octies : D-303
+  à D-306) : relecture des prévisions dans la journée, carte « Alertes non
+  délivrées », veille qui prévient l'exploitant, bouton « Réactiver les
+  notifications ». **E7** : toujours non cochable ; la page promet
+  l'effacement de la clé à « Déconnecter la ferme » (`pages.ts` l. 96),
+  geste absent de `lib/`, `db/` et `app/` ; il vient avec la 4.3 PR 3 et
+  PR 4 (accès d'OTF), E7 se coche donc après E2 ; le reste de la page est
+  conforme au code. Détail :
+  `/mnt/project-files/pilote-fiche/preverification-E5-E7-2026-11-24.md`.
 - Tranche 4, **4.6 : constats du 22 novembre 2026 pour la fiche d'entrée,
   gardés hors de la fiche** (un fil à part, en lecture seule, sur `main` à
   `ba8cbde`). La fiche `docs/pilote-fiche-entree.md` reste vide : elle ne
