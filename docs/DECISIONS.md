@@ -8814,8 +8814,10 @@ fichier `app/manifest.ts` lu par le cadre : la règle de
 écartées par le porteur. (d) Un badge de notification (petite icône
 monochrome de la barre d'état) : il demande un dessin à part.
 
-**Reste.** L'installation sur le téléphone du porteur n'est constatée
-qu'après la mise en ligne, avec son accord. Les notifications quand le
+**Reste.** L'installation sur le téléphone du porteur, constatée après
+la mise en ligne (24 novembre 2026, 11 h 25, #185) : le porteur a installé
+le module sur son téléphone (Android, Chrome) et confirmé à 12 h 51 :
+« Tout fonctionne. » Les notifications quand le
 téléphone n'a plus de session Access sont étudiées à part : la cause n'est
 pas la même (le manifeste n'intervient pas dans la réception d'une
 notification).
@@ -8984,3 +8986,28 @@ la carte de la ferme (C2) et la veille (C3) qui le disent à l'exploitant.
 
 **Ne change pas.** Le geste, l'abonnement, Réglages et la page des
 arrosages (leur texte est inchangé). Aucune migration.
+
+## D-307 — Les pages d'alertes disent la dernière lecture de la météo (alertes sur le téléphone, C5)
+
+Date : 24 novembre 2026. Statut : dernière des cinq corrections de la
+section 6 octies de la roadmap, déléguées par le porteur le 24 novembre 2026
+à 9 h 36 ; réglage : Opus 5.5 · Élevé.
+
+**Contexte.** Le 24 novembre 2026, une alerte de gel n'est arrivée qu'à la
+réouverture du module : rien à l'écran ne disait que les alertes se
+calculent à chaque lecture de la météo, ni quand la dernière avait eu lieu.
+
+**Décision.** Les pages « Alertes météo » et « Alertes cultures » disent
+l'heure de la dernière lecture réussie de la météo de la ferme. Au-delà de
+3 heures (le seuil qui fait relire la météo à l'ouverture du module), la
+ligne passe en orange : « … il y a plus de 3 heures. Une alerte apparue
+depuis dans les prévisions n'a pas encore pu partir. » Un pli « Pourquoi
+une alerte peut arriver en retard » nomme chaque lecture : 6 h 15, 9 h 30,
+12 h 30, 15 h 30, 18 h 30, 21 h 30 quand une alerte est active (C1), et
+l'ouverture du module. L'âge se juge une fois la page prête : le rendu du
+serveur dit l'heure seule, la même partout. Contrats :
+`docs/weather-alerts-contract.md` et `docs/weather-crop-alerts-contract.md`,
+« L'écran » ; règle : `lib/domain/weather/alert-reading-note.ts`.
+
+**Ne change pas.** Les lectures elles-mêmes, les alertes, leur envoi.
+Aucune migration.

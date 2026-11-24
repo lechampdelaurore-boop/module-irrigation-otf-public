@@ -44,6 +44,11 @@ test('les carottes se rattachent au jeu commun, le curseur de microclimat décal
   await encart.scrollIntoViewIfNeeded();
   await expect(encart.getByRole('heading', { name: 'Alertes cultures', exact: true })).toBeAttached();
   await expect(encart).toContainText('la prévision est celle de l’air à 2 m, à l’extérieur');
+  // La dernière lecture de la météo et pourquoi une alerte peut tarder (C5, D-307).
+  const lecture = encart.locator('.alert-reading-note');
+  await expect(lecture).toContainText(/^(Dernière lecture de la météo : le \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})?\.|Aucune lecture de la météo enregistrée)/);
+  await lecture.getByText('Pourquoi une alerte peut arriver en retard').click();
+  await expect(lecture).toContainText('à 9 h 30, 12 h 30, 15 h 30, 18 h 30 et 21 h 30 quand une alerte est active');
   const statut = encart.locator('.water-notice');
 
   // Les deux plis des seuils ouverts : les carottes sont dans l'un ou dans l'autre selon le passage précédent.
