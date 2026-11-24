@@ -56,13 +56,14 @@ async function loadEquipmentState(context: ReadyPageContext) {
   return { equipment, equipmentPlacements, equipmentPoses, equipmentPoseHistory, gardenGroupConfiguration };
 }
 
-function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = false) {
+function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = false, includeAutomaticObjective = false) {
   return getWaterDashboardForUser({
     ownerUserId: context.userId,
     season: context.season,
     snapshot: context.snapshot,
     weekStart: context.week,
     includeWeatherAlerts,
+    includeAutomaticObjective,
     now: new Date(context.nowIso),
   });
 }
@@ -133,7 +134,8 @@ export async function loadBesoinsPage(context: ReadyPageContext) {
   const [state, irrigationEvents, waterDashboard] = await Promise.all([
     loadEquipmentState(context),
     listIrrigationEventsForUser(context.userId, context.season, true),
-    loadWaterDashboard(context),
+    // Le réglage « Objectif automatique » vit dans le volet des objectifs de cette page (D-319).
+    loadWaterDashboard(context, false, true),
   ]);
   context.lap('dashboards');
   const coverage = calculateIrrigationCoverage({

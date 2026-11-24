@@ -21,6 +21,19 @@ source détaillée commit par commit.
   garde son titre, sa marque dans le menu et le retour du navigateur ; le
   clavier repart de son contenu.
 
+### Ajouté (objectif automatique sur l'ET0, O4)
+
+- **Le réglage « Objectif automatique » se voit et s'allume** (D-319) : dans
+  « Objectifs et besoins », volet « Objectifs hebdomadaires », un
+  interrupteur, éteint au départ. Allumé, une planche sans objectif saisi
+  suit chaque matin le besoin de sa culture, ou l'ET0 ; un objectif saisi
+  passe toujours avant, et le volet propose « Vider les objectifs » quand
+  des planches en gardent un. L'origine de l'objectif se lit partout
+  (tableau des besoins et sa bulle, fiche de la culture, « Aujourd'hui »,
+  planning, historique) ; « Adopter la proposition » disparaît quand
+  l'objectif suit déjà la culture ; « Fiabilité du calcul » dit les jours
+  sans ET0. Réglage éteint, rien ne change.
+
 ### Ajouté (objectif automatique sur l'ET0, O3)
 
 - **Les semaines closes de l'objectif automatique ne bougent plus**

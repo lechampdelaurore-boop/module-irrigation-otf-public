@@ -321,3 +321,17 @@ test('mêmes entrées, mêmes suggestions : deux calculs sans événement entre 
   assert.deepEqual(second.suggestions, first.suggestions);
   assert.deepEqual(second.overcommittedDays, first.overcommittedDays);
 });
+
+test('l’objectif automatique se dit dans la raison d’une suggestion ; un objectif saisi, ou un besoin posé à la main, non (6 decies, O4, D-319)', () => {
+  const soir = validatedIrrigation('bloc-2-mercredi', 'rampe-bloc-2', WEDNESDAY_21H, SPRINKLER_10MM, BLOC_2);
+  const causeFor = (extra: Partial<BedIrrigationNeed>, terms: Parameters<typeof need>[0] = { objectiveMm: 10, actualRainMm: 8, plannedIrrigationMm: MM_SPRINKLER_10 }) => {
+    const { inputs } = farm({ now: WEDNESDAY_8H, events: [soir], plotNeeds: { 'bloc-2': { ...need(terms), ...extra } } });
+    return usefulCause(only(buildWeeklyPlan(inputs, settings), 'bloc-2-mercredi')[0]);
+  };
+  assert.equal(causeFor({ objectiveOrigin: 'automatic' }).objectiveOrigin, 'automatic');
+  assert.equal(causeFor({ objectiveOrigin: 'both' }).objectiveOrigin, 'both');
+  assert.equal('objectiveOrigin' in causeFor({ objectiveOrigin: 'entered' }), false, 'saisi : la raison d’avant');
+  assert.equal('objectiveOrigin' in causeFor({}), false, 'sans origine : la raison d’avant');
+  const manual = causeFor({ objectiveOrigin: 'automatic' }, { objectiveMm: 10, actualRainMm: 8, plannedIrrigationMm: MM_SPRINKLER_10, manualOverrideMm: 2 });
+  assert.equal('objectiveOrigin' in manual, false, 'un besoin posé à la main tient lieu d’objectif');
+});
