@@ -11,6 +11,8 @@ import { weatherRefreshClaimed } from '@/lib/domain/weather/cache-policy';
 import { hasWeatherValue } from '@/lib/domain/weather/weather-provider';
 
 const JOB_KEY = 'automatic-weather-sync';
+/** Le verrou de la relecture de la journée (C1, D-303), distinct de celui du matin. */
+const INTRADAY_JOB_KEY = 'intraday-weather-sync';
 
 type TargetRow = {
   workspace_id: string;
@@ -32,6 +34,22 @@ export const automaticWeatherRepository: AutomaticWeatherSyncRepository = {
   upsertValues: upsertAutomaticWeatherValues,
   archiveForecast: writeForecastArchive,
   recordWorkspaceResult: recordAutomaticWeatherWorkspaceResult,
+};
+
+/**
+ * La relecture de la journée (C1, D-303) : son propre verrou, pour qu'un
+ * matin en retard ne la bloque pas ni l'inverse ; et elle ne touche que la
+ * dernière lecture de l'exploitation (celle qui évite une relecture à
+ * l'ouverture du module), jamais l'état de la mise à jour automatique du
+ * matin, qui lit aussi la réanalyse (D-165).
+ */
+export const intradayWeatherRepository: AutomaticWeatherSyncRepository = {
+  claimJob: (attemptedAt, lockExpiresAt) => claimJob(INTRADAY_JOB_KEY, attemptedAt, lockExpiresAt),
+  finishJob: (input) => finishJob(INTRADAY_JOB_KEY, input),
+  listTargets: listAutomaticWeatherTargets,
+  upsertValues: upsertAutomaticWeatherValues,
+  archiveForecast: writeForecastArchive,
+  recordWorkspaceResult: recordIntradayWeatherWorkspaceResult,
 };
 
 /**
@@ -80,22 +98,35 @@ export async function tryClaimAutomaticWeatherSync(
   attemptedAt: string,
   lockExpiresAt: string,
 ): Promise<string | null> {
+  return claimJob(JOB_KEY, attemptedAt, lockExpiresAt);
+}
+
+async function claimJob(jobKey: string, attemptedAt: string, lockExpiresAt: string): Promise<string | null> {
   const token = crypto.randomUUID();
   await db.prepare(
     `INSERT OR IGNORE INTO irrigation_background_jobs
        (job_key, updated_at)
      VALUES (?, ?)`,
-  ).bind(JOB_KEY, attemptedAt).run();
+  ).bind(jobKey, attemptedAt).run();
   const result = await db.prepare(
     `UPDATE irrigation_background_jobs
      SET lock_token = ?, lock_expires_at = ?, last_started_at = ?, updated_at = ?
      WHERE job_key = ?
        AND (lock_token IS NULL OR lock_expires_at IS NULL OR lock_expires_at <= ?)`,
-  ).bind(token, lockExpiresAt, attemptedAt, attemptedAt, JOB_KEY, attemptedAt).run();
+  ).bind(token, lockExpiresAt, attemptedAt, attemptedAt, jobKey, attemptedAt).run();
   return weatherRefreshClaimed(result.meta) ? token : null;
 }
 
 export async function finishAutomaticWeatherSync(input: {
+  token: string;
+  at: string;
+  successful: boolean;
+  error: string | null;
+}): Promise<void> {
+  await finishJob(JOB_KEY, input);
+}
+
+async function finishJob(jobKey: string, input: {
   token: string;
   at: string;
   successful: boolean;
@@ -113,7 +144,7 @@ export async function finishAutomaticWeatherSync(input: {
     input.at,
     input.successful ? null : input.error,
     input.at,
-    JOB_KEY,
+    jobKey,
     input.token,
   ).run();
 }
@@ -183,6 +214,26 @@ async function recordAutomaticWeatherWorkspaceResult(
     input.successful ? 1 : 0,
     input.at,
     input.successful ? null : input.error,
+    input.at,
+    input.workspaceId,
+  ).run();
+}
+
+async function recordIntradayWeatherWorkspaceResult(
+  input: Parameters<AutomaticWeatherSyncRepository['recordWorkspaceResult']>[0],
+): Promise<void> {
+  await db.prepare(
+    `UPDATE irrigation_weather_preferences
+     SET last_refresh_attempt_at = ?,
+         last_successful_refresh_at = CASE WHEN ? = 1 THEN ? ELSE last_successful_refresh_at END,
+         last_refresh_error = ?, refresh_not_before_at = ?, updated_at = ?
+     WHERE workspace_id = ?`,
+  ).bind(
+    input.at,
+    input.successful ? 1 : 0,
+    input.at,
+    input.successful ? null : input.error,
+    input.successful ? null : input.notBeforeAt,
     input.at,
     input.workspaceId,
   ).run();

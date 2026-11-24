@@ -262,4 +262,5 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/water-management-repository.ts › recordWeatherRefreshForUser › irrigation_weather_preferences': WEATHER_SYNC,
   'db/water-management-repository.ts › tryClaimWeatherRefreshForUser › irrigation_weather_preferences': WEATHER_SYNC,
   'db/automatic-weather-repository.ts › recordAutomaticWeatherWorkspaceResult › irrigation_weather_preferences': WEATHER_SYNC,
+  'db/automatic-weather-repository.ts › recordIntradayWeatherWorkspaceResult › irrigation_weather_preferences': WEATHER_SYNC,
 };

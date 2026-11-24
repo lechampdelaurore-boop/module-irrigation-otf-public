@@ -140,8 +140,8 @@ test('le jugement d’ensemble compte les fermes : « tout va bien » seulement 
   const okFarm = farmObservationLines([healthy('17')], context());
   const warnFarm = farmObservationLines([healthy('17', { lastWeatherAt: hoursAgo(27) })], context());
   const tasks = TASK_REGISTRY.map((declaration) => ({ declaration, state: taskState(declaration, { ...EMPTY_TASK_RUN, lastSuccessAt: hoursAgo(3) }, NOW) }));
-  assert.deepEqual(operatorStatusView(tasks, null, okFarm).verdict, { tone: 'ok', text: 'Tout va bien : les 10 tâches sont à l\'heure.' });
-  assert.deepEqual(operatorStatusView(tasks, null, warnFarm).verdict, { tone: 'warn', text: 'Les 10 tâches sont à l\'heure ; 1 ferme à regarder.' });
+  assert.deepEqual(operatorStatusView(tasks, null, okFarm).verdict, { tone: 'ok', text: 'Tout va bien : les 11 tâches sont à l\'heure.' });
+  assert.deepEqual(operatorStatusView(tasks, null, warnFarm).verdict, { tone: 'warn', text: 'Les 11 tâches sont à l\'heure ; 1 ferme à regarder.' });
 });
 
 test('C2 (D-304) : une alerte non délivrée en 24 heures met la ferme en rouge, plus ancienne en orange ; une nouvelle tentative ne change rien', () => {

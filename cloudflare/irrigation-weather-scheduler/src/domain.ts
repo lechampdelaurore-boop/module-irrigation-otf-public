@@ -15,14 +15,23 @@ export function isParisDailyWeatherWindow(date: Date) {
 export const WEATHER_CRON = '15 4,5 * * *';
 export const OPERATOR_WATCH_CRON = '0 7,8 * * *';
 export const EVENING_REMINDER_CRON = '5 * * * *';
+/**
+ * La relecture des prévisions pour les alertes (C1, D-303) : 9 h 30, 12 h 30,
+ * 15 h 30, 18 h 30 et 21 h 30 à Paris, soit en UTC 8 h 30, 11 h 30, 14 h 30,
+ * 17 h 30 et 20 h 30 en hiver, une heure plus tôt en été ; les dix créneaux
+ * sont déclarés, et seul celui qui tombe à la bonne heure de Paris lance.
+ */
+export const INTRADAY_WEATHER_CRON = '30 7,8,10,11,13,14,16,17,19,20 * * *';
+const INTRADAY_WEATHER_PARIS_HOURS: readonly number[] = [9, 12, 15, 18, 21];
 
-export type ScheduledJob = 'weather' | 'operator-watch' | 'evening-reminder';
+export type ScheduledJob = 'weather' | 'operator-watch' | 'evening-reminder' | 'weather-intraday';
 
 /**
  * Ce qu'un déclenchement doit lancer (4.5, docs/tranche-4-contract.md, F566,
  * F608) : la météo et les calculs du matin à 6 h 15 ; la veille de
  * l'exploitant à 9 h, un déclencheur distinct de ce qu'elle surveille (R5) ;
- * le passage du rappel du soir chaque heure (amélioration n° 2).
+ * le passage du rappel du soir chaque heure (amélioration n° 2) ; la
+ * relecture des prévisions pour les alertes cinq fois dans la journée (C1).
  * Rien pour le créneau UTC qui ne tombe pas à la bonne heure de Paris, ni pour
  * une expression inconnue.
  */
@@ -31,7 +40,12 @@ export function scheduledJob(cron: string, date: Date): ScheduledJob | null {
   if (cron === OPERATOR_WATCH_CRON) return isParisTime(date, 9, 0) ? 'operator-watch' : null;
   // Chaque heure : l'heure de Paris n'importe pas ici, le site lit l'heure réglée de chaque ferme.
   if (cron === EVENING_REMINDER_CRON) return 'evening-reminder';
+  if (cron === INTRADAY_WEATHER_CRON) return isParisIntradayWeatherWindow(date) ? 'weather-intraday' : null;
   return null;
+}
+
+function isParisIntradayWeatherWindow(date: Date) {
+  return INTRADAY_WEATHER_PARIS_HOURS.some((hour) => isParisTime(date, hour, 30));
 }
 
 function isParisTime(date: Date, expectedHour: number, expectedMinute: number) {
@@ -79,6 +93,13 @@ export const OPERATOR_WATCH_TIMEOUT_MS = 30_000;
  * notification ; trente secondes, comme la veille.
  */
 export const EVENING_REMINDER_TIMEOUT_MS = 30_000;
+
+/**
+ * Le temps laissé à la relecture de la journée (C1, D-303) : un appel de
+ * prévisions par lieu, puis l'évaluation des alertes des fermes relues, sans
+ * les calculs du matin ; soixante secondes, moins que le matin.
+ */
+export const INTRADAY_WEATHER_TIMEOUT_MS = 60_000;
 
 /**
  * Une erreur d'appel se retente seulement si la route n'a sans doute rien

@@ -77,6 +77,23 @@ export function morningTaskOutcomes(report: MorningRunReport): TaskOutcome[] {
   return tasksOfTrigger('weather-morning').map((task) => outcomes[task] ?? failed(task, 'tâche du matin sans résultat'));
 }
 
+/**
+ * Ce que dit une relecture des prévisions de la journée (C1, D-303,
+ * docs/weather-scheduler-contract.md) : une exécution de la tâche
+ * « weather-intraday », réussie quand chaque lieu relu a reçu ses prévisions
+ * et qu'aucune ferme n'a été remise à plus tard. Rien quand une autre relecture
+ * tenait déjà le verrou. Comme le matin, le résumé ne porte que des nombres et
+ * des classes d'erreur.
+ */
+export function intradayWeatherOutcome(report: {
+  weather?: MorningRunReport['weather'];
+  interruptedBy?: string;
+}): TaskOutcome[] {
+  if (report.weather?.status === 'already-running') return [];
+  const interrupted = `interrompu avant la fin (${errorClassWords(report.interruptedBy)})`;
+  return [weatherOutcome('weather-intraday', { weather: report.weather }, 'forecastFailures', 'sans prévisions', interrupted)];
+}
+
 function weatherOutcome(
   task: TaskKey,
   report: MorningRunReport,
