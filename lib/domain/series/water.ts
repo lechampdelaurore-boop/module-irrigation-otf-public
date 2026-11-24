@@ -11,6 +11,7 @@ import { cubicMetersFromMillimeterSquareMeters } from '../units.ts';
 import { addDaysToDateKey, localDateStartUtc } from '../water-management.ts';
 import { isIgnoredSeries, resolveSeriesOccupation, type SeriesOccupation } from './occupation.ts';
 import { compareNamesNaturally } from '../bed-order.ts';
+import type { AutomaticObjectiveDayValues } from '../automatic-objective.ts';
 
 /**
  * Les cumuls d'eau par série (docs/series-contract.md, « L'attribution des
@@ -53,7 +54,18 @@ type SeriesWaterSummary = {
   rainAvailability: HistoryAvailability;
   objectiveMm: number | null;
   objectiveAvailability: { availableBedDays: number; totalBedDays: number; complete: boolean };
-  /** Objectif prévu d'aujourd'hui à la dernière récolte attendue ; `null` : fin inconnue ou objectif absent. */
+  /**
+   * Présent quand la ferme a allumé l'objectif automatique (D-309, D-317) :
+   * les journées-planche observées qu'il a remplies, et celles où il
+   * s'appliquait sans valeur, jamais comptées pour zéro en silence (D-003) ;
+   * la règle de l'historique.
+   */
+  objectiveAutomatic?: { bedDays: number; missingBedDays: number };
+  /**
+   * Objectif prévu d'aujourd'hui à la dernière récolte attendue ; `null` : fin
+   * inconnue, objectif absent, ou un jour où l'objectif automatique n'a pas de
+   * valeur (au-delà de l'ET0 prévue, le plus souvent).
+   */
   objectiveRemainingMm: number | null;
   irrigationAndRainMm: number | null;
   gapToObjectiveMm: number | null;
@@ -78,6 +90,8 @@ export function buildSeriesWaterReport(input: {
   weather: readonly WeatherDailyLike[];
   goalRevisions: readonly GoalRevisionLike[];
   today: string;
+  /** Les valeurs de l'objectif automatique, quand la ferme l'a allumé (D-309) ; l'objectif se compose comme dans l'historique. */
+  automaticObjective?: AutomaticObjectiveDayValues;
 }): SeriesWaterReport {
   const bedsById = new Map(input.beds.map((bed) => [bed.id, bed]));
   const plotsById = new Map(input.plots.map((plot) => [plot.id, plot]));
@@ -110,11 +124,19 @@ export function buildSeriesWaterReport(input: {
 
 type PlaceOnBed = { place: CropPlan['places'][number]; bed: Bed; plot: Plot | null };
 
+type SummaryInput = {
+  events: readonly IrrigationEventRecord[];
+  weather: readonly WeatherDailyLike[];
+  goalRevisions: readonly GoalRevisionLike[];
+  today: string;
+  automaticObjective?: AutomaticObjectiveDayValues;
+};
+
 function summarizeSeries(
   item: CropSeries,
   occupation: SeriesOccupation,
   places: readonly PlaceOnBed[],
-  input: { events: readonly IrrigationEventRecord[]; weather: readonly WeatherDailyLike[]; goalRevisions: readonly GoalRevisionLike[]; today: string },
+  input: SummaryInput,
 ): SeriesWaterSummary {
   const base = {
     seriesId: item.id,
@@ -156,6 +178,8 @@ function summarizeSeries(
   let volumeIncomplete = false;
   let availableBedDays = 0;
   let totalBedDays = 0;
+  let automaticBedDays = 0;
+  let automaticMissingBedDays = 0;
   let allSheltered = places.length > 0;
   let rainUnknown = false;
 
@@ -166,7 +190,7 @@ function summarizeSeries(
     if (!sheltered) allSheltered = false;
     const area = placeArea(place.lengthMeters, bed);
     const irrigation = irrigationOnBed(input.events, bed, place.lengthMeters, observed);
-    const objective = aggregateHydricObjective(input.goalRevisions, [bed], observed);
+    const objective = aggregateHydricObjective(input.goalRevisions, [bed], observed, input.automaticObjective);
     // Sous abri, la pluie vaut explicitement zéro ; ailleurs, la mesure, sinon
     // la réanalyse — et seulement quand tous les jours sont là : une somme
     // partielle affichée comme un total tromperait (recette du 29 septembre 2026).
@@ -177,6 +201,8 @@ function summarizeSeries(
     if (irrigation.cubicMeters === null) volumeIncomplete = true;
     availableBedDays += objective.objectiveAvailability.availableBedDays;
     totalBedDays += objective.objectiveAvailability.totalBedDays;
+    automaticBedDays += objective.objectiveAutomatic?.bedDays ?? 0;
+    automaticMissingBedDays += objective.objectiveAutomatic?.missingBedDays ?? 0;
     if (area === null || totalArea === null) {
       totalArea = null;
     } else {
@@ -217,7 +243,8 @@ function summarizeSeries(
       : weather.actualRainAvailability,
     objectiveMm,
     objectiveAvailability: { availableBedDays, totalBedDays, complete: totalBedDays > 0 && availableBedDays === totalBedDays },
-    objectiveRemainingMm: remainingObjective(occupation, places, input.goalRevisions, input.today),
+    ...(input.automaticObjective === undefined ? {} : { objectiveAutomatic: { bedDays: automaticBedDays, missingBedDays: automaticMissingBedDays } }),
+    objectiveRemainingMm: remainingObjective(occupation, places, input),
     irrigationAndRainMm,
     gapToObjectiveMm,
     et0Mm: weather.et0Mm,
@@ -262,21 +289,25 @@ function irrigationOnBed(
   return { mm, cubicMeters: unknown ? null : cubicMetersFromMillimeterSquareMeters(wettedMillimeterSquareMeters) };
 }
 
-/** L'objectif encore prévu de demain à la dernière récolte attendue, pondéré par la surface occupée. */
+/**
+ * L'objectif encore prévu de demain à la dernière récolte attendue, pondéré
+ * par la surface occupée. Un jour où l'objectif automatique s'applique sans
+ * valeur (au-delà de l'ET0 prévue, le plus souvent) le rend inconnu : une
+ * somme qui l'oublierait passerait pour l'objectif restant (D-003).
+ */
 function remainingObjective(
   occupation: SeriesOccupation,
   places: readonly PlaceOnBed[],
-  goalRevisions: readonly GoalRevisionLike[],
-  today: string,
+  input: Pick<SummaryInput, 'goalRevisions' | 'today' | 'automaticObjective'>,
 ): number | null {
-  if (occupation.endDate === null || occupation.endDate <= today) return null;
-  const period = { startDate: addDaysToDateKey(today, 1), endDate: occupation.endDate };
+  if (occupation.endDate === null || occupation.endDate <= input.today) return null;
+  const period = { startDate: addDaysToDateKey(input.today, 1), endDate: occupation.endDate };
   let totalArea = 0;
   let weighted = 0;
   for (const { place, bed } of places) {
     const area = placeArea(place.lengthMeters, bed);
-    const objective = aggregateHydricObjective(goalRevisions, [bed], period);
-    if (area === null || objective.objectiveMm === null) return null;
+    const objective = aggregateHydricObjective(input.goalRevisions, [bed], period, input.automaticObjective);
+    if (area === null || objective.objectiveMm === null || (objective.objectiveAutomatic?.missingBedDays ?? 0) > 0) return null;
     totalArea += area;
     weighted += objective.objectiveMm * area;
   }

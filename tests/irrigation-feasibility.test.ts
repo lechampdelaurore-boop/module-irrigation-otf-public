@@ -8,7 +8,7 @@ const close = (actual: number | null, expected: number) => assert.ok(actual !== 
 const bed = (id: string, need: number | null, patch: Partial<BedIrrigationNeed> = {}): BedIrrigationNeed => ({
   bedId: id, bedName: id, plotId: 'garden', plotName: 'Jardin', zoneId: 'zone', zoneName: 'Parcelle', sheltered: true,
   areaSquareMeters: 1000, wettedAreaSquareMeters: 1000, wettedAreaSource: 'drip', et0Mm: need, et0KnownMm: need, et0ReanalysisMm: need, et0ForecastMm: null,
-  objectiveMm: need, objectiveSource: 'farm', actualRainMm: 0, actualIrrigationMm: 0,
+  objectiveMm: need, objectiveSource: 'farm', objectiveOrigin: 'entered', automaticObjective: null, actualRainMm: 0, actualIrrigationMm: 0,
   realRemainingMm: need, relativeDeficitPercent: 100, forecastRainMm: 0, plannedIrrigationMm: 0, rawPlanningNeedMm: need,
   thresholdMm: 0, calculatedNeedMm: need, manualOverrideMm: null, overrideReason: null, effectiveNeedMm: need, effectiveVolumeCubicMeters: need,
   priority: 'high', weekStart: '2026-09-07', weekEnd: '2026-09-13', deadlineAt: '2026-09-13T22:00:00.000Z', completeness: { complete: need !== null, missing: [], demandComplete: need !== null, realComplete: need !== null, planningComplete: need !== null, missingDates: { et0: [], actualRain: [], forecastRain: [] }, estimatedDates: { actualRain: [] } }, ...patch,

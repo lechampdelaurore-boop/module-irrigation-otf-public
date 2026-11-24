@@ -272,6 +272,7 @@ const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWo
   'objectif-hydrique': { amountMm: { label: 'Objectif', format: mm } },
   'objectif-adopte': { amountMm: { label: 'Objectif', format: mm } },
   'seuil-de-besoin': { thresholdMm: { label: 'Seuil minimal', format: mm } },
+  'objectif-automatique': { enabled: { label: 'Objectif automatique', format: words({ 1: 'allumé', 0: 'éteint', true: 'allumé', false: 'éteint' }) } },
   'decision-de-planche': {
     priority: { label: 'Priorité', format: (value) => priorityLabel(String(value) as Parameters<typeof priorityLabel>[0]) },
     manualOverrideMm: { label: 'Besoin forcé', format: mm, empty: 'aucun' },

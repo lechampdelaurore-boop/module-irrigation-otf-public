@@ -29,6 +29,8 @@ import {
   normalizeHistoryScope,
 } from '../domain/irrigation-history/scope';
 import { buildIrrigationHistorySummary } from '../domain/irrigation-history/summary';
+import { dateKeys } from '../domain/irrigation-history/dates';
+import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
 import {
   countHistoryStatuses,
   DEFAULT_HISTORY_STATUS_FILTER,
@@ -169,7 +171,7 @@ async function readHistoryAnalysis({
   const locationKey = weatherLocationKey(preference, snapshot.structure) ?? 'unconfigured';
   const repositoryScope: IrrigationHistoryScopeFilter = scope;
   const throughWeek = weekStartDateKey(period.endDate);
-  const [events, weather, goalRevisions, protectedSlotVersions] = await Promise.all([
+  const [events, weather, goalRevisions, protectedSlotVersions, automatic] = await Promise.all([
     listIrrigationHistoryForUser(ownerUserId, {
       season,
       startAt: period.startAt,
@@ -186,6 +188,8 @@ async function readHistoryAnalysis({
     // Le journal des créneaux protégés : une irrigation faite pendant l'un d'eux le dit sur sa carte (3.8 ter, règle 11),
     // Planning coché seulement : les créneaux sont un réglage du planning, ni affichés ni pris en compte décoché (3.8, R1).
     readProtectedSlotVersions(ownerUserId),
+    // L'objectif automatique, quand la ferme l'a allumé sur la période (D-309) : les jours sans objectif saisi.
+    readAutomaticObjectiveSourceForUser({ ownerUserId, season, snapshot, from: period.startDate, to: period.endDate, now }),
   ]);
   return {
     period,
@@ -198,6 +202,7 @@ async function readHistoryAnalysis({
       period,
       weather,
       goalRevisions,
+      automaticObjective: automatic?.dayValuesFor(scopeBeds, dateKeys(period.startDate, period.endDate)),
     }),
     events,
     protectedSlotVersions,
@@ -254,6 +259,11 @@ function historyWarnings(summary: IrrigationHistorySummary) {
   // « Objectif » affiche le nombre de journées-planche couvertes.
   if (summary.objectiveAvailability.availableBedDays === 0) {
     warnings.push('Aucun objectif hydrique applicable n’est historisé sur cette période.');
+  }
+  // L'objectif automatique sans valeur un jour n'est jamais compté pour zéro en silence (D-003, D-309).
+  const automaticMissing = summary.objectiveAutomatic?.missingBedDays ?? 0;
+  if (automaticMissing > 0) {
+    warnings.push(`L’objectif automatique n’a pas de valeur pour ${countText(automaticMissing, 'journée-planche', 'journées-planche')} (jours au-delà de la prévision météo, ET0 manquante ou hors bornes, jardin à classer, plan de culture non lu) : l’objectif et l’écart ne les comptent pas.`);
   }
   return warnings;
 }

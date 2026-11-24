@@ -8,6 +8,7 @@ import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey }
 import { earlySprinklerWarning } from '../domain/crop-water/proposal';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
 import { getCropWaterWeekForUser, type BedCropWater } from './crop-water-week';
+import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
 
 /**
  * La fiche d'une planche pour le besoin par culture et par stade (5 quater,
@@ -49,13 +50,14 @@ export async function getBedCropWaterSheetForUser(input: {
   const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
   const weekStart = weekStartDateKey(input.weekStart ?? today);
   const weekEnd = addDaysToDateKey(weekStart, 6);
-  const [revisions, adoptions, sprinklerOnBed, irrigationDates] = await Promise.all([
+  const [revisions, adoptions, sprinklerOnBed, irrigationDates, automatic] = await Promise.all([
     listHydricGoalRevisionsThroughWeekForUser(input.ownerUserId, input.season, weekStart),
     listAdoptionsForBedForUser(input.ownerUserId, input.season, bed.id),
     sprinklerPlacedOnBed(input.ownerUserId, input.season, bed.id),
     irrigationDatesOfBed(input.ownerUserId, input.season, bed.id, addDaysToDateKey(weekStart, -SPRINKLER_LOOKBACK_DAYS), weekEnd),
+    readAutomaticObjectiveSourceForUser({ ...input, from: weekStart, to: weekEnd, now }),
   ]);
-  const objective = objectiveForBed(revisions, bed, weekStart, weekEnd);
+  const objective = objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed));
   const week = await getCropWaterWeekForUser({
     ownerUserId: input.ownerUserId,
     season: input.season,

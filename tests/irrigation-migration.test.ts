@@ -45,6 +45,8 @@ test('la migration irrigation s’applique sur une base vide', () => {
   assert.deepEqual(tables, [
     'irrigation_arbitration_log',
     'irrigation_arbitrations',
+    // Le réglage « Objectif automatique » d'une ferme (6 decies, O2, migration 0047).
+    'irrigation_automatic_objective_revisions',
     'irrigation_background_jobs',
     'irrigation_bed_applications',
     // Les treize tables du besoin par culture et par stade (5 quater), les cinq des alertes par culture (5 quinquies) et le relevé des coûts (4.5, migration 0041) partagent la ligne de leur voisine, même raison.
