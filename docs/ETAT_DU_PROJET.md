@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Heures de silence des notifications : contrat écrit le
+  24 novembre 2026, sans code** (D-320, roadmap section 6 undecies,
+  `docs/heures-de-silence-contract.md`), sur la demande du porteur de répondre
+  soi-même à toutes les questions. Une plage de nuit par ferme, éteinte tant
+  qu'elle ne l'allume pas ; dans la plage, la fin d'un arrosage et le gel
+  passent, le reste est retenu jusqu'à la fin ; le Worker de notification ne
+  change pas. Dix choix faits par l'assistant, aucun budget, aucune question
+  agronomique réservée. Code en trois PR (H1 à H3) après O4. Rien n'est codé :
+  aucune ferme ne change.
 - **Objectif automatique sur l'ET0, O2 : le réglage par ferme et ses
   lecteurs, codé le 24 novembre 2026** (D-317, F774 à F781, roadmap
   section 6 decies, PR 2 sur 4), en Opus 5.5 · Max, le réglage de la
