@@ -297,7 +297,7 @@ test('D-003 : une pluie inconnue laisse le total inconnu, jamais zéro ; sans ob
   assert.deepEqual(week.shown.map((row) => row.text), ['6 mm irrigués / 20 mm, pluie inconnue', '2 mm reçus, aucun objectif posé']);
   // Depuis le lot A (R2, F280) : la ferme se chiffre sur la planche qui a un objectif, et le dit ; sa pluie reste inconnue.
   assert.deepEqual([week.tiles.objective, week.tiles.received, week.tiles.remaining], ['20 mm', null, null]);
-  assert.equal(week.tiles.objectiveDetail, 'objectifs posés sur 1 planche sur 2, du lun. 9 nov. au dim. 15 nov.');
+  assert.equal(week.tiles.objectiveDetail, '1 planche sur 2 a un objectif, du lun. 9 nov. au dim. 15 nov.');
   assert.equal(week.tiles.receivedDetail, '6 mm d’irrigation, pluie inconnue, sur cette planche');
   assert.equal(week.tiles.water, 'au moins 3 m³');
   assert.equal(week.shown[0].bars.objectivePercent, 100 * 20 / 20);

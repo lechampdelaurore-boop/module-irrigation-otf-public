@@ -235,7 +235,7 @@ const weekBed = (plotId: string, plotName: string, objectiveMm: number | null, v
   realRemainingMm: objectiveMm === null ? null : Math.max(0, objectiveMm - 6), ...values,
 });
 
-test('cas 6, F280 : 10 planches, 7 avec un objectif : « objectifs posés sur 7 planches sur 10 », les chiffres sur ces 7 seulement', () => {
+test('cas 6, F280 : 10 planches, 7 avec un objectif : « 7 planches sur 10 ont un objectif » (L1, D-310), les chiffres sur ces 7 seulement', () => {
   const beds = [
     ...Array.from({ length: 7 }, () => weekBed('g1', 'Champ du haut', 20)),
     ...Array.from({ length: 3 }, () => weekBed('g2', 'Abri des noues', null, { actualIrrigationMm: 30 })),
@@ -246,7 +246,7 @@ test('cas 6, F280 : 10 planches, 7 avec un objectif : « objectifs posés sur 7 
   // L'irrigation des trois planches sans objectif (30 mm) n'entre pas dans les chiffres de la ferme.
   assert.equal(week.farm.text, '6 / 20 mm (7 planches de 10 ont un objectif)');
   assert.equal(week.tiles.objective, '20 mm');
-  assert.equal(week.tiles.objectiveDetail, 'objectifs posés sur 7 planches sur 10, du lun. 9 nov. au dim. 15 nov.');
+  assert.equal(week.tiles.objectiveDetail, '7 planches sur 10 ont un objectif, du lun. 9 nov. au dim. 15 nov.');
   assert.equal(week.tiles.received, '6 mm');
   assert.equal(week.tiles.receivedDetail, '4 mm d’irrigation, 2 mm de pluie mesurée, sur ces 7 planches');
   assert.equal(week.tiles.remaining, '14 mm');

@@ -12,6 +12,17 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **« Aujourd'hui » mène aux menus, L1 : les quatre tuiles mènent à leur
+  menu, codé le 24 novembre 2026** (D-310, F757, F758, roadmap section
+  6 nonies, PR 1 sur 6), en Opus 5.5 · Élevé. Chaque tuile de « Cette
+  semaine » est un lien vers « Objectifs et besoins », son mot d'action
+  écrit en bas (« Modifier les objectifs », « Noter une pluie mesurée »,
+  « Voir par planche », « Voir jour par jour ») ; « rien aujourd'hui » et
+  « 7 planches sur 10 ont un objectif ». Affichage seul, aucune migration.
+  Parcours P30 étendu aux deux largeurs. Contrôles : voir la PR. Reste L2
+  à L6. Mise en ligne de #190 (C5, D-307) consignée ici : fusionnée le
+  24 novembre 2026 à 14 h 02, **en ligne à 14 h 36** (déploiement vérifié
+  job par job par le fil des alertes sur le téléphone).
 - **« Aujourd'hui » mène aux menus, et l'objectif automatique sur l'ET0 :
   diagnostic et deux contrats écrits le 24 novembre 2026, sans code**
   (D-308, D-309, roadmap sections 6 nonies et 6 decies), en Fable 5.2 ·

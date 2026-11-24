@@ -24,7 +24,10 @@ import {
  * au téléphone, son entrée de la barre du bas est le bouton rond, et la
  * feuille « Plus » garde l'encart et les groupes. La page dit la date, les
  * chiffres de la semaine et ses pastilles ; une pastille mène à son bloc.
- * Rien ne déborde à 390 px.
+ * Les quatre tuiles de la semaine sont des liens, leur mot d'action écrit
+ * (docs/aujourdhui-liens-contract.md, L1) : « Objectif de la semaine » ouvre
+ * le volet des objectifs, le champ dans l'écran ; « Eau reçue » celui de la
+ * pluie mesurée. Rien ne déborde à 390 px.
  *
  * « Tout est fait » (section 3.4), sur une autre ferme neuve : une irrigation
  * planifiée il y a six heures, finie, fait paraître le bouton ; la
@@ -124,6 +127,45 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   await expect(page).toHaveURL(/#today-reliability$/);
   await expect(page.locator('#today-reliability')).toBeInViewport();
   await verifierLEtape(page, journal, 'une pastille mène à son bloc');
+
+  // Les tuiles mènent à leur menu (6 nonies, L1, D-310) : chaque tuile est un lien entier, le mot d'action écrit dessus.
+  const tuiles = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi');
+  await expect(tuiles).toHaveCount(4);
+  await expect(tuiles.locator('.today-kpi-action')).toHaveText([
+    /^(Modifier les objectifs|Poser un objectif)$/,
+    /^(Noter une pluie mesurée|Voir jour par jour)$/,
+    /^(Voir par planche|Voir ce qui manque)$/,
+    'Voir jour par jour',
+  ]);
+  for (const tuile of await tuiles.all()) {
+    await expect(tuile).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#/);
+    if (telephone) await verifierCibleTactile(tuile, `La tuile « ${await tuile.locator('.today-kpi-label').innerText()} »`);
+  }
+  // Le nom lu : le titre, le chiffre, puis le mot d'action.
+  await expect(tuiles.first()).toHaveAccessibleName(/^Objectif de la semaine .+ (Modifier les objectifs|Poser un objectif)$/);
+
+  // « Objectif de la semaine » ouvre le volet des objectifs, le champ dans l'écran.
+  await tuiles.filter({ hasText: 'Objectif de la semaine' }).click();
+  await expect(page).toHaveURL(/\/irrigation\/besoins\?season=\d{4}#objectifs-de-la-semaine$/);
+  await attendreLaPagePrete(page, 'besoins');
+  await expect(page.locator('#objectifs-de-la-semaine')).toHaveAttribute('open', '');
+  await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeInViewport();
+  await verifierLEtape(page, journal, 'la tuile de l’objectif mène aux objectifs');
+
+  // « Eau reçue » ouvre la pluie mesurée (ou les jours, pour une ferme toute sous abri).
+  await page.goBack();
+  await attendreLaPagePrete(page, 'aujourdhui');
+  const eauRecue = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi').filter({ hasText: 'Eau reçue' });
+  const versLaPluie = (await eauRecue.getAttribute('href'))?.endsWith('#manual-rain') ?? false;
+  await eauRecue.click();
+  await attendreLaPagePrete(page, 'besoins');
+  if (versLaPluie) {
+    await expect(page.locator('#manual-rain')).toHaveAttribute('open', '');
+    await expect(page.locator('#manual-rain').getByLabel('Millimètres')).toBeInViewport();
+  } else {
+    await expect(page.locator('#weather')).toBeInViewport();
+  }
+  await verifierLEtape(page, journal, 'la tuile de l’eau reçue mène à la pluie mesurée');
 });
 
 test('« Tout est fait » : la confirmation liste l’irrigation passée, « Annuler » n’écrit rien, « Enregistrer » l’enregistre', async ({ page, context }, testInfo) => {
