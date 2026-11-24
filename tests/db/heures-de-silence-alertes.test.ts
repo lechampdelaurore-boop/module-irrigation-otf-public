@@ -21,7 +21,7 @@ import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Les heures de silence et les alertes (6 undecies, PR H2,
- * docs/heures-de-silence-contract.md, sections 3, 5 et 8 ; D-322) : les
+ * docs/heures-de-silence-contract.md, sections 3, 5 et 8 ; D-324) : les
  * alertes météo et par culture lisent la règle à l'instant de leur envoi,
  * avec le réglage de leur ferme. Dans la plage, le message est retenu par
  * une alarme du Worker, simulé ici, à échéance de la fin de la plage, sous

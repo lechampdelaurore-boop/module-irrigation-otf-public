@@ -24,7 +24,7 @@ import { ALICE, BOB } from '../support/spaces';
 
 /**
  * Les heures de silence et les messages à alarme (6 undecies, PR H2,
- * docs/heures-de-silence-contract.md, sections 3, 5 et 8 ; D-322) : le
+ * docs/heures-de-silence-contract.md, sections 3, 5 et 8 ; D-324) : le
  * message du matin et le retard d'une irrigation planifiée gardent leur
  * propre alarme, à échéance de la fin de la plage (F800) ; le retard se juge
  * à son échéance (F797) ; la fin d'un minuteur ne lit pas le réglage (S3) ;

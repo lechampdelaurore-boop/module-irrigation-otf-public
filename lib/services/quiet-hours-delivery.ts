@@ -13,7 +13,7 @@ import type { IrrigationPushSendResult, PhoneNoticeAlarmResult } from './irrigat
 
 /**
  * Les envoyeurs et les heures de silence (6 undecies, PR H2,
- * docs/heures-de-silence-contract.md, sections 3 et 5 ; D-322) : ce que les
+ * docs/heures-de-silence-contract.md, sections 3 et 5 ; D-324) : ce que les
  * cinq envoyeurs partagent. La règle elle-même vit dans le domaine
  * (`quietHoursDecision`) ; ici, la lecture du réglage d'une ferme, l'alarme
  * qui retient une alerte jusqu'à la fin de la plage, et le repli quand la

@@ -9670,7 +9670,7 @@ aucun envoyeur ne lit la règle et aucun écran ne l'allume ; la migration
 ajoute quatre colonnes vides. Le Worker de notification ne change pas.
 D-028, D-060 et D-293 tiennent.
 
-## D-322 — Les heures de silence, H2 : les envoyeurs
+## D-324 — Les heures de silence, H2 : les envoyeurs
 
 Date : 24 novembre 2026. Statut : codé (PR H2 sur 3 du contrat
 `docs/heures-de-silence-contract.md`, D-320, sections 3, 5 et 8) ; roadmap

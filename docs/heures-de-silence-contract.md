@@ -328,7 +328,7 @@ d'heure ; le scénario 17 en base ; le journal ; l'effacement d'une ferme
 qui laisse l'autre). Contre-épreuve : trente-cinq altérations de la règle,
 du réglage ou du journal font chacune échouer au moins un test (PR H1).
 
-## 12. Précisions faites en codant H2 (24 novembre 2026, D-322)
+## 12. Précisions faites en codant H2 (24 novembre 2026, D-324)
 
 Les cinq envoyeurs lisent la règle, chacun avec le réglage de sa ferme, à
 l'instant où sa notification partirait (F797) : les alertes météo

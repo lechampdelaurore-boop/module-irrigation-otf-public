@@ -13,7 +13,7 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - **Heures de silence des notifications, H2 : les envoyeurs, codés le
-  24 novembre 2026** (D-322, F803 à F809, roadmap section 6 undecies, PR 2
+  24 novembre 2026** (D-324, F803 à F809, roadmap section 6 undecies, PR 2
   sur 3), en Opus 5.5 · Max, le réglage de la roadmap. Les cinq envoyeurs
   lisent la règle de H1, chacun avec le réglage de sa ferme, à l'instant où
   sa notification partirait. Une alerte météo ou par culture retenue part

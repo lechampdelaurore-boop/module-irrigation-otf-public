@@ -8,7 +8,7 @@ source détaillée commit par commit.
 ### Ajouté (heures de silence des notifications, H2)
 
 - **Les notifications suivent les heures de silence de leur ferme**
-  (D-322) : une alerte météo ou par culture, le message du matin et le
+  (D-324) : une alerte météo ou par culture, le message du matin et le
   retard d'une irrigation planifiée qui tomberaient dans la plage
   attendent sa fin, puis partent avec le même texte ; la fin d'un arrosage
   démarré et le gel, case cochée, passent toujours ; le rappel du soir qui
