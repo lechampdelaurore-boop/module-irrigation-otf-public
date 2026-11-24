@@ -12,7 +12,7 @@ import { cropAlertsScreen, type CropAlertsScreen } from '../domain/crop-alerts/v
 import type { IrrigationSnapshot } from '../domain/domain';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
 import { pageHref } from '../domain/features/pages';
-import { alertWeekUrl, weatherAlertDeliveryLabel, type WeatherAlertDeliveryStatus } from '../domain/weather/weather-alerts';
+import { alertDeliveryLabel, alertWeekUrl, type WeatherAlertDeliveryStatus } from '../domain/weather/weather-alerts';
 import { bedNamesBySeries, readSprinklerSlots, shelteredSeries } from './crop-alerts-service';
 
 /** Les alertes affichées dans l'historique de l'encart : les plus récentes. */
@@ -93,10 +93,10 @@ export async function readCropAlertsView({
     sprinklerSlots: slots,
     location: position,
   });
-  return { ...screen, history: history.map(historyEntry) };
+  return { ...screen, history: history.map((record) => historyEntry(record, now)) };
 }
 
-function historyEntry(record: CropAlertRecord): CropAlertHistoryEntry {
+function historyEntry(record: CropAlertRecord, now: Date): CropAlertHistoryEntry {
   return {
     id: record.id,
     kind: record.kind,
@@ -106,7 +106,7 @@ function historyEntry(record: CropAlertRecord): CropAlertHistoryEntry {
     detail: record.detail,
     sentAt: record.sentAt,
     deliveryStatus: record.deliveryStatus,
-    deliveryLabel: weatherAlertDeliveryLabel(record.deliveryStatus),
+    deliveryLabel: alertDeliveryLabel(record.deliveryStatus, record.heldUntil, now),
     url: historyUrl(record),
   };
 }

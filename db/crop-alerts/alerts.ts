@@ -32,7 +32,12 @@ export type CropAlertDraftRecord = {
 
 export type ClaimedCropAlert = CropAlertDraftRecord & { id: string };
 
-export type CropAlertRecord = ClaimedCropAlert & { sentAt: string; deliveryStatus: WeatherAlertDeliveryStatus };
+export type CropAlertRecord = ClaimedCropAlert & {
+  sentAt: string;
+  deliveryStatus: WeatherAlertDeliveryStatus;
+  /** La fin de la plage jusqu'à laquelle les heures de silence ont retenu son message, ou rien (H2, S9). */
+  heldUntil: string | null;
+};
 
 /** Les clés déjà prises d'une nature d'alerte : sujet, version et jour visé ; pour le séchage, la série. */
 export async function listAlertedKeys(workspaceId: string, kind: CropAlertKind): Promise<Set<string>> {
@@ -70,31 +75,32 @@ export async function claimCropAlerts(workspaceId: string, drafts: readonly Crop
   return candidates.filter((alert) => ids.has(alert.id));
 }
 
-/** Le résultat de l'envoi et le texte annoncé, écrits une fois sur des alertes encore en attente. */
+/** Le résultat de l'envoi et le texte annoncé, écrits une fois sur des alertes encore en attente ; `heldUntil`, la fin de la plage qui a retenu son message (H2, S9). */
 export async function recordCropAlertDelivery(
   workspaceId: string,
   alertIds: readonly string[],
   status: Exclude<WeatherAlertDeliveryStatus, 'pending'>,
   detail: string | null,
+  heldUntil: string | null = null,
 ): Promise<void> {
   if (alertIds.length === 0) return;
   await db.prepare(
-    `UPDATE irrigation_crop_alerts SET delivery_status = ?, detail = COALESCE(?, detail)
+    `UPDATE irrigation_crop_alerts SET delivery_status = ?, detail = COALESCE(?, detail), held_until = ?
      WHERE workspace_id = ? AND delivery_status = 'pending' AND id IN (${alertIds.map(() => '?').join(', ')})`,
-  ).bind(status, detail, workspaceId, ...alertIds).run();
+  ).bind(status, detail, heldUntil, workspaceId, ...alertIds).run();
 }
 
 /** L'historique des alertes de l'exploitation, la plus récente en premier, au plus `limit`. */
 export async function listCropAlertHistory(workspaceId: string, limit: number): Promise<CropAlertRecord[]> {
   const result = await db.prepare(
     `SELECT id, kind, subject_key, subject_version, plant_id, series_id, name, target_date, damage_celsius, margin_celsius, offset_celsius,
-            drying_days, forecast_value, unit, forecasted_at, detail, sent_at, delivery_status
+            drying_days, forecast_value, unit, forecasted_at, detail, sent_at, delivery_status, held_until
      FROM irrigation_crop_alerts WHERE workspace_id = ? ORDER BY sent_at DESC, target_date, name LIMIT ?`,
   ).bind(workspaceId, limit).all<{
     id: string; kind: CropAlertKind; subject_key: string; subject_version: string; plant_id: string | null; series_id: string | null;
     name: string; target_date: string; damage_celsius: number | null; margin_celsius: number | null; offset_celsius: number | null;
     drying_days: number | null; forecast_value: number | null; unit: CropAlertDraftRecord['unit']; forecasted_at: string | null;
-    detail: string | null; sent_at: string; delivery_status: WeatherAlertDeliveryStatus;
+    detail: string | null; sent_at: string; delivery_status: WeatherAlertDeliveryStatus; held_until: string | null;
   }>();
   return result.results.map((row) => ({
     id: row.id,
@@ -115,6 +121,7 @@ export async function listCropAlertHistory(workspaceId: string, limit: number): 
     detail: row.detail,
     sentAt: row.sent_at,
     deliveryStatus: row.delivery_status,
+    heldUntil: row.held_until,
   }));
 }
 

@@ -12,7 +12,7 @@ import {
   unavailableForecastMessage,
   WEATHER_ALERT_MAXIMUM_HORIZON_DAYS,
   weatherAlertCriterionSummary,
-  weatherAlertDeliveryLabel,
+  alertDeliveryLabel,
   alertWeekUrl,
   type WeatherAlertCriterion,
   type WeatherAlertDeliveryStatus,
@@ -86,14 +86,14 @@ export async function readWeatherAlertsView({
         criterion,
         summary: weatherAlertCriterionSummary(criterion),
         unavailableMessage: unavailableForecastMessage(evaluation.unavailableDates),
-        lastAlert: last ? historyEntry(last) : null,
+        lastAlert: last ? historyEntry(last, now) : null,
       };
     }),
-    history: history.map(historyEntry),
+    history: history.map((record) => historyEntry(record, now)),
   };
 }
 
-function historyEntry(record: WeatherAlertHistoryRecord): WeatherAlertHistoryEntry {
+function historyEntry(record: WeatherAlertHistoryRecord, now: Date): WeatherAlertHistoryEntry {
   return {
     id: record.id,
     criterionId: record.criterionId,
@@ -105,7 +105,7 @@ function historyEntry(record: WeatherAlertHistoryRecord): WeatherAlertHistoryEnt
     forecastedAt: record.forecastedAt,
     sentAt: record.sentAt,
     deliveryStatus: record.deliveryStatus,
-    deliveryLabel: weatherAlertDeliveryLabel(record.deliveryStatus),
+    deliveryLabel: alertDeliveryLabel(record.deliveryStatus, record.heldUntil, now),
     url: alertWeekUrl('alertes-meteo', record.targetDate),
   };
 }

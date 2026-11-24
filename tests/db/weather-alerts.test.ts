@@ -135,7 +135,7 @@ test('scénarios 1 et 4 : l’alerte du matin part une fois pour mardi ; l’act
   });
   assert.deepEqual((await listWeatherAlertsForWorkspace(workspaceId)).map((alert) => ({ ...alert, id: 'x' })), [{
     id: 'x', criterionId: criterion.id, criterionVersion: 1, targetDate: '2026-11-03', forecastValue: 4, unit: '°C',
-    forecastedAt: MORNING.toISOString(), sentAt: MORNING.toISOString(), deliveryStatus: 'sent',
+    forecastedAt: MORNING.toISOString(), sentAt: MORNING.toISOString(), deliveryStatus: 'sent', heldUntil: null,
   }]);
 
   await writeForecast(ALICE, [7, 3, 6], AFTERNOON);

@@ -17,7 +17,8 @@ import {
   type WeatherAlertDeliveryStatus,
 } from '../domain/weather/weather-alerts';
 import { getEnabledFeaturesForWorkspace } from './feature-selection-service';
-import { type IrrigationPushSendResult, sendIrrigationPushNotification } from './irrigation-push-service';
+import { type IrrigationPushSendResult, schedulePhoneNoticeAlarm, sendIrrigationPushNotification } from './irrigation-push-service';
+import { type QuietAlarmScheduler, type QuietAlertResult, quietHoursReader, sendAlertWithQuietHours } from './quiet-hours-delivery';
 
 export type WeatherAlertSender = (request: IrrigationPushSendRequest) => Promise<IrrigationPushSendResult>;
 
@@ -31,19 +32,24 @@ export type WeatherAlertSender = (request: IrrigationPushSendRequest) => Promise
  * Une alerte est une information : rien ici ne touche le besoin, l'objectif
  * ni le planning. Une panne n'empêche ni la synchronisation météo ni
  * l'enregistrement : la fonction ne lève jamais, elle journalise sans nommer
- * personne.
+ * personne. Les heures de silence de la ferme (H2) ne retiennent que le
+ * message sur le téléphone : l'alerte est enregistrée à son heure (S9), et
+ * celle d'un critère de gel passe, case cochée (S3).
  */
 export async function evaluateWeatherAlertsAfterForecastWrite({
   workspaceId,
   locationKey,
   now,
   send = sendIrrigationPushNotification,
+  schedule = schedulePhoneNoticeAlarm,
   log = logJsonLine,
 }: {
   workspaceId: string;
   locationKey: string;
   now: Date;
   send?: WeatherAlertSender;
+  /** L'alarme qui retient une alerte jusqu'à la fin des heures de silence (H2). */
+  schedule?: QuietAlarmScheduler;
   log?: (level: LogLevel, entry: Record<string, unknown>) => void;
 }): Promise<void> {
   try {
@@ -52,6 +58,7 @@ export async function evaluateWeatherAlertsAfterForecastWrite({
     const criteria = (await listWeatherAlertCriteriaForWorkspace(workspaceId)).filter((criterion) => criterion.active);
     if (criteria.length === 0) return;
     const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
+    const quietHours = quietHoursReader(workspaceId, now, log);
     const forecasts = await listWeatherAlertForecastDays(
       workspaceId,
       locationKey,
@@ -69,20 +76,30 @@ export async function evaluateWeatherAlertsAfterForecastWrite({
       const notification = weatherAlertNotification(criterion, crossings.filter((crossing) => claimedDates.has(crossing.date)));
       if (!notification) continue;
 
-      const result = await sendSafely(send, {
-        notificationId: notification.tag,
-        recipientKey: workspaceId,
-        revision: newPushAlarmRevision(now),
-        notification: { title: notification.title, body: notification.body, tag: notification.tag, data: { url: notification.url } },
+      const result = await sendAlertWithQuietHours({
+        settings: await quietHours(),
+        notification: { kind: 'weather-alert', criterion: { field: criterion.field, direction: criterion.direction } },
+        request: {
+          notificationId: notification.tag,
+          recipientKey: workspaceId,
+          revision: newPushAlarmRevision(now),
+          notification: { title: notification.title, body: notification.body, tag: notification.tag, data: { url: notification.url } },
+        },
+        now,
+        send,
+        schedule,
+        log,
       });
       const status = deliveryStatus(result);
-      await recordWeatherAlertDelivery(workspaceId, claimed.map((alert) => alert.id), status);
+      const heldUntil = result.status === 'held' ? result.until : null;
+      await recordWeatherAlertDelivery(workspaceId, claimed.map((alert) => alert.id), status, heldUntil);
       log(status === 'sent' || status === 'no-subscriber' ? 'info' : 'warn', {
         event: 'weather_alert_evaluated',
         criterionId: criterion.id,
         criterionVersion: criterion.version,
         targetDates: claimed.map((alert) => alert.targetDate),
         deliveryStatus: status,
+        heldUntil: heldUntil ?? undefined,
         error: result.status === 'unreachable' ? result.message : undefined,
         evaluatedAt: now.toISOString(),
       });
@@ -96,15 +113,12 @@ export async function evaluateWeatherAlertsAfterForecastWrite({
   }
 }
 
-async function sendSafely(send: WeatherAlertSender, request: IrrigationPushSendRequest): Promise<IrrigationPushSendResult> {
-  try {
-    return await send(request);
-  } catch (error) {
-    return { status: 'unreachable', message: error instanceof Error ? error.message : 'Le service d’alerte est indisponible.' };
-  }
-}
-
-/** Le résultat enregistré : un service non configuré ou injoignable est un échec du service de notification. */
-function deliveryStatus(result: IrrigationPushSendResult): Exclude<WeatherAlertDeliveryStatus, 'pending'> {
+/**
+ * Le résultat enregistré : un service non configuré ou injoignable est un échec
+ * du service de notification ; une alerte retenue par les heures de silence,
+ * gardée par le Worker, compte comme envoyée (F745, H2).
+ */
+function deliveryStatus(result: QuietAlertResult): Exclude<WeatherAlertDeliveryStatus, 'pending'> {
+  if (result.status === 'held') return 'sent';
   return result.status === 'disabled' || result.status === 'unreachable' ? 'failed' : result.status;
 }

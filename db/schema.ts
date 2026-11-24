@@ -1832,6 +1832,8 @@ export const weatherAlerts = sqliteTable(
     forecastedAt: text('forecasted_at').notNull(),
     sentAt: text('sent_at').notNull(),
     deliveryStatus: text('delivery_status', { enum: ['pending', 'sent', 'no-subscriber', 'retrying', 'failed'] }).notNull().default('pending'),
+    // Les heures de silence (H2, migration 0050) : la fin de la plage jusqu'à laquelle le message a été retenu, ou vide.
+    heldUntil: text('held_until'),
   },
   (table) => [
     uniqueIndex('uq_weather_alert_criterion_day').on(table.criterionId, table.criterionVersion, table.targetDate),
@@ -2390,6 +2392,8 @@ export const cropAlerts = sqliteTable(
     detail: text('detail'),
     sentAt: text('sent_at').notNull(),
     deliveryStatus: text('delivery_status').notNull().default('pending'),
+    // Les heures de silence (H2, migration 0050) : la fin de la plage jusqu'à laquelle le message a été retenu, ou vide.
+    heldUntil: text('held_until'),
   },
   (table) => [
     index('idx_crop_alerts_workspace_sent').on(table.workspaceId, table.sentAt),

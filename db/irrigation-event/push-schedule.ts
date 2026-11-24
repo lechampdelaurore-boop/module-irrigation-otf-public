@@ -5,6 +5,8 @@ import type {
   IrrigationPushAlarmStatus,
   IrrigationPushScheduleRecord,
 } from '@/lib/domain/irrigation-event-record';
+import { MAXIMUM_QUIET_HOLD_MINUTES } from '@/lib/domain/notification-quiet-hours';
+import { millisecondsFromMinutes, MINUTES_PER_HOUR } from '@/lib/domain/units';
 import { findMutableEventEquipment } from './ownership';
 import { type MutableEventEquipmentRow, parseJson } from './rows';
 
@@ -41,28 +43,50 @@ export async function markIrrigationPushScheduleStatusForUser(
 }
 
 /**
+ * Le retard d'une irrigation planifiée peut être retenu par les heures de
+ * silence jusqu'à la fin de la plage (H2) : treize heures de l'horloge de
+ * Paris au plus, quatorze heures réelles la nuit du passage à l'heure
+ * d'hiver. La base garde son échéance d'origine ; le Worker, la fin de la
+ * plage.
+ */
+const QUIET_HELD_LATE_ALARM_MS = millisecondsFromMinutes(MAXIMUM_QUIET_HOLD_MINUTES + MINUTES_PER_HOUR);
+
+/** Une alarme confiée au Worker, avec son échéance d'origine et sa nature. */
+export type UpcomingPushAlarm = { eventEquipmentId: string; revision: string; dueAt: string; kind: 'finished' | 'late' };
+
+/**
  * Les alarmes de la ferme encore à venir et confiées au Worker de notification
  * (fin d'un minuteur ou retard d'une irrigation planifiée), pour les retirer
- * quand la case Arrosages est décochée (3.8, R1, P29).
+ * quand la case Arrosages est décochée (3.8, R1, P29). Avec elles, les retards
+ * dont l'échéance est passée depuis moins que la plus longue retenue : les
+ * heures de silence peuvent les garder jusqu'à la fin de la plage (H2), et
+ * c'est le service qui trie ceux qui attendent encore.
  */
 export async function listUpcomingPushAlarmsForUser(
   ownerUserId: string,
   now: Date,
-): Promise<{ eventEquipmentId: string; revision: string }[]> {
+): Promise<UpcomingPushAlarm[]> {
   const result = await db.prepare(
-    `SELECT event_equipment.id, event_equipment.timer_alarm_revision
+    `SELECT event_equipment.id, event_equipment.timer_alarm_revision,
+            event_equipment.timer_theoretical_end_at, event_equipment.late_alarm_due_at
      FROM irrigation_event_equipment AS event_equipment
      INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
      WHERE ${WORKSPACE_SPACE_FILTER}
        AND event_equipment.timer_alarm_status IN ('pending', 'scheduled')
        AND event_equipment.timer_alarm_revision IS NOT NULL
-       AND COALESCE(event_equipment.timer_theoretical_end_at, event_equipment.late_alarm_due_at) > ?
+       AND (event_equipment.timer_theoretical_end_at > ?
+            OR (event_equipment.timer_theoretical_end_at IS NULL AND event_equipment.late_alarm_due_at > ?))
      ORDER BY event_equipment.id`,
   )
-    .bind(...spaceParams(ownerUserId), now.toISOString())
-    .all<{ id: string; timer_alarm_revision: string }>();
-  return result.results.map((row) => ({ eventEquipmentId: row.id, revision: row.timer_alarm_revision }));
+    .bind(...spaceParams(ownerUserId), now.toISOString(), new Date(now.getTime() - QUIET_HELD_LATE_ALARM_MS).toISOString())
+    .all<{ id: string; timer_alarm_revision: string; timer_theoretical_end_at: string | null; late_alarm_due_at: string }>();
+  return result.results.map((row) => ({
+    eventEquipmentId: row.id,
+    revision: row.timer_alarm_revision,
+    dueAt: row.timer_theoretical_end_at ?? row.late_alarm_due_at,
+    kind: row.timer_theoretical_end_at === null ? 'late' : 'finished',
+  }));
 }
 
 /**
