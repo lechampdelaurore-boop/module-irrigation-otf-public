@@ -383,3 +383,89 @@ relue chez l'une, pendant que la ferme d'à côté, sans enregistrement,
 relit et dit « provisoire » ; un Kc corrigé ; le rattrapage après un
 matin manqué, huit semaines au plus, les plus anciennes d'abord ; une
 saison sans planche ; F784 ; les fermes de la tâche du matin).
+
+## 11. Précisions faites en codant O4 (24 novembre 2026, D-319)
+
+Le réglage devient visible et l'origine de l'objectif se dit partout où il
+se lit (section 5). Réglage éteint, ou objectif automatique qui ne
+s'applique à aucun jour d'une planche, l'écran est celui d'avant, mot pour
+mot. Huit cas que la section 5 ne tranchait pas, réglés par l'option la
+plus prudente :
+
+- **F789, le geste** : un interrupteur « Objectif automatique » en tête du
+  volet « Objectifs hebdomadaires », enregistré dès qu'on le touche, le
+  message sous lui. Un geste qui change l'état recalcule le plan comme un
+  objectif saisi (`objective-changed`, durable, à l'instant du geste) :
+  c'est le recalcul que F775 laissait à O4. Un geste sans effet n'écrit
+  rien et le dit (« L'objectif automatique était déjà allumé. »). Le
+  résumé du volet fermé commence par « Objectif automatique allumé ». Seule
+  la page « Objectifs et besoins » lit le réglage pour son volet : une
+  requête de plus sur cette page, aucune sur les autres.
+- **F790, les planches qui gardent un objectif saisi** (section 5,
+  point 2) : comptées sur les objectifs de la semaine affichée, à tous les
+  niveaux, pour les planches de la saison ; dites tant que le réglage est
+  allumé, avec « Vider les objectifs », le geste existant, confirmé en
+  rouge dans la même fenêtre. L'écran ne vide jamais seul (règle 2).
+- **F791, l'origine dite** : « saisi », « automatique, d'après le besoin
+  de la culture », « … d'après l'ET0 », « … d'après l'ET0 sous abri »,
+  « … d'après la culture et l'ET0 » (des jours de chaque), ou « saisi et
+  automatique ». Le tableau des besoins la dit sur la ligne « Objectif » de
+  « Voir le calcul » et dans « Pourquoi ? », la fiche du besoin de la
+  culture à côté de l'objectif adopté, « Aujourd'hui » sur la tuile
+  « Objectif de la semaine », avec sa base, et sur chaque ligne de la
+  semaine, en un mot (« objectif automatique ») pour tenir au téléphone ;
+  le planning dans la cause d'une suggestion (« objectif automatique
+  21 mm ») ; l'historique sous l'objectif de la période (« Objectif
+  automatique », ou « saisi et automatique » avec ses journées-planche
+  automatiques), sans base : une période mêle des semaines et des
+  planches. La ligne de l'ET0 du tableau des besoins dit « entre par
+  l'objectif automatique » quand l'ET0 y sert, « hors calcul » sinon.
+- **F792, la bulle « D'où vient cet objectif ? »** : les jours où
+  l'objectif automatique s'applique, sa somme et sa base, le K_abri sous
+  abri, les millimètres par nature d'ET0 (réanalyse, prévision reprise pour
+  un jour passé, prévision), les jours sans valeur nommés avec leur raison
+  (ET0 manquante, hors bornes, jardin à classer, plan de culture non lu),
+  et la clôture : « mis à jour chaque matin », « enregistrée : elle ne
+  bouge plus » ou « provisoire : la tâche du matin l'enregistrera ». Une
+  semaine sans culture, ou sans aucune valeur, se dit comme telle, jamais
+  comme zéro (D-003).
+- **F793, « Adopter la proposition »** (section 5, point 4) : retiré
+  quand l'objectif automatique est le besoin de la culture tous les jours
+  de la semaine et qu'aucun objectif saisi ne compte ; la fiche dit
+  « L'objectif automatique suit déjà le besoin de la culture : rien à
+  adopter. », et l'écart entre prévu et réel ne propose plus d'adopter
+  pour cette planche. Avec des jours d'après l'ET0, ou un objectif saisi
+  une partie de la semaine, la proposition reste adoptable : elle
+  changerait l'objectif.
+- **F794, « Fiabilité du calcul »** (section 5, point 5) : une sixième
+  donnée, « Objectif automatique », suivie seulement quand « Objectifs et
+  besoins » est cochée et que le réglage est allumé aujourd'hui. Elle
+  compte les jours de la semaine en cours (du lundi au dimanche) où le
+  réglage est allumé et où l'ET0 manque, lue comme l'objectif automatique
+  la lit (la réanalyse pour un jour passé, sinon la prévision) ; la ligne
+  les nomme et mène à « Météo de référence ». À jour, elle dit « ET0 connue
+  chaque jour de la semaine ». Elle compte dans la pastille du menu : une
+  requête de plus (le réglage), et l'ET0 de la semaine seulement réglage
+  allumé. Le « ? » de la zone écrit ce seuil. Une espèce sans culture de
+  référence reste dite par la ligne « Espèces ».
+- **F795, l'avertissement avant de décocher « Objectifs et besoins »**
+  (question laissée par O3) : le réglage n'y est pas compté. L'avertissement
+  compte ce que la ferme a saisi (objectifs, mesures de pluie) ; le
+  réglage reste tel quel et reprend quand la case est recochée, sans rien
+  perdre.
+- **F796, les aides** : l'aide de « Objectifs et besoins » et celle du
+  besoin par culture disent l'objectif automatique ; les « ? » de l'ET0 et
+  de l'objectif du tableau des besoins ne disent plus que l'ET0 n'entre
+  jamais dans le besoin. La démonstration garde le réglage éteint dans
+  tous ses profils : rien ne l'y allume.
+
+Preuve : `tests/objectif-automatique-ecrans.test.ts` (l'origine des cas 1
+à 6, 9 et 11 ; la bulle des cas 2 et 8, de la semaine en cours et d'une
+semaine enregistrée ; F793 ; F790 ; le résumé du volet ; « Aujourd'hui »
+avec et sans objectif automatique ; l'historique ; le planning ; F794),
+`tests/db/objectif-automatique-ecrans.test.ts` (à deux fermes : le volet
+lit le réglage de sa ferme et compte les planches qui gardent un objectif
+saisi ; le tableau des besoins rend l'origine et la bulle du dimanche sans
+ET0 ; la pastille compte la ligne de la ferme qui l'a allumé, pas de
+l'autre) et le parcours P58 aux deux largeurs (allumer, lire l'origine,
+saisir un objectif qui passe avant, vider, éteindre).

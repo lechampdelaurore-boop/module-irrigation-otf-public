@@ -255,6 +255,7 @@ function usefulDoseSuggestion(
     bedName: need.bedName,
     objectiveMm: need.manualOverrideMm ?? need.objectiveMm ?? 0,
     manual: need.manualOverrideMm !== null,
+    ...(need.manualOverrideMm === null && (need.objectiveOrigin === 'automatic' || need.objectiveOrigin === 'both') ? { objectiveOrigin: need.objectiveOrigin } : {}),
     actualRainMm: need.sheltered ? 0 : Math.max(0, need.actualRainMm ?? 0),
     forecastRainMm: need.sheltered ? 0 : settings.forecastRainShare * Math.max(0, need.forecastRainMm ?? 0),
     actualIrrigationMm: Math.max(0, need.actualIrrigationMm),

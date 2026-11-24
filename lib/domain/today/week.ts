@@ -1,6 +1,7 @@
 import { compareNamesNaturally } from '../bed-order.ts';
 import { mmText, waterText } from '../figure-origin.ts';
 import type { BedIrrigationNeed } from '../irrigation-needs.ts';
+import { groupObjectiveOriginText, type ObjectiveOriginReading } from '../objective-reading.ts';
 import { percentFromFraction } from '../units.ts';
 import type { WaterDashboardDay } from '../water-management.ts';
 import { MEASURED_RAIN_ANCHOR } from './reliability.ts';
@@ -51,7 +52,9 @@ export function pastRainOrigins(
 
 /** Ce que la page lit d'une planche dans le tableau des besoins de la semaine. */
 export type TodayWeekBed = Pick<BedIrrigationNeed,
-  'plotId' | 'plotName' | 'sheltered' | 'areaSquareMeters' | 'objectiveMm' | 'actualRainMm' | 'actualIrrigationMm' | 'realRemainingMm'>;
+  'plotId' | 'plotName' | 'sheltered' | 'areaSquareMeters' | 'objectiveMm' | 'actualRainMm' | 'actualIrrigationMm' | 'realRemainingMm'>
+  /** L'origine de l'objectif (6 decies, O4, D-319) ; absente, l'objectif se lit comme avant. */
+  & Partial<Pick<BedIrrigationNeed, 'objectiveOrigin' | 'automaticObjective'>>;
 
 export type TodayWeekInputs = {
   weekStart: string;
@@ -87,6 +90,8 @@ type WeekRow = {
   objectiveBeds: { withObjective: number; total: number };
   /** « 8 / 20 mm », « 8 / 20 mm sur 7 planches sur 10 », « 8 mm reçus, aucun objectif posé », « pluie inconnue ». */
   text: string;
+  /** L'origine de l'objectif quand l'objectif automatique y compte : « automatique, d’après l’ET0 » ; `null` sinon. */
+  objectiveOrigin: string | null;
   /** Les barres empilées et le trait de l'objectif, en % de l'échelle. */
   bars: { irrigationPercent: number; rainPercent: number; objectivePercent: number | null };
   /** La phrase lue de la ligne, nom de son lien : « Jardin Nord : 7 / 20 mm ». */
@@ -186,6 +191,11 @@ function counted(beds: readonly TodayWeekBed[]): { scope: readonly TodayWeekBed[
   return { scope: partial ? withObjective : beds, objectiveBeds: { withObjective: withObjective.length, total: beds.length } };
 }
 
+/** L'origine lue d'une planche ; sans elle, l'objectif est dit comme avant. */
+function originReading(bed: TodayWeekBed): ObjectiveOriginReading {
+  return { objectiveOrigin: bed.objectiveOrigin ?? null, automaticObjective: bed.automaticObjective ?? null };
+}
+
 function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxMm: number): WeekRow {
   const { scope, objectiveBeds } = counted(beds);
   const partial = objectiveBeds.withObjective > 0 && objectiveBeds.withObjective < objectiveBeds.total;
@@ -198,11 +208,14 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
   const irrigationPercent = percent(irrigationMm);
   // Un seul « sur » par phrase (lot H, n° 13, F443) : « 15 / 26,7 mm (5 planches de 10 ont un objectif) ».
   const on = partial ? ` (${bedsOf(objectiveBeds.withObjective, objectiveBeds.total)})` : '';
+  const origin = objectiveMm === null ? null : groupObjectiveOriginText(scope.map(originReading));
+  // L'objectif automatique se dit sur la ligne, en un mot (D-319, section 5, point 3).
+  const automatic = origin === null ? '' : `, objectif ${groupObjectiveOriginText(scope.map(originReading), false)}`;
   const text = objectiveMm === null
     ? `${mmText(rounded(receivedMm ?? irrigationMm))} reçus, aucun objectif posé`
     : receivedMm === null
-      ? `${mmText(rounded(irrigationMm))} irrigués / ${mmText(rounded(objectiveMm))}${on}, pluie inconnue`
-      : `${millimeters.format(receivedMm)} / ${mmText(rounded(objectiveMm))}${on}`;
+      ? `${mmText(rounded(irrigationMm))} irrigués / ${mmText(rounded(objectiveMm))}${on}${automatic}, pluie inconnue`
+      : `${millimeters.format(receivedMm)} / ${mmText(rounded(objectiveMm))}${on}${automatic}`;
   return {
     key,
     name,
@@ -214,6 +227,7 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
     remainingMm,
     objectiveBeds,
     text,
+    objectiveOrigin: origin,
     bars: {
       irrigationPercent,
       rainPercent: rainMm === null ? 0 : Math.max(0, rounded(Math.min(100, percent(irrigationMm + rainMm)) - irrigationPercent)),
@@ -365,7 +379,7 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
     moreLabel: moreGardensLabel(hidden.length),
     tiles: {
       objective: mm(farm.objectiveMm),
-      objectiveDetail: partial ? `${bedsWithObjective(withObjective, total)}, ${label}` : `ferme entière, ${label}`,
+      objectiveDetail: `${partial ? `${bedsWithObjective(withObjective, total)}, ${label}` : `ferme entière, ${label}`}${farm.objectiveOrigin === null ? '' : ` · objectif ${farm.objectiveOrigin}`}`,
       received: mm(farm.receivedMm),
       receivedDetail: scoped(farm.rainMm === null
         ? `${mmText(rounded(farm.irrigationMm))} d’irrigation, pluie inconnue`

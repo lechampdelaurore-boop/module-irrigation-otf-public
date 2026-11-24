@@ -10,6 +10,7 @@ import {
   saveWeatherGeocodeForUser,
   saveWeatherPreferenceForUser,
 } from '@/db/water-management-repository';
+import { saveAutomaticObjectiveForUser } from '@/db/automatic-objective-repository';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import { getIrrigationSnapshot } from '@/lib/services/irrigation-service';
 import { recalculatePlanAfterEvent } from '@/lib/services/planning-recalculation';
@@ -67,6 +68,7 @@ export async function loadWaterDashboardAction(input: {
       forceWeatherRefresh: input.forceWeatherRefresh === true,
       allowWeatherRefresh: input.allowWeatherRefresh !== false,
       includeWeatherAlerts: true,
+      includeAutomaticObjective: true,
     });
     return {
       ok: true,
@@ -114,6 +116,35 @@ export async function saveHydricGoalAction(input: {
   // Un objectif vaut de sa semaine jusqu'à ce qu'un autre le remplace : le plan se recalcule dès qu'il n'est pas à venir (3.7, règle 4).
   await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'objective-changed', season: input.season, at: weekStart, lasting: true });
   return successWithDashboard(context.value, weekStart, 'L’objectif hebdomadaire a été enregistré.');
+}
+
+/**
+ * Allume ou éteint l'objectif automatique de la ferme (6 decies, O4, D-319) :
+ * un geste daté, au journal des modifications, qui compte à partir
+ * d'aujourd'hui (règle 1). Un geste qui change l'état rend la faisabilité à
+ * refaire (F775) et recalcule le plan, comme un objectif saisi
+ * (`objective-changed`, durable) ; un geste sans effet n'écrit rien.
+ */
+export async function saveAutomaticObjectiveAction(input: {
+  season: number;
+  weekStart: string;
+  enabled: boolean;
+}): Promise<WaterActionResult> {
+  const context = await loadContext(input.season);
+  if (!context.ok) return context;
+  const weekStart = safeWeekStart(input.weekStart);
+  if (!weekStart || typeof input.enabled !== 'boolean') return { ok: false, message: 'Le réglage demandé est invalide.' };
+  const now = new Date();
+  const changed = await saveAutomaticObjectiveForUser(context.value.ownerUserId, input.enabled, now);
+  if (changed) await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'objective-changed', season: input.season, at: now, lasting: true });
+  return successWithDashboard(context.value, weekStart, automaticObjectiveMessage(input.enabled, changed));
+}
+
+function automaticObjectiveMessage(enabled: boolean, changed: boolean): string {
+  if (!changed) return enabled ? 'L’objectif automatique était déjà allumé.' : 'L’objectif automatique était déjà éteint.';
+  return enabled
+    ? 'Objectif automatique allumé : à partir d’aujourd’hui, une planche sans objectif saisi suit le besoin de sa culture, ou l’ET0.'
+    : 'Objectif automatique éteint : à partir d’aujourd’hui, seuls les objectifs saisis comptent.';
 }
 
 export async function clearHydricGoalsAction(input: {
@@ -482,6 +513,7 @@ async function successWithDashboard(
         forceWeatherRefresh,
         allowWeatherRefresh: forceWeatherRefresh,
         includeWeatherAlerts: true,
+        includeAutomaticObjective: true,
       }),
     };
   } catch (error) {

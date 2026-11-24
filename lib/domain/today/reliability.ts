@@ -20,14 +20,20 @@ import { compareNamesNaturally } from '../bed-order.ts';
  * moteur, et chacun est écrit dans le « ? » de la zone.
  */
 
-/** Les cinq données, dans l'ordre de leur effet sur le plan (section 6, tableau). */
-export const RELIABILITY_KINDS = ['reservoir-volume', 'actual-rain', 'soil', 'species', 'plan'] as const;
+/**
+ * Les données, dans l'ordre de leur effet sur le plan (section 6, tableau) ;
+ * la sixième, l'objectif automatique, n'est suivie que réglage allumé
+ * (6 decies, O4, docs/objectif-automatique-contract.md, section 5, point 5 ;
+ * D-319).
+ */
+export const RELIABILITY_KINDS = ['reservoir-volume', 'actual-rain', 'automatic-objective', 'soil', 'species', 'plan'] as const;
 type ReliabilityKind = (typeof RELIABILITY_KINDS)[number];
 
 /** La case dont chaque donnée dépend : décochée, la donnée ne compte pas (F3, F5). */
 const RELIABILITY_FEATURE: Record<ReliabilityKind, FeatureId> = {
   'reservoir-volume': 'ressources',
   'actual-rain': 'besoins',
+  'automatic-objective': 'besoins',
   soil: 'sol',
   species: 'cultures',
   plan: 'planning',
@@ -102,6 +108,12 @@ export type ReliabilityInputs = {
    * tout sous abri) : rien à rafraîchir.
    */
   actualRainMissingDates: readonly string[] | null;
+  /**
+   * Les jours de la semaine en cours sans ET0 où l'objectif automatique
+   * s'applique ; `null` ou absent quand le réglage est éteint aujourd'hui :
+   * la donnée n'est pas suivie.
+   */
+  automaticObjectiveMissingEt0Dates?: readonly string[] | null;
   /** Les jardins dont le sol n'a jamais été observé et dont la jauge est inconnue. */
   soilGardensNeverObserved: readonly ReliabilitySoilGarden[];
   /** Les espèces plantées de la saison qui n'ont aucun rattachement à une culture de référence. */
@@ -138,6 +150,10 @@ export const ACTUAL_RAIN_CONSEQUENCE = 'Sans elle, le besoin est surévalué.';
 
 /** Le bloc « Pluie mesurée » de « Objectifs et besoins », celui que l'historique ouvre déjà (lot 1, point 11). */
 export const MEASURED_RAIN_ANCHOR = 'manual-rain';
+/** Le volet « Météo de référence » de « Objectifs et besoins » : l'ET0 de la semaine s'y lit et s'y actualise. */
+export const WEATHER_ANCHOR = 'meteo-de-reference';
+/** La conséquence d'un jour sans ET0 pour l'objectif automatique (D-003). */
+const AUTOMATIC_OBJECTIVE_CONSEQUENCE = 'Ces jours ne comptent pas dans l’objectif automatique.';
 /** La correspondance des espèces, dans Réglages. */
 const SPECIES_CORRESPONDENCE_ANCHOR = 'species-correspondence-title';
 
@@ -160,6 +176,16 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
       key: 'actual-rain',
       text: `Pluie réelle incomplète : ${countText(missing, 'jour manquant', 'jours manquants')}. ${ACTUAL_RAIN_CONSEQUENCE}`,
       action: { kind: 'link', label: 'Noter la pluie de la semaine', page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
+    });
+  }
+  const missingEt0 = input.automaticObjectiveMissingEt0Dates ?? null;
+  if (on('automatic-objective') && missingEt0 !== null && missingEt0.length > 0) {
+    const dates = [...new Set(missingEt0)].sort();
+    lines.push({
+      kind: 'automatic-objective',
+      key: 'automatic-objective',
+      text: `Objectif automatique incomplet : ${countText(dates.length, 'jour sans ET0', 'jours sans ET0')} cette semaine (${dates.map(shortDayText).join(', ')}). ${AUTOMATIC_OBJECTIVE_CONSEQUENCE}`,
+      action: { kind: 'link', label: 'Voir la météo de référence', page: 'besoins', anchor: WEATHER_ANCHOR },
     });
   }
   if (on('soil')) lines.push(...soilLines(input.soilGardensNeverObserved));
@@ -263,6 +289,7 @@ function planLine(computedAt: string | null, now: Date): ReliabilityLine | null 
 const CHECK_LABELS: Record<ReliabilityKind, string> = {
   'reservoir-volume': 'Volume des réserves',
   'actual-rain': 'Pluie mesurée',
+  'automatic-objective': 'Objectif automatique',
   soil: 'Réserve du sol',
   species: 'Espèces',
   plan: 'Plan de la semaine',
@@ -289,6 +316,7 @@ export type ReliabilityCheck = {
 const CHECK_PAGES: Record<ReliabilityKind, { page: IrrigationPageId; anchor: string | null }> = {
   'reservoir-volume': { page: 'ressources', anchor: null },
   'actual-rain': { page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
+  'automatic-objective': { page: 'besoins', anchor: WEATHER_ANCHOR },
   soil: { page: 'sol', anchor: null },
   species: { page: 'reglages', anchor: SPECIES_CORRESPONDENCE_ANCHOR },
   plan: { page: 'planning', anchor: null },
@@ -300,6 +328,7 @@ function okSummary(kind: ReliabilityKind, input: ReliabilityInputs): string {
       return input.reservoirs.length === 0 ? 'Aucune réserve à relever' : `Relevé de moins de ${RESERVOIR_VOLUME_MAX_AGE_DAYS} jours`;
     case 'actual-rain':
       return input.actualRainMissingDates === null ? 'Tout est sous abri : pas de pluie à noter' : `Notée les ${ACTUAL_RAIN_LOOKBACK_DAYS} derniers jours`;
+    case 'automatic-objective': return 'ET0 connue chaque jour de la semaine';
     case 'soil': return 'Tous les jardins ont été observés';
     case 'species': return 'Toutes ont une culture de référence';
     case 'plan': return `Calculé il y a moins de ${PLAN_MAX_AGE_HOURS} heures`;
@@ -312,6 +341,10 @@ function todoSummary(kind: ReliabilityKind, input: ReliabilityInputs, lines: rea
     case 'actual-rain': {
       const missing = new Set(input.actualRainMissingDates ?? []).size;
       return `${countText(missing, 'jour manquant', 'jours manquants')} : le besoin est surévalué`;
+    }
+    case 'automatic-objective': {
+      const missing = new Set(input.automaticObjectiveMissingEt0Dates ?? []).size;
+      return `${countText(missing, 'jour sans ET0', 'jours sans ET0')} : non comptés`;
     }
     case 'soil': {
       const observable = input.soilGardensNeverObserved.filter((garden) => !garden.withoutRfu).length;
@@ -337,12 +370,18 @@ function todoSummary(kind: ReliabilityKind, input: ReliabilityInputs, lines: rea
  */
 export function reliabilityChecks(input: ReliabilityInputs, lines: readonly ReliabilityLine[]): ReliabilityCheck[] {
   return RELIABILITY_KINDS
-    .filter((kind) => input.enabled.includes(RELIABILITY_FEATURE[kind]))
+    .filter((kind) => tracked(kind, input))
     .map((kind) => {
       const own = lines.filter((line) => line.kind === kind);
       const ok = own.length === 0;
       return { kind, label: CHECK_LABELS[kind], ok, summary: ok ? okSummary(kind, input) : todoSummary(kind, input, own), lines: own, link: ok ? CHECK_PAGES[kind] : null };
     });
+}
+
+/** Une donnée est suivie quand sa case est cochée ; l'objectif automatique, en plus, quand le réglage est allumé. */
+function tracked(kind: ReliabilityKind, input: ReliabilityInputs): boolean {
+  if (!input.enabled.includes(RELIABILITY_FEATURE[kind])) return false;
+  return kind !== 'automatic-objective' || (input.automaticObjectiveMissingEt0Dates ?? null) !== null;
 }
 
 export type ReliabilityZone = {
@@ -376,7 +415,8 @@ export function hasReliabilityZone(enabled: FeatureSelection): boolean {
 /** Le « ? » de la zone écrit chaque seuil : aucun n'est caché (section 6). */
 export function reliabilityThresholdsText(): string {
   return `Une donnée est à rafraîchir quand le volume d’une réserve date de plus de ${RESERVOIR_VOLUME_MAX_AGE_DAYS} jours, `
-    + `quand la pluie réelle manque un des ${ACTUAL_RAIN_LOOKBACK_DAYS} derniers jours, quand le sol d’un jardin n’a jamais été observé, `
+    + `quand la pluie réelle manque un des ${ACTUAL_RAIN_LOOKBACK_DAYS} derniers jours, quand l’ET0 manque un jour de la semaine où l’objectif automatique est allumé, `
+    + 'quand le sol d’un jardin n’a jamais été observé, '
     + `quand une espèce plantée n’est rattachée à aucune culture de référence, ou quand le plan date de plus de ${PLAN_MAX_AGE_HOURS} heures. `
     + 'Le dépliant « Par planche » nomme, planche par planche, la réserve du sol non saisie, le stade deviné d’après le calendrier '
     + `et le pluviomètre absent, quand aucune pluie mesurée n’est notée depuis plus de ${RAIN_GAUGE_MAX_AGE_DAYS} jours. `

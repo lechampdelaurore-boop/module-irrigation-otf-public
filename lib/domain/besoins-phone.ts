@@ -45,10 +45,12 @@ export function weekTotalsLine(totals: WeekTotalsLine): string {
 }
 
 /** Le résumé du pli des objectifs : celui de la ferme d'abord, puis leur nombre. */
-export function goalsFoldLine(goalCount: number, farmGoalMm: number | null): string {
-  if (goalCount === 0) return 'Aucun objectif pour cette semaine.';
+export function goalsFoldLine(goalCount: number, farmGoalMm: number | null, automaticOn = false): string {
+  // L'objectif automatique allumé se lit dès le résumé du pli (6 decies, O4, D-319).
+  if (goalCount === 0) return automaticOn ? 'Objectif automatique allumé, aucun objectif saisi.' : 'Aucun objectif pour cette semaine.';
   const count = plural(goalCount, 'objectif', 'objectifs');
-  return farmGoalMm === null ? count : `Toute la ferme : ${mmText(farmGoalMm)} · ${count}`;
+  const line = farmGoalMm === null ? count : `Toute la ferme : ${mmText(farmGoalMm)} · ${count}`;
+  return automaticOn ? `Objectif automatique allumé · ${line}` : line;
 }
 
 /** Le résumé du pli « Pluie mesurée » : les jours de la semaine déjà mesurés à la ferme. */

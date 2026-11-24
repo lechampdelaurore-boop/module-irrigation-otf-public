@@ -18,6 +18,7 @@ import type { IrrigationSnapshot } from '../domain/domain';
 import type { FeatureId } from '../domain/features/catalogue';
 import { featurePart, isPartActive } from '../domain/features/socle';
 import { objectiveForBed } from '../domain/irrigation-needs';
+import { objectiveFollowsCropNeed } from '../domain/objective-reading';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
 import { getCropWaterWeekForUser } from './crop-water-week';
@@ -148,7 +149,8 @@ async function objectiveReadings(
     // L'objectif automatique, quand la ferme l'a allumé (D-309) : la dernière semaine comparée et la semaine en cours.
     readAutomaticObjectiveSourceForUser({ ...input, from: lastWeek.weekStart, to: weekEnd, now }),
   ]);
-  const objectiveMmByBed = new Map(beds.map((bed) => [bed.id, objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed)).value]));
+  const objectives = new Map(beds.map((bed) => [bed.id, objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed))]));
+  const objectiveMmByBed = new Map([...objectives].map(([bedId, objective]) => [bedId, objective.value]));
   const [week, adoptions] = await Promise.all([
     getCropWaterWeekForUser({ ownerUserId: input.ownerUserId, season: input.season, snapshot: input.snapshot, weekStart, now, objectiveMmByBed, bedIds: beds.map((bed) => bed.id) }),
     Promise.all(beds.map((bed) => listAdoptionsForBedForUser(input.ownerUserId, input.season, bed.id))),
@@ -159,7 +161,8 @@ async function objectiveReadings(
     return [bed.id, {
       objectiveMm: objectiveMmByBed.get(bed.id) ?? null,
       proposedMm: proposal?.proposedMm ?? null,
-      adoptable: proposal?.adoptable ?? false,
+      // L'objectif automatique qui suit déjà la culture n'a rien à adopter (D-319, section 5, point 4).
+      adoptable: (proposal?.adoptable ?? false) && !objectiveFollowsCropNeed(objectives.get(bed.id) ?? { origin: null, automatic: null }),
       lastWeekObjectiveMm: objectiveForBed(revisions, bed, lastWeek.weekStart, lastWeek.weekEnd, automatic?.inputFor(bed)).value,
       adoptedThisWeekMm: adoptions[index]
         .filter((adoption) => dateKeyInTimeZone(adoption.adoptedAt, FARM_TIME_ZONE) >= weekStart)

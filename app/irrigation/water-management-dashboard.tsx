@@ -26,6 +26,7 @@ import {
 import {
   clearHydricGoalsAction,
   loadWaterDashboardAction,
+  saveAutomaticObjectiveAction,
   saveDailyWaterLimitAction,
   saveHydricGoalAction,
   removeManualRainfallAction,
@@ -36,6 +37,7 @@ import {
   type WaterActionResult,
 } from './water-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
+import { AUTOMATIC_OBJECTIVE_SETTING_TEXT } from '@/lib/domain/objective-reading';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -240,6 +242,16 @@ export function WaterManagementDashboard({
     });
   };
 
+  /**
+   * Le réglage « Objectif automatique » (6 decies, O4, D-319) : un geste
+   * daté, enregistré tout de suite ; le besoin et le journal se relisent.
+   */
+  const saveAutomaticObjective = (enabled: boolean) => {
+    startTransition(async () => {
+      receiveChange(await saveAutomaticObjectiveAction({ season, weekStart: dashboard.weekStart, enabled }), 'objectif-automatique');
+    });
+  };
+
   /** « Vider les objectifs » : le même mot sur le bouton et dans la fenêtre, en rouge (lot G, n° 8, F414 et F415). */
   const clearGoals = async () => {
     if (!(await confirm({
@@ -406,8 +418,9 @@ export function WaterManagementDashboard({
           id="objectifs-de-la-semaine"
           className="water-panel water-fold"
           bodyClassName="water-fold-body"
-          summary={<><h3>Objectifs hebdomadaires</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null)}</small></>}
+          summary={<><h3>Objectifs hebdomadaires</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null, dashboard.automaticObjective?.enabled === true)}</small></>}
         >
+          {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} pending={pending} onChange={saveAutomaticObjective} onClearGoals={() => void clearGoals()} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
           <div className="water-panel-title">
             <div><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
             <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => void clearGoals()}>Vider les objectifs</button>
@@ -496,6 +509,39 @@ export function WaterManagementDashboard({
 const WATER_REPLY_CLASSES = { notice: 'water-notice', warning: 'weather-stale', error: 'water-error' } as const;
 
 /** Une tuile de total, son icône au trait devant le libellé ; la pluie est en bleu eau (charte du module). */
+/**
+ * Le réglage « Objectif automatique », en tête du volet des objectifs
+ * (docs/objectif-automatique-contract.md, section 5, points 1 et 2) : la
+ * phrase de ce qu'il fait, l'interrupteur, et, allumé, les planches qui
+ * gardent un objectif saisi avec le geste existant « Vider les objectifs ».
+ * L'écran ne vide jamais seul (règle 2).
+ */
+function AutomaticObjectiveSetting({ setting, pending, onChange, onClearGoals, reply }: {
+  setting: NonNullable<WaterDashboard['automaticObjective']>;
+  pending: boolean;
+  onChange: (enabled: boolean) => void;
+  onClearGoals: () => void;
+  reply: React.ReactNode;
+}) {
+  const kept = setting.keptGoalBeds;
+  return (
+    <div className="automatic-objective-setting">
+      <label className="automatic-objective-toggle">
+        <input type="checkbox" role="switch" checked={setting.enabled} disabled={pending} onChange={(event) => onChange(event.target.checked)} />
+        <span><strong>Objectif automatique</strong> · {setting.enabled ? 'allumé' : 'éteint'}</span>
+      </label>
+      <p>{AUTOMATIC_OBJECTIVE_SETTING_TEXT} Un objectif saisi passe toujours avant.</p>
+      {setting.enabled && kept > 0 ? (
+        <div className="automatic-objective-kept" role="note">
+          <p>{kept === 1 ? '1 planche garde un objectif saisi cette semaine' : `${kept} planches gardent un objectif saisi cette semaine`} : il passe avant l’objectif automatique. Pour qu’elle{kept > 1 ? 's' : ''} le sui{kept > 1 ? 'vent' : 've'}, videz les objectifs.</p>
+          <button type="button" className="danger-outline" disabled={pending} onClick={onClearGoals}>Vider les objectifs</button>
+        </div>
+      ) : null}
+      {reply}
+    </div>
+  );
+}
+
 function SummaryCard({ icon, label, value, detail, water = false }: { icon: IconName; label: string; value: string; detail: string; water?: boolean }) {
   // Un chiffre absent (« Non défini », « non disponible · partielle ») s'écrit à la taille du texte courant, sur une ligne, pas en très gros (lot D, J3, F300).
   const unknown = !/^\d/.test(value);

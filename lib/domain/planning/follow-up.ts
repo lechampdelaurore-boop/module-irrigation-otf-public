@@ -35,7 +35,8 @@ export function suggestionLabel(suggestion: Pick<StoredPlanSuggestion, 'suggesti
 export function suggestionCauseLabel(cause: PlanSuggestionCause, format: DateFormats): string {
   switch (cause.kind) {
     case 'useful-dose': {
-      const terms = [`${cause.manual ? 'besoin posé à la main' : 'objectif'} ${mm.format(cause.objectiveMm)} mm`];
+      const objective = cause.objectiveOrigin === 'automatic' ? 'objectif automatique' : cause.objectiveOrigin === 'both' ? 'objectif saisi et automatique' : 'objectif';
+      const terms = [`${cause.manual ? 'besoin posé à la main' : objective} ${mm.format(cause.objectiveMm)} mm`];
       if (cause.actualRainMm > 0) terms.push(`pluie au pluviomètre ${mm.format(cause.actualRainMm)} mm`);
       if (cause.forecastRainMm > 0) terms.push(`pluie prévue comptée ${mm.format(cause.forecastRainMm)} mm`);
       if (cause.actualIrrigationMm > 0) terms.push(`déjà arrosé ${mm.format(cause.actualIrrigationMm)} mm`);

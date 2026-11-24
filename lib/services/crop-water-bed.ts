@@ -4,6 +4,7 @@ import { listEquipmentPlacementsForUser } from '@/db/equipment-placement-reposit
 import { listHydricGoalRevisionsThroughWeekForUser } from '@/db/water-management-repository';
 import type { IrrigationSnapshot } from '../domain/domain';
 import { objectiveForBed } from '../domain/irrigation-needs';
+import { objectiveFollowsCropNeed, objectiveOriginText } from '../domain/objective-reading';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
 import { earlySprinklerWarning } from '../domain/crop-water/proposal';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
@@ -28,6 +29,14 @@ export type BedCropWaterSheet =
       bed: BedCropWater;
       /** On n'adopte pas la proposition d'une semaine finie : elle ne compterait pour aucun jour. */
       weekOpen: boolean;
+      /**
+       * L'objectif automatique de la planche est déjà, tous ses jours, le
+       * besoin de la culture : rien à adopter (6 decies, O4, section 5,
+       * point 4 ; D-319).
+       */
+      followsCropNeed: boolean;
+      /** L'origine de l'objectif quand l'objectif automatique s'applique (« automatique, d’après l’ET0 ») ; `null` sinon. */
+      objectiveOrigin: string | null;
       adoptions: StoredAdoption[];
       /** « Besoin probablement sous-estimé en début de cycle », ou `null` (« Les garde-fous »). */
       sprinklerWarning: string | null;
@@ -76,6 +85,8 @@ export async function getBedCropWaterSheetForUser(input: {
     weekEnd,
     bed: week.beds[0],
     weekOpen: weekEnd >= today,
+    followsCropNeed: objectiveFollowsCropNeed(objective),
+    objectiveOrigin: objectiveOriginText({ objectiveOrigin: objective.origin, automaticObjective: objective.automatic }),
     adoptions,
     sprinklerWarning: earlySprinklerWarning({ days: week.beds[0].week.days, sprinklerOnBed, irrigationDates }),
     unusableCrops: week.unusableCrops,
