@@ -13,6 +13,7 @@ import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-re
 import type { WeatherAlertCriterion, WeatherAlertForecastDay } from '../lib/domain/weather/weather-alerts';
 import type { StoredProposal } from '../lib/domain/planning/contract';
 import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue';
+import { DAY_REPLY, irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, TODAY_REPLY_CLASSES } from '../app/irrigation/today/today-replies';
 
 /**
  * « Aujourd'hui » mène aux menus (docs/aujourdhui-liens-contract.md, D-308).
@@ -25,6 +26,9 @@ import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue';
  * les cuves et les ressources limitées d'« Eau disponible » mènent à leur
  * page ; leur lien porte la phrase écrite pour un lecteur d'écran
  * (section 4).
+ *
+ * L4 (D-313) : la réponse d'un geste s'écrit sous le bouton pressé, par
+ * `ActionReply` (section 6) ; les deux paragraphes de tête disparaissent.
  *
  * L3 (D-312) : un jour en alerte, une donnée à jour de « Fiabilité du
  * calcul », « Plan calculé … », l'état vide de « Votre journée » et une
@@ -273,4 +277,34 @@ test('L3 : les liens dessinés — jour en alerte, donnée à jour, plan, état 
   assert.doesNotMatch(header, /plan\.linkToPlanning \? <a/);
   const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
   assert.match(day, /hrefWithIntent\(pagePath\(emptyLink\.page\), query\.season, emptyLink\.intent, '1'\)/);
+});
+
+test('L4, règle 1 : chaque geste de la page a son endroit, et un seul ; le refus en rouge', () => {
+  assert.equal(irrigationReply('e7'), 'irrigation:e7');
+  assert.deepEqual(new Set([DAY_REPLY, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, irrigationReply('e7')]).size, 4);
+  assert.deepEqual(TODAY_REPLY_CLASSES, { notice: 'today-notice', warning: 'today-notice', error: 'today-error' });
+  const page = readFileSync('app/irrigation/today/today-page.tsx', 'utf8');
+  // Règle 3 : les deux paragraphes de tête ne sont plus ; une seule réponse à la fois.
+  assert.doesNotMatch(page, /className="today-notice"|className="today-error"|setNotice|setError|setRefused/);
+  assert.match(page, /const origin = irrigationReply\(eventEquipmentId\);/);
+  assert.match(page, /onRecalculatePlan=\{\(\) => recalculatePlan\(PLAN_HEADER_REPLY\)\}/);
+  assert.match(page, /onRecalculatePlan=\{\(\) => recalculatePlan\(PLAN_RELIABILITY_REPLY\)\}/);
+  assert.match(page, /link: \{ href: pageHref\('arrosages', dayQuery\), label: 'Suivre sur « Arrosages »' \}/);
+  assert.match(page, /\{ lines: refused \}/);
+});
+
+test('L4, règle 2 : sous la carte, qui la suit dans « En cours » ; la carte partie, en tête de « Votre journée »', () => {
+  const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
+  assert.match(day, /reply=\{reply\(irrigationReply\(line\.eventEquipmentId\)\)\}/, 'la carte « En cours » porte la réponse de son démarrage');
+  assert.match(day, /reply=\{id \? reply\(irrigationReply\(id\)\) : null\}/, 'chaque carte du jour porte la sienne');
+  assert.match(day, /onAllDone\(\[id\], irrigationReply\(id\)\)/, '« Fait comme prévu » répond sous sa carte');
+  assert.match(day, /onConfirm=\{\(ids\) => onAllDone\(ids, DAY_REPLY\)\}/, '« Tout est fait » répond en tête du bloc');
+  assert.match(day, /!cards\.has\(reply\.origin\) \? \{ \.\.\.reply, origin: DAY_REPLY \}/, 'une carte partie : la réponse en tête du bloc, jamais perdue');
+  assert.equal((day.match(/\{reply\}\n {4}<\/li>/g) ?? []).length, 2, 'sous les boutons, dans la carte, pour les deux sortes de carte');
+  const header = readFileSync('app/irrigation/today/today-header.tsx', 'utf8');
+  assert.match(header, /<ActionReply messages=\{replies\} origin=\{PLAN_HEADER_REPLY\}/);
+  const zone = readFileSync('app/irrigation/today/reliability-zone.tsx', 'utf8');
+  assert.match(zone, /check\.kind === 'plan' \? <ActionReply messages=\{replies\} origin=\{PLAN_RELIABILITY_REPLY\}/, 'sous la ligne du plan, qui reste une fois le plan à jour');
+  const reply = readFileSync('app/irrigation/shell/action-reply.tsx', 'utf8');
+  assert.match(reply, /scrollIntoView\?\.\(\{ block: 'nearest'/, 'la réponse entre dans l’écran');
 });

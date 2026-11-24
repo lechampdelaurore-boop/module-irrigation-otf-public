@@ -152,6 +152,8 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   // Un manque corrigé par son bouton : le plan calculé, la ligne disparaît, la pastille baisse.
   await recalculer.click();
   await expect(page.locator('.today-notice')).toHaveText('Plan calculé.', { timeout: 30_000 });
+  // La réponse s'écrit sous la ligne du plan, qui reste, et entre dans l'écran (6 nonies, L4, D-313).
+  await expect(fiabilite.locator('.reliability-check').filter({ hasText: 'Plan de la semaine' }).locator('.today-notice')).toBeInViewport();
   await expect(lignesDeFiabilite(page).filter({ hasText: 'Le plan de la semaine n’a pas été calculé.' })).toHaveCount(0);
   await expect(page.locator('.today-plan')).toContainText(/^Plan calculé aujourd’hui à \d{1,2} h( \d{2})?$/);
   await expect.poll(() => pastille(page)).toBe(manquesAuDepart - 1 === 0 ? null : manquesAuDepart - 1);

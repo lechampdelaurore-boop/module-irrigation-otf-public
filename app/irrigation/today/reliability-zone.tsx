@@ -6,8 +6,10 @@ import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import { MISSING_BY_BED_ANCHOR, type MissingByBed } from '@/lib/domain/today/missing-by-bed';
 import type { ReliabilityAction as ReliabilityGesture, ReliabilityCheck, ReliabilityLine, ReliabilityZone } from '@/lib/domain/today/reliability';
 import { Icon, type IconName } from '../line-icon';
+import { ActionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { AnchoredFold } from '../shell/page-settings-fold';
 import { useSectionHelp } from '../shell/section-help';
+import { PLAN_RELIABILITY_REPLY, TODAY_REPLY_CLASSES } from './today-replies';
 
 const RELIABILITY_TITLE = 'Fiabilité du calcul';
 
@@ -37,6 +39,7 @@ export function ReliabilityZoneView({
   byBed,
   query,
   pending,
+  replies = [],
   onRecalculatePlan,
 }: {
   zone: ReliabilityZone;
@@ -45,6 +48,8 @@ export function ReliabilityZoneView({
   byBed: MissingByBed | null;
   query: PageQuery;
   pending: boolean;
+  /** La réponse de « Recalculer le plan », sous la ligne du plan, qui reste quand le plan est à jour (L4, D-313). */
+  replies?: readonly ActionReplyMessage[];
   onRecalculatePlan: () => void;
 }) {
   const help = useSectionHelp(RELIABILITY_TITLE, RELIABILITY_HELP);
@@ -89,6 +94,7 @@ export function ReliabilityZoneView({
                       ))}
                     </ul>
                   ) : null}
+                  {check.kind === 'plan' ? <ActionReply messages={replies} origin={PLAN_RELIABILITY_REPLY} classNames={TODAY_REPLY_CLASSES} /> : null}
                 </div>
               </li>
             );

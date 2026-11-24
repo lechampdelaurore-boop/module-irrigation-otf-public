@@ -259,6 +259,8 @@ test('« Tout est fait » : la confirmation liste l’irrigation passée, « Ann
 
   await confirmation.getByRole('button', { name: 'Enregistrer 1 irrigation' }).click();
   await expect(page.locator('.today-notice')).toHaveText('1 irrigation enregistrée comme faite.');
+  // Sous « Tout est fait », en tête de « Votre journée », dans l'écran (6 nonies, L4, D-313).
+  await expect(page.locator('#today-day > .action-reply .today-notice')).toBeInViewport();
   await expect(confirmation).toBeHidden();
   await expect(toutEstFait).toHaveCount(0);
   await expect(page.locator('#today-day [data-group="late"]')).toHaveCount(0);

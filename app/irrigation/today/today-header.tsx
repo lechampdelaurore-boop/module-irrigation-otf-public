@@ -5,6 +5,8 @@ import type { TodayShortage } from '@/lib/domain/today/ahead';
 import type { TodayHeadline } from '@/lib/domain/today/headline';
 import type { TodayPlanLine } from '@/lib/domain/today/today-view';
 import { Icon, type IconName } from '../line-icon';
+import { ActionReply, type ActionReplyMessage } from '../shell/action-reply';
+import { PLAN_HEADER_REPLY, TODAY_REPLY_CLASSES } from './today-replies';
 
 type Chip = TodayHeadline['chips'][number];
 
@@ -38,12 +40,14 @@ const CHIP_TARGETS: Record<Chip['target'], string> = {
  * phrase du planning et son lien « Répartir l'eau » (audit ergonomique final,
  * lot A, R1, F276).
  */
-export function TodayHeader({ headline, plan, shortage, query, pending, onRecalculatePlan }: {
+export function TodayHeader({ headline, plan, shortage, query, pending, replies = [], onRecalculatePlan }: {
   headline: TodayHeadline;
   plan: TodayPlanLine | null;
   shortage: TodayShortage | null;
   query: PageQuery;
   pending: boolean;
+  /** La réponse de « Recalculer », sous la ligne du plan (6 nonies, L4, D-313). */
+  replies?: readonly ActionReplyMessage[];
   onRecalculatePlan: () => void;
 }) {
   return (
@@ -65,6 +69,7 @@ export function TodayHeader({ headline, plan, shortage, query, pending, onRecalc
             )}
           </div>
         ) : null}
+        <ActionReply messages={replies} origin={PLAN_HEADER_REPLY} classNames={TODAY_REPLY_CLASSES} />
       </div>
       {headline.chips.length > 0 ? (
         <nav className="today-chips" aria-label="Résumé du jour">

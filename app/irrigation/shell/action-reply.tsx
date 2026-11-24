@@ -17,14 +17,23 @@ export type ActionReplyMessage = {
   text: string;
   /** Change à chaque message, même identique au précédent : l'écran y revient. */
   serial: number;
+  /** Un lien écrit au bout de la phrase (« Suivre sur « Arrosages » », 6 nonies, L4). */
+  link?: { href: string; label: string };
+  /** Une liste sous la phrase : chaque refus avec sa raison (« Tout est fait », L4). */
+  lines?: readonly string[];
 };
 
 let nextSerial = 1;
 
 /** Un message nouveau, pour un endroit donné. */
-export function actionReply(origin: string, tone: ActionReplyTone, text: string): ActionReplyMessage {
+export function actionReply(
+  origin: string,
+  tone: ActionReplyTone,
+  text: string,
+  extra: Pick<ActionReplyMessage, 'link' | 'lines'> = {},
+): ActionReplyMessage {
   nextSerial += 1;
-  return { origin, tone, text, serial: nextSerial };
+  return { origin, tone, text, serial: nextSerial, ...extra };
 }
 
 export function ActionReply({ messages, origin, classNames }: {
@@ -45,11 +54,18 @@ export function ActionReply({ messages, origin, classNames }: {
   if (shown.length === 0) return null;
   return (
     <div ref={zone} className="action-reply" data-origin={origin}>
-      {shown.map((message) => (
-        <p key={`${message.tone}:${message.serial}`} className={classNames[message.tone]} role={message.tone === 'notice' ? 'status' : 'alert'}>
-          {message.text}
-        </p>
-      ))}
+      {shown.map((message) => {
+        const role = message.tone === 'notice' ? 'status' : 'alert';
+        const text = <>{message.text}{message.link ? <> <a href={message.link.href}>{message.link.label}</a></> : null}</>;
+        return message.lines && message.lines.length > 0 ? (
+          <div key={`${message.tone}:${message.serial}`} className={classNames[message.tone]} role={role}>
+            <p>{text}</p>
+            <ul>{message.lines.map((line) => <li key={line}>{line}</li>)}</ul>
+          </div>
+        ) : (
+          <p key={`${message.tone}:${message.serial}`} className={classNames[message.tone]} role={role}>{text}</p>
+        );
+      })}
     </div>
   );
 }

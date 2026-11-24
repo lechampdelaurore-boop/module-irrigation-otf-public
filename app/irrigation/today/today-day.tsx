@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { pageHref, pagePath, type PageQuery } from '@/lib/domain/features/pages';
 import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all-done';
 import type { TodayTomorrow } from '@/lib/domain/today/ahead';
@@ -10,8 +11,10 @@ import { shortDayText } from '@/lib/domain/today/today-text';
 import type { TodayBlock, TodayDayEmptyLink } from '@/lib/domain/today/today-view';
 import { Icon, type IconName } from '../line-icon';
 import { DoneAsPlannedButton } from '../done-as-planned-button';
+import { ActionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { hrefWithIntent } from '../shell/url-intent';
 import { TodayAllDone } from './today-all-done';
+import { DAY_REPLY, irrigationReply, TODAY_REPLY_CLASSES } from './today-replies';
 
 type LateBlock = Extract<TodayBlock, { kind: 'late' }>;
 type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
@@ -32,9 +35,11 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * qui coule ou attend d'être repris : une irrigation en cours, avec
  * « Terminer l’irrigation » (lot K, F473) qui ouvre sa carte sur « Arrosages », et un
  * reliquat, avec « Reprendre le reliquat » (audit du 19 novembre 2026,
- * lot H, n° 2, F433 et F434).
+ * lot H, n° 2, F433 et F434). La réponse d'un geste s'écrit sous sa carte ;
+ * quand la carte est partie (« Fait comme prévu »), en tête du bloc, sous
+ * « Tout est fait » (6 nonies, L4, D-313).
  */
-export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, query, pending, onStart, onAllDone }: {
+export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, query, pending, replies = [], onStart, onAllDone }: {
   today: string;
   current?: readonly TodayNowLine[];
   late: LateBlock;
@@ -46,11 +51,20 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
   emptyLink?: TodayDayEmptyLink | null;
   query: PageQuery;
   pending: boolean;
+  /** La réponse du dernier geste, avec l'endroit du bouton pressé (L4). */
+  replies?: readonly ActionReplyMessage[];
   onStart: (eventEquipmentId: string) => void;
-  onAllDone: (eventEquipmentIds: string[]) => Promise<void>;
+  /** `origin` : l'endroit du geste, « Tout est fait » ou la carte de « Fait comme prévu ». */
+  onAllDone: (eventEquipmentIds: string[], origin: string) => Promise<void>;
 }) {
   const nothing = current.length === 0 && late.lines.length === 0 && todo.lines.length === 0;
   const confirmations = doneAsPlannedConfirmations(allDone);
+  // Une réponse dont la carte n'est plus sur la page se lit en tête du bloc : jamais perdue (L4, règle 2).
+  const cards = new Set([...current.map((line) => line.eventEquipmentId), ...late.lines.map((line) => line.eventEquipmentId), ...todo.lines.map((line) => line.eventEquipmentId)]
+    .filter((id): id is string => id !== null)
+    .map(irrigationReply));
+  const shown = replies.map((reply) => (reply.origin.startsWith(irrigationReply('')) && !cards.has(reply.origin) ? { ...reply, origin: DAY_REPLY } : reply));
+  const reply = (origin: string) => <ActionReply messages={shown} origin={origin} classNames={TODAY_REPLY_CLASSES} />;
   const card = (line: TodayIrrigationLine) => {
     const id = line.eventEquipmentId;
     const confirmation = id ? confirmations.get(id) : undefined;
@@ -62,7 +76,8 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
         query={query}
         pending={pending}
         onStart={onStart}
-        doneAsPlanned={id && confirmation ? { confirmation, onConfirm: () => onAllDone([id]) } : null}
+        doneAsPlanned={id && confirmation ? { confirmation, onConfirm: () => onAllDone([id], irrigationReply(id)) } : null}
+        reply={id ? reply(irrigationReply(id)) : null}
       />
     );
   };
@@ -74,8 +89,9 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
           <h2 id="today-day-title">Votre journée</h2>
           <p className="today-block-sub">{daySummary(current, late, todo)}</p>
         </div>
-        {allDone ? <TodayAllDone allDone={allDone} pending={pending} onConfirm={onAllDone} /> : null}
+        {allDone ? <TodayAllDone allDone={allDone} pending={pending} onConfirm={(ids) => onAllDone(ids, DAY_REPLY)} /> : null}
       </div>
+      {reply(DAY_REPLY)}
       {timeline ? <Timeline timeline={timeline} /> : null}
       {nothing ? (
         <div className="today-empty">
@@ -97,7 +113,7 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
         <div className="today-group" data-group="now">
           <h3 className="today-group-title">{nowTitle(current)}</h3>
           <ul className="today-irrigations">
-            {current.map((line) => <NowCard key={line.key} line={line} query={query} pending={pending} onStart={onStart} />)}
+            {current.map((line) => <NowCard key={line.key} line={line} query={query} pending={pending} onStart={onStart} reply={reply(irrigationReply(line.eventEquipmentId))} />)}
           </ul>
         </div>
       ) : null}
@@ -152,11 +168,12 @@ function nowTitle(current: readonly TodayNowLine[]): string {
 }
 
 /** Une irrigation en cours, en pause ou à confirmer, ou un reliquat (F433, F434). */
-function NowCard({ line, query, pending, onStart }: {
+function NowCard({ line, query, pending, onStart, reply }: {
   line: TodayNowLine;
   query: PageQuery;
   pending: boolean;
   onStart: (eventEquipmentId: string) => void;
+  reply: ReactNode;
 }) {
   return (
     <li className="today-irrigation" data-tone={line.tone}>
@@ -185,6 +202,7 @@ function NowCard({ line, query, pending, onStart }: {
           {line.canResume ? 'Ouvrir' : 'Terminer l’irrigation'}
         </a>
       </div>
+      {reply}
     </li>
   );
 }
@@ -226,7 +244,7 @@ const EQUIPMENT_ICONS: Record<NonNullable<TodayIrrigationLine['equipmentKind']>,
   drip: 'rampe',
 };
 
-function IrrigationCard({ line, today, query, pending, onStart, doneAsPlanned }: {
+function IrrigationCard({ line, today, query, pending, onStart, doneAsPlanned, reply }: {
   line: TodayIrrigationLine;
   today: string;
   query: PageQuery;
@@ -234,6 +252,8 @@ function IrrigationCard({ line, today, query, pending, onStart, doneAsPlanned }:
   onStart: (eventEquipmentId: string) => void;
   /** « Fait comme prévu », seulement quand la règle de « Tout est fait » accepte l'irrigation. */
   doneAsPlanned: { confirmation: string; onConfirm: () => Promise<void> } | null;
+  /** La réponse d'un geste de la carte, sous ses boutons (L4). */
+  reply: ReactNode;
 }) {
   const startId = line.canStart ? line.eventEquipmentId : null;
   return (
@@ -266,6 +286,7 @@ function IrrigationCard({ line, today, query, pending, onStart, doneAsPlanned }:
           {line.open.label}
         </a>
       </div>
+      {reply}
     </li>
   );
 }

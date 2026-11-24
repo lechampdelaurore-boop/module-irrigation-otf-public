@@ -9249,3 +9249,48 @@ alerte, à 44 px au téléphone).
 **Ne change pas.** Les chiffres, les phrases, les dessins et l'ordre des
 blocs ; aucune donnée, aucune migration. Les barres de la frise de
 « Votre journée » restent inertes (contrat, section 9).
+
+## D-313 — « Aujourd'hui » mène aux menus, L4 : la réponse d'un geste s'écrit sous le bouton
+
+Date : 24 novembre 2026. Statut : codé (PR 4 sur 6 du contrat
+`docs/aujourdhui-liens-contract.md`, D-308, section 6) ; roadmap section
+6 nonies. Code en Opus 5.5 · Élevé.
+
+**Décision.** La règle du lot G (`ActionReply`, F404) s'étend à
+« Aujourd'hui ». La réponse de chaque geste de la page s'écrit sous le
+bouton pressé, et l'écran l'amène en vue au plus près :
+
+- « Démarrer maintenant » et « Reprendre le reliquat » : sous la carte de
+  l'irrigation ; démarrée, la carte passe « En cours » et la réponse l'y
+  suit, avec « Suivre sur « Arrosages » » au bout ;
+- « Fait comme prévu » : sous sa carte ; la carte partie, en tête de
+  « Votre journée » ;
+- « Tout est fait » : en tête de « Votre journée », sous le bouton, avec
+  la liste des refus ;
+- « Recalculer » de l'en-tête : sous la ligne du plan ;
+- « Recalculer le plan » de « Fiabilité du calcul » : sous la ligne « Plan
+  de la semaine », qui reste une fois le plan à jour.
+
+Un refus s'écrit au même endroit, en rouge. Les deux paragraphes de tête de
+page disparaissent : une réponse ne s'écrit qu'à un endroit, et un nouveau
+geste remplace la réponse du précédent.
+
+**Précisions tranchées en codant.**
+
+- F764 : une réponse dont la carte n'est plus sur la page (une irrigation
+  enregistrée comme faite, ou démarrée hors du jour) se lit en tête de
+  « Votre journée » : jamais perdue. Les endroits vivent dans
+  `app/irrigation/today/today-replies.ts`.
+- F765 : `ActionReply` gagne deux ajouts facultatifs, un lien au bout de la
+  phrase et une liste sous elle ; les autres pages n'en usent pas et ne
+  changent pas.
+
+**Preuve.** `tests/aujourdhui-liens.test.ts` (les endroits, un seul à la
+fois, la carte qui garde sa réponse en passant « En cours », la carte
+partie) ; parcours P29 (« Plan calculé. » sous la ligne du plan, dans
+l'écran), P30 (la réponse de « Tout est fait » en tête de « Votre
+journée », dans l'écran) et P38 (« Reprendre le reliquat » répond sous la
+carte en cours, dans l'écran, jamais en tête de page) aux deux largeurs.
+
+**Ne change pas.** Les gestes, leurs messages et leurs refus ; aucune
+donnée, aucune migration. Les autres pages gardent leurs réponses.

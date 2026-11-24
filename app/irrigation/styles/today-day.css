@@ -351,3 +351,9 @@
     padding: 14px;
   }
 }
+
+/* La réponse d'un geste, sous les boutons de sa carte, sur toute la largeur (6 nonies, L4, D-313). */
+.today-irrigation > .action-reply {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}

@@ -172,14 +172,7 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
 
   // « Terminer l’irrigation » ouvre la carte sur « Arrosages », où l'arrêt se confirme.
   await carte.getByRole('link', { name: `Arrêter ou terminer : ${materiel}`, exact: false }).click();
-  await attendreLaPagePrete(page, 'arrosages');
-  const enCours = page.getByLabel('Irrigations en cours');
-  await expect(enCours).toContainText(materiel);
-  const minuteur = await enCours.innerText();
-  await expect.poll(async () => (await enCours.innerText()) !== minuteur, { timeout: 15_000 }).toBe(true);
-  await enCours.locator('article').filter({ hasText: materiel }).getByRole('button', { name: 'Terminer l’irrigation' }).click();
-  await page.locator('[role=dialog]').filter({ hasText: 'Terminer l’irrigation' }).getByRole('button', { name: 'Terminer l’irrigation' }).click();
-  await expect(enCours.locator('article').filter({ hasText: materiel })).toHaveCount(0);
+  await terminerSurArrosages(page, materiel);
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   const reliquat = enTete.locator('.today-irrigation').filter({ hasText: materiel });
@@ -187,6 +180,27 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await expect(reliquat.getByRole('button', { name: 'Reprendre le reliquat' })).toBeVisible();
   await expect(page.locator('.today-sentence')).toContainText(/reliquats? (est|sont) à reprendre\./);
   await verifierLEtape(page, journal, 'le reliquat à reprendre');
+
+  // « Reprendre le reliquat » répond sous la carte, qui passe « En cours », et la réponse l'y suit, dans l'écran ;
+  // un refus s'y écrit aussi ; jamais en tête de page (6 nonies, L4, D-313).
+  await reliquat.getByRole('button', { name: 'Reprendre le reliquat' }).click();
+  const reponse = enTete.locator('.today-irrigation').filter({ hasText: materiel }).locator('.action-reply');
+  await expect(reponse).toBeVisible();
+  await expect(page.locator('.action-reply')).toHaveCount(1);
+  await expect(page.locator('.today-head .today-notice, .today-head .today-error')).toHaveCount(0);
+  await expect(page.locator('.today-page')).toHaveAttribute('aria-busy', 'false');
+  await expect(reponse).toBeInViewport();
+  if (await reponse.locator('.today-notice').count() > 0) {
+    await expect(reponse).toContainText('L’irrigation a démarré.');
+    await expect(reponse.getByRole('link', { name: 'Suivre sur « Arrosages »' })).toHaveAttribute('href', /^\/irrigation\/arrosages\?season=\d{4}$/);
+    await expect(enTete.locator('.today-irrigation').filter({ hasText: materiel }).locator('.today-status')).toHaveText('En cours');
+    await verifierLEtape(page, journal, 'reliquat repris, la réponse sous sa carte en cours');
+    await attendreLaPageIrrigation(page, 'arrosages');
+    await terminerSurArrosages(page, materiel);
+  } else {
+    await expect(reponse.locator('.today-error')).not.toBeEmpty();
+    await verifierLEtape(page, journal, 'reprise refusée, le refus sous sa carte');
+  }
 
   // Remise en état : le reliquat annulé, il quitte « Aujourd'hui ».
   await attendreLaPageIrrigation(page, 'arrosages');
@@ -196,6 +210,18 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(enTete.locator('.today-irrigation').filter({ hasText: materiel })).toHaveCount(0);
 });
+
+/** Termine sur « Arrosages » l'irrigation en cours du matériel ; ce qui reste passe en reliquat. */
+async function terminerSurArrosages(page: Page, materiel: string): Promise<void> {
+  await attendreLaPagePrete(page, 'arrosages');
+  const enCours = page.getByLabel('Irrigations en cours');
+  await expect(enCours).toContainText(materiel);
+  const minuteur = await enCours.innerText();
+  await expect.poll(async () => (await enCours.innerText()) !== minuteur, { timeout: 15_000 }).toBe(true);
+  await enCours.locator('article').filter({ hasText: materiel }).getByRole('button', { name: 'Terminer l’irrigation' }).click();
+  await page.locator('[role=dialog]').filter({ hasText: 'Terminer l’irrigation' }).getByRole('button', { name: 'Terminer l’irrigation' }).click();
+  await expect(enCours.locator('article').filter({ hasText: materiel })).toHaveCount(0);
+}
 
 test('la liste « Matériel » se regroupe par jardin, dans l’ordre naturel', async ({ page }) => {
   const journal = surveillerLaConsole(page);
