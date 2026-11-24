@@ -12,6 +12,14 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Alertes sur le téléphone : l'écran des alertes dit quand l'appareil
+  n'est plus inscrit, codé le 24 novembre 2026** (C4, D-306, roadmap
+  section 6 octies), en Opus 5.5 · Élevé. Une autorisation donnée sans
+  inscription veut dire une inscription perdue : l'écran « Alertes météo »
+  le dit en orange, avec le bouton « Réactiver les notifications » (le
+  geste `activate`, F372) ; le même bouton quand le service n'a pas pu
+  inscrire l'appareil. Aucune migration. Parcours P13 aux deux largeurs.
+  Contrôles : voir la PR. Reste C5.
 - **Alertes sur le téléphone : la veille de 9 h prévient l'exploitant des
   alertes non délivrées, codé le 24 novembre 2026** (C3, D-305, F756,
   roadmap section 6 octies), en Opus 5.5 · Élevé. Une seule alerte d'une
@@ -21,8 +29,7 @@ registres, elle y renvoie.
   l'exploitant. Limite écrite : si l'appareil de l'exploitant n'est plus
   inscrit, la veille est manquée (page d'état) ; la condition E5 de la fiche
   d'entrée du pilote la porte. Aucune migration. Tests à deux fermes
-  (`tests/db/operator-watch.test.ts`). Contrôles : voir la PR. Restent C4
-  et C5.
+  (`tests/db/operator-watch.test.ts`). Contrôles : voir la PR.
 - **Alertes sur le téléphone : les alertes non délivrées sur la page
   d'état, codé le 24 novembre 2026** (C2, D-304, F755, roadmap
   section 6 octies), en Opus 5.5 · Élevé. La carte de chaque ferme porte

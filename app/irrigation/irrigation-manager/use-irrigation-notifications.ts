@@ -5,6 +5,8 @@ import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record
 import {
   applicationServerKeyBytes,
   deviceStatusAfterRefresh,
+  deviceSubscriptionLost,
+  type DeviceNotificationStatus,
   showIrrigationCompletionNotification,
 } from '@/lib/domain/irrigation-notifications';
 import {
@@ -19,13 +21,7 @@ import {
 } from './completion-signal';
 import { remainingForEvent } from './presentation';
 
-export type NotificationStatus =
-  | 'checking'
-  | 'enabled'
-  | 'default'
-  | 'denied'
-  | 'unsupported'
-  | 'unavailable';
+export type NotificationStatus = DeviceNotificationStatus;
 
 /**
  * Les notifications de fin d'irrigation : état du navigateur, abonnement Push,
@@ -48,6 +44,8 @@ export function useIrrigationNotifications({
 }) {
   const [notificationStatus, setNotificationStatus] =
     useState<NotificationStatus>('checking');
+  // L'inscription de cet appareil s'est perdue depuis le geste « Activer » (C4, D-306).
+  const [subscriptionLost, setSubscriptionLost] = useState(false);
   const notifiedEventIds = useRef(new Set<string>());
   const notificationRegistration = useRef<ServiceWorkerRegistration | null>(null);
 
@@ -78,6 +76,7 @@ export function useIrrigationNotifications({
         }
         const subscription = await registration.pushManager.getSubscription();
         if (!subscription) {
+          setSubscriptionLost(deviceSubscriptionLost(Notification.permission, false));
           setNotificationStatus('default');
           return;
         }
@@ -184,6 +183,7 @@ export function useIrrigationNotifications({
         return;
       }
       setNotificationStatus('enabled');
+      setSubscriptionLost(false);
       setWarning(null);
     } catch {
       setNotificationStatus('unavailable');
@@ -208,5 +208,5 @@ export function useIrrigationNotifications({
     }
   };
 
-  return { notificationStatus, enableNotifications, disableNotifications };
+  return { notificationStatus, subscriptionLost, enableNotifications, disableNotifications };
 }

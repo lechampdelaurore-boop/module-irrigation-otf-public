@@ -191,3 +191,28 @@ async function actualiserLaMeteo(page: Page): Promise<void> {
   // Le message vient sous le bouton, dans l'encart de la météo (lot G, n° 1, F404).
   await expect(meteo.locator('.water-notice')).toHaveText(/La météo a été actualisée\.|Actualisation météo incomplète/);
 }
+
+/**
+ * C4 (alertes sur le téléphone, D-306) : un appareil dont l'autorisation est
+ * donnée mais qui n'a plus d'inscription (données du navigateur effacées,
+ * inscription expirée) l'apprend sur l'écran des alertes, avec le bouton
+ * « Réactiver les notifications ». Le navigateur des parcours n'a pas de
+ * service de notification : le geste lui-même reste la recette réelle.
+ */
+test('un appareil dont l’inscription s’est perdue le lit sur l’écran des alertes, avec « Réactiver les notifications »', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  // L'autorisation déjà donnée sur cet appareil (le navigateur sans tête la refuse d'office) ; aucune inscription.
+  await page.addInitScript(() => {
+    Object.defineProperty(Notification, 'permission', { configurable: true, get: () => 'granted' });
+  });
+  await attendreLaPageIrrigation(page, 'alertes-meteo');
+  const appareil = page.locator('#weather-alerts .weather-alert-device');
+  await appareil.scrollIntoViewIfNeeded();
+  await expect(appareil).toContainText('Cet appareil ne reçoit plus les alertes : son inscription aux notifications s’est perdue.');
+  await expect(appareil).toHaveAttribute('data-lost', 'true');
+  const reactiver = appareil.getByRole('button', { name: 'Réactiver les notifications' });
+  await expect(reactiver).toBeVisible();
+  if (testInfo.project.name === 'telephone') await verifierCibleTactile(reactiver, 'le bouton « Réactiver les notifications »');
+  await expect(appareil.getByRole('button', { name: 'Activer sur cet appareil' })).toHaveCount(0);
+  await verifierLEtape(page, journal, 'inscription perdue dite sur l’écran des alertes');
+});

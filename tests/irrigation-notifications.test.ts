@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { showIrrigationCompletionNotification } from '../lib/domain/irrigation-notifications.ts';
+import {
+  ACTIVATE_LABEL,
+  alertDeviceView,
+  deviceSubscriptionLost,
+  REACTIVATE_LABEL,
+  showIrrigationCompletionNotification,
+  type DeviceNotificationStatus,
+} from '../lib/domain/irrigation-notifications.ts';
 
 const payload = {
   eventEquipmentId: 'event-equipment-1',
@@ -68,4 +75,26 @@ test('l’absence de service worker laisse le minuteur utilisable', async () => 
     await showIrrigationCompletionNotification(null, 'denied', payload),
     'not-permitted',
   );
+});
+
+test('C4 (D-306) : une autorisation donnée sans inscription, c’est une inscription perdue ; jamais inscrit, ce n’en est pas une', () => {
+  assert.equal(deviceSubscriptionLost('granted', false), true, 'l’autorisation ne se donne qu’au geste « Activer »');
+  assert.equal(deviceSubscriptionLost('granted', true), false);
+  assert.equal(deviceSubscriptionLost('default', false), false, 'jamais activé sur cet appareil');
+  assert.equal(deviceSubscriptionLost('denied', false), false, 'bloqué : seul le réglage du navigateur y peut quelque chose');
+});
+
+test('C4 (D-306) : l’écran des alertes dit quand l’appareil n’est plus inscrit et propose « Réactiver les notifications »', () => {
+  assert.deepEqual(alertDeviceView('default', true), {
+    state: 'Cet appareil ne reçoit plus les alertes : son inscription aux notifications s’est perdue.',
+    action: REACTIVATE_LABEL,
+  });
+  assert.equal(REACTIVATE_LABEL, 'Réactiver les notifications');
+  assert.deepEqual(alertDeviceView('default', false), { state: 'Cet appareil ne reçoit pas encore les alertes.', action: ACTIVATE_LABEL });
+  assert.equal(alertDeviceView('unavailable', false).action, REACTIVATE_LABEL, 'le service n’a pas pu l’inscrire : le même geste réessaie');
+  assert.deepEqual(alertDeviceView('enabled', false), { state: 'Cet appareil reçoit les alertes.', action: null });
+  const statuses: DeviceNotificationStatus[] = ['checking', 'denied', 'unsupported'];
+  for (const status of statuses) {
+    assert.equal(alertDeviceView(status, false).action, null, `${status} : aucun geste que la page puisse faire`);
+  }
 });
