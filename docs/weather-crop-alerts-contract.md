@@ -70,7 +70,11 @@ une donnée de cette ferme.
 
 - Les prévisions et les températures minimales prévues, conservées depuis la
   5 bis (`irrigation_weather_daily_values`, migration 0022), mises à jour par
-  la synchronisation de 06 h 15 et par chaque actualisation.
+  la synchronisation de 06 h 15, par la relecture de la journée (9 h 30,
+  12 h 30, 15 h 30, 18 h 30 et 21 h 30, pour les fermes dont le gel ou les
+  aspersions sont actifs ; depuis le 24 novembre 2026, C1, D-303,
+  `docs/weather-scheduler-contract.md`) et par chaque actualisation : le gel
+  et les aspersions s'évaluent après chacune.
 - La route d'envoi immédiat du Worker Web Push et l'abonnement des appareils de
   l'exploitation ; l'enregistrement des alertes et leur résultat d'envoi.
 - Les créneaux d'aspersion du planning (3.5, 3.7) avec leur jour, leur heure

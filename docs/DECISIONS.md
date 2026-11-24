@@ -8745,3 +8745,58 @@ l'ancien calcul, le plus rapide.
 après une semaine sur `commun` sans écart, lue au journal comme les trois
 matins. Ne changent pas : D-028, D-047, D-053, D-270. Aucune migration.
 Aucune question de budget.
+
+## D-303 — Les prévisions sont relues dans la journée pour les alertes (alertes sur le téléphone, C1)
+
+Date : 24 novembre 2026. Statut : correction déléguée par le porteur le
+24 novembre 2026 à 9 h 36 (« Réalise les corrections que tu juges
+nécessaires. Comme d'habitude, tu inscris tout ça dans les registres
+correspondants. ») ; première des cinq corrections de la section 6 octies de
+la roadmap ; réglage : Opus 5.5 · Élevé.
+
+**Contexte.** Le 24 novembre 2026, le porteur n'a reçu une notification de
+gel qu'après s'être reconnecté à Cloudflare Access sur son téléphone et avoir
+rouvert le module, vers 9 h 30. La livraison ne dépend pas d'Access : le
+Worker de notification réessaie au plus 1 h 45 environ, un message n'attend
+pas trois heures. Mais les alertes météo et de gel ne s'évaluaient qu'après
+la lecture de 6 h 15 et à l'ouverture du module, quand la dernière lecture
+avait plus de 3 heures : un gel apparu dans les prévisions après 6 h 15
+n'alertait que si quelqu'un ouvrait le module. C'est la cause la plus
+probable du retard, non prouvée : l'heure d'envoi de l'alerte, lisible dans
+« Alertes cultures », la confirmerait.
+
+**Décision.** Le planificateur relit les prévisions à 9 h 30, 12 h 30,
+15 h 30, 18 h 30 et 21 h 30, heure de Paris (déclencheur
+`30 7,8,10,11,13,14,16,17,19,20 * * *`, route
+`/api/internal/weather-intraday`, même jeton de service), pour les seules
+fermes qui lisent la météo et ont une alerte qui lit les prévisions (un
+critère d'alerte météo actif, ou le gel ou les aspersions actifs). Chaque
+relecture lit 7 jours de prévisions, le plus long horizon d'une alerte, un
+appel par lieu partagé ; jamais la réanalyse ; rien n'est archivé (D-297).
+Les alertes météo, le gel et les aspersions s'évaluent ensuite comme après la
+lecture du matin ; leur règle de répétition empêche tout second envoi. La
+relecture note la dernière lecture de la ferme (une ouverture du module dans
+les 3 heures ne relit donc plus) sans toucher l'état de la mise à jour
+automatique du matin (D-165), et a son propre verrou. Elle est une tâche du
+registre, `weather-intraday` : orange à 16 heures, rouge à 27 (la nuit sépare
+21 h 30 de 9 h 30 de douze heures). Le contrat est
+`docs/weather-scheduler-contract.md`, « La relecture de la journée ».
+
+**Coût, chiffré avant le code** (consigne : le budget est au porteur) :
+5 lectures de prévisions de plus par jour et par lieu relu. Visual Crossing
+compte une lecture de prévisions pour un enregistrement quel que soit le
+nombre de jours (sa documentation, « What exactly is a weather record? ») :
+5 sur les 1 000 enregistrements gratuits par jour. Sans clé Visual Crossing,
+Open-Meteo : 5 appels sur les 10 000 gratuits par jour. Aucun service payant,
+aucun secret nouveau : rien à demander au porteur.
+
+**Alternatives écartées.** Relire toutes les heures (plus d'appels pour un
+gain faible : les prévisions bougent peu d'une heure à l'autre) ; relire
+toutes les fermes (une ferme sans alerte active n'a rien à recevoir) ; relire
+la nuit (une alerte à 3 h ne réveille personne utilement ; la lecture de
+6 h 15 la rattrape).
+
+**Ne change pas.** Le besoin, l'objectif, le planning, la dose, la jauge ;
+la lecture de 6 h 15 et ses calculs ; le séchage, évalué au matin ; les
+textes et l'écran. Aucune migration. Ne règle pas, à lui seul, le cas d'une
+alerte partie vers « aucun appareil » : c'est l'objet de C2 et C3.

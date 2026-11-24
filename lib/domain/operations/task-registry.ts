@@ -40,9 +40,10 @@ export type TaskKey =
   | 'offsite-export'
   | 'restore-rehearsal'
   | 'operator-watch'
-  | 'evening-reminder';
+  | 'evening-reminder'
+  | 'weather-intraday';
 
-export type TriggerKey = 'weather-morning' | 'operator-watch' | 'evening-reminder' | 'demo-nightly-reset';
+export type TriggerKey = 'weather-morning' | 'operator-watch' | 'evening-reminder' | 'weather-intraday' | 'demo-nightly-reset';
 
 /**
  * Une tâche faite par l'exploitant, hors du Worker, et notée par un geste de
@@ -128,6 +129,13 @@ export const TASK_TRIGGERS: readonly TriggerDeclaration[] = [
     config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
     cron: '5 * * * *',
     description: 'Le planificateur appelle le passage du rappel du soir à chaque heure et cinq minutes : chaque ferme règle son heure, de 17 h à 22 h au quart d\'heure, et le passage envoie les rappels dus (amélioration n° 2, F705, F714). Avant 17 h, heure de Paris, il ne lit rien.',
+    monitored: true,
+  },
+  {
+    key: 'weather-intraday',
+    config: 'cloudflare/irrigation-weather-scheduler/wrangler.jsonc',
+    cron: '30 7,8,10,11,13,14,16,17,19,20 * * *',
+    description: 'Le planificateur appelle la relecture des prévisions à 9 h 30, 12 h 30, 15 h 30, 18 h 30 et 21 h 30, heure de Paris (chaque heure déclarée deux fois en UTC, l\'une pour l\'hiver, l\'autre pour l\'été) : les prévisions des fermes qui ont une alerte active sont relues et leurs alertes évaluées, sans attendre qu\'on ouvre le module (C1, D-303).',
     monitored: true,
   },
   {
@@ -238,6 +246,17 @@ export const TASK_REGISTRY: readonly TaskDeclaration[] = [
     ifMissing: 'Les fermes ne reçoivent pas le rappel des arrosages validés du jour jamais confirmés ; rien n\'est confirmé à leur place.',
     successKeptIn: 'Ligne « task:evening-reminder » de irrigation_background_jobs (réussi quand chaque rappel dû est parti, ou qu\'aucun n\'était dû).',
     trigger: 'evening-reminder',
+  },
+  {
+    key: 'weather-intraday',
+    label: 'Relecture des prévisions pour les alertes (9 h 30 à 21 h 30)',
+    rhythm: '5 passages par jour, à 9 h 30, 12 h 30, 15 h 30, 18 h 30 et 21 h 30 (heure de Paris) ; seules les fermes qui ont une alerte active sont relues',
+    lateAfterHours: 16,
+    brokenAfterHours: 27,
+    thresholdReason: 'Douze heures séparent le passage de 21 h 30 de celui de 9 h 30 : orange à 16 heures (au moins deux passages de suite manqués, vu dans la journée), rouge à 27 heures (une journée entière de passages manquée, vue par la veille de 9 h le lendemain).',
+    ifMissing: 'Un gel ou une alerte météo apparu dans les prévisions après 6 h 15 n\'alerte qu\'au matin suivant, ou quand quelqu\'un ouvre le module.',
+    successKeptIn: 'Ligne « task:weather-intraday » de irrigation_background_jobs (réussie quand chaque lieu relu a reçu ses prévisions, ou qu\'aucune ferme n\'avait d\'alerte active).',
+    trigger: 'weather-intraday',
   },
 ];
 

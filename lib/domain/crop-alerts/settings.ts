@@ -25,6 +25,9 @@ export type CropAlertSettings = {
 };
 
 const HORIZON_DAYS = { minimum: 1, maximum: 7 } as const;
+
+/** Le plus long horizon du gel qu'une ferme peut régler, aujourd'hui compris. */
+export const CROP_ALERT_MAXIMUM_HORIZON_DAYS = HORIZON_DAYS.maximum;
 const SPRINKLER_TEMPERATURE_CELSIUS = { minimum: 0, maximum: 40 } as const;
 const SPRINKLER_RADIATION = { minimum: 50, maximum: 1000 } as const;
 

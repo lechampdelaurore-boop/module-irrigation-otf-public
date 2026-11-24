@@ -116,6 +116,10 @@ Nombre maximal d’appels externes avec une commune déjà géocodée :
 - passage planifié quotidien : **1** Forecast et **1** Historical par lieu
   distinct, quel que soit le nombre de workspaces partageant ce lieu, hors
   tentatives bornées après erreur temporaire ;
+- relecture de la journée (depuis le 24 novembre 2026, C1, D-303) : **1**
+  Forecast de 7 jours par lieu distinct à 9 h 30, 12 h 30, 15 h 30, 18 h 30
+  et 21 h 30, seulement pour les fermes qui ont une alerte active ; aucune
+  réanalyse (`docs/weather-scheduler-contract.md`) ;
 - chargement de la semaine courante avec cache frais : **0** ;
 - chargement avec cache météo absent ou périmé : **1** appel Forecast ;
 - recherche explicite d’une commune : **1** appel Geocoding ;

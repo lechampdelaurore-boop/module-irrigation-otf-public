@@ -2,6 +2,7 @@ import { logJsonLine } from '../../adapters/log.ts';
 import { millisecondsFromMinutes } from '../../domain/units.ts';
 import { dateKeyInTimeZone } from '../../domain/water-management.ts';
 import { automaticWeatherRequestRanges } from '../../domain/weather/cache-policy.ts';
+import { intradayWeatherRequestRanges } from '../../domain/weather/intraday-alerts.ts';
 import {
   fetchWeatherForLocation,
   weatherLocationDeduplicationKey,
@@ -39,6 +40,15 @@ const AUTOMATIC_LOCK_MS = millisecondsFromMinutes(10);
 /** Appelé après chaque écriture réussie de prévisions d'une exploitation : les alertes météo (5 bis). */
 export type ForecastWrittenHandler = (input: { workspaceId: string; locationKey: string; now: Date }) => Promise<void>;
 
+/**
+ * La lecture du matin (`morning`, par défaut) lit 15 jours de prévisions et
+ * la réanalyse, et archive la prévision du jour. La relecture de la journée
+ * (`intraday`, C1, D-303) ne lit que les 7 jours de prévisions des alertes,
+ * pour les seules cibles que `includeTarget` retient ; elle n'archive rien
+ * (l'archive garde la première lecture du jour, D-297).
+ */
+export type AutomaticWeatherSyncMode = 'morning' | 'intraday';
+
 export async function runAutomaticWeatherSync({
   repository,
   provider,
@@ -46,6 +56,8 @@ export async function runAutomaticWeatherSync({
   retry,
   log = logJsonLine,
   onForecastWritten,
+  mode = 'morning',
+  includeTarget,
 }: {
   repository: AutomaticWeatherSyncRepository;
   provider: WeatherProvider;
@@ -53,6 +65,8 @@ export async function runAutomaticWeatherSync({
   retry?: WeatherRetryOptions;
   log?: WeatherSyncLogger;
   onForecastWritten?: ForecastWrittenHandler;
+  mode?: AutomaticWeatherSyncMode;
+  includeTarget?: (target: AutomaticWeatherTarget) => Promise<boolean>;
 }): Promise<AutomaticWeatherSyncResult> {
   const at = now.toISOString();
   const token = await repository.claimJob(
@@ -64,7 +78,7 @@ export async function runAutomaticWeatherSync({
   let finalResult = emptyResult('completed');
   let finalError: string | null = null;
   try {
-    const targets = await repository.listTargets();
+    const targets = await selectTargets(await repository.listTargets(), includeTarget);
     const eligible = targets.filter((target) => !target.refreshNotBeforeAt
       || Date.parse(target.refreshNotBeforeAt) <= now.getTime());
     const groups = groupTargetsByLocation(eligible);
@@ -77,6 +91,7 @@ export async function runAutomaticWeatherSync({
 
     log('info', {
       event: 'weather_automatic_sync_started',
+      mode,
       startedAt: at,
       targets: targets.length,
       locations: groups.size,
@@ -86,9 +101,10 @@ export async function runAutomaticWeatherSync({
     for (const groupedTargets of groups.values()) {
       const representative = groupedTargets[0];
       const today = dateKeyInTimeZone(now, representative.timezone);
-      const ranges = automaticWeatherRequestRanges({ today });
+      const ranges = mode === 'intraday' ? intradayWeatherRequestRanges({ today }) : automaticWeatherRequestRanges({ today });
       log('info', {
         event: 'weather_automatic_location_started',
+        mode,
         locationKey: representative.locationKey,
         provider: provider.id,
         workspaceCount: groupedTargets.length,
@@ -116,6 +132,7 @@ export async function runAutomaticWeatherSync({
         at,
         now,
         onForecastWritten,
+        archive: mode === 'morning',
         log,
       });
       if (weatherOutcomeSucceeded(outcome)) {
@@ -145,6 +162,7 @@ export async function runAutomaticWeatherSync({
 
     log(finalResult.failedTargets > 0 ? 'warn' : 'info', {
       event: 'weather_automatic_sync_completed',
+      mode,
       completedAt: new Date().toISOString(),
       ...finalResult,
     });
@@ -167,6 +185,23 @@ export async function runAutomaticWeatherSync({
   }
 }
 
+/**
+ * Les cibles retenues : toutes pour le matin ; pour la relecture de la
+ * journée, celles que le filtre garde. Un filtre qui échoue pour une ferme
+ * l'écarte de ce passage sans arrêter les autres : elle sera relue au matin.
+ */
+async function selectTargets(
+  targets: readonly AutomaticWeatherTarget[],
+  includeTarget: ((target: AutomaticWeatherTarget) => Promise<boolean>) | undefined,
+): Promise<AutomaticWeatherTarget[]> {
+  if (!includeTarget) return [...targets];
+  const kept: AutomaticWeatherTarget[] = [];
+  for (const target of targets) {
+    if (await includeTarget(target).catch(() => false)) kept.push(target);
+  }
+  return kept;
+}
+
 function groupTargetsByLocation(targets: readonly AutomaticWeatherTarget[]) {
   const groups = new Map<string, AutomaticWeatherTarget[]>();
   for (const target of targets) {
@@ -186,6 +221,7 @@ async function persistOutcomeForTargets({
   at,
   now,
   onForecastWritten,
+  archive,
   log,
 }: {
   repository: AutomaticWeatherSyncRepository;
@@ -195,6 +231,7 @@ async function persistOutcomeForTargets({
   at: string;
   now: Date;
   onForecastWritten?: ForecastWrittenHandler;
+  archive: boolean;
   log: WeatherSyncLogger;
 }) {
   const error = weatherOutcomeError(outcome);
@@ -211,7 +248,7 @@ async function persistOutcomeForTargets({
         fetchedAt: at,
       });
       // L'archive J+1 à J+7, par exploitation, de la même lecture (docs/forecast-archive-contract.md).
-      await archiveForecastReading({
+      if (archive) await archiveForecastReading({
         write: (snapshot) => repository.archiveForecast({ ...snapshot, workspaceId: target.workspaceId }),
         locationKey: target.locationKey,
         values: outcome.forecast.values,
