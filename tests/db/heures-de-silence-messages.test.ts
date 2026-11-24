@@ -279,6 +279,28 @@ test('Arrosages décochée dans la nuit : le retard retenu dont l’échéance e
   assert.equal((await getIrrigationPushScheduleForUser(ALICE, night.eventEquipmentId))?.status, 'disabled');
 });
 
+test('S8 : un réglage illisible n’empêche pas de retirer les alarmes à venir ; le retard échu, qu’on ne sait plus retenu, compte pour parti, et le journal le dit sans nom', async () => {
+  pushService();
+  await saveQuietHoursForUser(ALICE, ALICE, quiet('22:00', '06:00'), SAVED_AT);
+  const night = await planNight(ALICE);
+  await synchronizeIrrigationPushSchedule(ALICE, night);
+  const tomorrow = await planNight(ALICE, { startAt: '2099-06-16T10:00:00.000Z', endAt: '2099-06-16T11:00:00.000Z', durationSeconds: 3600 }, 'Rampe du lendemain');
+  await synchronizeIrrigationPushSchedule(ALICE, tomorrow);
+  database.sqlite.exec('DROP TABLE irrigation_phone_notice_settings');
+  const canceled: string[] = [];
+  const lines: Line[] = [];
+  const result = await cancelUpcomingIrrigationAlarmsForUser(ALICE, {
+    now: new Date('2099-06-15T23:00:00.000Z'),
+    cancel: async (request) => { canceled.push(request.eventEquipmentId); return { status: 'ok' }; },
+    log: (level, entry) => { lines.push({ level, entry }); },
+  });
+  assert.deepEqual(result, { canceled: 1, failed: 0 });
+  assert.deepEqual(canceled, [tomorrow.eventEquipmentId], 'l’alarme du lendemain est retirée ; celle de la nuit, échue, ne l’est pas');
+  assert.deepEqual(lines.map((line) => [line.level, line.entry.event]), [['warn', 'quiet_hours_unreadable'], ['info', 'irrigation_alarms_feature_canceled']]);
+  const workspaceId = await ensureWorkspaceForUser(ALICE);
+  assert.ok(withoutIds(lines, [ALICE, workspaceId]));
+});
+
 test('S17 : un réglage corrompu en base ne retient ni le message du matin, ni le rappel du soir, ni le retard ; chaque envoyeur dit le défaut, sans nom', async () => {
   mock.timers.enable({ apis: ['Date'], now: new Date('2026-09-30T04:00:00.000Z') });
   const received = pushService();

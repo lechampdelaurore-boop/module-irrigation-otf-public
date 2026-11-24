@@ -100,7 +100,7 @@ export async function cancelUpcomingIrrigationAlarmsForUser(
   try {
     const alarms = await listUpcomingPushAlarmsForUser(ownerUserId, now);
     const past = alarms.filter((alarm) => Date.parse(alarm.dueAt) <= now.getTime());
-    const quietHours = past.length > 0 ? (await readPhoneNoticeSettingsForUser(ownerUserId)).quietHours : null;
+    const quietHours = past.length > 0 ? await readQuietHoursOrNothing(ownerUserId, now, log) : null;
     for (const alarm of alarms) {
       if (past.includes(alarm) && !stillHeld(alarm, quietHours, now)) continue;
       const request = { eventEquipmentId: alarm.eventEquipmentId, revision: alarm.revision };
@@ -118,6 +118,24 @@ export async function cancelUpcomingIrrigationAlarmsForUser(
   }
   if (canceled + failed > 0) log(failed > 0 ? 'warn' : 'info', { event: 'irrigation_alarms_feature_canceled', canceled, failed, at: now.toISOString() });
   return { canceled, failed };
+}
+
+/**
+ * Le réglage des heures de silence de la ferme, ou rien s'il est illisible
+ * (S8) : la plage compte alors pour éteinte, un retard échu pour parti, et
+ * les alarmes à venir se retirent quand même. L'incident se dit sans nom.
+ */
+async function readQuietHoursOrNothing(
+  ownerUserId: string,
+  now: Date,
+  log: (level: LogLevel, entry: Record<string, unknown>) => void,
+): Promise<QuietHoursSettings | null> {
+  try {
+    return (await readPhoneNoticeSettingsForUser(ownerUserId)).quietHours;
+  } catch {
+    log('warn', { event: 'quiet_hours_unreadable', at: now.toISOString() });
+    return null;
+  }
 }
 
 /** Un retard à l'échéance passée que les heures de silence retiennent encore : sa fin de plage n'est pas venue. */
