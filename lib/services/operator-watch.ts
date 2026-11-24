@@ -1,3 +1,4 @@
+import { readUndeliveredAlertsByFarm } from '@/db/farm-observation-repository';
 import { newPushAlarmRevision } from '@/db/irrigation-event/push-schedule';
 import {
   claimOperatorNotice,
@@ -9,6 +10,7 @@ import { logJsonLine } from '../adapters/log';
 import type { IrrigationPushSendRequest } from '../domain/irrigation-push-contract';
 import { errorClassWords } from '../domain/operations/morning-task-outcomes';
 import { operatorWatchNotice, parisDay, type OperatorNotice } from '../domain/operations/operator-watch';
+import { undeliveredAlertsOfDay, undeliveredAlertWindows, type UndeliveredAlertsOfDay } from '../domain/operations/undelivered-alerts';
 import { knownDeploymentFarm } from './farm-identity-service';
 import { type IrrigationPushSendResult, sendIrrigationPushNotification } from './irrigation-push-service';
 import { readTaskStates, recordTaskOutcomes } from './task-runs';
@@ -18,6 +20,10 @@ import { readTaskStates, recordTaskOutcomes } from './task-runs';
  * F608 à F611) : à 9 h, le planificateur appelle la route interne, qui lit
  * le registre, envoie la notification due à l'exploitant, et enregistre
  * l'exécution de la veille comme celle de toute tâche du registre.
+ *
+ * Elle compte aussi les alertes des fermes parties sans atteindre un appareil
+ * dans les 24 dernières heures (C3, D-305) : une seule suffit à envoyer
+ * l'alerte, au lieu du silence.
  *
  * L'exploitant, c'est la personne du déploiement : ses appareils sont
  * inscrits sous les espaces de la ferme du déploiement (F608). Aucun appel à
@@ -47,18 +53,20 @@ export async function runOperatorWatch({
   now = new Date(),
   send = sendIrrigationPushNotification,
   deploymentFarm = knownDeploymentFarm,
+  undeliveredAlerts = readUndeliveredAlertsOfDay,
   log = logJsonLine,
 }: {
   now?: Date;
   send?: OperatorNoticeSender;
   deploymentFarm?: () => Promise<string | null>;
+  undeliveredAlerts?: (now: Date) => Promise<UndeliveredAlertsOfDay>;
   log?: typeof logJsonLine;
 } = {}): Promise<OperatorWatchResult> {
   const at = now.toISOString();
   let result: OperatorWatchResult;
   let error: string | null = null;
   try {
-    const notice = operatorWatchNotice(await readTaskStates(now), now);
+    const notice = operatorWatchNotice(await readTaskStates(now), now, await undeliveredAlerts(now));
     if (!notice) {
       result = { notice: 'none', problems: 0, successful: true };
     } else {
@@ -85,6 +93,11 @@ export async function runOperatorWatch({
     summary: error ?? undefined,
   });
   return result;
+}
+
+/** Les alertes de toutes les fermes parties sans atteindre un appareil dans les 24 dernières heures. */
+async function readUndeliveredAlertsOfDay(now: Date): Promise<UndeliveredAlertsOfDay> {
+  return undeliveredAlertsOfDay((await readUndeliveredAlertsByFarm(undeliveredAlertWindows(now))).values());
 }
 
 /** Envoie la notification vers chaque espace de l'exploitant ; `null` si elle est partie, sinon le résumé de l'échec. */

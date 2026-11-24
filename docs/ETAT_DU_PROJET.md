@@ -12,6 +12,17 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Alertes sur le téléphone : la veille de 9 h prévient l'exploitant des
+  alertes non délivrées, codé le 24 novembre 2026** (C3, D-305, F756,
+  roadmap section 6 octies), en Opus 5.5 · Élevé. Une seule alerte d'une
+  ferme partie sans atteindre un appareil dans les 24 dernières heures fait
+  partir la notification de la veille (« alertes non délivrées »), au lieu
+  du silence ; des nombres seulement, vers les seuls appareils de
+  l'exploitant. Limite écrite : si l'appareil de l'exploitant n'est plus
+  inscrit, la veille est manquée (page d'état) ; la condition E5 de la fiche
+  d'entrée du pilote la porte. Aucune migration. Tests à deux fermes
+  (`tests/db/operator-watch.test.ts`). Contrôles : voir la PR. Restent C4
+  et C5.
 - **Alertes sur le téléphone : les alertes non délivrées sur la page
   d'état, codé le 24 novembre 2026** (C2, D-304, F755, roadmap
   section 6 octies), en Opus 5.5 · Élevé. La carte de chaque ferme porte
@@ -22,7 +33,7 @@ registres, elle y renvoie.
   part comme le proposait la fiche : une alerte n'est pas une tâche du
   registre (D-304). Aucune migration. Procédure dans `docs/exploitation.md`.
   Tests à deux fermes (`tests/db/farm-observation.test.ts`). Contrôles :
-  voir la PR. Restent C3 à C5.
+  voir la PR.
 - **Le module s'installe sur le téléphone, avec son logo, corrigé le
   24 novembre 2026** (D-302, demande du porteur à 9 h 31), en Opus 5.5 ·
   Élevé, réglage choisi par le coordinateur faute de ligne de la roadmap.

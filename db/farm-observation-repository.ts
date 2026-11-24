@@ -1,7 +1,7 @@
 import { db } from './binding';
 import { OTF_CALL_OUTCOMES, type OtfCallCounts, type OtfCallOutcome } from '@/lib/domain/otf/call-outcome';
 import { emptyFarmObservation, type FarmConnectionState, type FarmObservationRecord } from '@/lib/domain/operations/farm-observation';
-import type { UndeliveredAlertCounts } from '@/lib/domain/operations/undelivered-alerts';
+import { EMPTY_FARM_ALERT_DELIVERIES, type FarmAlertDeliveries, type UndeliveredAlertCounts } from '@/lib/domain/operations/undelivered-alerts';
 
 /**
  * Ce que la page d'état de l'exploitant lit de chaque ferme (4.5, PR 2 ;
@@ -33,7 +33,7 @@ export async function readFarmObservations({ parisDay, dayStartMs, weekStartMs, 
    * 24 heures et les 7 jours, et avant quand une alerte prise sans résultat
    * est interrompue (instants ISO, comme `sent_at`).
    */
-  alerts: { dayStart: string; weekStart: string; interruptedBefore: string };
+  alerts: AlertWindows;
 }): Promise<FarmObservationRecord[]> {
   const [spaces, connections, daily, outcomes, reads, weather, mornings, deliveries] = await db.batch([
     db.prepare('SELECT otf_farm_id AS farm, COUNT(*) AS spaces FROM irrigation_workspaces WHERE otf_farm_id IS NOT NULL GROUP BY otf_farm_id'),
@@ -58,22 +58,7 @@ export async function readFarmObservations({ parisDay, dayStartMs, weekStartMs, 
        JOIN irrigation_workspaces AS workspace ON workspace.id = calculation.workspace_id
        WHERE calculation.trigger = 'daily' AND workspace.otf_farm_id IS NOT NULL GROUP BY workspace.otf_farm_id`,
     ),
-    // Les alertes météo et par culture des 7 derniers jours qui n'ont atteint aucun appareil, par ferme et par état.
-    db.prepare(
-      `SELECT workspace.otf_farm_id AS farm, alert.delivery_status AS status,
-              SUM(CASE WHEN alert.sent_at >= ? THEN 1 ELSE 0 END) AS day_count,
-              COUNT(*) AS week_count
-       FROM (
-         SELECT workspace_id, sent_at, delivery_status FROM irrigation_weather_alerts
-         UNION ALL
-         SELECT workspace_id, sent_at, delivery_status FROM irrigation_crop_alerts
-       ) AS alert
-       JOIN irrigation_workspaces AS workspace ON workspace.id = alert.workspace_id
-       WHERE workspace.otf_farm_id IS NOT NULL AND alert.sent_at >= ?
-         AND (alert.delivery_status IN ('no-subscriber', 'failed', 'retrying')
-              OR (alert.delivery_status = 'pending' AND alert.sent_at < ?))
-       GROUP BY workspace.otf_farm_id, alert.delivery_status`,
-    ).bind(alerts.dayStart, alerts.weekStart, alerts.interruptedBefore),
+    undeliveredAlertsStatement(alerts),
   ]);
 
   const records = new Map<string, FarmObservationRecord>();
@@ -97,21 +82,59 @@ export async function readFarmObservations({ parisDay, dayStartMs, weekStartMs, 
   for (const row of reads.results as { farm: string; at: string }[]) recordOf(row.farm).lastCompleteReadAt = row.at;
   for (const row of weather.results as { farm: string; at: string | null }[]) recordOf(row.farm).lastWeatherAt = row.at;
   for (const row of mornings.results as { farm: string; at: string | null }[]) recordOf(row.farm).lastMorningPlanAt = row.at;
-  for (const row of deliveries.results as { farm: string; status: string; day_count: number; week_count: number }[]) {
-    const record = recordOf(row.farm);
+  for (const [farm, alertDeliveries] of farmAlertDeliveries(deliveries.results as DeliveryRow[])) recordOf(farm).alertDeliveries = alertDeliveries;
+  return [...records.values()];
+}
+
+type AlertWindows = { dayStart: string; weekStart: string; interruptedBefore: string };
+type DeliveryRow = { farm: string; status: string; day_count: number; week_count: number };
+
+/**
+ * Les alertes non délivrées de chaque ferme, seules (C3, D-305) : ce que la
+ * veille de 9 h compte, sans lire le reste de la page d'état. La même
+ * requête que la carte de la ferme (C2, D-304).
+ */
+export async function readUndeliveredAlertsByFarm(alerts: AlertWindows): Promise<Map<string, FarmAlertDeliveries>> {
+  const { results } = await undeliveredAlertsStatement(alerts).all<DeliveryRow>();
+  return farmAlertDeliveries(results);
+}
+
+/** Les alertes météo et par culture des 7 derniers jours qui n'ont atteint aucun appareil, par ferme et par état. */
+function undeliveredAlertsStatement(alerts: AlertWindows): D1PreparedStatement {
+  return db.prepare(
+    `SELECT workspace.otf_farm_id AS farm, alert.delivery_status AS status,
+            SUM(CASE WHEN alert.sent_at >= ? THEN 1 ELSE 0 END) AS day_count,
+            COUNT(*) AS week_count
+     FROM (
+       SELECT workspace_id, sent_at, delivery_status FROM irrigation_weather_alerts
+       UNION ALL
+       SELECT workspace_id, sent_at, delivery_status FROM irrigation_crop_alerts
+     ) AS alert
+     JOIN irrigation_workspaces AS workspace ON workspace.id = alert.workspace_id
+     WHERE workspace.otf_farm_id IS NOT NULL AND alert.sent_at >= ?
+       AND (alert.delivery_status IN ('no-subscriber', 'failed', 'retrying')
+            OR (alert.delivery_status = 'pending' AND alert.sent_at < ?))
+     GROUP BY workspace.otf_farm_id, alert.delivery_status`,
+  ).bind(alerts.dayStart, alerts.weekStart, alerts.interruptedBefore);
+}
+
+function farmAlertDeliveries(rows: readonly DeliveryRow[]): Map<string, FarmAlertDeliveries> {
+  const farms = new Map<string, FarmAlertDeliveries>();
+  for (const row of rows) {
+    const deliveries = farms.get(row.farm) ?? EMPTY_FARM_ALERT_DELIVERIES;
     if (row.status === 'retrying') {
-      record.alertDeliveries = { ...record.alertDeliveries, retrying7d: record.alertDeliveries.retrying7d + Number(row.week_count) };
+      farms.set(row.farm, { ...deliveries, retrying7d: deliveries.retrying7d + Number(row.week_count) });
       continue;
     }
     const key = UNDELIVERED_KEYS[row.status];
     if (!key) continue;
-    record.alertDeliveries = {
-      ...record.alertDeliveries,
-      undelivered24h: added(record.alertDeliveries.undelivered24h, key, Number(row.day_count)),
-      undelivered7d: added(record.alertDeliveries.undelivered7d, key, Number(row.week_count)),
-    };
+    farms.set(row.farm, {
+      ...deliveries,
+      undelivered24h: added(deliveries.undelivered24h, key, Number(row.day_count)),
+      undelivered7d: added(deliveries.undelivered7d, key, Number(row.week_count)),
+    });
   }
-  return [...records.values()];
+  return farms;
 }
 
 const UNDELIVERED_KEYS: Record<string, keyof UndeliveredAlertCounts | undefined> = {

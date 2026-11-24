@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (alertes sur le téléphone, C3)
+
+- **La veille de 9 h prévient l'exploitant des alertes non délivrées**
+  (D-305, F756) : une seule alerte d'une ferme partie sans atteindre un
+  appareil dans les 24 dernières heures fait partir sa notification
+  « alertes non délivrées », au lieu du silence ; le nombre d'alertes, de
+  fermes et les causes, jamais le nom d'une ferme. Sans alerte non
+  délivrée, rien ne change. Aucune migration.
+
 ### Corrigé (alertes sur le téléphone, C2)
 
 - **Les alertes non délivrées se voient sur la page d'état** (D-304,

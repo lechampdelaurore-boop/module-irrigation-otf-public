@@ -8912,3 +8912,45 @@ erreurs d'Ouvre ta ferme, avec ses seuils nommés dans son module.
 de la ferme. Aucune migration (les deux tables d'alertes gardent déjà leur
 état d'envoi et leur heure). La veille de 9 h n'en dit encore rien : c'est
 C3.
+
+## D-305 — La veille de 9 h prévient l'exploitant des alertes non délivrées (alertes sur le téléphone, C3)
+
+Date : 24 novembre 2026. Statut : troisième des cinq corrections de la
+section 6 octies de la roadmap, déléguées par le porteur le 24 novembre 2026
+à 9 h 36 ; réglage : Opus 5.5 · Élevé.
+
+**Contexte.** Depuis C2 (D-304), la page d'état montre les alertes parties
+sans atteindre un appareil ; encore faut-il l'ouvrir. La veille de 9 h
+(F566) ne prévenait que des tâches du registre : une ferme dont plus aucun
+appareil ne reçoit ses alertes de gel restait dans le silence.
+
+**Décision.** Chaque matin à 9 h, la veille compte aussi les alertes météo
+et par culture de **toutes les fermes** parties sans atteindre un appareil
+dans les **24 dernières heures** (aucun appareil inscrit, échec de l'envoi,
+envoi interrompu ; les mêmes que la carte de C2, par la même requête). Une
+seule suffit : la veille envoie sa notification d'alerte habituelle, au lieu
+du silence ou du « tout va bien » du dimanche. Titre « Module d'irrigation :
+alertes non délivrées » (ou « … et N tâches à regarder » quand des tâches
+sont aussi en cause) ; le texte le dit **en premier** : « 2 alertes non
+délivrées en 24 heures, sur 1 ferme (aucun appareil inscrit : 2). » puis les
+tâches, sans « depuis quand » si la place manque. Des nombres seulement :
+jamais le nom ni l'identifiant d'une ferme, ni le contenu d'une alerte. La
+notification part, comme avant, vers les seuls appareils de l'exploitant
+(F608), jamais vers la ferme concernée. Une alerte en nouvelle tentative
+ou plus ancienne que 24 heures ne compte pas : elle reste sur la carte de
+la ferme.
+
+**Pourquoi 24 heures.** La veille passe une fois par jour : une fenêtre de
+24 heures compte chaque alerte une fois, sans en oublier entre deux veilles.
+
+**Limite écrite.** Si c'est l'appareil de l'exploitant lui-même qui n'est
+plus inscrit, la notification de la veille ne part pas non plus : la veille
+est alors manquée (« aucun appareil de l'exploitant inscrit »), ce que la
+page d'état montre, et le « tout va bien » du dimanche manque. La condition
+E5 de la fiche d'entrée du pilote porte désormais cette vérification.
+
+**Ne change pas.** Une notification au plus par jour ; le dimanche « tout
+va bien » est le même quand aucune alerte n'a manqué son appareil. Aucune
+migration, aucun déclencheur nouveau. Contrat : `docs/tranche-4-contract.md`,
+F756 ; règle : `lib/domain/operations/operator-watch.ts` et
+`lib/domain/operations/undelivered-alerts.ts`.

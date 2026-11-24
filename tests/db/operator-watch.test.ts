@@ -3,6 +3,7 @@ import test, { afterEach, beforeEach } from 'node:test';
 import { overrideDatabase } from '../../db/binding';
 import { claimOperatorNotice, readLatestOperatorNotice } from '../../db/operator-repository';
 import { readTaskRuns, recordTaskRun } from '../../db/task-run-repository';
+import { createWeatherAlertCriterionForUser } from '../../db/weather-alert-repository';
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { farmSpaceKey } from '../../lib/domain/farm-space';
 import type { IrrigationPushSendRequest } from '../../lib/domain/irrigation-push-contract';
@@ -210,6 +211,52 @@ test('rien à signaler : aucune notification en semaine, « tout va bien » le d
   assert.deepEqual(await runOperatorWatch({ now: sunday, send, deploymentFarm, log: silent }), { notice: 'all-good', problems: 0, successful: true });
   assert.equal(requests[0].notification.title, 'Module d\'irrigation : tout va bien');
   assert.deepEqual(await readLatestOperatorNotice(), { parisDay: '2026-11-22', kind: 'all-good', problems: 0, sentAt: sunday.toISOString() });
+});
+
+/** Une alerte de gel d'une ferme, partie à `sentAt` avec l'issue donnée (C3, D-305). */
+async function frostAlert(owner: string, workspaceId: string, id: string, sentAt: string, status: 'sent' | 'no-subscriber' | 'failed') {
+  const criterion = await createWeatherAlertCriterionForUser(owner, {
+    field: 'minimum-temperature', direction: 'below', threshold: 3, horizonDays: 3, active: true, label: 'Gel des Hirondelles',
+  });
+  database.sqlite.prepare(
+    `INSERT INTO irrigation_weather_alerts (id, workspace_id, criterion_id, criterion_version, target_date, forecast_value, unit, forecasted_at, sent_at, delivery_status)
+     VALUES (?, ?, ?, 1, '2026-11-21', 1.5, '°C', ?, ?, ?)`,
+  ).run(id, workspaceId, criterion.id, sentAt, sentAt, status);
+}
+
+test('C3 (D-305) : une alerte d’une autre ferme partie vers aucun appareil fait partir l’alerte de la veille vers l’exploitant seul, sans rien de la ferme', async () => {
+  await morningAt('2026-11-20', { reanalysis: true });
+  // La ferme voisine : un gel annoncé à 7 h, parti vers aucun appareil ; la ferme du déploiement : le sien est arrivé.
+  await frostAlert(OTHER_FARM_PERSON, otherWorkspace, 'gel-voisine', '2026-11-20T06:00:00.000Z', 'no-subscriber');
+  await frostAlert(OPERATOR, operatorWorkspace, 'gel-exploitant', '2026-11-20T06:00:00.000Z', 'sent');
+  const { requests, send } = sender();
+  const { lines, log } = journal();
+
+  const result = await runOperatorWatch({ now: FRIDAY, send, deploymentFarm, log });
+
+  assert.deepEqual(result, { notice: 'alert', problems: 1, successful: true }, 'toutes les tâches à l’heure : l’alerte part quand même, au lieu du silence');
+  assert.deepEqual(requests.map((request) => request.recipientKey), [operatorWorkspace], 'vers l’exploitant, jamais vers la ferme concernée');
+  assert.deepEqual(requests[0].notification, {
+    title: 'Module d\'irrigation : alertes non délivrées',
+    body: '1 alerte non délivrée en 24 heures, sur 1 ferme (aucun appareil inscrit : 1). Le détail est sur la page d\'état.',
+    tag: 'operator-watch',
+    data: { url: '/irrigation/exploitation' },
+  });
+  const written = JSON.stringify([requests, lines]);
+  for (const forbidden of ['5120', 'voisine', 'Gel des Hirondelles', '2026-11-21', otherWorkspace]) {
+    assert.ok(!written.includes(forbidden), `rien de la ferme concernée ni de son alerte : ${forbidden}`);
+  }
+});
+
+test('C3 (D-305) : une alerte non délivrée de plus de 24 heures ne fait plus partir la veille ; le dimanche « tout va bien » reste le même', async () => {
+  await morningAt('2026-11-22', { reanalysis: true });
+  await frostAlert(OTHER_FARM_PERSON, otherWorkspace, 'gel-ancien', '2026-11-21T07:00:00.000Z', 'failed');
+  await frostAlert(OPERATOR, operatorWorkspace, 'gel-arrive', '2026-11-22T06:00:00.000Z', 'sent');
+  const { requests, send } = sender();
+  const sunday = new Date('2026-11-22T08:00:00.000Z');
+  assert.deepEqual(await runOperatorWatch({ now: sunday, send, deploymentFarm, log: journal().log }), { notice: 'all-good', problems: 0, successful: true });
+  assert.equal(requests[0].notification.title, 'Module d\'irrigation : tout va bien');
+  assert.match(requests[0].notification.body, /^Les \d+ tâches sont à l'heure\. Ce message revient chaque dimanche/);
 });
 
 test('une prise sans envoi est celle d’une veille en cours : respectée cinq minutes, reprise au-delà', async () => {
