@@ -12,6 +12,30 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Le module s'installe sur le téléphone, avec son logo, corrigé le
+  24 novembre 2026** (D-302, demande du porteur à 9 h 31), en Opus 5.5 ·
+  Élevé, réglage choisi par le coordinateur faute de ligne de la roadmap.
+  Deux causes : le navigateur demandait le manifeste sans la session
+  Cloudflare Access (balise sans `crossorigin="use-credentials"`, que
+  `vinext` n'écrit pas), qui le renvoyait vers la connexion ; et le
+  manifeste n'avait aucune icône PNG. La page déclare le manifeste avec
+  l'attribut ; le manifeste nomme des PNG de 192 et 512 pixels et une icône
+  à masque. Le porteur a choisi un logo parmi trois (« C · Planches dans la
+  goutte ») et l'a voulu partout : onglet et favoris, application
+  installée, iPhone, notification de fin d'irrigation, site public. Rien
+  n'est changé chez Cloudflare. Contrôles du 24 novembre 2026 : état de
+  départ `pnpm lint`, `pnpm typecheck` et `pnpm test` (2 289 tests) réussis ;
+  après correction `pnpm lint`, `pnpm typecheck`, `pnpm test` (2 290 tests,
+  0 échec), `pnpm build`, `pnpm knip`, `pnpm push:check` (50 tests),
+  `pnpm weather:check` (6 tests), `pnpm site:check` (14 tests) et
+  `pnpm e2e` (180 réussis, 8 sautés, 0 échec ; joué avec le Chromium 1243
+  de l'environnement, la version 1248 attendue n'y étant pas installée)
+  réussis ; P0 rouge sans la correction (balise du manifeste sans
+  `crossorigin`), vert avec. Reste : le constat sur le téléphone du
+  porteur après la mise en ligne, avec son accord. Mise en ligne de #184
+  (D-301) consignée ici : fusionnée le 24 novembre 2026 à 9 h 47, **en
+  ligne à 10 h 17** (run 45359207603 vérifié job par job : les cinq jobs
+  verts).
 - **Alertes sur le téléphone : les prévisions relues dans la journée,
   codé le 24 novembre 2026** (C1, D-303, roadmap section 6 octies), en
   Opus 5.5 · Élevé, sur la délégation du porteur du jour (9 h 36). Son
@@ -32,12 +56,9 @@ registres, elle y renvoie.
   le fournisseur, un refus 429 est compté sans lever. Contrôles du
   24 novembre 2026 : voir la PR (`pnpm lint`, `pnpm typecheck`,
   `pnpm test`, `pnpm build`, `pnpm knip`, `pnpm push:check`,
-  `pnpm weather:check`, `pnpm site:check` réussis en local) ; **`pnpm e2e`
-  non rejoué en local**, sans rapport : ni l'interface ni les services
-  qu'elle appelle ne changent ; la CI le joue. Mise en ligne de #184
-  (D-301) consignée ici : fusionnée le 24 novembre 2026 à 9 h 47, **en
-  ligne à 10 h 17** (run 45359207603 vérifié job par job : les cinq jobs
-  verts). Restent C2 à C5 (section 6 octies) ; la cause du retard du
+  `pnpm weather:check`, `pnpm site:check` réussis en local) ; parcours P50
+  (page d'état, la tâche nouvelle s'ajoutant à la liste) rejoué aux deux
+  largeurs ; les autres parcours, joués par la CI. Restent C2 à C5 (section 6 octies) ; la cause du retard du
   24 novembre reste à confirmer par l'heure d'envoi de l'alerte dans
   « Alertes cultures ».
 - **La jauge passe au moteur commun le 24 novembre 2026** (fusion des
