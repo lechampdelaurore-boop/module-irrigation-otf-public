@@ -9599,3 +9599,73 @@ renverser d'un mot avant le code.
 notifications arrivent comme avant, pour toutes les fermes, jusqu'à H3.
 D-060 (priorité haute), D-293 (une alarme par espace), D-028 (rien ne
 change sans le geste de la ferme) tiennent.
+
+## D-321 — Les heures de silence, H1 : la règle et le réglage
+
+Date : 24 novembre 2026. Statut : codé (PR H1 sur 3 du contrat
+`docs/heures-de-silence-contract.md`, D-320, sections 3, 4 et 8) ; roadmap
+section 6 undecies. Code en Opus 5.5 · Max, le réglage de la roadmap.
+D-321 et les précisions F797 et suivantes sont pris au-dessus de ceux d'O4
+(D-319, F789 à F796), pour ne pas les disputer.
+
+**Décision.** La règle des heures de silence vit en un seul endroit du
+domaine, une fonction pure (`lib/domain/notification-quiet-hours.ts`) :
+pour une notification et l'instant où elle partirait, avec le réglage de
+sa ferme, elle dit « part », « retenue jusqu'à » la fin de la plage ou
+« ne part pas » (le rappel du soir), et le défaut quand c'en est un (S1 à
+S7, S17) ; une seule fonction compose l'identifiant d'une retenue, propre à
+l'espace (S10). Le réglage de chaque ferme s'ajoute à
+`irrigation_phone_notice_settings` (migration additive 0049, quatre
+colonnes vides lues pour leurs défauts : éteinte, 22 h à 6 h, le gel qui
+passe), sous une contrainte des bornes de S1, au quart d'heure ;
+`saveQuietHoursForUser` l'écrit, refuse un réglage hors des bornes avant
+toute écriture et passe par le journal des modifications (ancre
+`heures-de-silence`). Aucun envoyeur ne lit encore la règle (H2), aucun
+écran ne l'allume (H3).
+
+**Précisions tranchées en codant** (contrat, section 11).
+
+- F797 : la règle juge l'instant où la notification partirait : l'heure
+  de l'envoi immédiat, l'échéance d'une alarme programmée d'avance.
+- F798 : l'ordre : la fin d'arrosage sans lire le réglage, même corrompu ;
+  éteinte ; corrompue (S17) ; le gel ; hors de la plage ; le rappel du
+  soir ; S7 ; la retenue. Le gel se lit à la nature de l'alerte et au
+  champ et au sens du critère, jamais à un texte ni à un seuil.
+- F799 : les treize heures de S7 se comptent sur l'horloge de Paris : la
+  plage de 20 h à 9 h de la nuit du passage à l'heure d'hiver, quatorze
+  heures réelles, n'est pas un défaut.
+- F800 : seule une alerte (météo, par culture) prend l'identifiant de
+  retenue « quiet: », l'espace, son étiquette, ou l'empreinte d'une
+  étiquette trop longue ; le message du matin et le retard d'une
+  irrigation gardent leur propre alarme, à échéance de fin de plage.
+- F801 : une valeur écrite se lit telle quelle, jamais remplacée par un
+  défaut (S17) ; deux gardes à l'écriture, le service et la contrainte, sur
+  les mêmes listes de quarts d'heure.
+- F802 : un geste écrit les quatre valeurs ensemble ; éteinte, la plage
+  garde ses heures ; le journal ne dit que les champs changés.
+
+**Preuve.** `tests/heures-de-silence.test.ts` (les heures offertes, les
+défauts, les scénarios 1 à 14 et 17 du contrat, la nuit du passage à
+l'heure d'hiver, S7, l'identifiant d'une étiquette longue accepté par le
+Worker) et `tests/db/heures-de-silence.test.ts` (à deux fermes : défauts
+sans rien écrit, chacune sa plage, aucun effet sur le message du matin ni
+le rappel du soir, refus avant toute écriture, contrainte quart d'heure par
+quart d'heure, scénario 17 en base, journal, effacement d'une ferme qui
+laisse l'autre). Contre-épreuve : trente-cinq altérations (début exclu,
+fin incluse, fin prise en ajoutant des heures UTC ou toujours au
+lendemain ; réglage éteint ignoré ; fin d'arrosage qui lit le réglage ou
+retenue ; case du gel ignorée, toujours ou jamais suivie ; gel sans la
+minimale ou sans « en dessous de », séchage compté pour du gel ; rappel du
+soir retenu, ou sauté hors de la plage ; S7 sans borne, comptée en temps
+réel ou sans dire son défaut ; réglage corrompu remplacé par le défaut ou
+sans dire son défaut ; identifiant ou empreinte sans l'espace, étiquette
+longue non bornée ; bornes élargies d'un quart d'heure ; défauts allumé ou
+gel retenu ; écriture sans contrôle des bornes, des seules cases ou qui
+touche le message du matin ; lecture qui remplace un réglage corrompu ou
+lit décochée la case du gel vide ; journal oublié ou à défaut faux) font
+chacune échouer au moins un test.
+
+**Ne change pas.** Aucune notification ne change, pour aucune ferme :
+aucun envoyeur ne lit la règle et aucun écran ne l'allume ; la migration
+ajoute quatre colonnes vides. Le Worker de notification ne change pas.
+D-028, D-060 et D-293 tiennent.

@@ -246,3 +246,84 @@ Plage 22 h à 6 h, gel qui passe, sauf mention contraire.
 Aucune n'est posée : toutes sont répondues par l'option recommandée, section 2.
 Le choix 5 (le gel passe, case pour le retenir) est le seul qui touche à ce
 qui est urgent pour les cultures ; il se renverse d'un mot avant le code.
+
+## 11. Précisions faites en codant H1 (24 novembre 2026, D-321)
+
+La règle vit dans `lib/domain/notification-quiet-hours.ts`
+(`quietHoursDecision`, et `quietHoldAlarmId` pour S10) ; le réglage, dans
+quatre colonnes de `irrigation_phone_notice_settings` (migration additive
+0049), écrit par `saveQuietHoursForUser` (`db/phone-notice-repository.ts`)
+au journal des modifications. Aucun envoyeur ne lit encore la règle (H2) et
+aucun écran ne l'allume (H3) : rien ne change pour aucune ferme. Six cas que
+les sections 3 et 4 ne tranchaient pas, réglés par l'option la plus
+prudente :
+
+- **F797, l'instant jugé** : la règle juge l'instant où la notification
+  partirait, pas celui où elle est décidée : l'heure de l'envoi pour une
+  alerte ou un message qui part tout de suite, l'échéance pour une alarme
+  programmée d'avance (le retard d'une irrigation planifiée se juge à son
+  début prévu plus la tolérance). Elle répond « part », « retenue jusqu'à »
+  la fin de la plage (un instant UTC), ou « ne part pas » (le rappel du
+  soir, S5) ; « part » dit le défaut quand c'est un défaut qui la fait
+  partir (S7, S17).
+- **F798, l'ordre de la règle** : la fin d'un arrosage démarré part sans
+  lire le réglage, même corrompu (S3) ; puis la plage éteinte ou absente ne
+  change rien (S2) ; puis un réglage hors des bornes est ignoré comme
+  éteint et dit son défaut (S17) ; puis le gel passe, case cochée (S3) ;
+  puis ce qui tombe hors de la plage part ; dans la plage, le rappel du soir
+  ne part pas (S5), et le reste est retenu jusqu'à la fin (S4, S6), sauf
+  au-delà de S7. Sont du gel l'alerte par culture de nature `frost` (ses
+  étiquettes commencent par `crop-frost:`) et l'alerte météo d'un critère
+  sur la température minimale (`minimum-temperature`) « en dessous de »
+  (`below`) : la règle lit la nature de la notification, le champ et le
+  sens du critère, jamais un texte, une étiquette ni un seuil.
+- **F799, S7 sur l'horloge de Paris** : les treize heures se comptent sur
+  l'horloge de Paris, comme la fin (S1). La nuit du passage à l'heure
+  d'hiver (25 octobre 2026), la plage la plus longue, de 20 h à 9 h, dure
+  quatorze heures réelles sans être un défaut : comptées en temps réel,
+  elles l'auraient fait partir tout de suite. Aucune plage dans les bornes
+  n'atteint la borne : elle ne joue que pour une plage corrompue, que S17
+  arrête avant, et se prouve par la règle d'une plage donnée
+  (`quietWindowDecision`). Le rappel du soir n'est jamais retenu : même
+  là, il ne part pas.
+- **F800, l'identifiant d'une retenue** (S10) : une alerte météo ou par
+  culture, qui part aujourd'hui par l'envoi immédiat, part retenue par une
+  alarme d'identifiant « quiet: », l'espace, puis son étiquette, composé
+  par `quietHoldAlarmId` ; une étiquette qui ferait dépasser les 128
+  caractères d'un identifiant du Worker est remplacée par son empreinte,
+  toujours propre à l'espace. Deux alertes de même étiquette d'une même
+  ferme n'en font qu'une, comme aujourd'hui (S4). Le message du matin et le
+  retard d'une irrigation gardent leur propre alarme, qui porte déjà
+  l'espace et le jour (F744) ou l'arrosage, avec une échéance à la fin de
+  la plage : le démarrage d'une irrigation remplace ainsi l'alarme de
+  retard retenue par celle de la fin, comme aujourd'hui.
+- **F801, le réglage lu** : les quatre colonnes vides valent leurs défauts
+  (éteinte, 22:00, 06:00, le gel qui passe), et lire ne crée aucune ligne.
+  Une valeur écrite se lit telle quelle, jamais remplacée par un défaut :
+  une heure hors des bornes passerait sinon pour une plage de 22 h à 6 h ;
+  la règle l'ignore comme éteinte et dit le défaut (S17). Deux gardes à
+  l'écriture : le service refuse un réglage hors des bornes avant toute
+  écriture, sans créer ni espace, ni ligne, ni journal, avec la phrase
+  « Choisissez un début de 20 h à 23 h 45 et une fin de 4 h à 9 h, au
+  quart d'heure. » ; la contrainte de la base tient les mêmes listes de
+  quarts d'heure que la règle, écrites en clair.
+- **F802, un geste écrit les quatre valeurs** : la case, le début, la fin
+  et la case du gel s'écrivent ensemble ; éteinte, la plage garde ses
+  heures, et la rallumer retrouve celles d'avant. Le message du matin et le
+  rappel du soir, sur la même ligne, n'en changent pas, et l'inverse. Le
+  journal des modifications (ancre `heures-de-silence`, famille
+  « Réglage ») dit l'avant et l'après des seuls champs changés ; un geste
+  sans changement n'écrit rien. La ligne s'efface avec la ferme
+  (`SPACE_TABLES`, F563 : rien à ajouter).
+
+Preuve : `tests/heures-de-silence.test.ts` (les heures offertes ; les
+défauts ; les scénarios 1 à 14 et 17 de la section 8, les scénarios 15 et
+16 étant ceux des envoyeurs, H2 ; la nuit du passage à l'heure d'hiver ;
+S7 ; l'identifiant d'une étiquette longue, accepté par le Worker) et
+`tests/db/heures-de-silence.test.ts` (à deux fermes : les défauts sans rien
+écrit ; chacune sa plage, éteinte qui garde ses heures ; aucun effet sur
+le message du matin ni le rappel du soir ; un réglage hors des bornes
+refusé avant toute écriture ; la contrainte quart d'heure par quart
+d'heure ; le scénario 17 en base ; le journal ; l'effacement d'une ferme
+qui laisse l'autre). Contre-épreuve : trente-cinq altérations de la règle,
+du réglage ou du journal font chacune échouer au moins un test (PR H1).

@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Heures de silence des notifications, H1 : la règle et le réglage,
+  codés le 24 novembre 2026** (D-321, F797 à F802, roadmap section 6
+  undecies, PR 1 sur 3), en Opus 5.5 · Max, le réglage de la roadmap. La
+  règle vit en un seul endroit du domaine
+  (`lib/domain/notification-quiet-hours.ts`) : pour une notification et
+  l'instant où elle partirait, elle dit si elle part, si elle est retenue
+  jusqu'à la fin de la plage ou si elle ne part pas (le rappel du soir) ;
+  la fin se prend sur l'horloge de Paris. Le réglage de chaque ferme
+  s'ajoute aux réglages des messages du téléphone (migration 0049, quatre
+  colonnes vides : éteinte, 22 h à 6 h, le gel qui passe), refusé hors des
+  bornes, écrit au journal des modifications. Aucun envoyeur ne lit encore
+  la règle (H2) et aucun écran ne l'allume (H3) : rien ne change pour
+  aucune ferme. Tests à deux fermes (`tests/db/heures-de-silence.test.ts`),
+  contre-épreuve de trente-cinq altérations. Contrôles : voir la PR.
+  **Fusion après la mise en ligne vérifiée d'O4.** Restent H2, en
+  Opus 5.5 · Max, et H3, en Opus 5.5 · Élevé.
 - **Objectif automatique sur l'ET0, O3 : les semaines closes, codé le
   24 novembre 2026** (D-318, F782 à F788, roadmap section 6 decies, PR 3
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. Une semaine finie
