@@ -27,6 +27,9 @@ import { DAY_REPLY, irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, 
  * page ; leur lien porte la phrase écrite pour un lecteur d'écran
  * (section 4).
  *
+ * L5 (D-314) : la mise en page (section 7), prouvée par mesures dans P30 ;
+ * ici, seulement les règles de dessin qui la portent.
+ *
  * L4 (D-313) : la réponse d'un geste s'écrit sous le bouton pressé, par
  * `ActionReply` (section 6) ; les deux paragraphes de tête disparaissent.
  *
@@ -307,4 +310,15 @@ test('L4, règle 2 : sous la carte, qui la suit dans « En cours » ; la carte p
   assert.match(zone, /check\.kind === 'plan' \? <ActionReply messages=\{replies\} origin=\{PLAN_RELIABILITY_REPLY\}/, 'sous la ligne du plan, qui reste une fois le plan à jour');
   const reply = readFileSync('app/irrigation/shell/action-reply.tsx', 'utf8');
   assert.match(reply, /scrollIntoView\?\.\(\{ block: 'nearest'/, 'la réponse entre dans l’écran');
+});
+
+test('L5 : un bloc étiré garde son contenu en haut ; l’heure prend sa place ; le nom d’un jardin se lit en entier au téléphone', () => {
+  const page = readFileSync('app/irrigation/styles/today.css', 'utf8');
+  assert.match(page, /\.today-block \{\n  display: grid;\n[^}]*align-content: start;/, 'règle 1 : le contenu en haut du bloc');
+  const day = readFileSync('app/irrigation/styles/today-day.css', 'utf8');
+  assert.match(day, /grid-template-columns: minmax\(56px, max-content\) minmax\(0, 1fr\);/, 'règle 2 : la colonne de l’heure à sa mesure');
+  assert.doesNotMatch(day, /grid-template-columns: 56px minmax\(0, 1fr\);/);
+  const gauges = readFileSync('app/irrigation/styles/today-gauges.css', 'utf8');
+  const phone = gauges.slice(gauges.indexOf('@container (max-width: 620px)'));
+  assert.match(phone, /\.today-bar-row \.today-bar-name \{\n    overflow: visible;\n    overflow-wrap: anywhere;\n    white-space: normal;/, 'règle 3 : le nom en entier, au besoin sur deux lignes');
 });

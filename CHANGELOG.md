@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (« Aujourd'hui » mène aux menus, L5)
+
+- **La mise en page de « Aujourd'hui »** (D-314) : sur ordinateur, un bloc
+  plus court que son voisin garde son contenu en haut, sans grand vide au
+  milieu ; au téléphone, l'heure d'une irrigation ne chevauche plus son
+  texte, et le nom de chaque jardin des jauges se lit en entier.
+
 ### Modifié (« Aujourd'hui » mène aux menus, L4)
 
 - **Sur « Aujourd'hui », la réponse s'écrit sous le bouton** (D-313) :

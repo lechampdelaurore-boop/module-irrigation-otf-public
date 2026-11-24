@@ -322,7 +322,8 @@
   }
 
   .today-irrigation {
-    grid-template-columns: 56px minmax(0, 1fr);
+    /* L'heure, d'un seul tenant (F441), prend la place qu'il lui faut : elle ne touche jamais le texte (L5, D-314). */
+    grid-template-columns: minmax(56px, max-content) minmax(0, 1fr);
     padding: 10px;
   }
 

@@ -63,6 +63,33 @@ async function verifierLaLegendeDeLaFrise(page: Page): Promise<void> {
 }
 
 /** La ferme neuve du parcours, toutes les cases cochées, arrivée sur « Aujourd'hui ». */
+/** Les noms des jauges qui ne tiennent pas dans leur place (6 nonies, L5, D-314). */
+async function nomsCoupes(page: Page): Promise<string[]> {
+  return page.locator('.today-bar-name').evaluateAll((noms) => noms
+    .filter((nom) => nom.scrollWidth > nom.clientWidth + 1)
+    .map((nom) => nom.textContent ?? ''));
+}
+
+/** L'heure d'une carte qui déborde sur son texte, en pixels ; 0 quand elles ne se touchent pas (L5, D-314). */
+async function recouvrementDeLHeure(page: Page): Promise<number> {
+  return page.locator('#today-day .today-irrigation').evaluateAll((cartes) => Math.max(0, ...cartes.map((carte) => {
+    const heure = carte.querySelector('.today-irrigation-time strong')?.getBoundingClientRect();
+    const texte = carte.querySelector('.today-irrigation-body')?.getBoundingClientRect();
+    return heure && texte ? heure.right - texte.left : 0;
+  })));
+}
+
+/** Rejoue une mesure à 360 px de large, puis rend la largeur du téléphone. */
+async function a360px<T>(page: Page, mesure: () => Promise<T>): Promise<T> {
+  const avant = page.viewportSize();
+  await page.setViewportSize({ width: 360, height: avant?.height ?? 780 });
+  try {
+    return await mesure();
+  } finally {
+    if (avant) await page.setViewportSize(avant);
+  }
+}
+
 async function ouvrirLaFermeToutCoche(page: Page, context: BrowserContext, testInfo: TestInfo, nom: string): Promise<void> {
   await ouvrirUneFermeNeuve(context, testInfo, nom);
   await page.goto('/irrigation/bienvenue');
@@ -170,6 +197,20 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   // Les jauges mènent à leur page (6 nonies, L2, D-311) : chaque ligne est un lien qui porte sa phrase.
   await page.goBack();
   await attendreLaPagePrete(page, 'aujourdhui');
+  // La mise en page, par mesures (L5, D-314) : au téléphone, chaque nom de jardin se lit en entier, à 390 et à
+  // 360 px ; à l'ordinateur, un bloc étiré garde son contenu en haut, aucune rangée de titre de plus de 60 px à 1440 px.
+  if (telephone) {
+    expect(await nomsCoupes(page), 'noms coupés à 390 px').toEqual([]);
+    expect(await a360px(page, () => nomsCoupes(page)), 'noms coupés à 360 px').toEqual([]);
+  } else {
+    const avant = page.viewportSize();
+    await page.setViewportSize({ width: 1440, height: avant?.height ?? 900 });
+    const titres = await page.locator('.today-block-heading').evaluateAll((rangées) => rangées.map((rangée) => Math.round(rangée.getBoundingClientRect().height)));
+    if (avant) await page.setViewportSize(avant);
+    expect(titres.length).toBeGreaterThan(0);
+    expect(Math.max(...titres), `rangées de titre : ${titres.join(', ')} px`).toBeLessThanOrEqual(60);
+  }
+  await verifierLEtape(page, journal, 'mise en page mesurée');
   const eauDeLaSemaine = page.locator('#today-week-water');
   const lignesEau = eauDeLaSemaine.locator('a.today-bar-row');
   await expect(lignesEau.first()).toHaveAccessibleName(/^Ferme : /);
@@ -235,6 +276,10 @@ test('« Tout est fait » : la confirmation liste l’irrigation passée, « Ann
   await expect(toutEstFait).toHaveAccessibleName('Tout est fait (1)');
   if (telephone) await verifierCibleTactile(toutEstFait, 'Le bouton « Tout est fait »');
   await verifierLEtape(page, journal, 'bouton « Tout est fait »');
+  // L'heure de la carte ne touche jamais son texte, à 390 et à 360 px comme à l'ordinateur (L5, D-314).
+  await expect(page.locator('#today-day .today-irrigation')).not.toHaveCount(0);
+  expect(await recouvrementDeLHeure(page), 'l’heure recouvre le texte').toBe(0);
+  if (telephone) expect(await a360px(page, () => recouvrementDeLHeure(page)), 'à 360 px').toBe(0);
   if (!telephone) await verifierLaLegendeDeLaFrise(page);
 
   // Rien n'est écrit au premier clic : la confirmation liste, cochée ; décocher retire du compte.
