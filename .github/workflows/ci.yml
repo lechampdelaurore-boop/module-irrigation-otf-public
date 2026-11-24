@@ -83,7 +83,10 @@ jobs:
     # secondes d'habitude, en a pris jusqu'à dix et demie quand le miroir
     # Ubuntu de GitHub est lent (sept et demie le 20 novembre 2026, run
     # 44761479471 : 25 minutes ne suffisaient plus).
-    timeout-minutes: 35
+    # 50 minutes depuis le 24 novembre 2026 (F763) : les parcours en prennent
+    # vingt-sept à trente-trois, et la fusion de #193 a été coupée à
+    # 35 minutes pendant les parcours de la démonstration (run 45422205205).
+    timeout-minutes: 50
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7

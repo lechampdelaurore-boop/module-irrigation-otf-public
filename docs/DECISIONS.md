@@ -9233,6 +9233,11 @@ visible.
 - F762 : à jour, la ligne des réserves mène à « Ressources et pompes » sans
   viser une réserve, et celle du sol à « Réserve du sol » sans viser un
   jardin : à jour, aucune n'est à montrer plus qu'une autre.
+- F763 : le job « Parcours navigateur » passe de 35 à 50 minutes. Les
+  parcours ordinaires prennent désormais 27 à 33 minutes sur GitHub (17 à
+  19 au lot K) ; la fusion de #193 (L2) a été coupée à 35 minutes, pendant
+  les parcours de la démonstration (run 45422205205), et n'a donc pas été
+  déployée à la première tentative. Aucun test retiré ni sauté.
 
 **Preuve.** `tests/aujourdhui-liens.test.ts` (la page du jour en alerte,
 le lien des lignes à jour et son absence à rafraîchir, l'état vide selon
