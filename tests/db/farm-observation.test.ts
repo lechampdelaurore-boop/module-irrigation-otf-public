@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach, mock } from 'node:test';
 import { endOtfFarmRead, recordOtfCallOutcome } from '../../db/otf-call-ledger-repository';
+import { createWeatherAlertCriterionForUser } from '../../db/weather-alert-repository';
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { OtfReadClient, resetOtfRatePacer } from '../../lib/adapters/otf/read-client';
 import { farmSpaceKey } from '../../lib/domain/farm-space';
@@ -154,6 +155,7 @@ test('la page d’état montre chaque ferme, la plus en difficulté d’abord, s
     lastOtfRead: 'le 20/11 à 6 h 16',
     lastWeather: 'le 20/11 à 6 h 16',
     lastMorning: 'le 20/11 à 6 h 17',
+    undeliveredAlerts: 'aucune sur 7 jours',
   });
   // Le jugement d'ensemble compte les fermes : jamais « tout va bien » quand une ferme est en difficulté.
   assert.match(status.verdict.text, /; 2 fermes en difficulté, 1 à regarder\.$/);
@@ -161,5 +163,48 @@ test('la page d’état montre chaque ferme, la plus en difficulté d’abord, s
   const shown = JSON.stringify(status);
   for (const secret of [PILOT_FARM_NAME, 'exploitante', 'pilote', operatorWorkspace, pilotWorkspace]) {
     assert.ok(!shown.includes(secret), `rien de « ${secret} » sur la page`);
+  }
+});
+
+test('C2 (D-304) : les alertes non délivrées se comptent par ferme, sur 24 heures et 7 jours, sans rien de leur contenu', async () => {
+  const operatorOwner = farmSpaceKey('exploitante', DEPLOYMENT_FARM);
+  const pilotOwner = farmSpaceKey('pilote', PILOT_FARM);
+  const operatorWorkspace = await ensureWorkspaceForUser(operatorOwner);
+  const pilotWorkspace = await ensureWorkspaceForUser(pilotOwner);
+  const criterion = await createWeatherAlertCriterionForUser(pilotOwner, {
+    field: 'minimum-temperature', direction: 'below', threshold: 3, horizonDays: 3, active: true, label: 'Gel des Hirondelles',
+  });
+  const ago = (hours: number) => new Date(NOW.getTime() - hours * HOUR_MS).toISOString();
+  const weatherAlert = database.sqlite.prepare(
+    `INSERT INTO irrigation_weather_alerts (id, workspace_id, criterion_id, criterion_version, target_date, forecast_value, unit, forecasted_at, sent_at, delivery_status)
+     VALUES (?, ?, ?, 1, ?, 1.5, '°C', ?, ?, ?)`,
+  );
+  const cropAlert = database.sqlite.prepare(
+    `INSERT INTO irrigation_crop_alerts (id, workspace_id, kind, subject_key, subject_version, name, target_date, sent_at, delivery_status)
+     VALUES (?, ?, 'frost', ?, 'v1', 'Laitue', ?, ?, ?)`,
+  );
+  // La ferme pilote : une alerte de gel partie il y a 2 heures vers aucun appareil, une envoyée hier.
+  weatherAlert.run('m1', pilotWorkspace, criterion.id, '2026-11-21', ago(2), ago(2), 'no-subscriber');
+  weatherAlert.run('m2', pilotWorkspace, criterion.id, '2026-11-20', ago(26), ago(26), 'sent');
+  // La ferme du déploiement : un échec il y a 3 jours, un envoi interrompu il y a 2 heures, un envoi en cours
+  // depuis 10 minutes (pas encore interrompu), une nouvelle tentative, et un échec de plus de 7 jours.
+  cropAlert.run('c1', operatorWorkspace, 'laitue-1', '2026-11-18', ago(72), 'failed');
+  cropAlert.run('c2', operatorWorkspace, 'laitue-2', '2026-11-21', ago(2), 'pending');
+  cropAlert.run('c3', operatorWorkspace, 'laitue-3', '2026-11-22', ago(1 / 6), 'pending');
+  cropAlert.run('c4', operatorWorkspace, 'laitue-4', '2026-11-23', ago(5), 'retrying');
+  cropAlert.run('c5', operatorWorkspace, 'laitue-5', '2026-11-12', ago(8 * 24), 'failed');
+
+  const status = await readOperatorStatus(NOW, async () => DEPLOYMENT_FARM);
+  const byFarm = new Map(status.farms.map((farm) => [farm.farmKey, farm]));
+  const pilot = byFarm.get(PILOT_FARM)!;
+  const deployment = byFarm.get(DEPLOYMENT_FARM)!;
+  assert.equal(pilot.undeliveredAlerts, '1 sur 7 jours, dont 1 en 24 heures : aucun appareil inscrit : 1');
+  assert.equal(pilot.tone, 'danger', 'une alerte des 24 dernières heures qui n’a atteint personne');
+  assert.match(pilot.verdict ?? '', /1 alerte non délivrée en 24 heures \(aucun appareil inscrit : 1\)\./);
+  assert.equal(deployment.undeliveredAlerts, '2 sur 7 jours, dont 1 en 24 heures : échec de l’envoi : 1, envoi interrompu : 1 ; 1 alerte en nouvelle tentative par le service de notification');
+  assert.match(deployment.verdict ?? '', /1 alerte non délivrée en 24 heures \(envoi interrompu : 1\)\./);
+  const written = JSON.stringify(status.farms);
+  for (const forbidden of ['Gel des Hirondelles', 'Laitue', 'laitue', '1.5', '2026-11-21', operatorWorkspace, pilotWorkspace]) {
+    assert.ok(!written.includes(forbidden), `rien du contenu d’une alerte ni d’un espace : ${forbidden}`);
   }
 });

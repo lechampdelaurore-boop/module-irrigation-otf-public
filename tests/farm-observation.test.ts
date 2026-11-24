@@ -9,6 +9,7 @@ import {
 import { operatorStatusView } from '../lib/domain/operations/operator-status-view.ts';
 import { TASK_REGISTRY } from '../lib/domain/operations/task-registry.ts';
 import { EMPTY_TASK_RUN, taskState } from '../lib/domain/operations/task-state.ts';
+import { NO_UNDELIVERED_ALERTS, undeliveredAlertWindows } from '../lib/domain/operations/undelivered-alerts.ts';
 
 /**
  * La ligne de chaque ferme sur la page d'état (4.5, PR 2 ;
@@ -141,4 +142,32 @@ test('le jugement d’ensemble compte les fermes : « tout va bien » seulement 
   const tasks = TASK_REGISTRY.map((declaration) => ({ declaration, state: taskState(declaration, { ...EMPTY_TASK_RUN, lastSuccessAt: hoursAgo(3) }, NOW) }));
   assert.deepEqual(operatorStatusView(tasks, null, okFarm).verdict, { tone: 'ok', text: 'Tout va bien : les 11 tâches sont à l\'heure.' });
   assert.deepEqual(operatorStatusView(tasks, null, warnFarm).verdict, { tone: 'warn', text: 'Les 11 tâches sont à l\'heure ; 1 ferme à regarder.' });
+});
+
+test('C2 (D-304) : une alerte non délivrée en 24 heures met la ferme en rouge, plus ancienne en orange ; une nouvelle tentative ne change rien', () => {
+  const deliveries = (day: Partial<typeof NO_UNDELIVERED_ALERTS>, week: Partial<typeof NO_UNDELIVERED_ALERTS>, retrying7d = 0) => ({
+    undelivered24h: { ...NO_UNDELIVERED_ALERTS, ...day },
+    undelivered7d: { ...NO_UNDELIVERED_ALERTS, ...week },
+    retrying7d,
+  });
+  const [today] = farmObservationLines([healthy('17', { alertDeliveries: deliveries({ noDevice: 2 }, { noDevice: 2, failed: 1 }) })], context());
+  assert.equal(today.tone, 'danger');
+  assert.equal(today.verdict, '2 alertes non délivrées en 24 heures (aucun appareil inscrit : 2).');
+  assert.equal(today.undeliveredAlerts, '3 sur 7 jours, dont 2 en 24 heures : aucun appareil inscrit : 2, échec de l’envoi : 1');
+
+  const [older] = farmObservationLines([healthy('17', { alertDeliveries: deliveries({}, { interrupted: 1 }) })], context());
+  assert.equal(older.tone, 'warn');
+  assert.equal(older.verdict, '1 alerte non délivrée sur 7 jours (envoi interrompu : 1).');
+
+  const [retrying] = farmObservationLines([healthy('17', { alertDeliveries: deliveries({}, {}, 2) })], context());
+  assert.equal(retrying.tone, 'ok', 'le service réessaie seul : ce n’est pas un problème');
+  assert.equal(retrying.undeliveredAlerts, 'aucune sur 7 jours ; 2 alertes en nouvelle tentative par le service de notification');
+
+  const [none] = farmObservationLines([healthy('17')], context());
+  assert.equal(none.undeliveredAlerts, 'aucune sur 7 jours');
+  assert.deepEqual(undeliveredAlertWindows(NOW), {
+    dayStart: '2026-11-19T09:00:00.000Z',
+    weekStart: '2026-11-13T09:00:00.000Z',
+    interruptedBefore: '2026-11-20T08:00:00.000Z',
+  });
 });

@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (alertes sur le téléphone, C2)
+
+- **Les alertes non délivrées se voient sur la page d'état** (D-304,
+  F755) : la carte de chaque ferme compte, sur 7 jours et sur 24 heures,
+  ses alertes météo et par culture parties sans atteindre un appareil
+  (aucun appareil inscrit, échec de l'envoi, envoi interrompu), en rouge
+  dans les 24 heures, en orange au-delà ; des nombres seulement. Aucune
+  migration.
+
 ### Corrigé (installation sur le téléphone, logo du module)
 
 - **Le module s'installe sur le téléphone comme une application** (D-302) :

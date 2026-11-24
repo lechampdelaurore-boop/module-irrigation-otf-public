@@ -10,6 +10,7 @@ import { farmSpaceOf } from '../domain/farm-space';
 import { farmObservationLines } from '../domain/operations/farm-observation';
 import { gestureDates, gestureDecision, gestureRecordedMessage, OPERATOR_GESTURES, type GestureTask } from '../domain/operations/operator-gesture';
 import { operatorStatusView, type OperatorStatusView } from '../domain/operations/operator-status-view';
+import { undeliveredAlertWindows } from '../domain/operations/undelivered-alerts';
 import { oldestKeptSupportDay, supportAccessDecision, supportAccessLines, supportAccessRecordedMessage } from '../domain/operations/support-access';
 import { outcomeHourStartMs } from '../domain/otf/call-outcome';
 import { parisDayOf } from '../domain/otf/shared-call-pace';
@@ -53,6 +54,7 @@ export async function readOperatorStatus(now = new Date(), deploymentFarm = know
       parisDay: parisDayOf(now.getTime()),
       dayStartMs: hourStartMs - millisecondsFromHours(HOURS_PER_DAY - 1),
       weekStartMs: hourStartMs - millisecondsFromHours(7 * HOURS_PER_DAY - 1),
+      alerts: undeliveredAlertWindows(now),
     }),
     deploymentFarm(),
     listFarmsWithFeature('planning'),

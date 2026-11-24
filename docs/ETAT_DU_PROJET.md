@@ -12,6 +12,17 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Alertes sur le téléphone : les alertes non délivrées sur la page
+  d'état, codé le 24 novembre 2026** (C2, D-304, F755, roadmap
+  section 6 octies), en Opus 5.5 · Élevé. La carte de chaque ferme porte
+  la ligne « Alertes non délivrées » : sur 7 jours et sur 24 heures, ses
+  alertes météo et par culture parties sans atteindre un appareil, par
+  cause ; rouge dans les 24 heures, orange au-delà ; une alerte en nouvelle
+  tentative comptée à part. Sur la carte de la ferme et non sur une carte à
+  part comme le proposait la fiche : une alerte n'est pas une tâche du
+  registre (D-304). Aucune migration. Procédure dans `docs/exploitation.md`.
+  Tests à deux fermes (`tests/db/farm-observation.test.ts`). Contrôles :
+  voir la PR. Restent C3 à C5.
 - **Le module s'installe sur le téléphone, avec son logo, corrigé le
   24 novembre 2026** (D-302, demande du porteur à 9 h 31), en Opus 5.5 ·
   Élevé, réglage choisi par le coordinateur faute de ligne de la roadmap.
