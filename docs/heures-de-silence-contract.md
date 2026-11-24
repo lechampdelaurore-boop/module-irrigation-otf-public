@@ -327,3 +327,105 @@ refusé avant toute écriture ; la contrainte quart d'heure par quart
 d'heure ; le scénario 17 en base ; le journal ; l'effacement d'une ferme
 qui laisse l'autre). Contre-épreuve : trente-cinq altérations de la règle,
 du réglage ou du journal font chacune échouer au moins un test (PR H1).
+
+## 12. Précisions faites en codant H2 (24 novembre 2026, D-322)
+
+Les cinq envoyeurs lisent la règle, chacun avec le réglage de sa ferme, à
+l'instant où sa notification partirait (F797) : les alertes météo
+(`lib/services/weather-alerts-service.ts`) et par culture
+(`lib/services/crop-alerts-service.ts`), qui partagent la retenue de
+`lib/services/quiet-hours-delivery.ts` ; le message du matin
+(`lib/services/morning-message.ts`, que la section 5 nommait de son nom
+d'avant) ; le rappel du soir ; le retard d'une irrigation planifiée
+(`lib/services/irrigation-push-orchestration.ts`). La fin d'un arrosage
+démarré et la veille de l'exploitant ne lisent pas le réglage (S3,
+choix 7). Le Worker de notification ne change pas. Sept cas que les
+sections 3, 5 et 8 ne tranchaient pas, réglés par l'option la plus
+prudente :
+
+- **F803, la retenue d'une alerte** : une alerte météo ou par culture
+  retenue part par l'alarme du Worker d'identifiant « quiet: », l'espace,
+  son étiquette (F800), à échéance de la fin de la plage, avec le même
+  titre, le même texte, la même étiquette, la même page au toucher et une
+  révision neuve. Le Worker la garde (`scheduled`), ou garde déjà sous cet
+  identifiant une retenue plus récente de la même étiquette (`stale`), qui
+  partira à la même fin : dans les deux cas, l'alerte est retenue. Le
+  réglage de la ferme est lu une seule fois par évaluation, au premier
+  envoi qui en a besoin ; sans alerte à envoyer, il n'est pas lu.
+- **F804, l'état « retenue » et le scénario 15** : le Worker ne dit jamais
+  ce que devient une alarme ; il ne répond qu'à sa programmation, et il ne
+  change pas (choix 9). Une retenue gardée compte donc comme envoyée, comme
+  le message du matin (F745) : l'alerte est enregistrée « envoyée » à son
+  heure (S9), avec la fin de sa retenue (`held_until`, migration additive
+  0050, une colonne vide sur chacune des deux tables d'alertes, vide pour
+  toute alerte d'avant et pour toute alerte partie tout de suite).
+  L'historique dit « Retenue jusqu'à 6 h (heures de silence) » tant que la
+  fin n'est pas venue, puis « Envoyée à 6 h, à la fin des heures de
+  silence », l'heure dite comme partout dans le module (« 6 h »,
+  « 6 h 30 »). Aucune valeur nouvelle dans l'état de remise : sa contrainte
+  aurait demandé de refaire les tables. Le suivi des alertes non délivrées
+  (C2, C3) ne compte jamais une retenue pour non délivrée : le choix 8 est
+  tenu. **Limite** : le scénario 15 (une retenue sans appareil inscrit,
+  « non délivrée » le matin) n'est pas tenu, le module ne pouvant le savoir
+  sans changer le Worker ; une ferme sans appareil se voit aux alertes de
+  la journée, qui partent tout de suite et disent « Aucun appareil
+  abonné », et la veille les compte comme avant.
+- **F805, le message du matin** (S4, S6, S8) : retenu, il part par sa
+  propre alarme du jour (F744), à échéance de la fin de la plage, avec le
+  texte composé et daté au calcul du matin. Le Worker ne recompose rien :
+  « s'il y a toujours quelque chose à dire » (S6) se juge au calcul, et le
+  message part tel quel à la fin de la plage, au plus tard à 9 h. Gardée
+  par le Worker, la retenue compte comme envoyée (F745) : le passage
+  suivant du matin ne renvoie rien. Si la retenue échoue, le même message
+  part tout de suite, sous la même alarme et la même révision (le Worker
+  remplace une alarme de même révision : une retenue gardée malgré
+  l'erreur ne se double pas), et l'incident se dit sans nom.
+- **F806, le rappel du soir** (S5) : il se juge à l'heure réelle de son
+  passage, chaque heure à 5 minutes, pas à l'heure réglée (F797) : un
+  rappel réglé à 21 h 30 part au passage de 22 h 05, et ne part donc pas
+  avec une plage qui commence à 22 h. Pour la ferme dont le rappel tombe
+  dans la plage, rien n'est lu ni pris ; le passage la compte à part
+  (`silenced`, dans sa ligne de journal) et jamais en panne. **Pour H3** :
+  l'avertissement de l'écran juge l'heure du premier passage qui suit
+  l'heure réglée, pas l'heure réglée seule.
+- **F807, le retard d'une irrigation planifiée** (F797, S4, S8) : il se
+  juge à son échéance (le début prévu plus la tolérance), avec le réglage
+  de la ferme au moment où son alarme est programmée. Dans la plage, la
+  même alarme (l'identifiant de l'arrosage, la même révision, le même
+  texte) prend pour échéance la fin de la plage ; la base garde l'échéance
+  d'origine, que l'écran dit comme avant. Démarrer l'irrigation remplace
+  l'alarme comme aujourd'hui (F800). Un réglage illisible laisse
+  l'échéance d'origine (S8) ; un défaut se dit sans nom. **Limite, pour
+  H3** : un retard programmé avant que la ferme allume ou change sa plage
+  garde l'échéance d'alors ; l'enregistrement du réglage reprogrammera les
+  retards à venir de la ferme.
+- **F808, Arrosages décochée dans la nuit** (P29) : un retard dont
+  l'échéance est passée mais que la plage retient encore n'est pas parti :
+  il est retiré avec les alarmes à venir. La liste des alarmes à venir
+  garde pour cela les retards échus depuis moins de quatorze heures (la
+  plus longue retenue, treize heures de l'horloge de Paris, plus l'heure
+  du passage à l'heure d'hiver) ; le service écarte ceux que la plage de la
+  ferme ne retient plus. Une alarme partie ne se retire toujours pas.
+- **F809, le journal** : une retenue refusée (`quiet_hold_failed`, avec la
+  phrase de l'erreur), un réglage illisible (`quiet_hours_unreadable`), un
+  défaut de la règle (`quiet_hours_defect`, avec sa nature : S7 ou S17), le
+  message du matin retenu (`morning_message_held`, avec la fin de la
+  plage) ; la fin de la retenue dans la ligne de chaque alerte évaluée ; le
+  nombre de rappels du soir tus dans celle du passage. Aucune ligne ne
+  nomme ni ferme ni personne.
+
+Preuve : `tests/db/heures-de-silence-alertes.test.ts` (à deux fermes et
+Worker simulé : les scénarios 5 à 8, 12, 13 et 16 ; une maximale basse et
+une minimale haute qui ne sont pas du gel ; `stale` qui retient, le service
+non configuré qui envoie comme avant ; le scénario 17 et le réglage
+illisible ; les alertes par culture, le gel qui passe, case cochée ou non,
+et l'arrêt d'arrosage avant récolte retenu ; l'historique des deux encarts
+avant et après la fin de la plage) et
+`tests/db/heures-de-silence-messages.test.ts` (les scénarios 10, 11 et 16
+pour le message du matin ; le retard jugé à son échéance, la base qui garde
+la sienne, de jour ou sans plage rien ne change ; la fin d'un minuteur qui
+ne lit pas le réglage ; le réglage illisible ; le retrait des alarmes la
+nuit ; le scénario 17 pour les trois envoyeurs à alarme). Contre-épreuve :
+trente-huit altérations des envoyeurs, de la retenue, de son
+enregistrement et de son affichage font chacune échouer au moins un test
+(PR H2).

@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Heures de silence des notifications, H2 : les envoyeurs, codés le
+  24 novembre 2026** (D-322, F803 à F809, roadmap section 6 undecies, PR 2
+  sur 3), en Opus 5.5 · Max, le réglage de la roadmap. Les cinq envoyeurs
+  lisent la règle de H1, chacun avec le réglage de sa ferme, à l'instant où
+  sa notification partirait. Une alerte météo ou par culture retenue part
+  par une alarme du Worker à la fin de la plage, sous un identifiant propre
+  à l'espace, et s'enregistre « envoyée » à son heure avec la fin de sa
+  retenue (migration 0050), que l'historique dit ; le message du matin et
+  le retard d'une irrigation gardent leur alarme, à échéance de la fin de
+  la plage ; le rappel du soir dans la plage ne part pas ; une retenue
+  refusée part tout de suite (S8). Le Worker ne change pas ; ne disant pas
+  ce que devient une alarme, il laisse le scénario 15 du contrat non tenu
+  (F804). Aucun écran n'allume encore la plage : rien ne change pour aucune
+  ferme. Tests à deux fermes et Worker simulé, contre-épreuve de
+  trente-huit altérations. Contrôles : voir la PR. **Fusion après H1.**
+  Reste H3, l'écran, en Opus 5.5 · Élevé.
 - **Heures de silence des notifications, H1 : la règle et le réglage,
   codés le 24 novembre 2026** (D-321, F797 à F802, roadmap section 6
   undecies, PR 1 sur 3), en Opus 5.5 · Max, le réglage de la roadmap. La
@@ -26,8 +42,7 @@ registres, elle y renvoie.
   la règle (H2) et aucun écran ne l'allume (H3) : rien ne change pour
   aucune ferme. Tests à deux fermes (`tests/db/heures-de-silence.test.ts`),
   contre-épreuve de trente-cinq altérations. Contrôles : voir la PR.
-  **Fusion après la mise en ligne vérifiée d'O4.** Restent H2, en
-  Opus 5.5 · Max, et H3, en Opus 5.5 · Élevé.
+  **Fusion après la mise en ligne vérifiée d'O4.**
 - **Objectif automatique sur l'ET0, O3 : les semaines closes, codé le
   24 novembre 2026** (D-318, F782 à F788, roadmap section 6 decies, PR 3
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. Une semaine finie

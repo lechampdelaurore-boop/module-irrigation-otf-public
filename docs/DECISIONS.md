@@ -9669,3 +9669,80 @@ chacune échouer au moins un test.
 aucun envoyeur ne lit la règle et aucun écran ne l'allume ; la migration
 ajoute quatre colonnes vides. Le Worker de notification ne change pas.
 D-028, D-060 et D-293 tiennent.
+
+## D-322 — Les heures de silence, H2 : les envoyeurs
+
+Date : 24 novembre 2026. Statut : codé (PR H2 sur 3 du contrat
+`docs/heures-de-silence-contract.md`, D-320, sections 3, 5 et 8) ; roadmap
+section 6 undecies. Code en Opus 5.5 · Max, le réglage de la roadmap. Les
+précisions F803 et suivantes suivent celles de H1 (D-321, F797 à F802).
+
+**Décision.** Les cinq envoyeurs lisent la règle de H1, chacun avec le
+réglage de sa ferme, à l'instant où sa notification partirait (F797) : les
+alertes météo et par culture, le message du matin, le rappel du soir et le
+retard d'une irrigation planifiée. Une alerte retenue part par une alarme
+du Worker, sous l'identifiant de l'espace et de son étiquette, à échéance
+de la fin de la plage, même texte ; elle est enregistrée à son heure,
+« envoyée », avec la fin de sa retenue (migration additive 0050,
+`held_until` sur les deux tables d'alertes), et l'historique la dit
+« Retenue jusqu'à 6 h (heures de silence) », puis « Envoyée à 6 h, à la fin
+des heures de silence ». Le message du matin et le retard gardent leur
+propre alarme, à échéance de la fin de la plage ; le rappel du soir dans la
+plage ne part pas, n'est pas retenu et ne compte pas la ferme en panne ;
+la fin d'un arrosage démarré et la veille ne lisent pas le réglage. Une
+retenue refusée part tout de suite et un réglage illisible ne retient
+rien, l'incident dit sans nom (S8). Le Worker de notification ne change
+pas.
+
+**Précisions tranchées en codant** (contrat, section 12).
+
+- F803 : une retenue gardée (`scheduled`) ou déjà tenue par une retenue
+  plus récente de la même étiquette (`stale`) retient l'alerte ; le
+  réglage est lu une fois par évaluation, au premier envoi qui en a
+  besoin.
+- F804 : le Worker ne disant jamais ce que devient une alarme, une retenue
+  gardée compte comme envoyée (F745) ; pas de valeur nouvelle dans l'état
+  de remise ; le suivi C2/C3 ne compte jamais une retenue (choix 8).
+  Limite : le scénario 15 (une retenue sans appareil, « non délivrée »)
+  n'est pas tenu sans changer le Worker.
+- F805 : le message du matin retenu part tel que composé au calcul du
+  matin ; une retenue refusée le fait partir tout de suite, même alarme,
+  même révision, sans doublon.
+- F806 : le rappel du soir se juge à l'heure réelle de son passage (chaque
+  heure à 5 minutes) ; l'avertissement de H3 suivra la même heure.
+- F807 : le retard se juge à son échéance ; dans la plage, son alarme a
+  pour échéance la fin de la plage, la base garde l'échéance d'origine.
+  Limite pour H3 : l'enregistrement du réglage reprogrammera les retards à
+  venir.
+- F808 : un retard échu mais encore retenu n'est pas parti : décocher
+  Arrosages le retire.
+- F809 : le journal dit la retenue refusée, le réglage illisible, le
+  défaut, le message du matin retenu et les rappels tus, sans nom.
+
+**Preuve.** `tests/db/heures-de-silence-alertes.test.ts` et
+`tests/db/heures-de-silence-messages.test.ts`, à deux fermes et Worker
+simulé, verts dans les passes ordinaire, d'isolation des fermes, des
+personnes et du rattachement, et de l'ancien calcul de la jauge.
+Contre-épreuve : trente-huit altérations (la retenue qui envoie quand
+même, `stale` compté comme échec, une retenue refusée comptée retenue,
+l'incident non dit, l'identifiant sans l'espace, la retenue à échéance
+immédiate, le défaut ou le réglage illisible non dits, le réglage illisible
+qui fait échouer l'évaluation ; le champ ou le sens du critère météo non
+transmis ; tout ou rien compté pour du gel par culture ; la fin de retenue
+non enregistrée ou la retenue enregistrée sans appareil, météo et
+cultures ; le matin jamais retenu, sans repli, dit envoyé au journal ou
+sans dire son défaut ; le rappel du soir envoyé dans la plage, compté en
+panne ou sans dire son défaut ; le retard jamais retenu ou jugé à la
+programmation, la fin d'un minuteur qui lit le réglage, le retard sans
+dire son défaut ni le réglage illisible ; le retrait qui oublie un retard
+retenu, retire tout retard passé ou ignore la fin de la plage, la liste qui
+ne garde plus les retards échus ; l'affichage qui dit retenue jusqu'à la
+fin comprise ou oublie la retenue, météo et cultures ; la base qui
+n'écrit pas la fin de retenue, météo et cultures) font chacune échouer au
+moins un test.
+
+**Ne change pas.** Aucune notification ne change, pour aucune ferme :
+aucun écran n'allume la plage (H3), et une plage éteinte ou jamais réglée
+ne change rien (S2) ; la migration ajoute deux colonnes vides. Le Worker de
+notification et la veille de l'exploitant ne changent pas. D-028, D-060,
+D-293 et D-321 tiennent.
