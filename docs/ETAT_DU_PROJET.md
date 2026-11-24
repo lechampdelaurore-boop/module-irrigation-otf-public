@@ -26,7 +26,7 @@ registres, elle y renvoie.
   ce que devient une alarme, il laisse le scénario 15 du contrat non tenu
   (F804). Aucun écran n'allume encore la plage : rien ne change pour aucune
   ferme. Tests à deux fermes et Worker simulé, contre-épreuve de
-  trente-huit altérations. Contrôles : voir la PR. **Fusion après H1.**
+  quarante altérations. Contrôles : voir la PR. **Fusion après H1.**
   Reste H3, l'écran, en Opus 5.5 · Élevé.
 - **Heures de silence des notifications, H1 : la règle et le réglage,
   codés le 24 novembre 2026** (D-321, F797 à F802, roadmap section 6

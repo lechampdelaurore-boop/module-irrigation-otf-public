@@ -405,7 +405,10 @@ prudente :
   garde pour cela les retards échus depuis moins de quatorze heures (la
   plus longue retenue, treize heures de l'horloge de Paris, plus l'heure
   du passage à l'heure d'hiver) ; le service écarte ceux que la plage de la
-  ferme ne retient plus. Une alarme partie ne se retire toujours pas.
+  ferme ne retient plus. Une alarme partie ne se retire toujours pas. Un
+  réglage illisible n'empêche pas le retrait : la plage compte pour
+  éteinte et un retard échu pour parti, comme avant H2, et l'incident se
+  dit sans nom.
 - **F809, le journal** : une retenue refusée (`quiet_hold_failed`, avec la
   phrase de l'erreur), un réglage illisible (`quiet_hours_unreadable`), un
   défaut de la règle (`quiet_hours_defect`, avec sa nature : S7 ou S17), le
@@ -425,7 +428,8 @@ avant et après la fin de la plage) et
 pour le message du matin ; le retard jugé à son échéance, la base qui garde
 la sienne, de jour ou sans plage rien ne change ; la fin d'un minuteur qui
 ne lit pas le réglage ; le réglage illisible ; le retrait des alarmes la
-nuit ; le scénario 17 pour les trois envoyeurs à alarme). Contre-épreuve :
-trente-huit altérations des envoyeurs, de la retenue, de son
+nuit, réglage lisible ou non ; le scénario 17 pour les trois envoyeurs à
+alarme). Contre-épreuve :
+quarante altérations des envoyeurs, de la retenue, de son
 enregistrement et de son affichage font chacune échouer au moins un test
 (PR H2).

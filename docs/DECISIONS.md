@@ -9715,7 +9715,7 @@ pas.
   Limite pour H3 : l'enregistrement du réglage reprogrammera les retards à
   venir.
 - F808 : un retard échu mais encore retenu n'est pas parti : décocher
-  Arrosages le retire.
+  Arrosages le retire ; un réglage illisible n'arrête pas le retrait.
 - F809 : le journal dit la retenue refusée, le réglage illisible, le
   défaut, le message du matin retenu et les rappels tus, sans nom.
 
@@ -9723,7 +9723,7 @@ pas.
 `tests/db/heures-de-silence-messages.test.ts`, à deux fermes et Worker
 simulé, verts dans les passes ordinaire, d'isolation des fermes, des
 personnes et du rattachement, et de l'ancien calcul de la jauge.
-Contre-épreuve : trente-huit altérations (la retenue qui envoie quand
+Contre-épreuve : quarante altérations (la retenue qui envoie quand
 même, `stale` compté comme échec, une retenue refusée comptée retenue,
 l'incident non dit, l'identifiant sans l'espace, la retenue à échéance
 immédiate, le défaut ou le réglage illisible non dits, le réglage illisible
@@ -9736,7 +9736,8 @@ panne ou sans dire son défaut ; le retard jamais retenu ou jugé à la
 programmation, la fin d'un minuteur qui lit le réglage, le retard sans
 dire son défaut ni le réglage illisible ; le retrait qui oublie un retard
 retenu, retire tout retard passé ou ignore la fin de la plage, la liste qui
-ne garde plus les retards échus ; l'affichage qui dit retenue jusqu'à la
+ne garde plus les retards échus, le retrait arrêté par un réglage
+illisible ou qui ne le dit pas ; l'affichage qui dit retenue jusqu'à la
 fin comprise ou oublie la retenue, météo et cultures ; la base qui
 n'écrit pas la fin de retenue, météo et cultures) font chacune échouer au
 moins un test.

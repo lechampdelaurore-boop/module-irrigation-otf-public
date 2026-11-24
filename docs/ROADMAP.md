@@ -5734,7 +5734,7 @@ et l'enregistrement du réglage reprogrammera les retards à venir. Aucun
 écran n'allume encore la plage : rien ne change pour aucune ferme. Tests
 à deux fermes et Worker simulé (`tests/db/heures-de-silence-alertes.test.ts`,
 `tests/db/heures-de-silence-messages.test.ts`) ; contre-épreuve de
-trente-huit altérations. Fusion après H1. Reste H3, l'écran.
+quarante altérations. Fusion après H1. Reste H3, l'écran.
 
 ## 7. Décisions prises par le porteur de projet le 18 septembre 2026
 
