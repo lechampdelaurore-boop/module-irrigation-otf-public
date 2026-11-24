@@ -26,7 +26,7 @@ registres, elle y renvoie.
   Réglage éteint, aucun écran ne change. Tests à deux fermes
   (`tests/db/objectif-automatique-ecrans.test.ts`), parcours P58 aux deux
   largeurs. Contrôles : voir la PR. **La ligne 30 (6 decies) est codée en
-  entier.** Mise en ligne de #201 (O3, D-318) consignée ici : __O3_ONLINE__.
+  entier.** Mise en ligne de #201 (O3, D-318) consignée ici : #201 fusionnée le 24 novembre 2026 à 22 h 02, en ligne à 22 h 36 (run 45486987409, les cinq jobs verts ; migration 0048 appliquée en production et sur la démonstration) ; celle de #200 (contrat des heures de silence, D-320) aussi : en ligne le 24 novembre 2026 à 21 h 50 (run 45479608364, les cinq jobs verts).
 - **Objectif automatique sur l'ET0, O3 : les semaines closes, codé le
   24 novembre 2026** (D-318, F782 à F788, roadmap section 6 decies, PR 3
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. Une semaine finie
