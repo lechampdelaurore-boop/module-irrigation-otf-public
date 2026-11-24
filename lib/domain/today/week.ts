@@ -89,6 +89,10 @@ type WeekRow = {
   text: string;
   /** Les barres empilées et le trait de l'objectif, en % de l'échelle. */
   bars: { irrigationPercent: number; rainPercent: number; objectivePercent: number | null };
+  /** La phrase lue de la ligne, nom de son lien : « Jardin Nord : 7 / 20 mm ». */
+  label: string;
+  /** Où mène la ligne (L2) : la ferme au tableau des besoins, un jardin à son pli dans ce tableau. */
+  anchor: string;
 };
 
 /**
@@ -105,6 +109,14 @@ export type TodayTileLink = { label: string; page: 'besoins'; anchor: string };
 const WEEK_OBJECTIVES_ANCHOR = 'objectifs-de-la-semaine';
 const WEEK_DAYS_ANCHOR = 'weather';
 const NEEDS_TABLE_ANCHOR = 'irrigation-needs-title';
+
+/**
+ * L'ancre d'un jardin dans le tableau des besoins d'« Objectifs et besoins »
+ * (6 nonies, L2) : son pli s'ouvre quand l'adresse le vise.
+ */
+export function needsGardenAnchor(plotId: string): string {
+  return `besoin-jardin-${plotId}`;
+}
 
 export type TodayWeek = {
   /** « du lun. 2 nov. au dim. 8 nov. ». */
@@ -207,6 +219,8 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
       rainPercent: rainMm === null ? 0 : Math.max(0, rounded(Math.min(100, percent(irrigationMm + rainMm)) - irrigationPercent)),
       objectivePercent: objectiveMm === null ? null : percent(objectiveMm),
     },
+    label: `${name} : ${text}`,
+    anchor: key === 'farm' ? NEEDS_TABLE_ANCHOR : needsGardenAnchor(key),
   };
 }
 

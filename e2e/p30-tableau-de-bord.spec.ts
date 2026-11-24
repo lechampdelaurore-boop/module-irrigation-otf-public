@@ -166,6 +166,50 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     await expect(page.locator('#weather')).toBeInViewport();
   }
   await verifierLEtape(page, journal, 'la tuile de l’eau reçue mène à la pluie mesurée');
+
+  // Les jauges mènent à leur page (6 nonies, L2, D-311) : chaque ligne est un lien qui porte sa phrase.
+  await page.goBack();
+  await attendreLaPagePrete(page, 'aujourdhui');
+  const eauDeLaSemaine = page.locator('#today-week-water');
+  const lignesEau = eauDeLaSemaine.locator('a.today-bar-row');
+  await expect(lignesEau.first()).toHaveAccessibleName(/^Ferme : /);
+  await expect(lignesEau.first()).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#irrigation-needs-title$/);
+  // Le lien du bloc : en tête à l'ordinateur, en bas au téléphone, jamais les deux.
+  await expect(eauDeLaSemaine.getByRole('link', { name: 'Objectifs et besoins', exact: true })).toHaveCount(1);
+  await expect(eauDeLaSemaine.locator(telephone ? '.today-block-foot' : '.today-block-more')).toBeVisible();
+  if (telephone) {
+    for (const ligne of await lignesEau.all()) await verifierCibleTactile(ligne, `La ligne « ${await ligne.locator('.today-bar-name').innerText()} »`);
+  }
+  if ((await lignesEau.count()) > 1) {
+    // Un jardin ouvre son pli dans le tableau des besoins.
+    const jardin = lignesEau.nth(1);
+    const nom = await jardin.locator('.today-bar-name').innerText();
+    await jardin.click();
+    await attendreLaPagePrete(page, 'besoins');
+    await expect(page).toHaveURL(/#besoin-jardin-/);
+    const pli = page.locator(`details${new URL(page.url()).hash}`);
+    await expect(pli).toHaveJSProperty('open', true);
+    await expect(pli).toContainText(nom);
+    await expect(pli.locator(':scope > summary')).toBeInViewport();
+    await verifierLEtape(page, journal, 'le jardin de l’eau de la semaine ouvre son pli des besoins');
+    await page.goBack();
+    await attendreLaPagePrete(page, 'aujourdhui');
+  }
+
+  const sol = page.locator('#today-soil');
+  const lignesSol = sol.locator('a.today-bar-row');
+  if ((await lignesSol.count()) > 0) {
+    await expect(sol.getByRole('link', { name: 'Voir le sol', exact: true })).toHaveCount(1);
+    const nom = await lignesSol.first().locator('.today-bar-name').innerText();
+    await expect(lignesSol.first()).toHaveAccessibleName(new RegExp(`^${nom} : `));
+    await lignesSol.first().click();
+    await attendreLaPagePrete(page, 'sol');
+    await expect(page).toHaveURL(/#soil-garden-/);
+    const pli = page.locator(`details${new URL(page.url()).hash}`);
+    await expect(pli).toHaveJSProperty('open', true);
+    await expect(pli).toBeInViewport();
+    await verifierLEtape(page, journal, 'le jardin de la réserve du sol ouvre son pli');
+  }
 });
 
 test('« Tout est fait » : la confirmation liste l’irrigation passée, « Annuler » n’écrit rien, « Enregistrer » l’enregistre', async ({ page, context }, testInfo) => {

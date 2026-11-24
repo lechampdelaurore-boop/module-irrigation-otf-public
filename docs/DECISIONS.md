@@ -9144,3 +9144,48 @@ le champ dans l'écran, « Eau reçue » le volet de la pluie mesurée.
 
 **Ne change pas.** Les chiffres, les phrases de détail, les couleurs et
 l'ordre des tuiles ; les pages d'arrivée ; aucune donnée, aucune migration.
+
+## D-311 — « Aujourd'hui » mène aux menus, L2 : les jauges mènent à leur page
+
+Date : 24 novembre 2026. Statut : codé (PR 2 sur 6 du contrat
+`docs/aujourdhui-liens-contract.md`, D-308, section 4) ; roadmap section
+6 nonies. Code en Opus 5.5 · Élevé.
+
+**Décision.** Chaque ligne de « Eau de la semaine » devient un lien :
+la ferme vers le tableau des besoins (`besoins#irrigation-needs-title`),
+chaque jardin vers son pli dans ce tableau, par l'ancre nouvelle
+`besoin-jardin-<jardin>` (`needsGardenAnchor`, `lib/domain/today/week.ts`),
+posée sur le pli du jardin, qui s'ouvre et vient en haut quand l'adresse le
+vise, au chargement comme à un lien suivi. Chaque ligne de « Réserve du
+sol » mène au pli de son jardin sur « Réserve du sol »
+(`sol#soil-garden-<jardin>`), y compris une ligne « inconnue ». « Eau
+disponible » gagne le lien d'en-tête « Ressources et pompes » ; chaque cuve
+mène à sa carte (`ressources#reservoir-<réserve>`), où son volume se
+corrige. Chaque lien porte, comme nom, la phrase déjà écrite pour un
+lecteur d'écran (celles du bloc « Eau disponible » ne changent pas) ; le
+dessin lui reste caché, et plus aucun lien ne vit sous `aria-hidden`.
+Chaque ligne fait au moins 44 px de haut au téléphone, avec un focus
+visible.
+
+**Précisions tranchées en codant.**
+
+- F759 : une ressource limitée mène à la liste des ressources de
+  « Ressources et pompes » (`#water-resources-title`), pas à sa carte : les
+  cartes des ressources n'ont pas d'ancre chacune, et le contrat ne change
+  aucune page d'arrivée hors l'ancre des jardins des besoins (section 2).
+  L'ancre d'une ressource, si elle est voulue, est une PR à part.
+- F760 : sous 620 px, le lien d'en-tête reste caché dans l'en-tête et un
+  second lien, le même, s'écrit en bas du bloc, sur toute la largeur, en
+  forme de bouton (`.today-block-foot`) ; à l'ordinateur, l'inverse. Un
+  seul des deux est visible et lu à chaque largeur.
+
+**Preuve.** `tests/aujourdhui-liens.test.ts` (ancres et phrases des trois
+blocs, les phrases d'« Eau disponible » inchangées, aucun dessin lu, aucun
+lien sous `aria-hidden`, l'ancre du pli des besoins) ; parcours P29 (la
+cuve mène à sa carte, dans l'écran) et P30 (la ferme et un jardin de « Eau
+de la semaine », un jardin de « Réserve du sol », le lien de bloc en tête
+ou en bas) aux deux largeurs.
+
+**Ne change pas.** Les chiffres, les phrases, les dessins et l'ordre des
+blocs ; aucune donnée, aucune migration. Les blocs étirés sur ordinateur
+restent pour L5.

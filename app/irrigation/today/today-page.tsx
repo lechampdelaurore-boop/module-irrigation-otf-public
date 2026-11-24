@@ -162,7 +162,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
         layout="split"
       />
       <Pair
-        wide={water ? <TodayWaterBlockView block={water} /> : null}
+        wide={water ? <TodayWaterBlockView block={water} query={dayQuery} /> : null}
         narrow={reliability ? <ReliabilityZoneView zone={reliability.zone} checks={reliability.checks} byBed={reliability.byBed} query={dayQuery} pending={pending} onRecalculatePlan={recalculatePlan} /> : null}
         layout="half"
       />

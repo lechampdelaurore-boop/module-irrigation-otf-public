@@ -1,5 +1,6 @@
 import { compareNamesNaturally } from '../bed-order.ts';
 import type { SoilGaugeZone } from '../soil-reserve/gauge-view.ts';
+import { soilGardenAnchor } from './reliability.ts';
 import { moreGardensLabel, shownFirst } from './week.ts';
 
 /**
@@ -30,6 +31,13 @@ type TodaySoilGarden = {
   text: string;
   /** « la plus sèche : B3, 32 % », ou `null`. */
   lowestText: string | null;
+  /** La phrase lue de la ligne, nom de son lien : « Jardin Nord : 72 %, la plus sèche : B3, 32 % ». */
+  label: string;
+  /**
+   * Le pli du jardin sur « Réserve du sol » (6 nonies, L2), où il s'observe ;
+   * une ligne « inconnue » y mène aussi : la raison se lit à l'arrivée.
+   */
+  anchor: string;
 };
 
 export type TodaySoil = {
@@ -48,6 +56,7 @@ function garden(plot: SoilGaugeZone['plots'][number]): TodaySoilGarden {
     ? percentText(percent)
     : plot.garden.countedBeds === 0 && plot.garden.unknownBeds === 0 ? 'aucune planche cultivée' : 'inconnue';
   const lowest = plot.garden.lowest;
+  const lowestText = lowest && plot.garden.countedBeds > 1 ? `la plus sèche : ${lowest.bedName}, ${percentText(lowest.percent)}` : null;
   return {
     key: plot.plotId,
     plotId: plot.plotId,
@@ -56,7 +65,9 @@ function garden(plot: SoilGaugeZone['plots'][number]): TodaySoilGarden {
     percent,
     barPercent: percent === null ? null : Math.min(PERCENT_MAXIMUM, Math.max(0, Math.round(percent))),
     text,
-    lowestText: lowest && plot.garden.countedBeds > 1 ? `la plus sèche : ${lowest.bedName}, ${percentText(lowest.percent)}` : null,
+    lowestText,
+    label: `${plot.name} : ${text}${lowestText ? `, ${lowestText}` : ''}`,
+    anchor: soilGardenAnchor(plot.plotId),
   };
 }
 

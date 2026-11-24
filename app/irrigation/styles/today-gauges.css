@@ -190,7 +190,8 @@
   gap: 6px;
 }
 
-.today-limit p {
+.today-limit-top,
+.today-limit-bottom {
   display: flex;
   margin: 0;
   justify-content: space-between;
@@ -216,6 +217,43 @@
 
 .today-limit-bar i {
   background: var(--water);
+}
+
+/*
+ * Les lignes des jauges, les cuves et les ressources mènent à leur page
+ * (docs/aujourdhui-liens-contract.md, L2) : le survol les éclaire, le
+ * focus clavier se voit, au téléphone chacune fait au moins 44 px.
+ */
+a.today-bar-row,
+a.today-tank-row,
+a.today-limit {
+  margin: -4px -6px;
+  padding: 4px 6px;
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.today-bar-row:hover,
+a.today-tank-row:hover,
+a.today-limit:hover {
+  background: var(--tile);
+}
+
+a.today-bar-row:focus-visible,
+a.today-tank-row:focus-visible,
+a.today-limit:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.today-tanks > li {
+  min-width: 0;
+}
+
+/* Le lien d'en-tête répété en bas du bloc : seulement au téléphone, où l'en-tête le cache. */
+.today-page .today-block-foot {
+  display: none;
 }
 
 /* « Fiabilité du calcul » : l'anneau et la liste des données suivies. */
@@ -458,6 +496,18 @@
 }
 
 @container (max-width: 620px) {
+  .today-page .today-block .today-block-foot {
+    display: inline-flex;
+    justify-self: stretch;
+  }
+
+  a.today-bar-row,
+  a.today-tank-row,
+  a.today-limit {
+    min-height: var(--touch-target);
+    align-content: center;
+  }
+
   /* Au téléphone, le nom et le chiffre sur une ligne, la barre dessous sur toute la largeur. */
   .today-bar-row {
     grid-template-columns: minmax(0, 1fr) auto;

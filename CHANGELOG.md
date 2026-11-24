@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (« Aujourd'hui » mène aux menus, L2)
+
+- **Les jauges de « Aujourd'hui » mènent à leur page** (D-311) : une ligne
+  de « Eau de la semaine » ouvre les besoins de son jardin, une ligne de
+  « Réserve du sol » le sol de son jardin, une cuve sa carte où son volume
+  se corrige ; « Eau disponible » gagne le lien « Ressources et pompes » ;
+  au téléphone, le lien de chaque bloc passe en bas, bien visible.
+
 ### Ajouté (« Aujourd'hui » mène aux menus, L1)
 
 - **Les quatre tuiles de la semaine mènent à leur menu** (D-310) : un
