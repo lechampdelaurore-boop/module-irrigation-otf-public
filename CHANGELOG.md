@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (alertes sur le téléphone, C4)
+
+- **L'écran des alertes dit quand l'appareil n'est plus inscrit** (D-306) :
+  quand l'autorisation des notifications est donnée mais que l'inscription
+  de l'appareil s'est perdue, l'écran « Alertes météo » le dit, en orange,
+  avec le bouton « Réactiver les notifications » ; le même bouton quand le
+  service n'a pas pu inscrire l'appareil. Avant, l'appareil se disait
+  « pas encore » inscrit. Aucune migration.
+
 ### Corrigé (alertes sur le téléphone, C3)
 
 - **La veille de 9 h prévient l'exploitant des alertes non délivrées**

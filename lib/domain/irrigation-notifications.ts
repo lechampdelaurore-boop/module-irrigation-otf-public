@@ -81,3 +81,49 @@ export function applicationServerKeyBytes(value: string): ArrayBuffer {
   }
   return bytes.buffer;
 }
+
+/** L'état des notifications de cet appareil, tel que la page le lit. */
+export type DeviceNotificationStatus =
+  | 'checking'
+  | 'enabled'
+  | 'default'
+  | 'denied'
+  | 'unsupported'
+  | 'unavailable';
+
+/**
+ * L'état de l'appareil à l'ouverture d'une page, avant le renouvellement :
+ * l'autorisation est donnée mais le navigateur n'a plus d'inscription
+ * (alertes sur le téléphone, C4, D-306). L'autorisation ne se donne qu'au
+ * geste « Activer » : l'appareil était donc inscrit, et son inscription
+ * s'est perdue (données du navigateur effacées, inscription expirée ou
+ * retirée par le service de notification).
+ */
+export function deviceSubscriptionLost(permission: NotificationPermission, hasSubscription: boolean): boolean {
+  return permission === 'granted' && !hasSubscription;
+}
+
+export const ACTIVATE_LABEL = 'Activer sur cet appareil';
+export const REACTIVATE_LABEL = 'Réactiver les notifications';
+
+/**
+ * Ce que l'écran des alertes dit de cet appareil, et le geste qu'il propose
+ * (C4, D-306) : « Activer » pour un appareil jamais inscrit ;
+ * « Réactiver les notifications » quand son inscription s'est perdue ou que
+ * le service n'a pas pu l'inscrire, le même geste `activate` (F372). Aucun
+ * geste quand le navigateur bloque ou ne sait pas recevoir : seul son
+ * réglage y peut quelque chose.
+ */
+export function alertDeviceView(status: DeviceNotificationStatus, subscriptionLost: boolean): { state: string; action: string | null } {
+  switch (status) {
+    case 'enabled': return { state: 'Cet appareil reçoit les alertes.', action: null };
+    case 'default':
+      return subscriptionLost
+        ? { state: 'Cet appareil ne reçoit plus les alertes : son inscription aux notifications s’est perdue.', action: REACTIVATE_LABEL }
+        : { state: 'Cet appareil ne reçoit pas encore les alertes.', action: ACTIVATE_LABEL };
+    case 'checking': return { state: 'Lecture de l’état de cet appareil…', action: null };
+    case 'denied': return { state: 'Les alertes sont bloquées dans les réglages du navigateur de cet appareil.', action: null };
+    case 'unsupported': return { state: 'Ce navigateur ne peut pas recevoir les alertes.', action: null };
+    case 'unavailable': return { state: 'Cet appareil ne reçoit pas les alertes : le service de notification n’a pas pu l’inscrire.', action: REACTIVATE_LABEL };
+  }
+}

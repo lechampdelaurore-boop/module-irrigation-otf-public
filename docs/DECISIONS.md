@@ -8954,3 +8954,33 @@ va bien » est le même quand aucune alerte n'a manqué son appareil. Aucune
 migration, aucun déclencheur nouveau. Contrat : `docs/tranche-4-contract.md`,
 F756 ; règle : `lib/domain/operations/operator-watch.ts` et
 `lib/domain/operations/undelivered-alerts.ts`.
+
+## D-306 — L'écran des alertes dit quand l'appareil n'est plus inscrit (alertes sur le téléphone, C4)
+
+Date : 24 novembre 2026. Statut : quatrième des cinq corrections de la
+section 6 octies de la roadmap, déléguées par le porteur le 24 novembre 2026
+à 9 h 36 ; réglage : Opus 5.5 · Élevé.
+
+**Contexte.** Un appareil dont l'inscription aux notifications s'est perdue
+(données du navigateur effacées, inscription expirée ou retirée par le
+service de notification) se présentait sur l'écran des alertes comme un
+appareil « qui ne reçoit pas encore les alertes ». Rien ne disait qu'il les
+recevait avant, ni qu'il fallait refaire le geste.
+
+**Décision.** À l'ouverture de l'écran, une autorisation donnée sans
+inscription veut dire une inscription perdue : l'autorisation ne se donne
+qu'au geste « Activer ». L'écran dit alors « Cet appareil ne reçoit plus
+les alertes : son inscription aux notifications s'est perdue. », en orange,
+avec le bouton **« Réactiver les notifications »**, le même geste `activate`
+(F372) ; le même bouton revient quand le service n'a pas pu inscrire
+l'appareil. Un appareil jamais inscrit garde « Activer sur cet appareil ».
+Contrat : `docs/weather-alerts-contract.md`, « L'écran » ; règle :
+`lib/domain/irrigation-notifications.ts`.
+
+**Limite.** La page ne sait pas qu'un appareil inscrit a cessé de recevoir
+côté service : à l'ouverture, elle renouvelle l'inscription (F372), ce qui
+la rétablit. Un appareil qui n'ouvre jamais le module n'apprend rien : c'est
+la carte de la ferme (C2) et la veille (C3) qui le disent à l'exploitant.
+
+**Ne change pas.** Le geste, l'abonnement, Réglages et la page des
+arrosages (leur texte est inchangé). Aucune migration.

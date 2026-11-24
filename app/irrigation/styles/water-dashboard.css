@@ -327,7 +327,8 @@
 .weather-alert-device { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-radius: 9.75px; background: var(--sheet); color: var(--green-dark); font-size: var(--text-12); }
 .weather-alert-device[data-status="denied"],
 .weather-alert-device[data-status="unsupported"],
-.weather-alert-device[data-status="unavailable"] { background: var(--warn-soft); color: var(--warn-ink); }
+.weather-alert-device[data-status="unavailable"],
+.weather-alert-device[data-lost="true"] { background: var(--warn-soft); color: var(--warn-ink); }
 .weather-alert-device a { color: var(--green-dark); font-weight: 700; }
 .weather-alert-form { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); }
 .weather-alert-fields { flex-wrap: wrap; }

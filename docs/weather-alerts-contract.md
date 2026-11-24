@@ -169,6 +169,19 @@ Un encart « Alertes météo » près de la météo de la semaine (question 5) :
   ont été activées, avec le bouton d'activation s'il ne l'est pas ;
 - l'historique des alertes envoyées, plus récente en premier.
 
+**Un appareil qui n'est plus inscrit** (alertes sur le téléphone, C4, D-306,
+24 novembre 2026). Quand l'autorisation des notifications est donnée sur
+l'appareil mais que le navigateur n'a plus d'inscription (données effacées,
+inscription expirée ou retirée par le service), l'écran le dit : « Cet
+appareil ne reçoit plus les alertes : son inscription aux notifications
+s'est perdue. », en orange, avec le bouton **« Réactiver les
+notifications »**. Le même bouton revient quand le service n'a pas pu
+inscrire l'appareil. C'est le geste « Activer » (`activate`, F372) : il
+réinscrit l'appareil pour la personne qui le touche. Un appareil jamais
+inscrit garde « Activer sur cet appareil » ; un navigateur qui bloque ou ne
+sait pas recevoir n'a pas de bouton. La règle vit dans
+`lib/domain/irrigation-notifications.ts` (`alertDeviceView`).
+
 La réorganisation 3.8 pourra déplacer cet encart avec les autres.
 
 ## Hors périmètre
