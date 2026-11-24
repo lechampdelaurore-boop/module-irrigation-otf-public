@@ -28,7 +28,7 @@ registres, elle y renvoie.
   Tests à deux fermes (`tests/db/objectif-automatique-semaines-closes.test.ts`).
   Contrôles : voir la PR. Reste O4, en Opus 5.5 · Élevé. Mise en ligne de
   #199 (O2, D-317) consignée ici : fusionnée le 24 novembre 2026 à
-  ⟪O2-FUSION⟫, **en ligne à ⟪O2-EN-LIGNE⟫** (run ⟪O2-RUN⟫, les cinq jobs
+  20 h 40, **en ligne à ⟪O2-EN-LIGNE⟫** (run 45472762765, les cinq jobs
   verts).
 - **Objectif automatique sur l'ET0, O2 : le réglage par ferme et ses
   lecteurs, codé le 24 novembre 2026** (D-317, F774 à F781, roadmap
