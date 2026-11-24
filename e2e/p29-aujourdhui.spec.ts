@@ -194,6 +194,20 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(lignesDeFiabilite(page).filter({ hasText: cuve })).toHaveCount(0);
   await verifierLEtape(page, journal, 'volume saisi, ligne disparue');
 
+  // La cuve mène à sa carte (6 nonies, L2, D-311) : le lien porte la phrase, le volume s'y corrige.
+  const eauDisponible = bloc(page, 'Eau disponible');
+  const lienCuve = eauDisponible.getByRole('link', { name: `${cuve} : 12 m³ sur 20 m³, observé aujourd’hui.` });
+  await expect(lienCuve).toHaveAttribute('href', /^\/irrigation\/ressources\?season=\d{4}#reservoir-/);
+  if (telephone) await verifierCibleTactile(lienCuve, 'La cuve');
+  // Le lien du bloc : en tête à l'ordinateur, en bas au téléphone, jamais les deux.
+  await expect(eauDisponible.getByRole('link', { name: 'Ressources et pompes', exact: true })).toHaveCount(1);
+  await expect(eauDisponible.locator(telephone ? '.today-block-foot' : '.today-block-more')).toBeVisible();
+  await lienCuve.click();
+  await attendreLaPagePrete(page, 'ressources');
+  await expect(page.locator(`.water-asset-card${new URL(page.url()).hash}`)).toContainText(cuve);
+  await expect(page.locator(`.water-asset-card${new URL(page.url()).hash}`)).toBeInViewport();
+  await verifierLEtape(page, journal, 'la cuve mène à sa carte');
+
   // J14 (lot A, F284) : le lien « Poser « Gel : moins de 3 °C » » de « Aujourd'hui » met le modèle de gel en vue,
   // le formulaire rempli et modifiable ; rien ne s'enregistre sans « Enregistrer l'alerte ».
   await page.goto('/irrigation/alertes-meteo#modele-gel');

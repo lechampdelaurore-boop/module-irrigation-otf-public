@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { pageHref } from '../lib/domain/features/pages';
-import { todayWeek, type TodayWeekBed, type TodayWeekInputs } from '../lib/domain/today/week';
+import type { SoilGaugeZone } from '../lib/domain/soil-reserve/gauge-view';
+import { todaySoil } from '../lib/domain/today/soil';
+import { waterBlock } from '../lib/domain/today/water';
+import { needsGardenAnchor, todayWeek, type TodayWeekBed, type TodayWeekInputs } from '../lib/domain/today/week';
+import type { WaterInfrastructure, WaterReservoir } from '../lib/domain/water-resources';
 
 /**
  * « Aujourd'hui » mène aux menus (docs/aujourdhui-liens-contract.md, D-308).
@@ -10,6 +14,11 @@ import { todayWeek, type TodayWeekBed, type TodayWeekInputs } from '../lib/domai
  * L1 (D-310) : les quatre tuiles de la semaine mènent à leur menu, avec un
  * mot d'action écrit ; deux textes corrigés (« rien aujourd'hui », un seul
  * « sur » par phrase). Les cas sont ceux du contrat, section 3.
+ *
+ * L2 (D-311) : les lignes de « Eau de la semaine » et de « Réserve du sol »,
+ * les cuves et les ressources limitées d'« Eau disponible » mènent à leur
+ * page ; leur lien porte la phrase écrite pour un lecteur d'écran
+ * (section 4).
  */
 
 const bed = (plotId: string, plotName: string, objectiveMm: number | null, values: Partial<TodayWeekBed> = {}): TodayWeekBed => ({
@@ -96,4 +105,73 @@ test('L1 : chaque tuile est un lien entier, le mot d’action écrit dessus ; le
   assert.doesNotMatch(view, /onClick|Action\(/, 'une tuile ne fait aucun geste');
   const css = readFileSync('app/irrigation/styles/today-board.css', 'utf8');
   assert.match(css, /\.today-kpi:focus-visible \{\n {2}outline: 3px solid var\(--focus-ring\);/);
+});
+
+// L2 — les jauges mènent à leur page (section 4).
+
+test('L2 : « Eau de la semaine » : la ferme au tableau des besoins, chaque jardin à son pli, la phrase lue en nom', () => {
+  const result = week([bed('g1', 'Champ du haut', 20), bed('g2', 'Champ du bas', 20)]);
+  assert.equal(result.farm.anchor, 'irrigation-needs-title');
+  assert.deepEqual(result.shown.map((row) => [row.anchor, row.label]), [
+    ['besoin-jardin-g2', 'Champ du bas : 6 / 20 mm'],
+    ['besoin-jardin-g1', 'Champ du haut : 6 / 20 mm'],
+  ]);
+  assert.equal(needsGardenAnchor('g1'), 'besoin-jardin-g1');
+  assert.equal(pageHref('besoins', { season: 2026 }, result.shown[0].anchor), '/irrigation/besoins?season=2026#besoin-jardin-g2');
+});
+
+const soilPlot = (plotId: string, name: string, garden: Partial<SoilGaugeZone['plots'][number]['garden']>): SoilGaugeZone['plots'][number] => ({
+  plotId, name, sheltered: false, week: [], observation: null, beds: [],
+  garden: { percent: null, lowest: null, countedBeds: 0, unknownBeds: 0, withoutCrop: [], ...garden },
+});
+
+test('L2 : « Réserve du sol » : chaque jardin à son pli sur « Réserve du sol », une ligne inconnue aussi', () => {
+  const soil = todaySoil({ zones: [{ plots: [
+    soilPlot('p1', 'Tunnel', { percent: 72.4, countedBeds: 3, lowest: { bedId: 'b3', bedName: 'T3', percent: 41.6 } }),
+    soilPlot('p2', 'Nord', { percent: null, unknownBeds: 2 }),
+  ] }] });
+  assert.deepEqual(soil.shown.map((garden) => [garden.anchor, garden.label]), [
+    ['soil-garden-p1', 'Tunnel : 72 %, la plus sèche : T3, 42 %'],
+    ['soil-garden-p2', 'Nord : inconnue'],
+  ]);
+});
+
+const reservoir = (id: string, name: string, volume: number | null): WaterReservoir => ({
+  id, name, type: 'tank', capacityCubicMeters: 20, currentVolumeCubicMeters: volume, currentVolumeObservedAt: volume === null ? null : '2026-11-12T05:00:00.000Z',
+  minimumSafetyCubicMeters: 0, exposedSurfaceSquareMeters: 0, receivesRain: false, evaporationEnabled: false,
+  evaporationCoefficient: 1, status: 'active', notes: null,
+});
+
+test('L2 : « Eau disponible » : chaque cuve à sa carte, chaque ressource limitée à la liste des ressources, la phrase en nom (F759)', () => {
+  const water: WaterInfrastructure = {
+    resources: [{ id: 'f1', name: 'Forage', type: 'borehole', nominalFlowCubicMetersPerHour: 3, status: 'active', availableFrom: null, availableUntil: null, notes: null }],
+    resourceLimits: [{ id: 'l1', resourceId: 'f1', enabled: true, maxCubicMetersPerDay: 12, validFrom: '2026-01-01', validUntil: null, referenceNote: null, createdAt: '2026-01-01T00:00:00.000Z' }],
+    reservoirs: [reservoir('r1', 'Cuve', 12), reservoir('r2', 'Citerne', null)],
+    resourceReservoirLinks: [], reservoirLinks: [], defaultSupply: null, movements: [],
+  };
+  const block = waterBlock(water, new Date('2026-11-12T05:00:00.000Z'));
+  assert.deepEqual(block.reservoirs.map((gauge) => [gauge.anchor, gauge.label]), [
+    ['reservoir-r2', 'Citerne : volume jamais saisi.'],
+    ['reservoir-r1', 'Cuve : 12 m³ sur 20 m³, observé aujourd’hui.'],
+  ]);
+  assert.deepEqual(block.limits.map((gauge) => [gauge.anchor, gauge.label]), [['water-resources-title', 'Forage : 12 m³ restants aujourd’hui sur 12 m³ (0 m³ prélevés).']]);
+  // Les phrases du bloc ne changent pas : chacune est le nom d'un lien.
+  assert.deepEqual(block.lines, [...block.reservoirs.map((gauge) => gauge.label), ...block.limits.map((gauge) => gauge.label)]);
+});
+
+test('L2 : les lignes, cuves et ressources sont des liens ; le dessin caché, la phrase lue ; le lien d’en-tête répété en bas au téléphone', () => {
+  const view = readFileSync('app/irrigation/today/today-gauges.tsx', 'utf8');
+  assert.match(view, /<a className="today-bar-row" data-total=\{total \|\| undefined\} href=\{href\}>/);
+  assert.match(view, /<a className="today-bar-row" data-kind="soil" href=\{href\}>/);
+  assert.match(view, /<a className="today-tank-row" href=\{pageHref\('ressources', query, reservoir\.anchor\)\}/);
+  assert.match(view, /<a key=\{limit\.id\} className="today-limit" href=\{pageHref\('ressources', query, limit\.anchor\)\}>/);
+  assert.match(view, /<a className="today-block-more" href=\{pageHref\('ressources', query\)\}>Ressources et pompes<\/a>/);
+  assert.equal(view.match(/<BlockFootLink /g)?.length, 3, 'les trois blocs à lien d’en-tête le répètent en bas');
+  assert.doesNotMatch(view, /role="img"/, 'le dessin est caché, le lien porte la phrase');
+  assert.doesNotMatch(view, /className="today-tanks" aria-hidden/, 'un lien ne vit jamais sous aria-hidden');
+  const css = readFileSync('app/irrigation/styles/today-gauges.css', 'utf8');
+  assert.match(css, /\.today-page \.today-block-foot \{\n {2}display: none;/);
+  assert.match(css, /a\.today-limit \{\n {4}min-height: var\(--touch-target\);/);
+  const needs = readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8');
+  assert.match(needs, /<details key=\{garden\.plotId\} id=\{needsGardenAnchor\(garden\.plotId\)\}>/);
 });

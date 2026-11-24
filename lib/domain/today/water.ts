@@ -2,7 +2,7 @@ import { waterText } from '../figure-origin.ts';
 import { percentFromFraction } from '../units.ts';
 import { FARM_TIME_ZONE } from '../water-management.ts';
 import { actualWithdrawalsByResourceAndDate, latestResourceLimit, type WaterInfrastructure } from '../water-resources.ts';
-import { RESERVOIR_VOLUME_MAX_AGE_DAYS } from './reliability.ts';
+import { RESERVOIR_VOLUME_MAX_AGE_DAYS, reservoirAnchor } from './reliability.ts';
 import { countText, dateWithYearText, daysBetween, farmDateKey } from './today-text.ts';
 import { compareNamesNaturally } from '../bed-order.ts';
 
@@ -37,6 +37,10 @@ type ReservoirGauge = {
    * en orange, et le mot le dit ; `null` sinon.
    */
   belowMinimumText: string | null;
+  /** La phrase lue de la cuve, nom de son lien (6 nonies, L2) : celle de `lines`. */
+  label: string;
+  /** La carte de la réserve sur « Ressources et pompes », où son volume se corrige. */
+  anchor: string;
 };
 
 type LimitGauge = {
@@ -51,7 +55,18 @@ type LimitGauge = {
   text: string;
   /** « 4 m³ prélevés ». */
   takenText: string;
+  /** La phrase lue de la ressource, nom de son lien : celle de `lines`. */
+  label: string;
+  /**
+   * Où mène la ressource (L2) : la liste des ressources de « Ressources et
+   * pompes » ; ses cartes n'ont pas d'ancre chacune, et le contrat ne change
+   * pas les pages d'arrivée (F759).
+   */
+  anchor: string;
 };
+
+/** Le titre de « Ressources et pompes », au-dessus de la liste des ressources. */
+const WATER_RESOURCES_ANCHOR = 'water-resources-title';
 
 export type TodayWaterBlock = {
   kind: 'water';
@@ -72,7 +87,7 @@ function byName<T extends { name: string }>(items: readonly T[]): T[] {
   return [...items].sort((a, b) => compareNamesNaturally(a.name, b.name));
 }
 
-function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], today: string): { gauge: ReservoirGauge; line: string } {
+function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], today: string): { gauge: Omit<ReservoirGauge, 'label' | 'anchor'>; line: string } {
   const capacityText = `sur ${waterText(reservoir.capacityCubicMeters, 'm³')}`;
   const base = { id: reservoir.id, name: reservoir.name, capacityCubicMeters: reservoir.capacityCubicMeters, capacityText, belowMinimumText: null };
   if (reservoir.currentVolumeCubicMeters === null) {
@@ -109,7 +124,7 @@ export function waterBlock(infrastructure: WaterInfrastructure, now: Date): Toda
   const reservoirs: ReservoirGauge[] = [];
   for (const reservoir of byName(infrastructure.reservoirs.filter((item) => item.status === 'active'))) {
     const { gauge, line } = reservoirGauge(reservoir, today);
-    reservoirs.push(gauge);
+    reservoirs.push({ ...gauge, label: line, anchor: reservoirAnchor(reservoir.id) });
     lines.push(line);
   }
   const limits: LimitGauge[] = [];
@@ -121,6 +136,7 @@ export function waterBlock(infrastructure: WaterInfrastructure, now: Date): Toda
     const remaining = Math.max(0, limit.maxCubicMetersPerDay - taken);
     const text = `${waterText(remaining, 'm³')} restants aujourd’hui sur ${waterText(limit.maxCubicMetersPerDay, 'm³')}`;
     const takenText = `${waterText(taken, 'm³')} prélevés`;
+    const line = `${resource.name} : ${text} (${takenText}).`;
     limits.push({
       id: resource.id,
       name: resource.name,
@@ -130,8 +146,10 @@ export function waterBlock(infrastructure: WaterInfrastructure, now: Date): Toda
       takenPercent: fillPercent(taken, limit.maxCubicMetersPerDay),
       text,
       takenText,
+      label: line,
+      anchor: WATER_RESOURCES_ANCHOR,
     });
-    lines.push(`${resource.name} : ${text} (${takenText}).`);
+    lines.push(line);
   }
   return { kind: 'water', lines, empty: lines.length === 0 ? NO_WATER_TRACKED : null, reservoirs, limits };
 }

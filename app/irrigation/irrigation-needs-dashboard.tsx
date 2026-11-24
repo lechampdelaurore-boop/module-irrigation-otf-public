@@ -8,6 +8,7 @@ import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriorit
 import { gardenUnknownReason } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
 import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
+import { needsGardenAnchor } from '@/lib/domain/today/week';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { PageSettingsFold } from './shell/page-settings-fold';
@@ -60,6 +61,19 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     window.addEventListener('irrigation-needs-source-changed', refresh);
     return () => { window.removeEventListener('irrigation-events-changed', refresh); window.removeEventListener('irrigation-needs-source-changed', refresh); };
   }, [receive, season]);
+  // Un lien d'« Aujourd'hui » vise un jardin (6 nonies, L2) : son pli s'ouvre et vient en haut, au chargement comme à un lien suivi dans la page.
+  useEffect(() => {
+    const openTargetedGarden = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const target = id ? document.getElementById(id) : null;
+      if (!(target instanceof HTMLDetailsElement) || !target.closest('.irrigation-needs-gardens')) return;
+      target.open = true;
+      requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    };
+    openTargetedGarden();
+    window.addEventListener('hashchange', openTargetedGarden);
+    return () => window.removeEventListener('hashchange', openTargetedGarden);
+  }, []);
   const sortedGardens = useMemo(() => dashboard.gardens.map((garden) => ({ ...garden, beds: [...garden.beds].sort(sorter(sort)) })), [dashboard.gardens, sort]);
   return <section className="irrigation-needs-section" aria-labelledby="irrigation-needs-title">
     <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">Besoins d’irrigation</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
@@ -68,7 +82,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     <div className="irrigation-needs-controls">
       <label><span>Trier les planches</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="priority">Priorités hautes</option><option value="deficit">Déficit le plus fort</option><option value="remaining">Besoin restant</option><option value="covered">Déjà couvert</option></select></label>
     </div>
-    <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId}>
+    <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId} id={needsGardenAnchor(garden.plotId)}>
       {/* Au téléphone, une ligne compacte : le nom, le reste à apporter, l'état ; le détail s'ouvre dessous. Une seule des deux formes s'affiche, et se lit (lot J, n° 15, F460). */}
       <summary><span className="garden-compact"><strong>{garden.plotName}</strong><b>{garden.effectiveNeedMm === null ? '—' : formatMm(garden.effectiveNeedMm)}</b>{gardenStateBadge(garden)}</span><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
       <p className="garden-compact-detail">{gardenSummaryDetail(garden)}</p>
