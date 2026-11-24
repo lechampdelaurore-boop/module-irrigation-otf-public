@@ -9053,8 +9053,8 @@ dans le tableau des besoins.
 
 Date : 24 novembre 2026. Statut : **choix du porteur consignés, contrat
 écrit sans code ; question 5 répondue le jour même à 18 h 46 : « Maintenir,
-éteint par défaut »** ; code en quatre PR, O1 et O2 codées le jour même
-(D-316, D-317) ; roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
+éteint par défaut »** ; code en quatre PR, O1, O2 et O3 codées le jour même
+(D-316, D-317, D-318) ; roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
 expresse du porteur pour ce seul fil ; code dans un autre fil, en Opus.
 
 **Contexte.** Le porteur demande le 24 novembre 2026 (13 h 25) « un bouton
@@ -9493,6 +9493,77 @@ K_abri oublié) font chacune échouer au moins un test.
 le besoin, le planning, la faisabilité, l'historique, les séries et les
 écrans sont ceux d'avant, pour toutes les fermes. Les semaines closes ne
 sont pas encore enregistrées (O3).
+
+## D-318 — L'objectif automatique, O3 : les semaines closes
+
+Date : 24 novembre 2026. Statut : codé (PR O3 sur 4 du contrat
+`docs/objectif-automatique-contract.md`, D-309, règle 6, sections 4, 6 et
+10) ; roadmap section 6 decies. Code en Opus 5.5 · Max, le réglage de la
+roadmap.
+
+**Décision.** Une semaine finie ne bouge plus. Chaque matin, juste après
+l'ETM du matin, la tâche du matin enregistre l'objectif automatique de
+chaque semaine close (son dimanche est passé) où le réglage de la ferme
+était allumé au moins un jour : une ligne par planche de la saison, dans
+`irrigation_automatic_objective_weeks` (migration additive 0048), avec les
+jours allumés de la semaine, chacun avec sa valeur et la nature de son
+ET0 ou ce qui l'empêchait, et la semaine sans culture. Une ligne n'est
+jamais réécrite. Les lecteurs de l'objectif la lisent par la source
+automatique (`closedWeeks`) : relire la météo, corriger un Kc ou un stade
+après coup ne change pas une semaine close, et son besoin de culture
+n'est plus recalculé. Une semaine close pas encore enregistrée se relit et
+se dit provisoire ; le matin suivant la rattrape
+(`lib/services/automatic-objective-record.ts`).
+
+**Précisions tranchées en codant** (contrat, section 10).
+
+- F782 : tous les jours allumés s'enregistrent, qu'un objectif saisi les
+  couvre ou non ; l'objectif saisi passe avant à la lecture, comme avant ;
+  les valeurs et les natures sont celles du matin de l'enregistrement.
+- F783 : une semaine à cheval sur deux années se ferme pour chacune de
+  ses saisons, avec ses jours de chacune ; la tâche du matin regarde
+  aussi la saison d'avant, toute l'année, pour la rattraper.
+- F784 : une planche apparue après l'enregistrement d'une semaine n'y a
+  pas d'objectif automatique, sans être dite provisoire.
+- F785 : « provisoire » se dit dans les avertissements de l'historique et
+  par `closure` pour les écrans d'O4 ; le rattrapage prend au plus huit
+  semaines par ferme et par matin, les plus anciennes d'abord, y compris
+  celles closes pendant qu'« Objectifs et besoins » était décochée (écart
+  assumé à P5 : sinon elles resteraient provisoires pour toujours) ; une
+  saison sans planche attend ses planches, sans prendre la part de l'autre.
+- F786 : seules les fermes qui ont coché « Objectifs et besoins » et
+  allumé le réglage au moins une fois ; rien n'est lu d'Ouvre ta ferme
+  quand aucune semaine ne manque.
+- F787 : une étape « objectif automatique » du calcul du matin ; une
+  ferme en échec est comptée et n'arrête pas les autres.
+- F788 : le coût mesuré sur la ferme fictive de 300 planches : semaines
+  closes enregistrées, l'historique de la saison passe de 469 à 297 ms et
+  les séries de 586 à 336 ms ; enregistrer huit semaines prend 190 ms.
+
+**Preuve.** `tests/objectif-automatique-semaines-closes.test.ts` (une
+semaine close enregistrée ne bouge pas quand la météo est relue ou qu'un
+Kc est corrigé ; ses natures et ses jours sans valeur restent ; la
+semaine sans culture ; F783, F784 ; l'objectif saisi passe avant ;
+l'historique compte les semaines provisoires) et
+`tests/db/objectif-automatique-semaines-closes.test.ts` (à deux fermes :
+l'enregistrement du lundi, jamais réécrit, rien le dimanche ; la météo
+relue chez l'une, la ferme d'à côté sans enregistrement relit et dit
+« provisoire » ; un Kc corrigé ; le rattrapage après un matin manqué,
+huit semaines au plus, les plus anciennes d'abord ; une saison sans
+planche ; F784 ; les fermes de la tâche du matin). Contre-épreuve :
+dix-huit altérations (semaine close relue au lieu de son enregistrement,
+jamais « provisoire », close dès son dimanche dans le domaine ou dans la
+source, aucune semaine provisoire dans la source ou dans l'historique,
+planche absente relue, tâche qui réenregistre, ligne réécrite,
+rattrapage sans borne ou les plus récentes d'abord, saison d'avant
+oubliée, saison sans planche qui prend la part de l'autre, semaine en
+cours enregistrée, « Objectifs et besoins » ignorée, semaine sans
+culture recalculée, table oubliée à l'effacement, étape oubliée au
+compte rendu du matin) font chacune échouer au moins un test.
+
+**Ne change pas.** Aucun écran ne montre ni n'allume le réglage (O4) :
+rien ne s'écrit dans la nouvelle table tant qu'aucune ferme ne l'allume,
+et les lecteurs restent ceux d'avant pour toutes les fermes.
 
 ## D-320 — Les heures de silence des notifications : le contrat, sans code
 

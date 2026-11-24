@@ -82,9 +82,11 @@ export type IrrigationHistorySummary = {
    * Présent quand la ferme a allumé l'objectif automatique sur la période
    * (D-309, D-317) : les journées-planche qu'il a remplies, et celles où il
    * s'appliquait sans valeur (ET0 manquante ou hors bornes, jardin à
-   * classer, plan de culture non lu), jamais comptées pour zéro (D-003).
+   * classer, plan de culture non lu), jamais comptées pour zéro (D-003) ;
+   * et les semaines closes où il s'est appliqué sans être encore enregistré
+   * par la tâche du matin : provisoires (règle 6, D-318).
    */
-  objectiveAutomatic?: { bedDays: number; missingBedDays: number };
+  objectiveAutomatic?: { bedDays: number; missingBedDays: number; provisionalWeeks: number };
   irrigationAndRainMm: number | null;
   gapToObjectiveMm: number | null;
   scopeAreaSquareMeters: number;

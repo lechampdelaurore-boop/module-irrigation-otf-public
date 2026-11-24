@@ -31,6 +31,18 @@ export async function listAutomaticObjectiveRevisionsForUser(ownerUserId: string
 }
 
 /**
+ * Les espaces dont le réglage a été allumé au moins une fois : seuls eux ont
+ * des semaines closes à enregistrer chaque matin (O3, D-318). Une lecture
+ * pour toutes les fermes, quand personne ne l'a allumé.
+ */
+export async function listWorkspacesWithAutomaticObjective(): Promise<Set<string>> {
+  const result = await db.prepare(
+    `SELECT DISTINCT workspace_id FROM irrigation_automatic_objective_revisions WHERE enabled = 1`,
+  ).all<{ workspace_id: string }>();
+  return new Set(result.results.map((row) => row.workspace_id));
+}
+
+/**
  * Allume ou éteint l'objectif automatique de la ferme, à l'instant `now` du
  * geste. Un geste qui ne change pas l'état en vigueur n'écrit rien, au
  * journal non plus ; sinon la ligne et celle du journal des modifications

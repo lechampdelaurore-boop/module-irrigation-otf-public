@@ -1,5 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { automaticWeatherRepository } from '@/db/automatic-weather-repository';
+import { recordAutomaticObjectiveWeeksForAllWorkspaces } from '@/lib/services/automatic-objective-record';
 import { evaluateCropAlertsAfterForecastWrite, evaluateCropDryingForAllWorkspaces } from '@/lib/services/crop-alerts-service';
 import { recordEtmDaysForAllWorkspaces } from '@/lib/services/crop-water-etm-record';
 import { runDueFarmErasures } from '@/lib/services/farm-erasure';
@@ -44,6 +45,9 @@ export async function POST(request: Request) {
     // L'ETM de chaque planche s'enregistre après la météo du matin (docs/crop-water-need-contract.md,
     // « La traçabilité ») ; comme le planning, un échec est compté à part.
     const cropWater = report.cropWater = result.status === 'completed' ? await recordEtmDaysForAllWorkspaces() : null;
+    // Puis les semaines closes de l'objectif automatique (docs/objectif-automatique-contract.md, règle 6) :
+    // enregistrées une fois, jamais réécrites ; une semaine manquée est rattrapée le matin suivant.
+    const automaticObjective = report.automaticObjective = result.status === 'completed' ? await recordAutomaticObjectiveWeeksForAllWorkspaces() : null;
     // Puis l'état du jour de la jauge de la réserve du sol (docs/soil-reserve-contract.md, 5 ter, PR 3d).
     const soilReserve = report.soilReserve = result.status === 'completed' ? await recordSoilDaysForAllWorkspaces() : null;
     // Le séchage est une échéance du plan de culture : il s'évalue chaque matin, même si la météo est en panne.
@@ -58,7 +62,7 @@ export async function POST(request: Request) {
     // même quand rien ne lit Ouvre ta ferme ; un échec ne fait pas échouer le matin.
     const retentionPurge = report.retentionPurge = result.status === 'already-running' ? null : await runRetentionPurges();
     await recordMorningTaskRuns(report);
-    return Response.json({ ...result, planning, cropWater, soilReserve, cropDrying, otfVault, farmErasure, retentionPurge }, {
+    return Response.json({ ...result, planning, cropWater, automaticObjective, soilReserve, cropDrying, otfVault, farmErasure, retentionPurge }, {
       status: result.status === 'already-running' ? 409 : 200,
       headers: { 'cache-control': 'no-store' },
     });

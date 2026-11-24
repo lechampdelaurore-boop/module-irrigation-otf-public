@@ -9,6 +9,7 @@ import {
   type Et0Nature,
   type Et0Reading,
 } from './crop-water/etm.ts';
+import { dateKeys } from './irrigation-history/dates.ts';
 import { FARM_TIME_ZONE, addDaysToDateKey, dateKeyInTimeZone, weekStartDateKey } from './water-management.ts';
 
 /**
@@ -18,6 +19,10 @@ import { FARM_TIME_ZONE, addDaysToDateKey, dateKeyInTimeZone, weekStartDateKey }
  * connu, sinon l'ET0 du jour, multipliée par le K_abri sous abri. La valeur
  * se relit depuis la météo enregistrée : rien n'est écrit jour après jour,
  * l'objectif du matin suit la synchronisation du matin.
+ *
+ * Une semaine close ne bouge plus (règle 6, O3, D-318) : la tâche du matin
+ * l'enregistre par planche, et sa valeur se lit dans cet enregistrement,
+ * jamais recalculée ; d'ici là, elle se relit et se dit provisoire.
  *
  * L'ET0 n'entre dans le besoin que par l'objectif : l'écart reste
  * « objectif − (irrigation réelle + pluie réelle) » (D-010, exception de
@@ -60,6 +65,13 @@ export type AutomaticObjectiveInput = {
   /** Les K_abri enregistrés ; celui d'une planche sous abri est celui de son jardin, sinon 0,8. */
   shelterFactors: BedWaterSettings['shelterFactors'];
   cropNeed: AutomaticObjectiveCropNeed;
+  /**
+   * Les semaines closes enregistrées par la tâche du matin, par lundi (règle
+   * 6, O3) : une semaine enregistrée se lit telle quelle, jamais recalculée ;
+   * un jour qu'elle ne porte pas n'a pas d'objectif automatique pour la
+   * planche (une planche apparue après l'enregistrement, F784).
+   */
+  closedWeeks?: ReadonlyMap<string, RecordedAutomaticObjectiveWeek>;
 };
 
 /** La valeur automatique d'un jour, ou ce qui l'empêche, toujours nommé. */
@@ -86,6 +98,17 @@ type AutomaticObjectiveDay = { date: string } & (
 
 type ValuedDay = Extract<AutomaticObjectiveDay, { mm: number }>;
 
+/**
+ * L'objectif automatique d'une planche pour une semaine close, tel que la
+ * tâche du matin l'a enregistré (règle 6, O3) : les jours de la saison où le
+ * réglage était allumé, chacun avec sa valeur et la nature de son ET0, ou ce
+ * qui l'empêchait ce matin-là ; et la semaine sans culture (F772).
+ */
+export type RecordedAutomaticObjectiveWeek = {
+  noCropWeek: boolean;
+  days: readonly AutomaticObjectiveDay[];
+};
+
 /** L'objectif automatique d'une planche sur les jours de la semaine où il s'applique. */
 export type AutomaticObjectiveWeek = {
   /** Les jours où il s'applique (réglage allumé, aucun objectif saisi), chacun avec sa valeur ou ce qui manque. */
@@ -102,6 +125,12 @@ export type AutomaticObjectiveWeek = {
   noCropWeek: boolean;
   /** Ce sur quoi la somme repose : la culture, l'ET0, l'ET0 sous abri, ou plusieurs ; `null` sans somme. */
   basis: 'crop' | 'et0' | 'sheltered-et0' | 'mixed' | null;
+  /**
+   * La semaine est en cours ou à venir (`open`) ; close et lue dans son
+   * enregistrement (`recorded`) ; ou close sans enregistrement encore, relue
+   * en attendant le prochain matin (`provisional`, règle 6).
+   */
+  closure: 'open' | 'recorded' | 'provisional';
 };
 
 /**
@@ -164,8 +193,15 @@ function weekOf(
   dates: readonly string[],
   { readings, cropDays }: DayLookups,
 ): AutomaticObjectiveWeek {
-  const noCropWeek = cropDays !== null && weekDates.every((date) => cropDays.get(date)?.status === 'no-crop');
-  const days = dates.map((date) => automaticObjectiveDay(input, bed, date, readings, cropDays));
+  // Une semaine close enregistrée se lit telle quelle : ni la météo relue, ni un Kc ou un stade corrigé ne la changent (règle 6).
+  const recorded = input.closedWeeks?.get(weekDates[0]);
+  const recordedDays = recorded ? new Map(recorded.days.map((day) => [day.date, day])) : null;
+  const noCropWeek = recorded
+    ? recorded.noCropWeek
+    : cropDays !== null && weekDates.every((date) => cropDays.get(date)?.status === 'no-crop');
+  const days = recordedDays
+    ? dates.flatMap((date) => recordedDays.get(date) ?? [])
+    : dates.map((date) => automaticObjectiveDay(input, bed, date, readings, cropDays));
   const valued = noCropWeek ? [] : days.filter(isValued);
   const byNature: Record<Et0Nature, number> = { reanalysis: 0, estimated: 0, forecast: 0 };
   for (const day of valued) if (day.status !== 'no-crop') byNature[day.nature] += day.mm;
@@ -177,6 +213,7 @@ function weekOf(
     missingDates: days.filter((day) => !isValued(day)).map((day) => day.date),
     noCropWeek,
     basis: basisOf(valued),
+    closure: recorded ? 'recorded' : weekDates[weekDates.length - 1] < input.today ? 'provisional' : 'open',
   };
 }
 
@@ -213,6 +250,48 @@ export function automaticObjectivePeriod(
     weekDates: Array.from({ length: 7 }, (_, offset) => addDaysToDateKey(monday, offset)),
     days,
   }));
+}
+
+/**
+ * Les semaines closes d'une saison où le réglage était allumé au moins un
+ * jour, que la tâche du matin enregistre (règle 6, O3) : du 1er janvier au
+ * dernier dimanche passé, sans dépasser le 31 décembre ; chaque semaine porte
+ * ses jours allumés de la saison. Une semaine à cheval sur deux années se
+ * ferme pour chacune de ses deux saisons, avec les jours de chacune (F783).
+ */
+export function automaticObjectiveClosedPeriod(
+  settings: readonly AutomaticObjectiveSettingRevision[],
+  season: number,
+  today: string,
+): AutomaticObjectivePeriod {
+  const lastClosedDay = addDaysToDateKey(weekStartDateKey(today), -1);
+  const seasonEnd = `${season}-12-31`;
+  return automaticObjectivePeriod(settings, dateKeys(`${season}-01-01`, lastClosedDay < seasonEnd ? lastClosedDay : seasonEnd));
+}
+
+/**
+ * Les saisons où une semaine close peut manquer ce matin : celle du jour et la
+ * précédente, pour une semaine à cheval sur deux années (F783) ou un
+ * rattrapage passé le 1er janvier (F785).
+ */
+export function automaticObjectiveRecordSeasons(today: string): number[] {
+  const season = Number(today.slice(0, 4));
+  return [season - 1, season];
+}
+
+/**
+ * Ce que la tâche du matin enregistre d'une planche pour une semaine close
+ * (règle 6, O3) : ses jours allumés, chacun avec la valeur que
+ * `objectiveForBed` lui donne ce matin-là, et la semaine sans culture.
+ * Toujours relu, jamais tiré d'un enregistrement.
+ */
+export function automaticObjectiveWeekRecord(
+  input: AutomaticObjectiveInput,
+  bed: Pick<Bed, 'plotId'>,
+  week: AutomaticObjectivePeriod[number],
+): RecordedAutomaticObjectiveWeek {
+  const { noCropWeek, days } = weekOf({ ...input, closedWeeks: undefined }, bed, week.weekDates, week.days, dayLookups(input));
+  return { noCropWeek, days };
 }
 
 /**

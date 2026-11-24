@@ -36,6 +36,8 @@ export type MorningRunReport = {
   };
   planning?: { failed: number } | null;
   cropWater?: { failed: number } | null;
+  /** Les semaines closes de l'objectif automatique (6 decies, O3, D-318). */
+  automaticObjective?: { failed: number } | null;
   soilReserve?: { failed: number } | null;
   cropDrying?: { failed: number } | null;
   otfVault?: { status: 'dormant' | 'unavailable' | 'failed' } | { status: 'done'; unreadable: number } | null;
@@ -119,6 +121,7 @@ function morningCalculationOutcome(report: MorningRunReport, interrupted: string
   const steps = [
     ['planning', report.planning],
     ['eau des cultures', report.cropWater],
+    ['objectif automatique', report.automaticObjective],
     ['réserve du sol', report.soilReserve],
     ['séchage avant récolte', report.cropDrying],
   ] as const;

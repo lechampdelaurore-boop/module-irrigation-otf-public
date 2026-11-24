@@ -185,7 +185,7 @@ test('un jour sans ET0 n’a pas de valeur : la semaine se dit incomplète et no
     ownerUserId: ALICE, season: 2026, snapshot, now: MONDAY_MORNING,
     selection: { period: { mode: 'week', anchorDate: WEEK }, scope: { level: 'farm' }, page: 1 },
   });
-  assert.deepEqual(history.summary.objectiveAutomatic, { bedDays: 12, missingBedDays: 2 });
+  assert.deepEqual(history.summary.objectiveAutomatic, { bedDays: 12, missingBedDays: 2, provisionalWeeks: 0 });
   assert.deepEqual(history.summary.objectiveAvailability, { availableBedDays: 12, totalBedDays: 14, complete: false });
   assert.ok(
     history.warnings.some((warning) => warning.startsWith('L’objectif automatique n’a pas de valeur pour 2 journées-planche')),
@@ -202,7 +202,7 @@ test('l’historique et l’aide du formulaire d’irrigation lisent la même r�
   const alice = await getIrrigationHistoryDashboardForUser({ ownerUserId: ALICE, season: 2026, snapshot, now: MONDAY_MORNING, selection });
   near(alice.summary.objectiveMm, (30 + 24) / 2, 'deux planches de même surface : la moyenne pondérée');
   assert.deepEqual(alice.summary.objectiveAvailability, { availableBedDays: 14, totalBedDays: 14, complete: true });
-  assert.deepEqual(alice.summary.objectiveAutomatic, { bedDays: 14, missingBedDays: 0 });
+  assert.deepEqual(alice.summary.objectiveAutomatic, { bedDays: 14, missingBedDays: 0, provisionalWeeks: 0 });
   assert.equal(alice.warnings.some((warning) => warning.includes('objectif automatique')), false, 'rien ne manque : rien à dire');
 
   const bob = await getIrrigationHistoryDashboardForUser({ ownerUserId: BOB, season: 2026, snapshot, now: MONDAY_MORNING, selection });
