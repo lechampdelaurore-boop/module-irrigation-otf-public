@@ -9053,8 +9053,8 @@ dans le tableau des besoins.
 
 Date : 24 novembre 2026. Statut : **choix du porteur consignés, contrat
 écrit sans code ; question 5 répondue le jour même à 18 h 46 : « Maintenir,
-éteint par défaut »** ; code en quatre PR, O1 codée le jour même (D-316) ;
-roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
+éteint par défaut »** ; code en quatre PR, O1 et O2 codées le jour même
+(D-316, D-317) ; roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
 expresse du porteur pour ce seul fil ; code dans un autre fil, en Opus.
 
 **Contexte.** Le porteur demande le 24 novembre 2026 (13 h 25) « un bouton
@@ -9434,3 +9434,63 @@ au lieu de Paris, priorité de l'objectif saisi oubliée) font chacune
 `objectiveForBed` : le besoin, l'écart, le planning, la faisabilité,
 l'historique, les séries et les écrans sont ceux d'avant, pour toutes les
 fermes. Aucune donnée, aucune migration, aucun écran (O2 à O4).
+
+## D-317 — L'objectif automatique, O2 : le réglage par ferme et ses lecteurs
+
+Date : 24 novembre 2026. Statut : codé (PR O2 sur 4 du contrat
+`docs/objectif-automatique-contract.md`, D-309, sections 3, 4 et 9) ;
+roadmap section 6 decies. Code en Opus 5.5 · Max, le réglage de la roadmap.
+
+**Décision.** Le réglage « Objectif automatique » est gardé par ferme,
+geste par geste, dans `irrigation_automatic_objective_revisions`
+(migration additive 0047) : éteint au départ, allumé ou éteint par un geste
+daté qui compte à partir de son jour, en heure de Paris (D-316, F773). Le
+geste s'écrit au journal des modifications, dans la même opération ; un
+geste qui ne change pas l'état en vigueur n'écrit rien. Chaque lecteur de
+l'objectif reçoit la source automatique, lue une fois
+(`lib/services/automatic-objective-source.ts`), et la passe à
+`objectiveForBed` : le besoin, et par lui le planning, la faisabilité et
+« Aujourd'hui » ; l'aide du formulaire d'irrigation ; les fiches d'une
+planche et d'une série ; l'écart entre prévu et réel ; l'historique et les
+séries, qui composent l'objectif de leur période jour par jour avec les
+valeurs qu'`objectiveForBed` donne à chaque jour. Réglage éteint, chaque
+lecteur garde son calcul d'avant.
+
+**Précisions tranchées en codant** (contrat, section 9).
+
+- F774 : une ligne par geste, jamais réécrite ; un geste sans changement
+  n'écrit ni ligne ni journal ; le journal dit « éteint → allumé ».
+- F775 : un geste rend la faisabilité à refaire ; le recalcul du plan
+  après le geste revient à l'action de l'écran (O4).
+- F776 : une source par lecture ; éteint, deux requêtes et rien d'autre.
+- F777 : une planche dont le jardin manque à l'instantané n'a pas
+  d'objectif automatique, comme un jardin à classer.
+- F778 : dans l'historique et les séries, un jour sans valeur automatique
+  est compté à part, jamais pour zéro ; l'historique le dit.
+- F779 : l'objectif restant d'une série devient inconnu dès qu'un de ses
+  jours n'a pas de valeur automatique (au-delà de la prévision, le plus
+  souvent).
+- F780 : le tableau des besoins rend l'origine de l'objectif et le détail
+  de ses jours automatiques, pour les écrans d'O4.
+- F781 : le coût mesuré sur une ferme fictive de 300 planches : allumé,
+  le besoin de la semaine passe de 71 à 118 ms et l'historique de la saison
+  de 44 à 457 ms, après une correction qui l'a divisé par trois ; aucune
+  requête vers Ouvre ta ferme.
+
+**Preuve.** `tests/db/objectif-automatique-reglage.test.ts` (à deux
+fermes : éteint au départ, le geste et son journal, la faisabilité, le
+besoin en plein champ et sous abri, l'objectif saisi qui passe avant, le
+réglage éteint un jeudi, un jour sans ET0, l'historique et l'aide du
+formulaire ; la ferme d'à côté ne change jamais),
+`tests/objectif-automatique-lecteurs.test.ts` et
+`tests/series-water.test.ts`. Contre-épreuve : neuf altérations (jour sans
+valeur compté, objectif automatique avant le saisi, restant sans garde,
+semaine sans culture lue sur les seuls jours de la période, besoin,
+historique ou aide du formulaire privés de la source, geste sans garde,
+K_abri oublié) font chacune échouer au moins un test.
+
+**Ne change pas.** Aucun écran ne montre ni n'allume le réglage (O4) :
+le besoin, le planning, la faisabilité, l'historique, les séries et les
+écrans sont ceux d'avant, pour toutes les fermes. Les semaines closes ne
+sont pas encore enregistrées (O3).
+

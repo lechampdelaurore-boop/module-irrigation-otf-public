@@ -47,6 +47,8 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     // arrêtée à la 0041, ses lignes vont dans une table temporaire, hors de la copie, effacée avant la migration.
     sqlite.exec(`CREATE TEMP TABLE irrigation_change_journal (id, workspace_id, family, subject, object_id, object_context, action,
       before_values, after_values, actor_user_id, created_at)`);
+    // Même raison : ils lisent le réglage de l'objectif automatique (0047, D-317), vide, donc éteint.
+    sqlite.exec('CREATE TEMP TABLE irrigation_automatic_objective_revisions (id, workspace_id, enabled, actor_user_id, created_at)');
     const choice = resolveDemoChoice('maraichage', 'ete');
     await prepareDemoSpace(demoOwnerUserId('copie', choice), choice);
     delete process.env.DEMO_MODE;
@@ -57,6 +59,7 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     assert.throws(() => insertDay(sqlite, workspace, '2026-07-04', 12.1), /CHECK constraint failed/, 'avant : 12 au plus');
     const sqlBefore = tableSql(sqlite);
     sqlite.exec('DROP TABLE temp.irrigation_change_journal');
+    sqlite.exec('DROP TABLE temp.irrigation_automatic_objective_revisions');
 
     const before = dump(sqlite);
     assert.ok(before[TABLE].length >= 3);

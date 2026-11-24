@@ -52,7 +52,13 @@ Les lectures où le plus récent fait foi :
   `listDailyWaterLimitsForUser` ;
 - les révisions de limite de prélèvement d'une ressource,
   `irrigation_water_resource_limit_revisions`, lues par
-  `listWaterInfrastructureForUser`.
+  `listWaterInfrastructureForUser` ;
+- les gestes sur le réglage de l'objectif automatique,
+  `irrigation_automatic_objective_revisions`, lus par
+  `listAutomaticObjectiveRevisionsForUser` dans l'ordre d'écriture et remis
+  en ordre par `automaticObjectiveSchedule` dans
+  `lib/domain/automatic-objective.ts` ; la garde d'écriture lit le dernier
+  geste de la même façon (depuis le 24 novembre 2026, D-317, F774).
 
 Hors portée, notés sans être corrigés : les ordres d'affichage départagés par
 l'identifiant, placements de matériel, liaisons entre ressources et réserves,

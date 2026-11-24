@@ -9,6 +9,8 @@ import { buildSeriesWaterReport, periodBetween, type SeriesWaterReport } from '.
 import { dateKeyInTimeZone, weekStartDateKey } from '../domain/water-management';
 import { weatherLocationKey } from '../domain/weather/location';
 import { readWeatherPreference } from './weather-preference';
+import { dateKeys } from '../domain/irrigation-history/dates';
+import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
 
 export type SeriesWaterDashboard =
   | {
@@ -62,9 +64,14 @@ export async function getSeriesWaterDashboardForUser({
     if (occupation.endDate !== null && occupation.endDate > latestEnd) latestEnd = occupation.endDate;
   }
 
-  const [events, weather, goalRevisions] = earliestStart === null
-    ? [[], [], []]
-    : await readInputs(ownerUserId, season, snapshot, earliestStart, today, latestEnd);
+  const [[events, weather, goalRevisions], automatic] = earliestStart === null
+    ? [[[], [], []], null]
+    : await Promise.all([
+      readInputs(ownerUserId, season, snapshot, earliestStart, today, latestEnd),
+      // L'objectif automatique, quand la ferme l'a allumé (D-309) : la règle de l'historique, jusqu'à la dernière récolte attendue.
+      readAutomaticObjectiveSourceForUser({ ownerUserId, season, snapshot, from: earliestStart, to: latestEnd, now }),
+    ]);
+  const placedBedIds = new Set(cropPlan.places.map((place) => place.bedId));
 
   const report = buildSeriesWaterReport({
     cropPlan,
@@ -74,6 +81,9 @@ export async function getSeriesWaterDashboardForUser({
     weather,
     goalRevisions,
     today,
+    automaticObjective: earliestStart === null
+      ? undefined
+      : automatic?.dayValuesFor(snapshot.beds.filter((bed) => placedBedIds.has(bed.id)), dateKeys(earliestStart, latestEnd)),
   });
 
   return {

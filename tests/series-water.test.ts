@@ -4,6 +4,7 @@ import type { Bed, CropPlan, Plot } from '../lib/domain/domain.ts';
 import type { IrrigationEventRecord } from '../lib/domain/irrigation-event-record.ts';
 import type { GoalRevisionLike, WeatherDailyLike } from '../lib/domain/irrigation-history/contract.ts';
 import { buildSeriesWaterReport, periodBetween } from '../lib/domain/series/water.ts';
+import { dateKeys } from '../lib/domain/irrigation-history/dates.ts';
 
 const TODAY = '2026-09-29';
 
@@ -228,4 +229,51 @@ test('la période d’une série commence au lundi 00:00 à la ferme, pas en UTC
   assert.equal(period.endAtExclusive, '2026-06-28T22:00:00.000Z');
   const winter = periodBetween('2025-11-03', '2025-11-09');
   assert.equal(winter.startAt, '2025-11-02T23:00:00.000Z', 'heure d’hiver');
+});
+
+test('l’objectif automatique remplit les jours sans objectif saisi ; un jour sans valeur rend l’objectif restant inconnu (D-309, D-003)', () => {
+  // Choux plantés W36 (31 août), récolte attendue W44 (dimanche 1er novembre) : observé du 31 août au 29 septembre,
+  // 30 jours ; restant du 30 septembre au 1er novembre, 33 jours. L'objectif automatique vaut 3 mm par jour.
+  const cropPlan = plan({
+    series: [series('choux', 'Choux', ['2026-W44'])],
+    places: [{ id: 'p2', seriesId: 'choux', bedId: 'bed-n01', lengthMeters: 30 }],
+    implantationTasks: [sowing('choux', '2026-W36')],
+  });
+  const weather = days('2026-08-31', '2026-09-29', 0);
+  const everyDay = (value: (date: string) => number | null) => new Map([
+    ['bed-n01', new Map(dateKeys('2026-08-31', '2026-11-01').map((date) => [date, value(date)]))],
+  ]);
+  const report = (automaticObjective?: ReturnType<typeof everyDay>, goalRevisions: GoalRevisionLike[] = []) => (
+    buildSeriesWaterReport({ cropPlan, beds, plots, events: [], weather, goalRevisions, today: TODAY, automaticObjective }).series[0]
+  );
+
+  const known = report(everyDay(() => 3));
+  assert.equal(known.objectiveMm, 90, '30 jours × 3 mm');
+  assert.deepEqual(known.objectiveAvailability, { availableBedDays: 30, totalBedDays: 30, complete: true });
+  assert.deepEqual(known.objectiveAutomatic, { bedDays: 30, missingBedDays: 0 });
+  assert.equal(known.objectiveRemainingMm, 99, '33 jours × 3 mm');
+  assert.equal(known.gapToObjectiveMm, 90, 'objectif 90 − irrigation 0 − pluie 0');
+
+  // Au-delà de l'ET0 prévue, l'objectif automatique n'a pas de valeur : le restant est inconnu, pas une somme partielle.
+  const beyondForecast = report(everyDay((date) => (date > '2026-10-06' ? null : 3)));
+  assert.equal(beyondForecast.objectiveMm, 90, 'l’observé ne change pas');
+  assert.equal(beyondForecast.objectiveRemainingMm, null);
+
+  // Un objectif de ferme de 14 mm posé la semaine du 14 septembre passe avant : 14 × 3 + 16 × 2 = 74 mm observés ;
+  // il couvre aussi tout le restant, 33 × 2 = 66 mm, même les jours où l'objectif automatique n'a pas de valeur.
+  const entered = report(everyDay((date) => (date > '2026-10-06' ? null : 3)), [farmGoal(14, '2026-09-14')]);
+  assert.equal(entered.objectiveMm, 74);
+  assert.deepEqual(entered.objectiveAutomatic, { bedDays: 14, missingBedDays: 0 });
+  assert.equal(entered.objectiveRemainingMm, 66);
+
+  // Un jour observé sans valeur : compté à part, jamais pour zéro en silence.
+  const missingDay = report(everyDay((date) => (date === '2026-09-15' ? null : 3)));
+  assert.equal(missingDay.objectiveMm, 87);
+  assert.deepEqual(missingDay.objectiveAvailability, { availableBedDays: 29, totalBedDays: 30, complete: false });
+  assert.deepEqual(missingDay.objectiveAutomatic, { bedDays: 29, missingBedDays: 1 });
+
+  // Réglage éteint : rien ne change.
+  const off = report();
+  assert.equal('objectiveAutomatic' in off, false);
+  assert.equal(off.objectiveMm, null);
 });

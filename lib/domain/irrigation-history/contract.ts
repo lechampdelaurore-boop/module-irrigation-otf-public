@@ -78,6 +78,13 @@ export type IrrigationHistorySummary = {
     totalBedDays: number;
     complete: boolean;
   };
+  /**
+   * Présent quand la ferme a allumé l'objectif automatique sur la période
+   * (D-309, D-317) : les journées-planche qu'il a remplies, et celles où il
+   * s'appliquait sans valeur (ET0 manquante ou hors bornes, jardin à
+   * classer, plan de culture non lu), jamais comptées pour zéro (D-003).
+   */
+  objectiveAutomatic?: { bedDays: number; missingBedDays: number };
   irrigationAndRainMm: number | null;
   gapToObjectiveMm: number | null;
   scopeAreaSquareMeters: number;

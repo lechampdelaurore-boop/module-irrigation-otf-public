@@ -43,6 +43,8 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
     // arrêtée à la 0033, ses lignes vont dans une table temporaire, hors de la copie, effacée avant les migrations.
     sqlite.exec(`CREATE TEMP TABLE irrigation_change_journal (id, workspace_id, family, subject, object_id, object_context, action,
       before_values, after_values, actor_user_id, created_at)`);
+    // Même raison : ils lisent le réglage de l'objectif automatique (0047, D-317), vide, donc éteint.
+    sqlite.exec('CREATE TEMP TABLE irrigation_automatic_objective_revisions (id, workspace_id, enabled, actor_user_id, created_at)');
     const choice = resolveDemoChoice('maraichage', 'ete');
     const farm = demoOwnerUserId('copie', choice);
     await prepareDemoSpace(farm, choice);
@@ -51,6 +53,7 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
     assert.equal(await attachPendingWorkspace('ancienne-personne', '4394'), true);
 
     sqlite.exec('DROP TABLE temp.irrigation_change_journal');
+    sqlite.exec('DROP TABLE temp.irrigation_automatic_objective_revisions');
     const before = dump(sqlite);
     const filled = Object.entries(before).filter(([, rows]) => rows.length > 0).map(([table]) => table);
     assert.ok(filled.length >= 15, `la copie est une ferme complète (${filled.length} tables remplies : ${filled.join(', ')})`);

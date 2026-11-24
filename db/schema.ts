@@ -876,6 +876,28 @@ export const hydricGoalRevisions = sqliteTable(
   ],
 );
 
+/**
+ * Le réglage « Objectif automatique » d'une ferme, geste par geste (6 decies,
+ * O2, migration 0047 ; D-309, D-317) : chaque ligne l'allume ou l'éteint à
+ * partir de son jour, en heure de Paris ; sans ligne, il est éteint.
+ */
+export const automaticObjectiveRevisions = sqliteTable(
+  'irrigation_automatic_objective_revisions',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    enabled: integer('enabled', { mode: 'boolean' }).notNull(),
+    actorUserId: text('actor_user_id').notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    index('idx_automatic_objective_workspace_created').on(table.workspaceId, table.createdAt),
+    check('chk_automatic_objective_enabled', sql`${table.enabled} IN (0, 1)`),
+  ],
+);
+
 export const weatherPreferences = sqliteTable(
   'irrigation_weather_preferences',
   {

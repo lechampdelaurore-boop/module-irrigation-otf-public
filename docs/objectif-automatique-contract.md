@@ -233,3 +233,74 @@ source automatique, ou réglage éteint, le résultat est celui d'avant ;
 aucun lecteur ne lui en passe encore une. Preuve :
 `tests/objectif-automatique.test.ts`, les douze cas de la section 3 et ces
 cinq précisions.
+
+## 9. Précisions faites en codant O2 (24 novembre 2026, D-317)
+
+Le réglage est gardé par ferme et chaque lecteur de l'objectif reçoit la
+source automatique. Aucun écran ne l'allume encore (O4) : rien ne change
+pour aucune ferme. Huit cas que les sections 3 à 7 ne tranchaient pas,
+réglés par l'option la plus prudente :
+
+- **F774, le réglage** : une ligne par geste, jamais réécrite, dans
+  `irrigation_automatic_objective_revisions` (migration 0047), lue dans
+  l'ordre d'écriture (`docs/revision-order-contract.md`). Un geste qui ne
+  change pas l'état en vigueur (allumer un réglage allumé, éteindre un
+  réglage jamais allumé) n'écrit rien, ni ligne ni journal. Le journal des
+  modifications dit « Objectif automatique : éteint → allumé », dans la
+  famille des objectifs, avec la personne du geste. La ligne s'efface avec
+  la ferme et part dans son export, comme une révision d'objectif.
+- **F775, la faisabilité** : un geste la rend à refaire, comme un objectif
+  saisi (déclencheurs de la migration 0047). Le recalcul du plan après le
+  geste, comme après un objectif (`objective-changed`, durable), revient à
+  l'action de l'écran, en O4.
+- **F776, une source par lecture** : `readAutomaticObjectiveSourceForUser`
+  (`lib/services/automatic-objective-source.ts`) lit une fois les gestes,
+  l'ET0 enregistrée, les K_abri, le classement des jardins et, « Besoin par
+  culture » cochée, le besoin de la culture ; chaque lecteur la passe à
+  `objectiveForBed` : le besoin, et par lui le planning, la faisabilité et
+  « Aujourd'hui » ; l'aide du formulaire d'irrigation ; les fiches d'une
+  planche et d'une série ; l'écart entre prévu et réel ; l'historique ; les
+  séries. Réglage éteint tous les jours lus : deux requêtes, rien d'autre
+  n'est lu, chaque lecteur garde son calcul d'avant.
+- **F777, une planche dont le jardin manque à l'instantané** : comme un
+  jardin à classer (F769), pas d'objectif automatique.
+- **F778, l'historique et les séries** composent l'objectif de leur
+  période jour par jour, avec `aggregateHydricObjective` : l'objectif saisi
+  d'abord, sinon la valeur automatique du jour, celle qu'`objectiveForBed`
+  lui donne (`automaticObjectiveDayValues`). Un jour où l'objectif
+  automatique s'applique sans valeur n'est pas compté pour zéro en silence :
+  il est compté à part (`objectiveAutomatic`), l'objectif se dit partiel
+  avec ses journées-planche couvertes (D-036), et l'historique le dit dans
+  ses avertissements, jours au-delà de la prévision météo compris.
+- **F779, l'objectif restant d'une série** (de demain à la dernière récolte
+  attendue) devient inconnu dès qu'un de ses jours n'a pas de valeur
+  automatique, au-delà de la prévision le plus souvent : une somme
+  partielle passerait pour le restant (D-003). Un objectif saisi qui couvre
+  ces jours les compte, comme avant.
+- **F780, ce que le tableau des besoins rend pour O4** : par planche,
+  l'origine de l'objectif (`objectiveOrigin` : saisi, automatique ou les
+  deux) et le détail de ses jours automatiques (`automaticObjective`) ; rien
+  ne les affiche encore.
+- **F781, le coût** (section 7), mesuré le 24 novembre 2026 sur une ferme
+  fictive de 300 planches et 570 séries, le double de la ferme réelle,
+  « Besoin par culture » cochée, réglage allumé depuis mars, un 15 juillet
+  (Node 22 et la base SQLite des tests, médiane de cinq lectures). Éteint,
+  chaque lecteur fait deux requêtes de plus, rien d'autre. Allumé, le
+  besoin de la semaine passe de 71 à 118 ms, l'aide du formulaire de 9 à
+  66 ms, l'historique de la saison de 44 à 457 ms, les séries de 164 à
+  508 ms ; la source fait 22 requêtes en lecture, en parallèle pour la
+  plupart, aucune vers Ouvre ta ferme. Sur 150 planches, l'historique de la
+  saison passe de 24 à 229 ms. La première mesure donnait 1 306 ms pour
+  l'historique : la découpe des jours par semaine se refaisait pour chaque
+  planche ; elle se fait une fois par ferme (`automaticObjectivePeriod`),
+  et les tables de l'ET0 et du besoin une fois par planche. Ce qui reste
+  est le calcul de l'ETM jour par jour, lu sans être changé ; O3 l'évitera
+  pour les semaines closes, lues dans leur enregistrement.
+
+Depuis O2, les lecteurs passent la source à `objectiveForBed` : la phrase
+« aucun lecteur ne lui en passe encore une » de la section 8 ne vaut plus.
+Preuve : `tests/db/objectif-automatique-reglage.test.ts` (le réglage à
+deux fermes, le journal, la faisabilité, le besoin, l'historique et l'aide
+du formulaire, cas 1, 2, 5, 8 et 11), `tests/objectif-automatique-lecteurs.test.ts`
+(les valeurs jour par jour égales à celles d'`objectiveForBed`, F772 sur
+une période, l'historique) et `tests/series-water.test.ts` (les séries).

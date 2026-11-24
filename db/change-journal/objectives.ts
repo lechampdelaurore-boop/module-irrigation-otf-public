@@ -5,8 +5,8 @@ import { journalDeletion, journalUpdate, latestRevision, type JournalGesture, ty
  * Les lignes du journal des modifications pour les objectifs (amélioration
  * n° 7, PR 5 ; docs/ameliorations-6-2-3-7-contract.md, §5.1 ; D-286) :
  * l'objectif hydrique d'une semaine, posé à la main ou adopté d'une
- * proposition, son retrait, le seuil minimal de besoin et la décision sur le
- * besoin d'une planche.
+ * proposition, son retrait, le réglage « Objectif automatique », le seuil
+ * minimal de besoin et la décision sur le besoin d'une planche.
  *
  * Chaque fonction rend l'instruction que l'écrivain place dans son lot,
  * **avant** son écriture : l'avant se lit sur la ligne d'avant (F716).
@@ -65,6 +65,21 @@ export function clearedGoalJournal(subject: 'objectif-hydrique', gesture: Journa
   return journalDeletion(goalLine(subject, gesture, scope), goalTarget(gesture.workspaceId, scope), [
     { key: 'amountMm', current: 'current.amount_mm' },
   ]);
+}
+
+/**
+ * Le réglage « Objectif automatique » de la ferme (6 decies, O2 ; D-309,
+ * D-317) : sa révision la plus récente ; sans révision, il est éteint. La
+ * ligne dit « modifié », d'éteint à allumé ou l'inverse ; rien s'il ne change
+ * pas.
+ */
+export function automaticObjectiveJournal(subject: 'objectif-automatique', gesture: JournalGesture, enabled: boolean): D1PreparedStatement {
+  return journalUpdate(
+    { ...gesture, subject, objectId: null },
+    latestRevision('irrigation_automatic_objective_revisions', 'workspace_id = ?', [gesture.workspaceId]),
+    [{ key: 'enabled', current: 'COALESCE(current.enabled, 0)', next: enabled }],
+    'defaults',
+  );
 }
 
 /** Le seuil minimal de besoin de la ferme ; sans réglage, il vaut 0 mm. */

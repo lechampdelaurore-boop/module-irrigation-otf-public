@@ -76,6 +76,10 @@ export type BedIrrigationNeed = {
   et0ForecastMm: number | null;
   objectiveMm: number | null;
   objectiveSource: GoalRevisionLike['scopeType'] | 'mixed' | null;
+  /** D'où vient l'objectif : saisi, automatique (D-309) ou les deux selon les jours ; `null` sans objectif. */
+  objectiveOrigin: BedObjective['origin'];
+  /** Les jours où l'objectif automatique s'applique, leur valeur ou ce qui manque ; `null` quand il ne s'applique à aucun jour. */
+  automaticObjective: AutomaticObjectiveWeek | null;
   actualRainMm: number | null;
   actualIrrigationMm: number;
   realRemainingMm: number | null;
@@ -199,6 +203,12 @@ export function buildIrrigationNeedsDashboard(input: {
   weekStart: string;
   weekEnd: string;
   now: Date;
+  /**
+   * L'objectif automatique de chaque planche, quand la ferme l'a allumé
+   * (D-309) : `objectiveForBed` le compose avec les objectifs saisis. Absent,
+   * rien ne change.
+   */
+  automaticObjective?: ReadonlyMap<string, AutomaticObjectiveInput>;
 }): IrrigationNeedsDashboard {
   const { season, snapshot, days, events, goalRevisions, decisions, weekStart, weekEnd, now } = input;
   const plots = new Map(snapshot.plots.map((plot) => [plot.id, plot]));
@@ -236,7 +246,7 @@ export function buildIrrigationNeedsDashboard(input: {
     const sheltered = plot.mode === 'greenhouse';
     // Un jardin à classer (4.4, F583) : on ne sait pas s'il reçoit la pluie ; son besoin n'est pas calculé.
     const unclassified = plot.mode === 'unclassified';
-    const objective = objectiveForBed(goalRevisions, bed, weekStart, weekEnd);
+    const objective = objectiveForBed(goalRevisions, bed, weekStart, weekEnd, input.automaticObjective?.get(bed.id));
     const actualRain = unclassified ? null : sheltered ? 0 : actualExteriorRainMm;
     const forecastRain = unclassified ? null : sheltered ? 0 : forecastExteriorRainMm;
     const actualIrrigation = actualByBed.get(bed.id) ?? 0;
@@ -265,6 +275,7 @@ export function buildIrrigationNeedsDashboard(input: {
       et0KnownMm: et0.knownValue, et0ReanalysisMm: et0Reanalysis,
       et0ForecastMm: et0Forecast,
       objectiveMm: objective.value, objectiveSource: objective.source,
+      objectiveOrigin: objective.origin, automaticObjective: objective.automatic,
       actualRainMm: actualRain, actualIrrigationMm: actualIrrigation,
       realRemainingMm: realRemaining,
       relativeDeficitPercent: relativeDeficitPercent(realRemaining, objective.value),
