@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **« Aujourd'hui » mène aux menus, L6 : au téléphone, la page commence
+  par la journée, codé le 24 novembre 2026** (D-315, F767, F768, roadmap
+  section 6 nonies, PR 6 sur 6, la dernière), en Opus 5.5 · Élevé. Sous
+  620 px, « Votre journée » (avec « Gel ou chaleur ») passe juste après
+  l'en-tête, avant les tuiles, à l'écran comme dans l'ordre de lecture ;
+  change la précision T5, au téléphone seulement (option recommandée du
+  contrat, que le porteur peut encore refuser). Affichage seul, aucune
+  migration. Parcours P30 étendu. Contrôles : voir la PR. **Le chantier
+  6 nonies est entièrement codé.**
 - **« Aujourd'hui » mène aux menus, L5 : la mise en page, codé le
   24 novembre 2026** (D-314, F766, roadmap section 6 nonies, PR 5 sur 6),
   en Opus 5.5 · Élevé. Un bloc étiré garde son contenu en haut ; l'heure

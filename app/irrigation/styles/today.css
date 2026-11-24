@@ -339,6 +339,20 @@
   .today-block-more {
     display: none;
   }
+
+  /*
+   * Au téléphone, « Votre journée » juste après l'en-tête, avant les tuiles
+   * de la semaine, toujours (6 nonies, L6, D-315). La page met aussi son DOM
+   * dans cet ordre dès qu'elle a lu sa largeur (today-page.tsx) ; ces deux
+   * règles ne servent qu'au premier dessin, avant ce moment.
+   */
+  .today-head {
+    order: -2;
+  }
+
+  .today-row:has(> #today-day) {
+    order: -1;
+  }
 }
 
 /* Jusqu'à 980 px : la tablette a la barre du téléphone (lot K, n° 24, F481). */
