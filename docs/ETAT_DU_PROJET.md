@@ -26,8 +26,12 @@ registres, elle y renvoie.
   la règle (H2) et aucun écran ne l'allume (H3) : rien ne change pour
   aucune ferme. Tests à deux fermes (`tests/db/heures-de-silence.test.ts`),
   contre-épreuve de trente-cinq altérations. Contrôles : voir la PR.
-  **Fusion après la mise en ligne vérifiée d'O4.** Restent H2, en
-  Opus 5.5 · Max, et H3, en Opus 5.5 · Élevé.
+  Fusion après la mise en ligne vérifiée d'O4. Mise en ligne de #203 (O4,
+  D-319) consignée ici : fusionnée le 24 novembre 2026 à 23 h 12, **en
+  ligne à 23 h 37** (run 45498654145, les cinq jobs verts ; aucune
+  migration : « No migrations to apply » en production et sur la
+  démonstration). Restent H2, en Opus 5.5 · Max, et H3, en
+  Opus 5.5 · Élevé.
 - **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
   2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en
   Opus 5.5 · Élevé, le réglage choisi par le porteur. Le réglage se voit
