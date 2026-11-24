@@ -109,7 +109,7 @@ async function scheduleSafely(schedule: QuietAlarmScheduler, request: Irrigation
 }
 
 /** L'envoi immédiat, qui ne lève jamais : une panne devient un service injoignable, comme avant. */
-export async function sendSafely(send: QuietAlertSender, request: IrrigationPushSendRequest): Promise<IrrigationPushSendResult> {
+async function sendSafely(send: QuietAlertSender, request: IrrigationPushSendRequest): Promise<IrrigationPushSendResult> {
   try {
     return await send(request);
   } catch (error) {
