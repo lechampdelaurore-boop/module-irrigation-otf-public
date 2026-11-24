@@ -13,7 +13,7 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - **« Aujourd'hui » mène aux menus, L4 : la réponse d'un geste s'écrit
-  sous le bouton, codé le 24 novembre 2026** (D-313, F763, F764, roadmap
+  sous le bouton, codé le 24 novembre 2026** (D-313, F764, F765, roadmap
   section 6 nonies, PR 4 sur 6), en Opus 5.5 · Élevé. « Démarrer
   maintenant », « Reprendre le reliquat », « Fait comme prévu », « Tout est
   fait » et les deux « Recalculer » répondent sous leur bouton, dans

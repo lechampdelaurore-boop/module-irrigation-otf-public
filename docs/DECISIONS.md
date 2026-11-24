@@ -9272,11 +9272,11 @@ geste remplace la réponse du précédent.
 
 **Précisions tranchées en codant.**
 
-- F763 : une réponse dont la carte n'est plus sur la page (une irrigation
+- F764 : une réponse dont la carte n'est plus sur la page (une irrigation
   enregistrée comme faite, ou démarrée hors du jour) se lit en tête de
   « Votre journée » : jamais perdue. Les endroits vivent dans
   `app/irrigation/today/today-replies.ts`.
-- F764 : `ActionReply` gagne deux ajouts facultatifs, un lien au bout de la
+- F765 : `ActionReply` gagne deux ajouts facultatifs, un lien au bout de la
   phrase et une liste sous elle ; les autres pages n'en usent pas et ne
   changent pas.
 

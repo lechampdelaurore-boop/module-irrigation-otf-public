@@ -5537,13 +5537,13 @@ vide de « Votre journée » propose « Voir le planning de la semaine » ou
 dit « Valider au planning ». 44 px au téléphone. Tests du domaine ;
 parcours P29 étendu aux deux largeurs.
 
-**L4 codée le 24 novembre 2026** (PR 4 sur 6, D-313, F763 et F764), en
+**L4 codée le 24 novembre 2026** (PR 4 sur 6, D-313, F764 et F765), en
 Opus 5.5 · Élevé : la réponse de « Démarrer maintenant », « Reprendre le
 reliquat », « Fait comme prévu », « Tout est fait », « Recalculer » et
 « Recalculer le plan » s'écrit sous le bouton pressé, par `ActionReply`, et
 entre dans l'écran ; une carte démarrée garde sa réponse en passant « En
-cours » ; une carte partie la laisse en tête de « Votre journée » (F763) ;
-`ActionReply` gagne un lien et une liste facultatifs (F764). Les deux
+cours » ; une carte partie la laisse en tête de « Votre journée » (F764) ;
+`ActionReply` gagne un lien et une liste facultatifs (F765). Les deux
 paragraphes de tête disparaissent. Parcours P29, P30 et P38 étendus aux
 deux largeurs. Reste L5 et L6.
 
