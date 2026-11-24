@@ -225,3 +225,16 @@ export function legacyRedirect(hash: string, selection: FeatureSelection): Legac
   const page = rule.pages.find((id) => selection.includes(id));
   return page ? { page, notEnabled: false } : { page: first, notEnabled: true };
 }
+
+/**
+ * Le script qui conduit `/irrigation` sans ancre à la page d'arrivée dès que
+ * le navigateur lit la page (lenteur du module, N2, D-323) : l'application
+ * installée s'ouvre sur `/irrigation`, et la conduite attendait jusque-là que
+ * tous les scripts du module soient chargés et l'écran repris, pour recharger
+ * ensuite. Une ancre, qui ne parvient jamais au serveur, laisse la conduite à
+ * `legacyRedirect`, côté navigateur, comme avant.
+ */
+export function landingRedirectScript(href: string): string {
+  if (!/^\/irrigation\/[a-z-]+(\?[A-Za-z0-9=&%-]*)?$/.test(href)) throw new RangeError('Adresse de la page d’arrivée illisible.');
+  return `if(!window.location.hash)window.location.replace(${JSON.stringify(href)});`;
+}

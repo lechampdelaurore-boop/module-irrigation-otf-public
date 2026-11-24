@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (lenteur du module, N2)
+
+- **Le module s'ouvre plus vite** (D-323) : l'application installée, le logo
+  et les favoris mènent directement à « Aujourd'hui » (ou à la première page
+  cochée), sans attendre la page « Ouverture du module… » qui rechargeait
+  tout. Les liens des anciennes notifications mènent toujours au bon bloc.
+
 ### Corrigé (lenteur du module, N1)
 
 - **Un clic du menu ne recharge plus tout le module** (D-322) : le menu de

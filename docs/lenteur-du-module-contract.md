@@ -1,7 +1,7 @@
 # Contrat — La lenteur du module (correctif du 24 novembre 2026)
 
-Roadmap section 6 duodecies. Décisions D-322 (N1), puis les suivantes pour N2
-et N3. Ce contrat dit le constat, les mesures et les règles des trois
+Roadmap section 6 duodecies. Décisions D-322 (N1), D-323 (N2), puis la
+suivante pour N3. Ce contrat dit le constat, les mesures et les règles des trois
 corrections ; chacune a sa PR.
 
 ## 1. Le constat
@@ -62,9 +62,23 @@ contenu de la page est demandé au serveur, sans relancer les scripts.
   dans cette PR : un geste à la fois.
 - Parcours P59, aux deux largeurs.
 
-**N2. L'application installée s'ouvre sur sa page d'arrivée** (PR suivante) :
-sans la page d'attente qui recharge tout, sans rien changer pour une ancienne
-adresse de notification `/irrigation#…`.
+**N2. L'adresse de départ mène à la page d'arrivée sans attendre les
+scripts (D-323).** L'application installée s'ouvre sur `/irrigation`, comme le
+logo du module et les favoris : la page d'attente « Ouverture du module… »
+attendait que tous les scripts du module soient chargés et l'écran repris,
+puis rechargeait vers la page d'arrivée.
+
+- Sans ancre, un script lu avec la page conduit aussitôt à la page d'arrivée
+  (« Aujourd'hui », ou la première page cochée), avec la saison, la semaine et
+  « Actualiser » de l'adresse, comme avant.
+- Avec une ancre, celle des anciennes notifications `/irrigation#…`, qui ne
+  parvient jamais au serveur, rien ne change : la conduite reste celle du
+  navigateur (`legacyRedirect`).
+- L'adresse de départ du manifeste ne change pas : une application déjà
+  installée en profite sans rien refaire.
+- Mesuré (même banc que la section 2) : environ 0,4 s de moins à l'ouverture.
+- Parcours P59 : tous les scripts du module refusés, `/irrigation` mène
+  encore à « Aujourd'hui ».
 
 **N3. L'identifiant de l'espace n'est lu qu'une fois par requête** (fil à
 part, en Opus 5.5 · Max : il touche à la résolution de l'espace d'une ferme,

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requireAuthenticatedUser, type AuthenticatedUser } from '@/app/access-auth';
-import { WELCOME_PATH } from '@/lib/domain/features/pages';
+import { landingRedirectScript, legacyRedirect, pageHref, WELCOME_PATH } from '@/lib/domain/features/pages';
 import { parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
@@ -35,12 +35,14 @@ export default async function IrrigationIndexPage({ searchParams }: { searchPara
   // Une ferme qui n'a jamais ouvert le module choisit d'abord ses cases (R5).
   if (selection.firstVisit) redirect(WELCOME_PATH);
   const season = typeof params.season === 'string' && /^\d{4}$/.test(params.season) ? Number(params.season) : null;
+  const week = typeof params.week === 'string' ? parseIrrigationWeek(params.week) : null;
+  const refresh = params.refresh === '1';
+  // Sans ancre, la page d'arrivée dès la lecture de la page, sans attendre les scripts du module (N2, D-323).
+  const landing = pageHref(legacyRedirect('', selection.enabled).page, { season, week, refresh });
   return (
-    <LegacyRedirect
-      enabled={selection.enabled}
-      season={season}
-      week={typeof params.week === 'string' ? parseIrrigationWeek(params.week) : null}
-      refresh={params.refresh === '1'}
-    />
+    <>
+      <script dangerouslySetInnerHTML={{ __html: landingRedirectScript(landing) }} />
+      <LegacyRedirect enabled={selection.enabled} season={season} week={week} refresh={refresh} />
+    </>
   );
 }

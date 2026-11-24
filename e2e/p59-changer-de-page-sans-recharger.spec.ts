@@ -83,3 +83,16 @@ test('un clic du menu change la page sans recharger le module, et le clavier rep
   expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
   await verifierLEtape(page, journal, 'retour à Matériel');
 });
+
+/**
+ * N2 (D-323) : `/irrigation` sans ancre, l'adresse de départ de l'application
+ * installée, mène à la page d'arrivée sans attendre les scripts du module.
+ * Ils sont tous refusés ici : seul le script lu avec la page peut conduire à
+ * « Aujourd'hui », dont le titre vient du serveur.
+ */
+test('l’adresse de départ du module mène à « Aujourd’hui » sans attendre les scripts', async ({ page }) => {
+  await page.route('**/*', (route) => (route.request().resourceType() === 'script' ? route.abort() : route.continue()));
+  await page.goto('/irrigation');
+  await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
+  await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES.aujourdhui })).toBeVisible();
+});

@@ -12,8 +12,8 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
-- **Lenteur du module : N1, le menu sans rechargement, codée le
-  24 novembre 2026** (D-322, roadmap section 6 duodecies,
+- **Lenteur du module : N1, le menu sans rechargement, et N2, l'ouverture
+  directe, codées le 24 novembre 2026** (D-322, D-323, roadmap section 6 duodecies,
   `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
   la roadmap. Constat du porteur à 22 h 33 : le module « rame », au
   téléphone comme à l'ordinateur. Mesuré sur une copie locale : les PR du
@@ -22,7 +22,10 @@ registres, elle y renvoie.
   du menu passent par le routeur de l'application, sans rien demander
   d'avance ; seule la page voulue est demandée au serveur, sans relancer les
   scripts ; un menu neuf à chaque page, le clavier repart du contenu
-  (parcours P59). Restent N2, l'ouverture directe de l'application, et N3,
+  (parcours P59). N2 : `/irrigation` sans ancre, l'adresse de départ de
+  l'application installée, mène à la page d'arrivée par un script lu avec
+  la page, sans attendre les scripts du module ni recharger une seconde
+  fois ; une ancre d'ancienne notification garde sa conduite. Reste N3,
   les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
   sur le téléphone réel du porteur reste à faire, sur son accord.
   Contrôles : voir la PR.
