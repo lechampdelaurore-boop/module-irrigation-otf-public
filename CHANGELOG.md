@@ -55,6 +55,9 @@ source détaillée commit par commit.
   quatre carrés bleus dans l'onglet et les favoris, devient l'icône de
   l'application installée et de l'écran d'accueil de l'iPhone, s'affiche
   sur la notification de fin d'irrigation et sur le site public.
+- En ligne le 24 novembre 2026 à 11 h 25 (#185, run 45369110943, cinq jobs
+  verts) ; le porteur l'a installé sur son téléphone (Android, Chrome) :
+  « Tout fonctionne. » (12 h 51).
 
 ### Corrigé (alertes sur le téléphone, C1)
 

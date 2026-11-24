@@ -21,7 +21,9 @@ registres, elle y renvoie.
   corrections de la section 6 octies sont codées (#186 à #189 et celle-ci),
   à fusionner une à une. Mise en ligne de #185 (D-302) consignée ici :
   fusionnée le 24 novembre 2026 à 10 h 51, **en ligne à 11 h 25** (run 45369110943 vérifié job
-  par job : les cinq jobs verts). Mise en ligne de #186 (C1, D-303)
+  par job : les cinq jobs verts ; application et site public redéployés).
+  Le porteur a installé le module sur son téléphone (Android, Chrome) et
+  confirmé le 24 novembre 2026 à 12 h 51 : « Tout fonctionne. » Mise en ligne de #186 (C1, D-303)
   consignée ici : fusionnée le 24 novembre 2026 à 11 h 30, **en ligne à
   11 h 55** (run 45375391314 vérifié job par job : les cinq jobs verts ; le
   planificateur déployé avec le déclencheur `30 7,8,10,11,13,14,16,17,19,20 * * *`).
@@ -74,8 +76,9 @@ registres, elle y renvoie.
   `pnpm e2e` (180 réussis, 8 sautés, 0 échec ; joué avec le Chromium 1243
   de l'environnement, la version 1248 attendue n'y étant pas installée)
   réussis ; P0 rouge sans la correction (balise du manifeste sans
-  `crossorigin`), vert avec. Reste : le constat sur le téléphone du
-  porteur après la mise en ligne, avec son accord. Mise en ligne de #184
+  `crossorigin`), vert avec. Constat du porteur, après la mise en ligne
+  de 11 h 25 : module installé sur son téléphone (Android, Chrome), « Tout
+  fonctionne. » (24 novembre 2026, 12 h 51). Mise en ligne de #184
   (D-301) consignée ici : fusionnée le 24 novembre 2026 à 9 h 47, **en
   ligne à 10 h 17** (run 45359207603 vérifié job par job : les cinq jobs
   verts).

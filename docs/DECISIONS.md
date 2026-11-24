@@ -8814,8 +8814,10 @@ fichier `app/manifest.ts` lu par le cadre : la règle de
 écartées par le porteur. (d) Un badge de notification (petite icône
 monochrome de la barre d'état) : il demande un dessin à part.
 
-**Reste.** L'installation sur le téléphone du porteur n'est constatée
-qu'après la mise en ligne, avec son accord. Les notifications quand le
+**Reste.** ~~L'installation sur le téléphone du porteur n'est constatée
+qu'après la mise en ligne, avec son accord.~~ Constat fait : en ligne le
+24 novembre 2026 à 11 h 25 (#185), le porteur a installé le module sur son
+téléphone (Android, Chrome) et confirmé à 12 h 51 : « Tout fonctionne. » Les notifications quand le
 téléphone n'a plus de session Access sont étudiées à part : la cause n'est
 pas la même (le manifeste n'intervient pas dans la réception d'une
 notification).

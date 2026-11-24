@@ -3234,8 +3234,10 @@ des PNG de 192 et 512 pixels et une icône à masque. Le porteur a choisi un
 logo, une goutte dont le bas montre des planches et leurs goutteurs, mis
 partout : onglet, application installée, iPhone, notification de fin
 d'irrigation, site public. `tests/web-app-manifest.test.ts`, P0, le test du
-service worker et celui du site le vérifient. Reste : le constat sur le
-téléphone du porteur, après la mise en ligne et avec son accord.
+service worker et celui du site le vérifient. **En ligne le 24 novembre 2026
+à 11 h 25** (#185, run 45369110943) ; le porteur a installé le module sur son
+téléphone (Android, Chrome) et confirmé le 24 novembre 2026 à 12 h 51 : « Tout
+fonctionne. »
 
 ### Q6 — Découpage des fichiers concentrateurs (✅ close le 21 septembre 2026)
 
