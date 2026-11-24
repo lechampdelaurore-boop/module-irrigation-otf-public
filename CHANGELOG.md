@@ -16,6 +16,13 @@ source détaillée commit par commit.
   calcul du matin gagne une étape « objectif automatique ». Rien ne change
   encore pour aucune ferme : aucun écran ne l'allume (O4).
 
+### Documenté (heures de silence des notifications)
+
+- **Le contrat des heures de silence** (D-320, `docs/heures-de-silence-contract.md`) :
+  une plage de nuit par ferme, éteinte tant que la ferme ne l'allume pas ;
+  la fin d'un arrosage et le gel passent, le reste attend la fin de la plage.
+  Aucun code, aucune ferme ne change.
+
 ### Ajouté (objectif automatique sur l'ET0, O2)
 
 - **Le réglage « Objectif automatique » de chaque ferme et ses lecteurs**

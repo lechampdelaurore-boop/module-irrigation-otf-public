@@ -9564,3 +9564,38 @@ compte rendu du matin) font chacune échouer au moins un test.
 **Ne change pas.** Aucun écran ne montre ni n'allume le réglage (O4) :
 rien ne s'écrit dans la nouvelle table tant qu'aucune ferme ne l'allume,
 et les lecteurs restent ceux d'avant pour toutes les fermes.
+
+## D-320 — Les heures de silence des notifications : le contrat, sans code
+
+Date : 24 novembre 2026. Statut : **contrat écrit, sans code** ; roadmap
+section 6 undecies, contrat `docs/heures-de-silence-contract.md`. Écrit en
+Sonnet 5.5 · Moyen (grille du travail sans code). Les numéros D-317 à D-319
+sont ceux des PR O2 à O4 de l'objectif automatique ; celui-ci est pris
+au-dessus pour ne pas les disputer.
+
+**Contexte.** L'idée « heures de silence des notifications » est rangée sans
+engagement depuis le 7 novembre 2026 (D-065). Le porteur demande son
+contrat le 24 novembre 2026 à 20 h 24 : « Lance le contrat, mais tu réponds à
+toutes tes questions par tes propres recommandations. » Une alerte lue à
+21 h 30 sonne aujourd'hui à 21 h 30, une fin d'arrosage à 3 h sonne à 3 h.
+
+**Décision.** Dix choix faits par l'assistant sur son option recommandée
+(contrat, section 2) : un réglage par ferme, éteint par défaut (D-028) ; une
+plage de nuit de 20 h à 9 h au plus, au quart d'heure, heure de Paris
+(D-004) ; dans la plage, une notification est **retenue** et part à la fin ;
+passent toujours la fin d'un arrosage démarré et le gel (case cochée par
+défaut) ; le rappel du soir qui tombe dans la plage ne part pas ; la veille
+de l'exploitant est hors de la règle ; une alerte retenue n'est pas « non
+délivrée » (C2, C3) avant la fin de la plage plus une heure ; **le Worker de
+notification ne change pas**, la retenue étant une alarme à échéance par la
+route existante. Trois PR de code, après O4 : règle et réglage, envoyeurs,
+écran.
+
+**À la main du porteur.** Aucune question agronomique réservée ni aucun
+budget. Le gel qui passe par défaut est du côté prudent ; il peut le
+renverser d'un mot avant le code.
+
+**Ne change pas.** Aucun code, aucune migration, aucun écran ; toutes les
+notifications arrivent comme avant, pour toutes les fermes, jusqu'à H3.
+D-060 (priorité haute), D-293 (une alarme par espace), D-028 (rien ne
+change sans le geste de la ferme) tiennent.
