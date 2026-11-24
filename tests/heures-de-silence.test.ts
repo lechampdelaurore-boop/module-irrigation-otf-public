@@ -9,8 +9,9 @@ import {
   QUIET_END_TIMES,
   QUIET_START_TIMES,
   quietHoldAlarmId,
-  quietHoldEnd,
   quietHoursDecision,
+  quietWindowDecision,
+  type QuietHoursDecision,
   type QuietHoursNotification,
   type QuietHoursSettings,
 } from '../lib/domain/notification-quiet-hours.ts';
@@ -115,8 +116,8 @@ test('scénarios 5 à 8 : le gel passe tant que sa case est cochée ; seul est d
   assert.deepEqual(quietHoursDecision(NIGHT, HEAT, AT_23_00), hold(UNTIL_06_00), '8. maximale au-dessus de 35 °C : pas du gel, retenue');
   // Le module ne devine pas l'intention de la ferme : aucune autre alerte n'est du gel, même pour un seuil bas.
   for (const notification of ALL_KINDS) {
-    const frost = notification === CROP_FROST || notification === MINIMUM_BELOW;
-    const expected = notification.kind === 'irrigation-finished' || frost ? SEND
+    const frost: boolean = notification === CROP_FROST || notification === MINIMUM_BELOW;
+    const expected: QuietHoursDecision = notification.kind === 'irrigation-finished' || frost ? SEND
       : notification.kind === 'evening-reminder' ? { action: 'skip' } : hold(UNTIL_06_00);
     assert.deepEqual(quietHoursDecision(NIGHT, notification, AT_23_00), expected, JSON.stringify(notification));
   }
@@ -208,14 +209,18 @@ test('la nuit du passage à l’heure d’hiver, la fin reste aussi à l’heure
   assert.deepEqual(quietHoursDecision(longest, HEAT, AT_21_30), hold('2026-11-25T08:00:00.000Z'), 'un soir ordinaire');
 });
 
-test('S7 : une retenue ne dure jamais plus d’une plage, treize heures de l’horloge de Paris', () => {
+test('S7 : une retenue ne dure jamais plus d’une plage, treize heures de l’horloge de Paris ; au-delà, elle part et le défaut se dit', () => {
+  const tooLong = { action: 'send', defect: 'hold-too-long' } as const;
   const corrupted = { startMinutes: 15 * 60, endMinutes: 6 * 60 };
-  assert.equal(quietHoldEnd(corrupted, new Date('2026-11-24T15:00:00.000Z')), 'too-long', '16 h jusqu’à 6 h : quatorze heures');
-  assert.deepEqual(quietHoldEnd(corrupted, AT_23_00), new Date(UNTIL_06_00), '23 h jusqu’à 6 h : sept heures');
-  assert.deepEqual(quietHoldEnd({ startMinutes: 20 * 60, endMinutes: 9 * 60 }, new Date('2026-11-24T19:00:00.000Z')), new Date('2026-11-25T08:00:00.000Z'), '20 h jusqu’à 9 h : treize heures, la borne comprise');
-  assert.equal(quietHoldEnd({ startMinutes: 20 * 60, endMinutes: 9 * 60 + 1 }, new Date('2026-11-24T19:00:00.000Z')), 'too-long', 'une minute de plus');
-  assert.equal(quietHoldEnd({ startMinutes: 2 * 60, endMinutes: 6 * 60 }, new Date('2026-11-25T02:00:00.000Z')), 'too-long', 'une plage de jour corrompue ne retient pas un jour entier');
-  assert.equal(quietHoldEnd(corrupted, new Date('2026-11-24T12:00:00.000Z')), null, '13 h : hors de la plage');
+  assert.deepEqual(quietWindowDecision(corrupted, true, HEAT, new Date('2026-11-24T15:00:00.000Z')), tooLong, '16 h jusqu’à 6 h : quatorze heures');
+  assert.deepEqual(quietWindowDecision(corrupted, true, HEAT, AT_23_00), hold(UNTIL_06_00), '23 h jusqu’à 6 h : sept heures');
+  assert.deepEqual(quietWindowDecision({ startMinutes: 20 * 60, endMinutes: 9 * 60 }, true, HEAT, new Date('2026-11-24T19:00:00.000Z')), hold('2026-11-25T08:00:00.000Z'), '20 h jusqu’à 9 h : treize heures, la borne comprise');
+  assert.deepEqual(quietWindowDecision({ startMinutes: 20 * 60, endMinutes: 9 * 60 + 1 }, true, HEAT, new Date('2026-11-24T19:00:00.000Z')), tooLong, 'une minute de plus');
+  assert.deepEqual(quietWindowDecision({ startMinutes: 2 * 60, endMinutes: 6 * 60 }, true, HEAT, new Date('2026-11-25T02:00:00.000Z')), tooLong, 'une plage de jour corrompue ne retient pas un jour entier');
+  assert.deepEqual(quietWindowDecision(corrupted, true, HEAT, new Date('2026-11-24T12:00:00.000Z')), SEND, '13 h : hors de la plage');
+  assert.deepEqual(quietWindowDecision(corrupted, true, { kind: 'evening-reminder' }, new Date('2026-11-24T15:00:00.000Z')), { action: 'skip' }, 'le rappel du soir n’est jamais retenu : S5 et non S7');
+  assert.deepEqual(quietWindowDecision(corrupted, true, { kind: 'irrigation-finished' }, new Date('2026-11-24T15:00:00.000Z')), SEND);
+  assert.deepEqual(quietWindowDecision(corrupted, true, CROP_FROST, new Date('2026-11-24T15:00:00.000Z')), SEND);
 });
 
 test('scénario 17 : un réglage hors des bornes est ignoré comme éteint, et le défaut se dit (S17)', () => {

@@ -86,7 +86,7 @@ export type QuietHoursNotification =
   | { kind: 'weather-alert'; criterion: Pick<WeatherAlertCriterionSettings, 'field' | 'direction'> };
 
 /** Un défaut à journaliser sans nommer ni ferme ni personne : un réglage hors des bornes (S17), une retenue trop longue (S7). */
-export type QuietHoursDefect = 'invalid-setting' | 'hold-too-long';
+type QuietHoursDefect = 'invalid-setting' | 'hold-too-long';
 
 export type QuietHoursDecision =
   /** Part tout de suite ; `defect` quand c'est un défaut qui la fait partir. */
@@ -130,7 +130,7 @@ function windowOf(settings: QuietHoursSettings): QuietWindow | null {
  * ne la décalent pas. `'too-long'` quand l'attente dépasserait treize heures
  * de l'horloge de Paris (S7), ce qu'aucune plage dans les bornes ne fait.
  */
-export function quietHoldEnd(window: QuietWindow, at: Date): Date | 'too-long' | null {
+function quietHoldEnd(window: QuietWindow, at: Date): Date | 'too-long' | null {
   const minutes = farmMinutesOfDay(at);
   const today = dateKeyInTimeZone(at, FARM_TIME_ZONE);
   let endDay: string;
@@ -169,7 +169,18 @@ export function quietHoursDecision(settings: QuietHoursSettings, notification: Q
   if (!settings.enabled) return SEND;
   const window = windowOf(settings);
   if (!window) return { action: 'send', defect: 'invalid-setting' };
-  if (settings.frostPasses && isFrost(notification)) return SEND;
+  return quietWindowDecision(window, settings.frostPasses, notification, at);
+}
+
+/**
+ * La règle dans une plage donnée en minutes, une fois le réglage lu et ses
+ * bornes vérifiées (S3 à S7). Exportée pour éprouver S7, qu'aucune plage dans
+ * les bornes n'atteint : une plage corrompue qui retiendrait plus de treize
+ * heures fait partir la notification et dit le défaut.
+ */
+export function quietWindowDecision(window: QuietWindow, frostPasses: boolean, notification: QuietHoursNotification, at: Date): QuietHoursDecision {
+  if (notification.kind === 'irrigation-finished') return SEND;
+  if (frostPasses && isFrost(notification)) return SEND;
   const end = quietHoldEnd(window, at);
   if (end === null) return SEND;
   if (notification.kind === 'evening-reminder') return { action: 'skip' };
