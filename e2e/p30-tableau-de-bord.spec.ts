@@ -107,6 +107,29 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   await ouvrirLaFermeToutCoche(page, context, testInfo, 'tableau-de-bord');
   await verifierLEtape(page, journal, 'arrivée sur le tableau de bord');
 
+  // Au téléphone, « Votre journée » juste après l'en-tête, avant les tuiles, à l'écran comme dans l'ordre de lecture ;
+  // à l'ordinateur, les tuiles d'abord, comme avant (6 nonies, L6, D-315).
+  await expect(page.locator('#today-day')).toBeVisible();
+  const ordre = await page.evaluate(() => {
+    const entete = document.querySelector('.today-head');
+    const journee = document.querySelector('#today-day');
+    const tuiles = document.querySelector('.today-kpis');
+    if (!entete || !journee || !tuiles) return null;
+    return {
+      journeeAvantLesTuiles: Boolean(journee.compareDocumentPosition(tuiles) & Node.DOCUMENT_POSITION_FOLLOWING),
+      basDeLEnTete: entete.getBoundingClientRect().bottom,
+      hautDeLaJournee: journee.getBoundingClientRect().top,
+      hautDesTuiles: tuiles.getBoundingClientRect().top,
+    };
+  });
+  expect(ordre, 'l’en-tête, la journée et les tuiles').not.toBeNull();
+  if (ordre) {
+    expect(ordre.journeeAvantLesTuiles, 'ordre de lecture').toBe(telephone);
+    expect(ordre.hautDeLaJournee < ordre.hautDesTuiles, 'ordre affiché').toBe(telephone);
+    expect(Math.min(ordre.hautDeLaJournee, ordre.hautDesTuiles)).toBeGreaterThanOrEqual(ordre.basDeLEnTete);
+  }
+  await verifierLEtape(page, journal, 'la journée avant les tuiles au téléphone');
+
   // Les pages du menu, dans l'ordre de toujours : les groupes n'en changent pas l'ordre (T1).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
 

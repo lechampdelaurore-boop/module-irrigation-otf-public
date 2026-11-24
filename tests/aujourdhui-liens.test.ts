@@ -27,6 +27,9 @@ import { DAY_REPLY, irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, 
  * page ; leur lien porte la phrase écrite pour un lecteur d'écran
  * (section 4).
  *
+ * L6 (D-315) : au téléphone, « Votre journée » passe avant les tuiles
+ * (section 8), prouvé dans P30 ; ici, la borne et l'ordre du rendu.
+ *
  * L5 (D-314) : la mise en page (section 7), prouvée par mesures dans P30 ;
  * ici, seulement les règles de dessin qui la portent.
  *
@@ -321,4 +324,16 @@ test('L5 : un bloc étiré garde son contenu en haut ; l’heure prend sa place 
   const gauges = readFileSync('app/irrigation/styles/today-gauges.css', 'utf8');
   const phone = gauges.slice(gauges.indexOf('@container (max-width: 620px)'));
   assert.match(phone, /\.today-bar-row \.today-bar-name \{\n    overflow: visible;\n    overflow-wrap: anywhere;\n    white-space: normal;/, 'règle 3 : le nom en entier, au besoin sur deux lignes');
+});
+
+test('L6 : au téléphone, « Votre journée » avant les tuiles, dans le DOM et au dessin ; à l’ordinateur, l’ordre de toujours', () => {
+  const page = readFileSync('app/irrigation/today/today-page.tsx', 'utf8');
+  assert.match(page, /const TODAY_PHONE_MAX_PX = 620;/, 'la borne des requêtes de conteneur');
+  assert.match(page, /\{phone \? \[dayRow, tiles\] : \[tiles, dayRow\]\}/, 'le DOM suit l’ordre affiché');
+  assert.match(page, /key="semaine"/);
+  assert.match(page, /key="journee"/);
+  const css = readFileSync('app/irrigation/styles/today.css', 'utf8');
+  const phone = css.slice(css.indexOf('@container (max-width: 620px)'));
+  assert.match(phone, /\.today-head \{\n    order: -2;\n  \}/);
+  assert.match(phone, /\.today-row:has\(> #today-day\) \{\n    order: -1;\n  \}/, 'le premier dessin, avant la lecture de la largeur');
 });

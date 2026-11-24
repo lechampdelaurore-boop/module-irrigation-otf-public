@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useTransition, type ReactNode, type RefObject } from 'react';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import { dayRowLayout, type TodayBlock, type TodayView } from '@/lib/domain/today/today-view';
 import { millisecondsFromMinutes, millisecondsFromSeconds } from '@/lib/domain/units';
@@ -22,6 +22,30 @@ import { irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY } from './to
 const TODAY_REFRESH_MS = millisecondsFromMinutes(5);
 const TODAY_REFRESH_SLACK_MS = millisecondsFromSeconds(5);
 const TODAY_RETURN_MS = millisecondsFromMinutes(1);
+/** La largeur de page sous laquelle « Aujourd'hui » est au téléphone : la borne de ses requêtes de conteneur. */
+const TODAY_PHONE_MAX_PX = 620;
+
+/**
+ * La page est-elle au téléphone ? Lue sur sa propre largeur, comme ses
+ * requêtes de conteneur, et relue quand elle change. Avant d'être lue, la
+ * page se rend comme à l'ordinateur ; le dessin du téléphone remonte déjà
+ * « Votre journée » par `order` (today.css), et le DOM suit ici, pour que
+ * le clavier et le lecteur d'écran lisent dans l'ordre affiché (L6).
+ */
+function useTodayPhone(page: RefObject<HTMLDivElement | null>): boolean {
+  const [phone, setPhone] = useState(false);
+  useLayoutEffect(() => {
+    const element = page.current;
+    if (!element) return;
+    const read = () => setPhone(element.getBoundingClientRect().width <= TODAY_PHONE_MAX_PX);
+    read();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(read);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [page]);
+  return phone;
+}
 
 /**
  * La page « Aujourd'hui », tableau de bord du module
@@ -33,11 +57,15 @@ const TODAY_RETURN_MS = millisecondsFromMinutes(1);
  * plan », et « Tout est fait » (section 3.4) ; elle se relit après chacun,
  * et d'elle-même au fil des minutes (lot H, F438). La réponse d'un geste
  * s'écrit sous le bouton pressé, et à un seul endroit
- * (docs/aujourdhui-liens-contract.md, L4, D-313).
+ * (docs/aujourdhui-liens-contract.md, L4, D-313). Au téléphone, « Votre
+ * journée » passe juste après l'en-tête, avant les tuiles de la semaine,
+ * toujours (L6, D-315) ; à l'ordinateur, l'ordre ne change pas.
  */
 export function TodayPage({ initialView, query }: { initialView: TodayView; query: PageQuery }) {
   const [view, setView] = useState(initialView);
   const [pending, startTransition] = useTransition();
+  const pageRef = useRef<HTMLDivElement>(null);
+  const phone = useTodayPhone(pageRef);
   /** La réponse du dernier geste, à l'endroit du bouton pressé ; un nouveau geste la remplace. */
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   // La saison du jour (F2) : les liens vers les cartes et les données du jour la portent.
@@ -119,8 +147,19 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const water = block('water');
   const reliability = block('reliability');
 
+  // Des clés : la journée et les tuiles changent de place sans se recréer (L6).
+  const tiles = view.week ? <TodayWeekTiles key="semaine" week={view.week} query={dayQuery} /> : null;
+  const dayRow = (
+    <Pair
+      key="journee"
+      wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onStart={start} onAllDone={recordAllDone} /> : null}
+      narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
+      layout={late && todo ? dayRowLayout(late.lines.length + view.current.length, todo.lines.length) : 'wide'}
+    />
+  );
+
   return (
-    <div className="today-page" aria-busy={pending}>
+    <div ref={pageRef} className="today-page" aria-busy={pending}>
       <TodayHeader
         headline={view.headline}
         plan={view.plan}
@@ -130,12 +169,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
         replies={replies}
         onRecalculatePlan={() => recalculatePlan(PLAN_HEADER_REPLY)}
       />
-      {view.week ? <TodayWeekTiles week={view.week} query={dayQuery} /> : null}
-      <Pair
-        wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onStart={start} onAllDone={recordAllDone} /> : null}
-        narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
-        layout={late && todo ? dayRowLayout(late.lines.length + view.current.length, todo.lines.length) : 'wide'}
-      />
+      {phone ? [dayRow, tiles] : [tiles, dayRow]}
       <Pair
         wide={view.week ? <TodayWeekWater week={view.week} query={dayQuery} /> : null}
         narrow={view.soil ? <TodaySoilBlock soil={view.soil} query={dayQuery} /> : null}
