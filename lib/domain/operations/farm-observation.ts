@@ -2,6 +2,7 @@ import { otfErrorRate, type OtfCallCounts, type OtfErrorRate } from '../otf/call
 import { parisMoment } from './operator-watch.ts';
 import { taskDeclaration, type TaskKey } from './task-registry.ts';
 import { EMPTY_TASK_RUN, taskState, type TaskState } from './task-state.ts';
+import { EMPTY_FARM_ALERT_DELIVERIES, undeliveredAlertsProblem, undeliveredAlertsWords, type FarmAlertDeliveries } from './undelivered-alerts.ts';
 
 /**
  * Chaque ferme sur la page d'état de l'exploitant (4.5, PR 2 ;
@@ -9,7 +10,8 @@ import { EMPTY_TASK_RUN, taskState, type TaskState } from './task-state.ts';
  * ligne par ferme, la plus en difficulté d'abord, calculée à la lecture.
  * Son raccordement, ses appels du jour, ses erreurs d'Ouvre ta ferme sur
  * 24 heures et 7 jours, sa dernière lecture complète, sa dernière météo et
- * son dernier calcul du matin. Des identifiants, des états, des heures et des
+ * son dernier calcul du matin, et ses alertes non délivrées (C2, D-304). Des
+ * identifiants, des états, des heures et des
  * nombres : jamais un nom de ferme ni un contenu.
  *
  * Les âges se jugent avec les seuils du registre (F600) : la lecture d'OTF et
@@ -34,6 +36,8 @@ export type FarmObservationRecord = {
   lastCompleteReadAt: string | null;
   lastWeatherAt: string | null;
   lastMorningPlanAt: string | null;
+  /** Les alertes de ses espaces parties sans atteindre un appareil (C2, D-304). */
+  alertDeliveries: FarmAlertDeliveries;
 };
 
 type FarmTone = 'ok' | 'warn' | 'danger';
@@ -53,6 +57,8 @@ export type FarmObservationLine = {
   lastOtfRead: string;
   lastWeather: string;
   lastMorning: string;
+  /** « aucune sur 7 jours », ou le nombre d'alertes non délivrées et leur cause (C2, D-304). */
+  undeliveredAlerts: string;
 };
 
 export type FarmObservationContext = {
@@ -100,6 +106,7 @@ export function emptyFarmObservation(farmKey: string): FarmObservationRecord {
     lastCompleteReadAt: null,
     lastWeatherAt: null,
     lastMorningPlanAt: null,
+    alertDeliveries: EMPTY_FARM_ALERT_DELIVERIES,
   };
 }
 
@@ -130,6 +137,9 @@ function farmLine(record: FarmObservationRecord, context: FarmObservationContext
   const morning = ageOf('morning-calculation', record.lastMorningPlanAt, context.now);
   if (morningExpected) pushAgeProblem(problems, morning, 'Aucun calcul du matin.', 'Aucun calcul du matin depuis le');
 
+  const alerts = undeliveredAlertsProblem(record.alertDeliveries);
+  if (alerts) problems.push(alerts);
+
   problems.sort((left, right) => TONE_RANK[right.tone] - TONE_RANK[left.tone]);
   const tone: FarmTone = problems[0]?.tone ?? 'ok';
   const line: FarmObservationLine = {
@@ -151,6 +161,7 @@ function farmLine(record: FarmObservationRecord, context: FarmObservationContext
     lastMorning: morningExpected
       ? momentWords(morning, 'aucun enregistré')
       : hasSpaces ? 'sans objet : le Planning n’est coché sur aucun de ses espaces' : 'sans objet : aucun espace sur cette ferme',
+    undeliveredAlerts: undeliveredAlertsWords(record.alertDeliveries),
   };
   return { line, problems: problems.length };
 }
