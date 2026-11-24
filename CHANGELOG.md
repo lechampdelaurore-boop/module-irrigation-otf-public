@@ -17,6 +17,17 @@ source détaillée commit par commit.
   l'allume ; un objectif saisi passe toujours avant ; quatre PR de code.
   Cette seconde décision change D-010 et D-045 et revient sur D-054 :
   aucun code avant la confirmation du porteur.
+### Corrigé (alertes sur le téléphone, C5)
+
+- **Les pages d'alertes disent la dernière lecture de la météo** (D-307) :
+  son heure, en orange au-delà de 3 heures avec ce que cela veut dire pour
+  les alertes, et, dans un pli, pourquoi une alerte peut arriver en retard.
+  Aucune migration.
+- En ligne le 24 novembre 2026 : #185 à 11 h 25 (run 45369110943, cinq jobs
+  verts) ; #186 à 11 h 55 (run 45375391314, cinq jobs verts, planificateur
+  redéployé avec le déclencheur de la relecture) ; #187 à 12 h 29 (run
+  45380954584) ; #188 à 13 h 00 (run 45385740978) ; #189 à 13 h 36 (run
+  45390228188), cinq jobs verts chacun.
 
 ### Corrigé (alertes sur le téléphone, C4)
 
@@ -58,6 +69,9 @@ source détaillée commit par commit.
   quatre carrés bleus dans l'onglet et les favoris, devient l'icône de
   l'application installée et de l'écran d'accueil de l'iPhone, s'affiche
   sur la notification de fin d'irrigation et sur le site public.
+- En ligne le 24 novembre 2026 à 11 h 25 (#185, run 45369110943, cinq jobs
+  verts) ; le porteur l'a installé sur son téléphone (Android, Chrome) :
+  « Tout fonctionne. » (12 h 51).
 
 ### Corrigé (alertes sur le téléphone, C1)
 

@@ -330,6 +330,13 @@
 .weather-alert-device[data-status="unavailable"],
 .weather-alert-device[data-lost="true"] { background: var(--warn-soft); color: var(--warn-ink); }
 .weather-alert-device a { color: var(--green-dark); font-weight: 700; }
+/* La dernière lecture de la météo et pourquoi une alerte peut tarder (C5, D-307). */
+.alert-reading-note { margin-top: 8px; padding: 8px 12px; border-radius: 9.75px; background: var(--sheet); color: var(--green-dark); font-size: var(--text-12); }
+.alert-reading-note[data-tone="warn"] { background: var(--warn-soft); color: var(--warn-ink); }
+.alert-reading-note > p { margin: 0; overflow-wrap: anywhere; }
+.alert-reading-note details { margin-top: 4px; }
+.alert-reading-note summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.alert-reading-note details > p { margin: 4px 0 0; color: inherit; }
 .weather-alert-form { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); }
 .weather-alert-fields { flex-wrap: wrap; }
 .weather-alert-fields label { flex-basis: 150px; }

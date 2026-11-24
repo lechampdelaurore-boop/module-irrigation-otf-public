@@ -377,6 +377,10 @@ Le rappel que ces seuils sont des repères, que la prévision est à 2 m et que
 sous abri la température réelle diffère. La refonte ergonomique et la 3.8
 pourront déplacer l'encart.
 
+Depuis le 24 novembre 2026 (C5, D-307), l'écran dit aussi la dernière
+lecture de la météo et pourquoi une alerte peut tarder, comme celui des
+alertes météo (`docs/weather-alerts-contract.md`, « L'écran »).
+
 ## Hors périmètre
 
 - Alertes de maladies (mildiou, oïdium, acariens, mildiou du soir après une

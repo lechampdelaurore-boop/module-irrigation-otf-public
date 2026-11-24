@@ -13,6 +13,7 @@ import {
 import { FROST_TEMPLATE, FROST_TEMPLATE_ANCHOR, weatherAlertTemplates, type WeatherAlertTemplate } from '@/lib/domain/weather/weather-alert-templates';
 import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { WeatherAlertsDevice } from './weather-alerts-device';
+import { AlertReadingNote } from './alert-reading-note';
 import { DeliveryStatus } from './alert-delivery';
 import {
   deleteWeatherAlertCriterionAction,
@@ -79,9 +80,12 @@ export function WeatherAlertsPanel({
   view,
   cropAlertsHref,
   demo,
+  lastReadingAt,
   onDashboard,
 }: {
   season: number;
+  /** La dernière lecture réussie de la météo de la ferme (C5, D-307). */
+  lastReadingAt: string | null;
   /** Un déploiement de démonstration : la ligne qui le dit au lieu de l'abonnement de l'appareil (C7). */
   demo: boolean;
   /** La page « Alertes cultures » quand elle est cochée, `null` sinon (précision P43). */
@@ -208,6 +212,7 @@ export function WeatherAlertsPanel({
       </div>
 
       {demo ? <p className="demo-push-notice" role="note">{DEMO_PUSH_NOTICE}</p> : <WeatherAlertsDevice season={season} />}
+      <AlertReadingNote lastReadingAt={lastReadingAt} />
 
       {notice ? <p className="water-notice" role="status">{notice}</p> : null}
       {error ? <p className="water-error" role="alert">{error}</p> : null}

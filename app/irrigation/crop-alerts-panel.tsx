@@ -9,6 +9,7 @@ import { DRYING_DAYS, FROST_DAMAGE_CELSIUS, FROST_OFFSET_CELSIUS } from '@/lib/d
 import { frostThresholdOrigin, type CropAlertCommonView, type DryingRow, type FrostThresholdRow } from '@/lib/domain/crop-alerts/view';
 import { FigureOrigin } from './shell/figure-origin';
 import { DeliveryStatus } from './alert-delivery';
+import { AlertReadingNote } from './alert-reading-note';
 import {
   saveCropAlertSettingsAction,
   saveCropDryingDaysAction,
@@ -39,8 +40,11 @@ export function CropAlertsPanel({
   onDashboard,
   sprinklerUnavailable = null,
   demo,
+  lastReadingAt,
 }: {
   season: number;
+  /** La dernière lecture réussie de la météo de la ferme (C5, D-307). */
+  lastReadingAt: string | null;
   weekStart: string;
   view: CropAlertsView;
   onDashboard: (dashboard: WaterDashboard) => void;
@@ -81,6 +85,8 @@ export function CropAlertsPanel({
           </p>
         </div>
       </div>
+
+      <AlertReadingNote lastReadingAt={lastReadingAt} />
 
       {notice ? <p className="water-notice" role="status">{notice}</p> : null}
       {error ? <p className="water-error" role="alert">{error}</p> : null}
