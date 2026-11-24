@@ -182,6 +182,17 @@ inscrit garde « Activer sur cet appareil » ; un navigateur qui bloque ou ne
 sait pas recevoir n'a pas de bouton. La règle vit dans
 `lib/domain/irrigation-notifications.ts` (`alertDeviceView`).
 
+**La dernière lecture de la météo** (alertes sur le téléphone, C5, D-307,
+24 novembre 2026). L'écran dit l'heure de la dernière lecture réussie de la
+météo de la ferme ; au-delà de 3 heures, la ligne passe en orange et dit
+qu'une alerte apparue depuis dans les prévisions n'a pas encore pu partir.
+Un pli « Pourquoi une alerte peut arriver en retard » explique que les
+alertes se calculent à chaque lecture : à 6 h 15, à 9 h 30, 12 h 30,
+15 h 30, 18 h 30 et 21 h 30 quand une alerte est active (C1, D-303), et à
+l'ouverture du module quand la dernière lecture a plus de 3 heures. La même
+ligne figure sur les deux écrans d'alertes. La règle vit dans
+`lib/domain/weather/alert-reading-note.ts`.
+
 La réorganisation 3.8 pourra déplacer cet encart avec les autres.
 
 ## Hors périmètre

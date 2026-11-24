@@ -21,7 +21,7 @@ export function WeatherAlertsPage({ season, initialDashboard, cropAlertsHref, de
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
   if (!dashboard.weatherAlerts) return null;
-  return <WeatherAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.weatherAlerts} cropAlertsHref={cropAlertsHref} demo={demo} onDashboard={setDashboard} />;
+  return <WeatherAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.weatherAlerts} cropAlertsHref={cropAlertsHref} demo={demo} lastReadingAt={dashboard.weather.preference.lastSuccessfulRefreshAt} onDashboard={setDashboard} />;
 }
 
 export function CropAlertsPage({ season, initialDashboard, sprinklerUnavailable, demo }: {
@@ -34,5 +34,5 @@ export function CropAlertsPage({ season, initialDashboard, sprinklerUnavailable,
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
   if (!dashboard.cropAlerts) return null;
-  return <CropAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.cropAlerts} onDashboard={setDashboard} sprinklerUnavailable={sprinklerUnavailable} demo={demo} />;
+  return <CropAlertsPanel season={season} weekStart={dashboard.weekStart} view={dashboard.cropAlerts} onDashboard={setDashboard} sprinklerUnavailable={sprinklerUnavailable} demo={demo} lastReadingAt={dashboard.weather.preference.lastSuccessfulRefreshAt} />;
 }

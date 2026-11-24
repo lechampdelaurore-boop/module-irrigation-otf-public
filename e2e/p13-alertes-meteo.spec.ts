@@ -214,5 +214,14 @@ test('un appareil dont l’inscription s’est perdue le lit sur l’écran des 
   await expect(reactiver).toBeVisible();
   if (testInfo.project.name === 'telephone') await verifierCibleTactile(reactiver, 'le bouton « Réactiver les notifications »');
   await expect(appareil.getByRole('button', { name: 'Activer sur cet appareil' })).toHaveCount(0);
+
+  // C5 (D-307) : la dernière lecture de la météo, à l'heure (la page vient de la relire), et pourquoi une alerte peut tarder.
+  const lecture = page.locator('#weather-alerts .alert-reading-note');
+  await expect(lecture).toHaveAttribute('data-tone', 'ok');
+  await expect(lecture).toContainText(/^Dernière lecture de la météo : le \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})?\./);
+  const pourquoi = lecture.getByText('Pourquoi une alerte peut arriver en retard');
+  if (testInfo.project.name === 'telephone') await verifierCibleTactile(pourquoi, 'le pli « Pourquoi une alerte peut arriver en retard »');
+  await pourquoi.click();
+  await expect(lecture).toContainText('Les alertes se calculent à chaque lecture de la météo');
   await verifierLEtape(page, journal, 'inscription perdue dite sur l’écran des alertes');
 });

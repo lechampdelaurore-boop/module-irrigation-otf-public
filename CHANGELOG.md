@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (alertes sur le téléphone, C5)
+
+- **Les pages d'alertes disent la dernière lecture de la météo** (D-307) :
+  son heure, en orange au-delà de 3 heures avec ce que cela veut dire pour
+  les alertes, et, dans un pli, pourquoi une alerte peut arriver en retard.
+  Aucune migration.
+- En ligne le 24 novembre 2026 : #185 à 11 h 25 (run 45369110943, cinq jobs
+  verts).
+
 ### Corrigé (alertes sur le téléphone, C4)
 
 - **L'écran des alertes dit quand l'appareil n'est plus inscrit** (D-306) :

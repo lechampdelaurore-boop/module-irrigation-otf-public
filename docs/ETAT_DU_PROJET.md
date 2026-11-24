@@ -12,6 +12,16 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Alertes sur le téléphone : les pages d'alertes disent la dernière
+  lecture de la météo, codé le 24 novembre 2026** (C5, D-307, roadmap
+  section 6 octies), en Opus 5.5 · Élevé. « Alertes météo » et « Alertes
+  cultures » disent l'heure de la dernière lecture réussie, en orange
+  au-delà de 3 heures, et, dans un pli, pourquoi une alerte peut tarder.
+  Aucune migration. Parcours P13 et P21 aux deux largeurs. Les cinq
+  corrections de la section 6 octies sont codées (#186 à #189 et celle-ci),
+  à fusionner une à une. Mise en ligne de #185 (D-302) consignée ici :
+  fusionnée le 24 novembre 2026 à 10 h 51, **en ligne à 11 h 25** (run 45369110943 vérifié job
+  par job : les cinq jobs verts). Contrôles : voir la PR.
 - **Alertes sur le téléphone : l'écran des alertes dit quand l'appareil
   n'est plus inscrit, codé le 24 novembre 2026** (C4, D-306, roadmap
   section 6 octies), en Opus 5.5 · Élevé. Une autorisation donnée sans
@@ -19,7 +29,7 @@ registres, elle y renvoie.
   le dit en orange, avec le bouton « Réactiver les notifications » (le
   geste `activate`, F372) ; le même bouton quand le service n'a pas pu
   inscrire l'appareil. Aucune migration. Parcours P13 aux deux largeurs.
-  Contrôles : voir la PR. Reste C5.
+  Contrôles : voir la PR.
 - **Alertes sur le téléphone : la veille de 9 h prévient l'exploitant des
   alertes non délivrées, codé le 24 novembre 2026** (C3, D-305, F756,
   roadmap section 6 octies), en Opus 5.5 · Élevé. Une seule alerte d'une
