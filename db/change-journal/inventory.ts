@@ -44,7 +44,7 @@ export const JOURNAL_TABLES: Readonly<Record<string, readonly ChangeSubject[]>> 
   irrigation_crop_drying_revisions: ['jours-de-sechage'],
   irrigation_crop_sensitive_stages: ['stade-sensible'],
   irrigation_feature_selections: ['fonctionnalites'],
-  irrigation_phone_notice_settings: ['message-du-matin', 'rappel-du-soir'],
+  irrigation_phone_notice_settings: ['message-du-matin', 'rappel-du-soir', 'heures-de-silence'],
   // Réglages que la liste du contrat ne nommait pas, au journal depuis D-289 (F718).
   irrigation_crop_kc_overrides: ['kc-corrige'],
   irrigation_crop_reference_crops: ['culture-de-reference'],
@@ -203,6 +203,7 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/feature-selection-repository.ts › dismissFeatureBannerForUser › irrigation_feature_selections': sansObjet('Le bandeau des fonctionnalités fermé : ni case cochée ni décochée.'),
   'db/phone-notice-repository.ts › saveMorningMessageForUser › irrigation_phone_notice_settings': branche('message-du-matin'),
   'db/phone-notice-repository.ts › saveEveningReminderForUser › irrigation_phone_notice_settings': branche('rappel-du-soir'),
+  'db/phone-notice-repository.ts › saveQuietHoursForUser › irrigation_phone_notice_settings': branche('heures-de-silence'),
   // Matériel et ressources.
   'db/equipment/equipment.ts › createEquipmentForUser › irrigation_equipment': branche('materiel'),
   'db/equipment/equipment.ts › updateEquipmentForUser › irrigation_equipment': branche('materiel'),

@@ -34,6 +34,7 @@ export const JOURNAL_OBJECT_TABLES: Readonly<Record<ChangeSubject, string | null
   fonctionnalites: null,
   'message-du-matin': null,
   'rappel-du-soir': null,
+  'heures-de-silence': null,
   'kc-corrige': null,
   'culture-de-reference': null,
   'correspondance-d-espece': null,

@@ -1,5 +1,6 @@
 import { DEFAULT_CROP_ALERT_SETTINGS, type CropAlertSettings } from '@/lib/domain/crop-alerts/settings';
 import { FEATURE_IDS, FEATURES_BEFORE_SELECTION, type FeatureId } from '@/lib/domain/features/catalogue';
+import { DEFAULT_QUIET_HOURS, type QuietHoursSettings } from '@/lib/domain/notification-quiet-hours';
 import { DEFAULT_PLANNING_SETTINGS, type PlanningSettings } from '@/lib/domain/planning/settings';
 import { DEFAULT_SOIL_SETTINGS, type SoilRecord, type SoilSettings } from '@/lib/domain/soil-reserve/soil';
 import type { RootingStage } from '@/lib/domain/soil-reserve/rooting';
@@ -394,6 +395,16 @@ export function eveningReminderJournal(subject: 'rappel-du-soir', gesture: Journ
   return journalUpdate({ ...gesture, subject, objectId: null }, PHONE_TARGET(gesture), [
     { key: 'enabled', current: `COALESCE(current.evening_reminder, ${sqlLiteral(EVENING_REMINDER_DEFAULT)})`, next: setting.enabled },
     { key: 'time', current: `COALESCE(current.evening_time, ${sqlLiteral(EVENING_REMINDER_DEFAULT_TIME)})`, next: setting.time },
+  ], 'defaults');
+}
+
+/** Les heures de silence (6 undecies) : allumées ou éteintes, leur plage et la case du gel ; une colonne vide vaut le défaut. */
+export function quietHoursJournal(subject: 'heures-de-silence', gesture: JournalGesture, setting: QuietHoursSettings): D1PreparedStatement {
+  return journalUpdate({ ...gesture, subject, objectId: null }, PHONE_TARGET(gesture), [
+    { key: 'enabled', current: `COALESCE(current.quiet_hours, ${sqlLiteral(DEFAULT_QUIET_HOURS.enabled)})`, next: setting.enabled },
+    { key: 'start', current: `COALESCE(current.quiet_start, ${sqlLiteral(DEFAULT_QUIET_HOURS.start)})`, next: setting.start },
+    { key: 'end', current: `COALESCE(current.quiet_end, ${sqlLiteral(DEFAULT_QUIET_HOURS.end)})`, next: setting.end },
+    { key: 'frostPasses', current: `COALESCE(current.quiet_frost_passes, ${sqlLiteral(DEFAULT_QUIET_HOURS.frostPasses)})`, next: setting.frostPasses },
   ], 'defaults');
 }
 
