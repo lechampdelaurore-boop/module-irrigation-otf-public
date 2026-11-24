@@ -20,7 +20,9 @@ registres, elle y renvoie.
   « Voir par planche », « Voir jour par jour ») ; « rien aujourd'hui » et
   « 7 planches sur 10 ont un objectif ». Affichage seul, aucune migration.
   Parcours P30 étendu aux deux largeurs. Contrôles : voir la PR. Reste L2
-  à L6.
+  à L6. Mise en ligne de #190 (C5, D-307) consignée ici : fusionnée le
+  24 novembre 2026 à 14 h 02, **en ligne à 14 h 36** (déploiement vérifié
+  job par job par le fil des alertes sur le téléphone).
 - **« Aujourd'hui » mène aux menus, et l'objectif automatique sur l'ET0 :
   diagnostic et deux contrats écrits le 24 novembre 2026, sans code**
   (D-308, D-309, roadmap sections 6 nonies et 6 decies), en Fable 5.2 ·
@@ -35,6 +37,27 @@ registres, elle y renvoie.
   quatre PR de code O1 à O4. **Il change D-010 et D-045 et revient sur
   D-054 : question 5 posée au porteur, aucun code de l'objectif automatique
   avant sa réponse.** PR de registres seule : **aucun contrôle rejoué**.
+- **Alertes sur le téléphone : les pages d'alertes disent la dernière
+  lecture de la météo, codé le 24 novembre 2026** (C5, D-307, roadmap
+  section 6 octies), en Opus 5.5 · Élevé. « Alertes météo » et « Alertes
+  cultures » disent l'heure de la dernière lecture réussie, en orange
+  au-delà de 3 heures, et, dans un pli, pourquoi une alerte peut tarder.
+  Aucune migration. Parcours P13 et P21 aux deux largeurs. Les cinq
+  corrections de la section 6 octies sont codées (#186 à #189 et celle-ci),
+  à fusionner une à une. Mise en ligne de #185 (D-302) consignée ici :
+  fusionnée le 24 novembre 2026 à 10 h 51, **en ligne à 11 h 25** (run 45369110943 vérifié job
+  par job : les cinq jobs verts ; application et site public redéployés).
+  Le porteur a installé le module sur son téléphone (Android, Chrome) et
+  confirmé le 24 novembre 2026 à 12 h 51 : « Tout fonctionne. » Mise en ligne de #186 (C1, D-303)
+  consignée ici : fusionnée le 24 novembre 2026 à 11 h 30, **en ligne à
+  11 h 55** (run 45375391314 vérifié job par job : les cinq jobs verts ; le
+  planificateur déployé avec le déclencheur `30 7,8,10,11,13,14,16,17,19,20 * * *`).
+  Mises en ligne consignées ici, chaque run vérifié job par job (les cinq
+  jobs verts) : #187 (C2, D-304) fusionnée à 12 h 06, **en ligne à 12 h 29**
+  (run 45380954584) ; #188 (C3, D-305) fusionnée à 12 h 37, **en ligne à
+  13 h 00** (run 45385740978) ; #189 (C4, D-306) fusionnée à 13 h 06,
+  **en ligne à 13 h 36** (run 45390228188).
+  Contrôles : voir la PR.
 - **Alertes sur le téléphone : l'écran des alertes dit quand l'appareil
   n'est plus inscrit, codé le 24 novembre 2026** (C4, D-306, roadmap
   section 6 octies), en Opus 5.5 · Élevé. Une autorisation donnée sans
@@ -42,7 +65,7 @@ registres, elle y renvoie.
   le dit en orange, avec le bouton « Réactiver les notifications » (le
   geste `activate`, F372) ; le même bouton quand le service n'a pas pu
   inscrire l'appareil. Aucune migration. Parcours P13 aux deux largeurs.
-  Contrôles : voir la PR. Reste C5.
+  Contrôles : voir la PR.
 - **Alertes sur le téléphone : la veille de 9 h prévient l'exploitant des
   alertes non délivrées, codé le 24 novembre 2026** (C3, D-305, F756,
   roadmap section 6 octies), en Opus 5.5 · Élevé. Une seule alerte d'une
@@ -83,8 +106,9 @@ registres, elle y renvoie.
   `pnpm e2e` (180 réussis, 8 sautés, 0 échec ; joué avec le Chromium 1243
   de l'environnement, la version 1248 attendue n'y étant pas installée)
   réussis ; P0 rouge sans la correction (balise du manifeste sans
-  `crossorigin`), vert avec. Reste : le constat sur le téléphone du
-  porteur après la mise en ligne, avec son accord. Mise en ligne de #184
+  `crossorigin`), vert avec. Constat du porteur, après la mise en ligne
+  de 11 h 25 : module installé sur son téléphone (Android, Chrome), « Tout
+  fonctionne. » (24 novembre 2026, 12 h 51). Mise en ligne de #184
   (D-301) consignée ici : fusionnée le 24 novembre 2026 à 9 h 47, **en
   ligne à 10 h 17** (run 45359207603 vérifié job par job : les cinq jobs
   verts).
@@ -861,6 +885,25 @@ registres, elle y renvoie.
   13 h 30** (#175, fusionnée à 12 h 58, run 45019879666 vérifié job par
   job : les cinq jobs verts ; consigné par la PR du cas d'écart de la
   démonstration, #178).
+- Tranche 4, **4.6 : pré-vérification du 24 novembre 2026 pour la fiche
+  d'entrée** (lecture de `main` à `e88dcb7`, rien rejoué ; fiche toujours
+  vide). **E5** : la 4.5 en ligne en entier (21 novembre 2026, 13 h 32),
+  l'effacement et la restauration prouvés (S1 à S3, essai chez Cloudflare
+  du 20 novembre 2026) et la phrase des 30 jours (`pages.ts` l. 108, test
+  du site) sont constatés ; la première veille réelle (22 novembre 2026,
+  9 h 00) est vue sur la page d'état ; **reste la notification reçue sur
+  l'appareil du porteur** (contrat, 10 bis.7, 4.5-f, g), attendue avec le
+  « tout va bien » du dimanche 29 novembre 2026 : sa confirmation coche la
+  ligne. Le risque « alertes non délivrées », ajouté à E5 le 24 novembre
+  2026, est couvert par les corrections C1 à C4 (section 6 octies : D-303
+  à D-306) : relecture des prévisions dans la journée, carte « Alertes non
+  délivrées », veille qui prévient l'exploitant, bouton « Réactiver les
+  notifications ». **E7** : toujours non cochable ; la page promet
+  l'effacement de la clé à « Déconnecter la ferme » (`pages.ts` l. 96),
+  geste absent de `lib/`, `db/` et `app/` ; il vient avec la 4.3 PR 3 et
+  PR 4 (accès d'OTF), E7 se coche donc après E2 ; le reste de la page est
+  conforme au code. Détail :
+  `/mnt/project-files/pilote-fiche/preverification-E5-E7-2026-11-24.md`.
 - Tranche 4, **4.6 : constats du 22 novembre 2026 pour la fiche d'entrée,
   gardés hors de la fiche** (un fil à part, en lecture seule, sur `main` à
   `ba8cbde`). La fiche `docs/pilote-fiche-entree.md` reste vide : elle ne
