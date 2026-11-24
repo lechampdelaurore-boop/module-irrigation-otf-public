@@ -1,6 +1,7 @@
 import { dateKeyInTimeZone, FARM_TIME_ZONE } from '../water-management.ts';
 import type { TaskDeclaration } from './task-registry.ts';
 import type { TaskState } from './task-state.ts';
+import { undeliveredAlertsWatchSentence, type UndeliveredAlertsOfDay } from './undelivered-alerts.ts';
 
 /**
  * La veille de l'exploitant (4.5, PR 2 ; docs/tranche-4-contract.md, F566,
@@ -9,6 +10,9 @@ import type { TaskState } from './task-state.ts';
  *
  * - Au moins une tâche en panne, en retard ou jamais réussie : une alerte qui
  *   dit **quelle tâche et depuis quand**, avec le lien vers la page d'état.
+ * - Au moins une alerte d'une ferme partie sans atteindre un appareil dans
+ *   les 24 dernières heures (C3, D-305) : la même alerte, qui le dit en
+ *   premier, avec le nombre de fermes et les causes.
  * - Rien à signaler un dimanche : « tout va bien », qui prouve que la veille
  *   elle-même tourne ; s'il manque, l'exploitant sait qu'il doit regarder.
  * - Rien à signaler un autre jour : rien (pas de bruit).
@@ -53,17 +57,21 @@ export function tasksToWatch(tasks: readonly WatchedTask[]): WatchedTask[] {
  * elle-même : quand elle tourne, elle est à l'heure, et quand elle ne tourne
  * plus, c'est le dimanche manquant et la page d'état qui le disent (F566).
  */
-export function operatorWatchNotice(registered: readonly WatchedTask[], now: Date): OperatorNotice | null {
+export function operatorWatchNotice(
+  registered: readonly WatchedTask[],
+  now: Date,
+  undeliveredAlerts: UndeliveredAlertsOfDay | null = null,
+): OperatorNotice | null {
   const tasks = registered.filter((task) => task.declaration.key !== 'operator-watch');
   const problems = tasksToWatch(tasks);
-  if (problems.length > 0) {
+  const alertsSentence = undeliveredAlerts ? undeliveredAlertsWatchSentence(undeliveredAlerts) : null;
+  const count = problems.length + (alertsSentence ? 1 : 0);
+  if (count > 0) {
     return {
       kind: 'alert',
-      problems: problems.length,
-      title: fitted(problems.length === 1
-        ? `Module d'irrigation : une tâche ${stateWords(problems[0].state.kind)}`
-        : `Module d'irrigation : ${problems.length} tâches à regarder`, TITLE_MAX_LENGTH),
-      body: alertBody(problems),
+      problems: count,
+      title: fitted(alertTitle(problems, alertsSentence !== null), TITLE_MAX_LENGTH),
+      body: alertBody(problems, alertsSentence),
       tag: 'operator-watch',
       url: OPERATOR_PAGE_PATH,
     };
@@ -79,24 +87,45 @@ export function operatorWatchNotice(registered: readonly WatchedTask[], now: Dat
   };
 }
 
-/**
- * Autant de tâches nommées que le texte en tient, la plus grave d'abord, puis
- * « Et N autres. » ; la dernière erreur quand une seule tâche est en cause et
- * qu'il reste la place. Le détail est sur la page d'état.
- */
-function alertBody(problems: readonly WatchedTask[]): string {
-  const sentences = problems.map(problemSentence);
-  for (let named = problems.length; named >= 1; named -= 1) {
-    const others = problems.length - named;
-    const body = [...sentences.slice(0, named), others > 0 ? `Et ${others} autre${others > 1 ? 's' : ''}.` : null]
-      .filter((line): line is string => line !== null)
-      .join(' ');
-    if (body.length > BODY_MAX_LENGTH) continue;
-    const lastError = problems.length === 1 ? problems[0].state.lastError : null;
-    const withError = lastError ? `${body} Dernière erreur : ${lastError}.` : body;
-    return withError.length <= BODY_MAX_LENGTH ? withError : body;
+function alertTitle(problems: readonly WatchedTask[], undeliveredAlerts: boolean): string {
+  if (!undeliveredAlerts) {
+    return problems.length === 1
+      ? `Module d'irrigation : une tâche ${stateWords(problems[0].state.kind)}`
+      : `Module d'irrigation : ${problems.length} tâches à regarder`;
   }
-  return fitted(`${problems.length} tâche${problems.length > 1 ? 's' : ''} à regarder : le détail est sur la page d'état.`, BODY_MAX_LENGTH);
+  if (problems.length === 0) return 'Module d\'irrigation : alertes non délivrées';
+  return `Module d'irrigation : alertes non délivrées et ${problems.length === 1 ? 'une tâche' : `${problems.length} tâches`} à regarder`;
+}
+
+/**
+ * Les alertes non délivrées d'abord, quand il y en a : une alerte de gel vue
+ * par personne touche une ferme dès aujourd'hui. Puis autant de tâches
+ * nommées que le texte en tient, la plus grave d'abord, puis « Et N
+ * autres. » ; la dernière erreur quand une seule tâche est en cause et qu'il
+ * reste la place. Le détail est sur la page d'état.
+ */
+function alertBody(problems: readonly WatchedTask[], alertsSentence: string | null): string {
+  if (problems.length === 0) return fitted(`${alertsSentence} Le détail est sur la page d'état.`, BODY_MAX_LENGTH);
+  // Après les alertes, la place manque souvent : les tâches se disent alors sans « depuis quand ».
+  const wordings = alertsSentence ? [problemSentence, shortProblemSentence] : [problemSentence];
+  for (const wording of wordings) {
+    const sentences = problems.map(wording);
+    for (let named = problems.length; named >= 1; named -= 1) {
+      const others = problems.length - named;
+      const body = [alertsSentence, ...sentences.slice(0, named), others > 0 ? `Et ${others} autre${others > 1 ? 's' : ''}.` : null]
+        .filter((line): line is string => line !== null)
+        .join(' ');
+      if (body.length > BODY_MAX_LENGTH) continue;
+      const lastError = problems.length === 1 ? problems[0].state.lastError : null;
+      const withError = lastError ? `${body} Dernière erreur : ${lastError}.` : body;
+      return withError.length <= BODY_MAX_LENGTH ? withError : body;
+    }
+  }
+  const tasks = `${problems.length} tâche${problems.length > 1 ? 's' : ''} à regarder`;
+  const detailed = `${tasks} : le détail est sur la page d'état.`;
+  if (!alertsSentence) return fitted(detailed, BODY_MAX_LENGTH);
+  const both = `${alertsSentence} Et ${detailed}`;
+  return fitted(both.length <= BODY_MAX_LENGTH ? both : `${alertsSentence} Et ${tasks}.`, BODY_MAX_LENGTH);
 }
 
 /**
@@ -108,6 +137,11 @@ function problemSentence({ declaration, state }: WatchedTask): string {
   if (state.failingSince) return `${declaration.label} : ${stateWords(state.kind)} (en échec depuis le ${parisMoment(state.failingSince)}).`;
   if (state.lastSuccessAt) return `${declaration.label} : ${stateWords(state.kind)} (aucune réussite depuis le ${parisMoment(state.lastSuccessAt)}).`;
   return `${declaration.label} : jamais réussie.`;
+}
+
+/** « Pluie estimée après coup (réanalyse) : en panne. » */
+function shortProblemSentence({ declaration, state }: WatchedTask): string {
+  return `${declaration.label} : ${stateWords(state.kind)}.`;
 }
 
 export function stateWords(kind: TaskState['kind']): string {

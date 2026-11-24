@@ -12,6 +12,7 @@ import {
 } from '../lib/domain/operations/operator-watch.ts';
 import { REPEATED_FAILURES_FOR_BROKEN, TASK_REGISTRY, taskDeclaration, type TaskKey } from '../lib/domain/operations/task-registry.ts';
 import { EMPTY_TASK_RUN, taskState, type TaskRunRecord } from '../lib/domain/operations/task-state.ts';
+import { NO_UNDELIVERED_ALERTS, undeliveredAlertsOfDay, type UndeliveredAlertsOfDay } from '../lib/domain/operations/undelivered-alerts.ts';
 import { millisecondsFromHours, millisecondsFromMinutes } from '../lib/domain/units.ts';
 
 /**
@@ -153,6 +154,52 @@ test('rien à signaler : « tout va bien » le dimanche seulement, pas de bruit 
   // Le dimanche de Paris, même quand l'heure UTC est encore samedi (23 h 30 UTC un samedi d'été = dimanche 1 h 30 à Paris).
   const parisSunday = new Date('2026-07-11T23:30:00.000Z');
   assert.equal(operatorWatchNotice(registry(parisSunday), parisSunday)?.kind, 'all-good');
+});
+
+test('C3 (D-305) : une alerte d’une ferme partie sans atteindre un appareil en 24 heures fait partir l’alerte de la veille, et la dit en premier', () => {
+  const twoNoDevice: UndeliveredAlertsOfDay = { alerts: 2, farms: 1, counts: { ...NO_UNDELIVERED_ALERTS, noDevice: 2 } };
+  const alone = operatorWatchNotice(registry(FRIDAY), FRIDAY, twoNoDevice);
+  assert.ok(alone, 'un vendredi où toutes les tâches vont bien : la veille ne se tait plus');
+  assert.deepEqual({ kind: alone.kind, problems: alone.problems, title: alone.title, body: alone.body }, {
+    kind: 'alert',
+    problems: 1,
+    title: 'Module d\'irrigation : alertes non délivrées',
+    body: '2 alertes non délivrées en 24 heures, sur 1 ferme (aucun appareil inscrit : 2). Le détail est sur la page d\'état.',
+  });
+  assertDeliverable(alone, 'alertes non délivrées seules');
+
+  const withTask = operatorWatchNotice(registry(FRIDAY, { 'weather-reanalysis': { ...EMPTY_TASK_RUN, lastSuccessAt: ago(FRIDAY, millisecondsFromHours(40)) } }), FRIDAY, twoNoDevice);
+  assert.ok(withTask);
+  assert.equal(withTask.title, 'Module d\'irrigation : alertes non délivrées et une tâche à regarder');
+  assert.equal(withTask.problems, 2);
+  assert.equal(withTask.body, '2 alertes non délivrées en 24 heures, sur 1 ferme (aucun appareil inscrit : 2). Pluie estimée après coup (réanalyse) : en panne.', 'après les alertes, la tâche se dit sans « depuis quand » quand la place manque');
+  assertDeliverable(withTask, 'alertes et une tâche');
+
+  // Le pire : toutes les causes, plusieurs fermes, tout le matin en panne ; le texte tient toujours.
+  const worst: UndeliveredAlertsOfDay = { alerts: 123, farms: 12, counts: { noDevice: 100, failed: 20, interrupted: 3 } };
+  const stale = { ...EMPTY_TASK_RUN, lastSuccessAt: ago(FRIDAY, millisecondsFromHours(40)), lastAttemptAt: ago(FRIDAY, millisecondsFromHours(40)), lastError: 'une erreur très longue '.repeat(5) };
+  const allStale = registry(FRIDAY, Object.fromEntries(WATCHED.map((task) => [task.key, stale])));
+  const everything = operatorWatchNotice(allStale, FRIDAY, worst);
+  assert.ok(everything);
+  assert.ok(everything.body.startsWith('123 alertes non délivrées en 24 heures, sur 12 fermes (aucun appareil inscrit : 100, échec de l’envoi : 20, envoi interrompu : 3).'), everything.body);
+  const staleTasks = allStale.filter((task) => task.declaration.key !== 'operator-watch' && task.state.kind !== 'ok').length;
+  assert.ok(staleTasks >= 5);
+  assert.equal(everything.problems, staleTasks + 1, 'les tâches en cause, plus les alertes');
+  assert.match(everything.title, new RegExp(`alertes non délivrées et ${staleTasks} tâches à regarder$`));
+  assertDeliverable(everything, 'tout en panne');
+});
+
+test('C3 (D-305) : sans alerte non délivrée, rien ne change ; le dimanche « tout va bien » reste le même', () => {
+  const none = undeliveredAlertsOfDay([]);
+  assert.deepEqual(none, { alerts: 0, farms: 0, counts: NO_UNDELIVERED_ALERTS });
+  assert.equal(operatorWatchNotice(registry(FRIDAY), FRIDAY, none), null);
+  assert.deepEqual(operatorWatchNotice(registry(SUNDAY), SUNDAY, none), operatorWatchNotice(registry(SUNDAY), SUNDAY));
+  // Une alerte plus ancienne que 24 heures, ou en nouvelle tentative, ne compte pas pour la veille.
+  const older = undeliveredAlertsOfDay([
+    { undelivered24h: NO_UNDELIVERED_ALERTS, undelivered7d: { ...NO_UNDELIVERED_ALERTS, failed: 2 }, retrying7d: 3 },
+    { undelivered24h: { ...NO_UNDELIVERED_ALERTS, interrupted: 1 }, undelivered7d: { ...NO_UNDELIVERED_ALERTS, interrupted: 1 }, retrying7d: 0 },
+  ]);
+  assert.deepEqual(older, { alerts: 1, farms: 1, counts: { ...NO_UNDELIVERED_ALERTS, interrupted: 1 } });
 });
 
 test('les dates sont à l’heure de Paris, en hiver comme en été ; une notification par jour de Paris', () => {

@@ -93,6 +93,35 @@ export function undeliveredAlertsWords(deliveries: FarmAlertDeliveries): string 
   return `${week} sur 7 jours${today} : ${causeWords(deliveries.undelivered7d)}${retrying}`;
 }
 
+/**
+ * Ce que la veille de 9 h compte (C3, D-305) : les alertes de toutes les
+ * fermes parties sans atteindre un appareil dans les 24 dernières heures, le
+ * nombre de fermes concernées et les causes. Des nombres seulement.
+ */
+export type UndeliveredAlertsOfDay = { alerts: number; farms: number; counts: UndeliveredAlertCounts };
+
+export function undeliveredAlertsOfDay(farms: Iterable<FarmAlertDeliveries>): UndeliveredAlertsOfDay {
+  let counts = NO_UNDELIVERED_ALERTS;
+  let concerned = 0;
+  for (const farm of farms) {
+    const day = farm.undelivered24h;
+    if (undeliveredTotal(day) === 0) continue;
+    concerned += 1;
+    counts = { noDevice: counts.noDevice + day.noDevice, failed: counts.failed + day.failed, interrupted: counts.interrupted + day.interrupted };
+  }
+  return { alerts: undeliveredTotal(counts), farms: concerned, counts };
+}
+
+/**
+ * La phrase de la notification de la veille, ou `null` quand aucune alerte
+ * n'a manqué son appareil : « 2 alertes non délivrées en 24 heures, sur
+ * 1 ferme (aucun appareil inscrit : 2). » Jamais le nom d'une ferme.
+ */
+export function undeliveredAlertsWatchSentence(day: UndeliveredAlertsOfDay): string | null {
+  if (day.alerts === 0) return null;
+  return `${alertWords(day.alerts)} non délivrée${day.alerts > 1 ? 's' : ''} en 24 heures, sur ${day.farms} ferme${day.farms > 1 ? 's' : ''} (${causeWords(day.counts)}).`;
+}
+
 function alertWords(count: number): string {
   return `${count} alerte${count > 1 ? 's' : ''}`;
 }
