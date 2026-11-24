@@ -12,6 +12,23 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Objectif automatique sur l'ET0, O1 : la règle, codé le
+  24 novembre 2026** (D-316, F769 à F773, roadmap section 6 decies, PR 1
+  sur 4), en Opus 5.5 · Max, le réglage de la roadmap. **Le porteur a
+  maintenu l'objectif automatique le 24 novembre 2026 à 18 h 46**
+  (question 5 : « Maintenir, éteint par défaut »), consigné dans D-309 :
+  son choix remplace D-054. La règle vit dans
+  `lib/domain/automatic-objective.ts`, et `objectiveForBed` la compose
+  avec les objectifs saisis : un jour sans objectif saisi, réglage allumé,
+  l'ETM du jour, 0 sans culture, sinon l'ET0 × K_abri sous abri ; un jour
+  sans ET0 n'a pas de valeur et se nomme ; un objectif saisi passe
+  toujours avant. Aucun lecteur ne l'appelle encore : rien ne change pour
+  aucune ferme ; aucun écran, aucune migration. `AGENTS.md` et les
+  contrats qui portent D-010 et D-045 corrigés. Tests : les douze cas du
+  contrat et cinq précisions (`tests/objectif-automatique.test.ts`).
+  Contrôles : voir la PR. Reste O2 à O4. Mise en ligne de #196 (L5,
+  D-314) consignée ici : fusionnée le 24 novembre 2026 à 18 h 22, **en
+  ligne à 18 h 54** (run 45447955147, les cinq jobs verts).
 - **« Aujourd'hui » mène aux menus, L5 : la mise en page, codé le
   24 novembre 2026** (D-314, F766, roadmap section 6 nonies, PR 5 sur 6),
   en Opus 5.5 · Élevé. Un bloc étiré garde son contenu en haut ; l'heure
@@ -82,6 +99,8 @@ registres, elle y renvoie.
   quatre PR de code O1 à O4. **Il change D-010 et D-045 et revient sur
   D-054 : question 5 posée au porteur, aucun code de l'objectif automatique
   avant sa réponse.** PR de registres seule : **aucun contrôle rejoué**.
+  (Réponse du porteur le jour même à 18 h 46 : « Maintenir, éteint par
+  défaut » ; voir l'entrée de O1, plus haut.)
 - **Alertes sur le téléphone : les pages d'alertes disent la dernière
   lecture de la météo, codé le 24 novembre 2026** (C5, D-307, roadmap
   section 6 octies), en Opus 5.5 · Élevé. « Alertes météo » et « Alertes
