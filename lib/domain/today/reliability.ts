@@ -151,7 +151,7 @@ export const ACTUAL_RAIN_CONSEQUENCE = 'Sans elle, le besoin est surévalué.';
 /** Le bloc « Pluie mesurée » de « Objectifs et besoins », celui que l'historique ouvre déjà (lot 1, point 11). */
 export const MEASURED_RAIN_ANCHOR = 'manual-rain';
 /** Le volet « Météo de référence » de « Objectifs et besoins » : l'ET0 de la semaine s'y lit et s'y actualise. */
-export const WEATHER_ANCHOR = 'meteo-de-reference';
+const WEATHER_ANCHOR = 'meteo-de-reference';
 /** La conséquence d'un jour sans ET0 pour l'objectif automatique (D-003). */
 const AUTOMATIC_OBJECTIVE_CONSEQUENCE = 'Ces jours ne comptent pas dans l’objectif automatique.';
 /** La correspondance des espèces, dans Réglages. */
