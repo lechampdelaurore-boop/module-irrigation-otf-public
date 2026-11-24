@@ -194,6 +194,21 @@ test('le rattrapage : au plus huit semaines par ferme et par matin, les plus anc
   assert.equal(await record(ALICE, new Date('2026-08-26T04:30:00.000Z')), 0);
 });
 
+test('une saison sans planche n’a rien à enregistrer : ses semaines attendent ses planches, sans prendre la part de l’autre saison', async () => {
+  await prepareFarm(ALICE);
+  const withoutBeds = { ...snapshot, beds: [] };
+  assert.equal(await record(ALICE, MORNING, withoutBeds), 0);
+  assert.deepEqual(recordedRows(), []);
+  const beds2027 = { ...snapshot, beds: [{ ...bed(OPEN_BED, NORTH), seasons: [2027] }] };
+  const recorded = await recordAutomaticObjectiveWeeksForUser({
+    ownerUserId: ALICE,
+    now: new Date('2027-01-11T05:30:00.000Z'),
+    readSnapshot: async (season) => season === 2026 ? withoutBeds : beds2027,
+  });
+  assert.equal(recorded, 2, 'les deux semaines closes de 2027, pendant que les vingt-neuf de 2026 attendent leurs planches');
+  assert.deepEqual(recordedRows().map((row) => [row.week_start, row.days]), [['2026-12-28', 3], ['2027-01-04', 7]]);
+});
+
 test('F784 : une planche apparue après l’enregistrement n’a pas d’objectif automatique pour la semaine close', async () => {
   await prepareFarm(ALICE);
   const onlyOpen = { ...snapshot, beds: [bed(OPEN_BED, NORTH)] };

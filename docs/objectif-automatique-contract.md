@@ -349,7 +349,9 @@ sections 3 à 7 ne tranchaient pas, réglés par l'option la plus prudente :
   choix des fonctionnalités (ce qui n'a pas tourné ne se rattrape pas)
   laisserait ces semaines relues et provisoires pour toujours, ce que la
   règle 6 exclut ; elles s'enregistrent avec ce qui est connu le matin du
-  rattrapage.
+  rattrapage. Une saison sans planche dans Ouvre ta ferme n'a rien à
+  enregistrer : ses semaines closes attendent ses planches, sans prendre
+  la part de l'autre saison.
 - **F786, quelles fermes** : celles qui ont coché « Objectifs et besoins »
   (R1) et allumé le réglage au moins une fois ; une seule lecture pour
   toutes les fermes quand aucune ne l'a allumé. Rien n'est lu d'Ouvre ta
@@ -379,5 +381,5 @@ provisoires de l'historique) et
 l'enregistrement du lundi, jamais réécrit, rien le dimanche ; la météo
 relue chez l'une, pendant que la ferme d'à côté, sans enregistrement,
 relit et dit « provisoire » ; un Kc corrigé ; le rattrapage après un
-matin manqué, huit semaines au plus, les plus anciennes d'abord ; F784 ;
-les fermes de la tâche du matin).
+matin manqué, huit semaines au plus, les plus anciennes d'abord ; une
+saison sans planche ; F784 ; les fermes de la tâche du matin).

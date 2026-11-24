@@ -21,7 +21,8 @@ import { getIrrigationSnapshot } from './irrigation-service';
  * la tâche, un matin manqué) est rattrapée au matin suivant ; d'ici là elle
  * se relit et l'historique la dit provisoire. Au plus huit semaines par
  * ferme et par matin, les plus anciennes d'abord : le reste suit les matins
- * d'après (F785).
+ * d'après (F785). La saison d'avant est regardée aussi (F783) ; une saison
+ * sans planche attend ses planches.
  */
 
 const WEEKS_PER_MORNING = 8;
@@ -50,9 +51,11 @@ export async function recordAutomaticObjectiveWeeksForUser(input: {
     const recorded = await listRecordedAutomaticObjectiveWeeks(workspaceId, season);
     const missing = closed.filter((week) => !recorded.has(week.weekDates[0])).slice(0, budget);
     if (missing.length === 0) continue;
-    budget -= missing.length;
     const snapshot = await readSnapshot(season);
     const beds = snapshot.beds.filter((bed) => bed.seasons.includes(season));
+    // Une saison sans planche n'a rien à enregistrer : ses semaines attendent ses planches, sans prendre la part de l'autre saison.
+    if (beds.length === 0) continue;
+    budget -= missing.length;
     const lastWeek = missing[missing.length - 1];
     const source = await readAutomaticObjectiveSourceForUser({
       ownerUserId: input.ownerUserId,

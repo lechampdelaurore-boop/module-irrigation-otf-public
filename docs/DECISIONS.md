@@ -9529,7 +9529,8 @@ se dit provisoire ; le matin suivant la rattrape
   par `closure` pour les écrans d'O4 ; le rattrapage prend au plus huit
   semaines par ferme et par matin, les plus anciennes d'abord, y compris
   celles closes pendant qu'« Objectifs et besoins » était décochée (écart
-  assumé à P5 : sinon elles resteraient provisoires pour toujours).
+  assumé à P5 : sinon elles resteraient provisoires pour toujours) ; une
+  saison sans planche attend ses planches, sans prendre la part de l'autre.
 - F786 : seules les fermes qui ont coché « Objectifs et besoins » et
   allumé le réglage au moins une fois ; rien n'est lu d'Ouvre ta ferme
   quand aucune semaine ne manque.
@@ -9547,17 +9548,18 @@ l'historique compte les semaines provisoires) et
 `tests/db/objectif-automatique-semaines-closes.test.ts` (à deux fermes :
 l'enregistrement du lundi, jamais réécrit, rien le dimanche ; la météo
 relue chez l'une, la ferme d'à côté sans enregistrement relit et dit
-« provisoire » ; un Kc corrigé ; le rattrapage après un matin manqué, huit
-semaines au plus, les plus anciennes d'abord ; F784 ; les fermes de la
-tâche du matin). Contre-épreuve : dix-sept altérations (semaine close
-relue au lieu de son enregistrement, jamais « provisoire », close dès son
-dimanche dans le domaine ou dans la source, aucune semaine provisoire
-dans la source ou dans l'historique, planche absente relue, tâche qui
-réenregistre, ligne réécrite, rattrapage sans borne ou les plus récentes
-d'abord, saison d'avant oubliée, semaine en cours enregistrée,
-« Objectifs et besoins » ignorée, semaine sans culture recalculée, table
-oubliée à l'effacement, étape oubliée au compte rendu du matin) font
-chacune échouer au moins un test.
+« provisoire » ; un Kc corrigé ; le rattrapage après un matin manqué,
+huit semaines au plus, les plus anciennes d'abord ; une saison sans
+planche ; F784 ; les fermes de la tâche du matin). Contre-épreuve :
+dix-huit altérations (semaine close relue au lieu de son enregistrement,
+jamais « provisoire », close dès son dimanche dans le domaine ou dans la
+source, aucune semaine provisoire dans la source ou dans l'historique,
+planche absente relue, tâche qui réenregistre, ligne réécrite,
+rattrapage sans borne ou les plus récentes d'abord, saison d'avant
+oubliée, saison sans planche qui prend la part de l'autre, semaine en
+cours enregistrée, « Objectifs et besoins » ignorée, semaine sans
+culture recalculée, table oubliée à l'effacement, étape oubliée au
+compte rendu du matin) font chacune échouer au moins un test.
 
 **Ne change pas.** Aucun écran ne montre ni n'allume le réglage (O4) :
 rien ne s'écrit dans la nouvelle table tant qu'aucune ferme ne l'allume,
