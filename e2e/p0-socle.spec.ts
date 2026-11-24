@@ -26,11 +26,25 @@ test('la page d’irrigation se charge avec les données de démonstration', asy
   // demande `/favicon.ico`, absent du site, et reçoit 404 (D-298).
   await expect(page.locator('link[rel="icon"][href="/favicon.svg"][type="image/svg+xml"]')).toHaveCount(1);
   const ressourcesDeclarees = await page
-    .locator('link[rel~="icon"], link[rel="manifest"]')
+    .locator('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]')
     .evaluateAll((liens) => liens.map((lien) => (lien as HTMLLinkElement).href));
   for (const adresse of ressourcesDeclarees) {
     const reponse = await page.request.get(adresse);
     expect(reponse.status(), `La ressource déclarée ${adresse} ne répond pas`).toBe(200);
+  }
+  // Le manifeste est déclaré une seule fois, demandé avec la session : sans
+  // `crossorigin="use-credentials"`, Cloudflare Access renvoie sa demande vers
+  // la connexion et le téléphone ne peut pas installer le module (D-302). Les
+  // images qu'il nomme répondent toutes.
+  const manifeste = page.locator('link[rel="manifest"]');
+  await expect(manifeste).toHaveCount(1);
+  await expect(manifeste).toHaveAttribute('crossorigin', 'use-credentials');
+  const adresseDuManifeste = await manifeste.evaluate((lien) => (lien as HTMLLinkElement).href);
+  const contenuDuManifeste = (await (await page.request.get(adresseDuManifeste)).json()) as { icons: { src: string; type: string }[] };
+  for (const icone of contenuDuManifeste.icons) {
+    const reponse = await page.request.get(new URL(icone.src, adresseDuManifeste).href);
+    expect(reponse.status(), `L’icône ${icone.src} du manifeste ne répond pas`).toBe(200);
+    expect(reponse.headers()['content-type']).toContain(icone.type);
   }
 
   await verifierLEtape(page, journal, 'chargement de la page');

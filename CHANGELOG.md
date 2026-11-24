@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (installation sur le téléphone, logo du module)
+
+- **Le module s'installe sur le téléphone comme une application** (D-302) :
+  le navigateur demandait le manifeste sans la session Cloudflare Access,
+  qui le renvoyait vers la connexion, et le manifeste ne nommait qu'une
+  icône SVG, refusée par Chrome pour Android. La page déclare désormais le
+  manifeste avec `crossorigin="use-credentials"` ; le manifeste nomme des
+  icônes PNG de 192 et 512 pixels et une icône à masque.
+- **Un logo pour le module, choisi par le porteur** (D-302) : une goutte
+  d'eau dont le bas montre des planches et leurs goutteurs. Il remplace les
+  quatre carrés bleus dans l'onglet et les favoris, devient l'icône de
+  l'application installée et de l'écran d'accueil de l'iPhone, s'affiche
+  sur la notification de fin d'irrigation et sur le site public.
+- En ligne le 24 novembre 2026 : #184 à 10 h 17 (run 45359207603, cinq jobs
+  verts).
+
 ### Changé (la jauge sur le moteur commun)
 
 - **La jauge de la réserve du sol est calculée par le moteur hydrique

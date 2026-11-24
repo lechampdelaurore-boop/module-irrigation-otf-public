@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { FAVICON_SVG } from '../src/favicon.ts';
 import { MODULE_URL, OAUTH_RETURN_URL, PAGE_PATHS, SITE_URL } from '../src/addresses.ts';
 import { handleSiteRequest } from '../src/index.ts';
 import { contactHtml, RESPONSIBLE } from '../src/pages.ts';
@@ -166,6 +168,22 @@ test('la feuille de style est servie avec son type', async () => {
   const { response, body } = await get('/site.css');
   assert.equal(response.headers.get('content-type'), 'text/css; charset=utf-8');
   assert.match(body, /min-height: 44px/);
+});
+
+test('le logo du module est servi en SVG et déclaré par chaque page, y compris la page introuvable (D-302)', async () => {
+  const { response, body } = await get('/favicon.svg');
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('content-type'), 'image/svg+xml');
+  assert.match(body, /^<svg /);
+  for (const path of [...Object.values(PAGE_PATHS), '/adresse-inconnue']) {
+    const page = await get(path);
+    assert.match(page.body, /<link rel="icon" href="\/favicon.svg" type="image\/svg\+xml">/, path);
+  }
+});
+
+test("le logo du site est celui de l'application, octet pour octet (D-302)", async () => {
+  const application = readFileSync(new URL('../../../public/favicon.svg', import.meta.url), 'utf8');
+  assert.equal(FAVICON_SVG, application);
 });
 
 test("les adresses fixes données à Ouvre ta ferme ne changent pas sans qu'on le voie", () => {

@@ -10,11 +10,18 @@ export const metadata: Metadata = {
   title: { default: 'Irrigation · Ouvre ta ferme', template: PAGE_TITLE_TEMPLATE },
   description:
     "Module de suivi et d'aide à l'irrigation connecté à Ouvre ta ferme.",
-  manifest: '/manifest.webmanifest',
+  // Le manifeste n'est pas déclaré ici : les métadonnées écrivent sa balise
+  // sans `crossorigin`, et le navigateur le demande alors sans la session
+  // Cloudflare Access, qui le renvoie vers la connexion ; le site n'est plus
+  // installable (D-302). Il est déclaré par `<head>` ci-dessous.
   // L'icône de l'onglet, celle du manifeste : sans elle, le navigateur demande
   // `/favicon.ico`, absent du site, et reçoit une erreur 404 (constat du
-  // 22 novembre 2026, D-298).
-  icons: { icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }] },
+  // 22 novembre 2026, D-298). L'icône d'iPhone, opaque, est celle de l'écran
+  // d'accueil (D-302).
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
   themeColor: '#0f6849',
   openGraph: {
     title: 'Irrigation · Ouvre ta ferme',
@@ -43,11 +50,15 @@ export default function RootLayout({
   const offset = currentSimulatedOffsetMs();
   return (
     <html lang="fr">
-      {offset === null ? null : (
-        <head>
+      <head>
+        {/* `use-credentials` : le manifeste est demandé avec la session
+            Cloudflare Access, sans quoi le téléphone ne peut pas installer le
+            module (D-302). */}
+        <link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials" />
+        {offset === null ? null : (
           <script dangerouslySetInnerHTML={{ __html: browserClockScript(offset) }} />
-        </head>
-      )}
+        )}
+      </head>
       <body>{children}</body>
     </html>
   );

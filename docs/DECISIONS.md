@@ -8745,3 +8745,77 @@ l'ancien calcul, le plus rapide.
 après une semaine sur `commun` sans écart, lue au journal comme les trois
 matins. Ne changent pas : D-028, D-047, D-053, D-270. Aucune migration.
 Aucune question de budget.
+
+## D-302 — Le module s'installe sur le téléphone, avec son logo
+
+Date : 24 novembre 2026. Statut : décidé (correction demandée par le porteur
+le 24 novembre 2026 à 9 h 31 : « Est-ce que c'est faisable que le site
+internet soit installable sur mobile ? » ; logo choisi par lui à 9 h 44
+parmi trois propositions, « C · Planches dans la goutte », et voulu
+« partout » à 9 h 44 ; réglage choisi par le coordinateur faute de ligne de
+la roadmap : Opus 5.5 · Élevé, celui des corrections).
+
+**Contexte.** Sur son téléphone (Android, Chrome), le porteur ne pouvait pas
+installer le module : le navigateur ne proposait qu'un raccourci. Deux
+causes, trouvées dans le code, sans rien lire ni changer chez Cloudflare :
+
+1. *Le manifeste demandé sans la session.* Un navigateur demande le
+   manifeste **sans ses cookies** tant que sa balise ne porte pas
+   `crossorigin="use-credentials"`, même sur le même site (règle du HTML).
+   Or Cloudflare Access protège tout le Worker : sans le cookie de session,
+   la demande est renvoyée vers la page de connexion, le manifeste n'est pas
+   lu et le site n'est pas installable. `next` écrit cet attribut sur la
+   balise qu'il tire des métadonnées ; `vinext` 1.0.1, qui sert le module,
+   ne l'écrit pas (`shims/metadata.js`).
+2. *Pas d'icône PNG.* Le manifeste ne nommait qu'une icône SVG, déclarée à
+   la fois « any » et « maskable ». Chrome pour Android demande des icônes
+   PNG de 192 et 512 pixels pour installer une application.
+
+Le porteur a jugé l'ancienne icône (quatre carrés bleus) trop pauvre et a
+choisi un logo parmi trois dessinés pour l'occasion : une goutte d'eau dont
+le bas montre trois planches vertes et leurs goutteurs.
+
+**Décision.**
+
+- *Manifeste.* La page déclare le manifeste elle-même, dans `<head>`
+  (`app/layout.tsx`), avec `crossorigin="use-credentials"`, et plus par les
+  métadonnées, qui écriraient une seconde balise sans l'attribut. Le
+  manifeste prend un identifiant (`/irrigation`) et nomme quatre images de
+  `public/` : `icon-192.png` et `icon-512.png` (« any », la goutte sur fond
+  transparent), `icon-maskable-512.png` (« maskable », la goutte sur le fond
+  `#f4f7f1` du manifeste, dans la zone sûre du masque) et `favicon.svg`
+  (« any » seulement).
+- *Le logo partout.* `public/favicon.svg` devient la goutte (onglet,
+  favoris) ; l'iPhone reçoit `apple-touch-icon.png` (180 pixels, fond plein,
+  iOS n'acceptant pas la transparence) ; la notification de fin
+  d'irrigation porte `icon-192.png` ; le site public
+  (`irrigation-otf-site`) sert le même SVG à `/favicon.svg` et le déclare sur
+  chaque page, page introuvable comprise. Le Worker du site ne lit pas
+  `public/` : `cloudflare/irrigation-site/src/favicon.ts` en garde une copie,
+  et son test échoue si elle diffère d'un octet.
+- *Fabrication.* Les PNG sont rendues par Chromium (Playwright) à partir des
+  SVG du logo, aux tailles du manifeste ; les sources et le script de rendu
+  sont gardés hors du dépôt avec les aperçus montrés au porteur.
+- *Vérifications.* `tests/web-app-manifest.test.ts` fige ce que le manifeste
+  promet et vérifie que chaque PNG existe à la taille annoncée ; le parcours
+  P0 vérifie la balise unique du manifeste, son attribut, et que chaque
+  image déclarée ou nommée par le manifeste répond ; le test du service
+  worker vérifie l'icône de la notification ; le test du site, le logo servi
+  et déclaré.
+
+**Écarté.** (a) Ouvrir le manifeste et les icônes à tous dans Cloudflare
+Access (règle « Bypass ») : réglage Cloudflare, réservé au porteur, et
+inutile si le navigateur présente la session. À reprendre seulement si
+l'installation échoue encore une fois la correction en ligne. (b) Un
+fichier `app/manifest.ts` lu par le cadre : la règle de
+`tests/app-metadata-files.test.ts` les écarte (route créée par le cadre,
+404 du 7 novembre 2026), et `vinext` n'y mettrait pas non plus l'attribut.
+(c) Les propositions A (goutte et pousse) et B (feuille et goutte),
+écartées par le porteur. (d) Un badge de notification (petite icône
+monochrome de la barre d'état) : il demande un dessin à part.
+
+**Reste.** L'installation sur le téléphone du porteur n'est constatée
+qu'après la mise en ligne, avec son accord. Les notifications quand le
+téléphone n'a plus de session Access sont étudiées à part : la cause n'est
+pas la même (le manifeste n'intervient pas dans la réception d'une
+notification).
