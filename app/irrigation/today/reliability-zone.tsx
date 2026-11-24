@@ -19,6 +19,7 @@ const RING_GAP = 2;
 const CHECK_ICONS: Record<ReliabilityCheck['kind'], IconName> = {
   'reservoir-volume': 'cuve',
   'actual-rain': 'pluie',
+  'automatic-objective': 'soleil',
   soil: 'jauge',
   species: 'pousse',
   plan: 'calendrier',

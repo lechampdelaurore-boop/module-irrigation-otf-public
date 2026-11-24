@@ -474,3 +474,12 @@
 .phone-notice-hint { margin: 0; color: var(--muted); font-size: var(--text-12); }
 .phone-notice-time { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: var(--text-14); }
 .phone-notice-time select { min-height: var(--touch-target, 44px); }
+
+/* Le réglage « Objectif automatique », en tête du volet des objectifs (6 decies, O4, D-319). */
+.automatic-objective-setting { display: grid; gap: 8px; margin-bottom: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--sheet); }
+.automatic-objective-setting p { margin: 0; color: var(--muted); font-size: var(--text-14); }
+.automatic-objective-toggle { display: flex; align-items: center; gap: 10px; min-height: var(--touch-target, 44px); color: var(--ink); cursor: pointer; }
+.automatic-objective-toggle input { width: 22px; height: 22px; flex: none; }
+.automatic-objective-kept { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
+.automatic-objective-kept p { color: var(--warn-ink); }
+.automatic-objective-kept .danger-outline { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-ink); }
