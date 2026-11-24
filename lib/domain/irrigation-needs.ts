@@ -9,6 +9,12 @@ import type { WaterDashboardDay } from './water-management.ts';
 import { remainingPlannedApplications } from './planned-irrigation.ts';
 import { goalRevisionFirstDate } from './hydric-goal-revisions.ts';
 import type { ProposalSummary } from './crop-water/proposal.ts';
+import {
+  automaticObjectiveEnabledOn,
+  automaticObjectiveWeek,
+  type AutomaticObjectiveInput,
+  type AutomaticObjectiveWeek,
+} from './automatic-objective.ts';
 import { mmText } from './figure-origin.ts';
 import {
   FARM_TIME_ZONE,
@@ -365,16 +371,47 @@ function uniqueSorted(values: readonly string[]) {
   return [...new Set(values)].sort();
 }
 
-/** L'objectif applicable d'une planche pour une semaine : la règle du besoin, lue aussi par l'objectif proposé (5 quater). */
-export function objectiveForBed(revisions: readonly GoalRevisionLike[], bed: Pick<Bed, 'id' | 'zoneId' | 'plotId'>, weekStart: string, weekEnd: string) {
+/** D'où vient l'objectif d'une semaine : saisi, automatique (D-309), ou les deux selon les jours. */
+type BedObjectiveOrigin = 'entered' | 'automatic' | 'both';
+
+export type BedObjective = {
+  /** La somme des septièmes des objectifs saisis et des valeurs automatiques ; `null` sans aucun jour couvert. */
+  value: number | null;
+  /** Au moins un jour de la semaine a une cible ; un objectif automatique incomplet nomme ses jours dans `automatic`. */
+  complete: boolean;
+  /** Le niveau des objectifs saisis qui ont servi ; `null` quand aucun n'a servi. */
+  source: GoalRevisionLike['scopeType'] | 'mixed' | null;
+  origin: BedObjectiveOrigin | null;
+  /** Les jours où l'objectif automatique s'applique ; `null` quand il ne s'applique à aucun jour. */
+  automatic: AutomaticObjectiveWeek | null;
+};
+
+/**
+ * L'objectif applicable d'une planche pour une semaine : la règle du besoin,
+ * lue aussi par l'objectif proposé (5 quater). Jour par jour, l'objectif
+ * saisi le plus précis qui couvre la planche apporte un septième de sa
+ * valeur ; un jour sans objectif saisi prend la valeur de l'objectif
+ * automatique quand `automatic` le dit allumé ce jour-là (D-309), sinon rien.
+ * Sans `automatic`, ou réglage éteint, rien ne change (D-316).
+ */
+export function objectiveForBed(
+  revisions: readonly GoalRevisionLike[],
+  bed: Pick<Bed, 'id' | 'zoneId' | 'plotId'>,
+  weekStart: string,
+  weekEnd: string,
+  automatic?: AutomaticObjectiveInput,
+): BedObjective {
   // Tri stable, semaine puis date : deux révisions reçues dans la même milliseconde gardent l'ordre
   // reçu du dépôt et la seconde fait foi ; jamais de départage par l'identifiant (docs/revision-order-contract.md).
   const ordered = [...revisions].sort((a, b) => a.weekStart.localeCompare(b.weekStart) || a.createdAt.localeCompare(b.createdAt));
   const state = new Map<string, GoalRevisionLike>();
   let total = 0;
-  let available = 0;
+  let entered = 0;
   const sources = new Set<GoalRevisionLike['scopeType']>();
+  const weekDates: string[] = [];
+  const automaticDates: string[] = [];
   for (let date = weekStart; date <= weekEnd; date = addDaysToDateKey(date, 1)) {
+    weekDates.push(date);
     for (const revision of ordered) {
       // Chaque révision compte à partir de son jour de pose (D-034), règle partagée avec l'historique (D-039).
       if (goalRevisionFirstDate(revision) <= date) {
@@ -385,10 +422,17 @@ export function objectiveForBed(revisions: readonly GoalRevisionLike[], bed: Pic
     const applicable = [...state.values()].filter((goal) => goalApplies(goal, bed)).sort((a, b) => scopeRank(b.scopeType) - scopeRank(a.scopeType) || b.createdAt.localeCompare(a.createdAt))[0];
     if (applicable?.amountMm !== null && applicable?.amountMm !== undefined) {
       total += Math.max(0, applicable.amountMm) / 7;
-      available += 1;
+      entered += 1;
       sources.add(applicable.scopeType);
+    } else if (automatic !== undefined && automaticObjectiveEnabledOn(automatic.settings, date)) {
+      // Un objectif saisi, à n'importe quel niveau, passe toujours avant l'objectif automatique (D-309).
+      automaticDates.push(date);
     }
   }
+  const automaticWeek = automatic !== undefined && automaticDates.length > 0
+    ? automaticObjectiveWeek(automatic, bed, weekDates, automaticDates)
+    : null;
+  const automaticDays = automaticWeek?.valuedDays ?? 0;
   const source: GoalRevisionLike['scopeType'] | 'mixed' | null = sources.size === 0
     ? null
     : sources.size === 1
@@ -397,10 +441,13 @@ export function objectiveForBed(revisions: readonly GoalRevisionLike[], bed: Pic
   // Un objectif posé en cours de semaine vaut pour ses jours restants : la
   // demande est la somme des septièmes sur les jours couverts, et seule une
   // semaine sans aucun jour couvert est sans objectif (D-034, point ouvert 16).
+  const covered = entered + automaticDays;
   return {
-    value: available > 0 ? total : null,
-    complete: available > 0,
+    value: covered > 0 ? total + (automaticWeek?.mm ?? 0) : null,
+    complete: covered > 0,
     source,
+    origin: entered > 0 && automaticDays > 0 ? 'both' : entered > 0 ? 'entered' : automaticDays > 0 ? 'automatic' : null,
+    automatic: automaticWeek,
   };
 }
 

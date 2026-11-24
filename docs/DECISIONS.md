@@ -9052,9 +9052,10 @@ dans le tableau des besoins.
 ## D-309 — L'objectif automatique : l'objectif de la semaine peut suivre l'ET0, si la ferme l'allume
 
 Date : 24 novembre 2026. Statut : **choix du porteur consignés, contrat
-écrit sans code ; aucun code avant sa réponse à la question 5** ; roadmap
-section 6 decies. Contrat en Fable 5.2 · Élevé, par exception expresse du
-porteur pour ce seul fil ; code dans un autre fil, en Opus.
+écrit sans code ; question 5 répondue le jour même à 18 h 46 : « Maintenir,
+éteint par défaut »** ; code en quatre PR, O1 codée le jour même (D-316) ;
+roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
+expresse du porteur pour ce seul fil ; code dans un autre fil, en Opus.
 
 **Contexte.** Le porteur demande le 24 novembre 2026 (13 h 25) « un bouton
 pour que on puisse, par défaut, régler les objectifs de la semaine sur
@@ -9091,8 +9092,13 @@ PR O1, avec le code : d'ici là, ils disent vrai du code.
 **Contradiction signalée.** Cette décision revient sur D-054 avant la
 saison de comparaison qu'elle demandait. L'assistant l'a signalée au
 porteur le jour même (question 5, 13 h 43 : maintenir, attendre une saison,
-ou un bouton de préremplissage seul). **Aucun code de l'objectif
-automatique avant sa réponse** ; elle sera consignée ici.
+ou un bouton de préremplissage seul), et aucun code de l'objectif
+automatique n'a commencé avant sa réponse. **Réponse du porteur, le
+24 novembre 2026 à 18 h 46**, sur la carte de décision : « Maintenir,
+éteint par défaut », l'option recommandée. Son choix du jour remplace
+D-054 : le mode automatique est retenu, par ferme, éteint tant que la ferme
+ne l'allume pas ; chaque ferme l'allume si elle le veut, et rien ne change
+sans ce geste. Le code suit les six PR de la section 6 nonies.
 
 **Ne change pas.** Réglage éteint, rien ne change, pour aucune ferme. Le
 calcul de l'ETM, la pluie comptée, la pénurie, les priorités, la
@@ -9370,3 +9376,61 @@ borne, l'ordre du rendu et les deux règles du premier dessin.
 
 **Ne change pas.** Le contenu des blocs, l'ordre à l'ordinateur ; aucune
 donnée, aucune migration.
+
+## D-316 — L'objectif automatique, O1 : la règle
+
+Date : 24 novembre 2026. Statut : codé (PR O1 sur 4 du contrat
+`docs/objectif-automatique-contract.md`, D-309, sections 3 et 8) ; roadmap
+section 6 decies. Code en Opus 5.5 · Max, le réglage de la roadmap.
+
+**Décision.** La règle de l'objectif automatique vit en un seul endroit,
+`lib/domain/automatic-objective.ts`, et `objectiveForBed`
+(`lib/domain/irrigation-needs.ts`) la compose avec les objectifs saisis,
+jour par jour :
+
+- un jour où un objectif saisi couvre la planche, à n'importe quel niveau
+  et même de 0 mm, il apporte un septième de sa valeur, comme avant ;
+- un jour sans objectif saisi, réglage de la ferme allumé ce jour-là :
+  l'ETM du jour quand « Besoin par culture » la connaît, 0 un jour sans
+  culture, sinon l'ET0 du jour, × K_abri sous abri ; jamais une demi-ETM ;
+- un jour sans ET0 n'a pas de valeur : la semaine compte les jours connus
+  et nomme les autres ; une semaine entière sans culture n'a pas
+  d'objectif automatique.
+
+La fonction dit l'origine (« saisi », « automatique », « les deux ») et le
+détail des jours automatiques : leur valeur ou ce qui l'empêche, la somme
+par nature de l'ET0 (réanalysée, estimée, prévue), les jours manquants et
+la base (culture, ET0, ET0 sous abri). Elle lit `et0OfDay`,
+`shelterFactorOn` et les bornes de l'ETM (`lib/domain/crop-water/etm.ts`,
+ces deux dernières exportées pour cela) : aucune règle copiée.
+
+**Précisions tranchées en codant** (contrat, section 8).
+
+- F769 : un jardin à classer n'a pas d'objectif automatique ; on ne sait
+  pas s'il est sous abri.
+- F770 : « Besoin par culture » cochée et plan de culture non lu : les
+  jours n'ont pas de valeur, jamais l'ET0 d'une planche peut-être vide.
+- F771 : une ET0 ou un K_abri hors bornes, quand l'ET0 sert seule : le
+  jour n'a pas de valeur, le message de l'ETM la nomme.
+- F772 : « sans culture de toute la semaine » se lit sur les sept jours ;
+  une culture récoltée le mercredi laisse 0 ensuite.
+- F773 : le réglage compte à partir du jour du geste, en heure de Paris ;
+  deux gestes le même jour, le second fait foi.
+
+**Corrigés avec le code**, comme le contrat le demandait : les deux règles
+d'`AGENTS.md` qui portent D-010 et D-045, `docs/irrigation-needs-contract.md`
+et la section « Le mode automatique » de `docs/crop-water-need-contract.md`.
+
+**Preuve.** `tests/objectif-automatique.test.ts`, vingt tests : les douze
+cas chiffrés du contrat, les cinq précisions, les natures de l'ET0, l'ETM
+partielle ou bloquée, et un passage par le vrai calcul de l'ETM (une
+carotte au Kc 0,7, un zinnia sans culture de référence). Contre-épreuve :
+sept altérations de la règle (ET0 inconnue comptée 0, K_abri oublié,
+demi-ETM, semaine sans culture comptée 0, jardin à classer ignoré, jour UTC
+au lieu de Paris, priorité de l'objectif saisi oubliée) font chacune
+échouer au moins un test.
+
+**Ne change pas.** Aucun lecteur ne passe encore de source automatique à
+`objectiveForBed` : le besoin, l'écart, le planning, la faisabilité,
+l'historique, les séries et les écrans sont ceux d'avant, pour toutes les
+fermes. Aucune donnée, aucune migration, aucun écran (O2 à O4).

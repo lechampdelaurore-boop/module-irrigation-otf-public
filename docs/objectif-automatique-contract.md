@@ -18,7 +18,8 @@ reconsidérer « après une saison de comparaison, par une décision nouvelle »
 (D-054, `docs/crop-water-need-contract.md`, « Le mode automatique »). Les
 choix du 24 novembre ci-dessous sont cette décision nouvelle (D-309), prise
 avant la saison de comparaison : la contradiction avec D-054 a été signalée
-au porteur le jour même (question 5 ci-dessous).
+au porteur le jour même (question 5 ci-dessous), et il a maintenu son choix
+à 18 h 46.
 
 ## 1. Les choix du porteur (24 novembre 2026, heure de Paris)
 
@@ -30,7 +31,7 @@ Sur des cartes de décision, une question par message.
 | 2 | Quand l'objectif suit l'ET0 | **Mis à jour chaque matin** | 13 h 32 |
 | 3 | Sous abri | **L'ET0 corrigée par l'abri** (ET0 × K_abri de l'abri) | 13 h 33 |
 | 4 | Quand le besoin de la culture est connu | **Le besoin de la culture, sinon l'ET0** | 13 h 35 |
-| 5 | Maintenir ce mode, écarté le 31 octobre (D-054) | **question posée à 13 h 43, réponse attendue** ; aucun code de ce contrat avant elle | — |
+| 5 | Maintenir ce mode, écarté le 31 octobre (D-054) ; question posée à 13 h 43 | **Maintenir, éteint par défaut** : son choix du jour remplace D-054 ; chaque ferme allume le réglage si elle le veut, rien ne change sans ce geste | 18 h 46 |
 
 Deux garde-fous posés par l'assistant en cadrant, annoncés au porteur :
 
@@ -193,3 +194,42 @@ textes disent vrai du code.
   plus vers Ouvre ta ferme.
 - Le planning de la semaine suivante : l'ET0 prévue n'y couvre pas toujours
   les sept jours ; l'objectif y est alors incomplet et le dit (cas 8).
+
+## 8. Précisions faites en codant O1 (24 novembre 2026, D-316)
+
+La règle vit dans `lib/domain/automatic-objective.ts` ; `objectiveForBed`
+la compose avec les objectifs saisis, jour par jour. Cinq cas que la
+section 3 ne tranchait pas, réglés par l'option la plus prudente :
+
+- **F769, un jardin à classer** (4.4, F583) : pas d'objectif automatique.
+  On ne sait pas s'il est sous abri, donc ni s'il prend le K_abri ; son
+  besoin n'est déjà pas calculé. Ses jours se disent « jardin à classer ».
+- **F770, « Besoin par culture » cochée mais plan de culture non lu** : les
+  jours n'ont pas de valeur. L'ET0 servirait une planche peut-être vide, et
+  l'objectif changerait selon qu'Ouvre ta ferme a répondu ; la semaine se
+  dit incomplète et nomme ses jours (D-003).
+- **F771, une ET0 ou un K_abri hors bornes** quand l'ET0 sert seule : les
+  bornes de l'ETM (0 à 15 mm/j pour l'ET0, 0,5 à 1 pour le K_abri,
+  `docs/crop-water-need-contract.md`, « Les garde-fous ») valent aussi pour
+  elle ; le jour n'a pas de valeur et le message la nomme, le même que
+  celui de l'ETM.
+- **F772, « sans culture de toute la semaine »** se lit sur les sept jours,
+  du lundi au dimanche, comme l'objectif proposé : une culture récoltée le
+  mercredi laisse 0 les jours qui suivent, pas « pas d'objectif », même
+  quand ces jours sans culture sont les seuls où l'objectif automatique
+  s'applique.
+- **F773, le jour du geste** : le réglage compte à partir du jour, en heure
+  de Paris, où il est allumé ou éteint ; deux gestes le même jour, le second
+  fait foi pour toute la journée ; deux gestes de la même milliseconde
+  gardent l'ordre reçu (`docs/revision-order-contract.md`).
+
+Ce que `objectiveForBed` rend, pour O2 : la valeur et `complete` gardent
+leur sens (au moins un jour a une cible) ; `origin` dit « saisi »,
+« automatique » ou « les deux » ; `automatic` donne les jours où
+l'objectif automatique s'applique, chacun avec sa valeur ou ce qui
+l'empêche, la somme par nature de l'ET0, les jours manquants, la semaine
+sans culture et sa base (culture, ET0, ET0 sous abri, ou plusieurs). Sans
+source automatique, ou réglage éteint, le résultat est celui d'avant ;
+aucun lecteur ne lui en passe encore une. Preuve :
+`tests/objectif-automatique.test.ts`, les douze cas de la section 3 et ces
+cinq précisions.

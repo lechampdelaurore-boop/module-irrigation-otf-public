@@ -263,13 +263,15 @@ function presentWithoutReference(dates: CultivationDates, date: string): boolean
   return date >= dates.presenceStart && (dates.lastHarvest === null || date <= dates.lastHarvest);
 }
 
-function shelterFactorProblem(value: number): string | null {
+/** Ce qui bloque un K_abri hors bornes (0,5 à 1) ; l'objectif automatique le lit aussi (D-316). */
+export function shelterFactorProblem(value: number): string | null {
   const { minimum, maximum } = SHELTER_FACTOR.bounds;
   if (Number.isFinite(value) && value >= minimum && value <= maximum) return null;
   return `K_abri hors bornes : ${decimal.format(value)} (entre ${decimal.format(minimum)} et ${decimal.format(maximum)}).`;
 }
 
-function et0Problem(et0: DayEt0, date: string): string | null {
+/** Ce qui bloque une ET0 hors bornes, le jour nommé ; l'objectif automatique le lit aussi (D-316). */
+export function et0Problem(et0: DayEt0, date: string): string | null {
   const { minimum, maximum } = ET0_BOUNDS;
   if (Number.isFinite(et0.mm) && et0.mm >= minimum && et0.mm <= maximum) return null;
   const day = dayLabel.format(new Date(`${date}T12:00:00.000Z`));

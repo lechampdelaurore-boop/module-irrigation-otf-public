@@ -129,7 +129,9 @@ que par une nouvelle décision dans `docs/DECISIONS.md`.
   proratisé par jour ; il n'existe pas de niveaux qualitatifs.
 - Le besoin se calcule à partir de l'objectif seul : écart = objectif −
   (irrigation réelle + pluie réelle), positif en cas de déficit. L'ET0 est une
-  information affichée, jamais un terme du besoin ni de l'écart (D-010).
+  information affichée, jamais un terme du besoin ni de l'écart (D-010) ; elle
+  n'y entre que par l'objectif automatique, quand une ferme l'allume, les
+  jours sans objectif saisi (D-309, `docs/objectif-automatique-contract.md`).
 - Les millimètres ne s'additionnent pas entre surfaces : à l'échelle du
   jardin, de la parcelle ou de l'exploitation, ils sont pondérés par la
   surface, `Σ(mm × m²) / Σ(m²)` ; les volumes, eux, s'additionnent.
@@ -152,8 +154,9 @@ que par une nouvelle décision dans `docs/DECISIONS.md`.
   confond pas avec elle (D-041, D-047).
 - Le besoin calculé par culture et par stade (ETM) est un objectif
   **proposé** : il n'entre dans le besoin que par une révision d'objectif que
-  l'utilisateur adopte ; un objectif qui suivrait la proposition sans son
-  geste demande une décision nouvelle (D-010, D-045).
+  l'utilisateur adopte, ou par l'objectif automatique que la ferme allume, les
+  jours sans objectif saisi ; un objectif saisi passe toujours avant (D-010,
+  D-045, D-309). Réglage éteint, ce qui est le cas par défaut, rien ne change.
 - Les unités sont explicites dans les noms et les libellés : mm, m², m³, m³/h,
   minutes ou secondes.
 

@@ -396,7 +396,8 @@ sans rien effacer, valable à partir du jour de l'adoption (D-039). Son
 origine, « proposition adoptée », est conservée.
 
 Tant que rien n'est adopté, l'objectif saisi reste le seul utilisé par le
-besoin, l'écart, la faisabilité et le planning.
+besoin, l'écart, la faisabilité et le planning, sauf quand la ferme a allumé
+l'objectif automatique (ci-dessous, D-309).
 
 ### Le mode automatique
 
@@ -404,9 +405,18 @@ Le document de départ prévoit un mode, par planche ou par série, où
 l'objectif suit la proposition chaque semaine sans geste de l'utilisateur.
 L'ET0 entrerait alors dans le besoin par l'objectif, ce que D-010 interdit
 sans décision nouvelle. **Non retenu par le porteur le 31 octobre 2026
-(D-054)** : seule l'adoption à la main existe ; D-010 ne change pas. Il pourra
-être reconsidéré après une saison de comparaison, par une décision
-nouvelle.
+(D-054)** : seule l'adoption à la main existait ; il pourrait être reconsidéré
+après une saison de comparaison, par une décision nouvelle.
+
+**Retenu par le porteur le 24 novembre 2026 (D-309), avant cette saison** :
+il a maintenu son choix (« Maintenir, éteint par défaut », 18 h 46) quand la
+contradiction avec D-054 lui a été signalée. C'est l'objectif automatique
+(`docs/objectif-automatique-contract.md`) : par ferme et non par planche,
+éteint tant que la ferme ne l'allume pas ; les jours sans objectif saisi,
+l'objectif suit l'ETM du jour quand « Besoin par culture » la connaît, sinon
+l'ET0 du jour, × K_abri sous abri ; un objectif saisi passe toujours avant.
+Le calcul de l'ETM, ses coefficients, ses bornes et ses garde-fous ne
+changent pas : l'objectif automatique les lit. L'adoption à la main reste.
 
 ## Les garde-fous
 

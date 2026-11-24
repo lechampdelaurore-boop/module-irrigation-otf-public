@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (objectif automatique sur l'ET0, O1)
+
+- **La règle de l'objectif automatique** (D-316) : quand une ferme
+  l'allumera, l'objectif de la semaine d'une planche suivra, les jours sans
+  objectif saisi, le besoin de sa culture, sinon l'ET0 du jour, corrigée
+  par l'abri ; un objectif saisi passera toujours avant, et un jour sans
+  ET0 sera nommé, jamais compté pour zéro. Le porteur a maintenu ce choix
+  le 24 novembre 2026 (D-309). Rien ne change encore pour aucune ferme :
+  aucun écran ne l'allume, aucun calcul ne la lit (O2 à O4).
+
 ### Modifié (« Aujourd'hui » mène aux menus, L6)
 
 - **Au téléphone, « Aujourd'hui » commence par la journée** (D-315) :
