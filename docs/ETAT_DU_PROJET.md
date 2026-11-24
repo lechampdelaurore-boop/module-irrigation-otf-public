@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **« Aujourd'hui » mène aux menus, L3 : les autres liens de la page,
+  codé le 24 novembre 2026** (D-312, F761, F762, roadmap section 6 nonies,
+  PR 3 sur 6), en Opus 5.5 · Élevé. Un jour en alerte de « Gel ou
+  chaleur » mène à la page de son alerte ; une ligne à jour de « Fiabilité
+  du calcul » à la page de sa donnée ; « Plan calculé … » au planning ;
+  l'état vide de « Votre journée » au planning ou à « Planifier un
+  arrosage » ; une carte « À valider » dit « Valider au planning ».
+  Affichage seul, aucune migration. Parcours P29 étendu. Contrôles : voir la
+  PR. Reste L4 à L6.
 - **« Aujourd'hui » mène aux menus, L2 : les jauges mènent à leur page,
   codé le 24 novembre 2026** (D-311, F759, F760, roadmap section 6 nonies,
   PR 2 sur 6), en Opus 5.5 · Élevé. Chaque ligne de « Eau de la semaine »

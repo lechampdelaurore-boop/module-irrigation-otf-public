@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (« Aujourd'hui » mène aux menus, L3)
+
+- **Les autres liens de « Aujourd'hui »** (D-312) : un jour de gel ou
+  d'alerte mène à sa page d'alertes ; une donnée à jour de « Fiabilité du
+  calcul » mène à la page où elle se saisit ; « Plan calculé … » mène au
+  planning ; une journée sans rien à faire propose « Voir le planning de la
+  semaine » ou « Planifier un arrosage » ; une proposition à valider dit
+  « Valider au planning » au lieu d'« Ouvrir ».
+
 ### Ajouté (« Aujourd'hui » mène aux menus, L2)
 
 - **Les jauges de « Aujourd'hui » mènent à leur page** (D-311) : une ligne

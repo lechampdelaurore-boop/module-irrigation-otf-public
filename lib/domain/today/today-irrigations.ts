@@ -44,8 +44,12 @@ export type TodayIrrigationLine = {
   tone: TodayIrrigationTone;
   /** Le bouton existant « Démarrer maintenant » : une irrigation planifiée seulement, jamais une proposition. */
   canStart: boolean;
-  /** La carte à ouvrir : sa page et son ancre. */
-  open: { page: IrrigationPageId; anchor: string };
+  /**
+   * La carte à ouvrir : sa page, son ancre et le mot du lien (6 nonies, L3) :
+   * « Ouvrir », ou « Valider au planning » pour une proposition à valider ;
+   * rien n'est validé par le lien (D-028).
+   */
+  open: { page: IrrigationPageId; anchor: string; label: string };
   /** L'heure de début prévue, l'instant : la frise de la journée la place. */
   startAt: string;
   /** Le jour civil à la ferme du début prévu, `AAAA-MM-JJ`. */
@@ -131,7 +135,7 @@ function irrigationLine(
     status: STATUS_TEXT[tone],
     tone,
     canStart: true,
-    open: { page: context.page, anchor: irrigationAnchor(equipment.id) },
+    open: { page: context.page, anchor: irrigationAnchor(equipment.id), label: 'Ouvrir' },
     ...drawn({ startAt, durationSeconds: equipment.plannedDurationSeconds, doseMm: dose, bedIds, beds }),
     equipmentName: equipment.equipmentSnapshot.name,
     settingName: equipment.settingSnapshot.name,
@@ -218,7 +222,7 @@ export function todayTodoLines(input: {
           status: STATUS_TEXT.proposed,
           tone: 'proposed',
           canStart: false,
-          open: { page: 'planning', anchor: proposalAnchor(proposal.storedId) },
+          open: { page: 'planning', anchor: proposalAnchor(proposal.storedId), label: 'Valider au planning' },
           ...drawn({ startAt: proposal.startAt, durationSeconds: proposal.durationSeconds, doseMm: proposal.doseMm, bedIds, beds }),
           equipmentName: proposal.equipmentName,
           settingName: proposal.settingName,

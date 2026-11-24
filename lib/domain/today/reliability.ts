@@ -277,6 +277,21 @@ export type ReliabilityCheck = {
   summary: string;
   /** Les lignes de la donnée, chacune avec sa phrase et son geste ; vide quand elle est à jour. */
   lines: ReliabilityLine[];
+  /**
+   * À jour, la ligne mène à la page où vit sa donnée (6 nonies, L3), là où
+   * son geste mènerait si elle était à rafraîchir ; `null` à rafraîchir :
+   * ses propres lignes portent leur geste.
+   */
+  link: { page: IrrigationPageId; anchor: string | null } | null;
+};
+
+/** Où vit chaque donnée suivie (L3, règle 2) : la page de son geste, sans viser une réserve ou un jardin en particulier. */
+const CHECK_PAGES: Record<ReliabilityKind, { page: IrrigationPageId; anchor: string | null }> = {
+  'reservoir-volume': { page: 'ressources', anchor: null },
+  'actual-rain': { page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
+  soil: { page: 'sol', anchor: null },
+  species: { page: 'reglages', anchor: SPECIES_CORRESPONDENCE_ANCHOR },
+  plan: { page: 'planning', anchor: null },
 };
 
 function okSummary(kind: ReliabilityKind, input: ReliabilityInputs): string {
@@ -325,7 +340,8 @@ export function reliabilityChecks(input: ReliabilityInputs, lines: readonly Reli
     .filter((kind) => input.enabled.includes(RELIABILITY_FEATURE[kind]))
     .map((kind) => {
       const own = lines.filter((line) => line.kind === kind);
-      return { kind, label: CHECK_LABELS[kind], ok: own.length === 0, summary: own.length === 0 ? okSummary(kind, input) : todoSummary(kind, input, own), lines: own };
+      const ok = own.length === 0;
+      return { kind, label: CHECK_LABELS[kind], ok, summary: ok ? okSummary(kind, input) : todoSummary(kind, input, own), lines: own, link: ok ? CHECK_PAGES[kind] : null };
     });
 }
 

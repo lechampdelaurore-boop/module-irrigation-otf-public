@@ -32,7 +32,10 @@ import {
  * ligne disparaît ensuite et la pastille baisse d'autant. Sans réserve utile
  * (RFU) saisie, la fiabilité ne propose pas « Observer le sol de… » mais
  * « Renseigner la réserve de la parcelle… », qui ouvre « Réglages du sol » sur
- * sa parcelle (lot D, J4, F309). Tout se passe sur
+ * sa parcelle (lot D, J4, F309). Les liens de la page (6 nonies, L2 et L3,
+ * D-311, D-312) : la cuve mène à sa carte ; l'état vide de « Votre journée »,
+ * la ligne du plan à jour et « Plan calculé … » mènent au planning ; le jour
+ * en alerte mène à la page de son alerte. Tout se passe sur
  * une ferme propre au parcours et à la largeur : rien n'est laissé sur la
  * ferme de démonstration habituelle.
  *
@@ -108,6 +111,10 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(blocs(page).locator('h2')).toHaveText(TITRES_DES_BLOCS);
   await expect(bloc(page, 'Votre journée')).toContainText('Aucune irrigation en retard.');
   await expect(bloc(page, 'Votre journée')).toContainText('Rien à faire aujourd’hui.');
+  // L'état vide propose la suite (6 nonies, L3, D-312) : « Planning » coché, le planning de la semaine.
+  const suiteDuJour = bloc(page, 'Votre journée').getByRole('link', { name: 'Voir le planning de la semaine' });
+  await expect(suiteDuJour).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
+  if (telephone) await verifierCibleTactile(suiteDuJour, 'Le lien « Voir le planning de la semaine »');
   // L'en-tête : un seul titre, celui de la page ; la date en toutes lettres en sous-titre, et la phrase du jour (lot A, J13, F285).
   await expect(page.locator('.today-head .today-date')).toHaveText(/^[A-Z][a-zé]+ \d{1,2} [a-zéû]+$/);
   await expect(page.locator('.today-head').getByRole('heading')).toHaveCount(0);
@@ -148,6 +155,11 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(lignesDeFiabilite(page).filter({ hasText: 'Le plan de la semaine n’a pas été calculé.' })).toHaveCount(0);
   await expect(page.locator('.today-plan')).toContainText(/^Plan calculé aujourd’hui à \d{1,2} h( \d{2})?$/);
   await expect.poll(() => pastille(page)).toBe(manquesAuDepart - 1 === 0 ? null : manquesAuDepart - 1);
+  // À jour, la ligne du plan mène au planning, comme « Plan calculé … » de l'en-tête (L3, D-312).
+  const planAJour = fiabilite.locator('a.reliability-check-link').filter({ hasText: 'Plan de la semaine' });
+  await expect(planAJour).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
+  if (telephone) await verifierCibleTactile(planAJour, 'La ligne « Plan de la semaine »');
+  await expect(page.locator('.today-plan a')).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
   await verifierLEtape(page, journal, 'plan recalculé, ligne disparue');
 
   // Sans RFU, une observation ne remplirait rien : « Renseigner la réserve de la parcelle … » à la place d'« Observer le sol de … »,
@@ -235,6 +247,11 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(pastilleMeteo).toHaveAttribute('href', '#today-weather');
   const voirLesAlertes = meteo.getByRole('link', { name: 'Voir les alertes' });
   if (telephone) await verifierCibleTactile(voirLesAlertes, 'Le lien « Voir les alertes »');
+  // Le jour en alerte est un lien entier vers la page de son alerte, « Voir l’alerte » écrit dessous (L3, D-312).
+  const jourEnAlerte = meteo.locator('a.today-day-link').first();
+  await expect(jourEnAlerte).toContainText('Voir l’alerte');
+  await expect(jourEnAlerte).toHaveAttribute('href', /^\/irrigation\/alertes-(meteo|cultures)\?season=\d{4}$/);
+  if (telephone) await verifierCibleTactile(jourEnAlerte, 'Le jour en alerte');
   await verifierLEtape(page, journal, 'gel ou froid annoncé en barre rouge');
 
   // Au téléphone : la barre du bas commence par « Aujourd’hui » ; la phrase du jour et ses pastilles tiennent dans le premier écran (T10).

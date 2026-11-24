@@ -306,7 +306,21 @@ export type TodayView = {
   tomorrow: TodayTomorrow | null;
   /** L'eau qui manque à la semaine, la phrase du planning (F276) ; `null` sans « Planning » ou sans manque. */
   shortage: TodayShortage | null;
+  /**
+   * Le lien de « Rien à arroser aujourd'hui » (6 nonies, L3) : le planning
+   * de la semaine quand « Planning » est coché, sinon « Planifier un
+   * arrosage » sur « Arrosages » (l'intention d'adresse `planifier`).
+   */
+  dayEmptyLink: TodayDayEmptyLink | null;
 };
+
+export type TodayDayEmptyLink = { label: string; page: 'planning' | 'arrosages'; intent: 'planifier' | null };
+
+function dayEmptyLink(enabled: FeatureSelection): TodayDayEmptyLink | null {
+  if (enabled.includes('planning')) return { label: 'Voir le planning de la semaine', page: 'planning', intent: null };
+  if (enabled.includes('arrosages')) return { label: 'Planifier un arrosage', page: 'arrosages', intent: 'planifier' };
+  return null;
+}
 
 /** Les jardins d'une irrigation d'aujourd'hui : en cours, reliquat, en retard, planifiée ou à valider (F430). */
 function gardensIrrigatedToday(lines: readonly { bedIds: readonly string[] }[], bedPlots: ReadonlyMap<string, string> | undefined): Set<string> {
@@ -372,5 +386,6 @@ export function todayView(input: TodayInputs): TodayView {
     soil: on('sol') && input.soil ? todaySoil(input.soil, irrigatedToday) : null,
     tomorrow,
     shortage,
+    dayEmptyLink: irrigationsOn ? dayEmptyLink(enabled) : null,
   };
 }

@@ -35,6 +35,13 @@ export type TodayWeatherDay = {
   notes: string[];
   /** La barre de la minimale à la maximale sur l'échelle, en % ; `null` sans les deux. */
   range: { fromPercent: number; toPercent: number } | null;
+  /**
+   * La page de l'alerte du jour (6 nonies, L3) : « Alertes cultures » pour un
+   * gel des cultures, sinon « Alertes météo » ; un jour qui a les deux mène au
+   * gel des cultures, comme « Voir les alertes » (F761). `null` pour un jour
+   * calme ou inconnu : pas de lien qui ne mène à rien de neuf.
+   */
+  alertPage: 'alertes-cultures' | 'alertes-meteo' | null;
 };
 
 export type TodayWeatherScale = { minimumCelsius: number; maximumCelsius: number; zeroPercent: number };
@@ -92,6 +99,7 @@ export function weatherDays(input: {
       range: minimumCelsius !== null && maximumCelsius !== null
         ? { fromPercent: at(minimumCelsius), toPercent: at(maximumCelsius) }
         : null,
+      alertPage: announced?.frost ? 'alertes-cultures' : (announced?.alerts.length ?? 0) > 0 ? 'alertes-meteo' : null,
     };
   });
 }
