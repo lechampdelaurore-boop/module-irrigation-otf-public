@@ -148,6 +148,15 @@ reste tel quel tant que l'égalité n'est pas prouvée. Une PR par bloc :
    écart, sans échec et sans planche laissée de côté sur la ferme réelle, lus
    au journal ; le journal compare alors dans l'autre sens. Les deux données
    impossibles (ci-dessus) y sont dites au porteur, avec leurs deux valeurs.
+   **Faite le 24 novembre 2026** (D-301), après les matins des 22, 23 et
+   24 novembre 2026, lus le 24 au journal du Worker : chaque matin
+   164 planches, 5 084, 6 068 puis 5 904 jours comparés, aucun écart, aucun
+   échec, aucune planche laissée de côté (le plus grand écart :
+   2,8e-14 mm). Tous les tests sont rejoués une seconde fois l'interrupteur
+   sur `module` (`pnpm test:jauge-ancien-calcul`, dans `pnpm test`, qui
+   remplace `pnpm test:jauge-moteur-commun`), sans en modifier un seul hors
+   celui de l'interrupteur ; la ligne du matin dit désormais
+   `"reference":"commun","compared":"module"`.
 3. **PR 3** : l'ancien code et la comparaison du matin retirés, après une
    semaine sur `commun` sans écart.
 
@@ -201,7 +210,12 @@ porteur avec les deux valeurs, jamais corrigé en silence (plan de la fusion,
    tirées au hasard : environ 40 microsecondes par jour pour l'ancien,
    50 pour le moteur, 5 pour comparer un jour) : sans effet visible à
    l'écran. La comparaison du matin ajoute donc environ une fois et demie le
-   temps de la jauge, d'où sa limite ; à remesurer avec la PR 2.
+   temps de la jauge, d'où sa limite ; à remesurer avec la PR 2. **Remesuré
+   avec la PR 2** (24 novembre 2026, les mêmes 3 000 planches, médiane de
+   sept passages) : 34 microsecondes par jour pour l'ancien calcul, 50 pour
+   le moteur (1,46 fois, de 1,25 à 1,83 selon le passage), 4 pour comparer
+   un jour. Le matin rejoue désormais l'ancien calcul, le plus rapide : au
+   plus 50 000 jours, environ deux secondes de plus que la jauge seule.
 
 ## Preuve de fin de la PR 1
 
@@ -224,3 +238,16 @@ les deux données impossibles, le bilan du matin) et
 `tests/db/soil-reserve-engine-comparison.test.ts` (la comparaison du matin
 sur une ferme de test, sa ligne au journal) ; le tirage est dans
 `tests/support/soil-reserve-draw.ts`.
+
+## Preuve de fin de la PR 2
+
+Les mêmes contrôles, le second passage des tests tourné vers l'ancien
+calcul (`pnpm test:jauge-ancien-calcul`, dans `pnpm test`) ; la comparaison
+tirée au hasard et le script de l'étape 1 relancés, le script sans passage
+de test jouant désormais le moteur commun :
+
+```text
+node --experimental-strip-types --import ./tests/support/register.mjs scripts/shared-engine-compare.ts 1 10 2000
+node --experimental-strip-types --import ./tests/support/register.mjs scripts/shared-engine-cases.ts --json
+node --experimental-strip-types --import ./tests/support/register.mjs --import ./tests/support/jauge-ancien-calcul.mjs scripts/shared-engine-cases.ts --json
+```

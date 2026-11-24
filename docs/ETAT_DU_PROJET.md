@@ -32,7 +32,38 @@ registres, elle y renvoie.
   de l'environnement, la version 1248 attendue n'y étant pas installée)
   réussis ; P0 rouge sans la correction (balise du manifeste sans
   `crossorigin`), vert avec. Reste : le constat sur le téléphone du
-  porteur après la mise en ligne, avec son accord.
+  porteur après la mise en ligne, avec son accord. Mise en ligne de #184
+  (D-301) consignée ici : fusionnée le 24 novembre 2026 à 9 h 47, **en
+  ligne à 10 h 17** (run 45359207603 vérifié job par job : les cinq jobs
+  verts).
+- **La jauge passe au moteur commun le 24 novembre 2026** (fusion des
+  moteurs, étape 3, PR 2 ; D-301, D-270), en Opus 5.5 · Max (MC-26) :
+  l'interrupteur `GAUGE_ENGINE` passe sur `commun` après trois matins sans
+  écart, lus le 24 novembre 2026 vers 9 h 15 au journal du Worker
+  (Observability de Cloudflare), dans le Chrome du porteur avec son accord,
+  en lecture seule : les 22, 23 et 24 novembre 2026 vers 6 h 15,
+  164 planches et 5 084, 6 068 puis 5 904 jours comparés, aucun écart,
+  aucun échec, aucune planche laissée de côté (le plus grand écart :
+  2,8e-14 mm), et aucune ligne `soil_reserve_day_record_failed`. Sur la
+  ferme du porteur, aucun chiffre ne change ; les deux données impossibles
+  du contrat (une RFU de 0 mm/m, une ET0 négative sous un couvert) lui ont
+  été dites avec leurs deux valeurs le 24 novembre 2026. L'ancien calcul
+  reste derrière l'interrupteur jusqu'à la PR 3 : le second passage des
+  tests le rejoue (`pnpm test:jauge-ancien-calcul`, qui remplace
+  `pnpm test:jauge-moteur-commun`) et la comparaison du matin compare dans
+  l'autre sens. Contrôles du 24 novembre 2026 : `pnpm lint`,
+  `pnpm typecheck`, `pnpm test` (2 284 tests sur le moteur commun, les
+  trois passages d'isolation de 624 tests, puis les 2 284 sur l'ancien
+  calcul, 0 échec), `pnpm build` et `pnpm knip` réussis ; 20 000 planches
+  tirées au hasard, 437 355 jours sans écart (8,9e-14 mm au plus) ; O01 à
+  O10 et les huit cas limites, comptes rendus identiques par les deux
+  calculs ; temps de calcul remesuré (contrat, choix 7). `pnpm push:check`,
+  `pnpm weather:check` et `pnpm site:check` omis, sans rapport (aucun
+  Worker à part ne change) ; `pnpm e2e` joué par la CI. Mise en ligne de
+  #183 (D-300) consignée ici : fusionnée le 22 novembre 2026 à 19 h 32,
+  **en ligne à 20 h 04** (run 45055688184 vérifié job par job : les cinq
+  jobs verts). Reste : la PR 3 (l'ancien calcul retiré) après une semaine
+  sur le moteur sans écart, lue au journal.
 - **La page de confidentialité ne promet plus de relecture juridique,
   corrigée le 22 novembre 2026** (D-300, sur le « oui » du porteur à
   18 h 35), en Opus 5.5 · Élevé, le réglage de code de la 4.8 : sa note dit
@@ -1826,9 +1857,10 @@ registres, elle y renvoie.
   1 930 sur le moteur, compilation, knip, `demo:check`, verts ; parcours
   navigateur et Workers sans rapport (ni interface ni Worker touchés), joués
   par la CI. **En ligne le 22 novembre 2026 à 3 h 39** (#158, fusionnée à
-  3 h 09, run 44974783445 vérifié job par job : les cinq jobs verts). Reste :
-  la PR 2 (l'interrupteur sur le moteur) après trois matins sans écart sur
-  la ferme.
+  3 h 09, run 44974783445 vérifié job par job : les cinq jobs verts). **PR 2
+  faite le 24 novembre 2026** (D-301, voir plus haut) : la jauge passe au
+  moteur commun après trois matins sans écart. Reste : la PR 3 (l'ancien
+  calcul retiré) après une semaine sur le moteur sans écart.
 - **Quatre extensions closes sur le mot du porteur le 14 novembre 2026 à
   22 h 30** (D-118) : la réserve du sol (5 ter), le besoin en eau par
   culture et par stade (5 quater), les alertes météo par culture (5
