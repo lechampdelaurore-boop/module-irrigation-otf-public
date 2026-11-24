@@ -8800,3 +8800,41 @@ la nuit (une alerte à 3 h ne réveille personne utilement ; la lecture de
 la lecture de 6 h 15 et ses calculs ; le séchage, évalué au matin ; les
 textes et l'écran. Aucune migration. Ne règle pas, à lui seul, le cas d'une
 alerte partie vers « aucun appareil » : c'est l'objet de C2 et C3.
+
+## D-304 — Les alertes non délivrées se voient sur la page d'état (alertes sur le téléphone, C2)
+
+Date : 24 novembre 2026. Statut : deuxième des cinq corrections de la
+section 6 octies de la roadmap, déléguées par le porteur le 24 novembre 2026
+à 9 h 36 ; réglage : Opus 5.5 · Élevé.
+
+**Contexte.** Une alerte météo ou par culture partie vers « aucun appareil »
+ou en échec n'était qu'enregistrée dans l'historique de la page des alertes
+de la ferme, et journalisée au niveau info : ni la page d'état ni la veille
+n'en disaient rien. Le 24 novembre 2026, une session Access expirée sur le
+téléphone du porteur a montré qu'un appareil peut cesser de recevoir sans
+que personne le voie.
+
+**Décision.** La carte de chaque ferme, sur la page d'état, porte une ligne
+« Alertes non délivrées » : sur 7 jours, dont les 24 dernières heures, le
+nombre d'alertes météo et par culture (gel, séchage, aspersions) de ses
+espaces parties sans atteindre un appareil, par cause (aucun appareil
+inscrit ; échec de l'envoi ; envoi interrompu, c'est-à-dire pris sans
+résultat après une heure). **Rouge** pour une alerte non délivrée dans les
+24 heures, **orange** pour une plus ancienne ; le jugement d'ensemble la
+compte avec les autres problèmes de la ferme. Une alerte « en nouvelle
+tentative » (le service réessaie seul, son issue n'est pas rapportée) se
+compte à part et ne change pas le ton. Des nombres seulement : ni contenu,
+ni culture, ni jour visé. Contrat : `docs/tranche-4-contract.md`, F755 ;
+règle : `lib/domain/operations/undelivered-alerts.ts` ; procédure :
+`docs/exploitation.md`, « Une ferme a des alertes non délivrées ».
+
+**Écart avec la fiche du 24 novembre 2026.** La fiche proposait une carte à
+part, avec ses seuils dans le registre des tâches. Une alerte non délivrée
+n'est pas une tâche (elle n'a ni rythme ni dernière réussite) et elle
+appartient à une ferme : elle entre donc sur la carte de la ferme, comme les
+erreurs d'Ouvre ta ferme, avec ses seuils nommés dans son module.
+
+**Ne change pas.** L'envoi, la règle de répétition, l'historique des alertes
+de la ferme. Aucune migration (les deux tables d'alertes gardent déjà leur
+état d'envoi et leur heure). La veille de 9 h n'en dit encore rien : c'est
+C3.

@@ -49,7 +49,7 @@ export const EMPTY_FARM_ALERT_DELIVERIES: FarmAlertDeliveries = {
  * comme interrompue. L'envoi enregistre son résultat dès que le service de
  * notification répond (quelques secondes) : une heure laisse une large marge.
  */
-export const INTERRUPTED_ALERT_AFTER_MINUTES = 60;
+const INTERRUPTED_ALERT_AFTER_MINUTES = 60;
 
 /** Les instants qui bornent le compte (`sent_at` est un instant ISO) : 24 heures, 7 jours, et le seuil d'une alerte interrompue. */
 export function undeliveredAlertWindows(now: Date): { dayStart: string; weekStart: string; interruptedBefore: string } {
@@ -63,7 +63,7 @@ export function undeliveredAlertWindows(now: Date): { dayStart: string; weekStar
 /** Les alertes non délivrées se comptent sur 7 jours, comme les erreurs d'Ouvre ta ferme. */
 const UNDELIVERED_WINDOW_DAYS = 7;
 
-export function undeliveredTotal(counts: UndeliveredAlertCounts): number {
+function undeliveredTotal(counts: UndeliveredAlertCounts): number {
   return counts.noDevice + counts.failed + counts.interrupted;
 }
 
