@@ -1187,8 +1187,8 @@ selon la règle de la section 10.
     16 h 26** (#212) ; **PR 3 (un seul
     objectif, S1-O1) codée le même jour, en ligne à 16 h 56** (#213) ; **PR 3 bis (l'Historique
     compté comme « Aujourd'hui », D-329) codée le même jour**, en Opus 5.5 ·
-    Max : le code de S1 est fini. **Contrat S2 écrit le
-    25 novembre 2026** (`docs/simplification-s2-contract.md`) ; **S2, PR 1 à 5 sur 5 (valider et
+    Max, **en ligne à 18 h 04** (#214) : le code de S1 est fini. **Contrat S2 écrit le
+    25 novembre 2026** (`docs/simplification-s2-contract.md`, sans code), **en ligne à 18 h 04** (#211, run 45655189938) ; **S2, PR 1 à 5 sur 5 (valider et
     démarrer, terminer et reprendre, l'arrosage à rattraper, noter la
     pluie, la page à l'essentiel) codées le 25 novembre 2026** (D-330), en
     Opus 5.5 · Élevé : le code de S2 est fini, ses PR s'ouvrent une à une.
