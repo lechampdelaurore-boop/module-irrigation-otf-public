@@ -34,15 +34,17 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, on
   const titleId = useId();
   // Fermer pendant l'enregistrement laisserait la réponse sans fenêtre : le formulaire le dit.
   const [pending, setPending] = useState(false);
-  // Un formulaire neuf à chaque ouverture : le jour par défaut, le champ vide, aucun refus d'avant.
+  // Un formulaire neuf à chaque ouverture : le jour par défaut, le champ vide, aucun refus d'avant. Il
+  // se refait à la fermeture, jamais à l'ouverture : refait après `showModal`, il perdrait le clavier,
+  // que la fenêtre vient de poser sur « Quel jour ? ».
   const [opening, setOpening] = useState(0);
 
   useEffect(() => {
-    if (open && !dialog.current?.open) {
+    if (open && !dialog.current?.open) dialog.current?.showModal();
+    if (!open && dialog.current?.open) {
+      dialog.current.close();
       setOpening((value) => value + 1);
-      dialog.current?.showModal();
     }
-    if (!open && dialog.current?.open) dialog.current.close();
   }, [open]);
 
   const close = () => {
