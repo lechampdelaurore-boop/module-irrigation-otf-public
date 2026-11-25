@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s3-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. Trois endroits : « Aujourd'hui » (avec
+  « Arrosages »), « Semaine » (planning, objectifs et besoins, historique),
+  « Ma ferme » (matériel, ressources, cultures, sol, alertes, réglages),
+  et un « + » pour arroser maintenant, noter la pluie ou noter un arrosage
+  déjà fait. Quatre PR : la page « Ma ferme » en fiches, la barre du bas
+  du téléphone (avec la bande de la semaine et le retour), le menu de
+  l'ordinateur, les liens et la visite guidée ; Opus 5.5 · Très élevé,
+  après la fin du code de S2. Aucune page, adresse ni notification ne
+  change ; aucun calcul ; aucune question agronomique. Écart voulu avec la
+  maquette : les fiches n'ont pas encore de chiffres d'état (S6). PR de
+  contrat seule : **aucun contrôle rejoué**. **Mises en ligne consignées ici** :
+  #213 (S1, PR 3) fusionnée, déployée à 16 h 56, run 45645335129 ; #214
+  (S1, PR 3 bis) et #211 (contrat S2) fusionnées, déployées à 18 h 04, run
+  45655189938, vérifiés job par job : « Application », « Workers
+  Cloudflare », « Parcours navigateur », « Déploiement Cloudflare » et
+  « Déploiement de la démonstration », verts.
 - **Simplifier l'usage du module, S2 : contrat écrit le 25 novembre 2026**
   (`docs/simplification-s2-contract.md`, roadmap section 6 terdecies,
   ligne 33), **sans code**. « Aujourd'hui » où l'on fait tout : un bouton
