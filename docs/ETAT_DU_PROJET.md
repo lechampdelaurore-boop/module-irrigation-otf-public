@@ -96,7 +96,12 @@ registres, elle y renvoie.
   après la fin du code de S2. Aucune page, adresse ni notification ne
   change ; aucun calcul ; aucune question agronomique. Écart voulu avec la
   maquette : les fiches n'ont pas encore de chiffres d'état (S6). PR de
-  contrat seule : **aucun contrôle rejoué**.
+  contrat seule : **aucun contrôle rejoué**. **Mises en ligne consignées ici** :
+  #213 (S1, PR 3) fusionnée, déployée à 16 h 56, run 45645335129 ; #214
+  (S1, PR 3 bis) et #211 (contrat S2) fusionnées, déployées à 18 h 04, run
+  45655189938, vérifiés job par job : « Application », « Workers
+  Cloudflare », « Parcours navigateur », « Déploiement Cloudflare » et
+  « Déploiement de la démonstration », verts.
 - **Simplifier l'usage du module, S2 : contrat écrit le 25 novembre 2026**
   (`docs/simplification-s2-contract.md`, roadmap section 6 terdecies,
   ligne 33), **sans code**. « Aujourd'hui » où l'on fait tout : un bouton
