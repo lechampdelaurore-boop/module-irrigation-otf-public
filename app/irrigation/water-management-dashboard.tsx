@@ -8,7 +8,8 @@ import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, 
 import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-days';
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
-import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
+import { FARM_OBJECTIVE_READ, notifyChangeJournalChanged, type FarmObjectiveNotice } from '@/lib/domain/feasibility-notifications';
+import { farmObjectiveScopeText } from '@/lib/domain/farm-objective';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { useConfirm } from './shell/use-confirm';
@@ -66,14 +67,25 @@ export function WaterManagementDashboard({
   season,
   snapshot,
   initialDashboard,
+  initialFarmObjective = null,
   part = 'besoins',
 }: {
   season: number;
   snapshot: IrrigationSnapshot;
   initialDashboard: WaterDashboard;
+  /** L'objectif de la ferme lu avec les besoins de la même semaine (S1, PR 3). */
+  initialFarmObjective?: FarmObjectiveNotice | null;
   part?: WaterDashboardPart;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
+  const [farmObjectiveNotice, setFarmObjectiveNotice] = useState(initialFarmObjective);
+  useEffect(() => {
+    const read = (event: Event) => {
+      if (event instanceof CustomEvent) setFarmObjectiveNotice(event.detail as FarmObjectiveNotice);
+    };
+    window.addEventListener(FARM_OBJECTIVE_READ, read);
+    return () => window.removeEventListener(FARM_OBJECTIVE_READ, read);
+  }, []);
   const { confirm, dialog: confirmDialog } = useConfirm();
   // Chaque message s'affiche sous le bouton de son geste (audit du 19 novembre 2026, lot G, n° 1, F404).
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
@@ -114,6 +126,8 @@ export function WaterManagementDashboard({
 
   const currentDay = dashboard.todayWater;
   const farmGoal = dashboard.goals.find((goal) => goal.scopeType === 'farm');
+  // L'objectif de la ferme : celui d'« Aujourd'hui », pour la semaine affichée seulement (S1, PR 3).
+  const farmObjective = farmObjectiveNotice?.weekStart === dashboard.weekStart ? farmObjectiveNotice.objective : null;
   const quietDays = quietWaterDaysText(dashboard.days);
   const missingEt0Dates = dashboard.days.filter((day) => day.et0Mm === null).map((day) => day.date);
   const missingActualRainDates = dashboard.days.filter((day) => day.date <= today && day.effectiveActualRainMm === null).map((day) => day.date);
@@ -396,7 +410,7 @@ export function WaterManagementDashboard({
 
       <button type="button" className="water-summary-line" aria-expanded={tilesOpen} aria-controls={tilesId} onClick={() => setTilesOpen((value) => !value)}>
         <span>{weekTotalsLine({
-          farmGoalMm: farmGoal?.amountMm ?? null,
+          objective: farmObjective,
           realizedIrrigationMm: dashboard.totals.realizedIrrigationMm,
           actualRainMm: dashboard.totals.actualRainMm,
           remainingForecastRainMm: dashboard.totals.remainingForecastRainMm,
@@ -406,7 +420,7 @@ export function WaterManagementDashboard({
         <small>{tilesOpen ? 'Replier' : 'Détail'}</small>
       </button>
       <div className="water-summary-grid" id={tilesId} data-open={tilesOpen}>
-        <SummaryCard icon="cible" label="Objectif ferme" value={farmGoal ? `${mm.format(farmGoal.amountMm)} mm` : 'Non défini'} detail={`${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} ciblé${dashboard.goals.length > 1 ? 's' : ''}`} />
+        <SummaryCard icon="cible" label={SIMPLE_WORDS.weekGoal} value={farmObjective === null ? 'En cours de lecture' : farmObjective.objectiveMm === null ? 'Aucune' : `${mm.format(Math.round(farmObjective.objectiveMm * 10) / 10)} mm`} detail={`${farmObjective === null ? '' : `${farmObjectiveScopeText(farmObjective)} · `}${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} saisi${dashboard.goals.length > 1 ? 's' : ''}`} />
         <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
         <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
         <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />

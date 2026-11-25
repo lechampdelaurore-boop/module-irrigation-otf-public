@@ -1,4 +1,5 @@
 import { compareNamesNaturally } from '../bed-order.ts';
+import { farmObjective, farmObjectivePartial, farmObjectiveScopeText } from '../farm-objective.ts';
 import { mmText, waterText } from '../figure-origin.ts';
 import type { BedIrrigationNeed } from '../irrigation-needs.ts';
 import { groupObjectiveOriginText, type ObjectiveOriginReading } from '../objective-reading.ts';
@@ -171,11 +172,6 @@ function rounded(value: number): number {
   return Math.round(value * PERCENT_DECIMALS) / PERCENT_DECIMALS;
 }
 
-/** « 1 planche sur 2 a un objectif », « 7 planches sur 10 ont un objectif » : un seul « sur » par phrase (F443). */
-function bedsWithObjective(count: number, total: number): string {
-  return `${count} planche${count > 1 ? 's' : ''} sur ${total} ${count > 1 ? 'ont' : 'a'} un objectif`;
-}
-
 /** « 1 planche de 2 a un objectif », « 5 planches de 10 ont un objectif ». */
 function bedsOf(count: number, total: number): string {
   return `${count} planche${count > 1 ? 's' : ''} de ${total} ${count > 1 ? 'ont' : 'a'} un objectif`;
@@ -198,8 +194,10 @@ function originReading(bed: TodayWeekBed): ObjectiveOriginReading {
 
 function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxMm: number): WeekRow {
   const { scope, objectiveBeds } = counted(beds);
-  const partial = objectiveBeds.withObjective > 0 && objectiveBeds.withObjective < objectiveBeds.total;
-  const objectiveMm = weighted(scope, (bed) => bed.objectiveMm);
+  // L'objectif de la ferme et de chaque jardin : le calcul unique (S1, PR 3), sur les planches qui en ont un.
+  const objective = farmObjective(beds);
+  const partial = farmObjectivePartial(objective);
+  const objectiveMm = objective.objectiveMm;
   const irrigationMm = weighted(scope, (bed) => Math.max(0, bed.actualIrrigationMm)) ?? 0;
   const rainMm = weighted(scope, (bed) => bed.actualRainMm);
   const receivedMm = rainMm === null ? null : irrigationMm + rainMm;
@@ -366,7 +364,8 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
   const volume = (value: number) => `${water?.incomplete ? 'au moins ' : ''}${waterText(value, 'm³')}`;
   const label = `du ${shortDayText(input.weekStart)} au ${shortDayText(input.weekEnd)}`;
   const { withObjective, total } = farm.objectiveBeds;
-  const partial = withObjective > 0 && withObjective < total;
+  const objective = { objectiveMm: farm.objectiveMm, withObjective, total };
+  const partial = farmObjectivePartial(objective);
   // Sur une partie des planches, chaque tuile le dit : jamais un chiffre lu pour la ferme entière (F280).
   const scoped = (detail: string) => (partial ? `${detail}, ${withObjective === 1 ? 'sur cette planche' : `sur ces ${withObjective} planches`}` : detail);
   return {
@@ -379,7 +378,7 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
     moreLabel: moreGardensLabel(hidden.length),
     tiles: {
       objective: mm(farm.objectiveMm),
-      objectiveDetail: `${partial ? `${bedsWithObjective(withObjective, total)}, ${label}` : `ferme entière, ${label}`}${farm.objectiveOrigin === null ? '' : ` · objectif ${farm.objectiveOrigin}`}`,
+      objectiveDetail: `${farmObjectiveScopeText(objective)}, ${label}${farm.objectiveOrigin === null ? '' : ` · objectif ${farm.objectiveOrigin}`}`,
       received: mm(farm.receivedMm),
       receivedDetail: scoped(farm.rainMm === null
         ? `${mmText(rounded(farm.irrigationMm))} d’irrigation, pluie inconnue`

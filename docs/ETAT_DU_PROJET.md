@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
+  le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
+  33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm
+  sur « Objectifs et besoins », 5,2 mm sur « Aujourd'hui ») est établie dans
+  le code, pas relue sur la ferme : « Objectifs et besoins » montrait
+  l'objectif « Toute la ferme » saisi, « Aujourd'hui » la moyenne pondérée
+  des objectifs de chaque planche ; un autre périmètre, pas une erreur de
+  calcul. Un seul calcul et une seule phrase de l'objectif de la ferme
+  (`lib/domain/farm-objective.ts`, « 5,2 mm visés, ferme entière », « 7
+  planches sur 10 ont un objectif ») pour « Aujourd'hui » et la ligne de
+  résumé et la tuile d'« Objectifs et besoins ». **Décision du porteur à
+  13 h 35** (D-329) : l'Historique comptera comme « Aujourd'hui », les
+  planches sans objectif dites et non plus comptées à zéro ; PR 3 bis, à
+  part, en Opus 5.5 · Max. Tests à deux fermes, parcours P61 étendu.
+  Contrôles : voir la PR.
 - **Simplifier l'usage du module, S1, PR 2 sur 3 : les mots, codée le
   25 novembre 2026** (D-328, F832 à F837, roadmap section 6 terdecies,
   ligne 33), en Opus 5.5 · Élevé. Le premier niveau parle comme le champ,
