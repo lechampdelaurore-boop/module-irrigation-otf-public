@@ -66,10 +66,14 @@ contenu de la page est demandé au serveur, sans relancer les scripts.
   la requête, ce que son premier appel a rendu (`renderOncePerRequest`, par
   `cacheForRequest` de vinext) ; hors d'une requête, rien n'est gardé.
 - Mesuré (banc de la section 2, barre du bas, moyenne de deux tours, page
-  utilisable) : sans lecture lente de la base, « Arrosages » 1,66 s → 0,90 s,
-  « Planning » 1,65 s → 0,91 s, « Ressources » 1,71 s → 0,42 s,
-  « Aujourd'hui » 1,49 s → 1,22 s ; à 20 ms la lecture, 2,22 s → 0,95 s,
-  2,05 s → 0,95 s, 1,93 s → 0,97 s et 2,05 s → 1,92 s. Sans la page calculée
+  utilisable, styles chargés) : sans lecture lente de la base, « Arrosages »
+  1,66 s → 0,94 s, « Planning » 1,65 s → 0,92 s, « Ressources » 1,71 s →
+  0,52 s, « Aujourd'hui » 1,49 s → 1,44 s ; à 20 ms la lecture, 2,22 s →
+  0,97 s, 2,05 s → 1,33 s, 1,93 s → 0,95 s et 2,05 s → 1,94 s.
+  « Aujourd'hui » gagne peu tant que ses lectures restent nombreuses : c'est
+  l'objet de N3. Une page du module exporte une fonction telle quelle, qui
+  délègue au calcul gardé : le greffon RSC n'accroche les styles de la page
+  qu'à une fonction exportée. Sans la page calculée
   une fois, « Aujourd'hui » par le menu était plus lent qu'avant (1,92 s et
   2,96 s) : les deux vont ensemble.
 - Les autres liens (tuiles, jauges, « Actualiser », bandeaux) ne changent pas
