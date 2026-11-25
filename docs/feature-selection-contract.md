@@ -187,7 +187,8 @@ relevée (précision P4).
 lot S3 de la simplification (D-331), « Ma ferme », toujours ouverte comme
 Réglages, au-dessus d'elle dans le menu ; chaque page est rangée dans un des
 trois endroits (`docs/simplification-s3-contract.md`, section 3). L'ordre des
-pages est celui de la liste. La première page, celle qu'ouvre
+pages est celui de la liste ; depuis la PR 3 du lot S3, le menu de
+l'ordinateur les montre dans l'ordre de leurs endroits (section 6). La première page, celle qu'ouvre
 « Irrigation », est la première case cochée de la liste (précision P10) : pour
 une ferme qui a tout coché, Arrosages (précision P36).
 
@@ -216,6 +217,9 @@ une ferme qui a tout coché, Arrosages (précision P36).
   44 px. Depuis la simplification S3, PR 2 (D-331), la barre du bas porte
   les trois endroits et le « + » ; les pages d'un endroit se trouvent par sa
   bande ou ses fiches (`docs/simplification-s3-contract.md`, section 4).
+  Depuis la PR 3, le menu de l'ordinateur porte le bouton « + Arroser ou
+  noter » en tête, puis les trois endroits dépliés, Réglages dans
+  « Ma ferme » (section 6).
 - **La saison et la parcelle** suivent d'une page à l'autre, dans l'adresse
   (`?season=…&zone=…`) ; la parcelle choisie n'est plus perdue en changeant de
   page (précision P12).

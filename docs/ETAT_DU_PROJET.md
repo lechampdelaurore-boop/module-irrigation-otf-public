@@ -12,6 +12,17 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3, PR 3 sur 4 : le menu de
+  l'ordinateur, codée le 25 novembre 2026** (D-331, F885 à F889 ; contrat,
+  section 6), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Au-delà
+  de 980 px, le menu de gauche montre le bouton « + Arroser ou noter » (la
+  même feuille que le « + » du téléphone, en boîte de dialogue), puis les
+  trois endroits dépliés : « Aujourd'hui » et Arrosages, « Semaine » et ses
+  trois pages, « Ma ferme » et ses fiches, Réglages comprise. Les titres
+  « Semaine » et « Ma ferme » sont des liens ; toute page reste à un clic.
+  Le téléphone ne change pas. Tests sur les 235 choix de cases, parcours
+  P63 à 1 440 px, mesures du menu : voir la PR. Reste la PR 4 (visite
+  guidée, liens et phrases qui disent « menu » ou « Plus »).
 - **Simplifier l'usage du module, S3, PR 2 sur 4 : la barre du bas, le
   « + » et le chemin de retour, codée le 25 novembre 2026** (D-331, F876 à
   F884 ; contrat, sections 3.3, 3.4, 4, 4.1 et 5.1), en Opus 5.5 · Très
