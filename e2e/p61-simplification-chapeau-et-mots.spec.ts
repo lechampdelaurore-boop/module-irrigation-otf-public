@@ -6,10 +6,15 @@ import {
   ouvrirLeDetailDuJour,
   surveillerLaConsole,
   TITRES_DES_PAGES,
+  titreDeLaPage,
   verifierCibleTactile,
   verifierLEtape,
+  type PageDuMenu,
   type PageDuModule,
 } from './support/parcours.ts';
+
+/** Chaque page du menu, et la vue « Les cumuls » de « Semaine » par l'ancienne adresse de l'historique (lot S4). */
+const PAGES_ET_VUES: readonly PageDuModule[] = [...Object.keys(TITRES_DES_PAGES) as PageDuMenu[], 'historique'];
 
 /**
  * Parcours P61 : simplifier l'usage du module, lot S1, « le chapeau et les
@@ -51,12 +56,12 @@ test('aucune page ne montre la ligne de lecture quand tout va bien ; « Actualis
   const telephone = testInfo.project.name === 'telephone';
   await aLaLargeurDuContrat(page, telephone);
 
-  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+  for (const cible of PAGES_ET_VUES) {
     await attendreLaPageIrrigation(page, cible);
     // Le chapeau : le titre et son « ? », la saison là où elle sert, rien d'autre (règle 1).
     await expect(page.locator('section.intro .sync-card')).toHaveCount(0);
     await expect(page.locator('a.refresh-link')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: `Aide : ${TITRES_DES_PAGES[cible]}` })).toBeVisible();
+    await expect(page.getByRole('button', { name: `Aide : ${titreDeLaPage(cible)}` })).toBeVisible();
     await verifierLEtape(page, journal, `chapeau de ${cible}`);
   }
 
@@ -96,7 +101,8 @@ test('« Arrosages » sans saison ; « Historique et cumuls » ouvre une autre s
   const autre = valeurs.find((valeur) => valeur !== actuelle);
   expect(autre, 'la ferme des parcours a plusieurs saisons').toBeTruthy();
   await saison.selectOption(autre!);
-  await expect(page).toHaveURL(new RegExp(`/irrigation/historique\\?season=${autre}$`));
+  // Depuis le lot S4, l'historique est la vue « Les cumuls » de « Semaine » : le choix de la saison la garde.
+  await expect(page).toHaveURL(new RegExp(`/irrigation/semaine\\?season=${autre}&vue=cumuls$`));
   await attendreLaPagePrete(page, 'historique');
   // Les liens vers « Arrosages » gardent la saison choisie (F825).
   const versLesArrosages = page.locator('a[href^="/irrigation/arrosages?"]').first();
@@ -138,18 +144,18 @@ test('l’explication fixe de « Réserve du sol » est dans son « ? », plus e
  * « ? » et la saison ne tiennent plus sur une ligne (38 px, Besoin par
  * culture et Alertes cultures ; Matériel y était déjà).
  */
-const PREMIERS_BLOCS: Record<PageDuModule, { bloc: string; budget: number }> = {
+const PREMIERS_BLOCS: Record<PageDuMenu | 'historique', { bloc: string; budget: number }> = {
   // 152 → 108 px : la ligne de lecture retirée.
   aujourdhui: { bloc: '.today-head', budget: 120 },
   // 393 → 287 px : la ligne de lecture, la saison et la phrase d'explication. Le premier geste : le formulaire ;
   // les alertes du téléphone, dans tous leurs états, passent dessous (S5, PR 3, F908).
   arrosages: { bloc: '.irrigation-events-section .irrigation-creation-panel', budget: 400 },
-  // 309 → 203 px ; 261 px avec la bande de la semaine (S3, PR 2).
-  planning: { bloc: '.planning-heading-actions', budget: 400 },
-  // 470 → 391 px : la ligne de résumé de la semaine, sous la navigation des semaines.
-  // S3, PR 2 : 449 px avec la bande de la semaine ; borne redite à 460 px avec sa mesure.
-  besoins: { bloc: '.water-summary-line', budget: 460 },
-  // 283 → 203 px ; 261 px avec la bande de la semaine (S3, PR 2).
+  // Lot S4, PR 1 (contrat S4, section 10) : une borne pour « Semaine », à la place des trois du planning
+  // (261 px avec la bande de S3), des besoins (449 px) et de l'historique (261 px). La vue « La semaine »
+  // s'ouvre sur le plan, qui la commence comme il commençait le planning : 215 px, le sélecteur de vue
+  // à la place de la bande.
+  semaine: { bloc: '.planning-heading-actions', budget: 400 },
+  // La vue « Les cumuls », par l'ancienne adresse de l'historique : 215 px (261 px avant).
   historique: { bloc: '.history-view-tabs', budget: 400 },
   // 417 → 270 px.
   sol: { bloc: '.soil-gauge', budget: 400 },
@@ -185,11 +191,11 @@ test('au téléphone, le premier bloc utile de chaque page sous son budget', asy
       await expect(bandeau).toHaveCount(0, { timeout: 1_000 });
     }).toPass({ timeout: 30_000 });
   }
-  for (const [cible, { bloc, budget }] of Object.entries(PREMIERS_BLOCS) as [PageDuModule, { bloc: string; budget: number }][]) {
+  for (const [cible, { bloc, budget }] of Object.entries(PREMIERS_BLOCS) as [PageDuMenu | 'historique', { bloc: string; budget: number }][]) {
     await attendreLaPageIrrigation(page, cible);
     await expect(page.getByRole('complementary', { name: 'Choix des fonctionnalités' })).toHaveCount(0);
     const haut = await page.locator(bloc).first().evaluate((element) => Math.round(element.getBoundingClientRect().top + window.scrollY));
-    expect(haut, `premier bloc utile de « ${TITRES_DES_PAGES[cible]} » à ${haut} px du haut, au-delà de ${budget} px`).toBeLessThanOrEqual(budget);
+    expect(haut, `premier bloc utile de « ${titreDeLaPage(cible)} » (${cible}) à ${haut} px du haut, au-delà de ${budget} px`).toBeLessThanOrEqual(budget);
     await verifierLEtape(page, journal, `premier bloc de ${cible}`);
   }
 });
@@ -257,12 +263,12 @@ test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’
   await expect(page.getByRole('heading', { name: 'Y a-t-il assez d’eau ?' })).toBeVisible();
 
   const lus: string[] = [];
-  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+  for (const cible of PAGES_ET_VUES) {
     await attendreLaPageIrrigation(page, cible);
     const texte = (await page.locator('main').innerText()).toLocaleLowerCase('fr-FR');
     for (const mot of MOTS_DU_CALCUL) {
       const debut = texte.indexOf(mot.toLocaleLowerCase('fr-FR'));
-      if (debut >= 0) lus.push(`${TITRES_DES_PAGES[cible]} : « ${mot} » dans « ${texte.slice(Math.max(0, debut - 40), debut + mot.length + 40)} »`);
+      if (debut >= 0) lus.push(`${titreDeLaPage(cible)} (${cible}) : « ${mot} » dans « ${texte.slice(Math.max(0, debut - 40), debut + mot.length + 40)} »`);
     }
     await verifierLEtape(page, journal, `mots de ${cible}`);
   }
