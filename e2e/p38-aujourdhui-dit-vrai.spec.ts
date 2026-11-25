@@ -22,9 +22,10 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, ver
  *
  * - en cours et reliquat (n° 2, F433 à F435) : une irrigation démarrée se
  *   lit en tête de « Votre journée », « En cours », la phrase du jour le
- *   dit, sans « Rien à arroser » ; « Terminer l’irrigation » ouvre sa carte sur
- *   « Arrosages » ; arrêtée en route, son reliquat se lit « Reliquat » avec
- *   « Reprendre le reliquat » ; le reliquat annulé, il n'y est plus.
+ *   dit, sans « Rien à arroser » ; « Terminer » ouvre sur la page même la
+ *   fenêtre de fin d'« Arrosages » (simplification S2, PR 2) ; arrêtée en
+ *   route, ce qui reste se lit avec « Reprendre ce qui reste » ; annulé, il
+ *   n'y est plus.
  *
  * - l'ordre naturel (n° 14, F436 et F437) : la liste « Matériel »
  *   d'« Arrosages » est regroupée par jardin, les groupes et les matériels
@@ -158,6 +159,7 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await expect(demarree.or(fenetre)).toBeVisible();
   if (await fenetre.isVisible()) await fenetre.getByRole('button', { name: /quand même$/ }).click();
   await expect(demarree).toBeVisible();
+  const demarreeA = Date.now();
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   const journee = page.locator('#today-day');
@@ -170,9 +172,13 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await expect(page.locator('.today-sentence')).toContainText(/irrigations? (est|sont) en cours\./);
   await verifierLEtape(page, journal, 'l’irrigation en cours en tête de la journée');
 
-  // « Terminer l’irrigation » ouvre la carte sur « Arrosages », où l'arrêt se confirme.
-  await carte.getByRole('link', { name: `Arrêter ou terminer : ${materiel}`, exact: false }).click();
-  await terminerSurArrosages(page, materiel);
+  // « Terminer » ouvre la fenêtre de fin sur la page même, où l'arrêt se confirme (simplification S2, PR 2).
+  // L'heure de fin se lit à la seconde : le serveur refuse une durée nulle, comme l'attente du minuteur sur « Arrosages ».
+  await expect.poll(() => Date.now() - demarreeA).toBeGreaterThan(2_000);
+  await carte.getByRole('button', { name: `Terminer : ${materiel}` }).click();
+  const fin = page.getByRole('dialog', { name: 'Terminer l’irrigation' });
+  await fin.getByRole('button', { name: 'Terminer l’irrigation' }).click();
+  await expect(fin).toHaveCount(0);
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   const reliquat = enTete.locator('.today-irrigation').filter({ hasText: materiel });

@@ -382,6 +382,13 @@
   text-underline-offset: 3px;
 }
 
+/* Le compte à rebours d'une irrigation qui coule, ou la consigne de fermer la vanne (S2, section 6). */
+.today-countdown {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-weight: 700;
+}
+
 .today-other-choices {
   display: contents;
 }
