@@ -193,6 +193,7 @@ test('le matin sur la page seule : « Pas à cette heure », « Valider », « D
   await verifierLEtape(page, journal, 'en pause depuis la carte, « Reprendre » en tête');
 
   await coule.getByRole('button', { name: /^Reprendre : / }).click();
+  const repriseA = Date.now();
   await expect(coule.locator('.today-status')).toHaveText('En cours');
   await expect(coule.locator('.action-reply')).toContainText('L’irrigation a repris.');
   await expect(coule.getByRole('button', { name: /^Terminer : / })).toBeFocused();
@@ -206,6 +207,10 @@ test('le matin sur la page seule : « Pas à cette heure », « Valider », « D
   await fin.getByRole('button', { name: 'Retour' }).click();
   await expect(fin).toHaveCount(0);
   await expect(coule.locator('.today-status')).toHaveText('En cours');
+  // L'heure proposée est prise à la seconde à l'ouverture de la fenêtre : dans la seconde même de la reprise, le
+  // serveur la refuserait (« ne peut pas précéder la dernière reprise »), comme sur « Arrosages ». Un vrai geste
+  // prend plus de temps ; le parcours attend deux secondes après la reprise (comme P38 après le démarrage).
+  await expect.poll(() => Date.now() - repriseA).toBeGreaterThan(2_000);
   await coule.getByRole('button', { name: /^Terminer : / }).click();
   await fin.getByRole('button', { name: 'Terminer l’irrigation' }).click();
   await expect(fin).toHaveCount(0);
