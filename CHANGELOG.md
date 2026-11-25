@@ -16,6 +16,13 @@ source détaillée commit par commit.
   d'heure. Le réglage est gardé par ferme et écrit au journal des
   modifications. Rien ne change encore pour aucune ferme : aucune
   notification ne lit la règle (H2) et aucun écran ne l'allume (H3).
+### Corrigé (lenteur du module, N2)
+
+- **Le module s'ouvre plus vite** (D-323) : l'application installée, le logo
+  et les favoris mènent directement à « Aujourd'hui » (ou à la première page
+  cochée), sans attendre la page « Ouverture du module… » qui rechargeait
+  tout. Les liens des anciennes notifications mènent toujours au bon bloc.
+
 ### Corrigé (lenteur du module, N3)
 
 - **Le serveur relit beaucoup moins la base** (D-325) : pendant une
