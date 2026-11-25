@@ -48,7 +48,9 @@ registres, elle y renvoie.
   ancres existantes. Le choix du premier niveau vit dans
   `lib/domain/today/essential.ts` ; aucun bloc retiré, aucune règle changée.
   Tests du domaine et de la page, P29, P30, P38 suivis, P62 mesure le premier
-  niveau à 390 px. Contrôles : voir la PR.
+  niveau à 390 px. Contrôles : voir la PR. **Mise en ligne consignée ici** :
+  la PR 3 du lot (#224), fusionnée à 20 h 51, déployée à 21 h 29, run
+  45689347330 vérifié job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S2, PR 4 sur 5 : noter la pluie d'un
   geste, codée le 25 novembre 2026** (D-330, F854 à F859 ; contrat, section
   7), en Opus 5.5 · Élevé, sur la branche de la PR 3. La fenêtre « Noter la
@@ -57,7 +59,9 @@ registres, elle y renvoie.
   écrit par l'action existante, hier par défaut, la mesure déjà notée dite,
   « Remplacer par » au lieu d'un écrasement silencieux. Aucune règle de pluie
   ne change. Tests du domaine, de la vraie base à deux fermes, P62 étendu,
-  P30 et L1 suivent les mots. Contrôles : voir la PR.
+  P30 et L1 suivent les mots. Contrôles : voir la PR. **Mise en ligne
+  consignée ici** : la PR 2 du lot (#221), fusionnée à 20 h 10, déployée à
+  20 h 40, run 45682330610 vérifié job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S2, PR 3 sur 5 : l'arrosage à rattraper,
   codée le 25 novembre 2026** (D-330, F850 à F853 ; contrat, section 4), en
   Opus 5.5 · Élevé, sur la branche de la PR 2. La carte d'un arrosage en
