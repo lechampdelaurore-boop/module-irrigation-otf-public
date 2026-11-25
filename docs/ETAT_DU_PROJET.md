@@ -144,6 +144,19 @@ registres, elle y renvoie.
   cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
   une action existante : aucune règle ne change. PR de contrat seule :
   **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S5 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s5-contract.md`, D-327, roadmap section 6
+  terdecies, ligne 33), sans code, en Sonnet 5.5 · Moyen. « Arroser en trois
+  champs » : le formulaire d'arrosage passe de neuf éléments à un premier
+  niveau court (où, combien de temps, démarrer) et « Plus d'options » (pompe,
+  note, saisir en mm, durée exacte) ; trois PR (« Arroser maintenant » ;
+  « Planifier » et « Déjà fait » ; l'entrée et les mots), Opus 5.5 · Élevé.
+  Aucun calcul ni aucune règle d'écriture changés ; les précautions (pompe
+  dépassée, créneau protégé) restent au premier niveau ; solde les deux dettes
+  de S2 (« Fait comme prévu » devient « C'est fait » sur « Arrosages » ;
+  l'ajustement d'une proposition ne remonte pas). Ce lot ne touche pas l'écran
+  de bienvenue du contrat 3.8 : « trois façons de commencer » est le lot S6.
+  Dépend de la fin du code de S3 ; contrat non fusionné avant #214, #211, #215.
 - **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
   l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
   décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat

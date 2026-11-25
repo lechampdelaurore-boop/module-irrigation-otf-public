@@ -127,6 +127,14 @@ source détaillée commit par commit.
   planning et « Arrosages », avec les mêmes gardes ; le planning ne change
   pas. « Valider au planning » disparaît.
 
+### Ajouté (simplifier l'usage du module, S5 : contrat de l'arrosage en trois champs)
+
+- **Contrat du lot S5** (`docs/simplification-s5-contract.md`, D-327) : le
+  formulaire d'arrosage tient en trois champs (où, combien de temps, démarrer)
+  et « Plus d'options » (pompe, note, saisir en mm). Aucun code, aucun calcul
+  ni aucune règle d'écriture changés ; les précautions restent au premier
+  niveau. Ne touche pas l'écran de bienvenue du contrat 3.8 (lot S6).
+
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
