@@ -1187,8 +1187,8 @@ selon la règle de la section 10.
     16 h 26** (#212) ; **PR 3 (un seul
     objectif, S1-O1) codée le même jour, en ligne à 16 h 56** (#213) ; **PR 3 bis (l'Historique
     compté comme « Aujourd'hui », D-329) codée le même jour**, en Opus 5.5 ·
-    Max : le code de S1 est fini. **Contrat S2 écrit le
-    25 novembre 2026** (`docs/simplification-s2-contract.md`, sans code). Un seul chantier
+    Max, **en ligne à 18 h 04** (#214) : le code de S1 est fini. **Contrat S2 écrit le
+    25 novembre 2026** (`docs/simplification-s2-contract.md`, sans code), **en ligne à 18 h 04** (#211, run 45655189938). Un seul chantier
     de code à la fois ; indépendant des lignes 30 à 32 (S1 ne touche ni l'objectif
     automatique ni les notifications), mais S2 et S3 attendent la fin du
     code de S1 (fichiers communs : le gabarit des pages). **Contrat S3
