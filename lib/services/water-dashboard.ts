@@ -15,6 +15,9 @@ import {
   type WeatherPreference,
 } from '@/db/water-management-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
+import { listAutomaticObjectiveRevisionsForUser } from '@/db/automatic-objective-repository';
+import { automaticObjectiveEnabledOn } from '../domain/automatic-objective';
+import { bedsKeepingEnteredGoal } from '../domain/objective-reading';
 import { writeForecastArchiveForUser } from '@/db/forecast-archive-repository';
 import { evaluateCropAlertsAfterForecastWrite } from './crop-alerts-service';
 import { evaluateWeatherAlertsAfterForecastWrite } from './weather-alerts-service';
@@ -86,6 +89,13 @@ export type WaterDashboard = {
   weatherAlerts: WeatherAlertsView | null;
   /** L'encart « Alertes cultures » (5 quinquies), lu avec celui des alertes météo. */
   cropAlerts: CropAlertsView | null;
+  /**
+   * Le réglage « Objectif automatique » (6 decies, O4, D-319), lu seulement
+   * par le volet des objectifs : allumé aujourd'hui ou non, et les planches de
+   * la saison qui gardent un objectif saisi la semaine affichée (section 5,
+   * points 1 et 2). `null` quand l'écran ne le lit pas.
+   */
+  automaticObjective: { enabled: boolean; keptGoalBeds: number } | null;
 };
 
 export async function getWaterDashboardForUser({
@@ -96,6 +106,7 @@ export async function getWaterDashboardForUser({
   forceWeatherRefresh = false,
   allowWeatherRefresh = true,
   includeWeatherAlerts = false,
+  includeAutomaticObjective = false,
   now = new Date(),
   provider = getConfiguredWeatherProvider(),
   preloadedEvents,
@@ -107,6 +118,7 @@ export async function getWaterDashboardForUser({
   forceWeatherRefresh?: boolean;
   allowWeatherRefresh?: boolean;
   includeWeatherAlerts?: boolean;
+  includeAutomaticObjective?: boolean;
   now?: Date;
   provider?: WeatherProvider;
   preloadedEvents?: IrrigationEventRecord[] | Promise<IrrigationEventRecord[]>;
@@ -179,13 +191,14 @@ export async function getWaterDashboardForUser({
 
   const refreshedPreference = await readWeatherPreference(ownerUserId);
   const alertsWorkspaceId = includeWeatherAlerts ? findWorkspaceIdForUser(ownerUserId) : null;
-  const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts] = await Promise.all([
+  const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts, automaticSettings] = await Promise.all([
     ensureRecurringHydricGoalsForUser(ownerUserId, season, requestedWeek),
     listDailyWaterLimitsForUser(ownerUserId),
     listWeatherDailyValuesForUser(ownerUserId, locationKey ?? 'unconfigured', dates[0], dates[6]),
     preloadedEvents ?? listCountedIrrigationEventsForUser(ownerUserId, undefined, true),
     alertsWorkspaceId?.then((workspaceId) => readWeatherAlertsView({ workspaceId, locationKey, now })) ?? null,
     alertsWorkspaceId?.then((workspaceId) => readCropAlertsView({ ownerUserId, workspaceId, locationKey, snapshot, season, now })) ?? null,
+    includeAutomaticObjective ? listAutomaticObjectiveRevisionsForUser(ownerUserId) : null,
   ]);
   const ledger = buildDailyWaterLedger(allEvents.filter((event) => event.season === season), now, FARM_TIME_ZONE);
   const ledgerByDate = new Map(ledger.map((row) => [row.date, row]));
@@ -280,6 +293,10 @@ export async function getWaterDashboardForUser({
     },
     weatherAlerts,
     cropAlerts,
+    automaticObjective: automaticSettings === null ? null : {
+      enabled: automaticObjectiveEnabledOn(automaticSettings, today),
+      keptGoalBeds: bedsKeepingEnteredGoal(goals, snapshot.beds, season),
+    },
   };
 }
 

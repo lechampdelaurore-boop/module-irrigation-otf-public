@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import Link from 'next/link';
 import { menuLayout } from '@/lib/domain/features/menu-groups';
 import { phoneBar, phoneBarLabel } from '@/lib/domain/features/phone-bar';
 import { pageHref, pageLabel, type IrrigationPageId, type PageQuery } from '@/lib/domain/features/pages';
@@ -20,7 +21,30 @@ import { TodayBadge, todayBadgeLabel, useTodayBadge } from './today-badge';
  * section 3.1), « Aujourd'hui » est détaché en tête dans son encart, les
  * autres pages rangées en trois groupes titrés, Réglages à part en bas ; au
  * téléphone, son entrée de la barre est un bouton rond qui dépasse.
+ *
+ * Un clic du menu ne recharge plus toute l'application (D-322) : `Link`
+ * demande au serveur la seule page voulue, sans relancer les scripts ni
+ * réhydrater l'écran, ce qui coûtait l'essentiel de l'attente au téléphone.
+ * Rien n'est demandé d'avance (`prefetch={false}`) : chaque page est calculée
+ * à la demande, et lire d'avance les quatre pages de la barre multipliait le
+ * travail du serveur à l'ouverture.
  */
+/**
+ * Un clic du menu vient de lancer le changement de page (D-322) : la page
+ * suivante le lit une fois pour porter le clavier sur son contenu.
+ */
+let menuNavigation = false;
+
+function markMenuNavigation(): void {
+  menuNavigation = true;
+}
+
+export function takeMenuNavigation(): boolean {
+  const taken = menuNavigation;
+  menuNavigation = false;
+  return taken;
+}
+
 export function FeatureMenu({
   menu,
   current,
@@ -69,15 +93,17 @@ export function FeatureMenu({
         <ul>
           {bar.entries.map((item) => (
             <li key={item} data-home={item === 'aujourdhui' || undefined}>
-              <a
+              <Link
                 href={pageHref(item, query)}
+                prefetch={false}
+                onClick={item === current ? undefined : markMenuNavigation}
                 aria-label={todayBadgeLabel(pageLabel(item), badgeOf(item))}
                 aria-current={item === current ? 'page' : undefined}
               >
                 {item === 'aujourdhui' ? <span className="menu-home-badge"><Icon name={PAGE_ICONS[item]} /></span> : <Icon name={PAGE_ICONS[item]} />}
                 <span>{phoneBarLabel(item, pageLabel(item))}</span>
                 <TodayBadge count={badgeOf(item)} />
-              </a>
+              </Link>
             </li>
           ))}
           {bar.more ? (
@@ -103,8 +129,10 @@ export function FeatureMenu({
         <ul>
           {layout.today ? (
             <li className="menu-home-item">
-              <a
+              <Link
                 className="menu-home"
+                prefetch={false}
+                onClick={current === 'aujourdhui' ? undefined : markMenuNavigation}
                 href={pageHref('aujourdhui', query)}
                 aria-label={todayBadgeLabel(pageLabel('aujourdhui'), badgeOf('aujourdhui'))}
                 aria-current={current === 'aujourdhui' ? 'page' : undefined}
@@ -115,7 +143,7 @@ export function FeatureMenu({
                   <small>Tableau de bord</small>
                 </span>
                 <TodayBadge count={badgeOf('aujourdhui')} />
-              </a>
+              </Link>
             </li>
           ) : null}
           {layout.groups.map((group) => (
@@ -143,10 +171,10 @@ export function FeatureMenu({
 function MenuLink({ item, current, query }: { item: IrrigationPageId; current: IrrigationPageId | null; query: PageQuery }) {
   return (
     <li>
-      <a href={pageHref(item, query)} aria-current={item === current ? 'page' : undefined}>
+      <Link href={pageHref(item, query)} prefetch={false} onClick={item === current ? undefined : markMenuNavigation} aria-current={item === current ? 'page' : undefined}>
         <Icon name={PAGE_ICONS[item]} />
         <span>{pageLabel(item)}</span>
-      </a>
+      </Link>
     </li>
   );
 }

@@ -42,7 +42,42 @@ registres, elle y renvoie.
   la règle (H2) et aucun écran ne l'allume (H3) : rien ne change pour
   aucune ferme. Tests à deux fermes (`tests/db/heures-de-silence.test.ts`),
   contre-épreuve de trente-cinq altérations. Contrôles : voir la PR.
-  **Fusion après la mise en ligne vérifiée d'O4.**
+  Fusion après la mise en ligne vérifiée d'O4. Mise en ligne de #203 (O4,
+  D-319) consignée ici : fusionnée le 24 novembre 2026 à 23 h 12, **en
+  ligne à 23 h 37** (run 45498654145, les cinq jobs verts ; aucune
+  migration : « No migrations to apply » en production et sur la
+  démonstration).
+- **Lenteur du module : N1, le menu sans rechargement, codée le
+  24 novembre 2026** (D-322, roadmap section 6 duodecies,
+  `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
+  la roadmap. Constat du porteur à 22 h 33 : le module « rame », au
+  téléphone comme à l'ordinateur. Mesuré sur une copie locale : les PR du
+  jour n'y sont pour rien (175 lectures de la base pour ouvrir
+  « Aujourd'hui » contre 173 avant) ; trois freins anciens. N1 : les liens
+  du menu passent par le routeur de l'application, sans rien demander
+  d'avance ; seule la page voulue est demandée au serveur, sans relancer les
+  scripts ; chaque page n'est calculée qu'une fois par requête (vinext
+  l'appelait deux fois pour une page demandée par le routeur) ; un menu
+  neuf à chaque page, le clavier repart du contenu (parcours P59). Restent N2, l'ouverture directe de l'application, et N3,
+  les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
+  sur le téléphone réel du porteur reste à faire, sur son accord.
+  Contrôles : voir la PR.
+
+- **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
+  2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en
+  Opus 5.5 · Élevé, le réglage choisi par le porteur. Le réglage se voit
+  et s'allume dans le volet « Objectifs hebdomadaires » ; son geste
+  recalcule le plan ; le volet compte les planches qui gardent un objectif
+  saisi et propose « Vider les objectifs ». L'origine de l'objectif se dit
+  dans le tableau des besoins (et sa bulle : jours, natures d'ET0, jours
+  sans valeur, clôture), la fiche de la culture, « Aujourd'hui », le
+  planning et l'historique ; « Adopter la proposition » est retiré quand
+  l'objectif suit déjà la culture ; « Fiabilité du calcul » gagne la ligne
+  « Objectif automatique » (jours sans ET0), réglage allumé seulement.
+  Réglage éteint, aucun écran ne change. Tests à deux fermes
+  (`tests/db/objectif-automatique-ecrans.test.ts`), parcours P58 aux deux
+  largeurs. Contrôles : voir la PR. **La ligne 30 (6 decies) est codée en
+  entier.** Mise en ligne de #201 (O3, D-318) consignée ici : #201 fusionnée le 24 novembre 2026 à 22 h 02, en ligne à 22 h 36 (run 45486987409, les cinq jobs verts ; migration 0048 appliquée en production et sur la démonstration) ; celle de #200 (contrat des heures de silence, D-320) aussi : en ligne le 24 novembre 2026 à 21 h 50 (run 45479608364, les cinq jobs verts).
 - **Objectif automatique sur l'ET0, O3 : les semaines closes, codé le
   24 novembre 2026** (D-318, F782 à F788, roadmap section 6 decies, PR 3
   sur 4), en Opus 5.5 · Max, le réglage de la roadmap. Une semaine finie

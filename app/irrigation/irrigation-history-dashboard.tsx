@@ -25,6 +25,7 @@ import {
 import { protectedSlotRealSignal } from '@/lib/domain/planning/follow-up';
 import { loadIrrigationHistoryAction } from './irrigation-history-actions';
 import { FigureOrigin } from './shell/figure-origin';
+import { historyObjectiveOriginText } from '@/lib/domain/objective-reading';
 import { historyFilterSummary } from '@/lib/domain/premier-geste';
 import { clockText, dateClockText, durationMinutesText } from '@/lib/domain/clock-text';
 
@@ -353,7 +354,11 @@ export function IrrigationHistoryDashboardView({
           label="Objectif"
           value={dashboard.summary.objectiveMm}
           format={millimetersText}
-          availability={objectiveAvailabilityText(dashboard.summary.objectiveAvailability)}
+          availability={[
+            // L'origine de l'objectif quand l'objectif automatique y compte (6 decies, O4, D-319).
+            historyObjectiveOriginText(dashboard.summary.objectiveAvailability.availableBedDays, dashboard.summary.objectiveAutomatic),
+            objectiveAvailabilityText(dashboard.summary.objectiveAvailability),
+          ].filter((part): part is string => part !== null).join(' · ') || null}
         />
         <SummaryCard
           label="Écart à l’objectif"

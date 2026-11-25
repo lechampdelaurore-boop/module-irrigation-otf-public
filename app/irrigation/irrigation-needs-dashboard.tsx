@@ -5,7 +5,7 @@ import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriority, type IrrigationNeedsDashboard } from '@/lib/domain/irrigation-needs';
-import { gardenUnknownReason } from '@/lib/domain/objective-reading';
+import { automaticObjectiveOriginText, gardenUnknownReason, objectiveOriginText } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
 import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { needsGardenAnchor } from '@/lib/domain/today/week';
@@ -25,9 +25,9 @@ type SortMode = 'priority' | 'deficit' | 'covered' | 'remaining';
 const NEEDS_REPLY_CLASSES = { notice: 'water-notice', warning: 'irrigation-needs-warning', error: 'water-error' } as const;
 
 const help = {
-  et0: 'ET0 cumulée sur la semaine, réanalyse pour les jours passés et prévision pour les jours à venir. Affichée pour information : elle n’entre pas dans le calcul du besoin.',
+  et0: 'ET0 cumulée sur la semaine, réanalyse pour les jours passés et prévision pour les jours à venir. Elle n’entre dans le besoin que par l’objectif automatique, quand la ferme l’allume et que la planche n’a pas d’objectif saisi.',
   proposed: 'Somme des ETM des sept jours, culture par culture et stade par stade. Une information : elle n’entre dans le besoin que si vous l’adoptez depuis la fiche de la planche.',
-  objective: 'Objectif hydrique adopté pour cette planche selon l’historique des objectifs de la semaine. C’est la demande de la semaine, avant déduction des pluies et des irrigations.',
+  objective: 'Objectif hydrique adopté pour cette planche selon l’historique des objectifs de la semaine. Quand la ferme allume l’objectif automatique, les jours sans objectif saisi suivent le besoin de la culture, ou l’ET0. C’est la demande de la semaine, avant déduction des pluies et des irrigations.',
   actual: 'Reste réel après la pluie mesurée ou réanalysée et les irrigations réellement confirmées.',
   forecast: 'Pluie extérieure encore prévue jusqu’à dimanche. Elle vaut 0 sous abri.',
   planning: 'Reste à planifier après pluie réelle, pluie prévue, irrigation réelle et irrigation déjà planifiée.',
@@ -115,7 +115,7 @@ function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrriga
     {!bed.completeness.complete ? <NeedDiagnostic bed={bed} /> : null}
     <details className="need-calculation"><summary>Voir le calcul</summary><dl>
       <Et0Metric bed={bed} />
-      <Metric label="Objectif" value={bed.objectiveMm} helpText={help.objective} kind="Renseigné · demande de la semaine" />
+      <ObjectiveMetric bed={bed} />
       {proposal ? <ProposedMetric proposal={proposal} /> : null}
       <Metric label="Pluie réelle" value={bed.actualRainMm} kind={bed.sheltered ? 'Réel · abri = 0' : 'Réel / estimé'} />
       <Metric label="Irrigation réelle" value={bed.actualIrrigationMm} kind="Réel confirmé" />
@@ -137,12 +137,13 @@ function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrriga
 }
 
 function NeedDiagnostic({ bed }: { bed: BedIrrigationNeed }) {
-  const objectiveOrigin = bed.objectiveSource === 'farm' ? 'hérité de la ferme' : bed.objectiveSource === 'zone' ? 'hérité de la parcelle' : bed.objectiveSource === 'plot' ? 'hérité du jardin ou de l’abri' : bed.objectiveSource === 'bed' ? 'défini pour la planche' : bed.objectiveSource === 'mixed' ? 'objectifs historiques de plusieurs niveaux' : 'aucun objectif adopté';
+  const automaticOrigin = bed.objectiveOrigin === 'entered' ? null : objectiveOriginText(bed);
+  const objectiveOrigin = automaticOrigin !== null ? `objectif ${automaticOrigin}` : bed.objectiveSource === 'farm' ? 'hérité de la ferme' : bed.objectiveSource === 'zone' ? 'hérité de la parcelle' : bed.objectiveSource === 'plot' ? 'hérité du jardin ou de l’abri' : bed.objectiveSource === 'bed' ? 'défini pour la planche' : bed.objectiveSource === 'mixed' ? 'objectifs historiques de plusieurs niveaux' : 'aucun objectif adopté';
   return <details className="need-diagnostic">
     <summary>ⓘ Pourquoi&nbsp;?</summary>
     <ul>
       <DiagnosticLine label="Objectif" value={bed.objectiveMm} ok={bed.objectiveMm !== null} detail={objectiveOrigin} />
-      <li data-status={bed.et0Mm === null ? 'partial' : 'ok'}><strong>ET0, information hors calcul :</strong> {bed.et0Mm === null ? `partielle${bed.et0KnownMm === null ? '' : ` — ${formatMm(bed.et0KnownMm)} disponibles`}` : formatMm(bed.et0Mm)} — {bed.et0Mm === null ? missingDatesText(bed.completeness.missingDates.et0) : 'OK'}<small>Réanalyse : {formatOptionalMm(bed.et0ReanalysisMm)} · Prévision : {formatOptionalMm(bed.et0ForecastMm)} · n’entre pas dans le besoin</small></li>
+      <li data-status={bed.et0Mm === null ? 'partial' : 'ok'}><strong>{et0EntersObjective(bed) ? 'ET0, par l’objectif automatique :' : 'ET0, information hors calcul :'}</strong> {bed.et0Mm === null ? `partielle${bed.et0KnownMm === null ? '' : ` — ${formatMm(bed.et0KnownMm)} disponibles`}` : formatMm(bed.et0Mm)} — {bed.et0Mm === null ? missingDatesText(bed.completeness.missingDates.et0) : 'OK'}<small>Réanalyse : {formatOptionalMm(bed.et0ReanalysisMm)} · Prévision : {formatOptionalMm(bed.et0ForecastMm)} · {et0EntersObjective(bed) ? 'entre dans le besoin par l’objectif automatique' : 'n’entre pas dans le besoin'}</small></li>
       <DiagnosticLine label="Pluie réelle" value={bed.actualRainMm} ok={bed.completeness.realComplete} detail={bed.sheltered ? 'abri : pluie extérieure non applicable, zéro valide' : bed.completeness.realComplete ? 'mesure manuelle prioritaire, sinon réanalyse' : rainFallbackText(bed)} />
       <DiagnosticLine label="Irrigation réelle" value={bed.actualIrrigationMm} ok detail="apports confirmés" />
       <DiagnosticLine label="Pluie prévue" value={bed.forecastRainMm} ok={bed.completeness.missingDates.forecastRain.length === 0} detail={bed.sheltered ? 'abri : pluie extérieure non applicable, zéro valide' : bed.completeness.missingDates.forecastRain.length === 0 ? 'prévision disponible' : `${missingDatesText(bed.completeness.missingDates.forecastRain)}, comptée zéro`} />
@@ -180,7 +181,18 @@ function ProposedMetric({ proposal }: { proposal: ProposalSummary }) {
   return <div data-kind="proposed"><dt>Objectif proposé <HelpButton text={help.proposed} /><small>{kind}</small></dt><dd>{proposal.status === 'no-crop' ? '—' : formatMm(proposal.proposedMm)}</dd></div>;
 }
 function signedMm(value: number) { return `${value > 0 ? '+' : ''}${mm.format(value)} mm`; }
-function Et0Metric({ bed }: { bed: BedIrrigationNeed }) { return <div><dt>ET0 <HelpButton text={help.et0} /><small>Information · hors calcul</small></dt><dd>{formatEt0(bed)}</dd></div>; }
+function Et0Metric({ bed }: { bed: BedIrrigationNeed }) { return <div><dt>ET0 <HelpButton text={help.et0} /><small>{et0EntersObjective(bed) ? 'Entre par l’objectif automatique' : 'Information · hors calcul'}</small></dt><dd>{formatEt0(bed)}</dd></div>; }
+/** L'ET0 compte dans l'objectif de la planche cette semaine : l'objectif automatique a au moins un jour d'après l'ET0 (D-309). */
+function et0EntersObjective(bed: BedIrrigationNeed): boolean {
+  const basis = bed.automaticObjective?.basis;
+  return (bed.objectiveOrigin === 'automatic' || bed.objectiveOrigin === 'both') && basis !== null && basis !== undefined && basis !== 'crop';
+}
+/** L'objectif de la semaine et son origine : saisi, automatique d'après la culture ou l'ET0, ou les deux (6 decies, O4, section 5, point 3). */
+function ObjectiveMetric({ bed }: { bed: BedIrrigationNeed }) {
+  const origin = objectiveOriginText(bed);
+  return <div data-kind="objective"><dt>Objectif <HelpButton text={help.objective} /><small>{origin === null ? 'Renseigné · demande de la semaine' : `${capitalized(origin)} · demande de la semaine`}</small></dt><dd>{formatMm(bed.objectiveMm)}<FigureOrigin text={automaticObjectiveOriginText(bed)} label="D’où vient cet objectif ?" /></dd></div>;
+}
+function capitalized(text: string): string { return text.charAt(0).toUpperCase() + text.slice(1); }
 function formatEt0(bed: BedIrrigationNeed) {
   if (bed.et0Mm !== null) return formatMm(bed.et0Mm);
   return bed.et0KnownMm === null ? 'Non disponible' : `${formatMm(bed.et0KnownMm)} (partielle)`;

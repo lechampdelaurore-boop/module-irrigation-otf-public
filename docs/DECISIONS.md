@@ -9053,8 +9053,8 @@ dans le tableau des besoins.
 
 Date : 24 novembre 2026. Statut : **choix du porteur consignés, contrat
 écrit sans code ; question 5 répondue le jour même à 18 h 46 : « Maintenir,
-éteint par défaut »** ; code en quatre PR, O1, O2 et O3 codées le jour même
-(D-316, D-317, D-318) ; roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
+éteint par défaut »** ; code en quatre PR, O1 à O4 codées le jour même
+(D-316, D-317, D-318, D-319) ; roadmap section 6 decies. Contrat en Fable 5.2 · Élevé, par exception
 expresse du porteur pour ce seul fil ; code dans un autre fil, en Opus.
 
 **Contexte.** Le porteur demande le 24 novembre 2026 (13 h 25) « un bouton
@@ -9565,6 +9565,74 @@ compte rendu du matin) font chacune échouer au moins un test.
 rien ne s'écrit dans la nouvelle table tant qu'aucune ferme ne l'allume,
 et les lecteurs restent ceux d'avant pour toutes les fermes.
 
+## D-319 — L'objectif automatique, O4 : les écrans
+
+Date : 24 novembre 2026. Statut : codé (PR O4 sur 4 du contrat
+`docs/objectif-automatique-contract.md`, D-309, sections 4, 5 et 11) ;
+roadmap section 6 decies. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap, choisi par le porteur sur carte le 24 novembre 2026 à 20 h 46.
+
+**Décision.** Le réglage « Objectif automatique » devient visible : un
+interrupteur en tête du volet « Objectifs hebdomadaires » de « Objectifs
+et besoins », avec la phrase du contrat, enregistré dès qu'on le touche, au
+journal des modifications ; un geste qui change l'état recalcule le plan
+comme un objectif saisi. Allumé, le volet compte les planches qui gardent
+un objectif saisi et propose « Vider les objectifs », le geste existant.
+L'origine de l'objectif se dit partout où il se lit : le tableau des
+besoins (avec la bulle « D'où vient cet objectif ? », ses jours par nature
+d'ET0, ses jours sans valeur et la clôture de la semaine), la fiche du
+besoin de la culture, « Aujourd'hui », le planning et l'historique. Une
+planche dont l'objectif automatique est déjà le besoin de la culture ne
+propose plus « Adopter la proposition ». « Fiabilité du calcul » gagne une
+sixième donnée, « Objectif automatique », suivie seulement réglage allumé :
+les jours sans ET0 de la semaine, avec un lien vers la météo.
+
+**Précisions tranchées en codant** (contrat, section 11).
+
+- F789 : le geste, enregistré tout de suite, recalcule le plan
+  (`objective-changed`, durable) ; un geste sans effet n'écrit rien et le
+  dit ; seule la page « Objectifs et besoins » lit le réglage pour son volet.
+- F790 : les planches qui gardent un objectif saisi se comptent sur les
+  objectifs de la semaine affichée ; l'écran ne vide jamais seul.
+- F791 : l'origine en mots (« saisi », « automatique, d'après … », « saisi
+  et automatique ») ; un mot seulement sur les lignes d'« Aujourd'hui » et
+  sans base dans l'historique ; réglage éteint, l'écran est celui d'avant.
+- F792 : la bulle dit les jours, la base, le K_abri, les natures d'ET0, les
+  jours sans valeur et la clôture (en cours, enregistrée, provisoire).
+- F793 : « Adopter la proposition » est retiré seulement quand tous les
+  jours suivent la culture, sans objectif saisi.
+- F794 : la ligne de fiabilité compte les jours de la semaine en cours sans
+  ET0 où le réglage est allumé ; elle compte dans la pastille du menu.
+- F795 : l'avertissement avant de décocher « Objectifs et besoins » ne
+  compte pas le réglage, qui reprend tel quel à la case recochée (la
+  question qu'O3 laissait).
+- F796 : les aides ne disent plus que l'ET0 n'entre jamais dans le
+  besoin ; la démonstration garde le réglage éteint.
+
+**Preuve.** `tests/objectif-automatique-ecrans.test.ts` (l'origine des cas
+1 à 6, 9 et 11, la bulle, F790, F793, le résumé du volet, « Aujourd'hui »,
+l'historique, le planning, F794), `tests/db/objectif-automatique-ecrans.test.ts`
+(à deux fermes : le volet, le tableau des besoins, la pastille),
+`tests/db/crop-water-bed-sheet.test.ts` (la fiche d'une planche qui suit
+la culture, à deux fermes), `tests/planning-suggestions.test.ts` (la
+raison d'une suggestion) et le parcours P58 aux deux largeurs (allumer,
+lire l'origine, saisir un objectif qui passe avant, vider, éteindre).
+Contre-épreuve : vingt-deux altérations (l'origine jamais dite, sans base,
+« les deux » dit « automatique », la bulle sans natures, sans jours
+manquants ou sans clôture, « Adopter » gardé ou proposé quand l'objectif
+suit la culture, la fiche sans origine, les planches gardées de toutes
+saisons, le groupe mêlé dit « automatique », l'historique toujours
+« automatique », les jours sans ET0 comptés réglage éteint, la ligne de
+fiabilité suivie réglage éteint ou menant ailleurs, « Aujourd'hui » sans
+origine sur les lignes ou la tuile, le planning ou la suggestion sans
+origine, le volet qui lit le premier geste, la pastille qui ignore
+l'objectif automatique, le résumé du volet muet) font chacune échouer au
+moins un test.
+
+**Ne change pas.** Réglage éteint, aucun écran ne change, mot pour mot, et
+aucune ferme ne l'allume sans son geste (D-028). La règle, les lecteurs et
+les semaines closes (D-316 à D-318) sont lus, jamais changés.
+
 ## D-320 — Les heures de silence des notifications : le contrat, sans code
 
 Date : 24 novembre 2026. Statut : **contrat écrit, sans code** ; roadmap
@@ -9669,6 +9737,42 @@ chacune échouer au moins un test.
 aucun envoyeur ne lit la règle et aucun écran ne l'allume ; la migration
 ajoute quatre colonnes vides. Le Worker de notification ne change pas.
 D-028, D-060 et D-293 tiennent.
+
+## D-322 — Le menu change de page sans recharger le module
+
+Date : 24 novembre 2026. Statut : **codée** ; roadmap section 6 duodecies,
+contrat `docs/lenteur-du-module-contract.md` (N1). Écrite en Opus 5.5 ·
+Élevé (correction sous contrôle des tests et des parcours). Les numéros D-319
+et D-321 sont ceux d'O4 et de H1, en PR ; celui-ci est le suivant libre.
+
+**Contexte.** Le 24 novembre 2026 à 22 h 33, le porteur trouve que le module
+« rame », au téléphone comme à l'ordinateur : « l'ouverture, c'est le pire,
+ensuite le moindre changement de page ». Mesuré sur une copie locale (contrat,
+section 2) : les PR du jour n'y sont pour rien ; chaque clic du menu
+recharge toute l'application, ses scripts et son écran, parce que ses liens
+sont des liens simples.
+
+**Décision.** Les liens du menu (menu de gauche, barre du bas, feuille
+« Plus », encart « Aujourd'hui ») passent par le routeur de l'application
+(`next/link`) : seule la page voulue est demandée au serveur. Rien n'est
+demandé d'avance (`prefetch={false}`) : lire d'avance les pages de la barre
+doublait le temps d'ouverture mesuré. Ce qu'un chargement donnait reste
+vrai : un menu neuf à chaque page (feuille « Plus » refermée, pastille
+relue), l'adresse nettoyée, le titre de l'onglet ; le clavier repart du
+contenu de la nouvelle page. Parcours P59.
+
+Pour une page demandée par le routeur, vinext 1.0.1 appelle la page une
+première fois pour y chercher une redirection, puis la rend : chaque lecture
+se faisait deux fois, et « Aujourd'hui » par le menu devenait plus lente
+qu'avec le rechargement. Chaque page du module est donc calculée une fois par
+requête (`app/irrigation/render-once.ts`, `cacheForRequest` de vinext) ;
+mesuré, chaque page de la barre du bas devient utilisable plus tôt
+qu'avant, « Aujourd'hui » comprise (contrat, N1).
+
+**Ne change pas.** Aucun calcul, aucune donnée, aucune migration, aucun texte ;
+les autres liens restent des liens simples (un geste à la fois). Les deux
+autres freins, l'ouverture en deux pages (N2) et les lectures répétées de la
+base (N3), ont leurs PR.
 
 ## D-324 — Les heures de silence, H2 : les envoyeurs
 

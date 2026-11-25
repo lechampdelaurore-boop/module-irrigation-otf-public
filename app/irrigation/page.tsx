@@ -8,6 +8,7 @@ import { accessRefusedState, type IrrigationSearchParams } from './page-context'
 import { LegacyRedirect } from './shell/legacy-redirect';
 import { UnavailableState } from './shell/unavailable-state';
 import './irrigation.css';
+import { renderOncePerRequest } from './render-once';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * cochée —, et les anciennes adresses des notifications à la page qui porte
  * leur bloc (P14).
  */
-export default async function IrrigationIndexPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeIrrigationIndexPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const params = await searchParams;
   let user: AuthenticatedUser;
   try {
@@ -43,4 +44,11 @@ export default async function IrrigationIndexPage({ searchParams }: { searchPara
       refresh={params.refresh === '1'}
     />
   );
+}
+
+const computeIrrigationIndexPageOnce = renderOncePerRequest(computeIrrigationIndexPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function IrrigationIndexPage(props: Parameters<typeof computeIrrigationIndexPage>[0]) {
+  return computeIrrigationIndexPageOnce(props);
 }

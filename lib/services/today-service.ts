@@ -11,9 +11,12 @@ import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/tod
 import { guessedStages, lastMeasuredRainOn, missingByBedBeds, rainGaugeLookbackStart, unknownSoilBeds } from '../domain/today/missing-by-bed';
 import { todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
 import { pastRainOrigins, type TodayWeekInputs } from '../domain/today/week';
-import { dateKeyInTimeZone, FARM_TIME_ZONE } from '../domain/water-management';
+import { dateKeyInTimeZone, FARM_TIME_ZONE, weekDateKeys, weekStartDateKey } from '../domain/water-management';
+import { automaticObjectiveEnabledOn } from '../domain/automatic-objective';
+import { automaticObjectiveMissingEt0Dates } from '../domain/objective-reading';
+import { listAutomaticObjectiveRevisionsForUser } from '@/db/automatic-objective-repository';
 import { weatherLocationKey } from '../domain/weather/location';
-import { getCropWaterDaysForUser } from './crop-water-week';
+import { et0Readings, getCropWaterDaysForUser } from './crop-water-week';
 import { readWeeklyPlanForUser } from './planning-service';
 import { getSoilReserveViewForUser } from './soil-reserve-view';
 import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
@@ -65,7 +68,7 @@ async function readTodayInputs(
   // Le dépliant « Par planche » (amélioration n° 6) se lit pour la page seulement : la pastille ne le compte pas (F710).
   const byBed = read.weather;
 
-  const [weather, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays] = await Promise.all([
+  const [weather, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays, automaticMissingEt0] = await Promise.all([
     read.weather
       ? readTodayWeatherInputs({ ownerUserId, workspaceId, locationKey, snapshot, season, enabled, now })
       : { forecasts: [], frost: null, criteria: on('alertes-meteo') ? [] : null },
@@ -79,6 +82,7 @@ async function readTodayInputs(
     on('cultures') && workspaceId && snapshot.cropPlan ? listSpeciesCorrespondencesForWorkspace(workspaceId) : [],
     read.weather && on('besoins') ? readWeek({ ownerUserId, season, snapshot, now }) : null,
     byBed && on('cultures') ? getCropWaterDaysForUser({ ownerUserId, season, snapshot, dates: [today], now }) : null,
+    on('besoins') ? automaticObjectiveMissingEt0(ownerUserId, locationKey, today) : null,
   ]);
 
   const seasonBeds = snapshot.beds.filter((bed) => bed.seasons.includes(season));
@@ -102,6 +106,7 @@ async function readTodayInputs(
     infrastructure,
     reliability: {
       actualRainMissingDates: rainMatters ? lookback.filter((date) => !rainKnown.has(date)) : null,
+      automaticObjectiveMissingEt0Dates: automaticMissingEt0,
       soilGardensNeverObserved: neverObservedSoilGardens(soil?.gauge?.zones ?? []),
       speciesWithoutReference: snapshot.cropPlan
         ? speciesWithoutReference(snapshot.cropPlan.series.filter((series) => series.season === season), correspondences)
@@ -120,6 +125,19 @@ async function readTodayInputs(
     week,
     soil: soil ? (soil.gauge ? { zones: soil.gauge.zones } : { unavailable: soil.gaugeUnavailable ?? GAUGE_UNAVAILABLE }) : null,
   };
+}
+
+/**
+ * Les jours de la semaine en cours sans ET0 où l'objectif automatique
+ * s'applique (6 decies, O4, section 5, point 5 ; D-319) ; `null` quand le
+ * réglage est éteint aujourd'hui : une requête, rien d'autre n'est lu.
+ */
+async function automaticObjectiveMissingEt0(ownerUserId: string, locationKey: string | null, today: string): Promise<string[] | null> {
+  const settings = await listAutomaticObjectiveRevisionsForUser(ownerUserId);
+  if (!automaticObjectiveEnabledOn(settings, today)) return null;
+  const dates = weekDateKeys(weekStartDateKey(today));
+  const rows = await listWeatherDailyValuesForUser(ownerUserId, locationKey ?? 'unconfigured', dates[0], dates[6]);
+  return automaticObjectiveMissingEt0Dates(settings, et0Readings(rows), dates, today);
 }
 
 /** La jauge du sol absente sans raison donnée : jamais lue comme un sol plein (D-003). */

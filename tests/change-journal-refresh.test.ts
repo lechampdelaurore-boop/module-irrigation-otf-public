@@ -45,6 +45,8 @@ const RANGEMENT: Readonly<Record<string, Rangement>> = {
   restoreOtfWeatherLocationAction: previent(WATER),
   saveHydricGoalAction: previent(WATER),
   clearHydricGoalsAction: previent(WATER),
+  // Le réglage « Objectif automatique » (6 decies, O4, D-319) : un geste au journal, comme un objectif.
+  saveAutomaticObjectiveAction: previent(WATER),
   saveDailyWaterLimitAction: previent(WATER),
   // La correspondance des espèces, et le besoin par culture du même panneau.
   saveSpeciesCorrespondenceAction: previent(CROP_PANEL),
