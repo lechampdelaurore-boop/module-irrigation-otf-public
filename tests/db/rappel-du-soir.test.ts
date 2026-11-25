@@ -7,6 +7,7 @@ import { readPhoneNoticeSettingsForUser, saveEveningReminderForUser, saveMorning
 import { readTaskRuns } from '../../db/task-run-repository';
 import { ensureWorkspaceForUser } from '../../db/workspace-repository';
 import { FEATURE_IDS } from '../../lib/domain/features/catalogue';
+import { DEFAULT_QUIET_HOURS } from '../../lib/domain/notification-quiet-hours';
 import type { IrrigationPushAlarmRequest } from '../../lib/domain/irrigation-push-contract';
 import { runEveningReminders } from '../../lib/services/evening-reminder';
 import type { PlanningAlarmScheduler } from '../../lib/services/morning-message';
@@ -109,7 +110,7 @@ test('l’heure réglée, la case coupée, une ferme sans « Arrosages » ou fig
   await planIrrigation(bob, '2026-09-30T05:00:00.000Z');
   assert.deepEqual(
     await saveEveningReminderForUser(ALICE, ALICE, { enabled: true, time: '20:30' }, MORNING.toISOString()),
-    { morningMessage: true, eveningReminder: true, eveningTime: '20:30' },
+    { morningMessage: true, eveningReminder: true, eveningTime: '20:30', quietHours: DEFAULT_QUIET_HOURS },
   );
   const calls = recorder();
   await runEveningReminders({ now: EVENING, schedule: calls.schedule, log: calls.log });
@@ -119,7 +120,7 @@ test('l’heure réglée, la case coupée, une ferme sans « Arrosages » ou fig
 
   await saveEveningReminderForUser(ALICE, ALICE, { enabled: false, time: '19:00' }, MORNING.toISOString());
   await saveMorningMessageForUser(ALICE, ALICE, false, MORNING.toISOString());
-  assert.deepEqual(await readPhoneNoticeSettingsForUser(ALICE), { morningMessage: false, eveningReminder: false, eveningTime: '19:00' }, 'le matin et le soir se règlent chacun');
+  assert.deepEqual(await readPhoneNoticeSettingsForUser(ALICE), { morningMessage: false, eveningReminder: false, eveningTime: '19:00', quietHours: DEFAULT_QUIET_HOURS }, 'le matin et le soir se règlent chacun, sans toucher aux heures de silence');
   await assert.rejects(saveEveningReminderForUser(ALICE, ALICE, { enabled: true, time: '23:00' }, MORNING.toISOString()), /de 17 h à 22 h/);
 
   const nextDay = new Date('2026-10-01T17:05:00.000Z');

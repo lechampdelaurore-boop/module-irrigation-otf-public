@@ -12,6 +12,26 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Heures de silence des notifications, H1 : la règle et le réglage,
+  codés le 24 novembre 2026** (D-321, F797 à F802, roadmap section 6
+  undecies, PR 1 sur 3), en Opus 5.5 · Max, le réglage de la roadmap. La
+  règle vit en un seul endroit du domaine
+  (`lib/domain/notification-quiet-hours.ts`) : pour une notification et
+  l'instant où elle partirait, elle dit si elle part, si elle est retenue
+  jusqu'à la fin de la plage ou si elle ne part pas (le rappel du soir) ;
+  la fin se prend sur l'horloge de Paris. Le réglage de chaque ferme
+  s'ajoute aux réglages des messages du téléphone (migration 0049, quatre
+  colonnes vides : éteinte, 22 h à 6 h, le gel qui passe), refusé hors des
+  bornes, écrit au journal des modifications. Aucun envoyeur ne lit encore
+  la règle (H2) et aucun écran ne l'allume (H3) : rien ne change pour
+  aucune ferme. Tests à deux fermes (`tests/db/heures-de-silence.test.ts`),
+  contre-épreuve de trente-cinq altérations. Contrôles : voir la PR.
+  Fusion après la mise en ligne vérifiée d'O4. Mise en ligne de #203 (O4,
+  D-319) consignée ici : fusionnée le 24 novembre 2026 à 23 h 12, **en
+  ligne à 23 h 37** (run 45498654145, les cinq jobs verts ; aucune
+  migration : « No migrations to apply » en production et sur la
+  démonstration). Restent H2, en Opus 5.5 · Max, et H3, en
+  Opus 5.5 · Élevé.
 - **Lenteur du module : N3, l'espace lu une fois par requête, en ligne le
   25 novembre 2026 à 3 h 36** (D-325, F810 à F816, contrat de la tranche 4, section
   5 sexies ; roadmap section 6 duodecies), en Opus 5.5 · Max, le réglage de
@@ -32,8 +52,8 @@ registres, elle y renvoie.
   démonstration à 3 h 36). Contrôles : voir la PR.
 
 - **Lenteur du module : N1, le menu sans rechargement, en ligne le
-  25 novembre 2026 à 2 h 45, et N2, l'ouverture directe, codée le
-  24 novembre 2026** (D-322, D-323, roadmap section 6 duodecies,
+  25 novembre 2026 à 2 h 45, et N2, l'ouverture directe, en ligne le
+  25 novembre 2026 à 4 h 42** (D-322, D-323, roadmap section 6 duodecies,
   `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
   la roadmap. Constat du porteur à 22 h 33 : le module « rame », au
   téléphone comme à l'ordinateur. Mesuré sur une copie locale : les PR du
@@ -52,7 +72,10 @@ registres, elle y renvoie.
   sur le téléphone réel du porteur reste à faire, sur son accord.
   Mise en ligne de #204 (N1, D-322) consignée ici : #204 fusionnée le
   25 novembre 2026 à 2 h 11, en ligne à 2 h 45 (run 45523929120, les cinq
-  jobs verts ; démonstration à 2 h 46). Contrôles : voir la PR.
+  jobs verts ; démonstration à 2 h 46). Mise en ligne de #206 (N2, D-323)
+  consignée ici : #206 fusionnée le 25 novembre 2026 à 4 h 11, en ligne à
+  4 h 42 (run 45538289955, les cinq jobs verts ; démonstration à 4 h 43 ;
+  aucune migration). Contrôles : voir la PR.
 
 - **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
   2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en

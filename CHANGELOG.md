@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (heures de silence des notifications, H1)
+
+- **La règle et le réglage des heures de silence** (D-321) : chaque ferme
+  aura une plage de nuit, éteinte tant qu'elle ne l'allume pas, de 22 h à
+  6 h proposée. La règle dit, pour chaque notification, si elle part tout
+  de suite (la fin d'un arrosage, le gel si sa case est cochée), si elle
+  attend la fin de la plage, ou si elle ne part pas (le rappel du soir) ;
+  la fin se prend sur l'horloge de Paris, même la nuit du changement
+  d'heure. Le réglage est gardé par ferme et écrit au journal des
+  modifications. Rien ne change encore pour aucune ferme : aucune
+  notification ne lit la règle (H2) et aucun écran ne l'allume (H3).
 ### Corrigé (lenteur du module, N2)
 
 - **Le module s'ouvre plus vite** (D-323) : l'application installée, le logo

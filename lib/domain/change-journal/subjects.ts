@@ -58,6 +58,8 @@ const CHANGE_SUBJECTS = {
   fonctionnalites: { family: 'reglage', label: 'Fonctionnalités' },
   'message-du-matin': { family: 'reglage', label: 'Message du matin' },
   'rappel-du-soir': { family: 'reglage', label: 'Rappel du soir' },
+  // Les heures de silence des notifications, pour toute la ferme (6 undecies, H1 ; D-320).
+  'heures-de-silence': { family: 'reglage', label: 'Heures de silence' },
   // Réglages que la liste du contrat ne nommait pas, ajoutés par D-289 (F718, F725).
   'kc-corrige': { family: 'reglage', label: 'Kc corrigé d’une culture' },
   'culture-de-reference': { family: 'reglage', label: 'Culture de référence de la ferme' },

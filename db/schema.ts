@@ -2478,11 +2478,20 @@ export const phoneNoticeSettings = sqliteTable(
     eveningTime: text('evening_time'),
     actorUserId: text('actor_user_id').notNull(),
     updatedAt: text('updated_at').notNull(),
+    // Les heures de silence (6 undecies, H1, migration 0049) : une colonne vide vaut le défaut.
+    quietHours: integer('quiet_hours'),
+    quietStart: text('quiet_start'),
+    quietEnd: text('quiet_end'),
+    quietFrostPasses: integer('quiet_frost_passes'),
   },
   (table) => [
     check('chk_phone_notice_settings_morning', sql`${table.morningMessage} IS NULL OR ${table.morningMessage} IN (0, 1)`),
     check('chk_phone_notice_settings_evening', sql`${table.eveningReminder} IS NULL OR ${table.eveningReminder} IN (0, 1)`),
     check('chk_phone_notice_settings_time', sql`${table.eveningTime} IS NULL OR ${table.eveningTime} GLOB '[12][0-9]:[0-5][0-9]'`),
+    check('chk_phone_notice_settings_quiet', sql`${table.quietHours} IS NULL OR ${table.quietHours} IN (0, 1)`),
+    check('chk_phone_notice_settings_quiet_start', sql`${table.quietStart} IS NULL OR ${table.quietStart} IN ('20:00', '20:15', '20:30', '20:45', '21:00', '21:15', '21:30', '21:45', '22:00', '22:15', '22:30', '22:45', '23:00', '23:15', '23:30', '23:45')`),
+    check('chk_phone_notice_settings_quiet_end', sql`${table.quietEnd} IS NULL OR ${table.quietEnd} IN ('04:00', '04:15', '04:30', '04:45', '05:00', '05:15', '05:30', '05:45', '06:00', '06:15', '06:30', '06:45', '07:00', '07:15', '07:30', '07:45', '08:00', '08:15', '08:30', '08:45', '09:00')`),
+    check('chk_phone_notice_settings_quiet_frost', sql`${table.quietFrostPasses} IS NULL OR ${table.quietFrostPasses} IN (0, 1)`),
   ],
 );
 

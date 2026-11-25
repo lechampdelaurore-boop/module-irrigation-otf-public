@@ -336,6 +336,12 @@ const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWo
   fonctionnalites: featureFields(),
   'message-du-matin': { enabled: { label: 'Message du matin', format: flag } },
   'rappel-du-soir': { enabled: { label: 'Rappel du soir', format: flag }, time: { label: 'Heure', format: timeOfDay } },
+  'heures-de-silence': {
+    enabled: { label: 'Heures de silence', format: flag },
+    start: { label: 'Début', format: timeOfDay },
+    end: { label: 'Fin', format: timeOfDay },
+    frostPasses: { label: 'Laisser passer les alertes de gel', format: checked },
+  },
   'kc-corrige': { kc: { label: 'Kc de la ferme', format: decimal, empty: 'celui de la source' } },
   'culture-de-reference': {
     source: { label: 'Source des Kc', format: (value) => kcSourceLabel(String(value) as KcSource) },

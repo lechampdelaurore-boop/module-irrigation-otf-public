@@ -1,7 +1,8 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
-import { eveningReminderJournal, morningMessageJournal } from './change-journal/settings';
+import { eveningReminderJournal, morningMessageJournal, quietHoursJournal } from './change-journal/settings';
+import { DEFAULT_QUIET_HOURS, isValidQuietHours, type QuietHoursSettings } from '@/lib/domain/notification-quiet-hours';
 import { EVENING_REMINDER_DEFAULT, EVENING_REMINDER_DEFAULT_TIME, isEveningTime } from '@/lib/domain/today/evening-reminder';
 import { MORNING_MESSAGE_DEFAULT } from '@/lib/domain/today/morning-message';
 import { millisecondsFromMinutes } from '@/lib/domain/units';
@@ -10,7 +11,9 @@ import { millisecondsFromMinutes } from '@/lib/domain/units';
  * Les messages du téléphone d'une ferme (améliorations n° 3 et n° 2,
  * docs/ameliorations-6-2-3-7-contract.md, sections 4.1 à 4.3, F702 à F705,
  * F712, F714) : le réglage de la ferme et la prise du jour de chaque message.
- * Une colonne vide du réglage vaut le défaut, jamais écrit en base.
+ * Une colonne vide du réglage vaut le défaut, jamais écrit en base. Les heures
+ * de silence (6 undecies, docs/heures-de-silence-contract.md, section 4)
+ * vivent dans la même ligne.
  */
 
 export type PhoneNoticeKind = 'morning' | 'evening';
@@ -20,11 +23,25 @@ export type PhoneNoticeSettings = {
   eveningReminder: boolean;
   /** « 19:00 » : de 17 h à 22 h, au quart d'heure, heure de Paris. */
   eveningTime: string;
+  /**
+   * Les heures de silence, défauts compris. Le début et la fin sont lus tels
+   * qu'écrits : un réglage hors des bornes, que la contrainte refuse à
+   * l'écriture, est ignoré comme éteint par la règle, qui dit le défaut (S17).
+   */
+  quietHours: QuietHoursSettings;
 };
 
-type SettingsRow = { morning_message: number | null; evening_reminder: number | null; evening_time: string | null };
+type SettingsRow = {
+  morning_message: number | null;
+  evening_reminder: number | null;
+  evening_time: string | null;
+  quiet_hours: number | null;
+  quiet_start: string | null;
+  quiet_end: string | null;
+  quiet_frost_passes: number | null;
+};
 
-const SETTINGS_COLUMNS = 'morning_message, evening_reminder, evening_time';
+const SETTINGS_COLUMNS = 'morning_message, evening_reminder, evening_time, quiet_hours, quiet_start, quiet_end, quiet_frost_passes';
 
 function flag(value: number | null | undefined, fallback: boolean): boolean {
   return value === null || value === undefined ? fallback : value === 1;
@@ -35,6 +52,12 @@ function settingsOf(row: SettingsRow | null): PhoneNoticeSettings {
     morningMessage: flag(row?.morning_message, MORNING_MESSAGE_DEFAULT),
     eveningReminder: flag(row?.evening_reminder, EVENING_REMINDER_DEFAULT),
     eveningTime: isEveningTime(row?.evening_time) ? row.evening_time : EVENING_REMINDER_DEFAULT_TIME,
+    quietHours: {
+      enabled: flag(row?.quiet_hours, DEFAULT_QUIET_HOURS.enabled),
+      start: row?.quiet_start ?? DEFAULT_QUIET_HOURS.start,
+      end: row?.quiet_end ?? DEFAULT_QUIET_HOURS.end,
+      frostPasses: flag(row?.quiet_frost_passes, DEFAULT_QUIET_HOURS.frostPasses),
+    },
   };
 }
 
@@ -95,6 +118,37 @@ export class InvalidEveningTimeError extends Error {
   constructor() {
     super('Choisissez une heure de 17 h à 22 h, au quart d’heure.');
     this.name = 'InvalidEveningTimeError';
+  }
+}
+
+/**
+ * Allume ou éteint les heures de silence et règle leur plage et la case du gel
+ * (6 undecies, contrat section 4), avec la personne qui le change et l'heure ;
+ * le matin et le soir ne bougent pas. Les quatre valeurs s'écrivent ensemble :
+ * éteinte, la plage garde ses heures pour le prochain allumage.
+ */
+export async function saveQuietHoursForUser(
+  ownerUserId: string,
+  actorUserId: string,
+  setting: QuietHoursSettings,
+  at: string,
+): Promise<PhoneNoticeSettings> {
+  if (!isValidQuietHours(setting)) throw new InvalidQuietHoursError();
+  const workspaceId = await ensureWorkspaceForUser(ownerUserId);
+  // Le journal des modifications d'abord : l'avant est le réglage en vigueur, défauts compris (amélioration n° 7, D-286).
+  await db.batch([quietHoursJournal('heures-de-silence', { workspaceId, actorUserId, at }, setting), db.prepare(
+    `INSERT INTO irrigation_phone_notice_settings (workspace_id, quiet_hours, quiet_start, quiet_end, quiet_frost_passes, actor_user_id, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (workspace_id) DO UPDATE SET quiet_hours = excluded.quiet_hours, quiet_start = excluded.quiet_start, quiet_end = excluded.quiet_end,
+       quiet_frost_passes = excluded.quiet_frost_passes, actor_user_id = excluded.actor_user_id, updated_at = excluded.updated_at`,
+  ).bind(workspaceId, setting.enabled ? 1 : 0, setting.start, setting.end, setting.frostPasses ? 1 : 0, actorUserId, at)]);
+  return readPhoneNoticeSettingsForWorkspace(workspaceId);
+}
+
+export class InvalidQuietHoursError extends Error {
+  constructor() {
+    super('Choisissez un début de 20 h à 23 h 45 et une fin de 4 h à 9 h, au quart d’heure.');
+    this.name = 'InvalidQuietHoursError';
   }
 }
 
