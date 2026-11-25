@@ -78,7 +78,8 @@ test('le menu de l’ordinateur : le « + Arroser ou noter » en tête, les troi
   const source = readFileSync('app/irrigation/shell/feature-menu.tsx', 'utf8');
   const desktop = source.slice(source.indexOf('<nav className="feature-menu"'));
   // Le « + » en tête, avant le premier endroit, la même feuille que la barre.
-  assert.ok(desktop.indexOf('<PlusSheet variant="menu" {...plusProps} />') < desktop.indexOf('places.map('));
+  const plus = desktop.indexOf('<PlusSheet variant="menu" {...plusProps} />');
+  assert.ok(plus >= 0 && plus < desktop.indexOf('places.map('), 'le « + » en tête du menu');
   assert.match(source, /<PlusSheet variant="bar" \{\.\.\.plusProps\} \/>/);
   // Pas de « + » sans geste (section 8), au menu comme à la barre.
   assert.match(desktop, /\{gestures\.length > 0 \? \(\s*<li className="menu-plus-item">/);
