@@ -35,7 +35,7 @@ test('un seul calcul : la moyenne pondérée par la surface, sur les planches qu
   const second = farmObjective([{ areaSquareMeters: 50, objectiveMm: 20 }, { areaSquareMeters: 150, objectiveMm: 28 }, { areaSquareMeters: 800, objectiveMm: null }]);
   assert.deepEqual(second, { objectiveMm: 26, withObjective: 2, total: 3 });
   assert.equal(farmObjectiveText(second), '26 mm visés, 2 planches sur 3 ont un objectif');
-  assert.equal(farmObjectiveScopeText({ objectiveMm: 5, withObjective: 1, total: 4 }), '1 planche sur 4 a un objectif');
+  assert.equal(farmObjectiveScopeText({ withObjective: 1, total: 4 }), '1 planche sur 4 a un objectif');
   // Aucune planche n'a d'objectif : rien n'est inventé.
   assert.equal(farmObjectiveText(farmObjective([{ areaSquareMeters: 10, objectiveMm: null }])), 'aucune eau visée');
   assert.equal(farmObjective([]).objectiveMm, null);

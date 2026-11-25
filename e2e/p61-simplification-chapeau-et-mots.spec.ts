@@ -277,3 +277,39 @@ test('« Aujourd’hui » et « Objectifs et besoins » disent le même objectif
   await expect(ligne).toHaveText(new RegExp(`^${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} · `));
   await verifierLEtape(page, journal, 'le même objectif sur « Objectifs et besoins »');
 });
+
+/**
+ * PR 3 bis, l'Historique comme « Aujourd'hui » (contrat, section 5 bis ;
+ * D-329) : la semaine en cours de « Historique et cumuls », sur la ferme
+ * entière, dit l'objectif d'« Aujourd'hui » : le même chiffre, et, quand une
+ * partie seulement des planches en a un, combien. La règle et l'écart se
+ * prouvent à deux fermes par tests/simplification-s1-historique.test.ts et
+ * tests/db/simplification-s1-historique.test.ts.
+ */
+test('« Historique et cumuls » dit l’objectif d’« Aujourd’hui » pour la semaine en cours', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const tuile = page.locator('a.today-kpi').filter({ has: page.locator('.today-kpi-label', { hasText: 'Eau visée cette semaine' }) });
+  const valeur = (await tuile.locator('.today-kpi-value').innerText()).trim();
+  const portee = (await tuile.locator('.today-kpi-detail').innerText()).split(', du ')[0].trim();
+  await verifierLEtape(page, journal, 'l’objectif d’« Aujourd’hui »');
+
+  // La page s'ouvre sur la semaine en cours, la ferme entière.
+  await attendreLaPageIrrigation(page, 'historique');
+  const carte = page.locator('article.history-summary-card').filter({ has: page.locator('span', { hasText: /^Objectif$/ }) });
+  await expect(carte).toHaveCount(1);
+  if (/^\d/.test(valeur)) {
+    await expect(carte.locator('strong')).toHaveText(valeur);
+    // « ferme entière » ne s'écrit pas sous la carte ; « 7 planches sur 10 ont un objectif » s'y écrit, comme sur « Aujourd'hui ».
+    if (portee === 'ferme entière') await expect(carte).not.toContainText(' ont un objectif');
+    else await expect(carte.locator('small')).toContainText(portee);
+  } else {
+    await expect(carte.locator('strong')).toHaveText('Donnée indisponible');
+    await expect(carte.locator('small')).toContainText('Aucun objectif sur la période');
+  }
+  // La phrase F444, la moyenne sur toute la surface, a disparu.
+  await expect(page.locator('main')).not.toContainText('comptées à 0');
+  await verifierLEtape(page, journal, 'le même objectif sur « Historique et cumuls »');
+});

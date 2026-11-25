@@ -215,7 +215,12 @@ Sur la période d'occupation, pour chaque série, par planche puis pondéré :
   zéro et n'est pas une donnée manquante, seule une période sans aucun jour
   couvert est sans objectif ni écart, et le nombre de journées-planche
   couvertes — une planche sur un jour — est affiché (D-036, point ouvert 39, 9
-  octobre 2026). Un objectif compte, dans la semaine pour laquelle il est
+  octobre 2026). Entre planches, depuis le 25 novembre 2026 (D-329,
+  `docs/simplification-s1-contract.md`, section 5 bis) : la moyenne pondérée
+  par la surface occupée porte sur les seules planches qui ont un objectif
+  sur la période, comme « Aujourd'hui » ; une planche sans aucun jour
+  couvert n'est plus comptée à zéro, elle est dite (« 2 planches sur 3 ont
+  un objectif »). Un objectif compte, dans la semaine pour laquelle il est
   posé, à partir de son jour de pose en heure de Paris (D-004), ou dès le
   lundi s'il reprend automatiquement la semaine précédente ; les semaines
   suivantes le comptent dès le lundi, jusqu'à la révision qui le remplace ; un
@@ -231,7 +236,8 @@ Sur la période d'occupation, pour chaque série, par planche puis pondéré :
   de demain à la dernière récolte attendue, se présente à part ; il est
   inconnu dès qu'un de ses jours n'a pas de valeur automatique (F779) ;
 - **écart** : `objectif cumulé − (irrigation réelle + pluie réelle)`, positif
-  en déficit ;
+  en déficit ; l'irrigation et la pluie y sont celles des planches qui ont
+  un objectif, quand une partie seulement en a un (D-329) ;
 - **ET0** de la période, pour information seulement, à côté, jamais dans une
   formule (D-010).
 
@@ -255,7 +261,11 @@ champ. L'écart à l'objectif suit. Elle applique aussi la règle de l'objectif
 cumulé ci-dessus depuis le 9 octobre 2026 (D-036, point ouvert 39) : objectif
 sommé sur les journées-planche couvertes, pondéré par la surface des planches,
 jamais « indisponible » dès qu'une journée-planche l'est ; le nombre de
-journées-planche couvertes est affiché. Elle compte aussi un objectif à partir
+journées-planche couvertes est affiché. Depuis le 25 novembre 2026 (D-329,
+`docs/simplification-s1-contract.md`, section 5 bis), la moyenne porte sur
+les seules planches qui ont un objectif sur la période, comme « Aujourd'hui »,
+et la carte dit combien en ont un ; l'écart se chiffre sur ces mêmes
+planches. Elle compte aussi un objectif à partir
 de son jour de pose, comme ci-dessus et comme le tableau des besoins (D-039,
 point ouvert 40, 9 octobre 2026).
 
