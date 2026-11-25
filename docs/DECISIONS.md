@@ -10784,3 +10784,97 @@ montre », « Arroser, Équiper » ; le « ? » d'« Aujourd'hui » ; le repère
 règles des bulles (`demo-tours` : longueur, sans emoji ni sigle, pages
 cochées) tiennent sans changer. Parcours V1 et V6 de la démonstration et
 P29, aux deux largeurs. Contre-épreuve : voir la PR.
+
+## D-332 — Simplifier l'usage du module, lot S5 : arroser en trois champs
+
+Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (« Arroser
+maintenant » en trois champs) ; contrat `docs/simplification-s5-contract.md`,
+roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage
+de la roadmap et du contrat (section 14), sur le mandat du porteur du
+25 novembre 2026 (enchaîner les lots sans nouveau « vas-y », D-327), après
+la fin du code de S3.
+
+**Décision (PR 1).** Le formulaire « Arroser maintenant » d'« Arrosages »
+tient en trois champs : « 1. Où ? », « 2. Combien de temps ? », puis un
+bouton qui dit ce qu'il fait ; le reste est derrière « Plus d'options ». Les
+règles d'écran vivent dans `lib/domain/watering-now.ts` : les pastilles de
+durée, le pas de cinq minutes, la phrase du résultat, l'heure de fin, le
+bouton et ce qui lui manque, ce qui reste au premier niveau. Les valeurs
+écrites sont celles du formulaire d'avant, par les mêmes champs et la même
+action serveur : la durée tirée d'une quantité, l'apport par planche, le
+volume, la faisabilité hydraulique, la dose du jour et le dépassement de
+l'objectif sont les fonctions existantes. Aucune règle d'écriture ni aucun
+calcul ne change ; aucune question agronomique (contrat, section 10).
+
+Précisions prises en codant :
+
+- **F894** — L'onglet s'appelle « Arroser maintenant » dès la PR 1 (S5-a),
+  dans le « ? » de la page et la visite guidée aussi ; les phrases de
+  description des trois onglets et les noms « Planifier », « Déjà
+  réalisée » restent jusqu'à la PR 2, qui refait ces deux onglets.
+- **F895** — « Où ? » : une case ronde par matériel prêt (la règle
+  d'avant : actif, un réglage, une position), rangée par jardin
+  (`equipmentByGarden`) ; le nom lu de la case est celui du matériel, son
+  type et ses planches en sont la description (« Goutte-à-goutte · 3
+  planches »). Le nombre de planches est celui de la couverture de la ferme
+  pour la position enregistrée (`reachedBedCount`), comme la ligne
+  d'avant. Au-delà de six matériels, la liste déroulante groupée, chaque
+  choix suivi du même détail (S5-c). Un seul matériel prêt est choisi
+  d'office sur « Arroser maintenant », hors modification, et une ligne le
+  dit (S5-b) ; avec plusieurs, rien n'est choisi.
+- **F896** — Le réglage reste au premier niveau seulement pour un
+  matériel qui en a plusieurs : une liste « Réglage » sous les lignes, qui
+  montre son nom ; son premier choix est celui d'avant (la position
+  enregistrée, sinon le premier).
+- **F897** — La durée : un grand nombre, « − » et « + » ronds de 52 px,
+  les pastilles « 30 min », « 1 h » et « Conseillé : *durée* » quand le
+  jour a une dose pour ce matériel. La pastille choisie se lit sur le
+  formulaire (mode, quantité, durée), jamais retenue à part. « Conseillé »
+  écrit la dose en mm, mode « Objectif en mm », exactement la valeur
+  d'avant ; une pastille fixe, « − » et « + » écrivent des heures et des
+  minutes entières, mode « Durée d'irrigation ». Une durée hors grille
+  (« 1 h 23 ») rejoint la grille de cinq minutes voisine au premier pas.
+  « — » tant qu'aucune durée n'est choisie : le premier « + » donne
+  30 min, « − » est inactif ; plancher 5 min, plafond 744 h.
+- **F898** — La phrase du résultat dit « pris à « *origine* » », le nom
+  entre guillemets, plutôt que « pris au *origine* » de la maquette : les
+  noms des réserves sont libres et l'article ne se devine pas. L'origine
+  ne se dit qu'avec un volume connu ; un volume inconnu se dit avec sa
+  raison (« volume inconnu : passe-pied non renseigné ») ; un apport
+  inconnu sur une planche se dit, jamais zéro. La pompe ne se dit qu'avec
+  la case « Ressources et pompes » cochée. Les millimètres sont une seule
+  valeur quand toutes les planches reçoivent la même au dixième, sinon
+  « de *a* à *b* mm selon les planches ». L'intensité (goutte-à-goutte) ou
+  l'étendue (aspersion) et le tableau « Apport estimé par planche » sont
+  sous « Voir planche par planche ».
+- **F899** — Le bouton dit « Démarrer · fin vers *h* » ; son nom lu est
+  « Démarrer l'arrosage de *matériel*, fin vers *h* ». L'heure de fin est
+  relue chaque minute par une horloge du formulaire : celle de la page ne
+  bat que pendant un arrosage. Inactif aux conditions d'avant, la ligne
+  dessous dit, dans l'ordre, « Choisissez où arroser. », « Choisissez une
+  durée. », puis, pour un matériel dont la position n'atteint aucune
+  planche, « Ce matériel n'atteint aucune planche depuis sa position :
+  vérifiez sa pose. »
+- **F900** — « Plus d'options (pompe, note, saisir en mm) » est un bouton
+  à `aria-expanded` qui montre ou cache ses champs, fermé par défaut,
+  ouvert d'emblée quand une valeur y est déjà posée : une pompe qui n'est
+  pas l'habituelle du matériel, une note, la saisie en mm. Il contient
+  « Saisir en mm » (une case : la quantité « Quantité souhaitée » au
+  premier niveau, « soit *durée* » en résultat, la planche de référence
+  d'un asperseur), « Durée exacte » (les heures et minutes, qui montrent
+  la durée en cours), la pompe et l'origine de l'eau avec la faisabilité
+  « ok » ou « inconnue », la note. La pompe dépassée et le créneau
+  protégé restent au premier niveau.
+- **F901** — Le formulaire a son propre fichier (`creation-panel.tsx`,
+  `watering-now-form.tsx`) et ses valeurs leur fonction
+  (`use-creation-form.ts`) : le composant de la page passe de 598 à 422
+  lignes comptées (limite 600, `docs/file-splitting-contract.md`). Vidé après une réussite (F406), il revient aussi au mode
+  « Objectif en mm » sans quantité, pour les trois onglets : aucune durée
+  n'y reste choisie.
+
+**Écart, dit.** Le budget de hauteur du contrat (section 7 : « Où ? » sous
+400 px au téléphone sans arrosage en cours, sous 700 px avec) n'est pas
+tenu par la PR 1 : mesuré par P64, il dépend des onglets d'une ligne
+(PR 2) et de l'ordre de la page (PR 3), qui le vérifiera. Les contrats de
+la section 9.1 sont réécrits par la PR 3, comme le prévoit la section 2 du
+contrat ; celui des parcours suit dès cette PR.

@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5, PR 1 sur 3 : « Arroser maintenant »
+  en trois champs, codée le 25 novembre 2026** (D-332, F894 à F901 ;
+  contrat `docs/simplification-s5-contract.md`, sections 3 et 9.3 ;
+  roadmap section 6 terdecies, ligne 33), en Opus 5.5 · Élevé, après la fin
+  du code de S3, sur la branche de sa PR 4. « 1. Où ? » (cases rondes,
+  type et planches ; un seul matériel choisi d'office), « 2. Combien de
+  temps ? » (« − », « + », « 30 min », « 1 h », « Conseillé »), la phrase
+  du résultat, « Démarrer · fin vers … » ; « Plus d'options » pour la
+  pompe, la note, la saisie en mm et la durée exacte ; la pompe dépassée
+  et le créneau protégé au premier niveau. Règles d'écran dans
+  `lib/domain/watering-now.ts` ; le formulaire dans son propre fichier.
+  Aucun calcul ni aucune écriture changés. Tests du domaine et des écrans,
+  parcours P64 (trois touches sans clavier), P1 réécrit, P11, P24, P37,
+  P38, P40, P63 suivent. Budget de hauteur du contrat mesuré, tenu par la
+  PR 3. Contrôles : voir la PR. Viennent les PR 2 et 3.
 - **Simplifier l'usage du module, S3, PR 4 sur 4 : les liens et les
   visites, codée le 25 novembre 2026** (D-331, F890 à F893 ; contrat,
   sections 2 et 9), en Opus 5.5 · Très élevé, sur la branche de la PR 3.

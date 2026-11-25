@@ -482,6 +482,59 @@ s'arrête, le dit, et le porteur tranche, une question par message.
 - Décision de ce lot, précisions F, parcours : numéros pris en codant (PR 1).
 - Le nom de la demande portée par l'adresse, tel que S3 l'a posé (PR 3).
 
+### 13.1 Relevé de la PR 1
+
+**Où est allé chaque champ de « Irriguer maintenant »** (tableau 9.3 ; la PR 1
+ne refait que cet onglet, « Planifier » et « Déjà réalisée » gardent leur
+formulaire jusqu'à la PR 2) :
+
+| Champ d'avant | Dans la PR 1 |
+| --- | --- |
+| Onglet « Irriguer maintenant » | « Arroser maintenant » ; la phrase de description reste aux trois onglets jusqu'à la PR 2 (onglets d'une ligne) |
+| Matériel (liste déroulante) | « 1. Où ? » : cases rondes groupées par jardin jusqu'à 6, liste « Où arroser ? » au-delà (S5-c) ; un seul matériel prêt est choisi d'office et la ligne le dit (S5-b) |
+| Réglage | sous « Où ? », seulement quand le matériel en a plusieurs |
+| « n planches atteintes depuis la position » | le détail de chaque ligne : « Goutte-à-goutte · 3 planches » |
+| Pompe, Origine de l'eau | « Plus d'options » ; la pompe dite dans la phrase du résultat |
+| Indicateur hydraulique | premier niveau s'il est dépassé, « Plus d'options » sinon |
+| « Objectif en mm » / « Durée d'irrigation » | « Saisir en mm » (case de « Plus d'options ») ; « Durée exacte » (Heures, Minutes) dans « Plus d'options » ; le premier niveau règle une durée |
+| Quantité souhaitée | « Quantité souhaitée » au premier niveau quand « Saisir en mm » est coché, suivie de « soit 30 min » |
+| Planche de référence | « Plus d'options », pour un asperseur |
+| Heures, Minutes | « 2. Combien de temps ? » : « − », la durée, « + », pastilles « 30 min », « 1 h », « Conseillé : … » s'il y a une dose du jour |
+| Note | « Plus d'options » |
+| « Résultat calculé » | la phrase « Soit 8 mm sur les 3 planches, et 470 L pris à « Bassin ». » ; intensité, étendue et « Apport estimé par planche » sous « Voir planche par planche » |
+| Créneau protégé | premier niveau, sous la phrase |
+| « Démarrer l'irrigation » | « Démarrer · fin vers 11 h 50 », lu « Démarrer l'arrosage de *matériel*, fin vers 11 h 50 » ; ce qui manque est dit dessous (« Choisissez où arroser. », « Choisissez une durée. ») |
+| Réponse du module, promesse du minuteur | sous le bouton, inchangées |
+
+**Ce qui lisait un mot de la section 6** et suit dans la PR 1 : P1, P11, P24,
+P37, P38, P40, P63 (nom de l'onglet, nouveau formulaire) ;
+`lib/domain/features/help.ts`, `lib/domain/features/catalogue.ts`,
+`lib/domain/demo/tours.ts` (« Arroser maintenant ») ; les aides des parcours
+(`e2e/support/materiel.ts`). **Restent pour la PR 2** : « Déjà réalisée » (onglet,
+Historique, P2, P3, P4, P9, P11, P63) et le libellé de l'Historique
+`irrigationModeLabel` (« Irriguer maintenant », « Déjà réalisée »), qui changeront
+ensemble ; « Résultat calculé » de « Planifier » et « Déjà réalisée »
+(`irrigation-form.tsx`, test du lot J, P37) ; « Planifier l'irrigation ».
+**PR 3** : « Fait comme prévu » (P31, tests du lot 3, de S2 et des liens).
+
+**Mesures, même ferme neuve, même script, deux matériels posés** (la base
+e027002 contre la PR 1, Chromium, projets « ordinateur » et « telephone » à
+390 px) :
+
+| | Avant | PR 1 |
+| --- | --- | --- |
+| Haut du premier bloc (« Matériel », puis « 1. Où ? »), ordinateur | 437 px | 437 px |
+| id., téléphone | 603 px | 603 px |
+| Hauteur des onglets, téléphone | 206 px | 206 px |
+| Gestes d'« aucun matériel choisi » à « arrosage en cours », sans dose du jour | 3, dont une liste déroulante (2 touches au téléphone) et le passage en « Durée d'irrigation » | 3 touches : la case ronde, « + » (30 min), « Démarrer · fin vers … » |
+
+Le premier bloc n'a **pas encore remonté** : ce qui le précède (onglets de trois
+lignes, compteurs, bandeau « À finir ») est le travail des PR 2 et 3 ; le
+budget de la section 7 (sous 400 px au téléphone) y sera vérifié. P64 relève
+aussi ces hauteurs en annotation, dans son propre état de ferme.
+
+**Numéros pris** : D-332 ; F894 à F901 ; parcours P64.
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Élevé** pour les trois PR (ligne 33 de la roadmap, quatrième cas de
