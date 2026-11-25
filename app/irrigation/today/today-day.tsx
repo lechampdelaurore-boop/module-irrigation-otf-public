@@ -6,26 +6,32 @@ import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all
 import type { TodayTomorrow } from '@/lib/domain/today/ahead';
 import { finishInputText, finishValueToSend } from '@/lib/domain/finish-time';
 import { localDateTimeInputValue } from '@/lib/domain/irrigation-timer';
-import { nowCountdownText, todayCardActions, todayNowActions, type TodayCardActions, type TodayCardChoice, type TodayCardGesture } from '@/lib/domain/today/card-action';
+import { DONE_OTHERWISE, lateQuestion, nowCountdownText, todayCardActions, todayNowActions, type TodayCardActions, type TodayCardChoice, type TodayCardGesture } from '@/lib/domain/today/card-action';
 import type { DayTimeline, LateItem } from '@/lib/domain/today/day-plan';
 import type { TodayNowLine } from '@/lib/domain/today/now-irrigations';
 import type { TodayIrrigationLine } from '@/lib/domain/today/today-irrigations';
 import { shortDayText } from '@/lib/domain/today/today-text';
 import type { TodayBlock, TodayDayEmptyLink } from '@/lib/domain/today/today-view';
 import { Icon, type IconName } from '../line-icon';
-import { DoneAsPlannedButton } from '../done-as-planned-button';
 import { FinishIrrigationDialog } from '../irrigation-manager/finish-irrigation-dialog';
 import { isoFromLocalInput } from '../irrigation-manager/presentation';
 import { ActionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { hrefWithIntent } from '../shell/url-intent';
+import { ConfirmDialog } from '../shell/confirm-dialog';
 import { useConfirm } from '../shell/use-confirm';
 import { OtherChoices } from './other-choices';
 import { TodayAllDone } from './today-all-done';
 import { useCardClock } from './use-card-clock';
 import { DAY_REPLY, irrigationReply, isCardReply, proposalReply, TODAY_REPLY_CLASSES } from './today-replies';
 
-/** Un geste de la carte qui écrit tout de suite : ni un lien, ni « Terminer », qui passe d'abord par sa fenêtre. */
-export type TodayCardWrite = Exclude<TodayCardGesture, { kind: 'open' } | { kind: 'finish' }>;
+/**
+ * Un geste de la carte qui écrit tout de suite : ni un lien, ni « Terminer »
+ * ni « C'est fait », qui passent d'abord par leur fenêtre.
+ */
+export type TodayCardWrite = Exclude<TodayCardGesture, { kind: 'open' } | { kind: 'finish' } | { kind: 'done-as-planned' }>;
+
+/** « C'est fait » demandé : sa confirmation, avant tout enregistrement. */
+type DoneAsked = Extract<TodayCardGesture, { kind: 'done-as-planned' }>;
 
 /** La fenêtre de fin ouverte : l'irrigation, l'heure proposée à la seconde, et le champ tel qu'il se lit. */
 type Finishing = { eventEquipmentId: string; equipmentName: string; precise: string; finishAt: string };
@@ -56,7 +62,7 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * quand la carte est partie (« Fait comme prévu »), en tête du bloc, sous
  * « Tout est fait » (6 nonies, L4, D-313).
  */
-export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, query, pending, replies = [], onStart, onCardGesture, onFinish, onAllDone }: {
+export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, query, pending, replies = [], onCardGesture, onFinish, onAllDone }: {
   today: string;
   current?: readonly TodayNowLine[];
   late: LateBlock;
@@ -70,7 +76,6 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
   pending: boolean;
   /** La réponse du dernier geste, avec l'endroit du bouton pressé (L4). */
   replies?: readonly ActionReplyMessage[];
-  onStart: (eventEquipmentId: string) => void;
   /** Un geste de la carte à un bouton (S2) : valider, démarrer, refuser, mettre en pause, reprendre ; un refus est déjà confirmé. */
   onCardGesture: (gesture: TodayCardWrite) => void;
   /** « Terminer », l'heure réelle confirmée dans la fenêtre ; la fenêtre se ferme à la réponse. */
@@ -82,6 +87,7 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
   const confirmations = doneAsPlannedConfirmations(allDone);
   const { confirm, dialog } = useConfirm();
   const [finishing, setFinishing] = useState<Finishing | null>(null);
+  const [doneAsked, setDoneAsked] = useState<DoneAsked | null>(null);
   // Une réponse dont la carte n'est plus sur la page se lit en tête du bloc : jamais perdue (L4, règle 2).
   const cards = new Set([
     ...[...current.map((line) => line.eventEquipmentId), ...late.lines.map((line) => line.eventEquipmentId), ...todo.lines.map((line) => line.eventEquipmentId)]
@@ -99,12 +105,17 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
       setFinishing({ eventEquipmentId: choice.eventEquipmentId, equipmentName: choice.equipmentName, precise, finishAt: finishInputText(precise) });
       return;
     }
+    // « C'est fait » écrit une donnée réelle qui ne se corrige plus : sa confirmation d'abord (D-006, section 4).
+    if (choice.kind === 'done-as-planned') {
+      setDoneAsked(choice);
+      return;
+    }
     if (choice.kind === 'refuse' && !await confirm({ ...choice.confirmation, tone: 'erase' })) return;
+    if (choice.kind === 'cancel' && !await confirm({ ...choice.confirmation, tone: 'erase' })) return;
     onCardGesture(choice);
   };
   const card = (line: TodayIrrigationLine) => {
     const id = line.eventEquipmentId;
-    const confirmation = id ? confirmations.get(id) : undefined;
     const origin = id ? irrigationReply(id) : line.proposalId ? proposalReply(line.proposalId) : null;
     return (
       <IrrigationCard
@@ -113,12 +124,15 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
         today={today}
         query={query}
         pending={pending}
-        onStart={onStart}
         onGesture={(choice) => void gesture(choice)}
-        doneAsPlanned={id && confirmation ? { confirmation, onConfirm: () => onAllDone([id], irrigationReply(id)) } : null}
+        doneAsPlanned={id ? confirmations.get(id) ?? null : null}
         reply={origin ? reply(origin) : null}
       />
     );
+  };
+  const recordDone = (asked: DoneAsked) => {
+    const id = asked.eventEquipmentId;
+    void onAllDone([id], irrigationReply(id)).then(() => setDoneAsked(null));
   };
   return (
     <section className="today-block" id="today-day" data-tour="aujourdhui-journee" data-kind="day" aria-labelledby="today-day-title">
@@ -182,6 +196,23 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
         </p>
       ) : null}
       {dialog}
+      <ConfirmDialog
+        open={doneAsked !== null}
+        title="Fait comme prévu ?"
+        confirmLabel="Enregistrer comme faite"
+        cancelLabel="Ne rien enregistrer"
+        pending={pending}
+        onConfirm={() => doneAsked && recordDone(doneAsked)}
+        onCancel={() => !pending && setDoneAsked(null)}
+      >
+        <p>{doneAsked?.confirmation}</p>
+        {doneAsked?.otherwise ? (
+          <p>
+            {DONE_OTHERWISE.text}{' '}
+            <a href={pageHref(doneAsked.otherwise.page, query, doneAsked.otherwise.anchor)}>{DONE_OTHERWISE.link}</a>
+          </p>
+        ) : null}
+      </ConfirmDialog>
       {finishing ? (
         <FinishIrrigationDialog
           equipmentName={finishing.equipmentName}
@@ -270,7 +301,7 @@ function OneButtonActions({ actions, title, query, pending, onGesture }: {
   return (
     <div className="today-irrigation-actions" data-actions="one-button">
       <CardChoice choice={actions.primary} query={query} pending={pending} onGesture={onGesture} primary />
-      {actions.secondary ? <CardChoice choice={actions.secondary} query={query} pending={pending} onGesture={onGesture} /> : null}
+      {actions.secondary ? <CardChoice choice={actions.secondary} query={query} pending={pending} onGesture={onGesture} twin={actions.twin} /> : null}
       {actions.others.length > 0 ? (
         <OtherChoices title={title} pending={pending}>
           {actions.others.map((choice) => (
@@ -319,19 +350,19 @@ const EQUIPMENT_ICONS: Record<NonNullable<TodayIrrigationLine['equipmentKind']>,
   drip: 'rampe',
 };
 
-function IrrigationCard({ line, today, query, pending, onStart, onGesture, doneAsPlanned, reply }: {
+function IrrigationCard({ line, today, query, pending, onGesture, doneAsPlanned, reply }: {
   line: TodayIrrigationLine;
   today: string;
   query: PageQuery;
   pending: boolean;
-  onStart: (eventEquipmentId: string) => void;
   onGesture: (gesture: CardGesture) => void;
-  /** « Fait comme prévu », seulement quand la règle de « Tout est fait » accepte l'irrigation. */
-  doneAsPlanned: { confirmation: string; onConfirm: () => Promise<void> } | null;
+  /** La confirmation de « C'est fait », seulement quand la règle de « Tout est fait » accepte l'irrigation (T15). */
+  doneAsPlanned: string | null;
   /** La réponse d'un geste de la carte, sous ses boutons (L4). */
   reply: ReactNode;
 }) {
-  const actions = todayCardActions(line);
+  const actions = todayCardActions(line, { doneAsPlanned });
+  const question = lateQuestion(line, today);
   return (
     <li
       className="today-irrigation"
@@ -355,11 +386,16 @@ function IrrigationCard({ line, today, query, pending, onStart, onGesture, doneA
           <span className="today-tag" data-kind="duration">{line.durationText}</span>
           {line.doseText ? <span className="today-tag" data-kind="dose">{line.doseText}</span> : null}
         </p>
+        {question ? <p className="today-late-question">{question}</p> : null}
       </div>
       {actions ? (
         <OneButtonActions actions={actions} title={`${line.title}, ${line.time}`} query={query} pending={pending} onGesture={onGesture} />
       ) : (
-        <LateActions line={line} query={query} pending={pending} onStart={onStart} doneAsPlanned={doneAsPlanned} />
+        <div className="today-irrigation-actions">
+          <a className="today-action-link" href={pageHref(line.open.page, query, line.open.anchor)} aria-label={`${line.open.label} : ${line.title}, ${line.time}`}>
+            {line.open.label}
+          </a>
+        </div>
       )}
       {reply}
     </li>
@@ -371,12 +407,14 @@ function IrrigationCard({ line, today, query, pending, onStart, onGesture, doneA
  * page. Le bouton principal porte `data-primary`, que le focus retrouve
  * après le geste (contrat S2, section 3).
  */
-function CardChoice({ choice, query, pending, onGesture, primary = false }: {
+function CardChoice({ choice, query, pending, onGesture, primary = false, twin = false }: {
   choice: TodayCardChoice;
   query: PageQuery;
   pending: boolean;
   onGesture: (gesture: CardGesture) => void;
   primary?: boolean;
+  /** Le second geste à la taille du premier, bordé (l'arrosage à rattraper, section 4). */
+  twin?: boolean;
 }) {
   const gesture = choice.gesture;
   if (gesture.kind === 'open') {
@@ -389,7 +427,7 @@ function CardChoice({ choice, query, pending, onGesture, primary = false }: {
   return (
     <button
       type="button"
-      className={primary ? 'primary today-card-primary' : 'today-card-secondary'}
+      className={primary ? 'primary today-card-primary' : twin ? 'today-card-twin' : 'today-card-secondary'}
       data-primary={primary ? '' : undefined}
       disabled={pending}
       aria-label={choice.accessibleName}
@@ -397,32 +435,5 @@ function CardChoice({ choice, query, pending, onGesture, primary = false }: {
     >
       {choice.label}
     </button>
-  );
-}
-
-/**
- * Les gestes d'une irrigation en retard ou non faite, inchangés jusqu'à la
- * PR 3 du lot S2 : « Fait comme prévu », « Démarrer maintenant », « Ouvrir ».
- */
-function LateActions({ line, query, pending, onStart, doneAsPlanned }: {
-  line: TodayIrrigationLine;
-  query: PageQuery;
-  pending: boolean;
-  onStart: (eventEquipmentId: string) => void;
-  doneAsPlanned: { confirmation: string; onConfirm: () => Promise<void> } | null;
-}) {
-  const startId = line.canStart ? line.eventEquipmentId : null;
-  return (
-    <div className="today-irrigation-actions">
-      {doneAsPlanned ? <DoneAsPlannedButton title={line.title} confirmation={doneAsPlanned.confirmation} pending={pending} onConfirm={doneAsPlanned.onConfirm} /> : null}
-      {startId ? (
-        <button type="button" className="primary" disabled={pending} onClick={() => onStart(startId)}>
-          Démarrer maintenant
-        </button>
-      ) : null}
-      <a className="today-action-link" href={pageHref(line.open.page, query, line.open.anchor)} aria-label={`${line.open.label} : ${line.title}, ${line.time}`}>
-        {line.open.label}
-      </a>
-    </div>
   );
 }

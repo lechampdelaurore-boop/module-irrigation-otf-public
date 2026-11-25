@@ -424,8 +424,28 @@
   text-decoration: none;
 }
 
+/*
+ * L'arrosage à rattraper (S2, section 4) : la carte pose la question, et
+ * « C'est fait » a la taille de « Je le fais maintenant », bordé.
+ */
+.today-late-question {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.today-page button.today-card-twin {
+  min-height: 50px;
+  padding-inline: 1.4rem;
+  border: 2px solid var(--green);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
+}
+
 @container (max-width: 620px) {
-  .today-page button.today-card-primary {
+  .today-page button.today-card-primary,
+  .today-page button.today-card-twin {
     flex: 1 0 100%;
   }
 }

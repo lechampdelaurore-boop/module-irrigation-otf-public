@@ -1,6 +1,6 @@
 import { expect, test, type BrowserContext, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
-import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
+import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/planning.ts';
 
@@ -38,6 +38,15 @@ import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/
  *
  * Le matériel du matin est posé sous abri (T01, T02 au téléphone), comme
  * P12 : la pluie prévue n'y compte pas et le plan propose dès aujourd'hui.
+ * PR 3, l'arrosage à rattraper, sur une troisième ferme neuve : trois
+ * irrigations planifiées dans le passé, non faites ; chaque carte pose la
+ * question (« L’avez-vous fait ? ») et porte « Je le fais maintenant » et
+ * « C’est fait », de même taille, « Ne pas le faire » rangé ; « C’est fait »
+ * se confirme, avec la ligne « Fait autrement… Notez-le sur « Arrosages » »
+ * (« Ne rien enregistrer » n'écrit rien), et la carte part ; « Ne pas le
+ * faire » se confirme (« Le garder » ne fait rien), et la carte part ; « Je le
+ * fais maintenant » la fait couler.
+ *
  * L'heure où il tourne : le plan ne propose rien aujourd'hui quand la
  * journée est finie ; les gestes qui demandent une proposition du jour ne
  * sont alors pas joués, et le parcours le dit (comme P12).
@@ -252,4 +261,68 @@ test('« Démarrer tout de suite » : la proposition du jour validée et démarr
   await expect(coule.locator('.action-reply')).toContainText('Validé. L’irrigation a démarré.');
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui/);
   await verifierLEtape(page, journal, 'validée et démarrée d’un appui');
+});
+
+test('un arrosage à rattraper : la question, « C’est fait » confirmé, « Ne pas le faire », « Je le fais maintenant »', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const reference = Date.now();
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'p62-rattraper');
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'materiel');
+  const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p62 rattraper' });
+  // Trois arrosages de 30 min (5 mm à 10 mm/h), finis depuis des heures, jamais marqués.
+  await attendreLaPageIrrigation(page, 'arrosages');
+  await page.getByRole('tab', { name: /^Planifier/ }).click();
+  for (const heures of [12, 9, 6]) {
+    await choisirMaterielEtReglage(page, materiel, reglage, '5');
+    await page.getByLabel('Date et heure de début').fill(horodatageLocal(-heures * 60, reference));
+    await soumettreIrrigation(page, 'Planifier l’irrigation', 'p62 à rattraper');
+  }
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const aRattraper = page.locator('#today-day [data-group="late"] .today-irrigation[data-tone="missed"]').filter({ hasText: materiel });
+  await expect(aRattraper).toHaveCount(3);
+  const carte = aRattraper.first();
+  await expect(carte.locator('.today-late-question')).toHaveText(/^Prévu (hier |avant-hier )?à \d{1,2} h( \d{2})?\. L’avez-vous fait \?$/);
+  await verifierLaCarteAUnBouton(page, carte, 'Je le fais maintenant', ['Ne pas le faire', 'Ouvrir sur « Arrosages »'], telephone);
+  const cEstFait = carte.getByRole('button', { name: /^C’est fait : / });
+  expect(Math.round((await cEstFait.boundingBox())?.height ?? 0), '« C’est fait » a la taille du bouton principal').toBeGreaterThanOrEqual(50);
+  await verifierLEtape(page, journal, 'la carte à rattraper pose la question');
+
+  // « C’est fait » : rien au premier appui ; la confirmation dit l'heure, le volume, et où noter un arrosage fait autrement.
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  await cEstFait.click();
+  await expect(fenetre).toContainText('Elle ne se corrigera plus dans le module.');
+  await expect(fenetre).toContainText('Fait autrement (une autre durée, un autre moment) ?');
+  await expect(fenetre.getByRole('link', { name: 'Notez-le sur « Arrosages »' })).toHaveAttribute('href', /^\/irrigation\/arrosages\?season=\d{4}#irrigation-/);
+  await fenetre.getByRole('button', { name: 'Ne rien enregistrer' }).click();
+  await expect(fenetre).toHaveCount(0);
+  await expect(aRattraper).toHaveCount(3);
+  await carte.getByRole('button', { name: /^C’est fait : / }).click();
+  await fenetre.getByRole('button', { name: 'Enregistrer comme faite' }).click();
+  await expect(aRattraper).toHaveCount(2);
+  await expect(page.locator('#today-day .action-reply').filter({ hasText: 'enregistrée comme faite' })).toBeVisible();
+  await verifierLEtape(page, journal, '« C’est fait » confirmé, la carte partie');
+
+  // « Ne pas le faire » : confirmé d'une ligne ; « Le garder » ne fait rien.
+  await aRattraper.first().getByRole('button', { name: /^Autres choix : / }).click();
+  await aRattraper.first().getByRole('button', { name: /^Ne pas le faire : / }).click();
+  await expect(fenetre).toContainText('Cet arrosage ne sera pas fait. Le module recalcule la semaine.');
+  await fenetre.getByRole('button', { name: 'Le garder' }).click();
+  await expect(aRattraper).toHaveCount(2);
+  await aRattraper.first().getByRole('button', { name: /^Autres choix : / }).click();
+  await aRattraper.first().getByRole('button', { name: /^Ne pas le faire : / }).click();
+  await fenetre.getByRole('button', { name: 'Ne pas le faire' }).click();
+  await expect(aRattraper).toHaveCount(1);
+  await expect(page.locator('#today-day .action-reply').filter({ hasText: 'L’irrigation planifiée a été annulée.' })).toBeVisible();
+  await verifierLEtape(page, journal, '« Ne pas le faire » confirmé');
+
+  // « Je le fais maintenant » : elle coule, la réponse sous sa carte.
+  await aRattraper.first().getByRole('button', { name: /^Je le fais maintenant : / }).click();
+  const coule = enCours(page, materiel);
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation a démarré.');
+  await expect(aRattraper).toHaveCount(0);
+  await verifierLEtape(page, journal, '« Je le fais maintenant » démarre');
 });
