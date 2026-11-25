@@ -413,7 +413,8 @@ autre chose qu'une page plus rapide.
   dans le Worker. Une requête, c'est une page, une action ou une route ; à un
   changement de page, vinext exécute la page une première fois pour y
   chercher une redirection, puis la rend : les deux passages partagent la
-  mémoire de leur requête. Hors d'une requête (une tâche sans requête, les
+  mémoire de leur requête (depuis N1, la page elle-même n'y est calculée
+  qu'une fois, D-322). Hors d'une requête (une tâche sans requête, les
   tests), il n'y en a pas : chaque lecture va à la base, comme avant.
 - **F811 · Rangée par la personne et la ferme ensemble.** Une lecture est
   rangée sous la clé entière de l'espace, la personne et la ferme, comme le
@@ -462,18 +463,24 @@ autre chose qu'une page plus rapide.
   mémoire commune au Worker et une écriture qui ne vide plus la mémoire font
   chacune échouer des tests.
 
-**La mesure** (en local, base locale, mêmes données, deuxième passage de
-chaque page) : ouvrir « Aujourd'hui » coûtait 174 lectures de la base, dont
-57 de l'espace ; il en coûte 97, dont 2. Y changer de page par le menu
-coûtait 338 lectures ; il en coûte 190. Sur les treize pages du menu,
-890 lectures deviennent 458 à l'ouverture, et 1 650 deviennent 866 aux
-changements de page. L'espace reste lu deux fois à l'ouverture et trois fois
-au changement de page : l'espace sans ferme de la personne, qui n'existe
-pas, est relu à chaque vérification de la personne connectée (F813). Un
-changement de page coûte encore près de deux fois une ouverture : les
-lectures qui ne sont pas gardées sont faites dans les deux passages de
-vinext. Le temps gagné en ligne, où chaque lecture traverse le réseau, reste
-à mesurer.
+**La mesure** (en local, `vinext dev`, base locale de démonstration,
+deuxième passage de chaque page, 20 ms ajoutées à chaque lecture, l'ordre de
+grandeur supposé d'une base D1 éloignée du Worker, comme au contrat de la
+lenteur, section 2 ; avant = `main` après N1, D-322) : ouvrir « Aujourd'hui »
+coûtait 176 lectures de la base, dont 58 de l'espace ; il en coûte 98,
+dont 2. Y changer de page par le menu coûtait aussi 176 lectures, N1 ne
+calculant plus la page qu'une fois ; il en coûte 100. Sur les treize pages du
+menu, 894 lectures deviennent 460 à l'ouverture et 485 aux changements de
+page. En temps, sur un seul essai : « Aujourd'hui » s'ouvre en 0,72 s au lieu
+de 1,25 s et s'atteint par le menu en 0,63 s au lieu de 1,15 s ; les treize
+pages, 4,5 s au lieu de 7,1 s à l'ouverture, 4,4 s au lieu de 7,7 s par le
+menu. L'espace reste lu deux fois à l'ouverture : l'espace sans ferme de la
+personne, qui n'existe pas, est relu à chaque vérification de la personne
+connectée (F813). Un changement de page coûte deux lectures de plus qu'une
+ouverture : la page y est calculée au premier passage de vinext, hors du
+rendu, où la personne connectée se vérifie à chaque appel (F815). Le temps
+gagné en ligne, où chaque lecture traverse le réseau, reste à mesurer sur le
+téléphone du porteur, avec son accord.
 
 ## 6. Connexion à l'API d'OTF (4.3)
 

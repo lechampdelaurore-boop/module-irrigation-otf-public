@@ -8,9 +8,10 @@ import { createRequestMemo, provideRequestMemo } from '@/db/request-memo';
  * requête (une tâche sans requête et les tests lisent alors la base à chaque
  * fois). Toute la requête, pas seulement le rendu : à un changement de page,
  * vinext exécute la page une première fois pour y chercher une redirection,
- * puis la rend ; les deux passages partagent la même mémoire. Posée au
- * chargement de `app/access-auth.ts`, par où passe toute page avant de lire la
- * base.
+ * puis la rend ; les deux passages partagent la même mémoire (la page
+ * elle-même n'est calculée qu'une fois, `app/irrigation/render-once.ts`).
+ * Posée au chargement de `app/access-auth.ts`, par où passe toute page avant
+ * de lire la base.
  */
 export const requestMemoOfRequest = cacheForRequest(createRequestMemo);
 
