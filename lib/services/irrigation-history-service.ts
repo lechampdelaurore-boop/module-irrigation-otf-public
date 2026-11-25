@@ -247,17 +247,21 @@ function buildHistoryPage({
 function historyWarnings(summary: IrrigationHistorySummary) {
   const warnings: string[] = [];
   if (!summary.actualRainAvailability.complete) {
+    // L'écart se chiffre sur les planches de l'objectif (D-329, règle 3) : toutes sous abri, il
+    // ne manque pas de pluie ; il n'est dit indisponible que s'il l'est.
+    const gapMissing = summary.gapToObjectiveMm === null;
     warnings.push(summary.actualRainAvailability.availableDays === 0
-      ? 'La pluie réelle est indisponible sur cette période. L’écart à l’objectif ne peut pas être calculé.'
-      : `La pluie réelle n’est disponible que pour ${countText(summary.actualRainAvailability.availableDays, 'jour')} sur ${summary.actualRainAvailability.totalDays}. L’écart à l’objectif reste indisponible.`);
+      ? `La pluie réelle est indisponible sur cette période.${gapMissing ? ' L’écart à l’objectif ne peut pas être calculé.' : ''}`
+      : `La pluie réelle n’est disponible que pour ${countText(summary.actualRainAvailability.availableDays, 'jour')} sur ${summary.actualRainAvailability.totalDays}.${gapMissing ? ' L’écart à l’objectif reste indisponible.' : ''}`);
   }
   if (!summary.et0Availability.complete) {
     warnings.push(summary.et0Availability.availableDays === 0
       ? 'L’ET0 est indisponible sur cette période.'
       : `L’ET0 n’est disponible que pour ${countText(summary.et0Availability.availableDays, 'jour')} sur ${summary.et0Availability.totalDays}.`);
   }
-  // Une couverture partielle n'est pas une donnée manquante (D-036) : la carte
-  // « Objectif » affiche le nombre de journées-planche couvertes.
+  // Une couverture partielle n'est pas une donnée manquante (D-036, D-329) : la
+  // carte « Objectif » dit les planches qui ont un objectif et leurs
+  // journées-planche couvertes.
   if (summary.objectiveAvailability.availableBedDays === 0) {
     warnings.push('Aucune eau visée n’est enregistrée sur cette période.');
   }
