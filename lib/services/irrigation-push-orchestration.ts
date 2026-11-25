@@ -6,13 +6,16 @@ import {
   listUpcomingPushAlarmsForUser,
   markIrrigationPushScheduleStatusForUser,
 } from '@/db/irrigation-event/push-schedule';
+import { readPhoneNoticeSettingsForUser, readPhoneNoticeSettingsForWorkspace } from '@/db/phone-notice-repository';
 import { logJsonLine, type LogLevel } from '@/lib/adapters/log';
 import { pageHref } from '@/lib/domain/features/pages';
+import { quietHoursDecision, type QuietHoursSettings } from '@/lib/domain/notification-quiet-hours';
 import {
   cancelIrrigationPushAlarm,
   type IrrigationPushServiceResult,
   scheduleIrrigationPushAlarm,
 } from './irrigation-push-service';
+import { logQuietHoursDefect } from './quiet-hours-delivery';
 
 export async function synchronizeIrrigationPushSchedule(
   ownerUserId: string,
@@ -22,7 +25,7 @@ export async function synchronizeIrrigationPushSchedule(
   if (!schedule) return undefined;
 
   const serviceResult = await scheduleIrrigationPushAlarm(
-    pushAlarmRequest(schedule),
+    await alarmRequestInQuietHours(schedule),
   );
   const status = serviceResult.status === 'ok'
     ? 'scheduled'
@@ -76,6 +79,9 @@ export async function cancelIrrigationPushScheduleBeforeMutation(
  * et marquées « non programmées » ; les irrigations restent telles quelles. Ce
  * qui n'est pas parti ne se rattrape pas en recochant (P5). Un retrait refusé
  * se journalise sans nommer personne ; le choix reste enregistré. Ne lève jamais.
+ * Un retard dont l'échéance est passée mais que les heures de silence de la
+ * ferme retiennent encore n'est pas parti : il est retiré aussi (H2) ; une
+ * alarme passée, elle, ne se retire pas.
  */
 export async function cancelUpcomingIrrigationAlarmsForUser(
   ownerUserId: string,
@@ -92,8 +98,13 @@ export async function cancelUpcomingIrrigationAlarmsForUser(
   let canceled = 0;
   let failed = 0;
   try {
-    for (const alarm of await listUpcomingPushAlarmsForUser(ownerUserId, now)) {
-      const result = await cancel(alarm).catch((): IrrigationPushServiceResult => ({ status: 'failed', message: 'unreachable' }));
+    const alarms = await listUpcomingPushAlarmsForUser(ownerUserId, now);
+    const past = alarms.filter((alarm) => Date.parse(alarm.dueAt) <= now.getTime());
+    const quietHours = past.length > 0 ? await readQuietHoursOrNothing(ownerUserId, now, log) : null;
+    for (const alarm of alarms) {
+      if (past.includes(alarm) && !stillHeld(alarm, quietHours, now)) continue;
+      const request = { eventEquipmentId: alarm.eventEquipmentId, revision: alarm.revision };
+      const result = await cancel(request).catch((): IrrigationPushServiceResult => ({ status: 'failed', message: 'unreachable' }));
       if (result.status === 'failed') {
         failed += 1;
         continue;
@@ -107,6 +118,54 @@ export async function cancelUpcomingIrrigationAlarmsForUser(
   }
   if (canceled + failed > 0) log(failed > 0 ? 'warn' : 'info', { event: 'irrigation_alarms_feature_canceled', canceled, failed, at: now.toISOString() });
   return { canceled, failed };
+}
+
+/**
+ * Le réglage des heures de silence de la ferme, ou rien s'il est illisible
+ * (S8) : la plage compte alors pour éteinte, un retard échu pour parti, et
+ * les alarmes à venir se retirent quand même. L'incident se dit sans nom.
+ */
+async function readQuietHoursOrNothing(
+  ownerUserId: string,
+  now: Date,
+  log: (level: LogLevel, entry: Record<string, unknown>) => void,
+): Promise<QuietHoursSettings | null> {
+  try {
+    return (await readPhoneNoticeSettingsForUser(ownerUserId)).quietHours;
+  } catch {
+    log('warn', { event: 'quiet_hours_unreadable', at: now.toISOString() });
+    return null;
+  }
+}
+
+/** Un retard à l'échéance passée que les heures de silence retiennent encore : sa fin de plage n'est pas venue. */
+function stillHeld(alarm: { dueAt: string; kind: 'finished' | 'late' }, quietHours: QuietHoursSettings | null, now: Date): boolean {
+  if (alarm.kind !== 'late' || !quietHours) return false;
+  const decision = quietHoursDecision(quietHours, { kind: 'irrigation-late' }, new Date(alarm.dueAt));
+  return decision.action === 'hold' && Date.parse(decision.until) > now.getTime();
+}
+
+/**
+ * Les heures de silence (H2, S3, S4 ; F797) : la fin du minuteur part
+ * toujours, sans lire le réglage. Le retard d'une irrigation planifiée se
+ * juge à son échéance, avec le réglage de la ferme au moment où l'alarme est
+ * programmée : dans la plage, son échéance devient la fin de la plage, même
+ * identifiant, même révision, même texte. Un réglage illisible laisse
+ * l'échéance telle quelle (S8) ; un défaut de la règle se dit sans nom.
+ */
+async function alarmRequestInQuietHours(schedule: IrrigationPushScheduleRecord): Promise<IrrigationPushAlarmRequest> {
+  const request = pushAlarmRequest(schedule);
+  if (schedule.kind !== 'late') return request;
+  const now = new Date();
+  try {
+    const settings = await readPhoneNoticeSettingsForWorkspace(schedule.workspaceId);
+    const decision = quietHoursDecision(settings.quietHours, { kind: 'irrigation-late' }, new Date(schedule.dueAt));
+    logQuietHoursDefect(decision, now, logJsonLine);
+    return decision.action === 'hold' ? { ...request, dueAt: decision.until } : request;
+  } catch {
+    logJsonLine('warn', { event: 'quiet_hours_unreadable', at: now.toISOString() });
+    return request;
+  }
 }
 
 /**

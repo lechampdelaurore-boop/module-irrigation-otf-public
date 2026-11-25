@@ -8,12 +8,14 @@ import {
   releasePhoneNotice,
 } from '@/db/phone-notice-repository';
 import { logJsonLine, type LogLevel } from '../adapters/log';
+import { quietHoursDecision } from '../domain/notification-quiet-hours';
 import { errorClassWords } from '../domain/operations/morning-task-outcomes';
 import { eveningPassUseful, eveningReminder, eveningReminderDue } from '../domain/today/evening-reminder';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc } from '../domain/water-management';
 import { listFarmsWithFeature } from './feature-selection-service';
 import { schedulePhoneNoticeAlarm } from './irrigation-push-service';
 import type { PlanningAlarmScheduler } from './morning-message';
+import { logQuietHoursDefect } from './quiet-hours-delivery';
 import { recordTaskOutcomes } from './task-runs';
 
 /**
@@ -30,6 +32,10 @@ import { recordTaskOutcomes } from './task-runs';
  * compte alors comme une panne, jamais comme un envoi. Une ferme en panne
  * n'arrête pas les autres. Le passage s'enregistre comme une tâche du
  * registre (`evening-reminder`). Le journal ne porte que des nombres.
+ *
+ * Un rappel qui tomberait dans les heures de silence de la ferme ne part pas
+ * et n'est pas retenu (H2, S5) : rien n'est lu ni pris pour elle, et elle
+ * n'est pas comptée en panne, ne pas envoyer étant ici le comportement voulu.
  */
 
 export type EveningPassResult = {
@@ -37,6 +43,8 @@ export type EveningPassResult = {
   due: number;
   sent: number;
   alreadySent: number;
+  /** Les fermes dont le rappel tombait dans leurs heures de silence : ni envoyé, ni retenu, ni en panne (S5). */
+  silenced: number;
   failed: number;
   successful: boolean;
 };
@@ -51,7 +59,7 @@ export async function runEveningReminders({
   log?: (level: LogLevel, entry: Record<string, unknown>) => void;
 } = {}): Promise<EveningPassResult> {
   const at = now.toISOString();
-  const result: EveningPassResult = { due: 0, sent: 0, alreadySent: 0, failed: 0, successful: true };
+  const result: EveningPassResult = { due: 0, sent: 0, alreadySent: 0, silenced: 0, failed: 0, successful: true };
   let error: string | null = null;
   try {
     if (eveningPassUseful(now)) {
@@ -60,6 +68,12 @@ export async function runEveningReminders({
         const setting = settings.get(farm.workspaceId) ?? DEFAULT_PHONE_NOTICE_SETTINGS;
         if (!setting.eveningReminder || !eveningReminderDue(setting.eveningTime, now)) continue;
         result.due += 1;
+        const decision = quietHoursDecision(setting.quietHours, { kind: 'evening-reminder' }, now);
+        logQuietHoursDefect(decision, now, log);
+        if (decision.action === 'skip') {
+          result.silenced += 1;
+          continue;
+        }
         const outcome = await remindFarm(farm, now, schedule);
         if (outcome === 'sent') result.sent += 1;
         else if (outcome === 'already-sent') result.alreadySent += 1;
@@ -77,6 +91,7 @@ export async function runEveningReminders({
     due: result.due,
     sent: result.sent,
     alreadySent: result.alreadySent,
+    silenced: result.silenced,
     failed: result.failed,
     summary: error ?? undefined,
   });

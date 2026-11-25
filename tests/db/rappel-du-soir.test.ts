@@ -70,7 +70,7 @@ test('à 19 h 05, la ferme reçoit le rappel de ses arrosages non confirmés, so
   await planIrrigation(fixture, '2026-09-30T05:00:00.000Z');
   const calls = recorder();
   const result = await runEveningReminders({ now: EVENING, schedule: calls.schedule, log: calls.log });
-  assert.deepEqual(result, { due: 1, sent: 1, alreadySent: 0, failed: 0, successful: true });
+  assert.deepEqual(result, { due: 1, sent: 1, alreadySent: 0, silenced: 0, failed: 0, successful: true });
   assert.equal(calls.requests.length, 1);
   const [request] = calls.requests;
   assert.equal(request.eventEquipmentId, `evening:${workspaceId}:2026-09-30`);
@@ -91,9 +91,9 @@ test('un seul rappel par jour : le passage suivant se tait ; jamais avant l’he
   await ensureWorkspaceForUser(ALICE);
   await planIrrigation(fixture, '2026-09-30T05:00:00.000Z');
   const calls = recorder();
-  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() - HOUR_MS), schedule: calls.schedule, log: calls.log }), { due: 0, sent: 0, alreadySent: 0, failed: 0, successful: true }, '18 h 05 : trop tôt');
+  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() - HOUR_MS), schedule: calls.schedule, log: calls.log }), { due: 0, sent: 0, alreadySent: 0, silenced: 0, failed: 0, successful: true }, '18 h 05 : trop tôt');
   await runEveningReminders({ now: EVENING, schedule: calls.schedule, log: calls.log });
-  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() + HOUR_MS), schedule: calls.schedule, log: calls.log }), { due: 1, sent: 0, alreadySent: 1, failed: 0, successful: true }, '20 h 05 : déjà parti');
+  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() + HOUR_MS), schedule: calls.schedule, log: calls.log }), { due: 1, sent: 0, alreadySent: 1, silenced: 0, failed: 0, successful: true }, '20 h 05 : déjà parti');
   assert.equal(calls.requests.length, 1);
 
   await saveEveningReminderForUser(BOB, BOB, { enabled: true, time: '19:00' }, MORNING.toISOString());
@@ -129,12 +129,12 @@ test('l’heure réglée, la case coupée, une ferme sans « Arrosages » ou fig
   await planIrrigation(bob, '2026-10-01T05:00:00.000Z');
   await saveFeatureSelectionForUser(BOB, ['alertes-meteo'], new Date());
   const quiet = recorder();
-  assert.deepEqual(await runEveningReminders({ now: nextDay, schedule: quiet.schedule, log: quiet.log }), { due: 0, sent: 0, alreadySent: 0, failed: 0, successful: true });
+  assert.deepEqual(await runEveningReminders({ now: nextDay, schedule: quiet.schedule, log: quiet.log }), { due: 0, sent: 0, alreadySent: 0, silenced: 0, failed: 0, successful: true });
   assert.deepEqual(quiet.requests, [], 'A a coupé, B a décoché « Arrosages »');
 
   await saveFeatureSelectionForUser(BOB, [...FEATURE_IDS], new Date());
   await requestFarmErasure(BOB, new Date());
-  assert.deepEqual(await runEveningReminders({ now: nextDay, schedule: quiet.schedule, log: quiet.log }), { due: 0, sent: 0, alreadySent: 0, failed: 0, successful: true });
+  assert.deepEqual(await runEveningReminders({ now: nextDay, schedule: quiet.schedule, log: quiet.log }), { due: 0, sent: 0, alreadySent: 0, silenced: 0, failed: 0, successful: true });
   assert.deepEqual(quiet.requests, [], 'B, figé par sa demande d’effacement, ne reçoit plus rien');
 });
 
@@ -143,7 +143,7 @@ test('une panne du Worker se journalise sans nom, rend la prise et marque le pas
   await ensureWorkspaceForUser(ALICE);
   await planIrrigation(fixture, '2026-09-30T05:00:00.000Z');
   const broken = recorder('throw');
-  assert.deepEqual(await runEveningReminders({ now: EVENING, schedule: broken.schedule, log: broken.log }), { due: 1, sent: 0, alreadySent: 0, failed: 1, successful: false });
+  assert.deepEqual(await runEveningReminders({ now: EVENING, schedule: broken.schedule, log: broken.log }), { due: 1, sent: 0, alreadySent: 0, silenced: 0, failed: 1, successful: false });
   const failed = recorder('failed');
   assert.equal((await runEveningReminders({ now: new Date(EVENING.getTime() + 60_000), schedule: failed.schedule, log: failed.log })).failed, 1);
   const pass = broken.lines.find((line) => line.entry.event === 'evening_reminder_pass_failed');
@@ -154,7 +154,7 @@ test('une panne du Worker se journalise sans nom, rend la prise et marque le pas
   assert.equal(run?.lastSuccessAt ?? null, null, 'aucune réussite');
 
   const disabled = recorder('disabled');
-  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() + 2 * 60_000), schedule: disabled.schedule, log: disabled.log }), { due: 1, sent: 0, alreadySent: 0, failed: 0, successful: true }, 'le service non configuré n’est pas une panne');
+  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() + 2 * 60_000), schedule: disabled.schedule, log: disabled.log }), { due: 1, sent: 0, alreadySent: 0, silenced: 0, failed: 0, successful: true }, 'le service non configuré n’est pas une panne');
   const retry = recorder();
   assert.equal((await runEveningReminders({ now: new Date(EVENING.getTime() + HOUR_MS), schedule: retry.schedule, log: retry.log })).sent, 1, 'chaque prise rendue : 20 h 05 réessaie');
 });
@@ -174,7 +174,7 @@ test('deux fermes au même passage : chacune son alarme, aucune ne remplace l’
     kept.set(request.eventEquipmentId, request);
     return { status: 'ok' };
   };
-  assert.deepEqual(await runEveningReminders({ now: EVENING, schedule, log: () => undefined }), { due: 2, sent: 2, alreadySent: 0, failed: 0, successful: true });
+  assert.deepEqual(await runEveningReminders({ now: EVENING, schedule, log: () => undefined }), { due: 2, sent: 2, alreadySent: 0, silenced: 0, failed: 0, successful: true });
   assert.deepEqual(
     [...kept.values()].map((alarm) => [alarm.eventEquipmentId, alarm.recipientKey, alarm.notification.body]).sort(),
     [
@@ -190,15 +190,15 @@ test('un refus du Worker (« stale ») n’est jamais compté comme parti : la p
   await ensureWorkspaceForUser(ALICE);
   await planIrrigation(fixture, '2026-09-30T05:00:00.000Z');
   const refused = recorder('stale');
-  assert.deepEqual(await runEveningReminders({ now: EVENING, schedule: refused.schedule, log: refused.log }), { due: 1, sent: 0, alreadySent: 0, failed: 1, successful: false });
+  assert.deepEqual(await runEveningReminders({ now: EVENING, schedule: refused.schedule, log: refused.log }), { due: 1, sent: 0, alreadySent: 0, silenced: 0, failed: 1, successful: false });
   assert.equal((await readTaskRuns(['evening-reminder'])).get('evening-reminder')?.lastSuccessAt ?? null, null, 'aucune réussite au registre');
   const retry = recorder();
-  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() + HOUR_MS), schedule: retry.schedule, log: retry.log }), { due: 1, sent: 1, alreadySent: 0, failed: 0, successful: true }, 'la prise rendue : 20 h 05 envoie le rappel');
+  assert.deepEqual(await runEveningReminders({ now: new Date(EVENING.getTime() + HOUR_MS), schedule: retry.schedule, log: retry.log }), { due: 1, sent: 1, alreadySent: 0, silenced: 0, failed: 0, successful: true }, 'la prise rendue : 20 h 05 envoie le rappel');
 });
 
 test('avant 17 h, le passage ne lit rien et réussit', async () => {
   await ensureWorkspaceForUser(ALICE);
   const calls = recorder();
-  assert.deepEqual(await runEveningReminders({ now: new Date('2026-09-30T10:05:00.000Z'), schedule: calls.schedule, log: calls.log }), { due: 0, sent: 0, alreadySent: 0, failed: 0, successful: true });
+  assert.deepEqual(await runEveningReminders({ now: new Date('2026-09-30T10:05:00.000Z'), schedule: calls.schedule, log: calls.log }), { due: 0, sent: 0, alreadySent: 0, silenced: 0, failed: 0, successful: true });
   assert.equal((await readTaskRuns(['evening-reminder'])).get('evening-reminder')?.lastSuccessAt, '2026-09-30T10:05:00.000Z');
 });

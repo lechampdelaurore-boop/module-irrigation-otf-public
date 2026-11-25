@@ -23,10 +23,12 @@ import { isPartActive } from '../domain/features/socle';
 import type { IrrigationPushSendRequest } from '../domain/irrigation-push-contract';
 import { effectiveProposalStatus } from '../domain/planning/contract';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
+import type { QuietHoursSettings } from '../domain/notification-quiet-hours';
 import type { WeatherAlertDeliveryStatus } from '../domain/weather/weather-alerts';
 import { getEnabledFeaturesForWorkspace, listFarmsWithFeature } from './feature-selection-service';
-import { type IrrigationPushSendResult, sendIrrigationPushNotification } from './irrigation-push-service';
+import { type IrrigationPushSendResult, schedulePhoneNoticeAlarm, sendIrrigationPushNotification } from './irrigation-push-service';
 import { readCachedIrrigationSnapshot } from './irrigation-service';
+import { type QuietAlarmScheduler, type QuietAlertResult, quietHoursReader, sendAlertWithQuietHours } from './quiet-hours-delivery';
 
 /**
  * L'évaluation et l'envoi des alertes par culture
@@ -37,12 +39,27 @@ import { readCachedIrrigationSnapshot } from './irrigation-service';
  * écrit sur elles. Les séries sont celles de l'instantané déjà en cache :
  * aucun appel nouveau vers Ouvre ta ferme. Rien ici ne touche le besoin,
  * l'objectif, le planning ni la dose (D-010, D-028). Une panne ne lève
- * jamais : elle se journalise sans nommer personne.
+ * jamais : elle se journalise sans nommer personne. Les heures de silence de
+ * la ferme (H2) ne retiennent que le message sur le téléphone : l'alerte est
+ * enregistrée à son heure (S9), et le gel passe, case cochée (S3).
  */
 
 export type CropAlertSender = (request: IrrigationPushSendRequest) => Promise<IrrigationPushSendResult>;
 type Log = (level: LogLevel, entry: Record<string, unknown>) => void;
-type Context = { workspaceId: string; now: Date; send: CropAlertSender; log: Log };
+type Context = {
+  workspaceId: string;
+  now: Date;
+  send: CropAlertSender;
+  /** L'alarme qui retient une alerte jusqu'à la fin des heures de silence (H2). */
+  schedule: QuietAlarmScheduler;
+  log: Log;
+  /** Le réglage des heures de silence de la ferme, lu au premier envoi qui en a besoin. */
+  quietHours: () => Promise<QuietHoursSettings>;
+};
+
+function contextOf(workspaceId: string, now: Date, send: CropAlertSender, schedule: QuietAlarmScheduler, log: Log): Context {
+  return { workspaceId, now, send, schedule, log, quietHours: quietHoursReader(workspaceId, now, log) };
+}
 
 /** Les jours de prévisions qu'une évaluation lit : l'horizon le plus long, aujourd'hui compris. */
 const FORECAST_DAYS = 7;
@@ -52,12 +69,14 @@ export async function evaluateCropAlertsAfterForecastWrite({
   locationKey,
   now,
   send = sendIrrigationPushNotification,
+  schedule = schedulePhoneNoticeAlarm,
   log = logJsonLine,
 }: {
   workspaceId: string;
   locationKey: string;
   now: Date;
   send?: CropAlertSender;
+  schedule?: QuietAlarmScheduler;
   log?: Log;
 }): Promise<void> {
   try {
@@ -71,7 +90,7 @@ export async function evaluateCropAlertsAfterForecastWrite({
     if (!loaded) return;
     const { ownerUserId, snapshot, today } = loaded;
     const forecasts = await listCropAlertForecastDays(workspaceId, locationKey, today, addDaysToDateKey(today, FORECAST_DAYS - 1));
-    const context = { workspaceId, now, send, log };
+    const context = contextOf(workspaceId, now, send, schedule, log);
     if (settings.frostActive && snapshot.cropPlan) {
       const common = commonMap(await listCropAlertCommon());
       const { subjects } = frostSubjects({
@@ -129,7 +148,12 @@ export async function evaluateCropAlertsAfterForecastWrite({
  */
 export async function evaluateSprinklerAlertsForUser(
   ownerUserId: string,
-  { now = new Date(), send = sendIrrigationPushNotification, log = logJsonLine }: { now?: Date; send?: CropAlertSender; log?: Log } = {},
+  {
+    now = new Date(),
+    send = sendIrrigationPushNotification,
+    schedule = schedulePhoneNoticeAlarm,
+    log = logJsonLine,
+  }: { now?: Date; send?: CropAlertSender; schedule?: QuietAlarmScheduler; log?: Log } = {},
 ): Promise<void> {
   try {
     const workspaceId = await findWorkspaceIdForUser(ownerUserId);
@@ -142,7 +166,7 @@ export async function evaluateSprinklerAlertsForUser(
     const loaded = await loadFarm(workspaceId, now);
     if (!loaded) return;
     const forecasts = await listCropAlertForecastDays(workspaceId, locationKey, loaded.today, addDaysToDateKey(loaded.today, FORECAST_DAYS - 1));
-    await evaluateSprinklerAlerts({ workspaceId, now, send, log }, ownerUserId, loaded.snapshot, loaded.today, locationKey, forecasts, settings);
+    await evaluateSprinklerAlerts(contextOf(workspaceId, now, send, schedule, log), ownerUserId, loaded.snapshot, loaded.today, locationKey, forecasts, settings);
   } catch (error) {
     log('warn', { event: 'crop_alert_evaluation_failed', error: describe(error), failedAt: now.toISOString() });
   }
@@ -152,8 +176,9 @@ export async function evaluateSprinklerAlertsForUser(
 export async function evaluateCropDryingForAllWorkspaces({
   now = new Date(),
   send = sendIrrigationPushNotification,
+  schedule = schedulePhoneNoticeAlarm,
   log = logJsonLine,
-}: { now?: Date; send?: CropAlertSender; log?: Log } = {}): Promise<{ evaluated: number; failed: number }> {
+}: { now?: Date; send?: CropAlertSender; schedule?: QuietAlarmScheduler; log?: Log } = {}): Promise<{ evaluated: number; failed: number }> {
   let evaluated = 0;
   let failed = 0;
   // Seules les fermes qui ont coché Alertes cultures reçoivent l'arrêt d'arrosage avant récolte (3.8, R1).
@@ -192,7 +217,7 @@ export async function evaluateCropDryingForAllWorkspaces({
       })), now);
       const claimedSeries = new Set(claimed.map((alert) => alert.subjectKey));
       const notification = dryingNotification(evaluation.due.filter((deadline) => claimedSeries.has(deadline.seriesId)));
-      await notify({ workspaceId, now, send, log }, 'drying', claimed, notification ? [notification] : []);
+      await notify(contextOf(workspaceId, now, send, schedule, log), 'drying', claimed, notification ? [notification] : []);
       evaluated += 1;
     } catch (error) {
       failed += 1;
@@ -245,20 +270,30 @@ async function notify(context: Context, kind: CropAlertKind, claimed: readonly C
   for (const notification of notifications) {
     const ids = claimed.filter((alert) => notification.targetDates.includes(alert.targetDate)).map((alert) => alert.id);
     if (ids.length === 0) continue;
-    const result = await sendSafely(context.send, {
-      notificationId: notification.tag,
-      recipientKey: context.workspaceId,
-      revision: newPushAlarmRevision(context.now),
-      notification: { title: notification.title, body: notification.body, tag: notification.tag, data: { url: notification.url } },
+    const result = await sendAlertWithQuietHours({
+      settings: await context.quietHours(),
+      notification: { kind: 'crop-alert', alert: kind },
+      request: {
+        notificationId: notification.tag,
+        recipientKey: context.workspaceId,
+        revision: newPushAlarmRevision(context.now),
+        notification: { title: notification.title, body: notification.body, tag: notification.tag, data: { url: notification.url } },
+      },
+      now: context.now,
+      send: context.send,
+      schedule: context.schedule,
+      log: context.log,
     });
     const status = deliveryStatus(result);
-    await recordCropAlertDelivery(context.workspaceId, ids, status, notification.body);
+    const heldUntil = result.status === 'held' ? result.until : null;
+    await recordCropAlertDelivery(context.workspaceId, ids, status, notification.body, heldUntil);
     context.log(status === 'sent' || status === 'no-subscriber' ? 'info' : 'warn', {
       event: 'crop_alert_evaluated',
       kind,
       targetDates: notification.targetDates,
       alerts: ids.length,
       deliveryStatus: status,
+      heldUntil: heldUntil ?? undefined,
       error: result.status === 'unreachable' ? result.message : undefined,
       evaluatedAt: context.now.toISOString(),
     });
@@ -322,16 +357,13 @@ function commonMap(entries: readonly CropAlertCommonEntry[]): Map<string, CropAl
   return new Map(entries.map((entry) => [entry.key, entry]));
 }
 
-async function sendSafely(send: CropAlertSender, request: IrrigationPushSendRequest): Promise<IrrigationPushSendResult> {
-  try {
-    return await send(request);
-  } catch (error) {
-    return { status: 'unreachable', message: error instanceof Error ? error.message : 'Le service d’alerte est indisponible.' };
-  }
-}
-
-/** Un service non configuré ou injoignable est un échec du service de notification. */
-function deliveryStatus(result: IrrigationPushSendResult): Exclude<WeatherAlertDeliveryStatus, 'pending'> {
+/**
+ * Un service non configuré ou injoignable est un échec du service de
+ * notification ; une alerte retenue par les heures de silence, gardée par le
+ * Worker, compte comme envoyée (F745, H2).
+ */
+function deliveryStatus(result: QuietAlertResult): Exclude<WeatherAlertDeliveryStatus, 'pending'> {
+  if (result.status === 'held') return 'sent';
   return result.status === 'disabled' || result.status === 'unreachable' ? 'failed' : result.status;
 }
 

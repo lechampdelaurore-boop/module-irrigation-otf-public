@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (heures de silence des notifications, H2)
+
+- **Les notifications suivent les heures de silence de leur ferme**
+  (D-324) : une alerte météo ou par culture, le message du matin et le
+  retard d'une irrigation planifiée qui tomberaient dans la plage
+  attendent sa fin, puis partent avec le même texte ; la fin d'un arrosage
+  démarré et le gel, case cochée, passent toujours ; le rappel du soir qui
+  tomberait dans la plage ne part pas. Une alerte retenue est enregistrée à
+  son heure, et son historique dit « Retenue jusqu'à 6 h (heures de
+  silence) », puis « Envoyée à 6 h, à la fin des heures de silence ». Si
+  la retenue échoue, la notification part tout de suite plutôt que perdue.
+  Rien ne change encore pour aucune ferme : aucun écran n'allume la plage
+  (H3).
+
 ### Ajouté (heures de silence des notifications, H1)
 
 - **La règle et le réglage des heures de silence** (D-321) : chaque ferme

@@ -206,17 +206,22 @@ export async function claimWeatherAlerts(
   return candidates.filter((alert) => ids.has(alert.id));
 }
 
-/** Le résultat de l'envoi, écrit une fois sur des alertes encore en attente ; l'alerte ne change plus ensuite. */
+/**
+ * Le résultat de l'envoi, écrit une fois sur des alertes encore en attente ;
+ * l'alerte ne change plus ensuite. `heldUntil` : la fin de la plage jusqu'à
+ * laquelle les heures de silence ont retenu son message (H2, S9), ou rien.
+ */
 export async function recordWeatherAlertDelivery(
   workspaceId: string,
   alertIds: readonly string[],
   status: Exclude<WeatherAlertDeliveryStatus, 'pending'>,
+  heldUntil: string | null = null,
 ): Promise<void> {
   if (alertIds.length === 0) return;
   await db.prepare(
-    `UPDATE irrigation_weather_alerts SET delivery_status = ?
+    `UPDATE irrigation_weather_alerts SET delivery_status = ?, held_until = ?
      WHERE workspace_id = ? AND delivery_status = 'pending' AND id IN (${alertIds.map(() => '?').join(', ')})`,
-  ).bind(status, workspaceId, ...alertIds).run();
+  ).bind(status, heldUntil, workspaceId, ...alertIds).run();
 }
 
 function versionStatement(
@@ -257,9 +262,10 @@ function nullableNumber(value: number | null): number | null {
 export async function listWeatherAlertsForWorkspace(workspaceId: string): Promise<Array<ClaimedWeatherAlert & {
   sentAt: string;
   deliveryStatus: WeatherAlertDeliveryStatus;
+  heldUntil: string | null;
 }>> {
   const result = await db.prepare(
-    `SELECT id, criterion_id, criterion_version, target_date, forecast_value, unit, forecasted_at, sent_at, delivery_status
+    `SELECT id, criterion_id, criterion_version, target_date, forecast_value, unit, forecasted_at, sent_at, delivery_status, held_until
      FROM irrigation_weather_alerts
      WHERE workspace_id = ?
      ORDER BY sent_at DESC, target_date`,
@@ -273,6 +279,7 @@ export async function listWeatherAlertsForWorkspace(workspaceId: string): Promis
     forecasted_at: string;
     sent_at: string;
     delivery_status: WeatherAlertDeliveryStatus;
+    held_until: string | null;
   }>();
   return result.results.map((row) => ({
     id: row.id,
@@ -284,6 +291,7 @@ export async function listWeatherAlertsForWorkspace(workspaceId: string): Promis
     forecastedAt: row.forecasted_at,
     sentAt: row.sent_at,
     deliveryStatus: row.delivery_status,
+    heldUntil: row.held_until,
   }));
 }
 
@@ -291,6 +299,8 @@ export async function listWeatherAlertsForWorkspace(workspaceId: string): Promis
 export type WeatherAlertHistoryRecord = ClaimedWeatherAlert & {
   sentAt: string;
   deliveryStatus: WeatherAlertDeliveryStatus;
+  /** La fin de la plage jusqu'à laquelle les heures de silence ont retenu son message, ou rien (H2, S9). */
+  heldUntil: string | null;
   criterion: Omit<WeatherAlertCriterionSettings, 'active'>;
 };
 
@@ -304,6 +314,7 @@ type HistoryRow = {
   forecasted_at: string;
   sent_at: string;
   delivery_status: WeatherAlertDeliveryStatus;
+  held_until: string | null;
   field: WeatherAlertCriterion['field'];
   direction: WeatherAlertCriterion['direction'];
   threshold: number;
@@ -312,7 +323,7 @@ type HistoryRow = {
 };
 
 const HISTORY_SELECT = `SELECT a.id, a.criterion_id, a.criterion_version, a.target_date, a.forecast_value, a.unit,
-            a.forecasted_at, a.sent_at, a.delivery_status, v.field, v.direction, v.threshold, v.horizon_days, v.label
+            a.forecasted_at, a.sent_at, a.delivery_status, a.held_until, v.field, v.direction, v.threshold, v.horizon_days, v.label
      FROM irrigation_weather_alerts a
      JOIN irrigation_weather_alert_criterion_versions v
        ON v.criterion_id = a.criterion_id AND v.version = a.criterion_version`;
@@ -354,6 +365,7 @@ function historyFromRow(row: HistoryRow): WeatherAlertHistoryRecord {
     forecastedAt: row.forecasted_at,
     sentAt: row.sent_at,
     deliveryStatus: row.delivery_status,
+    heldUntil: row.held_until,
     criterion: {
       field: row.field,
       direction: row.direction,

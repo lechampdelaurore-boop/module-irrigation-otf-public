@@ -1,6 +1,6 @@
 import { pageHref } from '../features/pages.ts';
 import { addDaysToDateKey, FARM_TIME_ZONE, isValidDateKey, weekStartDateKey } from '../water-management.ts';
-import { clockFromMinutes } from '../clock-text.ts';
+import { clockFromMinutes, clockText } from '../clock-text.ts';
 
 /**
  * Les alertes météo paramétrables (docs/weather-alerts-contract.md, D-050).
@@ -334,6 +334,21 @@ export function weatherAlertDeliveryLabel(status: WeatherAlertDeliveryStatus): s
     case 'retrying': return 'Nouvelle tentative du service de notification';
     case 'failed': return 'Échec du service de notification';
   }
+}
+
+/**
+ * Le résultat d'un envoi tel que l'historique le dit, heures de silence
+ * comprises (H2, S9) : une alerte dont le message a été retenu dit « Retenue
+ * jusqu’à 6 h (heures de silence) » tant que la fin de la plage n'est pas
+ * venue, puis « Envoyée à 6 h, à la fin des heures de silence ». L'alerte
+ * elle-même est enregistrée à son heure (D-006). Sans retenue, le résultat
+ * d'avant.
+ */
+export function alertDeliveryLabel(status: WeatherAlertDeliveryStatus, heldUntil: string | null, now: Date): string {
+  if (status !== 'sent' || heldUntil === null) return weatherAlertDeliveryLabel(status);
+  return now.getTime() < Date.parse(heldUntil)
+    ? `Retenue jusqu’à ${clockText(heldUntil)} (heures de silence)`
+    : `Envoyée à ${clockText(heldUntil)}, à la fin des heures de silence`;
 }
 
 /** Le résultat d'un envoi lu en démonstration, où les notifications sont coupées. */

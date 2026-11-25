@@ -39,9 +39,10 @@ const LAST_END_MINUTES = 9 * MINUTES_PER_HOUR;
  * S7 : une retenue ne dure jamais plus d'une plage, la plus longue allant de
  * 20 h à 9 h, treize heures de l'horloge de Paris. Comptée sur l'horloge, comme
  * la fin (S1) : la nuit du passage à l'heure d'hiver, cette plage dure
- * quatorze heures réelles sans être un défaut.
+ * quatorze heures réelles sans être un défaut. Exportée pour l'alarme de retard
+ * retenue, que le retrait des alarmes à venir doit encore trouver (H2).
  */
-const MAXIMUM_HOLD_MINUTES = 13 * MINUTES_PER_HOUR;
+export const MAXIMUM_QUIET_HOLD_MINUTES = 13 * MINUTES_PER_HOUR;
 
 /** « 20:00 », « 20:15 », … : chaque quart d'heure de `first` à `last`, compris. */
 function quarterHours(first: number, last: number): readonly string[] {
@@ -144,7 +145,7 @@ function quietHoldEnd(window: QuietWindow, at: Date): Date | 'too-long' | null {
   } else {
     return null;
   }
-  if (heldMinutes > MAXIMUM_HOLD_MINUTES) return 'too-long';
+  if (heldMinutes > MAXIMUM_QUIET_HOLD_MINUTES) return 'too-long';
   return localDateTimeUtc(endDay, {
     hour: Math.floor(window.endMinutes / MINUTES_PER_HOUR),
     minute: window.endMinutes % MINUTES_PER_HOUR,
