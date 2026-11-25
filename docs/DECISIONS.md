@@ -9737,3 +9737,39 @@ chacune échouer au moins un test.
 aucun envoyeur ne lit la règle et aucun écran ne l'allume ; la migration
 ajoute quatre colonnes vides. Le Worker de notification ne change pas.
 D-028, D-060 et D-293 tiennent.
+
+## D-322 — Le menu change de page sans recharger le module
+
+Date : 24 novembre 2026. Statut : **codée** ; roadmap section 6 duodecies,
+contrat `docs/lenteur-du-module-contract.md` (N1). Écrite en Opus 5.5 ·
+Élevé (correction sous contrôle des tests et des parcours). Les numéros D-319
+et D-321 sont ceux d'O4 et de H1, en PR ; celui-ci est le suivant libre.
+
+**Contexte.** Le 24 novembre 2026 à 22 h 33, le porteur trouve que le module
+« rame », au téléphone comme à l'ordinateur : « l'ouverture, c'est le pire,
+ensuite le moindre changement de page ». Mesuré sur une copie locale (contrat,
+section 2) : les PR du jour n'y sont pour rien ; chaque clic du menu
+recharge toute l'application, ses scripts et son écran, parce que ses liens
+sont des liens simples.
+
+**Décision.** Les liens du menu (menu de gauche, barre du bas, feuille
+« Plus », encart « Aujourd'hui ») passent par le routeur de l'application
+(`next/link`) : seule la page voulue est demandée au serveur. Rien n'est
+demandé d'avance (`prefetch={false}`) : lire d'avance les pages de la barre
+doublait le temps d'ouverture mesuré. Ce qu'un chargement donnait reste
+vrai : un menu neuf à chaque page (feuille « Plus » refermée, pastille
+relue), l'adresse nettoyée, le titre de l'onglet ; le clavier repart du
+contenu de la nouvelle page. Parcours P59.
+
+Pour une page demandée par le routeur, vinext 1.0.1 appelle la page une
+première fois pour y chercher une redirection, puis la rend : chaque lecture
+se faisait deux fois, et « Aujourd'hui » par le menu devenait plus lente
+qu'avec le rechargement. Chaque page du module est donc calculée une fois par
+requête (`app/irrigation/render-once.ts`, `cacheForRequest` de vinext) ;
+mesuré, chaque page de la barre du bas devient utilisable plus tôt
+qu'avant, « Aujourd'hui » comprise (contrat, N1).
+
+**Ne change pas.** Aucun calcul, aucune donnée, aucune migration, aucun texte ;
+les autres liens restent des liens simples (un geste à la fois). Les deux
+autres freins, l'ouverture en deux pages (N2) et les lectures répétées de la
+base (N3), ont leurs PR.

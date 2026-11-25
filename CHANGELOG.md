@@ -17,6 +17,15 @@ source détaillée commit par commit.
   modifications. Rien ne change encore pour aucune ferme : aucune
   notification ne lit la règle (H2) et aucun écran ne l'allume (H3).
 
+### Corrigé (lenteur du module, N1)
+
+- **Un clic du menu ne recharge plus tout le module** (D-322) : le menu de
+  gauche, la barre du bas et la feuille « Plus » du téléphone ne demandent
+  plus que la page voulue, sans relancer toute l'application ; le
+  changement de page est plus court, surtout au téléphone. La page suivie
+  garde son titre, sa marque dans le menu et le retour du navigateur ; le
+  clavier repart de son contenu.
+
 ### Ajouté (objectif automatique sur l'ET0, O4)
 
 - **Le réglage « Objectif automatique » se voit et s'allume** (D-319) : dans

@@ -8,12 +8,13 @@ import { pageHref } from '@/lib/domain/features/pages';
 import { isPartActive } from '@/lib/domain/features/socle';
 import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('planning');
 
 /** La page « Planning de la semaine » (3.8) : le plan, ses réglages et son suivi. */
-export default async function PlanningRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computePlanningRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('planning', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { weeklyPlan, planningSettings, protectedSlots, soilNotes, waterGap } = await loadPlanningPage(context);
@@ -27,4 +28,11 @@ export default async function PlanningRoutePage({ searchParams }: { searchParams
       <PlanningPage season={context.season} initialNowIso={context.nowIso} weeklyPlan={weeklyPlan} planningSettings={planningSettings} protectedSlots={protectedSlots} soilNotes={soilNotes} repartitionHref={repartitionHref} waterGap={waterGap} rainHref={rainHref} />
     </IrrigationShell>
   );
+}
+
+const computePlanningRoutePageOnce = renderOncePerRequest(computePlanningRoutePage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function PlanningRoutePage(props: Parameters<typeof computePlanningRoutePage>[0]) {
+  return computePlanningRoutePageOnce(props);
 }

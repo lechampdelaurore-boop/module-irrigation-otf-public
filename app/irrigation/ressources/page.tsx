@@ -10,12 +10,13 @@ import { PartUnavailable } from '../shell/part-unavailable';
 import { pageMetadata } from '../page-metadata';
 
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('ressources');
 
 /** La page « Ressources et pompes » (3.8) : ressources en eau, relevés et débit, pompes, puis la faisabilité et la répartition en cas de manque. */
-export default async function RessourcesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeRessourcesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('ressources', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { equipment, irrigationEvents, waterResourceDashboard, pumpDashboard, decisionPending } = await loadRessourcesPage(context);
@@ -38,4 +39,11 @@ export default async function RessourcesPage({ searchParams }: { searchParams: I
       />
     </IrrigationShell>
   );
+}
+
+const computeRessourcesPageOnce = renderOncePerRequest(computeRessourcesPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function RessourcesPage(props: Parameters<typeof computeRessourcesPage>[0]) {
+  return computeRessourcesPageOnce(props);
 }
