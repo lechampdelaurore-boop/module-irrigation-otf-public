@@ -62,6 +62,12 @@ source détaillée commit par commit.
 
 ### Décidé (simplifier l'usage du module)
 
+- **Contrat du lot S2 écrit** (« Aujourd'hui » où l'on fait tout) : un seul
+  bouton qui change de nom sur la carte (Valider, Démarrer, Terminer),
+  l'arrosage à rattraper (« Je le fais maintenant » ou « C'est fait »), la
+  pluie notée d'un geste, la page à l'essentiel. Rien n'est codé : aucune page
+  ne change encore. Contrat : `docs/simplification-s2-contract.md`.
+
 - **Six lots de simplification retenus, contrat du lot S1 écrit** (D-327) :
   trois endroits, valider-démarrer-terminer depuis la carte d'« Aujourd'hui »,
   trois façons de commencer, les mots du champ. Rien n'est codé : aucune
