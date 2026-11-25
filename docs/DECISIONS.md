@@ -9691,6 +9691,14 @@ vrai : un menu neuf à chaque page (feuille « Plus » refermée, pastille
 relue), l'adresse nettoyée, le titre de l'onglet ; le clavier repart du
 contenu de la nouvelle page. Parcours P59.
 
+Pour une page demandée par le routeur, vinext 1.0.1 appelle la page une
+première fois pour y chercher une redirection, puis la rend : chaque lecture
+se faisait deux fois, et « Aujourd'hui » par le menu devenait plus lente
+qu'avec le rechargement. Chaque page du module est donc calculée une fois par
+requête (`app/irrigation/render-once.ts`, `cacheForRequest` de vinext) ;
+mesuré, chaque page de la barre du bas devient utilisable plus tôt
+qu'avant, « Aujourd'hui » comprise (contrat, N1).
+
 **Ne change pas.** Aucun calcul, aucune donnée, aucune migration, aucun texte ;
 les autres liens restent des liens simples (un geste à la fois). Les deux
 autres freins, l'ouverture en deux pages (N2) et les lectures répétées de la

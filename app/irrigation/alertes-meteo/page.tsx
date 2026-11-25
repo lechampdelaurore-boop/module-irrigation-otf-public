@@ -6,12 +6,13 @@ import { WeatherAlertsPage } from '../pages/alerts-pages';
 import { pageHref } from '@/lib/domain/features/pages';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
+import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('alertes-meteo');
 
 /** La page « Alertes météo » (3.8) : l'encart des alertes météo et leurs réglages. */
-export default async function AlertesMeteoPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeAlertesMeteoPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('alertes-meteo', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { waterDashboard } = await loadWaterDashboardPage(context, true);
@@ -26,4 +27,11 @@ export default async function AlertesMeteoPage({ searchParams }: { searchParams:
       />
     </IrrigationShell>
   );
+}
+
+const computeAlertesMeteoPageOnce = renderOncePerRequest(computeAlertesMeteoPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function AlertesMeteoPage(props: Parameters<typeof computeAlertesMeteoPage>[0]) {
+  return computeAlertesMeteoPageOnce(props);
 }
