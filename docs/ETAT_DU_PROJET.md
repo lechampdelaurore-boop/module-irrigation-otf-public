@@ -203,6 +203,20 @@ registres, elle y renvoie.
   l'ajustement d'une proposition ne remonte pas). Ce lot ne touche pas l'écran
   de bienvenue du contrat 3.8 : « trois façons de commencer » est le lot S6.
   Dépend de la fin du code de S3 ; contrat non fusionné avant #214, #211, #215.
+
+- **Simplifier l'usage du module, S4 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s4-contract.md`, D-327, roadmap section 6 terdecies,
+  ligne 33), sans code, en Sonnet 5.5 · Moyen. « La semaine sur une page » :
+  les trois pages de la semaine (planning, objectifs et besoins, historique)
+  deviennent une page, « Semaine », à `/irrigation/semaine`, en deux vues (la
+  semaine, les cumuls) ; le premier niveau tient en une phrase, une barre,
+  trois chiffres, « Jour par jour » (un bouton « Valider » par créneau) et
+  « Jardin par jardin », le reste derrière « Le détail » ; quatre PR, Opus 5.5 ·
+  Très élevé. Aucun calcul, aucune fonction retirée ; les anciennes adresses
+  et leurs ancres sont gardées ; écarts voulus avec la maquette dits au porteur
+  (« m³ arrosés » et non « pris au bassin », pas de jugement « à moitié
+  arrosée »). Dépend de la fin du code de S3 et de S5 ; contrat non fusionné
+  avant #211, #215 et #216. Aucun contrôle rejoué (PR de registres seule).
 - **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
   l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
   décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat
