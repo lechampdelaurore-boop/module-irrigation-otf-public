@@ -10223,3 +10223,70 @@ passages d'isolation. `tests/db/simplification-s1-historique-demo.test.ts` :
 chaque ferme de démonstration à chaque moment (la Ferme des Trois Noues au
 début de l'été : 23,4 mm, 7 planches sur 10). Parcours P61 étendu.
 Contre-épreuve : treize altérations, chacune prise par au moins un test.
+
+## D-330 — Simplifier l'usage du module, lot S2 : « Aujourd'hui » où l'on fait tout
+
+Date : 25 novembre 2026. Statut : **PR 1 sur 5 codée** (valider et démarrer
+depuis la carte) ; contrat `docs/simplification-s2-contract.md`, roadmap
+section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap et du contrat (section 15), sur le mandat du porteur du 25 novembre
+2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met en œuvre le
+choix n° 2 du porteur (« Oui, tout depuis la carte », 25 novembre 2026,
+12 h 00) ; les PR 2 à 5 la compléteront.
+
+**Décision (PR 1).** Une carte de « Votre journée » porte un seul bouton
+principal, un geste d'appoint au plus et un seul « Autres choix ». Une
+proposition du plan : « Valider », « Démarrer tout de suite » dessous, et
+dans « Autres choix » « Changer l'heure ou la dose » (le formulaire
+« Ajuster » du planning, S2-d) et « Pas à cette heure » (le refus du
+planning, D-030, S2-b). Une irrigation planifiée à venir : « Démarrer », et
+« Modifier ou annuler sur « Arrosages » » rangé. La règle vit dans
+`lib/domain/today/card-action.ts`, que la carte dessine sans rien décider.
+« Valider » est la même action que sur le planning
+(`validatePlanProposalsAction`, pour une proposition), donc les mêmes
+gardes ; « Démarrer tout de suite » valide puis démarre par les deux
+actions existantes, et un démarrage refusé laisse l'arrosage validé et
+planifié, le message le dit (S2-c). Le planning ne change pas ; « Valider au
+planning » disparaît (L3, règle 5, réécrite : rien n'est validé par un
+lien, D-028 tient).
+
+**Précisions tranchées en codant.**
+
+- F838 : sans « Arrosages » cochée, l'entrée rangée d'une irrigation
+  planifiée dit « Ouvrir sur « Planning de la semaine » » : le nom du menu,
+  où sa carte s'ouvre.
+- F839 : la validation rend aussi l'irrigation créée par son matériel
+  (`eventEquipmentId`, en plus de l'événement) : la réponse se lit sous la
+  nouvelle carte et le focus va à son « Démarrer ». Un ajout de donnée au
+  résultat du service, aucune règle changée.
+- F840 : une réserve de la validation (« faisabilité hydraulique non
+  vérifiée », « ce matériel a déjà une irrigation sur ce créneau ») suit
+  « Validé : l'arrosage est planifié. » dans la même réponse, sous la carte.
+- F841 : « Pas à cette heure » se confirme par « Pas à cette heure ? — Le
+  module cherchera une autre place pour cet arrosage. », « Chercher une
+  autre place » en rouge et « Garder la proposition » ; la réponse dit
+  « Heure refusée : le module cherche une autre place pour cet arrosage. »,
+  en tête de « Votre journée » quand la carte est partie.
+- F842 : « Démarrer tout de suite » est un bouton au dessin d'un lien
+  (souligné, sans fond), pas un lien : il écrit, et rien ne s'écrit par un
+  lien (D-028).
+- F843 : les irrigations en retard ou non faites gardent « Fait comme
+  prévu », « Démarrer maintenant » et « Ouvrir » jusqu'à la PR 3 du lot,
+  qui leur donne leur carte (contrat, section 4).
+
+**Preuve (PR 1).** `tests/simplification-s2-carte.test.ts` : la règle pour
+chaque carte, un seul bouton principal, jamais un lien pour valider ou
+démarrer, les réponses (validation, réserve, refus de garde, démarrage
+refusé après validation, refus), la composition valider-puis-démarrer sur
+des étapes simulées, la réponse qui suit sa carte, « Autres choix » au
+clavier. `tests/db/simplification-s2-carte.test.ts` : la composition sur les
+vrais services, à deux fermes (validée et planifiée, un second appui
+refusé, la limite journalière qui refuse sans rien créer, « Démarrer tout de
+suite » réussi puis refusé sur le même matériel qui coule, Bob qui ne valide,
+ne démarre ni ne refuse rien d'Alice). Parcours P62 aux deux largeurs ; les
+tests qui lisaient « Valider au planning » suivent. Contre-épreuve : voir la
+PR.
+
+**Ne change pas.** Aucune règle de validation, de démarrage ni de refus,
+aucun calcul, aucune donnée, aucune migration ; le planning et « Arrosages »
+gardent tous leurs gestes ; les notifications gardent leurs mots.

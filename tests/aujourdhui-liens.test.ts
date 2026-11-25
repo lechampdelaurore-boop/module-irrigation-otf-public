@@ -261,15 +261,16 @@ test('L3, règle 4 : « Rien à arroser aujourd’hui » mène au planning, sino
   assert.equal(todayView(todayInputs(['besoins'])).dayEmptyLink, null, 'sans « Votre journée », aucun lien');
 });
 
-test('L3, règle 5 : une proposition dit « Valider au planning », une irrigation planifiée garde « Ouvrir » ; la cible ne change pas', () => {
+test('L3, règle 5, réécrite par le lot S2 : le lien d’une proposition devient « Changer l’heure ou la dose », vers la même carte ; rien n’est validé par un lien', () => {
   const proposal = {
     storedId: 'p20', status: 'proposed', startAt: '2026-11-12T17:00:00.000Z', endAt: '2026-11-12T18:00:00.000Z', durationSeconds: 3600, doseMm: 8,
     equipmentName: 'Asperseur A', settingName: 'Buse 2', applications: [{ otfBedId: 'b2' }],
   } as unknown as StoredProposal;
   const [line] = todayTodoLines({ enabled: ALL, now: NOW, events: [], lateToleranceMinutes: 30, bedNames: new Map([['b2', 'P2']]), proposals: [proposal] });
-  assert.deepEqual(line.open, { page: 'planning', anchor: 'proposal-p20', label: 'Valider au planning' });
+  assert.deepEqual(line.open, { page: 'planning', anchor: 'proposal-p20', label: 'Changer l’heure ou la dose' });
+  // Le lien est dessiné par la carte à un bouton (S2), dans « Autres choix » ; « Valider » y est un bouton.
   const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
-  assert.match(day, /aria-label=\{`\$\{line\.open\.label\} : \$\{line\.title\}, \$\{line\.time\}`\}>\n {10}\{line\.open\.label\}/);
+  assert.match(day, /<a className="today-action-link" href=\{pageHref\(gesture\.page, query, gesture\.anchor\)\} aria-label=\{choice\.accessibleName\}>/);
 });
 
 test('L3 : les liens dessinés — jour en alerte, donnée à jour, plan, état vide', () => {
@@ -302,11 +303,12 @@ test('L4, règle 1 : chaque geste de la page a son endroit, et un seul ; le refu
 test('L4, règle 2 : sous la carte, qui la suit dans « En cours » ; la carte partie, en tête de « Votre journée »', () => {
   const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
   assert.match(day, /reply=\{reply\(irrigationReply\(line\.eventEquipmentId\)\)\}/, 'la carte « En cours » porte la réponse de son démarrage');
-  assert.match(day, /reply=\{id \? reply\(irrigationReply\(id\)\) : null\}/, 'chaque carte du jour porte la sienne');
+  assert.match(day, /const origin = id \? irrigationReply\(id\) : line\.proposalId \? proposalReply\(line\.proposalId\) : null;/, 'chaque carte du jour porte la sienne');
   assert.match(day, /onAllDone\(\[id\], irrigationReply\(id\)\)/, '« Fait comme prévu » répond sous sa carte');
   assert.match(day, /onConfirm=\{\(ids\) => onAllDone\(ids, DAY_REPLY\)\}/, '« Tout est fait » répond en tête du bloc');
   assert.match(day, /!cards\.has\(reply\.origin\) \? \{ \.\.\.reply, origin: DAY_REPLY \}/, 'une carte partie : la réponse en tête du bloc, jamais perdue');
   assert.equal((day.match(/\{reply\}\n {4}<\/li>/g) ?? []).length, 2, 'sous les boutons, dans la carte, pour les deux sortes de carte');
+  assert.match(day, /reply=\{origin \? reply\(origin\) : null\}/, 'une proposition porte la sienne (lot S2)');
   const header = readFileSync('app/irrigation/today/today-header.tsx', 'utf8');
   assert.match(header, /<ActionReply messages=\{replies\} origin=\{PLAN_HEADER_REPLY\}/);
   const zone = readFileSync('app/irrigation/today/reliability-zone.tsx', 'utf8');

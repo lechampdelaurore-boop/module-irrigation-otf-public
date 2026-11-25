@@ -167,6 +167,13 @@ mène à sa proposition du planning.
 5. Une carte « À valider » dit « Valider au planning » au lieu d'« Ouvrir » ;
    la cible ne change pas, rien n'est validé par le lien (D-028). Une carte
    planifiée garde « Ouvrir ».
+   **Réécrite par la simplification, lot S2, PR 1** (D-330,
+   `docs/simplification-s2-contract.md`, section 10) : le **bouton**
+   « Valider » valide, la même action que le planning ; le lien vers la
+   carte du planning devient « Changer l'heure ou la dose », dans « Autres
+   choix » ; rien n'est validé par un lien (D-028 tient). Une carte
+   planifiée porte « Démarrer », son lien « Modifier ou annuler sur
+   « Arrosages » » dans « Autres choix ».
 
 ## 6. L4 — La réponse d'un geste s'écrit sous le bouton
 
