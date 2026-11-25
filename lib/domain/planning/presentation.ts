@@ -99,7 +99,7 @@ export const PLAN_EVENT_LABELS: Record<PlanCalculationEvent, string> = {
   'irrigation-recorded': 'une irrigation saisie après coup',
   'irrigation-completed': 'une irrigation terminée',
   'irrigation-partially-completed': 'une irrigation terminée en partie',
-  'irrigation-remaining-canceled': 'un reliquat annulé',
+  'irrigation-remaining-canceled': 'la suite d’un arrosage arrêté annulée',
   'irrigation-canceled': 'une irrigation annulée',
   'rain-recorded': 'la pluie saisie au pluviomètre',
   'reservoir-level-observed': 'un niveau de réserve observé',

@@ -3,6 +3,7 @@
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import type { TodayTileLink, TodayWeek } from '@/lib/domain/today/week';
 import { Icon, type IconName } from '../line-icon';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 /**
  * « La semaine » (docs/aujourdhui-tableau-de-bord-contract.md, section 3.2,
@@ -23,12 +24,12 @@ export function TodayWeekTiles({ week, query }: { week: TodayWeek; query: PageQu
   const href = (link: TodayTileLink) => pageHref(link.page, query, link.anchor);
   return (
     <section className="today-kpis" aria-label="Cette semaine">
-      <Tile tone="green" icon="calendrier" label="Objectif de la semaine" value={tiles.objective ?? 'aucun objectif posé'} detail={tiles.objectiveDetail} link={links.objective} href={href(links.objective)} />
+      <Tile tone="green" icon="calendrier" label={SIMPLE_WORDS.weekGoal} value={tiles.objective ?? 'aucun objectif posé'} detail={tiles.objectiveDetail} link={links.objective} href={href(links.objective)} />
       <Tile tone="water" icon="goutte" label="Eau reçue" value={tiles.received ?? 'inconnue'} detail={tiles.receivedDetail ?? ''} link={links.received} href={href(links.received)} />
       <Tile
         tone={remainingTone}
         icon={remainingTone === 'ok' ? 'coche' : 'horloge'}
-        label="Reste à apporter"
+        label={SIMPLE_WORDS.stillMissing}
         value={tiles.remaining ?? 'inconnu'}
         detail={tiles.remainingDetail}
         link={links.remaining}

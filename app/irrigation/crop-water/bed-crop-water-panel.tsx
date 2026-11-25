@@ -102,7 +102,7 @@ function AvailableSheetView({ sheet, pending, run, season }: { sheet: AvailableS
       <AdoptionList sheet={sheet} />
       {sheet.unusableCrops.length > 0 ? (
         <p className="bed-crop-water-muted">
-          Cultures de référence inutilisables : {sheet.unusableCrops.map((crop) => `${crop.name} (${crop.problems.join(' ')})`).join(' ; ')}.
+          Cultures inutilisables : {sheet.unusableCrops.map((crop) => `${crop.name} (${crop.problems.join(' ')})`).join(' ; ')}.
         </p>
       ) : null}
     </>

@@ -7,6 +7,7 @@ import { isTimerAwaitingConfirmation } from '../irrigation-timer.ts';
 import { remainingIrrigationForStart } from '../water-management.ts';
 import { bedsText, durationText, irrigationAnchor, irrigationPage, timeText } from './today-irrigations.ts';
 import { farmDateKey } from './today-text.ts';
+import { SIMPLE_WORDS } from '../simple-words.ts';
 
 /**
  * Ce qui coule ou attend d'être repris, en tête de « Votre journée »
@@ -25,14 +26,14 @@ const STATUS_TEXT: Record<NowTone, string> = {
   running: 'En cours',
   paused: 'En pause',
   finished: 'Durée atteinte',
-  remainder: 'Reliquat',
+  remainder: SIMPLE_WORDS.stoppedRemainder,
 };
 
 export type TodayNowLine = {
   key: string;
   eventEquipmentId: string;
   tone: NowTone;
-  /** « En cours », « En pause », « Durée atteinte », « Reliquat ». */
+  /** « En cours », « En pause », « Durée atteinte », ou le reste d’un arrosage arrêté (`SIMPLE_WORDS.stoppedRemainder`). */
   status: string;
   /** « Goutte-à-goutte B · Réglage 1 ». */
   title: string;

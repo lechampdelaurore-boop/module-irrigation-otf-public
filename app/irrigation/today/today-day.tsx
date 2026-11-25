@@ -152,7 +152,7 @@ function daySummary(current: readonly TodayNowLine[], late: LateBlock, todo: Tod
   const remainders = current.length - running;
   const nowText = [
     running > 0 ? `${running} en cours` : null,
-    remainders > 0 ? `${remainders} reliquat${remainders > 1 ? 's' : ''} à reprendre` : null,
+    remainders > 0 ? `${remainders} arrosage${remainders > 1 ? 's' : ''} arrêté${remainders > 1 ? 's' : ''} à reprendre` : null,
   ];
   const lateText = late.lines.length === 0 ? 'aucune en retard' : `${late.lines.length} à rattraper`;
   const todoText = todo.lines.length === 0 ? 'rien à faire aujourd’hui' : `${todo.lines.length} à faire aujourd’hui`;
@@ -160,10 +160,10 @@ function daySummary(current: readonly TodayNowLine[], late: LateBlock, todo: Tod
   return text.charAt(0).toLocaleUpperCase('fr-FR') + text.slice(1);
 }
 
-/** « En cours (1) », « Reliquat à reprendre (1) », « En cours et reliquats (2) ». */
+/** « En cours (1) », « À reprendre (1) », « En cours et à reprendre (2) » : un arrosage arrêté en route (simplification S1, mots). */
 function nowTitle(current: readonly TodayNowLine[]): string {
   const remainders = current.filter((line) => line.tone === 'remainder').length;
-  const label = remainders === 0 ? 'En cours' : remainders === current.length ? `Reliquat${remainders > 1 ? 's' : ''} à reprendre` : 'En cours et reliquats';
+  const label = remainders === 0 ? 'En cours' : remainders === current.length ? 'À reprendre' : 'En cours et à reprendre';
   return `${label} (${current.length})`;
 }
 
@@ -191,7 +191,7 @@ function NowCard({ line, query, pending, onStart, reply }: {
       <div className="today-irrigation-actions">
         {line.canResume ? (
           <button type="button" className="primary" disabled={pending} onClick={() => onStart(line.eventEquipmentId)}>
-            Reprendre le reliquat
+            Reprendre ce qui reste
           </button>
         ) : null}
         <a

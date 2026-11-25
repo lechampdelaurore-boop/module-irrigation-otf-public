@@ -62,7 +62,7 @@ test('décocher une fonctionnalité avertit, retire sa page et ses blocs sans ri
   await expect(caseDeLaFonctionnalite(page, 'Besoin par culture')).not.toBeChecked();
   await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
   expect(await entreesDuMenu(page)).not.toContain('Besoin par culture');
-  await expect(page.getByRole('heading', { name: 'Correspondance des espèces' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'À quelle culture ressemble chaque espèce ?' })).toHaveCount(0);
   await page.goto('/irrigation/cultures');
   await attendreLaPagePrete(page, 'aujourdhui');
   // La ligne nomme la page décochée (audit final, lot E, J11, F265).
@@ -86,15 +86,15 @@ test('décocher une fonctionnalité avertit, retire sa page et ses blocs sans ri
 async function rattacherLaCarotte(page: Page): Promise<void> {
   await ouvrirLaCorrespondanceDesEspeces(page);
   const especes = page.locator('section.crop-coefficients');
-  await expect(especes.getByRole('heading', { level: 2, name: 'Correspondance des espèces' })).toBeVisible();
+  await expect(especes.getByRole('heading', { level: 2, name: 'À quelle culture ressemble chaque espèce ?' })).toBeVisible();
   const carte = especes.locator('details.species-link-card').filter({ has: page.locator('summary strong', { hasText: /^Carotte$/ }) });
   const formulaire = carte.getByRole('group', { name: 'Rattachement de l’espèce Carotte' });
   await carte.scrollIntoViewIfNeeded();
   await ouvrirParClic(carte.locator('summary').first(), formulaire);
   const enregistrer = formulaire.getByRole('button', { name: 'Enregistrer' });
   await expect(async () => {
-    await formulaire.getByLabel('Culture de référence').selectOption({ value: '' });
-    await formulaire.getByLabel('Culture de référence').selectOption({ label: 'Carotte' });
+    await formulaire.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ value: '' });
+    await formulaire.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ label: 'Carotte' });
     await expect(enregistrer).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   await enregistrer.click();

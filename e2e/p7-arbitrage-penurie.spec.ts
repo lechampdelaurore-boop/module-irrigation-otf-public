@@ -58,7 +58,7 @@ test('la pénurie s’arbitre depuis l’écran, sans débordement ni cible trop
   await verifierLEtape(page, journal, 'besoins manuels posés');
   await attendreLaPageIrrigation(page, 'ressources');
 
-  const faisabilite = page.locator('section').filter({ hasText: 'Faisabilité et répartition' }).last();
+  const faisabilite = page.locator('section').filter({ hasText: 'Y a-t-il assez d’eau ?' }).last();
   await faisabilite.scrollIntoViewIfNeeded();
   // Les deux dates de l'en-tête sont à la française : la semaine s'affichait en
   // format brut à côté d'une date de calcul déjà mise en forme.

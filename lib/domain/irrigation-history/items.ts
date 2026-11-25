@@ -141,7 +141,7 @@ export function buildIrrigationTimeline(
     } else if (timerAction === 'started') label = 'Démarrage';
     else if (timerAction === 'paused') label = 'Pause';
     else if (timerAction === 'resumed') label = 'Reprise';
-    else if (timerAction === 'remaining_canceled') label = 'Annulation du reliquat';
+    else if (timerAction === 'remaining_canceled') label = 'Annulation de ce qui restait';
     else if (entry.action === 'partially_completed') label = 'Arrêt anticipé';
     else if (entry.action === 'completed') label = entry.payload.asPlanned === true ? 'Faite comme prévu' : 'Confirmation de fin';
     else if (entry.action === 'canceled') label = 'Annulation';
@@ -158,7 +158,7 @@ function irrigationStatusLabel(event: IrrigationEventRecord) {
   if (event.status === 'completed') return 'Terminée';
   if (event.status === 'canceled') return 'Annulée';
   if (event.status === 'partially_completed') {
-    return event.remainingCanceledAt ? 'Partielle · reliquat annulé' : 'Partielle';
+    return event.remainingCanceledAt ? 'Partielle · la suite annulée' : 'Partielle';
   }
   if (event.equipment.timerState === 'running') return 'En cours';
   if (event.equipment.timerState === 'paused') return 'En pause';

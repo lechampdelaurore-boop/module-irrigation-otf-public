@@ -172,14 +172,14 @@ test('n° 2, F434 : le reliquat d’une irrigation partielle se lit avec « Repr
   const completed = irrigation('d', { status: 'completed' });
   const lines = nowIrrigationLines({ enabled: [...FEATURE_IDS], now: NOW, events: [partial, canceled, completed], bedNames: BED_NAMES });
   // 4 h 10 prévues, 1 h faite : reste 3 h 10 ; 2 m³ prévus, 0,48 m³ apportés.
-  assert.deepEqual(lines.map((line) => [line.status, line.detail, line.canResume]), [['Reliquat', 'reste 3 h 10 · 1,52 m³', true]]);
+  assert.deepEqual(lines.map((line) => [line.status, line.detail, line.canResume]), [['Ce qui reste d’un arrosage arrêté', 'reste 3 h 10 · 1,52 m³', true]]);
 });
 
 test('n° 2, F435 : la phrase et les pastilles disent l’en-cours et le reliquat, jamais « Rien à arroser »', () => {
   const current = nowIrrigationLines({ enabled: [...FEATURE_IDS], now: NOW, events: [running, irrigation('q', { status: 'partially_completed' })], bedNames: BED_NAMES });
   const headline = todayHeadline({ today: '2026-11-19', irrigations: { current, late: [], todo: [] }, weather: null, reliabilityCount: null, tomorrow: null, shortage: null });
-  assert.equal(headline.sentence, 'Une irrigation est en cours. Un reliquat est à reprendre.');
-  assert.deepEqual(headline.chips.map((chip) => chip.text), ['1 en cours', '1 reliquat']);
+  assert.equal(headline.sentence, 'Une irrigation est en cours. Un arrosage arrêté est à reprendre.');
+  assert.deepEqual(headline.chips.map((chip) => chip.text), ['1 en cours', '1 à reprendre']);
   const calm = todayHeadline({ today: '2026-11-19', irrigations: { current: [], late: [], todo: [] }, weather: null, reliabilityCount: null, tomorrow: null, shortage: null });
   assert.deepEqual(calm.chips.map((chip) => chip.text), ['Rien à arroser']);
 });

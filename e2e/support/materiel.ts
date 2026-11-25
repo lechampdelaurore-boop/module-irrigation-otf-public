@@ -120,10 +120,10 @@ export async function choisirMaterielEtReglage(page: Page, materiel: string, reg
  * boîte du navigateur (lot G, n° 8, F413) : le parcours confirme comme un
  * utilisateur.
  */
-export async function annulerDepuisLeMenu(page: Page, ligne: Locator, action: 'Annuler' | 'Annuler le reliquat' = 'Annuler'): Promise<void> {
+export async function annulerDepuisLeMenu(page: Page, ligne: Locator, action: 'Annuler' | 'Annuler ce qui reste' = 'Annuler'): Promise<void> {
   await ligne.locator('.row-menu > summary').click();
   await ligne.getByRole('menuitem', { name: action, exact: true }).click();
-  await confirmerDansLaFenetre(page, action === 'Annuler' ? 'Annuler l’irrigation' : 'Annuler le reliquat');
+  await confirmerDansLaFenetre(page, action === 'Annuler' ? 'Annuler l’irrigation' : 'Annuler ce qui reste');
 }
 
 /**

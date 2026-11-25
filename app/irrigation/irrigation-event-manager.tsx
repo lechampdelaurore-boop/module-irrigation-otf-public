@@ -588,7 +588,7 @@ export function IrrigationEventManager({
         onCancel={async (event) => {
           // La fenêtre du module, en rouge, à la place de la boîte du navigateur (lot G, n° 8, F413).
           if (event.status === 'partially_completed') {
-            if (!(await confirm({ title: 'Annuler le reliquat ?', text: 'Annuler définitivement le reliquat de cette irrigation ?', confirmLabel: 'Annuler le reliquat', cancelLabel: 'Garder le reliquat' }))) return;
+            if (!(await confirm({ title: 'Annuler ce qui reste ?', text: 'Annuler définitivement ce qui reste de cette irrigation arrêtée ?', confirmLabel: 'Annuler ce qui reste', cancelLabel: 'Garder ce qui reste' }))) return;
             runEventAction(() => cancelRemainingIrrigationAction(event.equipment.id), 'liste');
             return;
           }

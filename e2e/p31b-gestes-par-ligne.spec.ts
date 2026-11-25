@@ -107,10 +107,10 @@ test('les gestes par ligne : espèces à rattacher en tête, « Observer » sur 
   await expect(ligne.getByRole('button', { name: /^Observer/ })).toHaveCount(0);
   const pres = reserve.getByRole('region', { name: 'Réserve · Les Prés' });
   await expect(pres.getByRole('group', { name: 'Observer la parcelle' })).toHaveCount(0);
-  await expect(pres.locator('.soil-zone-without-soil')).toContainText('La réserve utile (RFU) de la parcelle n’est pas saisie');
-  // « RFU » s'écrit en entier à sa première occurrence de la page (F312).
+  await expect(pres.locator('.soil-zone-without-soil')).toContainText('Ce que le sol de la parcelle retient (sa RFU) n’est pas saisi');
+  // « RFU » s'explique à sa première occurrence de la page (F312), par le mot simple du tableau (S1, F837).
   const texte = await reserve.innerText();
-  expect(texte.indexOf('RFU'), 'la première « RFU » suit « réserve utile ( »').toBe(texte.indexOf('réserve utile (RFU)') + 'réserve utile ('.length);
+  expect(texte.indexOf('RFU'), 'la première « RFU » suit « retient (sa »').toBe(texte.indexOf('retient (sa RFU)') + 'retient (sa '.length);
   await verifierLEtape(page, journal, 'sans RFU, « Renseigner la réserve de la parcelle »');
 
   // Cas 8 : les planches pareilles d'un jardin se disent en une phrase, leurs lignes dans un pli (F310).

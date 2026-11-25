@@ -128,7 +128,7 @@ test('les jardins qui ont une irrigation aujourd’hui passent en tête', async 
   await verifierLEtape(page, journal, 'le jardin arrosé aujourd’hui en tête');
 
   // Les petits défauts de lecture (F440, F441) : une quantité n'est pas une alerte ; l'heure tient sur une ligne.
-  const reste = page.locator('.today-kpi').filter({ hasText: 'Reste à apporter' });
+  const reste = page.locator('.today-kpi').filter({ hasText: 'Il manque encore' });
   if (await reste.count()) await expect(reste).not.toHaveAttribute('data-tone', 'warn');
   const heure = page.locator('.today-irrigation-time strong').first();
   await expect(heure).toHaveCSS('white-space', 'nowrap');
@@ -176,14 +176,14 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   const reliquat = enTete.locator('.today-irrigation').filter({ hasText: materiel });
-  await expect(reliquat.locator('.today-status')).toHaveText('Reliquat');
-  await expect(reliquat.getByRole('button', { name: 'Reprendre le reliquat' })).toBeVisible();
-  await expect(page.locator('.today-sentence')).toContainText(/reliquats? (est|sont) à reprendre\./);
+  await expect(reliquat.locator('.today-status')).toHaveText('Ce qui reste d’un arrosage arrêté');
+  await expect(reliquat.getByRole('button', { name: 'Reprendre ce qui reste' })).toBeVisible();
+  await expect(page.locator('.today-sentence')).toContainText(/(Un arrosage arrêté est|\d+ arrosages arrêtés sont) à reprendre\./);
   await verifierLEtape(page, journal, 'le reliquat à reprendre');
 
   // « Reprendre le reliquat » répond sous la carte, qui passe « En cours », et la réponse l'y suit, dans l'écran ;
   // un refus s'y écrit aussi ; jamais en tête de page (6 nonies, L4, D-313).
-  await reliquat.getByRole('button', { name: 'Reprendre le reliquat' }).click();
+  await reliquat.getByRole('button', { name: 'Reprendre ce qui reste' }).click();
   const reponse = enTete.locator('.today-irrigation').filter({ hasText: materiel }).locator('.action-reply');
   await expect(reponse).toBeVisible();
   await expect(page.locator('.action-reply')).toHaveCount(1);
@@ -205,7 +205,7 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   // Remise en état : le reliquat annulé, il quitte « Aujourd'hui ».
   await attendreLaPageIrrigation(page, 'arrosages');
   const fiche = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
-  await annulerDepuisLeMenu(page, fiche.first(), 'Annuler le reliquat');
+  await annulerDepuisLeMenu(page, fiche.first(), 'Annuler ce qui reste');
   await expect(fiche).toHaveCount(0);
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(enTete.locator('.today-irrigation').filter({ hasText: materiel })).toHaveCount(0);

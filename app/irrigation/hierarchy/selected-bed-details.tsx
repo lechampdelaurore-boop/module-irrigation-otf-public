@@ -4,6 +4,7 @@ import { formatIrrigationRate, formatMeasure, formatOptionalMeasure } from './pr
 import type { Bed, Plot } from '@/lib/domain/domain';
 import { coverageOrigin, type BedIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
 import { FigureOrigin } from '../shell/figure-origin';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 export function SelectedBedDetails({
   bed,
@@ -26,7 +27,7 @@ export function SelectedBedDetails({
         <div><dt>Passe-pied</dt><dd>{formatOptionalMeasure(bed.alleyWidth, 'm', true)}</dd></div>
         <div><dt>Surface</dt><dd>{formatMeasure(bed.area, 'm²')}</dd></div>
         <div data-irrigated={Boolean(coverage)}>
-          <dt>Apport horaire</dt>
+          <dt>{SIMPLE_WORDS.hourlyApplication}</dt>
           <dd>{coverage ? formatIrrigationRate(coverage.totalRateMmPerHour) : 'Aucun'}{coverage ? <FigureOrigin text={coverageOrigin(coverage)} /> : null}</dd>
           {coverage ? (
             <small>{coverage.contributions.length} matériel{coverage.contributions.length > 1 ? 's' : ''}</small>

@@ -42,6 +42,7 @@ import { PlantVignette } from './plant-vignette';
 import { SpeciesLinkSuggestion } from './species-link-suggestion';
 import { linkCandidatesOf } from '@/lib/domain/onboarding/species';
 import { SpeciesStep } from './species-step';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 /**
  * La page « Coefficients culturaux » (docs/crop-water-need-contract.md,
@@ -94,9 +95,9 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
       <header className="crop-coefficients-heading">
         {species ? (
           <>
-            <h2 id="species-correspondence-title">Correspondance des espèces</h2>
+            <h2 id="species-correspondence-title">{SIMPLE_WORDS.lookalikeCrops}</h2>
             <p>
-              Rattachez chaque espèce de vos séries à une culture de référence : le besoin par culture et les alertes de gel s’en
+              Dites à quelle culture ressemble chaque espèce de vos séries : le besoin par culture et les alertes de gel s’en
               servent. Une espèce non rattachée n’a pas d’objectif proposé : son objectif saisi reste seul.
             </p>
           </>
@@ -146,7 +147,7 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
       ) : (
         <>
           <section className="crop-coefficients-part" aria-labelledby="reference-crops-title">
-            <h3 id="reference-crops-title">Cultures de référence</h3>
+            <h3 id="reference-crops-title">{SIMPLE_WORDS.cropFineSettings}</h3>
             <p>
               Touchez une culture pour voir ce qu’elle boit à chaque stade, la durée de ses stades et la profondeur de ses racines,
               et les régler pour votre ferme. Une culture inutilisable dit pourquoi.
@@ -212,11 +213,11 @@ function ReferenceCropGroups({ crops, seriesCount, children }: {
     <>
       <h4 className="reference-crop-group-title">Vos cultures cette saison ({cultivated.length})</h4>
       {cultivated.length === 0 ? (
-        <p className="crop-coefficients-empty">Aucune culture de référence ne sert à vos séries cette saison : rattachez leurs espèces dans Réglages.</p>
+        <p className="crop-coefficients-empty">Aucune de ces cultures ne sert à vos séries cette saison : dites dans Réglages à quelle culture ressemble chaque espèce.</p>
       ) : <div className="reference-crop-list">{cultivated.map(children)}</div>}
       {others.length > 0 ? (
         <details className="reference-crop-others" open={cultivated.length === 0} suppressHydrationWarning>
-          <summary>Les autres cultures de référence ({others.length})</summary>
+          <summary>Les autres cultures ({others.length})</summary>
           <div className="reference-crop-list">{others.map(children)}</div>
         </details>
       ) : null}
@@ -370,7 +371,7 @@ function CorrespondenceForm({ label, crops, current, pending, onSave, onRemove, 
   return (
     <div className="correspondence-form" role="group" aria-label={label}>
       <label>
-        <span>Culture de référence</span>
+        <span>{SIMPLE_WORDS.lookalikeCrop}</span>
         <select value={choice} onChange={(event) => setChoice(event.target.value)}>
           <option value="">— Choisir —</option>
           {SOURCES.map((source) => {
@@ -411,9 +412,9 @@ function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView,
   const toLink = view.species.filter(speciesNeedsLink).length;
   return (
     <section className="crop-coefficients-part" aria-labelledby="without-reference-title">
-      <h3 id="without-reference-title">Espèces sans culture de référence</h3>
+      <h3 id="without-reference-title">Espèces qui ne ressemblent encore à aucune culture</h3>
       {view.withoutReference.length === 0 ? (
-        <p>Toutes les espèces de la saison ont une culture de référence ou sont de l’engrais vert.</p>
+        <p>Chaque espèce de la saison ressemble à une culture, ou est de l’engrais vert.</p>
       ) : beyond.length === 0 ? (
         <p>{WITHOUT_REFERENCE_CONSEQUENCE} Ce sont les {toLink > 1 ? `${toLink} espèces` : 'espèce'} à rattacher, en tête de la liste ci-dessus.</p>
       ) : (
@@ -422,7 +423,7 @@ function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView,
             {WITHOUT_REFERENCE_CONSEQUENCE}{' '}
             {toLink > 0 ? `En plus des ${toLink > 1 ? `${toLink} espèces` : 'espèce'} à rattacher ci-dessus, ces séries suivent « sans référence » par exception :` : 'Ces séries suivent « sans référence » par exception :'}
           </p>
-          <ul className="without-reference-list" aria-label="Espèces sans culture de référence">
+          <ul className="without-reference-list" aria-label="Espèces qui ne ressemblent encore à aucune culture">
             {beyond.map((item) => (
               <li key={`${item.plantId}:${item.reason}`}>
                 <strong>{item.plantName}</strong>

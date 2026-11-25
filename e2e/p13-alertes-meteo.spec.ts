@@ -131,7 +131,7 @@ test('une alerte météo se règle, refuse un seuil non numérique, s’enregist
   // Audit final, lot D, J3 : l'évaporation dit son nom (F300) ; au téléphone, un jour replié tient
   // en une ligne, la date et ce qui s'y est passé, et s'ouvre dessous (F299) ; à l'ordinateur, une
   // ligne par jour, sans bouton.
-  await expect(page.locator('.water-summary-card').filter({ hasText: 'Évaporation de la semaine (ET0)' })).toHaveCount(1);
+  await expect(page.locator('.water-summary-card').filter({ hasText: 'Soif de la semaine' })).toHaveCount(1);
   const jours = page.locator('#weather tbody tr');
   await expect(jours).toHaveCount(7);
   if (testInfo.project.name === 'telephone') {

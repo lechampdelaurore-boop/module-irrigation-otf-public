@@ -84,7 +84,7 @@ test('besoin par culture en mots simples : titre en clair, plis « Pour les expe
   const vosCultures = section.getByRole('heading', { level: 4, name: /^Vos cultures cette saison \(\d+\)$/ });
   await expect(vosCultures).toBeVisible();
   const autres = section.locator('details.reference-crop-others');
-  await expect(autres.locator(':scope > summary')).toHaveText(/^Les autres cultures de référence \(\d+\)$/);
+  await expect(autres.locator(':scope > summary')).toHaveText(/^Les autres cultures \(\d+\)$/);
   const cultivees = Number((await vosCultures.innerText()).match(/\((\d+)\)/)![1]);
   expect(await autres.evaluate((element) => (element as HTMLDetailsElement).open), 'le pli des autres cultures fermé, sauf sans culture de la saison').toBe(cultivees === 0);
   await expect(options.locator('label.crop-water-option').filter({ hasText: 'Ombrage' })).not.toContainText('√');

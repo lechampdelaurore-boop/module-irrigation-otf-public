@@ -115,7 +115,7 @@ export async function saveHydricGoalAction(input: {
   });
   // Un objectif vaut de sa semaine jusqu'à ce qu'un autre le remplace : le plan se recalcule dès qu'il n'est pas à venir (3.7, règle 4).
   await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'objective-changed', season: input.season, at: weekStart, lasting: true });
-  return successWithDashboard(context.value, weekStart, 'L’objectif hebdomadaire a été enregistré.');
+  return successWithDashboard(context.value, weekStart, 'L’eau visée de la semaine a été enregistrée.');
 }
 
 /**
@@ -293,7 +293,7 @@ export async function removeManualRainfallAction(input: {
   const removed = await deleteManualRainfallForUser(context.value.ownerUserId, input.date);
   if (!removed) return { ok: false, message: 'Aucune mesure de pluie n’est saisie pour ce jour.' };
   await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'rain-recorded', season: input.season, at: input.date });
-  return successWithDashboard(context.value, safeWeekStart(input.weekStart) ?? weekStartDateKey(new Date()), 'La mesure de pluie a été retirée : la réanalyse reprend pour ce jour.');
+  return successWithDashboard(context.value, safeWeekStart(input.weekStart) ?? weekStartDateKey(new Date()), 'La mesure de pluie a été retirée : la pluie estimée par la météo reprend pour ce jour.');
 }
 
 export async function saveDailyWaterLimitAction(input: {

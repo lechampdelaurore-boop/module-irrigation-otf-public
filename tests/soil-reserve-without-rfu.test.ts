@@ -123,12 +123,12 @@ test('« Aujourd’hui » : « Observer le sol de … » seulement avec la RFU ;
     ['soil', 'Le sol du jardin Tunnel 1 n’a jamais été observé.', { kind: 'link', label: 'Observer le sol de Tunnel 1', page: 'sol', anchor: 'soil-garden-Tunnel 1' }],
     [
       'soil-rfu',
-      'La réserve utile (RFU) de 2 parcelles n’est pas saisie : Les Prés, Sous le verger. La réserve du sol de leurs jardins reste inconnue.',
+      'Ce que le sol de 2 parcelles retient (leur RFU) n’est pas saisi : Les Prés, Sous le verger. La réserve du sol de leurs jardins reste inconnue.',
       { kind: 'link', label: 'Renseigner la réserve de la parcelle Les Prés', page: 'sol', anchor: 'soil-parcel-z1' },
     ],
   ]);
   const one = reliabilityLines({ ...FRESH, soilGardensNeverObserved: gardens.filter((garden) => garden.withoutRfu?.zoneId === 'z1') });
-  assert.deepEqual(one.map((line) => line.text), ['La réserve utile (RFU) de la parcelle Les Prés n’est pas saisie : la réserve du sol de ses 2 jardins reste inconnue.']);
+  assert.deepEqual(one.map((line) => line.text), ['Ce que le sol de la parcelle Les Prés retient (sa RFU) n’est pas saisi : la réserve du sol de ses 2 jardins reste inconnue.']);
   const [check] = reliabilityChecks({ ...FRESH, soilGardensNeverObserved: gardens }, lines);
   assert.equal(check.summary, '1 jardin jamais observé · 2 parcelles sans RFU');
   assert.equal(soilParcelAnchor('z1'), 'soil-parcel-z1');

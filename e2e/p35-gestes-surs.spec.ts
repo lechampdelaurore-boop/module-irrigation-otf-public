@@ -124,8 +124,8 @@ async function rattacherLaCarotte(page: Page, rattacher: boolean): Promise<void>
   }
   const enregistrer = formulaire.getByRole('button', { name: 'Enregistrer' });
   await expect(async () => {
-    await formulaire.getByLabel('Culture de référence').selectOption({ value: '' });
-    await formulaire.getByLabel('Culture de référence').selectOption({ label: 'Carotte' });
+    await formulaire.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ value: '' });
+    await formulaire.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ label: 'Carotte' });
     await expect(enregistrer).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   await enregistrer.click();

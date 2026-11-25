@@ -228,7 +228,7 @@ export function rainGaugeLookbackStart(today: string): string {
   return addDaysToDateKey(today, -RAIN_GAUGE_MAX_AGE_DAYS);
 }
 
-const RAIN_GAUGE_CONSEQUENCE = 'La pluie vient de la réanalyse, qui peut s’écarter du terrain.';
+const RAIN_GAUGE_CONSEQUENCE = 'La pluie vient de l’estimation météo, qui peut s’écarter du terrain.';
 const STAGE_CONSEQUENCE = 'Le besoin proposé suit le calendrier, pas votre constat.';
 const SOIL_CONSEQUENCE = 'La jauge de la planche reste inconnue.';
 
@@ -293,7 +293,7 @@ function soilLine(bed: MissingByBedBed, soil: UnknownSoilBed): MissingLine {
     return {
       kind: 'soil',
       key,
-      text: `Réserve du sol non saisie : la réserve utile (RFU) de la parcelle ${soil.withoutRfu.zoneName} manque. ${SOIL_CONSEQUENCE}`,
+      text: `Réserve du sol non saisie : ce que le sol de la parcelle ${soil.withoutRfu.zoneName} retient (sa RFU) manque. ${SOIL_CONSEQUENCE}`,
       action: { kind: 'link', label: `Renseigner la réserve de la parcelle ${soil.withoutRfu.zoneName}`, page: 'sol', anchor: soilParcelAnchor(soil.withoutRfu.zoneId) },
     };
   }

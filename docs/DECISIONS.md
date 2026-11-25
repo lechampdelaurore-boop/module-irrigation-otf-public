@@ -10058,8 +10058,8 @@ téléphone ; la proposition elle-même n'a pas été essayée par un maraîcher
 
 ## D-328 — Simplifier l'usage du module, lot S1 : le chapeau et les mots
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (le chapeau d'une
-ligne) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
+Date : 25 novembre 2026. Statut : **PR 1 et PR 2 sur 3 codées** (le
+chapeau d'une ligne, les mots) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la roadmap,
 sur le mandat du porteur du 25 novembre 2026 (enchaîner les lots sans
 nouveau « vas-y », D-327). Les PR 2 (les mots) et 3 (un seul objectif)
@@ -10097,3 +10097,40 @@ P28 et P31c suivis. Contre-épreuve : voir la PR.
 adresse ; `?refresh=1` et son nettoyage, le bloc « Données en cache », les
 liens existants et les notifications gardent leur effet. Logiciel
 multi-fermes : la règle vaut pour toute ferme, quelle que soit sa taille.
+
+**Décision (PR 2, les mots).** Le premier niveau (titres, boutons, phrases
+d'en-tête, étiquettes des tuiles) dit les mots du tableau accepté tel quel
+par le porteur (D-327). Ils vivent en un seul endroit,
+`lib/domain/simple-words.ts`, que l'interface appelle sans recopier ; le
+mot du calcul (RFU, ET0, culture de référence, apport horaire) reste dans
+le « ? », dans le détail d'une tuile et dans les bulles « d'où vient ce
+chiffre ». Gardent leurs mots (F828) : les identifiants, les adresses,
+l'en-tête de l'export CSV, les notifications, le journal des modifications
+(le nom du réglage tel qu'enregistré) et deux erreurs techniques. Le relevé
+mot par mot et ce que chacun devient : contrat, section 9.4.
+
+**Précisions tranchées en codant** (contrat, section 9.5).
+
+- F832 : la liste des espèces s'intitule « À quelle culture ressemble
+  chaque espèce ? », le choix d'une espèce garde « … cette espèce ? ».
+- F833 : l'ET0 se dit « soif du jour », « de la semaine » ou « de la
+  période » selon la tuile ; « ET0, l'évaporation de référence » dans le
+  détail ; le tableau des jours et le suivi par série gardent « ET0 ».
+- F834 : le tableau ne nomme aucune page : les noms du menu ne changent
+  pas ; leur rangement est S3.
+- F835 : « réanalyse » et « historisé », au premier niveau, sont dits
+  « pluie estimée par la météo », « estimée », « Non enregistré » ; ils
+  restent dans les causes d'écart et les replis de diagnostic.
+- F836 : « ce qui reste » d'un arrosage arrêté, « Reprendre ce qui reste »,
+  « Annuler ce qui reste », « Un arrosage arrêté est à reprendre ».
+- F837 : « RFU » s'explique toujours à sa première occurrence d'une page
+  (F312), par le mot du tableau : « Ce que le sol de la parcelle retient
+  (sa RFU) ».
+
+**Preuve (PR 2).** `tests/simplification-s1-mots.test.ts` : le tableau des
+mots, le test de garde sur `app/` et `lib/domain/` (les endroits permis
+écrits avec leur raison, une permission devenue inutile échoue), seize
+usages pris dans le module sans recopie, l'ET0 dans le détail, l'écran de
+bienvenue et la visite guidée ; parcours P61 étendu (les mots du tableau
+lus, aucun mot du calcul visible d'emblée sur les douze pages) ; seize
+parcours relus avec les nouveaux libellés. Contre-épreuve : voir la PR.

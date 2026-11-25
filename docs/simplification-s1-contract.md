@@ -306,6 +306,72 @@ parcours) : c'est un geste utile, compté comme tel.
   se calcule côté serveur, à l'ouverture de la page ; une date illisible
   compte comme ancienne (D-003).
 
+### 9.4 PR 2 — Les mots relevés et ce qu'ils deviennent (25 novembre 2026)
+
+Le module des mots : `lib/domain/simple-words.ts` (`SIMPLE_WORDS`, règle 1),
+avec la liste des mots du calcul que cherche le test de garde
+(`TECHNICAL_WORDS`, règle 5). Relevé dans `app/` et `lib/domain/`, lignes
+hors commentaire, avant la PR (branche de la PR 1) puis après.
+
+| Mot du calcul | Avant | Devenu | Où il reste, et pourquoi |
+| --- | --- | --- | --- |
+| Objectif(s) hydrique(s), objectif hebdomadaire | 6 lignes | « Eau visée cette semaine » : titres d'« Objectifs et besoins », tuile d'« Aujourd'hui », message d'enregistrement, « 7 planches : aucune eau visée cette semaine », « Aucune eau visée n'est enregistrée sur cette période » (historique) | la bulle de la colonne, dans le détail d'une planche ; le journal des modifications ; l'en-tête de l'export CSV (F828) |
+| Reste à apporter | 1 | « Il manque encore » (tuile d'« Aujourd'hui ») | nulle part |
+| Besoins d'irrigation | 1 | « Ce qu'il reste à arroser » (titre de la section) | le nom du menu « Objectifs et besoins » ne change pas (F834) |
+| Faisabilité et répartition | 1 | « Y a-t-il assez d'eau ? » (titre de la section) | nulle part |
+| Volume mobilisable, disponibilité physique | 3 | « Eau utilisable » (surtitre de « Ressources et pompes », phrase des pompes) | nulle part |
+| Réserve utile, RFU | 2 phrases de premier niveau | « Ce que le sol de la parcelle retient (sa RFU) n'est pas saisi » : jauge, « Aujourd'hui », données manquantes | « réserve utile (RFU) » dans le « ? » de « Réserve du sol » |
+| ET0 | tuiles « Évaporation de la semaine (ET0) », « ET0 » | « Soif de la semaine », « Soif de la période » ; la ligne de résumé au téléphone dit « soif de la semaine » (F833) | « ET0, l'évaporation de référence » dans le détail de la tuile ; la colonne du tableau des jours et la mesure du suivi par série, qui sont du détail |
+| Culture(s) de référence, correspondance des espèces | 10 | « À quelle culture ressemble chaque espèce ? » (titre), « … cette espèce ? » (le choix de chaque espèce, F832), « Espèces qui ne ressemblent encore à aucune culture », « Cultures inutilisables », « Les autres cultures (32) », les phrases de « Besoin par culture » et de « Réglages » | le journal des modifications (nom du réglage tel qu'enregistré) ; deux erreurs techniques d'identifiant inconnu, jamais attendues d'un geste |
+| Coefficients culturaux, profils racinaires | titre du repli | « Réglages fins des cultures (pour les experts) » ; résumé de l'écran de bienvenue | nulle part au premier niveau |
+| Apport horaire | 1 libellé de la fiche d'une planche, 1 phrase du cumul maximal (« Matériel et placement ») | « Ce que ce matériel apporte en une heure » ; « Ce que les matériels apportent en une heure, additionnés, sur la planche qui en reçoit le plus » | la bulle « d'où vient ce chiffre » (détail) |
+| Créneaux protégés | 3 | « Heures où l'on n'arrose pas » (titre, liste, résumé du plan, visite guidée) | nulle part |
+| Reliquat, reliquats | 14 | statut « Ce qui reste d'un arrosage arrêté » ; « à reprendre » dans la phrase et les pastilles d'« Aujourd'hui » ; boutons « Reprendre ce qui reste », « Annuler ce qui reste » ; historique « la suite annulée » (F836) | « Reliquat non vérifiable » : le solde d'un bilan d'eau, dans le détail de la faisabilité, pas le reste d'un arrosage |
+| Par périmètre | 1 | « Par lieu » (onglet de l'historique) | nulle part |
+| totaux partiels | 1 | « totaux incomplets » | nulle part |
+| réanalyse, historisé | 5 au premier niveau | « pluie estimée par la météo », « estimée », « l'estimation météo », « Non enregistré » (F835) | les causes d'écart, les bulles, les replis de diagnostic et la page d'état de l'exploitant, qui sont du détail |
+| journées-planche | 1 | inchangé ici : la phrase de l'objectif de l'historique est réécrite par la PR 3 (un seul objectif) | — |
+
+Deux gardes. Le test de garde (`tests/simplification-s1-mots.test.ts`) lit
+le code : il échoue si l'un de ces mots, écrit comme un titre, reparaît hors
+des neuf endroits permis, écrits dans le test avec
+leur raison, et si une permission ne sert plus. Les titres et étiquettes du
+tableau prennent leur mot dans le module, sans le recopier (seize usages
+vérifiés). Le parcours P61 lit l'écran : sur les douze pages, replis et
+« ? » fermés, aucun de ces mots ne se lit, en majuscule ou non ; c'est lui
+qui a trouvé les phrases de « Besoin par culture », de « Réglages », de
+l'historique et l'avertissement des besoins. Dans une phrase d'un repli
+(justification d'un créneau du plan, fiabilité d'« Aujourd'hui », journal),
+le mot du calcul reste : c'est le détail. L'écran de bienvenue et la visite
+guidée sont lus avec les mêmes mots (règle 6).
+
+### 9.5 PR 2 — Précisions tranchées en codant
+
+- F832 : le titre de la liste des espèces dit « À quelle culture ressemble
+  chaque espèce ? » ; le choix d'une espèce garde la question du tableau,
+  « … cette espèce ? ». Le même mot, au nombre du sens.
+- F833 : l'ET0 se dit « soif du jour », « de la semaine » ou « de la
+  période » selon ce que la tuile compte ; « ET0, l'évaporation de
+  référence » reste dans son détail. Le tableau des jours et le suivi par
+  série, déjà du détail, gardent « ET0 ».
+- F834 : le tableau ne nomme aucun nom de page : les noms du menu ne
+  changent pas (« Objectifs et besoins », « Ressources et pompes »…) ; leur
+  rangement est S3.
+- F835 : « réanalyse » et « historisé » sont dits en mots simples là où ils
+  paraissaient au premier niveau (le message après le retrait d'une mesure
+  de pluie, la phrase du panneau de pluie, la colonne de pluie du tableau des
+  jours, la conséquence « pluviomètre absent », l'objectif initial d'un
+  arrosage) ; ils restent dans les causes d'écart et les replis de
+  diagnostic.
+- F836 : un arrosage arrêté en cours de route a « ce qui reste » ; les
+  boutons disent « Reprendre ce qui reste » et « Annuler ce qui reste », la
+  phrase d'« Aujourd'hui » « Un arrosage arrêté est à reprendre » et la
+  pastille « 1 à reprendre ».
+- F837 : « RFU » s'explique toujours à sa première occurrence d'une page
+  (F312), désormais par le mot du tableau : « Ce que le sol de la parcelle
+  retient (sa RFU) » ; « réserve utile (RFU) » reste dans le « ? » de
+  « Réserve du sol ».
+
 ## 10. Réglage du code
 
 Opus 5.5 · Élevé pour les trois PR : fonctionnalité délimitée sous contrat
