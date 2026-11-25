@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (simplifier l'usage du module, S4 : contrat de la semaine sur une page)
+
+- **Contrat du lot S4** (`docs/simplification-s4-contract.md`, D-327) : une
+  page « Semaine » réunit le planning, « Objectifs et besoins » et « Historique
+  et cumuls » en deux vues (la semaine, les cumuls) ; une phrase, trois chiffres,
+  les jours et les jardins au premier niveau, le reste derrière « Le détail ».
+  Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
+  adresses sont gardées.
+
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
