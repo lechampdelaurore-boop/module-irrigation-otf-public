@@ -535,6 +535,44 @@ aussi ces hauteurs en annotation, dans son propre état de ferme.
 
 **Numéros pris** : D-332 ; F894 à F901 ; parcours P64.
 
+### 13.2 Relevé de la PR 2
+
+**Où sont allés les champs de « Planifier » et « Déjà réalisée »** : ceux
+de la PR 1 (tableau 13.1) pour « Où ? », « Combien de temps ? » et « Plus
+d'options » ; « Date et heure de début » dans « 2. Quand ? » ; « Début
+réel » et « Fin réelle » dans « 1. De quand à quand ? », la durée lue
+dessous (« soit 30 min ») ; « Planifier l'irrigation » devient « Planifier ·
+demain à 6 h », « Enregistrer l'irrigation réalisée » devient « Enregistrer
+cet arrosage ». Pour « Déjà fait », « Plus d'options » ne range que la
+pompe et la note. L'ancien formulaire, l'encart « Résultat calculé » et sa
+règle d'attente (lot J, F462) sont retirés.
+
+**Ce qui lisait un mot de la section 6** et suit dans la PR 2 : P2, P3, P4,
+P9, P11, P26, P30, P31, P37, P38, P57, P62, P63 ; le test du lot J
+(`tests/audit-ergonomie-2026-11-19-lot-j.test.ts`), celui de l'Historique ;
+`help.ts`, `tours.ts`, `plus-sheet.ts`, `items.ts` (l'Historique et la
+colonne « Mode » de l'export disent « Arroser maintenant » et « Déjà
+fait »). **Reste pour la PR 3** : « Fait comme prévu » (P31, tests du lot 3,
+de S2 et des liens).
+
+**Mesures, même ferme neuve, même script, deux matériels posés** (la base
+e027002 contre la PR 2) :
+
+| | Avant | PR 2 |
+| --- | --- | --- |
+| Hauteur des onglets, téléphone 390 px | 206 px | 54 px |
+| id., ordinateur | 72 px | 72 px |
+| Haut du premier bloc des trois onglets, téléphone | 603 px (« Matériel ») | 451 px (« 1. Où ? » ; « 1. De quand à quand ? » pour « Déjà fait ») |
+| id., ordinateur | 437 px | 457 px |
+| « Planifier » d'un matériel neuf, sans dose du jour, d'aucun matériel choisi à « planifié » | une liste déroulante (2 touches au téléphone), « Durée d'irrigation », la date, « Planifier l'irrigation » | la case ronde (ou rien, s'il est seul), la date, « + », « Planifier · … » |
+
+Le premier bloc remonte de 152 px au téléphone, pas encore sous 400 px :
+le bandeau, les compteurs et l'ordre de la page sont le travail de la PR 3.
+À l'ordinateur, le titre du bloc et la marge du formulaire le descendent de
+20 px, sans changer ce qui se voit sans défiler.
+
+**Numéros pris** : D-333 ; F902 à F907 ; parcours P65.
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Élevé** pour les trois PR (ligne 33 de la roadmap, quatrième cas de
