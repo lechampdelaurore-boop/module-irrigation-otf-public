@@ -24,14 +24,14 @@ test('la vue par série montre chaque culture avec ses cumuls, met les séries �
   // L'irrigation se saisit sur la page des arrosages, les cumuls se lisent sur
   // celle de l'historique (3.8).
   await attendreLaPageIrrigation(page, 'arrosages');
-  await page.getByRole('tab', { name: /^Déjà réalisée/ }).click();
+  await page.getByRole('tab', { name: /^Déjà fait/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   // Finie à la minute précédente, pour que l'export de la semaine en cours la
   // compte quelle que soit l'heure (docs/browser-journeys-contract.md,
   // « Reproductibilité », point ouvert 49).
   await page.getByLabel('Début réel').fill(horodatageLocal(-61, reference));
   await page.getByLabel('Fin réelle').fill(horodatageLocal(-1, reference));
-  await soumettreIrrigation(page, 'Enregistrer l’irrigation réalisée', 'parcours séries');
+  await soumettreIrrigation(page, /^Enregistrer l’arrosage de /, 'parcours séries');
   await attendreLaPageIrrigation(page, 'historique');
 
   const historique = page.locator('.irrigation-history-dashboard');

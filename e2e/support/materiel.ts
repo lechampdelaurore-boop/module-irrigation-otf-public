@@ -111,7 +111,9 @@ export async function choisirMaterielEtReglage(page: Page, materiel: string, reg
     const reglages = page.locator('.watering-setting select');
     if ((await reglages.count()) > 0) await reglages.selectOption({ label: reglage });
     // Sans dose du jour, aucune durée n'est choisie : le parcours tape la quantité, en mm, dans « Plus d'options ».
-    if (quantite !== '' && (await page.getByRole('button', { name: /^Conseillé/, pressed: true }).count()) === 0) await saisirEnMillimetres(page, quantite);
+    // « Déjà fait » n'en a pas : sa durée se lit des dates (S5, section 4).
+    const dejaFait = (await page.locator('.watering-now[data-kind="completed"]').count()) > 0;
+    if (!dejaFait && quantite !== '' && (await page.getByRole('button', { name: /^Conseillé/, pressed: true }).count()) === 0) await saisirEnMillimetres(page, quantite);
     return;
   }
   await page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) }).selectOption({ label: materiel });
@@ -147,7 +149,7 @@ export async function choisirOuArroser(page: Page, materiel: string): Promise<vo
   await formulaire.locator('.watering-where-select select').selectOption(valeur);
 }
 
-/** Ouvre « Plus d'options » d'« Arroser maintenant », s'il est fermé. */
+/** Ouvre « Plus d'options » du formulaire d'« Arrosages », s'il est fermé. */
 export async function ouvrirPlusDOptions(page: Page): Promise<Locator> {
   const pli = page.getByRole('button', { name: /^Plus d’options/ });
   if ((await pli.getAttribute('aria-expanded')) !== 'true') await pli.click();
@@ -200,6 +202,8 @@ export function horodatageLocal(decalageMinutes: number, reference: number): str
  * soumission-ci (docs/browser-journeys-contract.md).
  */
 export async function soumettreIrrigation(page: Page, intitule: string | RegExp, note: string): Promise<void> {
+  // La note est rangée dans « Plus d'options » (simplification S5, sections 3.4 et 4).
+  if (await page.locator('.watering-now').isVisible()) await ouvrirPlusDOptions(page);
   const champNote = page.getByLabel('Note (facultatif)');
   await champNote.fill(note);
   const bouton = page.getByRole('button', { name: intitule });

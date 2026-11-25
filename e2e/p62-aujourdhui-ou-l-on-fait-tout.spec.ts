@@ -109,8 +109,8 @@ test('une irrigation planifiée : « Démarrer » seul, le reste dans « Autres 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage, '5');
   await page.getByLabel('Date et heure de début').fill(debut);
-  await page.getByRole('button', { name: 'Planifier l’irrigation' }).click();
-  await expect(page.locator('.irrigation-preview .action-reply .irrigation-event-notice')).toHaveText(/planifiée/);
+  await page.getByRole('button', { name: /^Planifier l’arrosage de / }).click();
+  await expect(page.locator('.watering-start .action-reply .irrigation-event-notice')).toHaveText(/planifiée/);
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   const carte = cartes(page, materiel, 'planned');
@@ -288,7 +288,7 @@ test('un arrosage à rattraper : la question, « C’est fait » confirmé, « N
   for (const heures of [12, 9, 6]) {
     await choisirMaterielEtReglage(page, materiel, reglage, '5');
     await page.getByLabel('Date et heure de début').fill(horodatageLocal(-heures * 60, reference));
-    await soumettreIrrigation(page, 'Planifier l’irrigation', 'p62 à rattraper');
+    await soumettreIrrigation(page, /^Planifier l’arrosage de /, 'p62 à rattraper');
   }
 
   await attendreLaPageIrrigation(page, 'aujourdhui');

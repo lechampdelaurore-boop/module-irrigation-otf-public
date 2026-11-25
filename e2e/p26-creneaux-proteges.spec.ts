@@ -102,7 +102,7 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
   await attendreLaPageIrrigation(page, 'arrosages');
   await ouvrirPlanifier(page, materiel, reglage, horodatageLocal(DECALAGE_DE_L_ARROSAGE_MIN, reference));
   await expect(page.locator('.irrigation-preview-warning')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Planifier l’irrigation' }).click();
+  await page.getByRole('button', { name: /^Planifier l’arrosage de / }).click();
   const aVenir = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
   await expect(aVenir).toHaveCount(1, { timeout: 15_000 });
   await verifierLEtape(page, journal, 'arrosage planifié à la main');
@@ -124,7 +124,7 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
   await attendreLaPageIrrigation(page, 'arrosages');
   await ouvrirPlanifier(page, materiel, reglage, horodatageLocal(DECALAGE_DE_L_ARROSAGE_MIN + 60, reference));
   await expect(page.locator('.irrigation-preview-warning')).toContainText('Cet arrosage tombe dans le créneau protégé « Lavage des légumes » : le planning n’y propose jamais d’arrosage. Vous pouvez l’enregistrer quand même.');
-  await expect(page.getByRole('button', { name: 'Planifier l’irrigation' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Planifier l’arrosage de / })).toBeEnabled();
   await verifierLEtape(page, journal, 'avertissement du geste manuel');
 
   await attendreLaPageIrrigation(page, 'planning');
@@ -225,7 +225,7 @@ async function ouvrirPlanifier(page: Page, materiel: string, reglage: string, de
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Date et heure de début').fill(debut);
-  await expect(page.getByRole('button', { name: 'Planifier l’irrigation' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Planifier l’arrosage de / })).toBeEnabled();
 }
 
 /** Les irrigations à venir de la ligne du parcours, annulées une à une avec leur confirmation. */

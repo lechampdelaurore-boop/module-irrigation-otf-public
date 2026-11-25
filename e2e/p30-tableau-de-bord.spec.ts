@@ -321,7 +321,7 @@ test('« Tout est fait » : la confirmation liste l’irrigation passée, « Ann
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(-6 * 60, reference));
-  await soumettreIrrigation(page, 'Planifier l’irrigation', 'arrosée sans le chrono');
+  await soumettreIrrigation(page, /^Planifier l’arrosage de /, 'arrosée sans le chrono');
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(toutEstFait).toHaveAccessibleName('Tout est fait (1)');

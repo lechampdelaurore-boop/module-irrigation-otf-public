@@ -21,34 +21,46 @@ test('une irrigation passée se saisit, et une fin antérieure au début est ref
   // Les irrigations se saisissent sur la page des arrosages (3.8).
   await attendreLaPageIrrigation(page, 'arrosages');
 
-  await page.getByRole('tab', { name: /^Déjà réalisée/ }).click();
+  await page.getByRole('tab', { name: /^Déjà fait/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
 
-  const enregistrer = page.getByRole('button', { name: 'Enregistrer l’irrigation réalisée' });
-  const volumeEstime = page.locator('.irrigation-preview dl > div').filter({ hasText: 'Volume estimé' }).locator('dd');
+  const enregistrer = page.getByRole('button', { name: /^Enregistrer l’arrosage de / });
+  // « Déjà fait » : « De quand à quand ? » d'abord, la durée tirée des dates dessous (S5, section 4).
+  const duree = page.locator('.watering-now .watering-duration-result');
+  const resultat = page.locator('.watering-now .watering-result');
+  const manque = page.locator('.watering-missing');
+  await expect(page.getByRole('heading', { name: '1. De quand à quand ?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '2. Où ?' })).toBeVisible();
 
   // D'abord le cas refusé : une fin placée avant le début. L'écran ne laisse
   // même pas soumettre, ce qui vaut mieux qu'un message après coup.
   await page.getByLabel('Début réel').fill(horodatageLocal(-60, reference));
   await page.getByLabel('Fin réelle').fill(horodatageLocal(-120, reference));
   await expect(enregistrer).toBeDisabled();
-  // Sans durée lisible, le volume est inconnu, jamais « 0 L » (D-003, point
-  // ouvert 45).
-  await expect(volumeEstime).toHaveText('Inconnu — vérifiez le début et la fin');
+  // Sans durée lisible, rien ne se chiffre, jamais « 0 L » (D-003, point
+  // ouvert 45) : la durée est « — », la ligne sous le bouton dit quoi faire.
+  await expect(duree).toHaveText('soit —');
+  await expect(resultat).toHaveCount(0);
+  await expect(manque).toHaveText('Choisissez une fin après le début.');
   await verifierLEtape(page, journal, 'fin antérieure au début refusée');
 
   // Un début vidé, comme pendant la frappe au clavier d'une date, ne ferme
   // pas la page : l'aperçu retombe sur maintenant (point ouvert 44).
   await page.getByLabel('Début réel').fill('');
   await expect(enregistrer).toBeDisabled();
-  await expect(volumeEstime).toHaveText('Inconnu — vérifiez le début et la fin');
+  await expect(duree).toHaveText('soit —');
+  await expect(resultat).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1, name: 'Arrosages' })).toBeVisible();
   await page.getByLabel('Début réel').fill(horodatageLocal(-60, reference));
   await verifierLEtape(page, journal, 'début vidé sans fermer la page');
 
   // Puis la saisie correcte : une demi-heure d'irrigation, terminée il y a une demi-heure.
   await page.getByLabel('Fin réelle').fill(horodatageLocal(-30, reference));
-  await soumettreIrrigation(page, 'Enregistrer l’irrigation réalisée', 'parcours saisie');
+  // La phrase dit ce qui s'enregistrera : la durée tirée des dates, les mm et les litres.
+  await expect(duree).toHaveText(/^soit 30 min/);
+  await expect(resultat.first()).toHaveText(/^Soit \S+ mm sur la planche, et \S+ L\.$/);
+  await expect(enregistrer).toHaveText('Enregistrer cet arrosage');
+  await soumettreIrrigation(page, /^Enregistrer l’arrosage de /, 'parcours saisie');
 
   // Une irrigation passée est archivée d'emblée, elle ne passe jamais « en cours ».
   await expect(page.getByLabel('Irrigations en cours').filter({ hasText: materiel })).toHaveCount(0);
