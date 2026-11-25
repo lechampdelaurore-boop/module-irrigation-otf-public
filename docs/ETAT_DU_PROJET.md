@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 24 novembre 2026.
+Dernière mise à jour : 25 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -47,6 +47,23 @@ registres, elle y renvoie.
   ligne à 23 h 37** (run 45498654145, les cinq jobs verts ; aucune
   migration : « No migrations to apply » en production et sur la
   démonstration).
+- **Lenteur du module : N3, l'espace lu une fois par requête, codée le
+  24 novembre 2026** (D-325, F810 à F816, contrat de la tranche 4, section
+  5 sexies ; roadmap section 6 duodecies), en Opus 5.5 · Max, le réglage de
+  la roadmap (résolution de l'espace d'une ferme, donc isolation). Pendant
+  une requête, l'espace d'une personne et d'une ferme, le choix des
+  fonctionnalités, l'accueil et la préférence météo ne se lisent qu'une
+  fois, au lieu d'une fois par service qui les demande ; la mémoire naît et
+  meurt avec la requête (`cacheForRequest` de vinext), rangée par la
+  personne et la ferme ensemble, vidée par toute écriture ; l'absence d'un
+  espace n'est jamais gardée. Mesuré en local après N1, 20 ms ajoutées à
+  chaque lecture : « Aujourd'hui » passe de 176 à 98 lectures de la base et
+  de 1,25 s à 0,72 s à l'ouverture ; les treize pages du menu, de 894 à 460
+  lectures. Nouveau test rejoué dans les quatre passages d'isolation,
+  éprouvé en cassant le code exprès. Le temps gagné en ligne reste à
+  mesurer sur le téléphone du porteur, avec son accord. Contrôles : voir la
+  PR.
+
 - **Lenteur du module : N1, le menu sans rechargement, codée le
   24 novembre 2026** (D-322, roadmap section 6 duodecies,
   `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
