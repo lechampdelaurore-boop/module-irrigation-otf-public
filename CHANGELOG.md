@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
+
+- **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
+  décision du porteur du 25 novembre 2026) : l'objectif d'une période, par
+  lieu comme par série, est la moyenne sur les seules planches qui ont un
+  objectif, et la carte « Objectif » dit combien en ont un (« 7 planches sur
+  10 ont un objectif ») ; les planches sans objectif n'y comptent plus pour
+  zéro. La semaine en cours dit le même chiffre qu'« Aujourd'hui » : sur la
+  démonstration, la Ferme des Trois Noues passe de 16,5 à 23,4 mm au début
+  de l'été. L'écart compare cet objectif à l'eau reçue par ces mêmes
+  planches, et la carte le dit (« Eau reçue par ces 7 planches : 12,4 mm »).
+  Quand chaque planche a un objectif, rien ne change. L'export CSV garde ses
+  colonnes.
+
 ### Modifié (simplifier l'usage du module, S1, PR 3 : un seul objectif)
 
 - **« Objectifs et besoins » dit le même objectif qu'« Aujourd'hui »**
@@ -53,6 +67,12 @@ source détaillée commit par commit.
   fait, à la place de la barre du bas à quatre entrées et de « Plus ». Rien
   n'est codé : aucune page ne change encore, aucune adresse non plus.
   Contrat : `docs/simplification-s3-contract.md`.
+
+- **Contrat du lot S2 écrit** (« Aujourd'hui » où l'on fait tout) : un seul
+  bouton qui change de nom sur la carte (Valider, Démarrer, Terminer),
+  l'arrosage à rattraper (« Je le fais maintenant » ou « C'est fait »), la
+  pluie notée d'un geste, la page à l'essentiel. Rien n'est codé : aucune page
+  ne change encore. Contrat : `docs/simplification-s2-contract.md`.
 
 - **Six lots de simplification retenus, contrat du lot S1 écrit** (D-327) :
   trois endroits, valider-démarrer-terminer depuis la carte d'« Aujourd'hui »,

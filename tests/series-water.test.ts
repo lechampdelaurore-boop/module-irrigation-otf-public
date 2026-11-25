@@ -198,6 +198,42 @@ test('un objectif posé après l’implantation se somme sur les jours qu’il c
   assert.equal(choux.gapToObjectiveMm, 32, 'objectif 32 − irrigation 0 − pluie 0');
 });
 
+test('une série dont une partie des planches a un objectif : l’objectif et l’écart se chiffrent sur elles, les autres sont dites (D-329)', () => {
+  // Salades plantées W36 (31 août) sur N01 (22,5 m², plein champ) et T01 (12 m², sous tunnel), observées 30 jours ;
+  // seule T01 a un objectif, 14 mm par semaine : 14 × 30 / 7 = 60 mm.
+  const cropPlan = plan({
+    series: [series('salades', 'Salades', ['2026-W44'])],
+    places: [{ id: 'p1', seriesId: 'salades', bedId: 'bed-n01', lengthMeters: 30 }, { id: 'p2', seriesId: 'salades', bedId: 'bed-t01', lengthMeters: 16 }],
+    implantationTasks: [sowing('salades', '2026-W36')],
+  });
+  const tunnelGoal: GoalRevisionLike = {
+    id: 'goal-t01', weekStart: '2026-08-31', scopeType: 'bed', otfZoneId: 'zone', otfPlotId: 'plot-tunnel', otfBedId: 'bed-t01',
+    amountMm: 14, action: 'set', createdAt: '2026-08-31T00:00:00Z',
+  };
+  const events = [irrigation('a', '2026-09-10T06:00:00Z', [{ bedId: 'bed-t01', mm: 10, area: 12 }, { bedId: 'bed-n01', mm: 10 }])];
+  const weather = days('2026-08-31', '2026-09-29', 1);
+  const [salades] = buildSeriesWaterReport({ cropPlan, beds, plots, events, weather, goalRevisions: [tunnelGoal], today: TODAY }).series;
+  assert.equal(salades.objectiveMm, 60, 'la moyenne sur T01 seule ; 60 × 12 / 34,5 ≈ 20,9 mm avant, N01 comptée à zéro');
+  assert.deepEqual(salades.objectiveBeds, { withObjective: 1, total: 2 });
+  // Les cumuls de la série restent ceux de ses deux planches ; l'écart compare l'objectif à l'eau de T01 : 10 mm, 0 de pluie sous tunnel.
+  assert.equal(salades.irrigationMm, 10);
+  assert.ok(salades.rainMm !== null && Math.abs(salades.rainMm - 30 * 22.5 / 34.5) < 1e-9, 'la pluie de la série, au prorata du plein champ');
+  assert.equal(salades.irrigationAndRainMm, 10);
+  assert.equal(salades.gapToObjectiveMm, 50);
+
+  // Sans la pluie de la période : la série n'a pas sa pluie, mais l'écart de T01, sous tunnel, se chiffre.
+  const [withoutRain] = buildSeriesWaterReport({ cropPlan, beds, plots, events, weather: [], goalRevisions: [tunnelGoal], today: TODAY }).series;
+  assert.equal(withoutRain.rainMm, null);
+  assert.equal(withoutRain.gapToObjectiveMm, 50);
+
+  // « Toute la ferme » 14 mm : les deux planches ont un objectif, rien ne change, l'eau de toute la série.
+  const [all] = buildSeriesWaterReport({ cropPlan, beds, plots, events, weather, goalRevisions: [farmGoal(14, '2026-08-31')], today: TODAY }).series;
+  assert.equal(all.objectiveMm, 60);
+  assert.deepEqual(all.objectiveBeds, { withObjective: 2, total: 2 });
+  assert.ok(all.irrigationAndRainMm !== null && Math.abs(all.irrigationAndRainMm - (10 + 30 * 22.5 / 34.5)) < 1e-9);
+  assert.ok(all.gapToObjectiveMm !== null && Math.abs(all.gapToObjectiveMm - (60 - 10 - 30 * 22.5 / 34.5)) < 1e-9);
+});
+
 test('les séries à venir sont à part sans cumul, les séries en bloc et sans implantation comptées sans ligne', () => {
   const cropPlan = plan({
     series: [

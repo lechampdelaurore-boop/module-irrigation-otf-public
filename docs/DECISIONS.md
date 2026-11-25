@@ -10059,8 +10059,8 @@ téléphone ; la proposition elle-même n'a pas été essayée par un maraîcher
 ## D-328 — Simplifier l'usage du module, lot S1 : le chapeau et les mots
 
 Date : 25 novembre 2026. Statut : **PR 1, PR 2 et PR 3 sur 3 codées** (le
-chapeau d'une ligne, les mots, un seul objectif ; l'Historique suit par une
-PR 3 bis, D-329) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
+chapeau d'une ligne, les mots, un seul objectif ; l'Historique suit par la
+PR 3 bis, codée le même jour, D-329) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la roadmap,
 sur le mandat du porteur du 25 novembre 2026 (enchaîner les lots sans
 nouveau « vas-y », D-327). Les PR 2 (les mots) et 3 (un seul objectif)
@@ -10173,7 +10173,9 @@ Parcours P61 étendu. Contre-épreuve : voir la PR.
 
 Date : 25 novembre 2026, 13 h 35. **Décision du porteur** (« ok pour
 l'historique »), sur la question posée par la PR 3 du lot S1 (D-328), avec
-l'option recommandée. Elle remplace D-036 sur un point : l'objectif d'une
+l'option recommandée. Statut : **codée le 25 novembre 2026 par la PR 3 bis
+du lot S1**, en Opus 5.5 · Max (contrat `docs/simplification-s1-contract.md`,
+sections 5 bis et 9.7). Elle remplace D-036 sur un point : l'objectif d'une
 période ne compte plus à zéro les planches sans objectif. Comme
 « Aujourd'hui », il est la moyenne pondérée par la surface sur les seules
 planches qui ont un objectif sur la période, et la page dit combien n'en
@@ -10191,3 +10193,33 @@ période) : une PR à part, la PR 3 bis du lot S1, en Opus 5.5 · Max (contrat,
 section 10), dans un fil à part, après la PR 3. L'écart d'une période se
 redéfinit avec elle sur le même périmètre ; la PR 3 bis l'écrit avant le
 code.
+
+**Décision (PR 3 bis).** L'objectif d'une période, dans la vue « Par
+lieu » comme dans la vue « Par série », est la moyenne pondérée par la
+surface sur les seules planches qui ont un objectif sur la période, par la
+fonction unique de la PR 3 (`farmObjective`) ; une planche en a un dès
+qu'un de ses jours en a un, même de 0 mm. L'écart reste « objectif moins
+irrigation et pluie réelles » ; quand une partie seulement des planches a
+un objectif, cette eau est celle de ces seules planches, comme
+« Aujourd'hui » chiffre l'eau reçue (F280) ; quand toutes en ont un, il
+est celui d'avant. Sous la carte « Objectif » : « 7 planches sur 10 ont un
+objectif », puis « objectif posé sur 40/49 journées-planche » quand des
+jours leur manquent ; sous l'écart, « Eau reçue par ces 7 planches :
+12,4 mm » ; la phrase « … comptées à 0 » (F444) disparaît. L'export CSV
+garde ses colonnes : « Irrigation + pluie réelle » est l'eau que l'écart
+compare. Les cumuls du périmètre (volume, apport, surface, pluie, soif) ne
+changent pas.
+
+**Preuve (PR 3 bis).** `tests/simplification-s1-historique.test.ts` : deux
+fermes (chaque planche avec un objectif, 17,5 mm et un écart de 2,5 mm
+comme avant ; une partie seulement, 28,5 mm au lieu de 5,7 et l'écart de
+16,5 mm sur l'eau de la serre), les jours manquants, le retrait, le zéro,
+deux semaines, une semaine égale à « Aujourd'hui » sur onze cas (objectifs
+posés en cours de semaine, retirés, automatiques) à trois niveaux, l'export
+CSV ; la vue « Par série » dans `tests/series-water.test.ts`.
+`tests/db/simplification-s1-historique.test.ts` : Alice et Bob, l'Historique,
+« Objectifs et besoins » et « Aujourd'hui » lus ensemble, les quatre
+passages d'isolation. `tests/db/simplification-s1-historique-demo.test.ts` :
+chaque ferme de démonstration à chaque moment (la Ferme des Trois Noues au
+début de l'été : 23,4 mm, 7 planches sur 10). Parcours P61 étendu.
+Contre-épreuve : treize altérations, chacune prise par au moins un test.

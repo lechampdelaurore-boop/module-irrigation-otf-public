@@ -25,6 +25,31 @@ registres, elle y renvoie.
   change ; aucun calcul ; aucune question agronomique. Écart voulu avec la
   maquette : les fiches n'ont pas encore de chiffres d'état (S6). PR de
   contrat seule : **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S2 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s2-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. « Aujourd'hui » où l'on fait tout : un bouton
+  qui change de nom sur la carte (Valider, Démarrer, Terminer), l'arrosage
+  « à rattraper » (deux boutons, parce que le module ne sait pas s'il a été
+  fait : « Je le fais maintenant » ou « C'est fait »), la pluie notée d'un
+  geste, la page à l'essentiel (un pli « Le détail », rien de retiré) ;
+  cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
+  une action existante : aucune règle ne change. PR de contrat seule :
+  **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
+  l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
+  décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat
+  S1, sections 5 bis et 9.7 ; roadmap section 6 terdecies, ligne 33), en
+  Opus 5.5 · Max. L'objectif d'une période, par lieu comme par série, est
+  la moyenne sur les seules planches qui en ont un (`farmObjective`), et la
+  carte « Objectif » dit combien en ont un ; l'écart compare cet objectif à
+  l'eau de ces mêmes planches ; quand chaque planche a un objectif, rien ne
+  change. Sur la démonstration, la Ferme des Trois Noues passe de 16,5 à
+  23,4 mm au début de l'été, le chiffre d'« Aujourd'hui ». Tests à deux
+  fermes, démonstration rejouée, parcours P61 étendu, contre-épreuve
+  (13 altérations sur 13 prises). Le code du lot S1 est fini. Contrôles :
+  voir la PR. **La PR 2 (les mots) est en ligne** (#212, fusionnée le
+  25 novembre 2026 à 15 h 51, déployée à 16 h 26, run 45638614621 vérifié
+  job par job : les cinq jobs verts).
 - **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
   le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
   33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm

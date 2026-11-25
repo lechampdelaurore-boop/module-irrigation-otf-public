@@ -12,6 +12,7 @@ import { addDaysToDateKey, localDateStartUtc } from '../water-management.ts';
 import { isIgnoredSeries, resolveSeriesOccupation, type SeriesOccupation } from './occupation.ts';
 import { compareNamesNaturally } from '../bed-order.ts';
 import type { AutomaticObjectiveDayValues } from '../automatic-objective.ts';
+import { farmObjective, farmObjectivePartial } from '../farm-objective.ts';
 
 /**
  * Les cumuls d'eau par série (docs/series-contract.md, « L'attribution des
@@ -54,6 +55,12 @@ type SeriesWaterSummary = {
   rainAvailability: HistoryAvailability;
   objectiveMm: number | null;
   objectiveAvailability: { availableBedDays: number; totalBedDays: number; complete: boolean };
+  /**
+   * Les planches de la série qui ont un objectif sur sa période, sur toutes
+   * (D-329, docs/simplification-s1-contract.md, section 5 bis) : l'objectif
+   * et l'écart se chiffrent sur elles, les autres sont dites.
+   */
+  objectiveBeds: { withObjective: number; total: number };
   /**
    * Présent quand la ferme a allumé l'objectif automatique (D-309, D-317) :
    * les journées-planche observées qu'il a remplies, et celles où il
@@ -159,6 +166,7 @@ function summarizeSeries(
       irrigationMm: null, irrigationCubicMeters: 0, irrigationVolumeIncomplete: false,
       rainMm: null, rainAvailability: none,
       objectiveMm: null, objectiveAvailability: { availableBedDays: 0, totalBedDays: 0, complete: false },
+      objectiveBeds: { withObjective: 0, total: places.length },
       objectiveRemainingMm: null,
       irrigationAndRainMm: null, gapToObjectiveMm: null,
       et0Mm: null, et0Availability: none,
@@ -170,24 +178,18 @@ function summarizeSeries(
   const observed = periodBetween(occupation.startDate, endDate);
   const weather = aggregateObservedWeather(input.weather, observed);
 
-  let totalArea: number | null = 0;
-  let millimeterSquareMeters = 0;
-  let rainMillimeterSquareMeters = 0;
-  let objectiveMillimeterSquareMeters = 0;
   let cubicMeters = 0;
   let volumeIncomplete = false;
   let availableBedDays = 0;
   let totalBedDays = 0;
   let automaticBedDays = 0;
   let automaticMissingBedDays = 0;
-  let allSheltered = places.length > 0;
-  let rainUnknown = false;
+  const received: ReceivedOnBed[] = [];
 
   const beds = places.map(({ place, bed, plot }) => {
     const sheltered = plot?.mode === 'greenhouse';
     // Un jardin à classer (4.4, F583) : on ne sait pas s'il reçoit la pluie.
     const unclassified = plot?.mode === 'unclassified';
-    if (!sheltered) allSheltered = false;
     const area = placeArea(place.lengthMeters, bed);
     const irrigation = irrigationOnBed(input.events, bed, place.lengthMeters, observed);
     const objective = aggregateHydricObjective(input.goalRevisions, [bed], observed, input.automaticObjective);
@@ -195,7 +197,6 @@ function summarizeSeries(
     // la réanalyse — et seulement quand tous les jours sont là : une somme
     // partielle affichée comme un total tromperait (recette du 29 septembre 2026).
     const rainMm = sheltered ? 0 : unclassified ? null : weather.actualRainAvailability.complete ? weather.actualRainMm : null;
-    if (unclassified) rainUnknown = true;
 
     cubicMeters += irrigation.cubicMeters ?? 0;
     if (irrigation.cubicMeters === null) volumeIncomplete = true;
@@ -203,16 +204,7 @@ function summarizeSeries(
     totalBedDays += objective.objectiveAvailability.totalBedDays;
     automaticBedDays += objective.objectiveAutomatic?.bedDays ?? 0;
     automaticMissingBedDays += objective.objectiveAutomatic?.missingBedDays ?? 0;
-    if (area === null || totalArea === null) {
-      totalArea = null;
-    } else {
-      totalArea += area;
-      millimeterSquareMeters += irrigation.mm * area;
-      rainMillimeterSquareMeters += (rainMm ?? 0) * area;
-      // Une planche sans aucune journée couverte n'avait pas de cible : zéro,
-      // pas une donnée manquante (D-036).
-      objectiveMillimeterSquareMeters += (objective.objectiveMm ?? 0) * area;
-    }
+    received.push({ area, irrigationMm: irrigation.mm, rainMm, sheltered, unclassified, objectiveMm: objective.objectiveMm });
     return {
       bedId: bed.id, bedName: bed.name, plotName: plot?.name ?? '—', sheltered,
       lengthMeters: place.lengthMeters, areaSquareMeters: area,
@@ -221,34 +213,88 @@ function summarizeSeries(
     };
   });
 
-  const rainComplete = !rainUnknown && (allSheltered || weather.actualRainAvailability.complete);
-  const weighted = (value: number) => (totalArea !== null && totalArea > 0 ? value / totalArea : null);
-  const irrigationMm = weighted(millimeterSquareMeters);
-  const rainMm = rainComplete ? weighted(rainMillimeterSquareMeters) : null;
-  const objectiveMm = availableBedDays > 0 ? weighted(objectiveMillimeterSquareMeters) : null;
-  const irrigationAndRainMm = irrigationMm !== null && rainMm !== null ? irrigationMm + rainMm : null;
+  const water = receivedWater(received, weather.actualRainAvailability.complete);
+  // L'objectif de la série : la moyenne pondérée par la surface occupée, sur les seules
+  // planches qui ont un objectif sur sa période, comme « Aujourd'hui » (D-329) ; une planche
+  // sans aucun jour couvert est dite, jamais comptée à zéro. Une surface inconnue : pas de
+  // moyenne (D-003).
+  const seriesObjective = farmObjective(received.map((row) => ({ areaSquareMeters: row.area ?? 0, objectiveMm: row.objectiveMm })));
+  const objectiveMm = water.areaSquareMeters === null ? null : seriesObjective.objectiveMm;
+  // L'écart se chiffre sur les mêmes planches que l'objectif (D-329, règle 3).
+  const gapWater = farmObjectivePartial(seriesObjective)
+    ? receivedWater(received.filter((row) => row.objectiveMm !== null), weather.actualRainAvailability.complete)
+    : water;
+  const irrigationAndRainMm = gapWater.irrigationMm !== null && gapWater.rainMm !== null ? gapWater.irrigationMm + gapWater.rainMm : null;
   const gapToObjectiveMm = objectiveMm !== null && irrigationAndRainMm !== null ? objectiveMm - irrigationAndRainMm : null;
 
   return {
     ...base,
     observedPeriod: { startDate: observed.startDate, endDate: observed.endDate },
     beds,
-    areaSquareMeters: totalArea,
-    irrigationMm,
+    areaSquareMeters: water.areaSquareMeters,
+    irrigationMm: water.irrigationMm,
     irrigationCubicMeters: cubicMeters,
     irrigationVolumeIncomplete: volumeIncomplete,
-    rainMm,
-    rainAvailability: allSheltered
+    rainMm: water.rainMm,
+    rainAvailability: water.allSheltered
       ? { availableDays: weather.actualRainAvailability.totalDays, totalDays: weather.actualRainAvailability.totalDays, complete: true }
       : weather.actualRainAvailability,
     objectiveMm,
     objectiveAvailability: { availableBedDays, totalBedDays, complete: totalBedDays > 0 && availableBedDays === totalBedDays },
+    objectiveBeds: { withObjective: seriesObjective.withObjective, total: seriesObjective.total },
     ...(input.automaticObjective === undefined ? {} : { objectiveAutomatic: { bedDays: automaticBedDays, missingBedDays: automaticMissingBedDays } }),
     objectiveRemainingMm: remainingObjective(occupation, places, input),
     irrigationAndRainMm,
     gapToObjectiveMm,
     et0Mm: weather.et0Mm,
     et0Availability: weather.et0Availability,
+  };
+}
+
+/** Ce qu'une planche de la série a reçu sur sa période, et son objectif. */
+type ReceivedOnBed = {
+  /** Surface occupée ; `null` : inconnue. */
+  area: number | null;
+  irrigationMm: number;
+  /** `null` : inconnue (jardin à classer, ou pluie réelle incomplète en plein champ). */
+  rainMm: number | null;
+  sheltered: boolean;
+  unclassified: boolean;
+  objectiveMm: number | null;
+};
+
+/**
+ * L'eau reçue par des planches de la série, pondérée par la surface occupée,
+ * Σ(mm × m²) / Σ(m²) : toutes ses planches pour ses cumuls, les seules
+ * planches de l'objectif pour l'écart (D-329). Une surface inconnue : pas de
+ * moyenne ; la pluie est inconnue dès qu'un jardin est à classer, ou qu'elle
+ * manque un jour sur une planche de plein champ.
+ */
+function receivedWater(rows: readonly ReceivedOnBed[], weatherComplete: boolean) {
+  let areaSquareMeters: number | null = 0;
+  let millimeterSquareMeters = 0;
+  let rainMillimeterSquareMeters = 0;
+  let allSheltered = rows.length > 0;
+  let rainUnknown = false;
+  for (const row of rows) {
+    if (!row.sheltered) allSheltered = false;
+    if (row.unclassified) rainUnknown = true;
+    if (row.area === null || areaSquareMeters === null) {
+      areaSquareMeters = null;
+      continue;
+    }
+    areaSquareMeters += row.area;
+    millimeterSquareMeters += row.irrigationMm * row.area;
+    rainMillimeterSquareMeters += (row.rainMm ?? 0) * row.area;
+  }
+  const area = areaSquareMeters;
+  const weighted = (value: number) => (area !== null && area > 0 ? value / area : null);
+  const rainComplete = !rainUnknown && (allSheltered || weatherComplete);
+  return {
+    areaSquareMeters: area,
+    irrigationMm: weighted(millimeterSquareMeters),
+    rainMm: rainComplete ? weighted(rainMillimeterSquareMeters) : null,
+    allSheltered,
   };
 }
 

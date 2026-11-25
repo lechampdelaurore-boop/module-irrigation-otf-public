@@ -128,7 +128,12 @@ test('une période à cheval sur deux semaines : chaque jour prend la valeur de 
 
 test('l’historique : sans objectif automatique, le résultat d’avant ; allumé, il remplit les jours sans objectif saisi', () => {
   const before = aggregateHydricObjective([], [BED], PERIOD);
-  assert.deepEqual(before, { objectiveMm: null, objectiveAvailability: { availableBedDays: 0, totalBedDays: 7, complete: false } });
+  assert.deepEqual(before, {
+    objectiveMm: null,
+    objectiveAvailability: { availableBedDays: 0, totalBedDays: 7, complete: false },
+    // Les planches de l'objectif (D-329) : aucune n'en a un.
+    objectiveBeds: { withObjective: 0, total: 1, bedDays: 0 },
+  });
   assert.equal('objectiveAutomatic' in before, false, 'réglage éteint, rien ne change (D-309)');
 
   const values = valuesOf([[BED.id, automaticObjectiveDayValues(automatic(), BED, WEEK)]]);
