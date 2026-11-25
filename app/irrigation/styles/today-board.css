@@ -28,6 +28,23 @@
   text-decoration: none;
 }
 
+/* La tuile « Eau reçue » qui ouvre « Noter la pluie » (S2, PR 4) : un bouton, le dessin d'une tuile. */
+button.today-kpi {
+  width: 100%;
+  min-height: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.today-kpis > .action-reply {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+
 .today-kpi:hover {
   box-shadow: var(--shadow-light);
 }

@@ -449,3 +449,60 @@
     flex: 1 0 100%;
   }
 }
+
+/*
+ * « Noter la pluie » (S2, PR 4) : le jour, le chiffre et « mm », la consigne
+ * du zéro ; un refus en rouge, dans la fenêtre.
+ */
+.rain-entry-form {
+  display: grid;
+  gap: 6px;
+}
+
+.rain-entry-form label {
+  font-weight: 700;
+}
+
+.rain-entry-form select,
+.rain-entry-amount input {
+  box-sizing: border-box;
+  min-height: var(--touch-target);
+  padding: .55rem .7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-button);
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+
+.rain-entry-form select {
+  width: 100%;
+}
+
+.rain-entry-amount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rain-entry-amount input {
+  width: 8rem;
+}
+
+.rain-entry-hint,
+.rain-entry-already,
+.rain-entry-more {
+  margin: 0;
+  color: var(--muted);
+}
+
+.rain-entry-already {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.rain-entry-refusal {
+  margin: 0;
+  color: var(--danger);
+  font-weight: 700;
+}

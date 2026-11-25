@@ -124,6 +124,13 @@ async function readTodayInputs(
       : null,
     week,
     soil: soil ? (soil.gauge ? { zones: soil.gauge.zones } : { unavailable: soil.gaugeUnavailable ?? GAUGE_UNAVAILABLE }) : null,
+    // « Noter la pluie » (S2, PR 4) dit la mesure déjà notée : jamais d'écrasement sans le dire.
+    rain: {
+      measured: new Map(rainRows
+        .filter((row) => row.dataKind === 'manual_precipitation' && row.precipitationMm !== null)
+        .map((row) => [row.date, row.precipitationMm as number])),
+      rainMatters,
+    },
   };
 }
 

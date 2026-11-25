@@ -178,17 +178,19 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   await expect(page.locator('#today-reliability')).toBeInViewport();
   await verifierLEtape(page, journal, 'une pastille mène à son bloc');
 
-  // Les tuiles mènent à leur menu (6 nonies, L1, D-310) : chaque tuile est un lien entier, le mot d'action écrit dessus.
-  const tuiles = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi');
+  // Les tuiles mènent à leur menu (6 nonies, L1, D-310) : chaque tuile est un lien entier, le mot d'action écrit dessus ;
+  // « Eau reçue » ouvre la fenêtre « Noter la pluie » quand la pluie compte (S2, PR 4), un bouton du même dessin.
+  const tuiles = page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi');
   await expect(tuiles).toHaveCount(4);
   await expect(tuiles.locator('.today-kpi-action')).toHaveText([
     /^(Modifier les objectifs|Poser un objectif)$/,
-    /^(Noter une pluie mesurée|Voir jour par jour)$/,
+    /^(Noter la pluie|Voir jour par jour)$/,
     /^(Voir par planche|Voir ce qui manque)$/,
     'Voir jour par jour',
   ]);
   for (const tuile of await tuiles.all()) {
-    await expect(tuile).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#/);
+    if (await tuile.evaluate((element) => element.tagName) === 'A') await expect(tuile).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#/);
+    else await expect(tuile).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
     if (telephone) await verifierCibleTactile(tuile, `La tuile « ${await tuile.locator('.today-kpi-label').innerText()} »`);
   }
   // Le nom lu : le titre, le chiffre, puis le mot d'action.
@@ -202,24 +204,29 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeInViewport();
   await verifierLEtape(page, journal, 'la tuile de l’objectif mène aux objectifs');
 
-  // « Eau reçue » ouvre la pluie mesurée (ou les jours, pour une ferme toute sous abri).
+  // « Eau reçue » ouvre « Noter la pluie » sur la page (S2, PR 4), ou les jours pour une ferme toute sous abri.
   await page.goBack();
   await attendreLaPagePrete(page, 'aujourdhui');
-  const eauRecue = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi').filter({ hasText: 'Eau reçue' });
-  const versLaPluie = (await eauRecue.getAttribute('href'))?.endsWith('#manual-rain') ?? false;
-  await eauRecue.click();
-  await attendreLaPagePrete(page, 'besoins');
-  if (versLaPluie) {
-    await expect(page.locator('#manual-rain')).toHaveAttribute('open', '');
-    await expect(page.locator('#manual-rain').getByLabel('Millimètres')).toBeInViewport();
+  const eauRecue = page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi').filter({ hasText: 'Eau reçue' });
+  if (await eauRecue.evaluate((element) => element.tagName) === 'BUTTON') {
+    await eauRecue.click();
+    const fenetre = page.getByRole('dialog', { name: 'Noter la pluie' });
+    await expect(fenetre).toBeVisible();
+    await expect(fenetre.getByLabel('Combien ?')).toBeVisible();
+    // Échap ferme sans rien écrire ; le focus revient à la tuile.
+    await page.keyboard.press('Escape');
+    await expect(fenetre).toBeHidden();
+    await expect(eauRecue).toBeFocused();
   } else {
+    await eauRecue.click();
+    await attendreLaPagePrete(page, 'besoins');
     await expect(page.locator('#weather')).toBeInViewport();
+    await page.goBack();
+    await attendreLaPagePrete(page, 'aujourdhui');
   }
-  await verifierLEtape(page, journal, 'la tuile de l’eau reçue mène à la pluie mesurée');
+  await verifierLEtape(page, journal, 'la tuile de l’eau reçue ouvre la pluie');
 
   // Les jauges mènent à leur page (6 nonies, L2, D-311) : chaque ligne est un lien qui porte sa phrase.
-  await page.goBack();
-  await attendreLaPagePrete(page, 'aujourdhui');
   // La mise en page, par mesures (L5, D-314) : au téléphone, chaque nom de jardin se lit en entier, à 390 et à
   // 360 px ; à l'ordinateur, un bloc étiré garde son contenu en haut, aucune rangée de titre de plus de 60 px à 1440 px.
   if (telephone) {

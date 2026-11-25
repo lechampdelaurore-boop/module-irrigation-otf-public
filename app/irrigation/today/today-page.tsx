@@ -8,7 +8,8 @@ import { recordDoneAsPlannedAction } from '../done-as-planned-actions';
 import { eventReply, type TodayStart } from '@/lib/domain/today/card-action';
 import { cancelPlannedIrrigationAction, finishIrrigationEventAction, pauseIrrigationEventAction, resumeIrrigationEventAction, startIrrigationEventAction } from '../irrigation-event-actions';
 import { computeWeeklyPlanAction } from '../planning-actions';
-import { actionReply, type ActionReplyMessage } from '../shell/action-reply';
+import { RainEntryDialog } from '../rain-entry-dialog';
+import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { announceTodayBadge } from '../shell/today-badge';
 import { loadTodayViewAction } from '../today-actions';
 import { refuseProposalFromTodayAction, validateAndStartProposalFromTodayAction, validateProposalFromTodayAction } from '../today-card-actions';
@@ -18,7 +19,7 @@ import { TodayHeader } from './today-header';
 import { TodaySoilBlock, TodayWaterBlockView, TodayWeekWater } from './today-gauges';
 import { TodayWeather } from './today-weather';
 import { TodayWeekTiles } from './today-week';
-import { irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, proposalReply } from './today-replies';
+import { irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, proposalReply, RAIN_RELIABILITY_REPLY, RAIN_WEEK_REPLY, TODAY_REPLY_CLASSES } from './today-replies';
 
 /** La page se relit seule toutes les cinq minutes, et au retour sur l'onglet après une minute (F438). */
 const TODAY_REFRESH_MS = millisecondsFromMinutes(5);
@@ -72,6 +73,8 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const phone = useTodayPhone(pageRef);
   /** La réponse du dernier geste, à l'endroit du bouton pressé ; un nouveau geste la remplace. */
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
+  // « Noter la pluie » ouverte, et l'endroit du bouton qui l'a ouverte, où sa réponse s'écrit (S2, PR 4).
+  const [rainFrom, setRainFrom] = useState<string | null>(null);
   /** Après un geste de la carte, le focus va au nouveau bouton principal de sa carte (contrat S2, section 3). */
   const focusCard = useRef<string | null>(null);
   // La saison du jour (F2) : les liens vers les cartes et les données du jour la portent.
@@ -205,7 +208,25 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const reliability = block('reliability');
 
   // Des clés : la journée et les tuiles changent de place sans se recréer (L6).
-  const tiles = view.week ? <TodayWeekTiles key="semaine" week={view.week} query={dayQuery} /> : null;
+  const openRain = view.rain ? (origin: string) => () => setRainFrom(origin) : null;
+  const rainSaved = (text: string) => {
+    const origin = rainFrom ?? RAIN_WEEK_REPLY;
+    setRainFrom(null);
+    startTransition(async () => {
+      setReplies([actionReply(origin, 'notice', text)]);
+      await reload();
+    });
+  };
+  const tiles = view.week ? (
+    <TodayWeekTiles
+      key="semaine"
+      week={view.week}
+      query={dayQuery}
+      pending={pending}
+      onOpenRain={openRain?.(RAIN_WEEK_REPLY)}
+      rainReply={<ActionReply messages={replies} origin={RAIN_WEEK_REPLY} classNames={TODAY_REPLY_CLASSES} />}
+    />
+  ) : null;
   const dayRow = (
     <Pair
       key="journee"
@@ -234,9 +255,20 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       />
       <Pair
         wide={water ? <TodayWaterBlockView block={water} query={dayQuery} /> : null}
-        narrow={reliability ? <ReliabilityZoneView zone={reliability.zone} checks={reliability.checks} byBed={reliability.byBed} query={dayQuery} pending={pending} replies={replies} onRecalculatePlan={() => recalculatePlan(PLAN_RELIABILITY_REPLY)} /> : null}
+        narrow={reliability ? <ReliabilityZoneView zone={reliability.zone} checks={reliability.checks} byBed={reliability.byBed} query={dayQuery} pending={pending} replies={replies} onRecalculatePlan={() => recalculatePlan(PLAN_RELIABILITY_REPLY)} onOpenRain={openRain?.(RAIN_RELIABILITY_REPLY)} /> : null}
         layout="half"
       />
+      {view.rain ? (
+        <RainEntryDialog
+          open={rainFrom !== null}
+          entry={view.rain}
+          season={season}
+          planning={view.plan !== null}
+          besoinsHref={pageHref('besoins', dayQuery, 'manual-rain')}
+          onClose={() => setRainFrom(null)}
+          onSaved={rainSaved}
+        />
+      ) : null}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { Icon, type IconName } from '../line-icon';
 import { ActionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { AnchoredFold } from '../shell/page-settings-fold';
 import { useSectionHelp } from '../shell/section-help';
-import { PLAN_RELIABILITY_REPLY, TODAY_REPLY_CLASSES } from './today-replies';
+import { PLAN_RELIABILITY_REPLY, RAIN_RELIABILITY_REPLY, TODAY_REPLY_CLASSES } from './today-replies';
 
 const RELIABILITY_TITLE = 'Fiabilité du calcul';
 
@@ -42,6 +42,7 @@ export function ReliabilityZoneView({
   pending,
   replies = [],
   onRecalculatePlan,
+  onOpenRain,
 }: {
   zone: ReliabilityZone;
   checks: readonly ReliabilityCheck[];
@@ -52,6 +53,8 @@ export function ReliabilityZoneView({
   /** La réponse de « Recalculer le plan », sous la ligne du plan, qui reste quand le plan est à jour (L4, D-313). */
   replies?: readonly ActionReplyMessage[];
   onRecalculatePlan: () => void;
+  /** « Noter la pluie » ouvre sa fenêtre (S2, PR 4) ; absent : le lien vers « Objectifs et besoins ». */
+  onOpenRain?: () => void;
 }) {
   const help = useSectionHelp(RELIABILITY_TITLE, RELIABILITY_HELP);
   const [showAll, setShowAll] = useState(false);
@@ -90,12 +93,14 @@ export function ReliabilityZoneView({
                       {lines.map((line) => (
                         <li key={line.key} className="reliability-line" data-reliability={line.kind}>
                           <p className="reliability-line-text">{line.text}</p>
-                          <ReliabilityAction line={line} query={query} pending={pending} onRecalculatePlan={onRecalculatePlan} />
+                          <ReliabilityAction line={line} query={query} pending={pending} onRecalculatePlan={onRecalculatePlan} onOpenRain={onOpenRain} />
                         </li>
                       ))}
                     </ul>
                   ) : null}
                   {check.kind === 'plan' ? <ActionReply messages={replies} origin={PLAN_RELIABILITY_REPLY} classNames={TODAY_REPLY_CLASSES} /> : null}
+                  {/* La ligne de la pluie part quand la semaine est complète : la réponse reste, sous sa donnée suivie. */}
+                  {check.kind === 'actual-rain' ? <ActionReply messages={replies} origin={RAIN_RELIABILITY_REPLY} classNames={TODAY_REPLY_CLASSES} /> : null}
                 </div>
               </li>
             );
@@ -192,13 +197,19 @@ function Ring({ checks, upToDate }: { checks: readonly ReliabilityCheck[]; upToD
   );
 }
 
-function ReliabilityAction({ line, query, pending, onRecalculatePlan }: {
+function ReliabilityAction({ line, query, pending, onRecalculatePlan, onOpenRain }: {
   line: ReliabilityLine;
   query: PageQuery;
   pending: boolean;
   onRecalculatePlan: () => void;
+  onOpenRain?: () => void;
 }) {
   const action = line.action;
+  if (action.kind === 'rain') {
+    return onOpenRain
+      ? <button type="button" className="primary" disabled={pending} onClick={onOpenRain}>{action.label}</button>
+      : <GestureLink action={{ ...action, kind: 'link' }} query={query} />;
+  }
   if (action.kind === 'recalculate-plan') {
     return (
       <button type="button" className="primary" disabled={pending} onClick={onRecalculatePlan}>
