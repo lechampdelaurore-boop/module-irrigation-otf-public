@@ -16,7 +16,7 @@ export const metadata = pageMetadata('aujourdhui');
  * module, la réponse à la question du matin, et la zone « Fiabilité du
  * calcul ». Elle ne calcule rien : elle lit le modèle construit côté serveur.
  */
-async function AujourdhuiRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeAujourdhuiRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('aujourdhui', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { view } = await loadAujourdhuiPage(context);
@@ -28,4 +28,9 @@ async function AujourdhuiRoutePage({ searchParams }: { searchParams: IrrigationS
   );
 }
 
-export default renderOncePerRequest(AujourdhuiRoutePage);
+const computeAujourdhuiRoutePageOnce = renderOncePerRequest(computeAujourdhuiRoutePage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function AujourdhuiRoutePage(props: Parameters<typeof computeAujourdhuiRoutePage>[0]) {
+  return computeAujourdhuiRoutePageOnce(props);
+}

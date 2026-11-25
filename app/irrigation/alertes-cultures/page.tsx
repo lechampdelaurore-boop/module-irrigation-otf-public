@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('alertes-cultures');
 
 /** La page « Alertes cultures » (3.8) : gel selon la culture, arrêt d'arrosage avant récolte, aspersions à reconsidérer, microclimat. */
-async function AlertesCulturesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeAlertesCulturesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('alertes-cultures', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { waterDashboard } = await loadWaterDashboardPage(context, true);
@@ -32,4 +32,9 @@ async function AlertesCulturesPage({ searchParams }: { searchParams: IrrigationS
   );
 }
 
-export default renderOncePerRequest(AlertesCulturesPage);
+const computeAlertesCulturesPageOnce = renderOncePerRequest(computeAlertesCulturesPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function AlertesCulturesPage(props: Parameters<typeof computeAlertesCulturesPage>[0]) {
+  return computeAlertesCulturesPageOnce(props);
+}

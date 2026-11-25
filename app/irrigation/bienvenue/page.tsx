@@ -21,7 +21,7 @@ export const metadata = { title: WELCOME_TITLE };
  * lecture d'Ouvre ta ferme. Une ferme qui a déjà ouvert le module va à sa
  * page d'arrivée ; elle change son choix dans Réglages.
  */
-async function BienvenuePage() {
+async function computeBienvenuePage() {
   let user: AuthenticatedUser;
   try {
     user = await requireAuthenticatedUser();
@@ -43,4 +43,9 @@ async function BienvenuePage() {
   />;
 }
 
-export default renderOncePerRequest(BienvenuePage);
+const computeBienvenuePageOnce = renderOncePerRequest(computeBienvenuePage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function BienvenuePage() {
+  return computeBienvenuePageOnce(undefined);
+}

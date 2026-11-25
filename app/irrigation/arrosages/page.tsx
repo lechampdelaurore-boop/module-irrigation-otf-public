@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('arrosages');
 
 /** La page « Arrosages » (3.8) : irriguer maintenant, planifier, saisir un arrosage fait, l'eau du jour et la limite journalière. */
-async function ArrosagesRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeArrosagesRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('arrosages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const data = await loadArrosagesPage(context);
@@ -40,4 +40,9 @@ async function ArrosagesRoutePage({ searchParams }: { searchParams: IrrigationSe
   );
 }
 
-export default renderOncePerRequest(ArrosagesRoutePage);
+const computeArrosagesRoutePageOnce = renderOncePerRequest(computeArrosagesRoutePage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function ArrosagesRoutePage(props: Parameters<typeof computeArrosagesRoutePage>[0]) {
+  return computeArrosagesRoutePageOnce(props);
+}

@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('besoins');
 
 /** La page « Objectifs et besoins » (3.8) : objectifs, météo de la semaine, pluie mesurée, tableau des jours, puis les besoins et priorités par planche. */
-async function BesoinsPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeBesoinsPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('besoins', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { waterDashboard, irrigationNeeds } = await loadBesoinsPage(context);
@@ -25,4 +25,9 @@ async function BesoinsPage({ searchParams }: { searchParams: IrrigationSearchPar
   );
 }
 
-export default renderOncePerRequest(BesoinsPage);
+const computeBesoinsPageOnce = renderOncePerRequest(computeBesoinsPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function BesoinsPage(props: Parameters<typeof computeBesoinsPage>[0]) {
+  return computeBesoinsPageOnce(props);
+}

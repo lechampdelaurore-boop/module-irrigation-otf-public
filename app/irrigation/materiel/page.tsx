@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('materiel');
 
 /** La page « Matériel et placement » (3.8) : trois onglets, le plan et la fiche de la planche, le matériel, les groupes de jardins (lot J, F461). */
-async function MaterielPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeMaterielPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('materiel', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const data = await loadMaterielPage(context);
@@ -36,4 +36,9 @@ async function MaterielPage({ searchParams }: { searchParams: IrrigationSearchPa
   );
 }
 
-export default renderOncePerRequest(MaterielPage);
+const computeMaterielPageOnce = renderOncePerRequest(computeMaterielPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function MaterielPage(props: Parameters<typeof computeMaterielPage>[0]) {
+  return computeMaterielPageOnce(props);
+}

@@ -36,7 +36,7 @@ export const metadata = pageMetadata('reglages');
  * « Supprimer ma ferme et mes données » (4.5, F665), replié, hors
  * démonstration.
  */
-async function ReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal } = await loadReglagesPage(context);
@@ -96,4 +96,9 @@ function DemoNotificationSettings() {
   );
 }
 
-export default renderOncePerRequest(ReglagesPage);
+const computeReglagesPageOnce = renderOncePerRequest(computeReglagesPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function ReglagesPage(props: Parameters<typeof computeReglagesPage>[0]) {
+  return computeReglagesPageOnce(props);
+}

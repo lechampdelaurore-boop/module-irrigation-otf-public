@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('sol');
 
 /** La page « Réserve du sol » (3.8) : réglages du sol, jauges par jardin et par planche, observations, eau arrosée en trop. */
-async function SolPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeSolPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('sol', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { soilReserve } = await loadSolPage(context);
@@ -23,4 +23,9 @@ async function SolPage({ searchParams }: { searchParams: IrrigationSearchParams 
   );
 }
 
-export default renderOncePerRequest(SolPage);
+const computeSolPageOnce = renderOncePerRequest(computeSolPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function SolPage(props: Parameters<typeof computeSolPage>[0]) {
+  return computeSolPageOnce(props);
+}

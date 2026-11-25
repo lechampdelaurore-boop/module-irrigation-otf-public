@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('planning');
 
 /** La page « Planning de la semaine » (3.8) : le plan, ses réglages et son suivi. */
-async function PlanningRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computePlanningRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('planning', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { weeklyPlan, planningSettings, protectedSlots, soilNotes, waterGap } = await loadPlanningPage(context);
@@ -30,4 +30,9 @@ async function PlanningRoutePage({ searchParams }: { searchParams: IrrigationSea
   );
 }
 
-export default renderOncePerRequest(PlanningRoutePage);
+const computePlanningRoutePageOnce = renderOncePerRequest(computePlanningRoutePage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function PlanningRoutePage(props: Parameters<typeof computePlanningRoutePage>[0]) {
+  return computePlanningRoutePageOnce(props);
+}

@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('historique');
 
 /** La page « Historique et cumuls » (3.8) : cumuls, historique, suivi par série, export CSV. */
-async function HistoriquePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeHistoriquePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('historique', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { irrigationHistory } = await loadHistoriquePage(context);
@@ -26,4 +26,9 @@ async function HistoriquePage({ searchParams }: { searchParams: IrrigationSearch
   );
 }
 
-export default renderOncePerRequest(HistoriquePage);
+const computeHistoriquePageOnce = renderOncePerRequest(computeHistoriquePage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function HistoriquePage(props: Parameters<typeof computeHistoriquePage>[0]) {
+  return computeHistoriquePageOnce(props);
+}

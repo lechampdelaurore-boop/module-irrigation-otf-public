@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('alertes-meteo');
 
 /** La page « Alertes météo » (3.8) : l'encart des alertes météo et leurs réglages. */
-async function AlertesMeteoPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeAlertesMeteoPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('alertes-meteo', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
   const { waterDashboard } = await loadWaterDashboardPage(context, true);
@@ -29,4 +29,9 @@ async function AlertesMeteoPage({ searchParams }: { searchParams: IrrigationSear
   );
 }
 
-export default renderOncePerRequest(AlertesMeteoPage);
+const computeAlertesMeteoPageOnce = renderOncePerRequest(computeAlertesMeteoPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function AlertesMeteoPage(props: Parameters<typeof computeAlertesMeteoPage>[0]) {
+  return computeAlertesMeteoPageOnce(props);
+}

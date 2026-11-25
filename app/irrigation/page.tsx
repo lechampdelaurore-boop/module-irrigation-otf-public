@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * cochée —, et les anciennes adresses des notifications à la page qui porte
  * leur bloc (P14).
  */
-async function IrrigationIndexPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+async function computeIrrigationIndexPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const params = await searchParams;
   let user: AuthenticatedUser;
   try {
@@ -46,4 +46,9 @@ async function IrrigationIndexPage({ searchParams }: { searchParams: IrrigationS
   );
 }
 
-export default renderOncePerRequest(IrrigationIndexPage);
+const computeIrrigationIndexPageOnce = renderOncePerRequest(computeIrrigationIndexPage);
+
+// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
+export default async function IrrigationIndexPage(props: Parameters<typeof computeIrrigationIndexPage>[0]) {
+  return computeIrrigationIndexPageOnce(props);
+}
