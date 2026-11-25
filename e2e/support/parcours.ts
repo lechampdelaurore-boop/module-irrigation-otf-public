@@ -240,3 +240,16 @@ export async function confirmerDansLaFenetre(page: Page, bouton: string): Promis
   await confirmer.click();
   await expect(fenetre).toHaveCount(0);
 }
+
+/**
+ * Ouvre le pli « Le détail » d'« Aujourd'hui » (simplification S2, PR 5) :
+ * les tuiles, les jauges, l'eau disponible, la fiabilité entière et les trois
+ * jours de « Gel ou chaleur » y sont rangés. Rend le pli ; ne fait rien s'il
+ * est déjà ouvert.
+ */
+export async function ouvrirLeDetailDuJour(page: Page): Promise<Locator> {
+  const pli = page.locator('details#today-detail');
+  if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) await pli.locator(':scope > summary').click();
+  await expect(pli).toHaveJSProperty('open', true);
+  return pli;
+}

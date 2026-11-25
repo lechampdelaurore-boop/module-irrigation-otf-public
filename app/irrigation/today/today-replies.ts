@@ -16,6 +16,8 @@ export const PLAN_RELIABILITY_REPLY = 'fiabilite-plan';
 /** « Noter la pluie » (S2, PR 4) : sous la tuile « Eau reçue », ou sous la ligne de la pluie de « Fiabilité du calcul ». */
 export const RAIN_WEEK_REPLY = 'pluie-semaine';
 export const RAIN_RELIABILITY_REPLY = 'pluie-fiabilite';
+/** « Noter la pluie » ouverte de la tuile « Eau reçue », dans « Le détail » (S2, PR 5). */
+export const RAIN_TILE_REPLY = 'pluie-tuile';
 
 export function irrigationReply(eventEquipmentId: string): string {
   return `irrigation:${eventEquipmentId}`;

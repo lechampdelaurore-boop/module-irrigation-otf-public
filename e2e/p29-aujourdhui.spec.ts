@@ -3,6 +3,7 @@ import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, preparerLaFerme
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
+  ouvrirLeDetailDuJour,
   ouvrirLeMenuDesPages,
   ouvrirParClic,
   surveillerLaConsole,
@@ -46,8 +47,9 @@ import {
 
 const DUREE_DU_PARCOURS = 150_000;
 const ECRAN_DU_TELEPHONE_PX = 844;
-// T5 : l'ordre du tableau de bord ; le gel annoncé n'est plus remonté en tête, il est dans les pastilles.
-const TITRES_DES_BLOCS = ['Votre journée', 'Gel ou chaleur', 'Eau de la semaine', 'Réserve du sol', 'Eau disponible', 'Fiabilité du calcul'];
+// L'ordre de la page à l'essentiel (simplification S2, PR 5) : « Votre journée » et « La semaine » au premier niveau,
+// les autres blocs dans « Le détail », dans leur ordre d'avant ; « Gel ou chaleur » calme n'a rien au premier niveau.
+const TITRES_DES_BLOCS = ['Votre journée', 'La semaine', 'Eau de la semaine', 'Réserve du sol', 'Eau disponible', 'Fiabilité du calcul', 'Gel ou chaleur'];
 
 function blocs(page: Page): Locator {
   return page.locator('.today-page section.today-block');
@@ -119,12 +121,11 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(page.locator('.today-head .today-date')).toHaveText(/^[A-Z][a-zé]+ \d{1,2} [a-zéû]+$/);
   await expect(page.locator('.today-head').getByRole('heading')).toHaveCount(0);
   await expect(page.locator('.today-head')).not.toContainText('Tableau de bord');
-  // Rien à rattraper ni à faire : la journée est courte, « Gel ou chaleur » passe dessous, sans grand vide à côté (J13, F287).
-  const rangee = page.locator('.today-row').filter({ has: page.getByRole('heading', { level: 2, name: 'Votre journée' }) });
-  await expect(rangee).toHaveAttribute('data-layout', 'stack');
-  const basDeLaJournee = await bloc(page, 'Votre journée').evaluate((element) => element.getBoundingClientRect().bottom);
-  const hautDuGel = await bloc(page, 'Gel ou chaleur').evaluate((element) => element.getBoundingClientRect().top);
-  expect(hautDuGel, '« Gel ou chaleur » sous « Votre journée »').toBeGreaterThanOrEqual(basDeLaJournee);
+  // Rien d'annoncé : « Gel ou chaleur » n'a rien au premier niveau, ses trois jours sont dans « Le détail », fermé (S2, PR 5).
+  await expect(page.locator('#today-weather-alert')).toHaveCount(0);
+  await expect(page.locator('#today-weather')).toBeHidden();
+  await ouvrirLeDetailDuJour(page);
+  await expect(page.locator('#today-weather')).toBeVisible();
   await expect(page.locator('.today-sentence')).not.toBeEmpty();
   await expect(bloc(page, 'Eau disponible')).toContainText('Aucune réserve ni ressource limitée suivie.');
   // La saison n'y est pas proposée (F2) ; le plan jamais calculé se dit en une ligne qui mène au planning.
@@ -183,6 +184,7 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await attendreLaPageIrrigation(page, 'ressources');
   await ajouterUneCuveSansVolume(page, cuve);
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   await expect(bloc(page, 'Eau disponible')).toContainText(`${cuve} : volume jamais saisi.`);
   const ligneCuve = lignesDeFiabilite(page).filter({ hasText: `Le volume de ${cuve} n’a jamais été saisi.` });
   await expect(ligneCuve).toHaveCount(1);
@@ -204,6 +206,7 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
 
   // De retour : la ligne a disparu, l'eau disponible dit le volume observé aujourd'hui.
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   await expect(bloc(page, 'Eau disponible')).toContainText(`${cuve} : 12 m³ sur 20 m³, observé aujourd’hui.`);
   await expect(lignesDeFiabilite(page).filter({ hasText: cuve })).toHaveCount(0);
   await verifierLEtape(page, journal, 'volume saisi, ligne disparue');
@@ -240,13 +243,21 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await attendreLaPageIrrigation(page, 'alertes-meteo');
   await ajouterUneAlerteDeFroid(page, libelle);
   await attendreLaPageIrrigation(page, 'aujourdhui');
-  const meteo = bloc(page, 'Gel ou chaleur');
+  // Au premier niveau, le jour en alerte en carte, avec sa barre rouge (S2, PR 5) ; les trois jours dans « Le détail ».
+  const alerte = page.locator('#today-weather-alert');
+  await expect(alerte).toHaveAttribute('data-tone', 'alert');
+  await expect(alerte.locator('a.today-day-link').first()).toHaveAttribute('href', /^\/irrigation\/alertes-(meteo|cultures)\?season=\d{4}$/);
+  expect(await alerte.evaluate((element) => getComputedStyle(element).borderLeftColor)).toBe('rgb(220, 53, 69)');
+  await ouvrirLeDetailDuJour(page);
+  const meteo = page.locator('#today-weather');
   await expect(meteo).toHaveAttribute('data-tone', 'alert');
   await expect(meteo).toContainText(new RegExp(`${libelle} : température minimale prévue \\d+(,\\d)? °C le `));
   expect(await meteo.evaluate((element) => getComputedStyle(element).borderLeftColor)).toBe('rgb(220, 53, 69)');
-  // L'alerte est dans les pastilles de l'en-tête, qui mènent au bloc.
-  const pastilleMeteo = page.getByRole('navigation', { name: 'Résumé du jour' }).getByRole('link', { name: /^Alerte météo / });
-  await expect(pastilleMeteo).toHaveAttribute('href', '#today-weather');
+  // L'alerte est dans les pastilles de l'en-tête, qui mènent au bloc ; au téléphone, elles quittent le premier niveau (S2-g).
+  const pastilles = page.locator('nav[aria-label="Résumé du jour"]');
+  await expect(pastilles.locator('a').filter({ hasText: /^Alerte météo / })).toHaveAttribute('href', '#today-weather');
+  if (telephone) await expect(pastilles).toBeHidden();
+  else await expect(pastilles).toBeVisible();
   const voirLesAlertes = meteo.getByRole('link', { name: 'Voir les alertes' });
   if (telephone) await verifierCibleTactile(voirLesAlertes, 'Le lien « Voir les alertes »');
   // Le jour en alerte est un lien entier vers la page de son alerte, « Voir l’alerte » écrit dessous (L3, D-312).

@@ -332,14 +332,15 @@ test('L5 : un bloc étiré garde son contenu en haut ; l’heure prend sa place 
   assert.match(phone, /\.today-bar-row \.today-bar-name \{\n    overflow: visible;\n    overflow-wrap: anywhere;\n    white-space: normal;/, 'règle 3 : le nom en entier, au besoin sur deux lignes');
 });
 
-test('L6 : au téléphone, « Votre journée » avant les tuiles, dans le DOM et au dessin ; à l’ordinateur, l’ordre de toujours', () => {
+test('L6, réécrite par S2 (PR 5) : « Votre journée » juste après l’en-tête, à toute largeur, dans le DOM comme au dessin ; les tuiles dans « Le détail »', () => {
   const page = readFileSync('app/irrigation/today/today-page.tsx', 'utf8');
-  assert.match(page, /const TODAY_PHONE_MAX_PX = 620;/, 'la borne des requêtes de conteneur');
-  assert.match(page, /\{phone \? \[dayRow, tiles\] : \[tiles, dayRow\]\}/, 'le DOM suit l’ordre affiché');
-  assert.match(page, /key="semaine"/);
-  assert.match(page, /key="journee"/);
+  const order = ['<TodayHeader', '<TodayDay', '<TodayWeekBarView', '<TodayApproximateView', '<TodayWaterAlertView', '<TodayDetail', '<TodayWeekTiles'];
+  const at = order.map((name) => page.indexOf(name));
+  assert.ok(at.every((index) => index > 0), `présents : ${order.join(', ')}`);
+  assert.deepEqual([...at].sort((a, b) => a - b), at, 'le DOM suit l’ordre affiché, le même au clavier');
+  assert.doesNotMatch(page, /phone \?/, 'plus d’ordre qui dépend de la largeur');
   const css = readFileSync('app/irrigation/styles/today.css', 'utf8');
   const phone = css.slice(css.indexOf('@container (max-width: 620px)'));
   assert.match(phone, /\.today-head \{\n    order: -2;\n  \}/);
-  assert.match(phone, /\.today-row:has\(> #today-day\) \{\n    order: -1;\n  \}/, 'le premier dessin, avant la lecture de la largeur');
+  assert.match(phone, /\.today-row:has\(> #today-day\) \{\n    order: -1;\n  \}/, 'le premier dessin');
 });

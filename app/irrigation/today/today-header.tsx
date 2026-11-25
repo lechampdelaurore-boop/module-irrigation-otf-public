@@ -31,6 +31,13 @@ const CHIP_TARGETS: Record<Chip['target'], string> = {
 };
 
 /**
+ * Les blocs rangés dans « Le détail » (S2, PR 5) : la pastille l'ouvre sur
+ * eux. Les pastilles ne sont qu'à l'ordinateur ; au téléphone, la phrase les
+ * redit (S2-g, today.css).
+ */
+const IN_DETAIL: ReadonlySet<Chip['target']> = new Set(['weather', 'reliability']);
+
+/**
  * L'en-tête du tableau de bord (docs/aujourdhui-tableau-de-bord-contract.md,
  * sections 3.2 et 3.5) : la date en toutes lettres sous le titre de la page
  * (audit final, lot A, J13, F285), la
@@ -40,7 +47,7 @@ const CHIP_TARGETS: Record<Chip['target'], string> = {
  * phrase du planning et son lien « Répartir l'eau » (audit ergonomique final,
  * lot A, R1, F276).
  */
-export function TodayHeader({ headline, plan, shortage, query, pending, replies = [], onRecalculatePlan }: {
+export function TodayHeader({ headline, plan, shortage, query, pending, replies = [], onRecalculatePlan, onReveal }: {
   headline: TodayHeadline;
   plan: TodayPlanLine | null;
   shortage: TodayShortage | null;
@@ -49,6 +56,8 @@ export function TodayHeader({ headline, plan, shortage, query, pending, replies 
   /** La réponse de « Recalculer », sous la ligne du plan (6 nonies, L4, D-313). */
   replies?: readonly ActionReplyMessage[];
   onRecalculatePlan: () => void;
+  /** Ouvre « Le détail » sur un bloc qui y est rangé (S2, PR 5) ; absent : l'ancre seule. */
+  onReveal?: (id: string) => void;
 }) {
   return (
     <header className="today-head">
@@ -74,7 +83,16 @@ export function TodayHeader({ headline, plan, shortage, query, pending, replies 
       {headline.chips.length > 0 ? (
         <nav className="today-chips" aria-label="Résumé du jour">
           {headline.chips.map((chip) => (
-            <a key={chip.key} className="today-chip" data-tone={chip.tone} href={CHIP_TARGETS[chip.target]}>
+            <a
+              key={chip.key}
+              className="today-chip"
+              data-tone={chip.tone}
+              href={CHIP_TARGETS[chip.target]}
+              onClick={onReveal && IN_DETAIL.has(chip.target) ? (event) => {
+                event.preventDefault();
+                onReveal(CHIP_TARGETS[chip.target].slice(1));
+              } : undefined}
+            >
               <span className="today-chip-dot"><Icon name={CHIP_ICONS[chip.icon]} /></span>
               {chip.text}
             </a>

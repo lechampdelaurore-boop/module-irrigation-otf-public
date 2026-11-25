@@ -1,7 +1,7 @@
 import { expect, test, type BrowserContext, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLeDetailDuJour, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/planning.ts';
 
 /**
@@ -338,7 +338,7 @@ test('un arrosage à rattraper : la question, « C’est fait » confirmé, « N
   await verifierLEtape(page, journal, '« Je le fais maintenant » démarre');
 });
 
-test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis la tuile « Eau reçue »', async ({ page, context }, testInfo) => {
+test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis « La semaine »', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   const reference = Date.now();
@@ -346,16 +346,16 @@ test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis la tuile «
   await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'aujourdhui');
 
-  const tuile = page.getByRole('region', { name: 'Cette semaine' }).locator('button.today-kpi').filter({ hasText: 'Eau reçue' });
-  await expect(tuile).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
-  if (telephone) await verifierCibleTactile(tuile, 'La tuile « Eau reçue »');
+  // « Noter la pluie » de « La semaine », au premier niveau (S2, PR 5) ; la tuile « Eau reçue » du détail ouvre la même fenêtre.
+  const tuile = page.locator('#today-week').getByRole('button', { name: 'Noter la pluie' });
+  if (telephone) await verifierCibleTactile(tuile, '« Noter la pluie »');
   const fenetre = page.getByRole('dialog', { name: 'Noter la pluie' });
   const jour = fenetre.getByLabel('Quel jour ?');
   const combien = fenetre.getByLabel('Combien ?');
   const premierJanvier = horodatageLocal(0, reference).slice(5, 10) === '01-01';
   const parDefaut = horodatageLocal(premierJanvier ? 0 : -24 * 60, reference).slice(0, 10);
   const pourLeJour = premierJanvier ? 'pour aujourd’hui' : 'pour hier';
-  const reponse = page.getByRole('region', { name: 'Cette semaine' }).locator('.action-reply');
+  const reponse = page.locator('#today-week .action-reply');
 
   // Ouverte : hier par défaut, le focus sur le jour, le bouton inactif tant que le champ est vide (D-003).
   await tuile.click();
@@ -380,7 +380,7 @@ test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis la tuile «
   await expect(fenetre).toBeHidden();
   await expect(reponse).toHaveCount(0);
 
-  // 8 mm, au clavier : le bouton dit le chiffre, Entrée enregistre, la réponse sous les tuiles.
+  // 8 mm, au clavier : le bouton dit le chiffre, Entrée enregistre, la réponse sous « La semaine ».
   await tuile.click();
   await combien.fill('8');
   await expect(fenetre.getByRole('button', { name: 'Enregistrer 8 mm' })).toBeEnabled();
@@ -410,5 +410,90 @@ test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis la tuile «
   await expect(fenetre).toContainText(`3,5 mm déjà notés ${pourLeJour}.`);
   await page.keyboard.press('Escape');
   await expect(fenetre).toBeHidden();
+  await expect(tuile).toBeFocused();
   await verifierLEtape(page, journal, 'la mesure remplacée');
+
+  // La tuile « Eau reçue », dans « Le détail », ouvre la même fenêtre ; sa réponse s'écrit sous les tuiles.
+  await ouvrirLeDetailDuJour(page);
+  const tuileDuDetail = page.getByRole('region', { name: 'Cette semaine' }).locator('button.today-kpi').filter({ hasText: 'Eau reçue' });
+  await expect(tuileDuDetail).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
+  await tuileDuDetail.click();
+  await expect(fenetre).toContainText(`3,5 mm déjà notés ${pourLeJour}.`);
+  await combien.fill('2');
+  await fenetre.getByRole('button', { name: 'Remplacer par 2 mm' }).click();
+  await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.action-reply')).toHaveText(/^Pluie enregistrée : 2 mm le /);
+  await verifierLEtape(page, journal, 'la tuile du détail note la pluie');
+});
+
+/** Les bornes de la page à l'essentiel au téléphone, à 390 px (contrat S2, section 8) : mesurées, pas devinées. */
+const PREMIER_NIVEAU_MAX_PX = 1_600;
+const PREMIER_BOUTON_MAX_PX = 600;
+const CHOSES_A_TOUCHER_MAX = 12;
+
+test('la page à l’essentiel : le premier niveau dans ses bornes, « Le détail » fermé, chaque ancre l’ouvre', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const materiel = await preparerUnPlanDuJour(page, context, testInfo, 'p62-essentiel', journal);
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const proposee = cartes(page, materiel, 'proposed').first();
+  const pli = page.locator('details#today-detail');
+  await expect(pli).toHaveJSProperty('open', false);
+  // Le premier niveau : la journée, la semaine en une barre ; les blocs entiers dans le pli, fermé.
+  await expect(page.locator('#today-week .today-week-sentence')).not.toBeEmpty();
+  for (const id of ['today-week-water', 'today-soil', 'today-water', 'today-reliability', 'today-weather']) {
+    await expect(pli.locator(`#${id}`), `#${id} dans « Le détail »`).toHaveCount(1);
+    await expect(page.locator(`#${id}`)).toBeHidden();
+  }
+  await expect(pli.locator(':scope > summary .today-detail-count')).toHaveText(/chiffres · \d+ jardins? · /);
+
+  if (telephone && await proposee.count() > 0) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const mesures = await page.evaluate(() => {
+      const page = document.querySelector('.today-page');
+      const resume = document.querySelector('#today-detail > summary');
+      const bouton = document.querySelector('#today-day [data-primary]');
+      if (!page || !resume || !bouton) return null;
+      // Le nom du matériel du parcours, rendu unique par le titre du test, tient sur plusieurs lignes ; celui
+      // d'une ferme tient sur une : la mesure retire les lignes en trop du nom, et le dit.
+      const nom = bouton.closest('li')?.querySelector('.today-irrigation-title > span');
+      const lignes = nom ? [...nom.getClientRects()] : [];
+      const nomEnTrop = lignes.length > 1 ? Math.round(lignes[lignes.length - 1].bottom - lignes[0].bottom) : 0;
+      const visibles = [...page.querySelectorAll('a[href], button, select, input, summary')]
+        .filter((element) => !element.closest('.today-detail-body, dialog'))
+        .filter((element) => (element as HTMLElement).offsetParent !== null);
+      return {
+        hauteur: Math.round(resume.getBoundingClientRect().bottom + window.scrollY),
+        premierBouton: Math.round(bouton.getBoundingClientRect().top + window.scrollY) - nomEnTrop,
+        nomEnTrop,
+        choses: visibles.length,
+      };
+    });
+    expect(mesures, 'le premier niveau se mesure').not.toBeNull();
+    if (mesures) {
+      testInfo.annotations.push({ type: 'mesure', description: `premier niveau ${mesures.hauteur} px, premier bouton à ${mesures.premierBouton} px (nom du matériel ramené à une ligne : ${mesures.nomEnTrop} px retirés), ${mesures.choses} choses à toucher` });
+      expect(mesures.hauteur, `premier niveau : ${mesures.hauteur} px`).toBeLessThanOrEqual(PREMIER_NIVEAU_MAX_PX);
+      expect(mesures.premierBouton, `premier bouton : ${mesures.premierBouton} px`).toBeLessThan(PREMIER_BOUTON_MAX_PX);
+      expect(mesures.choses, `choses à toucher : ${mesures.choses}`).toBeLessThanOrEqual(CHOSES_A_TOUCHER_MAX);
+    }
+    await verifierLEtape(page, journal, 'premier niveau dans ses bornes');
+  }
+
+  // Chaque ancre existante ouvre le pli sur son bloc, à l'arrivée sur la page (les liens des notifications, des autres pages).
+  for (const id of ['today-reliability', 'today-weather', 'today-water', 'today-week-water', 'today-soil']) {
+    await page.goto(`/irrigation/aujourdhui#${id}`);
+    await attendreLaPagePrete(page, 'aujourdhui');
+    await expect(pli).toHaveJSProperty('open', true);
+    await expect(page.locator(`#${id}`)).toBeInViewport();
+  }
+  await verifierLEtape(page, journal, 'chaque ancre ouvre « Le détail »');
+
+  // Le pli se ferme et se rouvre au clavier ; son résumé fait une cible de 44 px.
+  const resume = pli.locator(':scope > summary');
+  if (telephone) await verifierCibleTactile(resume, '« Le détail »');
+  await resume.focus();
+  await page.keyboard.press('Enter');
+  await expect(pli).toHaveJSProperty('open', false);
+  await page.keyboard.press('Enter');
+  await expect(pli).toHaveJSProperty('open', true);
+  await verifierLEtape(page, journal, '« Le détail » au clavier');
 });

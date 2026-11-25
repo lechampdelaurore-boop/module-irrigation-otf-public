@@ -5,6 +5,7 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   nomsDesPagesDuMenu,
+  ouvrirLeDetailDuJour,
   ouvrirLeMenuDesPages,
   surveillerLaConsole,
   TITRES_DES_PAGES,
@@ -107,28 +108,32 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   await ouvrirLaFermeToutCoche(page, context, testInfo, 'tableau-de-bord');
   await verifierLEtape(page, journal, 'arrivée sur le tableau de bord');
 
-  // Au téléphone, « Votre journée » juste après l'en-tête, avant les tuiles, à l'écran comme dans l'ordre de lecture ;
-  // à l'ordinateur, les tuiles d'abord, comme avant (6 nonies, L6, D-315).
+  // « Votre journée » juste après l'en-tête, puis « La semaine », à toute largeur, à l'écran comme dans l'ordre de lecture ;
+  // les tuiles dans « Le détail », fermé (6 nonies, L6, D-315, réécrite par la simplification S2, PR 5, D-330).
   await expect(page.locator('#today-day')).toBeVisible();
+  await expect(page.locator('details#today-detail')).toHaveJSProperty('open', false);
   const ordre = await page.evaluate(() => {
     const entete = document.querySelector('.today-head');
     const journee = document.querySelector('#today-day');
+    const semaine = document.querySelector('#today-week');
     const tuiles = document.querySelector('.today-kpis');
-    if (!entete || !journee || !tuiles) return null;
+    if (!entete || !journee || !semaine || !tuiles) return null;
     return {
-      journeeAvantLesTuiles: Boolean(journee.compareDocumentPosition(tuiles) & Node.DOCUMENT_POSITION_FOLLOWING),
+      journeeAvantLaSemaine: Boolean(journee.compareDocumentPosition(semaine) & Node.DOCUMENT_POSITION_FOLLOWING),
+      tuilesDansLeDetail: Boolean(tuiles.closest('#today-detail')),
       basDeLEnTete: entete.getBoundingClientRect().bottom,
       hautDeLaJournee: journee.getBoundingClientRect().top,
-      hautDesTuiles: tuiles.getBoundingClientRect().top,
+      hautDeLaSemaine: semaine.getBoundingClientRect().top,
     };
   });
-  expect(ordre, 'l’en-tête, la journée et les tuiles').not.toBeNull();
+  expect(ordre, 'l’en-tête, la journée, la semaine et les tuiles').not.toBeNull();
   if (ordre) {
-    expect(ordre.journeeAvantLesTuiles, 'ordre de lecture').toBe(telephone);
-    expect(ordre.hautDeLaJournee < ordre.hautDesTuiles, 'ordre affiché').toBe(telephone);
-    expect(Math.min(ordre.hautDeLaJournee, ordre.hautDesTuiles)).toBeGreaterThanOrEqual(ordre.basDeLEnTete);
+    expect(ordre.journeeAvantLaSemaine, 'ordre de lecture').toBe(true);
+    expect(ordre.tuilesDansLeDetail, 'les tuiles dans « Le détail »').toBe(true);
+    expect(ordre.hautDeLaJournee < ordre.hautDeLaSemaine, 'ordre affiché').toBe(true);
+    expect(ordre.hautDeLaJournee).toBeGreaterThanOrEqual(ordre.basDeLEnTete);
   }
-  await verifierLEtape(page, journal, 'la journée avant les tuiles au téléphone');
+  await verifierLEtape(page, journal, 'la journée avant la semaine, les tuiles dans le détail');
 
   // Les pages du menu, dans l'ordre de toujours : les groupes n'en changent pas l'ordre (T1).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
@@ -165,18 +170,25 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   }
   await verifierLEtape(page, journal, 'menu détaché et groupes');
 
-  // L'en-tête : la date, les chiffres de la semaine, les pastilles.
+  // L'en-tête : la date ; les pastilles à l'ordinateur seulement, la phrase les redit au téléphone (S2-g).
   await expect(page.locator('.today-head .today-date')).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi')).toHaveCount(4);
-  const pastilles = page.getByRole('navigation', { name: 'Résumé du jour' }).getByRole('link');
-  await expect(pastilles.first()).toBeVisible();
+  // Masquées au téléphone, elles sortent de l'arbre d'accessibilité : elles se comptent dans la page.
+  const pastilles = page.locator('nav[aria-label="Résumé du jour"] a');
   const donnees = pastilles.filter({ hasText: /données? à rafraîchir$/ });
   await expect(donnees).toHaveCount(1);
-  if (telephone) await verifierCibleTactile(donnees, 'La pastille des données à rafraîchir');
-  await donnees.click();
-  await expect(page).toHaveURL(/#today-reliability$/);
-  await expect(page.locator('#today-reliability')).toBeInViewport();
-  await verifierLEtape(page, journal, 'une pastille mène à son bloc');
+  if (telephone) {
+    await expect(pastilles.first()).toBeHidden();
+    await ouvrirLeDetailDuJour(page);
+  } else {
+    // Une pastille ouvre « Le détail » sur son bloc (S2, PR 5).
+    await expect(pastilles.first()).toBeVisible();
+    await donnees.click();
+    await expect(page).toHaveURL(/#today-reliability$/);
+    await expect(page.locator('details#today-detail')).toHaveJSProperty('open', true);
+    await expect(page.locator('#today-reliability')).toBeInViewport();
+    await verifierLEtape(page, journal, 'une pastille ouvre le détail sur son bloc');
+  }
+  await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi')).toHaveCount(4);
 
   // Les tuiles mènent à leur menu (6 nonies, L1, D-310) : chaque tuile est un lien entier, le mot d'action écrit dessus ;
   // « Eau reçue » ouvre la fenêtre « Noter la pluie » quand la pluie compte (S2, PR 4), un bouton du même dessin.
@@ -207,6 +219,7 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   // « Eau reçue » ouvre « Noter la pluie » sur la page (S2, PR 4), ou les jours pour une ferme toute sous abri.
   await page.goBack();
   await attendreLaPagePrete(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   const eauRecue = page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi').filter({ hasText: 'Eau reçue' });
   if (await eauRecue.evaluate((element) => element.tagName) === 'BUTTON') {
     await eauRecue.click();
@@ -223,6 +236,7 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     await expect(page.locator('#weather')).toBeInViewport();
     await page.goBack();
     await attendreLaPagePrete(page, 'aujourdhui');
+    await ouvrirLeDetailDuJour(page);
   }
   await verifierLEtape(page, journal, 'la tuile de l’eau reçue ouvre la pluie');
 
@@ -265,6 +279,7 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     await verifierLEtape(page, journal, 'le jardin de l’eau de la semaine ouvre son pli des besoins');
     await page.goBack();
     await attendreLaPagePrete(page, 'aujourdhui');
+    await ouvrirLeDetailDuJour(page);
   }
 
   const sol = page.locator('#today-soil');

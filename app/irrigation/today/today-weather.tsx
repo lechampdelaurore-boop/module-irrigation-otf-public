@@ -68,7 +68,7 @@ export function TodayWeather({ block, query }: { block: WeatherBlock; query: Pag
  * la page de son alerte, « Voir l'alerte » écrit dessous (6 nonies, L3,
  * D-312) ; un jour calme reste inerte.
  */
-function WeatherDay({ day, zeroPercent, query }: { day: TodayWeatherDay; zeroPercent: number; query: PageQuery }) {
+export function WeatherDay({ day, zeroPercent, query }: { day: TodayWeatherDay; zeroPercent: number; query: PageQuery }) {
   return (
     <li className="today-day" data-tone={day.tone} data-icon={day.icon}>
       {day.alertPage ? (
