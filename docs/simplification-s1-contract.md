@@ -295,7 +295,8 @@ parcours) : c'est un geste utile, compté comme tel.
 
 - F829 : les données de démonstration (source `mock`, démonstration en ligne
   et parcours) ne viennent d'aucune lecture d'Ouvre ta ferme : la ligne de
-  lecture ne s'y montre jamais ; « Actualiser » reste dans le menu du compte.
+  lecture ne s'y montre jamais ; « Actualiser » reste dans le menu du compte,
+  qui dit « Données de démonstration » avant la date.
 - F830 : une phrase fixe qui met en garde (la prévision prise à 2 m, les
   seuils qui ne sont que des repères) reste en place, comme un état : seule
   l'explication de ce que montre la page passe dans le « ? ».

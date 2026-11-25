@@ -10,8 +10,12 @@ test('la page d’irrigation se charge avec les données de démonstration', asy
   const journal = surveillerLaConsole(page);
   await attendreLaPageIrrigation(page);
 
-  // Données Ouvre ta ferme de démonstration : l'écran l'annonce lui-même.
-  await expect(page.getByText('Données de démonstration')).toBeVisible();
+  // Données Ouvre ta ferme de démonstration : l'écran l'annonce lui-même, dans
+  // le menu du compte, la ligne de lecture ne se montrant que pour un problème
+  // (simplification S1, F829).
+  await page.locator('header.topbar').getByRole('button', { name: /^Compte de / }).click();
+  await expect(page.getByRole('menu', { name: 'Compte' }).getByText('Données de démonstration')).toBeVisible();
+  await page.keyboard.press('Escape');
   // Utilisateur de démonstration : la page est servie sans redirection vers la
   // connexion Cloudflare Access. Le nom du compte, lui, est masqué à 390 px et
   // ne peut donc pas servir de preuve aux deux largeurs.
