@@ -413,12 +413,12 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   await expect(feuille).toHaveCount(0);
   await verifierLEtape(page, journal, 'la pluie relue');
 
-  // « Arroser maintenant » : « Arrosages » sur « Irriguer maintenant », la demande retirée de l'adresse.
+  // « Arroser maintenant » : « Arrosages » sur l'onglet du même nom (S5), la demande retirée de l'adresse.
   await plus.click();
   await feuille.getByRole('link', { name: /^Arroser maintenant/ }).click();
   await attendreLaPagePrete(page, 'arrosages');
   await expect(page).toHaveURL(/\/irrigation\/arrosages\?season=\d{4}$/);
-  await expect(page.getByRole('tab', { name: /^Irriguer maintenant/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: /^Arroser maintenant/ })).toHaveAttribute('aria-selected', 'true');
   await verifierLEtape(page, journal, '« Arroser maintenant »');
 
   // « Noter un arrosage déjà fait » : « Déjà réalisée », depuis « Arrosages » même.

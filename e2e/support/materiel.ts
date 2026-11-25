@@ -105,12 +105,61 @@ function debutDeSaison(): string {
  * qu'elle propose, seul repère stable.
  */
 export async function choisirMaterielEtReglage(page: Page, materiel: string, reglage: string, quantite = '25'): Promise<void> {
+  if (await page.locator('.watering-now').isVisible()) {
+    await choisirOuArroser(page, materiel);
+    // Le réglage ne se montre qu'à un matériel qui en a plusieurs (simplification S5, section 3.1).
+    const reglages = page.locator('.watering-setting select');
+    if ((await reglages.count()) > 0) await reglages.selectOption({ label: reglage });
+    // Sans dose du jour, aucune durée n'est choisie : le parcours tape la quantité, en mm, dans « Plus d'options ».
+    if (quantite !== '' && (await page.getByRole('button', { name: /^Conseillé/, pressed: true }).count()) === 0) await saisirEnMillimetres(page, quantite);
+    return;
+  }
   await page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) }).selectOption({ label: materiel });
   await page.locator('select').filter({ has: page.getByRole('option', { name: reglage }) }).selectOption({ label: reglage });
   // Sans dose du jour proposée par le planning, la quantité reste vide (audit du 19 novembre 2026, lot G, n° 9, F409) :
   // le parcours la tape, comme un utilisateur.
   const champ = page.getByLabel('Quantité souhaitée');
   if (await champ.isVisible() && (await champ.inputValue()) === '') await champ.fill(quantite);
+}
+
+/** Un nom tel quel dans une expression régulière. */
+function echapper(texte: string): string {
+  return texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * « 1. Où ? » d'« Arroser maintenant » (simplification S5, section 3.1) : une
+ * case ronde par matériel, nommée par lui ; au-delà de six matériels prêts, la
+ * liste déroulante groupée, dont chaque choix dit aussi son type et ses
+ * planches (S5-c). Les parcours partagent une base : le nombre de matériels,
+ * donc la forme de la liste, dépend de ceux qui ont joué avant.
+ */
+export async function choisirOuArroser(page: Page, materiel: string): Promise<void> {
+  const formulaire = page.locator('.watering-now');
+  const caseRonde = formulaire.getByRole('radio', { name: materiel, exact: true });
+  if ((await caseRonde.count()) > 0) {
+    await caseRonde.check();
+    return;
+  }
+  const choix = formulaire.locator('select option').filter({ hasText: new RegExp(`^${echapper(materiel)} · `) });
+  const valeur = await choix.getAttribute('value');
+  if (!valeur) throw new Error(`« ${materiel} » n’est pas proposé dans « Où ? ».`);
+  await formulaire.locator('.watering-where-select select').selectOption(valeur);
+}
+
+/** Ouvre « Plus d'options » d'« Arroser maintenant », s'il est fermé. */
+export async function ouvrirPlusDOptions(page: Page): Promise<Locator> {
+  const pli = page.getByRole('button', { name: /^Plus d’options/ });
+  if ((await pli.getAttribute('aria-expanded')) !== 'true') await pli.click();
+  await expect(pli).toHaveAttribute('aria-expanded', 'true');
+  return page.locator('.watering-more-options');
+}
+
+/** « Saisir en mm », dans « Plus d'options » : la quantité se tape au premier niveau, la durée en devient le résultat. */
+export async function saisirEnMillimetres(page: Page, quantite: string): Promise<void> {
+  const options = await ouvrirPlusDOptions(page);
+  await options.getByRole('checkbox', { name: 'Saisir en mm' }).check();
+  await page.getByLabel('Quantité souhaitée').fill(quantite);
 }
 
 /**

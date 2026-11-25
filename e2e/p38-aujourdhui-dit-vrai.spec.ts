@@ -147,13 +147,11 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await attendreLaPageIrrigation(page);
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p38 en cours' });
   await attendreLaPageIrrigation(page, 'arrosages');
-  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
-  await page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) }).selectOption({ label: materiel });
-  await page.locator('select').filter({ has: page.getByRole('option', { name: reglage }) }).selectOption({ label: reglage });
-  await page.getByRole('button', { name: 'Durée d’irrigation' }).click();
-  await page.getByLabel('Heures').fill('0');
-  await page.getByLabel('Minutes').fill('30');
-  await page.getByRole('button', { name: 'Démarrer l’irrigation' }).click();
+  // « Arroser maintenant » en trois champs (simplification S5) : où, la pastille « 30 min », démarrer.
+  await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
+  await choisirMaterielEtReglage(page, materiel, reglage, '');
+  await page.getByRole('button', { name: '30 min', exact: true }).click();
+  await page.getByRole('button', { name: new RegExp(`^Démarrer l’arrosage de ${materiel},`) }).click();
   const fenetre = page.locator('dialog.module-confirm-dialog[open]');
   const demarree = page.getByText('L’irrigation a démarré.');
   await expect(demarree.or(fenetre)).toBeVisible();
