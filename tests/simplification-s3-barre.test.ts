@@ -230,6 +230,9 @@ test('règles 3 à 5 : la barre dessine le domaine, le « + » est un bouton qui
   // Le formulaire de la pluie est le même dans la fenêtre d'« Aujourd'hui » et dans la feuille.
   const dialog = readFileSync('app/irrigation/rain-entry-dialog.tsx', 'utf8');
   assert.match(dialog, /<RainEntryForm\s+key=\{opening\}/);
+  // Refait à la fermeture, jamais à l'ouverture : refait après `showModal`, il perdrait le clavier de « Quel jour ? » (P62).
+  assert.match(dialog, /if \(open && !dialog\.current\?\.open\) dialog\.current\?\.showModal\(\);\s+if \(!open && dialog\.current\?\.open\) \{\s+dialog\.current\.close\(\);\s+setOpening\(\(value\) => value \+ 1\);/);
+  assert.equal((dialog.match(/setOpening\(/g) ?? []).length, 1);
   assert.equal((dialog.match(/saveManualRainfallAction\(/g) ?? []).length, 1);
 });
 
