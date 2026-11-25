@@ -121,6 +121,65 @@ export async function cancelUpcomingIrrigationAlarmsForUser(
 }
 
 /**
+ * L'enregistrement des heures de silence (H3, F807, F820) : les retards
+ * d'irrigation encore à venir de la ferme, programmés avec la plage d'avant,
+ * prennent l'échéance que la plage nouvelle leur donne : la fin de la plage
+ * s'ils y tombent, leur échéance d'origine sinon. Même identifiant, même
+ * révision, même texte : le Worker remplace l'alarme. Un retard échu que la
+ * plage d'avant retenait encore n'est pas parti : la plage éteinte ou
+ * raccourcie le fait partir tout de suite. Un retard déjà parti, la fin d'un
+ * minuteur, une alarme dont l'échéance ne change pas : rien n'est envoyé.
+ * `before` vaut `null` quand le réglage d'avant était illisible : chaque
+ * retard à venir est alors reprogrammé. Ne lève jamais ; un échec se compte
+ * et se dit sans nom, l'alarme garde son échéance d'avant.
+ */
+export async function rescheduleLateAlarmsForQuietHours(
+  ownerUserId: string,
+  before: QuietHoursSettings | null,
+  after: QuietHoursSettings,
+  {
+    now = new Date(),
+    schedule = scheduleIrrigationPushAlarm,
+    log = logJsonLine,
+  }: {
+    now?: Date;
+    schedule?: typeof scheduleIrrigationPushAlarm;
+    log?: (level: LogLevel, entry: Record<string, unknown>) => void;
+  } = {},
+): Promise<{ rescheduled: number; failed: number }> {
+  let rescheduled = 0;
+  let failed = 0;
+  try {
+    const alarms = await listUpcomingPushAlarmsForUser(ownerUserId, now);
+    for (const alarm of alarms) {
+      if (alarm.kind !== 'late') continue;
+      const due = new Date(alarm.dueAt);
+      if (due.getTime() <= now.getTime() && !stillHeld(alarm, before, now)) continue;
+      const dueAt = workerDueAt(after, due);
+      if (before && dueAt === workerDueAt(before, due)) continue;
+      // Démarrée entre-temps, l'irrigation a une révision nouvelle et l'alarme de sa fin : rien à reprogrammer.
+      const record = await getIrrigationPushScheduleForUser(ownerUserId, alarm.eventEquipmentId);
+      if (!record || record.revision !== alarm.revision) continue;
+      const result = await schedule({ ...pushAlarmRequest(record), dueAt })
+        .catch((): IrrigationPushServiceResult => ({ status: 'failed', message: 'unreachable' }));
+      if (result.status === 'failed') failed += 1;
+      else if (result.status === 'ok') rescheduled += 1;
+    }
+  } catch (error) {
+    failed += 1;
+    log('warn', { event: 'quiet_hours_reschedule_failed', error: error instanceof Error ? error.message : 'unknown', failedAt: now.toISOString() });
+  }
+  if (rescheduled + failed > 0) log(failed > 0 ? 'warn' : 'info', { event: 'quiet_hours_late_alarms_rescheduled', rescheduled, failed, at: now.toISOString() });
+  return { rescheduled, failed };
+}
+
+/** L'échéance que le Worker donne au retard d'échéance `due` sous ce réglage : la fin de la plage s'il y tombe. */
+function workerDueAt(settings: QuietHoursSettings, due: Date): string {
+  const decision = quietHoursDecision(settings, { kind: 'irrigation-late' }, due);
+  return decision.action === 'hold' ? decision.until : due.toISOString();
+}
+
+/**
  * Le réglage des heures de silence de la ferme, ou rien s'il est illisible
  * (S8) : la plage compte alors pour éteinte, un retard échu pour parti, et
  * les alarmes à venir se retirent quand même. L'incident se dit sans nom.

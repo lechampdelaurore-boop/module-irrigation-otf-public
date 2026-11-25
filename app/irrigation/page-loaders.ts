@@ -7,10 +7,10 @@ import { listEquipmentForUser } from '@/db/equipment/read';
 import { listSettingProvenancesForUser } from '@/db/equipment/setting-calculations';
 import { listGardenGroupConfigurationForUser } from '@/db/garden-group-repository';
 import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
-import { readPhoneNoticeSettingsForUser } from '@/db/phone-notice-repository';
+import { lastAlertFoundNoDeviceForUser, readPhoneNoticeSettingsForUser } from '@/db/phone-notice-repository';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
 import { listProtectedSlotsForUser } from '@/db/protected-slots-repository';
-import { usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
+import { usesPushNotifications, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { plotShelterLines } from '@/lib/domain/onboarding/plots';
 import { calculateIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
 import { getAppliedWaterGapsForUser } from '@/lib/services/applied-water-gap';
@@ -244,7 +244,9 @@ export async function loadHistoriquePage(context: ReadyPageContext) {
  * lieu de la météo et la correspondance des espèces (P3).
  */
 export async function loadReglagesPage(context: ReadyPageContext) {
-  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices, changeJournal] = await Promise.all([
+  // Les notifications du téléphone se règlent hors démonstration, pour une ferme qui en reçoit (cases 2, 4, 8, 9).
+  const phoneSettings = usesPushNotifications(context.enabled) && !context.shell.demo;
+  const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices, noDeviceAtLastAlert, changeJournal] = await Promise.all([
     countFeatureDataForUser(context.userId),
     getOnboardingForUser(context.userId),
     usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
@@ -254,15 +256,15 @@ export async function loadReglagesPage(context: ReadyPageContext) {
     // « Réglages à relire », pour une ferme qui fait l'accueil (4.4, F588).
     getSettingsReviewForUser(context.userId, context.enabled),
     // Le message du matin suit le calcul du matin du Planning (amélioration n° 3, F712), le rappel du soir les Arrosages
-    // (n° 2, F714) ; pas de réglage en démonstration.
-    (context.enabled.includes('planning') || context.enabled.includes('arrosages')) && !context.shell.demo
-      ? readPhoneNoticeSettingsForUser(context.userId)
-      : null,
+    // (n° 2, F714) ; les heures de silence, toute ferme qui reçoit des notifications (H3, F817). Pas de réglage en démonstration.
+    phoneSettings ? readPhoneNoticeSettingsForUser(context.userId) : null,
+    // Ce que la dernière alerte a trouvé d'appareils, pour l'avertissement des heures de silence (F818).
+    phoneSettings ? lastAlertFoundNoDeviceForUser(context.userId) : false,
     // Le journal des modifications se lit toujours, sans case de fonctionnalité (amélioration n° 7, §5.5).
     getChangeJournalViewForUser(context.userId, context.snapshot),
   ]);
   context.lap('dashboards');
   // Le classement des jardins, pour une ferme qui fait l'accueil (4.4, F583).
   const plotShelters = plotShelterLines(context.snapshot, context.season);
-  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal };
+  return { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, noDeviceAtLastAlert, changeJournal };
 }

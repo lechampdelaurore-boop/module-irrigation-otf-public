@@ -12,8 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
-- **Heures de silence des notifications, H2 : les envoyeurs, codés le
-  24 novembre 2026** (D-324, F803 à F809, roadmap section 6 undecies, PR 2
+- **Heures de silence des notifications, H3 : l'écran, codé le
+  25 novembre 2026** (D-326, F817 à F821, roadmap section 6 undecies, PR 3
+  sur 3), en Opus 5.5 · Élevé, le réglage de la roadmap. Dans « Réglages »,
+  le pli « Messages de la ferme » porte la case « Heures de silence », pour
+  toute ferme qui reçoit des notifications (pas en démonstration) ; allumée,
+  le début, la fin et la case du gel, chaque geste enregistré aussitôt, les
+  quatre valeurs ensemble, au journal des modifications. La phrase dit ce
+  qui passe et ce qui attend ; trois avertissements sans blocage : le
+  rappel du soir jugé au passage qui l'enverrait (21 h 30 part à 22 h 05,
+  F806), la plage pour tous les appareils, et la dernière alerte partie
+  sans trouver d'appareil (F818, le Worker ne dit pas combien d'appareils
+  une ferme a). L'enregistrement reprogramme les retards d'irrigation à
+  venir de la ferme (F807, F820). Tests à deux fermes et Worker simulé,
+  parcours P60 aux deux largeurs, contre-épreuve de trente altérations.
+  Contrôles : voir la PR. La ligne 31 est codée en entier ; c'est le
+  premier moyen d'allumer la plage. Mise en ligne de #207 (H2, D-324) consignée ici : fusionnée le 25 novembre 2026 à 6 h 31, **en ligne à 7 h 03** (run 45554215207, les cinq jobs verts ; migration 0050 appliquée en production et sur la démonstration, démonstration à 7 h 04).
+- **Heures de silence des notifications, H2 : les envoyeurs, en ligne le
+  25 novembre 2026 à 7 h 03** (D-324, F803 à F809, roadmap section 6 undecies, PR 2
   sur 3), en Opus 5.5 · Max, le réglage de la roadmap. Les cinq envoyeurs
   lisent la règle de H1, chacun avec le réglage de sa ferme, à l'instant où
   sa notification partirait. Une alerte météo ou par culture retenue part
@@ -26,8 +42,7 @@ registres, elle y renvoie.
   ce que devient une alarme, il laisse le scénario 15 du contrat non tenu
   (F804). Aucun écran n'allume encore la plage : rien ne change pour aucune
   ferme. Tests à deux fermes et Worker simulé, contre-épreuve de
-  quarante altérations. Contrôles : voir la PR. Reste H3, l'écran, en
-  Opus 5.5 · Élevé.
+  quarante altérations. Contrôles : voir la PR.
 - **Heures de silence des notifications, H1 : la règle et le réglage,
   en ligne le 25 novembre 2026 à 5 h 56** (D-321, F797 à F802, roadmap section 6
   undecies, PR 1 sur 3), en Opus 5.5 · Max, le réglage de la roadmap. La

@@ -153,6 +153,27 @@ export class InvalidQuietHoursError extends Error {
 }
 
 /**
+ * L'écran des heures de silence (H3, F818) : `true` quand la dernière alerte
+ * météo ou par culture de la ferme, partie tout de suite, n'a trouvé aucun
+ * appareil inscrit. Le Worker de notification ne dit pas combien d'appareils
+ * une ferme a (il ne change pas, choix 9) : seul le dernier envoi le dit. Une
+ * alerte retenue compte comme envoyée sans avoir rien atteint (F804), une
+ * alerte en échec ou en nouvelle tentative ne dit rien des appareils : ni
+ * l'une ni l'autre ne compte. Sans alerte, `false` : l'écran ne dit rien.
+ */
+export async function lastAlertFoundNoDeviceForUser(ownerUserId: string): Promise<boolean> {
+  const workspaceId = await findWorkspaceIdForUser(ownerUserId);
+  if (!workspaceId) return false;
+  const latest = (table: string) => `SELECT * FROM (SELECT delivery_status, sent_at FROM ${table}
+     WHERE workspace_id = ? AND held_until IS NULL AND delivery_status IN ('sent', 'no-subscriber')
+     ORDER BY sent_at DESC LIMIT 1)`;
+  const row = await db.prepare(
+    `${latest('irrigation_weather_alerts')} UNION ALL ${latest('irrigation_crop_alerts')} ORDER BY sent_at DESC LIMIT 1`,
+  ).bind(workspaceId, workspaceId).first<{ delivery_status: string }>();
+  return row?.delivery_status === 'no-subscriber';
+}
+
+/**
  * Une prise sans envoi plus vieille que ceci est celle d'un calcul ou d'un
  * passage coupé en route : un calcul relancé le même jour la reprend.
  */

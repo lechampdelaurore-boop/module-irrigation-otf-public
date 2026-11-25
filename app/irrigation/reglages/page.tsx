@@ -27,7 +27,7 @@ export const metadata = pageMetadata('reglages');
  * La page « Réglages » (3.8, docs/feature-selection-contract.md, section 3) :
  * la liste des cases, toujours, puis le socle que les cases cochées demandent :
  * le lieu de la météo (cases 3, 6, 7, 8, 9), les notifications du téléphone
- * (cases 2, 4, 8, 9) et la correspondance des espèces (cases 7, 9, P3) ;
+ * (cases 2, 4, 8, 9), heures de silence comprises (H3), et la correspondance des espèces (cases 7, 9, P3) ;
  * le classement des jardins d'une ferme qui fait l'accueil (4.4, F583) ;
  * l'étape « Rattachez vos espèces » d'une ferme qui fait l'accueil, en tête
  * de la correspondance des espèces (4.4, F587) ; « Réglages à relire »
@@ -39,7 +39,7 @@ export const metadata = pageMetadata('reglages');
 async function computeReglagesPage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('reglages', searchParams);
   if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, changeJournal } = await loadReglagesPage(context);
+  const { counts, onboarding, waterDashboard, cropCoefficients, plotShelters, settingsReview, phoneNotices, noDeviceAtLastAlert, changeJournal } = await loadReglagesPage(context);
   context.logLoaded();
   // Le sol se saisit sur la page « Réserve du sol » : l'étape y mène, comme le bandeau (F584).
   const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
@@ -52,6 +52,7 @@ async function computeReglagesPage({ searchParams }: { searchParams: IrrigationS
             season={context.season}
             morningMessage={phoneNotices && context.enabled.includes('planning') ? phoneNotices.morningMessage : null}
             evening={phoneNotices && context.enabled.includes('arrosages') ? { enabled: phoneNotices.eveningReminder, time: phoneNotices.eveningTime } : null}
+            quietHours={phoneNotices ? { settings: phoneNotices.quietHours, noDeviceAtLastAlert } : null}
           />
         : null}
       {cropCoefficients ? <CropCoefficientsPanel season={context.season} initialView={cropCoefficients} part="especes" /> : null}
