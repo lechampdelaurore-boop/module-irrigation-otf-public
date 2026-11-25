@@ -337,6 +337,8 @@ d'« Aujourd'hui ». Contre-épreuve.
   ci-dessous.
 - Occurrences relevées des mots du tableau et ce qu'elles deviennent (PR 2).
 - Cause établie du point ouvert S1-O1 et issue choisie (PR 3).
+- Précisions tranchées en codant l'Historique comme « Aujourd'hui » (PR 3 bis,
+  D-329).
 
 ### 9.1 PR 1 — Inventaire des paragraphes de tête (25 novembre 2026)
 
@@ -424,7 +426,7 @@ hors commentaire, avant la PR (branche de la PR 1) puis après.
 | Par périmètre | 1 | « Par lieu » (onglet de l'historique) | nulle part |
 | totaux partiels | 1 | « totaux incomplets » | nulle part |
 | réanalyse, historisé | 5 au premier niveau | « pluie estimée par la météo », « estimée », « l'estimation météo », « Non enregistré » (F835) | les causes d'écart, les bulles, les replis de diagnostic et la page d'état de l'exploitant, qui sont du détail |
-| journées-planche | 1 | inchangé ici : la phrase de l'objectif de l'historique est réécrite par la PR 3 (un seul objectif) | — |
+| journées-planche | 1 | inchangé ici : la phrase de l'objectif de l'historique est réécrite par la PR 3 bis (D-329, section 9.7) | — |
 
 Deux gardes. Le test de garde (`tests/simplification-s1-mots.test.ts`) lit
 le code : il échoue si l'un de ces mots, écrit comme un titre, reparaît hors
@@ -503,6 +505,41 @@ pour la semaine affichée seulement (« eau visée en cours de lecture » le
 temps que les besoins d'une autre semaine soient relus). Le pli « Eau visée
 cette semaine » garde « Toute la ferme : 2,7 mm », qui dit l'objectif saisi
 à ce niveau. Le planning ne dit pas d'objectif de ferme : rien à aligner.
+
+### 9.7 PR 3 bis — Précisions tranchées en codant (25 novembre 2026)
+
+- **Où vit la règle.** `aggregateHydricObjective` garde son parcours jour
+  par jour (règle 1) et somme l'objectif de chaque planche ; `farmObjective`
+  en fait la moyenne (règle 2). Les planches qui ont un objectif servent à
+  l'écart dans `buildIrrigationHistorySummary` (règle 3). La vue « Par
+  série » appelle la même fonction sur ses planches, pondérées par leur
+  surface occupée. Les phrases de la page (règle 5) :
+  `lib/domain/irrigation-history/objective-scope.ts`.
+- **Une planche arrosée hors du plan de la saison** n'a pas d'objectif :
+  son eau compte dans les cumuls du périmètre, comme avant, et pas dans
+  l'écart quand une partie seulement des planches a un objectif. Quand
+  toutes en ont un, l'écart garde l'eau d'avant, cette planche comprise
+  (« au millimètre près », règle 3).
+- **Les journées-planche** se comptent sur les planches qui ont un
+  objectif : « objectif posé sur 8/14 journées-planche » pour deux planches
+  couvertes quatre jours sur sept. La donnée d'avant (toutes les planches du
+  périmètre) reste dans le résumé ; la page ne la dit plus.
+- **Une planche de surface nulle** qui a un objectif compte parmi les
+  planches qui en ont un, sans poids ; quand aucune des planches de
+  l'objectif n'a de surface, il n'y a pas de moyenne (D-003), comme sur
+  « Aujourd'hui ».
+- **La pluie qui manque.** L'Historique dit l'écart indisponible quand la
+  pluie réelle manque un jour sur une planche de plein champ qui a un
+  objectif (règle 3) ; « Aujourd'hui » compte la pluie connue et dit le
+  manque dans « Fiabilité du calcul ». Deux façons de dire un même manque,
+  déjà là avant D-329 : rien ne change ici.
+- **La démonstration**, à la semaine de chaque moment : la Ferme des Trois
+  Noues dit 10,6 mm (5 planches sur 10 ont un objectif) au gel de
+  printemps, 23,4 mm (7 sur 10) au début de l'été, 26,7 mm (5 sur 10) en
+  pénurie et 11,3 mm (2 sur 10) à l'automne, au lieu de 5,2, 16,5, 13,1 et
+  2,6 mm, et chaque fois le chiffre d'« Aujourd'hui » ; les trois autres
+  fermes n'ont pas d'objectif ces semaines-là. L'écart y reste indisponible :
+  la démonstration ne mesure pas la pluie.
 
 ## 10. Réglage du code
 
