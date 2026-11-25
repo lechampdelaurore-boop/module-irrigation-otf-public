@@ -13,6 +13,20 @@ source détaillée commit par commit.
   ni aucune règle d'écriture changés ; les précautions restent au premier
   niveau. Ne touche pas l'écran de bienvenue du contrat 3.8 (lot S6).
 
+### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
+
+- **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
+  décision du porteur du 25 novembre 2026) : l'objectif d'une période, par
+  lieu comme par série, est la moyenne sur les seules planches qui ont un
+  objectif, et la carte « Objectif » dit combien en ont un (« 7 planches sur
+  10 ont un objectif ») ; les planches sans objectif n'y comptent plus pour
+  zéro. La semaine en cours dit le même chiffre qu'« Aujourd'hui » : sur la
+  démonstration, la Ferme des Trois Noues passe de 16,5 à 23,4 mm au début
+  de l'été. L'écart compare cet objectif à l'eau reçue par ces mêmes
+  planches, et la carte le dit (« Eau reçue par ces 7 planches : 12,4 mm »).
+  Quand chaque planche a un objectif, rien ne change. L'export CSV garde ses
+  colonnes.
+
 ### Modifié (simplifier l'usage du module, S1, PR 3 : un seul objectif)
 
 - **« Objectifs et besoins » dit le même objectif qu'« Aujourd'hui »**

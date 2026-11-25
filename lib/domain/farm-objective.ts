@@ -9,7 +9,9 @@ import { mmText } from './figure-origin.ts';
  * la ferme en est la moyenne pondérée par la surface, Σ(mm × m²) / Σ(m²),
  * sur les seules planches qui ont un objectif ; celles qui n'en ont pas sont
  * comptées à voix haute, jamais à zéro (D-003). Aucune page ne refait cette
- * moyenne : « Aujourd'hui » et « Objectifs et besoins » l'appellent.
+ * moyenne : « Aujourd'hui » et « Objectifs et besoins » l'appellent, et
+ * « Historique et cumuls » pour l'objectif d'une période et d'une série
+ * (PR 3 bis, D-329, section 5 bis du contrat).
  *
  * Ce n'est pas l'objectif « Toute la ferme » saisi : celui-là n'est qu'un
  * réglage, que l'objectif d'un jardin ou d'une planche remplace là où il est
@@ -40,8 +42,11 @@ export function farmObjective(beds: readonly FarmObjectiveBed[]): FarmObjective 
   };
 }
 
+/** Les planches comptées : celles qui ont un objectif, sur toutes. */
+type ObjectiveBedCount = Pick<FarmObjective, 'withObjective' | 'total'>;
+
 /** Une partie seulement des planches a un objectif. */
-export function farmObjectivePartial(objective: FarmObjective): boolean {
+export function farmObjectivePartial(objective: ObjectiveBedCount): boolean {
   return objective.withObjective > 0 && objective.withObjective < objective.total;
 }
 
@@ -49,7 +54,7 @@ export function farmObjectivePartial(objective: FarmObjective): boolean {
  * Sur quelles planches se lit le chiffre : « ferme entière », ou « 7 planches
  * sur 10 ont un objectif » (un seul « sur » par phrase, F443).
  */
-export function farmObjectiveScopeText(objective: FarmObjective): string {
+export function farmObjectiveScopeText(objective: ObjectiveBedCount): string {
   if (!farmObjectivePartial(objective)) return 'ferme entière';
   const count = objective.withObjective;
   return `${count} planche${count > 1 ? 's' : ''} sur ${objective.total} ${count > 1 ? 'ont' : 'a'} un objectif`;

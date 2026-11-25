@@ -6,6 +6,7 @@ import type { SeriesWaterDashboard } from '@/lib/services/series-water-service';
 import { loadSeriesWaterAction } from './irrigation-history-actions';
 import { SeriesCropWaterPanel } from './crop-water/series-crop-water-panel';
 import { countText } from '@/lib/domain/clock-text';
+import { farmObjectivePartial, farmObjectiveScopeText } from '@/lib/domain/farm-objective';
 
 type Report = Extract<SeriesWaterDashboard, { available: true }>['report'];
 type SeriesSummary = Report['series'][number];
@@ -197,7 +198,9 @@ function harvestLabel(item: SeriesSummary) {
 function bedsLabel(item: SeriesSummary) {
   const names = item.beds.map((bed) => bed.bedName).join(', ');
   const linear = item.beds.reduce<number | null>((sum, bed) => (sum === null || bed.lengthMeters === null ? null : sum + bed.lengthMeters), 0);
-  return `${item.beds.length} planche${item.beds.length > 1 ? 's' : ''} (${names || '—'})${linear === null ? '' : ` · ${numberFormatter.format(linear)} m`}`;
+  // L'objectif et l'écart se chiffrent sur les planches qui en ont un : la carte dit combien (D-329, contrat S1, section 5 bis).
+  const scope = farmObjectivePartial(item.objectiveBeds) ? ` · ${farmObjectiveScopeText(item.objectiveBeds)}` : '';
+  return `${item.beds.length} planche${item.beds.length > 1 ? 's' : ''} (${names || '—'})${linear === null ? '' : ` · ${numberFormatter.format(linear)} m`}${scope}`;
 }
 
 /** `2025-W45` → « semaine 45 de 2025 ». */
