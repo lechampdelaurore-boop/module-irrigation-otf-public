@@ -5,7 +5,8 @@ import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
 import { dayRowLayout, type TodayBlock, type TodayView } from '@/lib/domain/today/today-view';
 import { millisecondsFromMinutes, millisecondsFromSeconds } from '@/lib/domain/units';
 import { recordDoneAsPlannedAction } from '../done-as-planned-actions';
-import { startIrrigationEventAction } from '../irrigation-event-actions';
+import { eventReply, type TodayStart } from '@/lib/domain/today/card-action';
+import { finishIrrigationEventAction, pauseIrrigationEventAction, resumeIrrigationEventAction, startIrrigationEventAction } from '../irrigation-event-actions';
 import { computeWeeklyPlanAction } from '../planning-actions';
 import { actionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { announceTodayBadge } from '../shell/today-badge';
@@ -133,6 +134,10 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   // Validée, elle devient une irrigation planifiée : la réponse et le focus la suivent ; sinon, la réponse reste sous la proposition.
   const cardGesture = (gesture: TodayCardWrite) => {
     if (gesture.kind === 'start') return start(gesture.eventEquipmentId);
+    if (gesture.kind === 'pause' || gesture.kind === 'resume') {
+      const id = gesture.eventEquipmentId;
+      return eventGesture(id, () => (gesture.kind === 'pause' ? pauseIrrigationEventAction(id) : resumeIrrigationEventAction(id)));
+    }
     startTransition(async () => {
       const input = { season, proposalId: gesture.proposalId };
       const result = gesture.kind === 'validate'
@@ -147,6 +152,23 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       focusCard.current = result.eventEquipmentId ?? gesture.proposalId;
     });
   };
+
+  // « Mettre en pause », « Reprendre », « Terminer » (S2, PR 2) : les actions d'« Arrosages » ; la réponse reste sous la carte
+  // de l'irrigation, qui passe « En pause », « En cours » ou devient « ce qui reste » ; terminée, elle se lit en tête du bloc.
+  const eventGesture = (eventEquipmentId: string, act: () => Promise<TodayStart>) => new Promise<boolean>((resolve) => startTransition(async () => {
+    try {
+      const result = await act();
+      const reply = eventReply(eventEquipmentId, result);
+      setReplies([actionReply(irrigationReply(eventEquipmentId), reply.tone, reply.text)]);
+      if (result.ok) await reload();
+      focusCard.current = eventEquipmentId;
+      resolve(result.ok);
+    } catch (error) {
+      resolve(false);
+      throw error;
+    }
+  }));
+  const finish = (eventEquipmentId: string, actualEndAt: string | null) => eventGesture(eventEquipmentId, () => finishIrrigationEventAction({ eventEquipmentId, actualEndAt }));
 
   // « Tout est fait » (section 3.4) : le message dit combien sont enregistrées, et nomme chaque refus.
   const recordAllDone = (eventEquipmentIds: string[], origin: string) => new Promise<void>((resolve) => startTransition(async () => {
@@ -185,7 +207,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const dayRow = (
     <Pair
       key="journee"
-      wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onStart={start} onCardGesture={cardGesture} onAllDone={recordAllDone} /> : null}
+      wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onStart={start} onCardGesture={cardGesture} onFinish={finish} onAllDone={recordAllDone} /> : null}
       narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
       layout={late && todo ? dayRowLayout(late.lines.length + view.current.length, todo.lines.length) : 'wide'}
     />

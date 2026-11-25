@@ -1,5 +1,8 @@
 import { pageLabel, type IrrigationPageId } from '../features/pages.ts';
-import type { TodayIrrigationLine } from './today-irrigations.ts';
+import { remainingTimerSeconds } from '../irrigation-timer.ts';
+import { MINUTES_PER_HOUR, SECONDS_PER_HOUR } from '../units.ts';
+import type { TodayNowLine } from './now-irrigations.ts';
+import { durationText, type TodayIrrigationLine } from './today-irrigations.ts';
 
 /**
  * La carte à un bouton d'« Aujourd'hui » (simplification, lot S2,
@@ -11,9 +14,11 @@ import type { TodayIrrigationLine } from './today-irrigations.ts';
  * se fait sans appui (D-028).
  *
  * PR 1 du lot : une proposition du plan (« Valider ») et une irrigation
- * planifiée à venir (« Démarrer »). Les irrigations en retard ou non faites
- * gardent leurs gestes jusqu'à la PR 3 : la fonction ne leur donne pas de
- * carte à un bouton (`null`).
+ * planifiée à venir (« Démarrer »). PR 2 : ce qui coule ou attend d'être
+ * repris (« Terminer », « Reprendre », « Mettre en pause », « Reprendre ce qui
+ * reste »), par la fenêtre de fin et les actions d'« Arrosages ». Les
+ * irrigations en retard ou non faites gardent leurs gestes jusqu'à la PR 3 :
+ * la fonction ne leur donne pas de carte à un bouton (`null`).
  */
 
 /** Ce que fait un choix de la carte : un geste existant, ou un lien vers une autre page. */
@@ -22,6 +27,14 @@ export type TodayCardGesture =
   | { kind: 'validate-and-start'; proposalId: string }
   | { kind: 'refuse'; proposalId: string; confirmation: TodayCardConfirmation }
   | { kind: 'start'; eventEquipmentId: string }
+  | { kind: 'pause'; eventEquipmentId: string }
+  | { kind: 'resume'; eventEquipmentId: string }
+  /**
+   * « Terminer » ouvre la fenêtre de fin d'« Arrosages » : la vanne à
+   * vérifier, l'heure réelle à confirmer, pré-remplie à l'heure de la pause
+   * ou, `null`, à maintenant (contrat, section 6).
+   */
+  | { kind: 'finish'; eventEquipmentId: string; equipmentName: string; suggestedEndAt: string | null }
   | { kind: 'open'; page: IrrigationPageId; anchor: string };
 
 /** La confirmation d'une ligne qui précède un geste qui ne se défait pas. */
@@ -58,6 +71,10 @@ function choice(line: TodayIrrigationLine, label: string, gesture: TodayCardGest
   return { label, accessibleName: `${label} : ${line.title}, ${line.time}`, gesture };
 }
 
+function nowChoice(line: TodayNowLine, label: string, gesture: TodayCardGesture): TodayCardChoice {
+  return { label, accessibleName: `${label} : ${line.title}`, gesture };
+}
+
 /** « Modifier ou annuler sur « Arrosages » », ou « Ouvrir sur « Planning » » quand les arrosages ne sont pas cochés. */
 function openLabel(page: IrrigationPageId): string {
   return page === 'arrosages' ? `Modifier ou annuler sur « ${pageLabel(page)} »` : `Ouvrir sur « ${pageLabel(page)} »`;
@@ -92,6 +109,60 @@ export function todayCardActions(line: TodayIrrigationLine): TodayCardActions | 
   return null;
 }
 
+/**
+ * Les gestes d'une carte de ce qui coule ou attend d'être repris (contrat,
+ * section 3, tableau ; section 6) : « Terminer » quand l'arrosage coule ou a
+ * atteint sa durée, « Reprendre » en pause, avec « Terminer » en lien
+ * d'appoint, « Reprendre ce qui reste » pour le reste d'un arrosage arrêté
+ * (le mot de S1, F836). La pause est rangée dans « Autres choix » (S2-i) ;
+ * l'abandon de ce qui reste et tout le reste se font sur « Arrosages ».
+ */
+export function todayNowActions(line: TodayNowLine): TodayCardActions {
+  const id = line.eventEquipmentId;
+  const open = nowChoice(line, `Ouvrir sur « ${pageLabel(line.open.page)} »`, { kind: 'open', page: line.open.page, anchor: line.open.anchor });
+  const finish = nowChoice(line, 'Terminer', { kind: 'finish', eventEquipmentId: id, equipmentName: line.equipmentName, suggestedEndAt: line.suggestedEndAt });
+  switch (line.tone) {
+    case 'running':
+      return { primary: finish, secondary: null, others: [nowChoice(line, 'Mettre en pause', { kind: 'pause', eventEquipmentId: id }), open] };
+    case 'paused':
+      return { primary: nowChoice(line, 'Reprendre', { kind: 'resume', eventEquipmentId: id }), secondary: finish, others: [open] };
+    case 'finished':
+      return { primary: finish, secondary: null, others: [open] };
+    case 'remainder':
+      return { primary: nowChoice(line, 'Reprendre ce qui reste', { kind: 'start', eventEquipmentId: id }), secondary: null, others: [open] };
+  }
+}
+
+const SECONDS_PER_MINUTE = SECONDS_PER_HOUR / MINUTES_PER_HOUR;
+
+/** Ce que dit une durée atteinte : l'état « fermer la vanne » du minuteur, en consigne (contrat, section 6). */
+export const CLOSE_THE_VALVE = 'Fermez la vanne, puis appuyez sur « Terminer ».';
+
+/**
+ * Le compte à rebours d'une irrigation qui coule, lu sur le minuteur
+ * existant à l'heure donnée, jamais recalculé par la page : « Reste 52 min »,
+ * à la minute supérieure ; la durée atteinte, la consigne de fermer la vanne ;
+ * en pause ou pour ce qui reste d'un arrosage arrêté, rien.
+ */
+export function nowCountdownText(line: TodayNowLine, now: Date): string | null {
+  if (line.tone === 'finished') return CLOSE_THE_VALVE;
+  if (line.tone !== 'running' || !line.timer) return null;
+  const remaining = remainingTimerSeconds(line.timer, now);
+  if (remaining <= 0) return CLOSE_THE_VALVE;
+  return `Reste ${durationText(Math.ceil(remaining / SECONDS_PER_MINUTE) * SECONDS_PER_MINUTE)}`;
+}
+
+/**
+ * La réponse de « Terminer », « Mettre en pause », « Reprendre » : le
+ * message de l'action d'« Arrosages », sous la carte de l'irrigation ; une
+ * irrigation partielle devient « ce qui reste », la réponse la suit.
+ */
+export function eventReply(eventEquipmentId: string, result: TodayStart): TodayCardReply {
+  return result.ok
+    ? { tone: 'notice', text: sentences(result.message, result.warning), eventEquipmentId }
+    : { tone: 'error', text: result.message, eventEquipmentId };
+}
+
 /** La réponse d'un geste de la carte, telle qu'elle s'écrit sous elle. */
 export type TodayCardReply = {
   tone: 'notice' | 'error';
@@ -108,7 +179,7 @@ export type TodayValidation =
   | { ok: true; eventEquipmentId: string; warning?: string }
   | { ok: false; message: string };
 
-/** Le résultat d'un démarrage, tel que l'action le rend (`IrrigationEventActionResult`). */
+/** Le résultat d'une action d'« Arrosages » (démarrer, mettre en pause, reprendre, terminer), tel qu'elle le rend (`IrrigationEventActionResult`). */
 export type TodayStart = { ok: true; message: string; warning?: string } | { ok: false; message: string };
 
 function sentences(...parts: (string | null | undefined)[]): string {

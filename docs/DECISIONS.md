@@ -10226,8 +10226,8 @@ Contre-épreuve : treize altérations, chacune prise par au moins un test.
 
 ## D-330 — Simplifier l'usage du module, lot S2 : « Aujourd'hui » où l'on fait tout
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 5 codée** (valider et démarrer
-depuis la carte) ; contrat `docs/simplification-s2-contract.md`, roadmap
+Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 5 codées** (valider et
+démarrer, puis terminer et reprendre depuis la carte) ; contrat `docs/simplification-s2-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 15), sur le mandat du porteur du 25 novembre
 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met en œuvre le
@@ -10290,3 +10290,58 @@ PR.
 **Ne change pas.** Aucune règle de validation, de démarrage ni de refus,
 aucun calcul, aucune donnée, aucune migration ; le planning et « Arrosages »
 gardent tous leurs gestes ; les notifications gardent leurs mots.
+
+**Décision (PR 2).** Ce qui coule ou attend d'être repris, en tête de « Votre
+journée », a sa carte à un bouton (contrat, sections 3 et 6). Une irrigation
+en cours : « Terminer », et dans « Autres choix » « Mettre en pause » (S2-i)
+et « Ouvrir sur « Arrosages » ». En pause : « Reprendre », « Terminer »
+dessous. Durée atteinte : « Terminer ». Ce qui reste d'un arrosage arrêté :
+« Reprendre ce qui reste ». « Terminer » ouvre, sur la page même, la fenêtre
+de fin d'« Arrosages » (`FinishIrrigationDialog`) : la vanne à vérifier,
+l'heure réelle pré-remplie comme là-bas (maintenant, ou l'heure de la pause),
+puis `finishIrrigationEventAction`. La pause et la reprise sont
+`pauseIrrigationEventAction` et `resumeIrrigationEventAction` ; la pause ne
+fait pas recalculer le plan (3.7, règle 5). La règle est `todayNowActions`
+dans `lib/domain/today/card-action.ts`. Une irrigation arrêtée en route
+devient ce qui reste, la réponse « L'irrigation partielle a été enregistrée.
+Ce qui reste est planifié. » sous sa carte, le focus sur « Reprendre ce qui
+reste » : le matin se fait de bout en bout sans quitter « Aujourd'hui ».
+
+**Précisions tranchées en codant (PR 2).**
+
+- F844 : la fenêtre de fin reçoit le nom du matériel au lieu de la fiche
+  entière ; « Arrosages » lui passe ce nom. Un changement de signature, sans
+  changement de comportement sur « Arrosages » (contrat, section 6, la seconde
+  voie : la fenêtre reçoit les valeurs).
+- F845 : sur « Aujourd'hui », la fenêtre se ferme à la réponse, réussie ou
+  refusée : le motif d'un refus se lit sous la carte (L4), jamais caché
+  derrière la fenêtre. Sur « Arrosages », elle reste ouverte comme avant.
+- F846 : le compte à rebours d'une irrigation qui coule dit « Reste 52 min »,
+  à la minute supérieure, lu sur le minuteur existant
+  (`remainingTimerSeconds`) à l'heure du navigateur, relue toutes les quinze
+  secondes ; jamais au rendu du serveur, pour ne pas écrire deux heures
+  différentes. La « fin prévue à » reste dans le détail ; le « 8 mm au total »
+  de la maquette attend la PR 5, qui range la carte.
+- F847 : la durée atteinte dit « Fermez la vanne, puis appuyez sur
+  « Terminer ». » sous la carte ; le détail ne répète plus « fermer la
+  vanne ».
+- F848 : « Reprendre ce qui reste » (le mot de S1, F836) remplace « Reprendre
+  le reliquat » du contrat. L'abandon de ce qui reste se fait sur
+  « Arrosages », par « Ouvrir sur « Arrosages » » rangé dans « Autres choix ».
+- F849 : le lien « Terminer l’irrigation » de la carte (lot K, F473), qui
+  menait à « Arrosages », disparaît : la carte dit « Terminer » (contrat,
+  section 3, mots) ; la fenêtre et « Arrosages » gardent « Terminer
+  l’irrigation ».
+
+**Preuve (PR 2).** `tests/simplification-s2-terminer.test.ts` : le bouton de
+chaque carte, les gestes (la fin par sa fenêtre, l'heure de la pause), le
+compte à rebours (à la minute supérieure, jamais « 0 min », la durée atteinte
+entre deux relectures), la réponse sous la carte, l'interface (la carte
+dessine le domaine, la fenêtre d'« Arrosages » par le nom, fermée à la
+réponse, l'heure du navigateur seulement).
+`tests/db/simplification-s2-terminer.test.ts` : sur les vrais services, en
+cours, en pause, repris, terminé avant la fin, ce qui reste repris puis
+terminé à la durée, « Terminer » à l'heure de la pause, un refus dit sous la
+carte, Bob qui ne met en pause, ne reprend ni ne termine rien d'Alice. P62
+étendu (valider, démarrer, mettre en pause, reprendre, terminer sur la page
+seule), P38 suit le nouveau geste. Contre-épreuve : voir la PR.

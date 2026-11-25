@@ -151,7 +151,7 @@ const running = irrigation('r', { timerState: 'running', timer: {
   timerStartedAt: '2026-11-19T08:40:00.000Z', timerResumedAt: '2026-11-19T08:40:00.000Z', timerTheoreticalEndAt: '2026-11-19T12:50:00.000Z',
 } });
 
-test('n° 2, F433 : une irrigation en cours, en pause ou à confirmer se lit en tête, avec « Terminer l’irrigation » (son nom depuis le lot K, F473) vers sa carte', () => {
+test('n° 2, F433 : une irrigation en cours, en pause ou à confirmer se lit en tête, avec sa carte sur « Arrosages »', () => {
   const paused = irrigation('p', { timerState: 'paused', timer: {
     timerStartedAt: '2026-11-19T08:00:00.000Z', timerPausedAt: '2026-11-19T09:05:00.000Z', timerAccumulatedSeconds: 3900,
   } });
@@ -160,7 +160,8 @@ test('n° 2, F433 : une irrigation en cours, en pause ou à confirmer se lit en 
   } });
   const lines = nowIrrigationLines({ enabled: [...FEATURE_IDS], now: NOW, events: [running, paused, finished], bedNames: BED_NAMES });
   assert.deepEqual(lines.map((line) => [line.status, line.title, line.detail, line.bedsText, line.canResume, line.open]), [
-    ['Durée atteinte', 'Goutte-à-goutte de l’abri · Réglage 1', 'depuis 5 h, fermer la vanne', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-f' }],
+    // La consigne de fermer la vanne se dit à part, sous la carte (simplification S2, section 6 : `nowCountdownText`).
+    ['Durée atteinte', 'Goutte-à-goutte de l’abri · Réglage 1', 'depuis 5 h', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-f' }],
     ['En pause', 'Goutte-à-goutte de l’abri · Réglage 1', 'en pause depuis 10 h 05', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-p' }],
     ['En cours', 'Goutte-à-goutte de l’abri · Réglage 1', 'depuis 9 h 40, fin prévue à 13 h 50', 'planches P1 et P2', false, { page: 'arrosages', anchor: 'irrigation-r' }],
   ]);

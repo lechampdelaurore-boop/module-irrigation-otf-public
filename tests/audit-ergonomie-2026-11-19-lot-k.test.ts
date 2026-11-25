@@ -110,7 +110,8 @@ test('n° 21, F472 : l’heure réelle de fin à la minute, la seconde du minute
 });
 
 test('n° 21, F473 : un seul mot pour finir un arrosage', () => {
-  for (const file of ['app/irrigation/irrigation-manager/finish-irrigation-dialog.tsx', 'app/irrigation/irrigation-manager/irrigation-cards.tsx', 'app/irrigation/today/today-day.tsx']) {
+  // « Aujourd'hui » dit « Terminer » sur sa carte à un bouton, et ouvre la même fenêtre (simplification S2, section 3).
+  for (const file of ['app/irrigation/irrigation-manager/finish-irrigation-dialog.tsx', 'app/irrigation/irrigation-manager/irrigation-cards.tsx']) {
     const source = readFileSync(file, 'utf8');
     assert.ok(source.includes('Terminer l’irrigation'), file);
     assert.doesNotMatch(source, /Terminer maintenant|'Irrigation terminée'\}/, file);

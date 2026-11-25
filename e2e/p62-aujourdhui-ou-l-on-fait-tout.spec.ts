@@ -22,7 +22,12 @@ import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/
  *   (« Changer l'heure ou la dose », « Pas à cette heure ») ; « Pas à cette
  *   heure » se confirme d'une ligne ; « Valider » la fait passer
  *   « Planifiée », la réponse et le focus sur sa carte, sur « Démarrer » ;
- *   « Démarrer » la fait couler ;
+ *   « Démarrer » la fait couler ; PR 2 : en cours, elle dit « Terminer » et
+ *   « Reste … », « Mettre en pause » rangé dans « Autres choix » ; en pause,
+ *   « Reprendre », le focus dessus ; reprise, « Terminer » ouvre la fenêtre
+ *   d'« Arrosages » (« Retour » ne fait rien), et l'irrigation arrêtée en
+ *   route devient ce qui reste, « Reprendre ce qui reste » : le matin de bout
+ *   en bout sans quitter la page ;
  *
  * - « Démarrer tout de suite », sur une autre ferme neuve : la proposition du
  *   jour validée et démarrée d'un appui, « En cours », la réponse sous sa
@@ -131,7 +136,7 @@ async function preparerUnPlanDuJour(page: Page, context: BrowserContext, testInf
   return materiel;
 }
 
-test('le matin sur la page seule : « Pas à cette heure », « Valider », « Démarrer »', async ({ page, context }, testInfo) => {
+test('le matin sur la page seule : « Pas à cette heure », « Valider », « Démarrer », « Mettre en pause », « Reprendre », « Terminer »', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   const materiel = await preparerUnPlanDuJour(page, context, testInfo, 'p62-matin', journal);
@@ -173,6 +178,47 @@ test('le matin sur la page seule : « Pas à cette heure », « Valider », « D
   await expect(enCours(page, materiel).locator('.today-status')).toHaveText('En cours');
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui/);
   await verifierLEtape(page, journal, 'démarrée sur la carte');
+
+  // PR 2 : en cours, la carte dit « Terminer » et son compte à rebours ; « Mettre en pause » est rangé dans « Autres choix ».
+  const coule = enCours(page, materiel);
+  await verifierLaCarteAUnBouton(page, coule, 'Terminer', ['Mettre en pause', 'Ouvrir sur « Arrosages »'], telephone);
+  await expect(coule.locator('.today-countdown')).toHaveText(/^Reste (\d+ h( \d{2})?|\d+ min)$/);
+  await coule.getByRole('button', { name: /^Autres choix : / }).click();
+  await coule.getByRole('button', { name: /^Mettre en pause : / }).click();
+  await expect(coule.locator('.today-status')).toHaveText('En pause');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation est en pause.');
+  await expect(coule.getByRole('button', { name: /^Reprendre : / })).toBeFocused();
+  await expect(coule.locator('.today-countdown')).toHaveCount(0);
+  await expect(coule.getByRole('button', { name: /^Terminer : / })).toBeVisible();
+  await verifierLEtape(page, journal, 'en pause depuis la carte, « Reprendre » en tête');
+
+  await coule.getByRole('button', { name: /^Reprendre : / }).click();
+  const repriseA = Date.now();
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation a repris.');
+  await expect(coule.getByRole('button', { name: /^Terminer : / })).toBeFocused();
+  await verifierLEtape(page, journal, 'reprise depuis la carte');
+
+  // « Terminer » : la fenêtre d'« Arrosages », l'heure réelle pré-remplie ; arrêtée avant la fin, ce qui reste se lit sur la carte.
+  await coule.getByRole('button', { name: /^Terminer : / }).click();
+  const fin = page.getByRole('dialog', { name: 'Terminer l’irrigation' });
+  await expect(fin).toContainText(`Vérifiez que la vanne de ${materiel} est fermée`);
+  await expect(fin.getByLabel('Heure réelle de fin')).toHaveValue(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+  await fin.getByRole('button', { name: 'Retour' }).click();
+  await expect(fin).toHaveCount(0);
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  // L'heure proposée est prise à la seconde à l'ouverture de la fenêtre : dans la seconde même de la reprise, le
+  // serveur la refuserait (« ne peut pas précéder la dernière reprise »), comme sur « Arrosages ». Un vrai geste
+  // prend plus de temps ; le parcours attend deux secondes après la reprise (comme P38 après le démarrage).
+  await expect.poll(() => Date.now() - repriseA).toBeGreaterThan(2_000);
+  await coule.getByRole('button', { name: /^Terminer : / }).click();
+  await fin.getByRole('button', { name: 'Terminer l’irrigation' }).click();
+  await expect(fin).toHaveCount(0);
+  await expect(coule.locator('.today-status')).toHaveText('Ce qui reste d’un arrosage arrêté');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation partielle a été enregistrée. Ce qui reste est planifié.');
+  await expect(coule.getByRole('button', { name: /^Reprendre ce qui reste : / })).toBeFocused();
+  await expect(page).toHaveURL(/\/irrigation\/aujourdhui/);
+  await verifierLEtape(page, journal, 'terminée sur la carte : valider, démarrer, terminer sans quitter la page');
 
   // « Démarrer tout de suite » sur une autre proposition du même matériel : validée, mais pas démarrée, le matériel coule.
   const autre = cartes(page, materiel, 'proposed').first();

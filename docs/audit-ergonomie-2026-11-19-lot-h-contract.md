@@ -105,6 +105,11 @@ irrigation partielle encore planifié, n'y apparaissent pas : la page dit
    minuteur attend sa confirmation. Son geste est un lien « Arrêter /
    Terminer », qui ouvre la carte de l'irrigation sur « Arrosages » : le
    geste d'arrêt, avec sa durée réelle à confirmer, reste là-bas (D-028).
+   **Remplacé par la simplification, lot S2, PR 2** (D-330, F844 à F849) :
+   la carte porte « Terminer », qui ouvre sur « Aujourd'hui » la même
+   fenêtre de fin, la durée réelle toujours confirmée (D-028 tient) ;
+   « Mettre en pause » et « Reprendre » s'y ajoutent ; « Reprendre le
+   reliquat » se dit « Reprendre ce qui reste » (S1, F836).
 2. Une ligne par **reliquat à reprendre** : « Reliquat à reprendre ·
    Goutte-à-goutte B · 1,3 m³ » (ou en mm sans surface mouillée connue),
    avec « Reprendre le reliquat », le même geste qu'« Arrosages », et le

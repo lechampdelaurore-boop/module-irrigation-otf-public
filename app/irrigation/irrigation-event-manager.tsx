@@ -618,7 +618,7 @@ export function IrrigationEventManager({
 
       {finishEvent ? (
         <FinishIrrigationDialog
-          event={finishEvent}
+          equipmentName={finishEvent.equipment.equipmentSnapshot.name}
           finishAt={finishAt}
           pending={pending}
           onFinishAtChange={setFinishAt}
