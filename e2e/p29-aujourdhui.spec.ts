@@ -65,12 +65,9 @@ function lignesDeFiabilite(page: Page): Locator {
 
 /** Le nombre de la pastille de « Aujourd'hui », lu dans le nom du lien du menu ; `null` sans pastille. */
 async function pastille(page: Page): Promise<number | null> {
+  // La barre du bas au téléphone, le menu de gauche à l'ordinateur : ni l'une ni l'autre ne s'ouvre (S3, PR 2 et 3).
   const menu = await ouvrirLeMenuDesPages(page);
   const nom = await menu.getByRole('link', { name: /^Aujourd’hui/ }).getAttribute('aria-label');
-  if ((await menu.getAttribute('data-open')) === 'true') {
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
-  }
   const nombre = nom?.match(/, (\d+) choses? à regarder$/)?.[1];
   return nombre ? Number(nombre) : null;
 }

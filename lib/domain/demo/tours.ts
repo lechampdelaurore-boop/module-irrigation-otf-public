@@ -4,7 +4,10 @@ import type { IrrigationPageId } from '../features/pages.ts';
  * Les sept visites guidées de la démonstration (docs/demo-guided-contract.md,
  * section 7 ; D3 de la sous-tranche 4.0). Une visite est une suite de bulles,
  * chacune accrochée à un élément de l'écran par son attribut `data-tour`,
- * jamais par son texte ni par sa place dans le menu. Une étape dont l'élément
+ * jamais par son texte ni par sa place dans le menu. L'ancre `menu` désigne
+ * la barre du bas au téléphone et le menu de gauche à l'ordinateur ; les
+ * phrases qui en parlent disent les trois endroits (simplification, lot S3,
+ * PR 4, D-331). Une étape dont l'élément
  * manque (case décochée, page masquée, bloc vide) est sautée sans message.
  *
  * Les textes sont écrits pour quelqu'un qui n'a jamais vu le module : aucun
@@ -100,8 +103,8 @@ export const TOURS: readonly Tour[] = [
       },
       {
         anchor: 'menu',
-        title: 'Une page par fonctionnalité',
-        text: 'Chaque ferme coche les fonctionnalités qui lui servent, et le menu ne montre qu’elles. Une visite saute ce que la ferme choisie n’a pas coché.',
+        title: 'Trois endroits',
+        text: '« Aujourd’hui » pour ce qu’on fait maintenant, « Semaine » pour savoir si la semaine est bonne, « Ma ferme » pour ce que le module sait de la ferme. Le « + » lance ou note un arrosage, ou note la pluie, depuis n’importe quelle page. Chaque ferme ne voit que ce qu’elle a coché ; une visite saute le reste.',
       },
       {
         anchor: 'aide-page',
@@ -284,7 +287,7 @@ export const TOURS: readonly Tour[] = [
         pages: ['reglages', 'bienvenue'],
         anchor: 'fonctionnalites',
         title: 'Cochez ce qui vous sert',
-        text: 'Chaque case est une fonctionnalité. Une ferme qui ne veut que le matériel et les alertes ne coche que cela : le reste disparaît du menu et des calculs.',
+        text: 'Chaque case est une fonctionnalité. Une ferme qui ne veut que le matériel et les alertes ne coche que cela : le reste disparaît des écrans et des calculs.',
       },
       {
         pages: ['reglages', 'bienvenue'],
@@ -294,8 +297,8 @@ export const TOURS: readonly Tour[] = [
       },
       {
         anchor: 'menu',
-        title: 'Le menu suit vos cases',
-        text: 'Une page n’apparaît au menu que si sa fonctionnalité est cochée.',
+        title: 'Les endroits suivent vos cases',
+        text: 'Une page n’apparaît dans son endroit que si sa fonctionnalité est cochée. Un endroit qui n’a plus de page disparaît, comme le « + » quand il n’a plus rien à proposer.',
       },
     ],
   },

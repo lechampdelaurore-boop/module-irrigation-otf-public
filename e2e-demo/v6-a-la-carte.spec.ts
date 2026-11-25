@@ -23,7 +23,7 @@ test('V6 Le module à la carte : Réglages, puis la première ouverture de la fe
   await jouerLaVisite(page, visite, [
     { titre: 'Cochez ce qui vous sert', rang: 'étape 1 sur 3', ancre: 'fonctionnalites', chemin: '/irrigation/reglages' },
     { titre: 'Sans rien perdre', rang: 'étape 2 sur 3', ancre: 'fonctionnalites', chemin: '/irrigation/reglages' },
-    { titre: 'Le menu suit vos cases', rang: 'étape 3 sur 3', ancre: 'menu', chemin: '/irrigation/reglages' },
+    { titre: 'Les endroits suivent vos cases', rang: 'étape 3 sur 3', ancre: 'menu', chemin: '/irrigation/reglages' },
   ]);
 
   // La ferme vierge s'ouvre sur la liste à cocher, sans menu.
