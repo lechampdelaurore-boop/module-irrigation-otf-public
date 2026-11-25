@@ -13,6 +13,7 @@ import type {
   IrrigationHistorySelection,
 } from '@/lib/services/irrigation-history-service';
 import { irrigationCumulOrigin } from '@/lib/domain/irrigation-history/summary';
+import { historyGapScopeText, historyObjectiveScopeText } from '@/lib/domain/irrigation-history/objective-scope';
 import { sortByNameNaturally } from '@/lib/domain/bed-order';
 import {
   HISTORY_STATUS_FILTER_LABELS,
@@ -358,7 +359,8 @@ export function IrrigationHistoryDashboardView({
           availability={[
             // L'origine de l'objectif quand l'objectif automatique y compte (6 decies, O4, D-319).
             historyObjectiveOriginText(dashboard.summary.objectiveAvailability.availableBedDays, dashboard.summary.objectiveAutomatic),
-            objectiveAvailabilityText(dashboard.summary.objectiveAvailability),
+            // Les planches de l'objectif, comme sur « Aujourd'hui » (D-329, contrat S1, section 5 bis, règle 5).
+            historyObjectiveScopeText(dashboard.summary),
           ].filter((part): part is string => part !== null).join(' · ') || null}
         />
         <SummaryCard
@@ -367,7 +369,7 @@ export function IrrigationHistoryDashboardView({
           format={millimetersText}
           signed
           tone={gapTone(dashboard.summary.gapToObjectiveMm)}
-          availability={gapWaitsForRain ? 'pluie réelle incomplète' : null}
+          availability={gapWaitsForRain ? 'pluie réelle incomplète' : historyGapScopeText(dashboard.summary)}
           missingAction={gapWaitsForRain ? rainAction : null}
         />
       </div>
@@ -583,13 +585,6 @@ function formatDuration(seconds: number) {
 function availabilityText(value: { availableDays: number; totalDays: number; complete: boolean }) {
   if (value.complete) return null;
   return `${value.availableDays} ${value.availableDays < 2 ? 'jour disponible' : 'jours disponibles'} sur ${value.totalDays}`;
-}
-
-function objectiveAvailabilityText(value: { availableBedDays: number; totalBedDays: number; complete: boolean }) {
-  if (value.complete) return null;
-  if (value.availableBedDays === 0) return 'Aucun objectif sur la période';
-  // La portée dite, comme sur « Aujourd'hui » (F280) : ici la moyenne court sur toute la surface (lot H, n° 13, F444).
-  return `Moyenne sur toute la surface, les planches sans objectif comptées à 0 : objectif posé sur ${value.availableBedDays}/${value.totalBedDays} journées-planche`;
 }
 
 function gapTone(value: number | null) {

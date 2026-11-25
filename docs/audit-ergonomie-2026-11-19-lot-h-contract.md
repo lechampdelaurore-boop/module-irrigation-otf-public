@@ -165,6 +165,11 @@ irrigation partielle encore planifié, n'y apparaissent pas : la page dit
    « Aujourd'hui » chiffre les seules planches qui ont un objectif (F280).
    « Historique » le dit désormais sous son chiffre : « Moyenne sur toute
    la surface, les planches sans objectif comptées à 0 ».
+   Depuis le 25 novembre 2026 (D-329, simplification S1, PR 3 bis,
+   `docs/simplification-s1-contract.md`, section 5 bis), « Historique »
+   compte comme « Aujourd'hui », sur les seules planches qui ont un
+   objectif, et dit « 7 planches sur 10 ont un objectif » ; cette phrase a
+   disparu.
 
 ## 8. Tests et preuves
 

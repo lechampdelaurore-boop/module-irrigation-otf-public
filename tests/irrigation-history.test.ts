@@ -208,7 +208,7 @@ test('les objectifs de plusieurs planches sont pondérés par leur surface', () 
   assert.equal(result.objectiveMm, 24.5);
 });
 
-test('l’objectif d’une période se somme sur les journées-planche couvertes, jamais « indisponible » dès qu’une l’est (D-036)', () => {
+test('l’objectif d’une période se somme sur les journées-planche couvertes, jamais « indisponible » dès qu’une l’est (D-036, D-329)', () => {
   // Point ouvert 39 : une période commencée avant le premier objectif de la ferme lisait « objectif indisponible ».
   const late = aggregateHydricObjective([goalRevision({ weekStart: '2026-09-07', amountMm: 35 })], [snapshot.beds[0]], {
     startDate: '2026-08-31', endDate: '2026-09-13',
@@ -216,7 +216,8 @@ test('l’objectif d’une période se somme sur les journées-planche couvertes
   assert.equal(late.objectiveMm, 35, 'sept jours couverts sur quatorze : 35 mm, les sept autres comptent zéro');
   assert.deepEqual(late.objectiveAvailability, { availableBedDays: 7, totalBedDays: 14, complete: false });
 
-  // Deux planches, un objectif sur une seule : pondéré par la surface, 35 × 100 / 400.
+  // Deux planches, un objectif sur une seule : la moyenne porte sur elle seule, comme « Aujourd'hui »
+  // (D-329, qui remplace D-036 sur ce point) ; l'autre est dite, jamais comptée à zéro (35 × 100 / 400 = 8,75 avant).
   const weather = Array.from({ length: 7 }, (_, index) => ({
     date: addDays('2026-08-31', index), dataKind: 'reanalysis' as const, precipitationMm: 0, et0Mm: 4,
   }));
@@ -224,9 +225,10 @@ test('l’objectif d’une période se somme sur les journées-planche couvertes
     events: [], scopeBeds: snapshot.beds, plots: snapshot.plots, scope: farmScope, period: weekPeriod, weather,
     goalRevisions: [goalRevision({ scopeType: 'bed', zoneId: 'zone-a', plotId: 'plot-a', bedId: 'bed-a', amountMm: 35 })],
   });
-  assert.equal(partial.objectiveMm, 8.75);
+  assert.equal(partial.objectiveMm, 35);
   assert.deepEqual(partial.objectiveAvailability, { availableBedDays: 7, totalBedDays: 14, complete: false });
-  assert.equal(partial.gapToObjectiveMm, 8.75, 'l’écart se calcule : objectif 8,75 − irrigation 0 − pluie 0');
+  assert.deepEqual(partial.objectiveBeds, { withObjective: 1, total: 2, bedDays: 7 });
+  assert.equal(partial.gapToObjectiveMm, 35, 'l’écart sur la même planche : objectif 35 − irrigation 0 − pluie 0');
 
   // Aucune journée-planche couverte : sans objectif, sans écart.
   const none = buildIrrigationHistorySummary({
@@ -553,6 +555,7 @@ function exportData(items: IrrigationHistoryItem[]) {
       et0Availability: { availableDays: 7, totalDays: 7, complete: true },
       objectiveMm: 35,
       objectiveAvailability: { availableBedDays: 7, totalBedDays: 7, complete: true },
+      objectiveBeds: { withObjective: 1, total: 1, bedDays: 7 },
       irrigationAndRainMm: 28,
       gapToObjectiveMm: 7,
       scopeAreaSquareMeters: 100,
