@@ -4,7 +4,7 @@ import test from 'node:test';
 import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue';
 import { FARM_CARD_LINES, farmCards } from '../lib/domain/features/farm-cards';
 import { pageHelp } from '../lib/domain/features/help';
-import { menuLayout } from '../lib/domain/features/menu-groups';
+import { menuPlaces } from '../lib/domain/features/desktop-menu';
 import {
   hasTodayPage,
   IRRIGATION_PAGE_IDS,
@@ -215,15 +215,14 @@ test('section 5 : chaque fiche est un lien vers sa page, qui garde la saison et 
   assert.match(readFileSync('app/irrigation/irrigation.css', 'utf8'), /@import '\.\/styles\/ma-ferme\.css';/);
 });
 
-test('PR 1 : « Ma ferme » s’ajoute à l’ancien menu comme une page de plus, au-dessus de Réglages', () => {
+test('« Ma ferme » est une page du menu, avant Réglages ; à l’ordinateur, le titre de son endroit (PR 3)', () => {
   const all = [...FEATURE_IDS];
   const menu = menuPages(all);
   assert.deepEqual(menu.slice(-2), ['ma-ferme', 'reglages']);
-  assert.equal(menuLayout(menu).farm, true);
-  // Les trois groupes d'avant ne bougent pas : la PR 3 du lot les remplace.
-  assert.deepEqual(menuLayout(menu).groups.map((group) => group.title), ['Arroser', 'Équiper', 'Surveiller']);
-  const source = readFileSync('app/irrigation/shell/feature-menu.tsx', 'utf8');
-  assert.match(source, /\{layout\.farm \? <MenuLink item="ma-ferme" current=\{current\} query=\{query\} \/> : null\}\n\s*\{layout\.settings \? <MenuLink item="reglages"/);
+  // Le titre de l'endroit mène à « Ma ferme », ses fiches dessous, Réglages comprise (section 6).
+  const farm = menuPlaces(menu, null).find((group) => group.place === 'ma-ferme');
+  assert.equal(farm?.entry, 'ma-ferme');
+  assert.deepEqual(farm?.pages, FARM_CARD_PAGES);
   assert.match(readFileSync('app/irrigation/shell/page-icons.ts', 'utf8'), /'ma-ferme': 'ferme',/);
 });
 

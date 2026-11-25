@@ -1,8 +1,7 @@
 'use client';
 
-import { useId } from 'react';
 import Link from 'next/link';
-import { menuLayout } from '@/lib/domain/features/menu-groups';
+import { menuPlaces } from '@/lib/domain/features/desktop-menu';
 import { phoneBar } from '@/lib/domain/features/phone-bar';
 import { pageHref, pageLabel, type IrrigationPageId, type PageQuery } from '@/lib/domain/features/pages';
 import { placeLabel } from '@/lib/domain/features/places';
@@ -19,14 +18,15 @@ import { TodayBadge, todayBadgeLabel, useTodayBadge } from './today-badge';
  * Il sert au gabarit de chaque page et à la page introuvable (audit
  * ergonomique, point 7), qui n'a pas de page courante : les deux
  * gardent le même menu. « Aujourd'hui » y porte sa pastille (F12).
- * Depuis le tableau de bord (docs/aujourdhui-tableau-de-bord-contract.md,
- * section 3.1), « Aujourd'hui » est détaché en tête dans son encart, les
- * autres pages rangées en trois groupes titrés, Réglages à part en bas.
  *
- * Depuis la simplification, lot S3, PR 2 (D-331), la barre du téléphone
+ * Depuis la simplification, lot S3 (D-331), les deux se rangent en trois
+ * endroits, de la même fonction du domaine. La barre du téléphone (PR 2)
  * montre les trois endroits et le « + » (`phoneBar`) : « Plus » et sa
  * feuille n'existent plus ; le bouton rond qui dépasse est le « + ». Le menu
- * de l'ordinateur reste celui d'avant jusqu'à la PR 3 du lot.
+ * de l'ordinateur (PR 3, section 6) montre le bouton « + Arroser ou noter »
+ * en tête, puis les trois endroits dépliés (`menuPlaces`) : « Aujourd'hui »
+ * dans son encart, les titres « Semaine » et « Ma ferme » qui sont des
+ * liens, Réglages dans « Ma ferme ».
  *
  * Un clic du menu ne recharge plus toute l'application (D-322) : `Link`
  * demande au serveur la seule page voulue, sans relancer les scripts ni
@@ -76,10 +76,16 @@ export function FeatureMenu({
 }) {
   const gestures = plusGestures(menu, rainMatters);
   const bar = phoneBar(menu, current, gestures.length > 0);
-  const layout = menuLayout(menu);
+  const places = menuPlaces(menu, current);
+  // Le « + » de la barre et celui du menu de l'ordinateur ouvrent la même feuille (section 6, S3-l).
+  const plusProps = {
+    gestures,
+    season: query.season ?? null,
+    planning: menu.includes('planning'),
+    besoinsHref: menu.includes('besoins') ? pageHref('besoins', query) : null,
+  };
   const badge = useTodayBadge(menu, todayBadge);
   const badgeOf = (item: IrrigationPageId) => (item === 'aujourdhui' && badge !== null ? badge : null);
-  const menuId = useId();
 
   return (
     <>
@@ -87,12 +93,7 @@ export function FeatureMenu({
         <ul>
           {bar.map((item) => (item.kind === 'plus' ? (
             <li key="plus" data-plus>
-              <PlusSheet
-                gestures={gestures}
-                season={query.season ?? null}
-                planning={menu.includes('planning')}
-                besoinsHref={menu.includes('besoins') ? pageHref('besoins', query) : null}
-              />
+              <PlusSheet variant="bar" {...plusProps} />
             </li>
           ) : (
             <li key={item.place} data-place={item.place}>
@@ -111,43 +112,54 @@ export function FeatureMenu({
           )))}
         </ul>
       </nav>
-      <nav id={menuId} className="feature-menu" data-tour="menu" aria-label="Pages du module">
+      <nav className="feature-menu" data-tour="menu" aria-label="Pages du module">
         <ul>
-          {layout.today ? (
-            <li className="menu-home-item">
-              <Link
-                className="menu-home"
-                prefetch={false}
-                onClick={current === 'aujourdhui' ? undefined : markMenuNavigation}
-                href={pageHref('aujourdhui', query)}
-                aria-label={todayBadgeLabel(pageLabel('aujourdhui'), badgeOf('aujourdhui'))}
-                aria-current={current === 'aujourdhui' ? 'page' : undefined}
-              >
-                <span className="menu-home-badge"><Icon name={PAGE_ICONS.aujourdhui} /></span>
-                <span className="menu-home-text">
-                  <strong>{pageLabel('aujourdhui')}</strong>
-                  <small>Tableau de bord</small>
-                </span>
-                <TodayBadge count={badgeOf('aujourdhui')} />
-              </Link>
+          {gestures.length > 0 ? (
+            <li className="menu-plus-item">
+              <PlusSheet variant="menu" {...plusProps} />
             </li>
           ) : null}
-          {layout.groups.map((group) => (
-            <li key={group.title} className="menu-group">
-              <span className="menu-group-title" id={`${menuId}-${group.title}`}>{group.title}</span>
-              <ul aria-labelledby={`${menuId}-${group.title}`}>
-                {group.pages.map((item) => <MenuLink key={item} item={item} current={current} query={query} />)}
-              </ul>
-            </li>
-          ))}
-          {layout.farm || layout.settings ? (
-            <li className="menu-settings-item">
-              <ul>
-                {layout.farm ? <MenuLink item="ma-ferme" current={current} query={query} /> : null}
-                {layout.settings ? <MenuLink item="reglages" current={current} query={query} /> : null}
-              </ul>
-            </li>
-          ) : null}
+          {places.map((group) => {
+            // La semaine garde le jour ouvert, comme la bande du téléphone (section 3.3, F885).
+            const groupQuery = group.place === 'semaine' ? { ...query, week } : query;
+            return (
+              <li key={group.place} className="menu-place" data-place={group.place}>
+                {group.entry === 'aujourdhui' ? (
+                  <Link
+                    className="menu-home"
+                    prefetch={false}
+                    onClick={group.mark === 'page' ? undefined : markMenuNavigation}
+                    href={pageHref('aujourdhui', query)}
+                    aria-label={todayBadgeLabel(pageLabel('aujourdhui'), badgeOf('aujourdhui'))}
+                    aria-current={group.mark ?? undefined}
+                  >
+                    <span className="menu-home-badge"><Icon name={PAGE_ICONS.aujourdhui} /></span>
+                    <span className="menu-home-text">
+                      <strong>{pageLabel('aujourdhui')}</strong>
+                      <small>Tableau de bord</small>
+                    </span>
+                    <TodayBadge count={badgeOf('aujourdhui')} />
+                  </Link>
+                ) : (
+                  <Link
+                    className="menu-place-title"
+                    href={pageHref(group.entry, groupQuery)}
+                    prefetch={false}
+                    onClick={group.entry === current ? undefined : markMenuNavigation}
+                    aria-current={group.mark ?? undefined}
+                  >
+                    <span>{placeLabel(group.place)}</span>
+                    <Icon name="chevron" />
+                  </Link>
+                )}
+                {group.pages.length > 0 ? (
+                  <ul aria-label={placeLabel(group.place)}>
+                    {group.pages.map((item) => <MenuLink key={item} item={item} current={current} query={groupQuery} />)}
+                  </ul>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </>

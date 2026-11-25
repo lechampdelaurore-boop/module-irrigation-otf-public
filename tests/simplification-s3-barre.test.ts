@@ -212,7 +212,7 @@ test('règles 3 à 5 : la barre dessine le domaine, le « + » est un bouton qui
   assert.match(menu, /item\.place === 'aujourdhui' \? <TodayBadge count=\{badgeOf\(item\.page\)\} \/> : null/);
   assert.doesNotMatch(menu, /Plus de pages|phone-bar-more|data-open/);
   const sheet = readFileSync('app/irrigation/shell/plus-sheet.tsx', 'utf8');
-  assert.match(sheet, /<button\s+ref=\{button\}\s+type="button"\s+className="phone-bar-plus"\s+aria-label=\{PLUS_BUTTON_LABEL\}\s+aria-haspopup="dialog"/);
+  assert.match(sheet, /<button\s+ref=\{button\}\s+type="button"\s+className=\{variant === 'bar' \? 'phone-bar-plus' : 'menu-plus'\}\s+aria-label=\{variant === 'bar' \? PLUS_BUTTON_LABEL : undefined\}\s+aria-haspopup="dialog"/);
   assert.match(sheet, /sheet\.current\.showModal\(\)/);
   // Échap, un geste sur le voile et « Fermer » referment ; le clavier revient sur le « + ».
   assert.match(sheet, /onCancel=\{\(event\) => \{ event\.preventDefault\(\); close\(\); \}\}/);

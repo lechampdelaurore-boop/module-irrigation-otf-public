@@ -5,9 +5,10 @@
  * de pages fixée en bas qui défile, la page courante en pilule verte, avec des
  * cibles de 44 px. Depuis la deuxième passe (D-068), le menu est une colonne
  * de 247 px collée au bord gauche, du haut en bas de la page, comme sur OTF.
- * Au téléphone (audit ergonomique, point 2, 3.8 quater lot 2, précision F6),
- * la bande devient une barre de quatre entrées et « Plus », qui ouvre le menu
- * entier en feuille au-dessus d'elle.
+ * Depuis la simplification, lot S3 (D-331), le menu se range en trois
+ * endroits : au téléphone, une barre du bas de trois endroits et du « + »
+ * (PR 2) ; à l'ordinateur, le « + Arroser ou noter » en tête et les trois
+ * endroits dépliés (PR 3).
  */
 .feature-layout {
   display: grid;
@@ -43,15 +44,47 @@
 }
 
 /*
- * Le tableau de bord (docs/aujourdhui-tableau-de-bord-contract.md,
- * section 3.1) : « Aujourd'hui » détaché en tête, un encart blanc avec sa
- * pastille ronde verte, un trait sous lui ; les autres pages en trois
- * groupes titrés ; Réglages à part, sous un trait.
+ * Le menu de l'ordinateur en trois endroits (simplification, lot S3, PR 3,
+ * docs/simplification-s3-contract.md, section 6) : le « + Arroser ou noter »
+ * en tête, en vert plein ; « Aujourd'hui » dans son encart blanc avec sa
+ * pastille ronde verte (tableau de bord, T1), puis « Arrosages » ; les titres
+ * « Semaine » et « Ma ferme », des liens, au-dessus de leurs pages. Un trait
+ * sépare les endroits.
  */
-.menu-home-item {
-  margin-bottom: 4px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgb(11 105 77 / 18%);
+.feature-menu button.menu-plus {
+  display: flex;
+  width: 100%;
+  min-height: var(--touch-target);
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--radius-button);
+  background: var(--green);
+  color: #fff;
+  font: 500 var(--text-14)/1.2 var(--font-ui);
+  cursor: pointer;
+}
+
+.feature-menu button.menu-plus:hover {
+  background: var(--green-dark);
+}
+
+.feature-menu button.menu-plus:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.menu-place + .menu-place {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgb(11 105 77 / 18%);
+}
+
+.feature-menu .menu-place ul {
+  gap: 2px;
 }
 
 .feature-menu a.menu-home {
@@ -59,6 +92,7 @@
   min-height: 58px;
   grid-template-columns: 38px minmax(0, 1fr) auto;
   gap: 10px;
+  margin-bottom: 2px;
   padding: 10px;
   border: 1.5px solid var(--green-soft);
   border-radius: 9.75px;
@@ -72,7 +106,7 @@
   border-color: var(--green);
 }
 
-.feature-menu a.menu-home[aria-current="page"] {
+.feature-menu a.menu-home[aria-current] {
   border-color: var(--green);
   background: var(--card);
   color: var(--ink);
@@ -107,23 +141,25 @@
   font: 400 var(--text-12)/1.3 var(--font-ui);
 }
 
-.menu-group-title {
-  display: block;
-  padding: 10px 12px 2px;
+/*
+  Le titre d'un endroit, un lien : en gras, le chevron dit qu'il mène
+  quelque part ; vert quand la page ouverte est dans l'endroit, la pilule
+  verte quand c'est la sienne (« Ma ferme »). Pas de capitales : un lecteur
+  d'écran lirait le nom lettre à lettre.
+*/
+.feature-menu a.menu-place-title {
+  justify-content: space-between;
   color: var(--ink2);
-  font: 700 var(--text-12)/1.4 var(--font-ui);
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  font: 700 var(--text-13)/1.25 var(--font-ui);
 }
 
-.feature-menu .menu-group ul {
-  gap: 2px;
+.feature-menu a.menu-place-title[aria-current="true"] {
+  color: var(--green);
 }
 
-.menu-settings-item {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgb(11 105 77 / 18%);
+.feature-menu a.menu-place-title .icon {
+  width: 16px;
+  height: 16px;
 }
 
 .feature-menu a {
@@ -176,10 +212,6 @@
     padding: 20px 24px 0;
   }
 
-  .app-shell:has(.feature-menu) {
-    padding-bottom: 96px;
-  }
-
   /*
     Le menu d'un matériel s'ouvre vers le haut : vers le bas, celui de la
     dernière carte passait sous la barre des pages, sans pouvoir défiler.
@@ -187,66 +219,6 @@
   .equipment-menu > div {
     top: auto;
     bottom: 48px;
-  }
-
-  .feature-menu {
-    position: fixed;
-    z-index: 40;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
-    overflow-x: auto;
-    border-top: 1px solid var(--line);
-    border-radius: 0;
-    background: var(--card);
-    box-shadow: 0 -4px 20px rgb(0 0 0 / 6%);
-    overscroll-behavior-x: contain;
-  }
-
-  .feature-menu ul {
-    position: static;
-    width: max-content;
-    flex-direction: row;
-    gap: 6px;
-  }
-
-  /* Dans la bande de la tablette, les groupes se fondent en une seule rangée de pilules. */
-  .feature-menu > ul {
-    position: static;
-  }
-
-  .menu-home-item,
-  .menu-group,
-  .menu-settings-item,
-  .feature-menu .menu-group ul,
-  .menu-settings-item ul {
-    display: contents;
-  }
-
-  .menu-group-title,
-  .menu-home-text small {
-    display: none;
-  }
-
-  .feature-menu a {
-    min-height: var(--touch-target);
-    padding: 8px 14px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
-  .feature-menu a.menu-home {
-    display: flex;
-    min-height: var(--touch-target);
-    padding: 4px 14px 4px 4px;
-    border-radius: 999px;
-    box-shadow: none;
-  }
-
-  .feature-menu a.menu-home .menu-home-badge {
-    width: 32px;
-    height: 32px;
   }
 }
 
