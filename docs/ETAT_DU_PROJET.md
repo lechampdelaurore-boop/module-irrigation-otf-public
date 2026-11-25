@@ -32,6 +32,9 @@ registres, elle y renvoie.
   2026 à 12 h 30, déployée à 13 h 22, run 45605041672 vérifié job par job :
   « Application », « Workers Cloudflare », « Parcours navigateur »,
   « Déploiement Cloudflare » et « Déploiement de la démonstration », verts).
+  **La PR 1 (le chapeau d'une ligne) est en ligne** (#210, fusionnée le
+  25 novembre 2026 à 13 h 32, déployée à 14 h 06, run 45614777249 vérifié
+  job par job : les cinq jobs verts).
 - **Simplifier l'usage du module, S1, PR 1 sur 3 : le chapeau d'une ligne,
   codée le 25 novembre 2026** (D-328, F829 à F831, roadmap section 6
   terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap, sur
