@@ -50,7 +50,9 @@ registres, elle y renvoie.
   Tests du domaine et de la page, P29, P30, P38 suivis, P62 mesure le premier
   niveau à 390 px. Contrôles : voir la PR. **Mise en ligne consignée ici** :
   la PR 3 du lot (#224), fusionnée à 20 h 51, déployée à 21 h 29, run
-  45689347330 vérifié job par job (les cinq jobs verts).
+  45689347330 vérifié job par job (les cinq jobs verts) ; la PR 4 du lot
+  (#226), fusionnée à 21 h 36, déployée à 22 h 13, run 45696515280 vérifié
+  job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S2, PR 4 sur 5 : noter la pluie d'un
   geste, codée le 25 novembre 2026** (D-330, F854 à F859 ; contrat, section
   7), en Opus 5.5 · Élevé, sur la branche de la PR 3. La fenêtre « Noter la
