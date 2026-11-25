@@ -20,7 +20,7 @@ registres, elle y renvoie.
   fait » est l'enregistrement de « Fait comme prévu », sa règle et sa
   confirmation (avec « Fait autrement… Notez-le sur « Arrosages » »). Aucune
   règle nouvelle. Tests du domaine, des vrais services à deux fermes
-  (restriction d'eau comprise), P62 étendu. Contrôles : voir la PR.
+  (restriction d'eau comprise), P62 étendu. Contrôles : voir la PR. **Mise en ligne consignée ici** : la PR 1 du lot (#219), fusionnée à 19 h 28, déployée à 19 h 57, run 45675486394 vérifié job par job (« Application », « Workers Cloudflare », « Parcours navigateur », « Déploiement Cloudflare », « Déploiement de la démonstration », verts).
 - **Simplifier l'usage du module, S2, PR 2 sur 5 : terminer et reprendre
   depuis la carte, codée le 25 novembre 2026** (D-330, F844 à F849 ; contrat
   `docs/simplification-s2-contract.md`, sections 3 et 6), en Opus 5.5 · Élevé,
@@ -51,6 +51,34 @@ registres, elle y renvoie.
   les vrais services à deux fermes, parcours P62 aux deux largeurs.
   Contrôles : voir la PR. Viennent les PR 2 (terminer et reprendre) à 5 (la
   page à l'essentiel).
+- **Simplifier l'usage du module, S3 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s3-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. Trois endroits : « Aujourd'hui » (avec
+  « Arrosages »), « Semaine » (planning, objectifs et besoins, historique),
+  « Ma ferme » (matériel, ressources, cultures, sol, alertes, réglages),
+  et un « + » pour arroser maintenant, noter la pluie ou noter un arrosage
+  déjà fait. Quatre PR : la page « Ma ferme » en fiches, la barre du bas
+  du téléphone (avec la bande de la semaine et le retour), le menu de
+  l'ordinateur, les liens et la visite guidée ; Opus 5.5 · Très élevé,
+  après la fin du code de S2. Aucune page, adresse ni notification ne
+  change ; aucun calcul ; aucune question agronomique. Écart voulu avec la
+  maquette : les fiches n'ont pas encore de chiffres d'état (S6). PR de
+  contrat seule : **aucun contrôle rejoué**. **Mises en ligne consignées ici** :
+  #213 (S1, PR 3) fusionnée, déployée à 16 h 56, run 45645335129 ; #214
+  (S1, PR 3 bis) et #211 (contrat S2) fusionnées, déployées à 18 h 04, run
+  45655189938, vérifiés job par job : « Application », « Workers
+  Cloudflare », « Parcours navigateur », « Déploiement Cloudflare » et
+  « Déploiement de la démonstration », verts.
+- **Simplifier l'usage du module, S2 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s2-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. « Aujourd'hui » où l'on fait tout : un bouton
+  qui change de nom sur la carte (Valider, Démarrer, Terminer), l'arrosage
+  « à rattraper » (deux boutons, parce que le module ne sait pas s'il a été
+  fait : « Je le fais maintenant » ou « C'est fait »), la pluie notée d'un
+  geste, la page à l'essentiel (un pli « Le détail », rien de retiré) ;
+  cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
+  une action existante : aucune règle ne change. PR de contrat seule :
+  **aucun contrôle rejoué**.
 - **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
   l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
   décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat
@@ -62,8 +90,10 @@ registres, elle y renvoie.
   change. Sur la démonstration, la Ferme des Trois Noues passe de 16,5 à
   23,4 mm au début de l'été, le chiffre d'« Aujourd'hui ». Tests à deux
   fermes, démonstration rejouée, parcours P61 étendu, contre-épreuve
-  (13 altérations sur 13 prises). Le code du lot S1 est fini ; la PR
-  s'ouvre après la fusion de la PR 3. Contrôles : voir la PR.
+  (13 altérations sur 13 prises). Le code du lot S1 est fini. Contrôles :
+  voir la PR. **La PR 2 (les mots) est en ligne** (#212, fusionnée le
+  25 novembre 2026 à 15 h 51, déployée à 16 h 26, run 45638614621 vérifié
+  job par job : les cinq jobs verts).
 - **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
   le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
   33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm
