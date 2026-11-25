@@ -40,6 +40,8 @@ const RANGEMENT: Readonly<Record<string, Rangement>> = {
   // Les messages de la ferme (n° 2 et 3).
   saveMorningMessageAction: previent(NOTIFICATIONS),
   saveEveningReminderAction: previent(NOTIFICATIONS),
+  // Les heures de silence (6 undecies, H3).
+  saveQuietHoursAction: previent(NOTIFICATIONS),
   // Le lieu de la météo, et les parts du tableau de l'eau affichées ailleurs (objectif, limite d'eau du jour).
   saveWeatherLocationAction: previent(WATER),
   restoreOtfWeatherLocationAction: previent(WATER),
