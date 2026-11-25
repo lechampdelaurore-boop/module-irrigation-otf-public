@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S1, PR 2 sur 3 : les mots, codée le
+  25 novembre 2026** (D-328, F832 à F837, roadmap section 6 terdecies,
+  ligne 33), en Opus 5.5 · Élevé. Le premier niveau parle comme le champ,
+  avec les mots du tableau acceptés tels quels par le porteur : « Eau visée
+  cette semaine », « Il manque encore », « Ce qu'il reste à arroser », « Y
+  a-t-il assez d'eau ? », « Eau utilisable », « Soif de la semaine », « À
+  quelle culture ressemble cette espèce ? », « Réglages fins des cultures
+  (pour les experts) », « Ce que ce matériel apporte en une heure »,
+  « Heures où l'on n'arrose pas », « Ce qui reste d'un arrosage arrêté ».
+  Un seul module de libellés (`lib/domain/simple-words.ts`) ; RFU et ET0
+  restent dans le « ? » et le détail ; les noms du menu, l'export CSV, les
+  notifications et le journal des modifications gardent leurs mots. Un
+  test de garde échoue si un mot du calcul reparaît hors des endroits
+  permis. Relevé et sort de chaque mot : contrat, section 9.4. Parcours
+  P61 étendu, seize parcours relus avec les nouveaux mots. Contrôles : voir
+  la PR. Reste la PR 3 (un seul objectif, S1-O1).
 - **Simplifier l'usage du module, S1, PR 1 sur 3 : le chapeau d'une ligne,
   codée le 25 novembre 2026** (D-328, F829 à F831, roadmap section 6
   terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap, sur

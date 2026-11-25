@@ -15,6 +15,7 @@ import { PageSettingsFold } from './shell/page-settings-fold';
 import { gardenState } from '@/lib/domain/besoins-phone';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -76,7 +77,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
   }, []);
   const sortedGardens = useMemo(() => dashboard.gardens.map((garden) => ({ ...garden, beds: [...garden.beds].sort(sorter(sort)) })), [dashboard.gardens, sort]);
   return <section className="irrigation-needs-section" aria-labelledby="irrigation-needs-title">
-    <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">Besoins d’irrigation</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
+    <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">{SIMPLE_WORDS.leftToWater}</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
     <ActionReply messages={replies} origin="haut" classNames={NEEDS_REPLY_CLASSES} />
     {!dashboard.completeness.complete ? <p className="irrigation-needs-warning" role="status">{dashboardWarning(dashboard)}</p> : null}
     <div className="irrigation-needs-controls">

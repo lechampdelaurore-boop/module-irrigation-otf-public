@@ -169,7 +169,7 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(lignesDeFiabilite(page).getByRole('link', { name: /^Observer le sol / })).toHaveCount(0);
   const renseigner = lignesDeFiabilite(page).getByRole('link', { name: /^Renseigner la réserve de la parcelle / });
   await expect(renseigner).toHaveCount(1);
-  await expect(lignesDeFiabilite(page).filter({ has: page.getByRole('link', { name: /^Renseigner la réserve de la parcelle / }) })).toContainText('La réserve utile (RFU) de');
+  await expect(lignesDeFiabilite(page).filter({ has: page.getByRole('link', { name: /^Renseigner la réserve de la parcelle / }) })).toContainText('Ce que le sol de');
   await renseigner.click();
   await attendreLaPagePrete(page, 'sol');
   await expect(page).toHaveURL(/\/irrigation\/sol\?season=\d{4}#soil-parcel-/);

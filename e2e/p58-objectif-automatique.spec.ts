@@ -89,7 +89,7 @@ test('« Objectif automatique » : allumer, lire l’origine, saisir un objectif
   // « Aujourd'hui » : l'origine sur la tuile, la ligne « Objectif automatique » de « Fiabilité du calcul ».
   await page.goto('/irrigation');
   await attendreLaPagePrete(page, 'aujourdhui');
-  const tuile = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi').filter({ hasText: 'Objectif de la semaine' });
+  const tuile = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi').filter({ hasText: 'Eau visée cette semaine' });
   await expect(tuile).toContainText('objectif automatique');
   await expect(page.locator('#today-reliability .reliability-check').filter({ hasText: 'Objectif automatique' })).toHaveCount(1);
   await verifierLEtape(page, journal, '« Aujourd’hui » dit l’objectif automatique');

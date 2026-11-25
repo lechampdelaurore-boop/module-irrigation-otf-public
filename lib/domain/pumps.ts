@@ -4,6 +4,7 @@ import { litersPerHourForBed } from './irrigation-calculations.ts';
 import type { WaterInfrastructure } from './water-resources.ts';
 import { actualWithdrawalsByResourceAndDate, latestResourceLimit } from './water-resources.ts';
 import { FARM_TIME_ZONE, dateKeyInTimeZone } from './water-management.ts';
+import { SIMPLE_WORDS } from './simple-words.ts';
 
 type PumpStatus = 'active' | 'archived';
 export type PumpOriginKind = 'resource' | 'reservoir';
@@ -240,10 +241,10 @@ export function resolvePumpOriginAvailability({
   if (mobilizable + 1e-9 < requiredVolumeCubicMeters) {
     return {
       status: 'unavailable',
-      message: `Volume mobilisable insuffisant (${volumeText(mobilizable)}).`,
+      message: `${SIMPLE_WORDS.usableWater} insuffisante (${volumeText(mobilizable)}).`,
     };
   }
-  return { status: 'available', message: 'Volume mobilisable suffisant selon le dernier stock observé.' };
+  return { status: 'available', message: `${SIMPLE_WORDS.usableWater} suffisante selon le dernier stock observé.` };
 }
 
 export function evaluateHydraulicFeasibility({

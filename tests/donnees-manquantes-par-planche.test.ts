@@ -77,7 +77,7 @@ test('une planche par cas : la réserve du sol non saisie, faute d’observation
     unknownSoilBeds: [{ bedId: 'B1', plotId: 'jardin-sud', plotName: 'Jardin Sud', withoutRfu: { zoneId: 'z1', zoneName: 'Les Prés' } }],
   });
   assert.deepEqual(withoutRfu.map((line) => [line.text, line.action]), [[
-    'Réserve du sol non saisie : la réserve utile (RFU) de la parcelle Les Prés manque. La jauge de la planche reste inconnue.',
+    'Réserve du sol non saisie : ce que le sol de la parcelle Les Prés retient (sa RFU) manque. La jauge de la planche reste inconnue.',
     { kind: 'link', label: 'Renseigner la réserve de la parcelle Les Prés', page: 'sol', anchor: 'soil-parcel-z1' },
   ]]);
 });
@@ -104,7 +104,7 @@ test('une planche par cas : le pluviomètre absent, sur une planche de plein cha
   const found = lines({ beds: [bed('B3')], lastMeasuredRainOn: null });
   assert.deepEqual(found.map((line) => [line.kind, line.text, line.action]), [[
     'rain-gauge',
-    'Pluviomètre absent : aucune pluie mesurée n’est notée depuis plus de 30 jours. La pluie vient de la réanalyse, qui peut s’écarter du terrain.',
+    'Pluviomètre absent : aucune pluie mesurée n’est notée depuis plus de 30 jours. La pluie vient de l’estimation météo, qui peut s’écarter du terrain.',
     { kind: 'link', label: 'Saisir une pluie mesurée, même 0 mm', page: 'besoins', anchor: 'manual-rain' },
   ]]);
   // Une planche sans culture ne dépend pas de la pluie ; une planche sous abri non plus (la pluie y vaut 0).

@@ -82,8 +82,8 @@ function irrigationParts(irrigations: NonNullable<HeadlineInputs['irrigations']>
     chips.push({ key: 'running', tone: 'todo', icon: 'drop', text: `${running} en cours`, target: 'day' });
   }
   if (remainders > 0) {
-    sentences.push(plural(remainders, 'Un reliquat est à reprendre.', '{n} reliquats sont à reprendre.'));
-    chips.push({ key: 'remainder', tone: 'todo', icon: 'clock', text: plural(remainders, '1 reliquat', '{n} reliquats'), target: 'day' });
+    sentences.push(plural(remainders, 'Un arrosage arrêté est à reprendre.', '{n} arrosages arrêtés sont à reprendre.'));
+    chips.push({ key: 'remainder', tone: 'todo', icon: 'clock', text: plural(remainders, '1 à reprendre', '{n} à reprendre'), target: 'day' });
   }
   if (late > 0) {
     sentences.push(plural(late, 'Une irrigation est à rattraper.', '{n} irrigations sont à rattraper.'));

@@ -75,7 +75,7 @@ export function SeriesCropWaterPanel({ season, seriesId, seriesName }: { season:
           <DeclareSeriesStageForm key={sheet.today} sheet={sheet} pending={pending} onDeclare={(input) => run(() => declareSeriesStageAction({ season, seriesId, ...input }))} />
           {sheet.unusableCrops.length > 0 ? (
             <p className="bed-crop-water-muted">
-              Cultures de référence inutilisables : {sheet.unusableCrops.map((crop) => `${crop.name} (${crop.problems.join(' ')})`).join(' ; ')}.
+              Cultures inutilisables : {sheet.unusableCrops.map((crop) => `${crop.name} (${crop.problems.join(' ')})`).join(' ; ')}.
             </p>
           ) : null}
         </>

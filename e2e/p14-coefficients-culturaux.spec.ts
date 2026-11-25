@@ -40,9 +40,9 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
 
   const section = page.locator('section.crop-coefficients');
   await section.scrollIntoViewIfNeeded();
-  await expect(section.getByRole('heading', { level: 2, name: 'Correspondance des espèces' })).toBeVisible();
+  await expect(section.getByRole('heading', { level: 2, name: 'À quelle culture ressemble chaque espèce ?' })).toBeVisible();
   // La liste « sans référence Kc » ne répète pas les espèces à rattacher, déjà en tête (lot J, n° 15, F459).
-  const sansReference = section.getByRole('list', { name: 'Espèces sans culture de référence' });
+  const sansReference = section.getByRole('list', { name: 'Espèces qui ne ressemblent encore à aucune culture' });
   const dansSansReference = (espece: string) => sansReference.locator('li').filter({ has: page.locator('strong', { hasText: new RegExp(`^${espece}$`) }) });
   const ligneEspece = section.locator('.species-link-row').filter({ has: page.locator('summary strong', { hasText: new RegExp(`^${cas.espece}$`) }) });
   await expect(ligneEspece).toHaveAttribute('data-to-link', 'true');
@@ -70,8 +70,8 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   // serait perdu. Choisir jusqu'à ce que le bouton s'active est une attente de
   // condition (docs/browser-journeys-contract.md).
   await expect(async () => {
-    await formulaire.getByLabel('Culture de référence').selectOption({ value: '' });
-    await formulaire.getByLabel('Culture de référence').selectOption({ label: cas.culture });
+    await formulaire.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ value: '' });
+    await formulaire.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ label: cas.culture });
     await expect(enregistrer).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   if (cas.analogie) await formulaire.getByLabel(/Par analogie/).check();
@@ -85,7 +85,7 @@ test('une espèce se rattache à une culture de référence, sort de la liste «
   // Une exception sur sa série : sans référence.
   await carte.locator('details.species-exceptions > summary').click();
   const exception = carte.getByRole('group', { name: `Exception de la série ${cas.serie}` });
-  await exception.getByLabel('Culture de référence').selectOption({ label: 'Sans référence Kc' });
+  await exception.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ label: 'Sans référence Kc' });
   await exception.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(section.getByRole('status')).toHaveText('L’exception de la série est enregistrée.');
   await expect(carte.locator('summary').first()).toContainText('1 exception');

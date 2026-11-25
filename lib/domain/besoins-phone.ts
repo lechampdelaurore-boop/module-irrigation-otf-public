@@ -38,9 +38,9 @@ export function weekTotalsLine(totals: WeekTotalsLine): string {
     `irrigué ${mmText(totals.realizedIrrigationMm)}`,
     `pluie ${mmText(totals.actualRainMm)}`,
     `prévue ${mmText(totals.remainingForecastRainMm)}`,
-    `ET0 ${mmText(totals.et0Mm)}`,
+    `soif de la semaine ${mmText(totals.et0Mm)}`,
   ];
-  if (totals.partial) parts.push('totaux partiels');
+  if (totals.partial) parts.push('totaux incomplets');
   return parts.join(' · ');
 }
 

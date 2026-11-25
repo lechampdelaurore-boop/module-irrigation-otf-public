@@ -94,7 +94,7 @@ function ZoneGauge({ season, zone, today, pending, run }: { season: number; zone
       {zone.fieldPlotCount > 0 && zoneFieldWithoutSoil(zone) ? (
         <div className="soil-zone-without-soil">
           <p>
-            La réserve utile (RFU) de la parcelle n’est pas saisie : sans elle, une observation ne remplit pas la jauge de ses jardins.
+            Ce que le sol de la parcelle retient (sa RFU) n’est pas saisi : sans lui, une observation ne remplit pas la jauge de ses jardins.
           </p>
           <SoilFirstButton zoneId={zone.zoneId} label={`Renseigner la réserve de la parcelle ${zone.name}`} />
         </div>
@@ -242,7 +242,7 @@ function PlotGauge({ season, zoneId, plot, today, pending, run, hidden, action, 
           ) : null}
           {action === 'soil' ? (
             <p className="soil-garden-without-soil">
-              Sans réserve utile (RFU) saisie pour sa parcelle, la jauge reste inconnue : une observation ne la remplirait pas.
+              Sans ce que le sol de sa parcelle retient (sa RFU), la jauge reste inconnue : une observation ne la remplirait pas.
             </p>
           ) : (
             <ObservationForm

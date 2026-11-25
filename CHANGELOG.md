@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S1, PR 2 : les mots)
+
+- **Les titres et les boutons parlent comme le champ** (D-328) :
+  « Objectifs hydriques » devient « Eau visée cette semaine », « Reste à
+  apporter » « Il manque encore », « Besoins d'irrigation » « Ce qu'il reste
+  à arroser », « Faisabilité et répartition de l'eau » « Y a-t-il assez
+  d'eau ? », « Volume mobilisable » « Eau utilisable », l'ET0 « Soif de la
+  semaine », « Culture de référence » « À quelle culture ressemble cette
+  espèce ? », « Coefficients culturaux » « Réglages fins des cultures (pour
+  les experts) », « Apport horaire » « Ce que ce matériel apporte en une
+  heure », « Créneaux protégés » « Heures où l'on n'arrose pas » et
+  « Reliquat » « Ce qui reste d'un arrosage arrêté », avec « Reprendre ce
+  qui reste ». RFU et ET0 restent dans le « ? » et le détail, pour qui lit
+  un document d'Ouvre ta ferme ou de Tlaloc. Les noms du menu, l'export CSV
+  et les notifications ne changent pas.
+
 ### Modifié (simplifier l'usage du module, S1, PR 1 : le chapeau d'une ligne)
 
 - **Le haut de chaque page tient en une ligne** (D-328) : le titre, son

@@ -26,6 +26,9 @@ import {
  * - une explication fixe est passée dans le « ? » (F826) ;
  * - au téléphone, le premier bloc utile de chaque page sous son budget.
  *
+ * PR 2, les mots : les mots du tableau se lisent au premier niveau, et aucun
+ * mot du calcul ne se lit d’emblée sur les douze pages (voir plus bas).
+ *
  * Ce qu'il ne prouve pas : la ligne de lecture quand Ouvre ta ferme échoue ou
  * qu'elle date de plus de 24 heures, que les parcours ne savent pas provoquer
  * (les données de démonstration n'ont pas de lecture) : la règle est chiffrée
@@ -176,5 +179,68 @@ test('au téléphone, le premier bloc utile de chaque page sous son budget', asy
     const haut = await page.locator(bloc).first().evaluate((element) => Math.round(element.getBoundingClientRect().top + window.scrollY));
     expect(haut, `premier bloc utile de « ${TITRES_DES_PAGES[cible]} » à ${haut} px du haut, au-delà de ${budget} px`).toBeLessThanOrEqual(budget);
     await verifierLEtape(page, journal, `premier bloc de ${cible}`);
+  }
+});
+
+/**
+ * PR 2, les mots (contrat, section 4 et section 9.4) : les titres et les
+ * étiquettes du premier niveau parlent comme le champ, et aucun mot du calcul
+ * de la colonne de gauche ne se lit sur une page, replis fermés et « ? »
+ * fermé. Le mot du calcul reste dans le détail : il s'ouvre, il ne se lit pas
+ * d'emblée.
+ */
+const MOTS_DU_CALCUL = [
+  'Objectifs hydriques',
+  'Objectif hydrique',
+  'objectif hebdomadaire',
+  'Reste à apporter',
+  'Besoins d’irrigation',
+  'Faisabilité et répartition',
+  'Volume mobilisable',
+  'Disponibilité physique',
+  'Réserve utile',
+  'Culture de référence',
+  'Cultures de référence',
+  'Correspondance des espèces',
+  'Coefficients culturaux',
+  'Profils racinaires',
+  'Apport horaire',
+  'Créneaux protégés',
+  'reliquat',
+  'Par périmètre',
+  'totaux partiels',
+];
+
+test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’emblée', async ({ page }, testInfo) => {
+  test.setTimeout(150_000);
+  const journal = surveillerLaConsole(page);
+  await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  await expect(page.getByText('Eau visée cette semaine', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Il manque encore', { exact: true }).first()).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'besoins');
+  await expect(page.getByRole('heading', { name: 'Eau visée cette semaine, météo et ressource en eau' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ce qu’il reste à arroser' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Y a-t-il assez d’eau ?' })).toBeVisible();
+  await expect(page.getByText('Soif de la semaine', { exact: true }).first()).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'cultures');
+  await expect(page.getByRole('heading', { name: 'À quelle culture ressemble chaque espèce ?' })).toBeVisible();
+  await expect(page.getByText('Réglages fins des cultures (pour les experts)').first()).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'planning');
+  await expect(page.getByRole('heading', { name: 'Heures où l’on n’arrose pas' })).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'ressources');
+  await expect(page.getByText('Eau utilisable', { exact: true }).first()).toBeVisible();
+
+  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+    await attendreLaPageIrrigation(page, cible);
+    const texte = (await page.locator('main').innerText()).toLocaleLowerCase('fr-FR');
+    const lus = MOTS_DU_CALCUL.filter((mot) => texte.includes(mot.toLocaleLowerCase('fr-FR')));
+    expect(lus, `« ${TITRES_DES_PAGES[cible]} » montre d’emblée un mot du calcul`).toEqual([]);
+    await verifierLEtape(page, journal, `mots de ${cible}`);
   }
 });

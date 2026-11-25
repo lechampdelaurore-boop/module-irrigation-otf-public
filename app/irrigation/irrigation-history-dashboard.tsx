@@ -28,6 +28,7 @@ import { FigureOrigin } from './shell/figure-origin';
 import { historyObjectiveOriginText } from '@/lib/domain/objective-reading';
 import { historyFilterSummary } from '@/lib/domain/premier-geste';
 import { clockText, dateClockText, durationMinutesText } from '@/lib/domain/clock-text';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 type Props = {
   season: number;
@@ -345,7 +346,7 @@ export function IrrigationHistoryDashboardView({
           action={rainAction}
         />
         <SummaryCard
-          label="ET0"
+          label={SIMPLE_WORDS.thirstOfPeriod}
           value={dashboard.summary.et0Mm}
           format={millimetersText}
           availability={availabilityText(dashboard.summary.et0Availability)}
@@ -515,7 +516,7 @@ function HistoryItem({ item }: { item: IrrigationHistoryItem }) {
           <Detail label="Volume réel" value={!showsActual ? '0 m³' : item.actualCubicMeters === null ? '— (surface mouillée inconnue)' : `${volumeText(item.actualCubicMeters)}`} />
           <Detail label="Surface concernée" value={showsActual ? `${numberFormatter.format(item.irrigatedAreaSquareMeters)} m²` : '0 m²'} />
           <Detail label="Surface mouillée" value={item.wettedAreaSquareMeters === null ? item.wettedAreaLabel : `${numberFormatter.format(item.wettedAreaSquareMeters)} m² — ${item.wettedAreaLabel}`} />
-          <Detail label="Objectif initial" value={item.initialObjectiveMm === null ? 'Non historisé' : `${millimetersText(item.initialObjectiveMm)}`} />
+          <Detail label="Objectif initial" value={item.initialObjectiveMm === null ? 'Non enregistré' : `${millimetersText(item.initialObjectiveMm)}`} />
           <Detail label="Statut" value={item.statusLabel} />
           <Detail label="Mode de création" value={item.modeLabel} />
         </dl>

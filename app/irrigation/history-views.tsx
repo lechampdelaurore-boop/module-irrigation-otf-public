@@ -9,7 +9,7 @@ import { SeriesWaterView } from './series-water-view';
 type HistoryView = 'scope' | 'series';
 
 const viewLabels: Record<HistoryView, { label: string; hint: string }> = {
-  scope: { label: 'Par périmètre', hint: 'Ferme, parcelle, jardin ou planche, sur une période' },
+  scope: { label: 'Par lieu', hint: 'Ferme, parcelle, jardin ou planche, sur une période' },
   series: { label: 'Par série', hint: 'Chaque culture, de son implantation à sa dernière récolte' },
 };
 

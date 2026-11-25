@@ -192,10 +192,10 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     if (telephone) await verifierCibleTactile(tuile, `La tuile « ${await tuile.locator('.today-kpi-label').innerText()} »`);
   }
   // Le nom lu : le titre, le chiffre, puis le mot d'action.
-  await expect(tuiles.first()).toHaveAccessibleName(/^Objectif de la semaine .+ (Modifier les objectifs|Poser un objectif)$/);
+  await expect(tuiles.first()).toHaveAccessibleName(/^Eau visée cette semaine .+ (Modifier les objectifs|Poser un objectif)$/);
 
   // « Objectif de la semaine » ouvre le volet des objectifs, le champ dans l'écran.
-  await tuiles.filter({ hasText: 'Objectif de la semaine' }).click();
+  await tuiles.filter({ hasText: 'Eau visée cette semaine' }).click();
   await expect(page).toHaveURL(/\/irrigation\/besoins\?season=\d{4}#objectifs-de-la-semaine$/);
   await attendreLaPagePrete(page, 'besoins');
   await expect(page.locator('#objectifs-de-la-semaine')).toHaveAttribute('open', '');
