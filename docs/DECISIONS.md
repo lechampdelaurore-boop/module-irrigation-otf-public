@@ -9991,3 +9991,67 @@ moins un test.
 **Ne change pas.** Une ferme qui n'allume pas la plage ne voit aucune
 notification changer (S2). Le Worker de notification ne change pas ;
 aucune migration. D-028, D-320, D-321 et D-324 tiennent.
+
+## D-327 — Simplifier l'usage du module : trois endroits, deux niveaux, un chemin, en six lots
+
+Date : 25 novembre 2026. Statut : **décidé**, rien n'est codé ; roadmap section
+6 terdecies, contrat du premier lot `docs/simplification-s1-contract.md`.
+Écrite en Sonnet 5.5 · Moyen (registres et contrat sans code). Le diagnostic
+a été fait exceptionnellement en Fable, à la demande expresse du porteur, pour
+ce seul travail ; D-055 tient pour tout le reste.
+
+**Contexte.** Le 25 novembre 2026 à 9 h 26, le porteur trouve le logiciel
+« très complexe à utiliser ». Le diagnostic
+(`/mnt/project-files/audit-ergonomie/diagnostic-simplicite-2026-11-25.md`,
+sans code, sur `main` ecddc14, complété sur la ferme réelle dans le Chrome du
+porteur, en lecture seule) relève sept causes : un rangement par type de
+donnée (treize pages au même rang), tout au même niveau (« Aujourd'hui » :
+5 123 px et 66 chiffres sur la ferme réelle), les mots du calcul, des
+réglages à quatre endroits, une première ouverture à onze cases, un chapeau
+d'un tiers d'écran, un même chiffre qui change d'une page à l'autre.
+
+**Décision.** Le porteur répond « oui » aux quatre choix posés un par un
+(cartes de décision, 25 novembre 2026, 11 h 59 à 12 h 01) :
+
+1. **Trois endroits** : Aujourd'hui, Semaine, Ma ferme ; un bouton « + » pour
+   arroser maintenant, noter la pluie, noter un arrosage déjà fait.
+2. **Sur « Aujourd'hui », un seul bouton qui change de nom** (Valider,
+   Démarrer, Terminer) : un arrosage se valide et se démarre depuis sa carte,
+   sans passer par le planning. **Change** `docs/aujourdhui-tableau-de-bord-contract.md`
+   et la règle « une proposition se valide au planning » ; le contrat du lot
+   S2 dit comment, et prévoit l'arrosage « à rattraper ».
+3. **À la première ouverture, trois façons de commencer** à la place des onze
+   cases, qui restent dans « Ma ferme ». **Change** l'écran de bienvenue du
+   contrat 3.8 (`docs/feature-selection-contract.md`) ; le contrat du lot S6
+   dit comment.
+4. **Les mots du tableau** (diagnostic, cause 3) **tels que proposés**, et le
+   lot S1 d'abord.
+
+**Les six lots**, un contrat avant chaque code, une PR par point, enchaînés
+sans nouveau « vas-y » (consigne du porteur du 25 novembre 2026) : S1 chapeau
+et mots, S2 « Aujourd'hui » où l'on fait tout, S3 trois endroits, S5 arroser
+en trois champs, S4 la semaine sur une page, S6 mise en route guidée.
+
+**Réglages** (grille, quatre critères) : contrats en Sonnet 5.5 · Moyen ;
+code en Opus 5.5 · Élevé pour S1, S2 et S5 (écrans sous contrat, les tests
+jugent), Opus 5.5 · Très élevé pour S3, S4 et S6 (refonte de l'organisation
+de tout le module, contexte étendu). Jamais Fable.
+
+**Garde-fous.** Aucun calcul, aucune règle d'agronomie, aucune donnée ni
+migration ne change ; aucune fonction n'est retirée ; les fonctionnalités à la
+carte restent ; la charte graphique reste. Logiciel multi-fermes : les trois
+endroits sont ceux de toute ferme, quelle que soit sa taille. Un contrat
+validé (« Aujourd'hui », menu, planning, besoins, historique, bienvenue) ne
+change que par le contrat du lot qui le touche.
+
+**Point ouvert S1-O1, non examiné.** Sur la ferme réelle, « Objectifs et
+besoins » dit « objectif 2,7 mm · irrigué 2,8 mm » quand « Aujourd'hui » dit
+5,2 mm et 2,1 mm et « Historique » 5,2 mm, la même semaine. La PR 3 du lot S1
+en établit la cause avant toute modification.
+
+**Précisions du lot S1** : voir le contrat (F822 et suivantes), qui prendra
+D-328 par sa première PR.
+
+**Non vérifié.** Le toucher, la vitesse et la lecture au soleil sur un vrai
+téléphone ; la proposition elle-même n'a pas été essayée par un maraîcher
+(cinq tâches conseillées au premier volontaire du pilote avant S3 et S4).

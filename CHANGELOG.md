@@ -5,6 +5,13 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Décidé (simplifier l'usage du module)
+
+- **Six lots de simplification retenus, contrat du lot S1 écrit** (D-327) :
+  trois endroits, valider-démarrer-terminer depuis la carte d'« Aujourd'hui »,
+  trois façons de commencer, les mots du champ. Rien n'est codé : aucune
+  page ne change encore. Contrat : `docs/simplification-s1-contract.md`.
+
 ### Ajouté (heures de silence des notifications, H3)
 
 - **Les heures de silence se règlent dans « Réglages »** (D-326) : dans
