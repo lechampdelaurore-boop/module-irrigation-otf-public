@@ -260,6 +260,15 @@ export function precautionLevel(precaution: { kind: 'protected-slot' } | { kind:
 export const MORE_OPTIONS_LABEL = 'Plus d’options (pompe, note, saisir en mm)';
 
 /**
+ * Le nom du pli selon l'onglet (section 4) : « Déjà fait » n'a ni saisie en
+ * mm ni durée exacte, sa durée se lit des dates ; le pli ne range que la
+ * pompe et la note.
+ */
+export function moreOptionsLabel(kind: 'running' | 'planned' | 'completed'): string {
+  return kind === 'completed' ? 'Plus d’options (pompe, note)' : MORE_OPTIONS_LABEL;
+}
+
+/**
  * « Plus d'options » s'ouvre seul quand une valeur y est déjà posée par une
  * autre voie (section 3.4) : une pompe choisie qui n'est pas celle du
  * matériel, une note, la saisie en mm demandée. Fermé sinon.
