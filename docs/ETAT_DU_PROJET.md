@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3, PR 4 sur 4 : les liens et les
+  visites, codée le 25 novembre 2026** (D-331, F890 à F893 ; contrat,
+  sections 2 et 9), en Opus 5.5 · Très élevé, sur la branche de la PR 3.
+  La visite guidée de la démonstration présente les trois endroits et le
+  « + » (« Trois endroits », « Les endroits suivent vos cases ») ; le « ? »
+  d'« Aujourd'hui » situe sa pastille dans la barre du bas ou le menu ; la
+  charte du module et les contrats de la démonstration, de S1 et des
+  parcours suivent. Aucun écran ne change. **Le code de S3 est fini** ;
+  les quatre PR se fusionnent après la dernière de S2, une à la fois.
 - **Simplifier l'usage du module, S3, PR 3 sur 4 : le menu de
   l'ordinateur, codée le 25 novembre 2026** (D-331, F885 à F889 ; contrat,
   section 6), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Au-delà
@@ -21,8 +30,7 @@ registres, elle y renvoie.
   trois pages, « Ma ferme » et ses fiches, Réglages comprise. Les titres
   « Semaine » et « Ma ferme » sont des liens ; toute page reste à un clic.
   Le téléphone ne change pas. Tests sur les 235 choix de cases, parcours
-  P63 à 1 440 px, mesures du menu : voir la PR. Reste la PR 4 (visite
-  guidée, liens et phrases qui disent « menu » ou « Plus »).
+  P63 à 1 440 px, mesures du menu : voir la PR.
 - **Simplifier l'usage du module, S3, PR 2 sur 4 : la barre du bas, le
   « + » et le chemin de retour, codée le 25 novembre 2026** (D-331, F876 à
   F884 ; contrat, sections 3.3, 3.4, 4, 4.1 et 5.1), en Opus 5.5 · Très

@@ -78,7 +78,8 @@ d'explication. Sur « Arrosages », le premier champ commence vers 670 px ; sur
    reste dans l'adresse : tous les liens existants (notifications comprises)
    gardent leur effet ; une autre saison s'ouvre depuis « Historique » (F825).
    Le regroupement en « Semaine » et « Ma ferme » vient avec S3 : S1 ne déplace
-   aucune page.
+   aucune page. (S3 l'a fait : trois endroits, D-331,
+   `docs/simplification-s3-contract.md`.)
 5. **Les explications fixes passent dans le « ? ».** Un paragraphe qui dit
    chaque jour la même chose (exemple : « L'eau que le sol de chaque planche
    tient à la disposition des racines… », `soil-reserve-section.tsx`) quitte le
@@ -147,7 +148,7 @@ par le porteur le 25 novembre 2026**) :
    ceux d'une notification est noté comme dette à traiter après S6.
 4. **Les noms de pages du menu** changent seulement si le tableau les nomme
    (« Objectifs et besoins », « Ressources et pompes »…) ; le rangement du
-   menu est S3.
+   menu est S3 (fait : trois endroits, D-331).
 5. **Test de garde.** Un test échoue si un mot de la colonne de gauche
    réapparaît dans un titre, un bouton ou une phrase de premier niveau ; la
    liste des endroits où il est permis (le « ? », les replis de détail) est
@@ -452,7 +453,7 @@ guidée sont lus avec les mêmes mots (règle 6).
   série, déjà du détail, gardent « ET0 ».
 - F834 : le tableau ne nomme aucun nom de page : les noms du menu ne
   changent pas (« Objectifs et besoins », « Ressources et pompes »…) ; leur
-  rangement est S3.
+  rangement est S3 (fait, D-331 : les noms n'ont pas changé).
 - F835 : « réanalyse » et « historisé » sont dits en mots simples là où ils
   paraissaient au premier niveau (le message après le retrait d'une mesure
   de pluie, la phrase du panneau de pluie, la colonne de pluie du tableau des
