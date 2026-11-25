@@ -12,8 +12,8 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
-- **Lenteur du module : N3, l'espace lu une fois par requête, codée le
-  24 novembre 2026** (D-325, F810 à F816, contrat de la tranche 4, section
+- **Lenteur du module : N3, l'espace lu une fois par requête, en ligne le
+  25 novembre 2026 à 3 h 36** (D-325, F810 à F816, contrat de la tranche 4, section
   5 sexies ; roadmap section 6 duodecies), en Opus 5.5 · Max, le réglage de
   la roadmap (résolution de l'espace d'une ferme, donc isolation). Pendant
   une requête, l'espace d'une personne et d'une ferme, le choix des
@@ -26,8 +26,10 @@ registres, elle y renvoie.
   de 1,25 s à 0,72 s à l'ouverture ; les treize pages du menu, de 894 à 460
   lectures. Nouveau test rejoué dans les quatre passages d'isolation,
   éprouvé en cassant le code exprès. Le temps gagné en ligne reste à
-  mesurer sur le téléphone du porteur, avec son accord. Contrôles : voir la
-  PR.
+  mesurer sur le téléphone du porteur, avec son accord. Mise en ligne de
+  #205 (N3, D-325) consignée ici : #205 fusionnée le 25 novembre 2026 à
+  3 h 04, en ligne à 3 h 36 (run 45530280168, les cinq jobs verts ;
+  démonstration à 3 h 36). Contrôles : voir la PR.
 
 - **Lenteur du module : N1, le menu sans rechargement, en ligne le
   25 novembre 2026 à 2 h 45, et N2, l'ouverture directe, codée le
