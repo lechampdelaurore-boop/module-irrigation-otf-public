@@ -16,10 +16,11 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLesReglagesDeLaPag
  *   « Plus d'options » est fermé.
  * - Deux matériels : rien de choisi (« Choisissez où arroser. ») ; chaque
  *   ligne de « Où ? » dit son type et ses planches. La hauteur du premier
- *   bloc est mesurée, sans et avec un arrosage en cours ; son budget (sous
- *   400 px et 700 px au téléphone, section 7) tient à l'ordre de la page et
- *   aux onglets d'une ligne, que les PR 2 et 3 du lot posent : il sera
- *   vérifié ici par la PR 3.
+ *   bloc est mesurée, sans et avec un arrosage en cours (PR 3, section 7) :
+ *   sous 400 px au téléphone sans arrosage en cours, tenu ; sous 700 px avec,
+ *   non tenu (F910) : la carte de l'arrosage en cours, raccourcie au
+ *   téléphone (F909), le met vers 800 px avec le nom long d'un parcours ; la
+ *   borne de 820 px garde ce gain.
  * - Trois touches, sans clavier : la case ronde, « + » (30 min), « Démarrer ·
  *   fin vers … » ; la phrase du résultat dit 5 mm et 113 L ; la réponse sous
  *   le bouton, l'arrosage en cours en tête de page, le formulaire vidé.
@@ -75,6 +76,8 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await expect(formulaire.locator('.watering-missing')).toHaveText('Choisissez où arroser.');
   const ouSansArrosage = await hautDuPremierBloc(page);
   testInfo.annotations.push({ type: 'mesure', description: `« 1. Où ? » à ${ouSansArrosage} px du haut de la page (${testInfo.project.name}), sans arrosage en cours` });
+  // Le budget de la section 7 (PR 3) : au téléphone, « Où ? » sous 400 px sans arrosage en cours.
+  if (telephone) expect(ouSansArrosage, '« 1. Où ? » sous 400 px, sans arrosage en cours').toBeLessThan(400);
   testInfo.annotations.push({ type: 'mesure', description: `onglets : ${await hauteur(page.locator('.irrigation-action-tabs'))} px de haut (${testInfo.project.name})` });
   if (telephone) {
     for (const ligne of await formulaire.locator('.watering-where-row').all()) await verifierCibleTactile(ligne, 'Une ligne de « Où ? »');
@@ -125,6 +128,8 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await demarrer.click(); touches += 1;
   await expect(formulaire.locator('.watering-start .action-reply')).toContainText('L’irrigation a démarré.');
   await expect(page.getByLabel('Irrigations en cours')).toContainText(a.materiel);
+  // La page reste ; un lien sous la réponse mène à la carte d'« Aujourd'hui » (S5-g, PR 3).
+  await expect(formulaire.getByRole('link', { name: 'Voir l’arrosage en cours sur Aujourd’hui' })).toBeVisible();
   // Le formulaire vidé (F406) : rien de choisi, aucune durée.
   await expect(formulaire.getByRole('radio', { checked: true })).toHaveCount(0);
   await expect(duree).toHaveText('—');
@@ -134,6 +139,8 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await attendreLaPagePrete(page, 'arrosages');
   const ouAvecArrosage = await hautDuPremierBloc(page);
   testInfo.annotations.push({ type: 'mesure', description: `« 1. Où ? » à ${ouAvecArrosage} px du haut de la page (${testInfo.project.name}), avec un arrosage en cours` });
+  // Budget de 700 px non tenu (F910) : la borne garde le gain de la carte raccourcie (1 011 → 800 px).
+  if (telephone) expect(ouAvecArrosage, '« 1. Où ? » sous 820 px, avec un arrosage en cours').toBeLessThan(820);
   await verifierLEtape(page, journal, 'trois touches, la réponse sous le bouton');
 
   // Une pompe trop petite, habituelle du matériel B : dite dans la phrase, son dépassement au premier niveau.

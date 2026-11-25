@@ -110,10 +110,10 @@ recommandée et consignée ici.
    mode de calcul.
 3. **Onglets.** À l'ordinateur, l'onglet choisi est blanc, souligné d'un
    trait vert de 5 px, les autres sur la feuille ; libellé DM Sans 14 px /
-   500. Au téléphone, les trois onglets « Irriguer maintenant / Planifier /
-   Déjà réalisée » restent empilés, chacun avec sa ligne d'explication :
-   l'onglet choisi y prend un trait vert de 5 px à gauche plutôt que la
-   pilule de la maquette, faite pour deux libellés courts. Les segments de
+   500. Au téléphone, les trois onglets « Arroser maintenant / Planifier /
+   Déjà fait » tiennent sur une ligne de 44 px, sans leur ligne
+   d'explication, l'onglet choisi souligné du même trait vert (simplification
+   S5, D-333, F902). Les segments de
    période de l'historique sont déjà des pilules vertes.
 4. **Tableaux.** Lignes alternées `#fcfcfe` / `#f2f2f5`, en-têtes gris de
    11,7 px, chiffres tabulaires, survol vert pâle ; dans le tableau de la

@@ -158,7 +158,8 @@ n'a plus d'entrée de barre ; on y va par **« Arroser maintenant »** du « + �
 et par un lien **« Tous les arrosages »** en pied du bloc « Votre journée » de
 « Aujourd'hui » (S3 l'ajoute s'il n'y est pas, en une ligne de 44 px ; il garde
 l'adresse et la saison courante). C'est la seule page dont le chemin passe par
-« Aujourd'hui » plutôt que par la barre ; S5 la refondra.
+« Aujourd'hui » plutôt que par la barre ; S5 l'a refondue (D-332 à D-334 :
+l'en-cours, le formulaire en trois champs, l'à-venir, puis le résumé).
 
 ## 4. La barre du bas et le « + » (téléphone)
 
@@ -205,9 +206,9 @@ n'écrit rien tant qu'on n'a pas appuyé sur son bouton** (D-028).
 
 | Geste | Texte | Ce qu'il fait | Existe si |
 | --- | --- | --- | --- |
-| **Arroser maintenant** | « Je choisis où et combien de temps » | ouvre « Arrosages » sur son formulaire « Irriguer maintenant » (demande portée par l'adresse, lue une fois puis retirée, comme `?planifier=1` ; le nom du paramètre est posé en codant) | « Arrosages » cochée |
+| **Arroser maintenant** | « Je choisis où et combien de temps » | ouvre « Arrosages » sur son formulaire « Arroser maintenant » (le nom de l'onglet depuis S5) (demande portée par l'adresse, lue une fois puis retirée, comme `?planifier=1` ; le nom du paramètre est posé en codant) | « Arrosages » cochée |
 | **Noter la pluie** | « Ce que dit votre pluviomètre » | monte **dans la feuille** la fenêtre de la PR 4 de S2 (jour, millimètres, bouton qui dit le chiffre, réponse sous le bouton), sans changer de page | « Objectifs et besoins » cochée et ferme pas toute sous abri (la règle de S2, section 7, appelée, jamais recopiée) |
-| **Noter un arrosage déjà fait** | « J'ai arrosé sans le module » | ouvre « Arrosages » sur son formulaire « Déjà réalisée » (même mécanisme) | « Arrosages » cochée |
+| **Noter un arrosage déjà fait** | « J'ai arrosé sans le module » | ouvre « Arrosages » sur son formulaire « Déjà fait » (le nom de l'onglet depuis S5 ; même mécanisme, avec un retour « ‹ Aujourd'hui ») | « Arrosages » cochée |
 
 La feuille ne dit jamais que quelque chose est enregistré avant que le serveur
 l'ait dit : la réponse de la fenêtre de la pluie est celle de S2. Après un

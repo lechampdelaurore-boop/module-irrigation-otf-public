@@ -25,6 +25,7 @@ import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import { placementsOpenAt, plannedIrrigationSignal } from '@/lib/domain/equipment-pose-presentation';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
 import { IRRIGATION_FORM_REQUESTED, PLANNED_IRRIGATION_FORM_REQUESTED } from '@/lib/domain/feasibility-notifications';
+import { pageHref } from '@/lib/domain/features/pages';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import type { Bed } from '@/lib/domain/domain';
 import { localDateTimeInputValue } from '@/lib/domain/irrigation-timer';
@@ -46,7 +47,6 @@ import { ObjectiveExcessDialog } from './irrigation-manager/objective-excess-dia
 import { NO_FORM_HINTS, objectiveExcess, proposedDoseFor, type IrrigationFormHints, type ObjectiveExcess } from '@/lib/domain/irrigation-form-hints';
 import { dateKeyInTimeZone } from '@/lib/domain/water-management';
 import { recordDoneAsPlannedAction } from './done-as-planned-actions';
-import { isLimitedAlertStatus } from '@/lib/domain/system-alerts-banner';
 import { preselectedEquipmentId } from '@/lib/domain/watering-now';
 import { finishInputText, finishValueToSend } from '@/lib/domain/finish-time';
 
@@ -113,6 +113,10 @@ export function IrrigationEventManager({
   const [excess, setExcess] = useState<ObjectiveExcess | null>(null);
   const [finishEvent, setFinishEvent] = useState<IrrigationEventRecord | null>(null);
   const [pending, startTransition] = useTransition();
+  // Arrivé par un geste du « + » (S5, section 7) : un retour « ‹ Aujourd'hui » en tête du formulaire.
+  const [fromGesture, setFromGesture] = useState(false);
+  // Après « Démarrer », la page reste et un lien mène à la carte d'« Aujourd'hui » (S5-g).
+  const [justStarted, setJustStarted] = useState(false);
   const { confirm, dialog: confirmDialog } = useConfirm();
   // L'heure de fin proposée, à la seconde ; le champ la montre à la minute (lot K, n° 21, F472).
   const [finishPrecise, setFinishPrecise] = useState(() => localDateTimeInputValue(new Date(initialNowIso), true));
@@ -195,6 +199,7 @@ export function IrrigationEventManager({
     setReplies([]);
     setConflict(null);
     setExcess(null);
+    setJustStarted(false);
     // Au-delà de l'objectif de la semaine d'une planche : la fenêtre demande d'abord (F410). Rien à demander après coup.
     const beyond = confirmExcess || creationKind === 'completed' ? null : objectiveExcess(previewApplications, formHints.weeks, irrigationDay());
     if (beyond) {
@@ -229,7 +234,10 @@ export function IrrigationEventManager({
         return;
       }
       receiveActionResult(result, 'formulaire');
-      if (result.ok) form.reset();
+      if (result.ok) {
+        setJustStarted(creationKind === 'running' && !editingEventEquipmentId);
+        form.reset();
+      }
     });
   };
 
@@ -294,7 +302,10 @@ export function IrrigationEventManager({
       document.querySelector('.irrigation-creation-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     const openPlannedForm = () => openForm('planned');
-    const openRequestedForm = (event: Event) => openForm((event as CustomEvent<unknown>).detail);
+    const openRequestedForm = (event: Event) => {
+      openForm((event as CustomEvent<unknown>).detail);
+      setFromGesture(true);
+    };
     window.addEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
     window.addEventListener(IRRIGATION_FORM_REQUESTED, openRequestedForm);
     return () => {
@@ -321,7 +332,6 @@ export function IrrigationEventManager({
     document.querySelector('.irrigation-creation-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const limitedAlerts = isLimitedAlertStatus(notificationStatus);
   const notificationReadiness = (
     <NotificationReadiness
       foldable
@@ -334,20 +344,11 @@ export function IrrigationEventManager({
 
   return (
     <section className="irrigation-events-section" aria-labelledby="irrigation-events-title">
+      {/* L'ordre de la page (simplification S5, section 7, S5-m) : l'en-cours, le formulaire, l'à-venir, puis le résumé. */}
       <header className="irrigation-events-heading">
-        <div>
-          <h2 id="irrigation-events-title">Enregistrer ou planifier une irrigation</h2>
-          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
-        </div>
-        <div className="irrigation-event-counts" aria-label="Résumé des irrigations">
-          <span><strong>{activeEvents.length}</strong> en cours</span>
-          <span><strong>{plannedEvents.length + openPartialEvents.length}</strong> à venir</span>
-          <span><strong>{historyEvents.length}</strong> archivées</span>
-        </div>
+        <h2 id="irrigation-events-title">Arroser ou noter</h2>
+        {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
       </header>
-
-      {/* Un état limité vient sous le formulaire (audit final, lot E, J12, F266) ; « Recevoir les alertes » et « Alertes activées » gardent leur place. */}
-      {limitedAlerts ? null : notificationReadiness}
 
       <ActionReply messages={replies} origin="haut" classNames={REPLY_CLASSES} />
 
@@ -394,6 +395,9 @@ export function IrrigationEventManager({
         completedStartAt={completedStartAt}
         dose={selectedEquipment ? proposedDoseFor(formHints.doses, selectedEquipment.id, irrigationDay()) : null}
         unplacedChoice={unplacedChoice}
+        todayHref={pageHref('aujourdhui', { season })}
+        fromGesture={fromGesture}
+        justStarted={justStarted}
         now={now}
         pending={pending}
         reply={<ActionReply messages={replies} origin="formulaire" classNames={REPLY_CLASSES} />}
@@ -401,7 +405,8 @@ export function IrrigationEventManager({
         onSubmit={() => submitCreation()}
       />
 
-      {limitedAlerts ? notificationReadiness : null}
+      {/* Les alertes du téléphone, dans tous leurs états, sous le formulaire (S5, sections 5 et 7, F908) : « 1. Où ? » sous 400 px. */}
+      {notificationReadiness}
 
       <ActionReply messages={replies} origin="liste" classNames={REPLY_CLASSES} />
       <UpcomingIrrigations
@@ -426,6 +431,15 @@ export function IrrigationEventManager({
         }}
         onDoneAsPlanned={recordDoneAsPlanned}
       />
+
+      {/* Le résumé vient après l'à-venir (S5-m) : il ne repousse plus « Où ? » sous l'écran du téléphone. */}
+      <footer className="irrigation-events-summary">
+        <div className="irrigation-event-counts" aria-label="Résumé des irrigations">
+          <span><strong>{activeEvents.length}</strong> en cours</span>
+          <span><strong>{plannedEvents.length + openPartialEvents.length}</strong> à venir</span>
+          <span><strong>{historyEvents.length}</strong> archivées</span>
+        </div>
+      </footer>
 
       <ScheduleConflictDialog
         conflict={conflict}

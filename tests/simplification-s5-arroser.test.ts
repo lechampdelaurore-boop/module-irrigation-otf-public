@@ -240,7 +240,7 @@ test('tableau 9.3 : chaque champ d’aujourd’hui a sa place, au premier niveau
   assert.match(more, /<NoteField form=\{form\} \/>/);
   assert.doesNotMatch(firstLevel, /<NoteField|<PumpFields/);
   // La note est le dernier champ du pli, dans lui : juste avant sa fermeture, avant le bouton.
-  assert.match(form, /<NoteField form=\{form\} \/>\s*<\/div>\s*<\/div>\s*<div className="watering-start">/);
+  assert.match(form, /<NoteField form=\{form\} \/>\s*<\/div>\s*<\/div>\s*<div className="watering-start" data-tour="arrosage-bouton">/);
   // « Résultat calculé » : la phrase ; l'intensité, l'étendue et l'apport par planche sous « Voir planche par planche ».
   assert.match(firstLevel, /<ResultLine sentence=\{sentence\} \/>/);
   assert.match(firstLevel, /<summary>Voir planche par planche<\/summary>/);

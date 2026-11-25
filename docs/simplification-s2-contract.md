@@ -427,7 +427,7 @@ des notifications gardent leurs mots.
 | S2-a | Un retard : deux boutons | « Je le fais maintenant » (principal) et « C'est fait » (bordé), parce que le module ne sait pas lequel est vrai (section 4) |
 | S2-b | Refuser un créneau | « Pas à cette heure », pas « Pas aujourd'hui » : le plan ne reporte pas, il cherche une autre place (D-030) |
 | S2-c | « Démarrer tout de suite » sur une proposition | valide puis démarre ; si le démarrage est refusé, la validation tient et le message le dit |
-| S2-d | Ajuster une proposition depuis « Aujourd'hui » | un lien vers le formulaire du planning, pas une copie ; S5 décidera s'il remonte |
+| S2-d | Ajuster une proposition depuis « Aujourd'hui » | un lien vers le formulaire du planning, pas une copie ; **S5 a décidé qu'il ne remonte pas** (S5-f, section 6.2) |
 | S2-e | Jour par défaut de la pluie | hier, avec « Aujourd'hui » et les jours d'avant dans la liste ; jamais d'écrasement sans le dire |
 | S2-f | La frise du jour | passe dans « Le détail » : les cartes disent déjà la journée |
 | S2-g | Les pastilles de l'en-tête | quittent le téléphone (la phrase les redit), restent à l'ordinateur |
@@ -497,7 +497,7 @@ question par message.
 | Plusieurs fermes, plusieurs matériels : une carte par irrigation devient longue | les retards d'un même jour passé se replient (T2, inchangé) ; au-delà, c'est le planning qui sert |
 | Les tests et parcours qui lisent un mot changent | relevé d'abord (six fichiers de parcours et cinq fichiers de tests lisent « Démarrer maintenant », « Valider au planning » ou « Fait comme prévu ») ; ils suivent dans la PR qui change le mot |
 | S1 pas fini quand S2 commence | S2 attend la fin du code de S1 (ligne 33) ; la barre de la PR 5 attend la fonction de l'objectif de la PR 3 de S1 |
-| La page « Arrosages » dit « Fait comme prévu » et « Aujourd'hui » dit « C'est fait » | dette notée, traitée avec S5 |
+| La page « Arrosages » dit « Fait comme prévu » et « Aujourd'hui » dit « C'est fait » | dette notée, **soldée par S5** (section 6.1, D-334 : « C'est fait » sur « Arrosages ») |
 
 ## 14. À remplir par les PR
 

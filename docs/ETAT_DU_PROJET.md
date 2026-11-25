@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
+  les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
+  sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
+  PR 2 : **le code de S5 est fini.** « Arroser ou noter » : l'en-cours, le
+  formulaire, les alertes du téléphone, l'à-venir, le résumé ; le retour
+  « ‹ Aujourd'hui » après un geste du « + », le lien après « Démarrer »,
+  « C'est fait » sur « Arrosages », la visite en trois blocs, les contrats
+  de la section 9.1 réécrits. « 1. Où ? » à 298 px au téléphone (603 px
+  avant S5). **Budget avec une irrigation en cours non tenu** (800 px au
+  lieu de 700, F910 ; la carte en cours raccourcie au téléphone, F909) :
+  dette dite. Contrôles : voir la PR. Viennent les fusions de S5 (après
+  S3), puis S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
