@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S2, PR 5 : la page à l'essentiel)
+
+- **« Aujourd'hui » tient à l'essentiel, le reste dans « Le détail »**
+  (D-330, F860 à F867) : en haut, la journée et ses cartes, puis le gel ou la
+  chaleur seulement quand une alerte est annoncée, « La semaine » en une
+  barre et une phrase (« 23,4 mm visés, ferme entière : 12 mm reçus. Il manque
+  encore 11,4 mm d’ici dimanche. »), avec « Voir la semaine » et « Noter la
+  pluie », une seule ligne « Calcul approximatif » quand une donnée manque,
+  et une ligne d'eau quand une réserve ou une limite le demande. Les tuiles,
+  l'eau et la réserve par jardin, l'eau disponible, la fiabilité, les trois
+  jours de météo et la frise sont dans un pli fermé, « Le détail », qui dit
+  ce qu'il contient : rien n'est retiré. Les liens qui visaient un bloc
+  ouvrent le pli dessus. Au téléphone, les pastilles de l'en-tête laissent la
+  place, la phrase les redit ; le même ordre à toutes les largeurs.
+
 ### Ajouté (simplifier l'usage du module, S2, PR 4 : noter la pluie d'un geste)
 
 - **La pluie du pluviomètre se note depuis « Aujourd'hui »** (D-330, F854 à

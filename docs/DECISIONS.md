@@ -10226,8 +10226,9 @@ Contre-épreuve : treize altérations, chacune prise par au moins un test.
 
 ## D-330 — Simplifier l'usage du module, lot S2 : « Aujourd'hui » où l'on fait tout
 
-Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 5 codées** (valider et
-démarrer, terminer et reprendre, l'arrosage à rattraper, noter la pluie) ;
+Date : 25 novembre 2026. Statut : **PR 1 à 5 sur 5 codées** (valider et
+démarrer, terminer et reprendre, l'arrosage à rattraper, noter la pluie, la
+page à l'essentiel) ;
 contrat `docs/simplification-s2-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 15), sur le mandat du porteur du 25 novembre
@@ -10453,3 +10454,63 @@ mesure par jour, le retrait sur « Objectifs et besoins », sept jours en
 arrière au plus, le jour futur et le chiffre hors bornes refusés, Bob qui ne
 voit, ne remplace ni ne retire la pluie d'Alice, pas de fenêtre toute sous
 abri. P62 étendu ; P30 et L1 suivent les mots. Contre-épreuve : voir la PR.
+
+**Décision (PR 5).** La page « Aujourd'hui » a deux niveaux (contrat,
+sections 8 et 9), dans le même ordre à toutes les largeurs. Au premier
+niveau : l'en-tête ; « Votre journée », sans la frise ; « Gel ou chaleur »
+seulement pour un jour en alerte, la prévision qui manque ou le gel sans
+alerte posée (J14) ; « La semaine » en une barre pour la ferme entière (la
+phrase de l'objectif de S1, `farmObjectiveText`, l'eau reçue, ce qui manque,
+jamais négatif, un inconnu dit inconnu), « Voir la semaine » et « Noter la
+pluie » ; une seule ligne « Calcul approximatif », la première donnée qui
+manque avec son geste et « + n autres » ; une ligne d'eau seulement quand une
+réserve ou une limite le demande. Le reste est dans **un seul pli fermé, « Le
+détail »**, que sa ligne de résumé compte (« 4 chiffres · 3 jardins · 2
+données à rafraîchir ») : aucun bloc n'est retiré, chacun garde ses liens,
+ses boutons et ses réponses. Les ancres existantes ouvrent le pli sur leur
+bloc. Ce que garde le premier niveau se choisit dans
+`lib/domain/today/essential.ts`, parmi ce que les blocs disent déjà : rien ne
+se calcule de nouveau, aucune règle ne change.
+
+**Précisions tranchées en codant (PR 5).**
+
+- F860 : au téléphone (la page à 620 px ou moins, le seuil de L6), les
+  pastilles de l'en-tête sont masquées (S2-g) ; à l'ordinateur, une pastille
+  qui vise un bloc du pli (« Gel ou chaleur », « Fiabilité du calcul ») l'ouvre
+  et y descend, l'adresse gardant l'ancre.
+- F861 : « Gel ou chaleur » au premier niveau a sa propre ancre,
+  `#today-weather-alert`, et dessine le jour en alerte par la carte du bloc,
+  avec son lien ; le bloc entier, ses trois jours et sa phrase, garde
+  `#today-weather` dans le pli, pour que les liens existants y mènent.
+- F862 : « Voir la semaine » mène à la ligne de la ferme d'« Objectifs et
+  besoins », comme la ligne de la ferme d'« Eau de la semaine », jusqu'à ce que
+  « Semaine » (S4) existe ; sans objectif, le lien est celui de la tuile,
+  « Poser un objectif ».
+- F863 : le geste de la ligne « Calcul approximatif » est le composant du
+  bloc « Fiabilité du calcul » (`ReliabilityAction`), le même bouton ou le même
+  lien ; « Recalculer » y répond sous la ligne du plan, « Noter la pluie » sous
+  la barre de la semaine.
+- F864 : la frise du jour passe dans le pli, sous son titre « La journée en
+  frise », à l'ordinateur seulement, comme avant au téléphone.
+- F865 : la tuile « Eau reçue » du pli garde sa fenêtre « Noter la pluie » et
+  sa réponse sous les tuiles, distincte de celle de la barre.
+- F866 : le navigateur ouvre seul un pli qui contient l'ancre de l'adresse,
+  avant que React ne s'attache ; l'attribut `open` du pli peut donc différer
+  du rendu serveur sans faute (`suppressHydrationWarning` sur ce seul
+  élément), et l'effet de l'ancre recale l'état.
+- F867 : P62 mesure le premier bouton en ramenant à une ligne le nom du
+  matériel du parcours, que le titre du test rend unique et étire sur
+  plusieurs lignes ; la mesure dit les pixels retirés.
+
+**Preuve (PR 5).** `tests/simplification-s2-essentiel.test.ts` : la barre de
+la semaine (phrase de S1, partielle, atteinte, inconnue, sans objectif),
+l'ordre de « Calcul approximatif » et « + n autres », la ligne d'eau
+seulement en alerte, « Gel ou chaleur » seulement en alerte ou sans
+prévision, la ligne de résumé du pli, l'ordre de la page sans branche du
+téléphone, chaque bloc dans le pli, les ancres qui l'ouvrent.
+`tests/aujourdhui-liens.test.ts` (L6) suit l'ordre. P29, P30 et P38 suivent
+la page ; P62 mesure le premier niveau à 390 px et ouvre le pli par chaque
+ancre et au clavier. Mesure à 390 px (P62, une proposition à valider) : le
+premier niveau finit à 1 384 px (borne 1 600), le premier bouton est à
+539 px (borne 600), 11 choses à toucher (borne 12) ; avant, la page du jour
+faisait 3 888 px sur la démonstration. Contre-épreuve : voir la PR.
