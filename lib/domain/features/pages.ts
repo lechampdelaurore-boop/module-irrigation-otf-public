@@ -11,16 +11,22 @@ import { usesSpeciesCorrespondence } from './socle';
 
 /**
  * Une case sans page (le calculateur) n'a pas d'adresse : elle vit dans la
- * page d'une autre. « Aujourd'hui » et « Réglages » sont des pages sans case.
+ * page d'une autre. « Aujourd'hui », « Ma ferme » et « Réglages » sont des
+ * pages sans case. « Ma ferme » est l'entrée de l'endroit du même nom
+ * (simplification, lot S3, docs/simplification-s3-contract.md, section 5 ;
+ * D-331) : ses fiches mènent aux pages de réglage de la ferme.
  */
-export type IrrigationPageId = 'aujourdhui' | PageFeatureId | 'reglages';
+export type IrrigationPageId = 'aujourdhui' | PageFeatureId | 'ma-ferme' | 'reglages';
 
 const IRRIGATION_BASE_PATH = '/irrigation';
 export const WELCOME_PATH = `${IRRIGATION_BASE_PATH}/bienvenue`;
 
 export function isIrrigationPageId(value: unknown): value is IrrigationPageId {
-  return value === 'aujourdhui' || value === 'reglages' || isPageFeatureId(value);
+  return value === 'aujourdhui' || value === 'ma-ferme' || value === 'reglages' || isPageFeatureId(value);
 }
+
+/** Toutes les pages du module, dans l'ordre du menu. */
+export const IRRIGATION_PAGE_IDS: readonly IrrigationPageId[] = ['aujourdhui', ...PAGE_FEATURE_IDS, 'ma-ferme', 'reglages'];
 
 /**
  * La page « Aujourd'hui » (audit ergonomique, point 1, 3.8 quater lot 2,
@@ -99,6 +105,7 @@ export function absentPageNotice(value: string | string[] | undefined): AbsentPa
 /** Le nom d'une page, au menu, en titre et dans l'onglet du navigateur. */
 export function pageLabel(page: IrrigationPageId): string {
   if (page === 'aujourdhui') return 'Aujourd’hui';
+  if (page === 'ma-ferme') return 'Ma ferme';
   return page === 'reglages' ? 'Réglages' : featureLabel(page);
 }
 
@@ -140,7 +147,10 @@ export function notFoundReturnLink(farm: { firstVisit: boolean; enabled: Feature
  * « Arrosages », on travaille presque toujours dans la saison en cours : le
  * choix la quitte (simplification, lot S1, F824). La saison reste dans
  * l'adresse et suit vers les autres pages ; une autre saison s'ouvre depuis
- * « Historique et cumuls » (F825).
+ * « Historique et cumuls » (F825). « Ma ferme » la montre et la transmet à
+ * chaque fiche, qui s'en sert presque toutes ; ses marques « À faire »
+ * comptent les jardins, les parcelles et les espèces de la saison (lot S3,
+ * section 5).
  */
 export function pageUsesSeason(page: IrrigationPageId, selection: FeatureSelection): boolean {
   if (page === 'alertes-meteo' || page === 'aujourdhui' || page === 'arrosages') return false;
@@ -178,21 +188,37 @@ export type PageAccess =
   | { kind: 'not-enabled'; page: IrrigationPageId; requested: IrrigationPageId };
 
 /**
+ * La ferme a-t-elle cette page ? « Réglages » et « Ma ferme » toujours (elles
+ * n'ont pas de case), « Aujourd'hui » quand l'une de ses huit cases est
+ * cochée (F1), toute autre page quand sa case l'est.
+ */
+export function pageEnabled(page: IrrigationPageId, selection: FeatureSelection): boolean {
+  if (page === 'reglages' || page === 'ma-ferme') return true;
+  return page === 'aujourdhui' ? hasTodayPage(selection) : selection.includes(page);
+}
+
+/**
  * Ce qu'une page fait de la ferme qui la demande : s'ouvrir, ou conduire
  * ailleurs (R1, R5, P10). « Aujourd'hui » sans aucune de ses huit cases se
- * comporte comme une page non cochée (F1).
+ * comporte comme une page non cochée (F1) ; « Ma ferme », comme « Réglages »,
+ * s'ouvre toujours, sauf à la première visite (lot S3, section 5).
  */
 export function pageAccess(page: IrrigationPageId, firstVisit: boolean, selection: FeatureSelection): PageAccess {
   if (firstVisit) return { kind: 'welcome' };
-  if (page === 'reglages') return { kind: 'open' };
-  if (page === 'aujourdhui' ? hasTodayPage(selection) : selection.includes(page)) return { kind: 'open' };
+  if (pageEnabled(page, selection)) return { kind: 'open' };
   return { kind: 'not-enabled', page: landingPage(selection), requested: page };
 }
 
-/** Les pages du menu, dans l'ordre de la liste : « Aujourd'hui » en tête quand elle existe, les cases cochées, puis Réglages. */
+/**
+ * Les pages du menu, dans l'ordre de la liste : « Aujourd'hui » en tête quand
+ * elle existe, les cases cochées, puis « Ma ferme » et Réglages. « Ma ferme »
+ * s'ajoute au menu d'avant comme une page de plus (lot S3, PR 1) : la barre
+ * du bas et le menu de l'ordinateur passent aux trois endroits dans les PR 2
+ * et 3.
+ */
 export function menuPages(selection: FeatureSelection): IrrigationPageId[] {
   const today: IrrigationPageId[] = hasTodayPage(selection) ? ['aujourdhui'] : [];
-  return [...today, ...PAGE_FEATURE_IDS.filter((id) => selection.includes(id)), 'reglages'];
+  return [...today, ...PAGE_FEATURE_IDS.filter((id) => selection.includes(id)), 'ma-ferme', 'reglages'];
 }
 
 /**

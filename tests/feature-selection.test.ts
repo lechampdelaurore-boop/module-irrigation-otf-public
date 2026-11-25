@@ -184,7 +184,7 @@ test('un choix enregistré n’a pas de bandeau ; une case apparue depuis arrive
   assert.deepEqual(beforeCalculator.banner, { kind: 'new-features', features: ['calculateur'] });
   assert.equal(featureBannerText(beforeCalculator.banner!), 'Nouvelle fonctionnalité : Calculateur d’irrigation. Elle n’est pas cochée ; vous pouvez la cocher dans Réglages.');
   assert.equal(firstEnabledFeature(['materiel', 'calculateur']), 'materiel', 'une case sans page n’est jamais la première page');
-  assert.deepEqual(menuPages(['materiel', 'calculateur']), ['materiel', 'reglages']);
+  assert.deepEqual(menuPages(['materiel', 'calculateur']), ['materiel', 'ma-ferme', 'reglages']);
   assert.ok(!isIrrigationPageId('calculateur'), 'pas d’adresse /irrigation/calculateur');
 });
 
@@ -252,7 +252,8 @@ test('une page par case, plus Réglages ; la saison, la parcelle et la semaine s
   assert.equal(pageFromPathname('/irrigation/inconnue'), null);
   assert.ok(isIrrigationPageId('reglages'));
   assert.ok(!isIrrigationPageId('bienvenue'));
-  assert.deepEqual(menuPages(['alertes-meteo', 'materiel']), ['aujourdhui', 'materiel', 'alertes-meteo', 'reglages']);
+  // « Ma ferme », une page de plus depuis le lot S3 (PR 1), avant Réglages.
+  assert.deepEqual(menuPages(['alertes-meteo', 'materiel']), ['aujourdhui', 'materiel', 'alertes-meteo', 'ma-ferme', 'reglages']);
   assert.ok(isIrrigationPageId('aujourdhui'));
   assert.equal(pageFromPathname('/irrigation/aujourdhui'), 'aujourdhui');
 });

@@ -25,10 +25,10 @@ export function surveillerLaConsole(page: Page): JournalDeConsole {
 }
 
 /**
- * Les pages du module, une par fonctionnalité, plus « Aujourd'hui » et
- * Réglages (3.8, docs/feature-selection-contract.md, section 5 ; audit
- * ergonomique, lot 2, F1) : un parcours va à la page qui porte le bloc qu'il
- * éprouve.
+ * Les pages du module, une par fonctionnalité, plus « Aujourd'hui », « Ma
+ * ferme » et Réglages (3.8, docs/feature-selection-contract.md, section 5 ;
+ * audit ergonomique, lot 2, F1 ; simplification, lot S3, PR 1), dans l'ordre
+ * du menu : un parcours va à la page qui porte le bloc qu'il éprouve.
  */
 export const TITRES_DES_PAGES = {
   aujourdhui: 'Aujourd’hui',
@@ -42,6 +42,7 @@ export const TITRES_DES_PAGES = {
   'alertes-meteo': 'Alertes météo',
   'alertes-cultures': 'Alertes cultures',
   historique: 'Historique et cumuls',
+  'ma-ferme': 'Ma ferme',
   reglages: 'Réglages',
 } as const;
 

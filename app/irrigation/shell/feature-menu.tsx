@@ -35,7 +35,8 @@ import { TodayBadge, todayBadgeLabel, useTodayBadge } from './today-badge';
  */
 let menuNavigation = false;
 
-function markMenuNavigation(): void {
+/** Un lien qui change de page comme le menu (les fiches de « Ma ferme ») le marque aussi. */
+export function markMenuNavigation(): void {
   menuNavigation = true;
 }
 
@@ -154,10 +155,11 @@ export function FeatureMenu({
               </ul>
             </li>
           ))}
-          {layout.settings ? (
+          {layout.farm || layout.settings ? (
             <li className="menu-settings-item">
               <ul>
-                <MenuLink item="reglages" current={current} query={query} />
+                {layout.farm ? <MenuLink item="ma-ferme" current={current} query={query} /> : null}
+                {layout.settings ? <MenuLink item="reglages" current={current} query={query} /> : null}
               </ul>
             </li>
           ) : null}

@@ -69,6 +69,11 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
     reading: 'Les cumuls sont en millimètres et en mètres cubes. À l’échelle d’un jardin ou de la ferme, ils sont pondérés par la surface des planches.',
     firstStep: 'Choisissez un périmètre et une période, ou une série. « Exporter CSV » garde les chiffres dans un tableur.',
   },
+  'ma-ferme': {
+    purpose: 'Retrouver ce que le module sait de votre ferme : votre matériel, d’où vient l’eau, vos cultures, votre sol, les alertes et les réglages. On y vient surtout à l’installation, ou quand quelque chose change au champ.',
+    reading: 'Chaque fiche ouvre sa page et dit en une ligne à quoi elle sert. « À faire », en orange, marque une fiche où il reste une étape de l’accueil de la ferme, la même que dans « À finir ». Seules vos fonctionnalités cochées ont leur fiche ; Réglages est toujours là.',
+    firstStep: 'Touchez d’abord une fiche « À faire », s’il y en a une. Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
+  },
   reglages: {
     purpose: 'Choisir les fonctionnalités affichées, et régler ce qui sert à plusieurs pages.',
     reading: 'Une case décochée n’est ni affichée ni prise en compte ; ses données restent enregistrées. Selon vos cases, vous trouvez aussi le lieu de la météo, les notifications du téléphone et la correspondance des espèces.',

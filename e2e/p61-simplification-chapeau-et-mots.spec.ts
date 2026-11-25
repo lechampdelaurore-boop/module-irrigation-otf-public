@@ -156,6 +156,8 @@ const PREMIERS_BLOCS: Record<PageDuModule, { bloc: string; budget: number }> = {
   'alertes-cultures': { bloc: 'details.crop-alert-fold', budget: 400 },
   // 297 → 199 px : les cases des fonctionnalités.
   reglages: { bloc: 'fieldset.feature-choice', budget: 400 },
+  // Page nouvelle du lot S3 (PR 1, docs/simplification-s3-contract.md, section 5) : la première fiche.
+  'ma-ferme': { bloc: '.farm-card', budget: 400 },
 };
 
 test('au téléphone, le premier bloc utile de chaque page sous son budget', async ({ page }, testInfo) => {

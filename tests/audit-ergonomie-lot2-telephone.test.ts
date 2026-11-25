@@ -27,23 +27,24 @@ test('cas 1 : toutes cases cochées, quatre entrées et « Plus », qui ouvre to
   assert.deepEqual(bar.entries, ['aujourdhui', 'arrosages', 'planning', 'ressources']);
   assert.equal(bar.more, true);
   assert.equal(bar.moreMarked, false);
-  assert.equal(menu.length, 12, '« Plus » liste les douze pages');
+  assert.equal(menu.length, 13, '« Plus » liste les douze pages et « Ma ferme » (lot S3, PR 1)');
   assert.equal(menu[0], 'aujourdhui');
   assert.equal(menu.at(-1), 'reglages');
 });
 
 test('cas 2 : un menu de cinq pages ou moins tient entier dans la barre, sans « Plus »', () => {
-  // Arrosages a besoin de Matériel : le menu compte Aujourd'hui, Arrosages, Matériel, Historique et Réglages.
-  const menu = menuPages(withRequirements(['arrosages', 'historique']));
-  assert.deepEqual(menu, ['aujourdhui', 'arrosages', 'materiel', 'historique', 'reglages']);
-  assert.deepEqual(phoneBar(menu, 'historique'), { entries: menu, more: false, moreMarked: false });
-  // Sans « Aujourd'hui » (Matériel et Calculateur seuls) : deux pages, toutes dans la barre.
-  const two = menuPages(withRequirements(['calculateur']));
-  assert.deepEqual(two, ['materiel', 'reglages']);
-  assert.equal(phoneBar(two, null).more, false);
-  const six = menuPages(withRequirements(['arrosages', 'historique', 'alertes-meteo']));
+  // Arrosages a besoin de Matériel : le menu compte Aujourd'hui, Arrosages, Matériel, Ma ferme et
+  // Réglages (« Ma ferme », une page de plus depuis le lot S3, PR 1 ; la PR 2 remplace la barre).
+  const menu = menuPages(withRequirements(['arrosages']));
+  assert.deepEqual(menu, ['aujourdhui', 'arrosages', 'materiel', 'ma-ferme', 'reglages']);
+  assert.deepEqual(phoneBar(menu, 'ma-ferme'), { entries: menu, more: false, moreMarked: false });
+  // Sans « Aujourd'hui » (Matériel et Calculateur seuls) : trois pages, toutes dans la barre.
+  const three = menuPages(withRequirements(['calculateur']));
+  assert.deepEqual(three, ['materiel', 'ma-ferme', 'reglages']);
+  assert.equal(phoneBar(three, null).more, false);
+  const six = menuPages(withRequirements(['arrosages', 'historique']));
   assert.equal(six.length, 6);
-  assert.deepEqual(phoneBar(six, null).entries, ['aujourdhui', 'arrosages', 'materiel', 'alertes-meteo']);
+  assert.deepEqual(phoneBar(six, null).entries, ['aujourdhui', 'arrosages', 'materiel', 'historique']);
   assert.equal(phoneBar(six, null).more, true);
 });
 
@@ -59,12 +60,13 @@ test('cas 3 : la page ouverte hors de la barre fait porter la pastille verte à 
 test('une page prioritaire décochée laisse sa place à la suivante du menu, et la barre suit l’ordre du menu', () => {
   // Sans planning ni ressources : Aujourd'hui, Arrosages, puis les pages suivantes du menu.
   const menu = menuPages(withRequirements(['arrosages', 'besoins', 'sol', 'historique', 'alertes-meteo']));
-  assert.deepEqual(menu, ['aujourdhui', 'arrosages', 'besoins', 'sol', 'cultures', 'materiel', 'alertes-meteo', 'historique', 'reglages']);
+  assert.deepEqual(menu, ['aujourdhui', 'arrosages', 'besoins', 'sol', 'cultures', 'materiel', 'alertes-meteo', 'historique', 'ma-ferme', 'reglages']);
   assert.deepEqual(phoneBar(menu, null).entries, ['aujourdhui', 'arrosages', 'besoins', 'sol']);
   // Sans arrosages du tout : les pages du début du menu.
   const sansArrosages = menuPages(['materiel', 'alertes-meteo', 'alertes-cultures', 'calculateur']);
-  assert.deepEqual(sansArrosages, ['aujourdhui', 'materiel', 'alertes-meteo', 'alertes-cultures', 'reglages']);
-  assert.equal(phoneBar(sansArrosages, null).more, false);
+  assert.deepEqual(sansArrosages, ['aujourdhui', 'materiel', 'alertes-meteo', 'alertes-cultures', 'ma-ferme', 'reglages']);
+  assert.deepEqual(phoneBar(sansArrosages, null).entries, ['aujourdhui', 'materiel', 'alertes-meteo', 'alertes-cultures']);
+  assert.equal(phoneBar(sansArrosages, null).more, true);
 });
 
 test('la barre porte un nom court sous l’icône, le nom entier restant celui de la page', () => {
