@@ -12,6 +12,26 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module : six lots retenus, contrat S1 écrit, le
+  25 novembre 2026** (D-327, roadmap section 6 terdecies, ligne 33),
+  **sans code**. Le porteur trouvait le logiciel trop complexe (9 h 26) ;
+  diagnostic sans code (`/mnt/project-files/audit-ergonomie/diagnostic-simplicite-2026-11-25.md`,
+  dix maquettes) ; quatre choix, tous « oui » (11 h 59 à 12 h 01) : trois
+  endroits (Aujourd'hui, Semaine, Ma ferme), valider-démarrer-terminer
+  depuis la carte d'« Aujourd'hui » (change le contrat de la page), trois
+  façons de commencer (change l'écran de bienvenue du 3.8), les mots du
+  tableau tels que proposés. Lots S1 à S6 dans l'ordre S1, S2, S3, S5, S4,
+  S6, enchaînés sans nouveau « vas-y » ; code en Opus 5.5 · Élevé (S1, S2,
+  S5) ou Très élevé (S3, S4, S6), contrats en Sonnet 5.5 · Moyen. Contrat de
+  S1 : `docs/simplification-s1-contract.md` (chapeau d'une ligne, mots, un
+  seul objectif ; trois PR). À prévoir au contrat de S2 : l'arrosage « à
+  rattraper ». **Point à examiner, non examiné** (S1-O1) : sur la ferme
+  réelle, « Objectifs et besoins » dit 2,7 mm quand « Aujourd'hui » et
+  « Historique » disent 5,2 mm la même semaine. Mise en ligne de #208 (H3,
+  D-326) consignée ici : fusionnée le 25 novembre 2026 à 10 h 37, **en ligne
+  à 11 h 10** (run 45587141459, les cinq jobs verts ; aucune migration ;
+  démonstration à 11 h 11). PR de registres et de contrat seule : **aucun
+  contrôle rejoué**.
 - **Heures de silence des notifications, H3 : l'écran, codé le
   25 novembre 2026** (D-326, F817 à F821, roadmap section 6 undecies, PR 3
   sur 3), en Opus 5.5 · Élevé, le réglage de la roadmap. Dans « Réglages »,
