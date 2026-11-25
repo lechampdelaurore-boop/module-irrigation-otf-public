@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s5-contract.md`, D-327, roadmap section 6
+  terdecies, ligne 33), sans code, en Sonnet 5.5 · Moyen. « Arroser en trois
+  champs » : le formulaire d'arrosage passe de neuf éléments à un premier
+  niveau court (où, combien de temps, démarrer) et « Plus d'options » (pompe,
+  note, saisir en mm, durée exacte) ; trois PR (« Arroser maintenant » ;
+  « Planifier » et « Déjà fait » ; l'entrée et les mots), Opus 5.5 · Élevé.
+  Aucun calcul ni aucune règle d'écriture changés ; les précautions (pompe
+  dépassée, créneau protégé) restent au premier niveau ; solde les deux dettes
+  de S2 (« Fait comme prévu » devient « C'est fait » sur « Arrosages » ;
+  l'ajustement d'une proposition ne remonte pas). Ce lot ne touche pas l'écran
+  de bienvenue du contrat 3.8 : « trois façons de commencer » est le lot S6.
+  Dépend de la fin du code de S3 ; contrat non fusionné avant #214, #211, #215.
 - **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
   le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
   33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm
