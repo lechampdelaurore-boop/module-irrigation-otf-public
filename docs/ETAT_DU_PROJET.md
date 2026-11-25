@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Lenteur du module : N1, le menu sans rechargement, codée le
+  24 novembre 2026** (D-322, roadmap section 6 duodecies,
+  `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
+  la roadmap. Constat du porteur à 22 h 33 : le module « rame », au
+  téléphone comme à l'ordinateur. Mesuré sur une copie locale : les PR du
+  jour n'y sont pour rien (175 lectures de la base pour ouvrir
+  « Aujourd'hui » contre 173 avant) ; trois freins anciens. N1 : les liens
+  du menu passent par le routeur de l'application, sans rien demander
+  d'avance ; seule la page voulue est demandée au serveur, sans relancer les
+  scripts ; chaque page n'est calculée qu'une fois par requête (vinext
+  l'appelait deux fois pour une page demandée par le routeur) ; un menu
+  neuf à chaque page, le clavier repart du contenu (parcours P59). Restent N2, l'ouverture directe de l'application, et N3,
+  les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
+  sur le téléphone réel du porteur reste à faire, sur son accord.
+  Contrôles : voir la PR.
+
 - **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
   2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en
   Opus 5.5 · Élevé, le réglage choisi par le porteur. Le réglage se voit
