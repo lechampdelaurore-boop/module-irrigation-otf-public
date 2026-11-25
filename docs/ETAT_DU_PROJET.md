@@ -12,6 +12,15 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S2, PR 3 sur 5 : l'arrosage à rattraper,
+  codée le 25 novembre 2026** (D-330, F850 à F853 ; contrat, section 4), en
+  Opus 5.5 · Élevé, sur la branche de la PR 2. La carte d'un arrosage en
+  retard ou non fait pose la question : « Je le fais maintenant » et « C’est
+  fait » de même taille, « Ne pas le faire » rangé et confirmé ; « C’est
+  fait » est l'enregistrement de « Fait comme prévu », sa règle et sa
+  confirmation (avec « Fait autrement… Notez-le sur « Arrosages » »). Aucune
+  règle nouvelle. Tests du domaine, des vrais services à deux fermes
+  (restriction d'eau comprise), P62 étendu. Contrôles : voir la PR. **Mise en ligne consignée ici** : la PR 1 du lot (#219), fusionnée à 19 h 28, déployée à 19 h 57, run 45675486394 vérifié job par job (« Application », « Workers Cloudflare », « Parcours navigateur », « Déploiement Cloudflare », « Déploiement de la démonstration », verts).
 - **Simplifier l'usage du module, S2, PR 2 sur 5 : terminer et reprendre
   depuis la carte, codée le 25 novembre 2026** (D-330, F844 à F849 ; contrat
   `docs/simplification-s2-contract.md`, sections 3 et 6), en Opus 5.5 · Élevé,

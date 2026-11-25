@@ -114,10 +114,10 @@ test('un seul bouton principal par carte, jamais deux ; « Valider » et « Dém
   }
 });
 
-test('les irrigations en retard ou non faites gardent leurs gestes jusqu’à la PR 3 du lot (pas de carte à un bouton)', () => {
+test('les irrigations en retard ou non faites ont leur carte depuis la PR 3 du lot (tests/simplification-s2-a-rattraper.test.ts)', () => {
   const late = lateIrrigationLines({ enabled: ALL, now: NOW, events: [event('e1', '2026-11-11T05:00:00.000Z'), event('e2', '2026-11-12T04:00:00.000Z', 120)], lateToleranceMinutes: 30, bedNames: BEDS });
   assert.deepEqual(late.map((line) => line.tone), ['missed', 'late']);
-  for (const line of late) assert.equal(todayCardActions(line), null);
+  for (const line of late) assert.equal(todayCardActions(line)?.primary.label, 'Je le fais maintenant');
 });
 
 test('section 5 : « Pas à cette heure » se confirme d’une ligne, qui dit ce que fait le plan (D-030, S2-b)', () => {
@@ -189,7 +189,7 @@ test('L4 tient : la réponse d’une proposition a son endroit ; validée, elle 
 
 test('le dessin : la carte dessine ce que dit la règle, sans rien décider ; « Autres choix » déplie sa liste, Échap la referme', () => {
   const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
-  assert.match(day, /const actions = todayCardActions\(line\);/);
+  assert.match(day, /const actions = todayCardActions\(line, \{ doneAsPlanned \}\);/);
   assert.match(day, /<CardChoice choice=\{actions\.primary\} query=\{query\} pending=\{pending\} onGesture=\{onGesture\} primary \/>/);
   assert.doesNotMatch(day, /Valider au planning/);
   // « Pas à cette heure » passe par la confirmation avant d'écrire.

@@ -2,7 +2,9 @@ import { pageLabel, type IrrigationPageId } from '../features/pages.ts';
 import { remainingTimerSeconds } from '../irrigation-timer.ts';
 import { MINUTES_PER_HOUR, SECONDS_PER_HOUR } from '../units.ts';
 import type { TodayNowLine } from './now-irrigations.ts';
+import { addDaysToDateKey } from '../water-management.ts';
 import { durationText, type TodayIrrigationLine } from './today-irrigations.ts';
+import { shortDayText } from './today-text.ts';
 
 /**
  * La carte à un bouton d'« Aujourd'hui » (simplification, lot S2,
@@ -16,9 +18,10 @@ import { durationText, type TodayIrrigationLine } from './today-irrigations.ts';
  * PR 1 du lot : une proposition du plan (« Valider ») et une irrigation
  * planifiée à venir (« Démarrer »). PR 2 : ce qui coule ou attend d'être
  * repris (« Terminer », « Reprendre », « Mettre en pause », « Reprendre ce qui
- * reste »), par la fenêtre de fin et les actions d'« Arrosages ». Les
- * irrigations en retard ou non faites gardent leurs gestes jusqu'à la PR 3 :
- * la fonction ne leur donne pas de carte à un bouton (`null`).
+ * reste »), par la fenêtre de fin et les actions d'« Arrosages ». PR 3 :
+ * l'arrosage à rattraper, en retard ou non fait, où la carte pose la
+ * question au lieu de deviner : « Je le fais maintenant » et « C'est fait »,
+ * de même taille, « Ne pas le faire » rangé (contrat, section 4).
  */
 
 /** Ce que fait un choix de la carte : un geste existant, ou un lien vers une autre page. */
@@ -35,6 +38,15 @@ export type TodayCardGesture =
    * ou, `null`, à maintenant (contrat, section 6).
    */
   | { kind: 'finish'; eventEquipmentId: string; equipmentName: string; suggestedEndAt: string | null }
+  /**
+   * « C'est fait » : l'enregistrement « tel que prévu » de « Fait comme
+   * prévu » et « Tout est fait », après sa confirmation (D-006, T15) ;
+   * `otherwise` : où noter un arrosage fait autrement, quand « Arrosages »
+   * est cochée.
+   */
+  | { kind: 'done-as-planned'; eventEquipmentId: string; confirmation: string; otherwise: { page: IrrigationPageId; anchor: string } | null }
+  /** « Ne pas le faire » : l'annulation d'« Arrosages », après une confirmation d'une ligne. */
+  | { kind: 'cancel'; eventEquipmentId: string; confirmation: TodayCardConfirmation }
   | { kind: 'open'; page: IrrigationPageId; anchor: string };
 
 /** La confirmation d'une ligne qui précède un geste qui ne se défait pas. */
@@ -53,11 +65,28 @@ export type TodayCardActions = {
   primary: TodayCardChoice;
   /** Un lien d'appoint sous le bouton, au plus. */
   secondary: TodayCardChoice | null;
+  /**
+   * Le second geste a la taille du premier : le seul cas est l'arrosage à
+   * rattraper, où le module ne sait pas lequel est vrai (contrat, section 4,
+   * S2-a). Absent : un lien d'appoint.
+   */
+  twin?: true;
   /** Le reste, rangé derrière « Autres choix » ; vide : pas de « Autres choix ». */
   others: TodayCardChoice[];
 };
 
 export const OTHER_CHOICES_LABEL = 'Autres choix';
+
+/** « Ne pas le faire » se confirme : une annulation ne se défait pas, et le plan se recalcule (contrat, section 4). */
+export const CANCEL_CONFIRMATION: TodayCardConfirmation = {
+  title: 'Ne pas le faire ?',
+  text: 'Cet arrosage ne sera pas fait. Le module recalcule la semaine.',
+  confirmLabel: 'Ne pas le faire',
+  cancelLabel: 'Le garder',
+};
+
+/** La ligne que la confirmation de « C'est fait » gagne, avec son lien vers « Arrosages » (contrat, section 4). */
+export const DONE_OTHERWISE = { text: 'Fait autrement (une autre durée, un autre moment) ?', link: 'Notez-le sur « Arrosages »' };
 
 /** « Pas à cette heure » se confirme : le plan cherche une autre place (D-030, S2-b). */
 export const REFUSE_CONFIRMATION: TodayCardConfirmation = {
@@ -84,7 +113,32 @@ function openLabel(page: IrrigationPageId): string {
  * Les gestes d'une carte de « Votre journée » (contrat, section 3, tableau) ;
  * `null` pour une carte dont la PR qui la change n'est pas encore venue.
  */
-export function todayCardActions(line: TodayIrrigationLine): TodayCardActions | null {
+export function todayCardActions(line: TodayIrrigationLine, options: {
+  /**
+   * La confirmation de « C'est fait », quand la règle de `doneAsPlanned`
+   * accepte l'irrigation (heure de fin prévue passée, T15) ; `null` : pas
+   * de « C'est fait ».
+   */
+  doneAsPlanned?: string | null;
+} = {}): TodayCardActions | null {
+  if (line.tone === 'missed' || line.tone === 'late') {
+    if (!line.eventEquipmentId) return null;
+    const id = line.eventEquipmentId;
+    const confirmation = options.doneAsPlanned ?? null;
+    const open = choice(line, `Ouvrir sur « ${pageLabel(line.open.page)} »`, { kind: 'open', page: line.open.page, anchor: line.open.anchor });
+    return {
+      // « Je le fais maintenant » n'écrit rien que le chrono ne tienne : c'est le principal (section 4).
+      primary: choice(line, 'Je le fais maintenant', { kind: 'start', eventEquipmentId: id }),
+      secondary: confirmation === null ? null : choice(line, 'C’est fait', {
+        kind: 'done-as-planned',
+        eventEquipmentId: id,
+        confirmation,
+        otherwise: line.open.page === 'arrosages' ? { page: line.open.page, anchor: line.open.anchor } : null,
+      }),
+      ...(confirmation === null ? {} : { twin: true as const }),
+      others: [choice(line, 'Ne pas le faire', { kind: 'cancel', eventEquipmentId: id, confirmation: CANCEL_CONFIRMATION }), open],
+    };
+  }
   if (line.tone === 'proposed') {
     if (!line.proposalId) return null;
     const proposalId = line.proposalId;
@@ -107,6 +161,24 @@ export function todayCardActions(line: TodayIrrigationLine): TodayCardActions | 
     };
   }
   return null;
+}
+
+/**
+ * La phrase d'un arrosage à rattraper, qui dit le jour et pose la question
+ * (contrat, section 4) : « Prévu à 7 h, pas encore démarré. » pour un
+ * créneau en cours ; « Prévu hier à 7 h. L’avez-vous fait ? » pour un
+ * créneau passé, « avant-hier », ou le jour (« mer. 11 nov. »). `null` pour
+ * une autre carte.
+ */
+export function lateQuestion(line: TodayIrrigationLine, today: string): string | null {
+  if (line.tone !== 'missed' && line.tone !== 'late') return null;
+  const day = line.day === today
+    ? null
+    : line.day === addDaysToDateKey(today, -1)
+      ? 'hier'
+      : line.day === addDaysToDateKey(today, -2) ? 'avant-hier' : shortDayText(line.day);
+  const when = `${day ? `${day} ` : ''}à ${line.hour}`;
+  return line.tone === 'late' ? `Prévu ${when}, pas encore démarré.` : `Prévu ${when}. L’avez-vous fait ?`;
 }
 
 /**

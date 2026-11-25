@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S2, PR 3 : l'arrosage à rattraper)
+
+- **« Aujourd'hui » demande si un arrosage en retard a été fait, au lieu de
+  deviner** (D-330, F850 à F853) : la carte dit « Prévu hier à 7 h.
+  L’avez-vous fait ? » et porte deux boutons de même taille, « Je le fais
+  maintenant » (le démarrage) et « C’est fait » (l'enregistrement tel que
+  prévu, confirmé, avec un lien pour noter un arrosage fait autrement) ; « Ne
+  pas le faire », confirmé, est dans « Autres choix ». « C’est fait »
+  n'apparaît qu'une fois le créneau fini, et reste accepté sous restriction
+  d'eau. Les règles de « Fait comme prévu » et de l'annulation ne changent
+  pas.
+
 ### Modifié (simplifier l'usage du module, S2, PR 2 : terminer et reprendre depuis la carte)
 
 - **« Aujourd'hui » termine, met en pause et reprend un arrosage sans changer
