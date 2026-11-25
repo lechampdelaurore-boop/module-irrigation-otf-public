@@ -182,14 +182,14 @@ export function IrrigationRecordCard({
           {doneAsPlanned ? <DoneAsPlannedButton title={title} confirmation={doneAsPlanned.confirmation} pending={pending} onConfirm={doneAsPlanned.onConfirm} /> : null}
           {onStart ? (
             <button type="button" className={doneAsPlanned ? undefined : 'primary'} disabled={pending || Boolean(blockedReason)} onClick={onStart}>
-              {event.status === 'partially_completed' ? 'Reprendre le reliquat' : 'Démarrer maintenant'}
+              {event.status === 'partially_completed' ? 'Reprendre ce qui reste' : 'Démarrer maintenant'}
             </button>
           ) : null}
           {onEdit ? <button type="button" disabled={pending} onClick={onEdit}>Modifier</button> : null}
           {onCancel ? (
             <RowMenu label={`Plus d’actions : ${title}`}>
               <button type="button" role="menuitem" className="danger-outline" disabled={pending} onClick={onCancel}>
-                {event.status === 'partially_completed' ? 'Annuler le reliquat' : 'Annuler'}
+                {event.status === 'partially_completed' ? 'Annuler ce qui reste' : 'Annuler'}
               </button>
             </RowMenu>
           ) : null}

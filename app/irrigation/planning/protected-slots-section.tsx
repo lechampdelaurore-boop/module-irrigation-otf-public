@@ -20,6 +20,7 @@ import {
   type ProtectedSlotsActionResult,
 } from '../protected-slots-actions';
 import { capitalize, formatDateTime } from './format';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 /** Le créneau en cours de saisie : un nouveau (`slotId` nul) ou un existant. */
 type Editing = { slotId: string | null; form: ProtectedSlotForm };
@@ -104,14 +105,14 @@ export function ProtectedSlotsSection({ initialSlots }: { initialSlots: Protecte
 
   return (
     <section className="protected-slots" aria-labelledby="protected-slots-title" data-tour="planning-creneaux">
-      <h3 id="protected-slots-title">Créneaux protégés</h3>
+      <h3 id="protected-slots-title">{SIMPLE_WORDS.noWateringHours}</h3>
       <p className="planning-settings-note">
         Des heures où le planning ne propose jamais d’arrosage, pour tout le matériel : le lavage des légumes, un passage, une livraison. Un créneau vaut au prochain calcul ; « Recalculer le plan » le prend tout de suite. Un arrosage déjà validé qui y tombe reçoit une suggestion ; rien n’est annulé sans vous.
       </p>
       {slots.length === 0 ? (
         <p className="planning-empty">Aucun créneau protégé : le planning peut arroser à toutes les heures des plages R8.</p>
       ) : (
-        <ul className="protected-slot-list" aria-label="Créneaux protégés enregistrés">
+        <ul className="protected-slot-list" aria-label={`${SIMPLE_WORDS.noWateringHours}, enregistrées`}>
           {slots.map((slot) => (
             <li key={slot.id}>
               <span>{protectedSlotLine(slot)}</span>

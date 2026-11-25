@@ -36,6 +36,7 @@ import {
   type WaterResourceActionResult,
 } from './water-resource-actions';
 import { countText } from '@/lib/domain/clock-text';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const volume = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3 });
 
@@ -109,7 +110,7 @@ export function WaterResourceManager({
     <section className="water-resources-section" aria-labelledby="water-resources-title">
       <header className="water-resources-heading">
         <div>
-          <p className="eyebrow">Disponibilité physique</p>
+          <p className="eyebrow">{SIMPLE_WORDS.usableWater}</p>
           <h2 id="water-resources-title">Ressources en eau</h2>
           {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>

@@ -69,7 +69,7 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
   await planning.scrollIntoViewIfNeeded();
   await reglerLaPlageDuGoutteAGoutte(planning, PLAGE_OUVERTE);
   const creneaux = sectionDesCreneaux(planning);
-  await expect(creneaux.getByRole('heading', { name: 'Créneaux protégés' })).toBeVisible();
+  await expect(creneaux.getByRole('heading', { name: 'Heures où l’on n’arrose pas' })).toBeVisible();
   await expect(creneaux.locator('.planning-empty'), 'aucun créneau ne doit rester d’un parcours précédent').toContainText('Aucun créneau protégé');
   await verifierLEtape(page, journal, 'objectif posé, plage ouverte, aucun créneau');
 
@@ -181,7 +181,7 @@ function sectionDesCreneaux(planning: Locator): Locator {
 }
 
 function listeDesCreneaux(planning: Locator): Locator {
-  return sectionDesCreneaux(planning).getByRole('list', { name: 'Créneaux protégés enregistrés' });
+  return sectionDesCreneaux(planning).getByRole('list', { name: 'Heures où l’on n’arrose pas, enregistrées' });
 }
 
 /** Le pli « Réglages du planning » ouvert, s'il ne l'est pas déjà. */

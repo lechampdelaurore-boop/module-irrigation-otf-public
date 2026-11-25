@@ -195,7 +195,7 @@ export const TOURS: readonly Tour[] = [
       {
         pages: ['planning'],
         anchor: 'planning-creneaux',
-        title: 'Les créneaux protégés',
+        title: 'Les heures où l’on n’arrose pas',
         text: 'Des heures où le module ne propose aucun arrosage, par exemple pendant une récolte ou le marché.',
       },
     ],
@@ -235,7 +235,7 @@ export const TOURS: readonly Tour[] = [
       {
         pages: ['ressources'],
         anchor: 'faisabilite',
-        title: 'La faisabilité de la semaine',
+        title: 'Y a-t-il assez d’eau cette semaine ?',
         text: 'Ce calcul confronte les besoins de la semaine à l’eau qu’on peut mobiliser jusqu’à dimanche, et dit comment la répartir entre les planches.',
       },
     ],

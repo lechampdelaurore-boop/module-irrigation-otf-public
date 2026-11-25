@@ -87,6 +87,19 @@ export type IrrigationHistorySummary = {
    * par la tâche du matin : provisoires (règle 6, D-318).
    */
   objectiveAutomatic?: { bedDays: number; missingBedDays: number; provisionalWeeks: number };
+  /**
+   * Les planches de l'objectif (D-329, docs/simplification-s1-contract.md,
+   * section 5 bis) : celles qui ont un objectif sur la période, sur toutes
+   * celles du périmètre, et leurs journées-planche. L'objectif en est la
+   * moyenne pondérée par la surface ; les autres sont dites, jamais
+   * comptées à zéro.
+   */
+  objectiveBeds: { withObjective: number; total: number; bedDays: number };
+  /**
+   * L'eau reçue que l'écart compare à l'objectif, irrigation et pluie réelles,
+   * sur les mêmes planches que lui : celles qui ont un objectif quand une
+   * partie seulement en a un, tout le périmètre sinon (D-329, règle 3).
+   */
   irrigationAndRainMm: number | null;
   gapToObjectiveMm: number | null;
   scopeAreaSquareMeters: number;

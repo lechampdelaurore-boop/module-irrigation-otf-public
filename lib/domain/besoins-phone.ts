@@ -6,6 +6,8 @@
  * vient du tableau de la semaine ou des besoins, tel qu'il s'affiche déplié.
  */
 
+import { farmObjectiveText, type FarmObjective } from './farm-objective.ts';
+
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 
 function mmText(value: number | null): string {
@@ -18,7 +20,11 @@ function plural(count: number, one: string, many: string): string {
 
 /** Les totaux de la semaine que la ligne de résumé reprend, dans l'ordre des tuiles. */
 export interface WeekTotalsLine {
-  farmGoalMm: number | null;
+  /**
+   * L'objectif de la ferme de la semaine, le calcul unique (S1, PR 3) ;
+   * `null` le temps que les besoins de la semaine affichée soient relus.
+   */
+  objective: FarmObjective | null;
   realizedIrrigationMm: number;
   actualRainMm: number | null;
   remainingForecastRainMm: number | null;
@@ -28,19 +34,20 @@ export interface WeekTotalsLine {
 }
 
 /**
- * Les tuiles en une ligne, comme au planning (F11) : « objectif 25 mm ·
- * irrigué 12 mm · pluie 3 mm · prévue 5 mm · ET0 18 mm ». Un total incomplet
- * se lit « partiel » ; le détail reste dans les tuiles, qui se déplient.
+ * Les tuiles en une ligne, comme au planning (F11) : « 25 mm visés, ferme
+ * entière · irrigué 12 mm · pluie 3 mm · prévue 5 mm · soif de la semaine
+ * 18 mm ». Un total incomplet se dit ; le détail reste dans les tuiles, qui
+ * se déplient.
  */
 export function weekTotalsLine(totals: WeekTotalsLine): string {
   const parts = [
-    totals.farmGoalMm === null ? 'objectif non défini' : `objectif ${mmText(totals.farmGoalMm)}`,
+    totals.objective === null ? 'eau visée en cours de lecture' : farmObjectiveText(totals.objective),
     `irrigué ${mmText(totals.realizedIrrigationMm)}`,
     `pluie ${mmText(totals.actualRainMm)}`,
     `prévue ${mmText(totals.remainingForecastRainMm)}`,
-    `ET0 ${mmText(totals.et0Mm)}`,
+    `soif de la semaine ${mmText(totals.et0Mm)}`,
   ];
-  if (totals.partial) parts.push('totaux partiels');
+  if (totals.partial) parts.push('totaux incomplets');
   return parts.join(' · ');
 }
 

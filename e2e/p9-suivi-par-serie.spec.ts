@@ -70,7 +70,7 @@ test('la vue par série montre chaque culture avec ses cumuls, met les séries �
 
   // L'export garde sa colonne « Séries », vide aujourd'hui pour N01 : les carottes
   // sont récoltées depuis juin et la mâche n'est pas encore plantée.
-  await historique.getByRole('tab', { name: /^Par périmètre/ }).click();
+  await historique.getByRole('tab', { name: /^Par lieu/ }).click();
   const adresse = await historique.getByRole('link', { name: 'Exporter CSV' }).getAttribute('href');
   expect(adresse).not.toBeNull();
   const contenu = await (await page.request.get(adresse!)).text();

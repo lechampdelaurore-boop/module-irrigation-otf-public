@@ -16,6 +16,7 @@ import { pageHref } from '@/lib/domain/features/pages';
 import { dateClockText } from '@/lib/domain/clock-text';
 import type { StageAdviceScreen } from '@/lib/domain/stage-advice';
 import { StageAdviceBlock } from './stage-advice-block';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
 // « 16/06/2026 à 8 h 50 » (audit du 19 novembre 2026, lot K, n° 22, F474).
@@ -83,7 +84,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
   const reasons = dashboard ? feasibilityUnknownReasons(dashboard) : null;
   // L'ancre de « Répartir l'eau », depuis le planning (audit final, lot B, R4, F247).
   return <section ref={root} id="repartition" className="feasibility-section" aria-labelledby="feasibility-title" data-tour="faisabilite" aria-busy={pending}>
-    <header className="feasibility-heading"><div><h2 id="feasibility-title">Faisabilité et répartition de l’eau</h2><p>De maintenant à dimanche soir · les volumes, pas encore les horaires <FeasibilityHelp label="Ce que vérifie ce calcul" text={help.preliminary} /></p></div><button type="button" className="feasibility-recalculate" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
+    <header className="feasibility-heading"><div><h2 id="feasibility-title">{SIMPLE_WORDS.enoughWater}</h2><p>De maintenant à dimanche soir · les volumes, pas encore les horaires <FeasibilityHelp label="Ce que vérifie ce calcul" text={help.preliminary} /></p></div><button type="button" className="feasibility-recalculate" disabled={pending} onClick={() => { activated.current = true; void refresh(); }}>{pending ? 'Calcul en cours…' : 'Recalculer la faisabilité'}</button></header>
     {error ? <p className="water-error" role="alert">{error}</p> : null}
     {notice ? <p className="water-notice feasibility-notice" role="status">{notice}</p> : null}
     {!dashboard ? <p>Les besoins et ressources seront chargés pour la semaine en cours.</p> : <>

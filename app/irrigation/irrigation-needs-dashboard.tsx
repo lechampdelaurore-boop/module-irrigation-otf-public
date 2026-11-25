@@ -3,7 +3,7 @@
 import { UNCLASSIFIED_PLOT_REASON } from '@/lib/domain/onboarding/plots';
 import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
+import { notifyFarmObjectiveRead, notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriority, type IrrigationNeedsDashboard } from '@/lib/domain/irrigation-needs';
 import { automaticObjectiveOriginText, gardenUnknownReason, objectiveOriginText } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
@@ -15,6 +15,7 @@ import { PageSettingsFold } from './shell/page-settings-fold';
 import { gardenState } from '@/lib/domain/besoins-phone';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -61,6 +62,10 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     window.addEventListener('irrigation-needs-source-changed', refresh);
     return () => { window.removeEventListener('irrigation-events-changed', refresh); window.removeEventListener('irrigation-needs-source-changed', refresh); };
   }, [receive, season]);
+  // L'objectif de la ferme de la semaine affichée, à la ligne de résumé de la page (S1, PR 3).
+  useEffect(() => {
+    notifyFarmObjectiveRead({ weekStart: dashboard.weekStart, objective: dashboard.farmObjective });
+  }, [dashboard]);
   // Un lien d'« Aujourd'hui » vise un jardin (6 nonies, L2) : son pli s'ouvre et vient en haut, au chargement comme à un lien suivi dans la page.
   useEffect(() => {
     const openTargetedGarden = () => {
@@ -76,7 +81,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
   }, []);
   const sortedGardens = useMemo(() => dashboard.gardens.map((garden) => ({ ...garden, beds: [...garden.beds].sort(sorter(sort)) })), [dashboard.gardens, sort]);
   return <section className="irrigation-needs-section" aria-labelledby="irrigation-needs-title">
-    <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">Besoins d’irrigation</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
+    <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">{SIMPLE_WORDS.leftToWater}</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
     <ActionReply messages={replies} origin="haut" classNames={NEEDS_REPLY_CLASSES} />
     {!dashboard.completeness.complete ? <p className="irrigation-needs-warning" role="status">{dashboardWarning(dashboard)}</p> : null}
     <div className="irrigation-needs-controls">
@@ -241,7 +246,7 @@ function dashboardWarning(dashboard: IrrigationNeedsDashboard) {
   const beds = dashboard.gardens.flatMap((garden) => garden.beds);
   const causes = [
     ['unclassified-plot', UNCLASSIFIED_PLOT_REASON, []] as const,
-    ['objective', 'aucun objectif hydrique adopté', []] as const,
+    ['objective', 'aucune eau visée cette semaine', []] as const,
     ['actual-rain', 'pluie réelle incomplète', dashboard.completeness.missingDates.actualRain] as const,
     ['forecast-rain', 'pluie prévue incomplète', dashboard.completeness.missingDates.forecastRain] as const,
   ].flatMap(([key, label, dates]) => {

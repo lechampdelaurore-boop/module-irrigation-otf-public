@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
+  ouvrirLaCorrespondanceDesEspeces,
   surveillerLaConsole,
   TITRES_DES_PAGES,
   verifierCibleTactile,
@@ -25,6 +26,9 @@ import {
  *   une autre saison, que l'adresse garde vers « Arrosages » (F824, F825) ;
  * - une explication fixe est passée dans le « ? » (F826) ;
  * - au téléphone, le premier bloc utile de chaque page sous son budget.
+ *
+ * PR 2, les mots : les mots du tableau se lisent au premier niveau, et aucun
+ * mot du calcul ne se lit d’emblée sur les douze pages (voir plus bas).
  *
  * Ce qu'il ne prouve pas : la ligne de lecture quand Ouvre ta ferme échoue ou
  * qu'elle date de plus de 24 heures, que les parcours ne savent pas provoquer
@@ -177,4 +181,135 @@ test('au téléphone, le premier bloc utile de chaque page sous son budget', asy
     expect(haut, `premier bloc utile de « ${TITRES_DES_PAGES[cible]} » à ${haut} px du haut, au-delà de ${budget} px`).toBeLessThanOrEqual(budget);
     await verifierLEtape(page, journal, `premier bloc de ${cible}`);
   }
+});
+
+/**
+ * PR 2, les mots (contrat, section 4 et section 9.4) : les titres et les
+ * étiquettes du premier niveau parlent comme le champ, et aucun mot du calcul
+ * de la colonne de gauche ne se lit sur une page, replis fermés et « ? »
+ * fermé. Le mot du calcul reste dans le détail : il s'ouvre, il ne se lit pas
+ * d'emblée.
+ */
+const MOTS_DU_CALCUL = [
+  'Objectifs hydriques',
+  'Objectif hydrique',
+  'objectif hebdomadaire',
+  'Reste à apporter',
+  'Besoins d’irrigation',
+  'Faisabilité et répartition',
+  'Volume mobilisable',
+  'Disponibilité physique',
+  'Réserve utile',
+  'Culture de référence',
+  'Cultures de référence',
+  'Correspondance des espèces',
+  'Coefficients culturaux',
+  'Profils racinaires',
+  'Apport horaire',
+  'Créneaux protégés',
+  'reliquat',
+  'Par périmètre',
+  'totaux partiels',
+];
+
+test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’emblée', async ({ page }, testInfo) => {
+  test.setTimeout(150_000);
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  await aLaLargeurDuContrat(page, telephone);
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  await expect(page.getByText('Eau visée cette semaine', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Il manque encore', { exact: true }).first()).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'besoins');
+  await expect(page.getByRole('heading', { name: 'Eau visée cette semaine, météo et ressource en eau' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ce qu’il reste à arroser' })).toBeVisible();
+  // L'ET0 se dit « soif » (F833) : dans la ligne de résumé au téléphone, sur la tuile à l'ordinateur.
+  if (telephone) await expect(page.locator('.water-summary-line')).toContainText('soif de la semaine');
+  else await expect(page.getByText('Soif de la semaine', { exact: true }).first()).toBeVisible();
+
+  await attendreLaPageIrrigation(page, 'cultures');
+  await expect(page.getByText('Réglages fins des cultures (pour les experts)').first()).toBeVisible();
+
+  // La correspondance des espèces vit dans « Réglages » (3.8, précision P3).
+  await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
+  await expect(page.getByRole('heading', { level: 2, name: 'À quelle culture ressemble chaque espèce ?' })).toBeVisible();
+
+  // « Heures où l'on n'arrose pas » : le parcours P26, qui pose d'abord un objectif et un plan.
+
+  await attendreLaPageIrrigation(page, 'ressources');
+  await expect(page.getByText('Eau utilisable', { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Y a-t-il assez d’eau ?' })).toBeVisible();
+
+  const lus: string[] = [];
+  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+    await attendreLaPageIrrigation(page, cible);
+    const texte = (await page.locator('main').innerText()).toLocaleLowerCase('fr-FR');
+    for (const mot of MOTS_DU_CALCUL) {
+      const debut = texte.indexOf(mot.toLocaleLowerCase('fr-FR'));
+      if (debut >= 0) lus.push(`${TITRES_DES_PAGES[cible]} : « ${mot} » dans « ${texte.slice(Math.max(0, debut - 40), debut + mot.length + 40)} »`);
+    }
+    await verifierLEtape(page, journal, `mots de ${cible}`);
+  }
+  expect(lus, 'un mot du calcul se lit d’emblée').toEqual([]);
+});
+
+/**
+ * PR 3, un seul objectif (contrat, section 5 et section 9.6) : « Aujourd'hui »
+ * et « Objectifs et besoins » disent le même objectif de la ferme pour la
+ * semaine en cours, avec la même phrase, sur la ferme des parcours.
+ */
+test('« Aujourd’hui » et « Objectifs et besoins » disent le même objectif de la ferme', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const tuile = page.locator('a.today-kpi').filter({ has: page.locator('.today-kpi-label', { hasText: 'Eau visée cette semaine' }) });
+  const valeur = (await tuile.locator('.today-kpi-value').innerText()).trim();
+  const portee = (await tuile.locator('.today-kpi-detail').innerText()).split(', du ')[0].trim();
+  await verifierLEtape(page, journal, 'l’objectif d’« Aujourd’hui »');
+
+  await attendreLaPageIrrigation(page, 'besoins');
+  const ligne = page.locator('.water-summary-line > span');
+  const phrase = /^\d/.test(valeur) ? `${valeur} visés, ${portee}` : 'aucune eau visée';
+  await expect(ligne).toHaveText(new RegExp(`^${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} · `));
+  await verifierLEtape(page, journal, 'le même objectif sur « Objectifs et besoins »');
+});
+
+/**
+ * PR 3 bis, l'Historique comme « Aujourd'hui » (contrat, section 5 bis ;
+ * D-329) : la semaine en cours de « Historique et cumuls », sur la ferme
+ * entière, dit l'objectif d'« Aujourd'hui » : le même chiffre, et, quand une
+ * partie seulement des planches en a un, combien. La règle et l'écart se
+ * prouvent à deux fermes par tests/simplification-s1-historique.test.ts et
+ * tests/db/simplification-s1-historique.test.ts.
+ */
+test('« Historique et cumuls » dit l’objectif d’« Aujourd’hui » pour la semaine en cours', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const tuile = page.locator('a.today-kpi').filter({ has: page.locator('.today-kpi-label', { hasText: 'Eau visée cette semaine' }) });
+  const valeur = (await tuile.locator('.today-kpi-value').innerText()).trim();
+  const portee = (await tuile.locator('.today-kpi-detail').innerText()).split(', du ')[0].trim();
+  await verifierLEtape(page, journal, 'l’objectif d’« Aujourd’hui »');
+
+  // La page s'ouvre sur la semaine en cours, la ferme entière.
+  await attendreLaPageIrrigation(page, 'historique');
+  const carte = page.locator('article.history-summary-card').filter({ has: page.locator('span', { hasText: /^Objectif$/ }) });
+  await expect(carte).toHaveCount(1);
+  if (/^\d/.test(valeur)) {
+    await expect(carte.locator('strong')).toHaveText(valeur);
+    // « ferme entière » ne s'écrit pas sous la carte ; « 7 planches sur 10 ont un objectif » s'y écrit, comme sur « Aujourd'hui ».
+    if (portee === 'ferme entière') await expect(carte).not.toContainText(' ont un objectif');
+    else await expect(carte.locator('small')).toContainText(portee);
+  } else {
+    await expect(carte.locator('strong')).toHaveText('Donnée indisponible');
+    await expect(carte.locator('small')).toContainText('Aucun objectif sur la période');
+  }
+  // La phrase F444, la moyenne sur toute la surface, a disparu.
+  await expect(page.locator('main')).not.toContainText('comptées à 0');
+  await verifierLEtape(page, journal, 'le même objectif sur « Historique et cumuls »');
 });

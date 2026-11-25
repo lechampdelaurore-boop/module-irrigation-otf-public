@@ -22,6 +22,59 @@ registres, elle y renvoie.
   cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
   une action existante : aucune règle ne change. PR de contrat seule :
   **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
+  l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
+  décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat
+  S1, sections 5 bis et 9.7 ; roadmap section 6 terdecies, ligne 33), en
+  Opus 5.5 · Max. L'objectif d'une période, par lieu comme par série, est
+  la moyenne sur les seules planches qui en ont un (`farmObjective`), et la
+  carte « Objectif » dit combien en ont un ; l'écart compare cet objectif à
+  l'eau de ces mêmes planches ; quand chaque planche a un objectif, rien ne
+  change. Sur la démonstration, la Ferme des Trois Noues passe de 16,5 à
+  23,4 mm au début de l'été, le chiffre d'« Aujourd'hui ». Tests à deux
+  fermes, démonstration rejouée, parcours P61 étendu, contre-épreuve
+  (13 altérations sur 13 prises). Le code du lot S1 est fini. Contrôles :
+  voir la PR. **La PR 2 (les mots) est en ligne** (#212, fusionnée le
+  25 novembre 2026 à 15 h 51, déployée à 16 h 26, run 45638614621 vérifié
+  job par job : les cinq jobs verts).
+- **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
+  le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
+  33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm
+  sur « Objectifs et besoins », 5,2 mm sur « Aujourd'hui ») est établie dans
+  le code, pas relue sur la ferme : « Objectifs et besoins » montrait
+  l'objectif « Toute la ferme » saisi, « Aujourd'hui » la moyenne pondérée
+  des objectifs de chaque planche ; un autre périmètre, pas une erreur de
+  calcul. Un seul calcul et une seule phrase de l'objectif de la ferme
+  (`lib/domain/farm-objective.ts`, « 5,2 mm visés, ferme entière », « 7
+  planches sur 10 ont un objectif ») pour « Aujourd'hui » et la ligne de
+  résumé et la tuile d'« Objectifs et besoins ». **Décision du porteur à
+  13 h 35** (D-329) : l'Historique comptera comme « Aujourd'hui », les
+  planches sans objectif dites et non plus comptées à zéro ; PR 3 bis, à
+  part, en Opus 5.5 · Max. Tests à deux fermes, parcours P61 étendu.
+  Contrôles : voir la PR.
+- **Simplifier l'usage du module, S1, PR 2 sur 3 : les mots, codée le
+  25 novembre 2026** (D-328, F832 à F837, roadmap section 6 terdecies,
+  ligne 33), en Opus 5.5 · Élevé. Le premier niveau parle comme le champ,
+  avec les mots du tableau acceptés tels quels par le porteur : « Eau visée
+  cette semaine », « Il manque encore », « Ce qu'il reste à arroser », « Y
+  a-t-il assez d'eau ? », « Eau utilisable », « Soif de la semaine », « À
+  quelle culture ressemble cette espèce ? », « Réglages fins des cultures
+  (pour les experts) », « Ce que ce matériel apporte en une heure »,
+  « Heures où l'on n'arrose pas », « Ce qui reste d'un arrosage arrêté ».
+  Un seul module de libellés (`lib/domain/simple-words.ts`) ; RFU et ET0
+  restent dans le « ? » et le détail ; les noms du menu, l'export CSV, les
+  notifications et le journal des modifications gardent leurs mots. Un
+  test de garde échoue si un mot du calcul reparaît hors des endroits
+  permis. Relevé et sort de chaque mot : contrat, section 9.4. Parcours
+  P61 étendu, seize parcours relus avec les nouveaux mots. Contrôles : voir
+  la PR. Reste la PR 3 (un seul objectif, S1-O1). **Le contrat S1 et
+  l'inscription des six lots sont en ligne** (#209, fusionnée le 25 novembre
+  2026 à 12 h 30, déployée à 13 h 22, run 45605041672 vérifié job par job :
+  « Application », « Workers Cloudflare », « Parcours navigateur »,
+  « Déploiement Cloudflare » et « Déploiement de la démonstration », verts).
+  **La PR 1 (le chapeau d'une ligne) est en ligne** (#210, fusionnée le
+  25 novembre 2026 à 13 h 32, déployée à 14 h 06, run 45614777249 vérifié
+  job par job : les cinq jobs verts).
 - **Simplifier l'usage du module, S1, PR 1 sur 3 : le chapeau d'une ligne,
   codée le 25 novembre 2026** (D-328, F829 à F831, roadmap section 6
   terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap, sur

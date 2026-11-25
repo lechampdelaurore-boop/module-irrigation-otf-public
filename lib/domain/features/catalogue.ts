@@ -78,7 +78,7 @@ export const FEATURES: readonly FeatureDefinition[] = [
   {
     id: 'cultures',
     label: 'Besoin par culture',
-    summary: 'Les coefficients culturaux, les profils racinaires, les durées et l’objectif proposé.',
+    summary: 'Les réglages fins des cultures, pour les experts, les durées et l’objectif proposé.',
     requires: ['besoins'],
   },
   {
@@ -96,7 +96,7 @@ export const FEATURES: readonly FeatureDefinition[] = [
   {
     id: 'ressources',
     label: 'Ressources et pompes',
-    summary: 'Les ressources en eau, leurs relevés et leur débit, les pompes, la faisabilité.',
+    summary: 'Les ressources en eau, leurs relevés et leur débit, les pompes, et s’il y a assez d’eau.',
     requires: ['arrosages'],
   },
   {

@@ -1,6 +1,7 @@
 import { plannedIrrigationLateness } from '../planned-irrigation.ts';
 import type { PlanBedOutcome, StoredProposal, UnplacedReason } from './contract.ts';
 import type { PlanSummary } from './presentation.ts';
+import { SIMPLE_WORDS } from '../simple-words.ts';
 
 /**
  * Le planning de la semaine, l'action contre le bruit (audit ergonomique,
@@ -144,7 +145,7 @@ const GROUP_TITLES: Record<UnplacedGroupKey, string> = {
   'insufficient-reach': 'Réglage plus large que la planche',
   spacing: 'Espacement entre deux arrosages',
   'refused-slot': 'Créneaux refusés',
-  'protected-slot': 'Créneaux protégés',
+  'protected-slot': SIMPLE_WORDS.noWateringHours,
   partial: 'Servies en partie, faute de place',
 };
 

@@ -8,7 +8,8 @@ import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, 
 import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-days';
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
-import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
+import { FARM_OBJECTIVE_READ, notifyChangeJournalChanged, type FarmObjectiveNotice } from '@/lib/domain/feasibility-notifications';
+import { farmObjectiveScopeText } from '@/lib/domain/farm-objective';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { useConfirm } from './shell/use-confirm';
@@ -38,6 +39,7 @@ import {
 } from './water-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
 import { AUTOMATIC_OBJECTIVE_SETTING_TEXT } from '@/lib/domain/objective-reading';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -65,14 +67,25 @@ export function WaterManagementDashboard({
   season,
   snapshot,
   initialDashboard,
+  initialFarmObjective = null,
   part = 'besoins',
 }: {
   season: number;
   snapshot: IrrigationSnapshot;
   initialDashboard: WaterDashboard;
+  /** L'objectif de la ferme lu avec les besoins de la même semaine (S1, PR 3). */
+  initialFarmObjective?: FarmObjectiveNotice | null;
   part?: WaterDashboardPart;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
+  const [farmObjectiveNotice, setFarmObjectiveNotice] = useState(initialFarmObjective);
+  useEffect(() => {
+    const read = (event: Event) => {
+      if (event instanceof CustomEvent) setFarmObjectiveNotice(event.detail as FarmObjectiveNotice);
+    };
+    window.addEventListener(FARM_OBJECTIVE_READ, read);
+    return () => window.removeEventListener(FARM_OBJECTIVE_READ, read);
+  }, []);
   const { confirm, dialog: confirmDialog } = useConfirm();
   // Chaque message s'affiche sous le bouton de son geste (audit du 19 novembre 2026, lot G, n° 1, F404).
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
@@ -113,6 +126,8 @@ export function WaterManagementDashboard({
 
   const currentDay = dashboard.todayWater;
   const farmGoal = dashboard.goals.find((goal) => goal.scopeType === 'farm');
+  // L'objectif de la ferme : celui d'« Aujourd'hui », pour la semaine affichée seulement (S1, PR 3).
+  const farmObjective = farmObjectiveNotice?.weekStart === dashboard.weekStart ? farmObjectiveNotice.objective : null;
   const quietDays = quietWaterDaysText(dashboard.days);
   const missingEt0Dates = dashboard.days.filter((day) => day.et0Mm === null).map((day) => day.date);
   const missingActualRainDates = dashboard.days.filter((day) => day.date <= today && day.effectiveActualRainMm === null).map((day) => day.date);
@@ -379,7 +394,7 @@ export function WaterManagementDashboard({
     <section className="water-management-section" aria-labelledby="water-management-title">
       <header className="water-management-heading">
         <div>
-          <h2 id="water-management-title">Objectifs hydriques, météo et ressource en eau</h2>
+          <h2 id="water-management-title">{SIMPLE_WORDS.weekGoal}, météo et ressource en eau</h2>
           {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>
         <div className="water-week-navigation" aria-label="Changer de semaine">
@@ -395,7 +410,7 @@ export function WaterManagementDashboard({
 
       <button type="button" className="water-summary-line" aria-expanded={tilesOpen} aria-controls={tilesId} onClick={() => setTilesOpen((value) => !value)}>
         <span>{weekTotalsLine({
-          farmGoalMm: farmGoal?.amountMm ?? null,
+          objective: farmObjective,
           realizedIrrigationMm: dashboard.totals.realizedIrrigationMm,
           actualRainMm: dashboard.totals.actualRainMm,
           remainingForecastRainMm: dashboard.totals.remainingForecastRainMm,
@@ -405,11 +420,11 @@ export function WaterManagementDashboard({
         <small>{tilesOpen ? 'Replier' : 'Détail'}</small>
       </button>
       <div className="water-summary-grid" id={tilesId} data-open={tilesOpen}>
-        <SummaryCard icon="cible" label="Objectif ferme" value={farmGoal ? `${mm.format(farmGoal.amountMm)} mm` : 'Non défini'} detail={`${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} ciblé${dashboard.goals.length > 1 ? 's' : ''}`} />
+        <SummaryCard icon="cible" label={SIMPLE_WORDS.weekGoal} value={farmObjective === null ? 'En cours de lecture' : farmObjective.objectiveMm === null ? 'Aucune' : `${mm.format(Math.round(farmObjective.objectiveMm * 10) / 10)} mm`} detail={`${farmObjective === null ? '' : `${farmObjectiveScopeText(farmObjective)} · `}${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} saisi${dashboard.goals.length > 1 ? 's' : ''}`} />
         <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
         <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
         <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
-        <SummaryCard icon="soleil" label="Évaporation de la semaine (ET0)" value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
+        <SummaryCard icon="soleil" label={SIMPLE_WORDS.thirstOfWeek} value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`ET0, l’évaporation de référence. Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
       </div>
 
       {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
@@ -421,7 +436,7 @@ export function WaterManagementDashboard({
           id="objectifs-de-la-semaine"
           className="water-panel water-fold"
           bodyClassName="water-fold-body"
-          summary={<><h3>Objectifs hebdomadaires</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null, dashboard.automaticObjective?.enabled === true)}</small></>}
+          summary={<><h3>{SIMPLE_WORDS.weekGoal}</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null, dashboard.automaticObjective?.enabled === true)}</small></>}
         >
           {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} shown={automaticShown} pending={pending} onChange={saveAutomaticObjective} onClearGoals={() => void clearGoals()} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
           <div className="water-panel-title">
@@ -465,7 +480,7 @@ export function WaterManagementDashboard({
           bodyClassName="water-fold-body"
           summary={<><h3>Pluie mesurée</h3><small>{manualRainFoldLine(dashboard.days)}</small></>}
         >
-          <div className="water-panel-title"><div><p>Mesure de la ferme, prioritaire sur la réanalyse même si la commune météo change.</p></div></div>
+          <div className="water-panel-title"><div><p>Mesure de la ferme, prioritaire sur la pluie estimée par la météo, même si la commune météo change.</p></div></div>
           <div className="water-inline-form">
             <label><span>Date</span><input type="date" max={today} value={rainDate} onChange={(event) => chooseRainDate(event.target.value)} /></label>
             <label><span>Millimètres</span><input inputMode="decimal" value={rainAmount} onChange={(event) => setRainAmount(event.target.value)} /></label>
@@ -484,7 +499,7 @@ export function WaterManagementDashboard({
       <div className="water-week-table-wrap" id="weather">
         {quietDays ? <p className="water-week-quiet">{quietDays}.</p> : null}
         <table className="water-week-table">
-          <thead><tr><th>Jour</th><th>Irrigation réalisée</th><th>Planifiée</th><th>Pluie mesurée / réanalyse</th><th>Prévision</th><th>Températures prévues</th><th>ET0</th><th>Limite</th></tr></thead>
+          <thead><tr><th>Jour</th><th>Irrigation réalisée</th><th>Planifiée</th><th>Pluie mesurée / estimée</th><th>Prévision</th><th>Températures prévues</th><th>ET0</th><th>Limite</th></tr></thead>
           <tbody>{dashboard.days.map((day) => <tr key={day.date} className={day.limitExceededByCubicMeters > 0 ? 'limit-exceeded-row' : undefined} data-open={openDay === day.date ? 'true' : undefined}>
             <th>
               <span className="water-day-date">{formatDate(day.date)}</span>
@@ -495,7 +510,7 @@ export function WaterManagementDashboard({
             </th>
             <td data-label="Irrigation réalisée">{volumeText(day.realizedIrrigationCubicMeters)}{day.volumeIncomplete ? <small> · incomplet, surface mouillée inconnue</small> : null}{day.estimatedOngoingCubicMeters > 0 ? <small> + {volumeText(day.estimatedOngoingCubicMeters)} en cours estimés</small> : null}</td>
             <td data-label="Planifiée">{volumeText(day.plannedIrrigationCubicMeters)}</td>
-            <td data-label="Pluie réelle / estimée">{day.effectiveActualRainMm === null ? '—' : `${mm.format(day.effectiveActualRainMm)} mm`}{day.manualRainMm !== null ? ' · mesurée' : day.reanalysisRainMm !== null ? ' · réanalyse' : ''}<FigureOrigin text={actualRainOrigin(day)} /></td>
+            <td data-label="Pluie réelle / estimée">{day.effectiveActualRainMm === null ? '—' : `${mm.format(day.effectiveActualRainMm)} mm`}{day.manualRainMm !== null ? ' · mesurée' : day.reanalysisRainMm !== null ? ' · estimée' : ''}<FigureOrigin text={actualRainOrigin(day)} /></td>
             <td data-label="Prévision">{day.forecastRainMm === null ? '—' : `${mm.format(day.forecastRainMm)} mm`}</td>
             <td data-label="Températures prévues">{formatTemperatures(day.forecastMinimumTemperatureCelsius, day.forecastMaximumTemperatureCelsius)}</td>
             <td data-label="ET0">{day.et0Mm === null ? '—' : `${mm.format(day.et0Mm)} mm · ${day.et0Kind === 'reanalysis' ? 'réanalyse' : 'prévue'}`}</td>

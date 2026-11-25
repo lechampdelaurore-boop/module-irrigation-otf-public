@@ -87,12 +87,12 @@ test('n° 15, F459 : « Correspondance des espèces » est un pli fermé à ancr
 
 test('n° 15, F460 : les tuiles en une ligne, un total incomplet dit « partiel »', () => {
   assert.equal(
-    weekTotalsLine({ farmGoalMm: 25, realizedIrrigationMm: 12, actualRainMm: 3.5, remainingForecastRainMm: 5, et0Mm: 18.2, partial: false }),
-    'objectif 25 mm · irrigué 12 mm · pluie 3,5 mm · prévue 5 mm · ET0 18,2 mm',
+    weekTotalsLine({ objective: { objectiveMm: 25, withObjective: 4, total: 4 }, realizedIrrigationMm: 12, actualRainMm: 3.5, remainingForecastRainMm: 5, et0Mm: 18.2, partial: false }),
+    '25 mm visés, ferme entière · irrigué 12 mm · pluie 3,5 mm · prévue 5 mm · soif de la semaine 18,2 mm',
   );
   assert.equal(
-    weekTotalsLine({ farmGoalMm: null, realizedIrrigationMm: 0, actualRainMm: null, remainingForecastRainMm: 14.8, et0Mm: 11.5, partial: true }),
-    'objectif non défini · irrigué 0 mm · pluie non disponible · prévue 14,8 mm · ET0 11,5 mm · totaux partiels',
+    weekTotalsLine({ objective: { objectiveMm: null, withObjective: 0, total: 4 }, realizedIrrigationMm: 0, actualRainMm: null, remainingForecastRainMm: 14.8, et0Mm: 11.5, partial: true }),
+    'aucune eau visée · irrigué 0 mm · pluie non disponible · prévue 14,8 mm · soif de la semaine 11,5 mm · totaux incomplets',
   );
 });
 

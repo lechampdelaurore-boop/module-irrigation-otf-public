@@ -323,7 +323,7 @@ export async function finishIrrigationEventAction(input: {
     return {
       message: status === 'completed'
         ? 'L’irrigation réalisée a été enregistrée.'
-        : 'L’irrigation partielle a été enregistrée. Le reliquat reste planifié.',
+        : 'L’irrigation partielle a été enregistrée. Ce qui reste est planifié.',
       planEvent: status === 'completed' ? 'irrigation-completed' : 'irrigation-partially-completed',
     };
   });
@@ -345,7 +345,7 @@ export async function cancelRemainingIrrigationAction(
 ): Promise<IrrigationEventActionResult> {
   return mutateEvent(eventEquipmentId, async (userId) => {
     await cancelRemainingIrrigationForUser(userId, eventEquipmentId);
-    return { message: 'Le reliquat planifié a été annulé.', planEvent: 'irrigation-remaining-canceled' };
+    return { message: 'Ce qui restait de l’arrosage arrêté a été annulé.', planEvent: 'irrigation-remaining-canceled' };
   });
 }
 

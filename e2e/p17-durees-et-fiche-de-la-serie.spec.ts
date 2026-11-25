@@ -78,8 +78,8 @@ test('les durées d’une culture se règlent puis reviennent au jeu commun, et 
   await ouvrirParClic(espece.locator('summary').first(), rattachement);
   const enregistrerRattachement = rattachement.getByRole('button', { name: 'Enregistrer' });
   await expect(async () => {
-    await rattachement.getByLabel('Culture de référence').selectOption({ value: '' });
-    await rattachement.getByLabel('Culture de référence').selectOption({ label: 'Carotte' });
+    await rattachement.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ value: '' });
+    await rattachement.getByLabel('À quelle culture ressemble cette espèce ?').selectOption({ label: 'Carotte' });
     await expect(enregistrerRattachement).toBeEnabled({ timeout: 1_000 });
   }).toPass({ timeout: 30_000 });
   await enregistrerRattachement.click();

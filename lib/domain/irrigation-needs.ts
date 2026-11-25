@@ -16,6 +16,7 @@ import {
   type AutomaticObjectiveWeek,
 } from './automatic-objective.ts';
 import { mmText } from './figure-origin.ts';
+import { farmObjective, type FarmObjective } from './farm-objective.ts';
 import {
   FARM_TIME_ZONE,
   addDaysToDateKey,
@@ -123,6 +124,12 @@ export type IrrigationNeedsDashboard = {
   calculatedAt: string;
   thresholdMm: number;
   gardens: GardenIrrigationNeeds[];
+  /**
+   * L'objectif de la ferme pour la semaine, le calcul unique (S1, PR 3) :
+   * celui que lit « Aujourd'hui », repris par la ligne de résumé et la tuile
+   * d'« Objectifs et besoins ».
+   */
+  farmObjective: FarmObjective;
   completeness: IrrigationNeedCompleteness;
   /**
    * L'objectif proposé de chaque planche (5 quater), une information à côté
@@ -340,6 +347,7 @@ export function buildIrrigationNeedsDashboard(input: {
   return {
     season, weekStart, weekEnd, timeZone: FARM_TIME_ZONE,
     calculatedAt: now.toISOString(), thresholdMm: Math.max(0, input.thresholdMm), gardens,
+    farmObjective: farmObjective(allBeds),
     completeness: {
       complete: allBeds.every((bed) => bed.completeness.planningComplete),
       missing,

@@ -234,8 +234,8 @@ function soilLines(all: readonly ReliabilitySoilGarden[]): ReliabilityLine[] {
       kind: 'soil',
       key: 'soil-rfu',
       text: parcels.length === 1
-        ? `La réserve utile (RFU) de la parcelle ${first.zoneName} n’est pas saisie : la réserve du sol de ${first.gardens === 1 ? 'son jardin' : `ses ${first.gardens} jardins`} reste inconnue.`
-        : `La réserve utile (RFU) de ${parcels.length} parcelles n’est pas saisie : ${namesText(parcels.map((parcel) => parcel.zoneName))}. La réserve du sol de leurs jardins reste inconnue.`,
+        ? `Ce que le sol de la parcelle ${first.zoneName} retient (sa RFU) n’est pas saisi : la réserve du sol de ${first.gardens === 1 ? 'son jardin' : `ses ${first.gardens} jardins`} reste inconnue.`
+        : `Ce que le sol de ${parcels.length} parcelles retient (leur RFU) n’est pas saisi : ${namesText(parcels.map((parcel) => parcel.zoneName))}. La réserve du sol de leurs jardins reste inconnue.`,
       action: { kind: 'link', label: `Renseigner la réserve de la parcelle ${first.zoneName}`, page: 'sol', anchor: soilParcelAnchor(first.zoneId) },
     });
   }

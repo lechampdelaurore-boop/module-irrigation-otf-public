@@ -10058,8 +10058,9 @@ téléphone ; la proposition elle-même n'a pas été essayée par un maraîcher
 
 ## D-328 — Simplifier l'usage du module, lot S1 : le chapeau et les mots
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (le chapeau d'une
-ligne) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
+Date : 25 novembre 2026. Statut : **PR 1, PR 2 et PR 3 sur 3 codées** (le
+chapeau d'une ligne, les mots, un seul objectif ; l'Historique suit par la
+PR 3 bis, codée le même jour, D-329) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la roadmap,
 sur le mandat du porteur du 25 novembre 2026 (enchaîner les lots sans
 nouveau « vas-y », D-327). Les PR 2 (les mots) et 3 (un seul objectif)
@@ -10097,3 +10098,128 @@ P28 et P31c suivis. Contre-épreuve : voir la PR.
 adresse ; `?refresh=1` et son nettoyage, le bloc « Données en cache », les
 liens existants et les notifications gardent leur effet. Logiciel
 multi-fermes : la règle vaut pour toute ferme, quelle que soit sa taille.
+
+**Décision (PR 2, les mots).** Le premier niveau (titres, boutons, phrases
+d'en-tête, étiquettes des tuiles) dit les mots du tableau accepté tel quel
+par le porteur (D-327). Ils vivent en un seul endroit,
+`lib/domain/simple-words.ts`, que l'interface appelle sans recopier ; le
+mot du calcul (RFU, ET0, culture de référence, apport horaire) reste dans
+le « ? », dans le détail d'une tuile et dans les bulles « d'où vient ce
+chiffre ». Gardent leurs mots (F828) : les identifiants, les adresses,
+l'en-tête de l'export CSV, les notifications, le journal des modifications
+(le nom du réglage tel qu'enregistré) et deux erreurs techniques. Le relevé
+mot par mot et ce que chacun devient : contrat, section 9.4.
+
+**Précisions tranchées en codant** (contrat, section 9.5).
+
+- F832 : la liste des espèces s'intitule « À quelle culture ressemble
+  chaque espèce ? », le choix d'une espèce garde « … cette espèce ? ».
+- F833 : l'ET0 se dit « soif du jour », « de la semaine » ou « de la
+  période » selon la tuile ; « ET0, l'évaporation de référence » dans le
+  détail ; le tableau des jours et le suivi par série gardent « ET0 ».
+- F834 : le tableau ne nomme aucune page : les noms du menu ne changent
+  pas ; leur rangement est S3.
+- F835 : « réanalyse » et « historisé », au premier niveau, sont dits
+  « pluie estimée par la météo », « estimée », « Non enregistré » ; ils
+  restent dans les causes d'écart et les replis de diagnostic.
+- F836 : « ce qui reste » d'un arrosage arrêté, « Reprendre ce qui reste »,
+  « Annuler ce qui reste », « Un arrosage arrêté est à reprendre ».
+- F837 : « RFU » s'explique toujours à sa première occurrence d'une page
+  (F312), par le mot du tableau : « Ce que le sol de la parcelle retient
+  (sa RFU) ».
+
+**Preuve (PR 2).** `tests/simplification-s1-mots.test.ts` : le tableau des
+mots, le test de garde sur `app/` et `lib/domain/` (les endroits permis
+écrits avec leur raison, une permission devenue inutile échoue), seize
+usages pris dans le module sans recopie, l'ET0 dans le détail, l'écran de
+bienvenue et la visite guidée ; parcours P61 étendu (les mots du tableau
+lus, aucun mot du calcul visible d'emblée sur les douze pages) ; seize
+parcours relus avec les nouveaux libellés. Contre-épreuve : voir la PR.
+
+**Cause du point S1-O1 (PR 3), établie dans le code.** Ce n'est pas une
+moyenne sans pondération : les deux pages pondèrent par la surface. La
+ligne de résumé et la tuile « Objectif ferme » d'« Objectifs et besoins »
+affichaient l'objectif « Toute la ferme » **saisi**, un réglage que
+l'objectif d'un jardin ou d'une planche remplace là où il est posé ;
+« Aujourd'hui » fait la moyenne pondérée des objectifs **applicables** de
+chaque planche (`objectiveForBed`). Sur la ferme réelle, 2,7 mm sont
+vraisemblablement l'objectif saisi pour toute la ferme, et 5,2 mm la
+moyenne avec des objectifs plus hauts posés sur des jardins : déduit du
+code et rejoué en test, pas relu sur la ferme réelle. C'est la
+première issue du contrat (un autre périmètre) : on aligne. L'irrigation
+diffère aussi (2,8 mm contre 2,1 mm) : « Objectifs et besoins » répartit le
+volume sorti des pompes sur toute la surface des planches, « Aujourd'hui »
+pondère l'eau que chaque planche a reçue ; les deux disent ce qu'ils
+comptent, rien ne change (contrat, section 9.6).
+
+**Décision (PR 3).** Un seul calcul de l'objectif de la ferme :
+`lib/domain/farm-objective.ts`, la moyenne pondérée par la surface sur les
+planches qui ont un objectif, les autres comptées à voix haute (« 7
+planches sur 10 ont un objectif »), jamais à zéro. Une seule phrase :
+« 5,2 mm visés, ferme entière ». « Aujourd'hui » (la semaine de la ferme et
+de chaque jardin) et « Objectifs et besoins » (la ligne de résumé et la
+tuile « Eau visée cette semaine », lues sur les besoins de la semaine
+affichée) l'appellent ; le planning ne dit pas d'objectif de ferme. Rien ne
+change dans le besoin, l'écart, l'ET0 ni l'objectif automatique.
+
+**Preuve (PR 3).** `tests/simplification-s1-objectif.test.ts` : deux
+fermes (toutes les planches avec objectif, de surfaces différentes ; une
+partie seulement), le cas S1-O1 rejoué (« Toute la ferme » 2,7 mm, un
+jardin à 7 mm : 5,9 mm visés), « Aujourd'hui » et la ligne des besoins avec
+le même chiffre et la même phrase, aucune page qui refait la moyenne.
+Parcours P61 étendu. Contre-épreuve : voir la PR.
+
+## D-329 — L'Historique compte l'objectif comme « Aujourd'hui »
+
+Date : 25 novembre 2026, 13 h 35. **Décision du porteur** (« ok pour
+l'historique »), sur la question posée par la PR 3 du lot S1 (D-328), avec
+l'option recommandée. Statut : **codée le 25 novembre 2026 par la PR 3 bis
+du lot S1**, en Opus 5.5 · Max (contrat `docs/simplification-s1-contract.md`,
+sections 5 bis et 9.7). Elle remplace D-036 sur un point : l'objectif d'une
+période ne compte plus à zéro les planches sans objectif. Comme
+« Aujourd'hui », il est la moyenne pondérée par la surface sur les seules
+planches qui ont un objectif sur la période, et la page dit combien n'en
+ont pas ; une seule période sur une seule semaine donne le même chiffre que
+« Aujourd'hui ». Le reste de D-036 tient : un objectif posé en cours de
+semaine vaut pour ses jours restants, et une période sans aucun objectif est
+sans objectif ni écart.
+
+**Pourquoi.** Le but du lot S1 : un seul objectif, le même chiffre sur
+chaque page (contrat, section 5). Sur la démonstration, la même semaine,
+« Aujourd'hui » disait 23,4 mm et « Historique » 16,5 mm.
+
+**Comment.** Une règle de calcul sensible (l'objectif et l'écart d'une
+période) : une PR à part, la PR 3 bis du lot S1, en Opus 5.5 · Max (contrat,
+section 10), dans un fil à part, après la PR 3. L'écart d'une période se
+redéfinit avec elle sur le même périmètre ; la PR 3 bis l'écrit avant le
+code.
+
+**Décision (PR 3 bis).** L'objectif d'une période, dans la vue « Par
+lieu » comme dans la vue « Par série », est la moyenne pondérée par la
+surface sur les seules planches qui ont un objectif sur la période, par la
+fonction unique de la PR 3 (`farmObjective`) ; une planche en a un dès
+qu'un de ses jours en a un, même de 0 mm. L'écart reste « objectif moins
+irrigation et pluie réelles » ; quand une partie seulement des planches a
+un objectif, cette eau est celle de ces seules planches, comme
+« Aujourd'hui » chiffre l'eau reçue (F280) ; quand toutes en ont un, il
+est celui d'avant. Sous la carte « Objectif » : « 7 planches sur 10 ont un
+objectif », puis « objectif posé sur 40/49 journées-planche » quand des
+jours leur manquent ; sous l'écart, « Eau reçue par ces 7 planches :
+12,4 mm » ; la phrase « … comptées à 0 » (F444) disparaît. L'export CSV
+garde ses colonnes : « Irrigation + pluie réelle » est l'eau que l'écart
+compare. Les cumuls du périmètre (volume, apport, surface, pluie, soif) ne
+changent pas.
+
+**Preuve (PR 3 bis).** `tests/simplification-s1-historique.test.ts` : deux
+fermes (chaque planche avec un objectif, 17,5 mm et un écart de 2,5 mm
+comme avant ; une partie seulement, 28,5 mm au lieu de 5,7 et l'écart de
+16,5 mm sur l'eau de la serre), les jours manquants, le retrait, le zéro,
+deux semaines, une semaine égale à « Aujourd'hui » sur onze cas (objectifs
+posés en cours de semaine, retirés, automatiques) à trois niveaux, l'export
+CSV ; la vue « Par série » dans `tests/series-water.test.ts`.
+`tests/db/simplification-s1-historique.test.ts` : Alice et Bob, l'Historique,
+« Objectifs et besoins » et « Aujourd'hui » lus ensemble, les quatre
+passages d'isolation. `tests/db/simplification-s1-historique-demo.test.ts` :
+chaque ferme de démonstration à chaque moment (la Ferme des Trois Noues au
+début de l'été : 23,4 mm, 7 planches sur 10). Parcours P61 étendu.
+Contre-épreuve : treize altérations, chacune prise par au moins un test.

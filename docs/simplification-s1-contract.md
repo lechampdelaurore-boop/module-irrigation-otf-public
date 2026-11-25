@@ -38,6 +38,7 @@ jardins au plus), jamais sur la ferme du porteur.
 | 1 · Le chapeau d'une ligne | la ligne « Dernière lecture réussie… Actualiser » n'apparaît que si la lecture a échoué ou date ; la saison seulement là où elle sert ; les explications fixes de tête de page passent dans le « ? » | 6 | tests, P61 (390 et 1440 px) |
 | 2 · Les mots | les titres, boutons et phrases du tableau de la section 5, un seul endroit pour ces libellés | 3 | test de garde, P61 étendu |
 | 3 · Un seul objectif | une seule façon de dire l'objectif de la ferme, partout ; l'écart des 2,7 et 5,2 mm établi d'abord (point ouvert S1-O1) | 7 | tests du domaine, P61 étendu |
+| 3 bis · L'Historique comme « Aujourd'hui » | l'objectif d'une période sur les seules planches qui en ont un, l'écart sur ces mêmes planches, et la page dit combien n'en ont pas (D-329, section 5 bis) ; Opus 5.5 · Max | 7 | tests du domaine et de la persistance à deux fermes, démonstration rejouée, P61 étendu |
 
 Chaque PR : `lint`, `typecheck`, `test`, `build`, `knip`, `push:check`,
 `weather:check`, `site:check` collés ; `e2e` joué en local sur les parcours
@@ -191,16 +192,109 @@ la cause dans le code, avant toute modification, et la consigne ici
 3. **Rien ne change dans le besoin.** L'objectif, l'écart, l'ET0 (information
    seulement, D-010) et l'objectif automatique (D-309) sont ceux d'aujourd'hui.
 
+## 5 bis. PR 3 bis — L'Historique compte l'objectif comme « Aujourd'hui » (D-329)
+
+**Origine.** La PR 3 a établi pourquoi, sur la démonstration, « Historique
+et cumuls » disait 16,5 mm quand « Aujourd'hui » disait 23,4 mm la même
+semaine : l'Historique divisait par toute la surface du périmètre, les
+planches sans objectif comptées à zéro (D-036), et le disait sous son
+chiffre (F444). Le porteur a choisi le 25 novembre 2026 à 13 h 35 de compter
+comme « Aujourd'hui » (D-329, qui remplace D-036 sur ce point). Règle de
+calcul sensible (l'objectif et l'écart d'une période) : une PR à part, en
+Opus 5.5 · Max (section 10). Cette section l'écrit avant le code, l'écart
+compris, comme D-329 le demande.
+
+**Règles.**
+
+1. **L'objectif de chaque planche sur la période ne change pas.** Jour par
+   jour, un septième de l'objectif saisi le plus précis qui la couvre,
+   compté à partir de son jour de pose (D-034, D-039) ; un jour sans
+   objectif saisi, la valeur de l'objectif automatique, quand la ferme l'a
+   allumé (D-309) ; rien sinon. Une planche **a un objectif sur la
+   période** dès qu'un de ses jours en a un, même de 0 mm ; une planche
+   dont aucun jour n'en a n'a pas d'objectif sur la période (un jour où
+   l'objectif automatique s'applique sans valeur n'en donne pas, F778).
+2. **L'objectif du périmètre** (ferme, parcelle, jardin ou planche, dans la
+   vue « Par lieu » ; chaque série, dans la vue « Par série ») est la
+   moyenne pondérée par la surface des objectifs de ses planches, **sur les
+   seules planches qui en ont un** : la fonction unique de la PR 3,
+   `farmObjective` (`lib/domain/farm-objective.ts`), la surface occupée
+   pesant pour une série. Une planche sans objectif n'entre ni dans la somme
+   ni dans la surface : elle n'est jamais comptée à zéro (D-003), elle est
+   dite (règle 5). Aucune planche avec un objectif : ni objectif ni écart,
+   comme avant. Sur une semaine, le chiffre est celui d'« Aujourd'hui » et
+   d'« Objectifs et besoins » pour cette semaine : même objectif de planche
+   (`objectiveForBed`), même moyenne.
+3. **L'écart, sur le même périmètre.** L'écart reste `objectif − (irrigation
+   réelle + pluie réelle)`, positif en déficit ; l'ET0 n'y entre pas
+   (D-010). Quand une partie seulement des planches a un objectif,
+   l'irrigation et la pluie de l'écart sont celles de **ces seules
+   planches** : l'eau que chacune a reçue sur la période, pondérée par sa
+   surface, Σ(mm × m²) / Σ(m²), la pluie à zéro sous abri (D-032), inconnue
+   sur un jardin à classer (F583) ; c'est ainsi qu'« Aujourd'hui » chiffre
+   l'eau reçue (F280). Quand toutes les planches ont un objectif, l'écart
+   est celui d'avant, au millimètre près. Une pluie réelle incomplète sur
+   ces planches laisse l'écart indisponible, comme avant ; elle ne le rend
+   pas indisponible quand ces planches sont toutes sous abri.
+4. **Ce qui tient de D-036.** Un objectif posé en cours de période ne
+   compte que pour ses jours couverts, et l'eau reçue sur toute la période
+   se compare à l'objectif de ces jours ; le nombre de journées-planche
+   couvertes reste dit, désormais sur les seules planches qui ont un
+   objectif, quand des jours leur manquent. Une journée-planche où
+   l'objectif automatique s'applique sans valeur n'est jamais comptée pour
+   zéro et reste dite dans les avertissements (F778).
+5. **Ce que la page dit.** Vue « Par lieu », sous l'objectif : la phrase de
+   la PR 3, « 7 planches sur 10 ont un objectif », quand toutes n'en ont
+   pas (rien quand toutes en ont un), puis, quand des jours manquent à ces
+   planches, « objectif posé sur 40/49 journées-planche » ; « Aucun objectif
+   sur la période » sans aucun. La phrase « Moyenne sur toute la surface,
+   les planches sans objectif comptées à 0 » (F444) disparaît. Sous
+   l'écart, quand une partie seulement des planches a un objectif : « Eau
+   reçue par ces 7 planches : 12,4 mm » (« par cette planche » pour une
+   seule), pour que l'écart se relise « objectif moins eau reçue ». Un
+   avertissement ne dit l'écart indisponible que s'il l'est (règle 3, sous
+   abri). Vue « Par série » : la ligne des planches de la carte ajoute
+   « 2 planches sur 3 ont un objectif » quand toutes n'en ont pas ; le
+   tableau des planches garde « — » pour une planche sans objectif.
+6. **L'export CSV garde ses colonnes.** « Objectif hydrique » et « Écart à
+   l'objectif » suivent les règles 2 et 3 ; « Irrigation + pluie réelle »
+   est l'eau que l'écart compare à l'objectif, sur les mêmes planches
+   (règle 3) : l'écart est toujours l'objectif moins cette colonne.
+   « Volume irrigation », « Apport irrigation », « Surface irriguée » et
+   « Pluie réelle » restent les cumuls de tout le périmètre.
+
+**Ne change pas.** Les cumuls de tout le périmètre (volume, apport
+d'irrigation en mm, surface irriguée, pluie réelle, soif de la période) ;
+l'objectif de chaque planche, et donc le tableau des planches d'une série ;
+l'objectif restant d'une série (F779) ; le besoin, « Aujourd'hui »,
+« Objectifs et besoins », le planning, l'objectif automatique (D-309,
+D-317, D-318) ; aucune donnée, aucune migration. Logiciel multi-fermes :
+la règle vaut pour toute ferme et tout périmètre, quelle que soit sa
+taille.
+
+**Preuve.** Tests du domaine (deux fermes : chaque planche avec un
+objectif, rien ne change ; une partie seulement, le chiffre d'« Aujourd'hui »
+et l'écart sur ces planches ; une semaine égale à « Aujourd'hui » quels que
+soient les objectifs posés en cours de semaine, retirés ou automatiques ;
+la vue « Par série ») ; test de persistance à deux fermes par le service de
+l'Historique et celui des besoins, et chaque ferme de démonstration rejouée
+à son moment ; parcours P61 étendu : sur la ferme des parcours, la carte
+« Objectif » de l'Historique (semaine en cours, toute la ferme) dit le
+chiffre et la portée de la tuile « Eau visée cette semaine »
+d'« Aujourd'hui ». Contre-épreuve.
+
 ## 6. Ce qui ne change pas
 
 - Aucun calcul, aucune règle d'agronomie, aucune donnée, aucune migration ; la
   seule correction de calcul possible est celle de la section 5, deuxième
-  issue, dite au porteur.
+  issue, dite au porteur, et le seul calcul changé est celui que le porteur
+  a décidé pour l'Historique (D-329, section 5 bis, PR 3 bis).
 - Aucune fonction retirée, aucune page déplacée, aucune adresse changée ; les
   cases des fonctionnalités à la carte restent.
 - Les contrats validés des pages (« Aujourd'hui », planning, besoins,
   historique, 3.8) ne changent pas : S2, S3, S4 et S6 les modifieront, chacun
-  par son contrat.
+  par son contrat. L'Historique ne change que par D-329 : son objectif et son
+  écart (section 5 bis).
 - La charte graphique, les cibles de 44 px, les contrastes mesurés.
 - L'honnêteté du calcul : une donnée manquante reste dite, prévu, estimé et
   observé restent distingués par le mot.
@@ -243,6 +337,8 @@ la cause dans le code, avant toute modification, et la consigne ici
   ci-dessous.
 - Occurrences relevées des mots du tableau et ce qu'elles deviennent (PR 2).
 - Cause établie du point ouvert S1-O1 et issue choisie (PR 3).
+- Précisions tranchées en codant l'Historique comme « Aujourd'hui » (PR 3 bis,
+  D-329).
 
 ### 9.1 PR 1 — Inventaire des paragraphes de tête (25 novembre 2026)
 
@@ -306,6 +402,145 @@ parcours) : c'est un geste utile, compté comme tel.
   se calcule côté serveur, à l'ouverture de la page ; une date illisible
   compte comme ancienne (D-003).
 
+### 9.4 PR 2 — Les mots relevés et ce qu'ils deviennent (25 novembre 2026)
+
+Le module des mots : `lib/domain/simple-words.ts` (`SIMPLE_WORDS`, règle 1),
+avec la liste des mots du calcul que cherche le test de garde
+(`TECHNICAL_WORDS`, règle 5). Relevé dans `app/` et `lib/domain/`, lignes
+hors commentaire, avant la PR (branche de la PR 1) puis après.
+
+| Mot du calcul | Avant | Devenu | Où il reste, et pourquoi |
+| --- | --- | --- | --- |
+| Objectif(s) hydrique(s), objectif hebdomadaire | 6 lignes | « Eau visée cette semaine » : titres d'« Objectifs et besoins », tuile d'« Aujourd'hui », message d'enregistrement, « 7 planches : aucune eau visée cette semaine », « Aucune eau visée n'est enregistrée sur cette période » (historique) | la bulle de la colonne, dans le détail d'une planche ; le journal des modifications ; l'en-tête de l'export CSV (F828) |
+| Reste à apporter | 1 | « Il manque encore » (tuile d'« Aujourd'hui ») | nulle part |
+| Besoins d'irrigation | 1 | « Ce qu'il reste à arroser » (titre de la section) | le nom du menu « Objectifs et besoins » ne change pas (F834) |
+| Faisabilité et répartition | 1 | « Y a-t-il assez d'eau ? » (titre de la section) | nulle part |
+| Volume mobilisable, disponibilité physique | 3 | « Eau utilisable » (surtitre de « Ressources et pompes », phrase des pompes) | nulle part |
+| Réserve utile, RFU | 2 phrases de premier niveau | « Ce que le sol de la parcelle retient (sa RFU) n'est pas saisi » : jauge, « Aujourd'hui », données manquantes | « réserve utile (RFU) » dans le « ? » de « Réserve du sol » |
+| ET0 | tuiles « Évaporation de la semaine (ET0) », « ET0 » | « Soif de la semaine », « Soif de la période » ; la ligne de résumé au téléphone dit « soif de la semaine » (F833) | « ET0, l'évaporation de référence » dans le détail de la tuile ; la colonne du tableau des jours et la mesure du suivi par série, qui sont du détail |
+| Culture(s) de référence, correspondance des espèces | 10 | « À quelle culture ressemble chaque espèce ? » (titre), « … cette espèce ? » (le choix de chaque espèce, F832), « Espèces qui ne ressemblent encore à aucune culture », « Cultures inutilisables », « Les autres cultures (32) », les phrases de « Besoin par culture » et de « Réglages » | le journal des modifications (nom du réglage tel qu'enregistré) ; deux erreurs techniques d'identifiant inconnu, jamais attendues d'un geste |
+| Coefficients culturaux, profils racinaires | titre du repli | « Réglages fins des cultures (pour les experts) » ; résumé de l'écran de bienvenue | nulle part au premier niveau |
+| Apport horaire | 1 libellé de la fiche d'une planche, 1 phrase du cumul maximal (« Matériel et placement ») | « Ce que ce matériel apporte en une heure » ; « Ce que les matériels apportent en une heure, additionnés, sur la planche qui en reçoit le plus » | la bulle « d'où vient ce chiffre » (détail) |
+| Créneaux protégés | 3 | « Heures où l'on n'arrose pas » (titre, liste, résumé du plan, visite guidée) | nulle part |
+| Reliquat, reliquats | 14 | statut « Ce qui reste d'un arrosage arrêté » ; « à reprendre » dans la phrase et les pastilles d'« Aujourd'hui » ; boutons « Reprendre ce qui reste », « Annuler ce qui reste » ; historique « la suite annulée » (F836) | « Reliquat non vérifiable » : le solde d'un bilan d'eau, dans le détail de la faisabilité, pas le reste d'un arrosage |
+| Par périmètre | 1 | « Par lieu » (onglet de l'historique) | nulle part |
+| totaux partiels | 1 | « totaux incomplets » | nulle part |
+| réanalyse, historisé | 5 au premier niveau | « pluie estimée par la météo », « estimée », « l'estimation météo », « Non enregistré » (F835) | les causes d'écart, les bulles, les replis de diagnostic et la page d'état de l'exploitant, qui sont du détail |
+| journées-planche | 1 | inchangé ici : la phrase de l'objectif de l'historique est réécrite par la PR 3 bis (D-329, section 9.7) | — |
+
+Deux gardes. Le test de garde (`tests/simplification-s1-mots.test.ts`) lit
+le code : il échoue si l'un de ces mots, écrit comme un titre, reparaît hors
+des neuf endroits permis, écrits dans le test avec
+leur raison, et si une permission ne sert plus. Les titres et étiquettes du
+tableau prennent leur mot dans le module, sans le recopier (seize usages
+vérifiés). Le parcours P61 lit l'écran : sur les douze pages, replis et
+« ? » fermés, aucun de ces mots ne se lit, en majuscule ou non ; c'est lui
+qui a trouvé les phrases de « Besoin par culture », de « Réglages », de
+l'historique et l'avertissement des besoins. Dans une phrase d'un repli
+(justification d'un créneau du plan, fiabilité d'« Aujourd'hui », journal),
+le mot du calcul reste : c'est le détail. L'écran de bienvenue et la visite
+guidée sont lus avec les mêmes mots (règle 6).
+
+### 9.5 PR 2 — Précisions tranchées en codant
+
+- F832 : le titre de la liste des espèces dit « À quelle culture ressemble
+  chaque espèce ? » ; le choix d'une espèce garde la question du tableau,
+  « … cette espèce ? ». Le même mot, au nombre du sens.
+- F833 : l'ET0 se dit « soif du jour », « de la semaine » ou « de la
+  période » selon ce que la tuile compte ; « ET0, l'évaporation de
+  référence » reste dans son détail. Le tableau des jours et le suivi par
+  série, déjà du détail, gardent « ET0 ».
+- F834 : le tableau ne nomme aucun nom de page : les noms du menu ne
+  changent pas (« Objectifs et besoins », « Ressources et pompes »…) ; leur
+  rangement est S3.
+- F835 : « réanalyse » et « historisé » sont dits en mots simples là où ils
+  paraissaient au premier niveau (le message après le retrait d'une mesure
+  de pluie, la phrase du panneau de pluie, la colonne de pluie du tableau des
+  jours, la conséquence « pluviomètre absent », l'objectif initial d'un
+  arrosage) ; ils restent dans les causes d'écart et les replis de
+  diagnostic.
+- F836 : un arrosage arrêté en cours de route a « ce qui reste » ; les
+  boutons disent « Reprendre ce qui reste » et « Annuler ce qui reste », la
+  phrase d'« Aujourd'hui » « Un arrosage arrêté est à reprendre » et la
+  pastille « 1 à reprendre ».
+- F837 : « RFU » s'explique toujours à sa première occurrence d'une page
+  (F312), désormais par le mot du tableau : « Ce que le sol de la parcelle
+  retient (sa RFU) » ; « réserve utile (RFU) » reste dans le « ? » de
+  « Réserve du sol ».
+
+### 9.6 PR 3 — Cause du point S1-O1 et issue choisie (25 novembre 2026)
+
+**Cause, établie dans le code** (lecture seule ; pas relue sur la ferme
+réelle, qui demande l'accord du porteur) :
+
+| Page | Objectif de la ferme | Irrigation |
+| --- | --- | --- |
+| « Aujourd'hui » (`lib/domain/today/week.ts`) | moyenne pondérée par la surface des objectifs **applicables** de chaque planche (`objectiveForBed` : le plus précis des objectifs saisis, sinon l'objectif automatique), sur les planches qui en ont un | moyenne pondérée de l'eau reçue par chaque planche, sur les mêmes planches |
+| « Objectifs et besoins », ligne de résumé et tuile « Objectif ferme » | l'objectif « Toute la ferme » **saisi** (`goals.find(scopeType === 'farm')`), un réglage que l'objectif d'un jardin ou d'une planche remplace là où il est posé | le volume sorti des pompes dans la semaine, réparti sur toute la surface des planches de la saison |
+| « Historique et cumuls » | la somme, sur les journées-planche, des objectifs applicables pondérés par la surface, **les planches sans objectif comptées à zéro** (D-036) | l'eau réelle de la période |
+
+Les trois pondèrent par la surface : **ce n'est pas la deuxième issue** (une
+moyenne sans pondération). Les 2,7 mm de la ferme réelle sont
+vraisemblablement l'objectif « Toute la ferme » saisi, et ses 5,2 mm la
+moyenne avec des objectifs plus hauts posés sur des jardins ; le test rejoue
+ce cas. **Première issue** : un autre périmètre, on aligne. L'irrigation
+(2,8 mm contre 2,1 mm) compte deux choses différentes, chacune dite dans son
+détail (« répartis sur la surface totale des planches ») : elle ne change
+pas.
+
+**L'Historique** (23,4 mm contre 16,5 mm sur la démonstration) tient à une
+décision écrite du porteur, D-036 : la question lui a été posée ; il a
+choisi le 25 novembre 2026 à 13 h 35 de compter comme « Aujourd'hui »
+(D-329). Règle de calcul sensible : PR 3 bis, à part, en Opus 5.5 · Max.
+
+**Ce que fait la PR 3.** `lib/domain/farm-objective.ts` : `farmObjective`
+(la moyenne pondérée sur les planches qui ont un objectif, leur nombre et
+le total), `farmObjectiveScopeText` (« ferme entière », « 7 planches sur 10
+ont un objectif ») et `farmObjectiveText`, la phrase (« 5,2 mm visés, ferme
+entière », « aucune eau visée »). « Aujourd'hui » l'appelle pour la ferme et
+chaque jardin ; les besoins de la semaine la calculent
+(`IrrigationNeedsDashboard.farmObjective`), et la ligne de résumé et la
+tuile « Eau visée cette semaine » d'« Objectifs et besoins » la reprennent,
+pour la semaine affichée seulement (« eau visée en cours de lecture » le
+temps que les besoins d'une autre semaine soient relus). Le pli « Eau visée
+cette semaine » garde « Toute la ferme : 2,7 mm », qui dit l'objectif saisi
+à ce niveau. Le planning ne dit pas d'objectif de ferme : rien à aligner.
+
+### 9.7 PR 3 bis — Précisions tranchées en codant (25 novembre 2026)
+
+- **Où vit la règle.** `aggregateHydricObjective` garde son parcours jour
+  par jour (règle 1) et somme l'objectif de chaque planche ; `farmObjective`
+  en fait la moyenne (règle 2). Les planches qui ont un objectif servent à
+  l'écart dans `buildIrrigationHistorySummary` (règle 3). La vue « Par
+  série » appelle la même fonction sur ses planches, pondérées par leur
+  surface occupée. Les phrases de la page (règle 5) :
+  `lib/domain/irrigation-history/objective-scope.ts`.
+- **Une planche arrosée hors du plan de la saison** n'a pas d'objectif :
+  son eau compte dans les cumuls du périmètre, comme avant, et pas dans
+  l'écart quand une partie seulement des planches a un objectif. Quand
+  toutes en ont un, l'écart garde l'eau d'avant, cette planche comprise
+  (« au millimètre près », règle 3).
+- **Les journées-planche** se comptent sur les planches qui ont un
+  objectif : « objectif posé sur 8/14 journées-planche » pour deux planches
+  couvertes quatre jours sur sept. La donnée d'avant (toutes les planches du
+  périmètre) reste dans le résumé ; la page ne la dit plus.
+- **Une planche de surface nulle** qui a un objectif compte parmi les
+  planches qui en ont un, sans poids ; quand aucune des planches de
+  l'objectif n'a de surface, il n'y a pas de moyenne (D-003), comme sur
+  « Aujourd'hui ».
+- **La pluie qui manque.** L'Historique dit l'écart indisponible quand la
+  pluie réelle manque un jour sur une planche de plein champ qui a un
+  objectif (règle 3) ; « Aujourd'hui » compte la pluie connue et dit le
+  manque dans « Fiabilité du calcul ». Deux façons de dire un même manque,
+  déjà là avant D-329 : rien ne change ici.
+- **La démonstration**, à la semaine de chaque moment : la Ferme des Trois
+  Noues dit 10,6 mm (5 planches sur 10 ont un objectif) au gel de
+  printemps, 23,4 mm (7 sur 10) au début de l'été, 26,7 mm (5 sur 10) en
+  pénurie et 11,3 mm (2 sur 10) à l'automne, au lieu de 5,2, 16,5, 13,1 et
+  2,6 mm, et chaque fois le chiffre d'« Aujourd'hui » ; les trois autres
+  fermes n'ont pas d'objectif ces semaines-là. L'écart y reste indisponible :
+  la démonstration ne mesure pas la pluie.
+
 ## 10. Réglage du code
 
 Opus 5.5 · Élevé pour les trois PR : fonctionnalité délimitée sous contrat
@@ -314,4 +549,6 @@ roadmap, quatrième cas, comme O4, H3 et les lots G à K). Si la cause du
 point S1-O1 est un défaut de calcul de l'objectif, la correction relève du
 premier cas de la grille (règle de calcul sensible, erreur silencieuse) :
 elle se fait en Opus 5.5 · Max, dans une PR à part, sans autre question au
-porteur, qui en est informé.
+porteur, qui en est informé. Le changement de l'Historique décidé par le
+porteur (D-329, section 5 bis) relève du même cas : PR 3 bis, à part, en
+Opus 5.5 · Max.
