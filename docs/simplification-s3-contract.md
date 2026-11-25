@@ -466,6 +466,46 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
   météo) et cinq sur deux ; à 1 440 px, les sept sur une. La ligne
   d'« Alertes cultures » est corrigée contre le « ? » de sa page (F871).
 
+**Rempli par la PR 2 (25 novembre 2026).**
+
+- **Numéros.** Précisions **F876 à F884** (D-331) ; le parcours reste
+  **P63**, étendu.
+- **Mesures à 390 px**, ferme de démonstration des parcours, bandeau du
+  choix des fonctionnalités fermé, avant (PR 1, `eccad49`) → après :
+  - barre du bas : 65 px de haut, inchangée ; avant, cinq places
+    (Aujourd'hui, Arrosages, Planning, Ressources, Plus), le rond
+    d'« Aujourd'hui » de 42 px dépassant de 10 px ; après, quatre places
+    (Aujourd'hui, Semaine, « + », Ma ferme) de 96 × 56 px (78 × 56 à
+    320 px), le rond du « + » de 52 px dépassant de 10 px ;
+  - premier bloc utile (le sélecteur de P61) : Aujourd'hui 108 → 108,
+    Arrosages 287 → 287, Planning 203 → 261, Objectifs et besoins
+    391 → 449, Historique 203 → 261, Réserve du sol 270 → 270, Besoin par
+    culture 169 → 207, Matériel 168 → 168, Ressources 252 → 252, Alertes
+    météo 122 → 122, Alertes cultures 315 → 353, Réglages 199 → 199, Ma
+    ferme 112 → 112 px. La bande descend les trois pages de la semaine de
+    58 px (44 px et sa marge) ; le retour, sans hauteur à lui, passe la
+    saison sous le titre quand le titre, le « ? » et la saison ne tiennent
+    plus sur une ligne (Besoin par culture, Alertes cultures : 38 px ;
+    Matériel y passait déjà). **Borne de P61 redite** : « Objectifs et
+    besoins » 460 px (449 mesurés) ; les autres restent sous 400 px ;
+  - touches pour ouvrir chaque page, au pire depuis n'importe quelle autre
+    (une depuis une page du même endroit qui porte le lien), avant → après :
+    Aujourd'hui 1 → 1, Arrosages 1 → 2 (1 depuis « Aujourd'hui »), Planning
+    1 → 1, Ressources 1 → 2, Objectifs et besoins 2 → 2, Historique 2 → 2,
+    Réserve du sol, Besoin par culture, Matériel, Alertes météo, Alertes
+    cultures 2 → 2, Réglages 2 → 2, Ma ferme 2 → 1. P63 le rejoue par une
+    tournée de toutes les pages, et `tests/simplification-s3-barre.test.ts`
+    pour les 235 choix de cases.
+- **Relevé suivi par la PR 2** : `audit-ergonomie-lot2-telephone` (F6,
+  F12), `audit-ergonomie-final-lot-a` (F287), `aujourdhui-liens`,
+  `simplification-s2-pluie`, `change-journal-refresh` (la lecture des
+  pluies rangée hors du journal) ; `e2e/support/parcours.ts`
+  (`ouvrirLeMenuDesPages`, `nomsDesPagesDuMenu`, `allerALaPage`), P0, P27,
+  P28, P30, P41, P59, P61 et P63 ; les contrats F6, F12, F287 et T1 (la
+  barre). Restent à la PR 3 le menu de l'ordinateur, à la PR 4 la visite
+  guidée, `demo-tours`, les phrases qui disent « menu » ou « Plus », et le
+  « ? » d'« Aujourd'hui ».
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième cas
