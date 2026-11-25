@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S2, PR 2 sur 5 : terminer et reprendre
+  depuis la carte, codée le 25 novembre 2026** (D-330, F844 à F849 ; contrat
+  `docs/simplification-s2-contract.md`, sections 3 et 6), en Opus 5.5 · Élevé,
+  sur la branche de la PR 1. Ce qui coule ou attend d'être repris a sa carte à
+  un bouton : « Terminer » (la fenêtre de fin d'« Arrosages », ouverte sur la
+  page, l'heure réelle à confirmer), « Mettre en pause » rangé, « Reprendre »
+  une pause, « Reprendre ce qui reste » ; le compte à rebours se lit sur le
+  minuteur, dans le navigateur. Les écritures sont celles d'« Arrosages » ; la
+  fenêtre de fin reçoit le nom du matériel au lieu de la fiche, sans
+  changement sur « Arrosages ». Tests du domaine, des vrais services à deux
+  fermes, P62 étendu (le matin de bout en bout sur la page), P38 suit.
+  Contrôles : voir la PR.
 - **Simplifier l'usage du module, S2, PR 1 sur 5 : valider et démarrer depuis
   la carte, codée le 25 novembre 2026** (D-330, F838 à F843 ; contrat
   `docs/simplification-s2-contract.md`, sections 3 et 5 ; roadmap section 6

@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S2, PR 2 : terminer et reprendre depuis la carte)
+
+- **« Aujourd'hui » termine, met en pause et reprend un arrosage sans changer
+  de page** (D-330, F844 à F849) : une irrigation en cours porte « Terminer »,
+  avec son compte à rebours (« Reste 52 min ») et « Mettre en pause » dans
+  « Autres choix » ; en pause, « Reprendre », « Terminer » dessous ; à durée
+  atteinte, « Fermez la vanne, puis appuyez sur « Terminer ». ». « Terminer »
+  ouvre la même fenêtre que sur « Arrosages », l'heure réelle à confirmer ;
+  arrêtée en route, l'irrigation devient ce qui reste, avec « Reprendre ce qui
+  reste ». Ce sont les gestes d'« Arrosages », sans règle nouvelle.
+
 ### Modifié (simplifier l'usage du module, S2, PR 1 : valider et démarrer depuis la carte)
 
 - **« Aujourd'hui » valide et démarre un arrosage sans changer de page**
