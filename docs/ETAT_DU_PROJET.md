@@ -39,7 +39,10 @@ registres, elle y renvoie.
   la PR 3 du lot (#224), fusionnée à 20 h 51, déployée à 21 h 29, run
   45689347330 vérifié job par job (les cinq jobs verts) ; la PR 4 du lot
   (#226), fusionnée à 21 h 36, déployée à 22 h 13, run 45696515280 vérifié
-  job par job (les cinq jobs verts).
+  job par job (les cinq jobs verts) ; **cette PR 5, la dernière (#229),
+  fusionnée à 22 h 47, déployée à 23 h 15, run 45707546339 vérifié job par
+  job (les cinq jobs verts), consignée par la PR 1 de S3 : S2 est en ligne
+  en entier.**
 - **Simplifier l'usage du module, S2, PR 4 sur 5 : noter la pluie d'un
   geste, codée le 25 novembre 2026** (D-330, F854 à F859 ; contrat, section
   7), en Opus 5.5 · Élevé, sur la branche de la PR 3. La fenêtre « Noter la
