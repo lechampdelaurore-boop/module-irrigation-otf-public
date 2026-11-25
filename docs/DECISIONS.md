@@ -10078,7 +10078,8 @@ les positions avant et après sont dans la section 9 du contrat.
 **Précisions tranchées en codant** (contrat, section 9.3).
 
 - F829 : les données de démonstration ne viennent d'aucune lecture d'Ouvre
-  ta ferme : la ligne de lecture ne s'y montre jamais.
+  ta ferme : la ligne de lecture ne s'y montre jamais ; le menu du compte
+  dit « Données de démonstration » avant la date.
 - F830 : une phrase fixe qui met en garde (la prévision prise à 2 m, les
   seuils de gel qui ne sont que des repères) reste en place ; seule
   l'explication de ce que montre la page passe dans le « ? ».

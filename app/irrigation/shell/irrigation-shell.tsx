@@ -111,7 +111,7 @@ export function IrrigationShell({
         demoSelection={demoSelection}
         tour={demo ? { current: page, reachable: menu, query: { season, zone } } : null}
         notificationsHref={usesPushNotifications(menu.filter(isPageFeatureId)) ? pageHref('reglages', { season, zone }, 'notifications-title') : null}
-        refresh={{ href: refreshHref, lastReadText: `Dernière lecture réussie le ${updatedAt}` }}
+        refresh={{ href: refreshHref, lastReadText: `${source === 'mock' ? `${sourceLabel(source)} · ` : ''}Dernière lecture réussie le ${updatedAt}` }}
       />
 
       <div className="feature-layout">
