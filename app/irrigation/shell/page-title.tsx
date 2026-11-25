@@ -10,7 +10,13 @@ import type { PageHelp } from '@/lib/domain/features/help';
  * « Fermer » ou par la touche Échap. Au téléphone, le choix de la saison se
  * pose à côté du « ? » (audit ergonomique, point 2, précision F7).
  */
-export function PageTitle({ title, help, aside = null }: { title: string; help: PageHelp; aside?: ReactNode }) {
+export function PageTitle({ title, help, back = null, aside = null }: {
+  title: string;
+  help: PageHelp;
+  /** Le retour « ‹ Ma ferme » au début de la ligne, au téléphone (simplification S3, section 5.1). */
+  back?: ReactNode;
+  aside?: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const toggle = useRef<HTMLButtonElement>(null);
@@ -29,6 +35,7 @@ export function PageTitle({ title, help, aside = null }: { title: string; help: 
   return (
     <div className="page-heading">
       <div className="page-title-row">
+        {back}
         <h1 id="page-title">{title}</h1>
         <button
           ref={toggle}

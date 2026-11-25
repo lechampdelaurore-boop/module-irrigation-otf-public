@@ -265,6 +265,16 @@ test('L3, règle 4 : « Rien à arroser aujourd’hui » mène au planning, sino
   assert.equal(todayView(todayInputs(['besoins'])).dayEmptyLink, null, 'sans « Votre journée », aucun lien');
 });
 
+test('S3, section 3.4 : « Tous les arrosages » en pied de « Votre journée », avec « Arrosages » cochée', () => {
+  assert.equal(todayView(todayInputs(ALL)).allIrrigationsLink, true);
+  assert.equal(todayView(todayInputs(['arrosages'])).allIrrigationsLink, true);
+  assert.equal(todayView(todayInputs(['planning'])).allIrrigationsLink, false, 'le planning seul : pas de page « Arrosages »');
+  const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
+  assert.match(day, /\{allIrrigationsLink \? \(\s*<p className="today-all-irrigations">\s*(?:\{\/\*[^}]*\*\/\}\s*)?<Link href=\{pageHref\('arrosages', query\)\} prefetch=\{false\} onClick=\{markMenuNavigation\}>Tous les arrosages/);
+  assert.match(readFileSync('app/irrigation/today/today-page.tsx', 'utf8'), /allIrrigationsLink=\{view\.allIrrigationsLink\}/);
+  assert.match(readFileSync('app/irrigation/styles/trois-endroits.css', 'utf8'), /\.today-all-irrigations a \{[^}]*min-height: var\(--touch-target\);/);
+});
+
 test('L3, règle 5, réécrite par le lot S2 : le lien d’une proposition devient « Changer l’heure ou la dose », vers la même carte ; rien n’est validé par un lien', () => {
   const proposal = {
     storedId: 'p20', status: 'proposed', startAt: '2026-11-12T17:00:00.000Z', endAt: '2026-11-12T18:00:00.000Z', durationSeconds: 3600, doseMm: 8,

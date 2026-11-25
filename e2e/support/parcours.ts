@@ -85,20 +85,120 @@ export async function ouvrirParClic(bouton: Locator, attendu: Locator): Promise<
 }
 
 /**
- * Le menu entier des pages. Au téléphone (audit ergonomique, point 2, 3.8
- * quater lot 2), la barre du bas n'a que quatre entrées : « Plus » ouvre le
- * menu entier en feuille. Un menu de cinq pages ou moins tient tout entier
- * dans la barre, sans « Plus » : c'est elle qu'on lit. À l'ordinateur, le
- * menu de gauche, tel quel.
+ * Où se lisent les pages. À l'ordinateur, le menu de gauche, tel quel. Au
+ * téléphone et à la tablette, jusqu'à 980 px (simplification, lot S3, PR 2,
+ * D-331), la barre du bas n'a plus que les trois endroits et le « + » : c'est
+ * elle qu'on lit ; les pages se trouvent par leur endroit (`allerALaPage`,
+ * `nomsDesPagesDuMenu`).
  */
 export async function ouvrirLeMenuDesPages(page: Page): Promise<Locator> {
   const barre = page.getByRole('navigation', { name: 'Pages principales' });
-  if (!(await barre.isVisible())) return page.getByRole('navigation', { name: 'Pages du module' });
-  const plus = barre.getByRole('button', { name: /^Plus de pages/ });
-  if ((await plus.count()) === 0) return barre;
-  const menu = page.getByRole('navigation', { name: 'Pages du module' });
-  if (!(await menu.isVisible())) await ouvrirParClic(plus, menu);
-  return menu;
+  if (await barre.isVisible()) return barre;
+  return page.getByRole('navigation', { name: 'Pages du module' });
+}
+
+/**
+ * L'endroit de chaque page, tel que le contrat le range (simplification,
+ * lot S3, section 3.1) : le parcours le redit, comme le maraîcher le lit
+ * dans la barre. Pas d'import du domaine ici : ce fichier est lu aussi par
+ * des tests sans chargeur (`tests/parcours-heure.test.ts`), et P63 vérifie
+ * sur chaque page que la barre marque bien cet endroit.
+ */
+const ENDROIT_DES_PAGES: Record<PageDuModule, 'aujourdhui' | 'semaine' | 'ma-ferme'> = {
+  aujourdhui: 'aujourdhui',
+  arrosages: 'aujourdhui',
+  planning: 'semaine',
+  besoins: 'semaine',
+  historique: 'semaine',
+  sol: 'ma-ferme',
+  cultures: 'ma-ferme',
+  materiel: 'ma-ferme',
+  ressources: 'ma-ferme',
+  'alertes-meteo': 'ma-ferme',
+  'alertes-cultures': 'ma-ferme',
+  'ma-ferme': 'ma-ferme',
+  reglages: 'ma-ferme',
+};
+
+/** La page d'une adresse du module : `/irrigation/planning?season=2026` → `planning`. */
+function pageDeLAdresse(adresse: string): PageDuModule {
+  const id = new URL(adresse, 'http://module').pathname.replace(/^\/irrigation\//, '');
+  if (!(id in TITRES_DES_PAGES)) throw new Error(`« ${adresse} » n’est pas une page du module`);
+  return id as PageDuModule;
+}
+
+/** Une page de la bande « La semaine », une fiche de « Ma ferme » ou « Tous les arrosages », sur la page ouverte. */
+function lienDeLEndroit(page: Page, cible: PageDuModule): Locator {
+  if (cible === 'arrosages') return page.locator('.today-all-irrigations').getByRole('link', { name: 'Tous les arrosages' });
+  if (ENDROIT_DES_PAGES[cible] === 'semaine') return page.getByRole('navigation', { name: 'La semaine' }).getByRole('link', { name: TITRES_DES_PAGES[cible], exact: true });
+  return page.getByRole('navigation', { name: 'Les fiches de Ma ferme' }).getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[cible]} `) });
+}
+
+/**
+ * Suit le chemin d'une page comme le maraîcher. À l'ordinateur, son lien du
+ * menu de gauche. Au téléphone (S3, section 3), son endroit dans la barre du
+ * bas puis, quand la page n'est pas celle où l'endroit mène, son onglet de la
+ * bande « La semaine », sa fiche de « Ma ferme » ou « Tous les arrosages » :
+ * deux touches au plus, une seule depuis une page du même endroit qui porte
+ * déjà le lien. Rend le nombre de touches.
+ */
+export async function allerALaPage(page: Page, cible: PageDuModule): Promise<number> {
+  const barre = page.getByRole('navigation', { name: 'Pages principales' });
+  if (!(await barre.isVisible())) {
+    // « Aujourd'hui » peut porter le nombre de sa pastille dans son nom.
+    await page.getByRole('navigation', { name: 'Pages du module' }).getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[cible]}(,|$)`) }).click();
+    await attendreLaPagePrete(page, cible);
+    return 1;
+  }
+  const lienDirect = lienDeLEndroit(page, cible);
+  if (cible !== 'aujourdhui' && cible !== 'ma-ferme' && await lienDirect.isVisible()) {
+    await lienDirect.click();
+    await attendreLaPagePrete(page, cible);
+    return 1;
+  }
+  let touches = 0;
+  const endroit = barre.locator(`li[data-place="${ENDROIT_DES_PAGES[cible]}"]`).getByRole('link');
+  const entree = pageDeLAdresse((await endroit.getAttribute('href')) ?? '');
+  if ((await endroit.getAttribute('aria-current')) !== 'page') {
+    await endroit.click();
+    await attendreLaPagePrete(page, entree);
+    touches += 1;
+  }
+  if (entree === cible) return touches;
+  await lienDeLEndroit(page, cible).click();
+  await attendreLaPagePrete(page, cible);
+  return touches + 1;
+}
+
+/**
+ * Les pages qu'on trouve au téléphone par les trois endroits : chaque entrée
+ * de la barre du bas, puis, sur la page où elle mène, « Tous les arrosages »,
+ * la bande « La semaine » ou les fiches de « Ma ferme ». Le relevé se fait dans
+ * un autre onglet de la même session, à la même largeur : le parcours
+ * retrouve sa page telle qu'il l'a laissée.
+ */
+async function pagesParLesEndroits(page: Page): Promise<Set<PageDuModule>> {
+  const adresses = await page.getByRole('navigation', { name: 'Pages principales' }).locator('li[data-place] a')
+    .evaluateAll((liens) => liens.map((lien) => lien.getAttribute('href') ?? ''));
+  const trouvees = new Set<PageDuModule>();
+  const onglet = await page.context().newPage();
+  try {
+    for (const adresse of adresses) {
+      const entree = pageDeLAdresse(adresse);
+      trouvees.add(entree);
+      await onglet.goto(adresse);
+      await attendreLaPagePrete(onglet, entree);
+      const chemins = entree === 'aujourdhui'
+        ? onglet.locator('.today-all-irrigations a')
+        : entree === 'ma-ferme'
+          ? onglet.getByRole('navigation', { name: 'Les fiches de Ma ferme' }).getByRole('link')
+          : onglet.getByRole('navigation', { name: 'La semaine' }).getByRole('link');
+      for (const cible of await chemins.evaluateAll((liens) => liens.map((lien) => lien.getAttribute('href') ?? ''))) trouvees.add(pageDeLAdresse(cible));
+    }
+  } finally {
+    await onglet.close();
+  }
+  return trouvees;
 }
 
 /** La pastille de « Aujourd'hui » s'ajoute à son nom accessible (F12, F287) : « Aujourd’hui, 3 choses à regarder ». */
@@ -114,17 +214,19 @@ export const TEXTES_DES_LIENS_DU_MENU: (string | RegExp)[] = Object.values(TITRE
   // L'encart de « Aujourd'hui » dit aussi « Tableau de bord », et sa pastille quand elle a un nombre.
   .map((titre) => (titre === TITRES_DES_PAGES.aujourdhui ? /^Aujourd’hui\s*Tableau de bord\s*\d*$/ : titre));
 
-/** Les noms des pages du menu, dans l'ordre : le nom accessible, qui reste entier dans la barre du bas, sans la pastille. */
+/**
+ * Les noms des pages du menu, dans l'ordre : le nom accessible, sans la
+ * pastille. Au téléphone, les pages trouvées par les trois endroits, dans
+ * l'ordre du menu de l'ordinateur (S3, PR 2).
+ */
 export async function nomsDesPagesDuMenu(page: Page): Promise<string[]> {
   const menu = await ouvrirLeMenuDesPages(page);
-  const noms = (await menu.getByRole('link').evaluateAll((liens) => liens.map((lien) => lien.getAttribute('aria-label') ?? (lien as HTMLElement).innerText.trim())))
-    .map((nom) => nom.replace(PASTILLE_DANS_LE_NOM, ''));
-  // La feuille ouverte se referme : le parcours retrouve la page telle qu'il l'a laissée.
-  if ((await menu.getAttribute('data-open')) === 'true') {
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
+  if ((await menu.getAttribute('aria-label')) === 'Pages principales') {
+    const trouvees = await pagesParLesEndroits(page);
+    return (Object.keys(TITRES_DES_PAGES) as PageDuModule[]).filter((id) => trouvees.has(id)).map((id) => TITRES_DES_PAGES[id]);
   }
-  return noms;
+  return (await menu.getByRole('link').evaluateAll((liens) => liens.map((lien) => lien.getAttribute('aria-label') ?? (lien as HTMLElement).innerText.trim())))
+    .map((nom) => nom.replace(PASTILLE_DANS_LE_NOM, ''));
 }
 
 /**

@@ -10517,8 +10517,8 @@ faisait 3 888 px sur la démonstration. Contre-épreuve : voir la PR.
 
 ## D-331 — Simplifier l'usage du module, lot S3 : trois endroits
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 4 codée** (le rangement et
-« Ma ferme ») ; contrat `docs/simplification-s3-contract.md`, roadmap
+Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 4 codées** (le rangement
+et « Ma ferme » ; la barre du bas, le « + » et le chemin de retour) ; contrat `docs/simplification-s3-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le réglage de
 la roadmap et du contrat (section 14), sur le mandat du porteur du
 25 novembre 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met
@@ -10592,3 +10592,86 @@ météo) a trois fiches, et « À faire : commune de la ferme » sur « Réglage
 P0, P22, P24, P27, P28, P30, P59 et P61 suivent le menu d'une page de plus.
 Contre-épreuve : quatorze altérations, chacune fait échouer un test (voir la
 PR).
+
+**Décision (PR 2).** Au téléphone et à la tablette, là où la barre du bas
+remplace le menu (jusqu'à 980 px), la barre porte les trois endroits et le
+« + », dans l'ordre Aujourd'hui, Semaine, « + », Ma ferme ; un endroit sans
+page cochée disparaît, le « + » n'existe que si l'un de ses gestes existe
+(`lib/domain/features/phone-bar.ts`). « Plus », sa feuille des pages, la
+règle « cinq pages ou moins » (F6) et le point vert de « Plus » (F287)
+n'existent plus. Chaque endroit ouvre sa première page cochée ; l'endroit de
+la page ouverte porte la marque de l'ancienne barre, `aria-current="page"`
+sur la page où il mène, `"true"` sur une autre page de l'endroit (S3-e) ; la
+pastille reste sur « Aujourd'hui » (F12). Le « + » est un bouton rond de
+52 px au centre, nom « Arroser ou noter », qui ouvre la feuille modale « Que
+voulez-vous faire ? » (`lib/domain/features/plus-sheet.ts`,
+`app/irrigation/shell/plus-sheet.tsx`) : « Arroser maintenant » et « Noter un
+arrosage déjà fait », « Arrosages » cochée, ouvrent « Arrosages » sur
+« Irriguer maintenant » ou « Déjà réalisée » ; « Noter la pluie », « Objectifs
+et besoins » cochée et la pluie comptant pour la ferme (la règle de S2,
+`farmRainMatters`, appelée), monte dans la feuille le formulaire de la
+fenêtre de S2, sans changer de page. Sous le titre des trois pages de
+« Semaine », la bande « La semaine » (une page cochée par lien, 44 px, la page
+ouverte marquée, saison, parcelle et jour gardés ; pas de bande sous deux
+pages) ; au début de la ligne du titre des pages de « Ma ferme », hors
+« Ma ferme », le retour « ‹ » de 44 px, « Retour à Ma ferme ». « Tous les
+arrosages » ferme « Votre journée » quand « Arrosages » est cochée : c'est le
+chemin d'« Arrosages » depuis « Aujourd'hui » (section 3.4). Le menu de
+l'ordinateur ne change pas avant la PR 3. Aucune adresse ne change ; aucune
+page ni fonction n'est retirée ; aucun calcul, aucune donnée, aucune
+migration ; aucune règle de pluie ne change.
+
+**Précisions tranchées en codant (PR 2).**
+
+- F876 : la bande et le retour existent là où la barre du bas remplace le
+  menu, jusqu'à 980 px, tablette comprise (« au téléphone » du contrat) ; à
+  l'ordinateur, le menu de gauche montre déjà toutes les pages.
+- F877 : la demande d'« Arrosages » s'appelle `arroser` (`?arroser=maintenant`,
+  `?arroser=fait`), lue une fois puis retirée de l'adresse comme
+  `?planifier=1` ; elle ouvre le formulaire voulu et l'amène dans l'écran ;
+  une valeur inconnue n'ouvre rien. Les deux gestes sont des liens : ils
+  rechargent « Arrosages », qui lit ses données à l'ouverture.
+- F878 : « Noter la pluie » du « + » lit les pluies déjà notées des sept
+  derniers jours à l'ouverture du geste (`readRainEntryAction`, une lecture,
+  hors du journal), jamais avec la page : aucune page ne lit rien de plus à
+  l'affichage pour le « + ».
+- F879 : une pluie enregistrée depuis la feuille, la fermeture de la feuille
+  recharge la page derrière, pour que le plan et les chiffres la montrent :
+  les pages gardent leurs blocs dans leur état, une relecture serveur ne les
+  relirait pas tous. Pendant l'enregistrement, la feuille ne se ferme pas.
+- F880 : « la pluie compte » se calcule sur la saison de la page, avec le
+  contexte de chaque page (`page-context.ts`), par la règle de S2 déplacée de
+  `today-service.ts` vers `lib/domain/today/rain-entry.ts` (`farmRainMatters`),
+  que « Aujourd'hui » appelle aussi ; la page introuvable, qui ne lit pas le
+  plan de la ferme, n'a pas « Noter la pluie ».
+- F881 : la feuille n'existe qu'ouverte, posée hors de la barre
+  (`document.body`) pour que les styles de la barre ne la touchent pas ; le
+  « + » porte `aria-haspopup="dialog"` et `aria-expanded`.
+- F882 : « Tous les arrosages » et la bande changent de page comme le menu,
+  sans recharger le module (D-322), et portent le clavier sur le contenu.
+- F883 : l'entrée « Semaine » garde le jour ouvert de la page courante, comme
+  la bande (section 3.3) ; les autres entrées gardent la saison et la
+  parcelle, comme le menu.
+- F884 : la marque d'un endroit est celle de la page ouverte de l'ancienne
+  barre (l'icône sur le vert), pour `page` comme pour `true` : le lecteur
+  d'écran et la marque disent la même chose (S3-e).
+
+**Preuve (PR 2).** `tests/simplification-s3-barre.test.ts` : l'ordre de la
+barre ; pour chacun des 235 choix de cases valides, la pluie comptant ou
+non, les endroits égaux à ceux de « Ma ferme », leurs entrées, le « + » avant
+« Ma ferme », quatre places au plus, chaque page à deux touches au plus ; le
+bilan des touches (Planning à une ; Arrosages et Ressources à deux) ; les
+états rares ; les gestes, leurs textes et la demande `arroser` ; S3-e ; la
+bande (zéro à trois pages) et le retour ; `farmRainMatters` appelée par
+« Aujourd'hui » et le contexte des pages ; la lecture des pluies ; le
+composant de la barre, la feuille, la bande, le retour, la charte (52, 72 et
+44 px ; la bande et le retour seulement sous 980 px). Les tests de F6, F12,
+F287, T1 et de la fenêtre de la pluie suivent. Parcours P63, aux deux
+largeurs : chacune des treize pages par son adresse marque son endroit, la
+bande et le retour où il faut, 44 px, rien de coupé ni de débordant à
+320 px, la page introuvable garde sa barre ; une tournée de toutes les pages
+à deux touches au plus, sans recharger ; au téléphone, la feuille du « + »
+(modale, 72 px, Échap et le voile, le clavier revenu), 8 mm de pluie notés
+sans quitter la page puis relus, et les deux formulaires d'« Arrosages ». P0,
+P27, P28, P30, P41 et P59 suivent la barre. Mesures et contre-épreuve : voir
+la PR et le contrat, section 13.

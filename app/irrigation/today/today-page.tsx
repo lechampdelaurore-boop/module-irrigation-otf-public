@@ -213,7 +213,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
         onReveal={reveal}
       />
       <Pair
-        wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={null} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onCardGesture={cardGesture} onFinish={finish} onAllDone={recordAllDone} /> : null}
+        wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={null} allDone={view.allDone} emptyLink={view.dayEmptyLink} allIrrigationsLink={view.allIrrigationsLink} query={dayQuery} pending={pending} replies={replies} onCardGesture={cardGesture} onFinish={finish} onAllDone={recordAllDone} /> : null}
         narrow={weatherAlertView}
         layout={late && todo ? dayRowLayout(late.lines.length + view.current.length, todo.lines.length) : 'wide'}
       />

@@ -5,6 +5,7 @@ import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import { isPageFeatureId } from '@/lib/domain/features/catalogue';
 import { pageHelp } from '@/lib/domain/features/help';
 import { FEATURE_SETTINGS_ANCHOR, pageHref, pageLabel, pagePath, type AbsentPageNotice, type IrrigationPageId } from '@/lib/domain/features/pages';
+import { backToFarm } from '@/lib/domain/features/phone-bar';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
 import type { UnfinishedStep } from '@/lib/domain/onboarding/steps';
@@ -14,6 +15,7 @@ import { FeatureBanner } from './feature-banner';
 import { FeatureMenu, takeMenuNavigation } from './feature-menu';
 import { UnfinishedBanner } from './unfinished-banner';
 import { PageTitle } from './page-title';
+import { BackToFarm, WeekBand } from './place-paths';
 import { Topbar } from './topbar';
 import { dateClockText } from '@/lib/domain/clock-text';
 
@@ -60,6 +62,10 @@ export type ShellProps = {
   demoSelection: DemoSelection | null;
   /** Les étapes de l'accueil à finir, dites sur chaque page (4.4, F582) ; vide pour une ferme réglée. */
   unfinished: readonly UnfinishedStep[];
+  /** Le jour de la semaine ouvert, gardé par la bande « La semaine » (simplification S3, section 3.3). */
+  week: string | null;
+  /** La pluie compte pour la ferme (`farmRainMatters`) : le « + » propose « Noter la pluie » (S3, section 4.1). */
+  rainMatters: boolean;
 };
 
 export function IrrigationShell({
@@ -74,7 +80,7 @@ export function IrrigationShell({
   /** La pastille de « Aujourd'hui » quand la page la connaît (F12) ; absente, le menu la lit après l'affichage. */
   todayBadge?: number | null;
 }) {
-  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, readLine, banner, notice, demo, demoSelection, unfinished } = props;
+  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, readLine, banner, notice, demo, demoSelection, unfinished, week, rainMatters } = props;
 
   const shell = useRef<HTMLElement>(null);
 
@@ -115,16 +121,18 @@ export function IrrigationShell({
       />
 
       <div className="feature-layout">
-        {/* Un menu neuf à chaque page, comme après un rechargement (D-322) : la feuille « Plus » refermée, la pastille relue. */}
-        <FeatureMenu key={page} menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} />
+        {/* Un menu neuf à chaque page, comme après un rechargement (D-322) : la feuille du « + » refermée, la pastille relue. */}
+        <FeatureMenu key={page} menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} rainMatters={rainMatters} week={week} />
 
         <div className="feature-page" id="contenu" tabIndex={-1}>
           <section className="intro" aria-labelledby="page-title">
             <PageTitle
               title={title}
               help={pageHelp(page)}
+              back={backToFarm(page) ? <BackToFarm query={{ season, zone }} /> : null}
               aside={showSeason ? <SeasonPicker page={page} season={season} seasonFirst={seasonFirst} seasonLast={seasonLast} compact /> : null}
             />
+            <WeekBand menu={menu} current={page} query={{ season, zone, week }} />
             {readLine ? (
               <div className="sync-card" data-source={source} role="status">
                 <span className="status-dot" aria-hidden="true" />

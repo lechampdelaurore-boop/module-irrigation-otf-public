@@ -9,6 +9,7 @@ import type { IrrigationSnapshot } from '../domain/domain';
 import type { FeatureSelection } from '../domain/features/selection';
 import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/today/reliability';
 import { guessedStages, lastMeasuredRainOn, missingByBedBeds, rainGaugeLookbackStart, unknownSoilBeds } from '../domain/today/missing-by-bed';
+import { farmRainMatters } from '../domain/today/rain-entry';
 import { todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
 import { pastRainOrigins, type TodayWeekInputs } from '../domain/today/week';
 import { dateKeyInTimeZone, FARM_TIME_ZONE, weekDateKeys, weekStartDateKey } from '../domain/water-management';
@@ -85,10 +86,8 @@ async function readTodayInputs(
     on('besoins') ? automaticObjectiveMissingEt0(ownerUserId, locationKey, today) : null,
   ]);
 
-  const seasonBeds = snapshot.beds.filter((bed) => bed.seasons.includes(season));
-  const shelteredPlots = new Set(snapshot.plots.filter((plot) => plot.mode === 'greenhouse').map((plot) => plot.id));
   // Sous abri, la pluie vaut zéro (D-032) : une ferme tout sous abri n'a pas de pluie réelle à compléter.
-  const rainMatters = seasonBeds.some((bed) => !shelteredPlots.has(bed.plotId));
+  const rainMatters = farmRainMatters(snapshot, season);
   const rainKnown = new Set(rainRows
     .filter((row) => (row.dataKind === 'manual_precipitation' || row.dataKind === 'reanalysis') && row.precipitationMm !== null)
     .map((row) => row.date));

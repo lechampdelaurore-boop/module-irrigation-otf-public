@@ -27,6 +27,7 @@ import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { FarmFrozenError } from '@/lib/services/farm-erasure-request';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
+import { farmRainMatters } from '@/lib/domain/today/rain-entry';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
 import { usesPlotShelters, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
@@ -179,6 +180,9 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
         speciesToLink,
         planningToValidate: enabled.includes('planning') && !planningAllowed(onboarding),
       }),
+      week,
+      // Le « + » propose « Noter la pluie » sauf à une ferme toute sous abri (simplification S3, section 4.1, D-032).
+      rainMatters: farmRainMatters(snapshot, season),
     },
     lap: (step) => stopwatch.lap(step),
     logLoaded: () => {

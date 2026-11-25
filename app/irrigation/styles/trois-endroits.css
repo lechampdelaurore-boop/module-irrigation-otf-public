@@ -1,0 +1,296 @@
+/*
+ * Les trois endroits (simplification, lot S3, PR 2,
+ * docs/simplification-s3-contract.md, sections 3.3, 3.4, 4, 4.1 et 5.1 ;
+ * D-331) : le « + » de la barre du bas et sa feuille « Que voulez-vous
+ * faire ? », la bande « La semaine », le retour « ‹ Ma ferme » et le lien
+ * « Tous les arrosages ». Couleurs de la charte ; cibles de 44 px, 72 px
+ * pour les gestes de la feuille.
+ */
+
+/* La bande et le retour n'existent que sous la barre du bas, jusqu'à 980 px : à l'ordinateur, le menu de gauche montre toutes les pages. */
+.week-band,
+.page-back {
+  display: none;
+}
+
+/* « Tous les arrosages », en pied de « Votre journée », sur une ligne de 44 px (section 3.4). */
+.today-all-irrigations {
+  margin: 0;
+}
+
+.today-all-irrigations a {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  gap: 4px;
+  color: var(--green);
+  font: 500 var(--text-14)/1.2 var(--font-ui);
+  text-decoration: none;
+}
+
+.today-all-irrigations .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* La feuille du « + » : elle monte du bas, modale ; le voile assombrit la page (section 4.1). */
+.plus-sheet {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100dvh - 24px);
+  margin: auto auto 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--card);
+  box-shadow: 0 -4px 20px rgb(0 0 0 / 12%);
+  color: var(--ink);
+  overscroll-behavior: contain;
+}
+
+.plus-sheet::backdrop {
+  background: rgb(17 17 17 / 45%);
+}
+
+.plus-sheet-body {
+  display: grid;
+  gap: 12px;
+  padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.plus-sheet-handle {
+  justify-self: center;
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--line);
+}
+
+.plus-sheet h2 {
+  margin: 0;
+  font: 500 var(--text-20)/1.3 var(--font-ui);
+}
+
+.plus-gestures {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plus-gesture {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 72px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  background: var(--sheet);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.plus-gesture:focus-visible,
+.page-back:focus-visible,
+.week-band a:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.plus-gesture-icon {
+  display: grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--tile);
+  color: var(--green);
+}
+
+.plus-gesture-icon .icon {
+  width: 22px;
+  height: 22px;
+}
+
+[data-gesture="noter-la-pluie"] .plus-gesture {
+  border-color: var(--water-line);
+  background: var(--water-soft);
+}
+
+[data-gesture="noter-la-pluie"] .plus-gesture-icon {
+  background: var(--card);
+  color: var(--water-ink);
+}
+
+[data-gesture="arrosage-fait"] .plus-gesture-icon {
+  background: var(--card);
+  color: var(--anthracite);
+}
+
+.plus-gesture-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.plus-gesture-text strong {
+  font: 500 var(--text-16)/1.3 var(--font-ui);
+}
+
+.plus-gesture-text span {
+  color: var(--ink2);
+  font-size: var(--text-13);
+}
+
+/* Le formulaire de la pluie, monté dans la feuille sous son geste (S2, PR 4). */
+.plus-rain {
+  padding: 12px 14px 4px;
+}
+
+.plus-rain-form .irrigation-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.plus-rain-form .irrigation-dialog-actions button {
+  min-height: 50px;
+}
+
+.plus-rain-reading,
+.plus-rain-saved {
+  margin: 8px 0 0;
+  font-size: var(--text-14);
+}
+
+.plus-rain-saved {
+  color: var(--ok-ink);
+  font-weight: 700;
+}
+
+.plus-sheet-close {
+  justify-self: stretch;
+  min-height: var(--touch-target);
+}
+
+@media (hover: hover) {
+  .today-all-irrigations a:hover,
+  .week-band a:hover {
+    text-decoration: underline;
+  }
+
+  .plus-gesture:hover {
+    border-color: var(--green);
+  }
+}
+
+@media (max-width: 980px) {
+  /*
+    Le « + » au centre de la barre : un rond vert de 52 px qui dépasse de 10 px, comme l’ancien rond, sa
+    cible de 56 px de haut comme les endroits (règle 5) ; il garde la place
+    de l'ancien bouton rond d'« Aujourd'hui » (T1).
+  */
+  .phone-bar li[data-plus] {
+    display: grid;
+    place-items: center;
+  }
+
+  .phone-bar button.phone-bar-plus {
+    justify-content: center;
+  }
+
+  .phone-bar-plus-badge {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    margin-top: -34px;
+    place-items: center;
+    box-sizing: border-box;
+    border: 3px solid var(--card);
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 3px 10px rgb(11 105 77 / 35%);
+    color: #fff;
+  }
+
+  .phone-bar .phone-bar-plus-badge .icon {
+    padding: 0;
+    background: none;
+    color: #fff;
+  }
+
+  .phone-bar button.phone-bar-plus:focus-visible .phone-bar-plus-badge {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* La bande « La semaine » sous le titre : un lien par page cochée, 44 px, la page ouverte marquée (section 3.3). */
+  .week-band {
+    display: block;
+    margin-top: 8px;
+  }
+
+  .week-band ul {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .week-band li {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .week-band a {
+    display: flex;
+    min-height: var(--touch-target);
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink2);
+    font: 500 var(--text-14)/1.2 var(--font-ui);
+    text-decoration: none;
+  }
+
+  .week-band a[aria-current="page"] {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /*
+    Le retour « ‹ » de 44 px au début de la ligne du titre (section 5.1) :
+    ses marges négatives lui gardent la place de l'icône, il n'ajoute aucune
+    hauteur au chapeau.
+  */
+  .page-back {
+    display: inline-grid;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin: -8px -6px -8px -12px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--anthracite);
+  }
+
+  .page-back .icon {
+    width: 22px;
+    height: 22px;
+  }
+}

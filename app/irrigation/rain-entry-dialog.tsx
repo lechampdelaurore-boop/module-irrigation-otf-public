@@ -11,9 +11,10 @@ import { saveManualRainfallAction } from './water-actions';
  * d'un jour, notée d'un geste par l'action existante
  * `saveManualRainfallAction`, qui fait recalculer le plan de sa semaine.
  * Un composant partagé de `app/irrigation/` : il ne suppose rien de la page
- * qui l'ouvre (le « + » de S3 l'ouvrira aussi). Les jours, le jour par
- * défaut, la lecture du chiffre et le mot du bouton viennent du domaine
- * (`lib/domain/today/rain-entry.ts`). Un refus se lit dans la fenêtre ;
+ * qui l'ouvre ; le « + » de S3 monte son formulaire dans sa feuille. Les
+ * jours, le jour par défaut, la lecture du chiffre et le mot du bouton
+ * viennent du domaine (`lib/domain/today/rain-entry.ts`). Un refus se lit
+ * dans la fenêtre ;
  * l'enregistrement la ferme, et la page qui l'a ouverte écrit la réponse
  * sous son bouton.
  */
@@ -31,6 +32,64 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, on
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  // Fermer pendant l'enregistrement laisserait la réponse sans fenêtre : le formulaire le dit.
+  const [pending, setPending] = useState(false);
+  // Un formulaire neuf à chaque ouverture : le jour par défaut, le champ vide, aucun refus d'avant.
+  const [opening, setOpening] = useState(0);
+
+  useEffect(() => {
+    if (open && !dialog.current?.open) {
+      setOpening((value) => value + 1);
+      dialog.current?.showModal();
+    }
+    if (!open && dialog.current?.open) dialog.current.close();
+  }, [open]);
+
+  const close = () => {
+    if (pending) return;
+    onClose();
+  };
+
+  return (
+    <dialog
+      ref={dialog}
+      className="module-confirm-dialog rain-entry-dialog"
+      aria-labelledby={titleId}
+      onCancel={(event) => { event.preventDefault(); close(); }}
+    >
+      <h3 id={titleId}>{RAIN_ENTRY_TITLE}</h3>
+      <RainEntryForm
+        key={opening}
+        className="module-confirm-body rain-entry-form"
+        entry={entry}
+        season={season}
+        planning={planning}
+        besoinsHref={besoinsHref}
+        onPending={setPending}
+        onClose={close}
+        onSaved={onSaved}
+      />
+    </dialog>
+  );
+}
+
+/**
+ * Le formulaire de « Noter la pluie », seul : la fenêtre d'« Aujourd'hui » le
+ * monte dans sa boîte de dialogue, la feuille du « + » (S3, section 4.1) dans
+ * la feuille, sans changer de page. Le même jour par défaut, la même lecture
+ * du chiffre, le même bouton qui dit le chiffre, la même action.
+ */
+export function RainEntryForm({ className, entry, season, planning, besoinsHref, onPending, onClose, onSaved }: {
+  className: string;
+  entry: RainEntry;
+  season: number;
+  planning: boolean;
+  besoinsHref: string | null;
+  onPending?: (pending: boolean) => void;
+  /** « Fermer » ; absent, le formulaire n'en a pas (la feuille a le sien). */
+  onClose?: () => void;
+  onSaved: (text: string) => void;
+}) {
   const dayId = useId();
   const amountId = useId();
   const hintId = useId();
@@ -40,22 +99,14 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, on
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (open && !dialog.current?.open) dialog.current?.showModal();
-    if (!open && dialog.current?.open) dialog.current.close();
-  }, [open]);
+    onPending?.(pending);
+  }, [pending, onPending]);
 
   const day = entry.days.find((item) => item.date === date) ?? entry.days[0];
   const reading = readRainMm(text);
   const button = rainButton(day, reading);
   const problem = rainReadingProblem(reading);
   const already = rainAlreadyText(day);
-  const close = () => {
-    if (pending) return;
-    setText('');
-    setRefusal(null);
-    setDate(entry.defaultDate);
-    onClose();
-  };
 
   const save = () => {
     if (!reading.ok) return;
@@ -74,54 +125,46 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, on
   };
 
   return (
-    <dialog
-      ref={dialog}
-      className="module-confirm-dialog rain-entry-dialog"
-      aria-labelledby={titleId}
-      onCancel={(event) => { event.preventDefault(); close(); }}
+    <form
+      className={className}
+      onSubmit={(event) => {
+        event.preventDefault();
+        save();
+      }}
     >
-      <h3 id={titleId}>{RAIN_ENTRY_TITLE}</h3>
-      <form
-        className="module-confirm-body rain-entry-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          save();
-        }}
-      >
-        <label htmlFor={dayId}>Quel jour ?</label>
-        <select id={dayId} value={date} disabled={pending} onChange={(event) => { setDate(event.target.value); setRefusal(null); }}>
-          {entry.days.map((item) => <option key={item.date} value={item.date}>{item.label}</option>)}
-        </select>
-        {already ? <p className="rain-entry-already">{already}</p> : null}
-        <label htmlFor={amountId}>Combien ?</label>
-        <span className="rain-entry-amount">
-          <input
-            id={amountId}
-            type="text"
-            inputMode="decimal"
-            autoComplete="off"
-            value={text}
-            disabled={pending}
-            aria-describedby={hintId}
-            aria-invalid={problem ? true : undefined}
-            onChange={(event) => { setText(event.target.value); setRefusal(null); }}
-          />
-          <span aria-hidden="true">mm</span>
-        </span>
-        <p id={hintId} className="rain-entry-hint">{problem ?? RAIN_ZERO_HINT}</p>
-        {refusal ? <p className="rain-entry-refusal" role="alert">{refusal}</p> : null}
-        {besoinsHref ? (
-          <p className="rain-entry-more">
-            Retirer une mesure, voir jour par jour : <a href={besoinsHref}>sur « Objectifs et besoins »</a>
-          </p>
-        ) : null}
-        <div className="irrigation-dialog-actions">
-          <button type="button" disabled={pending} onClick={close}>Fermer</button>
-          <button type="submit" className="primary" disabled={pending || !button.enabled}>
-            {pending ? 'Enregistrement…' : button.label}
-          </button>
-        </div>
-      </form>
-    </dialog>
+      <label htmlFor={dayId}>Quel jour ?</label>
+      <select id={dayId} value={date} disabled={pending} onChange={(event) => { setDate(event.target.value); setRefusal(null); }}>
+        {entry.days.map((item) => <option key={item.date} value={item.date}>{item.label}</option>)}
+      </select>
+      {already ? <p className="rain-entry-already">{already}</p> : null}
+      <label htmlFor={amountId}>Combien ?</label>
+      <span className="rain-entry-amount">
+        <input
+          id={amountId}
+          type="text"
+          inputMode="decimal"
+          autoComplete="off"
+          value={text}
+          disabled={pending}
+          aria-describedby={hintId}
+          aria-invalid={problem ? true : undefined}
+          onChange={(event) => { setText(event.target.value); setRefusal(null); }}
+        />
+        <span aria-hidden="true">mm</span>
+      </span>
+      <p id={hintId} className="rain-entry-hint">{problem ?? RAIN_ZERO_HINT}</p>
+      {refusal ? <p className="rain-entry-refusal" role="alert">{refusal}</p> : null}
+      {besoinsHref ? (
+        <p className="rain-entry-more">
+          Retirer une mesure, voir jour par jour : <a href={besoinsHref}>sur « Objectifs et besoins »</a>
+        </p>
+      ) : null}
+      <div className="irrigation-dialog-actions">
+        {onClose ? <button type="button" disabled={pending} onClick={onClose}>Fermer</button> : null}
+        <button type="submit" className="primary" disabled={pending || !button.enabled}>
+          {pending ? 'Enregistrement…' : button.label}
+        </button>
+      </div>
+    </form>
   );
 }

@@ -325,6 +325,13 @@ export type TodayView = {
    * arrosage » sur « Arrosages » (l'intention d'adresse `planifier`).
    */
   dayEmptyLink: TodayDayEmptyLink | null;
+  /**
+   * « Tous les arrosages », en pied de « Votre journée » (simplification S3,
+   * section 3.4) : la page « Arrosages » n'a plus d'entrée de barre au
+   * téléphone ; on y va par le « + » ou par ce lien. Vrai avec « Arrosages »
+   * cochée.
+   */
+  allIrrigationsLink: boolean;
 };
 
 export type TodayDayEmptyLink = { label: string; page: 'planning' | 'arrosages'; intent: 'planifier' | null };
@@ -417,6 +424,7 @@ export function todayView(input: TodayInputs): TodayView {
     tomorrow,
     shortage,
     dayEmptyLink: irrigationsOn ? dayEmptyLink(enabled) : null,
+    allIrrigationsLink: on('arrosages'),
     rain: on('besoins') && input.rain?.rainMatters ? rainEntry({ today, measured: input.rain.measured }) : null,
     essential,
   };

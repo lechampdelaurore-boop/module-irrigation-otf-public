@@ -213,7 +213,9 @@ une ferme qui a tout coché, Arrosages (précision P36).
   défile, la page courante en pilule verte. Les quatre pastilles d'univers de
   la maquette (Production, Vente, Gestion, Paramètres) sont celles d'Ouvre ta
   ferme : le module ne les reproduit pas (précision P11). Cibles tactiles de
-  44 px.
+  44 px. Depuis la simplification S3, PR 2 (D-331), la barre du bas porte
+  les trois endroits et le « + » ; les pages d'un endroit se trouvent par sa
+  bande ou ses fiches (`docs/simplification-s3-contract.md`, section 4).
 - **La saison et la parcelle** suivent d'une page à l'autre, dans l'adresse
   (`?season=…&zone=…`) ; la parcelle choisie n'est plus perdue en changeant de
   page (précision P12).

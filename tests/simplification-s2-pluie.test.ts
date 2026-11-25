@@ -159,7 +159,9 @@ test('l’interface : une fenêtre partagée, au clavier, qui écrit par l’act
   assert.match(dialog, /role="alert">\{refusal\}/);
   // Aucun bouton actif pendant l'enregistrement.
   assert.match(dialog, /disabled=\{pending \|\| !button\.enabled\}/);
-  assert.match(dialog, /<button type="button" disabled=\{pending\} onClick=\{close\}>Fermer<\/button>/);
+  // Le formulaire est partagé avec la feuille du « + » (S3), qui a son propre « Fermer ».
+  assert.match(dialog, /\{onClose \? <button type="button" disabled=\{pending\} onClick=\{onClose\}>Fermer<\/button> : null\}/);
+  assert.match(dialog, /onClose=\{close\}/);
 
   const week = readFileSync('app/irrigation/today/today-week.tsx', 'utf8');
   assert.match(week, /onOpen=\{links\.received\.rain \? onOpenRain : undefined\}/);

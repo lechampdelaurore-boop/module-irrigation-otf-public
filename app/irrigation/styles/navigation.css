@@ -252,8 +252,8 @@
 
 /*
  * Jusqu'à 980 px, et non plus 600 : la tablette prend la barre du
- * téléphone, quatre entrées et « Plus », au lieu d'une bande qui défilait
- * de côté (audit du 19 novembre 2026, lot K, n° 24, F481).
+ * téléphone au lieu d'une bande qui défilait de côté (audit du 19 novembre
+ * 2026, lot K, n° 24, F481).
  */
 @media (max-width: 600px) {
   .feature-page {
@@ -272,9 +272,9 @@
   }
 
   /*
-    La barre du bas : quatre entrées et « Plus », à parts égales, l'icône
-    au-dessus d'un nom court (le nom entier reste le nom accessible) ; la page
-    ouverte prend la pilule verte de la charte.
+    La barre du bas : les trois endroits et le « + » (simplification S3,
+    PR 2), à parts égales, l'icône au-dessus du nom de l'endroit ; l'endroit
+    de la page ouverte prend la pilule verte de la charte.
   */
   .phone-bar {
     display: block;
@@ -327,32 +327,12 @@
     border-radius: 999px;
   }
 
-  .phone-bar a[aria-current="page"] {
+  .phone-bar a[aria-current] {
     color: var(--green);
     font-weight: 700;
   }
 
-  .phone-bar a[aria-current="page"] .icon {
-    background: var(--green);
-    color: #fff;
-  }
-
-  .phone-bar button[aria-expanded="true"] .icon {
-    background: var(--green-soft);
-  }
-
-  /*
-    La page ouverte n'est pas dans la barre : « Plus » prend la marque de la
-    page ouverte, comme les autres entrées, au lieu d'un point vert qui ne
-    disait pas ce qu'il comptait (audit final, lot A, J13, F287). Son nom dit
-    laquelle.
-  */
-  .phone-bar-more[data-marked="true"] {
-    color: var(--green);
-    font-weight: 700;
-  }
-
-  .phone-bar-more[data-marked="true"] .icon {
+  .phone-bar a[aria-current] .icon {
     background: var(--green);
     color: #fff;
   }
@@ -363,90 +343,12 @@
     outline-offset: -3px;
   }
 
-  /* Le menu entier, fermé ; « Plus » l'ouvre en feuille au-dessus de la barre. */
+  /*
+    Le menu de l'ordinateur n'existe pas sous la barre : la barre montre les
+    trois endroits et le « + » (simplification S3, PR 2, D-331) ; « Plus »
+    et sa feuille ne sont plus.
+  */
   .feature-menu {
     display: none;
-  }
-
-  .feature-menu[data-open="true"] {
-    display: block;
-    z-index: 42;
-    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
-    max-height: calc(100dvh - 66px - 52px - env(safe-area-inset-bottom, 0px));
-    padding: 10px 12px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 1px solid var(--line);
-    border-bottom: 0;
-    border-radius: var(--radius) var(--radius) 0 0;
-    box-shadow: var(--shadow-raised);
-    overscroll-behavior: contain;
-  }
-
-  .feature-menu[data-open="true"] ul {
-    width: auto;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  /* La feuille du téléphone retrouve l'encart et les groupes de l'ordinateur. */
-  .feature-menu[data-open="true"] .menu-home-item,
-  .feature-menu[data-open="true"] .menu-group,
-  .feature-menu[data-open="true"] .menu-settings-item {
-    display: block;
-  }
-
-  .feature-menu[data-open="true"] .menu-group ul,
-  .feature-menu[data-open="true"] .menu-settings-item ul {
-    display: flex;
-  }
-
-  .feature-menu[data-open="true"] .menu-group-title,
-  .feature-menu[data-open="true"] .menu-home-text small {
-    display: block;
-  }
-
-  .feature-menu[data-open="true"] a {
-    min-height: var(--touch-target);
-    border-radius: 9.75px;
-    white-space: normal;
-  }
-
-  .feature-menu[data-open="true"] a.menu-home {
-    display: grid;
-    padding: 8px 10px;
-    border-radius: 9.75px;
-  }
-
-  /*
-    L'entrée « Aujourd'hui » de la barre du bas : un bouton rond vert qui
-    dépasse de la barre, séparé des autres pages par un filet.
-  */
-  .phone-bar li[data-home] {
-    border-right: 1px solid var(--line);
-  }
-
-  .phone-bar li[data-home] a {
-    position: relative;
-    color: var(--green);
-  }
-
-  .phone-bar li[data-home] .menu-home-badge {
-    width: 42px;
-    height: 42px;
-    margin-top: -20px;
-    border: 3px solid var(--card);
-    box-shadow: 0 3px 10px rgb(11 105 77 / 35%);
-  }
-
-  .phone-bar li[data-home] .menu-home-badge .icon,
-  .phone-bar li[data-home] a[aria-current="page"] .menu-home-badge .icon {
-    padding: 0;
-    background: none;
-    color: #fff;
-  }
-
-  .phone-bar li[data-home] .today-badge {
-    top: -14px;
   }
 }

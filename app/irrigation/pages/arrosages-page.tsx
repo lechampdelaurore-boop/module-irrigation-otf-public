@@ -5,8 +5,9 @@ import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-record';
 import type { EquipmentListItem } from '@/lib/domain/equipment-record';
-import { requestPlannedIrrigationForm } from '@/lib/domain/feasibility-notifications';
+import { requestIrrigationForm, requestPlannedIrrigationForm } from '@/lib/domain/feasibility-notifications';
 import { pagePath } from '@/lib/domain/features/pages';
+import { WATERING_INTENT, wateringIntentForm } from '@/lib/domain/features/plus-sheet';
 import type { GardenGroupConfiguration } from '@/lib/domain/garden-group-record';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 import type { IrrigationFormHints } from '@/lib/domain/irrigation-form-hints';
@@ -63,6 +64,11 @@ export function ArrosagesPage({
 }) {
   // « Ajouter un créneau à la main » depuis le planning ouvre ici le formulaire « Planifier » (`?planifier=1`).
   useUrlIntent('planifier', () => requestPlannedIrrigationForm());
+  // Le « + » de la barre du bas (simplification S3, section 4.1) ouvre « Irriguer maintenant » (`?arroser=maintenant`) ou « Déjà réalisée » (`?arroser=fait`).
+  useUrlIntent(WATERING_INTENT, (value) => {
+    const form = wateringIntentForm(value);
+    if (form) requestIrrigationForm(form);
+  });
 
   return (
     <>

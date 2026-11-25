@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3, PR 2 sur 4 : la barre du bas, le
+  « + » et le chemin de retour, codée le 25 novembre 2026** (D-331, F876 à
+  F884 ; contrat, sections 3.3, 3.4, 4, 4.1 et 5.1), en Opus 5.5 · Très
+  élevé, sur la branche de la PR 1. Jusqu'à 980 px, la barre du bas porte
+  Aujourd'hui, Semaine, le « + » et Ma ferme ; « Plus » n'existe plus. Le
+  « + » ouvre « Que voulez-vous faire ? » : arroser maintenant, noter la
+  pluie dans la feuille même, noter un arrosage déjà fait. La bande « La
+  semaine », le retour « ‹ Ma ferme » et « Tous les arrosages » relient les
+  pages d'un endroit ; chaque page est à deux touches au plus. Le menu de
+  l'ordinateur ne change qu'à la PR 3. Tests sur les 235 choix de cases,
+  parcours P63 aux deux largeurs, mesures à 390 px : voir la PR. L'essai des
+  cinq tâches avec le premier volontaire est conseillé avant sa mise en
+  ligne (S3-m), jamais bloquant.
 - **Simplifier l'usage du module, S3, PR 1 sur 4 : le rangement et « Ma
   ferme », codée le 25 novembre 2026** (D-331, F868 à F875 ; contrat,
   sections 3 et 5), en Opus 5.5 · Très élevé, sur la branche de la PR 5 de
