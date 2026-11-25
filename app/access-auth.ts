@@ -1,5 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { cookies, headers } from 'next/headers';
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createJwksFetcher, verifyAccessJwt } from '@/lib/services/access-jwt';
 import { DEMO_MOMENT_COOKIE, DEMO_PROFILE_COOKIE, demoOwnerUserId, resolveDemoChoice } from '@/lib/domain/demo/catalogue';
@@ -10,6 +11,8 @@ import { recordDemoVisit } from '@/lib/services/demo-reset';
 import { prepareDemoSpace } from '@/lib/services/demo-space';
 import { FarmIdentityUnavailableError, resolveSpaceKey } from '@/lib/services/farm-identity-service';
 import { assertSpaceNotFrozen, FarmFrozenError } from '@/lib/services/farm-erasure-request';
+// La mémoire de chaque requête, posée avant que toute page ne lise la base (section 5 sexies du contrat de la tranche 4).
+import './request-memo';
 
 /**
  * Identité de l'utilisateur connecté.
@@ -63,13 +66,30 @@ function demoUser(farm: string | undefined): AuthenticatedUser {
  * l'exploitant, qui ne touche pas aux données de sa ferme).
  */
 export async function getAuthenticatedUser({ allowFrozen = false }: { allowFrozen?: boolean } = {}): Promise<AuthenticatedUser | null> {
+  const user = await authenticatedUserOfRender(allowFrozen);
+  // Une copie par appelant : ce que l'un change ne se voit pas chez l'autre.
+  return user ? { ...user } : null;
+}
+
+/**
+ * Lue une fois par rendu de page, pour chaque valeur de `allowFrozen`
+ * (section 5 sexies du contrat de la tranche 4) : la page la demande, et la
+ * page introuvable que son rendu prépare avec elle la redemandait deux fois,
+ * avec la vérification du jeton, la ferme et l'effacement. `cache` de React la
+ * garde le temps du rendu d'une page, jamais d'une requête à l'autre ; hors
+ * d'un rendu (une action, une route, le premier passage de vinext sur une
+ * page), elle est lue à chaque appel, comme avant : le rendu qui suit une
+ * action voit l'espace qu'elle vient de figer ou de rattacher. Une erreur vaut
+ * pour tout le rendu.
+ */
+const authenticatedUserOfRender = cache(async (allowFrozen: boolean): Promise<AuthenticatedUser | null> => {
   const user = await readUser();
   if (!user) return null;
   if (isDemoDeployment()) return demoSpaceUser(user);
   const spaceUser = await farmSpaceUser(user);
   if (!allowFrozen) await assertSpaceNotFrozen(spaceUser.userId, spaceUser.displayName);
   return spaceUser;
-}
+});
 
 /**
  * Hors démonstration, la personne travaille dans l'espace de sa ferme
