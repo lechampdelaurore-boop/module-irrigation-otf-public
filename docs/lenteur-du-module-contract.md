@@ -1,7 +1,6 @@
 # Contrat — La lenteur du module (correctif du 24 novembre 2026)
 
-Roadmap section 6 duodecies. Décisions D-322 (N1), D-323 (N2), puis la
-suivante pour N3. Ce contrat dit le constat, les mesures et les règles des trois
+Roadmap section 6 duodecies. Décisions D-322 (N1), D-323 (N2) et D-325 (N3). Ce contrat dit le constat, les mesures et les règles des trois
 corrections ; chacune a sa PR.
 
 ## 1. Le constat
@@ -102,9 +101,24 @@ puis rechargeait vers la page d'arrivée.
 - Parcours P59 : tous les scripts du module refusés, `/irrigation` mène
   encore à « Aujourd'hui ».
 
-**N3. L'identifiant de l'espace n'est lu qu'une fois par requête** (fil à
-part, en Opus 5.5 · Max : il touche à la résolution de l'espace d'une ferme,
-donc à l'isolation).
+**N3. L'identifiant de l'espace n'est lu qu'une fois par requête (D-325).**
+Ses règles sont au contrat de la tranche 4, section 5 sexies (F810 à F816),
+avec celles de l'isolation des fermes qu'elles touchent : une mémoire par
+requête, jamais d'une requête à l'autre ni dans le Worker ; rangée par la
+personne et la ferme ensemble ; vidée par toute écriture, à son début et à
+sa fin ; l'absence d'un espace jamais gardée ; trois lectures de service
+gardées aussi (le choix des fonctionnalités, l'accueil, la préférence
+météo), une copie par appelant ; la personne connectée vérifiée une fois
+par rendu de page. Écrite en Opus 5.5 · Max (résolution de l'espace d'une
+ferme, donc isolation).
+
+- Mesuré après N1, en local (`vinext dev`, base de démonstration, 20 ms
+  ajoutées à chaque lecture, deuxième passage) : « Aujourd'hui » passe de
+  176 à 98 lectures de la base à l'ouverture, dont l'espace de 58 à 2, et
+  de 176 à 100 par le menu ; les treize pages du menu, de 894 à 460 et de
+  894 à 485. En temps, sur un seul essai : « Aujourd'hui » s'ouvre en
+  0,72 s au lieu de 1,25 s, et s'atteint par le menu en 0,63 s au lieu de
+  1,15 s.
 
 ## 4. Ce qui ne change pas
 

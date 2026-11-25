@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 24 novembre 2026.
+Dernière mise à jour : 25 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -11,6 +11,23 @@ constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
 Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons »).
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
+
+- **Lenteur du module : N3, l'espace lu une fois par requête, codée le
+  24 novembre 2026** (D-325, F810 à F816, contrat de la tranche 4, section
+  5 sexies ; roadmap section 6 duodecies), en Opus 5.5 · Max, le réglage de
+  la roadmap (résolution de l'espace d'une ferme, donc isolation). Pendant
+  une requête, l'espace d'une personne et d'une ferme, le choix des
+  fonctionnalités, l'accueil et la préférence météo ne se lisent qu'une
+  fois, au lieu d'une fois par service qui les demande ; la mémoire naît et
+  meurt avec la requête (`cacheForRequest` de vinext), rangée par la
+  personne et la ferme ensemble, vidée par toute écriture ; l'absence d'un
+  espace n'est jamais gardée. Mesuré en local après N1, 20 ms ajoutées à
+  chaque lecture : « Aujourd'hui » passe de 176 à 98 lectures de la base et
+  de 1,25 s à 0,72 s à l'ouverture ; les treize pages du menu, de 894 à 460
+  lectures. Nouveau test rejoué dans les quatre passages d'isolation,
+  éprouvé en cassant le code exprès. Le temps gagné en ligne reste à
+  mesurer sur le téléphone du porteur, avec son accord. Contrôles : voir la
+  PR.
 
 - **Lenteur du module : N1, le menu sans rechargement, en ligne le
   25 novembre 2026 à 2 h 45, et N2, l'ouverture directe, codée le
@@ -28,8 +45,8 @@ registres, elle y renvoie.
   `/irrigation` sans ancre, l'adresse de départ de l'application installée,
   mène à la page d'arrivée par un script lu avec la page, sans attendre les
   scripts du module ni recharger une seconde fois ; une ancre d'ancienne
-  notification garde sa conduite. Reste N3,
-  les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
+  notification garde sa conduite. N3, les lectures répétées de la base :
+  point ci-dessus. La mesure
   sur le téléphone réel du porteur reste à faire, sur son accord.
   Mise en ligne de #204 (N1, D-322) consignée ici : #204 fusionnée le
   25 novembre 2026 à 2 h 11, en ligne à 2 h 45 (run 45523929120, les cinq

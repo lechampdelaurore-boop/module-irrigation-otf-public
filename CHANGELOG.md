@@ -12,6 +12,15 @@ source détaillée commit par commit.
   cochée), sans attendre la page « Ouverture du module… » qui rechargeait
   tout. Les liens des anciennes notifications mènent toujours au bon bloc.
 
+### Corrigé (lenteur du module, N3)
+
+- **Le serveur relit beaucoup moins la base** (D-325) : pendant une
+  requête, l'espace de la ferme, le choix des fonctionnalités, l'accueil et
+  la préférence météo ne sont lus qu'une fois, au lieu d'une fois par
+  service qui les demande ; ouvrir « Aujourd'hui » demande 98 lectures au
+  lieu de 176. Rien n'est gardé d'une requête à l'autre ni d'une ferme à
+  l'autre ; toute écriture vide cette mémoire.
+
 ### Corrigé (lenteur du module, N1)
 
 - **Un clic du menu ne recharge plus tout le module** (D-322) : le menu de

@@ -9724,3 +9724,65 @@ applications déjà installées en profitent. Parcours P59, scripts refusés.
 **Ne change pas.** Aucune donnée, aucun calcul, aucun texte ; une redirection
 côté serveur a été écartée, parce que le serveur ne voit pas l'ancre et
 perdrait la conduite des anciennes notifications.
+
+## D-325 — La lenteur du module, N3 : l'espace lu une fois par requête
+
+Date : 24 novembre 2026. Statut : **codée** ; roadmap section 6 duodecies,
+contrat de la tranche 4, section 5 sexies (F810 à F816), où renvoie
+`docs/lenteur-du-module-contract.md` (N3). Écrite en Opus 5.5 · Max, le
+réglage de la roadmap (résolution de l'espace d'une ferme, donc isolation).
+D-323 et D-324 sont ceux de N2 et de H2, en cours ; celui-ci est le suivant
+libre.
+
+**Contexte.** Le 24 novembre 2026 à 22 h 33, le porteur trouve que le
+module « rame », l'ouverture surtout, puis chaque changement de page.
+Mesuré en local avant le code : pour ouvrir « Aujourd'hui », le serveur
+lisait 57 fois l'identifiant du même espace, 12 fois son accueil et 8 fois
+sa préférence météo, une fois par service qui les demande.
+
+**Décision.** Une mémoire par requête (`db/request-memo.ts`), que
+l'interface fournit (`app/request-memo.ts`, `cacheForRequest` de vinext) :
+pendant une requête, l'identifiant de l'espace d'une personne et d'une
+ferme ne se lit qu'une fois ; le choix des fonctionnalités, l'accueil et la
+préférence météo d'un espace non plus, une copie par appelant ; la personne
+connectée se vérifie une fois par rendu de page (`cache` de React).
+
+**Précisions** (contrat de la tranche 4, section 5 sexies).
+
+- F810 : une mémoire par requête, page, action ou route, les deux passages
+  de vinext compris ; rien d'une requête à l'autre ni dans le Worker ; hors
+  d'une requête, chaque lecture va à la base comme avant.
+- F811 : rangée par la personne et la ferme ensemble, comme le filtre des
+  requêtes (F327) ; une lecture de service, par son nom et tous ses
+  arguments.
+- F812 : toute instruction qui n'est pas une lecture, un lot qui en
+  contient une et `exec` la vident à leur début et à leur fin, même en
+  échec ; une lecture qui croise une écriture n'est pas gardée.
+- F813 : l'absence d'un espace et une lecture en échec ne restent pas.
+- F814 : trois lectures de service gardées, une copie par appelant ;
+  jamais le compteur des appels à OTF ni le dépôt que la démonstration
+  relit.
+- F815 : la personne connectée, une fois par rendu de page et par valeur
+  de `allowFrozen` ; hors d'un rendu, à chaque appel.
+- F816 : les preuves, ci-dessous.
+
+**Preuve.** `tests/db/memoire-de-requete.test.ts` (quinze tests), rejoué
+dans les quatre passages d'isolation : une lecture par clé même en
+parallèle, deux fermes dans une requête, deux requêtes simultanées, rien
+après ni hors d'une requête, l'absence, l'échec, la lecture qui croise une
+écriture, le rattachement, la mise de côté et l'effacement, les lectures de
+service, vinext lui-même avec trois changements de page simultanés.
+Contre-épreuve : une clé sans la ferme, une mémoire commune au Worker et
+une écriture qui ne vide plus la mémoire font chacune échouer des tests.
+Les tests d'isolation existants restent verts.
+
+**Mesure.** Après N1, en local, 20 ms ajoutées à chaque lecture :
+« Aujourd'hui » passe de 176 à 98 lectures de la base à l'ouverture
+(l'espace, de 58 à 2) et de 176 à 100 par le menu ; les treize pages du
+menu, de 894 à 460 et de 894 à 485 ; « Aujourd'hui » s'ouvre en 0,72 s au
+lieu de 1,25 s (un seul essai). Le temps gagné en ligne reste à mesurer.
+
+**Ne change pas.** Aucun calcul, aucune donnée, aucune migration, aucun
+texte, aucun réglage de Cloudflare ; une tâche sans requête lit la base
+comme avant ; toutes les fermes voient les mêmes pages, plus vite. Les
+règles de l'isolation (F327, F331, F647) tiennent.
