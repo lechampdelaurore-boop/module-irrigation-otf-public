@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s3-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. Trois endroits : « Aujourd'hui » (avec
+  « Arrosages »), « Semaine » (planning, objectifs et besoins, historique),
+  « Ma ferme » (matériel, ressources, cultures, sol, alertes, réglages),
+  et un « + » pour arroser maintenant, noter la pluie ou noter un arrosage
+  déjà fait. Quatre PR : la page « Ma ferme » en fiches, la barre du bas
+  du téléphone (avec la bande de la semaine et le retour), le menu de
+  l'ordinateur, les liens et la visite guidée ; Opus 5.5 · Très élevé,
+  après la fin du code de S2. Aucune page, adresse ni notification ne
+  change ; aucun calcul ; aucune question agronomique. Écart voulu avec la
+  maquette : les fiches n'ont pas encore de chiffres d'état (S6). PR de
+  contrat seule : **aucun contrôle rejoué**.
 - **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
   le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
   33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm

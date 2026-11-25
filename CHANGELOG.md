@@ -48,6 +48,12 @@ source détaillée commit par commit.
 
 ### Décidé (simplifier l'usage du module)
 
+- **Contrat du lot S3 écrit** (trois endroits) : « Aujourd'hui », « Semaine »,
+  « Ma ferme » et un « + » pour arroser, noter la pluie ou noter un arrosage
+  fait, à la place de la barre du bas à quatre entrées et de « Plus ». Rien
+  n'est codé : aucune page ne change encore, aucune adresse non plus.
+  Contrat : `docs/simplification-s3-contract.md`.
+
 - **Six lots de simplification retenus, contrat du lot S1 écrit** (D-327) :
   trois endroits, valider-démarrer-terminer depuis la carte d'« Aujourd'hui »,
   trois façons de commencer, les mots du champ. Rien n'est codé : aucune
