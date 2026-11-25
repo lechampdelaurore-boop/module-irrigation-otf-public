@@ -1191,8 +1191,8 @@ selon la règle de la section 10.
     25 novembre 2026** (`docs/simplification-s2-contract.md`, sans code), **en ligne à 18 h 04** (#211, run 45655189938) ; **S2, PR 1 à 4 sur 5
     (valider et démarrer, terminer et reprendre, l'arrosage à rattraper,
     noter la pluie) codées le 25 novembre 2026** (D-330), en Opus 5.5 ·
-    Élevé, **la PR 1 en ligne à 19 h 57** (#219, run 45675486394) ; vient
-    la PR 5 du lot. Un seul chantier
+    Élevé, **la PR 1 en ligne à 19 h 57** (#219, run 45675486394), **la PR 2
+    à 20 h 40** (#221, run 45682330610) ; vient la PR 5 du lot. Un seul chantier
     de code à la fois ; indépendant des lignes 30 à 32 (S1 ne touche ni l'objectif
     automatique ni les notifications), mais S2 et S3 attendent la fin du
     code de S1 (fichiers communs : le gabarit des pages). **Contrat S3
