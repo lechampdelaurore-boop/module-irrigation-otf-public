@@ -1,0 +1,289 @@
+/* « Arroser maintenant » en trois champs (simplification S5, PR 1,
+   docs/simplification-s5-contract.md, section 3) : « 1. Où ? », « 2. Combien
+   de temps ? », « Plus d'options », puis le bouton qui dit ce qu'il fait. */
+
+.watering-now {
+  display: grid;
+  max-width: 640px;
+  gap: 18px;
+  padding: 22px;
+}
+
+.watering-block {
+  display: grid;
+  gap: 10px;
+}
+
+.watering-block h3 {
+  margin: 0;
+  color: var(--ink);
+  font: 500 var(--text-16)/1.3 var(--font-title);
+}
+
+.watering-where {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.watering-where legend {
+  margin-bottom: 4px;
+  padding: 0;
+  color: var(--muted);
+  font-size: var(--text-12);
+  font-weight: 500;
+}
+
+.watering-where-row {
+  display: flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  background: var(--card);
+  cursor: pointer;
+}
+
+.watering-where-row[data-chosen="true"] {
+  border-color: var(--green);
+  background: var(--tile);
+}
+
+.watering-where-row input {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin: 0;
+  accent-color: var(--green);
+}
+
+.watering-where-row span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.watering-where-row strong {
+  color: var(--ink);
+  font-size: var(--text-14);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.watering-where-row small,
+.watering-note,
+.watering-missing,
+.watering-detail-line,
+.watering-start > small {
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
+.watering-note,
+.watering-missing,
+.watering-detail-line {
+  margin: 0;
+}
+
+.watering-now select,
+.watering-now input[type="number"],
+.watering-now textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--touch-target);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-13);
+  font-weight: 500;
+}
+
+.watering-where-select,
+.watering-setting,
+.watering-amount label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: var(--text-13);
+  font-weight: 500;
+}
+
+.watering-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.watering-stepper button {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  font: 500 var(--text-20)/1 var(--font-ui);
+  cursor: pointer;
+}
+
+.watering-stepper button:disabled {
+  cursor: default;
+  opacity: .45;
+}
+
+.watering-duration,
+.watering-duration-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--water-ink);
+}
+
+.watering-duration strong {
+  font: 300 var(--text-28)/1.1 var(--font-title);
+  letter-spacing: -.01em;
+}
+
+.watering-duration-result strong {
+  font-size: var(--text-20);
+  font-weight: 500;
+}
+
+.watering-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.watering-chips button {
+  min-height: var(--touch-target);
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font: 500 var(--text-13)/1 var(--font-ui);
+  cursor: pointer;
+}
+
+.watering-chips button[aria-pressed="true"] {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
+.watering-result {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-14);
+  line-height: 1.45;
+}
+
+.watering-result strong {
+  color: var(--water-ink);
+  font-weight: 600;
+}
+
+.watering-more-toggle {
+  min-height: var(--touch-target);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green);
+  font: 500 var(--text-13)/1.3 var(--font-ui);
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.watering-more-toggle[aria-expanded="true"] {
+  text-decoration: none;
+}
+
+.watering-more-options {
+  margin-top: 8px;
+}
+
+.watering-more-options[hidden] {
+  display: none;
+}
+
+.watering-switch {
+  display: flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: var(--text-13);
+  font-weight: 500;
+  grid-column: 1 / -1;
+}
+
+.watering-switch input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--green);
+}
+
+.watering-exact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  grid-column: 1 / -1;
+}
+
+.watering-exact legend {
+  margin-bottom: 6px;
+  padding: 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+  font-weight: 500;
+}
+
+.watering-exact label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.watering-more-options .irrigation-pump-fields,
+.watering-more-options .hydraulic-indicator,
+.watering-more-options > label {
+  grid-column: 1 / -1;
+}
+
+.watering-start {
+  display: grid;
+  gap: 8px;
+}
+
+.watering-start .start-irrigation-button {
+  margin-top: 0;
+}
+
+.watering-start > small {
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .watering-now {
+    gap: 16px;
+    padding: 14px;
+  }
+}

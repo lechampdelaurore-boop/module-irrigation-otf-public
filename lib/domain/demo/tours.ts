@@ -135,7 +135,7 @@ export const TOURS: readonly Tour[] = [
         pages: ['arrosages'],
         anchor: 'arrosage-actions',
         title: 'Trois façons d’enregistrer un arrosage',
-        text: '« Irriguer maintenant » lance un minuteur. « Planifier » prépare un arrosage pour plus tard. « Déjà réalisée » note un arrosage fait sans le module.',
+        text: '« Arroser maintenant » lance un minuteur. « Planifier » prépare un arrosage pour plus tard. « Déjà réalisée » note un arrosage fait sans le module.',
       },
       {
         pages: ['arrosages'],

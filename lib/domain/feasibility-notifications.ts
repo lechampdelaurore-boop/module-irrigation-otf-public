@@ -50,7 +50,7 @@ export function requestPlannedIrrigationForm() {
 /**
  * Le « + » de la barre du bas (simplification S3, section 4.1) : « Arroser
  * maintenant » et « Noter un arrosage déjà fait » ouvrent « Arrosages » sur
- * le formulaire « Irriguer maintenant » ou « Déjà réalisée ». Le signal porte
+ * le formulaire « Arroser maintenant » ou « Déjà réalisée ». Le signal porte
  * le formulaire.
  */
 export const IRRIGATION_FORM_REQUESTED = 'irrigation-form-requested';

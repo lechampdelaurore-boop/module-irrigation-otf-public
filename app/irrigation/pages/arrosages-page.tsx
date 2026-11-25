@@ -64,7 +64,7 @@ export function ArrosagesPage({
 }) {
   // « Ajouter un créneau à la main » depuis le planning ouvre ici le formulaire « Planifier » (`?planifier=1`).
   useUrlIntent('planifier', () => requestPlannedIrrigationForm());
-  // Le « + » de la barre du bas (simplification S3, section 4.1) ouvre « Irriguer maintenant » (`?arroser=maintenant`) ou « Déjà réalisée » (`?arroser=fait`).
+  // Le « + » de la barre du bas (simplification S3, section 4.1) ouvre « Arroser maintenant » (`?arroser=maintenant`) ou « Déjà réalisée » (`?arroser=fait`).
   useUrlIntent(WATERING_INTENT, (value) => {
     const form = wateringIntentForm(value);
     if (form) requestIrrigationForm(form);
