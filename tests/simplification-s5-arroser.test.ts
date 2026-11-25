@@ -16,6 +16,7 @@ import {
   MISSING_DURATION,
   MISSING_WHERE,
   MORE_OPTIONS_LABEL,
+  moreOptionsLabel,
   moreOptionsOpenAtFirst,
   precautionLevel,
   preselectedEquipmentId,
@@ -40,7 +41,7 @@ import {
  * dans le parcours P64.
  */
 
-const FORM = 'app/irrigation/irrigation-manager/watering-now-form.tsx';
+const FORM = 'app/irrigation/irrigation-manager/watering-form.tsx';
 const PANEL = 'app/irrigation/irrigation-manager/creation-panel.tsx';
 const STATE = 'app/irrigation/irrigation-manager/use-creation-form.ts';
 const MANAGER = 'app/irrigation/irrigation-event-manager.tsx';
@@ -190,6 +191,8 @@ test('les précautions restent au premier niveau : le créneau protégé, la pom
 
 test('« Plus d’options » : fermé par défaut, ouvert seul quand une valeur y est déjà posée, `aria-expanded`', () => {
   assert.equal(MORE_OPTIONS_LABEL, 'Plus d’options (pompe, note, saisir en mm)');
+  assert.equal(moreOptionsLabel('running'), MORE_OPTIONS_LABEL);
+  assert.equal(moreOptionsLabel('planned'), MORE_OPTIONS_LABEL);
   assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '', millimetersEntry: false }), false);
   // La pompe habituelle du matériel ne l'ouvre pas : elle est dite dans la phrase (S5-k).
   assert.equal(moreOptionsOpenAtFirst({ pumpChosen: true, pumpIsDefault: true, note: '', millimetersEntry: false }), false);
@@ -201,7 +204,7 @@ test('« Plus d’options » : fermé par défaut, ouvert seul quand une valeur 
   assert.match(form, /aria-expanded=\{moreOpen\}/);
   assert.match(form, /aria-controls=\{`\$\{moreId\}-options`\}/);
   assert.match(form, /hidden=\{!moreOpen\}/);
-  assert.match(form, /\{MORE_OPTIONS_LABEL\}/);
+  assert.match(form, /\{moreOptionsLabel\(kind\)\}/);
 });
 
 test('tableau 9.3 : chaque champ d’aujourd’hui a sa place, au premier niveau ou dans « Plus d’options »', () => {
@@ -211,7 +214,7 @@ test('tableau 9.3 : chaque champ d’aujourd’hui a sa place, au premier niveau
   const more = form.slice(pli, form.indexOf('className="watering-start"'));
   const start = form.slice(form.indexOf('className="watering-start"'));
   // Matériel : « 1. Où ? », cases rondes nommées par le matériel, la liste au-delà de six.
-  assert.match(firstLevel, /<h3 id=\{`\$\{moreId\}-ou`\}>1\. Où \?<\/h3>/);
+  assert.match(firstLevel, /<h3 id=\{`\$\{moreId\}-ou`\}>\{n\('where'\)\}\. Où \?<\/h3>/);
   assert.match(firstLevel, /type="radio"/);
   assert.match(firstLevel, /whereListKind\(usableEquipment\.length\) === 'radios'/);
   assert.match(firstLevel, /<span>Où arroser \?<\/span>/);
@@ -220,7 +223,7 @@ test('tableau 9.3 : chaque champ d’aujourd’hui a sa place, au premier niveau
   // Réglage : seulement quand le matériel en a plusieurs.
   assert.match(firstLevel, /selectedEquipment\.settings\.length > 1 \? \(\s*<label className="watering-setting">/);
   // Heures et minutes : « Combien de temps ? », « − », « + », pastilles ; la saisie exacte dans le pli.
-  assert.match(firstLevel, /2\. Combien de temps \?/);
+  assert.match(firstLevel, /\{n\('duration'\)\}\. Combien de temps \?/);
   assert.match(firstLevel, /aria-label="Cinq minutes de moins"/);
   assert.match(firstLevel, /aria-label="Cinq minutes de plus"/);
   assert.match(firstLevel, /role="group" aria-label="Durées proposées"/);
@@ -261,27 +264,24 @@ test('« Conseillé » enregistre exactement la valeur d’avant : la dose du jo
   assert.match(form, /form\.setPreparationMode\('duration'\);\s*form\.setMillimetersEntry\(false\);\s*form\.setDurationHours\(String\(hours\)\);\s*form\.setDurationMinutes\(String\(rest\)\);/);
 });
 
-test('les trois onglets : « Arroser maintenant » a son premier niveau ; « Planifier » et « Déjà réalisée » gardent leur formulaire jusqu’à la PR 2', () => {
+test('les trois onglets partagent le squelette ; le formulaire garde son propre fichier', () => {
   const panel = read(PANEL);
-  assert.match(panel, /title="Arroser maintenant"/);
-  assert.doesNotMatch(panel, /title="Irriguer maintenant"/);
-  assert.match(panel, /title="Planifier"/);
-  assert.match(panel, /title="Déjà réalisée"/);
-  assert.match(panel, /creationKind === 'running' \? \(\s*<WateringNowForm/);
-  assert.match(panel, /<PreparationFields/);
+  assert.match(panel, /title=\{WATERING_TAB_LABELS\.running\}/);
+  assert.match(panel, /title=\{WATERING_TAB_LABELS\.planned\}/);
+  assert.match(panel, /title=\{WATERING_TAB_LABELS\.completed\}/);
+  assert.match(panel, /<WateringForm\n/);
+  assert.doesNotMatch(panel, /<PreparationFields|<IrrigationPreview\b/);
   // Le formulaire a son propre fichier : la page redescend sous la limite de 600 lignes.
   const counted = read(MANAGER).split('\n').filter((line) => line.trim() !== '' && !line.trim().startsWith('//')).length;
   assert.ok(counted < 500, `${counted} lignes comptées`);
 });
 
-test('un seul matériel prêt est choisi d’office sur « Arroser maintenant », et le formulaire vidé repart sans durée (F406)', () => {
+test('un seul matériel prêt est choisi d’office, sauf pendant une modification, et le formulaire vidé repart sans durée (F406)', () => {
   const manager = read(MANAGER);
-  assert.match(manager, /creationKind === 'running' && editingEventEquipmentId === null \? preselectedEquipmentId\(usableEquipment\) : null/);
-  assert.match(manager, /if \(onlyEquipmentId !== null && equipmentId === ''\) \{\s*chooseEquipment\(onlyEquipmentId\);\s*setAutoChosenId\(onlyEquipmentId\);/);
-  assert.match(read(FORM), /Le seul matériel prêt à arroser est choisi\./);
-  // Le choix d'office ne passe pas aux autres onglets : « Planifier » et « Déjà réalisée » reprennent sans matériel (lot 3, point 6, cas 3).
-  assert.match(manager, /if \(creationKind !== 'running' && autoChosenId !== null\) \{\s*if \(equipmentId === autoChosenId\) \{\s*setEquipmentId\(''\);/);
-  assert.match(manager, /onChooseEquipment=\{chooseByHand\}/);
+  assert.match(manager, /const onlyEquipmentId = editingEventEquipmentId === null \? preselectedEquipmentId\(usableEquipment\) : null;/);
+  assert.match(manager, /if \(onlyEquipmentId !== null && equipmentId === ''\) chooseEquipment\(onlyEquipmentId\);/);
+  assert.match(manager, /onChooseEquipment=\{chooseEquipment\}/);
+  assert.match(read(FORM), /preselectedEquipmentId\(usableEquipment\) !== null && selectedEquipment !== null && form\.editingEventEquipmentId === null \? <p className="watering-note">Le seul matériel prêt à arroser est choisi\.<\/p>/);
   const reset = read(STATE).slice(read(STATE).indexOf('const reset = () => {'));
   assert.match(reset, /setPreparationMode\('amount'\);/);
   assert.match(reset, /setTargetMillimeters\(''\);/);

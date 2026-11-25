@@ -165,7 +165,7 @@ test('la durée d’une irrigation déjà réalisée reste inconnue tant que ses
 test('une irrigation planifiée sans date de début lisible ne s’enregistre pas (point ouvert 46)', () => {
   assert.equal(plannedStartKnown('planned', Date.parse('2026-10-31T09:00')), true);
   // Un champ vidé ou incomplet, comme pendant la frappe, vaut NaN : le bouton
-  // « Planifier l'irrigation » reste grisé, comme dans « Déjà réalisée ».
+  // « Planifier l'irrigation » reste grisé, comme dans « Déjà fait ».
   assert.equal(plannedStartKnown('planned', Date.parse('')), false);
   assert.equal(plannedStartKnown('planned', Date.parse('2026-10-31T')), false);
   // Lancée maintenant ou déjà réalisée, une irrigation ne lit pas ce champ.
