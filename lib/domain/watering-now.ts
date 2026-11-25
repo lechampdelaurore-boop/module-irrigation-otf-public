@@ -18,7 +18,7 @@ import { cubicMetersFromLiters, millisecondsFromMinutes, millisecondsFromSeconds
  */
 
 /** Le pas des boutons « − » et « + » (S5-h) : une durée plus fine se règle dans « Plus d'options ». */
-export const DURATION_STEP_MINUTES = 5;
+const DURATION_STEP_MINUTES = 5;
 /** Le plancher du réglage (S5-h). */
 export const MINIMUM_DURATION_MINUTES = 5;
 /** Le plafond : 744 h, celui des champs Heures et Minutes et de la validation serveur. */
