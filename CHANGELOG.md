@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (simplifier l'usage du module, S2, PR 4 : noter la pluie d'un geste)
+
+- **La pluie du pluviomètre se note depuis « Aujourd'hui »** (D-330, F854 à
+  F859) : la tuile « Eau reçue » et la ligne « Pluie réelle incomplète »
+  ouvrent la fenêtre « Noter la pluie ». Le jour (hier par défaut, jusqu'à
+  sept jours en arrière, jamais un jour futur), le chiffre (virgule ou point,
+  0 accepté, un champ vide jamais lu 0), un bouton qui dit le chiffre
+  (« Enregistrer 8 mm ») ou « Remplacer par 5 mm » quand une mesure existe
+  déjà ce jour-là, qu'elle dit. La réponse s'écrit sous le bouton qui l'a
+  ouverte. Écriture par l'action d'« Objectifs et besoins », dont aucune règle
+  ne change ; retirer une mesure reste là-bas. Pas de fenêtre pour une ferme
+  toute sous abri.
+
 ### Modifié (simplifier l'usage du module, S2, PR 3 : l'arrosage à rattraper)
 
 - **« Aujourd'hui » demande si un arrosage en retard a été fait, au lieu de

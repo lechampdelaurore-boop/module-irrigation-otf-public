@@ -73,12 +73,16 @@ l'écran.
 **Règles.**
 
 1. Chaque tuile entière est un lien (`<a>`), construit par `pageHref` avec
-   la saison et la zone de la page :
+   la saison et la zone de la page ; « Eau reçue », quand la pluie compte,
+   est un bouton du même dessin qui ouvre la fenêtre « Noter la pluie »
+   (simplification S2, PR 4, D-330, F856), le lien vers
+   `besoins#manual-rain` restant dans la fenêtre pour retirer une mesure ou
+   voir jour par jour :
 
    | Tuile | Mot d'action écrit sur la tuile | Cible |
    | --- | --- | --- |
    | Objectif de la semaine | « Modifier les objectifs » ; « Poser un objectif » quand aucun n'est posé | `besoins#objectifs-de-la-semaine` |
-   | Eau reçue | « Noter une pluie mesurée » ; « Voir jour par jour » pour une ferme toute sous abri, où la pluie ne compte pas (D-032) | `besoins#manual-rain` ; sinon `besoins#weather` |
+   | Eau reçue | « Noter la pluie » (depuis S2, PR 4 ; « Noter une pluie mesurée » avant) ; « Voir jour par jour » pour une ferme toute sous abri, où la pluie ne compte pas (D-032) | la fenêtre « Noter la pluie » ; sans elle `besoins#manual-rain` ; toute sous abri `besoins#weather` |
    | Reste à apporter | « Voir par planche » ; « Voir ce qui manque » quand le reste est inconnu | `besoins#irrigation-needs-title` |
    | Eau utilisée | « Voir jour par jour » | `besoins#weather` |
 
@@ -103,7 +107,7 @@ l'écran.
 | --- | --- | --- |
 | Maraîchage, début d'été | Objectif 23,4 mm | « 7 planches sur 10 ont un objectif, du lun. 15 juin au dim. 21 juin » · « Modifier les objectifs » |
 | Petite ferme, début d'été | « aucun objectif posé » | « Poser un objectif » ; « Reste à apporter : inconnu » · « Voir ce qui manque » |
-| Maraîchage, automne | Eau reçue, « 2,4 mm de pluie prévue, non mesurée » | « Noter une pluie mesurée » |
+| Maraîchage, automne | Eau reçue, « 2,4 mm de pluie prévue, non mesurée » | « Noter la pluie », qui ouvre sa fenêtre |
 | Maraîchage, pénurie | Eau utilisée 768 L | « rien aujourd'hui » · « Voir jour par jour » |
 
 ## 4. L2 — Les jauges mènent à leur page

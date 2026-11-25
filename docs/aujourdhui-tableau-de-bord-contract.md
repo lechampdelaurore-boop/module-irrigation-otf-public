@@ -46,7 +46,9 @@ le lot 3 de l'audit et les correctifs de la 3.9.
   d'une proposition et d'une irrigation planifiée (PR 1), « Terminer »,
   « Reprendre », « Mettre en pause » et « Reprendre ce qui reste » sur ce qui
   coule ou attend d'être repris (PR 2), « Je le fais maintenant » et « C’est
-  fait » sur l'arrosage à rattraper (PR 3).
+  fait » sur l'arrosage à rattraper (PR 3) ; « Noter la pluie », de la tuile
+  « Eau reçue » et de la ligne « Pluie réelle incomplète », ouvre sa fenêtre
+  sur la page au lieu de mener à « Objectifs et besoins » (PR 4).
 - L'adresse, la place de première page et de page d'arrivée (F1, F31), la
   saison du jour (F2, F32), la pastille du menu et son compte (F12, F33).
 - La règle de présence : un bloc n'existe que si sa fonctionnalité est

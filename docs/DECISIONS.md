@@ -10226,8 +10226,9 @@ Contre-épreuve : treize altérations, chacune prise par au moins un test.
 
 ## D-330 — Simplifier l'usage du module, lot S2 : « Aujourd'hui » où l'on fait tout
 
-Date : 25 novembre 2026. Statut : **PR 1 à 3 sur 5 codées** (valider et
-démarrer, terminer et reprendre, l'arrosage à rattraper) ; contrat `docs/simplification-s2-contract.md`, roadmap
+Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 5 codées** (valider et
+démarrer, terminer et reprendre, l'arrosage à rattraper, noter la pluie) ;
+contrat `docs/simplification-s2-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 15), sur le mandat du porteur du 25 novembre
 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met en œuvre le
@@ -10388,3 +10389,67 @@ autrement », l'annulation d'« Arrosages », la même taille).
 refuse le démarrage mais pas « C’est fait », un créneau en cours sans « C’est
 fait » démarré, « Ne pas le faire » annule, Bob n'annule, n'enregistre ni ne
 démarre rien d'Alice. P62 étendu. Contre-épreuve : voir la PR.
+
+**Décision (PR 4).** La pluie du pluviomètre se note d'un geste depuis
+« Aujourd'hui », dans une fenêtre « Noter la pluie » qui écrit par l'action
+existante `saveManualRainfallAction` (contrat, section 7) : aucune règle de
+pluie ne change. La mesure, 0 mm compris, prime sur la réanalyse et la
+prévision et fait recalculer le plan de sa semaine (3.7, règle 4). « Quel
+jour ? » : « Aujourd’hui », « Hier », « Avant-hier », puis les jours
+d'avant jusqu'à sept jours en arrière, jamais un jour futur ; hier par défaut
+(S2-e). « Combien ? » : un champ décimal, virgule ou point, « mm » à côté ;
+un champ vide n'est jamais 0 (D-003), le bouton reste inactif, et la ligne
+« Pas de pluie ? Notez 0 : c’est une vraie mesure, elle compte. » le dit.
+Le bouton dit le chiffre (« Enregistrer 8 mm ») ; une mesure déjà notée ce
+jour-là se dit (« 8 mm déjà notés pour hier. ») et le bouton devient
+« Remplacer par 5 mm » : jamais d'écrasement silencieux. La réponse se lit
+sous le bouton qui a ouvert la fenêtre : « Pluie enregistrée : 8 mm le
+lundi 15 juin. Le plan se recalcule. » ; un refus de l'action, dans la
+fenêtre, avec son motif. Deux entrées : la tuile « Eau reçue » de « La
+semaine » et la ligne « Pluie réelle incomplète » de « Fiabilité du
+calcul ». La fenêtre n'existe qu'avec « Objectifs et besoins » cochée et
+jamais pour une ferme toute sous abri (D-032). Elle est un composant partagé
+de `app/irrigation/` (`rain-entry-dialog.tsx`), sans rien supposer de la
+page qui l'ouvre : le « + » de S3 la montera aussi.
+
+**Précisions tranchées en codant (PR 4).**
+
+- F854 : les jours proposés restent dans la saison du jour, l'année civile :
+  le 1er janvier, la liste ne porte qu'« Aujourd’hui », qui devient le jour
+  par défaut ; le 3 janvier, aujourd'hui, hier et avant-hier.
+- F855 : « déjà noté » au singulier sous 2 mm (« 0 mm déjà noté pour
+  hier. », « 1,5 mm déjà noté »), au pluriel au-delà, comme le français
+  l'accorde ; un jour plus ancien qu'avant-hier se dit « pour le ven. 12
+  juin ».
+- F856 : la tuile « Eau reçue » dit « Noter la pluie » (au lieu de « Noter
+  une pluie mesurée ») et devient un bouton du même dessin, qui ouvre la
+  fenêtre ; sa réponse s'écrit sous les tuiles. La ligne « Pluie réelle
+  incomplète » dit « Noter la pluie » (au lieu de « Noter la pluie de la
+  semaine ») et devient un bouton plein ; sa réponse reste sous la donnée
+  suivie quand la ligne part, la semaine complète. Sans la fenêtre, les deux
+  restent des liens vers « Objectifs et besoins », comme avant. Dans la
+  fenêtre, « Retirer une mesure, voir jour par jour : sur « Objectifs et
+  besoins » » mène au pli « Pluie mesurée ».
+- F857 : « Le plan se recalcule » ne se dit que « Planning » coché.
+- F858 : les gardes de l'action (date valide, jamais future, de 0 à
+  1 000 mm) se lisent dans `manualRainfallRefusal`
+  (`lib/domain/today/rain-entry.ts`), mêmes mots et mêmes bornes, pour se
+  tester sans session ; l'action l'appelle avec la date du jour à la ferme.
+  Aucune garde ne change.
+- F859 : la règle des boutons de la page « Aujourd'hui » (la pilule de
+  44 px) ne s'applique pas à une tuile-bouton, qui garde le dessin des
+  tuiles ; au téléphone, son mot d'action passe à la ligne comme celui d'une
+  tuile-lien (le parcours a mesuré un pixel de débordement avant).
+
+**Preuve (PR 4).** `tests/simplification-s2-pluie.test.ts` : les jours et le
+jour par défaut, la saison au 1er janvier, la lecture « 8,5 » et « 8.5 », le
+champ vide, 0 accepté, hors bornes refusé, le motif sous le champ, le mot du
+bouton (« Enregistrer », « Remplacer par »), la mesure déjà notée, la réponse,
+les gardes de l'action, la fenêtre absente sans « Objectifs et besoins » ou
+toute sous abri, l'interface (fenêtre partagée, au clavier, l'action
+existante, deux entrées). `tests/db/simplification-s2-pluie.test.ts` : sur la
+vraie base, 8 mm puis 0 mm puis 5,5 mm pour hier relus par la page, une seule
+mesure par jour, le retrait sur « Objectifs et besoins », sept jours en
+arrière au plus, le jour futur et le chiffre hors bornes refusés, Bob qui ne
+voit, ne remplace ni ne retire la pluie d'Alice, pas de fenêtre toute sous
+abri. P62 étendu ; P30 et L1 suivent les mots. Contre-épreuve : voir la PR.
