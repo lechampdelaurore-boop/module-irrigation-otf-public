@@ -504,6 +504,17 @@ question par message.
 - Relevé des mots lus par les tests et les parcours (PR 1).
 - Hauteur du premier niveau, position du premier bouton, nombre de choses à
   toucher, avant et après (PR 5).
+  **Relevé de la PR 5** (25 novembre 2026, P62 à 390 px, une ferme neuve
+  propre au parcours, une proposition à valider, trois données à rafraîchir
+  et l'encart « À finir » de S1 au-dessus) : **avant**, les mesures de la
+  section 1 (la page du jour 3 888 px sur la démonstration, 5 123 px sur la
+  ferme réelle ; le premier bouton à 1 057 px ; 39 à 56 choses à toucher) ;
+  **après**, le premier niveau finit à **1 384 px** (borne 1 600), le bouton
+  principal de la première carte est à **539 px** (borne 600 ; 623 px tel quel,
+  dont 84 px de nom de matériel que le titre du test étire sur quatre
+  lignes, F867), **11** choses à toucher (borne 12). L'avant n'a pas été
+  remesuré sur la même ferme de parcours : le parcours n'existait pas avant
+  cette PR.
 - Décision de ce lot, précisions F, parcours P62 : numéros pris en codant.
 
 ## 15. Réglage du code
