@@ -16,6 +16,14 @@ source détaillée commit par commit.
   d'heure. Le réglage est gardé par ferme et écrit au journal des
   modifications. Rien ne change encore pour aucune ferme : aucune
   notification ne lit la règle (H2) et aucun écran ne l'allume (H3).
+### Corrigé (lenteur du module, N3)
+
+- **Le serveur relit beaucoup moins la base** (D-325) : pendant une
+  requête, l'espace de la ferme, le choix des fonctionnalités, l'accueil et
+  la préférence météo ne sont lus qu'une fois, au lieu d'une fois par
+  service qui les demande ; ouvrir « Aujourd'hui » demande 98 lectures au
+  lieu de 176. Rien n'est gardé d'une requête à l'autre ni d'une ferme à
+  l'autre ; toute écriture vide cette mémoire.
 
 ### Corrigé (lenteur du module, N1)
 
