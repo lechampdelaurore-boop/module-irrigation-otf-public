@@ -94,7 +94,11 @@ puis rechargeait vers la page d'arrivée.
   navigateur (`legacyRedirect`).
 - L'adresse de départ du manifeste ne change pas : une application déjà
   installée en profite sans rien refaire.
-- Mesuré (même banc que la section 2) : environ 0,4 s de moins à l'ouverture.
+- Mesuré (banc de la section 2, sans lecture lente de la base, moyenne de
+  cinq ouvertures à cache vide) : le départ vers « Aujourd'hui » part
+  0,33 s après la demande au lieu de 0,59 s, la page est utilisable à
+  2,04 s au lieu de 2,18 s. Le reste de l'ouverture est le calcul
+  d'« Aujourd'hui » (N3) et le chargement des scripts.
 - Parcours P59 : tous les scripts du module refusés, `/irrigation` mène
   encore à « Aujourd'hui ».
 
