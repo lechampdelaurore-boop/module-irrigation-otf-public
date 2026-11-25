@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S1, PR 3 : un seul objectif)
+
+- **« Objectifs et besoins » dit le même objectif qu'« Aujourd'hui »**
+  (D-328) : la ligne de résumé et la tuile « Eau visée cette semaine »
+  montraient l'objectif saisi pour toute la ferme, quand « Aujourd'hui »
+  montrait la moyenne des objectifs de chaque planche, ceux des jardins et
+  des planches compris. Les deux pages lisent maintenant le même calcul et
+  la même phrase, « 5,2 mm visés, ferme entière » ou « 23,4 mm visés, 7
+  planches sur 10 ont un objectif ». Le besoin, l'écart et l'objectif
+  automatique ne changent pas. L'Historique suivra (D-329).
+
 ### Modifié (simplifier l'usage du module, S1, PR 2 : les mots)
 
 - **Les titres et les boutons parlent comme le champ** (D-328) :

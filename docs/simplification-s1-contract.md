@@ -372,6 +372,44 @@ guidée sont lus avec les mêmes mots (règle 6).
   retient (sa RFU) » ; « réserve utile (RFU) » reste dans le « ? » de
   « Réserve du sol ».
 
+### 9.6 PR 3 — Cause du point S1-O1 et issue choisie (25 novembre 2026)
+
+**Cause, établie dans le code** (lecture seule ; pas relue sur la ferme
+réelle, qui demande l'accord du porteur) :
+
+| Page | Objectif de la ferme | Irrigation |
+| --- | --- | --- |
+| « Aujourd'hui » (`lib/domain/today/week.ts`) | moyenne pondérée par la surface des objectifs **applicables** de chaque planche (`objectiveForBed` : le plus précis des objectifs saisis, sinon l'objectif automatique), sur les planches qui en ont un | moyenne pondérée de l'eau reçue par chaque planche, sur les mêmes planches |
+| « Objectifs et besoins », ligne de résumé et tuile « Objectif ferme » | l'objectif « Toute la ferme » **saisi** (`goals.find(scopeType === 'farm')`), un réglage que l'objectif d'un jardin ou d'une planche remplace là où il est posé | le volume sorti des pompes dans la semaine, réparti sur toute la surface des planches de la saison |
+| « Historique et cumuls » | la somme, sur les journées-planche, des objectifs applicables pondérés par la surface, **les planches sans objectif comptées à zéro** (D-036) | l'eau réelle de la période |
+
+Les trois pondèrent par la surface : **ce n'est pas la deuxième issue** (une
+moyenne sans pondération). Les 2,7 mm de la ferme réelle sont
+vraisemblablement l'objectif « Toute la ferme » saisi, et ses 5,2 mm la
+moyenne avec des objectifs plus hauts posés sur des jardins ; le test rejoue
+ce cas. **Première issue** : un autre périmètre, on aligne. L'irrigation
+(2,8 mm contre 2,1 mm) compte deux choses différentes, chacune dite dans son
+détail (« répartis sur la surface totale des planches ») : elle ne change
+pas.
+
+**L'Historique** (23,4 mm contre 16,5 mm sur la démonstration) tient à une
+décision écrite du porteur, D-036 : la question lui a été posée ; il a
+choisi le 25 novembre 2026 à 13 h 35 de compter comme « Aujourd'hui »
+(D-329). Règle de calcul sensible : PR 3 bis, à part, en Opus 5.5 · Max.
+
+**Ce que fait la PR 3.** `lib/domain/farm-objective.ts` : `farmObjective`
+(la moyenne pondérée sur les planches qui ont un objectif, leur nombre et
+le total), `farmObjectiveScopeText` (« ferme entière », « 7 planches sur 10
+ont un objectif ») et `farmObjectiveText`, la phrase (« 5,2 mm visés, ferme
+entière », « aucune eau visée »). « Aujourd'hui » l'appelle pour la ferme et
+chaque jardin ; les besoins de la semaine la calculent
+(`IrrigationNeedsDashboard.farmObjective`), et la ligne de résumé et la
+tuile « Eau visée cette semaine » d'« Objectifs et besoins » la reprennent,
+pour la semaine affichée seulement (« eau visée en cours de lecture » le
+temps que les besoins d'une autre semaine soient relus). Le pli « Eau visée
+cette semaine » garde « Toute la ferme : 2,7 mm », qui dit l'objectif saisi
+à ce niveau. Le planning ne dit pas d'objectif de ferme : rien à aligner.
+
 ## 10. Réglage du code
 
 Opus 5.5 · Élevé pour les trois PR : fonctionnalité délimitée sous contrat

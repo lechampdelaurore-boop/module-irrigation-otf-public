@@ -107,7 +107,7 @@ test('règle 1 : les titres et les étiquettes prennent leur mot dans le module 
 });
 
 test('l’ET0 : au premier niveau, la soif ; « ET0 » reste dans le détail', () => {
-  const line = weekTotalsLine({ farmGoalMm: 25, realizedIrrigationMm: 12, actualRainMm: 3.5, remainingForecastRainMm: 5, et0Mm: 18.2, partial: true });
+  const line = weekTotalsLine({ objective: { objectiveMm: 25, withObjective: 4, total: 4 }, realizedIrrigationMm: 12, actualRainMm: 3.5, remainingForecastRainMm: 5, et0Mm: 18.2, partial: true });
   assert.match(line, /soif de la semaine 18,2 mm/);
   assert.doesNotMatch(line, /ET0|totaux partiels/);
   assert.match(line, /totaux incomplets$/);

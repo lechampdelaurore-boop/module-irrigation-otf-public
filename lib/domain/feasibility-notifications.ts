@@ -58,3 +58,20 @@ export const CHANGE_JOURNAL_CHANGED = 'irrigation-change-journal-changed';
 export function notifyChangeJournalChanged() {
   window.dispatchEvent(new CustomEvent(CHANGE_JOURNAL_CHANGED));
 }
+
+/**
+ * L'objectif de la ferme de la semaine, relu avec les besoins (S1, PR 3) :
+ * la ligne de résumé et la tuile d'« Objectifs et besoins » le reprennent
+ * tel quel, sans refaire la moyenne. Le signal porte la semaine, pour qu'une
+ * réponse d'une autre semaine ne s'affiche pas.
+ */
+export const FARM_OBJECTIVE_READ = 'irrigation-farm-objective-read';
+
+export type FarmObjectiveNotice = {
+  weekStart: string;
+  objective: { objectiveMm: number | null; withObjective: number; total: number };
+};
+
+export function notifyFarmObjectiveRead(notice: FarmObjectiveNotice) {
+  window.dispatchEvent(new CustomEvent<FarmObjectiveNotice>(FARM_OBJECTIVE_READ, { detail: notice }));
+}

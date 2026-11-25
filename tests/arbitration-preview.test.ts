@@ -25,6 +25,7 @@ const bed = (id: string, need: number, patch: Partial<BedIrrigationNeed> = {}): 
 const pool = (amount: number, beds: BedIrrigationNeed[]): FeasibilityPool => ({ key: 'reservoir:r', name: 'Réserve', currentCubicMeters: amount, forecastCubicMeters: amount, reasons: [], paths: Object.fromEntries(beds.map((row) => [row.bedId, 'confirmed'])) });
 const needs = (beds: BedIrrigationNeed[]) => ({
   season: 2026, weekStart: '2026-07-20', weekEnd: '2026-07-26', timeZone: 'Europe/Paris', calculatedAt: '2026-07-22T08:00:00.000Z', thresholdMm: 0,
+  farmObjective: { objectiveMm: null, withObjective: 0, total: beds.length },
   gardens: [{ plotId: 'jardin-a', plotName: 'Jardin A', zoneId: 'parcelle-sud', zoneName: 'Parcelle Sud', sheltered: false, areaSquareMeters: beds.length * 1000, bedCount: beds.length, priorityCounts: { high: 0, normal: beds.length, low: 0 }, realRemainingMm: null, effectiveNeedMm: null, effectiveVolumeCubicMeters: null, beds }],
   completeness: { complete: true, missing: [], demandComplete: true, realComplete: true, planningComplete: true, missingDates: { et0: [], actualRain: [], forecastRain: [] }, estimatedDates: { actualRain: [] } },
 }) as IrrigationNeedsDashboard;

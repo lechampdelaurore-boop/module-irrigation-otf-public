@@ -19,7 +19,7 @@ async function computeBesoinsPage({ searchParams }: { searchParams: IrrigationSe
   context.logLoaded();
   return (
     <IrrigationShell {...context.shell}>
-      <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} />
+      <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} initialFarmObjective={{ weekStart: irrigationNeeds.weekStart, objective: irrigationNeeds.farmObjective }} />
       <IrrigationNeedsDashboardView season={context.season} initialDashboard={irrigationNeeds} showProposals={context.enabled.includes('cultures')} />
     </IrrigationShell>
   );

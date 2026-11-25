@@ -255,3 +255,25 @@ test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’
   }
   expect(lus, 'un mot du calcul se lit d’emblée').toEqual([]);
 });
+
+/**
+ * PR 3, un seul objectif (contrat, section 5 et section 9.6) : « Aujourd'hui »
+ * et « Objectifs et besoins » disent le même objectif de la ferme pour la
+ * semaine en cours, avec la même phrase, sur la ferme des parcours.
+ */
+test('« Aujourd’hui » et « Objectifs et besoins » disent le même objectif de la ferme', async ({ page }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const tuile = page.locator('a.today-kpi').filter({ has: page.locator('.today-kpi-label', { hasText: 'Eau visée cette semaine' }) });
+  const valeur = (await tuile.locator('.today-kpi-value').innerText()).trim();
+  const portee = (await tuile.locator('.today-kpi-detail').innerText()).split(', du ')[0].trim();
+  await verifierLEtape(page, journal, 'l’objectif d’« Aujourd’hui »');
+
+  await attendreLaPageIrrigation(page, 'besoins');
+  const ligne = page.locator('.water-summary-line > span');
+  const phrase = /^\d/.test(valeur) ? `${valeur} visés, ${portee}` : 'aucune eau visée';
+  await expect(ligne).toHaveText(new RegExp(`^${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} · `));
+  await verifierLEtape(page, journal, 'le même objectif sur « Objectifs et besoins »');
+});

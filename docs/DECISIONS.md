@@ -10058,8 +10058,9 @@ téléphone ; la proposition elle-même n'a pas été essayée par un maraîcher
 
 ## D-328 — Simplifier l'usage du module, lot S1 : le chapeau et les mots
 
-Date : 25 novembre 2026. Statut : **PR 1 et PR 2 sur 3 codées** (le
-chapeau d'une ligne, les mots) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
+Date : 25 novembre 2026. Statut : **PR 1, PR 2 et PR 3 sur 3 codées** (le
+chapeau d'une ligne, les mots, un seul objectif ; l'Historique suit par une
+PR 3 bis, D-329) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la roadmap,
 sur le mandat du porteur du 25 novembre 2026 (enchaîner les lots sans
 nouveau « vas-y », D-327). Les PR 2 (les mots) et 3 (un seul objectif)
@@ -10134,3 +10135,59 @@ usages pris dans le module sans recopie, l'ET0 dans le détail, l'écran de
 bienvenue et la visite guidée ; parcours P61 étendu (les mots du tableau
 lus, aucun mot du calcul visible d'emblée sur les douze pages) ; seize
 parcours relus avec les nouveaux libellés. Contre-épreuve : voir la PR.
+
+**Cause du point S1-O1 (PR 3), établie dans le code.** Ce n'est pas une
+moyenne sans pondération : les deux pages pondèrent par la surface. La
+ligne de résumé et la tuile « Objectif ferme » d'« Objectifs et besoins »
+affichaient l'objectif « Toute la ferme » **saisi**, un réglage que
+l'objectif d'un jardin ou d'une planche remplace là où il est posé ;
+« Aujourd'hui » fait la moyenne pondérée des objectifs **applicables** de
+chaque planche (`objectiveForBed`). Sur la ferme réelle, 2,7 mm sont
+vraisemblablement l'objectif saisi pour toute la ferme, et 5,2 mm la
+moyenne avec des objectifs plus hauts posés sur des jardins : déduit du
+code et rejoué en test, pas relu sur la ferme réelle. C'est la
+première issue du contrat (un autre périmètre) : on aligne. L'irrigation
+diffère aussi (2,8 mm contre 2,1 mm) : « Objectifs et besoins » répartit le
+volume sorti des pompes sur toute la surface des planches, « Aujourd'hui »
+pondère l'eau que chaque planche a reçue ; les deux disent ce qu'ils
+comptent, rien ne change (contrat, section 9.6).
+
+**Décision (PR 3).** Un seul calcul de l'objectif de la ferme :
+`lib/domain/farm-objective.ts`, la moyenne pondérée par la surface sur les
+planches qui ont un objectif, les autres comptées à voix haute (« 7
+planches sur 10 ont un objectif »), jamais à zéro. Une seule phrase :
+« 5,2 mm visés, ferme entière ». « Aujourd'hui » (la semaine de la ferme et
+de chaque jardin) et « Objectifs et besoins » (la ligne de résumé et la
+tuile « Eau visée cette semaine », lues sur les besoins de la semaine
+affichée) l'appellent ; le planning ne dit pas d'objectif de ferme. Rien ne
+change dans le besoin, l'écart, l'ET0 ni l'objectif automatique.
+
+**Preuve (PR 3).** `tests/simplification-s1-objectif.test.ts` : deux
+fermes (toutes les planches avec objectif, de surfaces différentes ; une
+partie seulement), le cas S1-O1 rejoué (« Toute la ferme » 2,7 mm, un
+jardin à 7 mm : 5,9 mm visés), « Aujourd'hui » et la ligne des besoins avec
+le même chiffre et la même phrase, aucune page qui refait la moyenne.
+Parcours P61 étendu. Contre-épreuve : voir la PR.
+
+## D-329 — L'Historique compte l'objectif comme « Aujourd'hui »
+
+Date : 25 novembre 2026, 13 h 35. **Décision du porteur** (« ok pour
+l'historique »), sur la question posée par la PR 3 du lot S1 (D-328), avec
+l'option recommandée. Elle remplace D-036 sur un point : l'objectif d'une
+période ne compte plus à zéro les planches sans objectif. Comme
+« Aujourd'hui », il est la moyenne pondérée par la surface sur les seules
+planches qui ont un objectif sur la période, et la page dit combien n'en
+ont pas ; une seule période sur une seule semaine donne le même chiffre que
+« Aujourd'hui ». Le reste de D-036 tient : un objectif posé en cours de
+semaine vaut pour ses jours restants, et une période sans aucun objectif est
+sans objectif ni écart.
+
+**Pourquoi.** Le but du lot S1 : un seul objectif, le même chiffre sur
+chaque page (contrat, section 5). Sur la démonstration, la même semaine,
+« Aujourd'hui » disait 23,4 mm et « Historique » 16,5 mm.
+
+**Comment.** Une règle de calcul sensible (l'objectif et l'écart d'une
+période) : une PR à part, la PR 3 bis du lot S1, en Opus 5.5 · Max (contrat,
+section 10), dans un fil à part, après la PR 3. L'écart d'une période se
+redéfinit avec elle sur le même périmètre ; la PR 3 bis l'écrit avant le
+code.

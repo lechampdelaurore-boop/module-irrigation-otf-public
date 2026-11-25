@@ -3,7 +3,7 @@
 import { UNCLASSIFIED_PLOT_REASON } from '@/lib/domain/onboarding/plots';
 import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
+import { notifyFarmObjectiveRead, notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriority, type IrrigationNeedsDashboard } from '@/lib/domain/irrigation-needs';
 import { automaticObjectiveOriginText, gardenUnknownReason, objectiveOriginText } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
@@ -62,6 +62,10 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     window.addEventListener('irrigation-needs-source-changed', refresh);
     return () => { window.removeEventListener('irrigation-events-changed', refresh); window.removeEventListener('irrigation-needs-source-changed', refresh); };
   }, [receive, season]);
+  // L'objectif de la ferme de la semaine affichée, à la ligne de résumé de la page (S1, PR 3).
+  useEffect(() => {
+    notifyFarmObjectiveRead({ weekStart: dashboard.weekStart, objective: dashboard.farmObjective });
+  }, [dashboard]);
   // Un lien d'« Aujourd'hui » vise un jardin (6 nonies, L2) : son pli s'ouvre et vient en haut, au chargement comme à un lien suivi dans la page.
   useEffect(() => {
     const openTargetedGarden = () => {
