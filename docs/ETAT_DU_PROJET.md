@@ -26,10 +26,10 @@ registres, elle y renvoie.
   ce que devient une alarme, il laisse le scénario 15 du contrat non tenu
   (F804). Aucun écran n'allume encore la plage : rien ne change pour aucune
   ferme. Tests à deux fermes et Worker simulé, contre-épreuve de
-  quarante altérations. Contrôles : voir la PR. **Fusion après H1.**
-  Reste H3, l'écran, en Opus 5.5 · Élevé.
+  quarante altérations. Contrôles : voir la PR. Reste H3, l'écran, en
+  Opus 5.5 · Élevé.
 - **Heures de silence des notifications, H1 : la règle et le réglage,
-  codés le 24 novembre 2026** (D-321, F797 à F802, roadmap section 6
+  en ligne le 25 novembre 2026 à 5 h 56** (D-321, F797 à F802, roadmap section 6
   undecies, PR 1 sur 3), en Opus 5.5 · Max, le réglage de la roadmap. La
   règle vit en un seul endroit du domaine
   (`lib/domain/notification-quiet-hours.ts`) : pour une notification et
@@ -46,7 +46,10 @@ registres, elle y renvoie.
   D-319) consignée ici : fusionnée le 24 novembre 2026 à 23 h 12, **en
   ligne à 23 h 37** (run 45498654145, les cinq jobs verts ; aucune
   migration : « No migrations to apply » en production et sur la
-  démonstration).
+  démonstration). Mise en ligne de #202 (H1, D-321) consignée ici :
+  fusionnée le 25 novembre 2026 à 5 h 28, **en ligne à 5 h 56** (run
+  45547072540, les cinq jobs verts ; migration 0049 appliquée en
+  production et sur la démonstration, démonstration à 5 h 57).
 - **Lenteur du module : N3, l'espace lu une fois par requête, en ligne le
   25 novembre 2026 à 3 h 36** (D-325, F810 à F816, contrat de la tranche 4, section
   5 sexies ; roadmap section 6 duodecies), en Opus 5.5 · Max, le réglage de
