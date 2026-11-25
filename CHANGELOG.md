@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
+
+- **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
+  page, `/irrigation/semaine`. Sa vue « La semaine » montre, dans l'ordre
+  d'avant et sans rien changer, le planning puis les objectifs et besoins ;
+  sa vue « Les cumuls » est l'historique. Sous le titre, deux liens passent
+  d'une vue à l'autre sans recharger ; ils remplacent la bande « La
+  semaine ». La barre du bas et le menu de l'ordinateur ouvrent la page ;
+  le menu nomme ses deux vues. Les adresses du planning, des besoins et de
+  l'historique mènent à la page, avec leurs réglages d'adresse et leur
+  ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
+  coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
 
 - **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page

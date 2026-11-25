@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S4, PR 1 sur 4 : une page, deux vues,
+  codée le 25 novembre 2026** (D-335, F916 à F922 ; contrat
+  `docs/simplification-s4-contract.md`, sections 3, 7.4 et 9), en Opus 5.5 ·
+  Très élevé, après la fin du code de S5, sur la branche de sa PR 3. La page
+  « Semaine » (`/irrigation/semaine`) réunit sans rien changer les blocs du
+  planning et des besoins (vue « La semaine ») et l'historique (vue « Les
+  cumuls », `?vue=cumuls`) ; le sélecteur des deux vues remplace la bande de
+  S3 ; la barre et le menu y mènent ; les trois anciennes adresses sont
+  redirigées par le serveur, paramètres et ancre gardés. Règle dans
+  `lib/domain/features/week-page.ts` ; relevé des onze ancres ; temps du
+  serveur 359 ms pour 394 permis (F918) ; à 390 px, « La semaine »
+  3 047 px (894 et 2 573 px avant), « Les cumuls » 1 874 px (1 920 px) : la
+  PR 1 range, la PR 2 raccourcit. Aucun calcul ni aucune écriture
+  changés. Tests, parcours P66 ; neuf parcours suivent. Contrôles : voir la
+  PR. Viennent la PR 2 (le premier niveau), les PR 3 et 4 ; fusions après
+  celles de S3 et S5.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la

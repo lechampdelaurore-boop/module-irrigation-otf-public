@@ -665,6 +665,60 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
 - Décision de ce lot, précisions F, parcours : numéros pris en codant (PR 1).
 - Ce que la PR 2 a trouvé sur le « mm par jour » (S4-e).
 
+### PR 1 (25 novembre 2026)
+
+**Numéros** : décision D-335 ; précisions F916 à F922 ; parcours P66.
+
+**Relevé, ce qui lit les trois anciennes pages.**
+
+- *Ancres* (section 7.4, `WEEK_ANCHORS` de `lib/domain/features/week-page.ts`) :
+  `irrigation-needs-title`, `besoin-jardin-<jardin>`, `planning` (posée par la
+  PR 1 sur la section du plan : elle n'existait pas), `planning-title`,
+  `proposal-<proposition>`, `objectifs-de-la-semaine`, `manual-rain`,
+  `meteo-de-reference`, `weather`, `reglages-de-la-page` (la vue « La
+  semaine ») ; `series-water-title` (la vue « Les cumuls », qui ouvre
+  désormais « Par série »). Un test vérifie que toute ancre citée par un lien
+  du domaine, un test ou un parcours y est. Les ancres des visites
+  (`data-tour` : `planning-semaine`, `planning-propositions`,
+  `planning-non-servies`, `planning-creneaux`) sont sur le plan, inchangées.
+- *Liens des pages* (rebranchés par la PR 4, servis d'ici là par les
+  redirections) : « Aujourd'hui » (`today-header.tsx`, `today-page.tsx`,
+  `today-gauges.tsx` ; `lib/domain/today/` : `essential.ts`, `week.ts`,
+  `ahead.ts`, `today-view.ts`, `reliability.ts`, `today-irrigations.ts`,
+  `missing-by-bed.ts`), « Matériel » (`hierarchy-browser.tsx`), la feuille du
+  « + » (`feature-menu.tsx`, le lien vers les besoins), l'accueil
+  (`settings-review.ts`), la faisabilité (`feasibility-plan-gap.ts`).
+- *Notifications* : l'alerte d'aspersion et l'historique des alertes cultures
+  (`crop-alerts/sprinkler.ts`, `crop-alerts-view.ts`, `/irrigation/planning?week=…`)
+  passent à « Semaine » dans la PR 4 ; les anciennes adresses de
+  `/irrigation#…` suivent `legacyRedirect`, réécrite dans la PR 1.
+- *Tests* réécrits dans la PR 1 : `feature-selection`, `aujourdhui-menu`,
+  `audit-ergonomie-final-lot-b`, `audit-ergonomie-lot2-aujourdhui`,
+  `audit-ergonomie-lot2-telephone`, `simplification-s1`,
+  `simplification-s1-objectif`, `simplification-s3-endroits`,
+  `simplification-s3-menu`, `simplification-s3-barre` ; nouveau :
+  `simplification-s4-semaine`.
+- *Parcours* réécrits dans la PR 1 : P0, P22, P24, P27, P28, P40, P59, P61,
+  P63 ; nouveau : P66. Restent verts par les redirections, à reprendre dans
+  la PR qui les change : P1, P4, P7, P8, P9, P10, P12, P13, P15, P17, P21,
+  P26, P30, P31, P32, P35, P37, P38, P41, P52, P56, P57, P58, P62.
+
+**Mesures.**
+
+- *Temps du serveur* (F918 ; en local, `vinext dev`, base de démonstration,
+  20 ms par lecture, deuxième passage, comme N1) : avant, planning 235 ms
+  (39 lectures), besoins 328 ms (45), historique 120 ms (14) ; après, « La
+  semaine » 359 ms (68), « Les cumuls » 120 ms (14). Budget : 394 ms, tenu.
+- *Hauteur à 390 px*, données des parcours fraîches, toutes cases cochées :
+  avant, planning 894 px, besoins 2 573 px, historique 1 920 px ; après,
+  « La semaine » 3 047 px (3 935 px dans la suite des parcours, P40),
+  « Les cumuls » 1 874 px. La PR 1 ne raccourcit rien (elle range) ; le
+  premier niveau et son budget de 1 700 px viennent avec la PR 2.
+- *Premier bloc utile* à 390 px (P61) : le plan à 215 px (261 px sur le
+  planning avec la bande de S3), les onglets des cumuls à 215 px (261 px), le
+  sélecteur des deux vues à la place de la bande ; le tableau des besoins à
+  922 px, sous le plan (449 px sur sa page).
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième
