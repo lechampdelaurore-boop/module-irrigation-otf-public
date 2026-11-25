@@ -55,7 +55,7 @@ export function CoverageOverview({
             <span>
               <small>Cumul maximal</small>
               <strong>{formatIrrigationRate(coverage.maxRateMmPerHour)}</strong>
-              <em className="coverage-metric-meaning">L’apport horaire le plus fort sur une planche, matériels additionnés : à comparer à ce que votre sol absorbe.</em>
+              <em className="coverage-metric-meaning">Ce que les matériels apportent en une heure, additionnés, sur la planche qui en reçoit le plus : à comparer à ce que votre sol absorbe.</em>
             </span>
           </div>
           <div className="coverage-equipment-list" aria-label="Matériels calculés">

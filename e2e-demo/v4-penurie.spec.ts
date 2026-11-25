@@ -12,7 +12,7 @@ const ETAPES: EtapeAttendue[] = [
   { titre: 'Les réserves et leur minimum', rang: 'étape 2 sur 5', ancre: 'ressources-reserves', chemin: '/irrigation/ressources' },
   { titre: 'Le manque chiffré', rang: 'étape 3 sur 5', ancre: 'planning-semaine', chemin: '/irrigation/planning' },
   { titre: 'Qui passe après les autres', rang: 'étape 4 sur 5', ancre: 'planning-non-servies', chemin: '/irrigation/planning' },
-  { titre: 'La faisabilité de la semaine', rang: 'étape 5 sur 5', ancre: 'faisabilite', chemin: '/irrigation/ressources' },
+  { titre: 'Y a-t-il assez d’eau cette semaine ?', rang: 'étape 5 sur 5', ancre: 'faisabilite', chemin: '/irrigation/ressources' },
 ];
 
 test('V4 Quand l’eau manque : trois pages, une pause ailleurs, la reprise sur un clic', async ({ page }) => {
