@@ -1192,7 +1192,9 @@ selon la règle de la section 10.
     (valider et démarrer, terminer et reprendre, l'arrosage à rattraper,
     noter la pluie, la page à l'essentiel) codées le 25 novembre 2026**
     (D-330), en Opus 5.5 · Élevé : le code de S2 est fini, ses PR s'ouvrent
-    une à une ; **la PR 1 en ligne à 19 h 57** (#219, run 45675486394). Un seul chantier
+    une à une ; **la PR 1 en ligne à 19 h 57** (#219, run 45675486394), **la
+    PR 2 à 20 h 40** (#221, run 45682330610), **la PR 3 à 21 h 29** (#224,
+    run 45689347330). Un seul chantier
     de code à la fois ; indépendant des lignes 30 à 32 (S1 ne touche ni l'objectif
     automatique ni les notifications), mais S2 et S3 attendent la fin du
     code de S1 (fichiers communs : le gabarit des pages). **Contrat S3
