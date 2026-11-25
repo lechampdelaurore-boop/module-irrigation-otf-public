@@ -167,13 +167,14 @@ test('arrosages : rien de présélectionné, « À traiter » en tête, lignes p
   await expect(annuler).toBeHidden();
   await verifierLEtape(page, journal, 'menu « … » ouvert puis refermé');
 
-  // Cas 7 : « Fait comme prévu » sur la ligne passée seulement, ici et sur « Aujourd'hui ».
+  // Cas 7 : « Fait comme prévu » sur la ligne passée seulement ; sur « Aujourd'hui », le même enregistrement dit « C’est fait »
+  // depuis la simplification S2, PR 3 (D-330).
   await expect(prevue.getByRole('button', { name: /^Fait comme prévu/ })).toHaveCount(0);
   const faitCommePrevu = passee.getByRole('button', { name: new RegExp(`^Fait comme prévu : ${materiel}`) });
   await expect(faitCommePrevu).toBeVisible();
   if (telephone) await verifierCibleTactile(faitCommePrevu, 'Le bouton « Fait comme prévu »');
   await attendreLaPageIrrigation(page, 'aujourdhui');
-  await expect(page.locator('#today-day').getByRole('button', { name: new RegExp(`^Fait comme prévu : ${materiel}`) })).toHaveCount(1);
+  await expect(page.locator('#today-day').getByRole('button', { name: new RegExp(`^C’est fait : ${materiel}`) })).toHaveCount(1);
   await attendreLaPageIrrigation(page, 'arrosages');
 
   // Rien n'est écrit au premier clic ; « Ne rien enregistrer » ferme sans rien écrire.
