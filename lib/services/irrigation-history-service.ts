@@ -259,7 +259,7 @@ function historyWarnings(summary: IrrigationHistorySummary) {
   // Une couverture partielle n'est pas une donnée manquante (D-036) : la carte
   // « Objectif » affiche le nombre de journées-planche couvertes.
   if (summary.objectiveAvailability.availableBedDays === 0) {
-    warnings.push('Aucun objectif hydrique applicable n’est historisé sur cette période.');
+    warnings.push('Aucune eau visée n’est enregistrée sur cette période.');
   }
   // L'objectif automatique sans valeur un jour n'est jamais compté pour zéro en silence (D-003, D-309).
   const automaticMissing = summary.objectiveAutomatic?.missingBedDays ?? 0;

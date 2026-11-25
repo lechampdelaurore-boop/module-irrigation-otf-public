@@ -1180,7 +1180,7 @@ selon la règle de la section 10.
     s'enchaînent sans nouveau « vas-y » : S1 (chapeau et mots,
     `docs/simplification-s1-contract.md`), S2, S3, S5, S4, S6. Opus 5.5 ·
     Élevé pour S1, S2 et S5, Opus 5.5 · Très élevé pour S3, S4 et S6.
-    **Contrat S1 écrit le 25 novembre 2026.** **S1, PR 1 sur 3 (le
+    **Contrat S1 écrit le 25 novembre 2026, en ligne à 13 h 22 (#209).** **S1, PR 1 sur 3 (le
     chapeau d'une ligne) codée le 25 novembre 2026** (D-328) ; **PR 2 sur
     3 (les mots) codée le même jour** (D-328, F832 à F837) ; vient la PR 3
     (un seul objectif, S1-O1). Un seul chantier
@@ -5942,7 +5942,7 @@ la PR 3 du lot S1 l'établit d'abord (contrat, section 5).
 
 **Avancement.**
 
-- **S1, contrat écrit le 25 novembre 2026** (D-327, D-328) : trois PR, le
+- **S1, contrat écrit le 25 novembre 2026** (D-327, D-328 ; en ligne à 13 h 22, #209) : trois PR, le
   chapeau d'une ligne, les mots, un seul objectif ; Opus 5.5 · Élevé.
   **PR 1 codée le 25 novembre 2026** (D-328, F829 à F831) : le chapeau
   tient en une ligne ; la ligne de lecture d'Ouvre ta ferme ne se montre

@@ -27,7 +27,11 @@ registres, elle y renvoie.
   test de garde échoue si un mot du calcul reparaît hors des endroits
   permis. Relevé et sort de chaque mot : contrat, section 9.4. Parcours
   P61 étendu, seize parcours relus avec les nouveaux mots. Contrôles : voir
-  la PR. Reste la PR 3 (un seul objectif, S1-O1).
+  la PR. Reste la PR 3 (un seul objectif, S1-O1). **Le contrat S1 et
+  l'inscription des six lots sont en ligne** (#209, fusionnée le 25 novembre
+  2026 à 12 h 30, déployée à 13 h 22, run 45605041672 vérifié job par job :
+  « Application », « Workers Cloudflare », « Parcours navigateur »,
+  « Déploiement Cloudflare » et « Déploiement de la démonstration », verts).
 - **Simplifier l'usage du module, S1, PR 1 sur 3 : le chapeau d'une ligne,
   codée le 25 novembre 2026** (D-328, F829 à F831, roadmap section 6
   terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap, sur

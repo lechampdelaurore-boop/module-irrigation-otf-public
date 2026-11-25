@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
+  ouvrirLaCorrespondanceDesEspeces,
   surveillerLaConsole,
   TITRES_DES_PAGES,
   verifierCibleTactile,
@@ -214,7 +215,8 @@ const MOTS_DU_CALCUL = [
 test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’emblée', async ({ page }, testInfo) => {
   test.setTimeout(150_000);
   const journal = surveillerLaConsole(page);
-  await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
+  const telephone = testInfo.project.name === 'telephone';
+  await aLaLargeurDuContrat(page, telephone);
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(page.getByText('Eau visée cette semaine', { exact: true }).first()).toBeVisible();
@@ -223,24 +225,33 @@ test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’
   await attendreLaPageIrrigation(page, 'besoins');
   await expect(page.getByRole('heading', { name: 'Eau visée cette semaine, météo et ressource en eau' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Ce qu’il reste à arroser' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Y a-t-il assez d’eau ?' })).toBeVisible();
-  await expect(page.getByText('Soif de la semaine', { exact: true }).first()).toBeVisible();
+  // L'ET0 se dit « soif » (F833) : dans la ligne de résumé au téléphone, sur la tuile à l'ordinateur.
+  if (telephone) await expect(page.locator('.water-summary-line')).toContainText('soif de la semaine');
+  else await expect(page.getByText('Soif de la semaine', { exact: true }).first()).toBeVisible();
 
   await attendreLaPageIrrigation(page, 'cultures');
-  await expect(page.getByRole('heading', { name: 'À quelle culture ressemble chaque espèce ?' })).toBeVisible();
   await expect(page.getByText('Réglages fins des cultures (pour les experts)').first()).toBeVisible();
 
-  await attendreLaPageIrrigation(page, 'planning');
-  await expect(page.getByRole('heading', { name: 'Heures où l’on n’arrose pas' })).toBeVisible();
+  // La correspondance des espèces vit dans « Réglages » (3.8, précision P3).
+  await attendreLaPageIrrigation(page, 'reglages');
+  await ouvrirLaCorrespondanceDesEspeces(page);
+  await expect(page.getByRole('heading', { level: 2, name: 'À quelle culture ressemble chaque espèce ?' })).toBeVisible();
+
+  // « Heures où l'on n'arrose pas » : le parcours P26, qui pose d'abord un objectif et un plan.
 
   await attendreLaPageIrrigation(page, 'ressources');
   await expect(page.getByText('Eau utilisable', { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Y a-t-il assez d’eau ?' })).toBeVisible();
 
+  const lus: string[] = [];
   for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
     await attendreLaPageIrrigation(page, cible);
     const texte = (await page.locator('main').innerText()).toLocaleLowerCase('fr-FR');
-    const lus = MOTS_DU_CALCUL.filter((mot) => texte.includes(mot.toLocaleLowerCase('fr-FR')));
-    expect(lus, `« ${TITRES_DES_PAGES[cible]} » montre d’emblée un mot du calcul`).toEqual([]);
+    for (const mot of MOTS_DU_CALCUL) {
+      const debut = texte.indexOf(mot.toLocaleLowerCase('fr-FR'));
+      if (debut >= 0) lus.push(`${TITRES_DES_PAGES[cible]} : « ${mot} » dans « ${texte.slice(Math.max(0, debut - 40), debut + mot.length + 40)} »`);
+    }
     await verifierLEtape(page, journal, `mots de ${cible}`);
   }
+  expect(lus, 'un mot du calcul se lit d’emblée').toEqual([]);
 });

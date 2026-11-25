@@ -97,7 +97,7 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
           <>
             <h2 id="species-correspondence-title">{SIMPLE_WORDS.lookalikeCrops}</h2>
             <p>
-              Rattachez chaque espèce de vos séries à une culture de référence : le besoin par culture et les alertes de gel s’en
+              Dites à quelle culture ressemble chaque espèce de vos séries : le besoin par culture et les alertes de gel s’en
               servent. Une espèce non rattachée n’a pas d’objectif proposé : son objectif saisi reste seul.
             </p>
           </>
@@ -213,11 +213,11 @@ function ReferenceCropGroups({ crops, seriesCount, children }: {
     <>
       <h4 className="reference-crop-group-title">Vos cultures cette saison ({cultivated.length})</h4>
       {cultivated.length === 0 ? (
-        <p className="crop-coefficients-empty">Aucune culture de référence ne sert à vos séries cette saison : rattachez leurs espèces dans Réglages.</p>
+        <p className="crop-coefficients-empty">Aucune de ces cultures ne sert à vos séries cette saison : dites dans Réglages à quelle culture ressemble chaque espèce.</p>
       ) : <div className="reference-crop-list">{cultivated.map(children)}</div>}
       {others.length > 0 ? (
         <details className="reference-crop-others" open={cultivated.length === 0} suppressHydrationWarning>
-          <summary>Les autres cultures de référence ({others.length})</summary>
+          <summary>Les autres cultures ({others.length})</summary>
           <div className="reference-crop-list">{others.map(children)}</div>
         </details>
       ) : null}
@@ -414,7 +414,7 @@ function WithoutReferenceSection({ view }: { view: Extract<CropCoefficientsView,
     <section className="crop-coefficients-part" aria-labelledby="without-reference-title">
       <h3 id="without-reference-title">Espèces qui ne ressemblent encore à aucune culture</h3>
       {view.withoutReference.length === 0 ? (
-        <p>Toutes les espèces de la saison ont une culture de référence ou sont de l’engrais vert.</p>
+        <p>Chaque espèce de la saison ressemble à une culture, ou est de l’engrais vert.</p>
       ) : beyond.length === 0 ? (
         <p>{WITHOUT_REFERENCE_CONSEQUENCE} Ce sont les {toLink > 1 ? `${toLink} espèces` : 'espèce'} à rattacher, en tête de la liste ci-dessus.</p>
       ) : (

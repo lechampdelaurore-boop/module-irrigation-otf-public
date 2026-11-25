@@ -242,7 +242,7 @@ function dashboardWarning(dashboard: IrrigationNeedsDashboard) {
   const beds = dashboard.gardens.flatMap((garden) => garden.beds);
   const causes = [
     ['unclassified-plot', UNCLASSIFIED_PLOT_REASON, []] as const,
-    ['objective', 'aucun objectif hydrique adopté', []] as const,
+    ['objective', 'aucune eau visée cette semaine', []] as const,
     ['actual-rain', 'pluie réelle incomplète', dashboard.completeness.missingDates.actualRain] as const,
     ['forecast-rain', 'pluie prévue incomplète', dashboard.completeness.missingDates.forecastRain] as const,
   ].flatMap(([key, label, dates]) => {
