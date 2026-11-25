@@ -83,10 +83,7 @@ export function FeatureSettings({
       <header className="water-management-heading">
         <div>
           <h2 id="feature-settings-title">Fonctionnalités de la ferme</h2>
-          <p>
-            Seules les fonctionnalités cochées s’affichent et tournent, pour toute la ferme. Décocher n’efface rien : les données
-            reviennent telles quelles quand on recoche.
-          </p>
+          {/* L'explication fixe est dans le « ? » de la page ; décocher prévient de ce qui reste enregistré (simplification S1, F826). */}
         </div>
       </header>
       {error ? <p className="water-error" role="alert">{error}</p> : null}

@@ -136,11 +136,14 @@ export function notFoundReturnLink(farm: { firstVisit: boolean; enabled: Feature
  * (audit ergonomique, point 9, 3.8 quater). Les alertes météo valent pour
  * l'exploitation, quelle que soit la saison ; Réglages ne dépend de la saison
  * que par la correspondance des espèces, celles de la saison choisie.
- * « Aujourd'hui » montre toujours le jour du jour (lot 2, F2). La saison
- * reste dans l'adresse et suit vers les autres pages.
+ * « Aujourd'hui » montre toujours le jour du jour (lot 2, F2). Sur
+ * « Arrosages », on travaille presque toujours dans la saison en cours : le
+ * choix la quitte (simplification, lot S1, F824). La saison reste dans
+ * l'adresse et suit vers les autres pages ; une autre saison s'ouvre depuis
+ * « Historique et cumuls » (F825).
  */
 export function pageUsesSeason(page: IrrigationPageId, selection: FeatureSelection): boolean {
-  if (page === 'alertes-meteo' || page === 'aujourdhui') return false;
+  if (page === 'alertes-meteo' || page === 'aujourdhui' || page === 'arrosages') return false;
   if (page === 'reglages') return usesSpeciesCorrespondence(selection);
   return true;
 }

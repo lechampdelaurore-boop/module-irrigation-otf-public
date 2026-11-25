@@ -111,7 +111,7 @@ export function WaterResourceManager({
         <div>
           <p className="eyebrow">Disponibilité physique</p>
           <h2 id="water-resources-title">Ressources en eau</h2>
-          <p>Origines, réserves, connexions et estimation du volume mobilisable.</p>
+          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>
       </header>
 

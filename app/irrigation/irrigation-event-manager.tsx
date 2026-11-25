@@ -362,9 +362,7 @@ export function IrrigationEventManager({
       <header className="irrigation-events-heading">
         <div>
           <h2 id="irrigation-events-title">Enregistrer ou planifier une irrigation</h2>
-          <p>
-            Calculez l’apport, lancez un minuteur fiable ou conservez une irrigation déjà réalisée.
-          </p>
+          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>
         <div className="irrigation-event-counts" aria-label="Résumé des irrigations">
           <span><strong>{activeEvents.length}</strong> en cours</span>

@@ -55,7 +55,11 @@ test('besoin par culture en mots simples : titre en clair, plis « Pour les expe
   await attendreLaPageIrrigation(page, 'cultures');
   const section = page.locator('section.crop-coefficients');
   await expect(section.getByRole('heading', { level: 2, name: 'Besoin en eau par culture' })).toBeAttached();
-  await expect(section.locator('.crop-coefficients-heading p')).toContainText('Une culture ne boit pas autant à la levée qu’en pleine saison.');
+  // La phrase de tête est passée dans le « ? » de la page (simplification S1, F826).
+  await expect(section.locator('.crop-coefficients-heading p')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Aide : Besoin par culture' }).click();
+  await expect(page.getByRole('region', { name: 'Aide : Besoin par culture' })).toContainText('une culture ne boit pas autant à la levée qu’en pleine saison');
+  await page.getByRole('button', { name: 'Aide : Besoin par culture' }).click();
   const experts = section.locator('.crop-coefficients-part > details.experts-fold').first();
   await expect(experts.locator('summary')).toHaveText('Pour les experts');
   await expect(experts.locator('.experts-fold-body')).toBeHidden();

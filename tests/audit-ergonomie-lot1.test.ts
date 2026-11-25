@@ -129,7 +129,7 @@ test('point 4 : la recherche réduit la liste, garde le choix en cours et dit co
 test('point 9 : la saison n’est pas proposée là où elle ne change rien', () => {
   const pages: IrrigationPageId[] = menuPages(ALL);
   const without = pages.filter((page) => !pageUsesSeason(page, ALL));
-  assert.deepEqual(without, ['aujourdhui', 'alertes-meteo'], 'avec toutes les cases, Réglages garde la saison pour la correspondance des espèces ; « Aujourd’hui » montre le jour du jour (lot 2, F2)');
+  assert.deepEqual(without, ['aujourdhui', 'arrosages', 'alertes-meteo'], 'avec toutes les cases, Réglages garde la saison pour la correspondance des espèces ; « Aujourd’hui » montre le jour du jour (lot 2, F2) ; « Arrosages » travaille dans la saison en cours (simplification S1, F824)');
   // Sans « Besoin par culture » ni « Alertes cultures », Réglages ne montre rien qui dépende de la saison.
   assert.equal(pageUsesSeason('reglages', withRequirements(['arrosages', 'alertes-meteo'])), false);
   assert.equal(pageUsesSeason('reglages', withRequirements(['alertes-cultures'])), true);

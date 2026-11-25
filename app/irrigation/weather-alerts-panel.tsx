@@ -194,7 +194,7 @@ export function WeatherAlertsPanel({
         <div>
           {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran sans niveau sauté (audit du 19 novembre 2026, lot J, n° 18, F456). */}
           <h2 id="weather-alerts-title" className="sr-only">Alertes météo</h2>
-          <p>Une notification quand la prévision de la commune franchit le seuil que vous choisissez, sans marge ajoutée.</p>
+          {/* L'explication fixe est dans le « ? » de la page ; l'avertissement du gel reste, replié (simplification S1, F826). */}
           <details className="weather-alerts-margin">
             <summary>Pour le gel : la prévision est celle de l’air à 2 m</summary>
             <p>

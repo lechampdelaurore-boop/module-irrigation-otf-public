@@ -10055,3 +10055,45 @@ D-328 par sa première PR.
 **Non vérifié.** Le toucher, la vitesse et la lecture au soleil sur un vrai
 téléphone ; la proposition elle-même n'a pas été essayée par un maraîcher
 (cinq tâches conseillées au premier volontaire du pilote avant S3 et S4).
+
+## D-328 — Simplifier l'usage du module, lot S1 : le chapeau et les mots
+
+Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (le chapeau d'une
+ligne) ; contrat `docs/simplification-s1-contract.md`, roadmap section 6
+terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la roadmap,
+sur le mandat du porteur du 25 novembre 2026 (enchaîner les lots sans
+nouveau « vas-y », D-327). Les PR 2 (les mots) et 3 (un seul objectif)
+compléteront cette décision.
+
+**Décision (PR 1).** Le chapeau de chaque page tient en une ligne : le
+titre, son « ? » et, là où elle sert, la saison. La ligne de lecture
+d'Ouvre ta ferme ne se montre que si la lecture a échoué ou date de plus de
+24 heures (F822) ; « Actualiser » et la date de la dernière lecture réussie
+sont toujours dans le menu du compte (F823). La saison quitte « Arrosages »
+(F824) et reste dans l'adresse ; « Historique et cumuls » ouvre les autres
+saisons (F825). Les explications fixes de tête de dix pages passent dans le
+« ? », qui dit ce qu'elles disaient (F826) ; l'inventaire page par page et
+les positions avant et après sont dans la section 9 du contrat.
+
+**Précisions tranchées en codant** (contrat, section 9.3).
+
+- F829 : les données de démonstration ne viennent d'aucune lecture d'Ouvre
+  ta ferme : la ligne de lecture ne s'y montre jamais ; le menu du compte
+  dit « Données de démonstration » avant la date.
+- F830 : une phrase fixe qui met en garde (la prévision prise à 2 m, les
+  seuils de gel qui ne sont que des repères) reste en place ; seule
+  l'explication de ce que montre la page passe dans le « ? ».
+- F831 : « Actualiser les données d'Ouvre ta ferme » au-dessus de « Se
+  déconnecter », la date dessous ; l'avis se calcule côté serveur, une date
+  illisible compte comme ancienne (D-003).
+
+**Preuve.** `tests/simplification-s1.test.ts` (la règle de la ligne de
+lecture à chaque âge et chaque source, le gabarit et le menu du compte, la
+saison page par page, les dix explications déplacées et ce que dit chaque
+« ? », les mises en garde gardées) ; parcours P61 aux deux largeurs, et P27,
+P28 et P31c suivis. Contre-épreuve : voir la PR.
+
+**Ne change pas.** Aucun calcul, aucune donnée, aucune migration, aucune
+adresse ; `?refresh=1` et son nettoyage, le bloc « Données en cache », les
+liens existants et les notifications gardent leur effet. Logiciel
+multi-fermes : la règle vaut pour toute ferme, quelle que soit sa taille.
