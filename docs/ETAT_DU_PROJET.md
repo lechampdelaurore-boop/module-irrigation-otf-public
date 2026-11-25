@@ -12,6 +12,16 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S2 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s2-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. « Aujourd'hui » où l'on fait tout : un bouton
+  qui change de nom sur la carte (Valider, Démarrer, Terminer), l'arrosage
+  « à rattraper » (deux boutons, parce que le module ne sait pas s'il a été
+  fait : « Je le fais maintenant » ou « C'est fait »), la pluie notée d'un
+  geste, la page à l'essentiel (un pli « Le détail », rien de retiré) ;
+  cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
+  une action existante : aucune règle ne change. PR de contrat seule :
+  **aucun contrôle rejoué**.
 - **Simplifier l'usage du module, S1, PR 1 sur 3 : le chapeau d'une ligne,
   codée le 25 novembre 2026** (D-328, F829 à F831, roadmap section 6
   terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap, sur
