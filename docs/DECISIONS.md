@@ -9934,3 +9934,60 @@ lieu de 1,25 s (un seul essai). Le temps gagné en ligne reste à mesurer.
 texte, aucun réglage de Cloudflare ; une tâche sans requête lit la base
 comme avant ; toutes les fermes voient les mêmes pages, plus vite. Les
 règles de l'isolation (F327, F331, F647) tiennent.
+
+## D-326 — Les heures de silence, H3 : l'écran
+
+Date : 25 novembre 2026. Statut : codé (PR H3 sur 3 du contrat
+`docs/heures-de-silence-contract.md`, D-320, section 4) ; roadmap section
+6 undecies. Code en Opus 5.5 · Élevé, le réglage de la roadmap, sur le mot
+du porteur du 25 novembre 2026 (« Code l'écran des heures de silence. »).
+Les précisions F817 et suivantes suivent celles de N3 (D-325, F810 à F816).
+
+**Décision.** Le pli « Messages de la ferme » de « Réglages » porte la case
+« Heures de silence » ; allumée, le début, la fin et la case « Laisser
+passer les alertes de gel ». Chaque geste enregistre aussitôt les quatre
+valeurs (F802), au journal des modifications ; un échec remet l'écran comme
+avant et le dit. La phrase dit ce qui passe toujours et ce qui attend ;
+trois avertissements, sans bloquer l'enregistrement. La ligne du pli dit le
+réglage ; l'ancre `#heures-de-silence` ouvre le pli. L'enregistrement
+reprogramme les retards d'irrigation encore à venir de la ferme (F807).
+
+**Précisions tranchées en codant** (contrat, section 13).
+
+- F817 : le réglage se montre pour toute ferme qui reçoit des
+  notifications (cases 2, 4, 8 ou 9), pas seulement avec le Planning ou les
+  Arrosages : les alertes météo et par culture se retiennent aussi. Rien en
+  démonstration, où les notifications sont coupées (F455). Éteinte, la
+  plage cache ses heures et les garde.
+- F818 : le Worker de notification ne dit pas combien d'appareils une
+  ferme a, et il ne change pas (choix 9) : la ligne « aucun appareil » se
+  lit à la dernière alerte météo ou par culture partie tout de suite ; une
+  retenue, un échec ou une nouvelle tentative n'y comptent pas. Une ferme
+  qui n'a jamais envoyé d'alerte ne voit pas la ligne.
+- F819 : l'avertissement du rappel du soir juge le premier passage horaire
+  (hh:05) qui suit l'heure réglée (F806), se relit sans recharger quand
+  l'heure du rappel change dans le même pli, et ne paraît que plage
+  allumée, rappel activé et Arrosages cochée.
+- F820 : à l'enregistrement, chaque retard à venir reçoit l'échéance que la
+  plage nouvelle lui donne ; un retard échu que la plage d'avant retenait
+  encore part tout de suite si la plage nouvelle ne le retient plus ; un
+  retard déjà parti, la fin d'un minuteur ou une échéance inchangée
+  n'envoient rien. Un retard qui n'a pas pu suivre garde son échéance
+  d'avant, le réglage reste enregistré, l'écran et le journal le disent.
+- F821 : le parcours P60, aux deux largeurs, allume, règle, lit
+  l'avertissement du rappel et éteint.
+
+**Preuve.** `tests/heures-de-silence-ecran.test.ts` (les phrases et
+l'avertissement, chaque heure du rappel contre chaque début) et
+`tests/db/heures-de-silence-ecran.test.ts` (à deux fermes et Worker simulé :
+la reprogrammation, le retard retenu qui part quand la plage s'éteint, le
+refus du Worker, le réglage d'avant illisible, la fin d'un minuteur, la
+ligne « aucun appareil »), verts dans les passes ordinaire, d'isolation des
+fermes, des personnes et du rattachement, et de l'ancien calcul de la
+jauge ; parcours P60. Contre-épreuve : trente altérations de l'écran, de la
+reprogrammation et de la ligne « aucun appareil » font chacune échouer au
+moins un test.
+
+**Ne change pas.** Une ferme qui n'allume pas la plage ne voit aucune
+notification changer (S2). Le Worker de notification ne change pas ;
+aucune migration. D-028, D-320, D-321 et D-324 tiennent.

@@ -433,3 +433,65 @@ alarme). Contre-épreuve :
 quarante altérations des envoyeurs, de la retenue, de son
 enregistrement et de son affichage font chacune échouer au moins un test
 (PR H2).
+
+## 13. Précisions faites en codant H3 (25 novembre 2026, D-326)
+
+L'écran (`app/irrigation/reglages/notification-settings.tsx`), ses phrases
+(`lib/domain/quiet-hours-screen.ts`), l'enregistrement
+(`lib/services/quiet-hours-setting.ts`, l'action
+`saveQuietHoursAction`) et la reprogrammation des retards
+(`rescheduleLateAlarmsForQuietHours`,
+`lib/services/irrigation-push-orchestration.ts`). Le Worker de notification
+ne change pas ; aucune migration. Cinq cas que la section 4 et les
+précisions F806 et F807 ne tranchaient pas :
+
+- **F817, où le réglage se montre.** Pour toute ferme qui reçoit des
+  notifications (cases 2, 4, 8 ou 9), pas seulement avec le Planning (le
+  message du matin) ou les Arrosages (le rappel du soir) : les alertes
+  météo et par culture se retiennent aussi. Rien en démonstration, où les
+  notifications sont coupées (F455). Allumée, la plage reprend les heures
+  gardées, 22 h à 6 h si la ferme ne les a jamais réglées ; éteinte, elle
+  les cache et les garde. Chaque geste écrit les quatre valeurs (F802). La
+  ligne du pli : « Silence de 22 h à 6 h. » ou « Heures de silence
+  coupées. ».
+- **F818, la ligne « aucun appareil ».** Le Worker ne dit pas combien
+  d'appareils une ferme a (choix 9) : la ligne se lit à la dernière alerte
+  météo ou par culture partie tout de suite, « Aucun appareil abonné » ;
+  une retenue (comptée envoyée sans rien atteindre, F804), un échec ou une
+  nouvelle tentative ne disent rien des appareils et n'y comptent pas. Une
+  ferme qui n'a jamais envoyé d'alerte ne voit pas la ligne : l'écran ne
+  devine pas.
+- **F819, l'avertissement du rappel du soir.** Il juge le premier passage
+  horaire (hh:05) qui suit l'heure réglée (F806) : réglé à 21 h 30, le
+  rappel part à 22 h 05 ; « Le rappel du soir (21 h 30) ne partira pas :
+  son envoi, à 22 h 05, tombe dans les heures de silence. » Il se relit
+  sans recharger quand l'heure du rappel change dans le même pli, et ne
+  paraît que plage allumée, rappel activé et Arrosages cochée. Un passage
+  à hh:05 ne tombe jamais sur un début au quart d'heure : le début inclus
+  ou exclu donne le même avertissement.
+- **F820, les retards à venir** (limite de F807). À l'enregistrement,
+  chaque retard d'irrigation encore confié au Worker reçoit l'échéance que
+  la plage nouvelle lui donne (la fin de la plage s'il y tombe, son
+  échéance d'origine sinon), même identifiant, même révision, même texte ;
+  un retard échu que la plage d'avant retenait encore n'est pas parti, et
+  part tout de suite si la plage nouvelle ne le retient plus. Un retard
+  déjà parti, la fin d'un minuteur ou une échéance inchangée n'envoient
+  rien. Le réglage d'avant illisible ne bloque rien : chaque retard à venir
+  est reprogrammé. Un refus du Worker laisse le retard à son échéance
+  d'avant et le réglage enregistré ; l'écran le dit (« Des alertes de
+  retard déjà programmées n'ont pas pu suivre ce réglage »), le journal le
+  compte sans nom (`quiet_hours_late_alarms_rescheduled`).
+- **F821, le parcours.** P60, aux deux largeurs : allumer, régler, lire
+  l'avertissement du rappel, éteindre (section 6).
+
+Preuve : `tests/heures-de-silence-ecran.test.ts` (la ligne du pli, la
+phrase avec et sans le gel, l'avertissement du rappel, dont chaque heure du
+rappel contre chaque début) et `tests/db/heures-de-silence-ecran.test.ts`
+(à deux fermes et Worker simulé : la plage allumée l'après-midi qui
+déplace le retard de la nuit et pas celui du jour, ni la fin d'un minuteur,
+ni l'autre ferme ; la même plage enregistrée de nouveau qui n'envoie rien ;
+la plage éteinte à 1 h qui fait partir le retard retenu ; le refus du
+Worker ; le réglage hors des bornes ; le réglage d'avant illisible ; la
+ligne « aucun appareil » à deux fermes) ; parcours P60. Contre-épreuve :
+trente altérations de l'écran, de la reprogrammation et de la ligne
+« aucun appareil » font chacune échouer au moins un test (PR H3).

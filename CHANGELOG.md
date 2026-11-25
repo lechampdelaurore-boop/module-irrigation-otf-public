@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (heures de silence des notifications, H3)
+
+- **Les heures de silence se règlent dans « Réglages »** (D-326) : dans
+  « Notifications du téléphone », le pli « Messages de la ferme » porte la
+  case « Heures de silence » ; allumée, le début (20 h à 23 h 45), la fin
+  (4 h à 9 h) et la case « Laisser passer les alertes de gel », 22 h à 6 h
+  proposées. Une phrase dit ce qui passe toujours et ce qui attend ; trois
+  avertissements, qui n'empêchent rien : le rappel du soir qui ne partira
+  pas, la plage qui vaut pour tous les téléphones de la ferme, et la
+  dernière alerte qui n'a trouvé aucun appareil. La ligne du pli dit
+  « Silence de 22 h à 6 h. ». Enregistrer le réglage déplace aussi les
+  alertes de retard déjà programmées des irrigations à venir. C'est le
+  premier moyen d'allumer la plage : une ferme qui ne l'allume pas ne voit
+  rien changer.
+
 ### Ajouté (heures de silence des notifications, H2)
 
 - **Les notifications suivent les heures de silence de leur ferme**
