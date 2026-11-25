@@ -358,3 +358,67 @@
   grid-column: 1 / -1;
   margin-top: 0;
 }
+
+/*
+ * La carte à un bouton (simplification, lot S2, section 3) : le bouton
+ * principal à 50 px, le lien d'appoint et « Autres choix » à 44 px au moins ;
+ * « Autres choix » déplie sa courte liste sous les boutons, sur toute la
+ * largeur de la carte.
+ */
+.today-irrigation-actions[data-actions="one-button"] {
+  align-items: center;
+}
+
+.today-page button.today-card-primary {
+  min-height: 50px;
+  padding-inline: 1.4rem;
+  font-weight: 700;
+}
+
+.today-page button.today-card-secondary {
+  border-color: transparent;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.today-other-choices {
+  display: contents;
+}
+
+.today-page button.today-other-choices-toggle {
+  border-color: var(--line);
+  background: var(--card);
+  color: var(--anthracite);
+}
+
+.today-other-choices-list {
+  display: grid;
+  order: 10;
+  flex: 1 0 100%;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+}
+
+.today-other-choices-list[hidden] {
+  display: none;
+}
+
+.today-other-choices-list .today-action-link,
+.today-page .today-other-choices-list button {
+  justify-self: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  border-color: var(--line);
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+@container (max-width: 620px) {
+  .today-page button.today-card-primary {
+    flex: 1 0 100%;
+  }
+}

@@ -266,7 +266,8 @@ test('cas 8 : deux irrigations planifiées et une proposition, par heure ; « D�
   ]);
   assert.equal(todo.lines[0].detail, 'planche P1 · 1 h 30 · 12 mm');
   assert.equal(todo.lines[2].title, 'Asperseur A · Buse 2');
-  assert.deepEqual(todo.lines[2].open, { page: 'planning', anchor: 'proposal-p20', label: 'Valider au planning' });
+  // Le lien de la proposition mène à son « Ajuster » du planning (simplification, lot S2, S2-d) ; « Valider » est un bouton.
+  assert.deepEqual(todo.lines[2].open, { page: 'planning', anchor: 'proposal-p20', label: 'Changer l’heure ou la dose' });
   assert.deepEqual(todo.lines.map((line) => line.tone), ['planned', 'planned', 'proposed']);
   assert.equal(block(view.blocks, 'late').empty, NOTHING_LATE);
   assert.equal(view.badge, null);

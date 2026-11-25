@@ -14,8 +14,9 @@ import { farmDateKey, farmHourText, shortDayText, sortedNames } from './today-te
  * docs/audit-ergonomie-lot2-contract.md, section 5, blocs b et c, précision
  * F4). Ils lisent les irrigations comme la page des arrosages, avec la même
  * tolérance R14, et les propositions encore à valider du plan de la semaine.
- * Rien n'est annulé ni démarré ici (D-028) : chaque ligne reprend le bouton
- * existant « Démarrer maintenant » et ouvre la carte de l'irrigation.
+ * Rien n'est annulé ni démarré ici (D-028) : les gestes de chaque carte sont
+ * dits par `card-action.ts` (simplification, lot S2), qui ne fait que
+ * nommer les actions existantes.
  */
 
 type TodayIrrigationTone = 'missed' | 'late' | 'planned' | 'proposed';
@@ -30,8 +31,10 @@ const STATUS_TEXT: Record<TodayIrrigationTone, string> = {
 export type TodayIrrigationLine = {
   /** Unique dans la page : l'irrigation par son matériel, ou la proposition. */
   key: string;
-  /** L'irrigation par son matériel, ce que « Démarrer maintenant » désigne ; `null` pour une proposition. */
+  /** L'irrigation par son matériel, ce que « Démarrer » désigne ; `null` pour une proposition. */
   eventEquipmentId: string | null;
+  /** La proposition du plan, ce que « Valider » désigne (son `storedId`) ; `null` pour une irrigation. */
+  proposalId: string | null;
   /** « 7 h », ou « mer. 11 nov. à 7 h » pour un autre jour. */
   time: string;
   /** « Goutte-à-goutte B · Réglage 1 ». */
@@ -42,12 +45,13 @@ export type TodayIrrigationLine = {
   status: string;
   /** La couleur du statut : rouge pour « Non faite », ambre pour « En retard » et « À valider ». */
   tone: TodayIrrigationTone;
-  /** Le bouton existant « Démarrer maintenant » : une irrigation planifiée seulement, jamais une proposition. */
+  /** Le démarrage existant : une irrigation planifiée seulement ; une proposition se valide d'abord. */
   canStart: boolean;
   /**
    * La carte à ouvrir : sa page, son ancre et le mot du lien (6 nonies, L3) :
-   * « Ouvrir », ou « Valider au planning » pour une proposition à valider ;
-   * rien n'est validé par le lien (D-028).
+   * « Ouvrir », ou « Changer l’heure ou la dose » pour une proposition à
+   * valider, vers son formulaire « Ajuster » du planning (simplification,
+   * lot S2, S2-d) ; rien n'est validé par un lien (D-028).
    */
   open: { page: IrrigationPageId; anchor: string; label: string };
   /** L'heure de début prévue, l'instant : la frise de la journée la place. */
@@ -129,6 +133,7 @@ function irrigationLine(
   return {
     key: `irrigation:${equipment.id}`,
     eventEquipmentId: equipment.id,
+    proposalId: null,
     time: timeText(startAt, context.today),
     title: `${equipment.equipmentSnapshot.name} · ${equipment.settingSnapshot.name}`,
     detail: detailText([beds, durationText(equipment.plannedDurationSeconds), dose === null ? null : mmText(dose)]),
@@ -216,13 +221,14 @@ export function todayTodoLines(input: {
         line: {
           key: `proposal:${proposal.storedId}`,
           eventEquipmentId: null,
+          proposalId: proposal.storedId,
           time: timeText(proposal.startAt, today),
           title: `${proposal.equipmentName} · ${proposal.settingName}`,
           detail: detailText([beds, durationText(proposal.durationSeconds), mmText(proposal.doseMm)]),
           status: STATUS_TEXT.proposed,
           tone: 'proposed',
           canStart: false,
-          open: { page: 'planning', anchor: proposalAnchor(proposal.storedId), label: 'Valider au planning' },
+          open: { page: 'planning', anchor: proposalAnchor(proposal.storedId), label: 'Changer l’heure ou la dose' },
           ...drawn({ startAt: proposal.startAt, durationSeconds: proposal.durationSeconds, doseMm: proposal.doseMm, bedIds, beds }),
           equipmentName: proposal.equipmentName,
           settingName: proposal.settingName,

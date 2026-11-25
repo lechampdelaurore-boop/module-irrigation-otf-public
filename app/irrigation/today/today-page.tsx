@@ -10,13 +10,14 @@ import { computeWeeklyPlanAction } from '../planning-actions';
 import { actionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { announceTodayBadge } from '../shell/today-badge';
 import { loadTodayViewAction } from '../today-actions';
+import { refuseProposalFromTodayAction, validateAndStartProposalFromTodayAction, validateProposalFromTodayAction } from '../today-card-actions';
 import { ReliabilityZoneView } from './reliability-zone';
-import { TodayDay } from './today-day';
+import { TodayDay, type TodayCardWrite } from './today-day';
 import { TodayHeader } from './today-header';
 import { TodaySoilBlock, TodayWaterBlockView, TodayWeekWater } from './today-gauges';
 import { TodayWeather } from './today-weather';
 import { TodayWeekTiles } from './today-week';
-import { irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY } from './today-replies';
+import { irrigationReply, PLAN_HEADER_REPLY, PLAN_RELIABILITY_REPLY, proposalReply } from './today-replies';
 
 /** La page se relit seule toutes les cinq minutes, et au retour sur l'onglet après une minute (F438). */
 const TODAY_REFRESH_MS = millisecondsFromMinutes(5);
@@ -53,8 +54,10 @@ function useTodayPhone(page: RefObject<HTMLDivElement | null>): boolean {
  * résume le jour, les chiffres de la semaine, puis les blocs en grille, chacun
  * présent seulement si sa case est cochée. Un bloc sans rien à dire le dit en
  * une phrase calme. La page ne contient ni formulaire ni calcul : ses boutons
- * sont les actions existantes « Démarrer maintenant » et « Recalculer le
- * plan », et « Tout est fait » (section 3.4) ; elle se relit après chacun,
+ * sont les actions existantes « Démarrer » et « Recalculer le plan », « Tout
+ * est fait » (section 3.4) et, sur la carte d'une proposition, la validation
+ * et le refus du planning (simplification, lot S2, section 5) ; elle se
+ * relit après chacun,
  * et d'elle-même au fil des minutes (lot H, F438). La réponse d'un geste
  * s'écrit sous le bouton pressé, et à un seul endroit
  * (docs/aujourdhui-liens-contract.md, L4, D-313). Au téléphone, « Votre
@@ -68,6 +71,8 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const phone = useTodayPhone(pageRef);
   /** La réponse du dernier geste, à l'endroit du bouton pressé ; un nouveau geste la remplace. */
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
+  /** Après un geste de la carte, le focus va au nouveau bouton principal de sa carte (contrat S2, section 3). */
+  const focusCard = useRef<string | null>(null);
   // La saison du jour (F2) : les liens vers les cartes et les données du jour la portent.
   const season = Number(view.today.slice(0, 4));
   const dayQuery: PageQuery = { ...query, season };
@@ -105,6 +110,14 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
     };
   }, []);
 
+  // Le bouton principal de la carte, une fois le geste fini et la page relue.
+  useEffect(() => {
+    if (!focusCard.current || pending) return;
+    const id = CSS.escape(focusCard.current);
+    focusCard.current = null;
+    pageRef.current?.querySelector<HTMLElement>(`[data-irrigation="${id}"] [data-primary], [data-proposal="${id}"] [data-primary]`)?.focus({ preventScroll: true });
+  }, [pending, view]);
+
   // Démarrée, l'irrigation passe « En cours » : sa réponse la suit, sous sa nouvelle carte (L4, règle 2).
   const start = (eventEquipmentId: string) => startTransition(async () => {
     const origin = irrigationReply(eventEquipmentId);
@@ -113,7 +126,27 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       ? actionReply(origin, 'notice', result.warning ? `${result.message} ${result.warning}` : result.message, { link: { href: pageHref('arrosages', dayQuery), label: 'Suivre sur « Arrosages »' } })
       : actionReply(origin, 'error', result.message)]);
     await reload();
+    focusCard.current = eventEquipmentId;
   });
+
+  // La carte d'une proposition (S2) : « Valider », « Démarrer tout de suite », « Pas à cette heure ».
+  // Validée, elle devient une irrigation planifiée : la réponse et le focus la suivent ; sinon, la réponse reste sous la proposition.
+  const cardGesture = (gesture: TodayCardWrite) => {
+    if (gesture.kind === 'start') return start(gesture.eventEquipmentId);
+    startTransition(async () => {
+      const input = { season, proposalId: gesture.proposalId };
+      const result = gesture.kind === 'validate'
+        ? await validateProposalFromTodayAction(input)
+        : gesture.kind === 'validate-and-start'
+          ? await validateAndStartProposalFromTodayAction(input)
+          : await refuseProposalFromTodayAction(input);
+      const origin = result.eventEquipmentId ? irrigationReply(result.eventEquipmentId) : proposalReply(gesture.proposalId);
+      const followed = gesture.kind === 'validate-and-start' && result.tone === 'notice' ? { link: { href: pageHref('arrosages', dayQuery), label: 'Suivre sur « Arrosages »' } } : {};
+      setReplies([actionReply(origin, result.tone, result.text, followed)]);
+      await reload();
+      focusCard.current = result.eventEquipmentId ?? gesture.proposalId;
+    });
+  };
 
   // « Tout est fait » (section 3.4) : le message dit combien sont enregistrées, et nomme chaque refus.
   const recordAllDone = (eventEquipmentIds: string[], origin: string) => new Promise<void>((resolve) => startTransition(async () => {
@@ -152,7 +185,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
   const dayRow = (
     <Pair
       key="journee"
-      wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onStart={start} onAllDone={recordAllDone} /> : null}
+      wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={view.timeline} allDone={view.allDone} emptyLink={view.dayEmptyLink} query={dayQuery} pending={pending} replies={replies} onStart={start} onCardGesture={cardGesture} onAllDone={recordAllDone} /> : null}
       narrow={weather ? <TodayWeather block={weather} query={dayQuery} /> : null}
       layout={late && todo ? dayRowLayout(late.lines.length + view.current.length, todo.lines.length) : 'wide'}
     />
