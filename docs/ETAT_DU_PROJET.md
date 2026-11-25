@@ -47,8 +47,8 @@ registres, elle y renvoie.
   ligne à 23 h 37** (run 45498654145, les cinq jobs verts ; aucune
   migration : « No migrations to apply » en production et sur la
   démonstration).
-- **Lenteur du module : N3, l'espace lu une fois par requête, codée le
-  24 novembre 2026** (D-325, F810 à F816, contrat de la tranche 4, section
+- **Lenteur du module : N3, l'espace lu une fois par requête, en ligne le
+  25 novembre 2026 à 3 h 36** (D-325, F810 à F816, contrat de la tranche 4, section
   5 sexies ; roadmap section 6 duodecies), en Opus 5.5 · Max, le réglage de
   la roadmap (résolution de l'espace d'une ferme, donc isolation). Pendant
   une requête, l'espace d'une personne et d'une ferme, le choix des
@@ -61,11 +61,14 @@ registres, elle y renvoie.
   de 1,25 s à 0,72 s à l'ouverture ; les treize pages du menu, de 894 à 460
   lectures. Nouveau test rejoué dans les quatre passages d'isolation,
   éprouvé en cassant le code exprès. Le temps gagné en ligne reste à
-  mesurer sur le téléphone du porteur, avec son accord. Contrôles : voir la
-  PR.
+  mesurer sur le téléphone du porteur, avec son accord. Mise en ligne de
+  #205 (N3, D-325) consignée ici : #205 fusionnée le 25 novembre 2026 à
+  3 h 04, en ligne à 3 h 36 (run 45530280168, les cinq jobs verts ;
+  démonstration à 3 h 36). Contrôles : voir la PR.
 
-- **Lenteur du module : N1, le menu sans rechargement, codée le
-  24 novembre 2026** (D-322, roadmap section 6 duodecies,
+- **Lenteur du module : N1, le menu sans rechargement, en ligne le
+  25 novembre 2026 à 2 h 45, et N2, l'ouverture directe, en ligne le
+  25 novembre 2026 à 4 h 42** (D-322, D-323, roadmap section 6 duodecies,
   `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
   la roadmap. Constat du porteur à 22 h 33 : le module « rame », au
   téléphone comme à l'ordinateur. Mesuré sur une copie locale : les PR du
@@ -75,10 +78,19 @@ registres, elle y renvoie.
   d'avance ; seule la page voulue est demandée au serveur, sans relancer les
   scripts ; chaque page n'est calculée qu'une fois par requête (vinext
   l'appelait deux fois pour une page demandée par le routeur) ; un menu
-  neuf à chaque page, le clavier repart du contenu (parcours P59). Restent N2, l'ouverture directe de l'application, et N3,
-  les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
+  neuf à chaque page, le clavier repart du contenu (parcours P59). N2 :
+  `/irrigation` sans ancre, l'adresse de départ de l'application installée,
+  mène à la page d'arrivée par un script lu avec la page, sans attendre les
+  scripts du module ni recharger une seconde fois ; une ancre d'ancienne
+  notification garde sa conduite. N3, les lectures répétées de la base :
+  point ci-dessus. La mesure
   sur le téléphone réel du porteur reste à faire, sur son accord.
-  Contrôles : voir la PR.
+  Mise en ligne de #204 (N1, D-322) consignée ici : #204 fusionnée le
+  25 novembre 2026 à 2 h 11, en ligne à 2 h 45 (run 45523929120, les cinq
+  jobs verts ; démonstration à 2 h 46). Mise en ligne de #206 (N2, D-323)
+  consignée ici : #206 fusionnée le 25 novembre 2026 à 4 h 11, en ligne à
+  4 h 42 (run 45538289955, les cinq jobs verts ; démonstration à 4 h 43 ;
+  aucune migration). Contrôles : voir la PR.
 
 - **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
   2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en

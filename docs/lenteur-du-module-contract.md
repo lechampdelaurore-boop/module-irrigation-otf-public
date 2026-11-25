@@ -79,9 +79,27 @@ contenu de la page est demandé au serveur, sans relancer les scripts.
   dans cette PR : un geste à la fois.
 - Parcours P59, aux deux largeurs.
 
-**N2. L'application installée s'ouvre sur sa page d'arrivée** (PR suivante) :
-sans la page d'attente qui recharge tout, sans rien changer pour une ancienne
-adresse de notification `/irrigation#…`.
+**N2. L'adresse de départ mène à la page d'arrivée sans attendre les
+scripts (D-323).** L'application installée s'ouvre sur `/irrigation`, comme le
+logo du module et les favoris : la page d'attente « Ouverture du module… »
+attendait que tous les scripts du module soient chargés et l'écran repris,
+puis rechargeait vers la page d'arrivée.
+
+- Sans ancre, un script lu avec la page conduit aussitôt à la page d'arrivée
+  (« Aujourd'hui », ou la première page cochée), avec la saison, la semaine et
+  « Actualiser » de l'adresse, comme avant.
+- Avec une ancre, celle des anciennes notifications `/irrigation#…`, qui ne
+  parvient jamais au serveur, rien ne change : la conduite reste celle du
+  navigateur (`legacyRedirect`).
+- L'adresse de départ du manifeste ne change pas : une application déjà
+  installée en profite sans rien refaire.
+- Mesuré (banc de la section 2, sans lecture lente de la base, moyenne de
+  cinq ouvertures à cache vide) : le départ vers « Aujourd'hui » part
+  0,33 s après la demande au lieu de 0,59 s, la page est utilisable à
+  2,04 s au lieu de 2,18 s. Le reste de l'ouverture est le calcul
+  d'« Aujourd'hui » (N3) et le chargement des scripts.
+- Parcours P59 : tous les scripts du module refusés, `/irrigation` mène
+  encore à « Aujourd'hui ».
 
 **N3. L'identifiant de l'espace n'est lu qu'une fois par requête (D-325).**
 Ses règles sont au contrat de la tranche 4, section 5 sexies (F810 à F816),

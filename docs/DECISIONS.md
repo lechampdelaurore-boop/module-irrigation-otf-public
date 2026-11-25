@@ -9774,6 +9774,27 @@ les autres liens restent des liens simples (un geste à la fois). Les deux
 autres freins, l'ouverture en deux pages (N2) et les lectures répétées de la
 base (N3), ont leurs PR.
 
+## D-323 — L'adresse de départ mène à la page d'arrivée sans attendre les scripts
+
+Date : 24 novembre 2026. Statut : **codée** ; roadmap section 6 duodecies,
+contrat `docs/lenteur-du-module-contract.md` (N2). Écrite en Opus 5.5 ·
+Élevé.
+
+**Contexte.** Le porteur trouve l'ouverture du module la plus lente (D-322).
+L'application installée s'ouvre sur `/irrigation` (D-302), qui montrait
+« Ouverture du module… », attendait que tous les scripts soient chargés et
+l'écran repris, puis rechargeait vers la page d'arrivée : deux pages pour une.
+
+**Décision.** Sans ancre, `/irrigation` porte un script lu avec la page qui
+conduit aussitôt à la page d'arrivée (saison, semaine et « Actualiser » de
+l'adresse gardés). Avec une ancre (anciennes notifications), la conduite reste
+celle du navigateur, inchangée (P14). Le manifeste ne change pas : les
+applications déjà installées en profitent. Parcours P59, scripts refusés.
+
+**Ne change pas.** Aucune donnée, aucun calcul, aucun texte ; une redirection
+côté serveur a été écartée, parce que le serveur ne voit pas l'ancre et
+perdrait la conduite des anciennes notifications.
+
 ## D-324 — Les heures de silence, H2 : les envoyeurs
 
 Date : 24 novembre 2026. Statut : codé (PR H2 sur 3 du contrat
