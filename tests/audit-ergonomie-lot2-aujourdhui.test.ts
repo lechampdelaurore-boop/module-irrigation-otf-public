@@ -141,7 +141,8 @@ test('cas 4 : sans aucune des huit cases utiles, pas de page « Aujourd’hui »
   assert.equal(hasTodayPage(ALL), true);
 
   const sansAujourdhui: FeatureId[] = ['materiel', 'calculateur'];
-  assert.deepEqual(menuPages(sansAujourdhui), ['materiel', 'reglages']);
+  // « Ma ferme » s'ajoute au menu comme une page de plus (simplification, lot S3, PR 1).
+  assert.deepEqual(menuPages(sansAujourdhui), ['materiel', 'ma-ferme', 'reglages']);
   assert.equal(landingPage(sansAujourdhui), 'materiel');
   // `/irrigation` va à Matériel ; `/irrigation/aujourdhui`, à la première page cochée avec sa ligne.
   assert.deepEqual(legacyRedirect('', sansAujourdhui), { page: 'materiel', notEnabled: false });
@@ -151,7 +152,7 @@ test('cas 4 : sans aucune des huit cases utiles, pas de page « Aujourd’hui »
 
 test('F1 et F2 : « Aujourd’hui » est la première du menu, la page d’arrivée, et ne propose pas la saison', () => {
   assert.equal(menuPages(ALL)[0], 'aujourdhui');
-  assert.equal(menuPages(ALL).length, 12);
+  assert.equal(menuPages(ALL).length, 13, 'les douze pages et « Ma ferme » (lot S3, PR 1)');
   assert.equal(landingPage(ALL), 'aujourdhui');
   assert.deepEqual(legacyRedirect('', ALL), { page: 'aujourdhui', notEnabled: false });
   // Une ancienne ancre garde sa page ; une ancre inconnue conduit à « Aujourd'hui ».

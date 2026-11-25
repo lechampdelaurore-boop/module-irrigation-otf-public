@@ -21,7 +21,7 @@ import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/
  * docs/browser-journeys-contract.md).
  *
  * Sur une ferme neuve qui a tout coché : au téléphone, la barre du bas a
- * quatre entrées et « Plus », qui ouvre les douze pages ; la saison est dans
+ * quatre entrées et « Plus », qui ouvre les douze pages et « Ma ferme » (lot S3, PR 1) ; la saison est dans
  * la ligne du titre ; le bandeau « Alertes système non disponibles », montré
  * une fois, se replie en un point sur la cloche et reste entier dans
  * Réglages ; le premier champ d'« Arrosages » tient dans le premier écran ;
@@ -158,7 +158,8 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
     expect(marque, 'la marque de « Plus »').not.toBe(ouverte);
     await expect(plus).toHaveAccessibleName('Plus de pages, dont la page ouverte : Réglages');
     const menu = await ouvrirLeMenuDesPages(page);
-    await expect(menu.getByRole('link')).toHaveCount(12);
+    // Les douze pages et « Ma ferme » (simplification, lot S3, PR 1, D-331).
+    await expect(menu.getByRole('link')).toHaveCount(13);
     for (const lien of await menu.getByRole('link').all()) await verifierCibleTactile(lien, `Le lien « ${await lien.innerText()} » de « Plus »`);
     await expect(menu.getByRole('link', { name: TITRES_DES_PAGES.reglages })).toHaveAttribute('aria-current', 'page');
     await verifierLEtape(page, journal, 'feuille « Plus » ouverte');

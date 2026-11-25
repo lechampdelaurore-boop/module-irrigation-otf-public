@@ -1,0 +1,97 @@
+/*
+  « Ma ferme » en fiches (simplification, lot S3, PR 1,
+  docs/simplification-s3-contract.md, section 5 ; D-331) : une carte, une
+  fiche par page de l'endroit, chacune avec l'icône de sa page, son nom, une
+  ligne fixe et un chevron, sur 68 px au moins. « À faire » en orange quand
+  l'accueil de la ferme attend une étape de la page. Les couleurs et les
+  tailles sont celles de la charte.
+*/
+.farm-cards {
+  max-width: 44rem;
+}
+
+.farm-cards ul {
+  margin: 0;
+  padding: var(--space-1) var(--space-4);
+  list-style: none;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-light);
+}
+
+.farm-cards li + li .farm-card {
+  border-top: 1px solid var(--line-soft);
+}
+
+.farm-card {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 68px;
+  padding: var(--space-3) 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.farm-card:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.farm-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--tile);
+  color: var(--green);
+}
+
+.farm-card[data-todo] .farm-card-icon {
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.farm-card-icon .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.farm-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.farm-card-text strong {
+  font-family: var(--font-ui);
+  font-size: var(--text-16);
+  font-weight: 500;
+}
+
+.farm-card-line {
+  color: var(--ink2);
+  font-size: var(--text-13);
+}
+
+.farm-card-todo {
+  color: var(--warn-ink);
+  font-size: var(--text-13);
+  font-weight: 700;
+}
+
+.farm-card-chevron {
+  display: flex;
+  color: var(--ink2);
+}
+
+@media (hover: hover) {
+  .farm-card:hover strong {
+    color: var(--green);
+    text-decoration: underline;
+  }
+}

@@ -10514,3 +10514,81 @@ ancre et au clavier. Mesure à 390 px (P62, une proposition à valider) : le
 premier niveau finit à 1 384 px (borne 1 600), le premier bouton est à
 539 px (borne 600), 11 choses à toucher (borne 12) ; avant, la page du jour
 faisait 3 888 px sur la démonstration. Contre-épreuve : voir la PR.
+
+## D-331 — Simplifier l'usage du module, lot S3 : trois endroits
+
+Date : 25 novembre 2026. Statut : **PR 1 sur 4 codée** (le rangement et
+« Ma ferme ») ; contrat `docs/simplification-s3-contract.md`, roadmap
+section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le réglage de
+la roadmap et du contrat (section 14), sur le mandat du porteur du
+25 novembre 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met
+en œuvre le choix n° 1 du porteur (« trois endroits », 25 novembre 2026,
+11 h 59) ; les PR 2 à 4 la compléteront.
+
+**Décision (PR 1).** Chaque page du module est rangée dans un endroit et un
+seul : « Aujourd'hui » (Aujourd'hui, Arrosages), « Semaine » (Planning de la
+semaine, Objectifs et besoins, Historique et cumuls), « Ma ferme » (Matériel
+et placement, Ressources et pompes, Besoin par culture, Réserve du sol,
+Alertes météo, Alertes cultures, Réglages, et la page « Ma ferme »
+elle-même). La correspondance vit dans `lib/domain/features/places.ts`, avec
+l'entrée de chaque endroit (sa première page cochée) et les fiches de
+« Ma ferme » (les pages cochées de l'endroit, Réglages toujours) ; une page
+existe pour un choix de cases par une seule règle, `pageEnabled`, que
+`pageAccess` emploie aussi. La page « Ma ferme » s'ouvre à
+`/irrigation/ma-ferme`, avec le gabarit des pages (chapeau, titre, « ? »,
+saison) : une fiche par page cochée, dans l'ordre de la maquette, l'icône de
+la page, son nom, une ligne fixe (`lib/domain/features/farm-cards.ts`), un
+chevron, 68 px au moins. Elle ne lit rien de plus que le gabarit : la marque
+« À faire » vient de l'accueil de la ferme (`UnfinishedStep.page`). Elle
+s'ajoute à l'ancien menu comme une page de plus, au-dessus de Réglages ; la
+barre du téléphone (PR 2) et le menu de l'ordinateur (PR 3) ne changent pas
+encore. Aucune adresse ne change ; aucune page, aucune fonction n'est
+retirée ; aucun calcul, aucune donnée, aucune migration.
+
+**Précisions tranchées en codant (PR 1).**
+
+- F868 : jusqu'à la PR 2, « Ma ferme » est une page de l'ancien menu comme
+  les autres, donc comptée dans la règle de la barre du téléphone (F6,
+  « cinq pages ou moins : toutes ») : une ferme qui avait cinq pages en a
+  six et retrouve « Plus », le temps d'une PR. La PR 2 remplace la barre.
+- F869 : « Ma ferme » montre toujours le choix de la saison et le transmet à
+  chaque fiche (`pageUsesSeason`, comme toute page sauf « Aujourd'hui »,
+  Arrosages et Alertes météo) : la saison sert à presque toutes les fiches.
+- F870 : la ligne fixe d'une fiche tient sur deux lignes au plus à 390 px et
+  sur une à l'ordinateur. « Une ligne à 390 px » (contrat, section 5) ne
+  tient pas avec les lignes mêmes du contrat, que la maquette passe déjà à
+  la ligne ; les textes du contrat sont gardés, P63 mesure le nombre de
+  lignes de chacune aux deux largeurs.
+- F871 : la ligne d'« Alertes cultures » devient « Gel selon la culture,
+  arrêt avant la récolte, aspersions », relue contre le « ? » de la page
+  (S3-f) : la page parle du gel par culture, de l'arrêt avant la récolte et
+  des aspersions, pas du séchage.
+- F872 : « À faire » s'écrit sous la ligne fixe, en orange de la charte
+  (`--warn-ink`, en gras), avec le texte de chaque étape de la page, séparés
+  par une virgule (« À faire : commune de la ferme ») ; l'icône de la fiche
+  passe au fond orange pâle. Le bandeau « À finir » ne change pas.
+- F873 : la phrase de bas de page de la maquette (« Le module lit le plan de
+  votre ferme… sans jamais le modifier ») est déjà au pied de chaque page du
+  gabarit ; elle n'est pas redite dans « Ma ferme ».
+- F874 : une fiche change de page comme le menu, sans recharger le module
+  (D-322), et porte le clavier sur le contenu de la page ouverte.
+- F875 : « Ma ferme » a sa propre icône, une maison (`ferme`), dans la table
+  des icônes des pages.
+
+**Preuve (PR 1).** `tests/simplification-s3-endroits.test.ts` : chaque page
+dans un endroit et un seul ; le tableau du contrat ; pour chacun des 235
+choix de cases valides (parmi les 2 048), les endroits, leur entrée, les
+fiches, leur union égale au menu, `pageEnabled` équivalent à l'accès
+ouvert, la page d'arrivée jamais « Ma ferme » ; les états rares ;
+l'adresse, la saison et les anciennes adresses ; les lignes (sans mot du
+calcul, une phrase, 60 signes au plus) ; « À faire » ; la page ne lit rien
+de plus ; la fiche (lien, saison, 68 px) ; l'ordre du menu ; le « ? ».
+Parcours P63, aux deux largeurs : la page, ses sept fiches dans l'ordre,
+68 px, lignes mesurées, charte (rien sous 12 px, quatre graisses), « Ma
+ferme » au-dessus de Réglages dans le menu et marquée ; chaque fiche ouvre
+sa page sans recharger, la saison gardée, le clavier sur le contenu ; une
+autre saison suit dans chaque fiche ; une ferme neuve (Matériel et Alertes
+météo) a trois fiches, et « À faire : commune de la ferme » sur « Réglages ».
+P0, P22, P24, P27, P28, P30, P59 et P61 suivent le menu d'une page de plus.
+Contre-épreuve : quatorze altérations, chacune fait échouer un test (voir la
+PR).

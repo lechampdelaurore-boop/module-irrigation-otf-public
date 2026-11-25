@@ -1,15 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { PAGE_FEATURE_IDS } from '../lib/domain/features/catalogue';
 import { GARDEN_GROUP_HELP, PAGE_HELP, pageHelp, RELIABILITY_HELP, SHELTER_FACTOR_HELP } from '../lib/domain/features/help';
-import type { IrrigationPageId } from '../lib/domain/features/pages';
+import { IRRIGATION_PAGE_IDS } from '../lib/domain/features/pages';
 
 /**
  * Le « ? » de chaque page (docs/feature-selection-contract.md, section 6) :
  * chaque page a ses trois textes, courts, en phrases.
  */
 
-const PAGES: IrrigationPageId[] = ['aujourdhui', ...PAGE_FEATURE_IDS, 'reglages'];
+const PAGES = IRRIGATION_PAGE_IDS;
 
 test('chaque page a son aide : à quoi elle sert, comment la lire, par où commencer', () => {
   assert.deepEqual(Object.keys(PAGE_HELP).sort(), [...PAGES].sort(), 'une aide par page, aucune de trop');

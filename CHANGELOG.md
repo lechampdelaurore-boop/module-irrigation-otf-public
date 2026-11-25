@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (simplifier l'usage du module, S3, PR 1 : le rangement et « Ma ferme »)
+
+- **La page « Ma ferme »** (D-331, F868 à F875), à `/irrigation/ma-ferme` :
+  une fiche par page qui dit ce que le module sait de la ferme (Matériel et
+  placement, Ressources et pompes, Besoin par culture, Réserve du sol,
+  Alertes météo, Alertes cultures, Réglages), seulement les cases cochées,
+  Réglages toujours. Chaque fiche porte l'icône de la page, son nom, une
+  ligne qui dit à quoi elle sert, et « À faire » en orange quand une étape
+  de la mise en route attend sur cette page (« À faire : commune de la
+  ferme »). Elle ouvre sa page sans recharger, la saison gardée. « Ma
+  ferme » s'ajoute au menu, au-dessus de Réglages ; chaque page du module
+  est désormais rangée dans un des trois endroits, « Aujourd'hui »,
+  « Semaine » et « Ma ferme », que la barre du bas et le menu suivront.
+  Aucune adresse ne change, rien n'est retiré.
+
 ### Modifié (simplifier l'usage du module, S2, PR 5 : la page à l'essentiel)
 
 - **« Aujourd'hui » tient à l'essentiel, le reste dans « Le détail »**

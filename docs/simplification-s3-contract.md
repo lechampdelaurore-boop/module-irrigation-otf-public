@@ -436,6 +436,36 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
   pour joindre chaque page (PR 2).
 - Décision de ce lot, précisions F, parcours : numéros pris en codant (PR 1).
 
+**Rempli par la PR 1 (25 novembre 2026).**
+
+- **Numéros.** Décision **D-331** ; précisions **F868 à F875** pour la PR 1
+  (S3-f est F871 et F872 ; les autres S3-x prennent leur F avec la PR qui les
+  code) ; parcours **P63**, « Les trois endroits ».
+- **Relevé de ce qui lit « Plus », « Pages du module » ou l'ancien menu**,
+  à suivre dans la PR qui change ce qu'ils lisent :
+  - tests : `audit-ergonomie-lot2-telephone` (F6, F12, F17), `aujourdhui-menu`
+    (T1), `audit-ergonomie-final-lot-a` (F287), `audit-ergonomie-lot3-gestes`,
+    `audit-ergonomie-2026-11-19-lot-k` (F481), `demo-tours`,
+    `feature-selection`, `audit-ergonomie-lot2-aujourdhui`,
+    `audit-ergonomie-lot1` ;
+  - parcours : `e2e/support/parcours.ts` (`ouvrirLeMenuDesPages`,
+    `nomsDesPagesDuMenu`), P0, P22, P23, P27, P28, P29, P30, P41, P59, P61 ;
+  - visite guidée : `e2e-demo/support/visite.ts`, V1 (l'ancre « menu »), V6
+    (« Le menu suit vos cases ») ; les phrases de `lib/domain/demo/tours.ts`
+    qui parlent du menu ;
+  - liens et textes : le « ? » d'« Aujourd'hui » (« dans le menu »).
+  La PR 1 a suivi ceux que « Ma ferme » touche (une page de plus dans le
+  menu) : `audit-ergonomie-lot2-telephone`, `aujourdhui-menu`,
+  `feature-selection`, `audit-ergonomie-lot2-aujourdhui`, `page-help`,
+  P0, P22, P24, P27, P28, P30, P59 et P61 par la liste des titres.
+- **Lignes des fiches** (section 5, « une ligne à 390 px ») : les lignes du
+  contrat mesurent de 182 à 350 px en Open Sans à 13 px, pour environ 238 px
+  de place à 390 px ; la maquette les passe déjà à la ligne. Gardées, sur
+  deux lignes au plus au téléphone et une à l'ordinateur (F870), mesurées
+  par P63 : à 390 px, deux lignes tiennent sur une (Réserve du sol, Alertes
+  météo) et cinq sur deux ; à 1 440 px, les sept sur une. La ligne
+  d'« Alertes cultures » est corrigée contre le « ? » de sa page (F871).
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième cas

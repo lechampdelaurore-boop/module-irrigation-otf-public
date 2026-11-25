@@ -183,7 +183,10 @@ relevée (précision P4).
 
 ## 5. Les pages et la navigation
 
-**Une page par case cochée** (question 6), plus « Réglages ». L'ordre des
+**Une page par case cochée** (question 6), plus « Réglages » et, depuis le
+lot S3 de la simplification (D-331), « Ma ferme », toujours ouverte comme
+Réglages, au-dessus d'elle dans le menu ; chaque page est rangée dans un des
+trois endroits (`docs/simplification-s3-contract.md`, section 3). L'ordre des
 pages est celui de la liste. La première page, celle qu'ouvre
 « Irrigation », est la première case cochée de la liste (précision P10) : pour
 une ferme qui a tout coché, Arrosages (précision P36).
@@ -200,6 +203,7 @@ une ferme qui a tout coché, Arrosages (précision P36).
 | Alertes météo | `/irrigation/alertes-meteo` | l'encart et ses réglages |
 | Alertes cultures | `/irrigation/alertes-cultures` | l'encart, ses réglages, le microclimat |
 | Historique et cumuls | `/irrigation/historique` | cumuls, historique, séries, export |
+| Ma ferme | `/irrigation/ma-ferme` | une fiche par page cochée de l'endroit « Ma ferme », Réglages toujours (simplification, lot S3, PR 1, D-331) |
 | Réglages | `/irrigation/reglages` | la liste des cases et le socle de la section 3 |
 | (première ouverture) | `/irrigation/bienvenue` | la liste, rien coché |
 

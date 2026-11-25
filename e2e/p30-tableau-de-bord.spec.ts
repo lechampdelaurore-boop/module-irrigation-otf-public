@@ -151,13 +151,17 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     const hautDeLaBarre = await barre.evaluate((element) => element.getBoundingClientRect().top);
     expect(hautDuRond).toBeLessThan(hautDeLaBarre);
   }
-  // L'encart détaché, en tête : son nom, « Tableau de bord » ; puis les trois groupes titrés, Réglages à part.
+  // L'encart détaché, en tête : son nom, « Tableau de bord » ; puis les trois groupes titrés, Réglages à part,
+  // « Ma ferme » au-dessus d'elle (simplification, lot S3, PR 1, D-331).
   const encart = menu.locator('a.menu-home');
   await expect(encart).toHaveCount(1);
   await expect(encart).toContainText('Tableau de bord');
   await expect(encart).toHaveAttribute('aria-current', 'page');
   await expect(menu.locator('.menu-group-title')).toHaveText(GROUPES);
-  await expect(menu.locator('.menu-settings-item').getByRole('link')).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
+  const aPart = menu.locator('.menu-settings-item').getByRole('link');
+  await expect(aPart).toHaveCount(2);
+  await expect(aPart.nth(0)).toHaveAccessibleName(TITRES_DES_PAGES['ma-ferme']);
+  await expect(aPart.nth(1)).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
   if (!telephone) {
     // L'encart est au-dessus du premier groupe, et ne prend pas le vert plein d'une page ouverte.
     const basDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().bottom);

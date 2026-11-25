@@ -15,6 +15,7 @@ export const PAGE_ICONS: Record<IrrigationPageId | FeatureId, IconName> = {
   'alertes-meteo': 'cloche',
   'alertes-cultures': 'alerte',
   historique: 'courbe',
+  'ma-ferme': 'ferme',
   // Une case sans page : son icône ne sert que dans la liste des cases.
   calculateur: 'calcul',
   reglages: 'reglages',

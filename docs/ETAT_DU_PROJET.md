@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3, PR 1 sur 4 : le rangement et « Ma
+  ferme », codée le 25 novembre 2026** (D-331, F868 à F875 ; contrat,
+  sections 3 et 5), en Opus 5.5 · Très élevé, sur la branche de la PR 5 de
+  S2. Chaque page est rangée dans un des trois endroits
+  (`lib/domain/features/places.ts`) ; la page « Ma ferme »
+  (`/irrigation/ma-ferme`) montre une fiche par page cochée de l'endroit,
+  Réglages toujours, avec une ligne fixe et « À faire » en orange quand
+  l'accueil de la ferme attend une étape de la page ; elle ne lit rien de
+  plus que le gabarit. Elle s'ajoute à l'ancien menu, au-dessus de
+  Réglages ; la barre du téléphone et le menu de l'ordinateur changent aux
+  PR 2 et 3. Tests du domaine sur les 235 choix de cases valides, parcours
+  P63 aux deux largeurs, contre-épreuve de quatorze altérations. Contrôles :
+  voir la PR. Ses PR se fusionnent après la dernière de S2.
 - **Simplifier l'usage du module, S2, PR 5 sur 5 : la page à l'essentiel,
   codée le 25 novembre 2026** (D-330, F860 à F867 ; contrat, sections 8 et
   9), en Opus 5.5 · Élevé, sur la branche de la PR 4 : **le code du lot S2
@@ -26,7 +39,10 @@ registres, elle y renvoie.
   la PR 3 du lot (#224), fusionnée à 20 h 51, déployée à 21 h 29, run
   45689347330 vérifié job par job (les cinq jobs verts) ; la PR 4 du lot
   (#226), fusionnée à 21 h 36, déployée à 22 h 13, run 45696515280 vérifié
-  job par job (les cinq jobs verts).
+  job par job (les cinq jobs verts) ; **cette PR 5, la dernière (#229),
+  fusionnée à 22 h 47, déployée à 23 h 16, run 45707546339 vérifié job par
+  job (les cinq jobs verts), consignée par la PR 1 de S3 : S2 est en ligne
+  en entier.**
 - **Simplifier l'usage du module, S2, PR 4 sur 5 : noter la pluie d'un
   geste, codée le 25 novembre 2026** (D-330, F854 à F859 ; contrat, section
   7), en Opus 5.5 · Élevé, sur la branche de la PR 3. La fenêtre « Noter la

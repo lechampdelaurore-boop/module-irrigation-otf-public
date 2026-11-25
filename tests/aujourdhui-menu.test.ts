@@ -16,14 +16,16 @@ test('T1 : « Aujourd’hui » détaché, Arroser, Équiper, Surveiller, Réglag
   const menu = menuPages(ALL);
   const layout = menuLayout(menu);
   assert.equal(layout.today, true);
+  assert.equal(layout.farm, true);
   assert.equal(layout.settings, true);
   assert.deepEqual(layout.groups, [
     { title: 'Arroser', pages: ['arrosages', 'planning', 'besoins', 'sol', 'cultures'] },
     { title: 'Équiper', pages: ['materiel', 'ressources'] },
     { title: 'Surveiller', pages: ['alertes-meteo', 'alertes-cultures', 'historique'] },
   ]);
-  // Les groupes ne changent pas l'ordre des pages : celui de la liste des cases (P36).
-  assert.deepEqual(['aujourdhui', ...layout.groups.flatMap((group) => group.pages), 'reglages'], menu);
+  // Les groupes ne changent pas l'ordre des pages : celui de la liste des cases (P36). « Ma ferme »,
+  // une page de plus depuis le lot S3 (PR 1), à part en bas, au-dessus de Réglages.
+  assert.deepEqual(['aujourdhui', ...layout.groups.flatMap((group) => group.pages), 'ma-ferme', 'reglages'], menu);
 });
 
 test('chaque page d’une case est dans un groupe, une seule fois', () => {

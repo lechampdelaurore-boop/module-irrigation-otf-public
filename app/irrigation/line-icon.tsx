@@ -21,6 +21,8 @@ const PATHS = {
   cloche: 'M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.5 2h-14zM10 20.5a2 2 0 0 0 4 0',
   alerte: 'M12 4l9 16H3zM12 10v4M12 17v.5',
   courbe: 'M4 20h16M7 16v-4M12 16V8M17 16v-6',
+  // Une maison : l'endroit « Ma ferme » (simplification, lot S3).
+  ferme: 'M3.5 10.5L12 4l8.5 6.5V20H3.5zM9.5 20v-6h5v6',
   reglages: 'M15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1',
   // Le calculateur d'irrigation (3.8 bis) : une calculette au trait.
   calcul: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8 7h8v3H8zM8.5 14h.5M12 14h.5M15.5 14h.5M8.5 17.5h.5M12 17.5h.5M15.5 17.5h.5',

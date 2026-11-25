@@ -64,7 +64,7 @@ test('une ferme neuve choisit ses fonctionnalités avant toute page, et ne voit 
   // La page d'arrivée est « Aujourd'hui », première du menu (audit ergonomique, lot 2, F1), sans bandeau.
   await attendreLaPagePrete(page, 'aujourdhui');
   expect(await entreesDuMenu(page)).toEqual([
-    'Aujourd’hui', 'Arrosages', 'Planning de la semaine', 'Objectifs et besoins', 'Matériel et placement', 'Alertes météo', 'Réglages',
+    'Aujourd’hui', 'Arrosages', 'Planning de la semaine', 'Objectifs et besoins', 'Matériel et placement', 'Alertes météo', 'Ma ferme', 'Réglages',
   ]);
   await expect(page.getByRole('complementary', { name: 'Choix des fonctionnalités' })).toHaveCount(0);
   await verifierLEtape(page, journal, 'première page après le choix');
@@ -104,7 +104,8 @@ test('une ferme d’avant la 3.8 garde tout coché et voit le bandeau, qui mène
   await attendreLaPageIrrigation(page, 'materiel');
   const bandeau = page.getByRole('complementary', { name: 'Choix des fonctionnalités' });
   await expect(bandeau).toContainText('Vous pouvez maintenant choisir les fonctionnalités affichées, dans Réglages.');
-  expect(await entreesDuMenu(page)).toHaveLength(12);
+  // Les dix pages des cases, « Aujourd'hui », « Ma ferme » (S3, PR 1) et « Réglages ».
+  expect(await entreesDuMenu(page)).toHaveLength(13);
   const lien = bandeau.getByRole('link', { name: 'Choisir dans Réglages' });
   await verifierCibleTactile(lien, 'Le lien « Choisir dans Réglages »');
   await verifierCibleTactile(bandeau.getByRole('button', { name: 'Fermer' }), 'Le bouton « Fermer » du bandeau');
