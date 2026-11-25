@@ -281,9 +281,41 @@
   text-align: center;
 }
 
+/* « Planifier » et « Déjà fait » (S5, PR 2, section 4) : les champs de date au premier niveau. */
+.watering-when,
+.watering-period label {
+  display: grid;
+  gap: 6px;
+}
+
+.watering-when input,
+.watering-period input {
+  min-height: var(--touch-target);
+}
+
 @media (max-width: 560px) {
   .watering-now {
     gap: 16px;
     padding: 14px;
+  }
+
+  /* Trois onglets de 44 px sur une ligne, sans leur phrase de description (S5-e). */
+  .irrigation-action-tabs {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .irrigation-action-tabs button {
+    min-height: var(--touch-target);
+    align-items: center;
+    padding: 6px 4px;
+    text-align: center;
+  }
+
+  .irrigation-action-tabs button span {
+    display: none;
+  }
+
+  .watering-period {
+    grid-template-columns: 1fr;
   }
 }

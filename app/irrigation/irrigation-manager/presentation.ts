@@ -64,12 +64,6 @@ export function countLiveOverlapBeds(events: readonly IrrigationEventRecord[]) {
   return [...counts.values()].filter((count) => count > 1).length;
 }
 
-export function creationButtonLabel(kind: CreationKind) {
-  if (kind === 'running') return 'Démarrer l’irrigation';
-  if (kind === 'planned') return 'Planifier l’irrigation';
-  return 'Enregistrer l’irrigation réalisée';
-}
-
 export function formatDuration(seconds: number | null) {
   if (seconds === null || !Number.isFinite(seconds) || seconds <= 0) return '—';
   const roundedMinutes = Math.max(1, Math.round(seconds / 60));

@@ -4,24 +4,24 @@ import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-
 import type { GardenGroupRecord } from '@/lib/domain/garden-group-record';
 import { equipmentByGarden } from '@/lib/domain/equipment-by-garden';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
-import { ActionTab, HydraulicIndicator, IrrigationPreview } from './irrigation-form';
-import { PreparationFields } from './preparation-fields';
+import { WATERING_TAB_LABELS } from '@/lib/domain/watering-plan-record';
+import { ActionTab } from './irrigation-form';
 import { decimalFormatter, pumpOriginLabel } from './presentation';
 import type { CreationForm } from './use-creation-form';
 import type { useIrrigationPreview } from './use-irrigation-preview';
-import { WateringNowForm } from './watering-now-form';
+import { WateringForm } from './watering-form';
 
 export type IrrigationPreviewResult = ReturnType<typeof useIrrigationPreview>;
 
 /**
  * Le formulaire d'« Arrosages » et ses trois onglets, séparé du composant de
- * la page (simplification S5, PR 1, section 2). « Arroser maintenant » a son
- * premier niveau en trois champs (`WateringNowForm`) ; « Planifier » et
- * « Déjà réalisée » gardent leur formulaire d'avant jusqu'à la PR 2 du lot.
+ * la page (simplification S5, PR 1, section 2). Les trois onglets partagent
+ * un squelette (`WateringForm`, PR 2, section 4) ; au téléphone, ils tiennent
+ * sur une ligne, sans leur phrase de description (S5-e).
  */
 export function CreationPanel({
   form, preview, pumpDashboard, pumpsEnabled, placements, placementsCount, plots, groups,
-  completedStartAt, dose, now, pending, reply, onChooseEquipment, onSubmit,
+  completedStartAt, dose, unplacedChoice, now, pending, reply, onChooseEquipment, onSubmit,
 }: {
   form: CreationForm;
   preview: IrrigationPreviewResult;
@@ -36,6 +36,8 @@ export function CreationPanel({
   completedStartAt: string | null;
   /** La dose du jour pour le matériel choisi (F409), sinon `null`. */
   dose: number | null;
+  /** Le nom d'un matériel choisi qui n'était pas posé à l'heure de début de « Déjà fait » (section 4). */
+  unplacedChoice: string | null;
   now: Date;
   pending: boolean;
   reply: ReactNode;
@@ -43,15 +45,15 @@ export function CreationPanel({
   onSubmit: () => void;
 }) {
   const { creationKind } = form;
-  const { usableEquipment, selectedEquipment, selectedSetting } = preview;
+  const { usableEquipment } = preview;
   const gardens = equipmentByGarden(usableEquipment, placements, { plots, groups });
   return (
     <div className="irrigation-creation-panel">
       {form.editingEventEquipmentId ? <div className="irrigation-edit-banner"><strong>Modification d’une irrigation planifiée</strong><button type="button" onClick={() => form.setEditingEventEquipmentId(null)}>Annuler la modification</button></div> : null}
       <div className="irrigation-action-tabs" data-tour="arrosage-actions" role="tablist" aria-label="Action d’irrigation">
-        <ActionTab active={creationKind === 'running'} onClick={() => form.setCreationKind('running')} title="Arroser maintenant" description="Calculer puis démarrer le minuteur" />
-        <ActionTab active={creationKind === 'planned'} onClick={() => form.setCreationKind('planned')} title="Planifier" description="Préparer une irrigation future" />
-        <ActionTab active={creationKind === 'completed'} onClick={() => form.setCreationKind('completed')} title="Déjà réalisée" description="Enregistrer des horaires réels" />
+        <ActionTab active={creationKind === 'running'} onClick={() => form.setCreationKind('running')} title={WATERING_TAB_LABELS.running} description="Calculer puis démarrer le minuteur" />
+        <ActionTab active={creationKind === 'planned'} onClick={() => form.setCreationKind('planned')} title={WATERING_TAB_LABELS.planned} description="Préparer une irrigation future" />
+        <ActionTab active={creationKind === 'completed'} onClick={() => form.setCreationKind('completed')} title={WATERING_TAB_LABELS.completed} description="Enregistrer des horaires réels" />
       </div>
 
       {usableEquipment.length === 0 ? (
@@ -63,97 +65,21 @@ export function CreationPanel({
             <label><span>Début réel</span><input type="datetime-local" value={form.actualStartAt} onChange={(event) => form.setActualStartAt(event.target.value)} /></label>
           ) : null}
         </div>
-      ) : creationKind === 'running' ? (
-        <WateringNowForm
+      ) : (
+        <WateringForm
           form={form}
           preview={preview}
           gardens={gardens}
           pumpDashboard={pumpDashboard}
           pumpsEnabled={pumpsEnabled}
           dose={dose}
+          unplacedChoice={unplacedChoice}
           now={now}
           pending={pending}
           reply={reply}
           onChooseEquipment={onChooseEquipment}
           onSubmit={onSubmit}
         />
-      ) : (
-        <div className="irrigation-form-layout">
-          <div className="irrigation-form-fields" data-tour="arrosage-champs">
-            <label>
-              <span>Matériel</span>
-              <select value={selectedEquipment?.id ?? ''} onChange={(event) => onChooseEquipment(event.target.value)}>
-                <option value="" disabled>Choisissez un matériel</option>
-                {gardens.map((garden) => (
-                  <optgroup key={garden.label} label={garden.label}>
-                    {garden.items.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                  </optgroup>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Réglage</span>
-              <select value={selectedSetting?.id ?? ''} onChange={(event) => { form.setSettingId(event.target.value); form.setReferenceBedId(''); }}>
-                {selectedEquipment?.settings.map((setting) => <option key={setting.id} value={setting.id}>{setting.name}</option>)}
-              </select>
-            </label>
-            <p className="placement-summary">
-              <span aria-hidden="true">⌖</span>
-              {!selectedEquipment
-                ? 'Choisissez un matériel : l’apport et la faisabilité se calculent ensuite.'
-                : preview.selectedPlacement
-                ? `${preview.preview?.applications.length ?? 0} planche${(preview.preview?.applications.length ?? 0) > 1 ? 's' : ''} atteinte${(preview.preview?.applications.length ?? 0) > 1 ? 's' : ''} depuis la position enregistrée`
-                : 'Position non renseignée'}
-            </p>
-
-            {pumpsEnabled ? (<>
-              <PumpFields form={form} preview={preview} pumpDashboard={pumpDashboard} />
-              {selectedEquipment ? <HydraulicIndicator feasibility={preview.hydraulicPreview} historical={creationKind === 'completed'} /> : null}
-            </>) : null}
-
-            {creationKind === 'completed' ? (
-              <div className="irrigation-datetime-grid">
-                <label><span>Début réel</span><input type="datetime-local" value={form.actualStartAt} onChange={(event) => form.setActualStartAt(event.target.value)} /></label>
-                <label><span>Fin réelle</span><input type="datetime-local" value={form.actualEndAt} onChange={(event) => form.setActualEndAt(event.target.value)} /></label>
-              </div>
-            ) : (
-              <>
-                <label><span>Date et heure de début</span><input type="datetime-local" value={form.plannedStartAt} onChange={(event) => form.setPlannedStartAt(event.target.value)} /></label>
-                <PreparationFields
-                  preparationMode={form.preparationMode}
-                  onPreparationModeChange={form.setPreparationMode}
-                  targetMillimeters={form.targetMillimeters}
-                  onTargetMillimetersChange={form.setTargetMillimeters}
-                  equipment={selectedEquipment}
-                  applications={preview.preview?.applications ?? []}
-                  referenceBedId={preview.effectiveReferenceBedId}
-                  onReferenceBedIdChange={form.setReferenceBedId}
-                  durationHours={form.durationHours}
-                  onDurationHoursChange={form.setDurationHours}
-                  durationMinutes={form.durationMinutes}
-                  onDurationMinutesChange={form.setDurationMinutes}
-                />
-              </>
-            )}
-
-            <NoteField form={form} />
-          </div>
-
-          <IrrigationPreview
-            equipment={selectedEquipment}
-            setting={selectedSetting}
-            applications={preview.previewApplications}
-            durationSeconds={preview.previewDurationSeconds}
-            volumeLiters={preview.previewVolumeLiters}
-            origin={preview.previewOrigin}
-            startKnown={preview.previewStartKnown}
-            creationKind={creationKind}
-            onSubmit={onSubmit}
-            pending={pending}
-            warning={preview.protectedSlotWarning}
-            reply={reply}
-          />
-        </div>
       )}
     </div>
   );
