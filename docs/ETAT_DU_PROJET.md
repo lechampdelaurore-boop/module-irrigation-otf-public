@@ -71,6 +71,19 @@ registres, elle y renvoie.
   les vrais services à deux fermes, parcours P62 aux deux largeurs.
   Contrôles : voir la PR. Viennent les PR 2 (terminer et reprendre) à 5 (la
   page à l'essentiel).
+- **Simplifier l'usage du module, S3 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s3-contract.md`, roadmap section 6 terdecies,
+  ligne 33), **sans code**. Trois endroits : « Aujourd'hui » (avec
+  « Arrosages »), « Semaine » (planning, objectifs et besoins, historique),
+  « Ma ferme » (matériel, ressources, cultures, sol, alertes, réglages),
+  et un « + » pour arroser maintenant, noter la pluie ou noter un arrosage
+  déjà fait. Quatre PR : la page « Ma ferme » en fiches, la barre du bas
+  du téléphone (avec la bande de la semaine et le retour), le menu de
+  l'ordinateur, les liens et la visite guidée ; Opus 5.5 · Très élevé,
+  après la fin du code de S2. Aucune page, adresse ni notification ne
+  change ; aucun calcul ; aucune question agronomique. Écart voulu avec la
+  maquette : les fiches n'ont pas encore de chiffres d'état (S6). PR de
+  contrat seule : **aucun contrôle rejoué**.
 - **Simplifier l'usage du module, S2 : contrat écrit le 25 novembre 2026**
   (`docs/simplification-s2-contract.md`, roadmap section 6 terdecies,
   ligne 33), **sans code**. « Aujourd'hui » où l'on fait tout : un bouton

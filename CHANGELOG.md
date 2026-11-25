@@ -126,6 +126,12 @@ source détaillée commit par commit.
 
 ### Décidé (simplifier l'usage du module)
 
+- **Contrat du lot S3 écrit** (trois endroits) : « Aujourd'hui », « Semaine »,
+  « Ma ferme » et un « + » pour arroser, noter la pluie ou noter un arrosage
+  fait, à la place de la barre du bas à quatre entrées et de « Plus ». Rien
+  n'est codé : aucune page ne change encore, aucune adresse non plus.
+  Contrat : `docs/simplification-s3-contract.md`.
+
 - **Contrat du lot S2 écrit** (« Aujourd'hui » où l'on fait tout) : un seul
   bouton qui change de nom sur la carte (Valider, Démarrer, Terminer),
   l'arrosage à rattraper (« Je le fais maintenant » ou « C'est fait »), la
