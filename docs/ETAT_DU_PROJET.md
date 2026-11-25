@@ -12,8 +12,9 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
-- **Lenteur du module : N1, le menu sans rechargement, et N2, l'ouverture
-  directe, codées le 24 novembre 2026** (D-322, D-323, roadmap section 6 duodecies,
+- **Lenteur du module : N1, le menu sans rechargement, en ligne le
+  25 novembre 2026 à 2 h 45, et N2, l'ouverture directe, codée le
+  24 novembre 2026** (D-322, D-323, roadmap section 6 duodecies,
   `docs/lenteur-du-module-contract.md`), en Opus 5.5 · Élevé, le réglage de
   la roadmap. Constat du porteur à 22 h 33 : le module « rame », au
   téléphone comme à l'ordinateur. Mesuré sur une copie locale : les PR du
@@ -30,7 +31,9 @@ registres, elle y renvoie.
   notification garde sa conduite. Reste N3,
   les lectures répétées de la base (fil à part, Opus 5.5 · Max). La mesure
   sur le téléphone réel du porteur reste à faire, sur son accord.
-  Contrôles : voir la PR.
+  Mise en ligne de #204 (N1, D-322) consignée ici : #204 fusionnée le
+  25 novembre 2026 à 2 h 11, en ligne à 2 h 45 (run 45523929120, les cinq
+  jobs verts ; démonstration à 2 h 46). Contrôles : voir la PR.
 
 - **Objectif automatique sur l'ET0, O4 : les écrans, codé le 24 novembre
   2026** (D-319, F789 à F796, roadmap section 6 decies, PR 4 sur 4), en

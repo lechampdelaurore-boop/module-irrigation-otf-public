@@ -5720,7 +5720,7 @@ cinq envoyeurs et le suivi ; H3, l'écran. Opus 5.5 · Max pour H1 et H2,
 Opus 5.5 · Élevé pour H3. Recette réelle sur le téléphone du porteur, jamais
 sans son accord.
 
-## 6 duodecies. Correctif — Lenteur du module (🟡 ouvert le 24 novembre 2026, N1 et N2 codées)
+## 6 duodecies. Correctif — Lenteur du module (🟡 ouvert le 24 novembre 2026, N1 en ligne, N2 codée)
 
 **Constat du porteur, 24 novembre 2026 à 22 h 33** : « Le logiciel rame »,
 au téléphone (application installée le matin, D-302) comme à l'ordinateur ;
@@ -5736,10 +5736,12 @@ relit la base trop souvent (49 fois le même identifiant d'espace pour
 
 **Les trois corrections**, une PR chacune :
 
-- **N1. Le menu sans rechargement — codée le 24 novembre 2026** (D-322,
-  parcours P59) : les liens du menu passent par le routeur de
-  l'application, sans rien demander d'avance ; un menu neuf à chaque page,
-  le clavier repart du contenu. Opus 5.5 · Élevé.
+- **N1. Le menu sans rechargement — en ligne le 25 novembre 2026 à 2 h 45**
+  (D-322, parcours P59) : les liens du menu passent par le routeur de
+  l'application, sans rien demander d'avance ; chaque page calculée une fois
+  par requête ; un menu neuf à chaque page, le clavier repart du contenu.
+  Opus 5.5 · Élevé. #204 fusionnée le 25 novembre 2026 à 2 h 11, run
+  45523929120, les cinq jobs verts (production 2 h 45, démonstration 2 h 46).
 - **N2. L'ouverture directe — codée le 24 novembre 2026** (D-323) :
   `/irrigation` sans ancre, l'adresse de départ de l'application installée,
   mène à la page d'arrivée par un script lu avec la page, sans attendre les
