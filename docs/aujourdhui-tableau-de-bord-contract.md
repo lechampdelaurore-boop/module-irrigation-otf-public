@@ -45,7 +45,8 @@ le lot 3 de l'audit et les correctifs de la 3.9.
   la carte à un bouton, « Valider » et « Démarrer » s'y ajoutent sur la carte
   d'une proposition et d'une irrigation planifiée (PR 1), « Terminer »,
   « Reprendre », « Mettre en pause » et « Reprendre ce qui reste » sur ce qui
-  coule ou attend d'être repris (PR 2) ; les retards suivent avec la PR 3.
+  coule ou attend d'être repris (PR 2), « Je le fais maintenant » et « C’est
+  fait » sur l'arrosage à rattraper (PR 3).
 - L'adresse, la place de première page et de page d'arrivée (F1, F31), la
   saison du jour (F2, F32), la pastille du menu et son compte (F12, F33).
 - La règle de présence : un bloc n'existe que si sa fonctionnalité est
@@ -140,7 +141,9 @@ la PR 3 de ce contrat et reprise par le lot 3.
   confirmation rappelle pourquoi les irrigations à venir n'y sont pas.
 - **Après** : un message « n irrigations enregistrées comme faites », sous
   le bouton, en tête de « Votre journée » (`docs/aujourdhui-liens-contract.md`,
-  L4, D-313 ; sous sa carte pour « Fait comme prévu ») ; la page se relit,
+  L4, D-313 ; sous sa carte pour « Fait comme prévu », qui se dit « C’est
+  fait » sur la carte depuis la simplification S2, PR 3, D-330, la règle, la
+  confirmation et la fonction inchangées) ; la page se relit,
   la pastille du menu baisse. L'historique dit chacune
   « Planifiée, faite comme prévu ». Une irrigation enregistrée **ne se
   modifie plus** (D-006, T16) : la confirmation le dit en gras, et c'est

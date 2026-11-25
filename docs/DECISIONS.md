@@ -10136,6 +10136,49 @@ bienvenue et la visite guidée ; parcours P61 étendu (les mots du tableau
 lus, aucun mot du calcul visible d'emblée sur les douze pages) ; seize
 parcours relus avec les nouveaux libellés. Contre-épreuve : voir la PR.
 
+**Décision (PR 3).** L'arrosage à rattraper, en retard ou non fait, a sa carte
+qui pose la question au lieu de deviner (contrat, section 4, S2-a) : « Je le
+fais maintenant », le principal (le démarrage d'« Arrosages », ses gardes), et
+« C’est fait », de même taille et bordé, qui enregistre l'arrosage tel que
+prévu par la règle et la fonction de « Fait comme prévu » et « Tout est
+fait », sans les changer (T15, T16, D-006). « C’est fait » n'existe que si
+cette règle l'accepte : jamais avant la fin du créneau. « Ne pas le faire »,
+rangé dans « Autres choix », est l'annulation d'« Arrosages », après « Ne pas
+le faire ? — Cet arrosage ne sera pas fait. Le module recalcule la semaine. ».
+La carte dit le jour et la question : « Prévu hier à 7 h. L’avez-vous
+fait ? », « Prévu à 7 h, pas encore démarré. ». Le repli des jours passés (T2)
+et « Tout est fait » ne changent pas. Sous restriction d'eau, « Je le fais
+maintenant » est refusé et le motif se lit sous la carte ; « C’est fait »
+reste accepté (section 9).
+
+**Précisions tranchées en codant (PR 3).**
+
+- F850 : la confirmation de « C’est fait » garde le titre et les mots de
+  « Fait comme prévu » (« Fait comme prévu ? », « Enregistrer comme faite »,
+  « Ne rien enregistrer ») : elle dit ce qui sera écrit, tel que prévu. Elle
+  gagne « Fait autrement (une autre durée, un autre moment) ? Notez-le sur
+  « Arrosages » », un lien vers la carte de l'irrigation, seulement quand
+  « Arrosages » est cochée.
+- F851 : « Ne pas le faire » se confirme par « Ne pas le faire » en rouge et
+  « Le garder » ; la carte partie, la réponse « L’irrigation planifiée a été
+  annulée. » se lit en tête de « Votre journée » (L4, règle 2).
+- F852 : un jour plus ancien qu'avant-hier se dit par sa date courte (« Prévu
+  dim. 8 nov. à 7 h. L’avez-vous fait ? ») ; un créneau passé du jour même,
+  sans jour (« Prévu à 7 h. L’avez-vous fait ? »).
+- F853 : le bouton « Fait comme prévu » quitte la carte d'« Aujourd'hui » pour
+  « C’est fait » ; il reste sur « Arrosages » (dette notée, S5).
+
+**Preuve (PR 3).** `tests/simplification-s2-a-rattraper.test.ts` : la carte
+d'un arrosage non fait et en retard, « C’est fait » absent sans la règle, la
+confirmation de « Ne pas le faire », la carte sans « Arrosages », la phrase
+pour chaque jour, l'interface (rien au premier appui, la ligne « Fait
+autrement », l'annulation d'« Arrosages », la même taille).
+`tests/db/simplification-s2-a-rattraper.test.ts` : sur les vrais services,
+« C’est fait » enregistre tel que prévu et la carte part, la restriction
+refuse le démarrage mais pas « C’est fait », un créneau en cours sans « C’est
+fait » démarré, « Ne pas le faire » annule, Bob n'annule, n'enregistre ni ne
+démarre rien d'Alice. P62 étendu. Contre-épreuve : voir la PR.
+
 **Cause du point S1-O1 (PR 3), établie dans le code.** Ce n'est pas une
 moyenne sans pondération : les deux pages pondèrent par la surface. La
 ligne de résumé et la tuile « Objectif ferme » d'« Objectifs et besoins »
@@ -10226,8 +10269,8 @@ Contre-épreuve : treize altérations, chacune prise par au moins un test.
 
 ## D-330 — Simplifier l'usage du module, lot S2 : « Aujourd'hui » où l'on fait tout
 
-Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 5 codées** (valider et
-démarrer, puis terminer et reprendre depuis la carte) ; contrat `docs/simplification-s2-contract.md`, roadmap
+Date : 25 novembre 2026. Statut : **PR 1 à 3 sur 5 codées** (valider et
+démarrer, terminer et reprendre, l'arrosage à rattraper) ; contrat `docs/simplification-s2-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 15), sur le mandat du porteur du 25 novembre
 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met en œuvre le
