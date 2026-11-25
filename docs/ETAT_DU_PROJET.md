@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S2, PR 1 sur 5 : valider et démarrer depuis
+  la carte, codée le 25 novembre 2026** (D-330, F838 à F843 ; contrat
+  `docs/simplification-s2-contract.md`, sections 3 et 5 ; roadmap section 6
+  terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap et du
+  contrat, sur le mandat du porteur (lots enchaînés sans nouveau « vas-y »).
+  Sur « Aujourd'hui », une proposition du plan porte un seul bouton,
+  « Valider », « Démarrer tout de suite » dessous et « Autres choix »
+  (« Changer l'heure ou la dose », vers le planning ; « Pas à cette heure »,
+  confirmé d'une ligne) ; une irrigation planifiée porte « Démarrer », et
+  « Modifier ou annuler sur « Arrosages » » rangé. Chaque geste est l'action
+  du planning ou d'« Arrosages », la même, avec ses gardes : aucune règle
+  nouvelle ; la validation rend l'irrigation créée par son matériel, pour que
+  la réponse et le focus suivent la carte. Les irrigations en retard gardent
+  leurs gestes jusqu'à la PR 3 du lot. La règle du bouton est dans
+  `lib/domain/today/card-action.ts`. Tests du domaine, de la composition sur
+  les vrais services à deux fermes, parcours P62 aux deux largeurs.
+  Contrôles : voir la PR. Viennent les PR 2 (terminer et reprendre) à 5 (la
+  page à l'essentiel).
 - **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
   l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
   décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat

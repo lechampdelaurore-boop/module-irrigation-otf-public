@@ -552,6 +552,13 @@ du moteur et n'écrit aucune règle métier : ce qu'elle calcule pour s'afficher
 — regrouper par jour, compter, convertir un ajustement en durée, lire et
 écrire les réglages — vit dans `lib/domain/planning/presentation.ts`, testé.
 
+**Depuis la simplification, lot S2** (D-330,
+`docs/simplification-s2-contract.md`, section 10) : valider et refuser une
+proposition se font aussi depuis sa carte d'« Aujourd'hui », par les mêmes
+actions et les mêmes gardes, une proposition à la fois ; « Ajuster » y
+mène par « Changer l'heure ou la dose ». Cet écran ne change pas : il garde
+tous ses gestes, « Tout valider » compris.
+
 - **L'en-tête** : la semaine du lundi au dimanche ; le dernier calcul avec
   sa date et son déclencheur (à la demande, recalcul du matin, ou l'événement
   nommé : « après la pluie saisie au pluviomètre », 3.7) ; quand un événement

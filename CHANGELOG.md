@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S2, PR 1 : valider et démarrer depuis la carte)
+
+- **« Aujourd'hui » valide et démarre un arrosage sans changer de page**
+  (D-330) : la carte d'une proposition du plan porte un seul bouton,
+  « Valider », avec « Démarrer tout de suite » dessous ; « Autres choix »
+  range « Changer l'heure ou la dose » (le formulaire du planning) et « Pas
+  à cette heure » (le refus du planning, confirmé d'une ligne). Validée, la
+  carte devient « Planifiée » avec « Démarrer », la réponse et le focus sur
+  elle. La carte d'une irrigation planifiée porte « Démarrer » ; « Modifier
+  ou annuler » est dans « Autres choix ». Ce sont les mêmes gestes que sur le
+  planning et « Arrosages », avec les mêmes gardes ; le planning ne change
+  pas. « Valider au planning » disparaît.
+
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
