@@ -46,6 +46,12 @@ import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/
  * (« Ne rien enregistrer » n'écrit rien), et la carte part ; « Ne pas le
  * faire » se confirme (« Le garder » ne fait rien), et la carte part ; « Je le
  * fais maintenant » la fait couler.
+ * PR 4, « Noter la pluie », sur une quatrième ferme neuve : la tuile « Eau
+ * reçue » ouvre la fenêtre, hier par défaut, le bouton inactif tant que le
+ * champ est vide ; 8 mm s'enregistrent au clavier (Entrée), la réponse sous
+ * les tuiles ; rouverte, la fenêtre dit « 8 mm déjà notés » et le bouton
+ * « Remplacer par 0 mm » ; 0 mm est une mesure, remplacée à son tour ; un
+ * chiffre illisible est dit sous le champ, et « Fermer » n'écrit rien.
  *
  * L'heure où il tourne : le plan ne propose rien aujourd'hui quand la
  * journée est finie ; les gestes qui demandent une proposition du jour ne
@@ -330,4 +336,79 @@ test('un arrosage à rattraper : la question, « C’est fait » confirmé, « N
   await expect(coule.locator('.action-reply')).toContainText('L’irrigation a démarré.');
   await expect(aRattraper).toHaveCount(0);
   await verifierLEtape(page, journal, '« Je le fais maintenant » démarre');
+});
+
+test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis la tuile « Eau reçue »', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const reference = Date.now();
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'p62-pluie');
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+
+  const tuile = page.getByRole('region', { name: 'Cette semaine' }).locator('button.today-kpi').filter({ hasText: 'Eau reçue' });
+  await expect(tuile).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
+  if (telephone) await verifierCibleTactile(tuile, 'La tuile « Eau reçue »');
+  const fenetre = page.getByRole('dialog', { name: 'Noter la pluie' });
+  const jour = fenetre.getByLabel('Quel jour ?');
+  const combien = fenetre.getByLabel('Combien ?');
+  const premierJanvier = horodatageLocal(0, reference).slice(5, 10) === '01-01';
+  const parDefaut = horodatageLocal(premierJanvier ? 0 : -24 * 60, reference).slice(0, 10);
+  const pourLeJour = premierJanvier ? 'pour aujourd’hui' : 'pour hier';
+  const reponse = page.getByRole('region', { name: 'Cette semaine' }).locator('.action-reply');
+
+  // Ouverte : hier par défaut, le focus sur le jour, le bouton inactif tant que le champ est vide (D-003).
+  await tuile.click();
+  await expect(fenetre).toBeVisible();
+  await expect(jour).toBeFocused();
+  await expect(jour).toHaveValue(parDefaut);
+  await expect(fenetre).toContainText('Pas de pluie ? Notez 0 : c’est une vraie mesure, elle compte.');
+  await expect(fenetre.getByRole('button', { name: 'Enregistrer', exact: true })).toBeDisabled();
+  await expect(fenetre.getByRole('link', { name: 'sur « Objectifs et besoins »' })).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#manual-rain$/);
+  if (telephone) {
+    for (const [cible, nom] of [[jour, 'Le jour'], [combien, 'Le champ des millimètres'], [fenetre.getByRole('button', { name: 'Fermer' }), '« Fermer »']] as const) {
+      await verifierCibleTactile(cible, nom);
+    }
+  }
+  await verifierLEtape(page, journal, 'la fenêtre de la pluie, hier par défaut');
+
+  // Un chiffre illisible est dit sous le champ ; « Fermer » n'écrit rien.
+  await combien.fill('beaucoup');
+  await expect(combien).toHaveAttribute('aria-invalid', 'true');
+  await expect(fenetre).toContainText('Tapez un nombre de millimètres, par exemple 8,5.');
+  await fenetre.getByRole('button', { name: 'Fermer' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveCount(0);
+
+  // 8 mm, au clavier : le bouton dit le chiffre, Entrée enregistre, la réponse sous les tuiles.
+  await tuile.click();
+  await combien.fill('8');
+  await expect(fenetre.getByRole('button', { name: 'Enregistrer 8 mm' })).toBeEnabled();
+  if (telephone) await verifierCibleTactile(fenetre.getByRole('button', { name: 'Enregistrer 8 mm' }), '« Enregistrer 8 mm »');
+  await combien.press('Enter');
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveText(/^Pluie enregistrée : 8 mm le \S+ \d{1,2} \S+\. Le plan se recalcule\.$/);
+  await verifierLEtape(page, journal, '8 mm enregistrés');
+
+  // Rouverte : la mesure se dit, le bouton devient « Remplacer par 0 mm » ; 0 est une vraie mesure.
+  await tuile.click();
+  await expect(fenetre).toContainText(`8 mm déjà notés ${pourLeJour}.`);
+  await combien.fill('0');
+  await fenetre.getByRole('button', { name: 'Remplacer par 0 mm' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveText(/^Pluie enregistrée : 0 mm le /);
+  await verifierLEtape(page, journal, '0 mm remplace 8 mm');
+
+  // Et remplacer encore, à la virgule.
+  await tuile.click();
+  await expect(fenetre).toContainText(`0 mm déjà noté ${pourLeJour}.`);
+  await combien.fill('3,5');
+  await fenetre.getByRole('button', { name: 'Remplacer par 3,5 mm' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveText(/^Pluie enregistrée : 3,5 mm le /);
+  await tuile.click();
+  await expect(fenetre).toContainText(`3,5 mm déjà notés ${pourLeJour}.`);
+  await page.keyboard.press('Escape');
+  await expect(fenetre).toBeHidden();
+  await verifierLEtape(page, journal, 'la mesure remplacée');
 });

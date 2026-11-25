@@ -109,7 +109,12 @@ type WeekRow = {
  * téléphone, rien d'autre ne dit qu'elle est un lien. Un lien mène, il
  * n'enregistre rien (D-028).
  */
-export type TodayTileLink = { label: string; page: 'besoins'; anchor: string };
+/**
+ * Le lien d'une tuile. `rain` : la tuile ouvre la fenêtre « Noter la pluie »
+ * (simplification S2, PR 4 ; L1 réécrite), le lien vers « Objectifs et
+ * besoins » restant dans la fenêtre, pour retirer ou voir jour par jour.
+ */
+export type TodayTileLink = { label: string; page: 'besoins'; anchor: string; rain?: true };
 
 /** Les volets et tableaux d'« Objectifs et besoins » que les tuiles visent (water-management-dashboard.tsx, irrigation-needs-dashboard.tsx). */
 const WEEK_OBJECTIVES_ANCHOR = 'objectifs-de-la-semaine';
@@ -417,7 +422,7 @@ function weekLinks(farm: WeekRow): TodayWeek['links'] {
   const besoins = (label: string, anchor: string): TodayTileLink => ({ label, page: 'besoins', anchor });
   return {
     objective: besoins(farm.objectiveMm === null ? 'Poser un objectif' : 'Modifier les objectifs', WEEK_OBJECTIVES_ANCHOR),
-    received: farm.sheltered ? besoins('Voir jour par jour', WEEK_DAYS_ANCHOR) : besoins('Noter une pluie mesurée', MEASURED_RAIN_ANCHOR),
+    received: farm.sheltered ? besoins('Voir jour par jour', WEEK_DAYS_ANCHOR) : { ...besoins('Noter la pluie', MEASURED_RAIN_ANCHOR), rain: true },
     remaining: besoins(farm.remainingMm === null ? 'Voir ce qui manque' : 'Voir par planche', NEEDS_TABLE_ANCHOR),
     water: besoins('Voir jour par jour', WEEK_DAYS_ANCHOR),
   };

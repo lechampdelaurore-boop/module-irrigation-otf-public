@@ -257,7 +257,7 @@
 }
 
 /* Les boutons et liens-gestes : 44 px, la pilule de la charte. */
-.today-page button:not(.page-help-toggle, .page-help-close, .section-help-toggle),
+.today-page button:not(.page-help-toggle, .page-help-close, .section-help-toggle, .today-kpi),
 .today-action-link {
   display: inline-flex;
   min-height: var(--touch-target);

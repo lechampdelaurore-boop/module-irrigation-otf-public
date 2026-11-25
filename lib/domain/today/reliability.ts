@@ -62,7 +62,13 @@ export const RAIN_GAUGE_MAX_AGE_DAYS = 30;
  */
 export type ReliabilityAction =
   | { kind: 'link'; label: string; page: IrrigationPageId; anchor: string | null; zone?: string }
-  | { kind: 'recalculate-plan'; label: string };
+  | { kind: 'recalculate-plan'; label: string }
+  /**
+   * « Noter la pluie » ouvre sa fenêtre sur la page (simplification S2,
+   * PR 4) ; la page et l'ancre restent le lien quand la fenêtre n'est pas
+   * offerte.
+   */
+  | { kind: 'rain'; label: string; page: 'besoins'; anchor: string };
 
 export type ReliabilityLine = {
   kind: ReliabilityKind;
@@ -175,7 +181,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
       kind: 'actual-rain',
       key: 'actual-rain',
       text: `Pluie réelle incomplète : ${countText(missing, 'jour manquant', 'jours manquants')}. ${ACTUAL_RAIN_CONSEQUENCE}`,
-      action: { kind: 'link', label: 'Noter la pluie de la semaine', page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
+      action: { kind: 'rain', label: 'Noter la pluie', page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
     });
   }
   const missingEt0 = input.automaticObjectiveMissingEt0Dates ?? null;

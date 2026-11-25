@@ -321,7 +321,7 @@ test('cas 12 : cinq jours de pluie réelle manquants sur sept', () => {
   const lines = reliabilityLines({ ...FRESH, enabled: ALL, now: NOW, actualRainMissingDates: ['2026-11-05', '2026-11-06', '2026-11-07', '2026-11-10', '2026-11-11'] });
   assert.deepEqual(lines.map((line) => [line.text, line.action]), [[
     'Pluie réelle incomplète : 5 jours manquants. Sans elle, le besoin est surévalué.',
-    { kind: 'link', label: 'Noter la pluie de la semaine', page: 'besoins', anchor: 'manual-rain' },
+    { kind: 'rain', label: 'Noter la pluie', page: 'besoins', anchor: 'manual-rain' },
   ]]);
   // Une ferme tout sous abri : la pluie ne compte pas, rien à rafraîchir.
   assert.deepEqual(reliabilityLines({ ...FRESH, enabled: ALL, now: NOW, actualRainMissingDates: null }), []);

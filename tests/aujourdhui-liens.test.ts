@@ -65,7 +65,7 @@ test('L1, cas 1 : maraîchage, début d’été, 7 planches sur 10 ont un object
   assert.equal(result.tiles.objectiveDetail, '7 planches sur 10 ont un objectif, du lun. 15 juin au dim. 21 juin');
   assert.deepEqual(actions(result), {
     objective: 'Modifier les objectifs → besoins#objectifs-de-la-semaine',
-    received: 'Noter une pluie mesurée → besoins#manual-rain',
+    received: 'Noter la pluie → besoins#manual-rain',
     remaining: 'Voir par planche → besoins#irrigation-needs-title',
     water: 'Voir jour par jour → besoins#weather',
   });
@@ -81,14 +81,16 @@ test('L1, cas 2 : petite ferme sans objectif : « Poser un objectif », reste in
   assert.equal(result.links.remaining.anchor, 'irrigation-needs-title');
 });
 
-test('L1, cas 3 : automne, pluie prévue non mesurée : « Noter une pluie mesurée » ; toute sous abri : « Voir jour par jour »', () => {
+test('L1, cas 3 : automne, pluie prévue non mesurée : « Noter la pluie » ouvre sa fenêtre (S2, PR 4) ; toute sous abri : « Voir jour par jour »', () => {
   const outside = week([bed('g1', 'Champ', 20, { actualRainMm: 2.4 })], { rainOrigins: { measuredMm: 0, reanalysisMm: 0, forecastMm: 2.4 } });
   assert.match(outside.tiles.receivedDetail ?? '', /2,4 mm de pluie prévue, non mesurée/);
-  assert.equal(outside.links.received.label, 'Noter une pluie mesurée');
+  assert.equal(outside.links.received.label, 'Noter la pluie');
   assert.equal(outside.links.received.anchor, 'manual-rain');
+  assert.equal(outside.links.received.rain, true);
   // Toute sous abri, la pluie ne compte pas (D-032) : la tuile mène aux jours de la semaine.
   const sheltered = week([bed('g1', 'Tunnel', 20, { sheltered: true, actualRainMm: 0 })]);
   assert.deepEqual([sheltered.links.received.label, sheltered.links.received.anchor], ['Voir jour par jour', 'weather']);
+  assert.equal(sheltered.links.received.rain, undefined);
   // Une seule planche dehors suffit à proposer la pluie mesurée.
   const mixed = week([bed('g1', 'Tunnel', 20, { sheltered: true, actualRainMm: 0 }), bed('g2', 'Champ', 20)]);
   assert.equal(mixed.links.received.anchor, 'manual-rain');
@@ -122,7 +124,9 @@ test('L1 : chaque tuile est un lien entier, le mot d’action écrit dessus ; le
   assert.match(view, /<span className="today-kpi-action"><ActionWords label=\{link\.label\} \/><\/span>/);
   assert.match(view, /<span className="today-kpi-action-end">\{label\.slice\(cut \+ 1\)\}<Icon name="chevron" \/><\/span>/);
   assert.doesNotMatch(view, /<div className="today-kpi"/);
-  assert.doesNotMatch(view, /onClick|Action\(/, 'une tuile ne fait aucun geste');
+  // Une tuile n'écrit rien : la seule qui agit, « Eau reçue », ouvre la fenêtre « Noter la pluie » (S2, PR 4), où l'on appuie pour enregistrer.
+  assert.doesNotMatch(view, /Action\(/, 'une tuile ne fait aucun geste');
+  assert.deepEqual(view.match(/onClick=\{[^}]*\}/g), ['onClick={onOpen}']);
   const css = readFileSync('app/irrigation/styles/today-board.css', 'utf8');
   assert.match(css, /\.today-kpi:focus-visible \{\n {2}outline: 3px solid var\(--focus-ring\);/);
 });

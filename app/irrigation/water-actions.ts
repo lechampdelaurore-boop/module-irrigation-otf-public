@@ -18,6 +18,7 @@ import {
   getWaterDashboardForUser,
   type WaterDashboard,
 } from '@/lib/services/water-dashboard';
+import { manualRainfallRefusal } from '@/lib/domain/today/rain-entry';
 import { locationKeyForCandidate, outsidePilotArea } from '@/lib/domain/weather/location';
 import {
   weekStartDateKey,
@@ -263,12 +264,8 @@ export async function saveManualRainfallAction(input: {
 }): Promise<WaterActionResult> {
   const context = await loadContext(input.season);
   if (!context.ok) return context;
-  if (!isValidDateKey(input.date) || input.date > dateKeyInTimeZone(new Date())) {
-    return { ok: false, message: 'Une mesure réelle doit concerner une date valide, aujourd’hui ou dans le passé.' };
-  }
-  if (!Number.isFinite(input.precipitationMm) || input.precipitationMm < 0 || input.precipitationMm > 1000) {
-    return { ok: false, message: 'La pluie mesurée doit être comprise entre 0 et 1 000 mm.' };
-  }
+  const refusal = manualRainfallRefusal({ date: input.date, precipitationMm: input.precipitationMm, today: dateKeyInTimeZone(new Date()) });
+  if (refusal) return { ok: false, message: refusal };
   await saveManualRainfallForUser(
     context.value.ownerUserId,
     input.date,

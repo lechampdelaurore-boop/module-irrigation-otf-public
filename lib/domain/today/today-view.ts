@@ -28,6 +28,7 @@ import {
   type ReliabilityInputs,
   type ReliabilityZone,
 } from './reliability.ts';
+import { rainEntry, type RainEntry } from './rain-entry.ts';
 import { hasMissingByBed, missingByBed, type MissingByBed, type MissingByBedInputs } from './missing-by-bed.ts';
 import { todaySoil, type TodaySoil } from './soil.ts';
 import { nowIrrigationLines, type TodayNowLine } from './now-irrigations.ts';
@@ -281,6 +282,13 @@ export type TodayInputs = {
   week: TodayWeekInputs | null;
   /** La jauge du sol, ou la raison de son absence ; `null` quand « Réserve du sol » n'est pas coché ou pas lu. */
   soil: { zones: readonly Pick<SoilGaugeZone, 'plots'>[] } | { unavailable: string } | null;
+  /**
+   * La pluie déjà notée au pluviomètre, par jour, pour « Noter la pluie »
+   * (simplification S2, PR 4) ; absent : la fenêtre n'est pas proposée.
+   * `rainMatters` faux pour une ferme toute sous abri, où la pluie vaut 0
+   * (D-032) : pas de fenêtre non plus.
+   */
+  rain?: { measured: ReadonlyMap<string, number>; rainMatters: boolean };
 };
 
 export type TodayView = {
@@ -296,6 +304,8 @@ export type TodayView = {
   current: TodayNowLine[];
   /** La frise des irrigations du jour ; `null` sans irrigation aujourd'hui ou sans planning ni arrosages. */
   timeline: DayTimeline | null;
+  /** « Noter la pluie » (S2, PR 4) : les jours et les mesures déjà notées ; `null` sans « Objectifs et besoins » ou pour une ferme toute sous abri. */
+  rain: RainEntry | null;
   /** « Tout est fait » : ce que le bouton enregistrera ; `null` sans rien à couvrir, pas de bouton (section 3.4). */
   allDone: AllDone | null;
   /** « La semaine » et « Eau de la semaine » ; `null` sans « Objectifs et besoins » ou sans planche de la saison. */
@@ -387,5 +397,6 @@ export function todayView(input: TodayInputs): TodayView {
     tomorrow,
     shortage,
     dayEmptyLink: irrigationsOn ? dayEmptyLink(enabled) : null,
+    rain: on('besoins') && input.rain?.rainMatters ? rainEntry({ today, measured: input.rain.measured }) : null,
   };
 }
