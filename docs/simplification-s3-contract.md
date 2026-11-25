@@ -529,8 +529,8 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
   `simplification-s3-endroits` et `simplification-s3-barre` (le « + » à deux
   formes) ; `e2e/support/parcours.ts` (l'ordre des titres, celui des
   endroits ; `nomsDesPagesDuMenu` lit la page de chaque lien une fois ;
-  `TEXTES_DES_LIENS_DU_MENU` avec le titre « Semaine »), P0, P27, P28, P30
-  et P63 ; les contrats T1 et la section 5 de `feature-selection-contract`.
+  `TEXTES_DES_LIENS_DU_MENU` avec le titre « Semaine »), P0, P22 (l'ordre
+  des entrées), P27, P28, P30 et P63 ; les contrats T1 et la section 5 de `feature-selection-contract`.
   Restent à la PR 4 la visite guidée, `demo-tours`, les phrases qui disent
   « menu » ou « Plus », et le « ? » d'« Aujourd'hui ».
 
