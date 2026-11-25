@@ -23,8 +23,10 @@ registres, elle y renvoie.
   change. Sur la démonstration, la Ferme des Trois Noues passe de 16,5 à
   23,4 mm au début de l'été, le chiffre d'« Aujourd'hui ». Tests à deux
   fermes, démonstration rejouée, parcours P61 étendu, contre-épreuve
-  (13 altérations sur 13 prises). Le code du lot S1 est fini ; la PR
-  s'ouvre après la fusion de la PR 3. Contrôles : voir la PR.
+  (13 altérations sur 13 prises). Le code du lot S1 est fini. Contrôles :
+  voir la PR. **La PR 2 (les mots) est en ligne** (#212, fusionnée le
+  25 novembre 2026 à 15 h 51, déployée à 16 h 26, run 45638614621 vérifié
+  job par job : les cinq jobs verts).
 - **Simplifier l'usage du module, S1, PR 3 sur 3 : un seul objectif, codée
   le 25 novembre 2026** (D-328, D-329, roadmap section 6 terdecies, ligne
   33), en Opus 5.5 · Élevé. La cause de l'écart de la ferme réelle (2,7 mm
