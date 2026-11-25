@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S2, PR 5 sur 5 : la page à l'essentiel,
+  codée le 25 novembre 2026** (D-330, F860 à F867 ; contrat, sections 8 et
+  9), en Opus 5.5 · Élevé, sur la branche de la PR 4 : **le code du lot S2
+  est fini**. Deux niveaux, le même ordre à toutes les largeurs : la
+  journée, le gel ou la chaleur en alerte, « La semaine » en une barre, une
+  ligne « Calcul approximatif », une ligne d'eau quand elle dit quelque
+  chose ; tout le reste dans un pli fermé, « Le détail », qu'ouvrent les
+  ancres existantes. Le choix du premier niveau vit dans
+  `lib/domain/today/essential.ts` ; aucun bloc retiré, aucune règle changée.
+  Tests du domaine et de la page, P29, P30, P38 suivis, P62 mesure le premier
+  niveau à 390 px. Contrôles : voir la PR. **Mise en ligne consignée ici** :
+  la PR 3 du lot (#224), fusionnée à 20 h 51, déployée à 21 h 29, run
+  45689347330 vérifié job par job (les cinq jobs verts) ; la PR 4 du lot
+  (#226), fusionnée à 21 h 36, déployée à 22 h 13, run 45696515280 vérifié
+  job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S2, PR 4 sur 5 : noter la pluie d'un
   geste, codée le 25 novembre 2026** (D-330, F854 à F859 ; contrat, section
   7), en Opus 5.5 · Élevé, sur la branche de la PR 3. La fenêtre « Noter la

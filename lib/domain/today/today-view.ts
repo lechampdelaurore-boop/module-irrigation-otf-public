@@ -29,6 +29,7 @@ import {
   type ReliabilityZone,
 } from './reliability.ts';
 import { rainEntry, type RainEntry } from './rain-entry.ts';
+import { approximateLine, detailSummary, waterAlert, weatherAlert, weekBar, type TodayEssential } from './essential.ts';
 import { hasMissingByBed, missingByBed, type MissingByBed, type MissingByBedInputs } from './missing-by-bed.ts';
 import { todaySoil, type TodaySoil } from './soil.ts';
 import { nowIrrigationLines, type TodayNowLine } from './now-irrigations.ts';
@@ -90,7 +91,7 @@ export type TodayWeatherBlock = {
   alerts: number;
 };
 
-type TodayUnposedFrost = {
+export type TodayUnposedFrost = {
   /** « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. » */
   text: string;
   /** Le modèle de gel mis en vue sur « Alertes météo », rien d'enregistré (F284) ; ou l'alerte désactivée. */
@@ -306,6 +307,8 @@ export type TodayView = {
   timeline: DayTimeline | null;
   /** « Noter la pluie » (S2, PR 4) : les jours et les mesures déjà notées ; `null` sans « Objectifs et besoins » ou pour une ferme toute sous abri. */
   rain: RainEntry | null;
+  /** Le premier niveau de la page et le résumé du pli « Le détail » (S2, PR 5). */
+  essential: TodayEssential;
   /** « Tout est fait » : ce que le bouton enregistrera ; `null` sans rien à couvrir, pas de bouton (section 3.4). */
   allDone: AllDone | null;
   /** « La semaine » et « Eau de la semaine » ; `null` sans « Objectifs et besoins » ou sans planche de la saison. */
@@ -376,6 +379,23 @@ export function todayView(input: TodayInputs): TodayView {
   // Ce qui attend après le jour ne se dit que « Planning » coché (lot A, R1) : le plan de la semaine en décide.
   const tomorrow = on('planning') && input.plan ? todayTomorrow(input.plan.proposals, now) : null;
   const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled, input.now) : null;
+  const week = on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null;
+  const waterShown = blocks.find((item): item is TodayWaterBlock => item.kind === 'water') ?? null;
+  const essential: TodayEssential = {
+    week: week ? weekBar(week) : null,
+    approximate: reliabilityOn ? approximateLine(reliability) : null,
+    water: waterAlert(waterShown),
+    weather: weatherAlert(weather),
+    detail: detailSummary({
+      tiles: week ? (week.tiles.water ? 4 : 3) : 0,
+      gardens: week ? week.shown.length + week.hidden.length : 0,
+      weatherDays: weather?.days.length ?? 0,
+      reservoirs: waterShown?.reservoirs.length ?? 0,
+      limits: waterShown?.limits.length ?? 0,
+      toRefresh: reliability.length,
+      reliability: reliabilityOn,
+    }),
+  };
   return {
     today,
     plan: on('planning') ? planLine(input.plan?.computedAt ?? null, now) : null,
@@ -392,11 +412,12 @@ export function todayView(input: TodayInputs): TodayView {
     current,
     timeline: irrigationsOn ? dayTimeline([...late, ...todo], now) : null,
     allDone: irrigationsOn ? allDone({ lines: [...late, ...todo], events: input.events, now }) : null,
-    week: on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null,
+    week,
     soil: on('sol') && input.soil ? todaySoil(input.soil, irrigatedToday) : null,
     tomorrow,
     shortage,
     dayEmptyLink: irrigationsOn ? dayEmptyLink(enabled) : null,
     rain: on('besoins') && input.rain?.rainMatters ? rainEntry({ today, measured: input.rain.measured }) : null,
+    essential,
   };
 }

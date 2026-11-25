@@ -313,7 +313,7 @@ function OneButtonActions({ actions, title, query, pending, onGesture }: {
   );
 }
 
-function Timeline({ timeline }: { timeline: DayTimeline }) {
+export function Timeline({ timeline }: { timeline: DayTimeline }) {
   const label = `Frise de la journée, de ${timeline.startHour} h à ${timeline.endHour} h${timeline.bars.length > 0 ? ` : ${timeline.bars.map((bar) => bar.label).join(' ; ')}` : ''}.`;
   return (
     <div className="today-timeline-wrap">

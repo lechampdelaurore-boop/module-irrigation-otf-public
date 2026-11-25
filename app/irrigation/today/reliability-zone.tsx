@@ -197,7 +197,7 @@ function Ring({ checks, upToDate }: { checks: readonly ReliabilityCheck[]; upToD
   );
 }
 
-function ReliabilityAction({ line, query, pending, onRecalculatePlan, onOpenRain }: {
+export function ReliabilityAction({ line, query, pending, onRecalculatePlan, onOpenRain }: {
   line: ReliabilityLine;
   query: PageQuery;
   pending: boolean;

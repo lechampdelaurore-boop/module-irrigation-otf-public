@@ -3,6 +3,7 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   ouvrirLaCorrespondanceDesEspeces,
+  ouvrirLeDetailDuJour,
   surveillerLaConsole,
   TITRES_DES_PAGES,
   verifierCibleTactile,
@@ -219,6 +220,8 @@ test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’
   await aLaLargeurDuContrat(page, telephone);
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  // Les tuiles de la semaine sont dans « Le détail » depuis S2, PR 5 (D-330) : leurs mots s'y lisent, pli ouvert.
+  await ouvrirLeDetailDuJour(page);
   await expect(page.getByText('Eau visée cette semaine', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Il manque encore', { exact: true }).first()).toBeVisible();
 
@@ -266,6 +269,7 @@ test('« Aujourd’hui » et « Objectifs et besoins » disent le même objectif
   await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   const tuile = page.locator('a.today-kpi').filter({ has: page.locator('.today-kpi-label', { hasText: 'Eau visée cette semaine' }) });
   const valeur = (await tuile.locator('.today-kpi-value').innerText()).trim();
   const portee = (await tuile.locator('.today-kpi-detail').innerText()).split(', du ')[0].trim();
@@ -291,6 +295,7 @@ test('« Historique et cumuls » dit l’objectif d’« Aujourd’hui » pour l
   await aLaLargeurDuContrat(page, testInfo.project.name === 'telephone');
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   const tuile = page.locator('a.today-kpi').filter({ has: page.locator('.today-kpi-label', { hasText: 'Eau visée cette semaine' }) });
   const valeur = (await tuile.locator('.today-kpi-value').innerText()).trim();
   const portee = (await tuile.locator('.today-kpi-detail').innerText()).split(', du ')[0].trim();

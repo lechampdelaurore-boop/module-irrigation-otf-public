@@ -242,6 +242,13 @@ qui change de place d'un jour à l'autre se cherche. Sur ordinateur, l'ordre
 ne change pas. L'ordre de lecture au clavier et au lecteur d'écran suit
 l'ordre affiché.
 
+**Étendue par la simplification, lot S2, PR 5** (D-330) : la règle tient, et
+vaut désormais à toutes les largeurs. « Votre journée » suit l'en-tête aussi à
+l'ordinateur ; la semaine y est une barre, et ses quatre tuiles sont dans le
+pli « Le détail » (`docs/simplification-s2-contract.md`, section 8). L'ordre
+de lecture suit toujours l'ordre affiché : il n'y a plus d'ordre propre au
+téléphone.
+
 **Ce que la règle change.** La précision T5 du contrat de la page (ordre des
 blocs validé le 8 novembre 2026), sur le téléphone seulement. **Option
 recommandée, que le porteur peut refuser d'un mot** avant le code de L6 ;

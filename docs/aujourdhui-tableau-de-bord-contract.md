@@ -105,6 +105,29 @@ côté de « Fiabilité du calcul ». Au téléphone : une colonne, dans le mêm
 ordre, la frise remplacée par les cartes seules, chaque bouton à 44 px ;
 la page peut dépasser deux écrans (T10).
 
+**Réécrit par la simplification, lot S2, PR 5** (`docs/simplification-s2-contract.md`,
+sections 8 et 10 ; D-330) : la page a **deux niveaux**, dans le même ordre à
+toutes les largeurs. Au premier niveau : l'en-tête (les pastilles quittent le
+téléphone, la phrase les redit ; elles restent à l'ordinateur) ; « Votre
+journée », sans la frise ; « Gel ou chaleur » seulement pour un jour **en
+alerte** (en carte), la prévision qui manque ou le gel sans alerte posée (J14) ;
+« La semaine » en **une barre** pour la ferme entière, avec la phrase de
+l'objectif de S1, l'eau reçue et ce qui manque, « Voir la semaine » et « Noter
+la pluie » (sans objectif : « Aucun objectif posé pour cette semaine. » et
+« Poser un objectif ») ; une seule ligne « Calcul approximatif » quand une
+donnée manque (la première, son geste, « + n autres ») ; une ligne d'eau
+seulement quand une réserve ou une limite le demande. Tout le reste est dans
+un seul pli fermé, **« Le détail »**, dont la ligne de résumé compte ce qu'il
+contient (« 4 chiffres · 3 jardins · 2 données à rafraîchir ») : les quatre
+tuiles de la semaine, « Eau de la semaine », « Réserve du sol », « Eau
+disponible », « Fiabilité du calcul », « Gel ou chaleur » en entier et la frise
+du jour, chaque bloc avec ses liens, ses boutons et ses réponses. Aucun bloc
+n'est retiré. Les ancres existantes (`#today-weather`, `#today-reliability`,
+`#today-water`, `#today-week-water`, `#today-soil`…) ouvrent le pli sur leur
+bloc, à l'arrivée sur la page comme d'un clic ; une pastille de l'ordinateur
+aussi. La règle de ce que garde le premier niveau vit dans
+`lib/domain/today/essential.ts`.
+
 ### 3.3 Beaucoup de retards
 
 Plus de trois irrigations à rattraper d'un même jour passé (T2) se replient
@@ -265,7 +288,7 @@ de 2 m³ »).
 | T2 | Seuil de repli des retards | plus de trois le même jour passé |
 | T3 | Bornes de la frise | 5 h à 22 h, élargies à l'heure ronde si une irrigation du jour en sort |
 | T4 | « Eau de la semaine » | la semaine en cours, du lundi au dimanche (D-004), par jardin, comme « Objectifs et besoins » |
-| T5 | Ordre des blocs | celui du 3.2 ; le gel annoncé n'est plus remonté en tête, il est déjà en tête à droite et dans les pastilles ; **au téléphone** (page de 620 px ou moins), « Votre journée » et « Gel ou chaleur » passent juste après l'en-tête, avant les tuiles de la semaine, toujours, à l'écran comme dans l'ordre de lecture ; à l'ordinateur, l'ordre ne change pas (`docs/aujourdhui-liens-contract.md`, L6, D-315, 24 novembre 2026) |
+| T5 | Ordre des blocs | celui du 3.2 ; le gel annoncé n'est plus remonté en tête, il est déjà en tête à droite et dans les pastilles ; **au téléphone** (page de 620 px ou moins), « Votre journée » et « Gel ou chaleur » passent juste après l'en-tête, avant les tuiles de la semaine, toujours, à l'écran comme dans l'ordre de lecture ; à l'ordinateur, l'ordre ne change pas (`docs/aujourdhui-liens-contract.md`, L6, D-315, 24 novembre 2026). **Réécrit par S2, PR 5 (D-330)** : l'ordre de la section 8 du contrat S2, le même à toutes les largeurs : l'en-tête, « Votre journée » et « Gel ou chaleur » (alerte seule), « La semaine » en une barre, « Calcul approximatif », la ligne d'eau, puis « Le détail » ; L6 tient |
 | T6 | Fiabilité | les données à jour s'affichent, cochées en vert |
 | T7 | Réserve du sol | pas de trait de seuil par jardin : les seuils de la réserve sont par planche, un seuil de jardin serait une règle nouvelle ; la planche la plus sèche du jardin est nommée à la place |
 | T8 | Icône de la pluie | un jour de 1 mm de pluie prévue ou plus porte la goutte ; le gel prime |
@@ -276,9 +299,9 @@ consigne :
 
 | N° | Précision | Choix |
 | --- | --- | --- |
-| T10 | Hauteur au téléphone | la limite de deux écrans de la page du lot 2 (F42) est levée : la maquette validée met tous les blocs en une colonne. La date, la ligne du plan, les pastilles et la phrase du jour tiennent dans le premier écran ; chaque pastille mène à son bloc |
+| T10 | Hauteur au téléphone | la limite de deux écrans de la page du lot 2 (F42) est levée : la maquette validée met tous les blocs en une colonne. La date, la ligne du plan, les pastilles et la phrase du jour tiennent dans le premier écran ; chaque pastille mène à son bloc. **Réécrit par S2, PR 5 (D-330)** : le budget de la section 8 du contrat S2, à 390 px, pour une proposition à valider : le premier niveau au plus 1 600 px, le bouton principal de la première carte à moins de 600 px du haut, au plus 12 choses à toucher ; P62 le mesure |
 | T11 | « Recalculer » dans l'en-tête | quand le plan existe, un lien-geste « Recalculer » (nommé « Recalculer le plan ») suit la ligne du plan : la même action que le bouton de la fiabilité ; sans plan, la ligne mène au planning comme avant |
-| T12 | Phrases des blocs dessinés | les phrases de « Gel ou chaleur » (quand une alerte est dessinée) et d'« Eau disponible » restent dans la page pour un lecteur d'écran, cachées à l'œil ; la phrase calme ou le manque de prévision restent visibles |
+| T12 | Phrases des blocs dessinés | les phrases de « Gel ou chaleur » (quand une alerte est dessinée) et d'« Eau disponible » restent dans la page pour un lecteur d'écran, cachées à l'œil ; la phrase calme ou le manque de prévision restent visibles. Depuis S2, PR 5 (D-330), cela tient dans « Le détail » ; au premier niveau, « Gel ou chaleur » dit le jour en alerte par sa carte et la prévision qui manque en clair |
 | T13 | Fiabilité | un manque montré dit sa propre phrase sous le nom de la donnée ; le résumé (« 5 jours manquants : … ») ne reste que pour une donnée à jour ou dont les lignes sont repliées |
 | T14 | Menu de la tablette | entre 600 et 980 px, la bande du bas garde une seule rangée de pilules : « Aujourd'hui » y garde sa pastille ronde, les titres des groupes s'effacent |
 
