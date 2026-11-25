@@ -53,7 +53,7 @@ registres, elle y renvoie.
   fait » est l'enregistrement de « Fait comme prévu », sa règle et sa
   confirmation (avec « Fait autrement… Notez-le sur « Arrosages » »). Aucune
   règle nouvelle. Tests du domaine, des vrais services à deux fermes
-  (restriction d'eau comprise), P62 étendu. Contrôles : voir la PR.
+  (restriction d'eau comprise), P62 étendu. Contrôles : voir la PR. **Mise en ligne consignée ici** : la PR 1 du lot (#219), fusionnée à 19 h 28, déployée à 19 h 57, run 45675486394 vérifié job par job (« Application », « Workers Cloudflare », « Parcours navigateur », « Déploiement Cloudflare », « Déploiement de la démonstration », verts).
 - **Simplifier l'usage du module, S2, PR 2 sur 5 : terminer et reprendre
   depuis la carte, codée le 25 novembre 2026** (D-330, F844 à F849 ; contrat
   `docs/simplification-s2-contract.md`, sections 3 et 6), en Opus 5.5 · Élevé,
