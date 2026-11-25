@@ -61,10 +61,11 @@ test('une ferme neuve choisit ses fonctionnalités avant toute page, et ne voit 
   await expect(page.getByText('5 fonctionnalités cochées.')).toBeVisible();
   await continuer.click();
 
-  // La page d'arrivée est « Aujourd'hui », première du menu (audit ergonomique, lot 2, F1), sans bandeau.
+  // La page d'arrivée est « Aujourd'hui », première du menu (audit ergonomique, lot 2, F1), sans bandeau ; les pages
+  // dans l'ordre des trois endroits (simplification, lot S3, PR 3, D-331).
   await attendreLaPagePrete(page, 'aujourdhui');
   expect(await entreesDuMenu(page)).toEqual([
-    'Aujourd’hui', 'Arrosages', 'Planning de la semaine', 'Objectifs et besoins', 'Matériel et placement', 'Alertes météo', 'Ma ferme', 'Réglages',
+    'Aujourd’hui', 'Arrosages', 'Planning de la semaine', 'Objectifs et besoins', 'Ma ferme', 'Matériel et placement', 'Alertes météo', 'Réglages',
   ]);
   await expect(page.getByRole('complementary', { name: 'Choix des fonctionnalités' })).toHaveCount(0);
   await verifierLEtape(page, journal, 'première page après le choix');
