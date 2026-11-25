@@ -79,9 +79,9 @@ export function CropAlertsPanel({
         <div>
           {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran sans niveau sauté (audit du 19 novembre 2026, lot J, n° 18, F456). */}
           <h2 id="crop-alerts-title" className="sr-only">Alertes cultures</h2>
+          {/* Ce que montre la page est dans son « ? » ; l'avertissement sur les seuils reste, c'est une mise en garde (simplification S1, F826, F830). */}
           <p>
-            Le gel selon chaque culture, l’arrêt d’arrosage avant la récolte et les aspersions sous abri à reconsidérer. Les seuils sont des
-            repères ; la prévision est celle de l’air à 2 m, à l’extérieur : au ras du sol et sous abri, la température diffère.
+            Les seuils sont des repères ; la prévision est celle de l’air à 2 m, à l’extérieur : au ras du sol et sous abri, la température diffère.
           </p>
         </div>
       </div>

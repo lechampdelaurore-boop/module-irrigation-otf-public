@@ -114,3 +114,17 @@ button.avatar {
 .account-menu a:focus-visible {
   background: var(--sheet);
 }
+
+/* « Actualiser » et la date de la dernière lecture réussie (simplification S1, F823). */
+.account-menu a.account-menu-refresh {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding-block: 6px;
+}
+
+.account-menu-refresh small {
+  color: var(--muted);
+  font: 400 var(--text-13)/1.3 var(--font-ui);
+}

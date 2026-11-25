@@ -15,6 +15,7 @@ import {
 } from '@/lib/domain/features/pages';
 import { parseIrrigationSeason, parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import type { IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
+import { otfReadLineReason } from '@/lib/domain/otf-read-line';
 import { OtfSeasonUnavailableError } from '@/lib/adapters/otf/snapshot-reader';
 import { logJsonLine } from '@/lib/adapters/log';
 import { startStopwatch } from '@/lib/adapters/stopwatch';
@@ -165,6 +166,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       source: snapshot.source,
       lastSuccessfulReadAt: snapshot.lastSuccessfulReadAt,
       warning: snapshot.warning ?? null,
+      // La ligne de lecture ne se montre que pour dire un problème (simplification S1, F822, F829).
+      readLine: otfReadLineReason(snapshot, new Date()) !== null,
       banner: selection.banner ? featureBannerText(selection.banner) : null,
       notice: absentPageNotice(params.absente),
       demo: isDemoDeployment(),

@@ -24,6 +24,12 @@ import { dateClockText } from '@/lib/domain/clock-text';
  * ferme et le choix de la saison, là où elle change ce que la page montre
  * (audit ergonomique, point 9). Chaque page y pose ses blocs, dans l'ordre
  * d'avant la 3.8 (précision P13).
+ *
+ * Le chapeau tient en une ligne (simplification, lot S1, PR 1,
+ * docs/simplification-s1-contract.md, section 3) : le titre, son « ? » et,
+ * là où elle sert, la saison. La ligne de lecture d'Ouvre ta ferme ne se
+ * montre que pour dire un problème (F822, F829) ; « Actualiser » et la date
+ * de la dernière lecture réussie sont toujours dans le menu du compte (F823).
  */
 
 export type ShellProps = {
@@ -42,6 +48,8 @@ export type ShellProps = {
   source: IrrigationSnapshot['source'];
   lastSuccessfulReadAt: string;
   warning: string | null;
+  /** La ligne de lecture d'Ouvre ta ferme : seulement quand la lecture a échoué ou date de plus de 24 heures (F822, F829). */
+  readLine: boolean;
   /** Le bandeau du choix des fonctionnalités, jusqu'à ce qu'on le ferme (R6, R7). */
   banner: string | null;
   /** La page demandée n'était pas cochée : la ligne qui la nomme et mène à Réglages (P14, F265). */
@@ -66,7 +74,7 @@ export function IrrigationShell({
   /** La pastille de « Aujourd'hui » quand la page la connaît (F12) ; absente, le menu la lit après l'affichage. */
   todayBadge?: number | null;
 }) {
-  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, banner, notice, demo, demoSelection, unfinished } = props;
+  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, readLine, banner, notice, demo, demoSelection, unfinished } = props;
 
   const shell = useRef<HTMLElement>(null);
 
@@ -90,6 +98,7 @@ export function IrrigationShell({
 
   const updatedAt = dateClockText(lastSuccessfulReadAt, 'Europe/Paris', 'long');
   const title = pageLabel(page);
+  const refreshHref = pageHref(page, { season, zone, refresh: true });
 
   return (
     <main ref={shell} className="app-shell" data-page={page}>
@@ -102,6 +111,7 @@ export function IrrigationShell({
         demoSelection={demoSelection}
         tour={demo ? { current: page, reachable: menu, query: { season, zone } } : null}
         notificationsHref={usesPushNotifications(menu.filter(isPageFeatureId)) ? pageHref('reglages', { season, zone }, 'notifications-title') : null}
+        refresh={{ href: refreshHref, lastReadText: `Dernière lecture réussie le ${updatedAt}` }}
       />
 
       <div className="feature-layout">
@@ -115,16 +125,18 @@ export function IrrigationShell({
               help={pageHelp(page)}
               aside={showSeason ? <SeasonPicker page={page} season={season} seasonFirst={seasonFirst} seasonLast={seasonLast} compact /> : null}
             />
-            <div className="sync-card" data-source={source} role="status">
-              <span className="status-dot" aria-hidden="true" />
-              <span className="sync-copy">
-                <strong>{sourceLabel(source)}</strong>
-                <small>Dernière lecture réussie le {updatedAt}</small>
-              </span>
-              <a className="refresh-link" href={pageHref(page, { season, zone, refresh: true })}>
-                Actualiser
-              </a>
-            </div>
+            {readLine ? (
+              <div className="sync-card" data-source={source} role="status">
+                <span className="status-dot" aria-hidden="true" />
+                <span className="sync-copy">
+                  <strong>{sourceLabel(source)}</strong>
+                  <small>Dernière lecture réussie le {updatedAt}</small>
+                </span>
+                <a className="refresh-link" href={refreshHref}>
+                  Actualiser
+                </a>
+              </div>
+            ) : null}
           </section>
 
           {notice ? (

@@ -380,7 +380,7 @@ export function WaterManagementDashboard({
       <header className="water-management-heading">
         <div>
           <h2 id="water-management-title">Objectifs hydriques, météo et ressource en eau</h2>
-          <p>Suivi hebdomadaire du lundi au dimanche. Ces données alimentent le calcul des besoins affiché ensuite.</p>
+          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>
         <div className="water-week-navigation" aria-label="Changer de semaine">
           <button type="button" disabled={pending} aria-label="Semaine précédente" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, -7))}>←</button>

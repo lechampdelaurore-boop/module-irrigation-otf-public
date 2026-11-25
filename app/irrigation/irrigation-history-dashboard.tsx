@@ -177,7 +177,7 @@ export function IrrigationHistoryDashboardView({
         <div>
           {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
           <h2 id="irrigation-history-title" className="sr-only">Cumuls et historique</h2>
-          <p>Analysez l’eau réellement appliquée, la météo observée et les objectifs historisés.</p>
+          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>
       </header>
 

@@ -31,26 +31,26 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   besoins: {
     purpose: 'Fixer l’eau que vos planches doivent recevoir chaque semaine, et voir ce qu’il leur manque.',
-    reading: 'Le besoin d’une planche est son objectif de la semaine moins l’eau déjà reçue, arrosages et pluie. Le tableau des jours donne la pluie et l’évapotranspiration. Objectif automatique allumé, une planche sans objectif saisi suit le besoin de sa culture, ou l’ET0.',
+    reading: 'La semaine va du lundi au dimanche. Le besoin d’une planche est son objectif de la semaine moins l’eau déjà reçue, arrosages et pluie. Le tableau des jours donne la pluie et l’évapotranspiration. Objectif automatique allumé, une planche sans objectif saisi suit le besoin de sa culture, ou l’ET0.',
     firstStep: 'Fixez un objectif en millimètres par semaine, pour la ferme, un jardin ou une planche. Après une pluie, saisissez ce qu’indique votre pluviomètre.',
   },
   planning: {
     purpose: 'Proposer, chaque semaine, quand et combien arroser pour couvrir les besoins avec votre matériel et votre eau.',
     reading: 'Chaque proposition dit le matériel, l’heure, la durée et la dose. « À venir » suit ce que vous avez validé ; « Ce qui a changé » dit ce que le dernier calcul a modifié. Le plan se recalcule chaque matin et après chaque événement.',
-    firstStep: 'Lisez les propositions de la semaine et validez celles qui vous conviennent : elles deviennent des arrosages planifiés.',
+    firstStep: 'Lisez les propositions, du calcul jusqu’à dimanche, et validez celles qui vous conviennent, une par une, par jour ou toutes ensemble : elles deviennent des arrosages planifiés. Rien n’est arrosé sans vous.',
   },
   ressources: {
     purpose: 'Décrire d’où vient votre eau et vos pompes, pour que le planning tienne compte des débits et des stocks.',
-    reading: 'Chaque ressource montre son débit et ses relevés, chaque réserve son stock. La faisabilité dit si l’eau disponible suffit aux besoins de la semaine et, sinon, comment la répartir.',
+    reading: 'Chaque ressource montre son débit et ses relevés, chaque réserve son stock, et leurs connexions disent où va l’eau ; « L’eau des jours à venir » en estime le volume. La faisabilité dit si l’eau disponible suffit aux besoins de la semaine et, sinon, comment la répartir.',
     firstStep: 'Ajoutez une ressource, forage, réseau ou réserve, puis une pompe avec son débit maximal et l’eau qu’elle prend.',
   },
   sol: {
-    purpose: 'Suivre l’eau que le sol garde pour vos cultures, jardin par jardin et planche par planche.',
-    reading: 'La jauge dit ce qui reste de la réserve facilement utilisable, en pourcentage. Sous le seuil d’arrosage, il est temps d’arroser. L’eau arrosée au-delà de ce que le sol retient est signalée.',
+    purpose: 'Suivre l’eau que le sol garde pour vos cultures, jardin par jardin et planche par planche. C’est une information : elle ne change ni le besoin, ni le plan, ni les priorités.',
+    reading: 'La jauge dit ce qui reste de la réserve facilement utilisable, en pourcentage, estimée jour par jour à partir de la réserve utile (RFU) de la parcelle. Sous le seuil d’arrosage, il est temps d’arroser. L’eau arrosée au-delà de ce que le sol retient est signalée.',
     firstStep: 'Renseignez votre sol : la réserve utile du laboratoire, la profondeur et la part de cailloux. Ajoutez une observation quand vous vérifiez l’humidité au champ.',
   },
   cultures: {
-    purpose: 'Adapter le besoin en eau à chaque culture et à son stade, à partir de la météo.',
+    purpose: 'Adapter le besoin en eau à chaque culture et à son stade, à partir de la météo : une culture ne boit pas autant à la levée qu’en pleine saison, et le module suit son stade jour après jour.',
     reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez, ou si l’objectif automatique est allumé dans « Objectifs et besoins ».',
     firstStep: 'Vérifiez dans Réglages que vos espèces d’Ouvre ta ferme correspondent à une culture de référence, puis ajustez coefficients, profils racinaires et durées si besoin.',
   },
@@ -65,7 +65,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
     firstStep: 'Rattachez vos espèces à une culture du jeu commun dans Réglages, puis réglez le microclimat si votre ferme est plus froide ou plus chaude que la météo de référence.',
   },
   historique: {
-    purpose: 'Retrouver l’eau apportée : les cumuls par planche, par jardin et pour la ferme, l’historique des arrosages et le suivi par série.',
+    purpose: 'Retrouver l’eau réellement apportée, la météo observée et les objectifs de chaque semaine : les cumuls par planche, par jardin et pour la ferme, l’historique des arrosages et le suivi par série.',
     reading: 'Les cumuls sont en millimètres et en mètres cubes. À l’échelle d’un jardin ou de la ferme, ils sont pondérés par la surface des planches.',
     firstStep: 'Choisissez un périmètre et une période, ou une série. « Exporter CSV » garde les chiffres dans un tableur.',
   },

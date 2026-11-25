@@ -224,7 +224,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
         <div>
           {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
           <h2 id="planning-title" className="sr-only">Planning de la semaine</h2>
-          <p>Des propositions de créneaux, du calcul à dimanche, que vous validez une par une, par jour ou toutes ensemble. Rien n’est arrosé sans vous.</p>
+          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
         </div>
         <div className="planning-heading-actions">
           <button type="button" className="primary" disabled={pending} onClick={compute}>

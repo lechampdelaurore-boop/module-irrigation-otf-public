@@ -3,7 +3,7 @@
 import { useSystemAlertsDot } from '../irrigation-manager/system-alerts-memory';
 import { Icon } from '../line-icon';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
-import { AccountMenu } from './account-menu';
+import { AccountMenu, type AccountMenuRefresh } from './account-menu';
 import { DemoBanner } from './demo-banner';
 import type { TourSurroundings } from './guided-tour';
 
@@ -25,6 +25,7 @@ export function Topbar({
   demo = false,
   demoSelection = null,
   tour = null,
+  refresh = null,
 }: {
   userName: string;
   signOutPath: string;
@@ -36,6 +37,8 @@ export function Topbar({
   demoSelection?: DemoSelection | null;
   /** En démonstration, ce que les visites guidées savent de la page (D3). */
   tour?: TourSurroundings | null;
+  /** Sur les pages du module : « Actualiser » dans le menu du compte (simplification S1, F823). */
+  refresh?: AccountMenuRefresh | null;
 }) {
   const alertsLimited = useSystemAlertsDot();
   const bellHref = demo ? null : notificationsHref;
@@ -62,7 +65,7 @@ export function Topbar({
               <Icon name="cloche" />
             </a>
           ) : null}
-          <AccountMenu userName={userName} signOutPath={signOutPath} />
+          <AccountMenu userName={userName} signOutPath={signOutPath} refresh={refresh} />
         </div>
       </header>
     </>

@@ -37,8 +37,9 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
     // Sous le titre à l'ordinateur, dans la ligne du titre au téléphone (lot 2, F7).
     const saison = page.locator(telephone ? '.page-title-row select[name="season"]' : '.plan-controls select[name="season"]');
     // Les alertes météo valent pour l'exploitation ; « Aujourd'hui » montre le jour du jour (lot 2, F2) ;
+    // « Arrosages » travaille dans la saison en cours (simplification S1, F824) ;
     // Réglages garde la saison pour la correspondance des espèces.
-    const sansSaison = cible === 'alertes-meteo' || cible === 'aujourdhui';
+    const sansSaison = cible === 'alertes-meteo' || cible === 'aujourdhui' || cible === 'arrosages';
     await expect(saison).toHaveCount(sansSaison ? 0 : 1);
     if (!sansSaison) await expect(saison).toBeVisible();
     await verifierLEtape(page, journal, `titre et saison de la page ${TITRES_DES_PAGES[cible]}`);

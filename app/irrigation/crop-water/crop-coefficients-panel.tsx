@@ -17,7 +17,6 @@ import {
 import { matchesSearch } from '@/lib/domain/name-search';
 import { notifyChangeJournalChanged } from '@/lib/domain/feasibility-notifications';
 import type { CropCoefficientsView } from '@/lib/services/crop-water-coefficients';
-import { pageHref } from '@/lib/domain/features/pages';
 import { kcOverrideRows } from '@/lib/domain/crop-water/settings-view';
 import { plantVignetteSpriteHref, referenceCropSymbol, speciesSymbol } from '@/lib/domain/crop-water/plant-vignettes';
 import { rootingProfileView } from '@/lib/domain/soil-reserve/rooting-view';
@@ -106,11 +105,7 @@ export function CropCoefficientsPanel({ season, initialView, part = 'coefficient
             {/* Le titre et la tête en clair ; le détail technique dans « Pour les experts » (audit ergonomique, lot 3, point 8). */}
             {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
             <h2 id="crop-coefficients-title" className="sr-only">Besoin en eau par culture</h2>
-            <p>
-              Une culture ne boit pas autant à la levée qu’en pleine saison. Le module suit le stade de chaque culture, jour après
-              jour, pour proposer un objectif d’arrosage. Chaque espèce de vos séries suit une culture de référence, choisie{' '}
-              <a href={pageHref('reglages', { season })}>dans Réglages</a>.
-            </p>
+            {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
           </>
         )}
       </header>

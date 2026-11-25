@@ -2,13 +2,20 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 
+/** « Actualiser » et la date de la dernière lecture réussie d'Ouvre ta ferme (simplification S1, F823). */
+export type AccountMenuRefresh = { href: string; lastReadText: string };
+
 /**
  * L'initiale ouvre le menu du compte (audit du 19 novembre 2026, lot G,
  * n° 6, F416 ; docs/charte-module.md) : le nom de la personne, puis « Se
  * déconnecter », le lien de toujours. Un appui sur l'initiale ne déconnecte
  * plus. Le menu se ferme par Échap, par un appui ailleurs ou sur l'initiale.
+ *
+ * Sur les pages du module, « Actualiser » y vit aussi, avec la date de la
+ * dernière lecture réussie (simplification, lot S1, F823) : la ligne de
+ * lecture ne se montre plus en tête de page que pour dire un problème.
  */
-export function AccountMenu({ userName, signOutPath }: { userName: string; signOutPath: string }) {
+export function AccountMenu({ userName, signOutPath, refresh = null }: { userName: string; signOutPath: string; refresh?: AccountMenuRefresh | null }) {
   const [open, setOpen] = useState(false);
   const zone = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -50,6 +57,12 @@ export function AccountMenu({ userName, signOutPath }: { userName: string; signO
       {open ? (
         <div className="account-menu" id={menuId} role="menu" aria-label="Compte">
           <p className="account-menu-name">{userName}</p>
+          {refresh ? (
+            <a role="menuitem" className="account-menu-refresh" href={refresh.href}>
+              Actualiser les données d’Ouvre ta ferme
+              <small>{refresh.lastReadText}</small>
+            </a>
+          ) : null}
           <a role="menuitem" href={signOutPath}>Se déconnecter</a>
         </div>
       ) : null}

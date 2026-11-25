@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S1, PR 1 : le chapeau d'une ligne)
+
+- **Le haut de chaque page tient en une ligne** (D-328) : le titre, son
+  « ? » et, là où elle sert, la saison. La ligne « Dernière lecture
+  réussie… Actualiser » ne se montre plus que si la lecture d'Ouvre ta
+  ferme a échoué ou date de plus de 24 heures ; « Actualiser » et la date
+  sont toujours dans le menu du compte (l'initiale, en haut à droite).
+  « Arrosages » ne propose plus de choisir la saison : on y travaille dans
+  la saison en cours, et une autre saison s'ouvre depuis « Historique et
+  cumuls ». Les phrases d'explication qui disaient chaque jour la même chose
+  en tête de dix pages sont passées dans le « ? » ; les mises en garde sur
+  le gel restent. Au téléphone, le premier bloc utile de chaque page monte
+  de 44 à 147 px.
+
 ### Décidé (simplifier l'usage du module)
 
 - **Six lots de simplification retenus, contrat du lot S1 écrit** (D-327) :

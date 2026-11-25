@@ -105,7 +105,13 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
   await verifierLEtape(page, journal, 'barre du bas');
 
-  // La saison (F7) : dans la ligne du titre au téléphone, sous le titre à l'ordinateur.
+  // « Arrosages » ne propose plus la saison (simplification S1, F824) ; la ligne de lecture
+  // ne se montre que pour dire un problème, « Actualiser » est dans le menu du compte (F822, F823).
+  await expect(page.locator('select[name="season"]')).toHaveCount(0);
+  await expect(page.locator('a.refresh-link')).toHaveCount(0);
+  if (telephone) await verifierCibleTactile(page.getByRole('button', { name: `Aide : ${TITRES_DES_PAGES.arrosages}` }), 'Le « ? » de la page');
+  // La saison (F7) : dans la ligne du titre au téléphone, sous le titre à l'ordinateur, sur une page qui s'en sert.
+  await attendreLaPageIrrigation(page, 'planning');
   const saisonDuTitre = page.locator('.page-title-row select[name="season"]');
   const saisonSousLeTitre = page.locator('.plan-controls select[name="season"]');
   if (telephone) {
@@ -114,8 +120,6 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
     await verifierCibleTactile(saisonDuTitre, 'La saison de la ligne du titre');
     await expect(saisonSousLeTitre).toBeHidden();
     await expect(page.getByRole('region', { name: 'Choix de la saison' })).toBeHidden();
-    await verifierCibleTactile(page.getByRole('button', { name: `Aide : ${TITRES_DES_PAGES.arrosages}` }), 'Le « ? » de la page');
-    await verifierCibleTactile(page.locator('a.refresh-link'), 'Le lien « Actualiser »');
   } else {
     await expect(saisonDuTitre).toBeHidden();
     await expect(saisonSousLeTitre).toBeVisible();

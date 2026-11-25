@@ -12,6 +12,20 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S1, PR 1 sur 3 : le chapeau d'une ligne,
+  codée le 25 novembre 2026** (D-328, F829 à F831, roadmap section 6
+  terdecies, ligne 33), en Opus 5.5 · Élevé, le réglage de la roadmap, sur
+  le mandat du porteur (lots enchaînés sans nouveau « vas-y »). Le chapeau
+  de chaque page : le titre, son « ? » et, là où elle sert, la saison. La
+  ligne de lecture d'Ouvre ta ferme ne se montre plus que si la lecture a
+  échoué ou date de plus de 24 heures (jamais sur les données de
+  démonstration) ; « Actualiser » et la date sont dans le menu du compte ;
+  « Arrosages » ne propose plus la saison ; dix explications fixes de tête
+  de page sont passées dans le « ? », les mises en garde sur le gel restent.
+  Au téléphone, le premier bloc utile de chaque page monte de 44 à 147 px,
+  sous 400 px partout (inventaire et mesures : contrat, section 9). Tests
+  du domaine et du gabarit, parcours P61 aux deux largeurs. Contrôles : voir
+  la PR. Restent la PR 2 (les mots) et la PR 3 (un seul objectif, S1-O1).
 - **Simplifier l'usage du module : six lots retenus, contrat S1 écrit, le
   25 novembre 2026** (D-327, roadmap section 6 terdecies, ligne 33),
   **sans code**. Le porteur trouvait le logiciel trop complexe (9 h 26) ;

@@ -238,10 +238,72 @@ la cause dans le code, avant toute modification, et la consigne ici
 
 ## 9. À remplir par les PR
 
-- Inventaire des paragraphes de tête, page par page (PR 1).
-- Positions du premier bloc utile avant et après, page par page (PR 1).
+- Inventaire des paragraphes de tête, page par page (PR 1) : ci-dessous.
+- Positions du premier bloc utile avant et après, page par page (PR 1) :
+  ci-dessous.
 - Occurrences relevées des mots du tableau et ce qu'elles deviennent (PR 2).
 - Cause établie du point ouvert S1-O1 et issue choisie (PR 3).
+
+### 9.1 PR 1 — Inventaire des paragraphes de tête (25 novembre 2026)
+
+Relevé à 390 px sur les données des parcours (ferme de démonstration, toutes
+les pages), puis dans le code. « Déplacé » : la phrase quitte la page, le
+« ? » dit ce qu'elle disait (`lib/domain/features/help.ts`, F826).
+
+| Page | Paragraphe de tête | Sort |
+| --- | --- | --- |
+| Aujourd'hui | l'en-tête du jour (« Mercredi 25 novembre », état du plan, pastilles) | gardé : c'est l'état du jour, et la carte est du ressort de S2 |
+| Arrosages | « Calculez l'apport, lancez un minuteur fiable ou conservez une irrigation déjà réalisée. » | déplacé (le « ? » le disait déjà) ; les compteurs « en cours, à venir, archivées » restent : un état |
+| Planning de la semaine | « Des propositions de créneaux, du calcul à dimanche, que vous validez une par une, par jour ou toutes ensemble. Rien n'est arrosé sans vous. » | déplacé ; « du calcul jusqu'à dimanche », « une par une, par jour ou toutes ensemble » et « Rien n'est arrosé sans vous » ajoutés au « ? » |
+| Objectifs et besoins | « Suivi hebdomadaire du lundi au dimanche. Ces données alimentent le calcul des besoins affiché ensuite. » | déplacé ; « La semaine va du lundi au dimanche » ajouté au « ? » ; la phrase des planches à pluie incomplète, plus bas, reste (un état) |
+| Historique et cumuls | « Analysez l'eau réellement appliquée, la météo observée et les objectifs historisés. » | déplacé ; « l'eau réellement apportée, la météo observée et les objectifs de chaque semaine » ajouté au « ? » |
+| Réserve du sol | « L'eau que le sol de chaque planche tient à la disposition des racines, estimée jour par jour à partir de la réserve utile (RFU) de sa parcelle. C'est une information : elle ne change ni le besoin, ni le plan, ni les priorités. » | déplacé ; la RFU et la phrase d'honnêteté (D-041) ajoutées au « ? » |
+| Besoin par culture | « Une culture ne boit pas autant à la levée qu'en pleine saison. Le module suit le stade… choisie dans Réglages. » | déplacé ; la levée et le stade suivi ajoutés au « ? », qui disait déjà « Vérifiez dans Réglages… » |
+| Matériel et placement | aucun paragraphe de tête (choix de la parcelle, fil d'Ariane, onglets) | rien à déplacer |
+| Ressources et pompes | « Origines, réserves, connexions et estimation du volume mobilisable. » | déplacé ; les connexions et « L'eau des jours à venir » ajoutées au « ? » ; le surtitre « Disponibilité physique » attend la PR 2 (les mots) |
+| Alertes météo | « Une notification quand la prévision de la commune franchit le seuil que vous choisissez, sans marge ajoutée. » | déplacé (le « ? » le disait) ; le repli « Pour le gel : la prévision est celle de l'air à 2 m » **reste** : une mise en garde (F830) |
+| Alertes cultures | « Le gel selon chaque culture, l'arrêt d'arrosage… à reconsidérer. Les seuils sont des repères ; la prévision est celle de l'air à 2 m… » | la première phrase déplacée (le « ? » la disait) ; **la seconde reste** : une mise en garde sur le gel (F830) |
+| Réglages | « Seules les fonctionnalités cochées s'affichent et tournent… Décocher n'efface rien… » | déplacé (le « ? » le disait) ; décocher une case dit déjà, dans sa confirmation, ce qui reste enregistré |
+
+### 9.2 PR 1 — Premier bloc utile à 390 px, avant et après
+
+Mesuré le 25 novembre 2026 sur les données des parcours, bandeau du choix des
+fonctionnalités fermé, depuis le haut de la page ; le parcours P61 fixe ces
+bornes.
+
+| Page | Premier bloc utile | Avant | Après | Borne P61 |
+| --- | --- | --- | --- | --- |
+| Aujourd'hui | l'en-tête du jour | 152 px | 108 px | 120 px (gain : la ligne de lecture, 44 px) |
+| Arrosages | « Recevoir les alertes » ou le formulaire | 393 px | 287 px | 400 px |
+| Planning de la semaine | « Calculer le plan de la semaine » | 309 px | 203 px | 400 px |
+| Objectifs et besoins | la ligne de résumé de la semaine | 470 px | 391 px | 400 px |
+| Historique et cumuls | « Par périmètre · Par série » | 283 px | 203 px | 400 px |
+| Réserve du sol | la jauge | 417 px | 270 px | 400 px |
+| Besoin par culture | les cultures de référence | 316 px | 169 px | 400 px |
+| Matériel et placement | le choix de la parcelle | 212 px | 168 px | 400 px |
+| Ressources et pompes | « Ressources · Réserves » | 340 px | 252 px | 400 px |
+| Alertes météo | « Ajouter une alerte » | 166 px | 122 px | 400 px |
+| Alertes cultures | le premier pli, « Réglages » | 395 px | 315 px | 400 px |
+| Réglages | les cases des fonctionnalités | 297 px | 199 px | 400 px |
+
+Aucune page ne dépasse sa borne. Sur « Arrosages », le premier bloc est
+l'invitation « Recevoir les alertes sur cet appareil » quand le navigateur
+n'a pas encore répondu (458 px pour le formulaire qui la suit, dans les
+parcours) : c'est un geste utile, compté comme tel.
+
+### 9.3 PR 1 — Précisions tranchées en codant
+
+- F829 : les données de démonstration (source `mock`, démonstration en ligne
+  et parcours) ne viennent d'aucune lecture d'Ouvre ta ferme : la ligne de
+  lecture ne s'y montre jamais ; « Actualiser » reste dans le menu du compte.
+- F830 : une phrase fixe qui met en garde (la prévision prise à 2 m, les
+  seuils qui ne sont que des repères) reste en place, comme un état : seule
+  l'explication de ce que montre la page passe dans le « ? ».
+- F831 : « Actualiser » s'appelle « Actualiser les données d'Ouvre ta
+  ferme » dans le menu du compte, au-dessus de « Se déconnecter », avec la
+  date de la dernière lecture réussie dessous ; l'avis « montrer la ligne »
+  se calcule côté serveur, à l'ouverture de la page ; une date illisible
+  compte comme ancienne (D-003).
 
 ## 10. Réglage du code
 
