@@ -6,7 +6,7 @@ import { weekHeading } from '../lib/domain/semaine/week-heading';
 import { announcedRainText, toValidateText, weekBilan, weekSentence, type WeekFarmRow } from '../lib/domain/semaine/week-sentence';
 import { weekDayEvents, weekDayLines, weekSlotText, type WeekDayEvent, type WeekWaterDay } from '../lib/domain/semaine/week-days';
 import { WEEK_PAGE_GARDENS_SHOWN, weekGardens } from '../lib/domain/semaine/week-gardens';
-import { PLAN_CURRENT_WEEK_ONLY, TIMER_AWAITING_LINE, WEEK_SECTION_TITLES, gapSectionLine, needsDetailLine, timerAwaiting, weekDetailSummary } from '../lib/domain/semaine/week-detail';
+import { GAP_SECTION_IDLE_LINE, PLAN_CURRENT_WEEK_ONLY, TIMER_AWAITING_LINE, WEEK_SECTION_TITLES, gapSectionLine, needsDetailLine, timerAwaiting, weekDetailSummary } from '../lib/domain/semaine/week-detail';
 import { todayWeek, todayWeekInputs, WEEK_GARDENS_SHOWN, type TodayWeekBed } from '../lib/domain/today/week';
 import { weekBar } from '../lib/domain/today/essential';
 import { weekDateKeys } from '../lib/domain/water-management';
@@ -326,4 +326,7 @@ test('« Le détail » : sa ligne dit ce qu’il contient, ses sections suivent 
   assert.equal(needsDetailLine(0), 'Aucun jardin cette saison.');
   assert.equal(gapSectionLine(1), '1 planche s’écarte du prévu');
   assert.equal(gapSectionLine(2), '2 planches s’écartent du prévu');
+  // Lu à l'ouverture de sa section (3.4, F918) : avant la lecture, ce qu'elle montrera ; sans signal, une ligne et pas de bloc (F735).
+  assert.equal(gapSectionLine(null), GAP_SECTION_IDLE_LINE);
+  assert.equal(gapSectionLine(0), 'Aucune planche ne s’écarte du prévu');
 });

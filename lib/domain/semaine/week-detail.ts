@@ -69,10 +69,26 @@ export function needsDetailLine(gardens: number): string {
   return `${gardens} jardin${gardens > 1 ? 's' : ''}, le besoin de chaque planche et son calcul`;
 }
 
-/** La ligne de l'écart du prévu, présent seulement quand une planche a un signal (F735) : « 2 planches s’écartent du prévu ». */
-export function gapSectionLine(beds: number): string {
+/**
+ * La ligne de l'écart du prévu, lu à l'ouverture de sa section (section 3.4,
+ * promesse de F918) : avant, ce que la section montrera ; après, combien de
+ * planches s'écartent, « 2 planches s’écartent du prévu ». Le bloc lui-même
+ * ne paraît que lorsqu'une planche a un signal (F735).
+ */
+export function gapSectionLine(beds: number | null): string {
+  if (beds === null) return GAP_SECTION_IDLE_LINE;
+  if (beds === 0) return GAP_SECTION_NONE;
   return beds > 1 ? `${beds} planches s’écartent du prévu` : '1 planche s’écarte du prévu';
 }
+
+/** La ligne avant la lecture : ce que l'ouverture lira. */
+export const GAP_SECTION_IDLE_LINE = 'Les planches arrosées plus ou moins que prévu, trois semaines de suite';
+
+/** Aucune planche ne s'écarte : la section le dit en une ligne, sans bloc (F735). */
+const GAP_SECTION_NONE = 'Aucune planche ne s’écarte du prévu';
+
+/** La lecture a échoué : la section le dit et propose de relire. */
+export const GAP_SECTION_FAILED = 'L’écart du prévu n’a pas pu être lu.';
 
 /** La ligne de « Réglages de la semaine » : celle du pli « Réglages de cette page » d'avant (F305). */
 export const WEEK_SETTINGS_LINE = 'Ce qui se règle une fois pour toutes ; rien n’y change le travail du jour.';
