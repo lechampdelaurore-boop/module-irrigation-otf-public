@@ -3,6 +3,7 @@ import { volumeText } from '../display-numbers.ts';
 import { mmText } from '../figure-origin.ts';
 import type { IrrigationEventStatus } from '../irrigation-domain.ts';
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
+import { rainEntryFirstDate } from '../today/rain-entry.ts';
 import { farmDateKey } from '../today/today-text.ts';
 import { weekDateKeys, type WaterDashboardDay } from '../water-management.ts';
 import type { WeekState } from './week-heading.ts';
@@ -113,9 +114,18 @@ export type WeekDayLine = {
    * ligne de la suite (« mer. 17 au ven. 19 · Rien de prévu · 14 mm de pluie
    * annoncés ») ; les suivants s'y comptent. `null` hors d'une suite.
    */
-  calmRun: { role: 'start'; label: string; days: number } | { role: 'member' } | null;
+  calmRun: { role: 'start'; label: string; days: number; noteRainDate: string | null } | { role: 'member' } | null;
   /** Au téléphone, un jour écoulé de la semaine en cours se replie sous « Jours écoulés (n) », sauf s'il porte un arrosage en retard. */
   fold: 'open' | 'past';
+  /**
+   * « Noter la pluie » sur la ligne (section 8.3, PR 3) : un jour passé dont
+   * la pluie réelle manque (ni mesure au pluviomètre ni estimation, ce qui
+   * rend le calcul approximatif), que la fenêtre propose (les sept jours
+   * d'avant, dans l'année du jour), quand la pluie compte pour la ferme.
+   * Aujourd'hui passe par le lien du bilan ; un jour plus ancien se note
+   * dans « Pluie mesurée » du détail.
+   */
+  noteRain: boolean;
 };
 
 export type WeekDaysView = {
@@ -222,6 +232,8 @@ export function weekDayLines(input: WeekDaysInput): WeekDaysView {
       calmText: calm ? (past ? 'Rien d’arrosé' : 'Rien de prévu') : null,
       calmRun: null,
       fold: state === 'current' && past && !late ? 'past' : 'open',
+      noteRain: rainMatters && past && dateKey >= rainEntryFirstDate(today) && dateKey.slice(0, 4) === today.slice(0, 4)
+        && (water?.manualRainMm ?? null) === null && (water?.reanalysisRainMm ?? null) === null,
       rain,
     };
   });
@@ -239,7 +251,9 @@ export function weekDayLines(input: WeekDaysInput): WeekDaysView {
     const run = lines.slice(start, end + 1);
     const rainMm = run.reduce((sum, line) => sum + (line.rain?.mm ?? 0), 0);
     const rain = first.rain ? ` · ${mm(rainMm)} de pluie ${RAIN_WORDS[first.rain.kind].run}` : '';
-    first.calmRun = { role: 'start', label: `${first.shortLabel} au ${run[run.length - 1].shortLabel} · ${first.calmText}${rain}`, days: run.length };
+    // « Noter la pluie » de la suite ouvre la fenêtre sur son dernier jour à noter ; la fenêtre en propose d'autres.
+    const noteRainDate = [...run].reverse().find((line) => line.noteRain)?.dateKey ?? null;
+    first.calmRun = { role: 'start', label: `${first.shortLabel} au ${run[run.length - 1].shortLabel} · ${first.calmText}${rain}`, days: run.length, noteRainDate };
     for (const member of run.slice(1)) member.calmRun = { role: 'member' };
     start = end;
   }

@@ -1,5 +1,6 @@
 import type { WeekSectionId } from '../features/week-page.ts';
 import { SIMPLE_WORDS } from '../simple-words.ts';
+import { forecastUnavailableText } from '../today/today-view.ts';
 import type { WaterDashboardDay } from '../water-management.ts';
 
 /**
@@ -58,6 +59,22 @@ export const TIMER_AWAITING_LINE = 'Un minuteur attend encore la confirmation de
 
 export function timerAwaiting(days: readonly Pick<WaterDashboardDay, 'estimatedOngoingCubicMeters'>[], today: Pick<WaterDashboardDay, 'estimatedOngoingCubicMeters'> | null): boolean {
   return days.some((day) => day.estimatedOngoingCubicMeters > 0) || (today?.estimatedOngoingCubicMeters ?? 0) > 0;
+}
+
+/**
+ * La météo indisponible (section 8.5) : les jours d'aujourd'hui à dimanche
+ * sans prévision, ni soif (ET0) ni, quand la pluie compte, pluie prévue, se
+ * disent dans l'encadré d'attention avec la phrase d'« Aujourd'hui » ; un
+ * jour sans prévision n'est jamais lu comme un jour sec (D-003).
+ */
+export function weekForecastUnavailable(
+  days: readonly Pick<WaterDashboardDay, 'date' | 'et0Mm' | 'forecastRainMm'>[],
+  today: string,
+  rainMatters: boolean,
+): string | null {
+  const ahead = days.filter((day) => day.date >= today);
+  const missing = ahead.filter((day) => day.et0Mm === null || (rainMatters && day.forecastRainMm === null)).map((day) => day.date);
+  return forecastUnavailableText(missing, ahead.length);
 }
 
 /** « Le plan ne couvre que la semaine en cours » (S4-l) : une ligne, dite une fois, pour toute autre semaine. */

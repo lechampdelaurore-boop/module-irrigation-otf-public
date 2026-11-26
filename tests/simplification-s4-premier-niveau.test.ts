@@ -260,9 +260,9 @@ test('« Jour par jour » : sept lignes, une par jour, aujourd’hui marqué, ce
   assert.equal(wednesday.calm, false);
   assert.equal(thursday.calm, true, 'un jour annulé ne compte pas');
   assert.equal(thursday.calmText, 'Rien de prévu');
-  assert.deepEqual(thursday.calmRun, { role: 'start', label: 'jeu. 18 au ven. 19 · Rien de prévu · 11 mm de pluie annoncés', days: 2 });
+  assert.deepEqual(thursday.calmRun, { role: 'start', label: 'jeu. 18 au ven. 19 · Rien de prévu · 11 mm de pluie annoncés', days: 2, noteRainDate: null });
   assert.deepEqual(friday.calmRun, { role: 'member' }, 'un jour calme n’est jamais masqué : il est compté (F301)');
-  assert.deepEqual(saturday.calmRun, { role: 'start', label: 'sam. 20 au dim. 21 · Rien de prévu', days: 2 }, 'une pluie annoncée nulle ne se dit pas');
+  assert.deepEqual(saturday.calmRun, { role: 'start', label: 'sam. 20 au dim. 21 · Rien de prévu', days: 2, noteRainDate: null }, 'une pluie annoncée nulle ne se dit pas');
   assert.deepEqual(sunday.calmRun, { role: 'member' });
   assert.deepEqual(view.lines.map((line) => line.fold), ['past', 'past', 'open', 'open', 'open', 'open', 'open']);
   assert.equal(view.pastCount, 2);
@@ -279,7 +279,7 @@ test('« Jour par jour » : un jour écoulé qui porte un arrosage planifié, ja
   const past = weekDayLines({ ...base, weekStart: '2026-06-08', state: 'past', today: '2026-06-17', days: weekDateKeys('2026-06-08').map((date) => day(date)), events: [] });
   assert.ok(past.lines.every((line) => line.fold === 'open'), 'les jours d’une semaine passée restent ouverts');
   assert.ok(past.lines.every((line) => line.toValidate === 0), 'aucun créneau à valider hors de la semaine en cours (S4-l)');
-  assert.deepEqual(past.lines[0].calmRun, { role: 'start', label: 'lun. 8 au dim. 14 · Rien d’arrosé', days: 7 });
+  assert.deepEqual(past.lines[0].calmRun, { role: 'start', label: 'lun. 8 au dim. 14 · Rien d’arrosé', days: 7, noteRainDate: '2026-06-14' }, 'la suite offre « Noter la pluie » sur son dernier jour à noter');
 });
 
 test('« Jour par jour » : une ferme toute sous abri ne dit pas la pluie ; une mesure du jour l’emporte sur l’annonce', () => {
@@ -290,6 +290,24 @@ test('« Jour par jour » : une ferme toute sous abri ne dit pas la pluie ; une 
   assert.deepEqual(open.lines[2].facts, ['pluie 1,5 mm, mesurée']);
   assert.deepEqual(open.lines[3].facts, ['pluie 4 mm, annoncée']);
   assert.deepEqual(open.lines[0].facts, ['pluie 4 mm, annoncée'], 'un jour passé sans mesure ni réanalyse garde la prévision, avec son mot (D-019)');
+});
+
+test('« Noter la pluie » sur la ligne d’un jour (8.3) : un jour passé de la fenêtre dont la pluie réelle manque, jamais aujourd’hui ni à l’abri', () => {
+  const days = WEEK.map((date, index) => day(date, {
+    manualRainMm: index === 0 ? 3 : null,
+    reanalysisRainMm: index === 1 ? 2 : null,
+  }));
+  const base = { weekStart: '2026-06-15', today: '2026-06-18', now: new Date('2026-06-18T10:00:00.000Z'), state: 'current', days, events: [], plan: null } as const;
+  const view = weekDayLines({ ...base, rainMatters: true });
+  assert.deepEqual(view.lines.map((line) => line.noteRain), [false, false, true, false, false, false, false],
+    'lundi mesuré, mardi estimé, mercredi sans pluie réelle ; jeudi est aujourd’hui ; la suite est à venir');
+  assert.ok(weekDayLines({ ...base, rainMatters: false }).lines.every((line) => !line.noteRain), 'une ferme toute sous abri n’a pas ce geste (D-032)');
+  // Plus de sept jours en arrière, la fenêtre ne propose plus le jour : « Pluie mesurée » du détail le prend.
+  const old = weekDayLines({ ...base, today: '2026-06-24', now: new Date('2026-06-24T10:00:00.000Z'), state: 'past', rainMatters: true });
+  assert.deepEqual(old.lines.map((line) => line.noteRain), [false, false, true, true, true, true, true]);
+  // L'année change : la fenêtre ne remonte pas dans la saison d'avant.
+  const newYear = weekDayLines({ weekStart: '2025-12-29', today: '2026-01-02', now: new Date('2026-01-02T10:00:00.000Z'), state: 'current', days: weekDateKeys('2025-12-29').map((date) => day(date)), events: [], plan: null, rainMatters: true });
+  assert.deepEqual(newYear.lines.map((line) => line.noteRain), [false, false, false, true, false, false, false]);
 });
 
 test('les irrigations de la semaine, réduites pour « Jour par jour » : le jour de la ferme, les annulées écartées', () => {
