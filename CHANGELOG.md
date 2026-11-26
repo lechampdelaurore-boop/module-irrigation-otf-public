@@ -7,7 +7,7 @@ source détaillée commit par commit.
 
 ### Ajouté (ET0 horaire, HR3 : la soif du jour heure par heure)
 
-- **« Soif du jour, heure par heure »** (D-350, F1042 à F1049) : en tête
+- **« Soif du jour, heure par heure »** (D-350, F1043 à F1050) : en tête
   du pli « Le détail » d'« Aujourd'hui », une phrase dit ce qu'il reste à
   consommer d'ici ce soir sur la soif du jour, une petite courbe montre
   chaque heure (l'heure en cours marquée) et les heures de plus forte
@@ -18,7 +18,7 @@ source détaillée commit par commit.
 
 ### Ajouté (ET0 horaire, HR2 : lire les heures et garder la forme de la journée)
 
-- **La forme de la journée se lit et se garde** (D-349, F1035 à F1041) :
+- **La forme de la journée se lit et se garde** (D-349, F1036 à F1042) :
   la lecture du matin et celles de la journée rapportent l'ET0 heure par
   heure (Open-Meteo la donne ; pour Visual Crossing, le module la calcule
   à partir des heures prévues, selon la méthode FAO-56), sans appel ni
@@ -28,7 +28,7 @@ source détaillée commit par commit.
 
 ### Ajouté (ET0 horaire, HR1 : la forme de la journée, sans écran)
 
-- **La forme de la journée, en calcul seul** (D-348, F1030 à F1034) : à
+- **La forme de la journée, en calcul seul** (D-348, F1031 à F1035) : à
   partir de l'ET0 heure par heure, ou à défaut de la course du soleil, le
   module sait dire quelle part de la consommation du jour tombe dans chaque
   heure, combien est déjà passé et combien reste à venir, et à quelles

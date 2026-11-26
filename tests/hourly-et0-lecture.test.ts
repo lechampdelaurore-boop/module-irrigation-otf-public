@@ -107,7 +107,7 @@ test('les heures d’un instant exact se rangent sur les heures du jour ; une he
   assert.ok(values.slice(1).every((value) => value === 0.1));
 });
 
-test('les heures d’horloge locales ne se rangent que si leur nombre est celui des heures du jour (F1038)', () => {
+test('les heures d’horloge locales ne se rangent que si leur nombre est celui des heures du jour (F1039)', () => {
   const day = (date: string, count: number) => Array.from({ length: count }, (_, index) => `${date}T${String(index).padStart(2, '0')}:00`);
   const ordinary = hourlyValuesInLocalOrder('2026-06-15', PARIS, [...day('2026-06-15', 24), '2026-06-16T00:00'], [...Array(24).fill(0.1), 7]);
   assert.equal(ordinary?.length, 24);
