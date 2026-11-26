@@ -290,13 +290,12 @@ même PR.
 
 ## 10. Questions au porteur (agronomie et conduite de la ferme)
 
-Posées une par une, sur cartes, avec recommandation ; **le contrat est
-écrit sur les options recommandées, modifiables** :
+Posées une par une, sur cartes, avec recommandation ; la question 2 est
+écrite sur l'option recommandée, modifiable :
 
-1. **La reprise.** Le filtre se lève (a) à la main, par « Reprendre »,
-   (b) à la main ou à une date de reprise facultative, (c) par un calendrier.
-   Recommandation : **(b)**, avec une date facultative, sans calendrier
-   supposé.
+1. **La reprise** — *répondue par le porteur le 26 novembre 2026 à 11 h 37* :
+   **à la main seulement**, par « Reprendre ». Ni date de reprise, ni
+   calendrier : le filtre ne se lève jamais seul.
 2. **Les arrosages déjà planifiés ou validés** quand on met hors saison :
    (a) ils restent, le module ne les efface jamais ; (b) ils sont
    proposés à l'annulation d'un geste. Recommandation : **(a)** avec une
