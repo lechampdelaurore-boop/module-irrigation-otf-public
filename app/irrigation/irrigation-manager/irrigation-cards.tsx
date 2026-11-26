@@ -16,6 +16,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Bed } from '@/lib/domain/domain';
 import { DoneAsPlannedButton } from '../done-as-planned-button';
 import { isTimerAwaitingConfirmation, millimetersForDurationSeconds } from '@/lib/domain/irrigation-timer';
+import { runningEndText } from '@/lib/domain/watering-now';
 
 function EventPumpSummary({ event }: { event: IrrigationEventRecord }) {
   const equipment = event.equipment;
@@ -84,8 +85,9 @@ export function ActiveIrrigationCard({
         <div><dt>Temps effectué</dt><dd>{formatDuration(elapsed)}</dd></div>
         <div>
           <dt>Fin estimée</dt>
+          {/* L'heure seule le jour même, comme la carte d'« Aujourd'hui » (D-342, F997). */}
           <dd>{equipment.timerTheoreticalEndAt
-            ? formatDateTime(equipment.timerTheoreticalEndAt)
+            ? runningEndText(equipment.timerTheoreticalEndAt, now)
             : 'Après la reprise'}</dd>
         </div>
         <div><dt>Volume en cours</dt><dd>{formatWettedVolume(currentVolume)}</dd></div>
