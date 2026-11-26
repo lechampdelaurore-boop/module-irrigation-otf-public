@@ -10802,7 +10802,8 @@ erreur dans la console
 
 ## D-332 — Simplifier l'usage du module, lot S5 : arroser en trois champs
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (« Arroser
+Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** (« Arroser
 maintenant » en trois champs) ; contrat `docs/simplification-s5-contract.md`,
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage
 de la roadmap et du contrat (section 14), sur le mandat du porteur du
@@ -10896,7 +10897,8 @@ contrat ; celui des parcours suit dès cette PR.
 
 ## D-333 — Simplifier l'usage du module, lot S5 : « Planifier » et « Déjà fait » sur le même squelette
 
-Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée** ; contrat
+Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** ; contrat
 `docs/simplification-s5-contract.md` (sections 4, 5, 6 et 10), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 14), dans la suite de D-332.
@@ -10972,7 +10974,8 @@ et les ancres de la visite guidée restent aussi à la PR 3.
 
 ## D-334 — Simplifier l'usage du module, lot S5 : l'entrée de la page et les mots
 
-Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée** ; contrat
+Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** ; contrat
 `docs/simplification-s5-contract.md` (sections 6.1, 7, 9.1 et 10), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 14), dans la suite de D-332 et D-333. **Le
@@ -11043,10 +11046,32 @@ Précisions prises en codant :
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
 
+**Preuve (recette, lot S5, D-332 à D-334).** S5 en ligne en entier le
+26 novembre 2026 à 11 h 38 (#227, #228, #230). Recette faite le même jour
+vers 11 h 45, avec l'accord du porteur (« Si tu as besoin de faire quelque
+chose sur Chrome, vas-y », 11 h 28 ; saisies permises, 11 h 18), sur la
+démonstration dans son Chrome (ferme des Trois Noues, « Pic d'été, l'eau
+manque », code de main 648cbc1). À l'ordinateur : « Arroser ou noter »
+dans l'ordre de la section 7 ; « Démarrer » indisponible tant que rien
+n'est choisi ; la case ronde, la durée conseillée, « + », la phrase du
+résultat (« Soit 6,5 mm sur les 3 planches, et 380 L pris à « Bassin des
+noues ». »), « Démarrer · fin vers 12 h 47 » ; la réponse sous le bouton,
+sans fenêtre, et « Voir l'arrosage en cours sur Aujourd'hui ». Au
+téléphone (390 px) : le retour « ‹ Aujourd'hui » par le « + », les
+onglets sur une ligne, la carte en cours raccourcie (F909), « Planifier »
+(« 1. Où ? », « 2. Quand ? », « 3. Combien de temps ? ») et « Déjà fait »
+(« 1. De quand à quand ? » puis « 2. Où ? »). « 1. Où ? » à 825 px avec un
+arrosage en cours, au-delà des 700 px, comme dit (F910, reprise par
+D-342). **Conforme.** Non vu : « C'est fait » sur « Arrosages » (aucune
+ligne « À traiter » ce moment-là ; tenu par P31 et les tests) ; la console
+n'a pas été relevée. La démonstration a été remise à zéro ensuite
+(`/mnt/project-files/simplification-s5/recette-s5-2026-11-26.md`).
+
 ## D-335 — Simplifier l'usage du module, lot S4 : une page, deux vues
 
 Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 4 codées** (la PR 2
-le 26 novembre 2026) ; contrat
+le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
+(#231) ; contrat
 `docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
 sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le

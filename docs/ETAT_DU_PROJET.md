@@ -45,8 +45,11 @@ registres, elle y renvoie.
   3 047 px (894 et 2 573 px avant), « Les cumuls » 1 874 px (1 920 px) : la
   PR 1 range, la PR 2 raccourcit. Aucun calcul ni aucune écriture
   changés. Tests, parcours P66 ; neuf parcours suivent. Contrôles : voir la
-  PR. Viennent la PR 2 (le premier niveau), les PR 3 et 4 ; fusions après
-  celles de S3 et S5.
+  PR. **En ligne** : #231 fusionnée le 26 novembre 2026 à 14 h 41
+  (112bbc4), déployée à 15 h 22, run 45831673115, les cinq jobs verts
+  (consigné par S4, PR 2). En chemin, V3, V4 (démonstration), P12, P13,
+  P30 et P52 suivent la redirection dès cette PR (F922). Viennent les PR 2
+  (le premier niveau), 3 et 4, une à la fois.
 - **Simplifier l'usage du module, S5 : le budget de hauteur tenu avec un
   arrosage en cours, codé le 26 novembre 2026** (D-342, F996, F997 ;
   contrat, sections 7 et 13), en Opus 5.5 · Élevé, sur le choix du porteur
@@ -74,7 +77,19 @@ registres, elle y renvoie.
   dette dite, reprise par D-342. Contrôles : voir la PR. **En ligne** :
   #230 fusionnée le 26 novembre 2026 à 10 h 55 (648cbc1), déployée à
   11 h 38, run 45796472386, les cinq jobs verts (consigné par la PR du
-  budget, D-342) : **S5 est en ligne en entier.** Vient S4.
+  budget, D-342) : **S5 est en ligne en entier.** **Recette faite et
+  conforme le 26 novembre 2026 vers 11 h 45**, avec l'accord du porteur,
+  sur la démonstration dans son Chrome (ferme des Trois Noues, « Pic
+  d'été, l'eau manque », code de main 648cbc1) : « Arroser ou noter » dans
+  l'ordre du contrat, « Arroser maintenant » de bout en bout (case ronde,
+  « + », phrase du résultat, « Démarrer · fin vers … », la réponse sous le
+  bouton et le lien vers « Aujourd'hui »), au téléphone le retour
+  « ‹ Aujourd'hui » du « + », les onglets sur une ligne, la carte en cours
+  raccourcie, « Planifier » et « Déjà fait » ; « 1. Où ? » à 825 px avec un
+  arrosage en cours, au-delà des 700 px (F910, reprise par D-342) ; la
+  démonstration remise à zéro ensuite
+  (`/mnt/project-files/simplification-s5/recette-s5-2026-11-26.md` ;
+  consigné par S4, PR 2). Vient S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
