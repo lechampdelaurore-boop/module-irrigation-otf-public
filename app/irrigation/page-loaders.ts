@@ -56,7 +56,12 @@ async function loadEquipmentState(context: ReadyPageContext) {
   return { equipment, equipmentPlacements, equipmentPoses, equipmentPoseHistory, gardenGroupConfiguration };
 }
 
-function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = false, includeAutomaticObjective = false) {
+function loadWaterDashboard(
+  context: ReadyPageContext,
+  includeWeatherAlerts = false,
+  includeAutomaticObjective = false,
+  includeForecastModelSetting = false,
+) {
   return getWaterDashboardForUser({
     ownerUserId: context.userId,
     season: context.season,
@@ -64,6 +69,7 @@ function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = fa
     weekStart: context.week,
     includeWeatherAlerts,
     includeAutomaticObjective,
+    includeForecastModelSetting,
     now: new Date(context.nowIso),
   });
 }
@@ -272,7 +278,8 @@ export async function loadReglagesPage(context: ReadyPageContext) {
   const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices, noDeviceAtLastAlert, changeJournal] = await Promise.all([
     countFeatureDataForUser(context.userId),
     getOnboardingForUser(context.userId),
-    usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
+    // La carte « Modèle de prévision » (D-347) se lit ici seulement.
+    usesWeather(context.enabled) ? loadWaterDashboard(context, false, false, true) : null,
     usesSpeciesCorrespondence(context.enabled)
       ? getCropCoefficientsViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot })
       : null,

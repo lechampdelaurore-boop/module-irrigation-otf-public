@@ -18,7 +18,8 @@ import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import { listAutomaticObjectiveRevisionsForUser } from '@/db/automatic-objective-repository';
 import { automaticObjectiveEnabledOn } from '../domain/automatic-objective';
 import { bedsKeepingEnteredGoal } from '../domain/objective-reading';
-import { returnForecastModelToAutomaticForUser } from '@/db/forecast-model-repository';
+import { readForecastModelSettingForUser, returnForecastModelToAutomaticForUser } from '@/db/forecast-model-repository';
+import { forecastModelSettingView, type ForecastModelSettingView } from '@/lib/domain/weather/forecast-model-setting';
 import { readCropAlertsView, type CropAlertsView } from './crop-alerts-view';
 import { readWeatherAlertsView, type WeatherAlertsView } from './weather-alerts-view';
 import type { IrrigationSnapshot } from '../domain/domain';
@@ -84,6 +85,18 @@ export type WaterDashboard = {
     refreshAttempted: boolean;
     nextRefreshAllowedAt: string | null;
     attribution: string;
+    /**
+     * Le déploiement lit les modèles de prévision (D-347) : faux en
+     * démonstration, où le réglage « Modèle de prévision » n'existe pas
+     * (docs/weather-models-contract.md, règle 13).
+     */
+    forecastModelsAvailable: boolean;
+    /**
+     * Les phrases de la carte « Modèle de prévision » tirées de ce que la
+     * ferme a gardé (règles 6 et 9 ; D-347) ; `null` quand l'écran ne les lit
+     * pas, ou en démonstration.
+     */
+    forecastModelSetting: ForecastModelSettingView | null;
   };
   /** L'encart « Alertes météo » (5 bis), lu seulement par l'écran de la météo. */
   weatherAlerts: WeatherAlertsView | null;
@@ -107,6 +120,7 @@ export async function getWaterDashboardForUser({
   allowWeatherRefresh = true,
   includeWeatherAlerts = false,
   includeAutomaticObjective = false,
+  includeForecastModelSetting = false,
   now = new Date(),
   provider = getConfiguredWeatherProvider(),
   modelReader = getModelForecastReader(),
@@ -120,6 +134,8 @@ export async function getWaterDashboardForUser({
   allowWeatherRefresh?: boolean;
   includeWeatherAlerts?: boolean;
   includeAutomaticObjective?: boolean;
+  /** La carte « Modèle de prévision » de Réglages (D-347) : deux lectures de plus, seulement pour cet écran. */
+  includeForecastModelSetting?: boolean;
   now?: Date;
   provider?: WeatherProvider;
   /** Le lecteur du modèle de prévision choisi par la ferme (D-346) ; `null` : la ferme lit « Automatique » (règle 13). */
@@ -196,7 +212,7 @@ export async function getWaterDashboardForUser({
 
   const refreshedPreference = await readWeatherPreference(ownerUserId);
   const alertsWorkspaceId = includeWeatherAlerts ? findWorkspaceIdForUser(ownerUserId) : null;
-  const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts, automaticSettings] = await Promise.all([
+  const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts, automaticSettings, forecastModelRecords] = await Promise.all([
     ensureRecurringHydricGoalsForUser(ownerUserId, season, requestedWeek),
     listDailyWaterLimitsForUser(ownerUserId),
     listWeatherDailyValuesForUser(ownerUserId, locationKey ?? 'unconfigured', dates[0], dates[6]),
@@ -204,6 +220,9 @@ export async function getWaterDashboardForUser({
     alertsWorkspaceId?.then((workspaceId) => readWeatherAlertsView({ workspaceId, locationKey, now })) ?? null,
     alertsWorkspaceId?.then((workspaceId) => readCropAlertsView({ ownerUserId, workspaceId, locationKey, snapshot, season, now })) ?? null,
     includeAutomaticObjective ? listAutomaticObjectiveRevisionsForUser(ownerUserId) : null,
+    includeForecastModelSetting && modelReader !== null
+      ? readForecastModelSettingForUser(ownerUserId, locationKey, dateKeyInTimeZone(now, location?.timezone ?? FARM_TIME_ZONE))
+      : null,
   ]);
   const ledger = buildDailyWaterLedger(allEvents.filter((event) => event.season === season), now, FARM_TIME_ZONE);
   const ledgerByDate = new Map(ledger.map((row) => [row.date, row]));
@@ -295,6 +314,18 @@ export async function getWaterDashboardForUser({
       refreshAttempted: weatherRefreshAttempted,
       nextRefreshAllowedAt: nextWeatherRefreshAllowedAt(refreshedPreference),
       attribution: weatherAttribution(provider, forecastModelToRead(resolveForecastModelChoice(refreshedPreference.forecastModel, location), modelReader !== null)),
+      forecastModelsAvailable: modelReader !== null,
+      forecastModelSetting: forecastModelRecords === null ? null : forecastModelSettingView(
+        refreshedPreference.forecastModel,
+        {
+          forecastDays: forecastModelRecords.forecastDays,
+          lastChange: forecastModelRecords.lastChange === null ? null : {
+            ...forecastModelRecords.lastChange,
+            dateKey: dateKeyInTimeZone(new Date(forecastModelRecords.lastChange.at), FARM_TIME_ZONE),
+          },
+        },
+        dateKeyInTimeZone(now, FARM_TIME_ZONE),
+      ),
     },
     weatherAlerts,
     cropAlerts,

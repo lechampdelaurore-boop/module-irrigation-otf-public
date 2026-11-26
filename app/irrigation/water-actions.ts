@@ -29,6 +29,9 @@ import {
   type HydricGoalScope,
 } from '@/lib/domain/water-management';
 import { openMeteoWeatherProvider } from '@/lib/adapters/weather/open-meteo-provider';
+import { forecastModelChoiceMessage } from '@/lib/domain/weather/forecast-model-choice';
+import { AUTOMATIC_FORECAST_CHOICE } from '@/lib/domain/weather/forecast-model-setting';
+import { saveForecastModelChoiceForUser } from '@/lib/services/weather/forecast-model-choice';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
 import {
   createWeatherAlertCriterionForUser,
@@ -72,6 +75,7 @@ export async function loadWaterDashboardAction(input: {
       allowWeatherRefresh: input.allowWeatherRefresh !== false,
       includeWeatherAlerts: true,
       includeAutomaticObjective: true,
+      includeForecastModelSetting: true,
     });
     return {
       ok: true,
@@ -256,6 +260,37 @@ export async function restoreOtfWeatherLocationAction(input: {
     'La commune du siège OTF est utilisée, en dernier recours.',
     true,
   );
+}
+
+/**
+ * Le modèle de prévision de la ferme (docs/weather-models-contract.md,
+ * règles 1, 3, 8 et 13 ; D-346, D-347) : « Automatique » (valeur vide) ou un
+ * modèle de la liste. Le service vérifie le modèle par une lecture avant de
+ * le garder ; la phrase dit en clair ce qui est arrivé. Rien n'est enregistré
+ * sur un refus ou une lecture qui ne prouve pas le modèle.
+ */
+export async function saveForecastModelAction(input: {
+  season: number;
+  weekStart: string;
+  choice: string;
+}): Promise<WaterActionResult> {
+  const context = await loadContext(input.season);
+  if (!context.ok) return context;
+  if (typeof input.choice !== 'string' || input.choice.length > 64) {
+    return { ok: false, message: 'Le modèle choisi est invalide : rien n’est enregistré.' };
+  }
+  try {
+    const outcome = await saveForecastModelChoiceForUser({
+      ownerUserId: context.value.ownerUserId,
+      snapshot: context.value.snapshot,
+      modelId: input.choice === AUTOMATIC_FORECAST_CHOICE ? null : input.choice,
+    });
+    const message = forecastModelChoiceMessage(outcome);
+    if (outcome.kind !== 'saved' && outcome.kind !== 'unchanged') return { ok: false, message };
+    return successWithDashboard(context.value, safeWeekStart(input.weekStart) ?? weekStartDateKey(new Date()), message);
+  } catch (error) {
+    return actionFailure(error);
+  }
 }
 
 export async function saveManualRainfallAction(input: {
@@ -536,6 +571,7 @@ async function successWithDashboard(
         allowWeatherRefresh: forceWeatherRefresh,
         includeWeatherAlerts: true,
         includeAutomaticObjective: true,
+        includeForecastModelSetting: true,
       }),
     };
   } catch (error) {

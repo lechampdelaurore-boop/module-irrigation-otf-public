@@ -486,3 +486,36 @@
 .automatic-objective-kept { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
 .automatic-objective-kept p { color: var(--warn-ink); }
 .automatic-objective-kept .danger-outline { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-ink); }
+
+/* Le réglage « Modèle de prévision » de la carte « Lieu de la météo » (météo multi-modèles, D-347). */
+.forecast-model-setting {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.forecast-model-setting h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-14);
+}
+
+.forecast-model-setting p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
+/* Le retour du module à « Automatique » (règle 9), dit comme une réserve, en clair. */
+.forecast-model-setting .forecast-model-notice {
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+@media (max-width: 600px) {
+  .forecast-model-setting select { height: 44px; }
+}

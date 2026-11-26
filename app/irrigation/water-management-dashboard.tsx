@@ -19,6 +19,7 @@ import { automaticRefreshStatus } from '@/lib/domain/weather/automatic-refresh-s
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
 import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
+import { ForecastModelSetting } from './forecast-model-setting';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
 import {
   finishManualWeatherRefresh,
@@ -32,6 +33,7 @@ import {
   saveHydricGoalAction,
   removeManualRainfallAction,
   saveManualRainfallAction,
+  saveForecastModelAction,
   saveWeatherLocationAction,
   searchWeatherLocationsAction,
   restoreOtfWeatherLocationAction,
@@ -383,6 +385,17 @@ export function WaterManagementDashboard({
             <ActionReply messages={replies} origin="commune" classNames={WATER_REPLY_CLASSES} />
             {candidates.length > 0 ? <div className="weather-candidates">{candidates.map((candidate) => <button key={`${candidate.latitude}:${candidate.longitude}`} type="button" disabled={pending} onClick={() => startTransition(async () => { receiveChange(await saveWeatherLocationAction({ season, weekStart: dashboard.weekStart, candidate }), 'commune'); setCandidates([]); })}>{candidate.displayName}</button>)}</div> : null}
             {dashboard.weather.preference.locationMode === 'custom' || !dashboard.weather.preference.locationConfirmed ? <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receiveChange(await restoreOtfWeatherLocationAction({ season, weekStart: dashboard.weekStart }), 'commune'))}>{dashboard.weather.preference.locationConfirmed ? 'Utiliser la commune du siège OTF' : 'Prendre le siège OTF, en dernier recours'}</button> : null}
+            {dashboard.weather.forecastModelsAvailable ? (
+              <ForecastModelSetting
+                key={`${dashboard.weather.preference.forecastModel ?? ''}:${dashboard.weather.locationKey ?? ''}`}
+                place={dashboard.weather.location}
+                savedModelId={dashboard.weather.preference.forecastModel}
+                view={dashboard.weather.forecastModelSetting}
+                pending={pending}
+                onSave={(choice) => startTransition(async () => receiveChange(await saveForecastModelAction({ season, weekStart: dashboard.weekStart, choice }), 'modele'))}
+              />
+            ) : null}
+            <ActionReply messages={replies} origin="modele" classNames={WATER_REPLY_CLASSES} />
             <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
           </article>
         </div>

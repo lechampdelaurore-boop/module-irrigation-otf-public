@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
+  26 novembre 2026** (D-347, F1023 à F1029 ; contrat v0.2, § 3, § 8 point 6,
+  § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
+  PR 2. Dans « Réglages », la carte « Lieu de la météo » porte la liste des
+  modèles qui couvrent le lieu (« Automatique » d'abord), la phrase de la
+  règle 12, les faits du modèle sans mot de qualité et « Enregistrer le
+  modèle », qui vérifie par une lecture ; la carte dit jusqu'à quel jour les
+  prévisions gardées viennent du modèle et, une semaine durant, le retour du
+  module à « Automatique ». Absent en démonstration. Parcours P72 aux deux
+  largeurs. **Première PR où une ferme peut choisir** : le premier
+  enregistrement en ligne fera l'essai B. Contrôles : voir la PR. Les PR 0 à
+  3 se fusionnent dans l'ordre, après la file en cours.
 - **Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par
   lieu et par modèle, codée le 26 novembre 2026** (D-346, F1016 à F1022 ;
   contrat v0.2, § 3, § 5, § 6, § 8 ; roadmap ligne 36), en Opus 5.5 · Max,

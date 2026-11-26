@@ -45,6 +45,8 @@ const RANGEMENT: Readonly<Record<string, Rangement>> = {
   // Le lieu de la météo, et les parts du tableau de l'eau affichées ailleurs (objectif, limite d'eau du jour).
   saveWeatherLocationAction: previent(WATER),
   restoreOtfWeatherLocationAction: previent(WATER),
+  // Le modèle de prévision de la ferme (météo multi-modèles, PR 3, D-347) : une ligne « Modèle de prévision ».
+  saveForecastModelAction: previent(WATER),
   saveHydricGoalAction: previent(WATER),
   clearHydricGoalsAction: previent(WATER),
   // Le réglage « Objectif automatique » (6 decies, O4, D-319) : un geste au journal, comme un objectif.

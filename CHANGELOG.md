@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (météo multi-modèles, PR 3 : l'écran)
+
+- **Choisir le modèle de prévision de la ferme** (D-347, F1023 à F1029) :
+  dans « Réglages », la carte « Lieu de la météo » propose « Automatique »
+  (le défaut, inchangé) ou un des modèles qui couvrent la commune
+  (Météo-France, DWD, centre européen, NOAA, « Automatique d’Open-Meteo »),
+  avec qui le fait, sa maille et sa portée, sans dire qu'un modèle est
+  meilleur. « Enregistrer le modèle » le vérifie d'abord par une lecture ;
+  la réponse dit jusqu'à quel jour le modèle prévoit, et la carte le redit
+  ensuite. Si le module ramène la ferme à « Automatique » (modèle retiré,
+  commune hors de sa zone), la carte le dit pendant une semaine. Pas de
+  réglage dans la démonstration.
+
 ### Ajouté (météo multi-modèles, PR 2 : le réglage de la ferme)
 
 - **Le modèle de prévision se garde par ferme et se lit par lieu et par
