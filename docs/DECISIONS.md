@@ -11120,7 +11120,12 @@ Précisions prises en codant :
   attend la vue qui porte son contenu. P0, P22, P24, P27, P28, P40, P59,
   P61 et P63 suivent ; P66 est nouveau. Les autres parcours qui lisent les
   trois pages restent verts par les redirections (contrat, section 12) et
-  suivent dans la PR qui les change.
+  suivent dans la PR qui les change. Les visites V3 et V4 de la
+  démonstration se jouent sur « Semaine » (la page affichée,
+  `displayedPage`) : leurs étapes attendent `/irrigation/semaine`, et la
+  pause de V4 la vue « Les cumuls ». Oubli de la PR (la suite de la
+  démonstration n'y avait pas été jouée en entier), relevé en local sur la
+  pile complète.
 
 **Décision (PR 2, 26 novembre 2026).** La vue « La semaine » commence par
 son premier niveau (contrat, sections 4 à 6), de haut en bas : les flèches
@@ -11257,7 +11262,12 @@ Précisions prises en codant :
   calme retiré, « pris au bassin » écrit, l'écart du prévu relu à
   l'ouverture de la page font chacun échouer un test ; une ancre qui
   n'ouvre plus son pli fait échouer P66, « Valider » montré pour une
-  semaine passée fait échouer P67.
+  semaine passée fait échouer P67. V11, de la démonstration, suit après
+  coup : il ouvrait « Planning de la semaine » et lisait le bloc de
+  l'écart du prévu au premier niveau ; il ouvre « Semaine » par l'ancre de
+  sa section (`#ecart-du-prevu`), qui ouvre les plis et lit l'écart. Oubli
+  de la PR (la suite de la démonstration n'y avait pas été jouée en
+  entier), relevé en local sur la pile complète.
 
 
 **Décision (PR 3, 26 novembre 2026).** Les gestes de la page (contrat,
