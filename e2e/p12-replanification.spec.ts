@@ -3,7 +3,7 @@ import { dateKeyInTimeZone } from '../lib/domain/irrigation-history/dates.ts';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { addDaysToDateKey, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, ouvrirLesReglagesDeLaPage, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesPlisAutour, ouvrirLesReglagesDeLaPage, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLePli } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
@@ -149,6 +149,8 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
     await expect(suggestion).toHaveAttribute('data-suggestion', 'cancel');
     await expect(suggestion.locator('.planning-suggestion-head strong')).toHaveText('Annuler');
     await expect(suggestion.locator('.planning-suggestion-causes')).toContainText(new RegExp(`limite journalière du .* : 10 L pour ${VOLUME_ECRIT} engagés`));
+    // Les suggestions sont dans « Le plan, chaîne par chaîne », au détail de la page « Semaine » (S4, PR 2).
+    await ouvrirLesPlisAutour(suggestion);
     await expect(suggestion.getByRole('button', { name: 'Garder' })).toBeVisible();
     await pli.locator('summary').click();
     await expect(pli.locator('li[data-kind="suggestion"]').filter({ hasText: materiel })).toContainText('Suggestion nouvelle : annuler');
@@ -232,7 +234,8 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   // que la course se joue à chaque passage, quel que soit le jour : sans cela,
   // elle ne se jouait que le lundi, quand la veille est dans la semaine passée.
   const pluieRouverte = await ouvrirLePli(page.locator('#manual-rain'));
-  const semaineAffichee = page.locator('.water-week-navigation strong');
+  // La semaine du tableau de l'eau : son premier jour, dans « Jours de la semaine, un par un » (S4, PR 2).
+  const semaineAffichee = page.locator('#weather .water-day-date').first();
   const semaineDAujourdhui = (await semaineAffichee.textContent()) ?? '';
   const unJourDeLaSemainePassee = addDaysToDateKey(aujourdhui, -7);
   const lundiDeLaSemainePassee = weekStartDateKey(unJourDeLaSemainePassee);

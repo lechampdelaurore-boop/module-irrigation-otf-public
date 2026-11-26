@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesPlisAutour, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -56,20 +56,25 @@ async function verifierLesGestesDeLaCarte(carte: Locator): Promise<void> {
 }
 
 /**
- * Audit final, lot C, R6 (F237), au téléphone : « Replier le jour » (ou
- * « Voir les créneaux ») est neutre, sur fond blanc ; la validation du jour,
- * en vert, se tient à 24 px au moins en dessous.
+ * Audit final, lot C, R6 (F237), au téléphone, sur « Jour par jour » de la
+ * page « Semaine » (simplification, lot S4, PR 2, section 5) : chaque créneau
+ * est une ligne, son « Autres choix » neutre, sur fond blanc, à côté de son
+ * « Valider » en vert ; la validation du jour, quand il y en a une, se tient
+ * à 24 px au moins au-dessus de la première ligne.
  */
 async function verifierLeJourEcarte(jour: Locator): Promise<void> {
-  const pli = jour.locator('.planning-day-toggle');
+  const ligne = jour.locator('.week-slot-line').filter({ has: jour.page().getByRole('button', { name: 'Valider', exact: true }) }).first();
+  const autres = ligne.getByRole('button', { name: 'Autres choix' });
+  await expect(autres).toBeVisible();
+  await expect(autres).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(ligne.getByRole('button', { name: 'Valider', exact: true })).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await verifierCibleTactile(autres, 'le bouton « Autres choix »');
   const toutValider = jour.getByRole('button', { name: /^Valider (?:la proposition|les \d+ propositions) du jour$/ });
-  await expect(pli).toBeVisible();
-  await expect(pli).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   // Un jour à une seule proposition n'a pas de bouton du jour (lot K, n° 17, F466) : rien à écarter.
   if (await toutValider.count() === 0) return;
   await expect(toutValider).not.toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  const [haut, bas] = await Promise.all([pli.boundingBox(), toutValider.boundingBox()]);
-  expect(Math.round(bas!.y - (haut!.y + haut!.height)), 'la validation du jour écartée du pli').toBeGreaterThanOrEqual(ECART_DES_GESTES_PX);
+  const [haut, bas] = await Promise.all([toutValider.boundingBox(), jour.locator('.week-slot-line').first().boundingBox()]);
+  expect(Math.round(bas!.y - (haut!.y + haut!.height)), 'la validation du jour écartée des créneaux').toBeGreaterThanOrEqual(ECART_DES_GESTES_PX);
 }
 
 /** Objectif de ferme assez grand pour qu'une dose entière tienne même le dernier jour de la semaine. */
@@ -152,6 +157,8 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
   // La liste est repliée derrière son titre, qui dit le nombre de planches (8 novembre 2026).
   const nonPlace = planning.locator('details.planning-unplaced');
   await expect(nonPlace).toHaveJSProperty('open', false);
+  // Dans « Le plan, chaîne par chaîne », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(nonPlace);
   const titreNonPlace = nonPlace.locator('summary');
   await expect(titreNonPlace).toHaveText(/^(Planches non servies \(\d+\)( · \d+ sans objectif)?( · \d+ en attente)?|Planches sans objectif \(\d+\)( · \d+ en attente)?|Planches en attente \(\d+\))$/);
   await expect(nonPlace.locator('tbody tr').first()).toBeHidden();
@@ -190,8 +197,7 @@ test('le planning propose, explique, se valide, s’ajuste et se refuse depuis l
     if (await boutonDuJour.count() > 0) await boutonDuJour.click();
     else {
       await expect(jour.getByRole('button', { name: /du jour$/ })).toHaveCount(0);
-      const pli = jour.locator('.planning-day-toggle');
-      if (await pli.isVisible() && await pli.getAttribute('aria-expanded') === 'false') await pli.click();
+      await montrerLaCarte(planning, deuxieme);
       await deuxieme.getByRole('button', { name: 'Valider', exact: true }).click();
     }
     await expect(deuxieme.locator('.planning-status')).toHaveText('Validée', { timeout: 30_000 });

@@ -27,9 +27,14 @@ test('chaque page range ses réglages dans le pli, en bas (F305)', () => {
   const limit = arrosages.indexOf('Limite journalière d’irrigation');
   assert.ok(arrosages.lastIndexOf('<PageSettingsFold>', limit) > arrosages.lastIndexOf("if (part === 'arrosages')", limit), 'Arrosages : la limite journalière');
 
+  // Le seuil est dans « Réglages de la semaine », le dernier pli du détail de la page « Semaine » (S4, PR 2), sous la même ancre.
   const besoins = source('app/irrigation/irrigation-needs-dashboard.tsx');
-  assert.ok(besoins.indexOf('<PageSettingsFold>') < besoins.indexOf('Seuil minimal de planification'), 'Objectifs et besoins : le seuil');
-  assert.ok(besoins.indexOf('irrigation-needs-gardens') < besoins.indexOf('<PageSettingsFold>'), 'après les besoins par planche');
+  assert.ok(besoins.indexOf('irrigation-needs-gardens') < besoins.indexOf('export function NeedsThresholdSettings'), 'après les besoins par planche');
+  assert.ok(besoins.indexOf('export function NeedsThresholdSettings') < besoins.indexOf('Seuil minimal de planification'), 'Objectifs et besoins : le seuil');
+  const semaine = source('app/irrigation/semaine/page.tsx');
+  assert.ok(semaine.lastIndexOf('<WeekSettings ') > semaine.lastIndexOf('<WaterManagementDashboard '), 'le pli des réglages, en bas du détail');
+  assert.ok(semaine.indexOf('<NeedsThresholdSettings ') > semaine.lastIndexOf('<WeekSettings '), 'le seuil dans le pli des réglages');
+  assert.match(semaine, /<AnchoredFold\s+id=\{PAGE_SETTINGS_ANCHOR\}/);
 
   const ressources = source('app/irrigation/water-resource-manager.tsx');
   const settingsAt = ressources.indexOf('<PageSettingsFold>');
