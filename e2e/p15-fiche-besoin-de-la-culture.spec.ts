@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../lib/domain/water-management.ts';
-import { attendreLaPageIrrigation, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLesPlisAutour, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLaCorrespondanceDesEspeces } from './support/parcours.ts';
 
 /**
  * Parcours P15 : le besoin de la culture dans la fiche de la planche
@@ -104,6 +104,8 @@ test('la fiche de la planche montre le stade, le Kc, l’ETM et l’objectif pro
   await attendreLaPageIrrigation(page, 'besoins');
   const besoins = page.locator('section.irrigation-needs-section');
   const jardin = besoins.locator('details').filter({ has: page.locator('summary strong', { hasText: 'Jardin du verger' }) }).first();
+  // Dans « Ce qu'il reste à arroser », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(jardin);
   await jardin.locator('summary').first().click();
   const planche = jardin.locator('article.irrigation-need-card').filter({ has: page.locator('header strong', { hasText: /^V01$/ }) });
   await planche.locator('details.need-calculation > summary').click();

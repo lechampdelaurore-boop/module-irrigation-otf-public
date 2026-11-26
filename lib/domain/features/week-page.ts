@@ -105,8 +105,12 @@ export const WEEK_SECTIONS = [
   { id: 'jours', feature: 'besoins' },
   /** L'écart du prévu des trois dernières semaines, lu à la demande. */
   { id: 'ecart-du-prevu', feature: 'planning' },
-  /** Les réglages du planning et les heures où l'on n'arrose pas. */
-  { id: 'reglages', feature: 'planning' },
+  /**
+   * Les réglages de la semaine : ceux du planning et les heures où l'on
+   * n'arrose pas (Planning coché), le seuil minimal de planification des
+   * besoins (S4, PR 2) ; la section existe avec la vue.
+   */
+  { id: 'reglages', feature: 'besoins' },
 ] as const satisfies readonly { id: string; feature: WeekPageFeature }[];
 
 export type WeekSectionId = (typeof WEEK_SECTIONS)[number]['id'];

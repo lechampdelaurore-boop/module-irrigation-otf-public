@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { horodatageLocal, nomUnique, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
+import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesPlisAutour, ouvrirLesReglagesDeLaPage, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 import { metresCubesLus, VOLUME_ECRIT } from './support/volumes.ts';
 import { annulerLesIrrigationsDuPlanning, carteNommee, lignesNonPlacees, montrerLaCarte, poserUnObjectifDeFerme, refuserLaProposition, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
@@ -280,6 +280,8 @@ function doseDe(carte: Locator): Locator {
 /** La ligne d'une chaîne dans le pli « Budget d'eau d'ici dimanche », déplié s'il ne l'est pas. */
 async function ligneDeBudget(planning: Locator, origine: string): Promise<Locator> {
   const pli = planning.locator('details.planning-budgets');
+  // Dans « Le plan, chaîne par chaîne », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(pli);
   await pli.scrollIntoViewIfNeeded();
   if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) await pli.locator('summary').click();
   await expect(pli).toHaveJSProperty('open', true);

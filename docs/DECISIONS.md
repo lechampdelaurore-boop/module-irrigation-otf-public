@@ -10802,7 +10802,8 @@ erreur dans la console
 
 ## D-332 — Simplifier l'usage du module, lot S5 : arroser en trois champs
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (« Arroser
+Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** (« Arroser
 maintenant » en trois champs) ; contrat `docs/simplification-s5-contract.md`,
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage
 de la roadmap et du contrat (section 14), sur le mandat du porteur du
@@ -10896,7 +10897,8 @@ contrat ; celui des parcours suit dès cette PR.
 
 ## D-333 — Simplifier l'usage du module, lot S5 : « Planifier » et « Déjà fait » sur le même squelette
 
-Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée** ; contrat
+Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** ; contrat
 `docs/simplification-s5-contract.md` (sections 4, 5, 6 et 10), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 14), dans la suite de D-332.
@@ -10972,7 +10974,8 @@ et les ancres de la visite guidée restent aussi à la PR 3.
 
 ## D-334 — Simplifier l'usage du module, lot S5 : l'entrée de la page et les mots
 
-Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée** ; contrat
+Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** ; contrat
 `docs/simplification-s5-contract.md` (sections 6.1, 7, 9.1 et 10), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 14), dans la suite de D-332 et D-333. **Le
@@ -11043,10 +11046,34 @@ Précisions prises en codant :
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
 
+**Preuve (recette, lot S5, D-332 à D-334).** S5 en ligne en entier le
+26 novembre 2026 à 11 h 38 (#227, #228, #230). Recette faite le même jour
+vers 11 h 45, avec l'accord du porteur (« Si tu as besoin de faire quelque
+chose sur Chrome, vas-y », 11 h 28 ; saisies permises, 11 h 18), sur la
+démonstration dans son Chrome (ferme des Trois Noues, « Pic d'été, l'eau
+manque », code de main 648cbc1). À l'ordinateur : « Arroser ou noter »
+dans l'ordre de la section 7 ; « Démarrer » indisponible tant que rien
+n'est choisi ; la case ronde, la durée conseillée, « + », la phrase du
+résultat (« Soit 6,5 mm sur les 3 planches, et 380 L pris à « Bassin des
+noues ». »), « Démarrer · fin vers 12 h 47 » ; la réponse sous le bouton,
+sans fenêtre, et « Voir l'arrosage en cours sur Aujourd'hui ». Au
+téléphone (390 px) : le retour « ‹ Aujourd'hui » par le « + », les
+onglets sur une ligne, la carte en cours raccourcie (F909), « Planifier »
+(« 1. Où ? », « 2. Quand ? », « 3. Combien de temps ? ») et « Déjà fait »
+(« 1. De quand à quand ? » puis « 2. Où ? »). « 1. Où ? » à 825 px avec un
+arrosage en cours, au-delà des 700 px, comme dit (F910, reprise par
+D-342). **Conforme.** Non vu : « C'est fait » sur « Arrosages » (aucune
+ligne « À traiter » ce moment-là ; tenu par P31 et les tests) ; la console
+n'a pas été relevée. La démonstration a été remise à zéro ensuite
+(`/mnt/project-files/simplification-s5/recette-s5-2026-11-26.md`).
+
 ## D-335 — Simplifier l'usage du module, lot S4 : une page, deux vues
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 4 codée** ; contrat
-`docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11),
+Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 4 codées** (la PR 2
+le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
+(#231) ; contrat
+`docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
+sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le
 réglage de la roadmap et du contrat (section 14), après la fin du code de
 S5, sur la branche de sa PR 3.
@@ -11142,6 +11169,150 @@ Précisions prises en codant :
   Oublis de la PR (ni la suite de la démonstration ni toute celle des
   parcours n'y avaient été jouées ; ils ne l'ont été qu'en PR 2 à 4),
   relevés sur la pile complète et par la CI de la PR.
+
+**Décision (PR 2, 26 novembre 2026).** La vue « La semaine » commence par
+son premier niveau (contrat, sections 4 à 6), de haut en bas : les flèches
+et le titre, la ligne du plan, une phrase, l'encadré d'attention quand il
+y a lieu, le bilan, « Jour par jour », « Jardin par jardin » ; tout ce que
+montraient le planning et « Objectifs et besoins » passe derrière « Le
+détail », un pli fermé dont chaque section est un pli fermé avec sa ligne
+(section 7.1). Les chiffres viennent des fonctions d'« Aujourd'hui » : la
+phrase, la barre, les trois chiffres et les jardins lisent `todayWeek`,
+la ligne « Calcul approximatif » `todayView`. Le domaine nouveau est dans
+`lib/domain/semaine/` (titre, phrase, bilan, jours, jardins, détail),
+testé sans navigateur. Aucun calcul, aucune migration, aucune règle
+d'enregistrement ne change ; « Valider » appelle l'action du planning ;
+aucune question agronomique.
+
+Précisions prises en codant :
+
+- **F923** — **Les flèches et le titre** : deux liens de 44 px, « Semaine
+  précédente » et « Semaine suivante », autour de « Cette semaine » ou
+  « Semaine du 8 au 14 juin » (avec l'année pour une autre saison que
+  celle du jour), « du lundi … au dimanche … » dessous ; l'adresse dit la
+  semaine (`week`), un rechargement et le retour du navigateur la
+  retrouvent (S4-g). Les flèches sont des liens simples : la page se
+  recharge, et chaque bloc du détail suit la semaine de la page. La barre
+  de navigation propre au tableau de l'eau (« Semaine précédente »,
+  « Cette semaine ») et l'en-tête du bloc des besoins sont retirés : les
+  flèches de la page les remplacent (F470 tient, « Cette semaine » n'existe
+  qu'ailleurs).
+- **F924** — **La ligne du plan, la phrase et le bilan** : « Plan calculé
+  aujourd'hui à 6 h 02 » et « Recalculer » (nom accessible « Recalculer le
+  plan », « Calcul en cours… »), pour la semaine en cours et une ferme qui a
+  coché le planning ; sans plan, « Calculer le plan de la semaine ». La
+  phrase et la barre (14 px, nommée comme la phrase) disent reçus sur
+  visés ; les trois chiffres « reçus », « visés », « arrosés » (m³, S4-d)
+  sont ceux des tuiles d'« Aujourd'hui » ; un chiffre inconnu est dit
+  inconnu (`data-missing`), jamais zéro (D-003). « Poser un objectif » mène
+  au pli des objectifs ; « Comprendre ces chiffres » et « Changer l'eau
+  visée » viennent avec la PR 3.
+- **F925** — **L'encadré d'attention** (semaine en cours seulement) :
+  « L'eau manque » du planning (`PlanShortage`), une seule ligne « Calcul
+  approximatif » et la ligne du minuteur qui attend. La ligne
+  « Calcul approximatif » se lit après l'affichage
+  (`readTodayApproximateAction`, la fonction d'« Aujourd'hui » sans la
+  météo) pour ne pas allonger le temps du serveur (3.4), et se relit après
+  une pluie notée ou un plan recalculé ; « Noter la pluie » y ouvre le pli
+  de la pluie mesurée (la fenêtre de S2 vient en PR 3). L'encadré ne
+  paraît que s'il porte une ligne : un plan sans pénurie n'y met rien.
+- **F926** — **« Jour par jour »** (`weekDayLines`) : sept lignes, une par
+  jour, aujourd'hui marqué ; ce qui s'est fait, ce qui tourne (lien
+  « Aujourd'hui », on ne démarre ni ne termine ici, S4-h), ce qui est
+  planifié (une heure passée le dit), la pluie avec son mot (mesurée,
+  estimée, annoncée, D-006), « limite dépassée ». À l'ordinateur, les jours
+  gardent le tableau du planning et ses cartes (`ProposalCard`, P46) ; au
+  téléphone, un créneau tient en une ligne (« 9 h 29 · Abri des noues ·
+  1 h 21 · 8 mm », « Valider », « Autres choix » qui ouvre la carte), les
+  jours écoulés se replient sous « Jours écoulés (n) » sauf celui d'un
+  arrosage planifié jamais démarré (F11), les jours calmes de suite se
+  comptent en une ligne (F301). « Valider toute la semaine (n) » et la
+  ligne des planches non servies restent au premier niveau. Le plan ne
+  couvre que la semaine en cours : ailleurs, aucun créneau, une ligne le
+  dit (S4-l). Les irrigations de la semaine se relisent après un geste
+  (`loadWeekEventsAction`, `getWeekDayEventsForUser`, celles du
+  propriétaire seulement).
+- **F927** — **Le « mm par jour » (S4-e)** : aucune fonction du domaine ne
+  donne des millimètres par jour pour la ferme ; le tableau de l'eau porte
+  des m³ par jour (`realizedIrrigationCubicMeters`). La ligne dit donc
+  « 4 arrosages faits · 0,9 m³ », « au moins 0,9 m³ » quand une surface
+  mouillée manque ; rien de nouveau n'est calculé.
+- **F928** — **« Jardin par jardin »** : les lignes d'« Eau de la
+  semaine » d'« Aujourd'hui » (T4, `todayWeek`), dix puis « Voir les n
+  autres » (S4-j), une barre de 10 px ; un jardin sans objectif dit « pas
+  d'eau visée » et « Lui en donner une » (S4-f). Chaque ligne mène à
+  l'ancre de son jardin dans « Ce qu'il reste à arroser », qui ouvre le pli
+  du détail, celui de la section et celui du jardin.
+- **F929** — **« Le détail »** : un pli fermé (`le-detail`), dont la ligne
+  dit ce qu'il contient (« 3 jardins · le besoin par planche · le plan ·
+  … · les réglages »), puis les sections de la section 7.1, chacune un pli
+  fermé avec sa ligne : le tableau des besoins (sans son en-tête), « Le
+  plan, chaîne par chaîne » (l'explication, les changements, le budget,
+  les suggestions, les planches non servies), les plis des objectifs, de
+  la pluie mesurée et de la météo (lignes de F460), « Jours de la semaine,
+  un par un » (ancre `weather` : les tuiles et le tableau des jours),
+  l'écart du prévu, « Réglages de la semaine » (ancre
+  `reglages-de-la-page` : les réglages du planning, les heures où l'on
+  n'arrose pas, le seuil minimal de planification, venu du pli du bas des
+  besoins). Toute ancre du relevé ouvre ses plis (`AnchoredFold`) ; Chrome
+  déplie lui-même les plis qui contiennent la cible avant React : l'attribut
+  `open` diffère alors du serveur, sans erreur (`suppressHydrationWarning`).
+  Les boutons des blocs des besoins gardent leur dessin dans la section du
+  plan (`planning.css`) ; sans la case Planning, la vue garde le même
+  cadre.
+- **F930** — **L'écart du prévu à la demande** (3.4, promesse de F918) : le
+  chargeur de la page ne le lit plus ; sa section le lit à la première
+  ouverture de son pli, par la personne ou par une ancre
+  (`readAppliedWaterGapAction` : la personne de la session, la case
+  Planning, la saison du jour). La section existe pour une ferme qui a
+  coché le planning, la saison du jour ; avant la lecture, sa ligne dit ce
+  qu'elle montrera ; sans signal, « Aucune planche ne s'écarte du prévu ».
+  Le bloc « L'eau apportée s'écarte du prévu » ne paraît toujours qu'avec
+  un signal (F735). Une lecture échouée le dit et se relit.
+- **F931** — **Mesures** (à 390 px, parcours P67, sur une ferme neuve,
+  toutes cases cochées, quatre jardins, deux créneaux à valider) : le
+  premier niveau fait 1 590 px (budget 1 700, tenu ; maquette 1 280) ; la
+  phrase est à 383 px du haut (400, tenu) ; 16 choses à toucher (24,
+  tenu). La barre est à 621 px et le premier « Valider » à 1 123 px :
+  400 et 900 visés, **non tenus**, dit comme au lot J. La ferme neuve
+  porte « À finir » au-dessus de la page et « Calcul approximatif » (sa
+  pluie réelle manque, 152 px) au-dessus du bilan, dont les trois
+  chiffres font 242 px. P67 fixe chaque borne sur la mesure (barre 680,
+  premier « Valider » 1 180, la phrase d'un autre jour pouvant prendre
+  une ligne). « Le détail » : 100 px replié, 11 818 px déplié. Sur la
+  ferme des parcours, chargée par les parcours d'avant (des créneaux
+  chaque jour), le premier niveau faisait 3 401 px : la borne vaut pour le
+  cas du contrat. La page entière : 3 935 → 2 846 px (P40, la suite
+  jouée jusqu'à lui ; borne 3 300). Sur la CI, toute la suite jouée avant
+  P40, 3 856 px : les créneaux laissés par les parcours d'avant allongent
+  « Jour par jour » ; la borne est portée à 4 250 (10 %). Temps du serveur (en local, 20 ms par
+  lecture, deuxième passage, comme la PR 1) : « La semaine » 341 ms en
+  médiane (322 à 351 ms, 62 lectures ; PR 1 : 359 ms, 68), « Les
+  cumuls » 116 ms (14) ; budget 394 ms, tenu. La ligne « Calcul
+  approximatif », les irrigations relues après un geste et l'écart du
+  prévu se lisent après l'affichage, hors de ce temps.
+- **F932** — **Les tests et les parcours** : nouveaux,
+  `tests/simplification-s4-premier-niveau.test.ts` (titre, phrase, bilan,
+  jours, jardins, détail, la même valeur qu'« Aujourd'hui ») et
+  `tests/db/simplification-s4-semaine.test.ts` (les irrigations de la
+  semaine, à deux fermes) ; P67 (le lundi matin sur « Semaine »).
+  Parcours repris : P7, P10, P12, P13, P15, P26, P28, P30, P31, P32,
+  P40, P41, P52, P56, P57, P61 ; P1, P8 et P35 suivent par les aides
+  communes (`ouvrirLesPlisAutour` : un bloc rangé dans « Le détail »
+  s'ouvre avec ses plis, comme le fait une personne). Trouvés en
+  chemin : une colonne du détail qui s'élargissait pour un besoin manuel
+  (2 px de débordement à 390 px, P56) et un encadré d'attention vide
+  quand le plan n'a pas de pénurie, tous deux corrigés. Contre-épreuve :
+  un chiffre du bilan changé, la pluie annoncée dite mesurée, un jour
+  calme retiré, « pris au bassin » écrit, l'écart du prévu relu à
+  l'ouverture de la page font chacun échouer un test ; une ancre qui
+  n'ouvre plus son pli fait échouer P66, « Valider » montré pour une
+  semaine passée fait échouer P67. V11, de la démonstration, suit après
+  coup : il ouvrait « Planning de la semaine » et lisait le bloc de
+  l'écart du prévu au premier niveau ; il ouvre « Semaine » par l'ancre de
+  sa section (`#ecart-du-prevu`), qui ouvre les plis et lit l'écart. Oubli
+  de la PR (la suite de la démonstration n'y avait pas été jouée en
+  entier), relevé en local sur la pile complète.
 
 ## D-339 — Météo multi-modèles : le modèle de prévision se choisit par ferme
 
