@@ -3,6 +3,8 @@ import { millimetersNumber, volumeText } from './display-numbers.ts';
 import type { EquipmentKind } from './irrigation-domain.ts';
 import type { IrrigationCoverageResult } from './irrigation-coverage.ts';
 import { EQUIPMENT_KIND_LABELS } from './planning/presentation.ts';
+import { timeText } from './today/today-irrigations.ts';
+import { farmDateKey } from './today/today-text.ts';
 import { cubicMetersFromLiters, millisecondsFromMinutes, millisecondsFromSeconds, MINUTES_PER_HOUR, minutesFromSeconds } from './units.ts';
 
 /**
@@ -200,6 +202,16 @@ export function resultSentenceText(sentence: ResultSentence): string | null {
 export function endClockText(now: Date, durationSeconds: number | null): string | null {
   if (durationSeconds === null || !Number.isFinite(durationSeconds) || durationSeconds <= 0) return null;
   return clockText(new Date(now.getTime() + millisecondsFromSeconds(durationSeconds)));
+}
+
+/**
+ * La fin estimée d'un arrosage en cours, sur sa carte d'« Arroser ou noter »
+ * (budget de hauteur tenu, D-337, F984) : les mots de la carte
+ * d'« Aujourd'hui » (« fin prévue à 13 h 50 »), l'heure seule le jour même,
+ * le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »). À l'heure de la ferme.
+ */
+export function runningEndText(endAt: string, now: Date): string {
+  return timeText(endAt, farmDateKey(now));
 }
 
 export type StartButton = {

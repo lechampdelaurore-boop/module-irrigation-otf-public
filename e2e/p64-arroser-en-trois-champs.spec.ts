@@ -17,10 +17,10 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLesReglagesDeLaPag
  * - Deux matériels : rien de choisi (« Choisissez où arroser. ») ; chaque
  *   ligne de « Où ? » dit son type et ses planches. La hauteur du premier
  *   bloc est mesurée, sans et avec un arrosage en cours (PR 3, section 7) :
- *   sous 400 px au téléphone sans arrosage en cours, tenu ; sous 700 px avec,
- *   non tenu (F910) : la carte de l'arrosage en cours, raccourcie au
- *   téléphone (F909), le met vers 800 px avec le nom long d'un parcours ; la
- *   borne de 820 px garde ce gain.
+ *   sous 400 px au téléphone sans arrosage en cours ; sous 700 px avec,
+ *   tenu depuis D-337 (F983, F984) : la carte de l'arrosage en cours,
+ *   rangée plus serré au téléphone, le met vers 650 px avec le nom long d'un
+ *   parcours (800 px avant, F910).
  * - Trois touches, sans clavier : la case ronde, « + » (30 min), « Démarrer ·
  *   fin vers … » ; la phrase du résultat dit 5 mm et 113 L ; la réponse sous
  *   le bouton, l'arrosage en cours en tête de page, le formulaire vidé.
@@ -139,8 +139,8 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await attendreLaPagePrete(page, 'arrosages');
   const ouAvecArrosage = await hautDuPremierBloc(page);
   testInfo.annotations.push({ type: 'mesure', description: `« 1. Où ? » à ${ouAvecArrosage} px du haut de la page (${testInfo.project.name}), avec un arrosage en cours` });
-  // Budget de 700 px non tenu (F910) : la borne garde le gain de la carte raccourcie (1 011 → 800 px).
-  if (telephone) expect(ouAvecArrosage, '« 1. Où ? » sous 820 px, avec un arrosage en cours').toBeLessThan(820);
+  // Le budget de 700 px, tenu depuis D-337 (F983, F984 ; 1 011 → 800 → environ 650 px).
+  if (telephone) expect(ouAvecArrosage, '« 1. Où ? » sous 700 px, avec un arrosage en cours').toBeLessThan(700);
   await verifierLEtape(page, journal, 'trois touches, la réponse sous le bouton');
 
   // Une pompe trop petite, habituelle du matériel B : dite dans la phrase, son dépassement au premier niveau.
