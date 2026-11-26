@@ -3,6 +3,7 @@
 import { useId, useState, type MouseEvent, type ReactNode } from 'react';
 import type { WeekGardenLine, WeekGardens } from '@/lib/domain/semaine/week-gardens';
 import type { WeekBilan } from '@/lib/domain/semaine/week-sentence';
+import { isOnScreen } from '../shell/on-screen';
 
 /**
  * Le bilan de la semaine (simplification, lot S4, PR 2,
@@ -97,7 +98,7 @@ export function openGoals(event: MouseEvent<HTMLAnchorElement>, href: string) {
   const focusWhenShown = () => {
     const fold = document.getElementById(id);
     const field = fold?.querySelector<HTMLElement>(GOAL_FIELD) ?? fold?.querySelector<HTMLElement>(FIRST_FIELD) ?? null;
-    if (field && field.checkVisibility()) {
+    if (field && isOnScreen(field)) {
       field.focus();
       if (document.activeElement === field) return;
     }
