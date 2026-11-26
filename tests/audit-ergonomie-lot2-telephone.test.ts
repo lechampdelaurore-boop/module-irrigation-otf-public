@@ -26,7 +26,7 @@ const ALL: FeatureId[] = [...FEATURE_IDS];
 
 test('F6 réécrite par S3 : « Aujourd’hui » en tête de la barre, plus de « Plus », chaque page joignable', () => {
   const menu = menuPages(ALL);
-  assert.equal(menu.length, 13, 'les douze pages et « Ma ferme » (lot S3, PR 1)');
+  assert.equal(menu.length, 14, 'les douze pages, « Semaine » (lot S4, PR 1) et « Ma ferme » (lot S3, PR 1)');
   const bar = phoneBar(menu, 'arrosages', true);
   assert.deepEqual(bar.map((item) => (item.kind === 'plus' ? 'plus' : item.place)), ['aujourdhui', 'semaine', 'plus', 'ma-ferme']);
   // Un menu de cinq pages ou moins ne tient plus entier dans la barre : la barre montre ses endroits.

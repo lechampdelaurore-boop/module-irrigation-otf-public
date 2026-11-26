@@ -9,7 +9,7 @@ import {
   TITRES_DES_PAGES,
   verifierCibleTactile,
   verifierLEtape,
-  type PageDuModule,
+  type PageDuMenu,
 } from './support/parcours.ts';
 
 /**
@@ -31,7 +31,7 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
   const telephone = testInfo.project.name === 'telephone';
 
   // Points 7 et 9 : le titre de l'onglet, et la saison là où elle change la page.
-  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuMenu[]) {
     await attendreLaPageIrrigation(page, cible);
     await expect(page).toHaveTitle(pageDocumentTitle(TITRES_DES_PAGES[cible]));
     // Sous le titre à l'ordinateur, dans la ligne du titre au téléphone (lot 2, F7).

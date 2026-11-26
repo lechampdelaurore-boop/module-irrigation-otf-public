@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
+
+- **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
+  page, `/irrigation/semaine`. Sa vue « La semaine » montre, dans l'ordre
+  d'avant et sans rien changer, le planning puis les objectifs et besoins ;
+  sa vue « Les cumuls » est l'historique. Sous le titre, deux liens passent
+  d'une vue à l'autre sans recharger ; ils remplacent la bande « La
+  semaine ». La barre du bas et le menu de l'ordinateur ouvrent la page ;
+  le menu nomme ses deux vues. Les adresses du planning, des besoins et de
+  l'historique mènent à la page, avec leurs réglages d'adresse et leur
+  ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
+  coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
 
 - **« Arroser ou noter » plus court au téléphone pendant un arrosage**
@@ -188,6 +202,15 @@ source détaillée commit par commit.
   et « Plus d'options » (pompe, note, saisir en mm). Aucun code, aucun calcul
   ni aucune règle d'écriture changés ; les précautions restent au premier
   niveau. Ne touche pas l'écran de bienvenue du contrat 3.8 (lot S6).
+
+### Ajouté (simplifier l'usage du module, S4 : contrat de la semaine sur une page)
+
+- **Contrat du lot S4** (`docs/simplification-s4-contract.md`, D-327) : une
+  page « Semaine » réunit le planning, « Objectifs et besoins » et « Historique
+  et cumuls » en deux vues (la semaine, les cumuls) ; une phrase, trois chiffres,
+  les jours et les jardins au premier niveau, le reste derrière « Le détail ».
+  Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
+  adresses sont gardées.
 
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 

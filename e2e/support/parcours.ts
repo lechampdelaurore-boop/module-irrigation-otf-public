@@ -30,14 +30,13 @@ export function surveillerLaConsole(page: Page): JournalDeConsole {
  * audit ergonomique, lot 2, F1 ; simplification, lot S3, PR 1), dans l'ordre
  * du menu, celui des trois endroits depuis la PR 3 du lot S3 (Aujourd'hui,
  * Semaine, Ma ferme) : un parcours va à la page qui porte le bloc qu'il
- * éprouve.
+ * éprouve. Depuis le lot S4, « Semaine » réunit le planning, les besoins et
+ * l'historique (docs/simplification-s4-contract.md, section 3).
  */
 export const TITRES_DES_PAGES = {
   aujourdhui: 'Aujourd’hui',
   arrosages: 'Arrosages',
-  planning: 'Planning de la semaine',
-  besoins: 'Objectifs et besoins',
-  historique: 'Historique et cumuls',
+  semaine: 'Semaine',
   'ma-ferme': 'Ma ferme',
   materiel: 'Matériel et placement',
   ressources: 'Ressources et pompes',
@@ -48,7 +47,28 @@ export const TITRES_DES_PAGES = {
   reglages: 'Réglages',
 } as const;
 
-export type PageDuModule = keyof typeof TITRES_DES_PAGES;
+/** Une page du menu, celle dont le titre s'affiche. */
+export type PageDuMenu = keyof typeof TITRES_DES_PAGES;
+
+/**
+ * Les trois anciennes pages de la semaine (lot S4, section 3.3) : leurs
+ * adresses mènent à « Semaine », l'historique sur la vue « Les cumuls ». Un
+ * parcours qui les ouvre éprouve aussi la redirection.
+ */
+const VUE_DES_ANCIENNES_PAGES = { planning: 'La semaine', besoins: 'La semaine', historique: 'Les cumuls' } as const;
+
+/** Une page qu'un parcours ouvre : une page du menu, ou l'une des trois anciennes adresses de la semaine. */
+export type PageDuModule = PageDuMenu | keyof typeof VUE_DES_ANCIENNES_PAGES;
+
+/** La page qui s'affiche pour une page ouverte : « Semaine » pour les trois anciennes. */
+export function pageAffichee(cible: PageDuModule): PageDuMenu {
+  return cible in VUE_DES_ANCIENNES_PAGES ? 'semaine' : (cible as PageDuMenu);
+}
+
+/** Le titre qui s'affiche pour une page ouverte. */
+export function titreDeLaPage(cible: PageDuModule): string {
+  return TITRES_DES_PAGES[pageAffichee(cible)];
+}
 
 /**
  * Ouvre une page du module, attend son titre, rendu par le serveur, puis que
@@ -63,8 +83,11 @@ export async function attendreLaPageIrrigation(page: Page, cible: PageDuModule =
 
 /** Après un rechargement ou un lien suivi : le titre de la page, puis la page prête. */
 export async function attendreLaPagePrete(page: Page, cible: PageDuModule): Promise<void> {
-  await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES[cible] })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: titreDeLaPage(cible) })).toBeVisible();
   await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
+  // L'historique s'ouvre sur « Les cumuls » ; le planning et les besoins sur « La semaine » (lot S4, section 3.3).
+  if (cible === 'historique') await expect(page).toHaveURL(/[?&]vue=cumuls(&|#|$)/);
+  if (cible === 'planning' || cible === 'besoins') await expect(page).not.toHaveURL(/[?&]vue=cumuls(&|#|$)/);
 }
 
 /**
@@ -109,6 +132,7 @@ export async function ouvrirLeMenuDesPages(page: Page): Promise<Locator> {
 const ENDROIT_DES_PAGES: Record<PageDuModule, 'aujourdhui' | 'semaine' | 'ma-ferme'> = {
   aujourdhui: 'aujourdhui',
   arrosages: 'aujourdhui',
+  semaine: 'semaine',
   planning: 'semaine',
   besoins: 'semaine',
   historique: 'semaine',
@@ -122,38 +146,53 @@ const ENDROIT_DES_PAGES: Record<PageDuModule, 'aujourdhui' | 'semaine' | 'ma-fer
   reglages: 'ma-ferme',
 };
 
-/** La page d'une adresse du module : `/irrigation/planning?season=2026` → `planning`. */
-function pageDeLAdresse(adresse: string): PageDuModule {
+/** La page d'une adresse du module : `/irrigation/materiel?season=2026` → `materiel`. */
+function pageDeLAdresse(adresse: string): PageDuMenu {
   const id = new URL(adresse, 'http://module').pathname.replace(/^\/irrigation\//, '');
   if (!(id in TITRES_DES_PAGES)) throw new Error(`« ${adresse} » n’est pas une page du module`);
-  return id as PageDuModule;
+  return id as PageDuMenu;
 }
 
-/** Une page de la bande « La semaine », une fiche de « Ma ferme » ou « Tous les arrosages », sur la page ouverte. */
-function lienDeLEndroit(page: Page, cible: PageDuModule): Locator {
+/** La vue ouverte de « Semaine », d'après l'adresse de la page. */
+function vueOuverte(page: Page): 'La semaine' | 'Les cumuls' {
+  return new URL(page.url()).searchParams.get('vue') === 'cumuls' ? 'Les cumuls' : 'La semaine';
+}
+
+/** La vue d'une ancienne page de la semaine, dans le sélecteur de « Semaine » ou dans le menu de l'ordinateur. */
+function lienDeLaVue(conteneur: Locator, cible: keyof typeof VUE_DES_ANCIENNES_PAGES): Locator {
+  return conteneur.getByRole('link', { name: VUE_DES_ANCIENNES_PAGES[cible], exact: true });
+}
+
+/** Une fiche de « Ma ferme » ou « Tous les arrosages », sur la page ouverte. */
+function lienDeLEndroit(page: Page, cible: PageDuMenu): Locator {
   if (cible === 'arrosages') return page.locator('.today-all-irrigations').getByRole('link', { name: 'Tous les arrosages' });
-  if (ENDROIT_DES_PAGES[cible] === 'semaine') return page.getByRole('navigation', { name: 'La semaine' }).getByRole('link', { name: TITRES_DES_PAGES[cible], exact: true });
   return page.getByRole('navigation', { name: 'Les fiches de Ma ferme' }).getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[cible]} `) });
 }
 
 /**
  * Suit le chemin d'une page comme le maraîcher. À l'ordinateur, son lien du
- * menu de gauche. Au téléphone (S3, section 3), son endroit dans la barre du
- * bas puis, quand la page n'est pas celle où l'endroit mène, son onglet de la
- * bande « La semaine », sa fiche de « Ma ferme » ou « Tous les arrosages » :
+ * menu de gauche ; pour une ancienne page de la semaine, la vue de
+ * « Semaine » qui la porte quand le menu la nomme (S4-m), sinon le titre
+ * « Semaine ». Au téléphone (S3, section 3), son endroit dans la barre du bas
+ * puis, quand la page n'est pas celle où l'endroit mène, sa fiche de « Ma
+ * ferme », « Tous les arrosages » ou la vue de « Semaine » de son sélecteur :
  * deux touches au plus, une seule depuis une page du même endroit qui porte
  * déjà le lien. Rend le nombre de touches.
  */
 export async function allerALaPage(page: Page, cible: PageDuModule): Promise<number> {
   const barre = page.getByRole('navigation', { name: 'Pages principales' });
+  const affichee = pageAffichee(cible);
   if (!(await barre.isVisible())) {
+    const menu = page.getByRole('navigation', { name: 'Pages du module' });
+    const vue = cible in VUE_DES_ANCIENNES_PAGES ? lienDeLaVue(menu, cible as keyof typeof VUE_DES_ANCIENNES_PAGES) : null;
     // « Aujourd'hui » peut porter le nombre de sa pastille dans son nom.
-    await page.getByRole('navigation', { name: 'Pages du module' }).getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[cible]}(,|$)`) }).click();
+    await (vue && await vue.count() > 0 ? vue : menu.getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[affichee]}(,|$)`) })).click();
     await attendreLaPagePrete(page, cible);
     return 1;
   }
-  const lienDirect = lienDeLEndroit(page, cible);
-  if (cible !== 'aujourdhui' && cible !== 'ma-ferme' && await lienDirect.isVisible()) {
+  if (cible !== affichee) return allerALaVue(page, barre, cible as keyof typeof VUE_DES_ANCIENNES_PAGES);
+  const lienDirect = affichee === 'semaine' ? null : lienDeLEndroit(page, affichee);
+  if (lienDirect && cible !== 'aujourdhui' && cible !== 'ma-ferme' && await lienDirect.isVisible()) {
     await lienDirect.click();
     await attendreLaPagePrete(page, cible);
     return 1;
@@ -167,7 +206,22 @@ export async function allerALaPage(page: Page, cible: PageDuModule): Promise<num
     touches += 1;
   }
   if (entree === cible) return touches;
-  await lienDeLEndroit(page, cible).click();
+  await lienDeLEndroit(page, affichee).click();
+  await attendreLaPagePrete(page, cible);
+  return touches + 1;
+}
+
+/** Au téléphone, une ancienne page de la semaine : « Semaine » dans la barre, puis sa vue dans le sélecteur quand elle n'est pas ouverte. */
+async function allerALaVue(page: Page, barre: Locator, cible: keyof typeof VUE_DES_ANCIENNES_PAGES): Promise<number> {
+  let touches = 0;
+  const endroit = barre.locator('li[data-place="semaine"]').getByRole('link');
+  if ((await endroit.getAttribute('aria-current')) !== 'page') {
+    await endroit.click();
+    await attendreLaPagePrete(page, 'semaine');
+    touches += 1;
+  }
+  if (vueOuverte(page) === VUE_DES_ANCIENNES_PAGES[cible]) return touches;
+  await lienDeLaVue(page.getByRole('navigation', { name: 'Vues de la semaine' }), cible).click();
   await attendreLaPagePrete(page, cible);
   return touches + 1;
 }
@@ -175,14 +229,14 @@ export async function allerALaPage(page: Page, cible: PageDuModule): Promise<num
 /**
  * Les pages qu'on trouve au téléphone par les trois endroits : chaque entrée
  * de la barre du bas, puis, sur la page où elle mène, « Tous les arrosages »,
- * la bande « La semaine » ou les fiches de « Ma ferme ». Le relevé se fait dans
- * un autre onglet de la même session, à la même largeur : le parcours
+ * les vues de « Semaine » ou les fiches de « Ma ferme ». Le relevé se fait
+ * dans un autre onglet de la même session, à la même largeur : le parcours
  * retrouve sa page telle qu'il l'a laissée.
  */
-async function pagesParLesEndroits(page: Page): Promise<Set<PageDuModule>> {
+async function pagesParLesEndroits(page: Page): Promise<Set<PageDuMenu>> {
   const adresses = await page.getByRole('navigation', { name: 'Pages principales' }).locator('li[data-place] a')
     .evaluateAll((liens) => liens.map((lien) => lien.getAttribute('href') ?? ''));
-  const trouvees = new Set<PageDuModule>();
+  const trouvees = new Set<PageDuMenu>();
   const onglet = await page.context().newPage();
   try {
     for (const adresse of adresses) {
@@ -194,7 +248,7 @@ async function pagesParLesEndroits(page: Page): Promise<Set<PageDuModule>> {
         ? onglet.locator('.today-all-irrigations a')
         : entree === 'ma-ferme'
           ? onglet.getByRole('navigation', { name: 'Les fiches de Ma ferme' }).getByRole('link')
-          : onglet.getByRole('navigation', { name: 'La semaine' }).getByRole('link');
+          : onglet.getByRole('navigation', { name: 'Vues de la semaine' }).getByRole('link');
       for (const cible of await chemins.evaluateAll((liens) => liens.map((lien) => lien.getAttribute('href') ?? ''))) trouvees.add(pageDeLAdresse(cible));
     }
   } finally {
@@ -212,21 +266,21 @@ export function sansLaPastille(nom: string | null): string | null {
 }
 
 /**
- * Le texte affiché de chaque lien du menu de l'ordinateur, dans l'ordre :
- * « Aujourd'hui » peut porter le nombre de sa pastille ; le titre « Semaine »,
- * un lien vers sa première page, précède ses pages (S3, PR 3, section 6) ;
- * « Ma ferme » est le titre de son endroit.
+ * Le texte affiché de chaque lien du menu de l'ordinateur, dans l'ordre, pour
+ * une ferme qui a tout coché : « Aujourd'hui » peut porter le nombre de sa
+ * pastille ; le titre « Semaine », un lien vers sa page, précède ses deux
+ * vues (S4-m) ; « Ma ferme » est le titre de son endroit.
  */
 export const TEXTES_DES_LIENS_DU_MENU: (string | RegExp)[] = Object.values(TITRES_DES_PAGES)
   // L'encart de « Aujourd'hui » dit aussi « Tableau de bord », et sa pastille quand elle a un nombre.
   .flatMap((titre): (string | RegExp)[] => (titre === TITRES_DES_PAGES.aujourdhui
     ? [/^Aujourd’hui\s*Tableau de bord\s*\d*$/]
-    : titre === TITRES_DES_PAGES.planning ? ['Semaine', titre] : [titre]));
+    : titre === TITRES_DES_PAGES.semaine ? [titre, 'La semaine', 'Les cumuls'] : [titre]));
 
 /**
  * Les noms des pages du menu, dans l'ordre. À l'ordinateur, la page où mène
- * chaque lien, une fois : le titre « Semaine » mène à sa première page, que
- * sa liste redit (S3, PR 3) ; les textes eux-mêmes, P28 les lit
+ * chaque lien, une fois : le titre « Semaine » mène à sa page, que ses vues
+ * redisent (S4-m) ; les textes eux-mêmes, P28 les lit
  * (`TEXTES_DES_LIENS_DU_MENU`). Au téléphone, les pages trouvées par les
  * trois endroits, dans l'ordre du menu de l'ordinateur (S3, PR 2).
  */
@@ -234,7 +288,7 @@ export async function nomsDesPagesDuMenu(page: Page): Promise<string[]> {
   const menu = await ouvrirLeMenuDesPages(page);
   if ((await menu.getAttribute('aria-label')) === 'Pages principales') {
     const trouvees = await pagesParLesEndroits(page);
-    return (Object.keys(TITRES_DES_PAGES) as PageDuModule[]).filter((id) => trouvees.has(id)).map((id) => TITRES_DES_PAGES[id]);
+    return (Object.keys(TITRES_DES_PAGES) as PageDuMenu[]).filter((id) => trouvees.has(id)).map((id) => TITRES_DES_PAGES[id]);
   }
   const adresses = await menu.getByRole('link').evaluateAll((liens) => liens.map((lien) => lien.getAttribute('href') ?? ''));
   return [...new Set(adresses.map(pageDeLAdresse))].map((id) => TITRES_DES_PAGES[id]);

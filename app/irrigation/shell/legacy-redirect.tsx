@@ -8,7 +8,8 @@ import { legacyRedirect, pageHref } from '@/lib/domain/features/pages';
  * `/irrigation` seule (3.8, docs/feature-selection-contract.md, section 5,
  * P10 et P14) : conduit à la page d'arrivée (« Aujourd'hui » quand elle
  * existe, audit ergonomique, lot 2, F1), ou, pour une ancienne
- * adresse de notification, à la page qui porte le bloc que désigne son ancre.
+ * adresse de notification, à la page qui porte le bloc que désigne son ancre
+ * (« Semaine » pour ceux du planning, des besoins et de l'historique, lot S4).
  * L'ancre ne parvient jamais au serveur : la conduite se fait ici.
  */
 export function LegacyRedirect({
@@ -24,7 +25,7 @@ export function LegacyRedirect({
 }) {
   useEffect(() => {
     const target = legacyRedirect(window.location.hash, enabled);
-    window.location.replace(pageHref(target.page, { season, week, refresh, absent: target.notEnabled }, window.location.hash || undefined));
+    window.location.replace(pageHref(target.page, { season, week, refresh, absent: target.notEnabled, view: target.view }, window.location.hash || undefined));
   }, [enabled, season, week, refresh]);
 
   return (
