@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (météo multi-modèles, contrat)
+
+- **Contrat du choix du modèle de prévision par ferme** (D-338,
+  `docs/weather-models-contract.md` v0.1, roadmap 6 quindecies) : écrit
+  sans code ; « Automatique » reste le défaut, un seul modèle Open-Meteo par
+  ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
+  avant le code. Rien ne change pour l'instant.
+
 ### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
 
 - **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page
