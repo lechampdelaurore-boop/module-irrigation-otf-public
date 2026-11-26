@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S3, PR 2 sur 4 : la barre du bas, le
+  « + » et le chemin de retour, codée le 25 novembre 2026** (D-331, F876 à
+  F884 ; contrat, sections 3.3, 3.4, 4, 4.1 et 5.1), en Opus 5.5 · Très
+  élevé, sur la branche de la PR 1. Jusqu'à 980 px, la barre du bas porte
+  Aujourd'hui, Semaine, le « + » et Ma ferme ; « Plus » n'existe plus. Le
+  « + » ouvre « Que voulez-vous faire ? » : arroser maintenant, noter la
+  pluie dans la feuille même, noter un arrosage déjà fait. La bande « La
+  semaine », le retour « ‹ Ma ferme » et « Tous les arrosages » relient les
+  pages d'un endroit ; chaque page est à deux touches au plus. Le menu de
+  l'ordinateur ne change qu'à la PR 3. Tests sur les 235 choix de cases,
+  parcours P63 aux deux largeurs, mesures à 390 px : voir la PR. L'essai des
+  cinq tâches avec le premier volontaire est conseillé avant sa mise en
+  ligne (S3-m), jamais bloquant.
 - **Simplifier l'usage du module, S3, PR 1 sur 4 : le rangement et « Ma
   ferme », codée le 25 novembre 2026** (D-331, F868 à F875 ; contrat,
   sections 3 et 5), en Opus 5.5 · Très élevé, sur la branche de la PR 5 de
@@ -24,7 +37,12 @@ registres, elle y renvoie.
   Réglages ; la barre du téléphone et le menu de l'ordinateur changent aux
   PR 2 et 3. Tests du domaine sur les 235 choix de cases valides, parcours
   P63 aux deux largeurs, contre-épreuve de quatorze altérations. Contrôles :
-  voir la PR. Ses PR se fusionnent après la dernière de S2.
+  voir la PR. Ses PR se fusionnent après la dernière de S2. **En ligne,
+  consignée par la PR 2** : #220 fusionnée le 25 novembre à 23 h 53, déployée
+  le 26 novembre à 3 h 17, run 45716978089 vérifié job par job (les cinq
+  jobs verts). Les parcours de main, joués à minuit, avaient échoué sur P37
+  et P12, sensibles à l'heure (le même code vert sur la PR à 23 h 52) : une
+  seule relance, à 2 h 37, hors de la fenêtre de minuit à 2 h 30.
 - **Simplifier l'usage du module, S2, PR 5 sur 5 : la page à l'essentiel,
   codée le 25 novembre 2026** (D-330, F860 à F867 ; contrat, sections 8 et
   9), en Opus 5.5 · Élevé, sur la branche de la PR 4 : **le code du lot S2

@@ -22,8 +22,8 @@ import {
  * à l'ordinateur, « Aujourd'hui » est détaché en tête du menu, dans son
  * encart « Tableau de bord », et les autres pages se rangent sous « Arroser »,
  * « Équiper » et « Surveiller », Réglages à part, dans l'ordre de toujours ;
- * au téléphone, son entrée de la barre du bas est le bouton rond, et la
- * feuille « Plus » garde l'encart et les groupes. La page dit la date, les
+ * au téléphone, son endroit ouvre la barre du bas, et le rond du centre est
+ * le « + » (simplification, lot S3, PR 2, D-331). La page dit la date, les
  * chiffres de la semaine et ses pastilles ; une pastille mène à son bloc.
  * Les quatre tuiles de la semaine sont des liens, leur mot d'action écrit
  * (docs/aujourdhui-liens-contract.md, L1) : « Objectif de la semaine » ouvre
@@ -140,37 +140,35 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
 
   const menu = await ouvrirLeMenuDesPages(page);
   if (telephone) {
-    // Au téléphone : le bouton rond de la barre, la page ouverte, puis la feuille « Plus ».
-    const barre = page.getByRole('navigation', { name: 'Pages principales' });
-    const rond = barre.getByRole('link').first();
-    await expect(rond).toHaveAccessibleName(new RegExp(`^${TITRES_DES_PAGES.aujourdhui}`));
-    await expect(rond.locator('.menu-home-badge')).toBeVisible();
-    await verifierCibleTactile(rond, 'Le bouton rond « Aujourd’hui »');
-    // Il dépasse de la barre : son rond monte au-dessus d'elle.
-    const hautDuRond = await rond.locator('.menu-home-badge').evaluate((element) => element.getBoundingClientRect().top);
-    const hautDeLaBarre = await barre.evaluate((element) => element.getBoundingClientRect().top);
+    // Au téléphone (simplification, lot S3, PR 2, D-331) : « Aujourd'hui », la page ouverte, puis le « + » rond au
+    // centre de la barre, à la place de l'ancien bouton rond ; il dépasse de la barre. Ni encart ni groupes : ils
+    // sont au menu de l'ordinateur.
+    const aujourdhui = menu.getByRole('link').first();
+    await expect(aujourdhui).toHaveAccessibleName(new RegExp(`^${TITRES_DES_PAGES.aujourdhui}`));
+    await expect(aujourdhui).toHaveAttribute('aria-current', 'page');
+    const plus = menu.getByRole('button', { name: 'Arroser ou noter' });
+    await verifierCibleTactile(plus, 'Le « + » de la barre du bas');
+    const hautDuRond = await plus.locator('.phone-bar-plus-badge').evaluate((element) => element.getBoundingClientRect().top);
+    const hautDeLaBarre = await menu.evaluate((element) => element.getBoundingClientRect().top);
     expect(hautDuRond).toBeLessThan(hautDeLaBarre);
-  }
-  // L'encart détaché, en tête : son nom, « Tableau de bord » ; puis les trois groupes titrés, Réglages à part,
-  // « Ma ferme » au-dessus d'elle (simplification, lot S3, PR 1, D-331).
-  const encart = menu.locator('a.menu-home');
-  await expect(encart).toHaveCount(1);
-  await expect(encart).toContainText('Tableau de bord');
-  await expect(encart).toHaveAttribute('aria-current', 'page');
-  await expect(menu.locator('.menu-group-title')).toHaveText(GROUPES);
-  const aPart = menu.locator('.menu-settings-item').getByRole('link');
-  await expect(aPart).toHaveCount(2);
-  await expect(aPart.nth(0)).toHaveAccessibleName(TITRES_DES_PAGES['ma-ferme']);
-  await expect(aPart.nth(1)).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
-  if (!telephone) {
+    await expect(page.getByRole('navigation', { name: 'Pages du module' })).toBeHidden();
+  } else {
+    // L'encart détaché, en tête : son nom, « Tableau de bord » ; puis les trois groupes titrés, Réglages à part,
+    // « Ma ferme » au-dessus d'elle (simplification, lot S3, PR 1, D-331).
+    const encart = menu.locator('a.menu-home');
+    await expect(encart).toHaveCount(1);
+    await expect(encart).toContainText('Tableau de bord');
+    await expect(encart).toHaveAttribute('aria-current', 'page');
+    await expect(menu.locator('.menu-group-title')).toHaveText(GROUPES);
+    const aPart = menu.locator('.menu-settings-item').getByRole('link');
+    await expect(aPart).toHaveCount(2);
+    await expect(aPart.nth(0)).toHaveAccessibleName(TITRES_DES_PAGES['ma-ferme']);
+    await expect(aPart.nth(1)).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
     // L'encart est au-dessus du premier groupe, et ne prend pas le vert plein d'une page ouverte.
     const basDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().bottom);
     const hautDuGroupe = await menu.locator('.menu-group-title').first().evaluate((element) => element.getBoundingClientRect().top);
     expect(basDeLEncart).toBeLessThan(hautDuGroupe);
     expect(await encart.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(255, 255, 255)');
-  } else {
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
   }
   await verifierLEtape(page, journal, 'menu détaché et groupes');
 

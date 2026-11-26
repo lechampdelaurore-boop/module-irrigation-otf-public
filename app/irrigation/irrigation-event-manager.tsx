@@ -27,7 +27,7 @@ import type { ClosedPlacementPose } from '@/db/equipment-placement-poses';
 import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import { placementsOpenAt, plannedIrrigationSignal } from '@/lib/domain/equipment-pose-presentation';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
-import { PLANNED_IRRIGATION_FORM_REQUESTED } from '@/lib/domain/feasibility-notifications';
+import { IRRIGATION_FORM_REQUESTED, PLANNED_IRRIGATION_FORM_REQUESTED } from '@/lib/domain/feasibility-notifications';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import type { Bed } from '@/lib/domain/domain';
 import { localDateTimeInputValue } from '@/lib/domain/irrigation-timer';
@@ -318,14 +318,21 @@ export function IrrigationEventManager({
   };
 
   useEffect(() => {
-    // Le planning (3.6) envoie ici le maraîcher qui veut ajouter un créneau de sa main.
-    const openPlannedForm = () => {
+    // Le planning (3.6) envoie ici le maraîcher qui veut ajouter un créneau de sa main ; le « + » de la barre du bas (S3), « Irriguer maintenant » ou « Déjà réalisée ».
+    const openForm = (kind: unknown) => {
+      if (kind !== 'planned' && kind !== 'running' && kind !== 'completed') return;
       setEditingEventEquipmentId(null);
-      setCreationKind('planned');
+      setCreationKind(kind);
       document.querySelector('.irrigation-creation-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
+    const openPlannedForm = () => openForm('planned');
+    const openRequestedForm = (event: Event) => openForm((event as CustomEvent<unknown>).detail);
     window.addEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
-    return () => window.removeEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
+    window.addEventListener(IRRIGATION_FORM_REQUESTED, openRequestedForm);
+    return () => {
+      window.removeEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
+      window.removeEventListener(IRRIGATION_FORM_REQUESTED, openRequestedForm);
+    };
   }, []);
 
   const editPlanned = (event: IrrigationEventRecord) => {

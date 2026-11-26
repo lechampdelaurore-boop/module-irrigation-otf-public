@@ -87,3 +87,24 @@ export function farmPlaces(selection: FeatureSelection): PlaceId[] {
 export function farmCardPages(selection: FeatureSelection): FarmCardPage[] {
   return FARM_CARD_PAGES.filter((page) => pageEnabled(page, selection));
 }
+
+/**
+ * Les pages d'un endroit présentes dans un menu (`menuPages`, les pages que
+ * la ferme a), dans l'ordre de l'endroit. La barre du bas, la bande de la
+ * semaine et la page introuvable n'ont que le menu ; il dit les mêmes pages
+ * que `enabledPlacePages` (le test des 235 choix de cases le vérifie).
+ */
+export function menuPlacePages(place: PlaceId, menu: readonly IrrigationPageId[]): IrrigationPageId[] {
+  return PLACES[place].pages.filter((page) => menu.includes(page));
+}
+
+/**
+ * La marque d'un endroit pour la page ouverte (précision S3-e) : `page`
+ * quand la page ouverte est l'entrée même de l'endroit, `true` quand c'est
+ * une autre page de l'endroit, `null` sinon. Le lecteur d'écran et la marque
+ * visuelle disent la même chose.
+ */
+export function placeMark(place: PlaceId, entry: IrrigationPageId, current: IrrigationPageId | null): 'page' | 'true' | null {
+  if (current === null || placeOfPage(current) !== place) return null;
+  return current === entry ? 'page' : 'true';
+}

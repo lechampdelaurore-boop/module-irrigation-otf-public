@@ -5,6 +5,25 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S3, PR 2 : la barre du bas, le « + » et le chemin de retour)
+
+- **Au téléphone, la barre du bas porte les trois endroits et le « + »**
+  (D-331, F876 à F884) : Aujourd'hui, Semaine, le « + » rond au centre et
+  Ma ferme, l'endroit de la page ouverte marqué. « Plus » et sa liste des
+  pages disparaissent : chaque page est à deux touches au plus, par son
+  endroit puis une fiche de « Ma ferme », la bande « La semaine » ou « Tous
+  les arrosages ».
+- **Le « + », « Que voulez-vous faire ? »** : « Arroser maintenant » et
+  « Noter un arrosage déjà fait » ouvrent « Arrosages » sur leur
+  formulaire ; « Noter la pluie » se fait dans la feuille même, sans
+  changer de page, et la page se relit à la fermeture pour montrer la
+  pluie. Rien ne s'enregistre sans un appui.
+- **La bande « La semaine »** (Planning, Besoins, Historique) sous le titre
+  des trois pages de la semaine, **le retour « ‹ Ma ferme »** sur les pages
+  de « Ma ferme », **« Tous les arrosages »** en pied de « Votre journée ».
+  À l'ordinateur, le menu de gauche ne change pas encore. Aucune adresse ne
+  change, rien n'est retiré.
+
 ### Ajouté (simplifier l'usage du module, S3, PR 1 : le rangement et « Ma ferme »)
 
 - **La page « Ma ferme »** (D-331, F868 à F875), à `/irrigation/ma-ferme` :

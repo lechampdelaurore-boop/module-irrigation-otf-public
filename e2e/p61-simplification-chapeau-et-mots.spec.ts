@@ -130,6 +130,13 @@ test('l’explication fixe de « Réserve du sol » est dans son « ? », plus e
  * bandeau du choix des fonctionnalités fermé, le 25 novembre 2026. Visé :
  * 400 px au plus, sauf « Aujourd'hui », dont la carte reste du ressort de S2 :
  * le gain y est la ligne de lecture retirée (44 px).
+ *
+ * Bornes redites par la simplification S3, PR 2 (contrat S3, sections 5.1
+ * et 11 ; D-331), mesurées avant → après à 390 px : la bande « La semaine »
+ * (44 px et sa marge) descend de 58 px les trois pages de la semaine ; le
+ * retour « ‹ Ma ferme » passe la saison sous le titre quand le titre, le
+ * « ? » et la saison ne tiennent plus sur une ligne (38 px, Besoin par
+ * culture et Alertes cultures ; Matériel y était déjà).
  */
 const PREMIERS_BLOCS: Record<PageDuModule, { bloc: string; budget: number }> = {
   // 152 → 108 px : la ligne de lecture retirée.
@@ -137,15 +144,16 @@ const PREMIERS_BLOCS: Record<PageDuModule, { bloc: string; budget: number }> = {
   // 393 → 287 px : la ligne de lecture, la saison et la phrase d'explication. Le premier geste :
   // « Recevoir les alertes sur cet appareil » quand le navigateur n'a pas encore répondu, sinon le formulaire.
   arrosages: { bloc: '.irrigation-events-section :is(.irrigation-notification-readiness, .irrigation-creation-panel)', budget: 400 },
-  // 309 → 203 px.
+  // 309 → 203 px ; 261 px avec la bande de la semaine (S3, PR 2).
   planning: { bloc: '.planning-heading-actions', budget: 400 },
   // 470 → 391 px : la ligne de résumé de la semaine, sous la navigation des semaines.
-  besoins: { bloc: '.water-summary-line', budget: 400 },
-  // 283 → 203 px.
+  // S3, PR 2 : 449 px avec la bande de la semaine ; borne redite à 460 px avec sa mesure.
+  besoins: { bloc: '.water-summary-line', budget: 460 },
+  // 283 → 203 px ; 261 px avec la bande de la semaine (S3, PR 2).
   historique: { bloc: '.history-view-tabs', budget: 400 },
   // 417 → 270 px.
   sol: { bloc: '.soil-gauge', budget: 400 },
-  // 316 → 169 px.
+  // 316 → 169 px ; 207 px avec le retour, la saison passée sous le titre (S3, PR 2).
   cultures: { bloc: '.crop-coefficients-part', budget: 400 },
   // 212 → 168 px : le choix de la parcelle.
   materiel: { bloc: '.parcel-control select', budget: 400 },
@@ -153,7 +161,7 @@ const PREMIERS_BLOCS: Record<PageDuModule, { bloc: string; budget: number }> = {
   ressources: { bloc: '.water-assets-columns', budget: 400 },
   // 166 → 122 px : « Ajouter une alerte ».
   'alertes-meteo': { bloc: '.weather-alerts-panel .water-panel-title > button', budget: 400 },
-  // 395 → 315 px : le premier pli, « Réglages ».
+  // 395 → 315 px : le premier pli, « Réglages » ; 353 px avec le retour, la saison passée sous le titre (S3, PR 2).
   'alertes-cultures': { bloc: 'details.crop-alert-fold', budget: 400 },
   // 297 → 199 px : les cases des fonctionnalités.
   reglages: { bloc: 'fieldset.feature-choice', budget: 400 },

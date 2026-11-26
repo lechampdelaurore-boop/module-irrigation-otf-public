@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, nomsDesPagesDuMenu, ouvrirLeMenuDesPages, surveillerLaConsole, TITRES_DES_PAGES, verifierLEtape, ouvrirLePli } from './support/parcours.ts';
+import { allerALaPage, attendreLaPageIrrigation, nomsDesPagesDuMenu, ouvrirLeMenuDesPages, surveillerLaConsole, TITRES_DES_PAGES, verifierLEtape, ouvrirLePli } from './support/parcours.ts';
 
 /**
  * Socle des parcours : la page se charge dans le mode déterministe attendu.
@@ -74,14 +74,14 @@ test('une page par fonctionnalité : le menu y conduit, et l’ancienne adresse 
   await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES.aujourdhui })).toBeVisible();
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
 
-  // Le menu porte « Aujourd'hui », les dix pages et Réglages, dans l'ordre de la liste ; la page ouverte y est marquée.
-  // Au téléphone, « Plus » l'ouvre au-dessus de la barre du bas (audit ergonomique, point 2).
+  // Le menu porte « Aujourd'hui », les dix pages, « Ma ferme » et Réglages, dans l'ordre de la liste ; la page ouverte y est marquée.
+  // Au téléphone, la barre du bas porte les trois endroits, et chaque page se trouve par le sien (simplification, lot S3, PR 2).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
   const menu = await ouvrirLeMenuDesPages(page);
   await expect(menu.getByRole('link', { name: TITRES_DES_PAGES.aujourdhui })).toHaveAttribute('aria-current', 'page');
   await verifierLEtape(page, journal, 'menu des pages');
 
-  await menu.getByRole('link', { name: TITRES_DES_PAGES.materiel }).click();
+  await allerALaPage(page, 'materiel');
   await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES.materiel })).toBeVisible();
   await expect(page).toHaveURL(/\/irrigation\/materiel\?season=\d{4}/);
   // Le plan de la parcelle d'abord, l'aperçu « Apport calculé par heure » ensuite (retour du porteur du 8 novembre 2026).

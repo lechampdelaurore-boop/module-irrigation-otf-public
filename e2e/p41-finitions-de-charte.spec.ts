@@ -107,7 +107,8 @@ test('la tablette garde la barre du bas et ses cibles de 44 px ; à 320 px les n
     await attendreLaPageIrrigation(page, cible);
     const barre = page.getByRole('navigation', { name: 'Pages principales' });
     await expect(barre).toBeVisible();
-    await expect(barre.locator('li')).toHaveCount(5);
+    // Les trois endroits et le « + » (simplification, lot S3, PR 2, D-331).
+    await expect(barre.locator('li')).toHaveCount(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `défilement de côté sur ${cible}`).toBeLessThanOrEqual(768);
     const petites = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>('main .feature-page :is(button, select, input:not([type="hidden"], [type="checkbox"], [type="radio"], [type="range"]), .history-summary-action, .refresh-link)')]
       .filter((element) => element.getClientRects().length > 0 && element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && !element.closest('.plot-plan-content, [aria-hidden="true"]'))
@@ -118,7 +119,7 @@ test('la tablette garde la barre du bas et ses cibles de 44 px ; à 320 px les n
   }
   await page.setViewportSize({ width: 320, height: 640 });
   await attendreLaPageIrrigation(page, 'aujourdhui');
-  const coupes = await page.locator('.phone-bar :is(a, button) > span:not(.menu-home-badge)').evaluateAll((noms) => noms
+  const coupes = await page.locator('.phone-bar :is(a, button) > span:not(.menu-home-badge, .phone-bar-plus-badge)').evaluateAll((noms) => noms
     .filter((nom) => nom.scrollWidth > nom.clientWidth + 1 || nom.getBoundingClientRect().height > 20)
     .map((nom) => nom.textContent));
   expect(coupes, 'noms de la barre coupés à 320 px').toEqual([]);

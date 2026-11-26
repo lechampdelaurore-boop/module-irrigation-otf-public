@@ -82,6 +82,10 @@ le lot 3 de l'audit et les correctifs de la 3.9.
   disparaît.
 - Au téléphone, l'onglet « Aujourd'hui » de la barre du bas est un bouton
   rond vert qui dépasse de la barre, séparé des autres par un filet.
+  **Réécrit par la simplification S3, PR 2 (D-331)** : le rond vert du
+  centre de la barre est le « + » ; « Aujourd'hui » est une entrée comme
+  « Semaine » et « Ma ferme », avec sa pastille. Les groupes du menu de
+  l'ordinateur changent à la PR 3 du lot.
 
 ### 3.2 La page, de haut en bas
 

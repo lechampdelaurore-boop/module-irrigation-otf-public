@@ -59,7 +59,7 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
   await saut.press('Enter');
   await expect(page.locator('#contenu')).toBeFocused();
   await expect(page.locator('#contenu')).toContainText(NOT_FOUND_LABEL);
-  // Le même menu que les autres pages ; au téléphone, « Plus » l'ouvre au-dessus de la barre du bas (lot 2).
+  // Le même menu que les autres pages ; au téléphone, la même barre du bas et ses trois endroits (lot 2 ; S3, PR 2).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
   const retour = page.getByRole('link', { name: 'Revenir à « Aujourd’hui »' });
   await verifierCibleTactile(retour, 'Le lien de la page introuvable');

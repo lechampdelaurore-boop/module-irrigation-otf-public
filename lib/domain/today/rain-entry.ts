@@ -1,3 +1,4 @@
+import type { Bed, Plot } from '../domain.ts';
 import { millimetersNumber } from '../display-numbers.ts';
 import { addDaysToDateKey, isValidDateKey } from '../water-management.ts';
 import { shortDayText } from './today-text.ts';
@@ -37,8 +38,25 @@ export type RainEntry = {
   defaultDate: string;
 };
 
+/**
+ * La pluie compte pour la ferme : une planche de la saison au moins est hors
+ * abri. Sous abri, la pluie vaut zéro (D-032) : une ferme toute sous abri n'a
+ * ni pluie réelle à compléter ni « Noter la pluie » (S2, section 7). La règle
+ * vit ici, pour « Aujourd'hui » et pour le « + » de la barre (S3, section
+ * 4.1).
+ */
+export function farmRainMatters(farm: { beds: readonly Pick<Bed, 'plotId' | 'seasons'>[]; plots: readonly Pick<Plot, 'id' | 'mode'>[] }, season: number): boolean {
+  const sheltered = new Set(farm.plots.filter((plot) => plot.mode === 'greenhouse').map((plot) => plot.id));
+  return farm.beds.some((bed) => bed.seasons.includes(season) && !sheltered.has(bed.plotId));
+}
+
 function capitalized(text: string): string {
   return text.charAt(0).toLocaleUpperCase('fr-FR') + text.slice(1);
+}
+
+/** Le premier jour que la fenêtre propose : les mesures déjà notées se lisent à partir de lui. */
+export function rainEntryFirstDate(today: string): string {
+  return addDaysToDateKey(today, -DAYS_BACK);
 }
 
 /**

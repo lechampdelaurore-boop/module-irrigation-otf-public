@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { pageHref, pagePath, type PageQuery } from '@/lib/domain/features/pages';
 import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all-done';
@@ -18,6 +19,7 @@ import { isoFromLocalInput } from '../irrigation-manager/presentation';
 import { ActionReply, type ActionReplyMessage } from '../shell/action-reply';
 import { hrefWithIntent } from '../shell/url-intent';
 import { ConfirmDialog } from '../shell/confirm-dialog';
+import { markMenuNavigation } from '../shell/feature-menu';
 import { useConfirm } from '../shell/use-confirm';
 import { OtherChoices } from './other-choices';
 import { TodayAllDone } from './today-all-done';
@@ -62,7 +64,7 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * quand la carte est partie (« Fait comme prévu »), en tête du bloc, sous
  * « Tout est fait » (6 nonies, L4, D-313).
  */
-export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, query, pending, replies = [], onCardGesture, onFinish, onAllDone }: {
+export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, allIrrigationsLink = false, query, pending, replies = [], onCardGesture, onFinish, onAllDone }: {
   today: string;
   current?: readonly TodayNowLine[];
   late: LateBlock;
@@ -72,6 +74,8 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
   allDone: AllDone | null;
   /** Le lien de « Rien à arroser aujourd’hui » (6 nonies, L3) ; `null` : aucun. */
   emptyLink?: TodayDayEmptyLink | null;
+  /** « Tous les arrosages » en pied du bloc, avec « Arrosages » cochée (simplification S3, section 3.4). */
+  allIrrigationsLink?: boolean;
   query: PageQuery;
   pending: boolean;
   /** La réponse du dernier geste, avec l'endroit du bouton pressé (L4). */
@@ -193,6 +197,12 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
           <Icon name="calendrier" />
           <span>{tomorrow.text}</span>
           <a href={pageHref(tomorrow.link.page, query, tomorrow.link.anchor)}>Voir au planning</a>
+        </p>
+      ) : null}
+      {allIrrigationsLink ? (
+        <p className="today-all-irrigations">
+          {/* Un chemin de l'endroit, comme la bande « La semaine » : la page change sans recharger le module (D-322). */}
+          <Link href={pageHref('arrosages', query)} prefetch={false} onClick={markMenuNavigation}>Tous les arrosages<Icon name="chevron" /></Link>
         </p>
       ) : null}
       {dialog}

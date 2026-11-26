@@ -377,12 +377,14 @@ test('F286 : les pastilles mènent au bloc avec le seul chiffre, sans redire la 
   assert.match(view.headline.sentence, /Une irrigation est à valider aujourd’hui\./);
 });
 
-test('F287 : la pastille du menu dit ce qu’elle compte, « Plus » prend la marque de la page ouverte, la journée courte passe au-dessus du gel', () => {
+test('F287 : la pastille du menu dit ce qu’elle compte, l’endroit de la page ouverte en porte la marque, la journée courte passe au-dessus du gel', () => {
   const badge = readFileSync('app/irrigation/shell/today-badge.tsx', 'utf8');
   assert.match(badge, /`\$\{label\}, \$\{count\} \$\{count === 1 \? 'chose' : 'choses'\} à regarder`/);
+  // Depuis la simplification S3, PR 2 (D-331), « Plus » n'existe plus : l'endroit de la page ouverte porte
+  // la marque (aria-current `page` ou `true`, S3-e), jamais un point vert muet.
   const navigation = readFileSync('app/irrigation/styles/navigation.css', 'utf8');
-  assert.doesNotMatch(navigation, /\.phone-bar-more\[data-marked="true"\]::after/);
-  assert.match(navigation, /\.phone-bar-more\[data-marked="true"\] \.icon \{\s+background: var\(--green\);/);
+  assert.doesNotMatch(navigation, /phone-bar-more|::after/);
+  assert.match(navigation, /\.phone-bar a\[aria-current\] \.icon \{\s+background: var\(--green\);/);
   assert.equal(dayRowLayout(0, 0), 'stack');
   assert.equal(dayRowLayout(1, 0), 'wide');
   assert.equal(dayRowLayout(0, 2), 'wide');
