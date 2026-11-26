@@ -70,7 +70,8 @@ registres, elle y renvoie.
   `farmObjective`, l'étape 5 par `parcelsWithoutSoil`. Aucune migration,
   aucun calcul changé. Tests ; P70 nouveau ; P29 et P63 suivent.
   Contrôles, contre-épreuves et mesures : voir la PR et la section 15 du
-  contrat. Fusion après la PR 1.
+  contrat. Fusion après la PR 1 (fusionnée à 21 h 32), sa mise en ligne
+  vérifiée.
 - **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
   commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
   sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de
@@ -88,7 +89,10 @@ registres, elle y renvoie.
   et la section 15 du contrat. **Essai des cinq tâches** avec le premier
   volontaire conseillé avant sa mise en ligne (S6-m). Viennent les PR 2
   (la carte « Mise en route »), 3 et 4 ; fusion après le contrat #218 et
-  la dernière PR de S4.
+  la dernière PR de S4. **Fusionnée** le 26 novembre 2026 à 21 h 32
+  (#235, a51c4fb) ; sa mise en ligne est à consigner par S6, PR 3. La même
+  PR donne 75 minutes au job des parcours navigateur au lieu de 50 (sa
+  vérification avait été coupée à 50, run 45880035932).
 - **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
   les contrats, codée le 26 novembre 2026** (D-335, F940 à F946 ; contrat,
   sections 2, 9 et 10), en Opus 5.5 · Très élevé, sur la branche de la PR 3.
@@ -106,8 +110,8 @@ registres, elle y renvoie.
   fusionnée le 26 novembre 2026 à 19 h 06 (ad1b0ce), déployée à 19 h 55,
   run 45873232247, les cinq jobs verts (consigné par S6, PR 1) : **S4 est
   en ligne en entier**. Le contrat de S6 (#218) est fusionné le même jour à
-  19 h 55 (5c2588f) ; sa mise en ligne est à consigner par S6, PR 2. Vient
-  S6.
+  19 h 55 (5c2588f), **en ligne à 20 h 42**, run 45879771173, les cinq
+  jobs verts (consigné par S6, PR 2). Vient S6.
 - **Simplifier l'usage du module, S4, PR 3 sur 4 : les gestes, codée le
   26 novembre 2026** (D-335, F933 à F939 ; contrat, sections 4.5, 4.6 et
   8), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Depuis « La
