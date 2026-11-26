@@ -11255,7 +11255,9 @@ Précisions prises en codant :
   ferme des parcours, chargée par les parcours d'avant (des créneaux
   chaque jour), le premier niveau faisait 3 401 px : la borne vaut pour le
   cas du contrat. La page entière : 3 935 → 2 846 px (P40, la suite
-  jouée jusqu'à lui ; borne 3 300). Temps du serveur (en local, 20 ms par
+  jouée jusqu'à lui ; borne 3 300). Sur la CI, toute la suite jouée avant
+  P40, 3 856 px : les créneaux laissés par les parcours d'avant allongent
+  « Jour par jour » ; la borne est portée à 4 250 (10 %). Temps du serveur (en local, 20 ms par
   lecture, deuxième passage, comme la PR 1) : « La semaine » 341 ms en
   médiane (322 à 351 ms, 62 lectures ; PR 1 : 359 ms, 68), « Les
   cumuls » 116 ms (14) ; budget 394 ms, tenu. La ligne « Calcul
