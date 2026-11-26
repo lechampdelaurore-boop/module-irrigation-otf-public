@@ -7,6 +7,7 @@ import {
   forecastModelFacts,
   forecastModelOptions,
   forecastModelSettingView,
+  forecastModelSummary,
   selectedForecastChoice,
 } from '../lib/domain/weather/forecast-model-setting.ts';
 
@@ -90,4 +91,10 @@ test('règle 9 : le retour du module à « Automatique » se dit la semaine qui 
   assert.equal(back('meteofrance_seamless', '2026-11-25', false), null);
   // Un modèle choisi depuis efface le message.
   assert.equal(forecastModelSettingView('icon_seamless', { forecastDays: [], lastChange: { byModule: true, previousModelId: 'meteofrance_seamless', dateKey: '2026-11-25' } }, '2026-11-26').returnNotice, null);
+});
+
+test('la ligne du pli dit le modèle gardé, tel que la liste le nomme (F1030)', () => {
+  const options = forecastModelOptions(RENNES);
+  assert.equal(forecastModelSummary(AUTOMATIC_FORECAST_CHOICE, options), 'Automatique');
+  assert.equal(forecastModelSummary('meteofrance_seamless', options), 'Météo-France (AROME puis ARPEGE)');
 });

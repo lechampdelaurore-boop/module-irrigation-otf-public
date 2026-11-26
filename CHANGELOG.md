@@ -39,7 +39,7 @@ source détaillée commit par commit.
 
 ### Ajouté (météo multi-modèles, PR 3 : l'écran)
 
-- **Choisir le modèle de prévision de la ferme** (D-347, F1023 à F1029) :
+- **Choisir le modèle de prévision de la ferme** (D-347, F1023 à F1030) :
   dans « Réglages », la carte « Lieu de la météo » propose « Automatique »
   (le défaut, inchangé) ou un des modèles qui couvrent la commune
   (Météo-France, DWD, centre européen, NOAA, « Automatique d’Open-Meteo »),

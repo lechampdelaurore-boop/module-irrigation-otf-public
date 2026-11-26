@@ -47,7 +47,7 @@ registres, elle y renvoie.
   Viennent HR2 (lecture, table, purge) et HR3 (écran) ; fusion à son tour,
   après #243 et la météo multi-modèles.
 - **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
-  26 novembre 2026** (D-347, F1023 à F1029 ; contrat v0.2, § 3, § 8 point 6,
+  26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
   § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
   PR 2. Dans « Réglages », la carte « Lieu de la météo » porte la liste des
   modèles qui couvrent le lieu (« Automatique » d'abord), la phrase de la
