@@ -15,6 +15,7 @@ import { loadTodayViewAction } from '../today-actions';
 import { refuseProposalFromTodayAction, validateAndStartProposalFromTodayAction, validateProposalFromTodayAction } from '../today-card-actions';
 import { ReliabilityZoneView } from './reliability-zone';
 import { Timeline, TodayDay, type TodayCardWrite } from './today-day';
+import { TodayDayCurveBlock } from './today-day-curve';
 import { TodayDetail, useTodayDetail } from './today-detail';
 import { TodayApproximateView, TodayWaterAlertView, TodayWeatherAlertView, TodayWeekBarView } from './today-essential';
 import { TodayHeader } from './today-header';
@@ -232,6 +233,8 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
       {essential.water ? <TodayWaterAlertView alert={essential.water} query={dayQuery} onReveal={reveal} /> : null}
       {essential.detail ? (
         <TodayDetail foldRef={fold} open={detailOpen} onOpenChange={setDetailOpen} summary={essential.detail}>
+          {/* La soif du jour heure par heure, en tête du pli, sous la ligne « Calcul approximatif » (ET0 horaire, HR3, D-350). */}
+          {view.dayCurve ? <TodayDayCurveBlock curve={view.dayCurve} /> : null}
           {view.week ? (
             <TodayWeekTiles
               week={view.week}

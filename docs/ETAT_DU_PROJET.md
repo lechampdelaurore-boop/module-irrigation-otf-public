@@ -12,6 +12,16 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **L'ET0 horaire, HR3 : « Soif du jour, heure par heure », codée le
+  26 novembre 2026** (D-350, F1042 à F1049 ; contrat
+  `docs/et0-horaire-contract.md`, § 7 ; roadmap ligne 37), en Opus 5.5 ·
+  Élevé, sur la branche de HR2 : en tête du pli « Le détail »
+  d'« Aujourd'hui », la phrase du reste à venir, la courbe d'une barre par
+  heure (l'heure en cours marquée), la forte évaporation, le « ? » ; la
+  forme de la source de l'ET0 du jour de la ferme, sinon la forme
+  théorique, dite ; sans ET0 du jour, « Pas de courbe : l'ET0 du jour
+  manque. ». Aucun calcul existant changé. Parcours P73. Contrôles : voir
+  la PR. La ligne 37 est codée en entier ; fusions dans l'ordre.
 - **L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger,
   codée le 26 novembre 2026** (D-349, F1035 à F1041 ; contrat
   `docs/et0-horaire-contract.md`, § 5, § 9 et § 11 ; roadmap ligne 37), en

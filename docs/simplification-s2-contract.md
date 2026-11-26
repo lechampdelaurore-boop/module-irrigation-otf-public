@@ -343,7 +343,10 @@ semaine ; « Eau de la semaine » par jardin ; « Réserve du sol » par jardin 
 « Eau disponible » ; « Fiabilité du calcul » en entier ; « Gel ou chaleur », les
 trois jours ; la frise du jour à l'ordinateur (un avant-goût que les cartes
 rendent inutile au premier niveau, précision S2-f). Chaque bloc garde ses
-liens, ses boutons et ses réponses (L1 à L4).
+liens, ses boutons et ses réponses (L1 à L4). Depuis l'ET0 horaire, HR3
+(D-350, `docs/et0-horaire-contract.md`, § 7) : « Soif du jour, heure par
+heure » vient en tête du pli, avant les tuiles ; la ligne de résumé dit
+« la soif heure par heure ».
 
 - **Les ancres existantes ouvrent le pli.** Les liens des notifications, les
   pastilles de l'ordinateur et les liens d'autres pages qui visent `#today-weather`,

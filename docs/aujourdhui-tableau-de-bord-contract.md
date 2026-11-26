@@ -129,8 +129,9 @@ la pluie » (sans objectif : « Aucun objectif posé pour cette semaine. » et
 donnée manque (la première, son geste, « + n autres ») ; une ligne d'eau
 seulement quand une réserve ou une limite le demande. Tout le reste est dans
 un seul pli fermé, **« Le détail »**, dont la ligne de résumé compte ce qu'il
-contient (« 4 chiffres · 3 jardins · 2 données à rafraîchir ») : les quatre
-tuiles de la semaine, « Eau de la semaine », « Réserve du sol », « Eau
+contient (« 4 chiffres · 3 jardins · 2 données à rafraîchir ») : depuis
+l'ET0 horaire, HR3 (D-350), « Soif du jour, heure par heure » en tête, puis
+les quatre tuiles de la semaine, « Eau de la semaine », « Réserve du sol », « Eau
 disponible », « Fiabilité du calcul », « Gel ou chaleur » en entier et la frise
 du jour, chaque bloc avec ses liens, ses boutons et ses réponses. Aucun bloc
 n'est retiré. Les ancres existantes (`#today-weather`, `#today-reliability`,

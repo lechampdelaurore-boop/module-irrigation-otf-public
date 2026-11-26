@@ -47,16 +47,36 @@ export async function listDayShapes(placeKey: string, source: string, days: read
      FROM irrigation_weather_day_shapes
      WHERE place_key = ? AND source = ? AND day IN (${days.map(() => '?').join(', ')})
      ORDER BY day`,
-  ).bind(placeKey, source, ...days).all<{ day: string; source: string; nature: string; shares: string; fetched_at: string }>();
-  return result.results.flatMap((row): DayShapeRecord[] => {
-    const nature = HOURLY_ET0_NATURES.find((known) => known === row.nature);
-    let shares: unknown;
-    try {
-      shares = JSON.parse(row.shares);
-    } catch {
-      return [];
-    }
-    if (!nature || nature === 'theoretical' || !Array.isArray(shares) || !shares.every((share) => typeof share === 'number')) return [];
-    return [{ date: row.day, nature, shares: shares as number[], source: row.source, fetchedAt: row.fetched_at }];
-  });
+  ).bind(placeKey, source, ...days).all<DayShapeRow>();
+  return result.results.flatMap(readableDayShape);
+}
+
+/**
+ * Les formes écrites d'un lieu pour un jour, toutes sources (HR3, D-350) :
+ * « Aujourd'hui » les lit en même temps que l'ET0 du jour, puis garde celle
+ * de la source de cette ET0 (`lib/domain/today/day-curve.ts`), sans attendre
+ * l'une pour lire l'autre.
+ */
+export async function listDayShapesOfDay(placeKey: string, day: string): Promise<DayShapeRecord[]> {
+  const result = await db.prepare(
+    `SELECT day, source, nature, shares, fetched_at
+     FROM irrigation_weather_day_shapes
+     WHERE place_key = ? AND day = ?
+     ORDER BY source`,
+  ).bind(placeKey, day).all<DayShapeRow>();
+  return result.results.flatMap(readableDayShape);
+}
+
+type DayShapeRow = { day: string; source: string; nature: string; shares: string; fetched_at: string };
+
+function readableDayShape(row: DayShapeRow): DayShapeRecord[] {
+  const nature = HOURLY_ET0_NATURES.find((known) => known === row.nature);
+  let shares: unknown;
+  try {
+    shares = JSON.parse(row.shares);
+  } catch {
+    return [];
+  }
+  if (!nature || nature === 'theoretical' || !Array.isArray(shares) || !shares.every((share) => typeof share === 'number')) return [];
+  return [{ date: row.day, nature, shares: shares as number[], source: row.source, fetchedAt: row.fetched_at }];
 }
