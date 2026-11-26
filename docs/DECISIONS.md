@@ -11034,7 +11034,7 @@ Date : 26 novembre 2026. Statut : **contrat écrit, rien de codé** ;
 `docs/objectif-automatique-saison-contract.md`, roadmap section 6
 quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
 
-**Demande du porteur** (10 h 24 et 10 h 26) : l'objectif automatique doit se
+**Demande du porteur** (11 h 24 et 11 h 26) : l'objectif automatique doit se
 renseigner et se modifier à l'écran ; un filtre « hors saison » ignore
 l'irrigation de planches, jardins, parcelles, de tout le plein champ ou de
 tout le sous-abri.
@@ -11051,12 +11051,12 @@ les semaines closes et l'historique ne bougent pas**, gardés par des tests.
 Cinq portées ; un jardin « à classer » n'est couvert par aucune des deux
 portées de mode, dit. Une seule fonction, un seul endroit. Sans question
 sur le calcul ; deux questions de conduite de la ferme, **répondues par le
-porteur le 26 novembre 2026 à 11 h 37** : le filtre se lève **à la main
+porteur le 26 novembre 2026 à 12 h 37** : le filtre se lève **à la main
 seulement** (« Reprendre », ni date ni calendrier) ; en mettant hors
 saison, **le module propose d'annuler** les arrosages planifiés ou
 validés des planches concernées, jamais sans son choix.
 
-Numéros : D-337 ; F à partir de F983 pour le code.
+Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, aligné sur #245) pour le code.
 
 ## D-341 — Ignorer l'irrigation hors saison, B1 : la règle
 
@@ -11064,9 +11064,9 @@ Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
 contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections 4,
 5 et 8) ; roadmap section 6 quaterdecies, ligne 34. Code en Opus 5.5 · Max,
 le réglage de la roadmap, sur la branche du contrat, avant la fusion de S4
-et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995 : D-337 et
-F983 à F984 sont aussi pris par une autre PR ouverte (#244), D-338 à D-340
-par trois contrats ouverts (#241 à #243).
+et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995, ceux que
+le contrat réserve au code ; D-338 à D-340 sont pris par trois contrats
+ouverts (#241 à #243), D-342 par le budget de hauteur de S5 (#244).
 
 **Décision.** La règle « hors saison » vit en un seul endroit,
 `lib/domain/off-season.ts` (le nom proposé par le contrat, section 4.6), et
