@@ -151,6 +151,10 @@ pages cochées : pas de bande. Les liens gardent saison, jour et parcelle dans
 l'adresse. La bande mesure 44 px au moins ; elle disparaîtra avec S4, qui crée
 `/irrigation/semaine` et la prend pour page d'entrée.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 1).** La bande « La semaine » est retirée : la
+barre ouvre la page « Semaine », et le menu de l'ordinateur a deux lignes,
+« La semaine » et « Les cumuls », selon les cases.
+
 ### 3.4 « Arrosages » et son entrée
 
 « Arrosages » est dans l'endroit « Aujourd'hui » : on y arrose. Au téléphone elle

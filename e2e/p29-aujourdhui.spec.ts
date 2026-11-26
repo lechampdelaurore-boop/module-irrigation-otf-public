@@ -110,10 +110,10 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(blocs(page).locator('h2')).toHaveText(TITRES_DES_BLOCS);
   await expect(bloc(page, 'Votre journée')).toContainText('Aucune irrigation en retard.');
   await expect(bloc(page, 'Votre journée')).toContainText('Rien à faire aujourd’hui.');
-  // L'état vide propose la suite (6 nonies, L3, D-312) : « Planning » coché, le planning de la semaine.
-  const suiteDuJour = bloc(page, 'Votre journée').getByRole('link', { name: 'Voir le planning de la semaine' });
-  await expect(suiteDuJour).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
-  if (telephone) await verifierCibleTactile(suiteDuJour, 'Le lien « Voir le planning de la semaine »');
+  // L'état vide propose la suite (6 nonies, L3, D-312) : « Planning » coché, la semaine (S4, PR 4).
+  const suiteDuJour = bloc(page, 'Votre journée').getByRole('link', { name: 'Voir la semaine' });
+  await expect(suiteDuJour).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}$/);
+  if (telephone) await verifierCibleTactile(suiteDuJour, 'Le lien « Voir la semaine »');
   // L'en-tête : un seul titre, celui de la page ; la date en toutes lettres en sous-titre, et la phrase du jour (lot A, J13, F285).
   await expect(page.locator('.today-head .today-date')).toHaveText(/^[A-Z][a-zé]+ \d{1,2} [a-zéû]+$/);
   await expect(page.locator('.today-head').getByRole('heading')).toHaveCount(0);
@@ -157,9 +157,9 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect.poll(() => pastille(page)).toBe(manquesAuDepart - 1 === 0 ? null : manquesAuDepart - 1);
   // À jour, la ligne du plan mène au planning, comme « Plan calculé … » de l'en-tête (L3, D-312).
   const planAJour = fiabilite.locator('a.reliability-check-link').filter({ hasText: 'Plan de la semaine' });
-  await expect(planAJour).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
+  await expect(planAJour).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}$/);
   if (telephone) await verifierCibleTactile(planAJour, 'La ligne « Plan de la semaine »');
-  await expect(page.locator('.today-plan a')).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
+  await expect(page.locator('.today-plan a')).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}$/);
   await verifierLEtape(page, journal, 'plan recalculé, ligne disparue');
 
   // Sans RFU, une observation ne remplirait rien : « Renseigner la réserve de la parcelle … » à la place d'« Observer le sol de … »,

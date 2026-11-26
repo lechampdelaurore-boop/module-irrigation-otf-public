@@ -11357,3 +11357,89 @@ Précisions prises en codant :
   page, le jour de la ligne ignoré par la fenêtre font chacun échouer
   P68 ; le clavier laissé hors du champ a été trouvé par P68 lui-même et
   corrigé (F933).
+
+**Décision (PR 4, 26 novembre 2026).** Tout ce qui menait aux trois
+anciennes pages mène à « Semaine » et à son ancre (contrat, sections 2, 9 et
+10) : les liens d'« Aujourd'hui » (les tuiles, « Eau de la semaine », la
+ligne du plan et « Plan calculé … », les propositions, « Fiabilité du
+calcul », les données manquantes par planche, la carte d'une irrigation
+quand « Arrosages » n'est pas coché), ceux des pages entre elles
+(« Matériel », « Ressources », « Arrosages », « Réglages à relire », le
+« + »), la notification de l'aspersion à reconsidérer et la ligne de son
+historique, la visite guidée de la démonstration. Les anciennes adresses
+restent servies, sans limite de durée : les notifications déjà envoyées les
+portent (S4-o). Un test de garde lit tout le code de l'application et du
+domaine : plus aucun lien ne vise `planning`, `besoins` ou `historique`, et
+plus aucun mot ne nomme une page disparue. Les contrats de la section 10
+disent, chacun à son passage, ce que S4 a changé. Aucun calcul, aucune
+migration, aucune règle d'enregistrement ne change ; aucune question
+agronomique.
+
+Précisions prises en codant :
+
+- **F940** — **Les mots qui nommaient une page disparue** : « Voir le
+  planning de la semaine » (« Votre journée » vide) et « Voir au planning »
+  (demain) deviennent « Voir la semaine », le mot du lien de la ferme
+  d'« Eau de la semaine » (S2) ; le lien du bloc « Eau de la semaine »,
+  « Objectifs et besoins », aussi. « Ouvrir Objectifs et besoins » et
+  « Ouvrir le planning » de « Ressources » deviennent « Ouvrir la semaine ».
+  La carte d'une irrigation, « Arrosages » non coché, dit « Ouvrir sur
+  « Semaine » », et les retards repliés d'un jour, « Voir les n sur
+  « Semaine » » (« Planning de la semaine » avant) ; le renvoi de « Matériel », « Semaine, dans « Ce qu'il
+  reste à arroser » » ; la fenêtre « Noter la pluie », « sur « Semaine »,
+  dans « Pluie mesurée » ». « Plan non calculé : ouvrir le planning » reste :
+  le planning est sur « Semaine ». Option recommandée, modifiable à la
+  relecture.
+- **F941** — **« Noter la pluie » de la fiabilité** ouvre toujours sa
+  fenêtre sur « Aujourd'hui ». Quand elle n'y est pas offerte, son lien mène
+  à « Semaine » avec `?pluie=1` (`WEEK_RAIN_INTENT`, lu par `useUrlIntent`
+  comme `?recalculer=1`) : la fenêtre s'ouvre à l'arrivée, une fois, sa
+  réponse sous le bilan ; l'adresse ne garde pas la demande, un rechargement
+  ne la rejoue pas (P68). Sans ancre : la réponse et le bilan qui bouge sont
+  en haut de la page. Le geste ne porte plus d'ancre (`kind: 'rain'`).
+- **F942** — **Les ancres visées** : « Eau de la semaine » garde celles de
+  ses lignes (`irrigation-needs-title`, un jardin) ; « Matériel » vise « Ce
+  qu'il reste à arroser » (`reste-a-arroser`) ; « Ressources », « Eau
+  visée » (`objectifs-de-la-semaine`, pour fixer un objectif) ou « Le plan,
+  chaîne par chaîne » (`le-plan`) ; « Réglages à relire », « Réglages de la
+  semaine » (`reglages-de-la-page`) ; « Retirer une mesure » du « + » et
+  d'« Aujourd'hui », « Pluie mesurée » (`manual-rain`). Les deux ancres de
+  section sont dans `week-page.ts` (`NEEDS_SECTION_ANCHOR`,
+  `PLAN_SECTION_ANCHOR`), que « Semaine » pose.
+- **F943** — **Les notifications** : l'aspersion à reconsidérer vise
+  `/irrigation/semaine?season=…&week=<lundi>`, comme la ligne de son
+  historique ; le texte ne change pas. Les autres (matin, soir, fin
+  d'arrosage, alertes météo, gel, dessèchement) ne visaient pas ces pages.
+  Le service worker n'est pas touché (D-323).
+- **F944** — **La visite guidée** : les quatre étapes de « Le planning » et
+  deux de « Quand l'eau manque » gardent leurs repères, sur « Semaine ».
+  Depuis la PR 2, trois d'entre eux sont dans des plis fermés de « Le
+  détail » : la visite soulignait un élément caché (la contre-épreuve fait
+  échouer V3 sur ce code). Elle ouvre désormais les plis fermés de la page
+  qui portent le repère, du plus lointain au plus proche, comme le détail de
+  la bannière au téléphone (F291) ; un élément n'est à l'écran qu'avec une
+  boîte et sans pli fermé autour (`isOnScreen`, la règle de F933). V3 et V4
+  vérifient que l'élément présenté est visible.
+- **F945** — **Le « ? » de « Semaine »** dit où est chaque chose (section
+  12, « le porteur ne reconnaît pas les habitudes ») : la phrase et le
+  bilan, « Jour par jour », « Jardin par jardin », puis « Le détail » ; et
+  « Noter la pluie », sous le bilan. Le « ? » des cultures dit où s'allume
+  l'objectif automatique (« Eau visée », sur « Semaine »).
+- **F946** — **Mesures et preuves** (section 13 du contrat, PR 4) : un
+  lien d'« Aujourd'hui » vers « Semaine », du clic à la page prête, à
+  390 px, en local, médiane de huit, deux passages : 903 et 946 ms par
+  l'ancienne adresse (la redirection), 782 et 801 ms par la nouvelle ;
+  la redirection coûtait un aller-retour. Le premier niveau (P67) ne bouge
+  pas : 1 687 px, la phrase à 383, la barre à 621, le premier « Valider » à
+  1 221, 19 choses à toucher. Temps du serveur, 20 ms par lecture : « La
+  semaine » 338 ms (322 à 342), 62 lectures ; « Les cumuls » 118 ms, 14
+  lectures, comme la PR 3 : aucune lecture ajoutée. Tests nouveaux :
+  `tests/simplification-s4-liens.test.ts` (8), dont la garde qui lit tout
+  le code ; vingt-deux tests suivent les nouveaux liens. Parcours : P68
+  joue `?pluie=1` ; P15, P29, P30, P62 lisent les nouveaux liens et mots ;
+  V3 et V4 jouent sur « Semaine » et vérifient que l'élément présenté est
+  visible. Contre-épreuves : le lien du plan d'« Aujourd'hui », la
+  notification de l'aspersion, la demande `?pluie=1` ignorée, la fiabilité
+  vers `besoins`, « Voir au planning » remis font chacun échouer un test ;
+  la visite sans l'ouverture des plis fait échouer V3 (l'élément souligné
+  est caché).

@@ -52,7 +52,7 @@ export function bedUnknownReason(need: Pick<PriorityFeasibility['beds'][number][
   return GENERAL_UNKNOWN_REASON;
 }
 
-/** Une ligne « Non calculable : raison. », la forme du besoin d'une planche sur « Objectifs et besoins » (F282, F316). */
+/** Une ligne « Non calculable : raison. », la forme du besoin d'une planche dans « Ce qu'il reste à arroser » de « Semaine » (F282, F316). */
 export function notComputableLine(reason: string): string {
   return `Non calculable : ${reason}.`;
 }

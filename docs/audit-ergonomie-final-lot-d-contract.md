@@ -132,6 +132,11 @@ surtout des « 0,00 m³ » et des « — ».
   (« non disponible · partielle », « Non défini ») s'écrit à la taille du
   texte courant (F300).
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** Les jours passent au premier niveau de « Semaine »,
+une ligne par jour (« Jour par jour », section 5 du contrat de S4) ; les
+cartes de J3 restent dans « Jours de la semaine, un par un », une section de
+« Le détail ».
+
 ## 5. J5 et J2
 
 **J5 — « Besoin par culture » liste 40 cultures.** Cause : chaque culture de
