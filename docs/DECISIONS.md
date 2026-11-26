@@ -11284,8 +11284,10 @@ Précisions prises en codant :
   et la recherche du périmètre le précèdent ; le périmètre, « Toute la
   ferme » par défaut, est juste au-dessus). Un pli fermé garde son
   contenu dans la page sans le montrer (Chrome) : le champ n'est pris
-  que visible (`checkVisibility`), et l'essai se refait tant que le
-  clavier n'y est pas. Option recommandée, modifiable à la relecture.
+  que visible (une boîte, et aucun pli fermé autour, `isOnScreen` ;
+  `checkVisibility` manque à Safari avant 17.4), et l'essai se refait
+  tant que le clavier n'y est pas. Option recommandée, modifiable à la
+  relecture.
 - **F934** — **« Comprendre ces chiffres »** est un bouton qui déplie et
   replie (`aria-expanded`) les cinq tuiles d'« Aujourd'hui » sous le
   bilan : eau visée, irrigation réalisée, pluie réelle ou estimée, pluie
