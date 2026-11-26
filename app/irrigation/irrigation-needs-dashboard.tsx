@@ -16,6 +16,7 @@ import { gardenState } from '@/lib/domain/besoins-phone';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
 import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
+import { gardenAllOffSeason, gardenOffSeasonText, offSeasonNeedText } from '@/lib/domain/off-season-view';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 const area = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
@@ -92,7 +93,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     </div>
     <div className="irrigation-needs-gardens">{sortedGardens.map((garden) => <details key={garden.plotId} id={needsGardenAnchor(garden.plotId)}>
       {/* Au téléphone, une ligne compacte : le nom, le reste à apporter, l'état ; le détail s'ouvre dessous. Une seule des deux formes s'affiche, et se lit (lot J, n° 15, F460). */}
-      <summary><span className="garden-compact"><strong>{garden.plotName}</strong><b>{garden.effectiveNeedMm === null ? '—' : formatMm(garden.effectiveNeedMm)}</b>{gardenStateBadge(garden)}</span><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}</small></span><span><strong>À planifier : {gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
+      <summary><span className="garden-compact"><strong>{garden.plotName}</strong><b>{gardenAllOffSeason(garden.beds) ? 'Hors saison' : garden.effectiveNeedMm === null ? '—' : formatMm(garden.effectiveNeedMm)}</b>{gardenStateBadge(garden)}</span><span><strong>{garden.plotName}</strong><small>{garden.zoneName} · {garden.sheltered ? 'Abri' : 'Plein champ'} · {garden.bedCount} planche{garden.bedCount > 1 ? 's' : ''}{gardenOffSeasonText(garden.beds) ? ` · ${gardenOffSeasonText(garden.beds)}` : ''}</small></span><span><strong>À planifier : {gardenAllOffSeason(garden.beds) ? 'hors saison' : gardenMm(garden.effectiveNeedMm, gardenUnknownReason(garden.beds, (bed) => bed.effectiveNeedMm))}</strong><small>Besoin réel : {gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · {garden.effectiveVolumeCubicMeters === null ? 'Volume non calculable' : `${volumeText(garden.effectiveVolumeCubicMeters)}`} · {garden.priorityCounts.high} haute{garden.priorityCounts.high > 1 ? 's' : ''} · {garden.priorityCounts.normal} normale{garden.priorityCounts.normal > 1 ? 's' : ''} · {garden.priorityCounts.low} basse{garden.priorityCounts.low > 1 ? 's' : ''}</small></span></summary>
       <p className="garden-compact-detail">{gardenSummaryDetail(garden)}</p>
       <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} reply={<ActionReply messages={replies} origin={`planche:${bed.bedId}`} classNames={NEEDS_REPLY_CLASSES} />} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm }), `planche:${bed.bedId}`))} />)}</div>
     </details>)}</div>
@@ -134,13 +135,17 @@ function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrriga
   const [override, setOverride] = useState(bed.manualOverrideMm === null ? '' : String(bed.manualOverrideMm));
   const [reason, setReason] = useState(bed.overrideReason ?? '');
   const exceeds = overrideEnabled && numeric(override) > (bed.objectiveMm ?? Number.POSITIVE_INFINITY);
-  return <article className="irrigation-need-card" data-priority={bed.priority}>
+  // Hors saison : la planche reste là, grisée et dite, jamais « non calculable » ni zéro (6 quaterdecies, B3, F1066).
+  const offSeasonLine = offSeasonNeedText(bed);
+  const need = (value: number | null) => (bed.offSeason === true && value === null ? 'Hors saison' : formatMm(value));
+  return <article className="irrigation-need-card" data-priority={bed.priority} data-off-season={bed.offSeason === true ? 'true' : undefined}>
     <header><div><strong>{bed.bedName}</strong><small>{area.format(bed.areaSquareMeters)} m²</small></div><span className="need-priority-label">Priorité {priorityLabel(bed.priority)}</span></header>
+    {offSeasonLine ? <p className="need-off-season">{offSeasonLine}</p> : null}
     {/* « À planifier » et le besoin d'abord ; les trois autres quantités dans « Pour les experts » (lot J, n° 15, F460). */}
-    <div className="need-primary"><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{formatMm(bed.calculatedNeedMm)}</strong></span><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{formatMm(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span></div>
+    <div className="need-primary"><span><small>À planifier <HelpButton text={help.planning} /></small><strong>{need(bed.calculatedNeedMm)}</strong></span><span><small>Besoin réel <HelpButton text={help.actual} /></small><strong>{need(bed.realRemainingMm)}<FigureOrigin text={realRemainingOrigin(bed)} /></strong></span></div>
     <details className="need-experts"><summary>Pour les experts</summary><div className="need-primary"><span><small>Besoin effectif <HelpButton text={help.effective} /></small><strong>{formatMm(bed.effectiveNeedMm)}</strong></span><span><small>Volume</small><strong>{bed.effectiveVolumeCubicMeters === null ? '—' : `${volumeText(bed.effectiveVolumeCubicMeters)}`}</strong></span><span><small>Déficit relatif <HelpButton text={help.deficit} /></small><strong>{bed.relativeDeficitPercent === null ? '—' : `${mm.format(bed.relativeDeficitPercent)} %`}</strong></span></div></details>
     {/* « Non calculable » dit pourquoi, avec la raison que le domaine connaît (audit final, lot A, R2, F282). */}
-    {bed.calculatedNeedMm === null && missingLabels(bed, 'planning') ? <p className="need-unknown-reason">Non calculable : {missingLabels(bed, 'planning')}.</p> : null}
+    {bed.calculatedNeedMm === null && bed.offSeason !== true && missingLabels(bed, 'planning') ? <p className="need-unknown-reason">Non calculable : {missingLabels(bed, 'planning')}.</p> : null}
     {!bed.completeness.complete ? <NeedDiagnostic bed={bed} /> : null}
     <details className="need-calculation"><summary>Voir le calcul</summary><dl>
       <Et0Metric bed={bed} />
@@ -148,11 +153,11 @@ function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrriga
       {proposal ? <ProposedMetric proposal={proposal} /> : null}
       <Metric label="Pluie réelle" value={bed.actualRainMm} kind={bed.sheltered ? 'Réel · abri = 0' : 'Réel / estimé'} />
       <Metric label="Irrigation réelle" value={bed.actualIrrigationMm} kind="Réel confirmé" />
-      <Metric label="Reste réel" value={bed.realRemainingMm} helpText={help.actual} kind="Calculé" />
+      <Metric label="Reste réel" value={need(bed.realRemainingMm)} helpText={help.actual} kind="Calculé" />
       <Metric label="Pluie prévue" value={bed.forecastRainMm} helpText={help.forecast} kind={bed.sheltered ? 'Prévu · abri = 0' : 'Prévu'} />
       <Metric label="Irrigation planifiée" value={bed.plannedIrrigationMm} kind="Planifié" />
-      <Metric label="Reste brut à planifier" value={bed.rawPlanningNeedMm} helpText={help.planning} kind="Calculé" />
-      <Metric label={`Après seuil (${mm.format(bed.thresholdMm)} mm)`} value={bed.calculatedNeedMm} kind="Calculé" />
+      <Metric label="Reste brut à planifier" value={need(bed.rawPlanningNeedMm)} helpText={help.planning} kind="Calculé" />
+      <Metric label={`Après seuil (${mm.format(bed.thresholdMm)} mm)`} value={need(bed.calculatedNeedMm)} kind="Calculé" />
       <WettedAreaMetric bed={bed} />
     </dl></details>
     <div className="need-decision-form"><label><span>Priorité manuelle</span><select value={priority} onChange={(event) => setPriority(event.target.value as IrrigationNeedPriority)}><option value="low">Basse</option><option value="normal">Normale</option><option value="high">Haute</option></select></label>
@@ -171,16 +176,18 @@ function NeedDiagnostic({ bed }: { bed: BedIrrigationNeed }) {
   return <details className="need-diagnostic">
     <summary>ⓘ Pourquoi&nbsp;?</summary>
     <ul>
-      <DiagnosticLine label="Objectif" value={bed.objectiveMm} ok={bed.objectiveMm !== null} detail={objectiveOrigin} />
+      {bed.offSeason === true ? <li data-status="ok"><strong>Objectif :</strong> hors saison — l’irrigation de cette planche est ignorée</li> : <DiagnosticLine label="Objectif" value={bed.objectiveMm} ok={bed.objectiveMm !== null} detail={objectiveOrigin} />}
       <li data-status={bed.et0Mm === null ? 'partial' : 'ok'}><strong>{et0EntersObjective(bed) ? 'ET0, par l’objectif automatique :' : 'ET0, information hors calcul :'}</strong> {bed.et0Mm === null ? `partielle${bed.et0KnownMm === null ? '' : ` — ${formatMm(bed.et0KnownMm)} disponibles`}` : formatMm(bed.et0Mm)} — {bed.et0Mm === null ? missingDatesText(bed.completeness.missingDates.et0) : 'OK'}<small>Réanalyse : {formatOptionalMm(bed.et0ReanalysisMm)} · Prévision : {formatOptionalMm(bed.et0ForecastMm)} · {et0EntersObjective(bed) ? 'entre dans le besoin par l’objectif automatique' : 'n’entre pas dans le besoin'}</small></li>
       <DiagnosticLine label="Pluie réelle" value={bed.actualRainMm} ok={bed.completeness.realComplete} detail={bed.sheltered ? 'abri : pluie extérieure non applicable, zéro valide' : bed.completeness.realComplete ? 'mesure manuelle prioritaire, sinon réanalyse' : rainFallbackText(bed)} />
       <DiagnosticLine label="Irrigation réelle" value={bed.actualIrrigationMm} ok detail="apports confirmés" />
       <DiagnosticLine label="Pluie prévue" value={bed.forecastRainMm} ok={bed.completeness.missingDates.forecastRain.length === 0} detail={bed.sheltered ? 'abri : pluie extérieure non applicable, zéro valide' : bed.completeness.missingDates.forecastRain.length === 0 ? 'prévision disponible' : `${missingDatesText(bed.completeness.missingDates.forecastRain)}, comptée zéro`} />
       <DiagnosticLine label="Irrigation planifiée" value={bed.plannedIrrigationMm} ok detail="planifications actives" />
     </ul>
+    {bed.offSeason === true ? <p><strong>Hors saison :</strong> ni objectif ni besoin cette semaine ; la pluie ci-dessus reste suivie.</p> : <>
     <p><strong>Objectif de la semaine :</strong> {bed.completeness.demandComplete ? `${formatMm(bed.objectiveMm)} — calculable` : 'non calculable — aucun objectif adopté'}</p>
     <p><strong>Besoin réel :</strong> {!bed.completeness.demandComplete ? `non calculable — ${missingLabels(bed, 'real')}` : bed.completeness.realComplete ? `${formatMm(bed.realRemainingMm)} — calculable` : `${formatMm(bed.realRemainingMm)} — partiel, ${missingLabels(bed, 'real')}`}</p>
     <p><strong>Besoin à planifier :</strong> {!bed.completeness.demandComplete ? `non calculable — ${missingLabels(bed, 'planning')}` : bed.completeness.planningComplete ? `${formatMm(bed.rawPlanningNeedMm)} — calculable` : `${formatMm(bed.rawPlanningNeedMm)} — partiel, ${missingLabels(bed, 'planning')}`}</p>
+    </>}
     <small>Période : {formatDate(bed.weekStart)} au {formatDate(bed.weekEnd)} · Surface de la planche : {area.format(bed.areaSquareMeters)} m² · Surface mouillée : {wettedArea(bed).value} ({wettedArea(bed).kind}) · {bed.sheltered ? 'Abri' : 'Plein champ'} · Seuil : {formatMm(bed.thresholdMm)} · Override : {bed.manualOverrideMm === null ? 'aucun' : formatMm(bed.manualOverrideMm)}</small>
   </details>;
 }
@@ -200,7 +207,8 @@ function DiagnosticLine({ label, value, ok, detail }: { label: string; value: nu
   return <li data-status={ok ? 'ok' : 'missing'}><strong>{label} :</strong> {value === null ? 'indisponible' : formatMm(value)} — {ok ? 'OK' : detail}{ok ? <small>{detail}</small> : null}</li>;
 }
 
-function Metric({ label, value, kind, helpText }: { label: string; value: number | null; kind: string; helpText?: string }) { return <div><dt>{label}{helpText ? <> <HelpButton text={helpText} /></> : null}<small>{kind}</small></dt><dd>{formatMm(value)}</dd></div>; }
+/** `value` en texte : déjà dit, comme « Hors saison » (B3). */
+function Metric({ label, value, kind, helpText }: { label: string; value: number | null | string; kind: string; helpText?: string }) { return <div><dt>{label}{helpText ? <> <HelpButton text={helpText} /></> : null}<small>{kind}</small></dt><dd>{typeof value === 'string' ? value : formatMm(value)}</dd></div>; }
 /** L'objectif proposé à côté de l'objectif (5 quater) : une information, avec son écart quand elle est complète. */
 function ProposedMetric({ proposal }: { proposal: ProposalSummary }) {
   const kind = proposal.status === 'complete' ? `Proposé · information${proposal.differenceMm === null ? '' : ` · écart ${signedMm(proposal.differenceMm)}${proposal.differencePercent === null ? '' : ` (${proposal.differencePercent > 0 ? '+' : ''}${mm.format(proposal.differencePercent)} %)`}`}`
@@ -219,7 +227,7 @@ function et0EntersObjective(bed: BedIrrigationNeed): boolean {
 /** L'objectif de la semaine et son origine : saisi, automatique d'après la culture ou l'ET0, ou les deux (6 decies, O4, section 5, point 3). */
 function ObjectiveMetric({ bed }: { bed: BedIrrigationNeed }) {
   const origin = objectiveOriginText(bed);
-  return <div data-kind="objective"><dt>Objectif <HelpButton text={help.objective} /><small>{origin === null ? 'Renseigné · demande de la semaine' : `${capitalized(origin)} · demande de la semaine`}</small></dt><dd>{formatMm(bed.objectiveMm)}<FigureOrigin text={automaticObjectiveOriginText(bed)} label="D’où vient cet objectif ?" /></dd></div>;
+  return <div data-kind="objective"><dt>Objectif <HelpButton text={help.objective} /><small>{origin === null ? 'Renseigné · demande de la semaine' : `${capitalized(origin)} · demande de la semaine`}</small></dt><dd>{bed.offSeason === true && bed.objectiveMm === null ? 'Hors saison' : formatMm(bed.objectiveMm)}<FigureOrigin text={automaticObjectiveOriginText(bed)} label="D’où vient cet objectif ?" /></dd></div>;
 }
 function capitalized(text: string): string { return text.charAt(0).toUpperCase() + text.slice(1); }
 function formatEt0(bed: BedIrrigationNeed) {
@@ -243,7 +251,8 @@ function gardenStateBadge(garden: GardenNeeds) {
 /** Le détail du jardin que sa ligne compacte cache, en tête du jardin ouvert au téléphone (F460). */
 function gardenSummaryDetail(garden: GardenNeeds) {
   const priorities = `${garden.priorityCounts.high} haute${garden.priorityCounts.high > 1 ? 's' : ''} · ${garden.priorityCounts.normal} normale${garden.priorityCounts.normal > 1 ? 's' : ''} · ${garden.priorityCounts.low} basse${garden.priorityCounts.low > 1 ? 's' : ''}`;
-  return `${garden.zoneName} · ${garden.sheltered ? 'Abri' : 'Plein champ'} · ${garden.bedCount} planche${garden.bedCount > 1 ? 's' : ''} · besoin réel ${gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · ${garden.effectiveVolumeCubicMeters === null ? 'volume non calculable' : volumeText(garden.effectiveVolumeCubicMeters)} · ${priorities}`;
+  const offSeason = gardenOffSeasonText(garden.beds);
+  return `${garden.zoneName} · ${garden.sheltered ? 'Abri' : 'Plein champ'} · ${garden.bedCount} planche${garden.bedCount > 1 ? 's' : ''}${offSeason ? ` · ${offSeason}` : ''} · besoin réel ${gardenMm(garden.realRemainingMm, gardenUnknownReason(garden.beds, (bed) => bed.realRemainingMm))} · ${garden.effectiveVolumeCubicMeters === null ? 'volume non calculable' : volumeText(garden.effectiveVolumeCubicMeters)} · ${priorities}`;
 }
 function formatMm(value: number | null) { return value === null ? 'Non calculable' : `${mm.format(value)} mm`; }
 /** Le total d'un jardin, ou « Non calculable » avec sa raison (audit final, lot A, R2, F282). */

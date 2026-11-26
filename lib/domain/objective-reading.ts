@@ -34,8 +34,9 @@ function bedsOf(count: number, total: number): string {
  * planche n'est inconnu que faute d'objectif adopté (la pluie inconnue est
  * remplacée et listée, D-019) ; `null` quand toutes ont leur valeur.
  */
-export function gardenUnknownReason<B extends Pick<BedIrrigationNeed, 'objectiveMm'>>(beds: readonly B[], value: (bed: B) => number | null): string | null {
-  const unknown = beds.filter((bed) => value(bed) === null);
+export function gardenUnknownReason<B extends Pick<BedIrrigationNeed, 'objectiveMm' | 'offSeason'>>(beds: readonly B[], value: (bed: B) => number | null): string | null {
+  // Une planche hors saison n'est pas inconnue : elle sort des comptes du jardin (D-352, B3).
+  const unknown = beds.filter((bed) => value(bed) === null && bed.offSeason !== true);
   if (unknown.length === 0) return null;
   const withoutObjective = unknown.filter((bed) => bed.objectiveMm === null).length;
   if (withoutObjective === unknown.length) return `${bedsOf(withoutObjective, beds.length)} sans objectif adopté`;

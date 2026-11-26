@@ -494,3 +494,23 @@
 .goal-amount-origin { display: block; margin-top: 4px; color: var(--muted); font-size: var(--text-12); }
 .automatic-objective-setting .automatic-objective-result { color: var(--ink); }
 .automatic-objective-enable .irrigation-dialog-actions { flex-wrap: wrap; }
+/* Le bloc « Hors saison », sous la liste des objectifs (6 quaterdecies, B3, D-353) : les endroits en puces, « Reprendre » et « Mettre hors saison » de 44 px, la fenêtre du choix et celle des arrosages prévus. */
+.off-season-block { display: grid; gap: 8px; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--sheet); }
+.off-season-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.off-season-heading h4 { margin: 0; font-size: var(--text-16); }
+.off-season-block p { margin: 0; color: var(--muted); font-size: var(--text-14); }
+.off-season-chips { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.off-season-chip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 6px 10px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--line); }
+.off-season-chip > span { flex: 1 1 12rem; color: var(--ink); }
+.off-season-chip small { color: var(--muted); }
+.off-season-block button { min-height: var(--touch-target, 44px); }
+.off-season-open { justify-self: start; }
+.off-season-choice .goal-scope-picker { margin-bottom: 8px; }
+.off-season-unclassified { padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); color: var(--warn-ink); }
+.off-season-planned-list { display: grid; gap: 6px; margin: 8px 0; padding-left: 18px; }
+.off-season-planned-list small { display: block; color: var(--warn-ink); }
+.off-season-planned .irrigation-dialog-actions,
+.off-season-choice .irrigation-dialog-actions { flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .off-season-open { justify-self: stretch; }
+}

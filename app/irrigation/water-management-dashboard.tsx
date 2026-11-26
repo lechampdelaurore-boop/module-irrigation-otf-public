@@ -1,7 +1,7 @@
 'use client';
 
 import { volumeText } from '@/lib/domain/display-numbers';
-import { useEffect, useMemo, useOptimistic, useRef, useState, useTransition } from 'react';
+import { useEffect, useMemo, useOptimistic, useRef, useState, useTransition, type ReactNode } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import { actualRainOrigin, dateKeyInTimeZone, isValidDateKey, manualRainInput, weekStartDateKey } from '@/lib/domain/water-management';
@@ -75,6 +75,7 @@ export function WaterManagementDashboard({
   snapshot,
   initialDashboard,
   initialFarmObjective = null,
+  offSeason = null,
   part = 'besoins',
 }: {
   season: number;
@@ -82,6 +83,8 @@ export function WaterManagementDashboard({
   initialDashboard: WaterDashboard;
   /** L'objectif de la ferme lu avec les besoins de la même semaine (S1, PR 3). */
   initialFarmObjective?: FarmObjectiveNotice | null;
+  /** Le bloc « Hors saison », sous la liste des objectifs (6 quaterdecies, B3, section 4.4). */
+  offSeason?: ReactNode;
   part?: WaterDashboardPart;
 }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
@@ -485,6 +488,7 @@ export function WaterManagementDashboard({
             ))}
             <AutomaticObjectiveLines lines={automaticLines} pending={pending} onCorrect={correctLine} />
           </div>
+          {offSeason}
         </AnchoredFold>
 
         <AnchoredFold

@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (ignorer l'irrigation hors saison, B3 : les écrans)
+
+- **Le bloc « Hors saison »** (D-353, F1075 à F1086), dans le pli
+  « Objectifs de la semaine » : « Mettre hors saison » une planche, un
+  jardin ou un abri, une parcelle, tout le plein champ ou tout le
+  sous-abri, à partir d'aujourd'hui ; chaque endroit hors saison en puce,
+  avec son jour et ses planches, et « Reprendre ». Quand des arrosages
+  planifiés ou validés arrosent ces planches, une fenêtre propose « Les
+  annuler » ou « Les garder » ; un arrosage déjà démarré se termine. Le
+  tableau des besoins garde ces planches, grisées et dites « hors saison »,
+  la pluie toujours suivie ; « Aujourd'hui » dit « 3 planches hors saison »
+  sur la tuile de l'objectif, avec un lien vers le bloc ; une proposition
+  du planning dit la planche hors saison qu'un matériel partagé arrose
+  encore. Un « ? » explique ce qui est ignoré et ce qui continue.
+
 ### Modifié (l'objectif automatique se voit et se modifie, A1)
 
 - **Le volet « Objectifs de la semaine » montre l'objectif automatique**

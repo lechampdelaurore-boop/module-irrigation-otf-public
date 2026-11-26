@@ -52,7 +52,8 @@ export function ProposalCard({ proposal, currentCalculationId, now, pending, fee
   const { justification } = proposal;
   // Les planches dans l'ordre naturel, comme sur « Aujourd'hui » (lot H, n° 14, F436).
   const bedApplications = [...proposal.bedApplications].sort((left, right) => compareNamesNaturally(left.bedName, right.bedName));
-  const bedNames = bedApplications.map((application) => application.bedName);
+  // Une planche hors saison qu'un matériel partagé arrose encore est dite telle (F1067, B3).
+  const bedNames = bedApplications.map((application) => (application.horsSaison ? `${application.bedName}, hors saison` : application.bedName));
   const earlierDate = earlierCalculationDate(proposal, currentCalculationId);
   const origin = earlierDate === null ? null : `calcul du ${formatDateTime(earlierDate)}`;
   return (
@@ -94,8 +95,8 @@ export function ProposalCard({ proposal, currentCalculationId, now, pending, fee
             <tbody>
               {bedApplications.map((application) => (
                 <tr key={application.bedId}>
-                  <th scope="row">{application.bedName}</th>
-                  <td data-label="Besoin avant">{formatMm(application.needBeforeMm)}</td>
+                  <th scope="row">{application.bedName}{application.horsSaison ? <small className="planning-bed-off-season">hors saison, arrosée par ce matériel partagé</small> : null}</th>
+                  <td data-label="Besoin avant">{application.horsSaison ? 'hors saison' : formatMm(application.needBeforeMm)}</td>
                   <td data-label="Apport">{formatMm(application.appliedMm)}</td>
                   <td data-label="Besoin après">{formatMm(application.needAfterMm)}</td>
                   <td data-label="Sur-apport">{application.surplusMm > 0 ? formatMm(application.surplusMm) : '—'}</td>

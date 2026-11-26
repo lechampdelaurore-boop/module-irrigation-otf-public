@@ -12,6 +12,27 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Ignorer l'irrigation hors saison, B3 : les écrans, codée le
+  26 novembre 2026** (D-353, F1075 à F1086 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4.3 à 4.5, 6
+  et 10 ; roadmap ligne 34), en Opus 5.5 · Élevé, sur une branche qui
+  réunit A1 (#255) et B2 (#256) par fusion. **Le code de la ligne 34 est
+  fini.** Dans le pli « Objectifs de la semaine », le bloc « Hors saison »
+  : les endroits hors saison en puces (« Tout le plein champ · depuis le
+  26 nov. », ses planches) avec « Reprendre » ; « Mettre hors saison »
+  ouvre le choix des cinq portées (tout le plein champ et tout le
+  sous-abri seulement si la ferme en a, les jardins à classer dits) ; s'il
+  y a des arrosages planifiés ou validés sur ces planches, une fenêtre
+  propose « Les annuler » ou « Les garder » (le défaut), l'annulation par
+  le geste du planning, un par un. Le tableau des besoins grise et dit
+  « hors saison » les planches et les jardins, la pluie reste suivie ; la
+  tuile de l'objectif d'« Aujourd'hui » dit « N planches hors saison » et
+  mène au bloc ; une proposition du planning marque la planche hors saison
+  qu'un matériel partagé arrose encore ; le « ? » du bloc dit ce qui
+  continue. Aucune migration de plus (celle de B2 renumérotée 0052 dans
+  cette branche, provisoire). Tests du domaine, parcours nouveau P74 aux
+  deux largeurs. Contrôles : voir la PR. Fusion après A1 et B2, dans
+  l'ordre de la ligne 34.
 - **L'objectif automatique se voit et se modifie, PR A1 : codée le
   26 novembre 2026** (D-351, F1051 à F1060 ; contrat
   `docs/objectif-automatique-saison-contract.md`, section 3, roadmap
