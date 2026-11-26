@@ -4,7 +4,7 @@ import { overrideDatabase } from '../../db/binding';
 import { readFeatureSelectionForUser, saveFeatureSelectionForUser, saveRouteStateForUser } from '../../db/feature-selection-repository';
 import { addSoilRecordForUser } from '../../db/soil-reserve/entries';
 import { saveHydricGoalForUser } from '../../db/water-management-repository';
-import { saveWaterResourceForUser } from '../../db/water-resource-repository';
+import { saveWaterReservoirForUser, saveWaterResourceForUser } from '../../db/water-resource-repository';
 import type { IrrigationSnapshot } from '../../lib/domain/domain';
 import { FEATURE_IDS } from '../../lib/domain/features/catalogue';
 import { startWaySelection } from '../../lib/domain/features/start';
@@ -77,11 +77,15 @@ async function countsOf(owner: string, snapshot: IrrigationSnapshot = snapshotWi
   return startRouteCounts(startRouteReads(owner, SEASON, enabled, NOW), { ownerUserId: owner, season: SEASON, snapshot, now: NOW });
 }
 
-/** La ferme d'Alice, passée par « Tout » : un goutte-à-goutte posé sur les deux planches de la serre, un puits, la serre visée, le sol d'une parcelle. */
+/** La ferme d'Alice, passée par « Tout » : un goutte-à-goutte posé sur les deux planches de la serre, un puits et un bassin, la serre visée, le sol d'une parcelle. */
 async function describeAlice() {
   await createDripFixture(ALICE, { beds: ['bed-1', 'bed-2'] });
   await saveWaterResourceForUser(ALICE, ALICE, null, { name: 'Puits', type: 'well', nominalFlowCubicMetersPerHour: 2, status: 'active', availableFrom: null, availableUntil: null, notes: null });
   await saveWaterResourceForUser(ALICE, ALICE, null, { name: 'Ancien forage', type: 'borehole', nominalFlowCubicMetersPerHour: 1, status: 'inactive', availableFrom: null, availableUntil: null, notes: null });
+  // Une réserve compte comme une ressource (« un puits, un bassin », section 5.1) ; une réserve arrêtée, non.
+  const reservoir = { type: 'pond', capacityCubicMeters: 40, currentVolumeCubicMeters: 30, minimumSafetyCubicMeters: 0, exposedSurfaceSquareMeters: 0, receivesRain: false, evaporationEnabled: false, evaporationCoefficient: 1, notes: null } as const;
+  await saveWaterReservoirForUser(ALICE, ALICE, null, { ...reservoir, name: 'Bassin des noues', status: 'active' }, '2026-09-10T07:00:00.000Z');
+  await saveWaterReservoirForUser(ALICE, ALICE, null, { ...reservoir, name: 'Vieille cuve', status: 'inactive' }, '2026-09-10T07:00:00.000Z');
   await saveHydricGoalForUser(ALICE, { season: SEASON, weekStart: WEEK, amountMm: 20, scopeType: 'plot', otfZoneId: FIXTURE_ZONE_ID, otfPlotId: FIXTURE_PLOT_ID, otfBedId: null });
   // Un objectif compte à partir de son jour de pose (D-034) : posé le lundi de la semaine lue.
   database.sqlite.prepare('UPDATE irrigation_hydric_goal_revisions SET created_at = ?').run('2026-09-07T05:00:00.000Z');
@@ -97,8 +101,8 @@ test('section 6 : les comptes d’une ferme décrite en partie, et rien de celle
   assert.deepEqual(await countsOf(ALICE), {
     equipment: { drip: 1, sprinkler: 0, withoutSetting: 0 },
     placement: { watered: 2, total: 3 },
-    // Une ressource arrêtée ne compte pas.
-    water: { names: ['Puits'], total: 1 },
+    // Une ressource ou une réserve arrêtée ne compte pas.
+    water: { names: ['Bassin des noues', 'Puits'], total: 2 },
     objective: { withObjective: 2, total: 3 },
     soil: { withoutSoil: 1, total: 2, anchor: soilParcelAnchor(OTHER_ZONE) },
   });
@@ -117,7 +121,7 @@ test('section 6 : les comptes d’une ferme décrite en partie, et rien de celle
   assert.deepEqual(alice.steps.map((step) => [step.id, step.status, step.line]), [
     ['equipment', 'done', '1 goutte-à-goutte'],
     ['placement', 'done', '2 planches arrosées sur 3'],
-    ['water', 'done', 'Puits'],
+    ['water', 'done', 'Bassin des noues et Puits'],
     ['objective', 'current', '1 planche n’a pas encore d’eau visée.'],
     ['soil', 'todo', 'sol de 1 parcelle saisi'],
   ]);

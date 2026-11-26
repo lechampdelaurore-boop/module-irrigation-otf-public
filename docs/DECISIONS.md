@@ -11619,7 +11619,8 @@ Précisions prises en codant (PR 2) :
   Ces lignes sont celles du matériel, jamais une par planche : trois cents
   planches lancent autant de requêtes que trois (un test les compte).
   « D'où vient l'eau » : `readActiveWaterResourceNamesForUser`
-  (**nouvelle**, un lot de deux requêtes : deux noms et un `COUNT`).
+  (**nouvelle**, un lot de deux requêtes : deux noms et un `COUNT` des
+  ressources et des réserves).
   « Combien je vise » : `listHydricGoalRevisionsThroughWeekForUser` puis,
   après le plan, `readAutomaticObjectiveSourceForUser`, `objectiveForBed`
   et `farmObjective`, ceux d'« Aujourd'hui » (S6-i). « Mon sol » :
@@ -11631,11 +11632,14 @@ Précisions prises en codant (PR 2) :
   **trois** étapes faites : « plus de trois » de la section 5.2 est lu
   comme « trois ou plus », d'après son propre exemple. Le pli ne contient
   que des étapes faites, donc jamais l'étape en cours.
-- **F960** — **« D'où vient l'eau »** ne compte que les ressources
-  **actives** : une ressource retirée n'apporte plus d'eau. Les noms sont
-  triés sans tenir compte des majuscules ; deux au plus, joints par « et »
-  comme F948, puis « et n autre(s) ». Le volume n'est pas regardé
-  (section 5.1).
+- **F960** — **« D'où vient l'eau »** compte les ressources **et les
+  réserves** (« un puits, un bassin », section 5.1 ; sur « Ressources et
+  pompes », deux listes, « Ressources » et « Réserves ») : une ferme qui
+  n'arrose qu'à partir d'une cuve a de l'eau. Seulement les **actives** :
+  une ressource ou une réserve arrêtée n'apporte plus d'eau. Les noms des
+  deux listes sont triés ensemble sans tenir compte des majuscules ; deux
+  au plus, joints par « et » comme F948, puis « et n autre(s) ». Le volume
+  n'est pas regardé (section 5.1).
 - **F961** — **Un compte inconnu** : la lecture qui échoue rend sa
   promesse `null` (journal `start_route_read_failed`, l'étape, jamais la
   personne) ; l'étape est « à vérifier » (« À vérifier : ce compte n'a pas

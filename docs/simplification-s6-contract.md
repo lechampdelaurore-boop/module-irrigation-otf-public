@@ -643,7 +643,7 @@ message.
   `listGardenGroupsForUser` (deux, nouvelle, en lecture seule), puis
   `calculateIrrigationCoverage` ; « D'où vient l'eau »,
   `readActiveWaterResourceNamesForUser` (nouvelle, un lot : deux noms et un
-  `COUNT`) ; « Combien je vise », `listHydricGoalRevisionsThroughWeekForUser`
+  `COUNT` des ressources et des réserves) ; « Combien je vise », `listHydricGoalRevisionsThroughWeekForUser`
   (une) puis, après le plan, `readAutomaticObjectiveSourceForUser` (une
   quand le réglage est éteint), `objectiveForBed` et `farmObjective` ;
   « Mon sol », `listZonesWithSoilForUser` (une, partagée avec le bandeau)

@@ -38,8 +38,9 @@ import { readAutomaticObjectiveSourceForUser } from './automatic-objective-sourc
  *   saison, lus sans rien écrire (`listGardenGroupsForUser`, deux) ; les
  *   planches arrosées sont celles de `calculateIrrigationCoverage`, le calcul
  *   du plan, jamais un compte à part (F958).
- * - « D'où vient l'eau » : deux noms et un `COUNT` des ressources actives
- *   (`readActiveWaterResourceNamesForUser`, un lot de deux requêtes).
+ * - « D'où vient l'eau » : deux noms et un `COUNT` des ressources et des
+ *   réserves actives (`readActiveWaterResourceNamesForUser`, un lot de deux
+ *   requêtes).
  * - « Combien je vise par semaine » : les objectifs saisis jusqu'à la semaine
  *   (`listHydricGoalRevisionsThroughWeekForUser`, une) et, après le plan,
  *   l'objectif automatique (`readAutomaticObjectiveSourceForUser`, une
