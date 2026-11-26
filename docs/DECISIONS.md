@@ -11056,7 +11056,10 @@ modèle par usage, correction de biais par station : rangés hors version.
 API officielles Météo-France : écartées. Aucune table recréée ; une colonne
 additive sur les préférences météo.
 
-**Points ouverts au porteur.** La licence « non commerciale » d'Open-Meteo
-au regard d'un module gratuit pendant le pilote puis ~1 € par mois et par
-ferme sans but lucratif ; le budget d'un abonnement. Le réseau du conteneur
-n'atteint pas Open-Meteo : essais par GitHub (A) et par le Worker (B).
+**Licence et budget (décision du porteur, 26 novembre 2026 à 12 h 47).** La
+licence « non commerciale » d'Open-Meteo ne bloque rien : tout reste gratuit
+pendant le pilote, une licence payante est probable ensuite, financée par
+la société qui gère Ouvre ta ferme ; aucune question à Open-Meteo, aucun
+abonnement acheté ; le code reste indifférent à l'offre. Le réseau du
+conteneur n'atteint pas Open-Meteo : essais par GitHub (A) et par le Worker
+(B). Plus aucun point ouvert au porteur.

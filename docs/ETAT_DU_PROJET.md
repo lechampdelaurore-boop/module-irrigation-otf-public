@@ -18,8 +18,9 @@ registres, elle y renvoie.
   Open-Meteo par ferme, « Automatique » (la lecture actuelle) restant le
   défaut ; liste tenue dans le code ; la `source` des lignes dit le modèle.
   Le conteneur n'atteint pas Open-Meteo : essai A sur un lanceur GitHub
-  avant le code. **Deux points au porteur** : la licence « non
-  commerciale » et le budget. Aucun contrôle rejoué (PR de registres, sans
+  avant le code. **Licence et budget tranchés par le porteur le
+  26 novembre 2026 à 12 h 47** : gratuit pendant le pilote, licence payante
+  probable ensuite, financée par OTF ; rien n'attend. Aucun contrôle rejoué (PR de registres, sans
   code).
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,

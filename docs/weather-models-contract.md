@@ -84,7 +84,7 @@ Le conteneur de l'assistant n'atteint pas Open-Meteo ; **aucune de ces preuves n
 
 - **Essai A, sur un lanceur GitHub** (workflow à déclenchement manuel, dépôt public donc gratuit, au plus 10 appels, aucune clé, aucun secret) : pour chaque modèle de la liste du § 4, un lieu de France métropolitaine ; relever (1) les noms exacts des séries dans une réponse à plusieurs modèles, (2) lesquelles des cinq variables chaque modèle rend, (3) la portée réelle en jours, (4) le comptage de l'appel (en-têtes de limite si présents). Le résultat est collé dans la PR du code (format, noms, portée) et **fixe la liste du § 4**.
 - **Essai B, depuis le Worker déployé** : le premier enregistrement d'un modèle (règle 8) est la preuve ; la PR du code la rend aussi lisible dans les journaux (statut, date) et l'**ETAT_DU_PROJET** la consigne avec le résultat. Si Open-Meteo refuse en effet les requêtes de l'infrastructure partagée, la règle 8 empêche toute ferme de choisir un modèle qui ne marche pas, et le chantier **s'arrête là** avec la cause écrite, sans casser personne (option : passer par un autre chemin, décision du porteur).
-- **Licence et prix : décision du porteur avant la mise en ligne** (§ 10, question 1).
+- **Licence et prix : tranchés par le porteur le 26 novembre 2026** (§ 10) : gratuit pendant le pilote, licence payante probable ensuite, financée par OTF ; rien n'attend.
 
 ## 8. Tests exigés (avant le code)
 
@@ -107,12 +107,17 @@ Ces pistes viennent de la recherche ; **rien n'est décidé, ni codé, ni daté*
 - **Correction d'un biais local** par station (type post-traitement statistique) : au moins un an de données pour les saisons ; hors de portée avant.
 - Les API officielles Météo-France : écartées sans besoin nouveau.
 
-## 10. Questions pour le porteur (une par message, avec recommandation)
+## 10. Décision du porteur sur la licence et le budget (26 novembre 2026, 12 h 47)
 
-Cinq points tranchés par l'assistant par son option recommandée (§ 11) ; **deux restent au porteur** : la licence et le budget, toujours à lui.
+La licence gratuite d'Open-Meteo est « non commerciale ». **Le porteur tranche : la licence ne bloque rien.** Pendant le pilote, tout reste gratuit, faute de moyens pour le financer ; après le pilote, une licence payante est probable, **financée directement par la société qui gère Ouvre ta ferme**. Conséquences :
 
-1. **Licence Open-Meteo « non commercial » (budget)** : l'offre gratuite d'Open-Meteo est réservée à un usage **non commercial**, avec attribution CC BY 4.0. Le module est gratuit pendant le pilote, puis ~1 € par mois et par ferme possible, **sans but lucratif** (PR #90). La frontière entre « non commercial » et « sans but lucratif » mérite d'être **demandée par écrit à Open-Meteo** (info@open-meteo.com, par vous : l'assistant n'écrit à personne, AGENTS.md) avant la première ferme tierce ; sinon, l'abonnement Standard (1 M d'appels par mois, **prix non affichés**, à demander) est la voie claire. Aujourd'hui la réanalyse passe déjà par Open-Meteo gratuit ; ce chantier **augmente** cet usage (la prévision aussi) mais pas le volume (§ 5).
-2. **Mise en ligne seulement après la réponse d'Open-Meteo ?** Recommandation : **oui pour une ferme tierce, non pour votre ferme seule** (pilote privé, sans facturation).
+- **aucune question écrite à Open-Meteo avant le code**, ni avant la mise en ligne, pour une ferme tierce comme pour la sienne : la mise en ligne n'attend plus de réponse ;
+- **aucun abonnement acheté maintenant** ; le budget d'un abonnement après le pilote n'est pas décidé ici et se retrouvera chez OTF ;
+- le code reste **indifférent à l'offre** : l'adresse de base de l'API et la clé éventuelle (`apikey`, adresse `customer-api…` du palier payant) seront un réglage serveur, **sans changer une règle de ce contrat** le jour où la licence payante arrive ; la clé, si elle existe, est saisie par le porteur lui-même (AGENTS.md) ;
+- l'attribution CC BY 4.0 reste affichée (§ 6) ;
+- le risque dit une fois : tant que le palier gratuit est utilisé, Open-Meteo n'offre aucune garantie de disponibilité et peut limiter l'accès ; la règle 8 (choix vérifié) et le retour à « Automatique » (règle 9) protègent les fermes.
+
+Aucune question n'est encore ouverte au porteur pour ce contrat.
 
 ## 11. Choix pris par défaut (option recommandée, modifiables par le porteur)
 
