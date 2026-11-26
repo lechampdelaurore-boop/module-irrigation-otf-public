@@ -152,7 +152,7 @@ test('cas 4 : sans aucune des huit cases utiles, pas de page « Aujourd’hui »
 
 test('F1 et F2 : « Aujourd’hui » est la première du menu, la page d’arrivée, et ne propose pas la saison', () => {
   assert.equal(menuPages(ALL)[0], 'aujourdhui');
-  assert.equal(menuPages(ALL).length, 13, 'les douze pages et « Ma ferme » (lot S3, PR 1)');
+  assert.equal(menuPages(ALL).length, 14, 'les douze pages, « Semaine » (lot S4, PR 1) et « Ma ferme » (lot S3, PR 1)');
   assert.equal(landingPage(ALL), 'aujourdhui');
   assert.deepEqual(legacyRedirect('', ALL), { page: 'aujourdhui', notEnabled: false });
   // Une ancienne ancre garde sa page ; une ancre inconnue conduit à « Aujourd'hui ».

@@ -219,7 +219,7 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
   const weekProposed = plan ? proposedIds(plan.proposals, now) : [];
 
   return (
-    <section className="planning-section" aria-labelledby="planning-title" aria-busy={pending}>
+    <section id="planning" className="planning-section" aria-labelledby="planning-title" aria-busy={pending}>
       <header className="planning-heading">
         <div>
           {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
