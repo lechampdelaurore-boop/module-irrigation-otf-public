@@ -11991,3 +11991,32 @@ saison, **le module propose d'annuler** les arrosages planifiés ou
 validés des planches concernées, jamais sans son choix.
 
 Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, aligné sur #245) pour le code.
+
+## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
+
+Date : 26 novembre 2026. Statut : **codée**, sur la branche de S6 PR 4
+(#238) et du contrat (#240) ; contrat
+`docs/objectif-automatique-saison-contract.md`, section 3 (D-337), et ses
+précisions F1051 à F1060 (section 11). Roadmap ligne 34, section 6
+quaterdecies.
+
+**Décision.** Le volet « Objectifs de la semaine » lit l'objectif de chaque
+planche tel que le tableau des besoins l'applique (`objectiveForBed`), porté
+par le signal qui portait déjà l'objectif de la ferme (S1, D-328) ; rien
+n'est écrit chaque matin, aucune lecture serveur de plus, aucune migration.
+Réglage allumé, il en tire les lignes « automatique » et la valeur du champ
+(`lib/domain/objective-reading.ts`, moyennes par `farmObjective`) ; la
+saisie passe avant comme toujours. « Revenir à l'automatique » est le geste
+« vider » restreint à un endroit (`clearHydricGoalsForUser` reçoit
+l'endroit) : même révision « cleared », même journal, même recalcul du
+plan. Allumer avec des objectifs saisis ouvre une fenêtre : garder (le
+défaut), vider (le geste existant, en rouge) ou annuler ; l'écran ne vide
+jamais seul. Réglage éteint, l'écran est celui d'avant.
+
+**Ajout de l'assistant, sans règle** : « Corriger » sur chaque ligne
+automatique choisit l'endroit et met le curseur dans le champ (F1056).
+
+**Ce qui n'est pas fait** : B1 à B3 (le filtre « hors saison ») ; la recette
+sur le site après la mise en ligne.
+
+Numéros : D-351 ; F1051 à F1060.

@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **L'objectif automatique se voit et se modifie, PR A1 : codée le
+  26 novembre 2026** (D-351, F1051 à F1060 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, section 3, roadmap
+  ligne 34), en Opus 5.5 · Élevé, sur la branche de S6 PR 4 (#238) et du
+  contrat (#240). Réglage allumé, le volet « Objectifs de la semaine »
+  liste une ligne « automatique » par jardin (et par planche qui s'en
+  écarte) avec ses mm et leur origine, « Corriger » ; le champ
+  « mm / semaine » montre la valeur en vigueur de l'endroit choisi,
+  marquée ; un objectif saisi dit « saisi » avec « Revenir à
+  l'automatique » (le geste « vider » de cet endroit seul) ; allumer avec
+  des objectifs saisis ouvre une fenêtre (garder, vider en rouge,
+  annuler) ; une phrase de résultat sous l'interrupteur. Rien n'est écrit
+  chaque matin, aucune migration, aucun calcul changé ; réglage éteint,
+  l'écran d'avant. Tests du domaine et de persistance, P58 repris aux deux
+  largeurs. Contrôles : voir la PR. Fusion après S4, S6, #240 et #245 ;
+  vient B3 (B2 d'abord pour les lecteurs).
 - **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
   vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
   F982 ; contrat, sections 10, 11 et 15), en Opus 5.5 · Très élevé,

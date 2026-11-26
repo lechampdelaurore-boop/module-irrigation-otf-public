@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (l'objectif automatique se voit et se modifie, A1)
+
+- **Le volet « Objectifs de la semaine » montre l'objectif automatique**
+  (D-351, F1051 à F1060) : réglage allumé, une ligne « automatique » par
+  jardin, et par planche qui s'en écarte, avec ses millimètres de la
+  semaine et leur origine (« d’après l’ET0 », « prévu » pour une semaine
+  à venir), et « Corriger » ; le champ « mm / semaine » montre la valeur
+  en vigueur de l'endroit choisi, « saisie » ou « automatique » ; laissé
+  tel quel, « Enregistrer » n'écrit rien. Un objectif saisi est dit
+  « saisi » et propose « Revenir à l’automatique », pour cet endroit seul.
+  Allumer quand des planches gardent un objectif saisi ouvre une fenêtre :
+  « Allumer, garder mes objectifs », « Allumer et vider les objectifs » (en
+  rouge) ou « Annuler ». Sous l'interrupteur, une phrase dit le résultat de
+  la semaine. Rien n'est écrit chaque matin ; réglage éteint, rien ne
+  change.
+
 ### Modifié (simplifier l'usage du module, S6, PR 4 : les visites, la ferme vierge, les contrats)
 
 - **La visite guidée parle des trois façons de commencer** (D-336, F976
