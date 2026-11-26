@@ -88,9 +88,10 @@ test('n° 21, F469 : un seul dessin de pli, le chevron à droite, sauf les menus
 });
 
 test('n° 21, F470 : les raccourcis et les choix ne sont plus pleins', () => {
-  // « Cette semaine » est un lien en secondaire, sous les flèches de la page « Semaine » (S4, PR 2), absent quand on y est.
+  // « Cette semaine » est un lien en secondaire, sous les flèches de la page « Semaine » (S4, PR 2), absent quand on y est ;
+  // un lien du routeur depuis la PR 3, qui change de semaine sans recharger la page (F936).
   const week = readFileSync('app/irrigation/semaine/week-first-level.tsx', 'utf8');
-  assert.match(week, /\{heading\.thisWeek \? <a className="week-this-week" href=\{href\(heading\.thisWeek, currentSeason\)\}>Cette semaine<\/a> : null\}/);
+  assert.match(week, /\{heading\.thisWeek \? <Link className="week-this-week" href=\{href\(heading\.thisWeek, currentSeason\)\} prefetch=\{false\}>Cette semaine<\/Link> : null\}/);
   assert.match(readFileSync('lib/domain/semaine/week-heading.ts', 'utf8'), /thisWeek: state === 'current' \? null : weekStartDateKey\(today\)/, '« Cette semaine » indisponible quand on y est');
   assert.match(readFileSync('app/irrigation/water-resource-manager.tsx', 'utf8'), /aria-pressed=\{dashboard\.horizon === horizon\}/);
   assert.match(readFileSync('app/irrigation/garden-group-manager.tsx', 'utf8'), /data-secondary=\{!hasSprinkler \|\| undefined\}/);
