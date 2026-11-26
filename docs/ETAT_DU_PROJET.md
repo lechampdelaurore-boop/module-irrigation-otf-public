@@ -31,6 +31,20 @@ registres, elle y renvoie.
   sur « Objectifs et besoins », aucun chiffre sans 14 jours, aucun verdict en
   mots. Aucun calcul, migration, écriture ni budget. Deux PR de code (Opus 5.5
   · Élevé).
+- **Simplifier l'usage du module, S5 : le budget de hauteur tenu avec un
+  arrosage en cours, codé le 26 novembre 2026** (D-342, F996, F997 ;
+  contrat, sections 7 et 13), en Opus 5.5 · Élevé, sur le choix du porteur
+  du même jour de reprendre la dette F910, depuis `main` après #230. Au
+  téléphone, la carte de l'arrosage en cours se range plus serré (le nom à
+  gauche du minuteur, l'état à droite du réglage, des marges plus courtes,
+  sans cadre bleu autour) ; « Fin estimée » dit l'heure seule le jour même,
+  comme sur « Aujourd'hui » (`runningEndText`, la fonction de la carte
+  d'« Aujourd'hui »). Rien n'est retiré du premier niveau. « 1. Où ? » à
+  **653 px** au téléphone avec un arrosage en cours (800 px avant, budget
+  700 px, borne de P64) ; 298 px sans, inchangé ; l'ordinateur ne change
+  pas. Aucun calcul ni aucune écriture changés. Contrôles : voir la PR.
+  Sa fusion vient à son tour, après les PR de S4 et de S6 qui passent
+  avant.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
@@ -41,8 +55,10 @@ registres, elle y renvoie.
   de la section 9.1 réécrits. « 1. Où ? » à 298 px au téléphone (603 px
   avant S5). **Budget avec une irrigation en cours non tenu** (800 px au
   lieu de 700, F910 ; la carte en cours raccourcie au téléphone, F909) :
-  dette dite. Contrôles : voir la PR. Viennent les fusions de S5 (après
-  S3), puis S4.
+  dette dite, reprise par D-342. Contrôles : voir la PR. **En ligne** :
+  #230 fusionnée le 26 novembre 2026 à 10 h 55 (648cbc1), déployée à
+  11 h 38, run 45796472386, les cinq jobs verts (consigné par la PR du
+  budget, D-342) : **S5 est en ligne en entier.** Vient S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
