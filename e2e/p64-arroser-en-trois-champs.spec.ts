@@ -18,7 +18,7 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLesReglagesDeLaPag
  *   ligne de « Où ? » dit son type et ses planches. La hauteur du premier
  *   bloc est mesurée, sans et avec un arrosage en cours (PR 3, section 7) :
  *   sous 400 px au téléphone sans arrosage en cours ; sous 700 px avec,
- *   tenu depuis D-337 (F983, F984) : la carte de l'arrosage en cours,
+ *   tenu depuis D-342 (F996, F997) : la carte de l'arrosage en cours,
  *   rangée plus serré au téléphone, le met vers 650 px avec le nom long d'un
  *   parcours (800 px avant, F910).
  * - Trois touches, sans clavier : la case ronde, « + » (30 min), « Démarrer ·
@@ -139,7 +139,7 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await attendreLaPagePrete(page, 'arrosages');
   const ouAvecArrosage = await hautDuPremierBloc(page);
   testInfo.annotations.push({ type: 'mesure', description: `« 1. Où ? » à ${ouAvecArrosage} px du haut de la page (${testInfo.project.name}), avec un arrosage en cours` });
-  // Le budget de 700 px, tenu depuis D-337 (F983, F984 ; 1 011 → 800 → environ 650 px).
+  // Le budget de 700 px, tenu depuis D-342 (F996, F997 ; 1 011 → 800 → environ 650 px).
   if (telephone) expect(ouAvecArrosage, '« 1. Où ? » sous 700 px, avec un arrosage en cours').toBeLessThan(700);
   await verifierLEtape(page, journal, 'trois touches, la réponse sous le bouton');
 

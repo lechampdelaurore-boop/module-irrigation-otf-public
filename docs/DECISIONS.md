@@ -11028,7 +11028,7 @@ Précisions prises en codant :
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
 
-## D-337 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
+## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
 
 Date : 26 novembre 2026. Statut : **codée** ; contrat
 `docs/simplification-s5-contract.md` (section 7, budget ; section 13,
@@ -11049,7 +11049,7 @@ détail des apports, la faisabilité de la pompe et ses deux boutons de
 
 Précisions prises en codant :
 
-- **F983** — Au téléphone (jusqu'à 560 px), la carte de l'arrosage en
+- **F996** — Au téléphone (jusqu'à 560 px), la carte de l'arrosage en
   cours se range plus serré : le nom à gauche du minuteur, l'état (« En
   cours », « En pause ») à droite du réglage, sur la même ligne ; le
   minuteur en 28 px ; des marges plus courtes autour des trois valeurs, du
@@ -11059,7 +11059,7 @@ Précisions prises en codant :
   réponse garde un écart de 12 px avec le titre. Mise en page seulement,
   dans `arroser-maintenant.css` ; l'ordinateur ne change pas. Amende F909
   (le nom et le minuteur restent côte à côte, l'état change de place).
-- **F984** — « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »)
+- **F997** — « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »)
   et le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »), à l'heure
   de la ferme : les mots de la carte d'« Aujourd'hui » (« fin prévue à
   12 h 15 »), par la même fonction (`timeText`, appelée par

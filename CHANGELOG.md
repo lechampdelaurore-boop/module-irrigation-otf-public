@@ -8,7 +8,7 @@ source détaillée commit par commit.
 ### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
 
 - **« Arroser ou noter » plus court au téléphone pendant un arrosage**
-  (D-337, F983, F984) : la carte de l'arrosage en cours se range plus
+  (D-342, F996, F997) : la carte de l'arrosage en cours se range plus
   serré (le nom à côté du minuteur, « En cours » à côté du réglage, des
   marges plus courtes, sans cadre bleu autour) et « 1. Où ? » commence à
   653 px au lieu de 800 px, sous le budget de 700 px. Rien n'est retiré :

@@ -206,7 +206,7 @@ export function endClockText(now: Date, durationSeconds: number | null): string 
 
 /**
  * La fin estimée d'un arrosage en cours, sur sa carte d'« Arroser ou noter »
- * (budget de hauteur tenu, D-337, F984) : les mots de la carte
+ * (budget de hauteur tenu, D-342, F997) : les mots de la carte
  * d'« Aujourd'hui » (« fin prévue à 13 h 50 »), l'heure seule le jour même,
  * le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »). À l'heure de la ferme.
  */

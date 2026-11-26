@@ -13,7 +13,7 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - **Simplifier l'usage du module, S5 : le budget de hauteur tenu avec un
-  arrosage en cours, codé le 26 novembre 2026** (D-337, F983, F984 ;
+  arrosage en cours, codé le 26 novembre 2026** (D-342, F996, F997 ;
   contrat, sections 7 et 13), en Opus 5.5 · Élevé, sur le choix du porteur
   du même jour de reprendre la dette F910, depuis `main` après #230. Au
   téléphone, la carte de l'arrosage en cours se range plus serré (le nom à
@@ -36,10 +36,10 @@ registres, elle y renvoie.
   de la section 9.1 réécrits. « 1. Où ? » à 298 px au téléphone (603 px
   avant S5). **Budget avec une irrigation en cours non tenu** (800 px au
   lieu de 700, F910 ; la carte en cours raccourcie au téléphone, F909) :
-  dette dite, reprise par D-337. Contrôles : voir la PR. **En ligne** :
+  dette dite, reprise par D-342. Contrôles : voir la PR. **En ligne** :
   #230 fusionnée le 26 novembre 2026 à 10 h 55 (648cbc1), déployée à
   11 h 38, run 45796472386, les cinq jobs verts (consigné par la PR du
-  budget, D-337) : **S5 est en ligne en entier.** Vient S4.
+  budget, D-342) : **S5 est en ligne en entier.** Vient S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche

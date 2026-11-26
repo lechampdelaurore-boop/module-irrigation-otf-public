@@ -34,11 +34,11 @@ test('l’ordre de la page (S5-m) : l’en-cours, le formulaire, l’à-venir, p
   assert.equal(render.split('{notificationReadiness}').length, 2, 'les alertes du téléphone à une seule place');
 });
 
-test('l’arrosage en cours raccourci au téléphone (F909, F983) : mêmes gestes, rangés côte à côte', () => {
+test('l’arrosage en cours raccourci au téléphone (F909, F996) : mêmes gestes, rangés côte à côte', () => {
   const css = read('app/irrigation/styles/arroser-maintenant.css');
   const phone = css.slice(css.indexOf('L\'arrosage en cours, plus court au téléphone'));
   assert.match(phone, /@media \(max-width: 560px\)/);
-  // Le nom à gauche du minuteur, l'état à droite du réglage (F983).
+  // Le nom à gauche du minuteur, l'état à droite du réglage (F996).
   assert.match(phone, /\.active-irrigation-card > header \{[^}]*display: grid;[^}]*"nom minuteur"\s*"reglage etat";/);
   assert.match(phone, /\.active-irrigation-card > header > div \{\s*display: contents;\s*\}/);
   for (const [selector, area] of [['h4', 'nom'], ['header p', 'reglage'], ['.event-status', 'etat'], ['.timer-countdown', 'minuteur']]) {
@@ -55,7 +55,7 @@ test('l’arrosage en cours raccourci au téléphone (F909, F983) : mêmes geste
   assert.doesNotMatch(phone, /display: none|visibility: hidden/);
 });
 
-test('la carte en cours garde ses valeurs, ses plis et ses gestes ; la fin estimée dit l’heure (F984)', () => {
+test('la carte en cours garde ses valeurs, ses plis et ses gestes ; la fin estimée dit l’heure (F997)', () => {
   const cards = read('app/irrigation/irrigation-manager/irrigation-cards.tsx');
   const active = cards.slice(cards.indexOf('export function ActiveIrrigationCard'), cards.indexOf('export function IrrigationRecordCard'));
   for (const kept of ['<dt>Temps effectué</dt>', '<dt>Fin estimée</dt>', '<dt>Volume en cours</dt>', '<ApplicationDetails', '<EventPumpSummary', '>Reprendre<', '>Pause<', 'Terminer l’irrigation', 'Fermer la vanne']) {
@@ -110,7 +110,7 @@ test('la visite suit les trois blocs : « 1. Où ? », « 2. Combien de temps ? 
   assert.match(read('lib/domain/demo/tours.ts'), /« Démarrer · fin vers … »/);
 });
 
-test('F984 : la fin estimée d’un arrosage en cours, l’heure seule le jour même, à l’heure de la ferme', () => {
+test('F997 : la fin estimée d’un arrosage en cours, l’heure seule le jour même, à l’heure de la ferme', () => {
   // 26 novembre 2026, 11 h 40 à Paris (UTC+1).
   const now = new Date('2026-11-26T10:40:00.000Z');
   assert.equal(runningEndText('2026-11-26T11:10:00.000Z', now), '12 h 10');

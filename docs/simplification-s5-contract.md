@@ -301,7 +301,7 @@ pas (S5-f).
   d'aujourd'hui. Sans irrigation en cours, **le bloc « Où ? » commence sous
   400 px à 390 px de large** (budget, mesuré par la PR 1 ; la maquette
   « AVANT » le mettait vers 670 px) ; **avec une irrigation en cours, sous
-  700 px** (tenu depuis le 26 novembre 2026, D-337 ; voir section 13).
+  700 px** (tenu depuis le 26 novembre 2026, D-342 ; voir section 13).
 - **Après « Démarrer »**, la page **reste**, la réponse est sous le bouton, et
   l'irrigation apparaît en cours en tête de page, comme aujourd'hui (F404) ;
   une ligne « Voir l'arrosage en cours sur Aujourd'hui » mène à la carte de
@@ -606,7 +606,7 @@ au téléphone sans rien retirer, mesure encore environ 430 px. La raccourcir
 davantage retirerait une information du premier niveau, ce que la section 1
 exclut ; dette dite dans D-334 (F910), P64 borne à 820 px.
 
-**Budget tenu, 26 novembre 2026** (D-337, F983, F984), sur le choix du
+**Budget tenu, 26 novembre 2026** (D-342, F996, F997), sur le choix du
 porteur de reprendre F910 : au téléphone, la carte en cours se range plus
 serré sans rien retirer (le nom à gauche du minuteur, l'état à droite du
 réglage, des marges plus courtes, le bloc « Irrigations en cours » sans

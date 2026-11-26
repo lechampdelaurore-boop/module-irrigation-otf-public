@@ -85,7 +85,7 @@ export function ActiveIrrigationCard({
         <div><dt>Temps effectué</dt><dd>{formatDuration(elapsed)}</dd></div>
         <div>
           <dt>Fin estimée</dt>
-          {/* L'heure seule le jour même, comme la carte d'« Aujourd'hui » (D-337, F984). */}
+          {/* L'heure seule le jour même, comme la carte d'« Aujourd'hui » (D-342, F997). */}
           <dd>{equipment.timerTheoreticalEndAt
             ? runningEndText(equipment.timerTheoreticalEndAt, now)
             : 'Après la reprise'}</dd>
