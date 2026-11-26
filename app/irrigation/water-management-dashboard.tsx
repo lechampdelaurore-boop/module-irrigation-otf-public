@@ -38,7 +38,14 @@ import {
   type WaterActionResult,
 } from './water-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
-import { AUTOMATIC_OBJECTIVE_SETTING_TEXT } from '@/lib/domain/objective-reading';
+import {
+  AUTOMATIC_OBJECTIVE_SETTING_TEXT,
+  automaticObjectiveLines,
+  automaticObjectiveResultText,
+  objectiveInForce,
+  type ObjectiveBedReading,
+} from '@/lib/domain/objective-reading';
+import { AutomaticObjectiveEnableDialog, AutomaticObjectiveLines, type EnableChoice } from './automatic-objective-panel';
 import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
@@ -95,7 +102,9 @@ export function WaterManagementDashboard({
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const say = (origin: string, tone: ActionReplyMessage['tone'], text: string) => setReplies([actionReply(origin, tone, text)]);
   const [scope, setScope] = useState(FARM_SCOPE_VALUE);
-  const [goalAmount, setGoalAmount] = useState('');
+  // Ce que la personne a tapé dans « mm / semaine » ; `null` : rien, le champ montre la valeur en vigueur (6 quaterdecies, A1, point 3).
+  const [goalDraft, setGoalDraft] = useState<string | null>(null);
+  const goalAmountInput = useRef<HTMLInputElement>(null);
   const [city, setCity] = useState('');
   const [postcode, setPostcode] = useState('');
   const [candidates, setCandidates] = useState<WeatherLocationCandidate[]>([]);
@@ -129,6 +138,13 @@ export function WaterManagementDashboard({
   const farmGoal = dashboard.goals.find((goal) => goal.scopeType === 'farm');
   // L'objectif de la ferme : celui d'« Aujourd'hui », pour la semaine affichée seulement (S1, PR 3).
   const farmObjective = farmObjectiveNotice?.weekStart === dashboard.weekStart ? farmObjectiveNotice.objective : null;
+  // L'objectif de chaque planche de la semaine affichée, lu avec les besoins ; réglage allumé, le volet le montre (A1, points 2 et 3).
+  const automaticOn = dashboard.automaticObjective?.enabled === true;
+  const objectiveBeds: ObjectiveBedReading[] | null = farmObjectiveNotice?.weekStart === dashboard.weekStart ? farmObjectiveNotice.beds : null;
+  const automaticLines = automaticOn && objectiveBeds !== null ? automaticObjectiveLines(objectiveBeds) : [];
+  const inForce = automaticOn && objectiveBeds !== null ? objectiveInForce(parseGoalScope(scope), dashboard.goals, objectiveBeds) : null;
+  const inForceText = inForce === null ? '' : mm.format(Math.round(inForce.mm * 10) / 10);
+  const goalAmount = goalDraft ?? inForceText;
   const quietDays = quietWaterDaysText(dashboard.days);
   const missingEt0Dates = dashboard.days.filter((day) => day.et0Mm === null).map((day) => day.date);
   const missingActualRainDates = dashboard.days.filter((day) => day.date <= today && day.effectiveActualRainMm === null).map((day) => day.date);
@@ -242,13 +258,46 @@ export function WaterManagementDashboard({
 
   const saveGoal = () => {
     const target = parseGoalScope(scope);
+    // Réglage allumé, un champ laissé tel quel n'écrit rien (A1, point 3).
+    if (inForce !== null && goalAmount === inForceText) {
+      say('objectif', 'notice', 'Valeur inchangée : rien n’est enregistré. Modifiez les millimètres pour poser un objectif saisi, qui passe avant l’objectif automatique.');
+      return;
+    }
     startTransition(async () => {
-      receiveChange(await saveHydricGoalAction({
+      const result = await saveHydricGoalAction({
         season,
         weekStart: dashboard.weekStart,
         amountMm: numeric(goalAmount),
         ...target,
+      });
+      receiveChange(result, 'objectif');
+      // Allumé, le champ montre ensuite la valeur en vigueur, l'objectif saisi.
+      if (result.ok && automaticOn) setGoalDraft(null);
+    });
+  };
+
+  /** Un autre endroit choisi : réglage allumé, le champ montre sa valeur en vigueur (A1, point 3) ; éteint, comme avant. */
+  const chooseScope = (value: string) => {
+    setScope(value);
+    if (automaticOn) setGoalDraft(null);
+  };
+
+  /** « Corriger » une ligne automatique : son endroit choisi, le champ prêt à la saisie (A1, point 3). */
+  const correctLine = (scopeValue: string) => {
+    chooseScope(scopeValue);
+    goalAmountInput.current?.focus();
+  };
+
+  /** « Revenir à l'automatique » : le geste « vider » de cet endroit seul (A1, point 4). */
+  const backToAutomatic = (goal: WaterDashboard['goals'][number]) => {
+    startTransition(async () => {
+      receiveChange(await clearHydricGoalsAction({
+        season,
+        weekStart: dashboard.weekStart,
+        confirmed: true,
+        scope: { scopeType: goal.scopeType, otfZoneId: goal.otfZoneId, otfPlotId: goal.otfPlotId, otfBedId: goal.otfBedId },
       }), 'objectif');
+      setGoalDraft(null);
     });
   };
 
@@ -258,11 +307,39 @@ export function WaterManagementDashboard({
    */
   // L'interrupteur suit le geste tout de suite ; un refus le rend à l'état enregistré.
   const [automaticShown, showAutomatic] = useOptimistic(dashboard.automaticObjective?.enabled ?? false);
-  const saveAutomaticObjective = (enabled: boolean) => {
+  const saveAutomaticObjective = (enabled: boolean, clearAfter = false) => {
     startTransition(async () => {
       showAutomatic(enabled);
-      receiveChange(await saveAutomaticObjectiveAction({ season, weekStart: dashboard.weekStart, enabled }), 'objectif-automatique');
+      const result = await saveAutomaticObjectiveAction({ season, weekStart: dashboard.weekStart, enabled });
+      if (result.ok && enabled) setGoalDraft(null);
+      if (!result.ok || !clearAfter) {
+        receiveChange(result, 'objectif-automatique');
+        return;
+      }
+      // « Allumer et vider les objectifs » : le geste existant, confirmé dans la fenêtre d'allumage (A1, point 5) ; les deux messages ensemble.
+      const cleared = await clearHydricGoalsAction({ season, weekStart: dashboard.weekStart, confirmed: true });
+      if (cleared.ok) {
+        receiveChange({ ...cleared, message: `${result.message} ${cleared.message}` }, 'objectif-automatique');
+        return;
+      }
+      receiveChange(result, 'objectif-automatique');
+      say('objectif-automatique', 'error', cleared.message);
     });
+  };
+
+  // Allumer quand des planches gardent un objectif saisi ouvre d'abord la fenêtre (A1, point 5) ; sinon, rien ne s'ouvre.
+  const [enableAsked, setEnableAsked] = useState<number | null>(null);
+  const toggleAutomaticObjective = (enabled: boolean) => {
+    const kept = dashboard.automaticObjective?.keptGoalBeds ?? 0;
+    if (enabled && kept > 0) {
+      setEnableAsked(kept);
+      return;
+    }
+    saveAutomaticObjective(enabled);
+  };
+  const chooseEnable = (choice: EnableChoice) => {
+    setEnableAsked(null);
+    if (choice !== 'cancel') saveAutomaticObjective(true, choice === 'clear');
   };
 
   /** « Vider les objectifs » : le même mot sur le bouton et dans la fenêtre, en rouge (lot G, n° 8, F414 et F415). */
@@ -400,21 +477,25 @@ export function WaterManagementDashboard({
           bodyClassName="water-fold-body"
           summary={<><h3>{SIMPLE_WORDS.weekGoal}</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null, dashboard.automaticObjective?.enabled === true)}</small></>}
         >
-          {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} shown={automaticShown} pending={pending} onChange={saveAutomaticObjective} onClearGoals={() => void clearGoals()} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
+          {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} shown={automaticShown} pending={pending} onChange={toggleAutomaticObjective} onClearGoals={() => void clearGoals()} result={automaticOn && farmObjective !== null && objectiveBeds !== null ? automaticObjectiveResultText(farmObjective, objectiveBeds, dashboard.automaticObjective.keptGoalBeds) : null} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
+          <AutomaticObjectiveEnableDialog keptGoalBeds={enableAsked} onChoose={chooseEnable} />
           <div className="water-panel-title">
             <div><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
             <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => void clearGoals()}>Vider les objectifs</button>
           </div>
-          <GoalScopePicker snapshot={snapshot} season={season} value={scope} onChange={setScope} />
+          <GoalScopePicker snapshot={snapshot} season={season} value={scope} onChange={chooseScope} />
           <div className="water-inline-form">
-            <label><span>mm / semaine</span><input inputMode="decimal" value={goalAmount} onChange={(event) => setGoalAmount(event.target.value)} /></label>
+            <label><span>mm / semaine</span><input ref={goalAmountInput} inputMode="decimal" value={goalAmount} onChange={(event) => setGoalDraft(event.target.value)} /></label>
             <button type="button" disabled={pending} onClick={saveGoal}>Enregistrer</button>
           </div>
+          {/* La valeur en vigueur de l'endroit choisi, et d'où elle vient (A1, point 3). */}
+          {inForce !== null && goalDraft === null ? <small className="goal-amount-origin">Valeur en vigueur : {inForce.origin}</small> : null}
           <ActionReply messages={replies} origin="objectif" classNames={WATER_REPLY_CLASSES} />
           <div className="goal-chip-list">
-            {dashboard.goals.length === 0 ? <p>Aucun objectif pour cette semaine.</p> : dashboard.goals.map((goal) => (
-              <span key={goal.id}><strong>{goalLabel(goal, snapshot)}</strong>{mm.format(goal.amountMm)} mm</span>
+            {dashboard.goals.length === 0 && automaticLines.length === 0 ? <p>Aucun objectif pour cette semaine.</p> : dashboard.goals.map((goal) => (
+              <span key={goal.id}><strong>{goalLabel(goal, snapshot)}</strong>{mm.format(goal.amountMm)} mm{automaticOn ? <><small>saisi</small><button type="button" className="secondary-button" disabled={pending} onClick={() => backToAutomatic(goal)}>Revenir à l’automatique</button></> : null}</span>
             ))}
+            <AutomaticObjectiveLines lines={automaticLines} pending={pending} onCorrect={correctLine} />
           </div>
         </AnchoredFold>
 
@@ -511,13 +592,15 @@ const WATER_REPLY_CLASSES = { notice: 'water-notice', warning: 'weather-stale', 
  * gardent un objectif saisi avec le geste existant « Vider les objectifs ».
  * L'écran ne vide jamais seul (règle 2).
  */
-function AutomaticObjectiveSetting({ setting, shown, pending, onChange, onClearGoals, reply }: {
+function AutomaticObjectiveSetting({ setting, shown, pending, onChange, onClearGoals, result, reply }: {
   setting: NonNullable<WaterDashboard['automaticObjective']>;
   /** L'état que l'interrupteur montre : celui du geste en cours, sinon l'état enregistré. */
   shown: boolean;
   pending: boolean;
   onChange: (enabled: boolean) => void;
   onClearGoals: () => void;
+  /** Allumé, la phrase de résultat de la semaine (6 quaterdecies, A1, point 6) ; `null` sinon. */
+  result: string | null;
   reply: React.ReactNode;
 }) {
   const kept = setting.keptGoalBeds;
@@ -528,6 +611,7 @@ function AutomaticObjectiveSetting({ setting, shown, pending, onChange, onClearG
         <span><strong>Objectif automatique</strong> · {shown ? 'allumé' : 'éteint'}</span>
       </label>
       <p>{AUTOMATIC_OBJECTIVE_SETTING_TEXT} Un objectif saisi passe toujours avant.</p>
+      {result !== null ? <p className="automatic-objective-result" role="status">{result}</p> : null}
       {setting.enabled && kept > 0 ? (
         <div className="automatic-objective-kept" role="note">
           <p>{kept === 1 ? '1 planche garde un objectif saisi cette semaine' : `${kept} planches gardent un objectif saisi cette semaine`} : il passe avant l’objectif automatique. Pour qu’elle{kept > 1 ? 's' : ''} le sui{kept > 1 ? 'vent' : 've'}, videz les objectifs.</p>
