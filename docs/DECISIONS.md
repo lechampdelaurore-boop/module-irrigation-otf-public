@@ -11071,7 +11071,8 @@ n'a pas été relevée. La démonstration a été remise à zéro ensuite
 
 Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées** (les PR 2
 à 4 le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
-(#231), **PR 2 à 17 h** (#232), **PR 3 à 18 h 31** (#233) ; contrat
+(#231), **PR 2 à 17 h** (#232), **PR 3 à 18 h 31** (#233), **PR 4 à
+19 h 55** (#234) : **les quatre PR en ligne** ; contrat
 `docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
 sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le
@@ -11498,6 +11499,289 @@ Précisions prises en codant :
   vers `besoins`, « Voir au planning » remis font chacun échouer un test ;
   la visite sans l'ouverture des plis fait échouer V3 (l'élément souligné
   est caché).
+
+## D-336 — Simplifier l'usage du module, lot S6 : la mise en route guidée
+
+Date : 26 novembre 2026. Statut : **PR 2 sur 4 codée** (contrat #218
+en ligne le 26 novembre 2026 à 20 h 42 ; PR 1 #235 fusionnée à 21 h 32) ; contrat `docs/simplification-s6-contract.md` (sections 3, 4,
+9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la PR 2), roadmap
+section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
+élevé, le réglage de la roadmap et du contrat (section 17), après la fin
+du code de S4, sur la branche de sa PR 4, le contrat (#218) fusionné dans
+la branche sans attendre sa fusion dans `main`.
+
+**Décision (PR 1).** La première ouverture (`/irrigation/bienvenue`)
+propose **trois façons de commencer** : « Je note mes arrosages », « Le
+module me propose quoi arroser » (étiquette « Conseillé ») et « Tout :
+sol, cultures et alertes ». **Rien n'est choisi d'avance** (S6-a) ;
+« Continuer » attend un appui. Le serveur calcule lui-même les cases de la
+façon choisie ; celles qu'envoie le navigateur sont ignorées. « Choisir
+moi-même les fonctionnalités » montre, sur la même page, la liste des
+onze cases de la 3.8, cochée des cases de la façon enfoncée. Une
+migration additive (0051) ajoute deux colonnes à
+`irrigation_feature_selections` : `start_mode` (comment la ferme a
+commencé, nul pour une ferme d'avant S6) et `route_state` (l'état de la
+carte de la PR 2, jamais écrit par la PR 1). La première arrivée est
+« Ma ferme » quand la mise en route a au moins une étape, sinon la page
+d'arrivée de F31 ; les ouvertures suivantes ne changent pas. Réglages dit
+comment la ferme a commencé, en une ligne au-dessus des cases.
+« Commencer par l'essentiel » (F452) est retiré. Aucun calcul, aucune
+règle d'agronomie ni d'isolation ne change ; aucune question
+agronomique.
+
+Précisions prises en codant :
+
+- **F947** — **Les trois façons** sont une table du domaine,
+  `lib/domain/features/start.ts` (`START_WAYS`, leurs noms et phrases,
+  ceux de la maquette, relus par le test de vocabulaire de S1). Les cases
+  de chaque façon sont la fermeture de la 3.8 (`withRequirements`, R3) :
+  « Je note » coche Arrosages, Matériel et placement, Historique et
+  cumuls (3) ; « Le module propose », en plus, Planning de la semaine,
+  Objectifs et besoins, Ressources et pompes (6) ; « Tout », les onze. Un
+  test les calcule et les vérifie. Les types et la lecture des deux
+  colonnes sont dans `lib/domain/features/start-mode.ts`, sans import, pour
+  qu'aucune boucle ne se forme entre le choix des cases et les façons.
+- **F948** — **La phrase de ce qui suit** vient de
+  `lib/domain/onboarding/route.ts` : les cinq étapes de la section 5.1,
+  chacune avec la case qui la fait exister (Matériel et placement pour les
+  deux premières, Ressources et pompes, Objectifs et besoins, Réserve du
+  sol), la même fonction que la carte de la PR 2 lira. Sans choix :
+  « quelques étapes ». **Écart de ponctuation** avec le tableau de la
+  section 3.3 : le dernier élément de la liste est joint par « et »
+  (« le matériel, où il est posé, d'où vient l'eau et combien vous
+  visez »), comme pour deux étapes (« le matériel et où il est posé »).
+  Option recommandée, modifiable à la relecture. Un test énumère toutes
+  les parties des onze cases que la fermeture accepte : la phrase, le
+  nombre d'étapes et la première arrivée se suivent pour chacune.
+- **F949** — **Un seul enregistrement** : `saveStartChoiceForUser`
+  (`db/feature-selection-repository.ts`) écrit dans un même lot D1
+  l'espace de la ferme, la ligne du journal des modifications et la ligne
+  du choix avec `start_mode`. L'index unique des espaces refuse un second
+  espace : deux appuis, ou deux onglets, ne font qu'un enregistrement (un
+  test les lance ensemble) ; le second apprend « Vous avez déjà choisi
+  comment commencer. » et reçoit la page d'arrivée, relue dans la base et
+  non dans la mémoire de la requête, et la page s'ouvre (section 12). Une
+  ferme qui a déjà un espace (d'avant la 3.8, d'avant S6) ne repasse
+  jamais par ce choix.
+- **F950** — **L'action** `saveFeatureSelectionAction` reçoit
+  `startMode` (`notes`, `proposals`, `all`, `custom`) ; le service
+  `lib/services/start-choice.ts` refuse une façon inconnue (« Choisissez
+  une façon de commencer. ») et un choix « moi-même » vide (P7). Appelée
+  sans `startMode` par une ferme à sa première ouverture (une page
+  d'avant S6 restée ouverte pendant la mise en ligne), elle enregistre
+  `custom` avec ses cases. Avec un espace, le chemin de Réglages ne change
+  pas. Le journal `irrigation_features_chosen` porte la façon, jamais
+  l'identifiant de la personne.
+- **F951** — **L'écran** : trois boutons radio natifs dans un
+  `radiogroup` nommé par le titre ; chaque ligne fait 72 px au moins, le
+  choix retenu porte la bordure verte épaisse **et** une coche ; le
+  contour du focus est sur la ligne. « Continuer » fait 50 px, pleine
+  largeur ; « Enregistrement… » pendant l'appel ; l'erreur sous le bouton,
+  le choix gardé. « Choisir moi-même les fonctionnalités » et « ‹ Revenir
+  aux trois façons » font 44 px ; le clavier suit le changement de vue. Le
+  texte de la 3.8 (« Cochez ce dont votre ferme a besoin… ») passe sur la
+  liste. Le repère de la visite `fonctionnalites` est sur les trois façons :
+  les étapes de la visite gardent leur ancre, leurs phrases suivent en
+  PR 4 (section 10). Les styles sont dans `mise-en-route.css`, importé
+  avant `trois-endroits.css`, qui reste juste avant `gestes-surs.css`.
+- **F952** — **« Commencer par l'essentiel » retiré** :
+  `ESSENTIAL_FEATURES`, `withEssentialFeatures` et les styles
+  `.welcome-start` sont supprimés ; le test du lot I vérifie désormais leur
+  absence (contre-épreuve : les remettre le fait échouer).
+- **F953** — **Les mots** : le titre de la page et celui de la visite
+  suivent le titre de l'écran (« Comment voulez-vous commencer ? ») ; le
+  lien de la page introuvable, pour une ferme qui n'a pas choisi, dit
+  « Choisir comment commencer ». La ligne de Réglages finit par un point :
+  « Vous avez commencé par : « Le module me propose quoi arroser ». »,
+  « Vous avez choisi vous-même vos fonctionnalités. » ; aucune pour une
+  ferme d'avant S6 ; elle ne propose pas de refaire le choix (section 9).
+- **F954** — **La migration 0051** ajoute deux colonnes nulles avec leur
+  contrainte `CHECK`, sans rien écrire ; un test la joue sur une base qui
+  a des lignes, un autre vérifie l'export et la restauration. La remise à
+  zéro de la démonstration rend la ferme vierge sans choix, façon comprise
+  (un test). Les deux essais de migration qui remplissent une copie
+  ancienne avec les dépôts d'aujourd'hui (0034, 0042) ajoutent les deux
+  colonnes le temps de la remplir, puis les retirent, comme ils le font
+  déjà pour les tables de la 0044 et de la 0047 ; celui de la 0034 compare
+  les lignes sans ces deux colonnes, nulles.
+- **F955** — **Les parcours** : `attendreLaPremiereOuverture` attend les
+  trois façons ; `attendreLeChoixDesFonctionnalites` passe par « Choisir
+  moi-même » ; une ferme neuve qui coche tout passe par « Tout », arrive
+  sur « Ma ferme », puis ouvre « Aujourd'hui ». P22 est réécrit ; P23,
+  P25, P29, P63 et P66 arrivent sur « Ma ferme » ; P28 et P30 prennent
+  l'aide commune ; V6 et V8 jouent les boutons radio ; P69 est nouveau.
+- **F956** — **Relevé de départ** (section 15) : avant la PR 1, « Commencer
+  par l'essentiel » était lu par `lib/domain/features/choice.ts` seulement
+  (et l'écran par son import) ; « Choisissez vos fonctionnalités » par
+  l'écran, `page-metadata.ts`, `guided-tour.tsx`, P22 et l'aide des
+  parcours ; l'écran de bienvenue par huit parcours directement (P22, P23,
+  P25, P28, P29, P30, P63, P66), vingt et un par l'aide `ouvrirUneFermeToutCochee`
+  (P31, P31b, P31c, P33, P41, P46, P51 à P58, P60, P62 à P65, P67, P68),
+  V6 et V8 de la démonstration, neuf fichiers de tests (lot I, deux, lot 1,
+  fonctionnalités, démonstration, visites, mots de S1, liens de S3, semaine
+  de S4) et les deux étapes de « Le module à la carte » posées sur
+  `bienvenue` (`lib/domain/demo/tours.ts`). Tous suivent dans la PR 1,
+  sauf les phrases des deux étapes de la visite, qui suivent en PR 4
+  (section 10) : leur repère est sur les trois façons.
+- **F957** — **Mesures et preuves** (section 14) : l'écran de la première
+  ouverture, à 390 px, en local, sur une ferme neuve, la hauteur de la
+  page et les mots de l'écran (`#contenu`, compté de la même façon avant
+  et après) : **avant, 2 227 px et 343 mots** (onze cases, « Commencer
+  par l'essentiel ») ; **après, 920 px et 108 mots** (les trois façons) ;
+  « Choisir moi-même », 2 230 px et 332 mots. Le contrat disait 365 mots
+  avant, compté autrement. Contre-épreuves, chacune fait échouer au moins
+  un test : une façon qui coche une case de moins ; un client qui impose
+  ses cases ; une façon enfoncée d'avance ; « Commencer par l'essentiel »
+  qui reparaît ; un second appui qui échoue au lieu d'apprendre « déjà
+  choisi » ; la phrase qui dit « cinq » partout ; la première arrivée
+  toujours sur la page d'arrivée ; une ligne de Réglages pour une ferme
+  d'avant S6. Parcours joués en local aux deux largeurs : P22 et P69
+  (9 verts), puis P23, P25, P28, P29, P30, P31, P62, P63, P66 et P69
+  (53 verts), aucun échec ; la suite complète par la CI.
+
+**Décision (PR 2).** Une carte **« Mise en route »** en tête de « Ma
+ferme », sous le titre, au-dessus des fiches : « 3 étapes sur 5 » et sa
+barre, les étapes qui existent (une par case cochée, section 5.1), la
+première étape non faite « en cours » avec ce qui lui manque et ce
+qu'elle débloque, « Continuer l'étape n » (un lien) et « Plus tard ».
+Une étape est faite quand **ce qu'elle décrit existe** : la carte se lit
+sur les données de la ferme, rien ne se coche, rien ne se confirme à la
+place de la personne (S6-h). « Plus tard », « Reprendre la mise en
+route » et « Terminer la mise en route » écrivent `route_state` par un
+appui, et rien d'autre ; `done` ne revient jamais (S6-k). Le bandeau « À
+finir » n'est plus répété sur « Ma ferme » quand la carte est visible
+(S6-d). Sur « Aujourd'hui », quand aucune carte d'arrosage n'est à
+montrer, la ligne vide devient un bloc qui dit l'étape en cours, tirée de
+la même fonction que la carte (section 8). **Une lecture par page**,
+lancée avant le plan d'Ouvre ta ferme, seulement sur « Ma ferme » et
+« Aujourd'hui » et seulement quand la carte existe (section 6). Aucun
+calcul, aucune règle d'agronomie ni d'isolation ne change ; aucune
+migration ; aucune question agronomique.
+
+Précisions prises en codant (PR 2) :
+
+- **F958** — **Les lectures**, relevées pour la section 15
+  (`lib/services/start-route.ts`) : « Mon matériel » et « Où il est
+  posé » lisent l'inventaire (`listEquipmentForUser`), les poses de la
+  saison (`listEquipmentPlacementsForUser`) et les groupes de jardins de
+  la saison (`listGardenGroupsForUser`, **nouvelle, en lecture seule** :
+  `listGardenGroupConfigurationForUser` pose le marqueur de la saison et
+  reporte les groupes de la saison d'avant à sa première lecture, et une
+  lecture ne fait pas de geste) ; les planches arrosées sont celles de
+  `calculateIrrigationCoverage`, le calcul du plan, appelé sur ces lignes.
+  **Écart dit avec la section 6** (« des `COUNT` ») : une pose vise une
+  planche, un jardin ou un groupe, et seul ce calcul dit quelles planches
+  elle arrose ; un `COUNT` des poses serait une seconde règle (AGENTS.md).
+  Ces lignes sont celles du matériel, jamais une par planche : trois cents
+  planches lancent autant de requêtes que trois (un test les compte).
+  « D'où vient l'eau » : `readActiveWaterResourceNamesForUser`
+  (**nouvelle**, un lot de deux requêtes : deux noms et un `COUNT` des
+  ressources et des réserves).
+  « Combien je vise » : `listHydricGoalRevisionsThroughWeekForUser` puis,
+  après le plan, `readAutomaticObjectiveSourceForUser`, `objectiveForBed`
+  et `farmObjective`, ceux d'« Aujourd'hui » (S6-i). « Mon sol » :
+  `listZonesWithSoilForUser` puis `parcelsWithoutSoil` et
+  `soilParcelAnchor`, ceux du bandeau ; la même promesse sert au bandeau,
+  jamais deux lectures. Les planches sont celles de la saison de la page
+  qui ont leur jardin et leur parcelle, celles du tableau des besoins.
+- **F959** — **Le pli** des étapes faites (« 3 étapes faites ») dès
+  **trois** étapes faites : « plus de trois » de la section 5.2 est lu
+  comme « trois ou plus », d'après son propre exemple. Le pli ne contient
+  que des étapes faites, donc jamais l'étape en cours.
+- **F960** — **« D'où vient l'eau »** compte les ressources **et les
+  réserves** (« un puits, un bassin », section 5.1 ; sur « Ressources et
+  pompes », deux listes, « Ressources » et « Réserves ») : une ferme qui
+  n'arrose qu'à partir d'une cuve a de l'eau. Seulement les **actives** :
+  une ressource ou une réserve arrêtée n'apporte plus d'eau. Les noms des
+  deux listes sont triés ensemble sans tenir compte des majuscules ; deux
+  au plus, joints par « et » comme F948, puis « et n autre(s) ». Le volume
+  n'est pas regardé (section 5.1).
+- **F961** — **Un compte inconnu** : la lecture qui échoue rend sa
+  promesse `null` (journal `start_route_read_failed`, l'étape, jamais la
+  personne) ; l'étape est « à vérifier » (« À vérifier : ce compte n'a pas
+  pu être lu. », un « ? » dans sa marque, son lien gardé), jamais faite ni
+  à zéro (D-003), et n'est jamais l'étape en cours. Toutes inconnues : une
+  ligne, « La mise en route n'a pas pu être lue. » (section 6). Un
+  objectif automatique illisible rend l'étape 4 inconnue : sans lui, des
+  planches seraient dites sans eau visée à tort.
+- **F962** — **Les états d'une étape** : l'étape en cours est la première
+  connue, non faite, qui n'attend pas. L'étape 4 attend l'étape 2 quand la
+  pose est connue et non faite (« Posez d'abord le matériel sur vos
+  planches. ») ; sans planche, elle dit « Aucune planche dans votre plan.
+  Ajoutez-les dans Ouvre ta ferme. » (section 12) ; l'étape 5 sans
+  parcelle dit la même phrase pour les parcelles. Une étape qui attend
+  n'a pas de lien. Une étape à faire dit ce qui existe déjà, jamais un
+  « 0 » ; « ce qu'elle débloque » n'est dit que pour l'étape en cours. Les
+  phrases sont celles du tableau de la section 5.1 ; « sol de n
+  parcelles » vient d'une seule fonction, `soilParcelsText`, que le
+  bandeau lit aussi.
+- **F963** — **Les liens** (`STEP_LINKS`, la saison et le jardin gardés
+  par `pageHref`) : étape 1, « Matériel et placement », onglet Matériel,
+  `#equipment-title` (le titre et son bouton d'ajout) ; étape 2, la même
+  page, `#farm-plan` ; étape 3, « Ressources et pompes »,
+  `#water-resources-title` ; étape 4, « Semaine », `#objectifs-de-la-semaine`,
+  le volet des objectifs qu'« Objectifs et besoins » est devenu en S4, et
+  non « le premier objectif manquant » : l'objectif se pose pour la ferme
+  ou par planche depuis ce volet ; étape 5, « Réserve du sol », l'ancre de
+  la première parcelle sans sol.
+- **F964** — **Les gestes** : une action du serveur,
+  `saveRouteStateAction` (`app/irrigation/start-route-actions.ts`), puis
+  `changeRouteStateForUser` et `saveRouteStateForUser`, **un** `UPDATE`
+  borné à l'espace de la personne (`WORKSPACE_SPACE_FILTER`), qui ne touche
+  ni une ferme d'avant S6 (`start_mode` nul) ni une mise en route terminée
+  (« La mise en route est déjà terminée. ») ; « Reprendre » remet
+  `route_state` à nul. « Terminer » n'est pas recompté au serveur : le
+  bouton ne paraît que tout fait, et une étape qui deviendrait fausse
+  après ne ramène pas la carte (S6-k). Le journal des modifications ne
+  note pas ce geste (`sansObjet`, ni case ni réglage) ; le journal du
+  serveur dit le geste et l'heure, jamais la personne. La réponse
+  s'écrit à côté du bouton (`ActionReply`) et reste à l'écran quand la
+  page se relit (`router.refresh`) : un seul composant pour tous les
+  états.
+- **F965** — **Le bloc d'« Aujourd'hui »** (`todayRouteBlock`) : titre
+  « Votre ferme n'est pas encore prête à proposer des arrosages. » quand
+  Planning de la semaine est coché, sinon « Votre ferme n'est pas encore
+  décrite. » (la première façon, et toute ferme qui n'a rien à proposer) ;
+  la phrase de l'étape en cours (« Combien vous visez par semaine : 3
+  planches n'ont pas encore d'eau visée. ») ; « Continuer l'étape n »,
+  48 px. Il remplace la ligne vide seulement : dès qu'une carte
+  d'arrosage existe, il n'est pas montré. Avec « Plus tard »,
+  « Aujourd'hui » ne lit rien de la mise en route (pas de bloc, pas de
+  coût).
+- **F966** — **Le bandeau « À finir »** n'est pas passé au gabarit de
+  « Ma ferme » quand la carte est visible, en entier ou en une ligne
+  (« Votre ferme est décrite. ») ; il revient avec « Plus tard » ou une
+  lecture impossible ; les fiches gardent leur « À faire ». Les autres
+  pages ne changent pas.
+- **F967** — **Où la lecture se lance** (`page-context.ts`) : avant le
+  `Promise.all` du plan, quand `routeReadNeeded` le dit (« Ma ferme » ou
+  « Aujourd'hui », `start_mode` non nul, pas `done`, pas `later` sur
+  « Aujourd'hui », au moins une étape) ; les comptes se font après le
+  plan ; le temps s'inscrit sous `route` dans `irrigation_page_loaded`.
+  Une ferme d'avant S6 et toute autre page ne lisent rien de plus.
+- **F968** — **Mesures et preuves** (section 14). La carte à 390 px
+  (P70, en local) : cinq étapes, aucune faite, **442 px** ; cinq étapes
+  dont quatre faites, repliées, **306 px** (borne 380, la maquette 330).
+  Le temps du serveur, mesuré comme N1 et F918 (en local, `vinext dev`,
+  20 ms ajoutées à chaque lecture, sept passages, médiane, une copie de
+  la base jamais commitée) : la ferme de démonstration des parcours (la
+  forme de la ferme A), « Ma ferme » **48 ms et 6 lectures sans la
+  carte, 94 ms et 18 lectures avec** (cinq étapes), Réglages 177 ms et
+  32 lectures ; la même ferme portée à **300 planches**, « Ma ferme » 49
+  ms sans la carte, **100 ms avec** (18 lectures, autant qu'avec sept
+  planches), Réglages 185 ms. Borne : Réglages + 20 %, soit 212 et
+  222 ms ; tenue. Les douze lectures de plus partent ensemble, avant le
+  plan ; le temps ajouté est celui de deux lectures en série (le sol,
+  attendu avec le plan pour le bandeau, et l'objectif automatique, qui
+  attend le plan). Contre-épreuves, chacune fait échouer au moins un
+  test : une carte montrée à une ferme d'avant S6 ; le bandeau « À finir »
+  doublé sur « Ma ferme » ; une étape faite sans donnée ; un compte de
+  l'étape 4 fait à part, différent d'« Aujourd'hui » ; la carte qui
+  revient après « Terminer », dans le domaine puis dans la base ; une
+  lecture par planche ; le bloc d'« Aujourd'hui » sur une autre étape que
+  la carte. Parcours joués en local aux deux largeurs : P29, P63, P69 et
+  P70 (24 verts), puis P22, P23, P25, P28, P30, P31, P62, P66 et P70 (56
+  verts), aucun échec ; la suite complète par la CI.
 
 ## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
 

@@ -198,14 +198,19 @@ test('une ferme neuve : « À faire » sur la fiche de l’étape à finir ; une
   await attendreLeChoixDesFonctionnalites(page);
   for (const nom of ['Matériel et placement', 'Alertes météo']) await page.getByRole('checkbox', { name: new RegExp(`^${nom}`) }).check();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  // Les alertes météo font naître « Aujourd'hui » : c'est la page d'arrivée (F1).
+  // Le matériel à décrire : la première arrivée est « Ma ferme », la mise en route ayant une étape (lot S6, section 3.4).
+  await attendreLaPagePrete(page, 'ma-ferme');
+  // Les alertes météo font naître « Aujourd'hui » : c'est la page d'arrivée des ouvertures suivantes (F1).
+  await page.goto('/irrigation');
   await attendreLaPagePrete(page, 'aujourdhui');
 
   await attendreLaPageIrrigation(page, 'ma-ferme');
   const fiches = lesFiches(page).getByRole('link');
   await expect(fiches.locator('strong')).toHaveText([TITRES_DES_PAGES.materiel, TITRES_DES_PAGES['alertes-meteo'], TITRES_DES_PAGES.reglages]);
-  // Le bandeau « À finir » nomme la commune ; la fiche « Réglages » le dit aussi.
-  await expect(page.locator('.onboarding-unfinished')).toContainText('commune de la ferme');
+  // La carte « Mise en route » en tête (le matériel à décrire) : le bandeau « À finir » n'y est pas répété (lot S6, S6-d) ;
+  // la fiche « Réglages » dit la commune à confirmer.
+  await expect(page.locator('section.start-route')).toBeVisible();
+  await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
   const reglages = fiches.filter({ has: page.locator('strong', { hasText: TITRES_DES_PAGES.reglages }) });
   await expect(reglages.locator('.farm-card-todo')).toHaveText('À faire : commune de la ferme');
   await expect(reglages).toHaveAttribute('data-todo', 'true');

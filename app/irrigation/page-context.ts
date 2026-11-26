@@ -15,6 +15,7 @@ import {
   type IrrigationPageId,
 } from '@/lib/domain/features/pages';
 import { resolveWeekView, type WeekPageFeature, type WeekViewId } from '@/lib/domain/features/week-page';
+import type { RouteState, StartMode } from '@/lib/domain/features/start-mode';
 import { parseIrrigationSeason, parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import type { IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
 import { otfReadLineReason } from '@/lib/domain/otf-read-line';
@@ -31,6 +32,8 @@ import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { farmRainMatters } from '@/lib/domain/today/rain-entry';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
+import { routeReadNeeded, startRoute, type StartRoute } from '@/lib/domain/onboarding/route';
+import { startRouteCounts, startRouteReads } from '@/lib/services/start-route';
 import { usesPlotShelters, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
 import { getOnboardingForUser } from '@/lib/services/onboarding-service';
@@ -81,6 +84,12 @@ export type ReadyPageContext = {
   nowIso: string;
   snapshot: IrrigationSnapshot;
   enabled: readonly FeatureId[];
+  /** Comment la ferme a commencé (lot S6, section 4) ; `null` : une ferme d'avant S6. */
+  startMode: StartMode | null;
+  /** L'état de sa carte « Mise en route » (lot S6, section 5.3). */
+  routeState: RouteState | null;
+  /** La mise en route lue (lot S6, section 6) : sur « Ma ferme » et « Aujourd'hui », quand la carte existe ; `null` sinon. */
+  route: StartRoute | null;
   /** La vue ouverte de « Semaine » (lot S4, section 3.2) ; `null` sur toute autre page. */
   weekView: WeekViewId | null;
   shell: ShellProps;
@@ -124,6 +133,10 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const weekView = page === 'semaine' ? resolveWeekView(params.vue, enabled) : null;
   stopwatch.lap('selection');
 
+  // La mise en route, sur « Ma ferme » et « Aujourd'hui » quand la carte existe (lot S6, section 6) : ses
+  // lectures partent tout de suite, en même temps que le plan ; aucune ne rejette.
+  const routeInput = { startMode: selection.startMode, routeState: selection.routeState, enabled };
+  const routeReads = routeReadNeeded(page, routeInput) ? startRouteReads(user.userId, season, enabled, new Date()) : null;
   // L'accueil de la ferme se lit avec le plan : le bandeau « À finir » de chaque page (4.4, F582).
   const [loaded, onboarding] = await Promise.all([loadSnapshot(user.userId, season, forceRefresh), getOnboardingForUser(user.userId)]);
   stopwatch.lap('snapshot');
@@ -145,10 +158,15 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     };
   }
   const snapshot = loaded.snapshot;
-  // Le sol des parcelles ne se lit que pour un espace qui fait l'accueil et a coché la réserve du sol (F584).
+  // Le sol des parcelles ne se lit que pour un espace qui fait l'accueil et a coché la réserve du sol (F584) ;
+  // la lecture de la mise en route le lit déjà quand elle a l'étape « Mon sol » : une seule lecture.
   const withoutSoil = onboarding.kind === 'onboarding' && enabled.includes('sol')
-    ? parcelsWithoutSoil(snapshot.zones, season, new Set(await listZonesWithSoilForUser(user.userId)))
+    ? parcelsWithoutSoil(snapshot.zones, season, new Set(await (routeReads?.zonesWithSoil ?? null) ?? await listZonesWithSoilForUser(user.userId)))
     : [];
+  const route = routeReads
+    ? startRoute({ ...routeInput, counts: await startRouteCounts(routeReads, { ownerUserId: user.userId, season, snapshot, now: new Date() }) })
+    : null;
+  if (routeReads) stopwatch.lap('route');
   // Les espèces à rattacher ne se comptent que tant que l'étape « Cultures » d'un espace qui fait l'accueil reste à faire (F587).
   const speciesToLink = await countSpeciesToLink(user.userId, snapshot, season, onboarding.kind === 'onboarding'
     && onboarding.remaining.some((step) => step.id === 'crops') && usesSpeciesCorrespondence(enabled));
@@ -163,6 +181,9 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     nowIso: new Date().toISOString(),
     snapshot,
     enabled,
+    startMode: selection.startMode,
+    routeState: selection.routeState,
+    route,
     weekView,
     shell: {
       page,

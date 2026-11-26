@@ -1,5 +1,5 @@
 import { expect, test, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee } from './support/fonctionnalites.ts';
 import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
@@ -92,14 +92,7 @@ async function a360px<T>(page: Page, mesure: () => Promise<T>): Promise<T> {
 }
 
 async function ouvrirLaFermeToutCoche(page: Page, context: BrowserContext, testInfo: TestInfo, nom: string): Promise<void> {
-  await ouvrirUneFermeNeuve(context, testInfo, nom);
-  await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'aujourdhui');
+  await ouvrirUneFermeToutCochee(page, context, testInfo, nom);
 }
 
 test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pastilles qui mènent aux blocs', async ({ page, context }, testInfo) => {

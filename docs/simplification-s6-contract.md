@@ -617,6 +617,49 @@ message.
   faite » ou « repli gardé ».
 - Mesures avant/après (section 14) et temps serveur (PR 2, PR 3).
 
+**PR 1, 26 novembre 2026** (D-336, F947 à F957) :
+
+- **Relevé de départ** (F956) : « Commencer par l'essentiel » n'était lu que
+  par `lib/domain/features/choice.ts` et l'écran ; « Choisissez vos
+  fonctionnalités » par l'écran, le titre de la page, la visite, P22 et
+  l'aide des parcours ; l'écran de bienvenue par P22, P23, P25, P28, P29,
+  P30, P63, P66, vingt et un parcours par l'aide `ouvrirUneFermeToutCochee`,
+  V6, V8, neuf fichiers de tests et les deux étapes de « Le module à la
+  carte » posées sur `bienvenue`. Tous suivent dans la PR 1, sauf les
+  phrases de ces deux étapes (PR 4, section 10).
+- **Pris en codant** : décision D-336 ; précisions F947 à F957 ; migration
+  `drizzle/0051_start_mode_route_state.sql` ; parcours P69 (nouveau).
+- **Mesures** (F957) : à 390 px, en local, ferme neuve, hauteur de la page
+  et mots de l'écran comptés de la même façon : avant, 2 227 px et 343 mots
+  (onze cases) ; après, 920 px et 108 mots (les trois façons) ; « Choisir
+  moi-même », 2 230 px et 332 mots. Huit contre-épreuves, chacune rouge.
+
+**PR 2, 26 novembre 2026** (D-336, F958 à F968) :
+
+- **Les lectures exactes** (F958, `lib/services/start-route.ts`), toutes
+  lancées ensemble avant le plan, seulement pour les étapes qui existent :
+  « Mon matériel » et « Où il est posé », `listEquipmentForUser` (quatre
+  requêtes), `listEquipmentPlacementsForUser` (une) et
+  `listGardenGroupsForUser` (deux, nouvelle, en lecture seule), puis
+  `calculateIrrigationCoverage` ; « D'où vient l'eau »,
+  `readActiveWaterResourceNamesForUser` (nouvelle, un lot : deux noms et un
+  `COUNT` des ressources et des réserves) ; « Combien je vise », `listHydricGoalRevisionsThroughWeekForUser`
+  (une) puis, après le plan, `readAutomaticObjectiveSourceForUser` (une
+  quand le réglage est éteint), `objectiveForBed` et `farmObjective` ;
+  « Mon sol », `listZonesWithSoilForUser` (une, partagée avec le bandeau)
+  puis `parcelsWithoutSoil`. Aucune n'est par planche ni par jardin.
+  **Écart dit** : le matériel et la pose se lisent en lignes (celles du
+  matériel), pas en `COUNT`, parce que seul le calcul de la couverture dit
+  quelles planches une pose arrose.
+- **Pris en codant** : précisions F958 à F968 ; aucune migration ; parcours
+  P70 (nouveau), P29 et P63 suivent.
+- **Mesures** (F968) : la carte à 390 px, 442 px sans étape faite, 306 px
+  avec quatre faites sur cinq (borne 380). Temps du serveur, 20 ms par
+  lecture, médiane de sept : « Ma ferme » 48 → 94 ms avec la carte
+  (Réglages 177 ms) ; à 300 planches, 49 → 100 ms (Réglages 185 ms) ; 18
+  lectures dans les deux cas. Borne de Réglages + 20 % tenue. Huit
+  contre-épreuves, chacune rouge.
+
 ## 16. Risques
 
 | Risque | Parade |
