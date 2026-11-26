@@ -7,7 +7,7 @@ source détaillée commit par commit.
 
 ### Ajouté (ET0 horaire, HR1 : la forme de la journée, sans écran)
 
-- **La forme de la journée, en calcul seul** (D-348, F1030 à F1034) : à
+- **La forme de la journée, en calcul seul** (D-348, F1031 à F1035) : à
   partir de l'ET0 heure par heure, ou à défaut de la course du soleil, le
   module sait dire quelle part de la consommation du jour tombe dans chaque
   heure, combien est déjà passé et combien reste à venir, et à quelles

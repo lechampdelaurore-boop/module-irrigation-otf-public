@@ -13,7 +13,7 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - **L'ET0 horaire, HR1 : la forme de la journée, domaine pur, codée le
-  26 novembre 2026** (D-348, F1030 à F1034 ; contrat
+  26 novembre 2026** (D-348, F1031 à F1035 ; contrat
   `docs/et0-horaire-contract.md`, § 4 et § 11 ; roadmap ligne 37), en
   Opus 5.5 · Élevé, sur la branche de la PR 3 de la météo multi-modèles,
   contrat #243 fusionné dedans. `lib/domain/weather/hourly-et0.ts` : les

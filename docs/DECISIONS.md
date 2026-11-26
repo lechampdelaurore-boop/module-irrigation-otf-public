@@ -11706,26 +11706,26 @@ alertes n'est touché.
 
 Précisions prises en codant (option recommandée, modifiables par le porteur) :
 
-- **F1030** — « Petite valeur négative de nuit » (§ 4.2) : jusqu'à
+- **F1031** — « Petite valeur négative de nuit » (§ 4.2) : jusqu'à
   0,05 mm en une heure, ramenée à 0 avant l'addition ; au-delà, l'heure est
   absente et la forme du fournisseur est refusée pour ce jour
   (`NIGHT_NEGATIVE_TOLERANCE_MM`). Le calcul FAO-56 horaire donne la nuit
   quelques centièmes négatifs ; plus, ce n'est plus une correction.
-- **F1031** — « Regroupées en une plage » (§ 4.3) : la plage va de la
+- **F1032** — « Regroupées en une plage » (§ 4.3) : la plage va de la
   première à la dernière heure au seuil ; une heure plus faible entre les
   deux (un passage nuageux à midi) reste dedans. Une seule phrase à l'écran,
   comme le contrat la montre.
-- **F1032** — La forme théorique (§ 4.4) : déclinaison de FAO-56
+- **F1033** — La forme théorique (§ 4.4) : déclinaison de FAO-56
   (équation 24) au rang du jour civil du lieu ; hauteur du soleil au milieu
   de chaque heure, heure solaire tirée de l'instant UTC et de la longitude,
   équation du temps négligée comme le contrat le dit. Un jour où le soleil
   n'est au-dessus de l'horizon au milieu d'aucune heure n'a pas de forme
   (`null`), jamais une forme inventée.
-- **F1033** — Les heures d'un jour partent de `localDateStartUtc`, la
+- **F1034** — Les heures d'un jour partent de `localDateStartUtc`, la
   fonction de toutes les dates du module ; un fuseau à changement d'heure
   d'une demi-heure (île Lord Howe) donnerait une dernière heure plus courte,
   non testé : le pilote est en France métropolitaine (F419).
-- **F1034** — La fraîcheur de la forme (§ 4.5) et l'arrondi des
+- **F1035** — La fraîcheur de la forme (§ 4.5) et l'arrondi des
   millimètres (« environ 1,7 mm ») ne sont pas dans HR1 : la fraîcheur se lit
   avec l'heure de lecture que HR2 écrit, l'arrondi est celui de l'écran
   (HR3). Le domaine rend des millimètres non arrondis.
