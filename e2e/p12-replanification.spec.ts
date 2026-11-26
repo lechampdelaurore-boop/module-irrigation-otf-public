@@ -237,7 +237,8 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   const unJourDeLaSemainePassee = addDaysToDateKey(aujourdhui, -7);
   const lundiDeLaSemainePassee = weekStartDateKey(unJourDeLaSemainePassee);
   const chargeLaSemainePassee = (requete: Request) => requete.method() === 'POST' && (requete.postData() ?? '').includes(lundiDeLaSemainePassee);
-  const pageDesBesoins = (adresse: URL) => adresse.pathname === '/irrigation/besoins';
+  // Les besoins sont sur la page « Semaine » depuis le lot S4 : ses actions y sont envoyées.
+  const pageDesBesoins = (adresse: URL) => adresse.pathname === '/irrigation/semaine';
   let retenue = false;
   let relacher: () => void = () => {};
   const relachee = new Promise<void>((resolve) => { relacher = resolve; });

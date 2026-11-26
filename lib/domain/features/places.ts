@@ -13,8 +13,8 @@ import type { FeatureSelection } from './selection';
  *
  * C'est le seul endroit qui le sait (AGENTS.md, une règle vit en un seul
  * endroit) : la page « Ma ferme », et après elle la barre du bas, le menu de
- * l'ordinateur, la bande de la semaine, le retour et la visite guidée,
- * l'appellent sans recopier la liste. Ajouter une page au module oblige à la
+ * l'ordinateur, le retour et la visite guidée, l'appellent sans recopier la
+ * liste. Ajouter une page au module oblige à la
  * ranger : un test échoue pour une page sans endroit ou avec deux.
  *
  * La page d'accueil du module, l'écran de bienvenue, la page introuvable et
@@ -36,12 +36,15 @@ export type FarmCardPage = (typeof FARM_CARD_PAGES)[number];
 /**
  * Les pages de chaque endroit, dans l'ordre où l'endroit les montre. La
  * première page cochée est l'entrée de l'endroit, celle qu'ouvre sa place
- * dans la barre (section 3.2) : « Aujourd'hui », la première page cochée de
- * la semaine (S4 lui donnera sa page, S3-a), « Ma ferme ».
+ * dans la barre (section 3.2) : « Aujourd'hui », « Semaine », « Ma ferme ».
+ * Depuis le lot S4 (docs/simplification-s4-contract.md, section 3), la page
+ * « Semaine » est l'entrée de son endroit ; le planning, les besoins et
+ * l'historique y restent rangés, comme les cases et les anciennes adresses
+ * dont « Semaine » porte le contenu : ces adresses mènent à elle.
  */
 const PLACES: Readonly<Record<PlaceId, { label: string; pages: readonly IrrigationPageId[] }>> = {
   aujourdhui: { label: 'Aujourd’hui', pages: ['aujourdhui', 'arrosages'] },
-  semaine: { label: 'Semaine', pages: ['planning', 'besoins', 'historique'] },
+  semaine: { label: 'Semaine', pages: ['semaine', 'planning', 'besoins', 'historique'] },
   'ma-ferme': { label: 'Ma ferme', pages: ['ma-ferme', ...FARM_CARD_PAGES] },
 };
 
@@ -71,8 +74,9 @@ export function enabledPlacePages(place: PlaceId, selection: FeatureSelection): 
 /**
  * La page qu'ouvre un endroit, ou `null` quand l'endroit n'existe pas pour
  * cette ferme (section 3.2) : « Aujourd'hui » quand l'une des huit cases de F1
- * est cochée, « Semaine » quand Planning, Objectifs et besoins ou Historique
- * l'est, « Ma ferme » toujours (« Réglages » n'a pas de case).
+ * est cochée, la page « Semaine » quand Planning, Objectifs et besoins ou
+ * Historique l'est (lot S4), « Ma ferme » toujours (« Réglages » n'a pas de
+ * case).
  */
 export function placeEntry(place: PlaceId, selection: FeatureSelection): IrrigationPageId | null {
   return enabledPlacePages(place, selection)[0] ?? null;
@@ -90,8 +94,8 @@ export function farmCardPages(selection: FeatureSelection): FarmCardPage[] {
 
 /**
  * Les pages d'un endroit présentes dans un menu (`menuPages`, les pages que
- * la ferme a), dans l'ordre de l'endroit. La barre du bas, la bande de la
- * semaine et la page introuvable n'ont que le menu ; il dit les mêmes pages
+ * la ferme a), dans l'ordre de l'endroit. La barre du bas et la page
+ * introuvable n'ont que le menu ; il dit les mêmes pages
  * que `enabledPlacePages` (le test des 235 choix de cases le vérifie).
  */
 export function menuPlacePages(place: PlaceId, menu: readonly IrrigationPageId[]): IrrigationPageId[] {

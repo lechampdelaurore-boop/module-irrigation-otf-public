@@ -263,12 +263,14 @@ test('les anciennes adresses des notifications conduisent à la page qui porte l
   // Sans ancre, la page d'arrivée : « Aujourd'hui » quand elle existe (audit ergonomique, lot 2, F1).
   assert.deepEqual(legacyRedirect('', all), { page: 'aujourdhui', notEnabled: false });
   assert.deepEqual(legacyRedirect('', ['materiel', 'calculateur']), { page: 'materiel', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#weather', all), { page: 'besoins', notEnabled: false });
+  // Depuis le lot S4 (section 9), les blocs du planning, des besoins et de l'historique vivent sur « Semaine ».
+  assert.deepEqual(legacyRedirect('#weather', all), { page: 'semaine', notEnabled: false });
   assert.deepEqual(legacyRedirect('#weather', ['alertes-meteo']), { page: 'alertes-meteo', notEnabled: false });
   assert.deepEqual(legacyRedirect('#irrigation-eq-1', all), { page: 'arrosages', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#series-water-title', all), { page: 'historique', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#series-water-title', all), { page: 'semaine', view: 'cumuls', notEnabled: false });
   assert.deepEqual(legacyRedirect('#series-water-title', ['alertes-cultures']), { page: 'alertes-cultures', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#planning', all), { page: 'planning', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#planning', all), { page: 'semaine', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#planning-title', ['arrosages', 'materiel', 'besoins']), { page: 'aujourdhui', notEnabled: true }, 'le planning décoché : la page d’arrivée et sa ligne, même quand « Semaine » existe');
   assert.deepEqual(legacyRedirect('#planning-title', ['alertes-cultures']), { page: 'alertes-cultures', notEnabled: false });
   assert.deepEqual(legacyRedirect('#farm-plan', ['alertes-meteo']), { page: 'aujourdhui', notEnabled: false }, 'une ancre sans règle mène à la page d’arrivée');
   assert.deepEqual(legacyRedirect('#irrigation-eq-1', ['alertes-meteo']), { page: 'aujourdhui', notEnabled: true }, 'la fonctionnalité n’est pas cochée : la page d’arrivée, avec la ligne qui le dit');

@@ -3,11 +3,12 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue';
 import { menuPages, type IrrigationPageId } from '../lib/domain/features/pages';
-import { BACK_TO_FARM_LABEL, backToFarm, phoneBar, weekBand, weekBandLabel, type PhoneBarItem } from '../lib/domain/features/phone-bar';
+import { BACK_TO_FARM_LABEL, backToFarm, phoneBar, type PhoneBarItem } from '../lib/domain/features/phone-bar';
 import { farmCardPages, farmPlaces, menuPlacePages, PLACE_IDS, placeEntry, placeLabel, placeMark, placeOfPage } from '../lib/domain/features/places';
 import { PLUS_BUTTON_LABEL, PLUS_SHEET_TITLE, plusGestures, WATERING_INTENT, wateringIntentForm } from '../lib/domain/features/plus-sheet';
 import { isCompleteSelection } from '../lib/domain/features/selection';
 import { farmRainMatters, rainEntry, rainEntryFirstDate } from '../lib/domain/today/rain-entry';
+import { isWeekPageFeature, weekViewOfFeature, weekViews } from '../lib/domain/features/week-page';
 
 /**
  * Simplifier l'usage du module, lot S3, PR 2 : la barre du bas, le « + » et
@@ -36,9 +37,11 @@ function names(bar: readonly PhoneBarItem[]): string[] {
 
 /**
  * Le nombre de touches pour ouvrir une page depuis n'importe quelle autre
- * (section 4, règle 2) : l'entrée d'un endroit à une touche ; une page de
- * « Semaine » par sa bande, une fiche de « Ma ferme », « Arrosages » par le
- * « + » ou « Tous les arrosages », à deux.
+ * (section 4, règle 2) : l'entrée d'un endroit à une touche ; une fiche de
+ * « Ma ferme », « Arrosages » par le « + » ou « Tous les arrosages », à deux.
+ * Depuis le lot S4, le planning, les besoins et l'historique sont dans les
+ * vues de la page « Semaine » : la première vue à une touche, la seconde à
+ * deux, par le sélecteur de vue.
  */
 function taps(page: IrrigationPageId, menu: readonly IrrigationPageId[], rainMatters: boolean): number | null {
   const bar = phoneBar(menu, null, plusGestures(menu, rainMatters).length > 0);
@@ -46,7 +49,11 @@ function taps(page: IrrigationPageId, menu: readonly IrrigationPageId[], rainMat
   const place = placeOfPage(page);
   const entry = bar.find((item) => item.kind === 'place' && item.place === place);
   if (!entry || entry.kind !== 'place') return null;
-  if (place === 'semaine') return weekBand(menu, entry.page)?.includes(page) ? 2 : null;
+  if (place === 'semaine') {
+    if (!isWeekPageFeature(page)) return null;
+    const index = weekViews(menu).indexOf(weekViewOfFeature(page));
+    return index === -1 ? null : index + 1;
+  }
   if (place === 'ma-ferme') return (farmCardPagesOfMenu(menu) as readonly IrrigationPageId[]).includes(page) ? 2 : null;
   // « Arrosages » : par « Arroser maintenant » du « + », ou « Tous les arrosages » d'« Aujourd'hui » (section 3.4).
   if (page === 'arrosages') return plusGestures(menu, rainMatters).some((gesture) => gesture.id === 'arroser-maintenant') ? 2 : null;
@@ -62,7 +69,8 @@ test('règle 1 : Aujourd’hui, Semaine, « + », Ma ferme, dans cet ordre ; tou
   const menu = menuPages(ALL);
   assert.deepEqual(names(phoneBar(menu, null, true)), ['aujourdhui', 'semaine', 'plus', 'ma-ferme']);
   const bar = phoneBar(menu, null, true).filter((item) => item.kind === 'place');
-  assert.deepEqual(bar.map((item) => item.kind === 'place' && item.page), ['aujourdhui', 'planning', 'ma-ferme']);
+  // Depuis le lot S4, « Semaine » ouvre sa page.
+  assert.deepEqual(bar.map((item) => item.kind === 'place' && item.page), ['aujourdhui', 'semaine', 'ma-ferme']);
   assert.deepEqual(PLACE_IDS.map(placeLabel), ['Aujourd’hui', 'Semaine', 'Ma ferme']);
 });
 
@@ -94,12 +102,16 @@ test('sections 3.2 et 4 : pour chaque choix de cases valide, la barre, le « + �
   }
 });
 
-test('règle 2, le bilan honnête : Planning à une touche ; Ressources et Arrosages passent à deux ; Besoins, Historique, Matériel à deux', () => {
+test('règle 2, le bilan honnête : la semaine, son planning et ses besoins à une touche ; Ressources et Arrosages passent à deux ; Les cumuls, Matériel à deux', () => {
   const menu = menuPages(ALL);
   assert.equal(taps('aujourdhui', menu, true), 1);
+  assert.equal(taps('semaine', menu, true), 1);
+  // Le planning et les besoins sont dans « La semaine », la vue qu'ouvre « Semaine » (lot S4).
   assert.equal(taps('planning', menu, true), 1);
+  assert.equal(taps('besoins', menu, true), 1);
   assert.equal(taps('ma-ferme', menu, true), 1);
-  for (const page of ['arrosages', 'ressources', 'besoins', 'historique', 'materiel', 'sol', 'cultures', 'alertes-meteo', 'alertes-cultures', 'reglages'] as const) {
+  // L'historique est dans « Les cumuls », à une touche de « La semaine ».
+  for (const page of ['arrosages', 'ressources', 'historique', 'materiel', 'sol', 'cultures', 'alertes-meteo', 'alertes-cultures', 'reglages'] as const) {
     assert.equal(taps(page, menu, true), 2, page);
   }
 });
@@ -147,34 +159,24 @@ test('S3-e : l’endroit de la page ouverte porte la marque, `page` sur son entr
   const mark = (current: IrrigationPageId) => Object.fromEntries(phoneBar(menu, current, true).flatMap((item) => (item.kind === 'place' ? [[item.place, item.current]] : [])));
   assert.deepEqual(mark('aujourdhui'), { aujourdhui: 'page', semaine: null, 'ma-ferme': null });
   assert.deepEqual(mark('arrosages'), { aujourdhui: 'true', semaine: null, 'ma-ferme': null });
-  assert.deepEqual(mark('planning'), { aujourdhui: null, semaine: 'page', 'ma-ferme': null });
+  // Depuis le lot S4, l'entrée de « Semaine » est sa page ; ses vues ne changent pas la marque de la barre.
+  assert.deepEqual(mark('semaine'), { aujourdhui: null, semaine: 'page', 'ma-ferme': null });
+  assert.deepEqual(mark('planning'), { aujourdhui: null, semaine: 'true', 'ma-ferme': null });
   assert.deepEqual(mark('historique'), { aujourdhui: null, semaine: 'true', 'ma-ferme': null });
   assert.deepEqual(mark('ma-ferme'), { aujourdhui: null, semaine: null, 'ma-ferme': 'page' });
   assert.deepEqual(mark('reglages'), { aujourdhui: null, semaine: null, 'ma-ferme': 'true' });
-  // Sans Planning, la semaine s'ouvre sur « Objectifs et besoins » : c'est son entrée.
+  // Sans Planning, la semaine s'ouvre toujours sur sa page.
   const withoutPlanning = menuPages(['besoins', 'historique']);
-  assert.equal(placeMark('semaine', menuPlacePages('semaine', withoutPlanning)[0], 'besoins'), 'page');
-  assert.equal(placeMark('semaine', 'besoins', null), null);
-});
-
-test('section 3.3 : la bande de la semaine, sur ses trois pages, à partir de deux pages cochées', () => {
-  const menu = menuPages(ALL);
-  for (const page of ['planning', 'besoins', 'historique'] as const) assert.deepEqual(weekBand(menu, page), ['planning', 'besoins', 'historique'], page);
-  for (const page of ['aujourdhui', 'arrosages', 'ma-ferme', 'materiel', 'reglages'] as const) assert.equal(weekBand(menu, page), null, page);
-  // Zéro, une, deux, trois pages cochées.
-  assert.equal(weekBand(menuPages(['historique']), 'historique'), null, 'une page : pas de bande');
-  assert.deepEqual(weekBand(menuPages(['besoins', 'historique']), 'historique'), ['besoins', 'historique']);
-  assert.deepEqual(weekBand(menuPages(['planning', 'historique']), 'planning'), menuPlacePages('semaine', menuPages(['planning', 'historique'])));
-  assert.equal(weekBand(menuPages(['materiel']), null), null);
-  // Les noms courts d'avant, le nom complet restant celui du lien.
-  assert.deepEqual(['planning', 'besoins', 'historique'].map((page) => weekBandLabel(page as IrrigationPageId, page)), ['Planning', 'Besoins', 'Historique']);
+  assert.equal(menuPlacePages('semaine', withoutPlanning)[0], 'semaine');
+  assert.equal(placeMark('semaine', 'semaine', 'semaine'), 'page');
+  assert.equal(placeMark('semaine', 'semaine', null), null);
 });
 
 test('section 5.1 : le retour « ‹ Ma ferme » sur toute page de « Ma ferme », hors « Ma ferme » elle-même', () => {
   assert.equal(BACK_TO_FARM_LABEL, 'Retour à Ma ferme');
   for (const page of menuPages(ALL)) assert.equal(backToFarm(page), placeOfPage(page) === 'ma-ferme' && page !== 'ma-ferme', page);
   assert.equal(backToFarm(null), false, 'la page introuvable');
-  assert.equal(backToFarm('besoins'), false, 'une page de « Semaine » n’a pas de retour : sa bande suffit');
+  assert.equal(backToFarm('semaine'), false, '« Semaine » est l’entrée de son endroit, à une touche de la barre');
 });
 
 test('D-032, appelée par la barre : la pluie compte dès qu’une planche de la saison est hors abri', () => {
@@ -236,26 +238,29 @@ test('règles 3 à 5 : la barre dessine le domaine, le « + » est un bouton qui
   assert.equal((dialog.match(/saveManualRainfallAction\(/g) ?? []).length, 1);
 });
 
-test('sections 3.3 et 5.1 : la bande et le retour, au gabarit, au téléphone seulement', () => {
+test('section 5.1 : le retour au gabarit, au téléphone seulement ; le sélecteur de vue de « Semaine » à sa place (S4)', () => {
   const shell = readFileSync('app/irrigation/shell/irrigation-shell.tsx', 'utf8');
-  assert.match(shell, /<FeatureMenu key=\{page\} menu=\{menu\} current=\{page\} query=\{\{ season, zone \}\} todayBadge=\{todayBadge\} rainMatters=\{rainMatters\} week=\{week\} \/>/);
+  assert.match(shell, /<FeatureMenu key=\{page\} menu=\{menu\} current=\{page\} query=\{\{ season, zone \}\} todayBadge=\{todayBadge\} rainMatters=\{rainMatters\} week=\{week\} weekView=\{weekView\} \/>/);
   assert.match(shell, /back=\{backToFarm\(page\) \? <BackToFarm query=\{\{ season, zone \}\} \/> : null\}/);
-  assert.match(shell, /<WeekBand menu=\{menu\} current=\{page\} query=\{\{ season, zone, week \}\} \/>/);
+  // La bande de la semaine n'est plus : le sélecteur des deux vues prend sa ligne, sous le titre de « Semaine ».
+  assert.doesNotMatch(shell, /WeekBand/);
+  assert.match(shell, /\{page === 'semaine' && weekView \? <WeekViews menu=\{menu\} current=\{weekView\} query=\{\{ season, zone, week \}\} \/> : null\}/);
   const paths = readFileSync('app/irrigation/shell/place-paths.tsx', 'utf8');
-  assert.match(paths, /aria-current=\{page === current \? 'page' : undefined\}/);
+  assert.match(paths, /aria-current=\{view === current \? 'page' : undefined\}/);
   assert.match(paths, /aria-label=\{BACK_TO_FARM_LABEL\}/);
   assert.match(readFileSync('app/irrigation/shell/page-title.tsx', 'utf8'), /<div className="page-title-row">\s*\{back\}\s*<h1/);
 });
 
-test('la charte : 52 px pour le « + », 72 px pour un geste, 44 px pour la bande et le retour ; la bande et le retour seulement sous la barre', () => {
+test('la charte : 52 px pour le « + », 72 px pour un geste, 44 px pour le sélecteur de vue et le retour ; le retour seulement sous la barre', () => {
   const css = readFileSync('app/irrigation/styles/trois-endroits.css', 'utf8');
-  assert.match(css, /^\.week-band,\n\.page-back \{\n  display: none;\n\}/m);
+  assert.match(css, /^\.page-back \{\n  display: none;\n\}/m);
+  // Le sélecteur des vues de « Semaine » à toutes les largeurs (S4, section 3.2), 44 px.
+  assert.match(css, /^\.week-views a \{[^}]*min-height: var\(--touch-target\);/m);
+  assert.doesNotMatch(css, /week-band/);
   const phone = css.slice(css.indexOf('@media (max-width: 980px)'));
   assert.match(phone, /\.phone-bar-plus-badge \{[^}]*width: 52px;\s*height: 52px;/);
   assert.match(css, /\.plus-gesture \{[^}]*min-height: 72px;/);
-  assert.match(phone, /\.week-band a \{[^}]*min-height: var\(--touch-target\);/);
   assert.match(phone, /\.page-back \{[^}]*width: 44px;\s*height: 44px;/);
-  assert.match(phone, /\.week-band \{\s*display: block;/);
   assert.match(readFileSync('app/irrigation/irrigation.css', 'utf8'), /@import '\.\/styles\/trois-endroits\.css';\n@import '\.\/styles\/gestes-surs\.css';/);
   // Les noms de la barre tiennent sur une ligne à 320 px (règle 6) : courts.
   for (const place of PLACE_IDS) assert.ok(placeLabel(place).length <= 11, place);
