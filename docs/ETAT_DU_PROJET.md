@@ -47,8 +47,10 @@ registres, elle y renvoie.
   « + » (« Trois endroits », « Les endroits suivent vos cases ») ; le « ? »
   d'« Aujourd'hui » situe sa pastille dans la barre du bas ou le menu ; la
   charte du module et les contrats de la démonstration, de S1 et des
-  parcours suivent. Aucun écran ne change. **Le code de S3 est fini** ;
-  les quatre PR se fusionnent après la dernière de S2, une à la fois.
+  parcours suivent. Aucun écran ne change. **Le code de S3 est fini.**
+  **En ligne** : #225 fusionnée le 26 novembre 2026 à 6 h 22 (3076d0f),
+  déployée à 6 h 58, run 45761209624, les cinq jobs verts (consigné par
+  S5, PR 1) : **S3 est en ligne en entier.**
 - **Simplifier l'usage du module, S3, PR 3 sur 4 : le menu de
   l'ordinateur, codée le 25 novembre 2026** (D-331, F885 à F889 ; contrat,
   section 6), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Au-delà
@@ -58,7 +60,9 @@ registres, elle y renvoie.
   trois pages, « Ma ferme » et ses fiches, Réglages comprise. Les titres
   « Semaine » et « Ma ferme » sont des liens ; toute page reste à un clic.
   Le téléphone ne change pas. Tests sur les 235 choix de cases, parcours
-  P63 à 1 440 px, mesures du menu : voir la PR.
+  P63 à 1 440 px, mesures du menu : voir la PR. **En ligne, consignée par la
+  PR 4** : #223 fusionnée le 26 novembre à 5 h 08, déployée à 5 h 42, run
+  45753253944 vérifié job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S3, PR 2 sur 4 : la barre du bas, le
   « + » et le chemin de retour, codée le 25 novembre 2026** (D-331, F876 à
   F884 ; contrat, sections 3.3, 3.4, 4, 4.1 et 5.1), en Opus 5.5 · Très
@@ -71,7 +75,9 @@ registres, elle y renvoie.
   l'ordinateur ne change qu'à la PR 3. Tests sur les 235 choix de cases,
   parcours P63 aux deux largeurs, mesures à 390 px : voir la PR. L'essai des
   cinq tâches avec le premier volontaire est conseillé avant sa mise en
-  ligne (S3-m), jamais bloquant.
+  ligne (S3-m), jamais bloquant. **En ligne, consignée par la PR 3** :
+  #222 fusionnée le 26 novembre à 3 h 57, déployée à 4 h 27, run
+  45745833876 vérifié job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S3, PR 1 sur 4 : le rangement et « Ma
   ferme », codée le 25 novembre 2026** (D-331, F868 à F875 ; contrat,
   sections 3 et 5), en Opus 5.5 · Très élevé, sur la branche de la PR 5 de
@@ -84,7 +90,12 @@ registres, elle y renvoie.
   Réglages ; la barre du téléphone et le menu de l'ordinateur changent aux
   PR 2 et 3. Tests du domaine sur les 235 choix de cases valides, parcours
   P63 aux deux largeurs, contre-épreuve de quatorze altérations. Contrôles :
-  voir la PR. Ses PR se fusionnent après la dernière de S2.
+  voir la PR. Ses PR se fusionnent après la dernière de S2. **En ligne,
+  consignée par la PR 2** : #220 fusionnée le 25 novembre à 23 h 53, déployée
+  le 26 novembre à 3 h 17, run 45716978089 vérifié job par job (les cinq
+  jobs verts). Les parcours de main, joués à minuit, avaient échoué sur P37
+  et P12, sensibles à l'heure (le même code vert sur la PR à 23 h 52) : une
+  seule relance, à 2 h 37, hors de la fenêtre de minuit à 2 h 30.
 - **Simplifier l'usage du module, S2, PR 5 sur 5 : la page à l'essentiel,
   codée le 25 novembre 2026** (D-330, F860 à F867 ; contrat, sections 8 et
   9), en Opus 5.5 · Élevé, sur la branche de la PR 4 : **le code du lot S2
@@ -97,7 +108,12 @@ registres, elle y renvoie.
   Tests du domaine et de la page, P29, P30, P38 suivis, P62 mesure le premier
   niveau à 390 px. Contrôles : voir la PR. **Mise en ligne consignée ici** :
   la PR 3 du lot (#224), fusionnée à 20 h 51, déployée à 21 h 29, run
-  45689347330 vérifié job par job (les cinq jobs verts).
+  45689347330 vérifié job par job (les cinq jobs verts) ; la PR 4 du lot
+  (#226), fusionnée à 21 h 36, déployée à 22 h 13, run 45696515280 vérifié
+  job par job (les cinq jobs verts) ; **cette PR 5, la dernière (#229),
+  fusionnée à 22 h 47, déployée à 23 h 16, run 45707546339 vérifié job par
+  job (les cinq jobs verts), consignée par la PR 1 de S3 : S2 est en ligne
+  en entier.**
 - **Simplifier l'usage du module, S2, PR 4 sur 5 : noter la pluie d'un
   geste, codée le 25 novembre 2026** (D-330, F854 à F859 ; contrat, section
   7), en Opus 5.5 · Élevé, sur la branche de la PR 3. La fenêtre « Noter la
