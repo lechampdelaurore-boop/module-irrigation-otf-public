@@ -55,7 +55,8 @@ registres, elle y renvoie.
   dit ses cultures de la saison, pas les espèces à rattacher (comptées
   dans Réglages, F972). Aucune migration, aucun calcul changé. Tests ;
   P63 et P70 suivent. Contrôles, contre-épreuves et mesures : voir la PR
-  et la section 15 du contrat. Fusion après la PR 2.
+  et la section 15 du contrat. Fusion après la PR 2 (fusionnée à 22 h 10),
+  sa mise en ligne vérifiée.
 - **Simplifier l'usage du module, S6, PR 2 sur 4 : la carte « Mise en
   route », codée le 26 novembre 2026** (D-336, F958 à F968 ; contrat,
   sections 5, 6, 8, 12 et 14), en Opus 5.5 · Très élevé, empilée sur la
@@ -70,8 +71,9 @@ registres, elle y renvoie.
   `farmObjective`, l'étape 5 par `parcelsWithoutSoil`. Aucune migration,
   aucun calcul changé. Tests ; P70 nouveau ; P29 et P63 suivent.
   Contrôles, contre-épreuves et mesures : voir la PR et la section 15 du
-  contrat. Fusion après la PR 1 (fusionnée à 21 h 32), sa mise en ligne
-  vérifiée.
+  contrat. **Fusionnée** le 26 novembre 2026 à 22 h 10 (#236, 57fddd7),
+  après la mise en ligne de la PR 1 ; sa mise en ligne est à consigner par
+  S6, PR 4.
 - **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
   commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
   sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de
@@ -90,7 +92,8 @@ registres, elle y renvoie.
   volontaire conseillé avant sa mise en ligne (S6-m). Viennent les PR 2
   (la carte « Mise en route »), 3 et 4 ; fusion après le contrat #218 et
   la dernière PR de S4. **Fusionnée** le 26 novembre 2026 à 21 h 32
-  (#235, a51c4fb) ; sa mise en ligne est à consigner par S6, PR 3. La même
+  (#235, a51c4fb), **en ligne à 22 h 08**, run 45891793153, les cinq jobs
+  verts, migration 0051 appliquée (consigné par S6, PR 3). La même
   PR donne 75 minutes au job des parcours navigateur au lieu de 50 (sa
   vérification avait été coupée à 50, run 45880035932).
 - **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
