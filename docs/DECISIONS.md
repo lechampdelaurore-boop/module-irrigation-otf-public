@@ -11027,3 +11027,30 @@ Précisions prises en codant :
   S2 (dettes soldées), S3, la charte du module (onglets d'une ligne au
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
+
+## D-337 — La météo prévue contre la météo réalisée : le contrat
+
+Date : 26 novembre 2026. Statut : **contrat écrit, sans code** ;
+`docs/forecast-reliability-contract.md`, roadmap section 6 quaterdecies,
+ligne 34. Contrat en Sonnet 5.5 · Moyen ; code en Opus 5.5 · Élevé (deux PR),
+après la relecture et le « vas-y » du porteur.
+
+**Décision.** Le porteur avance l'idée « prévu contre réalisé » (D-065,
+section 6 ter) le 26 novembre 2026. Ferme par ferme, la prévision archivée
+(D-297) est comparée au réalisé du jour visé : pluie (réanalyse en lecture de
+base, pluviomètre de la ferme en lecture séparée à partir de 14 jours
+mesurés) et ET0 (réanalyse seulement, réserve de méthode dite, l'écart de J+1
+comme plancher). Trois lignes d'horizon, un cumul de semaine lu sur la
+prévision du dimanche d'avant, une fenêtre de 90 jours. Aucun chiffre sans
+14 couples (4 semaines pour le cumul), aucun verdict en mots avant de vraies
+données. Un pli fermé sur « Objectifs et besoins » ; rien sur « Aujourd'hui ».
+
+**Ce qui ne change pas.** Aucun calcul, aucune migration, aucune écriture,
+aucun appel externe, aucun budget. La pluie prévue reste comptée à 100 % ; la
+corriger d'après les écarts serait une décision agronomique du porteur, dans
+un chantier à part. Les températures (alertes de gel) sont rangées pour
+plus tard.
+
+**Choix pris par l'assistant** (contrat, section 11) : l'emplacement, la
+fenêtre, les minimums, le seuil de 1 mm, l'absence de verdict, la semaine du
+dimanche. Aucun n'est un budget ni une question agronomique réservée.

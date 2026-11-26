@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 25 novembre 2026.
+Dernière mise à jour : 26 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -12,6 +12,13 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **La météo prévue contre la météo réalisée : contrat écrit le 26 novembre
+  2026, sans code** (D-337, `docs/forecast-reliability-contract.md`, roadmap
+  section 6 quaterdecies, ligne 34), sur l'archive des prévisions (D-297) :
+  pluie et ET0, à un jour, à quelques jours et sur la semaine ; un pli fermé
+  sur « Objectifs et besoins », aucun chiffre sans 14 jours, aucun verdict en
+  mots. Aucun calcul, migration, écriture ni budget. Deux PR de code (Opus 5.5
+  · Élevé) **après le « vas-y » du porteur**.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
