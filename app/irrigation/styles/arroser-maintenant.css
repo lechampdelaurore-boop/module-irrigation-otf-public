@@ -354,41 +354,97 @@
 }
 
 /*
- * L'arrosage en cours, plus court au téléphone (S5, PR 3, section 7, F909) : les
- * mêmes gestes et les mêmes mots, rangés côte à côte (le minuteur à droite du
- * nom, les trois valeurs sur une ligne, « Pause » et « Terminer » sur une
- * ligne, chacun de 52 px) ; « 1. Où ? » commence sous 700 px.
+ * L'arrosage en cours, plus court au téléphone (S5, PR 3, section 7, F909 ;
+ * budget tenu, D-342, F996) : les mêmes gestes et les mêmes mots, rangés côte
+ * à côte. Le nom à gauche du minuteur, l'état (« En cours », « En pause ») à
+ * droite du réglage ; les trois valeurs sur une ligne ; « Pause » et
+ * « Terminer » sur une ligne, chacun de 52 px. Le bloc des irrigations en
+ * cours perd son cadre bleu (la carte garde le sien) et les marges se
+ * resserrent : avec un arrosage en cours, « 1. Où ? » commence sous 700 px.
  */
 @media (max-width: 560px) {
+  .active-irrigations {
+    margin: 0 0 12px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .active-irrigations-title {
+    margin-bottom: 6px;
+  }
+
+  /* Sans le cadre, la réponse d'un geste (« L'irrigation est en pause. ») garde son écart avec le titre. */
+  .action-reply[data-origin="haut"] + .active-irrigations {
+    margin-top: 12px;
+  }
+
+  .active-irrigation-card {
+    padding: 12px;
+  }
+
   .active-irrigation-card > header {
-    align-items: flex-start;
-    flex-direction: row;
-    gap: 12px;
+    display: grid;
+    grid-template-areas:
+      "nom minuteur"
+      "reglage etat";
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 12px;
   }
 
   .active-irrigation-card > header > div {
-    min-width: 0;
+    display: contents;
   }
 
   .active-irrigation-card h4 {
+    grid-area: nom;
+    align-self: start;
+    margin: 0;
     overflow-wrap: anywhere;
   }
 
+  .active-irrigation-card header p {
+    grid-area: reglage;
+  }
+
+  .active-irrigation-card .event-status {
+    grid-area: etat;
+    justify-self: end;
+  }
+
   .active-irrigation-card .timer-countdown {
-    font-size: 32px;
+    grid-area: minuteur;
+    align-self: start;
+    font-size: 28px;
+    line-height: 1.15;
   }
 
   .active-timer-details {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin: 10px 0;
+    margin: 8px 0;
   }
 
   .active-timer-details div {
-    padding: 8px;
+    padding: 6px 8px;
+  }
+
+  .active-timer-details dd {
+    margin-top: 1px;
+  }
+
+  .active-irrigation-card .application-details {
+    margin-top: 0;
+  }
+
+  .active-irrigation-card .event-pump-summary {
+    margin: 4px 0 0;
+    padding: 6px 10px;
   }
 
   .active-timer-actions {
     flex-direction: row;
+    margin-top: 8px;
   }
 
   .active-timer-actions button {
