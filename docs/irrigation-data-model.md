@@ -148,8 +148,10 @@ Elle conserve séparément la dernière tentative, la dernière réussite et la
 dernière erreur de la synchronisation automatique. La table
 `irrigation_background_jobs` porte le verrou global et l’état de la tâche
 quotidienne. Le planificateur ne modifie jamais `manual_precipitation` et
-déduplique les workspaces partageant les mêmes coordonnées avant les appels aux
-fournisseurs.
+déduplique les workspaces partageant les mêmes coordonnées et le même modèle de
+prévision avant les appels aux fournisseurs. Ce modèle est une colonne de la
+préférence depuis la migration 0051 (`forecast_model`, D-346 ; vide :
+« Automatique », `docs/weather-models-contract.md`).
 
 La limite journalière est également versionnée. Une révision indique si elle
 est active, son maximum en m³/jour, sa période d’application et une note

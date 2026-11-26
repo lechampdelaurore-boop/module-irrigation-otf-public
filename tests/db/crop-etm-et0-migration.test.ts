@@ -49,6 +49,9 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
       before_values, after_values, actor_user_id, created_at)`);
     // Même raison : ils lisent le réglage de l'objectif automatique (0047, D-317), vide, donc éteint.
     sqlite.exec('CREATE TEMP TABLE irrigation_automatic_objective_revisions (id, workspace_id, enabled, actor_user_id, created_at)');
+    // Et le modèle de prévision de la ferme (0051, D-346), vide, donc « Automatique » : une colonne, ajoutée le temps de
+    // remplir la copie, retirée avant les migrations.
+    sqlite.exec('ALTER TABLE irrigation_weather_preferences ADD forecast_model text');
     const choice = resolveDemoChoice('maraichage', 'ete');
     await prepareDemoSpace(demoOwnerUserId('copie', choice), choice);
     delete process.env.DEMO_MODE;
@@ -60,6 +63,7 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     const sqlBefore = tableSql(sqlite);
     sqlite.exec('DROP TABLE temp.irrigation_change_journal');
     sqlite.exec('DROP TABLE temp.irrigation_automatic_objective_revisions');
+    sqlite.exec('ALTER TABLE irrigation_weather_preferences DROP COLUMN forecast_model');
 
     const before = dump(sqlite);
     assert.ok(before[TABLE].length >= 3);

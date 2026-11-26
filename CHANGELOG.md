@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (météo multi-modèles, PR 2 : le réglage de la ferme)
+
+- **Le modèle de prévision se garde par ferme et se lit par lieu et par
+  modèle** (D-346, F1016 à F1022) : une colonne neuve des préférences météo
+  (migration additive) ; la mise à jour du matin, celle de la journée et
+  « Actualiser la météo » lisent une fois chaque modèle d'un même lieu, et
+  chaque ferme écrit ses propres lignes. Choisir un modèle le vérifie d'abord
+  par une lecture : un échec n'enregistre rien ; une réussite remplace les
+  prévisions des jours à venir, jamais les jours passés ni l'archive. Un
+  modèle qui n'est plus proposé ramène la ferme à « Automatique », noté au
+  journal des modifications par « Le module ». Un jour ne mélange jamais
+  deux sources. Aucune ferme ne choisit encore : l'écran vient ensuite, et
+  « Automatique » ne change rien.
+
 ### Ajouté (météo multi-modèles, PR 1 : la liste et la lecture d'un modèle)
 
 - **La liste des modèles de prévision et leur lecture chez Open-Meteo**

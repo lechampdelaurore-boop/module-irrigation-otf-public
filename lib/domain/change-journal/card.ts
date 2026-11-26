@@ -1,7 +1,7 @@
 import { countText, dateClockText } from '../clock-text.ts';
 import { FAO_POINTS } from '../crop-water/settings-view.ts';
 import type { IrrigationSnapshot } from '../domain.ts';
-import type { ChangeJournalEntry, ChangeValues } from './entry.ts';
+import { MODULE_ACTOR_ID, type ChangeJournalEntry, type ChangeValues } from './entry.ts';
 import { changeFieldWords, changeValueText, dayKeyText, type NameOf } from './fields.ts';
 import { changeSubjectLabel, type ChangeAction, type ChangeFamily } from './subjects.ts';
 
@@ -22,7 +22,7 @@ export type ChangeJournalCard = {
   at: string;
   /** « 21/11/2026 à 14 h 12 », à l'heure de la ferme (D-004). */
   when: string;
-  /** « Vous » ou « Une autre personne connectée » : jamais une adresse (F708). */
+  /** « Vous », « Une autre personne connectée » ou « Le module » : jamais une adresse (F708). */
   who: string;
   /** Le sujet : « Objectif hydrique ». */
   subject: string;
@@ -35,6 +35,8 @@ export type ChangeJournalCard = {
 
 export const CHANGE_AUTHOR_SELF = 'Vous';
 export const CHANGE_AUTHOR_OTHER = 'Une autre personne connectée';
+/** Un changement que le module a fait seul (règle 9 de la météo multi-modèles ; D-346, F1019). */
+export const CHANGE_AUTHOR_MODULE = 'Le module';
 
 const ACTION_WORDS: Readonly<Record<ChangeAction, string>> = { cree: 'Création', modifie: 'Modification', supprime: 'Suppression' };
 
@@ -45,12 +47,17 @@ export function changeJournalCard(entry: ChangeJournalEntry, reader: { viewerUse
     family: entry.family,
     at: entry.createdAt,
     when: dateClockText(entry.createdAt),
-    who: entry.actorUserId === reader.viewerUserId ? CHANGE_AUTHOR_SELF : CHANGE_AUTHOR_OTHER,
+    who: authorText(entry.actorUserId, reader.viewerUserId),
     subject: changeSubjectLabel(entry.subject),
     action: ACTION_WORDS[entry.action],
     object: objectText(entry.context, reader.nameOf),
     lines: cardLines(entry, reader.nameOf),
   };
+}
+
+function authorText(actorUserId: string, viewerUserId: string): string {
+  if (actorUserId === MODULE_ACTOR_ID) return CHANGE_AUTHOR_MODULE;
+  return actorUserId === viewerUserId ? CHANGE_AUTHOR_SELF : CHANGE_AUTHOR_OTHER;
 }
 
 /**

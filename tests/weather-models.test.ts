@@ -13,6 +13,7 @@ import {
   resolveForecastModelChoice,
 } from '../lib/domain/weather/forecast-models.ts';
 import { WeatherProviderError, type WeatherDailyValue } from '../lib/domain/weather/weather-provider.ts';
+import { demonstrationModelForecastReader } from '../lib/adapters/weather/demonstration-provider.ts';
 import { getModelForecastReader } from '../lib/services/weather/configured-provider.ts';
 
 /**
@@ -263,7 +264,7 @@ test('une adresse non chiffrée ou illisible n’est jamais appelée', async () 
   }
 });
 
-test('le lecteur des modèles : l’offre gratuite sans réglage, l’offre payante par réglage, absent en démonstration et pour les parcours', async () => {
+test('le lecteur des modèles : l’offre gratuite sans réglage, l’offre payante par réglage, fixe pour les parcours, absent en démonstration', async () => {
   for (const key of SETTINGS) delete process.env[key];
   assert.equal(getModelForecastReader(), openMeteoWeatherProvider);
 
@@ -278,8 +279,9 @@ test('le lecteur des modèles : l’offre gratuite sans réglage, l’offre paya
   assert.equal(sent[0]?.origin, 'https://customer-api.open-meteo.com');
   assert.equal(sent[0]?.searchParams.get('apikey'), 'cle-d-essai-456');
 
+  // La réponse fixe par modèle des parcours automatisés vient avec la PR 2 (F1015, D-346).
   process.env.WEATHER_DATA_SOURCE = 'mock';
-  assert.equal(getModelForecastReader(), null);
+  assert.equal(getModelForecastReader(), demonstrationModelForecastReader);
   delete process.env.WEATHER_DATA_SOURCE;
   delete process.env.OPEN_METEO_API_KEY;
   process.env.DEMO_MODE = 'true';

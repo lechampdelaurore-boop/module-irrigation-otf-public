@@ -9,6 +9,7 @@ import { COLLECTIVE_DOSE_RULE_LABELS, EQUIPMENT_KIND_LABELS, SHORTAGE_STRATEGY_L
 import { WEEKDAY_LABELS } from '../planning/protected-slots-view.ts';
 import { SOIL_TEXTURES, soilTextureLabel } from '../soil-reserve/texture.ts';
 import { RESERVOIR_TYPE_LABELS, RESOURCE_TYPE_LABELS } from '../water-resource-labels.ts';
+import { forecastModel } from '../weather/forecast-models.ts';
 import { WEATHER_ALERT_FIELD_CHOICES } from '../weather/weather-alerts.ts';
 import type { ChangeSubject } from './subjects.ts';
 
@@ -77,6 +78,8 @@ const day: Format = (value) => dayKeyText(String(value));
 const instant: Format = (value) => dateClockText(String(value));
 const flag: Format = (value) => (value === true || Number(value) === 1 ? 'oui' : 'non');
 const checked: Format = (value) => (value === true || Number(value) === 1 ? 'cochée' : 'non cochée');
+/** Un modèle de prévision, par son libellé ; un modèle retiré de la liste, sans son identifiant (D-346). */
+const forecastModelName: Format = (value) => forecastModel(String(value))?.label ?? 'un modèle qui n’est plus proposé';
 
 function words(labels: Readonly<Record<string, string>>): Format {
   return (value) => labels[String(value)] ?? String(value);
@@ -385,6 +388,7 @@ const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWo
     customCity: { label: 'Commune', format: text, empty: 'aucune' },
     customPostcode: { label: 'Code postal', format: text, empty: 'aucun' },
   },
+  'modele-meteo': { forecastModel: { label: 'Modèle de prévision', format: forecastModelName, empty: '« Automatique »' } },
   materiel: {
     kind: { label: 'Nature', format: words(KIND_WORDS) },
     mobility: { label: 'Installation', format: words({ fixed: 'fixe', mobile: 'mobile' }) },

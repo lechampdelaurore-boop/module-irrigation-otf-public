@@ -60,7 +60,7 @@ export const JOURNAL_TABLES: Readonly<Record<string, readonly ChangeSubject[]>> 
   irrigation_plot_shelters: ['jardin-sous-abri'],
   irrigation_garden_groups: ['groupe-de-jardins'],
   irrigation_garden_group_members: ['groupe-de-jardins'],
-  irrigation_weather_preferences: ['lieu-meteo'],
+  irrigation_weather_preferences: ['lieu-meteo', 'modele-meteo'],
   // Matériel et ressources.
   irrigation_equipment: ['materiel'],
   irrigation_equipment_settings: ['reglage-de-materiel'],
@@ -263,6 +263,8 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/garden-group-repository.ts › listGardenGroupConfigurationForUser › irrigation_garden_groups': GROUPS_CARRIED,
   'db/garden-group-repository.ts › listGardenGroupConfigurationForUser › irrigation_garden_group_members': GROUPS_CARRIED,
   'db/water-management-repository.ts › saveWeatherPreferenceForUser › irrigation_weather_preferences': branche('lieu-meteo'),
+  'db/forecast-model-repository.ts › saveForecastModelForUser › irrigation_weather_preferences': branche('modele-meteo'),
+  'db/forecast-model-repository.ts › returnForecastModelToAutomatic › irrigation_weather_preferences': branche('modele-meteo'),
   'db/water-management-repository.ts › recordWeatherRefreshForUser › irrigation_weather_preferences': WEATHER_SYNC,
   'db/water-management-repository.ts › tryClaimWeatherRefreshForUser › irrigation_weather_preferences': WEATHER_SYNC,
   'db/automatic-weather-repository.ts › recordAutomaticWeatherWorkspaceResult › irrigation_weather_preferences': WEATHER_SYNC,
