@@ -26,6 +26,7 @@ export const JOURNAL_TABLES: Readonly<Record<string, readonly ChangeSubject[]>> 
   // Objectifs.
   irrigation_hydric_goal_revisions: ['objectif-hydrique', 'objectif-adopte'],
   irrigation_automatic_objective_revisions: ['objectif-automatique'],
+  irrigation_off_season_revisions: ['jardin-hors-saison', 'reprise-saison'],
   irrigation_need_preferences: ['seuil-de-besoin'],
   irrigation_bed_need_decisions: ['decision-de-planche'],
   // Réglages.
@@ -178,6 +179,8 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/water-management-repository.ts › ensureRecurringHydricGoalsForUser › irrigation_hydric_goal_revisions': sansObjet('Le report des objectifs de la semaine d’avant sur une semaine neuve, par le module : les mêmes valeurs, aucun geste ni changement.'),
   'db/crop-water/adoptions.ts › saveAdoptedGoalForUser › irrigation_hydric_goal_revisions': branche('objectif-adopte'),
   'db/automatic-objective-repository.ts › saveAutomaticObjectiveForUser › irrigation_automatic_objective_revisions': branche('objectif-automatique'),
+  // Les deux gestes, un seul écrivain : « Reprendre » s'écrit sous `reprise-saison`, dans le même code.
+  'db/off-season-repository.ts › saveOffSeasonForUser › irrigation_off_season_revisions': branche('jardin-hors-saison'),
   'db/irrigation-need-repository.ts › saveIrrigationNeedThresholdForUser › irrigation_need_preferences': branche('seuil-de-besoin'),
   'db/irrigation-need-repository.ts › saveIrrigationBedNeedDecisionForUser › irrigation_bed_need_decisions': branche('decision-de-planche'),
   // Réglages.

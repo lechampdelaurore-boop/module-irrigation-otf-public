@@ -17,6 +17,7 @@ import {
 } from './automatic-objective.ts';
 import { mmText } from './figure-origin.ts';
 import { farmObjective, type FarmObjective } from './farm-objective.ts';
+import { needOffSeason, type OffSeasonDays, type OffSeasonSchedule } from './off-season.ts';
 import {
   FARM_TIME_ZONE,
   addDaysToDateKey,
@@ -81,6 +82,23 @@ export type BedIrrigationNeed = {
   objectiveOrigin: BedObjective['origin'];
   /** Les jours où l'objectif automatique s'applique, leur valeur ou ce qui manque ; `null` quand il ne s'applique à aucun jour. */
   automaticObjective: AutomaticObjectiveWeek | null;
+  /**
+   * Les jours de la semaine où la planche est hors saison (D-337) : aucun
+   * objectif n'y compte. Sans objectif les autres jours, la planche est hors
+   * saison (`objectiveOffSeason`) : ni objectif manquant, ni besoin, ni
+   * volume, elle sort des comptes du jardin et de la ferme ; sa pluie et son
+   * irrigation réelle restent. Absent quand elle ne l'est aucun jour : la
+   * ligne d'avant.
+   */
+  offSeasonDates?: string[];
+  /**
+   * Le besoin de la semaine est hors saison (`needOffSeason`, D-352) : son
+   * objectif l'est, ou la planche l'est le jour du calcul. Ni besoin, ni
+   * reste, ni volume, ni objectif manquant ; le planning, la pénurie et la
+   * faisabilité ne la servent pas ; sa pluie et son irrigation réelle
+   * restent. Absent sinon : la ligne d'avant.
+   */
+  offSeason?: true;
   actualRainMm: number | null;
   actualIrrigationMm: number;
   realRemainingMm: number | null;
@@ -216,6 +234,11 @@ export function buildIrrigationNeedsDashboard(input: {
    * rien ne change.
    */
   automaticObjective?: ReadonlyMap<string, AutomaticObjectiveInput>;
+  /**
+   * Le filtre « hors saison » de la ferme (D-337) : `objectiveForBed` reçoit
+   * sa réponse pour chaque planche. Absent, ou vide, rien ne change.
+   */
+  offSeason?: OffSeasonSchedule;
 }): IrrigationNeedsDashboard {
   const { season, snapshot, days, events, goalRevisions, decisions, weekStart, weekEnd, now } = input;
   const plots = new Map(snapshot.plots.map((plot) => [plot.id, plot]));
@@ -253,21 +276,26 @@ export function buildIrrigationNeedsDashboard(input: {
     const sheltered = plot.mode === 'greenhouse';
     // Un jardin à classer (4.4, F583) : on ne sait pas s'il reçoit la pluie ; son besoin n'est pas calculé.
     const unclassified = plot.mode === 'unclassified';
-    const objective = objectiveForBed(goalRevisions, bed, weekStart, weekEnd, input.automaticObjective?.get(bed.id));
+    const offSeasonDays = input.offSeason?.daysOf({ ...bed, plotMode: plot.mode });
+    const objective = objectiveForBed(goalRevisions, bed, weekStart, weekEnd, input.automaticObjective?.get(bed.id), offSeasonDays);
+    // Hors saison sans objectif, ou hors saison aujourd'hui (D-337, D-352) : pas d'objectif manquant, rien à
+    // donner ; la pluie ne change pas.
+    const offSeason = needOffSeason({ objectiveMm: objective.value, offSeasonDates: objective.offSeasonDates }, today);
     const actualRain = unclassified ? null : sheltered ? 0 : actualExteriorRainMm;
     const forecastRain = unclassified ? null : sheltered ? 0 : forecastExteriorRainMm;
     const actualIrrigation = actualByBed.get(bed.id) ?? 0;
     const plannedIrrigation = plannedByBed.get(bed.id) ?? 0;
-    const realRemaining = realRemainingMm(objective.value, actualRain, actualIrrigation);
-    const raw = planningNeedMm(objective.value, actualRain, forecastRain, actualIrrigation, plannedIrrigation);
+    const realRemaining = offSeason ? null : realRemainingMm(objective.value, actualRain, actualIrrigation);
+    const raw = offSeason ? null : planningNeedMm(objective.value, actualRain, forecastRain, actualIrrigation, plannedIrrigation);
     const calculated = applyPlanningThreshold(raw, input.thresholdMm);
     const decision = decisionByBed.get(bed.id);
-    const effective = decision?.manualOverrideMm ?? calculated;
+    // Un besoin remplacé à la main reste enregistré, inactif, comme un objectif saisi sous une portée active (section 4.5).
+    const effective = offSeason ? null : decision?.manualOverrideMm ?? calculated;
     const wettedArea = resolveBedWettedArea(bed, positionedKindsByBed.get(bed.id) ?? []);
     // Une ET0 incomplète est signalée par missingDates.et0 mais ne bloque jamais le besoin (D-010).
     const demandMissing: IrrigationNeedCompleteness['missing'] = [];
     if (unclassified) demandMissing.push('unclassified-plot');
-    if (!objective.complete) demandMissing.push('objective');
+    if (!objective.complete && !offSeason) demandMissing.push('objective');
     const realMissing: IrrigationNeedCompleteness['missing'] = [...demandMissing];
     if (!sheltered && !unclassified && actualRainMissingDates.length > 0) realMissing.push('actual-rain');
     const planningMissing: IrrigationNeedCompleteness['missing'] = [...realMissing];
@@ -283,6 +311,8 @@ export function buildIrrigationNeedsDashboard(input: {
       et0ForecastMm: et0Forecast,
       objectiveMm: objective.value, objectiveSource: objective.source,
       objectiveOrigin: objective.origin, automaticObjective: objective.automatic,
+      ...(objective.offSeasonDates.length > 0 ? { offSeasonDates: objective.offSeasonDates } : {}),
+      ...(offSeason ? { offSeason: true as const } : {}),
       actualRainMm: actualRain, actualIrrigationMm: actualIrrigation,
       realRemainingMm: realRemaining,
       relativeDeficitPercent: relativeDeficitPercent(realRemaining, objective.value),
@@ -318,11 +348,15 @@ export function buildIrrigationNeedsDashboard(input: {
     const plot = plots.get(plotId)!;
     const zone = zones.get(plot.zoneId)!;
     const area = gardenBeds.reduce((sum, bed) => sum + bed.areaSquareMeters, 0);
-    const allComplete = gardenBeds.every((bed) => bed.effectiveNeedMm !== null);
-    const allRealComplete = gardenBeds.every((bed) => bed.realRemainingMm !== null);
-    // Un volume inconnu — surface mouillée inconnue — laisse le total du jardin inconnu (D-003).
-    const volumes = gardenBeds.map((bed) => bed.effectiveVolumeCubicMeters);
-    const volume = volumes.every((value) => value !== null) ? volumes.reduce((sum, value) => sum + (value ?? 0), 0) : null;
+    // Une planche hors saison sort des comptes du jardin (D-337, D-352) ; elle reste dans ses lignes.
+    const counted = gardenBeds.filter((bed) => bed.offSeason !== true);
+    const countedArea = counted.reduce((sum, bed) => sum + bed.areaSquareMeters, 0);
+    const allComplete = counted.every((bed) => bed.effectiveNeedMm !== null);
+    const allRealComplete = counted.every((bed) => bed.realRemainingMm !== null);
+    // Un volume inconnu — surface mouillée inconnue — laisse le total du jardin inconnu (D-003) ;
+    // un jardin tout entier hors saison n'a pas de volume, jamais un zéro.
+    const volumes = counted.map((bed) => bed.effectiveVolumeCubicMeters);
+    const volume = counted.length > 0 && volumes.every((value) => value !== null) ? volumes.reduce((sum, value) => sum + (value ?? 0), 0) : null;
     return {
       plotId, plotName: plot.name, zoneId: zone.id, zoneName: zone.name,
       sheltered: plot.mode === 'greenhouse', areaSquareMeters: area,
@@ -332,11 +366,11 @@ export function buildIrrigationNeedsDashboard(input: {
         normal: gardenBeds.filter((bed) => bed.priority === 'normal').length,
         high: gardenBeds.filter((bed) => bed.priority === 'high').length,
       },
-      realRemainingMm: allRealComplete && area > 0
-        ? gardenBeds.reduce((sum, bed) => sum + (bed.realRemainingMm ?? 0) * bed.areaSquareMeters, 0) / area
+      realRemainingMm: allRealComplete && countedArea > 0
+        ? counted.reduce((sum, bed) => sum + (bed.realRemainingMm ?? 0) * bed.areaSquareMeters, 0) / countedArea
         : null,
-      effectiveNeedMm: allComplete && area > 0
-        ? gardenBeds.reduce((sum, bed) => sum + (bed.effectiveNeedMm ?? 0) * bed.areaSquareMeters, 0) / area
+      effectiveNeedMm: allComplete && countedArea > 0
+        ? counted.reduce((sum, bed) => sum + (bed.effectiveNeedMm ?? 0) * bed.areaSquareMeters, 0) / countedArea
         : null,
       effectiveVolumeCubicMeters: volume,
       beds: gardenBeds,
@@ -403,6 +437,8 @@ export type BedObjective = {
   origin: BedObjectiveOrigin | null;
   /** Les jours où l'objectif automatique s'applique ; `null` quand il ne s'applique à aucun jour. */
   automatic: AutomaticObjectiveWeek | null;
+  /** Les jours de la semaine où la planche est hors saison (D-337) : aucun objectif n'y compte ; vide sans filtre. */
+  offSeasonDates: string[];
 };
 
 /**
@@ -411,7 +447,11 @@ export type BedObjective = {
  * saisi le plus précis qui couvre la planche apporte un septième de sa
  * valeur ; un jour sans objectif saisi prend la valeur de l'objectif
  * automatique quand `automatic` le dit allumé ce jour-là (D-309), sinon rien.
- * Sans `automatic`, ou réglage éteint, rien ne change (D-316).
+ * Sans `automatic`, ou réglage éteint, rien ne change (D-316). Un jour où
+ * `offSeason` dit la planche hors saison n'a aucun objectif, ni saisi ni
+ * automatique : il est rendu dans `offSeasonDates`, et l'objectif saisi
+ * reste là, inactif, jusqu'à la reprise (D-337). Sans `offSeason`, ou filtre
+ * vide, rien ne change.
  */
 export function objectiveForBed(
   revisions: readonly GoalRevisionLike[],
@@ -419,6 +459,7 @@ export function objectiveForBed(
   weekStart: string,
   weekEnd: string,
   automatic?: AutomaticObjectiveInput,
+  offSeason?: OffSeasonDays,
 ): BedObjective {
   // Tri stable, semaine puis date : deux révisions reçues dans la même milliseconde gardent l'ordre
   // reçu du dépôt et la seconde fait foi ; jamais de départage par l'identifiant (docs/revision-order-contract.md).
@@ -429,6 +470,7 @@ export function objectiveForBed(
   const sources = new Set<GoalRevisionLike['scopeType']>();
   const weekDates: string[] = [];
   const automaticDates: string[] = [];
+  const offSeasonDates: string[] = [];
   for (let date = weekStart; date <= weekEnd; date = addDaysToDateKey(date, 1)) {
     weekDates.push(date);
     for (const revision of ordered) {
@@ -437,6 +479,11 @@ export function objectiveForBed(
         const key = `${revision.scopeType}:${revision.otfZoneId ?? ''}:${revision.otfPlotId ?? ''}:${revision.otfBedId ?? ''}`;
         if (revision.action === 'cleared' || revision.amountMm === null) state.delete(key); else state.set(key, revision);
       }
+    }
+    // Hors saison, ni l'objectif saisi ni l'objectif automatique ne comptent ce jour-là (D-337, section 4.1).
+    if (offSeason?.(date) === true) {
+      offSeasonDates.push(date);
+      continue;
     }
     const applicable = [...state.values()].filter((goal) => goalApplies(goal, bed)).sort((a, b) => scopeRank(b.scopeType) - scopeRank(a.scopeType) || b.createdAt.localeCompare(a.createdAt))[0];
     if (applicable?.amountMm !== null && applicable?.amountMm !== undefined) {
@@ -467,6 +514,7 @@ export function objectiveForBed(
     source,
     origin: entered > 0 && automaticDays > 0 ? 'both' : entered > 0 ? 'entered' : automaticDays > 0 ? 'automatic' : null,
     automatic: automaticWeek,
+    offSeasonDates,
   };
 }
 

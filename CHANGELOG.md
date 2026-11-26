@@ -148,6 +148,32 @@ source détaillée commit par commit.
   coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
   règle d'enregistrement ne change.
 
+### Ajouté (ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs)
+
+- **Les gestes « hors saison » enregistrés** (D-352) : mettre hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, puis le reprendre, s'enregistre au jour du geste et se lit au
+  journal des modifications (« Mise hors saison », « Reprise de
+  l'irrigation ») ; un geste qui ne change rien n'écrit rien. Le tableau
+  des besoins, le planning, la faisabilité, « Aujourd'hui », l'historique,
+  les séries et l'aide du formulaire en tiennent compte : plus d'objectif
+  ni de proposition d'arrosage pour ces planches ; un arrosage déjà
+  planifié reste, la liste à proposer à l'annulation est prête. La pluie,
+  la réserve du sol, l'ET0, l'archive des prévisions et les alertes ne
+  changent jamais. Rien ne change encore pour aucune ferme : aucun écran
+  ne permet le geste (B3).
+
+### Ajouté (ignorer l'irrigation hors saison, B1 : la règle)
+
+- **La règle « hors saison »** (D-341) : quand une ferme mettra hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, ses planches n'auront plus d'objectif ni de besoin à partir
+  du jour du geste, et l'objectif de la ferme les dira à part (« 7 planches
+  sur 7 ont un objectif, 3 hors saison ») ; la pluie, la réserve du sol,
+  l'ET0, les alertes et les irrigations réelles ne changent pas. Rien ne
+  change encore pour aucune ferme : aucun écran ne l'allume, aucun service
+  ne la lit (B2, B3).
+
 ### Ajouté (contrat : l'objectif automatique se voit ; ignorer l'irrigation hors saison)
 
 - **Contrat écrit, sans code** (D-337, `docs/objectif-automatique-saison-contract.md`) :
@@ -156,6 +182,31 @@ source détaillée commit par commit.
   montrera (liste, champ prérempli, fenêtre d'allumage), et un filtre « hors
   saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
   l'historique ne changent pas. Quatre PR de code à venir.
+
+### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
+
+- **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
+  page, `/irrigation/semaine`. Sa vue « La semaine » montre, dans l'ordre
+  d'avant et sans rien changer, le planning puis les objectifs et besoins ;
+  sa vue « Les cumuls » est l'historique. Sous le titre, deux liens passent
+  d'une vue à l'autre sans recharger ; ils remplacent la bande « La
+  semaine ». La barre du bas et le menu de l'ordinateur ouvrent la page ;
+  le menu nomme ses deux vues. Les adresses du planning, des besoins et de
+  l'historique mènent à la page, avec leurs réglages d'adresse et leur
+  ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
+  coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
+
+- **« Arroser ou noter » plus court au téléphone pendant un arrosage**
+  (D-342, F996, F997) : la carte de l'arrosage en cours se range plus
+  serré (le nom à côté du minuteur, « En cours » à côté du réglage, des
+  marges plus courtes, sans cadre bleu autour) et « 1. Où ? » commence à
+  653 px au lieu de 800 px, sous le budget de 700 px. Rien n'est retiré :
+  les trois valeurs, le détail des apports, la pompe et les deux boutons
+  restent. « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »),
+  comme sur « Aujourd'hui ».
 
 ### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
 

@@ -18,6 +18,8 @@ export const JOURNAL_OBJECT_TABLES: Readonly<Record<ChangeSubject, string | null
   'objectif-adopte': null,
   'seuil-de-besoin': null,
   'objectif-automatique': null,
+  'jardin-hors-saison': null,
+  'reprise-saison': null,
   'decision-de-planche': null,
   'reglages-du-planning': null,
   'creneau-protege': 'irrigation_protected_slots',

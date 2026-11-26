@@ -152,6 +152,37 @@ registres, elle y renvoie.
   changés. Tests, parcours P66 ; neuf parcours suivent. Contrôles : voir la
   PR. Viennent la PR 2 (le premier niveau), les PR 3 et 4 ; fusions après
   celles de S3 et S5.
+
+- **Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs,
+  codée le 26 novembre 2026** (D-352, F1061 à F1074 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4 à 8 et 10 ;
+  roadmap ligne 34), en Opus 5.5 · Max, empilée sur B1 (#245). Les gestes
+  « Mettre hors saison » et « Reprendre » sont enregistrés (table
+  `irrigation_off_season_revisions`, **migration 0051 provisoire**, à
+  recaler au numéro libre à la fusion), un geste sans effet n'écrit rien,
+  le journal des modifications les dit. Le tableau des besoins, le
+  planning, la faisabilité et la pénurie, « Aujourd'hui », l'historique,
+  les séries, l'aide du formulaire et les fiches reçoivent le filtre ; la
+  liste des arrosages planifiés à proposer à l'annulation est prête pour
+  B3. La pluie, la réserve du sol, l'ET0, l'archive, les alertes et les
+  semaines closes ne le lisent jamais (garde à deux fermes sur la base,
+  garde des imports). **Aucun écran ne l'allume : rien ne change en
+  ligne.** Contrôles : voir la PR ; parcours navigateur omis, aucun écran
+  ne change. Fusion après B1 ; à la fusion de S6, `start-route.ts` reçoit
+  aussi le filtre (F1071). Vient B3 (les écrans).
+- **Ignorer l'irrigation hors saison, B1 : la règle, codée le 26 novembre
+  2026** (D-341, F985 à F995 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4, 5 et 8 ;
+  roadmap ligne 34), en Opus 5.5 · Max, sur la branche du contrat.
+  `lib/domain/off-season.ts` : le filtre d'une ferme à partir de ses gestes
+  datés, cinq portées, le jour compté en heure de Paris ; `objectiveForBed`
+  le reçoit jour par jour ; le tableau des besoins et l'objectif de la
+  ferme sortent les planches hors saison de leurs comptes et les disent à
+  part. **Filtre toujours vide : rien ne change en ligne.** Les dix cas et
+  les gardes (pluie, ET0, irrigation, réserve du sol, alertes jamais
+  touchées) dans `tests/hors-saison-regle.test.ts`. Contrôles : voir la PR.
+  Fusion après le contrat (#240) et les PR de S4 et S6 ; viennent A1, B2
+  et B3 (le stockage et les lecteurs, puis les écrans).
 - **L'objectif automatique se voit ; ignorer l'irrigation hors saison :
   contrat écrit le 26 novembre 2026, sans code** (D-337,
   `docs/objectif-automatique-saison-contract.md`, roadmap ligne 34, section
@@ -161,6 +192,36 @@ registres, elle y renvoie.
   restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
   filtre se lève à la main seulement, les arrosages planifiés sont proposés
   à l'annulation.
+- **Simplifier l'usage du module, S4, PR 1 sur 4 : une page, deux vues,
+  codée le 25 novembre 2026** (D-335, F916 à F922 ; contrat
+  `docs/simplification-s4-contract.md`, sections 3, 7.4 et 9), en Opus 5.5 ·
+  Très élevé, après la fin du code de S5, sur la branche de sa PR 3. La page
+  « Semaine » (`/irrigation/semaine`) réunit sans rien changer les blocs du
+  planning et des besoins (vue « La semaine ») et l'historique (vue « Les
+  cumuls », `?vue=cumuls`) ; le sélecteur des deux vues remplace la bande de
+  S3 ; la barre et le menu y mènent ; les trois anciennes adresses sont
+  redirigées par le serveur, paramètres et ancre gardés. Règle dans
+  `lib/domain/features/week-page.ts` ; relevé des onze ancres ; temps du
+  serveur 359 ms pour 394 permis (F918) ; à 390 px, « La semaine »
+  3 047 px (894 et 2 573 px avant), « Les cumuls » 1 874 px (1 920 px) : la
+  PR 1 range, la PR 2 raccourcit. Aucun calcul ni aucune écriture
+  changés. Tests, parcours P66 ; neuf parcours suivent. Contrôles : voir la
+  PR. Viennent la PR 2 (le premier niveau), les PR 3 et 4 ; fusions après
+  celles de S3 et S5.
+- **Simplifier l'usage du module, S5 : le budget de hauteur tenu avec un
+  arrosage en cours, codé le 26 novembre 2026** (D-342, F996, F997 ;
+  contrat, sections 7 et 13), en Opus 5.5 · Élevé, sur le choix du porteur
+  du même jour de reprendre la dette F910, depuis `main` après #230. Au
+  téléphone, la carte de l'arrosage en cours se range plus serré (le nom à
+  gauche du minuteur, l'état à droite du réglage, des marges plus courtes,
+  sans cadre bleu autour) ; « Fin estimée » dit l'heure seule le jour même,
+  comme sur « Aujourd'hui » (`runningEndText`, la fonction de la carte
+  d'« Aujourd'hui »). Rien n'est retiré du premier niveau. « 1. Où ? » à
+  **653 px** au téléphone avec un arrosage en cours (800 px avant, budget
+  700 px, borne de P64) ; 298 px sans, inchangé ; l'ordinateur ne change
+  pas. Aucun calcul ni aucune écriture changés. Contrôles : voir la PR.
+  Sa fusion vient à son tour, après les PR de S4 et de S6 qui passent
+  avant.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
@@ -171,10 +232,10 @@ registres, elle y renvoie.
   de la section 9.1 réécrits. « 1. Où ? » à 298 px au téléphone (603 px
   avant S5). **Budget avec une irrigation en cours non tenu** (800 px au
   lieu de 700, F910 ; la carte en cours raccourcie au téléphone, F909) :
-  dette dite. Contrôles : voir la PR. **En ligne** : #230 fusionnée le
-  26 novembre 2026 à 10 h 55 (648cbc1), déployée à 11 h 38, run
-  45796472386, les cinq jobs verts (consigné par S4, PR 1) : **S5 est en
-  ligne en entier** (#227 à 8 h 10, #228 à 9 h 31, #230 à 11 h 38).
+  dette dite, reprise par D-342. Contrôles : voir la PR. **En ligne** :
+  #230 fusionnée le 26 novembre 2026 à 10 h 55 (648cbc1), déployée à
+  11 h 38, run 45796472386, les cinq jobs verts (consigné par la PR du
+  budget, D-342) : **S5 est en ligne en entier.** Vient S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
@@ -3791,6 +3852,26 @@ registres, elle y renvoie.
 - Dependabot retiré du dépôt public par la PR #9 (8 novembre 2026) ; sa
   remise éventuelle sera une PR à part. Ses PR #230 à #234 restent sur
   l'archive, jamais fusionnées.
+- **Recettes en attente, faites le 26 novembre 2026** sur la démonstration
+  (ferme « Ferme des Trois Noues », moment « Pic d'été », puis « Matériel et
+  alertes » et « Ferme vierge »), dans le Chrome de François, sur son accord,
+  à l'ordinateur puis à 390 px (page de la démonstration dans un cadre de
+  390 px de large). **Conformes** : lots C, A, B, F, E et D de
+  l'audit final (24 octies à 24 terdecies), L1 à L6 de 6 nonies, O4 de
+  6 decies ; 6 duodecies déjà clos. Au téléphone : barre de la démo de
+  45 px (J1), une seule cible de moins de 44 px par page, l'avatar (A2),
+  cases de planche de « Matériel » à 90 × 100 px (M1), la journée avant les
+  tuiles (L6), aucun débord. Recette 3.9 : la remarque 5 (limite
+  journalière dite dans la colonne) est rejouée et conforme ; les remarques
+  2 et 4 ne se reproduisent pas sur la démonstration (une seule semaine, aucun
+  report). **Impossible sur la démonstration** : H3 de 6 undecies (les
+  notifications y sont désactivées) : attend une séance sur la ferme réelle,
+  avec l'accord de François. Données saisies pour l'essai (une pluie de
+  2 mm, une validation, l'objectif automatique allumé puis éteint, une limite
+  journalière) : la
+  démonstration a été remise à zéro ensuite (« 3 à faire », aucun arrosage
+  planifié), rien n'a été saisi sur la ferme réelle. Détail dans les lignes
+  de la roadmap (section 1).
 
 ## Référence Git
 
