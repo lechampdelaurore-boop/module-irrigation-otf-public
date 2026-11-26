@@ -83,7 +83,9 @@ test('règle 5 : aucun mot du calcul de la colonne de gauche ne reparaît à l�
 test('règle 1 : les titres et les étiquettes prennent leur mot dans le module des mots, sans le recopier', () => {
   const uses: readonly [string, keyof typeof SIMPLE_WORDS][] = [
     ['app/irrigation/water-management-dashboard.tsx', 'weekGoal'],
-    ['app/irrigation/water-management-dashboard.tsx', 'thirstOfWeek'],
+    // Les tuiles de résumé vivent dans leur composant, partagé avec « Comprendre ces chiffres » (S4, PR 3).
+    ['app/irrigation/water-summary-tiles.tsx', 'weekGoal'],
+    ['app/irrigation/water-summary-tiles.tsx', 'thirstOfWeek'],
     ['app/irrigation/today/today-week.tsx', 'weekGoal'],
     ['app/irrigation/today/today-week.tsx', 'stillMissing'],
     ['app/irrigation/irrigation-needs-dashboard.tsx', 'leftToWater'],
@@ -111,9 +113,11 @@ test('l’ET0 : au premier niveau, la soif ; « ET0 » reste dans le détail', (
   assert.match(line, /soif de la semaine 18,2 mm/);
   assert.doesNotMatch(line, /ET0|totaux partiels/);
   assert.match(line, /totaux incomplets$/);
-  const besoins = readFileSync('app/irrigation/water-management-dashboard.tsx', 'utf8');
+  // Les tuiles de la semaine, partagées par le détail et « Comprendre ces chiffres » (S4, PR 3).
+  const besoins = readFileSync('app/irrigation/water-summary-tiles.tsx', 'utf8');
   assert.match(besoins, /label=\{SIMPLE_WORDS\.thirstOfWeek\}[^\n]*detail=\{`ET0, l’évaporation de référence\./, 'le mot du calcul dans le détail de la tuile');
   assert.doesNotMatch(besoins, /label="Évaporation de la semaine \(ET0\)"/);
+  assert.match(readFileSync('app/irrigation/water-management-dashboard.tsx', 'utf8'), /<WaterSummaryTiles /);
   assert.doesNotMatch(readFileSync('app/irrigation/irrigation-history-dashboard.tsx', 'utf8'), /label="ET0"/);
 });
 

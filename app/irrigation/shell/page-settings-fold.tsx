@@ -66,11 +66,15 @@ export function AnchoredFold({ id, className, summary, bodyClassName, initiallyO
   }, []);
 
   return (
+    // Une adresse dont l'ancre vise un élément du pli le fait ouvrir par le navigateur avant React (Chrome
+    // déplie les plis qui contiennent la cible) : l'attribut `open` diffère alors du serveur, sans erreur ;
+    // l'effet ci-dessus l'accorde aussitôt (S4, PR 2, plis imbriqués de « Le détail »).
     <details
       ref={fold}
       id={id}
       className={className}
       open={open}
+      suppressHydrationWarning
       onToggle={(event) => {
         const opened = event.currentTarget.open;
         setOpen(opened);

@@ -4,6 +4,7 @@ import {
   attendreLaPagePrete,
   ouvrirLaCorrespondanceDesEspeces,
   ouvrirLeDetailDuJour,
+  ouvrirLePli,
   surveillerLaConsole,
   TITRES_DES_PAGES,
   titreDeLaPage,
@@ -241,12 +242,15 @@ test('les mots du tableau au premier niveau ; aucun mot du calcul ne se lit d’
   await expect(page.getByText('Eau visée cette semaine', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Il manque encore', { exact: true }).first()).toBeVisible();
 
+  // Depuis le lot S4 (PR 2), les blocs d'« Objectifs et besoins » sont des plis de « Le détail » de la page « Semaine ».
   await attendreLaPageIrrigation(page, 'besoins');
-  await expect(page.getByRole('heading', { name: 'Eau visée cette semaine, météo et ressource en eau' })).toBeVisible();
+  await ouvrirLePli(page.locator('details#le-detail'));
+  await expect(page.getByRole('heading', { name: 'Eau visée cette semaine', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Ce qu’il reste à arroser' })).toBeVisible();
-  // L'ET0 se dit « soif » (F833) : dans la ligne de résumé au téléphone, sur la tuile à l'ordinateur.
-  if (telephone) await expect(page.locator('.water-summary-line')).toContainText('soif de la semaine');
-  else await expect(page.getByText('Soif de la semaine', { exact: true }).first()).toBeVisible();
+  // L'ET0 se dit « soif » (F833) : dans la ligne du pli « Jours de la semaine, un par un », et sur sa tuile.
+  const jours = await ouvrirLePli(page.locator('details#weather'));
+  await expect(jours.locator(':scope > summary small')).toContainText('soif de la semaine');
+  await expect(jours.getByText('Soif de la semaine', { exact: true }).first()).toBeVisible();
 
   await attendreLaPageIrrigation(page, 'cultures');
   await expect(page.getByText('Réglages fins des cultures (pour les experts)').first()).toBeVisible();
@@ -292,7 +296,8 @@ test('« Aujourd’hui » et « Objectifs et besoins » disent le même objectif
   await verifierLEtape(page, journal, 'l’objectif d’« Aujourd’hui »');
 
   await attendreLaPageIrrigation(page, 'besoins');
-  const ligne = page.locator('.water-summary-line > span');
+  // La ligne du pli « Jours de la semaine, un par un » de la page « Semaine », les totaux d'avant (S4, PR 2).
+  const ligne = page.locator('details#weather > summary small');
   const phrase = /^\d/.test(valeur) ? `${valeur} visés, ${portee}` : 'aucune eau visée';
   await expect(ligne).toHaveText(new RegExp(`^${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} · `));
   await verifierLEtape(page, journal, 'le même objectif sur « Objectifs et besoins »');
