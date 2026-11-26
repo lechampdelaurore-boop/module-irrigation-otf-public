@@ -1,9 +1,10 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
-import { spaceKeyOfRow, spaceParams } from './workspace-scope';
+import { WORKSPACE_SPACE_FILTER, spaceKeyOfRow, spaceParams } from './workspace-scope';
+import { aEcritUneLigne } from './write-result';
 import { featureSelectionJournal } from './change-journal/settings';
 import { FEATURE_IDS, FEATURES_BEFORE_SELECTION, type FeatureId } from '@/lib/domain/features/catalogue';
-import type { StartMode } from '@/lib/domain/features/start-mode';
+import type { RouteState, StartMode } from '@/lib/domain/features/start-mode';
 import {
   isCompleteSelection,
   orderedSelection,
@@ -177,6 +178,25 @@ export async function saveStartChoiceForUser(
     throw error;
   }
   return 'saved';
+}
+
+/**
+ * L'état de la carte « Mise en route » (simplification, lot S6, sections 4
+ * et 5.4) : « Plus tard » (`later`), « Reprendre la mise en route » (nul),
+ * « Terminer la mise en route » (`done`). Écrit par un appui, jamais par une
+ * lecture (D-028), et rien d'autre : ni case, ni étape, ni objectif. Seule
+ * la ligne de l'espace de la personne change, celle d'une ferme passée par
+ * les trois façons (`start_mode` non nul) ; une mise en route terminée le
+ * reste (S6-k). `false` : aucune ligne n'a changé.
+ */
+export async function saveRouteStateForUser(ownerUserId: string, routeState: RouteState | null, now: Date): Promise<boolean> {
+  const result = await db.prepare(
+    `UPDATE irrigation_feature_selections SET route_state = ?, updated_at = ?
+     WHERE workspace_id = (SELECT workspace.id FROM irrigation_workspaces AS workspace WHERE ${WORKSPACE_SPACE_FILTER})
+       AND start_mode IS NOT NULL
+       AND (route_state IS NULL OR route_state <> 'done')`,
+  ).bind(routeState, now.toISOString(), ...spaceParams(ownerUserId)).run();
+  return aEcritUneLigne(result.meta);
 }
 
 /**

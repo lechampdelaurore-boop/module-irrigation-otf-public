@@ -5,6 +5,23 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (simplifier l'usage du module, S6, PR 2 : la carte « Mise en route »)
+
+- **La carte « Mise en route » en tête de « Ma ferme »** (D-336, F958 à
+  F968) : pour une ferme qui a commencé par une des trois façons, les
+  étapes qui décrivent la ferme (le matériel, où il est posé, d'où vient
+  l'eau, combien vous visez par semaine, le sol), selon les cases
+  cochées, « 3 étapes sur 5 » et sa barre, l'étape en cours avec ce qui
+  lui manque et « Continuer l'étape n ». Une étape est faite quand ce
+  qu'elle décrit existe : rien ne se coche à la main. « Plus tard » la
+  range en une ligne « Reprendre la mise en route » ; toutes les étapes
+  faites, « Terminer la mise en route » la retire pour de bon. Le bandeau
+  « À finir » n'est plus répété sur « Ma ferme » quand la carte est là.
+- **« Aujourd'hui » d'une ferme pas encore prête** : quand aucun arrosage
+  n'est à montrer, la ligne vide devient un bloc qui dit l'étape en cours
+  et mène à elle. Les fermes qui utilisaient déjà le module ne voient
+  rien changer.
+
 ### Modifié (simplifier l'usage du module, S6, PR 1 : les trois façons de commencer)
 
 - **Trois façons de commencer à la première ouverture** (D-336, F947 à
