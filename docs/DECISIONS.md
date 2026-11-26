@@ -11027,3 +11027,49 @@ Précisions prises en codant :
   S2 (dettes soldées), S3, la charte du module (onglets d'une ligne au
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
+
+## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/simplification-s5-contract.md` (section 7, budget ; section 13,
+mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
+le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
+D-334.
+
+**Décision du porteur.** Le 26 novembre 2026 à 11 h 24 (heure de Paris),
+parmi les chantiers proposés, le porteur choisit de reprendre le budget de
+hauteur de S5 (« Ramène « Arroser » en cours à 700 px »). Au téléphone
+(390 px de large), avec un arrosage en cours, « 1. Où ? » commence
+désormais **sous 700 px** : 653 px mesurés par P64 (nom long du parcours),
+800 px avant. Aucun calcul, aucune action serveur, aucune garde ne change ;
+aucune question agronomique. Rien n'est retiré du premier niveau : la carte
+garde son état, son nom, son réglage, le minuteur, les trois valeurs, le
+détail des apports, la faisabilité de la pompe et ses deux boutons de
+52 px ; F910 disait qu'il faudrait en retirer, la mise en page a suffi.
+
+Précisions prises en codant :
+
+- **F996** — Au téléphone (jusqu'à 560 px), la carte de l'arrosage en
+  cours se range plus serré : le nom à gauche du minuteur, l'état (« En
+  cours », « En pause ») à droite du réglage, sur la même ligne ; le
+  minuteur en 28 px ; des marges plus courtes autour des trois valeurs, du
+  pli « détail des apports » et de la ligne de la pompe. Le bloc
+  « Irrigations en cours » perd son cadre bleu (la carte garde le sien,
+  le titre reste) ; après un geste (« L'irrigation est en pause. »), la
+  réponse garde un écart de 12 px avec le titre. Mise en page seulement,
+  dans `arroser-maintenant.css` ; l'ordinateur ne change pas. Amende F909
+  (le nom et le minuteur restent côte à côte, l'état change de place).
+- **F997** — « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »)
+  et le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »), à l'heure
+  de la ferme : les mots de la carte d'« Aujourd'hui » (« fin prévue à
+  12 h 15 »), par la même fonction (`timeText`, appelée par
+  `runningEndText` de `lib/domain/watering-now.ts`). La valeur ne tient
+  plus que sur une ligne au téléphone. Vaut aussi à l'ordinateur ; « Après
+  la reprise » ne change pas. Avant, « 26 nov. 2026 à 12 h 15 ».
+
+**Mesures, P64 au téléphone** (390 px, « Recevoir les alertes » sous le
+formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
+298 px (inchangé) ; avec un arrosage en cours, **653 px** (800 px avant,
+1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
+À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
+aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
