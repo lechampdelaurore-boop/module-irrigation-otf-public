@@ -13,7 +13,7 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - **L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger,
-  codée le 26 novembre 2026** (D-349, F1035 à F1041 ; contrat
+  codée le 26 novembre 2026** (D-349, F1036 à F1042 ; contrat
   `docs/et0-horaire-contract.md`, § 5, § 9 et § 11 ; roadmap ligne 37), en
   Opus 5.5 · Élevé, sur la branche de HR1. Heures d'ET0 d'Open-Meteo dans
   le même appel ; pour Visual Crossing, heures de la prévision seulement
@@ -25,7 +25,7 @@ registres, elle y renvoie.
   écran, aucun calcul existant changé. Contrôles : voir la PR (`pnpm e2e`
   joué par la CI). Vient HR3 (l'écran).
 - **L'ET0 horaire, HR1 : la forme de la journée, domaine pur, codée le
-  26 novembre 2026** (D-348, F1030 à F1034 ; contrat
+  26 novembre 2026** (D-348, F1031 à F1035 ; contrat
   `docs/et0-horaire-contract.md`, § 4 et § 11 ; roadmap ligne 37), en
   Opus 5.5 · Élevé, sur la branche de la PR 3 de la météo multi-modèles,
   contrat #243 fusionné dedans. `lib/domain/weather/hourly-et0.ts` : les

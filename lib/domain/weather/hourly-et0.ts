@@ -313,7 +313,7 @@ export function hourlyValuesOnDayHours(
  * dans l'ordre de la réponse. Elles ne sont rangées que si leur nombre est
  * exactement celui des heures du jour au fuseau du lieu (23, 24 ou 25) ;
  * sinon `null` : la forme de ce fournisseur est refusée pour ce jour, jamais
- * décalée d'une heure (D-349, F1038).
+ * décalée d'une heure (D-349, F1039).
  */
 export function hourlyValuesInLocalOrder(
   date: string,
@@ -342,7 +342,7 @@ export type RecordedDayShape = {
  * Les formes qu'une lecture de prévision donne pour un lieu (§ 2 choix 3
  * et 4, § 5) : une par jour de J0 à J+2 dont l'heure du fournisseur ou
  * l'heure calculée donne une forme. Un jour sans heure lisible n'a pas de
- * ligne : l'écran prendra la forme théorique, et la dira (D-349, F1039) ;
+ * ligne : l'écran prendra la forme théorique, et la dira (D-349, F1040) ;
  * comme pour la météo du jour, un jour vide n'efface rien.
  */
 export function dayShapesToRecord(input: {

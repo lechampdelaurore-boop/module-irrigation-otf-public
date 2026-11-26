@@ -343,7 +343,7 @@ function readModelDays(payload: unknown, model: string, suffixed: boolean): Weat
  * Joint à chaque jour ses heures d'ET0 du fournisseur (source
  * `provider-hourly`, D-349), rangées par heure d'horloge du lieu. Un jour
  * dont les heures manquent, ou ne sont pas en même nombre que les heures du
- * jour du lieu, n'en reçoit pas (F1038) : la forme passera à la source
+ * jour du lieu, n'en reçoit pas (F1039) : la forme passera à la source
  * suivante, jamais un décalage ni un zéro.
  */
 function withHourlyEt0(days: WeatherDailyValue[], payload: unknown, seriesKey: string, timeZone: string): WeatherDailyValue[] {

@@ -76,7 +76,7 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
       `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(location)}/${input.startDate}/${input.endDate}`,
     );
     url.searchParams.set('unitGroup', 'metric');
-    // Les heures seulement avec la prévision (docs/et0-horaire-contract.md, § 5 ; D-349, F1035) :
+    // Les heures seulement avec la prévision (docs/et0-horaire-contract.md, § 5 ; D-349, F1036) :
     // une prévision compte pour un seul enregistrement, heures comprises ; l'historique, une heure par enregistrement.
     const withHours = endpoint === 'forecast';
     url.searchParams.set('include', withHours ? 'days,hours' : 'days');
@@ -95,7 +95,7 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
       });
     }
     const elevationMeters = finiteNumber(payload.elevation) ?? 0;
-    // Le coût de la requête dit par le fournisseur, journalisé pour prouver en ligne qu'il ne change pas (F1035).
+    // Le coût de la requête dit par le fournisseur, journalisé pour prouver en ligne qu'il ne change pas (F1036).
     this.log('info', { ...weatherLogEntry('weather_external_query_cost', endpoint), queryCost: finiteNumber(payload.queryCost), withHours });
     return payload.days.flatMap((value): WeatherDailyValue[] => {
       if (!isRecord(value)) return [];

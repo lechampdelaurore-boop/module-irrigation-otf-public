@@ -99,7 +99,7 @@ export function hourlyExtraterrestrialRadiationMj(startsAtMs: number, location: 
  * L'ET0 d'une heure, en mm (équation 53), à partir du rayonnement net de
  * l'heure déjà calculé. Le flux de chaleur du sol vaut 0,1 Rn le jour et
  * 0,5 Rn la nuit. Le résultat peut être légèrement négatif la nuit : la
- * forme de la journée le ramène à 0 (D-348, F1030).
+ * forme de la journée le ramène à 0 (D-348, F1031).
  */
 export function fao56HourlyEt0Mm(input: {
   temperatureCelsius: number;
@@ -132,7 +132,7 @@ function clampRelativeShortwave(ratio: number): number {
  * Le rapport Rs/Rso d'une heure de nuit, où Rso est nul, prend le rapport
  * des heures de jour de la même journée (somme de Rs sur somme de Rso) :
  * FAO-56 conseille le rapport de la fin d'après-midi ; une journée n'en a
- * qu'un (D-349, F1037). Sans heure de jour lisible, les heures de nuit sont
+ * qu'un (D-349, F1038). Sans heure de jour lisible, les heures de nuit sont
  * absentes.
  */
 export function computedHourlyEt0Mm(

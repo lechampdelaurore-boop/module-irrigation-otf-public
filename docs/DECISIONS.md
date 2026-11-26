@@ -11706,26 +11706,26 @@ alertes n'est touché.
 
 Précisions prises en codant (option recommandée, modifiables par le porteur) :
 
-- **F1030** — « Petite valeur négative de nuit » (§ 4.2) : jusqu'à
+- **F1031** — « Petite valeur négative de nuit » (§ 4.2) : jusqu'à
   0,05 mm en une heure, ramenée à 0 avant l'addition ; au-delà, l'heure est
   absente et la forme du fournisseur est refusée pour ce jour
   (`NIGHT_NEGATIVE_TOLERANCE_MM`). Le calcul FAO-56 horaire donne la nuit
   quelques centièmes négatifs ; plus, ce n'est plus une correction.
-- **F1031** — « Regroupées en une plage » (§ 4.3) : la plage va de la
+- **F1032** — « Regroupées en une plage » (§ 4.3) : la plage va de la
   première à la dernière heure au seuil ; une heure plus faible entre les
   deux (un passage nuageux à midi) reste dedans. Une seule phrase à l'écran,
   comme le contrat la montre.
-- **F1032** — La forme théorique (§ 4.4) : déclinaison de FAO-56
+- **F1033** — La forme théorique (§ 4.4) : déclinaison de FAO-56
   (équation 24) au rang du jour civil du lieu ; hauteur du soleil au milieu
   de chaque heure, heure solaire tirée de l'instant UTC et de la longitude,
   équation du temps négligée comme le contrat le dit. Un jour où le soleil
   n'est au-dessus de l'horizon au milieu d'aucune heure n'a pas de forme
   (`null`), jamais une forme inventée.
-- **F1033** — Les heures d'un jour partent de `localDateStartUtc`, la
+- **F1034** — Les heures d'un jour partent de `localDateStartUtc`, la
   fonction de toutes les dates du module ; un fuseau à changement d'heure
   d'une demi-heure (île Lord Howe) donnerait une dernière heure plus courte,
   non testé : le pilote est en France métropolitaine (F419).
-- **F1034** — La fraîcheur de la forme (§ 4.5) et l'arrondi des
+- **F1035** — La fraîcheur de la forme (§ 4.5) et l'arrondi des
   millimètres (« environ 1,7 mm ») ne sont pas dans HR1 : la fraîcheur se lit
   avec l'heure de lecture que HR2 écrit, l'arrondi est celui de l'écran
   (HR3). Le domaine rend des millimètres non arrondis.
@@ -11765,7 +11765,7 @@ existant ne change** ; rien ne s'affiche encore (HR3).
 
 Précisions prises en codant (option recommandée, modifiables par le porteur) :
 
-- **F1035** — Le coût de Visual Crossing (contrat § 5, non vérifié par le
+- **F1036** — Le coût de Visual Crossing (contrat § 5, non vérifié par le
   contrat) : **vérifié le 26 novembre 2026** sur les pages du fournisseur
   (« What exactly is a weather record? » et la page des tarifs) : « une
   prévision de 15 jours pour un lieu compte pour un seul enregistrement,
@@ -11778,27 +11778,27 @@ Précisions prises en codant (option recommandée, modifiables par le porteur) :
   en ligne le prouvera. S'il dépasse 1 par lieu, le fil s'arrête et le
   porteur décide (le budget est à lui ; tout reste gratuit pendant le
   pilote).
-- **F1036** — L'ET0 horaire calculée suit FAO-56 (équations 28 à 33, 37 à
+- **F1037** — L'ET0 horaire calculée suit FAO-56 (équations 28 à 33, 37 à
   39, 45 à 47, 53), vérifiée sur l'exemple 19 du bulletin : 0,63 mm de
   14 h à 15 h, 0,00 mm la nuit, Ra 3,543 MJ/m². Le vent de 10 m est ramené
   à 2 m comme au calcul du jour ; le rayonnement en W/m² devient des MJ/m²
   par heure par `units.ts`. Elle ne sert qu'à la forme : le total du jour
   reste le calcul du jour.
-- **F1037** — La nuit, le rapport Rs/Rso est celui des heures de jour de la
+- **F1038** — La nuit, le rapport Rs/Rso est celui des heures de jour de la
   même journée (somme sur somme) : FAO-56 conseille celui de la fin
   d'après-midi ; un seul rapport par jour suffit à la forme. Une heure dont
   une valeur manque reste absente, et la forme de ce jour est refusée.
-- **F1038** — Open-Meteo donne ses heures en heures d'horloge du lieu : elles
+- **F1039** — Open-Meteo donne ses heures en heures d'horloge du lieu : elles
   ne sont rangées que si leur nombre est exactement celui des heures du
   jour (23, 24 ou 25) ; sinon la forme de ce jour est refusée, jamais
   décalée. Le comportement d'Open-Meteo un jour de changement d'heure n'est
   pas mesuré (prochain : 28 mars 2027).
-- **F1039** — La table ne garde que les formes du fournisseur ou calculées ;
+- **F1040** — La table ne garde que les formes du fournisseur ou calculées ;
   la forme théorique ne s'écrit pas, elle se calcule à l'écran. Un jour
   qu'une lecture ne donne pas garde sa forme d'avant, comme un jour vide
   n'efface pas la météo du jour ; son heure de lecture dira « ancienne »
   (HR3).
-- **F1040** — Le lieu (`place_key`) est celui de la lecture partagée de la
+- **F1041** — Le lieu (`place_key`) est celui de la lecture partagée de la
   météo (latitude et longitude de la commune à six décimales, fuseau) ; la
   table n'a aucune ligne d'une ferme : table commune au contrôle de
   cohérence des espaces, gardée hors du plan d'effacement d'une ferme avec
@@ -11806,7 +11806,7 @@ Précisions prises en codant (option recommandée, modifiables par le porteur) :
   conservation avec sa purge (`day < ?`). Numéro de migration provisoire :
   0052, réglé à la mise à jour qui suit la fusion de S6 #235 et de la météo
   multi-modèles #250, jamais par un rebase.
-- **F1041** — Seules la lecture du matin et les relectures de la journée
+- **F1042** — Seules la lecture du matin et les relectures de la journée
   écrivent la forme, comme le contrat le dit ; « Actualiser la météo » à
   l'écran ne l'écrit pas. Une ferme qui change de modèle dans la journée
   verra la forme théorique jusqu'à la lecture suivante. La démonstration
