@@ -238,6 +238,15 @@ une ferme qui a tout coché, Arrosages (précision P36).
 - **Chaque page ne lit que ses données** : la page d'aujourd'hui charge tous les
   tableaux de bord à chaque ouverture ; chaque page ne chargera que les siens.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** Une page de plus, `semaine` (`/irrigation/semaine`),
+qui n'est pas une case : elle existe quand le planning, les besoins ou
+l'historique est coché, et les réunit (S4-a). Les trois cases gardent leur
+sens : elles disent ce que la page contient, au menu des fonctionnalités et
+pour `pageAccess`. Leurs anciennes adresses mènent à « Semaine », paramètres et
+ancre gardés, l'historique à la vue « Les cumuls ». Depuis la PR 4, aucun
+lien du module ne vise plus ces adresses : notifications, liens des pages,
+relecture des réglages et visite guidée visent « Semaine ».
+
 ## 6. L'aide contextuelle
 
 Choix du porteur, question 7 : le « ? » par page **et** l'origine des chiffres.

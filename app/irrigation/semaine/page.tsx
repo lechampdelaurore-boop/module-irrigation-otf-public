@@ -12,7 +12,7 @@ import { PlanSettings, WeeklyPlanSection } from '../planning/weekly-plan-view';
 import { pageMetadata } from '../page-metadata';
 import { pageHref } from '@/lib/domain/features/pages';
 import { isPartActive } from '@/lib/domain/features/socle';
-import { weekSections } from '@/lib/domain/features/week-page';
+import { NEEDS_SECTION_ANCHOR, weekSections } from '@/lib/domain/features/week-page';
 import { needsDetailLine, weekDetailSummary, WEEK_SECTION_TITLES, WEEK_SETTINGS_LINE } from '@/lib/domain/semaine/week-detail';
 import { weekDayEvents } from '@/lib/domain/semaine/week-days';
 import { farmRainMatters } from '@/lib/domain/today/rain-entry';
@@ -87,7 +87,7 @@ async function computeSemainePage({ searchParams }: { searchParams: IrrigationSe
         rainMatters={rainMatters}
       />
       <WeekDetail summary={weekDetailSummary(sections, needs.irrigationNeeds.gardens.length)}>
-        <WeekDetailSection id="reste-a-arroser" section="reste-a-arroser" line={needsDetailLine(needs.irrigationNeeds.gardens.length)}>
+        <WeekDetailSection id={NEEDS_SECTION_ANCHOR} section="reste-a-arroser" line={needsDetailLine(needs.irrigationNeeds.gardens.length)}>
           <IrrigationNeedsDashboardView season={context.season} initialDashboard={needs.irrigationNeeds} showProposals={context.enabled.includes('cultures')} />
         </WeekDetailSection>
         {planning ? <PlanDetailSection current={current} /> : null}

@@ -1,7 +1,7 @@
 import { PAGE_FEATURE_IDS, featureLabel, isPageFeatureId, type FeatureId, type PageFeatureId } from './catalogue';
 import { firstEnabledFeature, type FeatureSelection } from './selection';
 import { usesSpeciesCorrespondence } from './socle';
-import { CUMULS_VIEW_VALUE, SERIES_WATER_ANCHOR, WEEK_VIEW_PARAM, isWeekPageFeature, weekPageExists, weekViewOfFeature, type WeekPageFeature, type WeekViewId } from './week-page';
+import { CUMULS_VIEW_VALUE, SERIES_WATER_ANCHOR, WEEK_RAIN_INTENT, WEEK_VIEW_PARAM, isWeekPageFeature, weekPageExists, weekViewOfFeature, type WeekPageFeature, type WeekViewId } from './week-page';
 
 /**
  * Les pages et leurs adresses (docs/feature-selection-contract.md, section 5) :
@@ -79,6 +79,8 @@ export type PageQuery = {
   tab?: 'materiel' | 'groupes';
   /** La vue de « Semaine » (lot S4, S4-b) : `cumuls` pour la seconde ; la première n'a pas de paramètre. */
   view?: WeekViewId | null;
+  /** « Semaine » ouvre « Noter la pluie » à l'arrivée (lot S4, PR 4, `?pluie=1`). */
+  rain?: boolean;
 };
 
 /** La ligne de la page d'arrivée quand la page demandée n'est pas cochée et qu'on ne sait pas laquelle (section 5, P14). */
@@ -179,6 +181,7 @@ export function pageHref(page: IrrigationPageId, query: PageQuery = {}, hash?: s
   if (query.absent) params.set('absente', query.absent === true ? '1' : query.absent);
   if (query.tab) params.set('onglet', query.tab);
   if (query.view === 'cumuls') params.set(WEEK_VIEW_PARAM, CUMULS_VIEW_VALUE);
+  if (query.rain) params.set(WEEK_RAIN_INTENT, '1');
   const search = params.toString();
   return `${pagePath(page)}${search ? `?${search}` : ''}${hash ? `#${hash.replace(/^#/, '')}` : ''}`;
 }

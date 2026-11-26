@@ -21,7 +21,7 @@ import { loadWeekEventsAction } from './week-actions';
 import { WEEK_NEEDS_READ, WEEK_WATER_READ, useWeekReading, type WeekNeeds, type WeekWater } from './week-signals';
 import { WeekDays } from './week-days';
 import { WeekBilanCard, WeekGardensList, openGoals } from './week-summary';
-import { useWeekRain, type WeekRain } from './week-rain';
+import { BILAN_ORIGIN, useWeekRain, type WeekRain } from './week-rain';
 import { WaterSummaryTiles } from '../water-summary-tiles';
 
 /** L'ancre du pli des objectifs, où « Poser un objectif » mène (section 7.1, n° 3). */
@@ -65,7 +65,7 @@ export function WeekFirstLevel({ season, currentSeason, today, query, initialWat
   const forecast = current ? weekForecastUnavailable(water.days, today, rainMatters) : null;
   const rain = useWeekRain();
   // « Noter la pluie » du bilan (8.3) : pas pour une semaine qui n'a pas commencé.
-  const bilanRain = rain && heading.state !== 'upcoming' ? { open: () => rain.open(RAIN_BILAN), pending: rain.pending, reply: rain.reply(RAIN_BILAN) } : null;
+  const bilanRain = rain && heading.state !== 'upcoming' ? { open: () => rain.open(BILAN_ORIGIN), pending: rain.pending, reply: rain.reply(BILAN_ORIGIN) } : null;
   return (
     <div className="week-first-level">
       <WeekNavigation heading={heading} query={query} currentSeason={currentSeason} />
@@ -121,7 +121,6 @@ function WeekNavigation({ heading, query, currentSeason }: { heading: WeekHeadin
 }
 
 /** Les réponses de « Noter la pluie », sous le geste qui a ouvert la fenêtre. */
-const RAIN_BILAN = 'pluie-bilan';
 const RAIN_APPROXIMATE = 'pluie-approximatif';
 
 /**
