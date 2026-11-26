@@ -286,6 +286,12 @@ règle 4) ; le plan se relit après.
   (« 8,5 » → 8,5), le texte du bouton et l'état « déjà notée » sont une
   fonction de `lib/domain/today/` (`rain-entry.ts`), testée sans navigateur.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** Le lien de la fenêtre, « Retirer une mesure,
+voir jour par jour », mène à « Pluie mesurée » de « Semaine » et dit « sur
+« Semaine », dans « Pluie mesurée » ». La fenêtre est la même sur « Semaine »,
+appelée par le bilan, la ligne « Calcul approximatif » et la ligne d'un jour
+passé (S4, PR 3, F935).
+
 ## 8. La page à l'essentiel : deux niveaux
 
 **Règle.** Le premier niveau tient en un écran et demi au téléphone ; le reste
@@ -360,6 +366,11 @@ liens, ses boutons et ses réponses (L1 à L4).
   première carte à moins de **600 px** du haut (il est à 1 057 px sur la ferme
   réelle) ; au plus **12** choses à toucher au premier niveau (39 à 56
   aujourd'hui). Une page qui dépasse sa borne le dit, comme au lot J.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** « Voir la semaine » mène à « Semaine » ; la
+ligne de pied « Voir au planning » devient « Voir la semaine », vers la même
+proposition ; « Valider toute la semaine » est sur « Semaine » ; « Changer
+l'heure ou la dose » ouvre la proposition sur « Semaine ».
 
 ## 9. États rares : ce que chacun devient
 

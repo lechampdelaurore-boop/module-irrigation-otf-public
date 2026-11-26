@@ -40,6 +40,14 @@ export const SIMPLE_WORDS = {
   noWateringHours: 'Heures où l’on n’arrose pas',
   /** « Reliquat ». */
   stoppedRemainder: 'Ce qui reste d’un arrosage arrêté',
+  /**
+   * La page « Semaine » (S4, PR 2, section 4.2) : les mots de ce qui n'en
+   * avait pas, une semaine passée ou à venir. Des faits, jamais un jugement.
+   */
+  weekNoGoal: 'Aucune eau visée cette semaine.',
+  weekMissed: 'il a manqué',
+  rainAnnounced: 'de pluie annoncés',
+  rainAnnouncedUnknown: 'Pluie annoncée non disponible.',
 } as const;
 
 /**

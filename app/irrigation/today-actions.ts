@@ -5,7 +5,8 @@ import { hasTodayPage } from '@/lib/domain/features/pages';
 import { todaySeason, type TodayView } from '@/lib/domain/today/today-view';
 import { getFeatureSelectionForUser } from '@/lib/services/feature-selection-service';
 import { getIrrigationSnapshot, readCachedIrrigationSnapshot } from '@/lib/services/irrigation-service';
-import { getTodayBadgeForUser, getTodayViewForUser } from '@/lib/services/today-service';
+import { getTodayApproximateForUser, getTodayBadgeForUser, getTodayViewForUser } from '@/lib/services/today-service';
+import type { TodayApproximate } from '@/lib/domain/today/essential';
 
 /**
  * Les lectures de la page « Aujourd'hui » après un geste, et la pastille du
@@ -48,6 +49,28 @@ export async function readTodayBadgeAction(): Promise<number | null> {
     const snapshot = await readCachedIrrigationSnapshot(user.userId, season);
     if (!snapshot) return null;
     return await getTodayBadgeForUser({ ownerUserId: user.userId, season, snapshot, enabled: selection.enabled, now });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * La ligne « Calcul approximatif » de la page « Semaine » (simplification,
+ * lot S4, PR 2, section 4, point 3), lue après son affichage pour ne pas
+ * allonger son temps de serveur (section 3.4) : la fonction d'« Aujourd'hui »,
+ * la saison du jour. Une erreur ne montre rien, plutôt qu'une ligne fausse.
+ */
+export async function readTodayApproximateAction(): Promise<TodayApproximate | null> {
+  const user = await getAuthenticatedUser();
+  if (!user) return null;
+  try {
+    const now = new Date();
+    const season = todaySeason(now);
+    const selection = await getFeatureSelectionForUser(user.userId);
+    if (selection.firstVisit) return null;
+    const snapshot = await readCachedIrrigationSnapshot(user.userId, season);
+    if (!snapshot) return null;
+    return await getTodayApproximateForUser({ ownerUserId: user.userId, season, snapshot, enabled: selection.enabled, now });
   } catch {
     return null;
   }

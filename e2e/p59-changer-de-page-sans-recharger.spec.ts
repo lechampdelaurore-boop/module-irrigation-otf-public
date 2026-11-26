@@ -15,8 +15,9 @@ import {
  * « rame » au téléphone comme à l'ordinateur).
  *
  * Sur la ferme de démonstration, qui a tout coché : un clic du menu, ou au
- * téléphone de la barre du bas, d'une fiche de « Ma ferme », de la bande « La
- * semaine » et du retour « ‹ » (simplification, lot S3, PR 2), change la page
+ * téléphone de la barre du bas, d'une fiche de « Ma ferme », du retour « ‹ »
+ * (simplification, lot S3, PR 2) et du sélecteur des vues de « Semaine »
+ * (lot S4, section 3.2), change la page
  * sans recharger l'application (une marque posée dans la fenêtre survit au
  * changement) ; la page suivie a son titre, son onglet et sa marque dans le
  * menu ou la barre ; le clavier repart du contenu de la nouvelle page ; le
@@ -67,23 +68,23 @@ test('un clic du menu change la page sans recharger le module, et le clavier rep
     await verifierLEtape(page, journal, 'retour à « Ma ferme »');
   }
 
-  // « Semaine » dans la barre du bas au téléphone, puis « Besoins » par la bande (le menu de gauche à l'ordinateur).
-  await allerALaPage(page, 'planning');
+  // « Semaine » dans la barre du bas au téléphone, le menu de gauche à l'ordinateur (lot S4).
+  await allerALaPage(page, 'semaine');
   expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
-  await expect(page).toHaveTitle(pageDocumentTitle(TITRES_DES_PAGES.planning));
+  await expect(page).toHaveTitle(pageDocumentTitle(TITRES_DES_PAGES.semaine));
   await expect(page.locator('#contenu')).toBeFocused();
-  await verifierLEtape(page, journal, 'Planning par le menu');
-  if (telephone) {
-    await allerALaPage(page, 'besoins');
-    expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
-    await expect(page.getByRole('navigation', { name: 'La semaine' }).getByRole('link', { name: TITRES_DES_PAGES.besoins, exact: true })).toHaveAttribute('aria-current', 'page');
-    await expect(page.locator('#contenu')).toBeFocused();
-    await verifierLEtape(page, journal, 'Besoins par la bande');
-  }
+  await verifierLEtape(page, journal, 'Semaine par le menu');
+  // Puis « Les cumuls », par le sélecteur de vue au téléphone, par le menu à l'ordinateur : la vue change sans recharger (section 3.2).
+  await allerALaPage(page, 'historique');
+  expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
+  await expect(page.getByRole('navigation', { name: 'Vues de la semaine' }).getByRole('link', { name: 'Les cumuls', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('#contenu')).toBeFocused();
+  await verifierLEtape(page, journal, 'Les cumuls par le sélecteur de vue');
 
   // Le retour du navigateur ramène la page d'avant, sans recharger non plus.
   await page.goBack();
-  await attendreLaPagePrete(page, telephone ? 'planning' : 'materiel');
+  await attendreLaPagePrete(page, 'besoins');
+  await expect(page.getByRole('navigation', { name: 'Vues de la semaine' }).getByRole('link', { name: 'La semaine', exact: true })).toHaveAttribute('aria-current', 'page');
   expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
   await verifierLEtape(page, journal, 'retour à la page d’avant');
 });

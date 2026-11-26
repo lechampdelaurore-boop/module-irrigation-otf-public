@@ -51,7 +51,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   cultures: {
     purpose: 'Adapter le besoin en eau à chaque culture et à son stade, à partir de la météo : une culture ne boit pas autant à la levée qu’en pleine saison, et le module suit son stade jour après jour.',
-    reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez, ou si l’objectif automatique est allumé dans « Objectifs et besoins ».',
+    reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez, ou si l’objectif automatique est allumé dans « Eau visée », sur « Semaine ».',
     firstStep: 'Vérifiez dans Réglages que vos espèces d’Ouvre ta ferme correspondent à une culture de référence, puis ajustez coefficients, profils racinaires et durées si besoin.',
   },
   'alertes-meteo': {
@@ -68,6 +68,11 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
     purpose: 'Retrouver l’eau réellement apportée, la météo observée et les objectifs de chaque semaine : les cumuls par planche, par jardin et pour la ferme, l’historique des arrosages et le suivi par série.',
     reading: 'Les cumuls sont en millimètres et en mètres cubes. À l’échelle d’un jardin ou de la ferme, ils sont pondérés par la surface des planches.',
     firstStep: 'Choisissez un périmètre et une période, ou une série. « Exporter CSV » garde les chiffres dans un tableur.',
+  },
+  semaine: {
+    purpose: 'Savoir où en est l’eau de la semaine, sur une seule page : les arrosages proposés à valider, l’eau visée, la météo et la pluie, ce qu’il reste à arroser. « Les cumuls » retrouve l’eau apportée sur une autre période.',
+    reading: 'La semaine va du lundi au dimanche. En haut, la phrase et le bilan disent l’eau visée, reçue et arrosée. « Jour par jour » montre chaque jour et ses arrosages à valider, « Jardin par jardin » chaque jardin. « Le détail » range le reste : besoin par planche, plan, pluie, météo.',
+    firstStep: 'Validez, jour par jour, les arrosages proposés qui vous conviennent : rien n’est arrosé sans vous. Après une pluie, notez ce qu’indique votre pluviomètre avec « Noter la pluie », sous le bilan.',
   },
   'ma-ferme': {
     purpose: 'Retrouver ce que le module sait de votre ferme : votre matériel, d’où vient l’eau, vos cultures, votre sol, les alertes et les réglages. On y vient surtout à l’installation, ou quand quelque chose change au champ.',

@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { menuPlaces } from '@/lib/domain/features/desktop-menu';
 import { phoneBar } from '@/lib/domain/features/phone-bar';
 import { pageHref, pageLabel, type IrrigationPageId, type PageQuery } from '@/lib/domain/features/pages';
+import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import { placeLabel } from '@/lib/domain/features/places';
 import { plusGestures } from '@/lib/domain/features/plus-sheet';
+import { weekViewLabel, type WeekViewId } from '@/lib/domain/features/week-page';
 import { Icon } from '../line-icon';
 import { PAGE_ICONS, PLACE_ICONS } from './page-icons';
 import { PlusSheet } from './plus-sheet';
@@ -26,7 +28,9 @@ import { TodayBadge, todayBadgeLabel, useTodayBadge } from './today-badge';
  * de l'ordinateur (PR 3, section 6) montre le bouton « + Arroser ou noter »
  * en tête, puis les trois endroits dépliés (`menuPlaces`) : « Aujourd'hui »
  * dans son encart, les titres « Semaine » et « Ma ferme » qui sont des
- * liens, Réglages dans « Ma ferme ».
+ * liens, Réglages dans « Ma ferme ». Depuis le lot S4, « Semaine » est une
+ * page : son titre y mène, et ses deux vues, « La semaine » et « Les
+ * cumuls », la suivent quand la ferme a les deux (S4-m).
  *
  * Un clic du menu ne recharge plus toute l'application (D-322) : `Link`
  * demande au serveur la seule page voulue, sans relancer les scripts ni
@@ -59,6 +63,7 @@ export function FeatureMenu({
   todayBadge,
   rainMatters = false,
   week = null,
+  weekView = null,
 }: {
   menu: readonly IrrigationPageId[];
   current: IrrigationPageId | null;
@@ -71,8 +76,10 @@ export function FeatureMenu({
    * le plan de la ferme.
    */
   rainMatters?: boolean;
-  /** Le jour ouvert de la page courante : l'entrée « Semaine » le garde, comme la bande (section 3.3). */
+  /** Le jour ouvert de la page courante : l'entrée « Semaine » le garde (S3, section 3.3). */
   week?: string | null;
+  /** La vue ouverte de « Semaine », que sa ligne du menu marque (lot S4, S4-m). */
+  weekView?: WeekViewId | null;
 }) {
   const gestures = plusGestures(menu, rainMatters);
   const bar = phoneBar(menu, current, gestures.length > 0);
@@ -82,7 +89,7 @@ export function FeatureMenu({
     gestures,
     season: query.season ?? null,
     planning: menu.includes('planning'),
-    besoinsHref: menu.includes('besoins') ? pageHref('besoins', query) : null,
+    besoinsHref: menu.includes('besoins') ? pageHref('semaine', query, MEASURED_RAIN_ANCHOR) : null,
   };
   const badge = useTodayBadge(menu, todayBadge);
   const badgeOf = (item: IrrigationPageId) => (item === 'aujourdhui' && badge !== null ? badge : null);
@@ -157,12 +164,29 @@ export function FeatureMenu({
                     {group.pages.map((item) => <MenuLink key={item} item={item} current={current} query={groupQuery} />)}
                   </ul>
                 ) : null}
+                {group.views.length > 0 ? (
+                  <ul aria-label={placeLabel(group.place)}>
+                    {group.views.map((view) => <MenuViewLink key={view} view={view} current={current === 'semaine' ? weekView : null} query={groupQuery} />)}
+                  </ul>
+                ) : null}
               </li>
             );
           })}
         </ul>
       </nav>
     </>
+  );
+}
+
+/** Une vue de « Semaine » dans le menu de l'ordinateur (S4-m) : « La semaine », « Les cumuls ». */
+function MenuViewLink({ view, current, query }: { view: WeekViewId; current: WeekViewId | null; query: PageQuery }) {
+  return (
+    <li>
+      <Link href={pageHref('semaine', { ...query, view })} prefetch={false} onClick={view === current ? undefined : markMenuNavigation} aria-current={view === current ? 'page' : undefined}>
+        <Icon name={view === 'cumuls' ? PAGE_ICONS.historique : PAGE_ICONS.semaine} />
+        <span>{weekViewLabel(view)}</span>
+      </Link>
+    </li>
   );
 }
 

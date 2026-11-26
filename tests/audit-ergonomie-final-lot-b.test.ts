@@ -145,7 +145,8 @@ test('R4, F248 : une répartition attend quand le plan de la semaine manque d’
 });
 
 test('R4, F247 et F248 : le lien mène à l’ancre de la faisabilité, qui passe en tête de « Ressources » quand une répartition attend', () => {
-  const route = readFileSync('app/irrigation/planning/page.tsx', 'utf8');
+  // Le planning vit sur la page « Semaine » depuis le lot S4 (docs/simplification-s4-contract.md, section 3).
+  const route = readFileSync('app/irrigation/semaine/page.tsx', 'utf8');
   assert.match(route, /isPartActive\(context\.enabled, 'feasibility'\) \? pageHref\('ressources', \{ season: context\.season \}, 'repartition'\) : null/);
   const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
   assert.match(view, /action\.arbitrated \? 'Revoir la répartition' : 'Répartir l’eau'/);
@@ -244,7 +245,8 @@ test('remarque 5, F256 : le jour qu’une limite posée après coup met en défa
   assert.equal(overcommittedDayNotice(days, '2026-07-08', volume), null);
   assert.equal(overcommittedDayNotice([], '2026-07-07', volume), null);
   assert.equal(overcommittedDayNotice([{ date: '2026-07-07', limitCubicMeters: 0.01, committedCubicMeters: 0.12 }], '2026-07-07', volume), 'Limite journalière de 0,01 m³ dépassée : 0,12 m³ engagés');
-  const view = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
-  assert.match(view, /overcommitted=\{overcommittedDayNotice\(plan\.calculation\.summary\.overcommittedDays, day\.dateKey, formatVolume\)\}/);
+  // Le jour est une ligne de « Jour par jour », sur la page « Semaine » (S4, PR 2).
+  const view = readFileSync('app/irrigation/semaine/week-days.tsx', 'utf8');
+  assert.match(view, /overcommittedDayNotice\(plan\.plan\.calculation\.summary\.overcommittedDays, line\.dateKey, formatVolume\)/);
   assert.match(view, /\{overcommitted \? <p className="planning-day-overcommitted" role="note">\{overcommitted\}<\/p> : null\}/);
 });

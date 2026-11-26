@@ -14,6 +14,87 @@ source détaillée commit par commit.
   saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
   l'historique ne changent pas. Quatre PR de code à venir.
 
+### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
+
+- **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
+  première ouverture, trois façons de commencer à la place des onze cases ; une
+  carte « Mise en route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les
+  données de la ferme) ; les chiffres d'état des fiches de « Ma ferme ». Aucun
+  code, aucun calcul ni aucune fonction retirée ; une seule migration, additive,
+  prévue pour le code ; l'écran de bienvenue du contrat 3.8 est modifié, la 3.8
+  reste close.
+
+### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
+
+- **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens
+  d'« Aujourd'hui » (« Eau de la semaine », la ligne du plan, les
+  propositions, « Fiabilité du calcul »), de « Matériel », « Ressources »,
+  « Arrosages », « Réglages à relire » et du « + », et la notification de
+  l'aspersion à reconsidérer, ouvrent « Semaine » à la bonne section, sans
+  passer par les anciennes adresses, qui restent servies. « Noter la pluie »
+  d'une autre page ouvre la fenêtre à l'arrivée. Les mots qui nommaient une
+  page disparue changent : « Voir la semaine », « Ouvrir la semaine ». La
+  visite guidée « Le planning » ouvre les plis du détail pour montrer ce
+  qu'elle présente, au lieu d'un élément caché. Le « ? » de « Semaine » dit
+  où est chaque chose. Aucun calcul, aucune règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S4, PR 3 : les gestes de la semaine)
+
+- **Agir depuis la semaine, sans changer de page** (D-335, F933 à F939) :
+  « Comprendre ces chiffres » déplie sous le bilan les tuiles
+  d'« Aujourd'hui » (l'eau visée, l'irrigation, la pluie réelle ou estimée,
+  la pluie encore prévue, la soif de la semaine) ; « Changer l'eau visée »
+  ouvre le pli des objectifs, le champ des millimètres prêt à la saisie ;
+  « Noter la pluie » ouvre la fenêtre d'« Aujourd'hui » depuis le bilan, la
+  ligne « Calcul approximatif » ou la ligne d'un jour dont la pluie manque
+  (ce jour choisi), puis la semaine et le plan se relisent. Les flèches
+  changent de semaine sans recharger la page (276 ms contre 307 à 414 ms
+  pour les flèches d'avant, en local) ; « Exporter » télécharge la semaine
+  affichée au format de l'historique. Une prévision absente se dit
+  « Prévision indisponible : à vérifier », jamais zéro. Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S4, PR 2 : le premier niveau de la semaine)
+
+- **La semaine se lit d'un coup d'œil** (D-335, F923 à F932) : la page
+  « Semaine » commence par « ‹ Cette semaine › » (la semaine est dans
+  l'adresse), la ligne du plan et « Recalculer », une phrase de faits
+  (« 12 mm reçus sur 23 mm visés. Il manque encore 11 mm d'ici
+  dimanche. »), ce qui demande l'attention, le bilan (une barre et trois
+  chiffres : reçus, visés, arrosés), « Jour par jour » (sept lignes ; au
+  téléphone, un créneau tient en une ligne avec « Valider » ;
+  « Valider toute la semaine ») et « Jardin par jardin ». Les chiffres
+  sont ceux d'« Aujourd'hui ». Tout ce que montraient le planning et
+  « Objectifs et besoins » est derrière « Le détail », un pli fermé où
+  chaque partie a son pli et sa ligne ; un lien vers un de ces blocs ouvre
+  ses plis. L'écart du prévu se lit à l'ouverture de son pli. Aucun calcul,
+  aucune règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
+
+- **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
+  page, `/irrigation/semaine`. Sa vue « La semaine » montre, dans l'ordre
+  d'avant et sans rien changer, le planning puis les objectifs et besoins ;
+  sa vue « Les cumuls » est l'historique. Sous le titre, deux liens passent
+  d'une vue à l'autre sans recharger ; ils remplacent la bande « La
+  semaine ». La barre du bas et le menu de l'ordinateur ouvrent la page ;
+  le menu nomme ses deux vues. Les adresses du planning, des besoins et de
+  l'historique mènent à la page, avec leurs réglages d'adresse et leur
+  ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
+  coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
+
+- **« Arroser ou noter » plus court au téléphone pendant un arrosage**
+  (D-342, F996, F997) : la carte de l'arrosage en cours se range plus
+  serré (le nom à côté du minuteur, « En cours » à côté du réglage, des
+  marges plus courtes, sans cadre bleu autour) et « 1. Où ? » commence à
+  653 px au lieu de 800 px, sous le budget de 700 px. Rien n'est retiré :
+  les trois valeurs, le détail des apports, la pompe et les deux boutons
+  restent. « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »),
+  comme sur « Aujourd'hui ».
+
 ### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
 
 - **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page
@@ -186,6 +267,15 @@ source détaillée commit par commit.
   et « Plus d'options » (pompe, note, saisir en mm). Aucun code, aucun calcul
   ni aucune règle d'écriture changés ; les précautions restent au premier
   niveau. Ne touche pas l'écran de bienvenue du contrat 3.8 (lot S6).
+
+### Ajouté (simplifier l'usage du module, S4 : contrat de la semaine sur une page)
+
+- **Contrat du lot S4** (`docs/simplification-s4-contract.md`, D-327) : une
+  page « Semaine » réunit le planning, « Objectifs et besoins » et « Historique
+  et cumuls » en deux vues (la semaine, les cumuls) ; une phrase, trois chiffres,
+  les jours et les jardins au premier niveau, le reste derrière « Le détail ».
+  Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
+  adresses sont gardées.
 
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 

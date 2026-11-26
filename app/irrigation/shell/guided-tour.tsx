@@ -22,6 +22,7 @@ import { tourById, type Tour, type TourId, type TourPage, type TourStep } from '
 import { WELCOME_PATH, pageHref, pageLabel, type PageQuery } from '@/lib/domain/features/pages';
 import { Icon } from '../line-icon';
 import { DEMO_DETAIL_TOGGLE_SELECTOR, isInFoldedDemoDetail, openDemoDetail } from './demo-banner-detail';
+import { isOnScreen } from './on-screen';
 
 /** Ce que la bannière sait de la page pour y jouer une visite : la page ouverte, le menu de la ferme, la saison et la parcelle. */
 export type TourSurroundings = { current: TourPage; reachable: readonly TourPage[]; query: PageQuery };
@@ -67,10 +68,36 @@ function storageWorks(): boolean {
   return writeStored(probe, '1') && writeStored(probe, null);
 }
 
-/** Le premier élément visible qui porte ce repère : le menu existe en double, à gauche et en barre du bas. */
+/**
+ * Le premier élément visible qui porte ce repère : le menu existe en double,
+ * à gauche et en barre du bas. Le contenu d'un pli fermé n'est pas visible
+ * (lot S4, PR 4) : son pli doit d'abord s'ouvrir.
+ */
 function visibleAnchor(name: string): HTMLElement | null {
   for (const element of document.querySelectorAll<HTMLElement>(`[data-tour="${name}"]`)) {
-    if (element.getClientRects().length > 0) return element;
+    if (isOnScreen(element)) return element;
+  }
+  return null;
+}
+
+/** Les plis fermés de la page qui contiennent l'élément, du plus proche au plus lointain. */
+function closedFoldsAround(element: HTMLElement): HTMLDetailsElement[] {
+  const folds: HTMLDetailsElement[] = [];
+  for (let fold = element.parentElement?.closest('details'); fold; fold = fold.parentElement?.closest('details')) {
+    if (!fold.open) folds.push(fold);
+  }
+  return folds;
+}
+
+/**
+ * Le premier élément qui porte ce repère dans un pli fermé de la page : les
+ * blocs du planning sont rangés dans « Le détail » de « Semaine » (lot S4,
+ * PR 2 ; PR 4, section 10). La visite ouvre ces plis pour les montrer,
+ * comme le détail de la bannière, plutôt que de sauter l'étape.
+ */
+function inClosedPageFold(name: string): HTMLElement | null {
+  for (const element of document.querySelectorAll<HTMLElement>(`[data-tour="${name}"]`)) {
+    if (!isInFoldedDemoDetail(element) && closedFoldsAround(element).length > 0) return element;
   }
   return null;
 }
@@ -79,17 +106,20 @@ function visibleAnchor(name: string): HTMLElement | null {
  * Au téléphone, le choix de la ferme, le bouton des visites et la remise à
  * zéro sont rangés dans le détail replié de la bannière : une visite qui doit
  * les présenter l'ouvre (docs/audit-ergonomie-final-lot-f-contract.md, F291),
- * plutôt que de sauter l'étape.
+ * plutôt que de sauter l'étape. Il en va de même d'un pli fermé de la page.
  */
 function foldedAnchor(name: string): boolean {
-  return [...document.querySelectorAll(`[data-tour="${name}"]`)].some(isInFoldedDemoDetail);
+  return [...document.querySelectorAll(`[data-tour="${name}"]`)].some(isInFoldedDemoDetail) || inClosedPageFold(name) !== null;
 }
 
-/** L'élément visible, ou rendu visible en ouvrant le détail de la bannière. */
+/** L'élément visible, ou rendu visible en ouvrant le détail de la bannière ou les plis de la page qui le contiennent. */
 function revealedAnchor(name: string): HTMLElement | null {
   const element = visibleAnchor(name);
   if (element || !foldedAnchor(name)) return element;
-  openDemoDetail();
+  const folded = inClosedPageFold(name);
+  // Du plus lointain au plus proche : « Le détail », puis la section (`AnchoredFold` suit par `toggle`).
+  if (folded) for (const fold of closedFoldsAround(folded).reverse()) fold.open = true;
+  else openDemoDetail();
   return visibleAnchor(name);
 }
 

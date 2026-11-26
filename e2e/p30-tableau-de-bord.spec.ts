@@ -207,7 +207,7 @@ test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pas
     'Voir jour par jour',
   ]);
   for (const tuile of await tuiles.all()) {
-    if (await tuile.evaluate((element) => element.tagName) === 'A') await expect(tuile).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#/);
+    if (await tuile.evaluate((element) => element.tagName) === 'A') await expect(tuile).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#/);
     else await expect(tuile).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
     if (telephone) await verifierCibleTactile(tuile, `La tuile « ${await tuile.locator('.today-kpi-label').innerText()} »`);
   }
@@ -216,7 +216,8 @@ test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pas
 
   // « Objectif de la semaine » ouvre le volet des objectifs, le champ dans l'écran.
   await tuiles.filter({ hasText: 'Eau visée cette semaine' }).click();
-  await expect(page).toHaveURL(/\/irrigation\/besoins\?season=\d{4}#objectifs-de-la-semaine$/);
+  // L'ancienne adresse mène à la page « Semaine », l'ancre gardée (lot S4, PR 1, F917).
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?season=\d{4}#objectifs-de-la-semaine$/);
   await attendreLaPagePrete(page, 'besoins');
   await expect(page.locator('#objectifs-de-la-semaine')).toHaveAttribute('open', '');
   await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeInViewport();
@@ -264,9 +265,9 @@ test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pas
   const eauDeLaSemaine = page.locator('#today-week-water');
   const lignesEau = eauDeLaSemaine.locator('a.today-bar-row');
   await expect(lignesEau.first()).toHaveAccessibleName(/^Ferme : /);
-  await expect(lignesEau.first()).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#irrigation-needs-title$/);
-  // Le lien du bloc : en tête à l'ordinateur, en bas au téléphone, jamais les deux.
-  await expect(eauDeLaSemaine.getByRole('link', { name: 'Objectifs et besoins', exact: true })).toHaveCount(1);
+  await expect(lignesEau.first()).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#irrigation-needs-title$/);
+  // Le lien du bloc : en tête à l'ordinateur, en bas au téléphone, jamais les deux ; vers « Semaine » depuis S4 (PR 4).
+  await expect(eauDeLaSemaine.getByRole('link', { name: 'Voir la semaine', exact: true })).toHaveCount(1);
   await expect(eauDeLaSemaine.locator(telephone ? '.today-block-foot' : '.today-block-more')).toBeVisible();
   if (telephone) {
     for (const ligne of await lignesEau.all()) await verifierCibleTactile(ligne, `La ligne « ${await ligne.locator('.today-bar-name').innerText()} »`);

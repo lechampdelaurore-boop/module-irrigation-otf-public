@@ -16,9 +16,7 @@
 */
 #irrigation-events-title,
 #water-today-title,
-#water-management-title,
 #water-weather-title,
-#irrigation-needs-title,
 #feasibility-title,
 #planning-title,
 #soil-reserve-title,
@@ -41,9 +39,7 @@
 
 #irrigation-events-title::before,
 #water-today-title::before,
-#water-management-title::before,
 #water-weather-title::before,
-#irrigation-needs-title::before,
 #feasibility-title::before,
 #planning-title::before,
 #soil-reserve-title::before,
@@ -68,7 +64,6 @@
 }
 
 #water-today-title::before,
-#water-management-title::before,
 #water-weather-title::before,
 #water-resources-title::before,
 #pump-title::before {
@@ -79,12 +74,8 @@
 #irrigation-events-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3c3.5 4.2 6 7.2 6 10.2A6 6 0 0 1 6 13.2C6 10.2 8.5 7.2 12 3z'/%3E%3C/svg%3E"); }
 /* L’eau du jour */
 #water-today-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3c3.5 4.2 6 7.2 6 10.2A6 6 0 0 1 6 13.2C6 10.2 8.5 7.2 12 3z'/%3E%3C/svg%3E"); }
-/* Objectifs hydriques et météo */
-#water-management-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 8a3.5 3.5 0 0 1 0 7M8 18l-1 3M12 18l-1 3M16 18l-1 3'/%3E%3C/svg%3E"); }
 /* Lieu de la météo */
 #water-weather-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f6fb2' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 15a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 8a3.5 3.5 0 0 1 0 7M8 18l-1 3M12 18l-1 3M16 18l-1 3'/%3E%3C/svg%3E"); }
-/* Besoins d’irrigation */
-#irrigation-needs-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21v-9M12 12C12 8 9 6 5 6c0 4 2 6 7 6zM12 14c0-3 2-5 6-5 0 3-2 5-6 5z'/%3E%3C/svg%3E"); }
 /* Faisabilité */
 #feasibility-title { --badge-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b694d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17a8 8 0 1 1 16 0M12 17l4-5'/%3E%3C/svg%3E"); }
 /* Planning de la semaine */
@@ -262,9 +253,7 @@
 @media (max-width: 760px) {
   #irrigation-events-title::before,
   #water-today-title::before,
-  #water-management-title::before,
   #water-weather-title::before,
-  #irrigation-needs-title::before,
   #feasibility-title::before,
   #planning-title::before,
   #soil-reserve-title::before,
