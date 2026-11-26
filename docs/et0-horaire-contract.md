@@ -282,7 +282,8 @@ avec sa recommandation. La recommandation s'applique en attendant la réponse.
    déplace pas les heures ; une forme propre à l'abri (plus plate, plus
    tardive) demanderait des mesures que le module n'a pas.
 3. **3 sur 3 — Faut-il dire à quelles heures l'évaporation est la plus
-   forte, et à quel seuil ?** Recommandation : **oui, en information**, les
+   forte, et à quel seuil ?** **Réponse du porteur, le 26 novembre 2026 :
+   « Oui, en information (75 %) »** (option recommandée) : les
    heures à 75 % ou plus du maximum du jour (11 h à 16 h dans l'exemple de la
    section 11), sans aucune interdiction ni alerte : une aspersion en pleine
    chaleur reste décidée par la personne ; le seuil est une constante du code.

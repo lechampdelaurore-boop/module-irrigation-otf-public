@@ -11050,5 +11050,6 @@ du banc et une décision nouvelle.
 **Question 2 sur 3, tranchée le 26 novembre 2026** : « Oui, même forme » sous
 abri ; le K_abri ne change que le total du jour.
 
-**En attente du porteur.** Question 3 sur 3 (heures de forte évaporation) ;
-la recommandation s'applique d'ici là.
+**Question 3 sur 3, tranchée le 26 novembre 2026** : « Oui, en information
+(75 %) » ; les heures dont l'ET0 est à 75 % ou plus du maximum du jour, dites
+sans interdiction ni alerte. Les trois questions sont répondues.
