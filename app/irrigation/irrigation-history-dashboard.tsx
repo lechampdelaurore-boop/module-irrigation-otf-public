@@ -1,5 +1,6 @@
 'use client';
 
+import { historyCsvHref } from '@/lib/domain/irrigation-history/csv-href';
 import { millimetersText, volumeText } from '@/lib/domain/display-numbers';
 import { useMemo, useState, useTransition, type ReactNode } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
@@ -592,24 +593,23 @@ function gapTone(value: number | null) {
   return value > 0 ? 'deficit' : 'surplus';
 }
 
+/** L'adresse de l'export : le constructeur partagé avec « Exporter » de « La semaine » (S4, PR 3, section 4.6). */
 function csvHref(
   season: number,
   dashboard: IrrigationHistoryDashboard,
   selection: IrrigationHistorySelection,
 ) {
-  const params = new URLSearchParams({
-    season: String(season),
+  return historyCsvHref({
+    season,
     mode: dashboard.period.mode,
     level: dashboard.scope.level,
-    anchor: dashboard.period.startDate,
-    start: dashboard.period.startDate,
-    end: dashboard.period.endDate,
+    startDate: dashboard.period.startDate,
+    endDate: dashboard.period.endDate,
+    zoneId: selection.scope.zoneId,
+    plotId: selection.scope.plotId,
+    bedId: selection.scope.bedId,
+    status: dashboard.statusFilter,
   });
-  if (selection.scope.zoneId) params.set('zone', selection.scope.zoneId);
-  if (selection.scope.plotId) params.set('plot', selection.scope.plotId);
-  if (selection.scope.bedId) params.set('bed', selection.scope.bedId);
-  params.set('status', dashboard.statusFilter);
-  return `/irrigation/historique.csv?${params.toString()}`;
 }
 
 function addDays(dateKey: string, days: number) {
