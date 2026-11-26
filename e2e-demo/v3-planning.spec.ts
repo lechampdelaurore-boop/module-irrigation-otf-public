@@ -7,9 +7,9 @@ test('V3 Le planning : la semaine, les propositions, les planches non servies, l
   await ecarterLInvitation(page);
   await commencerLaVisite(page, 'Le planning');
   await jouerLaVisite(page, visite, [
-    { titre: 'La semaine en un coup d’œil', rang: 'étape 1 sur 4', ancre: 'planning-semaine', chemin: '/irrigation/planning' },
-    { titre: 'Des propositions, pas des ordres', rang: 'étape 2 sur 4', ancre: 'planning-propositions', chemin: '/irrigation/planning' },
-    { titre: 'Les planches non servies', rang: 'étape 3 sur 4', ancre: 'planning-non-servies', chemin: '/irrigation/planning' },
-    { titre: 'Les heures où l’on n’arrose pas', rang: 'étape 4 sur 4', ancre: 'planning-creneaux', chemin: '/irrigation/planning' },
+    { titre: 'La semaine en un coup d’œil', rang: 'étape 1 sur 4', ancre: 'planning-semaine', chemin: '/irrigation/semaine' },
+    { titre: 'Des propositions, pas des ordres', rang: 'étape 2 sur 4', ancre: 'planning-propositions', chemin: '/irrigation/semaine' },
+    { titre: 'Les planches non servies', rang: 'étape 3 sur 4', ancre: 'planning-non-servies', chemin: '/irrigation/semaine' },
+    { titre: 'Les heures où l’on n’arrose pas', rang: 'étape 4 sur 4', ancre: 'planning-creneaux', chemin: '/irrigation/semaine' },
   ]);
 });
