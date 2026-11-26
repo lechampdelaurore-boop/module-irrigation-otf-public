@@ -13,7 +13,7 @@ import {
 
 /**
  * L'essai A de la météo multi-modèles (docs/weather-models-contract.md, § 7),
- * joué par le flux « Essai des modèles météo » sur un lanceur GitHub : sept
+ * joué par le flux « Essai des modèles météo » sur un lanceur GitHub : huit
  * appels à l'API gratuite d'Open-Meteo, sans clé ni secret, sur deux lieux
  * quelconques (aucune ferme). Il écrit le compte rendu en Markdown (sortie et
  * résumé du flux), puis chaque réponse brute entre deux repères, pour que la

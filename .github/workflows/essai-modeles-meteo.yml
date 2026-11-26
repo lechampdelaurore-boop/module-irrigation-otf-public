@@ -1,7 +1,7 @@
 name: Essai des modèles météo
 
 # L'essai A de la météo multi-modèles (docs/weather-models-contract.md, § 7) :
-# sept appels à l'API gratuite d'Open-Meteo, depuis un lanceur GitHub, parce
+# huit appels à l'API gratuite d'Open-Meteo, depuis un lanceur GitHub, parce
 # que le conteneur de l'assistant n'atteint pas Open-Meteo. Il relève le nom
 # des séries dans une réponse à plusieurs modèles, les variables rendues par
 # chaque modèle et leur portée réelle. Aucune clé, aucun secret, aucune base,

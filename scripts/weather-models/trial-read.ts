@@ -44,6 +44,8 @@ export type TrialCall = {
    * tout l'appel, et c'est ce qu'on veut apprendre).
    */
   mayBeRefused?: boolean;
+  /** Demande aussi la pluie heure par heure : le dernier jour d'un modèle est-il entier ? */
+  hourlyRain?: boolean;
 };
 
 export const TRIAL_CALLS: readonly TrialCall[] = [
@@ -66,6 +68,12 @@ export const TRIAL_CALLS: readonly TrialCall[] = [
     place: FAR_PLACE,
     models: ['meteofrance_seamless', 'icon_seamless', 'best_match'],
   },
+  {
+    label: 'Pluie heure par heure : le dernier jour rendu d’un modèle est-il entier ?',
+    place: FRANCE_PLACE,
+    models: ['meteofrance_seamless', 'icon_seamless', 'best_match'],
+    hourlyRain: true,
+  },
   { label: 'Modèle inconnu (forme du refus)', place: FRANCE_PLACE, models: ['modele_inexistant'], mayBeRefused: true },
 ];
 
@@ -77,6 +85,7 @@ export function trialUrl(call: TrialCall, startDate: string, endDate: string): U
   url.searchParams.set('start_date', startDate);
   url.searchParams.set('end_date', endDate);
   url.searchParams.set('daily', TRIAL_DAILY_VARIABLES.join(','));
+  if (call.hourlyRain) url.searchParams.set('hourly', 'precipitation');
   if (call.models) url.searchParams.set('models', call.models.join(','));
   return url;
 }
@@ -92,7 +101,10 @@ export type SeriesReading = {
   lastValueDate: string | null;
 };
 
-export type ModelReading = { model: string; series: SeriesReading[] };
+/** La pluie heure par heure d'un modèle : ses heures avec valeur, jour par jour. */
+export type HourlyRainReading = { key: string | null; hoursWithValueByDate: Record<string, number>; lastValueHour: string | null };
+
+export type ModelReading = { model: string; series: SeriesReading[]; hourlyRain: HourlyRainReading | null };
 
 export type ResponseReading = {
   dailyKeys: string[];
@@ -119,6 +131,24 @@ function seriesKeyFor(daily: Record<string, unknown>, variable: string, model: s
   return variable in daily ? variable : null;
 }
 
+function readHourlyRain(hourly: unknown, model: string | null): HourlyRainReading | null {
+  if (!isRecord(hourly) || !Array.isArray(hourly.time)) return null;
+  const key = seriesKeyFor(hourly, 'precipitation', model);
+  const values = key !== null && Array.isArray(hourly[key]) ? hourly[key] : [];
+  const hoursWithValueByDate: Record<string, number> = {};
+  let lastValueHour: string | null = null;
+  hourly.time.forEach((hour, index) => {
+    if (typeof hour !== 'string') return;
+    const date = hour.slice(0, 10);
+    hoursWithValueByDate[date] ??= 0;
+    if (typeof values[index] === 'number') {
+      hoursWithValueByDate[date] += 1;
+      lastValueHour = hour;
+    }
+  });
+  return { key, hoursWithValueByDate, lastValueHour };
+}
+
 export function readTrialResponse(payload: unknown, models: readonly string[] | null): ResponseReading | null {
   if (!isRecord(payload) || !isRecord(payload.daily)) return null;
   const daily = payload.daily;
@@ -143,6 +173,7 @@ export function readTrialResponse(payload: unknown, models: readonly string[] | 
         lastValueDate: withValue.at(-1) ?? null,
       };
     }),
+    hourlyRain: readHourlyRain(payload.hourly, model),
   }));
   const dailyKeys = Object.keys(daily);
   return {
@@ -202,6 +233,13 @@ export function trialReport(outcomes: readonly TrialOutcome[], startDate: string
       for (const series of model.series) {
         lines.push(`| ${model.model} | ${series.variable} | ${series.key ? `\`${series.key}\`` : 'absente'} | ${series.unit ?? '—'} | ${series.nonNullDays} / ${series.days} | ${shortDate(series.firstValueDate)} | ${shortDate(series.lastValueDate)} |`);
       }
+    }
+    const hourly = reading.models.filter((model) => model.hourlyRain !== null);
+    if (hourly.length > 0) lines.push('', 'Pluie heure par heure (heures avec valeur, par jour) :', '');
+    for (const model of hourly) {
+      const perDay = Object.entries(model.hourlyRain?.hoursWithValueByDate ?? {})
+        .map(([date, hours]) => `${shortDate(date)} ${hours} h`).join(', ');
+      lines.push(`- ${model.model} (\`${model.hourlyRain?.key ?? 'absente'}\`) : dernière heure ${model.hourlyRain?.lastValueHour ?? '—'} ; ${perDay}.`);
     }
   });
   return `${lines.join('\n')}\n`;
