@@ -23,6 +23,8 @@ export type DeploymentSettings = {
   /** La clé maîtresse du coffre des jetons, ou l'ancienne le temps d'une rotation (4.3, F355, F356). */
   otfTokenMasterKey: boolean;
   visualCrossingApiKey: boolean;
+  /** La clé d'une offre payante d'Open-Meteo (docs/weather-models-contract.md, § 10), jamais en démonstration. */
+  openMeteoApiKey: boolean;
   pushServiceToken: boolean;
   weatherSyncServiceToken: boolean;
   /** La liaison de service vers le Worker Push de la production. */
@@ -52,7 +54,7 @@ const DEPLOYMENT_REFUSAL_LABELS: Readonly<Record<DeploymentRefusal, string>> = {
   'otf-token': 'la démonstration a un jeton Ouvre ta ferme (OTF_API_TOKEN)',
   'otf-vault-key': 'la démonstration a une clé du coffre des jetons d’Ouvre ta ferme (OTF_TOKEN_MASTER_KEY ou OTF_TOKEN_MASTER_KEY_PREVIOUS)',
   'weather-live-source': 'la démonstration lit la vraie météo (WEATHER_DATA_SOURCE=live)',
-  'weather-key': 'la démonstration a une clé de météo (VISUAL_CROSSING_API_KEY)',
+  'weather-key': 'la démonstration a une clé de météo (VISUAL_CROSSING_API_KEY ou OPEN_METEO_API_KEY)',
   'push-token': 'la démonstration a le jeton du service de notification (IRRIGATION_PUSH_SERVICE_TOKEN)',
   'push-binding': 'la démonstration est liée au Worker de notification (IRRIGATION_PUSH)',
   'weather-sync-token': 'la démonstration a le jeton de synchronisation météo (WEATHER_SYNC_SERVICE_TOKEN)',
@@ -77,7 +79,7 @@ export function deploymentMode(settings: DeploymentSettings): DeploymentMode {
   if (settings.otfApiToken) refusals.push('otf-token');
   if (settings.otfTokenMasterKey) refusals.push('otf-vault-key');
   if (settings.weatherDataSource?.trim() === LIVE) refusals.push('weather-live-source');
-  if (settings.visualCrossingApiKey) refusals.push('weather-key');
+  if (settings.visualCrossingApiKey || settings.openMeteoApiKey) refusals.push('weather-key');
   if (settings.pushServiceToken) refusals.push('push-token');
   if (settings.pushServiceBinding) refusals.push('push-binding');
   if (settings.weatherSyncServiceToken) refusals.push('weather-sync-token');

@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (météo multi-modèles, PR 1 : la liste et la lecture d'un modèle)
+
+- **La liste des modèles de prévision et leur lecture chez Open-Meteo**
+  (D-345, F1009 à F1015) : cinq modèles, vérifiés par l'essai A ; la lecture
+  d'un modèle complète les jours au-delà de sa portée par l'automatique
+  d'Open-Meteo et dit, jour par jour, quel modèle a donné la prévision. Une
+  offre payante d'Open-Meteo se réglera sans toucher au code. Aucune ferme
+  ne choisit encore : rien ne change à l'écran.
+
 ### Ajouté (météo multi-modèles, PR 0 : l'essai A)
 
 - **Un essai des modèles de prévision, joué sur un lanceur GitHub**

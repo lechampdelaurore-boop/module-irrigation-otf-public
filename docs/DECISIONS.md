@@ -11109,3 +11109,73 @@ formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
 1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
 À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
 aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
+
+## D-345 — Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un modèle choisi
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/weather-models-contract.md` v0.2 (§ 3 règles 4 à 6, 9 et 10 ; § 4 ;
+§ 5 ; § 10 ; § 14, l'essai A), roadmap section 6 sexdecies, ligne 36. Code en
+Opus 5.5 · Élevé, le réglage de la PR 1 (ligne 36). Aucune question
+agronomique.
+
+**Décision.** La liste des modèles vit dans un seul fichier de domaine,
+`lib/domain/weather/forecast-models.ts` : les cinq modèles du contrat,
+confirmés par l'essai A, avec le libellé, le fournisseur, la maille, la
+portée mesurée et la zone. L'adaptateur Open-Meteo sait lire la prévision
+d'un modèle choisi (`readModelForecast`) : un seul appel demande le modèle et
+« Automatique d'Open-Meteo », l'analyse est stricte, et chaque jour porte la
+`source` du modèle qui l'a vraiment donné (`open-meteo:<identifiant>`). Le
+domaine dit ce que la ferme lit (`resolveForecastModelChoice`, règles 1 et
+9), quels modèles un lieu peut choisir (`forecastModelsCovering`) et quels
+jours sont complétés (`forecastDaysForModel`, `forecastCompletion`, règle 6).
+**Rien ne l'appelle encore** : aucune ferme ne choisit avant la PR 2 ; rien
+ne change en ligne.
+
+Précisions prises en codant (option recommandée, modifiables par le porteur) :
+
+- **F1009** — La zone d'un modèle est celle de son modèle fin : AROME France
+  (37,5° N à 55,4° N, 12° O à 16° E) pour Météo-France, ICON-EU (29,5° N à
+  70,5° N, 23,5° O à 62,5° E) pour le DWD ; les autres, partout. Grilles
+  relevées dans le code source d'Open-Meteo (`MeteoFranceDomain.swift`,
+  `Icon.swift`), son site de documentation n'étant pas joignable depuis le
+  conteneur. Hors de ces zones Open-Meteo répond quand même (versions
+  mondiales, essai A) : la zone sert à ce que le libellé ne trompe pas.
+- **F1010** — Libellés du contrat, tels quels (« Automatique d'Open-Meteo »,
+  « Météo-France (AROME puis ARPEGE) », « DWD (ICON) », « Centre européen
+  (ECMWF) », « NOAA (GFS) ») ; la maille en clair d'après les grilles ; la
+  portée est celle de l'essai A (4, 7 et 15 jours). AROME seul et le Met
+  Office n'entrent pas (règle 5, essai A) ; les autres variantes non plus
+  (une ligne de code le jour où on les voudra). Le texte de l'écran se
+  relira à la recette de la PR 3.
+- **F1011** — Analyse stricte : une série attendue absente, d'une autre
+  longueur que les dates, ou une date illisible refuse **toute** la réponse
+  (`invalid-response`, la série nommée) ; jamais un zéro. Un identifiant
+  hors de la liste n'est jamais envoyé (`client`, aucun appel). Le refus
+  d'Open-Meteo garde sa raison (forme relevée par l'essai A).
+- **F1012** — Choisir « Automatique d'Open-Meteo » demande ce seul modèle
+  (séries sans suffixe, essai A) ; ses jours portent `open-meteo:best_match`
+  et aucun n'est dit « complété ».
+- **F1013** — Règle 6, cas limite : si le modèle n'a pas la pluie d'un jour
+  et qu'Automatique n'a pas ce jour non plus, le jour du modèle est gardé
+  tel quel (ses valeurs nulles restent nulles) plutôt que perdu.
+- **F1014** — Offre payante par réglage serveur (§ 10) :
+  `OPEN_METEO_API_BASE_URL` (adresse `https://` seulement, sans identifiant ;
+  sinon la lecture du modèle échoue avec « Configuration serveur invalide »,
+  rien d'autre n'est touché) et `OPEN_METEO_API_KEY` (secret, posé par le
+  porteur seul, jamais journalisé). Ils ne valent que pour la lecture d'un
+  modèle choisi : « Automatique » (Visual Crossing, ou Open-Meteo en repli)
+  et la réanalyse ne changent pas ici ; les passer à l'offre payante serait
+  une petite PR à part, le jour venu. Une démonstration qui reçoit
+  `OPEN_METEO_API_KEY` refuse de démarrer (`weather-key`, couche 2).
+- **F1015** — Le lecteur des modèles (`getModelForecastReader`) est absent
+  en démonstration (règle 13) et pour les parcours automatisés
+  (`WEATHER_DATA_SOURCE=mock`) ; la réponse fixe par modèle des parcours
+  vient avec la PR 2, qui s'en sert la première.
+
+**Tests.** `tests/weather-models.test.ts` (14) : propriétés de la liste
+sans la recopier (§ 4), filtre par lieu, règles 1, 5, 6 et 9, lecture sur
+les réponses figées de l'essai A (`tests/fixtures/open-meteo-models/`),
+analyse stricte, refus, offre payante et clé jamais journalisée, lecteur
+absent en démonstration ; `tests/demo-mode.test.ts` : la clé d'Open-Meteo
+en démonstration.
+

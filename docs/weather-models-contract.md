@@ -115,7 +115,7 @@ La licence gratuite d'Open-Meteo est « non commerciale ». **Le porteur tranche
 
 - **aucune question écrite à Open-Meteo avant le code**, ni avant la mise en ligne, pour une ferme tierce comme pour la sienne : la mise en ligne n'attend plus de réponse ;
 - **aucun abonnement acheté maintenant** ; le budget d'un abonnement après le pilote n'est pas décidé ici et se retrouvera chez OTF ;
-- le code reste **indifférent à l'offre** : l'adresse de base de l'API et la clé éventuelle (`apikey`, adresse `customer-api…` du palier payant) seront un réglage serveur, **sans changer une règle de ce contrat** le jour où la licence payante arrive ; la clé, si elle existe, est saisie par le porteur lui-même (AGENTS.md) ;
+- le code reste **indifférent à l'offre** : l'adresse de base de l'API et la clé éventuelle (`apikey`, adresse `customer-api…` du palier payant) seront un réglage serveur (`OPEN_METEO_API_BASE_URL`, `OPEN_METEO_API_KEY`, posés par la PR 1, D-345, F1014), **sans changer une règle de ce contrat** le jour où la licence payante arrive ; la clé, si elle existe, est saisie par le porteur lui-même (AGENTS.md) ;
 - l'attribution CC BY 4.0 reste affichée (§ 6) ;
 - le risque dit une fois : tant que le palier gratuit est utilisé, Open-Meteo n'offre aucune garantie de disponibilité et peut limiter l'accès ; la règle 8 (choix vérifié) et le retour à « Automatique » (règle 9) protègent les fermes.
 
