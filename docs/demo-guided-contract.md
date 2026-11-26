@@ -106,6 +106,14 @@ Des **bulles** ancrées sur des éléments de l'écran, avec un texte court, un 
 - La visite **ne fait jamais d'action à la place du visiteur** et ne valide rien sans clic de sa part.
 - Si un élément ancré est absent (case décochée, page masquée), l'étape est **sautée** sans message d'erreur.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** Les étapes `planning-semaine`,
+`planning-propositions`, `planning-non-servies` et `planning-creneaux` gardent
+leur repère et se jouent sur « Semaine ». Un repère rangé dans un pli fermé de
+la page (« Le détail » et ses sections) est montré en ouvrant ces plis, comme
+le détail de la bannière au téléphone (F291) : l'élément présenté est à
+l'écran, jamais caché dans un pli. Une étape dont l'élément manque reste
+sautée.
+
 ## 8. Remise à zéro
 
 - **Bouton** dans la bannière : remet l'espace de l'invité dans l'état initial du profil et du scénario courants, après confirmation (rien de destructif sans confirmation, comme le veut le porteur).

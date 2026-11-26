@@ -22,7 +22,7 @@ import type { TodayWeek } from '../lib/domain/today/week';
  * Les bornes de hauteur se mesurent dans le navigateur (P62).
  */
 
-const OBJECTIVE_LINK = { label: 'Poser un objectif', page: 'besoins', anchor: 'objectifs-de-la-semaine' } as const;
+const OBJECTIVE_LINK = { label: 'Poser un objectif', page: 'semaine', anchor: 'objectifs-de-la-semaine' } as const;
 
 function week(farm: Partial<TodayWeek['farm']>, receivedDetail: string | null = null): TodayWeek {
   return {
@@ -46,7 +46,7 @@ test('« La semaine » : une barre pour la ferme, la phrase de l’objectif de S
   assert.equal(bar.sentence, '23,4 mm visés, ferme entière : 12 mm reçus. Il manque encore 11,4 mm d’ici dimanche.');
   // L'origine de la pluie garde son mot (F429, D-006).
   assert.equal(bar.kind === 'bar' ? bar.detail : null, 'dont 2,4 mm de pluie prévue, non mesurée');
-  assert.deepEqual(bar.link, { label: 'Voir la semaine', page: 'besoins', anchor: 'besoins-ferme' });
+  assert.deepEqual(bar.link, { label: 'Voir la semaine', page: 'semaine', anchor: 'besoins-ferme' });
   // La phrase de l'objectif est celle de S1, partielle comprise.
   assert.match(weekBar(week({ objectiveBeds: { withObjective: 7, total: 10 } })).sentence, /^23,4 mm visés, 7 planches sur 10 ont un objectif : /);
   // Atteint : jamais un reste négatif.
@@ -63,7 +63,7 @@ test('« La semaine » : un inconnu se dit inconnu, jamais zéro (D-003) ; sans 
 });
 
 function line(kind: ReliabilityLine['kind'], key = kind): ReliabilityLine {
-  return { kind, key, text: `manque ${key}`, action: { kind: 'link', label: 'Voir', page: 'besoins', anchor: key } } as unknown as ReliabilityLine;
+  return { kind, key, text: `manque ${key}`, action: { kind: 'link', label: 'Voir', page: 'semaine', anchor: key } } as unknown as ReliabilityLine;
 }
 
 test('« Calcul approximatif » : la première donnée qui manque dans l’ordre du contrat, « + n autres », rien sans manque', () => {

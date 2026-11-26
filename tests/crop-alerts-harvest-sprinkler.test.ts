@@ -118,7 +118,7 @@ test('scénario 14 : aspersion de 10 h sous abri, maximale 18 °C, 500 W/m² : s
   assert.deepEqual(evaluation.flags.map((flag) => [flag.cool, flag.overcast, Math.round(flag.radiationWattsPerSquareMeter ?? 0)]), [[true, false, 500]]);
   assert.equal(notifications.length, 1);
   assert.equal(notifications[0].body, 'Aspersion à reconsidérer : jeudi 12 novembre 10 h, planche 4 (sous abri). Maximale prévue 18 °C (seuil : sous 24 °C).');
-  assert.equal(notifications[0].url, '/irrigation/planning?season=2026&week=2026-11-09');
+  assert.equal(notifications[0].url, '/irrigation/semaine?season=2026&week=2026-11-09');
 });
 
 test('scénario 15 : maximale 26 °C, rayonnement moyen 300 W/m² : signalée (ciel couvert)', () => {

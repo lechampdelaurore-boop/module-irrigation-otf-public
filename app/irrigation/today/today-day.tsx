@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { pageHref, pagePath, type PageQuery } from '@/lib/domain/features/pages';
+import { SEE_THE_WEEK } from '@/lib/domain/today/essential';
 import { doneAsPlannedConfirmations, type AllDone } from '@/lib/domain/today/all-done';
 import type { TodayTomorrow } from '@/lib/domain/today/ahead';
 import { finishInputText, finishValueToSend } from '@/lib/domain/finish-time';
@@ -196,7 +197,7 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
         <p className="today-tomorrow">
           <Icon name="calendrier" />
           <span>{tomorrow.text}</span>
-          <a href={pageHref(tomorrow.link.page, query, tomorrow.link.anchor)}>Voir au planning</a>
+          <a href={pageHref(tomorrow.link.page, query, tomorrow.link.anchor)}>{SEE_THE_WEEK}</a>
         </p>
       ) : null}
       {allIrrigationsLink ? (

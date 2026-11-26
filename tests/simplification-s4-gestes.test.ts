@@ -91,7 +91,7 @@ test('« Noter la pluie » : la fenêtre de S2 appelée, pas refaite ; le jour d
   assert.match(rain, /import \{ RainEntryDialog \} from '\.\.\/rain-entry-dialog';/);
   assert.match(rain, /const result = await readRainEntryAction\(\);/, 'les jours et les mesures se lisent à l’ouverture');
   assert.match(rain, /const defaultDate = date && result\.entry\.days\.some\(\(day\) => day\.date === date\) \? date : result\.entry\.defaultDate;/);
-  assert.match(rain, /const saved = \(text: string\) => \{\s+setShown\(false\);\s+setReplies\(\[actionReply\(origin \?\? 'bilan', 'notice', text\)\]\);\s+notifyRainNoted\(\);/, 'rien n’est dit avant la réponse du serveur');
+  assert.match(rain, /const saved = \(text: string\) => \{\s+setShown\(false\);\s+setReplies\(\[actionReply\(origin \?\? BILAN_ORIGIN, 'notice', text\)\]\);\s+notifyRainNoted\(\);/, 'rien n’est dit avant la réponse du serveur');
   assert.match(rain, /const value: WeekRain \| null = rainMatters \? \{/, 'une ferme toute sous abri n’a pas ce geste (D-032)');
   assert.match(rain, /besoinsHref=\{`#\$\{MEASURED_RAIN_ANCHOR\}`\}/, '« Retirer la mesure » reste dans « Pluie mesurée »');
   const signals = read('app/irrigation/semaine/week-signals.ts');
@@ -102,7 +102,7 @@ test('« Noter la pluie » : la fenêtre de S2 appelée, pas refaite ; le jour d
 
 test('« Noter la pluie » : ses trois entrées, le bilan, « Calcul approximatif », la ligne d’un jour ; aucune pour une semaine à venir', () => {
   const premier = read('app/irrigation/semaine/week-first-level.tsx');
-  assert.match(premier, /const bilanRain = rain && heading\.state !== 'upcoming' \? \{ open: \(\) => rain\.open\(RAIN_BILAN\)/);
+  assert.match(premier, /const bilanRain = rain && heading\.state !== 'upcoming' \? \{ open: \(\) => rain\.open\(BILAN_ORIGIN\)/);
   assert.match(premier, /onOpenRain=\{rain \? \(\) => rain\.open\(RAIN_APPROXIMATE\) : undefined\}/);
   const days = read('app/irrigation/semaine/week-days.tsx');
   assert.match(days, /data-scope="day" data-date=\{line\.dateKey\} disabled=\{rain\.pending\} aria-label=\{`Noter la pluie du \$\{lowerFirst\(line\.label\)\}`\} onClick=\{\(\) => rain\.open\(rainOrigin, line\.dateKey\)\}/);
@@ -118,7 +118,7 @@ test('« Noter la pluie » : ses trois entrées, le bilan, « Calcul approximati
 test('les flèches : un lien du routeur, sans recharger la page ; l’adresse dit la semaine ; une semaine neuve remet le client à zéro', () => {
   const premier = read('app/irrigation/semaine/week-first-level.tsx');
   assert.match(premier, /import Link from 'next\/link';/);
-  const navigation = premier.slice(premier.indexOf('function WeekNavigation'), premier.indexOf('const RAIN_BILAN'));
+  const navigation = premier.slice(premier.indexOf('function WeekNavigation'), premier.indexOf('const RAIN_APPROXIMATE'));
   assert.equal(navigation.match(/<Link className="week-arrow" href=\{href\(heading\.(previous|next)\)\} prefetch=\{false\}/g)?.length, 2);
   assert.match(navigation, /pageHref\('semaine', \{ season, zone: query\.zone, week \}\)/);
   assert.doesNotMatch(navigation, /<a /, 'aucune flèche ne recharge la page');

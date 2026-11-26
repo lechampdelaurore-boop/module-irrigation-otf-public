@@ -116,7 +116,7 @@ test('cas 1 : trois arrosages à valider demain à 6 h, rien aujourd’hui : la 
     count: 3,
     text: 'Demain à 6 h : 3 irrigations à valider',
     sentence: '3 irrigations sont à valider demain à 6 h.',
-    link: { page: 'planning', anchor: 'proposal-p1' },
+    link: { page: 'semaine', anchor: 'proposal-p1' },
   });
   assert.equal(view.headline.sentence, '3 irrigations sont à valider demain à 6 h.');
   const chips = view.headline.chips.map((chip) => [chip.key, chip.text]);

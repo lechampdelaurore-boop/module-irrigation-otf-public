@@ -307,6 +307,10 @@ de 2 m³ »).
 | T8 | Icône de la pluie | un jour de 1 mm de pluie prévue ou plus porte la goutte ; le gel prime |
 | T9 | Jardins montrés | huit d'emblée dans « Eau de la semaine » et « Réserve du sol », les autres derrière « Voir les n autres jardins ». Depuis le 19 novembre 2026 (audit, lot H, n° 4, F430 à F432, D-174), les huit sont ceux qui comptent : d'abord les jardins qui ont une irrigation aujourd'hui ; puis, pour l'eau, les plus loin de leur objectif, puis ceux sans objectif ; pour le sol, les plus secs, puis les « inconnue », puis « aucune planche cultivée » ; à égalité, l'ordre naturel. Les autres, repliés, dans l'ordre naturel (« bloc 2 » avant « bloc 10 ») |
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** « Eau de la semaine » mène à « Semaine », la
+semaine en cours, chaque ligne à l'ancre de son jardin ; le lien du bloc dit
+« Voir la semaine ».
+
 **Précisions de la PR 2 (les écrans)**, tranchées en codant par la même
 consigne :
 
