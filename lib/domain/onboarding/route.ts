@@ -88,11 +88,16 @@ export function whatFollowsText(selection: FeatureSelection | null): string {
  * qui n'existe pas (sa case décochée) n'est pas lu et vaut `null`.
  */
 export type RouteCounts = {
-  /** Les matériels actifs qui ont au moins un réglage, par sorte, et ceux qui n'en ont aucun. */
+  /**
+   * Les matériels actifs par sorte, comptés comme l'inventaire de « Matériel
+   * et placement » (le goutte-à-goutte : tout ce qui n'est pas une aspersion),
+   * et, parmi eux, ceux qui n'ont aucun réglage. La fiche « Matériel et
+   * placement » dit les mêmes nombres (section 7.1).
+   */
   equipment: { drip: number; sprinkler: number; withoutSetting: number } | null;
   /** Les planches de la saison arrosées par un matériel posé (`calculateIrrigationCoverage`), sur toutes. */
   placement: { watered: number; total: number } | null;
-  /** Les ressources en eau actives : au plus deux noms, et leur nombre. */
+  /** Les ressources et les réserves actives : au plus deux noms, et leur nombre. */
   water: { names: readonly string[]; total: number } | null;
   /** Les planches de la saison qui ont une eau visée cette semaine (`farmObjective`), sur toutes. */
   objective: { withObjective: number; total: number } | null;
@@ -172,8 +177,8 @@ function plural(count: number, word: string): string {
   return `${count} ${word}${count > 1 ? 's' : ''}`;
 }
 
-/** « 4 goutte-à-goutte », « 2 goutte-à-goutte et 1 aspersion ». */
-function equipmentKindsText(drip: number, sprinkler: number): string {
+/** « 4 goutte-à-goutte », « 2 goutte-à-goutte et 1 aspersion » : l'étape 1 et la fiche « Matériel et placement » (section 7.2). */
+export function equipmentKindsText(drip: number, sprinkler: number): string {
   return joinLabels([...(drip > 0 ? [`${drip} goutte-à-goutte`] : []), ...(sprinkler > 0 ? [plural(sprinkler, 'aspersion')] : [])]);
 }
 
@@ -217,7 +222,8 @@ function readStep(id: RouteStepId, counts: RouteCounts, placementDone: boolean |
     case 'equipment': {
       const count = counts.equipment;
       if (!count) return { known: false };
-      const withSetting = count.drip + count.sprinkler;
+      // Faite dès qu'un matériel a un réglage ; sa ligne dit tout le matériel actif, comme l'inventaire et la fiche.
+      const withSetting = count.drip + count.sprinkler - count.withoutSetting;
       return {
         known: true,
         done: withSetting > 0,

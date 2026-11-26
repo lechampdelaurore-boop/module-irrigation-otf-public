@@ -5,6 +5,26 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (simplifier l'usage du module, S6, PR 3 : les lignes d'état des fiches de « Ma ferme »)
+
+- **Chaque fiche de « Ma ferme » dit son état en une ligne** (D-336, F969
+  à F975) quand la donnée est connue : « 2 goutte-à-goutte et 1
+  aspersion, 1 pas posé », « Puits : débit de 2 m³/h », « Bassin des
+  noues : 30 m³ sur 40 m³, observé aujourd’hui », « 4 cultures cette
+  saison », « À renseigner pour 3 parcelles », « 2 alertes réglées, 1
+  inactive », « Météo de Nantes · 11 fonctionnalités cochées ». Chaque
+  nombre est celui que la page de la fiche montre, sous son mot ; la
+  ligne fixe revient quand la donnée est inconnue ou vide, jamais un
+  « 0 » pour un inconnu. « Alertes cultures » garde sa ligne fixe. La
+  marque « À faire » reste à côté.
+- **Une seule lecture** pour la carte « Mise en route » et les fiches :
+  l'étape 1 et la fiche du matériel comptent les mêmes matériels (tout le
+  matériel actif, comme l'inventaire), l'étape 3 et la fiche de l'eau les
+  mêmes ressources et réserves, l'étape 5 et la fiche du sol les mêmes
+  parcelles. Deux lectures nouvelles et légères : le nombre des alertes
+  météo réglées, les clés des cultures que la ferme connaît. Aucune
+  requête par planche ; « Ma ferme » reste sous le temps de Réglages.
+
 ### Ajouté (simplifier l'usage du module, S6, PR 2 : la carte « Mise en route »)
 
 - **La carte « Mise en route » en tête de « Ma ferme »** (D-336, F958 à
