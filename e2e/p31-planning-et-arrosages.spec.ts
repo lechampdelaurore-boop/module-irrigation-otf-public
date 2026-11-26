@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, ouvrirPlusDOptions, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
-import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLesPlisAutour, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme } from './support/planning.ts';
 
 /**
@@ -46,13 +46,10 @@ test('planning : les gestes en tête, les planches sans matériel en action vers
   await planning.getByRole('button', { name: /^(Calculer le plan de la semaine|Recalculer le plan)$/ }).click();
   await expect(planning.locator('.planning-meta')).toContainText('calculé le', { timeout: 30_000 });
 
-  // Cas 1 : les trois cartes qui demandent un geste d'abord, dans cet ordre.
-  if (telephone) {
-    const ligne = planning.locator('.planning-summary-line');
-    await expect(ligne).toContainText(/^0 à valider · 0 faite · /);
-    await ligne.click();
-  }
+  // Cas 1 : les trois cartes qui demandent un geste d'abord, dans cet ordre, dans « Le plan, chaîne par chaîne »
+  // au détail de la page « Semaine » (S4, PR 2), aux deux largeurs.
   const cartes = planning.locator('.planning-summary-card');
+  await ouvrirLesPlisAutour(cartes.first());
   await expect(cartes.nth(0)).toContainText('À valider');
   await expect(cartes.nth(1)).toContainText('Faites');
   await expect(cartes.nth(2)).toContainText('En retard');

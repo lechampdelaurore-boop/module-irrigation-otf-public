@@ -11,7 +11,8 @@ import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/tod
 import { guessedStages, lastMeasuredRainOn, missingByBedBeds, rainGaugeLookbackStart, unknownSoilBeds } from '../domain/today/missing-by-bed';
 import { farmRainMatters } from '../domain/today/rain-entry';
 import { todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
-import { pastRainOrigins, type TodayWeekInputs } from '../domain/today/week';
+import type { TodayApproximate } from '../domain/today/essential';
+import { todayWeekInputs, type TodayWeekInputs } from '../domain/today/week';
 import { dateKeyInTimeZone, FARM_TIME_ZONE, weekDateKeys, weekStartDateKey } from '../domain/water-management';
 import { automaticObjectiveEnabledOn } from '../domain/automatic-objective';
 import { automaticObjectiveMissingEt0Dates } from '../domain/objective-reading';
@@ -54,6 +55,15 @@ export async function getTodayViewForUser(request: TodayRequest): Promise<TodayV
  */
 export async function getTodayBadgeForUser(request: TodayRequest): Promise<number | null> {
   return todayView(await readTodayInputs(request, { weather: false })).badge;
+}
+
+/**
+ * La ligne « Calcul approximatif » d'« Aujourd'hui », pour la page
+ * « Semaine » (simplification, lot S4, PR 2, section 4, point 3) : la même
+ * lecture et la même fonction, sans la météo, lue après l'affichage.
+ */
+export async function getTodayApproximateForUser(request: TodayRequest): Promise<TodayApproximate | null> {
+  return todayView(await readTodayInputs(request, { weather: false })).essential.approximate;
 }
 
 async function readTodayInputs(
@@ -157,15 +167,6 @@ const GAUGE_UNAVAILABLE = 'La réserve du sol ne se calcule pas aujourd’hui.';
 async function readWeek(request: { ownerUserId: string; season: number; snapshot: IrrigationSnapshot; now: Date }): Promise<TodayWeekInputs> {
   const waterDashboard = await getWaterDashboardForUser({ ...request, allowWeatherRefresh: false });
   const needs = await getIrrigationNeedsDashboardForUser({ ...request, waterDashboard });
-  return {
-    weekStart: needs.weekStart,
-    weekEnd: needs.weekEnd,
-    beds: needs.gardens.flatMap((garden) => garden.beds),
-    water: {
-      weekCubicMeters: waterDashboard.totals.realizedIrrigationCubicMeters,
-      todayCubicMeters: waterDashboard.todayWater.realizedIrrigationCubicMeters,
-      incomplete: waterDashboard.days.some((day) => day.volumeIncomplete),
-    },
-    rainOrigins: pastRainOrigins(waterDashboard.days, dateKeyInTimeZone(request.now, FARM_TIME_ZONE)),
-  };
+  // La même lecture que la page « Semaine » (S4, section 6).
+  return todayWeekInputs(waterDashboard, needs, dateKeyInTimeZone(request.now, FARM_TIME_ZONE));
 }

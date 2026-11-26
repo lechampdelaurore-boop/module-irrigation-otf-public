@@ -11,7 +11,7 @@ import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { needsGardenAnchor } from '@/lib/domain/today/week';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
-import { PageSettingsFold } from './shell/page-settings-fold';
+import { notifyWeekNeedsRead } from './semaine/week-signals';
 import { gardenState } from '@/lib/domain/besoins-phone';
 import { loadIrrigationNeedsAction, saveIrrigationBedNeedDecisionAction, saveIrrigationNeedThresholdAction, type IrrigationNeedActionResult } from './irrigation-need-actions';
 import { dateClockText } from '@/lib/domain/clock-text';
@@ -39,7 +39,6 @@ const help = {
 /** `showProposals` : l'objectif proposé de la culture, avec la case « Besoin par culture » (3.8, R1). */
 export function IrrigationNeedsDashboardView({ season, initialDashboard, showProposals }: { season: number; initialDashboard: IrrigationNeedsDashboard; showProposals: boolean }) {
   const [dashboard, setDashboard] = useState(initialDashboard);
-  const [threshold, setThreshold] = useState(String(initialDashboard.thresholdMm));
   const [sort, setSort] = useState<SortMode>('priority');
   // Le message d'un geste s'affiche sous son bouton (F404) ; un rechargement automatique ne parle pas (F405).
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
@@ -48,7 +47,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
   /** `origin` nul : un rechargement automatique, silencieux s'il réussit. */
   const receive = useCallback((result: IrrigationNeedActionResult, origin: string | null) => {
     if (result.ok) {
-      dashboardRef.current = result.dashboard; setDashboard(result.dashboard); setThreshold(String(result.dashboard.thresholdMm)); notifyFeasibilityChanged();
+      dashboardRef.current = result.dashboard; setDashboard(result.dashboard); notifyFeasibilityChanged();
       if (origin !== null) setReplies([actionReply(origin, 'notice', result.message)]);
     } else setReplies([actionReply(origin ?? 'haut', 'error', result.message)]);
   }, []);
@@ -63,8 +62,10 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     return () => { window.removeEventListener('irrigation-events-changed', refresh); window.removeEventListener('irrigation-needs-source-changed', refresh); };
   }, [receive, season]);
   // L'objectif de la ferme de la semaine affichée, à la ligne de résumé de la page (S1, PR 3).
+  // Et le premier niveau de la page « Semaine » reprend le besoin relu, tel quel (S4, PR 2).
   useEffect(() => {
     notifyFarmObjectiveRead({ weekStart: dashboard.weekStart, objective: dashboard.farmObjective });
+    notifyWeekNeedsRead(dashboard);
   }, [dashboard]);
   // Un lien d'« Aujourd'hui » vise un jardin (6 nonies, L2) : son pli s'ouvre et vient en haut, au chargement comme à un lien suivi dans la page.
   useEffect(() => {
@@ -80,8 +81,10 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
     return () => window.removeEventListener('hashchange', openTargetedGarden);
   }, []);
   const sortedGardens = useMemo(() => dashboard.gardens.map((garden) => ({ ...garden, beds: [...garden.beds].sort(sorter(sort)) })), [dashboard.gardens, sort]);
-  return <section className="irrigation-needs-section" aria-labelledby="irrigation-needs-title">
-    <header className="irrigation-needs-heading"><div><h2 id="irrigation-needs-title">{SIMPLE_WORDS.leftToWater}</h2><p>Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
+  // Dans « Le détail » de la page « Semaine », sous le titre de son pli (S4, PR 2, section 7.1, n° 1) : l'ancre
+  // `irrigation-needs-title` que suivent les liens d'« Aujourd'hui » ouvre ce pli.
+  return <section className="irrigation-needs-section" aria-label={SIMPLE_WORDS.leftToWater}>
+    <header className="irrigation-needs-heading"><div><p id="irrigation-needs-title">Besoin calculé par planche pour la semaine sélectionnée, du {formatDate(dashboard.weekStart)} au {formatDate(dashboard.weekEnd)}.</p></div><small>Calculé le {dateTime.format(new Date(dashboard.calculatedAt))}</small></header>
     <ActionReply messages={replies} origin="haut" classNames={NEEDS_REPLY_CLASSES} />
     {!dashboard.completeness.complete ? <p className="irrigation-needs-warning" role="status">{dashboardWarning(dashboard)}</p> : null}
     <div className="irrigation-needs-controls">
@@ -93,15 +96,36 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
       <p className="garden-compact-detail">{gardenSummaryDetail(garden)}</p>
       <div className="irrigation-needs-bed-grid">{garden.beds.map((bed) => <BedNeedCard key={`${bed.bedId}:${bed.priority}:${bed.manualOverrideMm ?? 'auto'}:${bed.overrideReason ?? ''}`} bed={bed} proposal={showProposals ? dashboard.proposedByBed?.[bed.bedId] ?? null : null} pending={pending} reply={<ActionReply messages={replies} origin={`planche:${bed.bedId}`} classNames={NEEDS_REPLY_CLASSES} />} onSave={(priority, override, reason) => startTransition(async () => receive(await saveIrrigationBedNeedDecisionAction({ season, weekStart: dashboard.weekStart, bedId: bed.bedId, priority, manualOverrideMm: override, overrideReason: reason, calculatedNeedMm: bed.calculatedNeedMm }), `planche:${bed.bedId}`))} />)}</div>
     </details>)}</div>
-    {/* Le seuil minimal de planification dans le pli du bas (audit final, lot D, J2, F305). */}
-    <PageSettingsFold>
-      <div className="irrigation-needs-controls">
-        <label><span>Seuil minimal de planification (mm)</span><input inputMode="decimal" value={threshold} onChange={(event) => setThreshold(event.target.value)} /></label>
-        <button type="button" disabled={pending} onClick={() => startTransition(async () => receive(await saveIrrigationNeedThresholdAction({ season, weekStart: dashboard.weekStart, thresholdMm: numeric(threshold) }), 'seuil'))}>Enregistrer le seuil</button>
-      </div>
-      <ActionReply messages={replies} origin="seuil" classNames={NEEDS_REPLY_CLASSES} />
-    </PageSettingsFold>
   </section>;
+}
+
+/**
+ * Le seuil minimal de planification, dans « Réglages de la semaine », le
+ * pli du bas de « Le détail » (S4, PR 2, section 7.1, n° 8 ; audit final,
+ * lot D, J2, F305) : enregistré, le besoin par planche se relit.
+ */
+export function NeedsThresholdSettings({ season, weekStart, initialThresholdMm }: { season: number; weekStart: string; initialThresholdMm: number }) {
+  const [threshold, setThreshold] = useState(String(initialThresholdMm));
+  const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
+  const [pending, startTransition] = useTransition();
+  const save = () => startTransition(async () => {
+    const result = await saveIrrigationNeedThresholdAction({ season, weekStart, thresholdMm: numeric(threshold) });
+    if (!result.ok) {
+      setReplies([actionReply('seuil', 'error', result.message)]);
+      return;
+    }
+    setThreshold(String(result.dashboard.thresholdMm));
+    setReplies([actionReply('seuil', 'notice', result.message)]);
+    window.dispatchEvent(new CustomEvent('irrigation-needs-source-changed', { detail: { weekStart } }));
+    notifyFeasibilityChanged();
+  });
+  return <div className="needs-threshold-settings">
+    <div className="irrigation-needs-controls">
+      <label><span>Seuil minimal de planification (mm)</span><input inputMode="decimal" value={threshold} onChange={(event) => setThreshold(event.target.value)} /></label>
+      <button type="button" disabled={pending} onClick={save}>Enregistrer le seuil</button>
+    </div>
+    <ActionReply messages={replies} origin="seuil" classNames={NEEDS_REPLY_CLASSES} />
+  </div>;
 }
 
 function BedNeedCard({ bed, proposal, pending, reply, onSave }: { bed: BedIrrigationNeed; proposal: ProposalSummary | null; pending: boolean; reply: React.ReactNode; onSave: (priority: IrrigationNeedPriority, override: number | null, reason: string) => void }) {

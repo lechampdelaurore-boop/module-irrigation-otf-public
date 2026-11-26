@@ -354,6 +354,8 @@ export async function verifierLEtape(page: Page, journal: JournalDeConsole, etap
 export async function ouvrirLesReglagesDeLaPage(page: Page): Promise<Locator> {
   const pli = page.locator('details#reglages-de-la-page');
   await expect(pli).toHaveCount(1);
+  // Sur la page « Semaine », « Réglages de la semaine » est le dernier pli de « Le détail » (S4, PR 2).
+  await ouvrirLesPlisAutour(pli);
   if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await pli.locator(':scope > summary').click();
   }
@@ -388,6 +390,7 @@ export async function ouvrirLOnglet(page: Page, nom: 'Plan' | 'Matériel' | 'Gro
  */
 export async function ouvrirLePli(pli: Locator): Promise<Locator> {
   await expect(pli).toHaveCount(1);
+  await ouvrirLesPlisAutour(pli);
   if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await pli.locator(':scope > summary').click();
   }
@@ -395,6 +398,21 @@ export async function ouvrirLePli(pli: Locator): Promise<Locator> {
   return pli;
 }
 
+
+/**
+ * Les plis fermés qui contiennent l'élément, ouverts du plus extérieur au
+ * plus intérieur, comme une personne le fait : sur la page « Semaine », les
+ * blocs d'avant sont dans « Le détail », chacun dans le pli de sa section
+ * (simplification, lot S4, PR 2, section 7). Rien quand aucun n'est fermé.
+ */
+export async function ouvrirLesPlisAutour(element: Locator): Promise<void> {
+  const fermes = element.first().locator('xpath=ancestor::details[not(@open)]');
+  for (let restants = await fermes.count(); restants > 0; restants = await fermes.count()) {
+    // L'ordre du document : le premier est le plus extérieur.
+    await fermes.first().locator(':scope > summary').click();
+    await expect(fermes).toHaveCount(restants - 1);
+  }
+}
 
 /**
  * Confirme dans la fenêtre du module, qui remplace la boîte du navigateur
