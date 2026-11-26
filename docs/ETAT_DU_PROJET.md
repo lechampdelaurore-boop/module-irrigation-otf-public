@@ -37,7 +37,12 @@ registres, elle y renvoie.
   Réglages ; la barre du téléphone et le menu de l'ordinateur changent aux
   PR 2 et 3. Tests du domaine sur les 235 choix de cases valides, parcours
   P63 aux deux largeurs, contre-épreuve de quatorze altérations. Contrôles :
-  voir la PR. Ses PR se fusionnent après la dernière de S2.
+  voir la PR. Ses PR se fusionnent après la dernière de S2. **En ligne,
+  consignée par la PR 2** : #220 fusionnée le 25 novembre à 23 h 53, déployée
+  le 26 novembre à 3 h 17, run 45716978089 vérifié job par job (les cinq
+  jobs verts). Les parcours de main, joués à minuit, avaient échoué sur P37
+  et P12, sensibles à l'heure (le même code vert sur la PR à 23 h 52) : une
+  seule relance, à 2 h 37, hors de la fenêtre de minuit à 2 h 30.
 - **Simplifier l'usage du module, S2, PR 5 sur 5 : la page à l'essentiel,
   codée le 25 novembre 2026** (D-330, F860 à F867 ; contrat, sections 8 et
   9), en Opus 5.5 · Élevé, sur la branche de la PR 4 : **le code du lot S2
