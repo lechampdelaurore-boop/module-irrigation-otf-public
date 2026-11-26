@@ -337,6 +337,20 @@ registres, elle y renvoie.
   cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
   une action existante : aucune règle ne change. PR de contrat seule :
   **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S6 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s6-contract.md`, D-327, roadmap section 6 terdecies,
+  ligne 33), sans code, en Sonnet 5.5 · Moyen. « La mise en route guidée » :
+  trois façons de commencer à la première ouverture (choix n° 3 du porteur, qui
+  change l'écran de bienvenue du contrat 3.8, restée close), une carte « Mise en
+  route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les données, rien
+  confirmé à la place de la personne), les chiffres d'état des fiches de
+  « Ma ferme » laissés par S3 ; quatre PR, Opus 5.5 · Très élevé ; une seule
+  migration, additive (deux colonnes nullables). Écarts voulus avec la maquette
+  dits au porteur (rien enfoncé d'avance, nombre d'étapes selon le choix, noms
+  des pages inchangés, deux fiches d'alertes). Dépend de S3 et de S1 ; contrat
+  non fusionné avant #211, #215, #216 et #217. Aucun contrôle rejoué (PR de
+  registres seule).
+
 - **Simplifier l'usage du module, S5 : contrat écrit le 25 novembre 2026**
   (`docs/simplification-s5-contract.md`, D-327, roadmap section 6
   terdecies, ligne 33), sans code, en Sonnet 5.5 · Moyen. « Arroser en trois
