@@ -5,6 +5,12 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (contrat de l'ET0 horaire, sans code)
+
+- **`docs/et0-horaire-contract.md`** (D-340) : l'ET0 du jour reste la
+  référence, l'heure en donne la forme ; information seulement, aucun calcul
+  changé ; trois PR de code HR1 à HR3 à venir.
+
 ### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
 
 - **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page

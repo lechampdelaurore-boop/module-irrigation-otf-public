@@ -11027,3 +11027,25 @@ Précisions prises en codant :
   S2 (dettes soldées), S3, la charte du module (onglets d'une ligne au
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
+
+## D-340 — L'ET0 horaire donne la forme de la journée, en information seulement
+
+Décision du porteur de projet du 26 novembre 2026 (question 1 sur 3, carte de
+décision, option recommandée) : l'ET0 heure par heure sert à **informer**, pas
+à calculer. Contrat : `docs/et0-horaire-contract.md`, roadmap section
+6 septendecies.
+
+**Ce que cela décide.** L'ET0 du jour reste la valeur de référence ; l'heure
+ne donne que la forme de la journée (parts dont la somme vaut 1). D-010, D-045
+et D-047 restent intacts : aucun chiffre de la jauge, de l'objectif, du besoin
+ni des alertes ne change. Le module reste journalier (MC-19 du moteur commun).
+
+**Posé par l'assistant, sur sa recommandation.** Trois sources (heure du
+fournisseur, heure calculée, forme théorique du soleil, dite comme telle) ;
+J0 à J+2 par lieu ; affichage dans le pli « Le détail » d'« Aujourd'hui » ;
+un échec ne casse jamais la lecture météo ; même modèle que la ligne du jour
+de la ferme (D-339). Rouvrir « caler la jauge sur l'heure » exige un résultat
+du banc et une décision nouvelle.
+
+**En attente du porteur.** Question 2 sur 3 (sous abri) et question 3 sur 3
+(heures de forte évaporation) ; la recommandation s'applique d'ici là.
