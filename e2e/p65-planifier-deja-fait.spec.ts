@@ -12,14 +12,15 @@ import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, ve
  *
  * - Les trois onglets : « Arroser maintenant », « Planifier », « Déjà fait » ;
  *   au téléphone, sur une ligne, 44 px, sans phrase de description (S5-e).
- * - « Planifier » : « 1. Où ? », « 2. Quand ? », « 3. Combien de temps ? » ;
- *   le seul matériel choisi d'office ; sans durée, « Choisissez une durée. » ;
- *   « + » (30 min), le bouton dit « Planifier · demain à … », et l'arrosage se
- *   range sous « Demain ».
+ * - « Planifier » : « 1. Où ? », « 2. Quand ? », « 3. Combien de mm ? »
+ *   (D-354) ; le seul matériel choisi d'office ; sans quantité, « Indiquez
+ *   combien de mm apporter. » ; 5 mm (soit 30 min), le bouton dit
+ *   « Planifier · demain à … », et l'arrosage se range sous « Demain ».
  * - « Déjà fait » : « 1. De quand à quand ? » avant « 2. Où ? » (règle 12),
  *   pas de « Combien de temps ? » ; une fin avant le début, « Choisissez une
  *   fin après le début. » ; des dates dans l'ordre, « soit 30 min » et la
- *   phrase de ce qui s'enregistrera ; « Plus d'options » sans saisie en mm ;
+ *   phrase de ce qui s'enregistrera ; « Plus d'options » sans saisie d'une
+ *   durée ;
  *   « Enregistrer cet arrosage ».
  *
  * Mesures relevées en annotation : la hauteur des onglets et le haut de
@@ -57,15 +58,15 @@ test('« Planifier » et « Déjà fait » : le même squelette, leurs dates au 
   }
   await verifierLEtape(page, journal, 'les trois onglets');
 
-  // « Planifier » : où, quand, combien de temps.
+  // « Planifier » : où, quand, combien de mm (D-354).
   await onglets.getByRole('tab', { name: /^Planifier/ }).click();
   const planifier = page.locator('.watering-now[data-kind="planned"]');
-  await expect(planifier.getByRole('heading', { level: 3 })).toHaveText(['1. Où ?', '2. Quand ?', '3. Combien de temps ?']);
+  await expect(planifier.getByRole('heading', { level: 3 })).toHaveText(['1. Où ?', '2. Quand ?', '3. Combien de mm ?']);
   await expect(planifier.getByRole('radio', { name: a.materiel, exact: true })).toBeChecked();
-  await expect(planifier.locator('.watering-missing')).toHaveText('Choisissez une durée.');
+  await expect(planifier.locator('.watering-missing')).toHaveText('Indiquez combien de mm apporter.');
   await planifier.getByLabel('Date et heure de début').fill(horodatageLocal(24 * 60, reference));
-  await planifier.getByRole('button', { name: 'Cinq minutes de plus' }).click();
-  await expect(planifier.locator('.watering-duration strong')).toHaveText('30 min');
+  await planifier.getByLabel('Quantité souhaitée').fill('5');
+  await expect(planifier.locator('.watering-duration-result strong')).toHaveText('30 min');
   await expect(planifier.locator('.watering-result').first()).toHaveText(/^Soit 5 mm sur la planche, et 113 L\.$/);
   const boutonPlanifier = planifier.locator('.start-irrigation-button');
   await expect(boutonPlanifier).toHaveText(/^Planifier · demain à \d{1,2} h( \d{2})?$/);
@@ -91,7 +92,7 @@ test('« Planifier » et « Déjà fait » : le même squelette, leurs dates au 
   await expect(dejaFait.locator('.watering-result').first()).toHaveText(/^Soit 5 mm sur la planche, et 113 L\.$/);
   const options = await ouvrirPlusDOptions(page);
   await expect(page.getByRole('button', { name: /^Plus d’options/ })).toHaveText('Plus d’options (pompe, note)');
-  await expect(options.getByRole('checkbox', { name: 'Saisir en mm' })).toHaveCount(0);
+  await expect(options.getByRole('checkbox', { name: 'Saisir une durée' })).toHaveCount(0);
   await expect(options.getByText('Durée exacte')).toHaveCount(0);
   const enregistrer = dejaFait.locator('.start-irrigation-button');
   await expect(enregistrer).toHaveText('Enregistrer cet arrosage');

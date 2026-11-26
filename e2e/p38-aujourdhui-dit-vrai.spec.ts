@@ -147,10 +147,10 @@ test('une irrigation en cours puis son reliquat se lisent en tête de « Votre j
   await attendreLaPageIrrigation(page);
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p38 en cours' });
   await attendreLaPageIrrigation(page, 'arrosages');
-  // « Arroser maintenant » en trois champs (simplification S5) : où, la pastille « 30 min », démarrer.
+  // « Arroser maintenant » en trois champs (simplification S5, D-354) : où, 5 mm (30 min à 10 mm/h), démarrer.
   await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
-  await choisirMaterielEtReglage(page, materiel, reglage, '');
-  await page.getByRole('button', { name: '30 min', exact: true }).click();
+  await choisirMaterielEtReglage(page, materiel, reglage, '5');
+  await expect(page.locator('.watering-duration-result strong')).toHaveText('30 min');
   await page.getByRole('button', { name: new RegExp(`^Démarrer l’arrosage de ${materiel},`) }).click();
   const fenetre = page.locator('dialog.module-confirm-dialog[open]');
   const demarree = page.getByText('L’irrigation a démarré.');

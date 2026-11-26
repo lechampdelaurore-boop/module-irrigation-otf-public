@@ -44,7 +44,7 @@ test('le « ? » de chaque page l’explique ; une bulle dit d’où vient un ch
 
   // Arrosages : la durée d'un arrosage pour la dose demandée, 25 mm à 10 mm/h.
   await attendreLaPageIrrigation(page, 'arrosages');
-  // « Saisir en mm » (simplification S5) : la durée devient le résultat, avec sa bulle.
+  // La quantité en mm, au premier niveau (D-354) : la durée en est le résultat, avec sa bulle.
   await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   const resultat = page.locator('.watering-duration-result');

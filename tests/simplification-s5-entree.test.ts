@@ -97,11 +97,11 @@ test('« C’est fait » sur « Arrosages », le mot d’« Aujourd’hui » ; l
   assert.doesNotMatch(button, />\s*Fait comme prévu\s*<\/button>/);
 });
 
-test('la visite suit les trois blocs : « 1. Où ? », « 2. Combien de temps ? », le bouton', () => {
+test('la visite suit les trois blocs : « 1. Où ? », « 2. Combien de mm ? » (D-354), le bouton', () => {
   const steps = TOURS.flatMap((tour) => tour.steps).filter((step) => step.pages?.includes('arrosages'));
   const byAnchor = (anchor: string) => steps.filter((step) => step.anchor === anchor).map((step) => step.title);
   assert.deepEqual(byAnchor('arrosage-champs'), ['1. Où ?']);
-  assert.deepEqual(byAnchor('arrosage-resultat'), ['2. Combien de temps ?']);
+  assert.deepEqual(byAnchor('arrosage-resultat'), ['2. Combien de mm ?']);
   assert.deepEqual(byAnchor('arrosage-bouton'), ['Vous seul validez']);
   const form = read(FORM);
   assert.match(form, /data-tour="arrosage-champs"/);

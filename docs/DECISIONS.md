@@ -11544,3 +11544,62 @@ formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
 1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
 À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
 aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
+
+## D-354 — Simplifier l'usage du module, lot S5 : les millimètres d'abord au démarrage d'un arrosage
+
+Date : 26 novembre 2026. Statut : **codée** ; avenant au contrat
+`docs/simplification-s5-contract.md` (section 15), roadmap section 6
+terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de S5 (ligne 33,
+contrat section 14). Change D-332 (F897, F899, F900) et D-333 sur un seul
+point : ce que le deuxième bloc demande d'abord.
+
+**Demande du porteur.** Le 26 novembre 2026 à 20 h 10 (heure de Paris) :
+« Par défaut, quand on fait démarrer une irrigation, il faut qu'on saisisse
+en millimètres combien on veut mettre. »
+
+**Décision.** Dans « Arroser maintenant » et « Planifier », le deuxième bloc
+devient « Combien de mm ? » : le champ « Quantité souhaitée » au premier
+niveau, la durée en résultat (« soit 1 h 20 »), calculée par la fonction
+existante (mode « Objectif en mm »). Le réglage de durée de S5 (« − »,
+« + », pastilles « 30 min », « 1 h », « Conseillé : *durée* ») reste
+entier derrière la case « Saisir une durée » de « Plus d'options ».
+« Déjà fait » ne change pas : sa durée se lit des dates. Aucun calcul,
+aucune action serveur, aucune garde ne change ; aucune question
+agronomique (chaque réglage porte son intensité : la conversion se calcule
+toujours). Les règles d'écran restent dans `lib/domain/watering-now.ts`.
+
+Précisions prises en codant :
+
+- **F1087** — La saisie par défaut est en millimètres
+  (`DEFAULT_AMOUNT_ENTRY`) : formulaire neuf, et formulaire vidé après une
+  réussite (F406) ; le mode de calcul y est « Objectif en mm », comme le
+  premier état d'avant.
+- **F1088** — Le titre du bloc suit la saisie : « Combien de mm ? »,
+  « Combien de temps ? » en saisie d'une durée (`howMuchHeading`) ; la
+  visite guidée dit « 2. Combien de mm ? ».
+- **F1089** — « Conseillé : 8 mm », une pastille à côté du champ, seulement
+  avec une dose du jour pour ce matériel (`advisedAmountLabel`) : elle dit
+  ce qu'est la valeur déjà remplie au choix du matériel (F409) et y ramène ;
+  pressée quand la quantité est exactement la dose (`amountIsAdvised`, la
+  même règle que la pastille « Conseillé » de la durée). Sans dose, rien.
+- **F1090** — Ce qui manque se dit selon la saisie (`missingHowMuch`) :
+  « Indiquez combien de mm apporter. » en millimètres, « Choisissez une
+  durée. » en durée ; pour « Démarrer » et pour « Planifier ». L'ordre ne
+  change pas : où, (quand,) combien.
+- **F1091** — « Plus d'options (pompe, note, saisir une durée) » : la case
+  « Saisir une durée » remplace « Saisir en mm ». Cochée, le bloc montre le
+  réglage de durée de S5, ses règles inchangées (S5-h, S5-i) ; décochée, le
+  bloc revient aux millimètres, mode « Objectif en mm », la quantité tapée
+  gardée. Le pli ne s'ouvre plus seul pour la saisie en mm.
+- **F1092** — « Modifier » une irrigation planifiée relit sa durée
+  enregistrée telle quelle : la saisie passe en durée et « Plus d'options »
+  s'ouvre seul (`moreOptionsOpenAtFirst`, `durationEntry`), comme une
+  valeur déjà posée (contrat, section 5).
+
+**Ce qui est dit au porteur.** Sans dose du jour, démarrer demande la
+quantité au clavier : le parcours P64 compte désormais deux touches et la
+quantité (trois touches sans clavier avant). Avec une dose du jour, la
+quantité est déjà remplie : deux touches.
+
+**Numéros pris** : D-354 ; F1087 à F1092 ; aucun parcours nouveau (P64 et
+P65 réécrits ; P24, P31, P37, P38, P40 suivent).

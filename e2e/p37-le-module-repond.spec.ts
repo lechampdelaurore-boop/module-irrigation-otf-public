@@ -56,13 +56,13 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   const debut = horodatageLocal(2 * 24 * 60, reference);
-  // Aucune dose du jour pour un matériel neuf : aucune durée choisie, le bouton indisponible (F409, S5, section 3.2).
+  // Aucune dose du jour pour un matériel neuf : aucune quantité, donc aucune durée, le bouton indisponible (F409, D-354).
   await choisirMaterielEtReglage(page, materiel, reglage, '');
-  await expect(page.locator('.watering-duration strong')).toHaveText('—');
+  await expect(page.locator('.watering-duration-result strong')).toHaveText('—');
   // Sans durée, la phrase du résultat attend : pas de chiffre, le bouton à sa place (lot J, F462).
   const resultat = page.locator('.watering-now .watering-result');
   await expect(resultat).toHaveCount(0);
-  await expect(page.locator('.watering-missing')).toHaveText('Choisissez une durée.');
+  await expect(page.locator('.watering-missing')).toHaveText('Indiquez combien de mm apporter.');
   await saisirEnMillimetres(page, '25');
   await expect(resultat.first()).toBeVisible();
   await expect(page.locator('.watering-duration-result strong')).not.toHaveText('—');

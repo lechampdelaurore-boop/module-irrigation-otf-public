@@ -230,12 +230,12 @@ test('« Arrosages » attend le premier choix ; « Historique » plie ses filtre
     await preparerMaterielArrosant(page, testInfo, { repere: 'p40' });
     await attendreLaPageIrrigation(page, 'arrosages');
   }
-  // « Arroser maintenant » (simplification S5) : aucune durée choisie sans dose du jour, le bouton dit ce qui manque.
+  // « Arroser maintenant » (simplification S5, D-354) : aucune quantité sans dose du jour, le bouton dit ce qui manque.
   await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
   const formulaire = page.locator('.watering-now');
-  await expect(formulaire.locator('.watering-duration strong')).toHaveText('—');
+  await expect(formulaire.locator('.watering-duration-result strong')).toHaveText('—');
   await expect(formulaire.locator('.watering-result')).toHaveCount(0);
-  await expect(formulaire.locator('.watering-missing')).toHaveText(/^Choisissez (où arroser|une durée)\.$/);
+  await expect(formulaire.locator('.watering-missing')).toHaveText(/^(Choisissez où arroser|Indiquez combien de mm apporter)\.$/);
   await expect(formulaire.locator('.start-irrigation-button')).toBeDisabled();
 
   // L'historique : le pli « Filtrer » fermé dit le périmètre ; l'export, secondaire, suit les chiffres.

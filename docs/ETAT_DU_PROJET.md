@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5 : les millimètres d'abord au
+  démarrage d'un arrosage, demandé par le porteur le 26 novembre 2026 à
+  20 h 10 et codé le même jour** (D-354, F1087 à F1092 ; avenant au
+  contrat S5, section 15), en Opus 5.5 · Élevé, depuis `main`. Dans
+  « Arroser maintenant » et « Planifier », le deuxième bloc devient
+  « Combien de mm ? » : le champ des millimètres, « Conseillé : *n* mm »
+  avec une dose du jour, la durée en résultat (fonction existante) ; le
+  réglage de durée de S5 passe derrière « Saisir une durée », dans « Plus
+  d'options » ; « Déjà fait » ne change pas. Aucun calcul ni aucune
+  écriture changés. Tests ; P64 et P65 réécrits, P24, P31, P37, P38 et
+  P40 suivent. Contrôles : voir la PR. Sa fusion vient à son tour, après
+  la file en cours (S6, puis les PR à partir de #240).
 - **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
   les contrats, codée le 26 novembre 2026** (D-335, F940 à F946 ; contrat,
   sections 2, 9 et 10), en Opus 5.5 · Très élevé, sur la branche de la PR 3.

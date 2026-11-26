@@ -147,8 +147,8 @@ export const TOURS: readonly Tour[] = [
       {
         pages: ['arrosages'],
         anchor: 'arrosage-resultat',
-        title: '2. Combien de temps ?',
-        text: '« − » et « + » règlent la durée de cinq en cinq minutes ; « Conseillé » reprend la dose du jour. La phrase dessous dit les millimètres et les litres ; le petit « i » dit comment le chiffre a été calculé. La quantité en millimètres se saisit dans « Plus d’options ».',
+        title: '2. Combien de mm ?',
+        text: 'Indiquez combien de millimètres apporter ; « Conseillé » reprend la dose du jour. La durée se calcule dessous, et la phrase dit les millimètres et les litres ; le petit « i » dit comment le chiffre a été calculé. Une durée en minutes se règle dans « Plus d’options ».',
       },
       {
         pages: ['arrosages'],
