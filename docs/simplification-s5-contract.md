@@ -305,7 +305,7 @@ dans « Jour par jour ».
   d'aujourd'hui. Sans irrigation en cours, **le bloc « Où ? » commence sous
   400 px à 390 px de large** (budget, mesuré par la PR 1 ; la maquette
   « AVANT » le mettait vers 670 px) ; **avec une irrigation en cours, sous
-  700 px**.
+  700 px** (tenu depuis le 26 novembre 2026, D-342 ; voir section 13).
 - **Après « Démarrer »**, la page **reste**, la réponse est sous le bouton, et
   l'irrigation apparaît en cours en tête de page, comme aujourd'hui (F404) ;
   une ligne « Voir l'arrosage en cours sur Aujourd'hui » mène à la carte de
@@ -609,6 +609,16 @@ tenu** (1 011 px avant F909, budget 700 px) : la carte en cours, raccourcie
 au téléphone sans rien retirer, mesure encore environ 430 px. La raccourcir
 davantage retirerait une information du premier niveau, ce que la section 1
 exclut ; dette dite dans D-334 (F910), P64 borne à 820 px.
+
+**Budget tenu, 26 novembre 2026** (D-342, F996, F997), sur le choix du
+porteur de reprendre F910 : au téléphone, la carte en cours se range plus
+serré sans rien retirer (le nom à gauche du minuteur, l'état à droite du
+réglage, des marges plus courtes, le bloc « Irrigations en cours » sans
+cadre bleu), et « Fin estimée » dit l'heure seule le jour même, comme la
+carte d'« Aujourd'hui ». Avec une irrigation en cours, « 1. Où ? » à
+**653 px** dans P64 (800 px avant), **sous 700 px, tenu** ; P64 borne à
+700 px. Sans irrigation en cours, 298 px, inchangé. La phrase ci-dessus
+sur ce qu'il faudrait retirer ne vaut plus : la mise en page a suffi.
 
 **Numéros pris** : D-334 ; F908 à F915 ; aucun parcours nouveau (P31, P61,
 P63 et P64 suivent).

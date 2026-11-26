@@ -10802,7 +10802,8 @@ erreur dans la console
 
 ## D-332 — Simplifier l'usage du module, lot S5 : arroser en trois champs
 
-Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée** (« Arroser
+Date : 25 novembre 2026. Statut : **PR 1 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** (« Arroser
 maintenant » en trois champs) ; contrat `docs/simplification-s5-contract.md`,
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage
 de la roadmap et du contrat (section 14), sur le mandat du porteur du
@@ -10896,7 +10897,8 @@ contrat ; celui des parcours suit dès cette PR.
 
 ## D-333 — Simplifier l'usage du module, lot S5 : « Planifier » et « Déjà fait » sur le même squelette
 
-Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée** ; contrat
+Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** ; contrat
 `docs/simplification-s5-contract.md` (sections 4, 5, 6 et 10), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 14), dans la suite de D-332.
@@ -10972,7 +10974,8 @@ et les ancres de la visite guidée restent aussi à la PR 3.
 
 ## D-334 — Simplifier l'usage du module, lot S5 : l'entrée de la page et les mots
 
-Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée** ; contrat
+Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée, en ligne le
+26 novembre 2026, recette conforme le même jour** ; contrat
 `docs/simplification-s5-contract.md` (sections 6.1, 7, 9.1 et 10), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
 roadmap et du contrat (section 14), dans la suite de D-332 et D-333. **Le
@@ -11043,10 +11046,32 @@ Précisions prises en codant :
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
 
+**Preuve (recette, lot S5, D-332 à D-334).** S5 en ligne en entier le
+26 novembre 2026 à 11 h 38 (#227, #228, #230). Recette faite le même jour
+vers 11 h 45, avec l'accord du porteur (« Si tu as besoin de faire quelque
+chose sur Chrome, vas-y », 11 h 28 ; saisies permises, 11 h 18), sur la
+démonstration dans son Chrome (ferme des Trois Noues, « Pic d'été, l'eau
+manque », code de main 648cbc1). À l'ordinateur : « Arroser ou noter »
+dans l'ordre de la section 7 ; « Démarrer » indisponible tant que rien
+n'est choisi ; la case ronde, la durée conseillée, « + », la phrase du
+résultat (« Soit 6,5 mm sur les 3 planches, et 380 L pris à « Bassin des
+noues ». »), « Démarrer · fin vers 12 h 47 » ; la réponse sous le bouton,
+sans fenêtre, et « Voir l'arrosage en cours sur Aujourd'hui ». Au
+téléphone (390 px) : le retour « ‹ Aujourd'hui » par le « + », les
+onglets sur une ligne, la carte en cours raccourcie (F909), « Planifier »
+(« 1. Où ? », « 2. Quand ? », « 3. Combien de temps ? ») et « Déjà fait »
+(« 1. De quand à quand ? » puis « 2. Où ? »). « 1. Où ? » à 825 px avec un
+arrosage en cours, au-delà des 700 px, comme dit (F910, reprise par
+D-342). **Conforme.** Non vu : « C'est fait » sur « Arrosages » (aucune
+ligne « À traiter » ce moment-là ; tenu par P31 et les tests) ; la console
+n'a pas été relevée. La démonstration a été remise à zéro ensuite
+(`/mnt/project-files/simplification-s5/recette-s5-2026-11-26.md`).
+
 ## D-335 — Simplifier l'usage du module, lot S4 : une page, deux vues
 
-Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 4 codées** (la PR 2
-le 26 novembre 2026) ; contrat
+Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées** (les PR 2
+à 4 le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
+(#231), **PR 2 à 17 h** (#232) ; contrat
 `docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
 sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le
@@ -11138,9 +11163,12 @@ Précisions prises en codant :
   suivent dans la PR qui les change. Les visites V3 et V4 de la
   démonstration se jouent sur « Semaine » (la page affichée,
   `displayedPage`) : leurs étapes attendent `/irrigation/semaine`, et la
-  pause de V4 la vue « Les cumuls ». Oubli de la PR (la suite de la
-  démonstration n'y avait pas été jouée en entier), relevé en local sur la
-  pile complète.
+  pause de V4 la vue « Les cumuls ». De même, P12 (les actions de la page
+  des besoins, envoyées à `/irrigation/semaine`), P13, P30 et P52 (l'adresse
+  d'arrivée après la redirection) suivent dès cette PR, et P31c avec P13.
+  Oublis de la PR (ni la suite de la démonstration ni toute celle des
+  parcours n'y avaient été jouées ; ils ne l'ont été qu'en PR 2 à 4),
+  relevés sur la pile complète et par la CI de la PR.
 
 **Décision (PR 2, 26 novembre 2026).** La vue « La semaine » commence par
 son premier niveau (contrat, sections 4 à 6), de haut en bas : les flèches
@@ -11255,7 +11283,9 @@ Précisions prises en codant :
   ferme des parcours, chargée par les parcours d'avant (des créneaux
   chaque jour), le premier niveau faisait 3 401 px : la borne vaut pour le
   cas du contrat. La page entière : 3 935 → 2 846 px (P40, la suite
-  jouée jusqu'à lui ; borne 3 300). Temps du serveur (en local, 20 ms par
+  jouée jusqu'à lui ; borne 3 300). Sur la CI, toute la suite jouée avant
+  P40, 3 856 px : les créneaux laissés par les parcours d'avant allongent
+  « Jour par jour » ; la borne est portée à 4 250 (10 %). Temps du serveur (en local, 20 ms par
   lecture, deuxième passage, comme la PR 1) : « La semaine » 341 ms en
   médiane (322 à 351 ms, 62 lectures ; PR 1 : 359 ms, 68), « Les
   cumuls » 116 ms (14) ; budget 394 ms, tenu. La ligne « Calcul
@@ -11468,3 +11498,49 @@ Précisions prises en codant :
   vers `besoins`, « Voir au planning » remis font chacun échouer un test ;
   la visite sans l'ouverture des plis fait échouer V3 (l'élément souligné
   est caché).
+
+## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/simplification-s5-contract.md` (section 7, budget ; section 13,
+mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
+le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
+D-334.
+
+**Décision du porteur.** Le 26 novembre 2026 à 11 h 24 (heure de Paris),
+parmi les chantiers proposés, le porteur choisit de reprendre le budget de
+hauteur de S5 (« Ramène « Arroser » en cours à 700 px »). Au téléphone
+(390 px de large), avec un arrosage en cours, « 1. Où ? » commence
+désormais **sous 700 px** : 653 px mesurés par P64 (nom long du parcours),
+800 px avant. Aucun calcul, aucune action serveur, aucune garde ne change ;
+aucune question agronomique. Rien n'est retiré du premier niveau : la carte
+garde son état, son nom, son réglage, le minuteur, les trois valeurs, le
+détail des apports, la faisabilité de la pompe et ses deux boutons de
+52 px ; F910 disait qu'il faudrait en retirer, la mise en page a suffi.
+
+Précisions prises en codant :
+
+- **F996** — Au téléphone (jusqu'à 560 px), la carte de l'arrosage en
+  cours se range plus serré : le nom à gauche du minuteur, l'état (« En
+  cours », « En pause ») à droite du réglage, sur la même ligne ; le
+  minuteur en 28 px ; des marges plus courtes autour des trois valeurs, du
+  pli « détail des apports » et de la ligne de la pompe. Le bloc
+  « Irrigations en cours » perd son cadre bleu (la carte garde le sien,
+  le titre reste) ; après un geste (« L'irrigation est en pause. »), la
+  réponse garde un écart de 12 px avec le titre. Mise en page seulement,
+  dans `arroser-maintenant.css` ; l'ordinateur ne change pas. Amende F909
+  (le nom et le minuteur restent côte à côte, l'état change de place).
+- **F997** — « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »)
+  et le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »), à l'heure
+  de la ferme : les mots de la carte d'« Aujourd'hui » (« fin prévue à
+  12 h 15 »), par la même fonction (`timeText`, appelée par
+  `runningEndText` de `lib/domain/watering-now.ts`). La valeur ne tient
+  plus que sur une ligne au téléphone. Vaut aussi à l'ordinateur ; « Après
+  la reprise » ne change pas. Avant, « 26 nov. 2026 à 12 h 15 ».
+
+**Mesures, P64 au téléphone** (390 px, « Recevoir les alertes » sous le
+formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
+298 px (inchangé) ; avec un arrosage en cours, **653 px** (800 px avant,
+1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
+À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
+aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
