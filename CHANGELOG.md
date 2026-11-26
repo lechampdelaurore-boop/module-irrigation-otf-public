@@ -80,6 +80,22 @@ source détaillée commit par commit.
   ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
   avant le code. Rien ne change pour l'instant.
 
+### Modifié (simplifier l'usage du module, S4, PR 3 : les gestes de la semaine)
+
+- **Agir depuis la semaine, sans changer de page** (D-335, F933 à F939) :
+  « Comprendre ces chiffres » déplie sous le bilan les tuiles
+  d'« Aujourd'hui » (l'eau visée, l'irrigation, la pluie réelle ou estimée,
+  la pluie encore prévue, la soif de la semaine) ; « Changer l'eau visée »
+  ouvre le pli des objectifs, le champ des millimètres prêt à la saisie ;
+  « Noter la pluie » ouvre la fenêtre d'« Aujourd'hui » depuis le bilan, la
+  ligne « Calcul approximatif » ou la ligne d'un jour dont la pluie manque
+  (ce jour choisi), puis la semaine et le plan se relisent. Les flèches
+  changent de semaine sans recharger la page (276 ms contre 307 à 414 ms
+  pour les flèches d'avant, en local) ; « Exporter » télécharge la semaine
+  affichée au format de l'historique. Une prévision absente se dit
+  « Prévision indisponible : à vérifier », jamais zéro. Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S4, PR 2 : le premier niveau de la semaine)
 
 - **La semaine se lit d'un coup d'œil** (D-335, F923 à F932) : la page

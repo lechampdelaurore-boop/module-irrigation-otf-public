@@ -16,6 +16,7 @@ import { ProposalCard } from '../planning/proposal-card';
 import { formatVolume } from '../planning/format';
 import { UNPLACED_ANCHOR } from '../planning/weekly-plan-view';
 import { useWeeklyPlan, type WeeklyPlanState } from '../planning/weekly-plan-state';
+import { useWeekRain, type WeekRain } from './week-rain';
 
 /**
  * « Jour par jour » (simplification, lot S4, PR 2,
@@ -42,6 +43,7 @@ export function WeekDays({ weekStart, today, state, days, events, rainMatters, q
   query: PageQuery;
 }) {
   const weekly = useWeeklyPlan();
+  const rain = useWeekRain();
   // Le plan ne couvre que la semaine en cours (S4-l) : ailleurs, aucun créneau.
   const plan = weekly?.plan && state === 'current' && weekly.plan.calculation.weekStart === weekStart ? weekly : null;
   const planDays = useMemo(() => new Map((plan?.days ?? []).map((day) => [day.dateKey, day])), [plan?.days]);
@@ -105,7 +107,7 @@ export function WeekDays({ weekStart, today, state, days, events, rainMatters, q
           </li>
         ) : null}
         {view.lines.map((line, index) => (
-          <WeekDay key={line.dateKey} line={line} column={index} planDay={planDays.get(line.dateKey) ?? null} rows={rows} plan={plan} revealed={revealed} onToggleSlot={toggle} query={query} />
+          <WeekDay key={line.dateKey} line={line} column={index} planDay={planDays.get(line.dateKey) ?? null} rows={rows} plan={plan} revealed={revealed} onToggleSlot={toggle} query={query} rain={rain} />
         ))}
       </ol>
       {plan && plan.weekProposed.length > 0 ? (
@@ -123,7 +125,7 @@ export function WeekDays({ weekStart, today, state, days, events, rainMatters, q
   );
 }
 
-function WeekDay({ line, column, planDay, rows, plan, revealed, onToggleSlot, query }: {
+function WeekDay({ line, column, planDay, rows, plan, revealed, onToggleSlot, query, rain }: {
   line: WeekDayLine;
   /** Le rang du jour dans la semaine, à partir de 0 : sa colonne dans le tableau. */
   column: number;
@@ -133,8 +135,14 @@ function WeekDay({ line, column, planDay, rows, plan, revealed, onToggleSlot, qu
   revealed: ReadonlySet<string>;
   onToggleSlot: (id: string) => void;
   query: PageQuery;
+  /** « Noter la pluie » de la page ; `null` : la ferme n'a pas ce geste. */
+  rain: WeekRain | null;
 }) {
   const proposals = planDay?.proposals ?? [];
+  const runRainDate = line.calmRun?.role === 'start' ? line.calmRun.noteRainDate : null;
+  // « lun. 8 au dim. 14 », les jours de la suite, pour le lecteur d'écran.
+  const runDays = line.calmRun?.role === 'start' ? line.calmRun.label.split(' · ')[0] : '';
+  const rainOrigin = `pluie-${line.dateKey}`;
   const proposed = plan ? proposedIds(proposals, plan.now) : [];
   // Le jour qu'une limite posée après coup met en défaut le dit dans sa colonne (remarque 5 de la recette 3.9, F256).
   const overcommitted = plan?.plan ? overcommittedDayNotice(plan.plan.calculation.summary.overcommittedDays, line.dateKey, formatVolume) : null;
@@ -166,6 +174,18 @@ function WeekDay({ line, column, planDay, rows, plan, revealed, onToggleSlot, qu
             </p>
           ) : null}
           {overcommitted ? <p className="planning-day-overcommitted" role="note">{overcommitted}</p> : null}
+          {/* « Noter la pluie » d'un jour passé dont la pluie manque (8.3) : la fenêtre s'ouvre sur ce jour ; au téléphone, celui d'une suite de jours calmes. */}
+          {rain && (line.noteRain || runRainDate) ? (
+            <p className="week-day-rain">
+              {line.noteRain ? (
+                <button type="button" data-scope="day" data-date={line.dateKey} disabled={rain.pending} aria-label={`Noter la pluie du ${lowerFirst(line.label)}`} onClick={() => rain.open(rainOrigin, line.dateKey)}>Noter la pluie</button>
+              ) : null}
+              {runRainDate ? (
+                <button type="button" data-scope="run" data-date={runRainDate} disabled={rain.pending} aria-label={`Noter la pluie, ${runDays}`} onClick={() => rain.open(rainOrigin, runRainDate)}>Noter la pluie</button>
+              ) : null}
+            </p>
+          ) : null}
+          {rain?.reply(rainOrigin)}
         </div>
         {/* Une seule proposition : son « Valider » suffit, pas un second bouton pour le même geste (lot K, n° 17, F466). */}
         {plan && dayValidateShown(proposed.length) ? (
@@ -217,4 +237,8 @@ function WeekSlot({ proposal, plan, revealed, onToggle }: { proposal: StoredProp
       <ProposalCard proposal={proposal} currentCalculationId={plan.plan?.calculation.id ?? ''} now={plan.now} pending={plan.pending} feedback={feedback} soilNotes={plan.soilNotes[proposal.storedId] ?? []} onValidate={(id) => plan.validate([id])} onAdjust={plan.adjust} onRefuse={plan.askRefuse} />
     </div>
   );
+}
+
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLocaleLowerCase('fr-FR') + text.slice(1);
 }

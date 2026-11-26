@@ -9,16 +9,15 @@ import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-day
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
 import { FARM_OBJECTIVE_READ, notifyChangeJournalChanged, type FarmObjectiveNotice } from '@/lib/domain/feasibility-notifications';
-import { farmObjectiveScopeText } from '@/lib/domain/farm-objective';
 import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { useConfirm } from './shell/use-confirm';
 import { AnchoredFold, PageSettingsFold } from './shell/page-settings-fold';
-import { notifyWeekWaterRead } from './semaine/week-signals';
+import { notifyWeekWaterRead, WEEK_RAIN_NOTED } from './semaine/week-signals';
+import { WaterSummaryTiles } from './water-summary-tiles';
 import { goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '@/lib/domain/besoins-phone';
 import { automaticRefreshStatus } from '@/lib/domain/weather/automatic-refresh-status';
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
-import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
 import { ForecastModelSetting } from './forecast-model-setting';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
@@ -237,8 +236,8 @@ export function WaterManagementDashboard({
         }
       });
     };
-    // Une irrigation, ou un objectif enregistré ailleurs (une proposition adoptée, 5 quater).
-    const signals = ['irrigation-events-changed', 'irrigation-goals-changed'];
+    // Une irrigation, un objectif enregistré ailleurs (une proposition adoptée, 5 quater), une pluie notée par « Noter la pluie » de la page (S4, PR 3).
+    const signals = ['irrigation-events-changed', 'irrigation-goals-changed', WEEK_RAIN_NOTED];
     signals.forEach((name) => window.addEventListener(name, refreshAfterIrrigation));
     return () => signals.forEach((name) => window.removeEventListener(name, refreshAfterIrrigation));
   }, [dashboard.weekStart, season]);
@@ -483,13 +482,7 @@ export function WaterManagementDashboard({
           partial: missingActualRainDates.length + missingForecastRainDates.length + missingEt0Dates.length > 0,
         })}</small></>}
       >
-        <div className="water-summary-grid" data-open="true">
-          <SummaryCard icon="cible" label={SIMPLE_WORDS.weekGoal} value={farmObjective === null ? 'En cours de lecture' : farmObjective.objectiveMm === null ? 'Aucune' : `${mm.format(Math.round(farmObjective.objectiveMm * 10) / 10)} mm`} detail={`${farmObjective === null ? '' : `${farmObjectiveScopeText(farmObjective)} · `}${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} saisi${dashboard.goals.length > 1 ? 's' : ''}`} />
-          <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
-          <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
-          <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
-          <SummaryCard icon="soleil" label={SIMPLE_WORDS.thirstOfWeek} value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`ET0, l’évaporation de référence. Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
-        </div>
+        <WaterSummaryTiles dashboard={dashboard} farmObjective={farmObjective} today={today} />
         {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
           ? <p className="weather-stale">Un minuteur attend encore la confirmation de ses horaires réels. Son volume en cours est une estimation, réservée dans le budget mais non ajoutée au réalisé confirmé.</p> : null}
         <div className="water-week-table-wrap">
@@ -558,12 +551,6 @@ function AutomaticObjectiveSetting({ setting, shown, pending, onChange, onClearG
   );
 }
 
-function SummaryCard({ icon, label, value, detail, water = false }: { icon: IconName; label: string; value: string; detail: string; water?: boolean }) {
-  // Un chiffre absent (« Non défini », « non disponible · partielle ») s'écrit à la taille du texte courant, sur une ligne, pas en très gros (lot D, J3, F300).
-  const unknown = !/^\d/.test(value);
-  return <div className={water ? 'water-summary-card is-water' : 'water-summary-card'}><span><Icon name={icon} />{label}</span><strong className={unknown ? 'is-unknown' : undefined}>{value}</strong><small>{detail}</small></div>;
-}
-
 function TodayMetric({ label, value, warning = false }: { label: string; value: number | null; warning?: boolean }) {
   return <div className={warning ? 'today-water-metric is-warning' : 'today-water-metric'}><span>{label}</span><strong>{value === null ? '—' : `${volumeText(value)}`}</strong></div>;
 }
@@ -596,16 +583,8 @@ function formatTemperatures(minimum: number | null, maximum: number | null) {
   return `${text(minimum)} / ${text(maximum)} °C`;
 }
 
-function formatOptionalMm(value: number | null) {
-  return value === null ? 'Non disponible' : `${mm.format(value)} mm`;
-}
-
 function formatDate(dateKey: string) {
   return dateFormatter.format(new Date(`${dateKey}T12:00:00.000Z`));
-}
-
-function missingWeatherDates(dates: readonly string[]) {
-  return `${dates.length === 1 ? 'donnée manquante le' : 'données manquantes les'} ${dates.map(formatDate).join(', ')}`;
 }
 
 /** Le jour choisi est dans la semaine affichée et n'a aucune mesure de la ferme : rien à retirer (F471). */
