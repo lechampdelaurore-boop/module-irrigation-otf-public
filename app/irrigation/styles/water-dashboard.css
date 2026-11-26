@@ -488,18 +488,11 @@
 .automatic-objective-kept .danger-outline { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-ink); }
 
 /* Le réglage « Modèle de prévision » de la carte « Lieu de la météo » (météo multi-modèles, D-347). */
+.species-fold.forecast-model-fold { margin-top: 14px; }
+
 .forecast-model-setting {
   display: grid;
   gap: 8px;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-
-.forecast-model-setting h4 {
-  margin: 0;
-  color: var(--ink);
-  font-size: var(--text-14);
 }
 
 .forecast-model-setting p {
