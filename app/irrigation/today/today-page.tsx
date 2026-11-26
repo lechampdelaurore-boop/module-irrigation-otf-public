@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
+import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import { dayRowLayout, type TodayBlock, type TodayView } from '@/lib/domain/today/today-view';
 import { millisecondsFromMinutes, millisecondsFromSeconds } from '@/lib/domain/units';
 import { recordDoneAsPlannedAction } from '../done-as-planned-actions';
@@ -264,7 +265,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
           entry={view.rain}
           season={season}
           planning={view.plan !== null}
-          besoinsHref={pageHref('besoins', dayQuery, 'manual-rain')}
+          besoinsHref={pageHref('semaine', dayQuery, MEASURED_RAIN_ANCHOR)}
           onClose={() => setRainFrom(null)}
           onSaved={rainSaved}
         />

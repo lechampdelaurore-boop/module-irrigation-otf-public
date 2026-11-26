@@ -544,6 +544,17 @@ réelle, toujours enregistrable.
 
 ## Interface (3.6)
 
+> **Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** La page « Planning de la semaine » n'existe plus :
+> `/irrigation/planning` mène à « Semaine », paramètres et ancre gardés, et
+> ne sera jamais retirée. Les mêmes blocs y sont : les jours et leurs créneaux
+> à valider au premier niveau (« Jour par jour ») ; le résumé, les changements,
+> le budget, les suggestions et les planches non servies dans « Le plan, chaîne
+> par chaîne » ; les réglages et les heures où l'on n'arrose pas dans
+> « Réglages de la semaine », deux sections du pli « Le détail ». Les gestes
+> (« Valider », « Valider toute la semaine », « Pas à cette heure »,
+> « Recalculer ») et leurs gardes ne changent pas. Ce qui suit décrit l'écran
+> d'avant S4.
+
 Écrite le 29 septembre 2026, avant le code de l'écran, sur le « vas-y » du
 porteur. Une section **« Planning de la semaine »** sur la page d'irrigation,
 entre la faisabilité (3.4) et les cumuls (2.9), lisible sur ordinateur et à

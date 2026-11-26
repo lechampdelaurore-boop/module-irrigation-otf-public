@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
+
+- **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens
+  d'« Aujourd'hui » (« Eau de la semaine », la ligne du plan, les
+  propositions, « Fiabilité du calcul »), de « Matériel », « Ressources »,
+  « Arrosages », « Réglages à relire » et du « + », et la notification de
+  l'aspersion à reconsidérer, ouvrent « Semaine » à la bonne section, sans
+  passer par les anciennes adresses, qui restent servies. « Noter la pluie »
+  d'une autre page ouvre la fenêtre à l'arrivée. Les mots qui nommaient une
+  page disparue changent : « Voir la semaine », « Ouvrir la semaine ». La
+  visite guidée « Le planning » ouvre les plis du détail pour montrer ce
+  qu'elle présente, au lieu d'un élément caché. Le « ? » de « Semaine » dit
+  où est chaque chose. Aucun calcul, aucune règle d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S4, PR 3 : les gestes de la semaine)
 
 - **Agir depuis la semaine, sans changer de page** (D-335, F933 à F939) :

@@ -1,10 +1,12 @@
 'use client';
 
 import { createContext, useContext, useState, useTransition, type ReactNode } from 'react';
+import { WEEK_RAIN_INTENT } from '@/lib/domain/features/week-page';
 import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import type { RainEntry } from '@/lib/domain/today/rain-entry';
 import { RainEntryDialog } from '../rain-entry-dialog';
 import { ActionReply, actionReply, type ActionReplyMessage } from '../shell/action-reply';
+import { useUrlIntent } from '../shell/url-intent';
 import { readRainEntryAction } from '../water-actions';
 import { notifyRainNoted } from './week-signals';
 
@@ -20,6 +22,8 @@ import { notifyRainNoted } from './week-signals';
  * semaine se relit (le tableau de l'eau, les besoins, le plan recalculé).
  * « Retirer la mesure » et un jour plus ancien restent dans « Pluie
  * mesurée » du détail (`manual-rain`), où mène le lien de la fenêtre.
+ * Une autre page y mène par `?pluie=1` (PR 4, section 9) : la fenêtre s'ouvre
+ * à l'arrivée, comme du bilan, et sa réponse s'écrit sous le bilan.
  */
 
 export type WeekRain = {
@@ -36,6 +40,9 @@ const WeekRainContext = createContext<WeekRain | null>(null);
 export function useWeekRain(): WeekRain | null {
   return useContext(WeekRainContext);
 }
+
+/** L'origine du lien du bilan, où s'écrit aussi la réponse d'une fenêtre ouverte par l'adresse. */
+export const BILAN_ORIGIN = 'pluie-bilan';
 
 const REPLY_CLASSES = { notice: 'week-rain-reply', warning: 'week-rain-reply', error: 'planning-error' } as const;
 
@@ -68,9 +75,14 @@ export function WeekRainProvider({ planning, rainMatters, children }: {
     });
   };
 
+  // « Noter la pluie » d'une autre page (la fiabilité d'« Aujourd'hui ») : l'adresse le demande une fois.
+  useUrlIntent(WEEK_RAIN_INTENT, () => {
+    if (rainMatters) open(BILAN_ORIGIN);
+  });
+
   const saved = (text: string) => {
     setShown(false);
-    setReplies([actionReply(origin ?? 'bilan', 'notice', text)]);
+    setReplies([actionReply(origin ?? BILAN_ORIGIN, 'notice', text)]);
     notifyRainNoted();
   };
 

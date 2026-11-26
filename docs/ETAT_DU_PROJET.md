@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
+  les contrats, codée le 26 novembre 2026** (D-335, F940 à F946 ; contrat,
+  sections 2, 9 et 10), en Opus 5.5 · Très élevé, sur la branche de la PR 3.
+  Tout ce qui menait au planning, aux besoins ou à l'historique mène à
+  « Semaine » et à son ancre : les liens d'« Aujourd'hui », de la fiabilité
+  et des pages entre elles, la notification de l'aspersion à reconsidérer,
+  la relecture des réglages ; les anciennes adresses restent servies.
+  « Noter la pluie » d'une autre page ouvre la fenêtre à l'arrivée
+  (`?pluie=1`). La visite guidée ouvre les plis de « Le détail » (elle
+  soulignait un élément caché depuis la PR 2). Les mots des pages disparues
+  changent (« Voir la semaine »). Treize contrats disent ce que S4 a changé.
+  Aucun calcul ni aucune écriture changés. Tests ; P68 et les parcours de la
+  démonstration V3, V4 suivent. Contrôles et mesures : voir la PR et la
+  section 13 du contrat. **Le code de S4 est fini** ; les PR 1 à 3 sont en
+  ligne, celle-ci se fusionne après la PR 3. Vient S6.
 - **Simplifier l'usage du module, S4, PR 3 sur 4 : les gestes, codée le
   26 novembre 2026** (D-335, F933 à F939 ; contrat, sections 4.5, 4.6 et
   8), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Depuis « La
@@ -23,8 +38,10 @@ registres, elle y renvoie.
   contre 307 à 414 ms avant), « Exporter » la semaine affichée ; la météo
   indisponible se dit, jamais zéro. Aucun calcul ni aucune écriture
   changés. Tests ; parcours P68 nouveau. Contrôles et mesures : voir la PR
-  et la section 13 du contrat. Vient la PR 4 (les liens, la visite, les
-  contrats) ; les PR 1 et 2 sont en ligne.
+  et la section 13 du contrat. **En ligne** : #233 fusionnée le 26 novembre
+  2026 à 17 h 43 (f3f8e2b), déployée à 18 h 31, run 45861429069, les cinq jobs
+  verts (consigné par S4, PR 4). Vient la PR 4 (les liens, la visite, les
+  contrats).
 - **Simplifier l'usage du module, S4, PR 2 sur 4 : le premier niveau,
   codée le 26 novembre 2026** (D-335, F923 à F932 ; contrat, sections 4 à
   7), en Opus 5.5 · Très élevé, sur la branche de la PR 1. « La semaine »
