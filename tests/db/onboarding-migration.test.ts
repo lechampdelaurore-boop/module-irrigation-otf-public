@@ -45,6 +45,8 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
       before_values, after_values, actor_user_id, created_at)`);
     // Même raison : ils lisent le réglage de l'objectif automatique (0047, D-317), vide, donc éteint.
     sqlite.exec('CREATE TEMP TABLE irrigation_automatic_objective_revisions (id, workspace_id, enabled, actor_user_id, created_at)');
+    // Et les gestes « hors saison » (0051, D-352), aucun : rien n'est hors saison.
+    sqlite.exec('CREATE TEMP TABLE irrigation_off_season_revisions (id, workspace_id, scope_level, scope_id, off_season, actor_user_id, created_at)');
     const choice = resolveDemoChoice('maraichage', 'ete');
     const farm = demoOwnerUserId('copie', choice);
     await prepareDemoSpace(farm, choice);
@@ -54,6 +56,7 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
 
     sqlite.exec('DROP TABLE temp.irrigation_change_journal');
     sqlite.exec('DROP TABLE temp.irrigation_automatic_objective_revisions');
+    sqlite.exec('DROP TABLE temp.irrigation_off_season_revisions');
     const before = dump(sqlite);
     const filled = Object.entries(before).filter(([, rows]) => rows.length > 0).map(([table]) => table);
     assert.ok(filled.length >= 15, `la copie est une ferme complète (${filled.length} tables remplies : ${filled.join(', ')})`);

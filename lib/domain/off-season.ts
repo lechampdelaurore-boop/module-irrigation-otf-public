@@ -59,6 +59,13 @@ export type ActiveOffSeasonScope = { scope: OffSeasonScope; since: string };
 /** La réponse du filtre pour une planche, jour par jour (`AAAA-MM-JJ`) : ce que `objectiveForBed` reçoit. */
 export type OffSeasonDays = (date: string) => boolean;
 
+/**
+ * La réponse du filtre pour des planches, par identifiant : ce que reçoivent
+ * les lecteurs qui composent l'objectif sur une période, jour par jour
+ * (l'historique, les séries ; D-352). Une planche absente est en saison.
+ */
+export type OffSeasonByBed = ReadonlyMap<string, OffSeasonDays>;
+
 /** Le filtre d'une ferme, lu jour par jour ; le jour de chaque geste ne se calcule qu'une fois. */
 export type OffSeasonSchedule = {
   /** Les portées hors saison ce jour-là, chacune depuis le jour où elle l'est devenue. */
@@ -120,6 +127,33 @@ export function offSeasonSchedule(revisions: readonly OffSeasonRevision[]): OffS
  */
 export function objectiveOffSeason(bed: { objectiveMm: number | null; offSeasonDates?: readonly string[] }): boolean {
   return bed.objectiveMm === null && (bed.offSeasonDates?.length ?? 0) > 0;
+}
+
+/**
+ * Le besoin d'une planche est hors saison pour la semaine (D-352) : son
+ * objectif l'est (`objectiveOffSeason`), ou elle est hors saison le jour du
+ * calcul, `today`, en heure de Paris. Seul « Reprendre » lève une portée
+ * (section 10, question 1) : hors saison ce jour-là, la planche le reste
+ * jusqu'à la fin de la semaine, et rien ne lui reste à donner ; l'objectif de
+ * ses jours d'avant reste écrit, inactif. Ni besoin, ni volume, ni
+ * proposition d'arrosage ; la pénurie et la faisabilité ne la comptent pas
+ * (section 4.1). Reprise ce jour-là, elle est servie sur l'objectif de ses
+ * jours en saison (cas 9). Une semaine passée ne contient pas le jour du
+ * calcul : seul son objectif compte, comme dans l'historique.
+ */
+export function needOffSeason(bed: { objectiveMm: number | null; offSeasonDates?: readonly string[] }, today: string): boolean {
+  return objectiveOffSeason(bed) || (bed.offSeasonDates?.includes(today) ?? false);
+}
+
+/**
+ * La portée couvre-t-elle la planche ? Évaluée à la lecture, avec le mode du
+ * jardin à ce moment-là : un jardin à classer n'est couvert par aucune portée
+ * de mode (section 4.3, D-003). Pour la liste des arrosages planifiés à
+ * proposer à l'annulation (section 10, question 2) ; la réponse jour par jour
+ * reste celle de `offSeasonSchedule`.
+ */
+export function offSeasonScopeCovers(scope: OffSeasonScope, bed: OffSeasonBed): boolean {
+  return scopeCovers(scope, bed);
 }
 
 /**

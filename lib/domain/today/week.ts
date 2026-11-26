@@ -55,7 +55,9 @@ export function pastRainOrigins(
 export type TodayWeekBed = Pick<BedIrrigationNeed,
   'plotId' | 'plotName' | 'sheltered' | 'areaSquareMeters' | 'objectiveMm' | 'actualRainMm' | 'actualIrrigationMm' | 'realRemainingMm'>
   /** L'origine de l'objectif (6 decies, O4, D-319) ; absente, l'objectif se lit comme avant. */
-  & Partial<Pick<BedIrrigationNeed, 'objectiveOrigin' | 'automaticObjective'>>;
+  & Partial<Pick<BedIrrigationNeed, 'objectiveOrigin' | 'automaticObjective'>>
+  /** Hors saison (D-337, D-352) : la planche sort des comptes de la ligne ; absent, en saison. */
+  & Partial<Pick<BedIrrigationNeed, 'offSeason' | 'offSeasonDates'>>;
 
 export type TodayWeekInputs = {
   weekStart: string;
@@ -87,8 +89,12 @@ type WeekRow = {
   /** Irrigation + pluie ; `null` quand la pluie est inconnue. */
   receivedMm: number | null;
   remainingMm: number | null;
-  /** Les planches qui ont un objectif cette semaine, sur toutes celles du jardin ou de la ferme (F280). */
-  objectiveBeds: { withObjective: number; total: number };
+  /**
+   * Les planches qui ont un objectif cette semaine, sur toutes celles du
+   * jardin ou de la ferme (F280) ; celles hors saison, comptées à part
+   * (D-352), absent quand il n'y en a aucune.
+   */
+  objectiveBeds: { withObjective: number; total: number; offSeason?: number };
   /** « 8 / 20 mm », « 8 / 20 mm sur 7 planches sur 10 », « 8 mm reçus, aucun objectif posé », « pluie inconnue ». */
   text: string;
   /** L'origine de l'objectif quand l'objectif automatique y compte : « automatique, d’après l’ET0 » ; `null` sinon. */
@@ -187,9 +193,14 @@ function bedsOf(count: number, total: number): string {
  * objectif quand une partie seulement en a un ; sinon toutes.
  */
 function counted(beds: readonly TodayWeekBed[]): { scope: readonly TodayWeekBed[]; objectiveBeds: WeekRow['objectiveBeds'] } {
-  const withObjective = beds.filter((bed) => bed.objectiveMm !== null);
+  // Une planche hors saison n'a pas d'objectif qui compte (D-337, D-352) : ni son eau ni son reste ne s'y mêlent.
+  const objective = farmObjective(beds);
+  const withObjective = beds.filter((bed) => bed.objectiveMm !== null && bed.offSeason !== true);
   const partial = withObjective.length > 0 && withObjective.length < beds.length;
-  return { scope: partial ? withObjective : beds, objectiveBeds: { withObjective: withObjective.length, total: beds.length } };
+  return {
+    scope: partial ? withObjective : beds,
+    objectiveBeds: { withObjective: withObjective.length, total: beds.length, ...(objective.offSeason ? { offSeason: objective.offSeason } : {}) },
+  };
 }
 
 /** L'origine lue d'une planche ; sans elle, l'objectif est dit comme avant. */
@@ -368,8 +379,9 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
   const water = input.water;
   const volume = (value: number) => `${water?.incomplete ? 'au moins ' : ''}${waterText(value, 'm³')}`;
   const label = `du ${shortDayText(input.weekStart)} au ${shortDayText(input.weekEnd)}`;
-  const { withObjective, total } = farm.objectiveBeds;
-  const objective = { objectiveMm: farm.objectiveMm, withObjective, total };
+  const { withObjective, total, offSeason } = farm.objectiveBeds;
+  // Les planches hors saison se disent à part, la phrase de l'objectif de la ferme (D-337, D-352).
+  const objective = { objectiveMm: farm.objectiveMm, withObjective, total, ...(offSeason ? { offSeason } : {}) };
   const partial = farmObjectivePartial(objective);
   // Sur une partie des planches, chaque tuile le dit : jamais un chiffre lu pour la ferme entière (F280).
   const scoped = (detail: string) => (partial ? `${detail}, ${withObjective === 1 ? 'sur cette planche' : `sur ces ${withObjective} planches`}` : detail);

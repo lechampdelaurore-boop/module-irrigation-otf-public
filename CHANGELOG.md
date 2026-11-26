@@ -5,6 +5,21 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs)
+
+- **Les gestes « hors saison » enregistrés** (D-352) : mettre hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, puis le reprendre, s'enregistre au jour du geste et se lit au
+  journal des modifications (« Mise hors saison », « Reprise de
+  l'irrigation ») ; un geste qui ne change rien n'écrit rien. Le tableau
+  des besoins, le planning, la faisabilité, « Aujourd'hui », l'historique,
+  les séries et l'aide du formulaire en tiennent compte : plus d'objectif
+  ni de proposition d'arrosage pour ces planches ; un arrosage déjà
+  planifié reste, la liste à proposer à l'annulation est prête. La pluie,
+  la réserve du sol, l'ET0, l'archive des prévisions et les alertes ne
+  changent jamais. Rien ne change encore pour aucune ferme : aucun écran
+  ne permet le geste (B3).
+
 ### Ajouté (ignorer l'irrigation hors saison, B1 : la règle)
 
 - **La règle « hors saison »** (D-341) : quand une ferme mettra hors saison

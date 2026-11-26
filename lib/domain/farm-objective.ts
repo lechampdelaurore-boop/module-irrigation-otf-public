@@ -20,14 +20,18 @@ import { objectiveOffSeason } from './off-season.ts';
  *
  * Une planche hors saison sans objectif sur la période (D-337,
  * `objectiveOffSeason`) sort des comptes et se dit à part : « 7 planches sur
- * 7 ont un objectif, 3 hors saison ». Sans planche hors saison, rien ne
- * change.
+ * 7 ont un objectif, 3 hors saison ». Le tableau des besoins dit aussi hors
+ * saison la planche qui l'est le jour du calcul (`needOffSeason`, D-352) :
+ * elle sort des comptes de la même façon, l'objectif de ses jours d'avant
+ * reste écrit, inactif. Sans planche hors saison, rien ne change.
  */
 export type FarmObjectiveBed = {
   areaSquareMeters: number;
   objectiveMm: number | null;
   /** Les jours de la période où la planche est hors saison (D-337) ; absent ou vide : en saison tous les jours. */
   offSeasonDates?: readonly string[];
+  /** Hors saison pour le besoin de la semaine (`needOffSeason`, D-352) : hors des comptes, même avec un objectif sur ses jours d'avant. */
+  offSeason?: boolean;
 };
 
 export type FarmObjective = {
@@ -45,16 +49,20 @@ export type FarmObjective = {
 };
 
 export function farmObjective(beds: readonly FarmObjectiveBed[]): FarmObjective {
-  const counted = beds.filter((bed) => bed.objectiveMm !== null && Number.isFinite(bed.objectiveMm));
+  const counted = beds.filter((bed) => !bedOffSeason(bed) && bed.objectiveMm !== null && Number.isFinite(bed.objectiveMm));
   const area = counted.reduce((sum, bed) => sum + Math.max(0, bed.areaSquareMeters), 0);
   const weighted = counted.reduce((sum, bed) => sum + (bed.objectiveMm ?? 0) * Math.max(0, bed.areaSquareMeters), 0);
-  const offSeason = beds.filter((bed) => objectiveOffSeason(bed)).length;
+  const offSeason = beds.filter(bedOffSeason).length;
   return {
     objectiveMm: counted.length > 0 && area > 0 ? weighted / area : null,
     withObjective: counted.length,
     total: beds.length,
     ...(offSeason > 0 ? { offSeason } : {}),
   };
+}
+
+function bedOffSeason(bed: FarmObjectiveBed): boolean {
+  return bed.offSeason === true || objectiveOffSeason(bed);
 }
 
 /** Les planches comptées : celles qui ont un objectif, sur toutes, et celles hors saison. */

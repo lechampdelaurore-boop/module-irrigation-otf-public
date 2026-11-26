@@ -109,6 +109,8 @@ function objectText(context: ChangeValues, nameOf: NameOf): string | null {
   const place = named('bedId', 'Planche', 'une planche') ?? named('plotId', 'Jardin / abri', 'un jardin') ?? named('zoneId', 'Parcelle', 'une parcelle');
   if (place !== null) parts.push(place);
   else if (textOf('scopeType') === 'farm') parts.push('toute la ferme');
+  // Une portée « hors saison » de mode (D-352) : jamais un jardin à classer, qu'aucune ne couvre (D-003).
+  else if (textOf('offSeasonMode') !== null) parts.push(textOf('offSeasonMode') === 'greenhouse' ? 'tout le sous-abri' : 'tout le plein champ');
   const crop = named('seriesId', 'Série', 'une série') ?? named('plantId', 'Culture', 'une culture');
   if (crop !== null) parts.push(crop);
   // Un stade d'une culture de référence, par son nom : un stade sensible au manque d'eau (amélioration n° 4, D-290).

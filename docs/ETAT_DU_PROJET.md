@@ -12,6 +12,23 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs,
+  codée le 26 novembre 2026** (D-352, F1061 à F1074 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4 à 8 et 10 ;
+  roadmap ligne 34), en Opus 5.5 · Max, empilée sur B1 (#245). Les gestes
+  « Mettre hors saison » et « Reprendre » sont enregistrés (table
+  `irrigation_off_season_revisions`, **migration 0051 provisoire**, à
+  recaler au numéro libre à la fusion), un geste sans effet n'écrit rien,
+  le journal des modifications les dit. Le tableau des besoins, le
+  planning, la faisabilité et la pénurie, « Aujourd'hui », l'historique,
+  les séries, l'aide du formulaire et les fiches reçoivent le filtre ; la
+  liste des arrosages planifiés à proposer à l'annulation est prête pour
+  B3. La pluie, la réserve du sol, l'ET0, l'archive, les alertes et les
+  semaines closes ne le lisent jamais (garde à deux fermes sur la base,
+  garde des imports). **Aucun écran ne l'allume : rien ne change en
+  ligne.** Contrôles : voir la PR ; parcours navigateur omis, aucun écran
+  ne change. Fusion après B1 ; à la fusion de S6, `start-route.ts` reçoit
+  aussi le filtre (F1071). Vient B3 (les écrans).
 - **Ignorer l'irrigation hors saison, B1 : la règle, codée le 26 novembre
   2026** (D-341, F985 à F995 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4, 5 et 8 ;

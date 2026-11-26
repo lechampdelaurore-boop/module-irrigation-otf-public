@@ -49,6 +49,8 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
       before_values, after_values, actor_user_id, created_at)`);
     // Même raison : ils lisent le réglage de l'objectif automatique (0047, D-317), vide, donc éteint.
     sqlite.exec('CREATE TEMP TABLE irrigation_automatic_objective_revisions (id, workspace_id, enabled, actor_user_id, created_at)');
+    // Et les gestes « hors saison » (0051, D-352), aucun : rien n'est hors saison.
+    sqlite.exec('CREATE TEMP TABLE irrigation_off_season_revisions (id, workspace_id, scope_level, scope_id, off_season, actor_user_id, created_at)');
     const choice = resolveDemoChoice('maraichage', 'ete');
     await prepareDemoSpace(demoOwnerUserId('copie', choice), choice);
     delete process.env.DEMO_MODE;
@@ -60,6 +62,7 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     const sqlBefore = tableSql(sqlite);
     sqlite.exec('DROP TABLE temp.irrigation_change_journal');
     sqlite.exec('DROP TABLE temp.irrigation_automatic_objective_revisions');
+    sqlite.exec('DROP TABLE temp.irrigation_off_season_revisions');
 
     const before = dump(sqlite);
     assert.ok(before[TABLE].length >= 3);
