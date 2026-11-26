@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { FarmObjective } from '@/lib/domain/farm-objective';
 import type { TodayWeekBed } from '@/lib/domain/today/week';
 import type { WaterDashboardDay } from '@/lib/domain/water-management';
+import type { WaterDashboard } from '@/lib/services/water-dashboard';
 
 /**
  * Les tableaux de la semaine relus par leurs sections (simplification, lot
@@ -16,11 +18,9 @@ import type { WaterDashboardDay } from '@/lib/domain/water-management';
 export const WEEK_WATER_READ = 'irrigation-week-water-read';
 export const WEEK_NEEDS_READ = 'irrigation-week-needs-read';
 
-/** Ce que le premier niveau lit du tableau de l'eau de la semaine. */
-export type WeekWater = {
-  weekStart: string;
+/** Ce que le premier niveau lit du tableau de l'eau de la semaine ; « Comprendre ces chiffres » en lit les totaux et les objectifs (PR 3). */
+export type WeekWater = Pick<WaterDashboard, 'weekStart' | 'weekEnd' | 'totals' | 'goals'> & {
   days: WaterDashboardDay[];
-  totals: { realizedIrrigationCubicMeters: number };
   todayWater: WaterDashboardDay;
 };
 
@@ -29,10 +29,25 @@ export type WeekNeeds = {
   weekStart: string;
   weekEnd: string;
   gardens: readonly { beds: readonly TodayWeekBed[] }[];
+  /** L'eau visée de la ferme, celle d'« Aujourd'hui » (S1, PR 3). */
+  farmObjective: FarmObjective;
 };
 
 export function notifyWeekWaterRead(water: WeekWater) {
   window.dispatchEvent(new CustomEvent<WeekWater>(WEEK_WATER_READ, { detail: water }));
+}
+
+/**
+ * Une pluie notée par « Noter la pluie » de la page (S4, PR 3, section 8.3) :
+ * le tableau de l'eau se relit, puis les besoins, le plan et la ligne
+ * « Calcul approximatif » (leur signal, sans semaine : chacun relit la
+ * sienne, jamais celle du jour noté).
+ */
+export const WEEK_RAIN_NOTED = 'irrigation-week-rain-noted';
+
+export function notifyRainNoted() {
+  window.dispatchEvent(new CustomEvent(WEEK_RAIN_NOTED));
+  window.dispatchEvent(new CustomEvent('irrigation-needs-source-changed'));
 }
 
 export function notifyWeekNeedsRead(needs: WeekNeeds) {

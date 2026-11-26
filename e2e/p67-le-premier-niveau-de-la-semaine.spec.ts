@@ -55,19 +55,24 @@ const APPORT_MM_PAR_HEURE = 12;
  * Les bornes du téléphone, à 390 px, sur la mesure faite le 26 novembre 2026
  * (contrat, sections 11 et 13). Le contrat vise 1 700 px pour le premier
  * niveau, la phrase et la barre à moins de 400 px du haut, le premier
- * « Valider » à moins de 900 px, au plus 24 choses à toucher. Mesuré :
+ * « Valider » à moins de 900 px, au plus 24 choses à toucher. Mesuré en PR 2 :
  * premier niveau 1 590 px, phrase 383, barre 621, premier « Valider » 1 123,
- * 16 choses à toucher. La barre et le premier « Valider » ne tiennent pas la
- * cible : la ferme neuve porte « À finir » au-dessus de la page et « Calcul
- * approximatif » (sa pluie réelle manque) au-dessus du bilan ; c'est dit dans
- * la section 13, comme au lot J. Leurs bornes sont la mesure et 60 px, la
- * phrase d'un autre jour pouvant prendre une ligne de plus.
+ * 16 choses à toucher. En PR 3, les trois gestes du bilan (« Comprendre ces
+ * chiffres », « Changer l'eau visée », « Noter la pluie ») prennent deux
+ * lignes de 44 px à 390 px : premier niveau 1 687 px, premier « Valider »
+ * 1 221, 19 choses à toucher. La barre et le premier « Valider » ne tiennent
+ * pas la cible : la ferme neuve porte « À finir » au-dessus de la page et
+ * « Calcul approximatif » (sa pluie réelle manque) au-dessus du bilan ; c'est
+ * dit dans la section 13, comme au lot J. Les bornes sont la mesure et 60 px,
+ * la phrase ou l'encadré d'un autre jour pouvant prendre une ligne de plus ;
+ * le premier niveau, sous les 1 700 px du contrat de 13 px seulement, garde
+ * la même marge (F939).
  */
 const BORNES = {
-  premierNiveauPx: 1_700,
+  premierNiveauPx: 1_750,
   phrasePx: 400,
   barrePx: 680,
-  premierValiderPx: 1_180,
+  premierValiderPx: 1_280,
   chosesAToucher: 24,
 } as const;
 

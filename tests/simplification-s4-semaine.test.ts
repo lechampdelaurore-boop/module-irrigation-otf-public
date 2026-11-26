@@ -219,7 +219,7 @@ test('section 3.4 : l’écart du prévu ne se lit qu’à l’ouverture de son 
 test('section 4 : l’encadré d’attention ne paraît que s’il a une ligne ; un plan sans pénurie n’y met rien (PR 2, F925)', () => {
   const premier = readFileSync('app/irrigation/semaine/week-first-level.tsx', 'utf8');
   assert.match(premier, /const shortage = planShown\?\.plan \? shortageAction\(planShown\.plan, formatVolume, planShown\.now\) !== null : false;/);
-  assert.match(premier, /\{current && \(shortage \|\| approximate \|\| timer\) \? \(/);
+  assert.match(premier, /\{current && \(shortage \|\| approximate \|\| timer \|\| forecast\) \? \(/);
   assert.match(premier, /\{shortage \? <PlanShortage \/> : null\}/);
   // Le même test que `PlanShortage` : l'encadré ne peut pas rester vide.
   const vue = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
