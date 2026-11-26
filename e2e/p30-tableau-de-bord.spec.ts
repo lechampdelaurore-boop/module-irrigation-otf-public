@@ -5,6 +5,7 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   nomsDesPagesDuMenu,
+  ouvrirLeDetailDuJour,
   ouvrirLeMenuDesPages,
   surveillerLaConsole,
   TITRES_DES_PAGES,
@@ -18,11 +19,11 @@ import {
  * docs/browser-journeys-contract.md).
  *
  * Sur une ferme neuve qui a tout coché, propre au parcours et à la largeur :
- * à l'ordinateur, « Aujourd'hui » est détaché en tête du menu, dans son
- * encart « Tableau de bord », et les autres pages se rangent sous « Arroser »,
- * « Équiper » et « Surveiller », Réglages à part, dans l'ordre de toujours ;
- * au téléphone, son entrée de la barre du bas est le bouton rond, et la
- * feuille « Plus » garde l'encart et les groupes. La page dit la date, les
+ * à l'ordinateur, sous le bouton « + Arroser ou noter », « Aujourd'hui » est
+ * en tête du menu, dans son encart « Tableau de bord », et les autres pages
+ * se rangent sous les titres « Semaine » et « Ma ferme », Réglages dans
+ * « Ma ferme » (simplification, lot S3, PR 3, D-331) ; au téléphone, son
+ * endroit ouvre la barre du bas, et le rond du centre est le « + » (PR 2). La page dit la date, les
  * chiffres de la semaine et ses pastilles ; une pastille mène à son bloc.
  * Les quatre tuiles de la semaine sont des liens, leur mot d'action écrit
  * (docs/aujourdhui-liens-contract.md, L1) : « Objectif de la semaine » ouvre
@@ -40,7 +41,7 @@ import {
  * réelle, un vrai téléphone.
  */
 
-const GROUPES = ['Arroser', 'Équiper', 'Surveiller'];
+const TITRES_DES_ENDROITS = ['Semaine', 'Ma ferme'];
 
 /**
  * T19 : la légende de la frise nomme chaque couleur de barre présente, et
@@ -101,94 +102,113 @@ async function ouvrirLaFermeToutCoche(page: Page, context: BrowserContext, testI
   await attendreLaPagePrete(page, 'aujourdhui');
 }
 
-test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, les pastilles qui mènent aux blocs', async ({ page, context }, testInfo) => {
+test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pastilles qui mènent aux blocs', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirLaFermeToutCoche(page, context, testInfo, 'tableau-de-bord');
   await verifierLEtape(page, journal, 'arrivée sur le tableau de bord');
 
-  // Au téléphone, « Votre journée » juste après l'en-tête, avant les tuiles, à l'écran comme dans l'ordre de lecture ;
-  // à l'ordinateur, les tuiles d'abord, comme avant (6 nonies, L6, D-315).
+  // « Votre journée » juste après l'en-tête, puis « La semaine », à toute largeur, à l'écran comme dans l'ordre de lecture ;
+  // les tuiles dans « Le détail », fermé (6 nonies, L6, D-315, réécrite par la simplification S2, PR 5, D-330).
   await expect(page.locator('#today-day')).toBeVisible();
+  await expect(page.locator('details#today-detail')).toHaveJSProperty('open', false);
   const ordre = await page.evaluate(() => {
     const entete = document.querySelector('.today-head');
     const journee = document.querySelector('#today-day');
+    const semaine = document.querySelector('#today-week');
     const tuiles = document.querySelector('.today-kpis');
-    if (!entete || !journee || !tuiles) return null;
+    if (!entete || !journee || !semaine || !tuiles) return null;
     return {
-      journeeAvantLesTuiles: Boolean(journee.compareDocumentPosition(tuiles) & Node.DOCUMENT_POSITION_FOLLOWING),
+      journeeAvantLaSemaine: Boolean(journee.compareDocumentPosition(semaine) & Node.DOCUMENT_POSITION_FOLLOWING),
+      tuilesDansLeDetail: Boolean(tuiles.closest('#today-detail')),
       basDeLEnTete: entete.getBoundingClientRect().bottom,
       hautDeLaJournee: journee.getBoundingClientRect().top,
-      hautDesTuiles: tuiles.getBoundingClientRect().top,
+      hautDeLaSemaine: semaine.getBoundingClientRect().top,
     };
   });
-  expect(ordre, 'l’en-tête, la journée et les tuiles').not.toBeNull();
+  expect(ordre, 'l’en-tête, la journée, la semaine et les tuiles').not.toBeNull();
   if (ordre) {
-    expect(ordre.journeeAvantLesTuiles, 'ordre de lecture').toBe(telephone);
-    expect(ordre.hautDeLaJournee < ordre.hautDesTuiles, 'ordre affiché').toBe(telephone);
-    expect(Math.min(ordre.hautDeLaJournee, ordre.hautDesTuiles)).toBeGreaterThanOrEqual(ordre.basDeLEnTete);
+    expect(ordre.journeeAvantLaSemaine, 'ordre de lecture').toBe(true);
+    expect(ordre.tuilesDansLeDetail, 'les tuiles dans « Le détail »').toBe(true);
+    expect(ordre.hautDeLaJournee < ordre.hautDeLaSemaine, 'ordre affiché').toBe(true);
+    expect(ordre.hautDeLaJournee).toBeGreaterThanOrEqual(ordre.basDeLEnTete);
   }
-  await verifierLEtape(page, journal, 'la journée avant les tuiles au téléphone');
+  await verifierLEtape(page, journal, 'la journée avant la semaine, les tuiles dans le détail');
 
   // Les pages du menu, dans l'ordre de toujours : les groupes n'en changent pas l'ordre (T1).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
 
   const menu = await ouvrirLeMenuDesPages(page);
   if (telephone) {
-    // Au téléphone : le bouton rond de la barre, la page ouverte, puis la feuille « Plus ».
-    const barre = page.getByRole('navigation', { name: 'Pages principales' });
-    const rond = barre.getByRole('link').first();
-    await expect(rond).toHaveAccessibleName(new RegExp(`^${TITRES_DES_PAGES.aujourdhui}`));
-    await expect(rond.locator('.menu-home-badge')).toBeVisible();
-    await verifierCibleTactile(rond, 'Le bouton rond « Aujourd’hui »');
-    // Il dépasse de la barre : son rond monte au-dessus d'elle.
-    const hautDuRond = await rond.locator('.menu-home-badge').evaluate((element) => element.getBoundingClientRect().top);
-    const hautDeLaBarre = await barre.evaluate((element) => element.getBoundingClientRect().top);
+    // Au téléphone (simplification, lot S3, PR 2, D-331) : « Aujourd'hui », la page ouverte, puis le « + » rond au
+    // centre de la barre, à la place de l'ancien bouton rond ; il dépasse de la barre. Ni encart ni groupes : ils
+    // sont au menu de l'ordinateur.
+    const aujourdhui = menu.getByRole('link').first();
+    await expect(aujourdhui).toHaveAccessibleName(new RegExp(`^${TITRES_DES_PAGES.aujourdhui}`));
+    await expect(aujourdhui).toHaveAttribute('aria-current', 'page');
+    const plus = menu.getByRole('button', { name: 'Arroser ou noter' });
+    await verifierCibleTactile(plus, 'Le « + » de la barre du bas');
+    const hautDuRond = await plus.locator('.phone-bar-plus-badge').evaluate((element) => element.getBoundingClientRect().top);
+    const hautDeLaBarre = await menu.evaluate((element) => element.getBoundingClientRect().top);
     expect(hautDuRond).toBeLessThan(hautDeLaBarre);
-  }
-  // L'encart détaché, en tête : son nom, « Tableau de bord » ; puis les trois groupes titrés, Réglages à part.
-  const encart = menu.locator('a.menu-home');
-  await expect(encart).toHaveCount(1);
-  await expect(encart).toContainText('Tableau de bord');
-  await expect(encart).toHaveAttribute('aria-current', 'page');
-  await expect(menu.locator('.menu-group-title')).toHaveText(GROUPES);
-  await expect(menu.locator('.menu-settings-item').getByRole('link')).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
-  if (!telephone) {
-    // L'encart est au-dessus du premier groupe, et ne prend pas le vert plein d'une page ouverte.
-    const basDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().bottom);
-    const hautDuGroupe = await menu.locator('.menu-group-title').first().evaluate((element) => element.getBoundingClientRect().top);
-    expect(basDeLEncart).toBeLessThan(hautDuGroupe);
-    expect(await encart.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(255, 255, 255)');
+    await expect(page.getByRole('navigation', { name: 'Pages du module' })).toBeHidden();
   } else {
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
+    // Le « + Arroser ou noter » en tête ; puis l'encart d'« Aujourd'hui », son nom, « Tableau de bord » ; puis les
+    // titres « Semaine » et « Ma ferme », des liens ; Réglages, la dernière page, dans « Ma ferme » (S3, PR 3, D-331).
+    const plus = menu.getByRole('button', { name: 'Arroser ou noter' });
+    await expect(plus).toHaveText('Arroser ou noter');
+    await verifierCibleTactile(plus, 'Le « + Arroser ou noter » du menu');
+    const encart = menu.locator('a.menu-home');
+    await expect(encart).toHaveCount(1);
+    await expect(encart).toContainText('Tableau de bord');
+    await expect(encart).toHaveAttribute('aria-current', 'page');
+    await expect(menu.locator('a.menu-place-title')).toHaveText(TITRES_DES_ENDROITS);
+    await expect(menu.getByRole('link').last()).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
+    await expect(menu.locator('li[data-place="ma-ferme"]').getByRole('link').last()).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
+    // Le bouton au-dessus de l'encart, l'encart au-dessus du premier titre ; l'encart ne prend pas le vert plein d'une page ouverte.
+    const basDuPlus = await plus.evaluate((element) => element.getBoundingClientRect().bottom);
+    const hautDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().top);
+    const basDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().bottom);
+    const hautDuTitre = await menu.locator('a.menu-place-title').first().evaluate((element) => element.getBoundingClientRect().top);
+    expect(basDuPlus).toBeLessThanOrEqual(hautDeLEncart);
+    expect(basDeLEncart).toBeLessThan(hautDuTitre);
+    expect(await encart.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(255, 255, 255)');
   }
-  await verifierLEtape(page, journal, 'menu détaché et groupes');
+  await verifierLEtape(page, journal, 'menu : le « + », l’encart et les endroits');
 
-  // L'en-tête : la date, les chiffres de la semaine, les pastilles.
+  // L'en-tête : la date ; les pastilles à l'ordinateur seulement, la phrase les redit au téléphone (S2-g).
   await expect(page.locator('.today-head .today-date')).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi')).toHaveCount(4);
-  const pastilles = page.getByRole('navigation', { name: 'Résumé du jour' }).getByRole('link');
-  await expect(pastilles.first()).toBeVisible();
+  // Masquées au téléphone, elles sortent de l'arbre d'accessibilité : elles se comptent dans la page.
+  const pastilles = page.locator('nav[aria-label="Résumé du jour"] a');
   const donnees = pastilles.filter({ hasText: /données? à rafraîchir$/ });
   await expect(donnees).toHaveCount(1);
-  if (telephone) await verifierCibleTactile(donnees, 'La pastille des données à rafraîchir');
-  await donnees.click();
-  await expect(page).toHaveURL(/#today-reliability$/);
-  await expect(page.locator('#today-reliability')).toBeInViewport();
-  await verifierLEtape(page, journal, 'une pastille mène à son bloc');
+  if (telephone) {
+    await expect(pastilles.first()).toBeHidden();
+    await ouvrirLeDetailDuJour(page);
+  } else {
+    // Une pastille ouvre « Le détail » sur son bloc (S2, PR 5).
+    await expect(pastilles.first()).toBeVisible();
+    await donnees.click();
+    await expect(page).toHaveURL(/#today-reliability$/);
+    await expect(page.locator('details#today-detail')).toHaveJSProperty('open', true);
+    await expect(page.locator('#today-reliability')).toBeInViewport();
+    await verifierLEtape(page, journal, 'une pastille ouvre le détail sur son bloc');
+  }
+  await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi')).toHaveCount(4);
 
-  // Les tuiles mènent à leur menu (6 nonies, L1, D-310) : chaque tuile est un lien entier, le mot d'action écrit dessus.
-  const tuiles = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi');
+  // Les tuiles mènent à leur menu (6 nonies, L1, D-310) : chaque tuile est un lien entier, le mot d'action écrit dessus ;
+  // « Eau reçue » ouvre la fenêtre « Noter la pluie » quand la pluie compte (S2, PR 4), un bouton du même dessin.
+  const tuiles = page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi');
   await expect(tuiles).toHaveCount(4);
   await expect(tuiles.locator('.today-kpi-action')).toHaveText([
     /^(Modifier les objectifs|Poser un objectif)$/,
-    /^(Noter une pluie mesurée|Voir jour par jour)$/,
+    /^(Noter la pluie|Voir jour par jour)$/,
     /^(Voir par planche|Voir ce qui manque)$/,
     'Voir jour par jour',
   ]);
   for (const tuile of await tuiles.all()) {
-    await expect(tuile).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#/);
+    if (await tuile.evaluate((element) => element.tagName) === 'A') await expect(tuile).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#/);
+    else await expect(tuile).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
     if (telephone) await verifierCibleTactile(tuile, `La tuile « ${await tuile.locator('.today-kpi-label').innerText()} »`);
   }
   // Le nom lu : le titre, le chiffre, puis le mot d'action.
@@ -196,30 +216,38 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
 
   // « Objectif de la semaine » ouvre le volet des objectifs, le champ dans l'écran.
   await tuiles.filter({ hasText: 'Eau visée cette semaine' }).click();
-  await expect(page).toHaveURL(/\/irrigation\/besoins\?season=\d{4}#objectifs-de-la-semaine$/);
+  // L'ancienne adresse mène à la page « Semaine », l'ancre gardée (lot S4, PR 1, F917).
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?season=\d{4}#objectifs-de-la-semaine$/);
   await attendreLaPagePrete(page, 'besoins');
   await expect(page.locator('#objectifs-de-la-semaine')).toHaveAttribute('open', '');
   await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeInViewport();
   await verifierLEtape(page, journal, 'la tuile de l’objectif mène aux objectifs');
 
-  // « Eau reçue » ouvre la pluie mesurée (ou les jours, pour une ferme toute sous abri).
+  // « Eau reçue » ouvre « Noter la pluie » sur la page (S2, PR 4), ou les jours pour une ferme toute sous abri.
   await page.goBack();
   await attendreLaPagePrete(page, 'aujourdhui');
-  const eauRecue = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi').filter({ hasText: 'Eau reçue' });
-  const versLaPluie = (await eauRecue.getAttribute('href'))?.endsWith('#manual-rain') ?? false;
-  await eauRecue.click();
-  await attendreLaPagePrete(page, 'besoins');
-  if (versLaPluie) {
-    await expect(page.locator('#manual-rain')).toHaveAttribute('open', '');
-    await expect(page.locator('#manual-rain').getByLabel('Millimètres')).toBeInViewport();
+  await ouvrirLeDetailDuJour(page);
+  const eauRecue = page.getByRole('region', { name: 'Cette semaine' }).locator('.today-kpi').filter({ hasText: 'Eau reçue' });
+  if (await eauRecue.evaluate((element) => element.tagName) === 'BUTTON') {
+    await eauRecue.click();
+    const fenetre = page.getByRole('dialog', { name: 'Noter la pluie' });
+    await expect(fenetre).toBeVisible();
+    await expect(fenetre.getByLabel('Combien ?')).toBeVisible();
+    // Échap ferme sans rien écrire ; le focus revient à la tuile.
+    await page.keyboard.press('Escape');
+    await expect(fenetre).toBeHidden();
+    await expect(eauRecue).toBeFocused();
   } else {
+    await eauRecue.click();
+    await attendreLaPagePrete(page, 'besoins');
     await expect(page.locator('#weather')).toBeInViewport();
+    await page.goBack();
+    await attendreLaPagePrete(page, 'aujourdhui');
+    await ouvrirLeDetailDuJour(page);
   }
-  await verifierLEtape(page, journal, 'la tuile de l’eau reçue mène à la pluie mesurée');
+  await verifierLEtape(page, journal, 'la tuile de l’eau reçue ouvre la pluie');
 
   // Les jauges mènent à leur page (6 nonies, L2, D-311) : chaque ligne est un lien qui porte sa phrase.
-  await page.goBack();
-  await attendreLaPagePrete(page, 'aujourdhui');
   // La mise en page, par mesures (L5, D-314) : au téléphone, chaque nom de jardin se lit en entier, à 390 et à
   // 360 px ; à l'ordinateur, un bloc étiré garde son contenu en haut, aucune rangée de titre de plus de 60 px à 1440 px.
   if (telephone) {
@@ -237,9 +265,9 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
   const eauDeLaSemaine = page.locator('#today-week-water');
   const lignesEau = eauDeLaSemaine.locator('a.today-bar-row');
   await expect(lignesEau.first()).toHaveAccessibleName(/^Ferme : /);
-  await expect(lignesEau.first()).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#irrigation-needs-title$/);
-  // Le lien du bloc : en tête à l'ordinateur, en bas au téléphone, jamais les deux.
-  await expect(eauDeLaSemaine.getByRole('link', { name: 'Objectifs et besoins', exact: true })).toHaveCount(1);
+  await expect(lignesEau.first()).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#irrigation-needs-title$/);
+  // Le lien du bloc : en tête à l'ordinateur, en bas au téléphone, jamais les deux ; vers « Semaine » depuis S4 (PR 4).
+  await expect(eauDeLaSemaine.getByRole('link', { name: 'Voir la semaine', exact: true })).toHaveCount(1);
   await expect(eauDeLaSemaine.locator(telephone ? '.today-block-foot' : '.today-block-more')).toBeVisible();
   if (telephone) {
     for (const ligne of await lignesEau.all()) await verifierCibleTactile(ligne, `La ligne « ${await ligne.locator('.today-bar-name').innerText()} »`);
@@ -258,6 +286,7 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     await verifierLEtape(page, journal, 'le jardin de l’eau de la semaine ouvre son pli des besoins');
     await page.goBack();
     await attendreLaPagePrete(page, 'aujourdhui');
+    await ouvrirLeDetailDuJour(page);
   }
 
   const sol = page.locator('#today-soil');
@@ -293,7 +322,7 @@ test('« Tout est fait » : la confirmation liste l’irrigation passée, « Ann
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(-6 * 60, reference));
-  await soumettreIrrigation(page, 'Planifier l’irrigation', 'arrosée sans le chrono');
+  await soumettreIrrigation(page, /^Planifier l’arrosage de /, 'arrosée sans le chrono');
 
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(toutEstFait).toHaveAccessibleName('Tout est fait (1)');

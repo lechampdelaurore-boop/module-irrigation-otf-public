@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { FEATURE_IDS, type FeatureId } from '../lib/domain/features/catalogue';
-import { phoneBar, phoneBarLabel } from '../lib/domain/features/phone-bar';
-import { menuPages, pageLabel } from '../lib/domain/features/pages';
+import { phoneBar } from '../lib/domain/features/phone-bar';
+import { menuPages } from '../lib/domain/features/pages';
 import { withRequirements } from '../lib/domain/features/selection';
 import type { ProposalStatus, StoredProposal } from '../lib/domain/planning/contract';
 import { pastDaysLabel, phoneWeekFolds, planSummaryLine } from '../lib/domain/planning/phone-week';
@@ -19,60 +19,20 @@ import { isLimitedAlertStatus, isSystemAlertsBannerFolded, systemAlertsMemoryAft
 
 const ALL: FeatureId[] = [...FEATURE_IDS];
 
-// Barre du bas (F6).
+// Barre du bas (F6) : remplacée par les trois endroits et le « + » (simplification, lot S3, PR 2,
+// D-331, docs/simplification-s3-contract.md, section 4). Ses règles se testent dans
+// tests/simplification-s3-barre.test.ts ; ici, ce que F6 garde : la page la plus utilisée au
+// champ en tête, et la barre suit le menu.
 
-test('cas 1 : toutes cases cochées, quatre entrées et « Plus », qui ouvre toutes les pages', () => {
+test('F6 réécrite par S3 : « Aujourd’hui » en tête de la barre, plus de « Plus », chaque page joignable', () => {
   const menu = menuPages(ALL);
-  const bar = phoneBar(menu, 'arrosages');
-  assert.deepEqual(bar.entries, ['aujourdhui', 'arrosages', 'planning', 'ressources']);
-  assert.equal(bar.more, true);
-  assert.equal(bar.moreMarked, false);
-  assert.equal(menu.length, 12, '« Plus » liste les douze pages');
-  assert.equal(menu[0], 'aujourdhui');
-  assert.equal(menu.at(-1), 'reglages');
-});
-
-test('cas 2 : un menu de cinq pages ou moins tient entier dans la barre, sans « Plus »', () => {
-  // Arrosages a besoin de Matériel : le menu compte Aujourd'hui, Arrosages, Matériel, Historique et Réglages.
-  const menu = menuPages(withRequirements(['arrosages', 'historique']));
-  assert.deepEqual(menu, ['aujourdhui', 'arrosages', 'materiel', 'historique', 'reglages']);
-  assert.deepEqual(phoneBar(menu, 'historique'), { entries: menu, more: false, moreMarked: false });
-  // Sans « Aujourd'hui » (Matériel et Calculateur seuls) : deux pages, toutes dans la barre.
-  const two = menuPages(withRequirements(['calculateur']));
-  assert.deepEqual(two, ['materiel', 'reglages']);
-  assert.equal(phoneBar(two, null).more, false);
-  const six = menuPages(withRequirements(['arrosages', 'historique', 'alertes-meteo']));
-  assert.equal(six.length, 6);
-  assert.deepEqual(phoneBar(six, null).entries, ['aujourdhui', 'arrosages', 'materiel', 'alertes-meteo']);
-  assert.equal(phoneBar(six, null).more, true);
-});
-
-test('cas 3 : la page ouverte hors de la barre fait porter la pastille verte à « Plus »', () => {
-  const menu = menuPages(ALL);
-  assert.equal(phoneBar(menu, 'sol').moreMarked, true);
-  assert.equal(phoneBar(menu, 'reglages').moreMarked, true);
-  assert.equal(phoneBar(menu, 'planning').moreMarked, false);
-  // La page introuvable n'a pas de page courante : rien à signaler.
-  assert.equal(phoneBar(menu, null).moreMarked, false);
-});
-
-test('une page prioritaire décochée laisse sa place à la suivante du menu, et la barre suit l’ordre du menu', () => {
-  // Sans planning ni ressources : Aujourd'hui, Arrosages, puis les pages suivantes du menu.
-  const menu = menuPages(withRequirements(['arrosages', 'besoins', 'sol', 'historique', 'alertes-meteo']));
-  assert.deepEqual(menu, ['aujourdhui', 'arrosages', 'besoins', 'sol', 'cultures', 'materiel', 'alertes-meteo', 'historique', 'reglages']);
-  assert.deepEqual(phoneBar(menu, null).entries, ['aujourdhui', 'arrosages', 'besoins', 'sol']);
-  // Sans arrosages du tout : les pages du début du menu.
-  const sansArrosages = menuPages(['materiel', 'alertes-meteo', 'alertes-cultures', 'calculateur']);
-  assert.deepEqual(sansArrosages, ['aujourdhui', 'materiel', 'alertes-meteo', 'alertes-cultures', 'reglages']);
-  assert.equal(phoneBar(sansArrosages, null).more, false);
-});
-
-test('la barre porte un nom court sous l’icône, le nom entier restant celui de la page', () => {
-  assert.equal(phoneBarLabel('planning', pageLabel('planning')), 'Planning');
-  assert.equal(phoneBarLabel('ressources', pageLabel('ressources')), 'Ressources');
-  assert.equal(phoneBarLabel('arrosages', pageLabel('arrosages')), 'Arrosages');
-  assert.equal(phoneBarLabel('alertes-meteo', pageLabel('alertes-meteo')), 'Alertes météo');
-  for (const page of menuPages(ALL)) assert.ok(phoneBarLabel(page, pageLabel(page)).length <= 16, page);
+  assert.equal(menu.length, 14, 'les douze pages, « Semaine » (lot S4, PR 1) et « Ma ferme » (lot S3, PR 1)');
+  const bar = phoneBar(menu, 'arrosages', true);
+  assert.deepEqual(bar.map((item) => (item.kind === 'plus' ? 'plus' : item.place)), ['aujourdhui', 'semaine', 'plus', 'ma-ferme']);
+  // Un menu de cinq pages ou moins ne tient plus entier dans la barre : la barre montre ses endroits.
+  const small = menuPages(withRequirements(['arrosages']));
+  assert.deepEqual(small, ['aujourdhui', 'arrosages', 'materiel', 'ma-ferme', 'reglages']);
+  assert.deepEqual(phoneBar(small, null, true).map((item) => (item.kind === 'plus' ? 'plus' : item.place)), ['aujourdhui', 'plus', 'ma-ferme']);
 });
 
 // Planning replié (F11).

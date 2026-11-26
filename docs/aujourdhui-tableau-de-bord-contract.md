@@ -40,6 +40,15 @@ le lot 3 de l'audit et les correctifs de la 3.9.
 - Les gestes : « Démarrer maintenant », « Ouvrir », « Recalculer le plan »,
   « Voir les alertes » et les gestes de la fiabilité restent les mêmes
   actions, aux mêmes adresses et ancres (F36, F37, F39).
+  **Réécrit par la simplification, lot S2**
+  (`docs/simplification-s2-contract.md`, section 10 ; D-330) : les actions restent les mêmes ; les mots sont ceux de
+  la carte à un bouton, « Valider » et « Démarrer » s'y ajoutent sur la carte
+  d'une proposition et d'une irrigation planifiée (PR 1), « Terminer »,
+  « Reprendre », « Mettre en pause » et « Reprendre ce qui reste » sur ce qui
+  coule ou attend d'être repris (PR 2), « Je le fais maintenant » et « C’est
+  fait » sur l'arrosage à rattraper (PR 3) ; « Noter la pluie », de la tuile
+  « Eau reçue » et de la ligne « Pluie réelle incomplète », ouvre sa fenêtre
+  sur la page au lieu de mener à « Objectifs et besoins » (PR 4).
 - L'adresse, la place de première page et de page d'arrivée (F1, F31), la
   saison du jour (F2, F32), la pastille du menu et son compte (F12, F33).
 - La règle de présence : un bloc n'existe que si sa fonctionnalité est
@@ -70,9 +79,20 @@ le lot 3 de l'audit et les correctifs de la 3.9.
   Besoin par culture), **Équiper** (Matériel et placement, Ressources et
   pompes), **Surveiller** (Alertes météo, Alertes cultures, Historique et
   cumuls). Réglages reste en bas, à part. Un groupe sans page cochée
-  disparaît.
+  disparaît. **Réécrit par la simplification S3, PR 3 (D-331)** : à la place
+  des trois groupes, les trois endroits, tous dépliés, sous le bouton
+  « + Arroser ou noter » : « Aujourd'hui » dans son encart (inchangé) puis
+  Arrosages ; le titre « Semaine », un lien vers sa première page cochée,
+  puis Planning de la semaine, Objectifs et besoins, Historique et cumuls ;
+  le titre « Ma ferme », un lien vers la page « Ma ferme », puis ses fiches,
+  Réglages comprise, qui n'est plus à part. Un endroit sans page cochée
+  disparaît (`docs/simplification-s3-contract.md`, section 6).
 - Au téléphone, l'onglet « Aujourd'hui » de la barre du bas est un bouton
   rond vert qui dépasse de la barre, séparé des autres par un filet.
+  **Réécrit par la simplification S3, PR 2 (D-331)** : le rond vert du
+  centre de la barre est le « + » ; « Aujourd'hui » est une entrée comme
+  « Semaine » et « Ma ferme », avec sa pastille. Les groupes du menu de
+  l'ordinateur changent à la PR 3 du lot (ci-dessus).
 
 ### 3.2 La page, de haut en bas
 
@@ -80,7 +100,7 @@ le lot 3 de l'audit et les correctifs de la 3.9.
 | --- | --- | --- |
 | En-tête | toujours | sous le seul titre de la page, la date du jour en toutes lettres en sous-titre (« Jeudi 12 novembre » ; « Tableau de bord » n'y est plus redit, audit final, lot A, J13, D-141), la ligne du plan (« Plan calculé aujourd'hui à 6 h 02 · Recalculer »), une phrase de résumé (3.5) et des pastilles cliquables qui mènent au bloc : n à rattraper, n à faire (le chiffre seul, la phrase dit le reste, J13), le gel ou l'alerte annoncés, la prévision à vérifier, n données à rafraîchir ; rien de tout cela : des pastilles vertes (« Rien à arroser », « Rien d'annoncé sur trois jours », « Données à jour ») ; la ligne du plan, calculé ou non, mène au planning de la semaine (`docs/aujourdhui-liens-contract.md`, L3, D-312) |
 | La semaine | Objectifs et besoins | quatre tuiles : objectif de la semaine (ferme entière, pondéré par la surface), eau reçue (irrigation réelle + pluie comptée, avec le détail ; la pluie dit d'où elle vient, mesurée, estimée après coup ou prévue, audit du 19 novembre 2026, lot H, F429, D-173), reste à apporter (l'écart existant, jamais négatif), eau utilisée en m³ (et celle du jour, « rien aujourd'hui » quand il n'y en a pas) quand le tableau de l'eau existe, « au moins » quand une surface mouillée manque ; chaque tuile mène à son menu d'« Objectifs et besoins », son mot d'action écrit (`docs/aujourdhui-liens-contract.md`, L1, D-310) |
-| Votre journée | Planning ou Arrosages | tout en tête, « En cours (n) » : chaque irrigation dont le minuteur tourne, est en pause ou attend sa confirmation (« depuis 9 h 40, fin prévue à 13 h 50 », « en pause depuis 10 h 05 », « Durée atteinte : fermer la vanne »), avec « Arrêter / Terminer » qui ouvre sa carte sur « Arrosages », et chaque reliquat d'une irrigation partielle (« reste 3 h 10 · 1,52 m³ ») avec « Reprendre le reliquat » ; la phrase et les pastilles les comptent, jamais « Rien à arroser » vanne ouverte (audit du 19 novembre 2026, lot H, n° 2, F433 à F435, D-175) ; puis les anciens blocs « En retard » et « À faire aujourd'hui » réunis : à l'ordinateur, une frise de 5 h à 22 h avec l'heure actuelle et une barre par irrigation du jour (couleur du statut, longueur = durée) ; puis « À rattraper (n) » et « À faire aujourd'hui (n) », en cartes par heure (heure en grand, matériel et réglage, planches, durée et millimètres en étiquettes, statut, boutons) ; une carte « À valider » dit « Valider au planning », une carte planifiée « Ouvrir » ; rien à faire : « Voir le planning de la semaine » (« Planning » coché) ou « Planifier un arrosage » (« Arrosages » seul) (L3, D-312) |
+| Votre journée | Planning ou Arrosages | tout en tête, « En cours (n) » : chaque irrigation dont le minuteur tourne, est en pause ou attend sa confirmation (« depuis 9 h 40, fin prévue à 13 h 50 », « en pause depuis 10 h 05 », « Durée atteinte : fermer la vanne »), avec, depuis la simplification S2, PR 2 (D-330), « Terminer », qui ouvre sur la page la fenêtre de fin d'« Arrosages », « Mettre en pause » rangé dans « Autres choix », « Reprendre » une pause, le compte à rebours « Reste 52 min » ou « Fermez la vanne, puis appuyez sur « Terminer ». » (avant : « Arrêter / Terminer », qui ouvrait sa carte sur « Arrosages »), et chaque reliquat d'une irrigation partielle (« reste 3 h 10 · 1,52 m³ ») avec « Reprendre ce qui reste » ; la phrase et les pastilles les comptent, jamais « Rien à arroser » vanne ouverte (audit du 19 novembre 2026, lot H, n° 2, F433 à F435, D-175) ; puis les anciens blocs « En retard » et « À faire aujourd'hui » réunis : à l'ordinateur, une frise de 5 h à 22 h avec l'heure actuelle et une barre par irrigation du jour (couleur du statut, longueur = durée) ; puis « À rattraper (n) » et « À faire aujourd'hui (n) », en cartes par heure (heure en grand, matériel et réglage, planches, durée et millimètres en étiquettes, statut, boutons) ; une carte « À valider » porte « Valider », « Démarrer tout de suite » et « Autres choix » (« Changer l'heure ou la dose », « Pas à cette heure »), une carte planifiée « Démarrer » et « Autres choix » (« Modifier ou annuler sur « Arrosages » ») (simplification, lot S2, PR 1, D-330) ; rien à faire : « Voir le planning de la semaine » (« Planning » coché) ou « Planifier un arrosage » (« Arrosages » seul) (L3, D-312) |
 | Gel ou chaleur | Alertes cultures et/ou Alertes météo | les trois jours en cartes : icône, minimale et maximale sur une échelle commune avec le trait de 0 °C, pluie prévue ; le jour d'une alerte encadré en rouge avec ses cultures ou son alerte ; prévision absente : la carte du jour dit « inconnue » et le bloc « Prévision indisponible : à vérifier » en ambre ; une minimale prévue à 0 °C ou moins sans alerte de gel active ni gel des cultures annoncé, « Alertes météo » coché : « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. » en ambre, avec le lien « Poser « Gel : moins de 3 °C » » vers le modèle, et la pastille « Gel sans alerte posée » au lieu de « Rien d'annoncé sur trois jours » (audit final, lot A, J14, D-140) ; un jour en alerte est un lien entier vers la page de son alerte, « Voir l’alerte » écrit dessous, le gel des cultures d'abord ; un jour calme reste inerte (L3, D-312, F761) |
 | Eau de la semaine | Objectifs et besoins | une barre par jardin (et une pour la ferme) : irrigation et pluie empilées (la légende nomme l'origine de la pluie, F429), trait de l'objectif, « 8 / 20 mm » ; huit jardins d'emblée, les autres derrière « Voir les n autres jardins » ; la ligne de la ferme mène au tableau des besoins, celle d'un jardin à son pli dans ce tableau (`docs/aujourdhui-liens-contract.md`, L2, D-311) |
 | Réserve du sol | Réserve du sol | une jauge par jardin : part de la réserve facilement utilisable estimée maintenant (celle de la page « Réserve du sol »), et la planche la plus sèche du jardin (T7) ; jardin jamais observé : « inconnue », barre vide hachurée ; huit jardins d'emblée ; chaque ligne mène au pli de son jardin sur « Réserve du sol » (L2, D-311) |
@@ -95,6 +115,29 @@ passe dessous, pour ne pas laisser de grand vide (J13, D-141) ;
 côté de « Fiabilité du calcul ». Au téléphone : une colonne, dans le même
 ordre, la frise remplacée par les cartes seules, chaque bouton à 44 px ;
 la page peut dépasser deux écrans (T10).
+
+**Réécrit par la simplification, lot S2, PR 5** (`docs/simplification-s2-contract.md`,
+sections 8 et 10 ; D-330) : la page a **deux niveaux**, dans le même ordre à
+toutes les largeurs. Au premier niveau : l'en-tête (les pastilles quittent le
+téléphone, la phrase les redit ; elles restent à l'ordinateur) ; « Votre
+journée », sans la frise ; « Gel ou chaleur » seulement pour un jour **en
+alerte** (en carte), la prévision qui manque ou le gel sans alerte posée (J14) ;
+« La semaine » en **une barre** pour la ferme entière, avec la phrase de
+l'objectif de S1, l'eau reçue et ce qui manque, « Voir la semaine » et « Noter
+la pluie » (sans objectif : « Aucun objectif posé pour cette semaine. » et
+« Poser un objectif ») ; une seule ligne « Calcul approximatif » quand une
+donnée manque (la première, son geste, « + n autres ») ; une ligne d'eau
+seulement quand une réserve ou une limite le demande. Tout le reste est dans
+un seul pli fermé, **« Le détail »**, dont la ligne de résumé compte ce qu'il
+contient (« 4 chiffres · 3 jardins · 2 données à rafraîchir ») : les quatre
+tuiles de la semaine, « Eau de la semaine », « Réserve du sol », « Eau
+disponible », « Fiabilité du calcul », « Gel ou chaleur » en entier et la frise
+du jour, chaque bloc avec ses liens, ses boutons et ses réponses. Aucun bloc
+n'est retiré. Les ancres existantes (`#today-weather`, `#today-reliability`,
+`#today-water`, `#today-week-water`, `#today-soil`…) ouvrent le pli sur leur
+bloc, à l'arrivée sur la page comme d'un clic ; une pastille de l'ordinateur
+aussi. La règle de ce que garde le premier niveau vit dans
+`lib/domain/today/essential.ts`.
 
 ### 3.3 Beaucoup de retards
 
@@ -123,7 +166,7 @@ la PR 3 de ce contrat et reprise par le lot 3.
 - **Ce qui est enregistré** : chaque irrigation devient réalisée **telle que
   prévue**, à son heure de début prévue, avec sa durée, son matériel, son
   réglage et sa dose prévus (le volume en découle comme pour une saisie
-  « Déjà réalisée »). **Choix du porteur, le 8 novembre 2026** (« Tel que
+  « Déjà fait », « Déjà réalisée » avant S5). **Choix du porteur, le 8 novembre 2026** (« Tel que
   prévu »), parce que ce point touche les données réelles qui entrent dans
   l'écart.
 - **Garde-fou** : rien n'est enregistré au premier clic. Le bouton ouvre une
@@ -134,7 +177,11 @@ la PR 3 de ce contrat et reprise par le lot 3.
   confirmation rappelle pourquoi les irrigations à venir n'y sont pas.
 - **Après** : un message « n irrigations enregistrées comme faites », sous
   le bouton, en tête de « Votre journée » (`docs/aujourdhui-liens-contract.md`,
-  L4, D-313 ; sous sa carte pour « Fait comme prévu ») ; la page se relit,
+  L4, D-313 ; sous sa carte pour « Fait comme prévu », qui se dit « C’est
+  fait » sur la carte depuis la simplification S2, PR 3, D-330, la règle, la
+  confirmation et la fonction inchangées, et sur la ligne d'« Arrosages »
+  depuis la simplification S5, section 6.1, D-334, la confirmation gardant
+  son titre « Fait comme prévu ? ») ; la page se relit,
   la pastille du menu baisse. L'historique dit chacune
   « Planifiée, faite comme prévu ». Une irrigation enregistrée **ne se
   modifie plus** (D-006, T16) : la confirmation le dit en gras, et c'est
@@ -250,24 +297,28 @@ de 2 m³ »).
 
 | N° | Précision | Choix |
 | --- | --- | --- |
-| T1 | Groupes du menu | Arroser, Équiper, Surveiller ; Réglages à part en bas |
+| T1 | Groupes du menu | Arroser, Équiper, Surveiller ; Réglages à part en bas. **Réécrit par S3, PR 3 (D-331)** : les trois endroits, Aujourd'hui, Semaine, Ma ferme, tous dépliés ; Réglages dans « Ma ferme » |
 | T2 | Seuil de repli des retards | plus de trois le même jour passé |
 | T3 | Bornes de la frise | 5 h à 22 h, élargies à l'heure ronde si une irrigation du jour en sort |
 | T4 | « Eau de la semaine » | la semaine en cours, du lundi au dimanche (D-004), par jardin, comme « Objectifs et besoins » |
-| T5 | Ordre des blocs | celui du 3.2 ; le gel annoncé n'est plus remonté en tête, il est déjà en tête à droite et dans les pastilles ; **au téléphone** (page de 620 px ou moins), « Votre journée » et « Gel ou chaleur » passent juste après l'en-tête, avant les tuiles de la semaine, toujours, à l'écran comme dans l'ordre de lecture ; à l'ordinateur, l'ordre ne change pas (`docs/aujourdhui-liens-contract.md`, L6, D-315, 24 novembre 2026) |
+| T5 | Ordre des blocs | celui du 3.2 ; le gel annoncé n'est plus remonté en tête, il est déjà en tête à droite et dans les pastilles ; **au téléphone** (page de 620 px ou moins), « Votre journée » et « Gel ou chaleur » passent juste après l'en-tête, avant les tuiles de la semaine, toujours, à l'écran comme dans l'ordre de lecture ; à l'ordinateur, l'ordre ne change pas (`docs/aujourdhui-liens-contract.md`, L6, D-315, 24 novembre 2026). **Réécrit par S2, PR 5 (D-330)** : l'ordre de la section 8 du contrat S2, le même à toutes les largeurs : l'en-tête, « Votre journée » et « Gel ou chaleur » (alerte seule), « La semaine » en une barre, « Calcul approximatif », la ligne d'eau, puis « Le détail » ; L6 tient |
 | T6 | Fiabilité | les données à jour s'affichent, cochées en vert |
 | T7 | Réserve du sol | pas de trait de seuil par jardin : les seuils de la réserve sont par planche, un seuil de jardin serait une règle nouvelle ; la planche la plus sèche du jardin est nommée à la place |
 | T8 | Icône de la pluie | un jour de 1 mm de pluie prévue ou plus porte la goutte ; le gel prime |
 | T9 | Jardins montrés | huit d'emblée dans « Eau de la semaine » et « Réserve du sol », les autres derrière « Voir les n autres jardins ». Depuis le 19 novembre 2026 (audit, lot H, n° 4, F430 à F432, D-174), les huit sont ceux qui comptent : d'abord les jardins qui ont une irrigation aujourd'hui ; puis, pour l'eau, les plus loin de leur objectif, puis ceux sans objectif ; pour le sol, les plus secs, puis les « inconnue », puis « aucune planche cultivée » ; à égalité, l'ordre naturel. Les autres, repliés, dans l'ordre naturel (« bloc 2 » avant « bloc 10 ») |
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** « Eau de la semaine » mène à « Semaine », la
+semaine en cours, chaque ligne à l'ancre de son jardin ; le lien du bloc dit
+« Voir la semaine ».
 
 **Précisions de la PR 2 (les écrans)**, tranchées en codant par la même
 consigne :
 
 | N° | Précision | Choix |
 | --- | --- | --- |
-| T10 | Hauteur au téléphone | la limite de deux écrans de la page du lot 2 (F42) est levée : la maquette validée met tous les blocs en une colonne. La date, la ligne du plan, les pastilles et la phrase du jour tiennent dans le premier écran ; chaque pastille mène à son bloc |
+| T10 | Hauteur au téléphone | la limite de deux écrans de la page du lot 2 (F42) est levée : la maquette validée met tous les blocs en une colonne. La date, la ligne du plan, les pastilles et la phrase du jour tiennent dans le premier écran ; chaque pastille mène à son bloc. **Réécrit par S2, PR 5 (D-330)** : le budget de la section 8 du contrat S2, à 390 px, pour une proposition à valider : le premier niveau au plus 1 600 px, le bouton principal de la première carte à moins de 600 px du haut, au plus 12 choses à toucher ; P62 le mesure |
 | T11 | « Recalculer » dans l'en-tête | quand le plan existe, un lien-geste « Recalculer » (nommé « Recalculer le plan ») suit la ligne du plan : la même action que le bouton de la fiabilité ; sans plan, la ligne mène au planning comme avant |
-| T12 | Phrases des blocs dessinés | les phrases de « Gel ou chaleur » (quand une alerte est dessinée) et d'« Eau disponible » restent dans la page pour un lecteur d'écran, cachées à l'œil ; la phrase calme ou le manque de prévision restent visibles |
+| T12 | Phrases des blocs dessinés | les phrases de « Gel ou chaleur » (quand une alerte est dessinée) et d'« Eau disponible » restent dans la page pour un lecteur d'écran, cachées à l'œil ; la phrase calme ou le manque de prévision restent visibles. Depuis S2, PR 5 (D-330), cela tient dans « Le détail » ; au premier niveau, « Gel ou chaleur » dit le jour en alerte par sa carte et la prévision qui manque en clair |
 | T13 | Fiabilité | un manque montré dit sa propre phrase sous le nom de la donnée ; le résumé (« 5 jours manquants : … ») ne reste que pour une donnée à jour ou dont les lignes sont repliées |
 | T14 | Menu de la tablette | entre 600 et 980 px, la bande du bas garde une seule rangée de pilules : « Aujourd'hui » y garde sa pastille ronde, les titres des groupes s'effacent |
 

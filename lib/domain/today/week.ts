@@ -109,7 +109,12 @@ type WeekRow = {
  * téléphone, rien d'autre ne dit qu'elle est un lien. Un lien mène, il
  * n'enregistre rien (D-028).
  */
-export type TodayTileLink = { label: string; page: 'besoins'; anchor: string };
+/**
+ * Le lien d'une tuile. `rain` : la tuile ouvre la fenêtre « Noter la pluie »
+ * (simplification S2, PR 4 ; L1 réécrite), le lien vers « Objectifs et
+ * besoins » restant dans la fenêtre, pour retirer ou voir jour par jour.
+ */
+export type TodayTileLink = { label: string; page: 'semaine'; anchor: string; rain?: true };
 
 /** Les volets et tableaux d'« Objectifs et besoins » que les tuiles visent (water-management-dashboard.tsx, irrigation-needs-dashboard.tsx). */
 const WEEK_OBJECTIVES_ANCHOR = 'objectifs-de-la-semaine';
@@ -340,11 +345,35 @@ export function moreGardensLabel(hidden: number): string | null {
 }
 
 /**
+ * Ce que « Eau de la semaine » lit des deux tableaux de la semaine, l'eau et
+ * les besoins par planche : la même lecture pour « Aujourd'hui » et pour la
+ * page « Semaine » (S4, section 6 : une seule fonction pour les deux pages).
+ */
+export function todayWeekInputs(
+  water: { days: readonly Pick<WaterDashboardDay, 'date' | 'manualRainMm' | 'reanalysisRainMm' | 'forecastRainMm' | 'volumeIncomplete'>[]; totals: { realizedIrrigationCubicMeters: number }; todayWater: { realizedIrrigationCubicMeters: number } },
+  needs: { weekStart: string; weekEnd: string; gardens: readonly { beds: readonly TodayWeekBed[] }[] },
+  today: string,
+): TodayWeekInputs {
+  return {
+    weekStart: needs.weekStart,
+    weekEnd: needs.weekEnd,
+    beds: needs.gardens.flatMap((garden) => garden.beds),
+    water: {
+      weekCubicMeters: water.totals.realizedIrrigationCubicMeters,
+      todayCubicMeters: water.todayWater.realizedIrrigationCubicMeters,
+      incomplete: water.days.some((day) => day.volumeIncomplete),
+    },
+    rainOrigins: pastRainOrigins(water.days, today),
+  };
+}
+
+/**
  * La semaine de la ferme et de chaque jardin ; `null` sans planche de la
  * saison. `irrigatedToday` : les jardins qui ont une irrigation aujourd'hui,
- * montrés d'abord (F430).
+ * montrés d'abord (F430). `gardensShown` : les jardins montrés d'emblée, huit
+ * sur « Aujourd'hui », dix sur la page « Semaine » (S4-j).
  */
-export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<string> = new Set()): TodayWeek | null {
+export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<string> = new Set(), gardensShown = WEEK_GARDENS_SHOWN): TodayWeek | null {
   if (input.beds.length === 0) return null;
   const gardens = new Map<string, { name: string; beds: TodayWeekBed[] }>();
   for (const bed of input.beds) {
@@ -358,7 +387,7 @@ export function todayWeek(input: TodayWeekInputs, irrigatedToday: ReadonlySet<st
     return [probe.objectiveMm, probe.receivedMm ?? probe.irrigationMm];
   }));
   const [farm, ...rows] = groups.map((group) => row(group.key, group.name, group.beds, max));
-  const { shown, hidden } = shownFirst(rows, byWeekPriority(irrigatedToday), WEEK_GARDENS_SHOWN);
+  const { shown, hidden } = shownFirst(rows, byWeekPriority(irrigatedToday), gardensShown);
   const mm = (value: number | null) => (value === null ? null : mmText(rounded(value)));
   const water = input.water;
   const volume = (value: number) => `${water?.incomplete ? 'au moins ' : ''}${waterText(value, 'm³')}`;
@@ -414,10 +443,10 @@ function waterTodayText(water: NonNullable<TodayWeekInputs['water']>, volume: (v
  * tableau des besoins par planche ; l'eau utilisée aux jours de la semaine.
  */
 function weekLinks(farm: WeekRow): TodayWeek['links'] {
-  const besoins = (label: string, anchor: string): TodayTileLink => ({ label, page: 'besoins', anchor });
+  const besoins = (label: string, anchor: string): TodayTileLink => ({ label, page: 'semaine', anchor });
   return {
     objective: besoins(farm.objectiveMm === null ? 'Poser un objectif' : 'Modifier les objectifs', WEEK_OBJECTIVES_ANCHOR),
-    received: farm.sheltered ? besoins('Voir jour par jour', WEEK_DAYS_ANCHOR) : besoins('Noter une pluie mesurée', MEASURED_RAIN_ANCHOR),
+    received: farm.sheltered ? besoins('Voir jour par jour', WEEK_DAYS_ANCHOR) : { ...besoins('Noter la pluie', MEASURED_RAIN_ANCHOR), rain: true },
     remaining: besoins(farm.remainingMm === null ? 'Voir ce qui manque' : 'Voir par planche', NEEDS_TABLE_ANCHOR),
     water: besoins('Voir jour par jour', WEEK_DAYS_ANCHOR),
   };

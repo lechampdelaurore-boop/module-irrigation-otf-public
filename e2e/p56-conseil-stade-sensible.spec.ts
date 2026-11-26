@@ -5,6 +5,7 @@ import { nomUnique } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
   ouvrirLaCorrespondanceDesEspeces,
+  ouvrirLesPlisAutour,
   ouvrirParClic,
   surveillerLaConsole,
   verifierCibleTactile,
@@ -217,6 +218,8 @@ async function ouvrirLeJardinDe(page: Page, planche: string): Promise<Locator> {
   const jardin = page.locator('.irrigation-needs-gardens > details').filter({
     has: page.locator('article.irrigation-need-card header strong', { hasText: new RegExp(`^${planche}$`) }),
   });
+  // Dans « Ce qu'il reste à arroser », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(jardin);
   await jardin.scrollIntoViewIfNeeded();
   const bascule = carte.locator('label.need-toggle');
   await expect(async () => {

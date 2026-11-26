@@ -4,8 +4,11 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Icon } from './line-icon';
 
 /**
- * « Fait comme prévu » en un geste (audit ergonomique, lot 3, point 6.5,
- * docs/audit-ergonomie-lot3-contract.md, section 3, cas 7, précision F43) :
+ * « C'est fait » en un geste (audit ergonomique, lot 3, point 6.5 ; le mot
+ * de la carte d'« Aujourd'hui » depuis la simplification S5, section 6.1,
+ * D-334 ; la confirmation garde son titre « Fait comme prévu ? », le même
+ * que sur « Aujourd'hui »), docs/audit-ergonomie-lot3-contract.md,
+ * section 3, cas 7, précision F43 :
  * sur une ligne « À traiter » de « Arrosages » et sur « Votre journée »
  * d'« Aujourd'hui ». Rien n'est enregistré au premier clic : une confirmation
  * d'une ligne répète l'irrigation, son heure et son volume, et dit qu'elle ne
@@ -38,9 +41,9 @@ export function DoneAsPlannedButton({ title, confirmation, pending, onConfirm }:
 
   return (
     <>
-      <button type="button" className="done-as-planned" disabled={pending} aria-label={`Fait comme prévu : ${title}`} onClick={() => setOpen(true)}>
+      <button type="button" className="done-as-planned" disabled={pending} aria-label={`C’est fait : ${title}`} onClick={() => setOpen(true)}>
         <Icon name="coche" />
-        Fait comme prévu
+        C’est fait
       </button>
       <dialog ref={dialog} className="done-as-planned-dialog" aria-labelledby={titleId} onClose={() => setOpen(false)}>
         <h3 id={titleId}>Fait comme prévu ?</h3>

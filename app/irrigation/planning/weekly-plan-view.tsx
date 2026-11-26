@@ -1,246 +1,149 @@
 'use client';
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState, useTransition, type CSSProperties, type ReactNode, type RefObject } from 'react';
-import { notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
+import type { ReactNode } from 'react';
 import { priorityLabel } from '@/lib/domain/irrigation-feasibility';
-import type { PlanBedOutcome, PlanEventNotice, StoredPlanSuggestion, StoredProposal, StoredWeeklyPlan, SupplyBudget } from '@/lib/domain/planning/contract';
+import type { PlanBedOutcome, StoredWeeklyPlan, SupplyBudget } from '@/lib/domain/planning/contract';
 import {
-  PROPOSAL_STATUSES,
-  PROPOSAL_STATUS_LABELS,
   arbitrationNote,
   bedReasonLabels,
   budgetDemandText,
   budgetLevelsText,
   calculationTriggerLabel,
   pendingEventNotice,
-  planDays,
-  proposedIds,
-  summarizePlan,
-  unplacedBeds,
   unplacedReasonsExpertNote,
   waterDeficitExplanation,
-  type PlanDay,
   type PlanSummary,
 } from '@/lib/domain/planning/presentation';
-import { budgetValidatedNote, overcommittedDayNotice, shortageAction, waterReceivedWithoutShareMm } from '@/lib/domain/planning/shortage-reading';
+import { budgetValidatedNote, shortageAction } from '@/lib/domain/planning/shortage-reading';
 import { hasPumpTimeDeficit, hasWaterDeficit, pumpTimeDeficitDetail, pumpTimeDeficitValue, uncountedWaterCount, unknownWaterChainCount, waterDeficitTileDetail, waterDeficitValue } from '@/lib/domain/planning/water-deficit-summary';
-import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
-import type { PlanningSettings } from '@/lib/domain/planning/settings';
-import { millisecondsFromSeconds } from '@/lib/domain/units';
-import {
-  applyPlanSuggestionAction,
-  computeWeeklyPlanAction,
-  keepPlanSuggestionAction,
-  loadWeeklyPlanAction,
-  refusePlanProposalAction,
-  validateAdjustedPlanProposalAction,
-  validatePlanProposalsAction,
-  type ProposalsActionResult,
-} from '../planning-actions';
-import { ChangesFold, SuggestionList, type SuggestionFeedback } from './follow-up-blocks';
+import { ChangesFold, SuggestionList } from './follow-up-blocks';
 import { PlanningSettingsForm } from './planning-settings-form';
 import { ProtectedSlotsSection } from './protected-slots-section';
-import { ProposalCard, type ProposalFeedback } from './proposal-card';
-import type { ProposalSoilNote } from '@/lib/domain/soil-reserve/proposal-soil';
-import { capitalize, formatDateTime, formatLongDay, formatShortDay, formatVolume, formatWeekdayAndDay } from './format';
+import { formatDateTime, formatShortDay, formatVolume } from './format';
 import { unplacedOrigin } from '@/lib/domain/planning/origins';
-import { planDayCells, planWeekRows, type PlanWeekRow } from '@/lib/domain/planning/week-grid';
-import { dayValidateShown, pastDaysLabel, phoneWeekFolds, planSummaryLine, unplacedFoldLabel, type PhoneDayFold } from '@/lib/domain/planning/phone-week';
-import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionCounts, planActionLine, planActionTiles, unplacedDeficitCount, unplacedGroups, unplacedTileDetail, waitingBedCount, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
-import { pageHref } from '@/lib/domain/features/pages';
+import { planSummaryLine, unplacedFoldLabel } from '@/lib/domain/planning/phone-week';
+import { UNPLACED_GROUP_MEANING, informationalBedCount, planActionLine, planActionTiles, unplacedDeficitCount, unplacedTileDetail, waitingBedCount, type UnplacedGroups } from '@/lib/domain/planning/action-summary';
+import { pageHref, pagePath } from '@/lib/domain/features/pages';
+import { hrefWithIntent } from '../shell/url-intent';
+import { planLine } from '@/lib/domain/today/today-view';
 import { Icon, type IconName } from '../line-icon';
 import { FigureOrigin } from '../shell/figure-origin';
-import { ConfirmDialog } from '../shell/confirm-dialog';
-import { refusalMessage, refusalReplacement } from '@/lib/domain/planning/refusal-replacement';
-import { proposalsText } from '@/lib/domain/display-words';
-
-type Props = {
-  season: number;
-  initialNowIso: string;
-  initialPlan: StoredWeeklyPlan | null;
-  initialSettings: PlanningSettings;
-  /** Les créneaux protégés de l'exploitation, dans le pli des réglages (3.8 ter, section 7). */
-  initialProtectedSlots: ProtectedSlot[];
-  /** La dose au-delà de ce que le sol retient, par proposition, calculée au chargement de la page (5 ter, PR 3d). */
-  soilNotes?: Record<string, ProposalSoilNote[]>;
-  /** L'écran de répartition de « Ressources », ou rien sans la faisabilité (audit final, lot B, R4, F247). */
-  repartitionHref?: string | null;
-  /** « Ajouter un créneau à la main » : le formulaire « Planifier » est sur la page des arrosages depuis la 3.8. */
-  onAddManualSlot: () => void;
-  /** Un bloc de suivi des semaines passées, après les suggestions et avant la semaine : l'écart du prévu (amélioration n° 5, F735). */
-  followUp?: ReactNode;
-};
-
-/** Les délais entre deux relectures après un événement, en secondes : un recalcul prend de quelques secondes à trois quarts de minute sur le site (point ouvert 34). */
-const REFRESH_DELAYS_SECONDS = [1, 2, 3, 5, 8, 10, 10, 10];
-/** Les signaux que les autres sections envoient après un événement de la règle 4 (3.7) ; le canal porte ceux des autres onglets. */
-const REFRESH_SIGNALS = ['irrigation-events-changed', 'irrigation-needs-source-changed', 'irrigation-feasibility-source-changed'];
+import { AnchoredFold } from '../shell/page-settings-fold';
+import { useWeeklyPlan, type WeeklyPlanState } from './weekly-plan-state';
 
 /**
- * La section « Planning de la semaine » (docs/planning-contract.md,
- * « Interface (3.6) ») : le dernier calcul, son résumé, la semaine en jours
- * avec ses propositions, ce qui n'a pas été placé, et les réglages. Elle
- * appelle les actions du moteur ; les regroupements et les comptes viennent
- * de `lib/domain/planning/presentation.ts`.
+ * Le plan de la semaine sur la page « Semaine » (docs/planning-contract.md,
+ * « Interface (3.6) » ; simplification, lot S4, PR 2,
+ * docs/simplification-s4-contract.md, sections 4, 5 et 7.1) : la ligne du
+ * plan et l'eau qui manque au premier niveau, « Le plan, chaîne par chaîne »
+ * (le dernier calcul, son résumé, ses changements, ses budgets, ses
+ * suggestions, ce qui n'a pas été placé) et ses réglages dans le détail. Les
+ * jours et leurs créneaux sont dans « Jour par jour »
+ * (`app/irrigation/semaine/week-days.tsx`). Chaque morceau lit le même état
+ * (`WeeklyPlanProvider`) ; les regroupements et les comptes viennent de
+ * `lib/domain/planning/`.
  */
-export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSettings, initialProtectedSlots, soilNotes = {}, repartitionHref = null, onAddManualSlot, followUp = null }: Props) {
-  const [plan, setPlan] = useState(initialPlan);
-  const [now, setNow] = useState(() => new Date(initialNowIso));
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<Record<string, ProposalFeedback>>({});
-  const [suggestionFeedback, setSuggestionFeedback] = useState<Record<string, SuggestionFeedback>>({});
-  const [pending, startTransition] = useTransition();
-  const planRef = useRef(initialPlan);
-  useEffect(() => { planRef.current = plan; }, [plan]);
-  // Les créneaux refusés qui attendent le recalcul pour dire où leur besoin est allé (lot G, n° 7, F412).
-  const refusals = useRef(new Map<string, StoredProposal>());
-  const [askRefuse, setAskRefuse] = useState<string | null>(null);
-  const receiveRecalculated = useCallback((recalculated: StoredWeeklyPlan | null) => {
-    setNow(new Date());
-    setPlan(recalculated);
-    if (!recalculated) return;
-    for (const [proposalId, refused] of refusals.current) {
-      const replacement = refusalReplacement(refused, recalculated);
-      if (replacement === undefined) continue;
-      refusals.current.delete(proposalId);
-      setFeedback((current) => ({ ...current, [proposalId]: { ok: true, message: refusalMessage(replacement) } }));
-    }
-  }, []);
-  const refreshAfterEvent = usePlanRefreshAfterEvents(season, planRef, receiveRecalculated);
-  useEffect(() => {
-    // Un événement saisi sur une autre page (3.8) — une pluie, une limite, un
-    // arrosage — peut avoir un recalcul encore en cours à l'ouverture du
-    // planning : la section le relit comme après un geste fait ici.
-    if (planRef.current?.pendingEvent?.status === 'pending') refreshAfterEvent();
-  }, [refreshAfterEvent]);
 
-  useEffect(() => {
-    // Les statuts se lisent avec l'heure de l'écran : elle se remet à l'heure
-    // quand la page revient, et le plan aussi — le recalcul du matin a pu
-    // passer pendant que l'onglet dormait. Un calcul inchangé ne touche à rien.
-    const update = () => {
-      if (document.visibilityState !== 'visible') return;
-      setNow(new Date());
-      startTransition(async () => {
-        const result = await loadWeeklyPlanAction({ season });
-        if (!result.ok || result.plan?.calculation.id === planRef.current?.calculation.id) return;
-        setPlan(result.plan);
-        setFeedback({});
-      });
-    };
-    document.addEventListener('visibilitychange', update);
-    return () => document.removeEventListener('visibilitychange', update);
-  }, [season]);
+/** L'ancre de la liste des planches non servies, que « n planches non servies · Voir » ouvre (S4-i). */
+export const UNPLACED_ANCHOR = 'planches-non-servies';
 
-  const receiveProposals = useCallback((result: ProposalsActionResult) => {
-    setNow(new Date());
-    if (!result.ok) { setError(result.message); setNotice(null); return; }
-    setPlan(result.plan);
-    const validated = result.results.filter((item) => item.ok).length;
-    const refused = result.results.length - validated;
-    setFeedback((current) => ({
-      ...current,
-      ...Object.fromEntries(result.results.map((item) => [
-        item.proposalId,
-        item.ok
-          ? { ok: true, message: item.warning ? `Irrigation planifiée · ${item.warning}` : 'Irrigation planifiée.' }
-          : { ok: false, message: item.message },
-      ])),
-    }));
-    setNotice(`${validated} irrigation${validated > 1 ? 's' : ''} planifiée${validated > 1 ? 's' : ''}${refused > 0 ? `, ${refused} proposition${refused > 1 ? 's' : ''} refusée${refused > 1 ? 's' : ''} par une garde : le motif est sur la carte` : ''}.`);
-    setError(null);
-    if (validated > 0) {
-      window.dispatchEvent(new CustomEvent('irrigation-events-changed'));
-      notifyFeasibilityChanged();
-    }
-  }, []);
-
-  const compute = () => startTransition(async () => {
-    const result = await computeWeeklyPlanAction({ season });
-    setNow(new Date());
-    if (result.ok) { setPlan(result.plan); setFeedback({}); setSuggestionFeedback({}); setNotice('Plan calculé.'); setError(null); }
-    else { setError(result.message); setNotice(null); }
-  });
-  useEffect(() => {
-    // « Recalculer le plan » depuis la carte d'un arrosage en retard (3.7, règle 20) : un calcul à la demande.
-    const handler = () => compute();
-    window.addEventListener('planning-recalculate-requested', handler);
-    return () => window.removeEventListener('planning-recalculate-requested', handler);
-  });
-  // « Appliquer » une suggestion (règle 17) passe par le circuit ordinaire de l'irrigation : les autres sections relisent, le plan se recalcule après la réponse.
-  const applySuggestion = (suggestion: StoredPlanSuggestion) => startTransition(async () => {
-    const result = await applyPlanSuggestionAction({ season, eventEquipmentId: suggestion.eventEquipmentId });
-    setNow(new Date());
-    setSuggestionFeedback((current) => ({ ...current, [suggestion.eventEquipmentId]: { ok: result.ok, message: result.ok && result.warning ? `${result.message} ${result.warning}` : result.message } }));
-    if (!result.ok) return;
-    setPlan(result.plan);
-    // Le message reste dans le bandeau de la section : la carte de la suggestion s'en va avec le recalcul qui suit (recette réelle du 31 octobre 2026).
-    setNotice(result.warning ? `${result.message} ${result.warning}` : result.message);
-    setError(null);
-    window.dispatchEvent(new CustomEvent('irrigation-events-changed'));
-    notifyFeasibilityChanged();
-    refreshAfterEvent();
-  });
-  const keepSuggestion = (suggestion: StoredPlanSuggestion) => startTransition(async () => {
-    const result = await keepPlanSuggestionAction({ season, eventEquipmentId: suggestion.eventEquipmentId, suggestion: suggestion.suggestion, doseMm: suggestion.doseMm });
-    setSuggestionFeedback((current) => ({ ...current, [suggestion.eventEquipmentId]: { ok: result.ok, message: result.message } }));
-    if (result.ok) setPlan(result.plan);
-  });
-  const validate = (proposalIds: string[]) => startTransition(async () => receiveProposals(await validatePlanProposalsAction({ season, proposalIds })));
-  const adjust = (proposalId: string, startAt: string, doseMm: number) => startTransition(async () => receiveProposals(await validateAdjustedPlanProposalAction({ season, proposalId, startAt, doseMm })));
-  const refuse = (proposalId: string) => startTransition(async () => {
-    setAskRefuse(null);
-    const refused = planRef.current?.proposals.find((proposal) => proposal.storedId === proposalId);
-    const result = await refusePlanProposalAction({ season, proposalId });
-    setNow(new Date());
-    if (!result.ok) { setError(result.message); return; }
-    setPlan(result.plan);
-    if (result.refused && refused) refusals.current.set(proposalId, refused);
-    setFeedback((current) => ({ ...current, [proposalId]: { ok: true, message: result.refused ? 'Créneau refusé. Le plan se recalcule pour replacer le besoin…' : 'Cette proposition avait déjà été décidée.' } }));
-    setNotice(null);
-    setError(null);
-    // Un refus est un événement : le serveur recalcule après sa réponse, la section relit le plan quand il est prêt (3.7).
-    if (result.refused) refreshAfterEvent();
-  });
-
-  const days = useMemo(() => (plan ? planDays(plan, now) : []), [plan, now]);
-  // Au téléphone, les jours se replient (audit ergonomique, point 2, F11) ; un geste ouvre ou replie un jour, l'ordinateur ne replie rien.
-  const folds = useMemo(() => phoneWeekFolds(days, now), [days, now]);
-  const [dayToggles, setDayToggles] = useState<Record<string, boolean>>({});
-  const [pastOpen, setPastOpen] = useState(false);
-  const rows = useMemo(() => planWeekRows(days), [days]);
-  const summary = useMemo(() => (plan ? summarizePlan(plan, now) : null), [plan, now]);
-  const unplaced = useMemo(() => (plan ? unplacedBeds(plan) : []), [plan]);
-  const groups = useMemo(() => unplacedGroups(unplaced), [unplaced]);
-  // L'eau qu'une planche non servie reçoit quand même du matériel de ses voisines (remarque 2 de la recette 3.9, F254).
-  const received = useMemo(() => new Map(plan ? unplaced.map((bed) => [bed.bedId, waterReceivedWithoutShareMm(plan, bed, now)] as const) : []), [plan, unplaced, now]);
-  const actions = useMemo(() => (plan && summary ? planActionCounts(plan, summary, initialSettings.lateToleranceMinutes, now) : null), [plan, summary, initialSettings.lateToleranceMinutes, now]);
-  const weekProposed = plan ? proposedIds(plan.proposals, now) : [];
-
+/**
+ * La section du plan : elle porte les ancres `planning` et `planning-title`
+ * que visent les liens d'aujourd'hui (section 7.4), autour de toute la vue
+ * « La semaine » quand la ferme a coché « Planning de la semaine ».
+ */
+export function WeeklyPlanSection({ children }: { children: ReactNode }) {
+  const state = useWeeklyPlan();
   return (
-    <section className="planning-section" aria-labelledby="planning-title" aria-busy={pending}>
-      <header className="planning-heading">
-        <div>
-          {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
-          <h2 id="planning-title" className="sr-only">Planning de la semaine</h2>
-          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
-        </div>
-        <div className="planning-heading-actions">
-          <button type="button" className="primary" disabled={pending} onClick={compute}>
-            {pending ? 'Calcul en cours…' : plan ? 'Recalculer le plan' : 'Calculer le plan de la semaine'}
-          </button>
-          <button type="button" onClick={onAddManualSlot}>Ajouter un créneau à la main</button>
-        </div>
-      </header>
+    <section id="planning" className="planning-section" aria-labelledby="planning-title" aria-busy={state?.pending ?? false}>
+      {/* Le titre de la page le dit déjà : celui du bloc reste pour les lecteurs d’écran (audit du 19 novembre 2026, lot J, n° 18, F456). */}
+      <h2 id="planning-title" className="sr-only">Planning de la semaine</h2>
+      {children}
+    </section>
+  );
+}
 
+/**
+ * La ligne du plan, au premier niveau de la semaine en cours (section 4,
+ * point 2) : « Plan calculé aujourd'hui à 6 h 02 » et « Recalculer le plan »,
+ * mêmes mots et mêmes états que sur « Aujourd'hui » (S2) ; l'avis d'un geste
+ * et celui d'un recalcul en attente dessous.
+ */
+export function PlanLine() {
+  const state = useWeeklyPlan();
+  if (!state) return null;
+  const { plan, pending, compute, notice, error, now } = state;
+  return (
+    <>
+      <div className="planning-heading week-plan-line">
+        <p>{plan ? planLine(plan.calculation.computedAt, now).text : 'Aucun calcul pour cette semaine. Le plan se calcule chaque matin après la météo, ou maintenant d’un clic.'}</p>
+        {/* « Plan calculé aujourd'hui à 6 h 02 · Recalculer », les mots de S2 (section 4, point 2) ; sans plan, le calcul est le geste. */}
+        <div className="planning-heading-actions">
+          {plan ? (
+            <button type="button" className="week-plan-recalculate" aria-label="Recalculer le plan" disabled={pending} onClick={compute}>
+              {pending ? 'Calcul en cours…' : 'Recalculer'}
+            </button>
+          ) : (
+            <button type="button" className="primary" disabled={pending} onClick={compute}>
+              {pending ? 'Calcul en cours…' : 'Calculer le plan de la semaine'}
+            </button>
+          )}
+        </div>
+      </div>
       {notice ? <p className="planning-notice" role="status">{notice}</p> : null}
       {error ? <p className="planning-error" role="alert">{error}</p> : null}
+      {plan?.pendingEvent ? (
+        <p className={plan.pendingEvent.status === 'failed' ? 'planning-error' : 'planning-empty'} role={plan.pendingEvent.status === 'failed' ? 'alert' : 'status'}>
+          {pendingEventNotice(plan.pendingEvent, formatDateTime(plan.pendingEvent.occurredAt))}
+        </p>
+      ) : null}
+    </>
+  );
+}
 
+/**
+ * « L'eau manque » dans l'encadré d'attention (section 4, point 3) : la
+ * phrase d'action du plan quand l'eau manque (audit final, lot B, R3, F243)
+ * et « Répartir l'eau » vers l'écran de répartition (R4, F247).
+ */
+export function PlanShortage() {
+  const state = useWeeklyPlan();
+  if (!state?.plan) return null;
+  const action = shortageAction(state.plan, formatVolume, state.now);
+  if (!action) return null;
+  return (
+    <p className="planning-shortage-action" role="note">
+      <span>{action.sentence}</span>
+      {state.repartitionHref ? <a href={state.repartitionHref}>{action.arbitrated ? 'Revoir la répartition' : 'Répartir l’eau'}</a> : null}
+    </p>
+  );
+}
+
+/** La ligne du pli « Le plan, chaîne par chaîne » : celle du résumé du plan (F11), ou l'absence de calcul. */
+export function planDetailLine(state: WeeklyPlanState): string {
+  const { plan, summary, actions, groups } = state;
+  if (!plan || !summary || !actions) return 'Aucun calcul pour cette semaine';
+  return planSummaryLine(summary, planActionLine(actions), plan.calculation.summary.deficit, unplacedDeficitCount(groups), formatVolume, unknownWaterChainCount(plan.calculation.summary.budgets));
+}
+
+/**
+ * « Le plan, chaîne par chaîne » (section 7.1, n° 2) : le calcul et ses
+ * sources, ses tuiles, ses changements, le budget d'eau, les suggestions,
+ * les planches non servies ; « Ajouter un créneau à la main » ouvre le
+ * formulaire « Planifier » de la page des arrosages (3.8).
+ */
+export function PlanDetail() {
+  const state = useWeeklyPlan();
+  if (!state) return null;
+  const { plan, summary, actions, groups, unplaced, received, season, pending, suggestionFeedback, applySuggestion, keepSuggestion } = state;
+  return (
+    <>
+      <div className="planning-heading-actions">
+        <button type="button" onClick={() => window.location.assign(hrefWithIntent(pagePath('arrosages'), season, 'planifier', '1'))}>Ajouter un créneau à la main</button>
+      </div>
       {!plan || !summary ? (
         <>
           <p className="planning-empty">Aucun calcul pour cette semaine. Le plan se calcule chaque matin après la météo, ou maintenant d’un clic.</p>
-          {followUp}
         </>
       ) : (
         <>
@@ -254,195 +157,35 @@ export function WeeklyPlanView({ season, initialNowIso, initialPlan, initialSett
               ))}
             </small>
           </p>
-          {plan.pendingEvent ? (
-            <p className={plan.pendingEvent.status === 'failed' ? 'planning-error' : 'planning-empty'} role={plan.pendingEvent.status === 'failed' ? 'alert' : 'status'}>
-              {pendingEventNotice(plan.pendingEvent, formatDateTime(plan.pendingEvent.occurredAt))}
-            </p>
-          ) : null}
-          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} actionLine={planActionLine(actions)} unplacedCount={unplacedDeficitCount(groups)} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} repartitionHref={repartitionHref} now={now} /> : null}
+          {actions ? <PlanSummaryCards summary={summary} plan={plan} actions={planActionTiles(actions)} unplacedCount={unplacedDeficitCount(groups)} unplacedDetail={unplacedTileDetail(groups, plan.calculation.summary.deficit.bedCount)} /> : null}
           {plan.calculation.summary.changes ? <ChangesFold changes={plan.calculation.summary.changes} /> : null}
           {plan.calculation.summary.budgets.length > 0 ? <BudgetList budgets={plan.calculation.summary.budgets} validatedNote={budgetValidatedNote(plan, formatVolume)} /> : null}
           <SuggestionList suggestions={plan.suggestions} pending={pending} feedback={suggestionFeedback} onApply={applySuggestion} onKeep={keepSuggestion} />
-          {followUp}
-
-          <div className="planning-week-heading">
-            <h3>La semaine</h3>
-            {weekProposed.length > 0 ? (
-              <button type="button" className="primary" disabled={pending} onClick={() => validate(weekProposed)}>
-                Valider toute la semaine ({weekProposed.length})
-              </button>
-            ) : null}
-          </div>
-          {/* Sur un grand écran, la semaine en tableau : les jours en colonnes, une ligne par matériel (précision P46). */}
-          <ol className="planning-days" aria-label="Jours de la semaine" data-past-open={pastOpen} style={{ '--planning-rows': Math.max(rows.length, 1) } as CSSProperties}>
-            <li className="planning-row-label planning-corner" aria-hidden="true" style={{ '--row': 1 } as CSSProperties}><span>Matériel</span></li>
-            {rows.map((row, index) => (
-              <li key={`ligne-${row.equipmentId}`} className="planning-row-label" aria-hidden="true" style={{ '--row': index + 2 } as CSSProperties}><span>{row.equipmentName}</span></li>
-            ))}
-            {folds.pastCount > 0 ? (
-              <li className="planning-past-toggle">
-                <button type="button" aria-expanded={pastOpen} onClick={() => setPastOpen((value) => !value)}>{pastDaysLabel(folds.pastCount)}</button>
-              </li>
-            ) : null}
-            {days.map((day, index) => {
-              const fold = folds.folds[day.dateKey];
-              const expanded = dayToggles[day.dateKey] ?? fold === 'open';
-              return (
-                <DayBlock key={day.dateKey} day={day} column={index} rows={rows} fold={fold} expanded={expanded} onToggle={() => setDayToggles((current) => ({ ...current, [day.dateKey]: !expanded }))} calculationId={plan.calculation.id} overcommitted={overcommittedDayNotice(plan.calculation.summary.overcommittedDays, day.dateKey, formatVolume)} now={now} pending={pending} feedback={feedback} soilNotes={soilNotes} onValidateDay={validate} onValidate={(id) => validate([id])} onAdjust={adjust} onRefuse={setAskRefuse} />
-              );
-            })}
-          </ol>
-
           <UnplacedList beds={unplaced} groups={groups} season={season} received={received} />
         </>
       )}
-
-      <PlanningSettingsForm initialSettings={initialSettings}>
-        <ProtectedSlotsSection initialSlots={initialProtectedSlots} />
-      </PlanningSettingsForm>
-      {/* « Refuser » se confirme : un refus vaut pour toute la semaine (D-030 ; lot G, n° 7, F411). */}
-      <ConfirmDialog
-        open={askRefuse !== null}
-        title="Refuser ce créneau pour toute la semaine ?"
-        confirmLabel="Refuser le créneau"
-        cancelLabel="Garder la proposition"
-        tone="erase"
-        pending={pending}
-        onConfirm={() => askRefuse && refuse(askRefuse)}
-        onCancel={() => setAskRefuse(null)}
-      >
-        <p>Ce matériel ne sera plus proposé à ces heures cette semaine ; le besoin sera replacé ailleurs si c’est possible.</p>
-      </ConfirmDialog>
-    </section>
+    </>
   );
 }
 
-/**
- * La relecture du plan après un événement (3.7, règle 6) : le serveur
- * recalcule après sa réponse, et la section relit le plan à intervalles
- * croissants jusqu'à ce qu'un nouveau calcul paraisse, que le recalcul ait
- * échoué — l'avis le dit — ou qu'aucun recalcul ne soit en cours, puis
- * s'arrête. Rien ne tourne en continu, et rien ne tourne onglet caché : le
- * retour de l'onglet relit le plan de lui-même.
- */
-function usePlanRefreshAfterEvents(season: number, planRef: RefObject<StoredWeeklyPlan | null>, receive: (plan: StoredWeeklyPlan | null) => void) {
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const refresh = useCallback(() => {
-    if (timer.current) clearTimeout(timer.current);
-    let attempt = 0;
-    const schedule = () => {
-      if (attempt >= REFRESH_DELAYS_SECONDS.length) return;
-      timer.current = setTimeout(() => void tick(), millisecondsFromSeconds(REFRESH_DELAYS_SECONDS[attempt++]));
-    };
-    const tick = async () => {
-      timer.current = null;
-      if (document.visibilityState !== 'visible') return;
-      const before = planRef.current;
-      const result = await loadWeeklyPlanAction({ season });
-      if (!result.ok) return;
-      const changed = result.plan?.calculation.id !== before?.calculation.id;
-      if (changed || !sameNotice(result.plan?.pendingEvent ?? null, before?.pendingEvent ?? null)) receive(result.plan);
-      if (!changed && result.plan?.pendingEvent?.status === 'pending') schedule();
-    };
-    schedule();
-  }, [season, planRef, receive]);
-  useEffect(() => {
-    REFRESH_SIGNALS.forEach((name) => window.addEventListener(name, refresh));
-    const channel = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('irrigation-feasibility');
-    if (channel) channel.onmessage = refresh;
-    return () => {
-      REFRESH_SIGNALS.forEach((name) => window.removeEventListener(name, refresh));
-      channel?.close();
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, [refresh]);
-  return refresh;
-}
-
-function sameNotice(left: PlanEventNotice | null, right: PlanEventNotice | null): boolean {
-  return left?.kind === right?.kind && left?.status === right?.status && left?.occurredAt === right?.occurredAt;
-}
-
-function DayBlock({ day, column, rows, fold, expanded, onToggle, calculationId, overcommitted, now, pending, feedback, soilNotes, onValidateDay, onValidate, onAdjust, onRefuse }: {
-  day: PlanDay;
-  /** Le rang du jour dans la semaine, à partir de 0 : sa colonne dans le tableau. */
-  column: number;
-  rows: readonly PlanWeekRow[];
-  /** Le repli du jour au téléphone (F11) ; l'ordinateur l'ignore. */
-  fold: PhoneDayFold;
-  /** Au téléphone, les créneaux du jour sont montrés. */
-  expanded: boolean;
-  onToggle: () => void;
-  calculationId: string;
-  /** « Limite journalière de 1,50 m³ dépassée : 5,06 m³ engagés », nul pour un jour dans sa limite (F256). */
-  overcommitted: string | null;
-  now: Date;
-  pending: boolean;
-  feedback: Record<string, ProposalFeedback>;
-  soilNotes: Record<string, ProposalSoilNote[]>;
-  onValidateDay: (ids: string[]) => void;
-  onValidate: (id: string) => void;
-  onAdjust: (id: string, startAt: string, doseMm: number) => void;
-  onRefuse: (id: string) => void;
-}) {
-  const proposed = proposedIds(day.proposals, now);
-  const counts = PROPOSAL_STATUSES.filter((status) => day.counts[status] > 0).map((status) => `${day.counts[status]} ${PROPOSAL_STATUS_LABELS[status].toLocaleLowerCase('fr-FR')}${day.counts[status] > 1 ? 's' : ''}`);
-  const proposalsId = useId();
+/** Les réglages du planning et les heures où l'on n'arrose pas, dans « Réglages de la semaine » (section 7.1, n° 8 ; S4-n). */
+export function PlanSettings() {
+  const state = useWeeklyPlan();
+  if (!state) return null;
   return (
-    <li className="planning-day" data-before-horizon={day.beforeHorizon} data-fold={fold} data-expanded={expanded} aria-label={capitalize(formatLongDay(day.dateKey))} style={{ '--col': column + 2 } as CSSProperties}>
-      <div className="planning-day-band" aria-hidden="true" />
-      <header className="planning-day-heading">
-        <div>
-          <h4>
-            <span className="planning-label-long">{capitalize(formatLongDay(day.dateKey))}</span>
-            <span className="planning-label-short" aria-hidden="true">{capitalize(formatWeekdayAndDay(day.dateKey))}</span>
-          </h4>
-          <small>
-            {day.proposals.length === 0
-              ? (day.beforeHorizon ? 'Jour écoulé avant le calcul.' : 'Aucune proposition.')
-              : `${counts.join(' · ')} · ${formatVolume(day.volumeCubicMeters)}${day.unknownVolumeCount > 0 ? ` + ${day.unknownVolumeCount} au volume inconnu` : ''}`}
-          </small>
-          {/* Le jour qu'une limite posée après coup met en défaut le dit dans sa colonne (remarque 5 de la recette 3.9, F256). */}
-          {overcommitted ? <p className="planning-day-overcommitted" role="note">{overcommitted}</p> : null}
-          {day.proposals.length > 0 ? (
-            <button type="button" className="planning-day-toggle" aria-expanded={expanded} aria-controls={proposalsId} onClick={onToggle}>
-              {expanded ? 'Replier le jour' : `Voir les créneaux (${day.proposals.length})`}
-            </button>
-          ) : null}
-        </div>
-        {/* Une seule proposition : son « Valider » suffit, pas un second bouton pour le même geste (lot K, n° 17, F466). */}
-        {dayValidateShown(proposed.length) ? (
-          <button type="button" className="planning-day-validate" disabled={pending} aria-label={`Valider ${proposalsText(proposed.length)} du jour`} onClick={() => onValidateDay(proposed)}>
-            <span className="planning-label-long">Valider {proposalsText(proposed.length)} du jour</span>
-            <span className="planning-label-short">Tout valider ({proposed.length})</span>
-          </button>
-        ) : null}
-      </header>
-      {day.proposals.length > 0 ? (
-        <div className="planning-proposals" id={proposalsId} data-tour="planning-propositions">
-          {planDayCells(day, rows).map((cell) => (
-            <div key={cell.row} className="planning-cell" style={{ '--row': cell.row + 2 } as CSSProperties}>
-              {cell.proposals.map((proposal) => (
-                <ProposalCard key={proposal.storedId} proposal={proposal} currentCalculationId={calculationId} now={now} pending={pending} feedback={feedback[proposal.storedId]} soilNotes={soilNotes[proposal.storedId] ?? []} onValidate={onValidate} onAdjust={onAdjust} onRefuse={onRefuse} />
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </li>
+    <PlanningSettingsForm initialSettings={state.settings}>
+      <ProtectedSlotsSection initialSlots={state.protectedSlots} />
+    </PlanningSettingsForm>
   );
 }
 
-function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, unplacedDetail, repartitionHref, now }: {
+function PlanSummaryCards({ summary, plan, actions, unplacedCount, unplacedDetail }: {
   summary: PlanSummary;
   plan: StoredWeeklyPlan;
   /** « À valider », « Faites », « En retard » : les cartes de tête (audit ergonomique, lot 3, point 5, cas 1). */
   actions: ReturnType<typeof planActionTiles>;
-  actionLine: string[];
   unplacedCount: number;
   unplacedDetail: string;
-  repartitionHref: string | null;
-  now: Date;
 }) {
   const { deficit } = plan.calculation.summary;
   // Une chaîne servie à l'eau inconnue : son manque ne peut pas être chiffré, et le résumé le dit (point ouvert 51, D-089) ;
@@ -451,25 +194,11 @@ function PlanSummaryCards({ summary, plan, actions, actionLine, unplacedCount, u
   const explanation = waterDeficitExplanation(plan);
   // Sous un arbitrage validé, aucune ligne de budget : la note dit l'eau allouée et ce qui ne peut pas être reçu (D-052).
   const arbitration = arbitrationNote(plan.calculation.summary);
-  const action = shortageAction(plan, formatVolume, now);
-  // Au téléphone, les tuiles tiennent en une ligne de résumé, dépliable (F11).
-  const [open, setOpen] = useState(false);
-  const tilesId = useId();
+  // L'eau qui manque se dit au premier niveau, dans l'encadré d'attention (`PlanShortage`) ; ici, les tuiles du calcul,
+  // ouvertes : la ligne de résumé est celle du pli « Le plan, chaîne par chaîne » (F11).
   return (
     <>
-      {/* Une phrase d'action en tête quand l'eau manque (audit final, lot B, R3, F243). */}
-      {action ? (
-        <p className="planning-shortage-action" role="note">
-          <span>{action.sentence}</span>
-          {/* « Répartir l'eau » mène à l'écran de répartition (audit final, lot B, R4, F247). */}
-          {repartitionHref ? <a href={repartitionHref}>{action.arbitrated ? 'Revoir la répartition' : 'Répartir l’eau'}</a> : null}
-        </p>
-      ) : null}
-      <button type="button" className="planning-summary-line" data-tour="planning-semaine" aria-expanded={open} aria-controls={tilesId} onClick={() => setOpen((value) => !value)}>
-        <span>{planSummaryLine(summary, actionLine, deficit, unplacedCount, formatVolume, unknownWater)}</span>
-        <small>{open ? 'Replier' : 'Détail'}</small>
-      </button>
-      <div className="planning-summary" id={tilesId} data-open={open} data-tour="planning-semaine">
+      <div className="planning-summary" data-open="true" data-tour="planning-semaine">
         {actions.map((tile) => <SummaryCard key={tile.label} icon={ACTION_TILE_ICONS[tile.label]} label={tile.label} value={tile.value} detail={tile.detail} tone={tile.tone} action />)}
         <SummaryCard icon="goutte" label="Volume proposé et validé" value={formatVolume(summary.volumeCubicMeters)} detail={summary.unknownVolumeCount > 0 ? `${summary.unknownVolumeCount} créneau${summary.unknownVolumeCount > 1 ? 'x' : ''} au volume inconnu en plus` : 'Volumes connus'} />
         <SummaryCard icon="aide" label="Non vérifié" value={String(summary.unverifiedCount)} detail="Créneaux sans pompe, origine ou stock connu" />
@@ -549,11 +278,13 @@ function UnplacedList({ beds, groups, season, received }: { beds: readonly PlanB
           <a href={pageHref('materiel', { season })}>{groups.noEquipment.link}</a>
         </p>
       ) : null}
-      <details className="planning-unplaced">
-        <summary>
-          <h3>{unplacedFoldLabel(unplacedDeficitCount(groups), informationalBedCount(groups), waitingBedCount(groups))}</h3>
-          <Icon name="fleche-bas" />
-        </summary>
+      {/* « n planches non servies · Voir », au premier niveau, ouvre ce pli par son ancre (S4-i). */}
+      <AnchoredFold
+        id={UNPLACED_ANCHOR}
+        className="planning-unplaced"
+        bodyClassName="planning-unplaced-body"
+        summary={<><h3>{unplacedFoldLabel(unplacedDeficitCount(groups), informationalBedCount(groups), waitingBedCount(groups))}</h3><Icon name="fleche-bas" /></>}
+      >
         <p className="planning-unplaced-caption">Chaque planche que le plan ne sert pas en entier, rangée par motif : aussi important que ce qui est placé.</p>
         {groups.groups.map((group) => (
           <section key={group.key} className="planning-unplaced-group" data-group={group.key} data-informational={group.informational || undefined} aria-label={group.title}>
@@ -580,7 +311,7 @@ function UnplacedList({ beds, groups, season, received }: { beds: readonly PlanB
             </table>
           </section>
         ))}
-      </details>
+      </AnchoredFold>
     </div>
   );
 }

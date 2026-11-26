@@ -62,7 +62,13 @@ export const RAIN_GAUGE_MAX_AGE_DAYS = 30;
  */
 export type ReliabilityAction =
   | { kind: 'link'; label: string; page: IrrigationPageId; anchor: string | null; zone?: string }
-  | { kind: 'recalculate-plan'; label: string };
+  | { kind: 'recalculate-plan'; label: string }
+  /**
+   * « Noter la pluie » ouvre sa fenêtre sur la page (simplification S2,
+   * PR 4) ; quand la fenêtre n'y est pas offerte, le lien mène à « Semaine »,
+   * qui l'ouvre à l'arrivée (`?pluie=1`, lot S4, PR 4, section 9).
+   */
+  | { kind: 'rain'; label: string; page: 'semaine' };
 
 export type ReliabilityLine = {
   kind: ReliabilityKind;
@@ -175,7 +181,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
       kind: 'actual-rain',
       key: 'actual-rain',
       text: `Pluie réelle incomplète : ${countText(missing, 'jour manquant', 'jours manquants')}. ${ACTUAL_RAIN_CONSEQUENCE}`,
-      action: { kind: 'link', label: 'Noter la pluie de la semaine', page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
+      action: { kind: 'rain', label: 'Noter la pluie', page: 'semaine' },
     });
   }
   const missingEt0 = input.automaticObjectiveMissingEt0Dates ?? null;
@@ -185,7 +191,7 @@ export function reliabilityLines(input: ReliabilityInputs): ReliabilityLine[] {
       kind: 'automatic-objective',
       key: 'automatic-objective',
       text: `Objectif automatique incomplet : ${countText(dates.length, 'jour sans ET0', 'jours sans ET0')} cette semaine (${dates.map(shortDayText).join(', ')}). ${AUTOMATIC_OBJECTIVE_CONSEQUENCE}`,
-      action: { kind: 'link', label: 'Voir la météo de référence', page: 'besoins', anchor: WEATHER_ANCHOR },
+      action: { kind: 'link', label: 'Voir la météo de référence', page: 'semaine', anchor: WEATHER_ANCHOR },
     });
   }
   if (on('soil')) lines.push(...soilLines(input.soilGardensNeverObserved));
@@ -315,11 +321,11 @@ export type ReliabilityCheck = {
 /** Où vit chaque donnée suivie (L3, règle 2) : la page de son geste, sans viser une réserve ou un jardin en particulier. */
 const CHECK_PAGES: Record<ReliabilityKind, { page: IrrigationPageId; anchor: string | null }> = {
   'reservoir-volume': { page: 'ressources', anchor: null },
-  'actual-rain': { page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
-  'automatic-objective': { page: 'besoins', anchor: WEATHER_ANCHOR },
+  'actual-rain': { page: 'semaine', anchor: MEASURED_RAIN_ANCHOR },
+  'automatic-objective': { page: 'semaine', anchor: WEATHER_ANCHOR },
   soil: { page: 'sol', anchor: null },
   species: { page: 'reglages', anchor: SPECIES_CORRESPONDENCE_ANCHOR },
-  plan: { page: 'planning', anchor: null },
+  plan: { page: 'semaine', anchor: null },
 };
 
 function okSummary(kind: ReliabilityKind, input: ReliabilityInputs): string {

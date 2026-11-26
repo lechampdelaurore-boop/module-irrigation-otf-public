@@ -15,6 +15,259 @@ source détaillée commit par commit.
   prévue pour le code ; l'écran de bienvenue du contrat 3.8 est modifié, la 3.8
   reste close.
 
+### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
+
+- **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens
+  d'« Aujourd'hui » (« Eau de la semaine », la ligne du plan, les
+  propositions, « Fiabilité du calcul »), de « Matériel », « Ressources »,
+  « Arrosages », « Réglages à relire » et du « + », et la notification de
+  l'aspersion à reconsidérer, ouvrent « Semaine » à la bonne section, sans
+  passer par les anciennes adresses, qui restent servies. « Noter la pluie »
+  d'une autre page ouvre la fenêtre à l'arrivée. Les mots qui nommaient une
+  page disparue changent : « Voir la semaine », « Ouvrir la semaine ». La
+  visite guidée « Le planning » ouvre les plis du détail pour montrer ce
+  qu'elle présente, au lieu d'un élément caché. Le « ? » de « Semaine » dit
+  où est chaque chose. Aucun calcul, aucune règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S4, PR 3 : les gestes de la semaine)
+
+- **Agir depuis la semaine, sans changer de page** (D-335, F933 à F939) :
+  « Comprendre ces chiffres » déplie sous le bilan les tuiles
+  d'« Aujourd'hui » (l'eau visée, l'irrigation, la pluie réelle ou estimée,
+  la pluie encore prévue, la soif de la semaine) ; « Changer l'eau visée »
+  ouvre le pli des objectifs, le champ des millimètres prêt à la saisie ;
+  « Noter la pluie » ouvre la fenêtre d'« Aujourd'hui » depuis le bilan, la
+  ligne « Calcul approximatif » ou la ligne d'un jour dont la pluie manque
+  (ce jour choisi), puis la semaine et le plan se relisent. Les flèches
+  changent de semaine sans recharger la page (276 ms contre 307 à 414 ms
+  pour les flèches d'avant, en local) ; « Exporter » télécharge la semaine
+  affichée au format de l'historique. Une prévision absente se dit
+  « Prévision indisponible : à vérifier », jamais zéro. Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S4, PR 2 : le premier niveau de la semaine)
+
+- **La semaine se lit d'un coup d'œil** (D-335, F923 à F932) : la page
+  « Semaine » commence par « ‹ Cette semaine › » (la semaine est dans
+  l'adresse), la ligne du plan et « Recalculer », une phrase de faits
+  (« 12 mm reçus sur 23 mm visés. Il manque encore 11 mm d'ici
+  dimanche. »), ce qui demande l'attention, le bilan (une barre et trois
+  chiffres : reçus, visés, arrosés), « Jour par jour » (sept lignes ; au
+  téléphone, un créneau tient en une ligne avec « Valider » ;
+  « Valider toute la semaine ») et « Jardin par jardin ». Les chiffres
+  sont ceux d'« Aujourd'hui ». Tout ce que montraient le planning et
+  « Objectifs et besoins » est derrière « Le détail », un pli fermé où
+  chaque partie a son pli et sa ligne ; un lien vers un de ces blocs ouvre
+  ses plis. L'écart du prévu se lit à l'ouverture de son pli. Aucun calcul,
+  aucune règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
+
+- **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
+  page, `/irrigation/semaine`. Sa vue « La semaine » montre, dans l'ordre
+  d'avant et sans rien changer, le planning puis les objectifs et besoins ;
+  sa vue « Les cumuls » est l'historique. Sous le titre, deux liens passent
+  d'une vue à l'autre sans recharger ; ils remplacent la bande « La
+  semaine ». La barre du bas et le menu de l'ordinateur ouvrent la page ;
+  le menu nomme ses deux vues. Les adresses du planning, des besoins et de
+  l'historique mènent à la page, avec leurs réglages d'adresse et leur
+  ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
+  coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
+  règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
+
+- **« Arroser ou noter » plus court au téléphone pendant un arrosage**
+  (D-342, F996, F997) : la carte de l'arrosage en cours se range plus
+  serré (le nom à côté du minuteur, « En cours » à côté du réglage, des
+  marges plus courtes, sans cadre bleu autour) et « 1. Où ? » commence à
+  653 px au lieu de 800 px, sous le budget de 700 px. Rien n'est retiré :
+  les trois valeurs, le détail des apports, la pompe et les deux boutons
+  restent. « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »),
+  comme sur « Aujourd'hui ».
+
+### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
+
+- **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page
+  s'appelle « Arroser ou noter » ; viennent les arrosages en cours, le
+  formulaire, puis les alertes du téléphone, les arrosages à venir et les
+  compteurs. Au téléphone, « 1. Où ? » commence à 298 px au lieu de
+  603 px. Arrivé par le « + », un retour « ‹ Aujourd'hui » ouvre le
+  formulaire ; après « Démarrer », la page reste et un lien mène à
+  « Aujourd'hui ». Au téléphone, la carte d'un arrosage en cours est plus
+  courte (les mêmes boutons, côte à côte). « Fait comme prévu » s'appelle
+  « C'est fait », comme sur « Aujourd'hui » ; la visite guidée suit les
+  trois blocs. Aucun calcul, aucune règle d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S5, PR 2 : « Planifier » et « Déjà fait »)
+
+- **« Planifier » et « Déjà fait » comme « Arroser maintenant »** (D-333,
+  F902 à F907) : les trois onglets d'« Arrosages » ont le même formulaire.
+  « Planifier » demande « Où ? », « Quand ? », « Combien de temps ? » et
+  son bouton dit « Planifier · demain à 6 h ». « Déjà fait » (à la place
+  de « Déjà réalisée ») demande d'abord « De quand à quand ? », puis
+  « Où ? » parmi le matériel posé à cette heure ; la durée se lit des
+  dates, une phrase dit ce qui s'enregistrera, le bouton dit « Enregistrer
+  cet arrosage ». Un seul matériel prêt est choisi d'office partout. Au
+  téléphone, les trois onglets tiennent sur une ligne. L'Historique dit
+  « Arroser maintenant » et « Déjà fait ». Aucun calcul, aucune règle
+  d'enregistrement ne change.
+
+### Modifié (simplifier l'usage du module, S5, PR 1 : « Arroser maintenant » en trois champs)
+
+- **Arroser en trois champs** (D-332, F894 à F901) : sur « Arrosages »,
+  l'onglet « Arroser maintenant » (le mot du « + ») demande « 1. Où ? »
+  (une case ronde par matériel, son type et ses planches dessous ; un seul
+  matériel prêt est choisi d'office), « 2. Combien de temps ? » (« − » et
+  « + » de cinq en cinq, les pastilles « 30 min », « 1 h », et
+  « Conseillé » quand le planning propose une dose du jour), puis
+  « Démarrer · fin vers 10 h 50 ». Une phrase dit ce que l'arrosage
+  apportera (« Soit 5 mm sur la planche, et 113 L. ») et la pompe qui
+  s'applique ; une pompe dépassée et un créneau protégé restent visibles.
+  La pompe, la note, la saisie en mm et la durée à la minute sont dans
+  « Plus d'options ». Trois touches, sans clavier, pour lancer un
+  arrosage. Aucun calcul, aucune règle d'enregistrement ne change ;
+  « Planifier » et « Déjà réalisée » gardent leur formulaire pour l'instant.
+
+### Modifié (simplifier l'usage du module, S3, PR 4 : les liens et les visites)
+
+- **La visite guidée de la démonstration présente les trois endroits**
+  (D-331, F890 à F893) : l'étape « Trois endroits » de « Bienvenue » dit à
+  quoi sert « Aujourd'hui », « Semaine » et « Ma ferme », et ce que fait le
+  « + » ; « Le module à la carte » dit que les endroits suivent les cases.
+  Plus aucune bulle ne parle de « Plus » ni d'un menu « qui ne montre
+  que… ».
+- **Le « ? » d'« Aujourd'hui »** situe sa pastille « dans la barre du bas ou
+  le menu ». Aucun écran, aucune adresse ne change.
+
+### Modifié (simplifier l'usage du module, S3, PR 3 : le menu de l'ordinateur)
+
+- **À l'ordinateur, le menu de gauche se range en trois endroits**
+  (D-331, F885 à F889), tous dépliés, à la place de « Arroser, Équiper,
+  Surveiller » : « Aujourd'hui » dans son encart et Arrosages ; « Semaine »
+  et ses trois pages, qui gardent le jour ouvert ; « Ma ferme » et ses
+  fiches, Réglages comprise, qui n'est plus à part. Les titres « Semaine »
+  et « Ma ferme » sont des liens.
+- **« + Arroser ou noter » en tête du menu** : la même feuille « Que
+  voulez-vous faire ? » que le « + » du téléphone, en boîte de dialogue au
+  milieu de la page. Toute page reste à un clic ; aucune adresse ne change,
+  rien n'est retiré.
+
+### Modifié (simplifier l'usage du module, S3, PR 2 : la barre du bas, le « + » et le chemin de retour)
+
+- **Au téléphone, la barre du bas porte les trois endroits et le « + »**
+  (D-331, F876 à F884) : Aujourd'hui, Semaine, le « + » rond au centre et
+  Ma ferme, l'endroit de la page ouverte marqué. « Plus » et sa liste des
+  pages disparaissent : chaque page est à deux touches au plus, par son
+  endroit puis une fiche de « Ma ferme », la bande « La semaine » ou « Tous
+  les arrosages ».
+- **Le « + », « Que voulez-vous faire ? »** : « Arroser maintenant » et
+  « Noter un arrosage déjà fait » ouvrent « Arrosages » sur leur
+  formulaire ; « Noter la pluie » se fait dans la feuille même, sans
+  changer de page, et la page se relit à la fermeture pour montrer la
+  pluie. Rien ne s'enregistre sans un appui.
+- **La bande « La semaine »** (Planning, Besoins, Historique) sous le titre
+  des trois pages de la semaine, **le retour « ‹ Ma ferme »** sur les pages
+  de « Ma ferme », **« Tous les arrosages »** en pied de « Votre journée ».
+  À l'ordinateur, le menu de gauche ne change pas encore. Aucune adresse ne
+  change, rien n'est retiré.
+
+### Ajouté (simplifier l'usage du module, S3, PR 1 : le rangement et « Ma ferme »)
+
+- **La page « Ma ferme »** (D-331, F868 à F875), à `/irrigation/ma-ferme` :
+  une fiche par page qui dit ce que le module sait de la ferme (Matériel et
+  placement, Ressources et pompes, Besoin par culture, Réserve du sol,
+  Alertes météo, Alertes cultures, Réglages), seulement les cases cochées,
+  Réglages toujours. Chaque fiche porte l'icône de la page, son nom, une
+  ligne qui dit à quoi elle sert, et « À faire » en orange quand une étape
+  de la mise en route attend sur cette page (« À faire : commune de la
+  ferme »). Elle ouvre sa page sans recharger, la saison gardée. « Ma
+  ferme » s'ajoute au menu, au-dessus de Réglages ; chaque page du module
+  est désormais rangée dans un des trois endroits, « Aujourd'hui »,
+  « Semaine » et « Ma ferme », que la barre du bas et le menu suivront.
+  Aucune adresse ne change, rien n'est retiré.
+
+### Modifié (simplifier l'usage du module, S2, PR 5 : la page à l'essentiel)
+
+- **« Aujourd'hui » tient à l'essentiel, le reste dans « Le détail »**
+  (D-330, F860 à F867) : en haut, la journée et ses cartes, puis le gel ou la
+  chaleur seulement quand une alerte est annoncée, « La semaine » en une
+  barre et une phrase (« 23,4 mm visés, ferme entière : 12 mm reçus. Il manque
+  encore 11,4 mm d’ici dimanche. »), avec « Voir la semaine » et « Noter la
+  pluie », une seule ligne « Calcul approximatif » quand une donnée manque,
+  et une ligne d'eau quand une réserve ou une limite le demande. Les tuiles,
+  l'eau et la réserve par jardin, l'eau disponible, la fiabilité, les trois
+  jours de météo et la frise sont dans un pli fermé, « Le détail », qui dit
+  ce qu'il contient : rien n'est retiré. Les liens qui visaient un bloc
+  ouvrent le pli dessus. Au téléphone, les pastilles de l'en-tête laissent la
+  place, la phrase les redit ; le même ordre à toutes les largeurs.
+
+### Ajouté (simplifier l'usage du module, S2, PR 4 : noter la pluie d'un geste)
+
+- **La pluie du pluviomètre se note depuis « Aujourd'hui »** (D-330, F854 à
+  F859) : la tuile « Eau reçue » et la ligne « Pluie réelle incomplète »
+  ouvrent la fenêtre « Noter la pluie ». Le jour (hier par défaut, jusqu'à
+  sept jours en arrière, jamais un jour futur), le chiffre (virgule ou point,
+  0 accepté, un champ vide jamais lu 0), un bouton qui dit le chiffre
+  (« Enregistrer 8 mm ») ou « Remplacer par 5 mm » quand une mesure existe
+  déjà ce jour-là, qu'elle dit. La réponse s'écrit sous le bouton qui l'a
+  ouverte. Écriture par l'action d'« Objectifs et besoins », dont aucune règle
+  ne change ; retirer une mesure reste là-bas. Pas de fenêtre pour une ferme
+  toute sous abri.
+
+### Modifié (simplifier l'usage du module, S2, PR 3 : l'arrosage à rattraper)
+
+- **« Aujourd'hui » demande si un arrosage en retard a été fait, au lieu de
+  deviner** (D-330, F850 à F853) : la carte dit « Prévu hier à 7 h.
+  L’avez-vous fait ? » et porte deux boutons de même taille, « Je le fais
+  maintenant » (le démarrage) et « C’est fait » (l'enregistrement tel que
+  prévu, confirmé, avec un lien pour noter un arrosage fait autrement) ; « Ne
+  pas le faire », confirmé, est dans « Autres choix ». « C’est fait »
+  n'apparaît qu'une fois le créneau fini, et reste accepté sous restriction
+  d'eau. Les règles de « Fait comme prévu » et de l'annulation ne changent
+  pas.
+
+### Modifié (simplifier l'usage du module, S2, PR 2 : terminer et reprendre depuis la carte)
+
+- **« Aujourd'hui » termine, met en pause et reprend un arrosage sans changer
+  de page** (D-330, F844 à F849) : une irrigation en cours porte « Terminer »,
+  avec son compte à rebours (« Reste 52 min ») et « Mettre en pause » dans
+  « Autres choix » ; en pause, « Reprendre », « Terminer » dessous ; à durée
+  atteinte, « Fermez la vanne, puis appuyez sur « Terminer ». ». « Terminer »
+  ouvre la même fenêtre que sur « Arrosages », l'heure réelle à confirmer ;
+  arrêtée en route, l'irrigation devient ce qui reste, avec « Reprendre ce qui
+  reste ». Ce sont les gestes d'« Arrosages », sans règle nouvelle.
+
+### Modifié (simplifier l'usage du module, S2, PR 1 : valider et démarrer depuis la carte)
+
+- **« Aujourd'hui » valide et démarre un arrosage sans changer de page**
+  (D-330) : la carte d'une proposition du plan porte un seul bouton,
+  « Valider », avec « Démarrer tout de suite » dessous ; « Autres choix »
+  range « Changer l'heure ou la dose » (le formulaire du planning) et « Pas
+  à cette heure » (le refus du planning, confirmé d'une ligne). Validée, la
+  carte devient « Planifiée » avec « Démarrer », la réponse et le focus sur
+  elle. La carte d'une irrigation planifiée porte « Démarrer » ; « Modifier
+  ou annuler » est dans « Autres choix ». Ce sont les mêmes gestes que sur le
+  planning et « Arrosages », avec les mêmes gardes ; le planning ne change
+  pas. « Valider au planning » disparaît.
+
+### Ajouté (simplifier l'usage du module, S5 : contrat de l'arrosage en trois champs)
+
+- **Contrat du lot S5** (`docs/simplification-s5-contract.md`, D-327) : le
+  formulaire d'arrosage tient en trois champs (où, combien de temps, démarrer)
+  et « Plus d'options » (pompe, note, saisir en mm). Aucun code, aucun calcul
+  ni aucune règle d'écriture changés ; les précautions restent au premier
+  niveau. Ne touche pas l'écran de bienvenue du contrat 3.8 (lot S6).
+
+### Ajouté (simplifier l'usage du module, S4 : contrat de la semaine sur une page)
+
+- **Contrat du lot S4** (`docs/simplification-s4-contract.md`, D-327) : une
+  page « Semaine » réunit le planning, « Objectifs et besoins » et « Historique
+  et cumuls » en deux vues (la semaine, les cumuls) ; une phrase, trois chiffres,
+  les jours et les jardins au premier niveau, le reste derrière « Le détail ».
+  Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
+  adresses sont gardées.
+
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
@@ -71,6 +324,12 @@ source détaillée commit par commit.
   de 44 à 147 px.
 
 ### Décidé (simplifier l'usage du module)
+
+- **Contrat du lot S3 écrit** (trois endroits) : « Aujourd'hui », « Semaine »,
+  « Ma ferme » et un « + » pour arroser, noter la pluie ou noter un arrosage
+  fait, à la place de la barre du bas à quatre entrées et de « Plus ». Rien
+  n'est codé : aucune page ne change encore, aucune adresse non plus.
+  Contrat : `docs/simplification-s3-contract.md`.
 
 - **Contrat du lot S2 écrit** (« Aujourd'hui » où l'on fait tout) : un seul
   bouton qui change de nom sur la carte (Valider, Démarrer, Terminer),

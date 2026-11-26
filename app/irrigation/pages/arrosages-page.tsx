@@ -5,8 +5,9 @@ import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-record';
 import type { EquipmentListItem } from '@/lib/domain/equipment-record';
-import { requestPlannedIrrigationForm } from '@/lib/domain/feasibility-notifications';
+import { requestIrrigationForm, requestPlannedIrrigationForm } from '@/lib/domain/feasibility-notifications';
 import { pagePath } from '@/lib/domain/features/pages';
+import { WATERING_INTENT, wateringIntentForm } from '@/lib/domain/features/plus-sheet';
 import type { GardenGroupConfiguration } from '@/lib/domain/garden-group-record';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 import type { IrrigationFormHints } from '@/lib/domain/irrigation-form-hints';
@@ -56,13 +57,18 @@ export function ArrosagesPage({
   waterDashboard: WaterDashboard;
   /** La dose du jour et les objectifs de la semaine que le formulaire propose (lot G, n° 9). */
   formHints: IrrigationFormHints;
-  /** « Recalculer le plan » sur un arrosage en retard conduit au planning, s'il est coché. */
+  /** « Recalculer le plan » sur un arrosage en retard conduit à « Semaine », qui porte le plan, si le planning est coché (lot S4, PR 4). */
   planningEnabled: boolean;
   /** Le choix de la pompe, avec la case « Ressources et pompes » (R1). */
   pumpsEnabled: boolean;
 }) {
   // « Ajouter un créneau à la main » depuis le planning ouvre ici le formulaire « Planifier » (`?planifier=1`).
   useUrlIntent('planifier', () => requestPlannedIrrigationForm());
+  // Le « + » de la barre du bas (simplification S3, section 4.1) ouvre « Arroser maintenant » (`?arroser=maintenant`) ou « Déjà fait » (`?arroser=fait`).
+  useUrlIntent(WATERING_INTENT, (value) => {
+    const form = wateringIntentForm(value);
+    if (form) requestIrrigationForm(form);
+  });
 
   return (
     <>
@@ -83,7 +89,7 @@ export function ArrosagesPage({
         protectedSlots={protectedSlots}
         formHints={formHints}
         onRecalculatePlan={planningEnabled
-          ? () => window.location.assign(hrefWithIntent(pagePath('planning'), season, 'recalculer', '1'))
+          ? () => window.location.assign(hrefWithIntent(pagePath('semaine'), season, 'recalculer', '1'))
           : undefined}
       />
       <WaterManagementDashboard season={season} snapshot={snapshot} initialDashboard={waterDashboard} part="arrosages" />

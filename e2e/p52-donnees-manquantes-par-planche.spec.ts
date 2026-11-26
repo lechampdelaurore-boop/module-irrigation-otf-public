@@ -4,6 +4,7 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   ouvrirLaCorrespondanceDesEspeces,
+  ouvrirLeDetailDuJour,
   ouvrirParClic,
   surveillerLaConsole,
   verifierCibleTactile,
@@ -81,8 +82,10 @@ test('« Par planche » : ce qui manque à chaque planche, et le geste qui mène
   await rattacherLaCarotte(page);
   await verifierLEtape(page, journal, 'ferme neuve prête, carotte rattachée');
 
+  // « Fiabilité du calcul » est dans « Le détail » depuis S2, PR 5 (D-330) : le pli s'ouvre d'abord.
   // Fermé, le dépliant dit le total ; le « ? » de la zone écrit le seuil du pluviomètre (F701).
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   const fiabilite = page.locator('#today-reliability');
   const pli = pliParPlanche(page);
   await expect(pli).toHaveJSProperty('open', false);
@@ -128,6 +131,7 @@ test('« Par planche » : ce qui manque à chaque planche, et le geste qui mène
     if (!(await formulaire.evaluate((element) => (element as HTMLDetailsElement).open))) await formulaire.locator('summary').click();
   }
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   await ouvrirToutLePli(page);
   await expect(pli.locator(`li[data-bed="${planche}"] [data-missing="stage"]`)).toHaveCount(0);
   await verifierLEtape(page, journal, 'stade déclaré, ligne disparue');
@@ -142,18 +146,21 @@ test('« Par planche » : ce qui manque à chaque planche, et le geste qui mène
 
   // « Saisir une pluie mesurée, même 0 mm » : « Pluie mesurée » ouverte ; 0 mm aujourd'hui fait taire le pluviomètre.
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   await ouvrirToutLePli(page);
   const saisir = pli.locator('[data-missing="rain-gauge"]').first().getByRole('link', { name: 'Saisir une pluie mesurée, même 0 mm' });
   if (telephone) await verifierCibleTactile(saisir, 'Le lien « Saisir une pluie mesurée »');
   await saisir.click();
   await attendreLaPagePrete(page, 'besoins');
-  await expect(page).toHaveURL(/\/irrigation\/besoins\?.*#manual-rain$/);
+  // L'ancienne adresse mène à la page « Semaine », l'ancre gardée (lot S4, PR 1, F917).
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?.*#manual-rain$/);
   const pluie = page.locator('#manual-rain');
   await expect(pluie).toHaveJSProperty('open', true);
   await pluie.getByLabel('Millimètres').fill('0');
   await pluie.getByRole('button', { name: 'Enregistrer', exact: true }).click();
   await expect(pluie.locator('.action-reply .water-notice')).toHaveText('La pluie mesurée a été enregistrée.');
   await attendreLaPageIrrigation(page, 'aujourdhui');
+  await ouvrirLeDetailDuJour(page);
   await ouvrirToutLePli(page);
   await expect(pli.locator('[data-missing="rain-gauge"]')).toHaveCount(0);
   await expect(pli.locator('[data-missing="soil"]').first()).toBeVisible();

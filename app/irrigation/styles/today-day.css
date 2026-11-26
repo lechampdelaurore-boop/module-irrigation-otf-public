@@ -358,3 +358,151 @@
   grid-column: 1 / -1;
   margin-top: 0;
 }
+
+/*
+ * La carte à un bouton (simplification, lot S2, section 3) : le bouton
+ * principal à 50 px, le lien d'appoint et « Autres choix » à 44 px au moins ;
+ * « Autres choix » déplie sa courte liste sous les boutons, sur toute la
+ * largeur de la carte.
+ */
+.today-irrigation-actions[data-actions="one-button"] {
+  align-items: center;
+}
+
+.today-page button.today-card-primary {
+  min-height: 50px;
+  padding-inline: 1.4rem;
+  font-weight: 700;
+}
+
+.today-page button.today-card-secondary {
+  border-color: transparent;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Le compte à rebours d'une irrigation qui coule, ou la consigne de fermer la vanne (S2, section 6). */
+.today-countdown {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.today-other-choices {
+  display: contents;
+}
+
+.today-page button.today-other-choices-toggle {
+  border-color: var(--line);
+  background: var(--card);
+  color: var(--anthracite);
+}
+
+.today-other-choices-list {
+  display: grid;
+  order: 10;
+  flex: 1 0 100%;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+}
+
+.today-other-choices-list[hidden] {
+  display: none;
+}
+
+.today-other-choices-list .today-action-link,
+.today-page .today-other-choices-list button {
+  justify-self: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  border-color: var(--line);
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/*
+ * L'arrosage à rattraper (S2, section 4) : la carte pose la question, et
+ * « C'est fait » a la taille de « Je le fais maintenant », bordé.
+ */
+.today-late-question {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.today-page button.today-card-twin {
+  min-height: 50px;
+  padding-inline: 1.4rem;
+  border: 2px solid var(--green);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+@container (max-width: 620px) {
+  .today-page button.today-card-primary,
+  .today-page button.today-card-twin {
+    flex: 1 0 100%;
+  }
+}
+
+/*
+ * « Noter la pluie » (S2, PR 4) : le jour, le chiffre et « mm », la consigne
+ * du zéro ; un refus en rouge, dans la fenêtre.
+ */
+.rain-entry-form {
+  display: grid;
+  gap: 6px;
+}
+
+.rain-entry-form label {
+  font-weight: 700;
+}
+
+.rain-entry-form select,
+.rain-entry-amount input {
+  box-sizing: border-box;
+  min-height: var(--touch-target);
+  padding: .55rem .7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-button);
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+
+.rain-entry-form select {
+  width: 100%;
+}
+
+.rain-entry-amount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rain-entry-amount input {
+  width: 8rem;
+}
+
+.rain-entry-hint,
+.rain-entry-already,
+.rain-entry-more {
+  margin: 0;
+  color: var(--muted);
+}
+
+.rain-entry-already {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.rain-entry-refusal {
+  margin: 0;
+  color: var(--danger);
+  font-weight: 700;
+}

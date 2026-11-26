@@ -96,7 +96,7 @@ mobiles comprises (choix du porteur du 27 octobre 2026).
     matériel stocké ne couvre aucune planche : la surface mouillée d'une
     planche qu'il était seul à arroser revient à la planche seule, et le
     planning la dit « aucun matériel ne l'arrose ».
-11. **Irriguer maintenant** et **planifier une irrigation** ne proposent que
+11. **Arroser maintenant** et **planifier une irrigation** ne proposent que
     le matériel posé. Un matériel stocké n'y paraît pas : il se repose depuis
     sa carte, dans Matériel et placement (amendée le 7 novembre 2026, précision
     P37 de `docs/feature-selection-contract.md` ; avant, il s'affichait
@@ -340,8 +340,9 @@ L'écran :
   le … : reposez-le ou annulez cette irrigation. » ou « Matériel reposé
   ailleurs : annulez cette irrigation et planifiez-en une nouvelle. », et son
   bouton « Démarrer maintenant » est grisé ;
-- « Irriguer maintenant » et « Planifier » ne listent que le matériel posé
-  (règle 11, précision P37) ; « Déjà réalisée » propose le
+- « Arroser maintenant » et « Planifier » ne listent que le matériel posé
+  (règle 11, précision P37) ; « Déjà fait » (noms depuis la simplification S5, D-334), dont « De quand à
+  quand ? » vient avant « Où ? », propose le
   matériel posé à l'heure de début saisie, et, si aucun ne l'était, le dit
   (« Aucun matériel n'était posé à cette heure de début ») en gardant le champ
   de l'heure de début ;

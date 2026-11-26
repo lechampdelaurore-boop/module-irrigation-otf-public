@@ -49,7 +49,7 @@ test('règles 1 à 3 : le gabarit ne montre la ligne de lecture que sur l’avis
   assert.match(shell, /\{readLine \? \(\s*<div className="sync-card"/, 'la ligne ne se montre que si le domaine le dit');
   assert.match(shell, /<a className="refresh-link" href=\{refreshHref\}>/, 'quand elle s’affiche, elle garde son lien');
   assert.match(shell, /refresh=\{\{ href: refreshHref, lastReadText: `\$\{source === 'mock' \? `\$\{sourceLabel\(source\)\} · ` : ''\}Dernière lecture réussie le \$\{updatedAt\}` \}\}/, 'le menu du compte reçoit « Actualiser » et la date ; les données de démonstration s’y disent (F829)');
-  assert.match(shell, /const refreshHref = pageHref\(page, \{ season, zone, refresh: true \}\);/, 'la même adresse `?refresh=1` qu’avant');
+  assert.match(shell, /const refreshHref = pageHref\(page, \{ season, zone, refresh: true, view: weekView \}\);/, 'la même adresse `?refresh=1` qu’avant, dans la même vue de « Semaine » (lot S4)');
   // Le bloc « Données en cache » ne bouge pas.
   assert.match(shell, /\{warning \? \(\s*<aside className="cache-warning" role="alert">/);
   const topbar = readFileSync('app/irrigation/shell/topbar.tsx', 'utf8');

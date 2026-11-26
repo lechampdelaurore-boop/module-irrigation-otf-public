@@ -35,7 +35,8 @@ import { dateClockText } from '../domain/clock-text.ts';
  */
 
 export type ProposalValidationResult =
-  | { ok: true; proposalId: string; eventId: string; warning?: string }
+  /** `eventEquipmentId` : l'irrigation créée par son matériel, que « Démarrer » désigne (simplification, lot S2). */
+  | { ok: true; proposalId: string; eventId: string; eventEquipmentId: string; warning?: string }
   | { ok: false; proposalId: string; message: string };
 
 export async function validatePlanProposalForUser({
@@ -129,7 +130,7 @@ export async function validatePlanProposalForUser({
       hydraulicWarning(hydraulic.feasibility, 'planned'),
       pushWarning,
     ].filter((warning): warning is string => Boolean(warning));
-    return { ok: true, proposalId, eventId: created.eventId, warning: warnings.length > 0 ? warnings.join(' ') : undefined };
+    return { ok: true, proposalId, eventId: created.eventId, eventEquipmentId: created.eventEquipmentId, warning: warnings.length > 0 ? warnings.join(' ') : undefined };
   } catch (error) {
     if (error instanceof IrrigationEventInputError || error instanceof IrrigationDailyLimitExceededError || error instanceof IrrigationHydraulicLimitExceededError) {
       return refused(error.message);

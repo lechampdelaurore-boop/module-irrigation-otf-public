@@ -4,7 +4,10 @@ import type { IrrigationPageId } from '../features/pages.ts';
  * Les sept visites guidées de la démonstration (docs/demo-guided-contract.md,
  * section 7 ; D3 de la sous-tranche 4.0). Une visite est une suite de bulles,
  * chacune accrochée à un élément de l'écran par son attribut `data-tour`,
- * jamais par son texte ni par sa place dans le menu. Une étape dont l'élément
+ * jamais par son texte ni par sa place dans le menu. L'ancre `menu` désigne
+ * la barre du bas au téléphone et le menu de gauche à l'ordinateur ; les
+ * phrases qui en parlent disent les trois endroits (simplification, lot S3,
+ * PR 4, D-331). Une étape dont l'élément
  * manque (case décochée, page masquée, bloc vide) est sautée sans message.
  *
  * Les textes sont écrits pour quelqu'un qui n'a jamais vu le module : aucun
@@ -63,6 +66,7 @@ export const TOUR_ANCHORS = [
   'arrosage-actions',
   'arrosage-champs',
   'arrosage-resultat',
+  'arrosage-bouton',
   'eau-du-jour',
   'planning-semaine',
   'planning-propositions',
@@ -100,8 +104,8 @@ export const TOURS: readonly Tour[] = [
       },
       {
         anchor: 'menu',
-        title: 'Une page par fonctionnalité',
-        text: 'Chaque ferme coche les fonctionnalités qui lui servent, et le menu ne montre qu’elles. Une visite saute ce que la ferme choisie n’a pas coché.',
+        title: 'Trois endroits',
+        text: '« Aujourd’hui » pour ce qu’on fait maintenant, « Semaine » pour savoir si la semaine est bonne, « Ma ferme » pour ce que le module sait de la ferme. Le « + » lance ou note un arrosage, ou note la pluie, depuis n’importe quelle page. Chaque ferme ne voit que ce qu’elle a coché ; une visite saute le reste.',
       },
       {
         anchor: 'aide-page',
@@ -132,25 +136,25 @@ export const TOURS: readonly Tour[] = [
         pages: ['arrosages'],
         anchor: 'arrosage-actions',
         title: 'Trois façons d’enregistrer un arrosage',
-        text: '« Irriguer maintenant » lance un minuteur. « Planifier » prépare un arrosage pour plus tard. « Déjà réalisée » note un arrosage fait sans le module.',
+        text: '« Arroser maintenant » lance un minuteur. « Planifier » prépare un arrosage pour plus tard. « Déjà fait » note un arrosage fait sans le module.',
       },
       {
         pages: ['arrosages'],
         anchor: 'arrosage-champs',
-        title: 'Le matériel et la quantité',
-        text: 'Choisissez un matériel, par exemple un goutte-à-goutte, et son réglage : le module sait déjà sur quelles planches il est posé. Donnez ensuite la quantité voulue en millimètres d’eau (1 mm, c’est 1 litre par mètre carré), ou bien une durée.',
+        title: '1. Où ?',
+        text: 'Choisissez où arroser : chaque ligne dit le type du matériel et le nombre de planches qu’il atteint depuis sa pose. Quand un seul matériel est prêt, il est déjà choisi.',
       },
       {
         pages: ['arrosages'],
         anchor: 'arrosage-resultat',
-        title: 'D’où vient ce chiffre',
-        text: 'Le module en déduit la durée et le volume, planche par planche. Le petit « i » à côté d’un chiffre ouvre une bulle qui dit comment il a été calculé : quel débit, quelle surface.',
+        title: '2. Combien de temps ?',
+        text: '« − » et « + » règlent la durée de cinq en cinq minutes ; « Conseillé » reprend la dose du jour. La phrase dessous dit les millimètres et les litres ; le petit « i » dit comment le chiffre a été calculé. La quantité en millimètres se saisit dans « Plus d’options ».',
       },
       {
         pages: ['arrosages'],
-        anchor: 'arrosage-resultat',
+        anchor: 'arrosage-bouton',
         title: 'Vous seul validez',
-        text: 'Rien ne démarre sans votre clic sur le bouton du résultat. La visite ne clique jamais à votre place ; essayez si vous le souhaitez, c’est sans conséquence ici.',
+        text: 'Rien ne démarre sans votre clic sur le bouton, qui dit ce qu’il fait : « Démarrer · fin vers … ». La visite ne clique jamais à votre place ; essayez si vous le souhaitez, c’est sans conséquence ici.',
       },
       {
         pages: ['arrosages'],
@@ -284,7 +288,7 @@ export const TOURS: readonly Tour[] = [
         pages: ['reglages', 'bienvenue'],
         anchor: 'fonctionnalites',
         title: 'Cochez ce qui vous sert',
-        text: 'Chaque case est une fonctionnalité. Une ferme qui ne veut que le matériel et les alertes ne coche que cela : le reste disparaît du menu et des calculs.',
+        text: 'Chaque case est une fonctionnalité. Une ferme qui ne veut que le matériel et les alertes ne coche que cela : le reste disparaît des écrans et des calculs.',
       },
       {
         pages: ['reglages', 'bienvenue'],
@@ -294,8 +298,8 @@ export const TOURS: readonly Tour[] = [
       },
       {
         anchor: 'menu',
-        title: 'Le menu suit vos cases',
-        text: 'Une page n’apparaît au menu que si sa fonctionnalité est cochée.',
+        title: 'Les endroits suivent vos cases',
+        text: 'Une page n’apparaît dans son endroit que si sa fonctionnalité est cochée. Un endroit qui n’a plus de page disparaît, comme le « + » quand il n’a plus rien à proposer.',
       },
     ],
   },

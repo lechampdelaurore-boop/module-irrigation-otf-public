@@ -78,7 +78,8 @@ d'explication. Sur « Arrosages », le premier champ commence vers 670 px ; sur
    reste dans l'adresse : tous les liens existants (notifications comprises)
    gardent leur effet ; une autre saison s'ouvre depuis « Historique » (F825).
    Le regroupement en « Semaine » et « Ma ferme » vient avec S3 : S1 ne déplace
-   aucune page.
+   aucune page. (S3 l'a fait : trois endroits, D-331,
+   `docs/simplification-s3-contract.md`.)
 5. **Les explications fixes passent dans le « ? ».** Un paragraphe qui dit
    chaque jour la même chose (exemple : « L'eau que le sol de chaque planche
    tient à la disposition des racines… », `soil-reserve-section.tsx`) quitte le
@@ -99,6 +100,11 @@ Visé : au plus 400 px du haut de la page pour toutes les pages sauf
 retirée. P61 fixe chaque borne sur la mesure faite, comme le lot J (contrat
 `audit-ergonomie-2026-11-19-lot-j-contract.md`, section 2) ; une page qui la
 dépasse le dit.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** La page « Semaine » a sa borne de hauteur (P40,
+4 500 px depuis la PR 3, F939) ; celles du planning, des besoins et de
+l'historique disparaissent avec ces pages. Le chapeau d'une ligne de
+« Semaine » est celui de sa phrase (S4, section 4.2).
 
 ## 4. PR 2 — Les mots
 
@@ -147,7 +153,7 @@ par le porteur le 25 novembre 2026**) :
    ceux d'une notification est noté comme dette à traiter après S6.
 4. **Les noms de pages du menu** changent seulement si le tableau les nomme
    (« Objectifs et besoins », « Ressources et pompes »…) ; le rangement du
-   menu est S3.
+   menu est S3 (fait : trois endroits, D-331).
 5. **Test de garde.** Un test échoue si un mot de la colonne de gauche
    réapparaît dans un titre, un bouton ou une phrase de premier niveau ; la
    liste des endroits où il est permis (le « ? », les replis de détail) est
@@ -452,7 +458,7 @@ guidée sont lus avec les mêmes mots (règle 6).
   série, déjà du détail, gardent « ET0 ».
 - F834 : le tableau ne nomme aucun nom de page : les noms du menu ne
   changent pas (« Objectifs et besoins », « Ressources et pompes »…) ; leur
-  rangement est S3.
+  rangement est S3 (fait, D-331 : les noms n'ont pas changé).
 - F835 : « réanalyse » et « historisé » sont dits en mots simples là où ils
   paraissaient au premier niveau (le message après le retrait d'une mesure
   de pluie, la phrase du panneau de pluie, la colonne de pluie du tableau des

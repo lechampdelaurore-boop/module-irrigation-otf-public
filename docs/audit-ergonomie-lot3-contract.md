@@ -27,7 +27,7 @@ Moteur, planificateur, seuils, objectifs, données ; la page « Aujourd'hui » e
 4. Jours écoulés repliés : **déjà fait au lot 2 (cas 17)**, on ne le refait pas.
 
 **Point 6, arrosages : un message en clair et des gestes rangés.**
-1. **Aucun matériel présélectionné** à l'ouverture du formulaire de calcul : pas de cadre rouge tant que l'utilisateur n'a rien choisi.
+1. **Aucun matériel présélectionné** à l'ouverture du formulaire de calcul : pas de cadre rouge tant que l'utilisateur n'a rien choisi. **Amendé par la simplification S5 (S5-b, D-332, D-333)** : quand un seul matériel est prêt, il est choisi d'office et une ligne le dit ; avec plusieurs, rien n'est choisi ; aucun cadre rouge avant une durée.
 2. Message de faisabilité en phrase d'action : « La pompe ne peut pas alimenter ce matériel en plus des autres : il manque 0,26 m³/h. Raccourcissez, décalez ou changez de pompe », avec **un bouton qui applique la solution déjà calculée** quand le moteur en propose une (sinon, pas de bouton). Le calcul de faisabilité ne change pas, seul le texte.
 3. Liste des irrigations : bloc « À traiter » en tête (les « Non faite » et « En retard »), puis liste compacte **par jour** (une ligne = heure, matériel, volume, état) au lieu de cartes identiques ; la carte complète s'ouvre au toucher.
 4. **« Annuler » rangé dans un menu « … »** de la ligne, avec la confirmation existante. « Démarrer maintenant » et « Modifier » restent visibles.
@@ -57,7 +57,7 @@ Moteur, planificateur, seuils, objectifs, données ; la page « Aujourd'hui » e
 | 4 | pompe 8,26 pour 8 m³/h | phrase d'action avec « il manque 0,26 m³/h » ; bouton seulement si une solution est calculée |
 | 5 | 28 irrigations sur 6 jours | « À traiter » en tête, puis une ligne par irrigation, groupées par jour |
 | 6 | « Annuler » | rangé dans « … », confirmation inchangée |
-| 7 | « Fait comme prévu » sur une ligne passée | confirmation d'une ligne ; irrigation réalisée au volume et à la durée prévus ; absent sur une ligne future ou déjà démarrée |
+| 7 | « Fait comme prévu » (« C'est fait » depuis S5, section 6.1, D-334) sur une ligne passée | confirmation d'une ligne ; irrigation réalisée au volume et à la durée prévus ; absent sur une ligne future ou déjà démarrée |
 | 8 | 78 espèces dont 3 sans référence | les 3 en premier, compteur « 3 à rattacher sur 78 », recherche par nom |
 | 9 | « Rattacher comme… » | une proposition d'après le nom, confirmation obligatoire, aucune écriture sans elle |
 | 10 | 6 abris « inconnue » | un bouton « Observer » par ligne ; 11 jardins à 50 % rangés en une phrase |

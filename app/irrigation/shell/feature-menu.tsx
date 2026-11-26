@@ -1,26 +1,36 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
-import { menuLayout } from '@/lib/domain/features/menu-groups';
-import { phoneBar, phoneBarLabel } from '@/lib/domain/features/phone-bar';
+import { menuPlaces } from '@/lib/domain/features/desktop-menu';
+import { phoneBar } from '@/lib/domain/features/phone-bar';
 import { pageHref, pageLabel, type IrrigationPageId, type PageQuery } from '@/lib/domain/features/pages';
+import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
+import { placeLabel } from '@/lib/domain/features/places';
+import { plusGestures } from '@/lib/domain/features/plus-sheet';
+import { weekViewLabel, type WeekViewId } from '@/lib/domain/features/week-page';
 import { Icon } from '../line-icon';
-import { PAGE_ICONS } from './page-icons';
+import { PAGE_ICONS, PLACE_ICONS } from './page-icons';
+import { PlusSheet } from './plus-sheet';
 import { TodayBadge, todayBadgeLabel, useTodayBadge } from './today-badge';
 
 /**
  * Le menu des pages du module (charte, deuxième passe de la refonte) : à
- * gauche sur ordinateur, en bande en bas sur tablette. Au téléphone (audit
- * ergonomique, point 2, 3.8 quater lot 2, précision F6), une barre du bas à
- * quatre entrées et « Plus », qui ouvre le menu entier en feuille au-dessus
- * de la barre. Il sert au gabarit de chaque page et à la page introuvable
- * (audit ergonomique, point 7), qui n'a pas de page courante : les deux
+ * gauche sur ordinateur ; au téléphone et à la tablette, jusqu'à 980 px, une
+ * barre du bas (audit ergonomique, point 2, 3.8 quater lot 2 ; lot K, F481).
+ * Il sert au gabarit de chaque page et à la page introuvable (audit
+ * ergonomique, point 7), qui n'a pas de page courante : les deux
  * gardent le même menu. « Aujourd'hui » y porte sa pastille (F12).
- * Depuis le tableau de bord (docs/aujourdhui-tableau-de-bord-contract.md,
- * section 3.1), « Aujourd'hui » est détaché en tête dans son encart, les
- * autres pages rangées en trois groupes titrés, Réglages à part en bas ; au
- * téléphone, son entrée de la barre est un bouton rond qui dépasse.
+ *
+ * Depuis la simplification, lot S3 (D-331), les deux se rangent en trois
+ * endroits, de la même fonction du domaine. La barre du téléphone (PR 2)
+ * montre les trois endroits et le « + » (`phoneBar`) : « Plus » et sa
+ * feuille n'existent plus ; le bouton rond qui dépasse est le « + ». Le menu
+ * de l'ordinateur (PR 3, section 6) montre le bouton « + Arroser ou noter »
+ * en tête, puis les trois endroits dépliés (`menuPlaces`) : « Aujourd'hui »
+ * dans son encart, les titres « Semaine » et « Ma ferme » qui sont des
+ * liens, Réglages dans « Ma ferme ». Depuis le lot S4, « Semaine » est une
+ * page : son titre y mène, et ses deux vues, « La semaine » et « Les
+ * cumuls », la suivent quand la ferme a les deux (S4-m).
  *
  * Un clic du menu ne recharge plus toute l'application (D-322) : `Link`
  * demande au serveur la seule page voulue, sans relancer les scripts ni
@@ -35,7 +45,8 @@ import { TodayBadge, todayBadgeLabel, useTodayBadge } from './today-badge';
  */
 let menuNavigation = false;
 
-function markMenuNavigation(): void {
+/** Un lien qui change de page comme le menu (les fiches de « Ma ferme ») le marque aussi. */
+export function markMenuNavigation(): void {
   menuNavigation = true;
 }
 
@@ -50,120 +61,132 @@ export function FeatureMenu({
   current,
   query,
   todayBadge,
+  rainMatters = false,
+  week = null,
+  weekView = null,
 }: {
   menu: readonly IrrigationPageId[];
   current: IrrigationPageId | null;
   query: PageQuery;
   /** Le nombre de la pastille quand la page le connaît déjà ; absent, il est lu après l'affichage. */
   todayBadge?: number | null;
+  /**
+   * La pluie compte pour la ferme (`farmRainMatters`, D-032) : le « + »
+   * propose « Noter la pluie ». Faux sur la page introuvable, qui ne lit pas
+   * le plan de la ferme.
+   */
+  rainMatters?: boolean;
+  /** Le jour ouvert de la page courante : l'entrée « Semaine » le garde (S3, section 3.3). */
+  week?: string | null;
+  /** La vue ouverte de « Semaine », que sa ligne du menu marque (lot S4, S4-m). */
+  weekView?: WeekViewId | null;
 }) {
-  const bar = phoneBar(menu, current);
-  const layout = menuLayout(menu);
+  const gestures = plusGestures(menu, rainMatters);
+  const bar = phoneBar(menu, current, gestures.length > 0);
+  const places = menuPlaces(menu, current);
+  // Le « + » de la barre et celui du menu de l'ordinateur ouvrent la même feuille (section 6, S3-l).
+  const plusProps = {
+    gestures,
+    season: query.season ?? null,
+    planning: menu.includes('planning'),
+    besoinsHref: menu.includes('besoins') ? pageHref('semaine', query, MEASURED_RAIN_ANCHOR) : null,
+  };
   const badge = useTodayBadge(menu, todayBadge);
   const badgeOf = (item: IrrigationPageId) => (item === 'aujourdhui' && badge !== null ? badge : null);
-  const [open, setOpen] = useState(false);
-  const menuId = useId();
-  const moreButton = useRef<HTMLButtonElement>(null);
-  const sheet = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    // La feuille se referme par Échap ou par un geste en dehors d'elle.
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      setOpen(false);
-      moreButton.current?.focus();
-    };
-    const closeOutside = (event: PointerEvent) => {
-      const target = event.target as Node | null;
-      if (target && (sheet.current?.contains(target) || moreButton.current?.contains(target))) return;
-      setOpen(false);
-    };
-    window.addEventListener('keydown', closeOnEscape);
-    document.addEventListener('pointerdown', closeOutside);
-    return () => {
-      window.removeEventListener('keydown', closeOnEscape);
-      document.removeEventListener('pointerdown', closeOutside);
-    };
-  }, [open]);
 
   return (
     <>
-      <nav className="phone-bar" data-tour="menu" aria-label="Pages principales" data-entries={bar.entries.length + (bar.more ? 1 : 0)}>
+      <nav className="phone-bar" data-tour="menu" aria-label="Pages principales" data-entries={bar.length}>
         <ul>
-          {bar.entries.map((item) => (
-            <li key={item} data-home={item === 'aujourdhui' || undefined}>
+          {bar.map((item) => (item.kind === 'plus' ? (
+            <li key="plus" data-plus>
+              <PlusSheet variant="bar" {...plusProps} />
+            </li>
+          ) : (
+            <li key={item.place} data-place={item.place}>
               <Link
-                href={pageHref(item, query)}
+                href={pageHref(item.page, item.place === 'semaine' ? { ...query, week } : query)}
                 prefetch={false}
-                onClick={item === current ? undefined : markMenuNavigation}
-                aria-label={todayBadgeLabel(pageLabel(item), badgeOf(item))}
-                aria-current={item === current ? 'page' : undefined}
+                onClick={item.current === 'page' ? undefined : markMenuNavigation}
+                aria-label={item.place === 'aujourdhui' ? todayBadgeLabel(placeLabel(item.place), badgeOf(item.page)) : undefined}
+                aria-current={item.current ?? undefined}
               >
-                {item === 'aujourdhui' ? <span className="menu-home-badge"><Icon name={PAGE_ICONS[item]} /></span> : <Icon name={PAGE_ICONS[item]} />}
-                <span>{phoneBarLabel(item, pageLabel(item))}</span>
-                <TodayBadge count={badgeOf(item)} />
+                <Icon name={PLACE_ICONS[item.place]} />
+                <span>{placeLabel(item.place)}</span>
+                {item.place === 'aujourdhui' ? <TodayBadge count={badgeOf(item.page)} /> : null}
               </Link>
             </li>
-          ))}
-          {bar.more ? (
-            <li>
-              <button
-                ref={moreButton}
-                type="button"
-                className="phone-bar-more"
-                aria-expanded={open}
-                aria-controls={menuId}
-                aria-label={bar.moreMarked ? `Plus de pages, dont la page ouverte : ${current ? pageLabel(current) : ''}` : 'Plus de pages'}
-                data-marked={bar.moreMarked}
-                onClick={() => setOpen((value) => !value)}
-              >
-                <Icon name="plus" />
-                <span>Plus</span>
-              </button>
-            </li>
-          ) : null}
+          )))}
         </ul>
       </nav>
-      <nav ref={sheet} id={menuId} className="feature-menu" data-tour="menu" aria-label="Pages du module" data-open={open} data-phone-bar-only={!bar.more}>
+      <nav className="feature-menu" data-tour="menu" aria-label="Pages du module">
         <ul>
-          {layout.today ? (
-            <li className="menu-home-item">
-              <Link
-                className="menu-home"
-                prefetch={false}
-                onClick={current === 'aujourdhui' ? undefined : markMenuNavigation}
-                href={pageHref('aujourdhui', query)}
-                aria-label={todayBadgeLabel(pageLabel('aujourdhui'), badgeOf('aujourdhui'))}
-                aria-current={current === 'aujourdhui' ? 'page' : undefined}
-              >
-                <span className="menu-home-badge"><Icon name={PAGE_ICONS.aujourdhui} /></span>
-                <span className="menu-home-text">
-                  <strong>{pageLabel('aujourdhui')}</strong>
-                  <small>Tableau de bord</small>
-                </span>
-                <TodayBadge count={badgeOf('aujourdhui')} />
-              </Link>
+          {gestures.length > 0 ? (
+            <li className="menu-plus-item">
+              <PlusSheet variant="menu" {...plusProps} />
             </li>
           ) : null}
-          {layout.groups.map((group) => (
-            <li key={group.title} className="menu-group">
-              <span className="menu-group-title" id={`${menuId}-${group.title}`}>{group.title}</span>
-              <ul aria-labelledby={`${menuId}-${group.title}`}>
-                {group.pages.map((item) => <MenuLink key={item} item={item} current={current} query={query} />)}
-              </ul>
-            </li>
-          ))}
-          {layout.settings ? (
-            <li className="menu-settings-item">
-              <ul>
-                <MenuLink item="reglages" current={current} query={query} />
-              </ul>
-            </li>
-          ) : null}
+          {places.map((group) => {
+            // La semaine garde le jour ouvert, comme la bande du téléphone (section 3.3, F885).
+            const groupQuery = group.place === 'semaine' ? { ...query, week } : query;
+            return (
+              <li key={group.place} className="menu-place" data-place={group.place}>
+                {group.entry === 'aujourdhui' ? (
+                  <Link
+                    className="menu-home"
+                    prefetch={false}
+                    onClick={group.mark === 'page' ? undefined : markMenuNavigation}
+                    href={pageHref('aujourdhui', query)}
+                    aria-label={todayBadgeLabel(pageLabel('aujourdhui'), badgeOf('aujourdhui'))}
+                    aria-current={group.mark ?? undefined}
+                  >
+                    <span className="menu-home-badge"><Icon name={PAGE_ICONS.aujourdhui} /></span>
+                    <span className="menu-home-text">
+                      <strong>{pageLabel('aujourdhui')}</strong>
+                      <small>Tableau de bord</small>
+                    </span>
+                    <TodayBadge count={badgeOf('aujourdhui')} />
+                  </Link>
+                ) : (
+                  <Link
+                    className="menu-place-title"
+                    href={pageHref(group.entry, groupQuery)}
+                    prefetch={false}
+                    onClick={group.entry === current ? undefined : markMenuNavigation}
+                    aria-current={group.mark ?? undefined}
+                  >
+                    <span>{placeLabel(group.place)}</span>
+                    <Icon name="chevron" />
+                  </Link>
+                )}
+                {group.pages.length > 0 ? (
+                  <ul aria-label={placeLabel(group.place)}>
+                    {group.pages.map((item) => <MenuLink key={item} item={item} current={current} query={groupQuery} />)}
+                  </ul>
+                ) : null}
+                {group.views.length > 0 ? (
+                  <ul aria-label={placeLabel(group.place)}>
+                    {group.views.map((view) => <MenuViewLink key={view} view={view} current={current === 'semaine' ? weekView : null} query={groupQuery} />)}
+                  </ul>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </>
+  );
+}
+
+/** Une vue de « Semaine » dans le menu de l'ordinateur (S4-m) : « La semaine », « Les cumuls ». */
+function MenuViewLink({ view, current, query }: { view: WeekViewId; current: WeekViewId | null; query: PageQuery }) {
+  return (
+    <li>
+      <Link href={pageHref('semaine', { ...query, view })} prefetch={false} onClick={view === current ? undefined : markMenuNavigation} aria-current={view === current ? 'page' : undefined}>
+        <Icon name={view === 'cumuls' ? PAGE_ICONS.historique : PAGE_ICONS.semaine} />
+        <span>{weekViewLabel(view)}</span>
+      </Link>
+    </li>
   );
 }
 

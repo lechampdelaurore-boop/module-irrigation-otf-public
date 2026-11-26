@@ -183,8 +183,12 @@ relevée (précision P4).
 
 ## 5. Les pages et la navigation
 
-**Une page par case cochée** (question 6), plus « Réglages ». L'ordre des
-pages est celui de la liste. La première page, celle qu'ouvre
+**Une page par case cochée** (question 6), plus « Réglages » et, depuis le
+lot S3 de la simplification (D-331), « Ma ferme », toujours ouverte comme
+Réglages, au-dessus d'elle dans le menu ; chaque page est rangée dans un des
+trois endroits (`docs/simplification-s3-contract.md`, section 3). L'ordre des
+pages est celui de la liste ; depuis la PR 3 du lot S3, le menu de
+l'ordinateur les montre dans l'ordre de leurs endroits (section 6). La première page, celle qu'ouvre
 « Irrigation », est la première case cochée de la liste (précision P10) : pour
 une ferme qui a tout coché, Arrosages (précision P36).
 
@@ -200,6 +204,7 @@ une ferme qui a tout coché, Arrosages (précision P36).
 | Alertes météo | `/irrigation/alertes-meteo` | l'encart et ses réglages |
 | Alertes cultures | `/irrigation/alertes-cultures` | l'encart, ses réglages, le microclimat |
 | Historique et cumuls | `/irrigation/historique` | cumuls, historique, séries, export |
+| Ma ferme | `/irrigation/ma-ferme` | une fiche par page cochée de l'endroit « Ma ferme », Réglages toujours (simplification, lot S3, PR 1, D-331) |
 | Réglages | `/irrigation/reglages` | la liste des cases et le socle de la section 3 |
 | (première ouverture) | `/irrigation/bienvenue` | la liste, rien coché |
 
@@ -209,7 +214,12 @@ une ferme qui a tout coché, Arrosages (précision P36).
   défile, la page courante en pilule verte. Les quatre pastilles d'univers de
   la maquette (Production, Vente, Gestion, Paramètres) sont celles d'Ouvre ta
   ferme : le module ne les reproduit pas (précision P11). Cibles tactiles de
-  44 px.
+  44 px. Depuis la simplification S3, PR 2 (D-331), la barre du bas porte
+  les trois endroits et le « + » ; les pages d'un endroit se trouvent par sa
+  bande ou ses fiches (`docs/simplification-s3-contract.md`, section 4).
+  Depuis la PR 3, le menu de l'ordinateur porte le bouton « + Arroser ou
+  noter » en tête, puis les trois endroits dépliés, Réglages dans
+  « Ma ferme » (section 6).
 - **La saison et la parcelle** suivent d'une page à l'autre, dans l'adresse
   (`?season=…&zone=…`) ; la parcelle choisie n'est plus perdue en changeant de
   page (précision P12).
@@ -227,6 +237,15 @@ une ferme qui a tout coché, Arrosages (précision P36).
   votre ferme. » Les nouvelles notifications donnent l'adresse de la page.
 - **Chaque page ne lit que ses données** : la page d'aujourd'hui charge tous les
   tableaux de bord à chaque ouverture ; chaque page ne chargera que les siens.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** Une page de plus, `semaine` (`/irrigation/semaine`),
+qui n'est pas une case : elle existe quand le planning, les besoins ou
+l'historique est coché, et les réunit (S4-a). Les trois cases gardent leur
+sens : elles disent ce que la page contient, au menu des fonctionnalités et
+pour `pageAccess`. Leurs anciennes adresses mènent à « Semaine », paramètres et
+ancre gardés, l'historique à la vue « Les cumuls ». Depuis la PR 4, aucun
+lien du module ne vise plus ces adresses : notifications, liens des pages,
+relecture des réglages et visite guidée visent « Semaine ».
 
 ## 6. L'aide contextuelle
 

@@ -89,6 +89,8 @@ Les jeux de la 3.9 (scénarios S1 à S28) fournissent le comportement du moteur 
 ### Principe
 Des **bulles** ancrées sur des éléments de l'écran, avec un texte court, un bouton « Suivant », « Passer » et « Quitter la visite ». Elles se **raccrochent par un attribut stable** (par exemple `data-tour="..."`), jamais par le texte ou la position du menu : le menu, déjà réordonné en 3.8 (P36) et que la deuxième passe restyle, peut encore changer.
 
+**Depuis la simplification, lot S3, PR 4 (25 novembre 2026, D-331).** Le repère `menu` est posé sur la barre du bas et sur le menu de gauche ; la bulle se raccroche à celui qu'on voit (la barre jusqu'à 980 px, le menu au-delà). Les phrases qui en parlent disent les trois endroits et le « + » : l'étape 4 de « Bienvenue » s'appelle « Trois endroits » (à quoi sert chaque endroit, ce que fait le « + », et qu'une ferme ne voit que ce qu'elle a coché, la visite sautant le reste), l'étape 3 du « Module à la carte » « Les endroits suivent vos cases » (une page n'apparaît dans son endroit que cochée ; un endroit sans page disparaît, comme le « + » sans geste). Plus aucune bulle ne dit « le menu ne montre que… » ni « Plus ».
+
 ### Visites proposées (une par thème, 2 à 4 minutes chacune)
 1. **Bienvenue** : ce qu'est le module, ce que la démo contient, comment la remettre à zéro, comment passer d'une ferme à l'autre.
 2. **Un arrosage de A à Z** : choisir une planche, un matériel, une quantité, valider ; comprendre « d'où vient ce chiffre » (bulles de la 3.8).
@@ -103,6 +105,14 @@ Des **bulles** ancrées sur des éléments de l'écran, avec un texte court, un 
 - **Reprenable** : l'étape en cours est rangée côté navigateur (rien de sensible), avec repli propre si le stockage est refusé.
 - La visite **ne fait jamais d'action à la place du visiteur** et ne valide rien sans clic de sa part.
 - Si un élément ancré est absent (case décochée, page masquée), l'étape est **sautée** sans message d'erreur.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** Les étapes `planning-semaine`,
+`planning-propositions`, `planning-non-servies` et `planning-creneaux` gardent
+leur repère et se jouent sur « Semaine ». Un repère rangé dans un pli fermé de
+la page (« Le détail » et ses sections) est montré en ouvrant ces plis, comme
+le détail de la bannière au téléphone (F291) : l'élément présenté est à
+l'écran, jamais caché dans un pli. Une étape dont l'élément manque reste
+sautée.
 
 ## 8. Remise à zéro
 

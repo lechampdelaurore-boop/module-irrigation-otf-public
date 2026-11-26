@@ -3,7 +3,7 @@ import type { FeatureSelection } from '../features/selection.ts';
 import { waterText } from '../figure-origin.ts';
 import type { EquipmentKind } from '../irrigation-domain.ts';
 import type { IrrigationEventRecord } from '../irrigation-event-record.ts';
-import { isTimerAwaitingConfirmation } from '../irrigation-timer.ts';
+import { isTimerAwaitingConfirmation, type IrrigationTimerSnapshot } from '../irrigation-timer.ts';
 import { remainingIrrigationForStart } from '../water-management.ts';
 import { bedsText, durationText, irrigationAnchor, irrigationPage, timeText } from './today-irrigations.ts';
 import { farmDateKey } from './today-text.ts';
@@ -15,9 +15,10 @@ import { SIMPLE_WORDS } from '../simple-words.ts';
  * docs/audit-ergonomie-2026-11-19-lot-h-contract.md, section 5) : une
  * irrigation dont le minuteur tourne, est en pause ou attend sa
  * confirmation, et le reliquat d'une irrigation partielle encore à
- * reprendre. Les gestes restent ceux d'« Arrosages » (D-028) : l'arrêt, avec
- * sa durée réelle à confirmer, s'y fait depuis la carte ; « Reprendre le
- * reliquat » est le même geste que là-bas.
+ * reprendre. Les gestes sont ceux d'« Arrosages » (D-028), joués depuis la
+ * carte (simplification, lot S2, PR 2) : la fin, avec son heure réelle à
+ * confirmer dans la même fenêtre, la pause, la reprise, et « Reprendre ce
+ * qui reste ».
  */
 
 type NowTone = 'running' | 'paused' | 'finished' | 'remainder';
@@ -39,25 +40,37 @@ export type TodayNowLine = {
   title: string;
   /** « depuis 9 h 40, fin prévue à 13 h 50 », « reste 1 h 20 · 1,3 m³ ». */
   detail: string;
+  /** Le nom du matériel seul, que la fenêtre de fin nomme (« Vérifiez que la vanne de … est fermée »). */
+  equipmentName: string;
+  /** L'heure de fin à proposer : celle de la pause d'une irrigation en pause ; `null` : maintenant. */
+  suggestedEndAt: string | null;
+  /** Le minuteur, pour le compte à rebours de la carte ; `null` pour ce qui reste d'un arrosage arrêté. */
+  timer: IrrigationTimerSnapshot | null;
   /** « planches P1 et P2 », vide sans nom connu. */
   bedsText: string;
   bedIds: string[];
   equipmentKind: EquipmentKind;
-  /** « Reprendre le reliquat » : le reliquat seulement ; une irrigation en cours s'arrête sur « Arrosages ». */
+  /** « Reprendre ce qui reste » : le reste d'un arrosage arrêté seulement. */
   canResume: boolean;
   open: { page: IrrigationPageId; anchor: string };
 };
 
-function tone(event: IrrigationEventRecord, now: Date): NowTone {
+function timerOf(event: IrrigationEventRecord): IrrigationTimerSnapshot | null {
   const equipment = event.equipment;
-  if (equipment.timerState === 'paused') return 'paused';
-  return isTimerAwaitingConfirmation({
-    state: 'running',
+  if (!equipment.timerState) return null;
+  return {
+    state: equipment.timerState,
     resumedAt: equipment.timerResumedAt,
     pausedAt: equipment.timerPausedAt,
     accumulatedSeconds: equipment.timerAccumulatedSeconds,
     targetDurationSeconds: equipment.plannedDurationSeconds,
-  }, now) ? 'finished' : 'running';
+  };
+}
+
+function tone(event: IrrigationEventRecord, now: Date): NowTone {
+  if (event.equipment.timerState === 'paused') return 'paused';
+  const timer = timerOf(event);
+  return timer && isTimerAwaitingConfirmation({ ...timer, state: 'running' }, now) ? 'finished' : 'running';
 }
 
 function runningDetail(event: IrrigationEventRecord, state: NowTone, today: string): string {
@@ -66,8 +79,8 @@ function runningDetail(event: IrrigationEventRecord, state: NowTone, today: stri
   const parts: string[] = [];
   if (state === 'paused' && equipment.timerPausedAt) parts.push(`en pause depuis ${timeText(equipment.timerPausedAt, today)}`);
   else if (since) parts.push(`depuis ${timeText(since, today)}`);
-  if (state === 'finished') parts.push('fermer la vanne');
-  else if (state === 'running' && equipment.timerTheoreticalEndAt) parts.push(`fin prévue à ${timeText(equipment.timerTheoreticalEndAt, today)}`);
+  // La durée atteinte dit sa consigne à part, sous la carte (`nowCountdownText`).
+  if (state === 'running' && equipment.timerTheoreticalEndAt) parts.push(`fin prévue à ${timeText(equipment.timerTheoreticalEndAt, today)}`);
   return parts.join(', ');
 }
 
@@ -101,6 +114,9 @@ export function nowIrrigationLines(input: {
       status: STATUS_TEXT[state],
       title: `${equipment.equipmentSnapshot.name} · ${equipment.settingSnapshot.name}`,
       detail: state === 'remainder' ? remainderDetail(event, input.now) : runningDetail(event, state, today),
+      equipmentName: equipment.equipmentSnapshot.name,
+      suggestedEndAt: state === 'paused' ? equipment.timerPausedAt : null,
+      timer: state === 'remainder' ? null : timerOf(event),
       bedsText: bedsText(bedIds, input.bedNames),
       bedIds,
       equipmentKind: equipment.equipmentSnapshot.kind,

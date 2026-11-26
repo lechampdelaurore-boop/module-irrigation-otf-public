@@ -1,13 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import { pageDocumentTitle } from '../lib/domain/features/pages.ts';
 import {
+  allerALaPage,
   attendreLaPageIrrigation,
   attendreLaPagePrete,
-  ouvrirLeMenuDesPages,
   surveillerLaConsole,
   TITRES_DES_PAGES,
   verifierLEtape,
-  type PageDuModule,
 } from './support/parcours.ts';
 
 /**
@@ -15,13 +14,15 @@ import {
  * docs/browser-journeys-contract.md ; constat du 24 novembre 2026, le module
  * « rame » au téléphone comme à l'ordinateur).
  *
- * Sur la ferme de démonstration, qui a tout coché : un clic du menu, de la
- * barre du bas ou de la feuille « Plus » au téléphone, change la page sans
- * recharger l'application (une marque posée dans la fenêtre survit au
+ * Sur la ferme de démonstration, qui a tout coché : un clic du menu, ou au
+ * téléphone de la barre du bas, d'une fiche de « Ma ferme », du retour « ‹ »
+ * (simplification, lot S3, PR 2) et du sélecteur des vues de « Semaine »
+ * (lot S4, section 3.2), change la page
+ * sans recharger l'application (une marque posée dans la fenêtre survit au
  * changement) ; la page suivie a son titre, son onglet et sa marque dans le
- * menu ; la feuille « Plus » est refermée ; le clavier repart du contenu de la
- * nouvelle page ; le retour du navigateur ramène la page d'avant. Rien n'est
- * enregistré : le parcours ne laisse aucune trace dans la base partagée.
+ * menu ou la barre ; le clavier repart du contenu de la nouvelle page ; le
+ * retour du navigateur ramène la page d'avant. Rien n'est enregistré : le
+ * parcours ne laisse aucune trace dans la base partagée.
  */
 
 const MARQUE = 'p59-sans-rechargement';
@@ -36,11 +37,6 @@ async function laMarque(page: Page): Promise<string | null> {
   return page.evaluate((marque) => (window as unknown as Record<string, string | undefined>)[marque] ?? null, MARQUE);
 }
 
-async function suivreLeMenu(page: Page, cible: PageDuModule): Promise<void> {
-  const menu = await ouvrirLeMenuDesPages(page);
-  await menu.getByRole('link', { name: TITRES_DES_PAGES[cible], exact: true }).click();
-  await attendreLaPagePrete(page, cible);
-}
 
 test('un clic du menu change la page sans recharger le module, et le clavier repart de son contenu', async ({ page }, testInfo) => {
   const journal = surveillerLaConsole(page);
@@ -49,39 +45,48 @@ test('un clic du menu change la page sans recharger le module, et le clavier rep
   await attendreLaPageIrrigation(page, 'arrosages');
   await poserLaMarque(page);
 
-  // Une page de la feuille « Plus » au téléphone, du menu de gauche à l'ordinateur.
-  await suivreLeMenu(page, 'materiel');
+  // Le menu de gauche à l'ordinateur ; au téléphone, « Ma ferme » dans la barre du bas, puis la fiche du matériel.
+  await allerALaPage(page, 'materiel');
   expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
   await expect(page).toHaveTitle(pageDocumentTitle(TITRES_DES_PAGES.materiel));
   await expect(page).toHaveURL(/\/irrigation\/materiel(\?|$)/);
   await expect(page.locator('#contenu')).toBeFocused();
-  // La feuille « Plus » refermée, comme après un chargement ; « Plus » marque la page ouverte.
-  const feuille = page.getByRole('navigation', { name: 'Pages du module' });
+  // L'entrée de la page marquée : son lien à l'ordinateur, son endroit au téléphone.
   if (telephone) {
-    await expect(feuille).toBeHidden();
-    await expect(page.getByRole('navigation', { name: 'Pages principales' }).getByRole('button', { name: /^Plus de pages/ })).toHaveAttribute('data-marked', 'true');
+    await expect(page.getByRole('navigation', { name: 'Pages principales' }).getByRole('link', { name: TITRES_DES_PAGES['ma-ferme'], exact: true })).toHaveAttribute('aria-current', 'true');
   } else {
-    await expect(feuille.getByRole('link', { name: TITRES_DES_PAGES.materiel, exact: true })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('navigation', { name: 'Pages du module' }).getByRole('link', { name: TITRES_DES_PAGES.materiel, exact: true })).toHaveAttribute('aria-current', 'page');
   }
   await verifierLEtape(page, journal, 'Matériel par le menu');
 
-  // Une entrée de la barre du bas au téléphone (le menu de gauche à l'ordinateur).
+  // Le retour « ‹ » au téléphone, sans recharger non plus.
   if (telephone) {
-    await page.getByRole('navigation', { name: 'Pages principales' }).getByRole('link', { name: TITRES_DES_PAGES.planning, exact: true }).click();
-    await attendreLaPagePrete(page, 'planning');
-  } else {
-    await suivreLeMenu(page, 'planning');
+    await page.getByRole('link', { name: 'Retour à Ma ferme' }).click();
+    await attendreLaPagePrete(page, 'ma-ferme');
+    expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
+    await expect(page.locator('#contenu')).toBeFocused();
+    await verifierLEtape(page, journal, 'retour à « Ma ferme »');
   }
+
+  // « Semaine » dans la barre du bas au téléphone, le menu de gauche à l'ordinateur (lot S4).
+  await allerALaPage(page, 'semaine');
   expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
-  await expect(page).toHaveTitle(pageDocumentTitle(TITRES_DES_PAGES.planning));
+  await expect(page).toHaveTitle(pageDocumentTitle(TITRES_DES_PAGES.semaine));
   await expect(page.locator('#contenu')).toBeFocused();
-  await verifierLEtape(page, journal, 'Planning par le menu');
+  await verifierLEtape(page, journal, 'Semaine par le menu');
+  // Puis « Les cumuls », par le sélecteur de vue au téléphone, par le menu à l'ordinateur : la vue change sans recharger (section 3.2).
+  await allerALaPage(page, 'historique');
+  expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
+  await expect(page.getByRole('navigation', { name: 'Vues de la semaine' }).getByRole('link', { name: 'Les cumuls', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('#contenu')).toBeFocused();
+  await verifierLEtape(page, journal, 'Les cumuls par le sélecteur de vue');
 
   // Le retour du navigateur ramène la page d'avant, sans recharger non plus.
   await page.goBack();
-  await attendreLaPagePrete(page, 'materiel');
+  await attendreLaPagePrete(page, 'besoins');
+  await expect(page.getByRole('navigation', { name: 'Vues de la semaine' }).getByRole('link', { name: 'La semaine', exact: true })).toHaveAttribute('aria-current', 'page');
   expect(await laMarque(page), 'le module n’a pas été rechargé').toBe('posée');
-  await verifierLEtape(page, journal, 'retour à Matériel');
+  await verifierLEtape(page, journal, 'retour à la page d’avant');
 });
 
 /**

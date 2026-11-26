@@ -73,12 +73,16 @@ l'écran.
 **Règles.**
 
 1. Chaque tuile entière est un lien (`<a>`), construit par `pageHref` avec
-   la saison et la zone de la page :
+   la saison et la zone de la page ; « Eau reçue », quand la pluie compte,
+   est un bouton du même dessin qui ouvre la fenêtre « Noter la pluie »
+   (simplification S2, PR 4, D-330, F856), le lien vers
+   `besoins#manual-rain` restant dans la fenêtre pour retirer une mesure ou
+   voir jour par jour :
 
    | Tuile | Mot d'action écrit sur la tuile | Cible |
    | --- | --- | --- |
    | Objectif de la semaine | « Modifier les objectifs » ; « Poser un objectif » quand aucun n'est posé | `besoins#objectifs-de-la-semaine` |
-   | Eau reçue | « Noter une pluie mesurée » ; « Voir jour par jour » pour une ferme toute sous abri, où la pluie ne compte pas (D-032) | `besoins#manual-rain` ; sinon `besoins#weather` |
+   | Eau reçue | « Noter la pluie » (depuis S2, PR 4 ; « Noter une pluie mesurée » avant) ; « Voir jour par jour » pour une ferme toute sous abri, où la pluie ne compte pas (D-032) | la fenêtre « Noter la pluie » ; sans elle `besoins#manual-rain` ; toute sous abri `besoins#weather` |
    | Reste à apporter | « Voir par planche » ; « Voir ce qui manque » quand le reste est inconnu | `besoins#irrigation-needs-title` |
    | Eau utilisée | « Voir jour par jour » | `besoins#weather` |
 
@@ -103,7 +107,7 @@ l'écran.
 | --- | --- | --- |
 | Maraîchage, début d'été | Objectif 23,4 mm | « 7 planches sur 10 ont un objectif, du lun. 15 juin au dim. 21 juin » · « Modifier les objectifs » |
 | Petite ferme, début d'été | « aucun objectif posé » | « Poser un objectif » ; « Reste à apporter : inconnu » · « Voir ce qui manque » |
-| Maraîchage, automne | Eau reçue, « 2,4 mm de pluie prévue, non mesurée » | « Noter une pluie mesurée » |
+| Maraîchage, automne | Eau reçue, « 2,4 mm de pluie prévue, non mesurée » | « Noter la pluie », qui ouvre sa fenêtre |
 | Maraîchage, pénurie | Eau utilisée 768 L | « rien aujourd'hui » · « Voir jour par jour » |
 
 ## 4. L2 — Les jauges mènent à leur page
@@ -167,6 +171,13 @@ mène à sa proposition du planning.
 5. Une carte « À valider » dit « Valider au planning » au lieu d'« Ouvrir » ;
    la cible ne change pas, rien n'est validé par le lien (D-028). Une carte
    planifiée garde « Ouvrir ».
+   **Réécrite par la simplification, lot S2, PR 1** (D-330,
+   `docs/simplification-s2-contract.md`, section 10) : le **bouton**
+   « Valider » valide, la même action que le planning ; le lien vers la
+   carte du planning devient « Changer l'heure ou la dose », dans « Autres
+   choix » ; rien n'est validé par un lien (D-028 tient). Une carte
+   planifiée porte « Démarrer », son lien « Modifier ou annuler sur
+   « Arrosages » » dans « Autres choix ».
 
 ## 6. L4 — La réponse d'un geste s'écrit sous le bouton
 
@@ -231,6 +242,13 @@ qui change de place d'un jour à l'autre se cherche. Sur ordinateur, l'ordre
 ne change pas. L'ordre de lecture au clavier et au lecteur d'écran suit
 l'ordre affiché.
 
+**Étendue par la simplification, lot S2, PR 5** (D-330) : la règle tient, et
+vaut désormais à toutes les largeurs. « Votre journée » suit l'en-tête aussi à
+l'ordinateur ; la semaine y est une barre, et ses quatre tuiles sont dans le
+pli « Le détail » (`docs/simplification-s2-contract.md`, section 8). L'ordre
+de lecture suit toujours l'ordre affiché : il n'y a plus d'ordre propre au
+téléphone.
+
 **Ce que la règle change.** La précision T5 du contrat de la page (ordre des
 blocs validé le 8 novembre 2026), sur le téléphone seulement. **Option
 recommandée, que le porteur peut refuser d'un mot** avant le code de L6 ;
@@ -253,3 +271,15 @@ les cinq autres PR n'en dépendent pas.
   démonstration en ligne, sur ordinateur et sur son téléphone.
 - L'ancre d'une ressource limitée et la page d'alerte d'un jour quand les
   deux alertes sont cochées restent à confirmer en codant.
+
+## Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4)
+
+Les liens qui menaient à « Objectifs et besoins » ou au planning mènent à
+« Semaine », chacun à la même ancre (L1, L3) : les tuiles, les lignes d'« Eau
+de la semaine », la ligne du plan, « Plan calculé … », la proposition à
+« Changer l'heure ou la dose », les lignes de « Fiabilité du calcul ». Les mots
+qui nommaient une page disparue changent : « Voir le planning de la semaine »
+et « Voir au planning » deviennent « Voir la semaine », comme le lien d'« Eau
+de la semaine ». « Noter la pluie » de « Fiabilité du calcul » ouvre toujours
+sa fenêtre sur la page ; quand elle n'y est pas offerte, le lien mène à
+« Semaine », qui l'ouvre à l'arrivée (`?pluie=1`, lue une fois).

@@ -10,9 +10,11 @@ import {
   pageAccess,
   pageHref,
   pageUsesSeason,
+  weekRedirectHref,
   WELCOME_PATH,
   type IrrigationPageId,
 } from '@/lib/domain/features/pages';
+import { resolveWeekView, type WeekPageFeature, type WeekViewId } from '@/lib/domain/features/week-page';
 import { parseIrrigationSeason, parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import type { IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
 import { otfReadLineReason } from '@/lib/domain/otf-read-line';
@@ -27,6 +29,7 @@ import { DemoSpacePreparingError } from '@/lib/services/demo-space';
 import { FarmFrozenError } from '@/lib/services/farm-erasure-request';
 import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
+import { farmRainMatters } from '@/lib/domain/today/rain-entry';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
 import { usesPlotShelters, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
@@ -60,6 +63,10 @@ export type IrrigationSearchParams = Promise<{
   absente?: string | string[];
   /** L'onglet de « Matériel » (audit du 19 novembre 2026, lot J, n° 15, F461). */
   onglet?: string | string[];
+  /** La vue de « Semaine » : `cumuls` pour « Les cumuls » (simplification, lot S4, S4-b). */
+  vue?: string | string[];
+  /** Les autres paramètres, comme l'intention d'un lien (`recalculer`), qu'une ancienne adresse transmet à « Semaine ». */
+  [key: string]: string | string[] | undefined;
 }>;
 
 export type ReadyPageContext = {
@@ -74,6 +81,8 @@ export type ReadyPageContext = {
   nowIso: string;
   snapshot: IrrigationSnapshot;
   enabled: readonly FeatureId[];
+  /** La vue ouverte de « Semaine » (lot S4, section 3.2) ; `null` sur toute autre page. */
+  weekView: WeekViewId | null;
   shell: ShellProps;
   /** Les durées de chaque étape de la lecture, pour le journal `irrigation_page_loaded`. */
   lap: (step: string) => void;
@@ -112,6 +121,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     redirect(pageHref(access.page, { season: typeof params.season === 'string' ? linkSeason : null, zone, absent: access.requested }));
   }
   const enabled: FeatureId[] = selection.enabled;
+  const weekView = page === 'semaine' ? resolveWeekView(params.vue, enabled) : null;
   stopwatch.lap('selection');
 
   // L'accueil de la ferme se lit avec le plan : le bandeau « À finir » de chaque page (4.4, F582).
@@ -153,6 +163,7 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     nowIso: new Date().toISOString(),
     snapshot,
     enabled,
+    weekView,
     shell: {
       page,
       menu: menuPages(enabled),
@@ -179,6 +190,10 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
         speciesToLink,
         planningToValidate: enabled.includes('planning') && !planningAllowed(onboarding),
       }),
+      week,
+      weekView,
+      // Le « + » propose « Noter la pluie » sauf à une ferme toute sous abri (simplification S3, section 4.1, D-032).
+      rainMatters: farmRainMatters(snapshot, season),
     },
     lap: (step) => stopwatch.lap(step),
     logLoaded: () => {
@@ -187,6 +202,35 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
       logJsonLine('info', { event: 'irrigation_page_loaded', page, season, snapshotSource: snapshot.source, forceRefresh, durationsMs, totalMs, loadedAt: new Date().toISOString() });
     },
   };
+}
+
+/**
+ * Les trois anciennes pages de la semaine (simplification, lot S4,
+ * docs/simplification-s4-contract.md, section 3.3, précision S4-o) : leur
+ * adresse mène à « Semaine », sur la vue qui porte leur contenu, avec tous
+ * ses paramètres ; le navigateur garde l'ancre. Avant, la conduite d'avant
+ * tient : une ferme qui n'a jamais ouvert le module choisit ses cases (R5),
+ * une case décochée mène à la page d'arrivée, qui nomme la page demandée
+ * (P14, F265). Rien d'Ouvre ta ferme n'est lu pour une redirection.
+ */
+export async function redirectToWeekPage(feature: WeekPageFeature, searchParams: IrrigationSearchParams): Promise<UnavailableStateProps> {
+  const params = await searchParams;
+  let user: AuthenticatedUser;
+  try {
+    user = await requireAuthenticatedUser();
+  } catch (error) {
+    const props = accessRefusedState(feature, parseIrrigationSeason(params.season), error);
+    if (props) return props;
+    throw error;
+  }
+  const selection = await getFeatureSelectionForUser(user.userId);
+  const access = pageAccess(feature, selection.firstVisit, selection.enabled);
+  if (access.kind === 'welcome') redirect(WELCOME_PATH);
+  if (access.kind === 'not-enabled') {
+    const zone = typeof params.zone === 'string' && params.zone.length > 0 ? params.zone : null;
+    redirect(pageHref(access.page, { season: typeof params.season === 'string' ? parseIrrigationSeason(params.season) : null, zone, absent: access.requested }));
+  }
+  redirect(weekRedirectHref(feature, params));
 }
 
 /**

@@ -1,0 +1,139 @@
+/*
+ * « Aujourd'hui » à l'essentiel (simplification, lot S2, PR 5,
+ * docs/simplification-s2-contract.md, section 8) : le premier niveau tient en
+ * un écran et demi au téléphone ; le reste est derrière un seul pli « Le
+ * détail », fermé. Les lignes du premier niveau sont courtes, une phrase et
+ * son geste ; les blocs entiers gardent leur dessin dans le pli.
+ */
+
+/* Au téléphone, les pastilles quittent l'en-tête : la phrase les redit (S2-g). */
+@container (max-width: 620px) {
+  .today-chips {
+    display: none;
+  }
+
+  /* La frise, dans « Le détail », reste à l'ordinateur : au téléphone, les cartes suffisent (S2-f). */
+  .today-block[data-kind="timeline"] {
+    display: none;
+  }
+}
+
+.today-essential-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font: 500 var(--text-16)/1.3 var(--font-ui);
+}
+
+.today-essential-title .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--water-ink);
+}
+
+.today-essential .today-days {
+  margin-top: 10px;
+}
+
+.today-essential-warn {
+  margin: 10px 0 0;
+  padding: .6rem .8rem;
+  border-radius: 9.75px;
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-weight: 700;
+}
+
+.today-week-sentence {
+  margin: 8px 0 0;
+  font-size: var(--text-16);
+  line-height: 1.45;
+}
+
+.today-week-bar {
+  display: block;
+  margin-top: 10px;
+}
+
+.today-week-detail {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.today-essential-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+/* Une ligne d'avertissement : une phrase et son geste, sur la bande ambrée ou bleue de la charte. */
+.today-essential-line {
+  padding: 10px 14px 12px;
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+}
+
+.today-essential-line[data-tone="water"] {
+  border-left-color: var(--water);
+  background: var(--water-soft);
+}
+
+.today-essential-line-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.today-essential-line-text .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--water-ink);
+}
+
+.today-essential-line-text a {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--ink);
+}
+
+.today-essential-line .today-essential-actions {
+  margin-top: 6px;
+}
+
+/* « Le détail » : un seul pli, la ligne de résumé dit ce qu'il contient. */
+.today-detail > summary {
+  display: flex;
+  min-height: var(--touch-target);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--sheet);
+  cursor: pointer;
+}
+
+.today-detail-title {
+  font: 500 var(--text-16)/1.3 var(--font-ui);
+}
+
+.today-detail-count {
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.today-detail-body {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}

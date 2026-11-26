@@ -30,7 +30,7 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(24 * 60, reference));
-  await page.getByRole('button', { name: 'Planifier l’irrigation' }).click();
+  await page.getByRole('button', { name: /^Planifier l’arrosage de / }).click();
   const prevue = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
   await expect(prevue).toHaveCount(1);
   await expect(prevue.getByRole('button', { name: 'Démarrer maintenant' })).toBeEnabled();
@@ -67,7 +67,7 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
   await expect(prevue.getByRole('button', { name: 'Démarrer maintenant' })).toBeDisabled();
   // Le formulaire ne le propose plus, et ne l'affiche pas : un matériel se
   // repose depuis la page du matériel (règle 11, précision P37).
-  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+  await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
   await expect(optionDuMateriel(page, materiel)).toHaveCount(0);
   await expect(page.getByLabel('Matériel stocké')).toHaveCount(0);
   await verifierLEtape(page, journal, 'irrigation planifiée signalée, matériel non sélectionnable');
@@ -104,7 +104,7 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
 
   // Saisie après coup (règle 12) : le matériel n'est proposé qu'à une heure de
   // début où il était posé.
-  await page.getByRole('tab', { name: /^Déjà réalisée/ }).click();
+  await page.getByRole('tab', { name: /^Déjà fait/ }).click();
   await page.getByLabel('Début réel').fill(horodatageLocal(-45, reference));
   await expect(optionDuMateriel(page, materiel)).toHaveCount(0);
   await page.getByLabel('Début réel').fill(horodatageLocal(-90, reference));
@@ -128,7 +128,8 @@ async function compter(page: Page, etat: 'posé' | 'stocké'): Promise<number> {
 
 /** L'option du matériel dans la liste du formulaire d'irrigation. */
 function optionDuMateriel(page: Page, materiel: string) {
-  return page.locator('.irrigation-form-fields select option').filter({ hasText: materiel });
+  // « Arroser maintenant » le liste en case ronde, ou dans sa liste au-delà de six (simplification S5, section 3.1).
+  return page.locator('.irrigation-form-fields select option, .watering-now select option, .watering-where-row').filter({ hasText: materiel });
 }
 
 /**

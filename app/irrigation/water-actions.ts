@@ -4,6 +4,7 @@ import { getAuthenticatedUser } from '@/app/access-auth';
 import {
   clearHydricGoalsForUser,
   deleteManualRainfallForUser,
+  listWeatherDailyValuesForUser,
   saveDailyWaterLimitForUser,
   saveHydricGoalForUser,
   saveManualRainfallForUser,
@@ -18,6 +19,8 @@ import {
   getWaterDashboardForUser,
   type WaterDashboard,
 } from '@/lib/services/water-dashboard';
+import { manualRainfallRefusal, rainEntry, rainEntryFirstDate, type RainEntry } from '@/lib/domain/today/rain-entry';
+import { todaySeason } from '@/lib/domain/today/today-view';
 import { locationKeyForCandidate, outsidePilotArea } from '@/lib/domain/weather/location';
 import {
   weekStartDateKey,
@@ -263,12 +266,8 @@ export async function saveManualRainfallAction(input: {
 }): Promise<WaterActionResult> {
   const context = await loadContext(input.season);
   if (!context.ok) return context;
-  if (!isValidDateKey(input.date) || input.date > dateKeyInTimeZone(new Date())) {
-    return { ok: false, message: 'Une mesure réelle doit concerner une date valide, aujourd’hui ou dans le passé.' };
-  }
-  if (!Number.isFinite(input.precipitationMm) || input.precipitationMm < 0 || input.precipitationMm > 1000) {
-    return { ok: false, message: 'La pluie mesurée doit être comprise entre 0 et 1 000 mm.' };
-  }
+  const refusal = manualRainfallRefusal({ date: input.date, precipitationMm: input.precipitationMm, today: dateKeyInTimeZone(new Date()) });
+  if (refusal) return { ok: false, message: refusal };
   await saveManualRainfallForUser(
     context.value.ownerUserId,
     input.date,
@@ -277,6 +276,29 @@ export async function saveManualRainfallAction(input: {
   // La pluie au pluviomètre, 0 mm compris, fait recalculer le plan de sa semaine (3.7, règle 4).
   await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'rain-recorded', season: input.season, at: input.date });
   return successWithDashboard(context.value, safeWeekStart(input.weekStart) ?? weekStartDateKey(new Date()), 'La pluie mesurée a été enregistrée.');
+}
+
+/**
+ * « Noter la pluie » depuis le « + » de la barre (simplification S3, section
+ * 4.1) : les jours proposés et les mesures déjà notées au pluviomètre, lus
+ * quand on ouvre le geste, jamais au chargement d'une page (section 7). Seule
+ * la pluie notée à la main de la ferme est lue : elle ne dépend pas de la
+ * commune de la météo (`farm:manual`).
+ */
+export async function readRainEntryAction(): Promise<{ ok: true; entry: RainEntry; season: number } | { ok: false; message: string }> {
+  const user = await getAuthenticatedUser();
+  if (!user) return { ok: false, message: 'Votre session a expiré.' };
+  const now = new Date();
+  const today = dateKeyInTimeZone(now);
+  try {
+    const rows = await listWeatherDailyValuesForUser(user.userId, 'farm:manual', rainEntryFirstDate(today), today);
+    const measured = new Map(rows
+      .filter((row) => row.dataKind === 'manual_precipitation' && row.precipitationMm !== null)
+      .map((row) => [row.date, row.precipitationMm as number]));
+    return { ok: true, entry: rainEntry({ today, measured }), season: todaySeason(now) };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : 'La pluie déjà notée n’a pas pu être lue.' };
+  }
 }
 
 /** Retirer une mesure de pluie est une saisie au pluviomètre comme une autre : la réanalyse reprend, le plan se recalcule (3.7, règle 4). */

@@ -129,6 +129,9 @@ permises, il n'apparaît pas.
    formulaire** « Enregistrer ou planifier », texte inchangé ; les états
    « Recevoir les alertes » et « Alertes activées » gardent leur place
    (F266).
+   **Amendé par la simplification S5 (D-334, F908)** : tous les états
+   viennent sous le formulaire, à une seule place, pour que « 1. Où ? »
+   commence sous 400 px au téléphone ; le texte et le repli ne changent pas.
 2. **Replié une fois vu à toutes les largeurs** (F267), avec le point sur la
    cloche ; Réglages le garde en entier.
 

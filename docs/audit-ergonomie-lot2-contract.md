@@ -32,7 +32,7 @@ Chaque PR met les registres à jour ; la PR 1 consigne le déploiement de la PR 
 
 ## 4. Point 2 — le téléphone (largeur ≤ 600 px, PR 1)
 
-1. **Barre du bas : quatre entrées et « Plus » (F6).** Quatre entrées prises, dans cet ordre de priorité, parmi les pages de la ferme : Aujourd'hui, Arrosages, Planning de la semaine, Ressources et pompes. Les pages absentes (case décochée) laissent la place à la suivante de la liste complète du menu. « Plus » ouvre une feuille avec **toutes** les pages du menu, Réglages comprise, chacune ≥ 44 px ; il porte la pastille verte quand la page courante n'est pas dans la barre. Une ferme dont le menu compte cinq pages ou moins les montre toutes, sans « Plus ». Le menu de l'ordinateur ne change pas. `FeatureMenu` sert aussi à la page introuvable : les deux gardent le même menu (même composant, un seul test de rendu pour les deux).
+1. **Barre du bas : quatre entrées et « Plus » (F6).** Quatre entrées prises, dans cet ordre de priorité, parmi les pages de la ferme : Aujourd'hui, Arrosages, Planning de la semaine, Ressources et pompes. Les pages absentes (case décochée) laissent la place à la suivante de la liste complète du menu. « Plus » ouvre une feuille avec **toutes** les pages du menu, Réglages comprise, chacune ≥ 44 px ; il porte la pastille verte quand la page courante n'est pas dans la barre. Une ferme dont le menu compte cinq pages ou moins les montre toutes, sans « Plus ». Le menu de l'ordinateur ne change pas. `FeatureMenu` sert aussi à la page introuvable : les deux gardent le même menu (même composant, un seul test de rendu pour les deux). **Réécrit par la simplification S3, PR 2 (D-331)** : la barre porte les trois endroits (Aujourd'hui, Semaine, Ma ferme) et le « + » ; « Plus », sa feuille et la règle « cinq pages ou moins » n'existent plus ; chaque page est à deux touches au plus (`docs/simplification-s3-contract.md`, section 4).
 2. **Ligne d'état** : déjà faite par la deuxième passe (D-068) ; à vérifier à la mesure, rien à refaire.
 3. **Saison (F7)** : sur téléphone, le choix de la saison passe **dans la ligne du titre**, à côté du « ? », en un petit menu de 44 px de haut, au lieu d'un bloc « Saison » sous le titre. Il suit les règles de la 3.8 quater lot 1 (`pageUsesSeason`).
 4. **Bandeau « Alertes système non disponibles » (F10)** : après un premier affichage, il se replie en une pastille dans la barre du haut (la cloche existante prend un point) ; le rappel complet reste dans Réglages, au bloc des notifications. L'état « vu » est gardé **sur l'appareil** (stockage du navigateur, illisible = bandeau affiché), pas en base. Il revient si l'état change (par exemple du « limité » au « refusé »).
@@ -128,13 +128,13 @@ Sur la ferme de test du planning (aspersion, goutte-à-goutte, cuve, trois jardi
 | F3 | Blocs vides | une phrase calme, jamais cachés sauf case décochée |
 | F4 | « Fait » en un geste | reporté au lot 3 (point 6) ; « Ouvrir » vers la carte au lot 2 |
 | F5 | Fiabilité | liste fermée de cinq données, une fonction unique, mêmes mots partout |
-| F6 | Barre du bas | quatre entrées (Aujourd'hui, Arrosages, Planning, Ressources) et « Plus » ; cinq pages ou moins : toutes |
+| F6 | Barre du bas | quatre entrées (Aujourd'hui, Arrosages, Planning, Ressources) et « Plus » ; cinq pages ou moins : toutes. **Réécrit par S3, PR 2 (D-331)** : trois endroits et le « + », « Plus » retiré |
 | F7 | Saison au téléphone | petit menu dans la ligne du titre, à côté du « ? » |
 | F8 | Seuils d'affichage | 7 jours (volume), 7 jours (pluie), 48 h (plan) ; réglages d'affichage non agronomiques |
 | F9 | Avertissements des pages | aucun supprimé sans équivalent ; ceux qui doublent la zone deviennent une ligne qui y renvoie |
 | F10 | Bandeau « alertes système » | se replie en point sur la cloche après un affichage ; état gardé sur l'appareil ; rappel dans Réglages |
 | F11 | Planning au téléphone | résumé en une ligne, jour du jour ouvert, jours écoulés repliés, jamais un jour portant un retard |
-| F12 | Pastille du menu | nombre de lignes de fiabilité plus irrigations en retard, couleur de la charte « à regarder » |
+| F12 | Pastille du menu | nombre de lignes de fiabilité plus irrigations en retard, couleur de la charte « à regarder ». Tient avec S3, PR 2 (D-331) : sur l'entrée « Aujourd'hui » de la barre, jamais sur un autre endroit |
 | F13 | Migration | aucune ; 0031 reste libre ; l'état « vu » du bandeau est sur l'appareil |
 | F14 | Ordre des PR | téléphone, puis domaine, puis écrans (trois PR, une à la fois, chacune après le déploiement vérifié de la précédente) |
 

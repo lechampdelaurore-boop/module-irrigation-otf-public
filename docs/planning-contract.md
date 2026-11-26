@@ -544,6 +544,17 @@ réelle, toujours enregistrable.
 
 ## Interface (3.6)
 
+> **Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** La page « Planning de la semaine » n'existe plus :
+> `/irrigation/planning` mène à « Semaine », paramètres et ancre gardés, et
+> ne sera jamais retirée. Les mêmes blocs y sont : les jours et leurs créneaux
+> à valider au premier niveau (« Jour par jour ») ; le résumé, les changements,
+> le budget, les suggestions et les planches non servies dans « Le plan, chaîne
+> par chaîne » ; les réglages et les heures où l'on n'arrose pas dans
+> « Réglages de la semaine », deux sections du pli « Le détail ». Les gestes
+> (« Valider », « Valider toute la semaine », « Pas à cette heure »,
+> « Recalculer ») et leurs gardes ne changent pas. Ce qui suit décrit l'écran
+> d'avant S4.
+
 Écrite le 29 septembre 2026, avant le code de l'écran, sur le « vas-y » du
 porteur. Une section **« Planning de la semaine »** sur la page d'irrigation,
 entre la faisabilité (3.4) et les cumuls (2.9), lisible sur ordinateur et à
@@ -551,6 +562,13 @@ entre la faisabilité (3.4) et les cumuls (2.9), lisible sur ordinateur et à
 du moteur et n'écrit aucune règle métier : ce qu'elle calcule pour s'afficher
 — regrouper par jour, compter, convertir un ajustement en durée, lire et
 écrire les réglages — vit dans `lib/domain/planning/presentation.ts`, testé.
+
+**Depuis la simplification, lot S2** (D-330,
+`docs/simplification-s2-contract.md`, section 10) : valider et refuser une
+proposition se font aussi depuis sa carte d'« Aujourd'hui », par les mêmes
+actions et les mêmes gardes, une proposition à la fois ; « Ajuster » y
+mène par « Changer l'heure ou la dose ». Cet écran ne change pas : il garde
+tous ses gestes, « Tout valider » compris.
 
 - **L'en-tête** : la semaine du lundi au dimanche ; le dernier calcul avec
   sa date et son déclencheur (à la demande, recalcul du matin, ou l'événement

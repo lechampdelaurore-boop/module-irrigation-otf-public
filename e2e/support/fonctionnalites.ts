@@ -112,7 +112,7 @@ export function caseDeLaFonctionnalite(page: Page, nom: string) {
   return page.getByRole('checkbox', { name: new RegExp(`^${nom}`) });
 }
 
-/** Les entrées du menu des pages, dans l'ordre ; au téléphone, par « Plus » ou la barre du bas. */
+/** Les entrées du menu des pages, dans l'ordre des trois endroits ; au téléphone, par la barre du bas et ses chemins. */
 export async function entreesDuMenu(page: Page): Promise<string[]> {
   return nomsDesPagesDuMenu(page);
 }

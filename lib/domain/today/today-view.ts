@@ -28,6 +28,8 @@ import {
   type ReliabilityInputs,
   type ReliabilityZone,
 } from './reliability.ts';
+import { rainEntry, type RainEntry } from './rain-entry.ts';
+import { approximateLine, detailSummary, waterAlert, weatherAlert, weekBar, type TodayEssential } from './essential.ts';
 import { hasMissingByBed, missingByBed, type MissingByBed, type MissingByBedInputs } from './missing-by-bed.ts';
 import { todaySoil, type TodaySoil } from './soil.ts';
 import { nowIrrigationLines, type TodayNowLine } from './now-irrigations.ts';
@@ -89,7 +91,7 @@ export type TodayWeatherBlock = {
   alerts: number;
 };
 
-type TodayUnposedFrost = {
+export type TodayUnposedFrost = {
   /** « −2,4 °C annoncé le mer. 18 nov. et aucune alerte de gel posée. » */
   text: string;
   /** Le modèle de gel mis en vue sur « Alertes météo », rien d'enregistré (F284) ; ou l'alerte désactivée. */
@@ -106,6 +108,19 @@ function hasForecast(forecasts: readonly WeatherAlertForecastDay[], date: string
 function daysText(dates: readonly string[]): string {
   const days = dates.map((date) => `le ${shortDayText(date)}`);
   return days.length <= 1 ? (days[0] ?? '') : `${days.slice(0, -1).join(', ')} et ${days[days.length - 1]}`;
+}
+
+/**
+ * « Prévision indisponible : à vérifier. » quand aucun des `dayCount` jours
+ * n'a sa prévision, « Prévision indisponible le sam. 14 nov. : à vérifier. »
+ * quand certains seulement, `null` quand rien ne manque : la phrase
+ * d'« Aujourd'hui », reprise telle quelle par « La semaine » (S4, PR 3,
+ * section 8.5). Jamais un zéro (D-003, cas 6).
+ */
+export function forecastUnavailableText(missing: readonly string[], dayCount: number): string | null {
+  if (missing.length === 0) return null;
+  if (missing.length >= dayCount) return FORECAST_UNAVAILABLE;
+  return `Prévision indisponible ${daysText(missing)} : à vérifier.`;
 }
 
 /** Bloc a : le gel des cultures et les alertes de l'exploitation des trois jours, aujourd'hui compris. */
@@ -154,8 +169,8 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
   // Un jour sans prévision n'est jamais lu comme un jour calme (D-003, cas 6).
   const missing = days.filter((date) => !hasForecast(input.forecasts, date));
   const tone = lines.length > 0 ? 'alert' : missing.length > 0 ? 'unknown' : 'calm';
-  if (missing.length === days.length) lines.push(FORECAST_UNAVAILABLE);
-  else if (missing.length > 0) lines.push(`Prévision indisponible ${daysText(missing)} : à vérifier.`);
+  const unavailable = forecastUnavailableText(missing, days.length);
+  if (unavailable) lines.push(unavailable);
   // La phrase calme ne se dit pas à côté d'un gel annoncé sans alerte posée (J14) : elle serait vraie et trompeuse.
   if (tone === 'calm' && !unposedFrost) lines.push(calmWeatherText(frostOn, criteriaOn, days[days.length - 1]));
   const forecasts = input.forecasts.filter((day) => days.includes(day.date));
@@ -281,6 +296,13 @@ export type TodayInputs = {
   week: TodayWeekInputs | null;
   /** La jauge du sol, ou la raison de son absence ; `null` quand « Réserve du sol » n'est pas coché ou pas lu. */
   soil: { zones: readonly Pick<SoilGaugeZone, 'plots'>[] } | { unavailable: string } | null;
+  /**
+   * La pluie déjà notée au pluviomètre, par jour, pour « Noter la pluie »
+   * (simplification S2, PR 4) ; absent : la fenêtre n'est pas proposée.
+   * `rainMatters` faux pour une ferme toute sous abri, où la pluie vaut 0
+   * (D-032) : pas de fenêtre non plus.
+   */
+  rain?: { measured: ReadonlyMap<string, number>; rainMatters: boolean };
 };
 
 export type TodayView = {
@@ -296,6 +318,10 @@ export type TodayView = {
   current: TodayNowLine[];
   /** La frise des irrigations du jour ; `null` sans irrigation aujourd'hui ou sans planning ni arrosages. */
   timeline: DayTimeline | null;
+  /** « Noter la pluie » (S2, PR 4) : les jours et les mesures déjà notées ; `null` sans « Objectifs et besoins » ou pour une ferme toute sous abri. */
+  rain: RainEntry | null;
+  /** Le premier niveau de la page et le résumé du pli « Le détail » (S2, PR 5). */
+  essential: TodayEssential;
   /** « Tout est fait » : ce que le bouton enregistrera ; `null` sans rien à couvrir, pas de bouton (section 3.4). */
   allDone: AllDone | null;
   /** « La semaine » et « Eau de la semaine » ; `null` sans « Objectifs et besoins » ou sans planche de la saison. */
@@ -312,12 +338,19 @@ export type TodayView = {
    * arrosage » sur « Arrosages » (l'intention d'adresse `planifier`).
    */
   dayEmptyLink: TodayDayEmptyLink | null;
+  /**
+   * « Tous les arrosages », en pied de « Votre journée » (simplification S3,
+   * section 3.4) : la page « Arrosages » n'a plus d'entrée de barre au
+   * téléphone ; on y va par le « + » ou par ce lien. Vrai avec « Arrosages »
+   * cochée.
+   */
+  allIrrigationsLink: boolean;
 };
 
-export type TodayDayEmptyLink = { label: string; page: 'planning' | 'arrosages'; intent: 'planifier' | null };
+export type TodayDayEmptyLink = { label: string; page: 'semaine' | 'arrosages'; intent: 'planifier' | null };
 
 function dayEmptyLink(enabled: FeatureSelection): TodayDayEmptyLink | null {
-  if (enabled.includes('planning')) return { label: 'Voir le planning de la semaine', page: 'planning', intent: null };
+  if (enabled.includes('planning')) return { label: 'Voir la semaine', page: 'semaine', intent: null };
   if (enabled.includes('arrosages')) return { label: 'Planifier un arrosage', page: 'arrosages', intent: 'planifier' };
   return null;
 }
@@ -366,6 +399,23 @@ export function todayView(input: TodayInputs): TodayView {
   // Ce qui attend après le jour ne se dit que « Planning » coché (lot A, R1) : le plan de la semaine en décide.
   const tomorrow = on('planning') && input.plan ? todayTomorrow(input.plan.proposals, now) : null;
   const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled, input.now) : null;
+  const week = on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null;
+  const waterShown = blocks.find((item): item is TodayWaterBlock => item.kind === 'water') ?? null;
+  const essential: TodayEssential = {
+    week: week ? weekBar(week) : null,
+    approximate: reliabilityOn ? approximateLine(reliability) : null,
+    water: waterAlert(waterShown),
+    weather: weatherAlert(weather),
+    detail: detailSummary({
+      tiles: week ? (week.tiles.water ? 4 : 3) : 0,
+      gardens: week ? week.shown.length + week.hidden.length : 0,
+      weatherDays: weather?.days.length ?? 0,
+      reservoirs: waterShown?.reservoirs.length ?? 0,
+      limits: waterShown?.limits.length ?? 0,
+      toRefresh: reliability.length,
+      reliability: reliabilityOn,
+    }),
+  };
   return {
     today,
     plan: on('planning') ? planLine(input.plan?.computedAt ?? null, now) : null,
@@ -382,10 +432,13 @@ export function todayView(input: TodayInputs): TodayView {
     current,
     timeline: irrigationsOn ? dayTimeline([...late, ...todo], now) : null,
     allDone: irrigationsOn ? allDone({ lines: [...late, ...todo], events: input.events, now }) : null,
-    week: on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null,
+    week,
     soil: on('sol') && input.soil ? todaySoil(input.soil, irrigatedToday) : null,
     tomorrow,
     shortage,
     dayEmptyLink: irrigationsOn ? dayEmptyLink(enabled) : null,
+    allIrrigationsLink: on('arrosages'),
+    rain: on('besoins') && input.rain?.rainMatters ? rainEntry({ today, measured: input.rain.measured }) : null,
+    essential,
   };
 }

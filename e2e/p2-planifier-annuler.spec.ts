@@ -21,17 +21,20 @@ test('une irrigation planifiée apparaît dans les irrigations à venir, puis so
 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
-  const planifier = page.getByRole('button', { name: 'Planifier l’irrigation' });
+  const planifier = page.getByRole('button', { name: /^Planifier l’arrosage de / });
 
   // Sans date de début, rien ne se planifie : le bouton reste grisé, comme
-  // dans « Déjà réalisée » (point ouvert 46).
+  // dans « Déjà fait » (point ouvert 46), et la ligne dessous le dit (S5, section 4).
   await page.getByLabel('Date et heure de début').fill('');
   await expect(planifier).toBeDisabled();
+  await expect(page.locator('.watering-missing')).toHaveText('Choisissez quand arroser.');
   await verifierLEtape(page, journal, 'planification sans date refusée');
 
   // Demain, même heure : une date future, sans dépendre du jour où le parcours tourne.
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(24 * 60, reference));
   await expect(planifier).toBeEnabled();
+  // Le bouton dit ce qu'il fait : « Planifier · demain à … » (S5, section 6).
+  await expect(planifier).toHaveText(/^Planifier · demain à \d{1,2} h( \d{2})?$/);
   await verifierLEtape(page, journal, 'formulaire de planification');
 
   await planifier.click();

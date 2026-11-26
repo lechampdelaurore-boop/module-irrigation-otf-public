@@ -54,7 +54,7 @@ export const FEATURES: readonly FeatureDefinition[] = [
   {
     id: 'arrosages',
     label: 'Arrosages',
-    summary: 'Irriguer maintenant, planifier, saisir un arrosage fait, la limite journalière.',
+    summary: 'Arroser maintenant, planifier, saisir un arrosage fait, la limite journalière.',
     requires: ['materiel'],
   },
   {

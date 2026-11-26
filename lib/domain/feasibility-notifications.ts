@@ -48,6 +48,18 @@ export function requestPlannedIrrigationForm() {
 }
 
 /**
+ * Le « + » de la barre du bas (simplification S3, section 4.1) : « Arroser
+ * maintenant » et « Noter un arrosage déjà fait » ouvrent « Arrosages » sur
+ * le formulaire « Arroser maintenant » ou « Déjà fait ». Le signal porte
+ * le formulaire.
+ */
+export const IRRIGATION_FORM_REQUESTED = 'irrigation-form-requested';
+
+export function requestIrrigationForm(kind: 'running' | 'completed') {
+  window.dispatchEvent(new CustomEvent(IRRIGATION_FORM_REQUESTED, { detail: kind }));
+}
+
+/**
  * « Réglages » : un geste qui écrit au journal des modifications le dit une
  * fois réussi, et la section du journal se relit au serveur, sa ligne avec,
  * sans recharger la page (amélioration n° 7, écart E1 de la recette du

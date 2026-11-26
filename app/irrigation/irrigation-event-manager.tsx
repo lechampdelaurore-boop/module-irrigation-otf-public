@@ -3,21 +3,18 @@ import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-
 import type { EquipmentListItem } from '@/lib/domain/equipment-record';
 import type { GardenGroupRecord } from '@/lib/domain/garden-group-record';
 import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
-import { MILLISECONDS_PER_HOUR, SECONDS_PER_HOUR, hoursFromSeconds } from '@/lib/domain/units';
+import { SECONDS_PER_HOUR, hoursFromSeconds } from '@/lib/domain/units';
 import { FinishIrrigationDialog } from './irrigation-manager/finish-irrigation-dialog';
 import { ActiveIrrigationCard } from './irrigation-manager/irrigation-cards';
 import { UpcomingIrrigations } from './irrigation-manager/upcoming-irrigations';
-import { ActionTab, HydraulicIndicator, IrrigationPreview } from './irrigation-manager/irrigation-form';
+import { CreationPanel } from './irrigation-manager/creation-panel';
 import { NotificationReadiness } from './irrigation-manager/notification-readiness';
-import { PreparationFields } from './irrigation-manager/preparation-fields';
 import {
   countLiveOverlapBeds,
-  decimalFormatter,
   isoFromLocalInput,
   numericInput,
-  pumpOriginLabel,
-  type CreationKind,
 } from './irrigation-manager/presentation';
+import { useCreationForm } from './irrigation-manager/use-creation-form';
 import { useFarmClock } from './irrigation-manager/use-farm-clock';
 import { useIrrigationNotifications } from './irrigation-manager/use-irrigation-notifications';
 import { useIrrigationPreview } from './irrigation-manager/use-irrigation-preview';
@@ -27,7 +24,8 @@ import type { ClosedPlacementPose } from '@/db/equipment-placement-poses';
 import type { PlacementPose } from '@/lib/domain/equipment-placement-periods';
 import { placementsOpenAt, plannedIrrigationSignal } from '@/lib/domain/equipment-pose-presentation';
 import type { ProtectedSlot } from '@/lib/domain/planning/protected-slots';
-import { PLANNED_IRRIGATION_FORM_REQUESTED } from '@/lib/domain/feasibility-notifications';
+import { IRRIGATION_FORM_REQUESTED, PLANNED_IRRIGATION_FORM_REQUESTED } from '@/lib/domain/feasibility-notifications';
+import { pageHref } from '@/lib/domain/features/pages';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import type { Bed } from '@/lib/domain/domain';
 import { localDateTimeInputValue } from '@/lib/domain/irrigation-timer';
@@ -41,7 +39,7 @@ import {
   startIrrigationEventAction,
   updatePlannedIrrigationAction,
 } from './irrigation-event-actions';
-import type { IrrigationEventActionResult, IrrigationEventConfirmation, IrrigationPreparationMode } from './irrigation-event/contract';
+import type { IrrigationEventActionResult, IrrigationEventConfirmation } from './irrigation-event/contract';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { ScheduleConflictDialog } from './irrigation-manager/schedule-conflict-dialog';
 import { useConfirm } from './shell/use-confirm';
@@ -49,8 +47,7 @@ import { ObjectiveExcessDialog } from './irrigation-manager/objective-excess-dia
 import { NO_FORM_HINTS, objectiveExcess, proposedDoseFor, type IrrigationFormHints, type ObjectiveExcess } from '@/lib/domain/irrigation-form-hints';
 import { dateKeyInTimeZone } from '@/lib/domain/water-management';
 import { recordDoneAsPlannedAction } from './done-as-planned-actions';
-import { isLimitedAlertStatus } from '@/lib/domain/system-alerts-banner';
-import { equipmentByGarden } from '@/lib/domain/equipment-by-garden';
+import { preselectedEquipmentId } from '@/lib/domain/watering-now';
 import { finishInputText, finishValueToSend } from '@/lib/domain/finish-time';
 
 /** Les classes de message de la section, gardées telles qu'avant le lot G. */
@@ -101,38 +98,25 @@ export function IrrigationEventManager({
   protectedSlots = [],
   formHints = NO_FORM_HINTS,
 }: Props) {
-  const [creationKind, setCreationKind] = useState<CreationKind>('running');
-  // Aucun matériel présélectionné à l'ouverture (audit ergonomique, lot 3, point 6, cas 3) :
-  // rien ne se calcule, et aucun cadre rouge ne paraît, avant un choix de l'utilisateur.
-  const [equipmentId, setEquipmentId] = useState('');
-  const [settingId, setSettingId] = useState('');
-  const [pumpId, setPumpId] = useState('');
-  const [pumpOriginId, setPumpOriginId] = useState('');
-  const [preparationMode, setPreparationMode] =
-    useState<IrrigationPreparationMode>('amount');
-  // Rien d'office : la dose du jour arrive avec le choix d'un matériel, sinon le champ reste vide (lot G, n° 9, F409).
-  const [targetMillimeters, setTargetMillimeters] = useState('');
-  const [durationHours, setDurationHours] = useState('1');
-  const [durationMinutes, setDurationMinutes] = useState('0');
-  const [referenceBedId, setReferenceBedId] = useState('');
-  const [plannedStartAt, setPlannedStartAt] = useState(() =>
-    localDateTimeInputValue(new Date(Date.parse(initialNowIso) + MILLISECONDS_PER_HOUR)),
-  );
-  const [actualStartAt, setActualStartAt] = useState(() =>
-    localDateTimeInputValue(new Date(Date.parse(initialNowIso) - MILLISECONDS_PER_HOUR)),
-  );
-  const [actualEndAt, setActualEndAt] = useState(() =>
-    localDateTimeInputValue(new Date(initialNowIso)),
-  );
-  const [note, setNote] = useState('');
+  const form = useCreationForm(initialNowIso);
+  const {
+    creationKind, setCreationKind, equipmentId, setEquipmentId, settingId, setSettingId, pumpId, setPumpId,
+    pumpOriginId, setPumpOriginId, preparationMode, setPreparationMode, targetMillimeters, setTargetMillimeters,
+    durationHours, setDurationHours, durationMinutes, setDurationMinutes, referenceBedId, setReferenceBedId,
+    plannedStartAt, setPlannedStartAt, actualStartAt, actualEndAt, note, setNote,
+    editingEventEquipmentId, setEditingEventEquipmentId,
+  } = form;
   // Chaque message porte l'endroit du geste et s'affiche sous son bouton (audit du 19 novembre 2026, lot G, n° 1, F404) :
   // « formulaire » sous « Planifier l'irrigation », « liste » en tête des irrigations à venir, « haut » pour le reste.
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
   const [conflict, setConflict] = useState<IrrigationEventConfirmation | null>(null);
   const [excess, setExcess] = useState<ObjectiveExcess | null>(null);
   const [finishEvent, setFinishEvent] = useState<IrrigationEventRecord | null>(null);
-  const [editingEventEquipmentId, setEditingEventEquipmentId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Arrivé par un geste du « + » (S5, section 7) : un retour « ‹ Aujourd'hui » en tête du formulaire.
+  const [fromGesture, setFromGesture] = useState(false);
+  // Après « Démarrer », la page reste et un lien mène à la carte d'« Aujourd'hui » (S5-g).
+  const [justStarted, setJustStarted] = useState(false);
   const { confirm, dialog: confirmDialog } = useConfirm();
   // L'heure de fin proposée, à la seconde ; le champ la montre à la minute (lot K, n° 21, F472).
   const [finishPrecise, setFinishPrecise] = useState(() => localDateTimeInputValue(new Date(initialNowIso), true));
@@ -166,28 +150,13 @@ export function IrrigationEventManager({
   [completedStartAt, placements, poseHistory, poses]);
   const poseByEquipmentId = new Map(poses.map((pose) => [pose.equipmentId, pose]));
 
-  const {
-    usableEquipment,
-    selectedEquipment,
-    selectedPlacement,
-    selectedSetting,
-    selectedPump,
-    selectedPumpOrigin,
-    preview,
-    effectiveReferenceBedId,
-    previewDurationSeconds,
-    previewApplications,
-    previewVolumeLiters,
-    previewOrigin,
-    previewStartKnown,
-    hydraulicPreview,
-    protectedSlotWarning,
-  } = useIrrigationPreview({
+  const formPreview = useIrrigationPreview({
     equipment, placements: formPlacements, groups, beds, events, pumpDashboard, now, creationKind,
     equipmentId, settingId, pumpId, pumpOriginId, preparationMode, targetMillimeters,
     durationHours, durationMinutes, referenceBedId, plannedStartAt, actualStartAt,
     actualEndAt, editingEventEquipmentId, protectedSlots,
   });
+  const { usableEquipment, selectedEquipment, selectedSetting, selectedPumpOrigin, effectiveReferenceBedId, previewApplications } = formPreview;
 
   const say = (origin: string, tone: ActionReplyMessage['tone'], text: string | null | undefined) => {
     setReplies(text ? [actionReply(origin, tone, text)] : []);
@@ -195,20 +164,6 @@ export function IrrigationEventManager({
   const setTopWarning = (message: string | null) => say('haut', 'warning', message);
   const { notificationStatus, enableNotifications, disableNotifications } =
     useIrrigationNotifications({ season, now, activeEvents, setWarning: setTopWarning });
-
-  /** Après une réussite, le formulaire se vide : rien ne se renvoie d'un second appui (F406). Les dates restent. */
-  const resetCreationForm = () => {
-    setEquipmentId('');
-    setSettingId('');
-    setReferenceBedId('');
-    setPumpId('');
-    setPumpOriginId('');
-    setTargetMillimeters('');
-    setDurationHours('1');
-    setDurationMinutes('0');
-    setNote('');
-    setEditingEventEquipmentId(null);
-  };
 
   /** Le jour de l'irrigation : celui de la date de début pour « Planifier », aujourd'hui sinon. */
   const irrigationDay = () => dateKeyInTimeZone(creationKind === 'planned' ? (isoFromLocalInput(plannedStartAt) ?? now) : now);
@@ -219,6 +174,23 @@ export function IrrigationEventManager({
     setTargetMillimeters(dose === null ? '' : String(dose));
   };
 
+  /** Le choix d'un matériel : son réglage et sa pompe par défaut, la dose du jour (F409). */
+  const chooseEquipment = (nextEquipmentId: string) => {
+    setEquipmentId(nextEquipmentId);
+    setSettingId('');
+    setReferenceBedId('');
+    setPumpId(pumpDashboard.equipmentDefaults.find((item) => item.equipmentId === nextEquipmentId)?.pumpId ?? '');
+    setPumpOriginId('');
+    proposeDose(nextEquipmentId);
+  };
+
+  // Un seul matériel prêt à arroser : chaque onglet le choisit d'office, la ligne le dit (S5-b, section 4).
+  // Pas pendant une modification, qui porte son matériel ; « Déjà fait » lit le matériel posé à son heure de début.
+  const onlyEquipmentId = editingEventEquipmentId === null ? preselectedEquipmentId(usableEquipment) : null;
+  if (onlyEquipmentId !== null && equipmentId === '') chooseEquipment(onlyEquipmentId);
+  // « Déjà fait » : un matériel choisi qui n'était pas posé à l'heure de début n'est plus coché, la phrase le dit (section 4).
+  const unplacedChoice = equipmentId !== '' && selectedEquipment === null ? equipment.find((item) => item.id === equipmentId)?.name ?? null : null;
+
   const submitCreation = (confirmScheduleConflict = false, confirmExcess = false) => {
     if (!selectedEquipment || !selectedSetting) {
       say('formulaire', 'error', usableEquipment.length > 0 ? 'Choisissez un matériel avant d’enregistrer une irrigation.' : 'Ajoutez, réglez et placez au moins un matériel avant d’enregistrer une irrigation.');
@@ -227,6 +199,7 @@ export function IrrigationEventManager({
     setReplies([]);
     setConflict(null);
     setExcess(null);
+    setJustStarted(false);
     // Au-delà de l'objectif de la semaine d'une planche : la fenêtre demande d'abord (F410). Rien à demander après coup.
     const beyond = confirmExcess || creationKind === 'completed' ? null : objectiveExcess(previewApplications, formHints.weeks, irrigationDay());
     if (beyond) {
@@ -261,7 +234,10 @@ export function IrrigationEventManager({
         return;
       }
       receiveActionResult(result, 'formulaire');
-      if (result.ok) resetCreationForm();
+      if (result.ok) {
+        setJustStarted(creationKind === 'running' && !editingEventEquipmentId);
+        form.reset();
+      }
     });
   };
 
@@ -318,15 +294,25 @@ export function IrrigationEventManager({
   };
 
   useEffect(() => {
-    // Le planning (3.6) envoie ici le maraîcher qui veut ajouter un créneau de sa main.
-    const openPlannedForm = () => {
+    // Le planning (3.6) envoie ici le maraîcher qui veut ajouter un créneau de sa main ; le « + » de la barre du bas (S3), « Arroser maintenant » ou « Déjà fait ».
+    const openForm = (kind: unknown) => {
+      if (kind !== 'planned' && kind !== 'running' && kind !== 'completed') return;
       setEditingEventEquipmentId(null);
-      setCreationKind('planned');
+      setCreationKind(kind);
       document.querySelector('.irrigation-creation-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
+    const openPlannedForm = () => openForm('planned');
+    const openRequestedForm = (event: Event) => {
+      openForm((event as CustomEvent<unknown>).detail);
+      setFromGesture(true);
+    };
     window.addEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
-    return () => window.removeEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
-  }, []);
+    window.addEventListener(IRRIGATION_FORM_REQUESTED, openRequestedForm);
+    return () => {
+      window.removeEventListener(PLANNED_IRRIGATION_FORM_REQUESTED, openPlannedForm);
+      window.removeEventListener(IRRIGATION_FORM_REQUESTED, openRequestedForm);
+    };
+  }, [setCreationKind, setEditingEventEquipmentId]);
 
   const editPlanned = (event: IrrigationEventRecord) => {
     const item = event.equipment;
@@ -346,7 +332,6 @@ export function IrrigationEventManager({
     document.querySelector('.irrigation-creation-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const limitedAlerts = isLimitedAlertStatus(notificationStatus);
   const notificationReadiness = (
     <NotificationReadiness
       foldable
@@ -359,20 +344,11 @@ export function IrrigationEventManager({
 
   return (
     <section className="irrigation-events-section" aria-labelledby="irrigation-events-title">
+      {/* L'ordre de la page (simplification S5, section 7, S5-m) : l'en-cours, le formulaire, l'à-venir, puis le résumé. */}
       <header className="irrigation-events-heading">
-        <div>
-          <h2 id="irrigation-events-title">Enregistrer ou planifier une irrigation</h2>
-          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
-        </div>
-        <div className="irrigation-event-counts" aria-label="Résumé des irrigations">
-          <span><strong>{activeEvents.length}</strong> en cours</span>
-          <span><strong>{plannedEvents.length + openPartialEvents.length}</strong> à venir</span>
-          <span><strong>{historyEvents.length}</strong> archivées</span>
-        </div>
+        <h2 id="irrigation-events-title">Arroser ou noter</h2>
+        {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
       </header>
-
-      {/* Un état limité vient sous le formulaire (audit final, lot E, J12, F266) ; « Recevoir les alertes » et « Alertes activées » gardent leur place. */}
-      {limitedAlerts ? null : notificationReadiness}
 
       <ActionReply messages={replies} origin="haut" classNames={REPLY_CLASSES} />
 
@@ -407,172 +383,30 @@ export function IrrigationEventManager({
         </div>
       ) : null}
 
-      <div className="irrigation-creation-panel">
-        {editingEventEquipmentId ? <div className="irrigation-edit-banner"><strong>Modification d’une irrigation planifiée</strong><button type="button" onClick={() => setEditingEventEquipmentId(null)}>Annuler la modification</button></div> : null}
-        <div className="irrigation-action-tabs" data-tour="arrosage-actions" role="tablist" aria-label="Action d’irrigation">
-          <ActionTab
-            active={creationKind === 'running'}
-            onClick={() => setCreationKind('running')}
-            title="Irriguer maintenant"
-            description="Calculer puis démarrer le minuteur"
-          />
-          <ActionTab
-            active={creationKind === 'planned'}
-            onClick={() => setCreationKind('planned')}
-            title="Planifier"
-            description="Préparer une irrigation future"
-          />
-          <ActionTab
-            active={creationKind === 'completed'}
-            onClick={() => setCreationKind('completed')}
-            title="Déjà réalisée"
-            description="Enregistrer des horaires réels"
-          />
-        </div>
+      <CreationPanel
+        form={form}
+        preview={formPreview}
+        pumpDashboard={pumpDashboard}
+        pumpsEnabled={pumpsEnabled}
+        placements={formPlacements}
+        placementsCount={placements.length}
+        plots={plots}
+        groups={groups}
+        completedStartAt={completedStartAt}
+        dose={selectedEquipment ? proposedDoseFor(formHints.doses, selectedEquipment.id, irrigationDay()) : null}
+        unplacedChoice={unplacedChoice}
+        todayHref={pageHref('aujourdhui', { season })}
+        fromGesture={fromGesture}
+        justStarted={justStarted}
+        now={now}
+        pending={pending}
+        reply={<ActionReply messages={replies} origin="formulaire" classNames={REPLY_CLASSES} />}
+        onChooseEquipment={chooseEquipment}
+        onSubmit={() => submitCreation()}
+      />
 
-        {usableEquipment.length === 0 ? (
-          <div className="irrigation-empty-action">
-            {/* Saisie après coup : rien n'était posé à cette heure de début ; l'heure reste modifiable (règle 12). */}
-            <strong>{completedStartAt !== null && placements.length > 0 ? 'Aucun matériel n’était posé à cette heure de début' : 'Aucun matériel prêt à irriguer'}</strong>
-            <p>Un matériel doit posséder au moins un réglage et une position sur le plan.</p>
-            {creationKind === 'completed' ? (
-              <label><span>Début réel</span><input type="datetime-local" value={actualStartAt} onChange={(event) => setActualStartAt(event.target.value)} /></label>
-            ) : null}
-          </div>
-        ) : (
-          <div className="irrigation-form-layout">
-            <div className="irrigation-form-fields" data-tour="arrosage-champs">
-              <label>
-                <span>Matériel</span>
-                <select
-                  value={selectedEquipment?.id ?? ''}
-                  onChange={(event) => {
-                    setEquipmentId(event.target.value);
-                    setSettingId('');
-                    setReferenceBedId('');
-                    setPumpId(pumpDashboard.equipmentDefaults.find((item) => item.equipmentId === event.target.value)?.pumpId ?? '');
-                    setPumpOriginId('');
-                    proposeDose(event.target.value);
-                  }}
-                >
-                  <option value="" disabled>Choisissez un matériel</option>
-                  {equipmentByGarden(usableEquipment, formPlacements, { plots, groups }).map((garden) => (
-                    <optgroup key={garden.label} label={garden.label}>
-                      {garden.items.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-                    </optgroup>
-                  ))}
-                </select>
-              </label>
-              <label>
-                <span>Réglage</span>
-                <select
-                  value={selectedSetting?.id ?? ''}
-                  onChange={(event) => {
-                    setSettingId(event.target.value);
-                    setReferenceBedId('');
-                  }}
-                >
-                  {selectedEquipment?.settings.map((setting) => (
-                    <option key={setting.id} value={setting.id}>{setting.name}</option>
-                  ))}
-                </select>
-              </label>
-              <p className="placement-summary">
-                <span aria-hidden="true">⌖</span>
-                {!selectedEquipment
-                  ? 'Choisissez un matériel : l’apport et la faisabilité se calculent ensuite.'
-                  : selectedPlacement
-                  ? `${preview?.applications.length ?? 0} planche${(preview?.applications.length ?? 0) > 1 ? 's' : ''} atteinte${(preview?.applications.length ?? 0) > 1 ? 's' : ''} depuis la position enregistrée`
-                  : 'Position non renseignée'}
-              </p>
-
-              {pumpsEnabled ? (<>
-              <div className="irrigation-pump-fields">
-                <label><span>Pompe <small>(facultatif)</small></span><select value={pumpId} onChange={(event) => { setPumpId(event.target.value); setPumpOriginId(''); }}><option value="">Aucune · faisabilité non vérifiée</option>{pumpDashboard.pumps.filter((pump) => pump.status === 'active').map((pump) => <option key={pump.id} value={pump.id}>{pump.name} · {decimalFormatter.format(pump.maximumFlowCubicMetersPerHour)} m³/h</option>)}</select></label>
-                {selectedPump ? <label><span>Origine de l’eau <small>(facultative)</small></span><select value={selectedPumpOrigin?.id ?? ''} onChange={(event) => setPumpOriginId(event.target.value)}><option value="">Non renseignée</option>{selectedPump.origins.map((origin) => <option key={origin.id} value={origin.id}>{pumpOriginLabel(origin, pumpDashboard)}{origin.isDefault ? ' · par défaut' : ''}</option>)}</select></label> : null}
-              </div>
-              {selectedEquipment ? <HydraulicIndicator feasibility={hydraulicPreview} historical={creationKind === 'completed'} /> : null}
-              </>) : null}
-
-              {creationKind === 'completed' ? (
-                <div className="irrigation-datetime-grid">
-                  <label>
-                    <span>Début réel</span>
-                    <input
-                      type="datetime-local"
-                      value={actualStartAt}
-                      onChange={(event) => setActualStartAt(event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    <span>Fin réelle</span>
-                    <input
-                      type="datetime-local"
-                      value={actualEndAt}
-                      onChange={(event) => setActualEndAt(event.target.value)}
-                    />
-                  </label>
-                </div>
-              ) : (
-                <>
-                  {creationKind === 'planned' ? (
-                    <label>
-                      <span>Date et heure de début</span>
-                      <input
-                        type="datetime-local"
-                        value={plannedStartAt}
-                        onChange={(event) => setPlannedStartAt(event.target.value)}
-                      />
-                    </label>
-                  ) : null}
-                  <PreparationFields
-                    preparationMode={preparationMode}
-                    onPreparationModeChange={setPreparationMode}
-                    targetMillimeters={targetMillimeters}
-                    onTargetMillimetersChange={setTargetMillimeters}
-                    equipment={selectedEquipment}
-                    applications={preview?.applications ?? []}
-                    referenceBedId={effectiveReferenceBedId}
-                    onReferenceBedIdChange={setReferenceBedId}
-                    durationHours={durationHours}
-                    onDurationHoursChange={setDurationHours}
-                    durationMinutes={durationMinutes}
-                    onDurationMinutesChange={setDurationMinutes}
-                  />
-                </>
-              )}
-
-              <label>
-                <span>Note <small>(facultatif)</small></span>
-                <textarea
-                  value={note}
-                  maxLength={500}
-                  rows={2}
-                  placeholder="Ex. vanne nord, pression habituelle…"
-                  onChange={(event) => setNote(event.target.value)}
-                />
-              </label>
-            </div>
-
-            <IrrigationPreview
-              equipment={selectedEquipment}
-              setting={selectedSetting}
-              applications={previewApplications}
-              durationSeconds={previewDurationSeconds}
-              volumeLiters={previewVolumeLiters}
-              origin={previewOrigin}
-              startKnown={previewStartKnown}
-              creationKind={creationKind}
-              onSubmit={() => submitCreation()}
-              pending={pending}
-              warning={protectedSlotWarning}
-              reply={<ActionReply messages={replies} origin="formulaire" classNames={REPLY_CLASSES} />}
-            />
-          </div>
-        )}
-      </div>
-
-      {limitedAlerts ? notificationReadiness : null}
+      {/* Les alertes du téléphone, dans tous leurs états, sous le formulaire (S5, sections 5 et 7, F908) : « 1. Où ? » sous 400 px. */}
+      {notificationReadiness}
 
       <ActionReply messages={replies} origin="liste" classNames={REPLY_CLASSES} />
       <UpcomingIrrigations
@@ -598,6 +432,15 @@ export function IrrigationEventManager({
         onDoneAsPlanned={recordDoneAsPlanned}
       />
 
+      {/* Le résumé vient après l'à-venir (S5-m) : il ne repousse plus « Où ? » sous l'écran du téléphone. */}
+      <footer className="irrigation-events-summary">
+        <div className="irrigation-event-counts" aria-label="Résumé des irrigations">
+          <span><strong>{activeEvents.length}</strong> en cours</span>
+          <span><strong>{plannedEvents.length + openPartialEvents.length}</strong> à venir</span>
+          <span><strong>{historyEvents.length}</strong> archivées</span>
+        </div>
+      </footer>
+
       <ScheduleConflictDialog
         conflict={conflict}
         creationKind={editingEventEquipmentId ? 'edit' : creationKind}
@@ -618,7 +461,7 @@ export function IrrigationEventManager({
 
       {finishEvent ? (
         <FinishIrrigationDialog
-          event={finishEvent}
+          equipmentName={finishEvent.equipment.equipmentSnapshot.name}
           finishAt={finishAt}
           pending={pending}
           onFinishAtChange={setFinishAt}

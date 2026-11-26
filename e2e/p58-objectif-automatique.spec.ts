@@ -4,6 +4,7 @@ import {
   attendreLaPagePrete,
   confirmerDansLaFenetre,
   epinglerLaBulle,
+  ouvrirLeDetailDuJour,
   ouvrirLePli,
   surveillerLaConsole,
   verifierCibleTactile,
@@ -89,6 +90,8 @@ test('« Objectif automatique » : allumer, lire l’origine, saisir un objectif
   // « Aujourd'hui » : l'origine sur la tuile, la ligne « Objectif automatique » de « Fiabilité du calcul ».
   await page.goto('/irrigation');
   await attendreLaPagePrete(page, 'aujourdhui');
+  // Les tuiles et la fiabilité sont dans « Le détail » depuis S2, PR 5 (D-330).
+  await ouvrirLeDetailDuJour(page);
   const tuile = page.getByRole('region', { name: 'Cette semaine' }).locator('a.today-kpi').filter({ hasText: 'Eau visée cette semaine' });
   await expect(tuile).toContainText('objectif automatique');
   await expect(page.locator('#today-reliability .reliability-check').filter({ hasText: 'Objectif automatique' })).toHaveCount(1);

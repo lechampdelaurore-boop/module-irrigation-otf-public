@@ -21,7 +21,7 @@ Lignes alternées #fcfcfe / #f2f2f5, en-têtes 11,7 px #5f5f5f, chiffres à droi
 Succès #198754, attention #cb6503, danger #dc3545, info #e1eaff ; texte assombri de 28 % sur fond clair (contraste 4,5:1). Eau et pluie : bleu #1f6fb2, fond #dcebf7, jamais sur un bouton. Le bleu précis peut être affiné à l'application.
 
 ## 7. Navigation
-Ordinateur : menu à gauche #e7f1ee, entrée choisie en #0b694d texte blanc (rayon 9,75 px, hauteur 33 px). Téléphone : barre du haut anthracite #373737 (36 px, nom de la ferme, cloche, avatar) ; barre du bas fixe à **quatre entrées et « Plus »** (audit ergonomique, point 2, 3.8 quater lot 2, D-073, F6) : l'icône au-dessus d'un nom court, la page courante en pilule verte, « Plus » ouvrant le menu entier en feuille au-dessus de la barre, avec une pastille verte quand la page ouverte n'est pas dans la barre ; un menu de cinq pages ou moins tient entier dans la barre. La deuxième bande des 4 pastilles d'univers d'Ouvre ta ferme (Production vert, Vente #4E5FC0, Gestion #22829f, Paramètres #8747b1) n'est pas construite dans le module : l'en-tête d'Ouvre ta ferme la coiffe. Entre 601 et 980 px (tablette), la bande de pages qui défile reste. L'entrée « Aujourd'hui », première du menu et de la barre du bas, porte une petite pastille ronde au nombre de choses à regarder, aux couleurs « attention » (fond #fbe6cf, texte #6d3602), jamais au rouge du danger (audit ergonomique, 3.8 quater lot 2, D-073, F12, F33) ; aucune pastille quand il n'y a rien. Le nom de la ferme reste en haut (multi-fermes). Dans OTF, l'en-tête OTF coiffe le module.
+Ordinateur : menu à gauche #e7f1ee, entrée choisie en #0b694d texte blanc (rayon 9,75 px, hauteur 33 px). Depuis la simplification, lot S3 (D-331), il range les pages en **trois endroits dépliés** sous le bouton « + Arroser ou noter » (vert plein, 44 px) : « Aujourd'hui » dans son encart blanc « Tableau de bord », puis les titres « Semaine » et « Ma ferme », des liens en gras, sans capitales, avec un chevron ; un trait sépare les endroits. Téléphone et tablette, jusqu'à 980 px (lot K, F481) : barre du haut anthracite #373737 (36 px, nom de la ferme, cloche, avatar) ; barre du bas fixe aux **trois endroits et au « + »**, dans l'ordre Aujourd'hui, Semaine, « + », Ma ferme (D-331, à la place des quatre entrées et de « Plus » de l'audit ergonomique, D-073, F6) : l'icône au-dessus du nom de l'endroit, l'endroit de la page ouverte en pilule verte, le « + » en rond vert de 52 px qui dépasse de la barre et ouvre la feuille « Que voulez-vous faire ? ». La deuxième bande des 4 pastilles d'univers d'Ouvre ta ferme (Production vert, Vente #4E5FC0, Gestion #22829f, Paramètres #8747b1) n'est pas construite dans le module : l'en-tête d'Ouvre ta ferme la coiffe. L'entrée « Aujourd'hui », première du menu et de la barre du bas, porte une petite pastille ronde au nombre de choses à regarder, aux couleurs « attention » (fond #fbe6cf, texte #6d3602), jamais au rouge du danger (audit ergonomique, 3.8 quater lot 2, D-073, F12, F33) ; aucune pastille quand il n'y a rien. Le nom de la ferme reste en haut (multi-fermes). Dans OTF, l'en-tête OTF coiffe le module.
 
 ## 8. Icônes
 Au trait, une seule couleur, épaisseur ≈ 1,7 px, sans emoji ni picto coloré (la cloche de la maquette est un emoji provisoire à remplacer). Jeu de départ : goutte, calendrier, pousse, pluie, jauge, réglages, alerte, plus, coche.
@@ -110,10 +110,10 @@ recommandée et consignée ici.
    mode de calcul.
 3. **Onglets.** À l'ordinateur, l'onglet choisi est blanc, souligné d'un
    trait vert de 5 px, les autres sur la feuille ; libellé DM Sans 14 px /
-   500. Au téléphone, les trois onglets « Irriguer maintenant / Planifier /
-   Déjà réalisée » restent empilés, chacun avec sa ligne d'explication :
-   l'onglet choisi y prend un trait vert de 5 px à gauche plutôt que la
-   pilule de la maquette, faite pour deux libellés courts. Les segments de
+   500. Au téléphone, les trois onglets « Arroser maintenant / Planifier /
+   Déjà fait » tiennent sur une ligne de 44 px, sans leur ligne
+   d'explication, l'onglet choisi souligné du même trait vert (simplification
+   S5, D-333, F902). Les segments de
    période de l'historique sont déjà des pilules vertes.
 4. **Tableaux.** Lignes alternées `#fcfcfe` / `#f2f2f5`, en-têtes gris de
    11,7 px, chiffres tabulaires, survol vert pâle ; dans le tableau de la

@@ -286,6 +286,12 @@ règle 4) ; le plan se relit après.
   (« 8,5 » → 8,5), le texte du bouton et l'état « déjà notée » sont une
   fonction de `lib/domain/today/` (`rain-entry.ts`), testée sans navigateur.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** Le lien de la fenêtre, « Retirer une mesure,
+voir jour par jour », mène à « Pluie mesurée » de « Semaine » et dit « sur
+« Semaine », dans « Pluie mesurée » ». La fenêtre est la même sur « Semaine »,
+appelée par le bilan, la ligne « Calcul approximatif » et la ligne d'un jour
+passé (S4, PR 3, F935).
+
 ## 8. La page à l'essentiel : deux niveaux
 
 **Règle.** Le premier niveau tient en un écran et demi au téléphone ; le reste
@@ -361,6 +367,11 @@ liens, ses boutons et ses réponses (L1 à L4).
   réelle) ; au plus **12** choses à toucher au premier niveau (39 à 56
   aujourd'hui). Une page qui dépasse sa borne le dit, comme au lot J.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** « Voir la semaine » mène à « Semaine » ; la
+ligne de pied « Voir au planning » devient « Voir la semaine », vers la même
+proposition ; « Valider toute la semaine » est sur « Semaine » ; « Changer
+l'heure ou la dose » ouvre la proposition sur « Semaine ».
+
 ## 9. États rares : ce que chacun devient
 
 | État | Au premier niveau | Dans le pli |
@@ -427,7 +438,7 @@ des notifications gardent leurs mots.
 | S2-a | Un retard : deux boutons | « Je le fais maintenant » (principal) et « C'est fait » (bordé), parce que le module ne sait pas lequel est vrai (section 4) |
 | S2-b | Refuser un créneau | « Pas à cette heure », pas « Pas aujourd'hui » : le plan ne reporte pas, il cherche une autre place (D-030) |
 | S2-c | « Démarrer tout de suite » sur une proposition | valide puis démarre ; si le démarrage est refusé, la validation tient et le message le dit |
-| S2-d | Ajuster une proposition depuis « Aujourd'hui » | un lien vers le formulaire du planning, pas une copie ; S5 décidera s'il remonte |
+| S2-d | Ajuster une proposition depuis « Aujourd'hui » | un lien vers le formulaire du planning, pas une copie ; **S5 a décidé qu'il ne remonte pas** (S5-f, section 6.2) |
 | S2-e | Jour par défaut de la pluie | hier, avec « Aujourd'hui » et les jours d'avant dans la liste ; jamais d'écrasement sans le dire |
 | S2-f | La frise du jour | passe dans « Le détail » : les cartes disent déjà la journée |
 | S2-g | Les pastilles de l'en-tête | quittent le téléphone (la phrase les redit), restent à l'ordinateur |
@@ -497,13 +508,24 @@ question par message.
 | Plusieurs fermes, plusieurs matériels : une carte par irrigation devient longue | les retards d'un même jour passé se replient (T2, inchangé) ; au-delà, c'est le planning qui sert |
 | Les tests et parcours qui lisent un mot changent | relevé d'abord (six fichiers de parcours et cinq fichiers de tests lisent « Démarrer maintenant », « Valider au planning » ou « Fait comme prévu ») ; ils suivent dans la PR qui change le mot |
 | S1 pas fini quand S2 commence | S2 attend la fin du code de S1 (ligne 33) ; la barre de la PR 5 attend la fonction de l'objectif de la PR 3 de S1 |
-| La page « Arrosages » dit « Fait comme prévu » et « Aujourd'hui » dit « C'est fait » | dette notée, traitée avec S5 |
+| La page « Arrosages » dit « Fait comme prévu » et « Aujourd'hui » dit « C'est fait » | dette notée, **soldée par S5** (section 6.1, D-334 : « C'est fait » sur « Arrosages ») |
 
 ## 14. À remplir par les PR
 
 - Relevé des mots lus par les tests et les parcours (PR 1).
 - Hauteur du premier niveau, position du premier bouton, nombre de choses à
   toucher, avant et après (PR 5).
+  **Relevé de la PR 5** (25 novembre 2026, P62 à 390 px, une ferme neuve
+  propre au parcours, une proposition à valider, trois données à rafraîchir
+  et l'encart « À finir » de S1 au-dessus) : **avant**, les mesures de la
+  section 1 (la page du jour 3 888 px sur la démonstration, 5 123 px sur la
+  ferme réelle ; le premier bouton à 1 057 px ; 39 à 56 choses à toucher) ;
+  **après**, le premier niveau finit à **1 384 px** (borne 1 600), le bouton
+  principal de la première carte est à **539 px** (borne 600 ; 623 px tel quel,
+  dont 84 px de nom de matériel que le titre du test étire sur quatre
+  lignes, F867), **11** choses à toucher (borne 12). L'avant n'a pas été
+  remesuré sur la même ferme de parcours : le parcours n'existait pas avant
+  cette PR.
 - Décision de ce lot, précisions F, parcours P62 : numéros pris en codant.
 
 ## 15. Réglage du code

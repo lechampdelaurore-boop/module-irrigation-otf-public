@@ -6,14 +6,30 @@ import type { ActionReplyTone } from '../shell/action-reply';
  * par `ActionReply` (lot G, F404, étendu à la page). Une irrigation porte
  * son identifiant : démarrée, sa réponse la suit dans « En cours » ; partie
  * de la page (« Fait comme prévu »), sa réponse se lit en tête de « Votre
- * journée », sous « Tout est fait ».
+ * journée », sous « Tout est fait ». Une proposition porte le sien
+ * (simplification, lot S2) : validée, sa réponse suit l'irrigation créée ;
+ * refusée, elle se lit en tête du bloc.
  */
 export const DAY_REPLY = 'journee';
 export const PLAN_HEADER_REPLY = 'plan-entete';
 export const PLAN_RELIABILITY_REPLY = 'fiabilite-plan';
+/** « Noter la pluie » (S2, PR 4) : sous la tuile « Eau reçue », ou sous la ligne de la pluie de « Fiabilité du calcul ». */
+export const RAIN_WEEK_REPLY = 'pluie-semaine';
+export const RAIN_RELIABILITY_REPLY = 'pluie-fiabilite';
+/** « Noter la pluie » ouverte de la tuile « Eau reçue », dans « Le détail » (S2, PR 5). */
+export const RAIN_TILE_REPLY = 'pluie-tuile';
 
 export function irrigationReply(eventEquipmentId: string): string {
   return `irrigation:${eventEquipmentId}`;
+}
+
+export function proposalReply(proposalId: string): string {
+  return `proposition:${proposalId}`;
+}
+
+/** L'endroit d'une carte de « Votre journée » : une irrigation ou une proposition. */
+export function isCardReply(origin: string): boolean {
+  return origin.startsWith(irrigationReply('')) || origin.startsWith(proposalReply(''));
 }
 
 /** Le dessin de la page pour chaque ton : le vert calme, le rouge du refus. */

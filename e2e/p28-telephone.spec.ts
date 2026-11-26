@@ -5,7 +5,6 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   nomsDesPagesDuMenu,
-  ouvrirLeMenuDesPages,
   sansLaPastille,
   surveillerLaConsole,
   TEXTES_DES_LIENS_DU_MENU,
@@ -21,7 +20,9 @@ import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/
  * docs/browser-journeys-contract.md).
  *
  * Sur une ferme neuve qui a tout coché : au téléphone, la barre du bas a
- * quatre entrées et « Plus », qui ouvre les douze pages ; la saison est dans
+ * les trois endroits et le « + » (simplification, lot S3, PR 2, D-331) ;
+ * l'endroit de la page ouverte est marqué, et une page de « Ma ferme » a son
+ * retour « ‹ » ; la saison est dans
  * la ligne du titre ; le bandeau « Alertes système non disponibles », montré
  * une fois, se replie en un point sur la cloche et reste entier dans
  * Réglages ; le premier champ d'« Arrosages » tient dans le premier écran ;
@@ -83,20 +84,23 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'arrosages');
 
-  // La barre du bas (F6) : quatre entrées et « Plus » au téléphone, le menu de gauche à l'ordinateur.
+  // La barre du bas (F6, réécrite par la simplification S3, PR 2, D-331) : les trois endroits et le « + » au
+  // téléphone, « Aujourd'hui » marqué sur « Arrosages », qui est de son endroit ; le menu de gauche à l'ordinateur.
   const barre = barreDuBas(page);
   if (telephone) {
     await expect(barre).toBeVisible();
     const entrees = barre.getByRole('link');
-    await expect(entrees).toHaveCount(4);
-    expect((await entrees.evaluateAll((liens) => liens.map((lien) => lien.getAttribute('aria-label')))).map(sansLaPastille)).toEqual([
-      TITRES_DES_PAGES.aujourdhui, TITRES_DES_PAGES.arrosages, TITRES_DES_PAGES.planning, TITRES_DES_PAGES.ressources,
+    await expect(entrees).toHaveCount(3);
+    expect((await entrees.evaluateAll((liens) => liens.map((lien) => lien.getAttribute('aria-label') ?? (lien as HTMLElement).innerText.trim()))).map(sansLaPastille)).toEqual([
+      TITRES_DES_PAGES.aujourdhui, 'Semaine', TITRES_DES_PAGES['ma-ferme'],
     ]);
-    await expect(entrees).toHaveText([/^Aujourd’hui\d*$/, 'Arrosages', 'Planning', 'Ressources']);
-    await expect(barre.getByRole('link', { name: TITRES_DES_PAGES.arrosages })).toHaveAttribute('aria-current', 'page');
-    const plus = barre.getByRole('button', { name: 'Plus de pages' });
-    await expect(plus).toHaveAttribute('data-marked', 'false');
-    for (const cible of [...await entrees.all(), plus]) await verifierCibleTactile(cible, `L’entrée « ${await cible.innerText()} » de la barre du bas`);
+    await expect(entrees).toHaveText([/^Aujourd’hui\d*$/, 'Semaine', 'Ma ferme']);
+    await expect(barre.getByRole('link', { name: /^Aujourd’hui/ })).toHaveAttribute('aria-current', 'true');
+    const plus = barre.getByRole('button', { name: 'Arroser ou noter' });
+    await expect(barre.locator('li')).toHaveCount(4);
+    await expect(barre.locator('li').nth(2)).toHaveAttribute('data-plus', 'true');
+    for (const cible of [...await entrees.all(), plus]) await verifierCibleTactile(cible, `L’entrée « ${(await cible.innerText()) || 'Arroser ou noter'} » de la barre du bas`);
+    await expect(barre.getByRole('button', { name: /^Plus de pages/ })).toHaveCount(0);
     await expect(page.getByRole('navigation', { name: 'Pages du module' })).toBeHidden();
   } else {
     await expect(barre).toBeHidden();
@@ -148,23 +152,22 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   await expect(page.locator('section').filter({ has: page.getByRole('heading', { name: 'Notifications du téléphone' }) }).locator('.irrigation-notification-readiness[data-status="limited"]')).toBeVisible();
   await verifierLEtape(page, journal, 'rappel dans Réglages');
 
-  // « Plus » prend la marque de la page ouverte quand elle n'est pas dans la barre, sans point vert muet (lot A, J13, F287).
+  // Réglages est de « Ma ferme » : l'endroit prend la marque, sans point vert muet (lot A, J13, F287, réécrite par S3, PR 2) ;
+  // le retour « ‹ » de 44 px ramène aux fiches, où l'endroit est la page ouverte.
   if (telephone) {
-    const plus = barre.getByRole('button', { name: /^Plus de pages/ });
-    await expect(plus).toHaveAttribute('data-marked', 'true');
-    expect(await plus.evaluate((element) => getComputedStyle(element, '::after').content)).toBe('none');
-    const marque = await plus.locator('.icon').evaluate((element) => getComputedStyle(element).backgroundColor);
-    const ouverte = await barre.getByRole('link').first().locator('.icon').evaluate((element) => getComputedStyle(element).backgroundColor);
-    expect(marque, 'la marque de « Plus »').not.toBe(ouverte);
-    await expect(plus).toHaveAccessibleName('Plus de pages, dont la page ouverte : Réglages');
-    const menu = await ouvrirLeMenuDesPages(page);
-    await expect(menu.getByRole('link')).toHaveCount(12);
-    for (const lien of await menu.getByRole('link').all()) await verifierCibleTactile(lien, `Le lien « ${await lien.innerText()} » de « Plus »`);
-    await expect(menu.getByRole('link', { name: TITRES_DES_PAGES.reglages })).toHaveAttribute('aria-current', 'page');
-    await verifierLEtape(page, journal, 'feuille « Plus » ouverte');
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
-    await expect(plus).toBeFocused();
+    const maFerme = barre.getByRole('link', { name: TITRES_DES_PAGES['ma-ferme'], exact: true });
+    await expect(maFerme).toHaveAttribute('aria-current', 'true');
+    expect(await maFerme.evaluate((element) => getComputedStyle(element, '::after').content)).toBe('none');
+    const marque = await maFerme.locator('.icon').evaluate((element) => getComputedStyle(element).backgroundColor);
+    const libre = await barre.getByRole('link').first().locator('.icon').evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(marque, 'la marque de « Ma ferme »').not.toBe(libre);
+    const retour = page.getByRole('link', { name: 'Retour à Ma ferme' });
+    await verifierCibleTactile(retour, 'Le retour « ‹ Ma ferme »');
+    await retour.click();
+    await attendreLaPagePrete(page, 'ma-ferme');
+    await expect(maFerme).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('link', { name: 'Retour à Ma ferme' })).toHaveCount(0);
+    await verifierLEtape(page, journal, 'retour à « Ma ferme »');
   }
 
   // Le planning replié (F11).
@@ -175,31 +178,32 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   await reglerLaPlageDuGoutteAGoutte(planning, { debut: '00:00', fin: '23:59' });
   await planning.getByRole('button', { name: /^(Calculer le plan de la semaine|Recalculer le plan)$/ }).click();
   await expect(planning.locator('.planning-meta')).toContainText('calculé le', { timeout: 30_000 });
-  // La page rouverte, telle qu'on la trouve le matin : les réglages repliés.
+  // La page rouverte, telle qu'on la trouve le matin : « Jour par jour » de la page « Semaine »
+  // (simplification, lot S4, PR 2, section 5), les réglages dans « Le détail ».
   await attendreLaPageIrrigation(page, 'planning');
-  await expect(planning.locator('article.planning-proposal').first()).toBeVisible();
-  const resume = planning.locator('button.planning-summary-line');
-  const tuiles = planning.locator('.planning-summary');
+  await expect(planning.locator('article.planning-proposal').first()).toBeAttached();
   const ecoules = planning.getByRole('button', { name: /^Jours écoulés \(\d+\)$/ });
+  const lignes = planning.locator('.week-slot-line');
   if (telephone) {
-    const hauteur = await page.evaluate(() => document.documentElement.scrollHeight);
+    // Depuis le lot S4, les besoins suivent le planning sur la même page : le planning se mesure jusqu'à son bas.
+    const hauteur = await planning.evaluate((element) => Math.round(element.getBoundingClientRect().bottom + window.scrollY));
     expect(hauteur, `le planning mesure ${hauteur} px, plus de ${ECRANS_DU_PLANNING_MAX} écrans`).toBeLessThanOrEqual(ECRANS_DU_PLANNING_MAX * ECRAN_DU_TELEPHONE_PX);
-    await expect(resume).toBeVisible();
-    // Les gestes d'abord, comme les cartes de tête (audit ergonomique, lot 3, point 5).
-    await expect(resume).toContainText(/^\d+ à valider · \d+ faites? · /);
-    await expect(tuiles).toBeHidden();
-    await verifierCibleTactile(resume, 'La ligne de résumé du planning');
-    await resume.click();
-    await expect(tuiles).toBeVisible();
-    // Les tuiles de totaux sur deux colonnes (charte, point 5).
-    expect((await tuiles.evaluate((element) => getComputedStyle(element).gridTemplateColumns)).split(' ')).toHaveLength(2);
-    await resume.click();
-    await expect(tuiles).toBeHidden();
+    // Chaque créneau en une ligne : l'heure, le matériel, la durée, la dose ; la carte entière dessous, fermée.
+    const ligne = planning.locator('.week-slot-line:visible').first();
+    await expect(ligne).toBeVisible();
+    await expect(ligne.locator('p > span').first()).toHaveText(/^\d{1,2} h( \d{2})? · .+ · .+ · [\d,]+ mm$/);
+    const carte = ligne.locator('xpath=..').locator('article.planning-proposal');
+    await expect(carte).toBeHidden();
+    const autres = ligne.getByRole('button', { name: /^(Autres choix|Détail)$/ });
+    await verifierCibleTactile(autres, 'Le bouton « Autres choix » du créneau');
+    await autres.click();
+    await expect(carte).toBeVisible();
+    await autres.click();
+    await expect(carte).toBeHidden();
 
-    // Le jour du jour ouvert ; les jours écoulés sous leur pli ; un jour à venir replié se déplie.
+    // Le jour du jour ouvert ; les jours écoulés sous leur pli.
     const ouverts = planning.locator('li.planning-day[data-fold="open"]');
     await expect(ouverts.first()).toBeVisible();
-    await expect(ouverts.first()).toHaveAttribute('data-expanded', 'true');
     const replies = planning.locator('li.planning-day[data-fold="past"]');
     if (await replies.count() > 0) {
       await expect(replies.first()).toBeHidden();
@@ -211,22 +215,10 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
     } else {
       await expect(ecoules).toHaveCount(0);
     }
-    const aVenir = planning.locator('li.planning-day[data-fold="folded"]').filter({ has: page.locator('article.planning-proposal') }).first();
-    if (await aVenir.count() > 0) {
-      await expect(aVenir.locator('article.planning-proposal').first()).toBeHidden();
-      const voir = aVenir.getByRole('button', { name: /^Voir les créneaux \(\d+\)$/ });
-      await verifierCibleTactile(voir, 'Le bouton « Voir les créneaux »');
-      await voir.click();
-      await expect(aVenir.locator('article.planning-proposal').first()).toBeVisible();
-      await aVenir.getByRole('button', { name: 'Replier le jour' }).click();
-      await expect(aVenir.locator('article.planning-proposal').first()).toBeHidden();
-    }
   } else {
-    // À l'ordinateur, rien ne se replie.
-    await expect(resume).toBeHidden();
-    await expect(tuiles).toBeVisible();
+    // À l'ordinateur, rien ne se replie : les cartes entières, sans ligne compacte.
+    await expect(lignes.first()).toBeHidden();
     await expect(ecoules).toBeHidden();
-    for (const bouton of await planning.getByRole('button', { name: /^(Voir les créneaux|Replier le jour)/ }).all()) await expect(bouton).toBeHidden();
     await expect(planning.locator('article.planning-proposal').last()).toBeVisible();
   }
   await verifierLEtape(page, journal, 'planning replié au téléphone');
@@ -244,8 +236,9 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   expect(reponse?.status()).toBe(404);
   journal.erreurs = journal.erreurs.filter((erreur) => !erreur.includes('status of 404'));
   if (telephone) {
-    await expect(barreDuBas(page).getByRole('link')).toHaveText([/^Aujourd’hui\d*$/, 'Arrosages', 'Planning', 'Ressources']);
-    await expect(barreDuBas(page).getByRole('button', { name: 'Plus de pages' })).toHaveAttribute('data-marked', 'false');
+    await expect(barreDuBas(page).getByRole('link')).toHaveText([/^Aujourd’hui\d*$/, 'Semaine', 'Ma ferme']);
+    await expect(barreDuBas(page).locator('[aria-current]')).toHaveCount(0);
+    await expect(barreDuBas(page).getByRole('button', { name: 'Arroser ou noter' })).toBeVisible();
   }
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
   await verifierLEtape(page, journal, 'page introuvable');

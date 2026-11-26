@@ -1,16 +1,20 @@
 'use client';
-import type { IrrigationEventRecord } from '@/lib/domain/irrigation-event-record';
 
-
+/**
+ * La fenêtre de fin d'une irrigation : la vanne à vérifier, l'heure réelle
+ * à confirmer. Elle reçoit le nom du matériel et l'heure proposée, pas la
+ * fiche entière : « Arrosages » et « Aujourd'hui » l'ouvrent tous deux
+ * (simplification, lot S2, section 6).
+ */
 export function FinishIrrigationDialog({
-  event,
+  equipmentName,
   finishAt,
   pending,
   onFinishAtChange,
   onCancel,
   onConfirm,
 }: {
-  event: IrrigationEventRecord;
+  equipmentName: string;
   finishAt: string;
   pending: boolean;
   onFinishAtChange: (value: string) => void;
@@ -29,7 +33,7 @@ export function FinishIrrigationDialog({
         <p className="eyebrow">Confirmation</p>
         <h3 id="finish-irrigation-title">Terminer l’irrigation</h3>
         <p>
-          Vérifiez que la vanne de <strong>{event.equipment.equipmentSnapshot.name}</strong> est fermée, puis confirmez l’heure réelle.
+          Vérifiez que la vanne de <strong>{equipmentName}</strong> est fermée, puis confirmez l’heure réelle.
         </p>
         <label>
           <span>Heure réelle de fin</span>

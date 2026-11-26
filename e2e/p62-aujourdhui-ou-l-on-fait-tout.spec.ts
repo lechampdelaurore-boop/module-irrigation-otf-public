@@ -1,0 +1,499 @@
+import { expect, test, type BrowserContext, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
+import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLeDetailDuJour, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte } from './support/planning.ts';
+
+/**
+ * Parcours P62 : « Aujourd'hui » où l'on fait tout (simplification, lot S2,
+ * docs/simplification-s2-contract.md, sections 3, 5 et 12 ;
+ * docs/browser-journeys-contract.md). Sur une ferme neuve propre au parcours
+ * et à la largeur, jamais la ferme réelle : rien à rendre en partant.
+ *
+ * PR 1, valider et démarrer :
+ *
+ * - une irrigation planifiée plus tard dans la journée porte un seul bouton,
+ *   « Démarrer », à 50 px de haut, et « Autres choix », qui déplie « Modifier
+ *   ou annuler sur « Arrosages » » et se referme à Échap, le focus rendu ;
+ *   « Démarrer » la fait passer « En cours », la réponse sous sa carte ;
+ *
+ * - le matin de bout en bout sur la page seule : une proposition du plan du
+ *   jour porte « Valider », « Démarrer tout de suite » et « Autres choix »
+ *   (« Changer l'heure ou la dose », « Pas à cette heure ») ; « Pas à cette
+ *   heure » se confirme d'une ligne ; « Valider » la fait passer
+ *   « Planifiée », la réponse et le focus sur sa carte, sur « Démarrer » ;
+ *   « Démarrer » la fait couler ; PR 2 : en cours, elle dit « Terminer » et
+ *   « Reste … », « Mettre en pause » rangé dans « Autres choix » ; en pause,
+ *   « Reprendre », le focus dessus ; reprise, « Terminer » ouvre la fenêtre
+ *   d'« Arrosages » (« Retour » ne fait rien), et l'irrigation arrêtée en
+ *   route devient ce qui reste, « Reprendre ce qui reste » : le matin de bout
+ *   en bout sans quitter la page ;
+ *
+ * - « Démarrer tout de suite », sur une autre ferme neuve : la proposition du
+ *   jour validée et démarrée d'un appui, « En cours », la réponse sous sa
+ *   carte. Le démarrage refusé (le matériel coule déjà), validation gardée,
+ *   demande deux propositions du même matériel le même jour, que le plan ne
+ *   donne pas à coup sûr : le parcours le joue quand il y en a une seconde,
+ *   et tests/db/simplification-s2-carte.test.ts le prouve toujours.
+ *
+ * Le matériel du matin est posé sous abri (T01, T02 au téléphone), comme
+ * P12 : la pluie prévue n'y compte pas et le plan propose dès aujourd'hui.
+ * PR 3, l'arrosage à rattraper, sur une troisième ferme neuve : trois
+ * irrigations planifiées dans le passé, non faites ; chaque carte pose la
+ * question (« L’avez-vous fait ? ») et porte « Je le fais maintenant » et
+ * « C’est fait », de même taille, « Ne pas le faire » rangé ; « C’est fait »
+ * se confirme, avec la ligne « Fait autrement… Notez-le sur « Arrosages » »
+ * (« Ne rien enregistrer » n'écrit rien), et la carte part ; « Ne pas le
+ * faire » se confirme (« Le garder » ne fait rien), et la carte part ; « Je le
+ * fais maintenant » la fait couler.
+ * PR 4, « Noter la pluie », sur une quatrième ferme neuve : la tuile « Eau
+ * reçue » ouvre la fenêtre, hier par défaut, le bouton inactif tant que le
+ * champ est vide ; 8 mm s'enregistrent au clavier (Entrée), la réponse sous
+ * les tuiles ; rouverte, la fenêtre dit « 8 mm déjà notés » et le bouton
+ * « Remplacer par 0 mm » ; 0 mm est une mesure, remplacée à son tour ; un
+ * chiffre illisible est dit sous le champ, et « Fermer » n'écrit rien.
+ *
+ * L'heure où il tourne : le plan ne propose rien aujourd'hui quand la
+ * journée est finie ; les gestes qui demandent une proposition du jour ne
+ * sont alors pas joués, et le parcours le dit (comme P12).
+ */
+
+const OBJECTIF_MM = '70';
+const PLAGE_OUVERTE = { debut: '00:00', fin: '23:59' };
+/** Le débit de la ligne de P12 sur les mêmes tunnels : chaque parcours tourne sur sa ferme neuve, rien ne se partage. */
+const APPORT_MM_PAR_HEURE = 12;
+
+/** Les cartes du jour d'un matériel, par leur ton : « proposed », « planned », ou celles qui coulent. */
+function cartes(page: Page, materiel: string, ton: 'proposed' | 'planned'): Locator {
+  return page.locator(`#today-day [data-group="todo"] .today-irrigation[data-tone="${ton}"]`).filter({ hasText: materiel });
+}
+
+function enCours(page: Page, materiel: string): Locator {
+  return page.locator('#today-day [data-group="now"] .today-irrigation').filter({ hasText: materiel });
+}
+
+/** Une carte à un bouton : un seul bouton principal, et « Autres choix » qui se déplie, se referme à Échap et rend le focus. */
+async function verifierLaCarteAUnBouton(page: Page, carte: Locator, principal: string, rangés: string[], telephone: boolean): Promise<void> {
+  await expect(carte.locator('[data-primary]')).toHaveCount(1);
+  const bouton = carte.getByRole('button', { name: new RegExp(`^${principal} : `) });
+  await expect(bouton).toHaveText(principal);
+  const hauteur = (await bouton.boundingBox())?.height ?? 0;
+  expect(Math.round(hauteur), `« ${principal} » mesure ${Math.round(hauteur)} px`).toBeGreaterThanOrEqual(50);
+  const autres = carte.getByRole('button', { name: /^Autres choix : / });
+  await expect(autres).toHaveAttribute('aria-expanded', 'false');
+  for (const nom of rangés) await expect(carte.getByText(nom, { exact: true })).toBeHidden();
+  if (telephone) await verifierCibleTactile(autres, '« Autres choix »');
+  await autres.click();
+  await expect(autres).toHaveAttribute('aria-expanded', 'true');
+  for (const nom of rangés) {
+    const choix = carte.getByText(nom, { exact: true });
+    await expect(choix).toBeVisible();
+    if (telephone) await verifierCibleTactile(choix, `« ${nom} »`);
+  }
+  await page.keyboard.press('Escape');
+  await expect(autres).toHaveAttribute('aria-expanded', 'false');
+  await expect(autres).toBeFocused();
+}
+
+test('une irrigation planifiée : « Démarrer » seul, le reste dans « Autres choix » ; démarrée, la réponse la suit', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const reference = Date.now();
+  const debut = horodatageLocal(30, reference);
+  test.skip(debut.slice(0, 10) !== horodatageLocal(0, reference).slice(0, 10), 'trop près de minuit : plus d’irrigation planifiée aujourd’hui');
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'p62-planifiee');
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'materiel');
+  const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p62 planifiée' });
+  await attendreLaPageIrrigation(page, 'arrosages');
+  await page.getByRole('tab', { name: /^Planifier/ }).click();
+  await choisirMaterielEtReglage(page, materiel, reglage, '5');
+  await page.getByLabel('Date et heure de début').fill(debut);
+  await page.getByRole('button', { name: /^Planifier l’arrosage de / }).click();
+  await expect(page.locator('.watering-start .action-reply .irrigation-event-notice')).toHaveText(/planifiée/);
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const carte = cartes(page, materiel, 'planned');
+  await expect(carte).toHaveCount(1);
+  await expect(carte.getByRole('button', { name: 'Démarrer maintenant' })).toHaveCount(0);
+  await verifierLaCarteAUnBouton(page, carte, 'Démarrer', ['Modifier ou annuler sur « Arrosages »'], telephone);
+  await verifierLEtape(page, journal, 'la carte planifiée à un bouton');
+
+  await carte.getByRole('button', { name: /^Démarrer : / }).click();
+  const coule = enCours(page, materiel);
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation a démarré.');
+  await expect(page.locator('.today-page')).toHaveAttribute('aria-busy', 'false');
+  await expect(cartes(page, materiel, 'planned')).toHaveCount(0);
+  await verifierLEtape(page, journal, 'démarrée depuis la carte, la réponse sous elle');
+});
+
+/**
+ * Une ferme neuve dont le plan du jour propose un arrosage : matériel sous
+ * abri (T01, T02 au téléphone), comme P12, où la pluie prévue de la météo de
+ * démonstration ne repousse pas l'arrosage ; objectif posé, plage ouverte,
+ * plan calculé. Rend le nom du matériel.
+ */
+async function preparerUnPlanDuJour(page: Page, context: BrowserContext, testInfo: TestInfo, repere: string, journal: ReturnType<typeof surveillerLaConsole>): Promise<string> {
+  await ouvrirUneFermeToutCochee(page, context, testInfo, repere);
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'materiel');
+  const planche = testInfo.project.name === 'telephone' ? 'T02' : 'T01';
+  const { materiel } = await preparerMaterielArrosant(page, testInfo, { planche, apportMmParHeure: APPORT_MM_PAR_HEURE, repere: repere.replace('-', ' ') });
+  await attendreLaPageIrrigation(page, 'besoins');
+  await poserUnObjectifDeFerme(page, OBJECTIF_MM);
+  await attendreLaPageIrrigation(page, 'planning');
+  const planning = page.locator('section.planning-section');
+  await reglerLaPlageDuGoutteAGoutte(planning, PLAGE_OUVERTE);
+  await planning.getByRole('button', { name: /^(Calculer le plan de la semaine|Recalculer le plan)$/ }).click();
+  await expect(planning.locator('.planning-meta')).toContainText('(à la demande)', { timeout: 30_000 });
+  await verifierLEtape(page, journal, 'plan calculé');
+  return materiel;
+}
+
+test('le matin sur la page seule : « Pas à cette heure », « Valider », « Démarrer », « Mettre en pause », « Reprendre », « Terminer »', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const materiel = await preparerUnPlanDuJour(page, context, testInfo, 'p62-matin', journal);
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const proposees = cartes(page, materiel, 'proposed');
+  const aujourdhui = await proposees.count();
+  test.skip(aujourdhui === 0, 'le plan ne propose rien aujourd’hui pour ce matériel (journée finie) : les gestes du jour ne sont pas joués');
+
+  const premiere = proposees.first();
+  await verifierLaCarteAUnBouton(page, premiere, 'Valider', ['Changer l’heure ou la dose', 'Pas à cette heure'], telephone);
+  await expect(premiere.getByRole('button', { name: /^Démarrer tout de suite : / })).toBeVisible();
+  // Replié, le lien sort de l'arbre d'accessibilité : il se lit par son attribut.
+  await expect(premiere.locator('a[aria-label^="Changer l’heure ou la dose : "]')).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#proposal-/);
+  await expect(page.getByText('Valider au planning')).toHaveCount(0);
+  await verifierLEtape(page, journal, 'la proposition à un bouton');
+
+  // « Pas à cette heure » se confirme ; « Garder la proposition » ne fait rien.
+  await premiere.getByRole('button', { name: /^Autres choix : / }).click();
+  await premiere.getByRole('button', { name: /^Pas à cette heure : / }).click();
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  await expect(fenetre).toContainText('Pas à cette heure ?');
+  await expect(fenetre).toContainText('Le module cherchera une autre place pour cet arrosage.');
+  await fenetre.getByRole('button', { name: 'Garder la proposition' }).click();
+  await expect(fenetre).toHaveCount(0);
+  await expect(proposees).toHaveCount(aujourdhui);
+
+  // « Valider » : la proposition devient une irrigation planifiée ; la réponse la suit, le focus va sur « Démarrer ».
+  const titre = (await premiere.getByRole('button', { name: /^Valider : / }).getAttribute('aria-label'))?.replace(/^Valider : /, '') ?? '';
+  await premiere.getByRole('button', { name: /^Valider : / }).click();
+  const planifiee = page.locator('#today-day .today-irrigation[data-tone="planned"]').filter({ has: page.getByRole('button', { name: `Démarrer : ${titre}` }) });
+  await expect(planifiee).toHaveCount(1, { timeout: 30_000 });
+  await expect(planifiee.locator('.action-reply')).toContainText('Validé : l’arrosage est planifié.');
+  await expect(planifiee.getByRole('button', { name: `Démarrer : ${titre}` })).toBeFocused();
+  await verifierLEtape(page, journal, 'validée sur la carte, la réponse et le focus sur elle');
+
+  // « Démarrer » : elle coule, sans avoir quitté la page.
+  await planifiee.getByRole('button', { name: `Démarrer : ${titre}` }).click();
+  await expect(enCours(page, materiel).locator('.today-status')).toHaveText('En cours');
+  await expect(page).toHaveURL(/\/irrigation\/aujourdhui/);
+  await verifierLEtape(page, journal, 'démarrée sur la carte');
+
+  // PR 2 : en cours, la carte dit « Terminer » et son compte à rebours ; « Mettre en pause » est rangé dans « Autres choix ».
+  const coule = enCours(page, materiel);
+  await verifierLaCarteAUnBouton(page, coule, 'Terminer', ['Mettre en pause', 'Ouvrir sur « Arrosages »'], telephone);
+  await expect(coule.locator('.today-countdown')).toHaveText(/^Reste (\d+ h( \d{2})?|\d+ min)$/);
+  await coule.getByRole('button', { name: /^Autres choix : / }).click();
+  await coule.getByRole('button', { name: /^Mettre en pause : / }).click();
+  await expect(coule.locator('.today-status')).toHaveText('En pause');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation est en pause.');
+  await expect(coule.getByRole('button', { name: /^Reprendre : / })).toBeFocused();
+  await expect(coule.locator('.today-countdown')).toHaveCount(0);
+  await expect(coule.getByRole('button', { name: /^Terminer : / })).toBeVisible();
+  await verifierLEtape(page, journal, 'en pause depuis la carte, « Reprendre » en tête');
+
+  await coule.getByRole('button', { name: /^Reprendre : / }).click();
+  const repriseA = Date.now();
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation a repris.');
+  await expect(coule.getByRole('button', { name: /^Terminer : / })).toBeFocused();
+  await verifierLEtape(page, journal, 'reprise depuis la carte');
+
+  // « Terminer » : la fenêtre d'« Arrosages », l'heure réelle pré-remplie ; arrêtée avant la fin, ce qui reste se lit sur la carte.
+  await coule.getByRole('button', { name: /^Terminer : / }).click();
+  const fin = page.getByRole('dialog', { name: 'Terminer l’irrigation' });
+  await expect(fin).toContainText(`Vérifiez que la vanne de ${materiel} est fermée`);
+  await expect(fin.getByLabel('Heure réelle de fin')).toHaveValue(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+  await fin.getByRole('button', { name: 'Retour' }).click();
+  await expect(fin).toHaveCount(0);
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  // L'heure proposée est prise à la seconde à l'ouverture de la fenêtre : dans la seconde même de la reprise, le
+  // serveur la refuserait (« ne peut pas précéder la dernière reprise »), comme sur « Arrosages ». Un vrai geste
+  // prend plus de temps ; le parcours attend deux secondes après la reprise (comme P38 après le démarrage).
+  await expect.poll(() => Date.now() - repriseA).toBeGreaterThan(2_000);
+  await coule.getByRole('button', { name: /^Terminer : / }).click();
+  await fin.getByRole('button', { name: 'Terminer l’irrigation' }).click();
+  await expect(fin).toHaveCount(0);
+  await expect(coule.locator('.today-status')).toHaveText('Ce qui reste d’un arrosage arrêté');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation partielle a été enregistrée. Ce qui reste est planifié.');
+  await expect(coule.getByRole('button', { name: /^Reprendre ce qui reste : / })).toBeFocused();
+  await expect(page).toHaveURL(/\/irrigation\/aujourdhui/);
+  await verifierLEtape(page, journal, 'terminée sur la carte : valider, démarrer, terminer sans quitter la page');
+
+  // « Démarrer tout de suite » sur une autre proposition du même matériel : validée, mais pas démarrée, le matériel coule.
+  const autre = cartes(page, materiel, 'proposed').first();
+  if (await autre.count() > 0) {
+    await autre.getByRole('button', { name: /^Démarrer tout de suite : / }).click();
+    const reponse = page.locator('#today-day .action-reply').filter({ hasText: 'Validé, mais pas démarré' });
+    await expect(reponse).toContainText('L’arrosage reste planifié.');
+    await verifierLEtape(page, journal, '« Démarrer tout de suite », démarrage refusé, validation gardée');
+  } else {
+    testInfo.annotations.push({ type: 'non joué', description: '« Démarrer tout de suite » : plus d’autre proposition aujourd’hui pour ce matériel (le refus du démarrage est prouvé par tests/db/simplification-s2-carte.test.ts)' });
+  }
+
+  // « Pas à cette heure » confirmé sur une proposition qui reste : le refus du planning, dit en tête du bloc.
+  const derniere = cartes(page, materiel, 'proposed').first();
+  if (await derniere.count() > 0) {
+    await derniere.getByRole('button', { name: /^Autres choix : / }).click();
+    await derniere.getByRole('button', { name: /^Pas à cette heure : / }).click();
+    await page.locator('dialog.module-confirm-dialog[open]').getByRole('button', { name: 'Chercher une autre place' }).click();
+    await expect(page.locator('#today-day .action-reply').filter({ hasText: 'Heure refusée' })).toContainText('Heure refusée : le module cherche une autre place pour cet arrosage.');
+    await verifierLEtape(page, journal, '« Pas à cette heure » confirmé');
+  } else {
+    testInfo.annotations.push({ type: 'non joué', description: '« Pas à cette heure » confirmé : plus de proposition aujourd’hui pour ce matériel' });
+  }
+});
+
+test('« Démarrer tout de suite » : la proposition du jour validée et démarrée d’un appui, la réponse sous sa carte', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const materiel = await preparerUnPlanDuJour(page, context, testInfo, 'p62-tout-de-suite', journal);
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const proposee = cartes(page, materiel, 'proposed').first();
+  test.skip(await proposee.count() === 0, 'le plan ne propose rien aujourd’hui pour ce matériel (journée finie) : le geste du jour n’est pas joué');
+
+  await proposee.getByRole('button', { name: /^Démarrer tout de suite : / }).click();
+  const coule = enCours(page, materiel);
+  await expect(coule.locator('.today-status')).toHaveText('En cours', { timeout: 30_000 });
+  await expect(coule.locator('.action-reply')).toContainText('Validé. L’irrigation a démarré.');
+  await expect(page).toHaveURL(/\/irrigation\/aujourdhui/);
+  await verifierLEtape(page, journal, 'validée et démarrée d’un appui');
+});
+
+test('un arrosage à rattraper : la question, « C’est fait » confirmé, « Ne pas le faire », « Je le fais maintenant »', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const reference = Date.now();
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'p62-rattraper');
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'materiel');
+  const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p62 rattraper' });
+  // Trois arrosages de 30 min (5 mm à 10 mm/h), finis depuis des heures, jamais marqués.
+  await attendreLaPageIrrigation(page, 'arrosages');
+  await page.getByRole('tab', { name: /^Planifier/ }).click();
+  for (const heures of [12, 9, 6]) {
+    await choisirMaterielEtReglage(page, materiel, reglage, '5');
+    await page.getByLabel('Date et heure de début').fill(horodatageLocal(-heures * 60, reference));
+    await soumettreIrrigation(page, /^Planifier l’arrosage de /, 'p62 à rattraper');
+  }
+
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const aRattraper = page.locator('#today-day [data-group="late"] .today-irrigation[data-tone="missed"]').filter({ hasText: materiel });
+  await expect(aRattraper).toHaveCount(3);
+  const carte = aRattraper.first();
+  await expect(carte.locator('.today-late-question')).toHaveText(/^Prévu (hier |avant-hier )?à \d{1,2} h( \d{2})?\. L’avez-vous fait \?$/);
+  await verifierLaCarteAUnBouton(page, carte, 'Je le fais maintenant', ['Ne pas le faire', 'Ouvrir sur « Arrosages »'], telephone);
+  const cEstFait = carte.getByRole('button', { name: /^C’est fait : / });
+  expect(Math.round((await cEstFait.boundingBox())?.height ?? 0), '« C’est fait » a la taille du bouton principal').toBeGreaterThanOrEqual(50);
+  await verifierLEtape(page, journal, 'la carte à rattraper pose la question');
+
+  // « C’est fait » : rien au premier appui ; la confirmation dit l'heure, le volume, et où noter un arrosage fait autrement.
+  const fenetre = page.locator('dialog.module-confirm-dialog[open]');
+  await cEstFait.click();
+  await expect(fenetre).toContainText('Elle ne se corrigera plus dans le module.');
+  await expect(fenetre).toContainText('Fait autrement (une autre durée, un autre moment) ?');
+  await expect(fenetre.getByRole('link', { name: 'Notez-le sur « Arrosages »' })).toHaveAttribute('href', /^\/irrigation\/arrosages\?season=\d{4}#irrigation-/);
+  await fenetre.getByRole('button', { name: 'Ne rien enregistrer' }).click();
+  await expect(fenetre).toHaveCount(0);
+  await expect(aRattraper).toHaveCount(3);
+  await carte.getByRole('button', { name: /^C’est fait : / }).click();
+  await fenetre.getByRole('button', { name: 'Enregistrer comme faite' }).click();
+  await expect(aRattraper).toHaveCount(2);
+  await expect(page.locator('#today-day .action-reply').filter({ hasText: 'enregistrée comme faite' })).toBeVisible();
+  await verifierLEtape(page, journal, '« C’est fait » confirmé, la carte partie');
+
+  // « Ne pas le faire » : confirmé d'une ligne ; « Le garder » ne fait rien.
+  await aRattraper.first().getByRole('button', { name: /^Autres choix : / }).click();
+  await aRattraper.first().getByRole('button', { name: /^Ne pas le faire : / }).click();
+  await expect(fenetre).toContainText('Cet arrosage ne sera pas fait. Le module recalcule la semaine.');
+  await fenetre.getByRole('button', { name: 'Le garder' }).click();
+  await expect(aRattraper).toHaveCount(2);
+  await aRattraper.first().getByRole('button', { name: /^Autres choix : / }).click();
+  await aRattraper.first().getByRole('button', { name: /^Ne pas le faire : / }).click();
+  await fenetre.getByRole('button', { name: 'Ne pas le faire' }).click();
+  await expect(aRattraper).toHaveCount(1);
+  await expect(page.locator('#today-day .action-reply').filter({ hasText: 'L’irrigation planifiée a été annulée.' })).toBeVisible();
+  await verifierLEtape(page, journal, '« Ne pas le faire » confirmé');
+
+  // « Je le fais maintenant » : elle coule, la réponse sous sa carte.
+  await aRattraper.first().getByRole('button', { name: /^Je le fais maintenant : / }).click();
+  const coule = enCours(page, materiel);
+  await expect(coule.locator('.today-status')).toHaveText('En cours');
+  await expect(coule.locator('.action-reply')).toContainText('L’irrigation a démarré.');
+  await expect(aRattraper).toHaveCount(0);
+  await verifierLEtape(page, journal, '« Je le fais maintenant » démarre');
+});
+
+test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis « La semaine »', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const reference = Date.now();
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'p62-pluie');
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+
+  // « Noter la pluie » de « La semaine », au premier niveau (S2, PR 5) ; la tuile « Eau reçue » du détail ouvre la même fenêtre.
+  const tuile = page.locator('#today-week').getByRole('button', { name: 'Noter la pluie' });
+  if (telephone) await verifierCibleTactile(tuile, '« Noter la pluie »');
+  const fenetre = page.getByRole('dialog', { name: 'Noter la pluie' });
+  const jour = fenetre.getByLabel('Quel jour ?');
+  const combien = fenetre.getByLabel('Combien ?');
+  const premierJanvier = horodatageLocal(0, reference).slice(5, 10) === '01-01';
+  const parDefaut = horodatageLocal(premierJanvier ? 0 : -24 * 60, reference).slice(0, 10);
+  const pourLeJour = premierJanvier ? 'pour aujourd’hui' : 'pour hier';
+  const reponse = page.locator('#today-week .action-reply');
+
+  // Ouverte : hier par défaut, le focus sur le jour, le bouton inactif tant que le champ est vide (D-003).
+  await tuile.click();
+  await expect(fenetre).toBeVisible();
+  await expect(jour).toBeFocused();
+  await expect(jour).toHaveValue(parDefaut);
+  await expect(fenetre).toContainText('Pas de pluie ? Notez 0 : c’est une vraie mesure, elle compte.');
+  await expect(fenetre.getByRole('button', { name: 'Enregistrer', exact: true })).toBeDisabled();
+  await expect(fenetre.getByRole('link', { name: 'sur « Semaine », dans « Pluie mesurée »' })).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#manual-rain$/);
+  if (telephone) {
+    for (const [cible, nom] of [[jour, 'Le jour'], [combien, 'Le champ des millimètres'], [fenetre.getByRole('button', { name: 'Fermer' }), '« Fermer »']] as const) {
+      await verifierCibleTactile(cible, nom);
+    }
+  }
+  await verifierLEtape(page, journal, 'la fenêtre de la pluie, hier par défaut');
+
+  // Un chiffre illisible est dit sous le champ ; « Fermer » n'écrit rien.
+  await combien.fill('beaucoup');
+  await expect(combien).toHaveAttribute('aria-invalid', 'true');
+  await expect(fenetre).toContainText('Tapez un nombre de millimètres, par exemple 8,5.');
+  await fenetre.getByRole('button', { name: 'Fermer' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveCount(0);
+
+  // 8 mm, au clavier : le bouton dit le chiffre, Entrée enregistre, la réponse sous « La semaine ».
+  await tuile.click();
+  await combien.fill('8');
+  await expect(fenetre.getByRole('button', { name: 'Enregistrer 8 mm' })).toBeEnabled();
+  if (telephone) await verifierCibleTactile(fenetre.getByRole('button', { name: 'Enregistrer 8 mm' }), '« Enregistrer 8 mm »');
+  await combien.press('Enter');
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveText(/^Pluie enregistrée : 8 mm le \S+ \d{1,2} \S+\. Le plan se recalcule\.$/);
+  await verifierLEtape(page, journal, '8 mm enregistrés');
+
+  // Rouverte : la mesure se dit, le bouton devient « Remplacer par 0 mm » ; 0 est une vraie mesure.
+  await tuile.click();
+  await expect(fenetre).toContainText(`8 mm déjà notés ${pourLeJour}.`);
+  await combien.fill('0');
+  await fenetre.getByRole('button', { name: 'Remplacer par 0 mm' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveText(/^Pluie enregistrée : 0 mm le /);
+  await verifierLEtape(page, journal, '0 mm remplace 8 mm');
+
+  // Et remplacer encore, à la virgule.
+  await tuile.click();
+  await expect(fenetre).toContainText(`0 mm déjà noté ${pourLeJour}.`);
+  await combien.fill('3,5');
+  await fenetre.getByRole('button', { name: 'Remplacer par 3,5 mm' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(reponse).toHaveText(/^Pluie enregistrée : 3,5 mm le /);
+  await tuile.click();
+  await expect(fenetre).toContainText(`3,5 mm déjà notés ${pourLeJour}.`);
+  await page.keyboard.press('Escape');
+  await expect(fenetre).toBeHidden();
+  await expect(tuile).toBeFocused();
+  await verifierLEtape(page, journal, 'la mesure remplacée');
+
+  // La tuile « Eau reçue », dans « Le détail », ouvre la même fenêtre ; sa réponse s'écrit sous les tuiles.
+  await ouvrirLeDetailDuJour(page);
+  const tuileDuDetail = page.getByRole('region', { name: 'Cette semaine' }).locator('button.today-kpi').filter({ hasText: 'Eau reçue' });
+  await expect(tuileDuDetail).toHaveAccessibleName(/^Eau reçue .+ Noter la pluie$/);
+  await tuileDuDetail.click();
+  await expect(fenetre).toContainText(`3,5 mm déjà notés ${pourLeJour}.`);
+  await combien.fill('2');
+  await fenetre.getByRole('button', { name: 'Remplacer par 2 mm' }).click();
+  await expect(page.getByRole('region', { name: 'Cette semaine' }).locator('.action-reply')).toHaveText(/^Pluie enregistrée : 2 mm le /);
+  await verifierLEtape(page, journal, 'la tuile du détail note la pluie');
+});
+
+/** Les bornes de la page à l'essentiel au téléphone, à 390 px (contrat S2, section 8) : mesurées, pas devinées. */
+const PREMIER_NIVEAU_MAX_PX = 1_600;
+const PREMIER_BOUTON_MAX_PX = 600;
+const CHOSES_A_TOUCHER_MAX = 12;
+
+test('la page à l’essentiel : le premier niveau dans ses bornes, « Le détail » fermé, chaque ancre l’ouvre', async ({ page, context }, testInfo) => {
+  const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  const materiel = await preparerUnPlanDuJour(page, context, testInfo, 'p62-essentiel', journal);
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+  const proposee = cartes(page, materiel, 'proposed').first();
+  const pli = page.locator('details#today-detail');
+  await expect(pli).toHaveJSProperty('open', false);
+  // Le premier niveau : la journée, la semaine en une barre ; les blocs entiers dans le pli, fermé.
+  await expect(page.locator('#today-week .today-week-sentence')).not.toBeEmpty();
+  for (const id of ['today-week-water', 'today-soil', 'today-water', 'today-reliability', 'today-weather']) {
+    await expect(pli.locator(`#${id}`), `#${id} dans « Le détail »`).toHaveCount(1);
+    await expect(page.locator(`#${id}`)).toBeHidden();
+  }
+  await expect(pli.locator(':scope > summary .today-detail-count')).toHaveText(/chiffres · \d+ jardins? · /);
+
+  if (telephone && await proposee.count() > 0) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const mesures = await page.evaluate(() => {
+      const page = document.querySelector('.today-page');
+      const resume = document.querySelector('#today-detail > summary');
+      const bouton = document.querySelector('#today-day [data-primary]');
+      if (!page || !resume || !bouton) return null;
+      // Le nom du matériel du parcours, rendu unique par le titre du test, tient sur plusieurs lignes ; celui
+      // d'une ferme tient sur une : la mesure retire les lignes en trop du nom, et le dit.
+      const nom = bouton.closest('li')?.querySelector('.today-irrigation-title > span');
+      const lignes = nom ? [...nom.getClientRects()] : [];
+      const nomEnTrop = lignes.length > 1 ? Math.round(lignes[lignes.length - 1].bottom - lignes[0].bottom) : 0;
+      const visibles = [...page.querySelectorAll('a[href], button, select, input, summary')]
+        .filter((element) => !element.closest('.today-detail-body, dialog'))
+        .filter((element) => (element as HTMLElement).offsetParent !== null);
+      return {
+        hauteur: Math.round(resume.getBoundingClientRect().bottom + window.scrollY),
+        premierBouton: Math.round(bouton.getBoundingClientRect().top + window.scrollY) - nomEnTrop,
+        nomEnTrop,
+        choses: visibles.length,
+      };
+    });
+    expect(mesures, 'le premier niveau se mesure').not.toBeNull();
+    if (mesures) {
+      testInfo.annotations.push({ type: 'mesure', description: `premier niveau ${mesures.hauteur} px, premier bouton à ${mesures.premierBouton} px (nom du matériel ramené à une ligne : ${mesures.nomEnTrop} px retirés), ${mesures.choses} choses à toucher` });
+      expect(mesures.hauteur, `premier niveau : ${mesures.hauteur} px`).toBeLessThanOrEqual(PREMIER_NIVEAU_MAX_PX);
+      expect(mesures.premierBouton, `premier bouton : ${mesures.premierBouton} px`).toBeLessThan(PREMIER_BOUTON_MAX_PX);
+      expect(mesures.choses, `choses à toucher : ${mesures.choses}`).toBeLessThanOrEqual(CHOSES_A_TOUCHER_MAX);
+    }
+    await verifierLEtape(page, journal, 'premier niveau dans ses bornes');
+  }
+
+  // Chaque ancre existante ouvre le pli sur son bloc, à l'arrivée sur la page (les liens des notifications, des autres pages).
+  for (const id of ['today-reliability', 'today-weather', 'today-water', 'today-week-water', 'today-soil']) {
+    await page.goto(`/irrigation/aujourdhui#${id}`);
+    await attendreLaPagePrete(page, 'aujourdhui');
+    await expect(pli).toHaveJSProperty('open', true);
+    await expect(page.locator(`#${id}`)).toBeInViewport();
+  }
+  await verifierLEtape(page, journal, 'chaque ancre ouvre « Le détail »');
+
+  // Le pli se ferme et se rouvre au clavier ; son résumé fait une cible de 44 px.
+  const resume = pli.locator(':scope > summary');
+  if (telephone) await verifierCibleTactile(resume, '« Le détail »');
+  await resume.focus();
+  await page.keyboard.press('Enter');
+  await expect(pli).toHaveJSProperty('open', false);
+  await page.keyboard.press('Enter');
+  await expect(pli).toHaveJSProperty('open', true);
+  await verifierLEtape(page, journal, '« Le détail » au clavier');
+});

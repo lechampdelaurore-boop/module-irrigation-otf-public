@@ -184,7 +184,7 @@ test('un choix enregistré n’a pas de bandeau ; une case apparue depuis arrive
   assert.deepEqual(beforeCalculator.banner, { kind: 'new-features', features: ['calculateur'] });
   assert.equal(featureBannerText(beforeCalculator.banner!), 'Nouvelle fonctionnalité : Calculateur d’irrigation. Elle n’est pas cochée ; vous pouvez la cocher dans Réglages.');
   assert.equal(firstEnabledFeature(['materiel', 'calculateur']), 'materiel', 'une case sans page n’est jamais la première page');
-  assert.deepEqual(menuPages(['materiel', 'calculateur']), ['materiel', 'reglages']);
+  assert.deepEqual(menuPages(['materiel', 'calculateur']), ['materiel', 'ma-ferme', 'reglages']);
   assert.ok(!isIrrigationPageId('calculateur'), 'pas d’adresse /irrigation/calculateur');
 });
 
@@ -252,7 +252,8 @@ test('une page par case, plus Réglages ; la saison, la parcelle et la semaine s
   assert.equal(pageFromPathname('/irrigation/inconnue'), null);
   assert.ok(isIrrigationPageId('reglages'));
   assert.ok(!isIrrigationPageId('bienvenue'));
-  assert.deepEqual(menuPages(['alertes-meteo', 'materiel']), ['aujourdhui', 'materiel', 'alertes-meteo', 'reglages']);
+  // « Ma ferme », une page de plus depuis le lot S3 (PR 1), avant Réglages.
+  assert.deepEqual(menuPages(['alertes-meteo', 'materiel']), ['aujourdhui', 'materiel', 'alertes-meteo', 'ma-ferme', 'reglages']);
   assert.ok(isIrrigationPageId('aujourdhui'));
   assert.equal(pageFromPathname('/irrigation/aujourdhui'), 'aujourdhui');
 });
@@ -262,12 +263,14 @@ test('les anciennes adresses des notifications conduisent à la page qui porte l
   // Sans ancre, la page d'arrivée : « Aujourd'hui » quand elle existe (audit ergonomique, lot 2, F1).
   assert.deepEqual(legacyRedirect('', all), { page: 'aujourdhui', notEnabled: false });
   assert.deepEqual(legacyRedirect('', ['materiel', 'calculateur']), { page: 'materiel', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#weather', all), { page: 'besoins', notEnabled: false });
+  // Depuis le lot S4 (section 9), les blocs du planning, des besoins et de l'historique vivent sur « Semaine ».
+  assert.deepEqual(legacyRedirect('#weather', all), { page: 'semaine', notEnabled: false });
   assert.deepEqual(legacyRedirect('#weather', ['alertes-meteo']), { page: 'alertes-meteo', notEnabled: false });
   assert.deepEqual(legacyRedirect('#irrigation-eq-1', all), { page: 'arrosages', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#series-water-title', all), { page: 'historique', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#series-water-title', all), { page: 'semaine', view: 'cumuls', notEnabled: false });
   assert.deepEqual(legacyRedirect('#series-water-title', ['alertes-cultures']), { page: 'alertes-cultures', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#planning', all), { page: 'planning', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#planning', all), { page: 'semaine', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#planning-title', ['arrosages', 'materiel', 'besoins']), { page: 'aujourdhui', notEnabled: true }, 'le planning décoché : la page d’arrivée et sa ligne, même quand « Semaine » existe');
   assert.deepEqual(legacyRedirect('#planning-title', ['alertes-cultures']), { page: 'alertes-cultures', notEnabled: false });
   assert.deepEqual(legacyRedirect('#farm-plan', ['alertes-meteo']), { page: 'aujourdhui', notEnabled: false }, 'une ancre sans règle mène à la page d’arrivée');
   assert.deepEqual(legacyRedirect('#irrigation-eq-1', ['alertes-meteo']), { page: 'aujourdhui', notEnabled: true }, 'la fonctionnalité n’est pas cochée : la page d’arrivée, avec la ligne qui le dit');

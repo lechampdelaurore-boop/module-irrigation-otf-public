@@ -141,7 +141,8 @@ test('cas 4 : sans aucune des huit cases utiles, pas de page « Aujourd’hui »
   assert.equal(hasTodayPage(ALL), true);
 
   const sansAujourdhui: FeatureId[] = ['materiel', 'calculateur'];
-  assert.deepEqual(menuPages(sansAujourdhui), ['materiel', 'reglages']);
+  // « Ma ferme » s'ajoute au menu comme une page de plus (simplification, lot S3, PR 1).
+  assert.deepEqual(menuPages(sansAujourdhui), ['materiel', 'ma-ferme', 'reglages']);
   assert.equal(landingPage(sansAujourdhui), 'materiel');
   // `/irrigation` va à Matériel ; `/irrigation/aujourdhui`, à la première page cochée avec sa ligne.
   assert.deepEqual(legacyRedirect('', sansAujourdhui), { page: 'materiel', notEnabled: false });
@@ -151,7 +152,7 @@ test('cas 4 : sans aucune des huit cases utiles, pas de page « Aujourd’hui »
 
 test('F1 et F2 : « Aujourd’hui » est la première du menu, la page d’arrivée, et ne propose pas la saison', () => {
   assert.equal(menuPages(ALL)[0], 'aujourdhui');
-  assert.equal(menuPages(ALL).length, 12);
+  assert.equal(menuPages(ALL).length, 14, 'les douze pages, « Semaine » (lot S4, PR 1) et « Ma ferme » (lot S3, PR 1)');
   assert.equal(landingPage(ALL), 'aujourdhui');
   assert.deepEqual(legacyRedirect('', ALL), { page: 'aujourdhui', notEnabled: false });
   // Une ancienne ancre garde sa page ; une ancre inconnue conduit à « Aujourd'hui ».
@@ -237,9 +238,9 @@ test('cas 7 : trois « Non faite » hier et une « En retard » ce matin, chacun
   assert.equal(late.lines[3].open.anchor, 'irrigation-late');
   assert.equal(late.empty, null);
   assert.equal(view.badge, 4);
-  // Sans les arrosages cochés, la carte s'ouvre sur le planning.
+  // Sans les arrosages cochés, la carte s'ouvre sur « Semaine », qui porte le planning (S4, PR 4).
   const planningOnly = todayView(inputs({ events, enabled: ['planning', 'materiel'] }));
-  assert.equal(block(planningOnly.blocks, 'late').lines[0].open.page, 'planning');
+  assert.equal(block(planningOnly.blocks, 'late').lines[0].open.page, 'semaine');
 });
 
 test('cas 8 : deux irrigations planifiées et une proposition, par heure ; « Démarrer » pour les planifiées seulement', () => {
@@ -266,7 +267,8 @@ test('cas 8 : deux irrigations planifiées et une proposition, par heure ; « D�
   ]);
   assert.equal(todo.lines[0].detail, 'planche P1 · 1 h 30 · 12 mm');
   assert.equal(todo.lines[2].title, 'Asperseur A · Buse 2');
-  assert.deepEqual(todo.lines[2].open, { page: 'planning', anchor: 'proposal-p20', label: 'Valider au planning' });
+  // Le lien de la proposition mène à son « Ajuster » du planning (simplification, lot S2, S2-d) ; « Valider » est un bouton.
+  assert.deepEqual(todo.lines[2].open, { page: 'semaine', anchor: 'proposal-p20', label: 'Changer l’heure ou la dose' });
   assert.deepEqual(todo.lines.map((line) => line.tone), ['planned', 'planned', 'proposed']);
   assert.equal(block(view.blocks, 'late').empty, NOTHING_LATE);
   assert.equal(view.badge, null);
@@ -320,7 +322,7 @@ test('cas 12 : cinq jours de pluie réelle manquants sur sept', () => {
   const lines = reliabilityLines({ ...FRESH, enabled: ALL, now: NOW, actualRainMissingDates: ['2026-11-05', '2026-11-06', '2026-11-07', '2026-11-10', '2026-11-11'] });
   assert.deepEqual(lines.map((line) => [line.text, line.action]), [[
     'Pluie réelle incomplète : 5 jours manquants. Sans elle, le besoin est surévalué.',
-    { kind: 'link', label: 'Noter la pluie de la semaine', page: 'besoins', anchor: 'manual-rain' },
+    { kind: 'rain', label: 'Noter la pluie', page: 'semaine' },
   ]]);
   // Une ferme tout sous abri : la pluie ne compte pas, rien à rafraîchir.
   assert.deepEqual(reliabilityLines({ ...FRESH, enabled: ALL, now: NOW, actualRainMissingDates: null }), []);

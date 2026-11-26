@@ -1,63 +1,47 @@
 import type { IrrigationPageId } from './pages';
+import { menuPlacePages, PLACE_IDS, placeMark, placeOfPage, type PlaceId } from './places';
 
 /**
- * La barre du bas du téléphone (audit ergonomique, point 2, 3.8 quater lot 2,
- * docs/audit-ergonomie-lot2-contract.md, section 4, précision F6) : quatre
- * entrées et « Plus », au lieu d'une bande de pages qui défile et cache les
- * dernières derrière un geste. Les quatre entrées sont prises, dans l'ordre de
- * priorité, parmi les pages de la ferme ; une page absente (case décochée)
- * laisse sa place à la suivante du menu. « Plus » ouvre toutes les pages du
- * menu, Réglages comprise. Un menu de cinq pages ou moins tient entier dans la
- * barre, sans « Plus ». Le menu de l'ordinateur ne change pas.
+ * La barre du bas du téléphone (simplification, lot S3, PR 2,
+ * docs/simplification-s3-contract.md, section 4 ; D-331) : les trois
+ * endroits et le « + », à la place des quatre pages et de « Plus » (F6, lot
+ * 2 de l'audit ergonomique). Dans cet ordre : Aujourd'hui, Semaine, « + »,
+ * Ma ferme. Un endroit sans page cochée disparaît, les autres se partagent
+ * la largeur ; le « + » n'existe que si l'un de ses gestes existe
+ * (`plusGestures`). Toute page est à deux touches au plus : un endroit, puis
+ * une fiche (« Arrosages » passe par le « + » ou par « Aujourd'hui »,
+ * section 3.4) ; « Semaine » est une page depuis le lot S4, et sa seconde
+ * vue est à une touche de la première, par son sélecteur de vue. Le menu de
+ * l'ordinateur range de même (`menuPlaces`, PR 3).
  */
 
-/** Les pages de la barre, par ordre de priorité : ce qu'on ouvre au champ, « Aujourd'hui » en tête. */
-const PHONE_BAR_PRIORITY: readonly IrrigationPageId[] = ['aujourdhui', 'arrosages', 'planning', 'ressources'];
-
-/** Les entrées de la barre à côté de « Plus ». */
-const PHONE_BAR_ENTRIES = 4;
-
-/** Un menu de cette taille ou moins tient entier dans la barre, sans « Plus ». */
-const PHONE_BAR_WHOLE_MENU = 5;
-
-export type PhoneBar = {
-  /** Les entrées de la barre, dans l'ordre du menu. */
-  entries: IrrigationPageId[];
-  /** Vrai quand une page du menu n'est pas dans la barre : « Plus » les ouvre toutes. */
-  more: boolean;
-  /** La page ouverte n'est pas dans la barre : « Plus » porte la pastille verte. */
-  moreMarked: boolean;
+type PhoneBarPlace = {
+  kind: 'place';
+  place: PlaceId;
+  /** L'entrée de l'endroit : sa première page cochée (section 3.2). */
+  page: IrrigationPageId;
+  /** S3-e : `page` sur l'entrée même, `true` sur l'endroit d'une autre de ses pages. */
+  current: 'page' | 'true' | null;
 };
 
-export function phoneBar(menu: readonly IrrigationPageId[], current: IrrigationPageId | null): PhoneBar {
-  if (menu.length <= PHONE_BAR_WHOLE_MENU) return { entries: [...menu], more: false, moreMarked: false };
-  const chosen = new Set(PHONE_BAR_PRIORITY.filter((page) => menu.includes(page)).slice(0, PHONE_BAR_ENTRIES));
-  for (const page of menu) {
-    if (chosen.size >= PHONE_BAR_ENTRIES) break;
-    chosen.add(page);
-  }
-  return {
-    entries: menu.filter((page) => chosen.has(page)),
-    more: true,
-    moreMarked: current !== null && !chosen.has(current),
-  };
+export type PhoneBarItem = PhoneBarPlace | { kind: 'plus' };
+
+export function phoneBar(menu: readonly IrrigationPageId[], current: IrrigationPageId | null, plus: boolean): PhoneBarItem[] {
+  const places = PLACE_IDS.flatMap((place): PhoneBarPlace[] => {
+    const page = menuPlacePages(place, menu)[0];
+    return page ? [{ kind: 'place', place, page, current: placeMark(place, page, current) }] : [];
+  });
+  if (!plus) return places;
+  // Le « + » se pose avant « Ma ferme », au centre de ce qui reste (règle 1).
+  const farm = places.findIndex((item) => item.place === 'ma-ferme');
+  const at = farm === -1 ? places.length : farm;
+  return [...places.slice(0, at), { kind: 'plus' }, ...places.slice(at)];
 }
 
-/**
- * Le nom court d'une page sous son icône, dans la barre : une barre de
- * 390 px n'a qu'environ 75 px par entrée. Les noms qui tiennent en deux
- * lignes restent entiers ; le nom complet reste le nom accessible du lien.
- */
-const PHONE_BAR_LABELS: Partial<Record<IrrigationPageId, string>> = {
-  planning: 'Planning',
-  besoins: 'Besoins',
-  sol: 'Sol',
-  cultures: 'Cultures',
-  materiel: 'Matériel',
-  ressources: 'Ressources',
-  historique: 'Historique',
-};
-
-export function phoneBarLabel(page: IrrigationPageId, fullLabel: string): string {
-  return PHONE_BAR_LABELS[page] ?? fullLabel;
+/** Le retour « ‹ » vers les fiches (section 5.1) : sur toute page de « Ma ferme » hors « Ma ferme » elle-même. */
+export function backToFarm(current: IrrigationPageId | null): boolean {
+  return current !== null && current !== 'ma-ferme' && placeOfPage(current) === 'ma-ferme';
 }
+
+/** Le nom accessible du retour (section 5.1). */
+export const BACK_TO_FARM_LABEL = 'Retour à Ma ferme';
