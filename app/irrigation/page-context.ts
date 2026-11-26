@@ -15,6 +15,7 @@ import {
   type IrrigationPageId,
 } from '@/lib/domain/features/pages';
 import { resolveWeekView, type WeekPageFeature, type WeekViewId } from '@/lib/domain/features/week-page';
+import type { RouteState, StartMode } from '@/lib/domain/features/start-mode';
 import { parseIrrigationSeason, parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import type { IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
 import { otfReadLineReason } from '@/lib/domain/otf-read-line';
@@ -81,6 +82,10 @@ export type ReadyPageContext = {
   nowIso: string;
   snapshot: IrrigationSnapshot;
   enabled: readonly FeatureId[];
+  /** Comment la ferme a commencé (lot S6, section 4) ; `null` : une ferme d'avant S6. */
+  startMode: StartMode | null;
+  /** L'état de sa carte « Mise en route » (lot S6, section 5.3). */
+  routeState: RouteState | null;
   /** La vue ouverte de « Semaine » (lot S4, section 3.2) ; `null` sur toute autre page. */
   weekView: WeekViewId | null;
   shell: ShellProps;
@@ -163,6 +168,8 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     nowIso: new Date().toISOString(),
     snapshot,
     enabled,
+    startMode: selection.startMode,
+    routeState: selection.routeState,
     weekView,
     shell: {
       page,

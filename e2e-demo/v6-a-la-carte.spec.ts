@@ -26,7 +26,7 @@ test('V6 Le module à la carte : Réglages, puis la première ouverture de la fe
     { titre: 'Les endroits suivent vos cases', rang: 'étape 3 sur 3', ancre: 'menu', chemin: '/irrigation/reglages' },
   ]);
 
-  // La ferme vierge s'ouvre sur la liste à cocher, sans menu.
+  // La ferme vierge s'ouvre sur les trois façons de commencer (lot S6), sans menu.
   const vierge = await ouvrirLaDemo(page, 'vierge', 'ete');
   await expect(page).toHaveURL(/\/irrigation\/bienvenue/);
   expect(await visitesOffertes(page)).toEqual(['Bienvenue', 'Le module à la carte', 'Et pour ma ferme ?']);

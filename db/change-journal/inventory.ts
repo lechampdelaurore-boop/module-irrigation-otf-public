@@ -200,6 +200,7 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/crop-alerts/inputs.ts › saveDryingDaysForUser › irrigation_crop_drying_revisions': branche('jours-de-sechage'),
   'db/crop-water/sensitive-stages.ts › saveSensitiveStagesForUser › irrigation_crop_sensitive_stages': branche('stade-sensible'),
   'db/feature-selection-repository.ts › saveFeatureSelectionForUser › irrigation_feature_selections': branche('fonctionnalites'),
+  'db/feature-selection-repository.ts › saveStartChoiceForUser › irrigation_feature_selections': branche('fonctionnalites'),
   'db/feature-selection-repository.ts › dismissFeatureBannerForUser › irrigation_feature_selections': sansObjet('Le bandeau des fonctionnalités fermé : ni case cochée ni décochée.'),
   'db/phone-notice-repository.ts › saveMorningMessageForUser › irrigation_phone_notice_settings': branche('message-du-matin'),
   'db/phone-notice-repository.ts › saveEveningReminderForUser › irrigation_phone_notice_settings': branche('rappel-du-soir'),

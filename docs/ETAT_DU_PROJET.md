@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
+  commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
+  sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de
+  la PR 4 de S4, le contrat (#218) fusionné dans la branche. La première
+  ouverture propose « Je note mes arrosages », « Le module me propose quoi
+  arroser » (« Conseillé ») et « Tout : sol, cultures et alertes » ; rien
+  n'est choisi d'avance ; une phrase dit le nombre d'étapes qui suivent ;
+  le serveur calcule les cases de la façon ; « Choisir moi-même les
+  fonctionnalités » montre les onze cases. Migration 0051, additive (deux
+  colonnes nulles). Un seul enregistrement à deux appuis. La première
+  arrivée est « Ma ferme » quand la mise en route a une étape ; Réglages
+  dit comment la ferme a commencé. « Commencer par l'essentiel » est
+  retiré. Aucun calcul changé. Tests ; P69 nouveau ; P22, P23, P25, P28,
+  P29, P30, P63, P66, V6 et V8 suivent. Contrôles et mesures : voir la PR
+  et la section 15 du contrat. **Essai des cinq tâches** avec le premier
+  volontaire conseillé avant sa mise en ligne (S6-m). Viennent les PR 2
+  (la carte « Mise en route »), 3 et 4 ; fusion après le contrat #218 et
+  la dernière PR de S4.
 - **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
   les contrats, codée le 26 novembre 2026** (D-335, F940 à F946 ; contrat,
   sections 2, 9 et 10), en Opus 5.5 · Très élevé, sur la branche de la PR 3.

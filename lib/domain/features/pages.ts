@@ -137,13 +137,13 @@ export type ReturnLink = { href: string; label: string };
 /**
  * La page introuvable (audit ergonomique, point 7, 3.8 quater) ramène à la
  * page d'arrivée de la ferme — « Aujourd'hui » quand elle existe (lot 2, F1),
- * sinon la première page cochée —, au choix des fonctionnalités pour une
- * ferme qui n'a jamais ouvert le module, et à l'entrée du module quand la
+ * sinon la première page cochée —, aux trois façons de commencer pour une
+ * ferme qui n'a jamais ouvert le module (lot S6), et à l'entrée du module quand la
  * session n'est pas lue.
  */
 export function notFoundReturnLink(farm: { firstVisit: boolean; enabled: FeatureSelection } | null): ReturnLink {
   if (!farm) return { href: IRRIGATION_BASE_PATH, label: 'Revenir au module d’irrigation' };
-  if (farm.firstVisit) return { href: WELCOME_PATH, label: 'Choisir vos fonctionnalités' };
+  if (farm.firstVisit) return { href: WELCOME_PATH, label: 'Choisir comment commencer' };
   const landing = landingPage(farm.enabled);
   return { href: pageHref(landing), label: `Revenir à « ${pageLabel(landing)} »` };
 }

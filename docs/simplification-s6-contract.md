@@ -617,6 +617,23 @@ message.
   faite » ou « repli gardé ».
 - Mesures avant/après (section 14) et temps serveur (PR 2, PR 3).
 
+**PR 1, 26 novembre 2026** (D-336, F947 à F957) :
+
+- **Relevé de départ** (F956) : « Commencer par l'essentiel » n'était lu que
+  par `lib/domain/features/choice.ts` et l'écran ; « Choisissez vos
+  fonctionnalités » par l'écran, le titre de la page, la visite, P22 et
+  l'aide des parcours ; l'écran de bienvenue par P22, P23, P25, P28, P29,
+  P30, P63, P66, vingt et un parcours par l'aide `ouvrirUneFermeToutCochee`,
+  V6, V8, neuf fichiers de tests et les deux étapes de « Le module à la
+  carte » posées sur `bienvenue`. Tous suivent dans la PR 1, sauf les
+  phrases de ces deux étapes (PR 4, section 10).
+- **Pris en codant** : décision D-336 ; précisions F947 à F957 ; migration
+  `drizzle/0051_start_mode_route_state.sql` ; parcours P69 (nouveau).
+- **Mesures** (F957) : à 390 px, en local, ferme neuve, hauteur de la page
+  et mots de l'écran comptés de la même façon : avant, 2 227 px et 343 mots
+  (onze cases) ; après, 920 px et 108 mots (les trois façons) ; « Choisir
+  moi-même », 2 230 px et 332 mots. Huit contre-épreuves, chacune rouge.
+
 ## 16. Risques
 
 | Risque | Parade |

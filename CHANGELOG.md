@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S6, PR 1 : les trois façons de commencer)
+
+- **Trois façons de commencer à la première ouverture** (D-336, F947 à
+  F957) : « Je note mes arrosages », « Le module me propose quoi arroser »
+  (conseillé) ou « Tout : sol, cultures et alertes », à la place de la
+  liste des onze cases. Rien n'est choisi d'avance ; une phrase dit combien
+  d'étapes suivent pour décrire la ferme ; le serveur coche lui-même les
+  cases de la façon choisie. « Choisir moi-même les fonctionnalités »
+  montre toujours les onze cases. Après « Continuer », la première arrivée
+  est « Ma ferme » ; les ouvertures suivantes ne changent pas. Réglages dit
+  comment la ferme a commencé. « Commencer par l'essentiel » disparaît. Une
+  migration additive (0051) garde la façon choisie ; les fermes qui
+  utilisent déjà le module ne voient rien changer.
+
 ### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
 
 - **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens

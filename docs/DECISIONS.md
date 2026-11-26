@@ -11443,3 +11443,141 @@ Précisions prises en codant :
   vers `besoins`, « Voir au planning » remis font chacun échouer un test ;
   la visite sans l'ouverture des plis fait échouer V3 (l'élément souligné
   est caché).
+
+## D-336 — Simplifier l'usage du module, lot S6 : la mise en route guidée
+
+Date : 26 novembre 2026. Statut : **PR 1 sur 4 codée** ; contrat
+`docs/simplification-s6-contract.md` (sections 3, 4, 9, 12 et 14 pour la
+PR 1), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
+élevé, le réglage de la roadmap et du contrat (section 17), après la fin
+du code de S4, sur la branche de sa PR 4, le contrat (#218) fusionné dans
+la branche sans attendre sa fusion dans `main`.
+
+**Décision (PR 1).** La première ouverture (`/irrigation/bienvenue`)
+propose **trois façons de commencer** : « Je note mes arrosages », « Le
+module me propose quoi arroser » (étiquette « Conseillé ») et « Tout :
+sol, cultures et alertes ». **Rien n'est choisi d'avance** (S6-a) ;
+« Continuer » attend un appui. Le serveur calcule lui-même les cases de la
+façon choisie ; celles qu'envoie le navigateur sont ignorées. « Choisir
+moi-même les fonctionnalités » montre, sur la même page, la liste des
+onze cases de la 3.8, cochée des cases de la façon enfoncée. Une
+migration additive (0051) ajoute deux colonnes à
+`irrigation_feature_selections` : `start_mode` (comment la ferme a
+commencé, nul pour une ferme d'avant S6) et `route_state` (l'état de la
+carte de la PR 2, jamais écrit par la PR 1). La première arrivée est
+« Ma ferme » quand la mise en route a au moins une étape, sinon la page
+d'arrivée de F31 ; les ouvertures suivantes ne changent pas. Réglages dit
+comment la ferme a commencé, en une ligne au-dessus des cases.
+« Commencer par l'essentiel » (F452) est retiré. Aucun calcul, aucune
+règle d'agronomie ni d'isolation ne change ; aucune question
+agronomique.
+
+Précisions prises en codant :
+
+- **F947** — **Les trois façons** sont une table du domaine,
+  `lib/domain/features/start.ts` (`START_WAYS`, leurs noms et phrases,
+  ceux de la maquette, relus par le test de vocabulaire de S1). Les cases
+  de chaque façon sont la fermeture de la 3.8 (`withRequirements`, R3) :
+  « Je note » coche Arrosages, Matériel et placement, Historique et
+  cumuls (3) ; « Le module propose », en plus, Planning de la semaine,
+  Objectifs et besoins, Ressources et pompes (6) ; « Tout », les onze. Un
+  test les calcule et les vérifie. Les types et la lecture des deux
+  colonnes sont dans `lib/domain/features/start-mode.ts`, sans import, pour
+  qu'aucune boucle ne se forme entre le choix des cases et les façons.
+- **F948** — **La phrase de ce qui suit** vient de
+  `lib/domain/onboarding/route.ts` : les cinq étapes de la section 5.1,
+  chacune avec la case qui la fait exister (Matériel et placement pour les
+  deux premières, Ressources et pompes, Objectifs et besoins, Réserve du
+  sol), la même fonction que la carte de la PR 2 lira. Sans choix :
+  « quelques étapes ». **Écart de ponctuation** avec le tableau de la
+  section 3.3 : le dernier élément de la liste est joint par « et »
+  (« le matériel, où il est posé, d'où vient l'eau et combien vous
+  visez »), comme pour deux étapes (« le matériel et où il est posé »).
+  Option recommandée, modifiable à la relecture. Un test énumère toutes
+  les parties des onze cases que la fermeture accepte : la phrase, le
+  nombre d'étapes et la première arrivée se suivent pour chacune.
+- **F949** — **Un seul enregistrement** : `saveStartChoiceForUser`
+  (`db/feature-selection-repository.ts`) écrit dans un même lot D1
+  l'espace de la ferme, la ligne du journal des modifications et la ligne
+  du choix avec `start_mode`. L'index unique des espaces refuse un second
+  espace : deux appuis, ou deux onglets, ne font qu'un enregistrement (un
+  test les lance ensemble) ; le second apprend « Vous avez déjà choisi
+  comment commencer. » et reçoit la page d'arrivée, relue dans la base et
+  non dans la mémoire de la requête, et la page s'ouvre (section 12). Une
+  ferme qui a déjà un espace (d'avant la 3.8, d'avant S6) ne repasse
+  jamais par ce choix.
+- **F950** — **L'action** `saveFeatureSelectionAction` reçoit
+  `startMode` (`notes`, `proposals`, `all`, `custom`) ; le service
+  `lib/services/start-choice.ts` refuse une façon inconnue (« Choisissez
+  une façon de commencer. ») et un choix « moi-même » vide (P7). Appelée
+  sans `startMode` par une ferme à sa première ouverture (une page
+  d'avant S6 restée ouverte pendant la mise en ligne), elle enregistre
+  `custom` avec ses cases. Avec un espace, le chemin de Réglages ne change
+  pas. Le journal `irrigation_features_chosen` porte la façon, jamais
+  l'identifiant de la personne.
+- **F951** — **L'écran** : trois boutons radio natifs dans un
+  `radiogroup` nommé par le titre ; chaque ligne fait 72 px au moins, le
+  choix retenu porte la bordure verte épaisse **et** une coche ; le
+  contour du focus est sur la ligne. « Continuer » fait 50 px, pleine
+  largeur ; « Enregistrement… » pendant l'appel ; l'erreur sous le bouton,
+  le choix gardé. « Choisir moi-même les fonctionnalités » et « ‹ Revenir
+  aux trois façons » font 44 px ; le clavier suit le changement de vue. Le
+  texte de la 3.8 (« Cochez ce dont votre ferme a besoin… ») passe sur la
+  liste. Le repère de la visite `fonctionnalites` est sur les trois façons :
+  les étapes de la visite gardent leur ancre, leurs phrases suivent en
+  PR 4 (section 10). Les styles sont dans `mise-en-route.css`, importé
+  avant `trois-endroits.css`, qui reste juste avant `gestes-surs.css`.
+- **F952** — **« Commencer par l'essentiel » retiré** :
+  `ESSENTIAL_FEATURES`, `withEssentialFeatures` et les styles
+  `.welcome-start` sont supprimés ; le test du lot I vérifie désormais leur
+  absence (contre-épreuve : les remettre le fait échouer).
+- **F953** — **Les mots** : le titre de la page et celui de la visite
+  suivent le titre de l'écran (« Comment voulez-vous commencer ? ») ; le
+  lien de la page introuvable, pour une ferme qui n'a pas choisi, dit
+  « Choisir comment commencer ». La ligne de Réglages finit par un point :
+  « Vous avez commencé par : « Le module me propose quoi arroser ». »,
+  « Vous avez choisi vous-même vos fonctionnalités. » ; aucune pour une
+  ferme d'avant S6 ; elle ne propose pas de refaire le choix (section 9).
+- **F954** — **La migration 0051** ajoute deux colonnes nulles avec leur
+  contrainte `CHECK`, sans rien écrire ; un test la joue sur une base qui
+  a des lignes, un autre vérifie l'export et la restauration. La remise à
+  zéro de la démonstration rend la ferme vierge sans choix, façon comprise
+  (un test). Les deux essais de migration qui remplissent une copie
+  ancienne avec les dépôts d'aujourd'hui (0034, 0042) ajoutent les deux
+  colonnes le temps de la remplir, puis les retirent, comme ils le font
+  déjà pour les tables de la 0044 et de la 0047 ; celui de la 0034 compare
+  les lignes sans ces deux colonnes, nulles.
+- **F955** — **Les parcours** : `attendreLaPremiereOuverture` attend les
+  trois façons ; `attendreLeChoixDesFonctionnalites` passe par « Choisir
+  moi-même » ; une ferme neuve qui coche tout passe par « Tout », arrive
+  sur « Ma ferme », puis ouvre « Aujourd'hui ». P22 est réécrit ; P23,
+  P25, P29, P63 et P66 arrivent sur « Ma ferme » ; P28 et P30 prennent
+  l'aide commune ; V6 et V8 jouent les boutons radio ; P69 est nouveau.
+- **F956** — **Relevé de départ** (section 15) : avant la PR 1, « Commencer
+  par l'essentiel » était lu par `lib/domain/features/choice.ts` seulement
+  (et l'écran par son import) ; « Choisissez vos fonctionnalités » par
+  l'écran, `page-metadata.ts`, `guided-tour.tsx`, P22 et l'aide des
+  parcours ; l'écran de bienvenue par huit parcours directement (P22, P23,
+  P25, P28, P29, P30, P63, P66), vingt et un par l'aide `ouvrirUneFermeToutCochee`
+  (P31, P31b, P31c, P33, P41, P46, P51 à P58, P60, P62 à P65, P67, P68),
+  V6 et V8 de la démonstration, neuf fichiers de tests (lot I, deux, lot 1,
+  fonctionnalités, démonstration, visites, mots de S1, liens de S3, semaine
+  de S4) et les deux étapes de « Le module à la carte » posées sur
+  `bienvenue` (`lib/domain/demo/tours.ts`). Tous suivent dans la PR 1,
+  sauf les phrases des deux étapes de la visite, qui suivent en PR 4
+  (section 10) : leur repère est sur les trois façons.
+- **F957** — **Mesures et preuves** (section 14) : l'écran de la première
+  ouverture, à 390 px, en local, sur une ferme neuve, la hauteur de la
+  page et les mots de l'écran (`#contenu`, compté de la même façon avant
+  et après) : **avant, 2 227 px et 343 mots** (onze cases, « Commencer
+  par l'essentiel ») ; **après, 920 px et 108 mots** (les trois façons) ;
+  « Choisir moi-même », 2 230 px et 332 mots. Le contrat disait 365 mots
+  avant, compté autrement. Contre-épreuves, chacune fait échouer au moins
+  un test : une façon qui coche une case de moins ; un client qui impose
+  ses cases ; une façon enfoncée d'avance ; « Commencer par l'essentiel »
+  qui reparaît ; un second appui qui échoue au lieu d'apprendre « déjà
+  choisi » ; la phrase qui dit « cinq » partout ; la première arrivée
+  toujours sur la page d'arrivée ; une ligne de Réglages pour une ferme
+  d'avant S6. Parcours joués en local aux deux largeurs : P22 et P69
+  (9 verts), puis P23, P25, P28, P29, P30, P31, P62, P63, P66 et P69
+  (53 verts), aucun échec ; la suite complète par la CI.

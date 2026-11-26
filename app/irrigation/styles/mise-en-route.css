@@ -1,0 +1,167 @@
+/*
+  La mise en route guidée (simplification, lot S6,
+  docs/simplification-s6-contract.md ; D-336). PR 1 : les trois façons de
+  commencer, à la première ouverture (section 3.1). Un choix par ligne, pleine
+  largeur, 72 px au moins ; le choix retenu porte une bordure verte épaisse et
+  une coche, la couleur seule ne le dit pas. « Continuer » à 50 px, pleine
+  largeur ; les liens « Choisir moi-même » et « Revenir » à 44 px. Les
+  couleurs et les tailles sont celles de la charte.
+*/
+.start-ways {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.start-way {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 24px;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  cursor: pointer;
+}
+
+.start-way[data-checked="true"] {
+  border: 3px solid var(--green);
+  padding: calc(var(--space-3) - 2px) calc(var(--space-4) - 2px);
+}
+
+/* Le bouton radio natif reste là pour le clavier et les lecteurs d'écran ; la ligne entière le montre. */
+.start-way input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.start-way:has(input:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.start-way-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--tile);
+  color: var(--green);
+}
+
+.start-way-icon .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.start-way-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--space-2);
+  min-width: 0;
+}
+
+.start-way-copy strong {
+  font-family: var(--font-ui);
+  font-size: var(--text-16);
+  font-weight: 700;
+}
+
+.start-way-tag {
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green-dark);
+  font-family: var(--font-ui);
+  font-size: var(--text-12);
+  font-weight: 500;
+}
+
+.start-way-copy small {
+  flex-basis: 100%;
+  color: var(--ink2);
+  font-size: var(--text-13);
+  line-height: 1.45;
+}
+
+.start-way-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
+  color: white;
+}
+
+.start-way[data-checked="true"] .start-way-check {
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.start-way-check .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.welcome-choice > p.start-what-follows {
+  margin: 0 0 var(--space-4);
+  color: var(--ink2);
+  font-size: var(--text-14);
+}
+
+.welcome-actions .welcome-continue {
+  width: 100%;
+  min-height: 50px;
+}
+
+.welcome-choice > p.welcome-custom,
+.welcome-choice > p.welcome-back {
+  margin: var(--space-3) 0 0;
+}
+
+.welcome-link {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-1);
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font-size: var(--text-14);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.welcome-link:disabled {
+  cursor: wait;
+  opacity: .58;
+}
+
+.welcome-custom-title {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-20);
+}
+
+@media (max-width: 760px) {
+  .welcome-custom .welcome-link {
+    width: 100%;
+  }
+}
+
+/* Réglages : comment la ferme a commencé, en une ligne au-dessus des cases (section 9). */
+.feature-started-with {
+  margin: 0 0 var(--space-3);
+  color: var(--ink2);
+  font-size: var(--text-14);
+}

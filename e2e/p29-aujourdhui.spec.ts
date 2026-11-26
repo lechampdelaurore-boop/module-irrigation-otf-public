@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
+import { attendreLaPremiereOuverture, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
@@ -19,8 +19,9 @@ import {
  * docs/aujourdhui-tableau-de-bord-contract.md, section 3.2 ;
  * docs/browser-journeys-contract.md).
  *
- * Sur une ferme neuve de démonstration qui a tout coché : `/irrigation` et le
- * choix des cases mènent à « Aujourd'hui », première du menu ; ses six blocs
+ * Sur une ferme neuve de démonstration qui a tout coché : le choix « Tout »
+ * mène une fois à « Ma ferme » (lot S6), puis `/irrigation` mène à
+ * « Aujourd'hui », première du menu ; ses six blocs
  * sont là, dans l'ordre du tableau de bord, chacun avec sa phrase calme quand
  * il n'a rien à dire ; la saison n'y est pas proposée ; la pastille du menu compte les
  * lignes de « Fiabilité du calcul ». Une alerte météo de l'exploitation,
@@ -85,15 +86,16 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirUneFermeNeuve(context, testInfo, 'aujourdhui');
 
-  // Toutes les cases cochées : le choix mène à « Aujourd'hui » (F1).
+  // Toutes les cases cochées, par la façon « Tout » : la première arrivée est « Ma ferme », la mise en route ayant une étape (lot S6, section 3.4) ;
+  // les ouvertures suivantes mènent à « Aujourd'hui » (F1).
   await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
+  await attendreLaPremiereOuverture(page);
+  await page.getByRole('radio', { name: 'Tout : sol, cultures et alertes' }).check();
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await attendreLaPagePrete(page, 'ma-ferme');
+  await expect(page).toHaveURL(/\/irrigation\/ma-ferme(\?|$)/);
+  await page.goto('/irrigation/aujourdhui');
   await attendreLaPagePrete(page, 'aujourdhui');
-  await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
   // Une ferme neuve dit ce qui lui manque : la commune, ses jardins, le sol de ses parcelles et ses espèces, avant la météo,
   // le gel, les besoins et la réserve du sol (4.4, F582, F583, F584, F587).
   await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher, réglages du planning à valider.');

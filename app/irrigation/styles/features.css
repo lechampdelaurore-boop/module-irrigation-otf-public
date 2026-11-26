@@ -279,22 +279,3 @@
     width: 100%;
   }
 }
-
-/* Le point de départ conseillé de la première ouverture (audit du 19 novembre 2026, lot I, n° 25, F452). */
-.welcome-start {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin: 12px 0;
-}
-
-.welcome-start button {
-  min-height: var(--touch-target);
-  margin-top: 0;
-}
-
-.welcome-start span {
-  color: var(--muted);
-  font-size: var(--text-13);
-}

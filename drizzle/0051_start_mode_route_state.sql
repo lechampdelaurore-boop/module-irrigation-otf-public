@@ -1,0 +1,22 @@
+-- Simplifier l'usage du module, lot S6, PR 1 : la mise en route guidée
+-- (docs/simplification-s6-contract.md, section 4 ; D-336). Deux colonnes de
+-- présentation dans la ligne du choix des cases de chaque ferme, sans
+-- nouvelle table.
+--
+-- `start_mode` : comment la ferme a commencé, à la première ouverture :
+-- « Je note mes arrosages » (`notes`), « Le module me propose quoi arroser »
+-- (`proposals`), « Tout » (`all`), ou ses cases choisies elle-même
+-- (`custom`). Vide : une ferme d'avant S6, qui n'est jamais passée par
+-- l'écran des trois façons ; elle n'a jamais de carte « Mise en route ».
+-- `route_state` : l'état de cette carte, écrit par un appui de la personne :
+-- vide (visible), `later` (remise à plus tard), `done` (terminée).
+--
+-- Aucune valeur n'est écrite pour les lignes existantes : elles restent
+-- vides, et rien ne change pour ces fermes. La table est déjà dans le plan
+-- d'effacement (`SPACE_TABLES`, F563) et dans l'export de la base : ses
+-- colonnes suivent la ligne.
+--
+-- Migration additive (docs/migrations-contract.md) : deux colonnes acceptant
+-- NULL, chacune tenue à ses valeurs par une contrainte.
+ALTER TABLE `irrigation_feature_selections` ADD `start_mode` text CONSTRAINT `chk_feature_selection_start_mode` CHECK (`start_mode` IS NULL OR `start_mode` IN ('notes', 'proposals', 'all', 'custom'));--> statement-breakpoint
+ALTER TABLE `irrigation_feature_selections` ADD `route_state` text CONSTRAINT `chk_feature_selection_route_state` CHECK (`route_state` IS NULL OR `route_state` IN ('later', 'done'));
