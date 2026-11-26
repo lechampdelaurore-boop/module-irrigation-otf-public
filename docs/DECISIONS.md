@@ -11257,5 +11257,10 @@ Précisions prises en codant :
   calme retiré, « pris au bassin » écrit, l'écart du prévu relu à
   l'ouverture de la page font chacun échouer un test ; une ancre qui
   n'ouvre plus son pli fait échouer P66, « Valider » montré pour une
-  semaine passée fait échouer P67.
+  semaine passée fait échouer P67. V11, de la démonstration, suit après
+  coup : il ouvrait « Planning de la semaine » et lisait le bloc de
+  l'écart du prévu au premier niveau ; il ouvre « Semaine » par l'ancre de
+  sa section (`#ecart-du-prevu`), qui ouvre les plis et lit l'écart. Oubli
+  de la PR (la suite de la démonstration n'y avait pas été jouée en
+  entier), relevé en local sur la pile complète.
 
