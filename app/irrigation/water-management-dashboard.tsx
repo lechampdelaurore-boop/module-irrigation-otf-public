@@ -17,6 +17,7 @@ import { AnchoredFold, PageSettingsFold } from './shell/page-settings-fold';
 import { goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '@/lib/domain/besoins-phone';
 import { automaticRefreshStatus } from '@/lib/domain/weather/automatic-refresh-status';
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
+import { ForecastReliabilityFold } from './forecast-reliability-fold';
 import { Icon, type IconName } from './line-icon';
 import { GoalScopePicker } from './goal-scope-picker';
 import type { WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
@@ -491,6 +492,8 @@ export function WaterManagementDashboard({
           <ActionReply messages={replies} origin="pluie" classNames={WATER_REPLY_CLASSES} />
         </AnchoredFold>
 
+        {/* Ce que la météo annonçait, face à ce qui s'est passé : lu à l'ouverture du pli seulement (D-338). */}
+        <ForecastReliabilityFold season={season} />
       </div>
 
 

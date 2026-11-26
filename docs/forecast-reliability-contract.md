@@ -294,3 +294,7 @@ dépôt au moment du code, après les PR ouvertes.
   F998 à F1004 ; aucun parcours. La date des premiers chiffres de la
   section 5 est calculée par le domaine (F1004) : vers le 5 décembre 2026
   pour une archive commencée le 22 novembre, à confirmer par un constat.
+- **PR 2** (le pli, la démonstration, les parcours, 26 novembre 2026) :
+  D-344, précisions F1005 à F1008 ; parcours P71 (ferme vierge) et V12
+  (démonstration). Sur la démonstration, le cumul de la semaine reste à
+  « 3 sur 4 » (F1005).

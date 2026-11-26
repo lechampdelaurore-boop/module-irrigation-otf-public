@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (la météo prévue contre la météo réalisée, PR 2 : le pli)
+
+- **« La météo s'est-elle vérifiée ? »** (D-344, F1005 à F1008) : sur
+  « Objectifs et besoins », un pli fermé, lu seulement quand on l'ouvre,
+  dit de combien la pluie et la soif du jour annoncées se sont écartées de
+  ce qui s'est passé, à un ou deux jours, à 3 ou 4 jours, à 5 à 7 jours et
+  sur la semaine, en deux petits tableaux, le sens toujours en mots. Tant
+  qu'il n'y a pas assez de jours, il le dit et ne montre aucun chiffre. La
+  démonstration a des chiffres d'exemple, étiquetés comme tels. Parcours
+  P71 et V12.
+
 ### Ajouté (la météo prévue contre la météo réalisée, PR 1 : le calcul et la lecture)
 
 - **Le calcul de la comparaison** (D-343, F998 à F1004,

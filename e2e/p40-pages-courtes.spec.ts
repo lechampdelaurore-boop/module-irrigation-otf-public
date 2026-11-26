@@ -78,7 +78,9 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   reglages: 3_750,
   // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
   // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
-  besoins: 2_800,
+  // Prévu contre réalisé (D-344, F1006) : le pli fermé « La météo s'est-elle vérifiée ? », une ligne
+  // de plus au téléphone (2 841 px en local avec lui) ; 2 800 → 2 900 px.
+  besoins: 2_900,
   // PR 6 (F461) : trois onglets, le plan d'abord ; au téléphone, les jardins repliés. 1 782 px avec
   // les quatre jardins des données des parcours : le budget du contrat, pour une ferme de dix-huit jardins.
   materiel: 5_300,

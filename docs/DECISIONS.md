@@ -11113,3 +11113,61 @@ Précisions prises en codant :
   contrat ; le contrat demande de le confirmer par un constat avant
   d'écrire « vu ». Quand la date estimée est passée (des jours manquent),
   rien n'est promis.
+
+## D-344 — La météo prévue contre la météo réalisée, PR 2 : le pli, la démonstration, le parcours
+
+Date : 26 novembre 2026. Statut : **PR 2 sur 2 codée** ; contrat
+`docs/forecast-reliability-contract.md` (sections 6 et 8, test 11), roadmap
+section 6 quindecies, ligne 35. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap, sur la branche de la PR 1 (D-343). **Le code du chantier est fini.**
+
+**Décision (PR 2).** Sur « Objectifs et besoins », un pli fermé « La météo
+s'est-elle vérifiée ? » (`#meteo-verifiee`,
+`app/irrigation/forecast-reliability-fold.tsx`) suit les plis de la météo et
+de la pluie mesurée. Il ne lit rien tant qu'on ne l'ouvre pas : à la
+première ouverture, l'action de lecture `readForecastReliabilityAction`
+(`app/irrigation/forecast-reliability-actions.ts`) résout le lieu de météo de
+l'espace (`getForecastReliabilityForSpace`) et rend la comparaison. Ouvert :
+la phrase de tête, l'essentiel en phrases, deux tableaux (« La pluie », « La
+soif du jour (ET0) ») de cinq lignes, la pluie notée au pluviomètre (son
+tableau, ou le compte de ses jours), les deux réserves. La démonstration
+sème une archive des prévisions (`lib/services/demo-forecast-archive-seed.ts`,
+appelée par `seedDemoWeather`) et le pli y porte l'étiquette « Exemple ».
+Aucune page, aucune case, rien sur « Aujourd'hui » ; aucun calcul, aucune
+migration, aucune écriture sur une vraie ferme.
+
+Précisions prises en codant :
+
+- **F1005** — Sur la démonstration, le cumul de la semaine dit « Pas
+  encore assez de semaines : 3 sur 4 » : les moments sont des mardis, et la
+  réanalyse semée (28 jours avant la semaine du moment, jusqu'à cinq jours
+  avant lui) ne couvre que trois semaines entières. La prolonger changerait
+  la jauge du sol de toutes les fermes fictives, qui remonte à trente jours :
+  ce n'est pas l'objet du chantier. Les lignes par jour, elles, ont toutes
+  leurs chiffres.
+- **F1006** — Le pli vient après « Pluie mesurée », dans la colonne des
+  plis de la météo ; il se lit une fois par affichage de la page, à sa
+  première ouverture (lot N, lenteur du module). L'action porte un nom de
+  lecture (`read…Action`) : la visite de la démonstration ne la compte pas
+  comme une écriture. Une lecture impossible dit « La comparaison ne peut
+  pas se calculer pour le moment. Le reste de la page n'est pas touché. » et
+  se journalise par son statut et sa date seulement (D-164). Le pli fermé
+  ajoute une ligne au téléphone : la page mesure 2 841 px avec lui sur les
+  données des parcours, au-delà du budget de 2 800 px de P40, qui passe à
+  2 900 px, comme le journal des modifications l'avait fait pour
+  « Réglages » (F724).
+- **F1007** — L'annonce semée de la démonstration : pour chaque matin, de
+  sept jours avant le premier jour semé à la veille du moment, et chaque
+  horizon de J+1 à J+7, la valeur semée du jour visé, écartée de 0,4 mm par
+  jour d'horizon pour la pluie (un jour sur deux en plus, l'autre en moins),
+  quelques averses manquées (horizon 5 et plus) et quelques pluies de 2 mm
+  annoncées à tort (horizon 3 et plus) ; pour la soif, ± 5 % par jour
+  d'horizon et 0,3 mm de différence de méthode. Déterministe, écrite
+  seulement dans l'espace de l'invité, jamais réécrite à la réouverture.
+- **F1008** — Dans les tableaux, le nombre principal est l'écart dans un
+  sens ou dans l'autre (« 1,3 mm par jour ») ; le sens est dit en mots dans
+  la ligne de détail (« L'annonce était trop pluvieuse, de 1 mm par jour en
+  moyenne. »), avec les jours de pluie mal annoncés pour la pluie, le nombre
+  de jours ou de semaines comparés. Sous le minimum, le compte seul. Sous la
+  phrase de tête, l'essentiel : la phrase de la pluie à la première ligne
+  qui a ses chiffres, et celle de la semaine quand elle a les siens.

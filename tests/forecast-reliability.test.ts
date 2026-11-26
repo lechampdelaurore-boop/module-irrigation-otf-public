@@ -9,8 +9,11 @@ import {
   forecastPairs,
   forecastReliability,
   forecastReliabilityHeadline,
+  forecastReliabilitySummary,
   forecastReliabilityWindow,
+  measuredRainNotEnoughText,
   rainDaysText,
+  reliabilityTableRows,
   thirstReserveText,
   weekLineText,
   weekPairs,
@@ -254,4 +257,38 @@ test('les états : sans lieu, sans archive, en attente avec la date des premiers
   assert.equal(ready.status, 'ready');
   assert.equal(ready.firstFiguresAround, null);
   assert.equal(forecastReliabilityHeadline(ready), 'Sur les 90 derniers jours, voici de combien la météo annoncée s’est écartée de ce qui s’est passé.');
+});
+
+test('PR 2 : les lignes des tableaux du pli, le nombre dans un sens ou dans l’autre, le sens en mots ; sous le minimum, le compte seul', () => {
+  const { archive, realised } = series('2026-12-01', 14, [1, 2], (horizon) => (horizon === 1 ? 3 : 0), 1);
+  const reliability = forecastReliability(input(archive, realised));
+  const rain = reliabilityTableRows(reliability.rainEstimated);
+  assert.deepEqual(rain.map((row) => row.label), ['Demain et après-demain', 'Dans 3 ou 4 jours', 'Dans 5 à 7 jours', 'Tous les horizons', 'Cumul de la semaine']);
+  // 1 mm tombé chaque jour ; annoncé 3 mm la veille (2 de trop), 0 mm l'avant-veille (1 de moins) : en moyenne 0,5 de trop, 1,5 dans un sens ou dans l'autre ; les 14 pluies de l'avant-veille, tombées sans être annoncées.
+  assert.deepEqual(rain[0], {
+    label: 'Demain et après-demain',
+    figure: '1,5 mm par jour',
+    detail: 'L’annonce était trop pluvieuse, de 0,5 mm par jour en moyenne. Pluie annoncée sans tomber : 0 jour ; tombée sans être annoncée : 14 jours, sur 28 jours.',
+  });
+  assert.deepEqual(rain[1], { label: 'Dans 3 ou 4 jours', figure: 'Pas encore assez de jours : 0 sur 14', detail: null });
+  assert.deepEqual(rain[4], { label: 'Cumul de la semaine', figure: 'Pas encore assez de semaines : 0 sur 4', detail: null });
+  const thirst = reliabilityTableRows(reliability.thirst);
+  assert.equal(thirst[0].detail, 'L’annonce était trop forte, de 0,5 mm par jour en moyenne. Sur 28 jours comparés.');
+
+  const weeks = series('2026-11-23', 28, [1, 2, 3, 4, 5, 6, 7], () => 1, 3, { forecast: 2, realised: 1.5 });
+  const full = forecastReliability(input(weeks.archive, weeks.realised));
+  assert.deepEqual(reliabilityTableRows(full.rainEstimated)[4], {
+    label: 'Cumul de la semaine', figure: '14 mm', detail: 'L’annonce du dimanche n’était pas assez pluvieuse, de 14 mm en moyenne. Sur 4 semaines.',
+  });
+  assert.equal(reliabilityTableRows(full.thirst)[4].detail, 'L’annonce du dimanche était trop forte, de 3,5 mm en moyenne. Soit 33 % de la soif estimée. Sur 4 semaines.');
+});
+
+test('PR 2 : l’essentiel en phrases sous la phrase de tête, et la pluie notée tant qu’elle n’a pas ses jours', () => {
+  const weeks = series('2026-11-23', 28, [1, 2, 3, 4, 5, 6, 7], () => 4, 1);
+  assert.deepEqual(forecastReliabilitySummary(forecastReliability(input(weeks.archive, weeks.realised))), [
+    'À un ou deux jours, la pluie annoncée s’écarte en moyenne de 3 mm par jour de celle estimée ; elle était trop pluvieuse, de 3 mm par jour en moyenne.',
+    'Sur la semaine, la pluie annoncée le dimanche était trop pluvieuse, de 21 mm en moyenne ; l’écart, dans un sens ou dans l’autre, est de 21 mm en moyenne.',
+  ]);
+  assert.deepEqual(forecastReliabilitySummary(forecastReliability(input([], []))), [], 'rien tant que la comparaison n’est pas prête');
+  assert.equal(measuredRainNotEnoughText(10), 'Pluie notée au pluviomètre : pas encore assez de jours notés, 10 sur 14.');
 });

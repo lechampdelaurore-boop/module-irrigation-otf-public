@@ -1,5 +1,6 @@
 import { saveWeatherGeocodeForUser, upsertWeatherDailyValuesForUser } from '@/db/water-management-repository';
 import { demoSeasonWeatherProvider } from '../adapters/weather/demo-season-provider.ts';
+import { seedDemoForecastArchive } from './demo-forecast-archive-seed.ts';
 import type { IrrigationSnapshot } from '../domain/domain.ts';
 import { addDaysToDateKey, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management.ts';
 import { weatherLocationKey } from '../domain/weather/location.ts';
@@ -39,5 +40,9 @@ export async function seedDemoWeather(ownerUserId: string, snapshot: IrrigationS
   const at = now.toISOString();
   await upsertWeatherDailyValuesForUser(ownerUserId, locationKey, 'reanalysis', reanalysis, provider.sourceId?.('reanalysis') ?? provider.id, at);
   await upsertWeatherDailyValuesForUser(ownerUserId, locationKey, 'forecast', forecast, provider.sourceId?.('forecast') ?? provider.id, at);
+  // L'archive des prévisions, pour le pli « La météo s'est-elle vérifiée ? » (D-338) : semée, jamais lue d'un fournisseur.
+  await seedDemoForecastArchive({
+    ownerUserId, locationKey, values: [...reanalysis, ...forecast], firstDay: start, momentDateKey, source: provider.sourceId?.('forecast') ?? provider.id,
+  });
   return locationKey;
 }

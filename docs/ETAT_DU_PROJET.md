@@ -12,6 +12,17 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **La météo prévue contre la météo réalisée, PR 2 sur 2 : le pli, la
+  démonstration et les parcours, codée le 26 novembre 2026** (D-344, F1005 à
+  F1008), en Opus 5.5 · Élevé, sur la branche de la PR 1 : **le code du
+  chantier est fini.** Sur « Objectifs et besoins », le pli fermé « La météo
+  s'est-elle vérifiée ? », lu à son ouverture : phrase de tête, deux
+  tableaux (la pluie, la soif du jour), la pluie notée, les réserves. La
+  démonstration reçoit une archive semée, étiquetée « Exemple » (cumul de la
+  semaine à « 3 sur 4 », F1005). Parcours P71 et V12. Aucun calcul, aucune
+  migration. Contrôles : voir la PR. Restent les fusions (après la file),
+  la recette sur la démonstration en ligne, puis le constat des premiers
+  chiffres de la vraie ferme, avec l'accord du porteur.
 - **La météo prévue contre la météo réalisée, PR 1 sur 2 : le calcul et la
   lecture, codée le 26 novembre 2026** (D-343, F998 à F1004 ; contrat,
   sections 3 à 5, 7 et 8), en Opus 5.5 · Élevé, lancée sur le mandat du
