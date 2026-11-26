@@ -22,7 +22,9 @@ registres, elle y renvoie.
   zéro » la rend vierge, sans façon ni état de carte ; le « ? » de « Ma
   ferme » suit la carte et les lignes d'état (écart dit, F980) ; sept
   contrats validés annotés « Depuis S6 ». Aucune migration, aucun calcul
-  changé. Tests ; V6 et V8 suivent. Fusion après la PR 3 (fusionnée à
+  changé. Tests ; V6 et V8 suivent. Le parcours P67 (S4) ne borne plus la
+  hauteur quand il est lancé après 23 h (le plan y propose quatre
+  arrosages au lieu de deux) : il le dit « hors jeu ». Fusion après la PR 3 (fusionnée à
   22 h 55), sa mise en ligne vérifiée ; recette dans le Chrome du porteur,
   sur la ferme vierge, après la mise en ligne et avec son accord.
 - **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
