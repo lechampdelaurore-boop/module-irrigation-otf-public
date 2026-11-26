@@ -40,6 +40,16 @@ source détaillée commit par commit.
   saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
   l'historique ne changent pas. Quatre PR de code à venir.
 
+### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
+
+- **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
+  première ouverture, trois façons de commencer à la place des onze cases ; une
+  carte « Mise en route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les
+  données de la ferme) ; les chiffres d'état des fiches de « Ma ferme ». Aucun
+  code, aucun calcul ni aucune fonction retirée ; une seule migration, additive,
+  prévue pour le code ; l'écran de bienvenue du contrat 3.8 est modifié, la 3.8
+  reste close.
+
 ### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
 
 - **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens
