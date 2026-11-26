@@ -115,9 +115,9 @@ test('les jardins qui ont une irrigation aujourd’hui passent en tête', async 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage, '5');
   await page.getByLabel('Date et heure de début').fill(debut);
-  await page.getByRole('button', { name: 'Planifier l’irrigation' }).click();
+  await page.getByRole('button', { name: /^Planifier l’arrosage de / }).click();
   const fenetre = page.locator('dialog.module-confirm-dialog[open]');
-  const reponse = page.locator('.irrigation-preview .action-reply .irrigation-event-notice');
+  const reponse = page.locator('.watering-start .action-reply .irrigation-event-notice');
   await expect(reponse.or(fenetre)).toBeVisible();
   if (await fenetre.isVisible()) await fenetre.getByRole('button', { name: /quand même$/ }).click();
   await expect(reponse).toHaveText(/planifiée/);

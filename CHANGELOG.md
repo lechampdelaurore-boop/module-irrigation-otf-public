@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S5, PR 2 : « Planifier » et « Déjà fait »)
+
+- **« Planifier » et « Déjà fait » comme « Arroser maintenant »** (D-333,
+  F902 à F907) : les trois onglets d'« Arrosages » ont le même formulaire.
+  « Planifier » demande « Où ? », « Quand ? », « Combien de temps ? » et
+  son bouton dit « Planifier · demain à 6 h ». « Déjà fait » (à la place
+  de « Déjà réalisée ») demande d'abord « De quand à quand ? », puis
+  « Où ? » parmi le matériel posé à cette heure ; la durée se lit des
+  dates, une phrase dit ce qui s'enregistrera, le bouton dit « Enregistrer
+  cet arrosage ». Un seul matériel prêt est choisi d'office partout. Au
+  téléphone, les trois onglets tiennent sur une ligne. L'Historique dit
+  « Arroser maintenant » et « Déjà fait ». Aucun calcul, aucune règle
+  d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S5, PR 1 : « Arroser maintenant » en trois champs)
 
 - **Arroser en trois champs** (D-332, F894 à F901) : sur « Arrosages »,

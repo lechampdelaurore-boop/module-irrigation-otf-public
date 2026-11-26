@@ -6,7 +6,7 @@ import type { SeasonSpecies, SpeciesWithoutReference } from '../lib/domain/crop-
 import { withoutReferenceBeyondSpecies } from '../lib/domain/crop-water/species-linking.ts';
 import { gardenState, goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '../lib/domain/besoins-phone.ts';
 import { middleCutParts, parseMaterielTab, plotFoldSummary } from '../lib/domain/materiel-tabs.ts';
-import { historyFilterSummary, previewResultReady } from '../lib/domain/premier-geste.ts';
+import { historyFilterSummary } from '../lib/domain/premier-geste.ts';
 
 /**
  * Audit ergonomique du 19 novembre 2026, lot J « Pages courtes au
@@ -167,20 +167,17 @@ test('n° 15, F461 : les trois panneaux à onglets, cachés et non retirés ; po
 
 // n° 15 — « Arrosages » et « Historique » : le premier geste plus haut (PR 7, F462).
 
-test('n° 15, F462 : « Résultat calculé » attend un matériel et une quantité', () => {
-  assert.equal(previewResultReady(false, null), false);
-  assert.equal(previewResultReady(false, 3600), false, 'une durée sans matériel');
-  assert.equal(previewResultReady(true, 0), false, 'un matériel sans quantité');
-  assert.equal(previewResultReady(true, null), true, 'des dates illisibles : « Inconnu — vérifiez le début et la fin »');
-  assert.equal(previewResultReady(true, 5400), true);
-});
-
+// L'encart « Résultat calculé » n'existe plus (simplification S5, section 6, D-333) : la phrase du
+// résultat ne paraît qu'avec un matériel et une durée (tests/simplification-s5-arroser.test.ts) ;
+// la règle de F462 qui tient encore, le bouton et la réponse toujours rendus, se lit sur le squelette.
 test('n° 15, F462 : le bouton et la réponse du module restent hors de l’attente', () => {
-  const form = readFileSync('app/irrigation/irrigation-manager/irrigation-form.tsx', 'utf8');
-  const attente = form.indexOf('<p className="irrigation-preview-waiting">');
-  assert.ok(attente > 0);
-  assert.ok(form.indexOf('className="start-irrigation-button"') > attente, 'le bouton après l’attente, toujours rendu');
-  assert.ok(form.indexOf('{reply}') > attente, 'la réponse du lot G (F404) toujours rendue');
+  const form = readFileSync('app/irrigation/irrigation-manager/watering-form.tsx', 'utf8');
+  const start = form.indexOf('<div className="watering-start">');
+  assert.ok(start > 0);
+  const tail = form.slice(start);
+  assert.ok(tail.includes('className="start-irrigation-button"'), 'le bouton, toujours rendu');
+  assert.ok(tail.includes('{reply}'), 'la réponse du lot G (F404) toujours rendue');
+  assert.doesNotMatch(tail.slice(0, tail.indexOf('{reply}')), /\{sentence \?/, 'ni l’un ni l’autre n’attend la phrase du résultat');
 });
 
 test('n° 15, F462 : le pli « Filtrer » dit le périmètre ; l’export suit les chiffres', () => {

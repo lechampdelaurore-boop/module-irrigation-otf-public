@@ -203,8 +203,8 @@ function applicationMetrics(
 
 function irrigationModeLabel(event: IrrigationEventRecord) {
   const creation = event.timerHistory?.find((entry) => entry.action === 'created');
-  if (creation?.payload.kind === 'completed') return 'Déjà réalisée';
-  if (creation?.payload.kind === 'running') return 'Irriguer maintenant';
+  if (creation?.payload.kind === 'completed') return 'Déjà fait';
+  if (creation?.payload.kind === 'running') return 'Arroser maintenant';
   // « Tout est fait » (docs/aujourdhui-tableau-de-bord-contract.md, section 3.4) : enregistrée telle que prévue, sans chrono.
   const asPlanned = event.timerHistory?.some((entry) => entry.action === 'completed' && entry.payload.asPlanned === true);
   if (creation?.payload.kind === 'planned') return asPlanned ? 'Planifiée, faite comme prévu' : 'Planifiée';

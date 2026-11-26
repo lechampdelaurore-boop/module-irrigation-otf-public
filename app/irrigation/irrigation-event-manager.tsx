@@ -180,31 +180,12 @@ export function IrrigationEventManager({
     proposeDose(nextEquipmentId);
   };
 
-  // Un seul matériel prêt à arroser : « Arroser maintenant » le choisit d'office, la ligne le dit (S5-b).
-  // Ce choix ne vaut que pour cet onglet : « Planifier » et « Déjà réalisée » gardent, jusqu'à la PR 2
-  // du lot, la règle du lot 3 de l'audit (rien de présélectionné), et le reprennent vide.
-  const [autoChosenId, setAutoChosenId] = useState<string | null>(null);
-  const onlyEquipmentId = creationKind === 'running' && editingEventEquipmentId === null ? preselectedEquipmentId(usableEquipment) : null;
-  if (onlyEquipmentId !== null && equipmentId === '') {
-    chooseEquipment(onlyEquipmentId);
-    setAutoChosenId(onlyEquipmentId);
-  }
-  if (creationKind !== 'running' && autoChosenId !== null) {
-    if (equipmentId === autoChosenId) {
-      setEquipmentId('');
-      setSettingId('');
-      setReferenceBedId('');
-      setPumpId('');
-      setPumpOriginId('');
-      setTargetMillimeters('');
-    }
-    setAutoChosenId(null);
-  }
-  /** Un choix de l'utilisateur n'est plus un choix d'office. */
-  const chooseByHand = (nextEquipmentId: string) => {
-    setAutoChosenId(null);
-    chooseEquipment(nextEquipmentId);
-  };
+  // Un seul matériel prêt à arroser : chaque onglet le choisit d'office, la ligne le dit (S5-b, section 4).
+  // Pas pendant une modification, qui porte son matériel ; « Déjà fait » lit le matériel posé à son heure de début.
+  const onlyEquipmentId = editingEventEquipmentId === null ? preselectedEquipmentId(usableEquipment) : null;
+  if (onlyEquipmentId !== null && equipmentId === '') chooseEquipment(onlyEquipmentId);
+  // « Déjà fait » : un matériel choisi qui n'était pas posé à l'heure de début n'est plus coché, la phrase le dit (section 4).
+  const unplacedChoice = equipmentId !== '' && selectedEquipment === null ? equipment.find((item) => item.id === equipmentId)?.name ?? null : null;
 
   const submitCreation = (confirmScheduleConflict = false, confirmExcess = false) => {
     if (!selectedEquipment || !selectedSetting) {
@@ -305,7 +286,7 @@ export function IrrigationEventManager({
   };
 
   useEffect(() => {
-    // Le planning (3.6) envoie ici le maraîcher qui veut ajouter un créneau de sa main ; le « + » de la barre du bas (S3), « Arroser maintenant » ou « Déjà réalisée ».
+    // Le planning (3.6) envoie ici le maraîcher qui veut ajouter un créneau de sa main ; le « + » de la barre du bas (S3), « Arroser maintenant » ou « Déjà fait ».
     const openForm = (kind: unknown) => {
       if (kind !== 'planned' && kind !== 'running' && kind !== 'completed') return;
       setEditingEventEquipmentId(null);
@@ -323,7 +304,6 @@ export function IrrigationEventManager({
   }, [setCreationKind, setEditingEventEquipmentId]);
 
   const editPlanned = (event: IrrigationEventRecord) => {
-    setAutoChosenId(null);
     const item = event.equipment;
     if (!item.plannedStartAt) return;
     setEditingEventEquipmentId(item.id);
@@ -413,10 +393,11 @@ export function IrrigationEventManager({
         groups={groups}
         completedStartAt={completedStartAt}
         dose={selectedEquipment ? proposedDoseFor(formHints.doses, selectedEquipment.id, irrigationDay()) : null}
+        unplacedChoice={unplacedChoice}
         now={now}
         pending={pending}
         reply={<ActionReply messages={replies} origin="formulaire" classNames={REPLY_CLASSES} />}
-        onChooseEquipment={chooseByHand}
+        onChooseEquipment={chooseEquipment}
         onSubmit={() => submitCreation()}
       />
 

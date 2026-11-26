@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
-import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
+import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, ouvrirPlusDOptions, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
 import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { poserUnObjectifDeFerme } from './support/planning.ts';
 
@@ -16,8 +16,8 @@ import { poserUnObjectifDeFerme } from './support/planning.ts';
  *   « Matériel » au-dessus du pli, jamais en manque d'eau, et le pli
  *   « Planches non servies (n) » rangé par motif, « Sans matériel (n) » en
  *   tête (cas 1 et 2) ;
- * - « Arrosages » : aucun matériel choisi à l'ouverture du formulaire, aucun
- *   cadre rouge (cas 3) ; une irrigation planifiée il y a six heures et une
+ * - « Arrosages » : le seul matériel prêt choisi d'office et dit (cas 3,
+ *   amendé par S5-b), aucun cadre rouge ; une irrigation planifiée il y a six heures et une
  *   demain se rangent, la première dans « À traiter », la seconde sous
  *   « Demain » (cas 5) ; « Annuler » est rangé dans le menu « … », sa
  *   confirmation inchangée (cas 6) ; « Fait comme prévu » ne paraît que sur
@@ -103,7 +103,7 @@ test('planning : les gestes en tête, les planches sans matériel en action vers
   await verifierLEtape(page, journal, 'le lien mène à « Matériel »');
 });
 
-test('arrosages : rien de présélectionné, « À traiter » en tête, lignes par jour, « Annuler » dans « … », « Fait comme prévu » confirmé', async ({ page, context }, testInfo) => {
+test('arrosages : le seul matériel choisi d’office, « À traiter » en tête, lignes par jour, « Annuler » dans « … », « Fait comme prévu » confirmé', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   // Un seul « maintenant » par parcours : toutes les dates en découlent.
@@ -113,25 +113,28 @@ test('arrosages : rien de présélectionné, « À traiter » en tête, lignes p
   await attendreLaPageIrrigation(page, 'materiel');
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo);
 
-  // Cas 3 : à l'ouverture, aucun matériel choisi, aucun cadre rouge.
+  // Cas 3, amendé par S5-b (D-332, D-333) : le seul matériel prêt est choisi d'office, et la ligne le dit ;
+  // aucun cadre rouge avant une durée (rien n'est calculé ni dépassé).
   await attendreLaPageIrrigation(page, 'arrosages');
   await page.getByRole('tab', { name: /^Planifier/ }).click();
-  const choixDuMateriel = page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) });
-  await expect(choixDuMateriel).toHaveValue('');
-  await expect(page.getByText('Choisissez un matériel : l’apport et la faisabilité se calculent ensuite.')).toBeVisible();
-  await expect(page.locator('.hydraulic-indicator')).toHaveCount(0);
+  const formulaire = page.locator('.watering-now[data-kind="planned"]');
+  await expect(formulaire.getByRole('radio', { name: materiel, exact: true })).toBeChecked();
+  await expect(formulaire).toContainText('Le seul matériel prêt à arroser est choisi.');
+  await expect(formulaire.locator('.watering-duration strong')).toHaveText('—');
   await expect(page.locator('.is-exceeded')).toHaveCount(0);
-  await verifierLEtape(page, journal, 'formulaire sans matériel présélectionné');
+  await verifierLEtape(page, journal, 'formulaire, le seul matériel choisi d’office');
 
   // Une irrigation planifiée il y a six heures, finie ; une autre demain, même heure.
   await choisirMaterielEtReglage(page, materiel, reglage);
+  // La faisabilité « inconnue » se lit dans « Plus d'options » (S5, section 3.4).
+  await ouvrirPlusDOptions(page);
   await expect(page.locator('.hydraulic-indicator')).toContainText('Aucune pompe n’est choisie');
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(-6 * 60, reference));
-  await soumettreIrrigation(page, 'Planifier l’irrigation', 'passée sans démarrage');
+  await soumettreIrrigation(page, /^Planifier l’arrosage de /, 'passée sans démarrage');
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(24 * 60, reference));
-  await soumettreIrrigation(page, 'Planifier l’irrigation', 'demain');
+  await soumettreIrrigation(page, /^Planifier l’arrosage de /, 'demain');
 
   // Cas 5 : « À traiter » en tête, puis la ligne de demain sous son jour.
   const liste = page.locator('.upcoming-irrigations');

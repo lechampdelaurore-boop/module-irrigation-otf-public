@@ -10878,3 +10878,79 @@ tenu par la PR 1 : mesuré par P64, il dépend des onglets d'une ligne
 (PR 2) et de l'ordre de la page (PR 3), qui le vérifiera. Les contrats de
 la section 9.1 sont réécrits par la PR 3, comme le prévoit la section 2 du
 contrat ; celui des parcours suit dès cette PR.
+
+## D-333 — Simplifier l'usage du module, lot S5 : « Planifier » et « Déjà fait » sur le même squelette
+
+Date : 25 novembre 2026. Statut : **PR 2 sur 3 codée** ; contrat
+`docs/simplification-s5-contract.md` (sections 4, 5, 6 et 10), roadmap
+section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap et du contrat (section 14), dans la suite de D-332.
+
+**Décision (PR 2).** Les trois onglets d'« Arrosages » partagent un seul
+formulaire (`watering-form.tsx`) : le même « Où ? », le même « Plus
+d'options », la même phrase du résultat ; seuls le deuxième bloc et le
+bouton changent. Les règles d'écran nouvelles vivent dans
+`lib/domain/watering-plan-record.ts`. Les valeurs écrites et l'action
+serveur sont celles d'avant ; aucune règle d'écriture ni aucun calcul ne
+change, aucune question agronomique. L'ancien formulaire de « Planifier »
+et « Déjà réalisée » est retiré (`preparation-fields.tsx`, l'encart
+« Résultat calculé » et sa règle d'attente du lot J, F462, dont la part
+qui tient, le bouton et la réponse toujours rendus, se lit sur le
+squelette).
+
+Précisions prises en codant :
+
+- **F902** — Les onglets s'appellent « Arroser maintenant », « Planifier »,
+  « Déjà fait » (S5-e) ; au téléphone, ils tiennent sur une ligne de 44 px
+  et leur phrase de description ne se montre plus ; à l'ordinateur, elle
+  reste. L'Historique dit comment un arrosage a été noté avec les mêmes
+  mots (« Arroser maintenant », « Déjà fait »), dans sa fiche et dans la
+  colonne « Mode » de l'export.
+- **F903** — L'ordre des blocs, numérotés dans cet ordre
+  (`wateringBlocks`) : « Planifier », « 1. Où ? », « 2. Quand ? » (la date
+  et l'heure de début, le champ d'avant, proposé une heure plus tard),
+  « 3. Combien de temps ? » ; « Déjà fait », « 1. De quand à quand ? »
+  (début réel, fin réelle) avant « 2. Où ? », parce que le matériel listé
+  est celui qui était posé à l'heure de début (règle 12), sans « Combien
+  de temps ? » : « soit *durée* » se lit sous les dates, et la phrase du
+  résultat, sous « Où ? », dit ce qui s'enregistrera (les mm et les
+  litres estimés).
+- **F904** — Le bouton de « Planifier » dit « Planifier · *jour* à *h* » :
+  « aujourd'hui », « demain », « le vendredi 27 » dans les six jours qui
+  viennent et le même mois, « le mardi 1er décembre » sinon (un jour passé
+  aussi, qu'on planifie pour le noter) ; son nom lu est « Planifier
+  l'arrosage de *matériel*, demain à 6 h ». Ce qui manque se dit dans
+  l'ordre des blocs : « Choisissez où arroser. », « Choisissez quand
+  arroser. » (un début vide ou illisible, point ouvert 46), « Choisissez
+  une durée. », la planche non atteinte. Le bouton de « Déjà fait » dit
+  « Enregistrer cet arrosage », lu « Enregistrer l'arrosage de
+  *matériel* » ; ce qui manque, dans l'ordre : « Choisissez une fin après
+  le début. » (dates illisibles ou dans le désordre, point ouvert 45),
+  « Choisissez où arroser. », la planche non atteinte. Rien de ce qui est
+  signalé (pompe, restriction) ne le bloque.
+- **F905** — Un seul matériel prêt est choisi d'office **dans les trois
+  onglets** (S5-b, « mêmes règles », section 4), hors modification d'une
+  irrigation planifiée, qui porte son matériel ; la ligne le dit. La PR 1
+  le limitait à « Arroser maintenant » et retirait le choix en changeant
+  d'onglet ; ce retrait disparaît. P31 (cas 3 du lot 3) lit le nouveau
+  comportement.
+- **F906** — « Déjà fait » : un matériel choisi qui n'était pas posé à
+  l'heure de début n'est plus coché, et une ligne le dit (« *Matériel*
+  n'était pas posé à cette heure de début : choisissez où vous avez
+  arrosé. ») ; le choix est gardé en mémoire et revient si l'heure revient
+  à une pose. Le bouton dit « Choisissez où arroser. ».
+- **F907** — « Plus d'options » de « Déjà fait » ne range que la pompe et
+  la note (« Plus d'options (pompe, note) ») : ni saisie en mm ni durée
+  exacte, la durée se lit des dates ; la faisabilité s'y lit au passé, comme
+  avant. La promesse « Le minuteur retrouvera son état… » ne se dit que sous
+  « Démarrer ». « Modifier » d'une irrigation à venir ouvre « Planifier »
+  sur ce squelette, rempli, avec son bandeau (section 5) ; « Plus
+  d'options » s'y ouvre seul pour une pompe qui n'est pas l'habituelle ou
+  une note.
+
+**Ce qui reste à la PR 3.** « C'est fait » à la place de « Fait comme
+prévu » sur « Arrosages » : la section 2 du contrat le range en PR 2, sa
+section 6.1 en PR 3 ; la PR 3, qui réécrit les contrats de la section 9.1
+(dont T15 et T16), le porte, comme l'a annoncé la PR 1. L'ordre de la page
+et le budget de hauteur de la section 7, la demande portée par l'adresse
+et les ancres de la visite guidée restent aussi à la PR 3.

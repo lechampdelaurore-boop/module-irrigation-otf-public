@@ -421,12 +421,12 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   await expect(page.getByRole('tab', { name: /^Arroser maintenant/ })).toHaveAttribute('aria-selected', 'true');
   await verifierLEtape(page, journal, '« Arroser maintenant »');
 
-  // « Noter un arrosage déjà fait » : « Déjà réalisée », depuis « Arrosages » même.
+  // « Noter un arrosage déjà fait » : « Déjà fait », depuis « Arrosages » même.
   await ouvrirParClic(plus, feuille);
   await Promise.all([page.waitForEvent('load'), feuille.getByRole('link', { name: /^Noter un arrosage déjà fait/ }).click()]);
   await attendreLaPagePrete(page, 'arrosages');
   await expect(page).toHaveURL(/\/irrigation\/arrosages\?season=\d{4}$/);
-  await expect(page.getByRole('tab', { name: /^Déjà réalisée/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: /^Déjà fait/ })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('.irrigation-creation-panel')).toBeInViewport();
   await verifierLEtape(page, journal, '« Noter un arrosage déjà fait »');
 });

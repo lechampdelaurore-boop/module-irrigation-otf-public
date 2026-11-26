@@ -26,13 +26,13 @@ test('les cumuls suivent la période choisie, un détail s’ouvre et le CSV s�
   // la compte dès qu'elle la chevauche, et elle chevauche la semaine, le mois et
   // la saison en cours quelle que soit l'heure, le lundi peu après minuit compris
   // (docs/browser-journeys-contract.md, « Reproductibilité », point ouvert 49).
-  await page.getByRole('tab', { name: /^Déjà réalisée/ }).click();
+  await page.getByRole('tab', { name: /^Déjà fait/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Début réel').fill(horodatageLocal(-31, reference));
   await page.getByLabel('Fin réelle').fill(horodatageLocal(-1, reference));
   // Recharger avant la fin de l'action serveur l'interromprait, et l'irrigation
   // n'existerait jamais : on attend donc sa confirmation.
-  await soumettreIrrigation(page, 'Enregistrer l’irrigation réalisée', 'parcours cumuls');
+  await soumettreIrrigation(page, /^Enregistrer l’arrosage de /, 'parcours cumuls');
 
   // Les cumuls ont leur page, rendue par le serveur : l'ouvrir après
   // l'enregistrement les montre à jour.

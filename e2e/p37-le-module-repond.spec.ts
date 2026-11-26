@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
+import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, saisirEnMillimetres } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli, ouvrirLOnglet } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.ts';
 
@@ -10,7 +10,7 @@ import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.
  *
  * Sur la ferme de démonstration, sans rien laisser derrière lui :
  *
- * - « Planifier » : le message vient sous « Planifier l’irrigation », à
+ * - « Planifier » : le message vient sous « Planifier · … », à
  *   l'écran sans que l'utilisateur défile (F404) ; le formulaire se vide et
  *   son bouton redevient indisponible (F406) ; le même matériel replanifié
  *   sur le même créneau ouvre la fenêtre du module : « Ne pas planifier »
@@ -56,20 +56,23 @@ test('« Planifier » répond sous son bouton, se vide et demande avant un secon
 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   const debut = horodatageLocal(2 * 24 * 60, reference);
-  // Aucune dose du jour pour un matériel neuf : la quantité reste vide, le bouton indisponible (F409).
+  // Aucune dose du jour pour un matériel neuf : aucune durée choisie, le bouton indisponible (F409, S5, section 3.2).
   await choisirMaterielEtReglage(page, materiel, reglage, '');
-  await expect(page.getByLabel('Quantité souhaitée')).toHaveValue('');
-  // Sans quantité, « Résultat calculé » attend : pas de chiffre, le bouton à sa place (lot J, F462).
-  const resultat = page.locator('.irrigation-preview');
-  await expect(resultat).toHaveAttribute('data-ready', 'false');
-  await page.getByLabel('Quantité souhaitée').fill('25');
-  await expect(resultat).toHaveAttribute('data-ready', 'true');
-  await expect(resultat.locator('.calculated-duration')).toBeVisible();
+  await expect(page.locator('.watering-duration strong')).toHaveText('—');
+  // Sans durée, la phrase du résultat attend : pas de chiffre, le bouton à sa place (lot J, F462).
+  const resultat = page.locator('.watering-now .watering-result');
+  await expect(resultat).toHaveCount(0);
+  await expect(page.locator('.watering-missing')).toHaveText('Choisissez une durée.');
+  await saisirEnMillimetres(page, '25');
+  await expect(resultat.first()).toBeVisible();
+  await expect(page.locator('.watering-duration-result strong')).not.toHaveText('—');
   await page.getByLabel('Date et heure de début').fill(debut);
-  const planifier = page.getByRole('button', { name: 'Planifier l’irrigation' });
+  // Le bouton dit ce qu'il fait ; vidé après la réussite, il redevient « Planifier » (S5, D-333) : on le désigne par sa place.
+  const planifier = page.locator('.watering-start .start-irrigation-button');
+  await expect(planifier).toHaveAccessibleName(/^Planifier l’arrosage de /);
   await planifier.click();
 
-  const reponse = page.locator('.irrigation-preview .action-reply');
+  const reponse = page.locator('.watering-start .action-reply');
   await expect(reponse.locator('.irrigation-event-notice')).toHaveText(/planifiée/);
   await expect(reponse).toBeInViewport();
   await expect(page.locator('.irrigation-events-section > .action-reply')).toHaveCount(0);

@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { ciblesTropPetites, textesPeuContrastes } from './support/accessibilite.ts';
 import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
-import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, soumettreIrrigation } from './support/materiel.ts';
+import { choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, saisirEnMillimetres, soumettreIrrigation } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
@@ -85,9 +85,9 @@ test('trois semaines d’irrigations plus longues que prévu : le bloc, la cause
     await page.getByRole('tab', { name: /^Planifier/ }).click();
     await choisirMaterielEtReglage(page, materiel, reglage, QUANTITE_PREVUE_MM);
     // Une dose du jour proposée par le planning remplirait la quantité : le parcours tape la sienne.
-    await page.getByLabel('Quantité souhaitée').fill(QUANTITE_PREVUE_MM);
+    await saisirEnMillimetres(page, QUANTITE_PREVUE_MM);
     await page.getByLabel('Date et heure de début').fill(`${addDaysToDateKey(aujourdhui, -JOURS_PAR_SEMAINE * semaine)}T10:00`);
-    await soumettreIrrigation(page, 'Planifier l’irrigation', `il y a ${semaine} semaine${semaine > 1 ? 's' : ''}`);
+    await soumettreIrrigation(page, /^Planifier l’arrosage de /, `il y a ${semaine} semaine${semaine > 1 ? 's' : ''}`);
   }
   const aTraiter = page.locator('.upcoming-irrigations section.irrigation-to-handle');
   await expect(aTraiter.locator('article').filter({ hasText: materiel })).toHaveCount(SEMAINES_JUGEES);

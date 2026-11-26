@@ -30,7 +30,7 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
   await page.getByRole('tab', { name: /^Planifier/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
   await page.getByLabel('Date et heure de début').fill(horodatageLocal(24 * 60, reference));
-  await page.getByRole('button', { name: 'Planifier l’irrigation' }).click();
+  await page.getByRole('button', { name: /^Planifier l’arrosage de / }).click();
   const prevue = page.locator('.upcoming-irrigations article').filter({ hasText: materiel });
   await expect(prevue).toHaveCount(1);
   await expect(prevue.getByRole('button', { name: 'Démarrer maintenant' })).toBeEnabled();
@@ -104,7 +104,7 @@ test('un goutte-à-goutte se retire à une date choisie, reste stocké, puis se 
 
   // Saisie après coup (règle 12) : le matériel n'est proposé qu'à une heure de
   // début où il était posé.
-  await page.getByRole('tab', { name: /^Déjà réalisée/ }).click();
+  await page.getByRole('tab', { name: /^Déjà fait/ }).click();
   await page.getByLabel('Début réel').fill(horodatageLocal(-45, reference));
   await expect(optionDuMateriel(page, materiel)).toHaveCount(0);
   await page.getByLabel('Début réel').fill(horodatageLocal(-90, reference));

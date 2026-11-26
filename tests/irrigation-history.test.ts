@@ -567,7 +567,7 @@ function exportData(items: IrrigationHistoryItem[]) {
 
 const historyItemStub = {
   id: 'event', eventEquipmentId: 'event-equipment', date: '2026-09-02T08:00:00Z',
-  status: 'completed' as const, statusLabel: 'Terminée', modeLabel: 'Irriguer maintenant',
+  status: 'completed' as const, statusLabel: 'Terminée', modeLabel: 'Arroser maintenant',
   equipmentName: 'Rampe', settingName: 'Standard', locationLabel: 'Jardin A', zoneName: 'Parcelle A',
   plotNames: ['Jardin A'], bedNames: ['Planche A'], bedIds: ['bed-a'], plannedStartAt: null, plannedEndAt: null,
   actualStartAt: '2026-09-02T08:00:00Z', actualEndAt: '2026-09-02T09:00:00Z',
