@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 25 novembre 2026.
+Dernière mise à jour : 26 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Ignorer l'irrigation hors saison, B1 : la règle, codée le 26 novembre
+  2026** (D-341, F985 à F995 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4, 5 et 8 ;
+  roadmap ligne 34), en Opus 5.5 · Max, sur la branche du contrat.
+  `lib/domain/off-season.ts` : le filtre d'une ferme à partir de ses gestes
+  datés, cinq portées, le jour compté en heure de Paris ; `objectiveForBed`
+  le reçoit jour par jour ; le tableau des besoins et l'objectif de la
+  ferme sortent les planches hors saison de leurs comptes et les disent à
+  part. **Filtre toujours vide : rien ne change en ligne.** Les dix cas et
+  les gardes (pluie, ET0, irrigation, réserve du sol, alertes jamais
+  touchées) dans `tests/hors-saison-regle.test.ts`. Contrôles : voir la PR.
+  Fusion après le contrat (#240) et les PR de S4 et S6 ; viennent A1, B2
+  et B3 (le stockage et les lecteurs, puis les écrans).
 - **L'objectif automatique se voit ; ignorer l'irrigation hors saison :
   contrat écrit le 26 novembre 2026, sans code** (D-337,
   `docs/objectif-automatique-saison-contract.md`, roadmap ligne 34, section

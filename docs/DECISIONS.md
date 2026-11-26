@@ -11057,3 +11057,120 @@ saison, **le module propose d'annuler** les arrosages planifiés ou
 validés des planches concernées, jamais sans son choix.
 
 Numéros : D-337 ; F à partir de F983 pour le code.
+
+## D-341 — Ignorer l'irrigation hors saison, B1 : la règle
+
+Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
+contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections 4,
+5 et 8) ; roadmap section 6 quaterdecies, ligne 34. Code en Opus 5.5 · Max,
+le réglage de la roadmap, sur la branche du contrat, avant la fusion de S4
+et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995 : D-337 et
+F983 à F984 sont aussi pris par une autre PR ouverte (#244), D-338 à D-340
+par trois contrats ouverts (#241 à #243).
+
+**Décision.** La règle « hors saison » vit en un seul endroit,
+`lib/domain/off-season.ts` (le nom proposé par le contrat, section 4.6), et
+`objectiveForBed` (`lib/domain/irrigation-needs.ts`) reçoit sa réponse jour
+par jour : un jour où la planche est hors saison n'a aucun objectif, ni
+saisi ni automatique. Le tableau des besoins et l'objectif de la ferme
+(`lib/domain/farm-objective.ts`) en tirent les comptes de la section 4.1.
+**Le filtre reste vide** : aucun service ne le construit, aucun écran ne
+l'allume (B2, B3) ; rien ne change en ligne, deux tests le prouvent mot
+pour mot. Aucune question agronomique : les deux réponses du porteur (la
+reprise à la main seulement, l'annulation proposée des arrosages planifiés)
+sont des gestes, livrés par B2 et B3 ; la règle ne lève jamais seule une
+portée.
+
+**Précisions prises en codant.**
+
+- **F985** — Le filtre d'une ferme se construit à partir de ses gestes
+  datés (`offSeasonSchedule`) et se lit de trois façons : `daysOf(planche)`,
+  la réponse jour par jour que reçoit `objectiveForBed` ;
+  `activeScopes(jour)`, les portées actives, chacune avec son jour
+  (« Tout le plein champ · depuis le 20 nov. », section 4.4) ;
+  `scopesCovering(planche, jour)`, celles qui couvrent une planche (« Le
+  jardin Nord reste hors saison », section 4.3). B2 et B3 lisent ces trois
+  réponses ; aucun lecteur ne refait la règle.
+- **F986** — Une portée de planche, de jardin ou abri, ou de parcelle se
+  reconnaît à l'identifiant OTF de son seul niveau, qui suit l'endroit d'une
+  saison à l'autre (section 6). « Tout le plein champ » et « tout le
+  sous-abri » se lisent au mode du jardin **au moment de la lecture** : un
+  jardin reclassé suit la portée qui le couvre alors. Un jardin « à
+  classer » n'est couvert par aucune des deux (D-003).
+- **F987** — L'ordre des gestes, portée par portée : le dernier geste posé
+  ce jour ou avant, en heure de Paris, fait foi à partir de son jour
+  (D-034) ; deux gestes le même jour, le second fait foi pour toute la
+  journée ; deux gestes de la même milliseconde gardent l'ordre reçu
+  (`docs/revision-order-contract.md`), comme le réglage de l'objectif
+  automatique (F773). Un second « Mettre hors saison » sans « Reprendre »
+  entre les deux ne déplace pas le jour « depuis ». Seul « Reprendre » lève
+  une portée (section 10, question 1), et lever une portée ne lève pas
+  celles qui la recouvrent.
+- **F988** — Un jour hors saison, `objectiveForBed` ne compte ni l'objectif
+  saisi ni l'objectif automatique, et le rend dans `offSeasonDates`. Les
+  objectifs saisis restent lus pendant la pause : un objectif posé sous une
+  portée active reste là, inactif, et s'applique dès la reprise (section
+  4.5). L'objectif automatique ne compte que les jours en saison (cas 9 :
+  21,8 mm, du mercredi au dimanche).
+- **F989** — Sur une période, une planche est « hors saison »
+  (`objectiveOffSeason`) quand **aucun** jour n'a d'objectif et qu'**au
+  moins un** jour est hors saison : elle se dit « hors saison », jamais
+  « sans objectif » ni zéro (D-003). Une planche qui garde un objectif une
+  partie de la période le garde, compté comme tout objectif posé en cours
+  de semaine (D-034) ; ses jours hors saison restent listés, pour que B3
+  dise « hors saison depuis jeudi » (cas 2).
+- **F990** — Au tableau des besoins, une planche hors saison sans objectif
+  n'a ni objectif manquant, ni besoin, ni volume ; elle reste dans les
+  lignes de son jardin (section 6 : elle n'est pas masquée), avec sa pluie
+  et son irrigation réelle inchangées. Les comptes du jardin (besoin, reste
+  à apporter, volume) se font sur ses planches en saison, à leur surface ;
+  un jardin entièrement hors saison n'a pas de volume, jamais un zéro. Le
+  nombre de planches, les priorités et la surface du jardin comptent
+  toujours toutes ses planches.
+- **F991** — Un besoin remplacé à la main reste enregistré, mais inactif
+  tant que la planche est hors saison sans objectif, comme un objectif
+  saisi sous une portée active (section 4.5) : le module ne propose pas
+  d'irriguer une planche hors saison (section 4.1). Il compte de nouveau
+  si la planche reprend dans la semaine ; B3 dira qu'il est inactif.
+- **F992** — L'objectif de la ferme (`farmObjective`) reste la moyenne
+  pondérée par la surface sur les planches qui ont un objectif ; les
+  planches hors saison sans objectif y sont comptées à part (`offSeason`,
+  absent quand il n'y en a aucune : le résultat d'avant). Les phrases :
+  « 20 mm visés, 2 planches sur 2 ont un objectif, 4 hors saison » (un seul
+  « sur » par phrase, F443) ; « aucune eau visée, 4 planches hors saison »
+  quand aucune planche n'a d'objectif ; « aucune planche en saison » et
+  « aucune planche sur 3 n’a d’objectif » pour les deux cas limites du
+  compte. Une planche hors saison n'a pas d'objectif : l'eau reçue se
+  compare à l'objectif sur les seules planches qui en ont un (D-329).
+- **F993** — Ce que B1 laisse à B2 : construire le filtre à partir des
+  gestes enregistrés (migration, journal) et le donner à tous les lecteurs
+  qui composent eux-mêmes l'objectif ou le besoin : le service des
+  besoins ; le planning (`lib/domain/planning/demand.ts` et
+  `suggestions.ts`, qui lisent eux-mêmes le besoin remplacé à la main), la
+  faisabilité et la pénurie ; « Aujourd'hui » (`lib/domain/today/week.ts`) ;
+  l'historique (`hydricObjectiveOfBeds`,
+  `lib/domain/irrigation-history/summary.ts`) et l'eau des séries
+  (`lib/domain/series/water.ts`) ; les services qui appellent
+  `objectiveForBed` (`applied-water-gap.ts`, `crop-water-bed.ts`,
+  `crop-water-series.ts`, `irrigation-form-hints.ts`). Une semaine close
+  reste lue telle quelle (D-318) : le filtre ne remonte jamais avant le
+  jour de son geste (cas 7).
+- **F994** — Les gardes (`tests/hors-saison-regle.test.ts`) : filtre vide,
+  l'objectif et le tableau des besoins identiques mot pour mot ; sur deux
+  fermes, la pluie, l'ET0 et l'irrigation de chaque planche identiques,
+  filtre actif ou non ; les calculs de la pluie et de l'ET0
+  (`water-management.ts`, `weather/`), de la réserve du sol, des alertes et
+  de l'eau des cultures n'atteignent jamais `off-season.ts` par un import
+  et ne nomment pas le filtre ; les services de la météo, de la réserve du
+  sol, des alertes et le Worker de la météo ne le nomment pas ; une
+  contre-épreuve montre que la garde voit un calcul qui passe par le
+  filtre. Quinze casses volontaires du code (filtre ignoré, jour compté en
+  UTC, premier geste gagnant, jardin « à classer » couvert, planche hors
+  saison comptée au jardin ou à la ferme, pluie lue à travers le filtre…)
+  ont toutes été vues par les tests. La garde à deux fermes de la réserve
+  du sol, de l'historique de la pluie et de l'archivage des prévisions,
+  services compris, est à B2 (section 8).
+- **F995** — « Hors saison » dit déjà autre chose dans le module : une série
+  hors de la saison d'OTF (« série hors saison »,
+  `lib/services/series-water-service.ts`). Le code nomme le filtre
+  `offSeason` ; B3 gardera les deux sens à part à l'écran.
