@@ -211,10 +211,10 @@ export function pageAccess(page: IrrigationPageId, firstVisit: boolean, selectio
 
 /**
  * Les pages du menu, dans l'ordre de la liste : « Aujourd'hui » en tête quand
- * elle existe, les cases cochées, puis « Ma ferme » et Réglages. « Ma ferme »
- * s'ajoute au menu d'avant comme une page de plus (lot S3, PR 1) : la barre
- * du bas et le menu de l'ordinateur passent aux trois endroits dans les PR 2
- * et 3.
+ * elle existe, les cases cochées, puis « Ma ferme » et Réglages. La barre du
+ * bas et le menu de l'ordinateur les rangent en trois endroits (lot S3,
+ * PR 2 et 3 : `phoneBar`, `menuPlaces`) ; la liste dit seulement lesquelles
+ * existent.
  */
 export function menuPages(selection: FeatureSelection): IrrigationPageId[] {
   const today: IrrigationPageId[] = hasTodayPage(selection) ? ['aujourdhui'] : [];

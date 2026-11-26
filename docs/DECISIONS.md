@@ -10517,14 +10517,14 @@ faisait 3 888 px sur la démonstration. Contre-épreuve : voir la PR.
 
 ## D-331 — Simplifier l'usage du module, lot S3 : trois endroits
 
-Date : 25 novembre 2026. Statut : **PR 1 à 3 sur 4 codées** (le rangement
+Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées** (le rangement
 et « Ma ferme » ; la barre du bas, le « + » et le chemin de retour ; le menu
-de l'ordinateur) ; contrat `docs/simplification-s3-contract.md`, roadmap
+de l'ordinateur ; les liens et les visites) ; contrat `docs/simplification-s3-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le réglage de
 la roadmap et du contrat (section 14), sur le mandat du porteur du
 25 novembre 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met
 en œuvre le choix n° 1 du porteur (« trois endroits », 25 novembre 2026,
-11 h 59) ; les PR 2 à 4 la compléteront.
+11 h 59) ; les PR 2 à 4 la complètent.
 
 **Décision (PR 1).** Chaque page du module est rangée dans un endroit et un
 seul : « Aujourd'hui » (Aujourd'hui, Arrosages), « Semaine » (Planning de la
@@ -10740,3 +10740,47 @@ la page introuvable ; le parcours du « + » joué aussi à l'ordinateur (la
 boîte au milieu, sans poignée). P0, P27, P28 et P30 suivent le menu, et
 `e2e/support/parcours.ts` range ses titres dans l'ordre des endroits.
 Mesures et contre-épreuve : voir la PR et le contrat, section 13.
+
+**Décision (PR 4).** Ce qui parlait encore du menu d'avant parle des trois
+endroits et du « + ». La visite guidée de la démonstration : l'étape 4 de
+« Bienvenue » devient « Trois endroits » (« Aujourd'hui » pour ce qu'on fait
+maintenant, « Semaine » pour savoir si la semaine est bonne, « Ma ferme » pour
+ce que le module sait de la ferme ; le « + » lance ou note un arrosage, ou
+note la pluie, depuis n'importe quelle page) ; l'étape 3 du « Module à la
+carte » devient « Les endroits suivent vos cases ». Le « ? » d'« Aujourd'hui »
+dit que sa pastille est « dans la barre du bas ou le menu ». La charte du
+module décrit la navigation aux trois endroits. Avec elle, le lot S3 est
+codé en entier. Aucune adresse, aucun écran, aucun calcul, aucune donnée ne
+change.
+
+**Précisions tranchées en codant (PR 4).**
+
+- F890 : le repère `menu` des visites reste un seul nom, posé sur la barre
+  du bas et sur le menu de gauche ; la bulle se raccroche au premier des deux
+  qu'on voit, comme depuis la PR 2. Aucun repère n'est ajouté. Les noms
+  accessibles des deux navigations (« Pages principales », « Pages du
+  module ») ne changent pas : ce ne sont pas des mots de l'écran, et les
+  parcours les lisent.
+- F891 : « Trois endroits » garde l'idée de l'étape d'avant (« Une visite
+  saute ce que la ferme choisie n'a pas coché ») en une phrase : « Chaque
+  ferme ne voit que ce qu'elle a coché ; une visite saute le reste. » Le
+  « + » y est dit sans « quand il est là » : la phrase suivante le couvre.
+- F892 : « Le module à la carte », étape 1, « le reste disparaît des écrans
+  et des calculs » au lieu de « du menu et des calculs » ; étape 3, « Une
+  page n'apparaît dans son endroit que si sa fonctionnalité est cochée. Un
+  endroit qui n'a plus de page disparaît, comme le « + » quand il n'a plus
+  rien à proposer » (section 8).
+- F893 : P29 lit la pastille dans le nom de l'entrée « Aujourd'hui », sans
+  rien ouvrir : le code qui refermait la feuille « Plus » part. Les
+  commentaires du domaine (`menuPages`, `phoneBar`) disent le rangement tel
+  qu'il est.
+
+**Preuve (PR 4).** `tests/simplification-s3-liens.test.ts` : l'étape
+« Trois endroits », sur le repère `menu`, nomme les trois endroits et le
+« + » ; « Les endroits suivent vos cases » ; aucune bulle ni aucun « ? » ne
+dit « Plus », « Plus de pages », « Pages du module », « le menu ne
+montre », « Arroser, Équiper » ; le « ? » d'« Aujourd'hui » ; le repère
+`menu` sur les deux navigations, et la bulle sur celle qu'on voit. Les
+règles des bulles (`demo-tours` : longueur, sans emoji ni sigle, pages
+cochées) tiennent sans changer. Parcours V1 et V6 de la démonstration et
+P29, aux deux largeurs. Contre-épreuve : voir la PR.

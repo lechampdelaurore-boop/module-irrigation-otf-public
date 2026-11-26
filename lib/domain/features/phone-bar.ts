@@ -10,7 +10,8 @@ import { menuPlacePages, PLACE_IDS, placeMark, placeOfPage, type PlaceId } from 
  * la largeur ; le « + » n'existe que si l'un de ses gestes existe
  * (`plusGestures`). Toute page est à deux touches au plus : un endroit, puis
  * une fiche ou la bande de la semaine (« Arrosages » passe par le « + » ou par
- * « Aujourd'hui », section 3.4). Le menu de l'ordinateur ne change pas ici.
+ * « Aujourd'hui », section 3.4). Le menu de l'ordinateur range de même
+ * (`menuPlaces`, PR 3).
  */
 
 type PhoneBarPlace = {

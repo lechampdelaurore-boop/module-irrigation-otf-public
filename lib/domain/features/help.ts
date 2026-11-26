@@ -16,7 +16,7 @@ export type PageHelp = {
 export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   aujourdhui: {
     purpose: 'Le tableau de bord du module : savoir d’un coup d’œil ce qu’il y a à faire aujourd’hui, où en est l’eau de la semaine, le gel ou la chaleur des trois prochains jours, l’eau disponible et ce que le calcul sait de votre ferme.',
-    reading: 'L’en-tête résume le jour ; ses pastilles mènent au bloc qui en parle. Chaque bloc suit une fonctionnalité cochée. Une valeur inconnue est hachurée, jamais pleine. Le nombre à côté de « Aujourd’hui », dans le menu, compte les données à rafraîchir et les arrosages en retard.',
+    reading: 'L’en-tête résume le jour ; ses pastilles mènent au bloc qui en parle. Chaque bloc suit une fonctionnalité cochée. Une valeur inconnue est hachurée, jamais pleine. Le nombre à côté de « Aujourd’hui », dans la barre du bas ou le menu, compte les données à rafraîchir et les arrosages en retard.',
     firstStep: 'Commencez par « Votre journée » : démarrez un arrosage à rattraper, ou, s’il a été fait sans le chrono, enregistrez-le avec « Tout est fait », tel que prévu. Puis touchez le bouton de chaque donnée à rafraîchir de « Fiabilité du calcul ».',
   },
   materiel: {

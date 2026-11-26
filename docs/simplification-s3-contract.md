@@ -534,6 +534,24 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
   Restent à la PR 4 la visite guidée, `demo-tours`, les phrases qui disent
   « menu » ou « Plus », et le « ? » d'« Aujourd'hui ».
 
+**Rempli par la PR 4 (25 novembre 2026).**
+
+- **Numéros.** Précisions **F890 à F893** (D-331) ; aucun parcours nouveau.
+- **Relevé suivi par la PR 4**, le dernier : la visite guidée
+  (`lib/domain/demo/tours.ts` : « Bienvenue », étape 4, « Trois endroits » ;
+  « Le module à la carte », étapes 1 et 3), V1 et V6 ; `demo-tours`, dont les
+  règles des bulles tiennent sans changer (« Trois endroits » : 305 signes,
+  « Les endroits suivent vos cases » : 166, pour 320 au plus) ; le « ? »
+  d'« Aujourd'hui » (« dans la barre du bas ou le menu ») ; P29 (la pastille
+  lue sans rien ouvrir) ; les contrats `demo-guided-contract` (section 7),
+  `simplification-s1-contract` (sections 3 et 6, F834),
+  `browser-journeys-contract` (P29, V1, V6) et la charte du module (la
+  navigation). Plus aucun texte, test ni parcours ne lit « Plus » ni les
+  groupes d'avant, hors de ceux qui vérifient leur absence (P28,
+  `simplification-s3-menu`, `simplification-s3-liens`).
+- **Mesures** : aucune de plus ; la PR ne change ni la barre, ni le menu, ni
+  la place d'aucun bloc.
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième cas

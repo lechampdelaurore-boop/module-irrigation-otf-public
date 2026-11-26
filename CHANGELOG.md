@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S3, PR 4 : les liens et les visites)
+
+- **La visite guidée de la démonstration présente les trois endroits**
+  (D-331, F890 à F893) : l'étape « Trois endroits » de « Bienvenue » dit à
+  quoi sert « Aujourd'hui », « Semaine » et « Ma ferme », et ce que fait le
+  « + » ; « Le module à la carte » dit que les endroits suivent les cases.
+  Plus aucune bulle ne parle de « Plus » ni d'un menu « qui ne montre
+  que… ».
+- **Le « ? » d'« Aujourd'hui »** situe sa pastille « dans la barre du bas ou
+  le menu ». Aucun écran, aucune adresse ne change.
+
 ### Modifié (simplifier l'usage du module, S3, PR 3 : le menu de l'ordinateur)
 
 - **À l'ordinateur, le menu de gauche se range en trois endroits**
