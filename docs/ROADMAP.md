@@ -1205,7 +1205,8 @@ selon la règle de la section 10.
     45716978089) ; **PR 2 sur 4 (la barre du bas, le « + », la bande de la
     semaine, le retour) codée le même jour** (D-331), **en ligne le
     26 novembre à 4 h 27** (#222, run 45745833876) ; **PR 3 sur 4 (le
-    menu de l'ordinateur) codée le même jour** (D-331) ; **PR 4 sur 4 (les
+    menu de l'ordinateur) codée le même jour** (D-331), **en ligne le
+    26 novembre à 5 h 42** (#223, run 45753253944) ; **PR 4 sur 4 (les
     liens et les visites) codée le même jour** (D-331) : **le code de S3
     est fini** ; ses PR se fusionnent une à la fois.
 

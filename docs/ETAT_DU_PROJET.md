@@ -30,7 +30,9 @@ registres, elle y renvoie.
   trois pages, « Ma ferme » et ses fiches, Réglages comprise. Les titres
   « Semaine » et « Ma ferme » sont des liens ; toute page reste à un clic.
   Le téléphone ne change pas. Tests sur les 235 choix de cases, parcours
-  P63 à 1 440 px, mesures du menu : voir la PR.
+  P63 à 1 440 px, mesures du menu : voir la PR. **En ligne, consignée par la
+  PR 4** : #223 fusionnée le 26 novembre à 5 h 08, déployée à 5 h 42, run
+  45753253944 vérifié job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S3, PR 2 sur 4 : la barre du bas, le
   « + » et le chemin de retour, codée le 25 novembre 2026** (D-331, F876 à
   F884 ; contrat, sections 3.3, 3.4, 4, 4.1 et 5.1), en Opus 5.5 · Très
