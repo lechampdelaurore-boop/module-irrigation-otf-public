@@ -1,6 +1,7 @@
 import { PAGE_FEATURE_IDS, featureLabel, isPageFeatureId, type FeatureId, type PageFeatureId } from './catalogue';
 import { firstEnabledFeature, type FeatureSelection } from './selection';
 import { usesSpeciesCorrespondence } from './socle';
+import { CUMULS_VIEW_VALUE, SERIES_WATER_ANCHOR, WEEK_VIEW_PARAM, isWeekPageFeature, weekPageExists, weekViewOfFeature, type WeekPageFeature, type WeekViewId } from './week-page';
 
 /**
  * Les pages et leurs adresses (docs/feature-selection-contract.md, section 5) :
@@ -11,22 +12,26 @@ import { usesSpeciesCorrespondence } from './socle';
 
 /**
  * Une case sans page (le calculateur) n'a pas d'adresse : elle vit dans la
- * page d'une autre. « Aujourd'hui », « Ma ferme » et « Réglages » sont des
- * pages sans case. « Ma ferme » est l'entrée de l'endroit du même nom
- * (simplification, lot S3, docs/simplification-s3-contract.md, section 5 ;
- * D-331) : ses fiches mènent aux pages de réglage de la ferme.
+ * page d'une autre. « Aujourd'hui », « Semaine », « Ma ferme » et
+ * « Réglages » sont des pages sans case. « Ma ferme » est l'entrée de
+ * l'endroit du même nom (simplification, lot S3, docs/simplification-s3-contract.md,
+ * section 5 ; D-331) : ses fiches mènent aux pages de réglage de la ferme.
+ * « Semaine » réunit le planning, les besoins et l'historique (lot S4,
+ * docs/simplification-s4-contract.md, section 3 ; précision S4-a) : ces
+ * trois identifiants restent ceux des cases et des anciennes adresses, qui
+ * mènent à « Semaine » (`weekRedirectHref`).
  */
-export type IrrigationPageId = 'aujourdhui' | PageFeatureId | 'ma-ferme' | 'reglages';
+export type IrrigationPageId = 'aujourdhui' | PageFeatureId | 'semaine' | 'ma-ferme' | 'reglages';
 
 const IRRIGATION_BASE_PATH = '/irrigation';
 export const WELCOME_PATH = `${IRRIGATION_BASE_PATH}/bienvenue`;
 
 export function isIrrigationPageId(value: unknown): value is IrrigationPageId {
-  return value === 'aujourdhui' || value === 'ma-ferme' || value === 'reglages' || isPageFeatureId(value);
+  return value === 'aujourdhui' || value === 'semaine' || value === 'ma-ferme' || value === 'reglages' || isPageFeatureId(value);
 }
 
 /** Toutes les pages du module, dans l'ordre du menu. */
-export const IRRIGATION_PAGE_IDS: readonly IrrigationPageId[] = ['aujourdhui', ...PAGE_FEATURE_IDS, 'ma-ferme', 'reglages'];
+export const IRRIGATION_PAGE_IDS: readonly IrrigationPageId[] = ['aujourdhui', ...PAGE_FEATURE_IDS, 'semaine', 'ma-ferme', 'reglages'];
 
 /**
  * La page « Aujourd'hui » (audit ergonomique, point 1, 3.8 quater lot 2,
@@ -72,6 +77,8 @@ export type PageQuery = {
   absent?: boolean | IrrigationPageId;
   /** L'onglet de « Matériel » (audit du 19 novembre 2026, lot J, n° 15, F461) ; le plan sans paramètre. */
   tab?: 'materiel' | 'groupes';
+  /** La vue de « Semaine » (lot S4, S4-b) : `cumuls` pour la seconde ; la première n'a pas de paramètre. */
+  view?: WeekViewId | null;
 };
 
 /** La ligne de la page d'arrivée quand la page demandée n'est pas cochée et qu'on ne sait pas laquelle (section 5, P14). */
@@ -95,8 +102,8 @@ export type AbsentPageNotice = {
  */
 export function absentPageNotice(value: string | string[] | undefined): AbsentPageNotice | null {
   if (typeof value !== 'string' || value.length === 0) return null;
-  if (value === 'aujourdhui') {
-    return { text: `La page « ${pageLabel('aujourdhui')} » n’a aucune de ses fonctionnalités cochées pour votre ferme.`, settingsLabel: 'Les cocher dans Réglages' };
+  if (value === 'aujourdhui' || value === 'semaine') {
+    return { text: `La page « ${pageLabel(value)} » n’a aucune de ses fonctionnalités cochées pour votre ferme.`, settingsLabel: 'Les cocher dans Réglages' };
   }
   if (isPageFeatureId(value)) return { text: `La page « ${pageLabel(value)} » n’est pas cochée pour votre ferme.`, settingsLabel: 'La cocher dans Réglages' };
   return { text: ABSENT_FEATURE_NOTICE, settingsLabel: 'La cocher dans Réglages' };
@@ -105,6 +112,7 @@ export function absentPageNotice(value: string | string[] | undefined): AbsentPa
 /** Le nom d'une page, au menu, en titre et dans l'onglet du navigateur. */
 export function pageLabel(page: IrrigationPageId): string {
   if (page === 'aujourdhui') return 'Aujourd’hui';
+  if (page === 'semaine') return 'Semaine';
   if (page === 'ma-ferme') return 'Ma ferme';
   return page === 'reglages' ? 'Réglages' : featureLabel(page);
 }
@@ -170,6 +178,7 @@ export function pageHref(page: IrrigationPageId, query: PageQuery = {}, hash?: s
   if (query.refresh) params.set('refresh', '1');
   if (query.absent) params.set('absente', query.absent === true ? '1' : query.absent);
   if (query.tab) params.set('onglet', query.tab);
+  if (query.view === 'cumuls') params.set(WEEK_VIEW_PARAM, CUMULS_VIEW_VALUE);
   const search = params.toString();
   return `${pagePath(page)}${search ? `?${search}` : ''}${hash ? `#${hash.replace(/^#/, '')}` : ''}`;
 }
@@ -190,10 +199,12 @@ export type PageAccess =
 /**
  * La ferme a-t-elle cette page ? « Réglages » et « Ma ferme » toujours (elles
  * n'ont pas de case), « Aujourd'hui » quand l'une de ses huit cases est
- * cochée (F1), toute autre page quand sa case l'est.
+ * cochée (F1), « Semaine » quand l'une de ses trois l'est (lot S4,
+ * section 3.1), toute autre page quand sa case l'est.
  */
 export function pageEnabled(page: IrrigationPageId, selection: FeatureSelection): boolean {
   if (page === 'reglages' || page === 'ma-ferme') return true;
+  if (page === 'semaine') return weekPageExists(selection);
   return page === 'aujourdhui' ? hasTodayPage(selection) : selection.includes(page);
 }
 
@@ -211,35 +222,74 @@ export function pageAccess(page: IrrigationPageId, firstVisit: boolean, selectio
 
 /**
  * Les pages du menu, dans l'ordre de la liste : « Aujourd'hui » en tête quand
- * elle existe, les cases cochées, puis « Ma ferme » et Réglages. La barre du
- * bas et le menu de l'ordinateur les rangent en trois endroits (lot S3,
- * PR 2 et 3 : `phoneBar`, `menuPlaces`) ; la liste dit seulement lesquelles
- * existent.
+ * elle existe, les cases cochées, « Semaine » quand elle existe (lot S4),
+ * puis « Ma ferme » et Réglages. La barre du bas et le menu de l'ordinateur
+ * les rangent en trois endroits (lot S3, PR 2 et 3 : `phoneBar`,
+ * `menuPlaces`) ; la liste dit seulement lesquelles existent. Les cases du
+ * planning, des besoins et de l'historique y restent : elles disent ce que
+ * « Semaine » contient, et ce que les gestes du « + » et la visite trouvent.
  */
 export function menuPages(selection: FeatureSelection): IrrigationPageId[] {
   const today: IrrigationPageId[] = hasTodayPage(selection) ? ['aujourdhui'] : [];
-  return [...today, ...PAGE_FEATURE_IDS.filter((id) => selection.includes(id)), 'ma-ferme', 'reglages'];
+  const week: IrrigationPageId[] = weekPageExists(selection) ? ['semaine'] : [];
+  return [...today, ...PAGE_FEATURE_IDS.filter((id) => selection.includes(id)), ...week, 'ma-ferme', 'reglages'];
+}
+
+/**
+ * La page qui montre ce que porte une page de la liste : elle-même, sauf le
+ * planning, les besoins et l'historique, que montre « Semaine » depuis le
+ * lot S4 (section 3.3). La visite guidée y joue leurs étapes.
+ */
+export function displayedPage(page: IrrigationPageId): IrrigationPageId {
+  return isWeekPageFeature(page) ? 'semaine' : page;
+}
+
+/**
+ * Où mène l'adresse d'une des trois anciennes pages de la semaine (lot S4,
+ * section 3.3, précision S4-o) : à « Semaine », sur la vue qui porte son
+ * contenu (l'historique, « Les cumuls »), avec tous les paramètres de
+ * l'adresse (saison, semaine, parcelle, « Actualiser », l'intention d'un
+ * lien comme `recalculer`). L'ancre, qui ne parvient jamais au serveur, est
+ * gardée par le navigateur à travers la redirection. Ces adresses ne sont
+ * jamais retirées : les notifications déjà envoyées les portent.
+ */
+export function weekRedirectHref(feature: WeekPageFeature, params: Readonly<Record<string, string | string[] | undefined>>): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (key === WEEK_VIEW_PARAM) continue;
+    for (const item of typeof value === 'string' ? [value] : value ?? []) search.append(key, item);
+  }
+  if (weekViewOfFeature(feature) === 'cumuls') search.set(WEEK_VIEW_PARAM, CUMULS_VIEW_VALUE);
+  const query = search.toString();
+  return `${pagePath('semaine')}${query ? `?${query}` : ''}`;
 }
 
 /**
  * Les anciennes adresses (précision P14). Avant la 3.8, tout tenait sur
  * `/irrigation` et les notifications désignaient un bloc par son ancre ;
- * l'ancre dit désormais quelle page porte ce bloc, par ordre de préférence.
+ * l'ancre dit désormais quelle page porte ce bloc, par ordre de préférence :
+ * la case qui porte le bloc, et la page où il vit. Depuis le lot S4
+ * (section 9), les blocs du planning, des besoins et de l'historique vivent
+ * sur « Semaine », l'historique dans la vue « Les cumuls ».
  */
-const LEGACY_ANCHOR_PAGES: readonly { matches: (anchor: string) => boolean; pages: readonly PageFeatureId[] }[] = [
+type LegacyTarget = { feature: PageFeatureId; page: IrrigationPageId; view?: WeekViewId };
+
+const LEGACY_ANCHOR_PAGES: readonly { matches: (anchor: string) => boolean; targets: readonly LegacyTarget[] }[] = [
   // Les alertes météo ouvraient le tableau des jours de la semaine, sur la
   // page des besoins ; sans elle, la page des alertes garde leur historique.
-  { matches: (anchor) => anchor === 'weather', pages: ['besoins', 'alertes-meteo'] },
+  { matches: (anchor) => anchor === 'weather', targets: [{ feature: 'besoins', page: 'semaine' }, { feature: 'alertes-meteo', page: 'alertes-meteo' }] },
   // La fin d'un arrosage ouvrait sa carte.
-  { matches: (anchor) => anchor.startsWith('irrigation-'), pages: ['arrosages'] },
+  { matches: (anchor) => anchor.startsWith('irrigation-'), targets: [{ feature: 'arrosages', page: 'arrosages' }] },
   // L'arrêt d'arrosage avant récolte ouvrait le suivi par série.
-  { matches: (anchor) => anchor === 'series-water-title', pages: ['historique', 'alertes-cultures'] },
+  { matches: (anchor) => anchor === SERIES_WATER_ANCHOR, targets: [{ feature: 'historique', page: 'semaine', view: 'cumuls' }, { feature: 'alertes-cultures', page: 'alertes-cultures' }] },
   // La notification du matin et les aspersions à reconsidérer ouvraient le planning.
-  { matches: (anchor) => anchor === 'planning' || anchor === 'planning-title', pages: ['planning', 'alertes-cultures'] },
+  { matches: (anchor) => anchor === 'planning' || anchor === 'planning-title', targets: [{ feature: 'planning', page: 'semaine' }, { feature: 'alertes-cultures', page: 'alertes-cultures' }] },
 ];
 
 export type LegacyRedirect = {
   page: IrrigationPageId;
+  /** La vue de « Semaine » qui porte le bloc, quand c'est « Les cumuls ». */
+  view?: WeekViewId;
   /** Vrai quand l'ancre désignait une fonctionnalité que la ferme n'a pas cochée. */
   notEnabled: boolean;
 };
@@ -251,8 +301,9 @@ export function legacyRedirect(hash: string, selection: FeatureSelection): Legac
   if (!anchor) return { page: first, notEnabled: false };
   const rule = LEGACY_ANCHOR_PAGES.find((item) => item.matches(anchor));
   if (!rule) return { page: first, notEnabled: false };
-  const page = rule.pages.find((id) => selection.includes(id));
-  return page ? { page, notEnabled: false } : { page: first, notEnabled: true };
+  const target = rule.targets.find((item) => selection.includes(item.feature));
+  if (!target) return { page: first, notEnabled: true };
+  return target.view ? { page: target.page, view: target.view, notEnabled: false } : { page: target.page, notEnabled: false };
 }
 
 /**

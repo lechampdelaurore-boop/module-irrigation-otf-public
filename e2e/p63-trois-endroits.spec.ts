@@ -11,9 +11,12 @@ import {
   ouvrirLeMenuDesPages,
   ouvrirParClic,
   surveillerLaConsole,
+  pageAffichee,
   TITRES_DES_PAGES,
+  titreDeLaPage,
   verifierCibleTactile,
   verifierLEtape,
+  type PageDuMenu,
   type PageDuModule,
 } from './support/parcours.ts';
 
@@ -42,8 +45,9 @@ import {
  * - au téléphone, sur chacune des treize pages ouverte par son adresse : la
  *   barre porte « Aujourd'hui », « Semaine », le « + » et « Ma ferme »,
  *   l'endroit de la page marqué (`page` sur la page où il mène, `true`
- *   ailleurs dans l'endroit) ; la bande « La semaine » sur ses trois pages,
- *   la page ouverte marquée, la saison gardée, 44 px ; le retour « ‹ Ma
+ *   ailleurs dans l'endroit) ; depuis le lot S4, le sélecteur des deux vues
+ *   de « Semaine », à toute largeur, à la place de la bande « La semaine »,
+ *   la vue ouverte marquée, la saison gardée, 44 px ; le retour « ‹ Ma
  *   ferme » sur les pages de « Ma ferme », 44 px ; à 320 px, rien ne déborde
  *   et aucun nom n'est coupé ; la page introuvable garde sa barre. À
  *   l'ordinateur, rien de cela : le menu de gauche marque la page ;
@@ -61,8 +65,8 @@ import {
  * PR 3, le menu de l'ordinateur (section 6), à 1 440 px :
  * - sur chacune des treize pages, les trois endroits dépliés, la page
  *   marquée `page` une seule fois, le titre de son endroit `page` quand il
- *   est la page, `true` sinon ; le titre « Semaine » mène à sa première
- *   page ; « Ma ferme » est le titre de son endroit, ses fiches dessous dans
+ *   est la page, `true` sinon ; le titre « Semaine » mène à sa page,
+ *   ses deux vues dessous (lot S4, S4-m) ; « Ma ferme » est le titre de son endroit, ses fiches dessous dans
  *   le même ordre, Réglages comprise ; la page introuvable garde son menu,
  *   sans marque, le « + » compris ;
  * - le « + Arroser ou noter » en tête du menu ouvre la même feuille, en boîte
@@ -211,31 +215,61 @@ test('une ferme neuve : « À faire » sur la fiche de l’étape à finir ; une
   await verifierLEtape(page, journal, '« À faire » sur la fiche « Réglages »');
 });
 
-/** Une tournée de toutes les pages, aux sauts les plus longs du rangement : d'un endroit à une page qui n'est pas son entrée. */
-const TOURNEE: readonly PageDuModule[] = ['historique', 'materiel', 'besoins', 'arrosages', 'alertes-cultures', 'planning', 'sol', 'aujourdhui', 'ressources', 'ma-ferme', 'cultures', 'alertes-meteo', 'reglages'];
+/**
+ * Une tournée de toutes les pages, aux sauts les plus longs du rangement : d'un endroit à une page qui n'est pas son entrée.
+ * Depuis le lot S4, « Semaine » est une page ; l'historique, sa vue « Les cumuls » (par son ancienne adresse).
+ */
+const TOURNEE: readonly PageDuModule[] = ['historique', 'materiel', 'semaine', 'arrosages', 'alertes-cultures', 'sol', 'aujourdhui', 'ressources', 'ma-ferme', 'cultures', 'alertes-meteo', 'reglages'];
 
-/** Le lien d'une page dans le menu de l'ordinateur : « Aujourd'hui » peut porter le nombre de sa pastille. */
-function lienDuMenu(page: Page, cible: PageDuModule) {
-  return page.getByRole('navigation', { name: 'Pages du module' }).getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[cible]}(,|$)`) });
+/** Chaque page du menu par son adresse, et la vue « Les cumuls » par l'ancienne adresse de l'historique. */
+const PAGES_ET_VUES: readonly PageDuModule[] = [...Object.keys(TITRES_DES_PAGES) as PageDuMenu[], 'historique'];
+
+/** Le nom de la vue de « Semaine » qu'ouvre une page : « Les cumuls » pour l'historique, « La semaine » sinon. */
+function vueDeLaSemaine(cible: PageDuModule): 'La semaine' | 'Les cumuls' {
+  return cible === 'historique' ? 'Les cumuls' : 'La semaine';
 }
 
-test('la barre du bas : trois endroits et le « + » ; chaque page par son adresse marque son endroit, la bande et le retour où il faut', async ({ page }, testInfo) => {
+/** Le lien d'une page dans le menu de l'ordinateur : « Aujourd'hui » peut porter le nombre de sa pastille ; « Semaine », sa vue (S4-m). */
+function lienDuMenu(page: Page, cible: PageDuModule) {
+  const menu = page.getByRole('navigation', { name: 'Pages du module' });
+  if (pageAffichee(cible) === 'semaine') return menu.getByRole('link', { name: vueDeLaSemaine(cible), exact: true });
+  return menu.getByRole('link', { name: new RegExp(`^${TITRES_DES_PAGES[pageAffichee(cible)]}(,|$)`) });
+}
+
+test('la barre du bas : trois endroits et le « + » ; chaque page par son adresse marque son endroit, le sélecteur de vue et le retour où il faut', async ({ page }, testInfo) => {
   test.setTimeout(240_000);
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   if (!telephone) await page.setViewportSize({ width: LARGEUR_ORDINATEUR_PX, height: HAUTEUR_ORDINATEUR_PX });
   const barre = page.getByRole('navigation', { name: 'Pages principales' });
   const menuDeLOrdinateur = page.getByRole('navigation', { name: 'Pages du module' });
-  const bande = page.getByRole('navigation', { name: 'La semaine' });
+  // La bande de S3 n'est plus ; le sélecteur des deux vues de « Semaine » prend sa ligne, aux deux largeurs (lot S4, section 3.2).
+  await attendreLaPageIrrigation(page, 'semaine');
+  await expect(page.getByRole('navigation', { name: 'La semaine', exact: true })).toHaveCount(0);
+  const selecteur = page.getByRole('navigation', { name: 'Vues de la semaine' });
   const retour = page.getByRole('link', { name: 'Retour à Ma ferme' });
 
-  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+  for (const cible of PAGES_ET_VUES) {
     await attendreLaPageIrrigation(page, cible);
+    const affichee = pageAffichee(cible);
+    const endroit = placeOfPage(affichee);
+    const saison = new URL(page.url()).searchParams.get('season');
+    // Le sélecteur de vue sur « Semaine » seulement, à toute largeur : la vue ouverte marquée, la saison gardée, 44 px.
+    if (affichee === 'semaine') {
+      await expect(selecteur.getByRole('link')).toHaveText(['La semaine', 'Les cumuls']);
+      await expect(selecteur.getByRole('link', { name: vueDeLaSemaine(cible), exact: true })).toHaveAttribute('aria-current', 'page');
+      await expect(selecteur.locator('[aria-current]')).toHaveCount(1);
+      for (const lien of await selecteur.getByRole('link').all()) {
+        await verifierCibleTactile(lien, `La vue « ${await lien.innerText()} » du sélecteur`);
+        if (saison) expect(new URL((await lien.getAttribute('href'))!, 'http://x').searchParams.get('season')).toBe(saison);
+      }
+    } else {
+      await expect(selecteur).toHaveCount(0);
+    }
     if (!telephone) {
-      // À l'ordinateur (PR 3, section 6) : ni barre, ni bande, ni retour ; le menu de gauche montre les trois endroits
+      // À l'ordinateur (PR 3, section 6) : ni barre, ni retour ; le menu de gauche montre les trois endroits
       // dépliés, la page marquée `page` une fois, le titre de son endroit `true` quand la liste la porte.
       await expect(barre).toBeHidden();
-      await expect(bande).toBeHidden();
       await expect(retour).toBeHidden();
       await expect(lienDuMenu(page, cible)).toHaveAttribute('aria-current', 'page');
       await expect(menuDeLOrdinateur.locator('[aria-current="page"]')).toHaveCount(1);
@@ -243,61 +277,51 @@ test('la barre du bas : trois endroits et le « + » ; chaque page par son adres
       for (const autre of PLACE_IDS) {
         const titre = menuDeLOrdinateur.locator(`li[data-place="${autre}"] > a`);
         const marque = await titre.getAttribute('aria-current');
-        if (autre !== placeOfPage(cible)) expect(marque, `le titre « ${autre} » sur « ${TITRES_DES_PAGES[cible]} »`).toBeNull();
-        else expect(marque, `le titre « ${autre} » sur « ${TITRES_DES_PAGES[cible]} »`).toBe(autre === cible ? 'page' : 'true');
+        if (autre !== endroit) expect(marque, `le titre « ${autre} » sur « ${cible} »`).toBeNull();
+        // « Semaine » : ses vues la redisent, la vue ouverte porte `page` et le titre `true` (S4-m).
+        else expect(marque, `le titre « ${autre} » sur « ${cible} »`).toBe(autre === cible && autre !== 'semaine' ? 'page' : 'true');
       }
-      // La semaine : le titre mène à sa première page, ses pages gardent la saison.
+      // La semaine : le titre mène à sa page (lot S4), ses vues dessous, la saison gardée.
       const titreDeLaSemaine = menuDeLOrdinateur.locator('li[data-place="semaine"] > a');
-      expect(new URL((await titreDeLaSemaine.getAttribute('href'))!, 'http://x').pathname).toBe('/irrigation/planning');
-      await verifierLEtape(page, journal, `« ${TITRES_DES_PAGES[cible]} » à l’ordinateur`);
+      expect(new URL((await titreDeLaSemaine.getAttribute('href'))!, 'http://x').pathname).toBe('/irrigation/semaine');
+      await expect(menuDeLOrdinateur.locator('li[data-place="semaine"] li a')).toHaveText(['La semaine', 'Les cumuls']);
+      await verifierLEtape(page, journal, `« ${cible} » à l’ordinateur`);
       continue;
     }
-    const saison = new URL(page.url()).searchParams.get('season');
     await expect(barre.locator('li')).toHaveCount(4);
     await expect(barre.getByRole('link')).toHaveText([/^Aujourd’hui\d*$/, 'Semaine', 'Ma ferme']);
     await expect(barre.locator('li').nth(2).getByRole('button', { name: 'Arroser ou noter' })).toBeVisible();
     // L'endroit de la page : `page` sur la page où il mène, `true` ailleurs dans l'endroit ; les autres sans marque.
-    const endroit = placeOfPage(cible);
     for (const autre of PLACE_IDS) {
       const lien = barre.locator(`li[data-place="${autre}"]`).getByRole('link');
       if (autre !== endroit) {
-        expect(await lien.getAttribute('aria-current'), `« ${autre} » sur « ${TITRES_DES_PAGES[cible]} »`).toBeNull();
+        expect(await lien.getAttribute('aria-current'), `« ${autre} » sur « ${cible} »`).toBeNull();
         continue;
       }
-      const entree = new URL((await lien.getAttribute('href'))!, 'http://x').pathname === `/irrigation/${cible}`;
+      const entree = new URL((await lien.getAttribute('href'))!, 'http://x').pathname === `/irrigation/${affichee}`;
       await expect(lien).toHaveAttribute('aria-current', entree ? 'page' : 'true');
     }
-    // La bande sur les trois pages de « Semaine », la saison gardée ; le retour sur les pages de « Ma ferme », hors elle-même.
-    if (endroit === 'semaine') {
-      await expect(bande.getByRole('link')).toHaveText(['Planning', 'Besoins', 'Historique']);
-      await expect(bande.getByRole('link', { name: TITRES_DES_PAGES[cible], exact: true })).toHaveAttribute('aria-current', 'page');
-      for (const lien of await bande.getByRole('link').all()) {
-        await verifierCibleTactile(lien, `L’onglet « ${await lien.innerText()} » de la bande`);
-        if (saison) expect(new URL((await lien.getAttribute('href'))!, 'http://x').searchParams.get('season')).toBe(saison);
-      }
-    } else {
-      await expect(bande).toHaveCount(0);
-    }
+    // Le retour sur les pages de « Ma ferme », hors elle-même.
     if (endroit === 'ma-ferme' && cible !== 'ma-ferme') {
       await verifierCibleTactile(retour, 'Le retour « ‹ Ma ferme »');
       if (saison) expect(new URL((await retour.getAttribute('href'))!, 'http://x').searchParams.get('season')).toBe(saison);
     } else {
       await expect(retour).toHaveCount(0);
     }
-    for (const entree of await barre.locator(':is(a, button)').all()) await verifierCibleTactile(entree, `Une entrée de la barre sur « ${TITRES_DES_PAGES[cible]} »`);
-    await verifierLEtape(page, journal, `« ${TITRES_DES_PAGES[cible]} » au téléphone`);
+    for (const entree of await barre.locator(':is(a, button)').all()) await verifierCibleTactile(entree, `Une entrée de la barre sur « ${cible} »`);
+    await verifierLEtape(page, journal, `« ${cible} » au téléphone`);
   }
 
   if (telephone) {
-    // À 320 px : rien ne déborde, aucun nom de la barre ou de la bande n'est coupé.
+    // À 320 px : rien ne déborde, aucun nom de la barre ou du sélecteur de vue n'est coupé.
     await page.setViewportSize({ width: 320, height: 640 });
     for (const cible of ['besoins', 'reglages'] as const) {
       await attendreLaPageIrrigation(page, cible);
-      const coupes = await page.locator('.week-band a, .phone-bar a > span').evaluateAll((noms) => noms
+      const coupes = await page.locator('.week-views a, .phone-bar a > span').evaluateAll((noms) => noms
         .filter((nom) => nom.scrollWidth > nom.clientWidth + 1)
         .map((nom) => nom.textContent));
       expect(coupes, `noms coupés à 320 px sur ${cible}`).toEqual([]);
-      await verifierLEtape(page, journal, `« ${TITRES_DES_PAGES[cible]} » à 320 px`);
+      await verifierLEtape(page, journal, `« ${titreDeLaPage(cible)} » à 320 px`);
     }
   }
 
@@ -324,10 +348,10 @@ test('chaque page à deux touches au plus de la précédente, sans recharger le 
   for (const cible of TOURNEE) {
     const touches = await allerALaPage(page, cible);
     releve.push(`${cible} ${touches}`);
-    expect(touches, `« ${TITRES_DES_PAGES[cible]} » à ${touches} touches`).toBeLessThanOrEqual(telephone ? 2 : 1);
-    expect(await laMarque(page), `« ${TITRES_DES_PAGES[cible]} » sans recharger le module`).toBe('posée');
+    expect(touches, `« ${cible} » à ${touches} touches`).toBeLessThanOrEqual(telephone ? 2 : 1);
+    expect(await laMarque(page), `« ${cible} » sans recharger le module`).toBe('posée');
     await expect(page.locator('#contenu')).toBeFocused();
-    await verifierLEtape(page, journal, `« ${TITRES_DES_PAGES[cible]} » par son chemin`);
+    await verifierLEtape(page, journal, `« ${cible} » par son chemin`);
   }
   testInfo.annotations.push({ type: 'touches de la tournée', description: releve.join(' ; ') });
 });

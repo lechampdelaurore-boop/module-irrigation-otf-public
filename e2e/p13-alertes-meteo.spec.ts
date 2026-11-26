@@ -123,7 +123,8 @@ test('une alerte météo se règle, refuse un seuil non numérique, s’enregist
 
   // Une notification reçue avant la 3.8 garde son adresse : elle conduit à la page qui porte le tableau des jours, avec la même semaine (P14, P21).
   await page.goto(`/irrigation?season=${saison}&week=${semaine}#weather`);
-  await expect(page).toHaveURL(new RegExp(`/irrigation/besoins\\?season=${saison}&week=${semaine}#weather$`));
+  // Depuis le lot S4, les besoins sont sur la page « Semaine » (lot S4, PR 1, F917).
+  await expect(page).toHaveURL(new RegExp(`/irrigation/semaine\\?season=${saison}&week=${semaine}#weather$`));
   await expect(page.locator('#weather')).toBeInViewport({ timeout: 15_000 });
   await expect(page.locator('#weather thead')).toContainText('Températures prévues');
   await verifierLEtape(page, journal, 'ancienne adresse de la semaine conduite');

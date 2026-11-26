@@ -2,15 +2,58 @@
  * Les trois endroits (simplification, lot S3, PR 2 et 3,
  * docs/simplification-s3-contract.md, sections 3.3, 3.4, 4, 4.1, 5.1 et 6 ;
  * D-331) : le « + » de la barre du bas et sa feuille « Que voulez-vous
- * faire ? », en boîte de dialogue à l'ordinateur, la bande « La semaine », le
- * retour « ‹ Ma ferme » et le lien « Tous les arrosages ». Couleurs de la
- * charte ; cibles de 44 px, 72 px pour les gestes de la feuille.
+ * faire ? », en boîte de dialogue à l'ordinateur, le retour « ‹ Ma ferme »
+ * et le lien « Tous les arrosages » ; le sélecteur des deux vues de
+ * « Semaine », qui remplace la bande « La semaine » (lot S4,
+ * docs/simplification-s4-contract.md, section 3.2). Couleurs de la charte ;
+ * cibles de 44 px, 72 px pour les gestes de la feuille.
  */
 
-/* La bande et le retour n'existent que sous la barre du bas, jusqu'à 980 px : à l'ordinateur, le menu de gauche montre toutes les pages. */
-.week-band,
+/* Le retour n'existe que sous la barre du bas, jusqu'à 980 px : à l'ordinateur, le menu de gauche montre toutes les pages. */
 .page-back {
   display: none;
+}
+
+/* Les deux vues de « Semaine » sous le titre, sur sa propre ligne, au téléphone comme à l'ordinateur : 44 px, la vue ouverte marquée (S4, section 3.2). */
+.week-views {
+  flex: 1 1 100%;
+  align-self: stretch;
+  width: 100%;
+}
+
+.week-views ul {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.week-views li {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 220px;
+}
+
+.week-views a {
+  display: flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink2);
+  font: 500 var(--text-14)/1.2 var(--font-ui);
+  text-decoration: none;
+}
+
+.week-views a[aria-current="page"] {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+  font-weight: 700;
 }
 
 /* « Tous les arrosages », en pied de « Votre journée », sur une ligne de 44 px (section 3.4). */
@@ -101,7 +144,7 @@
 
 .plus-gesture:focus-visible,
 .page-back:focus-visible,
-.week-band a:focus-visible {
+.week-views a:focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -207,7 +250,7 @@
 
 @media (hover: hover) {
   .today-all-irrigations a:hover,
-  .week-band a:hover {
+  .week-views a:hover {
     text-decoration: underline;
   }
 
@@ -254,46 +297,6 @@
   .phone-bar button.phone-bar-plus:focus-visible .phone-bar-plus-badge {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
-  }
-
-  /* La bande « La semaine » sous le titre : un lien par page cochée, 44 px, la page ouverte marquée (section 3.3). */
-  .week-band {
-    display: block;
-    margin-top: 8px;
-  }
-
-  .week-band ul {
-    display: flex;
-    gap: 6px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .week-band li {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .week-band a {
-    display: flex;
-    min-height: var(--touch-target);
-    align-items: center;
-    justify-content: center;
-    padding: 0 8px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--card);
-    color: var(--ink2);
-    font: 500 var(--text-14)/1.2 var(--font-ui);
-    text-decoration: none;
-  }
-
-  .week-band a[aria-current="page"] {
-    border-color: var(--green);
-    background: var(--green);
-    color: #fff;
-    font-weight: 700;
   }
 
   /*
