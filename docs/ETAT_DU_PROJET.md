@@ -70,8 +70,10 @@ registres, elle y renvoie.
   de la section 9.1 réécrits. « 1. Où ? » à 298 px au téléphone (603 px
   avant S5). **Budget avec une irrigation en cours non tenu** (800 px au
   lieu de 700, F910 ; la carte en cours raccourcie au téléphone, F909) :
-  dette dite. Contrôles : voir la PR. Viennent les fusions de S5 (après
-  S3), puis S4.
+  dette dite. Contrôles : voir la PR. **En ligne** : #230 fusionnée le
+  26 novembre 2026 à 10 h 55 (648cbc1), déployée à 11 h 38, run
+  45796472386, les cinq jobs verts (consigné par S4, PR 1) : **S5 est en
+  ligne en entier** (#227 à 8 h 10, #228 à 9 h 31, #230 à 11 h 38).
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
@@ -113,7 +115,15 @@ registres, elle y renvoie.
   parcours suivent. Aucun écran ne change. **Le code de S3 est fini.**
   **En ligne** : #225 fusionnée le 26 novembre 2026 à 6 h 22 (3076d0f),
   déployée à 6 h 58, run 45761209624, les cinq jobs verts (consigné par
-  S5, PR 1) : **S3 est en ligne en entier.**
+  S5, PR 1) : **S3 est en ligne en entier.** **Recette faite et conforme
+  le 26 novembre 2026 vers 11 h 15**, avec l'accord du porteur (« Vas-y,
+  fais la recette », 11 h 12), sur la démonstration dans son Chrome, en
+  lecture seule, à l'ordinateur et au téléphone (390 px) : menu en trois
+  endroits, « + » et sa feuille, « Ma ferme » et ses sept fiches, retour
+  « ‹ », visites « Bienvenue » et « Le module à la carte », « ? »
+  d'« Aujourd'hui » ; aucune erreur dans la console
+  (`/mnt/project-files/simplification-s3/recette-s3-2026-11-26.md` ;
+  consigné par S4, PR 1).
 - **Simplifier l'usage du module, S3, PR 3 sur 4 : le menu de
   l'ordinateur, codée le 25 novembre 2026** (D-331, F885 à F889 ; contrat,
   section 6), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Au-delà
