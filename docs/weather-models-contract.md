@@ -1,4 +1,4 @@
-# Contrat de la météo multi-modèles (choix du modèle de prévision par ferme) : v0.1 (D-338)
+# Contrat de la météo multi-modèles (choix du modèle de prévision par ferme) : v0.1 (D-339)
 
 Écrit le 26 novembre 2026 **sans code** (Sonnet 5.5 · Moyen), sur le choix du porteur d'avancer la météo multi-modèles (message du 26 novembre 2026, 10 h 25). Il reprend la recherche du 8 novembre 2026 (`/mnt/project-files/meteo-modeles/synthese-choix-modeles-meteo.md`) **après relecture du dépôt** : là où la recherche et le code diffèrent, c'est le code qui fait foi (§ 2). Sources lues : `docs/weather-contract.md`, `db/schema.ts` (`irrigation_weather_daily_values`, `irrigation_weather_preferences`, `irrigation_weather_forecast_archive`), `lib/services/weather/configured-provider.ts`, `lib/domain/weather/weather-provider.ts`, `lib/adapters/weather/open-meteo-provider.ts`, `app/irrigation/water-actions.ts`, AGENTS.md (règles métier invariantes).
 

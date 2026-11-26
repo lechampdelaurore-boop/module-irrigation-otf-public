@@ -7,8 +7,8 @@ source détaillée commit par commit.
 
 ### Ajouté (météo multi-modèles, contrat)
 
-- **Contrat du choix du modèle de prévision par ferme** (D-338,
-  `docs/weather-models-contract.md` v0.1, roadmap 6 quindecies) : écrit
+- **Contrat du choix du modèle de prévision par ferme** (D-339,
+  `docs/weather-models-contract.md` v0.1, roadmap 6 sexdecies) : écrit
   sans code ; « Automatique » reste le défaut, un seul modèle Open-Meteo par
   ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
   avant le code. Rien ne change pour l'instant.

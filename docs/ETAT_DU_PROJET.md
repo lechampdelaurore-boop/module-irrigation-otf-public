@@ -13,8 +13,8 @@ Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
 - **Météo multi-modèles, contrat écrit le 26 novembre 2026, sans code**
-  (D-338, `docs/weather-models-contract.md` v0.1, roadmap section 6
-  quindecies, ligne 35), en Sonnet 5.5 · Moyen : un seul modèle de prévision
+  (D-339, `docs/weather-models-contract.md` v0.1, roadmap section 6
+  quindecies, ligne 36), en Sonnet 5.5 · Moyen : un seul modèle de prévision
   Open-Meteo par ferme, « Automatique » (la lecture actuelle) restant le
   défaut ; liste tenue dans le code ; la `source` des lignes dit le modèle.
   Le conteneur n'atteint pas Open-Meteo : essai A sur un lanceur GitHub

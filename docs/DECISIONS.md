@@ -11028,10 +11028,10 @@ Précisions prises en codant :
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
 
-## D-338 — Météo multi-modèles : le modèle de prévision se choisit par ferme
+## D-339 — Météo multi-modèles : le modèle de prévision se choisit par ferme
 
 Date : 26 novembre 2026. Statut : **contrat écrit, sans code** ;
-`docs/weather-models-contract.md` v0.1, roadmap section 6 quindecies, ligne 35.
+`docs/weather-models-contract.md` v0.1, roadmap section 6 sexdecies, ligne 36.
 Écrit en Sonnet 5.5 · Moyen ; code en Opus 5.5 · Élevé (PR 0, 1 et 3) et
 Opus 5.5 · Max (PR 2), le réglage de la roadmap. Aucune question agronomique
 dans cette version.
