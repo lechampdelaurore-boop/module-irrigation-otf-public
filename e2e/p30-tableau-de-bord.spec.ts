@@ -216,7 +216,8 @@ test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pas
 
   // « Objectif de la semaine » ouvre le volet des objectifs, le champ dans l'écran.
   await tuiles.filter({ hasText: 'Eau visée cette semaine' }).click();
-  await expect(page).toHaveURL(/\/irrigation\/besoins\?season=\d{4}#objectifs-de-la-semaine$/);
+  // L'ancienne adresse mène à la page « Semaine », l'ancre gardée (lot S4, PR 1, F917).
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?season=\d{4}#objectifs-de-la-semaine$/);
   await attendreLaPagePrete(page, 'besoins');
   await expect(page.locator('#objectifs-de-la-semaine')).toHaveAttribute('open', '');
   await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeInViewport();

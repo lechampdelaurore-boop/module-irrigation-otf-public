@@ -11136,6 +11136,9 @@ Précisions prises en codant :
   suivent dans la PR qui les change. Les visites V3 et V4 de la
   démonstration se jouent sur « Semaine » (la page affichée,
   `displayedPage`) : leurs étapes attendent `/irrigation/semaine`, et la
-  pause de V4 la vue « Les cumuls ». Oubli de la PR (la suite de la
-  démonstration n'y avait pas été jouée en entier), relevé en local sur la
-  pile complète.
+  pause de V4 la vue « Les cumuls ». De même, P12 (les actions de la page
+  des besoins, envoyées à `/irrigation/semaine`), P13, P30 et P52 (l'adresse
+  d'arrivée après la redirection) suivent dès cette PR, et P31c avec P13.
+  Oublis de la PR (ni la suite de la démonstration ni toute celle des
+  parcours n'y avaient été jouées ; ils ne l'ont été qu'en PR 2 à 4),
+  relevés sur la pile complète et par la CI de la PR.
