@@ -39,7 +39,9 @@ registres, elle y renvoie.
   Aucun calcul ni aucune écriture changés. Tests du domaine et des écrans,
   parcours P64 (trois touches sans clavier), P1 réécrit, P11, P24, P37,
   P38, P40, P63 suivent. Budget de hauteur du contrat mesuré, tenu par la
-  PR 3. Contrôles : voir la PR. Viennent les PR 2 et 3.
+  PR 3. Contrôles : voir la PR. **En ligne** : #227 fusionnée le
+  26 novembre 2026 à 7 h 28 (6427209), déployée à 8 h 10, run
+  45768484391, les cinq jobs verts (consigné par S5, PR 2).
 - **Simplifier l'usage du module, S3, PR 4 sur 4 : les liens et les
   visites, codée le 25 novembre 2026** (D-331, F890 à F893 ; contrat,
   sections 2 et 9), en Opus 5.5 · Très élevé, sur la branche de la PR 3.
