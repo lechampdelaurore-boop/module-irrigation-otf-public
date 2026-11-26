@@ -1245,10 +1245,11 @@ selon la règle de la section 10.
     de la PR 4 de S4, son contrat (#218) fusionné dans la branche ; elle
     se fusionne après la dernière PR de S4 et après son contrat (#218,
     fusionné le 26 novembre à 19 h 55, **en ligne à 20 h 42**, run
-    45879771173). Une seule migration, additive (0051). **Fusionnée le
-    26 novembre à 21 h 32** (#235). **S6, PR 2 sur 4 (la carte « Mise en
-    route ») codée le même jour** (D-336), sur la branche de la PR 1,
-    fusionnée après elle ; aucune migration. **S6, PR 3 sur 4 (les lignes
+    45879771173). Une seule migration, additive (0051). **En ligne le
+    26 novembre à 22 h 08** (#235, run 45891793153). **S6, PR 2 sur 4 (la
+    carte « Mise en route ») codée le même jour** (D-336), sur la branche
+    de la PR 1, fusionnée après elle ; aucune migration ; **fusionnée le
+    26 novembre à 22 h 10** (#236). **S6, PR 3 sur 4 (les lignes
     d'état des fiches de « Ma ferme ») codée le même jour** (D-336), sur
     la branche de la PR 2, fusionnée après elle ; aucune migration. **S6,
     PR 4 sur 4 (les visites, la ferme vierge, les contrats) codée le même
@@ -6349,7 +6350,9 @@ la PR 3 du lot S1 l'établit d'abord (contrat, section 5).
   P22, P23, P25, P28, P29, P30, P63, P66, V6 et V8 suivent ; P69 est
   nouveau. Les phrases de la visite sur l'écran viennent en PR 4.
   **Fusionnée le 26 novembre 2026 à 21 h 32** (#235, a51c4fb), après le
-  contrat (#218, **en ligne à 20 h 42**, run 45879771173).
+  contrat (#218, **en ligne à 20 h 42**, run 45879771173). **En ligne à
+  22 h 08** (run 45891793153, les cinq jobs verts, migration 0051
+  appliquée à la base du module et à celle de la démonstration).
 - **S6, PR 2 sur 4 codée le 26 novembre 2026** (D-336, F958 à F968 ;
   contrat, sections 5, 6, 8, 12 et 14), sur la branche de la PR 1 : la
   carte « Mise en route » en tête de « Ma ferme », les étapes qui existent
@@ -6365,7 +6368,9 @@ la PR 3 du lot S1 l'établit d'abord (contrat, section 5).
   carte. Une lecture par page, lancée avant le plan, seulement quand la
   carte existe ; l'étape 4 par `farmObjective`, l'étape 5 par
   `parcelsWithoutSoil` ; trois cents planches lancent autant de requêtes
-  que trois. Parcours P70 nouveau ; P29 et P63 suivent.
+  que trois. Parcours P70 nouveau ; P29 et P63 suivent. **Fusionnée le
+  26 novembre 2026 à 22 h 10** (#236, 57fddd7), après la mise en ligne
+  de la PR 1.
 - **S6, PR 3 sur 4 codée le 26 novembre 2026** (D-336, F969 à F975 ;
   contrat, sections 7, 14 et 15), sur la branche de la PR 2 : chaque fiche
   de « Ma ferme » dit son état en une ligne quand la donnée est connue, à
