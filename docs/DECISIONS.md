@@ -11069,9 +11069,9 @@ n'a pas été relevée. La démonstration a été remise à zéro ensuite
 
 ## D-335 — Simplifier l'usage du module, lot S4 : une page, deux vues
 
-Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 4 codées** (la PR 2
-le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
-(#231) ; contrat
+Date : 25 novembre 2026. Statut : **PR 1 à 3 sur 4 codées** (les PR 2
+et 3 le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
+(#231), **PR 2 à 17 h** (#232) ; contrat
 `docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
 sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le
