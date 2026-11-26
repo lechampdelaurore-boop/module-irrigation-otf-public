@@ -103,6 +103,16 @@ source détaillée commit par commit.
   migration additive (0051) garde la façon choisie ; les fermes qui
   utilisent déjà le module ne voient rien changer.
 
+### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
+
+- **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
+  première ouverture, trois façons de commencer à la place des onze cases ; une
+  carte « Mise en route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les
+  données de la ferme) ; les chiffres d'état des fiches de « Ma ferme ». Aucun
+  code, aucun calcul ni aucune fonction retirée ; une seule migration, additive,
+  prévue pour le code ; l'écran de bienvenue du contrat 3.8 est modifié, la 3.8
+  reste close.
+
 ### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
 
 - **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens
@@ -197,20 +207,6 @@ source détaillée commit par commit.
   montrera (liste, champ prérempli, fenêtre d'allumage), et un filtre « hors
   saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
   l'historique ne changent pas. Quatre PR de code à venir.
-
-### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
-
-- **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
-  page, `/irrigation/semaine`. Sa vue « La semaine » montre, dans l'ordre
-  d'avant et sans rien changer, le planning puis les objectifs et besoins ;
-  sa vue « Les cumuls » est l'historique. Sous le titre, deux liens passent
-  d'une vue à l'autre sans recharger ; ils remplacent la bande « La
-  semaine ». La barre du bas et le menu de l'ordinateur ouvrent la page ;
-  le menu nomme ses deux vues. Les adresses du planning, des besoins et de
-  l'historique mènent à la page, avec leurs réglages d'adresse et leur
-  ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
-  coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
-  règle d'enregistrement ne change.
 
 ### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
 
@@ -404,16 +400,6 @@ source détaillée commit par commit.
   les jours et les jardins au premier niveau, le reste derrière « Le détail ».
   Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
   adresses sont gardées.
-### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
-
-- **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
-  première ouverture, trois façons de commencer à la place des onze cases ; une
-  carte « Mise en route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les
-  données de la ferme) ; les chiffres d'état des fiches de « Ma ferme ». Aucun
-  code, aucun calcul ni aucune fonction retirée ; une seule migration, additive,
-  prévue pour le code ; l'écran de bienvenue du contrat 3.8 est modifié, la 3.8
-  reste close.
-
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,

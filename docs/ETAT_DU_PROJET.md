@@ -123,8 +123,12 @@ registres, elle y renvoie.
   changent (« Voir la semaine »). Treize contrats disent ce que S4 a changé.
   Aucun calcul ni aucune écriture changés. Tests ; P68 et les parcours de la
   démonstration V3, V4 suivent. Contrôles et mesures : voir la PR et la
-  section 13 du contrat. **Le code de S4 est fini** ; fusions des quatre PR
-  une à la fois, après celles de S3 et S5. Vient S6.
+  section 13 du contrat. **Le code de S4 est fini.** **En ligne** : #234
+  fusionnée le 26 novembre 2026 à 19 h 06 (ad1b0ce), déployée à 19 h 55,
+  run 45873232247, les cinq jobs verts (consigné par S6, PR 1) : **S4 est
+  en ligne en entier**. Le contrat de S6 (#218) est fusionné le même jour à
+  19 h 55 (5c2588f) ; sa mise en ligne est à consigner par S6, PR 2. Vient
+  S6.
 - **Simplifier l'usage du module, S4, PR 3 sur 4 : les gestes, codée le
   26 novembre 2026** (D-335, F933 à F939 ; contrat, sections 4.5, 4.6 et
   8), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Depuis « La
@@ -136,8 +140,10 @@ registres, elle y renvoie.
   contre 307 à 414 ms avant), « Exporter » la semaine affichée ; la météo
   indisponible se dit, jamais zéro. Aucun calcul ni aucune écriture
   changés. Tests ; parcours P68 nouveau. Contrôles et mesures : voir la PR
-  et la section 13 du contrat. Vient la PR 4 (les liens, la visite, les
-  contrats) ; fusions après celles de S3, S5 et des PR 1 et 2.
+  et la section 13 du contrat. **En ligne** : #233 fusionnée le 26 novembre
+  2026 à 17 h 43 (f3f8e2b), déployée à 18 h 31, run 45861429069, les cinq jobs
+  verts (consigné par S4, PR 4). Vient la PR 4 (les liens, la visite, les
+  contrats).
 - **Simplifier l'usage du module, S4, PR 2 sur 4 : le premier niveau,
   codée le 26 novembre 2026** (D-335, F923 à F932 ; contrat, sections 4 à
   7), en Opus 5.5 · Très élevé, sur la branche de la PR 1. « La semaine »
@@ -154,9 +160,12 @@ registres, elle y renvoie.
   Aucun calcul ni aucune écriture changés. Tests ; parcours P67 nouveau ;
   repris : P7, P10, P12, P13, P15, P26, P28, P30, P31, P32, P40,
   P41, P52, P56, P57, P61. Contrôles : voir la PR. **Essai des cinq tâches**
-  (diagnostic, section 6) conseillé avant la mise en ligne, au porteur.
-  Viennent les PR 3 (les gestes) et 4 ; fusions après celles de S3, S5 et
-  de la PR 1.
+  (diagnostic, section 6) conseillé au porteur ; jamais bloquant (S4-q).
+  **En ligne** : #232 fusionnée le 26 novembre 2026 à 16 h 13 (e671fcb),
+  déployée à 17 h, run 45846865573, les cinq jobs verts (consigné par S4,
+  PR 3). En chemin, V11 (démonstration) ouvre « Semaine » par l'ancre de
+  sa section (F932) et P40 suit la mesure de la CI (F931). Viennent les
+  PR 3 et 4, une à la fois.
 - **Simplifier l'usage du module, S4, PR 1 sur 4 : une page, deux vues,
   codée le 25 novembre 2026** (D-335, F916 à F922 ; contrat
   `docs/simplification-s4-contract.md`, sections 3, 7.4 et 9), en Opus 5.5 ·
@@ -171,9 +180,11 @@ registres, elle y renvoie.
   3 047 px (894 et 2 573 px avant), « Les cumuls » 1 874 px (1 920 px) : la
   PR 1 range, la PR 2 raccourcit. Aucun calcul ni aucune écriture
   changés. Tests, parcours P66 ; neuf parcours suivent. Contrôles : voir la
-  PR. Viennent la PR 2 (le premier niveau), les PR 3 et 4 ; fusions après
-  celles de S3 et S5.
-
+  PR. **En ligne** : #231 fusionnée le 26 novembre 2026 à 14 h 41
+  (112bbc4), déployée à 15 h 22, run 45831673115, les cinq jobs verts
+  (consigné par S4, PR 2). En chemin, V3, V4 (démonstration), P12, P13,
+  P30 et P52 suivent la redirection dès cette PR (F922). Viennent les PR 2
+  (le premier niveau), 3 et 4, une à la fois.
 - **Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs,
   codée le 26 novembre 2026** (D-352, F1061 à F1074 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4 à 8 et 10 ;
@@ -213,22 +224,6 @@ registres, elle y renvoie.
   restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
   filtre se lève à la main seulement, les arrosages planifiés sont proposés
   à l'annulation.
-- **Simplifier l'usage du module, S4, PR 1 sur 4 : une page, deux vues,
-  codée le 25 novembre 2026** (D-335, F916 à F922 ; contrat
-  `docs/simplification-s4-contract.md`, sections 3, 7.4 et 9), en Opus 5.5 ·
-  Très élevé, après la fin du code de S5, sur la branche de sa PR 3. La page
-  « Semaine » (`/irrigation/semaine`) réunit sans rien changer les blocs du
-  planning et des besoins (vue « La semaine ») et l'historique (vue « Les
-  cumuls », `?vue=cumuls`) ; le sélecteur des deux vues remplace la bande de
-  S3 ; la barre et le menu y mènent ; les trois anciennes adresses sont
-  redirigées par le serveur, paramètres et ancre gardés. Règle dans
-  `lib/domain/features/week-page.ts` ; relevé des onze ancres ; temps du
-  serveur 359 ms pour 394 permis (F918) ; à 390 px, « La semaine »
-  3 047 px (894 et 2 573 px avant), « Les cumuls » 1 874 px (1 920 px) : la
-  PR 1 range, la PR 2 raccourcit. Aucun calcul ni aucune écriture
-  changés. Tests, parcours P66 ; neuf parcours suivent. Contrôles : voir la
-  PR. Viennent la PR 2 (le premier niveau), les PR 3 et 4 ; fusions après
-  celles de S3 et S5.
 - **Simplifier l'usage du module, S5 : le budget de hauteur tenu avec un
   arrosage en cours, codé le 26 novembre 2026** (D-342, F996, F997 ;
   contrat, sections 7 et 13), en Opus 5.5 · Élevé, sur le choix du porteur
@@ -256,7 +251,19 @@ registres, elle y renvoie.
   dette dite, reprise par D-342. Contrôles : voir la PR. **En ligne** :
   #230 fusionnée le 26 novembre 2026 à 10 h 55 (648cbc1), déployée à
   11 h 38, run 45796472386, les cinq jobs verts (consigné par la PR du
-  budget, D-342) : **S5 est en ligne en entier.** Vient S4.
+  budget, D-342) : **S5 est en ligne en entier.** **Recette faite et
+  conforme le 26 novembre 2026 vers 11 h 45**, avec l'accord du porteur,
+  sur la démonstration dans son Chrome (ferme des Trois Noues, « Pic
+  d'été, l'eau manque », code de main 648cbc1) : « Arroser ou noter » dans
+  l'ordre du contrat, « Arroser maintenant » de bout en bout (case ronde,
+  « + », phrase du résultat, « Démarrer · fin vers … », la réponse sous le
+  bouton et le lien vers « Aujourd'hui »), au téléphone le retour
+  « ‹ Aujourd'hui » du « + », les onglets sur une ligne, la carte en cours
+  raccourcie, « Planifier » et « Déjà fait » ; « 1. Où ? » à 825 px avec un
+  arrosage en cours, au-delà des 700 px (F910, reprise par D-342) ; la
+  démonstration remise à zéro ensuite
+  (`/mnt/project-files/simplification-s5/recette-s5-2026-11-26.md` ;
+  consigné par S4, PR 2). Vient S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
@@ -448,6 +455,20 @@ registres, elle y renvoie.
   cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
   une action existante : aucune règle ne change. PR de contrat seule :
   **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S6 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s6-contract.md`, D-327, roadmap section 6 terdecies,
+  ligne 33), sans code, en Sonnet 5.5 · Moyen. « La mise en route guidée » :
+  trois façons de commencer à la première ouverture (choix n° 3 du porteur, qui
+  change l'écran de bienvenue du contrat 3.8, restée close), une carte « Mise en
+  route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les données, rien
+  confirmé à la place de la personne), les chiffres d'état des fiches de
+  « Ma ferme » laissés par S3 ; quatre PR, Opus 5.5 · Très élevé ; une seule
+  migration, additive (deux colonnes nullables). Écarts voulus avec la maquette
+  dits au porteur (rien enfoncé d'avance, nombre d'étapes selon le choix, noms
+  des pages inchangés, deux fiches d'alertes). Dépend de S3 et de S1 ; contrat
+  non fusionné avant #211, #215, #216 et #217. Aucun contrôle rejoué (PR de
+  registres seule).
+
 - **Simplifier l'usage du module, S5 : contrat écrit le 25 novembre 2026**
   (`docs/simplification-s5-contract.md`, D-327, roadmap section 6
   terdecies, ligne 33), sans code, en Sonnet 5.5 · Moyen. « Arroser en trois
