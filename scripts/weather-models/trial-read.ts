@@ -90,7 +90,7 @@ export function trialUrl(call: TrialCall, startDate: string, endDate: string): U
   return url;
 }
 
-export type SeriesReading = {
+type SeriesReading = {
   variable: string;
   /** Le nom de la série trouvée dans `daily`, ou `null` si aucune. */
   key: string | null;
@@ -102,9 +102,9 @@ export type SeriesReading = {
 };
 
 /** La pluie heure par heure d'un modèle : ses heures avec valeur, jour par jour. */
-export type HourlyRainReading = { key: string | null; hoursWithValueByDate: Record<string, number>; lastValueHour: string | null };
+type HourlyRainReading = { key: string | null; hoursWithValueByDate: Record<string, number>; lastValueHour: string | null };
 
-export type ModelReading = { model: string; series: SeriesReading[]; hourlyRain: HourlyRainReading | null };
+type ModelReading = { model: string; series: SeriesReading[]; hourlyRain: HourlyRainReading | null };
 
 export type ResponseReading = {
   dailyKeys: string[];

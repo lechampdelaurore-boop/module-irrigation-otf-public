@@ -5,6 +5,16 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (météo multi-modèles, PR 0 : l'essai A)
+
+- **Un essai des modèles de prévision, joué sur un lanceur GitHub**
+  (`docs/weather-models-contract.md` v0.2, § 14) : le flux « Essai des
+  modèles météo » interroge Open-Meteo sans clé ni secret et relève le nom
+  des séries, les valeurs rendues et la portée de chaque modèle. Joué le
+  26 novembre 2026 : Météo-France prévoit 4 jours, ICON 7, le Centre
+  européen, GFS et l'automatique d'Open-Meteo 15 jours. Rien ne change dans
+  le module.
+
 ### Ajouté (météo multi-modèles, contrat)
 
 - **Contrat du choix du modèle de prévision par ferme** (D-339,
