@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { TOURS } from '../lib/domain/demo/tours';
+import { TOURS, allStepWords } from '../lib/domain/demo/tours';
 import { PAGE_HELP } from '../lib/domain/features/help';
 import { PLACE_IDS, placeLabel } from '../lib/domain/features/places';
 
@@ -14,7 +14,7 @@ import { PLACE_IDS, placeLabel } from '../lib/domain/features/places';
  * gauche à l'ordinateur (docs/demo-guided-contract.md, section 7).
  */
 
-const TOUR_TEXTS = TOURS.flatMap((tour) => [tour.title, tour.summary, ...tour.steps.flatMap((step) => [step.title, step.text])]);
+const TOUR_TEXTS = TOURS.flatMap((tour) => [tour.title, tour.summary, ...tour.steps.flatMap(allStepWords).flatMap((words) => [words.title, words.text])]);
 const HELP_TEXTS = Object.values(PAGE_HELP).flatMap((help) => [help.purpose, help.reading, help.firstStep]);
 
 test('la visite « Bienvenue » présente, sur l’ancre du menu, les trois endroits et le « + »', () => {

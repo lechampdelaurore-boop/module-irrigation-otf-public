@@ -315,7 +315,11 @@ deux lots.
    l'en-cours en tête. « Tout est fait (n) » reste en tête de bloc. Les arrosages
    de demain à valider : la ligne de pied existante (« Demain à 6 h : 3
    arrosages à valider », « Voir au planning »). Rien à faire : l'état vide
-   existant et son lien (L3).
+   existant et son lien (L3). **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : pour une ferme qui n'est pas
+   encore prête (la mise en route a une étape en cours), l'état vide devient
+   le bloc de l'étape en cours (« Votre ferme n’est pas encore prête à
+   proposer des arrosages. », la phrase de l'étape, « Continuer l'étape n »,
+   F965) ; « Plus tard » sur « Ma ferme » rend l'état vide.
 4. **Le gel ou la chaleur annoncés** : seulement un jour **en alerte**, en carte,
    comme aujourd'hui ; « Prévision indisponible : à vérifier » en ambre ; le
    « gel annoncé sans alerte posée » (J14) avec son lien « Poser… ». Un jour

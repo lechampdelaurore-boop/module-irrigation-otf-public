@@ -384,6 +384,13 @@ répondait 404 sans qu'aucun parcours ne le voie).
   « Semaine » : la visite ouvre les plis de « Le détail » qui portent leur
   repère, et chaque étape vérifie que l'élément présenté est visible ; V4 va
   voir l'historique à `/irrigation/semaine?vue=cumuls`.
+  Depuis S6, PR 4 (D-336, F976 à F982), V6 attend sur la première ouverture
+  de la ferme vierge « Trois façons de commencer » puis « Rien n'est choisi
+  d'avance » (les mêmes étapes, leurs mots propres à la page), dans
+  Réglages « Cochez ce qui vous sert » et « Sans rien perdre » comme avant,
+  puis aucune façon enfoncée et « Continuer » inactif ; V8, après « Remettre
+  à zéro », le titre « Comment voulez-vous commencer ? », les trois façons,
+  aucune enfoncée, « Continuer » inactif.
 
 ## Interdits
 

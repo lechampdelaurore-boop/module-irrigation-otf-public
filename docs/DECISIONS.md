@@ -11446,10 +11446,11 @@ Précisions prises en codant :
 
 ## D-336 — Simplifier l'usage du module, lot S6 : la mise en route guidée
 
-Date : 26 novembre 2026. Statut : **PR 3 sur 4 codée** (PR 1 #235 et
-PR 2 #236 ouvertes) ; contrat `docs/simplification-s6-contract.md`
+Date : 26 novembre 2026. Statut : **les quatre PR codées, le code de S6
+est fini** (PR 1 #235, PR 2 #236 et PR 3 #237 ouvertes, la PR 4 avec
+cette entrée) ; contrat `docs/simplification-s6-contract.md`
 (sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
-PR 2 ; 7, 14 et 15 pour la PR 3), roadmap
+PR 2 ; 7, 14 et 15 pour la PR 3 ; 10, 11 et 15 pour la PR 4), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
 élevé, le réglage de la roadmap et du contrat (section 17), après la fin
 du code de S4, sur la branche de sa PR 4, le contrat (#218) fusionné dans
@@ -11851,3 +11852,87 @@ Précisions prises en codant (PR 3) :
   cette semaine » ; des volumes additionnés ; une deuxième lecture pour
   les fiches ; la page qui n'affiche pas les lignes ; une ligne inventée
   pour « Alertes cultures ».
+
+**Décision (PR 4).** Sur l'écran de la première ouverture, la visite
+guidée **dit les trois façons de commencer** : les deux étapes de « Le
+module à la carte » posées sur `bienvenue` y prennent leurs propres mots
+(« Trois façons de commencer », « Rien n'est choisi d'avance ») et gardent
+les leurs dans Réglages ; **aucune étape n'est ajoutée ni retirée**, même
+ancre, mêmes pages, même règle de saut (F177). La ferme vierge de la
+démonstration s'ouvre sur les trois façons, son catalogue le dit, et la
+remise à zéro la rend vierge, sa façon et l'état de sa carte compris. Le
+« ? » de « Ma ferme » suit la carte et les lignes d'état. Les contrats
+validés que S6 change (section 11) disent, à l'endroit du passage, ce qui
+change depuis S6. Aucun calcul, aucune règle d'agronomie ni d'isolation
+ne change ; aucune migration ; aucune question agronomique. **Le code de
+S6 est fini.**
+
+Précisions prises en codant (PR 4) :
+
+- **F976** — **Des mots propres à une page, pas une étape de plus.** Une
+  étape peut porter des mots pour une page (`TourStep.on`, par exemple
+  `on.bienvenue`) ; `stepWords(step, page)` rend ceux de la page ouverte,
+  sinon les siens. La bulle et l'annonce du lecteur d'écran passent par
+  elle (`guided-tour.tsx`, `context.current`) ; `allStepWords` donne tous
+  les mots d'une étape aux tests de garde (longueur, sigles, vocabulaire
+  de S1, mots de S3), qui les relisent tous. Ni le déroulé, ni le compte
+  « étape n sur N », ni l'adresse d'une étape (`visite=a-la-carte.0`) ne
+  changent.
+- **F977** — **Le relevé des visites** (section 10). La section 10 cite
+  trois visites ; le relevé n'en trouve qu'une qui parle de la liste sur
+  l'écran de la première ouverture : les étapes 1 et 2 de « Le module à
+  la carte ». « Bienvenue » n'y joue que des bulles générales (son étape
+  « Trois endroits » vise le menu, absent, et y est sautée) ; « Et pour
+  ma ferme ? » est du texte seul, sans case. Ces deux visites ne changent
+  pas (**écart dit avec la section 10**, aucune phrase n'y parlait des
+  cases). L'ancre `fonctionnalites` reste sur les trois façons
+  (`.start-ways`) et sur la liste de « Choisir moi-même » : les mots
+  disent l'une et l'autre.
+- **F978** — **Les phrases.** « Trois façons de commencer » : noter vos
+  arrosages, laisser le module proposer quoi arroser, ou tout ; chaque
+  façon coche les fonctionnalités qui vont avec ; « Choisir moi-même les
+  fonctionnalités » montre la liste des cases. « Rien n'est choisi
+  d'avance » : « Conseillé » désigne une façon sans la choisir (S6-a),
+  rien ne s'enregistre avant « Continuer » (D-028), les cases se changent
+  ensuite dans Réglages et décocher ne perd rien. Les mots sont ceux de
+  l'écran (`lib/domain/features/start.ts`), aucun sigle, aucun mot du
+  calcul.
+- **F979** — **La ferme vierge et sa remise à zéro** (section 10). Le
+  catalogue dit « rien de choisi, rien de réglé » et « les trois façons
+  de commencer, et rien de réglé ». La remise à zéro met l'espace de côté
+  avec sa ligne de choix (`start_mode`, `route_state` gardés sur l'espace
+  mis de côté, rien effacé) ; l'invité n'a plus d'espace, donc plus de
+  façon ni d'état de carte : il retrouve les trois façons, aucune
+  enfoncée, et son nouveau choix s'enregistre comme le premier. Aucune
+  ligne de code de la remise à zéro ne change : la preuve est un test de
+  base et V8.
+- **F980** — **Le « ? » de « Ma ferme »** (écart dit : ni la section 10
+  ni la 11 ne le citent). Il disait « Chaque fiche (…) dit en une ligne à
+  quoi elle sert », faux depuis la PR 3. Il dit maintenant que la ligne
+  dit où en est la fiche (« 4 goutte-à-goutte, tous posés »), qu'une
+  ferme qui commence voit sa mise en route en tête, et la première chose
+  à faire commence par elle. Le « ? » de Réglages (« Cochez ce qui vous
+  sert ») reste : il parle de la liste de Réglages.
+- **F981** — **Le relevé des contrats de la section 11**, chacun annoté à
+  l'endroit du passage par « **Depuis S6** (lot S6, D-336, (…) section
+  11) » : `feature-selection-contract.md` (R5, la ligne de
+  `/irrigation/bienvenue` du tableau de la section 5, « première page »,
+  la persistance avec 0051, P10) ; `audit-ergonomie-lot2-contract.md`
+  (F31, la première arrivée) ; `audit-ergonomie-2026-11-19-lot-i-contract.md`
+  (n° 25 et F452, retirés) ; `tranche-4-contract.md` (8 bis, le bandeau
+  non répété sur « Ma ferme ») ; `simplification-s3-contract.md` (les
+  chiffres d'état, la place de la mise en route, S3-b et S6-f) ;
+  `simplification-s2-contract.md` (la ligne vide et le bloc de F965) ;
+  `demo-guided-contract.md` (la ferme vierge du tableau des profils,
+  F165, F178 et F193, la remise à zéro, V8). Le contrat des parcours a
+  suivi dans les PR 1 à 3.
+- **F982** — **Preuves.** Tests du domaine (`tests/simplification-s6-visites.test.ts`,
+  huit tests) et de la base (`tests/db/demo-reset.test.ts`, un test
+  nouveau) ; V6 et V8 suivent. Contre-épreuves, chacune fait échouer au
+  moins un test : la bulle qui garde les mots de Réglages ; l'annonce qui
+  garde l'ancien titre ; `stepWords` qui ignore la page ; une étape
+  ajoutée ; des mots de première ouverture qui disent encore « Cochez » ;
+  un sigle dans ces mots (garde S1) ; un texte trop long (garde des
+  visites) ; la remise à zéro qui garde l'espace de la ferme vierge ; le
+  catalogue qui dit encore « à cocher » ; le « ? » de « Ma ferme » qui
+  dit encore « à quoi elle sert ».

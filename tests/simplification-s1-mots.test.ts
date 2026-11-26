@@ -5,7 +5,7 @@ import test from 'node:test';
 import { SIMPLE_WORDS, TECHNICAL_WORDS } from '../lib/domain/simple-words.ts';
 import { weekTotalsLine } from '../lib/domain/besoins-phone.ts';
 import { FEATURES } from '../lib/domain/features/catalogue.ts';
-import { TOURS } from '../lib/domain/demo/tours.ts';
+import { TOURS, allStepWords } from '../lib/domain/demo/tours.ts';
 
 /**
  * Simplifier l'usage du module, lot S1, PR 2 : les mots
@@ -124,7 +124,7 @@ test('l’ET0 : au premier niveau, la soif ; « ET0 » reste dans le détail', (
 test('règle 6 : l’écran de bienvenue et la visite guidée parlent avec les mêmes mots', () => {
   const texts = [
     ...FEATURES.flatMap((feature) => [feature.label, feature.summary]),
-    ...TOURS.flatMap((tour) => [tour.title, tour.summary, ...tour.steps.flatMap((step) => [step.title, step.text])]),
+    ...TOURS.flatMap((tour) => [tour.title, tour.summary, ...tour.steps.flatMap(allStepWords).flatMap((words) => [words.title, words.text])]),
   ];
   for (const text of texts) {
     for (const word of [...TECHNICAL_WORDS, 'coefficients culturaux', 'profils racinaires', 'créneaux protégés', 'faisabilité']) {
