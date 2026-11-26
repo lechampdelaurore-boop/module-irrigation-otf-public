@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
-import { attendreLaPageIrrigation, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, ouvrirLePli, ouvrirLesPlisAutour, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P41 : l'audit ergonomique du 19 novembre 2026, lot K,
@@ -30,6 +30,8 @@ test('planning : la ligne d’état en deux lignes, le pli des réglages signé 
   await expect(principale).toContainText('calculé le', { timeout: 30_000 });
   await expect(principale).toHaveText(/^Semaine du \d{2}\/\d{2} au \d{2}\/\d{2} · calculé le \d{2}\/\d{2}\/\d{4} à \d{1,2} h( \d{2})? \(à la demande\)$/);
   await expect(sources).toHaveText(/^Prévision météo sur \d+ jours?/);
+  // La ligne d'état est dans « Le plan, chaîne par chaîne », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(principale);
   const [haut, bas] = await Promise.all([principale.boundingBox(), sources.boundingBox()]);
   expect(haut && bas && bas.y >= haut.y + haut.height - 1, 'les sources sous la semaine').toBe(true);
   await expect(sources).toHaveCSS('font-size', '12px');
@@ -53,14 +55,20 @@ test('un seul dessin de pli, un bouton plein par geste, plus de geste muet', asy
       expect(pli.marque, `sans triangle : « ${pli.texte} » (${cible})`).toBe('none');
     }
   }
-  // « Cette semaine » : un raccourci en secondaire, sans effet quand on y est déjà (F470).
+  // « Cette semaine » : un raccourci en secondaire, sous les flèches de la page « Semaine », absent quand on y
+  // est déjà (F470 ; S4, PR 2, section 4, point 1).
   await attendreLaPageIrrigation(page, 'besoins');
-  const cetteSemaine = page.locator('.water-week-navigation').getByRole('button', { name: 'Cette semaine' });
-  await expect(cetteSemaine).toBeDisabled();
+  const navigation = page.getByRole('navigation', { name: 'Changer de semaine' });
+  await expect(navigation.getByRole('link', { name: 'Cette semaine' })).toHaveCount(0);
+  await navigation.getByRole('link', { name: 'Semaine précédente' }).click();
+  const cetteSemaine = navigation.getByRole('link', { name: 'Cette semaine' });
+  await expect(cetteSemaine).toBeVisible();
   await expect(cetteSemaine).not.toHaveCSS('background-color', 'rgb(11, 105, 77)');
+  await cetteSemaine.click();
+  await expect(navigation.locator('.week-title')).toHaveText('Cette semaine');
+  await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
   // « Retirer la mesure » ne fait pas semblant sur un jour sans mesure (F471).
-  const pluie = page.locator('#manual-rain');
-  await pluie.locator('summary').click();
+  const pluie = await ouvrirLePli(page.locator('details#manual-rain'));
   await expect(pluie.getByRole('button', { name: 'Retirer la mesure' })).toBeDisabled();
   // « 24 h / 48 h / 7 jours » : un seul choix plein, celui qui est fait (F470).
   await attendreLaPageIrrigation(page, 'ressources');

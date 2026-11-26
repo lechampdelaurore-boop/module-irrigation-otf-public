@@ -64,10 +64,10 @@ const ALL: FeatureId[] = [...FEATURE_IDS];
 /** Le tableau de la section 3.2 : pour les cases cochées parmi les trois, les vues, la vue ouverte et les sections de « La semaine ». */
 const COMBINATIONS: readonly { week: readonly WeekPageFeature[]; views: WeekViewId[]; opens: WeekViewId | null; sections: WeekSectionId[] }[] = [
   { week: [], views: [], opens: null, sections: [] },
-  { week: ['besoins'], views: ['semaine'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours'] },
+  { week: ['besoins'], views: ['semaine'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'reglages'] },
   { week: ['planning', 'besoins'], views: ['semaine'], opens: 'semaine', sections: ['reste-a-arroser', 'plan', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'ecart-du-prevu', 'reglages'] },
   { week: ['historique'], views: ['cumuls'], opens: 'cumuls', sections: [] },
-  { week: ['besoins', 'historique'], views: ['semaine', 'cumuls'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours'] },
+  { week: ['besoins', 'historique'], views: ['semaine', 'cumuls'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'reglages'] },
   { week: ['planning', 'besoins', 'historique'], views: ['semaine', 'cumuls'], opens: 'semaine', sections: ['reste-a-arroser', 'plan', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'ecart-du-prevu', 'reglages'] },
 ];
 
@@ -196,6 +196,37 @@ test('section 3.4 : la vue « Les cumuls » ne lit que l’historique ; « La se
   assert.doesNotMatch(loaders, /export async function load(Planning|Besoins|Historique)Page/);
 });
 
+test('section 3.4 : l’écart du prévu ne se lit qu’à l’ouverture de son pli, jamais à l’ouverture de la page (PR 2, promesse de F918)', () => {
+  // Le chargeur de la page ne le lit plus.
+  const loaders = readFileSync('app/irrigation/page-loaders.ts', 'utf8');
+  assert.doesNotMatch(loaders, /getAppliedWaterGapsForUser|waterGap/);
+  // La section le lit par son action, à l'ouverture du pli, une fois ; l'action vérifie la personne, la case et la saison du jour.
+  const detail = readFileSync('app/irrigation/semaine/week-detail.tsx', 'utf8');
+  const section = detail.slice(detail.indexOf('export function WaterGapSection'));
+  assert.match(section, /onOpen=\{read\}/);
+  assert.match(section, /readAppliedWaterGapAction\(\{ season \}\)/);
+  const actions = readFileSync('app/irrigation/semaine/week-actions.ts', 'utf8');
+  const action = actions.slice(actions.indexOf('export async function readAppliedWaterGapAction'));
+  assert.match(action, /getAuthenticatedUser\(\)/);
+  assert.match(action, /selection\.enabled\.includes\('planning'\)/);
+  assert.match(action, /input\.season !== todaySeason\(now\)/);
+  // La page ne montre la section qu'à une ferme qui a la case, pour la saison du jour.
+  const page = readFileSync('app/irrigation/semaine/page.tsx', 'utf8');
+  assert.match(page, /const gapSection = planning !== null && context\.season === todaySeason\(now\);/);
+  assert.match(page, /\{gapSection \? <WaterGapSection /);
+});
+
+test('section 4 : l’encadré d’attention ne paraît que s’il a une ligne ; un plan sans pénurie n’y met rien (PR 2, F925)', () => {
+  const premier = readFileSync('app/irrigation/semaine/week-first-level.tsx', 'utf8');
+  assert.match(premier, /const shortage = planShown\?\.plan \? shortageAction\(planShown\.plan, formatVolume, planShown\.now\) !== null : false;/);
+  assert.match(premier, /\{current && \(shortage \|\| approximate \|\| timer \|\| forecast\) \? \(/);
+  assert.match(premier, /\{shortage \? <PlanShortage \/> : null\}/);
+  // Le même test que `PlanShortage` : l'encadré ne peut pas rester vide.
+  const vue = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
+  const shortage = vue.slice(vue.indexOf('export function PlanShortage'), vue.indexOf('export function planDetailLine'));
+  assert.match(shortage, /const action = shortageAction\(state\.plan, formatVolume, state\.now\);\s+if \(!action\) return null;/);
+});
+
 test('section 9 : les anciennes ancres de `/irrigation` désignent « Semaine » quand la case qui portait leur contenu est cochée', () => {
   for (const selection of SELECTIONS) {
     const label = selection.join(', ');
@@ -232,7 +263,7 @@ const ANCHOR_SOURCES: Readonly<Record<string, { file: string; pattern: RegExp }>
   'manual-rain': { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="manual-rain"/ },
   'meteo-de-reference': { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="meteo-de-reference"/ },
   weather: { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="weather"/ },
-  'reglages-de-la-page': { file: 'app/irrigation/irrigation-needs-dashboard.tsx', pattern: /<PageSettingsFold>/ },
+  'reglages-de-la-page': { file: 'app/irrigation/semaine/page.tsx', pattern: /<AnchoredFold\s+id=\{PAGE_SETTINGS_ANCHOR\}/ },
   'series-water-title': { file: 'app/irrigation/series-water-view.tsx', pattern: /<h2 id="series-water-title"/ },
 };
 
@@ -245,7 +276,7 @@ test('section 7.4 : chaque ancre du relevé est posée dans le code de la page, 
   }
   // Les composants qui les posent sont ceux que la page rend, selon la case.
   const page = readFileSync('app/irrigation/semaine/page.tsx', 'utf8');
-  for (const component of ['PlanningPage', 'WaterManagementDashboard', 'IrrigationNeedsDashboardView', 'HistoryViews']) assert.match(page, new RegExp(`<${component} `), component);
+  for (const component of ['WeeklyPlanProvider', 'WaterManagementDashboard', 'IrrigationNeedsDashboardView', 'HistoryViews']) assert.match(page, new RegExp(`<${component} `), component);
   assert.match(readFileSync('app/irrigation/shell/page-settings-fold.tsx', 'utf8'), /export const PAGE_SETTINGS_ANCHOR = 'reglages-de-la-page';/);
   // Les ancres des fonctions du domaine.
   assert.equal(weekAnchor(MEASURED_RAIN_ANCHOR)?.feature, 'besoins');

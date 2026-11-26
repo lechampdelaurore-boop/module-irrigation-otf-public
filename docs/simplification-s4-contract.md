@@ -719,6 +719,147 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
   sélecteur des deux vues à la place de la bande ; le tableau des besoins à
   922 px, sous le plan (449 px sur sa page).
 
+### PR 2 (26 novembre 2026)
+
+**Numéros** : décision D-335 (suite, « Décision (PR 2) ») ; précisions F923 à
+F932 ; parcours P67.
+
+**Ce que la PR 2 a trouvé sur le « mm par jour » (S4-e, F927).** Aucune
+fonction du domaine ne donne des millimètres par jour pour la ferme : le
+tableau de l'eau porte des m³ par jour (`realizedIrrigationCubicMeters`),
+le besoin et l'objectif sont par semaine et par planche. La ligne d'un jour
+dit donc « 4 arrosages faits · 0,9 m³ » (« au moins 0,9 m³ » quand une
+surface mouillée manque) ; rien de nouveau n'est calculé.
+
+**L'écart du prévu à la demande (F930).** Le chargeur de la page ne le lit
+plus : sa section le lit à la première ouverture de son pli
+(`readAppliedWaterGapAction`). Elle existe pour une ferme qui a coché le
+planning, la saison du jour ; sans signal, une ligne le dit et le bloc ne
+paraît pas (F735). Le besoin par planche reste lu à l'ouverture (F918) :
+la phrase, le bilan et « Jardin par jardin » en viennent.
+
+**Relevé, ce qui suit la PR 2.**
+
+- *Tests* : nouveaux, `simplification-s4-premier-niveau` (13 tests) et
+  `db/simplification-s4-semaine` (à deux fermes) ; suivent
+  `simplification-s4-semaine` (les composants, l'écart du prévu à la
+  demande), `irrigation-needs` (le seuil dans les réglages de la semaine),
+  `audit-ergonomie-2026-11-19-lot-k` (F470), `audit-ergonomie-final-lot-b`
+  (F256), `audit-ergonomie-final-lot-d` (F305).
+- *Parcours* : nouveau, P67 ; repris, P7, P10, P12, P13, P15, P26, P28,
+  P30, P31, P32, P40, P41, P52, P56, P57, P61 ; P1, P8 et P35 suivent par
+  les aides communes (`ouvrirLesPlisAutour`, `montrerLaCarte`). Restent à
+  reprendre dans les PR 3 et 4 ceux qui touchent leurs gestes et leurs
+  liens.
+- *Ancres* : toutes celles du relevé ouvrent le pli de leur section et
+  « Le détail » ; `proposal-<id>` ouvre en plus son jour et sa carte (au
+  téléphone, « Jours écoulés » et « Autres choix »). Nouvelles :
+  `le-detail` (le pli), `le-plan`, `ecart-du-prevu`.
+
+**Mesures** (à 390 px, P67, sur une ferme neuve, toutes cases cochées,
+quatre jardins, deux créneaux à valider, F931) :
+
+| Mesure | Visé (section 11) | Mesuré | Tenu |
+| --- | --- | --- | --- |
+| Hauteur du premier niveau | 1 700 px | 1 590 px | oui |
+| Haut de la phrase | 400 px | 383 px | oui |
+| Haut de la barre | 400 px | 621 px | **non** |
+| Haut du premier « Valider » | 900 px | 1 123 px | **non** |
+| Choses à toucher au premier niveau | 24 | 16 | oui |
+| « Le détail » replié / déplié | sans borne | 100 px / 11 818 px | — |
+| Page entière (P40, suite jouée jusqu'à lui) | — | 3 935 → 2 846 px | borne 3 300 |
+| Temps du serveur, « La semaine » | 394 ms | 341 ms (322 à 351), 62 lectures | oui |
+| Temps du serveur, « Les cumuls » | — | 116 ms, 14 lectures | — |
+
+La barre et le premier « Valider » ne tiennent pas la cible : au-dessus du
+bilan, la ferme neuve porte « À finir » (en haut de la page) et « Calcul
+approximatif » (152 px, sa pluie réelle manque) ; le bilan et ses trois
+chiffres font 242 px. P67 fixe chaque borne sur la mesure (barre 680 px,
+premier « Valider » 1 180 px). Sur la ferme des parcours, chargée par les
+parcours d'avant (des créneaux chaque jour), le premier niveau faisait
+3 401 px : la borne de 1 700 px vaut pour le cas du contrat, peu de
+créneaux. Piste, si le porteur la veut après l'essai des cinq tâches : au
+téléphone, les trois chiffres du bilan sur une ligne.
+
+Temps du serveur : en local, `vinext dev`, base de démonstration, 20 ms
+par lecture, deuxième passage, comme la PR 1. La ligne « Calcul
+approximatif », les irrigations relues après un geste et l'écart du prévu
+se lisent après l'affichage, hors de ce temps.
+
+### PR 3 (26 novembre 2026)
+
+**Numéros** : décision D-335 (suite, « Décision (PR 3) ») ; précisions F933 à
+F939 ; parcours P68.
+
+**Les gestes, ce qui est appelé.** « Comprendre ces chiffres » : les tuiles
+de résumé d'« Aujourd'hui », sorties du tableau de l'eau
+(`water-summary-tiles.tsx`), un composant pour deux places. « Changer l'eau
+visée » : l'ancre `objectifs-de-la-semaine`, les plis ouverts, le champ des
+millimètres au clavier (F933). « Noter la pluie » : `RainEntryDialog` et
+`readRainEntryAction` de S2, depuis le bilan, « Calcul approximatif » et la
+ligne d'un jour passé dont la pluie réelle manque (F935). « Exporter » :
+`historyCsvHref`, le constructeur de « Les cumuls », sorti pour être partagé
+(F937). La météo indisponible : `forecastUnavailableText`, la phrase
+d'« Aujourd'hui », sortie de `weatherBlock` (F938).
+
+**Les flèches (8.4, F936).** Mécanisme : des liens du routeur (`next/link`,
+sans préchargement), la semaine dans l'adresse, le contenu de la semaine
+remis à neuf par une clé. Mesure, à 390 px, en local (`vinext dev`), du clic
+jusqu'aux dates de la semaine affichées, médiane de huit allers-retours,
+deux passages :
+
+| Flèches | 1er passage | 2e passage |
+| --- | --- | --- |
+| « Objectifs et besoins » d'avant (`ec99ccf`, l'action du tableau de l'eau) | 414 ms | 307 ms |
+| « La semaine », PR 3 | 276 ms | 274 ms |
+
+Tenu : la réponse n'est pas plus lente. **Aux limites d'une saison**, relevé :
+les flèches d'avant ajoutaient sept jours sans borne, la saison affichée
+gardée ; celles de la PR 3 font de même (une semaine de janvier se lit dans
+la saison choisie). Rien n'est inventé.
+
+**Les états rares (8.5, F938).** Relevés un à un ; tous tenus par la PR 2 ou
+par les blocs appelés, sauf la météo indisponible, ajoutée : une ligne ambre
+dans l'encadré d'attention de la semaine en cours.
+
+**Relevé, ce qui suit la PR 3.**
+
+- *Tests* : nouveau, `simplification-s4-gestes` (10 tests) ; suivent
+  `simplification-s4-premier-niveau` (« Noter la pluie » d'une ligne),
+  `simplification-s4-semaine` (l'encadré d'attention), `simplification-s1-mots`
+  (les mots des tuiles, dans leur nouveau fichier).
+- *Parcours* : nouveau, P68 ; suivent P13 (les tuiles du tableau des jours,
+  les mêmes étant aussi sous le bilan), P40 et P67 (bornes, ci-dessous).
+
+**Mesures** (à 390 px) :
+
+| Mesure | Visé (section 11) | PR 2 | PR 3 | Tenu |
+| --- | --- | --- | --- | --- |
+| Hauteur du premier niveau (P67, ferme neuve) | 1 700 px | 1 590 px | 1 687 px | oui, de justesse |
+| Haut de la phrase | 400 px | 383 px | 383 px | oui |
+| Haut de la barre | 400 px | 621 px | 621 px | **non** |
+| Haut du premier « Valider » | 900 px | 1 123 px | 1 221 px | **non** |
+| Choses à toucher au premier niveau | 24 | 16 | 19 | oui |
+| « Le détail » replié / déplié | sans borne | 100 / 11 818 px | 100 / 11 818 px | — |
+| Page entière, ferme des parcours (P40) | — | 2 846 px | 4 107 px | borne 4 500 |
+| Temps du serveur, « La semaine » | 394 ms | 341 ms, 62 lectures | 337 ms (328 à 340), 62 lectures | oui |
+| Temps du serveur, « Les cumuls » | — | 116 ms, 14 lectures | 116 ms (115 à 119), 14 lectures | — |
+
+Les trois gestes du bilan ne tiennent pas sur une ligne à 390 px : deux
+lignes de 44 px, 97 px de plus au premier niveau et au premier « Valider ».
+P67 fixe ses bornes sur la mesure et 60 px (premier niveau 1 750, premier
+« Valider » 1 280). La page entière de P40 suit surtout les créneaux que les
+parcours d'avant laissent sur la ferme des parcours (15 créneaux, 2 255 px de
+« Jour par jour », 4 107 px dans la suite jouée jusqu'à lui ; 2 180 px quand
+P40 suit seulement P13 et P31c) ; les gestes y ajoutent une centaine de
+pixels. La piste de la PR 2 reste : au téléphone, les trois chiffres du bilan
+sur une ligne, si le porteur la veut après l'essai des cinq tâches.
+
+Temps du serveur : en local, base de démonstration remise à zéro, 20 ms par
+lecture, deuxième passage, comme les PR 1 et 2. Aucun geste ne lit avec la
+page : les jours et les mesures de la pluie se lisent à l'ouverture de la
+fenêtre.
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième

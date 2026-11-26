@@ -8,8 +8,10 @@ import { ecarterLInvitation, ouvrirLaDemo } from './support/visite.ts';
  * n° 5, docs/ameliorations-4-5-contract.md, section 4, F747, D-295 ; écart E2
  * de la recette du 22 novembre 2026). La « Ferme des Trois Noues », au début
  * de l'été, a arrosé son clos plus longtemps que prévu les trois semaines
- * d'avant : « Planning de la semaine » porte le bloc « L'eau apportée
- * s'écarte du prévu » pour S01 et S02, les deux planches du clos, chaque
+ * d'avant : « Semaine » porte le bloc « L'eau apportée s'écarte du prévu »
+ * dans « Le détail », section « Écart du prévu des trois dernières
+ * semaines », pli fermé qu'ouvre son ancre (lot S4, PR 2, F930 ; avant :
+ * « Planning de la semaine »), pour S01 et S02, les deux planches du clos, chaque
  * semaine à +50 %, la cause du débit, réglé à 6 mm/h, proposé à 4 mm/h, et
  * « Adopter ». Aux deux largeurs. Le parcours regarde sans rien écrire :
  * « Adopter » et la remise à zéro, du bouton comme de la nuit, se prouvent
@@ -23,7 +25,7 @@ const REGLAGE = 'Réglage habituel';
 const SEMAINES = [['25/05', '4 mm', '6 mm'], ['01/06', '8 mm', '12 mm'], ['08/06', '8 mm', '12 mm']];
 
 test('V11 Le jeu de données : l’eau apportée au clos s’écarte du prévu, trois semaines de suite', async ({ page }, testInfo) => {
-  const visite = await ouvrirLaDemo(page, 'maraichage', 'ete', '/irrigation/planning');
+  const visite = await ouvrirLaDemo(page, 'maraichage', 'ete', '/irrigation/semaine#ecart-du-prevu');
   await ecarterLInvitation(page);
   const bloc = page.getByTestId('applied-water-gap');
   await expect(bloc).toBeVisible();

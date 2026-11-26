@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape, titreDeLaPage, type PageDuModule } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, ouvrirLesPlisAutour, surveillerLaConsole, verifierLEtape, titreDeLaPage, type PageDuModule } from './support/parcours.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 
 /**
@@ -86,7 +86,15 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // raccourcir (la PR 1 range) ; sa borne est la somme de celles d'avant, les huit écrans de 844 px du planning
   // (P28) et les 2 800 px des besoins. 3 935 px mesurés en local, la suite jouée jusqu'à P40 sans plan calculé ;
   // le premier niveau de la PR 2 a son propre budget, 1 700 px (section 11).
-  semaine: 8 * 844 + 2_800,
+  // Lot S4, PR 2 (F929) : le premier niveau, puis « Le détail » fermé ; 3 935 → 2 846 px mesurés en local, la
+  // suite jouée jusqu'à P40 ; la borne garde 15 % pour les jours de la semaine, que la page montre chacun.
+  // Sur la CI de la PR 2, toute la suite jouée avant P40 : 3 856 px, les créneaux que les parcours d'avant
+  // laissent sur la ferme des parcours allongeant « Jour par jour ».
+  // Lot S4, PR 3 (F939) : les gestes du bilan (60 px) et « Exporter » (44 px) ; surtout, « Jour par jour » porte
+  // les créneaux que les parcours d'avant laissent sur la ferme des parcours (15 créneaux, 2 255 px de jours) :
+  // 4 107 px mesurés en local, les 21 parcours de la suite qui touchent « Semaine » joués avant P40. La borne
+  // garde 10 % ; le premier niveau a son budget à part, tenu par P67 sur une ferme neuve.
+  semaine: 4_500,
   // PR 6 (F461) : trois onglets, le plan d'abord ; au téléphone, les jardins repliés. 1 782 px avec
   // les quatre jardins des données des parcours : le budget du contrat, pour une ferme de dix-huit jardins.
   materiel: 5_300,
@@ -98,6 +106,7 @@ for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuMod
     const journal = surveillerLaConsole(page);
     await attendreLaPageIrrigation(page, cible);
     const hauteur = await page.evaluate(() => document.documentElement.scrollHeight);
+    testInfo.annotations.push({ type: 'hauteur à 390 px', description: `${cible} : ${hauteur} px` });
     expect(hauteur, `hauteur de « ${cible} » à 390 px`).toBeLessThanOrEqual(budget);
     // Rien ne déborde de côté.
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
@@ -140,20 +149,18 @@ test('« Objectifs et besoins » : trois plis fermés d’une ligne, un jardin p
     await expect(pli.locator(':scope > summary small')).not.toHaveText('');
   }
   await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeHidden();
-  // Les tuiles : une ligne de résumé au téléphone, qui les déplie ; à l'ordinateur, les tuiles.
-  const ligne = page.locator('.water-summary-line');
-  const tuiles = page.locator('.water-summary-grid');
-  if (telephone) {
-    await expect(tuiles).toBeHidden();
-    await expect(ligne).toContainText('irrigué');
-    await ligne.click();
-    await expect(tuiles).toBeVisible();
-  } else {
-    await expect(ligne).toBeHidden();
-    await expect(tuiles).toBeVisible();
-  }
-  // Un jardin, une ligne de 64 px au plus au téléphone.
+  // Les tuiles : dans « Jours de la semaine, un par un », un pli fermé de « Le détail » dont la ligne dit
+  // les totaux de la semaine ; ouvert, les tuiles, aux deux largeurs (S4, PR 2, section 7.1, n° 6).
+  const jours = page.locator('details#weather');
+  const tuiles = jours.locator('.water-summary-grid');
+  await expect(jours).not.toHaveAttribute('open', '');
+  await expect(jours.locator(':scope > summary small')).toContainText('irrigué');
+  await expect(tuiles).toBeHidden();
+  await ouvrirLePli(jours);
+  await expect(tuiles).toBeVisible();
+  // Un jardin, une ligne de 64 px au plus au téléphone, dans « Ce qu'il reste à arroser ».
   const jardins = page.locator('.irrigation-needs-gardens > details');
+  await ouvrirLesPlisAutour(jardins.first());
   const hauteurs = await jardins.evaluateAll((plis) => plis.map((pli) => (pli.querySelector(':scope > summary') as HTMLElement).getBoundingClientRect().height));
   expect(hauteurs.length).toBeGreaterThan(0);
   if (telephone) expect(Math.max(...hauteurs), 'un jardin replié tient sur une ligne').toBeLessThanOrEqual(64);

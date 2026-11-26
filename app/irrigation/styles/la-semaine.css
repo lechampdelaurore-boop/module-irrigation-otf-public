@@ -1,0 +1,572 @@
+/*
+  Simplification, lot S4, PR 2 (docs/simplification-s4-contract.md,
+  sections 4 à 7) : la vue « La semaine », de haut en bas. Les flèches et
+  le titre, la ligne du plan, la phrase, l'encadré d'attention, le bilan
+  (une barre de 14 px), « Jour par jour », « Jardin par jardin » (une barre
+  de 10 px), puis « Le détail », un pli fermé dont chaque section est un pli
+  fermé. Jamais une couleur seule : chaque chiffre est écrit.
+*/
+
+/* Sans la case Planning, la vue garde le cadre de la section du plan (planning.css, charte.css). */
+.week-page-section {
+  margin-top: 1.5rem;
+  min-width: 0;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 2.5vw, 2rem);
+  color: var(--ink);
+}
+
+.week-first-level {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.week-first-level > * {
+  margin: 0;
+}
+
+/* Les flèches et le titre : deux liens de 44 px de chaque côté du titre. */
+.week-navigation {
+  display: grid;
+  grid-template-columns: var(--touch-target) minmax(0, 1fr) var(--touch-target);
+  align-items: center;
+  gap: .5rem;
+}
+
+.week-arrow {
+  display: inline-grid;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  font: 700 1.5rem/1 var(--font-ui);
+  text-decoration: none;
+}
+
+.week-arrow:hover,
+.week-arrow:focus-visible {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.week-navigation-title {
+  min-width: 0;
+  text-align: center;
+}
+
+.week-title {
+  margin: 0;
+  font-size: var(--text-20);
+  line-height: 1.25;
+}
+
+.week-range {
+  margin: .15rem 0 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.week-this-week {
+  display: inline-flex;
+  grid-column: 1 / -1;
+  justify-self: center;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-size: var(--text-13);
+  font-weight: 700;
+}
+
+/* La ligne du plan : « Plan calculé aujourd’hui à 6 h 02 » et son bouton, sur une ligne quand elle tient. */
+.week-plan-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  margin: 0;
+}
+
+.week-plan-line > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+/* « Recalculer » : un lien de 44 px, comme sur « Aujourd'hui » (S2) ; le geste de la page est « Valider ». */
+.week-plan-line .week-plan-recalculate {
+  min-height: var(--touch-target);
+  padding: .3rem .4rem;
+  border-color: transparent;
+  background: none;
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .week-plan-line:has(.week-plan-recalculate) {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .week-plan-line .planning-heading-actions button.week-plan-recalculate {
+    width: auto;
+  }
+}
+
+.week-sentence {
+  font-size: var(--text-16);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.week-sentence a {
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* L'encadré d'attention : la pénurie, la ligne « Calcul approximatif », le minuteur. */
+.week-attention {
+  display: grid;
+  gap: .6rem;
+  padding: .75rem 1rem;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+}
+
+.week-attention > * {
+  margin: 0;
+}
+
+.week-attention .today-essential-line {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+/* Le bilan : la barre de 14 px, reçus sur visés, puis trois chiffres écrits. */
+.week-bilan {
+  display: grid;
+  gap: .6rem;
+}
+
+.week-bilan-bar {
+  display: flex;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--sheet);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.week-bilan-bar i,
+.week-garden-bar i {
+  flex: none;
+  background: var(--green);
+}
+
+.week-bilan-bar i[data-tone="rain"],
+.week-garden-bar i[data-tone="rain"] {
+  background: #6ea6d8;
+}
+
+.week-bilan-bar[data-unknown],
+.week-garden-bar[data-unknown] {
+  background: repeating-linear-gradient(135deg, var(--sheet) 0 5px, var(--line-soft) 5px 10px);
+}
+
+.week-bilan-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: .5rem;
+  margin: 0;
+}
+
+.week-bilan-figures > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  align-items: baseline;
+  gap: 2px .35rem;
+  padding: .5rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 9.75px;
+  background: var(--card);
+}
+
+/* « 12 mm reçus », puis le détail dessous ; un chiffre absent se lit « Eau visée aucune ». */
+.week-bilan-figures dd {
+  display: contents;
+}
+
+.week-bilan-figures dd strong {
+  order: 1;
+}
+
+.week-bilan-figures dt {
+  order: 2;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.week-bilan-figures [data-missing] > dt {
+  order: 0;
+}
+
+.week-bilan-figures dd small,
+.week-bilan-figures dd a {
+  order: 3;
+  flex-basis: 100%;
+}
+
+.week-bilan-figures dd strong {
+  font-size: var(--text-20);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-bilan-figures dd small {
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
+.week-bilan-figures dd a {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-size: var(--text-13);
+  font-weight: 700;
+}
+
+/* « Jour par jour » : le titre, les jours (la liste du planning), puis « Valider toute la semaine ». */
+.week-days {
+  display: grid;
+  gap: .6rem;
+  min-width: 0;
+}
+
+.week-days > h3,
+.week-gardens > h3 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: var(--text-20);
+  font-weight: 400;
+}
+
+.week-days .planning-days {
+  margin: 0;
+}
+
+.week-plan-elsewhere,
+.week-unplaced-line {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.week-unplaced-line a {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.week-day-today {
+  margin-left: .4rem;
+  padding: 1px .45rem;
+  border-radius: 999px;
+  background: var(--tile);
+  color: var(--green-dark);
+  font-size: var(--text-12);
+  font-weight: 700;
+}
+
+.week-day-facts,
+.week-day-run,
+.week-day-ongoing {
+  margin: .2rem 0 0;
+  font-size: var(--text-13);
+}
+
+.week-day[data-calm-run] .week-day-facts,
+.week-day-run {
+  color: var(--muted);
+}
+
+.week-day-ongoing a {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.week-validate-all {
+  justify-self: start;
+  min-height: var(--touch-target);
+}
+
+/* La ligne compacte d'un créneau et la suite de jours calmes ne servent qu'au téléphone. */
+.week-slot-line,
+.week-day-run {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .week-day-run {
+    display: block;
+  }
+
+  /* Une suite de jours calmes tient en une ligne, sur son premier jour (F301). */
+  .week-day[data-calm-run="member"] {
+    display: none;
+  }
+
+  .week-day[data-calm-run="start"] .week-day-facts {
+    display: none;
+  }
+
+  .week-day[data-calm-run="start"] h4 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .week-slot-line {
+    display: grid;
+    gap: .35rem;
+    padding: .5rem .7rem;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--green);
+    border-radius: 9.75px;
+    background: var(--card);
+  }
+
+  .week-slot-line[data-status="validated"],
+  .week-slot-line[data-status="completed"] {
+    border-left-color: var(--line-strong);
+  }
+
+  .week-slot-line > p {
+    margin: 0;
+    font-size: var(--text-13);
+    font-weight: 700;
+  }
+
+  .week-slot-line > p small {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .week-slot-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+  }
+
+  .week-slot-actions button {
+    min-height: var(--touch-target);
+  }
+
+  /* « Autres choix » et « Détail » sont des gestes de lecture, neutres, à côté de « Valider » en vert (lot C, R6, F237). */
+  .week-slot-actions > button:not(.primary) {
+    border-color: var(--line-strong);
+    background: var(--card);
+    color: var(--ink);
+  }
+
+  /* La carte entière (justification, « Ajuster », « Refuser ») s'ouvre sous la ligne. */
+  .week-slot:not([data-revealed]) > .planning-proposal {
+    display: none;
+  }
+
+  .week-slot[data-revealed] > .planning-proposal {
+    margin-top: .4rem;
+  }
+
+  .week-validate-all {
+    justify-self: stretch;
+  }
+}
+
+/* À l'ordinateur, le créneau ouvert passe au-dessus du tableau, comme au planning (P46). */
+@media (min-width: 1360px) {
+  .planning-cell:has(> .week-slot > .planning-proposal > details[open]) {
+    z-index: 10;
+  }
+}
+
+/* « Jardin par jardin » : une ligne par jardin, son nom, « 12 mm sur 20 mm », une barre de 10 px. */
+.week-gardens {
+  display: grid;
+  gap: .5rem;
+}
+
+.week-gardens ul {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.week-garden {
+  display: grid;
+  gap: .2rem;
+}
+
+/* À l'ordinateur, « Lui en donner une » sur la ligne du jardin. */
+@media (min-width: 601px) {
+  .week-garden {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .2rem .75rem;
+  }
+}
+
+.week-garden-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .25rem .75rem;
+  min-height: var(--touch-target);
+  padding: .4rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 9.75px;
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.week-garden-link:hover,
+.week-garden-link:focus-visible {
+  border-color: var(--green);
+}
+
+.week-garden-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.week-garden-text {
+  color: var(--muted);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-garden-bar {
+  display: flex;
+  grid-column: 1 / -1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--sheet);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.week-garden-goal,
+.week-gardens-unaimed a {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-size: var(--text-13);
+  font-weight: 700;
+}
+
+.week-gardens-more {
+  justify-self: start;
+  min-height: var(--touch-target);
+}
+
+.week-gardens-unaimed {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+/* Au téléphone, la validation du jour se tient à 24 px des lignes de ses créneaux (lot C, R6, F237). */
+@media (max-width: 600px) {
+  .week-day .planning-day-validate {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Les gestes du bilan (PR 3, sections 4.5 et 8) : des liens de 44 px, qui n'écrivent rien par eux-mêmes. */
+.week-bilan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+}
+
+.week-bilan-actions .week-bilan-link,
+.week-day .week-day-rain button {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green);
+  font: inherit;
+  font-size: var(--text-13);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.week-understand {
+  display: grid;
+  gap: .5rem;
+}
+
+.week-understand[hidden],
+.week-day .week-day-rain [data-scope="run"] {
+  display: none;
+}
+
+.week-day-rain {
+  margin: 0;
+}
+
+.week-rain-reply {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: var(--text-13);
+}
+
+/* Au téléphone, une suite de jours calmes tient en une ligne : son « Noter la pluie » est celui de la suite. */
+@media (max-width: 600px) {
+  .week-day[data-calm-run="start"] .week-day-rain [data-scope="day"] {
+    display: none;
+  }
+
+  .week-day[data-calm-run="start"] .week-day-rain [data-scope="run"] {
+    display: inline-flex;
+  }
+}
+
+/* « Exporter » au pied de la page (4.6), le lien du bouton de « Les cumuls ». */
+.week-export {
+  margin: 0;
+}
+
+.week-export-link {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-size: var(--text-13);
+  font-weight: 700;
+}

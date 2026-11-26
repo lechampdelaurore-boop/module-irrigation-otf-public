@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { textesPeuContrastes } from './support/accessibilite.ts';
-import { attendreLaPageIrrigation, epinglerLaBulle, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, epinglerLaBulle, ouvrirLesPlisAutour, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 
 /**
  * Parcours P7 : l'écran d'arbitrage de la pénurie, aux deux largeurs
@@ -214,6 +214,8 @@ async function ouvrirLeJardinDe(page: Page, planche: string): Promise<Locator> {
       hasText: new RegExp(`^${planche}$`),
     }),
   });
+  // Dans « Ce qu'il reste à arroser », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(jardin);
   await jardin.scrollIntoViewIfNeeded();
   const bascule = carte.locator('label.need-toggle');
   await expect(async () => {

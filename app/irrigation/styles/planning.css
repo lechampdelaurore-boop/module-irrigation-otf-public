@@ -44,8 +44,12 @@
   gap: .5rem;
 }
 
-/* Les « i » et la croix de leur bulle gardent leur dessin (help.css) : 8 novembre 2026. */
-.planning-section button:not(:where(.figure-origin-toggle, .figure-origin-close)) {
+/*
+  Les « i » et la croix de leur bulle gardent leur dessin (help.css) : 8 novembre 2026.
+  Sur la page « Semaine », la section du plan contient aussi les blocs des besoins,
+  rangés dans « Le détail » : leurs boutons gardent le dessin de leur bloc (S4, PR 2).
+*/
+.planning-section button:not(:where(.figure-origin-toggle, .figure-origin-close, .water-management-section *, .irrigation-needs-section *, .needs-threshold-settings *)) {
   min-height: 44px;
   border: 1px solid var(--green);
   border-radius: var(--radius-button);
@@ -67,7 +71,7 @@
   background: var(--danger-soft);
 }
 
-.planning-section button:disabled {
+.planning-section button:disabled:not(:where(.water-management-section *, .irrigation-needs-section *, .needs-threshold-settings *)) {
   opacity: .55;
   cursor: wait;
 }
