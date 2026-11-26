@@ -11034,7 +11034,7 @@ Date : 26 novembre 2026. Statut : **contrat écrit, rien de codé** ;
 `docs/objectif-automatique-saison-contract.md`, roadmap section 6
 quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
 
-**Demande du porteur** (10 h 24 et 10 h 26) : l'objectif automatique doit se
+**Demande du porteur** (11 h 24 et 11 h 26) : l'objectif automatique doit se
 renseigner et se modifier à l'écran ; un filtre « hors saison » ignore
 l'irrigation de planches, jardins, parcelles, de tout le plein champ ou de
 tout le sous-abri.
@@ -11051,9 +11051,9 @@ les semaines closes et l'historique ne bougent pas**, gardés par des tests.
 Cinq portées ; un jardin « à classer » n'est couvert par aucune des deux
 portées de mode, dit. Une seule fonction, un seul endroit. Sans question
 sur le calcul ; deux questions de conduite de la ferme, **répondues par le
-porteur le 26 novembre 2026 à 11 h 37** : le filtre se lève **à la main
+porteur le 26 novembre 2026 à 12 h 37** : le filtre se lève **à la main
 seulement** (« Reprendre », ni date ni calendrier) ; en mettant hors
 saison, **le module propose d'annuler** les arrosages planifiés ou
 validés des planches concernées, jamais sans son choix.
 
-Numéros : D-337 ; F à partir de F983 pour le code.
+Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, aligné sur #245) pour le code.

@@ -1,7 +1,7 @@
 # Contrat court — l'objectif automatique se voit et se modifie ; ignorer l'irrigation hors saison (6 quaterdecies)
 
 Écrit le 26 novembre 2026, sans code, sur la demande du porteur du jour
-(10 h 24 et 10 h 26, heure de Paris) : « Quand je coche objectif
+(11 h 24 et 11 h 26, heure de Paris) : « Quand je coche objectif
 automatique, ça ne remplit pas les objectifs en fonction de l'ET0 [...]
 Je veux que, lorsqu'on coche, les millimètres que je dois rajouter par
 rapport à l'évapotranspiration se renseignent automatiquement partout,
@@ -293,11 +293,11 @@ même PR.
 Posées une par une, sur cartes, avec recommandation ; la question 2 est
 écrite sur l'option recommandée, modifiable :
 
-1. **La reprise** — *répondue par le porteur le 26 novembre 2026 à 11 h 37* :
+1. **La reprise** — *répondue par le porteur le 26 novembre 2026 à 12 h 37* :
    **à la main seulement**, par « Reprendre ». Ni date de reprise, ni
    calendrier : le filtre ne se lève jamais seul.
 2. **Les arrosages déjà planifiés ou validés** — *répondue par le porteur
-   le 26 novembre 2026 à 11 h 37* : **le module propose de les annuler**.
+   le 26 novembre 2026 à 12 h 37* : **le module propose de les annuler**.
    En mettant hors saison, une fenêtre compte les arrosages planifiés ou
    validés des planches concernées et propose « Les annuler » ou « Les
    garder » (le défaut) ; rien n'est annulé sans ce choix, et l'annulation

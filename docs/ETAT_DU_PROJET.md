@@ -18,7 +18,9 @@ registres, elle y renvoie.
   6 quaterdecies). Cause établie : l'objectif automatique est calculé, pas
   écrit, le volet reste vide. Quatre PR (A1, B1 à B3) après la fusion de S4
   et S6 ; le filtre n'ignore que l'irrigation, la pluie et son historique
-  restent. Deux questions au porteur (la reprise, les arrosages planifiés).
+  restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
+  filtre se lève à la main seulement, les arrosages planifiés sont proposés
+  à l'annulation.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
