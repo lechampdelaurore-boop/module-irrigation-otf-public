@@ -44,11 +44,12 @@ test('le « ? » de chaque page l’explique ; une bulle dit d’où vient un ch
 
   // Arrosages : la durée d'un arrosage pour la dose demandée, 25 mm à 10 mm/h.
   await attendreLaPageIrrigation(page, 'arrosages');
-  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+  // « Saisir en mm » (simplification S5) : la durée devient le résultat, avec sa bulle.
+  await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
   await choisirMaterielEtReglage(page, materiel, reglage);
-  const resultat = page.locator('.irrigation-preview');
-  await expect(resultat.locator('.calculated-duration')).toContainText('2 h 30');
-  await verifierLaBulle(page, resultat.locator('.calculated-duration'), `2 h 30 : le temps pour que ${planche} reçoive 25 mm à 10 mm/h.`);
+  const resultat = page.locator('.watering-duration-result');
+  await expect(resultat).toContainText('soit 2 h 30');
+  await verifierLaBulle(page, resultat, `2 h 30 : le temps pour que ${planche} reçoive 25 mm à 10 mm/h.`);
   await verifierLEtape(page, journal, 'bulle de la durée d’un arrosage');
 });
 

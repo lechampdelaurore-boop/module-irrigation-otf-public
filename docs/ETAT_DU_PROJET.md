@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5, PR 1 sur 3 : « Arroser maintenant »
+  en trois champs, codée le 25 novembre 2026** (D-332, F894 à F901 ;
+  contrat `docs/simplification-s5-contract.md`, sections 3 et 9.3 ;
+  roadmap section 6 terdecies, ligne 33), en Opus 5.5 · Élevé, après la fin
+  du code de S3, sur la branche de sa PR 4. « 1. Où ? » (cases rondes,
+  type et planches ; un seul matériel choisi d'office), « 2. Combien de
+  temps ? » (« − », « + », « 30 min », « 1 h », « Conseillé »), la phrase
+  du résultat, « Démarrer · fin vers … » ; « Plus d'options » pour la
+  pompe, la note, la saisie en mm et la durée exacte ; la pompe dépassée
+  et le créneau protégé au premier niveau. Règles d'écran dans
+  `lib/domain/watering-now.ts` ; le formulaire dans son propre fichier.
+  Aucun calcul ni aucune écriture changés. Tests du domaine et des écrans,
+  parcours P64 (trois touches sans clavier), P1 réécrit, P11, P24, P37,
+  P38, P40, P63 suivent. Budget de hauteur du contrat mesuré, tenu par la
+  PR 3. Contrôles : voir la PR. Viennent les PR 2 et 3.
 - **Simplifier l'usage du module, S3, PR 4 sur 4 : les liens et les
   visites, codée le 25 novembre 2026** (D-331, F890 à F893 ; contrat,
   sections 2 et 9), en Opus 5.5 · Très élevé, sur la branche de la PR 3.
@@ -19,8 +34,10 @@ registres, elle y renvoie.
   « + » (« Trois endroits », « Les endroits suivent vos cases ») ; le « ? »
   d'« Aujourd'hui » situe sa pastille dans la barre du bas ou le menu ; la
   charte du module et les contrats de la démonstration, de S1 et des
-  parcours suivent. Aucun écran ne change. **Le code de S3 est fini** ;
-  les quatre PR se fusionnent après la dernière de S2, une à la fois.
+  parcours suivent. Aucun écran ne change. **Le code de S3 est fini.**
+  **En ligne** : #225 fusionnée le 26 novembre 2026 à 6 h 22 (3076d0f),
+  déployée à 6 h 58, run 45761209624, les cinq jobs verts (consigné par
+  S5, PR 1) : **S3 est en ligne en entier.**
 - **Simplifier l'usage du module, S3, PR 3 sur 4 : le menu de
   l'ordinateur, codée le 25 novembre 2026** (D-331, F885 à F889 ; contrat,
   section 6), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Au-delà
@@ -162,6 +179,19 @@ registres, elle y renvoie.
   cinq PR, Opus 5.5 · Élevé, après la fin du code de S1. Chaque geste est
   une action existante : aucune règle ne change. PR de contrat seule :
   **aucun contrôle rejoué**.
+- **Simplifier l'usage du module, S5 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s5-contract.md`, D-327, roadmap section 6
+  terdecies, ligne 33), sans code, en Sonnet 5.5 · Moyen. « Arroser en trois
+  champs » : le formulaire d'arrosage passe de neuf éléments à un premier
+  niveau court (où, combien de temps, démarrer) et « Plus d'options » (pompe,
+  note, saisir en mm, durée exacte) ; trois PR (« Arroser maintenant » ;
+  « Planifier » et « Déjà fait » ; l'entrée et les mots), Opus 5.5 · Élevé.
+  Aucun calcul ni aucune règle d'écriture changés ; les précautions (pompe
+  dépassée, créneau protégé) restent au premier niveau ; solde les deux dettes
+  de S2 (« Fait comme prévu » devient « C'est fait » sur « Arrosages » ;
+  l'ajustement d'une proposition ne remonte pas). Ce lot ne touche pas l'écran
+  de bienvenue du contrat 3.8 : « trois façons de commencer » est le lot S6.
+  Dépend de la fin du code de S3 ; contrat non fusionné avant #214, #211, #215.
 - **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
   l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
   décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat

@@ -24,6 +24,7 @@ import {
 } from '@/lib/domain/pumps';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import { wettedAreaSquareMeters } from '@/lib/domain/irrigation-calculations';
+import { reachedBedCount } from '@/lib/domain/watering-now';
 import { cubicMetersForFlow, millisecondsFromSeconds } from '@/lib/domain/units';
 import type { IrrigationPreparationMode } from '../irrigation-event/contract';
 import type { CreationKind } from './presentation';
@@ -98,6 +99,16 @@ export function useIrrigationPreview({
     ),
     [equipment, placementByEquipmentId],
   );
+  // « Où ? » dit, ligne par ligne, combien de planches la position enregistrée atteint (S5, section 3.1).
+  const reachedBeds = useMemo(() => {
+    const coverage = calculateIrrigationCoverage({
+      beds,
+      groups,
+      equipment: usableEquipment,
+      placements: usableEquipment.flatMap((item) => placementByEquipmentId.get(item.id) ?? []),
+    });
+    return new Map(usableEquipment.map((item) => [item.id, reachedBedCount(coverage, item.id)]));
+  }, [beds, groups, placementByEquipmentId, usableEquipment]);
   // Aucun matériel par défaut (audit ergonomique, lot 3, point 6, cas 3) : seul le choix de l'utilisateur en désigne un.
   const selectedEquipment = usableEquipment.find((item) => item.id === equipmentId) ?? null;
   const selectedPlacement = selectedEquipment
@@ -251,6 +262,7 @@ export function useIrrigationPreview({
 
   return {
     usableEquipment,
+    reachedBeds,
     selectedEquipment,
     selectedPlacement,
     selectedSetting,
@@ -262,6 +274,8 @@ export function useIrrigationPreview({
     previewApplications,
     previewVolumeLiters,
     previewOrigin,
+    // L'apport horaire de la planche qui règle la durée : la pastille « Conseillé » en tire la durée de la dose du jour (S5, section 3.2).
+    referenceRateMmPerHour: referenceApplication?.rateMmPerHour ?? null,
     // Faux pour une irrigation planifiée dont la date de début ne se lit pas
     // encore : rien ne se planifie alors (point ouvert 46).
     previewStartKnown: plannedStartKnown(creationKind, Date.parse(plannedStartAt)),

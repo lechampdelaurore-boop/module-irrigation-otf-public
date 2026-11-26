@@ -5,6 +5,22 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S5, PR 1 : « Arroser maintenant » en trois champs)
+
+- **Arroser en trois champs** (D-332, F894 à F901) : sur « Arrosages »,
+  l'onglet « Arroser maintenant » (le mot du « + ») demande « 1. Où ? »
+  (une case ronde par matériel, son type et ses planches dessous ; un seul
+  matériel prêt est choisi d'office), « 2. Combien de temps ? » (« − » et
+  « + » de cinq en cinq, les pastilles « 30 min », « 1 h », et
+  « Conseillé » quand le planning propose une dose du jour), puis
+  « Démarrer · fin vers 10 h 50 ». Une phrase dit ce que l'arrosage
+  apportera (« Soit 5 mm sur la planche, et 113 L. ») et la pompe qui
+  s'applique ; une pompe dépassée et un créneau protégé restent visibles.
+  La pompe, la note, la saisie en mm et la durée à la minute sont dans
+  « Plus d'options ». Trois touches, sans clavier, pour lancer un
+  arrosage. Aucun calcul, aucune règle d'enregistrement ne change ;
+  « Planifier » et « Déjà réalisée » gardent leur formulaire pour l'instant.
+
 ### Modifié (simplifier l'usage du module, S3, PR 4 : les liens et les visites)
 
 - **La visite guidée de la démonstration présente les trois endroits**
@@ -126,6 +142,14 @@ source détaillée commit par commit.
   ou annuler » est dans « Autres choix ». Ce sont les mêmes gestes que sur le
   planning et « Arrosages », avec les mêmes gardes ; le planning ne change
   pas. « Valider au planning » disparaît.
+
+### Ajouté (simplifier l'usage du module, S5 : contrat de l'arrosage en trois champs)
+
+- **Contrat du lot S5** (`docs/simplification-s5-contract.md`, D-327) : le
+  formulaire d'arrosage tient en trois champs (où, combien de temps, démarrer)
+  et « Plus d'options » (pompe, note, saisir en mm). Aucun code, aucun calcul
+  ni aucune règle d'écriture changés ; les précautions restent au premier
+  niveau. Ne touche pas l'écran de bienvenue du contrat 3.8 (lot S6).
 
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 

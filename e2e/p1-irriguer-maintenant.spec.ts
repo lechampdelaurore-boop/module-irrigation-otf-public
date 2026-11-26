@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { preparerMaterielArrosant, verifierLaSurfaceMouillee } from './support/materiel.ts';
+import { choisirOuArroser, ouvrirPlusDOptions, preparerMaterielArrosant, verifierLaSurfaceMouillee } from './support/materiel.ts';
 import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape } from './support/parcours.ts';
 
 /**
@@ -29,20 +29,20 @@ test('un matériel neuf permet de démarrer un minuteur qui survit au rechargeme
   await attendreLaPageIrrigation(page, 'arrosages');
 
   // Une irrigation d'une minute : assez courte pour un parcours, assez longue
-  // pour être encore en cours au rechargement.
-  await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
-  // Le nom accessible d'une liste déroulante inclut son choix courant, donc il
-  // change ; on désigne chaque liste par le choix qu'elle propose.
-  await page.locator('select').filter({ has: page.getByRole('option', { name: materiel }) }).selectOption({ label: materiel });
-  await page.locator('select').filter({ has: page.getByRole('option', { name: reglage }) }).selectOption({ label: reglage });
-  await page.getByRole('button', { name: 'Durée d’irrigation' }).click();
-  await page.getByLabel('Heures').fill('0');
-  await page.getByLabel('Minutes').fill('1');
-  await expect(page.getByText('RÉSULTAT CALCULÉ')).toBeVisible();
-  await expect(page.getByText('1 min', { exact: true }).first()).toBeVisible();
+  // pour être encore en cours au rechargement. « Arroser maintenant » en trois
+  // champs (simplification S5, PR 1) : où, combien de temps, démarrer ; une
+  // minute ne se règle qu'à « Durée exacte », dans « Plus d'options ».
+  await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
+  await choisirOuArroser(page, materiel);
+  const options = await ouvrirPlusDOptions(page);
+  await options.getByLabel('Heures').fill('0');
+  await options.getByLabel('Minutes').fill('1');
+  await expect(page.locator('.watering-duration strong')).toHaveText('1 min');
+  // 10 mm/h pendant une minute sur N01 : 0,2 mm, 3,75 L, dits en une phrase.
+  await expect(page.locator('.watering-result').first()).toHaveText(/^Soit 0,2 mm sur la planche, et 4 L\.$/);
   await verifierLEtape(page, journal, 'durée calculée');
 
-  await page.getByRole('button', { name: 'Démarrer l’irrigation' }).click();
+  await page.getByRole('button', { name: new RegExp(`^Démarrer l’arrosage de ${materiel}, fin vers \\d{1,2} h( \\d{2})?$`) }).click();
   await expect(page.getByText('L’irrigation a démarré.')).toBeVisible();
   const enCours = page.getByLabel('Irrigations en cours');
   await expect(enCours).toContainText(materiel);

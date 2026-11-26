@@ -139,7 +139,7 @@ test('« Objectifs et besoins » répond sous chaque bouton, et un rechargement 
   }
 });
 
-test('au-delà de l’objectif de la semaine, « Irriguer maintenant » demande d’abord', async ({ page }, testInfo) => {
+test('au-delà de l’objectif de la semaine, « Arroser maintenant » demande d’abord', async ({ page }, testInfo) => {
   const journal = surveillerLaConsole(page);
   await attendreLaPageIrrigation(page);
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p37 objectif' });
@@ -147,9 +147,9 @@ test('au-delà de l’objectif de la semaine, « Irriguer maintenant » demande 
   await poserUnObjectifDeFerme(page, '10');
   try {
     await attendreLaPageIrrigation(page, 'arrosages');
-    await page.getByRole('tab', { name: /^Irriguer maintenant/ }).click();
+    await page.getByRole('tab', { name: /^Arroser maintenant/ }).click();
     await choisirMaterielEtReglage(page, materiel, reglage);
-    await page.getByRole('button', { name: 'Démarrer l’irrigation' }).click();
+    await page.getByRole('button', { name: new RegExp(`^Démarrer l’arrosage de ${materiel},`) }).click();
     const fenetre = page.locator('dialog.module-confirm-dialog[open]');
     await expect(fenetre).toContainText('25 mm dépassent l’objectif de la semaine de N01 (10 mm). Irriguer quand même ?');
     await fenetre.getByRole('button', { name: 'Ne pas irriguer' }).click();

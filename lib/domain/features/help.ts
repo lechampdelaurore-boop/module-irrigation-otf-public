@@ -27,7 +27,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   arrosages: {
     purpose: 'Enregistrer vos arrosages : celui qui commence maintenant, ceux que vous planifiez et ceux déjà faits.',
     reading: 'En haut, l’eau engagée aujourd’hui et la limite journalière. Puis les arrosages en cours, à venir ou à terminer. Le minuteur suit l’arrosage en cours et vous prévient à la fin.',
-    firstStep: 'Choisissez un matériel posé et son réglage, puis « Irriguer maintenant », « Planifier » ou « Déjà réalisée ».',
+    firstStep: 'Choisissez un matériel posé et son réglage, puis « Arroser maintenant », « Planifier » ou « Déjà réalisée ».',
   },
   besoins: {
     purpose: 'Fixer l’eau que vos planches doivent recevoir chaque semaine, et voir ce qu’il leur manque.',

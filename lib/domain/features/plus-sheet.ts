@@ -52,7 +52,7 @@ export const WATERING_INTENT = 'arroser';
 /** La valeur de la demande pour chaque geste qui ouvre un formulaire d'« Arrosages ». */
 export const WATERING_INTENT_VALUES = { 'arroser-maintenant': 'maintenant', 'arrosage-fait': 'fait' } as const;
 
-/** Le formulaire d'« Arrosages » qu'ouvre une demande : « Irriguer maintenant » ou « Déjà réalisée » ; `null` pour une valeur inconnue. */
+/** Le formulaire d'« Arrosages » qu'ouvre une demande : « Arroser maintenant » ou « Déjà réalisée » ; `null` pour une valeur inconnue. */
 export function wateringIntentForm(value: string): 'running' | 'completed' | null {
   if (value === WATERING_INTENT_VALUES['arroser-maintenant']) return 'running';
   if (value === WATERING_INTENT_VALUES['arrosage-fait']) return 'completed';
