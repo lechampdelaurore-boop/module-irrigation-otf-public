@@ -11502,8 +11502,9 @@ Précisions prises en codant :
 
 ## D-336 — Simplifier l'usage du module, lot S6 : la mise en route guidée
 
-Date : 26 novembre 2026. Statut : **PR 3 sur 4 codée** (PR 1 #235 et
-PR 2 #236 ouvertes) ; contrat `docs/simplification-s6-contract.md`
+Date : 26 novembre 2026. Statut : **PR 3 sur 4 codée** (contrat #218 en
+ligne le 26 novembre 2026 à 20 h 42 ; PR 1 #235 fusionnée à 21 h 32 ; PR 2
+#236 ouverte) ; contrat `docs/simplification-s6-contract.md`
 (sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
 PR 2 ; 7, 14 et 15 pour la PR 3), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
