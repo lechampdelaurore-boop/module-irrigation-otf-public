@@ -88,9 +88,10 @@ test('n° 21, F469 : un seul dessin de pli, le chevron à droite, sauf les menus
 });
 
 test('n° 21, F470 : les raccourcis et les choix ne sont plus pleins', () => {
-  const water = readFileSync('app/irrigation/water-management-dashboard.tsx', 'utf8');
-  assert.match(water, /className="water-week-today"/);
-  assert.match(water, /today >= dashboard\.weekStart && today <= dashboard\.weekEnd/, '« Cette semaine » indisponible quand on y est');
+  // « Cette semaine » est un lien en secondaire, sous les flèches de la page « Semaine » (S4, PR 2), absent quand on y est.
+  const week = readFileSync('app/irrigation/semaine/week-first-level.tsx', 'utf8');
+  assert.match(week, /\{heading\.thisWeek \? <a className="week-this-week" href=\{href\(heading\.thisWeek, currentSeason\)\}>Cette semaine<\/a> : null\}/);
+  assert.match(readFileSync('lib/domain/semaine/week-heading.ts', 'utf8'), /thisWeek: state === 'current' \? null : weekStartDateKey\(today\)/, '« Cette semaine » indisponible quand on y est');
   assert.match(readFileSync('app/irrigation/water-resource-manager.tsx', 'utf8'), /aria-pressed=\{dashboard\.horizon === horizon\}/);
   assert.match(readFileSync('app/irrigation/garden-group-manager.tsx', 'utf8'), /data-secondary=\{!hasSprinkler \|\| undefined\}/);
   assert.match(readFileSync('app/irrigation/hierarchy-browser.tsx', 'utf8'), /hasSprinkler=\{equipment\.some\(\(item\) => item\.kind === 'sprinkler'\)\}/);

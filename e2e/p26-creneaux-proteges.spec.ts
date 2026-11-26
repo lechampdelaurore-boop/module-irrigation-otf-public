@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { millisecondsFromMinutes } from '../lib/domain/units.ts';
 import { dateKeyInTimeZone, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant } from './support/materiel.ts';
-import { attendreLaPageIrrigation, confirmerDansLaFenetre, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
+import { attendreLaPageIrrigation, confirmerDansLaFenetre, ouvrirLesPlisAutour, surveillerLaConsole, verifierCibleTactile, verifierLEtape } from './support/parcours.ts';
 import { annulerLesIrrigationsDuPlanning, lignesNonPlacees, poserUnObjectifDeFerme, reglerLaPlageDuGoutteAGoutte, retirerLesObjectifs } from './support/planning.ts';
 
 /**
@@ -83,7 +83,8 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
   await ajouterUnCreneau(planning, 'Lavage');
   await expect(listeDesCreneaux(planning)).toContainText('Lavage · tous les jours · de 0 h à 23 h 59');
   await expect(creneaux.locator('.planning-notice')).toContainText('Créneau protégé « Lavage » enregistré : il vaut au prochain calcul.');
-  if (offertes) await expect(proposees().first(), 'le plan affiché reste celui d’avant le créneau').toBeVisible();
+  // Au téléphone, la carte est sous la ligne de son créneau, dans « Jour par jour » (S4, PR 2) : elle est là, fermée.
+  if (offertes) await expect(proposees().first(), 'le plan affiché reste celui d’avant le créneau').toBeAttached();
   await verifierLEtape(page, journal, 'créneau « Lavage » enregistré');
 
   if (offertes) {
@@ -136,6 +137,8 @@ test('un créneau protégé se crée, vaut au prochain calcul, écarte le plan, 
     await expect(suggestion).toHaveAttribute('data-suggestion', 'cancel');
     await expect(suggestion.locator('.planning-suggestion-head strong')).toHaveText('Annuler');
     await expect(suggestion.locator('.planning-suggestion-causes')).toContainText('cet arrosage tombe dans le créneau protégé « Lavage des légumes »');
+    // Les suggestions sont dans « Le plan, chaîne par chaîne », au détail de la page « Semaine » (S4, PR 2).
+    await ouvrirLesPlisAutour(suggestion);
     await expect(suggestion.getByRole('button', { name: 'Garder' })).toBeVisible();
     await verifierLEtape(page, journal, 'suggestion « Annuler » sur l’arrosage planifié');
 
@@ -187,6 +190,8 @@ function listeDesCreneaux(planning: Locator): Locator {
 /** Le pli « Réglages du planning » ouvert, s'il ne l'est pas déjà. */
 async function ouvrirLesReglages(planning: Locator): Promise<void> {
   const reglages = planning.locator('details.planning-settings');
+  // Dans « Réglages de la semaine », le dernier pli de « Le détail » (S4, PR 2).
+  await ouvrirLesPlisAutour(reglages);
   await reglages.scrollIntoViewIfNeeded();
   if (!(await reglages.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await reglages.locator('summary').click();
