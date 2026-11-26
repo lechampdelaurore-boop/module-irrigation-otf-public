@@ -1194,14 +1194,15 @@ selon la règle de la section 10.
     (D-330), en Opus 5.5 · Élevé : le code de S2 est fini, ses PR s'ouvrent
     une à une ; **la PR 1 en ligne à 19 h 57** (#219, run 45675486394), **la
     PR 2 à 20 h 40** (#221, run 45682330610), **la PR 3 à 21 h 29** (#224,
-    run 45689347330), **la PR 4 à 22 h 13** (#226, run 45696515280). Un seul chantier
+    run 45689347330), **la PR 4 à 22 h 13** (#226, run 45696515280), **la PR 5 à 23 h 16** (#229, run 45707546339) : **S2 est en ligne en entier**. Un seul chantier
     de code à la fois ; indépendant des lignes 30 à 32 (S1 ne touche ni l'objectif
     automatique ni les notifications), mais S2 et S3 attendent la fin du
     code de S1 (fichiers communs : le gabarit des pages). **Contrat S3
     écrit le 25 novembre 2026** (`docs/simplification-s3-contract.md`, sans
     code) ; **S3, PR 1 sur 4 (le rangement et « Ma ferme ») codée le
     25 novembre 2026** (D-331), en Opus 5.5 · Très élevé, après la fin du
-    code de S2 ; **PR 2 sur 4 (la barre du bas, le « + », la bande de la
+    code de S2, **en ligne le 26 novembre 2026 à 3 h 17** (#220, run
+    45716978089) ; **PR 2 sur 4 (la barre du bas, le « + », la bande de la
     semaine, le retour) codée le même jour** (D-331) ; **PR 3 sur 4 (le
     menu de l'ordinateur) codée le même jour** (D-331) ; ses PR se
     fusionnent après la dernière de S2 ; vient la PR 4 (les liens et les
