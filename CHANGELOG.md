@@ -13,6 +13,17 @@ source détaillée commit par commit.
   ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
   avant le code. Rien ne change pour l'instant.
 
+### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
+
+- **« Arroser ou noter » plus court au téléphone pendant un arrosage**
+  (D-342, F996, F997) : la carte de l'arrosage en cours se range plus
+  serré (le nom à côté du minuteur, « En cours » à côté du réglage, des
+  marges plus courtes, sans cadre bleu autour) et « 1. Où ? » commence à
+  653 px au lieu de 800 px, sous le budget de 700 px. Rien n'est retiré :
+  les trois valeurs, le détail des apports, la pompe et les deux boutons
+  restent. « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »),
+  comme sur « Aujourd'hui ».
+
 ### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
 
 - **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page
