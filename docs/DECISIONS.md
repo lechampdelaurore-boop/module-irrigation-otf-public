@@ -11510,3 +11510,61 @@ abri ; le K_abri ne change que le total du jour.
 **Question 3 sur 3, tranchée le 26 novembre 2026** : « Oui, en information
 (75 %) » ; les heures dont l'ET0 est à 75 % ou plus du maximum du jour, dites
 sans interdiction ni alerte. Les trois questions sont répondues.
+
+## D-348 — L'ET0 horaire, HR1 : la forme de la journée, domaine pur
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/et0-horaire-contract.md` (§ 2, § 4.1 à § 4.4, § 11 scénarios 1 à 6,
+8 et 9 ; § 12, PR HR1), roadmap section 6 septendecies, ligne 37. Code en
+Opus 5.5 · Élevé, le réglage de la ligne. Aucune question agronomique
+nouvelle : les trois réponses du porteur (D-340) s'appliquent.
+
+**Décision.** `lib/domain/weather/hourly-et0.ts`, sans base ni réseau, dit
+les heures d'une journée civile du lieu (`hoursOfDay` : 24, 23 ou 25, au
+fuseau du lieu, l'heure répétée comptée deux fois dans l'ordre), les parts
+tirées d'une ET0 horaire (`sharesFromHourlyEt0`), la forme théorique du
+soleil (`theoreticalShares`), le choix de la meilleure source
+(`dayShape` : fournisseur, puis calculée, puis théorique, la nature dite,
+jamais un mélange), la part écoulée à un instant (`elapsedShare`), la plage
+de forte évaporation (`highDemandRange`, 75 % du maximum) et la lecture
+d'un total du jour (`readDayShape` : consommé, reste, plage ; les trois
+inconnus, jamais 0, sans total). Rien ne l'appelle encore : HR2 l'utilise
+pour lire et écrire, HR3 pour l'écran. **Aucun calcul existant ne change**
+(scénario 12) : aucun test de la jauge, de l'ETM, de l'objectif ni des
+alertes n'est touché.
+
+Précisions prises en codant (option recommandée, modifiables par le porteur) :
+
+- **F1030** — « Petite valeur négative de nuit » (§ 4.2) : jusqu'à
+  0,05 mm en une heure, ramenée à 0 avant l'addition ; au-delà, l'heure est
+  absente et la forme du fournisseur est refusée pour ce jour
+  (`NIGHT_NEGATIVE_TOLERANCE_MM`). Le calcul FAO-56 horaire donne la nuit
+  quelques centièmes négatifs ; plus, ce n'est plus une correction.
+- **F1031** — « Regroupées en une plage » (§ 4.3) : la plage va de la
+  première à la dernière heure au seuil ; une heure plus faible entre les
+  deux (un passage nuageux à midi) reste dedans. Une seule phrase à l'écran,
+  comme le contrat la montre.
+- **F1032** — La forme théorique (§ 4.4) : déclinaison de FAO-56
+  (équation 24) au rang du jour civil du lieu ; hauteur du soleil au milieu
+  de chaque heure, heure solaire tirée de l'instant UTC et de la longitude,
+  équation du temps négligée comme le contrat le dit. Un jour où le soleil
+  n'est au-dessus de l'horizon au milieu d'aucune heure n'a pas de forme
+  (`null`), jamais une forme inventée.
+- **F1033** — Les heures d'un jour partent de `localDateStartUtc`, la
+  fonction de toutes les dates du module ; un fuseau à changement d'heure
+  d'une demi-heure (île Lord Howe) donnerait une dernière heure plus courte,
+  non testé : le pilote est en France métropolitaine (F419).
+- **F1034** — La fraîcheur de la forme (§ 4.5) et l'arrondi des
+  millimètres (« environ 1,7 mm ») ne sont pas dans HR1 : la fraîcheur se lit
+  avec l'heure de lecture que HR2 écrit, l'arrondi est celui de l'écran
+  (HR3). Le domaine rend des millimètres non arrondis.
+
+**Tests.** `tests/hourly-et0.test.ts` (22) : scénarios 1 à 6, 8 et 9 de la
+section 11 (13,6 % et 0,33 mm à 14 h ; 31,1 %, 0,75 mm et 1,65 mm à 12 h ;
+2,07 mm pour une ETM de 3,0 mm ; 37,9 % à 12 h 30 ; 11 h à 16 h ; jours de
+23 et 25 heures ; forme théorique symétrique, maximum à l'heure du midi
+solaire), plus : le total du jour reste la référence (2,4 mm consommés à
+20 h, pas 2,28), une heure absente ou illisible refuse la forme, la petite
+valeur négative de nuit, la source suivante prise et nommée, la nuit
+polaire, même forme sous abri (question 2), le fuseau du lieu (Martinique).
+
