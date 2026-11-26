@@ -88,7 +88,11 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   // le premier niveau de la PR 2 a son propre budget, 1 700 px (section 11).
   // Lot S4, PR 2 (F929) : le premier niveau, puis « Le détail » fermé ; 3 935 → 2 846 px mesurés en local, la
   // suite jouée jusqu'à P40 ; la borne garde 15 % pour les jours de la semaine, que la page montre chacun.
-  semaine: 3_300,
+  // Lot S4, PR 3 (F939) : les gestes du bilan (60 px) et « Exporter » (44 px) ; surtout, « Jour par jour » porte
+  // les créneaux que les parcours d'avant laissent sur la ferme des parcours (15 créneaux, 2 255 px de jours) :
+  // 4 107 px mesurés en local, les 21 parcours de la suite qui touchent « Semaine » joués avant P40. La borne
+  // garde 10 % ; le premier niveau a son budget à part, tenu par P67 sur une ferme neuve.
+  semaine: 4_500,
   // PR 6 (F461) : trois onglets, le plan d'abord ; au téléphone, les jardins repliés. 1 782 px avec
   // les quatre jardins des données des parcours : le budget du contrat, pour une ferme de dix-huit jardins.
   materiel: 5_300,
