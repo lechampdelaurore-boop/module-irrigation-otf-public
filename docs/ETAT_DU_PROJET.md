@@ -35,7 +35,9 @@ registres, elle y renvoie.
   l'ordinateur ne change qu'à la PR 3. Tests sur les 235 choix de cases,
   parcours P63 aux deux largeurs, mesures à 390 px : voir la PR. L'essai des
   cinq tâches avec le premier volontaire est conseillé avant sa mise en
-  ligne (S3-m), jamais bloquant.
+  ligne (S3-m), jamais bloquant. **En ligne, consignée par la PR 3** :
+  #222 fusionnée le 26 novembre à 3 h 57, déployée à 4 h 27, run
+  45745833876 vérifié job par job (les cinq jobs verts).
 - **Simplifier l'usage du module, S3, PR 1 sur 4 : le rangement et « Ma
   ferme », codée le 25 novembre 2026** (D-331, F868 à F875 ; contrat,
   sections 3 et 5), en Opus 5.5 · Très élevé, sur la branche de la PR 5 de

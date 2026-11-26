@@ -1203,10 +1203,10 @@ selon la règle de la section 10.
     25 novembre 2026** (D-331), en Opus 5.5 · Très élevé, après la fin du
     code de S2, **en ligne le 26 novembre 2026 à 3 h 17** (#220, run
     45716978089) ; **PR 2 sur 4 (la barre du bas, le « + », la bande de la
-    semaine, le retour) codée le même jour** (D-331) ; **PR 3 sur 4 (le
+    semaine, le retour) codée le même jour** (D-331), **en ligne le
+    26 novembre à 4 h 27** (#222, run 45745833876) ; **PR 3 sur 4 (le
     menu de l'ordinateur) codée le même jour** (D-331) ; ses PR se
-    fusionnent après la dernière de S2 ; vient la PR 4 (les liens et les
-    visites).
+    fusionnent une à la fois ; vient la PR 4 (les liens et les visites).
 
 **Idées Tlaloc, placement validé par le porteur le 6 novembre 2026**
 (`/mnt/project-files/tlaloc-comparaison/placement-idees-tlaloc.md`) :
