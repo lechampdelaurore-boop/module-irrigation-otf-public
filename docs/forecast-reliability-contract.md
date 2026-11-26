@@ -1,4 +1,4 @@
-# Contrat court — la météo prévue contre la météo réalisée (6 quaterdecies)
+# Contrat court — la météo prévue contre la météo réalisée (6 quindecies)
 
 Écrit le 26 novembre 2026, sans code, en Sonnet 5.5 · Moyen (grille du travail
 sans code). L'idée est rangée depuis le 7 novembre 2026 (D-065, roadmap

@@ -11028,11 +11028,11 @@ Précisions prises en codant :
   téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
   avec une note datée.
 
-## D-337 — La météo prévue contre la météo réalisée : le contrat
+## D-338 — La météo prévue contre la météo réalisée : le contrat
 
 Date : 26 novembre 2026. Statut : **contrat écrit, sans code** ;
-`docs/forecast-reliability-contract.md`, roadmap section 6 quaterdecies,
-ligne 34. Contrat en Sonnet 5.5 · Moyen ; code en Opus 5.5 · Élevé (deux PR),
+`docs/forecast-reliability-contract.md`, roadmap section 6 quindecies,
+ligne 35. Contrat en Sonnet 5.5 · Moyen ; code en Opus 5.5 · Élevé (deux PR),
 après la relecture et le « vas-y » du porteur.
 
 **Décision.** Le porteur avance l'idée « prévu contre réalisé » (D-065,

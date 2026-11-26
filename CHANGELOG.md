@@ -7,8 +7,8 @@ source détaillée commit par commit.
 
 ### Ajouté (contrat : la météo prévue contre la météo réalisée, sans code)
 
-- **Contrat écrit** (D-337, `docs/forecast-reliability-contract.md`, roadmap
-  section 6 quaterdecies) : comparer, ferme par ferme, la prévision archivée
+- **Contrat écrit** (D-338, `docs/forecast-reliability-contract.md`, roadmap
+  section 6 quindecies) : comparer, ferme par ferme, la prévision archivée
   (D-297) au réalisé, pour la pluie et l'ET0, à un jour, à quelques jours et
   sur la semaine ; un pli fermé sur « Objectifs et besoins », aucun chiffre
   sans assez de jours. Aucun code, aucun calcul changé, aucune migration.
