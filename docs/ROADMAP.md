@@ -5911,7 +5911,7 @@ relit la base trop souvent (49 fois le même identifiant d'espace pour
 La mesure sur le téléphone réel du porteur, dans son Chrome, reste à faire
 sur son accord ; elle dira la part de chaque frein.
 
-## 6 terdecies. Chantier — Simplifier l'usage du module (🟡 six lots retenus le 25 novembre 2026, S1 codé : PR 1, 2, 3 et 3 bis ; S2 codé : PR 1 à 5 ; S3 codé : PR 1 à 4 ; S5 codé : PR 1 à 3, en ligne ; S4 codé : PR 1 à 4)
+## 6 terdecies. Chantier — Simplifier l'usage du module (🟡 six lots retenus le 25 novembre 2026, S1 codé : PR 1, 2, 3 et 3 bis ; S2 codé : PR 1 à 5 ; S3 codé : PR 1 à 4 ; S5 codé : PR 1 à 3, en ligne ; S4 codé : PR 1 à 4 ; S6 codé : PR 1 à 4)
 
 **Origine.** Le 25 novembre 2026 à 9 h 26, le porteur : « le logiciel, d'une
 manière générale, est très complexe à utiliser ; il faudrait le simplifier ».
