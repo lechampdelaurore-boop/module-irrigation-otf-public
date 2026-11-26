@@ -8,6 +8,7 @@ import { FEATURE_SETTINGS_ANCHOR, pageHref, pageLabel, pagePath, type AbsentPage
 import { backToFarm } from '@/lib/domain/features/phone-bar';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
 import type { DemoSelection } from '@/lib/domain/demo/catalogue';
+import { CUMULS_VIEW_VALUE, WEEK_VIEW_PARAM, type WeekViewId } from '@/lib/domain/features/week-page';
 import type { UnfinishedStep } from '@/lib/domain/onboarding/steps';
 import { createSeasons, sourceLabel } from '../hierarchy/presentation';
 import { Icon } from '../line-icon';
@@ -15,7 +16,7 @@ import { FeatureBanner } from './feature-banner';
 import { FeatureMenu, takeMenuNavigation } from './feature-menu';
 import { UnfinishedBanner } from './unfinished-banner';
 import { PageTitle } from './page-title';
-import { BackToFarm, WeekBand } from './place-paths';
+import { BackToFarm, WeekViews } from './place-paths';
 import { Topbar } from './topbar';
 import { dateClockText } from '@/lib/domain/clock-text';
 
@@ -62,8 +63,10 @@ export type ShellProps = {
   demoSelection: DemoSelection | null;
   /** Les étapes de l'accueil à finir, dites sur chaque page (4.4, F582) ; vide pour une ferme réglée. */
   unfinished: readonly UnfinishedStep[];
-  /** Le jour de la semaine ouvert, gardé par la bande « La semaine » (simplification S3, section 3.3). */
+  /** Le jour de la semaine ouvert, gardé par l'entrée « Semaine » de la barre et du menu (simplification S3, section 3.3). */
   week: string | null;
+  /** La vue ouverte de « Semaine » (lot S4, section 3.2) ; `null` sur toute autre page. */
+  weekView: WeekViewId | null;
   /** La pluie compte pour la ferme (`farmRainMatters`) : le « + » propose « Noter la pluie » (S3, section 4.1). */
   rainMatters: boolean;
 };
@@ -80,11 +83,11 @@ export function IrrigationShell({
   /** La pastille de « Aujourd'hui » quand la page la connaît (F12) ; absente, le menu la lit après l'affichage. */
   todayBadge?: number | null;
 }) {
-  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, readLine, banner, notice, demo, demoSelection, unfinished, week, rainMatters } = props;
+  const { page, menu, season, showSeason, seasonFirst, seasonLast, zone, userName, signOutPath, source, lastSuccessfulReadAt, warning, readLine, banner, notice, demo, demoSelection, unfinished, week, weekView, rainMatters } = props;
 
   const shell = useRef<HTMLElement>(null);
 
-  // Rejoué à chaque page : sans rechargement, le gabarit peut rester en place d'une page à l'autre (D-322).
+  // Rejoué à chaque page, et à chaque vue de « Semaine » (lot S4) : sans rechargement, le gabarit peut rester en place d'une page à l'autre (D-322).
   useEffect(() => {
     // La page répond aux clics : les parcours navigateur l'attendent avant d'agir
     // (docs/browser-journeys-contract.md), au lieu de réessayer leur premier clic.
@@ -100,11 +103,11 @@ export function IrrigationShell({
     url.searchParams.delete('refresh');
     url.searchParams.delete('absente');
     window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
-  }, [page]);
+  }, [page, weekView]);
 
   const updatedAt = dateClockText(lastSuccessfulReadAt, 'Europe/Paris', 'long');
   const title = pageLabel(page);
-  const refreshHref = pageHref(page, { season, zone, refresh: true });
+  const refreshHref = pageHref(page, { season, zone, refresh: true, view: weekView });
 
   return (
     <main ref={shell} className="app-shell" data-page={page}>
@@ -122,7 +125,7 @@ export function IrrigationShell({
 
       <div className="feature-layout">
         {/* Un menu neuf à chaque page, comme après un rechargement (D-322) : la feuille du « + » refermée, la pastille relue. */}
-        <FeatureMenu key={page} menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} rainMatters={rainMatters} week={week} />
+        <FeatureMenu key={page} menu={menu} current={page} query={{ season, zone }} todayBadge={todayBadge} rainMatters={rainMatters} week={week} weekView={weekView} />
 
         <div className="feature-page" id="contenu" tabIndex={-1}>
           <section className="intro" aria-labelledby="page-title">
@@ -130,9 +133,9 @@ export function IrrigationShell({
               title={title}
               help={pageHelp(page)}
               back={backToFarm(page) ? <BackToFarm query={{ season, zone }} /> : null}
-              aside={showSeason ? <SeasonPicker page={page} season={season} seasonFirst={seasonFirst} seasonLast={seasonLast} compact /> : null}
+              aside={showSeason ? <SeasonPicker page={page} season={season} seasonFirst={seasonFirst} seasonLast={seasonLast} weekView={weekView} compact /> : null}
             />
-            <WeekBand menu={menu} current={page} query={{ season, zone, week }} />
+            {page === 'semaine' && weekView ? <WeekViews menu={menu} current={weekView} query={{ season, zone, week }} /> : null}
             {readLine ? (
               <div className="sync-card" data-source={source} role="status">
                 <span className="status-dot" aria-hidden="true" />
@@ -168,7 +171,7 @@ export function IrrigationShell({
           {showSeason || controls ? (
             // Au téléphone, la saison passe dans la ligne du titre (F7) : un bloc qui ne porte qu'elle disparaît.
             <section className={controls ? 'plan-controls' : 'plan-controls plan-controls-season-only'} aria-label={controls ? 'Choix du plan affiché' : 'Choix de la saison'}>
-              {showSeason ? <SeasonPicker page={page} season={season} seasonFirst={seasonFirst} seasonLast={seasonLast} /> : null}
+              {showSeason ? <SeasonPicker page={page} season={season} seasonFirst={seasonFirst} seasonLast={seasonLast} weekView={weekView} /> : null}
               {controls}
             </section>
           ) : null}
@@ -191,13 +194,15 @@ export function IrrigationShell({
  * Le choix de la saison : sous le titre à l'ordinateur, dans la ligne du
  * titre au téléphone, en un petit menu de 44 px (audit ergonomique, point 2,
  * précision F7). Les deux existent ; la feuille de style montre celui de la
- * largeur. Un choix recharge la page sur la saison choisie.
+ * largeur. Un choix recharge la page sur la saison choisie, dans la même vue
+ * de « Semaine » (lot S4).
  */
-function SeasonPicker({ page, season, seasonFirst, seasonLast, compact = false }: {
+function SeasonPicker({ page, season, seasonFirst, seasonLast, weekView, compact = false }: {
   page: IrrigationPageId;
   season: number;
   seasonFirst: number;
   seasonLast: number;
+  weekView: WeekViewId | null;
   compact?: boolean;
 }) {
   const select = (
@@ -222,6 +227,8 @@ function SeasonPicker({ page, season, seasonFirst, seasonLast, compact = false }
           {select}
         </label>
       )}
+      {/* Après la saison : l'adresse se lit comme celles de `pageHref`, `?season=…&vue=cumuls`. */}
+      {weekView === 'cumuls' ? <input type="hidden" name={WEEK_VIEW_PARAM} value={CUMULS_VIEW_VALUE} /> : null}
     </form>
   );
 }

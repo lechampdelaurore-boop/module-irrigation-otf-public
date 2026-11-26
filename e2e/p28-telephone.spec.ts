@@ -185,7 +185,8 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   const tuiles = planning.locator('.planning-summary');
   const ecoules = planning.getByRole('button', { name: /^Jours écoulés \(\d+\)$/ });
   if (telephone) {
-    const hauteur = await page.evaluate(() => document.documentElement.scrollHeight);
+    // Depuis le lot S4, les besoins suivent le planning sur la même page : le planning se mesure jusqu'à son bas.
+    const hauteur = await planning.evaluate((element) => Math.round(element.getBoundingClientRect().bottom + window.scrollY));
     expect(hauteur, `le planning mesure ${hauteur} px, plus de ${ECRANS_DU_PLANNING_MAX} écrans`).toBeLessThanOrEqual(ECRANS_DU_PLANNING_MAX * ECRAN_DU_TELEPHONE_PX);
     await expect(resume).toBeVisible();
     // Les gestes d'abord, comme les cartes de tête (audit ergonomique, lot 3, point 5).

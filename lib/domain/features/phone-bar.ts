@@ -9,9 +9,10 @@ import { menuPlacePages, PLACE_IDS, placeMark, placeOfPage, type PlaceId } from 
  * Ma ferme. Un endroit sans page cochée disparaît, les autres se partagent
  * la largeur ; le « + » n'existe que si l'un de ses gestes existe
  * (`plusGestures`). Toute page est à deux touches au plus : un endroit, puis
- * une fiche ou la bande de la semaine (« Arrosages » passe par le « + » ou par
- * « Aujourd'hui », section 3.4). Le menu de l'ordinateur range de même
- * (`menuPlaces`, PR 3).
+ * une fiche (« Arrosages » passe par le « + » ou par « Aujourd'hui »,
+ * section 3.4) ; « Semaine » est une page depuis le lot S4, et sa seconde
+ * vue est à une touche de la première, par son sélecteur de vue. Le menu de
+ * l'ordinateur range de même (`menuPlaces`, PR 3).
  */
 
 type PhoneBarPlace = {
@@ -37,17 +38,6 @@ export function phoneBar(menu: readonly IrrigationPageId[], current: IrrigationP
   return [...places.slice(0, at), { kind: 'plus' }, ...places.slice(at)];
 }
 
-/**
- * La bande « La semaine » (section 3.3, S3-a) : sur une page de « Semaine »,
- * un lien par page cochée de l'endroit, au nom court ; `null` hors de
- * « Semaine » ou avec moins de deux pages cochées. S4 la retirera.
- */
-export function weekBand(menu: readonly IrrigationPageId[], current: IrrigationPageId | null): IrrigationPageId[] | null {
-  if (current === null || placeOfPage(current) !== 'semaine') return null;
-  const pages = menuPlacePages('semaine', menu);
-  return pages.length >= 2 ? pages : null;
-}
-
 /** Le retour « ‹ » vers les fiches (section 5.1) : sur toute page de « Ma ferme » hors « Ma ferme » elle-même. */
 export function backToFarm(current: IrrigationPageId | null): boolean {
   return current !== null && current !== 'ma-ferme' && placeOfPage(current) === 'ma-ferme';
@@ -55,18 +45,3 @@ export function backToFarm(current: IrrigationPageId | null): boolean {
 
 /** Le nom accessible du retour (section 5.1). */
 export const BACK_TO_FARM_LABEL = 'Retour à Ma ferme';
-
-/**
- * Le nom court d'une page de la semaine dans sa bande, celui qu'elle portait
- * dans la barre du bas d'avant (section 3.3) ; le nom complet reste le nom
- * accessible du lien.
- */
-const SHORT_LABELS: Partial<Record<IrrigationPageId, string>> = {
-  planning: 'Planning',
-  besoins: 'Besoins',
-  historique: 'Historique',
-};
-
-export function weekBandLabel(page: IrrigationPageId, fullLabel: string): string {
-  return SHORT_LABELS[page] ?? fullLabel;
-}

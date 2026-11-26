@@ -69,6 +69,11 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
     reading: 'Les cumuls sont en millimètres et en mètres cubes. À l’échelle d’un jardin ou de la ferme, ils sont pondérés par la surface des planches.',
     firstStep: 'Choisissez un périmètre et une période, ou une série. « Exporter CSV » garde les chiffres dans un tableur.',
   },
+  semaine: {
+    purpose: 'Savoir où en est l’eau de la semaine, sur une seule page : les arrosages proposés à valider, l’eau visée, la météo et la pluie, ce qu’il reste à arroser. « Les cumuls » retrouve l’eau apportée sur une autre période.',
+    reading: 'La semaine va du lundi au dimanche. Le plan, quand vous l’avez coché, vient d’abord, puis l’eau visée, la météo, la pluie mesurée et le tableau des jours, puis le besoin de chaque planche : son eau visée moins l’eau déjà reçue, arrosages et pluie. Seules vos fonctionnalités cochées ont leur partie.',
+    firstStep: 'Lisez les propositions du plan et validez celles qui vous conviennent : rien n’est arrosé sans vous. Après une pluie, notez ce qu’indique votre pluviomètre.',
+  },
   'ma-ferme': {
     purpose: 'Retrouver ce que le module sait de votre ferme : votre matériel, d’où vient l’eau, vos cultures, votre sol, les alertes et les réglages. On y vient surtout à l’installation, ou quand quelque chose change au champ.',
     reading: 'Chaque fiche ouvre sa page et dit en une ligne à quoi elle sert. « À faire », en orange, marque une fiche où il reste une étape de l’accueil de la ferme, la même que dans « À finir ». Seules vos fonctionnalités cochées ont leur fiche ; Réglages est toujours là.',
