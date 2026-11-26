@@ -10517,7 +10517,8 @@ faisait 3 888 px sur la démonstration. Contre-épreuve : voir la PR.
 
 ## D-331 — Simplifier l'usage du module, lot S3 : trois endroits
 
-Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées** (le rangement
+Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées, en ligne le
+26 novembre 2026, recette conforme le même jour** (le rangement
 et « Ma ferme » ; la barre du bas, le « + » et le chemin de retour ; le menu
 de l'ordinateur ; les liens et les visites) ; contrat `docs/simplification-s3-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le réglage de
@@ -10784,6 +10785,20 @@ montre », « Arroser, Équiper » ; le « ? » d'« Aujourd'hui » ; le repère
 règles des bulles (`demo-tours` : longueur, sans emoji ni sigle, pages
 cochées) tiennent sans changer. Parcours V1 et V6 de la démonstration et
 P29, aux deux largeurs. Contre-épreuve : voir la PR.
+
+**Preuve (recette).** S3 en ligne en entier le 26 novembre 2026 à 6 h 58
+(#220, #222, #223, #225). Recette faite le même jour vers 11 h 15, avec
+l'accord du porteur (« Vas-y, fais la recette », 11 h 12), sur la
+démonstration dans son Chrome, en lecture seule (ferme des Trois Noues,
+« Pic d'été, l'eau manque », code de main 3076d0f) : à l'ordinateur, le
+menu en trois endroits, « + Arroser ou noter » et sa boîte de dialogue,
+« Ma ferme » et ses sept fiches, les visites « Bienvenue » (étape
+« Trois endroits », F890, F891) et « Le module à la carte » (F892), le
+« ? » d'« Aujourd'hui » ; au téléphone (390 px), la barre du bas, la
+feuille du « + », le retour « ‹ » de « Ma ferme », la bande de
+« Semaine », le repère de visite sur la barre. **Conforme**, aucune
+erreur dans la console
+(`/mnt/project-files/simplification-s3/recette-s3-2026-11-26.md`).
 
 ## D-332 — Simplifier l'usage du module, lot S5 : arroser en trois champs
 
