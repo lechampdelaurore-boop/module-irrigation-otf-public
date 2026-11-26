@@ -12465,4 +12465,6 @@ Aucune règle nouvelle, aucune question agronomique.
   S4) ; le parcours P74 aux deux largeurs. P74 n'ouvre pas la fenêtre des
   arrosages prévus (sa ferme neuve n'en a pas) : ses mots, sa liste et le
   passage par le geste du planning sont prouvés par les tests du domaine
-  et ceux de B2.
+  et ceux de B2. P27 suit : le pli des objectifs porte désormais deux
+  choix du périmètre, il vise le premier, celui de l'objectif (relevé par
+  la CI de la PR).
