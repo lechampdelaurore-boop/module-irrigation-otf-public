@@ -85,10 +85,10 @@ test('batch est atomique : un échec annule les écritures précédentes du lot'
   assert.deepEqual(results[1].results, [{ n: 1 }]);
 });
 
-test('la base migrée porte les 101 tables applicatives et applique leurs contraintes', async () => {
+test('la base migrée porte les 102 tables applicatives et applique leurs contraintes', async () => {
   const d1 = createD1FromSqlite(createMigratedSqliteDatabase());
   const tables = await d1.prepare("SELECT count(*) AS n FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'").first<number>('n');
-  assert.equal(tables, 101);
+  assert.equal(tables, 102); // … + la forme de la journée de l'ET0 horaire (0052, D-349)
   await assert.rejects(
     d1.prepare("INSERT INTO irrigation_events (id, workspace_id, season, status) VALUES ('e', 'ws-absent', 2026, 'planned')").run(),
     /FOREIGN KEY constraint failed/,

@@ -1,4 +1,5 @@
 import type { ForecastArchiveRow } from './forecast-archive.ts';
+import type { RecordedDayShape } from './hourly-et0.ts';
 import type { WeatherDailyValue } from './weather-provider.ts';
 
 /**
@@ -51,6 +52,18 @@ export type AutomaticWeatherSyncRepository = {
     locationKey: string;
     issuedOn: string;
     rows: readonly ForecastArchiveRow[];
+    source: string;
+    fetchedAt: string;
+  }): Promise<number>;
+  /**
+   * La forme de la journée d'un lieu, J0 à J+2, sous la source de la ligne du
+   * jour (docs/et0-horaire-contract.md, D-349) : une lecture plus récente
+   * remplace la forme d'un jour ; rend le nombre de lignes écrites. Absent :
+   * rien ne s'écrit et l'écran prend la forme théorique.
+   */
+  writeDayShapes?(input: {
+    placeKey: string;
+    rows: readonly RecordedDayShape[];
     source: string;
     fetchedAt: string;
   }): Promise<number>;

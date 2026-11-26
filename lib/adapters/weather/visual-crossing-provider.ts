@@ -1,6 +1,8 @@
 import { logJsonLine } from '../log.ts';
 import { describeNetworkError, globalFetch, type FetchLike } from '../network-call.ts';
-import { secondsFromMilliseconds } from '../../domain/units.ts';
+import { millisecondsFromSeconds, secondsFromMilliseconds } from '../../domain/units.ts';
+import { computedHourlyEt0Mm, type ForecastHourInput } from '../../domain/weather/fao56-hourly.ts';
+import { hourlyValuesOnDayHours, type HourlyEt0Series } from '../../domain/weather/hourly-et0.ts';
 import { openMeteoWeatherProvider } from './open-meteo-provider.ts';
 import {
   WeatherProviderError,
@@ -74,10 +76,15 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
       `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(location)}/${input.startDate}/${input.endDate}`,
     );
     url.searchParams.set('unitGroup', 'metric');
-    url.searchParams.set('include', 'days');
+    // Les heures seulement avec la prévision (docs/et0-horaire-contract.md, § 5 ; D-349, F1035) :
+    // une prévision compte pour un seul enregistrement, heures comprises ; l'historique, une heure par enregistrement.
+    const withHours = endpoint === 'forecast';
+    url.searchParams.set('include', withHours ? 'days,hours' : 'days');
     url.searchParams.set(
       'elements',
-      'datetime,precip,tempmax,tempmin,temp,dew,windspeedmean,solarenergy,elevation',
+      withHours
+        ? 'datetime,datetimeEpoch,precip,tempmax,tempmin,temp,dew,windspeed,windspeedmean,solarradiation,solarenergy,elevation'
+        : 'datetime,precip,tempmax,tempmin,temp,dew,windspeedmean,solarenergy,elevation',
     );
     url.searchParams.set('contentType', 'json');
     url.searchParams.set('key', this.apiKey);
@@ -88,10 +95,13 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
       });
     }
     const elevationMeters = finiteNumber(payload.elevation) ?? 0;
+    // Le coût de la requête dit par le fournisseur, journalisé pour prouver en ligne qu'il ne change pas (F1035).
+    this.log('info', { ...weatherLogEntry('weather_external_query_cost', endpoint), queryCost: finiteNumber(payload.queryCost), withHours });
     return payload.days.flatMap((value): WeatherDailyValue[] => {
       if (!isRecord(value)) return [];
       const date = optionalText(value.datetime);
       if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return [];
+      const hourlyEt0 = withHours ? computedHourlyEt0Series(date, input, elevationMeters, value.hours) : null;
       return [{
         date,
         precipitationMm: nullableNonNegative(value.precip),
@@ -109,6 +119,7 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
           meanWindSpeedKilometersPerHour: finiteNumber(value.windspeedmean),
           solarEnergyMegajoulesPerSquareMeter: finiteNumber(value.solarenergy),
         }),
+        ...(hourlyEt0 ? { hourlyEt0 } : {}),
       }];
     });
   }
@@ -206,6 +217,40 @@ export class VisualCrossingWeatherProvider implements WeatherProvider {
       clearTimeout(timeout);
     }
   }
+}
+
+/**
+ * Les heures d'ET0 d'un jour prévu, calculées par le module (source
+ * `computed-hourly`, D-349) : Visual Crossing ne donne pas l'ET0 à l'heure,
+ * mais ses heures portent la température, le point de rosée, le vent et le
+ * rayonnement. Chaque heure est rangée par son instant exact
+ * (`datetimeEpoch`) sur les heures du jour du lieu ; une heure absente ou
+ * incomplète reste `null`. Sans heures dans la réponse, rien.
+ */
+function computedHourlyEt0Series(
+  date: string,
+  input: WeatherReadInput,
+  elevationMeters: number,
+  hours: unknown,
+): HourlyEt0Series | null {
+  if (!Array.isArray(hours) || hours.length === 0) return null;
+  const inputs = hours.flatMap((hour): ForecastHourInput[] => {
+    if (!isRecord(hour)) return [];
+    const epochSeconds = finiteNumber(hour.datetimeEpoch);
+    if (epochSeconds === null) return [];
+    return [{
+      startsAtMs: millisecondsFromSeconds(epochSeconds),
+      temperatureCelsius: finiteNumber(hour.temp),
+      dewPointCelsius: finiteNumber(hour.dew),
+      windSpeedAtTenMetersKilometersPerHour: finiteNumber(hour.windspeed),
+      solarRadiationWattsPerSquareMeter: finiteNumber(hour.solarradiation),
+    }];
+  });
+  const values = computedHourlyEt0Mm(inputs, { latitude: input.latitude, longitude: input.longitude, elevationMeters });
+  return {
+    nature: 'computed-hourly',
+    valuesMm: hourlyValuesOnDayHours(date, input.timezone, inputs.map((hour, index) => ({ startsAtMs: hour.startsAtMs, valueMm: values[index] }))),
+  };
 }
 
 type Fao56Et0Input = {

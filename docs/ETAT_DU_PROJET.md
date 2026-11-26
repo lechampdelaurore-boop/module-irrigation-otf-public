@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger,
+  codée le 26 novembre 2026** (D-349, F1035 à F1041 ; contrat
+  `docs/et0-horaire-contract.md`, § 5, § 9 et § 11 ; roadmap ligne 37), en
+  Opus 5.5 · Élevé, sur la branche de HR1. Heures d'ET0 d'Open-Meteo dans
+  le même appel ; pour Visual Crossing, heures de la prévision seulement
+  (un seul enregistrement, vérifié sur ses pages ; `queryCost`
+  journalisé) et ET0 horaire FAO-56 calculée par le module ; table
+  additive `irrigation_weather_day_shapes` (migration 0052, provisoire),
+  J0 à J+2 par lieu et par source, écrite au matin et aux relectures, purgée
+  après 8 jours ; une écriture en échec ne change rien à la météo. Aucun
+  écran, aucun calcul existant changé. Contrôles : voir la PR (`pnpm e2e`
+  joué par la CI). Vient HR3 (l'écran).
 - **L'ET0 horaire, HR1 : la forme de la journée, domaine pur, codée le
   26 novembre 2026** (D-348, F1030 à F1034 ; contrat
   `docs/et0-horaire-contract.md`, § 4 et § 11 ; roadmap ligne 37), en

@@ -275,3 +275,90 @@ export function readDayShape(
   const consumedMm = totalMm * elapsedShare(shape, at);
   return { consumedMm, remainingMm: totalMm - consumedMm, highDemand: highDemandRange(shape) };
 }
+
+/**
+ * L'horizon de la forme : aujourd'hui, demain et après-demain (§ 2, choix 4).
+ * Au-delà, les prévisions horaires ne sont pas fiables et rien n'est écrit.
+ */
+const DAY_SHAPE_LAST_HORIZON_DAYS = 2;
+
+/** La conservation des formes écrites : 8 jours, les 3 jours lus, la veille et de la marge (§ 5). */
+export const DAY_SHAPES_KEPT_DAYS = 8;
+
+/** Les heures d'ET0 d'un jour, lues ou calculées, dans l'ordre de `hoursOfDay` : ce que l'adaptateur joint à un jour prévu. */
+export type HourlyEt0Series = {
+  nature: Exclude<HourlyEt0Nature, 'theoretical'>;
+  valuesMm: (number | null)[];
+};
+
+/**
+ * Les valeurs horaires d'un jour rangées sur les heures de `hoursOfDay`, à
+ * partir d'instants exacts (le début de chaque heure, en millisecondes
+ * UNIX). Une heure sans valeur reste `null` : la forme du jour sera refusée
+ * (§ 4.2), jamais bouchée par 0 ; une valeur qui ne tombe sur aucun début
+ * d'heure du jour est ignorée.
+ */
+export function hourlyValuesOnDayHours(
+  date: string,
+  timeZone: string,
+  points: readonly { startsAtMs: number; valueMm: number | null }[],
+): (number | null)[] {
+  const byStart = new Map(points.map((point) => [point.startsAtMs, point.valueMm]));
+  return hoursOfDay(date, timeZone).map((hour) => byStart.get(Date.parse(hour.startsAt)) ?? null);
+}
+
+/**
+ * Les valeurs horaires d'un jour à partir d'heures d'horloge locales
+ * (`AAAA-MM-JJTHH:MM`, comme les donne Open-Meteo avec un fuseau), prises
+ * dans l'ordre de la réponse. Elles ne sont rangées que si leur nombre est
+ * exactement celui des heures du jour au fuseau du lieu (23, 24 ou 25) ;
+ * sinon `null` : la forme de ce fournisseur est refusée pour ce jour, jamais
+ * décalée d'une heure (D-349, F1038).
+ */
+export function hourlyValuesInLocalOrder(
+  date: string,
+  timeZone: string,
+  localTimes: readonly unknown[],
+  valuesMm: readonly unknown[],
+): (number | null)[] | null {
+  if (localTimes.length !== valuesMm.length) return null;
+  const values: (number | null)[] = [];
+  localTimes.forEach((time, index) => {
+    if (typeof time !== 'string' || time.slice(0, 10) !== date) return;
+    const value = valuesMm[index];
+    values.push(typeof value === 'number' && Number.isFinite(value) ? value : null);
+  });
+  return values.length === hoursOfDay(date, timeZone).length ? values : null;
+}
+
+/** Une forme à écrire : un jour du lieu, sa nature et ses parts. La forme théorique ne s'écrit pas : elle se calcule. */
+export type RecordedDayShape = {
+  date: string;
+  nature: Exclude<HourlyEt0Nature, 'theoretical'>;
+  shares: number[];
+};
+
+/**
+ * Les formes qu'une lecture de prévision donne pour un lieu (§ 2 choix 3
+ * et 4, § 5) : une par jour de J0 à J+2 dont l'heure du fournisseur ou
+ * l'heure calculée donne une forme. Un jour sans heure lisible n'a pas de
+ * ligne : l'écran prendra la forme théorique, et la dira (D-349, F1039) ;
+ * comme pour la météo du jour, un jour vide n'efface rien.
+ */
+export function dayShapesToRecord(input: {
+  today: string;
+  timeZone: string;
+  days: readonly { date: string; hourlyEt0?: HourlyEt0Series | null }[];
+}): RecordedDayShape[] {
+  const lastDate = addDaysToDateKey(input.today, DAY_SHAPE_LAST_HORIZON_DAYS);
+  return input.days.flatMap((day): RecordedDayShape[] => {
+    if (!isValidDateKey(day.date) || day.date < input.today || day.date > lastDate || !day.hourlyEt0) return [];
+    const shares = sharesFromHourlyEt0(day.hourlyEt0.valuesMm, hoursOfDay(day.date, input.timeZone).length);
+    return shares ? [{ date: day.date, nature: day.hourlyEt0.nature, shares }] : [];
+  });
+}
+
+/** Le plus ancien jour gardé à la purge du jour `today` : les jours avant lui s'effacent (§ 5). */
+export function oldestKeptDayShapeDay(today: string): string {
+  return addDaysToDateKey(today, -DAY_SHAPES_KEPT_DAYS);
+}
