@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { millimetersText } from '@/lib/domain/display-numbers';
 import { automaticObjectiveEnableText, type AutomaticObjectiveLine } from '@/lib/domain/objective-reading';
 
@@ -13,14 +13,36 @@ import { automaticObjectiveEnableText, type AutomaticObjectiveLine } from '@/lib
  */
 
 /** Ce que l'allumage décide quand des planches gardent un objectif saisi (point 5). */
-export type EnableChoice = 'keep' | 'clear' | 'cancel';
+type EnableChoice = 'keep' | 'clear' | 'cancel';
+
+/**
+ * L'interrupteur et sa fenêtre (point 5) : allumer quand `keptGoalBeds`
+ * planches gardent un objectif saisi ouvre d'abord la fenêtre ; sinon le
+ * geste part tout de suite. `save(enabled, clearAfter)` est le geste du
+ * volet ; « Annuler » ne fait rien.
+ */
+export function useAutomaticObjectiveToggle(keptGoalBeds: number, save: (enabled: boolean, clearAfter?: boolean) => void) {
+  const [asked, setAsked] = useState<number | null>(null);
+  const toggle = (enabled: boolean) => {
+    if (enabled && keptGoalBeds > 0) {
+      setAsked(keptGoalBeds);
+      return;
+    }
+    save(enabled);
+  };
+  const choose = (choice: EnableChoice) => {
+    setAsked(null);
+    if (choice !== 'cancel') save(true, choice === 'clear');
+  };
+  return { toggle, dialog: <AutomaticObjectiveEnableDialog keptGoalBeds={asked} onChoose={choose} /> };
+}
 
 /**
  * La fenêtre d'allumage (point 5) : « Allumer, garder mes objectifs » par
  * défaut, « Allumer et vider les objectifs » en rouge, comme « Vider les
  * objectifs » (F414, F415), et « Annuler ». L'écran ne vide jamais seul.
  */
-export function AutomaticObjectiveEnableDialog({ keptGoalBeds, onChoose }: {
+function AutomaticObjectiveEnableDialog({ keptGoalBeds, onChoose }: {
   /** Les planches qui gardent un objectif saisi ; `null` : la fenêtre est fermée. */
   keptGoalBeds: number | null;
   onChoose: (choice: EnableChoice) => void;

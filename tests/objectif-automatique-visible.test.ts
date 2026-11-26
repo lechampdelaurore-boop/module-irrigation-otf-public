@@ -152,7 +152,8 @@ test('l’écran : réglage éteint, celui d’avant ; allumé, la liste, le cha
   assert.match(panel, /\{automaticOn \? <><small>saisi<\/small><button[^>]*onClick=\{\(\) => backToAutomatic\(goal\)\}>Revenir à l’automatique<\/button><\/> : null\}/);
   // Un champ laissé tel quel n'écrit rien ; la fenêtre ne s'ouvre que si des planches gardent un objectif saisi.
   assert.match(panel, /if \(inForce !== null && goalAmount === inForceText\) \{/);
-  assert.match(panel, /if \(enabled && kept > 0\) \{\s*setEnableAsked\(kept\);/);
+  assert.match(readFileSync('app/irrigation/automatic-objective-panel.tsx', 'utf8'), /if \(enabled && keptGoalBeds > 0\) \{\s*setAsked\(keptGoalBeds\);/);
+  assert.match(panel, /useAutomaticObjectiveToggle\(dashboard\.automaticObjective\?\.keptGoalBeds \?\? 0, saveAutomaticObjective\)/);
   // « Revenir à l'automatique » est le geste « vider » de cet endroit seul.
   const actions = readFileSync('app/irrigation/water-actions.ts', 'utf8');
   assert.match(actions, /clearHydricGoalsForUser\(\s*context\.value\.ownerUserId,\s*input\.season,\s*weekStart,\s*scope === undefined \? undefined :/);

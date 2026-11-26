@@ -45,7 +45,7 @@ import {
   objectiveInForce,
   type ObjectiveBedReading,
 } from '@/lib/domain/objective-reading';
-import { AutomaticObjectiveEnableDialog, AutomaticObjectiveLines, type EnableChoice } from './automatic-objective-panel';
+import { AutomaticObjectiveLines, useAutomaticObjectiveToggle } from './automatic-objective-panel';
 import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 
 const mm = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
@@ -327,20 +327,8 @@ export function WaterManagementDashboard({
     });
   };
 
-  // Allumer quand des planches gardent un objectif saisi ouvre d'abord la fenêtre (A1, point 5) ; sinon, rien ne s'ouvre.
-  const [enableAsked, setEnableAsked] = useState<number | null>(null);
-  const toggleAutomaticObjective = (enabled: boolean) => {
-    const kept = dashboard.automaticObjective?.keptGoalBeds ?? 0;
-    if (enabled && kept > 0) {
-      setEnableAsked(kept);
-      return;
-    }
-    saveAutomaticObjective(enabled);
-  };
-  const chooseEnable = (choice: EnableChoice) => {
-    setEnableAsked(null);
-    if (choice !== 'cancel') saveAutomaticObjective(true, choice === 'clear');
-  };
+  // Allumer quand des planches gardent un objectif saisi ouvre d'abord la fenêtre (A1, point 5).
+  const { toggle: toggleAutomaticObjective, dialog: enableDialog } = useAutomaticObjectiveToggle(dashboard.automaticObjective?.keptGoalBeds ?? 0, saveAutomaticObjective);
 
   /** « Vider les objectifs » : le même mot sur le bouton et dans la fenêtre, en rouge (lot G, n° 8, F414 et F415). */
   const clearGoals = async () => {
@@ -478,7 +466,7 @@ export function WaterManagementDashboard({
           summary={<><h3>{SIMPLE_WORDS.weekGoal}</h3><small>{goalsFoldLine(dashboard.goals.length, farmGoal?.amountMm ?? null, dashboard.automaticObjective?.enabled === true)}</small></>}
         >
           {dashboard.automaticObjective ? <AutomaticObjectiveSetting setting={dashboard.automaticObjective} shown={automaticShown} pending={pending} onChange={toggleAutomaticObjective} onClearGoals={() => void clearGoals()} result={automaticOn && farmObjective !== null && objectiveBeds !== null ? automaticObjectiveResultText(farmObjective, objectiveBeds, dashboard.automaticObjective.keptGoalBeds) : null} reply={<ActionReply messages={replies} origin="objectif-automatique" classNames={WATER_REPLY_CLASSES} />} /> : null}
-          <AutomaticObjectiveEnableDialog keptGoalBeds={enableAsked} onChoose={chooseEnable} />
+          {enableDialog}
           <div className="water-panel-title">
             <div><p>Valeurs directes, indépendantes et non cumulatives.</p></div>
             <button type="button" className="danger-outline" disabled={pending || dashboard.goals.length === 0} onClick={() => void clearGoals()}>Vider les objectifs</button>
