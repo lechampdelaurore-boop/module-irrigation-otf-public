@@ -11071,7 +11071,8 @@ n'a pas été relevée. La démonstration a été remise à zéro ensuite
 
 Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées** (les PR 2
 à 4 le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
-(#231), **PR 2 à 17 h** (#232), **PR 3 à 18 h 31** (#233) ; contrat
+(#231), **PR 2 à 17 h** (#232), **PR 3 à 18 h 31** (#233), **PR 4 à
+19 h 55** (#234) : **les quatre PR en ligne** ; contrat
 `docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
 sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le
