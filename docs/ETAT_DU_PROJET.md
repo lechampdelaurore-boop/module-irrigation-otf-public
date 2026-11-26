@@ -34,8 +34,10 @@ registres, elle y renvoie.
   « + » (« Trois endroits », « Les endroits suivent vos cases ») ; le « ? »
   d'« Aujourd'hui » situe sa pastille dans la barre du bas ou le menu ; la
   charte du module et les contrats de la démonstration, de S1 et des
-  parcours suivent. Aucun écran ne change. **Le code de S3 est fini** ;
-  les quatre PR se fusionnent après la dernière de S2, une à la fois.
+  parcours suivent. Aucun écran ne change. **Le code de S3 est fini.**
+  **En ligne** : #225 fusionnée le 26 novembre 2026 à 6 h 22 (3076d0f),
+  déployée à 6 h 58, run 45761209624, les cinq jobs verts (consigné par
+  S5, PR 1) : **S3 est en ligne en entier.**
 - **Simplifier l'usage du module, S3, PR 3 sur 4 : le menu de
   l'ordinateur, codée le 25 novembre 2026** (D-331, F885 à F889 ; contrat,
   section 6), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Au-delà
