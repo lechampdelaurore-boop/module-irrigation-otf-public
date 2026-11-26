@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S4, PR 3 sur 4 : les gestes, codée le
+  26 novembre 2026** (D-335, F933 à F939 ; contrat, sections 4.5, 4.6 et
+  8), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Depuis « La
+  semaine », sans changer de page : « Comprendre ces chiffres » (les tuiles
+  d'« Aujourd'hui » sous le bilan), « Changer l'eau visée » (le pli des
+  objectifs, les millimètres au clavier), « Noter la pluie » (la fenêtre de
+  S2, depuis le bilan, « Calcul approximatif » ou la ligne d'un jour dont la
+  pluie manque, ce jour choisi), les flèches sans rechargement (276 ms
+  contre 307 à 414 ms avant), « Exporter » la semaine affichée ; la météo
+  indisponible se dit, jamais zéro. Aucun calcul ni aucune écriture
+  changés. Tests ; parcours P68 nouveau. Contrôles et mesures : voir la PR
+  et la section 13 du contrat. Vient la PR 4 (les liens, la visite, les
+  contrats) ; fusions après celles de S3, S5 et des PR 1 et 2.
 - **Simplifier l'usage du module, S4, PR 2 sur 4 : le premier niveau,
   codée le 26 novembre 2026** (D-335, F923 à F932 ; contrat, sections 4 à
   7), en Opus 5.5 · Très élevé, sur la branche de la PR 1. « La semaine »
