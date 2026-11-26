@@ -3605,6 +3605,20 @@ registres, elle y renvoie.
 - Dependabot retiré du dépôt public par la PR #9 (8 novembre 2026) ; sa
   remise éventuelle sera une PR à part. Ses PR #230 à #234 restent sur
   l'archive, jamais fusionnées.
+- **Recettes en attente, faites le 26 novembre 2026** sur la démonstration
+  (ferme « Ferme des Trois Noues », moment « Pic d'été », puis « Matériel et
+  alertes » et « Ferme vierge »), dans le Chrome de François, sur son accord,
+  à l'ordinateur seulement. **Conformes** : lots C, A, B, F, E et D de
+  l'audit final (24 octies à 24 terdecies) et L1 à L4 de 6 nonies, O4 de
+  6 decies ; 6 duodecies déjà clos. **Non rejoués** : tout ce qui se lit au
+  téléphone (J1, A2, M1, L5, L6) et les remarques 2, 4 et 5 de la recette 3.9
+  une à une. **Impossible sur la démonstration** : H3 de 6 undecies (les
+  notifications y sont désactivées) : attend une séance sur la ferme réelle,
+  avec l'accord de François. Données saisies pour l'essai (une pluie de
+  2 mm, une validation, l'objectif automatique allumé puis éteint) : la
+  démonstration a été remise à zéro ensuite (« 3 à faire », aucun arrosage
+  planifié), rien n'a été saisi sur la ferme réelle. Détail dans les lignes
+  de la roadmap (section 1).
 
 ## Référence Git
 
