@@ -108,6 +108,19 @@ registres, elle y renvoie.
   probable ensuite, financée par OTF ; rien n'attend. Aucun contrôle rejoué (PR de registres, sans
   code).
 
+- **Simplifier l'usage du module, S4, PR 3 sur 4 : les gestes, codée le
+  26 novembre 2026** (D-335, F933 à F939 ; contrat, sections 4.5, 4.6 et
+  8), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Depuis « La
+  semaine », sans changer de page : « Comprendre ces chiffres » (les tuiles
+  d'« Aujourd'hui » sous le bilan), « Changer l'eau visée » (le pli des
+  objectifs, les millimètres au clavier), « Noter la pluie » (la fenêtre de
+  S2, depuis le bilan, « Calcul approximatif » ou la ligne d'un jour dont la
+  pluie manque, ce jour choisi), les flèches sans rechargement (276 ms
+  contre 307 à 414 ms avant), « Exporter » la semaine affichée ; la météo
+  indisponible se dit, jamais zéro. Aucun calcul ni aucune écriture
+  changés. Tests ; parcours P68 nouveau. Contrôles et mesures : voir la PR
+  et la section 13 du contrat. Vient la PR 4 (les liens, la visite, les
+  contrats) ; les PR 1 et 2 sont en ligne.
 - **Simplifier l'usage du module, S4, PR 2 sur 4 : le premier niveau,
   codée le 26 novembre 2026** (D-335, F923 à F932 ; contrat, sections 4 à
   7), en Opus 5.5 · Très élevé, sur la branche de la PR 1. « La semaine »
@@ -124,9 +137,12 @@ registres, elle y renvoie.
   Aucun calcul ni aucune écriture changés. Tests ; parcours P67 nouveau ;
   repris : P7, P10, P12, P13, P15, P26, P28, P30, P31, P32, P40,
   P41, P52, P56, P57, P61. Contrôles : voir la PR. **Essai des cinq tâches**
-  (diagnostic, section 6) conseillé avant la mise en ligne, au porteur.
-  Viennent les PR 3 (les gestes) et 4 ; fusions après celles de S3, S5 et
-  de la PR 1.
+  (diagnostic, section 6) conseillé au porteur ; jamais bloquant (S4-q).
+  **En ligne** : #232 fusionnée le 26 novembre 2026 à 16 h 13 (e671fcb),
+  déployée à 17 h, run 45846865573, les cinq jobs verts (consigné par S4,
+  PR 3). En chemin, V11 (démonstration) ouvre « Semaine » par l'ancre de
+  sa section (F932) et P40 suit la mesure de la CI (F931). Viennent les
+  PR 3 et 4, une à la fois.
 - **Simplifier l'usage du module, S4, PR 1 sur 4 : une page, deux vues,
   codée le 25 novembre 2026** (D-335, F916 à F922 ; contrat
   `docs/simplification-s4-contract.md`, sections 3, 7.4 et 9), en Opus 5.5 ·

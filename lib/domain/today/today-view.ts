@@ -111,6 +111,19 @@ function daysText(dates: readonly string[]): string {
   return days.length <= 1 ? (days[0] ?? '') : `${days.slice(0, -1).join(', ')} et ${days[days.length - 1]}`;
 }
 
+/**
+ * « Prévision indisponible : à vérifier. » quand aucun des `dayCount` jours
+ * n'a sa prévision, « Prévision indisponible le sam. 14 nov. : à vérifier. »
+ * quand certains seulement, `null` quand rien ne manque : la phrase
+ * d'« Aujourd'hui », reprise telle quelle par « La semaine » (S4, PR 3,
+ * section 8.5). Jamais un zéro (D-003, cas 6).
+ */
+export function forecastUnavailableText(missing: readonly string[], dayCount: number): string | null {
+  if (missing.length === 0) return null;
+  if (missing.length >= dayCount) return FORECAST_UNAVAILABLE;
+  return `Prévision indisponible ${daysText(missing)} : à vérifier.`;
+}
+
 /** Bloc a : le gel des cultures et les alertes de l'exploitation des trois jours, aujourd'hui compris. */
 export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelection, now: Date): TodayWeatherBlock {
   const today = farmDateKey(now);
@@ -157,8 +170,8 @@ export function weatherBlock(input: TodayWeatherInputs, enabled: FeatureSelectio
   // Un jour sans prévision n'est jamais lu comme un jour calme (D-003, cas 6).
   const missing = days.filter((date) => !hasForecast(input.forecasts, date));
   const tone = lines.length > 0 ? 'alert' : missing.length > 0 ? 'unknown' : 'calm';
-  if (missing.length === days.length) lines.push(FORECAST_UNAVAILABLE);
-  else if (missing.length > 0) lines.push(`Prévision indisponible ${daysText(missing)} : à vérifier.`);
+  const unavailable = forecastUnavailableText(missing, days.length);
+  if (unavailable) lines.push(unavailable);
   // La phrase calme ne se dit pas à côté d'un gel annoncé sans alerte posée (J14) : elle serait vraie et trompeuse.
   if (tone === 'calm' && !unposedFrost) lines.push(calmWeatherText(frostOn, criteriaOn, days[days.length - 1]));
   const forecasts = input.forecasts.filter((day) => days.includes(day.date));
