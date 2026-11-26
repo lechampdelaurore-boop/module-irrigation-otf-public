@@ -10,7 +10,8 @@ import { attendreLaPagePrete, surveillerLaConsole, verifierCibleTactile, verifie
  *
  * Sur une ferme neuve, toutes cases cochées, sa commune choisie (le siège,
  * Rennes pour la météo des parcours) : dans « Réglages », la carte « Lieu de
- * la météo » porte « Modèle de prévision », sur « Automatique », le bouton
+ * la météo » porte le pli « Modèle de prévision », ouvert par son ancre, sur
+ * « Automatique », le bouton
  * inactif tant que rien ne change, et la phrase « Les alertes météo et les
  * prévisions de la ferme utiliseront ce modèle. ». Météo-France choisi, les
  * faits du modèle (fournisseur, portée, complément par « Automatique
@@ -61,8 +62,10 @@ test('« Modèle de prévision » : Automatique par défaut, Météo-France vér
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'modele-de-prevision');
   await preparerLaFermeNeuve(page);
 
-  await page.goto('/irrigation/reglages#water-weather-title');
+  await page.goto('/irrigation/reglages#modele-de-prevision');
   await attendreLaPagePrete(page, 'reglages');
+  // Un pli fermé de « Réglages » (P40), que son ancre ouvre ; sa ligne dit le modèle gardé.
+  await expect(page.locator('#modele-de-prevision > summary')).toContainText('Automatique');
   const reglage = page.getByRole('group', { name: 'Modèle de prévision' });
   await reglage.scrollIntoViewIfNeeded();
   await expect(reglage).toContainText('Les alertes météo et les prévisions de la ferme utiliseront ce modèle.');
@@ -83,10 +86,11 @@ test('« Modèle de prévision » : Automatique par défaut, Météo-France vér
   await enregistrer(page, reglage, /^La ferme lit désormais « Météo-France \(AROME puis ARPEGE\) » : ses prévisions à venir sont relues, les jours passés gardent les leurs\. Après le .+, les jours viennent d’« Automatique d’Open-Meteo »\.$/);
   await verifierLEtape(page, journal, 'Météo-France enregistré');
 
-  await page.goto('/irrigation/reglages#water-weather-title');
+  await page.goto('/irrigation/reglages#modele-de-prevision');
   await attendreLaPagePrete(page, 'reglages');
   const relu = page.getByRole('group', { name: 'Modèle de prévision' }).getByRole('combobox', { name: 'Modèle' });
   await expect(relu.locator('option:checked')).toHaveText(METEO_FRANCE);
+  await expect(page.locator('#modele-de-prevision > summary')).toContainText(METEO_FRANCE);
   // Règle 6 : la carte dit le dernier jour du modèle parmi les prévisions gardées.
   await expect(page.getByRole('group', { name: 'Modèle de prévision' })).toContainText(/Prévisions gardées : ce modèle jusqu’au .+, puis « Automatique d’Open-Meteo »\./);
   await verifierLEtape(page, journal, 'Météo-France relu');

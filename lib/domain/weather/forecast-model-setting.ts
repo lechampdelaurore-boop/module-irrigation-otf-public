@@ -53,6 +53,11 @@ export function selectedForecastChoice(savedModelId: string | null, options: rea
   return savedModelId !== null && options.some((option) => option.value === savedModelId) ? savedModelId : AUTOMATIC_FORECAST_CHOICE;
 }
 
+/** La ligne du pli fermé (D-347, F1030) : le choix gardé, tel que la liste le nomme. */
+export function forecastModelSummary(saved: string, options: readonly ForecastModelOption[]): string {
+  return options.find((option) => option.value === saved)?.label ?? 'Automatique';
+}
+
 /**
  * Les faits du choix en cours (règles 6 et 10) : qui fait le modèle, sa
  * maille, sa portée mesurée ; au-delà de la portée, les jours viennent
