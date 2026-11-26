@@ -11050,8 +11050,10 @@ pluie, la réserve du sol, l'ET0, les alertes météo, les irrigations réelles,
 les semaines closes et l'historique ne bougent pas**, gardés par des tests.
 Cinq portées ; un jardin « à classer » n'est couvert par aucune des deux
 portées de mode, dit. Une seule fonction, un seul endroit. Sans question
-sur le calcul ; deux questions de conduite de la ferme sont au porteur
-(la reprise, les arrosages déjà planifiés), le contrat est écrit sur les
-options recommandées.
+sur le calcul ; deux questions de conduite de la ferme, **répondues par le
+porteur le 26 novembre 2026 à 11 h 37** : le filtre se lève **à la main
+seulement** (« Reprendre », ni date ni calendrier) ; en mettant hors
+saison, **le module propose d'annuler** les arrosages planifiés ou
+validés des planches concernées, jamais sans son choix.
 
 Numéros : D-337 ; F à partir de F983 pour le code.

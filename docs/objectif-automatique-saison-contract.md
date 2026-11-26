@@ -141,7 +141,7 @@ calculée** :
   semaine déjà close garde l'objectif qu'elle avait (D-318) ; l'historique
   est immuable (D-006) ;
 - **une irrigation déjà planifiée ou validée** n'est pas réécrite (« Le
-  cycle », `docs/planning-contract.md`) : voir la question 2 ci-dessous ;
+  cycle », `docs/planning-contract.md`) : voir la question 2, section 10 ;
 - **les cultures, les stades, les séries** restent lus : l'ETM et l'objectif
   proposé restent calculables et affichés, marqués « hors saison », pour
   que la reprise ne parte pas de rien.
@@ -259,7 +259,7 @@ même volet : le coordinateur lance le code au réglage de la ligne 34.
 | **A1 · Voir et modifier** | la liste « automatique » du volet, le champ prérempli, « Revenir à l'automatique », la fenêtre d'allumage, la phrase de résultat ; aucune migration, aucune règle | `app/irrigation/water-management-dashboard.tsx`, `lib/services/water-dashboard.ts`, `lib/domain/objective-reading.ts` | tests du domaine (liste, préremplissage), parcours aux deux largeurs : allumer avec un objectif de ferme, lire, corriger, revenir | Opus 5.5 · Élevé |
 | **B1 · La règle** | `off-season.ts` et son entrée dans `objectiveForBed` ; filtre toujours vide, rien ne change | `lib/domain/off-season.ts`, `lib/domain/irrigation-needs.ts`, `lib/domain/farm-objective.ts` | tests du domaine : les dix cas ; garde « pluie, RFU, alertes inchangées » | Opus 5.5 · Max |
 | **B2 · Le stockage et les lecteurs** | une migration (portées datées), journal, tous les lecteurs de l'objectif et du planning reçoivent le filtre ; semaine close inchangée ; aucun écran ne l'active | une migration, `db/`, services des besoins, du planning, de la faisabilité, de la pénurie, d'« Aujourd'hui », de l'historique | tests de persistance à deux fermes ; pluie, RFU, historique de pluie, alertes identiques filtre actif et inactif | Opus 5.5 · Max |
-| **B3 · Les écrans** | le bloc « Hors saison », la ligne « hors saison » au tableau des besoins, la tuile d'« Aujourd'hui », les aides | volet, tableau des besoins, `app/irrigation/today/`, `lib/domain/features/help.ts` | parcours nouveau aux deux largeurs : mettre tout le plein champ hors saison, lire, reprendre | Opus 5.5 · Élevé |
+| **B3 · Les écrans** | le bloc « Hors saison », la fenêtre « annuler les arrosages planifiés ? », la ligne « hors saison » au tableau des besoins, la tuile d'« Aujourd'hui », les aides | volet, tableau des besoins, `app/irrigation/today/`, `lib/domain/features/help.ts` | parcours nouveau aux deux largeurs : mettre tout le plein champ hors saison, lire, reprendre | Opus 5.5 · Élevé |
 
 A1 est indépendante de B1 à B3 ; B1 peut commencer avant la fusion de
 S4/S6 (domaine seul, aucun écran). B2 et B3 attendent cette fusion. Une PR
@@ -296,9 +296,12 @@ Posées une par une, sur cartes, avec recommandation ; la question 2 est
 1. **La reprise** — *répondue par le porteur le 26 novembre 2026 à 11 h 37* :
    **à la main seulement**, par « Reprendre ». Ni date de reprise, ni
    calendrier : le filtre ne se lève jamais seul.
-2. **Les arrosages déjà planifiés ou validés** quand on met hors saison :
-   (a) ils restent, le module ne les efface jamais ; (b) ils sont
-   proposés à l'annulation d'un geste. Recommandation : **(a)** avec une
-   ligne qui les compte (« 2 arrosages restent planifiés »).
-
-Les réponses seront consignées avant B2 (D-337, mise à jour).
+2. **Les arrosages déjà planifiés ou validés** — *répondue par le porteur
+   le 26 novembre 2026 à 11 h 37* : **le module propose de les annuler**.
+   En mettant hors saison, une fenêtre compte les arrosages planifiés ou
+   validés des planches concernées et propose « Les annuler » ou « Les
+   garder » (le défaut) ; rien n'est annulé sans ce choix, et l'annulation
+   passe par le geste existant du planning, planche par planche, jamais
+   par réécriture (« Le cycle », `docs/planning-contract.md`). Un arrosage
+   déjà démarré n'est pas proposé : il se termine. Ce geste est livré
+   par B3 (écran) ; B2 fournit la liste des arrosages concernés.
