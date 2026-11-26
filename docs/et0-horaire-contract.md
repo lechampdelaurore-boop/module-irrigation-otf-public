@@ -277,7 +277,8 @@ avec sa recommandation. La recommandation s'applique en attendant la réponse.
    l'objectif ni du besoin ne change ; l'horaire se mesure d'abord sur le banc
    avec Nicolas, section 8). Posée le 26 novembre 2026.
 2. **2 sur 3 — Sous abri, la forme de la journée est-elle celle du plein champ ?**
-   Recommandation : **oui**, le K_abri est un facteur du total du jour et ne
+   **Réponse du porteur, le 26 novembre 2026 : « Oui, même forme »** (option
+   recommandée). Raison : le K_abri est un facteur du total du jour et ne
    déplace pas les heures ; une forme propre à l'abri (plus plate, plus
    tardive) demanderait des mesures que le module n'a pas.
 3. **3 sur 3 — Faut-il dire à quelles heures l'évaporation est la plus

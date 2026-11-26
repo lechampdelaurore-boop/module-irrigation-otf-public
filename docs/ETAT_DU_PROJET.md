@@ -16,7 +16,7 @@ registres, elle y renvoie.
   `docs/et0-horaire-contract.md`, roadmap ligne 37, section 6
   septendecies) : l'ET0 du jour reste la référence, l'heure donne la
   forme de la journée ; **« Informer seulement », choix du porteur (question
-  1 sur 3)** ; questions 2 et 3 en attente. Trois PR de code à venir, HR1 à
+  1 sur 3)** ; question 2 tranchée (même forme sous abri), question 3 en attente. Trois PR de code à venir, HR1 à
   HR3, Opus 5.5 · Élevé. Rien de codé, aucun contrôle de code lancé.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,

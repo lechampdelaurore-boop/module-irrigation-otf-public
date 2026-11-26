@@ -11047,5 +11047,8 @@ un échec ne casse jamais la lecture météo ; même modèle que la ligne du jou
 de la ferme (D-339). Rouvrir « caler la jauge sur l'heure » exige un résultat
 du banc et une décision nouvelle.
 
-**En attente du porteur.** Question 2 sur 3 (sous abri) et question 3 sur 3
-(heures de forte évaporation) ; la recommandation s'applique d'ici là.
+**Question 2 sur 3, tranchée le 26 novembre 2026** : « Oui, même forme » sous
+abri ; le K_abri ne change que le total du jour.
+
+**En attente du porteur.** Question 3 sur 3 (heures de forte évaporation) ;
+la recommandation s'applique d'ici là.
