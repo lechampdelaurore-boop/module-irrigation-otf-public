@@ -103,6 +103,13 @@ registres, elle y renvoie.
   pas. Aucun calcul ni aucune écriture changés. Contrôles : voir la PR.
   Sa fusion vient à son tour, après les PR de S4 et de S6 qui passent
   avant.
+
+- **L'ET0 horaire, contrat écrit le 26 novembre 2026, sans code** (D-340,
+  `docs/et0-horaire-contract.md`, roadmap ligne 37, section 6
+  septendecies) : l'ET0 du jour reste la référence, l'heure donne la
+  forme de la journée ; **« Informer seulement », choix du porteur (question
+  1 sur 3)** ; questions 1 à 3 tranchées par le porteur. Trois PR de code à venir, HR1 à
+  HR3, Opus 5.5 · Élevé. Rien de codé, aucun contrôle de code lancé.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la

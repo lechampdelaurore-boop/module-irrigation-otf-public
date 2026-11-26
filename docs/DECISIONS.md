@@ -11484,3 +11484,29 @@ complétés, retour du module (7 jours, modèle retiré non nommé).
 réglage offert avec un lecteur et absent sans, jours complétés lus pour la
 ferme seule, retour du module dit sur la carte de cette ferme seule.
 Parcours P72 aux deux largeurs.
+
+## D-340 — L'ET0 horaire donne la forme de la journée, en information seulement
+
+Décision du porteur de projet du 26 novembre 2026 (question 1 sur 3, carte de
+décision, option recommandée) : l'ET0 heure par heure sert à **informer**, pas
+à calculer. Contrat : `docs/et0-horaire-contract.md`, roadmap section
+6 septendecies.
+
+**Ce que cela décide.** L'ET0 du jour reste la valeur de référence ; l'heure
+ne donne que la forme de la journée (parts dont la somme vaut 1). D-010, D-045
+et D-047 restent intacts : aucun chiffre de la jauge, de l'objectif, du besoin
+ni des alertes ne change. Le module reste journalier (MC-19 du moteur commun).
+
+**Posé par l'assistant, sur sa recommandation.** Trois sources (heure du
+fournisseur, heure calculée, forme théorique du soleil, dite comme telle) ;
+J0 à J+2 par lieu ; affichage dans le pli « Le détail » d'« Aujourd'hui » ;
+un échec ne casse jamais la lecture météo ; même modèle que la ligne du jour
+de la ferme (D-339). Rouvrir « caler la jauge sur l'heure » exige un résultat
+du banc et une décision nouvelle.
+
+**Question 2 sur 3, tranchée le 26 novembre 2026** : « Oui, même forme » sous
+abri ; le K_abri ne change que le total du jour.
+
+**Question 3 sur 3, tranchée le 26 novembre 2026** : « Oui, en information
+(75 %) » ; les heures dont l'ET0 est à 75 % ou plus du maximum du jour, dites
+sans interdiction ni alerte. Les trois questions sont répondues.
