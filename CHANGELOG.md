@@ -18,6 +18,11 @@ source détaillée commit par commit.
   comment la ferme a commencé. « Commencer par l'essentiel » disparaît. Une
   migration additive (0051) garde la façon choisie ; les fermes qui
   utilisent déjà le module ne voient rien changer.
+- **Contrôles du dépôt** : les parcours navigateur ont 75 minutes au lieu
+  de 50. Ils en prennent trente-deux à quarante-sept selon la machine de
+  GitHub, et la vérification de cette PR a été coupée à 50 minutes pendant
+  les parcours de la démonstration (run 45880035932). Aucun parcours ne
+  change.
 
 ### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
 
