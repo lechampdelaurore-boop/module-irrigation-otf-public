@@ -428,5 +428,9 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   await expect(page).toHaveURL(/\/irrigation\/arrosages\?season=\d{4}$/);
   await expect(page.getByRole('tab', { name: /^Déjà fait/ })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('.irrigation-creation-panel')).toBeInViewport();
+  // Arrivé par un geste du « + » : le retour « ‹ Aujourd'hui » en tête du formulaire (S5, section 7, D-334).
+  const retour = page.locator('.irrigation-creation-panel').getByRole('link', { name: '‹ Aujourd’hui' });
+  await expect(retour).toBeVisible();
+  await expect(retour).toHaveAttribute('href', /^\/irrigation(\/aujourdhui)?\?season=\d{4}$/);
   await verifierLEtape(page, journal, '« Noter un arrosage déjà fait »');
 });

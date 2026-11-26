@@ -55,7 +55,7 @@ demandé à cette section.
 
 1. **Le message d'un geste s'affiche juste sous le bouton du geste**, et
    l'écran l'amène en vue au plus près, sans sauter en haut de la page :
-   formulaire « Irriguer maintenant », « Planifier », « Déjà réalisée » ;
+   formulaire « Arroser maintenant », « Planifier », « Déjà fait » (noms depuis la simplification S5, D-334) ;
    objectif hebdomadaire ; « Tout vider » ; pluie mesurée ; seuil minimal
    de planification ; décision d'une planche des besoins. Le message d'une
    action d'une carte des irrigations à venir s'affiche en tête de cette
@@ -75,7 +75,8 @@ demandé à cette section.
    demande une confirmation** dans une fenêtre du module : « Ce matériel a
    déjà une irrigation planifiée le 19 novembre, de 11 h 13 à 12 h 33. En
    planifier une seconde ? », boutons « Ne pas planifier » et « Planifier quand même »
-   (« Démarrer quand même » pour « Irriguer maintenant »). Le serveur refuse
+   (« Démarrer quand même » pour « Arroser maintenant », dont le geste dit
+   « Démarrer · fin vers … » depuis S5). Le serveur refuse
    d'écrire sans cette confirmation, et ne compte que les irrigations
    planifiées non démarrées qui chevauchent, comme l'avertissement
    d'aujourd'hui ; la confirmation donnée, il écrit et garde
@@ -94,7 +95,7 @@ ne compare la quantité à l'objectif de la semaine.
 
 1. **À chaque choix d'un matériel**, en mode « Objectif en mm », la
    quantité prend la dose de la proposition du planning pour ce matériel
-   le jour de l'irrigation (aujourd'hui pour « Irriguer maintenant », le
+   le jour de l'irrigation (aujourd'hui pour « Arroser maintenant », le
    jour de la date de début pour « Planifier »), proposée ou validée, la
    première du jour s'il y en a plusieurs ; sinon le champ reste vide.
    Planning décoché, aucune proposition : champ vide. Une quantité tapée
@@ -107,6 +108,9 @@ ne compare la quantité à l'objectif de la semaine.
    au-delà ; « , et celui de 2 autres planches » s'il y en a). Sans objectif adopté,
    aucune fenêtre. Ce n'est qu'un avertissement : confirmé, l'arrosage
    s'enregistre (F410).
+   Depuis la simplification S5 (D-332, D-334), la dose du jour est la
+   pastille « Conseillé » de « Combien de temps ? », choisie d'emblée, qui
+   enregistre la même quantité en mm ; sans dose, aucune durée n'est choisie.
 
 ## 5. n° 7 — Refuser une proposition
 

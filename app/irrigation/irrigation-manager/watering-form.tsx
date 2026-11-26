@@ -50,7 +50,7 @@ import type { CreationForm } from './use-creation-form';
  * `lib/domain/watering-plan-record.ts`.
  */
 export function WateringForm({
-  form, preview, gardens, pumpDashboard, pumpsEnabled, dose, unplacedChoice, now, pending, reply, onChooseEquipment, onSubmit,
+  form, preview, gardens, pumpDashboard, pumpsEnabled, dose, unplacedChoice, afterStart, now, pending, reply, onChooseEquipment, onSubmit,
 }: {
   form: CreationForm;
   preview: IrrigationPreviewResult;
@@ -60,6 +60,8 @@ export function WateringForm({
   dose: number | null;
   /** Le nom d'un matériel choisi qui n'était pas posé à l'heure de début de « Déjà fait », sinon `null` (section 4). */
   unplacedChoice: string | null;
+  /** Le lien vers la carte d'« Aujourd'hui » après « Démarrer » (S5-g), sinon `null`. */
+  afterStart: ReactNode;
   now: Date;
   pending: boolean;
   reply: ReactNode;
@@ -292,12 +294,13 @@ export function WateringForm({
         </div>
       </div>
 
-      <div className="watering-start">
+      <div className="watering-start" data-tour="arrosage-bouton">
         <button type="button" className="start-irrigation-button" aria-label={pending ? undefined : button.accessibleName} disabled={pending || button.disabled} onClick={onSubmit}>
           {pending ? 'Enregistrement…' : button.label}
         </button>
         {button.missing && !pending ? <p className="watering-missing">{button.missing}</p> : null}
         {reply}
+        {kind === 'running' ? afterStart : null}
         {kind === 'running' ? <small>Le minuteur retrouvera son état après une actualisation de la page.</small> : null}
       </div>
     </div>

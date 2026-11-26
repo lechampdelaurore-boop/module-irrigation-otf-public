@@ -141,9 +141,9 @@ test('l’explication fixe de « Réserve du sol » est dans son « ? », plus e
 const PREMIERS_BLOCS: Record<PageDuModule, { bloc: string; budget: number }> = {
   // 152 → 108 px : la ligne de lecture retirée.
   aujourdhui: { bloc: '.today-head', budget: 120 },
-  // 393 → 287 px : la ligne de lecture, la saison et la phrase d'explication. Le premier geste :
-  // « Recevoir les alertes sur cet appareil » quand le navigateur n'a pas encore répondu, sinon le formulaire.
-  arrosages: { bloc: '.irrigation-events-section :is(.irrigation-notification-readiness, .irrigation-creation-panel)', budget: 400 },
+  // 393 → 287 px : la ligne de lecture, la saison et la phrase d'explication. Le premier geste : le formulaire ;
+  // les alertes du téléphone, dans tous leurs états, passent dessous (S5, PR 3, F908).
+  arrosages: { bloc: '.irrigation-events-section .irrigation-creation-panel', budget: 400 },
   // 309 → 203 px ; 261 px avec la bande de la semaine (S3, PR 2).
   planning: { bloc: '.planning-heading-actions', budget: 400 },
   // 470 → 391 px : la ligne de résumé de la semaine, sous la navigation des semaines.

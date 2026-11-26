@@ -10954,3 +10954,76 @@ section 6.1 en PR 3 ; la PR 3, qui réécrit les contrats de la section 9.1
 (dont T15 et T16), le porte, comme l'a annoncé la PR 1. L'ordre de la page
 et le budget de hauteur de la section 7, la demande portée par l'adresse
 et les ancres de la visite guidée restent aussi à la PR 3.
+
+## D-334 — Simplifier l'usage du module, lot S5 : l'entrée de la page et les mots
+
+Date : 25 novembre 2026. Statut : **PR 3 sur 3 codée** ; contrat
+`docs/simplification-s5-contract.md` (sections 6.1, 7, 9.1 et 10), roadmap
+section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap et du contrat (section 14), dans la suite de D-332 et D-333. **Le
+code de S5 est fini.**
+
+**Décision (PR 3).** La page « Arrosages » suit l'ordre de la section 7 :
+le titre « Arroser ou noter », les irrigations en cours, le formulaire,
+les alertes du téléphone, les irrigations à venir, puis le résumé (« 1 en
+cours, 0 à venir, 0 archivées »), qui quitte le titre. Le « + » de S3
+(`?arroser=maintenant`, `?arroser=fait`, `WATERING_INTENT` de
+`lib/domain/features/plus-sheet.ts`, lu une fois puis retiré par
+`useUrlIntent`) est repris tel quel : S5 n'y ajoute que le retour. Aucun
+calcul, aucune action serveur, aucune garde ne change ; aucune question
+agronomique.
+
+Précisions prises en codant :
+
+- **F908** — Les alertes du téléphone (« Recevoir les alertes sur cet
+  appareil », « Alertes activées », l'état limité) viennent **toutes** sous
+  le formulaire, à une seule place. Amende F266 (audit final, lot E,
+  section 7.1), qui ne descendait que l'état limité : en tête, « Recevoir
+  les alertes » mettait « 1. Où ? » à 469 px au téléphone, au-delà du
+  budget de 400 px. Le texte et le repli (F267) ne changent pas.
+- **F909** — Au téléphone, la carte d'une irrigation en cours est
+  raccourcie : le minuteur à droite du nom, les trois valeurs (temps
+  effectué, fin estimée, volume) sur une ligne, « Pause » et « Terminer
+  l'irrigation » côte à côte, chacun de 52 px comme avant. Les mêmes
+  gestes, les mêmes mots, la même règle ; seule la mise en page change
+  (`arroser-maintenant.css`). La carte passe de 639 à environ 430 px
+  (mesure de P64).
+- **F910** — **Budget de la section 7, avec une irrigation en cours, non
+  tenu** : « 1. Où ? » commence à 800 px au téléphone (1 011 px avant
+  F909), au lieu de moins de 700 px, mesuré par P64 avec le nom long d'un
+  parcours (« Ligne A p64-arroser-en-trois-champs telephone », trois
+  lignes). La carte en cours garde le détail des apports, la faisabilité
+  de la pompe et ses deux boutons : la raccourcir davantage retirerait une
+  information du premier niveau, ce que la section 1 du contrat exclut
+  (« leurs gestes restent ; seuls des mots s'alignent »). P64 borne à
+  820 px pour garder le gain ; le budget de 700 px reste une dette, à
+  reprendre avec la carte de S2 si le porteur le juge utile. **Sans
+  irrigation en cours, le budget est tenu** : 298 px au téléphone sur la
+  ferme de mesure (603 px avant S5), sous 400 px dans P64 et P65.
+- **F911** — Arrivé par un geste du « + » (« Arroser maintenant », « Noter
+  un arrosage déjà fait »), le formulaire commence par un retour « ‹
+  Aujourd'hui » de 44 px, avant les onglets ; il mène à « Aujourd'hui » de
+  la même saison. « Ajouter un créneau à la main » du planning
+  (`?planifier=1`) n'est pas un geste du « + » : pas de retour.
+- **F912** — Après « Démarrer », la page reste ; sous la réponse, un lien
+  de 44 px « Voir l'arrosage en cours sur Aujourd'hui » mène à la page,
+  sans ancre (section 10 : la carte de S2 peut changer de forme). Il
+  disparaît au geste suivant ; il ne paraît ni après « Planifier », ni
+  après « Déjà fait », ni après la modification d'une irrigation planifiée.
+- **F913** — Sur la ligne « À traiter » d'« Arrosages », « Fait comme
+  prévu » devient « C'est fait », le mot de la carte d'« Aujourd'hui »
+  (S2, PR 3) ; son nom lu « C'est fait : *irrigation* ». La confirmation
+  garde son titre « Fait comme prévu ? » et son bouton « Enregistrer comme
+  faite », sur les deux pages. Solde la dette de S2 (section 6.1) ; la
+  notification « Fait comme prévu » reste (dette notée avec F828).
+- **F914** — La visite guidée suit les trois blocs : « 1. Où ? »
+  (`arrosage-champs`), « 2. Combien de temps ? » (`arrosage-resultat`),
+  « Vous seul validez » sur le bouton (`arrosage-bouton`, ancre nouvelle,
+  qui nomme « Démarrer · fin vers … »).
+- **F915** — Les contrats de la section 9.1 lisent les mots nouveaux :
+  lot G (la dose du jour devient « Conseillé »), lot 3 (cas 3 amendé par
+  S5-b ; cas 7, « C'est fait »), « Aujourd'hui » tableau de bord, poses
+  du matériel (« Déjà fait » met « De quand à quand ? » avant « Où ? »),
+  S2 (dettes soldées), S3, la charte du module (onglets d'une ligne au
+  téléphone), lot E (F908) ; la recette 2.11 garde les mots de son jour,
+  avec une note datée.

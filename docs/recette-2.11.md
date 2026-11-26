@@ -133,3 +133,8 @@ navigateur, hors du dépôt, sont supprimées.
 
 Le porteur close la 2.11 le 30 octobre 2026 au soir (« Ok, vas-y, ferme-la »),
 sans constat séparé de la lisibilité sur son téléphone.
+
+_Note du 25 novembre 2026 (simplification S5, D-332 à D-334) : « Irriguer
+maintenant » s'appelle « Arroser maintenant », « Déjà réalisée » « Déjà fait »,
+et « Planifier l'irrigation » dit « Planifier · *jour* à *h* ». Cette recette
+garde les mots de son jour._

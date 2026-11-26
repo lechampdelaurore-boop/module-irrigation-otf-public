@@ -166,7 +166,7 @@ la PR 3 de ce contrat et reprise par le lot 3.
 - **Ce qui est enregistré** : chaque irrigation devient réalisée **telle que
   prévue**, à son heure de début prévue, avec sa durée, son matériel, son
   réglage et sa dose prévus (le volume en découle comme pour une saisie
-  « Déjà réalisée »). **Choix du porteur, le 8 novembre 2026** (« Tel que
+  « Déjà fait », « Déjà réalisée » avant S5). **Choix du porteur, le 8 novembre 2026** (« Tel que
   prévu »), parce que ce point touche les données réelles qui entrent dans
   l'écart.
 - **Garde-fou** : rien n'est enregistré au premier clic. Le bouton ouvre une
@@ -179,7 +179,9 @@ la PR 3 de ce contrat et reprise par le lot 3.
   le bouton, en tête de « Votre journée » (`docs/aujourdhui-liens-contract.md`,
   L4, D-313 ; sous sa carte pour « Fait comme prévu », qui se dit « C’est
   fait » sur la carte depuis la simplification S2, PR 3, D-330, la règle, la
-  confirmation et la fonction inchangées) ; la page se relit,
+  confirmation et la fonction inchangées, et sur la ligne d'« Arrosages »
+  depuis la simplification S5, section 6.1, D-334, la confirmation gardant
+  son titre « Fait comme prévu ? ») ; la page se relit,
   la pastille du menu baisse. L'historique dit chacune
   « Planifiée, faite comme prévu ». Une irrigation enregistrée **ne se
   modifie plus** (D-006, T16) : la confirmation le dit en gras, et c'est

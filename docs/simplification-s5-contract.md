@@ -573,6 +573,42 @@ le bandeau, les compteurs et l'ordre de la page sont le travail de la PR 3.
 
 **Numéros pris** : D-333 ; F902 à F907 ; parcours P65.
 
+### 13.3 Relevé de la PR 3
+
+**L'entrée.** La demande du « + » porte le nom que S3 a posé :
+`?arroser=maintenant` et `?arroser=fait` (`WATERING_INTENT` et
+`WATERING_INTENT_VALUES`, `lib/domain/features/plus-sheet.ts`), lue une fois
+puis retirée par `useUrlIntent` ; `?planifier=1` du planning ouvre toujours
+« Planifier », sans retour. S5 n'y ajoute que le retour « ‹ Aujourd'hui »
+(F911) et le lien après « Démarrer » (F912).
+
+**L'ordre de la page** : le titre « Arroser ou noter », les irrigations en
+cours, le formulaire, les alertes du téléphone (tous leurs états, F908), les
+irrigations à venir, le résumé des compteurs. **Mots** : « C'est fait » sur
+« Arrosages » (F913), la visite guidée en trois blocs (F914), les contrats
+de la section 9.1 (F915).
+
+**Mesures, même ferme neuve, même script, deux matériels posés, sans
+irrigation en cours** (la base e027002 contre les PR 1 à 3) :
+
+| | Avant | PR 1 | PR 2 | PR 3 |
+| --- | --- | --- | --- | --- |
+| Haut du premier bloc, téléphone 390 px | 603 px | 603 px | 451 px | **298 px** |
+| id., ordinateur | 437 px | 437 px | 457 px | 374 px |
+| Hauteur des onglets, téléphone | 206 px | 206 px | 54 px | 54 px |
+
+**Budget de la section 7**, mesuré par P64 au téléphone dans son propre état
+(« Recevoir les alertes » à l'écran, noms longs du parcours) : sans
+irrigation en cours, « 1. Où ? » sous 400 px, **tenu** (469 px avec les
+alertes en tête, avant F908) ; avec une irrigation en cours, **800 px, non
+tenu** (1 011 px avant F909, budget 700 px) : la carte en cours, raccourcie
+au téléphone sans rien retirer, mesure encore environ 430 px. La raccourcir
+davantage retirerait une information du premier niveau, ce que la section 1
+exclut ; dette dite dans D-334 (F910), P64 borne à 820 px.
+
+**Numéros pris** : D-334 ; F908 à F915 ; aucun parcours nouveau (P31, P61,
+P63 et P64 suivent).
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Élevé** pour les trois PR (ligne 33 de la roadmap, quatrième cas de

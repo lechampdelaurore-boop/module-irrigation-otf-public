@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
+  les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
+  sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
+  PR 2 : **le code de S5 est fini.** « Arroser ou noter » : l'en-cours, le
+  formulaire, les alertes du téléphone, l'à-venir, le résumé ; le retour
+  « ‹ Aujourd'hui » après un geste du « + », le lien après « Démarrer »,
+  « C'est fait » sur « Arrosages », la visite en trois blocs, les contrats
+  de la section 9.1 réécrits. « 1. Où ? » à 298 px au téléphone (603 px
+  avant S5). **Budget avec une irrigation en cours non tenu** (800 px au
+  lieu de 700, F910 ; la carte en cours raccourcie au téléphone, F909) :
+  dette dite. Contrôles : voir la PR. Viennent les fusions de S5 (après
+  S3), puis S4.
 - **Simplifier l'usage du module, S5, PR 2 sur 3 : « Planifier » et « Déjà
   fait » sur le même squelette, codée le 25 novembre 2026** (D-333, F902 à
   F907 ; contrat, sections 4, 5 et 6), en Opus 5.5 · Élevé, sur la branche
@@ -23,8 +35,9 @@ registres, elle y renvoie.
   onglets sur une ligne. L'ancien formulaire retiré, l'Historique dit les
   mêmes mots. Règles dans `lib/domain/watering-plan-record.ts` ; aucun
   calcul ni aucune écriture changés. Tests, parcours P65 ; P2, P3, P31,
-  P37 réécrits, neuf autres suivent. Contrôles : voir la PR. Vient la PR 3
-  (ordre de la page, budget, « C'est fait »).
+  P37 réécrits, neuf autres suivent. Contrôles : voir la PR. **En ligne** :
+  #228 fusionnée le 26 novembre 2026 à 8 h 55 (f3af768), déployée à
+  9 h 31, run 45778899693, les cinq jobs verts (consigné par S5, PR 3).
 - **Simplifier l'usage du module, S5, PR 1 sur 3 : « Arroser maintenant »
   en trois champs, codée le 25 novembre 2026** (D-332, F894 à F901 ;
   contrat `docs/simplification-s5-contract.md`, sections 3 et 9.3 ;

@@ -319,3 +319,79 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Le résumé des irrigations après l'à-venir (S5, PR 3, section 7, S5-m). */
+.irrigation-events-summary {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 22px 22px;
+}
+
+@media (max-width: 560px) {
+  .irrigation-events-summary {
+    padding: 0 14px 14px;
+  }
+}
+
+/* Le retour « ‹ Aujourd'hui » après un geste du « + », et le lien après « Démarrer » (S5, PR 3, section 7, S5-g). */
+.watering-back,
+.watering-after-start {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green-dark);
+  font-weight: 500;
+}
+
+.watering-back {
+  padding: 0 22px;
+}
+
+@media (max-width: 560px) {
+  .watering-back {
+    padding: 0 14px;
+  }
+}
+
+/*
+ * L'arrosage en cours, plus court au téléphone (S5, PR 3, section 7, F909) : les
+ * mêmes gestes et les mêmes mots, rangés côte à côte (le minuteur à droite du
+ * nom, les trois valeurs sur une ligne, « Pause » et « Terminer » sur une
+ * ligne, chacun de 52 px) ; « 1. Où ? » commence sous 700 px.
+ */
+@media (max-width: 560px) {
+  .active-irrigation-card > header {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .active-irrigation-card > header > div {
+    min-width: 0;
+  }
+
+  .active-irrigation-card h4 {
+    overflow-wrap: anywhere;
+  }
+
+  .active-irrigation-card .timer-countdown {
+    font-size: 32px;
+  }
+
+  .active-timer-details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 10px 0;
+  }
+
+  .active-timer-details div {
+    padding: 8px;
+  }
+
+  .active-timer-actions {
+    flex-direction: row;
+  }
+
+  .active-timer-actions button {
+    flex: 1;
+  }
+}

@@ -20,7 +20,8 @@ import { poserUnObjectifDeFerme } from './support/planning.ts';
  *   amendé par S5-b), aucun cadre rouge ; une irrigation planifiée il y a six heures et une
  *   demain se rangent, la première dans « À traiter », la seconde sous
  *   « Demain » (cas 5) ; « Annuler » est rangé dans le menu « … », sa
- *   confirmation inchangée (cas 6) ; « Fait comme prévu » ne paraît que sur
+ *   confirmation inchangée (cas 6) ; « C'est fait » (« Fait comme prévu »
+ *   avant S5) ne paraît que sur
  *   la ligne passée, ici et sur « Aujourd'hui », demande une confirmation
  *   d'une ligne qui dit qu'elle ne se corrige plus, et « Ne rien enregistrer »
  *   n'écrit rien (cas 7).
@@ -103,7 +104,7 @@ test('planning : les gestes en tête, les planches sans matériel en action vers
   await verifierLEtape(page, journal, 'le lien mène à « Matériel »');
 });
 
-test('arrosages : le seul matériel choisi d’office, « À traiter » en tête, lignes par jour, « Annuler » dans « … », « Fait comme prévu » confirmé', async ({ page, context }, testInfo) => {
+test('arrosages : le seul matériel choisi d’office, « À traiter » en tête, lignes par jour, « Annuler » dans « … », « C’est fait » confirmé', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   // Un seul « maintenant » par parcours : toutes les dates en découlent.
@@ -170,12 +171,12 @@ test('arrosages : le seul matériel choisi d’office, « À traiter » en tête
   await expect(annuler).toBeHidden();
   await verifierLEtape(page, journal, 'menu « … » ouvert puis refermé');
 
-  // Cas 7 : « Fait comme prévu » sur la ligne passée seulement ; sur « Aujourd'hui », le même enregistrement dit « C’est fait »
-  // depuis la simplification S2, PR 3 (D-330).
-  await expect(prevue.getByRole('button', { name: /^Fait comme prévu/ })).toHaveCount(0);
-  const faitCommePrevu = passee.getByRole('button', { name: new RegExp(`^Fait comme prévu : ${materiel}`) });
+  // Cas 7 : « C’est fait » sur la ligne passée seulement, le mot d'« Aujourd'hui » (S2, PR 3, D-330) repris sur
+  // « Arrosages » par S5 (section 6.1, D-334) ; la confirmation garde son titre « Fait comme prévu ? ».
+  await expect(prevue.getByRole('button', { name: /^C’est fait/ })).toHaveCount(0);
+  const faitCommePrevu = passee.getByRole('button', { name: new RegExp(`^C’est fait : ${materiel}`) });
   await expect(faitCommePrevu).toBeVisible();
-  if (telephone) await verifierCibleTactile(faitCommePrevu, 'Le bouton « Fait comme prévu »');
+  if (telephone) await verifierCibleTactile(faitCommePrevu, 'Le bouton « C’est fait »');
   await attendreLaPageIrrigation(page, 'aujourdhui');
   await expect(page.locator('#today-day').getByRole('button', { name: new RegExp(`^C’est fait : ${materiel}`) })).toHaveCount(1);
   await attendreLaPageIrrigation(page, 'arrosages');

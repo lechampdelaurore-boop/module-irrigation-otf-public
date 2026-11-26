@@ -172,7 +172,7 @@ test('n° 15, F461 : les trois panneaux à onglets, cachés et non retirés ; po
 // la règle de F462 qui tient encore, le bouton et la réponse toujours rendus, se lit sur le squelette.
 test('n° 15, F462 : le bouton et la réponse du module restent hors de l’attente', () => {
   const form = readFileSync('app/irrigation/irrigation-manager/watering-form.tsx', 'utf8');
-  const start = form.indexOf('<div className="watering-start">');
+  const start = form.indexOf('<div className="watering-start" data-tour="arrosage-bouton">');
   assert.ok(start > 0);
   const tail = form.slice(start);
   assert.ok(tail.includes('className="start-irrigation-button"'), 'le bouton, toujours rendu');

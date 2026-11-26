@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S5, PR 3 : l'entrée de la page et les mots)
+
+- **« Arrosages » commence par le geste** (D-334, F908 à F915) : la page
+  s'appelle « Arroser ou noter » ; viennent les arrosages en cours, le
+  formulaire, puis les alertes du téléphone, les arrosages à venir et les
+  compteurs. Au téléphone, « 1. Où ? » commence à 298 px au lieu de
+  603 px. Arrivé par le « + », un retour « ‹ Aujourd'hui » ouvre le
+  formulaire ; après « Démarrer », la page reste et un lien mène à
+  « Aujourd'hui ». Au téléphone, la carte d'un arrosage en cours est plus
+  courte (les mêmes boutons, côte à côte). « Fait comme prévu » s'appelle
+  « C'est fait », comme sur « Aujourd'hui » ; la visite guidée suit les
+  trois blocs. Aucun calcul, aucune règle d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S5, PR 2 : « Planifier » et « Déjà fait »)
 
 - **« Planifier » et « Déjà fait » comme « Arroser maintenant »** (D-333,
