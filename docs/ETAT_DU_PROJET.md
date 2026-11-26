@@ -3608,14 +3608,20 @@ registres, elle y renvoie.
 - **Recettes en attente, faites le 26 novembre 2026** sur la démonstration
   (ferme « Ferme des Trois Noues », moment « Pic d'été », puis « Matériel et
   alertes » et « Ferme vierge »), dans le Chrome de François, sur son accord,
-  à l'ordinateur seulement. **Conformes** : lots C, A, B, F, E et D de
-  l'audit final (24 octies à 24 terdecies) et L1 à L4 de 6 nonies, O4 de
-  6 decies ; 6 duodecies déjà clos. **Non rejoués** : tout ce qui se lit au
-  téléphone (J1, A2, M1, L5, L6) et les remarques 2, 4 et 5 de la recette 3.9
-  une à une. **Impossible sur la démonstration** : H3 de 6 undecies (les
+  à l'ordinateur puis à 390 px (page de la démonstration dans un cadre de
+  390 px de large). **Conformes** : lots C, A, B, F, E et D de
+  l'audit final (24 octies à 24 terdecies), L1 à L6 de 6 nonies, O4 de
+  6 decies ; 6 duodecies déjà clos. Au téléphone : barre de la démo de
+  45 px (J1), une seule cible de moins de 44 px par page, l'avatar (A2),
+  cases de planche de « Matériel » à 90 × 100 px (M1), la journée avant les
+  tuiles (L6), aucun débord. Recette 3.9 : la remarque 5 (limite
+  journalière dite dans la colonne) est rejouée et conforme ; les remarques
+  2 et 4 ne se reproduisent pas sur la démonstration (une seule semaine, aucun
+  report). **Impossible sur la démonstration** : H3 de 6 undecies (les
   notifications y sont désactivées) : attend une séance sur la ferme réelle,
   avec l'accord de François. Données saisies pour l'essai (une pluie de
-  2 mm, une validation, l'objectif automatique allumé puis éteint) : la
+  2 mm, une validation, l'objectif automatique allumé puis éteint, une limite
+  journalière) : la
   démonstration a été remise à zéro ensuite (« 3 à faire », aucun arrosage
   planifié), rien n'a été saisi sur la ferme réelle. Détail dans les lignes
   de la roadmap (section 1).
