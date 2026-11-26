@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
+  fiches de « Ma ferme », codée le 26 novembre 2026** (D-336, F969 à
+  F975 ; contrat, sections 7, 14 et 15), en Opus 5.5 · Très élevé,
+  empilée sur la PR 2 (#236). Chaque fiche dit son état en une ligne
+  quand la donnée est connue (matériel posé ou non, une ressource et son
+  débit ou une réserve à sa date, les cultures de la saison, les
+  parcelles sans sol, les alertes réglées, la commune de la météo et les
+  cases cochées), sinon la ligne fixe de S3 ; « Alertes cultures » garde
+  sa ligne fixe. Une seule lecture pour la carte et les fiches (l'étape 1
+  compte désormais tout le matériel actif, comme l'inventaire) ; deux
+  lectures nouvelles et légères. **Écart dit** : « Besoin par culture »
+  dit ses cultures de la saison, pas les espèces à rattacher (comptées
+  dans Réglages, F972). Aucune migration, aucun calcul changé. Tests ;
+  P63 et P70 suivent. Contrôles, contre-épreuves et mesures : voir la PR
+  et la section 15 du contrat. Vient la PR 4 (visites, ferme vierge,
+  contrats de la section 11) ; fusion après la PR 2.
 - **Simplifier l'usage du module, S6, PR 2 sur 4 : la carte « Mise en
   route », codée le 26 novembre 2026** (D-336, F958 à F968 ; contrat,
   sections 5, 6, 8, 12 et 14), en Opus 5.5 · Très élevé, empilée sur la
@@ -26,8 +42,7 @@ registres, elle y renvoie.
   `farmObjective`, l'étape 5 par `parcelsWithoutSoil`. Aucune migration,
   aucun calcul changé. Tests ; P70 nouveau ; P29 et P63 suivent.
   Contrôles, contre-épreuves et mesures : voir la PR et la section 15 du
-  contrat. Viennent les PR 3 (les lignes d'état des fiches) et 4 ; fusion
-  après la PR 1.
+  contrat. Fusion après la PR 1.
 - **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
   commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
   sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de

@@ -11446,9 +11446,10 @@ Précisions prises en codant :
 
 ## D-336 — Simplifier l'usage du module, lot S6 : la mise en route guidée
 
-Date : 26 novembre 2026. Statut : **PR 2 sur 4 codée** (PR 1 #235
-ouverte) ; contrat `docs/simplification-s6-contract.md` (sections 3, 4,
-9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la PR 2), roadmap
+Date : 26 novembre 2026. Statut : **PR 3 sur 4 codée** (PR 1 #235 et
+PR 2 #236 ouvertes) ; contrat `docs/simplification-s6-contract.md`
+(sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
+PR 2 ; 7, 14 et 15 pour la PR 3), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
 élevé, le réglage de la roadmap et du contrat (section 17), après la fin
 du code de S4, sur la branche de sa PR 4, le contrat (#218) fusionné dans
@@ -11726,3 +11727,127 @@ Précisions prises en codant (PR 2) :
   la carte. Parcours joués en local aux deux largeurs : P29, P63, P69 et
   P70 (24 verts), puis P22, P23, P25, P28, P30, P31, P62, P66 et P70 (56
   verts), aucun échec ; la suite complète par la CI.
+
+**Décision (PR 3).** Chaque fiche de « Ma ferme » dit **son état en une
+ligne** quand la donnée est connue, à la place de la ligne fixe de S3 ;
+la ligne fixe revient quand la donnée est inconnue, illisible ou vide,
+jamais un « 0 » pour un inconnu (D-003). La marque « À faire » reste : la
+ligne dit ce qui **est**, la marque ce qui **manque**. Les lignes sont des
+gabarits du domaine (`lib/domain/farm-home/lines.ts`), relus par le test
+de vocabulaire de S1 ; leurs nombres viennent de **la lecture de la mise
+en route**, lancée sur « Ma ferme » toujours (pour les fiches) et avec la
+carte quand elle existe : une seule lecture, plusieurs phrases, jamais
+deux comptes qui peuvent différer. « Alertes cultures » garde sa ligne
+fixe (repli gardé, section 7.2). Aucun calcul, aucune règle d'agronomie
+ni d'isolation ne change ; aucune migration ; aucune question
+agronomique.
+
+Précisions prises en codant (PR 3) :
+
+- **F969** — **Les lectures des lignes**, relevées pour la section 15
+  (`lib/services/start-route.ts`, `startRouteReads(…, { route, cards })`) :
+  seules les fiches cochées sont lues. « Matériel et placement » :
+  l'inventaire (`listEquipmentForUser`), les poses courantes de la saison,
+  posées ou stockées (`listEquipmentPosesForUser`, deux requêtes ; elle
+  remplace `listEquipmentPlacementsForUser` de la PR 2 : les poses
+  ouvertes, `posedPlacements`, servent la couverture de l'étape 2, et
+  `poseCounts`, le compte de l'inventaire, dit les posés) et les groupes
+  de jardins (étapes 1 et 2). « Ressources et pompes » :
+  `readActiveWaterAssetsForUser` (un lot de deux requêtes, les ressources
+  actives avec leur débit, les réserves actives avec leur volume à sa
+  date ; elle remplace `readActiveWaterResourceNamesForUser` et l'étape 3
+  en tire ses noms et son nombre). « Besoin par culture » : après
+  l'espace, les rattachements des espèces
+  (`listSpeciesCorrespondencesForWorkspace`, la même promesse sert au
+  bandeau « À finir ») et les clés des cultures que la ferme connaît
+  (`listReferenceCropKeysForWorkspace`, **nouvelle**, une requête, sans
+  les stades). « Réserve du sol » : `listZonesWithSoilForUser` (partagée
+  avec l'étape 5 et le bandeau). « Alertes météo » :
+  `countWeatherAlertCriteriaForUser` (**nouvelle**, un `COUNT` des
+  critères non supprimés et des actifs, dans l'espace de la personne).
+  « Réglages » : `readWeatherPreference` (lue une fois par requête) puis
+  `weatherLocationQuery`. Aucune n'est par planche ni par jardin. Une
+  lecture qui échoue rend la ligne fixe de sa fiche ; les autres restent.
+- **F970** — **« Matériel et placement »** (ligne d'état faite) : « 4
+  goutte-à-goutte, tous posés », « 2 goutte-à-goutte et 1 aspersion, 1
+  pas posé », « 2 aspersions, aucun posé », « 1 goutte-à-goutte, posé ».
+  Les sortes sont comptées comme l'inventaire (le goutte-à-goutte : tout
+  matériel actif qui n'est pas une aspersion ; un archivé ne compte pas),
+  les posés par `poseCounts` ; le texte des sortes est celui de l'étape 1
+  (`equipmentKindsText`). **L'étape 1 suit** : elle comptait les matériels
+  qui ont un réglage ; elle compte maintenant tout le matériel actif,
+  comme l'inventaire et la fiche, et reste faite dès qu'un matériel a un
+  réglage. Aucun matériel : la ligne fixe.
+- **F971** — **« Ressources et pompes »** (ligne d'état faite) : une seule
+  ressource, « Puits : débit de 2 m³/h » ; une seule réserve, la phrase du
+  bloc « Eau disponible » d'« Aujourd'hui » (`reservoirStateText` :
+  « Bassin des noues : 30 m³ sur 40 m³, observé aujourd’hui », « Cuve :
+  volume jamais saisi »), le volume à la date de son relevé ; plusieurs,
+  un compte : « 1 ressource et 2 réserves, 1 observée cette semaine »
+  (« toutes observées », « aucune observée », « pas observée »), une
+  réserve observée cette semaine quand son volume a été relevé depuis le
+  lundi. **Jamais une somme** de volumes ni de débits. **Écarts de mots
+  avec la maquette** : « observé » (le mot de la page et du bloc) pour
+  « relevé », « ressource » et « réserve » comptées à part (les deux
+  listes de la page). Aucune ressource ni réserve active : la ligne fixe.
+- **F972** — **« Besoin par culture »** (ligne d'état faite, **écart dit**) :
+  « 4 cultures cette saison », le titre de la page (« Vos cultures cette
+  saison (4) », `seasonCropCount`, les mêmes fonctions que la page :
+  `splitBySeasonUse` et `referenceCropSeriesCount` sur les cultures que la
+  ferme connaît) ; « Aucune culture ne sert à vos séries cette saison »,
+  la phrase de la page, quand des espèces sont plantées et qu'aucune n'est
+  rattachée ; la ligne fixe sans espèce plantée ou sans plan lu. Le
+  contrat proposait « 8 cultures cette saison, 2 pas encore reconnues » :
+  les espèces à rattacher se comptent et se rattachent dans **Réglages**,
+  pas sur « Besoin par culture » (relevé en jouant P63), et la règle « une
+  ligne qui dirait plus que sa page est refusée » l'emporte ; la marque
+  « À faire : n espèces à rattacher » de la fiche « Réglages » le dit
+  pendant l'accueil.
+- **F973** — **« Réserve du sol »**, **« Alertes météo »** et
+  **« Réglages »** (lignes d'état faites) : « Sol connu pour 6 parcelles
+  sur 6 », « À renseigner pour 3 parcelles » (`parcelsWithoutSoil`, les
+  parcelles de la saison) ; « 2 alertes réglées », « 2 alertes réglées, 1
+  inactive » (le mot de la page), « Aucune alerte réglée » ; « Météo de
+  Nantes · 11 fonctionnalités cochées », « Commune à confirmer · 11
+  fonctionnalités cochées » tant que la commune n'est pas confirmée et
+  qu'une case lit la météo (« de la météo » ôté : deux lignes au plus à
+  320 px), « 3 fonctionnalités cochées » sans case qui lit la météo ; une
+  commune confirmée introuvable garde la ligne fixe. Les messages du
+  téléphone n'y sont pas (S6-g, écart dit au contrat). **« Alertes
+  cultures » : repli gardé** : le gel suivi demande le calcul de la page
+  (espèces, jeu commun, liens de gel), hors du budget.
+- **F974** — **Où les lignes se lisent** : `page-context.ts` lance la
+  lecture sur « Ma ferme » toujours (`cards`), avec la carte quand
+  `routeReadNeeded` le dit (`route`), une seule fois ; les comptes des
+  fiches (`farmHomeCounts`) se font après le plan, en même temps que ceux
+  de la carte ; la page passe les lignes à `farmCards`, et chaque fiche dit
+  aux parcours quelle ligne elle porte (`data-line`, `state` ou `fixed`).
+  Le bandeau « À finir » réutilise les rattachements lus pour la fiche ;
+  il relit s'ils ont échoué. Toute autre page ne lit rien de plus.
+- **F975** — **Mesures et preuves** (section 14). Les lignes à 390 px
+  (P63, P70, en local) : deux lignes au plus au téléphone, une à
+  l'ordinateur, sur la ferme des parcours et une ferme neuve « Tout » ;
+  fiches de 70 à 92 px (borne 68). Mesuré à part : la colonne de texte
+  fait 242 px à 390 px et 172 px à 320 px ; les exemples du contrat
+  (« 2 goutte-à-goutte et 1 aspersion, tous posés », « Météo de Nantes ·
+  11 fonctionnalités cochées ») tiennent sur **deux** lignes à 390 px,
+  comme les lignes fixes de S3 (S3-f) : la règle tenue est celle de S3,
+  deux lignes au plus à 390 px ; à 320 px, une phrase de réserve longue
+  passe sur trois, la fiche grandit, aucun texte coupé. Le temps du
+  serveur, mesuré comme F968 (20 ms par lecture, sept passages,
+  médiane) : « Ma ferme » de la ferme des parcours **78 ms et 20
+  lectures sans la carte** (48 ms avant), **105 ms et 22 lectures avec**
+  (94 ms en PR 2), Réglages 180 et 184 ms ; à **300 planches**, **82 ms
+  sans la carte, 104 ms avec**, autant de lectures, Réglages 183 et
+  176 ms. Borne Réglages + 20 % (de 211 à 221 ms) tenue. Contre-épreuves,
+  chacune fait échouer au moins un test : une ligne « 0 goutte-à-goutte »
+  pour une ferme sans matériel ; « Aucune alerte réglée » quand la lecture
+  a échoué ; la fiche qui compte aussi le matériel archivé (deux comptes
+  différents) ; les alertes supprimées comptées ; le compte des alertes
+  sans le filtre d'espace (aux quatre passages) ; une lecture par
+  planche ; les espèces d'un bloc ou de l'an passé comptées ; les espèces
+  rattachées comptées au lieu des cultures de la page ; « Aucune culture »
+  quand le plan n'est pas lu ; une réserve d'avant lundi dite « observée
+  cette semaine » ; des volumes additionnés ; une deuxième lecture pour
+  les fiches ; la page qui n'affiche pas les lignes ; une ligne inventée
+  pour « Alertes cultures ».

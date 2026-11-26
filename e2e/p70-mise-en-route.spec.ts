@@ -25,6 +25,9 @@ import { poserUnObjectifDeFerme } from './support/planning.ts';
 const carte = (page: Page) => page.locator('section.start-route');
 const etapes = (page: Page) => carte(page).locator('li.start-route-step');
 const blocDuJour = (page: Page) => page.locator('#today-day .today-route');
+/** La ligne d'une fiche de « Ma ferme » (lot S6, PR 3, section 7). */
+const ligneDeFiche = (page: Page, titre: string) => page.getByRole('navigation', { name: 'Les fiches de Ma ferme' }).getByRole('link')
+  .filter({ has: page.locator('strong', { hasText: titre }) }).locator('.farm-card-line');
 
 async function ouvrirMaFerme(page: Page): Promise<void> {
   await attendreLaPageIrrigation(page, 'ma-ferme');
@@ -121,6 +124,19 @@ test('« Tout » : cinq étapes, la quatrième attend la deuxième, le bandeau �
   await expect(page.locator('.onboarding-unfinished')).toHaveCount(0);
   await expect(page.locator('.farm-card-todo').first()).toContainText('À faire : ');
   await verifierLEtape(page, journal, 'la carte, cinq étapes');
+  // Les fiches disent l'état de la ferme neuve (PR 3, section 7.2) : la ligne fixe pour ce qui n'est pas encore décrit,
+  // jamais « 0 goutte-à-goutte » ; les parcelles sans sol ; aucune culture rattachée encore ; la commune à confirmer.
+  await expect(ligneDeFiche(page, 'Matériel et placement')).toHaveAttribute('data-line', 'fixed');
+  await expect(ligneDeFiche(page, 'Ressources et pompes')).toHaveAttribute('data-line', 'fixed');
+  await expect(ligneDeFiche(page, 'Alertes cultures')).toHaveAttribute('data-line', 'fixed');
+  await expect(ligneDeFiche(page, 'Réserve du sol')).toHaveText(/^À renseigner pour \d+ parcelles?$/u);
+  const parcelles = /(\d+) parcelles?$/u.exec((await ligneDeFiche(page, 'Réserve du sol').textContent()) ?? '')?.[1];
+  expect(Number(parcelles)).toBeGreaterThan(0);
+  await expect(ligneDeFiche(page, 'Besoin par culture')).toHaveText('Aucune culture ne sert à vos séries cette saison');
+  await expect(ligneDeFiche(page, 'Alertes météo')).toHaveText('Aucune alerte réglée');
+  await expect(ligneDeFiche(page, 'Réglages')).toHaveText('Commune à confirmer · 11 fonctionnalités cochées');
+  for (const texte of await page.locator('.farm-card-line').allTextContents()) expect(texte, texte).not.toMatch(/(^|\s)0(\s|$)/u);
+  await verifierLEtape(page, journal, 'les lignes des fiches, la ferme neuve');
   // Sur toute autre page, il reste.
   await attendreLaPageIrrigation(page, 'reglages');
   await expect(page.locator('.onboarding-unfinished')).toContainText('commune de la ferme');
@@ -165,6 +181,9 @@ test('au téléphone, la carte à quatre étapes faites sur cinq tient dans 380 
   await expect(ressources.locator('.water-asset-card').filter({ hasText: 'Puits' })).toHaveCount(1);
   await ouvrirMaFerme(page);
   await expect(carte(page).locator('.start-route-count')).toHaveText('3 étapes sur 5');
+  // Les fiches comptent avec les mêmes lectures que la carte (section 7.1) : le matériel posé, le puits et son débit.
+  await expect(ligneDeFiche(page, 'Matériel et placement')).toHaveText('1 goutte-à-goutte, posé');
+  await expect(ligneDeFiche(page, 'Ressources et pompes')).toHaveText('Puits : débit de 2 m³/h');
   // L'étape en cours mène à l'eau visée : « Continuer l'étape 4 ».
   await carte(page).getByRole('link', { name: 'Continuer l’étape 4' }).click();
   await attendreLaPagePrete(page, 'semaine');

@@ -660,6 +660,46 @@ message.
   lectures dans les deux cas. Borne de Réglages + 20 % tenue. Huit
   contre-épreuves, chacune rouge.
 
+**PR 3, 26 novembre 2026** (D-336, F969 à F975) :
+
+- **Les lectures exactes de chaque ligne** (F969, `lib/services/start-route.ts`),
+  lancées avec celles de la carte, sur « Ma ferme » toujours, seulement
+  pour les fiches cochées : « Matériel et placement », l'inventaire
+  (`listEquipmentForUser`, quatre requêtes), les poses courantes de la
+  saison (`listEquipmentPosesForUser`, deux, à la place de
+  `listEquipmentPlacementsForUser` : les poses ouvertes servent l'étape 2,
+  `poseCounts` dit les posés) et les groupes (étapes 1 et 2) ;
+  « Ressources et pompes », `readActiveWaterAssetsForUser` (un lot de
+  deux : ressources avec leur débit, réserves avec leur volume à sa date ;
+  l'étape 3 en tire ses noms) ; « Besoin par culture », après l'espace,
+  `listSpeciesCorrespondencesForWorkspace` (une, partagée avec le bandeau)
+  et `listReferenceCropKeysForWorkspace` (une, **nouvelle**, les clés
+  seules) ; « Réserve du sol », `listZonesWithSoilForUser` (partagée avec
+  l'étape 5 et le bandeau) ; « Alertes météo »,
+  `countWeatherAlertCriteriaForUser` (un `COUNT`, **nouvelle**) ;
+  « Réglages », `readWeatherPreference` (une fois par requête). Aucune
+  n'est par planche ni par jardin.
+- **Ligne par ligne** : « Matériel et placement », **ligne d'état faite**
+  (F970 ; l'étape 1 compte désormais tout le matériel actif, comme
+  l'inventaire) ; « Ressources et pompes », **ligne d'état faite** (F971 ;
+  « observé », le mot de la page, pour « relevé ») ; « Besoin par
+  culture », **ligne d'état faite, écart dit** (F972 : « 4 cultures cette
+  saison », le titre de la page ; les espèces à rattacher se comptent dans
+  Réglages, pas sur cette page) ; « Réserve du sol », « Alertes météo »,
+  « Réglages », **lignes d'état faites** (F973 ; « Commune à confirmer »
+  raccourci) ; « Alertes cultures », **repli gardé** (le gel suivi demande
+  le calcul de la page).
+- **Pris en codant** : précisions F969 à F975 ; aucune migration ; P63 et
+  P70 suivent.
+- **Mesures** (F975) : à 390 px, deux lignes au plus au téléphone, une à
+  l'ordinateur, fiches de 70 à 92 px ; la colonne de texte fait 242 px à
+  390 px, où les exemples de la section 7.2 tiennent sur deux lignes comme
+  les lignes fixes de S3 : la borne tenue est celle de S3 (deux lignes à
+  390 px). Temps du serveur, 20 ms par lecture, médiane de sept : « Ma
+  ferme » 78 ms sans la carte (48 avant), 105 ms avec (94 en PR 2) ; à
+  300 planches, 82 et 104 ms, autant de lectures ; Réglages de 176 à
+  184 ms ; borne + 20 % tenue. Quatorze contre-épreuves, chacune rouge.
+
 ## 16. Risques
 
 | Risque | Parade |

@@ -86,6 +86,20 @@ type CropParts = { stages: StageRow[]; seasons: SeasonRow[]; months: MonthRow[];
 const DEGREE_DAYS_PROBLEM = 'des durées en degrés-jours, hors de cette extension';
 
 /**
+ * Les clés des cultures de référence qu'une exploitation connaît, le jeu
+ * commun et les siennes, sans leurs stades (simplification, lot S6,
+ * section 7.2 : la fiche « Besoin par culture » de « Ma ferme » compte ses
+ * cultures comme la page, `listReferenceCropsForWorkspace`, sans en lire le
+ * détail). Une requête.
+ */
+export async function listReferenceCropKeysForWorkspace(workspaceId: string | null): Promise<string[]> {
+  const result = await db.prepare(
+    `SELECT DISTINCT crop_key FROM irrigation_crop_reference_crops WHERE workspace_id IS NULL OR workspace_id = ?`,
+  ).bind(workspaceId).all<{ crop_key: string }>();
+  return result.results.map((row) => row.crop_key);
+}
+
+/**
  * Les cultures de référence d'une exploitation : le jeu commun, où chaque
  * culture dont la ferme a enregistré sa version est remplacée par elle, puis
  * ses cultures saisies, par nom.
