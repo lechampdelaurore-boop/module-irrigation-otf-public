@@ -383,7 +383,6 @@ export function WaterManagementDashboard({
             {dashboard.weather.preference.locationMode === 'custom' || !dashboard.weather.preference.locationConfirmed ? <button type="button" className="secondary-button" disabled={pending} onClick={() => startTransition(async () => receiveChange(await restoreOtfWeatherLocationAction({ season, weekStart: dashboard.weekStart }), 'commune'))}>{dashboard.weather.preference.locationConfirmed ? 'Utiliser la commune du siège OTF' : 'Prendre le siège OTF, en dernier recours'}</button> : null}
             {dashboard.weather.forecastModelsAvailable ? (
               <ForecastModelSetting
-                key={`${dashboard.weather.preference.forecastModel ?? ''}:${dashboard.weather.locationKey ?? ''}`}
                 place={dashboard.weather.location}
                 savedModelId={dashboard.weather.preference.forecastModel}
                 view={dashboard.weather.forecastModelSetting}

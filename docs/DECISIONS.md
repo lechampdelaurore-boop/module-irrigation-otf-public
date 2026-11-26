@@ -11582,7 +11582,7 @@ Code en Opus 5.5 · Élevé, le réglage de la PR 3. Aucune question
 agronomique.
 
 **Décision.** La carte « Lieu de la météo » de « Réglages » porte le réglage
-« Modèle de prévision » : une liste (« Automatique », puis les modèles de la
+« Modèle de prévision », dans un pli fermé : une liste (« Automatique », puis les modèles de la
 liste du logiciel qui couvrent le lieu de la ferme), la phrase de la
 règle 12, les faits du modèle choisi et un bouton « Enregistrer le modèle ».
 Le geste appelle l'enregistrement vérifié de la PR 2
@@ -11647,8 +11647,16 @@ Précisions prises en codant (option recommandée, modifiables par le porteur) :
   Il ne vérifie pas l'attribution : la météo des parcours se dit « de
   démonstration » (F1021), l'attribution d'un modèle est tenue par
   `tests/weather-models-reglage.test.ts`.
+- **F1030** — Un pli fermé (règle de P40 : « toute section nouvelle de
+  « Réglages » se plie ») : « Modèle de prévision » est un pli de la carte
+  « Lieu de la météo », sa ligne dit le modèle gardé (« Automatique » ou
+  son libellé) ; il s'ouvre par son ancre `#modele-de-prevision`, reste
+  ouvert après un enregistrement, et s'ouvre d'office quand il dit le
+  retour du module à « Automatique » (F1027). Le budget de hauteur de
+  « Réglages » au téléphone passe de 3 750 à 3 850 px (3 793 px mesurés en
+  local), comme pour chaque pli d'une ligne ajouté avant lui.
 
-**Tests.** `tests/weather-models-ecran.test.ts` (6) : choix offerts par lieu,
+**Tests.** `tests/weather-models-ecran.test.ts` (7) : choix offerts par lieu, ligne du pli,
 choix montré, faits sans mot de qualité, phrase de la règle 12, jours
 complétés, retour du module (7 jours, modèle retiré non nommé).
 `tests/db/forecast-model-reglage.test.ts`, test « à l'écran » étendu :
