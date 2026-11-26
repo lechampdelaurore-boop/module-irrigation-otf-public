@@ -64,10 +64,10 @@ const ALL: FeatureId[] = [...FEATURE_IDS];
 /** Le tableau de la section 3.2 : pour les cases cochées parmi les trois, les vues, la vue ouverte et les sections de « La semaine ». */
 const COMBINATIONS: readonly { week: readonly WeekPageFeature[]; views: WeekViewId[]; opens: WeekViewId | null; sections: WeekSectionId[] }[] = [
   { week: [], views: [], opens: null, sections: [] },
-  { week: ['besoins'], views: ['semaine'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours'] },
+  { week: ['besoins'], views: ['semaine'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'reglages'] },
   { week: ['planning', 'besoins'], views: ['semaine'], opens: 'semaine', sections: ['reste-a-arroser', 'plan', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'ecart-du-prevu', 'reglages'] },
   { week: ['historique'], views: ['cumuls'], opens: 'cumuls', sections: [] },
-  { week: ['besoins', 'historique'], views: ['semaine', 'cumuls'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours'] },
+  { week: ['besoins', 'historique'], views: ['semaine', 'cumuls'], opens: 'semaine', sections: ['reste-a-arroser', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'reglages'] },
   { week: ['planning', 'besoins', 'historique'], views: ['semaine', 'cumuls'], opens: 'semaine', sections: ['reste-a-arroser', 'plan', 'eau-visee', 'pluie-mesuree', 'meteo', 'jours', 'ecart-du-prevu', 'reglages'] },
 ];
 
