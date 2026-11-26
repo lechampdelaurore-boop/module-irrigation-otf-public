@@ -1,0 +1,134 @@
+/*
+  Simplification, lot S4, PR 2 (docs/simplification-s4-contract.md,
+  section 7) : « Le détail » de la vue « La semaine », un pli fermé dont
+  chaque section est un pli fermé avec sa ligne ; les blocs d'avant y
+  perdent leur marge de page. Importée après la-semaine.css.
+*/
+
+/* « Le détail » : un pli fermé, et chaque section un pli fermé avec sa ligne. */
+.week-detail,
+.week-detail-section {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.week-detail {
+  margin-top: 1.5rem;
+}
+
+.week-detail > summary,
+.week-detail-section > summary {
+  position: relative;
+  display: grid;
+  min-height: var(--touch-target);
+  box-sizing: border-box;
+  gap: 2px;
+  padding: .7rem 2.75rem .7rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.week-detail > summary::-webkit-details-marker,
+.week-detail-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.week-detail > summary small,
+.week-detail-section > summary small {
+  color: var(--muted);
+  font-size: var(--text-12);
+}
+
+.week-detail-section > summary h3 {
+  margin: 0;
+  font-size: var(--text-16);
+}
+
+.week-detail > summary::after,
+.week-detail-section > summary::after {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.week-detail[open] > summary::after,
+.week-detail-section[open] > summary::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.week-detail-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: .75rem;
+  padding: 0 .75rem .75rem;
+  min-width: 0;
+}
+
+.week-detail-section-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+  min-width: 0;
+}
+
+/*
+  Une seule colonne qui ne s'élargit pas pour son contenu : sans elle, un
+  besoin manuel (le jardin et sa carte, dans le pli de sa section) poussait
+  la colonne à 348 px dans une fenêtre de 390 px (P56).
+*/
+.week-detail .irrigation-needs-gardens {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Dans le pli de sa section, « Ce qu'il reste à arroser » n'est plus un bloc dans un bloc. */
+.week-detail-section-body > .irrigation-needs-section {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Dans le détail, les blocs d'avant perdent leur marge de page : les plis se suivent. */
+.week-detail-body > .water-management-section,
+.week-detail-body .irrigation-needs-section,
+.week-detail-section-body > .water-gap {
+  margin: 0;
+}
+
+.week-detail-body > .water-management-section {
+  display: grid;
+  gap: .75rem;
+}
+
+.week-detail-body > .water-management-section > .water-dashboard-columns {
+  margin: 0;
+}
+
+.week-detail-body > .page-settings {
+  margin-top: 0;
+}
+
+/* L'écart du prévu, lu à l'ouverture de sa section (3.4, F918) : la lecture, l'absence de signal, l'échec et « Relire ». */
+.week-detail-reading,
+.week-detail-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.week-detail-retry {
+  min-height: var(--touch-target);
+  padding: .5rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}

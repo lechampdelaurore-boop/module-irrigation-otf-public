@@ -1,10 +1,10 @@
 'use client';
 
 import { volumeText } from '@/lib/domain/display-numbers';
-import { useEffect, useId, useMemo, useOptimistic, useRef, useState, useTransition } from 'react';
+import { useEffect, useMemo, useOptimistic, useRef, useState, useTransition } from 'react';
 import type { IrrigationSnapshot } from '@/lib/domain/domain';
 import type { WaterDashboard } from '@/lib/services/water-dashboard';
-import { actualRainOrigin, addDaysToDateKey, dateKeyInTimeZone, isValidDateKey, manualRainInput, weekStartDateKey } from '@/lib/domain/water-management';
+import { actualRainOrigin, dateKeyInTimeZone, isValidDateKey, manualRainInput, weekStartDateKey } from '@/lib/domain/water-management';
 import { quietWaterDaysText, waterDaySummary } from '@/lib/domain/water-week-days';
 import { FARM_SCOPE_VALUE } from '@/lib/domain/goal-scope-choices';
 import { pageHref } from '@/lib/domain/features/pages';
@@ -14,6 +14,7 @@ import { FigureOrigin } from './shell/figure-origin';
 import { ActionReply, actionReply, type ActionReplyMessage } from './shell/action-reply';
 import { useConfirm } from './shell/use-confirm';
 import { AnchoredFold, PageSettingsFold } from './shell/page-settings-fold';
+import { notifyWeekWaterRead } from './semaine/week-signals';
 import { goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '@/lib/domain/besoins-phone';
 import { automaticRefreshStatus } from '@/lib/domain/weather/automatic-refresh-status';
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
@@ -86,6 +87,10 @@ export function WaterManagementDashboard({
     window.addEventListener(FARM_OBJECTIVE_READ, read);
     return () => window.removeEventListener(FARM_OBJECTIVE_READ, read);
   }, []);
+  // Le premier niveau de la page « Semaine » reprend le tableau relu après chaque geste (S4, PR 2).
+  useEffect(() => {
+    if (part === 'besoins') notifyWeekWaterRead(dashboard);
+  }, [dashboard, part]);
   const { confirm, dialog: confirmDialog } = useConfirm();
   // Chaque message s'affiche sous le bouton de son geste (audit du 19 novembre 2026, lot G, n° 1, F404).
   const [replies, setReplies] = useState<ActionReplyMessage[]>([]);
@@ -120,9 +125,6 @@ export function WaterManagementDashboard({
   const weatherRefreshGate = useRef({ running: false });
   const [weatherRefreshing, setWeatherRefreshing] = useState(false);
   const [weatherClock, setWeatherClock] = useState(0);
-  // Au téléphone, les tuiles en une ligne de résumé, dépliable, comme au planning (lot J, n° 15, F460).
-  const [tilesOpen, setTilesOpen] = useState(false);
-  const tilesId = useId();
 
   const currentDay = dashboard.todayWater;
   const farmGoal = dashboard.goals.find((goal) => goal.scopeType === 'farm');
@@ -185,12 +187,6 @@ export function WaterManagementDashboard({
   const receiveRain = (result: WaterActionResult, date: string) => {
     receive(result, 'pluie');
     if (result.ok) setRainAmount(manualRainInput(result.dashboard.days, date) ?? '');
-  };
-
-  const loadWeek = (weekStart: string, forceWeatherRefresh = false) => {
-    startTransition(async () => {
-      receive(await loadWaterDashboardAction({ season, weekStart, forceWeatherRefresh }));
-    });
   };
 
   const refreshWeatherNow = () => {
@@ -391,44 +387,11 @@ export function WaterManagementDashboard({
   }
 
   return (
-    <section className="water-management-section" aria-labelledby="water-management-title">
-      <header className="water-management-heading">
-        <div>
-          <h2 id="water-management-title">{SIMPLE_WORDS.weekGoal}, météo et ressource en eau</h2>
-          {/* L'explication fixe est dans le « ? » de la page (simplification S1, F826). */}
-        </div>
-        <div className="water-week-navigation" aria-label="Changer de semaine">
-          <button type="button" disabled={pending} aria-label="Semaine précédente" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, -7))}>←</button>
-          <strong>{formatDateRange(dashboard.weekStart, dashboard.weekEnd)}</strong>
-          <button type="button" disabled={pending} aria-label="Semaine suivante" onClick={() => loadWeek(addDaysToDateKey(dashboard.weekStart, 7))}>→</button>
-          {/* Un raccourci, pas le geste de la page : en secondaire, et sans effet quand on y est déjà (audit du 19 novembre 2026, lot K, n° 21, F470). */}
-          <button type="button" className="water-week-today" disabled={pending || (today >= dashboard.weekStart && today <= dashboard.weekEnd)} onClick={() => loadWeek(dateKeyInTimeZone(new Date()))}>Cette semaine</button>
-        </div>
-      </header>
-
+    // Dans « Le détail » de la page « Semaine » (S4, PR 2, section 7.1, n° 3 à 6) : l'eau visée, la pluie
+    // mesurée, la météo de référence et les jours de la semaine, chacun un pli fermé avec sa ligne. Les flèches
+    // de la semaine sont celles de la page, l'adresse dit la semaine (S4-g).
+    <section className="water-management-section" aria-label="L’eau de la semaine">
       <ActionReply messages={replies} origin="haut" classNames={WATER_REPLY_CLASSES} />
-
-      <button type="button" className="water-summary-line" aria-expanded={tilesOpen} aria-controls={tilesId} onClick={() => setTilesOpen((value) => !value)}>
-        <span>{weekTotalsLine({
-          objective: farmObjective,
-          realizedIrrigationMm: dashboard.totals.realizedIrrigationMm,
-          actualRainMm: dashboard.totals.actualRainMm,
-          remainingForecastRainMm: dashboard.totals.remainingForecastRainMm,
-          et0Mm: dashboard.totals.et0Mm,
-          partial: missingActualRainDates.length + missingForecastRainDates.length + missingEt0Dates.length > 0,
-        })}</span>
-        <small>{tilesOpen ? 'Replier' : 'Détail'}</small>
-      </button>
-      <div className="water-summary-grid" id={tilesId} data-open={tilesOpen}>
-        <SummaryCard icon="cible" label={SIMPLE_WORDS.weekGoal} value={farmObjective === null ? 'En cours de lecture' : farmObjective.objectiveMm === null ? 'Aucune' : `${mm.format(Math.round(farmObjective.objectiveMm * 10) / 10)} mm`} detail={`${farmObjective === null ? '' : `${farmObjectiveScopeText(farmObjective)} · `}${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} saisi${dashboard.goals.length > 1 ? 's' : ''}`} />
-        <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
-        <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
-        <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
-        <SummaryCard icon="soleil" label={SIMPLE_WORDS.thirstOfWeek} value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`ET0, l’évaporation de référence. Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
-      </div>
-
-      {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
-        ? <p className="weather-stale">Un minuteur attend encore la confirmation de ses horaires réels. Son volume en cours est une estimation, réservée dans le budget mais non ajoutée au réalisé confirmé.</p> : null}
 
       <div className="water-dashboard-columns">
         {/* Les objectifs, la météo et la pluie mesurée en plis fermés, une ligne de résumé chacun (lot J, n° 15, F460). */}
@@ -456,24 +419,6 @@ export function WaterManagementDashboard({
           </div>
         </AnchoredFold>
 
-        {/* La météo tient sur une ligne ; une erreur, des données anciennes ou une mise à jour automatique en retard l'ouvrent d'office. */}
-        <AnchoredFold
-          id="meteo-de-reference"
-          className="water-panel water-fold"
-          bodyClassName="water-fold-body"
-          initiallyOpen={weatherNeedsAttention}
-          summary={<><h3>Météo de référence</h3><small>{weatherFoldLine(weatherPlace, dashboard.weather.refreshedAt, dashboard.weather.stale, (value) => dateTimeFormatter.format(value))}</small></>}
-        >
-          <div className="water-panel-title"><div><p>{weatherPlace}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
-          <ActionReply messages={replies} origin="meteo" classNames={WATER_REPLY_CLASSES} />
-          {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error}{dashboard.weather.preference.locationConfirmed ? ' Les dernières valeurs valides restent affichées.' : ''}{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
-          {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
-          <AutomaticWeatherRefresh preference={dashboard.weather.preference} />
-          {/* La commune se change à un seul endroit, dans Réglages (audit ergonomique, point 9) : ici, le lien qui y mène. */}
-          <a className="weather-location-link" href={pageHref('reglages', { season }, 'water-weather-title')}>Changer la commune dans Réglages</a>
-          <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
-        </AnchoredFold>
-
         <AnchoredFold
           id="manual-rain"
           className="water-panel water-fold"
@@ -491,34 +436,73 @@ export function WaterManagementDashboard({
           <ActionReply messages={replies} origin="pluie" classNames={WATER_REPLY_CLASSES} />
         </AnchoredFold>
 
+        {/* La météo tient sur une ligne ; une erreur, des données anciennes ou une mise à jour automatique en retard l'ouvrent d'office. */}
+        <AnchoredFold
+          id="meteo-de-reference"
+          className="water-panel water-fold"
+          bodyClassName="water-fold-body"
+          initiallyOpen={weatherNeedsAttention}
+          summary={<><h3>Météo de référence</h3><small>{weatherFoldLine(weatherPlace, dashboard.weather.refreshedAt, dashboard.weather.stale, (value) => dateTimeFormatter.format(value))}</small></>}
+        >
+          <div className="water-panel-title"><div><p>{weatherPlace}</p></div><button type="button" disabled={pending || weatherRefreshing || weatherCooldown || !dashboard.weather.locationKey} onClick={refreshWeatherNow}>{weatherRefreshing ? 'Actualisation…' : 'Actualiser la météo'}</button></div>
+          <ActionReply messages={replies} origin="meteo" classNames={WATER_REPLY_CLASSES} />
+          {dashboard.weather.error ? <p className="weather-stale" role="status">{dashboard.weather.error}{dashboard.weather.preference.locationConfirmed ? ' Les dernières valeurs valides restent affichées.' : ''}{weatherCooldown && dashboard.weather.preference.refreshNotBeforeAt ? ` Nouvelle tentative possible à ${dateTimeFormatter.format(new Date(dashboard.weather.preference.refreshNotBeforeAt))}.` : ''}</p> : null}
+          {dashboard.weather.refreshedAt ? <p className={dashboard.weather.stale ? 'weather-stale' : 'weather-fresh'}>Dernière mise à jour : {dateTimeFormatter.format(new Date(dashboard.weather.refreshedAt))}{dashboard.weather.stale ? ' · données anciennes' : ''}</p> : null}
+          <AutomaticWeatherRefresh preference={dashboard.weather.preference} />
+          {/* La commune se change à un seul endroit, dans Réglages (audit ergonomique, point 9) : ici, le lien qui y mène. */}
+          <a className="weather-location-link" href={pageHref('reglages', { season }, 'water-weather-title')}>Changer la commune dans Réglages</a>
+          <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
+        </AnchoredFold>
       </div>
-
 
       {confirmDialog}
 
-      <div className="water-week-table-wrap" id="weather">
-        {quietDays ? <p className="water-week-quiet">{quietDays}.</p> : null}
-        <table className="water-week-table">
-          <thead><tr><th>Jour</th><th>Irrigation réalisée</th><th>Planifiée</th><th>Pluie mesurée / estimée</th><th>Prévision</th><th>Températures prévues</th><th>ET0</th><th>Limite</th></tr></thead>
-          <tbody>{dashboard.days.map((day) => <tr key={day.date} className={day.limitExceededByCubicMeters > 0 ? 'limit-exceeded-row' : undefined} data-open={openDay === day.date ? 'true' : undefined}>
-            <th>
-              <span className="water-day-date">{formatDate(day.date)}</span>
-              {/* Au téléphone, le jour replié en une ligne ; le bouton ouvre le détail dessous (lot D, J3, F299). */}
-              <button type="button" className="water-day-toggle" aria-expanded={openDay === day.date} onClick={() => setOpenDay((current) => (current === day.date ? null : day.date))}>
-                <span>{formatDate(day.date)}</span><small>{waterDaySummary(day)}</small>
-              </button>
-            </th>
-            <td data-label="Irrigation réalisée">{volumeText(day.realizedIrrigationCubicMeters)}{day.volumeIncomplete ? <small> · incomplet, surface mouillée inconnue</small> : null}{day.estimatedOngoingCubicMeters > 0 ? <small> + {volumeText(day.estimatedOngoingCubicMeters)} en cours estimés</small> : null}</td>
-            <td data-label="Planifiée">{volumeText(day.plannedIrrigationCubicMeters)}</td>
-            <td data-label="Pluie réelle / estimée">{day.effectiveActualRainMm === null ? '—' : `${mm.format(day.effectiveActualRainMm)} mm`}{day.manualRainMm !== null ? ' · mesurée' : day.reanalysisRainMm !== null ? ' · estimée' : ''}<FigureOrigin text={actualRainOrigin(day)} /></td>
-            <td data-label="Prévision">{day.forecastRainMm === null ? '—' : `${mm.format(day.forecastRainMm)} mm`}</td>
-            <td data-label="Températures prévues">{formatTemperatures(day.forecastMinimumTemperatureCelsius, day.forecastMaximumTemperatureCelsius)}</td>
-            <td data-label="ET0">{day.et0Mm === null ? '—' : `${mm.format(day.et0Mm)} mm · ${day.et0Kind === 'reanalysis' ? 'réanalyse' : 'prévue'}`}</td>
-            <td data-label="Limite">{day.limitCubicMeters === null ? '—' : `${volumeText(day.limitCubicMeters)}`}{day.limitExceededByCubicMeters > 0 ? ` · +${volumeText(day.actualLimitExceededByCubicMeters || day.limitExceededByCubicMeters)} ${day.actualLimitExceededByCubicMeters > 0 ? 'réels' : 'prévus'}` : ''}</td>
-          </tr>)}</tbody>
-        </table>
-      </div>
-
+      {/* Les jours de la semaine, un par un (S4, section 7.1, n° 6) : les totaux de la semaine et le tableau des jours ; son ancre `weather` l'ouvre. */}
+      <AnchoredFold
+        id="weather"
+        className="water-panel water-fold water-days-fold"
+        bodyClassName="water-fold-body"
+        summary={<><h3>Jours de la semaine, un par un</h3><small>{weekTotalsLine({
+          objective: farmObjective,
+          realizedIrrigationMm: dashboard.totals.realizedIrrigationMm,
+          actualRainMm: dashboard.totals.actualRainMm,
+          remainingForecastRainMm: dashboard.totals.remainingForecastRainMm,
+          et0Mm: dashboard.totals.et0Mm,
+          partial: missingActualRainDates.length + missingForecastRainDates.length + missingEt0Dates.length > 0,
+        })}</small></>}
+      >
+        <div className="water-summary-grid" data-open="true">
+          <SummaryCard icon="cible" label={SIMPLE_WORDS.weekGoal} value={farmObjective === null ? 'En cours de lecture' : farmObjective.objectiveMm === null ? 'Aucune' : `${mm.format(Math.round(farmObjective.objectiveMm * 10) / 10)} mm`} detail={`${farmObjective === null ? '' : `${farmObjectiveScopeText(farmObjective)} · `}${dashboard.goals.length} objectif${dashboard.goals.length > 1 ? 's' : ''} saisi${dashboard.goals.length > 1 ? 's' : ''}`} />
+          <SummaryCard icon="goutte" label="Irrigation réalisée" value={`${mm.format(dashboard.totals.realizedIrrigationMm)} mm`} detail={`${volumeText(dashboard.totals.realizedIrrigationCubicMeters)} répartis sur la surface totale des planches`} />
+          <SummaryCard water icon="pluie" label="Pluie réelle / estimée" value={`${formatOptionalMm(dashboard.totals.actualRainMm)}${missingActualRainDates.length ? ' · partielle' : ''}`} detail={missingActualRainDates.length ? `Non utilisable pour un bilan complet : ${missingWeatherDates(missingActualRainDates)}. Mesure manuelle prioritaire, sinon réanalyse.` : 'Mesure manuelle prioritaire, sinon réanalyse'} />
+          <SummaryCard water icon="pluie" label="Pluie encore prévue" value={`${formatOptionalMm(dashboard.totals.remainingForecastRainMm)}${missingForecastRainDates.length ? ' · partielle' : ''}`} detail={missingForecastRainDates.length ? `Prévision incomplète : ${missingWeatherDates(missingForecastRainDates)}.` : 'Prévision à partir d’aujourd’hui'} />
+          <SummaryCard icon="soleil" label={SIMPLE_WORDS.thirstOfWeek} value={`${formatOptionalMm(dashboard.totals.et0Mm)}${missingEt0Dates.length ? ' · partielle' : ''}`} detail={`ET0, l’évaporation de référence. Prévision : ${formatOptionalMm(dashboard.totals.et0ForecastMm)} · Réanalyse : ${formatOptionalMm(dashboard.totals.et0ReanalysisMm)}. ${missingEt0Dates.length ? `Non utilisée comme total hebdomadaire complet : ${missingWeatherDates(missingEt0Dates)}.` : 'Utilisée dans le calcul des besoins affiché ensuite.'}`} />
+        </div>
+        {dashboard.days.some((day) => day.estimatedOngoingCubicMeters > 0) || currentDay.estimatedOngoingCubicMeters > 0
+          ? <p className="weather-stale">Un minuteur attend encore la confirmation de ses horaires réels. Son volume en cours est une estimation, réservée dans le budget mais non ajoutée au réalisé confirmé.</p> : null}
+        <div className="water-week-table-wrap">
+          {quietDays ? <p className="water-week-quiet">{quietDays}.</p> : null}
+          <table className="water-week-table">
+            <thead><tr><th>Jour</th><th>Irrigation réalisée</th><th>Planifiée</th><th>Pluie mesurée / estimée</th><th>Prévision</th><th>Températures prévues</th><th>ET0</th><th>Limite</th></tr></thead>
+            <tbody>{dashboard.days.map((day) => <tr key={day.date} className={day.limitExceededByCubicMeters > 0 ? 'limit-exceeded-row' : undefined} data-open={openDay === day.date ? 'true' : undefined}>
+              <th>
+                <span className="water-day-date">{formatDate(day.date)}</span>
+                {/* Au téléphone, le jour replié en une ligne ; le bouton ouvre le détail dessous (lot D, J3, F299). */}
+                <button type="button" className="water-day-toggle" aria-expanded={openDay === day.date} onClick={() => setOpenDay((current) => (current === day.date ? null : day.date))}>
+                  <span>{formatDate(day.date)}</span><small>{waterDaySummary(day)}</small>
+                </button>
+              </th>
+              <td data-label="Irrigation réalisée">{volumeText(day.realizedIrrigationCubicMeters)}{day.volumeIncomplete ? <small> · incomplet, surface mouillée inconnue</small> : null}{day.estimatedOngoingCubicMeters > 0 ? <small> + {volumeText(day.estimatedOngoingCubicMeters)} en cours estimés</small> : null}</td>
+              <td data-label="Planifiée">{volumeText(day.plannedIrrigationCubicMeters)}</td>
+              <td data-label="Pluie réelle / estimée">{day.effectiveActualRainMm === null ? '—' : `${mm.format(day.effectiveActualRainMm)} mm`}{day.manualRainMm !== null ? ' · mesurée' : day.reanalysisRainMm !== null ? ' · estimée' : ''}<FigureOrigin text={actualRainOrigin(day)} /></td>
+              <td data-label="Prévision">{day.forecastRainMm === null ? '—' : `${mm.format(day.forecastRainMm)} mm`}</td>
+              <td data-label="Températures prévues">{formatTemperatures(day.forecastMinimumTemperatureCelsius, day.forecastMaximumTemperatureCelsius)}</td>
+              <td data-label="ET0">{day.et0Mm === null ? '—' : `${mm.format(day.et0Mm)} mm · ${day.et0Kind === 'reanalysis' ? 'réanalyse' : 'prévue'}`}</td>
+              <td data-label="Limite">{day.limitCubicMeters === null ? '—' : `${volumeText(day.limitCubicMeters)}`}{day.limitExceededByCubicMeters > 0 ? ` · +${volumeText(day.actualLimitExceededByCubicMeters || day.limitExceededByCubicMeters)} ${day.actualLimitExceededByCubicMeters > 0 ? 'réels' : 'prévus'}` : ''}</td>
+            </tr>)}</tbody>
+          </table>
+        </div>
+      </AnchoredFold>
     </section>
   );
 }
@@ -606,10 +590,6 @@ function formatOptionalMm(value: number | null) {
 
 function formatDate(dateKey: string) {
   return dateFormatter.format(new Date(`${dateKey}T12:00:00.000Z`));
-}
-
-function formatDateRange(start: string, end: string) {
-  return `${formatDate(start)} – ${formatDate(end)}`;
 }
 
 function missingWeatherDates(dates: readonly string[]) {

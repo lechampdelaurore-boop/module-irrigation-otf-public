@@ -46,6 +46,22 @@ source détaillée commit par commit.
   ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
   avant le code. Rien ne change pour l'instant.
 
+### Modifié (simplifier l'usage du module, S4, PR 2 : le premier niveau de la semaine)
+
+- **La semaine se lit d'un coup d'œil** (D-335, F923 à F932) : la page
+  « Semaine » commence par « ‹ Cette semaine › » (la semaine est dans
+  l'adresse), la ligne du plan et « Recalculer », une phrase de faits
+  (« 12 mm reçus sur 23 mm visés. Il manque encore 11 mm d'ici
+  dimanche. »), ce qui demande l'attention, le bilan (une barre et trois
+  chiffres : reçus, visés, arrosés), « Jour par jour » (sept lignes ; au
+  téléphone, un créneau tient en une ligne avec « Valider » ;
+  « Valider toute la semaine ») et « Jardin par jardin ». Les chiffres
+  sont ceux d'« Aujourd'hui ». Tout ce que montraient le planning et
+  « Objectifs et besoins » est derrière « Le détail », un pli fermé où
+  chaque partie a son pli et sa ligne ; un lien vers un de ces blocs ouvre
+  ses plis. L'écart du prévu se lit à l'ouverture de son pli. Aucun calcul,
+  aucune règle d'enregistrement ne change.
+
 ### Modifié (simplifier l'usage du module, S4, PR 1 : une page, deux vues)
 
 - **La semaine sur une page** (D-335, F916 à F922) : « Semaine » est une
