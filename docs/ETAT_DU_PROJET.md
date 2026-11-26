@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
+  commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
+  sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de
+  la PR 4 de S4, le contrat (#218) fusionné dans la branche. La première
+  ouverture propose « Je note mes arrosages », « Le module me propose quoi
+  arroser » (« Conseillé ») et « Tout : sol, cultures et alertes » ; rien
+  n'est choisi d'avance ; une phrase dit le nombre d'étapes qui suivent ;
+  le serveur calcule les cases de la façon ; « Choisir moi-même les
+  fonctionnalités » montre les onze cases. Migration 0051, additive (deux
+  colonnes nulles). Un seul enregistrement à deux appuis. La première
+  arrivée est « Ma ferme » quand la mise en route a une étape ; Réglages
+  dit comment la ferme a commencé. « Commencer par l'essentiel » est
+  retiré. Aucun calcul changé. Tests ; P69 nouveau ; P22, P23, P25, P28,
+  P29, P30, P63, P66, V6 et V8 suivent. Contrôles et mesures : voir la PR
+  et la section 15 du contrat. **Essai des cinq tâches** avec le premier
+  volontaire conseillé avant sa mise en ligne (S6-m). Viennent les PR 2
+  (la carte « Mise en route »), 3 et 4 ; fusion après le contrat #218 et
+  la dernière PR de S4.
 - **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
   les contrats, codée le 26 novembre 2026** (D-335, F940 à F946 ; contrat,
   sections 2, 9 et 10), en Opus 5.5 · Très élevé, sur la branche de la PR 3.
@@ -25,8 +43,12 @@ registres, elle y renvoie.
   changent (« Voir la semaine »). Treize contrats disent ce que S4 a changé.
   Aucun calcul ni aucune écriture changés. Tests ; P68 et les parcours de la
   démonstration V3, V4 suivent. Contrôles et mesures : voir la PR et la
-  section 13 du contrat. **Le code de S4 est fini** ; les PR 1 à 3 sont en
-  ligne, celle-ci se fusionne après la PR 3. Vient S6.
+  section 13 du contrat. **Le code de S4 est fini.** **En ligne** : #234
+  fusionnée le 26 novembre 2026 à 19 h 06 (ad1b0ce), déployée à 19 h 55,
+  run 45873232247, les cinq jobs verts (consigné par S6, PR 1) : **S4 est
+  en ligne en entier**. Le contrat de S6 (#218) est fusionné le même jour à
+  19 h 55 (5c2588f) ; sa mise en ligne est à consigner par S6, PR 2. Vient
+  S6.
 - **Simplifier l'usage du module, S4, PR 3 sur 4 : les gestes, codée le
   26 novembre 2026** (D-335, F933 à F939 ; contrat, sections 4.5, 4.6 et
   8), en Opus 5.5 · Très élevé, sur la branche de la PR 2. Depuis « La
@@ -355,6 +377,19 @@ registres, elle y renvoie.
   (« m³ arrosés » et non « pris au bassin », pas de jugement « à moitié
   arrosée »). Dépend de la fin du code de S3 et de S5 ; contrat non fusionné
   avant #211, #215 et #216. Aucun contrôle rejoué (PR de registres seule).
+- **Simplifier l'usage du module, S6 : contrat écrit le 25 novembre 2026**
+  (`docs/simplification-s6-contract.md`, D-327, roadmap section 6 terdecies,
+  ligne 33), sans code, en Sonnet 5.5 · Moyen. « La mise en route guidée » :
+  trois façons de commencer à la première ouverture (choix n° 3 du porteur, qui
+  change l'écran de bienvenue du contrat 3.8, restée close), une carte « Mise en
+  route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les données, rien
+  confirmé à la place de la personne), les chiffres d'état des fiches de
+  « Ma ferme » laissés par S3 ; quatre PR, Opus 5.5 · Très élevé ; une seule
+  migration, additive (deux colonnes nullables). Écarts voulus avec la maquette
+  dits au porteur (rien enfoncé d'avance, nombre d'étapes selon le choix, noms
+  des pages inchangés, deux fiches d'alertes). Dépend de S3 et de S1 ; contrat
+  non fusionné avant #211, #215, #216 et #217. Aucun contrôle rejoué (PR de
+  registres seule).
 - **Simplifier l'usage du module, S1, PR 3 bis : l'Historique compte
   l'objectif comme « Aujourd'hui », codée le 25 novembre 2026** (D-329,
   décision du porteur à 13 h 35, qui remplace D-036 sur ce point ; contrat

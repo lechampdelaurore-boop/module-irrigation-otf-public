@@ -20,6 +20,7 @@ import {
 } from '@/lib/domain/demo/tour-engine';
 import { tourById, type Tour, type TourId, type TourPage, type TourStep } from '@/lib/domain/demo/tours';
 import { WELCOME_PATH, pageHref, pageLabel, type PageQuery } from '@/lib/domain/features/pages';
+import { WELCOME_HEADING } from '@/lib/domain/features/start';
 import { Icon } from '../line-icon';
 import { DEMO_DETAIL_TOGGLE_SELECTOR, isInFoldedDemoDetail, openDemoDetail } from './demo-banner-detail';
 import { isOnScreen } from './on-screen';
@@ -163,7 +164,7 @@ function tourHref(page: TourPage, query: PageQuery, position: TourPosition): str
 }
 
 function pageName(page: TourPage): string {
-  return page === 'bienvenue' ? 'Choisissez vos fonctionnalités' : pageLabel(page);
+  return page === 'bienvenue' ? WELCOME_HEADING : pageLabel(page);
 }
 
 function scrollBehavior(): ScrollBehavior {

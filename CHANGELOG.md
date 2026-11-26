@@ -5,6 +5,25 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S6, PR 1 : les trois façons de commencer)
+
+- **Trois façons de commencer à la première ouverture** (D-336, F947 à
+  F957) : « Je note mes arrosages », « Le module me propose quoi arroser »
+  (conseillé) ou « Tout : sol, cultures et alertes », à la place de la
+  liste des onze cases. Rien n'est choisi d'avance ; une phrase dit combien
+  d'étapes suivent pour décrire la ferme ; le serveur coche lui-même les
+  cases de la façon choisie. « Choisir moi-même les fonctionnalités »
+  montre toujours les onze cases. Après « Continuer », la première arrivée
+  est « Ma ferme » ; les ouvertures suivantes ne changent pas. Réglages dit
+  comment la ferme a commencé. « Commencer par l'essentiel » disparaît. Une
+  migration additive (0051) garde la façon choisie ; les fermes qui
+  utilisent déjà le module ne voient rien changer.
+- **Contrôles du dépôt** : les parcours navigateur ont 75 minutes au lieu
+  de 50. Ils en prennent trente-deux à quarante-sept selon la machine de
+  GitHub, et la vérification de cette PR a été coupée à 50 minutes pendant
+  les parcours de la démonstration (run 45880035932). Aucun parcours ne
+  change.
+
 ### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
 
 - **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
@@ -267,7 +286,6 @@ source détaillée commit par commit.
   les jours et les jardins au premier niveau, le reste derrière « Le détail ».
   Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
   adresses sont gardées.
-
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,
