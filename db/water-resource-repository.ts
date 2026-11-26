@@ -44,6 +44,28 @@ type ReservoirRow = {
   notes: string | null;
 };
 
+/**
+ * Les ressources en eau actives d'une ferme, pour l'étape « D'où vient
+ * l'eau » de la mise en route (simplification, lot S6, section 5.1) : leurs
+ * deux premiers noms et leur nombre, en un lot de deux requêtes, sans le
+ * reste de l'infrastructure. Le volume d'un relevé n'y entre pas : sa
+ * fraîcheur est celle de « Fiabilité du calcul ».
+ */
+export async function readActiveWaterResourceNamesForUser(ownerUserId: string, shown: number): Promise<{ names: string[]; total: number }> {
+  const space = spaceParams(ownerUserId);
+  const from = `FROM irrigation_water_resources AS resource
+      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = resource.workspace_id
+      WHERE ${WORKSPACE_SPACE_FILTER} AND resource.status = 'active'`;
+  const [names, count] = await db.batch<{ name?: string; total?: number }>([
+    db.prepare(`SELECT resource.name AS name ${from} ORDER BY resource.name COLLATE NOCASE LIMIT ?`).bind(...space, shown),
+    db.prepare(`SELECT COUNT(*) AS total ${from}`).bind(...space),
+  ]);
+  return {
+    names: (names?.results ?? []).map((row) => String(row.name)),
+    total: Number(count?.results[0]?.total ?? 0),
+  };
+}
+
 export async function listWaterInfrastructureForUser(ownerUserId: string, movementPeriod?: { startAt: string; endAt: string }): Promise<WaterInfrastructure> {
   const space = spaceParams(ownerUserId);
   const queries = await Promise.all([

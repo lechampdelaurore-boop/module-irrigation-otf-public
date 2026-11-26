@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S6, PR 2 sur 4 : la carte « Mise en
+  route », codée le 26 novembre 2026** (D-336, F958 à F968 ; contrat,
+  sections 5, 6, 8, 12 et 14), en Opus 5.5 · Très élevé, empilée sur la
+  PR 1 (#235). En tête de « Ma ferme », les étapes qui existent selon les
+  cases, lues sur les données de la ferme (faite = la donnée existe),
+  l'étape en cours, « Continuer l'étape n », « Plus tard », « Reprendre
+  la mise en route », « Terminer la mise en route » (définitif) ; le
+  bandeau « À finir » non répété sur « Ma ferme » quand la carte est là ;
+  sur « Aujourd'hui », la ligne vide devient le bloc de l'étape en cours.
+  Une lecture par page, lancée avant le plan, seulement sur ces deux pages
+  et seulement quand la carte existe ; l'étape 4 compte par
+  `farmObjective`, l'étape 5 par `parcelsWithoutSoil`. Aucune migration,
+  aucun calcul changé. Tests ; P70 nouveau ; P29 et P63 suivent.
+  Contrôles, contre-épreuves et mesures : voir la PR et la section 15 du
+  contrat. Viennent les PR 3 (les lignes d'état des fiches) et 4 ; fusion
+  après la PR 1.
 - **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
   commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
   sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de

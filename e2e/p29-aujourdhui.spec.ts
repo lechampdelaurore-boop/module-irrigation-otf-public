@@ -108,6 +108,14 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : sol de 3 parcelles.');
   await verifierLEtape(page, journal, 'arrivée sur « Aujourd’hui »');
 
+  // Sans arrosage, la ferme pas encore décrite : l'étape en cours de sa mise en route à la place de « Rien à arroser »
+  // (lot S6, section 8). « Plus tard », sur « Ma ferme », rend la ligne vide d'avant.
+  await expect(page.locator('#today-day .today-route')).toContainText('Votre ferme n’est pas encore prête à proposer des arrosages.');
+  await attendreLaPageIrrigation(page, 'ma-ferme');
+  await page.locator('section.start-route').getByRole('button', { name: 'Plus tard' }).click();
+  await expect(page.getByText('La mise en route est remise à plus tard. Elle vous attend ici.')).toBeVisible();
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+
   // Les six blocs, dans l'ordre ; les blocs sans rien à dire le disent en une phrase (F3).
   await expect(blocs(page).locator('h2')).toHaveText(TITRES_DES_BLOCS);
   await expect(bloc(page, 'Votre journée')).toContainText('Aucune irrigation en retard.');
