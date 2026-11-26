@@ -12,13 +12,25 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **La météo prévue contre la météo réalisée, PR 1 sur 2 : le calcul et la
+  lecture, codée le 26 novembre 2026** (D-343, F998 à F1004 ; contrat,
+  sections 3 à 5, 7 et 8), en Opus 5.5 · Élevé, lancée sur le mandat du
+  porteur d'enchaîner les chantiers seul. Le domaine
+  `lib/domain/weather/forecast-reliability.ts`, la lecture
+  `db/forecast-reliability-repository.ts` (exploitation et lieu actuel
+  seulement), le service `lib/services/forecast-reliability.ts`. **Aucun
+  écran** : rien ne change pour la ferme. Aucun calcul existant, aucune
+  migration, aucune écriture, aucun appel externe. Premiers chiffres de la
+  vraie ferme vers le 5 décembre 2026 d'après le calcul (F1004 ; le
+  contrat disait le 11), à confirmer. Contrôles : voir la PR. Vient la PR 2
+  (le pli, la démonstration, le parcours).
 - **La météo prévue contre la météo réalisée : contrat écrit le 26 novembre
   2026, sans code** (D-338, `docs/forecast-reliability-contract.md`, roadmap
   section 6 quindecies, ligne 35), sur l'archive des prévisions (D-297) :
   pluie et ET0, à un jour, à quelques jours et sur la semaine ; un pli fermé
   sur « Objectifs et besoins », aucun chiffre sans 14 jours, aucun verdict en
   mots. Aucun calcul, migration, écriture ni budget. Deux PR de code (Opus 5.5
-  · Élevé) **après le « vas-y » du porteur**.
+  · Élevé).
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la

@@ -5,6 +5,20 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (la météo prévue contre la météo réalisée, PR 1 : le calcul et la lecture)
+
+- **Le calcul de la comparaison** (D-343, F998 à F1004,
+  `lib/domain/weather/forecast-reliability.ts`) : pour chaque ferme, ce que
+  la météo annonçait d'un à sept jours à l'avance face à ce qui s'est passé,
+  pour la pluie (estimée, et à part la pluie notée au pluviomètre) et la
+  soif du jour ; trois lignes d'horizon, le cumul de la semaine annoncé le
+  dimanche, 90 jours, aucun chiffre sans 14 jours (4 semaines pour la
+  semaine), des phrases sans verdict. La lecture
+  (`db/forecast-reliability-repository.ts`) et le service
+  (`lib/services/forecast-reliability.ts`) ne lisent que la ferme et son
+  lieu actuel. Aucun écran encore (PR 2) ; aucun calcul, aucune migration,
+  aucune écriture ne change.
+
 ### Ajouté (contrat : la météo prévue contre la météo réalisée, sans code)
 
 - **Contrat écrit** (D-338, `docs/forecast-reliability-contract.md`, roadmap
