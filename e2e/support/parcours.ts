@@ -28,21 +28,23 @@ export function surveillerLaConsole(page: Page): JournalDeConsole {
  * Les pages du module, une par fonctionnalité, plus « Aujourd'hui », « Ma
  * ferme » et Réglages (3.8, docs/feature-selection-contract.md, section 5 ;
  * audit ergonomique, lot 2, F1 ; simplification, lot S3, PR 1), dans l'ordre
- * du menu : un parcours va à la page qui porte le bloc qu'il éprouve.
+ * du menu, celui des trois endroits depuis la PR 3 du lot S3 (Aujourd'hui,
+ * Semaine, Ma ferme) : un parcours va à la page qui porte le bloc qu'il
+ * éprouve.
  */
 export const TITRES_DES_PAGES = {
   aujourdhui: 'Aujourd’hui',
   arrosages: 'Arrosages',
   planning: 'Planning de la semaine',
   besoins: 'Objectifs et besoins',
-  sol: 'Réserve du sol',
-  cultures: 'Besoin par culture',
-  materiel: 'Matériel et placement',
-  ressources: 'Ressources et pompes',
-  'alertes-meteo': 'Alertes météo',
-  'alertes-cultures': 'Alertes cultures',
   historique: 'Historique et cumuls',
   'ma-ferme': 'Ma ferme',
+  materiel: 'Matériel et placement',
+  ressources: 'Ressources et pompes',
+  cultures: 'Besoin par culture',
+  sol: 'Réserve du sol',
+  'alertes-meteo': 'Alertes météo',
+  'alertes-cultures': 'Alertes cultures',
   reglages: 'Réglages',
 } as const;
 
@@ -209,15 +211,24 @@ export function sansLaPastille(nom: string | null): string | null {
   return nom === null ? null : nom.replace(PASTILLE_DANS_LE_NOM, '');
 }
 
-/** Le texte affiché de chaque lien du menu, dans l'ordre : « Aujourd'hui » peut porter le nombre de sa pastille. */
+/**
+ * Le texte affiché de chaque lien du menu de l'ordinateur, dans l'ordre :
+ * « Aujourd'hui » peut porter le nombre de sa pastille ; le titre « Semaine »,
+ * un lien vers sa première page, précède ses pages (S3, PR 3, section 6) ;
+ * « Ma ferme » est le titre de son endroit.
+ */
 export const TEXTES_DES_LIENS_DU_MENU: (string | RegExp)[] = Object.values(TITRES_DES_PAGES)
   // L'encart de « Aujourd'hui » dit aussi « Tableau de bord », et sa pastille quand elle a un nombre.
-  .map((titre) => (titre === TITRES_DES_PAGES.aujourdhui ? /^Aujourd’hui\s*Tableau de bord\s*\d*$/ : titre));
+  .flatMap((titre): (string | RegExp)[] => (titre === TITRES_DES_PAGES.aujourdhui
+    ? [/^Aujourd’hui\s*Tableau de bord\s*\d*$/]
+    : titre === TITRES_DES_PAGES.planning ? ['Semaine', titre] : [titre]));
 
 /**
- * Les noms des pages du menu, dans l'ordre : le nom accessible, sans la
- * pastille. Au téléphone, les pages trouvées par les trois endroits, dans
- * l'ordre du menu de l'ordinateur (S3, PR 2).
+ * Les noms des pages du menu, dans l'ordre. À l'ordinateur, la page où mène
+ * chaque lien, une fois : le titre « Semaine » mène à sa première page, que
+ * sa liste redit (S3, PR 3) ; les textes eux-mêmes, P28 les lit
+ * (`TEXTES_DES_LIENS_DU_MENU`). Au téléphone, les pages trouvées par les
+ * trois endroits, dans l'ordre du menu de l'ordinateur (S3, PR 2).
  */
 export async function nomsDesPagesDuMenu(page: Page): Promise<string[]> {
   const menu = await ouvrirLeMenuDesPages(page);
@@ -225,8 +236,8 @@ export async function nomsDesPagesDuMenu(page: Page): Promise<string[]> {
     const trouvees = await pagesParLesEndroits(page);
     return (Object.keys(TITRES_DES_PAGES) as PageDuModule[]).filter((id) => trouvees.has(id)).map((id) => TITRES_DES_PAGES[id]);
   }
-  return (await menu.getByRole('link').evaluateAll((liens) => liens.map((lien) => lien.getAttribute('aria-label') ?? (lien as HTMLElement).innerText.trim())))
-    .map((nom) => nom.replace(PASTILLE_DANS_LE_NOM, ''));
+  const adresses = await menu.getByRole('link').evaluateAll((liens) => liens.map((lien) => lien.getAttribute('href') ?? ''));
+  return [...new Set(adresses.map(pageDeLAdresse))].map((id) => TITRES_DES_PAGES[id]);
 }
 
 /**

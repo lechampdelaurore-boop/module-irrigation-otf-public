@@ -37,8 +37,14 @@ type RainState =
  * page ; la réponse s'écrit sous le geste, et la page derrière se relit à la
  * fermeture de la feuille pour montrer la nouvelle pluie. Rien ne s'écrit
  * sans un appui (D-028).
+ *
+ * À l'ordinateur (PR 3, section 6, S3-l), le même « + » est un bouton
+ * « + Arroser ou noter » en tête du menu ; la même feuille s'ouvre en boîte
+ * de dialogue au milieu de la page.
  */
-export function PlusSheet({ gestures, season, planning, besoinsHref }: {
+export function PlusSheet({ variant, gestures, season, planning, besoinsHref }: {
+  /** `bar` : le rond de la barre du bas ; `menu` : le bouton en tête du menu de l'ordinateur. */
+  variant: 'bar' | 'menu';
   gestures: readonly PlusGesture[];
   /** La saison de la page, gardée par les liens vers « Arrosages » ; `null` sur la page introuvable. */
   season: number | null;
@@ -95,13 +101,13 @@ export function PlusSheet({ gestures, season, planning, besoinsHref }: {
       <button
         ref={button}
         type="button"
-        className="phone-bar-plus"
-        aria-label={PLUS_BUTTON_LABEL}
+        className={variant === 'bar' ? 'phone-bar-plus' : 'menu-plus'}
+        aria-label={variant === 'bar' ? PLUS_BUTTON_LABEL : undefined}
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen(true)}
       >
-        <span className="phone-bar-plus-badge"><Icon name="plus" /></span>
+        {variant === 'bar' ? <span className="phone-bar-plus-badge"><Icon name="plus" /></span> : <><Icon name="plus" /><span>{PLUS_BUTTON_LABEL}</span></>}
       </button>
       {open ? createPortal(
       <dialog

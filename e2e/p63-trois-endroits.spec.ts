@@ -25,7 +25,8 @@ import {
  * démonstration des parcours, qui a coché toutes les cases d'avant la 3.8 :
  * - « Ma ferme » s'ouvre à son adresse, avec son titre, son « ? » et la
  *   saison ; elle est dans le menu, au-dessus de Réglages (dans la feuille
- *   « Plus » au téléphone), et le menu la marque quand elle est ouverte ;
+ *   « Plus » au téléphone avant la PR 2), et le menu la marque quand elle
+ *   est ouverte ;
  * - ses sept fiches, dans l'ordre de la maquette : le nom de la page, sa
  *   ligne fixe, 68 px au moins ; à 390 px, la ligne tient sur deux lignes au
  *   plus ; aucun texte sous 12 px, les graisses de la charte ;
@@ -49,13 +50,24 @@ import {
  * - une tournée de toutes les pages, chacune à deux touches au plus de la
  *   précédente (une à l'ordinateur), sans recharger le module, le clavier sur
  *   le contenu, les touches notées ;
- * - au téléphone, sur une ferme neuve propre au parcours : le « + » ouvre la
+ * - sur une ferme neuve propre au parcours et à la largeur : le « + » ouvre la
  *   feuille modale « Que voulez-vous faire ? », ses trois gestes de 72 px ;
  *   Échap et le voile la referment, le clavier revient au « + » ; « Noter la
  *   pluie » y monte la fenêtre de S2, 8 mm s'enregistrent, la réponse sous le
  *   geste, la page relue à la fermeture et la mesure dite à la réouverture ;
  *   « Arroser maintenant » et « Noter un arrosage déjà fait » ouvrent
  *   « Arrosages » sur leur formulaire, la demande retirée de l'adresse.
+ *
+ * PR 3, le menu de l'ordinateur (section 6), à 1 440 px :
+ * - sur chacune des treize pages, les trois endroits dépliés, la page
+ *   marquée `page` une seule fois, le titre de son endroit `page` quand il
+ *   est la page, `true` sinon ; le titre « Semaine » mène à sa première
+ *   page ; « Ma ferme » est le titre de son endroit, ses fiches dessous dans
+ *   le même ordre, Réglages comprise ; la page introuvable garde son menu,
+ *   sans marque, le « + » compris ;
+ * - le « + Arroser ou noter » en tête du menu ouvre la même feuille, en boîte
+ *   de dialogue au milieu de la page, sans poignée : le même parcours qu'au
+ *   téléphone, sur une autre ferme neuve.
  *
  * Rien n'est enregistré sur la ferme des parcours : la pluie s'écrit sur la
  * ferme neuve.
@@ -80,7 +92,7 @@ function lesFiches(page: Page) {
   return page.getByRole('navigation', { name: 'Les fiches de Ma ferme' });
 }
 
-test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne fixe ; le menu la range au-dessus de Réglages', async ({ page }, testInfo) => {
+test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne fixe ; le menu en fait le titre de son endroit', async ({ page }, testInfo) => {
   test.setTimeout(150_000);
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
@@ -128,12 +140,11 @@ test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne 
   for (const graisse of mesure.graisses) expect(['300', '400', '500', '700']).toContain(graisse);
   await verifierLEtape(page, journal, 'les fiches de « Ma ferme »');
 
-  // À l'ordinateur, le menu d'avant, avec « Ma ferme » en plus, au-dessus de Réglages, marquée quand elle est ouverte ;
-  // au téléphone, son endroit de la barre du bas, la page ouverte (PR 2).
+  // À l'ordinateur, « Ma ferme » est le titre de son endroit, ses fiches dessous dans le même ordre, Réglages comprise (PR 3) ;
+  // au téléphone, son endroit de la barre du bas (PR 2). Marquée, la page ouverte.
   const menu = await ouvrirLeMenuDesPages(page);
   if (!telephone) {
-    const liens = await menu.getByRole('link').evaluateAll((elements) => elements.map((element) => element.getAttribute('aria-label') ?? (element as HTMLElement).innerText.trim()));
-    expect(liens.slice(-2)).toEqual([TITRES_DES_PAGES['ma-ferme'], TITRES_DES_PAGES.reglages]);
+    await expect(menu.locator('li[data-place="ma-ferme"]').getByRole('link')).toHaveText([TITRES_DES_PAGES['ma-ferme'], ...FARM_CARD_PAGES.map((cible) => TITRES_DES_PAGES[cible])]);
   }
   await expect(menu.getByRole('link', { name: TITRES_DES_PAGES['ma-ferme'], exact: true })).toHaveAttribute('aria-current', 'page');
   await verifierLEtape(page, journal, '« Ma ferme » dans le menu');
@@ -214,17 +225,30 @@ test('la barre du bas : trois endroits et le « + » ; chaque page par son adres
   const telephone = testInfo.project.name === 'telephone';
   if (!telephone) await page.setViewportSize({ width: LARGEUR_ORDINATEUR_PX, height: HAUTEUR_ORDINATEUR_PX });
   const barre = page.getByRole('navigation', { name: 'Pages principales' });
+  const menuDeLOrdinateur = page.getByRole('navigation', { name: 'Pages du module' });
   const bande = page.getByRole('navigation', { name: 'La semaine' });
   const retour = page.getByRole('link', { name: 'Retour à Ma ferme' });
 
   for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
     await attendreLaPageIrrigation(page, cible);
     if (!telephone) {
-      // L'ordinateur garde son menu jusqu'à la PR 3 : ni barre, ni bande, ni retour.
+      // À l'ordinateur (PR 3, section 6) : ni barre, ni bande, ni retour ; le menu de gauche montre les trois endroits
+      // dépliés, la page marquée `page` une fois, le titre de son endroit `true` quand la liste la porte.
       await expect(barre).toBeHidden();
       await expect(bande).toBeHidden();
       await expect(retour).toBeHidden();
       await expect(lienDuMenu(page, cible)).toHaveAttribute('aria-current', 'page');
+      await expect(menuDeLOrdinateur.locator('[aria-current="page"]')).toHaveCount(1);
+      await expect(menuDeLOrdinateur.locator('li[data-place]')).toHaveCount(PLACE_IDS.length);
+      for (const autre of PLACE_IDS) {
+        const titre = menuDeLOrdinateur.locator(`li[data-place="${autre}"] > a`);
+        const marque = await titre.getAttribute('aria-current');
+        if (autre !== placeOfPage(cible)) expect(marque, `le titre « ${autre} » sur « ${TITRES_DES_PAGES[cible]} »`).toBeNull();
+        else expect(marque, `le titre « ${autre} » sur « ${TITRES_DES_PAGES[cible]} »`).toBe(autre === cible ? 'page' : 'true');
+      }
+      // La semaine : le titre mène à sa première page, ses pages gardent la saison.
+      const titreDeLaSemaine = menuDeLOrdinateur.locator('li[data-place="semaine"] > a');
+      expect(new URL((await titreDeLaSemaine.getAttribute('href'))!, 'http://x').pathname).toBe('/irrigation/planning');
       await verifierLEtape(page, journal, `« ${TITRES_DES_PAGES[cible]} » à l’ordinateur`);
       continue;
     }
@@ -277,15 +301,15 @@ test('la barre du bas : trois endroits et le « + » ; chaque page par son adres
     }
   }
 
-  // La page introuvable garde sa barre, sans marque, le « + » compris.
+  // La page introuvable garde sa barre, ou son menu, sans marque, le « + » compris.
   const reponse = await page.goto('/irrigation/nimporte-quoi');
   expect(reponse?.status()).toBe(404);
   journal.erreurs = journal.erreurs.filter((erreur) => !erreur.includes('status of 404'));
-  if (telephone) {
-    await expect(barre.getByRole('link')).toHaveText([/^Aujourd’hui\d*$/, 'Semaine', 'Ma ferme']);
-    await expect(barre.locator('[aria-current]')).toHaveCount(0);
-    await expect(barre.getByRole('button', { name: 'Arroser ou noter' })).toBeVisible();
-  }
+  const navigation = telephone ? barre : menuDeLOrdinateur;
+  if (telephone) await expect(barre.getByRole('link')).toHaveText([/^Aujourd’hui\d*$/, 'Semaine', 'Ma ferme']);
+  else await expect(menuDeLOrdinateur.locator('li[data-place]')).toHaveCount(PLACE_IDS.length);
+  await expect(navigation.locator('[aria-current]')).toHaveCount(0);
+  await expect(navigation.getByRole('button', { name: 'Arroser ou noter' })).toBeVisible();
   await verifierLEtape(page, journal, 'page introuvable');
 });
 
@@ -309,15 +333,17 @@ test('chaque page à deux touches au plus de la précédente, sans recharger le 
 });
 
 test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans quitter la page ; les deux formulaires d’« Arrosages »', async ({ page, context }, testInfo) => {
-  test.skip(testInfo.project.name !== 'telephone', 'le « + » de l’ordinateur vient avec la PR 3 : jusque-là, seule la barre du bas le porte');
   test.setTimeout(240_000);
   const journal = surveillerLaConsole(page);
+  const telephone = testInfo.project.name === 'telephone';
+  if (!telephone) await page.setViewportSize({ width: LARGEUR_ORDINATEUR_PX, height: HAUTEUR_ORDINATEUR_PX });
   const reference = Date.now();
   await ouvrirUneFermeToutCochee(page, context, testInfo, 'p63-plus');
   await preparerLaFermeNeuve(page);
   await attendreLaPageIrrigation(page, 'planning');
 
-  const plus = page.getByRole('navigation', { name: 'Pages principales' }).getByRole('button', { name: 'Arroser ou noter' });
+  // Au téléphone, le rond de la barre du bas (PR 2) ; à l'ordinateur, « + Arroser ou noter » en tête du menu (PR 3, S3-l).
+  const plus = page.getByRole('navigation', { name: telephone ? 'Pages principales' : 'Pages du module' }).getByRole('button', { name: 'Arroser ou noter' });
   const feuille = page.getByRole('dialog', { name: 'Que voulez-vous faire ?' });
   const gestes = feuille.locator('.plus-gesture');
   await expect(plus).toHaveAttribute('aria-haspopup', 'dialog');
@@ -328,6 +354,17 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   await ouvrirParClic(plus, feuille);
   await expect(plus).toHaveAttribute('aria-expanded', 'true');
   expect(await feuille.evaluate((element) => element.matches(':modal')), 'la feuille est modale').toBe(true);
+  // Au téléphone, elle monte du bas ; à l'ordinateur, une boîte de dialogue au milieu de la page, sans poignée.
+  const boiteDeLaFeuille = (await feuille.boundingBox())!;
+  const hauteurDeLaFenetre = page.viewportSize()!.height;
+  if (telephone) {
+    expect(Math.round(boiteDeLaFeuille.y + boiteDeLaFeuille.height)).toBe(hauteurDeLaFenetre);
+  } else {
+    const dessus = boiteDeLaFeuille.y;
+    const dessous = hauteurDeLaFenetre - boiteDeLaFeuille.y - boiteDeLaFeuille.height;
+    expect(Math.abs(dessus - dessous), `la boîte au milieu (${Math.round(dessus)} / ${Math.round(dessous)} px)`).toBeLessThanOrEqual(2);
+    await expect(feuille.locator('.plus-sheet-handle')).toBeHidden();
+  }
   expect(await page.evaluate(() => document.activeElement?.closest('dialog') !== null), 'le clavier est dans la feuille').toBe(true);
   await expect(gestes.locator('strong')).toHaveText(['Arroser maintenant', 'Noter la pluie', 'Noter un arrosage déjà fait']);
   await expect(gestes.locator('.plus-gesture-text > span')).toHaveText(['Je choisis où et combien de temps', 'Ce que dit votre pluviomètre', 'J’ai arrosé sans le module']);

@@ -10517,8 +10517,9 @@ faisait 3 888 px sur la démonstration. Contre-épreuve : voir la PR.
 
 ## D-331 — Simplifier l'usage du module, lot S3 : trois endroits
 
-Date : 25 novembre 2026. Statut : **PR 1 et 2 sur 4 codées** (le rangement
-et « Ma ferme » ; la barre du bas, le « + » et le chemin de retour) ; contrat `docs/simplification-s3-contract.md`, roadmap
+Date : 25 novembre 2026. Statut : **PR 1 à 3 sur 4 codées** (le rangement
+et « Ma ferme » ; la barre du bas, le « + » et le chemin de retour ; le menu
+de l'ordinateur) ; contrat `docs/simplification-s3-contract.md`, roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le réglage de
 la roadmap et du contrat (section 14), sur le mandat du porteur du
 25 novembre 2026 (enchaîner les lots sans nouveau « vas-y », D-327). Elle met
@@ -10675,3 +10676,67 @@ bande et le retour où il faut, 44 px, rien de coupé ni de débordant à
 sans quitter la page puis relus, et les deux formulaires d'« Arrosages ». P0,
 P27, P28, P30, P41 et P59 suivent la barre. Mesures et contre-épreuve : voir
 la PR et le contrat, section 13.
+
+**Décision (PR 3).** À l'ordinateur, au-delà de 980 px, le menu de gauche
+range les pages en trois endroits, tous dépliés, à la place des groupes
+« Arroser, Équiper, Surveiller » (T1) : en tête, le bouton « + Arroser ou
+noter », qui ouvre la même feuille « Que voulez-vous faire ? » que le « + »
+de la barre, en boîte de dialogue au milieu de la page (S3-l) ; puis
+« Aujourd'hui » dans son encart « Tableau de bord », avec sa pastille (F12),
+et Arrosages ; le titre « Semaine », un lien vers sa première page cochée
+(S3-a), puis Planning de la semaine, Objectifs et besoins, Historique et
+cumuls ; le titre « Ma ferme », un lien vers la page « Ma ferme », puis ses
+fiches dans l'ordre de la section 5, Réglages comprise, qui n'est plus à
+part (S3-i). Un endroit sans page cochée disparaît ; le « + » n'existe que
+si l'un de ses gestes existe. Le menu et la barre viennent de la même
+fonction (`menuPlacePages`) : `lib/domain/features/desktop-menu.ts`
+(`menuPlaces`, qui remplace `menu-groups.ts` et `menuLayout`). Le téléphone
+ne change pas. Aucune adresse ne change ; aucune page ni fonction n'est
+retirée ; aucun calcul, aucune donnée, aucune migration.
+
+**Précisions tranchées en codant (PR 3).**
+
+- F885 : l'endroit « Semaine » du menu, son titre et ses trois pages,
+  garde le jour ouvert de la page courante, comme la bande et l'entrée
+  « Semaine » de la barre (F883) ; les deux autres endroits gardent la
+  saison et la parcelle, comme avant.
+- F886 : la page ouverte est marquée `page` une seule fois dans le menu.
+  Le titre de son endroit porte `page` quand il est le lien de la page et
+  que la liste ne la redit pas (l'encart d'« Aujourd'hui », le titre
+  « Ma ferme ») ; `true` quand la page ouverte est ailleurs dans l'endroit,
+  ou quand la liste la redit (le titre « Semaine » sur Planning de la
+  semaine) : un lecteur d'écran n'entend « page en cours » qu'une fois. Le
+  titre marqué `true` prend le vert, celui marqué `page` la pilule verte ;
+  l'encart garde son fond blanc.
+- F887 : le « + Arroser ou noter » est le composant du « + » de la barre
+  (`PlusSheet`, `variant="menu"`), premier élément de la liste du menu, qui
+  reste collée en haut de l'écran : son nom se lit sur le bouton, 44 px, en
+  vert plein. La même feuille s'ouvre en boîte de dialogue de 480 px au
+  milieu de la page à partir de 981 px, sans la poignée du téléphone ; en
+  dessous, elle monte du bas, comme la barre qui la porte.
+- F888 : les titres des endroits s'écrivent sans capitales (un lecteur
+  d'écran lirait un nom en capitales lettre à lettre), en gras, avec le
+  chevron qui dit qu'ils mènent quelque part ; un trait sépare les
+  endroits. Chaque liste porte le nom de son endroit. Les règles des anciens
+  groupes et celles de la bande de pilules de la tablette, que la PR 2 avait
+  rendues inertes, sortent de `navigation.css`.
+- F889 : à l'ordinateur, toute page reste à un clic ; « Arroser maintenant »,
+  « Noter la pluie » et « Noter un arrosage déjà fait » à deux, depuis
+  n'importe quelle page, comme au téléphone.
+
+**Preuve (PR 3).** `tests/simplification-s3-menu.test.ts` : pour chacun des
+235 choix de cases valides, les endroits du menu égaux à ceux de la barre,
+dans le même ordre et sur la même entrée, le titre et la liste qui disent
+ensemble les pages cochées de l'endroit, chaque page une fois, Réglages en
+dernier dans « Ma ferme » ; S3-e sur chacune des treize pages, et aucune
+marque sur la page introuvable ; le composant (le « + » en tête, la même
+feuille, les titres en liens, la semaine qui garde son jour, les groupes
+d'avant disparus), la charte (44 px, la boîte de dialogue au milieu à
+partir de 981 px). Les tests de T1 (`aujourdhui-menu`) et de « Ma ferme »
+(`simplification-s3-endroits`) suivent. Parcours P63 à 1 440 px : chacune
+des treize pages par son adresse, la marque de la page et de son endroit,
+le titre « Semaine » vers Planning, les fiches de « Ma ferme » dans le menu,
+la page introuvable ; le parcours du « + » joué aussi à l'ordinateur (la
+boîte au milieu, sans poignée). P0, P27, P28 et P30 suivent le menu, et
+`e2e/support/parcours.ts` range ses titres dans l'ordre des endroits.
+Mesures et contre-épreuve : voir la PR et le contrat, section 13.

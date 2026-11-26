@@ -74,7 +74,7 @@ test('une page par fonctionnalité : le menu y conduit, et l’ancienne adresse 
   await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES.aujourdhui })).toBeVisible();
   await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
 
-  // Le menu porte « Aujourd'hui », les dix pages, « Ma ferme » et Réglages, dans l'ordre de la liste ; la page ouverte y est marquée.
+  // Le menu porte « Aujourd’hui », les dix pages, « Ma ferme » et Réglages, rangés en trois endroits (S3, PR 3) ; la page ouverte y est marquée.
   // Au téléphone, la barre du bas porte les trois endroits, et chaque page se trouve par le sien (simplification, lot S3, PR 2).
   expect(await nomsDesPagesDuMenu(page)).toEqual(Object.values(TITRES_DES_PAGES));
   const menu = await ouvrirLeMenuDesPages(page);

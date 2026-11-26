@@ -506,6 +506,34 @@ codant, la PR s'arrête, le dit, et le porteur tranche, une question par message
   guidée, `demo-tours`, les phrases qui disent « menu » ou « Plus », et le
   « ? » d'« Aujourd'hui ».
 
+**Rempli par la PR 3 (25 novembre 2026).**
+
+- **Numéros.** Précisions **F885 à F889** (D-331) ; le parcours reste
+  **P63**, étendu à 1 440 px.
+- **Mesures du menu de l'ordinateur**, ferme de démonstration des parcours,
+  toutes les cases cochées, avant (PR 2, `0fb7501`) → après, les mêmes à
+  1 440 × 900, 1 280 × 800 et 1 024 × 700 :
+  - avant : l'encart d'« Aujourd'hui » (60 px), trois titres de groupe
+    (« Arroser », « Équiper », « Surveiller »), dix pages, puis « Ma ferme »
+    et Réglages à part ; treize liens de 68 à 676 px ;
+  - après : « + Arroser ou noter » (44 px), l'encart, Arrosages, le titre
+    « Semaine » et ses trois pages, le titre « Ma ferme » et ses sept
+    fiches ; quatorze liens et un bouton de 68 à 665 px, 11 px de moins
+    (deux titres-liens remplacent trois titres de groupe) : Réglages finit à
+    665 px, dans l'écran dès 700 px de haut ;
+  - clics : toute page à un clic, avant comme après ; « Arroser
+    maintenant », « Noter la pluie » et « Noter un arrosage déjà fait » à
+    deux depuis n'importe quelle page (avant : « Arrosages » puis son onglet,
+    ou la tuile « Eau reçue » d'« Aujourd'hui »).
+- **Relevé suivi par la PR 3** : `aujourdhui-menu` (T1),
+  `simplification-s3-endroits` et `simplification-s3-barre` (le « + » à deux
+  formes) ; `e2e/support/parcours.ts` (l'ordre des titres, celui des
+  endroits ; `nomsDesPagesDuMenu` lit la page de chaque lien une fois ;
+  `TEXTES_DES_LIENS_DU_MENU` avec le titre « Semaine »), P0, P22 (l'ordre
+  des entrées), P27, P28, P30 et P63 ; les contrats T1 et la section 5 de `feature-selection-contract`.
+  Restent à la PR 4 la visite guidée, `demo-tours`, les phrases qui disent
+  « menu » ou « Plus », et le « ? » d'« Aujourd'hui ».
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième cas

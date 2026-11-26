@@ -5,6 +5,19 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S3, PR 3 : le menu de l'ordinateur)
+
+- **À l'ordinateur, le menu de gauche se range en trois endroits**
+  (D-331, F885 à F889), tous dépliés, à la place de « Arroser, Équiper,
+  Surveiller » : « Aujourd'hui » dans son encart et Arrosages ; « Semaine »
+  et ses trois pages, qui gardent le jour ouvert ; « Ma ferme » et ses
+  fiches, Réglages comprise, qui n'est plus à part. Les titres « Semaine »
+  et « Ma ferme » sont des liens.
+- **« + Arroser ou noter » en tête du menu** : la même feuille « Que
+  voulez-vous faire ? » que le « + » du téléphone, en boîte de dialogue au
+  milieu de la page. Toute page reste à un clic ; aucune adresse ne change,
+  rien n'est retiré.
+
 ### Modifié (simplifier l'usage du module, S3, PR 2 : la barre du bas, le « + » et le chemin de retour)
 
 - **Au téléphone, la barre du bas porte les trois endroits et le « + »**

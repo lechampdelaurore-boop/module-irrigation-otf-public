@@ -19,11 +19,11 @@ import {
  * docs/browser-journeys-contract.md).
  *
  * Sur une ferme neuve qui a tout coché, propre au parcours et à la largeur :
- * à l'ordinateur, « Aujourd'hui » est détaché en tête du menu, dans son
- * encart « Tableau de bord », et les autres pages se rangent sous « Arroser »,
- * « Équiper » et « Surveiller », Réglages à part, dans l'ordre de toujours ;
- * au téléphone, son endroit ouvre la barre du bas, et le rond du centre est
- * le « + » (simplification, lot S3, PR 2, D-331). La page dit la date, les
+ * à l'ordinateur, sous le bouton « + Arroser ou noter », « Aujourd'hui » est
+ * en tête du menu, dans son encart « Tableau de bord », et les autres pages
+ * se rangent sous les titres « Semaine » et « Ma ferme », Réglages dans
+ * « Ma ferme » (simplification, lot S3, PR 3, D-331) ; au téléphone, son
+ * endroit ouvre la barre du bas, et le rond du centre est le « + » (PR 2). La page dit la date, les
  * chiffres de la semaine et ses pastilles ; une pastille mène à son bloc.
  * Les quatre tuiles de la semaine sont des liens, leur mot d'action écrit
  * (docs/aujourdhui-liens-contract.md, L1) : « Objectif de la semaine » ouvre
@@ -41,7 +41,7 @@ import {
  * réelle, un vrai téléphone.
  */
 
-const GROUPES = ['Arroser', 'Équiper', 'Surveiller'];
+const TITRES_DES_ENDROITS = ['Semaine', 'Ma ferme'];
 
 /**
  * T19 : la légende de la frise nomme chaque couleur de barre présente, et
@@ -102,7 +102,7 @@ async function ouvrirLaFermeToutCoche(page: Page, context: BrowserContext, testI
   await attendreLaPagePrete(page, 'aujourdhui');
 }
 
-test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, les pastilles qui mènent aux blocs', async ({ page, context }, testInfo) => {
+test('« Aujourd’hui » en tête du menu, les pages en trois endroits, les pastilles qui mènent aux blocs', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirLaFermeToutCoche(page, context, testInfo, 'tableau-de-bord');
@@ -153,24 +153,28 @@ test('« Aujourd’hui » détaché dans le menu, les pages en trois groupes, le
     expect(hautDuRond).toBeLessThan(hautDeLaBarre);
     await expect(page.getByRole('navigation', { name: 'Pages du module' })).toBeHidden();
   } else {
-    // L'encart détaché, en tête : son nom, « Tableau de bord » ; puis les trois groupes titrés, Réglages à part,
-    // « Ma ferme » au-dessus d'elle (simplification, lot S3, PR 1, D-331).
+    // Le « + Arroser ou noter » en tête ; puis l'encart d'« Aujourd'hui », son nom, « Tableau de bord » ; puis les
+    // titres « Semaine » et « Ma ferme », des liens ; Réglages, la dernière page, dans « Ma ferme » (S3, PR 3, D-331).
+    const plus = menu.getByRole('button', { name: 'Arroser ou noter' });
+    await expect(plus).toHaveText('Arroser ou noter');
+    await verifierCibleTactile(plus, 'Le « + Arroser ou noter » du menu');
     const encart = menu.locator('a.menu-home');
     await expect(encart).toHaveCount(1);
     await expect(encart).toContainText('Tableau de bord');
     await expect(encart).toHaveAttribute('aria-current', 'page');
-    await expect(menu.locator('.menu-group-title')).toHaveText(GROUPES);
-    const aPart = menu.locator('.menu-settings-item').getByRole('link');
-    await expect(aPart).toHaveCount(2);
-    await expect(aPart.nth(0)).toHaveAccessibleName(TITRES_DES_PAGES['ma-ferme']);
-    await expect(aPart.nth(1)).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
-    // L'encart est au-dessus du premier groupe, et ne prend pas le vert plein d'une page ouverte.
+    await expect(menu.locator('a.menu-place-title')).toHaveText(TITRES_DES_ENDROITS);
+    await expect(menu.getByRole('link').last()).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
+    await expect(menu.locator('li[data-place="ma-ferme"]').getByRole('link').last()).toHaveAccessibleName(TITRES_DES_PAGES.reglages);
+    // Le bouton au-dessus de l'encart, l'encart au-dessus du premier titre ; l'encart ne prend pas le vert plein d'une page ouverte.
+    const basDuPlus = await plus.evaluate((element) => element.getBoundingClientRect().bottom);
+    const hautDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().top);
     const basDeLEncart = await encart.evaluate((element) => element.getBoundingClientRect().bottom);
-    const hautDuGroupe = await menu.locator('.menu-group-title').first().evaluate((element) => element.getBoundingClientRect().top);
-    expect(basDeLEncart).toBeLessThan(hautDuGroupe);
+    const hautDuTitre = await menu.locator('a.menu-place-title').first().evaluate((element) => element.getBoundingClientRect().top);
+    expect(basDuPlus).toBeLessThanOrEqual(hautDeLEncart);
+    expect(basDeLEncart).toBeLessThan(hautDuTitre);
     expect(await encart.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(255, 255, 255)');
   }
-  await verifierLEtape(page, journal, 'menu détaché et groupes');
+  await verifierLEtape(page, journal, 'menu : le « + », l’encart et les endroits');
 
   // L'en-tête : la date ; les pastilles à l'ordinateur seulement, la phrase les redit au téléphone (S2-g).
   await expect(page.locator('.today-head .today-date')).toBeVisible();

@@ -79,13 +79,20 @@ le lot 3 de l'audit et les correctifs de la 3.9.
   Besoin par culture), **Équiper** (Matériel et placement, Ressources et
   pompes), **Surveiller** (Alertes météo, Alertes cultures, Historique et
   cumuls). Réglages reste en bas, à part. Un groupe sans page cochée
-  disparaît.
+  disparaît. **Réécrit par la simplification S3, PR 3 (D-331)** : à la place
+  des trois groupes, les trois endroits, tous dépliés, sous le bouton
+  « + Arroser ou noter » : « Aujourd'hui » dans son encart (inchangé) puis
+  Arrosages ; le titre « Semaine », un lien vers sa première page cochée,
+  puis Planning de la semaine, Objectifs et besoins, Historique et cumuls ;
+  le titre « Ma ferme », un lien vers la page « Ma ferme », puis ses fiches,
+  Réglages comprise, qui n'est plus à part. Un endroit sans page cochée
+  disparaît (`docs/simplification-s3-contract.md`, section 6).
 - Au téléphone, l'onglet « Aujourd'hui » de la barre du bas est un bouton
   rond vert qui dépasse de la barre, séparé des autres par un filet.
   **Réécrit par la simplification S3, PR 2 (D-331)** : le rond vert du
   centre de la barre est le « + » ; « Aujourd'hui » est une entrée comme
   « Semaine » et « Ma ferme », avec sa pastille. Les groupes du menu de
-  l'ordinateur changent à la PR 3 du lot.
+  l'ordinateur changent à la PR 3 du lot (ci-dessus).
 
 ### 3.2 La page, de haut en bas
 
@@ -288,7 +295,7 @@ de 2 m³ »).
 
 | N° | Précision | Choix |
 | --- | --- | --- |
-| T1 | Groupes du menu | Arroser, Équiper, Surveiller ; Réglages à part en bas |
+| T1 | Groupes du menu | Arroser, Équiper, Surveiller ; Réglages à part en bas. **Réécrit par S3, PR 3 (D-331)** : les trois endroits, Aujourd'hui, Semaine, Ma ferme, tous dépliés ; Réglages dans « Ma ferme » |
 | T2 | Seuil de repli des retards | plus de trois le même jour passé |
 | T3 | Bornes de la frise | 5 h à 22 h, élargies à l'heure ronde si une irrigation du jour en sort |
 | T4 | « Eau de la semaine » | la semaine en cours, du lundi au dimanche (D-004), par jardin, comme « Objectifs et besoins » |
