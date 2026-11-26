@@ -35,8 +35,9 @@ registres, elle y renvoie.
   onglets sur une ligne. L'ancien formulaire retiré, l'Historique dit les
   mêmes mots. Règles dans `lib/domain/watering-plan-record.ts` ; aucun
   calcul ni aucune écriture changés. Tests, parcours P65 ; P2, P3, P31,
-  P37 réécrits, neuf autres suivent. Contrôles : voir la PR. Vient la PR 3
-  (ordre de la page, budget, « C'est fait »).
+  P37 réécrits, neuf autres suivent. Contrôles : voir la PR. **En ligne** :
+  #228 fusionnée le 26 novembre 2026 à 8 h 55 (f3af768), déployée à
+  9 h 31, run 45778899693, les cinq jobs verts (consigné par S5, PR 3).
 - **Simplifier l'usage du module, S5, PR 1 sur 3 : « Arroser maintenant »
   en trois champs, codée le 25 novembre 2026** (D-332, F894 à F901 ;
   contrat `docs/simplification-s5-contract.md`, sections 3 et 9.3 ;
