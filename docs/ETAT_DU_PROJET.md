@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 25 novembre 2026.
+Dernière mise à jour : 26 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -12,6 +12,25 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S4, PR 2 sur 4 : le premier niveau,
+  codée le 26 novembre 2026** (D-335, F923 à F932 ; contrat, sections 4 à
+  7), en Opus 5.5 · Très élevé, sur la branche de la PR 1. « La semaine »
+  commence par les flèches et le titre (la semaine dans l'adresse), la
+  ligne du plan, une phrase de faits, l'encadré d'attention, le bilan (une
+  barre, reçus, visés, arrosés), « Jour par jour » (« Valider » sur la
+  ligne au téléphone, « Valider toute la semaine ») et « Jardin par
+  jardin » ; tout le reste est derrière « Le détail », un pli fermé, chaque
+  section dans son pli. Les chiffres viennent des fonctions d'« Aujourd'hui ».
+  L'écart du prévu se lit à l'ouverture de son pli (F930). Mesures à
+  390 px (P67, ferme neuve) : premier niveau 1 590 px (budget 1 700, tenu),
+  la barre et le premier « Valider » plus bas que visé (621 et 1 123 px
+  pour 400 et 900, dit, F931) ; serveur 341 ms (budget 394, tenu).
+  Aucun calcul ni aucune écriture changés. Tests ; parcours P67 nouveau ;
+  repris : P7, P10, P12, P13, P15, P26, P28, P30, P31, P32, P40,
+  P41, P52, P56, P57, P61. Contrôles : voir la PR. **Essai des cinq tâches**
+  (diagnostic, section 6) conseillé avant la mise en ligne, au porteur.
+  Viennent les PR 3 (les gestes) et 4 ; fusions après celles de S3, S5 et
+  de la PR 1.
 - **Simplifier l'usage du module, S4, PR 1 sur 4 : une page, deux vues,
   codée le 25 novembre 2026** (D-335, F916 à F922 ; contrat
   `docs/simplification-s4-contract.md`, sections 3, 7.4 et 9), en Opus 5.5 ·
