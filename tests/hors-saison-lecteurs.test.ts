@@ -7,7 +7,9 @@ import type { GoalRevisionLike, HistoryScope, WeatherDailyLike } from '../lib/do
 import { resolveHistoryPeriod } from '../lib/domain/irrigation-history/period.ts';
 import { buildIrrigationHistorySummary } from '../lib/domain/irrigation-history/summary.ts';
 import type { BedIrrigationNeed, IrrigationNeedsDashboard } from '../lib/domain/irrigation-needs.ts';
+import { FEATURE_IDS } from '../lib/domain/features/catalogue.ts';
 import { needOffSeason, offSeasonSchedule, type OffSeasonByBed, type OffSeasonRevision, type OffSeasonScope } from '../lib/domain/off-season.ts';
+import { startRoute, todayRouteBlock, type RouteCounts, type RouteStep } from '../lib/domain/onboarding/route.ts';
 import { plannedIrrigationsUnderOffSeason } from '../lib/domain/off-season-planned.ts';
 import { buildWeeklyPlan } from '../lib/domain/planning/engine.ts';
 import { buildSeriesWaterReport } from '../lib/domain/series/water.ts';
@@ -320,4 +322,40 @@ test('les arrosages planifiés que la mise hors saison toucherait : pas démarr�
   // Un jardin que l'instantané ne connaît plus se lit comme à classer : aucune portée de mode ne le couvre (D-003).
   assert.deepEqual(listed(PLEIN_CHAMP, plots.filter((plot) => plot.id !== 'jardin-sud')), [['vendredi-nord-abri', [NORD.id], [ABRI.id]]]);
   assert.deepEqual(events, before, 'la liste ne réécrit rien : l’annulation reste le geste du planning');
+});
+
+/** Une ferme décrite sauf son sol : la carte reste, et l'étape 4 se lit faite ou en cours (S6, section 5.1). */
+const DESCRIBED: RouteCounts = {
+  equipment: { drip: 4, sprinkler: 0, withoutSetting: 0 },
+  placement: { watered: 10, total: 10 },
+  water: { names: ['Bassin', 'Puits'], total: 2 },
+  objective: { withObjective: 10, total: 10 },
+  soil: { withoutSoil: 1, total: 6, anchor: 'soil-parcel-z6' },
+};
+
+function objectiveStep(objective: RouteCounts['objective']): RouteStep {
+  const value = startRoute({ startMode: 'all', routeState: null, enabled: [...FEATURE_IDS], counts: { ...DESCRIBED, objective } });
+  assert.equal(value.kind, 'card');
+  const step = value.kind === 'card' ? value.steps.find((item) => item.id === 'objective') : undefined;
+  assert.ok(step, 'l’étape « Combien je vise par semaine »');
+  return step;
+}
+
+test('F1071 : l’étape « Combien je vise par semaine » de la mise en route compte les planches en saison et dit les autres à part', () => {
+  // Filtre vide : le résultat d'avant, mot pour mot.
+  assert.deepEqual([objectiveStep({ withObjective: 10, total: 10 }).status, objectiveStep({ withObjective: 10, total: 10 }).line], ['done', 'ferme entière']);
+  const before = objectiveStep({ withObjective: 7, total: 10 });
+  assert.deepEqual([before.status, before.line], ['current', '3 planches n’ont pas encore d’eau visée.']);
+
+  // Trois planches hors saison : les sept en saison ont leur eau visée, l'étape est faite et le dit.
+  const paused = objectiveStep({ withObjective: 7, total: 10, offSeason: 3 });
+  assert.deepEqual([paused.status, paused.line], ['done', '7 planches sur 7 ont un objectif, 3 hors saison']);
+  // Une planche hors saison ne manque jamais : deux planches en saison sans eau visée, pas cinq.
+  const missing = objectiveStep({ withObjective: 5, total: 10, offSeason: 3 });
+  assert.deepEqual([missing.status, missing.line], ['current', '2 planches n’ont pas encore d’eau visée.']);
+  const card = startRoute({ startMode: 'all', routeState: null, enabled: [...FEATURE_IDS], counts: { ...DESCRIBED, objective: { withObjective: 5, total: 10, offSeason: 3 } } });
+  assert.equal(todayRouteBlock(card, [...FEATURE_IDS])?.sentence, 'Combien vous visez par semaine : 2 planches n’ont pas encore d’eau visée.');
+  // Toute la ferme hors saison : rien à viser, rien ne manque.
+  const all = objectiveStep({ withObjective: 0, total: 10, offSeason: 10 });
+  assert.deepEqual([all.status, all.line], ['done', 'aucune planche en saison, 10 hors saison']);
 });

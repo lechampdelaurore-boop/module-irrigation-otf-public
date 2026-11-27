@@ -74,6 +74,16 @@ export function referenceCropSeriesText(summary: ReferenceCropSummary): string {
     : `${summary.seriesCount} série${summary.seriesCount > 1 ? 's' : ''} de la saison`;
 }
 
+/**
+ * Le nombre des cultures de la saison, le titre « Vos cultures cette saison
+ * (N) » de « Besoin par culture » : les cultures que la ferme connaît dont une
+ * série de la saison au moins est rattachée. La fiche de « Ma ferme » le dit
+ * (simplification, lot S6, section 7.2), avec les mêmes fonctions que la page.
+ */
+export function seasonCropCount(cropIds: readonly string[], species: readonly SeasonSpecies[]): number {
+  return splitBySeasonUse([...new Set(cropIds)], (id) => referenceCropSeriesCount(id, species)).cultivated.length;
+}
+
 /** Les cultures cultivées cette saison d'abord, les autres à part (lot D, J5, F302) ; l'ordre de chaque groupe est gardé. */
 export function splitBySeasonUse<T>(items: readonly T[], seriesCount: (item: T) => number): { cultivated: T[]; others: T[] } {
   return {

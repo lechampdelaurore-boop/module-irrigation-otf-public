@@ -900,7 +900,7 @@ export const automaticObjectiveRevisions = sqliteTable(
 
 /**
  * Les gestes « Mettre hors saison » et « Reprendre » d'une ferme (6
- * quaterdecies, B2, migration 0051 ; D-337, D-352) : chaque ligne met une
+ * quaterdecies, B2, migration 0052 ; D-337, D-352) : chaque ligne met une
  * portée hors saison, ou la reprend, à partir de son jour, en heure de Paris ;
  * sans ligne, rien n'est hors saison. Une portée : une planche, un jardin, une
  * parcelle (identifiant OTF), ou tout le plein champ, tout le sous-abri.
@@ -2444,10 +2444,15 @@ export const featureSelections = sqliteTable(
     chosenAt: text('chosen_at'),
     bannerDismissedAt: text('banner_dismissed_at'),
     updatedAt: text('updated_at').notNull(),
+    // La mise en route guidée (lot S6, migration 0051) : comment la ferme a commencé, et l'état de sa carte ; vides pour une ferme d'avant S6.
+    startMode: text('start_mode'),
+    routeState: text('route_state'),
   },
   (table) => [
     check('chk_feature_selection_enabled', sql`json_valid(${table.enabledFeatures}) AND json_type(${table.enabledFeatures}) = 'array'`),
     check('chk_feature_selection_known', sql`json_valid(${table.knownFeatures}) AND json_type(${table.knownFeatures}) = 'array'`),
+    check('chk_feature_selection_start_mode', sql`${table.startMode} IS NULL OR ${table.startMode} IN ('notes', 'proposals', 'all', 'custom')`),
+    check('chk_feature_selection_route_state', sql`${table.routeState} IS NULL OR ${table.routeState} IN ('later', 'done')`),
   ],
 );
 

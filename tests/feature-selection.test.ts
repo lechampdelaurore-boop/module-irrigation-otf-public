@@ -129,12 +129,14 @@ test('un choix enregistré se relit cohérent : inconnus écartés, dépendances
 });
 
 test('la première ouverture : rien coché d’avance ; une ferme d’avant la 3.8 : tout coché et le bandeau (R5, R6)', () => {
-  assert.deepEqual(resolveFeatureSelection({ kind: 'first-visit' }), { firstVisit: true, enabled: [], banner: null, known: [] });
+  assert.deepEqual(resolveFeatureSelection({ kind: 'first-visit' }), { firstVisit: true, enabled: [], banner: null, known: [], startMode: null, routeState: null });
   assert.deepEqual(resolveFeatureSelection({ kind: 'before-selection' }), {
     firstVisit: false,
     enabled: [...FEATURES_BEFORE_SELECTION],
     banner: { kind: 'introduction' },
     known: [...FEATURES_BEFORE_SELECTION],
+    startMode: null,
+    routeState: null,
   });
 });
 
@@ -146,7 +148,7 @@ test('un choix enregistré n’a pas de bandeau ; une case apparue depuis arrive
     chosenAt: '2026-11-07T13:00:00.000Z',
     bannerDismissedAt: null,
   });
-  assert.deepEqual(chosen, { firstVisit: false, enabled: ['alertes-meteo'], banner: null, known: [...FEATURE_IDS] });
+  assert.deepEqual(chosen, { firstVisit: false, enabled: ['alertes-meteo'], banner: null, known: [...FEATURE_IDS], startMode: null, routeState: null });
 
   // Une ferme qui a choisi avant que « Historique et cumuls » n'existe ne la voit pas cochée d'elle-même.
   const knownBefore = FEATURE_IDS.filter((id) => id !== 'historique');
