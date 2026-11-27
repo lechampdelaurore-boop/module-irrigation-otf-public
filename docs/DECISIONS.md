@@ -11505,7 +11505,8 @@ Précisions prises en codant :
 Date : 26 novembre 2026. Statut : **les quatre PR codées, le code de S6
 est fini** (contrat #218 en ligne le 26 novembre 2026 à 20 h 42 ; PR 1
 #235 en ligne à 22 h 08 ; PR 2 #236 en ligne à 22 h 47 ; PR 3 #237
-fusionnée à 22 h 55, la PR 4 avec cette entrée) ; contrat `docs/simplification-s6-contract.md`
+en ligne le 27 novembre 2026 à 1 h 40 ; PR 4 #238 en ligne à 2 h 20,
+consigné par le contrat #240) : **les quatre PR en ligne** ; contrat `docs/simplification-s6-contract.md`
 (sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
 PR 2 ; 7, 14 et 15 pour la PR 3 ; 10, 11 et 15 pour la PR 4), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
@@ -11993,6 +11994,36 @@ Précisions prises en codant (PR 4) :
   visites) ; la remise à zéro qui garde l'espace de la ferme vierge ; le
   catalogue qui dit encore « à cocher » ; le « ? » de « Ma ferme » qui
   dit encore « à quoi elle sert ».
+
+## D-337 — L'objectif automatique se voit et se modifie ; ignorer l'irrigation hors saison
+
+Date : 26 novembre 2026. Statut : **contrat écrit, rien de codé** ;
+`docs/objectif-automatique-saison-contract.md`, roadmap section 6
+quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
+
+**Demande du porteur** (11 h 24 et 11 h 26) : l'objectif automatique doit se
+renseigner et se modifier à l'écran ; un filtre « hors saison » ignore
+l'irrigation de planches, jardins, parcelles, de tout le plein champ ou de
+tout le sous-abri.
+
+**Décision.** (1) Cause : l'objectif automatique est calculé à la lecture,
+jamais écrit ; le volet ne liste que les objectifs saisis. Il reste calculé
+et non écrit (la règle « un objectif saisi passe avant » tient) ; l'écran le
+liste, préremplit le champ, propose « Revenir à l'automatique » et, en
+allumant, offre « garder mes objectifs » ou « vider ». (2) Le filtre « hors
+saison » **n'ignore que l'irrigation** (objectif saisi et automatique,
+propositions, pénurie, faisabilité) à partir de son jour (D-034) ; **la
+pluie, la réserve du sol, l'ET0, les alertes météo, les irrigations réelles,
+les semaines closes et l'historique ne bougent pas**, gardés par des tests.
+Cinq portées ; un jardin « à classer » n'est couvert par aucune des deux
+portées de mode, dit. Une seule fonction, un seul endroit. Sans question
+sur le calcul ; deux questions de conduite de la ferme, **répondues par le
+porteur le 26 novembre 2026 à 12 h 37** : le filtre se lève **à la main
+seulement** (« Reprendre », ni date ni calendrier) ; en mettant hors
+saison, **le module propose d'annuler** les arrosages planifiés ou
+validés des planches concernées, jamais sans son choix.
+
+Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, aligné sur #245) pour le code.
 
 ## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
 
