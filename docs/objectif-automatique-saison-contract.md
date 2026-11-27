@@ -305,3 +305,53 @@ Posées une par une, sur cartes, avec recommandation ; la question 2 est
    par réécriture (« Le cycle », `docs/planning-contract.md`). Un arrosage
    déjà démarré n'est pas proposé : il se termine. Ce geste est livré
    par B3 (écran) ; B2 fournit la liste des arrosages concernés.
+
+## 11. Précisions du code, PR A1 (26 novembre 2026, D-351)
+
+- **F1051.** Une planche a une ligne « automatique » quand l'objectif
+  automatique s'applique à au moins un de ses jours et que l'objectif saisi
+  ne couvre pas à lui seul ses jours chiffrés : y compris sans valeur (une
+  semaine sans ET0 connue, sans culture), dite « sans valeur » avec sa
+  raison, jamais zéro (D-003). Une planche entièrement couverte par un
+  objectif saisi n'en a pas : sa ligne est celle de l'objectif saisi.
+- **F1052.** La ligne d'un jardin porte la moyenne de surface de ses
+  planches automatiques (`farmObjective`, D-328) et l'origine de leur
+  groupe (`groupObjectiveOriginText`) ; une planche a sa propre ligne
+  quand sa valeur au dixième ou son origine diffère de celle du jardin ; un
+  jardin d'une seule planche n'a que sa ligne de jardin.
+- **F1053.** « prévu » s'écrit quand tous les millimètres automatiques de
+  la ligne viennent de l'ET0 prévue ; la semaine en cours, mêlée de
+  réanalyse et de prévision, ne le dit pas (la bulle détaille, F791).
+- **F1054.** La valeur en vigueur d'un endroit : l'objectif saisi à cet
+  endroit même, marqué « saisi » ; sinon la moyenne de surface des
+  objectifs chiffrés de ses planches, marquée selon leur origine
+  (« automatique, d’après l’ET0 », « saisi et automatique », « saisi ») ;
+  aucune planche chiffrée : le champ reste vide.
+- **F1055.** Le champ, réglage allumé : un autre endroit choisi montre sa
+  valeur et efface la saisie en cours ; après un enregistrement, il montre
+  la valeur en vigueur ; « Enregistrer » sur la valeur montrée, inchangée,
+  n'écrit rien et le dit. Réglage éteint, le champ est celui d'avant.
+- **F1056.** « Corriger », sur chaque ligne automatique, choisit l'endroit
+  de la ligne dans le sélecteur et met le curseur dans le champ (ajout de
+  l'assistant, pour que « modifiable » se voie ; sans règle).
+- **F1057.** « Revenir à l'automatique » : `clearHydricGoalsForUser`
+  reçoit l'endroit ; une révision « cleared » et une ligne de journal pour
+  lui seul, le plan recalculé comme pour « Vider les objectifs » ; sans
+  fenêtre de confirmation (il ne retire que cet endroit, la valeur
+  automatique se lit aussitôt) ; sans objectif à cet endroit, rien n'est
+  écrit et le message le dit. Le bouton n'existe que réglage allumé.
+- **F1058.** La fenêtre d'allumage compte les planches de la saison
+  couvertes par un objectif saisi de la semaine affichée (`keptGoalBeds`,
+  O4) ; « Allumer et vider les objectifs » allume puis fait le geste
+  « Vider les objectifs » de la semaine affichée, les deux messages
+  ensemble ; « Annuler » et Échap ne changent rien ; le bouton « garder »
+  a le focus.
+- **F1059.** La phrase de résultat reprend l'objectif de la ferme
+  (`farmObjective`, toutes les planches qui ont un objectif, saisi ou
+  automatique) : « objectif saisi et automatique » quand les deux se
+  mêlent ; « aucune planche n’a encore d’objectif chiffré » sans valeur ;
+  elle ne s'affiche que quand les besoins de la même semaine sont lus.
+- **F1060.** Le signal de l'objectif de la ferme (S1, PR 3) porte aussi
+  l'objectif de chaque planche (`objectiveBedReadings`), à la page comme
+  après chaque relecture des besoins : aucune lecture serveur de plus.
+

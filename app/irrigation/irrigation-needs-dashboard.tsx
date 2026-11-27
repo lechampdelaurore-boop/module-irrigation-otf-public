@@ -5,7 +5,7 @@ import { volumeText } from '@/lib/domain/display-numbers';
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { notifyFarmObjectiveRead, notifyFeasibilityChanged } from '@/lib/domain/feasibility-notifications';
 import { realRemainingOrigin, type BedIrrigationNeed, type IrrigationNeedPriority, type IrrigationNeedsDashboard } from '@/lib/domain/irrigation-needs';
-import { automaticObjectiveOriginText, gardenUnknownReason, objectiveOriginText } from '@/lib/domain/objective-reading';
+import { automaticObjectiveOriginText, gardenUnknownReason, objectiveBedReadings, objectiveOriginText } from '@/lib/domain/objective-reading';
 import type { ProposalSummary } from '@/lib/domain/crop-water/proposal';
 import { ACTUAL_RAIN_CONSEQUENCE } from '@/lib/domain/today/reliability';
 import { needsGardenAnchor } from '@/lib/domain/today/week';
@@ -64,7 +64,7 @@ export function IrrigationNeedsDashboardView({ season, initialDashboard, showPro
   // L'objectif de la ferme de la semaine affichée, à la ligne de résumé de la page (S1, PR 3).
   // Et le premier niveau de la page « Semaine » reprend le besoin relu, tel quel (S4, PR 2).
   useEffect(() => {
-    notifyFarmObjectiveRead({ weekStart: dashboard.weekStart, objective: dashboard.farmObjective });
+    notifyFarmObjectiveRead({ weekStart: dashboard.weekStart, objective: dashboard.farmObjective, beds: objectiveBedReadings(dashboard.gardens) });
     notifyWeekNeedsRead(dashboard);
   }, [dashboard]);
   // Un lien d'« Aujourd'hui » vise un jardin (6 nonies, L2) : son pli s'ouvre et vient en haut, au chargement comme à un lien suivi dans la page.
