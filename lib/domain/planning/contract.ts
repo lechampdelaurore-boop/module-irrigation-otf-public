@@ -101,6 +101,15 @@ export type PlanBedApplication = {
   /** Ce qu'elle reçoit au-delà de son besoin : affiché, jamais fondu (R11). */
   surplusMm: number;
   wettedAreaSquareMeters: number | null;
+  /**
+   * La planche est hors saison : elle n'a pas de besoin, mais le matériel,
+   * partagé avec des planches en saison, l'arrose encore ; eau réelle, dite
+   * sur la proposition (6 quaterdecies, F1067, B3). Le nom est en français :
+   * le contrat du plan, lu par les calculs des cultures, ne nomme pas le
+   * filtre (garde de tests/hors-saison-regle.test.ts) ; c'est une marque
+   * de sortie, jamais une règle.
+   */
+  horsSaison?: true;
 };
 
 /** `reserved-share` : raccourci à ce que les parts de ses planches paient, le reste du budget étant réservé aux autres (D-037). */

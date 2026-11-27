@@ -337,6 +337,15 @@ calcul ; « Garder » sur une suggestion, avec sa dose, pour qu'elle se taise ;
 R14 avec les autres réglages et leur journal. Les refus sont déjà au
 registre ; la dose utile, le retard et « Ce qui a changé » se calculent.
 
+## Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`)
+
+Les liens vers le planning mènent à « Semaine », qui le porte : « Recalculer
+le plan » d'un arrosage en retard, sur « Arrosages », ouvre
+`/irrigation/semaine?recalculer=1` (PR 4). Le mécanisme `useUrlIntent` est
+gardé : la demande est lue une fois, puis retirée de l'adresse. L'ancienne
+adresse `/irrigation/planning?recalculer=1` reste servie, ses paramètres
+gardés par la redirection.
+
 ## Découpage et preuve de fin
 
 En PR courtes, chacune verte en CI, tests d'abord :

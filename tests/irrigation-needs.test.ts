@@ -370,7 +370,9 @@ test('le client transmet la semaine affichée aux besoins et le serveur la reço
   const actionSource = readFileSync('app/irrigation/irrigation-need-actions.ts', 'utf8');
   assert.match(waterSource, /detail: \{ weekStart: result\.dashboard\.weekStart \}/);
   assert.match(needsSource, /loadIrrigationNeedsAction\(\{ season, weekStart \}\)/);
-  assert.match(needsSource, /saveIrrigationNeedThresholdAction\(\{ season, weekStart: dashboard\.weekStart/);
+  // Le seuil se règle pour la semaine que l'adresse de la page dit (S4, PR 2, S4-g).
+  assert.match(needsSource, /saveIrrigationNeedThresholdAction\(\{ season, weekStart, thresholdMm: numeric\(threshold\) \}\)/);
+  assert.match(readFileSync('app/irrigation/semaine/page.tsx', 'utf8'), /<NeedsThresholdSettings season=\{context\.season\} weekStart=\{needs\.irrigationNeeds\.weekStart\}/);
   assert.match(actionSource, /getIrrigationNeedsDashboardForUser\(\{ \.\.\.context, weekStart: input\.weekStart \}\)/);
 });
 

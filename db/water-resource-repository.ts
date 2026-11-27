@@ -44,6 +44,52 @@ type ReservoirRow = {
   notes: string | null;
 };
 
+/** Ce que la mise en route et la fiche « Ressources et pompes » lisent des ressources et des réserves actives. */
+export type ActiveWaterAssets = {
+  resources: { name: string; nominalFlowCubicMetersPerHour: number }[];
+  reservoirs: Pick<WaterReservoir, 'id' | 'name' | 'capacityCubicMeters' | 'currentVolumeCubicMeters' | 'currentVolumeObservedAt' | 'minimumSafetyCubicMeters'>[];
+};
+
+/**
+ * Les ressources et les réserves actives d'une ferme (simplification, lot
+ * S6) : pour l'étape « D'où vient l'eau » de la mise en route (section 5.1 :
+ * « un puits, un bassin », leurs noms et leur nombre) et pour la ligne
+ * d'état de la fiche « Ressources et pompes » (section 7.2 : le volume
+ * d'une réserve à sa date). Un lot de deux requêtes, les lignes du matériel
+ * d'eau de la ferme, jamais une par planche ; sans les liens, les limites
+ * ni les mouvements de l'infrastructure.
+ */
+export async function readActiveWaterAssetsForUser(ownerUserId: string): Promise<ActiveWaterAssets> {
+  const space = spaceParams(ownerUserId);
+  const [resources, reservoirs] = await db.batch<Pick<ResourceRow, 'name' | 'nominal_flow_cubic_meters_per_hour'> | Pick<ReservoirRow, 'id' | 'name' | 'capacity_cubic_meters' | 'current_volume_cubic_meters' | 'current_volume_observed_at' | 'minimum_safety_cubic_meters'>>([
+    db.prepare(`SELECT resource.name, resource.nominal_flow_cubic_meters_per_hour
+      FROM irrigation_water_resources AS resource
+      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = resource.workspace_id
+      WHERE ${WORKSPACE_SPACE_FILTER} AND resource.status = 'active'
+      ORDER BY resource.name COLLATE NOCASE`).bind(...space),
+    db.prepare(`SELECT reservoir.id, reservoir.name, reservoir.capacity_cubic_meters,
+        reservoir.current_volume_cubic_meters, reservoir.current_volume_observed_at, reservoir.minimum_safety_cubic_meters
+      FROM irrigation_water_reservoirs AS reservoir
+      INNER JOIN irrigation_workspaces AS workspace ON workspace.id = reservoir.workspace_id
+      WHERE ${WORKSPACE_SPACE_FILTER} AND reservoir.status = 'active'
+      ORDER BY reservoir.name COLLATE NOCASE`).bind(...space),
+  ]);
+  return {
+    resources: ((resources?.results ?? []) as Pick<ResourceRow, 'name' | 'nominal_flow_cubic_meters_per_hour'>[]).map((row) => ({
+      name: row.name,
+      nominalFlowCubicMetersPerHour: Number(row.nominal_flow_cubic_meters_per_hour),
+    })),
+    reservoirs: ((reservoirs?.results ?? []) as Pick<ReservoirRow, 'id' | 'name' | 'capacity_cubic_meters' | 'current_volume_cubic_meters' | 'current_volume_observed_at' | 'minimum_safety_cubic_meters'>[]).map((row) => ({
+      id: row.id,
+      name: row.name,
+      capacityCubicMeters: Number(row.capacity_cubic_meters),
+      currentVolumeCubicMeters: row.current_volume_cubic_meters === null ? null : Number(row.current_volume_cubic_meters),
+      currentVolumeObservedAt: row.current_volume_observed_at,
+      minimumSafetyCubicMeters: Number(row.minimum_safety_cubic_meters),
+    })),
+  };
+}
+
 export async function listWaterInfrastructureForUser(ownerUserId: string, movementPeriod?: { startAt: string; endAt: string }): Promise<WaterInfrastructure> {
   const space = spaceParams(ownerUserId);
   const queries = await Promise.all([

@@ -48,6 +48,8 @@ test('le choix s’enregistre pour la ferme, dans l’ordre de la liste, avec sa
     known: [...FEATURE_IDS],
     chosenAt: NOW.toISOString(),
     bannerDismissedAt: null,
+    startMode: null,
+    routeState: null,
   });
   assert.deepEqual(await getEnabledFeaturesForUser('alice'), ['arrosages', 'materiel', 'alertes-meteo']);
 
@@ -76,6 +78,8 @@ test('fermer le bandeau d’une ferme d’avant la 3.8 garde tout coché, sans d
     known: [...FEATURE_IDS],
     chosenAt: null,
     bannerDismissedAt: NOW.toISOString(),
+    startMode: null,
+    routeState: null,
   });
   const resolved = resolveFeatureSelection(stored);
   assert.deepEqual([resolved.enabled, resolved.banner], [[...FEATURES_BEFORE_SELECTION], null]);

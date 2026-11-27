@@ -6,6 +6,7 @@ import { irrigationActiveIntervals, weekStartDateKey } from '../water-management
 import { goalRevisionFirstDate } from '../hydric-goal-revisions.ts';
 import type { AutomaticObjectiveDayValues } from '../automatic-objective.ts';
 import { farmObjective, farmObjectivePartial } from '../farm-objective.ts';
+import type { OffSeasonByBed } from '../off-season.ts';
 import type {
   GoalRevisionLike,
   HistoryAvailability,
@@ -27,6 +28,7 @@ export function buildIrrigationHistorySummary({
   goalRevisions,
   automaticObjective,
   automaticObjectiveProvisionalWeeks,
+  offSeason,
 }: {
   events: readonly IrrigationEventRecord[];
   scopeBeds: readonly Bed[];
@@ -39,12 +41,14 @@ export function buildIrrigationHistorySummary({
   automaticObjective?: AutomaticObjectiveDayValues;
   /** Les semaines closes, par leur lundi, que la tâche du matin n'a pas encore enregistrées : provisoires (règle 6, D-318). */
   automaticObjectiveProvisionalWeeks?: ReadonlySet<string>;
+  /** La réponse du filtre « hors saison » par planche (D-337, D-352) : ces jours-là, aucun objectif ; la pluie et l'irrigation ne changent pas. */
+  offSeason?: OffSeasonByBed;
 }): IrrigationHistorySummary {
   const irrigation = aggregateActualIrrigation(events, scopeBeds, scope, period);
   const observed = aggregateObservedWeather(weather, period);
   const weatherSummary = shelterObservedRain(observed, scopeBeds, plots, period);
   const { aggregate: objective, bedsWithObjective } = hydricObjectiveOfBeds(
-    goalRevisions, scopeBeds, period, automaticObjective, automaticObjectiveProvisionalWeeks,
+    goalRevisions, scopeBeds, period, automaticObjective, automaticObjectiveProvisionalWeeks, offSeason,
   );
   // L'écart se chiffre sur les planches de l'objectif (D-329, docs/simplification-s1-contract.md,
   // section 5 bis, règle 3) : quand une partie seulement en a un, l'eau reçue est celle de ces
@@ -220,6 +224,12 @@ function shelterObservedRain(
  * valeur, jamais comptées pour zéro (D-003), et les semaines `provisional`
  * (closes, pas encore enregistrées) où il s'est appliqué (D-318). Sans
  * `automatic`, le résultat est celui d'avant (D-317).
+ *
+ * Un jour où `offSeason` dit une planche hors saison n'a aucun objectif, ni
+ * saisi ni automatique, la règle d'`objectiveForBed` (D-337, D-352) : la
+ * journée-planche n'est pas à couvrir, et une planche hors saison sans aucun
+ * jour couvert est comptée à part (`objectiveBeds.offSeason`). Sans
+ * `offSeason`, ou filtre vide, rien ne change.
  */
 export function aggregateHydricObjective(
   revisions: readonly GoalRevisionLike[],
@@ -227,8 +237,9 @@ export function aggregateHydricObjective(
   period: Pick<HistoryPeriod, 'startDate' | 'endDate'>,
   automatic?: AutomaticObjectiveDayValues,
   provisional?: ReadonlySet<string>,
+  offSeason?: OffSeasonByBed,
 ): HydricObjectiveAggregate {
-  return hydricObjectiveOfBeds(revisions, scopeBeds, period, automatic, provisional).aggregate;
+  return hydricObjectiveOfBeds(revisions, scopeBeds, period, automatic, provisional, offSeason).aggregate;
 }
 
 /** L'agrégat de l'objectif, et les planches qui ont un objectif sur la période : celles de l'écart (D-329, règle 3). */
@@ -238,6 +249,7 @@ function hydricObjectiveOfBeds(
   period: Pick<HistoryPeriod, 'startDate' | 'endDate'>,
   automatic?: AutomaticObjectiveDayValues,
   provisional?: ReadonlySet<string>,
+  offSeason?: OffSeasonByBed,
 ): { aggregate: HydricObjectiveAggregate; bedsWithObjective: ReadonlySet<string> } {
   const dates = dateKeys(period.startDate, period.endDate);
   // Tri stable, semaine puis date, sans départage par l'identifiant (docs/revision-order-contract.md).
@@ -258,7 +270,9 @@ function hydricObjectiveOfBeds(
   let automaticBedDays = 0;
   let automaticMissingBedDays = 0;
   const provisionalWeeks = new Set<string>();
-  const totalBedDays = dates.length * scopeBeds.length;
+  // Les jours hors saison de chaque planche (D-352) : ils ne sont pas à couvrir.
+  const offSeasonDates = new Map<string, string[]>();
+  let offSeasonBedDays = 0;
 
   for (const date of dates) {
     const provisionalWeek = provisionalWeekOf(date, provisional);
@@ -272,6 +286,12 @@ function hydricObjectiveOfBeds(
     for (const bed of scopeBeds) {
       // Des planches sans aucune surface n'ont pas de moyenne : aucune journée n'y compte, comme avant.
       if (totalArea <= 0) continue;
+      // Hors saison, ni l'objectif saisi ni l'objectif automatique ne comptent ce jour-là (D-337, D-352).
+      if (offSeason?.get(bed.id)?.(date) === true) {
+        offSeasonBedDays += 1;
+        offSeasonDates.set(bed.id, [...(offSeasonDates.get(bed.id) ?? []), date]);
+        continue;
+      }
       const goal = applicableGoal(state, bed);
       if (goal) {
         availableBedDays += 1;
@@ -299,7 +319,9 @@ function hydricObjectiveOfBeds(
   const objective = farmObjective(scopeBeds.map((bed) => ({
     areaSquareMeters: bed.area,
     objectiveMm: objectiveByBed.get(bed.id) ?? null,
+    offSeasonDates: offSeasonDates.get(bed.id),
   })));
+  const totalBedDays = dates.length * scopeBeds.length - offSeasonBedDays;
   const aggregate: HydricObjectiveAggregate = {
     objectiveMm: objective.objectiveMm,
     objectiveAvailability: {
@@ -311,6 +333,7 @@ function hydricObjectiveOfBeds(
       withObjective: objective.withObjective,
       total: objective.total,
       bedDays: objective.withObjective * dates.length,
+      ...(objective.offSeason ? { offSeason: objective.offSeason } : {}),
     },
   };
   return {

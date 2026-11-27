@@ -34,8 +34,8 @@ export type TodayWeekBar =
   | { kind: 'no-objective'; sentence: string; link: TodayTileLink };
 
 export const NO_WEEK_OBJECTIVE = 'Aucun objectif posé pour cette semaine.';
-/** Vers « Objectifs et besoins », jusqu'à ce que « Semaine » (S4) existe. */
-const SEE_THE_WEEK = 'Voir la semaine';
+/** Vers « Semaine » (lot S4, PR 4), à la ligne de la ferme d'« Eau de la semaine ». */
+export const SEE_THE_WEEK = 'Voir la semaine';
 
 /**
  * Une barre pour la ferme entière (section 8, point 5) : l'objectif dit par
@@ -56,7 +56,7 @@ export function weekBar(week: TodayWeek): TodayWeekBar {
     sentence: `${objective.charAt(0).toLocaleUpperCase('fr-FR')}${objective.slice(1)} : ${received}. ${remaining}`,
     detail: week.tiles.receivedDetail,
     bars: farm.bars,
-    link: { label: SEE_THE_WEEK, page: 'besoins', anchor: farm.anchor },
+    link: { label: SEE_THE_WEEK, page: 'semaine', anchor: farm.anchor },
   };
 }
 

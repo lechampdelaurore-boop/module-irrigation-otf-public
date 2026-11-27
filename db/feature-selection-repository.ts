@@ -1,8 +1,10 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
-import { spaceKeyOfRow } from './workspace-scope';
+import { WORKSPACE_SPACE_FILTER, spaceKeyOfRow, spaceParams } from './workspace-scope';
+import { aEcritUneLigne } from './write-result';
 import { featureSelectionJournal } from './change-journal/settings';
 import { FEATURE_IDS, FEATURES_BEFORE_SELECTION, type FeatureId } from '@/lib/domain/features/catalogue';
+import type { RouteState, StartMode } from '@/lib/domain/features/start-mode';
 import {
   isCompleteSelection,
   orderedSelection,
@@ -24,6 +26,9 @@ type SelectionRow = {
   known_features: string;
   chosen_at: string | null;
   banner_dismissed_at: string | null;
+  /** Lot S6 (migration 0051) : comment la ferme a commencé, l'état de sa carte « Mise en route ». */
+  start_mode: string | null;
+  route_state: string | null;
 };
 
 function parseList(value: string): unknown[] {
@@ -43,13 +48,15 @@ function storedSelection(row: SelectionRow | null): StoredFeatureSelection {
     known: parseList(row.known_features),
     chosenAt: row.chosen_at,
     bannerDismissedAt: row.banner_dismissed_at,
+    startMode: row.start_mode,
+    routeState: row.route_state,
   };
 }
 
 /** Ce que la base sait du choix d'un espace d'irrigation qui existe : sans ligne, une ferme d'avant la 3.8 (R6). */
 async function readFeatureSelectionForWorkspace(workspaceId: string): Promise<StoredFeatureSelection> {
   const row = await db.prepare(
-    `SELECT enabled_features, known_features, chosen_at, banner_dismissed_at
+    `SELECT enabled_features, known_features, chosen_at, banner_dismissed_at, start_mode, route_state
      FROM irrigation_feature_selections WHERE workspace_id = ?`,
   ).bind(workspaceId).first<SelectionRow>();
   return storedSelection(row ?? null);
@@ -83,7 +90,8 @@ export async function listFarmsWithSelection(
 ): Promise<FarmForTreatment[]> {
   const result = await db.prepare(
     `SELECT workspace.id AS workspace_id, workspace.owner_user_id, workspace.otf_farm_id, selection.workspace_id AS selection_workspace_id,
-            selection.enabled_features, selection.known_features, selection.chosen_at, selection.banner_dismissed_at
+            selection.enabled_features, selection.known_features, selection.chosen_at, selection.banner_dismissed_at,
+            selection.start_mode, selection.route_state
      FROM irrigation_workspaces AS workspace
      LEFT JOIN irrigation_feature_selections AS selection ON selection.workspace_id = workspace.id
      WHERE NOT EXISTS (SELECT 1 FROM irrigation_farm_erasures AS erasure
@@ -127,6 +135,68 @@ export async function saveFeatureSelectionForUser(
        chosen_at = excluded.chosen_at,
        updated_at = excluded.updated_at`,
   ).bind(workspaceId, JSON.stringify(orderedSelection(enabled)), JSON.stringify(FEATURE_IDS), at, at)]);
+}
+
+/** Ce que dit l'enregistrement du choix de la première ouverture : fait, ou déjà fait par un autre appel. */
+export type StartChoiceResult = 'saved' | 'already-chosen';
+
+/**
+ * Le choix de la première ouverture (simplification, lot S6,
+ * docs/simplification-s6-contract.md, sections 3.4, 4 et 12 ; D-336) : les
+ * cases et la façon de commencer, pour une ferme qui n'a encore jamais ouvert
+ * le module. L'espace d'irrigation naît dans la même écriture que le choix,
+ * tout ou rien : une erreur n'écrit rien, et la page peut redemander. Si
+ * l'espace existe déjà (un second appui, un second onglet), l'écriture est
+ * refusée par la base et rien n'est réécrit : le choix est déjà fait. Les
+ * cases sont complètes (R3, P7) ; la carte « Mise en route » est visible
+ * (`route_state` vide).
+ */
+export async function saveStartChoiceForUser(
+  ownerUserId: string,
+  startMode: StartMode,
+  enabled: readonly FeatureId[],
+  now: Date,
+): Promise<StartChoiceResult> {
+  if (!isCompleteSelection(enabled)) throw new InvalidFeatureSelectionError();
+  if (await findWorkspaceIdForUser(ownerUserId) !== null) return 'already-chosen';
+  const workspaceId = crypto.randomUUID();
+  const at = now.toISOString();
+  try {
+    await db.batch([
+      db.prepare('INSERT INTO irrigation_workspaces (id, owner_user_id, otf_farm_id) VALUES (?, ?, ?)').bind(workspaceId, ...spaceParams(ownerUserId)),
+      // Le journal, comme pour tout choix des cases (D-286) : avant, aucune ligne.
+      featureSelectionJournal('fonctionnalites', { workspaceId, actorUserId: ownerUserId, at }, enabled),
+      db.prepare(
+        `INSERT INTO irrigation_feature_selections
+           (workspace_id, enabled_features, known_features, chosen_at, banner_dismissed_at, updated_at, start_mode, route_state)
+         VALUES (?, ?, ?, ?, NULL, ?, ?, NULL)`,
+      ).bind(workspaceId, JSON.stringify(orderedSelection(enabled)), JSON.stringify(FEATURE_IDS), at, at, startMode),
+    ]);
+  } catch (error) {
+    // L'espace est né entre-temps, par une autre requête : l'index unique des espaces a refusé celui-ci.
+    if (await findWorkspaceIdForUser(ownerUserId) !== null) return 'already-chosen';
+    throw error;
+  }
+  return 'saved';
+}
+
+/**
+ * L'état de la carte « Mise en route » (simplification, lot S6, sections 4
+ * et 5.4) : « Plus tard » (`later`), « Reprendre la mise en route » (nul),
+ * « Terminer la mise en route » (`done`). Écrit par un appui, jamais par une
+ * lecture (D-028), et rien d'autre : ni case, ni étape, ni objectif. Seule
+ * la ligne de l'espace de la personne change, celle d'une ferme passée par
+ * les trois façons (`start_mode` non nul) ; une mise en route terminée le
+ * reste (S6-k). `false` : aucune ligne n'a changé.
+ */
+export async function saveRouteStateForUser(ownerUserId: string, routeState: RouteState | null, now: Date): Promise<boolean> {
+  const result = await db.prepare(
+    `UPDATE irrigation_feature_selections SET route_state = ?, updated_at = ?
+     WHERE workspace_id = (SELECT workspace.id FROM irrigation_workspaces AS workspace WHERE ${WORKSPACE_SPACE_FILTER})
+       AND start_mode IS NOT NULL
+       AND (route_state IS NULL OR route_state <> 'done')`,
+  ).bind(routeState, now.toISOString(), ...spaceParams(ownerUserId)).run();
+  return aEcritUneLigne(result.meta);
 }
 
 /**
