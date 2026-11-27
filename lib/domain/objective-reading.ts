@@ -302,7 +302,7 @@ function sameShownMm(left: number | null, right: number | null): boolean {
 /**
  * Les lignes « automatique » du volet (point 2) : une par jardin dont des
  * planches suivent l'objectif automatique, avec la moyenne de surface de
- * leurs millimètres, puis une par planche dont la valeur ou l'origine
+ * leurs millimètres (sur les seules planches chiffrées, que la ligne compte), puis une par planche dont la valeur ou l'origine
  * s'écarte de celle de son jardin. Les jardins dans l'ordre du tableau des
  * besoins. Aucune ligne quand aucune planche ne suit l'objectif automatique.
  */
@@ -313,9 +313,14 @@ export function automaticObjectiveLines(beds: readonly ObjectiveBedReading[]): A
     const [first] = plotBeds;
     const gardenMm = farmObjective(plotBeds).objectiveMm;
     const gardenOrigin = groupObjectiveOriginText(plotBeds) ?? objectiveOriginText(first) ?? 'automatique';
+    // La moyenne ne porte que sur les planches chiffrées : la ligne dit lesquelles, « 1 planche sur 2 » (recette de la ligne 34, écart a).
+    const valued = plotBeds.filter((bed) => bed.objectiveMm !== null).length;
+    const counted = valued > 0 && valued < plotBeds.length
+      ? `${valued} planche${valued > 1 ? 's' : ''} sur ${plotBeds.length}`
+      : `${plotBeds.length} planche${plotBeds.length > 1 ? 's' : ''}`;
     const garden: AutomaticObjectiveLine = {
       key: `plot:${first.plotId}`,
-      label: `${first.plotName} · ${plotBeds.length} planche${plotBeds.length > 1 ? 's' : ''}`,
+      label: `${first.plotName} · ${counted}`,
       scopeValue: `plot:${first.zoneId}:${first.plotId}`,
       mm: gardenMm,
       origin: gardenOrigin,
