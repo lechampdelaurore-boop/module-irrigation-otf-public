@@ -12,6 +12,20 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
+  26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
+  § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
+  PR 2. Dans « Réglages », la carte « Lieu de la météo » porte un pli fermé
+  (sa ligne dit le modèle gardé) avec la liste des modèles qui couvrent le lieu (« Automatique » d'abord), la phrase de la
+  règle 12, les faits du modèle sans mot de qualité et « Enregistrer le
+  modèle », qui vérifie par une lecture ; la carte dit jusqu'à quel jour les
+  prévisions gardées viennent du modèle et, une semaine durant, le retour du
+  module à « Automatique ». Absent en démonstration. Parcours P72 aux deux
+  largeurs. **Première PR où une ferme peut choisir** : le premier
+  enregistrement en ligne fera l'essai B. Contrôles : voir la PR. Le
+  contrat (#242), la PR 0 (#248) et la PR 1 (#249) sont en ligne depuis le
+  27 novembre 2026, la PR 2 (#250) depuis 21 h 46 ; celle-ci la suit,
+  `main` fusionnée dedans ; elle consigne la mise en ligne de la PR 2.
 - **Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par
   lieu et par modèle, codée le 26 novembre 2026** (D-346, F1016 à F1022 ;
   contrat v0.2, § 3, § 5, § 6, § 8 ; roadmap ligne 36), en Opus 5.5 · Max,
@@ -27,8 +41,9 @@ registres, elle y renvoie.
   ferme en « Automatique » lit exactement comme avant. Contrôles : voir la
   PR ; `pnpm e2e` joué par la CI (job « Parcours navigateur »), les
   services de l'écran changent. Consigne la mise en ligne du contrat
-  (#242), de la PR 0 (#248) et de la PR 1 (#249). Vient la PR 3 (l'écran,
-  Opus 5.5 · Élevé).
+  (#242), de la PR 0 (#248) et de la PR 1 (#249). **En ligne le
+  27 novembre 2026 à 21 h 46** (#250, run 46060219139, cinq jobs verts ;
+  migration 0053 appliquée en production et sur la démonstration).
 - **Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un
   modèle choisi, codée le 26 novembre 2026** (D-345, F1009 à F1015 ;
   contrat v0.2, § 3 à § 5, § 10, § 14 ; roadmap ligne 36), en Opus 5.5 ·

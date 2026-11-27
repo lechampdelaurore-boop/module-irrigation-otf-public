@@ -362,20 +362,41 @@ test('à l’écran : la ferme lit son modèle et le crédite ; un modèle hors 
   await saveForecastModelForUser(ALICE, ICON, '2026-11-25T09:00:00.000Z');
   const reader = new ModelReader();
   const provider = new AutomaticProvider();
-  const dashboard = await getWaterDashboardForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, now: TEN, provider, modelReader: reader, forceWeatherRefresh: true });
+  const dashboard = await getWaterDashboardForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, now: TEN, provider, modelReader: reader, forceWeatherRefresh: true, includeForecastModelSetting: true });
   assert.deepEqual(reader.calls.map((call) => call.modelId), [ICON]);
+  // L'écran relit la semaine, que le modèle couvre : aucun jour complété à dire (règle 6 ; D-347).
+  assert.deepEqual(dashboard.weather.forecastModelSetting, { completion: null, returnNotice: null });
   assert.equal(provider.forecastCalls, 0, 'la prévision vient du modèle ; la réanalyse, elle, du fournisseur');
   assert.match(dashboard.weather.attribution, /^Prévisions : DWD, par Open-Meteo/);
+  // L'écran offre le réglage quand le déploiement lit les modèles (D-347).
+  assert.equal(dashboard.weather.forecastModelsAvailable, true);
   assert.equal((await forecastRows(ALICE, BOURGES, '2026-11-26', '2026-11-26'))[0][4], 'open-meteo:icon_seamless');
 
   await farmAt(BOB, 'Montréal');
   await saveForecastModelForUser(BOB, METEO_FRANCE, '2026-11-25T09:00:00.000Z');
   const bobReader = new ModelReader();
-  const bobDashboard = await getWaterDashboardForUser({ ownerUserId: BOB, season: 2026, snapshot: SNAPSHOT, now: TEN, provider, modelReader: bobReader, forceWeatherRefresh: true });
+  const bobDashboard = await getWaterDashboardForUser({ ownerUserId: BOB, season: 2026, snapshot: SNAPSHOT, now: TEN, provider, modelReader: bobReader, forceWeatherRefresh: true, includeForecastModelSetting: true });
+  // Le retour du module se dit sur la carte de cette ferme seulement (règle 9 ; D-347).
+  assert.deepEqual(bobDashboard.weather.forecastModelSetting, {
+    completion: null,
+    returnNotice: '« Météo-France (AROME puis ARPEGE) » ne couvre pas le lieu de la ferme : depuis le jeu. 26 nov., la ferme lit de nouveau « Automatique ».',
+  });
+  // Un jour complété au-delà, comme la tâche du matin l'écrit : la carte dit le dernier jour du modèle, chez Alice seulement.
+  const completed = { date: '2026-11-30', precipitationMm: 2, et0Mm: 0.5, minimumTemperatureCelsius: 3, maximumTemperatureCelsius: 9 };
+  await upsertWeatherDailyValuesForUser(ALICE, BOURGES, 'forecast', [completed], forecastModelSource(COMPLETION_FORECAST_MODEL_ID), TEN.toISOString());
+  const aliceAgain = await getWaterDashboardForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, now: TEN, provider, modelReader: reader, includeForecastModelSetting: true });
+  assert.deepEqual(aliceAgain.weather.forecastModelSetting, {
+    completion: 'Prévisions gardées : ce modèle jusqu’au dim. 29 nov., puis « Automatique d’Open-Meteo ».',
+    returnNotice: null,
+  });
   assert.deepEqual(bobReader.calls, []);
   assert.equal((await readWeatherPreferenceForUser(BOB)).forecastModel, null);
   assert.equal(changeJournalCard((await journal(BOB)).at(-1)!, { viewerUserId: BOB, nameOf: () => null }).who, 'Le module');
   assert.equal(bobDashboard.weather.attribution, weatherAttribution(provider), '« Automatique » est crédité comme avant');
+  // Sans lecteur des modèles (la démonstration, règle 13), l'écran n'offre pas le réglage (D-347).
+  const withoutModels = await getWaterDashboardForUser({ ownerUserId: BOB, season: 2026, snapshot: SNAPSHOT, now: TEN, provider, modelReader: null });
+  assert.equal(withoutModels.weather.forecastModelsAvailable, false);
+  assert.equal(withoutModels.weather.forecastModelSetting, null, 'ni lecture de la carte');
 });
 
 // --- Alertes et besoins (§ 8.7) ---------------------------------------------------------------

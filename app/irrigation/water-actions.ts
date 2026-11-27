@@ -72,6 +72,7 @@ export async function loadWaterDashboardAction(input: {
       allowWeatherRefresh: input.allowWeatherRefresh !== false,
       includeWeatherAlerts: true,
       includeAutomaticObjective: true,
+      includeForecastModelSetting: true,
     });
     return {
       ok: true,
@@ -553,6 +554,7 @@ async function successWithDashboard(
         allowWeatherRefresh: forceWeatherRefresh,
         includeWeatherAlerts: true,
         includeAutomaticObjective: true,
+        includeForecastModelSetting: true,
       }),
     };
   } catch (error) {

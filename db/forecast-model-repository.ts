@@ -2,7 +2,7 @@ import { db } from './binding';
 import { forecastModelJournal } from './change-journal/places';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
-import { MODULE_ACTOR_ID } from '@/lib/domain/change-journal/entry';
+import { MODULE_ACTOR_ID, parseChangeValues } from '@/lib/domain/change-journal/entry';
 
 /**
  * Le modèle de prévision d'une ferme (docs/weather-models-contract.md, § 3
@@ -59,4 +59,54 @@ export async function returnForecastModelToAutomaticForUser(ownerUserId: string,
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return false;
   return returnForecastModelToAutomatic({ workspaceId, savedModelId, at });
+}
+
+/** Ce que la carte « Modèle de prévision » lit (D-347) : les sources des prévisions à venir, le dernier changement du modèle. */
+export type ForecastModelSettingRecords = {
+  /** Les prévisions gardées à ce lieu, d'aujourd'hui aux jours suivants, avec la source de chaque jour. */
+  forecastDays: { date: string; source: string }[];
+  /** Le dernier changement du modèle de la ferme au journal ; `null` s'il n'y en a aucun. */
+  lastChange: { byModule: boolean; previousModelId: string | null; at: string } | null;
+};
+
+/**
+ * Lit, pour l'écran, les prévisions à venir de la ferme (le dernier jour de
+ * son modèle, règle 6) et la dernière ligne « Modèle de prévision » du
+ * journal (le retour du module, règle 9). Toute lecture porte l'espace de
+ * la personne ; sans espace, rien.
+ */
+export async function readForecastModelSettingForUser(
+  ownerUserId: string,
+  locationKey: string | null,
+  fromDate: string,
+): Promise<ForecastModelSettingRecords> {
+  const workspaceId = await findWorkspaceIdForUser(ownerUserId);
+  if (!workspaceId) return { forecastDays: [], lastChange: null };
+  const [days, change] = await db.batch([
+    db.prepare(
+      `SELECT date, source FROM irrigation_weather_daily_values
+       WHERE workspace_id = ? AND location_key = ? AND data_kind = 'forecast' AND date >= ?
+       ORDER BY date`,
+    ).bind(workspaceId, locationKey ?? '', fromDate),
+    db.prepare(
+      `SELECT actor_user_id, before_values, created_at FROM irrigation_change_journal
+       WHERE workspace_id = ? AND subject = 'modele-meteo'
+       ORDER BY created_at DESC, rowid DESC LIMIT 1`,
+    ).bind(workspaceId),
+  ]);
+  const last = (change.results as { actor_user_id: string; before_values: string | null; created_at: string }[])[0];
+  return {
+    forecastDays: (days.results as { date: string; source: string }[]).map((row) => ({ date: row.date, source: row.source })),
+    lastChange: last === undefined ? null : {
+      byModule: last.actor_user_id === MODULE_ACTOR_ID,
+      previousModelId: previousModel(last.before_values),
+      at: last.created_at,
+    },
+  };
+}
+
+function previousModel(json: string | null): string | null {
+  const before = parseChangeValues(json);
+  const value = before?.forecastModel;
+  return typeof value === 'string' && value !== '' ? value : null;
 }

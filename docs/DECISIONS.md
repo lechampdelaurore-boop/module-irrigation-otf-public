@@ -12455,7 +12455,9 @@ en démonstration.
 
 ## D-346 — Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par lieu et par modèle
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée, en ligne le 27 novembre 2026 à
+21 h 46** (#250, fusionnée à 20 h 56, run 46060219139, cinq jobs verts ;
+migration 0053 appliquée en production et sur la démonstration) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 1 à 3, 6 à 9 et 11 à 14 ;
 § 5 ; § 6 ; § 8 points 1, 3, 4, 5, 7 et 8 ; § 12), roadmap section
 6 sexdecies, ligne 36. Code en Opus 5.5 · Max, le réglage de la PR 2
@@ -12561,6 +12563,97 @@ réglage et journal, retour du module, jamais un mélange, export, import et
 effacement, tâche du matin (lignes, sources et archive de chaque ferme),
 règle 9, enregistrement en échec et réussi (jour passé et archive intacts),
 refus, délai, « Automatique », écran, mêmes alertes à données égales.
+
+## D-347 — Météo multi-modèles, PR 3 : l'écran « Modèle de prévision »
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/weather-models-contract.md` v0.2 (§ 3 règles 3, 6, 9, 10, 12 et 13 ;
+§ 8 point 6 ; § 11 point 5 ; § 12), roadmap section 6 sexdecies, ligne 36.
+Code en Opus 5.5 · Élevé, le réglage de la PR 3. Aucune question
+agronomique.
+
+**Décision.** La carte « Lieu de la météo » de « Réglages » porte le réglage
+« Modèle de prévision », dans un pli fermé : une liste (« Automatique », puis les modèles de la
+liste du logiciel qui couvrent le lieu de la ferme), la phrase de la
+règle 12, les faits du modèle choisi et un bouton « Enregistrer le modèle ».
+Le geste appelle l'enregistrement vérifié de la PR 2
+(`saveForecastModelChoiceForUser`) et montre sa réponse sous la carte, comme
+les autres gestes du tableau de l'eau. Rien sur « Aujourd'hui ». Le réglage
+n'existe pas en démonstration. **C'est la première PR qui laisse une ferme
+choisir** : à la mise en ligne, toutes les fermes restent en « Automatique »
+tant que personne ne choisit, et le premier enregistrement en ligne fait
+l'essai B (journal technique `weather_forecast_model_verified`).
+
+Précisions prises en codant (option recommandée, modifiables par le porteur) :
+
+- **F1023** — La place et les mots (§ 11 point 5) : sous le choix de la
+  commune, un titre « Modèle de prévision », la phrase de la règle 12 mot
+  pour mot, une liste « Modèle », le bouton « Enregistrer le modèle »
+  (« Vérification… » pendant la lecture), inactif tant que le choix ne
+  change pas, et une ligne : « Le modèle est vérifié par une lecture avant
+  d’être gardé ; les jours passés gardent leurs prévisions. » Sans commune
+  localisée, la carte le dit au lieu de la liste : « Choisissez d’abord la
+  commune : un modèle se vérifie par une lecture sur son lieu. » Au
+  téléphone, la liste et le bouton font 44 px. Pas de visite guidée : un
+  réglage de plus dans une carte existante, avec sa phrase, n'en demande pas.
+  Les mots sont relus par le porteur à la recette.
+- **F1024** — L'absence en démonstration (règle 13) : le tableau de l'eau dit
+  si le déploiement lit les modèles (`forecastModelsAvailable`, faux sans
+  lecteur, donc en démonstration) ; faux, la carte ne monte pas le réglage.
+- **F1025** — Les faits d'un modèle (règles 6 et 10) : « fournisseur ·
+  maille ; prévoit environ N jours, au-delà les jours viennent
+  d’« Automatique d’Open-Meteo » », la portée étant celle mesurée par
+  l'essai A ; « Automatique d’Open-Meteo » : sa maille et sa portée ;
+  « Automatique » : « Le module lit la prévision comme il l’a toujours
+  fait. » Aucun mot de qualité (vérifié par un test).
+- **F1026** — Les jours complétés (règle 6) : la réponse de l'enregistrement
+  dit le dernier jour du modèle (PR 2) ; ensuite, la carte le redit tant que
+  la ferme garde ce modèle : « Prévisions gardées : ce modèle jusqu’au <jour>,
+  puis « Automatique d’Open-Meteo ». », lu dans les prévisions gardées
+  d'aujourd'hui aux jours suivants (leur `source`), seulement si un jour
+  suivant est complété. Ces deux lectures (prévisions à venir, dernière
+  ligne « Modèle de prévision » du journal) ne se font que pour « Réglages »
+  et la réponse d'un geste du tableau de l'eau
+  (`includeForecastModelSetting`), jamais pour les autres pages, et jamais
+  sans lecteur des modèles.
+- **F1027** — Le retour à « Automatique » fait par le module (règle 9) : la
+  carte le dit pendant **7 jours** après le retour, tant que la ferme est en
+  « Automatique » et que c'est le dernier changement de son modèle :
+  « « <modèle> » ne couvre pas le lieu de la ferme : depuis le <jour>, la
+  ferme lit de nouveau « Automatique ». » ; un modèle sorti de la liste ne
+  se nomme pas : « Le modèle choisi n’est plus proposé : … » (F1019). « Une
+  fois » se lit « une semaine, sans geste à faire » : rien ne retient qu'un
+  message a été vu. Le journal des modifications garde la ligne au nom de
+  « Le module ».
+- **F1028** — Le geste (`saveForecastModelAction`, dans son fichier `app/irrigation/forecast-model-actions.ts`, qui relit ensuite le tableau de l’eau sans relire la météo) n’accepte qu'un texte de
+  64 signes au plus, vide pour « Automatique » ; un refus ou un échec de la
+  preuve répond par le message de la PR 2, en alerte, et rien ne change à
+  l'écran ; un enregistrement répond par son message et le tableau relu.
+- **F1029** — Le parcours P72 (§ 8 point 6) : ferme neuve des parcours,
+  toutes cases cochées, Rennes (couverte par Météo-France), à 390 px et à
+  1 440 px : « Automatique » par défaut, Météo-France choisi, vérifié et
+  gardé, la page rechargée le relit et dit le dernier jour du modèle, puis
+  retour à « Automatique ». Il attend 31 secondes avant chaque
+  enregistrement (le délai de 30 secondes entre deux lectures de la ferme).
+  Il ne vérifie pas l'attribution : la météo des parcours se dit « de
+  démonstration » (F1021), l'attribution d'un modèle est tenue par
+  `tests/weather-models-reglage.test.ts`.
+- **F1030** — Un pli fermé (règle de P40 : « toute section nouvelle de
+  « Réglages » se plie ») : « Modèle de prévision » est un pli de la carte
+  « Lieu de la météo », sa ligne dit le modèle gardé (« Automatique » ou
+  son libellé) ; il s'ouvre par son ancre `#modele-de-prevision`, reste
+  ouvert après un enregistrement, et s'ouvre d'office quand il dit le
+  retour du module à « Automatique » (F1027). Le budget de hauteur de
+  « Réglages » au téléphone passe de 3 750 à 3 850 px (3 793 px mesurés en
+  local), comme pour chaque pli d'une ligne ajouté avant lui.
+
+**Tests.** `tests/weather-models-ecran.test.ts` (7) : choix offerts par lieu, ligne du pli,
+choix montré, faits sans mot de qualité, phrase de la règle 12, jours
+complétés, retour du module (7 jours, modèle retiré non nommé).
+`tests/db/forecast-model-reglage.test.ts`, test « à l'écran » étendu :
+réglage offert avec un lecteur et absent sans, jours complétés lus pour la
+ferme seule, retour du module dit sur la carte de cette ferme seule.
+Parcours P72 aux deux largeurs.
 
 ## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
 

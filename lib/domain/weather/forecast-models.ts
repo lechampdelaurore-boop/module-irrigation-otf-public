@@ -177,7 +177,7 @@ export function forecastDaysForModel(
  * Ce que l'écran dira des jours complétés (règle 6) : le dernier jour donné
  * par le modèle choisi et le premier jour complété, ou `null` si aucun.
  */
-export function forecastCompletion(modelId: string, days: readonly SourcedWeatherDay[]): {
+export function forecastCompletion(modelId: string, days: readonly Pick<SourcedWeatherDay, 'date' | 'source'>[]): {
   lastModelDate: string | null;
   firstCompletedDate: string | null;
 } {
