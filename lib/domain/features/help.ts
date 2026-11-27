@@ -76,8 +76,8 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   'ma-ferme': {
     purpose: 'Retrouver ce que le module sait de votre ferme : votre matériel, d’où vient l’eau, vos cultures, votre sol, les alertes et les réglages. On y vient surtout à l’installation, ou quand quelque chose change au champ.',
-    reading: 'Chaque fiche ouvre sa page et dit en une ligne à quoi elle sert. « À faire », en orange, marque une fiche où il reste une étape de l’accueil de la ferme, la même que dans « À finir ». Seules vos fonctionnalités cochées ont leur fiche ; Réglages est toujours là.',
-    firstStep: 'Touchez d’abord une fiche « À faire », s’il y en a une. Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
+    reading: 'Chaque fiche ouvre sa page et dit en une ligne où elle en est, comme « 4 goutte-à-goutte, tous posés ». « À faire », en orange, marque une étape de l’accueil de la ferme, comme « À finir ». Une ferme qui commence voit sa mise en route en tête. Seules vos fonctionnalités cochées ont leur fiche.',
+    firstStep: 'Suivez la mise en route si elle est en tête, ou touchez une fiche « À faire ». Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
   },
   reglages: {
     purpose: 'Choisir les fonctionnalités affichées, et régler ce qui sert à plusieurs pages.',

@@ -16,7 +16,7 @@ import {
   withSeenTour,
   type TourContext,
 } from '../lib/domain/demo/tour-engine.ts';
-import { TOUR_ANCHORS, TOURS, tourById, type TourPage } from '../lib/domain/demo/tours.ts';
+import { TOUR_ANCHORS, TOURS, allStepWords, tourById, type TourPage } from '../lib/domain/demo/tours.ts';
 import { isIrrigationPageId, menuPages } from '../lib/domain/features/pages.ts';
 import { farm, largeFarm } from './support/planning-fixtures.ts';
 
@@ -83,13 +83,14 @@ test('chaque page d’étape existe, et la visite « Et pour ma ferme ? » est d
   assert.ok(tourById('ma-ferme')!.steps.every((step) => !step.anchor && !step.pages));
 });
 
-const TEXTS = TOURS.flatMap((tour) => [tour.title, tour.summary, tour.bestWith ?? '', ...tour.steps.flatMap((step) => [step.title, step.text])]);
+// Les mots propres à une page (l'écran des trois façons, lot S6) sont relus comme les autres.
+const TEXTS = TOURS.flatMap((tour) => [tour.title, tour.summary, tour.bestWith ?? '', ...tour.steps.flatMap(allStepWords).flatMap((words) => [words.title, words.text])]);
 
 test('des textes courts, sans emoji ni sigle laissé sans son sens', () => {
   for (const tour of TOURS) {
-    for (const step of tour.steps) {
-      assert.ok(step.title.length <= 50, `titre trop long : ${step.title}`);
-      assert.ok(step.text.length <= 320, `texte trop long (${step.text.length}) : ${step.title}`);
+    for (const words of tour.steps.flatMap(allStepWords)) {
+      assert.ok(words.title.length <= 50, `titre trop long : ${words.title}`);
+      assert.ok(words.text.length <= 320, `texte trop long (${words.text.length}) : ${words.title}`);
     }
   }
   for (const text of TEXTS) {

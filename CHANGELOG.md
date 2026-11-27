@@ -14,6 +14,85 @@ source détaillée commit par commit.
   saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
   l'historique ne changent pas. Quatre PR de code à venir.
 
+### Modifié (simplifier l'usage du module, S6, PR 4 : les visites, la ferme vierge, les contrats)
+
+- **La visite guidée parle des trois façons de commencer** (D-336, F976
+  à F978) : sur l'écran de la première ouverture, les deux étapes de « Le
+  module à la carte » disent « Trois façons de commencer » et « Rien
+  n’est choisi d’avance » ; dans Réglages, elles gardent leurs mots.
+  Aucune étape ajoutée ni retirée ; la bulle et l'annonce du lecteur
+  d'écran disent les mots de la page ouverte.
+- **La ferme vierge de la démonstration** (F979) se présente comme « les
+  trois façons de commencer, et rien de réglé » ; « Remettre à zéro » la
+  rend vierge, sans façon choisie ni état de la carte « Mise en route ».
+- **Le « ? » de « Ma ferme »** (F980) dit que chaque fiche dit où elle en
+  est, et que la mise en route est en tête pour une ferme qui commence.
+- **Sept contrats validés** (F981) disent, à l'endroit de chaque passage,
+  ce que S6 y change. **Le code de S6 est fini.**
+- **Parcours P67 (S4) le soir** : lancé après 23 h, il trouvait une
+  journée trop courte pour deux arrosages de 50 min ; le plan en propose
+  quatre plus courts et « Jour par jour » s'allonge (2 060 px au lieu de
+  1 750 au plus). La hauteur du premier niveau et les choses à toucher
+  ne sont bornées que dans le cas mesuré (deux arrosages) ; sinon le
+  parcours le dit (« hors jeu ») et joue tout le reste. La vérification
+  de cette PR et le déploiement de la PR 3 avaient échoué ainsi à 23 h 28.
+
+### Ajouté (simplifier l'usage du module, S6, PR 3 : les lignes d'état des fiches de « Ma ferme »)
+
+- **Chaque fiche de « Ma ferme » dit son état en une ligne** (D-336, F969
+  à F975) quand la donnée est connue : « 2 goutte-à-goutte et 1
+  aspersion, 1 pas posé », « Puits : débit de 2 m³/h », « Bassin des
+  noues : 30 m³ sur 40 m³, observé aujourd’hui », « 4 cultures cette
+  saison », « À renseigner pour 3 parcelles », « 2 alertes réglées, 1
+  inactive », « Météo de Nantes · 11 fonctionnalités cochées ». Chaque
+  nombre est celui que la page de la fiche montre, sous son mot ; la
+  ligne fixe revient quand la donnée est inconnue ou vide, jamais un
+  « 0 » pour un inconnu. « Alertes cultures » garde sa ligne fixe. La
+  marque « À faire » reste à côté.
+- **Une seule lecture** pour la carte « Mise en route » et les fiches :
+  l'étape 1 et la fiche du matériel comptent les mêmes matériels (tout le
+  matériel actif, comme l'inventaire), l'étape 3 et la fiche de l'eau les
+  mêmes ressources et réserves, l'étape 5 et la fiche du sol les mêmes
+  parcelles. Deux lectures nouvelles et légères : le nombre des alertes
+  météo réglées, les clés des cultures que la ferme connaît. Aucune
+  requête par planche ; « Ma ferme » reste sous le temps de Réglages.
+
+### Ajouté (simplifier l'usage du module, S6, PR 2 : la carte « Mise en route »)
+
+- **La carte « Mise en route » en tête de « Ma ferme »** (D-336, F958 à
+  F968) : pour une ferme qui a commencé par une des trois façons, les
+  étapes qui décrivent la ferme (le matériel, où il est posé, d'où vient
+  l'eau, combien vous visez par semaine, le sol), selon les cases
+  cochées, « 3 étapes sur 5 » et sa barre, l'étape en cours avec ce qui
+  lui manque et « Continuer l'étape n ». Une étape est faite quand ce
+  qu'elle décrit existe : rien ne se coche à la main. « Plus tard » la
+  range en une ligne « Reprendre la mise en route » ; toutes les étapes
+  faites, « Terminer la mise en route » la retire pour de bon. Le bandeau
+  « À finir » n'est plus répété sur « Ma ferme » quand la carte est là.
+- **« Aujourd'hui » d'une ferme pas encore prête** : quand aucun arrosage
+  n'est à montrer, la ligne vide devient un bloc qui dit l'étape en cours
+  et mène à elle. Les fermes qui utilisaient déjà le module ne voient
+  rien changer.
+
+### Modifié (simplifier l'usage du module, S6, PR 1 : les trois façons de commencer)
+
+- **Trois façons de commencer à la première ouverture** (D-336, F947 à
+  F957) : « Je note mes arrosages », « Le module me propose quoi arroser »
+  (conseillé) ou « Tout : sol, cultures et alertes », à la place de la
+  liste des onze cases. Rien n'est choisi d'avance ; une phrase dit combien
+  d'étapes suivent pour décrire la ferme ; le serveur coche lui-même les
+  cases de la façon choisie. « Choisir moi-même les fonctionnalités »
+  montre toujours les onze cases. Après « Continuer », la première arrivée
+  est « Ma ferme » ; les ouvertures suivantes ne changent pas. Réglages dit
+  comment la ferme a commencé. « Commencer par l'essentiel » disparaît. Une
+  migration additive (0051) garde la façon choisie ; les fermes qui
+  utilisent déjà le module ne voient rien changer.
+- **Contrôles du dépôt** : les parcours navigateur ont 75 minutes au lieu
+  de 50. Ils en prennent trente-deux à quarante-sept selon la machine de
+  GitHub, et la vérification de cette PR a été coupée à 50 minutes pendant
+  les parcours de la démonstration (run 45880035932). Aucun parcours ne
+  change.
+
 ### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
 
 - **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
@@ -276,7 +355,6 @@ source détaillée commit par commit.
   les jours et les jardins au premier niveau, le reste derrière « Le détail ».
   Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
   adresses sont gardées.
-
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,

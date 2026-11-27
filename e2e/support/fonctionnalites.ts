@@ -14,15 +14,20 @@ export async function ouvrirUneFermeNeuve(context: BrowserContext, testInfo: Tes
   await context.addCookies([{ name: 'demo-farm', value: `${nom}-${testInfo.project.name}`, url: adresse }]);
 }
 
-/** Une ferme neuve, propre au parcours et à la largeur, toutes les cases cochées, arrivée sur « Aujourd'hui » (P31). */
+/**
+ * Une ferme neuve, propre au parcours et à la largeur, toutes les cases cochées
+ * par la troisième façon de commencer (« Tout », lot S6, D-336) : la première
+ * arrivée est « Ma ferme » (section 3.4), puis « Aujourd'hui », la page
+ * d'arrivée des ouvertures suivantes (F31), où le parcours commence (P31).
+ */
 export async function ouvrirUneFermeToutCochee(page: Page, context: BrowserContext, testInfo: TestInfo, nom: string): Promise<void> {
   await ouvrirUneFermeNeuve(context, testInfo, nom);
   await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
+  await attendreLaPremiereOuverture(page);
+  await page.getByRole('radio', { name: 'Tout : sol, cultures et alertes' }).check();
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await attendreLaPagePrete(page, 'ma-ferme');
+  await page.goto('/irrigation/aujourdhui');
   await attendreLaPagePrete(page, 'aujourdhui');
 }
 
@@ -100,11 +105,18 @@ export async function preparerLaFermeNeuve(page: Page): Promise<void> {
   await validerLesReglagesDuPlanning(page);
 }
 
-/** L'écran de la première ouverture, prêt à répondre. */
-export async function attendreLeChoixDesFonctionnalites(page: Page): Promise<void> {
+/** L'écran de la première ouverture, les trois façons de commencer (lot S6, D-336), prêt à répondre. */
+export async function attendreLaPremiereOuverture(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/irrigation\/bienvenue$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Choisissez vos fonctionnalités' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Comment voulez-vous commencer ?' })).toBeVisible();
   await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
+}
+
+/** La liste des cases de la première ouverture : « Choisir moi-même les fonctionnalités », sur la même page (S6, section 3.2). */
+export async function attendreLeChoixDesFonctionnalites(page: Page): Promise<void> {
+  await attendreLaPremiereOuverture(page);
+  await page.getByRole('button', { name: 'Choisir moi-même les fonctionnalités' }).click();
+  await expect(page.getByRole('heading', { level: 2, name: 'Choisir moi-même les fonctionnalités' })).toBeVisible();
 }
 
 /** La case d'une fonctionnalité, par le début de son nom : son libellé porte aussi sa description. */
