@@ -12455,7 +12455,9 @@ en démonstration.
 
 ## D-346 — Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par lieu et par modèle
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée, en ligne le 27 novembre 2026 à
+21 h 46** (#250, fusionnée à 20 h 56, run 46060219139, cinq jobs verts ;
+migration 0053 appliquée en production et sur la démonstration) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 1 à 3, 6 à 9 et 11 à 14 ;
 § 5 ; § 6 ; § 8 points 1, 3, 4, 5, 7 et 8 ; § 12), roadmap section
 6 sexdecies, ligne 36. Code en Opus 5.5 · Max, le réglage de la PR 2
