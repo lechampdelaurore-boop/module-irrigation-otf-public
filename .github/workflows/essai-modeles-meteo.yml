@@ -1,0 +1,40 @@
+name: Essai des modèles météo
+
+# L'essai A de la météo multi-modèles (docs/weather-models-contract.md, § 7) :
+# huit appels à l'API gratuite d'Open-Meteo, depuis un lanceur GitHub, parce
+# que le conteneur de l'assistant n'atteint pas Open-Meteo. Il relève le nom
+# des séries dans une réponse à plusieurs modèles, les variables rendues par
+# chaque modèle et leur portée réelle. Aucune clé, aucun secret, aucune base,
+# deux lieux quelconques (aucune ferme) ; le compte rendu est dans le résumé du
+# flux et dans le journal, prêt à être collé dans la PR du code.
+#
+# Il ne se lance jamais sur une PR : à la main (onglet Actions, une fois ce
+# fichier dans main) ou en poussant la branche `essai-modeles-meteo`.
+on:
+  workflow_dispatch:
+  push:
+    branches: [essai-modeles-meteo]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: essai-modeles-meteo
+  cancel-in-progress: false
+
+jobs:
+  essai:
+    name: Essai A (modèles Open-Meteo)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+      # Aucune dépendance à installer : le script n'emploie que Node.js et le
+      # domaine du dépôt (dates).
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+      - name: Jouer l'essai A
+        run: node --experimental-strip-types --no-warnings scripts/weather-models-trial.ts

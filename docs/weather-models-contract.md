@@ -1,6 +1,8 @@
-# Contrat de la météo multi-modèles (choix du modèle de prévision par ferme) : v0.1 (D-339)
+# Contrat de la météo multi-modèles (choix du modèle de prévision par ferme) : v0.2 (D-339)
 
 Écrit le 26 novembre 2026 **sans code** (Sonnet 5.5 · Moyen), sur le choix du porteur d'avancer la météo multi-modèles (message du 26 novembre 2026, 10 h 25). Il reprend la recherche du 8 novembre 2026 (`/mnt/project-files/meteo-modeles/synthese-choix-modeles-meteo.md`) **après relecture du dépôt** : là où la recherche et le code diffèrent, c'est le code qui fait foi (§ 2). Sources lues : `docs/weather-contract.md`, `db/schema.ts` (`irrigation_weather_daily_values`, `irrigation_weather_preferences`, `irrigation_weather_forecast_archive`), `lib/services/weather/configured-provider.ts`, `lib/domain/weather/weather-provider.ts`, `lib/adapters/weather/open-meteo-provider.ts`, `app/irrigation/water-actions.ts`, AGENTS.md (règles métier invariantes).
+
+**v0.2, 26 novembre 2026** : l'essai A est joué (§ 14) ; il confirme la liste du § 4, le nom des séries et la portée réelle des modèles. Aucune règle ne change.
 
 Rien de ce contrat ne s'applique à une ferme qui ne choisit rien : **réglage « Automatique », rien ne change** (§ 3, règle 1).
 
@@ -45,15 +47,15 @@ Le logiciel est **multi-fermes** : rien n'est écrit pour la seule ferme du port
 
 ## 4. La liste des modèles (du code, jamais de l'écran)
 
-Fichier de domaine unique `lib/domain/weather/forecast-models.ts`, testé : pour chaque entrée, l'identifiant Open-Meteo, le libellé en clair, le fournisseur, la finesse et la portée (texte court), la zone couverte (rectangle de latitude et longitude, à relever dans la documentation Open-Meteo au codage), et un indicateur « proposé ». Le contenu de départ, **à confirmer par l'essai A** avant le code :
+Fichier de domaine unique `lib/domain/weather/forecast-models.ts`, testé : pour chaque entrée, l'identifiant Open-Meteo, le libellé en clair, le fournisseur, la finesse et la portée (texte court), la zone couverte (rectangle de latitude et longitude, à relever dans la documentation Open-Meteo au codage), et un indicateur « proposé ». Le contenu de départ, **confirmé par l'essai A le 26 novembre 2026** (§ 14 : les cinq identifiants répondent, rendent les cinq séries chaque jour de leur portée ; portée mesurée sur une fenêtre de 15 jours) :
 
-| Libellé proposé | Famille Open-Meteo (à vérifier) | Portée | Zone |
+| Libellé proposé | Identifiant Open-Meteo (essai A) | Portée (essai A) | Zone |
 | --- | --- | --- | --- |
-| Automatique d'Open-Meteo | `best_match` | longue | partout |
-| Météo-France (AROME puis ARPEGE) | `meteofrance_seamless` | ~4 jours | France et voisinage |
-| DWD (ICON) | `icon_seamless` | ~7 jours | Europe |
-| Centre européen (ECMWF) | `ecmwf_ifs025` | ~15 jours | partout |
-| NOAA (GFS) | `gfs_seamless` | ~16 jours | partout |
+| Automatique d'Open-Meteo | `best_match` | 15 jours sur 15 | partout |
+| Météo-France (AROME puis ARPEGE) | `meteofrance_seamless` | 4 jours | France et voisinage |
+| DWD (ICON) | `icon_seamless` | 7 jours | Europe |
+| Centre européen (ECMWF) | `ecmwf_ifs025` | 15 jours sur 15 | partout |
+| NOAA (GFS) | `gfs_seamless` | 15 jours sur 15 | partout |
 
 Règles de tenue :
 
@@ -141,3 +143,19 @@ Le code d'un lot ne commence que sur la décision de l'ordre d'exécution (roadm
 ## 13. Preuve de fin
 
 Les huit familles de tests du § 8 ; l'essai A collé dans la PR 1 ; l'essai B consigné ; la recette (constat de l'assistant, jugement du porteur) sur la ferme réelle **seulement sur son accord**, en choisissant un modèle puis en revenant à « Automatique » (retour à l'état de départ relevé avant) ; `docs/weather-contract.md` réécrit (fournisseur, source, décompte des appels, licence) à la mise en ligne.
+
+## 14. Résultat de l'essai A (26 novembre 2026)
+
+Joué par le flux « Essai des modèles météo » (`.github/workflows/essai-modeles-meteo.yml`, script `scripts/weather-models-trial.ts`), sur un lanceur GitHub, sans clé ni secret, sur deux lieux quelconques (Bourges pour la France, Montréal hors d'Europe ; aucune ferme) : runs 45827003670 (14 h 13, heure de Paris, sept appels) et 45827275586 (14 h 15, huit appels, la pluie heure par heure en plus). Fenêtre : aujourd'hui et 14 jours de plus, celle de la synchronisation. Comptes rendus et réponses brutes : `/mnt/project-files/meteo-modeles/essai-a-2026-11-26/`. Constats, valables pour ce jour-là :
+
+1. **Noms des séries.** Avec deux modèles ou plus dans `models`, chaque série du jour est suffixée par le modèle : `precipitation_sum_meteofrance_seamless`, `precipitation_sum_best_match`, et de même pour `temperature_2m_min`, `temperature_2m_max`, `et0_fao_evapotranspiration`, `shortwave_radiation_sum` ; les unités suivent (`mm`, `°C`, `MJ/m²`). **Avec un seul modèle, les séries ne sont pas suffixées.** La lecture de production demande toujours deux modèles (le choisi et `best_match`, § 5) : elle lit les noms suffixés.
+2. **Au-delà de la portée, la série est là, ses valeurs sont `null`** : jamais une série absente, jamais un zéro.
+3. **Un jour n'a de valeur que s'il est entier.** Météo-France rendait la pluie heure par heure jusqu'au 30 novembre à 13 h (14 heures ce jour-là) et sa pluie du jour s'arrêtait au 29 ; de même ICON (3 décembre, 14 heures ; dernier jour le 2). « Le modèle donne la pluie du jour » (règle 6) veut donc dire « le modèle couvre le jour entier » : aucun cumul partiel n'est à craindre.
+4. **Portée mesurée** : `meteofrance_seamless` 4 jours (aujourd'hui et 3 de plus), `icon_seamless` 7, `ecmwf_ifs025`, `gfs_seamless` et `best_match` toute la fenêtre (15 sur 15). Les cinq séries ont une valeur chaque jour de la portée, pour les cinq modèles.
+5. **Hors d'Europe** (Montréal), `meteofrance_seamless` et `icon_seamless` répondent quand même (4 et 7 jours) : leurs versions mondiales (ARPEGE, ICON global). La zone de la liste n'est donc pas une limite technique ; elle dit où le modèle fin du libellé (AROME, ICON-EU) existe, pour que le libellé ne trompe pas.
+6. **Variantes, non retenues pour la liste** : `meteofrance_arome_france_hd` seul ne rend **ni ET0 ni énergie solaire** (règle 5 : exclu) ; `ukmo_seamless` rend la pluie 7 jours mais l'ET0 et l'énergie solaire 2 jours seulement (exclu) ; `meteofrance_arpege_europe` (4 jours), `icon_eu` (5), `icon_d2` (2) sont complets mais doublent les familles « seamless » ; `ecmwf_aifs025_single` est complet sur 15 jours (candidat possible, une ligne de code le jour où on le voudra).
+7. **Coût d'un appel** (en-tête `x-ratelimit-cost`, fenêtre de 60 s, limite 600) : 1,0 pour un modèle, **1,07 pour la forme de production** (le choisi et `best_match`, cinq séries, 15 jours), 2,68 pour cinq modèles. Le décompte du § 5 tient.
+8. **Refus d'un modèle inconnu** : HTTP 400, `{"error": true, "reason": "Invalid value: Cannot initialize MultiDomains from invalid String value modele_inexistant"}` ; le chemin d'erreur existant (`client`, raison bornée) suffit.
+9. **Non prouvé par l'essai A** : que l'endpoint réponde au Worker de Cloudflare. Le lanceur GitHub n'est pas chez Cloudflare ; l'essai B (règle 8) reste la preuve.
+
+Le flux reste dans le dépôt pour rejouer l'essai le jour où un modèle change (§ 4, modèles « en fin de vie ») : à la main depuis l'onglet Actions, une fois dans `main`, ou en poussant la branche `essai-modeles-meteo`. Il ne se lance jamais sur une PR.

@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles, PR 0 : l'essai A, écrit et joué le
+  26 novembre 2026** (contrat `docs/weather-models-contract.md` v0.2,
+  § 7 et § 14 ; roadmap section 6 sexdecies, ligne 36), en Opus 5.5 ·
+  Élevé, sur la branche du contrat (#242) avec `main` fusionnée. Un flux
+  GitHub à la main (ou sur la branche `essai-modeles-meteo`), huit appels
+  à l'API gratuite d'Open-Meteo, sans clé ni secret, deux lieux
+  quelconques. Joué deux fois (runs 45827003670 et 45827275586, verts) :
+  la liste du contrat est confirmée, les séries sont suffixées par le
+  modèle dès deux modèles, un jour n'a de valeur que s'il est entier,
+  Météo-France rend 4 jours et ICON 7. Aucun écran, aucun calcul, aucune
+  base ne change. Contrôles : voir la PR ; `pnpm e2e` omis, ni
+  l'interface ni ses services ne changent. Le code du module commence
+  avec la PR 1.
 - **Météo multi-modèles, contrat écrit le 26 novembre 2026, sans code**
   (D-339, `docs/weather-models-contract.md` v0.1, roadmap section 6
   sexdecies, ligne 36), en Sonnet 5.5 · Moyen : un seul modèle de prévision
