@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (ignorer l'irrigation hors saison, B1 : la règle)
+
+- **La règle « hors saison »** (D-341) : quand une ferme mettra hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, ses planches n'auront plus d'objectif ni de besoin à partir
+  du jour du geste, et l'objectif de la ferme les dira à part (« 7 planches
+  sur 7 ont un objectif, 3 hors saison ») ; la pluie, la réserve du sol,
+  l'ET0, les alertes et les irrigations réelles ne changent pas. Rien ne
+  change encore pour aucune ferme : aucun écran ne l'allume, aucun service
+  ne la lit (B2, B3).
+
 ### Modifié (l'objectif automatique se voit et se modifie, A1)
 
 - **Le volet « Objectifs de la semaine » montre l'objectif automatique**
