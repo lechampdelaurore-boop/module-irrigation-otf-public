@@ -31,6 +31,15 @@ import {
  * (390 px), rien ne déborde de côté et l'interrupteur se touche au pouce ; à
  * l'ordinateur, à 1 440 px.
  *
+ * Repris pour l'objectif automatique qui se voit et se modifie (6 quaterdecies,
+ * A1, docs/objectif-automatique-saison-contract.md, section 3 ; D-337) :
+ * allumé, la phrase de résultat sous l'interrupteur, une ligne
+ * « automatique » par jardin dans la liste, le champ « mm / semaine » qui
+ * montre la valeur en vigueur, « Corriger » qui choisit le jardin ; l'objectif
+ * de ferme saisi lu « saisi » avec « Revenir à l'automatique » ; allumer avec
+ * un objectif saisi ouvre la fenêtre (« Annuler », « Allumer, garder mes
+ * objectifs », « Allumer et vider les objectifs », en rouge).
+ *
  * Ce qu'il ne prouve pas : les valeurs de l'objectif automatique, que les
  * tests du domaine et de la persistance chiffrent (tests/objectif-automatique*.test.ts,
  * tests/db/objectif-automatique*.test.ts) ; la météo de démonstration n'a
@@ -87,6 +96,25 @@ test('« Objectif automatique » : allumer, lire l’origine, saisir un objectif
   await bulle.getByRole('button', { name: 'Fermer' }).click();
   await verifierLEtape(page, journal, 'le réglage allumé, l’origine dite');
 
+  // A1 : la phrase de résultat, une ligne « automatique » par jardin, le champ qui montre la valeur en vigueur.
+  await expect(volet.locator('.automatic-objective-result')).toHaveText(/^Cette semaine : /, { timeout: 15_000 });
+  const ligneAutomatique = volet.locator('.goal-chip-list .goal-chip-automatic').first();
+  await expect(ligneAutomatique).toContainText('automatique', { timeout: 15_000 });
+  await expect(volet.locator('.goal-chip-list')).not.toContainText('Aucun objectif pour cette semaine.');
+  await expect(volet.getByLabel('mm / semaine')).toHaveValue(/^\d+(,\d)?$/);
+  await expect(volet.locator('.goal-amount-origin')).toHaveText(/^Valeur en vigueur : automatique/);
+  // « Corriger » choisit le jardin d'une ligne chiffrée : le champ montre sa valeur, automatique.
+  const ligneChiffree = volet.locator('.goal-chip-list .goal-chip-automatic').filter({ hasText: /\d mm/ }).first();
+  await ligneChiffree.getByRole('button', { name: 'Corriger' }).click();
+  await expect(volet.getByLabel('mm / semaine')).toBeFocused();
+  await expect(volet.getByLabel('mm / semaine')).toHaveValue(/^\d+(,\d)?$/);
+  await expect(volet.locator('.goal-amount-origin')).toHaveText(/^Valeur en vigueur : automatique/);
+  // Laissé tel quel, « Enregistrer » n'écrit rien et le dit.
+  await volet.getByRole('button', { name: 'Enregistrer' }).first().click();
+  await expect(volet).toContainText('Valeur inchangée : rien n’est enregistré.');
+  if (telephone) await verifierCibleTactile(ligneAutomatique.getByRole('button', { name: 'Corriger' }), 'Le bouton « Corriger »');
+  await verifierLEtape(page, journal, 'l’objectif automatique se lit dans le volet');
+
   // « Aujourd'hui » : l'origine sur la tuile, la ligne « Objectif automatique » de « Fiabilité du calcul ».
   await page.goto('/irrigation');
   await attendreLaPagePrete(page, 'aujourdhui');
@@ -109,14 +137,65 @@ test('« Objectif automatique » : allumer, lire l’origine, saisir un objectif
   await expect(await objectifDeLaPremierePlanche(page)).toContainText('Renseigné · demande de la semaine', { timeout: 15_000 });
   await verifierLEtape(page, journal, 'un objectif saisi passe avant');
 
+  // A1 : l'objectif de ferme saisi est dit « saisi » ; « Revenir à l'automatique » le retire, lui seul.
+  const ligneSaisie = volet2.locator('.goal-chip-list > span').filter({ hasText: 'Toute la ferme' });
+  await expect(ligneSaisie).toContainText('saisi');
+  if (telephone) await verifierCibleTactile(ligneSaisie.getByRole('button', { name: 'Revenir à l’automatique' }), 'Le bouton « Revenir à l’automatique »');
+  await ligneSaisie.getByRole('button', { name: 'Revenir à l’automatique' }).click();
+  await expect(volet2).toContainText('Cet endroit revient à l’objectif automatique.', { timeout: 15_000 });
+  await expect(ligneSaisie).toHaveCount(0);
+  await expect(gardees).toHaveCount(0);
+  await expect((await objectifDeLaPremierePlanche(page)).locator('dt small')).toHaveText(/^Automatique/, { timeout: 15_000 });
+  await verifierLEtape(page, journal, 'revenu à l’automatique');
+
+  // A1 : allumer avec un objectif saisi ouvre d'abord la fenêtre. Éteint, un objectif de ferme saisi, puis allumer.
+  await leReglage(page).uncheck();
+  await expect(leReglage(page)).not.toBeChecked();
+  await volet2.getByLabel('mm / semaine').fill('20');
+  await volet2.getByRole('button', { name: 'Enregistrer' }).click();
+  await expect(volet2.locator('.goal-chip-list')).toContainText('20 mm', { timeout: 15_000 });
+  const fenetre = page.locator('dialog.automatic-objective-enable[open]');
+  await leReglage(page).click();
+  await expect(fenetre).toContainText(/^Allumer l’objectif automatique \?\d+ planches? (a|ont) un objectif saisi, qui passe avant l’objectif automatique\./);
+  // « Annuler » : rien ne change.
+  await fenetre.getByRole('button', { name: 'Annuler', exact: true }).click();
+  await expect(fenetre).toHaveCount(0);
+  await expect(leReglage(page)).not.toBeChecked();
+  // « Allumer, garder mes objectifs » : allumé, l'objectif saisi passe avant.
+  await leReglage(page).click();
+  await expect(fenetre.getByRole('button', { name: 'Allumer, garder mes objectifs' })).toBeFocused();
+  await verifierLEtape(page, journal, 'la fenêtre d’allumage');
+  await fenetre.getByRole('button', { name: 'Allumer, garder mes objectifs' }).click();
+  await expect(fenetre).toHaveCount(0);
+  await expect(leReglage(page)).toBeChecked({ timeout: 15_000 });
+  await expect(gardees).toContainText(/^\d+ planches? garden?t? un objectif saisi cette semaine/, { timeout: 15_000 });
+  await expect(volet2.locator('.automatic-objective-result')).toHaveText(/ ; \d+ planches? garden?t? un objectif saisi\.$/, { timeout: 15_000 });
+  await verifierLEtape(page, journal, 'allumé en gardant l’objectif saisi');
+
   // « Vider les objectifs », proposé par le réglage, confirmé en rouge : l'objectif automatique reprend.
   await gardees.getByRole('button', { name: 'Vider les objectifs' }).click();
   await expect(page.locator('dialog.module-confirm-dialog[open]')).toContainText('Vider les objectifs de cette semaine ?');
   await confirmerDansLaFenetre(page, 'Vider les objectifs');
-  await expect(volet2.locator('.goal-chip-list')).toContainText('Aucun objectif pour cette semaine.', { timeout: 15_000 });
+  // Allumé, la liste garde les lignes « automatique » ; plus aucun objectif saisi (A1).
+  await expect(volet2.locator('.goal-chip-list > span:not(.goal-chip-automatic)')).toHaveCount(0, { timeout: 15_000 });
   await expect(gardees).toHaveCount(0);
   if (telephone) await verifierCibleTactile(volet2.getByRole('button', { name: 'Vider les objectifs' }), 'Le bouton « Vider les objectifs »');
   await verifierLEtape(page, journal, 'les objectifs vidés');
+
+  // A1 : « Allumer et vider les objectifs », en rouge dans la fenêtre : allumé, plus d'objectif saisi.
+  await leReglage(page).uncheck();
+  await expect(leReglage(page)).not.toBeChecked();
+  await volet2.getByLabel('mm / semaine').fill('20');
+  await volet2.getByRole('button', { name: 'Enregistrer' }).click();
+  await expect(volet2.locator('.goal-chip-list')).toContainText('20 mm', { timeout: 15_000 });
+  await leReglage(page).click();
+  await expect(fenetre).toHaveCount(1);
+  await confirmerDansLaFenetre(page, 'Allumer et vider les objectifs');
+  await expect(leReglage(page)).toBeChecked({ timeout: 15_000 });
+  await expect(volet2.locator('.automatic-objective-setting')).toContainText(/Objectif automatique allumé : .* objectifs? retirés? de cette semaine\./, { timeout: 15_000 });
+  await expect(volet2.locator('.goal-chip-list > span:not(.goal-chip-automatic)')).toHaveCount(0);
+  await expect(gardees).toHaveCount(0);
+  await verifierLEtape(page, journal, 'allumé en vidant les objectifs');
 
   // Éteint le même jour : le second geste fait foi toute la journée, l'écran est celui d'avant.
   await leReglage(page).uncheck();

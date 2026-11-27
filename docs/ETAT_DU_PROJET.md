@@ -27,10 +27,11 @@ registres, elle y renvoie.
   semaines closes ne le lisent jamais (garde à deux fermes sur la base,
   garde des imports). **Aucun écran ne l'allume : rien ne change en
   ligne.** Contrôles : voir la PR ; parcours navigateur omis, aucun écran
-  ne change. Fusion après B1. Depuis la fusion de S6, l'étape « Combien
-  je vise par semaine » de la mise en route reçoit aussi le filtre et
-  compte comme « Aujourd'hui » (`start-route.ts`, F1071). Vient B3 (les
-  écrans).
+  ne change. Fusion après B1 (#245). Depuis la fusion de S6, l'étape
+  « Combien je vise par semaine » de la mise en route reçoit aussi le
+  filtre et compte comme « Aujourd'hui » (`start-route.ts`, F1071). Le
+  volet d'A1 lit le tableau des besoins : il suit le filtre par lui. Vient
+  B3 (les écrans).
 - **Ignorer l'irrigation hors saison, B1 : la règle, codée le 26 novembre
   2026** (D-341, F985 à F995 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4, 5 et 8 ;
@@ -42,8 +43,30 @@ registres, elle y renvoie.
   part. **Filtre toujours vide : rien ne change en ligne.** Les dix cas et
   les gardes (pluie, ET0, irrigation, réserve du sol, alertes jamais
   touchées) dans `tests/hors-saison-regle.test.ts`. Contrôles : voir la PR.
-  Fusion après le contrat (#240) et les PR de S4 et S6 ; viennent A1, B2
-  et B3 (le stockage et les lecteurs, puis les écrans).
+  Fusion après A1 (#255) ; viennent B2 et B3 (le stockage et les lecteurs,
+  puis les écrans). **En ligne** : #245 fusionnée le 27 novembre 2026 à
+  6 h 28 (2ea0252), déployée à 7 h 15, run 45946029675, les cinq jobs
+  verts (consigné par B2).
+
+- **L'objectif automatique se voit et se modifie, PR A1 : codée le
+  26 novembre 2026** (D-351, F1051 à F1060 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, section 3, roadmap
+  ligne 34), en Opus 5.5 · Élevé, sur la branche de S6 PR 4 (#238) et du
+  contrat (#240). Réglage allumé, le volet « Objectifs de la semaine »
+  liste une ligne « automatique » par jardin (et par planche qui s'en
+  écarte) avec ses mm et leur origine, « Corriger » ; le champ
+  « mm / semaine » montre la valeur en vigueur de l'endroit choisi,
+  marquée ; un objectif saisi dit « saisi » avec « Revenir à
+  l'automatique » (le geste « vider » de cet endroit seul) ; allumer avec
+  des objectifs saisis ouvre une fenêtre (garder, vider en rouge,
+  annuler) ; une phrase de résultat sous l'interrupteur. Rien n'est écrit
+  chaque matin, aucune migration, aucun calcul changé ; réglage éteint,
+  l'écran d'avant. Tests du domaine et de persistance, P58 repris aux deux
+  largeurs. Contrôles : voir la PR. S4, S6 et le contrat (#240) en ligne,
+  A1 se fusionne la première de la ligne 34 ; puis B1, B2 et B3, une à la
+  fois. **En ligne** : #255 fusionnée le 27 novembre 2026 à 4 h 50
+  (6a8ff96), déployée à 5 h 40, run 45936521667, les cinq jobs verts
+  (consigné par B1).
 - **L'objectif automatique se voit ; ignorer l'irrigation hors saison :
   contrat écrit le 26 novembre 2026, sans code** (D-337,
   `docs/objectif-automatique-saison-contract.md`, roadmap ligne 34, section
@@ -52,7 +75,9 @@ registres, elle y renvoie.
   et S6 ; le filtre n'ignore que l'irrigation, la pluie et son historique
   restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
   filtre se lève à la main seulement, les arrosages planifiés sont proposés
-  à l'annulation.
+  à l'annulation. **En ligne** : #240 fusionnée le 27 novembre 2026 à
+  3 h 14 (83c51ad), déployée à 4 h 06, run 45927191810, les cinq jobs verts
+  (consigné par A1).
 
 - **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
   vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
@@ -215,8 +240,12 @@ registres, elle y renvoie.
   **653 px** au téléphone avec un arrosage en cours (800 px avant, budget
   700 px, borne de P64) ; 298 px sans, inchangé ; l'ordinateur ne change
   pas. Aucun calcul ni aucune écriture changés. Contrôles : voir la PR.
-  Sa fusion vient à son tour, après les PR de S4 et de S6 qui passent
-  avant.
+  **En ligne** : #244 fusionnée le 26 novembre 2026 à 13 h 57 (fd53c65),
+  avant S4 et S6, déployée à 14 h 37, run 45824529849, les cinq jobs
+  verts ; recette sur la démonstration le même jour vers 18 h 45,
+  conforme : « 1. Où ? » à 630 px avec un arrosage en cours, 674 px par
+  le « + », bandeau de la démonstration compris (825 px avant) (consigné
+  par B2).
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la

@@ -32,6 +32,22 @@ source détaillée commit par commit.
   change encore pour aucune ferme : aucun écran ne l'allume, aucun service
   ne la lit (B2, B3).
 
+### Modifié (l'objectif automatique se voit et se modifie, A1)
+
+- **Le volet « Objectifs de la semaine » montre l'objectif automatique**
+  (D-351, F1051 à F1060) : réglage allumé, une ligne « automatique » par
+  jardin, et par planche qui s'en écarte, avec ses millimètres de la
+  semaine et leur origine (« d’après l’ET0 », « prévu » pour une semaine
+  à venir), et « Corriger » ; le champ « mm / semaine » montre la valeur
+  en vigueur de l'endroit choisi, « saisie » ou « automatique » ; laissé
+  tel quel, « Enregistrer » n'écrit rien. Un objectif saisi est dit
+  « saisi » et propose « Revenir à l’automatique », pour cet endroit seul.
+  Allumer quand des planches gardent un objectif saisi ouvre une fenêtre :
+  « Allumer, garder mes objectifs », « Allumer et vider les objectifs » (en
+  rouge) ou « Annuler ». Sous l'interrupteur, une phrase dit le résultat de
+  la semaine. Rien n'est écrit chaque matin ; réglage éteint, rien ne
+  change.
+
 ### Ajouté (contrat : l'objectif automatique se voit ; ignorer l'irrigation hors saison)
 
 - **Contrat écrit, sans code** (D-337, `docs/objectif-automatique-saison-contract.md`) :

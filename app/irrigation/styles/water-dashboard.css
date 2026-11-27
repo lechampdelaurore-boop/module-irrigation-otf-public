@@ -486,3 +486,11 @@
 .automatic-objective-kept { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: var(--radius); background: var(--warn-soft); }
 .automatic-objective-kept p { color: var(--warn-ink); }
 .automatic-objective-kept .danger-outline { border-color: var(--danger); background: var(--danger-soft); color: var(--danger-ink); }
+/* L'objectif automatique se voit et se modifie (6 quaterdecies, A1, D-337) : les lignes « automatique », la valeur en vigueur, la phrase de résultat, la fenêtre d'allumage. */
+.goal-chip-list > span:has(button) { flex-wrap: wrap; align-items: center; border-radius: var(--radius); }
+.goal-chip-list > span button { min-height: var(--touch-target, 44px); margin: 0; padding: 4px 10px; font-size: var(--text-12); }
+.goal-chip-list > .goal-chip-automatic { border: 1px dashed var(--line); background: transparent; }
+.goal-chip-automatic small { color: var(--muted); }
+.goal-amount-origin { display: block; margin-top: 4px; color: var(--muted); font-size: var(--text-12); }
+.automatic-objective-setting .automatic-objective-result { color: var(--ink); }
+.automatic-objective-enable .irrigation-dialog-actions { flex-wrap: wrap; }

@@ -11997,7 +11997,10 @@ Précisions prises en codant (PR 4) :
 
 ## D-337 — L'objectif automatique se voit et se modifie ; ignorer l'irrigation hors saison
 
-Date : 26 novembre 2026. Statut : **contrat écrit, rien de codé** ;
+Date : 26 novembre 2026. Statut : **contrat écrit**, fusionné le
+27 novembre 2026 à 3 h 14 (#240) et **en ligne à 4 h 06** (run
+45927191810) ; le code suit en quatre PR (A1 : D-351 et B1 : D-341, en
+ligne le 27 novembre 2026 ; B2 : D-352) ;
 `docs/objectif-automatique-saison-contract.md`, roadmap section 6
 quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
 
@@ -12029,7 +12032,9 @@ Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, alig
 
 Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
 contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections 4,
-5 et 8) ; roadmap section 6 quaterdecies, ligne 34. Code en Opus 5.5 · Max,
+5 et 8), fusionnée le 27 novembre 2026 à 6 h 28 (#245) et **en ligne à
+7 h 15** (run 45946029675, consigné par B2) ; roadmap section 6
+quaterdecies, ligne 34. Code en Opus 5.5 · Max,
 le réglage de la roadmap, sur la branche du contrat, avant la fusion de S4
 et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995, ceux que
 le contrat réserve au code ; D-338 à D-340 sont pris par trois contrats
@@ -12146,7 +12151,9 @@ portée.
 
 ## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée**, fusionnée le même jour à
+13 h 57 (#244) et **en ligne à 14 h 37** (run 45824529849), recette
+conforme vers 18 h 45 (consigné par B2) ; contrat
 `docs/simplification-s5-contract.md` (section 7, budget ; section 13,
 mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
 le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
@@ -12190,6 +12197,37 @@ formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
 À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
 aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
 
+## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
+
+Date : 26 novembre 2026. Statut : **codée**, sur la branche de S6 PR 4
+(#238) et du contrat (#240), fusionnée le 27 novembre 2026 à 4 h 50
+(#255) et **en ligne à 5 h 40** (run 45936521667, consigné par B1) ;
+contrat
+`docs/objectif-automatique-saison-contract.md`, section 3 (D-337), et ses
+précisions F1051 à F1060 (section 11). Roadmap ligne 34, section 6
+quaterdecies.
+
+**Décision.** Le volet « Objectifs de la semaine » lit l'objectif de chaque
+planche tel que le tableau des besoins l'applique (`objectiveForBed`), porté
+par le signal qui portait déjà l'objectif de la ferme (S1, D-328) ; rien
+n'est écrit chaque matin, aucune lecture serveur de plus, aucune migration.
+Réglage allumé, il en tire les lignes « automatique » et la valeur du champ
+(`lib/domain/objective-reading.ts`, moyennes par `farmObjective`) ; la
+saisie passe avant comme toujours. « Revenir à l'automatique » est le geste
+« vider » restreint à un endroit (`clearHydricGoalsForUser` reçoit
+l'endroit) : même révision « cleared », même journal, même recalcul du
+plan. Allumer avec des objectifs saisis ouvre une fenêtre : garder (le
+défaut), vider (le geste existant, en rouge) ou annuler ; l'écran ne vide
+jamais seul. Réglage éteint, l'écran est celui d'avant.
+
+**Ajout de l'assistant, sans règle** : « Corriger » sur chaque ligne
+automatique choisit l'endroit et met le curseur dans le champ (F1056).
+
+**Ce qui n'est pas fait** : B1 à B3 (le filtre « hors saison ») ; la recette
+sur le site après la mise en ligne.
+
+Numéros : D-351 ; F1051 à F1060.
+
 ## D-352 — Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs
 
 Date : 26 novembre 2026. Statut : **codée** (PR B2 sur les quatre du
@@ -12201,8 +12239,9 @@ d'être pris : D-343 à D-351 et les précisions jusqu'à F1060 sont à d'autres
 PR ouvertes (A1, #255, a D-351 et F1051 à F1060). Migration **0052** : 0051
 à l'écriture, le numéro qui suivait le dernier de `main` (0050), recalée à
 0052 en fusionnant `main` après S6, qui a pris 0051
-(`0051_start_mode_route_state`, #235) ; la météo multi-modèles (#250, #253),
-qui prend aussi 0051 ou 0052, se recalera de même au numéro libre.
+(`0051_start_mode_route_state`, #235) ; la météo multi-modèles (#250) et
+l'ET0 horaire (#253), qui prennent aussi 0051 ou 0052, se recaleront de
+même au numéro libre.
 
 **Décision.** Les gestes « Mettre hors saison » et « Reprendre » sont
 enregistrés, une ligne datée par geste, écrits au journal des modifications,
