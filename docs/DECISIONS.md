@@ -11505,7 +11505,8 @@ Précisions prises en codant :
 Date : 26 novembre 2026. Statut : **les quatre PR codées, le code de S6
 est fini** (contrat #218 en ligne le 26 novembre 2026 à 20 h 42 ; PR 1
 #235 en ligne à 22 h 08 ; PR 2 #236 en ligne à 22 h 47 ; PR 3 #237
-fusionnée à 22 h 55, la PR 4 avec cette entrée) ; contrat `docs/simplification-s6-contract.md`
+en ligne le 27 novembre 2026 à 1 h 40 ; PR 4 #238 en ligne à 2 h 20,
+consigné par le contrat #240) : **les quatre PR en ligne** ; contrat `docs/simplification-s6-contract.md`
 (sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
 PR 2 ; 7, 14 et 15 pour la PR 3 ; 10, 11 et 15 pour la PR 4), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
