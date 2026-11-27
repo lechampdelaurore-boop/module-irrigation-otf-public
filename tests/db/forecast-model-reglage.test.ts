@@ -37,7 +37,7 @@ import { ALICE, BOB } from '../support/spaces';
 /**
  * La météo multi-modèles, PR 2, sur la base de test (docs/weather-models-contract.md,
  * § 3 règles 1, 2, 6 à 9, 11 et 12, § 6, § 8 points 3, 4, 5 et 7 ; D-346 ;
- * migration 0051) : la colonne du réglage, ses écritures et leur journal, la
+ * migration 0053) : la colonne du réglage, ses écritures et leur journal, la
  * règle « jamais un mélange », la lecture par lieu et par modèle de la tâche
  * du matin et de l'écran, et l'enregistrement vérifié. Chaque ferme ne voit
  * que ses lignes : le contrôle de cohérence des espaces relit la base après
@@ -156,14 +156,14 @@ const PREFERENCE_COLUMNS = `SELECT name, "notnull" AS required, dflt_value AS fa
 
 // --- Persistance (§ 8.4) ---------------------------------------------------------------
 
-test('migration 0051 : une colonne qui accepte « Automatique » (vide), la forme d’un identifiant seulement ; rien d’existant ne change', () => {
-  const before = createMigratedSqliteDatabase('drizzle', '0050_quiet_hours_held_alerts.sql');
+test('migration 0053 : une colonne qui accepte « Automatique » (vide), la forme d’un identifiant seulement ; rien d’existant ne change', () => {
+  const before = createMigratedSqliteDatabase('drizzle', '0052_off_season_revisions.sql');
   before.exec(`INSERT INTO irrigation_workspaces (id, owner_user_id) VALUES ('ferme-a', 'alice'), ('ferme-b', 'bob')`);
   before.exec(`INSERT INTO irrigation_weather_preferences (workspace_id, location_mode, custom_city, custom_postcode, last_successful_refresh_at, updated_at)
     VALUES ('ferme-a', 'custom', 'Bourges', '18000', '2026-11-25T05:15:00.000Z', '2026-11-25T05:15:00.000Z'), ('ferme-b', 'otf', NULL, NULL, NULL, '2026-11-20T10:00:00.000Z')`);
   const rows = () => before.prepare('SELECT * FROM irrigation_weather_preferences ORDER BY workspace_id').all() as Record<string, unknown>[];
   const existing = rows();
-  applyMigrationsAfter(before, '0050_quiet_hours_held_alerts.sql', 'drizzle', '0051_weather_forecast_model.sql');
+  applyMigrationsAfter(before, '0052_off_season_revisions.sql', 'drizzle', '0053_weather_forecast_model.sql');
   assert.deepEqual(rows().map(({ forecast_model: model, ...rest }) => [model, rest]), existing.map((row) => [null, { ...row }]), 'les lignes existantes restent, en « Automatique » (règle 1)');
   assert.deepEqual({ ...(before.prepare(PREFERENCE_COLUMNS).get() as object) }, { name: 'forecast_model', required: 0, fallback: null });
   before.prepare(`UPDATE irrigation_weather_preferences SET forecast_model = ? WHERE workspace_id = 'ferme-a'`).run(METEO_FRANCE);

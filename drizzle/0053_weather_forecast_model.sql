@@ -16,8 +16,9 @@
 -- La table est déjà dans le plan d'effacement (`SPACE_TABLES`, F563) et dans
 -- l'export de la base : sa colonne suit la ligne.
 --
--- Numéro provisoire : la PR 1 de S6 (#235) porte aussi 0051 et passe avant ;
--- celle-ci devient 0052 à la mise à jour qui suit sa fusion.
+-- Numéro : écrite sous 0051, elle a pris le numéro libre à la mise à jour
+-- qui précède sa fusion, après 0051_start_mode_route_state (S6, #235) et
+-- 0052_off_season_revisions (hors saison, #256).
 --
 -- Migration additive (docs/migrations-contract.md) : une colonne acceptant
 -- NULL ; aucune ligne existante ne change.

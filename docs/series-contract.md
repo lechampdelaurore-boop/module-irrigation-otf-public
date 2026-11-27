@@ -411,3 +411,12 @@ trois séries — Mâche #1, Cosmos 2, Tomates primeurs à Chloé — comparées
 main aux cumuls de leurs planches et à la période qu'affiche Ouvre ta ferme,
 sans écart ; un défaut de présentation trouvé et corrigé le jour même — la
 pluie partielle d'une planche affichée comme un total. L'extension est close.
+
+## Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`)
+
+La page « Historique et cumuls » est la vue « Les cumuls » de la page
+« Semaine » (`/irrigation/semaine?vue=cumuls`, S4-b). Le suivi par série y
+reste (S4-k) et ses règles ne changent pas ; `/irrigation/historique` y mène,
+l'ancre `series-water-title` comprise. Les règles de l'historique (roadmap 2.9,
+D-036, D-329) tiennent dans cette vue, l'export CSV compris (route et colonnes
+inchangées).

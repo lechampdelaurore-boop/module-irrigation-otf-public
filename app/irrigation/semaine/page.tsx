@@ -7,19 +7,23 @@ import { AnchoredFold, PAGE_SETTINGS_ANCHOR } from '../shell/page-settings-fold'
 import { HistoryViews } from '../history-views';
 import { IrrigationNeedsDashboardView, NeedsThresholdSettings } from '../irrigation-needs-dashboard';
 import { WaterManagementDashboard } from '../water-management-dashboard';
+import { OffSeasonPanel } from '../off-season-panel';
 import { WeeklyPlanProvider } from '../planning/weekly-plan-state';
 import { PlanSettings, WeeklyPlanSection } from '../planning/weekly-plan-view';
 import { pageMetadata } from '../page-metadata';
 import { pageHref } from '@/lib/domain/features/pages';
 import { isPartActive } from '@/lib/domain/features/socle';
-import { weekSections } from '@/lib/domain/features/week-page';
+import { NEEDS_SECTION_ANCHOR, weekSections } from '@/lib/domain/features/week-page';
 import { needsDetailLine, weekDetailSummary, WEEK_SECTION_TITLES, WEEK_SETTINGS_LINE } from '@/lib/domain/semaine/week-detail';
 import { weekDayEvents } from '@/lib/domain/semaine/week-days';
 import { farmRainMatters } from '@/lib/domain/today/rain-entry';
+import { objectiveBedReadings } from '@/lib/domain/objective-reading';
 import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '@/lib/domain/water-management';
+import { weekExportLink } from '@/lib/domain/irrigation-history/csv-href';
 import { WeekFirstLevel } from './week-first-level';
+import { WeekRainProvider } from './week-rain';
 import { PlanDetailSection, WaterGapSection, WeekDetail, WeekDetailSection } from './week-detail';
 import '../irrigation.css';
 import { renderOncePerRequest } from '../render-once';
@@ -34,6 +38,9 @@ export const metadata = pageMetadata('semaine');
  * du « Planning de la semaine » et d'« Objectifs et besoins », selon les
  * cases ; rien n'est retiré. La vue « Les cumuls » est la page « Historique
  * et cumuls ». Les trois anciennes adresses mènent ici (`redirectToWeekPage`).
+ * Les gestes (PR 3, section 8) : « Noter la pluie » (`WeekRainProvider`),
+ * « Comprendre ces chiffres », « Changer l'eau visée », les flèches qui
+ * changent de semaine sans quitter la page, « Exporter » au pied.
  */
 async function computeSemainePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('semaine', searchParams);
@@ -64,8 +71,13 @@ async function computeSemainePage({ searchParams }: { searchParams: IrrigationSe
   // L'écart du prévu se lit à l'ouverture de sa section (3.4, F918), pour la saison du jour seulement, comme avant (F735).
   const gapSection = planning !== null && context.season === todaySeason(now);
   const sections = weekSections(context.enabled).filter((section) => section !== 'ecart-du-prevu' || gapSection);
+  // « Exporter » la semaine affichée (4.6), seulement si la ferme a coché l'historique.
+  const exportLink = context.enabled.includes('historique')
+    ? weekExportLink({ season: context.season, weekStart, weekEnd: needs.waterDashboard.weekEnd })
+    : null;
   const content = (
-    <>
+    // Une semaine, une fenêtre de pluie neuve : la clé remet à zéro ce que le client tenait d'une autre semaine (8.4).
+    <WeekRainProvider key={weekStart} planning={planning !== null} rainMatters={rainMatters}>
       <WeekFirstLevel
         season={context.season}
         currentSeason={todaySeason(now)}
@@ -77,17 +89,20 @@ async function computeSemainePage({ searchParams }: { searchParams: IrrigationSe
         rainMatters={rainMatters}
       />
       <WeekDetail summary={weekDetailSummary(sections, needs.irrigationNeeds.gardens.length)}>
-        <WeekDetailSection id="reste-a-arroser" section="reste-a-arroser" line={needsDetailLine(needs.irrigationNeeds.gardens.length)}>
+        <WeekDetailSection id={NEEDS_SECTION_ANCHOR} section="reste-a-arroser" line={needsDetailLine(needs.irrigationNeeds.gardens.length)}>
           <IrrigationNeedsDashboardView season={context.season} initialDashboard={needs.irrigationNeeds} showProposals={context.enabled.includes('cultures')} />
         </WeekDetailSection>
         {planning ? <PlanDetailSection current={current} /> : null}
-        <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={needs.waterDashboard} initialFarmObjective={{ weekStart: needs.irrigationNeeds.weekStart, objective: needs.irrigationNeeds.farmObjective }} />
+        <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={needs.waterDashboard} initialFarmObjective={{ weekStart: needs.irrigationNeeds.weekStart, objective: needs.irrigationNeeds.farmObjective, beds: objectiveBedReadings(needs.irrigationNeeds.gardens) }} offSeason={<OffSeasonPanel season={context.season} snapshot={context.snapshot} initialView={needs.offSeason} />} />
         {gapSection ? <WaterGapSection season={context.season} rainHref={`#${MEASURED_RAIN_ANCHOR}`} /> : null}
         <WeekSettings planning={planning !== null}>
           <NeedsThresholdSettings season={context.season} weekStart={needs.irrigationNeeds.weekStart} initialThresholdMm={needs.irrigationNeeds.thresholdMm} />
         </WeekSettings>
       </WeekDetail>
-    </>
+      {exportLink ? (
+        <p className="week-export"><a className="week-export-link" href={exportLink.href}>{exportLink.label}</a></p>
+      ) : null}
+    </WeekRainProvider>
   );
   return (
     <IrrigationShell {...context.shell}>

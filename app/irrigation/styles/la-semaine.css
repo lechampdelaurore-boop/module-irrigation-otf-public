@@ -501,3 +501,72 @@
     margin-bottom: 1.5rem;
   }
 }
+
+/* Les gestes du bilan (PR 3, sections 4.5 et 8) : des liens de 44 px, qui n'écrivent rien par eux-mêmes. */
+.week-bilan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+}
+
+.week-bilan-actions .week-bilan-link,
+.week-day .week-day-rain button {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green);
+  font: inherit;
+  font-size: var(--text-13);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.week-understand {
+  display: grid;
+  gap: .5rem;
+}
+
+.week-understand[hidden],
+.week-day .week-day-rain [data-scope="run"] {
+  display: none;
+}
+
+.week-day-rain {
+  margin: 0;
+}
+
+.week-rain-reply {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: var(--text-13);
+}
+
+/* Au téléphone, une suite de jours calmes tient en une ligne : son « Noter la pluie » est celui de la suite. */
+@media (max-width: 600px) {
+  .week-day[data-calm-run="start"] .week-day-rain [data-scope="day"] {
+    display: none;
+  }
+
+  .week-day[data-calm-run="start"] .week-day-rain [data-scope="run"] {
+    display: inline-flex;
+  }
+}
+
+/* « Exporter » au pied de la page (4.6), le lien du bouton de « Les cumuls ». */
+.week-export {
+  margin: 0;
+}
+
+.week-export-link {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  color: var(--green);
+  font-size: var(--text-13);
+  font-weight: 700;
+}

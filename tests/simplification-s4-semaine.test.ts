@@ -219,7 +219,7 @@ test('section 3.4 : l’écart du prévu ne se lit qu’à l’ouverture de son 
 test('section 4 : l’encadré d’attention ne paraît que s’il a une ligne ; un plan sans pénurie n’y met rien (PR 2, F925)', () => {
   const premier = readFileSync('app/irrigation/semaine/week-first-level.tsx', 'utf8');
   assert.match(premier, /const shortage = planShown\?\.plan \? shortageAction\(planShown\.plan, formatVolume, planShown\.now\) !== null : false;/);
-  assert.match(premier, /\{current && \(shortage \|\| approximate \|\| timer\) \? \(/);
+  assert.match(premier, /\{current && \(shortage \|\| approximate \|\| timer \|\| forecast\) \? \(/);
   assert.match(premier, /\{shortage \? <PlanShortage \/> : null\}/);
   // Le même test que `PlanShortage` : l'encadré ne peut pas rester vide.
   const vue = readFileSync('app/irrigation/planning/weekly-plan-view.tsx', 'utf8');
@@ -260,6 +260,7 @@ const ANCHOR_SOURCES: Readonly<Record<string, { file: string; pattern: RegExp }>
   'planning-title': { file: 'app/irrigation/planning/weekly-plan-view.tsx', pattern: /<h2 id="planning-title"/ },
   'proposal-': { file: 'app/irrigation/planning/proposal-card.tsx', pattern: /<article id=\{proposalAnchor\(proposal\.storedId\)\}/ },
   'objectifs-de-la-semaine': { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="objectifs-de-la-semaine"/ },
+  'hors-saison': { file: 'app/irrigation/off-season-panel.tsx', pattern: /<section id=\{OFF_SEASON_ANCHOR\} className="off-season-block"/ },
   'manual-rain': { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="manual-rain"/ },
   'meteo-de-reference': { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="meteo-de-reference"/ },
   weather: { file: 'app/irrigation/water-management-dashboard.tsx', pattern: /id="weather"/ },
@@ -296,6 +297,7 @@ function citedAnchors(): Map<string, string> {
   const cited = new Map<string, string>();
   const files = [
     'lib/domain/today/week.ts',
+    'lib/domain/off-season-view.ts',
     'lib/domain/today/reliability.ts',
     'lib/domain/today/essential.ts',
     'lib/domain/today/missing-by-bed.ts',

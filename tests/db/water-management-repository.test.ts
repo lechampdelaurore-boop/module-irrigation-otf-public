@@ -87,6 +87,32 @@ test('objectifs hydriques : la dernière révision « set » de chaque périmèt
   assert.deepEqual(revisions.slice(3).map((revision) => revision.scopeType).sort(), ['bed', 'farm']);
 });
 
+test('« Revenir à l’automatique » : le geste « vider » d’un endroit seul, les autres gardés, isolé par ferme (6 quaterdecies, A1, D-337)', async () => {
+  await saveHydricGoalForUser(ALICE, farmGoal(WEEK_1, 20));
+  tickSecond();
+  await saveHydricGoalForUser(ALICE, bedGoal(WEEK_1, 'bed-1', 30));
+  tickSecond();
+  await saveHydricGoalForUser(ALICE, bedGoal(WEEK_1, 'bed-2', 12));
+  tickSecond();
+  await saveHydricGoalForUser(BOB, bedGoal(WEEK_1, 'bed-1', 40));
+  tickSecond();
+
+  const bed1 = { scopeType: 'bed' as const, otfZoneId: 'zone-1', otfPlotId: 'plot-1', otfBedId: 'bed-1' };
+  assert.equal(await clearHydricGoalsForUser(ALICE, SEASON, WEEK_1, bed1), 1, 'seul l’objectif de cette planche');
+  assert.deepEqual(
+    (await listHydricGoalsForUser(ALICE, SEASON, WEEK_1)).map((goal) => [goal.scopeType, goal.otfBedId, goal.amountMm]).sort(),
+    [['bed', 'bed-2', 12], ['farm', null, 20]],
+    'la ferme et l’autre planche gardent le leur',
+  );
+  assert.deepEqual((await listHydricGoalsForUser(BOB, SEASON, WEEK_1)).map((goal) => goal.amountMm), [40], 'l’autre ferme n’est pas touchée');
+  tickSecond();
+  assert.equal(await clearHydricGoalsForUser(ALICE, SEASON, WEEK_1, bed1), 0, 'rien à retirer une seconde fois : rien n’est écrit');
+  assert.equal(await clearHydricGoalsForUser(ALICE, SEASON, WEEK_1, { scopeType: 'farm', otfZoneId: null, otfPlotId: null, otfBedId: null }), 1);
+  assert.deepEqual((await listHydricGoalsForUser(ALICE, SEASON, WEEK_1)).map((goal) => goal.otfBedId), ['bed-2']);
+  const revisions = await listHydricGoalRevisionsThroughWeekForUser(ALICE, SEASON, WEEK_1);
+  assert.deepEqual(revisions.filter((revision) => revision.action === 'cleared').map((revision) => [revision.scopeType, revision.otfBedId]), [['bed', 'bed-1'], ['farm', null]], 'une révision « cleared » par endroit retiré, l’historique conservé');
+});
+
 test('objectifs hydriques : deux révisions dans la même milliseconde gardent leur ordre, la seconde fait foi', async () => {
   // Les identifiants commencent par l'horodatage, puis un UUID tiré au sort :
   // dans la même milliseconde, le préfixe est le même et l'identifiant ne classe

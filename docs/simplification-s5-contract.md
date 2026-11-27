@@ -286,6 +286,10 @@ une irrigation) : les confondre ferait écrire à un geste ce que l'autre propos
 Le lien « Changer l'heure ou la dose » reste vers le planning ; S5 n'y touche
 pas (S5-f).
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** « Changer l'heure ou la dose » mène à la
+proposition sur « Semaine » (`/irrigation/semaine#proposal-…`), qui la montre
+dans « Jour par jour ».
+
 ## 7. L'entrée de la page et son ordre
 
 - **Arriver par un geste du « + »** (S3, section 4.1) : « Arroser maintenant »

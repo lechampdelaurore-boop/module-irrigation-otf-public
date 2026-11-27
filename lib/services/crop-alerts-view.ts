@@ -135,5 +135,5 @@ function historyUrl(record: CropAlertRecord): string {
   if (record.kind === 'frost') return alertWeekUrl('alertes-cultures', record.targetDate);
   if (record.kind === 'drying') return pageHref('alertes-cultures', { season: Number(record.targetDate.slice(0, 4)) });
   const monday = weekStartDateKey(record.targetDate);
-  return pageHref('planning', { season: Number(monday.slice(0, 4)), week: monday });
+  return pageHref('semaine', { season: Number(monday.slice(0, 4)), week: monday });
 }

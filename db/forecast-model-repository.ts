@@ -6,7 +6,7 @@ import { MODULE_ACTOR_ID } from '@/lib/domain/change-journal/entry';
 
 /**
  * Le modèle de prévision d'une ferme (docs/weather-models-contract.md, § 3
- * règles 1 à 3, 8 et 9, § 6 ; D-346 ; migration 0051) : la colonne
+ * règles 1 à 3, 8 et 9, § 6 ; D-346 ; migration 0053) : la colonne
  * `forecast_model` de sa ligne de préférences météo, vide pour
  * « Automatique ». Chaque écriture porte l'exploitation et sa ligne du
  * journal des modifications, dans le même lot (F709) ; la lecture du réglage

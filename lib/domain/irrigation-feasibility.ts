@@ -91,7 +91,10 @@ export function allocateIrrigationWater(input: {
   reservedUnassignedCubicMeters?: number; reservedPlannedCubicMeters?: number;
 }): IrrigationFeasibility {
   const { needs, pools, decisions } = input;
-  const beds = needs.gardens.flatMap((garden) => garden.beds).sort((a, b) => a.bedId.localeCompare(b.bedId));
+  const listed = needs.gardens.flatMap((garden) => garden.beds).sort((a, b) => a.bedId.localeCompare(b.bedId));
+  // Une planche hors saison n'entre pas dans la demande (D-337, D-352) : ni comptée, ni inconnue, elle ne retient aucune priorité.
+  const beds = listed.filter((bed) => bed.offSeason !== true);
+  const offSeasonCount = listed.length - beds.length;
   // Le volume et la dose se convertissent sur la surface mouillée (D-022) : sans elle, le besoin est inconnu.
   const known = beds.filter((bed) => bed.effectiveVolumeCubicMeters !== null && bed.effectiveNeedMm !== null && bed.wettedAreaSquareMeters !== null && bed.wettedAreaSquareMeters > 0);
   const knownNeed = sum(known.map((bed) => bed.effectiveVolumeCubicMeters!));
@@ -112,6 +115,7 @@ export function allocateIrrigationWater(input: {
   const unknownBeds = beds.filter((bed) => !known.includes(bed));
   const unknownReason = feasibilityUnknownReason({ noObjective: unknownBeds.filter((bed) => bed.objectiveMm === null).length, noWettedArea: unknownBeds.filter((bed) => bed.objectiveMm !== null).length });
   if (unknownReason) notes.push(`${unknownReason.charAt(0).toLocaleUpperCase('fr-FR')}${unknownReason.slice(1)} : leur besoin n’est pas compté ici.`);
+  if (offSeasonCount > 0) notes.push(offSeasonNote(offSeasonCount));
   if (unknownWater) warnings.push('Disponibilité incomplète : un stock ou une prévision manque. Les volumes inconnus ne sont pas remplacés par zéro.');
   if ((input.reservedUnassignedCubicMeters ?? 0) > 0) warnings.push('Des irrigations existantes ont une origine inconnue ou insuffisante. Le solde non couvert est réservé une seule fois sur le total connu ; leur acheminement reste à vérifier.');
 
@@ -268,6 +272,13 @@ export function routeWater(pools: readonly FeasibilityPool[], demand: Record<str
     total += amount;
   }
   return { total, beds: Object.fromEntries(ids.map((id, i) => [id, ends[i].original - ends[i].capacity])) };
+}
+
+/** Les planches hors saison, dites sous l'écran comme ce que le calcul ne compte pas (F447 ; D-352). */
+function offSeasonNote(count: number): string {
+  return count === 1
+    ? '1 planche hors saison : son irrigation est ignorée, elle n’est pas comptée ici.'
+    : `${count} planches hors saison : leur irrigation est ignorée, elles ne sont pas comptées ici.`;
 }
 
 export function priorityLabel(priority: IrrigationNeedPriority) { return priority === 'high' ? 'Haute' : priority === 'normal' ? 'Normale' : 'Basse'; }

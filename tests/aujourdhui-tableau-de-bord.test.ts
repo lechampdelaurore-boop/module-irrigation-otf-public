@@ -185,10 +185,10 @@ test('T2 : plus de trois retards d’un même jour passé se replient en une lig
   // Quatre un autre jour que la veille : son nom court.
   const four = lateItems(lines([...before, event('d3', '2026-11-09T12:00:00.000Z', 60)]).late, NOW);
   assert.deepEqual(four.map((item) => item.kind === 'day' ? item.title : item.kind), ['Lun. 9 nov. : 4 irrigations à rattraper']);
-  // Sans les arrosages cochés, les cartes s'ouvrent sur le planning.
+  // Sans les arrosages cochés, les cartes s'ouvrent sur « Semaine », qui porte le planning (S4, PR 4).
   const planningOnly = lateIrrigationLines({ enabled: ['planning'], now: NOW, events: yesterday, lateToleranceMinutes: 30, bedNames: BEDS });
   const onPlanning = lateItems(planningOnly, NOW)[0];
-  assert.equal(onPlanning.kind === 'day' ? onPlanning.open.label : null, 'Voir les 5 sur « Planning de la semaine »');
+  assert.equal(onPlanning.kind === 'day' ? onPlanning.open.label : null, 'Voir les 5 sur « Semaine »');
 });
 
 test('la météo dessinée : l’échelle commune, le trait du zéro, l’icône, la pluie prévue et ce qui est annoncé chaque jour', () => {

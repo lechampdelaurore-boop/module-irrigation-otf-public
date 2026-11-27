@@ -38,3 +38,13 @@ Les valeurs dérivées ne sont jamais stockées. Priorités et remplacements son
 Au niveau jardin, les millimètres sont pondérés par la surface **de la planche** : `Σ(mm × m²) / Σ(m²)`, jamais par la surface mouillée. Les volumes sont additionnés ; un volume inconnu laisse le total du jardin inconnu. Les priorités ne sont pas moyennées : l’interface affiche leur nombre par niveau.
 
 Le service `getIrrigationNeedsDashboardForUser` fournit aux futures sous-tranches le détail complet par planche, la complétude séparée de la demande, du besoin réel et du besoin à planifier, les dates météo manquantes, l'origine de l'objectif (le niveau de l'objectif saisi ; depuis D-317, « saisi », « automatique » ou « les deux », avec le détail des jours automatiques), la date de calcul, le seuil et les agrégats. Il ne fournit aucun score combiné, aucun ordre automatique et aucune décision de faisabilité.
+
+## Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`)
+
+La page « Objectifs et besoins » est devenue la vue « La semaine » de la page
+« Semaine ». Le besoin par planche est la section « Ce qu'il reste à arroser »
+de « Le détail » ; les objectifs (« Eau visée »), la pluie mesurée, la météo
+de référence et le tableau des jours en sont d'autres sections, leurs lignes
+de résumé gardées. La règle de la semaine affichée (D-082) tient, la semaine
+étant dans l'adresse (`week`, S4-g). `/irrigation/besoins` mène à « Semaine »,
+paramètres et ancre gardés. Aucune règle de ce contrat ne change.

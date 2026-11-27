@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { menuPlaces } from '@/lib/domain/features/desktop-menu';
 import { phoneBar } from '@/lib/domain/features/phone-bar';
 import { pageHref, pageLabel, type IrrigationPageId, type PageQuery } from '@/lib/domain/features/pages';
+import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import { placeLabel } from '@/lib/domain/features/places';
 import { plusGestures } from '@/lib/domain/features/plus-sheet';
 import { weekViewLabel, type WeekViewId } from '@/lib/domain/features/week-page';
@@ -88,7 +89,7 @@ export function FeatureMenu({
     gestures,
     season: query.season ?? null,
     planning: menu.includes('planning'),
-    besoinsHref: menu.includes('besoins') ? pageHref('besoins', query) : null,
+    besoinsHref: menu.includes('besoins') ? pageHref('semaine', query, MEASURED_RAIN_ANCHOR) : null,
   };
   const badge = useTodayBadge(menu, todayBadge);
   const badgeOf = (item: IrrigationPageId) => (item === 'aujourdhui' && badge !== null ? badge : null);

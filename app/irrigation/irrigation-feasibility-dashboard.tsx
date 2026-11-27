@@ -93,7 +93,7 @@ export function IrrigationFeasibilityDashboardView({ season }: { season: number 
       {planGap ? <div className="feasibility-plan-gap" role="note">
         <p><strong>{planGap.lead}</strong></p>
         <p>{planGap.cause}</p>
-        <p className="feasibility-plan-gap-links">{planGap.links.map((link) => <a key={link.page} href={pageHref(link.page, { season })}>{link.label}</a>)}</p>
+        <p className="feasibility-plan-gap-links">{planGap.links.map((link) => <a key={link.page} href={pageHref(link.page, { season }, link.anchor)}>{link.label}</a>)}</p>
       </div> : null}
       {dashboard.warnings.map((warning) => <p className="feasibility-warning" key={warning}>{warning}</p>)}
       {/* Ce que le calcul ne compte pas, en texte ordinaire (F447). */}
