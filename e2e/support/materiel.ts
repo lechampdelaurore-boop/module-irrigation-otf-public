@@ -3,7 +3,7 @@ import { dateKeyInTimeZone } from '../../lib/domain/irrigation-history/dates.ts'
 import { formatIrrigationDateTimeInput } from '../../lib/domain/irrigation-format.ts';
 import { millisecondsFromMinutes } from '../../lib/domain/units.ts';
 import { FARM_TIME_ZONE } from '../../lib/domain/water-management.ts';
-import { confirmerDansLaFenetre, ouvrirParClic, ouvrirLOnglet } from './parcours.ts';
+import { confirmerDansLaFenetre, ouvrirLesPlisAutour, ouvrirParClic, ouvrirLOnglet } from './parcours.ts';
 
 /**
  * Création d'un matériel prêt à irriguer : une fiche, un réglage, une position
@@ -224,6 +224,8 @@ export async function verifierLaSurfaceMouillee(page: Page, planche: string, sur
   const nomDansLeJardin = page.locator('article.irrigation-need-card header strong', { hasText: new RegExp(`^${planche}$`) });
   const nomDansLaCarte = page.locator('header strong', { hasText: new RegExp(`^${planche}$`) });
   const jardin = page.locator('.irrigation-needs-gardens > details').filter({ has: nomDansLeJardin });
+  // Dans « Ce qu'il reste à arroser », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(jardin);
   await jardin.scrollIntoViewIfNeeded();
   if (!(await jardin.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await jardin.locator('summary').first().click();

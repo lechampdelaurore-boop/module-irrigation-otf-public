@@ -34,9 +34,7 @@ import { clockFromMinutes } from '../clock-text.ts';
  * n'ont que de l'affichage.
  */
 
-export const PROPOSAL_STATUSES: readonly ProposalStatus[] = ['proposed', 'validated', 'refused', 'replaced', 'expired'];
-
-export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
+const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   proposed: 'Proposée',
   validated: 'Validée',
   refused: 'Refusée',

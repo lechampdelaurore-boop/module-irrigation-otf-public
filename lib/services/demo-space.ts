@@ -26,9 +26,9 @@ import { computeWeeklyPlanForUser } from './planning-service.ts';
  * semaines passées, les alertes météo qu'elle a posées, les objectifs
  * proposés par le module et adoptés, le plan
  * de la semaine calculé), par les dépôts ordinaires, comme si la ferme l'avait
- * saisi. La ferme vierge n'a pas d'espace tant que l'invité n'a rien coché :
- * c'est ainsi qu'une ferme qui n'a jamais ouvert le module arrive sur la
- * liste à cocher (R5). Le plan de la ferme vient de
+ * saisi. La ferme vierge n'a pas d'espace tant que l'invité n'a rien choisi :
+ * c'est ainsi qu'une ferme qui n'a jamais ouvert le module arrive sur les
+ * trois façons de commencer (lot S6, D-336 ; R5). Le plan de la ferme vient de
  * `lib/adapters/demo/farms.ts`, la météo du fournisseur de la démonstration.
  *
  * Deux requêtes simultanées ne préparent l'espace qu'une fois : seule celle

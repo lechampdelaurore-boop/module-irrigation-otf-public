@@ -68,8 +68,8 @@ export function TodayHeader({ headline, plan, shortage, query, pending, replies 
           <div className="today-plan-row">
             <Icon name={plan.linkToPlanning ? 'calendrier' : 'coche'} />
             <p className="today-plan">
-              {/* Le plan, calculé ou non, mène au planning de la semaine (6 nonies, L3, D-312) : la ligne n'existe que « Planning » coché. */}
-              <a href={pageHref('planning', query)}>{plan.text}</a>
+              {/* Le plan, calculé ou non, mène à la semaine, qui le porte (6 nonies, L3, D-312 ; lot S4, PR 4) : la ligne n'existe que « Planning » coché. */}
+              <a href={pageHref('semaine', query)}>{plan.text}</a>
             </p>
             {plan.linkToPlanning ? null : (
               <button type="button" className="today-plan-recalculate" aria-label="Recalculer le plan" disabled={pending} onClick={onRecalculatePlan}>

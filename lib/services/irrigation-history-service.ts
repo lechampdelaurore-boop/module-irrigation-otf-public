@@ -31,6 +31,7 @@ import {
 import { buildIrrigationHistorySummary } from '../domain/irrigation-history/summary';
 import { dateKeys } from '../domain/irrigation-history/dates';
 import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
+import { readOffSeasonSourceForUser } from './off-season-source';
 import {
   countHistoryStatuses,
   DEFAULT_HISTORY_STATUS_FILTER,
@@ -171,7 +172,7 @@ async function readHistoryAnalysis({
   const locationKey = weatherLocationKey(preference, snapshot.structure) ?? 'unconfigured';
   const repositoryScope: IrrigationHistoryScopeFilter = scope;
   const throughWeek = weekStartDateKey(period.endDate);
-  const [events, weather, goalRevisions, protectedSlotVersions, automatic] = await Promise.all([
+  const [events, weather, goalRevisions, protectedSlotVersions, automatic, offSeason] = await Promise.all([
     listIrrigationHistoryForUser(ownerUserId, {
       season,
       startAt: period.startAt,
@@ -190,6 +191,8 @@ async function readHistoryAnalysis({
     readProtectedSlotVersions(ownerUserId),
     // L'objectif automatique, quand la ferme l'a allumé sur la période (D-309) : les jours sans objectif saisi.
     readAutomaticObjectiveSourceForUser({ ownerUserId, season, snapshot, from: period.startDate, to: period.endDate, now }),
+    // Le filtre « hors saison » (D-337, D-352) : ces jours-là, aucun objectif ; la pluie et l'irrigation restent.
+    readOffSeasonSourceForUser({ ownerUserId, snapshot }),
   ]);
   return {
     period,
@@ -204,6 +207,7 @@ async function readHistoryAnalysis({
       goalRevisions,
       automaticObjective: automatic?.dayValuesFor(scopeBeds, dateKeys(period.startDate, period.endDate)),
       automaticObjectiveProvisionalWeeks: automatic?.provisionalWeeks,
+      offSeason: offSeason?.byBed(scopeBeds),
     }),
     events,
     protectedSlotVersions,

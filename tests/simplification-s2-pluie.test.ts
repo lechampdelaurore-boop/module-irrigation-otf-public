@@ -172,5 +172,6 @@ test('l’interface : une fenêtre partagée, au clavier, qui écrit par l’act
   const page = readFileSync('app/irrigation/today/today-page.tsx', 'utf8');
   assert.match(page, /onOpenRain=\{openRain\?\.\(RAIN_WEEK_REPLY\)\}/);
   assert.match(page, /onOpenRain=\{openRain\?\.\(RAIN_RELIABILITY_REPLY\)\}/);
-  assert.match(page, /besoinsHref=\{pageHref\('besoins', dayQuery, 'manual-rain'\)\}/);
+  // « Retirer une mesure » mène à « Pluie mesurée » de « Semaine » (S4, PR 4).
+  assert.match(page, /besoinsHref=\{pageHref\('semaine', dayQuery, MEASURED_RAIN_ANCHOR\)\}/);
 });
