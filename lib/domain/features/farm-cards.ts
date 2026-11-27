@@ -1,3 +1,4 @@
+import type { FarmCardLines } from '../farm-home/lines.ts';
 import type { UnfinishedStep } from '../onboarding/steps.ts';
 import { farmCardPages, type FarmCardPage } from './places';
 import type { FeatureSelection } from './selection';
@@ -9,10 +10,12 @@ import type { FeatureSelection } from './selection';
  * la page (S3-b : les noms courts de la maquette attendent S6), et une ligne
  * fixe, qui dit à quoi sert la page, relue contre son « ? » (S3-f).
  *
- * Pas de chiffre d'état (« 4 goutte-à-goutte, tous posés ») : il demanderait
- * des lectures que la page n'a pas, et S6 les ajoute avec la mise en route
- * (S3-g). La seule chose qui change d'une ferme à l'autre est la marque « À
- * faire », qui vient de l'accueil de la ferme que chaque page lit déjà.
+ * S3 n'avait pas de chiffre d'état (S3-g) ; S6 les ajoute avec la mise en
+ * route (lot S6, PR 3, docs/simplification-s6-contract.md, section 7) : la
+ * ligne d'état (« 4 goutte-à-goutte, tous posés ») remplace la ligne fixe
+ * quand la donnée est connue (`lib/domain/farm-home/lines.ts`), la ligne fixe
+ * revient sinon. La marque « À faire » vient toujours de l'accueil de la
+ * ferme : la ligne dit ce qui est, la marque ce qui manque.
  */
 
 /**
@@ -34,6 +37,8 @@ export const FARM_CARD_LINES: Readonly<Record<FarmCardPage, string>> = {
 export type FarmCard = {
   page: FarmCardPage;
   line: string;
+  /** `state` : la ligne d'état de la fiche ; `fixed` : la ligne fixe de S3, son repli. */
+  lineKind: 'state' | 'fixed';
   /** « À faire : sol de 3 parcelles » quand l'accueil de la ferme attend une étape de cette page ; `null` sinon. */
   todo: string | null;
 };
@@ -42,11 +47,18 @@ export type FarmCard = {
  * Les fiches d'une ferme, dans l'ordre de l'endroit. Une étape de l'accueil
  * à finir (4.4, F582) dit sa page (`UnfinishedStep.page`) : la fiche de cette
  * page porte « À faire », avec le texte de l'étape, celui du bandeau « À
- * finir ». Aucune donnée nouvelle n'est lue.
+ * finir ». `lines` : les lignes d'état, lues par le gabarit de « Ma ferme »
+ * (lot S6, section 7) ; une fiche qui n'en a pas garde sa ligne fixe.
  */
-export function farmCards(selection: FeatureSelection, unfinished: readonly UnfinishedStep[]): FarmCard[] {
+export function farmCards(selection: FeatureSelection, unfinished: readonly UnfinishedStep[], lines: FarmCardLines | null = null): FarmCard[] {
   return farmCardPages(selection).map((page) => {
     const steps = unfinished.filter((step) => step.page === page);
-    return { page, line: FARM_CARD_LINES[page], todo: steps.length > 0 ? `À faire : ${steps.map((step) => step.text).join(', ')}` : null };
+    const state = lines?.[page];
+    return {
+      page,
+      line: state ?? FARM_CARD_LINES[page],
+      lineKind: state ? 'state' : 'fixed',
+      todo: steps.length > 0 ? `À faire : ${steps.map((step) => step.text).join(', ')}` : null,
+    };
   });
 }

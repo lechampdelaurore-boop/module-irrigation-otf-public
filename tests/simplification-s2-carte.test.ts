@@ -78,7 +78,7 @@ test('section 3 : une proposition porte « Valider », « Démarrer tout de suit
   assert.deepEqual(summary(line), {
     primary: 'Valider → validate',
     secondary: 'Démarrer tout de suite → validate-and-start',
-    others: ['Changer l’heure ou la dose → planning#proposal-p20', 'Pas à cette heure → refuse'],
+    others: ['Changer l’heure ou la dose → semaine#proposal-p20', 'Pas à cette heure → refuse'],
   });
   const actions = todayCardActions(line);
   assert.ok(actions);
@@ -100,7 +100,7 @@ test('section 3 : une irrigation planifiée porte « Démarrer », et « Modifie
   });
   assert.equal(todayCardActions(line)?.primary.accessibleName, 'Démarrer : Goutte-à-goutte B · Réglage 1, 16 h');
   const [onPlanning] = todo([event('e7', '2026-11-12T15:00:00.000Z')], [], ALL.filter((feature) => feature !== 'arrosages'));
-  assert.deepEqual(summary(onPlanning)?.others, ['Ouvrir sur « Planning de la semaine » → planning#irrigation-e7']);
+  assert.deepEqual(summary(onPlanning)?.others, ['Ouvrir sur « Semaine » → semaine#irrigation-e7']);
 });
 
 test('un seul bouton principal par carte, jamais deux ; « Valider » et « Démarrer » ne sont jamais des liens', () => {

@@ -1,7 +1,7 @@
 import { PAGE_FEATURE_IDS, featureLabel, isPageFeatureId, type FeatureId, type PageFeatureId } from './catalogue';
 import { firstEnabledFeature, type FeatureSelection } from './selection';
 import { usesSpeciesCorrespondence } from './socle';
-import { CUMULS_VIEW_VALUE, SERIES_WATER_ANCHOR, WEEK_VIEW_PARAM, isWeekPageFeature, weekPageExists, weekViewOfFeature, type WeekPageFeature, type WeekViewId } from './week-page';
+import { CUMULS_VIEW_VALUE, SERIES_WATER_ANCHOR, WEEK_RAIN_INTENT, WEEK_VIEW_PARAM, isWeekPageFeature, weekPageExists, weekViewOfFeature, type WeekPageFeature, type WeekViewId } from './week-page';
 
 /**
  * Les pages et leurs adresses (docs/feature-selection-contract.md, section 5) :
@@ -79,6 +79,8 @@ export type PageQuery = {
   tab?: 'materiel' | 'groupes';
   /** La vue de « Semaine » (lot S4, S4-b) : `cumuls` pour la seconde ; la première n'a pas de paramètre. */
   view?: WeekViewId | null;
+  /** « Semaine » ouvre « Noter la pluie » à l'arrivée (lot S4, PR 4, `?pluie=1`). */
+  rain?: boolean;
 };
 
 /** La ligne de la page d'arrivée quand la page demandée n'est pas cochée et qu'on ne sait pas laquelle (section 5, P14). */
@@ -135,13 +137,13 @@ export type ReturnLink = { href: string; label: string };
 /**
  * La page introuvable (audit ergonomique, point 7, 3.8 quater) ramène à la
  * page d'arrivée de la ferme — « Aujourd'hui » quand elle existe (lot 2, F1),
- * sinon la première page cochée —, au choix des fonctionnalités pour une
- * ferme qui n'a jamais ouvert le module, et à l'entrée du module quand la
+ * sinon la première page cochée —, aux trois façons de commencer pour une
+ * ferme qui n'a jamais ouvert le module (lot S6), et à l'entrée du module quand la
  * session n'est pas lue.
  */
 export function notFoundReturnLink(farm: { firstVisit: boolean; enabled: FeatureSelection } | null): ReturnLink {
   if (!farm) return { href: IRRIGATION_BASE_PATH, label: 'Revenir au module d’irrigation' };
-  if (farm.firstVisit) return { href: WELCOME_PATH, label: 'Choisir vos fonctionnalités' };
+  if (farm.firstVisit) return { href: WELCOME_PATH, label: 'Choisir comment commencer' };
   const landing = landingPage(farm.enabled);
   return { href: pageHref(landing), label: `Revenir à « ${pageLabel(landing)} »` };
 }
@@ -179,6 +181,7 @@ export function pageHref(page: IrrigationPageId, query: PageQuery = {}, hash?: s
   if (query.absent) params.set('absente', query.absent === true ? '1' : query.absent);
   if (query.tab) params.set('onglet', query.tab);
   if (query.view === 'cumuls') params.set(WEEK_VIEW_PARAM, CUMULS_VIEW_VALUE);
+  if (query.rain) params.set(WEEK_RAIN_INTENT, '1');
   const search = params.toString();
   return `${pagePath(page)}${search ? `?${search}` : ''}${hash ? `#${hash.replace(/^#/, '')}` : ''}`;
 }

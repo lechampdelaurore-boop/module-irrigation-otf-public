@@ -163,7 +163,13 @@ relevée (précision P4).
   pour la première fois (aucun espace d'irrigation encore créé) voit la liste,
   rien coché d'avance, avant toute autre page. Il faut cocher au moins une case
   pour continuer (précision P7). Le choix enregistré, elle arrive sur sa
-  première page.
+  première page. **Depuis S6** (lot S6, PR 1, D-336,
+  `docs/simplification-s6-contract.md`, sections 3 et 4) : elle voit **trois
+  façons de commencer** (« Je note mes arrosages », « Le module me propose
+  quoi arroser », « Tout : sol, cultures et alertes »), rien choisi d'avance ;
+  « Continuer » attend un choix, et le serveur coche les cases de la façon
+  choisie. La liste devient « Choisir moi-même les fonctionnalités », où il
+  faut toujours au moins une case (P7).
 - **R6 — Les fermes qui utilisent déjà le module** (question 5). Tout reste
   coché : rien ne disparaît sans prévenir. Un bandeau, affiché une seule fois
   et fermé d'un geste, dit : « Vous pouvez maintenant choisir les
@@ -190,7 +196,10 @@ trois endroits (`docs/simplification-s3-contract.md`, section 3). L'ordre des
 pages est celui de la liste ; depuis la PR 3 du lot S3, le menu de
 l'ordinateur les montre dans l'ordre de leurs endroits (section 6). La première page, celle qu'ouvre
 « Irrigation », est la première case cochée de la liste (précision P10) : pour
-une ferme qui a tout coché, Arrosages (précision P36).
+une ferme qui a tout coché, Arrosages (précision P36). **Depuis S6** (lot S6,
+PR 1, D-336, F953) : la **première arrivée**, juste après le choix, est « Ma
+ferme » quand la mise en route a une étape ; les ouvertures suivantes, la page
+d'arrivée de F31.
 
 | Page | Adresse | Contenu |
 | --- | --- | --- |
@@ -206,7 +215,7 @@ une ferme qui a tout coché, Arrosages (précision P36).
 | Historique et cumuls | `/irrigation/historique` | cumuls, historique, séries, export |
 | Ma ferme | `/irrigation/ma-ferme` | une fiche par page cochée de l'endroit « Ma ferme », Réglages toujours (simplification, lot S3, PR 1, D-331) |
 | Réglages | `/irrigation/reglages` | la liste des cases et le socle de la section 3 |
-| (première ouverture) | `/irrigation/bienvenue` | la liste, rien coché |
+| (première ouverture) | `/irrigation/bienvenue` | la liste, rien coché ; **depuis S6** (D-336) : les trois façons de commencer, ou la liste (« Choisir moi-même ») |
 
 - **Ordinateur** : menu à gauche, fond `#e7f1ee`, page choisie en vert `#0b694d`
   texte blanc (charte, section 7). **Téléphone** : barre du haut anthracite
@@ -237,6 +246,15 @@ une ferme qui a tout coché, Arrosages (précision P36).
   votre ferme. » Les nouvelles notifications donnent l'adresse de la page.
 - **Chaque page ne lit que ses données** : la page d'aujourd'hui charge tous les
   tableaux de bord à chaque ouverture ; chaque page ne chargera que les siens.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** Une page de plus, `semaine` (`/irrigation/semaine`),
+qui n'est pas une case : elle existe quand le planning, les besoins ou
+l'historique est coché, et les réunit (S4-a). Les trois cases gardent leur
+sens : elles disent ce que la page contient, au menu des fonctionnalités et
+pour `pageAccess`. Leurs anciennes adresses mènent à « Semaine », paramètres et
+ancre gardés, l'historique à la vue « Les cumuls ». Depuis la PR 4, aucun
+lien du module ne vise plus ces adresses : notifications, liens des pages,
+relecture des réglages et visite guidée visent « Semaine ».
 
 ## 6. L'aide contextuelle
 
@@ -285,7 +303,11 @@ Choix du porteur, question 7 : le « ? » par page **et** l'origine des chiffres
   espace d'irrigation : cases cochées, date du choix, date de la fermeture du
   bandeau, dernières cases annoncées), par une migration additive. Pas de
   ligne = ferme d'avant la 3.8 : tout coché, bandeau à montrer. Pas d'espace
-  d'irrigation = première ouverture.
+  d'irrigation = première ouverture. **Depuis S6** (D-336, migration 0051) :
+  deux colonnes de présentation, nulles pour une ferme d'avant S6,
+  `start_mode` (la façon dont la ferme a commencé : `notes`, `proposals`,
+  `all` ou `custom`) et `route_state` (l'état de la carte « Mise en route » :
+  `later` ou `done`), écrites chacune par un appui.
 - **La prise en compte** : chaque traitement du matin (plan, notification du
   matin, ETM, état du sol, relevé météo, alertes météo, alertes cultures, arrêt
   avant récolte) et chaque envoi de notification lit le choix de la ferme avant
@@ -402,7 +424,9 @@ changer chacune par une PR.
 - **P8** Un changement de cases qui touche le Planning le recalcule, raison
   dite dans l'en-tête.
 - **P9** La date du dernier changement est gardée, pas l'historique des choix.
-- **P10** La première page est la première case cochée de la liste.
+- **P10** La première page est la première case cochée de la liste (depuis S6,
+  D-336 : sauf la première arrivée, « Ma ferme » quand la mise en route a une
+  étape).
 - **P11** Les quatre pastilles d'univers d'Ouvre ta ferme ne sont pas
   reproduites.
 - **P12** Saison et parcelle dans l'adresse, gardées d'une page à l'autre.

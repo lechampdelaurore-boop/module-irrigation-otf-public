@@ -100,12 +100,13 @@ test('n° 5, F446 : un manque que la faisabilité ne voit pas se dit, d’où il
   const gap = feasibilityPlanGap({ plan, feasibility: sees, now })!;
   assert.match(gap.lead, /^Le planning compte un manque de [\d,]+ L d’ici dimanche, que cette répartition ne voit pas\.$/);
   assert.match(gap.cause, /^Les besoins des planches qui ont un objectif \(1,2 m³\) tiennent dans l’eau disponible \(2 m³\)\. Le matériel verse aussi [\d,]+ L sur des planches qui n’en ont pas besoin cette semaine \(A03, C01, H01 et 1 autre\)\. Le manque vient de là\. Fermez leurs lignes, retirez ces planches du matériel, ou fixez leur objectif\.$/);
-  assert.deepEqual(gap.links.map((link) => link.page), ['materiel', 'besoins']);
+  // Le planning et les besoins sont sur « Semaine » depuis S4 (PR 4) : « Eau visée », où se fixe l'objectif.
+  assert.deepEqual(gap.links.map((link) => [link.page, link.anchor]), [['materiel', undefined], ['semaine', 'objectifs-de-la-semaine']]);
   // Sans eau versée au-delà du besoin : les heures, les pompes, le remplissage, et le lien vers le planning.
   const withoutSurplus: StoredWeeklyPlan = { ...plan, proposals: plan.proposals.map((proposal) => ({ ...proposal, bedApplications: proposal.bedApplications.map((application) => ({ ...application, surplusMm: 0 })) })) };
   const timing = feasibilityPlanGap({ plan: withoutSurplus, feasibility: sees, now })!;
   assert.match(timing.cause, /Le manque vient des heures, des pompes ou du remplissage des réserves/);
-  assert.deepEqual(timing.links.map((link) => link.page), ['planning']);
+  assert.deepEqual(timing.links.map((link) => [link.label, link.page, link.anchor]), [['Ouvrir la semaine', 'semaine', 'le-plan']]);
   // La faisabilité voit le manque, une répartition s'applique, ou le plan ne manque de rien : rien à dire.
   assert.equal(feasibilityPlanGap({ plan, feasibility: { ...sees, requiresManualArbitration: true }, now }), null);
   const arbitrated: StoredWeeklyPlan = { ...plan, calculation: { ...plan.calculation, summary: { ...plan.calculation.summary, arbitration: { allocatedCubicMeters: 1, unreceivableCubicMeters: 0, unreceivableBedCount: 0 } as never } } };

@@ -43,6 +43,14 @@ export type WeekViewId = (typeof WEEK_VIEW_IDS)[number];
 export const WEEK_VIEW_PARAM = 'vue';
 export const CUMULS_VIEW_VALUE = 'cumuls';
 
+/**
+ * La demande « Noter la pluie » portée par l'adresse (lot S4, PR 4, section
+ * 9) : `?pluie=1` ouvre la fenêtre de « Noter la pluie » de « Semaine »
+ * (8.3), comme `?recalculer=1` recalcule le plan (`useUrlIntent`). La ligne
+ * « Pluie réelle incomplète » de la fiabilité y mène.
+ */
+export const WEEK_RAIN_INTENT = 'pluie';
+
 /** La case d'où vient chaque vue : le planning exige « Objectifs et besoins », dont la vue « La semaine » suit. */
 const VIEW_FEATURE: Readonly<Record<WeekViewId, WeekPageFeature>> = {
   semaine: 'besoins',
@@ -105,11 +113,24 @@ export const WEEK_SECTIONS = [
   { id: 'jours', feature: 'besoins' },
   /** L'écart du prévu des trois dernières semaines, lu à la demande. */
   { id: 'ecart-du-prevu', feature: 'planning' },
-  /** Les réglages du planning et les heures où l'on n'arrose pas. */
-  { id: 'reglages', feature: 'planning' },
+  /**
+   * Les réglages de la semaine : ceux du planning et les heures où l'on
+   * n'arrose pas (Planning coché), le seuil minimal de planification des
+   * besoins (S4, PR 2) ; la section existe avec la vue.
+   */
+  { id: 'reglages', feature: 'besoins' },
 ] as const satisfies readonly { id: string; feature: WeekPageFeature }[];
 
 export type WeekSectionId = (typeof WEEK_SECTIONS)[number]['id'];
+
+/**
+ * Les ancres de deux sections du détail, que d'autres pages visent (lot S4,
+ * PR 4) : la fiche d'une planche de « Matériel » mène à « Ce qu'il reste à
+ * arroser », le manque que la faisabilité de « Ressources » ne voit pas à
+ * « Le plan, chaîne par chaîne ».
+ */
+export const NEEDS_SECTION_ANCHOR = 'reste-a-arroser';
+export const PLAN_SECTION_ANCHOR = 'le-plan';
 
 /** Les sections que la vue « La semaine » contient pour ces cases, dans l'ordre. */
 export function weekSections(selection: FeatureSelection): WeekSectionId[] {
@@ -148,6 +169,8 @@ export const WEEK_ANCHORS = [
   { anchor: 'planning-title', feature: 'planning' },
   { anchor: 'proposal-', feature: 'planning', prefix: true },
   { anchor: 'objectifs-de-la-semaine', feature: 'besoins' },
+  // Le bloc « Hors saison », dans le pli des objectifs (6 quaterdecies, B3) : la tuile d'« Aujourd'hui » y mène.
+  { anchor: 'hors-saison', feature: 'besoins' },
   { anchor: 'manual-rain', feature: 'besoins' },
   { anchor: 'meteo-de-reference', feature: 'besoins' },
   { anchor: 'weather', feature: 'besoins' },

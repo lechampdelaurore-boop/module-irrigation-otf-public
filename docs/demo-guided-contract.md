@@ -70,7 +70,7 @@ Profils proposés (à valider, question 1 sur 4) :
 | **A. Maraîchage diversifié** : plein champ et tunnels, une réserve et une pompe | Le cœur du module : besoin, planning, pénurie, réserve | Presque tout |
 | **B. Petite exploitation, une seule ressource directe** | L'arrosage sans réserve ; le calculateur « millimètres → temps » | Matériel, Arrosages, Objectifs |
 | **C. Ferme qui ne veut que les vannes et les alertes** | Le module à la carte : une ferme qui ne coche presque rien | Matériel, Alertes météo |
-| **Ferme vierge** | Première ouverture, liste de cases à cocher, état « non finie de configurer » (non vérifié à ce jour dans l'audit) | Rien coché d'avance |
+| **Ferme vierge** | Première ouverture, liste de cases à cocher, état « non finie de configurer » (non vérifié à ce jour dans l'audit) ; depuis S6 (D-336), les trois façons de commencer, puis la carte « Mise en route » | Rien coché d'avance |
 
 Chaque profil a des **communes météo différentes** (valeurs par défaut adaptées par région, comme l'exige l'audit, point 10), des noms de lieux **inventés**, et des tailles différentes. Le profil A reprend la ferme de démonstration actuelle (`lib/adapters/mock-data.ts`, `mock-crop-plan.ts`, 15 planches sur 4 saisons), étendue au besoin.
 
@@ -105,6 +105,14 @@ Des **bulles** ancrées sur des éléments de l'écran, avec un texte court, un 
 - **Reprenable** : l'étape en cours est rangée côté navigateur (rien de sensible), avec repli propre si le stockage est refusé.
 - La visite **ne fait jamais d'action à la place du visiteur** et ne valide rien sans clic de sa part.
 - Si un élément ancré est absent (case décochée, page masquée), l'étape est **sautée** sans message d'erreur.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** Les étapes `planning-semaine`,
+`planning-propositions`, `planning-non-servies` et `planning-creneaux` gardent
+leur repère et se jouent sur « Semaine ». Un repère rangé dans un pli fermé de
+la page (« Le détail » et ses sections) est montré en ouvrant ces plis, comme
+le détail de la bannière au téléphone (F291) : l'élément présenté est à
+l'écran, jamais caché dans un pli. Une étape dont l'élément manque reste
+sautée.
 
 ## 8. Remise à zéro
 
@@ -250,7 +258,9 @@ attendant sa réponse, et changera si elle diffère.
   fourchettes déjà utilisées par la démonstration et les tests.
 - **F165 — la ferme vierge** n'a pas d'espace tant que l'invité n'a rien
   coché : elle s'ouvre, comme une ferme qui n'a jamais ouvert le module, sur
-  la liste à cocher. Les fermes A, B et C s'ouvrent avec leurs cases cochées
+  la liste à cocher (depuis S6, D-336 : sur les trois façons de commencer ;
+  son choix s'écrit dans la base de démonstration, et la remise à zéro la
+  rend vierge, la façon et l'état de la carte compris). Les fermes A, B et C s'ouvrent avec leurs cases cochées
   d'avance (B ajoute le calculateur, qu'elle montre) ; un espace déjà ouvert
   n'est jamais réécrit.
 
@@ -331,7 +341,12 @@ ergonomique final, sans toucher au moteur.
   qui a l'une de ses pages. Ferme A : les sept ; ferme B : Bienvenue, Un
   arrosage de A à Z, Le module à la carte, Et pour ma ferme ? ; ferme C :
   Bienvenue, Les alertes, Le module à la carte, Et pour ma ferme ? ; ferme
-  vierge : Bienvenue, Le module à la carte, Et pour ma ferme ?.
+  vierge : Bienvenue, Le module à la carte, Et pour ma ferme ?. **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) :
+  les mêmes ; sur l'écran des trois façons, les deux étapes de « Le module
+  à la carte » disent les trois façons (« Trois façons de commencer »,
+  « Rien n'est choisi d'avance »), aucune étape ajoutée ni retirée, la
+  règle de saut (F177) tient. Les fermes A, B et C sont d'avant S6 : pas de
+  carte « Mise en route », leurs lignes d'état se voient.
 - **F179 — la place de la bulle** : à partir de 981 px de large, près de
   l'élément (dessous, sinon dessus, sinon à côté, sinon au coin bas), elle
   le suit quand la page défile et ne sort jamais de la fenêtre ; en deçà,
@@ -389,7 +404,8 @@ d'Access relu.
   (la ferme et le moment ouverts) et ce qui ne change pas (les autres) ;
   « Annuler » ou Échap la ferment et rendent le focus au bouton.
   Confirmée, la page d'arrivée de la ferme se rouvre en entier ; la ferme
-  vierge revient à sa liste à cocher.
+  vierge revient à sa liste à cocher (depuis S6 : à ses trois façons de
+  commencer, rien de choisi).
 - **F187 — le dernier passage** de l'invité est l'heure de mise à jour de
   son espace, réécrite au plus une fois par heure à sa visite, à l'horloge
   réelle de la base, jamais au jour simulé.
@@ -430,7 +446,8 @@ d'Access relu.
   quand vous voulez » sur le bouton des visites, puis « Essayez sans
   crainte » sur le bouton « Remettre à zéro » (vingt-deux repères
   `data-tour`). Parcours V8 aux deux largeurs : rien sans confirmation,
-  puis la ferme vierge revenue à sa liste à cocher.
+  puis la ferme vierge revenue à sa liste à cocher (depuis S6 : à ses trois
+  façons de commencer).
 
 ## 12. Questions au porteur (répondues) (une par message, numérotées)
 

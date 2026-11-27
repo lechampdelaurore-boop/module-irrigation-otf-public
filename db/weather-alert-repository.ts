@@ -1,5 +1,6 @@
 import { db } from './binding';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
+import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import { weatherCriterionCreationJournal, weatherCriterionDeletionJournal, weatherCriterionUpdateJournal } from './change-journal/settings';
 import {
   weatherAlertCriterionNeedsNewVersion,
@@ -42,6 +43,22 @@ export async function listWeatherAlertCriteriaForWorkspace(workspaceId: string):
      ORDER BY c.created_at, c.rowid`,
   ).bind(workspaceId).all<CriterionRow>();
   return result.results.map(criterionFromRow);
+}
+
+/**
+ * Le nombre des alertes météo réglées d'une ferme, et de celles qui sont
+ * actives (simplification, lot S6, section 7.2 : la ligne d'état de la fiche
+ * « Alertes météo ») : un `COUNT`, les critères supprimés exclus, comme la
+ * liste de la page.
+ */
+export async function countWeatherAlertCriteriaForUser(ownerUserId: string): Promise<{ total: number; active: number }> {
+  const row = await db.prepare(
+    `SELECT COUNT(*) AS total, COALESCE(SUM(CASE WHEN c.active = 1 THEN 1 ELSE 0 END), 0) AS active
+     FROM irrigation_weather_alert_criteria AS c
+     INNER JOIN irrigation_workspaces AS workspace ON workspace.id = c.workspace_id
+     WHERE ${WORKSPACE_SPACE_FILTER} AND c.deleted_at IS NULL`,
+  ).bind(...spaceParams(ownerUserId)).first<{ total: number; active: number }>();
+  return { total: Number(row?.total ?? 0), active: Number(row?.active ?? 0) };
 }
 
 /** Ajoute un critère à l'exploitation de l'utilisateur, en version 1. */

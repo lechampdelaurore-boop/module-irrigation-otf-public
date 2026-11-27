@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
@@ -57,16 +57,8 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await sansAlertesSysteme(page);
-  await ouvrirUneFermeNeuve(context, testInfo, 'telephone');
-
-  // Toutes les cases cochées.
-  await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'aujourdhui');
+  // Toutes les cases cochées, par la façon « Tout » (lot S6).
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'telephone');
   await verifierLEtape(page, journal, 'toutes les cases cochées');
   // Le bandeau des alertes système vit sur la page des arrosages (F21).
   await attendreLaPageIrrigation(page, 'arrosages');
@@ -178,32 +170,32 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   await reglerLaPlageDuGoutteAGoutte(planning, { debut: '00:00', fin: '23:59' });
   await planning.getByRole('button', { name: /^(Calculer le plan de la semaine|Recalculer le plan)$/ }).click();
   await expect(planning.locator('.planning-meta')).toContainText('calculé le', { timeout: 30_000 });
-  // La page rouverte, telle qu'on la trouve le matin : les réglages repliés.
+  // La page rouverte, telle qu'on la trouve le matin : « Jour par jour » de la page « Semaine »
+  // (simplification, lot S4, PR 2, section 5), les réglages dans « Le détail ».
   await attendreLaPageIrrigation(page, 'planning');
-  await expect(planning.locator('article.planning-proposal').first()).toBeVisible();
-  const resume = planning.locator('button.planning-summary-line');
-  const tuiles = planning.locator('.planning-summary');
+  await expect(planning.locator('article.planning-proposal').first()).toBeAttached();
   const ecoules = planning.getByRole('button', { name: /^Jours écoulés \(\d+\)$/ });
+  const lignes = planning.locator('.week-slot-line');
   if (telephone) {
     // Depuis le lot S4, les besoins suivent le planning sur la même page : le planning se mesure jusqu'à son bas.
     const hauteur = await planning.evaluate((element) => Math.round(element.getBoundingClientRect().bottom + window.scrollY));
     expect(hauteur, `le planning mesure ${hauteur} px, plus de ${ECRANS_DU_PLANNING_MAX} écrans`).toBeLessThanOrEqual(ECRANS_DU_PLANNING_MAX * ECRAN_DU_TELEPHONE_PX);
-    await expect(resume).toBeVisible();
-    // Les gestes d'abord, comme les cartes de tête (audit ergonomique, lot 3, point 5).
-    await expect(resume).toContainText(/^\d+ à valider · \d+ faites? · /);
-    await expect(tuiles).toBeHidden();
-    await verifierCibleTactile(resume, 'La ligne de résumé du planning');
-    await resume.click();
-    await expect(tuiles).toBeVisible();
-    // Les tuiles de totaux sur deux colonnes (charte, point 5).
-    expect((await tuiles.evaluate((element) => getComputedStyle(element).gridTemplateColumns)).split(' ')).toHaveLength(2);
-    await resume.click();
-    await expect(tuiles).toBeHidden();
+    // Chaque créneau en une ligne : l'heure, le matériel, la durée, la dose ; la carte entière dessous, fermée.
+    const ligne = planning.locator('.week-slot-line:visible').first();
+    await expect(ligne).toBeVisible();
+    await expect(ligne.locator('p > span').first()).toHaveText(/^\d{1,2} h( \d{2})? · .+ · .+ · [\d,]+ mm$/);
+    const carte = ligne.locator('xpath=..').locator('article.planning-proposal');
+    await expect(carte).toBeHidden();
+    const autres = ligne.getByRole('button', { name: /^(Autres choix|Détail)$/ });
+    await verifierCibleTactile(autres, 'Le bouton « Autres choix » du créneau');
+    await autres.click();
+    await expect(carte).toBeVisible();
+    await autres.click();
+    await expect(carte).toBeHidden();
 
-    // Le jour du jour ouvert ; les jours écoulés sous leur pli ; un jour à venir replié se déplie.
+    // Le jour du jour ouvert ; les jours écoulés sous leur pli.
     const ouverts = planning.locator('li.planning-day[data-fold="open"]');
     await expect(ouverts.first()).toBeVisible();
-    await expect(ouverts.first()).toHaveAttribute('data-expanded', 'true');
     const replies = planning.locator('li.planning-day[data-fold="past"]');
     if (await replies.count() > 0) {
       await expect(replies.first()).toBeHidden();
@@ -215,22 +207,10 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
     } else {
       await expect(ecoules).toHaveCount(0);
     }
-    const aVenir = planning.locator('li.planning-day[data-fold="folded"]').filter({ has: page.locator('article.planning-proposal') }).first();
-    if (await aVenir.count() > 0) {
-      await expect(aVenir.locator('article.planning-proposal').first()).toBeHidden();
-      const voir = aVenir.getByRole('button', { name: /^Voir les créneaux \(\d+\)$/ });
-      await verifierCibleTactile(voir, 'Le bouton « Voir les créneaux »');
-      await voir.click();
-      await expect(aVenir.locator('article.planning-proposal').first()).toBeVisible();
-      await aVenir.getByRole('button', { name: 'Replier le jour' }).click();
-      await expect(aVenir.locator('article.planning-proposal').first()).toBeHidden();
-    }
   } else {
-    // À l'ordinateur, rien ne se replie.
-    await expect(resume).toBeHidden();
-    await expect(tuiles).toBeVisible();
+    // À l'ordinateur, rien ne se replie : les cartes entières, sans ligne compacte.
+    await expect(lignes.first()).toBeHidden();
     await expect(ecoules).toBeHidden();
-    for (const bouton of await planning.getByRole('button', { name: /^(Voir les créneaux|Replier le jour)/ }).all()) await expect(bouton).toBeHidden();
     await expect(planning.locator('article.planning-proposal').last()).toBeVisible();
   }
   await verifierLEtape(page, journal, 'planning replié au téléphone');
