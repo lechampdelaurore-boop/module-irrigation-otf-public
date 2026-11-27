@@ -21,9 +21,22 @@ registres, elle y renvoie.
   tableaux (la pluie, la soif du jour), la pluie notée, les réserves. La
   démonstration reçoit une archive semée, étiquetée « Exemple » (cumul de la
   semaine à « 3 sur 4 », F1005). Parcours P71 et V12. Aucun calcul, aucune
-  migration. Contrôles : voir la PR. Restent les fusions (après la file),
-  la recette sur la démonstration en ligne, puis le constat des premiers
+  migration. Contrôles : voir la PR. **En ligne** : le contrat (#241) le
+  27 novembre 2026 à 13 h 48 (run 45994373719), la PR 1 (#246) à 14 h 39
+  (run 46002240528), les cinq jobs verts chaque fois. Restent la fusion de
+  cette PR, la recette sur la démonstration en ligne, puis le constat des premiers
   chiffres de la vraie ferme, avec l'accord du porteur.
+- **Ligne 34 : recette sur la démonstration conforme, trois écarts
+  d'affichage corrigés, le 27 novembre 2026** (D-356, F1097 à F1099 ;
+  roadmap ligne 34), en Opus 5.5 · Élevé. La ligne « automatique » d'un
+  jardin dit sur combien de planches porte sa moyenne (« Clos des saules ·
+  1 planche sur 2 ») ; un jardin tout hors saison dit « Hors saison : ni
+  besoin ni volume » dans le tableau des besoins, jamais « non
+  calculable » ; « Eau de la semaine » d'« Aujourd'hui » et « Jardin par
+  jardin » de « Semaine » le disent « hors saison », sans « Lui en donner
+  une », et ses planches ne comptent plus « sans eau visée ». Aucune
+  migration. Consigne la mise en ligne de B3 (#257). Contrôles : voir la
+  PR.
 - **La météo prévue contre la météo réalisée, PR 1 sur 2 : le calcul et la
   lecture, codée le 26 novembre 2026** (D-343, F998 à F1004 ; contrat,
   sections 3 à 5, 7 et 8), en Opus 5.5 · Élevé, lancée sur le mandat du
@@ -61,8 +74,8 @@ registres, elle y renvoie.
   mène au bloc ; une proposition du planning marque la planche hors saison
   qu'un matériel partagé arrose encore ; le « ? » du bloc dit ce qui
   continue. Aucune migration. Tests du domaine, parcours nouveau P74 aux
-  deux largeurs. Contrôles : voir la PR. Fusion la dernière de la
-  ligne 34, A1, B1 et B2 en ligne.
+  deux largeurs. **En ligne : #257, fusionnée le 27 novembre 2026 à
+  10 h 06, en ligne à 10 h 56, run 45970882756** (consigné par D-356).
 - **Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs,
   codée le 26 novembre 2026** (D-352, F1061 à F1074 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4 à 8 et 10 ;
