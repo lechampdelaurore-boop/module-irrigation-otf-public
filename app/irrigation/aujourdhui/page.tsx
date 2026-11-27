@@ -1,3 +1,4 @@
+import { todayRouteBlock } from '@/lib/domain/onboarding/route';
 import { loadPageContext, type IrrigationSearchParams } from '../page-context';
 import { loadAujourdhuiPage } from '../page-loaders';
 import { IrrigationShell } from '../shell/irrigation-shell';
@@ -15,6 +16,8 @@ export const metadata = pageMetadata('aujourdhui');
  * docs/audit-ergonomie-lot2-contract.md, sections 5 et 6) : l'entrée du
  * module, la réponse à la question du matin, et la zone « Fiabilité du
  * calcul ». Elle ne calcule rien : elle lit le modèle construit côté serveur.
+ * Pour une ferme qui n'est pas prête, sans arrosage à montrer, l'étape en
+ * cours de sa mise en route remplace « Rien à arroser » (lot S6, section 8).
  */
 async function computeAujourdhuiRoutePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
   const context = await loadPageContext('aujourdhui', searchParams);
@@ -23,7 +26,7 @@ async function computeAujourdhuiRoutePage({ searchParams }: { searchParams: Irri
   context.logLoaded();
   return (
     <IrrigationShell {...context.shell} todayBadge={view.badge}>
-      <TodayPage initialView={view} query={{ season: context.shell.season, zone: context.zone }} />
+      <TodayPage initialView={view} query={{ season: context.shell.season, zone: context.zone }} routeBlock={todayRouteBlock(context.route, context.enabled)} />
     </IrrigationShell>
   );
 }

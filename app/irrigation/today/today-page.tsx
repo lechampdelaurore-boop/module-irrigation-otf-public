@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
+import type { TodayRouteBlock } from '@/lib/domain/onboarding/route';
 import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import { dayRowLayout, type TodayBlock, type TodayView } from '@/lib/domain/today/today-view';
 import { millisecondsFromMinutes, millisecondsFromSeconds } from '@/lib/domain/units';
@@ -44,7 +45,12 @@ const TODAY_RETURN_MS = millisecondsFromMinutes(1);
  * journée » passe juste après l'en-tête, avant les tuiles de la semaine,
  * toujours (L6, D-315) ; à l'ordinateur, l'ordre ne change pas.
  */
-export function TodayPage({ initialView, query }: { initialView: TodayView; query: PageQuery }) {
+export function TodayPage({ initialView, query, routeBlock = null }: {
+  initialView: TodayView;
+  query: PageQuery;
+  /** L'étape en cours de la mise en route, pour une ferme qui n'est pas prête (lot S6, section 8) ; `null` sinon. */
+  routeBlock?: TodayRouteBlock | null;
+}) {
   const [view, setView] = useState(initialView);
   const [pending, startTransition] = useTransition();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -214,7 +220,7 @@ export function TodayPage({ initialView, query }: { initialView: TodayView; quer
         onReveal={reveal}
       />
       <Pair
-        wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={null} allDone={view.allDone} emptyLink={view.dayEmptyLink} allIrrigationsLink={view.allIrrigationsLink} query={dayQuery} pending={pending} replies={replies} onCardGesture={cardGesture} onFinish={finish} onAllDone={recordAllDone} /> : null}
+        wide={late && todo ? <TodayDay today={view.today} current={view.current} late={late} todo={todo} tomorrow={view.tomorrow} timeline={null} allDone={view.allDone} emptyLink={view.dayEmptyLink} routeBlock={routeBlock} allIrrigationsLink={view.allIrrigationsLink} query={dayQuery} pending={pending} replies={replies} onCardGesture={cardGesture} onFinish={finish} onAllDone={recordAllDone} /> : null}
         narrow={weatherAlertView}
         layout={late && todo ? dayRowLayout(late.lines.length + view.current.length, todo.lines.length) : 'wide'}
       />

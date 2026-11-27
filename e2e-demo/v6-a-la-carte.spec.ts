@@ -5,7 +5,10 @@ import { commencerLaVisite, ecarterLInvitation, etapeSuivante, jouerLaVisite, ou
  * Parcours V6 : la visite « Le module à la carte » (contrat, section 7,
  * visite 6 ; D3) pour la ferme qui ne coche presque rien, puis pour la ferme
  * vierge, sur sa première ouverture : l'étape du menu, absent, y est sautée
- * sans message. « Passer » mène à la visite suivante.
+ * sans message. « Passer » mène à la visite suivante. Sur la première
+ * ouverture, les deux étapes disent les trois façons de commencer, mêmes
+ * étapes, même ancre (lot S6, PR 4, docs/simplification-s6-contract.md,
+ * section 10).
  */
 async function visitesOffertes(page: import('@playwright/test').Page): Promise<string[]> {
   await ouvrirLeDetailDeLaBanniere(page);
@@ -26,18 +29,21 @@ test('V6 Le module à la carte : Réglages, puis la première ouverture de la fe
     { titre: 'Les endroits suivent vos cases', rang: 'étape 3 sur 3', ancre: 'menu', chemin: '/irrigation/reglages' },
   ]);
 
-  // La ferme vierge s'ouvre sur la liste à cocher, sans menu.
+  // La ferme vierge s'ouvre sur les trois façons de commencer (lot S6), sans menu.
   const vierge = await ouvrirLaDemo(page, 'vierge', 'ete');
   await expect(page).toHaveURL(/\/irrigation\/bienvenue/);
   expect(await visitesOffertes(page)).toEqual(['Bienvenue', 'Le module à la carte', 'Et pour ma ferme ?']);
   await commencerLaVisite(page, 'Bienvenue');
   await verifierLEtapeDeVisite(page, vierge, { titre: 'Bienvenue dans la démonstration', rang: 'étape 1 sur 5', chemin: '/irrigation/bienvenue' });
   await page.locator('.tour-bubble').getByRole('button', { name: /^Passer/ }).click();
-  await verifierLEtapeDeVisite(page, vierge, { titre: 'Cochez ce qui vous sert', rang: 'étape 1 sur 2', ancre: 'fonctionnalites', chemin: '/irrigation/bienvenue' });
+  await verifierLEtapeDeVisite(page, vierge, { titre: 'Trois façons de commencer', rang: 'étape 1 sur 2', ancre: 'fonctionnalites', chemin: '/irrigation/bienvenue' });
+  await expect(page.locator('.tour-bubble')).toContainText('« Choisir moi-même les fonctionnalités » montre la liste des cases');
   await etapeSuivante(page);
-  await verifierLEtapeDeVisite(page, vierge, { titre: 'Sans rien perdre', rang: 'étape 2 sur 2', ancre: 'fonctionnalites', chemin: '/irrigation/bienvenue' });
+  await verifierLEtapeDeVisite(page, vierge, { titre: 'Rien n’est choisi d’avance', rang: 'étape 2 sur 2', ancre: 'fonctionnalites', chemin: '/irrigation/bienvenue' });
+  await expect(page.locator('.tour-bubble')).toContainText('rien ne s’enregistre avant « Continuer »');
   await etapeSuivante(page, 'Terminer');
   await expect(page.locator('.tour-bubble')).toHaveCount(0);
-  // Rien n'a été coché à la place du visiteur.
+  // Rien n'a été choisi à la place du visiteur : aucune façon enfoncée, « Continuer » attend.
   await expect(page.locator('[data-tour="fonctionnalites"] input:checked')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Continuer' })).toBeDisabled();
 });

@@ -14,7 +14,8 @@ import { PAGE_ICONS } from '../shell/page-icons';
  * la saison et la parcelle de la page (P12). Comme le menu, il change de page
  * sans recharger le module (D-322) et porte le clavier sur le contenu de la
  * page ouverte. « À faire », en orange, quand l'accueil de la ferme attend une
- * étape de cette page.
+ * étape de cette page. La ligne dit l'état de la fiche quand il est connu
+ * (lot S6, PR 3), sinon la ligne fixe : `data-line` le dit aux parcours.
  */
 export function FarmCards({ cards, query }: { cards: readonly FarmCard[]; query: PageQuery }) {
   return (
@@ -26,7 +27,7 @@ export function FarmCards({ cards, query }: { cards: readonly FarmCard[]; query:
               <span className="farm-card-icon"><Icon name={PAGE_ICONS[card.page]} /></span>
               <span className="farm-card-text">
                 <strong>{pageLabel(card.page)}</strong>
-                <span className="farm-card-line">{card.line}</span>
+                <span className="farm-card-line" data-line={card.lineKind}>{card.line}</span>
                 {card.todo ? <span className="farm-card-todo">{card.todo}</span> : null}
               </span>
               <span className="farm-card-chevron"><Icon name="chevron" /></span>

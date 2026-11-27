@@ -14,6 +14,7 @@ import type { TodayNowLine } from '@/lib/domain/today/now-irrigations';
 import type { TodayIrrigationLine } from '@/lib/domain/today/today-irrigations';
 import { shortDayText } from '@/lib/domain/today/today-text';
 import type { TodayBlock, TodayDayEmptyLink } from '@/lib/domain/today/today-view';
+import type { TodayRouteBlock } from '@/lib/domain/onboarding/route';
 import { Icon, type IconName } from '../line-icon';
 import { FinishIrrigationDialog } from '../irrigation-manager/finish-irrigation-dialog';
 import { isoFromLocalInput } from '../irrigation-manager/presentation';
@@ -65,7 +66,7 @@ type TodoBlock = Extract<TodayBlock, { kind: 'todo' }>;
  * quand la carte est partie (« Fait comme prévu »), en tête du bloc, sous
  * « Tout est fait » (6 nonies, L4, D-313).
  */
-export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, allIrrigationsLink = false, query, pending, replies = [], onCardGesture, onFinish, onAllDone }: {
+export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, allDone, emptyLink = null, routeBlock = null, allIrrigationsLink = false, query, pending, replies = [], onCardGesture, onFinish, onAllDone }: {
   today: string;
   current?: readonly TodayNowLine[];
   late: LateBlock;
@@ -75,6 +76,12 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
   allDone: AllDone | null;
   /** Le lien de « Rien à arroser aujourd’hui » (6 nonies, L3) ; `null` : aucun. */
   emptyLink?: TodayDayEmptyLink | null;
+  /**
+   * L'étape en cours de la mise en route (lot S6, section 8) : sans arrosage
+   * à montrer, elle remplace « Rien à arroser aujourd’hui » ; une carte
+   * d'arrosage passe toujours avant. `null` : la ligne vide habituelle.
+   */
+  routeBlock?: TodayRouteBlock | null;
   /** « Tous les arrosages » en pied du bloc, avec « Arrosages » cochée (simplification S3, section 3.4). */
   allIrrigationsLink?: boolean;
   query: PageQuery;
@@ -151,7 +158,18 @@ export function TodayDay({ today, current = [], late, todo, tomorrow, timeline, 
       </div>
       {reply(DAY_REPLY)}
       {timeline ? <Timeline timeline={timeline} /> : null}
-      {nothing ? (
+      {nothing && routeBlock ? (
+        <div className="today-empty today-route" data-route="true">
+          <span className="today-route-icon" aria-hidden="true"><Icon name="ferme" /></span>
+          <div>
+            <b>{routeBlock.title}</b>
+            <p>{routeBlock.sentence}</p>
+            <a className="primary-button today-route-continue" href={pageHref(routeBlock.link.page, { ...query, ...(routeBlock.link.tab ? { tab: routeBlock.link.tab } : {}) }, routeBlock.link.anchor)}>
+              {routeBlock.label}
+            </a>
+          </div>
+        </div>
+      ) : nothing ? (
         <div className="today-empty">
           <svg viewBox="0 0 64 44" aria-hidden="true" focusable="false">
             <path d="M6 38h52M10 38c2-6 6-9 10-9s8 3 10 9M34 38c2-5 5-7 8-7s6 2 8 7M40 6s5 5.5 5 9a5 5 0 0 1-10 0c0-3.5 5-9 5-9zM37.5 15l2 2 3.5-3.5" />
