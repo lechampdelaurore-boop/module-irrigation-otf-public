@@ -177,7 +177,7 @@ export function forecastDaysForModel(
  * Ce que l'écran dira des jours complétés (règle 6) : le dernier jour donné
  * par le modèle choisi et le premier jour complété, ou `null` si aucun.
  */
-export function forecastCompletion(modelId: string, days: readonly ModelForecastDay[]): {
+export function forecastCompletion(modelId: string, days: readonly SourcedWeatherDay[]): {
   lastModelDate: string | null;
   firstCompletedDate: string | null;
 } {
@@ -193,4 +193,61 @@ export function forecastCompletion(modelId: string, days: readonly ModelForecast
 /** Le lecteur de prévision par modèle (l'adaptateur Open-Meteo), vu du domaine. */
 export interface ModelForecastReader {
   readModelForecast(input: WeatherReadInput, modelId: string): Promise<ModelForecastDay[]>;
+}
+
+/**
+ * Le modèle qu'une lecture demande pour une ferme (règles 1, 9 et 13) : son
+ * modèle enregistré, s'il est encore proposé et couvre son lieu, et si le
+ * déploiement sait lire les modèles ; sinon `null`, « Automatique », la
+ * lecture d'avant ce chantier.
+ */
+export function forecastModelToRead(choice: ForecastModelChoice, modelsReadable: boolean): string | null {
+  return modelsReadable && choice.kind === 'model' ? choice.model.id : null;
+}
+
+/** Une lecture de prévision partagée : un modèle lu (`null` : « Automatique ») et les fermes qui la reçoivent. */
+export type ForecastReading<T> = { modelId: string | null; members: T[] };
+
+/**
+ * Les lectures de prévision des fermes d'un même lieu (contrat, § 5) : une
+ * par modèle lu, quel que soit le nombre de fermes qui le partagent ; deux
+ * fermes de modèles différents ne partagent jamais une lecture, et
+ * « Automatique » n'en partage aucune avec un modèle. Chaque ferme écrit
+ * ensuite **ses** lignes, sous son espace : une lecture se partage, une ligne
+ * jamais. L'ordre est celui de la première ferme de chaque lecture.
+ */
+export function forecastReadingsAtPlace<T>(members: readonly T[], modelOf: (member: T) => string | null): ForecastReading<T>[] {
+  const readings = new Map<string | null, T[]>();
+  for (const member of members) {
+    const modelId = modelOf(member);
+    const reading = readings.get(modelId) ?? [];
+    reading.push(member);
+    readings.set(modelId, reading);
+  }
+  return [...readings.entries()].map(([modelId, readingMembers]) => ({ modelId, members: readingMembers }));
+}
+
+/** Un jour de prévision lu, avec la `source` qu'il porte quand il vient d'un modèle choisi. */
+export type SourcedWeatherDay = WeatherDailyValue & { source?: string };
+
+/**
+ * Les jours d'une lecture rangés par `source` (contrat, § 6 ; règle 6) : un
+ * jour d'un modèle choisi porte la sienne (`open-meteo:<modèle>`, ou
+ * `open-meteo:best_match` pour un jour complété) ; un jour qui n'en porte pas
+ * vient du fournisseur d'« Automatique » et prend la sienne. Chaque groupe
+ * s'écrit sous sa `source` : la table et l'archive disent, jour par jour, qui
+ * a donné la ligne. L'ordre est celui du premier jour de chaque `source`.
+ */
+export function forecastDaysBySource(
+  days: readonly SourcedWeatherDay[],
+  providerSource: string,
+): { source: string; values: WeatherDailyValue[] }[] {
+  const groups = new Map<string, WeatherDailyValue[]>();
+  for (const { source, ...value } of days) {
+    const key = source ?? providerSource;
+    const group = groups.get(key) ?? [];
+    group.push(value);
+    groups.set(key, group);
+  }
+  return [...groups.entries()].map(([source, values]) => ({ source, values }));
 }

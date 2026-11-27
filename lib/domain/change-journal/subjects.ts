@@ -74,6 +74,9 @@ const CHANGE_SUBJECTS = {
   'jardin-sous-abri': { family: 'reglage', label: 'Jardin sous abri ou de plein champ' },
   'groupe-de-jardins': { family: 'reglage', label: 'Groupe de jardins' },
   'lieu-meteo': { family: 'reglage', label: 'Lieu de la météo' },
+  // Le modèle de prévision de la ferme (météo multi-modèles, PR 2 ; D-346) : choisi par la personne, ou ramené
+  // à « Automatique » par le module quand il n'est plus proposé ou ne couvre plus le lieu (règle 9).
+  'modele-meteo': { family: 'reglage', label: 'Modèle de prévision' },
   // Matériel et ressources.
   materiel: { family: 'materiel', label: 'Matériel' },
   'reglage-de-materiel': { family: 'materiel', label: 'Réglage de matériel' },

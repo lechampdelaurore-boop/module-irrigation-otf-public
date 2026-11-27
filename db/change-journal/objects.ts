@@ -47,6 +47,7 @@ export const JOURNAL_OBJECT_TABLES: Readonly<Record<ChangeSubject, string | null
   'jardin-sous-abri': null,
   'groupe-de-jardins': 'irrigation_garden_groups',
   'lieu-meteo': null,
+  'modele-meteo': null,
   materiel: 'irrigation_equipment',
   'reglage-de-materiel': 'irrigation_equipment_settings',
   pompe: 'irrigation_pumps',

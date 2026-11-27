@@ -1,5 +1,7 @@
 import { db } from './binding';
 import { writeForecastArchive } from './forecast-archive-repository';
+import { returnForecastModelToAutomatic } from './forecast-model-repository';
+import { weatherDailyValueStatement } from './weather-daily-value-write';
 import { listFarmsWithSelection } from './feature-selection-repository';
 import { usesWeather } from '@/lib/domain/features/socle';
 import type {
@@ -20,6 +22,7 @@ type TargetRow = {
   custom_city: string | null;
   custom_postcode: string | null;
   refresh_not_before_at: string | null;
+  forecast_model: string | null;
   location_key: string;
   latitude: number;
   longitude: number;
@@ -34,6 +37,7 @@ export const automaticWeatherRepository: AutomaticWeatherSyncRepository = {
   upsertValues: upsertAutomaticWeatherValues,
   archiveForecast: writeForecastArchive,
   recordWorkspaceResult: recordAutomaticWeatherWorkspaceResult,
+  returnForecastModelToAutomatic,
 };
 
 /**
@@ -50,18 +54,21 @@ export const intradayWeatherRepository: AutomaticWeatherSyncRepository = {
   upsertValues: upsertAutomaticWeatherValues,
   archiveForecast: writeForecastArchive,
   recordWorkspaceResult: recordIntradayWeatherWorkspaceResult,
+  returnForecastModelToAutomatic,
 };
 
 /**
  * Les exploitations dont la météo se relève chaque matin : celles qui ont un
  * lieu résolu et cochent au moins une case qui lit la météo ; les autres ne
- * sont plus relevées (3.8, docs/feature-selection-contract.md, P4).
+ * sont plus relevées (3.8, docs/feature-selection-contract.md, P4). Chacune
+ * porte son modèle de prévision enregistré (D-346) : la synchronisation lit
+ * par lieu et par modèle.
  */
 export async function listAutomaticWeatherTargets(): Promise<AutomaticWeatherTarget[]> {
   const usingWeather = new Set((await listFarmsWithSelection(usesWeather)).map((farm) => farm.workspaceId));
   const result = await db.prepare(
     `SELECT p.workspace_id, p.location_mode, p.custom_city, p.custom_postcode,
-            p.refresh_not_before_at, g.location_key, g.latitude, g.longitude,
+            p.refresh_not_before_at, p.forecast_model, g.location_key, g.latitude, g.longitude,
             g.timezone, g.resolved_at
      FROM irrigation_weather_preferences p
      JOIN irrigation_weather_geocodes g ON g.workspace_id = p.workspace_id
@@ -90,6 +97,7 @@ export async function listAutomaticWeatherTargets(): Promise<AutomaticWeatherTar
       longitude: Number(activeLocation.longitude),
       timezone: activeLocation.timezone,
       refreshNotBeforeAt: activeLocation.refresh_not_before_at,
+      forecastModel: activeLocation.forecast_model,
     }];
   });
 }
@@ -154,41 +162,15 @@ async function upsertAutomaticWeatherValues(
 ): Promise<void> {
   const available = input.values.filter(hasWeatherValue);
   if (available.length === 0) return;
-  await db.batch(available.map((value) => db.prepare(
-    `INSERT INTO irrigation_weather_daily_values
-       (workspace_id, location_key, date, data_kind, precipitation_mm, et0_mm,
-        minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter,
-        source, fetched_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT(workspace_id, location_key, date, data_kind) DO UPDATE SET
-       precipitation_mm = COALESCE(excluded.precipitation_mm, irrigation_weather_daily_values.precipitation_mm),
-       et0_mm = COALESCE(excluded.et0_mm, irrigation_weather_daily_values.et0_mm),
-       minimum_temperature_celsius = COALESCE(excluded.minimum_temperature_celsius, irrigation_weather_daily_values.minimum_temperature_celsius),
-       maximum_temperature_celsius = COALESCE(excluded.maximum_temperature_celsius, irrigation_weather_daily_values.maximum_temperature_celsius),
-       solar_energy_mj_per_square_meter = COALESCE(excluded.solar_energy_mj_per_square_meter, irrigation_weather_daily_values.solar_energy_mj_per_square_meter),
-       source = excluded.source,
-       fetched_at = CASE WHEN
-         (excluded.precipitation_mm IS NULL AND irrigation_weather_daily_values.precipitation_mm IS NOT NULL)
-         OR (excluded.et0_mm IS NULL AND irrigation_weather_daily_values.et0_mm IS NOT NULL)
-         OR (excluded.minimum_temperature_celsius IS NULL AND irrigation_weather_daily_values.minimum_temperature_celsius IS NOT NULL)
-         OR (excluded.maximum_temperature_celsius IS NULL AND irrigation_weather_daily_values.maximum_temperature_celsius IS NOT NULL)
-         OR (excluded.solar_energy_mj_per_square_meter IS NULL AND irrigation_weather_daily_values.solar_energy_mj_per_square_meter IS NOT NULL)
-         THEN irrigation_weather_daily_values.fetched_at ELSE excluded.fetched_at END,
-       updated_at = excluded.updated_at`,
-  ).bind(
-    input.target.workspaceId,
-    input.target.locationKey,
-    value.date,
-    input.kind,
-    value.precipitationMm,
-    value.et0Mm,
-    value.minimumTemperatureCelsius ?? null,
-    value.maximumTemperatureCelsius ?? null,
-    value.solarEnergyMegajoulesPerSquareMeter ?? null,
-    input.source,
-    input.fetchedAt,
-    input.fetchedAt,
-  )));
+  // La même écriture que l'actualisation à l'écran : une source nouvelle remplace le jour entier (D-346, F1016).
+  await db.batch(available.map((value) => weatherDailyValueStatement({
+    workspaceId: input.target.workspaceId,
+    locationKey: input.target.locationKey,
+    kind: input.kind,
+    value,
+    source: input.source,
+    fetchedAt: input.fetchedAt,
+  })));
 }
 
 async function recordAutomaticWeatherWorkspaceResult(

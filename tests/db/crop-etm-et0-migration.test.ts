@@ -58,6 +58,9 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     sqlite.exec(`CREATE TEMP TABLE irrigation_weather_forecast_archive (workspace_id, location_key, issued_on, target_date, horizon_days,
       precipitation_mm, et0_mm, minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter, source, fetched_at,
       UNIQUE (workspace_id, location_key, issued_on, target_date))`);
+    // Et le modèle de prévision de la ferme (0053, D-346), vide, donc « Automatique » : une colonne, ajoutée le temps de
+    // remplir la copie, retirée avant les migrations.
+    sqlite.exec('ALTER TABLE irrigation_weather_preferences ADD forecast_model text');
     const choice = resolveDemoChoice('maraichage', 'ete');
     await prepareDemoSpace(demoOwnerUserId('copie', choice), choice);
     delete process.env.DEMO_MODE;
@@ -73,6 +76,7 @@ test('la migration 0037 recrée la table des ETM du jour, borne de l’ET0 à 15
     sqlite.exec('ALTER TABLE irrigation_feature_selections DROP COLUMN route_state');
     sqlite.exec('DROP TABLE temp.irrigation_off_season_revisions');
     sqlite.exec('DROP TABLE temp.irrigation_weather_forecast_archive');
+    sqlite.exec('ALTER TABLE irrigation_weather_preferences DROP COLUMN forecast_model');
 
     const before = dump(sqlite);
     assert.ok(before[TABLE].length >= 3);

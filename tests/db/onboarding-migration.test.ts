@@ -63,6 +63,9 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
     sqlite.exec(`CREATE TEMP TABLE irrigation_weather_forecast_archive (workspace_id, location_key, issued_on, target_date, horizon_days,
       precipitation_mm, et0_mm, minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter, source, fetched_at,
       UNIQUE (workspace_id, location_key, issued_on, target_date))`);
+    // Et le modèle de prévision de la ferme (0053, D-346), vide, donc « Automatique » : une colonne, ajoutée le temps de
+    // remplir la copie, retirée avant les migrations.
+    sqlite.exec('ALTER TABLE irrigation_weather_preferences ADD forecast_model text');
     const choice = resolveDemoChoice('maraichage', 'ete');
     const farm = demoOwnerUserId('copie', choice);
     await prepareDemoSpace(farm, choice);
@@ -76,6 +79,7 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
     sqlite.exec('ALTER TABLE irrigation_feature_selections DROP COLUMN route_state');
     sqlite.exec('DROP TABLE temp.irrigation_off_season_revisions');
     sqlite.exec('DROP TABLE temp.irrigation_weather_forecast_archive');
+    sqlite.exec('ALTER TABLE irrigation_weather_preferences DROP COLUMN forecast_model');
     const before = dump(sqlite);
     const filled = Object.entries(before).filter(([, rows]) => rows.length > 0).map(([table]) => table);
     assert.ok(filled.length >= 15, `la copie est une ferme complète (${filled.length} tables remplies : ${filled.join(', ')})`);

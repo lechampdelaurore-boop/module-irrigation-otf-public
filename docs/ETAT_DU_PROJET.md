@@ -12,6 +12,23 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par
+  lieu et par modèle, codée le 26 novembre 2026** (D-346, F1016 à F1022 ;
+  contrat v0.2, § 3, § 5, § 6, § 8 ; roadmap ligne 36), en Opus 5.5 · Max,
+  sur la branche de la PR 1, mise à jour avec `main` par fusion le
+  27 novembre 2026. Une colonne additive `forecast_model` sur les
+  préférences météo (migration 0053 : le numéro libre après la 0051 de S6
+  et la 0052 du hors saison) ; la tâche du matin, la relecture de la
+  journée et l'écran lisent par lieu et par modèle, et chaque ferme écrit
+  ses lignes ; enregistrer un modèle le vérifie d'abord par une lecture,
+  puis remplace les jours à venir, jamais les jours passés ni l'archive ;
+  un modèle sorti de la liste ramène la ferme à « Automatique », au journal
+  au nom du module. Aucune ferme ne choisit avant l'écran (PR 3) : une
+  ferme en « Automatique » lit exactement comme avant. Contrôles : voir la
+  PR ; `pnpm e2e` joué par la CI (job « Parcours navigateur »), les
+  services de l'écran changent. Consigne la mise en ligne du contrat
+  (#242), de la PR 0 (#248) et de la PR 1 (#249). Vient la PR 3 (l'écran,
+  Opus 5.5 · Élevé).
 - **Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un
   modèle choisi, codée le 26 novembre 2026** (D-345, F1009 à F1015 ;
   contrat v0.2, § 3 à § 5, § 10, § 14 ; roadmap ligne 36), en Opus 5.5 ·
@@ -23,7 +40,9 @@ registres, elle y renvoie.
   l'appelle encore : aucun écran, aucune base, aucun calcul ne change en
   ligne. Contrôles : voir la PR ; `pnpm e2e` omis, ni l'interface ni ses
   services ne changent. Vient la PR 2 (le réglage de la ferme, Opus 5.5 ·
-  Max).
+  Max). **En ligne** : #249 fusionnée le 27 novembre 2026 à 19 h 12
+  (ab80a1b), déployée à 20 h 05, run 46047735579, les cinq jobs verts
+  (consigné par la PR 2).
 - **Météo multi-modèles, PR 0 : l'essai A, écrit et joué le
   26 novembre 2026** (contrat `docs/weather-models-contract.md` v0.2,
   § 7 et § 14 ; roadmap section 6 sexdecies, ligne 36), en Opus 5.5 ·
@@ -36,7 +55,9 @@ registres, elle y renvoie.
   Météo-France rend 4 jours et ICON 7. Aucun écran, aucun calcul, aucune
   base ne change. Contrôles : voir la PR ; `pnpm e2e` omis, ni
   l'interface ni ses services ne changent. Le code du module commence
-  avec la PR 1.
+  avec la PR 1. **En ligne** : #248 fusionnée le 27 novembre 2026 à
+  18 h 24 (5a1b519), déployée à 19 h 12, run 46041553937, les cinq jobs
+  verts (consigné par la PR 2).
 - **Météo multi-modèles, contrat écrit le 26 novembre 2026, sans code**
   (D-339, `docs/weather-models-contract.md` v0.1, roadmap section 6
   sexdecies, ligne 36), en Sonnet 5.5 · Moyen : un seul modèle de prévision
@@ -46,7 +67,9 @@ registres, elle y renvoie.
   avant le code. **Licence et budget tranchés par le porteur le
   26 novembre 2026 à 12 h 47** : gratuit pendant le pilote, licence payante
   probable ensuite, financée par OTF ; rien n'attend. Aucun contrôle rejoué (PR de registres, sans
-  code).
+  code). **En ligne** : #242 fusionnée le 27 novembre 2026 à 17 h 28
+  (91270d5), déployée à 18 h 19, run 46033860657, les cinq jobs verts
+  (consigné par la PR 2).
 - **La météo prévue contre la météo réalisée, PR 2 sur 2 : le pli, la
   démonstration et les parcours, codée le 26 novembre 2026** (D-344, F1005 à
   F1008), en Opus 5.5 · Élevé, sur la branche de la PR 1 : **le code du

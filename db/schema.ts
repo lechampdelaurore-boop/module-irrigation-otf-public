@@ -972,11 +972,17 @@ export const weatherPreferences = sqliteTable(
     lastAutomaticRefreshSuccessAt: text('last_automatic_refresh_success_at'),
     lastAutomaticRefreshError: text('last_automatic_refresh_error'),
     updatedAt: updatedAt(),
+    // Le modèle de prévision choisi (météo multi-modèles, PR 2, migration 0053) : vide, « Automatique ».
+    forecastModel: text('forecast_model'),
   },
   (table) => [
     check(
       'chk_weather_preferences_location',
       sql`(${table.locationMode} = 'otf' AND ${table.customCity} IS NULL AND ${table.customPostcode} IS NULL) OR (${table.locationMode} = 'custom' AND ${table.customCity} IS NOT NULL)`,
+    ),
+    check(
+      'chk_weather_preferences_forecast_model',
+      sql`${table.forecastModel} IS NULL OR (length(${table.forecastModel}) BETWEEN 1 AND 64 AND ${table.forecastModel} NOT GLOB '*[^a-z0-9_]*')`,
     ),
   ],
 );

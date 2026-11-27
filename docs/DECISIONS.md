@@ -12384,7 +12384,9 @@ Précisions prises en codant :
 
 ## D-345 — Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un modèle choisi
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée**, fusionnée le 27 novembre 2026
+à 19 h 12 (#249) et **en ligne à 20 h 05** (run 46047735579, consigné par
+la PR 2) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 4 à 6, 9 et 10 ; § 4 ;
 § 5 ; § 10 ; § 14, l'essai A), roadmap section 6 sexdecies, ligne 36. Code en
 Opus 5.5 · Élevé, le réglage de la PR 1 (ligne 36). Aucune question
@@ -12450,6 +12452,115 @@ les réponses figées de l'essai A (`tests/fixtures/open-meteo-models/`),
 analyse stricte, refus, offre payante et clé jamais journalisée, lecteur
 absent en démonstration ; `tests/demo-mode.test.ts` : la clé d'Open-Meteo
 en démonstration.
+
+## D-346 — Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par lieu et par modèle
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/weather-models-contract.md` v0.2 (§ 3 règles 1 à 3, 6 à 9 et 11 à 14 ;
+§ 5 ; § 6 ; § 8 points 1, 3, 4, 5, 7 et 8 ; § 12), roadmap section
+6 sexdecies, ligne 36. Code en Opus 5.5 · Max, le réglage de la PR 2
+(ligne 36 : une lecture se partage entre fermes, et une ligne écrite pour la
+mauvaise ferme serait discrète et grave). Aucune question agronomique.
+
+**Décision.** Une ferme garde son modèle de prévision dans une colonne neuve,
+additive, de ses préférences météo (`forecast_model`, migration 0053) ; vide,
+c'est « Automatique », le défaut de toutes les fermes existantes. La tâche du
+matin, la relecture de la journée et l'actualisation à l'écran lisent **par
+lieu et par modèle** : une lecture par lieu pour les fermes en
+« Automatique », comme avant, et une par modèle choisi à ce lieu, chez
+Open-Meteo, une seule fois quel que soit le nombre de fermes qui le
+partagent ; la réanalyse se lit une fois par lieu (règle 7). Chaque ferme
+écrit ensuite **ses** lignes, chaque jour sous la source qui l'a donné, et sa
+propre archive J+1 à J+7 : une lecture se partage, une ligne jamais.
+Enregistrer un modèle (`saveForecastModelChoiceForUser`, que l'écran de la
+PR 3 appellera) le **vérifie d'abord** par une lecture immédiate des
+15 jours ; un échec n'enregistre rien. Enregistré, il remplace les
+prévisions d'aujourd'hui et des jours suivants ; les jours passés et
+l'archive ne sont jamais réécrits (règle 11). Un modèle sorti de la liste,
+ou qui ne couvre plus le lieu, ramène la ferme à « Automatique », écrit au
+journal des modifications au nom du module (règle 9). **Aucune ferme ne
+choisit encore** : l'écran vient avec la PR 3 ; à la mise en ligne, toutes
+les fermes sont en « Automatique » et lisent exactement comme avant.
+
+Précisions prises en codant (option recommandée, modifiables par le porteur) :
+
+- **F1016** — Jamais un mélange (règle 6), pour toute écriture des
+  prévisions et des réanalyses : à source égale, une réponse partielle garde
+  les champs déjà connus, comme avant, avec l'instant de la lecture qui les a
+  donnés ; une lecture d'une **autre source** (un modèle choisi, un jour
+  complété par « Automatique d'Open-Meteo », le retour à « Automatique »)
+  remplace le jour entier : un champ qu'elle ne donne pas devient `null`,
+  jamais la valeur d'une autre source sous le nom de la nouvelle. Une seule
+  écriture sert la tâche du matin et l'écran
+  (`db/weather-daily-value-write.ts`). Une ferme en « Automatique » garde sa
+  source : rien ne change pour elle.
+- **F1017** — Les comptes de la tâche du matin : une requête de prévision
+  par lecture (lieu et modèle), une de réanalyse par lieu. Un lieu dont une
+  lecture échoue compte **une fois** dans « N lieux sur M », par la classe de
+  sa première lecture en échec ; l'échec d'un modèle ne touche que les
+  fermes de ce modèle, les autres fermes du lieu écrivent leurs lignes. Le
+  journal technique dit chaque lecture d'un modèle (son identifiant, le
+  nombre de fermes), jamais une exploitation ni une coordonnée.
+- **F1018** — L'enregistrement vérifié (règle 8 ; essai B). Refusé avant
+  toute lecture en démonstration (règle 13), pour un modèle hors de la
+  liste, sans commune localisée ou hors de la zone du modèle. Le même modèle
+  ne relit rien. Deux enregistrements rapprochés respectent le délai de
+  30 secondes de la ferme, celui de « Actualiser la météo ». La preuve est une
+  lecture sans échec qui donne la pluie du modèle pour au moins un jour ; son
+  journal technique (`weather_forecast_model_verified`) dit le résultat, la
+  classe de l'échec et le statut HTTP, jamais une coordonnée, une adresse ni
+  une clé : c'est l'essai B, au premier enregistrement en ligne.
+  « Automatique » ne se prouve pas : il s'enregistre, puis ses prévisions à
+  venir sont relues si le fournisseur répond, sinon à la prochaine lecture.
+  Ni le succès ni l'échec de cette lecture ne deviennent l'état de la météo
+  de la ferme (la réanalyse n'y est pas relue) : la réponse le dit à la
+  personne. Les alertes s'évaluent après l'écriture, comme après toute
+  lecture (règle 12).
+- **F1019** — Le retour à « Automatique » (règle 9) se fait **à la
+  lecture** : par la tâche du matin et la relecture de la journée avant de
+  regrouper les fermes, par l'actualisation à l'écran avant de lire ;
+  seulement si la ferme a encore ce modèle (un choix fait entre-temps
+  reste). Une ligne au journal des modifications, au nom du module
+  (« Le module ») : l'écran de la PR 3 la lira pour le dire une fois. Un
+  modèle sorti de la liste s'y lit « un modèle qui n'est plus proposé », sans
+  son identifiant.
+- **F1020** — Migration 0053 : écrite sous le numéro 0051, elle a pris le
+  numéro libre à la mise à jour qui précède sa fusion, après la 0051 de S6
+  (#235) et la 0052 du hors saison (#256), en reprenant `main` par fusion,
+  jamais par rebase. Une colonne texte, vide par défaut, à la forme d'un
+  identifiant (minuscules, chiffres et `_`, 1 à 64 signes) ; la liste des
+  modèles reste dans le code, jamais dans la base. Elle suit la ligne de la
+  ferme dans l'export, l'import et l'effacement.
+  Deux essais de migration arrêtés avant elle (0034, 0042), qui remplissent
+  leur copie par les dépôts d'aujourd'hui, ajoutent la colonne le temps de
+  la remplir, comme ils le font pour le journal (0044) et l'objectif
+  automatique (0047) : aucun test d'une ferme sans choix ne change
+  autrement (§ 8, point 8).
+- **F1021** — L'attribution d'un modèle choisi : « Prévisions : <le
+  producteur>, par Open-Meteo (CC BY 4.0) ; au-delà de la portée du modèle,
+  Automatique d'Open-Meteo. Réanalyses : Open-Meteo (CC BY 4.0). » ;
+  « Automatique d'Open-Meteo » choisi : « Prévisions et réanalyses :
+  Open-Meteo (CC BY 4.0). » ; « Automatique » ne change pas, et une donnée
+  de démonstration n'est jamais créditée à un fournisseur réel.
+- **F1022** — Les parcours automatisés (`WEATHER_DATA_SOURCE=mock`)
+  reçoivent une réponse fixe par modèle, sans réseau ni hasard : la série de
+  démonstration, décalée selon le modèle, sur sa portée, puis celle
+  d'« Automatique d'Open-Meteo » ; les lignes portent la vraie forme de la
+  source, pour que les parcours suivent les chemins de la production.
+  Remplace F1015 sur ce point ; la démonstration, elle, n'a toujours aucun
+  lecteur (règle 13).
+
+**Tests.** `tests/weather-models-reglage.test.ts` (14), sans base :
+regroupement par lieu et modèle, modèle lu, jours rangés par source, refus,
+preuve, messages sans mot de qualité, carte « Le module » du journal,
+lecteur fixe des parcours, attribution, tâche du matin à deux modèles au
+même lieu (un appel par modèle), règles 9 et 13, échec d'un modèle.
+`tests/db/forecast-model-reglage.test.ts` (12), sur la base de test et dans
+les trois passages d'isolation : migration sur base vide et sur copie,
+réglage et journal, retour du module, jamais un mélange, export, import et
+effacement, tâche du matin (lignes, sources et archive de chaque ferme),
+règle 9, enregistrement en échec et réussi (jour passé et archive intacts),
+refus, délai, « Automatique », écran, mêmes alertes à données égales.
 
 ## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
 
