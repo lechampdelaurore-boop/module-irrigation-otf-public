@@ -10,7 +10,6 @@ import {
   forecastModelSummary,
   selectedForecastChoice,
   type ForecastModelOption,
-  type ForecastModelSettingView,
 } from '@/lib/domain/weather/forecast-model-setting';
 
 /**

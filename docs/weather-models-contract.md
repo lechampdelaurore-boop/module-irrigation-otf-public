@@ -159,3 +159,14 @@ Joué par le flux « Essai des modèles météo » (`.github/workflows/essai-mod
 9. **Non prouvé par l'essai A** : que l'endpoint réponde au Worker de Cloudflare. Le lanceur GitHub n'est pas chez Cloudflare ; l'essai B (règle 8) reste la preuve.
 
 Le flux reste dans le dépôt pour rejouer l'essai le jour où un modèle change (§ 4, modèles « en fin de vie ») : à la main depuis l'onglet Actions, une fois dans `main`, ou en poussant la branche `essai-modeles-meteo`. Il ne se lance jamais sur une PR.
+
+## 15. Essai B et recette sur la ferme réelle (27 novembre 2026)
+
+Toutes les PR de la ligne sont en ligne le 27 novembre 2026 : #242 à 18 h 19, #248 à 19 h 12, #249 à 20 h 05, #250 à 21 h 46 (migration 0053), #251 à 23 h 31 (run 46072042226, heure de Paris). **Accord du porteur** pour la recette sur sa ferme réelle : carte du 27 novembre 2026 à 23 h 54 (« Oui, sur la ferme réelle »). Recette jouée vers 23 h 55, dans son Chrome, sur le site en ligne ; compte rendu : `/mnt/project-files/meteo-modeles/recette-modele-prevision-2026-11-27.md`.
+
+1. **État de départ relevé** : « Automatique » (ligne du pli, liste, « Le module lit la prévision comme il l’a toujours fait. »).
+2. **Essai B** : « Météo-France (AROME puis ARPEGE) » enregistré ; la lecture qui vérifie le choix (règle 8) a réussi depuis le Worker déployé. **L’endpoint Forecast d’Open-Meteo répond à l’infrastructure du site** : le doute du § 2 point 2 est levé, la phrase de `docs/weather-contract.md` est retirée. Réponse : « La ferme lit désormais « Météo-France (AROME puis ARPEGE) » : ses prévisions à venir sont relues… » ; crédit du lieu : « Prévisions : Météo-France, par Open-Meteo (CC BY 4.0) ». Le journal technique `weather_forecast_model_verified` n’a pas été lu (aucun accès aux journaux Cloudflare depuis l’assistant) ; l’enregistrement n’étant gardé que si la lecture est prouvée, l’écran suffit à la preuve.
+3. **Règle 6** : « Prévisions gardées : ce modèle jusqu’au mar. 1 déc., puis « Automatique d’Open-Meteo ». », soit aujourd’hui et 4 jours de plus, la portée mesurée par l’essai A ; le choix tient après un rechargement.
+4. **Retour à « Automatique »** : réponse « La ferme lit de nouveau « Automatique »… » ; la ligne du lieu redit « Prévisions : Visual Crossing Weather », la lecture d’avant (règle 1) ; aucun avis de retour du module (normal : le changement vient de la ferme, règle 9). État de départ retrouvé ; matériel et objectifs d’irrigation non touchés ; le journal des changements garde les deux lignes « modele-meteo ».
+
+Verdict : conforme sur les quatre points, noté comme celui du porteur (sa consigne du 13 novembre 2026). Remarque : la largeur du téléphone n’a pas été vue sur le site en ligne (P72 la joue à 390 px).

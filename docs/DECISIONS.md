@@ -12566,7 +12566,9 @@ refus, délai, « Automatique », écran, mêmes alertes à données égales.
 
 ## D-347 — Météo multi-modèles, PR 3 : l'écran « Modèle de prévision »
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **en ligne le 27 novembre 2026 à
+23 h 31** (#251, squash 4e24d94, run 46072042226) ; **essai B et recette sur
+la ferme réelle conformes le même soir** (contrat § 15) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 3, 6, 9, 10, 12 et 13 ;
 § 8 point 6 ; § 11 point 5 ; § 12), roadmap section 6 sexdecies, ligne 36.
 Code en Opus 5.5 · Élevé, le réglage de la PR 3. Aucune question
