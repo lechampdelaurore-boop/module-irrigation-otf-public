@@ -68,6 +68,7 @@ test('le mode démo accepte cette configuration telle qu’elle est écrite', ()
     otfApiToken: false,
     otfTokenMasterKey: false,
     visualCrossingApiKey: false,
+    openMeteoApiKey: false,
     pushServiceToken: false,
     weatherSyncServiceToken: false,
     pushServiceBinding: Boolean(demo.services?.length),

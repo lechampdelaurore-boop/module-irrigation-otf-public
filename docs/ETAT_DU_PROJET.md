@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un
+  modèle choisi, codée le 26 novembre 2026** (D-345, F1009 à F1015 ;
+  contrat v0.2, § 3 à § 5, § 10, § 14 ; roadmap ligne 36), en Opus 5.5 ·
+  Élevé, sur la branche de la PR 0. La liste des cinq modèles dans
+  `lib/domain/weather/forecast-models.ts` ; l'adaptateur lit un modèle et
+  « Automatique d'Open-Meteo » en un appel, refuse une réponse incomplète,
+  et chaque jour dit son modèle ; l'offre payante d'Open-Meteo se règle par
+  `OPEN_METEO_API_BASE_URL` et `OPEN_METEO_API_KEY`, sans code. Rien ne
+  l'appelle encore : aucun écran, aucune base, aucun calcul ne change en
+  ligne. Contrôles : voir la PR ; `pnpm e2e` omis, ni l'interface ni ses
+  services ne changent. Vient la PR 2 (le réglage de la ferme, Opus 5.5 ·
+  Max).
 - **Météo multi-modèles, PR 0 : l'essai A, écrit et joué le
   26 novembre 2026** (contrat `docs/weather-models-contract.md` v0.2,
   § 7 et § 14 ; roadmap section 6 sexdecies, ligne 36), en Opus 5.5 ·

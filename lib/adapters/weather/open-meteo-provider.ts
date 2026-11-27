@@ -2,6 +2,13 @@ import { logJsonLine } from '../log.ts';
 import { describeNetworkError, globalFetch, type FetchLike } from '../network-call.ts';
 import { secondsFromMilliseconds } from '../../domain/units.ts';
 import {
+  COMPLETION_FORECAST_MODEL_ID,
+  forecastDaysForModel,
+  forecastModel,
+  type ModelForecastDay,
+  type ModelForecastReader,
+} from '../../domain/weather/forecast-models.ts';
+import {
   WeatherProviderError,
   type WeatherDailyValue,
   type WeatherLocationCandidate,
@@ -18,21 +25,43 @@ type CloudflareRequestInit = RequestInit & {
   };
 };
 
+/**
+ * L'accès à l'API de prévision par modèle (docs/weather-models-contract.md,
+ * § 10) : l'offre gratuite par défaut ; une offre payante change l'adresse
+ * (`customer-api…`) et ajoute la clé, par réglage serveur seulement
+ * (`OPEN_METEO_API_BASE_URL`, `OPEN_METEO_API_KEY`), sans changer une règle.
+ * La clé n'est jamais journalisée.
+ */
+export type OpenMeteoAccess = { baseUrl?: string | null; apiKey?: string | null };
+
+const FREE_FORECAST_BASE_URL = 'https://api.open-meteo.com';
+
+/** Les cinq séries du jour lues pour un modèle (contrat, § 5). */
+const MODEL_DAILY_SERIES = {
+  precipitationMm: 'precipitation_sum',
+  minimumTemperatureCelsius: 'temperature_2m_min',
+  maximumTemperatureCelsius: 'temperature_2m_max',
+  et0Mm: 'et0_fao_evapotranspiration',
+  solarEnergyMegajoulesPerSquareMeter: 'shortwave_radiation_sum',
+} as const;
+
 const EDGE_CACHE_SECONDS: Record<WeatherEndpoint, number> = {
   geocoding: 30 * 24 * 60 * 60,
   forecast: 30 * 60,
   reanalysis: 7 * 24 * 60 * 60,
 };
 
-export class OpenMeteoWeatherProvider implements WeatherProvider {
+export class OpenMeteoWeatherProvider implements WeatherProvider, ModelForecastReader {
   readonly id = 'open-meteo';
   private readonly fetchImpl: FetchLike;
   private readonly log: WeatherLog;
+  private readonly access: OpenMeteoAccess;
   private readonly inFlight = new Map<string, Promise<unknown>>();
 
-  constructor(fetchImpl: FetchLike = globalFetch, log: WeatherLog = logJsonLine) {
+  constructor(fetchImpl: FetchLike = globalFetch, log: WeatherLog = logJsonLine, access: OpenMeteoAccess = {}) {
     this.fetchImpl = fetchImpl;
     this.log = log;
+    this.access = access;
   }
 
   async searchLocations(query: string, postcode?: string | null): Promise<WeatherLocationCandidate[]> {
@@ -81,6 +110,51 @@ export class OpenMeteoWeatherProvider implements WeatherProvider {
 
   readReanalysis(input: WeatherReadInput): Promise<WeatherDailyValue[]> {
     return this.readDaily('https://archive-api.open-meteo.com/v1/archive', 'reanalysis', input);
+  }
+
+  /**
+   * La prévision d'un modèle choisi (contrat, § 3 règles 4 à 6, § 5) : un seul
+   * appel demande le modèle et « Automatique d'Open-Meteo », qui complète les
+   * jours au-delà de sa portée. L'analyse est stricte : une série attendue
+   * absente, ou d'une autre longueur que les dates, refuse toute la réponse
+   * (`invalid-response`), jamais un zéro ; une valeur nulle reste nulle.
+   */
+  async readModelForecast(input: WeatherReadInput, modelId: string): Promise<ModelForecastDay[]> {
+    if (forecastModel(modelId) === null) {
+      throw new WeatherProviderError('Modèle de prévision inconnu.', { kind: 'client', endpoint: 'forecast' });
+    }
+    const models = modelId === COMPLETION_FORECAST_MODEL_ID ? [modelId] : [modelId, COMPLETION_FORECAST_MODEL_ID];
+    const url = new URL('/v1/forecast', this.forecastBaseUrl());
+    url.searchParams.set('latitude', String(input.latitude));
+    url.searchParams.set('longitude', String(input.longitude));
+    url.searchParams.set('timezone', input.timezone);
+    url.searchParams.set('start_date', input.startDate);
+    url.searchParams.set('end_date', input.endDate);
+    url.searchParams.set('daily', Object.values(MODEL_DAILY_SERIES).join(','));
+    url.searchParams.set('models', models.join(','));
+    const apiKey = this.access.apiKey?.trim();
+    if (apiKey) url.searchParams.set('apikey', apiKey);
+    const payload = await this.readJson(url, 'forecast', input.bypassCache === true);
+    const [chosen, completion] = models.map((model) => readModelDays(payload, model, models.length > 1));
+    return forecastDaysForModel(modelId, chosen ?? [], completion ?? chosen ?? []);
+  }
+
+  private forecastBaseUrl(): URL {
+    const configured = this.access.baseUrl?.trim();
+    if (!configured) return new URL(FREE_FORECAST_BASE_URL);
+    let url: URL | null = null;
+    try {
+      url = new URL(configured);
+    } catch {
+      url = null;
+    }
+    // Une adresse illisible ou non chiffrée n'est jamais appelée : la lecture du modèle échoue, rien d'autre.
+    if (url === null || url.protocol !== 'https:' || url.username || url.password) {
+      throw new WeatherProviderError('Configuration serveur invalide : OPEN_METEO_API_BASE_URL', {
+        kind: 'client', endpoint: 'forecast',
+      });
+    }
+    return url;
   }
 
   private async readDaily(
@@ -210,6 +284,43 @@ export class OpenMeteoWeatherProvider implements WeatherProvider {
 }
 
 export const openMeteoWeatherProvider = new OpenMeteoWeatherProvider();
+
+/**
+ * Les jours d'un modèle dans une réponse à un ou plusieurs modèles : à deux
+ * modèles ou plus, chaque série est suffixée par le modèle
+ * (`precipitation_sum_meteofrance_seamless`) ; à un seul, elle ne l'est pas
+ * (essai A, contrat § 14, point 1).
+ */
+function readModelDays(payload: unknown, model: string, suffixed: boolean): WeatherDailyValue[] {
+  if (!isRecord(payload) || !isRecord(payload.daily) || !Array.isArray(payload.daily.time)) {
+    throw new WeatherProviderError('Réponse météo quotidienne invalide.', { kind: 'invalid-response', endpoint: 'forecast' });
+  }
+  const daily = payload.daily;
+  const time = payload.daily.time;
+  const series = Object.fromEntries(Object.entries(MODEL_DAILY_SERIES).map(([field, variable]) => {
+    const key = suffixed ? `${variable}_${model}` : variable;
+    const values = daily[key];
+    if (!Array.isArray(values) || values.length !== time.length) {
+      throw new WeatherProviderError(`Série météo absente ou incomplète : ${key}.`, {
+        kind: 'invalid-response', endpoint: 'forecast',
+      });
+    }
+    return [field, values];
+  })) as Record<keyof typeof MODEL_DAILY_SERIES, unknown[]>;
+  return time.flatMap((date, index): WeatherDailyValue[] => {
+    if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      throw new WeatherProviderError('Date météo illisible.', { kind: 'invalid-response', endpoint: 'forecast' });
+    }
+    return [{
+      date,
+      precipitationMm: nullableNonNegative(series.precipitationMm[index]),
+      et0Mm: nullableNonNegative(series.et0Mm[index]),
+      minimumTemperatureCelsius: finiteNumber(series.minimumTemperatureCelsius[index]),
+      maximumTemperatureCelsius: finiteNumber(series.maximumTemperatureCelsius[index]),
+      solarEnergyMegajoulesPerSquareMeter: nullableNonNegative(series.solarEnergyMegajoulesPerSquareMeter[index]),
+    }];
+  });
+}
 
 function weatherHttpError(
   status: number,

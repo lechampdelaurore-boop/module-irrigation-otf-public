@@ -1,13 +1,16 @@
 import { env } from 'cloudflare:workers';
 import { demonstrationWeatherProvider } from '../../adapters/weather/demonstration-provider.ts';
 import { demoSeasonWeatherProvider } from '../../adapters/weather/demo-season-provider.ts';
-import { openMeteoWeatherProvider } from '../../adapters/weather/open-meteo-provider.ts';
+import { OpenMeteoWeatherProvider, openMeteoWeatherProvider } from '../../adapters/weather/open-meteo-provider.ts';
 import { VisualCrossingWeatherProvider } from '../../adapters/weather/visual-crossing-provider.ts';
+import type { ModelForecastReader } from '../../domain/weather/forecast-models.ts';
 import type { WeatherProvider } from '../../domain/weather/weather-provider.ts';
 import { isDemoDeployment } from '../deployment-mode.ts';
 
 let cachedKey: string | null = null;
 let cachedProvider: WeatherProvider | null = null;
+let cachedModelAccess: string | null = null;
+let cachedModelReader: ModelForecastReader | null = null;
 
 class FreeWeatherProvider implements WeatherProvider {
   readonly id = 'free-weather-stack';
@@ -59,6 +62,33 @@ export function getConfiguredWeatherProvider(): WeatherProvider {
   cachedKey = key;
   cachedProvider = new FreeWeatherProvider(new VisualCrossingWeatherProvider(key));
   return cachedProvider;
+}
+
+function readServerSetting(key: 'OPEN_METEO_API_BASE_URL' | 'OPEN_METEO_API_KEY'): string | null {
+  return (process.env[key] ?? env[key])?.trim() || null;
+}
+
+/**
+ * Le lecteur de la prévision d'un modèle choisi par la ferme
+ * (docs/weather-models-contract.md, D-345), ou `null` quand le choix n'existe
+ * pas : en démonstration, qui ne lit jamais la vraie météo (règle 13), et
+ * pour les parcours automatisés (`WEATHER_DATA_SOURCE=mock`), qui recevront
+ * leur réponse fixe par modèle avec la synchronisation (PR 2). Sans réglage,
+ * l'offre gratuite ; `OPEN_METEO_API_BASE_URL` et `OPEN_METEO_API_KEY`
+ * passent à une offre payante sans changer une règle (§ 10). La clé n'est
+ * jamais lue ailleurs ni journalisée.
+ */
+export function getModelForecastReader(): ModelForecastReader | null {
+  if (isDemoDeployment()) return null;
+  if (readWeatherDataSource() === 'mock') return null;
+  const baseUrl = readServerSetting('OPEN_METEO_API_BASE_URL');
+  const apiKey = readServerSetting('OPEN_METEO_API_KEY');
+  if (baseUrl === null && apiKey === null) return openMeteoWeatherProvider;
+  const access = JSON.stringify([baseUrl, apiKey]);
+  if (cachedModelReader && cachedModelAccess === access) return cachedModelReader;
+  cachedModelAccess = access;
+  cachedModelReader = new OpenMeteoWeatherProvider(undefined, undefined, { baseUrl, apiKey });
+  return cachedModelReader;
 }
 
 export function weatherAttribution(provider: WeatherProvider) {

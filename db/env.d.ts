@@ -13,6 +13,10 @@ declare namespace Cloudflare {
     IRRIGATION_PUSH_SERVICE_TOKEN?: string;
     IRRIGATION_PUSH_VAPID_PUBLIC_KEY?: string;
     VISUAL_CROSSING_API_KEY?: string;
+    /** L'adresse de l'API de prévision d'une offre payante d'Open-Meteo (`https://customer-api…`) ; absente : l'offre gratuite. */
+    OPEN_METEO_API_BASE_URL?: string;
+    /** La clé de cette offre : un secret posé par le porteur seul (docs/weather-models-contract.md, § 10). */
+    OPEN_METEO_API_KEY?: string;
     WEATHER_SYNC_SERVICE_TOKEN?: string;
     ACCESS_TEAM_DOMAIN?: string;
     ACCESS_AUD?: string;

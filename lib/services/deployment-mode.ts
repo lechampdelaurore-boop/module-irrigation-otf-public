@@ -23,6 +23,7 @@ type SettingKey =
   | 'OTF_TOKEN_MASTER_KEY'
   | 'OTF_TOKEN_MASTER_KEY_PREVIOUS'
   | 'VISUAL_CROSSING_API_KEY'
+  | 'OPEN_METEO_API_KEY'
   | 'IRRIGATION_PUSH_SERVICE_TOKEN'
   | 'WEATHER_SYNC_SERVICE_TOKEN'
   | 'ACCESS_TEAM_DOMAIN';
@@ -42,6 +43,7 @@ function readDeploymentSettings(): DeploymentSettings {
     otfApiToken: present('OTF_API_TOKEN'),
     otfTokenMasterKey: present('OTF_TOKEN_MASTER_KEY') || present('OTF_TOKEN_MASTER_KEY_PREVIOUS'),
     visualCrossingApiKey: present('VISUAL_CROSSING_API_KEY'),
+    openMeteoApiKey: present('OPEN_METEO_API_KEY'),
     pushServiceToken: present('IRRIGATION_PUSH_SERVICE_TOKEN'),
     weatherSyncServiceToken: present('WEATHER_SYNC_SERVICE_TOKEN'),
     pushServiceBinding: Boolean((env as { IRRIGATION_PUSH?: unknown }).IRRIGATION_PUSH),
