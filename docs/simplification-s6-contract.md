@@ -700,6 +700,31 @@ message.
   300 planches, 82 et 104 ms, autant de lectures ; Réglages de 176 à
   184 ms ; borne + 20 % tenue. Quatorze contre-épreuves, chacune rouge.
 
+**PR 4, 26 novembre 2026** (D-336, F976 à F982) :
+
+- **Les visites** (F976 à F978) : sur `bienvenue`, les étapes 1 et 2 de
+  « Le module à la carte » disent « Trois façons de commencer » et « Rien
+  n'est choisi d'avance » (mots propres à la page, `TourStep.on`,
+  `stepWords`) ; dans Réglages, leurs mots d'avant. Sept visites, 7, 6, 4,
+  5, 4, 3 et 3 étapes, comme avant ; même ancre, mêmes pages, même règle
+  de saut. **Écart dit** (F977) : « Bienvenue » et « Et pour ma ferme ? »
+  n'avaient aucune phrase sur les cases à la première ouverture ; elles
+  ne changent pas.
+- **La ferme vierge** (F979) : le catalogue dit les trois façons ; la
+  remise à zéro la rend vierge, sans façon ni état de carte, l'ancien
+  choix mis de côté avec son espace (test de base, V8).
+- **Le « ? » de « Ma ferme »** (F980, écart dit : hors des sections 10
+  et 11) : la ligne d'état et la mise en route en tête.
+- **Les contrats de la section 11** (F981) : sept contrats annotés « Depuis
+  S6 » à l'endroit de chaque passage ; le contrat des parcours a suivi
+  dans les PR 1 à 3.
+- **Preuves** (F982) : huit tests du domaine, un de base ; V6 et V8
+  suivent ; dix contre-épreuves, chacune rouge.
+- **La recette** dans le Chrome du porteur, sur la ferme vierge de la
+  démonstration : après la mise en ligne des quatre PR et avec son
+  accord ; l'essai des cinq tâches avec le premier volontaire reste
+  conseillé avant la mise en ligne de la PR 1 (S6-m).
+
 ## 16. Risques
 
 | Risque | Parade |

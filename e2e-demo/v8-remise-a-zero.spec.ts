@@ -9,7 +9,7 @@ import { ecarterLInvitation, ouvrirLaDemo, ouvrirLeDetailDeLaBanniere, verifierL
  * les trois façons de commencer, rien de choisi. La fenêtre tient les cibles de 44 px et
  * les contrastes de 4,5:1 (section 9).
  */
-test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revient à sa liste à cocher', async ({ page }) => {
+test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revient à ses trois façons de commencer', async ({ page }) => {
   await ouvrirLaDemo(page, 'vierge', 'ete');
   await expect(page).toHaveURL(/\/irrigation\/bienvenue/);
   await ecarterLInvitation(page);
@@ -43,5 +43,9 @@ test('V8 Remettre à zéro : rien sans confirmation, puis la ferme vierge revien
   await fenetre.getByRole('button', { name: 'Remettre à zéro' }).click();
   await expect(page).toHaveURL(/\/irrigation\/bienvenue/);
   await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
+  // Les trois façons de nouveau, aucune enfoncée : la façon choisie avant la remise à zéro ne revient pas (lot S6, section 10).
+  await expect(page.getByRole('heading', { level: 1, name: 'Comment voulez-vous commencer ?' })).toBeVisible();
+  await expect(page.locator('[data-tour="fonctionnalites"] input[type="radio"]')).toHaveCount(3);
   await expect(page.locator('[data-tour="fonctionnalites"] input:checked')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Continuer' })).toBeDisabled();
 });

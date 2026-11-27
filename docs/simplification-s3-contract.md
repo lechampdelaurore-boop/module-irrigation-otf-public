@@ -258,15 +258,19 @@ un chapeau d'une ligne, titre, « ? », saison).
   « Ma ferme » n'a pas aujourd'hui, et la lenteur du module (N1 à N3) a été
   payée cher. S6 les ajoute avec la mise en route, qui lit les mêmes données ; S3
   garde la place (précision S3-g, écart voulu avec la maquette, dit au porteur).
+  **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : chaque fiche dit son état en une ligne quand la donnée est
+  connue (PR 3, F969 à F975), sinon cette ligne fixe.
 - **La phrase de bas de page** de la maquette : « Le module lit le plan de votre
   ferme dans Ouvre ta ferme, sans jamais le modifier. »
 - **« Mise en route » (cinq étapes)** : la place est en tête de page, vide en S3 ;
-  c'est S6.
+  c'est S6. **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : la carte « Mise en route » y est, pour une ferme
+  passée par les trois façons (PR 2, F958 à F968).
 - **Son « ? »** (`PAGE_HELP`) dit à quoi sert l'endroit, comme les autres pages.
 - **Saison** : la page la montre et la transmet à chaque fiche (elle sert à presque
   toutes), comme « Réglages » quand l'espèce en dépend (`pageUsesSeason`).
 - **Accès** : comme « Réglages », toujours ouverte, sauf la première visite, qui
-  conduit à l'écran de bienvenue (S6 le réécrira).
+  conduit à l'écran de bienvenue (S6 le réécrira ; réécrit, PR 1 de S6 :
+  les trois façons de commencer).
 
 ### 5.1 Le chemin de retour
 
@@ -358,7 +362,8 @@ modifie ni leur contenu ni leur titre ; S1, S2, S4, S5 et S6 le font).
   qui existe (ou que S2 crée).
 - Aucune fonction retirée, aucune page retirée ; toutes les adresses valent.
 - Le nom des pages (« Matériel et placement », « Ressources et pompes »…) : S3 range,
-  S6 retouchera les noms avec les cases (précision S3-b).
+  S6 retouchera les noms avec les cases (précision S3-b). **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : **les
+  noms ne changent pas** (S6-f) ; la ligne d'état dit ce que la fiche contient.
 
 ### Précisions tranchées (option recommandée, modifiables à la relecture)
 

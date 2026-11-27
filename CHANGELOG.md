@@ -5,6 +5,29 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S6, PR 4 : les visites, la ferme vierge, les contrats)
+
+- **La visite guidée parle des trois façons de commencer** (D-336, F976
+  à F978) : sur l'écran de la première ouverture, les deux étapes de « Le
+  module à la carte » disent « Trois façons de commencer » et « Rien
+  n’est choisi d’avance » ; dans Réglages, elles gardent leurs mots.
+  Aucune étape ajoutée ni retirée ; la bulle et l'annonce du lecteur
+  d'écran disent les mots de la page ouverte.
+- **La ferme vierge de la démonstration** (F979) se présente comme « les
+  trois façons de commencer, et rien de réglé » ; « Remettre à zéro » la
+  rend vierge, sans façon choisie ni état de la carte « Mise en route ».
+- **Le « ? » de « Ma ferme »** (F980) dit que chaque fiche dit où elle en
+  est, et que la mise en route est en tête pour une ferme qui commence.
+- **Sept contrats validés** (F981) disent, à l'endroit de chaque passage,
+  ce que S6 y change. **Le code de S6 est fini.**
+- **Parcours P67 (S4) le soir** : lancé après 23 h, il trouvait une
+  journée trop courte pour deux arrosages de 50 min ; le plan en propose
+  quatre plus courts et « Jour par jour » s'allonge (2 060 px au lieu de
+  1 750 au plus). La hauteur du premier niveau et les choses à toucher
+  ne sont bornées que dans le cas mesuré (deux arrosages) ; sinon le
+  parcours le dit (« hors jeu ») et joue tout le reste. La vérification
+  de cette PR et le déploiement de la PR 3 avaient échoué ainsi à 23 h 28.
+
 ### Ajouté (simplifier l'usage du module, S6, PR 3 : les lignes d'état des fiches de « Ma ferme »)
 
 - **Chaque fiche de « Ma ferme » dit son état en une ligne** (D-336, F969

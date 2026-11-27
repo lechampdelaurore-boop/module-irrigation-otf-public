@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
+  vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
+  F982 ; contrat, sections 10, 11 et 15), en Opus 5.5 · Très élevé,
+  empilée sur la PR 3 (#237). **Le code de S6 est fini.** Sur l'écran de
+  la première ouverture, les deux étapes de « Le module à la carte »
+  disent les trois façons de commencer, sans étape ajoutée ni retirée ;
+  la ferme vierge de la démonstration s'annonce ainsi et « Remettre à
+  zéro » la rend vierge, sans façon ni état de carte ; le « ? » de « Ma
+  ferme » suit la carte et les lignes d'état (écart dit, F980) ; sept
+  contrats validés annotés « Depuis S6 ». Aucune migration, aucun calcul
+  changé. Tests ; V6 et V8 suivent. Le parcours P67 (S4) ne borne plus la
+  hauteur quand il est lancé après 23 h (le plan y propose quatre
+  arrosages au lieu de deux) : il le dit « hors jeu ». Fusion après la PR 3 (fusionnée à
+  22 h 55), sa mise en ligne vérifiée ; recette dans le Chrome du porteur,
+  sur la ferme vierge, après la mise en ligne et avec son accord.
 - **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
   fiches de « Ma ferme », codée le 26 novembre 2026** (D-336, F969 à
   F975 ; contrat, sections 7, 14 et 15), en Opus 5.5 · Très élevé,
@@ -26,9 +41,9 @@ registres, elle y renvoie.
   dit ses cultures de la saison, pas les espèces à rattacher (comptées
   dans Réglages, F972). Aucune migration, aucun calcul changé. Tests ;
   P63 et P70 suivent. Contrôles, contre-épreuves et mesures : voir la PR
-  et la section 15 du contrat. Vient la PR 4 (visites, ferme vierge,
-  contrats de la section 11) ; fusion après la PR 2 (fusionnée à 22 h 10),
-  sa mise en ligne vérifiée.
+  et la section 15 du contrat. **Fusionnée** le 26 novembre 2026 à
+  22 h 55 (#237, 0e8c0e6), après la mise en ligne de la PR 2 ; sa mise en
+  ligne et celle de la PR 4 sont à consigner par la PR suivante.
 - **Simplifier l'usage du module, S6, PR 2 sur 4 : la carte « Mise en
   route », codée le 26 novembre 2026** (D-336, F958 à F968 ; contrat,
   sections 5, 6, 8, 12 et 14), en Opus 5.5 · Très élevé, empilée sur la
@@ -44,8 +59,8 @@ registres, elle y renvoie.
   aucun calcul changé. Tests ; P70 nouveau ; P29 et P63 suivent.
   Contrôles, contre-épreuves et mesures : voir la PR et la section 15 du
   contrat. **Fusionnée** le 26 novembre 2026 à 22 h 10 (#236, 57fddd7),
-  après la mise en ligne de la PR 1 ; sa mise en ligne est à consigner par
-  S6, PR 4.
+  après la mise en ligne de la PR 1, **en ligne à 22 h 47**, run
+  45896237598, les cinq jobs verts (consigné par S6, PR 4).
 - **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
   commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
   sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de

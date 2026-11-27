@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach } from 'node:test';
-import { saveFeatureSelectionForUser } from '../../db/feature-selection-repository';
+import { readFeatureSelectionForUser, saveFeatureSelectionForUser, saveRouteStateForUser, saveStartChoiceForUser } from '../../db/feature-selection-repository';
 import { findWorkspaceIdForUser } from '../../db/workspace-repository';
 import { demoOwnerUserId, resolveDemoChoice } from '../../lib/domain/demo/catalogue';
+import { startWaySelection } from '../../lib/domain/features/start';
 import { DemoResetRefusedError, recordDemoVisit, resetDemoSpace, resetInactiveDemoSpaces } from '../../lib/services/demo-reset';
 import { prepareDemoSpace } from '../../lib/services/demo-space';
 import { getFeatureSelectionForUser } from '../../lib/services/feature-selection-service';
@@ -71,7 +72,7 @@ test('« Remettre à zéro » rend à l’espace son premier jour, sans toucher 
   assert.equal(archivedWorkspace.id, before);
 });
 
-test('deux remises à zéro de suite restent distinctes, et la ferme vierge revient à sa liste à cocher', async () => {
+test('deux remises à zéro de suite restent distinctes, et la ferme vierge revient à ses trois façons de commencer', async () => {
   const owner = demoOwnerUserId('invite-a', ETE);
   await prepareDemoSpace(owner, ETE);
   await resetDemoSpace(owner, new Date('2026-06-16T08:00:00.000Z'));
@@ -83,6 +84,36 @@ test('deux remises à zéro de suite restent distinctes, et la ferme vierge revi
   await saveFeatureSelectionForUser(blank, ['materiel'], new Date('2026-06-16T08:00:00.000Z'));
   await resetDemoSpace(blank);
   assert.equal((await getFeatureSelectionForUser(blank)).firstVisit, true);
+});
+
+test('la ferme vierge passée par les trois façons revient vierge : ni façon ni état de la carte (lot S6, section 10)', async () => {
+  const vierge = resolveDemoChoice('vierge', undefined);
+  const blank = demoOwnerUserId('invite-a', vierge);
+  const now = new Date('2026-06-16T08:00:00.000Z');
+  await prepareDemoSpace(blank, vierge);
+  assert.equal((await readFeatureSelectionForUser(blank)).kind, 'first-visit');
+  assert.equal(await saveStartChoiceForUser(blank, 'all', startWaySelection('all'), now), 'saved');
+  assert.equal(await saveRouteStateForUser(blank, 'later', now), true);
+  const chosen = await readFeatureSelectionForUser(blank);
+  assert.ok(chosen.kind === 'stored' && chosen.startMode === 'all' && chosen.routeState === 'later');
+
+  await resetDemoSpace(blank, now);
+
+  // Plus d'espace, donc ni `start_mode` ni `route_state` : les trois façons de commencer de nouveau.
+  assert.equal((await readFeatureSelectionForUser(blank)).kind, 'first-visit');
+  assert.equal((await getFeatureSelectionForUser(blank)).firstVisit, true);
+  // L'ancien choix est mis de côté avec son espace, pas effacé.
+  const archived = owners().find((owner) => owner.startsWith(`${blank}·archive·`));
+  assert.ok(archived);
+  const kept = database.sqlite.prepare(
+    `SELECT selection.start_mode AS start_mode, selection.route_state AS route_state FROM irrigation_feature_selections AS selection
+     JOIN irrigation_workspaces AS workspace ON workspace.id = selection.workspace_id WHERE workspace.owner_user_id = ?`,
+  ).get(archived) as { start_mode: string; route_state: string };
+  assert.deepEqual({ ...kept }, { start_mode: 'all', route_state: 'later' });
+  // L'invité choisit de nouveau, comme la première fois.
+  assert.equal(await saveStartChoiceForUser(blank, 'notes', startWaySelection('notes'), now), 'saved');
+  const again = await readFeatureSelectionForUser(blank);
+  assert.ok(again.kind === 'stored' && again.startMode === 'notes' && again.routeState === null);
 });
 
 test('la remise à zéro est refusée hors démonstration et pour un espace qui n’est pas de démonstration', async () => {
