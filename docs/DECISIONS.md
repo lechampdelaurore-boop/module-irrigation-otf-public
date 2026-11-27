@@ -11997,7 +11997,9 @@ Précisions prises en codant (PR 4) :
 
 ## D-337 — L'objectif automatique se voit et se modifie ; ignorer l'irrigation hors saison
 
-Date : 26 novembre 2026. Statut : **contrat écrit, rien de codé** ;
+Date : 26 novembre 2026. Statut : **contrat écrit**, fusionné le
+27 novembre 2026 à 3 h 14 (#240) et **en ligne à 4 h 06** (run
+45927191810) ; le code suit en quatre PR (A1 : D-351) ;
 `docs/objectif-automatique-saison-contract.md`, roadmap section 6
 quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
 

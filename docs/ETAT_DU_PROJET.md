@@ -26,8 +26,9 @@ registres, elle y renvoie.
   annuler) ; une phrase de résultat sous l'interrupteur. Rien n'est écrit
   chaque matin, aucune migration, aucun calcul changé ; réglage éteint,
   l'écran d'avant. Tests du domaine et de persistance, P58 repris aux deux
-  largeurs. Contrôles : voir la PR. Fusion après S4, S6, #240 et #245 ;
-  vient B3 (B2 d'abord pour les lecteurs).
+  largeurs. Contrôles : voir la PR. S4, S6 et le contrat (#240) en ligne,
+  A1 se fusionne la première de la ligne 34 ; puis B1, B2 et B3, une à la
+  fois.
 - **L'objectif automatique se voit ; ignorer l'irrigation hors saison :
   contrat écrit le 26 novembre 2026, sans code** (D-337,
   `docs/objectif-automatique-saison-contract.md`, roadmap ligne 34, section
@@ -36,7 +37,9 @@ registres, elle y renvoie.
   et S6 ; le filtre n'ignore que l'irrigation, la pluie et son historique
   restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
   filtre se lève à la main seulement, les arrosages planifiés sont proposés
-  à l'annulation.
+  à l'annulation. **En ligne** : #240 fusionnée le 27 novembre 2026 à
+  3 h 14 (83c51ad), déployée à 4 h 06, run 45927191810, les cinq jobs verts
+  (consigné par A1).
 
 - **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
   vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
