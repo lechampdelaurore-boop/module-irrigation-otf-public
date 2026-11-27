@@ -7,6 +7,7 @@ import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
   ouvrirLOnglet,
+  ouvrirLePli,
   surveillerLaConsole,
   verifierCibleTactile,
   verifierLEtape,
@@ -29,7 +30,10 @@ import {
  * d'eau apportée que prévu, les trois semaines, la cause du débit, le débit
  * réglé et le débit proposé. « Adopter » l'enregistre dans le réglage : le
  * message le dit, le bloc disparaît et ne revient pas au rechargement, et
- * le plan de « Matériel et placement » donne à N01 le débit adopté. Au
+ * le plan de « Matériel et placement » donne à N01 le débit adopté. Le bloc
+ * est dans « Le détail » de la page « Semaine », lu à l'ouverture de sa
+ * section (simplification, lot S4, PR 2, 3.4, F918) : rien n'est lu avant ;
+ * au rechargement, la section dit qu'aucune planche ne s'écarte. Au
  * téléphone (390 px) et à l'ordinateur, à 1 440 px de large.
  *
  * Ce qu'il ne prouve pas : le seuil de 20 %, les semaines sans prévu, la
@@ -102,8 +106,14 @@ test('trois semaines d’irrigations plus longues que prévu : le bloc, la cause
 
   // Le bloc, après les suggestions du planning : N01, les trois semaines, la cause du débit.
   await attendreLaPageIrrigation(page, 'planning');
+  // Dans « Écart du prévu des trois dernières semaines », au détail de la page « Semaine », lu à l'ouverture du pli (S4, PR 2, 3.4, F918).
+  const section = page.locator('details#ecart-du-prevu');
+  await expect(section.locator(':scope > summary small')).toHaveText('Les planches arrosées plus ou moins que prévu, trois semaines de suite');
   const bloc = page.getByTestId('applied-water-gap');
+  await expect(bloc, 'rien n’est lu avant l’ouverture du pli').toHaveCount(0);
+  await ouvrirLePli(section);
   await expect(bloc).toBeVisible({ timeout: 30_000 });
+  await expect(section.locator(':scope > summary small')).toHaveText('1 planche s’écarte du prévu');
   await expect(bloc.getByRole('heading', { name: 'L’eau apportée s’écarte du prévu' })).toBeVisible();
   const planche = bloc.locator('li.water-gap-bed').filter({ has: page.locator('.water-gap-bed-name strong', { hasText: new RegExp(`^${PLANCHE}$`) }) });
   await expect(planche).toHaveCount(1);
@@ -140,6 +150,8 @@ test('trois semaines d’irrigations plus longues que prévu : le bloc, la cause
   await verifierLEtape(page, journal, 'débit adopté, bloc disparu');
   await page.reload();
   await attendreLaPagePrete(page, 'planning');
+  await ouvrirLePli(page.locator('details#ecart-du-prevu'));
+  await expect(page.locator('details#ecart-du-prevu .week-detail-empty')).toHaveText('Aucune planche ne s’écarte du prévu sur les trois dernières semaines.', { timeout: 30_000 });
   await expect(page.getByRole('heading', { name: 'L’eau apportée s’écarte du prévu' })).toHaveCount(0);
   await verifierLEtape(page, journal, 'bloc absent au rechargement');
 

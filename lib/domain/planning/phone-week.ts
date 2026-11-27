@@ -18,7 +18,7 @@ import { hasPumpTimeDeficit, pumpTimeDeficitValue, uncountedWaterCount, waterDef
  * `open` : le jour et ses cartes ; `folded` : son en-tête seul, avec ses
  * comptes, ses cartes à un geste ; `past` : rangé sous « Jours écoulés (n) ».
  */
-export type PhoneDayFold = 'open' | 'folded' | 'past';
+type PhoneDayFold = 'open' | 'folded' | 'past';
 
 export type PhoneWeekFolds = {
   /** Le repli de chaque jour, par `AAAA-MM-JJ`. */

@@ -7,6 +7,7 @@ import {
   type FeatureId,
   type PageFeatureId,
 } from './catalogue';
+import { storedRouteState, storedStartMode, type RouteState, type StartMode } from './start-mode';
 
 /**
  * Les règles du choix (docs/feature-selection-contract.md, section 4) : cocher
@@ -98,6 +99,10 @@ export type StoredFeatureSelection =
       known: readonly unknown[];
       chosenAt: string | null;
       bannerDismissedAt: string | null;
+      /** Comment la ferme a commencé (lot S6, `start_mode`) ; absente ou nulle : une ferme d'avant S6. */
+      startMode?: unknown;
+      /** L'état de la carte « Mise en route » (lot S6, `route_state`). */
+      routeState?: unknown;
     };
 
 export type FeatureBanner =
@@ -112,27 +117,33 @@ export type ResolvedFeatureSelection = {
   banner: FeatureBanner | null;
   /** Les cases que la ferme connaissait, à enregistrer avec son prochain choix. */
   known: FeatureId[];
+  /** Comment la ferme a commencé (lot S6, D-336) ; `null` : une ferme d'avant S6, qui n'a jamais de carte « Mise en route ». */
+  startMode: StartMode | null;
+  /** L'état de sa carte « Mise en route » : visible (`null`), remise à plus tard, terminée. */
+  routeState: RouteState | null;
 };
 
 export function resolveFeatureSelection(stored: StoredFeatureSelection): ResolvedFeatureSelection {
-  if (stored.kind === 'first-visit') return { firstVisit: true, enabled: [], banner: null, known: [] };
+  if (stored.kind === 'first-visit') return { firstVisit: true, enabled: [], banner: null, known: [], startMode: null, routeState: null };
   if (stored.kind === 'before-selection') {
     const enabled = [...FEATURES_BEFORE_SELECTION];
-    return { firstVisit: false, enabled, banner: { kind: 'introduction' }, known: enabled };
+    return { firstVisit: false, enabled, banner: { kind: 'introduction' }, known: enabled, startMode: null, routeState: null };
   }
+  const startMode = storedStartMode(stored.startMode);
+  const routeState = storedRouteState(stored.routeState);
   const known = orderedSelection(stored.known);
   const enabled = normalizeSelection(stored.enabled);
   const newFeatures = FEATURE_IDS.filter((id) => !known.includes(id));
   if (enabled.length === 0) {
     // Un choix vide ne s'enregistre pas (P7) ; s'il se rencontre quand même, rien ne disparaît.
-    return { firstVisit: false, enabled: [...FEATURES_BEFORE_SELECTION], banner: { kind: 'introduction' }, known };
+    return { firstVisit: false, enabled: [...FEATURES_BEFORE_SELECTION], banner: { kind: 'introduction' }, known, startMode, routeState };
   }
   const banner: FeatureBanner | null = newFeatures.length > 0
     ? { kind: 'new-features', features: newFeatures }
     : stored.chosenAt === null && stored.bannerDismissedAt === null
       ? { kind: 'introduction' }
       : null;
-  return { firstVisit: false, enabled, banner, known };
+  return { firstVisit: false, enabled, banner, known, startMode, routeState };
 }
 
 /** La première page, celle qu'ouvre « Irrigation » : la première case cochée de la liste qui a sa page (P10). */

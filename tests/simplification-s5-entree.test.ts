@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { TOURS } from '../lib/domain/demo/tours.ts';
+import { runningEndText } from '../lib/domain/watering-now.ts';
+import { timeText } from '../lib/domain/today/today-irrigations.ts';
+import { farmDateKey } from '../lib/domain/today/today-text.ts';
 
 /**
  * Simplifier l'usage du module, lot S5, PR 3 : l'entrée de la page et les mots
@@ -31,15 +34,35 @@ test('l’ordre de la page (S5-m) : l’en-cours, le formulaire, l’à-venir, p
   assert.equal(render.split('{notificationReadiness}').length, 2, 'les alertes du téléphone à une seule place');
 });
 
-test('l’arrosage en cours raccourci au téléphone (F909) : mêmes gestes, rangés côte à côte', () => {
+test('l’arrosage en cours raccourci au téléphone (F909, F996) : mêmes gestes, rangés côte à côte', () => {
   const css = read('app/irrigation/styles/arroser-maintenant.css');
   const phone = css.slice(css.indexOf('L\'arrosage en cours, plus court au téléphone'));
   assert.match(phone, /@media \(max-width: 560px\)/);
-  assert.match(phone, /\.active-irrigation-card > header \{[^}]*flex-direction: row;/);
+  // Le nom à gauche du minuteur, l'état à droite du réglage (F996).
+  assert.match(phone, /\.active-irrigation-card > header \{[^}]*display: grid;[^}]*"nom minuteur"\s*"reglage etat";/);
+  assert.match(phone, /\.active-irrigation-card > header > div \{\s*display: contents;\s*\}/);
+  for (const [selector, area] of [['h4', 'nom'], ['header p', 'reglage'], ['.event-status', 'etat'], ['.timer-countdown', 'minuteur']]) {
+    assert.match(phone, new RegExp(`\\.active-irrigation-card ${selector.replace('.', '\\.')} \\{[^}]*grid-area: ${area};`), selector);
+  }
   assert.match(phone, /\.active-timer-details \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
   assert.match(phone, /\.active-timer-actions \{[^}]*flex-direction: row;/);
+  // Le bloc des irrigations en cours sans cadre au téléphone ; la carte garde le sien.
+  assert.match(phone, /\.active-irrigations \{[^}]*padding: 0;[^}]*border: 0;[^}]*background: none;/);
+  assert.doesNotMatch(phone, /\.active-irrigation-card \{[^}]*border/);
   // Les boutons gardent leurs 52 px du téléphone (irrigation-records.css) : rien n'y touche ici.
   assert.doesNotMatch(phone, /min-height/);
+  // Rien n'est caché : aucun élément de la carte n'est retiré de l'écran.
+  assert.doesNotMatch(phone, /display: none|visibility: hidden/);
+});
+
+test('la carte en cours garde ses valeurs, ses plis et ses gestes ; la fin estimée dit l’heure (F997)', () => {
+  const cards = read('app/irrigation/irrigation-manager/irrigation-cards.tsx');
+  const active = cards.slice(cards.indexOf('export function ActiveIrrigationCard'), cards.indexOf('export function IrrigationRecordCard'));
+  for (const kept of ['<dt>Temps effectué</dt>', '<dt>Fin estimée</dt>', '<dt>Volume en cours</dt>', '<ApplicationDetails', '<EventPumpSummary', '>Reprendre<', '>Pause<', 'Terminer l’irrigation', 'Fermer la vanne']) {
+    assert.ok(active.includes(kept), kept);
+  }
+  assert.match(active, /runningEndText\(equipment\.timerTheoreticalEndAt, now\)/);
+  assert.doesNotMatch(active, /formatDateTime\(equipment\.timerTheoreticalEndAt\)/);
 });
 
 test('arrivé par un geste du « + » : le retour « ‹ Aujourd’hui » en tête du formulaire (section 7)', () => {
@@ -85,4 +108,20 @@ test('la visite suit les trois blocs : « 1. Où ? », « 2. Combien de temps ? 
   assert.match(form, /data-tour="arrosage-resultat"/);
   assert.match(form, /<div className="watering-start" data-tour="arrosage-bouton">/);
   assert.match(read('lib/domain/demo/tours.ts'), /« Démarrer · fin vers … »/);
+});
+
+test('F997 : la fin estimée d’un arrosage en cours, l’heure seule le jour même, à l’heure de la ferme', () => {
+  // 26 novembre 2026, 11 h 40 à Paris (UTC+1).
+  const now = new Date('2026-11-26T10:40:00.000Z');
+  assert.equal(runningEndText('2026-11-26T11:10:00.000Z', now), '12 h 10');
+  assert.equal(runningEndText('2026-11-26T11:00:00.000Z', now), '12 h');
+  // Après minuit à la ferme : le jour devant l'heure, même si UTC est encore la veille.
+  const evening = new Date('2026-11-26T22:30:00.000Z');
+  const afterMidnight = runningEndText('2026-11-26T23:20:00.000Z', evening);
+  assert.equal(afterMidnight, 'ven. 27 nov. à 0 h 20');
+  // Les mêmes mots que la carte d'« Aujourd'hui » (« fin prévue à … »), une seule règle.
+  assert.equal(afterMidnight, timeText('2026-11-26T23:20:00.000Z', farmDateKey(evening)));
+  // Le changement d'heure d'octobre : 3 h à Paris devient 2 h ; l'heure reste celle de la ferme.
+  const dst = new Date('2026-10-25T00:30:00.000Z');
+  assert.equal(runningEndText('2026-10-25T01:30:00.000Z', dst), '2 h 30');
 });

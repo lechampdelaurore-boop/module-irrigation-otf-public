@@ -1,6 +1,7 @@
 import { DEMO_PUSH_NOTICE } from '@/lib/domain/demo/deployment-mode';
 import { usesPushNotifications } from '@/lib/domain/features/socle';
 import { pageHref } from '@/lib/domain/features/pages';
+import { startedWithText } from '@/lib/domain/features/start';
 import { CropCoefficientsPanel } from '../crop-water/crop-coefficients-panel';
 import { loadPageContext, type IrrigationSearchParams } from '../page-context';
 import { loadReglagesPage } from '../page-loaders';
@@ -45,7 +46,7 @@ async function computeReglagesPage({ searchParams }: { searchParams: IrrigationS
   const soilStep = context.shell.unfinished.find((step) => step.id === 'soil');
   return (
     <IrrigationShell {...context.shell}>
-      <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} />
+      <FeatureSettings selection={context.enabled} counts={counts} season={context.season} zone={context.zone} startedWith={startedWithText(context.startMode)} />
       {waterDashboard ? <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={waterDashboard} part="reglages" /> : null}
       {usesPushNotifications(context.enabled)
         ? context.shell.demo ? <DemoNotificationSettings /> : <NotificationSettings

@@ -101,6 +101,11 @@ retirée. P61 fixe chaque borne sur la mesure faite, comme le lot J (contrat
 `audit-ergonomie-2026-11-19-lot-j-contract.md`, section 2) ; une page qui la
 dépasse le dit.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`).** La page « Semaine » a sa borne de hauteur (P40,
+4 500 px depuis la PR 3, F939) ; celles du planning, des besoins et de
+l'historique disparaissent avec ces pages. Le chapeau d'une ligne de
+« Semaine » est celui de sa phrase (S4, section 4.2).
+
 ## 4. PR 2 — Les mots
 
 **Principe.** Le premier niveau (titres, boutons, phrases d'en-tête, noms du

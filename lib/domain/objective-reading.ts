@@ -5,6 +5,7 @@ import { automaticObjectiveSchedule, type AutomaticObjectiveSettingRevision, typ
 import { et0OfDay, type Et0Reading } from './crop-water/etm.ts';
 import { et0NatureLabel } from './crop-water/presentation.ts';
 import { decimalText, mmText } from './figure-origin.ts';
+import { farmObjective } from './farm-objective.ts';
 import { shortDayText } from './today/today-text.ts';
 
 /**
@@ -33,8 +34,9 @@ function bedsOf(count: number, total: number): string {
  * planche n'est inconnu que faute d'objectif adopté (la pluie inconnue est
  * remplacée et listée, D-019) ; `null` quand toutes ont leur valeur.
  */
-export function gardenUnknownReason<B extends Pick<BedIrrigationNeed, 'objectiveMm'>>(beds: readonly B[], value: (bed: B) => number | null): string | null {
-  const unknown = beds.filter((bed) => value(bed) === null);
+export function gardenUnknownReason<B extends Pick<BedIrrigationNeed, 'objectiveMm' | 'offSeason'>>(beds: readonly B[], value: (bed: B) => number | null): string | null {
+  // Une planche hors saison n'est pas inconnue : elle sort des comptes du jardin (D-352, B3).
+  const unknown = beds.filter((bed) => value(bed) === null && bed.offSeason !== true);
   if (unknown.length === 0) return null;
   const withoutObjective = unknown.filter((bed) => bed.objectiveMm === null).length;
   if (withoutObjective === unknown.length) return `${bedsOf(withoutObjective, beds.length)} sans objectif adopté`;
@@ -231,4 +233,182 @@ export function automaticObjectiveMissingEt0Dates(
   if (!enabledOn(today)) return null;
   const byDate = new Map(readings.map((reading) => [reading.date, reading]));
   return weekDates.filter((date) => enabledOn(date) && et0OfDay(byDate.get(date), date, today) === null);
+}
+
+/*
+ * L'objectif automatique se voit et se modifie dans le volet « Objectifs de
+ * la semaine » (6 quaterdecies, PR A1, docs/objectif-automatique-saison-contract.md,
+ * section 3 ; D-337). Affichage seul : les valeurs viennent du tableau des
+ * besoins (`objectiveForBed`), rien n'est écrit chaque matin (point 1), rien
+ * ici ne les recalcule ; les moyennes de surface sont celles de
+ * `farmObjective` (S1, D-328), le seul calcul de moyenne.
+ */
+
+/** Ce que le volet lit de l'objectif d'une planche, tel que le tableau des besoins le rend. */
+export type ObjectiveBedReading = Pick<BedIrrigationNeed,
+  'bedId' | 'bedName' | 'plotId' | 'plotName' | 'zoneId' | 'areaSquareMeters' | 'objectiveMm' | 'objectiveOrigin' | 'automaticObjective'>;
+
+/** Les planches du tableau des besoins, réduites à ce que le volet lit de leur objectif. */
+export function objectiveBedReadings(gardens: readonly { beds: readonly BedIrrigationNeed[] }[]): ObjectiveBedReading[] {
+  return gardens.flatMap((garden) => garden.beds.map((bed) => ({
+    bedId: bed.bedId,
+    bedName: bed.bedName,
+    plotId: bed.plotId,
+    plotName: bed.plotName,
+    zoneId: bed.zoneId,
+    areaSquareMeters: bed.areaSquareMeters,
+    objectiveMm: bed.objectiveMm,
+    objectiveOrigin: bed.objectiveOrigin,
+    automaticObjective: bed.automaticObjective,
+  })));
+}
+
+/** Une ligne « automatique » de la liste du volet (point 2) : un jardin, ou une planche qui s'écarte de son jardin. */
+export type AutomaticObjectiveLine = {
+  key: string;
+  /** « Jardin Nord · 6 planches », « Jardin Nord · Planche 3 ». */
+  label: string;
+  /** La valeur du choix d'endroit qui la corrige, au format du sélecteur (`plot:…:…`, `bed:…:…:…`). */
+  scopeValue: string;
+  /** Les millimètres de la semaine ; `null` quand aucun jour n'a de valeur (D-003, jamais zéro). */
+  mm: number | null;
+  /** L'origine dans les mots de F791 : « automatique, d’après l’ET0 », « saisi et automatique »… */
+  origin: string;
+  /** Tous les jours automatiques reposent sur l'ET0 prévue : la ligne le dit (« prévu »). */
+  forecast: boolean;
+};
+
+/**
+ * La planche suit l'objectif automatique au moins un jour de la semaine, avec
+ * ou sans valeur (une semaine sans ET0 connue le dit, D-003) ; celle dont
+ * l'objectif saisi couvre tous les jours chiffrés n'en a pas.
+ */
+function followsAutomatic(bed: ObjectiveBedReading): boolean {
+  return bed.automaticObjective !== null && bed.objectiveOrigin !== 'entered';
+}
+
+/** Tous les millimètres automatiques de la planche viennent de l'ET0 prévue (une semaine à venir). */
+function forecastOnly(bed: ObjectiveBedReading): boolean {
+  const nature = bed.automaticObjective?.byNature;
+  return nature !== undefined && nature.forecast > 0 && nature.reanalysis === 0 && nature.estimated === 0;
+}
+
+/** Les millimètres comparés comme l'écran les montre, au dixième. */
+function sameShownMm(left: number | null, right: number | null): boolean {
+  if (left === null || right === null) return left === right;
+  return Math.round(left * 10) === Math.round(right * 10);
+}
+
+/**
+ * Les lignes « automatique » du volet (point 2) : une par jardin dont des
+ * planches suivent l'objectif automatique, avec la moyenne de surface de
+ * leurs millimètres (sur les seules planches chiffrées, que la ligne compte), puis une par planche dont la valeur ou l'origine
+ * s'écarte de celle de son jardin. Les jardins dans l'ordre du tableau des
+ * besoins. Aucune ligne quand aucune planche ne suit l'objectif automatique.
+ */
+export function automaticObjectiveLines(beds: readonly ObjectiveBedReading[]): AutomaticObjectiveLine[] {
+  const byPlot = new Map<string, ObjectiveBedReading[]>();
+  for (const bed of beds.filter(followsAutomatic)) byPlot.set(bed.plotId, [...(byPlot.get(bed.plotId) ?? []), bed]);
+  return [...byPlot.values()].flatMap((plotBeds) => {
+    const [first] = plotBeds;
+    const gardenMm = farmObjective(plotBeds).objectiveMm;
+    const gardenOrigin = groupObjectiveOriginText(plotBeds) ?? objectiveOriginText(first) ?? 'automatique';
+    // La moyenne ne porte que sur les planches chiffrées : la ligne dit lesquelles, « 1 planche sur 2 » (recette de la ligne 34, écart a).
+    const valued = plotBeds.filter((bed) => bed.objectiveMm !== null).length;
+    const counted = valued > 0 && valued < plotBeds.length
+      ? `${valued} planche${valued > 1 ? 's' : ''} sur ${plotBeds.length}`
+      : `${plotBeds.length} planche${plotBeds.length > 1 ? 's' : ''}`;
+    const garden: AutomaticObjectiveLine = {
+      key: `plot:${first.plotId}`,
+      label: `${first.plotName} · ${counted}`,
+      scopeValue: `plot:${first.zoneId}:${first.plotId}`,
+      mm: gardenMm,
+      origin: gardenOrigin,
+      forecast: plotBeds.every(forecastOnly),
+    };
+    const apart = plotBeds.length < 2 ? [] : plotBeds.filter((bed) => {
+      const origin = objectiveOriginText(bed) ?? 'automatique';
+      return !sameShownMm(bed.objectiveMm, gardenMm) || origin !== gardenOrigin;
+    });
+    return [garden, ...apart.map((bed): AutomaticObjectiveLine => ({
+      key: `bed:${bed.bedId}`,
+      label: `${bed.plotName} · ${bed.bedName}`,
+      scopeValue: `bed:${bed.zoneId}:${bed.plotId}:${bed.bedId}`,
+      mm: bed.objectiveMm,
+      origin: objectiveOriginText(bed) ?? 'automatique',
+      forecast: forecastOnly(bed),
+    }))];
+  });
+}
+
+/** Un endroit du sélecteur des objectifs, comme `saveHydricGoalAction` le reçoit. */
+export type GoalScopeTarget = {
+  scopeType: HydricGoal['scopeType'];
+  otfZoneId: string | null;
+  otfPlotId: string | null;
+  otfBedId: string | null;
+};
+
+/** La valeur en vigueur d'un endroit (point 3) : ses millimètres et leur origine. */
+export type ObjectiveInForce = {
+  mm: number;
+  /** « saisi », « automatique, d’après l’ET0 », « saisi et automatique »… */
+  origin: string;
+};
+
+function bedInScope(bed: ObjectiveBedReading, scope: GoalScopeTarget): boolean {
+  if (scope.scopeType === 'farm') return true;
+  if (scope.scopeType === 'zone') return bed.zoneId === scope.otfZoneId;
+  if (scope.scopeType === 'plot') return bed.plotId === scope.otfPlotId;
+  return bed.bedId === scope.otfBedId;
+}
+
+/**
+ * La valeur que montre le champ « mm / semaine » pour l'endroit choisi
+ * (point 3) : l'objectif saisi à cet endroit même, s'il y en a un, marqué
+ * « saisi » ; sinon la moyenne de surface des objectifs de ses planches, telle
+ * que le besoin les applique, marquée selon leur origine. `null` quand aucune
+ * planche de l'endroit n'a d'objectif chiffré : le champ reste vide (D-003).
+ */
+export function objectiveInForce(
+  scope: GoalScopeTarget,
+  goals: readonly (GoalScopeTarget & { amountMm: number })[],
+  beds: readonly ObjectiveBedReading[],
+): ObjectiveInForce | null {
+  const entered = goals.find((goal) => goal.scopeType === scope.scopeType
+    && goal.otfZoneId === scope.otfZoneId && goal.otfPlotId === scope.otfPlotId && goal.otfBedId === scope.otfBedId);
+  if (entered) return { mm: entered.amountMm, origin: 'saisi' };
+  const covered = beds.filter((bed) => bedInScope(bed, scope) && bed.objectiveMm !== null);
+  const mm = farmObjective(covered).objectiveMm;
+  if (mm === null) return null;
+  return { mm, origin: groupObjectiveOriginText(covered) ?? 'saisi' };
+}
+
+/**
+ * La phrase de résultat sous l'interrupteur allumé (point 6) : « Cette
+ * semaine : 24 mm en moyenne sur 7 planches, d’après l’ET0 ; 2 planches
+ * gardent un objectif saisi. » Les chiffres de l'objectif de la ferme
+ * (`farmObjective`, D-328), l'origine de ses planches, et les planches qui
+ * gardent un objectif saisi.
+ */
+export function automaticObjectiveResultText(
+  objective: { objectiveMm: number | null; withObjective: number },
+  beds: readonly ObjectiveOriginReading[],
+  keptGoalBeds: number,
+): string {
+  const kept = keptGoalBeds > 0
+    ? ` ; ${keptGoalBeds} planche${keptGoalBeds > 1 ? 's gardent' : ' garde'} un objectif saisi`
+    : '';
+  if (objective.objectiveMm === null) return `Cette semaine : aucune planche n’a encore d’objectif chiffré${kept}.`;
+  const count = objective.withObjective;
+  const origin = groupObjectiveOriginText(beds);
+  const basis = origin === null ? '' : `, ${origin.startsWith('automatique, ') ? origin.slice('automatique, '.length) : `objectif ${origin}`}`;
+  return `Cette semaine : ${mmText(Math.round(objective.objectiveMm * 10) / 10)} en moyenne sur ${count} planche${count > 1 ? 's' : ''}${basis}${kept}.`;
+}
+
+/** La fenêtre d'allumage (point 5) : ce qui change, avant, quand des planches gardent un objectif saisi. */
+export function automaticObjectiveEnableText(keptGoalBeds: number): string {
+  return keptGoalBeds > 1
+    ? `${keptGoalBeds} planches ont un objectif saisi, qui passe avant l’objectif automatique.`
+    : '1 planche a un objectif saisi, qui passe avant l’objectif automatique.';
 }

@@ -84,12 +84,14 @@ test('section 3.1 : le tableau du contrat, page par page', () => {
     'alertes-cultures': 'ma-ferme',
     reglages: 'ma-ferme',
     'ma-ferme': 'ma-ferme',
+    // Depuis le lot S4, la page « Semaine » est l'entrée de son endroit (docs/simplification-s4-contract.md, section 3).
+    semaine: 'semaine',
   };
   for (const page of IRRIGATION_PAGE_IDS) assert.equal(placeOfPage(page), expected[page], page);
   assert.deepEqual(PLACE_IDS.map(placeLabel), ['Aujourd’hui', 'Semaine', 'Ma ferme']);
   // L'ordre des fiches de la maquette.
   assert.deepEqual(placePages('ma-ferme'), ['ma-ferme', 'materiel', 'ressources', 'cultures', 'sol', 'alertes-meteo', 'alertes-cultures', 'reglages']);
-  assert.deepEqual(placePages('semaine'), ['planning', 'besoins', 'historique']);
+  assert.deepEqual(placePages('semaine'), ['semaine', 'planning', 'besoins', 'historique']);
   assert.deepEqual(placePages('aujourdhui'), ['aujourdhui', 'arrosages']);
 });
 
@@ -104,9 +106,10 @@ test('section 3.2 : pour chaque choix de cases valide, les endroits, leur entré
     const places: PlaceId[] = [...(hasTodayPage(selection) ? ['aujourdhui' as const] : []), ...(week.length > 0 ? ['semaine' as const] : []), 'ma-ferme'];
     assert.deepEqual(farmPlaces(selection), places, label);
     assert.equal(placeEntry('aujourdhui', selection), hasTodayPage(selection) ? 'aujourdhui' : null, label);
-    assert.equal(placeEntry('semaine', selection), week[0] ?? null, label);
+    // Depuis le lot S4, l'endroit s'ouvre sur la page « Semaine », qui porte les pages de ses cases.
+    assert.equal(placeEntry('semaine', selection), week.length > 0 ? 'semaine' : null, label);
     assert.equal(placeEntry('ma-ferme', selection), 'ma-ferme', label);
-    assert.deepEqual(enabledPlacePages('semaine', selection), week, label);
+    assert.deepEqual(enabledPlacePages('semaine', selection), week.length > 0 ? ['semaine', ...week] : [], label);
     // Les fiches : les cases cochées de l'endroit, dans l'ordre de la maquette, Réglages toujours.
     assert.deepEqual(farmCardPages(selection), FARM_CARD_PAGES.filter((page) => page === 'reglages' || selection.includes(page)), label);
     // Une case décochée retire sa page : les endroits rangent exactement les pages du menu.
@@ -131,10 +134,11 @@ test('section 8 : les états rares du rangement', () => {
   // Matériel et calculateur seuls : ni « Aujourd'hui » ni « Semaine ».
   assert.deepEqual(farmPlaces(['materiel', 'calculateur']), ['ma-ferme']);
   assert.deepEqual(farmCardPages(['materiel', 'calculateur']), ['materiel', 'reglages']);
-  // L'historique seul (avec ce dont il a besoin) : la semaine s'ouvre sur lui.
-  assert.equal(placeEntry('semaine', ['arrosages', 'materiel', 'historique']), 'historique');
-  // Tout coché : la semaine s'ouvre sur le planning.
-  assert.equal(placeEntry('semaine', [...FEATURE_IDS]), 'planning');
+  // L'historique seul (avec ce dont il a besoin) comme tout coché : la semaine s'ouvre sur sa page (lot S4).
+  assert.equal(placeEntry('semaine', ['arrosages', 'materiel', 'historique']), 'semaine');
+  assert.equal(placeEntry('semaine', [...FEATURE_IDS]), 'semaine');
+  // Sans aucune des trois cases, pas d'endroit « Semaine ».
+  assert.equal(placeEntry('semaine', ['arrosages', 'materiel']), null);
 });
 
 test('section 5 : « Ma ferme » a son adresse, son nom, sa saison ; aucune adresse d’avant ne change', () => {
@@ -196,7 +200,8 @@ test('section 5 : « Ma ferme » ne lit rien de plus que le gabarit de chaque pa
   assert.match(page, /loadPageContext\('ma-ferme', searchParams\)/);
   // Ni chargeur de page, ni service, ni base : la marque « À faire » vient de `context.shell.unfinished`.
   assert.doesNotMatch(page, /page-loaders|@\/lib\/services|@\/db\//);
-  assert.match(page, /farmCards\(context\.enabled, context\.shell\.unfinished\)/);
+  // Les lignes d'état des fiches viennent aussi du gabarit (lot S6, PR 3, section 7).
+  assert.match(page, /farmCards\(context\.enabled, context\.shell\.unfinished, context\.farmCardLines\)/);
   assert.match(page, /pageMetadata\('ma-ferme'\)/);
 });
 

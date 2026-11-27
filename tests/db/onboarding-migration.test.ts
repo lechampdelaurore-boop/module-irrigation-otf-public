@@ -23,13 +23,22 @@ import { applyMigrationsAfter, createD1FromSqlite, createMigratedSqliteDatabase 
 const BEFORE = '0033_otf_token_vault.sql';
 const NEW_TABLE = 'irrigation_onboarding_steps';
 
+/** Les deux colonnes de la 0051 (lot S6, D-336), vides pour une ferme existante (voir son essai) : la comparaison porte sur les autres. */
+function withoutLaterColumns(table: string, row: Record<string, unknown>): Record<string, unknown> {
+  if (table !== 'irrigation_feature_selections') return row;
+  const { start_mode: startMode, route_state: routeState, ...rest } = row;
+  assert.equal(startMode ?? null, null);
+  assert.equal(routeState ?? null, null);
+  return rest;
+}
+
 function dump(database: DatabaseSync): Record<string, string[]> {
   const tables = (database.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all() as { name: string }[])
     .map(({ name }) => name)
     .filter((name) => name !== NEW_TABLE);
   return Object.fromEntries(tables.map((table) => [
     table,
-    (database.prepare(`SELECT * FROM "${table}"`).all() as Record<string, unknown>[]).map((row) => JSON.stringify(row)).sort(),
+    (database.prepare(`SELECT * FROM "${table}"`).all() as Record<string, unknown>[]).map((row) => JSON.stringify(withoutLaterColumns(table, row))).sort(),
   ]));
 }
 
@@ -45,6 +54,15 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
       before_values, after_values, actor_user_id, created_at)`);
     // Même raison : ils lisent le réglage de l'objectif automatique (0047, D-317), vide, donc éteint.
     sqlite.exec('CREATE TEMP TABLE irrigation_automatic_objective_revisions (id, workspace_id, enabled, actor_user_id, created_at)');
+    // Même raison : ils lisent la façon de commencer (0051, lot S6, D-336) : ses deux colonnes, sans contrainte, le temps de remplir la copie.
+    sqlite.exec('ALTER TABLE irrigation_feature_selections ADD COLUMN start_mode text');
+    sqlite.exec('ALTER TABLE irrigation_feature_selections ADD COLUMN route_state text');
+    // Et les gestes « hors saison » (0052, D-352), aucun : rien n'est hors saison.
+    sqlite.exec('CREATE TEMP TABLE irrigation_off_season_revisions (id, workspace_id, scope_level, scope_id, off_season, actor_user_id, created_at)');
+    // Même raison : la démonstration sème l'archive des prévisions (0046, D-297 ; D-344, F1007).
+    sqlite.exec(`CREATE TEMP TABLE irrigation_weather_forecast_archive (workspace_id, location_key, issued_on, target_date, horizon_days,
+      precipitation_mm, et0_mm, minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter, source, fetched_at,
+      UNIQUE (workspace_id, location_key, issued_on, target_date))`);
     const choice = resolveDemoChoice('maraichage', 'ete');
     const farm = demoOwnerUserId('copie', choice);
     await prepareDemoSpace(farm, choice);
@@ -54,6 +72,10 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
 
     sqlite.exec('DROP TABLE temp.irrigation_change_journal');
     sqlite.exec('DROP TABLE temp.irrigation_automatic_objective_revisions');
+    sqlite.exec('ALTER TABLE irrigation_feature_selections DROP COLUMN start_mode');
+    sqlite.exec('ALTER TABLE irrigation_feature_selections DROP COLUMN route_state');
+    sqlite.exec('DROP TABLE temp.irrigation_off_season_revisions');
+    sqlite.exec('DROP TABLE temp.irrigation_weather_forecast_archive');
     const before = dump(sqlite);
     const filled = Object.entries(before).filter(([, rows]) => rows.length > 0).map(([table]) => table);
     assert.ok(filled.length >= 15, `la copie est une ferme complète (${filled.length} tables remplies : ${filled.join(', ')})`);

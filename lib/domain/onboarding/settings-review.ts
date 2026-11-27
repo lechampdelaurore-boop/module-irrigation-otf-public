@@ -29,6 +29,8 @@ export type SettingsGroup = {
   lines: SettingsLine[];
   /** La page où l'on ajuste ces valeurs. */
   page: IrrigationPageId;
+  /** Le pli de la page qui les porte, quand elles n'y sont pas en tête : « Réglages de la semaine » pour le planning (lot S4, PR 4). */
+  anchor?: string;
   /** Ce que passer le groupe laisse de côté. */
   skippedConsequence: string;
 };
@@ -38,6 +40,8 @@ const n = (value: number) => number.format(value);
 const hour = (minutes: number) => `${Math.floor(minutes / 60)} h${minutes % 60 === 0 ? '' : String(minutes % 60).padStart(2, '0')}`;
 
 const PORTEUR = 'choix du porteur';
+/** Le pli « Réglages de la semaine » de « Semaine », l'ancre du pli « Réglages de cette page » d'avant (lot S4, section 7.4). */
+const WEEK_SETTINGS_ANCHOR = 'reglages-de-la-page';
 
 /** Les groupes, chacun avec les cases qui s'en servent : un groupe sans case cochée n'est pas à relire. */
 const GROUPS: readonly (SettingsGroup & { features: readonly FeatureId[] })[] = [
@@ -118,7 +122,8 @@ const GROUPS: readonly (SettingsGroup & { features: readonly FeatureId[] })[] = 
     id: 'planning',
     label: 'Planning',
     features: ['planning'],
-    page: 'planning',
+    page: 'semaine',
+    anchor: WEEK_SETTINGS_ANCHOR,
     lines: planningLines(DEFAULT_PLANNING_SETTINGS),
     skippedConsequence: 'Vous n’avez pas validé les réglages du planning : aucun planning n’est calculé.',
   },
@@ -145,7 +150,7 @@ function planningLines(settings: PlanningSettings): SettingsLine[] {
 /** Les groupes à relire pour les cases cochées, dans l'ordre. */
 export function settingsGroupsFor(enabled: readonly FeatureId[]): SettingsGroup[] {
   return GROUPS.filter((group) => group.features.some((feature) => enabled.includes(feature)))
-    .map((group): SettingsGroup => ({ id: group.id, label: group.label, lines: group.lines, page: group.page, skippedConsequence: group.skippedConsequence }));
+    .map((group): SettingsGroup => ({ id: group.id, label: group.label, lines: group.lines, page: group.page, ...(group.anchor ? { anchor: group.anchor } : {}), skippedConsequence: group.skippedConsequence }));
 }
 
 /** Les réponses gardées dans la valeur de l'étape ; ce qui n'est pas lisible est sans réponse. */

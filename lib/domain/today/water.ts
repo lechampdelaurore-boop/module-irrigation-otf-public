@@ -87,7 +87,10 @@ function byName<T extends { name: string }>(items: readonly T[]): T[] {
   return [...items].sort((a, b) => compareNamesNaturally(a.name, b.name));
 }
 
-function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], today: string): { gauge: Omit<ReservoirGauge, 'label' | 'anchor'>; line: string } {
+/** Ce qu'une réserve dit d'elle : son nom, sa capacité, son volume et sa date. */
+export type ReservoirState = Pick<WaterInfrastructure['reservoirs'][number], 'id' | 'name' | 'capacityCubicMeters' | 'currentVolumeCubicMeters' | 'currentVolumeObservedAt' | 'minimumSafetyCubicMeters'>;
+
+function reservoirGauge(reservoir: ReservoirState, today: string): { gauge: Omit<ReservoirGauge, 'label' | 'anchor'>; line: string } {
   const capacityText = `sur ${waterText(reservoir.capacityCubicMeters, 'm³')}`;
   const base = { id: reservoir.id, name: reservoir.name, capacityCubicMeters: reservoir.capacityCubicMeters, capacityText, belowMinimumText: null };
   if (reservoir.currentVolumeCubicMeters === null) {
@@ -115,6 +118,16 @@ function reservoirGauge(reservoir: WaterInfrastructure['reservoirs'][number], to
     gauge: { ...filled, observedText, stale: age > RESERVOIR_VOLUME_MAX_AGE_DAYS },
     line: `${reservoir.name} : ${both}, ${observedText}.`,
   };
+}
+
+/**
+ * La phrase d'une réserve, sans point : « Bassin : 14 m³ sur 20 m³, observé
+ * aujourd’hui », « Cuve : volume jamais saisi ». Celle du bloc « Eau
+ * disponible », reprise par la fiche « Ressources et pompes » de « Ma
+ * ferme » (simplification, lot S6, section 7.2) : les mêmes mots.
+ */
+export function reservoirStateText(reservoir: ReservoirState, now: Date): string {
+  return reservoirGauge(reservoir, farmDateKey(now)).line.replace(/\.$/u, '');
 }
 
 /** Bloc d : chaque réserve active avec son volume et sa date, chaque ressource limitée avec ce qui reste à prélever aujourd'hui. */

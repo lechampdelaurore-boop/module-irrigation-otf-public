@@ -129,12 +129,14 @@ test('un choix enregistré se relit cohérent : inconnus écartés, dépendances
 });
 
 test('la première ouverture : rien coché d’avance ; une ferme d’avant la 3.8 : tout coché et le bandeau (R5, R6)', () => {
-  assert.deepEqual(resolveFeatureSelection({ kind: 'first-visit' }), { firstVisit: true, enabled: [], banner: null, known: [] });
+  assert.deepEqual(resolveFeatureSelection({ kind: 'first-visit' }), { firstVisit: true, enabled: [], banner: null, known: [], startMode: null, routeState: null });
   assert.deepEqual(resolveFeatureSelection({ kind: 'before-selection' }), {
     firstVisit: false,
     enabled: [...FEATURES_BEFORE_SELECTION],
     banner: { kind: 'introduction' },
     known: [...FEATURES_BEFORE_SELECTION],
+    startMode: null,
+    routeState: null,
   });
 });
 
@@ -146,7 +148,7 @@ test('un choix enregistré n’a pas de bandeau ; une case apparue depuis arrive
     chosenAt: '2026-11-07T13:00:00.000Z',
     bannerDismissedAt: null,
   });
-  assert.deepEqual(chosen, { firstVisit: false, enabled: ['alertes-meteo'], banner: null, known: [...FEATURE_IDS] });
+  assert.deepEqual(chosen, { firstVisit: false, enabled: ['alertes-meteo'], banner: null, known: [...FEATURE_IDS], startMode: null, routeState: null });
 
   // Une ferme qui a choisi avant que « Historique et cumuls » n'existe ne la voit pas cochée d'elle-même.
   const knownBefore = FEATURE_IDS.filter((id) => id !== 'historique');
@@ -263,12 +265,14 @@ test('les anciennes adresses des notifications conduisent à la page qui porte l
   // Sans ancre, la page d'arrivée : « Aujourd'hui » quand elle existe (audit ergonomique, lot 2, F1).
   assert.deepEqual(legacyRedirect('', all), { page: 'aujourdhui', notEnabled: false });
   assert.deepEqual(legacyRedirect('', ['materiel', 'calculateur']), { page: 'materiel', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#weather', all), { page: 'besoins', notEnabled: false });
+  // Depuis le lot S4 (section 9), les blocs du planning, des besoins et de l'historique vivent sur « Semaine ».
+  assert.deepEqual(legacyRedirect('#weather', all), { page: 'semaine', notEnabled: false });
   assert.deepEqual(legacyRedirect('#weather', ['alertes-meteo']), { page: 'alertes-meteo', notEnabled: false });
   assert.deepEqual(legacyRedirect('#irrigation-eq-1', all), { page: 'arrosages', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#series-water-title', all), { page: 'historique', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#series-water-title', all), { page: 'semaine', view: 'cumuls', notEnabled: false });
   assert.deepEqual(legacyRedirect('#series-water-title', ['alertes-cultures']), { page: 'alertes-cultures', notEnabled: false });
-  assert.deepEqual(legacyRedirect('#planning', all), { page: 'planning', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#planning', all), { page: 'semaine', notEnabled: false });
+  assert.deepEqual(legacyRedirect('#planning-title', ['arrosages', 'materiel', 'besoins']), { page: 'aujourdhui', notEnabled: true }, 'le planning décoché : la page d’arrivée et sa ligne, même quand « Semaine » existe');
   assert.deepEqual(legacyRedirect('#planning-title', ['alertes-cultures']), { page: 'alertes-cultures', notEnabled: false });
   assert.deepEqual(legacyRedirect('#farm-plan', ['alertes-meteo']), { page: 'aujourdhui', notEnabled: false }, 'une ancre sans règle mène à la page d’arrivée');
   assert.deepEqual(legacyRedirect('#irrigation-eq-1', ['alertes-meteo']), { page: 'aujourdhui', notEnabled: true }, 'la fonctionnalité n’est pas cochée : la page d’arrivée, avec la ligne qui le dit');

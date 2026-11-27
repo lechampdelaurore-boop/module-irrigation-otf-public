@@ -81,8 +81,10 @@ test('règle 2 : aucune page ne refait sa moyenne de l’objectif', () => {
   assert.match(besoins, /objective: farmObjective,/);
   assert.match(besoins, /farmObjectiveNotice\?\.weekStart === dashboard\.weekStart/, 'jamais l’objectif d’une autre semaine');
   assert.match(readFileSync('lib/domain/irrigation-needs.ts', 'utf8'), /farmObjective: farmObjective\(allBeds\),/);
-  assert.match(readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8'), /notifyFarmObjectiveRead\(\{ weekStart: dashboard\.weekStart, objective: dashboard\.farmObjective \}\)/);
-  assert.match(readFileSync('app/irrigation/besoins/page.tsx', 'utf8'), /initialFarmObjective=\{\{ weekStart: irrigationNeeds\.weekStart, objective: irrigationNeeds\.farmObjective \}\}/);
+  assert.match(readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8'), /notifyFarmObjectiveRead\(\{ weekStart: dashboard\.weekStart, objective: dashboard\.farmObjective, beds: objectiveBedReadings\(dashboard\.gardens\) \}\)/);
+  // Le signal porte aussi l'objectif de chaque planche, pour le volet des objectifs (6 quaterdecies, A1, D-337).
+  // « Objectifs et besoins » vit sur la page « Semaine » depuis le lot S4.
+  assert.match(readFileSync('app/irrigation/semaine/page.tsx', 'utf8'), /initialFarmObjective=\{\{ weekStart: needs\.irrigationNeeds\.weekStart, objective: needs\.irrigationNeeds\.farmObjective, beds: objectiveBedReadings\(needs\.irrigationNeeds\.gardens\) \}\}/);
   const week = readFileSync('lib/domain/today/week.ts', 'utf8');
   assert.match(week, /const objective = farmObjective\(beds\);/);
   assert.doesNotMatch(week, /weighted\(scope, \(bed\) => bed\.objectiveMm\)/);
