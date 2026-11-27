@@ -12326,7 +12326,10 @@ Précisions prises en codant :
   « Semaine » (P40, 4 500 px, lot S4) ne change pas. Avant la fusion de S4,
   la page « Objectifs et besoins » mesurait 2 841 px avec lui au téléphone,
   et la PR avait porté son budget de 2 800 à 2 900 px ; la mise à jour sur
-  `main` retire ce changement, la page n'existant plus seule.
+  `main` retire ce changement, la page n'existant plus seule. Pour que
+  `water-management-dashboard.tsx` reste sous 600 lignes avec le pli, la
+  fonction `nothingToRemove` (« Retirer la mesure », F471) passe telle
+  quelle dans `lib/domain/besoins-phone.ts`.
 - **F1007** — L'annonce semée de la démonstration : pour chaque matin, de
   sept jours avant le premier jour semé à la veille du moment, et chaque
   horizon de J+1 à J+7, la valeur semée du jour visé, écartée de 0,4 mm par

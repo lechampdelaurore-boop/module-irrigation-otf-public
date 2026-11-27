@@ -15,7 +15,7 @@ import { useConfirm } from './shell/use-confirm';
 import { AnchoredFold, PageSettingsFold } from './shell/page-settings-fold';
 import { notifyWeekWaterRead, WEEK_RAIN_NOTED } from './semaine/week-signals';
 import { WaterSummaryTiles } from './water-summary-tiles';
-import { goalsFoldLine, manualRainFoldLine, weatherFoldLine, weekTotalsLine } from '@/lib/domain/besoins-phone';
+import { goalsFoldLine, manualRainFoldLine, nothingToRemove, weatherFoldLine, weekTotalsLine } from '@/lib/domain/besoins-phone';
 import { automaticRefreshStatus } from '@/lib/domain/weather/automatic-refresh-status';
 import { AutomaticWeatherRefresh } from './automatic-weather-refresh';
 import { ForecastReliabilityFold } from './forecast-reliability-fold';
@@ -526,9 +526,7 @@ export function WaterManagementDashboard({
           <a className="weather-location-link" href={pageHref('reglages', { season }, 'water-weather-title')}>Changer la commune dans Réglages</a>
           <small>{dashboard.weather.location ? `Coordonnées utilisées : ${dashboard.weather.location.latitude.toFixed(4)}, ${dashboard.weather.location.longitude.toFixed(4)} · ${dashboard.weather.location.source}. ` : ''}{dashboard.weather.attribution} Les « données réelles estimées » proviennent d’une réanalyse, pas d’une station de la ferme.</small>
         </AnchoredFold>
-
-        {/* Ce que la météo annonçait, face à ce qui s'est passé : lu à l'ouverture du pli seulement (D-338). */}
-        <ForecastReliabilityFold season={season} />
+        <ForecastReliabilityFold season={season} />{/* Le prévu face au réalisé, lu à l'ouverture du pli seulement (D-338, D-344). */}
       </div>
 
       {confirmDialog}
@@ -653,10 +651,4 @@ function formatTemperatures(minimum: number | null, maximum: number | null) {
 
 function formatDate(dateKey: string) {
   return dateFormatter.format(new Date(`${dateKey}T12:00:00.000Z`));
-}
-
-/** Le jour choisi est dans la semaine affichée et n'a aucune mesure de la ferme : rien à retirer (F471). */
-function nothingToRemove(days: readonly { date: string; manualRainMm: number | null }[], date: string): boolean {
-  const day = days.find((candidate) => candidate.date === date);
-  return day !== undefined && day.manualRainMm === null;
 }

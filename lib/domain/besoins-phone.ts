@@ -94,3 +94,9 @@ export function gardenState(garden: GardenStateInput): { text: string; tone: 'un
   if (garden.priorityCounts.high > 0) return { text: plural(garden.priorityCounts.high, 'haute', 'hautes'), tone: 'high' };
   return { text: '', tone: 'normal' };
 }
+
+/** Le jour choisi est dans la semaine affichée et n'a aucune mesure de la ferme : rien à retirer (F471). */
+export function nothingToRemove(days: readonly { date: string; manualRainMm: number | null }[], date: string): boolean {
+  const day = days.find((candidate) => candidate.date === date);
+  return day !== undefined && day.manualRainMm === null;
+}
