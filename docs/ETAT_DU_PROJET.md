@@ -12,6 +12,13 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **La météo prévue contre la météo réalisée : contrat écrit le 26 novembre
+  2026, sans code** (D-338, `docs/forecast-reliability-contract.md`, roadmap
+  section 6 quindecies, ligne 35), sur l'archive des prévisions (D-297) :
+  pluie et ET0, à un jour, à quelques jours et sur la semaine ; un pli fermé
+  sur « Objectifs et besoins », aucun chiffre sans 14 jours, aucun verdict en
+  mots. Aucun calcul, migration, écriture ni budget. Deux PR de code (Opus 5.5
+  · Élevé) **après le « vas-y » du porteur**.
 - **Ignorer l'irrigation hors saison, B3 : les écrans, codée le
   26 novembre 2026** (D-353, F1075 à F1086 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4.3 à 4.5, 6
