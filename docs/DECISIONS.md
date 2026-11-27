@@ -12224,6 +12224,65 @@ formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
 À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
 aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
 
+## D-343 — La météo prévue contre la météo réalisée, PR 1 : le calcul et la lecture
+
+Date : 26 novembre 2026. Statut : **PR 1 sur 2 codée** ; contrat
+`docs/forecast-reliability-contract.md` (sections 3 à 5, 7 et 8), roadmap
+section 6 quindecies, ligne 35. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap ; lancé par le coordinateur sur le mandat du porteur d'enchaîner les
+chantiers seul (consignes du projet, point 4 : ce chantier ne touche ni la
+3.8, ni la ferme réelle, ni Cloudflare, ni une question agronomique
+réservée).
+
+**Décision (PR 1).** Le calcul vit dans
+`lib/domain/weather/forecast-reliability.ts` : les couples (la prévision
+émise le jour D − h pour D, face au réalisé de D), trois lectures jamais
+mêlées (la pluie estimée, la pluie notée au pluviomètre, la soif du jour),
+les trois lignes d'horizon et le total, les horizons un à un, le cumul de la
+semaine lu sur l'annonce du dimanche, les minimums, les états et les
+phrases. La lecture, `db/forecast-reliability-repository.ts`, ne lit que
+l'exploitation de la personne et son lieu actuel, par `listForecastArchive`
+et une requête du réalisé (réanalyse du lieu, pluviomètre de la ferme) ; le
+service `lib/services/forecast-reliability.ts` assemble la fenêtre du jour,
+la lecture et le calcul, pour le pli de la PR 2. **Aucun écran, aucune
+migration, aucune écriture, aucun appel externe ; aucun calcul existant ne
+change** (D-010, D-041, D-047 ; la pluie prévue reste comptée à 100 %).
+
+Précisions prises en codant :
+
+- **F998** — La fenêtre compte 90 jours visés, de J − 90 à hier, bornes
+  comprises ; aujourd'hui n'est jamais comparé (pas encore réalisé). Un
+  couple de 91 jours sort, un de 90 jours entre (test 9 du contrat : 89
+  entre, 91 sort).
+- **F999** — Les « 14 jours mesurés » de la lecture sur le pluviomètre
+  (§3.3) comptent les jours notés dans la fenêtre, avec ou sans prévision
+  en face ; au-delà, chaque ligne de cette lecture demande encore ses
+  14 couples (§5), comme la lecture de base.
+- **F1000** — Le pourcentage de la soif de la semaine (§4, indicateur 5)
+  est l'écart moyen du cumul rapporté au cumul estimé moyen, pas la moyenne
+  des pourcentages de chaque semaine (une semaine presque sans soif
+  l'emporterait) ; il s'écrit à l'unité, et ne paraît pas quand rien n'a été
+  estimé ni quand l'écart s'écrit 0.
+- **F1001** — « Tombait juste en moyenne » se dit quand l'écart moyen
+  s'écrit « 0 » à une décimale : une règle d'affichage, pas un seuil de
+  jugement (§4 : aucun seuil inventé).
+- **F1002** — La soif du jour (ET0) se dit « la soif annoncée » et « la
+  soif estimée », le mot du tableau de S1 (D-328, F833) ; le signe se dit
+  « trop forte » ou « trop faible ». Le mot « ET0 » reste pour le détail du
+  pli (PR 2).
+- **F1003** — Une ligne d'archive dont l'horizon n'est pas de J+1 à J+7, ou
+  ne mène pas du jour d'émission au jour visé, n'entre dans aucun couple ;
+  une réanalyse d'un autre lieu non plus. Le pluviomètre, lui, appartient à
+  la ferme : il entre quel que soit le lieu.
+- **F1004** — La date des premiers chiffres (§5) est calculée : à partir du
+  premier jour d'émission gardé (ou de demain sans archive), le jour visé
+  qui complète 14 couples à un ou deux jours, plus les cinq jours de retard
+  de la réanalyse. Pour une archive commencée le 22 novembre 2026, cela
+  donne **vers le 5 décembre 2026**, et non le 11 décembre écrit au
+  contrat ; le contrat demande de le confirmer par un constat avant
+  d'écrire « vu ». Quand la date estimée est passée (des jours manquent),
+  rien n'est promis.
+
 ## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
 
 Date : 26 novembre 2026. Statut : **codée**, sur la branche de S6 PR 4
