@@ -12493,3 +12493,55 @@ Aucune règle nouvelle, aucune question agronomique.
   et ceux de B2. P27 suit : le pli des objectifs porte désormais deux
   choix du périmètre, il vise le premier, celui de l'objectif (relevé par
   la CI de la PR).
+
+## D-356 — Ligne 34 : la recette sur la démonstration, trois écarts d'affichage corrigés
+
+Date : 27 novembre 2026. Statut : **codée** (roadmap section 6
+quaterdecies, ligne 34 ; contrat `docs/objectif-automatique-saison-contract.md`,
+D-337). Code en Opus 5.5 · Élevé, le réglage de A1 et B3. Numéros D-356 et
+F1097 à F1099, vérifiés sur toutes les PR ouvertes avant d'être pris :
+D-354 et F1092 sont à #258, D-355 et F1096 à #259.
+
+**Contexte.** A1 (#255) et B3 (#257) en ligne, la recette a été faite le
+27 novembre 2026 sur la démonstration, dans le Chrome du porteur, à sa
+demande (« Si tu as des recettes à faire, c'est le moment ») : **conforme**.
+A1 : la fenêtre d'allumage, les lignes « automatique », « Corriger », la
+saisie, « Revenir à l'automatique ». B3 : le choix des portées, « Mettre
+hors saison » un jardin avec un arrosage validé (« Les annuler » : il est
+annulé, le message le compte), la puce, les cartes grisées, la tuile
+d'« Aujourd'hui » et son lien vers le bloc ouvert, « Reprendre ». La
+démonstration a été remise à zéro ensuite. Trois écarts d'affichage,
+sans effet sur un calcul, sont corrigés ici ; la mise en ligne de B3 est
+consignée (le 27 novembre 2026 à 10 h 56, run 45970882756).
+
+**Précisions.**
+
+- **F1097** — La ligne « automatique » d'un jardin (`automaticObjectiveLines`,
+  `lib/domain/objective-reading.ts`) fait la moyenne de surface des seules
+  planches chiffrées (D-003) : quand une partie seulement en a une, elle
+  le dit, « Clos des saules · 1 planche sur 2 », au lieu de « 2 planches ».
+  Toutes chiffrées, ou aucune (« sans valeur »), la ligne d'avant. La
+  planche sans valeur garde sa propre ligne.
+- **F1098** — Le tableau des besoins : un jardin dont toutes les planches
+  sont hors saison dit « Hors saison : ni besoin ni volume » sur sa ligne,
+  et « hors saison : ni besoin ni volume » dans son détail au téléphone,
+  au lieu de « Besoin réel : Non calculable · Volume non calculable »
+  (F1081 le disait déjà pour « À planifier »). Un seul texte pour les deux
+  (`gardenNeedText`).
+- **F1099** — « Eau de la semaine » d'« Aujourd'hui » (`todayWeek`) dit
+  d'un jardin tout hors saison « 0 mm reçus, hors saison » au lieu
+  d'« aucun objectif posé » ; « Jardin par jardin » de « Semaine »
+  (`weekGardens`) dit « hors saison », sans le lien « Lui en donner une »,
+  et la phrase « N planches n’ont pas d’eau visée » ne compte plus les
+  planches hors saison : elles n'attendent pas d'objectif (D-337). Un
+  jardin en partie hors saison reste dit comme avant.
+
+**Hors de cette PR.** Sur la démonstration seulement, un espace semé un
+jour réel plus tôt garde des révisions datées après les gestes du
+lendemain (l'horloge simulée fixe le jour, pas l'heure) : un « Revenir à
+l'automatique » peut alors sembler sans effet. « Remettre à zéro » avant
+une recette suffit ; rien ne change en ligne.
+
+**Preuves.** `tests/hors-saison-recette.test.ts` (3 tests) ; les suites
+du domaine, le typage et le lint passent ; aucun parcours ne lisait ces
+textes.

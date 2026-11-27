@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (ligne 34 : trois écarts de la recette)
+
+- **L'objectif automatique d'un jardin dit sur combien de planches porte
+  sa moyenne** (D-356) : « Clos des saules · 1 planche sur 2 · 18 mm »
+  quand une planche n'a pas encore de valeur.
+- **Un jardin tout hors saison n'est plus dit « non calculable »** : le
+  tableau des besoins dit « Hors saison : ni besoin ni volume » ; « Eau de
+  la semaine » et « Jardin par jardin » disent « hors saison », sans
+  « Lui en donner une », et ses planches ne sont plus comptées parmi
+  celles « sans eau visée ».
+
 ### Ajouté (ignorer l'irrigation hors saison, B3 : les écrans)
 
 - **Le bloc « Hors saison »** (D-353, F1075 à F1086), dans le pli

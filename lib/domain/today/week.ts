@@ -96,7 +96,7 @@ type WeekRow = {
    * (D-352), absent quand il n'y en a aucune.
    */
   objectiveBeds: { withObjective: number; total: number; offSeason?: number };
-  /** « 8 / 20 mm », « 8 / 20 mm sur 7 planches sur 10 », « 8 mm reçus, aucun objectif posé », « pluie inconnue ». */
+  /** « 8 / 20 mm », « 8 / 20 mm sur 7 planches sur 10 », « 8 mm reçus, aucun objectif posé », « 0 mm reçus, hors saison », « pluie inconnue ». */
   text: string;
   /** L'origine de l'objectif quand l'objectif automatique y compte : « automatique, d’après l’ET0 » ; `null` sinon. */
   objectiveOrigin: string | null;
@@ -226,8 +226,10 @@ function row(key: string, name: string, beds: readonly TodayWeekBed[], scaleMaxM
   const origin = objectiveMm === null ? null : groupObjectiveOriginText(scope.map(originReading));
   // L'objectif automatique se dit sur la ligne, en un mot (D-319, section 5, point 3).
   const automatic = origin === null ? '' : `, objectif ${groupObjectiveOriginText(scope.map(originReading), false)}`;
+  // Toutes ses planches hors saison : le jardin n'attend pas d'objectif, il est hors saison (recette de la ligne 34, écart c).
+  const allOffSeason = objectiveBeds.total > 0 && objectiveBeds.offSeason === objectiveBeds.total;
   const text = objectiveMm === null
-    ? `${mmText(rounded(receivedMm ?? irrigationMm))} reçus, aucun objectif posé`
+    ? `${mmText(rounded(receivedMm ?? irrigationMm))} reçus, ${allOffSeason ? 'hors saison' : 'aucun objectif posé'}`
     : receivedMm === null
       ? `${mmText(rounded(irrigationMm))} irrigués / ${mmText(rounded(objectiveMm))}${on}${automatic}, pluie inconnue`
       : `${millimeters.format(receivedMm)} / ${mmText(rounded(objectiveMm))}${on}${automatic}`;
