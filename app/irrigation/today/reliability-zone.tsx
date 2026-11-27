@@ -206,9 +206,10 @@ export function ReliabilityAction({ line, query, pending, onRecalculatePlan, onO
 }) {
   const action = line.action;
   if (action.kind === 'rain') {
+    // Sans la fenêtre sur cette page, « Semaine » l'ouvre à l'arrivée (lot S4, PR 4, `?pluie=1`).
     return onOpenRain
       ? <button type="button" className="primary" disabled={pending} onClick={onOpenRain}>{action.label}</button>
-      : <GestureLink action={{ ...action, kind: 'link' }} query={query} />;
+      : <a className="today-action-link" href={pageHref(action.page, { ...query, rain: true })}>{action.label}</a>;
   }
   if (action.kind === 'recalculate-plan') {
     return (

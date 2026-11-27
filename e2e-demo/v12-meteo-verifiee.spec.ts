@@ -6,8 +6,8 @@ import { ecarterLInvitation, ouvrirLaDemo } from './support/visite.ts';
 /**
  * Parcours V12 : « La météo s'est-elle vérifiée ? » sur la démonstration
  * (docs/forecast-reliability-contract.md, section 8, test 11 ; D-338, PR 2).
- * La « Ferme des Trois Noues », au début de l'été : dans « Objectifs et
- * besoins », le pli est fermé ; ouvert, il porte l'étiquette « exemple », la
+ * La « Ferme des Trois Noues », au début de l'été : sur « Semaine », dans
+ * « Le détail » (lot S4), le pli est fermé ; ouvert, il porte l'étiquette « exemple », la
  * phrase de tête, deux tableaux (la pluie, la soif du jour), chacun avec ses
  * trois lignes d'horizon, le total et le cumul de la semaine (trois semaines
  * sur quatre au mardi 16 juin), la pluie notée au pluviomètre qui n'a pas
@@ -21,7 +21,7 @@ const HAUTEUR_TELEPHONE_PX = 740;
 
 test('V12 La météo s’est-elle vérifiée ? : un pli fermé, puis l’exemple, deux tableaux et les réserves', async ({ page }, testInfo) => {
   if (testInfo.project.name === 'telephone') await page.setViewportSize({ width: LARGEUR_TELEPHONE_ETROIT_PX, height: HAUTEUR_TELEPHONE_PX });
-  const visite = await ouvrirLaDemo(page, 'maraichage', 'ete', '/irrigation/besoins');
+  const visite = await ouvrirLaDemo(page, 'maraichage', 'ete', '/irrigation/semaine');
   await ecarterLInvitation(page);
   const pli = page.locator('#meteo-verifiee');
   await expect(pli).not.toHaveAttribute('open', '');

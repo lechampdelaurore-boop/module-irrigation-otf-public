@@ -8,6 +8,7 @@ import { phoneBar } from '../lib/domain/features/phone-bar';
 import { enabledPlacePages, farmPlaces, placeEntry, placeOfPage } from '../lib/domain/features/places';
 import { PLUS_BUTTON_LABEL } from '../lib/domain/features/plus-sheet';
 import { isCompleteSelection } from '../lib/domain/features/selection';
+import { isWeekPageFeature, weekViewSelector } from '../lib/domain/features/week-page';
 
 /**
  * Simplifier l'usage du module, lot S3, PR 3 : le menu de l'ordinateur
@@ -41,15 +42,21 @@ test('section 6 : pour chaque choix de cases valide, les endroits de la barre, c
     assert.deepEqual(places.map((group) => group.entry), bar.map((item) => item.page), label);
     for (const group of places) {
       assert.equal(group.entry, placeEntry(group.place, selection), label);
-      // Le titre et la liste disent ensemble les pages cochées de l'endroit, dans son ordre ; l'entrée qui porte le nom
-      // de l'endroit n'est pas répétée, celle de « Semaine » l'est (S3-a).
-      const own = group.entry === group.place;
-      assert.deepEqual(own ? [group.entry, ...group.pages] : group.pages, enabledPlacePages(group.place, selection), label);
-      assert.equal(own, group.place !== 'semaine', label);
+      // Chaque titre porte le nom de son endroit et mène à sa page ; la liste ne la répète pas.
+      assert.equal(group.entry, group.place, label);
+      if (group.place === 'semaine') {
+        // Depuis le lot S4, « Semaine » est une page : sous son titre, ses deux vues quand la ferme a les deux (S4-m),
+        // plus le planning, les besoins ni l'historique, dont elle porte le contenu.
+        assert.deepEqual(group.pages, [], label);
+        assert.deepEqual(group.views, weekViewSelector(selection) ?? [], label);
+        continue;
+      }
+      assert.deepEqual([group.entry, ...group.pages], enabledPlacePages(group.place, selection), label);
+      assert.deepEqual(group.views, [], label);
     }
-    // Chaque page du menu y est une fois, Réglages en dernier, dans « Ma ferme » (S3-i).
-    const shown = places.flatMap((group) => (group.entry === group.place ? [group.entry, ...group.pages] : group.pages));
-    assert.deepEqual([...shown].sort(), [...menu].sort(), label);
+    // Chaque page du menu y est une fois, sauf les trois cases que porte « Semaine », Réglages en dernier, dans « Ma ferme » (S3-i).
+    const shown = places.flatMap((group) => [group.entry, ...group.pages]);
+    assert.deepEqual([...shown].sort(), menu.filter((page) => !isWeekPageFeature(page)).sort(), label);
     assert.equal(new Set(shown).size, shown.length, label);
     assert.equal(shown.at(-1), 'reglages', label);
     assert.equal(placeOfPage('reglages'), places.at(-1)?.place, label);
@@ -66,12 +73,17 @@ test('S3-e : la page ouverte marquée une fois ; le titre de son endroit `true` 
         assert.equal(group.mark, null, label);
         continue;
       }
-      // « Aujourd'hui » et « Ma ferme » sur leur page : `page` ; « Semaine » sur Planning : `true`, Planning porte `page`.
-      const titleIsThePage = group.entry === current && !group.pages.includes(current);
+      // « Aujourd'hui », « Semaine » et « Ma ferme » sur leur page : `page` ; sur une autre page de l'endroit : `true`.
+      // Quand les vues de « Semaine » la redisent, son titre porte `true` et la vue ouverte `page` (S4-m).
+      const titleIsThePage = group.entry === current && group.views.length === 0;
       assert.equal(group.mark, titleIsThePage ? 'page' : 'true', label);
     }
   }
   assert.deepEqual(menuPlaces(menu, null).map((group) => group.mark), [null, null, null]);
+  // Une seule vue (les besoins sans l'historique) : pas de sélecteur, le titre porte la marque.
+  const needsOnly = menuPages(['materiel', 'arrosages', 'besoins']);
+  const week = menuPlaces(needsOnly, 'semaine').find((group) => group.place === 'semaine');
+  assert.deepEqual(week && { mark: week.mark, views: week.views }, { mark: 'page', views: [] });
 });
 
 test('le menu de l’ordinateur : le « + Arroser ou noter » en tête, les trois endroits dépliés, les titres en liens, la semaine garde son jour', () => {

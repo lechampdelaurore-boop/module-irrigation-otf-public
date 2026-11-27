@@ -92,9 +92,10 @@ test('une page par fonctionnalité : le menu y conduit, et l’ancienne adresse 
   expect(boitePlan && boiteApercu && boitePlan.y < boiteApercu.y).toBe(true);
   await verifierLEtape(page, journal, 'page du matériel par le menu');
 
-  // Une notification reçue avant la 3.8 ouvrait `/irrigation?…#planning` : elle mène au planning (P14).
+  // Une notification reçue avant la 3.8 ouvrait `/irrigation?…#planning` : elle mène au planning (P14), sur « Semaine » depuis le lot S4.
   await page.goto('/irrigation?season=2026#planning');
-  await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES.planning })).toBeVisible();
-  await expect(page).toHaveURL(/\/irrigation\/planning\?season=2026#planning$/);
+  await expect(page.getByRole('heading', { level: 1, name: TITRES_DES_PAGES.semaine })).toBeVisible();
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?season=2026#planning$/);
+  await expect(page.locator('#planning')).toBeAttached();
   await verifierLEtape(page, journal, 'ancienne adresse du planning');
 });

@@ -23,7 +23,8 @@ test('décocher une fonctionnalité avertit, retire sa page et ses blocs sans ri
   await caseDeLaFonctionnalite(page, 'Réserve du sol').check();
   await expect(caseDeLaFonctionnalite(page, 'Besoin par culture')).toBeChecked();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'aujourdhui');
+  // Le sol à décrire : la première arrivée est « Ma ferme », la mise en route ayant une étape (lot S6, section 3.4).
+  await attendreLaPagePrete(page, 'ma-ferme');
   expect(await entreesDuMenu(page)).toContain('Besoin par culture');
 
   // Une donnée du besoin par culture : la carotte rattachée, dans Réglages (P3).

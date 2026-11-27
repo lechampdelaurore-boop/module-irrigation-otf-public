@@ -7,7 +7,8 @@ import { attendreLaPagePrete, ouvrirLePli, surveillerLaConsole, verifierLEtape }
  * (docs/forecast-reliability-contract.md, section 8, test 11 ; D-338, PR 2 ;
  * docs/browser-journeys-contract.md).
  *
- * Une ferme neuve, toutes cases cochées : dans « Objectifs et besoins », le
+ * Une ferme neuve, toutes cases cochées : avec les blocs d'« Objectifs et
+ * besoins » (« Le détail » de « Semaine », lot S4), le
  * pli est fermé et n'a rien lu ; ouvert sans commune, il dit qu'il n'y a rien
  * à comparer ; la commune choisie, il dit qu'il n'a pas encore assez de jours
  * (ou que rien n'est encore gardé) et ne montre aucun tableau ni aucun
@@ -21,7 +22,7 @@ import { attendreLaPagePrete, ouvrirLePli, surveillerLaConsole, verifierLEtape }
 const DUREE_DU_PARCOURS = 180_000;
 
 async function ouvrirLaMeteoVerifiee(page: Page) {
-  await page.goto('/irrigation/besoins');
+  await page.goto('/irrigation/semaine');
   await attendreLaPagePrete(page, 'besoins');
   const pli = page.locator('#meteo-verifiee');
   await expect(pli).not.toHaveAttribute('open', '');

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { TOURS } from '../lib/domain/demo/tours';
+import { TOURS, allStepWords } from '../lib/domain/demo/tours';
 import { PAGE_HELP } from '../lib/domain/features/help';
 import { PLACE_IDS, placeLabel } from '../lib/domain/features/places';
 
@@ -14,7 +14,7 @@ import { PLACE_IDS, placeLabel } from '../lib/domain/features/places';
  * gauche à l'ordinateur (docs/demo-guided-contract.md, section 7).
  */
 
-const TOUR_TEXTS = TOURS.flatMap((tour) => [tour.title, tour.summary, ...tour.steps.flatMap((step) => [step.title, step.text])]);
+const TOUR_TEXTS = TOURS.flatMap((tour) => [tour.title, tour.summary, ...tour.steps.flatMap(allStepWords).flatMap((words) => [words.title, words.text])]);
 const HELP_TEXTS = Object.values(PAGE_HELP).flatMap((help) => [help.purpose, help.reading, help.firstStep]);
 
 test('la visite « Bienvenue » présente, sur l’ancre du menu, les trois endroits et le « + »', () => {
@@ -47,5 +47,7 @@ test('l’ancre « menu » est posée sur la barre du bas et sur le menu de l’
   assert.match(menu, /<nav className="phone-bar" data-tour="menu"/);
   assert.match(menu, /<nav className="feature-menu" data-tour="menu"/);
   const tour = readFileSync('app/irrigation/shell/guided-tour.tsx', 'utf8');
-  assert.match(tour, /querySelectorAll<HTMLElement>\(`\[data-tour="\$\{name\}"\]`\)\) \{\s+if \(element\.getClientRects\(\)\.length > 0\) return element;/);
+  assert.match(tour, /querySelectorAll<HTMLElement>\(`\[data-tour="\$\{name\}"\]`\)\) \{\s+if \(isOnScreen\(element\)\) return element;/);
+  // Celle qu'on voit : une boîte, et aucun pli fermé autour (S4, PR 4).
+  assert.match(readFileSync('app/irrigation/shell/on-screen.ts', 'utf8'), /return element\.getClientRects\(\)\.length > 0 && element\.closest\('details:not\(\[open\]\) > :not\(summary\)'\) === null;/);
 });

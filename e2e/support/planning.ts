@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { confirmerDansLaFenetre, ouvrirLePli } from './parcours.ts';
+import { confirmerDansLaFenetre, ouvrirLePli, ouvrirLesPlisAutour } from './parcours.ts';
 import { annulerDepuisLeMenu } from './materiel.ts';
 
 /**
@@ -23,18 +23,22 @@ export async function carteNommee(planning: Locator, carte: Locator): Promise<Lo
 }
 
 /**
- * Au téléphone, un jour à venir n'affiche que son en-tête, et les jours
- * écoulés sont rangés sous « Jours écoulés (n) » (audit ergonomique, point 2,
- * précision F11) : la carte visée se montre en dépliant son jour. Sans effet
- * à l'ordinateur, ni quand la carte est déjà visible.
+ * Au téléphone, « Jour par jour » de la page « Semaine » montre chaque
+ * créneau en une ligne, et range les jours écoulés sous « Jours écoulés (n) »
+ * (simplification, lot S4, PR 2, section 5 ; F11) : la carte visée se montre
+ * en dépliant ses jours, puis par « Autres choix » (ou « Détail ») de sa
+ * ligne. Sans effet à l'ordinateur, ni quand la carte est déjà visible.
  */
 export async function montrerLaCarte(planning: Locator, carte: Locator): Promise<void> {
   if (await carte.isVisible()) return;
   const identifiant = await carte.getAttribute('data-proposal-id');
   expect(identifiant).not.toBeNull();
-  const jour = planning.locator('li.planning-day').filter({ has: planning.page().locator(`article.planning-proposal[data-proposal-id="${identifiant}"]`) });
+  // Un filtre `has` se lit dans l'élément filtré : la carte y est cherchée par son seul sélecteur.
+  const laCarte = planning.page().locator(`article.planning-proposal[data-proposal-id="${identifiant}"]`);
+  const creneau = planning.locator('.week-slot').filter({ has: laCarte });
+  const jour = planning.locator('li.planning-day').filter({ has: laCarte });
   if (!(await jour.isVisible())) await planning.getByRole('button', { name: /^Jours écoulés \(\d+\)$/ }).click();
-  await jour.getByRole('button', { name: /^Voir les créneaux/ }).click();
+  if (!(await carte.isVisible())) await creneau.locator('.week-slot-line').getByRole('button', { name: /^(Autres choix|Détail)$/ }).click();
   await expect(carte).toBeVisible();
 }
 
@@ -44,6 +48,8 @@ export async function montrerLaCarte(planning: Locator, carte: Locator): Promise
  */
 export async function lignesNonPlacees(planning: Locator): Promise<Locator> {
   const pli = planning.locator('details.planning-unplaced');
+  // Dans « Le plan, chaîne par chaîne », au détail de la page « Semaine » (S4, PR 2).
+  await ouvrirLesPlisAutour(pli);
   if (!(await pli.evaluate((element) => (element as HTMLDetailsElement).open))) await pli.locator('summary').click();
   await expect(pli).toHaveJSProperty('open', true);
   return pli.locator('tbody tr');
@@ -54,21 +60,27 @@ async function panneauDesObjectifs(page: Page): Promise<Locator> {
   return ouvrirLePli(page.locator('#objectifs-de-la-semaine'));
 }
 
-/** Va sur la semaine précédente de l'eau et attend que l'en-tête change. */
+/**
+ * Va sur la semaine précédente par la flèche de la page « Semaine » et
+ * attend ses dates : l'adresse dit la semaine (simplification, lot S4, PR 2,
+ * S4-g). Rend les dates de la semaine quittée.
+ */
 async function allerALaSemainePrecedente(page: Page): Promise<string> {
-  const navigation = page.locator('.water-management-section .water-week-navigation');
-  await navigation.scrollIntoViewIfNeeded();
-  const semaine = navigation.locator('strong');
-  const courante = await semaine.innerText();
-  await navigation.getByRole('button', { name: 'Semaine précédente' }).click();
-  await expect(semaine).not.toHaveText(courante, { timeout: 15_000 });
+  const navigation = page.getByRole('navigation', { name: 'Changer de semaine' });
+  const dates = navigation.locator('.week-range');
+  const courante = await dates.innerText();
+  await navigation.getByRole('link', { name: 'Semaine précédente' }).click();
+  await expect(dates).not.toHaveText(courante, { timeout: 15_000 });
+  await expect(page).toHaveURL(/[?&]week=\d{4}-\d{2}-\d{2}/);
+  await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
   return courante;
 }
 
 async function revenirACetteSemaine(page: Page, courante: string): Promise<void> {
-  const navigation = page.locator('.water-management-section .water-week-navigation');
-  await navigation.getByRole('button', { name: 'Cette semaine' }).click();
-  await expect(navigation.locator('strong')).toHaveText(courante, { timeout: 15_000 });
+  const navigation = page.getByRole('navigation', { name: 'Changer de semaine' });
+  await navigation.getByRole('link', { name: 'Cette semaine' }).click();
+  await expect(navigation.locator('.week-range')).toHaveText(courante, { timeout: 15_000 });
+  await expect(page.locator('main.app-shell[data-interactive="true"]')).toHaveCount(1);
 }
 
 /**
@@ -118,6 +130,8 @@ async function viderLesObjectifsDeLaSemaine(page: Page): Promise<void> {
 /** La plage horaire du goutte-à-goutte (R8), enregistrée et relue dans le résumé des réglages. */
 export async function reglerLaPlageDuGoutteAGoutte(planning: Locator, plage: { debut: string; fin: string }): Promise<void> {
   const reglages = planning.locator('details.planning-settings');
+  // Dans « Réglages de la semaine », le dernier pli de « Le détail » (S4, PR 2).
+  await ouvrirLesPlisAutour(reglages);
   await reglages.scrollIntoViewIfNeeded();
   if (!(await reglages.evaluate((element) => (element as HTMLDetailsElement).open))) {
     await reglages.locator('summary').click();

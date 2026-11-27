@@ -5,8 +5,9 @@ import { journalDeletion, journalUpdate, latestRevision, type JournalGesture, ty
  * Les lignes du journal des modifications pour les objectifs (amélioration
  * n° 7, PR 5 ; docs/ameliorations-6-2-3-7-contract.md, §5.1 ; D-286) :
  * l'objectif hydrique d'une semaine, posé à la main ou adopté d'une
- * proposition, son retrait, le réglage « Objectif automatique », le seuil
- * minimal de besoin et la décision sur le besoin d'une planche.
+ * proposition, son retrait, le réglage « Objectif automatique », les gestes
+ * « hors saison », le seuil minimal de besoin et la décision sur le besoin
+ * d'une planche.
  *
  * Chaque fonction rend l'instruction que l'écrivain place dans son lot,
  * **avant** son écriture : l'avant se lit sur la ligne d'avant (F716).
@@ -78,6 +79,33 @@ export function automaticObjectiveJournal(subject: 'objectif-automatique', gestu
     { ...gesture, subject, objectId: null },
     latestRevision('irrigation_automatic_objective_revisions', 'workspace_id = ?', [gesture.workspaceId]),
     [{ key: 'enabled', current: 'COALESCE(current.enabled, 0)', next: enabled }],
+    'defaults',
+  );
+}
+
+/** La portée d'un geste « hors saison », comme la ligne la garde : son niveau et son identifiant (le mode, pour tout le plein champ ou tout le sous-abri). */
+export type OffSeasonScopeColumns = { level: 'bed' | 'plot' | 'zone' | 'mode'; id: string };
+
+/**
+ * Un geste « Mettre hors saison » (`jardin-hors-saison`) ou « Reprendre »
+ * (`reprise-saison`) sur une portée (6 quaterdecies, B2 ; D-337, D-352) : la
+ * révision la plus récente de cette portée ; sans révision, elle est en
+ * saison. La ligne dit « modifié », d'en saison à hors saison ou l'inverse ;
+ * rien si l'état de la portée ne change pas. Le repère dit la planche, le
+ * jardin ou la parcelle par son identifiant OTF, ou le mode pour tout le
+ * plein champ et tout le sous-abri.
+ */
+export function offSeasonJournal(
+  subject: 'jardin-hors-saison' | 'reprise-saison',
+  gesture: JournalGesture,
+  scope: OffSeasonScopeColumns,
+  offSeason: boolean,
+): D1PreparedStatement {
+  const place = { bed: 'bedId', plot: 'plotId', zone: 'zoneId', mode: 'offSeasonMode' }[scope.level];
+  return journalUpdate(
+    { ...gesture, subject, objectId: scope.level === 'mode' ? null : scope.id, context: { [place]: { value: scope.id } } },
+    latestRevision('irrigation_off_season_revisions', 'workspace_id = ? AND scope_level = ? AND scope_id = ?', [gesture.workspaceId, scope.level, scope.id]),
+    [{ key: 'offSeason', current: 'COALESCE(current.off_season, 0)', next: offSeason }],
     'defaults',
   );
 }

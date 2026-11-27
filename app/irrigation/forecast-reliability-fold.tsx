@@ -14,7 +14,8 @@ import { readForecastReliabilityAction, type ForecastReliabilityActionResult } f
 import { AnchoredFold } from './shell/page-settings-fold';
 
 /**
- * Le pli « La météo s'est-elle vérifiée ? » de « Objectifs et besoins »
+ * Le pli « La météo s'est-elle vérifiée ? » des blocs d'« Objectifs et
+ * besoins », dans « Le détail » de la page « Semaine » (lot S4)
  * (docs/forecast-reliability-contract.md, §6 ; D-338, PR 2) : fermé, il ne
  * lit rien tant qu'on ne l'ouvre pas (lot N, lenteur du module), puis
  * demande la comparaison une fois. Une information seulement : aucun

@@ -92,9 +92,10 @@ export type IrrigationHistorySummary = {
    * section 5 bis) : celles qui ont un objectif sur la période, sur toutes
    * celles du périmètre, et leurs journées-planche. L'objectif en est la
    * moyenne pondérée par la surface ; les autres sont dites, jamais
-   * comptées à zéro.
+   * comptées à zéro. Celles hors saison sans aucun jour d'objectif sont
+   * comptées à part (D-337, D-352), absent quand il n'y en a aucune.
    */
-  objectiveBeds: { withObjective: number; total: number; bedDays: number };
+  objectiveBeds: { withObjective: number; total: number; bedDays: number; offSeason?: number };
   /**
    * L'eau reçue que l'écart compare à l'objectif, irrigation et pluie réelles,
    * sur les mêmes planches que lui : celles qui ont un objectif quand une

@@ -22,11 +22,14 @@ export function FeatureSettings({
   counts,
   season,
   zone,
+  startedWith,
 }: {
   selection: FeatureSelection;
   counts: FeatureDataCounts;
   season: number;
   zone: string | null;
+  /** Comment la ferme a commencé (lot S6, section 9) ; `null` pour une ferme d'avant S6. */
+  startedWith: string | null;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [change, setChange] = useState<PendingChange | null>(null);
@@ -86,6 +89,8 @@ export function FeatureSettings({
           {/* L'explication fixe est dans le « ? » de la page ; décocher prévient de ce qui reste enregistré (simplification S1, F826). */}
         </div>
       </header>
+      {/* Un fait, pas un réglage : les cases se changent ci-dessous, sans « refaire le choix de départ » (lot S6, section 9). */}
+      {startedWith ? <p className="feature-started-with">{startedWith}</p> : null}
       {error ? <p className="water-error" role="alert">{error}</p> : null}
       {pending && !change ? <p className="water-notice" role="status">Enregistrement du choix…</p> : null}
       <FeatureChoiceList selection={selection} disabled={pending} keepOne onToggle={toggle} />

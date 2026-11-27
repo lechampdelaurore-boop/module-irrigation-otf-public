@@ -16,10 +16,12 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: WELCOME_TITLE };
 
 /**
- * La première ouverture (docs/feature-selection-contract.md, R5) : la liste
- * des cases, rien coché d'avance, avant toute autre page et avant toute
- * lecture d'Ouvre ta ferme. Une ferme qui a déjà ouvert le module va à sa
- * page d'arrivée ; elle change son choix dans Réglages.
+ * La première ouverture (docs/feature-selection-contract.md, R5, changée par
+ * le lot S6 de la simplification, docs/simplification-s6-contract.md,
+ * section 3) : trois façons de commencer, ou la liste des cases, rien choisi
+ * d'avance, avant toute autre page et avant toute lecture d'Ouvre ta ferme.
+ * Une ferme qui a déjà ouvert le module va à sa page d'arrivée ; elle change
+ * son choix dans Réglages.
  */
 async function computeBienvenuePage() {
   let user: AuthenticatedUser;

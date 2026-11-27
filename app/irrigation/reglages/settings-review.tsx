@@ -58,7 +58,7 @@ export function SettingsReviewSection({ season, initialReview }: { season: numbe
               <button type="button" disabled={pending || group.answer === 'skipped'} onClick={() => answer(group.id, 'skipped')}>
                 Passer
               </button>
-              <a href={pageHref(group.page, { season })}>Ajuster</a>
+              <a href={pageHref(group.page, { season }, group.anchor)}>Ajuster</a>
             </div>
           </li>
         ))}

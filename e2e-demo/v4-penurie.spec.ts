@@ -10,8 +10,8 @@ import { commencerLaVisite, ecarterLInvitation, etapeSuivante, jouerLaVisite, ou
 const ETAPES: EtapeAttendue[] = [
   { titre: 'L’eau disponible', rang: 'étape 1 sur 5', ancre: 'aujourdhui-eau', chemin: '/irrigation/aujourdhui' },
   { titre: 'Les réserves et leur minimum', rang: 'étape 2 sur 5', ancre: 'ressources-reserves', chemin: '/irrigation/ressources' },
-  { titre: 'Le manque chiffré', rang: 'étape 3 sur 5', ancre: 'planning-semaine', chemin: '/irrigation/planning' },
-  { titre: 'Qui passe après les autres', rang: 'étape 4 sur 5', ancre: 'planning-non-servies', chemin: '/irrigation/planning' },
+  { titre: 'Le manque chiffré', rang: 'étape 3 sur 5', ancre: 'planning-semaine', chemin: '/irrigation/semaine' },
+  { titre: 'Qui passe après les autres', rang: 'étape 4 sur 5', ancre: 'planning-non-servies', chemin: '/irrigation/semaine' },
   { titre: 'Y a-t-il assez d’eau cette semaine ?', rang: 'étape 5 sur 5', ancre: 'faisabilite', chemin: '/irrigation/ressources' },
 ];
 
@@ -24,13 +24,13 @@ test('V4 Quand l’eau manque : trois pages, une pause ailleurs, la reprise sur 
   await etapeSuivante(page);
   await verifierLEtapeDeVisite(page, visite, ETAPES[1]);
 
-  // Le visiteur va voir l'historique : la visite se met en pause.
-  await page.goto('/irrigation/historique');
+  // Le visiteur va voir l'historique, la vue « Les cumuls » de « Semaine » depuis S4 : la visite se met en pause.
+  await page.goto('/irrigation/semaine?vue=cumuls');
   const bulle = page.locator('.tour-bubble');
   await expect(bulle.getByRole('heading', { name: 'Quand l’eau manque' })).toBeVisible();
   await expect(bulle).toContainText('La visite continue sur la page « Ressources et pompes ».');
   await expect(bulle.getByRole('heading')).not.toBeFocused();
-  await expect(page).toHaveURL(/\/irrigation\/historique/);
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?vue=cumuls/);
   await bulle.getByRole('button', { name: 'Reprendre la visite' }).click();
 
   await jouerLaVisite(page, visite, ETAPES.slice(1));

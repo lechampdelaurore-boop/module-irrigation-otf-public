@@ -116,7 +116,7 @@ test('cas 1 : trois arrosages à valider demain à 6 h, rien aujourd’hui : la 
     count: 3,
     text: 'Demain à 6 h : 3 irrigations à valider',
     sentence: '3 irrigations sont à valider demain à 6 h.',
-    link: { page: 'planning', anchor: 'proposal-p1' },
+    link: { page: 'semaine', anchor: 'proposal-p1' },
   });
   assert.equal(view.headline.sentence, '3 irrigations sont à valider demain à 6 h.');
   const chips = view.headline.chips.map((chip) => [chip.key, chip.text]);
@@ -298,8 +298,9 @@ test('F282 : le « Non calculable » d’un jardin dit pourquoi ; le besoin de �
   assert.match(view, /`au moins \$\{volumeText\(head\.knownNeedCubicMeters\)\}`/);
   assert.match(view, /`non chiffré pour \$\{feasibilityUnknownReason\(head\.unknownNeed\)/);
   const needs = readFileSync('app/irrigation/irrigation-needs-dashboard.tsx', 'utf8');
-  assert.match(needs, /À planifier : \{gardenMm\(garden\.effectiveNeedMm, gardenUnknownReason\(garden\.beds/);
-  assert.match(needs, /bed\.calculatedNeedMm === null && missingLabels\(bed, 'planning'\) \? <p className="need-unknown-reason">Non calculable : \{missingLabels\(bed, 'planning'\)\}\.<\/p>/);
+  // Un jardin tout entier hors saison le dit, et une planche hors saison n'est pas « non calculable » (6 quaterdecies, B3).
+  assert.match(needs, /À planifier : \{gardenAllOffSeason\(garden\.beds\) \? 'hors saison' : gardenMm\(garden\.effectiveNeedMm, gardenUnknownReason\(garden\.beds/);
+  assert.match(needs, /bed\.calculatedNeedMm === null && bed\.offSeason !== true && missingLabels\(bed, 'planning'\) \? <p className="need-unknown-reason">Non calculable : \{missingLabels\(bed, 'planning'\)\}\.<\/p>/);
 });
 
 // J14, un gel annoncé sans alerte posée (F283, F284).
