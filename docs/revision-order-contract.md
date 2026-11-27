@@ -58,7 +58,13 @@ Les lectures où le plus récent fait foi :
   `listAutomaticObjectiveRevisionsForUser` dans l'ordre d'écriture et remis
   en ordre par `automaticObjectiveSchedule` dans
   `lib/domain/automatic-objective.ts` ; la garde d'écriture lit le dernier
-  geste de la même façon (depuis le 24 novembre 2026, D-317, F774).
+  geste de la même façon (depuis le 24 novembre 2026, D-317, F774) ;
+- les gestes « Mettre hors saison » et « Reprendre »,
+  `irrigation_off_season_revisions`, lus par `listOffSeasonRevisionsForUser`
+  dans l'ordre d'écriture et remis en ordre, portée par portée, par
+  `offSeasonSchedule` dans `lib/domain/off-season.ts` ; la garde d'écriture
+  lit le dernier geste de la portée de la même façon (depuis le 26 novembre
+  2026, D-352).
 
 Hors portée, notés sans être corrigés : les ordres d'affichage départagés par
 l'identifiant, placements de matériel, liaisons entre ressources et réserves,

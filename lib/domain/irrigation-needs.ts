@@ -17,7 +17,7 @@ import {
 } from './automatic-objective.ts';
 import { mmText } from './figure-origin.ts';
 import { farmObjective, type FarmObjective } from './farm-objective.ts';
-import { objectiveOffSeason, type OffSeasonDays, type OffSeasonSchedule } from './off-season.ts';
+import { needOffSeason, type OffSeasonDays, type OffSeasonSchedule } from './off-season.ts';
 import {
   FARM_TIME_ZONE,
   addDaysToDateKey,
@@ -91,6 +91,14 @@ export type BedIrrigationNeed = {
    * ligne d'avant.
    */
   offSeasonDates?: string[];
+  /**
+   * Le besoin de la semaine est hors saison (`needOffSeason`, D-352) : son
+   * objectif l'est, ou la planche l'est le jour du calcul. Ni besoin, ni
+   * reste, ni volume, ni objectif manquant ; le planning, la pénurie et la
+   * faisabilité ne la servent pas ; sa pluie et son irrigation réelle
+   * restent. Absent sinon : la ligne d'avant.
+   */
+  offSeason?: true;
   actualRainMm: number | null;
   actualIrrigationMm: number;
   realRemainingMm: number | null;
@@ -270,14 +278,15 @@ export function buildIrrigationNeedsDashboard(input: {
     const unclassified = plot.mode === 'unclassified';
     const offSeasonDays = input.offSeason?.daysOf({ ...bed, plotMode: plot.mode });
     const objective = objectiveForBed(goalRevisions, bed, weekStart, weekEnd, input.automaticObjective?.get(bed.id), offSeasonDays);
-    // Hors saison sans objectif (D-337) : pas d'objectif manquant, pas de besoin ; la pluie ne change pas.
-    const offSeason = objectiveOffSeason({ objectiveMm: objective.value, offSeasonDates: objective.offSeasonDates });
+    // Hors saison sans objectif, ou hors saison aujourd'hui (D-337, D-352) : pas d'objectif manquant, rien à
+    // donner ; la pluie ne change pas.
+    const offSeason = needOffSeason({ objectiveMm: objective.value, offSeasonDates: objective.offSeasonDates }, today);
     const actualRain = unclassified ? null : sheltered ? 0 : actualExteriorRainMm;
     const forecastRain = unclassified ? null : sheltered ? 0 : forecastExteriorRainMm;
     const actualIrrigation = actualByBed.get(bed.id) ?? 0;
     const plannedIrrigation = plannedByBed.get(bed.id) ?? 0;
-    const realRemaining = realRemainingMm(objective.value, actualRain, actualIrrigation);
-    const raw = planningNeedMm(objective.value, actualRain, forecastRain, actualIrrigation, plannedIrrigation);
+    const realRemaining = offSeason ? null : realRemainingMm(objective.value, actualRain, actualIrrigation);
+    const raw = offSeason ? null : planningNeedMm(objective.value, actualRain, forecastRain, actualIrrigation, plannedIrrigation);
     const calculated = applyPlanningThreshold(raw, input.thresholdMm);
     const decision = decisionByBed.get(bed.id);
     // Un besoin remplacé à la main reste enregistré, inactif, comme un objectif saisi sous une portée active (section 4.5).
@@ -303,6 +312,7 @@ export function buildIrrigationNeedsDashboard(input: {
       objectiveMm: objective.value, objectiveSource: objective.source,
       objectiveOrigin: objective.origin, automaticObjective: objective.automatic,
       ...(objective.offSeasonDates.length > 0 ? { offSeasonDates: objective.offSeasonDates } : {}),
+      ...(offSeason ? { offSeason: true as const } : {}),
       actualRainMm: actualRain, actualIrrigationMm: actualIrrigation,
       realRemainingMm: realRemaining,
       relativeDeficitPercent: relativeDeficitPercent(realRemaining, objective.value),
@@ -338,8 +348,8 @@ export function buildIrrigationNeedsDashboard(input: {
     const plot = plots.get(plotId)!;
     const zone = zones.get(plot.zoneId)!;
     const area = gardenBeds.reduce((sum, bed) => sum + bed.areaSquareMeters, 0);
-    // Une planche hors saison sans objectif sort des comptes du jardin (D-337) ; elle reste dans ses lignes.
-    const counted = gardenBeds.filter((bed) => !objectiveOffSeason(bed));
+    // Une planche hors saison sort des comptes du jardin (D-337, D-352) ; elle reste dans ses lignes.
+    const counted = gardenBeds.filter((bed) => bed.offSeason !== true);
     const countedArea = counted.reduce((sum, bed) => sum + bed.areaSquareMeters, 0);
     const allComplete = counted.every((bed) => bed.effectiveNeedMm !== null);
     const allRealComplete = counted.every((bed) => bed.realRemainingMm !== null);

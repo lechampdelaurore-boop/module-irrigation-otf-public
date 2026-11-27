@@ -34,7 +34,10 @@ const MAX_SHARE_ROUNDS = 4;
 const MILLISECONDS_PER_MINUTE = millisecondsFromMinutes(1);
 
 
-export function buildWeeklyPlan(inputs: PlanningInputs, settings: PlanningSettings): WeeklyPlan {
+export function buildWeeklyPlan(given: PlanningInputs, settings: PlanningSettings): WeeklyPlan {
+  // Une planche hors saison n'est pas servie (D-337, D-352) : ni créneau, ni pénurie, ni dose utile ; ses arrosages
+  // déjà validés restent, sans suggestion, jusqu'à ce que la personne les annule ou les garde.
+  const inputs: PlanningInputs = { ...given, needs: given.needs.filter((need) => need.offSeason !== true) };
   const timeZone = inputs.timeZone;
   const now = inputs.now;
   const weekEndAt = localDateStartUtc(addDaysToDateKey(inputs.weekEnd, 1), timeZone);

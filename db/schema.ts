@@ -899,6 +899,34 @@ export const automaticObjectiveRevisions = sqliteTable(
 );
 
 /**
+ * Les gestes « Mettre hors saison » et « Reprendre » d'une ferme (6
+ * quaterdecies, B2, migration 0052 ; D-337, D-352) : chaque ligne met une
+ * portée hors saison, ou la reprend, à partir de son jour, en heure de Paris ;
+ * sans ligne, rien n'est hors saison. Une portée : une planche, un jardin, une
+ * parcelle (identifiant OTF), ou tout le plein champ, tout le sous-abri.
+ */
+export const offSeasonRevisions = sqliteTable(
+  'irrigation_off_season_revisions',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    scopeLevel: text('scope_level', { enum: ['bed', 'plot', 'zone', 'mode'] }).notNull(),
+    scopeId: text('scope_id').notNull(),
+    offSeason: integer('off_season', { mode: 'boolean' }).notNull(),
+    actorUserId: text('actor_user_id').notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    index('idx_off_season_workspace_created').on(table.workspaceId, table.createdAt),
+    check('chk_off_season_scope_level', sql`${table.scopeLevel} IN ('bed', 'plot', 'zone', 'mode')`),
+    check('chk_off_season_scope_id', sql`length(${table.scopeId}) > 0 AND (${table.scopeLevel} <> 'mode' OR ${table.scopeId} IN ('garden', 'greenhouse'))`),
+    check('chk_off_season_value', sql`${table.offSeason} IN (0, 1)`),
+  ],
+);
+
+/**
  * Les semaines closes de l'objectif automatique (6 decies, O3, migration
  * 0048 ; D-318) : une ligne par planche et par semaine close, écrite par la
  * tâche du matin, jamais réécrite ; ses jours allumés, en JSON.

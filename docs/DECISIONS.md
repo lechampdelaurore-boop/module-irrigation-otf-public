@@ -11999,8 +11999,8 @@ Précisions prises en codant (PR 4) :
 
 Date : 26 novembre 2026. Statut : **contrat écrit**, fusionné le
 27 novembre 2026 à 3 h 14 (#240) et **en ligne à 4 h 06** (run
-45927191810) ; le code suit en quatre PR (A1 : D-351, en ligne le
-27 novembre 2026 ; B1 : D-341) ;
+45927191810) ; le code suit en quatre PR (A1 : D-351 et B1 : D-341, en
+ligne le 27 novembre 2026 ; B2 : D-352) ;
 `docs/objectif-automatique-saison-contract.md`, roadmap section 6
 quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
 
@@ -12032,7 +12032,9 @@ Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, alig
 
 Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
 contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections 4,
-5 et 8) ; roadmap section 6 quaterdecies, ligne 34. Code en Opus 5.5 · Max,
+5 et 8), fusionnée le 27 novembre 2026 à 6 h 28 (#245) et **en ligne à
+7 h 15** (run 45946029675, consigné par B2) ; roadmap section 6
+quaterdecies, ligne 34. Code en Opus 5.5 · Max,
 le réglage de la roadmap, sur la branche du contrat, avant la fusion de S4
 et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995, ceux que
 le contrat réserve au code ; D-338 à D-340 sont pris par trois contrats
@@ -12149,7 +12151,9 @@ portée.
 
 ## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée**, fusionnée le même jour à
+13 h 57 (#244) et **en ligne à 14 h 37** (run 45824529849), recette
+conforme vers 18 h 45 (consigné par B2) ; contrat
 `docs/simplification-s5-contract.md` (section 7, budget ; section 13,
 mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
 le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
@@ -12223,3 +12227,159 @@ automatique choisit l'endroit et met le curseur dans le champ (F1056).
 sur le site après la mise en ligne.
 
 Numéros : D-351 ; F1051 à F1060.
+
+## D-352 — Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs
+
+Date : 26 novembre 2026. Statut : **codée** (PR B2 sur les quatre du
+contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections
+4.2 à 4.6, 6 à 8 et 10) ; roadmap section 6 quaterdecies, ligne 34. Code en
+Opus 5.5 · Max, le réglage de la ligne 34, empilé sur B1 (#245, D-341).
+Numéros D-352 et F1061 à F1074, vérifiés sur toutes les PR ouvertes avant
+d'être pris : D-343 à D-351 et les précisions jusqu'à F1060 sont à d'autres
+PR ouvertes (A1, #255, a D-351 et F1051 à F1060). Migration **0052** : 0051
+à l'écriture, le numéro qui suivait le dernier de `main` (0050), recalée à
+0052 en fusionnant `main` après S6, qui a pris 0051
+(`0051_start_mode_route_state`, #235) ; la météo multi-modèles (#250) et
+l'ET0 horaire (#253), qui prennent aussi 0051 ou 0052, se recaleront de
+même au numéro libre.
+
+**Décision.** Les gestes « Mettre hors saison » et « Reprendre » sont
+enregistrés, une ligne datée par geste, écrits au journal des modifications,
+et tous les lecteurs de l'objectif et du planning reçoivent le filtre de leur
+ferme, lu une fois par requête. **Aucun écran ne l'allume** (B3) : une ferme
+sans geste lit tout comme avant, mot pour mot, et c'est le cas de toutes en
+ligne. La pluie, la réserve du sol, l'ET0, la météo et ses alertes,
+l'archive des prévisions et les semaines closes ne le lisent jamais ; deux
+gardes le prouvent sur la base, à deux fermes. Aucune question agronomique :
+les deux réponses du porteur (la reprise à la main seulement ; l'annulation
+proposée, jamais imposée) sont tenues par les gestes et par la liste que
+B3 montrera.
+
+**Précisions prises en codant.**
+
+- **F1061** — Le stockage : la table `irrigation_off_season_revisions`
+  (migration 0052), une ligne par geste : la portée (`scope_level` : planche,
+  jardin ou abri, parcelle, ou `mode` pour tout le plein champ et tout le
+  sous-abri ; `scope_id` : l'identifiant OTF du seul niveau, ou
+  `garden`/`greenhouse`), `off_season` (1 : hors saison, 0 : reprise), la
+  personne et l'heure. Contrôles de la base sur chaque valeur ; un index
+  par ferme et par date ; trois déclencheurs rendent la faisabilité à
+  refaire, comme pour un objectif (3.4). Rien n'est jamais réécrit ni
+  effacé, sauf avec la ferme (plan d'effacement) ; « Reprendre » est une
+  ligne de plus (section 4.5). `scope_id` est classé identifiant extérieur
+  dans la cohérence des espaces.
+- **F1062** — Le geste n'écrit que s'il change l'état de sa portée : un
+  second « Mettre hors saison », ou « Reprendre » une portée en saison,
+  n'écrit rien et rend `false`, pour que l'écran le dise (section 4.5). La
+  garde lit le dernier geste de la portée dans l'ordre d'écriture (heure,
+  puis ordre reçu : `docs/revision-order-contract.md`, « Portée », mis à
+  jour) ; deux gestes de la même milliseconde, le second reçu fait foi.
+- **F1063** — Le journal des modifications, dans le même lot que la ligne
+  et avant elle : deux sujets de la famille « objectif », « Mise hors
+  saison » (`jardin-hors-saison`) et « Reprise de l'irrigation »
+  (`reprise-saison`), le schéma de O2 ; un champ, « Irrigation » : « en
+  saison → ignorée, hors saison » et l'inverse. L'objet se lit dans
+  l'instantané : « Planche · P1 », le jardin, la parcelle, ou « tout le
+  plein champ », « tout le sous-abri ».
+- **F1064** — Le service des gestes (`saveOffSeasonScopeForUser`) ne met
+  hors saison qu'une portée que la ferme connaît : une planche, un jardin
+  ou une parcelle absents de l'instantané sont refusés (« Ce lieu n'est pas
+  dans la ferme : rien n'a été mis hors saison. »). Toute portée se reprend,
+  même un lieu qu'OTF ne montre plus : rien ne reste hors saison sans
+  pouvoir en sortir.
+- **F1065** — La lecture (`readOffSeasonSourceForUser`) : les gestes d'une
+  ferme, lus une fois par requête, rendus en filtre par la règle de B1
+  (`offSeasonSchedule`), le mode de chaque jardin pris dans l'instantané
+  (un jardin absent se lit « à classer », qu'aucune portée de mode ne
+  couvre, D-003). Sans geste, `null` : chaque lecteur garde son calcul
+  d'avant.
+- **F1066** — Le tableau des besoins, semaine en cours : une planche est
+  hors saison pour le besoin (`needOffSeason`) quand elle l'est toute la
+  semaine (F989) **ou le jour du calcul**, en heure de Paris. Mise hors
+  saison jeudi, elle n'a plus de besoin dès jeudi, même si lundi à mercredi
+  gardent leur part d'objectif, qui reste affichée ; ni reste à apporter,
+  ni volume, ni objectif manquant ; un besoin remplacé à la main reste
+  enregistré, inactif (F991). Précise F990 et F991 pour la semaine en
+  cours ; une autre semaine garde la règle de F989.
+- **F1067** — Le planning : le calcul de la semaine (`buildWeeklyPlan`)
+  écarte à l'entrée les besoins hors saison : ni créneau, ni pénurie, ni
+  dose ; le plan est celui d'une ferme sans ces planches. Un arrosage déjà
+  planifié ou validé reste tel quel (section 4.2) ; le calcul ne propose
+  pas de l'annuler, c'est la fenêtre de B3 qui le propose (section 10,
+  question 2) ; les limites, la règle 16 et les créneaux protégés le
+  comptent toujours. Un matériel partagé avec une planche en saison arrose
+  encore la planche hors saison, eau réelle que la proposition dit
+  (`bedApplications`) : B3 le marquera.
+- **F1068** — La faisabilité et la pénurie ne comptent pas les planches hors
+  saison dans la demande, ni comme inconnues ; une note le dit sous le
+  calcul : « 1 planche hors saison : son irrigation est ignorée, elle n'est
+  pas comptée ici. » (au pluriel : « 3 planches hors saison : leur
+  irrigation est ignorée, elles ne sont pas comptées ici. »), comme ce que
+  le calcul ne compte pas (F447).
+- **F1069** — « Aujourd'hui » compte l'objectif de la semaine sur les
+  planches en saison et dit les autres à part (`offSeason`, F992) ; la
+  tuile et ses mots sont à B3.
+- **F1070** — L'historique et l'eau des séries : un jour hors saison compte
+  comme un jour sans objectif (D-036), sa pluie et son irrigation restent
+  comptées ; une planche hors saison toute la période sort des comptes
+  d'objectif, sans écart. L'eau que l'écart compare (« Eau reçue par ces
+  N planches », colonne « Irrigation + pluie réelle » de l'export) se fait
+  sur les planches qui ont un objectif, comme depuis D-329 ; la pluie
+  réelle, l'ET0 et l'irrigation ne changent jamais (garde F1073). Une
+  culture sur des planches en partie hors saison ne compte l'objectif que
+  des planches en saison.
+- **F1071** — Les autres lecteurs de `objectiveForBed` reçoivent le
+  filtre : l'aide du formulaire d'irrigation (aucun objectif proposé pour
+  une planche hors saison), la fiche d'une planche et celle d'une série
+  (l'objectif proposé par culture reste calculé, section 4.2 : les cultures
+  restent lues ; l'objectif de la semaine dit « hors saison »), l'écart
+  entre prévu et réel. Depuis la fusion de S6, `lib/services/start-route.ts`
+  (#235) le reçoit aussi : l'étape « Combien je vise par semaine » de la
+  carte « Mise en route » compte comme « Aujourd'hui » (mêmes comptes,
+  planches hors saison dites à part, `offSeason`) ; elle est faite quand
+  chaque planche en saison a son eau visée, et toute la ferme hors saison
+  n'a rien à viser ; une planche hors saison n'est jamais dite « sans eau
+  visée » ; un filtre illisible rend l'étape inconnue, comme un objectif
+  automatique illisible ; sans geste, le compte d'avant. La tâche du matin
+  qui enregistre les semaines closes de l'objectif automatique ne change
+  pas : elle garde l'ET0 de la semaine ; c'est la lecture qui retire les
+  jours hors saison (F988), et une semaine close avant la pause est lue
+  telle quelle, objectif compris (cas 7, test sur la base).
+- **F1072** — La liste des arrosages à proposer à l'annulation (section 10,
+  question 2 ; `listPlannedIrrigationsUnderOffSeasonForUser`, règle
+  `lib/domain/off-season-planned.ts`) : les arrosages planifiés de la
+  saison, pas démarrés, à partir d'aujourd'hui en heure de Paris, dont une
+  planche au moins est couverte par la portée, avec les planches couvertes
+  et les autres (l'annuler prive aussi celles-ci de leur eau : B3 le
+  dira). L'annulation passe par le geste du planning ; un arrosage commencé
+  finit. Ni la liste ni le geste ne touchent à un arrosage. Après un geste
+  qui a changé quelque chose, l'action de l'écran (B3) recalcule le plan,
+  comme pour un objectif.
+- **F1073** — La garde de la pluie, sur la base, à deux fermes pareilles,
+  l'une avec ses cinq portées hors saison (`tests/db/hors-saison-garde.test.ts`) :
+  la page de la météo (pluviomètre, `0 mm` compris, pluie estimée, pluie
+  prévue, ET0), l'historique de la pluie chaque jour, chaque semaine et sur
+  la saison, à la ferme, à la parcelle, au jardin et à la planche, la
+  réserve du sol (jauge, graphique des jardins, drainage, jours enregistrés
+  le matin), l'archive des prévisions (tâche du matin et actualisation à
+  l'écran) et les alertes météo donnent les mêmes valeurs. La jauge prévue
+  lit les arrosages proposés du plan enregistré : c'est le plan recalculé,
+  sans proposition hors saison, qui la change, jamais le filtre (même plan,
+  même jauge, test). Garde des imports : ces services n'atteignent jamais
+  le stockage du filtre ; contre-épreuves (les besoins changent ; la garde
+  voit un service qui lit les portées).
+- **F1074** — Preuves : 10 tests du domaine (`tests/hors-saison-lecteurs.test.ts`),
+  5 tests de persistance (`tests/db/hors-saison-stockage.test.ts` : gestes
+  par ferme, journal, garde, ordre, portées refusées, lecteurs, liste), 7 de
+  garde sur la base et 2 de garde des imports ; quatorze casses volontaires
+  (filtre ignoré par le planning, la faisabilité, l'historique, « Aujourd'hui »
+  ou les séries, jour du calcul ignoré ou lu en UTC, besoin remplacé actif,
+  arrosage démarré listé, pluie de l'historique lue à travers le filtre…)
+  toutes vues par les tests. Quatre tests d'avant suivent la nouvelle table
+  (102 tables ; les copies arrêtées avant la migration la reçoivent vide).
+  À la fusion de S6 : 1 test du domaine de plus (l'étape de la mise en
+  route), 2 tests sur la base (`tests/db/hors-saison-mise-en-route.test.ts` :
+  les comptes d'« Aujourd'hui », la voisine, toute la ferme hors saison) ;
+  cinq casses volontaires de plus (filtre non passé, étape faite sur toutes
+  les planches, compte hors saison perdu, jour du calcul ignoré, planches
+  hors saison dites sans eau visée), toutes vues.

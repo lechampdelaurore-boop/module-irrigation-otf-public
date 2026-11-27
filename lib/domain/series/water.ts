@@ -13,6 +13,7 @@ import { isIgnoredSeries, resolveSeriesOccupation, type SeriesOccupation } from 
 import { compareNamesNaturally } from '../bed-order.ts';
 import type { AutomaticObjectiveDayValues } from '../automatic-objective.ts';
 import { farmObjective, farmObjectivePartial } from '../farm-objective.ts';
+import type { OffSeasonByBed } from '../off-season.ts';
 
 /**
  * Les cumuls d'eau par série (docs/series-contract.md, « L'attribution des
@@ -58,9 +59,11 @@ type SeriesWaterSummary = {
   /**
    * Les planches de la série qui ont un objectif sur sa période, sur toutes
    * (D-329, docs/simplification-s1-contract.md, section 5 bis) : l'objectif
-   * et l'écart se chiffrent sur elles, les autres sont dites.
+   * et l'écart se chiffrent sur elles, les autres sont dites ; celles hors
+   * saison sans aucun jour d'objectif, à part (D-337, D-352), absent quand
+   * il n'y en a aucune.
    */
-  objectiveBeds: { withObjective: number; total: number };
+  objectiveBeds: { withObjective: number; total: number; offSeason?: number };
   /**
    * Présent quand la ferme a allumé l'objectif automatique (D-309, D-317) :
    * les journées-planche observées qu'il a remplies, et celles où il
@@ -99,6 +102,8 @@ export function buildSeriesWaterReport(input: {
   today: string;
   /** Les valeurs de l'objectif automatique, quand la ferme l'a allumé (D-309) ; l'objectif se compose comme dans l'historique. */
   automaticObjective?: AutomaticObjectiveDayValues;
+  /** La réponse du filtre « hors saison » par planche (D-337, D-352) : ces jours-là, aucun objectif, comme dans l'historique. */
+  offSeason?: OffSeasonByBed;
 }): SeriesWaterReport {
   const bedsById = new Map(input.beds.map((bed) => [bed.id, bed]));
   const plotsById = new Map(input.plots.map((plot) => [plot.id, plot]));
@@ -137,6 +142,7 @@ type SummaryInput = {
   goalRevisions: readonly GoalRevisionLike[];
   today: string;
   automaticObjective?: AutomaticObjectiveDayValues;
+  offSeason?: OffSeasonByBed;
 };
 
 function summarizeSeries(
@@ -192,7 +198,7 @@ function summarizeSeries(
     const unclassified = plot?.mode === 'unclassified';
     const area = placeArea(place.lengthMeters, bed);
     const irrigation = irrigationOnBed(input.events, bed, place.lengthMeters, observed);
-    const objective = aggregateHydricObjective(input.goalRevisions, [bed], observed, input.automaticObjective);
+    const objective = aggregateHydricObjective(input.goalRevisions, [bed], observed, input.automaticObjective, undefined, input.offSeason);
     // Sous abri, la pluie vaut explicitement zéro ; ailleurs, la mesure, sinon
     // la réanalyse — et seulement quand tous les jours sont là : une somme
     // partielle affichée comme un total tromperait (recette du 29 septembre 2026).
@@ -204,7 +210,7 @@ function summarizeSeries(
     totalBedDays += objective.objectiveAvailability.totalBedDays;
     automaticBedDays += objective.objectiveAutomatic?.bedDays ?? 0;
     automaticMissingBedDays += objective.objectiveAutomatic?.missingBedDays ?? 0;
-    received.push({ area, irrigationMm: irrigation.mm, rainMm, sheltered, unclassified, objectiveMm: objective.objectiveMm });
+    received.push({ area, irrigationMm: irrigation.mm, rainMm, sheltered, unclassified, objectiveMm: objective.objectiveMm, offSeason: objective.objectiveBeds.offSeason === 1 });
     return {
       bedId: bed.id, bedName: bed.name, plotName: plot?.name ?? '—', sheltered,
       lengthMeters: place.lengthMeters, areaSquareMeters: area,
@@ -218,7 +224,7 @@ function summarizeSeries(
   // planches qui ont un objectif sur sa période, comme « Aujourd'hui » (D-329) ; une planche
   // sans aucun jour couvert est dite, jamais comptée à zéro. Une surface inconnue : pas de
   // moyenne (D-003).
-  const seriesObjective = farmObjective(received.map((row) => ({ areaSquareMeters: row.area ?? 0, objectiveMm: row.objectiveMm })));
+  const seriesObjective = farmObjective(received.map((row) => ({ areaSquareMeters: row.area ?? 0, objectiveMm: row.objectiveMm, offSeason: row.offSeason })));
   const objectiveMm = water.areaSquareMeters === null ? null : seriesObjective.objectiveMm;
   // L'écart se chiffre sur les mêmes planches que l'objectif (D-329, règle 3).
   const gapWater = farmObjectivePartial(seriesObjective)
@@ -241,7 +247,11 @@ function summarizeSeries(
       : weather.actualRainAvailability,
     objectiveMm,
     objectiveAvailability: { availableBedDays, totalBedDays, complete: totalBedDays > 0 && availableBedDays === totalBedDays },
-    objectiveBeds: { withObjective: seriesObjective.withObjective, total: seriesObjective.total },
+    objectiveBeds: {
+      withObjective: seriesObjective.withObjective,
+      total: seriesObjective.total,
+      ...(seriesObjective.offSeason ? { offSeason: seriesObjective.offSeason } : {}),
+    },
     ...(input.automaticObjective === undefined ? {} : { objectiveAutomatic: { bedDays: automaticBedDays, missingBedDays: automaticMissingBedDays } }),
     objectiveRemainingMm: remainingObjective(occupation, places, input),
     irrigationAndRainMm,
@@ -258,6 +268,8 @@ type ReceivedOnBed = {
   irrigationMm: number;
   /** `null` : inconnue (jardin à classer, ou pluie réelle incomplète en plein champ). */
   rainMm: number | null;
+  /** Hors saison sur toute la période, sans aucun jour d'objectif (D-352) : comptée à part. */
+  offSeason: boolean;
   sheltered: boolean;
   unclassified: boolean;
   objectiveMm: number | null;
@@ -339,12 +351,14 @@ function irrigationOnBed(
  * L'objectif encore prévu de demain à la dernière récolte attendue, pondéré
  * par la surface occupée. Un jour où l'objectif automatique s'applique sans
  * valeur (au-delà de l'ET0 prévue, le plus souvent) le rend inconnu : une
- * somme qui l'oublierait passerait pour l'objectif restant (D-003).
+ * somme qui l'oublierait passerait pour l'objectif restant (D-003). Une
+ * planche hors saison sur tous ces jours n'en a pas : elle ne compte pas,
+ * comme dans l'objectif de la série (D-352).
  */
 function remainingObjective(
   occupation: SeriesOccupation,
   places: readonly PlaceOnBed[],
-  input: Pick<SummaryInput, 'goalRevisions' | 'today' | 'automaticObjective'>,
+  input: Pick<SummaryInput, 'goalRevisions' | 'today' | 'automaticObjective' | 'offSeason'>,
 ): number | null {
   if (occupation.endDate === null || occupation.endDate <= input.today) return null;
   const period = { startDate: addDaysToDateKey(input.today, 1), endDate: occupation.endDate };
@@ -352,7 +366,8 @@ function remainingObjective(
   let weighted = 0;
   for (const { place, bed } of places) {
     const area = placeArea(place.lengthMeters, bed);
-    const objective = aggregateHydricObjective(input.goalRevisions, [bed], period, input.automaticObjective);
+    const objective = aggregateHydricObjective(input.goalRevisions, [bed], period, input.automaticObjective, undefined, input.offSeason);
+    if (objective.objectiveBeds.offSeason === 1) continue;
     if (area === null || objective.objectiveMm === null || (objective.objectiveAutomatic?.missingBedDays ?? 0) > 0) return null;
     totalArea += area;
     weighted += objective.objectiveMm * area;
