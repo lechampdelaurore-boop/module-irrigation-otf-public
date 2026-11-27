@@ -12,6 +12,16 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles, contrat écrit le 26 novembre 2026, sans code**
+  (D-339, `docs/weather-models-contract.md` v0.1, roadmap section 6
+  sexdecies, ligne 36), en Sonnet 5.5 · Moyen : un seul modèle de prévision
+  Open-Meteo par ferme, « Automatique » (la lecture actuelle) restant le
+  défaut ; liste tenue dans le code ; la `source` des lignes dit le modèle.
+  Le conteneur n'atteint pas Open-Meteo : essai A sur un lanceur GitHub
+  avant le code. **Licence et budget tranchés par le porteur le
+  26 novembre 2026 à 12 h 47** : gratuit pendant le pilote, licence payante
+  probable ensuite, financée par OTF ; rien n'attend. Aucun contrôle rejoué (PR de registres, sans
+  code).
 - **La météo prévue contre la météo réalisée, PR 2 sur 2 : le pli, la
   démonstration et les parcours, codée le 26 novembre 2026** (D-344, F1005 à
   F1008), en Opus 5.5 · Élevé, sur la branche de la PR 1 : **le code du

@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (météo multi-modèles, contrat)
+
+- **Contrat du choix du modèle de prévision par ferme** (D-339,
+  `docs/weather-models-contract.md` v0.1, roadmap 6 sexdecies) : écrit
+  sans code ; « Automatique » reste le défaut, un seul modèle Open-Meteo par
+  ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
+  avant le code. Rien ne change pour l'instant.
+
 ### Ajouté (la météo prévue contre la météo réalisée, PR 2 : le pli)
 
 - **« La météo s'est-elle vérifiée ? »** (D-344, F1005 à F1008) : sur

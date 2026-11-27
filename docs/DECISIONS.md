@@ -12055,6 +12055,42 @@ plus tard.
 fenêtre, les minimums, le seuil de 1 mm, l'absence de verdict, la semaine du
 dimanche. Aucun n'est un budget ni une question agronomique réservée.
 
+## D-339 — Météo multi-modèles : le modèle de prévision se choisit par ferme
+
+Date : 26 novembre 2026. Statut : **contrat écrit, sans code** ;
+`docs/weather-models-contract.md` v0.1, roadmap section 6 sexdecies, ligne 36.
+Écrit en Sonnet 5.5 · Moyen ; code en Opus 5.5 · Élevé (PR 0, 1 et 3) et
+Opus 5.5 · Max (PR 2), le réglage de la roadmap. Aucune question agronomique
+dans cette version.
+
+**Décision.** Une ferme peut choisir **un** modèle de prévision Open-Meteo dans
+une liste tenue dans le code, ou rester en « Automatique », le défaut, qui garde
+la lecture actuelle sans rien changer. Le modèle choisi fournit pluie,
+températures, énergie solaire et ET0 ; la `source` de chaque ligne dit le
+modèle ; au-delà de sa portée, le jour entier vient d'« Automatique
+d'Open-Meteo ». Le choix se vérifie par une lecture avant d'être gardé. Un
+modèle retiré ramène la ferme à « Automatique », avec un message. Rien ne
+dit quel modèle est le meilleur tant que « prévu contre mesuré par modèle »
+n'existe pas.
+
+**Pourquoi.** Chaque ferme n'avait qu'un modèle choisi en interne par
+Visual Crossing, sans qu'on sache lequel. Un seul modèle par ferme tient le
+réglage simple (après la simplification S1 à S6) et évite une règle de
+combinaison, qui serait une règle agronomique réservée au porteur.
+
+**Écartés ou rangés.** Plusieurs modèles, « Prudent », écart entre modèles,
+modèle par usage, correction de biais par station : rangés hors version.
+API officielles Météo-France : écartées. Aucune table recréée ; une colonne
+additive sur les préférences météo.
+
+**Licence et budget (décision du porteur, 26 novembre 2026 à 12 h 47).** La
+licence « non commerciale » d'Open-Meteo ne bloque rien : tout reste gratuit
+pendant le pilote, une licence payante est probable ensuite, financée par
+la société qui gère Ouvre ta ferme ; aucune question à Open-Meteo, aucun
+abonnement acheté ; le code reste indifférent à l'offre. Le réseau du
+conteneur n'atteint pas Open-Meteo : essais par GitHub (A) et par le Worker
+(B). Plus aucun point ouvert au porteur.
+
 ## D-341 — Ignorer l'irrigation hors saison, B1 : la règle
 
 Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
