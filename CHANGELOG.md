@@ -36,6 +36,13 @@ source détaillée commit par commit.
   est, et que la mise en route est en tête pour une ferme qui commence.
 - **Sept contrats validés** (F981) disent, à l'endroit de chaque passage,
   ce que S6 y change. **Le code de S6 est fini.**
+- **Parcours P67 (S4) le soir** : lancé après 23 h, il trouvait une
+  journée trop courte pour deux arrosages de 50 min ; le plan en propose
+  quatre plus courts et « Jour par jour » s'allonge (2 060 px au lieu de
+  1 750 au plus). La hauteur du premier niveau et les choses à toucher
+  ne sont bornées que dans le cas mesuré (deux arrosages) ; sinon le
+  parcours le dit (« hors jeu ») et joue tout le reste. La vérification
+  de cette PR et le déploiement de la PR 3 avaient échoué ainsi à 23 h 28.
 
 ### Ajouté (simplifier l'usage du module, S6, PR 3 : les lignes d'état des fiches de « Ma ferme »)
 
