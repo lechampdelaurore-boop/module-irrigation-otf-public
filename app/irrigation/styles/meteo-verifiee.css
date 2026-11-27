@@ -1,0 +1,16 @@
+/* « La météo s'est-elle vérifiée ? » sur « Objectifs et besoins » (docs/forecast-reliability-contract.md, §6, D-338) : un empilement, lisible à 320 px. */
+
+.forecast-reliability-body { display: grid; gap: .6rem; min-width: 0; overflow-wrap: anywhere; }
+.forecast-reliability-body p { margin: 0; font-size: var(--text-14); line-height: 1.55; }
+.forecast-reliability-headline { font-weight: 700; }
+.forecast-reliability-example { justify-self: start; padding: .2rem .6rem; border-radius: var(--radius-button); background: var(--sheet); color: var(--muted); }
+.forecast-reliability-note { color: var(--muted); }
+.forecast-reliability-table { width: 100%; border-collapse: collapse; font-size: var(--text-14); font-variant-numeric: tabular-nums; table-layout: fixed; }
+.forecast-reliability-table caption { text-align: left; padding-bottom: .3rem; }
+.forecast-reliability-table caption strong, .forecast-reliability-table caption small { display: block; }
+.forecast-reliability-table caption small, .forecast-reliability-table thead th, .forecast-reliability-table td small { color: var(--muted); }
+.forecast-reliability-table th, .forecast-reliability-table td { padding: .35rem .4rem; border-bottom: 1px solid var(--line-soft); text-align: left; vertical-align: top; }
+.forecast-reliability-table th:first-child { width: 38%; padding-left: 0; }
+.forecast-reliability-table thead th { font-weight: 500; }
+.forecast-reliability-table td strong, .forecast-reliability-table td small { display: block; }
+.forecast-reliability-table td small { margin-top: .15rem; line-height: 1.45; }

@@ -403,8 +403,8 @@ function directionText(reading: ReliabilityReading, meanGapMm: number, unit: str
 const percent = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 
 /** « Pas encore assez de jours : 9 sur 14 » (§5). */
-function notEnoughDaysText(count: number, minimum = FORECAST_RELIABILITY_MINIMUM_PAIRS): string {
-  return `Pas encore assez de jours : ${count} sur ${minimum}`;
+function notEnoughDaysText(count: number): string {
+  return `Pas encore assez de jours : ${count} sur ${FORECAST_RELIABILITY_MINIMUM_PAIRS}`;
 }
 
 /** « Pas encore assez de semaines : 2 sur 4 » (§5). */
@@ -428,9 +428,12 @@ export function dailyLineText(reading: ReliabilityReading, line: DailyLine): str
 /** « Pluie annoncée mais pas tombée : 3 jours ; tombée sans être annoncée : 2 jours, sur 40 jours comparés. » */
 export function rainDaysText(line: DailyLine): string | null {
   if (!line.rainDays) return null;
-  const days = (count: number) => `${count} jour${count > 1 ? 's' : ''}`;
-  return `Pluie annoncée mais pas tombée : ${days(line.rainDays.announcedButDryDays)} ; `
-    + `tombée sans être annoncée : ${days(line.rainDays.fellButUnannouncedDays)}, sur ${days(line.pairCount)} comparés.`;
+  return `Pluie annoncée mais pas tombée : ${daysText(line.rainDays.announcedButDryDays)} ; `
+    + `tombée sans être annoncée : ${daysText(line.rainDays.fellButUnannouncedDays)}, sur ${daysText(line.pairCount)} comparés.`;
+}
+
+function daysText(count: number): string {
+  return `${count} jour${count > 1 ? 's' : ''}`;
 }
 
 /**
@@ -482,4 +485,61 @@ export function forecastReliabilityHeadline(reliability: ForecastReliability): s
     case 'ready':
       return `Sur les ${FORECAST_RELIABILITY_WINDOW_DAYS} derniers jours, voici de combien la météo annoncée s’est écartée de ce qui s’est passé.`;
   }
+}
+
+// Les tableaux du pli (§6, PR 2) : une ligne par horizon et le cumul de la semaine
+
+/** Une ligne d'un tableau : le libellé, le nombre principal, le détail en mots ; sous le minimum, le compte seul. */
+export type ReliabilityTableRow = { label: string; figure: string; detail: string | null };
+
+/**
+ * Les lignes d'un tableau : « Demain et après-demain · 2,1 mm par jour ·
+ * L'annonce était trop pluvieuse, de 0,8 mm par jour en moyenne », puis « Cumul de la
+ * semaine ». Le nombre principal est l'écart dans un sens ou dans l'autre ;
+ * le sens est toujours dit en mots, jamais par un signe.
+ */
+export function reliabilityTableRows(result: ReadingResult): ReliabilityTableRow[] {
+  const rows: ReliabilityTableRow[] = result.daily.map((line) => {
+    const label = groupOf(line.group).label;
+    if (!line.gaps) return { label, figure: notEnoughDaysText(line.pairCount), detail: null };
+    const misses = line.rainDays
+      ? ` Pluie annoncée sans tomber : ${daysText(line.rainDays.announcedButDryDays)} ; tombée sans être annoncée : ${daysText(line.rainDays.fellButUnannouncedDays)}, sur ${daysText(line.pairCount)}.`
+      : ` Sur ${daysText(line.pairCount)} comparés.`;
+    return {
+      label,
+      figure: `${millimetersText(line.gaps.meanAbsoluteGapMm)} par jour`,
+      detail: `L’annonce ${directionText(result.reading, line.gaps.meanGapMm, ' par jour')}.${misses}`,
+    };
+  });
+  const week = result.week;
+  rows.push(week.gaps
+    ? {
+      label: 'Cumul de la semaine',
+      figure: millimetersText(week.gaps.meanAbsoluteGapMm),
+      detail: `L’annonce du dimanche ${directionText(result.reading, week.gaps.meanGapMm, '')}.`
+        + (result.reading === 'thirst' && week.gaps.meanGapPercentOfRealised !== null && !roundsToZero(week.gaps.meanGapMm)
+          ? ` Soit ${percent.format(Math.abs(week.gaps.meanGapPercentOfRealised))} % de la soif estimée.` : '')
+        + ` Sur ${week.weekCount} semaines.`,
+    }
+    : { label: 'Cumul de la semaine', figure: notEnoughWeeksText(week.weekCount), detail: null });
+  return rows;
+}
+
+/** La lecture sur le pluviomètre, tant qu'elle n'a pas ses quatorze jours notés (§3.3). */
+export function measuredRainNotEnoughText(measuredDays: number): string {
+  return `Pluie notée au pluviomètre : pas encore assez de jours notés, ${measuredDays} sur ${FORECAST_RELIABILITY_MINIMUM_MEASURED_DAYS}.`;
+}
+
+/**
+ * L'essentiel en phrases, sous la phrase de tête (§6) : la pluie à la
+ * première ligne qui a ses chiffres, puis la semaine si elle a les siens.
+ * Rien tant que la comparaison n'est pas prête.
+ */
+export function forecastReliabilitySummary(reliability: ForecastReliability): string[] {
+  if (reliability.status !== 'ready') return [];
+  const firstLine = reliability.rainEstimated.daily.find((line) => line.gaps !== null);
+  return [
+    ...(firstLine ? [dailyLineText('rainEstimated', firstLine)] : []),
+    ...(reliability.rainEstimated.week.gaps ? [weekLineText('rainEstimated', reliability.rainEstimated.week)] : []),
+  ];
 }

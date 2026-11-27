@@ -59,6 +59,10 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
     sqlite.exec('ALTER TABLE irrigation_feature_selections ADD COLUMN route_state text');
     // Et les gestes « hors saison » (0052, D-352), aucun : rien n'est hors saison.
     sqlite.exec('CREATE TEMP TABLE irrigation_off_season_revisions (id, workspace_id, scope_level, scope_id, off_season, actor_user_id, created_at)');
+    // Même raison : la démonstration sème l'archive des prévisions (0046, D-297 ; D-344, F1007).
+    sqlite.exec(`CREATE TEMP TABLE irrigation_weather_forecast_archive (workspace_id, location_key, issued_on, target_date, horizon_days,
+      precipitation_mm, et0_mm, minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter, source, fetched_at,
+      UNIQUE (workspace_id, location_key, issued_on, target_date))`);
     const choice = resolveDemoChoice('maraichage', 'ete');
     const farm = demoOwnerUserId('copie', choice);
     await prepareDemoSpace(farm, choice);
@@ -71,6 +75,7 @@ test('la migration 0034 marque chaque espace existant « avant l’accueil » sa
     sqlite.exec('ALTER TABLE irrigation_feature_selections DROP COLUMN start_mode');
     sqlite.exec('ALTER TABLE irrigation_feature_selections DROP COLUMN route_state');
     sqlite.exec('DROP TABLE temp.irrigation_off_season_revisions');
+    sqlite.exec('DROP TABLE temp.irrigation_weather_forecast_archive');
     const before = dump(sqlite);
     const filled = Object.entries(before).filter(([, rows]) => rows.length > 0).map(([table]) => table);
     assert.ok(filled.length >= 15, `la copie est une ferme complète (${filled.length} tables remplies : ${filled.join(', ')})`);
