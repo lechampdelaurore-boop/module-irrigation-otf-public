@@ -172,8 +172,9 @@ export function sprinklerNotifications(
       title: 'Alerte aspersion',
       body: fitPushBody(full.length <= PUSH_BODY_MAX_LENGTH ? full : `${head} ${weatherText(first, thresholds, false)}`),
       tag: pushTag(`crop-sprinkler:${date}`, flags.map((flag) => flag.slotKey)),
-      // Le planning de la semaine, où l'on refuse ou déplace le créneau (3.8, P31).
-      url: pageHref('planning', { season: Number(monday.slice(0, 4)), week: monday }),
+      // La semaine du créneau, où l'on refuse ou déplace le créneau (3.8, P31) : « Semaine » depuis le
+      // lot S4 (PR 4, section 9) ; les notifications déjà envoyées gardent `/irrigation/planning`, redirigée.
+      url: pageHref('semaine', { season: Number(monday.slice(0, 4)), week: monday }),
       targetDates: [date],
     };
   });

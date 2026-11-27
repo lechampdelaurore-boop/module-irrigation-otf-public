@@ -33,6 +33,18 @@ type MemberRow = {
   gap_before_meters: number;
 };
 
+/**
+ * Les groupes de jardins d'une saison tels qu'enregistrés, sans rien écrire
+ * (simplification, lot S6, section 6) : la mise en route compte les planches
+ * arrosées sans poser le marqueur de la saison ni reporter les groupes de la
+ * saison d'avant, que fait `listGardenGroupConfigurationForUser` à la
+ * première lecture d'une saison (une lecture ne fait pas de geste, S6-h).
+ */
+export async function listGardenGroupsForUser(ownerUserId: string, season: number): Promise<GardenGroupRecord[]> {
+  const workspaceId = await findWorkspaceId(ownerUserId);
+  return workspaceId ? loadGroups(workspaceId, season) : [];
+}
+
 export async function listGardenGroupConfigurationForUser(
   ownerUserId: string,
   season: number,

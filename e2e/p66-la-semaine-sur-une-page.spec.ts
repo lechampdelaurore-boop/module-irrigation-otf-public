@@ -145,7 +145,8 @@ test('une ferme qui n’a coché que l’historique : « Semaine » s’ouvre su
   // L'historique coche ce dont il a besoin : Arrosages, et avec lui Matériel et placement.
   await expect(caseDeLaFonctionnalite(page, 'Arrosages')).toBeChecked();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'aujourdhui');
+  // Le matériel à décrire : la première arrivée est « Ma ferme », la mise en route ayant une étape (lot S6, section 3.4).
+  await attendreLaPagePrete(page, 'ma-ferme');
 
   // Par la barre ou le menu : la page « Semaine », sur « Les cumuls » d'office, sans paramètre ni sélecteur.
   await allerALaPage(page, 'semaine');

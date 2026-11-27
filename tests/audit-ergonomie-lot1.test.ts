@@ -50,7 +50,7 @@ test('point 7 : la page introuvable ramène à la page d’arrivée, au choix de
   // Une ferme qui n'a coché que le calculateur n'est pas renvoyée vers une page qu'elle n'a pas.
   assert.deepEqual(notFoundReturnLink({ firstVisit: false, enabled: withRequirements(['calculateur']) }), { href: '/irrigation/materiel', label: 'Revenir à « Matériel et placement »' });
   assert.deepEqual(notFoundReturnLink({ firstVisit: false, enabled: [] }), { href: '/irrigation/reglages', label: 'Revenir à « Réglages »' });
-  assert.deepEqual(notFoundReturnLink({ firstVisit: true, enabled: [] }), { href: '/irrigation/bienvenue', label: 'Choisir vos fonctionnalités' });
+  assert.deepEqual(notFoundReturnLink({ firstVisit: true, enabled: [] }), { href: '/irrigation/bienvenue', label: 'Choisir comment commencer' });
   assert.deepEqual(notFoundReturnLink(null), { href: '/irrigation', label: 'Revenir au module d’irrigation' });
 });
 

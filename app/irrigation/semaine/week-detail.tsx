@@ -2,7 +2,7 @@
 
 import { useState, useTransition, type ReactNode } from 'react';
 import { GAP_SECTION_FAILED, gapSectionLine, PLAN_CURRENT_WEEK_ONLY, WEEK_DETAIL_ANCHOR, WEEK_SECTION_TITLES } from '@/lib/domain/semaine/week-detail';
-import type { WeekSectionId } from '@/lib/domain/features/week-page';
+import { PLAN_SECTION_ANCHOR, type WeekSectionId } from '@/lib/domain/features/week-page';
 import type { AppliedWaterGapView } from '@/lib/services/applied-water-gap';
 import { AnchoredFold } from '../shell/page-settings-fold';
 import { AppliedWaterGapBlock } from '../planning/applied-water-gap-block';
@@ -79,9 +79,6 @@ export function WaterGapSection({ season, rainHref }: { season: number; rainHref
     </WeekDetailSection>
   );
 }
-
-/** L'ancre de la section « Le plan, chaîne par chaîne ». */
-const PLAN_SECTION_ANCHOR = 'le-plan';
 
 /**
  * « Le plan, chaîne par chaîne » (section 7.1, n° 2), pour la semaine en

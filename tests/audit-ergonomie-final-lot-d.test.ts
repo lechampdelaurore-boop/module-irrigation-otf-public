@@ -46,10 +46,10 @@ test('chaque page range ses réglages dans le pli, en bas (F305)', () => {
   assert.match(materiel, /<PageSettingsFold>\s*<BedCropWaterPanel /, 'Matériel : le besoin de la culture de la planche');
 });
 
-test('« Matériel » renvoie à « Objectifs et besoins » au lieu de répéter ETM, ET0 et Kc (F306)', () => {
+test('« Matériel » renvoie au besoin de la planche, sur « Semaine » depuis S4 (PR 4), au lieu de répéter ETM, ET0 et Kc (F306)', () => {
   const materiel = source('app/irrigation/hierarchy-browser.tsx');
   assert.match(materiel, /className="bed-crop-water-pointer"/);
-  assert.match(materiel, /pageHref\('besoins', \{ season \}\)/);
+  assert.match(materiel, /pageHref\('semaine', \{ season \}, NEEDS_SECTION_ANCHOR\)/);
   assert.match(materiel, /href=\{`#\$\{PAGE_SETTINGS_ANCHOR\}`\}/);
 });
 

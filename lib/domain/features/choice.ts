@@ -1,6 +1,6 @@
 import { FEATURES, featureLabel, type FeatureId } from './catalogue';
 import type { FeatureBanner, FeatureSelection } from './selection';
-import { checkFeature, featuresBroughtBy, featuresRequiring } from './selection';
+import { featuresBroughtBy, featuresRequiring } from './selection';
 
 /**
  * Ce que la liste des cases dit à côté de chacune (docs/feature-selection-contract.md,
@@ -39,18 +39,6 @@ export function featureChoiceRows(selection: FeatureSelection): FeatureChoiceRow
       brings: checked ? [] : featuresBroughtBy(selection, feature.id).map(featureLabel),
     };
   });
-}
-
-/**
- * Le point de départ conseillé à la première ouverture (audit du 19 novembre
- * 2026, lot I, n° 25, F452) : arroser, savoir combien, et le matériel qui le
- * fait. Rien n'est coché d'office : « Commencer par l'essentiel » les coche
- * d'un appui, avec ce dont elles ont besoin, et garde ce qui l'était déjà.
- */
-export const ESSENTIAL_FEATURES: readonly FeatureId[] = ['arrosages', 'besoins', 'materiel'];
-
-export function withEssentialFeatures(selection: FeatureSelection): FeatureSelection {
-  return ESSENTIAL_FEATURES.reduce((current, id) => checkFeature(current, id), selection);
 }
 
 /** La ligne sous une case : pourquoi elle reste cochée, ou ce qu'elle coche avec elle. */

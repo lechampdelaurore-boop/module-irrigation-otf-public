@@ -860,6 +860,61 @@ lecture, deuxième passage, comme les PR 1 et 2. Aucun geste ne lit avec la
 page : les jours et les mesures de la pluie se lisent à l'ouverture de la
 fenêtre.
 
+### PR 4 (26 novembre 2026)
+
+**Numéros** : décision D-335 (suite, « Décision (PR 4) ») ; précisions F940 à
+F946 ; aucun parcours nouveau (P68, P15, P29, P30, P62, V3 et V4 suivent).
+
+**Relevé, ce qui menait aux trois anciennes pages, et où cela mène.**
+
+| Lien | Avant | Depuis la PR 4 |
+| --- | --- | --- |
+| Tuiles d'« Aujourd'hui », lignes d'« Eau de la semaine », lien du bloc | `besoins#…` | `semaine#…`, le bloc « Voir la semaine » |
+| Ligne du plan, « Plan calculé … », « Plan de la semaine » à jour | `planning` | `semaine` |
+| Proposition, « Changer l'heure ou la dose » ; demain, « Voir au planning » | `planning#proposal-…` | `semaine#proposal-…`, « Voir la semaine » |
+| « Votre journée » vide | « Voir le planning de la semaine » | « Voir la semaine » |
+| Carte d'une irrigation, « Arrosages » non coché ; retards repliés d'un jour | `planning#irrigation-…`, « Voir les n sur « Planning de la semaine » » | `semaine`, « Ouvrir sur « Semaine » », « Voir les n sur « Semaine » » |
+| Fiabilité : pluie, objectif automatique, plan ; données manquantes par planche | `besoins#…`, `planning` | `semaine#…` ; « Noter la pluie » hors fenêtre : `semaine?pluie=1` |
+| Fenêtre « Noter la pluie » (« Aujourd'hui », « + ») | `besoins#manual-rain` | `semaine#manual-rain` |
+| « Matériel », le besoin de la planche | `besoins` | `semaine#reste-a-arroser` |
+| « Ressources », le manque que la faisabilité ne voit pas | `besoins`, `planning` | `semaine#objectifs-de-la-semaine`, `semaine#le-plan` |
+| « Arrosages », « Recalculer le plan » | `planning?recalculer=1` | `semaine?recalculer=1` |
+| « Réglages à relire », le planning | `planning` | `semaine#reglages-de-la-page` |
+| Notification de l'aspersion à reconsidérer, et son historique | `planning?week=…` | `semaine?week=…` |
+| Visite « Le planning », « Quand l'eau manque » | `planning` (déjà « Semaine » par la PR 1) | « Semaine », plis ouverts |
+
+Les anciennes adresses restent servies, paramètres et ancre gardés : une
+notification déjà envoyée s'ouvre. Un test de garde lit tout le code de
+l'application et du domaine et échoue au premier lien vers l'une d'elles.
+
+**La visite (F944).** Depuis la PR 2, trois repères de la visite « Le
+planning » sont dans des plis fermés : la visite soulignait un élément
+caché. Elle ouvre désormais ces plis ; V3 et V4 vérifient que l'élément
+présenté est visible (la contre-épreuve fait échouer V3 sur le code d'avant).
+
+**Les contrats de la section 10.** Chacun dit, à son passage, ce que S4 a
+changé : `planning-contract`, `replanning-contract`,
+`irrigation-needs-contract`, `series-contract`, les lots J et D de l'audit,
+`aujourdhui-tableau-de-bord-contract`, `aujourdhui-liens-contract`, les
+contrats de S1, S2, S3 et S5, `feature-selection-contract`,
+`demo-guided-contract` et `browser-journeys-contract`.
+
+**Mesures** (à 390 px) :
+
+| Mesure | Visé | PR 3 | PR 4 | Tenu |
+| --- | --- | --- | --- | --- |
+| Un lien d'« Aujourd'hui » vers « Semaine », clic à page prête (médiane de 8, deux passages) | — | 903 et 946 ms (par l’ancienne adresse, comme les liens de la PR 3) | 782 et 801 ms | oui |
+| Hauteur du premier niveau (P67) | 1 700 px | 1 687 px | 1 687 px | oui, de justesse |
+| Haut de la phrase / de la barre / du premier « Valider » | 400 / 400 / 900 px | 383 / 621 / 1 221 px | 383 / 621 / 1 221 px | oui / **non** / **non** |
+| Choses à toucher | 24 | 19 | 19 | oui |
+| Temps du serveur, « La semaine » | 394 ms | 337 ms, 62 lectures | 338 ms (322 à 342), 62 lectures | oui |
+| Temps du serveur, « Les cumuls » | — | 116 ms, 14 lectures | 118 ms (116 à 120), 14 lectures | — |
+
+Les deux cibles de la section 11 non tenues depuis la PR 2 (la barre, le
+premier « Valider ») le restent : la PR 4 ne touche pas la mise en page de
+« Semaine ». La piste reste celle de la PR 2, au porteur après l'essai des
+cinq tâches.
+
 ## 14. Réglage du code
 
 **Opus 5.5 · Très élevé** pour les quatre PR (ligne 33 de la roadmap, troisième

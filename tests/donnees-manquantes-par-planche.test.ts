@@ -105,7 +105,7 @@ test('une planche par cas : le pluviomètre absent, sur une planche de plein cha
   assert.deepEqual(found.map((line) => [line.kind, line.text, line.action]), [[
     'rain-gauge',
     'Pluviomètre absent : aucune pluie mesurée n’est notée depuis plus de 30 jours. La pluie vient de l’estimation météo, qui peut s’écarter du terrain.',
-    { kind: 'link', label: 'Saisir une pluie mesurée, même 0 mm', page: 'besoins', anchor: 'manual-rain' },
+    { kind: 'link', label: 'Saisir une pluie mesurée, même 0 mm', page: 'semaine', anchor: 'manual-rain' },
   ]]);
   // Une planche sans culture ne dépend pas de la pluie ; une planche sous abri non plus (la pluie y vaut 0).
   assert.deepEqual(lines({ beds: [bed('B3', { cultures: [] }), bed('A1', { sheltered: true })], lastMeasuredRainOn: null }), []);

@@ -75,10 +75,10 @@ test('« Ne pas le faire » se confirme d’une ligne, qui dit ce que fait le pl
   });
 });
 
-test('sans « Arrosages » cochée : la carte s’ouvre sur le planning, et la confirmation ne renvoie pas vers une page absente', () => {
+test('sans « Arrosages » cochée : la carte s’ouvre sur « Semaine », qui porte le planning (S4, PR 4), et la confirmation ne renvoie pas vers une page absente', () => {
   const [line] = late([event('m', '2026-11-11T05:00:00.000Z')], ALL.filter((id) => id !== 'arrosages'));
   const actions = todayCardActions(line, { doneAsPlanned: CONFIRMATION });
-  assert.equal(actions?.others[1].label, 'Ouvrir sur « Planning de la semaine »');
+  assert.equal(actions?.others[1].label, 'Ouvrir sur « Semaine »');
   assert.ok(actions?.secondary?.gesture.kind === 'done-as-planned');
   assert.equal(actions.secondary.gesture.otherwise, null);
 });
