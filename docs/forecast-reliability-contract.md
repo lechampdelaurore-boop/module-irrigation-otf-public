@@ -289,3 +289,8 @@ semaine lue sur la prévision du dimanche.
 
 Numéros de précisions (F) et de parcours (P) : à prendre à la lecture du
 dépôt au moment du code, après les PR ouvertes.
+
+- **PR 1** (le calcul et la lecture, 26 novembre 2026) : D-343, précisions
+  F998 à F1004 ; aucun parcours. La date des premiers chiffres de la
+  section 5 est calculée par le domaine (F1004) : vers le 5 décembre 2026
+  pour une archive commencée le 22 novembre, à confirmer par un constat.
