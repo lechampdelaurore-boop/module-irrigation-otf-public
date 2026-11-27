@@ -900,7 +900,7 @@ export const automaticObjectiveRevisions = sqliteTable(
 
 /**
  * Les gestes « Mettre hors saison » et « Reprendre » d'une ferme (6
- * quaterdecies, B2, migration 0051 ; D-337, D-352) : chaque ligne met une
+ * quaterdecies, B2, migration 0052 ; D-337, D-352) : chaque ligne met une
  * portée hors saison, ou la reprend, à partir de son jour, en heure de Paris ;
  * sans ligne, rien n'est hors saison. Une portée : une planche, un jardin, une
  * parcelle (identifiant OTF), ou tout le plein champ, tout le sous-abri.

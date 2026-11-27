@@ -25,12 +25,14 @@ import type { FeatureSelection } from '../domain/features/selection';
 import type { GardenGroupRecord } from '../domain/garden-group-record';
 import { calculateIrrigationCoverage } from '../domain/irrigation-coverage';
 import { objectiveForBed } from '../domain/irrigation-needs';
+import { needOffSeason } from '../domain/off-season';
 import { parcelsWithoutSoil } from '../domain/onboarding/soil';
 import { routeStepsFor, type RouteCounts } from '../domain/onboarding/route';
 import { soilParcelAnchor } from '../domain/today/reliability';
-import { addDaysToDateKey, weekStartDateKey } from '../domain/water-management';
+import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
 import { weatherLocationQuery } from '../domain/weather/location';
 import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
+import { readOffSeasonSourceForUser } from './off-season-source';
 import { readWeatherPreference, type ResolvedWeatherPreference } from './weather-preference';
 
 /**
@@ -61,8 +63,11 @@ import { readWeatherPreference, type ResolvedWeatherPreference } from './weather
  * - « Combien je vise par semaine » : les objectifs saisis jusqu'à la semaine
  *   (`listHydricGoalRevisionsThroughWeekForUser`, une) et, après le plan,
  *   l'objectif automatique (`readAutomaticObjectiveSourceForUser`, une
- *   requête quand le réglage est éteint) ; `objectiveForBed` puis
- *   `farmObjective`, comme « Aujourd'hui » (S6-i).
+ *   requête quand le réglage est éteint) et le filtre « hors saison »
+ *   (`readOffSeasonSourceForUser`, une requête, gardée pour la requête de la
+ *   page : la même que le tableau des besoins, D-352) ; `objectiveForBed`
+ *   puis `farmObjective`, comme « Aujourd'hui » (S6-i) : les planches hors
+ *   saison sont comptées à part (F1071).
  * - « Mon sol » et la fiche « Réserve du sol » : les parcelles qui ont un sol
  *   (`listZonesWithSoilForUser`, une), puis `parcelsWithoutSoil`, comme le
  *   bandeau « À finir » (S6-i) ; la même promesse sert au bandeau.
@@ -184,7 +189,7 @@ export async function startRouteCounts(reads: StartRouteReads, input: {
   const { ownerUserId, season, snapshot, now } = input;
   const beds = seasonBeds(snapshot, season);
   const { weekStart, weekEnd } = objectiveWeek(now);
-  const [equipmentRows, water, revisions, zonesWithSoil, automatic] = await Promise.all([
+  const [equipmentRows, water, revisions, zonesWithSoil, automatic, offSeason] = await Promise.all([
     reads.equipment,
     reads.water,
     reads.revisions,
@@ -194,6 +199,11 @@ export async function startRouteCounts(reads: StartRouteReads, input: {
     reads.revisions
       ? readAutomaticObjectiveSourceForUser({ ownerUserId, season, snapshot, from: weekStart, to: weekEnd, now })
         .then((source) => ({ source })).catch(readFailed('automatic-objective'))
+      : null,
+    // Le filtre « hors saison » (D-352, F1071), comme pour « Aujourd'hui » : `{ source: null }` : aucun geste,
+    // rien n'est hors saison et rien ne change ; `null` : la lecture a échoué.
+    reads.revisions
+      ? readOffSeasonSourceForUser({ ownerUserId, snapshot }).then((source) => ({ source })).catch(readFailed('off-season'))
       : null,
   ]);
 
@@ -207,12 +217,20 @@ export async function startRouteCounts(reads: StartRouteReads, input: {
     placement = { watered: coverage.beds.length, total: beds.length };
   }
 
-  // Un objectif automatique illisible rend l'étape inconnue : sans lui, des planches seraient dites sans eau visée à tort.
-  const objective = revisions && automatic
-    ? farmObjective(beds.map((bed) => ({
-      areaSquareMeters: Math.max(0, bed.area),
-      objectiveMm: objectiveForBed(revisions, bed, weekStart, weekEnd, automatic.source?.inputFor(bed)).value,
-    })))
+  // Un objectif automatique ou un filtre « hors saison » illisible rend l'étape inconnue : sans eux, des planches
+  // seraient dites sans eau visée à tort.
+  const today = dateKeyInTimeZone(now, FARM_TIME_ZONE);
+  const objective = revisions && automatic && offSeason
+    ? farmObjective(beds.map((bed) => {
+      const bedObjective = objectiveForBed(revisions, bed, weekStart, weekEnd, automatic.source?.inputFor(bed), offSeason.source?.daysFor(bed));
+      const { offSeasonDates } = bedObjective;
+      // Hors saison sans objectif, ou hors saison aujourd'hui : hors des comptes, dite à part, comme sur « Aujourd'hui » (F1069).
+      return {
+        areaSquareMeters: Math.max(0, bed.area),
+        objectiveMm: bedObjective.value,
+        ...(offSeasonDates.length > 0 ? { offSeasonDates, offSeason: needOffSeason({ objectiveMm: bedObjective.value, offSeasonDates }, today) } : {}),
+      };
+    }))
     : null;
 
   const seasonZones = snapshot.zones.filter((zone) => zone.seasons.includes(season));
@@ -223,7 +241,7 @@ export async function startRouteCounts(reads: StartRouteReads, input: {
     equipment,
     placement,
     water: water ? { names: waterNames.slice(0, WATER_NAMES_READ), total: waterNames.length } : null,
-    objective: objective ? { withObjective: objective.withObjective, total: objective.total } : null,
+    objective: objective ? { withObjective: objective.withObjective, total: objective.total, ...(objective.offSeason ? { offSeason: objective.offSeason } : {}) } : null,
     soil: withoutSoil ? { withoutSoil: withoutSoil.length, total: seasonZones.length, anchor: withoutSoil[0] ? soilParcelAnchor(withoutSoil[0]) : null } : null,
   };
 }

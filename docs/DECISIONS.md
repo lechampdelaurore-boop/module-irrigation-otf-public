@@ -11504,8 +11504,9 @@ Précisions prises en codant :
 
 Date : 26 novembre 2026. Statut : **les quatre PR codées, le code de S6
 est fini** (contrat #218 en ligne le 26 novembre 2026 à 20 h 42 ; PR 1
-#235 en ligne à 22 h 08 ; PR 2 #236 fusionnée à 22 h 10 ; PR 3 #237
-ouverte, la PR 4 avec cette entrée) ; contrat `docs/simplification-s6-contract.md`
+#235 en ligne à 22 h 08 ; PR 2 #236 en ligne à 22 h 47 ; PR 3 #237
+en ligne le 27 novembre 2026 à 1 h 40 ; PR 4 #238 en ligne à 2 h 20,
+consigné par le contrat #240) : **les quatre PR en ligne** ; contrat `docs/simplification-s6-contract.md`
 (sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
 PR 2 ; 7, 14 et 15 pour la PR 3 ; 10, 11 et 15 pour la PR 4), roadmap
 section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
@@ -11996,7 +11997,10 @@ Précisions prises en codant (PR 4) :
 
 ## D-337 — L'objectif automatique se voit et se modifie ; ignorer l'irrigation hors saison
 
-Date : 26 novembre 2026. Statut : **contrat écrit, rien de codé** ;
+Date : 26 novembre 2026. Statut : **contrat écrit**, fusionné le
+27 novembre 2026 à 3 h 14 (#240) et **en ligne à 4 h 06** (run
+45927191810) ; le code suit en quatre PR (A1 : D-351 et B1 : D-341, en
+ligne le 27 novembre 2026 ; B2 : D-352) ;
 `docs/objectif-automatique-saison-contract.md`, roadmap section 6
 quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
 
@@ -12024,86 +12028,13 @@ validés des planches concernées, jamais sans son choix.
 
 Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, aligné sur #245) pour le code.
 
-## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
-
-Date : 26 novembre 2026. Statut : **codée** ; contrat
-`docs/simplification-s5-contract.md` (section 7, budget ; section 13,
-mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
-le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
-D-334.
-
-**Décision du porteur.** Le 26 novembre 2026 à 11 h 24 (heure de Paris),
-parmi les chantiers proposés, le porteur choisit de reprendre le budget de
-hauteur de S5 (« Ramène « Arroser » en cours à 700 px »). Au téléphone
-(390 px de large), avec un arrosage en cours, « 1. Où ? » commence
-désormais **sous 700 px** : 653 px mesurés par P64 (nom long du parcours),
-800 px avant. Aucun calcul, aucune action serveur, aucune garde ne change ;
-aucune question agronomique. Rien n'est retiré du premier niveau : la carte
-garde son état, son nom, son réglage, le minuteur, les trois valeurs, le
-détail des apports, la faisabilité de la pompe et ses deux boutons de
-52 px ; F910 disait qu'il faudrait en retirer, la mise en page a suffi.
-
-Précisions prises en codant :
-
-- **F996** — Au téléphone (jusqu'à 560 px), la carte de l'arrosage en
-  cours se range plus serré : le nom à gauche du minuteur, l'état (« En
-  cours », « En pause ») à droite du réglage, sur la même ligne ; le
-  minuteur en 28 px ; des marges plus courtes autour des trois valeurs, du
-  pli « détail des apports » et de la ligne de la pompe. Le bloc
-  « Irrigations en cours » perd son cadre bleu (la carte garde le sien,
-  le titre reste) ; après un geste (« L'irrigation est en pause. »), la
-  réponse garde un écart de 12 px avec le titre. Mise en page seulement,
-  dans `arroser-maintenant.css` ; l'ordinateur ne change pas. Amende F909
-  (le nom et le minuteur restent côte à côte, l'état change de place).
-- **F997** — « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »)
-  et le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »), à l'heure
-  de la ferme : les mots de la carte d'« Aujourd'hui » (« fin prévue à
-  12 h 15 »), par la même fonction (`timeText`, appelée par
-  `runningEndText` de `lib/domain/watering-now.ts`). La valeur ne tient
-  plus que sur une ligne au téléphone. Vaut aussi à l'ordinateur ; « Après
-  la reprise » ne change pas. Avant, « 26 nov. 2026 à 12 h 15 ».
-
-**Mesures, P64 au téléphone** (390 px, « Recevoir les alertes » sous le
-formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
-298 px (inchangé) ; avec un arrosage en cours, **653 px** (800 px avant,
-1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
-À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
-aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
-
-## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
-
-Date : 26 novembre 2026. Statut : **codée**, sur la branche de S6 PR 4
-(#238) et du contrat (#240) ; contrat
-`docs/objectif-automatique-saison-contract.md`, section 3 (D-337), et ses
-précisions F1051 à F1060 (section 11). Roadmap ligne 34, section 6
-quaterdecies.
-
-**Décision.** Le volet « Objectifs de la semaine » lit l'objectif de chaque
-planche tel que le tableau des besoins l'applique (`objectiveForBed`), porté
-par le signal qui portait déjà l'objectif de la ferme (S1, D-328) ; rien
-n'est écrit chaque matin, aucune lecture serveur de plus, aucune migration.
-Réglage allumé, il en tire les lignes « automatique » et la valeur du champ
-(`lib/domain/objective-reading.ts`, moyennes par `farmObjective`) ; la
-saisie passe avant comme toujours. « Revenir à l'automatique » est le geste
-« vider » restreint à un endroit (`clearHydricGoalsForUser` reçoit
-l'endroit) : même révision « cleared », même journal, même recalcul du
-plan. Allumer avec des objectifs saisis ouvre une fenêtre : garder (le
-défaut), vider (le geste existant, en rouge) ou annuler ; l'écran ne vide
-jamais seul. Réglage éteint, l'écran est celui d'avant.
-
-**Ajout de l'assistant, sans règle** : « Corriger » sur chaque ligne
-automatique choisit l'endroit et met le curseur dans le champ (F1056).
-
-**Ce qui n'est pas fait** : B1 à B3 (le filtre « hors saison ») ; la recette
-sur le site après la mise en ligne.
-
-Numéros : D-351 ; F1051 à F1060.
-
 ## D-341 — Ignorer l'irrigation hors saison, B1 : la règle
 
 Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
 contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections 4,
-5 et 8) ; roadmap section 6 quaterdecies, ligne 34. Code en Opus 5.5 · Max,
+5 et 8), fusionnée le 27 novembre 2026 à 6 h 28 (#245) et **en ligne à
+7 h 15** (run 45946029675, consigné par B2) ; roadmap section 6
+quaterdecies, ligne 34. Code en Opus 5.5 · Max,
 le réglage de la roadmap, sur la branche du contrat, avant la fusion de S4
 et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995, ceux que
 le contrat réserve au code ; D-338 à D-340 sont pris par trois contrats
@@ -12193,9 +12124,11 @@ portée.
   `lib/domain/irrigation-history/summary.ts`) et l'eau des séries
   (`lib/domain/series/water.ts`) ; les services qui appellent
   `objectiveForBed` (`applied-water-gap.ts`, `crop-water-bed.ts`,
-  `crop-water-series.ts`, `irrigation-form-hints.ts`). Une semaine close
-  reste lue telle quelle (D-318) : le filtre ne remonte jamais avant le
-  jour de son geste (cas 7).
+  `crop-water-series.ts`, `irrigation-form-hints.ts` et, depuis la fusion
+  de S6, `start-route.ts`, l'étape « Combien je vise par semaine » de la
+  carte « Mise en route »). Une semaine close reste lue telle quelle
+  (D-318) : le filtre ne remonte jamais avant le jour de son geste
+  (cas 7).
 - **F994** — Les gardes (`tests/hors-saison-regle.test.ts`) : filtre vide,
   l'objectif et le tableau des besoins identiques mot pour mot ; sur deux
   fermes, la pluie, l'ET0 et l'irrigation de chaque planche identiques,
@@ -12216,6 +12149,85 @@ portée.
   `lib/services/series-water-service.ts`). Le code nomme le filtre
   `offSeason` ; B3 gardera les deux sens à part à l'écran.
 
+## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
+
+Date : 26 novembre 2026. Statut : **codée**, fusionnée le même jour à
+13 h 57 (#244) et **en ligne à 14 h 37** (run 45824529849), recette
+conforme vers 18 h 45 (consigné par B2) ; contrat
+`docs/simplification-s5-contract.md` (section 7, budget ; section 13,
+mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
+le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
+D-334.
+
+**Décision du porteur.** Le 26 novembre 2026 à 11 h 24 (heure de Paris),
+parmi les chantiers proposés, le porteur choisit de reprendre le budget de
+hauteur de S5 (« Ramène « Arroser » en cours à 700 px »). Au téléphone
+(390 px de large), avec un arrosage en cours, « 1. Où ? » commence
+désormais **sous 700 px** : 653 px mesurés par P64 (nom long du parcours),
+800 px avant. Aucun calcul, aucune action serveur, aucune garde ne change ;
+aucune question agronomique. Rien n'est retiré du premier niveau : la carte
+garde son état, son nom, son réglage, le minuteur, les trois valeurs, le
+détail des apports, la faisabilité de la pompe et ses deux boutons de
+52 px ; F910 disait qu'il faudrait en retirer, la mise en page a suffi.
+
+Précisions prises en codant :
+
+- **F996** — Au téléphone (jusqu'à 560 px), la carte de l'arrosage en
+  cours se range plus serré : le nom à gauche du minuteur, l'état (« En
+  cours », « En pause ») à droite du réglage, sur la même ligne ; le
+  minuteur en 28 px ; des marges plus courtes autour des trois valeurs, du
+  pli « détail des apports » et de la ligne de la pompe. Le bloc
+  « Irrigations en cours » perd son cadre bleu (la carte garde le sien,
+  le titre reste) ; après un geste (« L'irrigation est en pause. »), la
+  réponse garde un écart de 12 px avec le titre. Mise en page seulement,
+  dans `arroser-maintenant.css` ; l'ordinateur ne change pas. Amende F909
+  (le nom et le minuteur restent côte à côte, l'état change de place).
+- **F997** — « Fin estimée » dit l'heure seule le jour même (« 12 h 15 »)
+  et le jour devant l'heure sinon (« ven. 27 nov. à 0 h 20 »), à l'heure
+  de la ferme : les mots de la carte d'« Aujourd'hui » (« fin prévue à
+  12 h 15 »), par la même fonction (`timeText`, appelée par
+  `runningEndText` de `lib/domain/watering-now.ts`). La valeur ne tient
+  plus que sur une ligne au téléphone. Vaut aussi à l'ordinateur ; « Après
+  la reprise » ne change pas. Avant, « 26 nov. 2026 à 12 h 15 ».
+
+**Mesures, P64 au téléphone** (390 px, « Recevoir les alertes » sous le
+formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
+298 px (inchangé) ; avec un arrosage en cours, **653 px** (800 px avant,
+1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
+À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
+aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
+
+## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
+
+Date : 26 novembre 2026. Statut : **codée**, sur la branche de S6 PR 4
+(#238) et du contrat (#240), fusionnée le 27 novembre 2026 à 4 h 50
+(#255) et **en ligne à 5 h 40** (run 45936521667, consigné par B1) ;
+contrat
+`docs/objectif-automatique-saison-contract.md`, section 3 (D-337), et ses
+précisions F1051 à F1060 (section 11). Roadmap ligne 34, section 6
+quaterdecies.
+
+**Décision.** Le volet « Objectifs de la semaine » lit l'objectif de chaque
+planche tel que le tableau des besoins l'applique (`objectiveForBed`), porté
+par le signal qui portait déjà l'objectif de la ferme (S1, D-328) ; rien
+n'est écrit chaque matin, aucune lecture serveur de plus, aucune migration.
+Réglage allumé, il en tire les lignes « automatique » et la valeur du champ
+(`lib/domain/objective-reading.ts`, moyennes par `farmObjective`) ; la
+saisie passe avant comme toujours. « Revenir à l'automatique » est le geste
+« vider » restreint à un endroit (`clearHydricGoalsForUser` reçoit
+l'endroit) : même révision « cleared », même journal, même recalcul du
+plan. Allumer avec des objectifs saisis ouvre une fenêtre : garder (le
+défaut), vider (le geste existant, en rouge) ou annuler ; l'écran ne vide
+jamais seul. Réglage éteint, l'écran est celui d'avant.
+
+**Ajout de l'assistant, sans règle** : « Corriger » sur chaque ligne
+automatique choisit l'endroit et met le curseur dans le champ (F1056).
+
+**Ce qui n'est pas fait** : B1 à B3 (le filtre « hors saison ») ; la recette
+sur le site après la mise en ligne.
+
+Numéros : D-351 ; F1051 à F1060.
+
 ## D-352 — Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs
 
 Date : 26 novembre 2026. Statut : **codée** (PR B2 sur les quatre du
@@ -12224,10 +12236,12 @@ contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections
 Opus 5.5 · Max, le réglage de la ligne 34, empilé sur B1 (#245, D-341).
 Numéros D-352 et F1061 à F1074, vérifiés sur toutes les PR ouvertes avant
 d'être pris : D-343 à D-351 et les précisions jusqu'à F1060 sont à d'autres
-PR ouvertes (A1, #255, a D-351 et F1051 à F1060). Migration **0051, provisoire** : c'est le numéro
-qui suit le dernier de `main` (0050) ; S6 (#235) et la météo multi-modèles
-(#250, #253) ont aussi pris 0051 ou 0052 pour les leurs, celle qui fusionne
-après les autres se recale au numéro libre en fusionnant `main`.
+PR ouvertes (A1, #255, a D-351 et F1051 à F1060). Migration **0052** : 0051
+à l'écriture, le numéro qui suivait le dernier de `main` (0050), recalée à
+0052 en fusionnant `main` après S6, qui a pris 0051
+(`0051_start_mode_route_state`, #235) ; la météo multi-modèles (#250) et
+l'ET0 horaire (#253), qui prennent aussi 0051 ou 0052, se recaleront de
+même au numéro libre.
 
 **Décision.** Les gestes « Mettre hors saison » et « Reprendre » sont
 enregistrés, une ligne datée par geste, écrits au journal des modifications,
@@ -12244,7 +12258,7 @@ B3 montrera.
 **Précisions prises en codant.**
 
 - **F1061** — Le stockage : la table `irrigation_off_season_revisions`
-  (migration 0051), une ligne par geste : la portée (`scope_level` : planche,
+  (migration 0052), une ligne par geste : la portée (`scope_level` : planche,
   jardin ou abri, parcelle, ou `mode` pour tout le plein champ et tout le
   sous-abri ; `scope_id` : l'identifiant OTF du seul niveau, ou
   `garden`/`greenhouse`), `off_season` (1 : hors saison, 0 : reprise), la
@@ -12319,8 +12333,14 @@ B3 montrera.
   une planche hors saison), la fiche d'une planche et celle d'une série
   (l'objectif proposé par culture reste calculé, section 4.2 : les cultures
   restent lues ; l'objectif de la semaine dit « hors saison »), l'écart
-  entre prévu et réel. `lib/services/start-route.ts` (S6, #235, pas encore
-  dans `main`) le recevra à la fusion de S6 avec B2. La tâche du matin
+  entre prévu et réel. Depuis la fusion de S6, `lib/services/start-route.ts`
+  (#235) le reçoit aussi : l'étape « Combien je vise par semaine » de la
+  carte « Mise en route » compte comme « Aujourd'hui » (mêmes comptes,
+  planches hors saison dites à part, `offSeason`) ; elle est faite quand
+  chaque planche en saison a son eau visée, et toute la ferme hors saison
+  n'a rien à viser ; une planche hors saison n'est jamais dite « sans eau
+  visée » ; un filtre illisible rend l'étape inconnue, comme un objectif
+  automatique illisible ; sans geste, le compte d'avant. La tâche du matin
   qui enregistre les semaines closes de l'objectif automatique ne change
   pas : elle garde l'ET0 de la semaine ; c'est la lecture qui retire les
   jours hors saison (F988), et une semaine close avant la pause est lue
@@ -12357,6 +12377,12 @@ B3 montrera.
   arrosage démarré listé, pluie de l'historique lue à travers le filtre…)
   toutes vues par les tests. Quatre tests d'avant suivent la nouvelle table
   (102 tables ; les copies arrêtées avant la migration la reçoivent vide).
+  À la fusion de S6 : 1 test du domaine de plus (l'étape de la mise en
+  route), 2 tests sur la base (`tests/db/hors-saison-mise-en-route.test.ts` :
+  les comptes d'« Aujourd'hui », la voisine, toute la ferme hors saison) ;
+  cinq casses volontaires de plus (filtre non passé, étape faite sur toutes
+  les planches, compte hors saison perdu, jour du calcul ignoré, planches
+  hors saison dites sans eau visée), toutes vues.
 
 ## D-353 — Ignorer l'irrigation hors saison, B3 : les écrans
 
@@ -12457,10 +12483,8 @@ Aucune règle nouvelle, aucune question agronomique.
   saison », ce qui continue (la pluie tombée dehors, la réserve du sol,
   l'ET0, la météo et ses alertes, un arrosage noté à la main), les
   endroits, « Reprendre », les arrosages déjà prévus.
-- **F1085** — La migration de B2 (`0051_off_season_revisions.sql`) porte
-  le numéro 0052 dans cette branche : S6 (#235) a pris 0051 pour la mise
-  en route. Provisoire, comme celle de B2 : la PR qui fusionne après les
-  autres se recale au numéro libre en fusionnant `main`.
+- **F1085** — Aucune migration : B3 lit la table de B2 (0052, en ligne
+  depuis B2 ; S6 a pris 0051).
 - **F1086** — Preuves : 12 tests du domaine (`tests/hors-saison-ecrans.test.ts`)
   et deux tests d'avant accordés (F282 du lot A ; le relevé des ancres de
   S4) ; le parcours P74 aux deux largeurs. P74 n'ouvre pas la fenêtre des

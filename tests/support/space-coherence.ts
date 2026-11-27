@@ -110,7 +110,7 @@ const UNDECLARED: Reference[] = [
  * séries, cultures), personnes, identifiants choisis par le navigateur pour
  * une seule requête, identifiant d'une lecture complète et de son bail,
  * tirés par le serveur pour cette seule lecture (F362, F384). La portée d'un
- * geste « hors saison » (`scope_id`, migration 0051, D-352) : l'identifiant
+ * geste « hors saison » (`scope_id`, migration 0052, D-352) : l'identifiant
  * d'Ouvre ta ferme d'une planche, d'un jardin ou d'une parcelle, ou le mode
  * de tout le plein champ ou de tout le sous-abri.
  */

@@ -20,6 +20,33 @@ source détaillée commit par commit.
   du planning dit la planche hors saison qu'un matériel partagé arrose
   encore. Un « ? » explique ce qui est ignoré et ce qui continue.
 
+### Ajouté (ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs)
+
+- **Les gestes « hors saison » enregistrés** (D-352) : mettre hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, puis le reprendre, s'enregistre au jour du geste et se lit au
+  journal des modifications (« Mise hors saison », « Reprise de
+  l'irrigation ») ; un geste qui ne change rien n'écrit rien. Le tableau
+  des besoins, le planning, la faisabilité, « Aujourd'hui », l'historique,
+  les séries, l'aide du formulaire et l'étape « Combien je vise par
+  semaine » de la mise en route en tiennent compte : plus d'objectif
+  ni de proposition d'arrosage pour ces planches ; un arrosage déjà
+  planifié reste, la liste à proposer à l'annulation est prête. La pluie,
+  la réserve du sol, l'ET0, l'archive des prévisions et les alertes ne
+  changent jamais. Rien ne change encore pour aucune ferme : aucun écran
+  ne permet le geste (B3).
+
+### Ajouté (ignorer l'irrigation hors saison, B1 : la règle)
+
+- **La règle « hors saison »** (D-341) : quand une ferme mettra hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, ses planches n'auront plus d'objectif ni de besoin à partir
+  du jour du geste, et l'objectif de la ferme les dira à part (« 7 planches
+  sur 7 ont un objectif, 3 hors saison ») ; la pluie, la réserve du sol,
+  l'ET0, les alertes et les irrigations réelles ne changent pas. Rien ne
+  change encore pour aucune ferme : aucun écran ne l'allume, aucun service
+  ne la lit (B2, B3).
+
 ### Modifié (l'objectif automatique se voit et se modifie, A1)
 
 - **Le volet « Objectifs de la semaine » montre l'objectif automatique**
@@ -36,6 +63,15 @@ source détaillée commit par commit.
   la semaine. Rien n'est écrit chaque matin ; réglage éteint, rien ne
   change.
 
+### Ajouté (contrat : l'objectif automatique se voit ; ignorer l'irrigation hors saison)
+
+- **Contrat écrit, sans code** (D-337, `docs/objectif-automatique-saison-contract.md`) :
+  pourquoi cocher « Objectif automatique » ne remplit rien à l'écran (calculé
+  à la lecture, jamais écrit ; un objectif saisi passe avant), ce que l'écran
+  montrera (liste, champ prérempli, fenêtre d'allumage), et un filtre « hors
+  saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
+  l'historique ne changent pas. Quatre PR de code à venir.
+
 ### Modifié (simplifier l'usage du module, S6, PR 4 : les visites, la ferme vierge, les contrats)
 
 - **La visite guidée parle des trois façons de commencer** (D-336, F976
@@ -51,6 +87,13 @@ source détaillée commit par commit.
   est, et que la mise en route est en tête pour une ferme qui commence.
 - **Sept contrats validés** (F981) disent, à l'endroit de chaque passage,
   ce que S6 y change. **Le code de S6 est fini.**
+- **Parcours P67 (S4) le soir** : lancé après 23 h, il trouvait une
+  journée trop courte pour deux arrosages de 50 min ; le plan en propose
+  quatre plus courts et « Jour par jour » s'allonge (2 060 px au lieu de
+  1 750 au plus). La hauteur du premier niveau et les choses à toucher
+  ne sont bornées que dans le cas mesuré (deux arrosages) ; sinon le
+  parcours le dit (« hors jeu ») et joue tout le reste. La vérification
+  de cette PR et le déploiement de la PR 3 avaient échoué ainsi à 23 h 28.
 
 ### Ajouté (simplifier l'usage du module, S6, PR 3 : les lignes d'état des fiches de « Ma ferme »)
 
@@ -177,41 +220,6 @@ source détaillée commit par commit.
   ancre ; le lien du suivi par série ouvre « Par série ». Une ferme qui n'a
   coché que l'historique arrive sur « Les cumuls ». Aucun calcul, aucune
   règle d'enregistrement ne change.
-
-### Ajouté (ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs)
-
-- **Les gestes « hors saison » enregistrés** (D-352) : mettre hors saison
-  une planche, un jardin, une parcelle, tout le plein champ ou tout le
-  sous-abri, puis le reprendre, s'enregistre au jour du geste et se lit au
-  journal des modifications (« Mise hors saison », « Reprise de
-  l'irrigation ») ; un geste qui ne change rien n'écrit rien. Le tableau
-  des besoins, le planning, la faisabilité, « Aujourd'hui », l'historique,
-  les séries et l'aide du formulaire en tiennent compte : plus d'objectif
-  ni de proposition d'arrosage pour ces planches ; un arrosage déjà
-  planifié reste, la liste à proposer à l'annulation est prête. La pluie,
-  la réserve du sol, l'ET0, l'archive des prévisions et les alertes ne
-  changent jamais. Rien ne change encore pour aucune ferme : aucun écran
-  ne permet le geste (B3).
-
-### Ajouté (ignorer l'irrigation hors saison, B1 : la règle)
-
-- **La règle « hors saison »** (D-341) : quand une ferme mettra hors saison
-  une planche, un jardin, une parcelle, tout le plein champ ou tout le
-  sous-abri, ses planches n'auront plus d'objectif ni de besoin à partir
-  du jour du geste, et l'objectif de la ferme les dira à part (« 7 planches
-  sur 7 ont un objectif, 3 hors saison ») ; la pluie, la réserve du sol,
-  l'ET0, les alertes et les irrigations réelles ne changent pas. Rien ne
-  change encore pour aucune ferme : aucun écran ne l'allume, aucun service
-  ne la lit (B2, B3).
-
-### Ajouté (contrat : l'objectif automatique se voit ; ignorer l'irrigation hors saison)
-
-- **Contrat écrit, sans code** (D-337, `docs/objectif-automatique-saison-contract.md`) :
-  pourquoi cocher « Objectif automatique » ne remplit rien à l'écran (calculé
-  à la lecture, jamais écrit ; un objectif saisi passe avant), ce que l'écran
-  montrera (liste, champ prérempli, fenêtre d'allumage), et un filtre « hors
-  saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
-  l'historique ne changent pas. Quatre PR de code à venir.
 
 ### Modifié (simplifier l'usage du module, S5 : le budget de hauteur tenu)
 
