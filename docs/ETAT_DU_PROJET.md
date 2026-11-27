@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 26 novembre 2026.
+Dernière mise à jour : 27 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -12,6 +12,18 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Parcours navigateur à cheval sur minuit : P63, P12 et P37 corrigés
+  le 27 novembre 2026** (D-355, F1093 à F1096 ; point ouvert 70), en
+  Opus 5.5 · Élevé (corrections, les tests et la CI jugent). Une suite
+  commencée avant minuit et finie après les faisait échouer (déploiement
+  de #237 et PR #238, le 26 novembre au soir). P63 admet le jour que la
+  page propose entre son début et sa lecture ; P12 cherche un jour sans
+  mesure à l'avant-veille du jour qu'il vient de noter ; P37 joue la
+  fenêtre de l'objectif sur une ferme propre (sa cause : les objectifs
+  vidés la veille par d'autres parcours, pas l'eau). Les trois échecs
+  reproduits sur `main` sans attendre minuit, puis verts avec la
+  correction ; contrôles : voir la PR. Parcours seuls : aucun écran,
+  calcul ni migration. Fusion après la file en cours, une PR à la fois.
 - **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
   vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
   F982 ; contrat, sections 10, 11 et 15), en Opus 5.5 · Très élevé,
@@ -11100,6 +11112,16 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    à 18 h 56) : le jeton se vérifie à l'heure réelle. **Fermé le
    14 novembre 2026** : la recette réelle de la démonstration est conforme
    (19 h 53) et un invité s'y est connecté (20 h 53).
+70. 🟡 **Ouvert le 26 novembre 2026 par le déploiement de #237 et la PR
+   #238** (runs 45901421359 et 45906065683) : une suite de parcours
+   commencée avant minuit et finie après faisait échouer P63 à
+   l'ordinateur, P12 et P37 au téléphone, verts une fois relancés après
+   minuit. P63 comparait la page à l'heure relevée à son début ; P12 et
+   P37 lisaient sur la ferme de démonstration commune la pluie notée et
+   les objectifs vidés la veille par les parcours d'avant minuit.
+   **Corrigé en branche le 27 novembre 2026** (D-355, F1093 à F1096,
+   `fix/parcours-minuit`) : les trois échecs reproduits sur `main`, verts
+   avec la correction. Se ferme à la fusion et à la mise en ligne.
 
 ## Procédure de reprise rapide
 

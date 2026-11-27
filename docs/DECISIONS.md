@@ -12039,3 +12039,69 @@ formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
 1 011 px avant F909). P64 borne désormais à 700 px, le budget du contrat.
 À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
 aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
+
+## D-355 — Les parcours navigateur ne dépendent plus d'une suite qui passe minuit : P63, P12 et P37
+
+Date : 27 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant ; modifiable à la relecture du porteur. Aucune règle
+agronomique, aucun calcul, aucune migration, aucun écran : les parcours
+seuls changent.
+
+**Constat.** Le 26 novembre 2026 au soir, deux vérifications d'une suite
+commencée avant minuit et finie après ont échoué sur trois parcours, verts
+une fois relancés après minuit : le déploiement de #237 (run 45901421359,
+essai 2, de 23 h 42 à 0 h 25) et la PR #238 (run 45906065683, à 0 h 06).
+Le contrat des parcours promettait déjà qu'un parcours ne dépend pas de
+l'heure (« Reproductibilité », D-082). Trois causes, une par parcours :
+
+- **P63, à l'ordinateur** : le parcours a duré de 23 h 59 à 0 h 00 ; il
+  attendait, dans « Quel jour ? », la veille de l'heure relevée à son
+  début (le 25), et la page, servie après minuit, proposait la veille de
+  son propre jour (le 26).
+- **P12, au téléphone** : après minuit, il attendait un champ vide pour la
+  veille, et trouvait « 0 » : le 0 mm qu'un parcours d'avant minuit de la
+  même suite avait noté pour son « aujourd'hui ».
+- **P37, au téléphone** : il attendait « l'objectif de la semaine de N01
+  (10 mm) » et lisait 8,6 mm. **La cause n'est pas l'eau notée la veille**
+  (piste du relevé du 27 novembre 2026) : ce sont les objectifs que les
+  parcours d'avant minuit ont posés puis vidés sur la ferme commune. Un
+  objectif vidé vaut à partir de son jour (D-034) ; la veille de P37 reste
+  sans objectif, et la semaine ne vaut plus que six septièmes des 10 mm
+  (8,571 mm). Reproduit par `objectiveForBed` : 10 mm sur une ferme neuve
+  ou avant minuit, 8,571 mm sur la ferme commune après minuit.
+
+**Précisions** (techniques ; consignées au contrat des parcours,
+`docs/browser-journeys-contract.md`, « Reproductibilité » et lignes P12,
+P37, P63) :
+
+- **F1093** — P63 admet, dans « Quel jour ? », la veille de chacun des
+  jours de la ferme entre son relevé du début et sa lecture (ce jour même
+  le 1er janvier) ; la feuille rouverte ne dit « 8 mm déjà notés pour
+  hier » que si elle propose encore le jour noté, avant comme après la
+  relecture de la page ; sinon le parcours le dit hors jeu et joue la
+  suite.
+- **F1094** — P12 lit dans le formulaire le jour qu'il vient de noter à
+  0 mm, au lieu de relire l'horloge ; il cherche le champ vide à
+  l'avant-veille de ce jour : les parcours de la ferme commune ne notent
+  la pluie que le jour où ils tournent, et une suite tient sur deux jours
+  au plus. « 0 » à l'ouverture de la page n'est vérifié que si la page
+  s'ouvre sur le jour noté, sinon hors jeu ; la course de la réponse en
+  retard se joue depuis le jour où la page s'ouvre.
+- **F1095** — P37 joue « au-delà de l'objectif de la semaine » sur une
+  ferme propre au parcours et à la largeur (`ouvrirUneFermeToutCochee`,
+  comme P67), aucun objectif d'un autre parcours n'y entrant ; le délai
+  du parcours passe à 180 s, la ferme neuve se préparant d'abord.
+- **F1096** — La preuve se fait sans attendre minuit. L'horloge du
+  serveur ne se fausse pas (le serveur local ne démarre pas sous une
+  horloge faussée) : pour P12 et P37, l'ordinateur joue, puis la base
+  locale recule d'un jour la pluie mesurée et les objectifs écrits, puis
+  le téléphone joue, comme après minuit ; pour P63, seule l'horloge du
+  processus des parcours part 20 s avant minuit, la page étant servie au
+  jour réel. Sur `main`, les trois échecs de la CI reviennent à
+  l'identique ; avec la correction, les trois parcours passent. Ces
+  essais sont de séance, pas un parcours de plus.
+
+**Ce qui ne change pas.** Le point ouvert 48, le dimanche soir, reste
+ouvert. Les autres parcours de la ferme commune ne lisent que le jour où
+ils tournent, ou la semaine en cours sans chiffre exact d'un jour passé ;
+aucun autre échec à cheval sur minuit n'a été relevé.
