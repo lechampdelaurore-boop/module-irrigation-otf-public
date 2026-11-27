@@ -23,6 +23,8 @@ import { GardenGroupManager } from './garden-group-manager';
 import { BedCropWaterPanel } from './crop-water/bed-crop-water-panel';
 import { bedIdFromStageAnchor } from '@/lib/domain/today/missing-by-bed';
 import { pageHref } from '@/lib/domain/features/pages';
+import { NEEDS_SECTION_ANCHOR } from '@/lib/domain/features/week-page';
+import { SIMPLE_WORDS } from '@/lib/domain/simple-words';
 import { PAGE_SETTINGS_ANCHOR, PageSettingsFold } from './shell/page-settings-fold';
 import { IrrigationShell, type ShellProps } from './shell/irrigation-shell';
 import { PlanViewTabs, type PlanView } from './hierarchy/plan-view-tabs';
@@ -384,11 +386,11 @@ export function HierarchyBrowser({
           coverage={coverageByBedId.get(selectedBed.id) ?? null}
         />
       ) : null}
-      {/* Le besoin de la culture renvoie à « Objectifs et besoins » ; son stade et l'adoption sont dans le pli du bas (audit final, lot D, J2, F306). */}
+      {/* Le besoin de la culture renvoie à « Ce qu'il reste à arroser » de « Semaine » (lot S4, PR 4) ; son stade et l'adoption sont dans le pli du bas (audit final, lot D, J2, F306). */}
       {selectedBed && showBedCropWater ? (
         <p className="bed-crop-water-pointer">
           Le besoin de la culture de cette planche se lit dans{' '}
-          <a href={pageHref('besoins', { season })}>Objectifs et besoins</a> ; son stade et l’adoption de l’objectif proposé
+          <a href={pageHref('semaine', { season }, NEEDS_SECTION_ANCHOR)}>Semaine</a>, dans « {SIMPLE_WORDS.leftToWater} » ; son stade et l’adoption de l’objectif proposé
           sont dans <a href={`#${PAGE_SETTINGS_ANCHOR}`}>Réglages de cette page</a>, en bas.
         </p>
       ) : null}

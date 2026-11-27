@@ -18,14 +18,16 @@ import { saveManualRainfallAction } from './water-actions';
  * l'enregistrement la ferme, et la page qui l'a ouverte écrit la réponse
  * sous son bouton.
  */
-export function RainEntryDialog({ open, entry, season, planning, besoinsHref, onClose, onSaved }: {
+export function RainEntryDialog({ open, entry, season, planning, besoinsHref, besoinsLabel, onClose, onSaved }: {
   open: boolean;
   entry: RainEntry;
   season: number;
   /** « Le plan se recalcule » ne se dit que « Planning » coché. */
   planning: boolean;
-  /** Retirer une mesure ou voir jour par jour reste sur « Objectifs et besoins » ; `null` : pas de lien. */
+  /** Retirer une mesure ou voir jour par jour reste dans « Pluie mesurée » de « Semaine » (lot S4, PR 4) ; `null` : pas de lien. */
   besoinsHref: string | null;
+  /** Le mot du lien, quand il mène dans la page même (le pli « Pluie mesurée » de « Semaine », S4, PR 3). */
+  besoinsLabel?: string;
   onClose: () => void;
   /** La réponse, à écrire sous le bouton qui a ouvert la fenêtre ; la page se relit. */
   onSaved: (text: string) => void;
@@ -67,6 +69,7 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, on
         season={season}
         planning={planning}
         besoinsHref={besoinsHref}
+        besoinsLabel={besoinsLabel}
         onPending={setPending}
         onClose={close}
         onSaved={onSaved}
@@ -81,12 +84,13 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, on
  * la feuille, sans changer de page. Le même jour par défaut, la même lecture
  * du chiffre, le même bouton qui dit le chiffre, la même action.
  */
-export function RainEntryForm({ className, entry, season, planning, besoinsHref, onPending, onClose, onSaved }: {
+export function RainEntryForm({ className, entry, season, planning, besoinsHref, besoinsLabel = 'sur « Semaine », dans « Pluie mesurée »', onPending, onClose, onSaved }: {
   className: string;
   entry: RainEntry;
   season: number;
   planning: boolean;
   besoinsHref: string | null;
+  besoinsLabel?: string;
   onPending?: (pending: boolean) => void;
   /** « Fermer » ; absent, le formulaire n'en a pas (la feuille a le sien). */
   onClose?: () => void;
@@ -158,7 +162,8 @@ export function RainEntryForm({ className, entry, season, planning, besoinsHref,
       {refusal ? <p className="rain-entry-refusal" role="alert">{refusal}</p> : null}
       {besoinsHref ? (
         <p className="rain-entry-more">
-          Retirer une mesure, voir jour par jour : <a href={besoinsHref}>sur « Objectifs et besoins »</a>
+          {/* Le lien ferme la fenêtre : sur la même page, le pli qu'il ouvre ne reste pas sous elle (S4, PR 3). */}
+          Retirer une mesure, voir jour par jour : <a href={besoinsHref} onClick={onClose}>{besoinsLabel}</a>
         </p>
       ) : null}
       <div className="irrigation-dialog-actions">

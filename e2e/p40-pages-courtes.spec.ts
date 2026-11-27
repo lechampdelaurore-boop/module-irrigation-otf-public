@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { attendreLaPageIrrigation, attendreLaPagePrete, surveillerLaConsole, verifierLEtape, TITRES_DES_PAGES, type PageDuModule } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLePli, ouvrirLesPlisAutour, surveillerLaConsole, verifierLEtape, titreDeLaPage, type PageDuModule } from './support/parcours.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 
 /**
@@ -14,7 +14,11 @@ import { preparerMaterielArrosant } from './support/materiel.ts';
  * Ce qu'il ne prouve pas : un vrai lecteur d'écran, la ferme réelle.
  */
 
-/** Le titre de la page et le synonyme que son premier bloc portait. */
+/**
+ * Le titre de la page et le synonyme que son premier bloc portait. Le
+ * planning et l'historique s'ouvrent sur « Semaine » depuis le lot S4 : son
+ * titre seul se voit, celui de leur bloc reste aux lecteurs d'écran.
+ */
 const TITRES_EN_DOUBLE: Partial<Record<PageDuModule, string[]>> = {
   planning: ['Planning de la semaine'],
   sol: ['Réserve du sol'],
@@ -25,7 +29,7 @@ const TITRES_EN_DOUBLE: Partial<Record<PageDuModule, string[]>> = {
 };
 
 for (const [cible, noms] of Object.entries(TITRES_EN_DOUBLE) as [PageDuModule, string[]][]) {
-  test(`un seul titre visible sur « ${TITRES_DES_PAGES[cible]} », sans niveau sauté`, async ({ page }) => {
+  test(`un seul titre visible sur « ${titreDeLaPage(cible)} » (${cible}), sans niveau sauté`, async ({ page }) => {
     const journal = surveillerLaConsole(page);
     await attendreLaPageIrrigation(page, cible);
     const lus = await page.locator('main').evaluate((main, attendus) => {
@@ -45,8 +49,8 @@ for (const [cible, noms] of Object.entries(TITRES_EN_DOUBLE) as [PageDuModule, s
         precedent = niveau;
       }
       return { enDouble, sauts };
-    }, noms);
-    expect(lus.enDouble, 'le titre n’est dit qu’une fois').toEqual([TITRES_DES_PAGES[cible]]);
+    }, [titreDeLaPage(cible), ...noms]);
+    expect(lus.enDouble, 'le titre n’est dit qu’une fois').toEqual([titreDeLaPage(cible)]);
     expect(lus.sauts, 'aucun niveau de titre sauté').toEqual([]);
     await verifierLEtape(page, journal, `un seul titre sur ${cible}`);
   });
@@ -78,18 +82,31 @@ const BUDGETS_AU_TELEPHONE: Partial<Record<PageDuModule, number>> = {
   reglages: 3_750,
   // PR 5 (F460) : les objectifs, la météo et la pluie mesurée pliés, les tuiles en une ligne, chaque
   // jardin en une ligne compacte ; 4 704 → 2 750 px avec les quatre jardins des données des parcours.
-  besoins: 2_800,
+  // Lot S4, PR 1 (contrat S4, sections 2 et 10) : « Semaine » porte le planning puis les besoins, sans rien
+  // raccourcir (la PR 1 range) ; sa borne est la somme de celles d'avant, les huit écrans de 844 px du planning
+  // (P28) et les 2 800 px des besoins. 3 935 px mesurés en local, la suite jouée jusqu'à P40 sans plan calculé ;
+  // le premier niveau de la PR 2 a son propre budget, 1 700 px (section 11).
+  // Lot S4, PR 2 (F929) : le premier niveau, puis « Le détail » fermé ; 3 935 → 2 846 px mesurés en local, la
+  // suite jouée jusqu'à P40 ; la borne garde 15 % pour les jours de la semaine, que la page montre chacun.
+  // Sur la CI de la PR 2, toute la suite jouée avant P40 : 3 856 px, les créneaux que les parcours d'avant
+  // laissent sur la ferme des parcours allongeant « Jour par jour ».
+  // Lot S4, PR 3 (F939) : les gestes du bilan (60 px) et « Exporter » (44 px) ; surtout, « Jour par jour » porte
+  // les créneaux que les parcours d'avant laissent sur la ferme des parcours (15 créneaux, 2 255 px de jours) :
+  // 4 107 px mesurés en local, les 21 parcours de la suite qui touchent « Semaine » joués avant P40. La borne
+  // garde 10 % ; le premier niveau a son budget à part, tenu par P67 sur une ferme neuve.
+  semaine: 4_500,
   // PR 6 (F461) : trois onglets, le plan d'abord ; au téléphone, les jardins repliés. 1 782 px avec
   // les quatre jardins des données des parcours : le budget du contrat, pour une ferme de dix-huit jardins.
   materiel: 5_300,
 };
 
 for (const [cible, budget] of Object.entries(BUDGETS_AU_TELEPHONE) as [PageDuModule, number][]) {
-  test(`« ${TITRES_DES_PAGES[cible]} » tient sous ${budget} px au téléphone`, async ({ page }, testInfo) => {
+  test(`« ${titreDeLaPage(cible)} » tient sous ${budget} px au téléphone`, async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'telephone', 'le budget vaut au téléphone');
     const journal = surveillerLaConsole(page);
     await attendreLaPageIrrigation(page, cible);
     const hauteur = await page.evaluate(() => document.documentElement.scrollHeight);
+    testInfo.annotations.push({ type: 'hauteur à 390 px', description: `${cible} : ${hauteur} px` });
     expect(hauteur, `hauteur de « ${cible} » à 390 px`).toBeLessThanOrEqual(budget);
     // Rien ne déborde de côté.
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
@@ -132,20 +149,18 @@ test('« Objectifs et besoins » : trois plis fermés d’une ligne, un jardin p
     await expect(pli.locator(':scope > summary small')).not.toHaveText('');
   }
   await expect(page.locator('#objectifs-de-la-semaine').getByLabel('mm / semaine')).toBeHidden();
-  // Les tuiles : une ligne de résumé au téléphone, qui les déplie ; à l'ordinateur, les tuiles.
-  const ligne = page.locator('.water-summary-line');
-  const tuiles = page.locator('.water-summary-grid');
-  if (telephone) {
-    await expect(tuiles).toBeHidden();
-    await expect(ligne).toContainText('irrigué');
-    await ligne.click();
-    await expect(tuiles).toBeVisible();
-  } else {
-    await expect(ligne).toBeHidden();
-    await expect(tuiles).toBeVisible();
-  }
-  // Un jardin, une ligne de 64 px au plus au téléphone.
+  // Les tuiles : dans « Jours de la semaine, un par un », un pli fermé de « Le détail » dont la ligne dit
+  // les totaux de la semaine ; ouvert, les tuiles, aux deux largeurs (S4, PR 2, section 7.1, n° 6).
+  const jours = page.locator('details#weather');
+  const tuiles = jours.locator('.water-summary-grid');
+  await expect(jours).not.toHaveAttribute('open', '');
+  await expect(jours.locator(':scope > summary small')).toContainText('irrigué');
+  await expect(tuiles).toBeHidden();
+  await ouvrirLePli(jours);
+  await expect(tuiles).toBeVisible();
+  // Un jardin, une ligne de 64 px au plus au téléphone, dans « Ce qu'il reste à arroser ».
   const jardins = page.locator('.irrigation-needs-gardens > details');
+  await ouvrirLesPlisAutour(jardins.first());
   const hauteurs = await jardins.evaluateAll((plis) => plis.map((pli) => (pli.querySelector(':scope > summary') as HTMLElement).getBoundingClientRect().height));
   expect(hauteurs.length).toBeGreaterThan(0);
   if (telephone) expect(Math.max(...hauteurs), 'un jardin replié tient sur une ligne').toBeLessThanOrEqual(64);

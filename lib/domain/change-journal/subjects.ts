@@ -42,6 +42,9 @@ const CHANGE_SUBJECTS = {
   'decision-de-planche': { family: 'objectif', label: 'Décision sur le besoin d’une planche' },
   // L'objectif automatique sur l'ET0, allumé ou éteint pour toute la ferme (6 decies, O2 ; D-309, D-317).
   'objectif-automatique': { family: 'objectif', label: 'Objectif automatique' },
+  // L'irrigation ignorée hors saison, sur une portée, et sa reprise (6 quaterdecies, B2 ; D-337, D-352).
+  'jardin-hors-saison': { family: 'objectif', label: 'Mise hors saison' },
+  'reprise-saison': { family: 'objectif', label: 'Reprise de l’irrigation' },
   // Réglages.
   'reglages-du-planning': { family: 'reglage', label: 'Réglages du planning' },
   'creneau-protege': { family: 'reglage', label: 'Créneau protégé' },

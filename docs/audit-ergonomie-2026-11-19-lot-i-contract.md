@@ -146,7 +146,10 @@ de 600 px, le bandeau tient sur une ligne, et sa phrase est le seul
 4. Ferme vierge : la liste à cocher propose un point de départ,
    « Commencer par l'essentiel » (Arrosages, Objectifs et besoins,
    Matériel), sans rien cocher d'office ; « Cochera aussi … » s'écrit en
-   texte ordinaire, pas en vert gras qui ressemble à un lien.
+   texte ordinaire, pas en vert gras qui ressemble à un lien. **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) :
+   « Commencer par l'essentiel » est **retiré**, remplacé par les trois
+   façons de commencer ; « Cochera aussi … » reste dans la liste de
+   « Choisir moi-même ».
 
 ## 7. Tests et preuves
 
@@ -182,7 +185,7 @@ vierge ; puis la remise en état.
 
 - **F451** la bannière compacte du téléphone jusqu'à 1 000 px ; au-dessus, la phrase passe à la ligne sans rétrécir sous 18 caractères (section 5).
 
-- **F452** « Commencer par l'essentiel » coche Arrosages, Objectifs et besoins, Matériel et placement, avec ce dont elles ont besoin, et garde ce qui l'était ; « Cochera aussi … » en texte ordinaire gris (section 6, point 4).
+- **F452** « Commencer par l'essentiel » coche Arrosages, Objectifs et besoins, Matériel et placement, avec ce dont elles ont besoin, et garde ce qui l'était ; « Cochera aussi … » en texte ordinaire gris (section 6, point 4). Retiré depuis S6 (D-336) : les trois façons de commencer le remplacent.
 
 - **F453** le flocon suit aussi une alerte météo sur la température minimale « en dessous de », même au-dessus de 0 °C (section 6, point 1).
 

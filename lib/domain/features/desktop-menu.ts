@@ -1,5 +1,6 @@
 import type { IrrigationPageId } from './pages';
 import { menuPlacePages, PLACE_IDS, placeMark, type PlaceId } from './places';
+import { weekViewSelector, type WeekViewId } from './week-page';
 
 /**
  * Le menu de l'ordinateur (simplification, lot S3, PR 3,
@@ -12,9 +13,9 @@ import { menuPlacePages, PLACE_IDS, placeMark, type PlaceId } from './places';
  *
  * - « Aujourd'hui » : la page « Aujourd'hui » dans son encart, avec sa
  *   pastille (F12), puis « Arrosages » ;
- * - « Semaine » : un titre, lien vers la première page cochée de la semaine
- *   (S3-a ; S4 lui donnera sa page), puis Planning de la semaine, Objectifs
- *   et besoins, Historique et cumuls ;
+ * - « Semaine » : un titre, lien vers la page « Semaine » (lot S4,
+ *   précision S4-m), puis ses deux vues, « La semaine » et « Les cumuls »,
+ *   quand la ferme a les deux ;
  * - « Ma ferme » : un titre, lien vers la page « Ma ferme », puis ses fiches
  *   dans l'ordre de la section 5, Réglages comprise : elle n'est plus à part.
  *
@@ -34,6 +35,13 @@ type MenuPlace = {
   mark: 'page' | 'true' | null;
   /** Les pages sous le titre ; l'entrée n'y est pas quand elle porte le nom de l'endroit (« Aujourd'hui », « Ma ferme »). */
   pages: IrrigationPageId[];
+  /**
+   * Les vues de « Semaine » sous son titre (S4-m) : « La semaine » et « Les
+   * cumuls » quand la ferme a les deux, sinon aucune ; vide hors de
+   * « Semaine ». Le planning, les besoins et l'historique n'y sont plus des
+   * pages : leur contenu est dans ces vues.
+   */
+  views: WeekViewId[];
 };
 
 export function menuPlaces(menu: readonly IrrigationPageId[], current: IrrigationPageId | null): MenuPlace[] {
@@ -44,6 +52,11 @@ export function menuPlaces(menu: readonly IrrigationPageId[], current: Irrigatio
     // L'endroit qui est lui-même une page : son titre en est le lien, la liste ne la redit pas.
     const own = entry === place;
     const mark = placeMark(place, entry, current);
-    return [{ place, entry, mark: own || mark === null ? mark : 'true', pages: own ? pages.slice(1) : pages }];
+    if (place === 'semaine') {
+      // Le titre mène à la page ; ses vues, quand il y en a deux, la redisent : la vue ouverte y porte la marque.
+      const views = weekViewSelector(menu) ?? [];
+      return [{ place, entry, mark: views.length > 0 && mark !== null ? 'true' : mark, pages: [], views }];
+    }
+    return [{ place, entry, mark: own || mark === null ? mark : 'true', pages: own ? pages.slice(1) : pages, views: [] }];
   });
 }

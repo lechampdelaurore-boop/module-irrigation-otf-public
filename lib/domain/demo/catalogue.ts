@@ -39,7 +39,7 @@ export type DemoProfile = {
   /** Le nom de l'exploitation fictive, le seul que le module donne à la ferme (J9, F292). */
   farmName: string;
   description: string;
-  /** Les cases cochées d'avance ; vide pour la ferme vierge, qui s'ouvre sur la liste à cocher. */
+  /** Les cases cochées d'avance ; vide pour la ferme vierge, qui s'ouvre sur les trois façons de commencer (lot S6). */
   features: readonly FeatureId[];
   moments: readonly DemoMoment[];
 };
@@ -122,9 +122,9 @@ export const DEMO_PROFILES: readonly DemoProfile[] = [
     label: 'Ferme vierge',
     shortLabel: 'Ferme vierge',
     farmName: 'Ferme du Pré Neuf',
-    description: 'La première ouverture : rien de coché, rien de réglé.',
+    description: 'La première ouverture : rien de choisi, rien de réglé.',
     features: [],
-    moments: [shown('ete', 'La première ouverture : la liste des fonctionnalités à cocher, et rien de réglé.')],
+    moments: [shown('ete', 'La première ouverture : les trois façons de commencer, et rien de réglé.')],
   },
 ];
 

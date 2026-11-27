@@ -9,9 +9,7 @@ import { clockText, dateClockText } from '@/lib/domain/clock-text';
  * Aucune règle ici.
  */
 const flow = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
-const longDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 const shortDay = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
-const weekdayAndDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', timeZone: 'UTC' });
 
 export function formatMm(value: number | null) {
   return value === null ? 'inconnu' : millimetersText(value);
@@ -34,15 +32,6 @@ export function formatDateTime(iso: string) {
 }
 
 /** Midi UTC : une date métier ne glisse pas d'un jour selon le fuseau du navigateur. */
-export function formatLongDay(dateKey: string) {
-  return longDay.format(new Date(`${dateKey}T12:00:00Z`));
-}
-
-/** « lundi 2 » : l'en-tête d'une colonne de la semaine en tableau (précision P46). */
-export function formatWeekdayAndDay(dateKey: string) {
-  return weekdayAndDay.format(new Date(`${dateKey}T12:00:00Z`));
-}
-
 export function formatShortDay(dateKey: string) {
   return shortDay.format(new Date(`${dateKey}T12:00:00Z`));
 }

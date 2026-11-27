@@ -1,3 +1,5 @@
+import type { ObjectiveBedReading } from './objective-reading.ts';
+
 /**
  * Notifications only; decisions and water quantities remain on the server.
  * `source` names the block that sends it, so that it does not reread what it
@@ -82,6 +84,12 @@ export const FARM_OBJECTIVE_READ = 'irrigation-farm-objective-read';
 export type FarmObjectiveNotice = {
   weekStart: string;
   objective: { objectiveMm: number | null; withObjective: number; total: number };
+  /**
+   * L'objectif de chaque planche, tel que le besoin l'applique : le volet
+   * « Objectifs de la semaine » en tire ses lignes « automatique » et la
+   * valeur du champ (6 quaterdecies, A1, D-337), sans rien recalculer.
+   */
+  beds: ObjectiveBedReading[];
 };
 
 export function notifyFarmObjectiveRead(notice: FarmObjectiveNotice) {

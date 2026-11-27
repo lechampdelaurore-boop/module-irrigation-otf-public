@@ -152,7 +152,8 @@ test('« Par planche » : ce qui manque à chaque planche, et le geste qui mène
   if (telephone) await verifierCibleTactile(saisir, 'Le lien « Saisir une pluie mesurée »');
   await saisir.click();
   await attendreLaPagePrete(page, 'besoins');
-  await expect(page).toHaveURL(/\/irrigation\/besoins\?.*#manual-rain$/);
+  // L'ancienne adresse mène à la page « Semaine », l'ancre gardée (lot S4, PR 1, F917).
+  await expect(page).toHaveURL(/\/irrigation\/semaine\?.*#manual-rain$/);
   const pluie = page.locator('#manual-rain');
   await expect(pluie).toHaveJSProperty('open', true);
   await pluie.getByLabel('Millimètres').fill('0');

@@ -34,7 +34,10 @@ const MAX_SHARE_ROUNDS = 4;
 const MILLISECONDS_PER_MINUTE = millisecondsFromMinutes(1);
 
 
-export function buildWeeklyPlan(inputs: PlanningInputs, settings: PlanningSettings): WeeklyPlan {
+export function buildWeeklyPlan(given: PlanningInputs, settings: PlanningSettings): WeeklyPlan {
+  // Une planche hors saison n'est pas servie (D-337, D-352) : ni créneau, ni pénurie, ni dose utile ; ses arrosages
+  // déjà validés restent, sans suggestion, jusqu'à ce que la personne les annule ou les garde.
+  const inputs: PlanningInputs = { ...given, needs: given.needs.filter((need) => need.offSeason !== true) };
   const timeZone = inputs.timeZone;
   const now = inputs.now;
   const weekEndAt = localDateStartUtc(addDaysToDateKey(inputs.weekEnd, 1), timeZone);
@@ -65,7 +68,9 @@ export function buildWeeklyPlan(inputs: PlanningInputs, settings: PlanningSettin
   // Les créneaux protégés de la semaine, pour tout le matériel de l'exploitation (D-062, règles 2 et 5).
   const protectedIntervals = protectedIntervalsBetween(inputs.protectedSlots, horizonStart, weekEndAt, timeZone);
   const protectedNamesByBed = new Map<string, string[]>();
-  const context: PlacementContext = { beds: bedsById, chains, ledger, shares, refused, protectedIntervals, days, horizonStart, weekEndAt, timeZone, settings, proposals, now };
+  // Une planche hors saison qu'un matériel partagé arrose encore : la proposition dit son nom et la marque (F1067, B3).
+  const offSeasonBeds = new Map(given.needs.filter((need) => need.offSeason === true).map((need) => [need.bedId, need.bedName]));
+  const context: PlacementContext = { beds: bedsById, offSeasonBeds, chains, ledger, shares, refused, protectedIntervals, days, horizonStart, weekEndAt, timeZone, settings, proposals, now };
 
   for (let round = 0; round < MAX_SHARE_ROUNDS; round += 1) {
     const shareBlocked = new Set<string>();
@@ -242,6 +247,8 @@ function nextCandidate(
 
 type PlacementContext = {
   beds: ReadonlyMap<string, BedState>;
+  /** Les planches hors saison, écartées des besoins, par identifiant, avec leur nom (D-352, F1067). */
+  offSeasonBeds: ReadonlyMap<string, string>;
   chains: ReadonlyMap<string, SupplyChain>;
   ledger: DailyLimitLedger;
   /** Le registre des parts réservées de chaque matériel, quand sa chaîne a un budget fini (D-037). */
@@ -611,9 +618,11 @@ function commitProposal(
       state.proposalIds.push(id);
       if (PRIORITY_RANK[state.priority] < PRIORITY_RANK[highest]) highest = state.priority;
     }
+    const offSeasonName = state ? undefined : context.offSeasonBeds.get(application.otfBedId);
     bedApplications.push({
       bedId: application.otfBedId,
-      bedName: state?.bedName ?? application.otfBedId,
+      bedName: state?.bedName ?? offSeasonName ?? application.otfBedId,
+      ...(offSeasonName === undefined ? {} : { horsSaison: true as const }),
       needBeforeMm: needBefore,
       appliedMm: applied,
       needAfterMm: state?.remainingMm ?? 0,
