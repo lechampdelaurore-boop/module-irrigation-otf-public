@@ -6672,74 +6672,6 @@ constat)** : vers le 5 décembre 2026 pour les jours d'après le calcul de la
 PR 1 (F1004 ; le contrat disait le 11), vers le 1er janvier 2027 pour les
 semaines.
 
-## 6 sexdecies. Extension — Météo multi-modèles, choix du modèle de prévision par ferme (🟡 contrat écrit le 26 novembre 2026, rien n'est codé)
-
-**Choix du porteur, 26 novembre 2026 à 10 h 25** : avancer la météo
-multi-modèles (recherche du 8 novembre 2026, `/mnt/project-files/meteo-modeles/synthese-choix-modeles-meteo.md`).
-Aujourd'hui chaque ferme reçoit un seul modèle, celui que Visual Crossing
-choisit en interne.
-
-**Contrat** (`docs/weather-models-contract.md` v0.1, D-339, écrit sans code,
-Sonnet 5.5 · Moyen, après relecture du dépôt) :
-
-- « Automatique » est le défaut et ne change rien ; aucune ferme existante
-  n'est modifiée par la mise en ligne ;
-- **un seul modèle par ferme**, choisi dans une liste du code
-  (`lib/domain/weather/forecast-models.ts`), filtrée par la zone du lieu ; la
-  liste se tient dans le code parce que plusieurs modèles sont annoncés « en
-  fin de vie » en novembre 2026 ; un modèle retiré ramène la ferme à
-  « Automatique » avec un message ;
-- un modèle choisi se lit chez Open-Meteo : pluie, températures, énergie
-  solaire et ET0 du modèle ; la `source` de chaque ligne (`open-meteo:<modèle>`)
-  dit lequel, dans la table et dans l'archive des prévisions ; une donnée
-  absente reste `null` (D-003) ;
-- au-delà de la portée du modèle (AROME ~2 jours, ARPEGE ~4), le jour entier
-  vient d'« Automatique d'Open-Meteo » et l'écran le dit ;
-- le choix se vérifie par une lecture avant d'être gardé (preuve depuis le
-  Worker que l'endpoint répond) ;
-- une colonne neuve additive sur les préférences météo, aucune table
-  recréée ; lecture par lieu **et** modèle, jamais une ligne partagée entre
-  fermes ;
-- aucune affirmation de qualité tant que le tableau « prévu contre mesuré
-  par modèle » n'existe pas ;
-- **hors version, rangé** : plusieurs modèles à la fois, mode « Prudent »,
-  écart entre modèles, un modèle par usage, correction de biais (une règle
-  agronomique à trancher par le porteur).
-
-**Réseau.** Le conteneur de l'assistant n'atteint pas Open-Meteo
-(`api.open-meteo.com` refusé par le proxy, 26 novembre 2026) : **aucun
-format de réponse n'est connu par un essai réel**. Essai A sur un lanceur
-GitHub (déclenchement manuel, aucun secret) avant le code ; essai B depuis
-le Worker par le premier enregistrement d'un modèle. La phrase « l'endpoint
-Forecast refuse l'infrastructure Cloudflare » de `docs/weather-contract.md`
-n'est pas revérifiée : c'est un doute à lever, pas un fait.
-
-**Licence et budget, tranchés par le porteur le 26 novembre 2026 à 12 h 47.**
-La licence gratuite d'Open-Meteo est « non commerciale » : « on s'en fout »
-pour l'instant ; tout reste gratuit pendant le pilote (pas les moyens de le
-financer), une licence payante est probable ensuite, financée directement
-par la société qui gère Ouvre ta ferme. Aucune question à Open-Meteo, la
-mise en ligne n'attend rien ; le code reste indifférent à l'offre (adresse
-et clé en réglage serveur). Plus aucun point ouvert au porteur.
-
-**Découpage et réglage.** PR 0, l'essai A (script et workflow) : Opus 5.5 ·
-Élevé. PR 1, domaine et adaptateur : Opus 5.5 · Élevé. PR 2, le réglage de la
-ferme, la migration additive, le regroupement par lieu et modèle, le retour à
-« Automatique » : **Opus 5.5 · Max**, une lecture est partagée entre fermes et
-une ligne écrite pour la mauvaise ferme serait discrète et grave (critère 2
-de la grille ; même raison que N3). PR 3, l'écran : Opus 5.5 · Élevé. Jamais
-Fable (D-055).
-
-**Articulation.** L'ET0 horaire (section 6 septendecies) lit le même modèle
-que la ligne du jour de la ferme ; la « prévu contre réalisé » se servira de
-la `source` de l'archive pour comparer les modèles. Aucune des deux n'est
-préalable à celle-ci.
-
-Preuve de fin : les huit familles de tests du § 8 du contrat, l'essai A
-collé dans la PR 1, l'essai B consigné, la recette sur la ferme réelle
-seulement sur l'accord du porteur (retour à « Automatique » vérifié),
-`docs/weather-contract.md` réécrit à la mise en ligne.
-
 ## 6 sexdecies. Extension — Météo multi-modèles, choix du modèle de prévision par ferme (🟡 contrat écrit le 26 novembre 2026, essai A joué le même jour)
 
 **Choix du porteur, 26 novembre 2026 à 10 h 25** : avancer la météo
@@ -6812,7 +6744,7 @@ une ligne écrite pour la mauvaise ferme serait discrète et grave (critère 2
 de la grille ; même raison que N3). PR 3, l'écran : Opus 5.5 · Élevé. Jamais
 Fable (D-055).
 
-**Articulation.** L'ET0 horaire (section 6 quaterdecies) lit le même modèle
+**Articulation.** L'ET0 horaire (section 6 septendecies) lit le même modèle
 que la ligne du jour de la ferme ; la « prévu contre réalisé » se servira de
 la `source` de l'archive pour comparer les modèles. Aucune des deux n'est
 préalable à celle-ci.
