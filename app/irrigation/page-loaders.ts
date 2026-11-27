@@ -1,4 +1,5 @@
 import { getChangeJournalViewForUser } from '@/lib/services/change-journal-view';
+import { readOffSeasonViewForUser } from '@/lib/services/off-season-view';
 import { listEquipmentPlacementsForUser } from '@/db/equipment-placement-repository';
 import { countFeatureDataForUser } from '@/db/feature-data-counts';
 import { listEquipmentPoseHistoryForUser, listEquipmentPosesForUser } from '@/db/equipment-placement-poses';
@@ -151,8 +152,10 @@ async function readBesoins(context: ReadyPageContext) {
     events: irrigationEvents,
     coverage: coverage.beds,
   });
+  // Le bloc « Hors saison » du volet des objectifs (6 quaterdecies, B3) : les portées que les besoins viennent de lire, sans lecture de plus.
+  const offSeason = await readOffSeasonViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot, now: new Date(context.nowIso) });
   // Les irrigations de la saison servent aussi à « Jour par jour » (S4, PR 2, section 5) : aucune lecture de plus.
-  return { waterDashboard, irrigationNeeds, irrigationEvents };
+  return { waterDashboard, irrigationNeeds, irrigationEvents, offSeason };
 }
 
 /**

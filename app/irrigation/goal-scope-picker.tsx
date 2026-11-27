@@ -6,27 +6,33 @@ import {
   countGoalScopeMatches,
   filterGoalScopeChoices,
   goalScopeChoiceGroups,
+  type GoalScopeChoiceGroup,
 } from '@/lib/domain/goal-scope-choices';
 
 /**
  * Le périmètre d'un objectif (audit ergonomique, point 4, 3.8 quater) : une
  * recherche tapée au-dessus de la liste, et la liste rangée par jardin, dans
  * l'ordre naturel des noms. Taper « B9 » ne garde que les planches B9.
+ * `groups` remplace les choix des objectifs : le choix des portées « hors
+ * saison » (6 quaterdecies, B3) a la même recherche et le même rangement.
  */
 export function GoalScopePicker({
   snapshot,
   season,
   value,
   onChange,
+  groups: givenGroups,
 }: {
   snapshot: IrrigationSnapshot;
   season: number;
   value: string;
   onChange: (value: string) => void;
+  groups?: GoalScopeChoiceGroup[];
 }) {
   const [query, setQuery] = useState('');
   const hintId = useId();
-  const groups = useMemo(() => goalScopeChoiceGroups(snapshot, season), [snapshot, season]);
+  const goalGroups = useMemo(() => goalScopeChoiceGroups(snapshot, season), [snapshot, season]);
+  const groups = givenGroups ?? goalGroups;
   const shown = filterGoalScopeChoices(groups, query, value);
   const matches = query.trim() ? countGoalScopeMatches(groups, query) : null;
 

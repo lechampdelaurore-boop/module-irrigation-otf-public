@@ -3,6 +3,7 @@ import { farmObjective, farmObjectivePartial, farmObjectiveScopeText } from '../
 import { mmText, waterText } from '../figure-origin.ts';
 import type { BedIrrigationNeed } from '../irrigation-needs.ts';
 import { groupObjectiveOriginText, type ObjectiveOriginReading } from '../objective-reading.ts';
+import { OFF_SEASON_ANCHOR, offSeasonTileLabel } from '../off-season-view.ts';
 import { percentFromFraction } from '../units.ts';
 import type { WaterDashboardDay } from '../water-management.ts';
 import { MEASURED_RAIN_ANCHOR } from './reliability.ts';
@@ -457,7 +458,10 @@ function waterTodayText(water: NonNullable<TodayWeekInputs['water']>, volume: (v
 function weekLinks(farm: WeekRow): TodayWeek['links'] {
   const besoins = (label: string, anchor: string): TodayTileLink => ({ label, page: 'semaine', anchor });
   return {
-    objective: besoins(farm.objectiveMm === null ? 'Poser un objectif' : 'Modifier les objectifs', WEEK_OBJECTIVES_ANCHOR),
+    // Des planches hors saison : la tuile mène au bloc « Hors saison » du même pli (6 quaterdecies, B3, section 4.4).
+    objective: (farm.objectiveBeds.offSeason ?? 0) > 0
+      ? besoins(offSeasonTileLabel(farm.objectiveBeds.offSeason ?? 0), OFF_SEASON_ANCHOR)
+      : besoins(farm.objectiveMm === null ? 'Poser un objectif' : 'Modifier les objectifs', WEEK_OBJECTIVES_ANCHOR),
     received: farm.sheltered ? besoins('Voir jour par jour', WEEK_DAYS_ANCHOR) : { ...besoins('Noter la pluie', MEASURED_RAIN_ANCHOR), rain: true },
     remaining: besoins(farm.remainingMm === null ? 'Voir ce qui manque' : 'Voir par planche', NEEDS_TABLE_ANCHOR),
     water: besoins('Voir jour par jour', WEEK_DAYS_ANCHOR),

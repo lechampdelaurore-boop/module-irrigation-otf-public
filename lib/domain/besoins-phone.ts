@@ -78,6 +78,8 @@ export function weatherFoldLine(place: string, refreshedAt: string | null, stale
 export interface GardenStateInput {
   effectiveNeedMm: number | null;
   priorityCounts: { high: number };
+  /** Ses planches : toutes hors saison, le jardin le dit (6 quaterdecies, B3). */
+  beds?: readonly { offSeason?: true }[];
 }
 
 /**
@@ -86,6 +88,7 @@ export interface GardenStateInput {
  * ne reste rien, sinon le nombre de planches en priorité haute s'il y en a.
  */
 export function gardenState(garden: GardenStateInput): { text: string; tone: 'unknown' | 'covered' | 'high' | 'normal' } {
+  if (garden.beds !== undefined && garden.beds.length > 0 && garden.beds.every((bed) => bed.offSeason === true)) return { text: 'hors saison', tone: 'unknown' };
   if (garden.effectiveNeedMm === null) return { text: 'à compléter', tone: 'unknown' };
   if (garden.effectiveNeedMm <= 0) return { text: 'couvert', tone: 'covered' };
   if (garden.priorityCounts.high > 0) return { text: plural(garden.priorityCounts.high, 'haute', 'hautes'), tone: 'high' };

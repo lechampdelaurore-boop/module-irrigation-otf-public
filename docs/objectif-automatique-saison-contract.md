@@ -355,3 +355,24 @@ Posées une par une, sur cartes, avec recommandation ; la question 2 est
   l'objectif de chaque planche (`objectiveBedReadings`), à la page comme
   après chaque relecture des besoins : aucune lecture serveur de plus.
 
+
+## 12. Précisions du code, PR B3 (26 novembre 2026, D-353)
+
+Les écrans du filtre sont codés : le bloc « Hors saison » (section 4.4), la
+fenêtre des arrosages prévus (section 10, question 2), la ligne « hors
+saison » au tableau des besoins (section 6), la tuile d'« Aujourd'hui »,
+la marque sur la proposition du planning (F1067) et le « ? » du bloc. Les
+précisions prises en codant, **F1075 à F1086**, sont dans
+`docs/DECISIONS.md`, D-353 (comme celles de B2, D-352). Ce qu'elles
+ajoutent au contrat, sans règle nouvelle :
+
+- « Toute la ferme » n'est pas une portée : le choix ne la propose pas ;
+  « tout le plein champ » et « tout le sous-abri » n'y sont que si la
+  ferme a un jardin de ce mode cette saison (F1077).
+- « Reprendre » n'a pas de fenêtre ; il dit les portées qui couvrent
+  encore l'endroit (F1079).
+- Dans la fenêtre des arrosages prévus, « Ne rien faire » et Échap
+  n'écrivent rien, ni le filtre ni une annulation ; le geste est fait
+  d'abord, puis chaque annulation, par le geste du planning (F1080).
+- Une planche hors saison n'est plus comptée « sans objectif adopté »
+  dans la raison d'un total de jardin inconnu (F1081, précise F282).

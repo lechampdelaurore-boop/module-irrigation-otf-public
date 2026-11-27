@@ -12,6 +12,26 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Ignorer l'irrigation hors saison, B3 : les écrans, codée le
+  26 novembre 2026** (D-353, F1075 à F1086 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4.3 à 4.5, 6
+  et 10 ; roadmap ligne 34), en Opus 5.5 · Élevé, sur une branche qui
+  réunit A1 (#255) et B2 (#256) par fusion. **Le code de la ligne 34 est
+  fini.** Dans le pli « Objectifs de la semaine », le bloc « Hors saison »
+  : les endroits hors saison en puces (« Tout le plein champ · depuis le
+  26 nov. », ses planches) avec « Reprendre » ; « Mettre hors saison »
+  ouvre le choix des cinq portées (tout le plein champ et tout le
+  sous-abri seulement si la ferme en a, les jardins à classer dits) ; s'il
+  y a des arrosages planifiés ou validés sur ces planches, une fenêtre
+  propose « Les annuler » ou « Les garder » (le défaut), l'annulation par
+  le geste du planning, un par un. Le tableau des besoins grise et dit
+  « hors saison » les planches et les jardins, la pluie reste suivie ; la
+  tuile de l'objectif d'« Aujourd'hui » dit « N planches hors saison » et
+  mène au bloc ; une proposition du planning marque la planche hors saison
+  qu'un matériel partagé arrose encore ; le « ? » du bloc dit ce qui
+  continue. Aucune migration. Tests du domaine, parcours nouveau P74 aux
+  deux largeurs. Contrôles : voir la PR. Fusion la dernière de la
+  ligne 34, A1, B1 et B2 en ligne.
 - **Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs,
   codée le 26 novembre 2026** (D-352, F1061 à F1074 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4 à 8 et 10 ;
@@ -30,8 +50,10 @@ registres, elle y renvoie.
   ne change. Fusion après B1 (#245). Depuis la fusion de S6, l'étape
   « Combien je vise par semaine » de la mise en route reçoit aussi le
   filtre et compte comme « Aujourd'hui » (`start-route.ts`, F1071). Le
-  volet d'A1 lit le tableau des besoins : il suit le filtre par lui. Vient
-  B3 (les écrans).
+  volet d'A1 lit le tableau des besoins : il suit le filtre par lui.
+  **En ligne** : #256 fusionnée le 27 novembre 2026 à 8 h 10 (34966c6),
+  déployée à 8 h 58, run 45956606810, les cinq jobs verts, migration 0052
+  appliquée en production et sur la démonstration (consigné par B3).
 - **Ignorer l'irrigation hors saison, B1 : la règle, codée le 26 novembre
   2026** (D-341, F985 à F995 ; contrat
   `docs/objectif-automatique-saison-contract.md`, sections 4, 5 et 8 ;
