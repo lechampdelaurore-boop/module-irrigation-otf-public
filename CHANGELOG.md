@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (contrat : l'objectif automatique se voit ; ignorer l'irrigation hors saison)
+
+- **Contrat écrit, sans code** (D-337, `docs/objectif-automatique-saison-contract.md`) :
+  pourquoi cocher « Objectif automatique » ne remplit rien à l'écran (calculé
+  à la lecture, jamais écrit ; un objectif saisi passe avant), ce que l'écran
+  montrera (liste, champ prérempli, fenêtre d'allumage), et un filtre « hors
+  saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
+  l'historique ne changent pas. Quatre PR de code à venir.
+
 ### Modifié (simplifier l'usage du module, S6, PR 4 : les visites, la ferme vierge, les contrats)
 
 - **La visite guidée parle des trois façons de commencer** (D-336, F976

@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 26 novembre 2026.
+Dernière mise à jour : 27 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -11,6 +11,16 @@ constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
 Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons »).
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
+
+- **L'objectif automatique se voit ; ignorer l'irrigation hors saison :
+  contrat écrit le 26 novembre 2026, sans code** (D-337,
+  `docs/objectif-automatique-saison-contract.md`, roadmap ligne 34, section
+  6 quaterdecies). Cause établie : l'objectif automatique est calculé, pas
+  écrit, le volet reste vide. Quatre PR (A1, B1 à B3) après la fusion de S4
+  et S6 ; le filtre n'ignore que l'irrigation, la pluie et son historique
+  restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
+  filtre se lève à la main seulement, les arrosages planifiés sont proposés
+  à l'annulation.
 
 - **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
   vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
@@ -24,9 +34,11 @@ registres, elle y renvoie.
   contrats validés annotés « Depuis S6 ». Aucune migration, aucun calcul
   changé. Tests ; V6 et V8 suivent. Le parcours P67 (S4) ne borne plus la
   hauteur quand il est lancé après 23 h (le plan y propose quatre
-  arrosages au lieu de deux) : il le dit « hors jeu ». Fusion après la PR 3 (fusionnée à
-  22 h 55), sa mise en ligne vérifiée ; recette dans le Chrome du porteur,
-  sur la ferme vierge, après la mise en ligne et avec son accord.
+  arrosages au lieu de deux) : il le dit « hors jeu ». **Fusionnée** le
+  27 novembre 2026 à 1 h 41 (#238, ee5d5f6), après la mise en ligne de la
+  PR 3, **en ligne à 2 h 20**, run 45918177942, les cinq jobs verts
+  (consigné par le contrat #240) : **S6 est en ligne en entier**. Recette
+  dans le Chrome du porteur, sur la ferme vierge, avec son accord.
 - **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
   fiches de « Ma ferme », codée le 26 novembre 2026** (D-336, F969 à
   F975 ; contrat, sections 7, 14 et 15), en Opus 5.5 · Très élevé,
@@ -42,8 +54,9 @@ registres, elle y renvoie.
   dans Réglages, F972). Aucune migration, aucun calcul changé. Tests ;
   P63 et P70 suivent. Contrôles, contre-épreuves et mesures : voir la PR
   et la section 15 du contrat. **Fusionnée** le 26 novembre 2026 à
-  22 h 55 (#237, 0e8c0e6), après la mise en ligne de la PR 2 ; sa mise en
-  ligne et celle de la PR 4 sont à consigner par la PR suivante.
+  22 h 55 (#237, 0e8c0e6), après la mise en ligne de la PR 2, **en ligne
+  le 27 novembre 2026 à 1 h 40**, run 45901421359, les cinq jobs verts au
+  troisième essai (consigné par le contrat #240).
 - **Simplifier l'usage du module, S6, PR 2 sur 4 : la carte « Mise en
   route », codée le 26 novembre 2026** (D-336, F958 à F968 ; contrat,
   sections 5, 6, 8, 12 et 14), en Opus 5.5 · Très élevé, empilée sur la
