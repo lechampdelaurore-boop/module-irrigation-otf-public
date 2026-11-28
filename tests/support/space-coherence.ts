@@ -41,6 +41,8 @@ type Reference = {
  * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
  * coûts du mois (F662), des nombres du déploiement. La liste préremplie des
  * stades sensibles (migration 0045, F730) : des stades des cultures communes.
+ * La forme de la journée de l'ET0 horaire (migration 0054, D-349) : la forme
+ * d'un lieu, partagée par les fermes de ce lieu.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
@@ -49,6 +51,7 @@ const COMMON_TABLES = new Set([
   'irrigation_crop_sensitive_stage_common',
   'irrigation_operator_notices',
   'irrigation_support_accesses',
+  'irrigation_weather_day_shapes',
   'otf_authentication_failures',
   'otf_call_outcomes',
   'otf_call_pauses',
@@ -109,9 +112,12 @@ const UNDECLARED: Reference[] = [
  * identifiants d'Ouvre ta ferme (zones, parcelles, planches, plantes,
  * séries, cultures), personnes, identifiants choisis par le navigateur pour
  * une seule requête, identifiant d'une lecture complète et de son bail,
- * tirés par le serveur pour cette seule lecture (F362, F384).
+ * tirés par le serveur pour cette seule lecture (F362, F384). La portée d'un
+ * geste « hors saison » (`scope_id`, migration 0052, D-352) : l'identifiant
+ * d'Ouvre ta ferme d'une planche, d'un jardin ou d'une parcelle, ou le mode
+ * de tout le plein champ ou de tout le sous-abri.
  */
-const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_id|plant_id|series_id|cultivation_id|local_id|request_id|read_id|lease_id)$/;
+const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_id|plant_id|series_id|cultivation_id|local_id|request_id|read_id|lease_id|scope_id)$/;
 
 /**
  * Les tables qui désignent une culture de référence par sa clé (`crop_key`) :
@@ -129,10 +135,11 @@ const CROP_KEY_TABLES = [
 
 /**
  * Les colonnes en `_key` qui ne désignent aucune ligne : clé du cache, d'un
- * lieu météo, d'un traitement, d'un sujet d'alerte, et la ferme d'OTF dont le
- * compteur partagé compte les appels (F381).
+ * lieu météo, d'un traitement, d'un sujet d'alerte, la ferme d'OTF dont le
+ * compteur partagé compte les appels (F381), et le lieu d'une lecture météo
+ * partagée (`place_key`, D-349).
  */
-const NOT_A_ROW_KEY = /^(?:cache_key|location_key|job_key|subject_key|pace_key)$/;
+const NOT_A_ROW_KEY = /^(?:cache_key|location_key|job_key|subject_key|pace_key|place_key)$/;
 
 const SYSTEM_TABLE = /^(?:sqlite_|_cf_|d1_migrations$|__drizzle)/;
 

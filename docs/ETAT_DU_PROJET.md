@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 26 novembre 2026.
+Dernière mise à jour : 28 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -22,8 +22,319 @@ registres, elle y renvoie.
   réglage de durée de S5 passe derrière « Saisir une durée », dans « Plus
   d'options » ; « Déjà fait » ne change pas. Aucun calcul ni aucune
   écriture changés. Tests ; P64 et P65 réécrits, P24, P31, P37, P38 et
-  P40 suivent. Contrôles : voir la PR. Sa fusion vient à son tour, après
-  la file en cours (S6, puis les PR à partir de #240).
+  P40 suivent. Contrôles : voir la PR. Mise à jour avec `main` le
+  28 novembre 2026, à son tour après la ligne 37. Consigne la mise en
+  ligne de HR2 (#253, 4ede30b, run 46127984783, en ligne le 28 novembre
+  2026 à 10 h 35, cinq jobs verts) et de HR3 (#254, cc1e43e, run
+  46132250984, en ligne à 11 h 30, cinq jobs verts) : **l'ET0 horaire
+  (ligne 37) est en ligne en entier** ; celle de #261 l'est déjà (par HR1).
+- **L'ET0 horaire, HR3 : « Soif du jour, heure par heure », codée le
+  26 novembre 2026** (D-350, F1043 à F1050 ; contrat
+  `docs/et0-horaire-contract.md`, § 7 ; roadmap ligne 37), en Opus 5.5 ·
+  Élevé, sur la branche de HR2 : en tête du pli « Le détail »
+  d'« Aujourd'hui », la phrase du reste à venir, la courbe d'une barre par
+  heure (l'heure en cours marquée), la forte évaporation, le « ? » ; la
+  forme de la source de l'ET0 du jour de la ferme, sinon la forme
+  théorique, dite ; sans ET0 du jour, « Pas de courbe : l'ET0 du jour
+  manque. ». Aucun calcul existant changé. Parcours P73. Contrôles : voir
+  la PR. La ligne 37 est codée en entier ; fusions dans l'ordre. Consigne
+  la mise en ligne de HR1 (#252, c8e325a, run 46124178071, en ligne le
+  28 novembre 2026 à 9 h 53, cinq jobs verts) ; HR2 (#253, 4ede30b,
+  fusionnée à 9 h 54) est consignée par la PR suivante.
+- **L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger,
+  codée le 26 novembre 2026** (D-349, F1036 à F1042 ; contrat
+  `docs/et0-horaire-contract.md`, § 5, § 9 et § 11 ; roadmap ligne 37), en
+  Opus 5.5 · Élevé, sur la branche de HR1. Heures d'ET0 d'Open-Meteo dans
+  le même appel ; pour Visual Crossing, heures de la prévision seulement
+  (un seul enregistrement, vérifié sur ses pages ; `queryCost`
+  journalisé) et ET0 horaire FAO-56 calculée par le module ; table
+  additive `irrigation_weather_day_shapes` (migration 0054),
+  J0 à J+2 par lieu et par source, écrite au matin et aux relectures, purgée
+  après 8 jours ; une écriture en échec ne change rien à la météo. Aucun
+  écran, aucun calcul existant changé. Contrôles : voir la PR (`pnpm e2e`
+  joué par la CI). Vient HR3 (l'écran). Consigne la mise en ligne du
+  contrat (#243, 2bfd9cf, run 46119745752, en ligne le 28 novembre 2026 à
+  9 h 04, cinq jobs verts).
+- **L'ET0 horaire, HR1 : la forme de la journée, domaine pur, codée le
+  26 novembre 2026** (D-348, F1031 à F1035 ; contrat
+  `docs/et0-horaire-contract.md`, § 4 et § 11 ; roadmap ligne 37), en
+  Opus 5.5 · Élevé, sur la branche de la PR 3 de la météo multi-modèles,
+  contrat #243 fusionné dedans. `lib/domain/weather/hourly-et0.ts` : les
+  heures du jour du lieu (23, 24 ou 25), les parts, la forme théorique du
+  soleil, la meilleure source, le consommé et le reste, la plage de forte
+  évaporation ; 22 tests (scénarios 1 à 6, 8 et 9). Aucune base, aucun
+  appel, aucun écran ; aucun calcul existant changé. Contrôles : voir la
+  PR (`pnpm e2e` omis : ni l'interface ni ses services ne changent).
+  Viennent HR2 (lecture, table, purge) et HR3 (écran) ; fusion à son tour,
+  après #243 et la météo multi-modèles. Consigne la mise en ligne de la
+  correction du week-end (#262, 8419477, run 46107116135, en ligne le
+  28 novembre 2026 à 6 h 17, cinq jobs verts) et de la clôture de la
+  ligne 36 (#261, 2841013, run 46111653877, en ligne à 7 h 15, cinq jobs
+  verts).
+
+- **Météo multi-modèles : ligne 36 close le 27 novembre 2026.** La PR 3
+  (#251) est **en ligne depuis 23 h 31** (squash 4e24d94, run 46072042226,
+  cinq jobs verts) : tout le chantier est en ligne (#242, #248 à #251).
+  **Essai B et recette sur la ferme réelle conformes vers 23 h 55**, avec
+  l'accord du porteur (carte de 23 h 54), dans son Chrome : Météo-France
+  enregistré, la lecture qui le vérifie a réussi depuis le Worker (l'endpoint
+  Forecast d'Open-Meteo répond au site, contrairement à la phrase d'avant),
+  « Prévisions gardées : ce modèle jusqu'au mar. 1 déc. », puis retour à
+  « Automatique » et à la lecture d'avant (Visual Crossing). Contrat § 15 ;
+  compte rendu `/mnt/project-files/meteo-modeles/recette-modele-prevision-2026-11-27.md`.
+  `docs/weather-contract.md` réécrit (fournisseur, source, décompte des
+  appels, licence). Le journal `weather_forecast_model_verified` n'a pas
+  été lu (pas d'accès aux journaux Cloudflare).
+- **La météo du lundi dans « Aujourd'hui », le week-end : corrigée le
+  28 novembre 2026** (D-357, F1100 ; point ouvert 70), en Opus 5.5 ·
+  Élevé (corrections, les tests et la CI jugent). La lecture de la
+  semaine en cours à la consultation s'arrêtait au dimanche ; un samedi ou
+  un dimanche, le troisième jour d'« Aujourd'hui » restait sans prévision
+  hors de la tâche du matin, et P29 échouait sur toute branche, `main`
+  comprise. Elle va désormais jusqu'au troisième jour. Test du domaine et
+  P29 rouges avant, verts après ; contrôles : voir la PR. Fusionnée le
+  28 novembre 2026 (#262, 8419477), avant #261 et #259, qu'elle débloque.
+- **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
+  26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
+  § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
+  PR 2. Dans « Réglages », la carte « Lieu de la météo » porte un pli fermé
+  (sa ligne dit le modèle gardé) avec la liste des modèles qui couvrent le lieu (« Automatique » d'abord), la phrase de la
+  règle 12, les faits du modèle sans mot de qualité et « Enregistrer le
+  modèle », qui vérifie par une lecture ; la carte dit jusqu'à quel jour les
+  prévisions gardées viennent du modèle et, une semaine durant, le retour du
+  module à « Automatique ». Absent en démonstration. Parcours P72 aux deux
+  largeurs. **Première PR où une ferme peut choisir** : le premier
+  enregistrement en ligne fera l'essai B. Contrôles : voir la PR. Le
+  contrat (#242), la PR 0 (#248) et la PR 1 (#249) sont en ligne depuis le
+  27 novembre 2026, la PR 2 (#250) depuis 21 h 46 ; celle-ci la suit,
+  `main` fusionnée dedans ; elle consigne la mise en ligne de la PR 2.
+- **Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par
+  lieu et par modèle, codée le 26 novembre 2026** (D-346, F1016 à F1022 ;
+  contrat v0.2, § 3, § 5, § 6, § 8 ; roadmap ligne 36), en Opus 5.5 · Max,
+  sur la branche de la PR 1, mise à jour avec `main` par fusion le
+  27 novembre 2026. Une colonne additive `forecast_model` sur les
+  préférences météo (migration 0053 : le numéro libre après la 0051 de S6
+  et la 0052 du hors saison) ; la tâche du matin, la relecture de la
+  journée et l'écran lisent par lieu et par modèle, et chaque ferme écrit
+  ses lignes ; enregistrer un modèle le vérifie d'abord par une lecture,
+  puis remplace les jours à venir, jamais les jours passés ni l'archive ;
+  un modèle sorti de la liste ramène la ferme à « Automatique », au journal
+  au nom du module. Aucune ferme ne choisit avant l'écran (PR 3) : une
+  ferme en « Automatique » lit exactement comme avant. Contrôles : voir la
+  PR ; `pnpm e2e` joué par la CI (job « Parcours navigateur »), les
+  services de l'écran changent. Consigne la mise en ligne du contrat
+  (#242), de la PR 0 (#248) et de la PR 1 (#249). **En ligne le
+  27 novembre 2026 à 21 h 46** (#250, run 46060219139, cinq jobs verts ;
+  migration 0053 appliquée en production et sur la démonstration).
+- **Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un
+  modèle choisi, codée le 26 novembre 2026** (D-345, F1009 à F1015 ;
+  contrat v0.2, § 3 à § 5, § 10, § 14 ; roadmap ligne 36), en Opus 5.5 ·
+  Élevé, sur la branche de la PR 0. La liste des cinq modèles dans
+  `lib/domain/weather/forecast-models.ts` ; l'adaptateur lit un modèle et
+  « Automatique d'Open-Meteo » en un appel, refuse une réponse incomplète,
+  et chaque jour dit son modèle ; l'offre payante d'Open-Meteo se règle par
+  `OPEN_METEO_API_BASE_URL` et `OPEN_METEO_API_KEY`, sans code. Rien ne
+  l'appelle encore : aucun écran, aucune base, aucun calcul ne change en
+  ligne. Contrôles : voir la PR ; `pnpm e2e` omis, ni l'interface ni ses
+  services ne changent. Vient la PR 2 (le réglage de la ferme, Opus 5.5 ·
+  Max). **En ligne** : #249 fusionnée le 27 novembre 2026 à 19 h 12
+  (ab80a1b), déployée à 20 h 05, run 46047735579, les cinq jobs verts
+  (consigné par la PR 2).
+- **Météo multi-modèles, PR 0 : l'essai A, écrit et joué le
+  26 novembre 2026** (contrat `docs/weather-models-contract.md` v0.2,
+  § 7 et § 14 ; roadmap section 6 sexdecies, ligne 36), en Opus 5.5 ·
+  Élevé, sur la branche du contrat (#242) avec `main` fusionnée. Un flux
+  GitHub à la main (ou sur la branche `essai-modeles-meteo`), huit appels
+  à l'API gratuite d'Open-Meteo, sans clé ni secret, deux lieux
+  quelconques. Joué deux fois (runs 45827003670 et 45827275586, verts) :
+  la liste du contrat est confirmée, les séries sont suffixées par le
+  modèle dès deux modèles, un jour n'a de valeur que s'il est entier,
+  Météo-France rend 4 jours et ICON 7. Aucun écran, aucun calcul, aucune
+  base ne change. Contrôles : voir la PR ; `pnpm e2e` omis, ni
+  l'interface ni ses services ne changent. Le code du module commence
+  avec la PR 1. **En ligne** : #248 fusionnée le 27 novembre 2026 à
+  18 h 24 (5a1b519), déployée à 19 h 12, run 46041553937, les cinq jobs
+  verts (consigné par la PR 2).
+- **Météo multi-modèles, contrat écrit le 26 novembre 2026, sans code**
+  (D-339, `docs/weather-models-contract.md` v0.1, roadmap section 6
+  sexdecies, ligne 36), en Sonnet 5.5 · Moyen : un seul modèle de prévision
+  Open-Meteo par ferme, « Automatique » (la lecture actuelle) restant le
+  défaut ; liste tenue dans le code ; la `source` des lignes dit le modèle.
+  Le conteneur n'atteint pas Open-Meteo : essai A sur un lanceur GitHub
+  avant le code. **Licence et budget tranchés par le porteur le
+  26 novembre 2026 à 12 h 47** : gratuit pendant le pilote, licence payante
+  probable ensuite, financée par OTF ; rien n'attend. Aucun contrôle rejoué (PR de registres, sans
+  code). **En ligne** : #242 fusionnée le 27 novembre 2026 à 17 h 28
+  (91270d5), déployée à 18 h 19, run 46033860657, les cinq jobs verts
+  (consigné par la PR 2).
+- **La météo prévue contre la météo réalisée, PR 2 sur 2 : le pli, la
+  démonstration et les parcours, codée le 26 novembre 2026** (D-344, F1005 à
+  F1008), en Opus 5.5 · Élevé, sur la branche de la PR 1 : **le code du
+  chantier est fini.** Sur « Semaine », dans « Le détail » (les blocs
+  d'« Objectifs et besoins »), le pli fermé « La météo
+  s'est-elle vérifiée ? », lu à son ouverture : phrase de tête, deux
+  tableaux (la pluie, la soif du jour), la pluie notée, les réserves. La
+  démonstration reçoit une archive semée, étiquetée « Exemple » (cumul de la
+  semaine à « 3 sur 4 », F1005). Parcours P71 et V12. Aucun calcul, aucune
+  migration. Contrôles : voir la PR. **En ligne** : le contrat (#241) le
+  27 novembre 2026 à 13 h 48 (run 45994373719), la PR 1 (#246) à 14 h 39
+  (run 46002240528), les cinq jobs verts chaque fois. Restent la fusion de
+  cette PR, la recette sur la démonstration en ligne, puis le constat des premiers
+  chiffres de la vraie ferme, avec l'accord du porteur.
+- **Ligne 34 : recette sur la démonstration conforme, trois écarts
+  d'affichage corrigés, le 27 novembre 2026** (D-356, F1097 à F1099 ;
+  roadmap ligne 34), en Opus 5.5 · Élevé. La ligne « automatique » d'un
+  jardin dit sur combien de planches porte sa moyenne (« Clos des saules ·
+  1 planche sur 2 ») ; un jardin tout hors saison dit « Hors saison : ni
+  besoin ni volume » dans le tableau des besoins, jamais « non
+  calculable » ; « Eau de la semaine » d'« Aujourd'hui » et « Jardin par
+  jardin » de « Semaine » le disent « hors saison », sans « Lui en donner
+  une », et ses planches ne comptent plus « sans eau visée ». Aucune
+  migration. Consigne la mise en ligne de B3 (#257). Contrôles : voir la
+  PR.
+- **La météo prévue contre la météo réalisée, PR 1 sur 2 : le calcul et la
+  lecture, codée le 26 novembre 2026** (D-343, F998 à F1004 ; contrat,
+  sections 3 à 5, 7 et 8), en Opus 5.5 · Élevé, lancée sur le mandat du
+  porteur d'enchaîner les chantiers seul. Le domaine
+  `lib/domain/weather/forecast-reliability.ts`, la lecture
+  `db/forecast-reliability-repository.ts` (exploitation et lieu actuel
+  seulement), le service `lib/services/forecast-reliability.ts`. **Aucun
+  écran** : rien ne change pour la ferme. Aucun calcul existant, aucune
+  migration, aucune écriture, aucun appel externe. Premiers chiffres de la
+  vraie ferme vers le 5 décembre 2026 d'après le calcul (F1004 ; le
+  contrat disait le 11), à confirmer. Contrôles : voir la PR. Vient la PR 2
+  (le pli, la démonstration, le parcours).
+- **La météo prévue contre la météo réalisée : contrat écrit le 26 novembre
+  2026, sans code** (D-338, `docs/forecast-reliability-contract.md`, roadmap
+  section 6 quindecies, ligne 35), sur l'archive des prévisions (D-297) :
+  pluie et ET0, à un jour, à quelques jours et sur la semaine ; un pli fermé
+  sur « Objectifs et besoins », aucun chiffre sans 14 jours, aucun verdict en
+  mots. Aucun calcul, migration, écriture ni budget. Deux PR de code (Opus 5.5
+  · Élevé).
+- **Ignorer l'irrigation hors saison, B3 : les écrans, codée le
+  26 novembre 2026** (D-353, F1075 à F1086 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4.3 à 4.5, 6
+  et 10 ; roadmap ligne 34), en Opus 5.5 · Élevé, sur une branche qui
+  réunit A1 (#255) et B2 (#256) par fusion. **Le code de la ligne 34 est
+  fini.** Dans le pli « Objectifs de la semaine », le bloc « Hors saison »
+  : les endroits hors saison en puces (« Tout le plein champ · depuis le
+  26 nov. », ses planches) avec « Reprendre » ; « Mettre hors saison »
+  ouvre le choix des cinq portées (tout le plein champ et tout le
+  sous-abri seulement si la ferme en a, les jardins à classer dits) ; s'il
+  y a des arrosages planifiés ou validés sur ces planches, une fenêtre
+  propose « Les annuler » ou « Les garder » (le défaut), l'annulation par
+  le geste du planning, un par un. Le tableau des besoins grise et dit
+  « hors saison » les planches et les jardins, la pluie reste suivie ; la
+  tuile de l'objectif d'« Aujourd'hui » dit « N planches hors saison » et
+  mène au bloc ; une proposition du planning marque la planche hors saison
+  qu'un matériel partagé arrose encore ; le « ? » du bloc dit ce qui
+  continue. Aucune migration. Tests du domaine, parcours nouveau P74 aux
+  deux largeurs. **En ligne : #257, fusionnée le 27 novembre 2026 à
+  10 h 06, en ligne à 10 h 56, run 45970882756** (consigné par D-356).
+- **Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs,
+  codée le 26 novembre 2026** (D-352, F1061 à F1074 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4 à 8 et 10 ;
+  roadmap ligne 34), en Opus 5.5 · Max, empilée sur B1 (#245). Les gestes
+  « Mettre hors saison » et « Reprendre » sont enregistrés (table
+  `irrigation_off_season_revisions`, **migration 0052**, 0051 recalée
+  après S6, qui l'a prise), un geste sans effet n'écrit rien,
+  le journal des modifications les dit. Le tableau des besoins, le
+  planning, la faisabilité et la pénurie, « Aujourd'hui », l'historique,
+  les séries, l'aide du formulaire et les fiches reçoivent le filtre ; la
+  liste des arrosages planifiés à proposer à l'annulation est prête pour
+  B3. La pluie, la réserve du sol, l'ET0, l'archive, les alertes et les
+  semaines closes ne le lisent jamais (garde à deux fermes sur la base,
+  garde des imports). **Aucun écran ne l'allume : rien ne change en
+  ligne.** Contrôles : voir la PR ; parcours navigateur omis, aucun écran
+  ne change. Fusion après B1 (#245). Depuis la fusion de S6, l'étape
+  « Combien je vise par semaine » de la mise en route reçoit aussi le
+  filtre et compte comme « Aujourd'hui » (`start-route.ts`, F1071). Le
+  volet d'A1 lit le tableau des besoins : il suit le filtre par lui.
+  **En ligne** : #256 fusionnée le 27 novembre 2026 à 8 h 10 (34966c6),
+  déployée à 8 h 58, run 45956606810, les cinq jobs verts, migration 0052
+  appliquée en production et sur la démonstration (consigné par B3).
+- **Ignorer l'irrigation hors saison, B1 : la règle, codée le 26 novembre
+  2026** (D-341, F985 à F995 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, sections 4, 5 et 8 ;
+  roadmap ligne 34), en Opus 5.5 · Max, sur la branche du contrat.
+  `lib/domain/off-season.ts` : le filtre d'une ferme à partir de ses gestes
+  datés, cinq portées, le jour compté en heure de Paris ; `objectiveForBed`
+  le reçoit jour par jour ; le tableau des besoins et l'objectif de la
+  ferme sortent les planches hors saison de leurs comptes et les disent à
+  part. **Filtre toujours vide : rien ne change en ligne.** Les dix cas et
+  les gardes (pluie, ET0, irrigation, réserve du sol, alertes jamais
+  touchées) dans `tests/hors-saison-regle.test.ts`. Contrôles : voir la PR.
+  Fusion après A1 (#255) ; viennent B2 et B3 (le stockage et les lecteurs,
+  puis les écrans). **En ligne** : #245 fusionnée le 27 novembre 2026 à
+  6 h 28 (2ea0252), déployée à 7 h 15, run 45946029675, les cinq jobs
+  verts (consigné par B2).
+
+- **L'objectif automatique se voit et se modifie, PR A1 : codée le
+  26 novembre 2026** (D-351, F1051 à F1060 ; contrat
+  `docs/objectif-automatique-saison-contract.md`, section 3, roadmap
+  ligne 34), en Opus 5.5 · Élevé, sur la branche de S6 PR 4 (#238) et du
+  contrat (#240). Réglage allumé, le volet « Objectifs de la semaine »
+  liste une ligne « automatique » par jardin (et par planche qui s'en
+  écarte) avec ses mm et leur origine, « Corriger » ; le champ
+  « mm / semaine » montre la valeur en vigueur de l'endroit choisi,
+  marquée ; un objectif saisi dit « saisi » avec « Revenir à
+  l'automatique » (le geste « vider » de cet endroit seul) ; allumer avec
+  des objectifs saisis ouvre une fenêtre (garder, vider en rouge,
+  annuler) ; une phrase de résultat sous l'interrupteur. Rien n'est écrit
+  chaque matin, aucune migration, aucun calcul changé ; réglage éteint,
+  l'écran d'avant. Tests du domaine et de persistance, P58 repris aux deux
+  largeurs. Contrôles : voir la PR. S4, S6 et le contrat (#240) en ligne,
+  A1 se fusionne la première de la ligne 34 ; puis B1, B2 et B3, une à la
+  fois. **En ligne** : #255 fusionnée le 27 novembre 2026 à 4 h 50
+  (6a8ff96), déployée à 5 h 40, run 45936521667, les cinq jobs verts
+  (consigné par B1).
+- **L'objectif automatique se voit ; ignorer l'irrigation hors saison :
+  contrat écrit le 26 novembre 2026, sans code** (D-337,
+  `docs/objectif-automatique-saison-contract.md`, roadmap ligne 34, section
+  6 quaterdecies). Cause établie : l'objectif automatique est calculé, pas
+  écrit, le volet reste vide. Quatre PR (A1, B1 à B3) après la fusion de S4
+  et S6 ; le filtre n'ignore que l'irrigation, la pluie et son historique
+  restent. Ses deux questions sont répondues (12 h 37, heure de Paris) : le
+  filtre se lève à la main seulement, les arrosages planifiés sont proposés
+  à l'annulation. **En ligne** : #240 fusionnée le 27 novembre 2026 à
+  3 h 14 (83c51ad), déployée à 4 h 06, run 45927191810, les cinq jobs verts
+  (consigné par A1).
+
+- **Simplifier l'usage du module, S6, PR 4 sur 4 : les visites, la ferme
+  vierge et les contrats, codée le 26 novembre 2026** (D-336, F976 à
+  F982 ; contrat, sections 10, 11 et 15), en Opus 5.5 · Très élevé,
+  empilée sur la PR 3 (#237). **Le code de S6 est fini.** Sur l'écran de
+  la première ouverture, les deux étapes de « Le module à la carte »
+  disent les trois façons de commencer, sans étape ajoutée ni retirée ;
+  la ferme vierge de la démonstration s'annonce ainsi et « Remettre à
+  zéro » la rend vierge, sans façon ni état de carte ; le « ? » de « Ma
+  ferme » suit la carte et les lignes d'état (écart dit, F980) ; sept
+  contrats validés annotés « Depuis S6 ». Aucune migration, aucun calcul
+  changé. Tests ; V6 et V8 suivent. Le parcours P67 (S4) ne borne plus la
+  hauteur quand il est lancé après 23 h (le plan y propose quatre
+  arrosages au lieu de deux) : il le dit « hors jeu ». **Fusionnée** le
+  27 novembre 2026 à 1 h 41 (#238, ee5d5f6), après la mise en ligne de la
+  PR 3, **en ligne à 2 h 20**, run 45918177942, les cinq jobs verts
+  (consigné par le contrat #240) : **S6 est en ligne en entier**. Recette
+  dans le Chrome du porteur, sur la ferme vierge, avec son accord.
+- **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
+  fiches de « Ma ferme », codée le 26 novembre 2026** (D-336, F969 à
+  F975 ; contrat, sections 7, 14 et 15), en Opus 5.5 · Très élevé,
+  empilée sur la PR 2 (#236). Chaque fiche dit son état en une ligne
+  quand la donnée est connue (matériel posé ou non, une ressource et son
+  débit ou une réserve à sa date, les cultures de la saison, les
+  parcelles sans sol, les alertes réglées, la commune de la météo et les
+  cases cochées), sinon la ligne fixe de S3 ; « Alertes cultures » garde
+  sa ligne fixe. Une seule lecture pour la carte et les fiches (l'étape 1
+  compte désormais tout le matériel actif, comme l'inventaire) ; deux
+  lectures nouvelles et légères. **Écart dit** : « Besoin par culture »
+  dit ses cultures de la saison, pas les espèces à rattacher (comptées
+  dans Réglages, F972). Aucune migration, aucun calcul changé. Tests ;
+  P63 et P70 suivent. Contrôles, contre-épreuves et mesures : voir la PR
+  et la section 15 du contrat. **Fusionnée** le 26 novembre 2026 à
+  22 h 55 (#237, 0e8c0e6), après la mise en ligne de la PR 2, **en ligne
+  le 27 novembre 2026 à 1 h 40**, run 45901421359, les cinq jobs verts au
+  troisième essai (consigné par le contrat #240).
 - **Simplifier l'usage du module, S6, PR 2 sur 4 : la carte « Mise en
   route », codée le 26 novembre 2026** (D-336, F958 à F968 ; contrat,
   sections 5, 6, 8, 12 et 14), en Opus 5.5 · Très élevé, empilée sur la
@@ -38,8 +349,9 @@ registres, elle y renvoie.
   `farmObjective`, l'étape 5 par `parcelsWithoutSoil`. Aucune migration,
   aucun calcul changé. Tests ; P70 nouveau ; P29 et P63 suivent.
   Contrôles, contre-épreuves et mesures : voir la PR et la section 15 du
-  contrat. Viennent les PR 3 (les lignes d'état des fiches) et 4 ; fusion
-  après la PR 1 (fusionnée à 21 h 32), sa mise en ligne vérifiée.
+  contrat. **Fusionnée** le 26 novembre 2026 à 22 h 10 (#236, 57fddd7),
+  après la mise en ligne de la PR 1, **en ligne à 22 h 47**, run
+  45896237598, les cinq jobs verts (consigné par S6, PR 4).
 - **Simplifier l'usage du module, S6, PR 1 sur 4 : les trois façons de
   commencer, codée le 26 novembre 2026** (D-336, F947 à F957 ; contrat,
   sections 3, 4, 9, 12 et 14), en Opus 5.5 · Très élevé, sur la branche de
@@ -58,7 +370,8 @@ registres, elle y renvoie.
   volontaire conseillé avant sa mise en ligne (S6-m). Viennent les PR 2
   (la carte « Mise en route »), 3 et 4 ; fusion après le contrat #218 et
   la dernière PR de S4. **Fusionnée** le 26 novembre 2026 à 21 h 32
-  (#235, a51c4fb) ; sa mise en ligne est à consigner par S6, PR 3. La même
+  (#235, a51c4fb), **en ligne à 22 h 08**, run 45891793153, les cinq jobs
+  verts, migration 0051 appliquée (consigné par S6, PR 3). La même
   PR donne 75 minutes au job des parcours navigateur au lieu de 50 (sa
   vérification avait été coupée à 50, run 45880035932).
 - **Simplifier l'usage du module, S4, PR 4 sur 4 : les liens, la visite,
@@ -148,8 +461,19 @@ registres, elle y renvoie.
   **653 px** au téléphone avec un arrosage en cours (800 px avant, budget
   700 px, borne de P64) ; 298 px sans, inchangé ; l'ordinateur ne change
   pas. Aucun calcul ni aucune écriture changés. Contrôles : voir la PR.
-  Sa fusion vient à son tour, après les PR de S4 et de S6 qui passent
-  avant.
+  **En ligne** : #244 fusionnée le 26 novembre 2026 à 13 h 57 (fd53c65),
+  avant S4 et S6, déployée à 14 h 37, run 45824529849, les cinq jobs
+  verts ; recette sur la démonstration le même jour vers 18 h 45,
+  conforme : « 1. Où ? » à 630 px avec un arrosage en cours, 674 px par
+  le « + », bandeau de la démonstration compris (825 px avant) (consigné
+  par B2).
+
+- **L'ET0 horaire, contrat écrit le 26 novembre 2026, sans code** (D-340,
+  `docs/et0-horaire-contract.md`, roadmap ligne 37, section 6
+  septendecies) : l'ET0 du jour reste la référence, l'heure donne la
+  forme de la journée ; **« Informer seulement », choix du porteur (question
+  1 sur 3)** ; questions 1 à 3 tranchées par le porteur. Trois PR de code à venir, HR1 à
+  HR3, Opus 5.5 · Élevé. Rien de codé, aucun contrôle de code lancé.
 - **Simplifier l'usage du module, S5, PR 3 sur 3 : l'entrée de la page et
   les mots, codée le 25 novembre 2026** (D-334, F908 à F915 ; contrat,
   sections 6.1, 7, 9.1 et 10), en Opus 5.5 · Élevé, sur la branche de la
@@ -11078,6 +11402,14 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    à 18 h 56) : le jeton se vérifie à l'heure réelle. **Fermé le
    14 novembre 2026** : la recette réelle de la démonstration est conforme
    (19 h 53) et un invité s'y est connecté (20 h 53).
+70. 🟡 **Ouvert le 28 novembre 2026 par la PR #261** (run 46080341539
+   et sa relance) : P29 échouait chaque samedi et chaque dimanche, sur
+   toute branche, `main` comprise : « Gel ou chaleur » disait
+   « Prévision indisponible le lun. », la lecture de la semaine en cours
+   s'arrêtant au dimanche. **Corrigé en branche le 28 novembre 2026**
+   (D-357, F1100, `fix/meteo-aujourdhui-trois-jours`) : la lecture va
+   jusqu'au troisième jour d'« Aujourd'hui ». Se ferme à la fusion et à la
+   mise en ligne.
 
 ## Procédure de reprise rapide
 

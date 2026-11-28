@@ -315,7 +315,11 @@ deux lots.
    l'en-cours en tête. « Tout est fait (n) » reste en tête de bloc. Les arrosages
    de demain à valider : la ligne de pied existante (« Demain à 6 h : 3
    arrosages à valider », « Voir au planning »). Rien à faire : l'état vide
-   existant et son lien (L3).
+   existant et son lien (L3). **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : pour une ferme qui n'est pas
+   encore prête (la mise en route a une étape en cours), l'état vide devient
+   le bloc de l'étape en cours (« Votre ferme n’est pas encore prête à
+   proposer des arrosages. », la phrase de l'étape, « Continuer l'étape n »,
+   F965) ; « Plus tard » sur « Ma ferme » rend l'état vide.
 4. **Le gel ou la chaleur annoncés** : seulement un jour **en alerte**, en carte,
    comme aujourd'hui ; « Prévision indisponible : à vérifier » en ambre ; le
    « gel annoncé sans alerte posée » (J14) avec son lien « Poser… ». Un jour
@@ -349,7 +353,10 @@ semaine ; « Eau de la semaine » par jardin ; « Réserve du sol » par jardin 
 « Eau disponible » ; « Fiabilité du calcul » en entier ; « Gel ou chaleur », les
 trois jours ; la frise du jour à l'ordinateur (un avant-goût que les cartes
 rendent inutile au premier niveau, précision S2-f). Chaque bloc garde ses
-liens, ses boutons et ses réponses (L1 à L4).
+liens, ses boutons et ses réponses (L1 à L4). Depuis l'ET0 horaire, HR3
+(D-350, `docs/et0-horaire-contract.md`, § 7) : « Soif du jour, heure par
+heure » vient en tête du pli, avant les tuiles ; la ligne de résumé dit
+« la soif heure par heure ».
 
 - **Les ancres existantes ouvrent le pli.** Les liens des notifications, les
   pastilles de l'ordinateur et les liens d'autres pages qui visent `#today-weather`,

@@ -1,6 +1,7 @@
 import { logJsonLine } from '../../adapters/log.ts';
 import { millisecondsFromSeconds } from '../../domain/units.ts';
-import { WeatherProviderError, type WeatherDailyValue, type WeatherProvider } from '../../domain/weather/weather-provider.ts';
+import type { ModelForecastReader, SourcedWeatherDay } from '../../domain/weather/forecast-models.ts';
+import { WeatherProviderError, type WeatherProvider } from '../../domain/weather/weather-provider.ts';
 
 export type { WeatherSyncLocation } from '../../domain/weather/automatic-sync-contract.ts';
 import type { WeatherSyncLocation } from '../../domain/weather/automatic-sync-contract.ts';
@@ -15,9 +16,17 @@ export type WeatherSyncRanges = {
   reanalysis: WeatherSyncRange;
 };
 
-type WeatherEndpointResult =
-  | { status: 'fulfilled'; values: WeatherDailyValue[] }
+/** Les jours lus ; un jour d'un modèle choisi porte la `source` du modèle qui l'a donné (D-345). */
+export type WeatherEndpointResult =
+  | { status: 'fulfilled'; values: SourcedWeatherDay[] }
   | { status: 'rejected'; error: unknown };
+
+/**
+ * La prévision d'un modèle choisi par les fermes d'une lecture
+ * (docs/weather-models-contract.md, § 5 ; D-346) : lue par le lecteur des
+ * modèles, avec les mêmes tentatives que la lecture d'« Automatique ».
+ */
+export type ForecastModelReading = { reader: ModelForecastReader; modelId: string };
 
 export type WeatherFetchOutcome = {
   forecast: WeatherEndpointResult;
@@ -41,6 +50,7 @@ export async function fetchWeatherForLocation({
   bypassCache,
   retry,
   log = logJsonLine,
+  forecastModel = null,
 }: {
   location: WeatherSyncLocation;
   ranges: WeatherSyncRanges;
@@ -48,10 +58,12 @@ export async function fetchWeatherForLocation({
   bypassCache: boolean;
   retry?: WeatherRetryOptions;
   log?: WeatherSyncLogger;
+  /** Le modèle de prévision à lire ; `null` : « Automatique », le fournisseur (règle 1). La réanalyse ne change jamais (règle 7). */
+  forecastModel?: ForecastModelReading | null;
 }): Promise<WeatherFetchOutcome> {
   const [forecast, reanalysis] = await Promise.all([
-    readEndpoint('forecast', ranges.forecast, location, provider, bypassCache, retry, log),
-    readEndpoint('reanalysis', ranges.reanalysis, location, provider, bypassCache, retry, log),
+    readEndpoint('forecast', ranges.forecast, location, provider, bypassCache, retry, log, forecastModel),
+    readEndpoint('reanalysis', ranges.reanalysis, location, provider, bypassCache, retry, log, null),
   ]);
   return { forecast, reanalysis };
 }
@@ -106,17 +118,21 @@ async function readEndpoint(
   bypassCache: boolean,
   retry: WeatherRetryOptions | undefined,
   log: WeatherSyncLogger,
+  forecastModel: ForecastModelReading | null,
 ): Promise<WeatherEndpointResult> {
   if (!range) return { status: 'fulfilled', values: [] };
+  const input = {
+    latitude: location.latitude,
+    longitude: location.longitude,
+    timezone: location.timezone,
+    ...range,
+    bypassCache,
+  };
   try {
-    const values = await withControlledRetry(
-      () => provider[endpoint === 'forecast' ? 'readForecast' : 'readReanalysis']({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        timezone: location.timezone,
-        ...range,
-        bypassCache,
-      }),
+    const values = await withControlledRetry<SourcedWeatherDay[]>(
+      () => (forecastModel !== null && endpoint === 'forecast'
+        ? forecastModel.reader.readModelForecast(input, forecastModel.modelId)
+        : provider[endpoint === 'forecast' ? 'readForecast' : 'readReanalysis'](input)),
       endpoint,
       retry,
       log,

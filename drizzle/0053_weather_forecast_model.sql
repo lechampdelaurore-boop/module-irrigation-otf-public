@@ -1,0 +1,25 @@
+-- La météo multi-modèles, PR 2 (docs/weather-models-contract.md, § 3 règles 1
+-- à 3, § 6 ; D-346) : le modèle de prévision choisi par une ferme, dans la
+-- ligne de ses préférences météo, sans nouvelle table.
+--
+-- `forecast_model` : l'identifiant Open-Meteo du modèle choisi
+-- (`meteofrance_seamless`, `best_match`…). Vide : « Automatique », la lecture
+-- d'avant ce chantier (Visual Crossing, ou Open-Meteo en repli), le défaut.
+-- Aucune valeur n'est écrite pour les lignes existantes : aucune ferme ne
+-- change à la mise en ligne (règle 1).
+--
+-- La liste des modèles vit dans le code (`lib/domain/weather/forecast-models.ts`),
+-- jamais dans la base (§ 4) : la contrainte ne tient que la forme d'un
+-- identifiant (des minuscules, des chiffres, le tiret bas). Un modèle retiré
+-- du code ramène la ferme à « Automatique » (règle 9), sans migration.
+--
+-- La table est déjà dans le plan d'effacement (`SPACE_TABLES`, F563) et dans
+-- l'export de la base : sa colonne suit la ligne.
+--
+-- Numéro : écrite sous 0051, elle a pris le numéro libre à la mise à jour
+-- qui précède sa fusion, après 0051_start_mode_route_state (S6, #235) et
+-- 0052_off_season_revisions (hors saison, #256).
+--
+-- Migration additive (docs/migrations-contract.md) : une colonne acceptant
+-- NULL ; aucune ligne existante ne change.
+ALTER TABLE `irrigation_weather_preferences` ADD `forecast_model` text CONSTRAINT `chk_weather_preferences_forecast_model` CHECK (`forecast_model` IS NULL OR (length(`forecast_model`) BETWEEN 1 AND 64 AND `forecast_model` NOT GLOB '*[^a-z0-9_]*'));

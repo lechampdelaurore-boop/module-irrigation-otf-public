@@ -899,6 +899,34 @@ export const automaticObjectiveRevisions = sqliteTable(
 );
 
 /**
+ * Les gestes « Mettre hors saison » et « Reprendre » d'une ferme (6
+ * quaterdecies, B2, migration 0052 ; D-337, D-352) : chaque ligne met une
+ * portée hors saison, ou la reprend, à partir de son jour, en heure de Paris ;
+ * sans ligne, rien n'est hors saison. Une portée : une planche, un jardin, une
+ * parcelle (identifiant OTF), ou tout le plein champ, tout le sous-abri.
+ */
+export const offSeasonRevisions = sqliteTable(
+  'irrigation_off_season_revisions',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => irrigationWorkspaces.id, { onDelete: 'restrict' }),
+    scopeLevel: text('scope_level', { enum: ['bed', 'plot', 'zone', 'mode'] }).notNull(),
+    scopeId: text('scope_id').notNull(),
+    offSeason: integer('off_season', { mode: 'boolean' }).notNull(),
+    actorUserId: text('actor_user_id').notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    index('idx_off_season_workspace_created').on(table.workspaceId, table.createdAt),
+    check('chk_off_season_scope_level', sql`${table.scopeLevel} IN ('bed', 'plot', 'zone', 'mode')`),
+    check('chk_off_season_scope_id', sql`length(${table.scopeId}) > 0 AND (${table.scopeLevel} <> 'mode' OR ${table.scopeId} IN ('garden', 'greenhouse'))`),
+    check('chk_off_season_value', sql`${table.offSeason} IN (0, 1)`),
+  ],
+);
+
+/**
  * Les semaines closes de l'objectif automatique (6 decies, O3, migration
  * 0048 ; D-318) : une ligne par planche et par semaine close, écrite par la
  * tâche du matin, jamais réécrite ; ses jours allumés, en JSON.
@@ -944,11 +972,17 @@ export const weatherPreferences = sqliteTable(
     lastAutomaticRefreshSuccessAt: text('last_automatic_refresh_success_at'),
     lastAutomaticRefreshError: text('last_automatic_refresh_error'),
     updatedAt: updatedAt(),
+    // Le modèle de prévision choisi (météo multi-modèles, PR 2, migration 0053) : vide, « Automatique ».
+    forecastModel: text('forecast_model'),
   },
   (table) => [
     check(
       'chk_weather_preferences_location',
       sql`(${table.locationMode} = 'otf' AND ${table.customCity} IS NULL AND ${table.customPostcode} IS NULL) OR (${table.locationMode} = 'custom' AND ${table.customCity} IS NOT NULL)`,
+    ),
+    check(
+      'chk_weather_preferences_forecast_model',
+      sql`${table.forecastModel} IS NULL OR (length(${table.forecastModel}) BETWEEN 1 AND 64 AND ${table.forecastModel} NOT GLOB '*[^a-z0-9_]*')`,
     ),
   ],
 );
@@ -1117,6 +1151,30 @@ export const weatherDailyValues = sqliteTable(
       'chk_weather_daily_manual',
       sql`${table.dataKind} != 'manual_precipitation' OR (${table.precipitationMm} IS NOT NULL AND ${table.et0Mm} IS NULL)`,
     ),
+  ],
+);
+
+// La forme de la journée de l'ET0 horaire (migration 0054, docs/et0-horaire-contract.md, D-349) : par lieu, J0 à J+2, 8 jours.
+export const weatherDayShapes = sqliteTable(
+  'irrigation_weather_day_shapes',
+  {
+    placeKey: text('place_key').notNull(),
+    day: text('day').notNull(),
+    source: text('source').notNull(),
+    nature: text('nature', { enum: ['provider-hourly', 'computed-hourly'] }).notNull(),
+    hourCount: integer('hour_count').notNull(),
+    shares: text('shares').notNull(),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.placeKey, table.day, table.source] }),
+    index('idx_day_shapes_day').on(table.day),
+    check('chk_day_shapes_day', sql`${table.day} GLOB '[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]'`),
+    check('chk_day_shapes_nature', sql`${table.nature} IN ('provider-hourly', 'computed-hourly')`),
+    check('chk_day_shapes_hours', sql`${table.hourCount} BETWEEN 23 AND 25`),
+    check('chk_day_shapes_shares', sql`json_valid(${table.shares}) AND json_type(${table.shares}) = 'array' AND json_array_length(${table.shares}) = ${table.hourCount}`),
+    check('chk_day_shapes_source', sql`length(${table.source}) BETWEEN 1 AND 128`),
+    check('chk_day_shapes_place', sql`length(${table.placeKey}) BETWEEN 1 AND 128`),
   ],
 );
 

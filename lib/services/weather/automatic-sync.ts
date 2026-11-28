@@ -9,12 +9,21 @@ import {
   weatherOutcomeError,
   weatherOutcomeNotBeforeAt,
   weatherOutcomeSucceeded,
+  type WeatherEndpointResult,
   type WeatherFetchOutcome,
   type WeatherRetryOptions,
   type WeatherSyncLogger,
 } from './sync-engine.ts';
 import type { WeatherProvider } from '../../domain/weather/weather-provider.ts';
+import {
+  forecastDaysBySource,
+  forecastModelToRead,
+  forecastReadingsAtPlace,
+  resolveForecastModelChoice,
+  type ModelForecastReader,
+} from '../../domain/weather/forecast-models.ts';
 import { archiveForecastReading } from './forecast-archive.ts';
+import { recordDayShapes } from './day-shapes.ts';
 import { weatherFailureKind, type WeatherFailureKind } from '../../domain/operations/morning-task-outcomes.ts';
 
 export type { AutomaticWeatherSyncRepository, AutomaticWeatherTarget } from '../../domain/weather/automatic-sync-contract.ts';
@@ -29,7 +38,11 @@ export type AutomaticWeatherSyncResult = {
   failedTargets: number;
   forecastRequests: number;
   reanalysisRequests: number;
-  /** La classe de l'échec de chaque lieu sans prévisions (4.5, F602) : aucun message, aucune adresse. */
+  /**
+   * La classe de l'échec de chaque lieu sans prévisions (4.5, F602) : aucun
+   * message, aucune adresse. Un lieu lu pour plusieurs modèles (D-346) compte
+   * une fois, par la première lecture en échec.
+   */
   forecastFailures: WeatherFailureKind[];
   /** La classe de l'échec de chaque lieu sans réanalyse, comptée à part des prévisions (4.5, F600). */
   reanalysisFailures: WeatherFailureKind[];
@@ -49,9 +62,19 @@ export type ForecastWrittenHandler = (input: { workspaceId: string; locationKey:
  */
 export type AutomaticWeatherSyncMode = 'morning' | 'intraday';
 
+/**
+ * Les fermes d'un même lieu lisent **une lecture par modèle**
+ * (docs/weather-models-contract.md, § 5 ; D-346) : « Automatique » par le
+ * fournisseur, chaque modèle choisi par `modelReader`, une seule fois quel que
+ * soit le nombre de fermes qui le partagent ; la réanalyse, elle, ne dépend
+ * pas du modèle et se lit une fois par lieu (règle 7). Chaque ferme écrit
+ * ensuite **ses** lignes : une lecture se partage, une ligne jamais. Sans
+ * `modelReader` (démonstration, règle 13), toutes lisent « Automatique ».
+ */
 export async function runAutomaticWeatherSync({
   repository,
   provider,
+  modelReader = null,
   now = new Date(),
   retry,
   log = logJsonLine,
@@ -61,6 +84,7 @@ export async function runAutomaticWeatherSync({
 }: {
   repository: AutomaticWeatherSyncRepository;
   provider: WeatherProvider;
+  modelReader?: ModelForecastReader | null;
   now?: Date;
   retry?: WeatherRetryOptions;
   log?: WeatherSyncLogger;
@@ -79,6 +103,7 @@ export async function runAutomaticWeatherSync({
   let finalError: string | null = null;
   try {
     const targets = await selectTargets(await repository.listTargets(), includeTarget);
+    await returnWithdrawnModelsToAutomatic(targets, repository, at, log);
     const eligible = targets.filter((target) => !target.refreshNotBeforeAt
       || Date.parse(target.refreshNotBeforeAt) <= now.getTime());
     const groups = groupTargetsByLocation(eligible);
@@ -112,49 +137,77 @@ export async function runAutomaticWeatherSync({
         reanalysisRange: ranges.reanalysis,
         cacheMode: 'forced-refresh',
       });
-      const outcome = await fetchWeatherForLocation({
-        location: representative,
-        ranges,
-        provider,
-        bypassCache: true,
-        retry,
-        log,
-      });
-      finalResult.forecastRequests += ranges.forecast ? 1 : 0;
-      finalResult.reanalysisRequests += ranges.reanalysis ? 1 : 0;
-      if (outcome.forecast.status === 'rejected') finalResult.forecastFailures.push(weatherFailureKind(outcome.forecast.error));
-      if (outcome.reanalysis.status === 'rejected') finalResult.reanalysisFailures.push(weatherFailureKind(outcome.reanalysis.error));
-      await persistOutcomeForTargets({
-        repository,
-        provider,
-        targets: groupedTargets,
-        outcome,
-        at,
-        now,
-        onForecastWritten,
-        archive: mode === 'morning',
-        log,
-      });
-      if (weatherOutcomeSucceeded(outcome)) {
-        finalResult.successfulTargets += groupedTargets.length;
-      } else {
-        finalResult.failedTargets += groupedTargets.length;
-        finalError ??= weatherOutcomeError(outcome);
+      const readings = forecastReadingsAtPlace(groupedTargets, (target) => modelToRead(target, modelReader));
+      let reanalysis: WeatherEndpointResult | null = null;
+      let forecastFailure: WeatherFailureKind | null = null;
+      const outcomes: WeatherFetchOutcome[] = [];
+      for (const reading of readings) {
+        if (reading.modelId !== null) {
+          log('info', { event: 'weather_automatic_model_reading', mode, locationKey: representative.locationKey, forecastModel: reading.modelId, workspaceCount: reading.members.length });
+        }
+        // La réanalyse se lit avec la première lecture du lieu, et sert à toutes (règle 7).
+        const fetched = await fetchWeatherForLocation({
+          location: representative,
+          ranges: reanalysis === null ? ranges : { forecast: ranges.forecast, reanalysis: null },
+          provider,
+          bypassCache: true,
+          retry,
+          log,
+          forecastModel: reading.modelId === null || modelReader === null ? null : { reader: modelReader, modelId: reading.modelId },
+        });
+        finalResult.forecastRequests += ranges.forecast ? 1 : 0;
+        if (reanalysis === null) {
+          finalResult.reanalysisRequests += ranges.reanalysis ? 1 : 0;
+          if (fetched.reanalysis.status === 'rejected') finalResult.reanalysisFailures.push(weatherFailureKind(fetched.reanalysis.error));
+        }
+        reanalysis ??= fetched.reanalysis;
+        if (fetched.forecast.status === 'rejected') forecastFailure ??= weatherFailureKind(fetched.forecast.error);
+        const outcome: WeatherFetchOutcome = { forecast: fetched.forecast, reanalysis };
+        outcomes.push(outcome);
+        await persistOutcomeForTargets({
+          repository,
+          provider,
+          targets: reading.members,
+          outcome,
+          at,
+          now,
+          onForecastWritten,
+          archive: mode === 'morning',
+          log,
+        });
+        // La forme de la journée, une fois par lecture partagée du lieu (docs/et0-horaire-contract.md, D-349).
+        const writeDayShapes = repository.writeDayShapes?.bind(repository);
+        if (writeDayShapes && fetched.forecast.status === 'fulfilled') {
+          await recordDayShapes({
+            write: writeDayShapes,
+            placeKey: weatherLocationDeduplicationKey(representative),
+            timeZone: representative.timezone,
+            values: fetched.forecast.values,
+            providerSource: provider.sourceId?.('forecast') ?? provider.id,
+            fetchedAt: at,
+            now,
+            log,
+          });
+        }
+        if (weatherOutcomeSucceeded(outcome)) {
+          finalResult.successfulTargets += reading.members.length;
+        } else {
+          finalResult.failedTargets += reading.members.length;
+          finalError ??= weatherOutcomeError(outcome);
+        }
       }
-      log(weatherOutcomeSucceeded(outcome) ? 'info' : 'warn', {
+      if (forecastFailure !== null) finalResult.forecastFailures.push(forecastFailure);
+      const succeeded = outcomes.every(weatherOutcomeSucceeded);
+      log(succeeded ? 'info' : 'warn', {
         event: 'weather_automatic_location_completed',
         locationKey: representative.locationKey,
         provider: provider.id,
         workspaceCount: groupedTargets.length,
-        forecastDaysReceived: outcome.forecast.status === 'fulfilled'
-          ? outcome.forecast.values.length
-          : 0,
-        reanalysisDaysReceived: outcome.reanalysis.status === 'fulfilled'
-          ? outcome.reanalysis.values.length
-          : 0,
+        forecastDaysReceived: outcomes.reduce((total, outcome) => total + (outcome.forecast.status === 'fulfilled' ? outcome.forecast.values.length : 0), 0),
+        reanalysisDaysReceived: reanalysis?.status === 'fulfilled' ? reanalysis.values.length : 0,
         failedEndpoints: [
-          outcome.forecast.status === 'rejected' ? 'forecast' : null,
-          outcome.reanalysis.status === 'rejected' ? 'reanalysis' : null,
+          outcomes.some((outcome) => outcome.forecast.status === 'rejected') ? 'forecast' : null,
+          reanalysis?.status === 'rejected' ? 'reanalysis' : null,
         ].filter(Boolean),
         completedAt: new Date().toISOString(),
       });
@@ -202,6 +255,40 @@ async function selectTargets(
   return kept;
 }
 
+/**
+ * Le modèle qu'une ferme lit à ce passage (règles 1, 9 et 13) : son modèle
+ * enregistré s'il est encore proposé et couvre son lieu, et si le
+ * déploiement lit les modèles ; sinon « Automatique » (`null`).
+ */
+function modelToRead(target: AutomaticWeatherTarget, modelReader: ModelForecastReader | null): string | null {
+  return forecastModelToRead(resolveForecastModelChoice(target.forecastModel ?? null, target), modelReader !== null);
+}
+
+/**
+ * Règle 9 : une ferme dont le modèle n'est plus proposé, ou ne couvre plus son
+ * lieu, revient à « Automatique », dit au journal des modifications ; elle lit
+ * « Automatique » dès ce passage, même si l'écriture échoue (elle sera refaite
+ * au suivant). Rien n'est appelé chez le fournisseur ; aucune coordonnée ni
+ * exploitation dans le journal technique.
+ */
+async function returnWithdrawnModelsToAutomatic(
+  targets: readonly AutomaticWeatherTarget[],
+  repository: AutomaticWeatherSyncRepository,
+  at: string,
+  log: WeatherSyncLogger,
+): Promise<void> {
+  for (const target of targets) {
+    const choice = resolveForecastModelChoice(target.forecastModel ?? null, target);
+    if (choice.kind !== 'back-to-automatic' || !repository.returnForecastModelToAutomatic) continue;
+    try {
+      const returned = await repository.returnForecastModelToAutomatic({ workspaceId: target.workspaceId, savedModelId: choice.savedModelId, at });
+      if (returned) log('info', { event: 'weather_forecast_model_returned_to_automatic', forecastModel: choice.savedModelId, reason: choice.reason });
+    } catch (error) {
+      log('warn', { event: 'weather_forecast_model_return_failed', forecastModel: choice.savedModelId, error: error instanceof Error ? error.name : 'unknown' });
+    }
+  }
+}
+
 function groupTargetsByLocation(targets: readonly AutomaticWeatherTarget[]) {
   const groups = new Map<string, AutomaticWeatherTarget[]>();
   for (const target of targets) {
@@ -239,24 +326,27 @@ async function persistOutcomeForTargets({
   const notBeforeAt = weatherOutcomeNotBeforeAt(outcome, now);
   for (const target of targets) {
     if (outcome.forecast.status === 'fulfilled') {
-      const source = provider.sourceId?.('forecast') ?? provider.id;
-      await repository.upsertValues({
-        target,
-        kind: 'forecast',
-        values: outcome.forecast.values,
-        source,
-        fetchedAt: at,
-      });
-      // L'archive J+1 à J+7, par exploitation, de la même lecture (docs/forecast-archive-contract.md).
-      if (archive) await archiveForecastReading({
-        write: (snapshot) => repository.archiveForecast({ ...snapshot, workspaceId: target.workspaceId }),
-        locationKey: target.locationKey,
-        values: outcome.forecast.values,
-        source,
-        fetchedAt: at,
-        now,
-        log,
-      });
+      // Chaque jour sous la source qui l'a donné : le modèle choisi, « Automatique d'Open-Meteo »
+      // pour un jour complété, ou le fournisseur d'« Automatique » (D-346 ; contrat des modèles, § 6).
+      for (const { source, values } of forecastDaysBySource(outcome.forecast.values, provider.sourceId?.('forecast') ?? provider.id)) {
+        await repository.upsertValues({
+          target,
+          kind: 'forecast',
+          values,
+          source,
+          fetchedAt: at,
+        });
+        // L'archive J+1 à J+7, par exploitation, de la même lecture (docs/forecast-archive-contract.md).
+        if (archive) await archiveForecastReading({
+          write: (snapshot) => repository.archiveForecast({ ...snapshot, workspaceId: target.workspaceId }),
+          locationKey: target.locationKey,
+          values,
+          source,
+          fetchedAt: at,
+          now,
+          log,
+        });
+      }
       if (outcome.forecast.values.length > 0) {
         await onForecastWritten?.({ workspaceId: target.workspaceId, locationKey: target.locationKey, now });
       }

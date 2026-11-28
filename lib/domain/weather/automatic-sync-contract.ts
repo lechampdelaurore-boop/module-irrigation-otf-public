@@ -1,4 +1,5 @@
 import type { ForecastArchiveRow } from './forecast-archive.ts';
+import type { RecordedDayShape } from './hourly-et0.ts';
 import type { WeatherDailyValue } from './weather-provider.ts';
 
 /**
@@ -17,6 +18,12 @@ export type WeatherSyncLocation = {
 export type AutomaticWeatherTarget = WeatherSyncLocation & {
   workspaceId: string;
   refreshNotBeforeAt: string | null;
+  /**
+   * Le modèle de prévision enregistré par l'exploitation
+   * (docs/weather-models-contract.md, D-346) ; absent ou `null` :
+   * « Automatique », la lecture d'avant ce chantier (règle 1).
+   */
+  forecastModel?: string | null;
 };
 
 export type AutomaticWeatherSyncRepository = {
@@ -48,6 +55,18 @@ export type AutomaticWeatherSyncRepository = {
     source: string;
     fetchedAt: string;
   }): Promise<number>;
+  /**
+   * La forme de la journée d'un lieu, J0 à J+2, sous la source de la ligne du
+   * jour (docs/et0-horaire-contract.md, D-349) : une lecture plus récente
+   * remplace la forme d'un jour ; rend le nombre de lignes écrites. Absent :
+   * rien ne s'écrit et l'écran prend la forme théorique.
+   */
+  writeDayShapes?(input: {
+    placeKey: string;
+    rows: readonly RecordedDayShape[];
+    source: string;
+    fetchedAt: string;
+  }): Promise<number>;
   recordWorkspaceResult(input: {
     workspaceId: string;
     at: string;
@@ -55,4 +74,12 @@ export type AutomaticWeatherSyncRepository = {
     error: string | null;
     notBeforeAt: string | null;
   }): Promise<void>;
+  /**
+   * Règle 9 des modèles (docs/weather-models-contract.md, D-346) : ramène une
+   * exploitation à « Automatique » quand son modèle n'est plus proposé ou ne
+   * couvre plus son lieu, si elle l'a encore, avec sa ligne au journal des
+   * modifications (« Le module ») ; rend `true` si la ferme a changé. Absent :
+   * la ferme lit « Automatique » sans que rien ne s'écrive.
+   */
+  returnForecastModelToAutomatic?(input: { workspaceId: string; savedModelId: string; at: string }): Promise<boolean>;
 };

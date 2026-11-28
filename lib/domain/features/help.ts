@@ -76,8 +76,8 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   'ma-ferme': {
     purpose: 'Retrouver ce que le module sait de votre ferme : votre matériel, d’où vient l’eau, vos cultures, votre sol, les alertes et les réglages. On y vient surtout à l’installation, ou quand quelque chose change au champ.',
-    reading: 'Chaque fiche ouvre sa page et dit en une ligne à quoi elle sert. « À faire », en orange, marque une fiche où il reste une étape de l’accueil de la ferme, la même que dans « À finir ». Seules vos fonctionnalités cochées ont leur fiche ; Réglages est toujours là.',
-    firstStep: 'Touchez d’abord une fiche « À faire », s’il y en a une. Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
+    reading: 'Chaque fiche ouvre sa page et dit en une ligne où elle en est, comme « 4 goutte-à-goutte, tous posés ». « À faire », en orange, marque une étape de l’accueil de la ferme, comme « À finir ». Une ferme qui commence voit sa mise en route en tête. Seules vos fonctionnalités cochées ont leur fiche.',
+    firstStep: 'Suivez la mise en route si elle est en tête, ou touchez une fiche « À faire ». Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
   },
   reglages: {
     purpose: 'Choisir les fonctionnalités affichées, et régler ce qui sert à plusieurs pages.',
@@ -165,6 +165,37 @@ export const RELIABILITY_HELP: SectionHelp = {
     {
       title: 'Ce que fait le bouton',
       text: 'Il ouvre l’endroit où corriger la donnée, ou recalcule le plan. La ligne disparaît quand la donnée est à jour.',
+    },
+  ],
+};
+
+/**
+ * Le « ? » du bloc « Hors saison », dans « Objectifs de la semaine » (6
+ * quaterdecies, B3, docs/objectif-automatique-saison-contract.md, sections
+ * 4.1 à 4.5 ; D-337, D-353) : ce que le filtre ignore, ce qui continue, les
+ * cinq portées, et la reprise, à la main seulement.
+ */
+export const OFF_SEASON_HELP: SectionHelp = {
+  entries: [
+    {
+      title: 'Ce que fait « hors saison »',
+      text: 'Un endroit hors saison n’a plus d’objectif, ni saisi ni automatique, et le planning ne propose plus de l’arroser. Il sort des comptes de l’eau visée. Rien n’est effacé : un objectif saisi reste là et revient à la reprise.',
+    },
+    {
+      title: 'Ce qui continue',
+      text: 'La pluie tombée dehors reste enregistrée et suivie, comme la réserve du sol, l’ET0, la météo et ses alertes, le gel compris. Un arrosage fait à la main s’enregistre toujours. Le passé ne bouge pas : le geste compte à partir de son jour.',
+    },
+    {
+      title: 'Les endroits',
+      text: 'Une planche, un jardin ou un abri, une parcelle, tout le plein champ ou tout le sous-abri. Un jardin « à classer » n’est couvert ni par tout le plein champ ni par tout le sous-abri : classez-le, ou mettez-le hors saison seul.',
+    },
+    {
+      title: 'Reprendre',
+      text: 'Rien ne reprend seul, ni à une date ni au printemps : touchez « Reprendre » sur l’endroit. Un endroit couvert par un autre, comme un jardin et tout le plein champ, reste hors saison tant que l’autre l’est.',
+    },
+    {
+      title: 'Les arrosages déjà prévus',
+      text: 'En mettant hors saison, le module compte les arrosages planifiés ou validés de ces planches et propose de les annuler ou de les garder. Un arrosage déjà démarré n’est pas proposé : il se termine.',
     },
   ],
 };

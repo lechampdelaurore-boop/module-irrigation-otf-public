@@ -137,3 +137,93 @@
   gap: 16px;
   margin-top: 16px;
 }
+
+/*
+ * « Soif du jour, heure par heure » (ET0 horaire, HR3, D-350) : une barre par
+ * heure, la plus forte à pleine hauteur ; l'heure en cours foncée, les heures
+ * de forte évaporation en orange. Les heures écrites dessous : 0, 6, 12 et 18 h.
+ */
+.today-day-curve-sentence,
+.today-day-curve-strongest {
+  margin: 0;
+  font-size: var(--text-14);
+  line-height: 1.45;
+}
+
+.today-day-curve {
+  display: flex;
+  max-width: 720px;
+  height: 72px;
+  align-items: flex-end;
+  gap: 2px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.today-day-curve-bar {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex: 1 1 0;
+  align-items: flex-end;
+}
+
+.today-day-curve-fill {
+  width: 100%;
+  min-height: 1px;
+  border-radius: 2px 2px 0 0;
+  background: var(--water-line);
+}
+
+.today-day-curve-bar[data-strong] .today-day-curve-fill {
+  background: var(--warn-line);
+}
+
+.today-day-curve-bar[data-current] .today-day-curve-fill {
+  background: var(--water-ink);
+}
+
+/* L'heure en cours reste marquée la nuit, quand sa barre est à zéro : un trait sur toute la hauteur. */
+.today-day-curve-bar[data-current]::before {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  border-left: 2px dashed var(--water-ink);
+  content: "";
+}
+
+.today-day-curve-hour {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  color: var(--muted);
+  font-size: var(--text-12);
+  white-space: nowrap;
+}
+
+.today-day-curve-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-13);
+}
+
+.today-day-curve-legend span::before {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 2px;
+  content: "";
+  vertical-align: -1px;
+}
+
+.today-day-curve-legend [data-key="current"]::before {
+  background: var(--water-ink);
+}
+
+.today-day-curve-legend [data-key="strong"]::before {
+  background: var(--warn-line);
+}

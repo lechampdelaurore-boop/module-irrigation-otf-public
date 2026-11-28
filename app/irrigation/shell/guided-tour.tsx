@@ -18,7 +18,7 @@ import {
   type TourContext,
   type TourPosition,
 } from '@/lib/domain/demo/tour-engine';
-import { tourById, type Tour, type TourId, type TourPage, type TourStep } from '@/lib/domain/demo/tours';
+import { stepWords, tourById, type Tour, type TourId, type TourPage, type TourStep } from '@/lib/domain/demo/tours';
 import { WELCOME_PATH, pageHref, pageLabel, type PageQuery } from '@/lib/domain/features/pages';
 import { WELCOME_HEADING } from '@/lib/domain/features/start';
 import { Icon } from '../line-icon';
@@ -493,7 +493,8 @@ function announce(shown: Shown | null, context: TourContext): string {
   if (!tour) return '';
   if (shown.kind === 'paused') return `Visite « ${tour.title} » en pause.`;
   const { rank, total } = stepCount(tour, shown.position.step, context, anchorShown);
-  return `Visite « ${tour.title} », étape ${rank} sur ${total} : ${tour.steps[shown.position.step].title}.`;
+  // Les mots de la page ouverte : sur l'écran de la première ouverture, ceux des trois façons (lot S6, PR 4).
+  return `Visite « ${tour.title} », étape ${rank} sur ${total} : ${stepWords(tour.steps[shown.position.step], context.current).title}.`;
 }
 
 function TourBubble({
@@ -565,15 +566,15 @@ function TourBubble({
   }
 
   const index = shown.position.step;
-  const step = tour.steps[index];
+  const words = stepWords(tour.steps[index], context.current);
   const { rank, total } = stepCount(tour, index, context, anchorShown);
   const { last, hasPrevious } = shown;
   const nextTour = nextAvailableTour(tour.id, context);
   return (
     <section {...common} data-placement={shown.anchor ? 'anchored' : 'centered'} style={place}>
       <p className="tour-progress">{tour.title} · étape {rank} sur {total}</p>
-      <h2 id={titleId} ref={headingRef} tabIndex={-1}>{step.title}</h2>
-      <p id={textId}>{step.text}</p>
+      <h2 id={titleId} ref={headingRef} tabIndex={-1}>{words.title}</h2>
+      <p id={textId}>{words.text}</p>
       <div className="tour-actions">
         <button type="button" className="tour-primary" onClick={onNext}>{last ? 'Terminer' : 'Suivant'}</button>
         {hasPrevious ? <button type="button" className="tour-secondary" onClick={onPrevious}>Précédent</button> : null}

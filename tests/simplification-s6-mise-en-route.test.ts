@@ -107,7 +107,8 @@ test('section 5.1 : une ferme neuve, cinq étapes, la première en cours, ce qu�
 
 test('section 5.1 : chaque étape faite dit ce qui existe, avec les comptes de la ferme', () => {
   const value = route({
-    equipment: { drip: 2, sprinkler: 1, withoutSetting: 3 },
+    // Trois matériels actifs, dont un sans réglage : l'étape est faite, sa ligne dit tout le matériel (section 7.1).
+    equipment: { drip: 2, sprinkler: 1, withoutSetting: 1 },
     placement: { watered: 1, total: 18 },
     water: { names: ['Bassin', 'Puits'], total: 3 },
     objective: { withObjective: 7, total: 10 },
@@ -135,9 +136,9 @@ test('section 5.1 : chaque étape faite dit ce qui existe, avec les comptes de l
 });
 
 test('section 5.1 : ce qui manque à l’étape en cours, cas par cas (section 12)', () => {
-  assert.equal(route({ equipment: { drip: 0, sprinkler: 0, withoutSetting: 1 } }).kind, 'card');
-  assert.equal(step(route({ equipment: { drip: 0, sprinkler: 0, withoutSetting: 1 } }), 'equipment').line, 'Un matériel n’a pas encore de réglage.');
-  assert.equal(step(route({ equipment: { drip: 0, sprinkler: 0, withoutSetting: 2 } }), 'equipment').line, '2 matériels n’ont pas encore de réglage.');
+  assert.equal(route({ equipment: { drip: 1, sprinkler: 0, withoutSetting: 1 } }).kind, 'card');
+  assert.equal(step(route({ equipment: { drip: 1, sprinkler: 0, withoutSetting: 1 } }), 'equipment').line, 'Un matériel n’a pas encore de réglage.');
+  assert.equal(step(route({ equipment: { drip: 1, sprinkler: 1, withoutSetting: 2 } }), 'equipment').line, '2 matériels n’ont pas encore de réglage.');
   const posed = { equipment: FULL.equipment };
   assert.equal(step(route(posed), 'placement').line, 'Aucune planche n’a encore de matériel posé.');
   assert.deepEqual(step(route(posed), 'placement').link, { page: 'materiel', anchor: 'farm-plan' });
@@ -278,7 +279,7 @@ test('section 8 : le bloc d’« Aujourd’hui » dit l’étape en cours de la 
 test('section 14 : aucun mot du calcul dans aucune phrase de la mise en route (test de garde de S1)', () => {
   const phrases = new Set<string>();
   const cases: Partial<RouteCounts>[] = [
-    {}, FULL, { equipment: { drip: 0, sprinkler: 0, withoutSetting: 2 } },
+    {}, FULL, { equipment: { drip: 2, sprinkler: 0, withoutSetting: 2 } },
     { equipment: FULL.equipment, placement: { watered: 0, total: 0 }, objective: { withObjective: 0, total: 0 }, soil: { withoutSoil: 0, total: 0, anchor: null } },
     { equipment: FULL.equipment, placement: FULL.placement, water: FULL.water, objective: { withObjective: 3, total: 18 } },
     { ...FULL, soil: { withoutSoil: 2, total: 6, anchor: 'soil-parcel-z1' } }, { equipment: null },
@@ -302,7 +303,7 @@ test('interface : la carte, sa barre en image, ses cibles ; le bandeau « À fin
   const page = readFileSync('app/irrigation/ma-ferme/page.tsx', 'utf8');
   assert.match(page, /unfinished=\{routeCardVisible\(context\.route\) \? \[\] : context\.shell\.unfinished\}/);
   // Les fiches gardent « À faire » : leur ligne vient toujours de l'accueil de la ferme.
-  assert.match(page, /farmCards\(context\.enabled, context\.shell\.unfinished\)/);
+  assert.match(page, /farmCards\(context\.enabled, context\.shell\.unfinished, context\.farmCardLines\)/);
   assert.match(page, /context\.startMode !== null \? <StartRouteCard/);
   const component = readFileSync('app/irrigation/pages/start-route-card.tsx', 'utf8');
   assert.match(component, /className="start-route-bar" role="img" aria-label=\{route\.progress\}/);

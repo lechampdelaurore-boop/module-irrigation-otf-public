@@ -1,7 +1,8 @@
 import { listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries';
 import { listIrrigationEventsForUser } from '@/db/irrigation-event/read';
 import { readPlanningSettingsForUser } from '@/db/planning-repository';
-import { listWeatherDailyValuesForUser } from '@/db/water-management-repository';
+import { listDayShapesOfDay } from '@/db/day-shape-repository';
+import { listWeatherDailyValuesForUser, readWeatherGeocodeForUser, type WeatherDailyRecord } from '@/db/water-management-repository';
 import { listWaterInfrastructureForUser } from '@/db/water-resource-repository';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import { speciesWithoutReference } from '../domain/crop-water/species';
@@ -10,6 +11,7 @@ import type { FeatureSelection } from '../domain/features/selection';
 import { actualRainLookbackDates, neverObservedSoilGardens } from '../domain/today/reliability';
 import { guessedStages, lastMeasuredRainOn, missingByBedBeds, rainGaugeLookbackStart, unknownSoilBeds } from '../domain/today/missing-by-bed';
 import { farmRainMatters } from '../domain/today/rain-entry';
+import type { TodayDayCurveInputs } from '../domain/today/day-curve';
 import { todayView, type TodayInputs, type TodayView } from '../domain/today/today-view';
 import type { TodayApproximate } from '../domain/today/essential';
 import { todayWeekInputs, type TodayWeekInputs } from '../domain/today/week';
@@ -25,6 +27,7 @@ import { getIrrigationNeedsDashboardForUser } from './irrigation-needs-service';
 import { getWaterDashboardForUser } from './water-dashboard';
 import { readTodayWeatherInputs } from './today-weather';
 import { readWeatherPreference } from './weather-preference';
+import { weatherLocationDeduplicationKey } from './weather/sync-engine';
 
 /**
  * Le modèle de la page « Aujourd'hui » et de la zone « Fiabilité du calcul »
@@ -79,7 +82,7 @@ async function readTodayInputs(
   // Le dépliant « Par planche » (amélioration n° 6) se lit pour la page seulement : la pastille ne le compte pas (F710).
   const byBed = read.weather;
 
-  const [weather, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays, automaticMissingEt0] = await Promise.all([
+  const [weather, events, settings, plan, infrastructure, rainRows, soil, correspondences, week, cropDays, automaticMissingEt0, dayPlace] = await Promise.all([
     read.weather
       ? readTodayWeatherInputs({ ownerUserId, workspaceId, locationKey, snapshot, season, enabled, now })
       : { forecasts: [], frost: null, criteria: on('alertes-meteo') ? [] : null },
@@ -94,6 +97,8 @@ async function readTodayInputs(
     read.weather && on('besoins') ? readWeek({ ownerUserId, season, snapshot, now }) : null,
     byBed && on('cultures') ? getCropWaterDaysForUser({ ownerUserId, season, snapshot, dates: [today], now }) : null,
     on('besoins') ? automaticObjectiveMissingEt0(ownerUserId, locationKey, today) : null,
+    // La soif du jour heure par heure (HR3, D-350) : pour la page seulement, jamais pour la pastille.
+    read.weather && on('besoins') && locationKey ? readDayCurvePlace(ownerUserId, locationKey, today) : null,
   ]);
 
   // Sous abri, la pluie vaut zéro (D-032) : une ferme tout sous abri n'a pas de pluie réelle à compléter.
@@ -140,7 +145,33 @@ async function readTodayInputs(
         .map((row) => [row.date, row.precipitationMm as number])),
       rainMatters,
     },
+    dayCurve: dayPlace ? { ...dayPlace, date: today, et0: farmEt0OfDay(rainRows, today) } : null,
   };
+}
+
+/**
+ * Le lieu de la météo de la ferme et les formes écrites du jour, toutes
+ * sources (HR3, D-350) : deux requêtes à la suite, en même temps que les
+ * autres lectures de la page. La clé du lieu est celle de la lecture
+ * partagée qui a écrit la forme (HR2). `null` sans commune trouvée.
+ */
+async function readDayCurvePlace(ownerUserId: string, locationKey: string, today: string): Promise<Omit<TodayDayCurveInputs, 'date' | 'et0'> | null> {
+  const geocode = await readWeatherGeocodeForUser(ownerUserId, locationKey);
+  if (!geocode) return null;
+  const recorded = await listDayShapesOfDay(weatherLocationDeduplicationKey(geocode), today);
+  return { timeZone: geocode.timezone, location: { latitude: geocode.latitude, longitude: geocode.longitude }, recorded };
+}
+
+/**
+ * L'ET0 du jour de la ferme comme la lisent ses calculs (`et0Readings`,
+ * `et0OfDay`) : la prévision la plus récente du jour, et sa source, qui
+ * choisit la forme (contrat, § 9). `null` quand elle manque, jamais 0.
+ */
+function farmEt0OfDay(rows: readonly WeatherDailyRecord[], today: string): TodayDayCurveInputs['et0'] {
+  const latest = rows
+    .filter((row) => row.date === today && row.dataKind === 'forecast' && row.et0Mm !== null)
+    .reduce<WeatherDailyRecord | null>((found, row) => (found === null || row.fetchedAt >= found.fetchedAt ? row : found), null);
+  return latest && latest.et0Mm !== null ? { mm: latest.et0Mm, source: latest.source } : null;
 }
 
 /**

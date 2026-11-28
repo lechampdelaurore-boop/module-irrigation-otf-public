@@ -148,7 +148,7 @@ function GardenLine({ line, goalsHref }: { line: WeekGardenLine; goalsHref: stri
         ) : null}
         <span className="sr-only">{line.label}</span>
       </a>
-      {line.aimed ? null : <a className="week-garden-goal" href={goalsHref} onClick={(event) => openGoals(event, goalsHref)}>Lui en donner une</a>}
+      {line.aimed || line.offSeason ? null : <a className="week-garden-goal" href={goalsHref} onClick={(event) => openGoals(event, goalsHref)}>Lui en donner une</a>}
     </li>
   );
 }

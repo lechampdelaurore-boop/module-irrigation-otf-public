@@ -200,7 +200,8 @@ test('section 5 : « Ma ferme » ne lit rien de plus que le gabarit de chaque pa
   assert.match(page, /loadPageContext\('ma-ferme', searchParams\)/);
   // Ni chargeur de page, ni service, ni base : la marque « À faire » vient de `context.shell.unfinished`.
   assert.doesNotMatch(page, /page-loaders|@\/lib\/services|@\/db\//);
-  assert.match(page, /farmCards\(context\.enabled, context\.shell\.unfinished\)/);
+  // Les lignes d'état des fiches viennent aussi du gabarit (lot S6, PR 3, section 7).
+  assert.match(page, /farmCards\(context\.enabled, context\.shell\.unfinished, context\.farmCardLines\)/);
   assert.match(page, /pageMetadata\('ma-ferme'\)/);
 });
 

@@ -96,7 +96,29 @@ function lesFiches(page: Page) {
   return page.getByRole('navigation', { name: 'Les fiches de Ma ferme' });
 }
 
-test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne fixe ; le menu en fait le titre de son endroit', async ({ page }, testInfo) => {
+/**
+ * La forme de la ligne d'état de chaque fiche (lot S6, PR 3, section 7.2) ; « Alertes cultures » garde sa ligne
+ * fixe (repli gardé). Une fiche porte l'une ou l'autre, et le dit par `data-line`.
+ */
+const LIGNES_D_ETAT: Readonly<Record<(typeof FARM_CARD_PAGES)[number], RegExp | null>> = {
+  materiel: /^(\d+ goutte-à-goutte|\d+ aspersions?)( et \d+ aspersions?)?, (tous posés|posé|pas posé|aucun posé|\d+ pas posés?)$/u,
+  ressources: /^(.+ : débit de .+ m³\/h|.+ : (volume jamais saisi|.+ m³ sur .+ m³, .+)|\d+ ressources?( et \d+ réserves?, .+ cette semaine)?|\d+ réserves?, .+ cette semaine)$/u,
+  cultures: /^(\d+ cultures? cette saison|Aucune culture ne sert à vos séries cette saison)$/u,
+  sol: /^(Sol connu pour \d+ parcelles? sur \d+|À renseigner pour \d+ parcelles?)$/u,
+  'alertes-meteo': /^(Aucune alerte réglée|\d+ alertes? réglées?(, \d+ inactives?)?)$/u,
+  'alertes-cultures': null,
+  reglages: /^(Météo de .+ · \d+ fonctionnalités? cochées?|Commune à confirmer · \d+ fonctionnalités? cochées?|\d+ fonctionnalités? cochées?)$/u,
+};
+
+/** Le titre « Vos cultures cette saison (N) » de « Besoin par culture », dit dans les mots de la fiche. */
+function ligneDesCultures(titre: string): string | null {
+  const nombre = /^Vos cultures cette saison \((\d+)\)$/u.exec(titre)?.[1];
+  if (nombre === undefined) return null;
+  if (nombre === '0') return 'Aucune culture ne sert à vos séries cette saison';
+  return `${nombre} culture${Number(nombre) > 1 ? 's' : ''} cette saison`;
+}
+
+test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne fixe ou d’état ; le menu en fait le titre de son endroit', async ({ page }, testInfo) => {
   test.setTimeout(150_000);
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
@@ -114,13 +136,26 @@ test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne 
   for (const [rang, cible] of FARM_CARD_PAGES.entries()) {
     const fiche = fiches.nth(rang);
     await expect(fiche.locator('strong')).toHaveText(TITRES_DES_PAGES[cible]);
-    await expect(fiche.locator('.farm-card-line')).toHaveText(FARM_CARD_LINES[cible]);
+    // La ligne d'état quand la donnée est connue, sinon la ligne fixe de S3 (lot S6, PR 3, section 7.1).
+    const ligne = fiche.locator('.farm-card-line');
+    if (await ligne.getAttribute('data-line') === 'state') {
+      expect(LIGNES_D_ETAT[cible], `« ${TITRES_DES_PAGES[cible]} » n’a pas de ligne d’état`).not.toBeNull();
+      await expect(ligne).toHaveText(LIGNES_D_ETAT[cible]!);
+    } else {
+      await expect(ligne).toHaveAttribute('data-line', 'fixed');
+      await expect(ligne).toHaveText(FARM_CARD_LINES[cible]);
+    }
     await expect(fiche.locator('.farm-card-todo')).toHaveCount(0);
     expect(new URL((await fiche.getAttribute('href'))!, 'http://x').pathname).toBe(`/irrigation/${cible}`);
     const boite = await fiche.boundingBox();
     expect(Math.round(boite!.height), `la fiche « ${TITRES_DES_PAGES[cible]} » mesure ${Math.round(boite!.height)} px`).toBeGreaterThanOrEqual(FICHE_MINIMALE_PX);
   }
-  // À 390 px, la ligne fixe tient sur deux lignes au plus (S3-f, mesure rapportée au contrat).
+  // La ferme des parcours : la commune de la météo confirmée, ses cultures comptées comme la page « Besoin par culture ».
+  const fiche = (cible: (typeof FARM_CARD_PAGES)[number]) => fiches.filter({ has: page.locator('strong', { hasText: TITRES_DES_PAGES[cible] }) }).locator('.farm-card-line');
+  await expect(fiche('reglages')).toHaveText(/^Météo de Rennes · \d+ fonctionnalités cochées$/u);
+  await expect(fiche('alertes-cultures')).toHaveAttribute('data-line', 'fixed');
+  const cultures = await fiche('cultures').textContent();
+  // À 390 px, la ligne tient sur deux lignes au plus (S3-f, mesure rapportée au contrat), la ligne d'état aussi (section 7.1).
   const lignes = await lesFiches(page).locator('.farm-card-line').evaluateAll((elements) => elements.map((element) => {
     const hauteurDeLigne = Number.parseFloat(getComputedStyle(element).lineHeight);
     return { texte: element.textContent ?? '', lignes: Math.round(element.getBoundingClientRect().height / hauteurDeLigne) };
@@ -143,6 +178,13 @@ test('« Ma ferme » : son adresse, ses fiches dans l’ordre, 68 px, une ligne 
   expect(mesure.petits).toEqual([]);
   for (const graisse of mesure.graisses) expect(['300', '400', '500', '700']).toContain(graisse);
   await verifierLEtape(page, journal, 'les fiches de « Ma ferme »');
+
+  // Chaque nombre est celui de la page de la fiche (section 7.1) : le titre des cultures de « Besoin par culture ».
+  await attendreLaPageIrrigation(page, 'cultures');
+  const titre = (await page.locator('h4.reference-crop-group-title').first().textContent())?.trim() ?? '';
+  expect(ligneDesCultures(titre), `le titre « ${titre} »`).toBe(cultures);
+  await verifierLEtape(page, journal, 'la ligne des cultures, le titre de la page');
+  await attendreLaPageIrrigation(page, 'ma-ferme');
 
   // À l'ordinateur, « Ma ferme » est le titre de son endroit, ses fiches dessous dans le même ordre, Réglages comprise (PR 3) ;
   // au téléphone, son endroit de la barre du bas (PR 2). Marquée, la page ouverte.

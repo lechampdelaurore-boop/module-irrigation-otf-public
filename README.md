@@ -146,6 +146,16 @@ Sans cette clé, le repli Open-Meteo reste actif pour faciliter le développemen
 local, mais son service Forecast est actuellement limité depuis l’hébergement
 partagé et ne doit pas être considéré comme la configuration publiée finale.
 
+Le modèle de prévision choisi par une ferme (`docs/weather-models-contract.md`)
+se lit sur l’offre gratuite d’Open-Meteo, sans réglage. Le jour où une offre
+payante existe, elle se règle sans toucher au code, la clé saisie par le
+porteur seul :
+
+```dotenv
+OPEN_METEO_API_BASE_URL=https://customer-api.open-meteo.com
+OPEN_METEO_API_KEY=valeur-secrete
+```
+
 Le jeton doit posséder uniquement les portées suivantes :
 
 - `general:read` pour `/configuration` et `/me` ;

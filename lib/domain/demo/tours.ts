@@ -28,7 +28,29 @@ export type TourStep = {
   anchor?: TourAnchor;
   title: string;
   text: string;
+  /**
+   * Les mots de l'étape sur une page qui montre autre chose que les autres :
+   * sur l'écran de la première ouverture, les trois façons de commencer à la
+   * place de la liste des cases (simplification, lot S6, PR 4,
+   * docs/simplification-s6-contract.md, section 10). Même étape, même ancre,
+   * même règle de saut ; seules les phrases changent.
+   */
+  on?: Partial<Record<TourPage, TourWords>>;
 };
+
+/** Le titre et le texte d'une bulle. */
+export type TourWords = { title: string; text: string };
+
+/** Les mots que l'étape dit sur la page `page` : les siens, ou ceux propres à la page. */
+export function stepWords(step: TourStep, page: TourPage): TourWords {
+  const words = step.on?.[page];
+  return words ?? { title: step.title, text: step.text };
+}
+
+/** Tous les mots qu'une étape peut dire, quelle que soit la page : pour les tests de garde des mots. */
+export function allStepWords(step: TourStep): TourWords[] {
+  return [{ title: step.title, text: step.text }, ...Object.values(step.on ?? {}).filter((words): words is TourWords => words !== undefined)];
+}
 
 export type TourId = 'bienvenue' | 'arrosage' | 'planning' | 'penurie' | 'alertes' | 'a-la-carte' | 'ma-ferme';
 
@@ -289,12 +311,24 @@ export const TOURS: readonly Tour[] = [
         anchor: 'fonctionnalites',
         title: 'Cochez ce qui vous sert',
         text: 'Chaque case est une fonctionnalité. Une ferme qui ne veut que le matériel et les alertes ne coche que cela : le reste disparaît des écrans et des calculs.',
+        on: {
+          bienvenue: {
+            title: 'Trois façons de commencer',
+            text: 'Noter vos arrosages, laisser le module proposer quoi arroser, ou tout : chaque façon coche les fonctionnalités qui vont avec, et le reste disparaît des écrans et des calculs. « Choisir moi-même les fonctionnalités » montre la liste des cases, une par fonctionnalité.',
+          },
+        },
       },
       {
         pages: ['reglages', 'bienvenue'],
         anchor: 'fonctionnalites',
         title: 'Sans rien perdre',
         text: 'Certaines fonctionnalités en demandent d’autres et les cochent avec elles. Décocher ne perd rien : tout revient quand on recoche. Essayez si vous voulez ; enregistrer reste votre geste.',
+        on: {
+          bienvenue: {
+            title: 'Rien n’est choisi d’avance',
+            text: '« Conseillé » désigne une façon sans la choisir à votre place, et rien ne s’enregistre avant « Continuer ». Ensuite, les cases se changent dans Réglages : décocher ne perd rien, tout revient quand on recoche.',
+          },
+        },
       },
       {
         anchor: 'menu',

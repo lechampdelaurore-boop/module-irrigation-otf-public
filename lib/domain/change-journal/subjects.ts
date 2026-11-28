@@ -42,6 +42,9 @@ const CHANGE_SUBJECTS = {
   'decision-de-planche': { family: 'objectif', label: 'Décision sur le besoin d’une planche' },
   // L'objectif automatique sur l'ET0, allumé ou éteint pour toute la ferme (6 decies, O2 ; D-309, D-317).
   'objectif-automatique': { family: 'objectif', label: 'Objectif automatique' },
+  // L'irrigation ignorée hors saison, sur une portée, et sa reprise (6 quaterdecies, B2 ; D-337, D-352).
+  'jardin-hors-saison': { family: 'objectif', label: 'Mise hors saison' },
+  'reprise-saison': { family: 'objectif', label: 'Reprise de l’irrigation' },
   // Réglages.
   'reglages-du-planning': { family: 'reglage', label: 'Réglages du planning' },
   'creneau-protege': { family: 'reglage', label: 'Créneau protégé' },
@@ -71,6 +74,9 @@ const CHANGE_SUBJECTS = {
   'jardin-sous-abri': { family: 'reglage', label: 'Jardin sous abri ou de plein champ' },
   'groupe-de-jardins': { family: 'reglage', label: 'Groupe de jardins' },
   'lieu-meteo': { family: 'reglage', label: 'Lieu de la météo' },
+  // Le modèle de prévision de la ferme (météo multi-modèles, PR 2 ; D-346) : choisi par la personne, ou ramené
+  // à « Automatique » par le module quand il n'est plus proposé ou ne couvre plus le lieu (règle 9).
+  'modele-meteo': { family: 'reglage', label: 'Modèle de prévision' },
   // Matériel et ressources.
   materiel: { family: 'materiel', label: 'Matériel' },
   'reglage-de-materiel': { family: 'materiel', label: 'Réglage de matériel' },

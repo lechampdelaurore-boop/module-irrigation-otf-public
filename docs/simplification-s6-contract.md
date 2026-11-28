@@ -660,6 +660,71 @@ message.
   lectures dans les deux cas. Borne de Réglages + 20 % tenue. Huit
   contre-épreuves, chacune rouge.
 
+**PR 3, 26 novembre 2026** (D-336, F969 à F975) :
+
+- **Les lectures exactes de chaque ligne** (F969, `lib/services/start-route.ts`),
+  lancées avec celles de la carte, sur « Ma ferme » toujours, seulement
+  pour les fiches cochées : « Matériel et placement », l'inventaire
+  (`listEquipmentForUser`, quatre requêtes), les poses courantes de la
+  saison (`listEquipmentPosesForUser`, deux, à la place de
+  `listEquipmentPlacementsForUser` : les poses ouvertes servent l'étape 2,
+  `poseCounts` dit les posés) et les groupes (étapes 1 et 2) ;
+  « Ressources et pompes », `readActiveWaterAssetsForUser` (un lot de
+  deux : ressources avec leur débit, réserves avec leur volume à sa date ;
+  l'étape 3 en tire ses noms) ; « Besoin par culture », après l'espace,
+  `listSpeciesCorrespondencesForWorkspace` (une, partagée avec le bandeau)
+  et `listReferenceCropKeysForWorkspace` (une, **nouvelle**, les clés
+  seules) ; « Réserve du sol », `listZonesWithSoilForUser` (partagée avec
+  l'étape 5 et le bandeau) ; « Alertes météo »,
+  `countWeatherAlertCriteriaForUser` (un `COUNT`, **nouvelle**) ;
+  « Réglages », `readWeatherPreference` (une fois par requête). Aucune
+  n'est par planche ni par jardin.
+- **Ligne par ligne** : « Matériel et placement », **ligne d'état faite**
+  (F970 ; l'étape 1 compte désormais tout le matériel actif, comme
+  l'inventaire) ; « Ressources et pompes », **ligne d'état faite** (F971 ;
+  « observé », le mot de la page, pour « relevé ») ; « Besoin par
+  culture », **ligne d'état faite, écart dit** (F972 : « 4 cultures cette
+  saison », le titre de la page ; les espèces à rattacher se comptent dans
+  Réglages, pas sur cette page) ; « Réserve du sol », « Alertes météo »,
+  « Réglages », **lignes d'état faites** (F973 ; « Commune à confirmer »
+  raccourci) ; « Alertes cultures », **repli gardé** (le gel suivi demande
+  le calcul de la page).
+- **Pris en codant** : précisions F969 à F975 ; aucune migration ; P63 et
+  P70 suivent.
+- **Mesures** (F975) : à 390 px, deux lignes au plus au téléphone, une à
+  l'ordinateur, fiches de 70 à 92 px ; la colonne de texte fait 242 px à
+  390 px, où les exemples de la section 7.2 tiennent sur deux lignes comme
+  les lignes fixes de S3 : la borne tenue est celle de S3 (deux lignes à
+  390 px). Temps du serveur, 20 ms par lecture, médiane de sept : « Ma
+  ferme » 78 ms sans la carte (48 avant), 105 ms avec (94 en PR 2) ; à
+  300 planches, 82 et 104 ms, autant de lectures ; Réglages de 176 à
+  184 ms ; borne + 20 % tenue. Quatorze contre-épreuves, chacune rouge.
+
+**PR 4, 26 novembre 2026** (D-336, F976 à F982) :
+
+- **Les visites** (F976 à F978) : sur `bienvenue`, les étapes 1 et 2 de
+  « Le module à la carte » disent « Trois façons de commencer » et « Rien
+  n'est choisi d'avance » (mots propres à la page, `TourStep.on`,
+  `stepWords`) ; dans Réglages, leurs mots d'avant. Sept visites, 7, 6, 4,
+  5, 4, 3 et 3 étapes, comme avant ; même ancre, mêmes pages, même règle
+  de saut. **Écart dit** (F977) : « Bienvenue » et « Et pour ma ferme ? »
+  n'avaient aucune phrase sur les cases à la première ouverture ; elles
+  ne changent pas.
+- **La ferme vierge** (F979) : le catalogue dit les trois façons ; la
+  remise à zéro la rend vierge, sans façon ni état de carte, l'ancien
+  choix mis de côté avec son espace (test de base, V8).
+- **Le « ? » de « Ma ferme »** (F980, écart dit : hors des sections 10
+  et 11) : la ligne d'état et la mise en route en tête.
+- **Les contrats de la section 11** (F981) : sept contrats annotés « Depuis
+  S6 » à l'endroit de chaque passage ; le contrat des parcours a suivi
+  dans les PR 1 à 3.
+- **Preuves** (F982) : huit tests du domaine, un de base ; V6 et V8
+  suivent ; dix contre-épreuves, chacune rouge.
+- **La recette** dans le Chrome du porteur, sur la ferme vierge de la
+  démonstration : après la mise en ligne des quatre PR et avec son
+  accord ; l'essai des cinq tâches avec le premier volontaire reste
+  conseillé avant la mise en ligne de la PR 1 (S6-m).
+
 ## 16. Risques
 
 | Risque | Parade |

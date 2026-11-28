@@ -169,6 +169,8 @@ export const WEEK_ANCHORS = [
   { anchor: 'planning-title', feature: 'planning' },
   { anchor: 'proposal-', feature: 'planning', prefix: true },
   { anchor: 'objectifs-de-la-semaine', feature: 'besoins' },
+  // Le bloc « Hors saison », dans le pli des objectifs (6 quaterdecies, B3) : la tuile d'« Aujourd'hui » y mène.
+  { anchor: 'hors-saison', feature: 'besoins' },
   { anchor: 'manual-rain', feature: 'besoins' },
   { anchor: 'meteo-de-reference', feature: 'besoins' },
   { anchor: 'weather', feature: 'besoins' },

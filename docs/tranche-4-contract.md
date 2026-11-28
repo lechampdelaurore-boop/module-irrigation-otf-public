@@ -1310,7 +1310,7 @@ Un écran par étape, **reprenable** : fermer l'onglet ou être coupé ne perd r
 | 6 | Réglages à relire | planning, gel, alertes, surfaces… en « proposé, à ajuster » | valide, ajuste ou passe | non (F424) |
 | 7 | Vérification finale | liste verte, ou ce qui manque | corrige ou continue | non (F427) |
 
-**Rien n'oblige à tout finir d'un coup.** Une ferme « pas finie » ouvre le module ; chaque page dit ce qui lui manque et renvoie à l'étape (bandeau « À finir : sol des parcelles »), sans erreur ni zéro. Mais **aucun planning n'est calculé** tant que l'étape 6 n'est pas validée (réponse Q10).
+**Rien n'oblige à tout finir d'un coup.** Une ferme « pas finie » ouvre le module ; chaque page dit ce qui lui manque et renvoie à l'étape (bandeau « À finir : sol des parcelles »), sans erreur ni zéro. Mais **aucun planning n'est calculé** tant que l'étape 6 n'est pas validée (réponse Q10). **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : le bandeau « À finir » n'est **pas répété sur « Ma ferme »** quand la carte « Mise en route » y est visible (S6-d, F966) ; ses étapes restent sur les fiches, avec « À faire » ; sa règle et ses lignes ne changent pas, et il reste sur toutes les autres pages.
 
 #### 8 bis.4 · Les points
 
@@ -2116,6 +2116,7 @@ Le jugement d'une carte : **rouge** pour un raccordement révoqué ou hors d'usa
 | `irrigation_support_accesses` (10 bis.21) | le journal d'accès du support : le jour, la ferme, la raison en une ligne | 12 mois | la purge du matin ; l'effacement du dernier espace de la ferme (F642) |
 | `irrigation_cost_readings` (10 bis.21) | le relevé des coûts du mois, copié du tableau de bord | sans limite | personne : des nombres du déploiement, d'aucune ferme |
 | `irrigation_weather_forecast_archive` (archive des prévisions, D-297) | une table d'espace : chaque jour, les prévisions J+1 à J+7 de la première lecture réussie, jamais écrasées | 24 mois | la purge du matin, par jour d'émission ; l'effacement de la ferme, comme toute table d'un espace (F563) |
+| `irrigation_weather_day_shapes` (forme de la journée de l'ET0 horaire, D-349) | une table commune, par lieu : les parts d'heures de J0 à J+2 d'une lecture de prévision, aucune ligne d'une ferme | 8 jours | la purge du matin, par jour ; jamais l'effacement d'une ferme (aucune ligne n'est d'une ferme) |
 
 Hors de la base D1, les durées de F562 tiennent sans code nouveau : les journaux des Workers, 7 jours chez Cloudflare (F354) ; l'historique Time Travel, 30 jours ; l'export de la semaine, gardé par le porteur (10 bis.9), cinq semaines au plus (10 bis.20, F657). Les abonnements de notification vivent dans le Worker de notification, pas dans D1 (voir plus haut).
 

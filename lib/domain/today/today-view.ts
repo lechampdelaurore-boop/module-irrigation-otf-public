@@ -29,6 +29,7 @@ import {
   type ReliabilityZone,
 } from './reliability.ts';
 import { rainEntry, type RainEntry } from './rain-entry.ts';
+import { todayDayCurve, type TodayDayCurve, type TodayDayCurveInputs } from './day-curve.ts';
 import { approximateLine, detailSummary, waterAlert, weatherAlert, weekBar, type TodayEssential } from './essential.ts';
 import { hasMissingByBed, missingByBed, type MissingByBed, type MissingByBedInputs } from './missing-by-bed.ts';
 import { todaySoil, type TodaySoil } from './soil.ts';
@@ -303,6 +304,13 @@ export type TodayInputs = {
    * (D-032) : pas de fenêtre non plus.
    */
   rain?: { measured: ReadonlyMap<string, number>; rainMatters: boolean };
+  /**
+   * « Soif du jour, heure par heure » (ET0 horaire, HR3, D-350) : l'ET0 du
+   * jour de la ferme et les formes écrites de son lieu ; absent ou `null`
+   * quand elle n'est pas lue (la pastille, « Objectifs et besoins » décochée,
+   * aucun lieu de la météo).
+   */
+  dayCurve?: TodayDayCurveInputs | null;
 };
 
 export type TodayView = {
@@ -345,6 +353,8 @@ export type TodayView = {
    * cochée.
    */
   allIrrigationsLink: boolean;
+  /** « Soif du jour, heure par heure », dans « Le détail » ; `null` sans « Objectifs et besoins » ou sans lieu de la météo. */
+  dayCurve: TodayDayCurve | null;
 };
 
 export type TodayDayEmptyLink = { label: string; page: 'semaine' | 'arrosages'; intent: 'planifier' | null };
@@ -401,6 +411,7 @@ export function todayView(input: TodayInputs): TodayView {
   const shortage = on('planning') && input.shortagePlan ? todayShortage(input.shortagePlan, enabled, input.now) : null;
   const week = on('besoins') && input.week ? todayWeek(input.week, irrigatedToday) : null;
   const waterShown = blocks.find((item): item is TodayWaterBlock => item.kind === 'water') ?? null;
+  const dayCurve = on('besoins') && input.dayCurve ? todayDayCurve(input.dayCurve, now) : null;
   const essential: TodayEssential = {
     week: week ? weekBar(week) : null,
     approximate: reliabilityOn ? approximateLine(reliability) : null,
@@ -410,6 +421,7 @@ export function todayView(input: TodayInputs): TodayView {
       tiles: week ? (week.tiles.water ? 4 : 3) : 0,
       gardens: week ? week.shown.length + week.hidden.length : 0,
       weatherDays: weather?.days.length ?? 0,
+      dayCurve: dayCurve !== null,
       reservoirs: waterShown?.reservoirs.length ?? 0,
       limits: waterShown?.limits.length ?? 0,
       toRefresh: reliability.length,
@@ -440,5 +452,6 @@ export function todayView(input: TodayInputs): TodayView {
     allIrrigationsLink: on('arrosages'),
     rain: on('besoins') && input.rain?.rainMatters ? rainEntry({ today, measured: input.rain.measured }) : null,
     essential,
+    dayCurve,
   };
 }

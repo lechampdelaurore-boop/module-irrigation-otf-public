@@ -10,7 +10,7 @@ import { recalculateWeeklyPlansForAllWorkspaces } from '@/lib/services/planning-
 import { recordSoilDaysForAllWorkspaces } from '@/lib/services/soil-reserve-record';
 import { recordMorningTaskRuns } from '@/lib/services/task-runs';
 import { runAutomaticWeatherSync } from '@/lib/services/weather/automatic-sync';
-import { getConfiguredWeatherProvider } from '@/lib/services/weather/configured-provider';
+import { getConfiguredWeatherProvider, getModelForecastReader } from '@/lib/services/weather/configured-provider';
 import { evaluateWeatherAlertsAfterForecastWrite } from '@/lib/services/weather-alerts-service';
 import { verifyWeatherSyncToken } from '@/lib/services/weather/internal-auth';
 import type { MorningRunReport } from '@/lib/domain/operations/morning-task-outcomes';
@@ -31,6 +31,8 @@ export async function POST(request: Request) {
     const result = await runAutomaticWeatherSync({
       repository: automaticWeatherRepository,
       provider: getConfiguredWeatherProvider(),
+      // Les fermes qui ont choisi un modèle de prévision le lisent, une lecture par lieu et par modèle (D-346).
+      modelReader: getModelForecastReader(),
       // Les alertes météo (docs/weather-alerts-contract.md), puis le gel par culture et les aspersions
       // (docs/weather-crop-alerts-contract.md), après chaque écriture de prévisions.
       onForecastWritten: async (input) => {

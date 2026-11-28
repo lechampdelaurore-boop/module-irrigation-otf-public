@@ -88,14 +88,22 @@ export function whatFollowsText(selection: FeatureSelection | null): string {
  * qui n'existe pas (sa case décochée) n'est pas lu et vaut `null`.
  */
 export type RouteCounts = {
-  /** Les matériels actifs qui ont au moins un réglage, par sorte, et ceux qui n'en ont aucun. */
+  /**
+   * Les matériels actifs par sorte, comptés comme l'inventaire de « Matériel
+   * et placement » (le goutte-à-goutte : tout ce qui n'est pas une aspersion),
+   * et, parmi eux, ceux qui n'ont aucun réglage. La fiche « Matériel et
+   * placement » dit les mêmes nombres (section 7.1).
+   */
   equipment: { drip: number; sprinkler: number; withoutSetting: number } | null;
   /** Les planches de la saison arrosées par un matériel posé (`calculateIrrigationCoverage`), sur toutes. */
   placement: { watered: number; total: number } | null;
-  /** Les ressources en eau actives : au plus deux noms, et leur nombre. */
+  /** Les ressources et les réserves actives : au plus deux noms, et leur nombre. */
   water: { names: readonly string[]; total: number } | null;
-  /** Les planches de la saison qui ont une eau visée cette semaine (`farmObjective`), sur toutes. */
-  objective: { withObjective: number; total: number } | null;
+  /**
+   * Les planches de la saison qui ont une eau visée cette semaine (`farmObjective`), sur toutes ; celles hors
+   * saison, à part (`offSeason`, D-352), absent quand il n'y en a aucune.
+   */
+  objective: { withObjective: number; total: number; offSeason?: number } | null;
   /** Les parcelles de la saison sans sol saisi (`parcelsWithoutSoil`), sur toutes, et l'ancre de la première. */
   soil: { withoutSoil: number; total: number; anchor: string | null } | null;
 };
@@ -172,8 +180,8 @@ function plural(count: number, word: string): string {
   return `${count} ${word}${count > 1 ? 's' : ''}`;
 }
 
-/** « 4 goutte-à-goutte », « 2 goutte-à-goutte et 1 aspersion ». */
-function equipmentKindsText(drip: number, sprinkler: number): string {
+/** « 4 goutte-à-goutte », « 2 goutte-à-goutte et 1 aspersion » : l'étape 1 et la fiche « Matériel et placement » (section 7.2). */
+export function equipmentKindsText(drip: number, sprinkler: number): string {
   return joinLabels([...(drip > 0 ? [`${drip} goutte-à-goutte`] : []), ...(sprinkler > 0 ? [plural(sprinkler, 'aspersion')] : [])]);
 }
 
@@ -217,7 +225,8 @@ function readStep(id: RouteStepId, counts: RouteCounts, placementDone: boolean |
     case 'equipment': {
       const count = counts.equipment;
       if (!count) return { known: false };
-      const withSetting = count.drip + count.sprinkler;
+      // Faite dès qu'un matériel a un réglage ; sa ligne dit tout le matériel actif, comme l'inventaire et la fiche.
+      const withSetting = count.drip + count.sprinkler - count.withoutSetting;
       return {
         known: true,
         done: withSetting > 0,
@@ -259,12 +268,16 @@ function readStep(id: RouteStepId, counts: RouteCounts, placementDone: boolean |
       if (!count) return { known: false };
       // L'étape 4 attend l'étape 2 : sans planche arrosée, « combien je vise » n'a pas de sens pour le module (section 5.1).
       const waiting = placementDone === false ? PLACE_FIRST_TEXT : count.total === 0 ? NO_BED_TEXT : null;
+      // Une planche hors saison n'a rien à viser (D-337, D-352) : l'étape compte les planches en saison, comme
+      // « Aujourd'hui » ; toutes hors saison, rien ne manque.
+      const inSeason = count.total - (count.offSeason ?? 0);
       return {
         known: true,
-        done: count.total > 0 && count.withObjective === count.total,
-        // La phrase d'« Aujourd'hui » et de « Semaine » (S1, S6-i) : « 7 planches sur 10 ont un objectif », « ferme entière ».
-        progress: count.withObjective > 0 ? farmObjectiveScopeText(count) : null,
-        missing: count.total === 0 ? NO_BED_TEXT : bedsWithoutObjectiveText(count.total - count.withObjective),
+        done: count.total > 0 && count.withObjective === inSeason,
+        // La phrase d'« Aujourd'hui » et de « Semaine » (S1, S6-i) : « 7 planches sur 10 ont un objectif », « ferme entière »,
+        // « 7 planches sur 7 ont un objectif, 3 hors saison ».
+        progress: count.withObjective > 0 || inSeason < count.total ? farmObjectiveScopeText(count) : null,
+        missing: count.total === 0 ? NO_BED_TEXT : bedsWithoutObjectiveText(inSeason - count.withObjective),
         waiting,
         link: STEP_LINKS.objective,
       };

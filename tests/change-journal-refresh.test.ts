@@ -45,6 +45,8 @@ const RANGEMENT: Readonly<Record<string, Rangement>> = {
   // Le lieu de la météo, et les parts du tableau de l'eau affichées ailleurs (objectif, limite d'eau du jour).
   saveWeatherLocationAction: previent(WATER),
   restoreOtfWeatherLocationAction: previent(WATER),
+  // Le modèle de prévision de la ferme (météo multi-modèles, PR 3, D-347) : une ligne « Modèle de prévision ».
+  saveForecastModelAction: previent(WATER),
   saveHydricGoalAction: previent(WATER),
   clearHydricGoalsAction: previent(WATER),
   // Le réglage « Objectif automatique » (6 decies, O4, D-319) : un geste au journal, comme un objectif.
@@ -76,6 +78,7 @@ const RANGEMENT: Readonly<Record<string, Rangement>> = {
   loadWaterDashboardAction: horsJournal('La lecture du tableau de l’eau ; l’actualisation de la météo est une synchronisation, hors du journal (§5.1).'),
   searchWeatherLocationsAction: horsJournal('La recherche d’une commune : une lecture, rien n’est enregistré avant le choix.'),
   saveManualRainfallAction: horsJournal('Une pluie mesurée est une observation, pas un réglage : hors du journal (§5.1).'),
+  readForecastReliabilityAction: horsJournal('« La météo s’est-elle vérifiée ? », lue à l’ouverture de son pli dans « Le détail » de « Semaine » (D-344) : une lecture, rien n’est enregistré.'),
   readRainEntryAction: horsJournal('Les pluies déjà notées, lues à l’ouverture du geste « Noter la pluie » du « + » (S3) : une lecture, rien n’est enregistré.'),
   removeManualRainfallAction: horsJournal('Le retrait d’une pluie mesurée : une observation, pas un réglage, hors du journal (§5.1).'),
   confirmSpeciesStepAction: horsJournal('L’étape « Cultures » de l’accueil confirmée : l’avancement de l’accueil est hors du journal (4.4).'),

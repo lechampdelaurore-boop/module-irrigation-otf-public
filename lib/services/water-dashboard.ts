@@ -18,9 +18,8 @@ import { findWorkspaceIdForUser } from '@/db/workspace-repository';
 import { listAutomaticObjectiveRevisionsForUser } from '@/db/automatic-objective-repository';
 import { automaticObjectiveEnabledOn } from '../domain/automatic-objective';
 import { bedsKeepingEnteredGoal } from '../domain/objective-reading';
-import { writeForecastArchiveForUser } from '@/db/forecast-archive-repository';
-import { evaluateCropAlertsAfterForecastWrite } from './crop-alerts-service';
-import { evaluateWeatherAlertsAfterForecastWrite } from './weather-alerts-service';
+import { readForecastModelSettingForUser, returnForecastModelToAutomaticForUser } from '@/db/forecast-model-repository';
+import { forecastModelSettingView, type ForecastModelSettingView } from '@/lib/domain/weather/forecast-model-setting';
 import { readCropAlertsView, type CropAlertsView } from './crop-alerts-view';
 import { readWeatherAlertsView, type WeatherAlertsView } from './weather-alerts-view';
 import type { IrrigationSnapshot } from '../domain/domain';
@@ -36,9 +35,11 @@ import {
   type WaterDashboardDay,
 } from '../domain/water-management';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
-import { getConfiguredWeatherProvider, weatherAttribution } from './weather/configured-provider';
-import { archiveForecastReading } from './weather/forecast-archive';
+import { getConfiguredWeatherProvider, getModelForecastReader, weatherAttribution } from './weather/configured-provider';
+import { evaluateForecastAlertsForUser, writeForecastReadingForUser } from './weather/forecast-write';
+import { forecastModelToRead, resolveForecastModelChoice, type ModelForecastReader } from '../domain/weather/forecast-models';
 import { WeatherProviderError, type WeatherProvider } from '../domain/weather/weather-provider';
+import { TODAY_WEATHER_DAYS } from '../domain/today/today-view';
 import { oldestWeatherReadingInUse, weatherRefreshRequired, weatherRequestRanges } from '../domain/weather/cache-policy';
 import { weatherLocationKey, weatherLocationQuery } from '../domain/weather/location';
 import { weatherGeocodingRequired } from '../domain/weather/refresh-control';
@@ -47,6 +48,7 @@ import {
   weatherOutcomeError,
   weatherOutcomeNotBeforeAt,
   weatherOutcomeSucceeded,
+  type ForecastModelReading,
 } from './weather/sync-engine';
 import { readWeatherPreference, type ResolvedWeatherPreference } from './weather-preference';
 
@@ -84,6 +86,18 @@ export type WaterDashboard = {
     refreshAttempted: boolean;
     nextRefreshAllowedAt: string | null;
     attribution: string;
+    /**
+     * Le déploiement lit les modèles de prévision (D-347) : faux en
+     * démonstration, où le réglage « Modèle de prévision » n'existe pas
+     * (docs/weather-models-contract.md, règle 13).
+     */
+    forecastModelsAvailable: boolean;
+    /**
+     * Les phrases de la carte « Modèle de prévision » tirées de ce que la
+     * ferme a gardé (règles 6 et 9 ; D-347) ; `null` quand l'écran ne les lit
+     * pas, ou en démonstration.
+     */
+    forecastModelSetting: ForecastModelSettingView | null;
   };
   /** L'encart « Alertes météo » (5 bis), lu seulement par l'écran de la météo. */
   weatherAlerts: WeatherAlertsView | null;
@@ -107,8 +121,10 @@ export async function getWaterDashboardForUser({
   allowWeatherRefresh = true,
   includeWeatherAlerts = false,
   includeAutomaticObjective = false,
+  includeForecastModelSetting = false,
   now = new Date(),
   provider = getConfiguredWeatherProvider(),
+  modelReader = getModelForecastReader(),
   preloadedEvents,
 }: {
   ownerUserId: string;
@@ -119,8 +135,12 @@ export async function getWaterDashboardForUser({
   allowWeatherRefresh?: boolean;
   includeWeatherAlerts?: boolean;
   includeAutomaticObjective?: boolean;
+  /** La carte « Modèle de prévision » de Réglages (D-347) : deux lectures de plus, seulement pour cet écran. */
+  includeForecastModelSetting?: boolean;
   now?: Date;
   provider?: WeatherProvider;
+  /** Le lecteur du modèle de prévision choisi par la ferme (D-346) ; `null` : la ferme lit « Automatique » (règle 13). */
+  modelReader?: ModelForecastReader | null;
   preloadedEvents?: IrrigationEventRecord[] | Promise<IrrigationEventRecord[]>;
 }): Promise<WaterDashboard> {
   const preference = await readWeatherPreference(ownerUserId);
@@ -179,19 +199,21 @@ export async function getWaterDashboardForUser({
   }
 
   if (refreshClaimed && location) {
+    const modelId = await forecastModelForRefresh(ownerUserId, preference.forecastModel, location, modelReader !== null, now);
     await refreshWeather({
       ownerUserId,
       location,
       weekStart: requestedWeek,
       now,
       provider,
+      forecastModel: modelId === null || modelReader === null ? null : { reader: modelReader, modelId },
       bypassCache: forceWeatherRefresh,
     });
   }
 
   const refreshedPreference = await readWeatherPreference(ownerUserId);
   const alertsWorkspaceId = includeWeatherAlerts ? findWorkspaceIdForUser(ownerUserId) : null;
-  const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts, automaticSettings] = await Promise.all([
+  const [goals, limits, weatherRows, allEvents, weatherAlerts, cropAlerts, automaticSettings, forecastModelRecords] = await Promise.all([
     ensureRecurringHydricGoalsForUser(ownerUserId, season, requestedWeek),
     listDailyWaterLimitsForUser(ownerUserId),
     listWeatherDailyValuesForUser(ownerUserId, locationKey ?? 'unconfigured', dates[0], dates[6]),
@@ -199,6 +221,9 @@ export async function getWaterDashboardForUser({
     alertsWorkspaceId?.then((workspaceId) => readWeatherAlertsView({ workspaceId, locationKey, now })) ?? null,
     alertsWorkspaceId?.then((workspaceId) => readCropAlertsView({ ownerUserId, workspaceId, locationKey, snapshot, season, now })) ?? null,
     includeAutomaticObjective ? listAutomaticObjectiveRevisionsForUser(ownerUserId) : null,
+    includeForecastModelSetting && modelReader !== null
+      ? readForecastModelSettingForUser(ownerUserId, locationKey, dateKeyInTimeZone(now, location?.timezone ?? FARM_TIME_ZONE))
+      : null,
   ]);
   const ledger = buildDailyWaterLedger(allEvents.filter((event) => event.season === season), now, FARM_TIME_ZONE);
   const ledgerByDate = new Map(ledger.map((row) => [row.date, row]));
@@ -289,7 +314,19 @@ export async function getWaterDashboardForUser({
       ),
       refreshAttempted: weatherRefreshAttempted,
       nextRefreshAllowedAt: nextWeatherRefreshAllowedAt(refreshedPreference),
-      attribution: weatherAttribution(provider),
+      attribution: weatherAttribution(provider, forecastModelToRead(resolveForecastModelChoice(refreshedPreference.forecastModel, location), modelReader !== null)),
+      forecastModelsAvailable: modelReader !== null,
+      forecastModelSetting: forecastModelRecords === null ? null : forecastModelSettingView(
+        refreshedPreference.forecastModel,
+        {
+          forecastDays: forecastModelRecords.forecastDays,
+          lastChange: forecastModelRecords.lastChange === null ? null : {
+            ...forecastModelRecords.lastChange,
+            dateKey: dateKeyInTimeZone(new Date(forecastModelRecords.lastChange.at), FARM_TIME_ZONE),
+          },
+        },
+        dateKeyInTimeZone(now, FARM_TIME_ZONE),
+      ),
     },
     weatherAlerts,
     cropAlerts,
@@ -314,12 +351,41 @@ function weatherLocationLabel(
   return query ? [query.city, query.postcode].filter(Boolean).join(' · ') : null;
 }
 
+/**
+ * Le modèle que lit cette actualisation (docs/weather-models-contract.md,
+ * règles 1, 9 et 13 ; D-346) : le modèle enregistré s'il est encore proposé
+ * et couvre le lieu, et si le déploiement lit les modèles ; sinon
+ * « Automatique » (`null`). Un modèle retiré, ou qui ne couvre plus le lieu,
+ * ramène la ferme à « Automatique », dit au journal des modifications ; un
+ * échec de cette écriture n'empêche pas la lecture.
+ */
+async function forecastModelForRefresh(
+  ownerUserId: string,
+  savedModelId: string | null,
+  location: WeatherGeocodeRecord,
+  modelsReadable: boolean,
+  now: Date,
+): Promise<string | null> {
+  const choice = resolveForecastModelChoice(savedModelId, location);
+  if (choice.kind === 'back-to-automatic') {
+    try {
+      if (await returnForecastModelToAutomaticForUser(ownerUserId, choice.savedModelId, now.toISOString())) {
+        logJsonLine('info', { event: 'weather_forecast_model_returned_to_automatic', forecastModel: choice.savedModelId, reason: choice.reason });
+      }
+    } catch (error) {
+      logJsonLine('warn', { event: 'weather_forecast_model_return_failed', forecastModel: choice.savedModelId, error: error instanceof Error ? error.name : 'unknown' });
+    }
+  }
+  return forecastModelToRead(choice, modelsReadable);
+}
+
 async function refreshWeather({
   ownerUserId,
   location,
   weekStart,
   now,
   provider,
+  forecastModel,
   bypassCache,
 }: {
   ownerUserId: string;
@@ -327,14 +393,17 @@ async function refreshWeather({
   weekStart: string;
   now: Date;
   provider: WeatherProvider;
+  forecastModel: ForecastModelReading | null;
   bypassCache: boolean;
 }) {
   const at = now.toISOString();
   const today = dateKeyInTimeZone(now, location.timezone);
-  const ranges = weatherRequestRanges({ weekStart, today });
+  // La semaine en cours lit aussi les trois jours d'« Aujourd'hui », lundi compris le week-end (D-357).
+  const ranges = weatherRequestRanges({ weekStart, today, forecastDaysFromToday: TODAY_WEATHER_DAYS });
   logJsonLine('info', {
     event: 'weather_refresh_started',
     provider: provider.id,
+    ...(forecastModel ? { forecastModel: forecastModel.modelId } : {}),
     weekStart,
     today,
     forecastRange: ranges.forecast,
@@ -349,16 +418,9 @@ async function refreshWeather({
       provider,
       bypassCache,
       log: logJsonLine,
+      forecastModel,
     });
     await Promise.all([
-      upsertWeatherDailyValuesForUser(
-        ownerUserId,
-        location.locationKey,
-        'forecast',
-        outcome.forecast.status === 'fulfilled' ? outcome.forecast.values : [],
-        provider.sourceId?.('forecast') ?? provider.id,
-        at,
-      ),
       upsertWeatherDailyValuesForUser(
         ownerUserId,
         location.locationKey,
@@ -367,26 +429,22 @@ async function refreshWeather({
         provider.sourceId?.('reanalysis') ?? provider.id,
         at,
       ),
+      // Chaque jour sous sa source, puis l'archive J+1 à J+7 de la même lecture (D-297, D-346).
+      outcome.forecast.status === 'fulfilled'
+        ? writeForecastReadingForUser({
+          ownerUserId,
+          locationKey: location.locationKey,
+          days: outcome.forecast.values,
+          providerSource: provider.sourceId?.('forecast') ?? provider.id,
+          fetchedAt: at,
+          now,
+        })
+        : undefined,
     ]);
-    if (outcome.forecast.status === 'fulfilled') {
-      // L'archive J+1 à J+7 de la même lecture, sans appel de plus (docs/forecast-archive-contract.md).
-      await archiveForecastReading({
-        write: (snapshot) => writeForecastArchiveForUser(ownerUserId, snapshot),
-        locationKey: location.locationKey,
-        values: outcome.forecast.values,
-        source: provider.sourceId?.('forecast') ?? provider.id,
-        fetchedAt: at,
-        now,
-      });
-    }
     if (outcome.forecast.status === 'fulfilled' && outcome.forecast.values.length > 0) {
-      // Les alertes météo après chaque écriture de prévisions (docs/weather-alerts-contract.md).
-      const workspaceId = await findWorkspaceIdForUser(ownerUserId);
-      if (workspaceId) {
-        await evaluateWeatherAlertsAfterForecastWrite({ workspaceId, locationKey: location.locationKey, now });
-        // Puis le gel par culture et les aspersions (docs/weather-crop-alerts-contract.md).
-        await evaluateCropAlertsAfterForecastWrite({ workspaceId, locationKey: location.locationKey, now });
-      }
+      // Les alertes météo après chaque écriture de prévisions (docs/weather-alerts-contract.md),
+      // puis le gel par culture et les aspersions (docs/weather-crop-alerts-contract.md).
+      await evaluateForecastAlertsForUser(ownerUserId, location.locationKey, now);
     }
     const successful = weatherOutcomeSucceeded(outcome);
     logJsonLine(successful ? 'info' : 'warn', {
