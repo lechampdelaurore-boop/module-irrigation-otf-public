@@ -12,6 +12,19 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Météo multi-modèles : ligne 36 close le 27 novembre 2026.** La PR 3
+  (#251) est **en ligne depuis 23 h 31** (squash 4e24d94, run 46072042226,
+  cinq jobs verts) : tout le chantier est en ligne (#242, #248 à #251).
+  **Essai B et recette sur la ferme réelle conformes vers 23 h 55**, avec
+  l'accord du porteur (carte de 23 h 54), dans son Chrome : Météo-France
+  enregistré, la lecture qui le vérifie a réussi depuis le Worker (l'endpoint
+  Forecast d'Open-Meteo répond au site, contrairement à la phrase d'avant),
+  « Prévisions gardées : ce modèle jusqu'au mar. 1 déc. », puis retour à
+  « Automatique » et à la lecture d'avant (Visual Crossing). Contrat § 15 ;
+  compte rendu `/mnt/project-files/meteo-modeles/recette-modele-prevision-2026-11-27.md`.
+  `docs/weather-contract.md` réécrit (fournisseur, source, décompte des
+  appels, licence). Le journal `weather_forecast_model_verified` n'a pas
+  été lu (pas d'accès aux journaux Cloudflare).
 - **La météo du lundi dans « Aujourd'hui », le week-end : corrigée le
   28 novembre 2026** (D-357, F1100 ; point ouvert 70), en Opus 5.5 ·
   Élevé (corrections, les tests et la CI jugent). La lecture de la
@@ -19,8 +32,8 @@ registres, elle y renvoie.
   un dimanche, le troisième jour d'« Aujourd'hui » restait sans prévision
   hors de la tâche du matin, et P29 échouait sur toute branche, `main`
   comprise. Elle va désormais jusqu'au troisième jour. Test du domaine et
-  P29 rouges avant, verts après ; contrôles : voir la PR. À fusionner
-  avant #259 et #261, qu'elle débloque.
+  P29 rouges avant, verts après ; contrôles : voir la PR. Fusionnée le
+  28 novembre 2026 (#262, 8419477), avant #261 et #259, qu'elle débloque.
 - **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
   26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
   § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
