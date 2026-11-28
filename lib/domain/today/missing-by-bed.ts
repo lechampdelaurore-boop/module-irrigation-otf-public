@@ -253,7 +253,7 @@ export function missingByBed(input: MissingByBedInputs): MissingByBed {
         kind: 'rain-gauge',
         key: `rain-gauge:${bed.bedId}`,
         text: `${rainLine} ${RAIN_GAUGE_CONSEQUENCE}`,
-        action: { kind: 'link', label: 'Saisir une pluie mesurée, même 0 mm', page: 'besoins', anchor: MEASURED_RAIN_ANCHOR },
+        action: { kind: 'link', label: 'Saisir une pluie mesurée, même 0 mm', page: 'semaine', anchor: MEASURED_RAIN_ANCHOR },
       });
     }
     if (lines.length === 0) return [];

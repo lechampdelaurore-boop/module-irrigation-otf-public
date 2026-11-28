@@ -26,7 +26,7 @@ export type TodayTomorrow = {
   /** « 3 arrosages sont à valider demain dès 6 h. », pour la phrase de résumé. */
   sentence: string;
   /** La première proposition de demain sur le planning, comme les lignes du jour (F274). */
-  link: { page: 'planning'; anchor: string };
+  link: { page: 'semaine'; anchor: string };
 };
 
 export type TodayShortage = {
@@ -66,7 +66,7 @@ export function todayTomorrow(proposals: readonly StoredProposal[], now: Date): 
     count,
     text: `Demain ${at} : ${irrigations(count)} à valider`,
     sentence: count === 1 ? `Une irrigation est à valider demain ${at}.` : `${irrigations(count)} sont à valider demain ${at}.`,
-    link: { page: 'planning', anchor: proposalAnchor(first.storedId) },
+    link: { page: 'semaine', anchor: proposalAnchor(first.storedId) },
   };
 }
 

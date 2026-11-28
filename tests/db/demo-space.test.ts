@@ -31,8 +31,8 @@ import { installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 /**
  * L'espace d'un invité de la démonstration (docs/demo-guided-contract.md,
  * sections 5 et 6) : préparé à sa première ouverture avec les cases de la
- * ferme fictive, jamais réécrit ensuite ; la ferme vierge s'ouvre sur la
- * liste à cocher ; hors démonstration, rien ne se prépare.
+ * ferme fictive, jamais réécrit ensuite ; la ferme vierge s'ouvre sur les
+ * trois façons de commencer (lot S6) ; hors démonstration, rien ne se prépare.
  */
 
 let database: TestDatabase;
@@ -66,7 +66,7 @@ test('les essais de l’invité restent : un espace déjà ouvert n’est pas r�
   assert.deepEqual((await getFeatureSelectionForUser(owner)).enabled, ['materiel']);
 });
 
-test('la ferme vierge s’ouvre sur la liste à cocher, comme une ferme qui n’a jamais ouvert le module', async () => {
+test('la ferme vierge s’ouvre sur les trois façons de commencer, comme une ferme qui n’a jamais ouvert le module', async () => {
   const choice = resolveDemoChoice('vierge', 'ete');
   const owner = demoOwnerUserId('invite-a', choice);
   await prepareDemoSpace(owner, choice);

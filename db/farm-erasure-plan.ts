@@ -71,6 +71,8 @@ export const SPACE_TABLES: readonly SpaceTable[] = [
   { table: 'irrigation_hydric_goal_revisions' },
   { table: 'irrigation_automatic_objective_weeks' },
   { table: 'irrigation_automatic_objective_revisions' },
+  // Les gestes « Mettre hors saison » et « Reprendre » (6 quaterdecies, B2, D-352).
+  { table: 'irrigation_off_season_revisions' },
   { table: 'irrigation_garden_group_members', via: { column: 'group_id', parent: 'irrigation_garden_groups' } },
   { table: 'irrigation_feature_selections' },
   { table: 'irrigation_event_log', via: { column: 'event_id', parent: 'irrigation_events' } },

@@ -67,8 +67,9 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_hydric_goal_revisions',
     'irrigation_need_decision_log',
     // Même raison : l'état de l'accueil (4.4, migration 0034), la notification du jour de la veille de l'exploitant (4.5, migration 0038)
-    // et les deux tables des messages du téléphone (améliorations n° 3 et n° 2, migration 0043) partagent la ligne de leur voisine.
-    'irrigation_need_preferences', 'irrigation_onboarding_steps', 'irrigation_operator_notices', 'irrigation_phone_notice_settings', 'irrigation_phone_notices',
+    // et les deux tables des messages du téléphone (améliorations n° 3 et n° 2, migration 0043) partagent la ligne de leur voisine ;
+    // les gestes « hors saison » aussi (6 quaterdecies, B2, migration 0052).
+    'irrigation_need_preferences', 'irrigation_off_season_revisions', 'irrigation_onboarding_steps', 'irrigation_operator_notices', 'irrigation_phone_notice_settings', 'irrigation_phone_notices',
     'irrigation_placement_selected_beds',
     // Même raison : la table des événements de la 3.7 partage la ligne de sa voisine.
     'irrigation_plan_calculations', 'irrigation_plan_events',
@@ -92,7 +93,7 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_water_resources',
     'irrigation_water_stock_movements',
     'irrigation_water_supply_defaults',
-    // Les trois tables des alertes météo (5 bis), la forme de la journée (0052) et l'archive des prévisions (0046) partagent une ligne, même raison.
+    // Les trois tables des alertes météo (5 bis), la forme de la journée (0054) et l'archive des prévisions (0046) partagent une ligne, même raison.
     'irrigation_weather_alert_criteria', 'irrigation_weather_alert_criterion_versions', 'irrigation_weather_alerts', 'irrigation_weather_daily_values', 'irrigation_weather_day_shapes', 'irrigation_weather_forecast_archive',
     'irrigation_weather_geocodes',
     'irrigation_weather_preferences',

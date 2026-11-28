@@ -3,7 +3,7 @@ import { HOURLY_ET0_NATURES, type RecordedDayShape } from '@/lib/domain/weather/
 
 /**
  * La forme de la journée de l'ET0 horaire (docs/et0-horaire-contract.md, § 5 ;
- * D-349 ; migration 0052) : par lieu, jour et source, J0 à J+2.
+ * D-349 ; migration 0054) : par lieu, jour et source, J0 à J+2.
  *
  * Une lecture plus récente remplace la forme d'un jour et d'une source
  * (`ON CONFLICT … DO UPDATE`) ; un jour qu'une lecture ne donne pas garde

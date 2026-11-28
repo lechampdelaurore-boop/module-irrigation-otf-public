@@ -11,6 +11,7 @@ import { weatherLocationKey } from '../domain/weather/location';
 import { readWeatherPreference } from './weather-preference';
 import { dateKeys } from '../domain/irrigation-history/dates';
 import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
+import { readOffSeasonSourceForUser } from './off-season-source';
 
 export type SeriesWaterDashboard =
   | {
@@ -64,14 +65,17 @@ export async function getSeriesWaterDashboardForUser({
     if (occupation.endDate !== null && occupation.endDate > latestEnd) latestEnd = occupation.endDate;
   }
 
-  const [[events, weather, goalRevisions], automatic] = earliestStart === null
-    ? [[[], [], []], null]
+  const [[events, weather, goalRevisions], automatic, offSeason] = earliestStart === null
+    ? [[[], [], []], null, null]
     : await Promise.all([
       readInputs(ownerUserId, season, snapshot, earliestStart, today, latestEnd),
       // L'objectif automatique, quand la ferme l'a allumé (D-309) : la règle de l'historique, jusqu'à la dernière récolte attendue.
       readAutomaticObjectiveSourceForUser({ ownerUserId, season, snapshot, from: earliestStart, to: latestEnd, now }),
+      // Le filtre « hors saison » (D-337, D-352) : ces jours-là, aucun objectif, comme dans l'historique.
+      readOffSeasonSourceForUser({ ownerUserId, snapshot }),
     ]);
   const placedBedIds = new Set(cropPlan.places.map((place) => place.bedId));
+  const placedBeds = snapshot.beds.filter((bed) => placedBedIds.has(bed.id));
 
   const report = buildSeriesWaterReport({
     cropPlan,
@@ -83,7 +87,8 @@ export async function getSeriesWaterDashboardForUser({
     today,
     automaticObjective: earliestStart === null
       ? undefined
-      : automatic?.dayValuesFor(snapshot.beds.filter((bed) => placedBedIds.has(bed.id)), dateKeys(earliestStart, latestEnd)),
+      : automatic?.dayValuesFor(placedBeds, dateKeys(earliestStart, latestEnd)),
+    offSeason: offSeason?.byBed(placedBeds),
   });
 
   return {

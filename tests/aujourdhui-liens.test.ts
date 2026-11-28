@@ -64,10 +64,10 @@ test('L1, cas 1 : maraîchage, début d’été, 7 planches sur 10 ont un object
   assert.equal(result.tiles.objective, '23,4 mm');
   assert.equal(result.tiles.objectiveDetail, '7 planches sur 10 ont un objectif, du lun. 15 juin au dim. 21 juin');
   assert.deepEqual(actions(result), {
-    objective: 'Modifier les objectifs → besoins#objectifs-de-la-semaine',
-    received: 'Noter la pluie → besoins#manual-rain',
-    remaining: 'Voir par planche → besoins#irrigation-needs-title',
-    water: 'Voir jour par jour → besoins#weather',
+    objective: 'Modifier les objectifs → semaine#objectifs-de-la-semaine',
+    received: 'Noter la pluie → semaine#manual-rain',
+    remaining: 'Voir par planche → semaine#irrigation-needs-title',
+    water: 'Voir jour par jour → semaine#weather',
   });
 });
 
@@ -115,7 +115,7 @@ test('L1 : une planche sur deux, au singulier, un seul « sur » ; ferme entièr
 
 test('L1 : la cible garde la saison et la zone de la page', () => {
   const result = week([bed('g1', 'Champ', 20)]);
-  assert.equal(pageHref(result.links.objective.page, { season: 2026, zone: 'z1' }, result.links.objective.anchor), '/irrigation/besoins?season=2026&zone=z1#objectifs-de-la-semaine');
+  assert.equal(pageHref(result.links.objective.page, { season: 2026, zone: 'z1' }, result.links.objective.anchor), '/irrigation/semaine?season=2026&zone=z1#objectifs-de-la-semaine');
 });
 
 test('L1 : chaque tuile est un lien entier, le mot d’action écrit dessus ; le lien n’enregistre rien (D-028)', () => {
@@ -141,7 +141,7 @@ test('L2 : « Eau de la semaine » : la ferme au tableau des besoins, chaque jar
     ['besoin-jardin-g1', 'Champ du haut : 6 / 20 mm'],
   ]);
   assert.equal(needsGardenAnchor('g1'), 'besoin-jardin-g1');
-  assert.equal(pageHref('besoins', { season: 2026 }, result.shown[0].anchor), '/irrigation/besoins?season=2026#besoin-jardin-g2');
+  assert.equal(pageHref('semaine', { season: 2026 }, result.shown[0].anchor), '/irrigation/semaine?season=2026#besoin-jardin-g2');
 });
 
 const soilPlot = (plotId: string, name: string, garden: Partial<SoilGaugeZone['plots'][number]['garden']>): SoilGaugeZone['plots'][number] => ({
@@ -234,10 +234,10 @@ test('L3, règle 2 : une donnée à jour mène à la page où elle vit ; à rafr
   const checks = reliabilityChecks(input, reliabilityLines(input));
   assert.deepEqual(checks.map((check) => [check.label, check.ok, check.link]), [
     ['Volume des réserves', false, null],
-    ['Pluie mesurée', true, { page: 'besoins', anchor: 'manual-rain' }],
+    ['Pluie mesurée', true, { page: 'semaine', anchor: 'manual-rain' }],
     ['Réserve du sol', true, { page: 'sol', anchor: null }],
     ['Espèces', true, { page: 'reglages', anchor: 'species-correspondence-title' }],
-    ['Plan de la semaine', true, { page: 'planning', anchor: null }],
+    ['Plan de la semaine', true, { page: 'semaine', anchor: null }],
   ]);
   const fresh = { ...input, reservoirs: [{ id: 'r1', name: 'Bassin', observedAt: '2026-11-11T08:00:00.000Z' }] };
   assert.deepEqual(reliabilityChecks(fresh, reliabilityLines(fresh))[0].link, { page: 'ressources', anchor: null });
@@ -260,7 +260,7 @@ const todayInputs = (enabled: FeatureId[], overrides: Partial<TodayInputs> = {})
 });
 
 test('L3, règle 4 : « Rien à arroser aujourd’hui » mène au planning, sinon à « Planifier un arrosage »', () => {
-  assert.deepEqual(todayView(todayInputs(ALL)).dayEmptyLink, { label: 'Voir le planning de la semaine', page: 'planning', intent: null });
+  assert.deepEqual(todayView(todayInputs(ALL)).dayEmptyLink, { label: 'Voir la semaine', page: 'semaine', intent: null });
   assert.deepEqual(todayView(todayInputs(['arrosages'])).dayEmptyLink, { label: 'Planifier un arrosage', page: 'arrosages', intent: 'planifier' });
   assert.equal(todayView(todayInputs(['besoins'])).dayEmptyLink, null, 'sans « Votre journée », aucun lien');
 });
@@ -281,7 +281,7 @@ test('L3, règle 5, réécrite par le lot S2 : le lien d’une proposition devie
     equipmentName: 'Asperseur A', settingName: 'Buse 2', applications: [{ otfBedId: 'b2' }],
   } as unknown as StoredProposal;
   const [line] = todayTodoLines({ enabled: ALL, now: NOW, events: [], lateToleranceMinutes: 30, bedNames: new Map([['b2', 'P2']]), proposals: [proposal] });
-  assert.deepEqual(line.open, { page: 'planning', anchor: 'proposal-p20', label: 'Changer l’heure ou la dose' });
+  assert.deepEqual(line.open, { page: 'semaine', anchor: 'proposal-p20', label: 'Changer l’heure ou la dose' });
   // Le lien est dessiné par la carte à un bouton (S2), dans « Autres choix » ; « Valider » y est un bouton.
   const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
   assert.match(day, /<a className="today-action-link" href=\{pageHref\(gesture\.page, query, gesture\.anchor\)\} aria-label=\{choice\.accessibleName\}>/);
@@ -294,7 +294,7 @@ test('L3 : les liens dessinés — jour en alerte, donnée à jour, plan, état 
   const zone = readFileSync('app/irrigation/today/reliability-zone.tsx', 'utf8');
   assert.match(zone, /<a className="reliability-check-link" href=\{pageHref\(check\.link\.page, query, check\.link\.anchor \?\? undefined\)\}>/);
   const header = readFileSync('app/irrigation/today/today-header.tsx', 'utf8');
-  assert.match(header, /<a href=\{pageHref\('planning', query\)\}>\{plan\.text\}<\/a>/);
+  assert.match(header, /<a href=\{pageHref\('semaine', query\)\}>\{plan\.text\}<\/a>/);
   assert.doesNotMatch(header, /plan\.linkToPlanning \? <a/);
   const day = readFileSync('app/irrigation/today/today-day.tsx', 'utf8');
   assert.match(day, /hrefWithIntent\(pagePath\(emptyLink\.page\), query\.season, emptyLink\.intent, '1'\)/);

@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { featureLabel } from '../lib/domain/features/catalogue.ts';
-import { ESSENTIAL_FEATURES, withEssentialFeatures } from '../lib/domain/features/choice.ts';
+import * as choice from '../lib/domain/features/choice.ts';
 import { weatherDays, weatherScale } from '../lib/domain/today/weather-days.ts';
 import { DEMO_UNSENT_DELIVERY_LABEL, shownWeatherAlertDelivery } from '../lib/domain/weather/weather-alerts.ts';
 
@@ -31,14 +30,10 @@ test('n° 12, F451 : la bannière compacte du téléphone vaut jusqu’à 1 000 
 
 // n° 25 — Petits défauts de la démonstration (PR 5).
 
-test('n° 25, F452 : « Commencer par l’essentiel » coche arroser, les besoins et le matériel, et garde ce qui l’était déjà', () => {
-  assert.deepEqual([...ESSENTIAL_FEATURES], ['arrosages', 'besoins', 'materiel']);
-  const fromNothing = withEssentialFeatures([]);
-  for (const id of ESSENTIAL_FEATURES) assert.ok(fromNothing.includes(id), id);
-  assert.ok(withEssentialFeatures(['alertes-meteo']).includes('alertes-meteo'), 'rien n’est décoché');
-  const page = readFileSync('app/irrigation/bienvenue/welcome-choice.tsx', 'utf8');
-  assert.match(page, /Commencer par l’essentiel/);
-  for (const id of ESSENTIAL_FEATURES) assert.ok(page.includes(featureLabel(id)), `la phrase nomme ${featureLabel(id)}`);
+test('n° 25, F452 : « Commencer par l’essentiel » est retiré par le lot S6 de la simplification (D-336) : les trois façons de commencer font son travail', () => {
+  assert.ok(!('ESSENTIAL_FEATURES' in choice) && !('withEssentialFeatures' in choice));
+  assert.doesNotMatch(readFileSync('app/irrigation/bienvenue/welcome-choice.tsx', 'utf8'), /Commencer par l’essentiel/);
+  assert.doesNotMatch(readFileSync('app/irrigation/styles/features.css', 'utf8'), /\.welcome-start/);
 });
 
 test('n° 25, F452 : « Cochera aussi » se lit en texte ordinaire, pas en italique accentué', () => {

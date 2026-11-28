@@ -11,7 +11,7 @@ import { moreGardensLabel, type TodayWeek } from '../today/week.ts';
  * (S1-O1). L'ordre est celui d'« Aujourd'hui » ; à plus de dix jardins, les
  * dix premiers puis « Voir les n autres », les autres dans l'ordre naturel
  * (S4-j). Un jardin sans objectif n'a pas de barre : « pas d'eau visée » et
- * « Lui en donner une » (S4-f).
+ * « Lui en donner une » (S4-f) ; tout hors saison, « hors saison », sans lien.
  */
 
 /** Les jardins montrés d'emblée sur la page « Semaine » (S4-j). */
@@ -31,6 +31,8 @@ export type WeekGardenLine = {
   /** Son pli dans « Ce qu'il reste à arroser » (section 7.4). */
   anchor: string;
   aimed: boolean;
+  /** Toutes ses planches hors saison : « hors saison », sans « Lui en donner une » (recette de la ligne 34, écart c). */
+  offSeason: boolean;
 };
 
 export type WeekGardens = {
@@ -55,7 +57,9 @@ function partOf(row: WeekRow): string {
 function gardenLine(row: WeekRow): WeekGardenLine {
   const objective = row.objectiveMm;
   if (objective === null) {
-    return { key: row.key, name: row.name, text: 'pas d’eau visée', bar: null, label: `${row.name} : pas d’eau visée`, anchor: row.anchor, aimed: false };
+    const offSeason = allOffSeason(row);
+    const text = offSeason ? 'hors saison' : 'pas d’eau visée';
+    return { key: row.key, name: row.name, text, bar: null, label: `${row.name} : ${text}`, anchor: row.anchor, aimed: false, offSeason };
   }
   const percent = (value: number) => (objective <= 0 ? (value > 0 ? 100 : 0) : Math.round(percentFromFraction(Math.min(1, Math.max(0, value / objective))) * 10) / 10);
   const irrigationPercent = percent(row.irrigationMm);
@@ -74,13 +78,19 @@ function gardenLine(row: WeekRow): WeekGardenLine {
     label: `${row.name} : ${text}`,
     anchor: row.anchor,
     aimed: true,
+    offSeason: false,
   };
+}
+
+function allOffSeason(row: WeekRow): boolean {
+  return row.objectiveBeds.total > 0 && row.objectiveBeds.offSeason === row.objectiveBeds.total;
 }
 
 /** Les lignes des jardins, d'après la semaine d'« Aujourd'hui » lue avec dix jardins montrés. */
 export function weekGardens(week: Pick<TodayWeek, 'farm' | 'shown' | 'hidden'>): WeekGardens {
-  const { withObjective, total } = week.farm.objectiveBeds;
-  const unaimed = total - withObjective;
+  // Une planche hors saison n'attend pas d'objectif : elle n'est pas « sans eau visée » (écart c).
+  const { withObjective, total, offSeason = 0 } = week.farm.objectiveBeds;
+  const unaimed = total - withObjective - offSeason;
   const hidden = week.hidden.map(gardenLine);
   return {
     shown: week.shown.map(gardenLine),
