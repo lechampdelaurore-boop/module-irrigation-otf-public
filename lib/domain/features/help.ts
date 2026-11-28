@@ -51,7 +51,7 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   cultures: {
     purpose: 'Adapter le besoin en eau à chaque culture et à son stade, à partir de la météo : une culture ne boit pas autant à la levée qu’en pleine saison, et le module suit son stade jour après jour.',
-    reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez, ou si l’objectif automatique est allumé dans « Objectifs et besoins ».',
+    reading: 'L’ETM du jour est l’évapotranspiration de référence multipliée par le coefficient cultural de la culture. L’objectif proposé de la semaine en découle ; il ne compte que si vous l’adoptez, ou si l’objectif automatique est allumé dans « Eau visée », sur « Semaine ».',
     firstStep: 'Vérifiez dans Réglages que vos espèces d’Ouvre ta ferme correspondent à une culture de référence, puis ajustez coefficients, profils racinaires et durées si besoin.',
   },
   'alertes-meteo': {
@@ -71,13 +71,13 @@ export const PAGE_HELP: Readonly<Record<IrrigationPageId, PageHelp>> = {
   },
   semaine: {
     purpose: 'Savoir où en est l’eau de la semaine, sur une seule page : les arrosages proposés à valider, l’eau visée, la météo et la pluie, ce qu’il reste à arroser. « Les cumuls » retrouve l’eau apportée sur une autre période.',
-    reading: 'La semaine va du lundi au dimanche. Le plan, quand vous l’avez coché, vient d’abord, puis l’eau visée, la météo, la pluie mesurée et le tableau des jours, puis le besoin de chaque planche : son eau visée moins l’eau déjà reçue, arrosages et pluie. Seules vos fonctionnalités cochées ont leur partie.',
-    firstStep: 'Lisez les propositions du plan et validez celles qui vous conviennent : rien n’est arrosé sans vous. Après une pluie, notez ce qu’indique votre pluviomètre.',
+    reading: 'La semaine va du lundi au dimanche. En haut, la phrase et le bilan disent l’eau visée, reçue et arrosée. « Jour par jour » montre chaque jour et ses arrosages à valider, « Jardin par jardin » chaque jardin. « Le détail » range le reste : besoin par planche, plan, pluie, météo.',
+    firstStep: 'Validez, jour par jour, les arrosages proposés qui vous conviennent : rien n’est arrosé sans vous. Après une pluie, notez ce qu’indique votre pluviomètre avec « Noter la pluie », sous le bilan.',
   },
   'ma-ferme': {
     purpose: 'Retrouver ce que le module sait de votre ferme : votre matériel, d’où vient l’eau, vos cultures, votre sol, les alertes et les réglages. On y vient surtout à l’installation, ou quand quelque chose change au champ.',
-    reading: 'Chaque fiche ouvre sa page et dit en une ligne à quoi elle sert. « À faire », en orange, marque une fiche où il reste une étape de l’accueil de la ferme, la même que dans « À finir ». Seules vos fonctionnalités cochées ont leur fiche ; Réglages est toujours là.',
-    firstStep: 'Touchez d’abord une fiche « À faire », s’il y en a une. Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
+    reading: 'Chaque fiche ouvre sa page et dit en une ligne où elle en est, comme « 4 goutte-à-goutte, tous posés ». « À faire », en orange, marque une étape de l’accueil de la ferme, comme « À finir ». Une ferme qui commence voit sa mise en route en tête. Seules vos fonctionnalités cochées ont leur fiche.',
+    firstStep: 'Suivez la mise en route si elle est en tête, ou touchez une fiche « À faire ». Sinon, celle de ce qui a changé : un goutte-à-goutte remplacé se dit dans « Matériel et placement ».',
   },
   reglages: {
     purpose: 'Choisir les fonctionnalités affichées, et régler ce qui sert à plusieurs pages.',
@@ -165,6 +165,37 @@ export const RELIABILITY_HELP: SectionHelp = {
     {
       title: 'Ce que fait le bouton',
       text: 'Il ouvre l’endroit où corriger la donnée, ou recalcule le plan. La ligne disparaît quand la donnée est à jour.',
+    },
+  ],
+};
+
+/**
+ * Le « ? » du bloc « Hors saison », dans « Objectifs de la semaine » (6
+ * quaterdecies, B3, docs/objectif-automatique-saison-contract.md, sections
+ * 4.1 à 4.5 ; D-337, D-353) : ce que le filtre ignore, ce qui continue, les
+ * cinq portées, et la reprise, à la main seulement.
+ */
+export const OFF_SEASON_HELP: SectionHelp = {
+  entries: [
+    {
+      title: 'Ce que fait « hors saison »',
+      text: 'Un endroit hors saison n’a plus d’objectif, ni saisi ni automatique, et le planning ne propose plus de l’arroser. Il sort des comptes de l’eau visée. Rien n’est effacé : un objectif saisi reste là et revient à la reprise.',
+    },
+    {
+      title: 'Ce qui continue',
+      text: 'La pluie tombée dehors reste enregistrée et suivie, comme la réserve du sol, l’ET0, la météo et ses alertes, le gel compris. Un arrosage fait à la main s’enregistre toujours. Le passé ne bouge pas : le geste compte à partir de son jour.',
+    },
+    {
+      title: 'Les endroits',
+      text: 'Une planche, un jardin ou un abri, une parcelle, tout le plein champ ou tout le sous-abri. Un jardin « à classer » n’est couvert ni par tout le plein champ ni par tout le sous-abri : classez-le, ou mettez-le hors saison seul.',
+    },
+    {
+      title: 'Reprendre',
+      text: 'Rien ne reprend seul, ni à une date ni au printemps : touchez « Reprendre » sur l’endroit. Un endroit couvert par un autre, comme un jardin et tout le plein champ, reste hors saison tant que l’autre l’est.',
+    },
+    {
+      title: 'Les arrosages déjà prévus',
+      text: 'En mettant hors saison, le module compte les arrosages planifiés ou validés de ces planches et propose de les annuler ou de les garder. Un arrosage déjà démarré n’est pas proposé : il se termine.',
     },
   ],
 };

@@ -1310,7 +1310,7 @@ Un écran par étape, **reprenable** : fermer l'onglet ou être coupé ne perd r
 | 6 | Réglages à relire | planning, gel, alertes, surfaces… en « proposé, à ajuster » | valide, ajuste ou passe | non (F424) |
 | 7 | Vérification finale | liste verte, ou ce qui manque | corrige ou continue | non (F427) |
 
-**Rien n'oblige à tout finir d'un coup.** Une ferme « pas finie » ouvre le module ; chaque page dit ce qui lui manque et renvoie à l'étape (bandeau « À finir : sol des parcelles »), sans erreur ni zéro. Mais **aucun planning n'est calculé** tant que l'étape 6 n'est pas validée (réponse Q10).
+**Rien n'oblige à tout finir d'un coup.** Une ferme « pas finie » ouvre le module ; chaque page dit ce qui lui manque et renvoie à l'étape (bandeau « À finir : sol des parcelles »), sans erreur ni zéro. Mais **aucun planning n'est calculé** tant que l'étape 6 n'est pas validée (réponse Q10). **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : le bandeau « À finir » n'est **pas répété sur « Ma ferme »** quand la carte « Mise en route » y est visible (S6-d, F966) ; ses étapes restent sur les fiches, avec « À faire » ; sa règle et ses lignes ne changent pas, et il reste sur toutes les autres pages.
 
 #### 8 bis.4 · Les points
 

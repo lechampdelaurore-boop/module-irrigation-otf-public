@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
+import { attendreLaPremiereOuverture, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import {
   attendreLaPageIrrigation,
   attendreLaPagePrete,
@@ -19,8 +19,9 @@ import {
  * docs/aujourdhui-tableau-de-bord-contract.md, section 3.2 ;
  * docs/browser-journeys-contract.md).
  *
- * Sur une ferme neuve de démonstration qui a tout coché : `/irrigation` et le
- * choix des cases mènent à « Aujourd'hui », première du menu ; ses six blocs
+ * Sur une ferme neuve de démonstration qui a tout coché : le choix « Tout »
+ * mène une fois à « Ma ferme » (lot S6), puis `/irrigation` mène à
+ * « Aujourd'hui », première du menu ; ses six blocs
  * sont là, dans l'ordre du tableau de bord, chacun avec sa phrase calme quand
  * il n'a rien à dire ; la saison n'y est pas proposée ; la pastille du menu compte les
  * lignes de « Fiabilité du calcul ». Une alerte météo de l'exploitation,
@@ -86,15 +87,16 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirUneFermeNeuve(context, testInfo, 'aujourdhui');
 
-  // Toutes les cases cochées : le choix mène à « Aujourd'hui » (F1).
+  // Toutes les cases cochées, par la façon « Tout » : la première arrivée est « Ma ferme », la mise en route ayant une étape (lot S6, section 3.4) ;
+  // les ouvertures suivantes mènent à « Aujourd'hui » (F1).
   await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
+  await attendreLaPremiereOuverture(page);
+  await page.getByRole('radio', { name: 'Tout : sol, cultures et alertes' }).check();
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await attendreLaPagePrete(page, 'ma-ferme');
+  await expect(page).toHaveURL(/\/irrigation\/ma-ferme(\?|$)/);
+  await page.goto('/irrigation/aujourdhui');
   await attendreLaPagePrete(page, 'aujourdhui');
-  await expect(page).toHaveURL(/\/irrigation\/aujourdhui(\?|$)/);
   // Une ferme neuve dit ce qui lui manque : la commune, ses jardins, le sol de ses parcelles et ses espèces, avant la météo,
   // le gel, les besoins et la réserve du sol (4.4, F582, F583, F584, F587).
   await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : commune de la ferme, 4 jardins à classer, sol de 3 parcelles, 4 espèces à rattacher, réglages du planning à valider.');
@@ -107,14 +109,22 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect(page.locator('.onboarding-unfinished')).toHaveText('À finir : sol de 3 parcelles.');
   await verifierLEtape(page, journal, 'arrivée sur « Aujourd’hui »');
 
+  // Sans arrosage, la ferme pas encore décrite : l'étape en cours de sa mise en route à la place de « Rien à arroser »
+  // (lot S6, section 8). « Plus tard », sur « Ma ferme », rend la ligne vide d'avant.
+  await expect(page.locator('#today-day .today-route')).toContainText('Votre ferme n’est pas encore prête à proposer des arrosages.');
+  await attendreLaPageIrrigation(page, 'ma-ferme');
+  await page.locator('section.start-route').getByRole('button', { name: 'Plus tard' }).click();
+  await expect(page.getByText('La mise en route est remise à plus tard. Elle vous attend ici.')).toBeVisible();
+  await attendreLaPageIrrigation(page, 'aujourdhui');
+
   // Les six blocs, dans l'ordre ; les blocs sans rien à dire le disent en une phrase (F3).
   await expect(blocs(page).locator('h2')).toHaveText(TITRES_DES_BLOCS);
   await expect(bloc(page, 'Votre journée')).toContainText('Aucune irrigation en retard.');
   await expect(bloc(page, 'Votre journée')).toContainText('Rien à faire aujourd’hui.');
-  // L'état vide propose la suite (6 nonies, L3, D-312) : « Planning » coché, le planning de la semaine.
-  const suiteDuJour = bloc(page, 'Votre journée').getByRole('link', { name: 'Voir le planning de la semaine' });
-  await expect(suiteDuJour).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
-  if (telephone) await verifierCibleTactile(suiteDuJour, 'Le lien « Voir le planning de la semaine »');
+  // L'état vide propose la suite (6 nonies, L3, D-312) : « Planning » coché, la semaine (S4, PR 4).
+  const suiteDuJour = bloc(page, 'Votre journée').getByRole('link', { name: 'Voir la semaine' });
+  await expect(suiteDuJour).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}$/);
+  if (telephone) await verifierCibleTactile(suiteDuJour, 'Le lien « Voir la semaine »');
   // L'en-tête : un seul titre, celui de la page ; la date en toutes lettres en sous-titre, et la phrase du jour (lot A, J13, F285).
   await expect(page.locator('.today-head .today-date')).toHaveText(/^[A-Z][a-zé]+ \d{1,2} [a-zéû]+$/);
   await expect(page.locator('.today-head').getByRole('heading')).toHaveCount(0);
@@ -158,9 +168,9 @@ test('« Aujourd’hui » ouvre le module : six blocs dans l’ordre, le gel en 
   await expect.poll(() => pastille(page)).toBe(manquesAuDepart - 1 === 0 ? null : manquesAuDepart - 1);
   // À jour, la ligne du plan mène au planning, comme « Plan calculé … » de l'en-tête (L3, D-312).
   const planAJour = fiabilite.locator('a.reliability-check-link').filter({ hasText: 'Plan de la semaine' });
-  await expect(planAJour).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
+  await expect(planAJour).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}$/);
   if (telephone) await verifierCibleTactile(planAJour, 'La ligne « Plan de la semaine »');
-  await expect(page.locator('.today-plan a')).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}$/);
+  await expect(page.locator('.today-plan a')).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}$/);
   await verifierLEtape(page, journal, 'plan recalculé, ligne disparue');
 
   // Sans RFU, une observation ne remplirait rien : « Renseigner la réserve de la parcelle … » à la place d'« Observer le sol de … »,

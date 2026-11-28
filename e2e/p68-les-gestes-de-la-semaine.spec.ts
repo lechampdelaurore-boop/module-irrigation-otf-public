@@ -3,6 +3,7 @@ import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/foncti
 import { horodatageLocal } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
+  attendreLaPagePrete,
   surveillerLaConsole,
   verifierCibleTactile,
   verifierLEtape,
@@ -27,7 +28,9 @@ import {
  *   page, l'adresse la dit ; la ligne d'un jour sans pluie réelle ouvre la
  *   fenêtre sur ce jour ; le retour du navigateur ramène « Cette semaine » ;
  * - « Exporter » donne l'adresse du CSV de l'historique pour la semaine
- *   affichée, celle du bouton de « Les cumuls », et le fichier se télécharge.
+ *   affichée, celle du bouton de « Les cumuls », et le fichier se télécharge ;
+ * - `?pluie=1`, l'adresse que suit « Noter la pluie » d'une autre page (PR 4),
+ *   ouvre la fenêtre à l'arrivée, une fois : l'adresse ne la garde pas.
  *
  * La ligne d'un jour : un jour passé dont la pluie réelle manque, dans les
  * sept jours de la fenêtre. Quand la météo estimée après coup les couvre
@@ -176,4 +179,18 @@ test('les gestes de la semaine : comprendre, l’eau visée, la pluie, les flèc
   await expect(page).toHaveURL(/[?&]vue=cumuls/);
   await expect(page.locator('a.history-export-button')).toHaveAttribute('href', adresse!, { timeout: 15_000 });
   await verifierLEtape(page, journal, '« Exporter » et « Les cumuls »');
+
+  // « Noter la pluie » d'une autre page (la fiabilité, lot S4, PR 4) : `?pluie=1` ouvre la fenêtre à l'arrivée,
+  // une fois ; l'adresse ne la garde pas, un rechargement ne la rejoue pas.
+  await page.goto(`/irrigation/semaine?season=${aujourdhui.slice(0, 4)}&pluie=1`);
+  await attendreLaPagePrete(page, 'semaine');
+  await expect(fenetre).toBeVisible();
+  await expect(page).not.toHaveURL(/pluie=/);
+  await fenetre.getByRole('button', { name: 'Fermer' }).click();
+  await expect(fenetre).toBeHidden();
+  await page.reload();
+  await attendreLaPagePrete(page, 'semaine');
+  await expect(page.locator('.week-bilan')).toBeVisible();
+  await expect(fenetre).toHaveCount(0);
+  await verifierLEtape(page, journal, '« Noter la pluie » demandé par l’adresse');
 });

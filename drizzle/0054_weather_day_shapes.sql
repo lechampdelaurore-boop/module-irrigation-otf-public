@@ -21,9 +21,8 @@
 -- 8 jours. Aucune ligne n'est d'une ferme : la table n'est pas au plan
 -- d'effacement d'une ferme (`KEPT_TABLES` dit pourquoi).
 --
--- Numéro provisoire : 0052 tant que la PR 1 de S6 (#235, 0051) et la PR 2
--- de la météo multi-modèles (#250, 0051) n'ont pas réglé leur ordre ; la
--- mise à jour qui suit leur fusion le corrige, jamais un rebase.
+-- Numéro 0054 : après 0051 (S6, #235), 0052 (hors saison, #256) et 0053
+-- (météo multi-modèles, #250), réglé par fusion de `main`, jamais un rebase.
 CREATE TABLE `irrigation_weather_day_shapes` (
   `place_key` text NOT NULL,
   `day` text NOT NULL,

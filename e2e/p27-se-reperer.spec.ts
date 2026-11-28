@@ -79,9 +79,11 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
 
   // Point 4 : le périmètre d'un objectif, cherché puis rangé par jardin.
   const objectifs = await ouvrirLePli(page.locator('#objectifs-de-la-semaine'));
-  const recherche = objectifs.getByLabel('Chercher un périmètre');
+  // Le choix du périmètre de l'objectif, le premier du pli : celui du bloc « Hors saison » vient après (B3, D-353).
+  const choixDuPerimetre = objectifs.locator('.goal-scope-picker').first();
+  const recherche = choixDuPerimetre.getByLabel('Chercher un périmètre');
   // Le nom accessible d'une liste enveloppée dans son libellé porte aussi l'option choisie : on la vise par sa place.
-  const perimetre = objectifs.locator('.goal-scope-picker select');
+  const perimetre = choixDuPerimetre.locator('select');
   await expect(groupes(perimetre)).resolves.toEqual([
     'Ferme et parcelles',
     'Jardin Sud · Le Coteau',
@@ -91,7 +93,7 @@ test('chaque page a son titre, une adresse inconnue ramène au module, listes, s
   ]);
   await recherche.fill('n0');
   await expect(perimetre.locator('option')).toHaveText(['Toute la ferme', 'Planche · N01', 'Planche · N02', 'Planche · N03']);
-  await expect(objectifs.getByRole('status')).toHaveText('3 périmètres trouvés.');
+  await expect(choixDuPerimetre.getByRole('status')).toHaveText('3 périmètres trouvés.');
   await perimetre.selectOption({ label: 'Planche · N02' });
   await recherche.fill('tunnel');
   // Le choix en cours reste dans la liste, même quand la recherche ne le trouve plus.

@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { preparerMaterielArrosant } from './support/materiel.ts';
 import {
   attendreLaPageIrrigation,
@@ -57,16 +57,8 @@ test('au téléphone, la barre du bas, la saison, le bandeau et le planning lais
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await sansAlertesSysteme(page);
-  await ouvrirUneFermeNeuve(context, testInfo, 'telephone');
-
-  // Toutes les cases cochées.
-  await page.goto('/irrigation/bienvenue');
-  await attendreLeChoixDesFonctionnalites(page);
-  for (const caseACocher of await page.getByRole('checkbox').all()) {
-    if (!(await caseACocher.isChecked())) await caseACocher.check();
-  }
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'aujourdhui');
+  // Toutes les cases cochées, par la façon « Tout » (lot S6).
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'telephone');
   await verifierLEtape(page, journal, 'toutes les cases cochées');
   // Le bandeau des alertes système vit sur la page des arrosages (F21).
   await attendreLaPageIrrigation(page, 'arrosages');

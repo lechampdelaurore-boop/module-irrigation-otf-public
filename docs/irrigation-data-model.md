@@ -150,7 +150,7 @@ dernière erreur de la synchronisation automatique. La table
 quotidienne. Le planificateur ne modifie jamais `manual_precipitation` et
 déduplique les workspaces partageant les mêmes coordonnées et le même modèle de
 prévision avant les appels aux fournisseurs. Ce modèle est une colonne de la
-préférence depuis la migration 0051 (`forecast_model`, D-346 ; vide :
+préférence depuis la migration 0053 (`forecast_model`, D-346 ; vide :
 « Automatique », `docs/weather-models-contract.md`).
 
 La limite journalière est également versionnée. Une révision indique si elle

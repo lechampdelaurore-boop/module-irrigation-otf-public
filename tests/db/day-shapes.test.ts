@@ -20,7 +20,7 @@ import { ALICE, BOB } from '../support/spaces';
 
 /**
  * La forme de la journée de l'ET0 horaire, sur la base de test
- * (docs/et0-horaire-contract.md, § 5 ; D-349 ; migration 0052) : la
+ * (docs/et0-horaire-contract.md, § 5 ; D-349 ; migration 0054) : la
  * migration additive, l'écriture par lieu et par source, une lecture plus
  * récente qui remplace, la lecture du matin qui écrit une fois pour deux
  * fermes du même lieu, la purge des 8 jours, les plans.
@@ -43,10 +43,10 @@ afterEach(() => {
 const flat = (count = 24) => Array.from({ length: count }, () => 1 / count);
 const row = (date: string, nature: RecordedDayShape['nature'] = 'provider-hourly', shares = flat()): RecordedDayShape => ({ date, nature, shares });
 
-test('migration 0052 : une table neuve, rien d’existant ne change ; ses contraintes refusent une forme mal formée', () => {
-  const before = createMigratedSqliteDatabase('drizzle', '0051_weather_forecast_model.sql');
+test('migration 0054 : une table neuve, rien d’existant ne change ; ses contraintes refusent une forme mal formée', () => {
+  const before = createMigratedSqliteDatabase('drizzle', '0053_weather_forecast_model.sql');
   const tablesBefore = before.prepare(`SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name`).all().map((item) => item.name);
-  applyMigrationsAfter(before, '0051_weather_forecast_model.sql', 'drizzle', '0052_weather_day_shapes.sql');
+  applyMigrationsAfter(before, '0053_weather_forecast_model.sql', 'drizzle', '0054_weather_day_shapes.sql');
   const tablesAfter = before.prepare(`SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name`).all().map((item) => item.name);
   assert.deepEqual(tablesAfter.filter((name) => !tablesBefore.includes(name)), ['irrigation_weather_day_shapes']);
   const insert = before.prepare(`INSERT INTO irrigation_weather_day_shapes (place_key, day, source, nature, hour_count, shares, fetched_at) VALUES (?, ?, ?, ?, ?, ?, ?)`);

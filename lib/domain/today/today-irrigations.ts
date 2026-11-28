@@ -114,9 +114,9 @@ function detailText(parts: (string | null)[]): string {
   return parts.filter((part): part is string => Boolean(part)).join(' · ');
 }
 
-/** La carte d'une irrigation s'ouvre sur les arrosages, ou sur le planning quand les arrosages ne sont pas cochés. */
+/** La carte d'une irrigation s'ouvre sur les arrosages, ou sur « Semaine », qui porte le planning, quand les arrosages ne sont pas cochés (lot S4, PR 4). */
 export function irrigationPage(enabled: FeatureSelection): IrrigationPageId {
-  return enabled.includes('arrosages') ? 'arrosages' : 'planning';
+  return enabled.includes('arrosages') ? 'arrosages' : 'semaine';
 }
 
 function irrigationLine(
@@ -228,7 +228,7 @@ export function todayTodoLines(input: {
           status: STATUS_TEXT.proposed,
           tone: 'proposed',
           canStart: false,
-          open: { page: 'planning', anchor: proposalAnchor(proposal.storedId), label: 'Changer l’heure ou la dose' },
+          open: { page: 'semaine', anchor: proposalAnchor(proposal.storedId), label: 'Changer l’heure ou la dose' },
           ...drawn({ startAt: proposal.startAt, durationSeconds: proposal.durationSeconds, doseMm: proposal.doseMm, bedIds, beds }),
           equipmentName: proposal.equipmentName,
           settingName: proposal.settingName,

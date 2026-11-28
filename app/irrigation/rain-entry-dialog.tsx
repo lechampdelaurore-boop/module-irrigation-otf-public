@@ -24,9 +24,9 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, be
   season: number;
   /** « Le plan se recalcule » ne se dit que « Planning » coché. */
   planning: boolean;
-  /** Retirer une mesure ou voir jour par jour reste sur « Objectifs et besoins » ; `null` : pas de lien. */
+  /** Retirer une mesure ou voir jour par jour reste dans « Pluie mesurée » de « Semaine » (lot S4, PR 4) ; `null` : pas de lien. */
   besoinsHref: string | null;
-  /** Le mot du lien, quand il mène ailleurs que sur « Objectifs et besoins » (le pli « Pluie mesurée » de « Semaine », S4, PR 3). */
+  /** Le mot du lien, quand il mène dans la page même (le pli « Pluie mesurée » de « Semaine », S4, PR 3). */
   besoinsLabel?: string;
   onClose: () => void;
   /** La réponse, à écrire sous le bouton qui a ouvert la fenêtre ; la page se relit. */
@@ -84,7 +84,7 @@ export function RainEntryDialog({ open, entry, season, planning, besoinsHref, be
  * la feuille, sans changer de page. Le même jour par défaut, la même lecture
  * du chiffre, le même bouton qui dit le chiffre, la même action.
  */
-export function RainEntryForm({ className, entry, season, planning, besoinsHref, besoinsLabel = 'sur « Objectifs et besoins »', onPending, onClose, onSaved }: {
+export function RainEntryForm({ className, entry, season, planning, besoinsHref, besoinsLabel = 'sur « Semaine », dans « Pluie mesurée »', onPending, onClose, onSaved }: {
   className: string;
   entry: RainEntry;
   season: number;

@@ -14,6 +14,7 @@ import { proposalSummary, type ProposalSummary } from '../domain/crop-water/prop
 import { logJsonLine } from '@/lib/adapters/log';
 import { addDaysToDateKey } from '../domain/water-management';
 import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
+import { readOffSeasonSourceForUser } from './off-season-source';
 
 export async function getIrrigationNeedsDashboardForUser(input: {
   ownerUserId: string;
@@ -35,7 +36,7 @@ export async function getIrrigationNeedsDashboardForUser(input: {
   const automaticSource = (from: string, to: string) => readAutomaticObjectiveSourceForUser({
     ownerUserId: input.ownerUserId, season: input.season, snapshot: input.snapshot, from, to, now,
   });
-  const [waterDashboard, events, goalRevisions, settings, coverage, weekAutomatic] = await Promise.all([
+  const [waterDashboard, events, goalRevisions, settings, coverage, weekAutomatic, offSeason] = await Promise.all([
     input.waterDashboard ?? getWaterDashboardForUser({
       ownerUserId: input.ownerUserId, season: input.season, snapshot: input.snapshot,
       weekStart, allowWeatherRefresh: false, now,
@@ -46,6 +47,8 @@ export async function getIrrigationNeedsDashboardForUser(input: {
     input.coverage ?? loadBedCoverage(input.ownerUserId, input.season, input.snapshot),
     // L'objectif automatique, quand la ferme l'a allumé (D-309) ; éteint, une seule lecture, rien ne change.
     automaticSource(weekStart, addDaysToDateKey(weekStart, 6)),
+    // Le filtre « hors saison » (D-337, D-352) ; sans geste, une seule lecture, rien ne change.
+    readOffSeasonSourceForUser({ ownerUserId: input.ownerUserId, snapshot: input.snapshot }),
   ]);
   const automatic = waterDashboard.weekStart === weekStart
     ? weekAutomatic
@@ -55,6 +58,7 @@ export async function getIrrigationNeedsDashboardForUser(input: {
     events, goalRevisions, decisions: settings.decisions, coverage, thresholdMm: settings.thresholdMm,
     weekStart: waterDashboard.weekStart, weekEnd: waterDashboard.weekEnd, now,
     automaticObjective: automatic?.inputsFor(input.snapshot.beds.filter((bed) => bed.seasons.includes(input.season))),
+    offSeason: offSeason?.schedule,
   });
   return { ...dashboard, proposedByBed: await proposedByBed(input, dashboard, now) };
 }

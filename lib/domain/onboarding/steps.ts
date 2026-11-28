@@ -144,7 +144,16 @@ function enteredSoilText(value: unknown): string | null {
   if (!value || typeof value !== 'object') return null;
   const { parcels } = value as { parcels?: unknown };
   if (typeof parcels !== 'number' || parcels < 1) return null;
-  return `sol de ${parcels} parcelle${parcels > 1 ? 's' : ''} saisi`;
+  return `${soilParcelsText(parcels)} saisi`;
+}
+
+/**
+ * « sol de 4 parcelles » : le sol des parcelles en une expression, la même
+ * dans le bandeau « À finir », à la vérification de l'accueil et dans
+ * l'étape « Mon sol » de la mise en route (lot S6, section 5.1, S6-i).
+ */
+export function soilParcelsText(parcels: number): string {
+  return `sol de ${parcels} parcelle${parcels > 1 ? 's' : ''}`;
 }
 
 /** Les groupes des « Réglages à relire » validés et passés, gardés avec l'étape (F588). */
@@ -280,7 +289,7 @@ export function unfinishedSteps(resolved: ResolvedOnboarding, needs: {
   // Comme les jardins : une parcelle apparue après la confirmation de l'étape a besoin de son sol, et le bandeau la nomme.
   const soil = needs.soilToEnter;
   if (soil && soil.parcels > 0) {
-    unfinished.push({ id: 'soil', text: `sol de ${soil.parcels} parcelle${soil.parcels > 1 ? 's' : ''}`, page: 'sol', anchor: soil.anchor, count: soil.parcels });
+    unfinished.push({ id: 'soil', text: soilParcelsText(soil.parcels), page: 'sol', anchor: soil.anchor, count: soil.parcels });
   }
   // Une espèce peut rester sans référence par choix : l'étape confirmée, le bandeau ne la rappelle plus.
   const species = needs.speciesToLink ?? 0;

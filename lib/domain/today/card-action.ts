@@ -104,7 +104,7 @@ function nowChoice(line: TodayNowLine, label: string, gesture: TodayCardGesture)
   return { label, accessibleName: `${label} : ${line.title}`, gesture };
 }
 
-/** « Modifier ou annuler sur « Arrosages » », ou « Ouvrir sur « Planning » » quand les arrosages ne sont pas cochés. */
+/** « Modifier ou annuler sur « Arrosages » », ou « Ouvrir sur « Semaine » » quand les arrosages ne sont pas cochés. */
 function openLabel(page: IrrigationPageId): string {
   return page === 'arrosages' ? `Modifier ou annuler sur « ${pageLabel(page)} »` : `Ouvrir sur « ${pageLabel(page)} »`;
 }

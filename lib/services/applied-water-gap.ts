@@ -22,6 +22,7 @@ import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, localDateStartUtc 
 import { weatherLocationKey } from '../domain/weather/location';
 import { getCropWaterWeekForUser } from './crop-water-week';
 import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
+import { readOffSeasonSourceForUser } from './off-season-source';
 import { getEnabledFeaturesForUser } from './feature-selection-service';
 import { readWeatherPreference } from './weather-preference';
 
@@ -143,12 +144,14 @@ async function objectiveReadings(
   const weekStart = period.currentWeekStart;
   const weekEnd = addDaysToDateKey(weekStart, 6);
   const lastWeek = period.weeks[period.weeks.length - 1];
-  const [revisions, automatic] = await Promise.all([
+  const [revisions, automatic, offSeason] = await Promise.all([
     listHydricGoalRevisionsThroughWeekForUser(input.ownerUserId, input.season, weekStart),
     // L'objectif automatique, quand la ferme l'a allumé (D-309) : la dernière semaine comparée et la semaine en cours.
     readAutomaticObjectiveSourceForUser({ ...input, from: lastWeek.weekStart, to: weekEnd, now }),
+    // Le filtre « hors saison » (D-337, D-352) : ces jours-là, aucun objectif.
+    readOffSeasonSourceForUser(input),
   ]);
-  const objectiveMmByBed = new Map(beds.map((bed) => [bed.id, objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed)).value]));
+  const objectiveMmByBed = new Map(beds.map((bed) => [bed.id, objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed), offSeason?.daysFor(bed)).value]));
   const [week, adoptions] = await Promise.all([
     getCropWaterWeekForUser({ ownerUserId: input.ownerUserId, season: input.season, snapshot: input.snapshot, weekStart, now, objectiveMmByBed, bedIds: beds.map((bed) => bed.id) }),
     Promise.all(beds.map((bed) => listAdoptionsForBedForUser(input.ownerUserId, input.season, bed.id))),
@@ -160,7 +163,7 @@ async function objectiveReadings(
       objectiveMm: objectiveMmByBed.get(bed.id) ?? null,
       proposedMm: proposal?.proposedMm ?? null,
       adoptable: proposal?.adoptable ?? false,
-      lastWeekObjectiveMm: objectiveForBed(revisions, bed, lastWeek.weekStart, lastWeek.weekEnd, automatic?.inputFor(bed)).value,
+      lastWeekObjectiveMm: objectiveForBed(revisions, bed, lastWeek.weekStart, lastWeek.weekEnd, automatic?.inputFor(bed), offSeason?.daysFor(bed)).value,
       adoptedThisWeekMm: adoptions[index]
         .filter((adoption) => dateKeyInTimeZone(adoption.adoptedAt, FARM_TIME_ZONE) >= weekStart)
         .map((adoption) => adoption.amountMm),

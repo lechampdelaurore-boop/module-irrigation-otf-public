@@ -357,10 +357,10 @@ export type TodayView = {
   dayCurve: TodayDayCurve | null;
 };
 
-export type TodayDayEmptyLink = { label: string; page: 'planning' | 'arrosages'; intent: 'planifier' | null };
+export type TodayDayEmptyLink = { label: string; page: 'semaine' | 'arrosages'; intent: 'planifier' | null };
 
 function dayEmptyLink(enabled: FeatureSelection): TodayDayEmptyLink | null {
-  if (enabled.includes('planning')) return { label: 'Voir le planning de la semaine', page: 'planning', intent: null };
+  if (enabled.includes('planning')) return { label: 'Voir la semaine', page: 'semaine', intent: null };
   if (enabled.includes('arrosages')) return { label: 'Planifier un arrosage', page: 'arrosages', intent: 'planifier' };
   return null;
 }

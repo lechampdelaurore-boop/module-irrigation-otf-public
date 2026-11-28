@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AnchoredFold } from './shell/page-settings-fold';
+import type { WaterDashboard } from '@/lib/services/water-dashboard';
 import {
   FORECAST_MODEL_SETTING_TEXT,
   forecastModelFacts,
@@ -9,7 +10,6 @@ import {
   forecastModelSummary,
   selectedForecastChoice,
   type ForecastModelOption,
-  type ForecastModelSettingView,
 } from '@/lib/domain/weather/forecast-model-setting';
 
 /**
@@ -20,23 +20,22 @@ import {
  * Ouvert d'office quand il dit le retour du module à « Automatique »
  * (règle 9). Rien sur « Aujourd'hui ».
  * Le geste est celui du tableau de l'eau, qui montre la réponse sous la carte.
- * Absent en démonstration (règle 13) : le parent ne le monte pas.
+ * Absent en démonstration (règle 13) : rien sans lecteur des modèles.
  */
 export function ForecastModelSetting({
-  place,
-  savedModelId,
-  view,
+  weather,
   pending,
   onSave,
 }: {
-  /** Le lieu localisé de la ferme ; `null` : aucune commune encore. */
-  place: { latitude: number; longitude: number } | null;
-  savedModelId: string | null;
-  /** Les jours complétés du modèle gardé et le retour du module à « Automatique » (règles 6 et 9). */
-  view: ForecastModelSettingView | null;
+  /** La météo du tableau de l'eau : le lieu localisé, le modèle gardé, les phrases de la carte (règles 6 et 9). */
+  weather: Pick<WaterDashboard['weather'], 'forecastModelsAvailable' | 'location' | 'preference' | 'forecastModelSetting'>;
   pending: boolean;
   onSave: (choice: string) => void;
 }) {
+  if (!weather.forecastModelsAvailable) return null;
+  const place = weather.location;
+  const view = weather.forecastModelSetting;
+  const savedModelId = weather.preference.forecastModel;
   const options = place === null ? [] : forecastModelOptions(place);
   const saved = selectedForecastChoice(savedModelId, options);
   return (

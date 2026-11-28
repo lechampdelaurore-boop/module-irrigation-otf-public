@@ -286,6 +286,12 @@ règle 4) ; le plan se relit après.
   (« 8,5 » → 8,5), le texte du bouton et l'état « déjà notée » sont une
   fonction de `lib/domain/today/` (`rain-entry.ts`), testée sans navigateur.
 
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** Le lien de la fenêtre, « Retirer une mesure,
+voir jour par jour », mène à « Pluie mesurée » de « Semaine » et dit « sur
+« Semaine », dans « Pluie mesurée » ». La fenêtre est la même sur « Semaine »,
+appelée par le bilan, la ligne « Calcul approximatif » et la ligne d'un jour
+passé (S4, PR 3, F935).
+
 ## 8. La page à l'essentiel : deux niveaux
 
 **Règle.** Le premier niveau tient en un écran et demi au téléphone ; le reste
@@ -309,7 +315,11 @@ deux lots.
    l'en-cours en tête. « Tout est fait (n) » reste en tête de bloc. Les arrosages
    de demain à valider : la ligne de pied existante (« Demain à 6 h : 3
    arrosages à valider », « Voir au planning »). Rien à faire : l'état vide
-   existant et son lien (L3).
+   existant et son lien (L3). **Depuis S6** (lot S6, D-336, `docs/simplification-s6-contract.md`, section 11) : pour une ferme qui n'est pas
+   encore prête (la mise en route a une étape en cours), l'état vide devient
+   le bloc de l'étape en cours (« Votre ferme n’est pas encore prête à
+   proposer des arrosages. », la phrase de l'étape, « Continuer l'étape n »,
+   F965) ; « Plus tard » sur « Ma ferme » rend l'état vide.
 4. **Le gel ou la chaleur annoncés** : seulement un jour **en alerte**, en carte,
    comme aujourd'hui ; « Prévision indisponible : à vérifier » en ambre ; le
    « gel annoncé sans alerte posée » (J14) avec son lien « Poser… ». Un jour
@@ -363,6 +373,11 @@ heure » vient en tête du pli, avant les tuiles ; la ligne de résumé dit
   première carte à moins de **600 px** du haut (il est à 1 057 px sur la ferme
   réelle) ; au plus **12** choses à toucher au premier niveau (39 à 56
   aujourd'hui). Une page qui dépasse sa borne le dit, comme au lot J.
+
+**Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4).** « Voir la semaine » mène à « Semaine » ; la
+ligne de pied « Voir au planning » devient « Voir la semaine », vers la même
+proposition ; « Valider toute la semaine » est sur « Semaine » ; « Changer
+l'heure ou la dose » ouvre la proposition sur « Semaine ».
 
 ## 9. États rares : ce que chacun devient
 
