@@ -12,6 +12,24 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Parcours navigateur à cheval sur minuit : P63, P12 et P37 corrigés
+  le 27 novembre 2026** (D-355, F1093 à F1096 ; point ouvert 71), en
+  Opus 5.5 · Élevé (corrections, les tests et la CI jugent). Une suite
+  commencée avant minuit et finie après les faisait échouer (déploiement
+  de #237 et PR #238, le 26 novembre au soir). P63 admet le jour que la
+  page propose entre son début et sa lecture ; P12 cherche un jour sans
+  mesure à l'avant-veille du jour qu'il vient de noter ; P37 joue la
+  fenêtre de l'objectif sur une ferme propre (sa cause : les objectifs
+  vidés la veille par d'autres parcours, pas l'eau). Les trois échecs
+  reproduits sur `main` sans attendre minuit, puis verts avec la
+  correction ; contrôles : voir la PR. Parcours seuls : aucun écran,
+  calcul ni migration. Fusion à son tour, après la ligne 37 et #258.
+  Consigne la mise en ligne de #258 (dc83ae1, fusionnée le 28 novembre
+  2026 à 12 h 38, run 46140842075, en ligne à 13 h 34, cinq jobs verts),
+  sa recette sur la démonstration, conforme le 28 novembre 2026, et la
+  recette de S6, faite et conforme le 27 novembre 2026 vers 12 h 20
+  (démonstration, ferme vierge, dans le Chrome du porteur, avec son
+  accord) ; celle de #261 l'est déjà (par HR1).
 - **Simplifier l'usage du module, S5 : les millimètres d'abord au
   démarrage d'un arrosage, demandé par le porteur le 26 novembre 2026 à
   20 h 10 et codé le même jour** (D-354, F1087 à F1092 ; avenant au
@@ -27,7 +45,10 @@ registres, elle y renvoie.
   ligne de HR2 (#253, 4ede30b, run 46127984783, en ligne le 28 novembre
   2026 à 10 h 35, cinq jobs verts) et de HR3 (#254, cc1e43e, run
   46132250984, en ligne à 11 h 30, cinq jobs verts) : **l'ET0 horaire
-  (ligne 37) est en ligne en entier** ; celle de #261 l'est déjà (par HR1).
+  (ligne 37) est en ligne en entier** ; celle de #261 l'est déjà (par HR1). **Fusionnée le 28 novembre
+  2026 à 12 h 38** (#258, dc83ae1), **en ligne à 13 h 34** (run
+  46140842075, cinq jobs verts), **recette conforme le même jour**
+  (démonstration) ; consigné par #259.
 - **L'ET0 horaire, HR3 : « Soif du jour, heure par heure », codée le
   26 novembre 2026** (D-350, F1043 à F1050 ; contrat
   `docs/et0-horaire-contract.md`, § 7 ; roadmap ligne 37), en Opus 5.5 ·
@@ -92,8 +113,12 @@ registres, elle y renvoie.
   un dimanche, le troisième jour d'« Aujourd'hui » restait sans prévision
   hors de la tâche du matin, et P29 échouait sur toute branche, `main`
   comprise. Elle va désormais jusqu'au troisième jour. Test du domaine et
-  P29 rouges avant, verts après ; contrôles : voir la PR. Fusionnée le
-  28 novembre 2026 (#262, 8419477), avant #261 et #259, qu'elle débloque.
+  P29 rouges avant, verts après ; P13 compte désormais les trois jours
+  d'alerte le week-end. **Fusionnée le 28 novembre 2026 à 5 h 20** (#262,
+  8419477), CI de la PR verte (257 parcours passés, 11 sautés) ; **en
+  ligne le 28 novembre 2026 à 6 h 17**, run 46107116135 vérifié job par
+  job (les cinq jobs verts ; consigné par la PR des parcours à cheval
+  sur minuit, #259).
 - **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
   26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
   § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
@@ -315,8 +340,10 @@ registres, elle y renvoie.
   arrosages au lieu de deux) : il le dit « hors jeu ». **Fusionnée** le
   27 novembre 2026 à 1 h 41 (#238, ee5d5f6), après la mise en ligne de la
   PR 3, **en ligne à 2 h 20**, run 45918177942, les cinq jobs verts
-  (consigné par le contrat #240) : **S6 est en ligne en entier**. Recette
-  dans le Chrome du porteur, sur la ferme vierge, avec son accord.
+  (consigné par le contrat #240) : **S6 est en ligne en entier**. **Recette
+  faite et conforme le 27 novembre 2026 vers 12 h 20** (démonstration,
+  ferme vierge, dans le Chrome du porteur, avec son accord ; consignée
+  par #259).
 - **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
   fiches de « Ma ferme », codée le 26 novembre 2026** (D-336, F969 à
   F975 ; contrat, sections 7, 14 et 15), en Opus 5.5 · Très élevé,
@@ -11402,14 +11429,25 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    à 18 h 56) : le jeton se vérifie à l'heure réelle. **Fermé le
    14 novembre 2026** : la recette réelle de la démonstration est conforme
    (19 h 53) et un invité s'y est connecté (20 h 53).
-70. 🟡 **Ouvert le 28 novembre 2026 par la PR #261** (run 46080341539
+70. ✅ **Ouvert le 28 novembre 2026 par la PR #261** (run 46080341539
    et sa relance) : P29 échouait chaque samedi et chaque dimanche, sur
    toute branche, `main` comprise : « Gel ou chaleur » disait
    « Prévision indisponible le lun. », la lecture de la semaine en cours
    s'arrêtant au dimanche. **Corrigé en branche le 28 novembre 2026**
    (D-357, F1100, `fix/meteo-aujourdhui-trois-jours`) : la lecture va
-   jusqu'au troisième jour d'« Aujourd'hui ». Se ferme à la fusion et à la
-   mise en ligne.
+   jusqu'au troisième jour d'« Aujourd'hui ». **Fermé le 28 novembre
+   2026** : #262 fusionnée à 5 h 20, en ligne à 6 h 17 (run
+   46107116135, les cinq jobs verts).
+71. 🟡 **Ouvert le 26 novembre 2026 par le déploiement de #237 et la PR
+   #238** (runs 45901421359 et 45906065683) : une suite de parcours
+   commencée avant minuit et finie après faisait échouer P63 à
+   l'ordinateur, P12 et P37 au téléphone, verts une fois relancés après
+   minuit. P63 comparait la page à l'heure relevée à son début ; P12 et
+   P37 lisaient sur la ferme de démonstration commune la pluie notée et
+   les objectifs vidés la veille par les parcours d'avant minuit.
+   **Corrigé en branche le 27 novembre 2026** (D-355, F1093 à F1096,
+   `fix/parcours-minuit`) : les trois échecs reproduits sur `main`, verts
+   avec la correction. Se ferme à la fusion et à la mise en ligne.
 
 ## Procédure de reprise rapide
 
