@@ -13437,3 +13437,48 @@ quantité est déjà remplie : deux touches.
 
 **Numéros pris** : D-354 ; F1087 à F1092 ; aucun parcours nouveau (P64 et
 P65 réécrits ; P24, P31, P37, P38, P40 suivent).
+
+## D-358 — Accélérer le site, A1 : le serveur dit son temps, à chaque réponse et au journal
+
+Date : 28 novembre 2026. Statut : appliquée, sur le choix du porteur du
+28 novembre 2026 à 13 h 44 (« je suis tes recommandations, faire 1, puis
+2 et 3 ») ; modifiable à sa relecture. Contrat :
+`docs/acceleration-du-site-contract.md`, section 3 ; roadmap section
+6 octodecies. Aucune migration, aucun calcul, aucun texte de l'interface,
+aucun réglage de Cloudflare.
+
+**Constat.** La mesure du matin (`/mnt/project-files/performance/mesure-2026-11-28.md`)
+laisse trois délais : la première ouverture d'un espace de démonstration
+(4 à 8 s), « Aujourd'hui » (environ 1 s) et une première page de la ferme
+réelle à 7,8 s, vue une fois, de cause inconnue. Les temps du serveur ne se
+lisaient que dans les journaux de Cloudflare, que seul le porteur ouvre :
+chaque correction se serait faite sans mesure.
+
+**Décision.** Chaque réponse du Worker du module, en production comme en
+démonstration, porte l'en-tête `Server-Timing` (**F1102**) : le temps du
+serveur jusqu'au départ de la réponse (`app`), les appels à la base D1, à
+Ouvre ta ferme, à la météo et aux autres services, avec leur nombre et le
+temps pendant lequel au moins un était en cours (**F1101**, **F1103**), et
+si l'instance du Worker venait de démarrer (`instance` : `neuve` ou
+`chaude`). Le journal reçoit la même mesure, une ligne
+`irrigation_request_timing` par requête, sans adresse ni identifiant
+(**F1104**). Les comptes vivent dans le contexte de chaque requête (**F1105**) ;
+la mesure ne change rien d'autre à la réponse (**F1106**). Le point d'entrée
+de la production devient `site-worker.ts`, celui de vinext sous ce
+chronomètre, comme la démonstration a déjà le sien ; c'est du code déployé
+par la CI, pas un réglage de Cloudflare. Le placement du Worker près de la
+base (« Smart Placement ») n'est pas retenu par le porteur.
+
+**Constat en local, en écrivant A1** (`main`, `vinext dev`) : « Aujourd'hui »
+de la ferme des parcours fait 101 appels à la base ; la première ouverture
+d'un espace de démonstration, 935, dans une seule requête : le chantier A2
+vise ce nombre. Hypothèse pour les 7,8 s, que la mesure tranchera : le plan
+d'Ouvre ta ferme, gardé 4 heures, se relit dans la page qui l'ouvre, appel
+par appel, au plus quatre par seconde.
+
+**Vérifié par** `tests/server-timing.test.ts`, `tests/db/request-timing.test.ts`
+(rejoué dans les trois passages d'isolation), `tests/demo-deployment-config.test.ts`
+(le point d'entrée de la production), et les parcours P75 et V13, joués en
+local le 28 novembre 2026 (1 passed chacun, à l'ordinateur).
+
+**Numéros pris** : D-358 ; F1101 à F1106 ; parcours P75 et V13.

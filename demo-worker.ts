@@ -4,18 +4,23 @@ import { logJsonLine } from './lib/adapters/log';
 import { installSimulatedDate, runOnSimulatedDay } from './lib/services/demo-clock';
 import { resetInactiveDemoSpaces } from './lib/services/demo-reset';
 import { isAcceptedDemonstration } from './lib/services/deployment-mode';
+import { installRequestTiming, timeRequest } from './lib/services/request-timing';
 
 /**
  * Le point d'entrée du Worker de démonstration (docs/demo-guided-contract.md,
  * C1 et C3), à la place de `vinext/server/fetch-handler` dans sa propre
- * configuration (D4) ; la production garde le sien, inchangé. Chaque requête
- * se joue au jour du moment choisi par l'invité, à l'heure réelle de la
- * ferme. Chaque nuit, sa tâche planifiée remet à zéro les espaces où
- * personne n'est passé depuis plus de 24 heures (section 8, D4). Hors d'une
- * démonstration acceptée, il ne sert rien et ne remet rien à zéro.
+ * configuration (D4) ; la production a le sien (`site-worker.ts`). Chaque
+ * requête se joue au jour du moment choisi par l'invité, à l'heure réelle de
+ * la ferme, sous le même chronomètre que la production (accélérer le site,
+ * A1, D-358 : l'en-tête `Server-Timing` et la ligne du journal). Chaque
+ * nuit, sa tâche planifiée remet à zéro les espaces où personne n'est passé
+ * depuis plus de 24 heures (section 8, D4). Hors d'une démonstration
+ * acceptée, il ne sert rien et ne remet rien à zéro.
  */
 
 type FetchHandler = { fetch: (request: Request, env: unknown, context: unknown) => Promise<Response> };
+
+installRequestTiming();
 
 const demoWorker = {
   async fetch(request: Request, env: unknown, context: unknown): Promise<Response> {
@@ -25,7 +30,7 @@ const demoWorker = {
     installSimulatedDate();
     const cookies = request.headers.get('cookie');
     const choice = resolveDemoChoice(cookieValue(cookies, DEMO_PROFILE_COOKIE), cookieValue(cookies, DEMO_MOMENT_COOKIE));
-    return runOnSimulatedDay(choice.moment.dateKey, () => (handler as FetchHandler).fetch(request, env, context));
+    return timeRequest(request, () => runOnSimulatedDay(choice.moment.dateKey, () => (handler as FetchHandler).fetch(request, env, context)));
   },
 
   async scheduled(): Promise<void> {
