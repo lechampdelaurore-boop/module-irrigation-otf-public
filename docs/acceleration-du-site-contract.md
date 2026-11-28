@@ -1,6 +1,6 @@
 # Contrat — Accélérer le site (chantier du 28 novembre 2026)
 
-Roadmap section 6 octodecies. Décisions D-358 (A1) et D-359 (A2). Suite du
+Roadmap section 6 octodecies. Décisions D-358 (A1), D-359 (A2) et D-360 (A3). Suite du
 correctif de la lenteur (section 6 duodecies,
 `docs/lenteur-du-module-contract.md`, clos le 25 novembre 2026), dont la
 « suite possible » était de garder d'autres lectures répétées. Ce contrat dit
@@ -255,13 +255,118 @@ début de l'été et en automne, dans le Chrome du porteur (le temps jusqu'au
 premier octet, `app`, `d1` et son nombre d'appels). Objectif : 1 à 2 s au
 lieu de 4 à 8 s.
 
-## 5. A3 — « Aujourd'hui »
+## 5. A3 — « Aujourd'hui » (D-360)
 
-Écrite avec sa PR, après A2. Objectif : environ 0,6 s au lieu d'environ 1 s,
-en regroupant les lectures et en gardant le temps de la requête celles qui
-se répètent (la mémoire de la requête, section 5 sexies du contrat de la
-tranche 4, F810 à F816). **Aucun chiffre affiché ne change** : la page est
-comparée avant et après sur les mêmes données.
+**Pourquoi.** « Aujourd'hui » rassemble des lectures qui existent déjà
+(`lib/services/today-service.ts`) : le plan de la semaine, les arrosages, la
+météo, la réserve du sol, le besoin par culture, les besoins de la semaine,
+les alertes. Chaque service lit pour lui ce dont il a besoin : plusieurs
+lisent la même chose, et un même dépôt lit en plusieurs appels ce qu'il rend
+d'un bloc. Mesuré sur `main` (`dc83ae1`), base de test, mémoire de la
+requête posée comme en ligne : le modèle de la page demande **101 appels à
+la base** pour la « Ferme des Trois Noues » au début de l'été, en pénurie et
+en automne, 95 au gel de printemps, 47 pour la petite ferme, 4 pour la ferme
+aux vannes. Au début de l'été, 34 de ces appels refont à l'identique une
+lecture déjà faite, la même instruction avec les mêmes valeurs : le dernier
+plan de la semaine, lu trois fois en 4 appels ; les entrées du besoin par
+culture, trois fois en 6 appels ; les poses du matériel et la
+correspondance des espèces, quatre fois ; la météo de la semaine, trois
+fois ; les réglages du planning, l'objectif automatique et le lieu de la
+météo, deux fois. Et l'eau se lit en 7 appels, le matériel en 4, chaque
+liste d'arrosages en 2 ou 3. À 5 à 8 ms l'appel en ligne, c'est l'ordre de
+la seconde mesurée le matin.
+
+**Le choix : lire une fois, et d'un bloc.** Rien du calcul ne change : les
+lectures changent de forme, jamais ce qu'elles lisent ni ce qu'on en fait.
+
+**F1111. Les mêmes chiffres.** Le modèle d'« Aujourd'hui » est exactement
+celui d'avant, pour toute ferme et tout moment. Prouvé à chaque
+`pnpm test` : le modèle calculé avec la mémoire de la requête, comme en
+ligne, et sans elle, chaque lecture allant à la base, est le même pour
+chaque profil et chaque moment de la démonstration ; et une fois, à
+l'écriture de la PR, avant (`main`) et après, sur les mêmes données : le
+même modèle, octet pour octet.
+
+**F1112. Huit lectures de plus, gardées le temps de la requête.** La
+section 5 sexies du contrat de la tranche 4 le prévoyait (F814 : « une PR
+suivante pourra en ajouter, mesurée en ligne d'abord et avec les mêmes
+preuves »). S'ajoutent aux trois lectures de F814 :
+
+- le dernier plan d'une semaine (`readLatestPlanForUser`), rangé par
+  l'espace, la saison et la semaine ;
+- les entrées du besoin par culture (`readCropWaterInputsForWorkspace`), par
+  l'espace et la saison, et la correspondance des espèces
+  (`listSpeciesCorrespondencesForWorkspace`), par l'espace ;
+- les poses du matériel d'une saison (`listEquipmentPosesForUser`), par
+  l'espace et la saison ;
+- les valeurs météo de la ferme entre deux dates
+  (`listWeatherDailyValuesForUser`), par l'espace, le lieu et les deux dates ;
+- le lieu trouvé de la météo (`readWeatherGeocodeForUser`), par l'espace et
+  le lieu ;
+- les réglages du planning (`readPlanningSettingsForUser`) et les gestes de
+  l'objectif automatique (`listAutomaticObjectiveRevisionsForUser`), par
+  l'espace.
+
+Elles suivent les règles des premières (F810 à F813) : une mémoire par
+requête, jamais d'une requête à l'autre ; rangées sous l'espace entier, la
+personne et la ferme, deux fermes faisant deux entrées ; vidées par toute
+écriture, une lecture qui croise une écriture n'étant pas gardée ; une
+copie par appelant. Hors d'une requête (la tâche du matin, les tests),
+chaque lecture va à la base, comme avant. Les autres lectures ne sont
+toujours pas gardées : les arrosages, l'eau, le matériel, les décisions, et
+ce que F814 exclut.
+
+**F1113. Un calcul qui recommence relit la base.** Un seul calcul relit
+pour attendre l'écriture d'une autre requête : la faisabilité
+(`lib/services/irrigation-feasibility-service.ts`), qui recommence quand
+une de ses sources a changé pendant son calcul (sa révision,
+`feasibility_revision`, a bougé). Avant de recommencer, elle oublie ce que
+la requête a lu (`forgetRequestReads`, `db/request-memo.ts`), comme après
+une écriture : tout se relit à la base, le hors saison, gardé pour la
+requête depuis B2 (D-352), compris. L'attente de la démonstration (F450)
+relit le choix des fonctionnalités, que rien ne garde (F814).
+
+**F1114. Les lectures d'un même dépôt partent ensemble.** Un dépôt qui
+lisait en plusieurs appels indépendants ce qu'il rend d'un bloc les envoie
+en un seul lot de lectures (`readTogether`, `db/batches.ts`) : les mêmes
+instructions, les mêmes lignes dans le même ordre, un aller-retour au lieu
+d'un par lecture. Un lot de lectures n'écrit rien et ne vide pas la mémoire
+de la requête (F812) ; une lecture en échec fait échouer le lot, comme le
+premier refus d'un `Promise.all`. Sont concernés l'eau
+(`listWaterInfrastructureForUser`, 7 lectures), le matériel
+(`listEquipmentForUser`, 4), les arrosages (`listIrrigationEventsForUser`,
+2 ou 3), les poses (`listEquipmentPosesForUser`, 2), les groupes de jardins
+(`listGardenGroupConfigurationForUser`, 2 par saison lue) et les réglages
+des besoins (`readIrrigationNeedSettingsForUser`, 2). Les lectures qui
+s'enchaînent, comme les propositions du plan, qui attendent son calcul,
+restent à la suite.
+
+**F1115. Le budget.** Le modèle d'« Aujourd'hui » demande **au plus 60
+appels à la base**, pour chaque profil et chaque moment de la
+démonstration. MESURE_APRES Un retour à la lecture par service le dépasse
+aussitôt.
+
+**Ce qui ne change pas.** Aucun calcul, aucun texte, aucune page, aucune
+migration, aucun réglage de Cloudflare ; les écritures, leurs vérifications
+et leur journal ; la tâche du matin. Les autres pages lisent par les mêmes
+dépôts et y gagnent aussi, sans rien changer de ce qu'elles montrent.
+
+**Tests.** `tests/db/aujourdhui-lectures.test.ts`, rejoué dans les
+passages d'isolation (F336, F379) : le modèle avec et sans la mémoire de la
+requête, pour chaque profil et chaque moment (F1111) ; pour chacune des huit
+lectures, une seule lecture de la base par clé même demandée en parallèle,
+une lecture par espace, une copie par appelant, une relecture après une
+écriture, aucune mémoire hors d'une requête (F1112) ; la faisabilité qui
+recommence et relit ses sources (F1113) ; chaque dépôt groupé en un appel
+(F1114) ; le budget (F1115). Les tests des dépôts et des pages restent verts
+sans changement.
+
+**La mesure.** En local, par l'en-tête de A1 : « Aujourd'hui » de la ferme
+des parcours. En ligne, avant la fusion (F814 : mesurée en ligne d'abord)
+puis après la mise en ligne, par le même en-tête : trois ouvertures
+d'« Aujourd'hui » de la démonstration, dans le Chrome du porteur (le temps
+jusqu'au premier octet, `app`, `d1` et son nombre d'appels). Objectif :
+environ 0,6 s au lieu d'environ 1 s.
 
 ## 6. Ce qui ne change pas
 
