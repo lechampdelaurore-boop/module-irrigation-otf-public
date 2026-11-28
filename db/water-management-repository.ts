@@ -23,7 +23,7 @@ export type WeatherPreference = {
   lastAutomaticRefreshAttemptAt: string | null;
   lastAutomaticRefreshSuccessAt: string | null;
   lastAutomaticRefreshError: string | null;
-  /** Le modèle de prévision choisi (météo multi-modèles, D-346, migration 0051) ; `null` : « Automatique ». */
+  /** Le modèle de prévision choisi (météo multi-modèles, D-346, migration 0053) ; `null` : « Automatique ». */
   forecastModel: string | null;
 };
 
@@ -188,14 +188,22 @@ export async function saveHydricGoalForUser(
   )]);
 }
 
+/**
+ * Retire les objectifs saisis de la semaine ; avec `scope`, celui de cet
+ * endroit seul (« Revenir à l'automatique », 6 quaterdecies, A1, D-337) :
+ * le même geste, la même révision « cleared », le même journal.
+ */
 export async function clearHydricGoalsForUser(
   ownerUserId: string,
   season: number,
   weekStart: string,
+  scope?: Pick<HydricGoal, 'scopeType' | 'otfZoneId' | 'otfPlotId' | 'otfBedId'>,
 ): Promise<number> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return 0;
-  const goals = await listHydricGoalsForUser(ownerUserId, season, weekStart);
+  const goals = (await listHydricGoalsForUser(ownerUserId, season, weekStart)).filter((goal) => scope === undefined || (
+    goal.scopeType === scope.scopeType && goal.otfZoneId === scope.otfZoneId
+    && goal.otfPlotId === scope.otfPlotId && goal.otfBedId === scope.otfBedId));
   if (goals.length === 0) return 0;
   const at = moduleNow();
   await db.batch(goals.flatMap((goal) => [clearedGoalJournal('objectif-hydrique', { workspaceId, actorUserId: ownerUserId, at }, goal), db.prepare(

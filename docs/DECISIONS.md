@@ -11069,9 +11069,10 @@ n'a pas été relevée. La démonstration a été remise à zéro ensuite
 
 ## D-335 — Simplifier l'usage du module, lot S4 : une page, deux vues
 
-Date : 25 novembre 2026. Statut : **PR 1 à 3 sur 4 codées** (les PR 2
-et 3 le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
-(#231), **PR 2 à 17 h** (#232) ; contrat
+Date : 25 novembre 2026. Statut : **PR 1 à 4 sur 4 codées** (les PR 2
+à 4 le 26 novembre 2026) ; **PR 1 en ligne le 26 novembre 2026 à 15 h 22**
+(#231), **PR 2 à 17 h** (#232), **PR 3 à 18 h 31** (#233), **PR 4 à
+19 h 55** (#234) : **les quatre PR en ligne** ; contrat
 `docs/simplification-s4-contract.md` (sections 2, 3, 7.4, 9, 10 et 11 ;
 sections 4 à 7 pour la PR 2),
 roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Très élevé, le
@@ -11413,6 +11414,647 @@ Précisions prises en codant :
   P68 ; le clavier laissé hors du champ a été trouvé par P68 lui-même et
   corrigé (F933).
 
+**Décision (PR 4, 26 novembre 2026).** Tout ce qui menait aux trois
+anciennes pages mène à « Semaine » et à son ancre (contrat, sections 2, 9 et
+10) : les liens d'« Aujourd'hui » (les tuiles, « Eau de la semaine », la
+ligne du plan et « Plan calculé … », les propositions, « Fiabilité du
+calcul », les données manquantes par planche, la carte d'une irrigation
+quand « Arrosages » n'est pas coché), ceux des pages entre elles
+(« Matériel », « Ressources », « Arrosages », « Réglages à relire », le
+« + »), la notification de l'aspersion à reconsidérer et la ligne de son
+historique, la visite guidée de la démonstration. Les anciennes adresses
+restent servies, sans limite de durée : les notifications déjà envoyées les
+portent (S4-o). Un test de garde lit tout le code de l'application et du
+domaine : plus aucun lien ne vise `planning`, `besoins` ou `historique`, et
+plus aucun mot ne nomme une page disparue. Les contrats de la section 10
+disent, chacun à son passage, ce que S4 a changé. Aucun calcul, aucune
+migration, aucune règle d'enregistrement ne change ; aucune question
+agronomique.
+
+Précisions prises en codant :
+
+- **F940** — **Les mots qui nommaient une page disparue** : « Voir le
+  planning de la semaine » (« Votre journée » vide) et « Voir au planning »
+  (demain) deviennent « Voir la semaine », le mot du lien de la ferme
+  d'« Eau de la semaine » (S2) ; le lien du bloc « Eau de la semaine »,
+  « Objectifs et besoins », aussi. « Ouvrir Objectifs et besoins » et
+  « Ouvrir le planning » de « Ressources » deviennent « Ouvrir la semaine ».
+  La carte d'une irrigation, « Arrosages » non coché, dit « Ouvrir sur
+  « Semaine » », et les retards repliés d'un jour, « Voir les n sur
+  « Semaine » » (« Planning de la semaine » avant) ; le renvoi de « Matériel », « Semaine, dans « Ce qu'il
+  reste à arroser » » ; la fenêtre « Noter la pluie », « sur « Semaine »,
+  dans « Pluie mesurée » ». « Plan non calculé : ouvrir le planning » reste :
+  le planning est sur « Semaine ». Option recommandée, modifiable à la
+  relecture.
+- **F941** — **« Noter la pluie » de la fiabilité** ouvre toujours sa
+  fenêtre sur « Aujourd'hui ». Quand elle n'y est pas offerte, son lien mène
+  à « Semaine » avec `?pluie=1` (`WEEK_RAIN_INTENT`, lu par `useUrlIntent`
+  comme `?recalculer=1`) : la fenêtre s'ouvre à l'arrivée, une fois, sa
+  réponse sous le bilan ; l'adresse ne garde pas la demande, un rechargement
+  ne la rejoue pas (P68). Sans ancre : la réponse et le bilan qui bouge sont
+  en haut de la page. Le geste ne porte plus d'ancre (`kind: 'rain'`).
+- **F942** — **Les ancres visées** : « Eau de la semaine » garde celles de
+  ses lignes (`irrigation-needs-title`, un jardin) ; « Matériel » vise « Ce
+  qu'il reste à arroser » (`reste-a-arroser`) ; « Ressources », « Eau
+  visée » (`objectifs-de-la-semaine`, pour fixer un objectif) ou « Le plan,
+  chaîne par chaîne » (`le-plan`) ; « Réglages à relire », « Réglages de la
+  semaine » (`reglages-de-la-page`) ; « Retirer une mesure » du « + » et
+  d'« Aujourd'hui », « Pluie mesurée » (`manual-rain`). Les deux ancres de
+  section sont dans `week-page.ts` (`NEEDS_SECTION_ANCHOR`,
+  `PLAN_SECTION_ANCHOR`), que « Semaine » pose.
+- **F943** — **Les notifications** : l'aspersion à reconsidérer vise
+  `/irrigation/semaine?season=…&week=<lundi>`, comme la ligne de son
+  historique ; le texte ne change pas. Les autres (matin, soir, fin
+  d'arrosage, alertes météo, gel, dessèchement) ne visaient pas ces pages.
+  Le service worker n'est pas touché (D-323).
+- **F944** — **La visite guidée** : les quatre étapes de « Le planning » et
+  deux de « Quand l'eau manque » gardent leurs repères, sur « Semaine ».
+  Depuis la PR 2, trois d'entre eux sont dans des plis fermés de « Le
+  détail » : la visite soulignait un élément caché (la contre-épreuve fait
+  échouer V3 sur ce code). Elle ouvre désormais les plis fermés de la page
+  qui portent le repère, du plus lointain au plus proche, comme le détail de
+  la bannière au téléphone (F291) ; un élément n'est à l'écran qu'avec une
+  boîte et sans pli fermé autour (`isOnScreen`, la règle de F933). V3 et V4
+  vérifient que l'élément présenté est visible.
+- **F945** — **Le « ? » de « Semaine »** dit où est chaque chose (section
+  12, « le porteur ne reconnaît pas les habitudes ») : la phrase et le
+  bilan, « Jour par jour », « Jardin par jardin », puis « Le détail » ; et
+  « Noter la pluie », sous le bilan. Le « ? » des cultures dit où s'allume
+  l'objectif automatique (« Eau visée », sur « Semaine »).
+- **F946** — **Mesures et preuves** (section 13 du contrat, PR 4) : un
+  lien d'« Aujourd'hui » vers « Semaine », du clic à la page prête, à
+  390 px, en local, médiane de huit, deux passages : 903 et 946 ms par
+  l'ancienne adresse (la redirection), 782 et 801 ms par la nouvelle ;
+  la redirection coûtait un aller-retour. Le premier niveau (P67) ne bouge
+  pas : 1 687 px, la phrase à 383, la barre à 621, le premier « Valider » à
+  1 221, 19 choses à toucher. Temps du serveur, 20 ms par lecture : « La
+  semaine » 338 ms (322 à 342), 62 lectures ; « Les cumuls » 118 ms, 14
+  lectures, comme la PR 3 : aucune lecture ajoutée. Tests nouveaux :
+  `tests/simplification-s4-liens.test.ts` (8), dont la garde qui lit tout
+  le code ; vingt-deux tests suivent les nouveaux liens. Parcours : P68
+  joue `?pluie=1` ; P15, P29, P30, P62 lisent les nouveaux liens et mots ;
+  V3 et V4 jouent sur « Semaine » et vérifient que l'élément présenté est
+  visible. Contre-épreuves : le lien du plan d'« Aujourd'hui », la
+  notification de l'aspersion, la demande `?pluie=1` ignorée, la fiabilité
+  vers `besoins`, « Voir au planning » remis font chacun échouer un test ;
+  la visite sans l'ouverture des plis fait échouer V3 (l'élément souligné
+  est caché).
+
+## D-336 — Simplifier l'usage du module, lot S6 : la mise en route guidée
+
+Date : 26 novembre 2026. Statut : **les quatre PR codées, le code de S6
+est fini** (contrat #218 en ligne le 26 novembre 2026 à 20 h 42 ; PR 1
+#235 en ligne à 22 h 08 ; PR 2 #236 en ligne à 22 h 47 ; PR 3 #237
+en ligne le 27 novembre 2026 à 1 h 40 ; PR 4 #238 en ligne à 2 h 20,
+consigné par le contrat #240) : **les quatre PR en ligne** ; contrat `docs/simplification-s6-contract.md`
+(sections 3, 4, 9, 12 et 14 pour la PR 1 ; 5, 6, 8, 12 et 14 pour la
+PR 2 ; 7, 14 et 15 pour la PR 3 ; 10, 11 et 15 pour la PR 4), roadmap
+section 6 terdecies, ligne 33. Code en Opus 5.5 · Très
+élevé, le réglage de la roadmap et du contrat (section 17), après la fin
+du code de S4, sur la branche de sa PR 4, le contrat (#218) fusionné dans
+la branche sans attendre sa fusion dans `main`.
+
+**Décision (PR 1).** La première ouverture (`/irrigation/bienvenue`)
+propose **trois façons de commencer** : « Je note mes arrosages », « Le
+module me propose quoi arroser » (étiquette « Conseillé ») et « Tout :
+sol, cultures et alertes ». **Rien n'est choisi d'avance** (S6-a) ;
+« Continuer » attend un appui. Le serveur calcule lui-même les cases de la
+façon choisie ; celles qu'envoie le navigateur sont ignorées. « Choisir
+moi-même les fonctionnalités » montre, sur la même page, la liste des
+onze cases de la 3.8, cochée des cases de la façon enfoncée. Une
+migration additive (0051) ajoute deux colonnes à
+`irrigation_feature_selections` : `start_mode` (comment la ferme a
+commencé, nul pour une ferme d'avant S6) et `route_state` (l'état de la
+carte de la PR 2, jamais écrit par la PR 1). La première arrivée est
+« Ma ferme » quand la mise en route a au moins une étape, sinon la page
+d'arrivée de F31 ; les ouvertures suivantes ne changent pas. Réglages dit
+comment la ferme a commencé, en une ligne au-dessus des cases.
+« Commencer par l'essentiel » (F452) est retiré. Aucun calcul, aucune
+règle d'agronomie ni d'isolation ne change ; aucune question
+agronomique.
+
+Précisions prises en codant :
+
+- **F947** — **Les trois façons** sont une table du domaine,
+  `lib/domain/features/start.ts` (`START_WAYS`, leurs noms et phrases,
+  ceux de la maquette, relus par le test de vocabulaire de S1). Les cases
+  de chaque façon sont la fermeture de la 3.8 (`withRequirements`, R3) :
+  « Je note » coche Arrosages, Matériel et placement, Historique et
+  cumuls (3) ; « Le module propose », en plus, Planning de la semaine,
+  Objectifs et besoins, Ressources et pompes (6) ; « Tout », les onze. Un
+  test les calcule et les vérifie. Les types et la lecture des deux
+  colonnes sont dans `lib/domain/features/start-mode.ts`, sans import, pour
+  qu'aucune boucle ne se forme entre le choix des cases et les façons.
+- **F948** — **La phrase de ce qui suit** vient de
+  `lib/domain/onboarding/route.ts` : les cinq étapes de la section 5.1,
+  chacune avec la case qui la fait exister (Matériel et placement pour les
+  deux premières, Ressources et pompes, Objectifs et besoins, Réserve du
+  sol), la même fonction que la carte de la PR 2 lira. Sans choix :
+  « quelques étapes ». **Écart de ponctuation** avec le tableau de la
+  section 3.3 : le dernier élément de la liste est joint par « et »
+  (« le matériel, où il est posé, d'où vient l'eau et combien vous
+  visez »), comme pour deux étapes (« le matériel et où il est posé »).
+  Option recommandée, modifiable à la relecture. Un test énumère toutes
+  les parties des onze cases que la fermeture accepte : la phrase, le
+  nombre d'étapes et la première arrivée se suivent pour chacune.
+- **F949** — **Un seul enregistrement** : `saveStartChoiceForUser`
+  (`db/feature-selection-repository.ts`) écrit dans un même lot D1
+  l'espace de la ferme, la ligne du journal des modifications et la ligne
+  du choix avec `start_mode`. L'index unique des espaces refuse un second
+  espace : deux appuis, ou deux onglets, ne font qu'un enregistrement (un
+  test les lance ensemble) ; le second apprend « Vous avez déjà choisi
+  comment commencer. » et reçoit la page d'arrivée, relue dans la base et
+  non dans la mémoire de la requête, et la page s'ouvre (section 12). Une
+  ferme qui a déjà un espace (d'avant la 3.8, d'avant S6) ne repasse
+  jamais par ce choix.
+- **F950** — **L'action** `saveFeatureSelectionAction` reçoit
+  `startMode` (`notes`, `proposals`, `all`, `custom`) ; le service
+  `lib/services/start-choice.ts` refuse une façon inconnue (« Choisissez
+  une façon de commencer. ») et un choix « moi-même » vide (P7). Appelée
+  sans `startMode` par une ferme à sa première ouverture (une page
+  d'avant S6 restée ouverte pendant la mise en ligne), elle enregistre
+  `custom` avec ses cases. Avec un espace, le chemin de Réglages ne change
+  pas. Le journal `irrigation_features_chosen` porte la façon, jamais
+  l'identifiant de la personne.
+- **F951** — **L'écran** : trois boutons radio natifs dans un
+  `radiogroup` nommé par le titre ; chaque ligne fait 72 px au moins, le
+  choix retenu porte la bordure verte épaisse **et** une coche ; le
+  contour du focus est sur la ligne. « Continuer » fait 50 px, pleine
+  largeur ; « Enregistrement… » pendant l'appel ; l'erreur sous le bouton,
+  le choix gardé. « Choisir moi-même les fonctionnalités » et « ‹ Revenir
+  aux trois façons » font 44 px ; le clavier suit le changement de vue. Le
+  texte de la 3.8 (« Cochez ce dont votre ferme a besoin… ») passe sur la
+  liste. Le repère de la visite `fonctionnalites` est sur les trois façons :
+  les étapes de la visite gardent leur ancre, leurs phrases suivent en
+  PR 4 (section 10). Les styles sont dans `mise-en-route.css`, importé
+  avant `trois-endroits.css`, qui reste juste avant `gestes-surs.css`.
+- **F952** — **« Commencer par l'essentiel » retiré** :
+  `ESSENTIAL_FEATURES`, `withEssentialFeatures` et les styles
+  `.welcome-start` sont supprimés ; le test du lot I vérifie désormais leur
+  absence (contre-épreuve : les remettre le fait échouer).
+- **F953** — **Les mots** : le titre de la page et celui de la visite
+  suivent le titre de l'écran (« Comment voulez-vous commencer ? ») ; le
+  lien de la page introuvable, pour une ferme qui n'a pas choisi, dit
+  « Choisir comment commencer ». La ligne de Réglages finit par un point :
+  « Vous avez commencé par : « Le module me propose quoi arroser ». »,
+  « Vous avez choisi vous-même vos fonctionnalités. » ; aucune pour une
+  ferme d'avant S6 ; elle ne propose pas de refaire le choix (section 9).
+- **F954** — **La migration 0051** ajoute deux colonnes nulles avec leur
+  contrainte `CHECK`, sans rien écrire ; un test la joue sur une base qui
+  a des lignes, un autre vérifie l'export et la restauration. La remise à
+  zéro de la démonstration rend la ferme vierge sans choix, façon comprise
+  (un test). Les deux essais de migration qui remplissent une copie
+  ancienne avec les dépôts d'aujourd'hui (0034, 0042) ajoutent les deux
+  colonnes le temps de la remplir, puis les retirent, comme ils le font
+  déjà pour les tables de la 0044 et de la 0047 ; celui de la 0034 compare
+  les lignes sans ces deux colonnes, nulles.
+- **F955** — **Les parcours** : `attendreLaPremiereOuverture` attend les
+  trois façons ; `attendreLeChoixDesFonctionnalites` passe par « Choisir
+  moi-même » ; une ferme neuve qui coche tout passe par « Tout », arrive
+  sur « Ma ferme », puis ouvre « Aujourd'hui ». P22 est réécrit ; P23,
+  P25, P29, P63 et P66 arrivent sur « Ma ferme » ; P28 et P30 prennent
+  l'aide commune ; V6 et V8 jouent les boutons radio ; P69 est nouveau.
+- **F956** — **Relevé de départ** (section 15) : avant la PR 1, « Commencer
+  par l'essentiel » était lu par `lib/domain/features/choice.ts` seulement
+  (et l'écran par son import) ; « Choisissez vos fonctionnalités » par
+  l'écran, `page-metadata.ts`, `guided-tour.tsx`, P22 et l'aide des
+  parcours ; l'écran de bienvenue par huit parcours directement (P22, P23,
+  P25, P28, P29, P30, P63, P66), vingt et un par l'aide `ouvrirUneFermeToutCochee`
+  (P31, P31b, P31c, P33, P41, P46, P51 à P58, P60, P62 à P65, P67, P68),
+  V6 et V8 de la démonstration, neuf fichiers de tests (lot I, deux, lot 1,
+  fonctionnalités, démonstration, visites, mots de S1, liens de S3, semaine
+  de S4) et les deux étapes de « Le module à la carte » posées sur
+  `bienvenue` (`lib/domain/demo/tours.ts`). Tous suivent dans la PR 1,
+  sauf les phrases des deux étapes de la visite, qui suivent en PR 4
+  (section 10) : leur repère est sur les trois façons.
+- **F957** — **Mesures et preuves** (section 14) : l'écran de la première
+  ouverture, à 390 px, en local, sur une ferme neuve, la hauteur de la
+  page et les mots de l'écran (`#contenu`, compté de la même façon avant
+  et après) : **avant, 2 227 px et 343 mots** (onze cases, « Commencer
+  par l'essentiel ») ; **après, 920 px et 108 mots** (les trois façons) ;
+  « Choisir moi-même », 2 230 px et 332 mots. Le contrat disait 365 mots
+  avant, compté autrement. Contre-épreuves, chacune fait échouer au moins
+  un test : une façon qui coche une case de moins ; un client qui impose
+  ses cases ; une façon enfoncée d'avance ; « Commencer par l'essentiel »
+  qui reparaît ; un second appui qui échoue au lieu d'apprendre « déjà
+  choisi » ; la phrase qui dit « cinq » partout ; la première arrivée
+  toujours sur la page d'arrivée ; une ligne de Réglages pour une ferme
+  d'avant S6. Parcours joués en local aux deux largeurs : P22 et P69
+  (9 verts), puis P23, P25, P28, P29, P30, P31, P62, P63, P66 et P69
+  (53 verts), aucun échec ; la suite complète par la CI.
+
+**Décision (PR 2).** Une carte **« Mise en route »** en tête de « Ma
+ferme », sous le titre, au-dessus des fiches : « 3 étapes sur 5 » et sa
+barre, les étapes qui existent (une par case cochée, section 5.1), la
+première étape non faite « en cours » avec ce qui lui manque et ce
+qu'elle débloque, « Continuer l'étape n » (un lien) et « Plus tard ».
+Une étape est faite quand **ce qu'elle décrit existe** : la carte se lit
+sur les données de la ferme, rien ne se coche, rien ne se confirme à la
+place de la personne (S6-h). « Plus tard », « Reprendre la mise en
+route » et « Terminer la mise en route » écrivent `route_state` par un
+appui, et rien d'autre ; `done` ne revient jamais (S6-k). Le bandeau « À
+finir » n'est plus répété sur « Ma ferme » quand la carte est visible
+(S6-d). Sur « Aujourd'hui », quand aucune carte d'arrosage n'est à
+montrer, la ligne vide devient un bloc qui dit l'étape en cours, tirée de
+la même fonction que la carte (section 8). **Une lecture par page**,
+lancée avant le plan d'Ouvre ta ferme, seulement sur « Ma ferme » et
+« Aujourd'hui » et seulement quand la carte existe (section 6). Aucun
+calcul, aucune règle d'agronomie ni d'isolation ne change ; aucune
+migration ; aucune question agronomique.
+
+Précisions prises en codant (PR 2) :
+
+- **F958** — **Les lectures**, relevées pour la section 15
+  (`lib/services/start-route.ts`) : « Mon matériel » et « Où il est
+  posé » lisent l'inventaire (`listEquipmentForUser`), les poses de la
+  saison (`listEquipmentPlacementsForUser`) et les groupes de jardins de
+  la saison (`listGardenGroupsForUser`, **nouvelle, en lecture seule** :
+  `listGardenGroupConfigurationForUser` pose le marqueur de la saison et
+  reporte les groupes de la saison d'avant à sa première lecture, et une
+  lecture ne fait pas de geste) ; les planches arrosées sont celles de
+  `calculateIrrigationCoverage`, le calcul du plan, appelé sur ces lignes.
+  **Écart dit avec la section 6** (« des `COUNT` ») : une pose vise une
+  planche, un jardin ou un groupe, et seul ce calcul dit quelles planches
+  elle arrose ; un `COUNT` des poses serait une seconde règle (AGENTS.md).
+  Ces lignes sont celles du matériel, jamais une par planche : trois cents
+  planches lancent autant de requêtes que trois (un test les compte).
+  « D'où vient l'eau » : `readActiveWaterResourceNamesForUser`
+  (**nouvelle**, un lot de deux requêtes : deux noms et un `COUNT` des
+  ressources et des réserves).
+  « Combien je vise » : `listHydricGoalRevisionsThroughWeekForUser` puis,
+  après le plan, `readAutomaticObjectiveSourceForUser`, `objectiveForBed`
+  et `farmObjective`, ceux d'« Aujourd'hui » (S6-i). « Mon sol » :
+  `listZonesWithSoilForUser` puis `parcelsWithoutSoil` et
+  `soilParcelAnchor`, ceux du bandeau ; la même promesse sert au bandeau,
+  jamais deux lectures. Les planches sont celles de la saison de la page
+  qui ont leur jardin et leur parcelle, celles du tableau des besoins.
+- **F959** — **Le pli** des étapes faites (« 3 étapes faites ») dès
+  **trois** étapes faites : « plus de trois » de la section 5.2 est lu
+  comme « trois ou plus », d'après son propre exemple. Le pli ne contient
+  que des étapes faites, donc jamais l'étape en cours.
+- **F960** — **« D'où vient l'eau »** compte les ressources **et les
+  réserves** (« un puits, un bassin », section 5.1 ; sur « Ressources et
+  pompes », deux listes, « Ressources » et « Réserves ») : une ferme qui
+  n'arrose qu'à partir d'une cuve a de l'eau. Seulement les **actives** :
+  une ressource ou une réserve arrêtée n'apporte plus d'eau. Les noms des
+  deux listes sont triés ensemble sans tenir compte des majuscules ; deux
+  au plus, joints par « et » comme F948, puis « et n autre(s) ». Le volume
+  n'est pas regardé (section 5.1).
+- **F961** — **Un compte inconnu** : la lecture qui échoue rend sa
+  promesse `null` (journal `start_route_read_failed`, l'étape, jamais la
+  personne) ; l'étape est « à vérifier » (« À vérifier : ce compte n'a pas
+  pu être lu. », un « ? » dans sa marque, son lien gardé), jamais faite ni
+  à zéro (D-003), et n'est jamais l'étape en cours. Toutes inconnues : une
+  ligne, « La mise en route n'a pas pu être lue. » (section 6). Un
+  objectif automatique illisible rend l'étape 4 inconnue : sans lui, des
+  planches seraient dites sans eau visée à tort.
+- **F962** — **Les états d'une étape** : l'étape en cours est la première
+  connue, non faite, qui n'attend pas. L'étape 4 attend l'étape 2 quand la
+  pose est connue et non faite (« Posez d'abord le matériel sur vos
+  planches. ») ; sans planche, elle dit « Aucune planche dans votre plan.
+  Ajoutez-les dans Ouvre ta ferme. » (section 12) ; l'étape 5 sans
+  parcelle dit la même phrase pour les parcelles. Une étape qui attend
+  n'a pas de lien. Une étape à faire dit ce qui existe déjà, jamais un
+  « 0 » ; « ce qu'elle débloque » n'est dit que pour l'étape en cours. Les
+  phrases sont celles du tableau de la section 5.1 ; « sol de n
+  parcelles » vient d'une seule fonction, `soilParcelsText`, que le
+  bandeau lit aussi.
+- **F963** — **Les liens** (`STEP_LINKS`, la saison et le jardin gardés
+  par `pageHref`) : étape 1, « Matériel et placement », onglet Matériel,
+  `#equipment-title` (le titre et son bouton d'ajout) ; étape 2, la même
+  page, `#farm-plan` ; étape 3, « Ressources et pompes »,
+  `#water-resources-title` ; étape 4, « Semaine », `#objectifs-de-la-semaine`,
+  le volet des objectifs qu'« Objectifs et besoins » est devenu en S4, et
+  non « le premier objectif manquant » : l'objectif se pose pour la ferme
+  ou par planche depuis ce volet ; étape 5, « Réserve du sol », l'ancre de
+  la première parcelle sans sol.
+- **F964** — **Les gestes** : une action du serveur,
+  `saveRouteStateAction` (`app/irrigation/start-route-actions.ts`), puis
+  `changeRouteStateForUser` et `saveRouteStateForUser`, **un** `UPDATE`
+  borné à l'espace de la personne (`WORKSPACE_SPACE_FILTER`), qui ne touche
+  ni une ferme d'avant S6 (`start_mode` nul) ni une mise en route terminée
+  (« La mise en route est déjà terminée. ») ; « Reprendre » remet
+  `route_state` à nul. « Terminer » n'est pas recompté au serveur : le
+  bouton ne paraît que tout fait, et une étape qui deviendrait fausse
+  après ne ramène pas la carte (S6-k). Le journal des modifications ne
+  note pas ce geste (`sansObjet`, ni case ni réglage) ; le journal du
+  serveur dit le geste et l'heure, jamais la personne. La réponse
+  s'écrit à côté du bouton (`ActionReply`) et reste à l'écran quand la
+  page se relit (`router.refresh`) : un seul composant pour tous les
+  états.
+- **F965** — **Le bloc d'« Aujourd'hui »** (`todayRouteBlock`) : titre
+  « Votre ferme n'est pas encore prête à proposer des arrosages. » quand
+  Planning de la semaine est coché, sinon « Votre ferme n'est pas encore
+  décrite. » (la première façon, et toute ferme qui n'a rien à proposer) ;
+  la phrase de l'étape en cours (« Combien vous visez par semaine : 3
+  planches n'ont pas encore d'eau visée. ») ; « Continuer l'étape n »,
+  48 px. Il remplace la ligne vide seulement : dès qu'une carte
+  d'arrosage existe, il n'est pas montré. Avec « Plus tard »,
+  « Aujourd'hui » ne lit rien de la mise en route (pas de bloc, pas de
+  coût).
+- **F966** — **Le bandeau « À finir »** n'est pas passé au gabarit de
+  « Ma ferme » quand la carte est visible, en entier ou en une ligne
+  (« Votre ferme est décrite. ») ; il revient avec « Plus tard » ou une
+  lecture impossible ; les fiches gardent leur « À faire ». Les autres
+  pages ne changent pas.
+- **F967** — **Où la lecture se lance** (`page-context.ts`) : avant le
+  `Promise.all` du plan, quand `routeReadNeeded` le dit (« Ma ferme » ou
+  « Aujourd'hui », `start_mode` non nul, pas `done`, pas `later` sur
+  « Aujourd'hui », au moins une étape) ; les comptes se font après le
+  plan ; le temps s'inscrit sous `route` dans `irrigation_page_loaded`.
+  Une ferme d'avant S6 et toute autre page ne lisent rien de plus.
+- **F968** — **Mesures et preuves** (section 14). La carte à 390 px
+  (P70, en local) : cinq étapes, aucune faite, **442 px** ; cinq étapes
+  dont quatre faites, repliées, **306 px** (borne 380, la maquette 330).
+  Le temps du serveur, mesuré comme N1 et F918 (en local, `vinext dev`,
+  20 ms ajoutées à chaque lecture, sept passages, médiane, une copie de
+  la base jamais commitée) : la ferme de démonstration des parcours (la
+  forme de la ferme A), « Ma ferme » **48 ms et 6 lectures sans la
+  carte, 94 ms et 18 lectures avec** (cinq étapes), Réglages 177 ms et
+  32 lectures ; la même ferme portée à **300 planches**, « Ma ferme » 49
+  ms sans la carte, **100 ms avec** (18 lectures, autant qu'avec sept
+  planches), Réglages 185 ms. Borne : Réglages + 20 %, soit 212 et
+  222 ms ; tenue. Les douze lectures de plus partent ensemble, avant le
+  plan ; le temps ajouté est celui de deux lectures en série (le sol,
+  attendu avec le plan pour le bandeau, et l'objectif automatique, qui
+  attend le plan). Contre-épreuves, chacune fait échouer au moins un
+  test : une carte montrée à une ferme d'avant S6 ; le bandeau « À finir »
+  doublé sur « Ma ferme » ; une étape faite sans donnée ; un compte de
+  l'étape 4 fait à part, différent d'« Aujourd'hui » ; la carte qui
+  revient après « Terminer », dans le domaine puis dans la base ; une
+  lecture par planche ; le bloc d'« Aujourd'hui » sur une autre étape que
+  la carte. Parcours joués en local aux deux largeurs : P29, P63, P69 et
+  P70 (24 verts), puis P22, P23, P25, P28, P30, P31, P62, P66 et P70 (56
+  verts), aucun échec ; la suite complète par la CI.
+
+**Décision (PR 3).** Chaque fiche de « Ma ferme » dit **son état en une
+ligne** quand la donnée est connue, à la place de la ligne fixe de S3 ;
+la ligne fixe revient quand la donnée est inconnue, illisible ou vide,
+jamais un « 0 » pour un inconnu (D-003). La marque « À faire » reste : la
+ligne dit ce qui **est**, la marque ce qui **manque**. Les lignes sont des
+gabarits du domaine (`lib/domain/farm-home/lines.ts`), relus par le test
+de vocabulaire de S1 ; leurs nombres viennent de **la lecture de la mise
+en route**, lancée sur « Ma ferme » toujours (pour les fiches) et avec la
+carte quand elle existe : une seule lecture, plusieurs phrases, jamais
+deux comptes qui peuvent différer. « Alertes cultures » garde sa ligne
+fixe (repli gardé, section 7.2). Aucun calcul, aucune règle d'agronomie
+ni d'isolation ne change ; aucune migration ; aucune question
+agronomique.
+
+Précisions prises en codant (PR 3) :
+
+- **F969** — **Les lectures des lignes**, relevées pour la section 15
+  (`lib/services/start-route.ts`, `startRouteReads(…, { route, cards })`) :
+  seules les fiches cochées sont lues. « Matériel et placement » :
+  l'inventaire (`listEquipmentForUser`), les poses courantes de la saison,
+  posées ou stockées (`listEquipmentPosesForUser`, deux requêtes ; elle
+  remplace `listEquipmentPlacementsForUser` de la PR 2 : les poses
+  ouvertes, `posedPlacements`, servent la couverture de l'étape 2, et
+  `poseCounts`, le compte de l'inventaire, dit les posés) et les groupes
+  de jardins (étapes 1 et 2). « Ressources et pompes » :
+  `readActiveWaterAssetsForUser` (un lot de deux requêtes, les ressources
+  actives avec leur débit, les réserves actives avec leur volume à sa
+  date ; elle remplace `readActiveWaterResourceNamesForUser` et l'étape 3
+  en tire ses noms et son nombre). « Besoin par culture » : après
+  l'espace, les rattachements des espèces
+  (`listSpeciesCorrespondencesForWorkspace`, la même promesse sert au
+  bandeau « À finir ») et les clés des cultures que la ferme connaît
+  (`listReferenceCropKeysForWorkspace`, **nouvelle**, une requête, sans
+  les stades). « Réserve du sol » : `listZonesWithSoilForUser` (partagée
+  avec l'étape 5 et le bandeau). « Alertes météo » :
+  `countWeatherAlertCriteriaForUser` (**nouvelle**, un `COUNT` des
+  critères non supprimés et des actifs, dans l'espace de la personne).
+  « Réglages » : `readWeatherPreference` (lue une fois par requête) puis
+  `weatherLocationQuery`. Aucune n'est par planche ni par jardin. Une
+  lecture qui échoue rend la ligne fixe de sa fiche ; les autres restent.
+- **F970** — **« Matériel et placement »** (ligne d'état faite) : « 4
+  goutte-à-goutte, tous posés », « 2 goutte-à-goutte et 1 aspersion, 1
+  pas posé », « 2 aspersions, aucun posé », « 1 goutte-à-goutte, posé ».
+  Les sortes sont comptées comme l'inventaire (le goutte-à-goutte : tout
+  matériel actif qui n'est pas une aspersion ; un archivé ne compte pas),
+  les posés par `poseCounts` ; le texte des sortes est celui de l'étape 1
+  (`equipmentKindsText`). **L'étape 1 suit** : elle comptait les matériels
+  qui ont un réglage ; elle compte maintenant tout le matériel actif,
+  comme l'inventaire et la fiche, et reste faite dès qu'un matériel a un
+  réglage. Aucun matériel : la ligne fixe.
+- **F971** — **« Ressources et pompes »** (ligne d'état faite) : une seule
+  ressource, « Puits : débit de 2 m³/h » ; une seule réserve, la phrase du
+  bloc « Eau disponible » d'« Aujourd'hui » (`reservoirStateText` :
+  « Bassin des noues : 30 m³ sur 40 m³, observé aujourd’hui », « Cuve :
+  volume jamais saisi »), le volume à la date de son relevé ; plusieurs,
+  un compte : « 1 ressource et 2 réserves, 1 observée cette semaine »
+  (« toutes observées », « aucune observée », « pas observée »), une
+  réserve observée cette semaine quand son volume a été relevé depuis le
+  lundi. **Jamais une somme** de volumes ni de débits. **Écarts de mots
+  avec la maquette** : « observé » (le mot de la page et du bloc) pour
+  « relevé », « ressource » et « réserve » comptées à part (les deux
+  listes de la page). Aucune ressource ni réserve active : la ligne fixe.
+- **F972** — **« Besoin par culture »** (ligne d'état faite, **écart dit**) :
+  « 4 cultures cette saison », le titre de la page (« Vos cultures cette
+  saison (4) », `seasonCropCount`, les mêmes fonctions que la page :
+  `splitBySeasonUse` et `referenceCropSeriesCount` sur les cultures que la
+  ferme connaît) ; « Aucune culture ne sert à vos séries cette saison »,
+  la phrase de la page, quand des espèces sont plantées et qu'aucune n'est
+  rattachée ; la ligne fixe sans espèce plantée ou sans plan lu. Le
+  contrat proposait « 8 cultures cette saison, 2 pas encore reconnues » :
+  les espèces à rattacher se comptent et se rattachent dans **Réglages**,
+  pas sur « Besoin par culture » (relevé en jouant P63), et la règle « une
+  ligne qui dirait plus que sa page est refusée » l'emporte ; la marque
+  « À faire : n espèces à rattacher » de la fiche « Réglages » le dit
+  pendant l'accueil.
+- **F973** — **« Réserve du sol »**, **« Alertes météo »** et
+  **« Réglages »** (lignes d'état faites) : « Sol connu pour 6 parcelles
+  sur 6 », « À renseigner pour 3 parcelles » (`parcelsWithoutSoil`, les
+  parcelles de la saison) ; « 2 alertes réglées », « 2 alertes réglées, 1
+  inactive » (le mot de la page), « Aucune alerte réglée » ; « Météo de
+  Nantes · 11 fonctionnalités cochées », « Commune à confirmer · 11
+  fonctionnalités cochées » tant que la commune n'est pas confirmée et
+  qu'une case lit la météo (« de la météo » ôté : deux lignes au plus à
+  320 px), « 3 fonctionnalités cochées » sans case qui lit la météo ; une
+  commune confirmée introuvable garde la ligne fixe. Les messages du
+  téléphone n'y sont pas (S6-g, écart dit au contrat). **« Alertes
+  cultures » : repli gardé** : le gel suivi demande le calcul de la page
+  (espèces, jeu commun, liens de gel), hors du budget.
+- **F974** — **Où les lignes se lisent** : `page-context.ts` lance la
+  lecture sur « Ma ferme » toujours (`cards`), avec la carte quand
+  `routeReadNeeded` le dit (`route`), une seule fois ; les comptes des
+  fiches (`farmHomeCounts`) se font après le plan, en même temps que ceux
+  de la carte ; la page passe les lignes à `farmCards`, et chaque fiche dit
+  aux parcours quelle ligne elle porte (`data-line`, `state` ou `fixed`).
+  Le bandeau « À finir » réutilise les rattachements lus pour la fiche ;
+  il relit s'ils ont échoué. Toute autre page ne lit rien de plus.
+- **F975** — **Mesures et preuves** (section 14). Les lignes à 390 px
+  (P63, P70, en local) : deux lignes au plus au téléphone, une à
+  l'ordinateur, sur la ferme des parcours et une ferme neuve « Tout » ;
+  fiches de 70 à 92 px (borne 68). Mesuré à part : la colonne de texte
+  fait 242 px à 390 px et 172 px à 320 px ; les exemples du contrat
+  (« 2 goutte-à-goutte et 1 aspersion, tous posés », « Météo de Nantes ·
+  11 fonctionnalités cochées ») tiennent sur **deux** lignes à 390 px,
+  comme les lignes fixes de S3 (S3-f) : la règle tenue est celle de S3,
+  deux lignes au plus à 390 px ; à 320 px, une phrase de réserve longue
+  passe sur trois, la fiche grandit, aucun texte coupé. Le temps du
+  serveur, mesuré comme F968 (20 ms par lecture, sept passages,
+  médiane) : « Ma ferme » de la ferme des parcours **78 ms et 20
+  lectures sans la carte** (48 ms avant), **105 ms et 22 lectures avec**
+  (94 ms en PR 2), Réglages 180 et 184 ms ; à **300 planches**, **82 ms
+  sans la carte, 104 ms avec**, autant de lectures, Réglages 183 et
+  176 ms. Borne Réglages + 20 % (de 211 à 221 ms) tenue. Contre-épreuves,
+  chacune fait échouer au moins un test : une ligne « 0 goutte-à-goutte »
+  pour une ferme sans matériel ; « Aucune alerte réglée » quand la lecture
+  a échoué ; la fiche qui compte aussi le matériel archivé (deux comptes
+  différents) ; les alertes supprimées comptées ; le compte des alertes
+  sans le filtre d'espace (aux quatre passages) ; une lecture par
+  planche ; les espèces d'un bloc ou de l'an passé comptées ; les espèces
+  rattachées comptées au lieu des cultures de la page ; « Aucune culture »
+  quand le plan n'est pas lu ; une réserve d'avant lundi dite « observée
+  cette semaine » ; des volumes additionnés ; une deuxième lecture pour
+  les fiches ; la page qui n'affiche pas les lignes ; une ligne inventée
+  pour « Alertes cultures ».
+
+**Décision (PR 4).** Sur l'écran de la première ouverture, la visite
+guidée **dit les trois façons de commencer** : les deux étapes de « Le
+module à la carte » posées sur `bienvenue` y prennent leurs propres mots
+(« Trois façons de commencer », « Rien n'est choisi d'avance ») et gardent
+les leurs dans Réglages ; **aucune étape n'est ajoutée ni retirée**, même
+ancre, mêmes pages, même règle de saut (F177). La ferme vierge de la
+démonstration s'ouvre sur les trois façons, son catalogue le dit, et la
+remise à zéro la rend vierge, sa façon et l'état de sa carte compris. Le
+« ? » de « Ma ferme » suit la carte et les lignes d'état. Les contrats
+validés que S6 change (section 11) disent, à l'endroit du passage, ce qui
+change depuis S6. Aucun calcul, aucune règle d'agronomie ni d'isolation
+ne change ; aucune migration ; aucune question agronomique. **Le code de
+S6 est fini.**
+
+Précisions prises en codant (PR 4) :
+
+- **F976** — **Des mots propres à une page, pas une étape de plus.** Une
+  étape peut porter des mots pour une page (`TourStep.on`, par exemple
+  `on.bienvenue`) ; `stepWords(step, page)` rend ceux de la page ouverte,
+  sinon les siens. La bulle et l'annonce du lecteur d'écran passent par
+  elle (`guided-tour.tsx`, `context.current`) ; `allStepWords` donne tous
+  les mots d'une étape aux tests de garde (longueur, sigles, vocabulaire
+  de S1, mots de S3), qui les relisent tous. Ni le déroulé, ni le compte
+  « étape n sur N », ni l'adresse d'une étape (`visite=a-la-carte.0`) ne
+  changent.
+- **F977** — **Le relevé des visites** (section 10). La section 10 cite
+  trois visites ; le relevé n'en trouve qu'une qui parle de la liste sur
+  l'écran de la première ouverture : les étapes 1 et 2 de « Le module à
+  la carte ». « Bienvenue » n'y joue que des bulles générales (son étape
+  « Trois endroits » vise le menu, absent, et y est sautée) ; « Et pour
+  ma ferme ? » est du texte seul, sans case. Ces deux visites ne changent
+  pas (**écart dit avec la section 10**, aucune phrase n'y parlait des
+  cases). L'ancre `fonctionnalites` reste sur les trois façons
+  (`.start-ways`) et sur la liste de « Choisir moi-même » : les mots
+  disent l'une et l'autre.
+- **F978** — **Les phrases.** « Trois façons de commencer » : noter vos
+  arrosages, laisser le module proposer quoi arroser, ou tout ; chaque
+  façon coche les fonctionnalités qui vont avec ; « Choisir moi-même les
+  fonctionnalités » montre la liste des cases. « Rien n'est choisi
+  d'avance » : « Conseillé » désigne une façon sans la choisir (S6-a),
+  rien ne s'enregistre avant « Continuer » (D-028), les cases se changent
+  ensuite dans Réglages et décocher ne perd rien. Les mots sont ceux de
+  l'écran (`lib/domain/features/start.ts`), aucun sigle, aucun mot du
+  calcul.
+- **F979** — **La ferme vierge et sa remise à zéro** (section 10). Le
+  catalogue dit « rien de choisi, rien de réglé » et « les trois façons
+  de commencer, et rien de réglé ». La remise à zéro met l'espace de côté
+  avec sa ligne de choix (`start_mode`, `route_state` gardés sur l'espace
+  mis de côté, rien effacé) ; l'invité n'a plus d'espace, donc plus de
+  façon ni d'état de carte : il retrouve les trois façons, aucune
+  enfoncée, et son nouveau choix s'enregistre comme le premier. Aucune
+  ligne de code de la remise à zéro ne change : la preuve est un test de
+  base et V8.
+- **F980** — **Le « ? » de « Ma ferme »** (écart dit : ni la section 10
+  ni la 11 ne le citent). Il disait « Chaque fiche (…) dit en une ligne à
+  quoi elle sert », faux depuis la PR 3. Il dit maintenant que la ligne
+  dit où en est la fiche (« 4 goutte-à-goutte, tous posés »), qu'une
+  ferme qui commence voit sa mise en route en tête, et la première chose
+  à faire commence par elle. Le « ? » de Réglages (« Cochez ce qui vous
+  sert ») reste : il parle de la liste de Réglages.
+- **F981** — **Le relevé des contrats de la section 11**, chacun annoté à
+  l'endroit du passage par « **Depuis S6** (lot S6, D-336, (…) section
+  11) » : `feature-selection-contract.md` (R5, la ligne de
+  `/irrigation/bienvenue` du tableau de la section 5, « première page »,
+  la persistance avec 0051, P10) ; `audit-ergonomie-lot2-contract.md`
+  (F31, la première arrivée) ; `audit-ergonomie-2026-11-19-lot-i-contract.md`
+  (n° 25 et F452, retirés) ; `tranche-4-contract.md` (8 bis, le bandeau
+  non répété sur « Ma ferme ») ; `simplification-s3-contract.md` (les
+  chiffres d'état, la place de la mise en route, S3-b et S6-f) ;
+  `simplification-s2-contract.md` (la ligne vide et le bloc de F965) ;
+  `demo-guided-contract.md` (la ferme vierge du tableau des profils,
+  F165, F178 et F193, la remise à zéro, V8). Le contrat des parcours a
+  suivi dans les PR 1 à 3.
+- **F982** — **Preuves.** Tests du domaine (`tests/simplification-s6-visites.test.ts`,
+  huit tests) et de la base (`tests/db/demo-reset.test.ts`, un test
+  nouveau) ; V6 et V8 suivent. Contre-épreuves, chacune fait échouer au
+  moins un test : la bulle qui garde les mots de Réglages ; l'annonce qui
+  garde l'ancien titre ; `stepWords` qui ignore la page ; une étape
+  ajoutée ; des mots de première ouverture qui disent encore « Cochez » ;
+  un sigle dans ces mots (garde S1) ; un texte trop long (garde des
+  visites) ; la remise à zéro qui garde l'espace de la ferme vierge ; le
+  catalogue qui dit encore « à cocher » ; le « ? » de « Ma ferme » qui
+  dit encore « à quoi elle sert ».
+
+## D-337 — L'objectif automatique se voit et se modifie ; ignorer l'irrigation hors saison
+
+Date : 26 novembre 2026. Statut : **contrat écrit**, fusionné le
+27 novembre 2026 à 3 h 14 (#240) et **en ligne à 4 h 06** (run
+45927191810) ; le code suit en quatre PR (A1 : D-351 et B1 : D-341, en
+ligne le 27 novembre 2026 ; B2 : D-352) ;
+`docs/objectif-automatique-saison-contract.md`, roadmap section 6
+quaterdecies, ligne 34. Complète D-309 et D-316 à D-319 sans les changer.
+
+**Demande du porteur** (11 h 24 et 11 h 26) : l'objectif automatique doit se
+renseigner et se modifier à l'écran ; un filtre « hors saison » ignore
+l'irrigation de planches, jardins, parcelles, de tout le plein champ ou de
+tout le sous-abri.
+
+**Décision.** (1) Cause : l'objectif automatique est calculé à la lecture,
+jamais écrit ; le volet ne liste que les objectifs saisis. Il reste calculé
+et non écrit (la règle « un objectif saisi passe avant » tient) ; l'écran le
+liste, préremplit le champ, propose « Revenir à l'automatique » et, en
+allumant, offre « garder mes objectifs » ou « vider ». (2) Le filtre « hors
+saison » **n'ignore que l'irrigation** (objectif saisi et automatique,
+propositions, pénurie, faisabilité) à partir de son jour (D-034) ; **la
+pluie, la réserve du sol, l'ET0, les alertes météo, les irrigations réelles,
+les semaines closes et l'historique ne bougent pas**, gardés par des tests.
+Cinq portées ; un jardin « à classer » n'est couvert par aucune des deux
+portées de mode, dit. Une seule fonction, un seul endroit. Sans question
+sur le calcul ; deux questions de conduite de la ferme, **répondues par le
+porteur le 26 novembre 2026 à 12 h 37** : le filtre se lève **à la main
+seulement** (« Reprendre », ni date ni calendrier) ; en mettant hors
+saison, **le module propose d'annuler** les arrosages planifiés ou
+validés des planches concernées, jamais sans son choix.
+
+Numéros : D-337 ; F à partir de F985 (F983 et F984 sont à D-337 de #244, aligné sur #245) pour le code.
+
+## D-338 — La météo prévue contre la météo réalisée : le contrat
+
+Date : 26 novembre 2026. Statut : **contrat écrit, sans code** ;
+`docs/forecast-reliability-contract.md`, roadmap section 6 quindecies,
+ligne 35. Contrat en Sonnet 5.5 · Moyen ; code en Opus 5.5 · Élevé (deux PR),
+après la relecture et le « vas-y » du porteur.
+
+**Décision.** Le porteur avance l'idée « prévu contre réalisé » (D-065,
+section 6 ter) le 26 novembre 2026. Ferme par ferme, la prévision archivée
+(D-297) est comparée au réalisé du jour visé : pluie (réanalyse en lecture de
+base, pluviomètre de la ferme en lecture séparée à partir de 14 jours
+mesurés) et ET0 (réanalyse seulement, réserve de méthode dite, l'écart de J+1
+comme plancher). Trois lignes d'horizon, un cumul de semaine lu sur la
+prévision du dimanche d'avant, une fenêtre de 90 jours. Aucun chiffre sans
+14 couples (4 semaines pour le cumul), aucun verdict en mots avant de vraies
+données. Un pli fermé sur « Objectifs et besoins » ; rien sur « Aujourd'hui ».
+
+**Ce qui ne change pas.** Aucun calcul, aucune migration, aucune écriture,
+aucun appel externe, aucun budget. La pluie prévue reste comptée à 100 % ; la
+corriger d'après les écarts serait une décision agronomique du porteur, dans
+un chantier à part. Les températures (alertes de gel) sont rangées pour
+plus tard.
+
+**Choix pris par l'assistant** (contrat, section 11) : l'emplacement, la
+fenêtre, les minimums, le seuil de 1 mm, l'absence de verdict, la semaine du
+dimanche. Aucun n'est un budget ni une question agronomique réservée.
+
 ## D-339 — Météo multi-modèles : le modèle de prévision se choisit par ferme
 
 Date : 26 novembre 2026. Statut : **contrat écrit, sans code** ;
@@ -11449,9 +12091,132 @@ abonnement acheté ; le code reste indifférent à l'offre. Le réseau du
 conteneur n'atteint pas Open-Meteo : essais par GitHub (A) et par le Worker
 (B). Plus aucun point ouvert au porteur.
 
+## D-341 — Ignorer l'irrigation hors saison, B1 : la règle
+
+Date : 26 novembre 2026. Statut : **codée** (PR B1 sur les quatre du
+contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections 4,
+5 et 8), fusionnée le 27 novembre 2026 à 6 h 28 (#245) et **en ligne à
+7 h 15** (run 45946029675, consigné par B2) ; roadmap section 6
+quaterdecies, ligne 34. Code en Opus 5.5 · Max,
+le réglage de la roadmap, sur la branche du contrat, avant la fusion de S4
+et S6 (domaine seul, section 7). Numéros D-341 et F985 à F995, ceux que
+le contrat réserve au code ; D-338 à D-340 sont pris par trois contrats
+ouverts (#241 à #243), D-342 par le budget de hauteur de S5 (#244).
+
+**Décision.** La règle « hors saison » vit en un seul endroit,
+`lib/domain/off-season.ts` (le nom proposé par le contrat, section 4.6), et
+`objectiveForBed` (`lib/domain/irrigation-needs.ts`) reçoit sa réponse jour
+par jour : un jour où la planche est hors saison n'a aucun objectif, ni
+saisi ni automatique. Le tableau des besoins et l'objectif de la ferme
+(`lib/domain/farm-objective.ts`) en tirent les comptes de la section 4.1.
+**Le filtre reste vide** : aucun service ne le construit, aucun écran ne
+l'allume (B2, B3) ; rien ne change en ligne, deux tests le prouvent mot
+pour mot. Aucune question agronomique : les deux réponses du porteur (la
+reprise à la main seulement, l'annulation proposée des arrosages planifiés)
+sont des gestes, livrés par B2 et B3 ; la règle ne lève jamais seule une
+portée.
+
+**Précisions prises en codant.**
+
+- **F985** — Le filtre d'une ferme se construit à partir de ses gestes
+  datés (`offSeasonSchedule`) et se lit de trois façons : `daysOf(planche)`,
+  la réponse jour par jour que reçoit `objectiveForBed` ;
+  `activeScopes(jour)`, les portées actives, chacune avec son jour
+  (« Tout le plein champ · depuis le 20 nov. », section 4.4) ;
+  `scopesCovering(planche, jour)`, celles qui couvrent une planche (« Le
+  jardin Nord reste hors saison », section 4.3). B2 et B3 lisent ces trois
+  réponses ; aucun lecteur ne refait la règle.
+- **F986** — Une portée de planche, de jardin ou abri, ou de parcelle se
+  reconnaît à l'identifiant OTF de son seul niveau, qui suit l'endroit d'une
+  saison à l'autre (section 6). « Tout le plein champ » et « tout le
+  sous-abri » se lisent au mode du jardin **au moment de la lecture** : un
+  jardin reclassé suit la portée qui le couvre alors. Un jardin « à
+  classer » n'est couvert par aucune des deux (D-003).
+- **F987** — L'ordre des gestes, portée par portée : le dernier geste posé
+  ce jour ou avant, en heure de Paris, fait foi à partir de son jour
+  (D-034) ; deux gestes le même jour, le second fait foi pour toute la
+  journée ; deux gestes de la même milliseconde gardent l'ordre reçu
+  (`docs/revision-order-contract.md`), comme le réglage de l'objectif
+  automatique (F773). Un second « Mettre hors saison » sans « Reprendre »
+  entre les deux ne déplace pas le jour « depuis ». Seul « Reprendre » lève
+  une portée (section 10, question 1), et lever une portée ne lève pas
+  celles qui la recouvrent.
+- **F988** — Un jour hors saison, `objectiveForBed` ne compte ni l'objectif
+  saisi ni l'objectif automatique, et le rend dans `offSeasonDates`. Les
+  objectifs saisis restent lus pendant la pause : un objectif posé sous une
+  portée active reste là, inactif, et s'applique dès la reprise (section
+  4.5). L'objectif automatique ne compte que les jours en saison (cas 9 :
+  21,8 mm, du mercredi au dimanche).
+- **F989** — Sur une période, une planche est « hors saison »
+  (`objectiveOffSeason`) quand **aucun** jour n'a d'objectif et qu'**au
+  moins un** jour est hors saison : elle se dit « hors saison », jamais
+  « sans objectif » ni zéro (D-003). Une planche qui garde un objectif une
+  partie de la période le garde, compté comme tout objectif posé en cours
+  de semaine (D-034) ; ses jours hors saison restent listés, pour que B3
+  dise « hors saison depuis jeudi » (cas 2).
+- **F990** — Au tableau des besoins, une planche hors saison sans objectif
+  n'a ni objectif manquant, ni besoin, ni volume ; elle reste dans les
+  lignes de son jardin (section 6 : elle n'est pas masquée), avec sa pluie
+  et son irrigation réelle inchangées. Les comptes du jardin (besoin, reste
+  à apporter, volume) se font sur ses planches en saison, à leur surface ;
+  un jardin entièrement hors saison n'a pas de volume, jamais un zéro. Le
+  nombre de planches, les priorités et la surface du jardin comptent
+  toujours toutes ses planches.
+- **F991** — Un besoin remplacé à la main reste enregistré, mais inactif
+  tant que la planche est hors saison sans objectif, comme un objectif
+  saisi sous une portée active (section 4.5) : le module ne propose pas
+  d'irriguer une planche hors saison (section 4.1). Il compte de nouveau
+  si la planche reprend dans la semaine ; B3 dira qu'il est inactif.
+- **F992** — L'objectif de la ferme (`farmObjective`) reste la moyenne
+  pondérée par la surface sur les planches qui ont un objectif ; les
+  planches hors saison sans objectif y sont comptées à part (`offSeason`,
+  absent quand il n'y en a aucune : le résultat d'avant). Les phrases :
+  « 20 mm visés, 2 planches sur 2 ont un objectif, 4 hors saison » (un seul
+  « sur » par phrase, F443) ; « aucune eau visée, 4 planches hors saison »
+  quand aucune planche n'a d'objectif ; « aucune planche en saison » et
+  « aucune planche sur 3 n’a d’objectif » pour les deux cas limites du
+  compte. Une planche hors saison n'a pas d'objectif : l'eau reçue se
+  compare à l'objectif sur les seules planches qui en ont un (D-329).
+- **F993** — Ce que B1 laisse à B2 : construire le filtre à partir des
+  gestes enregistrés (migration, journal) et le donner à tous les lecteurs
+  qui composent eux-mêmes l'objectif ou le besoin : le service des
+  besoins ; le planning (`lib/domain/planning/demand.ts` et
+  `suggestions.ts`, qui lisent eux-mêmes le besoin remplacé à la main), la
+  faisabilité et la pénurie ; « Aujourd'hui » (`lib/domain/today/week.ts`) ;
+  l'historique (`hydricObjectiveOfBeds`,
+  `lib/domain/irrigation-history/summary.ts`) et l'eau des séries
+  (`lib/domain/series/water.ts`) ; les services qui appellent
+  `objectiveForBed` (`applied-water-gap.ts`, `crop-water-bed.ts`,
+  `crop-water-series.ts`, `irrigation-form-hints.ts` et, depuis la fusion
+  de S6, `start-route.ts`, l'étape « Combien je vise par semaine » de la
+  carte « Mise en route »). Une semaine close reste lue telle quelle
+  (D-318) : le filtre ne remonte jamais avant le jour de son geste
+  (cas 7).
+- **F994** — Les gardes (`tests/hors-saison-regle.test.ts`) : filtre vide,
+  l'objectif et le tableau des besoins identiques mot pour mot ; sur deux
+  fermes, la pluie, l'ET0 et l'irrigation de chaque planche identiques,
+  filtre actif ou non ; les calculs de la pluie et de l'ET0
+  (`water-management.ts`, `weather/`), de la réserve du sol, des alertes et
+  de l'eau des cultures n'atteignent jamais `off-season.ts` par un import
+  et ne nomment pas le filtre ; les services de la météo, de la réserve du
+  sol, des alertes et le Worker de la météo ne le nomment pas ; une
+  contre-épreuve montre que la garde voit un calcul qui passe par le
+  filtre. Quinze casses volontaires du code (filtre ignoré, jour compté en
+  UTC, premier geste gagnant, jardin « à classer » couvert, planche hors
+  saison comptée au jardin ou à la ferme, pluie lue à travers le filtre…)
+  ont toutes été vues par les tests. La garde à deux fermes de la réserve
+  du sol, de l'historique de la pluie et de l'archivage des prévisions,
+  services compris, est à B2 (section 8).
+- **F995** — « Hors saison » dit déjà autre chose dans le module : une série
+  hors de la saison d'OTF (« série hors saison »,
+  `lib/services/series-water-service.ts`). Le code nomme le filtre
+  `offSeason` ; B3 gardera les deux sens à part à l'écran.
+
 ## D-342 — Simplifier l'usage du module, lot S5 : le budget de hauteur tenu avec un arrosage en cours
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée**, fusionnée le même jour à
+13 h 57 (#244) et **en ligne à 14 h 37** (run 45824529849), recette
+conforme vers 18 h 45 (consigné par B2) ; contrat
 `docs/simplification-s5-contract.md` (section 7, budget ; section 13,
 mesures), roadmap section 6 terdecies, ligne 33. Code en Opus 5.5 · Élevé,
 le réglage de S5 (ligne 33, contrat section 14). Reprend la dette F910 de
@@ -11495,9 +12260,133 @@ formulaire, nom long du parcours) : sans arrosage en cours, « 1. Où ? » à
 À l'ordinateur (1 280 px), 793 px avant comme après. À 320 px de large,
 aucun défilement de côté (mesure locale, ferme de mesure : 689 px).
 
+## D-343 — La météo prévue contre la météo réalisée, PR 1 : le calcul et la lecture
+
+Date : 26 novembre 2026. Statut : **PR 1 sur 2 codée** ; contrat
+`docs/forecast-reliability-contract.md` (sections 3 à 5, 7 et 8), roadmap
+section 6 quindecies, ligne 35. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap ; lancé par le coordinateur sur le mandat du porteur d'enchaîner les
+chantiers seul (consignes du projet, point 4 : ce chantier ne touche ni la
+3.8, ni la ferme réelle, ni Cloudflare, ni une question agronomique
+réservée).
+
+**Décision (PR 1).** Le calcul vit dans
+`lib/domain/weather/forecast-reliability.ts` : les couples (la prévision
+émise le jour D − h pour D, face au réalisé de D), trois lectures jamais
+mêlées (la pluie estimée, la pluie notée au pluviomètre, la soif du jour),
+les trois lignes d'horizon et le total, les horizons un à un, le cumul de la
+semaine lu sur l'annonce du dimanche, les minimums, les états et les
+phrases. La lecture, `db/forecast-reliability-repository.ts`, ne lit que
+l'exploitation de la personne et son lieu actuel, par `listForecastArchive`
+et une requête du réalisé (réanalyse du lieu, pluviomètre de la ferme) ; le
+service `lib/services/forecast-reliability.ts` assemble la fenêtre du jour,
+la lecture et le calcul, pour le pli de la PR 2. **Aucun écran, aucune
+migration, aucune écriture, aucun appel externe ; aucun calcul existant ne
+change** (D-010, D-041, D-047 ; la pluie prévue reste comptée à 100 %).
+
+Précisions prises en codant :
+
+- **F998** — La fenêtre compte 90 jours visés, de J − 90 à hier, bornes
+  comprises ; aujourd'hui n'est jamais comparé (pas encore réalisé). Un
+  couple de 91 jours sort, un de 90 jours entre (test 9 du contrat : 89
+  entre, 91 sort).
+- **F999** — Les « 14 jours mesurés » de la lecture sur le pluviomètre
+  (§3.3) comptent les jours notés dans la fenêtre, avec ou sans prévision
+  en face ; au-delà, chaque ligne de cette lecture demande encore ses
+  14 couples (§5), comme la lecture de base.
+- **F1000** — Le pourcentage de la soif de la semaine (§4, indicateur 5)
+  est l'écart moyen du cumul rapporté au cumul estimé moyen, pas la moyenne
+  des pourcentages de chaque semaine (une semaine presque sans soif
+  l'emporterait) ; il s'écrit à l'unité, et ne paraît pas quand rien n'a été
+  estimé ni quand l'écart s'écrit 0.
+- **F1001** — « Tombait juste en moyenne » se dit quand l'écart moyen
+  s'écrit « 0 » à une décimale : une règle d'affichage, pas un seuil de
+  jugement (§4 : aucun seuil inventé).
+- **F1002** — La soif du jour (ET0) se dit « la soif annoncée » et « la
+  soif estimée », le mot du tableau de S1 (D-328, F833) ; le signe se dit
+  « trop forte » ou « trop faible ». Le mot « ET0 » reste pour le détail du
+  pli (PR 2).
+- **F1003** — Une ligne d'archive dont l'horizon n'est pas de J+1 à J+7, ou
+  ne mène pas du jour d'émission au jour visé, n'entre dans aucun couple ;
+  une réanalyse d'un autre lieu non plus. Le pluviomètre, lui, appartient à
+  la ferme : il entre quel que soit le lieu.
+- **F1004** — La date des premiers chiffres (§5) est calculée : à partir du
+  premier jour d'émission gardé (ou de demain sans archive), le jour visé
+  qui complète 14 couples à un ou deux jours, plus les cinq jours de retard
+  de la réanalyse. Pour une archive commencée le 22 novembre 2026, cela
+  donne **vers le 5 décembre 2026**, et non le 11 décembre écrit au
+  contrat ; le contrat demande de le confirmer par un constat avant
+  d'écrire « vu ». Quand la date estimée est passée (des jours manquent),
+  rien n'est promis.
+
+## D-344 — La météo prévue contre la météo réalisée, PR 2 : le pli, la démonstration, le parcours
+
+Date : 26 novembre 2026. Statut : **PR 2 sur 2 codée** ; contrat
+`docs/forecast-reliability-contract.md` (sections 6 et 8, test 11), roadmap
+section 6 quindecies, ligne 35. Code en Opus 5.5 · Élevé, le réglage de la
+roadmap, sur la branche de la PR 1 (D-343). **Le code du chantier est fini.**
+
+**Décision (PR 2).** Avec les blocs d'« Objectifs et besoins », dans « Le
+détail » de la vue « La semaine » de la page « Semaine » depuis le lot S4
+(D-335), un pli fermé « La météo s'est-elle vérifiée ? » (`#meteo-verifiee`,
+`app/irrigation/forecast-reliability-fold.tsx`) suit les plis de la pluie
+mesurée et de la météo de référence. Il ne lit rien tant qu'on ne l'ouvre pas : à la
+première ouverture, l'action de lecture `readForecastReliabilityAction`
+(`app/irrigation/forecast-reliability-actions.ts`) résout le lieu de météo de
+l'espace (`getForecastReliabilityForSpace`) et rend la comparaison. Ouvert :
+la phrase de tête, l'essentiel en phrases, deux tableaux (« La pluie », « La
+soif du jour (ET0) ») de cinq lignes, la pluie notée au pluviomètre (son
+tableau, ou le compte de ses jours), les deux réserves. La démonstration
+sème une archive des prévisions (`lib/services/demo-forecast-archive-seed.ts`,
+appelée par `seedDemoWeather`) et le pli y porte l'étiquette « Exemple ».
+Aucune page, aucune case, rien sur « Aujourd'hui » ; aucun calcul, aucune
+migration, aucune écriture sur une vraie ferme.
+
+Précisions prises en codant :
+
+- **F1005** — Sur la démonstration, le cumul de la semaine dit « Pas
+  encore assez de semaines : 3 sur 4 » : les moments sont des mardis, et la
+  réanalyse semée (28 jours avant la semaine du moment, jusqu'à cinq jours
+  avant lui) ne couvre que trois semaines entières. La prolonger changerait
+  la jauge du sol de toutes les fermes fictives, qui remonte à trente jours :
+  ce n'est pas l'objet du chantier. Les lignes par jour, elles, ont toutes
+  leurs chiffres.
+- **F1006** — Le pli vient après « Pluie mesurée » et « Météo de
+  référence », dans la colonne des plis de la météo ; il se lit une fois par affichage de la page, à sa
+  première ouverture (lot N, lenteur du module). L'action porte un nom de
+  lecture (`read…Action`) : la visite de la démonstration ne la compte pas
+  comme une écriture. Une lecture impossible dit « La comparaison ne peut
+  pas se calculer pour le moment. Le reste de la page n'est pas touché. » et
+  se journalise par son statut et sa date seulement (D-164). Le pli est
+  dans « Le détail », fermé à l'arrivée : le budget de hauteur de
+  « Semaine » (P40, 4 500 px, lot S4) ne change pas. Avant la fusion de S4,
+  la page « Objectifs et besoins » mesurait 2 841 px avec lui au téléphone,
+  et la PR avait porté son budget de 2 800 à 2 900 px ; la mise à jour sur
+  `main` retire ce changement, la page n'existant plus seule. Pour que
+  `water-management-dashboard.tsx` reste sous 600 lignes avec le pli, la
+  fonction `nothingToRemove` (« Retirer la mesure », F471) passe telle
+  quelle dans `lib/domain/besoins-phone.ts`.
+- **F1007** — L'annonce semée de la démonstration : pour chaque matin, de
+  sept jours avant le premier jour semé à la veille du moment, et chaque
+  horizon de J+1 à J+7, la valeur semée du jour visé, écartée de 0,4 mm par
+  jour d'horizon pour la pluie (un jour sur deux en plus, l'autre en moins),
+  quelques averses manquées (horizon 5 et plus) et quelques pluies de 2 mm
+  annoncées à tort (horizon 3 et plus) ; pour la soif, ± 5 % par jour
+  d'horizon et 0,3 mm de différence de méthode. Déterministe, écrite
+  seulement dans l'espace de l'invité, jamais réécrite à la réouverture.
+- **F1008** — Dans les tableaux, le nombre principal est l'écart dans un
+  sens ou dans l'autre (« 1,3 mm par jour ») ; le sens est dit en mots dans
+  la ligne de détail (« L'annonce était trop pluvieuse, de 1 mm par jour en
+  moyenne. »), avec les jours de pluie mal annoncés pour la pluie, le nombre
+  de jours ou de semaines comparés. Sous le minimum, le compte seul. Sous la
+  phrase de tête, l'essentiel : la phrase de la pluie à la première ligne
+  qui a ses chiffres, et celle de la semaine quand elle a les siens.
+
 ## D-345 — Météo multi-modèles, PR 1 : la liste des modèles et la lecture d'un modèle choisi
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée**, fusionnée le 27 novembre 2026
+à 19 h 12 (#249) et **en ligne à 20 h 05** (run 46047735579, consigné par
+la PR 2) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 4 à 6, 9 et 10 ; § 4 ;
 § 5 ; § 10 ; § 14, l'essai A), roadmap section 6 sexdecies, ligne 36. Code en
 Opus 5.5 · Élevé, le réglage de la PR 1 (ligne 36). Aucune question
@@ -11566,7 +12455,9 @@ en démonstration.
 
 ## D-346 — Météo multi-modèles, PR 2 : le réglage de la ferme et la lecture par lieu et par modèle
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **codée, en ligne le 27 novembre 2026 à
+21 h 46** (#250, fusionnée à 20 h 56, run 46060219139, cinq jobs verts ;
+migration 0053 appliquée en production et sur la démonstration) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 1 à 3, 6 à 9 et 11 à 14 ;
 § 5 ; § 6 ; § 8 points 1, 3, 4, 5, 7 et 8 ; § 12), roadmap section
 6 sexdecies, ligne 36. Code en Opus 5.5 · Max, le réglage de la PR 2
@@ -11574,7 +12465,7 @@ Date : 26 novembre 2026. Statut : **codée** ; contrat
 mauvaise ferme serait discrète et grave). Aucune question agronomique.
 
 **Décision.** Une ferme garde son modèle de prévision dans une colonne neuve,
-additive, de ses préférences météo (`forecast_model`, migration 0051) ; vide,
+additive, de ses préférences météo (`forecast_model`, migration 0053) ; vide,
 c'est « Automatique », le défaut de toutes les fermes existantes. La tâche du
 matin, la relecture de la journée et l'actualisation à l'écran lisent **par
 lieu et par modèle** : une lecture par lieu pour les fermes en
@@ -11635,12 +12526,13 @@ Précisions prises en codant (option recommandée, modifiables par le porteur) :
   (« Le module ») : l'écran de la PR 3 la lira pour le dire une fois. Un
   modèle sorti de la liste s'y lit « un modèle qui n'est plus proposé », sans
   son identifiant.
-- **F1020** — Migration 0051, numéro provisoire : la PR 1 de S6 (#235)
-  ajoute aussi une 0051 ; fusionnée d'abord, celle-ci devient la 0052, en
-  reprenant `main` par fusion, jamais par rebase. Une colonne texte, vide par
-  défaut, à la forme d'un identifiant (minuscules, chiffres et `_`, 1 à
-  64 signes) ; la liste des modèles reste dans le code, jamais dans la base.
-  Elle suit la ligne de la ferme dans l'export, l'import et l'effacement.
+- **F1020** — Migration 0053 : écrite sous le numéro 0051, elle a pris le
+  numéro libre à la mise à jour qui précède sa fusion, après la 0051 de S6
+  (#235) et la 0052 du hors saison (#256), en reprenant `main` par fusion,
+  jamais par rebase. Une colonne texte, vide par défaut, à la forme d'un
+  identifiant (minuscules, chiffres et `_`, 1 à 64 signes) ; la liste des
+  modèles reste dans le code, jamais dans la base. Elle suit la ligne de la
+  ferme dans l'export, l'import et l'effacement.
   Deux essais de migration arrêtés avant elle (0034, 0042), qui remplissent
   leur copie par les dépôts d'aujourd'hui, ajoutent la colonne le temps de
   la remplir, comme ils le font pour le journal (0044) et l'objectif
@@ -11674,7 +12566,9 @@ refus, délai, « Automatique », écran, mêmes alertes à données égales.
 
 ## D-347 — Météo multi-modèles, PR 3 : l'écran « Modèle de prévision »
 
-Date : 26 novembre 2026. Statut : **codée** ; contrat
+Date : 26 novembre 2026. Statut : **en ligne le 27 novembre 2026 à
+23 h 31** (#251, squash 4e24d94, run 46072042226) ; **essai B et recette sur
+la ferme réelle conformes le même soir** (contrat § 15) ; contrat
 `docs/weather-models-contract.md` v0.2 (§ 3 règles 3, 6, 9, 10, 12 et 13 ;
 § 8 point 6 ; § 11 point 5 ; § 12), roadmap section 6 sexdecies, ligne 36.
 Code en Opus 5.5 · Élevé, le réglage de la PR 3. Aucune question
@@ -11733,7 +12627,7 @@ Précisions prises en codant (option recommandée, modifiables par le porteur) :
   fois » se lit « une semaine, sans geste à faire » : rien ne retient qu'un
   message a été vu. Le journal des modifications garde la ligne au nom de
   « Le module ».
-- **F1028** — Le geste (`saveForecastModelAction`) n'accepte qu'un texte de
+- **F1028** — Le geste (`saveForecastModelAction`, dans son fichier `app/irrigation/forecast-model-actions.ts`, qui relit ensuite le tableau de l’eau sans relire la météo) n’accepte qu'un texte de
   64 signes au plus, vide pour « Automatique » ; un refus ou un échec de la
   preuve répond par le message de la PR 2, en alerte, et rien ne change à
   l'écran ; un enregistrement répond par son message et le tableau relu.
@@ -11762,6 +12656,396 @@ complétés, retour du module (7 jours, modèle retiré non nommé).
 réglage offert avec un lecteur et absent sans, jours complétés lus pour la
 ferme seule, retour du module dit sur la carte de cette ferme seule.
 Parcours P72 aux deux largeurs.
+
+## D-351 — L'objectif automatique se voit et se modifie : la PR A1 codée
+
+Date : 26 novembre 2026. Statut : **codée**, sur la branche de S6 PR 4
+(#238) et du contrat (#240), fusionnée le 27 novembre 2026 à 4 h 50
+(#255) et **en ligne à 5 h 40** (run 45936521667, consigné par B1) ;
+contrat
+`docs/objectif-automatique-saison-contract.md`, section 3 (D-337), et ses
+précisions F1051 à F1060 (section 11). Roadmap ligne 34, section 6
+quaterdecies.
+
+**Décision.** Le volet « Objectifs de la semaine » lit l'objectif de chaque
+planche tel que le tableau des besoins l'applique (`objectiveForBed`), porté
+par le signal qui portait déjà l'objectif de la ferme (S1, D-328) ; rien
+n'est écrit chaque matin, aucune lecture serveur de plus, aucune migration.
+Réglage allumé, il en tire les lignes « automatique » et la valeur du champ
+(`lib/domain/objective-reading.ts`, moyennes par `farmObjective`) ; la
+saisie passe avant comme toujours. « Revenir à l'automatique » est le geste
+« vider » restreint à un endroit (`clearHydricGoalsForUser` reçoit
+l'endroit) : même révision « cleared », même journal, même recalcul du
+plan. Allumer avec des objectifs saisis ouvre une fenêtre : garder (le
+défaut), vider (le geste existant, en rouge) ou annuler ; l'écran ne vide
+jamais seul. Réglage éteint, l'écran est celui d'avant.
+
+**Ajout de l'assistant, sans règle** : « Corriger » sur chaque ligne
+automatique choisit l'endroit et met le curseur dans le champ (F1056).
+
+**Ce qui n'est pas fait** : B1 à B3 (le filtre « hors saison ») ; la recette
+sur le site après la mise en ligne.
+
+Numéros : D-351 ; F1051 à F1060.
+
+## D-352 — Ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs
+
+Date : 26 novembre 2026. Statut : **codée** (PR B2 sur les quatre du
+contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections
+4.2 à 4.6, 6 à 8 et 10) ; roadmap section 6 quaterdecies, ligne 34. Code en
+Opus 5.5 · Max, le réglage de la ligne 34, empilé sur B1 (#245, D-341).
+Numéros D-352 et F1061 à F1074, vérifiés sur toutes les PR ouvertes avant
+d'être pris : D-343 à D-351 et les précisions jusqu'à F1060 sont à d'autres
+PR ouvertes (A1, #255, a D-351 et F1051 à F1060). Migration **0052** : 0051
+à l'écriture, le numéro qui suivait le dernier de `main` (0050), recalée à
+0052 en fusionnant `main` après S6, qui a pris 0051
+(`0051_start_mode_route_state`, #235) ; la météo multi-modèles (#250) et
+l'ET0 horaire (#253), qui prennent aussi 0051 ou 0052, se recaleront de
+même au numéro libre.
+
+**Décision.** Les gestes « Mettre hors saison » et « Reprendre » sont
+enregistrés, une ligne datée par geste, écrits au journal des modifications,
+et tous les lecteurs de l'objectif et du planning reçoivent le filtre de leur
+ferme, lu une fois par requête. **Aucun écran ne l'allume** (B3) : une ferme
+sans geste lit tout comme avant, mot pour mot, et c'est le cas de toutes en
+ligne. La pluie, la réserve du sol, l'ET0, la météo et ses alertes,
+l'archive des prévisions et les semaines closes ne le lisent jamais ; deux
+gardes le prouvent sur la base, à deux fermes. Aucune question agronomique :
+les deux réponses du porteur (la reprise à la main seulement ; l'annulation
+proposée, jamais imposée) sont tenues par les gestes et par la liste que
+B3 montrera.
+
+**Précisions prises en codant.**
+
+- **F1061** — Le stockage : la table `irrigation_off_season_revisions`
+  (migration 0052), une ligne par geste : la portée (`scope_level` : planche,
+  jardin ou abri, parcelle, ou `mode` pour tout le plein champ et tout le
+  sous-abri ; `scope_id` : l'identifiant OTF du seul niveau, ou
+  `garden`/`greenhouse`), `off_season` (1 : hors saison, 0 : reprise), la
+  personne et l'heure. Contrôles de la base sur chaque valeur ; un index
+  par ferme et par date ; trois déclencheurs rendent la faisabilité à
+  refaire, comme pour un objectif (3.4). Rien n'est jamais réécrit ni
+  effacé, sauf avec la ferme (plan d'effacement) ; « Reprendre » est une
+  ligne de plus (section 4.5). `scope_id` est classé identifiant extérieur
+  dans la cohérence des espaces.
+- **F1062** — Le geste n'écrit que s'il change l'état de sa portée : un
+  second « Mettre hors saison », ou « Reprendre » une portée en saison,
+  n'écrit rien et rend `false`, pour que l'écran le dise (section 4.5). La
+  garde lit le dernier geste de la portée dans l'ordre d'écriture (heure,
+  puis ordre reçu : `docs/revision-order-contract.md`, « Portée », mis à
+  jour) ; deux gestes de la même milliseconde, le second reçu fait foi.
+- **F1063** — Le journal des modifications, dans le même lot que la ligne
+  et avant elle : deux sujets de la famille « objectif », « Mise hors
+  saison » (`jardin-hors-saison`) et « Reprise de l'irrigation »
+  (`reprise-saison`), le schéma de O2 ; un champ, « Irrigation » : « en
+  saison → ignorée, hors saison » et l'inverse. L'objet se lit dans
+  l'instantané : « Planche · P1 », le jardin, la parcelle, ou « tout le
+  plein champ », « tout le sous-abri ».
+- **F1064** — Le service des gestes (`saveOffSeasonScopeForUser`) ne met
+  hors saison qu'une portée que la ferme connaît : une planche, un jardin
+  ou une parcelle absents de l'instantané sont refusés (« Ce lieu n'est pas
+  dans la ferme : rien n'a été mis hors saison. »). Toute portée se reprend,
+  même un lieu qu'OTF ne montre plus : rien ne reste hors saison sans
+  pouvoir en sortir.
+- **F1065** — La lecture (`readOffSeasonSourceForUser`) : les gestes d'une
+  ferme, lus une fois par requête, rendus en filtre par la règle de B1
+  (`offSeasonSchedule`), le mode de chaque jardin pris dans l'instantané
+  (un jardin absent se lit « à classer », qu'aucune portée de mode ne
+  couvre, D-003). Sans geste, `null` : chaque lecteur garde son calcul
+  d'avant.
+- **F1066** — Le tableau des besoins, semaine en cours : une planche est
+  hors saison pour le besoin (`needOffSeason`) quand elle l'est toute la
+  semaine (F989) **ou le jour du calcul**, en heure de Paris. Mise hors
+  saison jeudi, elle n'a plus de besoin dès jeudi, même si lundi à mercredi
+  gardent leur part d'objectif, qui reste affichée ; ni reste à apporter,
+  ni volume, ni objectif manquant ; un besoin remplacé à la main reste
+  enregistré, inactif (F991). Précise F990 et F991 pour la semaine en
+  cours ; une autre semaine garde la règle de F989.
+- **F1067** — Le planning : le calcul de la semaine (`buildWeeklyPlan`)
+  écarte à l'entrée les besoins hors saison : ni créneau, ni pénurie, ni
+  dose ; le plan est celui d'une ferme sans ces planches. Un arrosage déjà
+  planifié ou validé reste tel quel (section 4.2) ; le calcul ne propose
+  pas de l'annuler, c'est la fenêtre de B3 qui le propose (section 10,
+  question 2) ; les limites, la règle 16 et les créneaux protégés le
+  comptent toujours. Un matériel partagé avec une planche en saison arrose
+  encore la planche hors saison, eau réelle que la proposition dit
+  (`bedApplications`) : B3 le marquera.
+- **F1068** — La faisabilité et la pénurie ne comptent pas les planches hors
+  saison dans la demande, ni comme inconnues ; une note le dit sous le
+  calcul : « 1 planche hors saison : son irrigation est ignorée, elle n'est
+  pas comptée ici. » (au pluriel : « 3 planches hors saison : leur
+  irrigation est ignorée, elles ne sont pas comptées ici. »), comme ce que
+  le calcul ne compte pas (F447).
+- **F1069** — « Aujourd'hui » compte l'objectif de la semaine sur les
+  planches en saison et dit les autres à part (`offSeason`, F992) ; la
+  tuile et ses mots sont à B3.
+- **F1070** — L'historique et l'eau des séries : un jour hors saison compte
+  comme un jour sans objectif (D-036), sa pluie et son irrigation restent
+  comptées ; une planche hors saison toute la période sort des comptes
+  d'objectif, sans écart. L'eau que l'écart compare (« Eau reçue par ces
+  N planches », colonne « Irrigation + pluie réelle » de l'export) se fait
+  sur les planches qui ont un objectif, comme depuis D-329 ; la pluie
+  réelle, l'ET0 et l'irrigation ne changent jamais (garde F1073). Une
+  culture sur des planches en partie hors saison ne compte l'objectif que
+  des planches en saison.
+- **F1071** — Les autres lecteurs de `objectiveForBed` reçoivent le
+  filtre : l'aide du formulaire d'irrigation (aucun objectif proposé pour
+  une planche hors saison), la fiche d'une planche et celle d'une série
+  (l'objectif proposé par culture reste calculé, section 4.2 : les cultures
+  restent lues ; l'objectif de la semaine dit « hors saison »), l'écart
+  entre prévu et réel. Depuis la fusion de S6, `lib/services/start-route.ts`
+  (#235) le reçoit aussi : l'étape « Combien je vise par semaine » de la
+  carte « Mise en route » compte comme « Aujourd'hui » (mêmes comptes,
+  planches hors saison dites à part, `offSeason`) ; elle est faite quand
+  chaque planche en saison a son eau visée, et toute la ferme hors saison
+  n'a rien à viser ; une planche hors saison n'est jamais dite « sans eau
+  visée » ; un filtre illisible rend l'étape inconnue, comme un objectif
+  automatique illisible ; sans geste, le compte d'avant. La tâche du matin
+  qui enregistre les semaines closes de l'objectif automatique ne change
+  pas : elle garde l'ET0 de la semaine ; c'est la lecture qui retire les
+  jours hors saison (F988), et une semaine close avant la pause est lue
+  telle quelle, objectif compris (cas 7, test sur la base).
+- **F1072** — La liste des arrosages à proposer à l'annulation (section 10,
+  question 2 ; `listPlannedIrrigationsUnderOffSeasonForUser`, règle
+  `lib/domain/off-season-planned.ts`) : les arrosages planifiés de la
+  saison, pas démarrés, à partir d'aujourd'hui en heure de Paris, dont une
+  planche au moins est couverte par la portée, avec les planches couvertes
+  et les autres (l'annuler prive aussi celles-ci de leur eau : B3 le
+  dira). L'annulation passe par le geste du planning ; un arrosage commencé
+  finit. Ni la liste ni le geste ne touchent à un arrosage. Après un geste
+  qui a changé quelque chose, l'action de l'écran (B3) recalcule le plan,
+  comme pour un objectif.
+- **F1073** — La garde de la pluie, sur la base, à deux fermes pareilles,
+  l'une avec ses cinq portées hors saison (`tests/db/hors-saison-garde.test.ts`) :
+  la page de la météo (pluviomètre, `0 mm` compris, pluie estimée, pluie
+  prévue, ET0), l'historique de la pluie chaque jour, chaque semaine et sur
+  la saison, à la ferme, à la parcelle, au jardin et à la planche, la
+  réserve du sol (jauge, graphique des jardins, drainage, jours enregistrés
+  le matin), l'archive des prévisions (tâche du matin et actualisation à
+  l'écran) et les alertes météo donnent les mêmes valeurs. La jauge prévue
+  lit les arrosages proposés du plan enregistré : c'est le plan recalculé,
+  sans proposition hors saison, qui la change, jamais le filtre (même plan,
+  même jauge, test). Garde des imports : ces services n'atteignent jamais
+  le stockage du filtre ; contre-épreuves (les besoins changent ; la garde
+  voit un service qui lit les portées).
+- **F1074** — Preuves : 10 tests du domaine (`tests/hors-saison-lecteurs.test.ts`),
+  5 tests de persistance (`tests/db/hors-saison-stockage.test.ts` : gestes
+  par ferme, journal, garde, ordre, portées refusées, lecteurs, liste), 7 de
+  garde sur la base et 2 de garde des imports ; quatorze casses volontaires
+  (filtre ignoré par le planning, la faisabilité, l'historique, « Aujourd'hui »
+  ou les séries, jour du calcul ignoré ou lu en UTC, besoin remplacé actif,
+  arrosage démarré listé, pluie de l'historique lue à travers le filtre…)
+  toutes vues par les tests. Quatre tests d'avant suivent la nouvelle table
+  (102 tables ; les copies arrêtées avant la migration la reçoivent vide).
+  À la fusion de S6 : 1 test du domaine de plus (l'étape de la mise en
+  route), 2 tests sur la base (`tests/db/hors-saison-mise-en-route.test.ts` :
+  les comptes d'« Aujourd'hui », la voisine, toute la ferme hors saison) ;
+  cinq casses volontaires de plus (filtre non passé, étape faite sur toutes
+  les planches, compte hors saison perdu, jour du calcul ignoré, planches
+  hors saison dites sans eau visée), toutes vues.
+
+## D-353 — Ignorer l'irrigation hors saison, B3 : les écrans
+
+Date : 26 novembre 2026. Statut : **codée** (PR B3, la dernière des quatre
+du contrat `docs/objectif-automatique-saison-contract.md`, D-337, sections
+4.3 à 4.5, 6 et 10) ; roadmap section 6 quaterdecies, ligne 34. Code en
+Opus 5.5 · Élevé, le réglage de la ligne 34 pour B3, sur une branche qui
+réunit A1 (#255, D-351) et B2 (#256, D-352) par fusion, jamais par
+rebase. Numéros D-353, F1075 à F1086 et parcours P74, vérifiés sur toutes
+les PR ouvertes avant d'être pris : D-352 et F1074 sont à B2, P72 et P73 à
+la météo multi-modèles et à l'ET0 horaire.
+
+**Décision.** Le filtre de B1 et B2 s'allume à l'écran, au seul endroit
+que le contrat lui donne : un bloc « Hors saison » sous la liste du pli
+« Objectifs de la semaine », même geste au téléphone et à l'ordinateur.
+Les lecteurs le montrent là où ils en parlent déjà : le tableau des
+besoins, la tuile de l'objectif d'« Aujourd'hui », la proposition du
+planning. Les deux réponses du porteur sont tenues à l'écran : rien ne
+reprend seul (« Reprendre » seulement), et les arrosages planifiés ou
+validés sont proposés à l'annulation, jamais annulés sans son choix.
+Aucune règle nouvelle, aucune question agronomique.
+
+**Précisions prises en codant.**
+
+- **F1075** — Le bloc (`app/irrigation/off-season-panel.tsx`, mots dans
+  `lib/domain/off-season-view.ts`) : les portées actives aujourd'hui, en
+  heure de Paris, de la plus large à la plus étroite (tout le plein champ,
+  tout le sous-abri, parcelles, jardins, planches), chacune « · depuis le
+  20 nov. » avec ses planches de la saison, et « Reprendre » ; sans
+  portée, « Aucun endroit hors saison : toute la ferme suit son
+  objectif. ». La page lit le bloc par la source des besoins
+  (`readOffSeasonSourceForUser`), déjà lue pendant la requête : aucune
+  lecture de plus. Son ancre, `hors-saison`, entre au relevé des ancres de
+  « Semaine » (S4, section 7.4).
+- **F1076** — Le nom d'une portée suit le sélecteur des objectifs :
+  « Tout le plein champ », « Tout le sous-abri », « Parcelle · … »,
+  « Jardin · … » ou « Abri · … », « Planche · … ». Un lieu qu'Ouvre ta
+  ferme ne montre plus se dit « Une planche qui n’est plus dans Ouvre ta
+  ferme » et garde « Reprendre » (F1064).
+- **F1077** — Le choix des portées : une fenêtre, le sélecteur des
+  objectifs avec sa recherche, « Tout le plein champ » et « Tout le
+  sous-abri » en tête, chacun seulement si la ferme a un jardin de ce mode
+  cette saison, puis les parcelles et un groupe par jardin avec ses
+  planches ; « Toute la ferme » n'y est pas : ce n'est pas une portée. Les
+  jardins à classer sont dits sous le sélecteur (« 2 jardins à classer :
+  ni « tout le plein champ » ni « tout le sous-abri » ne les couvre… »,
+  section 4.3).
+- **F1078** — Le geste « Mettre hors saison » ou « Reprendre »
+  (`app/irrigation/off-season-actions.ts`) : le serveur reprend la portée
+  champ par champ (`parsedOffSeasonScope`) et ne croit pas l'écran ; le
+  geste passe par `saveOffSeasonScopeForUser` (B2) ; s'il a changé
+  quelque chose, le plan se recalcule (`objective-changed`, durable, à
+  l'instant du geste). Le message dit l'endroit, ses planches, et que la
+  pluie, la météo et les alertes restent suivies ; un geste sans effet
+  le dit (« … était déjà hors saison : rien n’a changé. »). Puis le
+  tableau des besoins, le planning et le journal des modifications se
+  relisent par leurs signaux.
+- **F1079** — « Reprendre » n'a pas de fenêtre (remettre hors saison le
+  défait) ; quand une autre portée couvre encore des planches de
+  l'endroit repris, le message les compte et les nomme : « 2 planches
+  restent hors saison : Jardin · Nord l’est encore. » (cas 4).
+- **F1080** — La fenêtre des arrosages prévus (section 10, question 2) :
+  la liste de B2 (F1072) est lue avant le geste ; vide, pas de fenêtre.
+  Sinon : « 2 arrosages planifiés ou validés arrosent ces planches à
+  partir d’aujourd’hui. Les annuler ? », chacun « matériel · jour, heure
+  · planches », et « Arrose aussi …, en saison : l’annuler les prive aussi
+  de cette eau. » quand il arrose d'autres planches. « Les garder » est le
+  défaut (le focus), « Les annuler » en rouge, « Ne rien faire » et Échap
+  n'écrivent rien, ni le filtre ni une annulation. Le geste est fait
+  d'abord, puis chaque arrosage s'annule par le geste existant du
+  planning (`cancelPlannedIrrigationAction` : l'alarme de retard part
+  avec, le plan se recalcule) ; un échec est compté et dit. Un arrosage
+  démarré n'est pas listé (B2) : il se termine.
+- **F1081** — Le tableau des besoins : la carte d'une planche hors saison
+  est grisée (`data-off-season`) et dit « Hors saison : son irrigation est
+  ignorée, ni besoin ni arrosage proposé. La pluie reste suivie. » ; ses
+  chiffres disent « Hors saison », jamais « Non calculable » ni zéro ; hors
+  saison depuis jeudi, l'objectif des jours d'avant reste affiché ; un
+  besoin remplacé à la main est dit « enregistré, inactif » (F991) ; reprise
+  en cours de semaine, ses jours hors saison sont nommés. Un jardin tout
+  entier hors saison le dit à la place du reste à apporter, sa ligne
+  compacte aussi ; un jardin en partie dit « 2 hors saison ». Une planche
+  hors saison n'est plus comptée « sans objectif adopté » dans la raison
+  d'un total inconnu (F282).
+- **F1082** — « Aujourd'hui » : avec des planches hors saison, le lien de
+  la tuile de l'objectif devient « 3 planches hors saison » et mène au
+  bloc, les plis « Le détail » et « Objectifs de la semaine » ouverts par
+  l'ancre ; la phrase de la tuile reste celle de B2 (F1069). Filtre vide,
+  le lien d'avant.
+- **F1083** — Le planning : une planche hors saison qu'un matériel partagé
+  avec des planches en saison arrose encore (F1067) porte son nom et la
+  marque `horsSaison` dans la proposition ; la carte dit « N01, hors
+  saison » dans la liste des planches et « hors saison » à la place de son
+  besoin. La marque est nommée en français : le contrat du plan est lu par
+  les calculs des cultures, que la garde de B1 veut sans le nom du filtre ;
+  c'est une marque de sortie, jamais une règle.
+- **F1084** — Le « ? » du bloc (`OFF_SEASON_HELP`) : ce que fait « hors
+  saison », ce qui continue (la pluie tombée dehors, la réserve du sol,
+  l'ET0, la météo et ses alertes, un arrosage noté à la main), les
+  endroits, « Reprendre », les arrosages déjà prévus.
+- **F1085** — Aucune migration : B3 lit la table de B2 (0052, en ligne
+  depuis B2 ; S6 a pris 0051).
+- **F1086** — Preuves : 12 tests du domaine (`tests/hors-saison-ecrans.test.ts`)
+  et deux tests d'avant accordés (F282 du lot A ; le relevé des ancres de
+  S4) ; le parcours P74 aux deux largeurs. P74 n'ouvre pas la fenêtre des
+  arrosages prévus (sa ferme neuve n'en a pas) : ses mots, sa liste et le
+  passage par le geste du planning sont prouvés par les tests du domaine
+  et ceux de B2. P27 suit : le pli des objectifs porte désormais deux
+  choix du périmètre, il vise le premier, celui de l'objectif (relevé par
+  la CI de la PR).
+
+## D-356 — Ligne 34 : la recette sur la démonstration, trois écarts d'affichage corrigés
+
+Date : 27 novembre 2026. Statut : **codée** (roadmap section 6
+quaterdecies, ligne 34 ; contrat `docs/objectif-automatique-saison-contract.md`,
+D-337). Code en Opus 5.5 · Élevé, le réglage de A1 et B3. Numéros D-356 et
+F1097 à F1099, vérifiés sur toutes les PR ouvertes avant d'être pris :
+D-354 et F1092 sont à #258, D-355 et F1096 à #259.
+
+**Contexte.** A1 (#255) et B3 (#257) en ligne, la recette a été faite le
+27 novembre 2026 sur la démonstration, dans le Chrome du porteur, à sa
+demande (« Si tu as des recettes à faire, c'est le moment ») : **conforme**.
+A1 : la fenêtre d'allumage, les lignes « automatique », « Corriger », la
+saisie, « Revenir à l'automatique ». B3 : le choix des portées, « Mettre
+hors saison » un jardin avec un arrosage validé (« Les annuler » : il est
+annulé, le message le compte), la puce, les cartes grisées, la tuile
+d'« Aujourd'hui » et son lien vers le bloc ouvert, « Reprendre ». La
+démonstration a été remise à zéro ensuite. Trois écarts d'affichage,
+sans effet sur un calcul, sont corrigés ici ; la mise en ligne de B3 est
+consignée (le 27 novembre 2026 à 10 h 56, run 45970882756).
+
+**Précisions.**
+
+- **F1097** — La ligne « automatique » d'un jardin (`automaticObjectiveLines`,
+  `lib/domain/objective-reading.ts`) fait la moyenne de surface des seules
+  planches chiffrées (D-003) : quand une partie seulement en a une, elle
+  le dit, « Clos des saules · 1 planche sur 2 », au lieu de « 2 planches ».
+  Toutes chiffrées, ou aucune (« sans valeur »), la ligne d'avant. La
+  planche sans valeur garde sa propre ligne.
+- **F1098** — Le tableau des besoins : un jardin dont toutes les planches
+  sont hors saison dit « Hors saison : ni besoin ni volume » sur sa ligne,
+  et « hors saison : ni besoin ni volume » dans son détail au téléphone,
+  au lieu de « Besoin réel : Non calculable · Volume non calculable »
+  (F1081 le disait déjà pour « À planifier »). Un seul texte pour les deux
+  (`gardenNeedText`).
+- **F1099** — « Eau de la semaine » d'« Aujourd'hui » (`todayWeek`) dit
+  d'un jardin tout hors saison « 0 mm reçus, hors saison » au lieu
+  d'« aucun objectif posé » ; « Jardin par jardin » de « Semaine »
+  (`weekGardens`) dit « hors saison », sans le lien « Lui en donner une »,
+  et la phrase « N planches n’ont pas d’eau visée » ne compte plus les
+  planches hors saison : elles n'attendent pas d'objectif (D-337). Un
+  jardin en partie hors saison reste dit comme avant.
+
+**Hors de cette PR.** Sur la démonstration seulement, un espace semé un
+jour réel plus tôt garde des révisions datées après les gestes du
+lendemain (l'horloge simulée fixe le jour, pas l'heure) : un « Revenir à
+l'automatique » peut alors sembler sans effet. « Remettre à zéro » avant
+une recette suffit ; rien ne change en ligne.
+
+**Preuves.** `tests/hors-saison-recette.test.ts` (3 tests) ; les suites
+du domaine, le typage et le lint passent ; aucun parcours ne lisait ces
+textes.
+
+## D-357 — La lecture météo de la semaine en cours couvre les trois jours d'« Aujourd'hui », lundi compris le week-end
+
+Date : 28 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant (correction d'un job rouge) ; modifiable à la relecture du
+porteur. Aucune règle agronomique, aucune migration, aucun écran changé.
+
+**Constat.** Le samedi 28 novembre 2026, le parcours P29 a échoué sur
+toute branche, `main` comprise, aux deux largeurs (PR #261, run
+46080341539 et sa relance de 2 h 45) : « Aujourd'hui » montrait un bloc
+« Gel ou chaleur » en trop, « Prévision indisponible le lun. 30 nov. : à
+vérifier ». « Aujourd'hui » montre trois jours (`TODAY_WEATHER_DAYS`),
+mais la lecture faite à la consultation (`weatherRequestRanges`,
+`lib/domain/weather/cache-policy.ts`) s'arrêtait au dimanche de la
+semaine en cours. Un samedi ou un dimanche, le troisième jour tombe dans
+la semaine suivante, que seule la tâche du matin (J0 à J+14) lit ; les
+parcours ne la jouent pas (`forecastValues: 2` au journal du serveur).
+Ce n'est pas un défaut des parcours seulement : une ferme que la tâche du
+matin n'a pas encore lue (créée le week-end), ou un matin où la tâche a
+échoué, voit le même message pour un jour dont la prévision est pourtant
+à portée de la même lecture.
+
+**Décision.** La lecture de la semaine en cours, à la consultation ou à
+la demande, va aussi jusqu'au dernier des trois jours d'« Aujourd'hui »
+quand il dépasse dimanche, dans la limite de J+14 (**F1100**). Un samedi,
+lundi ; un dimanche, lundi et mardi ; du lundi au vendredi, rien ne
+change. Une autre semaine garde ses sept jours, la réanalyse ne change
+pas. Une seule lecture externe comme avant, de un ou deux jours de plus.
+Retenue plutôt que de préparer la prévision du lundi dans P29 : le
+parcours aurait caché un manque réel de l'écran.
+
+**Vérifié par** `tests/weather-domain.test.ts` (« un samedi, la semaine
+en cours lit aussi la prévision des trois jours d'« Aujourd'hui » »),
+rouge avant la correction ; et par P29, joué en local le samedi
+28 novembre 2026 à 3 h 31 (heure de Paris) : rouge aux deux largeurs sur
+`main` (« Gel ou chaleur » en trop, `forecastValues: 2`), vert avec la
+correction (`forecastValues: 3`, 2 passed). P13, qui comptait
+jusque-là les jours d'alerte de la seule semaine affichée (deux un
+samedi, un le dimanche), compte désormais les trois jours de l'horizon :
+la CI de la PR l'a trouvé rouge le samedi (3 alertes au lieu de 2), vert
+une fois ajusté (4 passed, en local, le même samedi).
 
 ## D-340 — L'ET0 horaire donne la forme de la journée, en information seulement
 

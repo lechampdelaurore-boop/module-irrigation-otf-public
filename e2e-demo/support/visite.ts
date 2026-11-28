@@ -97,6 +97,8 @@ export async function verifierLEtapeDeVisite(page: Page, visite: Visite, attendu
   if (attendue.ancre) {
     await expect(soulignes).toHaveCount(1);
     await expect(soulignes).toHaveAttribute('data-tour', attendue.ancre);
+    // À l'écran, pas dans un pli fermé : la visite ouvre les plis de « Le détail » de « Semaine » (S4, PR 4).
+    await expect(soulignes).toBeVisible();
   } else {
     await expect(soulignes).toHaveCount(0);
   }

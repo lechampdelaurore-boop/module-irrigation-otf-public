@@ -15,6 +15,7 @@ import {
   type IrrigationPageId,
 } from '@/lib/domain/features/pages';
 import { resolveWeekView, type WeekPageFeature, type WeekViewId } from '@/lib/domain/features/week-page';
+import type { RouteState, StartMode } from '@/lib/domain/features/start-mode';
 import { parseIrrigationSeason, parseIrrigationWeek } from '@/lib/domain/irrigation-navigation';
 import type { IrrigationUnavailableReason } from '@/lib/domain/snapshot-policy';
 import { otfReadLineReason } from '@/lib/domain/otf-read-line';
@@ -31,6 +32,9 @@ import { demoSelectionOfOwner } from '@/lib/domain/demo/catalogue';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { farmRainMatters } from '@/lib/domain/today/rain-entry';
 import { unfinishedSteps } from '@/lib/domain/onboarding/steps';
+import { routeReadNeeded, startRoute, type StartRoute } from '@/lib/domain/onboarding/route';
+import { farmHomeCounts, startRouteCounts, startRouteReads } from '@/lib/services/start-route';
+import { farmCardLines, type FarmCardLines } from '@/lib/domain/farm-home/lines';
 import { usesPlotShelters, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { unclassifiedPlots } from '@/lib/domain/onboarding/plots';
 import { getOnboardingForUser } from '@/lib/services/onboarding-service';
@@ -39,7 +43,7 @@ import { parcelsWithoutSoil } from '@/lib/domain/onboarding/soil';
 import { soilParcelAnchor } from '@/lib/domain/today/reliability';
 import { listSpeciesCorrespondencesForWorkspace } from '@/db/crop-water/entries';
 import { findWorkspaceIdForUser } from '@/db/workspace-repository';
-import { seasonSpecies } from '@/lib/domain/crop-water/species';
+import { seasonSpecies, type CorrespondenceEntry } from '@/lib/domain/crop-water/species';
 import { speciesNeedsLink } from '@/lib/domain/crop-water/species-linking';
 import { planningAllowed } from '@/lib/domain/onboarding/settings-review';
 import type { ShellProps } from './shell/irrigation-shell';
@@ -81,6 +85,14 @@ export type ReadyPageContext = {
   nowIso: string;
   snapshot: IrrigationSnapshot;
   enabled: readonly FeatureId[];
+  /** Comment la ferme a commencé (lot S6, section 4) ; `null` : une ferme d'avant S6. */
+  startMode: StartMode | null;
+  /** L'état de sa carte « Mise en route » (lot S6, section 5.3). */
+  routeState: RouteState | null;
+  /** La mise en route lue (lot S6, section 6) : sur « Ma ferme » et « Aujourd'hui », quand la carte existe ; `null` sinon. */
+  route: StartRoute | null;
+  /** Les lignes d'état des fiches (lot S6, section 7) : sur « Ma ferme » seulement ; `null` sur toute autre page. */
+  farmCardLines: FarmCardLines | null;
   /** La vue ouverte de « Semaine » (lot S4, section 3.2) ; `null` sur toute autre page. */
   weekView: WeekViewId | null;
   shell: ShellProps;
@@ -124,6 +136,12 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
   const weekView = page === 'semaine' ? resolveWeekView(params.vue, enabled) : null;
   stopwatch.lap('selection');
 
+  // La mise en route, sur « Ma ferme » et « Aujourd'hui » quand la carte existe (lot S6, section 6), et les
+  // lignes d'état des fiches de « Ma ferme » (section 7) : une seule lecture, qui part tout de suite, en même
+  // temps que le plan ; aucune ne rejette.
+  const routeInput = { startMode: selection.startMode, routeState: selection.routeState, enabled };
+  const wants = { route: routeReadNeeded(page, routeInput), cards: page === 'ma-ferme' };
+  const routeReads = wants.route || wants.cards ? startRouteReads(user.userId, season, enabled, new Date(), wants) : null;
   // L'accueil de la ferme se lit avec le plan : le bandeau « À finir » de chaque page (4.4, F582).
   const [loaded, onboarding] = await Promise.all([loadSnapshot(user.userId, season, forceRefresh), getOnboardingForUser(user.userId)]);
   stopwatch.lap('snapshot');
@@ -145,13 +163,21 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     };
   }
   const snapshot = loaded.snapshot;
-  // Le sol des parcelles ne se lit que pour un espace qui fait l'accueil et a coché la réserve du sol (F584).
+  // Le sol des parcelles ne se lit que pour un espace qui fait l'accueil et a coché la réserve du sol (F584) ;
+  // la lecture de la mise en route le lit déjà quand elle a l'étape « Mon sol » : une seule lecture.
   const withoutSoil = onboarding.kind === 'onboarding' && enabled.includes('sol')
-    ? parcelsWithoutSoil(snapshot.zones, season, new Set(await listZonesWithSoilForUser(user.userId)))
+    ? parcelsWithoutSoil(snapshot.zones, season, new Set(await (routeReads?.zonesWithSoil ?? null) ?? await listZonesWithSoilForUser(user.userId)))
     : [];
+  const [routeCounts, homeCounts] = await Promise.all([
+    routeReads && wants.route ? startRouteCounts(routeReads, { ownerUserId: user.userId, season, snapshot, now: new Date() }) : null,
+    routeReads && wants.cards ? farmHomeCounts(routeReads, { season, snapshot }) : null,
+  ]);
+  const route = routeCounts ? startRoute({ ...routeInput, counts: routeCounts }) : null;
+  const cardLines = homeCounts ? farmCardLines({ enabled, usesWeather: usesWeather(enabled), counts: homeCounts, now: new Date() }) : null;
+  if (routeReads) stopwatch.lap('route');
   // Les espèces à rattacher ne se comptent que tant que l'étape « Cultures » d'un espace qui fait l'accueil reste à faire (F587).
   const speciesToLink = await countSpeciesToLink(user.userId, snapshot, season, onboarding.kind === 'onboarding'
-    && onboarding.remaining.some((step) => step.id === 'crops') && usesSpeciesCorrespondence(enabled));
+    && onboarding.remaining.some((step) => step.id === 'crops') && usesSpeciesCorrespondence(enabled), routeReads?.correspondences ?? null);
   return {
     kind: 'ready',
     page,
@@ -163,6 +189,10 @@ export async function loadPageContext(page: IrrigationPageId, searchParams: Irri
     nowIso: new Date().toISOString(),
     snapshot,
     enabled,
+    startMode: selection.startMode,
+    routeState: selection.routeState,
+    route,
+    farmCardLines: cardLines,
     weekView,
     shell: {
       page,
@@ -299,10 +329,15 @@ async function loadSnapshot(userId: string, season: number, forceRefresh: boolea
   }
 }
 
-/** Les espèces de la saison à rattacher (F587), lues seulement quand le bandeau peut les nommer. */
-async function countSpeciesToLink(spaceKey: string, snapshot: IrrigationSnapshot, season: number, wanted: boolean): Promise<number> {
+/**
+ * Les espèces de la saison à rattacher (F587), lues seulement quand le bandeau peut les nommer. Sur « Ma ferme »,
+ * la fiche « Besoin par culture » les a déjà lues (lot S6, section 7.1) : une seule lecture ; si elle a échoué,
+ * le bandeau relit.
+ */
+async function countSpeciesToLink(spaceKey: string, snapshot: IrrigationSnapshot, season: number, wanted: boolean, read: Promise<CorrespondenceEntry[] | null> | null): Promise<number> {
   if (!wanted || !snapshot.cropPlan) return 0;
-  const workspaceId = await findWorkspaceIdForUser(spaceKey);
-  const entries = workspaceId === null ? [] : await listSpeciesCorrespondencesForWorkspace(workspaceId);
+  const shared = read ? await read : null;
+  const workspaceId = shared ? null : await findWorkspaceIdForUser(spaceKey);
+  const entries = shared ?? (workspaceId === null ? [] : await listSpeciesCorrespondencesForWorkspace(workspaceId));
   return seasonSpecies(snapshot.cropPlan.series.filter((item) => item.season === season), entries).filter(speciesNeedsLink).length;
 }

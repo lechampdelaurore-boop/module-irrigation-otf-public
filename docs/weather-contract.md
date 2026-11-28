@@ -3,24 +3,48 @@
 ## Fournisseur et abstraction
 
 Le domaine dépend de l’interface `WeatherProvider`, jamais du JSON brut du
-fournisseur. En production, le pilote de prévision utilise l’offre gratuite
-Visual Crossing Timeline :
+fournisseur. Depuis le 27 novembre 2026 (météo multi-modèles,
+`docs/weather-models-contract.md`, D-339 et D-345 à D-347), la prévision d’une
+ferme dépend de son réglage « Modèle de prévision » (« Réglages », carte
+« Lieu de la météo ») :
 
-- prévisions :
-  `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/...` ;
-- champs quotidiens gratuits groupés : pluie, températures, point de rosée,
-  vent moyen et énergie solaire ;
-- configuration serveur obligatoire : `VISUAL_CROSSING_API_KEY`.
+- **« Automatique »**, le défaut, que gardent toutes les fermes qui ne
+  choisissent rien : la lecture d’avant, inchangée. En production, l’offre
+  gratuite Visual Crossing Timeline
+  (`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/...`),
+  ses champs quotidiens gratuits groupés (pluie, températures, point de rosée,
+  vent moyen et énergie solaire), avec le réglage serveur
+  `VISUAL_CROSSING_API_KEY` ; sans cette clé, le pilote Open-Meteo de
+  toujours (`api.open-meteo.com/v1/forecast`, sans paramètre `models`) ;
+- **un modèle choisi** dans la liste tenue dans le code
+  (`lib/domain/weather/forecast-models.ts` : Météo-France, DWD, centre
+  européen, NOAA, « Automatique d’Open-Meteo »), lu chez Open-Meteo
+  (`/v1/forecast`, `models=<choisi>,best_match`, une seule requête) : la
+  pluie, les températures, l’énergie solaire et l’ET0 du modèle ; au-delà de
+  sa portée, le jour entier vient de `best_match` et l’écran le dit. La
+  `source` de chaque ligne de prévision et de l’archive dit le modèle qui
+  l’a écrite.
 
-Le géocodage français et la réanalyse historique restent assurés par Open-Meteo :
+L’adresse de base de l’API de prévision par modèle et la clé éventuelle du
+palier payant sont des réglages serveur (`OPEN_METEO_API_BASE_URL`,
+`OPEN_METEO_API_KEY`) ; sans eux, l’adresse gratuite
+`https://api.open-meteo.com` est lue sans clé. La clé, si elle existe un
+jour, est saisie par le porteur lui-même ; elle n’est jamais dans Git, ni
+dans le navigateur, ni dans les journaux.
+
+Le géocodage français et la réanalyse historique restent assurés par
+Open-Meteo, quel que soit le réglage :
 
 - géocodage : `https://geocoding-api.open-meteo.com/v1/search` ;
 - réanalyse historique : `https://archive-api.open-meteo.com/v1/archive`.
 
-En l’absence de la clé Visual Crossing, l’ancien pilote Open-Meteo reste un
-repli de transition. Il ne constitue pas la configuration de production visée,
-car son endpoint Forecast refuse actuellement les requêtes provenant de
-l’infrastructure partagée du site.
+**Essai B, 27 novembre 2026 vers 23 h 55 (heure de Paris).** Le premier
+enregistrement d’un modèle en production (Météo-France, sur la ferme du
+porteur, avec son accord, puis retour à « Automatique ») a réussi :
+l’endpoint Forecast d’Open-Meteo répond au Worker déployé. La phrase
+d’avant, qui disait qu’il refusait les requêtes de l’infrastructure partagée
+du site, est donc retirée : la panne du 14 au 19 novembre 2026 venait du
+`fetch` appelé comme méthode (D-164), pas d’un refus d’Open-Meteo.
 
 Les appels partent exclusivement du serveur, utilisent HTTPS, sont limités par
 un délai d’attente et n’exposent aucune clé dans le navigateur. Pluie et ET0
@@ -76,6 +100,13 @@ peuvent aussi être rafraîchies au plus toutes les trois heures lors d’une
 consultation, ou à la demande. Elles sont signalées anciennes après six heures. Une
 semaine historique n’est récupérée que si son cache est vide ou si
 l’utilisateur force l’actualisation.
+La lecture de la semaine courante, à la consultation ou à la demande, va
+d’aujourd’hui à dimanche, et aussi jusqu’au dernier des trois jours que
+montre « Aujourd’hui » (aujourd’hui, demain, après-demain) quand il tombe
+après dimanche : un samedi, elle lit lundi ; un dimanche, lundi et mardi
+(D-357, F1100). Sans cela, une ferme que la tâche du matin n’a pas encore
+lue, ou un matin où elle a échoué, voyait « Prévision indisponible » pour
+le lundi dans « Gel ou chaleur ». Une autre semaine garde ses sept jours.
 Une erreur impose cinq minutes avant une nouvelle tentative automatique. Les
 modifications d’objectif, de pluie manuelle et de limite ne lancent pas d’appel
 météo. Une réponse partielle conserve les champs déjà connus de la même source ;
@@ -109,15 +140,22 @@ dédupliquées. Le bouton est désactivé pendant l’appel et le même délai e
 visible dans l’interface.
 
 Les sous-requêtes réussies utilisent en plus le cache de bord Cloudflare : 30
-jours pour le géocodage Open-Meteo, 30 minutes pour les prévisions Visual Crossing et 7 jours pour la
-réanalyse. Les réponses d’erreur ne sont jamais mises en cache. Les erreurs
+jours pour le géocodage Open-Meteo, 30 minutes pour les prévisions (Visual
+Crossing, ou Open-Meteo pour un modèle choisi, dont l’adresse contient le
+modèle : deux modèles n’ont jamais la même entrée) et 7 jours pour la
+réanalyse. La lecture qui vérifie un modèle à son enregistrement contourne
+ce cache. Les réponses d’erreur ne sont jamais mises en cache. Les erreurs
 réseau, `5xx` et `429` peuvent être retentées au maximum trois fois avec une
 attente exponentielle bornée à deux secondes. L’en-tête `Retry-After`, lorsqu’il
 existe, est ensuite mémorisé et bloque toute nouvelle tentative jusqu’à
 l’échéance ; sans en-tête, une minute de repli est appliquée. La dernière valeur
 valide en D1 reste affichée.
 
-Nombre maximal d’appels externes avec une commune déjà géocodée :
+Nombre maximal d’appels externes avec une commune déjà géocodée (décompte
+réécrit à la mise en ligne de la météo multi-modèles, le 27 novembre 2026 ;
+une lecture d’un modèle choisi coûte environ 1,07 appel au compteur
+d’Open-Meteo, essai A du 26 novembre 2026, contre une limite gratuite de
+600 par minute, 5 000 par heure et 10 000 par jour) :
 
 - passage planifié quotidien : **1** Forecast par lieu distinct et par
   modèle de prévision choisi à ce lieu (« Automatique » compte pour un), et
@@ -185,8 +223,22 @@ d'appels ci-dessus ne changent pas. L'archive est gardée 24 mois, n'a aucun
 Visual Crossing est crédité dans l’interface. Son offre gratuite fournit 1 000
 enregistrements par jour et convient au prototype privé actuel avec le cache
 durable et les lectures quotidiennes groupées. La consommation devra être
-réévaluée avant l’ouverture à de nombreuses exploitations. La clé est un secret
-serveur : elle ne figure ni dans Git, ni dans le navigateur, ni dans les journaux.
+réévaluée avant l’ouverture à de nombreuses exploitations. Sa clé est un
+secret serveur : elle ne figure ni dans Git, ni dans le navigateur, ni dans
+les journaux.
+
+Open-Meteo est crédité (CC BY 4.0) partout où ses données s’affichent ; pour
+un modèle choisi, le crédit nomme aussi le fournisseur du modèle
+(« Prévisions : Météo-France, par Open-Meteo »). Aucune donnée de
+démonstration n’est créditée à un fournisseur réel. L’offre gratuite
+d’Open-Meteo est « non commerciale » : **décision du porteur du
+26 novembre 2026 à 12 h 47** (`docs/weather-models-contract.md`, § 10),
+tout reste gratuit pendant le pilote ; une licence payante est probable
+ensuite, financée par la société qui gère Ouvre ta ferme, et elle ne
+demandera que les deux réglages serveur ci-dessus, sans changer une règle.
+Tant que l’offre gratuite est utilisée, Open-Meteo ne garantit pas sa
+disponibilité : l’enregistrement vérifié d’un modèle et le retour à
+« Automatique » protègent les fermes.
 
 Documentation officielle :
 
@@ -195,3 +247,5 @@ Documentation officielle :
 - [Méthode FAO-56](https://www.fao.org/fileadmin/user_upload/faowater/docs/ReferenceManualV32.pdf)
 - [Offre gratuite Visual Crossing](https://www.visualcrossing.com/resources/documentation/visual-crossing-weather-free-plan-free-weather-data-for-analysts-and-api-developers/)
 - [Geocoding API Open-Meteo](https://open-meteo.com/en/docs/geocoding-api)
+- [Forecast API Open-Meteo](https://open-meteo.com/en/docs)
+- [Conditions et licence Open-Meteo](https://open-meteo.com/en/terms)

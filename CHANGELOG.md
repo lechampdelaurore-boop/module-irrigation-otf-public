@@ -16,6 +16,15 @@ source détaillée commit par commit.
   aucun chiffre existant ne change : la lecture vient avec HR2, l'écran
   avec HR3.
 
+### Corrigé (la météo du lundi dans « Aujourd'hui », le week-end)
+
+- **La lecture météo de la semaine en cours va jusqu'au troisième jour
+  d'« Aujourd'hui »** (D-357, F1100) : un samedi ou un dimanche, la
+  prévision du lundi (et du mardi le dimanche) est lue avec la semaine,
+  sans attendre la tâche du matin ; « Gel ou chaleur » ne dit plus
+  « Prévision indisponible » pour ce jour. Le parcours P29, rouge chaque
+  week-end sur toute branche, repasse au vert.
+
 ### Ajouté (météo multi-modèles, PR 3 : l'écran)
 
 - **Choisir le modèle de prévision de la ferme** (D-347, F1023 à F1030) :
@@ -69,6 +78,221 @@ source détaillée commit par commit.
   sans code ; « Automatique » reste le défaut, un seul modèle Open-Meteo par
   ferme, liste tenue dans le code, essai de format sur un lanceur GitHub
   avant le code. Rien ne change pour l'instant.
+
+### Ajouté (la météo prévue contre la météo réalisée, PR 2 : le pli)
+
+- **« La météo s'est-elle vérifiée ? »** (D-344, F1005 à F1008) : sur
+  la page « Semaine », dans « Le détail », avec les blocs d'« Objectifs et
+  besoins », un pli fermé, lu seulement quand on l'ouvre,
+  dit de combien la pluie et la soif du jour annoncées se sont écartées de
+  ce qui s'est passé, à un ou deux jours, à 3 ou 4 jours, à 5 à 7 jours et
+  sur la semaine, en deux petits tableaux, le sens toujours en mots. Tant
+  qu'il n'y a pas assez de jours, il le dit et ne montre aucun chiffre. La
+  démonstration a des chiffres d'exemple, étiquetés comme tels. Parcours
+  P71 et V12.
+
+### Corrigé (ligne 34 : trois écarts de la recette)
+
+- **L'objectif automatique d'un jardin dit sur combien de planches porte
+  sa moyenne** (D-356) : « Clos des saules · 1 planche sur 2 · 18 mm »
+  quand une planche n'a pas encore de valeur.
+- **Un jardin tout hors saison n'est plus dit « non calculable »** : le
+  tableau des besoins dit « Hors saison : ni besoin ni volume » ; « Eau de
+  la semaine » et « Jardin par jardin » disent « hors saison », sans
+  « Lui en donner une », et ses planches ne sont plus comptées parmi
+  celles « sans eau visée ».
+
+### Ajouté (la météo prévue contre la météo réalisée, PR 1 : le calcul et la lecture)
+
+- **Le calcul de la comparaison** (D-343, F998 à F1004,
+  `lib/domain/weather/forecast-reliability.ts`) : pour chaque ferme, ce que
+  la météo annonçait d'un à sept jours à l'avance face à ce qui s'est passé,
+  pour la pluie (estimée, et à part la pluie notée au pluviomètre) et la
+  soif du jour ; trois lignes d'horizon, le cumul de la semaine annoncé le
+  dimanche, 90 jours, aucun chiffre sans 14 jours (4 semaines pour la
+  semaine), des phrases sans verdict. La lecture
+  (`db/forecast-reliability-repository.ts`) et le service
+  (`lib/services/forecast-reliability.ts`) ne lisent que la ferme et son
+  lieu actuel. Aucun écran encore (PR 2) ; aucun calcul, aucune migration,
+  aucune écriture ne change.
+
+### Ajouté (contrat : la météo prévue contre la météo réalisée, sans code)
+
+- **Contrat écrit** (D-338, `docs/forecast-reliability-contract.md`, roadmap
+  section 6 quindecies) : comparer, ferme par ferme, la prévision archivée
+  (D-297) au réalisé, pour la pluie et l'ET0, à un jour, à quelques jours et
+  sur la semaine ; un pli fermé sur « Objectifs et besoins », aucun chiffre
+  sans assez de jours. Aucun code, aucun calcul changé, aucune migration.
+
+### Ajouté (ignorer l'irrigation hors saison, B3 : les écrans)
+
+- **Le bloc « Hors saison »** (D-353, F1075 à F1086), dans le pli
+  « Objectifs de la semaine » : « Mettre hors saison » une planche, un
+  jardin ou un abri, une parcelle, tout le plein champ ou tout le
+  sous-abri, à partir d'aujourd'hui ; chaque endroit hors saison en puce,
+  avec son jour et ses planches, et « Reprendre ». Quand des arrosages
+  planifiés ou validés arrosent ces planches, une fenêtre propose « Les
+  annuler » ou « Les garder » ; un arrosage déjà démarré se termine. Le
+  tableau des besoins garde ces planches, grisées et dites « hors saison »,
+  la pluie toujours suivie ; « Aujourd'hui » dit « 3 planches hors saison »
+  sur la tuile de l'objectif, avec un lien vers le bloc ; une proposition
+  du planning dit la planche hors saison qu'un matériel partagé arrose
+  encore. Un « ? » explique ce qui est ignoré et ce qui continue.
+
+### Ajouté (ignorer l'irrigation hors saison, B2 : le stockage et les lecteurs)
+
+- **Les gestes « hors saison » enregistrés** (D-352) : mettre hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, puis le reprendre, s'enregistre au jour du geste et se lit au
+  journal des modifications (« Mise hors saison », « Reprise de
+  l'irrigation ») ; un geste qui ne change rien n'écrit rien. Le tableau
+  des besoins, le planning, la faisabilité, « Aujourd'hui », l'historique,
+  les séries, l'aide du formulaire et l'étape « Combien je vise par
+  semaine » de la mise en route en tiennent compte : plus d'objectif
+  ni de proposition d'arrosage pour ces planches ; un arrosage déjà
+  planifié reste, la liste à proposer à l'annulation est prête. La pluie,
+  la réserve du sol, l'ET0, l'archive des prévisions et les alertes ne
+  changent jamais. Rien ne change encore pour aucune ferme : aucun écran
+  ne permet le geste (B3).
+
+### Ajouté (ignorer l'irrigation hors saison, B1 : la règle)
+
+- **La règle « hors saison »** (D-341) : quand une ferme mettra hors saison
+  une planche, un jardin, une parcelle, tout le plein champ ou tout le
+  sous-abri, ses planches n'auront plus d'objectif ni de besoin à partir
+  du jour du geste, et l'objectif de la ferme les dira à part (« 7 planches
+  sur 7 ont un objectif, 3 hors saison ») ; la pluie, la réserve du sol,
+  l'ET0, les alertes et les irrigations réelles ne changent pas. Rien ne
+  change encore pour aucune ferme : aucun écran ne l'allume, aucun service
+  ne la lit (B2, B3).
+
+### Modifié (l'objectif automatique se voit et se modifie, A1)
+
+- **Le volet « Objectifs de la semaine » montre l'objectif automatique**
+  (D-351, F1051 à F1060) : réglage allumé, une ligne « automatique » par
+  jardin, et par planche qui s'en écarte, avec ses millimètres de la
+  semaine et leur origine (« d’après l’ET0 », « prévu » pour une semaine
+  à venir), et « Corriger » ; le champ « mm / semaine » montre la valeur
+  en vigueur de l'endroit choisi, « saisie » ou « automatique » ; laissé
+  tel quel, « Enregistrer » n'écrit rien. Un objectif saisi est dit
+  « saisi » et propose « Revenir à l’automatique », pour cet endroit seul.
+  Allumer quand des planches gardent un objectif saisi ouvre une fenêtre :
+  « Allumer, garder mes objectifs », « Allumer et vider les objectifs » (en
+  rouge) ou « Annuler ». Sous l'interrupteur, une phrase dit le résultat de
+  la semaine. Rien n'est écrit chaque matin ; réglage éteint, rien ne
+  change.
+
+### Ajouté (contrat : l'objectif automatique se voit ; ignorer l'irrigation hors saison)
+
+- **Contrat écrit, sans code** (D-337, `docs/objectif-automatique-saison-contract.md`) :
+  pourquoi cocher « Objectif automatique » ne remplit rien à l'écran (calculé
+  à la lecture, jamais écrit ; un objectif saisi passe avant), ce que l'écran
+  montrera (liste, champ prérempli, fenêtre d'allumage), et un filtre « hors
+  saison » qui n'ignore que l'irrigation : la pluie, la réserve du sol et
+  l'historique ne changent pas. Quatre PR de code à venir.
+
+### Modifié (simplifier l'usage du module, S6, PR 4 : les visites, la ferme vierge, les contrats)
+
+- **La visite guidée parle des trois façons de commencer** (D-336, F976
+  à F978) : sur l'écran de la première ouverture, les deux étapes de « Le
+  module à la carte » disent « Trois façons de commencer » et « Rien
+  n’est choisi d’avance » ; dans Réglages, elles gardent leurs mots.
+  Aucune étape ajoutée ni retirée ; la bulle et l'annonce du lecteur
+  d'écran disent les mots de la page ouverte.
+- **La ferme vierge de la démonstration** (F979) se présente comme « les
+  trois façons de commencer, et rien de réglé » ; « Remettre à zéro » la
+  rend vierge, sans façon choisie ni état de la carte « Mise en route ».
+- **Le « ? » de « Ma ferme »** (F980) dit que chaque fiche dit où elle en
+  est, et que la mise en route est en tête pour une ferme qui commence.
+- **Sept contrats validés** (F981) disent, à l'endroit de chaque passage,
+  ce que S6 y change. **Le code de S6 est fini.**
+- **Parcours P67 (S4) le soir** : lancé après 23 h, il trouvait une
+  journée trop courte pour deux arrosages de 50 min ; le plan en propose
+  quatre plus courts et « Jour par jour » s'allonge (2 060 px au lieu de
+  1 750 au plus). La hauteur du premier niveau et les choses à toucher
+  ne sont bornées que dans le cas mesuré (deux arrosages) ; sinon le
+  parcours le dit (« hors jeu ») et joue tout le reste. La vérification
+  de cette PR et le déploiement de la PR 3 avaient échoué ainsi à 23 h 28.
+
+### Ajouté (simplifier l'usage du module, S6, PR 3 : les lignes d'état des fiches de « Ma ferme »)
+
+- **Chaque fiche de « Ma ferme » dit son état en une ligne** (D-336, F969
+  à F975) quand la donnée est connue : « 2 goutte-à-goutte et 1
+  aspersion, 1 pas posé », « Puits : débit de 2 m³/h », « Bassin des
+  noues : 30 m³ sur 40 m³, observé aujourd’hui », « 4 cultures cette
+  saison », « À renseigner pour 3 parcelles », « 2 alertes réglées, 1
+  inactive », « Météo de Nantes · 11 fonctionnalités cochées ». Chaque
+  nombre est celui que la page de la fiche montre, sous son mot ; la
+  ligne fixe revient quand la donnée est inconnue ou vide, jamais un
+  « 0 » pour un inconnu. « Alertes cultures » garde sa ligne fixe. La
+  marque « À faire » reste à côté.
+- **Une seule lecture** pour la carte « Mise en route » et les fiches :
+  l'étape 1 et la fiche du matériel comptent les mêmes matériels (tout le
+  matériel actif, comme l'inventaire), l'étape 3 et la fiche de l'eau les
+  mêmes ressources et réserves, l'étape 5 et la fiche du sol les mêmes
+  parcelles. Deux lectures nouvelles et légères : le nombre des alertes
+  météo réglées, les clés des cultures que la ferme connaît. Aucune
+  requête par planche ; « Ma ferme » reste sous le temps de Réglages.
+
+### Ajouté (simplifier l'usage du module, S6, PR 2 : la carte « Mise en route »)
+
+- **La carte « Mise en route » en tête de « Ma ferme »** (D-336, F958 à
+  F968) : pour une ferme qui a commencé par une des trois façons, les
+  étapes qui décrivent la ferme (le matériel, où il est posé, d'où vient
+  l'eau, combien vous visez par semaine, le sol), selon les cases
+  cochées, « 3 étapes sur 5 » et sa barre, l'étape en cours avec ce qui
+  lui manque et « Continuer l'étape n ». Une étape est faite quand ce
+  qu'elle décrit existe : rien ne se coche à la main. « Plus tard » la
+  range en une ligne « Reprendre la mise en route » ; toutes les étapes
+  faites, « Terminer la mise en route » la retire pour de bon. Le bandeau
+  « À finir » n'est plus répété sur « Ma ferme » quand la carte est là.
+- **« Aujourd'hui » d'une ferme pas encore prête** : quand aucun arrosage
+  n'est à montrer, la ligne vide devient un bloc qui dit l'étape en cours
+  et mène à elle. Les fermes qui utilisaient déjà le module ne voient
+  rien changer.
+
+### Modifié (simplifier l'usage du module, S6, PR 1 : les trois façons de commencer)
+
+- **Trois façons de commencer à la première ouverture** (D-336, F947 à
+  F957) : « Je note mes arrosages », « Le module me propose quoi arroser »
+  (conseillé) ou « Tout : sol, cultures et alertes », à la place de la
+  liste des onze cases. Rien n'est choisi d'avance ; une phrase dit combien
+  d'étapes suivent pour décrire la ferme ; le serveur coche lui-même les
+  cases de la façon choisie. « Choisir moi-même les fonctionnalités »
+  montre toujours les onze cases. Après « Continuer », la première arrivée
+  est « Ma ferme » ; les ouvertures suivantes ne changent pas. Réglages dit
+  comment la ferme a commencé. « Commencer par l'essentiel » disparaît. Une
+  migration additive (0051) garde la façon choisie ; les fermes qui
+  utilisent déjà le module ne voient rien changer.
+- **Contrôles du dépôt** : les parcours navigateur ont 75 minutes au lieu
+  de 50. Ils en prennent trente-deux à quarante-sept selon la machine de
+  GitHub, et la vérification de cette PR a été coupée à 50 minutes pendant
+  les parcours de la démonstration (run 45880035932). Aucun parcours ne
+  change.
+
+### Ajouté (simplifier l'usage du module, S6 : contrat de la mise en route guidée)
+
+- **Contrat du lot S6** (`docs/simplification-s6-contract.md`, D-327) : à la
+  première ouverture, trois façons de commencer à la place des onze cases ; une
+  carte « Mise en route » dans « Ma ferme » (jusqu'à cinq étapes, lues sur les
+  données de la ferme) ; les chiffres d'état des fiches de « Ma ferme ». Aucun
+  code, aucun calcul ni aucune fonction retirée ; une seule migration, additive,
+  prévue pour le code ; l'écran de bienvenue du contrat 3.8 est modifié, la 3.8
+  reste close.
+
+### Modifié (simplifier l'usage du module, S4, PR 4 : les liens, la visite, les contrats)
+
+- **Tout mène à « Semaine »** (D-335, F940 à F946) : les liens
+  d'« Aujourd'hui » (« Eau de la semaine », la ligne du plan, les
+  propositions, « Fiabilité du calcul »), de « Matériel », « Ressources »,
+  « Arrosages », « Réglages à relire » et du « + », et la notification de
+  l'aspersion à reconsidérer, ouvrent « Semaine » à la bonne section, sans
+  passer par les anciennes adresses, qui restent servies. « Noter la pluie »
+  d'une autre page ouvre la fenêtre à l'arrivée. Les mots qui nommaient une
+  page disparue changent : « Voir la semaine », « Ouvrir la semaine ». La
+  visite guidée « Le planning » ouvre les plis du détail pour montrer ce
+  qu'elle présente, au lieu d'un élément caché. Le « ? » de « Semaine » dit
+  où est chaque chose. Aucun calcul, aucune règle d'enregistrement ne change.
 
 ### Modifié (simplifier l'usage du module, S4, PR 3 : les gestes de la semaine)
 
@@ -314,7 +538,6 @@ source détaillée commit par commit.
   les jours et les jardins au premier niveau, le reste derrière « Le détail ».
   Aucun code, aucun calcul ni aucune fonction retirée ; les trois anciennes
   adresses sont gardées.
-
 ### Modifié (simplifier l'usage du module, S1, PR 3 bis : l'Historique comme « Aujourd'hui »)
 
 - **« Historique et cumuls » dit l'objectif d'« Aujourd'hui »** (D-329,

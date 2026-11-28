@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { attendreLeChoixDesFonctionnalites, caseDeLaFonctionnalite, ouvrirUneFermeNeuve } from './support/fonctionnalites.ts';
-import { attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
+import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape, ouvrirLOnglet } from './support/parcours.ts';
 
 /**
  * Parcours P25 : le calculateur d'irrigation (3.8 bis,
@@ -47,7 +47,9 @@ test('le calculateur remplit un réglage depuis le matériel, montre son calcul 
   await caseDeLaFonctionnalite(page, 'Calculateur d’irrigation').check();
   await expect(caseDeLaFonctionnalite(page, 'Matériel et placement')).toBeChecked();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await attendreLaPagePrete(page, 'materiel');
+  // Le matériel à décrire : la première arrivée est « Ma ferme », la mise en route ayant une étape (lot S6, section 3.4) ; la page du matériel ensuite.
+  await attendreLaPagePrete(page, 'ma-ferme');
+  await attendreLaPageIrrigation(page, 'materiel');
   await verifierLEtape(page, journal, 'calculateur coché');
 
   // Goutte-à-goutte : un nouveau réglage, calculé depuis l'exemple.

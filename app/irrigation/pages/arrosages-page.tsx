@@ -57,7 +57,7 @@ export function ArrosagesPage({
   waterDashboard: WaterDashboard;
   /** La dose du jour et les objectifs de la semaine que le formulaire propose (lot G, n° 9). */
   formHints: IrrigationFormHints;
-  /** « Recalculer le plan » sur un arrosage en retard conduit au planning, s'il est coché. */
+  /** « Recalculer le plan » sur un arrosage en retard conduit à « Semaine », qui porte le plan, si le planning est coché (lot S4, PR 4). */
   planningEnabled: boolean;
   /** Le choix de la pompe, avec la case « Ressources et pompes » (R1). */
   pumpsEnabled: boolean;
@@ -89,7 +89,7 @@ export function ArrosagesPage({
         protectedSlots={protectedSlots}
         formHints={formHints}
         onRecalculatePlan={planningEnabled
-          ? () => window.location.assign(hrefWithIntent(pagePath('planning'), season, 'recalculer', '1'))
+          ? () => window.location.assign(hrefWithIntent(pagePath('semaine'), season, 'recalculer', '1'))
           : undefined}
       />
       <WaterManagementDashboard season={season} snapshot={snapshot} initialDashboard={waterDashboard} part="arrosages" />
