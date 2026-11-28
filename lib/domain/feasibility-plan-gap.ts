@@ -3,12 +3,16 @@ import { cubicMetersFromLiters } from './units.ts';
 import type { IrrigationFeasibility } from './irrigation-feasibility.ts';
 import type { StoredWeeklyPlan } from './planning/contract.ts';
 import { beyondNeedSentence, shortageDecisionPending, waterBeyondNeed } from './planning/shortage-reading.ts';
+import { PLAN_SECTION_ANCHOR } from './features/week-page.ts';
+
+/** « Eau visée » de « Semaine », où se fixe l'objectif d'une planche (lot S4, section 7.4). */
+const WEEK_GOALS_ANCHOR = 'objectifs-de-la-semaine';
 
 /** Sous un litre, un reste de la faisabilité est un arrondi : elle ne voit pas de manque. */
 const ONE_LITER_CUBIC_METERS = cubicMetersFromLiters(1);
 
-/** Les pages où se trouvent les gestes qui lèvent le manque. */
-type PlanGapLink = { label: string; page: 'materiel' | 'besoins' | 'planning' };
+/** Les pages où se trouvent les gestes qui lèvent le manque : le planning et les besoins sont sur « Semaine » (lot S4, PR 4). */
+type PlanGapLink = { label: string; page: 'materiel' | 'semaine'; anchor?: string };
 
 export type FeasibilityPlanGap = {
   /** « Le planning compte un manque de 367 L d'ici dimanche, que cette répartition ne voit pas. » */
@@ -54,13 +58,13 @@ export function feasibilityPlanGap(input: {
     return {
       lead,
       cause: `${fits} ${where} Le manque vient de là. ${todo}`,
-      links: [{ label: 'Ouvrir Matériel', page: 'materiel' }, { label: 'Ouvrir Objectifs et besoins', page: 'besoins' }],
+      links: [{ label: 'Ouvrir Matériel', page: 'materiel' }, { label: 'Ouvrir la semaine', page: 'semaine', anchor: WEEK_GOALS_ANCHOR }],
     };
   }
   // Sans eau versée au-delà du besoin : les heures, les pompes ou le remplissage, que seul le planning vérifie.
   return {
     lead,
-    cause: `${fits} Le manque vient des heures, des pompes ou du remplissage des réserves, que le planning vérifie et que ce calcul en volume ne voit pas : le détail est au planning.`,
-    links: [{ label: 'Ouvrir le planning', page: 'planning' }],
+    cause: `${fits} Le manque vient des heures, des pompes ou du remplissage des réserves, que le planning vérifie et que ce calcul en volume ne voit pas : le détail est sur « Semaine », dans « Le plan, chaîne par chaîne ».`,
+    links: [{ label: 'Ouvrir la semaine', page: 'semaine', anchor: PLAN_SECTION_ANCHOR }],
   };
 }

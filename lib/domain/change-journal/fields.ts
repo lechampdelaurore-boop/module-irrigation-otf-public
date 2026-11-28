@@ -9,6 +9,7 @@ import { COLLECTIVE_DOSE_RULE_LABELS, EQUIPMENT_KIND_LABELS, SHORTAGE_STRATEGY_L
 import { WEEKDAY_LABELS } from '../planning/protected-slots-view.ts';
 import { SOIL_TEXTURES, soilTextureLabel } from '../soil-reserve/texture.ts';
 import { RESERVOIR_TYPE_LABELS, RESOURCE_TYPE_LABELS } from '../water-resource-labels.ts';
+import { forecastModel } from '../weather/forecast-models.ts';
 import { WEATHER_ALERT_FIELD_CHOICES } from '../weather/weather-alerts.ts';
 import type { ChangeSubject } from './subjects.ts';
 
@@ -77,6 +78,8 @@ const day: Format = (value) => dayKeyText(String(value));
 const instant: Format = (value) => dateClockText(String(value));
 const flag: Format = (value) => (value === true || Number(value) === 1 ? 'oui' : 'non');
 const checked: Format = (value) => (value === true || Number(value) === 1 ? 'cochée' : 'non cochée');
+/** Un modèle de prévision, par son libellé ; un modèle retiré de la liste, sans son identifiant (D-346). */
+const forecastModelName: Format = (value) => forecastModel(String(value))?.label ?? 'un modèle qui n’est plus proposé';
 
 function words(labels: Readonly<Record<string, string>>): Format {
   return (value) => labels[String(value)] ?? String(value);
@@ -267,12 +270,17 @@ function slotFields(): Record<string, FieldWords> {
 const WEATHER_FIELD_WORDS = Object.fromEntries(WEATHER_ALERT_FIELD_CHOICES.map(({ field, label }) => [field, label]));
 const TEXTURE_WORDS = Object.fromEntries(SOIL_TEXTURES.map((texture) => [texture, soilTextureLabel(texture)]));
 
+/** L'état d'une portée « hors saison » (D-352) : ses deux gestes le disent avec les mêmes mots. */
+const OFF_SEASON_FIELD: FieldWords = { label: 'Irrigation', format: words({ 1: 'ignorée, hors saison', 0: 'en saison', true: 'ignorée, hors saison', false: 'en saison' }) };
+
 /** Les champs propres à chaque sujet ; un champ absent d'ici est lu dans les champs partagés. */
 const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWords>>>> = {
   'objectif-hydrique': { amountMm: { label: 'Objectif', format: mm } },
   'objectif-adopte': { amountMm: { label: 'Objectif', format: mm } },
   'seuil-de-besoin': { thresholdMm: { label: 'Seuil minimal', format: mm } },
   'objectif-automatique': { enabled: { label: 'Objectif automatique', format: words({ 1: 'allumé', 0: 'éteint', true: 'allumé', false: 'éteint' }) } },
+  'jardin-hors-saison': { offSeason: OFF_SEASON_FIELD },
+  'reprise-saison': { offSeason: OFF_SEASON_FIELD },
   'decision-de-planche': {
     priority: { label: 'Priorité', format: (value) => priorityLabel(String(value) as Parameters<typeof priorityLabel>[0]) },
     manualOverrideMm: { label: 'Besoin forcé', format: mm, empty: 'aucun' },
@@ -385,6 +393,7 @@ const BY_SUBJECT: Readonly<Record<ChangeSubject, Readonly<Record<string, FieldWo
     customCity: { label: 'Commune', format: text, empty: 'aucune' },
     customPostcode: { label: 'Code postal', format: text, empty: 'aucun' },
   },
+  'modele-meteo': { forecastModel: { label: 'Modèle de prévision', format: forecastModelName, empty: '« Automatique »' } },
   materiel: {
     kind: { label: 'Nature', format: words(KIND_WORDS) },
     mobility: { label: 'Installation', format: words({ fixed: 'fixe', mobile: 'mobile' }) },

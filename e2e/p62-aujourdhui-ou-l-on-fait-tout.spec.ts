@@ -165,7 +165,7 @@ test('le matin sur la page seule : « Pas à cette heure », « Valider », « D
   await verifierLaCarteAUnBouton(page, premiere, 'Valider', ['Changer l’heure ou la dose', 'Pas à cette heure'], telephone);
   await expect(premiere.getByRole('button', { name: /^Démarrer tout de suite : / })).toBeVisible();
   // Replié, le lien sort de l'arbre d'accessibilité : il se lit par son attribut.
-  await expect(premiere.locator('a[aria-label^="Changer l’heure ou la dose : "]')).toHaveAttribute('href', /^\/irrigation\/planning\?season=\d{4}#proposal-/);
+  await expect(premiere.locator('a[aria-label^="Changer l’heure ou la dose : "]')).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#proposal-/);
   await expect(page.getByText('Valider au planning')).toHaveCount(0);
   await verifierLEtape(page, journal, 'la proposition à un bouton');
 
@@ -364,7 +364,7 @@ test('« Noter la pluie » : 8 mm, puis 0 mm, puis remplacer, depuis « La semai
   await expect(jour).toHaveValue(parDefaut);
   await expect(fenetre).toContainText('Pas de pluie ? Notez 0 : c’est une vraie mesure, elle compte.');
   await expect(fenetre.getByRole('button', { name: 'Enregistrer', exact: true })).toBeDisabled();
-  await expect(fenetre.getByRole('link', { name: 'sur « Objectifs et besoins »' })).toHaveAttribute('href', /^\/irrigation\/besoins\?season=\d{4}#manual-rain$/);
+  await expect(fenetre.getByRole('link', { name: 'sur « Semaine », dans « Pluie mesurée »' })).toHaveAttribute('href', /^\/irrigation\/semaine\?season=\d{4}#manual-rain$/);
   if (telephone) {
     for (const [cible, nom] of [[jour, 'Le jour'], [combien, 'Le champ des millimètres'], [fenetre.getByRole('button', { name: 'Fermer' }), '« Fermer »']] as const) {
       await verifierCibleTactile(cible, nom);

@@ -133,8 +133,8 @@ function capitalized(text: string): string {
   return text.charAt(0).toLocaleUpperCase('fr-FR') + text.slice(1);
 }
 
-/** « Arrosages » quand la page est cochée, sinon le planning : là où s'ouvrent les cartes des irrigations. */
-const PAGE_TITLES: Partial<Record<IrrigationPageId, string>> = { arrosages: 'Arrosages', planning: 'Planning de la semaine' };
+/** La page où s'ouvrent les cartes : « Arrosages », ou « Semaine », qui porte le planning, sans « Arrosages » coché (lot S4, PR 4). */
+const PAGE_TITLES: Partial<Record<IrrigationPageId, string>> = { arrosages: 'Arrosages', semaine: 'Semaine' };
 
 /**
  * Les retards, dans l'ordre de l'heure : les jours passés qui en ont plus de

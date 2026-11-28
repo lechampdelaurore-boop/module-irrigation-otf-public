@@ -6,6 +6,7 @@ import { objectiveForBed } from '../domain/irrigation-needs';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
 import { getCropWaterWeekForUser, type StageChoice } from './crop-water-week';
 import { readAutomaticObjectiveSourceForUser } from './automatic-objective-source';
+import { readOffSeasonSourceForUser } from './off-season-source';
 
 /**
  * La fiche d'une série pour le besoin par culture et par stade
@@ -63,9 +64,11 @@ export async function getSeriesCropWaterSheetForUser(input: {
   const weekEnd = addDaysToDateKey(weekStart, 6);
   const placed = new Set(cropPlan.places.filter((place) => place.seriesId === series.id).map((place) => place.bedId));
   const beds = input.snapshot.beds.filter((bed) => placed.has(bed.id) && bed.seasons.includes(input.season));
-  const [revisions, automatic] = await Promise.all([
+  const [revisions, automatic, offSeason] = await Promise.all([
     listHydricGoalRevisionsThroughWeekForUser(input.ownerUserId, input.season, weekStart),
     readAutomaticObjectiveSourceForUser({ ...input, from: weekStart, to: weekEnd, now }),
+    // Le filtre « hors saison » (D-337, D-352) : ces jours-là, aucun objectif.
+    readOffSeasonSourceForUser(input),
   ]);
   const week = await getCropWaterWeekForUser({
     ownerUserId: input.ownerUserId,
@@ -73,7 +76,7 @@ export async function getSeriesCropWaterSheetForUser(input: {
     snapshot: input.snapshot,
     weekStart,
     now,
-    objectiveMmByBed: new Map(beds.map((bed) => [bed.id, objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed)).value])),
+    objectiveMmByBed: new Map(beds.map((bed) => [bed.id, objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed), offSeason?.daysFor(bed)).value])),
     bedIds: beds.map((bed) => bed.id),
   });
   const plots = new Map(input.snapshot.plots.map((plot) => [plot.id, plot.name]));

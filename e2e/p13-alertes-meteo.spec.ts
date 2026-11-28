@@ -1,5 +1,4 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../lib/domain/water-management.ts';
 import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirParClic, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli } from './support/parcours.ts';
 
 /**
@@ -28,19 +27,14 @@ const PAUSE_D_ACTUALISATION = { timeout: 45_000 };
 const HORIZON_JOURS = 3;
 
 /**
- * Les jours visés que l'actualisation peut alerter : ceux de l'horizon qui
- * tombent dans la semaine affichée, dont elle lit la prévision. Un samedi il
- * en reste deux, un dimanche un ; les autres sont dits « prévision
- * indisponible » jusqu'à la synchronisation de 06 h 15, qui lit 14 jours.
+ * Les jours visés que l'actualisation peut alerter : les trois de l'horizon,
+ * aujourd'hui, demain et après-demain. Depuis D-357 (28 novembre 2026), la
+ * lecture de la semaine en cours va jusqu'au troisième jour d'« Aujourd'hui »,
+ * même au-delà de dimanche : un samedi ou un dimanche ne laissent plus de jour
+ * « prévision indisponible » jusqu'à la synchronisation de 06 h 15.
  */
 function joursVisesDansLaSemaine(): number {
-  const aujourdhui = dateKeyInTimeZone(new Date(), FARM_TIME_ZONE);
-  const dimanche = addDaysToDateKey(weekStartDateKey(aujourdhui), 6);
-  let jours = 0;
-  for (let decalage = 0; decalage < HORIZON_JOURS; decalage += 1) {
-    if (addDaysToDateKey(aujourdhui, decalage) <= dimanche) jours += 1;
-  }
-  return jours;
+  return HORIZON_JOURS;
 }
 
 test('une alerte météo se règle, refuse un seuil non numérique, s’enregistre une fois par jour visé et ouvre la semaine, sans débordement ni cible trop petite', async ({ page }, testInfo) => {
@@ -123,7 +117,8 @@ test('une alerte météo se règle, refuse un seuil non numérique, s’enregist
 
   // Une notification reçue avant la 3.8 garde son adresse : elle conduit à la page qui porte le tableau des jours, avec la même semaine (P14, P21).
   await page.goto(`/irrigation?season=${saison}&week=${semaine}#weather`);
-  await expect(page).toHaveURL(new RegExp(`/irrigation/besoins\\?season=${saison}&week=${semaine}#weather$`));
+  // Depuis le lot S4, les besoins sont sur la page « Semaine » : l'ancre ouvre « Le détail » et « Jours de la semaine, un par un ».
+  await expect(page).toHaveURL(new RegExp(`/irrigation/semaine\\?season=${saison}&week=${semaine}#weather$`));
   await expect(page.locator('#weather')).toBeInViewport({ timeout: 15_000 });
   await expect(page.locator('#weather thead')).toContainText('Températures prévues');
   await verifierLEtape(page, journal, 'ancienne adresse de la semaine conduite');
@@ -131,7 +126,8 @@ test('une alerte météo se règle, refuse un seuil non numérique, s’enregist
   // Audit final, lot D, J3 : l'évaporation dit son nom (F300) ; au téléphone, un jour replié tient
   // en une ligne, la date et ce qui s'y est passé, et s'ouvre dessous (F299) ; à l'ordinateur, une
   // ligne par jour, sans bouton.
-  await expect(page.locator('.water-summary-card').filter({ hasText: 'Soif de la semaine' })).toHaveCount(1);
+  // Les tuiles sont aussi sous le bilan, dans « Comprendre ces chiffres », replié (S4, PR 3, F934) : on lit celles du tableau des jours.
+  await expect(page.locator('#weather .water-summary-card').filter({ hasText: 'Soif de la semaine' })).toHaveCount(1);
   const jours = page.locator('#weather tbody tr');
   await expect(jours).toHaveCount(7);
   if (testInfo.project.name === 'telephone') {

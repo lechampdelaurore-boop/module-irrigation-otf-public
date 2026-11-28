@@ -1,34 +1,18 @@
-import { loadPageContext, type IrrigationSearchParams } from '../page-context';
-import { loadHistoriquePage } from '../page-loaders';
-import { IrrigationShell } from '../shell/irrigation-shell';
+import { redirectToWeekPage, type IrrigationSearchParams } from '../page-context';
 import { UnavailableState } from '../shell/unavailable-state';
-import { HistoryViews } from '../history-views';
-import { pageHref } from '@/lib/domain/features/pages';
 import { pageMetadata } from '../page-metadata';
 import '../irrigation.css';
-import { renderOncePerRequest } from '../render-once';
 
 export const dynamic = 'force-dynamic';
 export const metadata = pageMetadata('historique');
 
-/** La page « Historique et cumuls » (3.8) : cumuls, historique, suivi par série, export CSV. */
-async function computeHistoriquePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
-  const context = await loadPageContext('historique', searchParams);
-  if (context.kind === 'unavailable') return <UnavailableState {...context.props} />;
-  const { irrigationHistory } = await loadHistoriquePage(context);
-  context.logLoaded();
-  return (
-    <IrrigationShell {...context.shell}>
-      <HistoryViews season={context.season} snapshot={context.snapshot} initialDashboard={irrigationHistory} cropWater={context.enabled.includes('cultures')}
-        rainHref={context.enabled.includes('besoins') ? pageHref('besoins', { season: context.season, zone: context.zone }, 'manual-rain') : null}
-      />
-    </IrrigationShell>
-  );
-}
-
-const computeHistoriquePageOnce = renderOncePerRequest(computeHistoriquePage);
-
-// Une fonction exportée telle quelle : le greffon RSC y accroche les styles de la page.
-export default async function HistoriquePage(props: Parameters<typeof computeHistoriquePage>[0]) {
-  return computeHistoriquePageOnce(props);
+/**
+ * L'ancienne adresse de « Historique et cumuls » (simplification, lot S4,
+ * docs/simplification-s4-contract.md, section 3.3, précision S4-o) : elle
+ * mène à la page « Semaine », avec ses paramètres et son ancre, et n'est
+ * jamais retirée. Ne s'affiche ici que l'écran d'une personne qui n'entre
+ * pas dans son espace.
+ */
+export default async function HistoriquePage({ searchParams }: { searchParams: IrrigationSearchParams }) {
+  return <UnavailableState {...await redirectToWeekPage('historique', searchParams)} />;
 }

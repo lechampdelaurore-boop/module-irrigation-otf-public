@@ -233,14 +233,14 @@ test('« Fiabilité du calcul » : la ligne « Objectif automatique » dit les j
     ['actual-rain', true, 'Notée les 7 derniers jours'],
     ['automatic-objective', true, 'ET0 connue chaque jour de la semaine'],
   ]);
-  assert.deepEqual(ok[1].link, { page: 'besoins', anchor: 'meteo-de-reference' });
+  assert.deepEqual(ok[1].link, { page: 'semaine', anchor: 'meteo-de-reference' });
   const todo = { ...RELIABILITY, automaticObjectiveMissingEt0Dates: ['2026-06-21', '2026-06-19'] };
   const lines = reliabilityLines(todo);
   assert.deepEqual(lines, [{
     kind: 'automatic-objective',
     key: 'automatic-objective',
     text: 'Objectif automatique incomplet : 2 jours sans ET0 cette semaine (ven. 19 juin, dim. 21 juin). Ces jours ne comptent pas dans l’objectif automatique.',
-    action: { kind: 'link', label: 'Voir la météo de référence', page: 'besoins', anchor: 'meteo-de-reference' },
+    action: { kind: 'link', label: 'Voir la météo de référence', page: 'semaine', anchor: 'meteo-de-reference' },
   }]);
   const check = reliabilityChecks(todo, lines).find((item) => item.kind === 'automatic-objective');
   assert.equal(check?.summary, '2 jours sans ET0 : non comptés');

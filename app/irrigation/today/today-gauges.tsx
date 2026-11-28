@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { pageHref, type PageQuery } from '@/lib/domain/features/pages';
+import { SEE_THE_WEEK } from '@/lib/domain/today/essential';
 import type { TodaySoil } from '@/lib/domain/today/soil';
 import type { TodayBlock } from '@/lib/domain/today/today-view';
 import type { TodayWeek } from '@/lib/domain/today/week';
@@ -42,11 +43,11 @@ export function TodayWeekWater({ week, query }: { week: TodayWeek; query: PageQu
           <h2 id="today-week-water-title">Eau de la semaine</h2>
           <p className="today-block-sub">Reçue par rapport à l’objectif, {week.label}</p>
         </div>
-        <a className="today-block-more" href={pageHref('besoins', query)}>Objectifs et besoins</a>
+        <a className="today-block-more" href={pageHref('semaine', query)}>{SEE_THE_WEEK}</a>
       </div>
       <ul className="today-bars">
-        <WeekBar row={week.farm} href={pageHref('besoins', query, week.farm.anchor)} total />
-        {rows.map((row) => <WeekBar key={row.key} row={row} href={pageHref('besoins', query, row.anchor)} />)}
+        <WeekBar row={week.farm} href={pageHref('semaine', query, week.farm.anchor)} total />
+        {rows.map((row) => <WeekBar key={row.key} row={row} href={pageHref('semaine', query, row.anchor)} />)}
       </ul>
       {week.moreLabel ? (
         <button type="button" className="today-more" aria-expanded={showAll} onClick={() => setShowAll((value) => !value)}>
@@ -59,7 +60,7 @@ export function TodayWeekWater({ week, query }: { week: TodayWeek; query: PageQu
         <span><i data-tone="goal" />Objectif</span>
         <span>Échelle : 0 à {week.scaleMaxMm} mm</span>
       </p>
-      <BlockFootLink href={pageHref('besoins', query)} label="Objectifs et besoins" />
+      <BlockFootLink href={pageHref('semaine', query)} label={SEE_THE_WEEK} />
     </section>
   );
 }

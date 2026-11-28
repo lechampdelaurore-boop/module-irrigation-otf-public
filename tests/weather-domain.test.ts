@@ -124,6 +124,23 @@ test('la semaine courante mélange passé indisponible et prévisions sans déca
   });
 });
 
+test('un samedi, la semaine en cours lit aussi la prévision des trois jours d’« Aujourd’hui », lundi compris (D-357)', () => {
+  assert.deepEqual(weatherRequestRanges({
+    weekStart: '2026-11-23',
+    today: '2026-11-28',
+    forecastDaysFromToday: 3,
+  }), {
+    forecast: { startDate: '2026-11-28', endDate: '2026-11-30' },
+    reanalysis: { startDate: '2026-11-23', endDate: '2026-11-23' },
+  });
+  // Un dimanche, lundi et mardi ; un mercredi, rien de plus que la semaine.
+  assert.deepEqual(weatherRequestRanges({ weekStart: '2026-11-23', today: '2026-11-29', forecastDaysFromToday: 3 }).forecast, { startDate: '2026-11-29', endDate: '2026-12-01' });
+  assert.deepEqual(weatherRequestRanges({ weekStart: '2026-11-23', today: '2026-11-25', forecastDaysFromToday: 3 }).forecast, { startDate: '2026-11-25', endDate: '2026-11-29' });
+  // Une autre semaine que celle d'aujourd'hui garde ses sept jours seuls.
+  assert.deepEqual(weatherRequestRanges({ weekStart: '2026-11-30', today: '2026-11-28', forecastDaysFromToday: 3 }).forecast, { startDate: '2026-11-30', endDate: '2026-12-06' });
+  assert.deepEqual(weatherRequestRanges({ weekStart: '2026-11-16', today: '2026-11-28', forecastDaysFromToday: 3 }).forecast, null);
+});
+
 test('une semaine historique complète utilise uniquement la réanalyse', () => {
   assert.deepEqual(weatherRequestRanges({
     weekStart: '2026-08-31',

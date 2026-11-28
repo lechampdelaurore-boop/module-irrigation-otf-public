@@ -97,7 +97,10 @@ avec les mêmes valeurs et la même source : par la tâche de 6 h 15, pour
 chaque exploitation du lieu (un seul appel externe pour toutes, règles 6
 et 8), et par l'actualisation à l'écran. La météo **semée** d'une ferme
 fictive de la démonstration (`seedDemoWeather`) n'est pas une lecture : elle
-n'est pas archivée. Le service est `lib/services/weather/forecast-archive.ts`,
+n'est pas archivée. Depuis D-344 (prévu contre réalisé, PR 2, F1007), la
+démonstration sème à part une archive d'**exemple**, déterministe, pour le
+pli « La météo s'est-elle vérifiée ? » (`lib/services/demo-forecast-archive-seed.ts`) :
+ce n'est toujours pas une lecture archivée. Le service est `lib/services/weather/forecast-archive.ts`,
 la règle des lignes `lib/domain/weather/forecast-archive.ts`, le dépôt
 `db/forecast-archive-repository.ts`.
 

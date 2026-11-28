@@ -72,6 +72,7 @@ export async function loadWaterDashboardAction(input: {
       allowWeatherRefresh: input.allowWeatherRefresh !== false,
       includeWeatherAlerts: true,
       includeAutomaticObjective: true,
+      includeForecastModelSetting: true,
     });
     return {
       ok: true,
@@ -150,10 +151,16 @@ function automaticObjectiveMessage(enabled: boolean, changed: boolean): string {
     : 'Objectif automatique éteint : à partir d’aujourd’hui, seuls les objectifs saisis comptent.';
 }
 
+/**
+ * « Vider les objectifs » de la semaine ; avec `scope`, « Revenir à
+ * l'automatique » : le même geste pour cet endroit seul, sans toucher aux
+ * autres (6 quaterdecies, A1, section 3, point 4 ; D-337).
+ */
 export async function clearHydricGoalsAction(input: {
   season: number;
   weekStart: string;
   confirmed: boolean;
+  scope?: { scopeType: HydricGoalScope; otfZoneId: string | null; otfPlotId: string | null; otfBedId: string | null };
 }): Promise<WaterActionResult> {
   const context = await loadContext(input.season);
   if (!context.ok) return context;
@@ -161,11 +168,22 @@ export async function clearHydricGoalsAction(input: {
   if (!weekStart || input.confirmed !== true) {
     return { ok: false, message: 'La remise à zéro doit être confirmée.' };
   }
+  const scope = input.scope;
+  if (scope !== undefined && !validGoalScope(scope, context.value.snapshot)) {
+    return { ok: false, message: 'Le niveau OTF choisi pour cet objectif est invalide.' };
+  }
   const count = await clearHydricGoalsForUser(
     context.value.ownerUserId,
     input.season,
     weekStart,
+    scope === undefined ? undefined : { scopeType: scope.scopeType, otfZoneId: scope.otfZoneId, otfPlotId: scope.otfPlotId, otfBedId: scope.otfBedId },
   );
+  if (scope !== undefined) {
+    if (count > 0) await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'objective-changed', season: input.season, at: weekStart, lasting: true });
+    return successWithDashboard(context.value, weekStart, count > 0
+      ? 'Cet endroit revient à l’objectif automatique. L’historique est conservé.'
+      : 'Aucun objectif saisi à cet endroit cette semaine : rien n’a changé.');
+  }
   if (count > 0) await recalculatePlanAfterEvent(context.value.ownerUserId, { kind: 'objective-changed', season: input.season, at: weekStart, lasting: true });
   return successWithDashboard(
     context.value,
@@ -536,6 +554,7 @@ async function successWithDashboard(
         allowWeatherRefresh: forceWeatherRefresh,
         includeWeatherAlerts: true,
         includeAutomaticObjective: true,
+        includeForecastModelSetting: true,
       }),
     };
   } catch (error) {

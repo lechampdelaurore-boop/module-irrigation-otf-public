@@ -271,3 +271,15 @@ les cinq autres PR n'en dépendent pas.
   démonstration en ligne, sur ordinateur et sur son téléphone.
 - L'ancre d'une ressource limitée et la page d'alerte d'un jour quand les
   deux alertes sont cochées restent à confirmer en codant.
+
+## Depuis S4 (lot S4, D-335, `docs/simplification-s4-contract.md`, PR 4)
+
+Les liens qui menaient à « Objectifs et besoins » ou au planning mènent à
+« Semaine », chacun à la même ancre (L1, L3) : les tuiles, les lignes d'« Eau
+de la semaine », la ligne du plan, « Plan calculé … », la proposition à
+« Changer l'heure ou la dose », les lignes de « Fiabilité du calcul ». Les mots
+qui nommaient une page disparue changent : « Voir le planning de la semaine »
+et « Voir au planning » deviennent « Voir la semaine », comme le lien d'« Eau
+de la semaine ». « Noter la pluie » de « Fiabilité du calcul » ouvre toujours
+sa fenêtre sur la page ; quand elle n'y est pas offerte, le lien mène à
+« Semaine », qui l'ouvre à l'arrivée (`?pluie=1`, lue une fois).

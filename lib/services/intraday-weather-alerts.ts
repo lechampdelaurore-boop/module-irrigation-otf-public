@@ -4,11 +4,12 @@ import { listWeatherAlertCriteriaForWorkspace } from '@/db/weather-alert-reposit
 import { logJsonLine, type LogLevel } from '../adapters/log';
 import { intradayWeatherOutcome } from '../domain/operations/morning-task-outcomes';
 import { readsForecastAlerts } from '../domain/weather/intraday-alerts';
+import type { ModelForecastReader } from '../domain/weather/forecast-models';
 import type { WeatherProvider } from '../domain/weather/weather-provider';
 import { evaluateCropAlertsAfterForecastWrite } from './crop-alerts-service';
 import { getEnabledFeaturesForWorkspace } from './feature-selection-service';
 import { recordTaskOutcomes } from './task-runs';
-import { getConfiguredWeatherProvider } from './weather/configured-provider';
+import { getConfiguredWeatherProvider, getModelForecastReader } from './weather/configured-provider';
 import { runAutomaticWeatherSync, type AutomaticWeatherSyncRepository, type ForecastWrittenHandler } from './weather/automatic-sync';
 import { evaluateWeatherAlertsAfterForecastWrite } from './weather-alerts-service';
 
@@ -52,6 +53,7 @@ export async function runIntradayWeatherAlerts({
   now = new Date(),
   repository = intradayWeatherRepository,
   provider = getConfiguredWeatherProvider(),
+  modelReader = getModelForecastReader(),
   includeTarget = (target) => farmReadsForecastAlerts(target.workspaceId),
   onForecastWritten = evaluateAlerts,
   sleep,
@@ -60,6 +62,8 @@ export async function runIntradayWeatherAlerts({
   now?: Date;
   repository?: AutomaticWeatherSyncRepository;
   provider?: WeatherProvider;
+  /** Le lecteur des modèles choisis par les fermes (D-346) ; `null` : toutes lisent « Automatique ». */
+  modelReader?: ModelForecastReader | null;
   includeTarget?: (target: { workspaceId: string }) => Promise<boolean>;
   onForecastWritten?: ForecastWrittenHandler;
   sleep?: (delayMs: number) => Promise<void>;
@@ -70,6 +74,7 @@ export async function runIntradayWeatherAlerts({
     const weather = await runAutomaticWeatherSync({
       repository,
       provider,
+      modelReader,
       now,
       mode: 'intraday',
       includeTarget,

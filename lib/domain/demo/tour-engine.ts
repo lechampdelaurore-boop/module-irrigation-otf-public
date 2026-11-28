@@ -1,4 +1,5 @@
 import { TOURS, tourById, type Tour, type TourId, type TourPage, type TourStep } from './tours.ts';
+import { displayedPage } from '../features/pages.ts';
 
 /**
  * Le déroulé des visites guidées (docs/demo-guided-contract.md, section 7 ;
@@ -14,15 +15,23 @@ export type TourPosition = { tour: TourId; step: number };
 /** La page ouverte et les pages que la ferme peut ouvrir (son menu). */
 export type TourContext = { current: TourPage; reachable: readonly TourPage[] };
 
+/** La page qui montre une page d'étape : « Semaine » pour le planning, les besoins et l'historique (lot S4, section 3.3). */
+function shownPage(page: TourPage): TourPage {
+  return page === 'bienvenue' ? page : displayedPage(page);
+}
+
 /**
  * La page où l'étape se joue : la page ouverte quand elle convient, sinon la
  * première des pages de l'étape que la ferme peut ouvrir ; `null` quand
- * aucune ne l'est (case décochée) : l'étape est alors sautée.
+ * aucune ne l'est (case décochée) : l'étape est alors sautée. Une étape du
+ * planning se joue sur « Semaine », qui le montre, et seulement pour une
+ * ferme qui a coché le planning (lot S4).
  */
 export function stepPage(step: TourStep, context: TourContext): TourPage | null {
   if (!step.pages) return context.current;
   if (step.pages.includes(context.current)) return context.current;
-  return step.pages.find((page) => context.reachable.includes(page)) ?? null;
+  const page = step.pages.find((candidate) => context.reachable.includes(candidate));
+  return page === undefined ? null : shownPage(page);
 }
 
 export type PlayableStep = { index: number; page: TourPage };

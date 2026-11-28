@@ -7,7 +7,7 @@ import {
   TITRES_DES_PAGES,
   verifierCibleTactile,
   verifierLEtape,
-  type PageDuModule,
+  type PageDuMenu,
 } from './support/parcours.ts';
 
 /**
@@ -26,7 +26,7 @@ import {
 test('le « ? » de chaque page l’explique ; une bulle dit d’où vient un chiffre', async ({ page }, testInfo) => {
   const journal = surveillerLaConsole(page);
 
-  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuModule[]) {
+  for (const cible of Object.keys(TITRES_DES_PAGES) as PageDuMenu[]) {
     await attendreLaPageIrrigation(page, cible);
     await verifierLAideDeLaPage(page, TITRES_DES_PAGES[cible]);
     await verifierLEtape(page, journal, `aide de la page ${TITRES_DES_PAGES[cible]}`);

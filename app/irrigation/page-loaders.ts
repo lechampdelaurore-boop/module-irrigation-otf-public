@@ -1,6 +1,6 @@
 import { getChangeJournalViewForUser } from '@/lib/services/change-journal-view';
+import { readOffSeasonViewForUser } from '@/lib/services/off-season-view';
 import { listEquipmentPlacementsForUser } from '@/db/equipment-placement-repository';
-import { logJsonLine } from '@/lib/adapters/log';
 import { countFeatureDataForUser } from '@/db/feature-data-counts';
 import { listEquipmentPoseHistoryForUser, listEquipmentPosesForUser } from '@/db/equipment-placement-poses';
 import { listEquipmentForUser } from '@/db/equipment/read';
@@ -13,7 +13,6 @@ import { listProtectedSlotsForUser } from '@/db/protected-slots-repository';
 import { usesPushNotifications, usesSpeciesCorrespondence, usesWeather } from '@/lib/domain/features/socle';
 import { plotShelterLines } from '@/lib/domain/onboarding/plots';
 import { calculateIrrigationCoverage } from '@/lib/domain/irrigation-coverage';
-import { getAppliedWaterGapsForUser } from '@/lib/services/applied-water-gap';
 import { getCropCoefficientsViewForUser } from '@/lib/services/crop-water-coefficients';
 import { getIrrigationFormHintsForUser } from '@/lib/services/irrigation-form-hints';
 import { getIrrigationHistoryDashboardForUser } from '@/lib/services/irrigation-history-service';
@@ -26,7 +25,6 @@ import { getSoilReserveViewForUser } from '@/lib/services/soil-reserve-view';
 import { getWaterDashboardForUser } from '@/lib/services/water-dashboard';
 import { getWaterResourceDashboardForUser } from '@/lib/services/water-resource-dashboard';
 import { getTodayViewForUser } from '@/lib/services/today-service';
-import { todaySeason } from '@/lib/domain/today/today-view';
 import type { ReadyPageContext } from './page-context';
 
 import { getSettingsReviewForUser } from '@/lib/services/onboarding-settings';
@@ -56,7 +54,12 @@ async function loadEquipmentState(context: ReadyPageContext) {
   return { equipment, equipmentPlacements, equipmentPoses, equipmentPoseHistory, gardenGroupConfiguration };
 }
 
-function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = false, includeAutomaticObjective = false) {
+function loadWaterDashboard(
+  context: ReadyPageContext,
+  includeWeatherAlerts = false,
+  includeAutomaticObjective = false,
+  includeForecastModelSetting = false,
+) {
   return getWaterDashboardForUser({
     ownerUserId: context.userId,
     season: context.season,
@@ -64,6 +67,7 @@ function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = fa
     weekStart: context.week,
     includeWeatherAlerts,
     includeAutomaticObjective,
+    includeForecastModelSetting,
     now: new Date(context.nowIso),
   });
 }
@@ -71,9 +75,10 @@ function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = fa
 /**
  * Avant la 3.8, chaque ouverture du module relisait la météo périmée en
  * construisant le tableau de l'eau. Les pages qui lisent la météo sans ce
- * tableau (le planning, la réserve du sol, le besoin par culture) le
- * construisent donc aussi, en parallèle de leurs lectures, sans l'afficher :
- * une ferme qui n'ouvre que ces pages garde une météo à jour.
+ * tableau (la réserve du sol, le besoin par culture) le construisent donc
+ * aussi, en parallèle de leurs lectures, sans l'afficher : une ferme qui
+ * n'ouvre que ces pages garde une météo à jour. « Semaine » le lit avec les
+ * besoins, que le planning exige.
  */
 async function refreshStaleWeather(context: ReadyPageContext): Promise<void> {
   await loadWaterDashboard(context);
@@ -130,14 +135,14 @@ export async function loadArrosagesPage(context: ReadyPageContext) {
   return { ...state, irrigationEvents, pumpDashboard, planningSettings, protectedSlots, waterDashboard, formHints };
 }
 
-export async function loadBesoinsPage(context: ReadyPageContext) {
+/** Ce que montrait « Objectifs et besoins » : le tableau de l'eau de la semaine et le besoin par planche. */
+async function readBesoins(context: ReadyPageContext) {
   const [state, irrigationEvents, waterDashboard] = await Promise.all([
     loadEquipmentState(context),
     listIrrigationEventsForUser(context.userId, context.season, true),
     // Le réglage « Objectif automatique » vit dans le volet des objectifs de cette page (D-319).
     loadWaterDashboard(context, false, true),
   ]);
-  context.lap('dashboards');
   const coverage = calculateIrrigationCoverage({
     beds: context.snapshot.beds.filter((bed) => bed.seasons.includes(context.season)),
     groups: state.gardenGroupConfiguration.groups,
@@ -153,39 +158,48 @@ export async function loadBesoinsPage(context: ReadyPageContext) {
     events: irrigationEvents,
     coverage: coverage.beds,
   });
-  context.lap('needs');
-  return { waterDashboard, irrigationNeeds };
+  // Le bloc « Hors saison » du volet des objectifs (6 quaterdecies, B3) : les portées que les besoins viennent de lire, sans lecture de plus.
+  const offSeason = await readOffSeasonViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot, now: new Date(context.nowIso) });
+  // Les irrigations de la saison servent aussi à « Jour par jour » (S4, PR 2, section 5) : aucune lecture de plus.
+  return { waterDashboard, irrigationNeeds, irrigationEvents, offSeason };
 }
 
-export async function loadPlanningPage(context: ReadyPageContext) {
-  const [weeklyPlan, planningSettings, protectedSlots, soilReserve, waterGap] = await Promise.all([
+/**
+ * Ce que montrait le « Planning de la semaine ». La météo périmée se relit
+ * avec le tableau de l'eau des besoins, que le planning exige (case) : la
+ * page « Semaine » le lit déjà.
+ */
+async function readPlanning(context: ReadyPageContext) {
+  const [weeklyPlan, planningSettings, protectedSlots, soilReserve] = await Promise.all([
     readWeeklyPlanForUser({ ownerUserId: context.userId, season: context.season, now: new Date(context.nowIso) }),
     readPlanningSettingsForUser(context.userId),
     listProtectedSlotsForUser(context.userId),
     context.enabled.includes('sol')
       ? getSoilReserveViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot, now: new Date(context.nowIso) })
       : null,
-    loadWaterGap(context),
-    refreshStaleWeather(context),
   ]);
-  context.lap('dashboards');
-  return { weeklyPlan, planningSettings, protectedSlots, soilNotes: soilReserve?.proposalSoilNotes ?? {}, waterGap };
+  return { weeklyPlan, planningSettings, protectedSlots, soilNotes: soilReserve?.proposalSoilNotes ?? {} };
 }
 
 /**
- * L'écart du prévu des trois semaines passées (amélioration n° 5, F735) :
- * une information, lue pour la saison de la semaine en cours seulement ; un
- * échec de sa lecture laisse le planning sans le bloc, et se journalise.
+ * La page « Semaine » (simplification, lot S4, docs/simplification-s4-contract.md,
+ * sections 3.2 et 3.4) : la vue « Les cumuls » ne lit que l'historique ; la
+ * vue « La semaine » lit, en même temps, ce que lisaient le planning et
+ * « Objectifs et besoins », selon les cases. Les lectures sont celles d'avant,
+ * avec les mêmes paramètres.
  */
-async function loadWaterGap(context: ReadyPageContext) {
-  const now = new Date(context.nowIso);
-  if (context.season !== todaySeason(now)) return null;
-  try {
-    return await getAppliedWaterGapsForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot, enabled: context.enabled, now });
-  } catch (error) {
-    logJsonLine('warn', { event: 'applied_water_gap_failed', season: context.season, error: error instanceof Error ? error.message : String(error), failedAt: now.toISOString() });
-    return null;
+export async function loadSemainePage(context: ReadyPageContext) {
+  if (context.weekView === 'cumuls') {
+    const { irrigationHistory } = await readHistorique(context);
+    context.lap('dashboards');
+    return { view: 'cumuls' as const, irrigationHistory };
   }
+  const [planning, besoins] = await Promise.all([
+    context.enabled.includes('planning') ? readPlanning(context) : null,
+    context.enabled.includes('besoins') ? readBesoins(context) : null,
+  ]);
+  context.lap('dashboards');
+  return { view: 'semaine' as const, planning, besoins };
 }
 
 export async function loadRessourcesPage(context: ReadyPageContext) {
@@ -226,7 +240,7 @@ export async function loadWaterDashboardPage(context: ReadyPageContext, includeW
   return { waterDashboard };
 }
 
-export async function loadHistoriquePage(context: ReadyPageContext) {
+async function readHistorique(context: ReadyPageContext) {
   const irrigationHistory = await getIrrigationHistoryDashboardForUser({
     ownerUserId: context.userId,
     season: context.season,
@@ -234,7 +248,6 @@ export async function loadHistoriquePage(context: ReadyPageContext) {
     now: new Date(context.nowIso),
     selection: { period: { mode: 'week' }, scope: { level: 'farm' }, page: 1 },
   });
-  context.lap('dashboards');
   return { irrigationHistory };
 }
 
@@ -249,7 +262,8 @@ export async function loadReglagesPage(context: ReadyPageContext) {
   const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices, noDeviceAtLastAlert, changeJournal] = await Promise.all([
     countFeatureDataForUser(context.userId),
     getOnboardingForUser(context.userId),
-    usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
+    // La carte « Modèle de prévision » (D-347) se lit ici seulement.
+    usesWeather(context.enabled) ? loadWaterDashboard(context, false, false, true) : null,
     usesSpeciesCorrespondence(context.enabled)
       ? getCropCoefficientsViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot })
       : null,
