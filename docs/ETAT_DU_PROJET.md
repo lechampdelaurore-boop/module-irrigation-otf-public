@@ -25,10 +25,11 @@ registres, elle y renvoie.
   correction ; contrôles : voir la PR. Parcours seuls : aucun écran,
   calcul ni migration. Fusion à son tour, après la ligne 37 et #258.
   Consigne la mise en ligne de #258 (dc83ae1, fusionnée le 28 novembre
-  2026 à 12 h 38, run 46140842075, en ligne à 13 h 34, cinq jobs verts)
-  et la recette de S6, faite et conforme le 27 novembre 2026 vers
-  12 h 20 (démonstration, ferme vierge, dans le Chrome du porteur, avec
-  son accord) ; celle de #261 l'est déjà (par HR1).
+  2026 à 12 h 38, run 46140842075, en ligne à 13 h 34, cinq jobs verts),
+  sa recette sur la démonstration, conforme le 28 novembre 2026, et la
+  recette de S6, faite et conforme le 27 novembre 2026 vers 12 h 20
+  (démonstration, ferme vierge, dans le Chrome du porteur, avec son
+  accord) ; celle de #261 l'est déjà (par HR1).
 - **Simplifier l'usage du module, S5 : les millimètres d'abord au
   démarrage d'un arrosage, demandé par le porteur le 26 novembre 2026 à
   20 h 10 et codé le même jour** (D-354, F1087 à F1092 ; avenant au
@@ -46,7 +47,8 @@ registres, elle y renvoie.
   46132250984, en ligne à 11 h 30, cinq jobs verts) : **l'ET0 horaire
   (ligne 37) est en ligne en entier** ; celle de #261 l'est déjà (par HR1). **Fusionnée le 28 novembre
   2026 à 12 h 38** (#258, dc83ae1), **en ligne à 13 h 34** (run
-  46140842075, cinq jobs verts) ; consigné par #259.
+  46140842075, cinq jobs verts), **recette conforme le même jour**
+  (démonstration) ; consigné par #259.
 - **L'ET0 horaire, HR3 : « Soif du jour, heure par heure », codée le
   26 novembre 2026** (D-350, F1043 à F1050 ; contrat
   `docs/et0-horaire-contract.md`, § 7 ; roadmap ligne 37), en Opus 5.5 ·
