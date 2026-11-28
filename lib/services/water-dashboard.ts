@@ -39,6 +39,7 @@ import { getConfiguredWeatherProvider, getModelForecastReader, weatherAttributio
 import { evaluateForecastAlertsForUser, writeForecastReadingForUser } from './weather/forecast-write';
 import { forecastModelToRead, resolveForecastModelChoice, type ModelForecastReader } from '../domain/weather/forecast-models';
 import { WeatherProviderError, type WeatherProvider } from '../domain/weather/weather-provider';
+import { TODAY_WEATHER_DAYS } from '../domain/today/today-view';
 import { oldestWeatherReadingInUse, weatherRefreshRequired, weatherRequestRanges } from '../domain/weather/cache-policy';
 import { weatherLocationKey, weatherLocationQuery } from '../domain/weather/location';
 import { weatherGeocodingRequired } from '../domain/weather/refresh-control';
@@ -397,7 +398,8 @@ async function refreshWeather({
 }) {
   const at = now.toISOString();
   const today = dateKeyInTimeZone(now, location.timezone);
-  const ranges = weatherRequestRanges({ weekStart, today });
+  // La semaine en cours lit aussi les trois jours d'« Aujourd'hui », lundi compris le week-end (D-357).
+  const ranges = weatherRequestRanges({ weekStart, today, forecastDaysFromToday: TODAY_WEATHER_DAYS });
   logJsonLine('info', {
     event: 'weather_refresh_started',
     provider: provider.id,

@@ -13003,3 +13003,40 @@ une recette suffit ; rien ne change en ligne.
 **Preuves.** `tests/hors-saison-recette.test.ts` (3 tests) ; les suites
 du domaine, le typage et le lint passent ; aucun parcours ne lisait ces
 textes.
+
+## D-357 — La lecture météo de la semaine en cours couvre les trois jours d'« Aujourd'hui », lundi compris le week-end
+
+Date : 28 novembre 2026. Statut : appliquée, sous la conduite de
+l'assistant (correction d'un job rouge) ; modifiable à la relecture du
+porteur. Aucune règle agronomique, aucune migration, aucun écran changé.
+
+**Constat.** Le samedi 28 novembre 2026, le parcours P29 a échoué sur
+toute branche, `main` comprise, aux deux largeurs (PR #261, run
+46080341539 et sa relance de 2 h 45) : « Aujourd'hui » montrait un bloc
+« Gel ou chaleur » en trop, « Prévision indisponible le lun. 30 nov. : à
+vérifier ». « Aujourd'hui » montre trois jours (`TODAY_WEATHER_DAYS`),
+mais la lecture faite à la consultation (`weatherRequestRanges`,
+`lib/domain/weather/cache-policy.ts`) s'arrêtait au dimanche de la
+semaine en cours. Un samedi ou un dimanche, le troisième jour tombe dans
+la semaine suivante, que seule la tâche du matin (J0 à J+14) lit ; les
+parcours ne la jouent pas (`forecastValues: 2` au journal du serveur).
+Ce n'est pas un défaut des parcours seulement : une ferme que la tâche du
+matin n'a pas encore lue (créée le week-end), ou un matin où la tâche a
+échoué, voit le même message pour un jour dont la prévision est pourtant
+à portée de la même lecture.
+
+**Décision.** La lecture de la semaine en cours, à la consultation ou à
+la demande, va aussi jusqu'au dernier des trois jours d'« Aujourd'hui »
+quand il dépasse dimanche, dans la limite de J+14 (**F1100**). Un samedi,
+lundi ; un dimanche, lundi et mardi ; du lundi au vendredi, rien ne
+change. Une autre semaine garde ses sept jours, la réanalyse ne change
+pas. Une seule lecture externe comme avant, de un ou deux jours de plus.
+Retenue plutôt que de préparer la prévision du lundi dans P29 : le
+parcours aurait caché un manque réel de l'écran.
+
+**Vérifié par** `tests/weather-domain.test.ts` (« un samedi, la semaine
+en cours lit aussi la prévision des trois jours d'« Aujourd'hui » »),
+rouge avant la correction ; et par P29, joué en local le samedi
+28 novembre 2026 à 3 h 31 (heure de Paris) : rouge aux deux largeurs sur
+`main` (« Gel ou chaleur » en trop, `forecastValues: 2`), vert avec la
+correction (`forecastValues: 3`, 2 passed).

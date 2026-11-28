@@ -44,17 +44,31 @@ export function weatherRefreshClaimed(meta: {
   return Number(meta.changes ?? 0) > 0 || Number(meta.rows_written ?? 0) > 0;
 }
 
+/**
+ * Les dates qu'une consultation lit chez le fournisseur pour une semaine :
+ * ses prévisions d'aujourd'hui à dimanche, ses réanalyses disponibles. Pour
+ * la semaine en cours, la prévision va aussi jusqu'au dernier des
+ * `forecastDaysFromToday` jours à partir d'aujourd'hui, même au-delà de
+ * dimanche : « Aujourd'hui » montre trois jours, et un samedi ou un
+ * dimanche le troisième tombe dans la semaine suivante, que seule la tâche
+ * du matin aurait lue (docs/weather-contract.md, D-357).
+ */
 export function weatherRequestRanges({
   weekStart,
   today,
+  forecastDaysFromToday = 0,
 }: {
   weekStart: string;
   today: string;
+  forecastDaysFromToday?: number;
 }) {
   const weekEnd = addDaysToDateKey(weekStart, 6);
   const forecastStart = weekStart > today ? weekStart : today;
   const forecastMax = addDaysToDateKey(today, 14);
-  const forecastEnd = weekEnd < forecastMax ? weekEnd : forecastMax;
+  const currentWeek = weekStart <= today && today <= weekEnd;
+  const lastShownDay = addDaysToDateKey(today, Math.max(0, forecastDaysFromToday - 1));
+  const wantedEnd = currentWeek && lastShownDay > weekEnd ? lastShownDay : weekEnd;
+  const forecastEnd = wantedEnd < forecastMax ? wantedEnd : forecastMax;
   const archiveMax = addDaysToDateKey(today, -5);
   const archiveEnd = weekEnd < archiveMax ? weekEnd : archiveMax;
   return {
