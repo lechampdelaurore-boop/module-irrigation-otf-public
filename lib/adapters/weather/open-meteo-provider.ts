@@ -8,6 +8,7 @@ import {
   type ModelForecastDay,
   type ModelForecastReader,
 } from '../../domain/weather/forecast-models.ts';
+import { hourlyValuesInLocalOrder } from '../../domain/weather/hourly-et0.ts';
 import {
   WeatherProviderError,
   type WeatherDailyValue,
@@ -44,6 +45,14 @@ const MODEL_DAILY_SERIES = {
   et0Mm: 'et0_fao_evapotranspiration',
   solarEnergyMegajoulesPerSquareMeter: 'shortwave_radiation_sum',
 } as const;
+
+/**
+ * L'ET0 heure par heure, demandée dans le même appel que les jours de la
+ * prévision (docs/et0-horaire-contract.md, § 2 choix 8 ; D-349) : aucun appel
+ * de plus. Elle ne sert qu'à la forme de la journée ; une série absente ou
+ * incomplète ne refuse jamais la lecture du jour.
+ */
+const HOURLY_ET0_SERIES = 'et0_fao_evapotranspiration';
 
 const EDGE_CACHE_SECONDS: Record<WeatherEndpoint, number> = {
   geocoding: 30 * 24 * 60 * 60,
@@ -131,11 +140,17 @@ export class OpenMeteoWeatherProvider implements WeatherProvider, ModelForecastR
     url.searchParams.set('start_date', input.startDate);
     url.searchParams.set('end_date', input.endDate);
     url.searchParams.set('daily', Object.values(MODEL_DAILY_SERIES).join(','));
+    url.searchParams.set('hourly', HOURLY_ET0_SERIES);
     url.searchParams.set('models', models.join(','));
     const apiKey = this.access.apiKey?.trim();
     if (apiKey) url.searchParams.set('apikey', apiKey);
     const payload = await this.readJson(url, 'forecast', input.bypassCache === true);
-    const [chosen, completion] = models.map((model) => readModelDays(payload, model, models.length > 1));
+    const [chosen, completion] = models.map((model) => withHourlyEt0(
+      readModelDays(payload, model, models.length > 1),
+      payload,
+      models.length > 1 ? `${HOURLY_ET0_SERIES}_${model}` : HOURLY_ET0_SERIES,
+      input.timezone,
+    ));
     return forecastDaysForModel(modelId, chosen ?? [], completion ?? chosen ?? []);
   }
 
@@ -169,6 +184,7 @@ export class OpenMeteoWeatherProvider implements WeatherProvider, ModelForecastR
     url.searchParams.set('start_date', input.startDate);
     url.searchParams.set('end_date', input.endDate);
     url.searchParams.set('daily', 'precipitation_sum,et0_fao_evapotranspiration');
+    if (endpointKind === 'forecast') url.searchParams.set('hourly', HOURLY_ET0_SERIES);
     const payload = await this.readJson(url, endpointKind, input.bypassCache === true);
     if (!isRecord(payload) || !isRecord(payload.daily)) {
       throw new WeatherProviderError('Réponse météo quotidienne invalide.', {
@@ -183,7 +199,7 @@ export class OpenMeteoWeatherProvider implements WeatherProvider, ModelForecastR
         kind: 'invalid-response', endpoint: endpointKind,
       });
     }
-    return time.flatMap((date, index): WeatherDailyValue[] => {
+    const days = time.flatMap((date, index): WeatherDailyValue[] => {
       if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return [];
       return [{
         date,
@@ -191,6 +207,7 @@ export class OpenMeteoWeatherProvider implements WeatherProvider, ModelForecastR
         et0Mm: nullableNonNegative(Array.isArray(et0) ? et0[index] : null),
       }];
     });
+    return endpointKind === 'forecast' ? withHourlyEt0(days, payload, HOURLY_ET0_SERIES, input.timezone) : days;
   }
 
   private readJson(
@@ -319,6 +336,24 @@ function readModelDays(payload: unknown, model: string, suffixed: boolean): Weat
       maximumTemperatureCelsius: finiteNumber(series.maximumTemperatureCelsius[index]),
       solarEnergyMegajoulesPerSquareMeter: nullableNonNegative(series.solarEnergyMegajoulesPerSquareMeter[index]),
     }];
+  });
+}
+
+/**
+ * Joint à chaque jour ses heures d'ET0 du fournisseur (source
+ * `provider-hourly`, D-349), rangées par heure d'horloge du lieu. Un jour
+ * dont les heures manquent, ou ne sont pas en même nombre que les heures du
+ * jour du lieu, n'en reçoit pas (F1039) : la forme passera à la source
+ * suivante, jamais un décalage ni un zéro.
+ */
+function withHourlyEt0(days: WeatherDailyValue[], payload: unknown, seriesKey: string, timeZone: string): WeatherDailyValue[] {
+  if (!isRecord(payload) || !isRecord(payload.hourly)) return days;
+  const time = payload.hourly.time;
+  const values = payload.hourly[seriesKey];
+  if (!Array.isArray(time) || !Array.isArray(values)) return days;
+  return days.map((day) => {
+    const valuesMm = hourlyValuesInLocalOrder(day.date, timeZone, time, values);
+    return valuesMm ? { ...day, hourlyEt0: { nature: 'provider-hourly' as const, valuesMm } } : day;
   });
 }
 

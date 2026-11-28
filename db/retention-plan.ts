@@ -115,6 +115,11 @@ export const RETENTION_PLAN: Readonly<Record<string, RetentionRule & { purge?: s
     erasedBy: 'La purge du matin, par jour d’émission (D-297) ; l’effacement de la ferme, sept jours après sa demande, comme toute table d’un espace (F563, F641).',
     purge: 'issued_on < ?',
   },
+  irrigation_weather_day_shapes: {
+    kept: RETENTION_WORDS.irrigation_weather_day_shapes,
+    erasedBy: 'La purge du matin, par jour (D-349) ; aucune ligne n’est d’une ferme : la forme de la journée d’un lieu, partagée par ses fermes.',
+    purge: 'day < ?',
+  },
 };
 
 /** Les tables d'un espace, l'espace compris, sauf celles qui ont leur propre durée dans `RETENTION_PLAN`. */

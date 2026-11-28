@@ -18,6 +18,27 @@ source détaillée commit par commit.
   reproduits sur `main`, puis verts avec la correction. Aucun écran ni
   calcul changé.
 
+### Ajouté (ET0 horaire, HR2 : lire les heures et garder la forme de la journée)
+
+- **La forme de la journée se lit et se garde** (D-349, F1036 à F1042) :
+  la lecture du matin et celles de la journée rapportent l'ET0 heure par
+  heure (Open-Meteo la donne ; pour Visual Crossing, le module la calcule
+  à partir des heures prévues, selon la méthode FAO-56), sans appel ni
+  coût de plus, et gardent la forme d'aujourd'hui, demain et
+  après-demain pour chaque lieu, huit jours au plus. Rien ne s'affiche
+  encore et aucun chiffre existant ne change : l'écran vient avec HR3.
+
+### Ajouté (ET0 horaire, HR1 : la forme de la journée, sans écran)
+
+- **La forme de la journée, en calcul seul** (D-348, F1031 à F1035) : à
+  partir de l'ET0 heure par heure, ou à défaut de la course du soleil, le
+  module sait dire quelle part de la consommation du jour tombe dans chaque
+  heure, combien est déjà passé et combien reste à venir, et à quelles
+  heures l'évaporation est la plus forte (75 % du maximum). Les jours de
+  changement d'heure comptent 23 ou 25 heures. Rien ne s'affiche encore et
+  aucun chiffre existant ne change : la lecture vient avec HR2, l'écran
+  avec HR3.
+
 ### Corrigé (la météo du lundi dans « Aujourd'hui », le week-end)
 
 - **La lecture météo de la semaine en cours va jusqu'au troisième jour

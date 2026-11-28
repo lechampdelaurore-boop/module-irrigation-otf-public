@@ -146,6 +146,7 @@ export const KEPT_TABLES: Readonly<Record<string, string>> = {
   irrigation_farm_erasures: 'L\'enregistrement minimal de la demande, qui prouve qu\'elle a été traitée : l\'identifiant interne de l\'espace, l\'état et des dates ; ni nom, ni personne, ni ferme, ni contenu.',
   irrigation_background_jobs: 'Les exécutions des tâches du module (le registre) : des heures, des nombres et des classes d\'erreur, communes à toutes les fermes.',
   irrigation_operator_notices: 'La notification du jour de la veille de l\'exploitant : un genre, un nombre et des heures.',
+  irrigation_weather_day_shapes: 'La forme de la journée de l\'ET0 horaire d\'un lieu (D-349) : la commune géocodée et des parts d\'heures, partagées par les fermes de ce lieu, aucune ligne d\'une ferme ; huit jours, purgés chaque matin.',
   irrigation_crop_alert_common: 'Les seuils de gel communs, les mêmes pour toutes les fermes : aucune ligne n\'est d\'une ferme.',
   irrigation_crop_sensitive_stage_common: 'La liste préremplie des stades sensibles au manque d\'eau, la même pour toutes les fermes : aucune ligne n\'est d\'une ferme.',
   otf_deployment_farm: 'La ferme de la clé du déploiement, un identifiant d\'Ouvre ta ferme et une heure : le réglage du déploiement, réécrit à chaque lecture, pas une donnée de la personne.',

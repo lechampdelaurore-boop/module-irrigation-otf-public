@@ -2116,6 +2116,7 @@ Le jugement d'une carte : **rouge** pour un raccordement révoqué ou hors d'usa
 | `irrigation_support_accesses` (10 bis.21) | le journal d'accès du support : le jour, la ferme, la raison en une ligne | 12 mois | la purge du matin ; l'effacement du dernier espace de la ferme (F642) |
 | `irrigation_cost_readings` (10 bis.21) | le relevé des coûts du mois, copié du tableau de bord | sans limite | personne : des nombres du déploiement, d'aucune ferme |
 | `irrigation_weather_forecast_archive` (archive des prévisions, D-297) | une table d'espace : chaque jour, les prévisions J+1 à J+7 de la première lecture réussie, jamais écrasées | 24 mois | la purge du matin, par jour d'émission ; l'effacement de la ferme, comme toute table d'un espace (F563) |
+| `irrigation_weather_day_shapes` (forme de la journée de l'ET0 horaire, D-349) | une table commune, par lieu : les parts d'heures de J0 à J+2 d'une lecture de prévision, aucune ligne d'une ferme | 8 jours | la purge du matin, par jour ; jamais l'effacement d'une ferme (aucune ligne n'est d'une ferme) |
 
 Hors de la base D1, les durées de F562 tiennent sans code nouveau : les journaux des Workers, 7 jours chez Cloudflare (F354) ; l'historique Time Travel, 30 jours ; l'export de la semaine, gardé par le porteur (10 bis.9), cinq semaines au plus (10 bis.20, F657). Les abonnements de notification vivent dans le Worker de notification, pas dans D1 (voir plus haut).
 

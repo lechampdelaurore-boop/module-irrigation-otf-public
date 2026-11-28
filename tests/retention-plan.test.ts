@@ -59,6 +59,7 @@ test('les limites à 6 h 16 le 28 novembre 2026 : deux jours, huit jours à l’
   assert.equal(at('irrigation_operator_notices'), '2026-10-24');
   assert.equal(at('irrigation_support_accesses'), '2025-11-28');
   assert.equal(at('irrigation_weather_forecast_archive'), '2024-11-28', 'l’archive des prévisions, 24 mois (D-297)');
+  assert.equal(at('irrigation_weather_day_shapes'), '2026-11-20', 'la forme de la journée, 8 jours (D-349)');
   assert.equal(OPERATOR_NOTICES_KEPT_DAYS, 35);
   assert.deepEqual(RETENTION_WORDS, {
     otf_call_starts: '2 jours',
@@ -69,6 +70,7 @@ test('les limites à 6 h 16 le 28 novembre 2026 : deux jours, huit jours à l’
     irrigation_operator_notices: '35 jours',
     irrigation_support_accesses: '12 mois',
     irrigation_weather_forecast_archive: '24 mois',
+    irrigation_weather_day_shapes: '8 jours',
   });
 });
 

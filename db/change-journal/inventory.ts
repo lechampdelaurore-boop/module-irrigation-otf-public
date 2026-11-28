@@ -123,6 +123,7 @@ export const OUTSIDE_JOURNAL: Readonly<Record<string, string>> = {
   irrigation_weather_daily_values: `${WEATHER} La pluie mesurée y est aussi : une observation.`,
   irrigation_weather_forecast_archive: `${WEATHER} L’archive des prévisions J+1 à J+7, jamais écrasée (D-297).`,
   irrigation_weather_geocodes: WEATHER,
+  irrigation_weather_day_shapes: `${WEATHER} La forme de la journée de l’ET0 horaire d’un lieu, J0 à J+2, huit jours (D-349).`,
   // Journaux de domaine.
   irrigation_planning_settings_log: DOMAIN_LOG,
   irrigation_protected_slots_log: DOMAIN_LOG,

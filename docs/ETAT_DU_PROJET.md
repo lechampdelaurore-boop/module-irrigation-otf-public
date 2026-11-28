@@ -24,6 +24,37 @@ registres, elle y renvoie.
   reproduits sur `main` sans attendre minuit, puis verts avec la
   correction ; contrôles : voir la PR. Parcours seuls : aucun écran,
   calcul ni migration. Fusion après la file en cours, une PR à la fois.
+- **L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger,
+  codée le 26 novembre 2026** (D-349, F1036 à F1042 ; contrat
+  `docs/et0-horaire-contract.md`, § 5, § 9 et § 11 ; roadmap ligne 37), en
+  Opus 5.5 · Élevé, sur la branche de HR1. Heures d'ET0 d'Open-Meteo dans
+  le même appel ; pour Visual Crossing, heures de la prévision seulement
+  (un seul enregistrement, vérifié sur ses pages ; `queryCost`
+  journalisé) et ET0 horaire FAO-56 calculée par le module ; table
+  additive `irrigation_weather_day_shapes` (migration 0054),
+  J0 à J+2 par lieu et par source, écrite au matin et aux relectures, purgée
+  après 8 jours ; une écriture en échec ne change rien à la météo. Aucun
+  écran, aucun calcul existant changé. Contrôles : voir la PR (`pnpm e2e`
+  joué par la CI). Vient HR3 (l'écran). Consigne la mise en ligne du
+  contrat (#243, 2bfd9cf, run 46119745752, en ligne le 28 novembre 2026 à
+  9 h 04, cinq jobs verts).
+- **L'ET0 horaire, HR1 : la forme de la journée, domaine pur, codée le
+  26 novembre 2026** (D-348, F1031 à F1035 ; contrat
+  `docs/et0-horaire-contract.md`, § 4 et § 11 ; roadmap ligne 37), en
+  Opus 5.5 · Élevé, sur la branche de la PR 3 de la météo multi-modèles,
+  contrat #243 fusionné dedans. `lib/domain/weather/hourly-et0.ts` : les
+  heures du jour du lieu (23, 24 ou 25), les parts, la forme théorique du
+  soleil, la meilleure source, le consommé et le reste, la plage de forte
+  évaporation ; 22 tests (scénarios 1 à 6, 8 et 9). Aucune base, aucun
+  appel, aucun écran ; aucun calcul existant changé. Contrôles : voir la
+  PR (`pnpm e2e` omis : ni l'interface ni ses services ne changent).
+  Viennent HR2 (lecture, table, purge) et HR3 (écran) ; fusion à son tour,
+  après #243 et la météo multi-modèles. Consigne la mise en ligne de la
+  correction du week-end (#262, 8419477, run 46107116135, en ligne le
+  28 novembre 2026 à 6 h 17, cinq jobs verts) et de la clôture de la
+  ligne 36 (#261, 2841013, run 46111653877, en ligne à 7 h 15, cinq jobs
+  verts).
+
 - **Météo multi-modèles : ligne 36 close le 27 novembre 2026.** La PR 3
   (#251) est **en ligne depuis 23 h 31** (squash 4e24d94, run 46072042226,
   cinq jobs verts) : tout le chantier est en ligne (#242, #248 à #251).
