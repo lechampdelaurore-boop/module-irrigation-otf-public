@@ -107,6 +107,17 @@ export async function duringWrite<T>(write: () => Promise<T>): Promise<T> {
   }
 }
 
+/**
+ * Un calcul qui recommence parce qu'une autre requête a écrit pendant le sien
+ * (la faisabilité, quand sa révision a bougé ; accélérer le site, A3, F1113) :
+ * la mémoire de la requête est vidée, comme par une écriture, et tout ce que
+ * le calcul relit va à la base. Hors d'une requête, rien à oublier.
+ */
+export function forgetRequestReads(): void {
+  const memo = currentRequestMemo();
+  if (memo) markWrite(memo);
+}
+
 function markWrite(memo: RequestMemo): void {
   memo.writeMarks += 1;
   memo.workspaceIds.clear();

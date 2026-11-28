@@ -18,6 +18,7 @@ import { DEFAULT_PLANNING_SETTINGS, validatePlanningSettings, type PlanningSetti
 import { markKeptSuggestions } from '@/lib/domain/planning/suggestions';
 import { readPendingPlanEvent } from './planning-events-repository';
 import { listKeptSuggestions } from './planning-suggestions-repository';
+import { rememberedRead } from './request-memo';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
 import { aEcritUneLigne } from './write-result';
 
@@ -34,7 +35,16 @@ import { aEcritUneLigne } from './write-result';
 // Réglages
 // ---------------------------------------------------------------------------
 
+/**
+ * Les réglages du planning d'un espace, lus une fois par requête (accélérer
+ * le site, A3, F1112 ; `db/request-memo.ts`) : la page, la réserve du sol et
+ * le planning les demandent chacun.
+ */
 export async function readPlanningSettingsForUser(ownerUserId: string): Promise<PlanningSettings> {
+  return rememberedRead('planning-settings', [ownerUserId], () => readPlanningSettings(ownerUserId));
+}
+
+async function readPlanningSettings(ownerUserId: string): Promise<PlanningSettings> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return DEFAULT_PLANNING_SETTINGS;
   const row = await db.prepare('SELECT payload FROM irrigation_planning_settings WHERE workspace_id = ?')
@@ -272,9 +282,16 @@ function proposalPayload(proposal: PlanProposal) {
  * le recalcul n'a pas abouti, s'il y en a un. Deux calculs à la même
  * milliseconde se départagent par l'ordre d'insertion
  * (docs/revision-order-contract.md) : le dernier enregistré a remplacé les
- * propositions de l'autre.
+ * propositions de l'autre. Lu une fois par requête (accélérer le site, A3,
+ * F1112) : « Aujourd'hui », ses alertes et la réserve du sol le demandent
+ * chacun ; le calcul qui enregistre un plan l'écrit, et sa relecture
+ * retrouve la base.
  */
 export async function readLatestPlanForUser(ownerUserId: string, season: number, weekStart: string): Promise<StoredWeeklyPlan | null> {
+  return rememberedRead('latest-plan', [ownerUserId, season, weekStart], () => readLatestPlan(ownerUserId, season, weekStart));
+}
+
+async function readLatestPlan(ownerUserId: string, season: number, weekStart: string): Promise<StoredWeeklyPlan | null> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return null;
   const row = await db.prepare(`SELECT id, season, week_start, trigger, trigger_event, computed_at, horizon_start_at, horizon_end_at, settings, summary

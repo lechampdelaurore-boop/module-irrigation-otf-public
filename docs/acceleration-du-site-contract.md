@@ -343,8 +343,11 @@ restent à la suite.
 
 **F1115. Le budget.** Le modèle d'« Aujourd'hui » demande **au plus 60
 appels à la base**, pour chaque profil et chaque moment de la
-démonstration. MESURE_APRES Un retour à la lecture par service le dépasse
-aussitôt.
+démonstration. Mesuré en local après la PR, de la même façon qu'avant : 49
+pour la « Ferme des Trois Noues » à chacun de ses moments (101, et 95 au
+gel de printemps, avant), 27 pour la petite ferme (47 avant), 4 pour la
+ferme aux vannes et 2 pour la ferme vierge, comme avant. Un retour à la
+lecture par service le dépasse aussitôt.
 
 **Ce qui ne change pas.** Aucun calcul, aucun texte, aucune page, aucune
 migration, aucun réglage de Cloudflare ; les écritures, leurs vérifications
@@ -355,15 +358,25 @@ dépôts et y gagnent aussi, sans rien changer de ce qu'elles montrent.
 passages d'isolation (F336, F379) : le modèle avec et sans la mémoire de la
 requête, pour chaque profil et chaque moment (F1111) ; pour chacune des huit
 lectures, une seule lecture de la base par clé même demandée en parallèle,
-une lecture par espace, une copie par appelant, une relecture après une
-écriture, aucune mémoire hors d'une requête (F1112) ; la faisabilité qui
-recommence et relit ses sources (F1113) ; chaque dépôt groupé en un appel
-(F1114) ; le budget (F1115). Les tests des dépôts et des pages restent verts
-sans changement.
+une lecture par espace et par argument (une autre saison, une autre
+semaine, une autre date, un autre lieu), une copie par appelant, une
+relecture après une écriture, aucune mémoire hors d'une requête (F1112) ;
+la faisabilité qui recommence et relit ses sources (F1113) ; chaque dépôt
+groupé en un appel, toutes ses lignes rendues, comptées dans la base
+(F1114) ; le budget (F1115). Chacun de ces tests a été éprouvé une fois en
+cassant le code exprès (une clé sans sa saison, sa semaine, ses dates ou
+son lieu ; une mémoire sans l'espace ; une valeur partagée sans copie ; une
+faisabilité qui n'oublie rien ; un dépôt relu en plusieurs appels ; une
+lecture du bloc perdue) : chaque cassure le fait échouer. Les tests des
+dépôts et des pages restent verts sans changement.
 
-**La mesure.** En local, par l'en-tête de A1 : « Aujourd'hui » de la ferme
-des parcours. En ligne, avant la fusion (F814 : mesurée en ligne d'abord)
-puis après la mise en ligne, par le même en-tête : trois ouvertures
+**La mesure.** En local, par la ligne de journal de A1 : les 25 ouvertures
+d'« Aujourd'hui » des parcours de la démonstration, joués avant (sur la
+branche de A2) et après. La page de la « Ferme des Trois Noues » passe de
+118 appels à la base à 59 (15 ouvertures), le temps du serveur de 379 à
+243 ms en médiane, celui de la base de 214 à 112 ms ; 1 438 appels en tout
+au lieu de 2 599. En ligne, avant la fusion (F814 : mesurée en ligne d'abord)
+puis après la mise en ligne, par l'en-tête de A1 : trois ouvertures
 d'« Aujourd'hui » de la démonstration, dans le Chrome du porteur (le temps
 jusqu'au premier octet, `app`, `d1` et son nombre d'appels). Objectif :
 environ 0,6 s au lieu d'environ 1 s.

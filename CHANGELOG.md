@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (accélérer le site, A3 : « Aujourd'hui » s'ouvre plus vite)
+
+- **« Aujourd'hui » s'ouvre plus vite** (D-360, F1111 à F1115) : la page lit
+  chaque donnée une seule fois, et d'un bloc, au lieu de la relire pour
+  chaque partie de l'écran (49 envois à la base au lieu de 101 pour la
+  « Ferme des Trois Noues »). Les autres pages qui lisent l'eau, le matériel
+  ou les arrosages y gagnent aussi. Rien ne change à l'écran ni dans les
+  calculs : les chiffres affichés sont exactement les mêmes.
+
 ### Modifié (accélérer le site, A2 : la démonstration s'ouvre plus vite)
 
 - **La première ouverture d'une démonstration est plus rapide** (D-359,

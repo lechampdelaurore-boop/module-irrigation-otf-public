@@ -1,3 +1,4 @@
+import { readTogether } from './batches';
 import { db } from './binding';
 import { aEcritUneLigne } from './write-result';
 import { ensureWorkspaceForUser as ensureWorkspace, findWorkspaceIdForUser as findWorkspaceId } from './workspace-repository';
@@ -311,12 +312,13 @@ export async function deleteGardenGroupForUser(
   return aEcritUneLigne(results.at(-1)?.meta);
 }
 
+/** Les groupes d'une saison et leurs jardins, lus d'un bloc, en un seul appel à la base (accélérer le site, A3, F1114). */
 async function loadGroups(
   workspaceId: string,
   season: number,
 ): Promise<GardenGroupRecord[]> {
   const database = db;
-  const [groupResult, memberResult] = await Promise.all([
+  const [groupResult, memberResult] = await readTogether<[GroupRow, MemberRow]>([
     database
       .prepare(
         `SELECT id, name, position, copied_from_group_id
@@ -324,8 +326,7 @@ async function loadGroups(
          WHERE workspace_id = ? AND season = ?
          ORDER BY position`,
       )
-      .bind(workspaceId, season)
-      .all<GroupRow>(),
+      .bind(workspaceId, season),
     database
       .prepare(
         `SELECT
@@ -341,8 +342,7 @@ async function loadGroups(
          WHERE groups.workspace_id = ? AND groups.season = ?
          ORDER BY members.group_id, members.position`,
       )
-      .bind(workspaceId, season)
-      .all<MemberRow>(),
+      .bind(workspaceId, season),
   ]);
 
   const membersByGroup = new Map<string, GardenGroupMemberRecord[]>();

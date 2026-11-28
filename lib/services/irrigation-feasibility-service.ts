@@ -4,6 +4,7 @@ import { listGardenGroupConfigurationForUser } from '@/db/garden-group-repositor
 import { listPumpConfigurationForUser } from '@/db/pump-repository';
 import { listWaterInfrastructureForUser } from '@/db/water-resource-repository';
 import { invalidateIrrigationArbitrationsForUser, listIrrigationArbitrationsForUser, readFeasibilityRevisionForUser } from '@/db/irrigation-arbitration-repository';
+import { forgetRequestReads } from '@/db/request-memo';
 import { listCountedIrrigationEventsForUser } from './counted-irrigation-events';
 import { getCropWaterDaysForUser } from './crop-water-week';
 import { logJsonLine } from '@/lib/adapters/log';
@@ -108,6 +109,9 @@ async function computeIrrigationFeasibility(input: { ownerUserId: string; season
   const start = localDateStartUtc(weekStart, FARM_TIME_ZONE);
   const end = localDateStartUtc(addDaysToDateKey(weekStart, 7), FARM_TIME_ZONE);
   for (let attempt = 0; attempt < 3; attempt += 1) {
+    // Une source a changé pendant le calcul précédent, écrite par une autre requête : tout se relit à la base,
+    // rien de ce que cette requête a gardé (accélérer le site, A3, F1113).
+    if (attempt > 0) forgetRequestReads();
     const before = await readFeasibilityRevisionForUser(ownerUserId);
     // Read through the existing OTF contract inside the revision boundary.
     const snapshot = await getIrrigationSnapshot(ownerUserId, { season });

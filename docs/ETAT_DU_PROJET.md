@@ -12,6 +12,25 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Accélérer le site, A3 : « Aujourd'hui » lit chaque donnée une fois,
+  et d'un bloc, codé le 28 novembre 2026** (D-360, F1111 à F1115 ;
+  contrat `docs/acceleration-du-site-contract.md`, section 5 ; roadmap
+  ligne 38), en Opus 5.5 · Max, sur A2. Huit lectures de plus sont
+  gardées le temps de la requête, sous les règles de la mémoire de N3
+  (F810 à F813) : le dernier plan d'une semaine, les entrées du besoin par
+  culture, la correspondance des espèces, les poses du matériel, les
+  valeurs et le lieu de la météo, les réglages du planning, l'objectif
+  automatique ; la faisabilité qui recommence oublie d'abord ce que la
+  requête a lu ; l'eau, le matériel, les arrosages, les poses, les groupes
+  de jardins et les réglages des besoins se lisent d'un bloc, en un seul
+  appel. Le modèle de la page : 49 appels à la base au lieu de 101 pour la
+  « Ferme des Trois Noues », 27 au lieu de 47 pour la petite ferme, au
+  plus 60 pour tout profil (un test le tient) ; le même modèle avec et
+  sans la mémoire, pour chaque profil et chaque moment, et avant et après,
+  octet pour octet. La page, en local, dans les parcours de la
+  démonstration : 59 appels au lieu de 118. Aucun écran, aucun calcul, aucune migration, aucun
+  réglage de Cloudflare. Fusion après A2 ; mesure en ligne avant la
+  fusion et après la mise en ligne, par l'en-tête d'A1.
 - **Accélérer le site, A2 : la ferme fictive s'écrit en quelques lots à
   la première ouverture d'une démonstration, codé le 28 novembre 2026**
   (D-359, F1107 à F1110 ; contrat `docs/acceleration-du-site-contract.md`,

@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { rememberedRead } from './request-memo';
 import type { HydricGoal, HydricGoalScope, DailyWaterLimit } from '@/lib/domain/water-management';
 import { hasWeatherValue, type WeatherDailyValue, type WeatherLocationCandidate } from '@/lib/domain/weather/weather-provider';
 import { weatherRefreshClaimed } from '@/lib/domain/weather/cache-policy';
@@ -353,10 +354,20 @@ export async function tryClaimWeatherRefreshForUser(
   return weatherRefreshClaimed(result.meta);
 }
 
+/**
+ * Le lieu trouvé d'une commune de la météo, lu une fois par requête
+ * (accélérer le site, A3, F1112 ; `db/request-memo.ts`) : la courbe du jour
+ * et le tableau de l'eau le demandent chacun ; une relecture de la météo qui
+ * le trouve l'écrit, et la lecture qui la suit retrouve la base.
+ */
 export async function readWeatherGeocodeForUser(
   ownerUserId: string,
   locationKey: string,
 ): Promise<WeatherGeocodeRecord | null> {
+  return rememberedRead('weather-geocode', [ownerUserId, locationKey], () => readWeatherGeocode(ownerUserId, locationKey));
+}
+
+async function readWeatherGeocode(ownerUserId: string, locationKey: string): Promise<WeatherGeocodeRecord | null> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return null;
   const row = await db.prepare(
@@ -415,12 +426,23 @@ export async function saveWeatherGeocodeForUser(
   return { ...candidate, locationKey, source, resolvedAt };
 }
 
+/**
+ * Les valeurs météo d'un lieu entre deux dates, et la pluie notée à la main,
+ * lues une fois par requête (accélérer le site, A3, F1112 ;
+ * `db/request-memo.ts`) : sur « Aujourd'hui », le tableau de l'eau et les
+ * besoins de la semaine lisent la même semaine ; une relecture de la météo
+ * les écrit, et la lecture qui la suit retrouve la base.
+ */
 export async function listWeatherDailyValuesForUser(
   ownerUserId: string,
   locationKey: string,
   startDate: string,
   endDate: string,
 ): Promise<WeatherDailyRecord[]> {
+  return rememberedRead('weather-daily-values', [ownerUserId, locationKey, startDate, endDate], () => listWeatherDailyValues(ownerUserId, locationKey, startDate, endDate));
+}
+
+async function listWeatherDailyValues(ownerUserId: string, locationKey: string, startDate: string, endDate: string): Promise<WeatherDailyRecord[]> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return [];
   const result = await db.prepare(

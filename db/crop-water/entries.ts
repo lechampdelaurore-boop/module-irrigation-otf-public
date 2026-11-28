@@ -1,4 +1,5 @@
 import { db } from '../binding';
+import { rememberedRead } from '../request-memo';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../workspace-repository';
 import { listReferenceCropsForWorkspace, type CropWaterWriteResult } from './references';
 import type { Season } from '@/lib/domain/domain';
@@ -169,8 +170,16 @@ export async function deleteSpeciesCorrespondenceForUser(
   return true;
 }
 
-/** La correspondance des espèces d'une exploitation : rattachements par espèce et exceptions par série. */
+/**
+ * La correspondance des espèces d'une exploitation : rattachements par espèce
+ * et exceptions par série. Lue une fois par requête (accélérer le site, A3,
+ * F1112 ; `db/request-memo.ts`).
+ */
 export async function listSpeciesCorrespondencesForWorkspace(workspaceId: string): Promise<CorrespondenceEntry[]> {
+  return rememberedRead('species-correspondences', [workspaceId], () => listSpeciesCorrespondences(workspaceId));
+}
+
+async function listSpeciesCorrespondences(workspaceId: string): Promise<CorrespondenceEntry[]> {
   const result = await db.prepare(
     `SELECT plant_id, series_id, target_kind, crop_key, analogy
      FROM irrigation_crop_species_links
