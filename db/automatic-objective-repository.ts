@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { rememberedRead } from './request-memo';
 import type { AutomaticObjectiveSettingRevision } from '@/lib/domain/automatic-objective';
 import { automaticObjectiveJournal } from './change-journal/objectives';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
@@ -16,9 +17,15 @@ import { aEcritUneLigne } from './write-result';
 /**
  * Les gestes de la ferme, du plus ancien au plus récent ; deux gestes de la
  * même milliseconde gardent l'ordre d'écriture, le second fait foi
- * (docs/revision-order-contract.md). Aucun : le réglage est éteint.
+ * (docs/revision-order-contract.md). Aucun : le réglage est éteint. Lus une
+ * fois par requête (accélérer le site, A3, F1112 ; `db/request-memo.ts`) :
+ * « Aujourd'hui » et les besoins de la semaine les demandent chacun.
  */
 export async function listAutomaticObjectiveRevisionsForUser(ownerUserId: string): Promise<AutomaticObjectiveSettingRevision[]> {
+  return rememberedRead('automatic-objective', [ownerUserId], () => listAutomaticObjectiveRevisions(ownerUserId));
+}
+
+async function listAutomaticObjectiveRevisions(ownerUserId: string): Promise<AutomaticObjectiveSettingRevision[]> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return [];
   const result = await db.prepare(

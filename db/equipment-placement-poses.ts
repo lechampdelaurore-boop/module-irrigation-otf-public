@@ -1,4 +1,6 @@
+import { readTogether } from './batches';
 import { db } from './binding';
+import { rememberedRead } from './request-memo';
 import { WORKSPACE_SPACE_FILTER, spaceParams } from './workspace-scope';
 import type { PlacementBedInput } from '@/lib/domain/equipment-placement-domain';
 import type {
@@ -78,12 +80,21 @@ export const OPEN_POSE_UNCHANGED = `id = ? AND workspace_id = ? AND removed_at I
       AND running.timer_state IS NOT NULL
   )`;
 
-/** Les poses courantes d'une saison, posées ou stockées, avec leurs dates. */
+/**
+ * Les poses courantes d'une saison, posées ou stockées, avec leurs dates. Lues
+ * une fois par requête, et d'un bloc (accélérer le site, A3, F1112 et F1114) :
+ * les arrosages qui comptent, la couverture des planches et la faisabilité
+ * les demandent chacun.
+ */
 export async function listEquipmentPosesForUser(
   ownerUserId: string,
   season: number,
 ): Promise<PlacementPose[]> {
-  const [placementsResult, selectedBedsResult] = await Promise.all([
+  return rememberedRead('equipment-poses', [ownerUserId, season], () => listEquipmentPoses(ownerUserId, season));
+}
+
+async function listEquipmentPoses(ownerUserId: string, season: number): Promise<PlacementPose[]> {
+  const [placementsResult, selectedBedsResult] = await readTogether<[PlacementRow, SelectedBedRow]>([
     db.prepare(
       `SELECT ${PLACEMENT_COLUMNS}
        FROM irrigation_equipment_placements AS placement
@@ -92,8 +103,7 @@ export async function listEquipmentPosesForUser(
        WHERE ${WORKSPACE_SPACE_FILTER} AND placement.season = ?
        ORDER BY placement.created_at, placement.id`,
     )
-      .bind(...spaceParams(ownerUserId), season)
-      .all<PlacementRow>(),
+      .bind(...spaceParams(ownerUserId), season),
     db.prepare(
       `SELECT
          selected.placement_id,
@@ -108,8 +118,7 @@ export async function listEquipmentPosesForUser(
        WHERE ${WORKSPACE_SPACE_FILTER} AND placement.season = ?
        ORDER BY selected.placement_id, selected.position`,
     )
-      .bind(...spaceParams(ownerUserId), season)
-      .all<SelectedBedRow>(),
+      .bind(...spaceParams(ownerUserId), season),
   ]);
 
   const selectedBedsByPlacement = groupSelectedBeds(selectedBedsResult.results);

@@ -1,3 +1,4 @@
+import { readTogether } from './batches';
 import { db } from './binding';
 import { ensureWorkspaceForUser } from './workspace-repository';
 import { resourceLimitJournal } from './change-journal/settings';
@@ -90,15 +91,20 @@ export async function readActiveWaterAssetsForUser(ownerUserId: string): Promise
   };
 }
 
+/**
+ * L'eau d'un espace : ressources, réserves, limites, liens, alimentation par
+ * défaut et mouvements de stock, lus d'un bloc, en un seul appel à la base
+ * (accélérer le site, A3, F1114).
+ */
 export async function listWaterInfrastructureForUser(ownerUserId: string, movementPeriod?: { startAt: string; endAt: string }): Promise<WaterInfrastructure> {
   const space = spaceParams(ownerUserId);
-  const queries = await Promise.all([
+  const queries = await readTogether<[ResourceRow, ReservoirRow, Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, Record<string, unknown>]>([
     db.prepare(`SELECT resource.id, resource.name, resource.type,
       resource.nominal_flow_cubic_meters_per_hour, resource.status,
       resource.available_from, resource.available_until, resource.notes
       FROM irrigation_water_resources AS resource
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = resource.workspace_id
-      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY resource.name COLLATE NOCASE`).bind(...space).all<ResourceRow>(),
+      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY resource.name COLLATE NOCASE`).bind(...space),
     db.prepare(`SELECT reservoir.id, reservoir.name, reservoir.type,
       reservoir.capacity_cubic_meters, reservoir.current_volume_cubic_meters,
       reservoir.current_volume_observed_at, reservoir.minimum_safety_cubic_meters,
@@ -107,7 +113,7 @@ export async function listWaterInfrastructureForUser(ownerUserId: string, moveme
       reservoir.status, reservoir.notes
       FROM irrigation_water_reservoirs AS reservoir
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = reservoir.workspace_id
-      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY reservoir.name COLLATE NOCASE`).bind(...space).all<ReservoirRow>(),
+      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY reservoir.name COLLATE NOCASE`).bind(...space),
     // Départage par rowid, l'ordre d'insertion : l'identifiant est tiré au sort (docs/revision-order-contract.md).
     db.prepare(`SELECT limits.id, limits.resource_id, limits.enabled,
       limits.max_cubic_meters_per_day, limits.valid_from, limits.valid_until,
@@ -115,21 +121,21 @@ export async function listWaterInfrastructureForUser(ownerUserId: string, moveme
       FROM irrigation_water_resource_limit_revisions AS limits
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = limits.workspace_id
       WHERE ${WORKSPACE_SPACE_FILTER}
-      ORDER BY limits.created_at DESC, limits.rowid DESC`).bind(...space).all<Record<string, unknown>>(),
+      ORDER BY limits.created_at DESC, limits.rowid DESC`).bind(...space),
     db.prepare(`SELECT links.id, links.resource_id, links.reservoir_id,
       links.fill_mode, links.active
       FROM irrigation_water_resource_reservoir_links AS links
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = links.workspace_id
-      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY links.created_at, links.id`).bind(...space).all<Record<string, unknown>>(),
+      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY links.created_at, links.id`).bind(...space),
     db.prepare(`SELECT links.id, links.upstream_reservoir_id,
       links.downstream_reservoir_id, links.transfer_mode, links.active
       FROM irrigation_water_reservoir_links AS links
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = links.workspace_id
-      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY links.created_at, links.id`).bind(...space).all<Record<string, unknown>>(),
+      WHERE ${WORKSPACE_SPACE_FILTER} ORDER BY links.created_at, links.id`).bind(...space),
     db.prepare(`SELECT supply.source_kind, supply.resource_id, supply.reservoir_id
       FROM irrigation_water_supply_defaults AS supply
       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = supply.workspace_id
-      WHERE ${WORKSPACE_SPACE_FILTER} LIMIT 1`).bind(...space).first<Record<string, unknown>>(),
+      WHERE ${WORKSPACE_SPACE_FILTER} LIMIT 1`).bind(...space),
     db.prepare(`SELECT movement.id, movement.reservoir_id, movement.resource_id,
       movement.kind, movement.volume_delta_cubic_meters, movement.occurred_at,
       movement.previous_volume_cubic_meters, movement.resulting_volume_cubic_meters,
@@ -139,9 +145,10 @@ export async function listWaterInfrastructureForUser(ownerUserId: string, moveme
       WHERE ${WORKSPACE_SPACE_FILTER}
       ${movementPeriod ? 'AND movement.occurred_at >= ? AND movement.occurred_at < ?' : ''}
       ORDER BY movement.occurred_at DESC, movement.created_at DESC
-      ${movementPeriod ? '' : 'LIMIT 500'}`).bind(...(movementPeriod ? [...space, movementPeriod.startAt, movementPeriod.endAt] : space)).all<Record<string, unknown>>(),
+      ${movementPeriod ? '' : 'LIMIT 500'}`).bind(...(movementPeriod ? [...space, movementPeriod.startAt, movementPeriod.endAt] : space)),
   ]);
-  const [resources, reservoirs, limits, resourceLinks, reservoirLinks, supply, movements] = queries;
+  const [resources, reservoirs, limits, resourceLinks, reservoirLinks, supplies, movements] = queries;
+  const supply = supplies.results[0] ?? null;
   return {
     resources: resources.results.map(mapResource),
     reservoirs: reservoirs.results.map(mapReservoir),

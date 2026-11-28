@@ -13518,3 +13518,38 @@ la préparation des neuf couples profil × moment sur `main` (`dc83ae1`) et
 après la PR : les mêmes lignes, octet pour octet.
 
 **Numéros pris** : D-359 ; F1107 à F1110.
+
+## D-360 — Accélérer le site, A3 : « Aujourd'hui » lit chaque donnée une fois, et d'un bloc
+
+Date : 28 novembre 2026. Statut : appliquée, sur le choix du porteur du
+28 novembre 2026 à 13 h 44 (« faire 1, puis 2 et 3 ») ; modifiable à sa
+relecture. Contrat : `docs/acceleration-du-site-contract.md`, section 5 ;
+roadmap section 6 octodecies. Aucune migration, aucun calcul, aucun texte de
+l'interface, aucun réglage de Cloudflare.
+
+**Constat.** Le modèle d'« Aujourd'hui » demandait 101 appels à la base pour
+la « Ferme des Trois Noues » au début de l'été (base de test, mémoire de la
+requête posée comme en ligne) : chaque service lit pour lui ce dont il a
+besoin, et 34 de ces appels refaisaient à l'identique une lecture déjà
+faite ; un même dépôt lisait aussi en plusieurs appels ce qu'il rend d'un
+bloc (l'eau en 7, le matériel en 4).
+
+**Décision.** Le modèle de la page reste exactement le même (**F1111**).
+Huit lectures de plus sont gardées le temps de la requête, sous les règles
+de la mémoire de la requête (F810 à F813) : le dernier plan d'une semaine,
+les entrées du besoin par culture, la correspondance des espèces, les poses
+du matériel, les valeurs météo, le lieu de la météo, les réglages du
+planning et l'objectif automatique (**F1112**). La faisabilité, seul calcul
+qui recommence pour attendre l'écriture d'une autre requête, oublie d'abord
+ce que la requête a lu (**F1113**). Les lectures indépendantes d'un même
+dépôt partent en un seul lot de lectures (**F1114**). Le modèle demande au
+plus 60 appels pour tout profil et tout moment de la démonstration
+(**F1115**).
+
+**Vérifié par** `tests/db/aujourdhui-lectures.test.ts` (le modèle avec et
+sans la mémoire de la requête, pour chaque profil et chaque moment ; les
+huit lectures ; la faisabilité qui recommence ; les lots de lectures ; le
+budget), et, une fois, par le modèle des neuf couples profil × moment
+calculé sur `main` et après la PR : le même, octet pour octet.
+
+**Numéros pris** : D-360 ; F1111 à F1115.

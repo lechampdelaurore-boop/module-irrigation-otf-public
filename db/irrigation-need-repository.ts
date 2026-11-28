@@ -1,3 +1,4 @@
+import { readTogether } from './batches';
 import { db } from './binding';
 import type { IrrigationNeedDecision, IrrigationNeedPriority } from '@/lib/domain/irrigation-needs';
 import { ensureWorkspaceForUser, findWorkspaceIdForUser } from './workspace-repository';
@@ -9,15 +10,17 @@ type DecisionRow = {
   override_reason: string | null; calculated_need_at_override_mm: number | null; updated_at: string;
 };
 
+/** Le seuil de besoin et les décisions par planche d'une semaine, lus d'un bloc, en un seul appel à la base (accélérer le site, A3, F1114). */
 export async function readIrrigationNeedSettingsForUser(ownerUserId: string, season: number, weekStart: string) {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return { thresholdMm: 0, decisions: [] as IrrigationNeedDecision[] };
-  const [preference, decisions] = await Promise.all([
-    db.prepare('SELECT minimum_need_threshold_mm FROM irrigation_need_preferences WHERE workspace_id = ?').bind(workspaceId).first<{ minimum_need_threshold_mm: number }>(),
+  const [preferences, decisions] = await readTogether<[{ minimum_need_threshold_mm: number }, DecisionRow]>([
+    db.prepare('SELECT minimum_need_threshold_mm FROM irrigation_need_preferences WHERE workspace_id = ?').bind(workspaceId),
     db.prepare(`SELECT otf_zone_id, otf_plot_id, otf_bed_id, priority, manual_override_mm, override_reason, calculated_need_at_override_mm, updated_at
       FROM irrigation_bed_need_decisions WHERE workspace_id = ? AND season = ? AND week_start = ? ORDER BY otf_plot_id, otf_bed_id`)
-      .bind(workspaceId, season, weekStart).all<DecisionRow>(),
+      .bind(workspaceId, season, weekStart),
   ]);
+  const preference = preferences.results[0] ?? null;
   return {
     thresholdMm: preference ? Number(preference.minimum_need_threshold_mm) : 0,
     decisions: decisions.results.map((row) => ({

@@ -12,6 +12,28 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Accélérer le site, A3 : « Aujourd'hui » lit chaque donnée une fois,
+  et d'un bloc, codé le 28 novembre 2026** (D-360, F1111 à F1115 ;
+  contrat `docs/acceleration-du-site-contract.md`, section 5 ; roadmap
+  ligne 38), en Opus 5.5 · Max, sur A2. Huit lectures de plus sont
+  gardées le temps de la requête, sous les règles de la mémoire de N3
+  (F810 à F813) : le dernier plan d'une semaine, les entrées du besoin par
+  culture, la correspondance des espèces, les poses du matériel, les
+  valeurs et le lieu de la météo, les réglages du planning, l'objectif
+  automatique ; la faisabilité qui recommence oublie d'abord ce que la
+  requête a lu ; l'eau, le matériel, les arrosages, les poses, les groupes
+  de jardins et les réglages des besoins se lisent d'un bloc, en un seul
+  appel. Le modèle de la page : 49 appels à la base au lieu de 101 pour la
+  « Ferme des Trois Noues », 27 au lieu de 47 pour la petite ferme, au
+  plus 60 pour tout profil (un test le tient) ; le même modèle avec et
+  sans la mémoire, pour chaque profil et chaque moment, et avant et après,
+  octet pour octet. La page, en local, dans les parcours de la
+  démonstration : 59 appels au lieu de 118. Aucun écran, aucun calcul,
+  aucune migration, aucun réglage de Cloudflare. Mesuré en ligne avant
+  la fusion, le 28 novembre 2026, par l'en-tête d'A1 : « Aujourd'hui »
+  de la démonstration, 1,0 à 1,2 s de serveur, entièrement à attendre
+  la base (110 à 118 appels). Fusion après A2 ; mesure après la mise en
+  ligne.
 - **Accélérer le site, A2 : la ferme fictive s'écrit en quelques lots à
   la première ouverture d'une démonstration, codé le 28 novembre 2026**
   (D-359, F1107 à F1110 ; contrat `docs/acceleration-du-site-contract.md`,
@@ -25,8 +47,10 @@ registres, elle y renvoie.
   appels à la base au lieu de 512 à 1 275 pour la « Ferme des Trois
   Noues », au plus 300 pour tout profil (un test le tient). Aucun écran,
   aucun calcul, aucune migration, aucun réglage de Cloudflare ; F450
-  tient. Fusion après A1 ; mesure en ligne avant la fusion et après la
-  mise en ligne, par l'en-tête d'A1. Puis A3.
+  tient. Fusion après A1. Mesuré en ligne avant la fusion, le 28 novembre
+  2026, par l'en-tête d'A1 : environ 38 s avant « Aujourd'hui » pour un
+  espace neuf en automne, dont 36,4 s et 1 278 appels à la base pour le
+  préparer ; mesure après la mise en ligne. Puis A3.
 - **Accélérer le site, A1 : le serveur dit son temps, demandé par le
   porteur le 28 novembre 2026 à 13 h 44 et codé le même jour** (D-358,
   F1101 à F1106 ; contrat `docs/acceleration-du-site-contract.md`,
@@ -41,9 +65,10 @@ registres, elle y renvoie.
   aucun calcul, aucune migration, aucun réglage de Cloudflare. Relevé en
   local : « Aujourd'hui », 101 appels à la base ; la première ouverture
   d'un espace de démonstration, 935 dans une seule requête. Tests ;
-  parcours P75 et V13. Contrôles : voir la PR. Fusion à son tour ; puis
-  le nouveau mesurage du démarrage à froid, sur la démonstration ; A2,
-  puis A3, suivent. Consigne la mise en ligne de #259 (1be6469,
+  parcours P75 et V13. Contrôles : voir la PR. **Fusionnée le 28 novembre
+  2026 à 16 h 25 et en ligne à 17 h 13** (#263, bf7f6eb, run 46159813202,
+  cinq jobs verts) ; reste le nouveau mesurage du démarrage à froid, sur
+  la démonstration ; A2, puis A3, suivent. Consigne la mise en ligne de #259 (1be6469,
   fusionnée le 28 novembre 2026 à 14 h 36, run 46150424037, en ligne à
   15 h 28, cinq jobs verts).
 - **Parcours navigateur à cheval sur minuit : P63, P12 et P37 corrigés

@@ -1,3 +1,4 @@
+import { readTogether } from '../batches';
 import { db } from '../binding';
 import { WORKSPACE_SPACE_FILTER, spaceParams } from '../workspace-scope';
 import type {
@@ -6,6 +7,9 @@ import type {
 } from '@/lib/domain/irrigation-event-record';
 import { findWorkspaceId } from './ownership';
 import { type ApplicationRow, type EventRow, eventSelectSql, parseJson } from './rows';
+
+/** Une ligne de l'historique des chronomètres. */
+type TimerLogRow = { event_id: string; action: string; payload: string; created_at: string };
 
 export type IrrigationStartLimitCandidate = {
   season: number;
@@ -17,6 +21,11 @@ export type IrrigationStartLimitCandidate = {
   volumeComplete: boolean;
 };
 
+/**
+ * Les arrosages d'un espace, d'une saison ou de toutes, d'une période ou non,
+ * avec leurs planches et, sur demande, l'historique de leurs chronomètres :
+ * lus d'un bloc, en un seul appel à la base (accélérer le site, A3, F1114).
+ */
 export async function listIrrigationEventsForUser(
   ownerUserId: string,
   season?: number,
@@ -32,48 +41,49 @@ export async function listIrrigationEventsForUser(
         (scoped.planned_end_at >= ? AND scoped.planned_start_at < ?)))`;
     queryArguments.push(period.startAt, period.endAt, period.startAt, period.endAt);
   }
-  const [eventsResult, applicationsResult, historyResult] = await Promise.all([
-    db.prepare(
-      `${eventSelectSql()}
-       WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
-       ORDER BY
-         CASE WHEN event_equipment.timer_state IS NOT NULL THEN 0 ELSE 1 END,
-         COALESCE(event_equipment.actual_end_at, event_equipment.planned_start_at, event.created_at) DESC,
-         event.id DESC`,
-    )
-      .bind(...queryArguments)
-      .all<EventRow>(),
-    db.prepare(
-      `SELECT
-         application.event_equipment_id,
-         application.otf_zone_id,
-         application.otf_plot_id,
-         application.otf_bed_id,
-         application.rate_mm_per_hour,
-         application.bed_area_square_meters,
-         application.wetted_area_square_meters,
-         application.planned_amount_mm,
-         application.actual_amount_mm
-       FROM irrigation_bed_applications AS application
-       INNER JOIN irrigation_event_equipment AS event_equipment
-         ON event_equipment.id = application.event_equipment_id
-       INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
-       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-       WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
-       ORDER BY application.event_equipment_id, application.otf_plot_id, application.otf_bed_id`,
-    )
-      .bind(...queryArguments)
-      .all<ApplicationRow>(),
-    includeTimerHistory ? db.prepare(
-      `SELECT log.event_id, log.action, log.payload, log.created_at
-       FROM irrigation_event_log AS log
-       INNER JOIN irrigation_events AS event ON event.id = log.event_id
-       INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
-       WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
-       ORDER BY log.created_at, log.rowid`,
-    ).bind(...queryArguments).all<{ event_id: string; action: string; payload: string; created_at: string }>()
-      : Promise.resolve({ results: [] }),
-  ]);
+  const eventsQuery = db.prepare(
+    `${eventSelectSql()}
+     WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
+     ORDER BY
+       CASE WHEN event_equipment.timer_state IS NOT NULL THEN 0 ELSE 1 END,
+       COALESCE(event_equipment.actual_end_at, event_equipment.planned_start_at, event.created_at) DESC,
+       event.id DESC`,
+  )
+    .bind(...queryArguments);
+  const applicationsQuery = db.prepare(
+    `SELECT
+       application.event_equipment_id,
+       application.otf_zone_id,
+       application.otf_plot_id,
+       application.otf_bed_id,
+       application.rate_mm_per_hour,
+       application.bed_area_square_meters,
+       application.wetted_area_square_meters,
+       application.planned_amount_mm,
+       application.actual_amount_mm
+     FROM irrigation_bed_applications AS application
+     INNER JOIN irrigation_event_equipment AS event_equipment
+       ON event_equipment.id = application.event_equipment_id
+     INNER JOIN irrigation_events AS event ON event.id = event_equipment.event_id
+     INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
+     WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
+     ORDER BY application.event_equipment_id, application.otf_plot_id, application.otf_bed_id`,
+  )
+    .bind(...queryArguments);
+  const [eventsResult, applicationsResult, historyResult] = includeTimerHistory
+    ? await readTogether<[EventRow, ApplicationRow, TimerLogRow]>([
+      eventsQuery,
+      applicationsQuery,
+      db.prepare(
+        `SELECT log.event_id, log.action, log.payload, log.created_at
+         FROM irrigation_event_log AS log
+         INNER JOIN irrigation_events AS event ON event.id = log.event_id
+         INNER JOIN irrigation_workspaces AS workspace ON workspace.id = event.workspace_id
+         WHERE ${WORKSPACE_SPACE_FILTER}${seasonFilter}
+         ORDER BY log.created_at, log.rowid`,
+      ).bind(...queryArguments),
+    ])
+    : [...await readTogether<[EventRow, ApplicationRow]>([eventsQuery, applicationsQuery]), { results: [] as TimerLogRow[] }];
 
   const historyByEvent = new Map<string, NonNullable<IrrigationEventRecord['timerHistory']>>();
   for (const row of historyResult.results) {

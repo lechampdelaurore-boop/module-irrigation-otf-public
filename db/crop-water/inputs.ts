@@ -1,6 +1,7 @@
 import { listKcOverridesForWorkspace, listSpeciesCorrespondencesForWorkspace, listStageDeclarationsForWorkspace } from './entries';
 import { listReferenceCropsForWorkspace, type StoredReferenceCrop } from './references';
 import { readCropWaterSettingsForWorkspace, type CropWaterSettings } from './settings';
+import { rememberedRead } from '../request-memo';
 import type { Season } from '@/lib/domain/domain';
 import type { BedWaterSettings } from '@/lib/domain/crop-water/etm';
 import type { KcOverride } from '@/lib/domain/crop-water/kc';
@@ -25,7 +26,16 @@ export type CropWaterInputs = {
   settings: CropWaterSettings;
 };
 
+/**
+ * Lues une fois par requête (accélérer le site, A3, F1112 ;
+ * `db/request-memo.ts`) : sur « Aujourd'hui », le besoin du jour, la réserve
+ * du sol et les besoins de la semaine les demandent chacun.
+ */
 export async function readCropWaterInputsForWorkspace(workspaceId: string, season: Season): Promise<CropWaterInputs> {
+  return rememberedRead('crop-water-inputs', [workspaceId, season], () => readCropWaterInputs(workspaceId, season));
+}
+
+async function readCropWaterInputs(workspaceId: string, season: Season): Promise<CropWaterInputs> {
   const [crops, correspondences, overrides, declarations, settings] = await Promise.all([
     listReferenceCropsForWorkspace(workspaceId),
     listSpeciesCorrespondencesForWorkspace(workspaceId),

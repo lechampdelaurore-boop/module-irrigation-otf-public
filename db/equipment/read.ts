@@ -1,15 +1,21 @@
+import { readTogether } from '../batches';
 import { db } from '../binding';
 import { WORKSPACE_SPACE_FILTER, spaceParams } from '../workspace-scope';
 import { type SprinklerProfilePoint } from '@/lib/domain/irrigation-domain';
 import type { EquipmentListItem, EquipmentSettingRecord } from '@/lib/domain/equipment-record';
 import type { DripRateRow, EquipmentRow, ProfilePointRow, SettingRow } from './rows';
 
+/**
+ * Le matériel d'un espace, ses réglages, les profils des asperseurs et les
+ * débits des goutte-à-goutte, lus d'un bloc, en un seul appel à la base
+ * (accélérer le site, A3, F1114).
+ */
 export async function listEquipmentForUser(
   ownerUserId: string,
 ): Promise<EquipmentListItem[]> {
   const database = db;
   const [equipmentResult, settingResult, profileResult, dripRateResult] =
-    await Promise.all([
+    await readTogether<[EquipmentRow, SettingRow, ProfilePointRow, DripRateRow]>([
       database
         .prepare(
           `SELECT
@@ -27,8 +33,7 @@ export async function listEquipmentForUser(
              CASE equipment.status WHEN 'active' THEN 0 ELSE 1 END,
              equipment.name COLLATE NOCASE`,
         )
-        .bind(...spaceParams(ownerUserId))
-        .all<EquipmentRow>(),
+        .bind(...spaceParams(ownerUserId)),
       database
         .prepare(
           `SELECT
@@ -45,8 +50,7 @@ export async function listEquipmentForUser(
            WHERE ${WORKSPACE_SPACE_FILTER}
            ORDER BY settings.equipment_id, settings.position`,
         )
-        .bind(...spaceParams(ownerUserId))
-        .all<SettingRow>(),
+        .bind(...spaceParams(ownerUserId)),
       database
         .prepare(
           `SELECT
@@ -64,8 +68,7 @@ export async function listEquipmentForUser(
            WHERE ${WORKSPACE_SPACE_FILTER}
            ORDER BY points.setting_id, points.side, points.distance_meters`,
         )
-        .bind(...spaceParams(ownerUserId))
-        .all<ProfilePointRow>(),
+        .bind(...spaceParams(ownerUserId)),
       database
         .prepare(
           `SELECT rates.setting_id, rates.rate_mm_per_hour
@@ -78,8 +81,7 @@ export async function listEquipmentForUser(
              ON workspace.id = equipment.workspace_id
            WHERE ${WORKSPACE_SPACE_FILTER}`,
         )
-        .bind(...spaceParams(ownerUserId))
-        .all<DripRateRow>(),
+        .bind(...spaceParams(ownerUserId)),
     ]);
 
   const profilePoints = new Map<
