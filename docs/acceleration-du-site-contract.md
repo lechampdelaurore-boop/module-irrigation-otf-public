@@ -1,10 +1,11 @@
 # Contrat — Accélérer le site (chantier du 28 novembre 2026)
 
-Roadmap section 6 octodecies. Décision D-358 (A1). Suite du correctif de la
-lenteur (section 6 duodecies, `docs/lenteur-du-module-contract.md`, clos le
-25 novembre 2026), dont la « suite possible » était de garder d'autres
-lectures répétées. Ce contrat dit le constat, les mesures et les règles des
-trois PR ; chacune a la sienne, mesurée avant et après.
+Roadmap section 6 octodecies. Décisions D-358 (A1) et D-359 (A2). Suite du
+correctif de la lenteur (section 6 duodecies,
+`docs/lenteur-du-module-contract.md`, clos le 25 novembre 2026), dont la
+« suite possible » était de garder d'autres lectures répétées. Ce contrat dit
+le constat, les mesures et les règles des trois PR ; chacune a la sienne,
+mesurée avant et après.
 
 ## 1. Le constat et le choix du porteur
 
@@ -153,14 +154,102 @@ premier octet bien au-delà de `app`), celle d'Ouvre ta ferme (`otf`) et celle
 de la base (`d1`), et ce qu'il convient de faire ensuite : rien n'est
 corrigé dans A1.
 
-## 4. A2 — La première ouverture d'un espace de démonstration
+## 4. A2 — La première ouverture d'un espace de démonstration (D-359)
 
-Écrite avec sa PR, après la mise en ligne de A1 et la mesure en ligne du
-nombre d'appels et de leur coût. Objectif : 1 à 2 s au lieu de 4 à 8 s, par
-l'écriture de la ferme fictive en lots, ou par un espace déjà prêt. Ce qui
-est écrit reste exactement ce qu'écrit la préparation d'aujourd'hui, ligne
-pour ligne (`docs/demo-guided-contract.md`, sections 5 et 6) ; la règle des
-deux requêtes simultanées et de la préparation interrompue (F450) tient.
+**Pourquoi.** Préparer l'espace d'un invité (`lib/services/demo-space.ts` ;
+`docs/demo-guided-contract.md`, sections 5 et 6) passe par les dépôts
+ordinaires, comme si la ferme avait tout saisi : chaque arrosage passé,
+chaque matin de prévisions archivé, chaque adoption, chaque rattachement
+d'espèce allait seul à la base, après ses propres vérifications. Mesuré sur
+`main` (`dc83ae1`), base de test, mémoire de la requête posée comme en ligne
+(section 5 sexies du contrat de la tranche 4) : pour la « Ferme des Trois
+Noues », **512 appels** au gel de printemps, **794** au début de l'été, **923**
+en pénurie, **1 275** en automne ; 260 et 512 pour la petite ferme, 118 pour
+la ferme aux vannes ; rien pour la ferme vierge. Au début de l'été : le
+matériel et ses arrosages passés 352, la météo et l'archive des prévisions
+78, les objectifs adoptés 231 (une fiche de planche entière lue pour chaque
+planche), les espèces 56, le plan de la semaine 74. À 5 ou 6 ms l'appel en
+ligne, c'est les 4 à 8 s mesurés le matin. En automne, la préparation et la
+page d'arrivée dépassaient de plus le millier d'appels dans une même
+requête, la limite que D1 donne à une invocation du Worker (un lot y compte
+pour une requête) : une préparation pouvait ne pas aboutir.
+
+**Le choix : écrire la ferme fictive en lots.** Un espace déjà prêt, préparé
+d'avance, ne porterait ni l'identité de l'invité ni l'heure de son arrivée :
+ses lignes ne seraient pas celles de la préparation d'aujourd'hui, et il
+faudrait un stock à tenir. Les lots gardent chaque ligne.
+
+**F1107. Les mêmes lignes, dans le même ordre.** La préparation écrit
+exactement ce qu'elle écrivait, toutes tables, ligne pour ligne, dans le
+même ordre (le journal des modifications compris). Quatre écritures
+deviennent groupées ; chacune est faite des instructions mêmes du geste
+ordinaire, construites par le même code, et lit ses vérifications une fois
+pour toutes ses lignes au lieu d'une fois par ligne :
+
+- les arrosages passés : `createCompletedIrrigationEventsForUser`
+  (`db/irrigation-event/create.ts`), les vérifications de
+  `createIrrigationEventForUser` (le matériel actif, son réglage et sa pose
+  dans l'espace, la pose ouverte à l'heure du début, au moins une planche),
+  lues une fois par matériel ; les avertissements, que personne ne voit à la
+  préparation, ne sont pas lus ;
+- l'archive des prévisions des semaines passées :
+  `writeForecastArchivesForUser`, qui n'écrase rien (D-297) ;
+- les objectifs adoptés : `getBedWeekProposalsForUser`
+  (`lib/services/crop-water-bed.ts`) lit ensemble la proposition de la
+  semaine de toutes les planches, celle que la fiche de chacune montrerait,
+  face à l'objectif lu de la même façon ; `saveAdoptedGoalsForUser` les
+  adopte, journal compris, dans l'ordre du plan ;
+- les espèces : `saveDemoSpeciesForUser` (`db/demo-seed-repository.ts`),
+  pour chaque espèce son rattachement à sa culture de référence puis son
+  seuil de gel, les cultures de référence et le jeu commun lus une fois.
+
+Le matériel, l'eau, les alertes météo, le plan de la semaine et les cases
+cochées restent écrits geste par geste : une soixantaine d'appels, des
+identifiants qui s'enchaînent (le réglage attend son matériel, la pose son
+réglage), et le plan est le calcul même de la tâche de nuit.
+
+**F1108. Un lot ne coupe jamais un geste.** Les gestes partent dans leur
+ordre, en lots d'au plus 100 instructions (`db/batches.ts`) ; un geste plus
+grand part dans un lot à lui. Un lot de D1 est une transaction : chaque
+geste est écrit en entier ou pas du tout, comme seul, et son journal, dans le
+lot du geste, lit pour « avant » ce que les gestes d'avant viennent
+d'écrire.
+
+**F1109. Un refus n'écrit rien.** Chaque ligne d'une écriture groupée est
+vérifiée avant la première écriture : une ligne refusée arrête tout, sans
+rien écrire de son groupe, et chaque problème est dit. La préparation qui
+échoue ainsi n'est pas finie, et se reprend comme avant (F450).
+
+**F1110. Le budget.** Préparer l'espace d'un invité demande **au plus 300
+appels à la base**, quel que soit le profil ou le moment. Mesuré en local
+après la PR : 206 au gel de printemps, 229 au début de l'été, 231 en pénurie
+et 235 en automne pour la « Ferme des Trois Noues » ; 66 et 69 pour la petite
+ferme ; 42 pour la ferme aux vannes ; rien pour la ferme vierge. Un retour à
+l'écriture ligne par ligne le dépasse aussitôt.
+
+**Ce qui ne change pas.** La règle des deux requêtes simultanées et de la
+préparation interrompue (F450 : les cases cochées en dernier, l'attente de
+deux secondes au plus, la reprise d'une préparation commencée depuis plus de
+deux minutes), la ferme vierge, la remise à zéro (D4), toutes les pages, et
+chaque geste ordinaire de la ferme : son code, ses vérifications et ses
+lignes restent les siens ; seul ce qui construit ses instructions est mis à
+part, pour servir aux deux.
+
+**Tests.** `tests/db/demo-space-en-lots.test.ts` : chaque écriture groupée
+comparée au geste ordinaire répété, dans deux bases neuves, toutes tables,
+identifiants tirés dans l'ordre et horloge arrêtée (F1107) ; les lots (F1108)
+; les refus (F1109) ; le budget, pour chaque profil et chaque moment (F1110).
+Une fois, à l'écriture de la PR, les neuf couples profil × moment préparés
+avant (sur `main`, `dc83ae1`) et après, de la même façon : les mêmes lignes,
+table par table, octet pour octet. Les tests de la démonstration
+(`tests/db/demo-space.test.ts` et les suivants) et ses parcours restent
+verts sans changement.
+
+**La mesure en ligne.** Avant la fusion, puis après la mise en ligne, par
+l'en-tête de A1 : la première ouverture d'un espace neuf de la « Ferme des
+Trois Noues », au début de l'été et en automne, dans le Chrome du porteur
+(le temps jusqu'au premier octet, `app`, `d1` et son nombre d'appels).
+Objectif : 1 à 2 s au lieu de 4 à 8 s.
 
 ## 5. A3 — « Aujourd'hui »
 

@@ -13416,3 +13416,39 @@ par appel, au plus quatre par seconde.
 local le 28 novembre 2026 (1 passed chacun, à l'ordinateur).
 
 **Numéros pris** : D-358 ; F1101 à F1106 ; parcours P75 et V13.
+
+## D-359 — Accélérer le site, A2 : la ferme fictive s'écrit en quelques lots à la première ouverture d'une démonstration
+
+Date : 28 novembre 2026. Statut : appliquée, sur le choix du porteur du
+28 novembre 2026 à 13 h 44 (« faire 1, puis 2 et 3 ») ; modifiable à sa
+relecture. Contrat : `docs/acceleration-du-site-contract.md`, section 4 ;
+roadmap section 6 octodecies. Aucune migration, aucun calcul, aucun texte de
+l'interface, aucun réglage de Cloudflare.
+
+**Constat.** La préparation de l'espace d'un invité écrivait la ferme
+fictive geste par geste, par les dépôts ordinaires : 512 à 1 275 appels à la
+base pour la « Ferme des Trois Noues » selon le moment (794 au début de
+l'été), dans la requête même de la première ouverture, d'où les 4 à 8 s
+mesurés le matin ; en automne, avec la page, plus que le millier de requêtes
+que D1 donne à une invocation du Worker.
+
+**Décision.** La préparation écrit les mêmes lignes, dans le même ordre
+(**F1107**), mais les arrosages passés, l'archive des prévisions, les
+objectifs adoptés et les espèces passent par quatre écritures groupées,
+faites des instructions mêmes des gestes ordinaires et vérifiées une fois
+pour toutes leurs lignes ; les gestes partent dans leur ordre, en lots d'au
+plus 100 instructions, jamais coupés (**F1108**) ; un refus arrête tout
+avant la première écriture (**F1109**) ; préparer un espace demande au plus
+300 appels à la base (**F1110**), 206 à 235 pour la « Ferme des Trois
+Noues ». Un espace préparé d'avance n'est pas retenu : il ne porterait ni
+l'identité de l'invité ni l'heure de son arrivée. Le matériel, l'eau, les
+alertes météo, le plan de la semaine et les cases cochées restent écrits
+geste par geste, et la règle F450 tient.
+
+**Vérifié par** `tests/db/demo-space-en-lots.test.ts` (chaque écriture
+groupée contre le geste ordinaire répété, toutes tables ; les lots ; les
+refus ; le budget de chaque profil et de chaque moment), et, une fois, par
+la préparation des neuf couples profil × moment sur `main` (`dc83ae1`) et
+après la PR : les mêmes lignes, octet pour octet.
+
+**Numéros pris** : D-359 ; F1107 à F1110.
