@@ -50,7 +50,8 @@ const DUREE_DU_PARCOURS = 150_000;
 const ECRAN_DU_TELEPHONE_PX = 844;
 // L'ordre de la page à l'essentiel (simplification S2, PR 5) : « Votre journée » et « La semaine » au premier niveau,
 // les autres blocs dans « Le détail », dans leur ordre d'avant ; « Gel ou chaleur » calme n'a rien au premier niveau.
-const TITRES_DES_BLOCS = ['Votre journée', 'La semaine', 'Eau de la semaine', 'Réserve du sol', 'Eau disponible', 'Fiabilité du calcul', 'Gel ou chaleur'];
+// Depuis l'ET0 horaire, HR3 (D-350) : « Soif du jour, heure par heure » en tête du pli « Le détail ».
+const TITRES_DES_BLOCS = ['Votre journée', 'La semaine', 'Soif du jour, heure par heure', 'Eau de la semaine', 'Réserve du sol', 'Eau disponible', 'Fiabilité du calcul', 'Gel ou chaleur'];
 
 function blocs(page: Page): Locator {
   return page.locator('.today-page section.today-block');

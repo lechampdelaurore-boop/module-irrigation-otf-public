@@ -142,6 +142,8 @@ export function detailSummary(input: {
   tiles: number;
   gardens: number;
   weatherDays: number;
+  /** « Soif du jour, heure par heure » (ET0 horaire, HR3) : absent, rien de dit. */
+  dayCurve?: boolean;
   reservoirs: number;
   limits: number;
   toRefresh: number;
@@ -151,6 +153,7 @@ export function detailSummary(input: {
     input.tiles > 0 ? countText(input.tiles, 'chiffre', 'chiffres') : null,
     input.gardens > 0 ? countText(input.gardens, 'jardin', 'jardins') : null,
     input.weatherDays > 0 ? `${countText(input.weatherDays, 'jour', 'jours')} de météo` : null,
+    input.dayCurve ? 'la soif heure par heure' : null,
     input.reservoirs > 0 ? countText(input.reservoirs, 'réserve', 'réserves') : null,
     input.limits > 0 ? countText(input.limits, 'limite de prélèvement', 'limites de prélèvement') : null,
     input.toRefresh > 0
