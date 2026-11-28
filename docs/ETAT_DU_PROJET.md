@@ -12,6 +12,23 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **L'ET0 horaire, HR1 : la forme de la journée, domaine pur, codée le
+  26 novembre 2026** (D-348, F1031 à F1035 ; contrat
+  `docs/et0-horaire-contract.md`, § 4 et § 11 ; roadmap ligne 37), en
+  Opus 5.5 · Élevé, sur la branche de la PR 3 de la météo multi-modèles,
+  contrat #243 fusionné dedans. `lib/domain/weather/hourly-et0.ts` : les
+  heures du jour du lieu (23, 24 ou 25), les parts, la forme théorique du
+  soleil, la meilleure source, le consommé et le reste, la plage de forte
+  évaporation ; 22 tests (scénarios 1 à 6, 8 et 9). Aucune base, aucun
+  appel, aucun écran ; aucun calcul existant changé. Contrôles : voir la
+  PR (`pnpm e2e` omis : ni l'interface ni ses services ne changent).
+  Viennent HR2 (lecture, table, purge) et HR3 (écran) ; fusion à son tour,
+  après #243 et la météo multi-modèles. Consigne la mise en ligne de la
+  correction du week-end (#262, 8419477, run 46107116135, en ligne le
+  28 novembre 2026 à 6 h 17, cinq jobs verts) et de la clôture de la
+  ligne 36 (#261, 2841013, run 46111653877, en ligne à 7 h 15, cinq jobs
+  verts).
+
 - **Météo multi-modèles : ligne 36 close le 27 novembre 2026.** La PR 3
   (#251) est **en ligne depuis 23 h 31** (squash 4e24d94, run 46072042226,
   cinq jobs verts) : tout le chantier est en ligne (#242, #248 à #251).

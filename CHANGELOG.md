@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (ET0 horaire, HR1 : la forme de la journée, sans écran)
+
+- **La forme de la journée, en calcul seul** (D-348, F1031 à F1035) : à
+  partir de l'ET0 heure par heure, ou à défaut de la course du soleil, le
+  module sait dire quelle part de la consommation du jour tombe dans chaque
+  heure, combien est déjà passé et combien reste à venir, et à quelles
+  heures l'évaporation est la plus forte (75 % du maximum). Les jours de
+  changement d'heure comptent 23 ou 25 heures. Rien ne s'affiche encore et
+  aucun chiffre existant ne change : la lecture vient avec HR2, l'écran
+  avec HR3.
+
 ### Corrigé (la météo du lundi dans « Aujourd'hui », le week-end)
 
 - **La lecture météo de la semaine en cours va jusqu'au troisième jour
