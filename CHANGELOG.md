@@ -5,6 +5,15 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Corrigé (la météo du lundi dans « Aujourd'hui », le week-end)
+
+- **La lecture météo de la semaine en cours va jusqu'au troisième jour
+  d'« Aujourd'hui »** (D-357, F1100) : un samedi ou un dimanche, la
+  prévision du lundi (et du mardi le dimanche) est lue avec la semaine,
+  sans attendre la tâche du matin ; « Gel ou chaleur » ne dit plus
+  « Prévision indisponible » pour ce jour. Le parcours P29, rouge chaque
+  week-end sur toute branche, repasse au vert.
+
 ### Ajouté (météo multi-modèles, PR 3 : l'écran)
 
 - **Choisir le modèle de prévision de la ferme** (D-347, F1023 à F1030) :

@@ -1,6 +1,6 @@
 # État du projet
 
-Dernière mise à jour : 27 novembre 2026.
+Dernière mise à jour : 28 novembre 2026.
 
 Ce document est le point d'entrée d'une reprise de travail. Il décrit l'état
 constaté du dépôt, pas une intention. Pour le détail fonctionnel, consulter
@@ -25,6 +25,15 @@ registres, elle y renvoie.
   `docs/weather-contract.md` réécrit (fournisseur, source, décompte des
   appels, licence). Le journal `weather_forecast_model_verified` n'a pas
   été lu (pas d'accès aux journaux Cloudflare).
+- **La météo du lundi dans « Aujourd'hui », le week-end : corrigée le
+  28 novembre 2026** (D-357, F1100 ; point ouvert 70), en Opus 5.5 ·
+  Élevé (corrections, les tests et la CI jugent). La lecture de la
+  semaine en cours à la consultation s'arrêtait au dimanche ; un samedi ou
+  un dimanche, le troisième jour d'« Aujourd'hui » restait sans prévision
+  hors de la tâche du matin, et P29 échouait sur toute branche, `main`
+  comprise. Elle va désormais jusqu'au troisième jour. Test du domaine et
+  P29 rouges avant, verts après ; contrôles : voir la PR. Fusionnée le
+  28 novembre 2026 (#262, 8419477), avant #261 et #259, qu'elle débloque.
 - **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
   26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
   § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
@@ -11326,6 +11335,14 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    à 18 h 56) : le jeton se vérifie à l'heure réelle. **Fermé le
    14 novembre 2026** : la recette réelle de la démonstration est conforme
    (19 h 53) et un invité s'y est connecté (20 h 53).
+70. 🟡 **Ouvert le 28 novembre 2026 par la PR #261** (run 46080341539
+   et sa relance) : P29 échouait chaque samedi et chaque dimanche, sur
+   toute branche, `main` comprise : « Gel ou chaleur » disait
+   « Prévision indisponible le lun. », la lecture de la semaine en cours
+   s'arrêtant au dimanche. **Corrigé en branche le 28 novembre 2026**
+   (D-357, F1100, `fix/meteo-aujourdhui-trois-jours`) : la lecture va
+   jusqu'au troisième jour d'« Aujourd'hui ». Se ferme à la fusion et à la
+   mise en ligne.
 
 ## Procédure de reprise rapide
 

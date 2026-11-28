@@ -100,6 +100,13 @@ peuvent aussi être rafraîchies au plus toutes les trois heures lors d’une
 consultation, ou à la demande. Elles sont signalées anciennes après six heures. Une
 semaine historique n’est récupérée que si son cache est vide ou si
 l’utilisateur force l’actualisation.
+La lecture de la semaine courante, à la consultation ou à la demande, va
+d’aujourd’hui à dimanche, et aussi jusqu’au dernier des trois jours que
+montre « Aujourd’hui » (aujourd’hui, demain, après-demain) quand il tombe
+après dimanche : un samedi, elle lit lundi ; un dimanche, lundi et mardi
+(D-357, F1100). Sans cela, une ferme que la tâche du matin n’a pas encore
+lue, ou un matin où elle a échoué, voyait « Prévision indisponible » pour
+le lundi dans « Gel ou chaleur ». Une autre semaine garde ses sept jours.
 Une erreur impose cinq minutes avant une nouvelle tentative automatique. Les
 modifications d’objectif, de pluie manuelle et de limite ne lancent pas d’appel
 météo. Une réponse partielle conserve les champs déjà connus de la même source ;
