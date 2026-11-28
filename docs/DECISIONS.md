@@ -13039,4 +13039,8 @@ en cours lit aussi la prévision des trois jours d'« Aujourd'hui » »),
 rouge avant la correction ; et par P29, joué en local le samedi
 28 novembre 2026 à 3 h 31 (heure de Paris) : rouge aux deux largeurs sur
 `main` (« Gel ou chaleur » en trop, `forecastValues: 2`), vert avec la
-correction (`forecastValues: 3`, 2 passed).
+correction (`forecastValues: 3`, 2 passed). P13, qui comptait
+jusque-là les jours d'alerte de la seule semaine affichée (deux un
+samedi, un le dimanche), compte désormais les trois jours de l'horizon :
+la CI de la PR l'a trouvé rouge le samedi (3 alertes au lieu de 2), vert
+une fois ajusté (4 passed, en local, le même samedi).
