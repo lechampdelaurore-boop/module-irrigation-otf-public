@@ -4,14 +4,13 @@ import { adoptionRevision } from '../domain/crop-water/proposal.ts';
 import type { DemoChoice } from '../domain/demo/catalogue.ts';
 import type { IrrigationSnapshot } from '../domain/domain.ts';
 import { weatherAlertTemplates } from '../domain/weather/weather-alert-templates.ts';
-import { saveFrostLinkForUser } from '@/db/crop-alerts/inputs';
-import { saveAdoptedGoalForUser } from '@/db/crop-water/adoptions';
-import { saveSpeciesCorrespondenceForUser } from '@/db/crop-water/entries';
+import { saveAdoptedGoalsForUser } from '@/db/crop-water/adoptions';
 import { readFeatureSelectionForUser, saveFeatureSelectionForUser } from '@/db/feature-selection-repository';
 import { createWeatherAlertCriterionForUser } from '@/db/weather-alert-repository';
 import { createWorkspaceIfAbsent } from '@/db/workspace-repository';
+import { saveDemoSpeciesForUser } from '@/db/demo-seed-repository';
 import { archiveStaleDemoPreparation } from '@/db/demo-space-repository';
-import { getBedCropWaterSheetForUser } from './crop-water-bed.ts';
+import { getBedWeekProposalsForUser } from './crop-water-bed.ts';
 import { isDemoDeployment } from './deployment-mode.ts';
 import { seedDemoEquipment } from './demo-equipment-seed.ts';
 import { seedDemoWeather } from './demo-weather-seed.ts';
@@ -26,10 +25,13 @@ import { computeWeeklyPlanForUser } from './planning-service.ts';
  * semaines passées, les alertes météo qu'elle a posées, les objectifs
  * proposés par le module et adoptés, le plan
  * de la semaine calculé), par les dépôts ordinaires, comme si la ferme l'avait
- * saisi. La ferme vierge n'a pas d'espace tant que l'invité n'a rien choisi :
- * c'est ainsi qu'une ferme qui n'a jamais ouvert le module arrive sur les
- * trois façons de commencer (lot S6, D-336 ; R5). Le plan de la ferme vient de
- * `lib/adapters/demo/farms.ts`, la météo du fournisseur de la démonstration.
+ * saisi ; les arrosages passés, l'archive des prévisions, les objectifs
+ * adoptés et les espèces en quelques lots, les mêmes lignes qu'une à une
+ * (accélérer le site, A2, D-359). La ferme vierge n'a pas d'espace tant que
+ * l'invité n'a rien choisi : c'est ainsi qu'une ferme qui n'a jamais ouvert
+ * le module arrive sur les trois façons de commencer (lot S6, D-336 ; R5).
+ * Le plan de la ferme vient de `lib/adapters/demo/farms.ts`, la météo du
+ * fournisseur de la démonstration.
  *
  * Deux requêtes simultanées ne préparent l'espace qu'une fois : seule celle
  * qui le crée l'écrit ; l'autre attend qu'il soit prêt, deux secondes au
@@ -116,15 +118,20 @@ async function waitUntilPrepared(ownerUserId: string): Promise<boolean> {
  * propose aucun objectif pour la ferme entière : en poser un demanderait un
  * chiffre saisi, une valeur agronomique, et il s'appliquerait aussi aux
  * planches vides. Aucun n'est inventé.
+ *
+ * Les propositions de toutes les planches se lisent ensemble, puis les
+ * adoptions s'écrivent d'un coup (accélérer le site, A2, D-359) : les mêmes
+ * que planche après planche, dans le même ordre ; l'adoption d'une planche ne
+ * change ni la proposition ni l'objectif d'une autre.
  */
 async function adoptProposals(ownerUserId: string, snapshot: IrrigationSnapshot, now: Date): Promise<void> {
   const season = snapshot.configuration.seasonFirst;
-  for (const bed of snapshot.beds) {
-    const sheet = await getBedCropWaterSheetForUser({ ownerUserId, season, snapshot, bedId: bed.id, now });
-    if (!sheet.available || !sheet.weekOpen) continue;
-    const revision = adoptionRevision(sheet.bed.week, bed, now.toISOString());
-    if (revision) await saveAdoptedGoalForUser(ownerUserId, season, revision);
-  }
+  const proposals = await getBedWeekProposalsForUser({ ownerUserId, season, snapshot, now });
+  const revisions = proposals.flatMap(({ bed, weekOpen, proposal }) => {
+    const revision = weekOpen ? adoptionRevision(proposal, bed, now.toISOString()) : null;
+    return revision ? [revision] : [];
+  });
+  await saveAdoptedGoalsForUser(ownerUserId, season, revisions);
 }
 
 /**
@@ -140,24 +147,19 @@ async function saveWeatherAlerts(ownerUserId: string, choice: DemoChoice, now: D
   }
 }
 
-/** Les espèces de la ferme, rattachées comme la ferme le ferait dans Réglages et dans Alertes cultures. */
+/**
+ * Les espèces de la ferme, rattachées comme la ferme le ferait dans Réglages
+ * et dans Alertes cultures : chacune à sa culture de référence, puis à son
+ * seuil de gel quand la ferme a coché les alertes cultures, écrites ensemble
+ * en quelques lots (accélérer le site, A2, D-359).
+ */
 async function saveSpecies(ownerUserId: string, choice: DemoChoice, now: Date): Promise<void> {
   const plantIds = [...new Set(DEMO_FARMS[choice.profile.id].series.map((series) => series.plantId))];
   const frost = choice.profile.features.includes('alertes-cultures');
-  for (const plantId of plantIds) {
-    const referenceCropId = DEMO_SPECIES_REFERENCES[plantId];
-    if (referenceCropId) {
-      const saved = await saveSpeciesCorrespondenceForUser(
-        ownerUserId,
-        { plantId, seriesId: null, target: { kind: 'reference', referenceCropId, analogy: false } },
-        now,
-      );
-      if (!saved.ok) throw new Error(`Démonstration : ${plantId} non rattachée (${saved.problems.join(' ; ')}).`);
-    }
-    const commonKey = DEMO_FROST_COMMON_KEYS[plantId];
-    if (frost && commonKey) {
-      const saved = await saveFrostLinkForUser(ownerUserId, { plantId, seriesId: null, commonKey }, now);
-      if (!saved.ok) throw new Error(`Démonstration : seuil de gel de ${plantId} refusé (${saved.problems.join(' ; ')}).`);
-    }
-  }
+  const saved = await saveDemoSpeciesForUser(ownerUserId, plantIds.map((plantId) => ({
+    plantId,
+    referenceCropId: DEMO_SPECIES_REFERENCES[plantId] ?? null,
+    frostCommonKey: frost ? DEMO_FROST_COMMON_KEYS[plantId] ?? null : null,
+  })), now);
+  if (!saved.ok) throw new Error(`Démonstration : espèces refusées (${saved.problems.join(' ; ')}).`);
 }

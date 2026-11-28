@@ -131,28 +131,48 @@ export async function saveFrostLinkForUser(
   now = new Date(),
 ): Promise<Saved<FrostLinkRevision>> {
   const common = await listCropAlertCommon();
-  const validation = validateFrostLink(input, new Set(common.map((entry) => entry.key)));
+  const checked = checkFrostLink(input, new Set(common.map((entry) => entry.key)));
+  if (!checked.ok) return checked;
+  const workspaceId = await ensureWorkspaceForUser(ownerUserId);
+  const { revision, statements } = frostLinkStatements({ workspaceId, ownerUserId, at: now.toISOString() }, checked.value);
+  await db.batch(statements);
+  return { ok: true, value: revision };
+}
+
+/** Un rattachement au jeu commun vérifié par `checkFrostLink`, prêt à s'écrire. */
+type CheckedFrostLink = { plantId: string; seriesId: string | null; commonKey: string | null; damageCelsius: number | null };
+
+/** Les vérifications de `saveFrostLinkForUser`, pour un jeu commun déjà lu (accélérer le site, A2, D-359). */
+export function checkFrostLink(
+  input: { plantId: string; seriesId: string | null } & FrostLinkInput,
+  commonKeys: ReadonlySet<string>,
+): Saved<CheckedFrostLink> {
+  const validation = validateFrostLink(input, commonKeys);
   const problems = [
     ...(validation.ok ? [] : [validation.message]),
     ...(input.plantId.trim() === '' ? ['Espèce inconnue.'] : []),
     ...(input.seriesId !== null && input.seriesId.trim() === '' ? ['Série inconnue.'] : []),
   ];
   if (!validation.ok || problems.length > 0) return { ok: false, problems };
-  const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  const revision: FrostLinkRevision = {
-    id: crypto.randomUUID(),
-    plantId: input.plantId,
-    seriesId: input.seriesId,
-    commonKey: validation.commonKey,
-    damageCelsius: validation.damageCelsius,
-    recordedAt: now.toISOString(),
-  };
+  return { ok: true, value: { plantId: input.plantId, seriesId: input.seriesId, commonKey: validation.commonKey, damageCelsius: validation.damageCelsius } };
+}
+
+/**
+ * La révision d'un rattachement vérifié et le lot que `saveFrostLinkForUser`
+ * envoie ; il peut partir avec d'autres gestes, dans leur ordre (accélérer le
+ * site, A2, D-359).
+ */
+export function frostLinkStatements(
+  gesture: { workspaceId: string; ownerUserId: string; at: string },
+  link: CheckedFrostLink,
+): { revision: FrostLinkRevision; statements: D1PreparedStatement[] } {
+  const { workspaceId, ownerUserId } = gesture;
+  const revision: FrostLinkRevision = { id: crypto.randomUUID(), ...link, recordedAt: gesture.at };
   // Le journal des modifications d'abord : l'avant est le rattachement en vigueur (amélioration n° 7, D-286).
-  await db.batch([frostLinkJournal('seuil-de-gel', { workspaceId, actorUserId: ownerUserId, at: revision.recordedAt }, revision), db.prepare(
+  return { revision, statements: [frostLinkJournal('seuil-de-gel', { workspaceId, actorUserId: ownerUserId, at: revision.recordedAt }, revision), db.prepare(
     `INSERT INTO irrigation_crop_frost_links (id, workspace_id, plant_id, series_id, common_key, damage_celsius, actor_user_id, recorded_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).bind(revision.id, workspaceId, revision.plantId, revision.seriesId, revision.commonKey, revision.damageCelsius, ownerUserId, revision.recordedAt)]);
-  return { ok: true, value: revision };
+  ).bind(revision.id, workspaceId, revision.plantId, revision.seriesId, revision.commonKey, revision.damageCelsius, ownerUserId, revision.recordedAt)] };
 }
 
 /** Corrige le délai de séchage d'une espèce ; vide, il le retire. */

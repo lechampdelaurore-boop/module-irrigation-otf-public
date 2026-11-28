@@ -2,7 +2,7 @@ import { listAdoptionsForBedForUser, type StoredAdoption } from '@/db/crop-water
 import { listEquipmentForUser } from '@/db/equipment/read';
 import { listEquipmentPlacementsForUser } from '@/db/equipment-placement-repository';
 import { listHydricGoalRevisionsThroughWeekForUser } from '@/db/water-management-repository';
-import type { IrrigationSnapshot } from '../domain/domain';
+import type { Bed, IrrigationSnapshot } from '../domain/domain';
 import { objectiveForBed } from '../domain/irrigation-needs';
 import { objectiveFollowsCropNeed, objectiveOriginText } from '../domain/objective-reading';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '../domain/water-management';
@@ -94,6 +94,53 @@ export async function getBedCropWaterSheetForUser(input: {
     sprinklerWarning: earlySprinklerWarning({ days: week.beds[0].week.days, sprinklerOnBed, irrigationDates }),
     unusableCrops: week.unusableCrops,
   };
+}
+
+/**
+ * La proposition de la semaine en cours de plusieurs planches, lues ensemble
+ * (accélérer le site, A2, D-359 : les objectifs adoptés d'une ferme de
+ * démonstration). Pour chaque planche de la saison, la proposition que sa
+ * fiche (`getBedCropWaterSheetForUser`) montrerait cette semaine, face à
+ * l'objectif applicable lu de la même façon, par la règle même du besoin ;
+ * les lectures de la ferme se font une fois pour toutes les planches, au lieu
+ * d'une fois par planche. Dans l'ordre du plan ; une planche sans
+ * proposition calculée (un jardin à classer) n'y est pas ; rien sans plan de
+ * culture lu.
+ */
+export async function getBedWeekProposalsForUser(input: {
+  ownerUserId: string;
+  season: number;
+  snapshot: IrrigationSnapshot;
+  now: Date;
+}): Promise<{ bed: Bed; weekOpen: boolean; proposal: BedCropWater['week'] }[]> {
+  const beds = input.snapshot.beds.filter((bed) => bed.seasons.includes(input.season));
+  if (!input.snapshot.cropPlan || beds.length === 0) return [];
+  const today = dateKeyInTimeZone(input.now, FARM_TIME_ZONE);
+  const weekStart = weekStartDateKey(today);
+  const weekEnd = addDaysToDateKey(weekStart, 6);
+  const [revisions, automatic, offSeason] = await Promise.all([
+    listHydricGoalRevisionsThroughWeekForUser(input.ownerUserId, input.season, weekStart),
+    readAutomaticObjectiveSourceForUser({ ...input, from: weekStart, to: weekEnd }),
+    readOffSeasonSourceForUser(input),
+  ]);
+  const objectiveMmByBed = new Map(beds.map((bed) => [
+    bed.id,
+    objectiveForBed(revisions, bed, weekStart, weekEnd, automatic?.inputFor(bed), offSeason?.daysFor(bed)).value,
+  ]));
+  const week = await getCropWaterWeekForUser({
+    ownerUserId: input.ownerUserId,
+    season: input.season,
+    snapshot: input.snapshot,
+    weekStart,
+    now: input.now,
+    objectiveMmByBed,
+    bedIds: beds.map((bed) => bed.id),
+  });
+  const proposals = new Map(week.beds.map((entry) => [entry.bedId, entry.week]));
+  return beds.flatMap((bed) => {
+    const proposal = proposals.get(bed.id);
+    return proposal ? [{ bed, weekOpen: weekEnd >= today, proposal }] : [];
+  });
 }
 
 /** Un arrosage des trois jours avant la semaine peut être proche du premier de la semaine. */

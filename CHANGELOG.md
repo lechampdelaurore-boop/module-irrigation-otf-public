@@ -5,6 +5,14 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (accélérer le site, A2 : la démonstration s'ouvre plus vite)
+
+- **La première ouverture d'une démonstration est plus rapide** (D-359,
+  F1107 à F1110) : la ferme fictive d'un invité s'écrit en quelques envois à
+  la base au lieu d'un par ligne (206 à 235 appels au lieu de 512 à 1 275
+  pour la « Ferme des Trois Noues »). L'espace préparé est exactement le même
+  qu'avant, ligne pour ligne ; rien ne change à l'écran ni dans les calculs.
+
 ### Ajouté (accélérer le site, A1 : le serveur dit son temps)
 
 - **Chaque page dit le temps de son serveur** (D-358, F1101 à F1106) :

@@ -1,7 +1,7 @@
-import { writeForecastArchiveForUser } from '@/db/forecast-archive-repository';
+import { writeForecastArchivesForUser } from '@/db/forecast-archive-repository';
 import { MILLISECONDS_PER_DAY } from '../domain/units.ts';
 import { addDaysToDateKey } from '../domain/water-management.ts';
-import { FORECAST_ARCHIVE_FIRST_HORIZON_DAYS, FORECAST_ARCHIVE_LAST_HORIZON_DAYS, forecastArchiveRows } from '../domain/weather/forecast-archive.ts';
+import { FORECAST_ARCHIVE_FIRST_HORIZON_DAYS, FORECAST_ARCHIVE_LAST_HORIZON_DAYS, forecastArchiveRows, type ForecastArchiveRow } from '../domain/weather/forecast-archive.ts';
 import type { WeatherDailyValue } from '../domain/weather/weather-provider.ts';
 
 /**
@@ -71,6 +71,7 @@ export async function seedDemoForecastArchive({ ownerUserId, locationKey, values
   source: string;
 }): Promise<void> {
   const byDate = new Map(values.map((value) => [value.date, value]));
+  const archives: { locationKey: string; issuedOn: string; rows: ForecastArchiveRow[]; source: string; fetchedAt: string }[] = [];
   for (let issuedOn = addDaysToDateKey(firstDay, -ISSUES_BEFORE_FIRST_DAY); issuedOn < momentDateKey; issuedOn = addDaysToDateKey(issuedOn, 1)) {
     const forecast: WeatherDailyValue[] = [];
     for (let horizonDays = FORECAST_ARCHIVE_FIRST_HORIZON_DAYS; horizonDays <= FORECAST_ARCHIVE_LAST_HORIZON_DAYS; horizonDays += 1) {
@@ -79,6 +80,8 @@ export async function seedDemoForecastArchive({ ownerUserId, locationKey, values
     }
     const rows = forecastArchiveRows(issuedOn, forecast);
     if (rows.length === 0) continue;
-    await writeForecastArchiveForUser(ownerUserId, { locationKey, issuedOn, rows, source, fetchedAt: `${issuedOn}T05:15:00.000Z` });
+    archives.push({ locationKey, issuedOn, rows, source, fetchedAt: `${issuedOn}T05:15:00.000Z` });
   }
+  // Tous les matins d'un coup (accélérer le site, A2, D-359) : les mêmes lignes que matin après matin.
+  await writeForecastArchivesForUser(ownerUserId, archives);
 }

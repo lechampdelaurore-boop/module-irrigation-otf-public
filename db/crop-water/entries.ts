@@ -3,6 +3,7 @@ import { ensureWorkspaceForUser, findWorkspaceIdForUser } from '../workspace-rep
 import { listReferenceCropsForWorkspace, type CropWaterWriteResult } from './references';
 import type { Season } from '@/lib/domain/domain';
 import type { KcOverride } from '@/lib/domain/crop-water/kc';
+import type { ReferenceCrop } from '@/lib/domain/crop-water/reference';
 import { correspondenceProblem, kcOverrideProblem, stageDeclarationProblem } from '@/lib/domain/crop-water/records';
 import type { CorrespondenceEntry } from '@/lib/domain/crop-water/species';
 import type { StageDeclaration } from '@/lib/domain/crop-water/stage';
@@ -94,10 +95,29 @@ export async function saveSpeciesCorrespondenceForUser(
 ): Promise<CropWaterWriteResult<CorrespondenceEntry>> {
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
   const crops = await listReferenceCropsForWorkspace(workspaceId);
-  const problem = correspondenceProblem(entry, crops.map((stored) => stored.crop));
-  if (problem) return { ok: false, problems: [problem] };
-  await db.batch(linkStatements(workspaceId, ownerUserId, entry, now.toISOString()));
+  const statements = speciesCorrespondenceStatements(
+    { workspaceId, ownerUserId, at: now.toISOString() },
+    crops.map((stored) => stored.crop),
+    entry,
+  );
+  if (!statements.ok) return statements;
+  await db.batch(statements.value);
   return { ok: true, value: entry };
+}
+
+/**
+ * Le lot que `saveSpeciesCorrespondenceForUser` envoie, pour une ferme dont
+ * les cultures de référence sont déjà lues, ou ses problèmes ; il peut partir
+ * avec d'autres gestes, dans leur ordre (accélérer le site, A2, D-359).
+ */
+export function speciesCorrespondenceStatements(
+  gesture: { workspaceId: string; ownerUserId: string; at: string },
+  crops: readonly ReferenceCrop[],
+  entry: CorrespondenceEntry,
+): CropWaterWriteResult<D1PreparedStatement[]> {
+  const problem = correspondenceProblem(entry, crops);
+  if (problem) return { ok: false, problems: [problem] };
+  return { ok: true, value: linkStatements(gesture.workspaceId, gesture.ownerUserId, entry, gesture.at) };
 }
 
 /**
