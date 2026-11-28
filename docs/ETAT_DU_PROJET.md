@@ -26,9 +26,11 @@ registres, elle y renvoie.
   aucun calcul, aucune migration, aucun réglage de Cloudflare. Relevé en
   local : « Aujourd'hui », 101 appels à la base ; la première ouverture
   d'un espace de démonstration, 935 dans une seule requête. Tests ;
-  parcours P75 et V13. Contrôles : voir la PR. Fusion à son tour, après
-  #259 ; puis le nouveau mesurage du démarrage à froid, sur la
-  démonstration ; A2, puis A3, suivent.
+  parcours P75 et V13. Contrôles : voir la PR. Fusion à son tour ; puis
+  le nouveau mesurage du démarrage à froid, sur la démonstration ; A2,
+  puis A3, suivent. Consigne la mise en ligne de #259 (1be6469,
+  fusionnée le 28 novembre 2026 à 14 h 36, run 46150424037, en ligne à
+  15 h 28, cinq jobs verts).
 - **Parcours navigateur à cheval sur minuit : P63, P12 et P37 corrigés
   le 27 novembre 2026** (D-355, F1093 à F1096 ; point ouvert 71), en
   Opus 5.5 · Élevé (corrections, les tests et la CI jugent). Une suite
@@ -40,8 +42,8 @@ registres, elle y renvoie.
   vidés la veille par d'autres parcours, pas l'eau). Les trois échecs
   reproduits sur `main` sans attendre minuit, puis verts avec la
   correction ; contrôles : voir la PR. Parcours seuls : aucun écran,
-  calcul ni migration. Fusion à son tour, après la ligne 37 et #258.
-  Consigne la mise en ligne de #258 (dc83ae1, fusionnée le 28 novembre
+  calcul ni migration. **En ligne le 28 novembre 2026 à 15 h 28** (#259,
+  run 46150424037, cinq jobs verts). Consigne la mise en ligne de #258 (dc83ae1, fusionnée le 28 novembre
   2026 à 12 h 38, run 46140842075, en ligne à 13 h 34, cinq jobs verts),
   sa recette sur la démonstration, conforme le 28 novembre 2026, et la
   recette de S6, faite et conforme le 27 novembre 2026 vers 12 h 20
@@ -11455,7 +11457,7 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    jusqu'au troisième jour d'« Aujourd'hui ». **Fermé le 28 novembre
    2026** : #262 fusionnée à 5 h 20, en ligne à 6 h 17 (run
    46107116135, les cinq jobs verts).
-71. 🟡 **Ouvert le 26 novembre 2026 par le déploiement de #237 et la PR
+71. ✅ **Ouvert le 26 novembre 2026 par le déploiement de #237 et la PR
    #238** (runs 45901421359 et 45906065683) : une suite de parcours
    commencée avant minuit et finie après faisait échouer P63 à
    l'ordinateur, P12 et P37 au téléphone, verts une fois relancés après
@@ -11464,7 +11466,8 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    les objectifs vidés la veille par les parcours d'avant minuit.
    **Corrigé en branche le 27 novembre 2026** (D-355, F1093 à F1096,
    `fix/parcours-minuit`) : les trois échecs reproduits sur `main`, verts
-   avec la correction. Se ferme à la fusion et à la mise en ligne.
+   avec la correction. **Fermé le 28 novembre 2026** : #259 fusionnée à
+   14 h 36, en ligne à 15 h 28 (run 46150424037, les cinq jobs verts).
 
 ## Procédure de reprise rapide
 
