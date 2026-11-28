@@ -3,6 +3,7 @@ import { FARM_CARD_LINES } from '../lib/domain/features/farm-cards.ts';
 import { pageDocumentTitle } from '../lib/domain/features/pages.ts';
 import { FARM_CARD_PAGES, PLACE_IDS, placeOfPage } from '../lib/domain/features/places.ts';
 import { attendreLeChoixDesFonctionnalites, ouvrirUneFermeNeuve, ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
+import { addDaysToDateKey } from '../lib/domain/water-management.ts';
 import { horodatageLocal } from './support/materiel.ts';
 import {
   allerALaPage,
@@ -464,8 +465,13 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   await expect(pluie).toHaveAttribute('aria-expanded', 'true');
   const combien = feuille.getByLabel('Combien ?');
   await expect(combien).toBeVisible();
-  const premierJanvier = horodatageLocal(0, reference).slice(5, 10) === '01-01';
-  await expect(feuille.getByLabel('Quel jour ?')).toHaveValue(horodatageLocal(premierJanvier ? 0 : -24 * 60, reference).slice(0, 10));
+  // La feuille propose la veille du jour où la page a été servie, ce jour même le 1er janvier. Ce jour
+  // tombe entre le début du parcours et cette lecture : passé minuit entre les deux, il y en a deux
+  // possibles, et chacun est juste (27 novembre 2026, contrat des parcours, « l'heure où il tourne »).
+  const quelJour = feuille.getByLabel('Quel jour ?');
+  await expect(quelJour).toHaveValue(/^\d{4}-\d{2}-\d{2}$/);
+  const jourPropose = await quelJour.inputValue();
+  expect([jourProposePourLaPluie(reference).jour, jourProposePourLaPluie(Date.now()).jour], 'la veille du jour de la ferme').toContain(jourPropose);
   await expect(feuille.getByRole('button', { name: 'Enregistrer', exact: true })).toBeDisabled();
   await combien.fill('8');
   await feuille.getByRole('button', { name: 'Enregistrer 8 mm' }).click();
@@ -473,13 +479,22 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   expect(await laMarque(page), 'la pluie s’écrit sans quitter la page').toBe('posée');
   await verifierLEtape(page, journal, '8 mm notés dans la feuille');
 
-  // Fermée, la page se relit pour montrer la pluie ; rouverte, la mesure se dit.
+  // Fermée, la page se relit pour montrer la pluie ; rouverte, la mesure se dit, si la feuille propose
+  // encore le jour noté : passé minuit entre les deux, elle propose le jour suivant, sans mesure, et le
+  // parcours le dit hors jeu.
+  const avantLaRelecture = Date.now();
   await Promise.all([page.waitForEvent('load'), feuille.getByRole('button', { name: 'Fermer' }).click()]);
   await attendreLaPagePrete(page, 'planning');
   expect(await laMarque(page), 'la page relue').toBeNull();
   await ouvrirParClic(plus, feuille);
   await feuille.getByRole('button', { name: /^Noter la pluie/ }).click();
-  await expect(feuille).toContainText(`8 mm déjà notés ${premierJanvier ? 'pour aujourd’hui' : 'pour hier'}.`);
+  await expect(feuille.getByLabel('Combien ?')).toBeVisible();
+  const relu = jourProposePourLaPluie(Date.now());
+  if (relu.jour === jourPropose && jourProposePourLaPluie(avantLaRelecture).jour === jourPropose) {
+    await expect(feuille).toContainText(`8 mm déjà notés ${relu.aujourdhui ? 'pour aujourd’hui' : 'pour hier'}.`);
+  } else {
+    testInfo.annotations.push({ type: 'hors jeu', description: `minuit passé entre la pluie notée (${jourPropose}) et la feuille rouverte : la mesure relue n’est pas vérifiée ici` });
+  }
   await page.keyboard.press('Escape');
   await expect(feuille).toHaveCount(0);
   await verifierLEtape(page, journal, 'la pluie relue');
@@ -505,3 +520,14 @@ test('le « + » : la feuille, Échap et le voile ; « Noter la pluie » sans qu
   await expect(retour).toHaveAttribute('href', /^\/irrigation(\/aujourdhui)?\?season=\d{4}$/);
   await verifierLEtape(page, journal, '« Noter un arrosage déjà fait »');
 });
+
+/**
+ * Le jour que « Noter la pluie » propose à un instant donné : la veille du
+ * jour de la ferme, ou ce jour même le 1er janvier, la veille étant dans la
+ * saison d'avant (S2, PR 4).
+ */
+function jourProposePourLaPluie(instant: number): { jour: string; aujourdhui: boolean } {
+  const jourDeLaFerme = horodatageLocal(0, instant).slice(0, 10);
+  const premierJanvier = jourDeLaFerme.slice(5) === '01-01';
+  return { jour: premierJanvier ? jourDeLaFerme : addDaysToDateKey(jourDeLaFerme, -1), aujourdhui: premierJanvier };
+}

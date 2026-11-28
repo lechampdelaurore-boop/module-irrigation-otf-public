@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { ouvrirUneFermeToutCochee, preparerLaFermeNeuve } from './support/fonctionnalites.ts';
 import { annulerDepuisLeMenu, choisirMaterielEtReglage, horodatageLocal, preparerMaterielArrosant, saisirEnMillimetres } from './support/materiel.ts';
 import { attendreLaPageIrrigation, surveillerLaConsole, verifierCibleTactile, verifierLEtape , ouvrirLePli, ouvrirLOnglet } from './support/parcours.ts';
 import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.ts';
@@ -8,7 +9,8 @@ import { poserUnObjectifDeFerme, retirerLesObjectifs } from './support/planning.
  * vous répond » (docs/audit-ergonomie-2026-11-19-lot-g-contract.md ;
  * docs/browser-journeys-contract.md).
  *
- * Sur la ferme de démonstration, sans rien laisser derrière lui :
+ * Sur la ferme de démonstration, sans rien laisser derrière lui, sauf la
+ * fenêtre de l'objectif, jouée sur une ferme propre au parcours :
  *
  * - « Planifier » : le message vient sous « Planifier · … », à
  *   l'écran sans que l'utilisateur défile (F404) ; le formulaire se vide et
@@ -142,9 +144,16 @@ test('« Objectifs et besoins » répond sous chaque bouton, et un rechargement 
   }
 });
 
-test('au-delà de l’objectif de la semaine, « Arroser maintenant » demande d’abord', async ({ page }, testInfo) => {
+test('au-delà de l’objectif de la semaine, « Arroser maintenant » demande d’abord', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
-  await attendreLaPageIrrigation(page);
+  // Une ferme propre au parcours : sur la ferme commune, un parcours qui passe minuit trouve, la veille,
+  // les objectifs vidés par les parcours d'avant minuit ; ce jour-là reste sans objectif, et la semaine
+  // de N01 ne vaut plus que six septièmes des 10 mm, 8,6 mm (27 novembre 2026).
+  // La ferme neuve se prépare dans Réglages avant le parcours lui-même, comme P67.
+  test.setTimeout(180_000);
+  await ouvrirUneFermeToutCochee(page, context, testInfo, 'p37-objectif');
+  await preparerLaFermeNeuve(page);
+  await attendreLaPageIrrigation(page, 'materiel');
   const { materiel, reglage } = await preparerMaterielArrosant(page, testInfo, { repere: 'p37 objectif' });
   await attendreLaPageIrrigation(page, 'besoins');
   await poserUnObjectifDeFerme(page, '10');
