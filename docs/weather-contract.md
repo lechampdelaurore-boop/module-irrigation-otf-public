@@ -76,9 +76,19 @@ peuvent aussi être rafraîchies au plus toutes les trois heures lors d’une
 consultation, ou à la demande. Elles sont signalées anciennes après six heures. Une
 semaine historique n’est récupérée que si son cache est vide ou si
 l’utilisateur force l’actualisation.
+La lecture de la semaine courante, à la consultation ou à la demande, va
+d’aujourd’hui à dimanche, et aussi jusqu’au dernier des trois jours que
+montre « Aujourd’hui » (aujourd’hui, demain, après-demain) quand il tombe
+après dimanche : un samedi, elle lit lundi ; un dimanche, lundi et mardi
+(D-357, F1100). Sans cela, une ferme que la tâche du matin n’a pas encore
+lue, ou un matin où elle a échoué, voyait « Prévision indisponible » pour
+le lundi dans « Gel ou chaleur ». Une autre semaine garde ses sept jours.
 Une erreur impose cinq minutes avant une nouvelle tentative automatique. Les
 modifications d’objectif, de pluie manuelle et de limite ne lancent pas d’appel
-météo. Une réponse partielle conserve les champs déjà connus ; si un des deux
+météo. Une réponse partielle conserve les champs déjà connus de la même source ;
+une lecture d’une autre source (un modèle de prévision choisi, ou le retour à
+« Automatique », `docs/weather-models-contract.md`) remplace le jour entier,
+jamais un mélange de deux sources dans un jour (D-346, F1016). Si un des deux
 services (prévision/réanalyse) échoue, l’autre peut tout de même être enregistré.
 La date affichée correspond à la plus ancienne lecture fournisseur encore
 utilisée dans la semaine, pas à une consultation d’une autre semaine. Sont
@@ -94,7 +104,10 @@ Le planificateur Cloudflare appelle une route interne authentifiée du site. Il
 ne possède aucun accès direct à la base et ne reçoit ni session utilisateur ni
 clé fournisseur. Le service partagé avec le bouton manuel sélectionne tous les
 workspaces dont la localisation a déjà été résolue, regroupe ceux qui utilisent
-les mêmes coordonnées et ne fait qu’une lecture externe par lieu. Le cache
+les mêmes coordonnées et ne fait qu’une lecture externe par lieu et par modèle
+de prévision (depuis le 26 novembre 2026, D-346) : une pour les fermes en
+« Automatique », une par modèle choisi à ce lieu, la réanalyse une fois par
+lieu ; chaque ferme écrit ensuite ses propres lignes. Le cache
 métier est durable dans D1. Un verrou global D1 empêche deux tâches planifiées
 de s’exécuter en parallèle ; un verrou par workspace espace d’au moins 30 secondes deux opérations météo
 pour une même exploitation, y compris lorsqu’elles atteignent deux instances du
@@ -113,18 +126,23 @@ valide en D1 reste affichée.
 
 Nombre maximal d’appels externes avec une commune déjà géocodée :
 
-- passage planifié quotidien : **1** Forecast et **1** Historical par lieu
-  distinct, quel que soit le nombre de workspaces partageant ce lieu, hors
-  tentatives bornées après erreur temporaire ;
+- passage planifié quotidien : **1** Forecast par lieu distinct et par
+  modèle de prévision choisi à ce lieu (« Automatique » compte pour un), et
+  **1** Historical par lieu distinct, quel que soit le nombre de workspaces
+  partageant ce lieu, hors tentatives bornées après erreur temporaire ;
 - relecture de la journée (depuis le 24 novembre 2026, C1, D-303) : **1**
-  Forecast de 7 jours par lieu distinct à 9 h 30, 12 h 30, 15 h 30, 18 h 30
-  et 21 h 30, seulement pour les fermes qui ont une alerte active ; aucune
-  réanalyse (`docs/weather-scheduler-contract.md`) ;
+  Forecast de 7 jours par lieu distinct et par modèle à 9 h 30, 12 h 30,
+  15 h 30, 18 h 30 et 21 h 30, seulement pour les fermes qui ont une alerte
+  active ; aucune réanalyse (`docs/weather-scheduler-contract.md`) ;
 - chargement de la semaine courante avec cache frais : **0** ;
 - chargement avec cache météo absent ou périmé : **1** appel Forecast ;
 - recherche explicite d’une commune : **1** appel Geocoding ;
 - clic sur « Actualiser la météo » : **1** appel Forecast pour la semaine
   courante ;
+- enregistrement d’un modèle de prévision : **1** appel Forecast chez
+  Open-Meteo, la lecture qui le vérifie (`docs/weather-models-contract.md`,
+  règle 8) ; **0** pour le modèle déjà enregistré ; le retour à
+  « Automatique » relit ses prévisions à venir : **1** appel Forecast ;
 - enregistrement d’un objectif, d’une pluie manuelle ou d’une limite : **0**.
 
 Pour une ancienne semaine qui recouvre à la fois une période réanalysable et une

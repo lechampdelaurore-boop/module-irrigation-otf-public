@@ -7,6 +7,7 @@ import { AnchoredFold, PAGE_SETTINGS_ANCHOR } from '../shell/page-settings-fold'
 import { HistoryViews } from '../history-views';
 import { IrrigationNeedsDashboardView, NeedsThresholdSettings } from '../irrigation-needs-dashboard';
 import { WaterManagementDashboard } from '../water-management-dashboard';
+import { OffSeasonPanel } from '../off-season-panel';
 import { WeeklyPlanProvider } from '../planning/weekly-plan-state';
 import { PlanSettings, WeeklyPlanSection } from '../planning/weekly-plan-view';
 import { pageMetadata } from '../page-metadata';
@@ -16,6 +17,7 @@ import { NEEDS_SECTION_ANCHOR, weekSections } from '@/lib/domain/features/week-p
 import { needsDetailLine, weekDetailSummary, WEEK_SECTION_TITLES, WEEK_SETTINGS_LINE } from '@/lib/domain/semaine/week-detail';
 import { weekDayEvents } from '@/lib/domain/semaine/week-days';
 import { farmRainMatters } from '@/lib/domain/today/rain-entry';
+import { objectiveBedReadings } from '@/lib/domain/objective-reading';
 import { MEASURED_RAIN_ANCHOR } from '@/lib/domain/today/reliability';
 import { todaySeason } from '@/lib/domain/today/today-view';
 import { dateKeyInTimeZone, FARM_TIME_ZONE, weekStartDateKey } from '@/lib/domain/water-management';
@@ -91,7 +93,7 @@ async function computeSemainePage({ searchParams }: { searchParams: IrrigationSe
           <IrrigationNeedsDashboardView season={context.season} initialDashboard={needs.irrigationNeeds} showProposals={context.enabled.includes('cultures')} />
         </WeekDetailSection>
         {planning ? <PlanDetailSection current={current} /> : null}
-        <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={needs.waterDashboard} initialFarmObjective={{ weekStart: needs.irrigationNeeds.weekStart, objective: needs.irrigationNeeds.farmObjective }} />
+        <WaterManagementDashboard season={context.season} snapshot={context.snapshot} initialDashboard={needs.waterDashboard} initialFarmObjective={{ weekStart: needs.irrigationNeeds.weekStart, objective: needs.irrigationNeeds.farmObjective, beds: objectiveBedReadings(needs.irrigationNeeds.gardens) }} offSeason={<OffSeasonPanel season={context.season} snapshot={context.snapshot} initialView={needs.offSeason} />} />
         {gapSection ? <WaterGapSection season={context.season} rainHref={`#${MEASURED_RAIN_ANCHOR}`} /> : null}
         <WeekSettings planning={planning !== null}>
           <NeedsThresholdSettings season={context.season} weekStart={needs.irrigationNeeds.weekStart} initialThresholdMm={needs.irrigationNeeds.thresholdMm} />

@@ -28,6 +28,15 @@ export type ChangeJournalEntry = {
   sequence: number;
 };
 
+/**
+ * L'auteur d'un changement que le module fait seul, sans geste d'une personne
+ * (D-346, F1019) : le retour d'une ferme à « Automatique » quand son modèle de
+ * prévision n'est plus proposé ou ne couvre plus son lieu (météo
+ * multi-modèles, règle 9). Jamais l'identifiant d'une personne : Cloudflare
+ * Access en donne d'une autre forme.
+ */
+export const MODULE_ACTOR_ID = 'module';
+
 /** Où reprendre la lecture : la dernière ligne lue (« Voir plus »). */
 export type ChangeJournalCursor = { createdAt: string; sequence: number };
 

@@ -92,3 +92,30 @@ export function weatherLocationJournal(
     'defaults',
   );
 }
+
+// --- Le modèle de prévision ---------------------------------------------------------
+
+/**
+ * Le modèle de prévision de la ferme (météo multi-modèles, D-346) : un modèle
+ * de la liste, ou « Automatique » (vide). Sans `expected`, une ferme sans
+ * ligne de préférences vaut « Automatique » (la personne qui choisit). Avec
+ * `expected`, la ligne ne s'écrit que si la ferme a encore ce modèle : le
+ * retour à « Automatique » fait par le module (règle 9) ne dit jamais un
+ * changement qui n'a pas eu lieu.
+ */
+export function forecastModelJournal(
+  subject: 'modele-meteo',
+  gesture: JournalGesture,
+  modelId: string | null,
+  expected?: string,
+): D1PreparedStatement {
+  const target: JournalTarget = expected === undefined
+    ? { table: 'irrigation_weather_preferences', where: 'current.workspace_id = ?', params: [gesture.workspaceId] }
+    : { table: 'irrigation_weather_preferences', where: 'current.workspace_id = ? AND current.forecast_model = ?', params: [gesture.workspaceId, expected] };
+  return journalUpdate(
+    { ...gesture, subject, objectId: null },
+    target,
+    [{ key: 'forecastModel', current: 'current.forecast_model', next: modelId }],
+    expected === undefined ? 'defaults' : 'refuse',
+  );
+}

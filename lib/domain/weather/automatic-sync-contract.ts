@@ -17,6 +17,12 @@ export type WeatherSyncLocation = {
 export type AutomaticWeatherTarget = WeatherSyncLocation & {
   workspaceId: string;
   refreshNotBeforeAt: string | null;
+  /**
+   * Le modèle de prévision enregistré par l'exploitation
+   * (docs/weather-models-contract.md, D-346) ; absent ou `null` :
+   * « Automatique », la lecture d'avant ce chantier (règle 1).
+   */
+  forecastModel?: string | null;
 };
 
 export type AutomaticWeatherSyncRepository = {
@@ -55,4 +61,12 @@ export type AutomaticWeatherSyncRepository = {
     error: string | null;
     notBeforeAt: string | null;
   }): Promise<void>;
+  /**
+   * Règle 9 des modèles (docs/weather-models-contract.md, D-346) : ramène une
+   * exploitation à « Automatique » quand son modèle n'est plus proposé ou ne
+   * couvre plus son lieu, si elle l'a encore, avec sa ligne au journal des
+   * modifications (« Le module ») ; rend `true` si la ferme a changé. Absent :
+   * la ferme lit « Automatique » sans que rien ne s'écrive.
+   */
+  returnForecastModelToAutomatic?(input: { workspaceId: string; savedModelId: string; at: string }): Promise<boolean>;
 };

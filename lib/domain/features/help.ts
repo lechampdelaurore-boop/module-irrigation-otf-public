@@ -168,3 +168,34 @@ export const RELIABILITY_HELP: SectionHelp = {
     },
   ],
 };
+
+/**
+ * Le « ? » du bloc « Hors saison », dans « Objectifs de la semaine » (6
+ * quaterdecies, B3, docs/objectif-automatique-saison-contract.md, sections
+ * 4.1 à 4.5 ; D-337, D-353) : ce que le filtre ignore, ce qui continue, les
+ * cinq portées, et la reprise, à la main seulement.
+ */
+export const OFF_SEASON_HELP: SectionHelp = {
+  entries: [
+    {
+      title: 'Ce que fait « hors saison »',
+      text: 'Un endroit hors saison n’a plus d’objectif, ni saisi ni automatique, et le planning ne propose plus de l’arroser. Il sort des comptes de l’eau visée. Rien n’est effacé : un objectif saisi reste là et revient à la reprise.',
+    },
+    {
+      title: 'Ce qui continue',
+      text: 'La pluie tombée dehors reste enregistrée et suivie, comme la réserve du sol, l’ET0, la météo et ses alertes, le gel compris. Un arrosage fait à la main s’enregistre toujours. Le passé ne bouge pas : le geste compte à partir de son jour.',
+    },
+    {
+      title: 'Les endroits',
+      text: 'Une planche, un jardin ou un abri, une parcelle, tout le plein champ ou tout le sous-abri. Un jardin « à classer » n’est couvert ni par tout le plein champ ni par tout le sous-abri : classez-le, ou mettez-le hors saison seul.',
+    },
+    {
+      title: 'Reprendre',
+      text: 'Rien ne reprend seul, ni à une date ni au printemps : touchez « Reprendre » sur l’endroit. Un endroit couvert par un autre, comme un jardin et tout le plein champ, reste hors saison tant que l’autre l’est.',
+    },
+    {
+      title: 'Les arrosages déjà prévus',
+      text: 'En mettant hors saison, le module compte les arrosages planifiés ou validés de ces planches et propose de les annuler ou de les garder. Un arrosage déjà démarré n’est pas proposé : il se termine.',
+    },
+  ],
+};

@@ -34,6 +34,7 @@ const NOTHING_REAL: DeploymentSettings = {
   otfApiToken: false,
   otfTokenMasterKey: false,
   visualCrossingApiKey: false,
+  openMeteoApiKey: false,
   pushServiceToken: false,
   weatherSyncServiceToken: false,
   pushServiceBinding: false,
@@ -48,6 +49,7 @@ const PRODUCTION: DeploymentSettings = {
   // La clé du coffre (4.3, F368) n'est pas encore posée : le porteur la pose à la validation d'OTF.
   otfTokenMasterKey: false,
   visualCrossingApiKey: true,
+  openMeteoApiKey: false,
   pushServiceToken: true,
   weatherSyncServiceToken: true,
   pushServiceBinding: true,
@@ -76,6 +78,7 @@ const DEMO_RECEIVES: readonly [string, Partial<DeploymentSettings>, DeploymentRe
   ['une clé du coffre des jetons OTF', { otfTokenMasterKey: true }, 'otf-vault-key'],
   ['la météo live', { weatherDataSource: 'live' }, 'weather-live-source'],
   ['une clé de météo', { visualCrossingApiKey: true }, 'weather-key'],
+  ['une clé d’Open-Meteo', { openMeteoApiKey: true }, 'weather-key'],
   ['le jeton du service de notification', { pushServiceToken: true }, 'push-token'],
   ['la liaison au Worker de notification', { pushServiceBinding: true }, 'push-binding'],
   ['le jeton de synchronisation météo', { weatherSyncServiceToken: true }, 'weather-sync-token'],

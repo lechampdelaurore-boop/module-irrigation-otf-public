@@ -8,6 +8,7 @@ import { confirmOnboardingStepStatement } from './onboarding-repository';
 import { clearedGoalJournal, goalJournal } from './change-journal/objectives';
 import { dailyWaterLimitJournal } from './change-journal/settings';
 import { weatherLocationJournal } from './change-journal/places';
+import { weatherDailyValueStatement } from './weather-daily-value-write';
 
 type WeatherLocationMode = 'otf' | 'custom';
 
@@ -22,6 +23,8 @@ export type WeatherPreference = {
   lastAutomaticRefreshAttemptAt: string | null;
   lastAutomaticRefreshSuccessAt: string | null;
   lastAutomaticRefreshError: string | null;
+  /** Le modèle de prévision choisi (météo multi-modèles, D-346, migration 0053) ; `null` : « Automatique ». */
+  forecastModel: string | null;
 };
 
 export type WeatherGeocodeRecord = WeatherLocationCandidate & {
@@ -185,14 +188,22 @@ export async function saveHydricGoalForUser(
   )]);
 }
 
+/**
+ * Retire les objectifs saisis de la semaine ; avec `scope`, celui de cet
+ * endroit seul (« Revenir à l'automatique », 6 quaterdecies, A1, D-337) :
+ * le même geste, la même révision « cleared », le même journal.
+ */
 export async function clearHydricGoalsForUser(
   ownerUserId: string,
   season: number,
   weekStart: string,
+  scope?: Pick<HydricGoal, 'scopeType' | 'otfZoneId' | 'otfPlotId' | 'otfBedId'>,
 ): Promise<number> {
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return 0;
-  const goals = await listHydricGoalsForUser(ownerUserId, season, weekStart);
+  const goals = (await listHydricGoalsForUser(ownerUserId, season, weekStart)).filter((goal) => scope === undefined || (
+    goal.scopeType === scope.scopeType && goal.otfZoneId === scope.otfZoneId
+    && goal.otfPlotId === scope.otfPlotId && goal.otfBedId === scope.otfBedId));
   if (goals.length === 0) return 0;
   const at = moduleNow();
   await db.batch(goals.flatMap((goal) => [clearedGoalJournal('objectif-hydrique', { workspaceId, actorUserId: ownerUserId, at }, goal), db.prepare(
@@ -216,7 +227,7 @@ export async function readWeatherPreferenceForUser(
     `SELECT location_mode, custom_city, custom_postcode, last_refresh_attempt_at,
             last_successful_refresh_at, last_refresh_error, refresh_not_before_at,
             last_automatic_refresh_attempt_at, last_automatic_refresh_success_at,
-            last_automatic_refresh_error
+            last_automatic_refresh_error, forecast_model
      FROM irrigation_weather_preferences WHERE workspace_id = ?`,
   ).bind(workspaceId).first<{
     location_mode: WeatherLocationMode;
@@ -229,6 +240,7 @@ export async function readWeatherPreferenceForUser(
     last_automatic_refresh_attempt_at: string | null;
     last_automatic_refresh_success_at: string | null;
     last_automatic_refresh_error: string | null;
+    forecast_model: string | null;
   }>();
   return row ? {
     locationMode: row.location_mode,
@@ -241,6 +253,7 @@ export async function readWeatherPreferenceForUser(
     lastAutomaticRefreshAttemptAt: row.last_automatic_refresh_attempt_at,
     lastAutomaticRefreshSuccessAt: row.last_automatic_refresh_success_at,
     lastAutomaticRefreshError: row.last_automatic_refresh_error,
+    forecastModel: row.forecast_model,
   } : defaultWeatherPreference();
 }
 
@@ -451,31 +464,8 @@ export async function upsertWeatherDailyValuesForUser(
   const availableValues = values.filter(hasWeatherValue);
   if (availableValues.length === 0) return;
   const workspaceId = await ensureWorkspaceForUser(ownerUserId);
-  await db.batch(availableValues.map((value) => db.prepare(
-    `INSERT INTO irrigation_weather_daily_values
-       (workspace_id, location_key, date, data_kind, precipitation_mm, et0_mm,
-        minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter,
-        source, fetched_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT(workspace_id, location_key, date, data_kind) DO UPDATE SET
-       precipitation_mm = COALESCE(excluded.precipitation_mm, irrigation_weather_daily_values.precipitation_mm),
-       et0_mm = COALESCE(excluded.et0_mm, irrigation_weather_daily_values.et0_mm),
-       minimum_temperature_celsius = COALESCE(excluded.minimum_temperature_celsius, irrigation_weather_daily_values.minimum_temperature_celsius),
-       maximum_temperature_celsius = COALESCE(excluded.maximum_temperature_celsius, irrigation_weather_daily_values.maximum_temperature_celsius),
-       solar_energy_mj_per_square_meter = COALESCE(excluded.solar_energy_mj_per_square_meter, irrigation_weather_daily_values.solar_energy_mj_per_square_meter), source = excluded.source,
-       fetched_at = CASE WHEN
-         (excluded.precipitation_mm IS NULL AND irrigation_weather_daily_values.precipitation_mm IS NOT NULL)
-         OR (excluded.et0_mm IS NULL AND irrigation_weather_daily_values.et0_mm IS NOT NULL)
-         OR (excluded.minimum_temperature_celsius IS NULL AND irrigation_weather_daily_values.minimum_temperature_celsius IS NOT NULL)
-         OR (excluded.maximum_temperature_celsius IS NULL AND irrigation_weather_daily_values.maximum_temperature_celsius IS NOT NULL)
-         OR (excluded.solar_energy_mj_per_square_meter IS NULL AND irrigation_weather_daily_values.solar_energy_mj_per_square_meter IS NOT NULL)
-         THEN irrigation_weather_daily_values.fetched_at ELSE excluded.fetched_at END,
-       updated_at = excluded.updated_at`,
-  ).bind(
-    workspaceId, locationKey, value.date, kind, value.precipitationMm,
-    value.et0Mm, value.minimumTemperatureCelsius ?? null, value.maximumTemperatureCelsius ?? null,
-    value.solarEnergyMegajoulesPerSquareMeter ?? null, source, fetchedAt, fetchedAt,
-  )));
+  // À source égale, une réponse partielle garde les champs connus ; une source nouvelle remplace le jour entier (D-346, F1016).
+  await db.batch(availableValues.map((value) => weatherDailyValueStatement({ workspaceId, locationKey, kind, value, source, fetchedAt })));
 }
 
 export async function saveManualRainfallForUser(
@@ -581,6 +571,7 @@ function defaultWeatherPreference(): WeatherPreference {
     lastAutomaticRefreshAttemptAt: null,
     lastAutomaticRefreshSuccessAt: null,
     lastAutomaticRefreshError: null,
+    forecastModel: null,
   };
 }
 

@@ -1,9 +1,17 @@
 import { addDaysToDateKey } from '../../domain/water-management.ts';
-import type {
-  WeatherDailyValue,
-  WeatherLocationCandidate,
-  WeatherProvider,
-  WeatherReadInput,
+import {
+  COMPLETION_FORECAST_MODEL_ID,
+  FORECAST_MODELS,
+  forecastDaysForModel,
+  forecastModel,
+  type ModelForecastReader,
+} from '../../domain/weather/forecast-models.ts';
+import {
+  WeatherProviderError,
+  type WeatherDailyValue,
+  type WeatherLocationCandidate,
+  type WeatherProvider,
+  type WeatherReadInput,
 } from '../../domain/weather/weather-provider.ts';
 
 /**
@@ -45,10 +53,10 @@ function dayIndex(date: string): number {
   return Number.isFinite(day) && Number.isFinite(month) ? day + month : 0;
 }
 
-function valuesForRange(input: WeatherReadInput): WeatherDailyValue[] {
+function valuesForRange(input: WeatherReadInput, shift = 0): WeatherDailyValue[] {
   const values: WeatherDailyValue[] = [];
   for (let date = input.startDate; date <= input.endDate; date = addDaysToDateKey(date, 1)) {
-    const index = dayIndex(date);
+    const index = dayIndex(date) + shift;
     values.push({
       date,
       precipitationMm: RAIN_PATTERN_MM[index % RAIN_PATTERN_MM.length],
@@ -78,5 +86,29 @@ export const demonstrationWeatherProvider: WeatherProvider = {
   },
   async readReanalysis(input: WeatherReadInput) {
     return valuesForRange(input);
+  },
+};
+
+/**
+ * La prévision d'un modèle choisi pour les parcours automatisés
+ * (`WEATHER_DATA_SOURCE=mock`, docs/weather-models-contract.md règle 13 ;
+ * D-346, F1022) : une réponse fixe par modèle, sans réseau. Chaque modèle
+ * décale les motifs de sa place dans la liste, pour que deux modèles ne
+ * rendent pas les mêmes jours ; il ne donne que les jours de sa portée
+ * mesurée, comptés depuis le premier jour lu, et « Automatique
+ * d'Open-Meteo » (les motifs sans décalage) complète les suivants, comme le
+ * vrai lecteur (règle 6). Les jours portent la `source` du modèle, pour que
+ * les parcours suivent les chemins de la production ; l'écran crédite
+ * toujours des données de démonstration, jamais un fournisseur réel.
+ */
+export const demonstrationModelForecastReader: ModelForecastReader = {
+  async readModelForecast(input: WeatherReadInput, modelId: string) {
+    const model = forecastModel(modelId);
+    if (model === null) throw new WeatherProviderError('Modèle de prévision inconnu.', { kind: 'client', endpoint: 'forecast' });
+    const completion = valuesForRange(input);
+    if (model.id === COMPLETION_FORECAST_MODEL_ID) return forecastDaysForModel(model.id, completion, completion);
+    const lastModelDate = addDaysToDateKey(input.startDate, model.measuredRangeDays - 1);
+    const chosen = valuesForRange(input, FORECAST_MODELS.indexOf(model)).filter((day) => day.date <= lastModelDate);
+    return forecastDaysForModel(model.id, chosen, completion);
   },
 };

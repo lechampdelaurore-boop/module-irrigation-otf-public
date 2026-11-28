@@ -109,9 +109,12 @@ const UNDECLARED: Reference[] = [
  * identifiants d'Ouvre ta ferme (zones, parcelles, planches, plantes,
  * séries, cultures), personnes, identifiants choisis par le navigateur pour
  * une seule requête, identifiant d'une lecture complète et de son bail,
- * tirés par le serveur pour cette seule lecture (F362, F384).
+ * tirés par le serveur pour cette seule lecture (F362, F384). La portée d'un
+ * geste « hors saison » (`scope_id`, migration 0052, D-352) : l'identifiant
+ * d'Ouvre ta ferme d'une planche, d'un jardin ou d'une parcelle, ou le mode
+ * de tout le plein champ ou de tout le sous-abri.
  */
-const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_id|plant_id|series_id|cultivation_id|local_id|request_id|read_id|lease_id)$/;
+const NOT_A_ROW = /^(?:otf_[a-z]+_id|[a-z]+_bed_otf_id|actor_user_id|owner_user_id|plant_id|series_id|cultivation_id|local_id|request_id|read_id|lease_id|scope_id)$/;
 
 /**
  * Les tables qui désignent une culture de référence par sa clé (`crop_key`) :

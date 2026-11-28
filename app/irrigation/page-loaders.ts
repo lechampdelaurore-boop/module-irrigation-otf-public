@@ -1,4 +1,5 @@
 import { getChangeJournalViewForUser } from '@/lib/services/change-journal-view';
+import { readOffSeasonViewForUser } from '@/lib/services/off-season-view';
 import { listEquipmentPlacementsForUser } from '@/db/equipment-placement-repository';
 import { countFeatureDataForUser } from '@/db/feature-data-counts';
 import { listEquipmentPoseHistoryForUser, listEquipmentPosesForUser } from '@/db/equipment-placement-poses';
@@ -53,7 +54,12 @@ async function loadEquipmentState(context: ReadyPageContext) {
   return { equipment, equipmentPlacements, equipmentPoses, equipmentPoseHistory, gardenGroupConfiguration };
 }
 
-function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = false, includeAutomaticObjective = false) {
+function loadWaterDashboard(
+  context: ReadyPageContext,
+  includeWeatherAlerts = false,
+  includeAutomaticObjective = false,
+  includeForecastModelSetting = false,
+) {
   return getWaterDashboardForUser({
     ownerUserId: context.userId,
     season: context.season,
@@ -61,6 +67,7 @@ function loadWaterDashboard(context: ReadyPageContext, includeWeatherAlerts = fa
     weekStart: context.week,
     includeWeatherAlerts,
     includeAutomaticObjective,
+    includeForecastModelSetting,
     now: new Date(context.nowIso),
   });
 }
@@ -151,8 +158,10 @@ async function readBesoins(context: ReadyPageContext) {
     events: irrigationEvents,
     coverage: coverage.beds,
   });
+  // Le bloc « Hors saison » du volet des objectifs (6 quaterdecies, B3) : les portées que les besoins viennent de lire, sans lecture de plus.
+  const offSeason = await readOffSeasonViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot, now: new Date(context.nowIso) });
   // Les irrigations de la saison servent aussi à « Jour par jour » (S4, PR 2, section 5) : aucune lecture de plus.
-  return { waterDashboard, irrigationNeeds, irrigationEvents };
+  return { waterDashboard, irrigationNeeds, irrigationEvents, offSeason };
 }
 
 /**
@@ -253,7 +262,8 @@ export async function loadReglagesPage(context: ReadyPageContext) {
   const [counts, onboarding, waterDashboard, cropCoefficients, settingsReview, phoneNotices, noDeviceAtLastAlert, changeJournal] = await Promise.all([
     countFeatureDataForUser(context.userId),
     getOnboardingForUser(context.userId),
-    usesWeather(context.enabled) ? loadWaterDashboard(context) : null,
+    // La carte « Modèle de prévision » (D-347) se lit ici seulement.
+    usesWeather(context.enabled) ? loadWaterDashboard(context, false, false, true) : null,
     usesSpeciesCorrespondence(context.enabled)
       ? getCropCoefficientsViewForUser({ ownerUserId: context.userId, season: context.season, snapshot: context.snapshot })
       : null,
