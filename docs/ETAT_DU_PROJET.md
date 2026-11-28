@@ -33,8 +33,10 @@ registres, elle y renvoie.
   comprise. Elle va désormais jusqu'au troisième jour. Test du domaine et
   P29 rouges avant, verts après ; P13 compte désormais les trois jours
   d'alerte le week-end. **Fusionnée le 28 novembre 2026 à 5 h 20** (#262,
-  8419477), CI de la PR verte (257 parcours passés, 11 sautés) ; sa mise
-  en ligne est à consigner par la PR suivante.
+  8419477), CI de la PR verte (257 parcours passés, 11 sautés) ; **en
+  ligne le 28 novembre 2026 à 6 h 17**, run 46107116135 vérifié job par
+  job (les cinq jobs verts ; consigné par la PR des parcours à cheval
+  sur minuit, #259).
 - **Météo multi-modèles, PR 3 : l'écran « Modèle de prévision », codée le
   26 novembre 2026** (D-347, F1023 à F1030 ; contrat v0.2, § 3, § 8 point 6,
   § 11 point 5 ; roadmap ligne 36), en Opus 5.5 · Élevé, sur la branche de la
@@ -11336,14 +11338,15 @@ Non vérifié : sa ferme réelle, un vrai téléphone.
    à 18 h 56) : le jeton se vérifie à l'heure réelle. **Fermé le
    14 novembre 2026** : la recette réelle de la démonstration est conforme
    (19 h 53) et un invité s'y est connecté (20 h 53).
-70. 🟡 **Ouvert le 28 novembre 2026 par la PR #261** (run 46080341539
+70. ✅ **Ouvert le 28 novembre 2026 par la PR #261** (run 46080341539
    et sa relance) : P29 échouait chaque samedi et chaque dimanche, sur
    toute branche, `main` comprise : « Gel ou chaleur » disait
    « Prévision indisponible le lun. », la lecture de la semaine en cours
    s'arrêtant au dimanche. **Corrigé en branche le 28 novembre 2026**
    (D-357, F1100, `fix/meteo-aujourdhui-trois-jours`) : la lecture va
-   jusqu'au troisième jour d'« Aujourd'hui ». Se ferme à la fusion et à la
-   mise en ligne.
+   jusqu'au troisième jour d'« Aujourd'hui ». **Fermé le 28 novembre
+   2026** : #262 fusionnée à 5 h 20, en ligne à 6 h 17 (run
+   46107116135, les cinq jobs verts).
 71. 🟡 **Ouvert le 26 novembre 2026 par le déploiement de #237 et la PR
    #238** (runs 45901421359 et 45906065683) : une suite de parcours
    commencée avant minuit et finie après faisait échouer P63 à
