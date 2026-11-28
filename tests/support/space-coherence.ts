@@ -41,6 +41,8 @@ type Reference = {
  * un jour et une raison, pour tous les espaces de la ferme ; le relevé des
  * coûts du mois (F662), des nombres du déploiement. La liste préremplie des
  * stades sensibles (migration 0045, F730) : des stades des cultures communes.
+ * La forme de la journée de l'ET0 horaire (migration 0054, D-349) : la forme
+ * d'un lieu, partagée par les fermes de ce lieu.
  */
 const COMMON_TABLES = new Set([
   'irrigation_background_jobs',
@@ -49,6 +51,7 @@ const COMMON_TABLES = new Set([
   'irrigation_crop_sensitive_stage_common',
   'irrigation_operator_notices',
   'irrigation_support_accesses',
+  'irrigation_weather_day_shapes',
   'otf_authentication_failures',
   'otf_call_outcomes',
   'otf_call_pauses',
@@ -132,10 +135,11 @@ const CROP_KEY_TABLES = [
 
 /**
  * Les colonnes en `_key` qui ne désignent aucune ligne : clé du cache, d'un
- * lieu météo, d'un traitement, d'un sujet d'alerte, et la ferme d'OTF dont le
- * compteur partagé compte les appels (F381).
+ * lieu météo, d'un traitement, d'un sujet d'alerte, la ferme d'OTF dont le
+ * compteur partagé compte les appels (F381), et le lieu d'une lecture météo
+ * partagée (`place_key`, D-349).
  */
-const NOT_A_ROW_KEY = /^(?:cache_key|location_key|job_key|subject_key|pace_key)$/;
+const NOT_A_ROW_KEY = /^(?:cache_key|location_key|job_key|subject_key|pace_key|place_key)$/;
 
 const SYSTEM_TABLE = /^(?:sqlite_|_cf_|d1_migrations$|__drizzle)/;
 

@@ -4,6 +4,7 @@ import { OTF_CALL_OUTCOME_HOURS_KEPT, outcomeHourStartMs } from '../otf/call-out
 import { OTF_AUTHENTICATION_BRAKE_WINDOW_MS, OTF_CALL_ROWS_KEPT_MS, oldestKeptCountDay, parisDayOf } from '../otf/shared-call-pace.ts';
 import { oldestKeptSupportDay, SUPPORT_ACCESS_KEPT_MONTHS } from './support-access.ts';
 import { FORECAST_ARCHIVE_KEPT_MONTHS, oldestKeptForecastArchiveDay } from '../weather/forecast-archive.ts';
+import { DAY_SHAPES_KEPT_DAYS, oldestKeptDayShapeDay } from '../weather/hourly-et0.ts';
 
 /**
  * La conservation des données à durée limitée (4.5, PR 5 ;
@@ -46,7 +47,8 @@ export type RetentionPurgeKey =
   | 'otf_authentication_failures'
   | 'irrigation_operator_notices'
   | 'irrigation_support_accesses'
-  | 'irrigation_weather_forecast_archive';
+  | 'irrigation_weather_forecast_archive'
+  | 'irrigation_weather_day_shapes';
 
 /**
  * La limite de chaque purge à l'instant `atMs` : une ligne en deçà est
@@ -68,6 +70,8 @@ export const RETENTION_LIMITS: Readonly<Record<RetentionPurgeKey, (atMs: number)
   irrigation_support_accesses: (atMs) => oldestKeptSupportDay(parisDayOf(atMs)),
   // L'archive des prévisions, vingt-quatre mois par jour d'émission (D-297) : le même jour, deux ans plus tôt, reste.
   irrigation_weather_forecast_archive: (atMs) => oldestKeptForecastArchiveDay(parisDayOf(atMs)),
+  // La forme de la journée de l'ET0 horaire, huit jours par jour du lieu (D-349) : J0 à J+2 seulement s'écrivent.
+  irrigation_weather_day_shapes: (atMs) => oldestKeptDayShapeDay(parisDayOf(atMs)),
 };
 
 /** Les durées, en clair, telles que le contrat et la politique de confidentialité les disent. */
@@ -80,6 +84,7 @@ export const RETENTION_WORDS: Readonly<Record<RetentionPurgeKey, string>> = {
   irrigation_operator_notices: `${OPERATOR_NOTICES_KEPT_DAYS} jours`,
   irrigation_support_accesses: `${SUPPORT_ACCESS_KEPT_MONTHS} mois`,
   irrigation_weather_forecast_archive: `${FORECAST_ARCHIVE_KEPT_MONTHS} mois`,
+  irrigation_weather_day_shapes: `${DAY_SHAPES_KEPT_DAYS} jours`,
 };
 
 /** Ce que le matin a purgé. */

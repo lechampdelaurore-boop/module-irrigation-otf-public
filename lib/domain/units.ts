@@ -153,3 +153,16 @@ export function minutesFromSeconds(seconds: number): number {
 function secondsToMinutes(seconds: number): number {
   return millisecondsFromSeconds(seconds) / MILLISECONDS_PER_MINUTE;
 }
+
+// Énergie
+
+/** 1 MJ = 1 000 000 J. */
+const JOULES_PER_MEGAJOULE = 1_000_000;
+
+/**
+ * Un rayonnement moyen d'une heure, en W/m², en énergie de l'heure, en MJ/m² :
+ * W × 3 600 s / 1 000 000 (l'ET0 horaire FAO-56, équation 53, D-349).
+ */
+export function megajoulesPerSquareMeterPerHourFromWattsPerSquareMeter(watts: number): number {
+  return watts * SECONDS_PER_HOUR / JOULES_PER_MEGAJOULE;
+}

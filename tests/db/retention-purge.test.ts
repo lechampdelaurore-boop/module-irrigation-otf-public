@@ -146,7 +146,7 @@ test('bornée, une purge reprend au passage suivant, sans rien effacer de plus',
   for (let index = 0; index < 1_200; index += 1) start.run('4394', ms('2026-11-01T05:16:00.000Z') + index, '2026-11-01');
 
   const cut = await runRetentionPurges({ now: NOW, statements: 2, log: () => undefined });
-  assert.deepEqual(cut, { purged: 1_000, unfinished: 8, failures: [] }, 'deux lots de 500, puis plus rien de neuf : huit purges à finir');
+  assert.deepEqual(cut, { purged: 1_000, unfinished: 9, failures: [] }, 'deux lots de 500, puis plus rien de neuf : neuf purges à finir (la forme de la journée, D-349, en plus)');
   assert.equal(Number((database.sqlite.prepare('SELECT COUNT(*) AS n FROM otf_call_starts').get() as { n: number }).n), 1_202 - 1_000 + 2);
 
   assert.deepEqual(await runRetentionPurges({ now: NOW, log: () => undefined }), { purged: 1_202 - 1_000 + 11, unfinished: 0, failures: [] });

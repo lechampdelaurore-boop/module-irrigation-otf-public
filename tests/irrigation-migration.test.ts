@@ -93,8 +93,8 @@ test('la migration irrigation s’applique sur une base vide', () => {
     'irrigation_water_resources',
     'irrigation_water_stock_movements',
     'irrigation_water_supply_defaults',
-    // Les trois tables des alertes météo (5 bis) et l'archive des prévisions (0046) partagent une ligne, même raison.
-    'irrigation_weather_alert_criteria', 'irrigation_weather_alert_criterion_versions', 'irrigation_weather_alerts', 'irrigation_weather_daily_values', 'irrigation_weather_forecast_archive',
+    // Les trois tables des alertes météo (5 bis), la forme de la journée (0054) et l'archive des prévisions (0046) partagent une ligne, même raison.
+    'irrigation_weather_alert_criteria', 'irrigation_weather_alert_criterion_versions', 'irrigation_weather_alerts', 'irrigation_weather_daily_values', 'irrigation_weather_day_shapes', 'irrigation_weather_forecast_archive',
     'irrigation_weather_geocodes',
     'irrigation_weather_preferences',
     'irrigation_workspaces',

@@ -209,10 +209,11 @@ test('Visual Crossing fournit en une requête gratuite la pluie et les données 
     assert.equal(url.hostname, 'weather.visualcrossing.com');
     assert.match(url.pathname, /\/timeline\/46\.4225%2C3\.068\/2026-09-05\/2026-09-06$/);
     assert.equal(url.searchParams.get('unitGroup'), 'metric');
-    assert.equal(url.searchParams.get('include'), 'days');
+    // La prévision demande aussi les heures, pour la forme de la journée (D-349, F1036) : un seul enregistrement.
+    assert.equal(url.searchParams.get('include'), 'days,hours');
     assert.equal(
       url.searchParams.get('elements'),
-      'datetime,precip,tempmax,tempmin,temp,dew,windspeedmean,solarenergy,elevation',
+      'datetime,datetimeEpoch,precip,tempmax,tempmin,temp,dew,windspeed,windspeedmean,solarradiation,solarenergy,elevation',
     );
     assert.equal(url.searchParams.get('key'), 'secret-test');
     assert.equal((init as RequestInit & { cf?: { cacheEverything?: boolean } }).cf?.cacheEverything, true);

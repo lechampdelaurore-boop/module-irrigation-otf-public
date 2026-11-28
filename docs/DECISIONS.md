@@ -13130,3 +13130,102 @@ solaire), plus : le total du jour reste la référence (2,4 mm consommés à
 valeur négative de nuit, la source suivante prise et nommée, la nuit
 polaire, même forme sous abri (question 2), le fuseau du lieu (Martinique).
 
+## D-349 — L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/et0-horaire-contract.md` (§ 2 choix 3, 5, 7 et 8 ; § 5 ; § 9 ; § 11
+scénarios 7, 10 et 11 ; § 12, PR HR2), roadmap section 6 septendecies,
+ligne 37. Code en Opus 5.5 · Élevé, le réglage de la ligne. Aucune question
+agronomique nouvelle.
+
+**Décision.** La lecture de prévision rapporte, en plus des jours, les
+heures d'ET0 de chaque jour (`hourlyEt0` du jour prévu, facultatif : un
+fournisseur qui ne la donne pas reste valide). Open-Meteo les donne dans le
+même appel (`hourly=et0_fao_evapotranspiration`, par modèle quand plusieurs
+sont lus) : source `provider-hourly`. Visual Crossing donne les heures de la
+prévision (`include=days,hours`) mais pas leur ET0 : le module la calcule,
+FAO-56 au pas horaire (équation 53, `lib/domain/weather/fao56-hourly.ts`),
+source `computed-hourly`. La lecture du matin et les relectures de la
+journée écrivent alors, une fois par lecture partagée d'un lieu, la forme
+de J0 à J+2 dans une table neuve (`irrigation_weather_day_shapes`,
+migration additive 0054), sous la source de la ligne du jour : une ferme ne
+lit que la forme du modèle de sa propre ligne. La purge du matin garde
+8 jours. Une écriture qui échoue est journalisée (statut et date) et ne
+change rien à la lecture, aux alertes ni à l'archive. **Aucun chiffre
+existant ne change** ; rien ne s'affiche encore (HR3).
+
+Précisions prises en codant (option recommandée, modifiables par le porteur) :
+
+- **F1036** — Le coût de Visual Crossing (contrat § 5, non vérifié par le
+  contrat) : **vérifié le 26 novembre 2026** sur les pages du fournisseur
+  (« What exactly is a weather record? » et la page des tarifs) : « une
+  prévision de 15 jours pour un lieu compte pour un seul enregistrement,
+  même pour une prévision horaire » ; l'historique, lui, compte une heure
+  par enregistrement (24 par jour). Les heures ne sont donc demandées
+  qu'avec la prévision, jamais avec l'historique (que la production lit
+  d'ailleurs chez Open-Meteo). Le coût que la réponse annonce
+  (`queryCost`) est journalisé à chaque lecture
+  (`weather_external_query_cost`, sans lieu ni clé) : la première lecture
+  en ligne le prouvera. S'il dépasse 1 par lieu, le fil s'arrête et le
+  porteur décide (le budget est à lui ; tout reste gratuit pendant le
+  pilote).
+- **F1037** — L'ET0 horaire calculée suit FAO-56 (équations 28 à 33, 37 à
+  39, 45 à 47, 53), vérifiée sur l'exemple 19 du bulletin : 0,63 mm de
+  14 h à 15 h, 0,00 mm la nuit, Ra 3,543 MJ/m². Le vent de 10 m est ramené
+  à 2 m comme au calcul du jour ; le rayonnement en W/m² devient des MJ/m²
+  par heure par `units.ts`. Elle ne sert qu'à la forme : le total du jour
+  reste le calcul du jour.
+- **F1038** — La nuit, le rapport Rs/Rso est celui des heures de jour de la
+  même journée (somme sur somme) : FAO-56 conseille celui de la fin
+  d'après-midi ; un seul rapport par jour suffit à la forme. Une heure dont
+  une valeur manque reste absente, et la forme de ce jour est refusée.
+- **F1039** — Open-Meteo donne ses heures en heures d'horloge du lieu : elles
+  ne sont rangées que si leur nombre est exactement celui des heures du
+  jour (23, 24 ou 25) ; sinon la forme de ce jour est refusée, jamais
+  décalée. Le comportement d'Open-Meteo un jour de changement d'heure n'est
+  pas mesuré (prochain : 28 mars 2027).
+- **F1040** — La table ne garde que les formes du fournisseur ou calculées ;
+  la forme théorique ne s'écrit pas, elle se calcule à l'écran. Un jour
+  qu'une lecture ne donne pas garde sa forme d'avant, comme un jour vide
+  n'efface pas la météo du jour ; son heure de lecture dira « ancienne »
+  (HR3).
+- **F1041** — Le lieu (`place_key`) est celui de la lecture partagée de la
+  météo (latitude et longitude de la commune à six décimales, fuseau) ; la
+  table n'a aucune ligne d'une ferme : table commune au contrôle de
+  cohérence des espaces, gardée hors du plan d'effacement d'une ferme avec
+  sa raison, à l'inventaire du journal des modifications, au plan de
+  conservation avec sa purge (`day < ?`). Numéro de migration : 0054, réglé
+  le 28 novembre 2026 en fusionnant `main` après 0051 (S6, #235), 0052
+  (hors saison, #256) et 0053 (météo multi-modèles, #250), jamais par un
+  rebase.
+- **F1042** — Seules la lecture du matin et les relectures de la journée
+  écrivent la forme, comme le contrat le dit ; « Actualiser la météo » à
+  l'écran ne l'écrit pas. Une ferme qui change de modèle dans la journée
+  verra la forme théorique jusqu'à la lecture suivante. La démonstration
+  n'a pas d'heures : forme théorique.
+
+**Coût de la base.** Relu le 26 novembre 2026 sur la page des prix de D1
+(Cloudflare) : 50 millions de lignes écrites par mois incluses ; un index
+compte une ligne de plus. Au pire, 3 lignes par lieu, source et lecture, au
+matin et aux cinq relectures, soit 18 écritures (36 avec l'index) par jour
+et par lieu : 100 lieux font environ 110 000 lignes par mois, 0,2 % de
+l'inclus ; quelques centaines de kilooctets gardés sur 8 jours. Aucun coût
+supplémentaire.
+
+**Ce que HR2 ne mesure pas.** Que la prévision d'Open-Meteo réponde depuis
+Cloudflare (contrat § 14) : c'est l'essai B de la météo multi-modèles ;
+les fermes en « Automatique » lisent Visual Crossing, dont la forme est
+calculée et n'en dépend pas.
+
+**Tests.** `tests/hourly-et0-lecture.test.ts` (14) : exemple 19 de FAO-56,
+une journée calculée (presque rien la nuit, le plus fort l'après-midi), une
+heure incomplète absente, le rangement des heures (instants exacts et
+heures d'horloge, jour de 23 heures), les formes écrites de J0 à J+2
+(scénario 7), la conservation, Visual Crossing (heures avec la prévision
+seulement, coût journalisé), Open-Meteo (même appel, heures du modèle de
+chaque jour), deux fermes sur un lieu (scénario 11), écriture en échec
+(scénario 10), jours rangés par source, dépôt sans écriture.
+`tests/db/day-shapes.test.ts` (5) : migration 0054 et ses contraintes,
+écriture et lecture par lieu et par source, remplacement, lecture du matin
+sur la base, purge des 8 jours, plans. `tests/weather-provider.test.ts` :
+l'adresse attendue de la prévision de Visual Crossing porte les heures.

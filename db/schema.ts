@@ -1154,6 +1154,30 @@ export const weatherDailyValues = sqliteTable(
   ],
 );
 
+// La forme de la journée de l'ET0 horaire (migration 0054, docs/et0-horaire-contract.md, D-349) : par lieu, J0 à J+2, 8 jours.
+export const weatherDayShapes = sqliteTable(
+  'irrigation_weather_day_shapes',
+  {
+    placeKey: text('place_key').notNull(),
+    day: text('day').notNull(),
+    source: text('source').notNull(),
+    nature: text('nature', { enum: ['provider-hourly', 'computed-hourly'] }).notNull(),
+    hourCount: integer('hour_count').notNull(),
+    shares: text('shares').notNull(),
+    fetchedAt: text('fetched_at').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.placeKey, table.day, table.source] }),
+    index('idx_day_shapes_day').on(table.day),
+    check('chk_day_shapes_day', sql`${table.day} GLOB '[0-9][0-9][0-9][0-9]-[01][0-9]-[0-3][0-9]'`),
+    check('chk_day_shapes_nature', sql`${table.nature} IN ('provider-hourly', 'computed-hourly')`),
+    check('chk_day_shapes_hours', sql`${table.hourCount} BETWEEN 23 AND 25`),
+    check('chk_day_shapes_shares', sql`json_valid(${table.shares}) AND json_type(${table.shares}) = 'array' AND json_array_length(${table.shares}) = ${table.hourCount}`),
+    check('chk_day_shapes_source', sql`length(${table.source}) BETWEEN 1 AND 128`),
+    check('chk_day_shapes_place', sql`length(${table.placeKey}) BETWEEN 1 AND 128`),
+  ],
+);
+
 // L'archive des prévisions J+1 à J+7 (migration 0046, docs/forecast-archive-contract.md, D-297) : jamais écrasée.
 export const weatherForecastArchive = sqliteTable(
   'irrigation_weather_forecast_archive',

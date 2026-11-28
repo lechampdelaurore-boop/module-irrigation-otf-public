@@ -23,6 +23,7 @@ import {
   type ModelForecastReader,
 } from '../../domain/weather/forecast-models.ts';
 import { archiveForecastReading } from './forecast-archive.ts';
+import { recordDayShapes } from './day-shapes.ts';
 import { weatherFailureKind, type WeatherFailureKind } from '../../domain/operations/morning-task-outcomes.ts';
 
 export type { AutomaticWeatherSyncRepository, AutomaticWeatherTarget } from '../../domain/weather/automatic-sync-contract.ts';
@@ -174,6 +175,20 @@ export async function runAutomaticWeatherSync({
           archive: mode === 'morning',
           log,
         });
+        // La forme de la journée, une fois par lecture partagée du lieu (docs/et0-horaire-contract.md, D-349).
+        const writeDayShapes = repository.writeDayShapes?.bind(repository);
+        if (writeDayShapes && fetched.forecast.status === 'fulfilled') {
+          await recordDayShapes({
+            write: writeDayShapes,
+            placeKey: weatherLocationDeduplicationKey(representative),
+            timeZone: representative.timezone,
+            values: fetched.forecast.values,
+            providerSource: provider.sourceId?.('forecast') ?? provider.id,
+            fetchedAt: at,
+            now,
+            log,
+          });
+        }
         if (weatherOutcomeSucceeded(outcome)) {
           finalResult.successfulTargets += reading.members.length;
         } else {

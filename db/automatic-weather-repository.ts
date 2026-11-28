@@ -1,4 +1,5 @@
 import { db } from './binding';
+import { writeDayShapes } from './day-shape-repository';
 import { writeForecastArchive } from './forecast-archive-repository';
 import { returnForecastModelToAutomatic } from './forecast-model-repository';
 import { weatherDailyValueStatement } from './weather-daily-value-write';
@@ -36,6 +37,7 @@ export const automaticWeatherRepository: AutomaticWeatherSyncRepository = {
   listTargets: listAutomaticWeatherTargets,
   upsertValues: upsertAutomaticWeatherValues,
   archiveForecast: writeForecastArchive,
+  writeDayShapes,
   recordWorkspaceResult: recordAutomaticWeatherWorkspaceResult,
   returnForecastModelToAutomatic,
 };
@@ -53,6 +55,7 @@ export const intradayWeatherRepository: AutomaticWeatherSyncRepository = {
   listTargets: listAutomaticWeatherTargets,
   upsertValues: upsertAutomaticWeatherValues,
   archiveForecast: writeForecastArchive,
+  writeDayShapes,
   recordWorkspaceResult: recordIntradayWeatherWorkspaceResult,
   returnForecastModelToAutomatic,
 };

@@ -1,3 +1,5 @@
+import type { HourlyEt0Series } from './hourly-et0.ts';
+
 export type WeatherLocationCandidate = {
   displayName: string;
   city: string;
@@ -25,6 +27,14 @@ export type WeatherDailyValue = {
    * lue comme 0 (D-003).
    */
   solarEnergyMegajoulesPerSquareMeter?: number | null;
+  /**
+   * Les heures d'ET0 du jour, lues chez le fournisseur ou calculées par le
+   * module, pour la forme de la journée seulement (docs/et0-horaire-contract.md,
+   * D-349) ; absentes quand le fournisseur ne donne pas l'heure. Elles ne
+   * s'écrivent jamais dans la ligne du jour ni dans l'archive : seule la
+   * forme, J0 à J+2, va dans sa table.
+   */
+  hourlyEt0?: HourlyEt0Series | null;
 };
 
 /** Un jour qui porte au moins une valeur s'écrit ; un jour entièrement vide n'efface rien. */
