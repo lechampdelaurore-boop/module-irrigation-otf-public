@@ -118,7 +118,7 @@ test('arrosages : le seul matériel choisi d’office, « À traiter » en tête
   const formulaire = page.locator('.watering-now[data-kind="planned"]');
   await expect(formulaire.getByRole('radio', { name: materiel, exact: true })).toBeChecked();
   await expect(formulaire).toContainText('Le seul matériel prêt à arroser est choisi.');
-  await expect(formulaire.locator('.watering-duration strong')).toHaveText('—');
+  await expect(formulaire.locator('.watering-duration-result strong')).toHaveText('—');
   await expect(page.locator('.is-exceeded')).toHaveCount(0);
   await verifierLEtape(page, journal, 'formulaire, le seul matériel choisi d’office');
 

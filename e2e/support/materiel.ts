@@ -110,7 +110,7 @@ export async function choisirMaterielEtReglage(page: Page, materiel: string, reg
     // Le réglage ne se montre qu'à un matériel qui en a plusieurs (simplification S5, section 3.1).
     const reglages = page.locator('.watering-setting select');
     if ((await reglages.count()) > 0) await reglages.selectOption({ label: reglage });
-    // Sans dose du jour, aucune durée n'est choisie : le parcours tape la quantité, en mm, dans « Plus d'options ».
+    // Sans dose du jour, la quantité reste vide : le parcours la tape, en mm, au premier niveau (D-354).
     // « Déjà fait » n'en a pas : sa durée se lit des dates (S5, section 4).
     const dejaFait = (await page.locator('.watering-now[data-kind="completed"]').count()) > 0;
     if (!dejaFait && quantite !== '' && (await page.getByRole('button', { name: /^Conseillé/, pressed: true }).count()) === 0) await saisirEnMillimetres(page, quantite);
@@ -157,11 +157,18 @@ export async function ouvrirPlusDOptions(page: Page): Promise<Locator> {
   return page.locator('.watering-more-options');
 }
 
-/** « Saisir en mm », dans « Plus d'options » : la quantité se tape au premier niveau, la durée en devient le résultat. */
+/**
+ * La quantité en mm, au premier niveau, la durée en résultat : la saisie par
+ * défaut depuis D-354. Si « Saisir une durée » est coché dans « Plus
+ * d'options », le parcours le décoche d'abord.
+ */
 export async function saisirEnMillimetres(page: Page, quantite: string): Promise<void> {
-  const options = await ouvrirPlusDOptions(page);
-  await options.getByRole('checkbox', { name: 'Saisir en mm' }).check();
-  await page.getByLabel('Quantité souhaitée').fill(quantite);
+  const champ = page.getByLabel('Quantité souhaitée');
+  if (!(await champ.isVisible())) {
+    const options = await ouvrirPlusDOptions(page);
+    await options.getByRole('checkbox', { name: 'Saisir une durée' }).uncheck();
+  }
+  await champ.fill(quantite);
 }
 
 /**

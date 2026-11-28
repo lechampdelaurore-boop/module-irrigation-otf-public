@@ -8,9 +8,12 @@ import { farmDateKey } from './today/today-text.ts';
 import { cubicMetersFromLiters, millisecondsFromMinutes, millisecondsFromSeconds, MINUTES_PER_HOUR, minutesFromSeconds } from './units.ts';
 
 /**
- * « Arroser maintenant » en trois champs : où, combien de temps, démarrer
+ * « Arroser maintenant » en trois champs : où, combien, démarrer
  * (simplification, lot S5, PR 1, docs/simplification-s5-contract.md,
- * sections 3 et 10 ; D-332, F894 à F901).
+ * sections 3 et 10 ; D-332, F894 à F901). Depuis D-354 (section 15 du
+ * contrat, F1087 à F1092), « combien » se saisit d'abord en millimètres ; la
+ * durée en est le résultat, et le réglage en minutes passe dans « Plus
+ * d'options ».
  *
  * Des règles d'écran seulement : la durée tirée d'une quantité, l'apport par
  * planche, le volume, la faisabilité hydraulique et la dose du jour sont les
@@ -18,6 +21,36 @@ import { cubicMetersFromLiters, millisecondsFromMinutes, millisecondsFromSeconds
  * recalculé ici. Ce module dit quelles durées proposer, comment écrire le
  * résultat, ce que dit le bouton et ce qui reste au premier niveau.
  */
+
+/**
+ * La façon de dire « combien » (section 15, F1087) : en millimètres d'abord,
+ * la durée en est le résultat ; ou en durée, par « Saisir une durée » de
+ * « Plus d'options ». Un formulaire neuf, ou vidé après une réussite, repart
+ * en millimètres.
+ */
+export type AmountEntry = 'millimeters' | 'duration';
+export const DEFAULT_AMOUNT_ENTRY: AmountEntry = 'millimeters';
+
+/** Le titre du deuxième bloc selon la façon de dire « combien » (F1088). */
+export function howMuchHeading(entry: AmountEntry): string {
+  return entry === 'millimeters' ? 'Combien de mm ?' : 'Combien de temps ?';
+}
+
+/**
+ * La pastille « Conseillé : 8 mm » à côté du champ des millimètres (F1089) :
+ * la dose du jour pour ce matériel, dite pour ce qu'elle est, et le moyen d'y
+ * revenir après l'avoir changée. Sans dose du jour, aucune pastille et rien
+ * à sa place (D-028).
+ */
+export function advisedAmountLabel(dose: number | null): string | null {
+  if (dose === null || !Number.isFinite(dose) || !(dose > 0)) return null;
+  return `Conseillé : ${millimetersNumber(dose)} mm`;
+}
+
+/** La quantité tapée est-elle exactement la dose du jour ? (« 2,5 » comme « 2.5 ») */
+export function amountIsAdvised(targetMillimeters: string, dose: number | null): boolean {
+  return dose !== null && targetMillimeters.trim() !== '' && Number(targetMillimeters.replace(',', '.')) === dose;
+}
 
 /** Le pas des boutons « − » et « + » (S5-h) : une durée plus fine se règle dans « Plus d'options ». */
 const DURATION_STEP_MINUTES = 5;
@@ -68,9 +101,7 @@ export type DurationFormState = {
 
 /** La pastille choisie, lue sur le formulaire ; `null` quand aucune ne correspond (une durée réglée au « + », une quantité tapée). */
 export function chosenChip(state: DurationFormState, dose: number | null): DurationChipId | null {
-  if (state.mode === 'amount') {
-    return dose !== null && state.targetMillimeters !== '' && Number(state.targetMillimeters.replace(',', '.')) === dose ? 'advised' : null;
-  }
+  if (state.mode === 'amount') return amountIsAdvised(state.targetMillimeters, dose) ? 'advised' : null;
   return FIXED_CHIPS.find((chip) => chip.minutes === state.durationMinutes)?.id ?? null;
 }
 
@@ -220,12 +251,19 @@ export type StartButton = {
   /** Le nom complet lu par un lecteur d'écran : « Démarrer l'arrosage de Goutte nord, fin vers 10 h 50 ». */
   accessibleName: string;
   disabled: boolean;
-  /** La seule chose qui manque, dans l'ordre : où, puis combien de temps (S5-d). */
+  /** La seule chose qui manque, dans l'ordre : où, puis combien (S5-d, F1090). */
   missing: string | null;
 };
 
 export const MISSING_WHERE = 'Choisissez où arroser.';
 export const MISSING_DURATION = 'Choisissez une durée.';
+/** Ce qui manque quand « combien » se dit en millimètres (F1090). */
+export const MISSING_AMOUNT = 'Indiquez combien de mm apporter.';
+
+/** Ce qui manque quand la durée n'est pas connue, selon la façon de dire « combien » (F1090). */
+export function missingHowMuch(entry: AmountEntry): string {
+  return entry === 'millimeters' ? MISSING_AMOUNT : MISSING_DURATION;
+}
 export const MISSING_BEDS = 'Ce matériel n’atteint aucune planche depuis sa position : vérifiez sa pose.';
 
 /**
@@ -234,14 +272,16 @@ export const MISSING_BEDS = 'Ce matériel n’atteint aucune planche depuis sa p
  * planche atteinte) ; la ligne dessous dit ce qui manque. « Vers », parce que
  * le minuteur démarre à l'appui, pas à l'ouverture de la page.
  */
-export function startButton({ equipmentName, durationSeconds, reachedBeds, now }: {
+export function startButton({ equipmentName, durationSeconds, reachedBeds, now, entry = 'duration' }: {
   equipmentName: string | null;
   durationSeconds: number | null;
   reachedBeds: number;
   now: Date;
+  /** La façon de dire « combien » : elle choisit les mots de ce qui manque (F1090). */
+  entry?: AmountEntry;
 }): StartButton {
   const missing = equipmentName === null ? MISSING_WHERE
-    : durationSeconds === null || !(durationSeconds > 0) ? MISSING_DURATION
+    : durationSeconds === null || !(durationSeconds > 0) ? missingHowMuch(entry)
       : reachedBeds === 0 ? MISSING_BEDS : null;
   const end = missing === null ? endClockText(now, durationSeconds) : null;
   return {
@@ -268,12 +308,12 @@ export function precautionLevel(precaution: { kind: 'protected-slot' } | { kind:
   return precaution.tone === 'exceeded' ? 'first-level' : 'more-options';
 }
 
-/** Le lien-pli de « Plus d'options », ce qu'il range dit dans son nom. */
-export const MORE_OPTIONS_LABEL = 'Plus d’options (pompe, note, saisir en mm)';
+/** Le lien-pli de « Plus d'options », ce qu'il range dit dans son nom (F1091 : la durée y passe, les mm en sortent). */
+export const MORE_OPTIONS_LABEL = 'Plus d’options (pompe, note, saisir une durée)';
 
 /**
- * Le nom du pli selon l'onglet (section 4) : « Déjà fait » n'a ni saisie en
- * mm ni durée exacte, sa durée se lit des dates ; le pli ne range que la
+ * Le nom du pli selon l'onglet (section 4) : « Déjà fait » n'a ni saisie d'une
+ * durée ni durée exacte, sa durée se lit des dates ; le pli ne range que la
  * pompe et la note.
  */
 export function moreOptionsLabel(kind: 'running' | 'planned' | 'completed'): string {
@@ -283,13 +323,14 @@ export function moreOptionsLabel(kind: 'running' | 'planned' | 'completed'): str
 /**
  * « Plus d'options » s'ouvre seul quand une valeur y est déjà posée par une
  * autre voie (section 3.4) : une pompe choisie qui n'est pas celle du
- * matériel, une note, la saisie en mm demandée. Fermé sinon.
+ * matériel, une note, une saisie en durée (la modification d'une irrigation
+ * planifiée la porte, F1092). Fermé sinon.
  */
-export function moreOptionsOpenAtFirst({ pumpChosen, pumpIsDefault, note, millimetersEntry }: {
+export function moreOptionsOpenAtFirst({ pumpChosen, pumpIsDefault, note, durationEntry }: {
   pumpChosen: boolean;
   pumpIsDefault: boolean;
   note: string;
-  millimetersEntry: boolean;
+  durationEntry: boolean;
 }): boolean {
-  return (pumpChosen && !pumpIsDefault) || note.trim() !== '' || millimetersEntry;
+  return (pumpChosen && !pumpIsDefault) || note.trim() !== '' || durationEntry;
 }

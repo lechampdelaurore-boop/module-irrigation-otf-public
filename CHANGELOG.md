@@ -5,6 +5,17 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Modifié (simplifier l'usage du module, S5 : les millimètres d'abord)
+
+- **Démarrer un arrosage en millimètres** (D-354, F1087 à F1092) : dans
+  « Arroser maintenant » et « Planifier », on indique d'abord combien de
+  millimètres apporter (« Combien de mm ? ») ; la durée se calcule dessous
+  (« soit 1 h 20 »). Avec une dose conseillée du jour, le champ est déjà
+  rempli et la pastille « Conseillé : 8 mm » le dit. Le réglage en minutes
+  (« − », « + », « 30 min », « 1 h ») reste possible par « Saisir une
+  durée », dans « Plus d'options » ; modifier une irrigation planifiée
+  relit sa durée. « Déjà fait » ne change pas. Aucun calcul ne change.
+
 ### Ajouté (ET0 horaire, HR3 : la soif du jour heure par heure)
 
 - **« Soif du jour, heure par heure »** (D-350, F1043 à F1050) : en tête

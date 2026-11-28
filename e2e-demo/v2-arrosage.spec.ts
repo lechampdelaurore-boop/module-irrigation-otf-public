@@ -26,7 +26,7 @@ test('V2 Un arrosage de A à Z : d’une page à l’autre, stockage refusé, sa
     { titre: 'Trois façons d’enregistrer un arrosage', rang: 'étape 1 sur 6', ancre: 'arrosage-actions', chemin: '/irrigation/arrosages' },
     // Les trois blocs d'« Arroser maintenant » (simplification S5, PR 3, D-334, F914).
     { titre: '1. Où ?', rang: 'étape 2 sur 6', ancre: 'arrosage-champs', chemin: '/irrigation/arrosages' },
-    { titre: '2. Combien de temps ?', rang: 'étape 3 sur 6', ancre: 'arrosage-resultat', chemin: '/irrigation/arrosages' },
+    { titre: '2. Combien de mm ?', rang: 'étape 3 sur 6', ancre: 'arrosage-resultat', chemin: '/irrigation/arrosages' },
     { titre: 'Vous seul validez', rang: 'étape 4 sur 6', ancre: 'arrosage-bouton', chemin: '/irrigation/arrosages' },
     { titre: 'L’eau du jour', rang: 'étape 5 sur 6', ancre: 'eau-du-jour', chemin: '/irrigation/arrosages' },
     { titre: 'Retrouver ses arrosages', rang: 'étape 6 sur 6', ancre: 'aujourdhui-journee', chemin: '/irrigation/aujourdhui' },

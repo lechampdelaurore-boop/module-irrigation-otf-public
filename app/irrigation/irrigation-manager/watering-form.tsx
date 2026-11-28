@@ -9,12 +9,16 @@ import { millimetersText } from '@/lib/domain/display-numbers';
 import { MINUTES_PER_HOUR } from '@/lib/domain/units';
 import type { PumpDashboard } from '@/lib/services/pump-dashboard';
 import {
+  advisedAmountLabel,
+  amountIsAdvised,
+  type AmountEntry,
   chosenChip,
   durationChips,
   durationMinutesOf,
   durationText,
   END_CLOCK_REFRESH_MILLISECONDS,
   hoursAndMinutes,
+  howMuchHeading,
   moreOptionsLabel,
   moreOptionsOpenAtFirst,
   precautionLevel,
@@ -39,12 +43,13 @@ import type { CreationForm } from './use-creation-form';
 /**
  * Le formulaire d'« Arrosages », un seul squelette pour les trois onglets
  * (simplification S5, docs/simplification-s5-contract.md, sections 3 et 4) :
- * « Arroser maintenant » (PR 1) : « 1. Où ? », « 2. Combien de temps ? », puis
+ * « Arroser maintenant » (PR 1) : « 1. Où ? », « 2. Combien de mm ? », puis
  * le bouton qui dit ce qu'il fait ; « Planifier » (PR 2) : « Où ? », « Quand ? »,
- * « Combien de temps ? » ; « Déjà fait » (PR 2) : « De quand à quand ? » avant
- * « Où ? » (règle 12), sans « Combien de temps ? », la durée se lit des dates.
- * La pompe, la note, la saisie en mm et la durée exacte sont derrière « Plus
- * d'options ». Les valeurs sont celles du formulaire d'avant, écrites par les
+ * « Combien de mm ? » ; « Déjà fait » (PR 2) : « De quand à quand ? » avant
+ * « Où ? » (règle 12), sans « Combien ? », la durée se lit des dates.
+ * « Combien » se dit en millimètres d'abord, la durée en résultat (D-354,
+ * section 15) ; la pompe, la note, la saisie d'une durée (« − », « + »,
+ * pastilles) et la durée exacte sont derrière « Plus d'options ». Les valeurs sont celles du formulaire d'avant, écrites par les
  * mêmes champs : aucun calcul ni aucune écriture ne change. Les règles
  * d'écran vivent dans `lib/domain/watering-now.ts` et
  * `lib/domain/watering-plan-record.ts`.
@@ -76,14 +81,16 @@ export function WateringForm({
   const chips = selectedEquipment ? durationChips(advisedSeconds) : durationChips(null);
   const chosen = chosenChip({ mode: form.preparationMode, targetMillimeters: form.targetMillimeters, durationMinutes: numericInput(form.durationHours) * MINUTES_PER_HOUR + numericInput(form.durationMinutes) }, dose);
   const clock = useMinuteClock(now);
+  const entry: AmountEntry = form.millimetersEntry ? 'millimeters' : 'duration';
+  const advisedAmount = selectedEquipment ? advisedAmountLabel(dose) : null;
   const equipmentName = selectedEquipment?.name ?? null;
   const reachedBedsCount = preview.previewApplications.length;
   const plannedStartIso = isoFromLocalInput(form.plannedStartAt);
   const button = kind === 'completed'
     ? recordButton({ equipmentName, durationSeconds, reachedBeds: reachedBedsCount })
     : kind === 'planned'
-      ? planButton({ equipmentName, start: plannedStartIso === null ? null : new Date(plannedStartIso), durationSeconds, reachedBeds: reachedBedsCount, now: clock })
-      : startButton({ equipmentName, durationSeconds, reachedBeds: reachedBedsCount, now: clock });
+      ? planButton({ equipmentName, start: plannedStartIso === null ? null : new Date(plannedStartIso), durationSeconds, reachedBeds: reachedBedsCount, now: clock, entry })
+      : startButton({ equipmentName, durationSeconds, reachedBeds: reachedBedsCount, now: clock, entry });
   const sentence = selectedEquipment && durationSeconds !== null && durationSeconds > 0
     ? resultSentence({
       amountsMm: preview.previewApplications.map((application) => application.amountMm),
@@ -95,7 +102,7 @@ export function WateringForm({
   const hydraulicTone = pumpsEnabled && selectedEquipment ? hydraulicMessage(preview.hydraulicPreview, kind === 'completed').tone : null;
   const hydraulicFirst = hydraulicTone !== null && precautionLevel({ kind: 'hydraulic', tone: hydraulicTone }) === 'first-level';
   const defaultPumpId = selectedEquipment ? pumpDashboard.equipmentDefaults.find((item) => item.equipmentId === selectedEquipment.id)?.pumpId ?? '' : '';
-  const autoOpen = moreOptionsOpenAtFirst({ pumpChosen: form.pumpId !== '', pumpIsDefault: form.pumpId === defaultPumpId, note: form.note, millimetersEntry: kind !== 'completed' && form.millimetersEntry });
+  const autoOpen = moreOptionsOpenAtFirst({ pumpChosen: form.pumpId !== '', pumpIsDefault: form.pumpId === defaultPumpId, note: form.note, durationEntry: kind !== 'completed' && !form.millimetersEntry });
   const [moreChoice, setMoreChoice] = useState<boolean | null>(null);
   const moreOpen = moreChoice ?? autoOpen;
   const moreId = useId();
@@ -212,7 +219,7 @@ export function WateringForm({
 
   const howLong = kind === 'completed' ? null : (
     <section className="watering-block" aria-labelledby={`${moreId}-combien`} data-tour="arrosage-resultat">
-      <h3 id={`${moreId}-combien`}>{n('duration')}. Combien de temps ?</h3>
+      <h3 id={`${moreId}-combien`}>{n('duration')}. {howMuchHeading(entry)}</h3>
       {form.millimetersEntry ? (
         <div className="watering-amount">
           <label>
@@ -222,6 +229,13 @@ export function WateringForm({
               <b>mm</b>
             </span>
           </label>
+          {advisedAmount ? (
+            <div className="watering-chips" role="group" aria-label="Quantité proposée">
+              <button type="button" aria-pressed={amountIsAdvised(form.targetMillimeters, dose)} onClick={() => { form.setPreparationMode('amount'); form.setTargetMillimeters(dose === null ? '' : String(dose)); }}>
+                {advisedAmount}
+              </button>
+            </div>
+          ) : null}
           <p className="watering-duration-result">soit <strong>{durationText(durationSeconds)}</strong><FigureOrigin text={preview.previewOrigin} /></p>
         </div>
       ) : (<>
@@ -266,8 +280,8 @@ export function WateringForm({
         <div id={`${moreId}-options`} className="watering-more-options irrigation-form-fields" hidden={!moreOpen}>
           {kind === 'completed' ? null : (<>
             <label className="watering-switch">
-              <input type="checkbox" checked={form.millimetersEntry} onChange={(event) => { form.setMillimetersEntry(event.target.checked); if (event.target.checked) form.setPreparationMode('amount'); }} />
-              <span>Saisir en mm</span>
+              <input type="checkbox" checked={!form.millimetersEntry} onChange={(event) => { form.setMillimetersEntry(!event.target.checked); if (!event.target.checked) form.setPreparationMode('amount'); }} />
+              <span>Saisir une durée</span>
             </label>
             {form.millimetersEntry && selectedEquipment?.kind === 'sprinkler' ? (
               <label>

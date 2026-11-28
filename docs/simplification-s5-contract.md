@@ -141,6 +141,10 @@ recopiée. Les lignes restent **groupées par jardin**, comme aujourd'hui
 
 ### 3.2 « 2. Combien de temps ? »
 
+> **Changé le 26 novembre 2026 (section 15, D-354)** : le premier niveau dit
+> d'abord « Combien de mm ? » ; le réglage de durée ci-dessous passe derrière
+> « Saisir une durée », dans « Plus d'options ».
+
 Un **réglage de durée comme sur la vanne** : un grand nombre (« 1 h 20 »), un
 bouton « − » et un bouton « + » ronds de 52 px (« Cinq minutes de moins », « Cinq
 minutes de plus »), et trois pastilles de 44 px.
@@ -630,3 +634,45 @@ la grille, comme S1 et S2) : écran sous contrat écrit, qui appelle des calculs
 des actions existants sans les changer ; les tests et la CI jugent. Si une PR
 doit **changer** un calcul ou une règle d'écriture (ce que ce contrat exclut), elle
 s'arrête, le dit, et passe en Très élevé après le mot du porteur.
+
+## 15. Avenant du 26 novembre 2026 : les millimètres d'abord (D-354)
+
+**Demande du porteur**, le 26 novembre 2026 à 20 h 10 (heure de Paris) :
+« Par défaut, quand on fait démarrer une irrigation, il faut qu'on saisisse
+en millimètres combien on veut mettre. » Elle change la section 3.2 et le
+contenu de « Plus d'options » (section 3.4) : le premier niveau disait une
+durée, comme sur la vanne ; il dit désormais une quantité, en millimètres,
+et la durée en est le résultat. Lecture retenue (dite au porteur) : la règle
+vaut pour **« Arroser maintenant » et « Planifier »**, les deux gestes qui
+lancent un arrosage ; **« Déjà fait »** ne change pas, sa durée se lit des
+dates.
+
+**Ce qui ne change pas.** Aucun calcul : la durée tirée d'une quantité est
+la fonction existante (`durationSecondsForTarget`, mode « Objectif en mm »,
+celui d'avant S5 et le premier état du formulaire depuis toujours) ; la
+planche de référence d'un asperseur, la dose du jour (F409), le
+dépassement de l'objectif, la faisabilité, l'action serveur et ses gardes
+sont ceux d'avant. Aucune question agronomique : chaque réglage d'un
+matériel porte son intensité, la conversion des millimètres en durée se
+calcule toujours. Logiciel multi-fermes : rien ne dépend de la ferme.
+
+| Élément | Règle (F1087 à F1092) |
+| --- | --- |
+| Saisie par défaut (F1087) | un formulaire neuf, ou vidé après une réussite (F406), dit « combien » en millimètres ; le mode de calcul est « Objectif en mm » |
+| Le deuxième bloc (F1088) | « 2. Combien de mm ? » (« 3. » dans « Planifier ») : le champ « Quantité souhaitée » en mm (pavé décimal), puis « soit *durée* » avec son « i », puis la phrase du résultat (3.3) ; il redevient « Combien de temps ? » quand on saisit une durée |
+| « Conseillé : 8 mm » (F1089) | une pastille à côté du champ, seulement quand le jour a une dose pour ce matériel : elle dit ce qu'est la valeur déjà remplie et y ramène après une autre saisie ; sans dose, le champ est vide et rien n'est dit à sa place (D-028) |
+| Ce qui manque (F1090) | « Choisissez où arroser. », puis « Indiquez combien de mm apporter. » ; en saisie d'une durée, « Choisissez une durée. » comme avant |
+| « Plus d'options » (F1091) | « Plus d'options (pompe, note, saisir une durée) » ; la case « Saisir une durée » remplace « Saisir en mm » : cochée, le deuxième bloc montre la durée, « − », « + » et les pastilles de la section 3.2, inchangés ; décochée, retour aux millimètres. « Durée exacte », la planche de référence (en saisie en mm), la pompe et la note restent où elles étaient |
+| Modifier une irrigation planifiée (F1092) | la durée enregistrée se relit telle quelle : la saisie passe en durée et « Plus d'options » s'ouvre seul, comme une valeur déjà posée (section 5) |
+
+**Ce que l'avenant coûte, dit.** Sans dose du jour, démarrer demande la
+quantité au clavier : « trois touches, sans clavier » (P64, section 11)
+devient « deux touches et la quantité ». Avec une dose du jour (le
+planning coché), la quantité est déjà remplie : deux touches, sans clavier.
+
+**Preuves.** `tests/arroser-en-millimetres.test.ts` (F1087 à F1092) ; les
+tests de S5 suivent ; parcours P64 et P65 réécrits ; P24, P31, P37, P38 et
+P40 suivent ; la visite guidée dit « 2. Combien de mm ? ».
+
+**Numéros pris** : D-354 ; F1087 à F1092 ; aucun parcours nouveau.
+Réglage du code : Opus 5.5 · Élevé, celui de S5 (section 14).

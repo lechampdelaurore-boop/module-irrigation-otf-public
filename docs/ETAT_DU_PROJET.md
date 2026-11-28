@@ -12,6 +12,22 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Simplifier l'usage du module, S5 : les millimètres d'abord au
+  démarrage d'un arrosage, demandé par le porteur le 26 novembre 2026 à
+  20 h 10 et codé le même jour** (D-354, F1087 à F1092 ; avenant au
+  contrat S5, section 15), en Opus 5.5 · Élevé, depuis `main`. Dans
+  « Arroser maintenant » et « Planifier », le deuxième bloc devient
+  « Combien de mm ? » : le champ des millimètres, « Conseillé : *n* mm »
+  avec une dose du jour, la durée en résultat (fonction existante) ; le
+  réglage de durée de S5 passe derrière « Saisir une durée », dans « Plus
+  d'options » ; « Déjà fait » ne change pas. Aucun calcul ni aucune
+  écriture changés. Tests ; P64 et P65 réécrits, P24, P31, P37, P38 et
+  P40 suivent. Contrôles : voir la PR. Mise à jour avec `main` le
+  28 novembre 2026, à son tour après la ligne 37. Consigne la mise en
+  ligne de HR2 (#253, 4ede30b, run 46127984783, en ligne le 28 novembre
+  2026 à 10 h 35, cinq jobs verts) et de HR3 (#254, cc1e43e, run
+  46132250984, en ligne à 11 h 30, cinq jobs verts) : **l'ET0 horaire
+  (ligne 37) est en ligne en entier** ; celle de #261 l'est déjà (par HR1).
 - **L'ET0 horaire, HR3 : « Soif du jour, heure par heure », codée le
   26 novembre 2026** (D-350, F1043 à F1050 ; contrat
   `docs/et0-horaire-contract.md`, § 7 ; roadmap ligne 37), en Opus 5.5 ·

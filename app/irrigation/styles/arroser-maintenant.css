@@ -116,6 +116,12 @@
   font-weight: 500;
 }
 
+/* Les millimètres d'abord (D-354) : le champ, « Conseillé : 8 mm », puis « soit 1 h 20 ». */
+.watering-amount {
+  display: grid;
+  gap: 10px;
+}
+
 .watering-stepper {
   display: flex;
   align-items: center;
