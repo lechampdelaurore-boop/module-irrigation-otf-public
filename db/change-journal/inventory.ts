@@ -178,7 +178,7 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/water-management-repository.ts › saveHydricGoalForUser › irrigation_hydric_goal_revisions': branche('objectif-hydrique'),
   'db/water-management-repository.ts › clearHydricGoalsForUser › irrigation_hydric_goal_revisions': branche('objectif-hydrique'),
   'db/water-management-repository.ts › ensureRecurringHydricGoalsForUser › irrigation_hydric_goal_revisions': sansObjet('Le report des objectifs de la semaine d’avant sur une semaine neuve, par le module : les mêmes valeurs, aucun geste ni changement.'),
-  'db/crop-water/adoptions.ts › saveAdoptedGoalForUser › irrigation_hydric_goal_revisions': branche('objectif-adopte'),
+  'db/crop-water/adoptions.ts › adoptionStatements › irrigation_hydric_goal_revisions': branche('objectif-adopte'),
   'db/automatic-objective-repository.ts › saveAutomaticObjectiveForUser › irrigation_automatic_objective_revisions': branche('objectif-automatique'),
   // Les deux gestes, un seul écrivain : « Reprendre » s'écrit sous `reprise-saison`, dans le même code.
   'db/off-season-repository.ts › saveOffSeasonForUser › irrigation_off_season_revisions': branche('jardin-hors-saison'),
@@ -200,7 +200,7 @@ export const JOURNAL_WRITE_SITES: Readonly<Record<string, WriteSiteStatus>> = {
   'db/weather-alert-repository.ts › deleteWeatherAlertCriterionForUser › irrigation_weather_alert_criteria': branche('critere-meteo'),
   'db/weather-alert-repository.ts › versionStatement › irrigation_weather_alert_criterion_versions': CHILD_OF('irrigation_weather_alert_criteria'),
   'db/crop-alerts/inputs.ts › saveCropAlertSettingsForUser › irrigation_crop_alert_settings': branche('alertes-de-culture'),
-  'db/crop-alerts/inputs.ts › saveFrostLinkForUser › irrigation_crop_frost_links': branche('seuil-de-gel'),
+  'db/crop-alerts/inputs.ts › frostLinkStatements › irrigation_crop_frost_links': branche('seuil-de-gel'),
   'db/crop-alerts/inputs.ts › saveDryingDaysForUser › irrigation_crop_drying_revisions': branche('jours-de-sechage'),
   'db/crop-water/sensitive-stages.ts › saveSensitiveStagesForUser › irrigation_crop_sensitive_stages': branche('stade-sensible'),
   'db/feature-selection-repository.ts › saveFeatureSelectionForUser › irrigation_feature_selections': branche('fonctionnalites'),

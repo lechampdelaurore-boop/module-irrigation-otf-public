@@ -1,6 +1,6 @@
 import { createEquipmentForUser } from '@/db/equipment/equipment';
 import { listEquipmentForUser } from '@/db/equipment/read';
-import { createIrrigationEventForUser } from '@/db/irrigation-event/create';
+import { createCompletedIrrigationEventsForUser, type CreateIrrigationEventDraft } from '@/db/irrigation-event/create';
 import { saveEquipmentSettingForUser } from '@/db/equipment/settings';
 import { saveEquipmentPlacementForUser } from '@/db/equipment-placement-repository';
 import { saveEquipmentDefaultPumpForUser, savePumpForUser } from '@/db/pump-repository';
@@ -68,7 +68,8 @@ export async function seedDemoEquipment(ownerUserId: string, choice: DemoChoice,
 
 /**
  * Les arrosages faits avant le jour du moment, saisis comme une ferme les
- * aurait notés : un par semaine, aux habitudes de la ferme fictive. Le
+ * aurait notés : un par semaine, aux habitudes de la ferme fictive, écrits
+ * ensemble en quelques lots. Le
  * goutte-à-goutte du cas d'écart (F747) a de plus, les trois semaines
  * complètes avant celle du moment, un début et une fin prévus, sa durée
  * prévue plus courte que la durée faite ; la durée faite reste l'habitude.
@@ -91,6 +92,7 @@ async function seedDemoHistory(
     return { ...selected, rateMmPerHour: definition.rateMmPerHour, bedAreaSquareMeters: area, wettedAreaSquareMeters: area };
   });
   const longer = longerThanPlanned(choice, definition);
+  const drafts: CreateIrrigationEventDraft[] = [];
   for (let day = DEMO_HISTORY_START; day < choice.moment.dateKey; day = addDaysToDateKey(day, 7)) {
     const minutes = DEMO_HISTORY_MINUTES_BY_MONTH[day.slice(5, 7)] ?? 0;
     if (minutes === 0) continue;
@@ -99,7 +101,7 @@ async function seedDemoHistory(
     const start = new Date(`${day}T${String(DEMO_HISTORY_HOUR_UTC).padStart(2, '0')}:00:00.000Z`);
     const end = new Date(start.getTime() + hours * MILLISECONDS_PER_HOUR);
     const plannedSeconds = longer && day >= longer.start && day <= longer.end ? Math.round(seconds * longer.plannedShareOfDuration) : null;
-    await createIrrigationEventForUser(ownerUserId, {
+    drafts.push({
       kind: 'completed',
       season: snapshot.configuration.seasonFirst,
       note: null,
@@ -116,6 +118,8 @@ async function seedDemoHistory(
       pumpAssignment: null,
     });
   }
+  // Toutes d'un coup (accélérer le site, A2, D-359) : les mêmes lignes qu'une à une, dans le même ordre.
+  await createCompletedIrrigationEventsForUser(ownerUserId, drafts);
 }
 
 /**

@@ -1,3 +1,4 @@
+import { batchWholeGroups } from './batches';
 import { db } from './binding';
 import { findWorkspaceIdForUser } from './workspace-repository';
 import type { ForecastArchiveRow } from '@/lib/domain/weather/forecast-archive';
@@ -35,7 +36,13 @@ export type ForecastArchiveRecord = ForecastArchiveRow & {
 /** Écrit la photographie d'un jour, sans rien écraser ; rend le nombre de lignes nouvelles. */
 export async function writeForecastArchive(snapshot: ForecastArchiveSnapshot): Promise<number> {
   if (snapshot.rows.length === 0) return 0;
-  const results = await db.batch(snapshot.rows.map((row) => db.prepare(
+  const results = await db.batch(archiveStatements(snapshot));
+  return results.reduce((written, result) => written + Number(result.meta.changes ?? 0), 0);
+}
+
+/** Les lignes d'un jour d'émission, une instruction chacune, qui n'écrasent rien. */
+function archiveStatements(snapshot: ForecastArchiveSnapshot): D1PreparedStatement[] {
+  return snapshot.rows.map((row) => db.prepare(
     `INSERT INTO irrigation_weather_forecast_archive
        (workspace_id, location_key, issued_on, target_date, horizon_days, precipitation_mm, et0_mm,
         minimum_temperature_celsius, maximum_temperature_celsius, solar_energy_mj_per_square_meter,
@@ -55,8 +62,7 @@ export async function writeForecastArchive(snapshot: ForecastArchiveSnapshot): P
     row.solarEnergyMegajoulesPerSquareMeter,
     snapshot.source,
     snapshot.fetchedAt,
-  )));
-  return results.reduce((written, result) => written + Number(result.meta.changes ?? 0), 0);
+  ));
 }
 
 /** La même écriture pour l'exploitation d'une personne, lue par une actualisation à l'écran ; sans exploitation, rien. */
@@ -67,6 +73,23 @@ export async function writeForecastArchiveForUser(
   const workspaceId = await findWorkspaceIdForUser(ownerUserId);
   if (!workspaceId) return 0;
   return writeForecastArchive({ ...snapshot, workspaceId });
+}
+
+/**
+ * Plusieurs jours d'émission d'un coup, pour l'exploitation d'une personne
+ * (accélérer le site, A2, D-359 : l'archive semée d'une ferme de
+ * démonstration) : les mêmes lignes que `writeForecastArchiveForUser` jour
+ * après jour, dans le même ordre, en quelques lots, sans qu'un jour soit
+ * coupé entre deux. Sans exploitation, rien.
+ */
+export async function writeForecastArchivesForUser(
+  ownerUserId: string,
+  snapshots: readonly Omit<ForecastArchiveSnapshot, 'workspaceId'>[],
+): Promise<void> {
+  if (snapshots.length === 0) return;
+  const workspaceId = await findWorkspaceIdForUser(ownerUserId);
+  if (!workspaceId) return;
+  await batchWholeGroups(snapshots.map((snapshot) => archiveStatements({ ...snapshot, workspaceId })));
 }
 
 /**

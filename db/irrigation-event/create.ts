@@ -1,3 +1,4 @@
+import { batchWholeGroups } from '../batches';
 import { db } from '../binding';
 import { listPosesOfEquipment } from '../equipment-placement-poses';
 import { hydraulicRevisionStatement, waterBudgetRevisionStatement } from '../workspace-repository';
@@ -5,6 +6,7 @@ import {
   completedIrrigationPoseRefusalMessage,
   poseForCompletedIrrigation,
   samePlace,
+  type PlacementPose,
 } from '@/lib/domain/equipment-placement-periods';
 import type { EquipmentPlacementRecord } from '@/lib/domain/equipment-placement-record';
 import type { EquipmentListItem, EquipmentSettingRecord } from '@/lib/domain/equipment-record';
@@ -64,6 +66,90 @@ export async function createIrrigationEventForUser(
     await assertEquipmentNotRunning(workspaceId, draft.equipment.id);
   }
 
+  const created = creationStatements(ownerUserId, workspaceId, draft, options);
+  await db.batch(created.statements);
+  const warnings = await findWarnings(
+    workspaceId,
+    draft.equipment.id,
+    draft.applications.map((application) => application.otfBedId),
+    draft.plannedStartAt,
+    draft.plannedEndAt,
+    created.eventEquipmentId,
+  );
+  return {
+    ...warnings,
+    eventId: created.eventId,
+    eventEquipmentId: created.eventEquipmentId,
+    pushSchedule:
+      created.alarmDueAt && created.timerAlarmRevision
+        ? pushScheduleFromValues({
+            workspaceId,
+            eventEquipmentId: created.eventEquipmentId,
+            season: draft.season,
+            kind: created.isRunning ? 'finished' : 'late',
+            revision: created.timerAlarmRevision,
+            dueAt: created.alarmDueAt,
+            status: 'pending',
+            equipmentName: draft.equipment.name,
+            settingName: draft.setting.name,
+          })
+        : null,
+  };
+}
+
+/**
+ * Plusieurs irrigations faites, saisies après coup d'un seul geste
+ * (accélérer le site, A2, D-359 : les arrosages passés d'une ferme de
+ * démonstration). Chacune est vérifiée comme `createIrrigationEventForUser`
+ * la vérifierait (son matériel, son réglage et sa pose dans l'espace, la
+ * pose ouverte à son heure de début, au moins une planche) et écrit les
+ * mêmes lignes, dans le même ordre ; les vérifications de l'espace se lisent
+ * une fois par matériel, et les irrigations partent ensemble, en quelques
+ * lots, sans qu'aucune soit coupée entre deux. Une irrigation refusée arrête
+ * tout avant la première écriture. Les avertissements, que ce geste ne
+ * montre à personne, ne se lisent pas.
+ */
+export async function createCompletedIrrigationEventsForUser(
+  ownerUserId: string,
+  drafts: readonly CreateIrrigationEventDraft[],
+): Promise<void> {
+  if (drafts.length === 0) return;
+  const workspaceId = await findWorkspaceId(ownerUserId);
+  if (!workspaceId) throw new IrrigationEventInputError('Espace d’irrigation introuvable.');
+  const checkedReferences = new Set<string>();
+  const posesByEquipment = new Map<string, PlacementPose[]>();
+  for (const draft of drafts) {
+    if (draft.kind !== 'completed') throw new IrrigationEventInputError('Seule une irrigation faite se saisit avec d’autres.');
+    const reference = JSON.stringify([draft.equipment.id, draft.setting.id, draft.placement.id, draft.season]);
+    if (!checkedReferences.has(reference)) {
+      await assertReferencedPlacement(workspaceId, draft);
+      checkedReferences.add(reference);
+    }
+    const posesKey = JSON.stringify([draft.equipment.id, draft.season]);
+    let poses = posesByEquipment.get(posesKey);
+    if (!poses) {
+      poses = await listPosesOfEquipment(workspaceId, draft.equipment.id, draft.season);
+      posesByEquipment.set(posesKey, poses);
+    }
+    assertCompletedIrrigationPose(draft, poses);
+    if (draft.applications.length === 0) {
+      throw new IrrigationEventInputError('Ce réglage n’irrigue aucune planche depuis sa position actuelle.');
+    }
+  }
+  await batchWholeGroups(drafts.map((draft) => creationStatements(ownerUserId, workspaceId, draft, {}).statements));
+}
+
+/**
+ * Ce qu'écrit la création d'une irrigation, en un lot : les révisions de
+ * l'espace, l'irrigation, son matériel, ses planches et son journal ; ses
+ * identifiants et son alerte. Rien n'est lu ni écrit ici.
+ */
+function creationStatements(
+  ownerUserId: string,
+  workspaceId: string,
+  draft: CreateIrrigationEventDraft,
+  options: IrrigationAlarmOptions,
+) {
   const eventId = crypto.randomUUID();
   const eventEquipmentId = crypto.randomUUID();
   const now = new Date();
@@ -174,34 +260,7 @@ export async function createIrrigationEventForUser(
     eventEquipmentId,
   }));
 
-  await db.batch(statements);
-  const warnings = await findWarnings(
-    workspaceId,
-    draft.equipment.id,
-    draft.applications.map((application) => application.otfBedId),
-    draft.plannedStartAt,
-    draft.plannedEndAt,
-    eventEquipmentId,
-  );
-  return {
-    ...warnings,
-    eventId,
-    eventEquipmentId,
-    pushSchedule:
-      alarmDueAt && timerAlarmRevision
-        ? pushScheduleFromValues({
-            workspaceId,
-            eventEquipmentId,
-            season: draft.season,
-            kind: isRunning ? 'finished' : 'late',
-            revision: timerAlarmRevision,
-            dueAt: alarmDueAt,
-            status: 'pending',
-            equipmentName: draft.equipment.name,
-            settingName: draft.setting.name,
-          })
-        : null,
-  };
+  return { statements, eventId, eventEquipmentId, isRunning, alarmDueAt, timerAlarmRevision };
 }
 
 /** L'échéance de l'alerte « en retard » d'une irrigation planifiée, quand la tolérance R14 est donnée (règle 24). */
@@ -295,6 +354,14 @@ async function assertOwnedEventReferences(
   workspaceId: string,
   draft: CreateIrrigationEventDraft,
 ) {
+  await assertReferencedPlacement(workspaceId, draft);
+  if (draft.kind === 'completed') {
+    assertCompletedIrrigationPose(draft, await listPosesOfEquipment(workspaceId, draft.equipment.id, draft.season));
+  }
+}
+
+/** Le matériel actif, son réglage et sa ligne de position, dans l'espace et la saison ; la pose ouverte, sauf après coup. */
+async function assertReferencedPlacement(workspaceId: string, draft: CreateIrrigationEventDraft) {
   const completed = draft.kind === 'completed';
   const row = await db.prepare(
     `SELECT placement.id
@@ -324,14 +391,13 @@ async function assertOwnedEventReferences(
       'Le matériel, son réglage ou sa position n’est plus disponible.',
     );
   }
-  if (completed) await assertCompletedIrrigationPose(workspaceId, draft);
 }
 
-async function assertCompletedIrrigationPose(workspaceId: string, draft: CreateIrrigationEventDraft) {
+/** Une irrigation saisie après coup porte la pose ouverte à son heure de début, même fermée depuis (règle 12). */
+function assertCompletedIrrigationPose(draft: CreateIrrigationEventDraft, poses: PlacementPose[]) {
   if (draft.actualStartAt === null || draft.actualEndAt === null) {
     throw new IrrigationEventInputError('Indiquez l’heure de début et l’heure de fin.');
   }
-  const poses = await listPosesOfEquipment(workspaceId, draft.equipment.id, draft.season);
   const found = poseForCompletedIrrigation(poses, draft.actualStartAt, draft.actualEndAt);
   if (!found.ok) throw new IrrigationEventInputError(completedIrrigationPoseRefusalMessage(found.refusal));
   if (!samePlace(found.pose, draft.placement)) {

@@ -12,6 +12,21 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Accélérer le site, A2 : la ferme fictive s'écrit en quelques lots à
+  la première ouverture d'une démonstration, codé le 28 novembre 2026**
+  (D-359, F1107 à F1110 ; contrat `docs/acceleration-du-site-contract.md`,
+  section 4 ; roadmap ligne 38), en Opus 5.5 · Max, sur A1. Les arrosages
+  passés, l'archive des prévisions, les objectifs adoptés et les espèces
+  passent par quatre écritures groupées, faites des instructions mêmes des
+  gestes ordinaires, vérifiées une fois pour toutes leurs lignes, en lots
+  d'au plus 100 instructions jamais coupés ; les mêmes lignes dans le même
+  ordre, prouvé sur les neuf couples profil × moment (avant, sur `main`
+  `dc83ae1`, et après : octet pour octet). Préparer un espace : 206 à 235
+  appels à la base au lieu de 512 à 1 275 pour la « Ferme des Trois
+  Noues », au plus 300 pour tout profil (un test le tient). Aucun écran,
+  aucun calcul, aucune migration, aucun réglage de Cloudflare ; F450
+  tient. Fusion après A1 ; mesure en ligne avant la fusion et après la
+  mise en ligne, par l'en-tête d'A1. Puis A3.
 - **Accélérer le site, A1 : le serveur dit son temps, demandé par le
   porteur le 28 novembre 2026 à 13 h 44 et codé le même jour** (D-358,
   F1101 à F1106 ; contrat `docs/acceleration-du-site-contract.md`,
