@@ -245,11 +245,15 @@ table par table, octet pour octet. Les tests de la démonstration
 (`tests/db/demo-space.test.ts` et les suivants) et ses parcours restent
 verts sans changement.
 
-**La mesure en ligne.** Avant la fusion, puis après la mise en ligne, par
-l'en-tête de A1 : la première ouverture d'un espace neuf de la « Ferme des
-Trois Noues », au début de l'été et en automne, dans le Chrome du porteur
-(le temps jusqu'au premier octet, `app`, `d1` et son nombre d'appels).
-Objectif : 1 à 2 s au lieu de 4 à 8 s.
+**La mesure.** En local, par l'en-tête de A1, la première ouverture
+d'« Aujourd'hui » d'un espace neuf (« Ferme des Trois Noues », début de
+l'été ; parcours V13 seul, base neuve) passe de 935 appels à la base à 370 :
+229 pour préparer l'espace, le reste pour la page, que vise A3. En ligne,
+avant la fusion puis après la mise en ligne, par le même en-tête : la
+première ouverture d'un espace neuf de la « Ferme des Trois Noues », au
+début de l'été et en automne, dans le Chrome du porteur (le temps jusqu'au
+premier octet, `app`, `d1` et son nombre d'appels). Objectif : 1 à 2 s au
+lieu de 4 à 8 s.
 
 ## 5. A3 — « Aujourd'hui »
 
