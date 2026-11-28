@@ -210,21 +210,32 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   await reglerLaPlageDuGoutteAGoutte(planning, PLAGE_DE_DEPART);
   await attendreLaPageIrrigation(page, 'besoins');
   await retirerLesObjectifs(page);
-  await saisirLaPluieDuJour(page, '0');
+  const jourDeLaMesure = await saisirLaPluieDuJour(page, '0');
   await verifierLEtape(page, journal, 'état initial rétabli');
 
   // Le champ « Millimètres » montre la mesure déjà saisie du jour choisi (détail
-  // de la recette 3.7, choix du porteur du 7 novembre 2026) : vide la veille,
-  // sans mesure ; « 0 » aujourd'hui, une mesure comme une autre ; et de même
-  // dès l'ouverture de la page.
+  // de la recette 3.7, choix du porteur du 7 novembre 2026) : vide un jour sans
+  // mesure ; « 0 » le jour que le parcours vient de noter, une mesure comme une
+  // autre ; et de même dès l'ouverture de la page, quand elle s'ouvre sur ce jour.
+  // Le jour sans mesure est l'avant-veille du jour noté : les parcours de la ferme
+  // commune ne notent la pluie que le jour où ils tournent, et une suite tient sur
+  // deux jours au plus. La veille, elle, porte la mesure des parcours d'avant
+  // minuit quand la suite passe minuit (27 novembre 2026).
   const pluie = await ouvrirLePli(page.locator('#manual-rain'));
-  const aujourdhui = dateKeyInTimeZone(new Date());
-  await pluie.getByLabel('Date', { exact: true }).fill(addDaysToDateKey(aujourdhui, -1));
+  await pluie.getByLabel('Date', { exact: true }).fill(addDaysToDateKey(jourDeLaMesure, -2));
   await expect(pluie.getByLabel('Millimètres')).toHaveValue('', { timeout: 15_000 });
-  await pluie.getByLabel('Date', { exact: true }).fill(aujourdhui);
+  await pluie.getByLabel('Date', { exact: true }).fill(jourDeLaMesure);
   await expect(pluie.getByLabel('Millimètres')).toHaveValue('0', { timeout: 15_000 });
   await attendreLaPageIrrigation(page, 'besoins');
-  await expect(page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' }).getByLabel('Millimètres')).toHaveValue('0');
+  const pluieALOuverture = page.locator('.water-management-section .water-panel').filter({ hasText: 'Pluie mesurée' });
+  // Le jour que la page propose d'elle-même : aujourd'hui quand elle a été servie.
+  const jourOuvert = await pluieALOuverture.getByLabel('Date', { exact: true }).inputValue();
+  const valeurOuverte = jourOuvert === jourDeLaMesure ? '0' : await pluieALOuverture.getByLabel('Millimètres').inputValue();
+  if (jourOuvert === jourDeLaMesure) {
+    await expect(pluieALOuverture.getByLabel('Millimètres')).toHaveValue('0');
+  } else {
+    testInfo.annotations.push({ type: 'hors jeu', description: `minuit passé entre la pluie notée (${jourDeLaMesure}) et la page rouverte (${jourOuvert}) : la mesure à l’ouverture n’est pas vérifiée ici` });
+  }
   await verifierLEtape(page, journal, 'mesure du jour montrée dans le champ');
 
   // Le dernier jour choisi l'emporte (point ouvert 50) : un jour de la semaine
@@ -237,7 +248,7 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   // La semaine du tableau de l'eau : son premier jour, dans « Jours de la semaine, un par un » (S4, PR 2).
   const semaineAffichee = page.locator('#weather .water-day-date').first();
   const semaineDAujourdhui = (await semaineAffichee.textContent()) ?? '';
-  const unJourDeLaSemainePassee = addDaysToDateKey(aujourdhui, -7);
+  const unJourDeLaSemainePassee = addDaysToDateKey(jourOuvert, -7);
   const lundiDeLaSemainePassee = weekStartDateKey(unJourDeLaSemainePassee);
   const chargeLaSemainePassee = (requete: Request) => requete.method() === 'POST' && (requete.postData() ?? '').includes(lundiDeLaSemainePassee);
   // Les besoins sont sur la page « Semaine » depuis le lot S4 : ses actions y sont envoyées.
@@ -257,26 +268,28 @@ test('le plan se recalcule seul après une pluie et un refus, suggère « Annule
   });
   await pluieRouverte.getByLabel('Date', { exact: true }).fill(unJourDeLaSemainePassee);
   await expect.poll(() => retenue).toBe(true);
-  await pluieRouverte.getByLabel('Date', { exact: true }).fill(aujourdhui);
-  await expect(pluieRouverte.getByLabel('Millimètres')).toHaveValue('0');
+  await pluieRouverte.getByLabel('Date', { exact: true }).fill(jourOuvert);
+  await expect(pluieRouverte.getByLabel('Millimètres')).toHaveValue(valeurOuverte);
   const reponseArrivee = page.waitForResponse((reponse) => chargeLaSemainePassee(reponse.request()));
   relacher();
   await reponseArrivee;
   // La réponse lue, la page rend la main : « Enregistrer » se réactive.
   await expect(pluieRouverte.getByRole('button', { name: 'Enregistrer' })).toBeEnabled();
-  await expect(pluieRouverte.getByLabel('Millimètres')).toHaveValue('0');
+  await expect(pluieRouverte.getByLabel('Millimètres')).toHaveValue(valeurOuverte);
   await expect(semaineAffichee).toHaveText(semaineDAujourdhui);
   await page.unroute(pageDesBesoins);
   await verifierLEtape(page, journal, 'réponse en retard sans effet sur le champ ni la semaine');
 });
 
-/** La pluie mesurée d'aujourd'hui, la date que le formulaire propose de lui-même. */
-async function saisirLaPluieDuJour(page: Page, millimetres: string): Promise<void> {
+/** La pluie mesurée d'aujourd'hui, la date que le formulaire propose de lui-même ; rend ce jour, celui de la page. */
+async function saisirLaPluieDuJour(page: Page, millimetres: string): Promise<string> {
   const panneau = await ouvrirLePli(page.locator('#manual-rain'));
   await panneau.scrollIntoViewIfNeeded();
+  const jour = await panneau.getByLabel('Date', { exact: true }).inputValue();
   await panneau.getByLabel('Millimètres').fill(millimetres);
   await panneau.getByRole('button', { name: 'Enregistrer' }).click();
   await expect(page.locator('.water-management-section .water-notice')).toContainText('La pluie mesurée a été enregistrée.', { timeout: 15_000 });
+  return jour;
 }
 
 /**

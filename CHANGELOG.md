@@ -25,6 +25,19 @@ source détaillée commit par commit.
   personne. Rien ne change à l'écran ni dans les calculs ; c'est la mesure
   qui guidera les deux accélérations suivantes.
 
+### Corrigé (parcours navigateur à cheval sur minuit)
+
+- **P63, P12 et P37 ne dépendent plus d'une suite qui passe minuit**
+  (D-355, F1093 à F1096). P63 admet le jour que la page propose entre
+  son début et sa lecture, et dit hors jeu la mesure relue quand minuit
+  passe entre deux gestes ; P12 cherche un jour sans mesure à
+  l'avant-veille du jour qu'il vient de noter, que nul parcours n'a pu
+  noter ; P37 joue la fenêtre de l'objectif sur une ferme propre. La
+  cause de P37 était les objectifs vidés la veille par d'autres
+  parcours, pas l'eau. Les trois échecs du 26 novembre 2026 au soir
+  reproduits sur `main`, puis verts avec la correction. Aucun écran ni
+  calcul changé.
+
 ### Modifié (simplifier l'usage du module, S5 : les millimètres d'abord)
 
 - **Démarrer un arrosage en millimètres** (D-354, F1087 à F1092) : dans
