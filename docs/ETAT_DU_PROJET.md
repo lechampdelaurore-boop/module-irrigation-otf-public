@@ -21,7 +21,10 @@ registres, elle y renvoie.
   forme de la source de l'ET0 du jour de la ferme, sinon la forme
   théorique, dite ; sans ET0 du jour, « Pas de courbe : l'ET0 du jour
   manque. ». Aucun calcul existant changé. Parcours P73. Contrôles : voir
-  la PR. La ligne 37 est codée en entier ; fusions dans l'ordre.
+  la PR. La ligne 37 est codée en entier ; fusions dans l'ordre. Consigne
+  la mise en ligne de HR1 (#252, c8e325a, run 46124178071, en ligne le
+  28 novembre 2026 à 9 h 53, cinq jobs verts) ; HR2 (#253, 4ede30b,
+  fusionnée à 9 h 54) est consignée par la PR suivante.
 - **L'ET0 horaire, HR2 : lire les heures, écrire la forme, la purger,
   codée le 26 novembre 2026** (D-349, F1036 à F1042 ; contrat
   `docs/et0-horaire-contract.md`, § 5, § 9 et § 11 ; roadmap ligne 37), en
