@@ -253,7 +253,13 @@ avant la fusion puis après la mise en ligne, par le même en-tête : la
 première ouverture d'un espace neuf de la « Ferme des Trois Noues », au
 début de l'été et en automne, dans le Chrome du porteur (le temps jusqu'au
 premier octet, `app`, `d1` et son nombre d'appels). Objectif : 1 à 2 s au
-lieu de 4 à 8 s.
+lieu de 4 à 8 s. Mesuré en ligne avant la fusion, le 28 novembre 2026 à
+18 h 15 (`/mnt/project-files/performance/mesure-2026-11-28-soir-avant.md`) :
+l'été était déjà prêt pour l'invité ; l'automne, espace neuf, demande
+36 366 ms jusqu'au premier octet de `/irrigation`, entièrement à attendre
+la base (1 278 appels, environ 28 ms chacun), puis 2 231 ms pour
+« Aujourd'hui » (143 appels) : environ 38 s. La pénurie est gardée neuve
+pour la mesure après la mise en ligne.
 
 ## 5. A3 — « Aujourd'hui » (D-360)
 
@@ -379,7 +385,12 @@ au lieu de 2 599. En ligne, avant la fusion (F814 : mesurée en ligne d'abord)
 puis après la mise en ligne, par l'en-tête de A1 : trois ouvertures
 d'« Aujourd'hui » de la démonstration, dans le Chrome du porteur (le temps
 jusqu'au premier octet, `app`, `d1` et son nombre d'appels). Objectif :
-environ 0,6 s au lieu d'environ 1 s.
+environ 0,6 s au lieu d'environ 1 s. Mesuré en ligne avant la fusion, le
+28 novembre 2026 à 18 h 15, sur un espace déjà prêt de la « Ferme des
+Trois Noues » : 1 317 à 1 500 ms jusqu'au premier octet, dont 1 007 à
+1 170 ms de serveur, **entièrement à attendre la base** (110 appels au gel
+de printemps, 118 au début de l'été, environ 9 à 10 ms chacun) ; 1 995 ms
+sur une instance neuve.
 
 ## 6. Ce qui ne change pas
 

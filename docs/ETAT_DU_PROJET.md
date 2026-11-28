@@ -28,9 +28,12 @@ registres, elle y renvoie.
   plus 60 pour tout profil (un test le tient) ; le même modèle avec et
   sans la mémoire, pour chaque profil et chaque moment, et avant et après,
   octet pour octet. La page, en local, dans les parcours de la
-  démonstration : 59 appels au lieu de 118. Aucun écran, aucun calcul, aucune migration, aucun
-  réglage de Cloudflare. Fusion après A2 ; mesure en ligne avant la
-  fusion et après la mise en ligne, par l'en-tête d'A1.
+  démonstration : 59 appels au lieu de 118. Aucun écran, aucun calcul,
+  aucune migration, aucun réglage de Cloudflare. Mesuré en ligne avant
+  la fusion, le 28 novembre 2026, par l'en-tête d'A1 : « Aujourd'hui »
+  de la démonstration, 1,0 à 1,2 s de serveur, entièrement à attendre
+  la base (110 à 118 appels). Fusion après A2 ; mesure après la mise en
+  ligne.
 - **Accélérer le site, A2 : la ferme fictive s'écrit en quelques lots à
   la première ouverture d'une démonstration, codé le 28 novembre 2026**
   (D-359, F1107 à F1110 ; contrat `docs/acceleration-du-site-contract.md`,
@@ -44,8 +47,10 @@ registres, elle y renvoie.
   appels à la base au lieu de 512 à 1 275 pour la « Ferme des Trois
   Noues », au plus 300 pour tout profil (un test le tient). Aucun écran,
   aucun calcul, aucune migration, aucun réglage de Cloudflare ; F450
-  tient. Fusion après A1 ; mesure en ligne avant la fusion et après la
-  mise en ligne, par l'en-tête d'A1. Puis A3.
+  tient. Fusion après A1. Mesuré en ligne avant la fusion, le 28 novembre
+  2026, par l'en-tête d'A1 : environ 38 s avant « Aujourd'hui » pour un
+  espace neuf en automne, dont 36,4 s et 1 278 appels à la base pour le
+  préparer ; mesure après la mise en ligne. Puis A3.
 - **Accélérer le site, A1 : le serveur dit son temps, demandé par le
   porteur le 28 novembre 2026 à 13 h 44 et codé le même jour** (D-358,
   F1101 à F1106 ; contrat `docs/acceleration-du-site-contract.md`,
