@@ -18,6 +18,17 @@ source détaillée commit par commit.
   reproduits sur `main`, puis verts avec la correction. Aucun écran ni
   calcul changé.
 
+### Ajouté (ET0 horaire, HR3 : la soif du jour heure par heure)
+
+- **« Soif du jour, heure par heure »** (D-350, F1043 à F1050) : en tête
+  du pli « Le détail » d'« Aujourd'hui », une phrase dit ce qu'il reste à
+  consommer d'ici ce soir sur la soif du jour, une petite courbe montre
+  chaque heure (l'heure en cours marquée) et les heures de plus forte
+  évaporation, et le « ? » dit d'où vient la courbe. Une information
+  seulement : le besoin des planches et l'objectif ne changent pas. Sans
+  heure du fournisseur, la courbe suit le soleil, et la phrase le dit ;
+  sans ET0 du jour, pas de courbe.
+
 ### Ajouté (ET0 horaire, HR2 : lire les heures et garder la forme de la journée)
 
 - **La forme de la journée se lit et se garde** (D-349, F1036 à F1042) :

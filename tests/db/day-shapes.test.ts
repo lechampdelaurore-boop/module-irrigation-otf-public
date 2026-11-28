@@ -2,15 +2,18 @@ import assert from 'node:assert/strict';
 import test, { afterEach, beforeEach } from 'node:test';
 import { automaticWeatherRepository } from '../../db/automatic-weather-repository';
 import { OUTSIDE_JOURNAL } from '../../db/change-journal/inventory';
-import { listDayShapes, writeDayShapes } from '../../db/day-shape-repository';
+import { listDayShapes, listDayShapesOfDay, writeDayShapes } from '../../db/day-shape-repository';
 import { KEPT_TABLES, SPACE_TABLES } from '../../db/farm-erasure-plan';
 import { RETENTION_PLAN } from '../../db/retention-plan';
-import { saveWeatherGeocodeForUser, saveWeatherPreferenceForUser } from '../../db/water-management-repository';
+import { saveWeatherGeocodeForUser, saveWeatherPreferenceForUser, upsertWeatherDailyValuesForUser } from '../../db/water-management-repository';
+import type { IrrigationSnapshot } from '../../lib/domain/domain';
+import { FEATURE_IDS } from '../../lib/domain/features/catalogue';
 import { addDaysToDateKey } from '../../lib/domain/water-management';
 import type { RecordedDayShape } from '../../lib/domain/weather/hourly-et0';
 import { customWeatherLocationKey } from '../../lib/domain/weather/location';
 import type { WeatherDailyValue, WeatherProvider, WeatherReadInput } from '../../lib/domain/weather/weather-provider';
 import { runRetentionPurges } from '../../lib/services/retention-purge';
+import { getTodayViewForUser } from '../../lib/services/today-service';
 import { runAutomaticWeatherSync } from '../../lib/services/weather/automatic-sync';
 import { applyMigrationsAfter, createMigratedSqliteDatabase, installTestDatabase, type TestDatabase } from '../support/d1-sqlite';
 import { ALICE, BOB } from '../support/spaces';
@@ -114,4 +117,59 @@ test('les plans connaissent la table : conservation avec sa purge, gardée hors 
   assert.ok(!SPACE_TABLES.some(({ table }) => table === 'irrigation_weather_day_shapes'), 'aucune ligne n’est d’une ferme');
   assert.match(KEPT_TABLES.irrigation_weather_day_shapes ?? '', /aucune ligne d'une ferme/);
   assert.match(OUTSIDE_JOURNAL.irrigation_weather_day_shapes ?? '', /forme de la journée/);
+});
+
+/** Une ferme à Vannes, sans planche : la page « Aujourd'hui » n'a besoin que du lieu et de l'ET0 du jour. */
+const SNAPSHOT: IrrigationSnapshot = {
+  configuration: { seasonFirst: 2026, seasonLast: 2026 },
+  structure: { id: '17', name: 'Ferme', legalCity: 'Vannes', legalPostcode: '56000', legalCountry: 'FR' },
+  zones: [],
+  plots: [],
+  beds: [],
+  source: 'cache',
+  lastSuccessfulReadAt: '2026-06-14T00:00:00.000Z',
+};
+/** Midi à Paris, le 15 juin 2026. */
+const NOON = new Date('2026-06-15T10:00:00.000Z');
+
+async function vannesFarm(owner: string, source: string) {
+  await saveWeatherPreferenceForUser(owner, { locationMode: 'custom', customCity: 'Vannes', customPostcode: '56000' });
+  await saveWeatherGeocodeForUser(owner, VANNES, candidate, 'open-meteo');
+  await upsertWeatherDailyValuesForUser(owner, VANNES, 'forecast', [{ date: '2026-06-15', precipitationMm: 0, et0Mm: 2.4 }], source, MORNING.toISOString());
+}
+
+test('HR3 : « Aujourd’hui » lit la forme du lieu pour la source de l’ET0 du jour de la ferme, jamais celle d’un autre modèle', async () => {
+  const peaked = flat().map((_, hour) => (hour >= 8 && hour < 18 ? 0.1 : 0));
+  await writeDayShapes({ placeKey: PLACE, source: 'open-meteo:meteofrance_seamless', fetchedAt: MORNING.toISOString(), rows: [row('2026-06-15', 'provider-hourly', peaked)] });
+  await writeDayShapes({ placeKey: PLACE, source: 'visual-crossing', fetchedAt: MORNING.toISOString(), rows: [row('2026-06-15', 'computed-hourly')] });
+  assert.deepEqual((await listDayShapesOfDay(PLACE, '2026-06-15')).map((shape) => shape.source), ['open-meteo:meteofrance_seamless', 'visual-crossing']);
+
+  await vannesFarm(ALICE, 'open-meteo:meteofrance_seamless');
+  const alice = await getTodayViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, enabled: [...FEATURE_IDS], now: NOON });
+  assert.equal(alice.dayCurve?.state, 'shown');
+  assert.ok(alice.dayCurve?.state === 'shown');
+  assert.equal(alice.dayCurve.nature, 'provider-hourly');
+  assert.equal(alice.dayCurve.strongest, 'Évaporation la plus forte entre 8 h et 18 h');
+  assert.equal(alice.dayCurve.sentence, 'D’ici ce soir, il reste environ 1,4 mm à consommer sur 2,4 mm.');
+
+  // Bob, au même lieu, lit avec « Automatique » (Visual Crossing) : la forme calculée à l’heure, la sienne.
+  await vannesFarm(BOB, 'visual-crossing');
+  const bob = await getTodayViewForUser({ ownerUserId: BOB, season: 2026, snapshot: SNAPSHOT, enabled: [...FEATURE_IDS], now: NOON });
+  assert.ok(bob.dayCurve?.state === 'shown');
+  assert.equal(bob.dayCurve.nature, 'computed-hourly');
+  assert.equal(bob.dayCurve.sentence, 'D’ici ce soir, il reste environ 1,2 mm à consommer sur 2,4 mm.');
+});
+
+test('HR3 : sans forme écrite, la forme théorique ; sans ET0 du jour, pas de courbe ; « Objectifs et besoins » décochée ne la lit pas', async () => {
+  await vannesFarm(ALICE, 'open-meteo:meteofrance_seamless');
+  const theoretical = await getTodayViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, enabled: [...FEATURE_IDS], now: NOON });
+  assert.ok(theoretical.dayCurve?.state === 'shown');
+  assert.equal(theoretical.dayCurve.nature, 'theoretical');
+  assert.match(theoretical.dayCurve.sentence, /d’après la forme théorique du soleil\.$/);
+
+  const tomorrow = await getTodayViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, enabled: [...FEATURE_IDS], now: new Date('2026-06-16T10:00:00.000Z') });
+  assert.deepEqual(tomorrow.dayCurve && { state: tomorrow.dayCurve.state, text: 'text' in tomorrow.dayCurve ? tomorrow.dayCurve.text : null }, { state: 'missing', text: 'Pas de courbe : l’ET0 du jour manque.' });
+
+  const withoutNeeds = await getTodayViewForUser({ ownerUserId: ALICE, season: 2026, snapshot: SNAPSHOT, enabled: FEATURE_IDS.filter((feature) => feature !== 'besoins'), now: NOON });
+  assert.equal(withoutNeeds.dayCurve, null);
 });

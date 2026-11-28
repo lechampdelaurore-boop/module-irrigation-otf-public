@@ -13295,3 +13295,86 @@ chaque jour), deux fermes sur un lieu (scénario 11), écriture en échec
 écriture et lecture par lieu et par source, remplacement, lecture du matin
 sur la base, purge des 8 jours, plans. `tests/weather-provider.test.ts` :
 l'adresse attendue de la prévision de Visual Crossing porte les heures.
+
+## D-350 — L'ET0 horaire, HR3 : « Soif du jour, heure par heure » dans « Le détail »
+
+Date : 26 novembre 2026. Statut : **codée** ; contrat
+`docs/et0-horaire-contract.md` (§ 4.4, § 4.5, § 7, § 9 ; § 11 scénarios 1,
+2, 5, 6, 7, 8 et 9 ; § 12, PR HR3), roadmap section 6 septendecies,
+ligne 37. Code en Opus 5.5 · Élevé, le réglage de la ligne. Aucune question
+agronomique nouvelle.
+
+**Décision.** Le pli « Le détail » d'« Aujourd'hui » s'ouvre sur un bloc
+« Soif du jour, heure par heure » : une phrase (« D'ici ce soir, il reste
+environ 1,7 mm à consommer sur 2,4 mm »), une petite courbe d'une barre par
+heure du jour (23, 24 ou 25), l'heure en cours marquée, la plage de forte
+évaporation en couleur et dite en clair (« Évaporation la plus forte entre
+11 h et 16 h »), et un « ? » qui dit d'où vient la forme et ce que la
+courbe n'est pas (« Elle ne change pas le besoin de vos planches ni
+l'objectif ; elle montre à quelle heure la journée consomme. »). Trois états :
+forme connue ; forme théorique du soleil, dite dans la phrase ; ET0 du jour
+manquante, « Pas de courbe : l'ET0 du jour manque. », sans courbe ni
+millimètre. Le domaine est `lib/domain/today/day-curve.ts`, le bloc
+`app/irrigation/today/today-day-curve.tsx`. **Aucun chiffre existant ne
+change** : la courbe n'entre dans aucun calcul, aucune alerte, aucun bouton.
+
+Précisions prises en codant (option recommandée, modifiables par le porteur) :
+
+- **F1043** — La place : le contrat met le bloc « sous la ligne « Calcul
+  approximatif » ». Depuis S2, PR 5 (D-330), cette ligne est au premier
+  niveau, au-dessus du pli : le bloc vient **en tête du pli**, donc juste
+  sous elle quand on ouvre « Le détail ». La ligne de résumé du pli le
+  compte (« … · la soif heure par heure · … »).
+- **F1044** — Le total : « l'ET0 de la ferme » est celle que lisent ses
+  calculs pour aujourd'hui (`et0Readings`, `et0OfDay`) : la prévision la plus
+  récente du jour, déjà lue par la page pour le pluviomètre (aucune requête
+  de plus). Sa colonne `source` choisit la forme (contrat, § 9) : la forme
+  écrite d'une autre source n'est jamais prise ; sans forme de cette source,
+  ou avec une forme qui n'a pas une part par heure du jour, la forme
+  théorique, dite.
+- **F1045** — Ce qui est lu : le lieu de la météo de la ferme (sa commune
+  géocodée), puis les formes écrites du jour pour ce lieu, toutes sources
+  (`listDayShapesOfDay`), deux requêtes à la suite, **en même temps** que les
+  autres lectures de la page ; pour la page seulement, jamais pour la
+  pastille du menu, et seulement « Objectifs et besoins » cochée (l'ET0 du
+  jour se lit sous cette case, R1). Sans commune trouvée, pas de bloc.
+- **F1046** — Les mots : le titre prend le mot du tableau (« Soif du
+  jour », D-328) ; « ET0 » ne paraît que dans « Pas de courbe : l'ET0 du
+  jour manque. » (les mots du contrat) et dans le « ? », comme le permet la
+  règle des mots dans le détail repliable.
+- **F1047** — Le soir, quand le reste s'arrondit à 0 mm, la phrase devient
+  « La soif du jour est passée : 2,4 mm aujourd'hui. » plutôt que « il reste
+  environ 0 mm ».
+- **F1048** — « Ancienne » : une forme écrite lue il y a **plus** de
+  6 heures (6 heures pile ne l'est pas) ajoute « Courbe ancienne : lue à
+  6 h 15. ». La forme théorique n'a pas d'heure de lecture : jamais
+  ancienne.
+- **F1049** — La courbe : chaque barre est rapportée à l'heure la plus forte
+  (pleine hauteur) ; l'heure en cours est foncée, avec un trait pointillé
+  sur toute la hauteur pour rester visible la nuit, et la légende la nomme
+  (« Maintenant, 17 h ») ; seules 0 h, 6 h, 12 h et 18 h sont écrites
+  dessous. L'heure et la part de chaque barre sont dans l'infobulle
+  (« 14 h : 13,6 % de la journée, environ 0,3 mm »), à la souris ; au
+  téléphone, l'infobulle ne s'ouvre pas : la phrase, la plage de forte
+  évaporation et l'heure en cours disent l'essentiel. Un lecteur d'écran lit
+  la courbe en une phrase (nature, plage, heure en cours).
+- **F1050** — Une journée sans soleil ni heure du fournisseur (nuit
+  polaire, hors du pilote) : pas de bloc, jamais une courbe à 0.
+
+**Ce que HR3 ne mesure pas.** La forme du fournisseur ou calculée à l'heure
+ne paraît en ligne qu'après une lecture du matin ou de la journée faite
+avec HR2 en ligne ; d'ici là, et pour une ferme dont la lecture n'a pas
+écrit de forme, la forme théorique, dite. Le parcours P73 ne voit que la
+forme théorique (la météo des parcours ne donne pas les heures).
+
+**Tests.** `tests/hourly-et0-ecran.test.ts` (11) : forme connue à midi
+(scénarios 1, 2 et 5), calculée à l'heure, forme d'un autre modèle refusée
+et forme théorique dite (scénario 9), forme de 23 parts refusée un jour de
+24 heures et acceptée un jour de 23 heures (scénarios 6 et 7), ancienne
+après 6 heures, ET0 manquante (scénario 8), le soir et la nuit polaire, les
+mots, la ligne de résumé du pli, la vue gardée par « Objectifs et
+besoins ». `tests/db/day-shapes.test.ts` (+2) : deux fermes du même lieu,
+chacune la forme de sa propre source (Météo-France, Visual Crossing) ; sans
+forme écrite, la forme théorique ; sans ET0 du jour, pas de courbe ;
+« Objectifs et besoins » décochée, rien. Parcours P73 aux deux largeurs
+(320 et 1 440 px).
