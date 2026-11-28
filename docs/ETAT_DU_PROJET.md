@@ -23,7 +23,30 @@ registres, elle y renvoie.
   vidés la veille par d'autres parcours, pas l'eau). Les trois échecs
   reproduits sur `main` sans attendre minuit, puis verts avec la
   correction ; contrôles : voir la PR. Parcours seuls : aucun écran,
-  calcul ni migration. Fusion après la file en cours, une PR à la fois.
+  calcul ni migration. Fusion à son tour, après la ligne 37 et #258.
+  Consigne la mise en ligne de #258 (dc83ae1, fusionnée le 28 novembre
+  2026 à 12 h 38, run 46140842075, en ligne à 13 h 34, cinq jobs verts)
+  et la recette de S6, faite et conforme le 27 novembre 2026 vers
+  12 h 20 (démonstration, ferme vierge, dans le Chrome du porteur, avec
+  son accord) ; celle de #261 l'est déjà (par HR1).
+- **Simplifier l'usage du module, S5 : les millimètres d'abord au
+  démarrage d'un arrosage, demandé par le porteur le 26 novembre 2026 à
+  20 h 10 et codé le même jour** (D-354, F1087 à F1092 ; avenant au
+  contrat S5, section 15), en Opus 5.5 · Élevé, depuis `main`. Dans
+  « Arroser maintenant » et « Planifier », le deuxième bloc devient
+  « Combien de mm ? » : le champ des millimètres, « Conseillé : *n* mm »
+  avec une dose du jour, la durée en résultat (fonction existante) ; le
+  réglage de durée de S5 passe derrière « Saisir une durée », dans « Plus
+  d'options » ; « Déjà fait » ne change pas. Aucun calcul ni aucune
+  écriture changés. Tests ; P64 et P65 réécrits, P24, P31, P37, P38 et
+  P40 suivent. Contrôles : voir la PR. Mise à jour avec `main` le
+  28 novembre 2026, à son tour après la ligne 37. Consigne la mise en
+  ligne de HR2 (#253, 4ede30b, run 46127984783, en ligne le 28 novembre
+  2026 à 10 h 35, cinq jobs verts) et de HR3 (#254, cc1e43e, run
+  46132250984, en ligne à 11 h 30, cinq jobs verts) : **l'ET0 horaire
+  (ligne 37) est en ligne en entier** ; celle de #261 l'est déjà (par HR1). **Fusionnée le 28 novembre
+  2026 à 12 h 38** (#258, dc83ae1), **en ligne à 13 h 34** (run
+  46140842075, cinq jobs verts) ; consigné par #259.
 - **L'ET0 horaire, HR3 : « Soif du jour, heure par heure », codée le
   26 novembre 2026** (D-350, F1043 à F1050 ; contrat
   `docs/et0-horaire-contract.md`, § 7 ; roadmap ligne 37), en Opus 5.5 ·
@@ -315,8 +338,10 @@ registres, elle y renvoie.
   arrosages au lieu de deux) : il le dit « hors jeu ». **Fusionnée** le
   27 novembre 2026 à 1 h 41 (#238, ee5d5f6), après la mise en ligne de la
   PR 3, **en ligne à 2 h 20**, run 45918177942, les cinq jobs verts
-  (consigné par le contrat #240) : **S6 est en ligne en entier**. Recette
-  dans le Chrome du porteur, sur la ferme vierge, avec son accord.
+  (consigné par le contrat #240) : **S6 est en ligne en entier**. **Recette
+  faite et conforme le 27 novembre 2026 vers 12 h 20** (démonstration,
+  ferme vierge, dans le Chrome du porteur, avec son accord ; consignée
+  par #259).
 - **Simplifier l'usage du module, S6, PR 3 sur 4 : les lignes d'état des
   fiches de « Ma ferme », codée le 26 novembre 2026** (D-336, F969 à
   F975 ; contrat, sections 7, 14 et 15), en Opus 5.5 · Très élevé,

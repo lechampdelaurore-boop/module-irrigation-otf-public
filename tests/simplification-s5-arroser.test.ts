@@ -190,16 +190,17 @@ test('les précautions restent au premier niveau : le créneau protégé, la pom
 });
 
 test('« Plus d’options » : fermé par défaut, ouvert seul quand une valeur y est déjà posée, `aria-expanded`', () => {
-  assert.equal(MORE_OPTIONS_LABEL, 'Plus d’options (pompe, note, saisir en mm)');
+  // Depuis D-354 (F1091), la durée passe dans le pli, les mm en sortent.
+  assert.equal(MORE_OPTIONS_LABEL, 'Plus d’options (pompe, note, saisir une durée)');
   assert.equal(moreOptionsLabel('running'), MORE_OPTIONS_LABEL);
   assert.equal(moreOptionsLabel('planned'), MORE_OPTIONS_LABEL);
-  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '', millimetersEntry: false }), false);
+  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '', durationEntry: false }), false);
   // La pompe habituelle du matériel ne l'ouvre pas : elle est dite dans la phrase (S5-k).
-  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: true, pumpIsDefault: true, note: '', millimetersEntry: false }), false);
-  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: true, pumpIsDefault: false, note: '', millimetersEntry: false }), true);
-  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: ' vanne nord ', millimetersEntry: false }), true);
-  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '   ', millimetersEntry: false }), false);
-  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '', millimetersEntry: true }), true);
+  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: true, pumpIsDefault: true, note: '', durationEntry: false }), false);
+  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: true, pumpIsDefault: false, note: '', durationEntry: false }), true);
+  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: ' vanne nord ', durationEntry: false }), true);
+  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '   ', durationEntry: false }), false);
+  assert.equal(moreOptionsOpenAtFirst({ pumpChosen: false, pumpIsDefault: true, note: '', durationEntry: true }), true);
   const form = read(FORM);
   assert.match(form, /aria-expanded=\{moreOpen\}/);
   assert.match(form, /aria-controls=\{`\$\{moreId\}-options`\}/);
@@ -222,16 +223,16 @@ test('tableau 9.3 : chaque champ d’aujourd’hui a sa place, au premier niveau
   assert.match(firstLevel, /whereRowDetail\(item\.kind, reachedBeds\.get\(item\.id\) \?\? 0\)/);
   // Réglage : seulement quand le matériel en a plusieurs.
   assert.match(firstLevel, /selectedEquipment\.settings\.length > 1 \? \(\s*<label className="watering-setting">/);
-  // Heures et minutes : « Combien de temps ? », « − », « + », pastilles ; la saisie exacte dans le pli.
-  assert.match(firstLevel, /\{n\('duration'\)\}\. Combien de temps \?/);
+  // Heures et minutes : « Combien de temps ? » (le titre suit la saisie, D-354), « − », « + », pastilles ; la saisie exacte dans le pli.
+  assert.match(firstLevel, /\{n\('duration'\)\}\. \{howMuchHeading\(entry\)\}/);
   assert.match(firstLevel, /aria-label="Cinq minutes de moins"/);
   assert.match(firstLevel, /aria-label="Cinq minutes de plus"/);
   assert.match(firstLevel, /role="group" aria-label="Durées proposées"/);
   assert.match(more, /<legend>Durée exacte<\/legend>/);
   assert.match(more, /<span>Heures<\/span>/);
   assert.match(more, /<span>Minutes<\/span>/);
-  // Objectif en mm, Quantité souhaitée, Planche de référence : « Saisir en mm » dans le pli, la quantité au premier niveau.
-  assert.match(more, /<span>Saisir en mm<\/span>/);
+  // Objectif en mm, Quantité souhaitée : au premier niveau, d'abord (D-354) ; « Saisir une durée » et la planche de référence dans le pli.
+  assert.match(more, /<span>Saisir une durée<\/span>/);
   assert.match(firstLevel, /<span>Quantité souhaitée<\/span>/);
   assert.match(more, /<span>Planche de référence<\/span>/);
   assert.match(more, /selectedEquipment\?\.kind === 'sprinkler'/);
@@ -285,7 +286,8 @@ test('un seul matériel prêt est choisi d’office, sauf pendant une modificati
   const reset = read(STATE).slice(read(STATE).indexOf('const reset = () => {'));
   assert.match(reset, /setPreparationMode\('amount'\);/);
   assert.match(reset, /setTargetMillimeters\(''\);/);
-  assert.match(reset, /setMillimetersEntry\(false\);/);
+  // Le formulaire vidé repart en millimètres (D-354, F1087).
+  assert.match(reset, /setMillimetersEntry\(DEFAULT_AMOUNT_ENTRY === 'millimeters'\);/);
 });
 
 test('les cibles : « − » et « + » ronds de 52 px, pastilles, lignes de « Où ? » et « Plus d’options » à 44 px', () => {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { MISSING_BEDS, MISSING_DURATION, MISSING_WHERE, moreOptionsLabel } from '../lib/domain/watering-now.ts';
+import { MISSING_AMOUNT, MISSING_BEDS, MISSING_DURATION, MISSING_WHERE, moreOptionsLabel } from '../lib/domain/watering-now.ts';
 import {
   MISSING_PERIOD,
   MISSING_START,
@@ -69,6 +69,8 @@ test('« Planifier · demain à 6 h » : ce qui manque dans l’ordre des blocs,
   assert.equal(noStart.accessibleName, 'Planifier l’arrosage de Goutte nord');
   assert.equal(planButton({ ...ready, start: new Date(Number.NaN) }).missing, MISSING_START, 'un début illisible (point ouvert 46)');
   assert.equal(planButton({ ...ready, durationSeconds: 0 }).missing, MISSING_DURATION);
+  // En millimètres, la saisie par défaut depuis D-354 : les mots suivent (F1090).
+  assert.equal(planButton({ ...ready, durationSeconds: 0, entry: 'millimeters' }).missing, MISSING_AMOUNT);
   assert.equal(planButton({ ...ready, reachedBeds: 0 }).missing, MISSING_BEDS);
 });
 

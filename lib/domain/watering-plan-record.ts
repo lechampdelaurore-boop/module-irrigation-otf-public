@@ -1,6 +1,6 @@
 import { clockText } from './clock-text.ts';
 import { addDaysToDateKey, dateKeyInTimeZone, FARM_TIME_ZONE } from './water-management.ts';
-import { MISSING_BEDS, MISSING_DURATION, MISSING_WHERE, type StartButton } from './watering-now.ts';
+import { type AmountEntry, MISSING_BEDS, MISSING_WHERE, missingHowMuch, type StartButton } from './watering-now.ts';
 
 /**
  * « Planifier » et « Déjà fait » sur le squelette d'« Arroser maintenant »
@@ -21,7 +21,7 @@ export const WATERING_TAB_LABELS: Record<WateringTab, string> = {
   completed: 'Déjà fait',
 };
 
-/** Un bloc du formulaire : « Où ? », « Quand ? », « Combien de temps ? », « De quand à quand ? ». */
+/** Un bloc du formulaire : « Où ? », « Quand ? », « Combien de mm ? » (ou « Combien de temps ? », D-354), « De quand à quand ? ». */
 export type WateringBlock = 'where' | 'when' | 'duration' | 'period';
 
 /**
@@ -66,20 +66,22 @@ export function plannedDayText(start: Date, now: Date, timeZone = FARM_TIME_ZONE
 /**
  * Le bouton de « Planifier » (section 4, section 6) : « Planifier · demain à
  * 6 h », lu « Planifier l'arrosage de Goutte nord, demain à 6 h ». Ce qui
- * manque se dit dans l'ordre des blocs : où, quand, combien de temps.
+ * manque se dit dans l'ordre des blocs : où, quand, combien (F1090).
  */
-export function planButton({ equipmentName, start, durationSeconds, reachedBeds, now }: {
+export function planButton({ equipmentName, start, durationSeconds, reachedBeds, now, entry = 'duration' }: {
   equipmentName: string | null;
   /** Le début tapé, `null` tant qu'il ne se lit pas. */
   start: Date | null;
   durationSeconds: number | null;
   reachedBeds: number;
   now: Date;
+  /** La façon de dire « combien » : elle choisit les mots de ce qui manque (F1090). */
+  entry?: AmountEntry;
 }): StartButton {
   const startKnown = start !== null && Number.isFinite(start.getTime());
   const missing = equipmentName === null ? MISSING_WHERE
     : !startKnown ? MISSING_START
-      : durationSeconds === null || !(durationSeconds > 0) ? MISSING_DURATION
+      : durationSeconds === null || !(durationSeconds > 0) ? missingHowMuch(entry)
         : reachedBeds === 0 ? MISSING_BEDS : null;
   const when = startKnown ? `${plannedDayText(start, now)} à ${clockText(start)}` : null;
   return {

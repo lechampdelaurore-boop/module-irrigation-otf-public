@@ -323,6 +323,8 @@ export function IrrigationEventManager({
     setSettingId(item.settingId);
     setPumpId(item.pumpId ?? '');
     setPumpOriginId(item.pumpOriginId ?? '');
+    // La durée enregistrée se relit telle quelle : la saisie passe en durée, « Plus d'options » s'ouvre (D-354, F1092).
+    form.setMillimetersEntry(false);
     setPreparationMode('duration');
     setDurationHours(String(Math.floor(hoursFromSeconds(item.plannedDurationSeconds))));
     setDurationMinutes(String(Math.round((item.plannedDurationSeconds % SECONDS_PER_HOUR) / 60)));

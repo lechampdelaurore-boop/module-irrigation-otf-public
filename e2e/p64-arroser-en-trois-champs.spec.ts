@@ -11,9 +11,9 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLesReglagesDeLaPag
  * rendre en partant.
  *
  * - Un seul matériel prêt : « Arroser maintenant » le choisit d'office et le
- *   dit ; sans dose du jour, aucune durée n'est choisie (« — »), « − » est
- *   inactif, le bouton dit ce qui manque (« Choisissez une durée. ») ;
- *   « Plus d'options » est fermé.
+ *   dit ; « 2. Combien de mm ? » (D-354) : sans dose du jour, la quantité
+ *   est vide et la durée inconnue (« soit — »), le bouton dit ce qui manque
+ *   (« Indiquez combien de mm apporter. ») ; « Plus d'options » est fermé.
  * - Deux matériels : rien de choisi (« Choisissez où arroser. ») ; chaque
  *   ligne de « Où ? » dit son type et ses planches. La hauteur du premier
  *   bloc est mesurée, sans et avec un arrosage en cours (PR 3, section 7) :
@@ -21,12 +21,14 @@ import { attendreLaPageIrrigation, attendreLaPagePrete, ouvrirLesReglagesDeLaPag
  *   tenu depuis D-342 (F996, F997) : la carte de l'arrosage en cours,
  *   rangée plus serré au téléphone, le met vers 650 px avec le nom long d'un
  *   parcours (800 px avant, F910).
- * - Trois touches, sans clavier : la case ronde, « + » (30 min), « Démarrer ·
- *   fin vers … » ; la phrase du résultat dit 5 mm et 113 L ; la réponse sous
- *   le bouton, l'arrosage en cours en tête de page, le formulaire vidé.
- * - Le réglage de la durée : « + » et « − » de cinq en cinq, les pastilles
- *   « 30 min » et « 1 h » ; « Saisir en mm » fait de la durée le résultat
- *   (« soit 30 min » pour 5 mm à 10 mm/h).
+ * - Deux touches et la quantité : la case ronde, « 5 » mm (soit 30 min),
+ *   « Démarrer · fin vers … » ; la phrase du résultat dit 5 mm et 113 L ; la
+ *   réponse sous le bouton, l'arrosage en cours en tête de page, le
+ *   formulaire vidé, de nouveau en mm (D-354, F1087). Avec une dose du jour,
+ *   la quantité est déjà remplie : deux touches, sans clavier.
+ * - La saisie d'une durée, dans « Plus d'options » (F1091) : « + » et « − »
+ *   de cinq en cinq, les pastilles « 30 min » et « 1 h » ; décochée, on
+ *   revient aux millimètres.
  * - Une pompe trop petite, habituelle du matériel : la phrase la dit
  *   (« Avec la pompe … ») et le dépassement se lit au premier niveau, hors de
  *   « Plus d'options », qui reste fermé.
@@ -41,7 +43,7 @@ test.setTimeout(240_000);
 
 const DEBIT_DE_LA_POMPE_M3_H = '0,05';
 
-test('arroser maintenant en trois touches : où, combien de temps, démarrer ; les précautions au premier niveau', async ({ page, context }, testInfo) => {
+test('arroser maintenant : où, combien de mm, démarrer ; les précautions au premier niveau', async ({ page, context }, testInfo) => {
   const journal = surveillerLaConsole(page);
   const telephone = testInfo.project.name === 'telephone';
   await ouvrirUneFermeToutCochee(page, context, testInfo, 's5-arroser');
@@ -55,10 +57,12 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await expect(page.getByRole('tab', { name: /^Arroser maintenant/ })).toHaveAttribute('aria-selected', 'true');
   await expect(formulaire.getByRole('radio', { name: a.materiel, exact: true })).toBeChecked();
   await expect(formulaire).toContainText('Le seul matériel prêt à arroser est choisi.');
-  await expect(formulaire.locator('.watering-duration strong')).toHaveText('—');
+  await expect(formulaire.getByRole('heading', { level: 3 })).toHaveText(['1. Où ?', '2. Combien de mm ?']);
+  await expect(formulaire.getByLabel('Quantité souhaitée')).toHaveValue('');
+  await expect(formulaire.locator('.watering-duration-result strong')).toHaveText('—');
   await expect(formulaire.getByRole('button', { name: /^Conseillé/ })).toHaveCount(0);
-  await expect(formulaire.getByRole('button', { name: 'Cinq minutes de moins' })).toBeDisabled();
-  await expect(formulaire.locator('.watering-missing')).toHaveText('Choisissez une durée.');
+  await expect(formulaire.getByRole('button', { name: 'Cinq minutes de moins' })).toHaveCount(0);
+  await expect(formulaire.locator('.watering-missing')).toHaveText('Indiquez combien de mm apporter.');
   await expect(formulaire.locator('.start-irrigation-button')).toBeDisabled();
   await expect(page.getByRole('button', { name: /^Plus d’options/ })).toHaveAttribute('aria-expanded', 'false');
   await expect(formulaire.getByLabel('Note (facultatif)')).toBeHidden();
@@ -85,41 +89,48 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   }
   await verifierLEtape(page, journal, 'deux matériels, rien de choisi');
 
-  // Le réglage de la durée, de cinq en cinq, et les pastilles.
+  // Les millimètres d'abord : 5 mm à 10 mm/h, soit 30 min (D-354).
   await formulaire.getByRole('radio', { name: a.materiel, exact: true }).check();
+  const quantite = formulaire.getByLabel('Quantité souhaitée');
+  const resultatDuree = formulaire.locator('.watering-duration-result strong');
+  await quantite.fill('5');
+  await expect(resultatDuree).toHaveText('30 min');
+  // « Saisir une durée », dans « Plus d'options » : « + » et « − » de cinq en cinq, et les pastilles (F1091).
+  const options = await ouvrirPlusDOptions(page);
+  await options.getByRole('checkbox', { name: 'Saisir une durée' }).check();
+  await expect(formulaire.getByRole('heading', { level: 3 })).toHaveText(['1. Où ?', '2. Combien de temps ?']);
   const plus = formulaire.getByRole('button', { name: 'Cinq minutes de plus' });
   const moins = formulaire.getByRole('button', { name: 'Cinq minutes de moins' });
   const duree = formulaire.locator('.watering-duration strong');
-  await plus.click();
   await expect(duree).toHaveText('30 min');
-  await expect(formulaire.getByRole('button', { name: '30 min', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await plus.click();
   await expect(duree).toHaveText('35 min');
   await expect(formulaire.getByRole('button', { name: '30 min', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  await formulaire.getByRole('button', { name: '30 min', exact: true }).click();
+  await expect(formulaire.getByRole('button', { name: '30 min', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await formulaire.getByRole('button', { name: '1 h', exact: true }).click();
   await expect(duree).toHaveText('1 h');
   await moins.click();
   await expect(duree).toHaveText('55 min');
-  // « Saisir en mm » : 5 mm à 10 mm/h, soit 30 min.
-  const options = await ouvrirPlusDOptions(page);
-  await options.getByRole('checkbox', { name: 'Saisir en mm' }).check();
-  await page.getByLabel('Quantité souhaitée').fill('5');
-  await expect(formulaire.locator('.watering-duration-result')).toContainText('soit 30 min');
-  await options.getByRole('checkbox', { name: 'Saisir en mm' }).uncheck();
-  await expect(duree).toHaveText('30 min');
   if (telephone) {
     await verifierCibleTactile(plus, '« + »');
     await verifierCibleTactile(formulaire.getByRole('button', { name: '1 h', exact: true }), 'La pastille « 1 h »');
   }
-  await verifierLEtape(page, journal, 'la durée réglée au « + », au « − », aux pastilles et en mm');
+  // Décochée : retour aux millimètres, la quantité tapée redonne sa durée.
+  await options.getByRole('checkbox', { name: 'Saisir une durée' }).uncheck();
+  await expect(formulaire.getByRole('heading', { level: 3 })).toHaveText(['1. Où ?', '2. Combien de mm ?']);
+  await expect(quantite).toHaveValue('5');
+  await expect(resultatDuree).toHaveText('30 min');
+  await verifierLEtape(page, journal, 'la quantité en mm, puis la durée au « + », au « − » et aux pastilles');
 
-  // Trois touches, sans clavier, depuis « aucun matériel choisi » : la page relue repart de rien.
+  // Deux touches et la quantité, depuis « aucun matériel choisi » : la page relue repart de rien, en mm.
   await page.reload();
   await attendreLaPagePrete(page, 'arrosages');
   await expect(formulaire.getByRole('radio', { checked: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Plus d’options/ })).toHaveAttribute('aria-expanded', 'false');
   let touches = 0;
   await formulaire.getByRole('radio', { name: a.materiel, exact: true }).check(); touches += 1;
-  await plus.click(); touches += 1;
+  await quantite.fill('5');
   // 10 mm/h pendant 30 min sur N01 (30 m × 0,75 m) : 5 mm, 112,5 L.
   await expect(formulaire.locator('.watering-result').first()).toHaveText(/^Soit 5 mm sur la planche, et 113 L\.$/);
   const demarrer = page.getByRole('button', { name: new RegExp(`^Démarrer l’arrosage de ${a.materiel}, fin vers \\d{1,2} h( \\d{2})?$`) });
@@ -130,11 +141,12 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await expect(page.getByLabel('Irrigations en cours')).toContainText(a.materiel);
   // La page reste ; un lien sous la réponse mène à la carte d'« Aujourd'hui » (S5-g, PR 3).
   await expect(formulaire.getByRole('link', { name: 'Voir l’arrosage en cours sur Aujourd’hui' })).toBeVisible();
-  // Le formulaire vidé (F406) : rien de choisi, aucune durée.
+  // Le formulaire vidé (F406) : rien de choisi, aucune quantité, de nouveau en mm (F1087).
   await expect(formulaire.getByRole('radio', { checked: true })).toHaveCount(0);
-  await expect(duree).toHaveText('—');
-  expect(touches, 'trois touches pour démarrer un arrosage').toBe(3);
-  testInfo.annotations.push({ type: 'mesure', description: `${touches} touches, sans clavier, d’aucun matériel choisi à l’arrosage en cours (${testInfo.project.name})` });
+  await expect(quantite).toHaveValue('');
+  await expect(resultatDuree).toHaveText('—');
+  expect(touches, 'deux touches et la quantité pour démarrer un arrosage').toBe(2);
+  testInfo.annotations.push({ type: 'mesure', description: `${touches} touches et la quantité au clavier, d’aucun matériel choisi à l’arrosage en cours (${testInfo.project.name})` });
   await page.reload();
   await attendreLaPagePrete(page, 'arrosages');
   const ouAvecArrosage = await hautDuPremierBloc(page);
@@ -150,7 +162,7 @@ test('arroser maintenant en trois touches : où, combien de temps, démarrer ; l
   await choisirLaPompeHabituelle(page, b.materiel, pompe);
   await attendreLaPageIrrigation(page, 'arrosages');
   await formulaire.getByRole('radio', { name: b.materiel, exact: true }).check();
-  await plus.click();
+  await quantite.fill('5');
   await expect(formulaire.getByText(`Avec la pompe ${pompe}.`)).toBeVisible();
   const premierNiveau = formulaire.locator('.watering-block .hydraulic-indicator.is-exceeded');
   await expect(premierNiveau).toBeVisible();

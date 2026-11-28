@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { localDateTimeInputValue } from '@/lib/domain/irrigation-timer';
+import { DEFAULT_AMOUNT_ENTRY } from '@/lib/domain/watering-now';
 import { MILLISECONDS_PER_HOUR } from '@/lib/domain/units';
 import type { IrrigationPreparationMode } from '../irrigation-event/contract';
 import type { CreationKind } from './presentation';
@@ -11,7 +12,8 @@ import type { CreationKind } from './presentation';
  * propre fichier (simplification S5, PR 1, section 2). Les valeurs et leurs
  * premiers états sont ceux d'avant ; seul le retour au premier état après
  * une réussite ramène aussi le mode à « Objectif en mm », sans quantité :
- * aucune durée n'y reste choisie (F406, F899).
+ * aucune durée n'y reste choisie (F406, F899). Depuis D-354 (F1087), le
+ * formulaire neuf ou vidé dit « combien » en millimètres, la durée en résultat.
  */
 export function useCreationForm(initialNowIso: string) {
   const [creationKind, setCreationKind] = useState<CreationKind>('running');
@@ -35,8 +37,8 @@ export function useCreationForm(initialNowIso: string) {
   );
   const [actualEndAt, setActualEndAt] = useState(() => localDateTimeInputValue(new Date(initialNowIso)));
   const [note, setNote] = useState('');
-  // « Saisir en mm » de « Plus d'options » (S5, section 3.4) : le champ « Combien ? » en millimètres.
-  const [millimetersEntry, setMillimetersEntry] = useState(false);
+  // « Combien ? » en millimètres d'abord (D-354, F1087) ; « Saisir une durée » de « Plus d'options » l'éteint.
+  const [millimetersEntry, setMillimetersEntry] = useState(DEFAULT_AMOUNT_ENTRY === 'millimeters');
   const [editingEventEquipmentId, setEditingEventEquipmentId] = useState<string | null>(null);
 
   /** Après une réussite, le formulaire se vide : rien ne se renvoie d'un second appui (F406). Les dates restent. */
@@ -51,7 +53,7 @@ export function useCreationForm(initialNowIso: string) {
     setDurationHours('1');
     setDurationMinutes('0');
     setNote('');
-    setMillimetersEntry(false);
+    setMillimetersEntry(DEFAULT_AMOUNT_ENTRY === 'millimeters');
     setEditingEventEquipmentId(null);
   };
 
