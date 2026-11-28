@@ -35,6 +35,8 @@ const demo = readConfig('wrangler.demo.jsonc');
 test('la démonstration est un autre Worker, sur une autre base, au même code et au même runtime', () => {
   assert.notEqual(demo.name, production.name);
   assert.equal(demo.main, 'demo-worker.ts');
+  // La production a le sien : celui de vinext sous le chronomètre des requêtes (accélérer le site, A1, D-358).
+  assert.equal(production.main, 'site-worker.ts');
   assert.equal(demo.compatibility_date, production.compatibility_date);
   assert.deepEqual(demo.compatibility_flags, production.compatibility_flags);
   assert.equal(demo.d1_databases.length, 1);

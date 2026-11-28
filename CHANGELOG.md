@@ -5,6 +5,18 @@ source détaillée commit par commit.
 
 ## Non publié
 
+### Ajouté (accélérer le site, A1 : le serveur dit son temps)
+
+- **Chaque page dit le temps de son serveur** (D-358, F1101 à F1106) :
+  chaque réponse du module, sur le site comme sur la démonstration, porte
+  l'en-tête `Server-Timing`, lisible dans les outils de développement du
+  navigateur : le temps passé par le serveur, le nombre d'appels à la base,
+  à Ouvre ta ferme, à la météo et aux autres services, avec leur temps, et
+  si l'instance du serveur venait de démarrer. Le journal du Worker reçoit
+  la même mesure, une ligne par requête, sans adresse ni identifiant de
+  personne. Rien ne change à l'écran ni dans les calculs ; c'est la mesure
+  qui guidera les deux accélérations suivantes.
+
 ### Modifié (simplifier l'usage du module, S5 : les millimètres d'abord)
 
 - **Démarrer un arrosage en millimètres** (D-354, F1087 à F1092) : dans

@@ -12,6 +12,23 @@ Section courte à lire d'abord à la reprise (AGENTS.md, « Économie de jetons 
 Toute PR qui change l'état du projet la met à jour ; elle ne remplace pas les
 registres, elle y renvoie.
 
+- **Accélérer le site, A1 : le serveur dit son temps, demandé par le
+  porteur le 28 novembre 2026 à 13 h 44 et codé le même jour** (D-358,
+  F1101 à F1106 ; contrat `docs/acceleration-du-site-contract.md`,
+  section 3 ; roadmap ligne 38), en Opus 5.5 · Max, depuis `main`.
+  Chaque réponse du Worker, en production comme en démonstration, porte
+  l'en-tête `Server-Timing` (le temps du serveur ; les appels à la base,
+  à Ouvre ta ferme, à la météo et aux autres services, leur nombre et
+  leur temps ; l'instance neuve ou chaude), et le journal une ligne
+  `irrigation_request_timing`, sans adresse ni identifiant. Point
+  d'entrée de la production : `site-worker.ts`, celui de vinext sous le
+  chronomètre ; celui de la démonstration y passe aussi. Aucun écran,
+  aucun calcul, aucune migration, aucun réglage de Cloudflare. Relevé en
+  local : « Aujourd'hui », 101 appels à la base ; la première ouverture
+  d'un espace de démonstration, 935 dans une seule requête. Tests ;
+  parcours P75 et V13. Contrôles : voir la PR. Fusion à son tour, après
+  #259 ; puis le nouveau mesurage du démarrage à froid, sur la
+  démonstration ; A2, puis A3, suivent.
 - **Simplifier l'usage du module, S5 : les millimètres d'abord au
   démarrage d'un arrosage, demandé par le porteur le 26 novembre 2026 à
   20 h 10 et codé le même jour** (D-354, F1087 à F1092 ; avenant au
