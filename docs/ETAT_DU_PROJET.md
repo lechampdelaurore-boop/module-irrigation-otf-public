@@ -60,9 +60,10 @@ registres, elle y renvoie.
   aucun calcul, aucune migration, aucun réglage de Cloudflare. Relevé en
   local : « Aujourd'hui », 101 appels à la base ; la première ouverture
   d'un espace de démonstration, 935 dans une seule requête. Tests ;
-  parcours P75 et V13. Contrôles : voir la PR. Fusion à son tour ; puis
-  le nouveau mesurage du démarrage à froid, sur la démonstration ; A2,
-  puis A3, suivent. Consigne la mise en ligne de #259 (1be6469,
+  parcours P75 et V13. Contrôles : voir la PR. **Fusionnée le 28 novembre
+  2026 à 16 h 25 et en ligne à 17 h 13** (#263, bf7f6eb, run 46159813202,
+  cinq jobs verts) ; reste le nouveau mesurage du démarrage à froid, sur
+  la démonstration ; A2, puis A3, suivent. Consigne la mise en ligne de #259 (1be6469,
   fusionnée le 28 novembre 2026 à 14 h 36, run 46150424037, en ligne à
   15 h 28, cinq jobs verts).
 - **Parcours navigateur à cheval sur minuit : P63, P12 et P37 corrigés
